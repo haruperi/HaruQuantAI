@@ -19,6 +19,7 @@ Utility Helpers:
     - needs_approval_result
     - needs_clarification_result
     - shared exception and error taxonomy helpers
+    - trace ID generation and validation helpers
 """
 
 # errors.py utility helpers
@@ -60,6 +61,26 @@ from tools.utils.errors import (
     is_success_retcode,
     message_for,
     raise_for_retcode,
+)
+
+# ids.py utility helpers
+from tools.utils.ids import (
+    ID_SEPARATOR,
+    REQUEST_ID_PREFIX,
+    RUN_ID_PREFIX,
+    TOOL_CALL_ID_PREFIX,
+    UUID_HEX_LENGTH,
+    VALID_ID_PREFIXES,
+    WORKFLOW_ID_PREFIX,
+    is_request_id,
+    is_run_id,
+    is_tool_call_id,
+    is_valid_prefixed_id,
+    is_workflow_id,
+    new_request_id,
+    new_run_id,
+    new_tool_call_id,
+    new_workflow_id,
 )
 
 # logger.py utilities and AI tools
@@ -141,6 +162,23 @@ __all__ = [
     "is_success_retcode",
     "message_for",
     "raise_for_retcode",
+    # ids.py utilities
+    "ID_SEPARATOR",
+    "REQUEST_ID_PREFIX",
+    "RUN_ID_PREFIX",
+    "TOOL_CALL_ID_PREFIX",
+    "UUID_HEX_LENGTH",
+    "VALID_ID_PREFIXES",
+    "WORKFLOW_ID_PREFIX",
+    "is_request_id",
+    "is_run_id",
+    "is_tool_call_id",
+    "is_valid_prefixed_id",
+    "is_workflow_id",
+    "new_request_id",
+    "new_run_id",
+    "new_tool_call_id",
+    "new_workflow_id",
     # logger.py utilities
     "CRITICAL",
     "DEBUG",
