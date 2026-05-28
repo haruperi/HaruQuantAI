@@ -165,6 +165,27 @@ from tools.utils.result import (
     success_result,
 )
 
+# security.py utility helpers and AI tools
+from tools.utils.security import (
+    REDACTED,
+    REDACTED_VALUE,
+    SENSITIVE_KEYWORDS,
+    SecretRef,
+    SecretRotationPolicy,
+    decrypt_data_value,
+    encrypt_data_value,
+    generate_encryption_key,
+    hash_password_value,
+    is_sensitive_key,
+    redact_mapping,
+    redact_scalar_value,
+    redact_text,
+    rotation_policy_to_dict,
+    secret_ref_to_dict,
+    select_active_secret_version,
+    verify_password_value,
+)
+
 # validators.py utility helpers and AI tools
 from tools.utils.validators import (
     REQUIRED_OHLC_COLUMNS,
@@ -309,6 +330,24 @@ __all__ = [
     "needs_approval_result",
     "needs_clarification_result",
     "success_result",
+    # security.py helpers and official AI tools
+    "REDACTED",
+    "REDACTED_VALUE",
+    "SENSITIVE_KEYWORDS",
+    "SecretRef",
+    "SecretRotationPolicy",
+    "decrypt_data_value",
+    "encrypt_data_value",
+    "generate_encryption_key",
+    "hash_password_value",
+    "is_sensitive_key",
+    "redact_mapping",
+    "redact_scalar_value",
+    "redact_text",
+    "rotation_policy_to_dict",
+    "secret_ref_to_dict",
+    "select_active_secret_version",
+    "verify_password_value",
     # validators.py helpers and official AI tools
     "REQUIRED_OHLC_COLUMNS",
     "prepare_ohlcv_data",

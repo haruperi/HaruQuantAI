@@ -38,5 +38,6 @@ structlog>=24.4.0
 python-telegram-bot>=21.4
 
 # Security / Auth
+cryptography>=48.0.0
 passlib[bcrypt]>=1.7.4
 python-jose[cryptography]>=3.3.0
