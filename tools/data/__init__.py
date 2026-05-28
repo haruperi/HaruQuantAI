@@ -25,6 +25,9 @@ from tools.data.dukascopy import (
     dukascopy_data_resolve_instrument,
 )
 
+# generators.py tools
+from tools.data.generators import data_generate_ticks, gbm_data_generate
+
 # mt5.py tools
 from tools.data.mt5 import (
     mt5_connection_check,
@@ -58,6 +61,9 @@ __all__ = [
     "dukascopy_data_list_symbols",
     "dukascopy_data_load",
     "dukascopy_data_resolve_instrument",
+    # generators.py tools
+    "data_generate_ticks",
+    "gbm_data_generate",
     # mt5.py tools
     "mt5_connection_check",
     "mt5_data_get_bars",
