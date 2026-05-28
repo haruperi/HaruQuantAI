@@ -1,4 +1,4 @@
-"""Result helpers for HaruQuantAI utilities.
+﻿"""Result helpers for HaruQuantAI utilities.
 
 Builds standard structured result dictionaries for HaruQuant utilities,
 workflows, tools, and runtime layers.

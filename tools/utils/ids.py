@@ -1,4 +1,4 @@
-"""Trace identifier generation and validation helpers.
+﻿"""Trace identifier generation and validation helpers.
 
 Generates and validates prefixed identifiers used for request, workflow, run,
 and tool-call traceability across HaruQuant workflows.

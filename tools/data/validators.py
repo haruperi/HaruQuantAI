@@ -1,4 +1,4 @@
-# mypy: disable-error-code=no-untyped-def
+﻿# mypy: disable-error-code=no-untyped-def
 """OHLCV market-data preparation and quality validation utilities.
 
 Exported AI Tools:
@@ -34,7 +34,7 @@ from typing import Any, Protocol, cast
 import numpy as np
 import pandas as pd
 
-from tools.utils.logger import logger
+from tools.utils import logger
 
 TOOL_NAME = "validate_ohlcv_quality"
 TOOL_VERSION = "1.0.0"

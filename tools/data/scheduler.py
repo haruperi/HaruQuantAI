@@ -1,4 +1,4 @@
-"""In-memory scheduled data updater tools for HaruQuantAI.
+﻿"""In-memory scheduled data updater tools for HaruQuantAI.
 
 This module provides safe, bounded, AI-callable tools for creating and managing
 local scheduled data updater state. It intentionally avoids exposing unbounded
@@ -38,7 +38,7 @@ from uuid import uuid4
 
 import pandas as pd
 
-from tools.utils.logger import logger
+from tools.utils import logger
 
 from ._common import Data, _frame_from_payload
 

@@ -1,4 +1,4 @@
-"""Synthetic and transformed market-data generation tools for HaruQuantAI.
+﻿"""Synthetic and transformed market-data generation tools for HaruQuantAI.
 
 Purpose:
     Provide deterministic, testable helpers for generating synthetic OHLCV
@@ -32,7 +32,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Union, cast
 import numpy as np
 import pandas as pd
 
-from tools.utils.logger import logger
+from tools.utils import logger
 
 TOOL_VERSION = "1.0.0"
 TOOL_CATEGORY = "data"

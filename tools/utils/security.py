@@ -39,7 +39,6 @@ Classes:
 
 from __future__ import annotations
 
-import logging
 import re
 import time
 from dataclasses import dataclass
@@ -49,8 +48,7 @@ from typing import Any, Mapping, Sequence, cast
 from cryptography.fernet import Fernet
 from passlib.context import CryptContext
 
-logger = logging.getLogger(__name__)
-
+from tools.utils.logger import logger
 
 TOOL_VERSION = "1.0.0"
 TOOL_CATEGORY = "utils"

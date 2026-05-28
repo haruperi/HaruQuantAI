@@ -43,8 +43,6 @@ from fnmatch import fnmatch
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Optional
 
-from tools.utils.security import _redact_mapping, _redact_text
-
 try:
     _STRUCTLOG_MODULE: Any = importlib.import_module("structlog")
     _HAS_STRUCTLOG = True
@@ -95,6 +93,20 @@ _DEFAULT_FILE_SINKS_CONFIGURED = False
 _WORKER_LOG_QUEUE: Optional[Any] = None
 _QUEUE_LISTENER_RUNNING = False
 _QUEUE_LISTENER_LOCK = threading.Lock()
+
+
+def _redact_mapping(value: Dict[str, Any]) -> Dict[str, Any]:
+    """Redact a mapping through the security helper using a lazy import."""
+    from tools.utils.security import _redact_mapping as redact_mapping
+
+    return redact_mapping(value)
+
+
+def _redact_text(value: str) -> str:
+    """Redact text through the security helper using a lazy import."""
+    from tools.utils.security import _redact_text as redact_text
+
+    return redact_text(value)
 
 
 @dataclass(frozen=True)

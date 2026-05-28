@@ -1,4 +1,4 @@
-"""Shared HaruQuant exception and error taxonomy helpers.
+﻿"""Shared HaruQuant exception and error taxonomy helpers.
 
 Defines shared HaruQuant exception types, error descriptors, and deterministic
 MT5/runtime error lookup helpers.

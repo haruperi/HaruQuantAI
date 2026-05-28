@@ -204,8 +204,21 @@ from tools.utils.security import (
 
 # validators.py utility helpers and AI tools
 from tools.utils.validators import (
+    ACTIVATOR_COLUMN_DEFAULTS,
     REQUIRED_OHLC_COLUMNS,
+    SIGNAL_COLUMN_DEFAULTS,
+    apply_warmup_policy,
+    assert_dataframe,
+    assert_ohlc_dataframe,
+    ensure_dataframe,
+    ensure_no_signal_columns,
+    ensure_signal_columns,
     prepare_ohlcv_data,
+    require_columns,
+    require_known_warmup_policy,
+    require_positive_float,
+    require_positive_int,
+    serialize_dataframe,
     validate_approval_packet,
     validate_artifact_reference,
     validate_blocked_actions,
@@ -217,6 +230,10 @@ from tools.utils.validators import (
     validate_output_schema,
     validate_registry_entry,
     validate_required_fields,
+    validate_strategy_actions,
+    validate_strategy_dataframe,
+    validate_trade_action_object,
+    validate_trade_actions,
 )
 
 __all__ = [
@@ -378,8 +395,21 @@ __all__ = [
     "select_active_secret_version",
     "verify_password_value",
     # validators.py helpers and official AI tools
+    "ACTIVATOR_COLUMN_DEFAULTS",
     "REQUIRED_OHLC_COLUMNS",
+    "SIGNAL_COLUMN_DEFAULTS",
+    "apply_warmup_policy",
+    "assert_dataframe",
+    "assert_ohlc_dataframe",
+    "ensure_dataframe",
+    "ensure_no_signal_columns",
+    "ensure_signal_columns",
     "prepare_ohlcv_data",
+    "require_columns",
+    "require_known_warmup_policy",
+    "require_positive_float",
+    "require_positive_int",
+    "serialize_dataframe",
     "validate_approval_packet",
     "validate_artifact_reference",
     "validate_blocked_actions",
@@ -391,4 +421,8 @@ __all__ = [
     "validate_output_schema",
     "validate_registry_entry",
     "validate_required_fields",
+    "validate_strategy_actions",
+    "validate_strategy_dataframe",
+    "validate_trade_action_object",
+    "validate_trade_actions",
 ]

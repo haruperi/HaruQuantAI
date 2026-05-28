@@ -1,4 +1,4 @@
-"""MetaTrader 5 market-data tools for HaruQuantAI.
+﻿"""MetaTrader 5 market-data tools for HaruQuantAI.
 
 Purpose:
     Provide safe, read-only, agent-callable MT5 market-data tools that load
@@ -54,7 +54,7 @@ try:  # pragma: no cover - exercised through mocks in unit tests.
 except ImportError:  # pragma: no cover - allows tests/dev machines without MT5.
     _mt5_module = None
 
-from tools.utils.logger import logger
+from tools.utils import logger
 from tools.utils.standard import ToolStandardSpec, standard_tool_response
 
 from ._common import _filter_symbols, _serialize_frame_records

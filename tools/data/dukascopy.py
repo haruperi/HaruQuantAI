@@ -1,4 +1,4 @@
-"""Dukascopy market-data tools for HaruQuantAI.
+﻿"""Dukascopy market-data tools for HaruQuantAI.
 
 Purpose:
     Provide safe, agent-callable tools for resolving Dukascopy instruments,
@@ -48,8 +48,8 @@ import pandas as pd
 import requests
 
 from tools.data.dukascopy_instruments import INSTRUMENT_MAP
+from tools.utils import logger
 from tools.utils.common import bars_to_records, get_cached_dataframe
-from tools.utils.logger import logger
 from tools.utils.normalization import evaluate_freshness, format_timestamp_z, to_utc
 from tools.utils.validators import prepare_ohlcv_data
 

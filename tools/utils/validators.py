@@ -1,4 +1,4 @@
-"""Generic AI-callable validation tools for HaruQuant agents and workflows.
+﻿"""Generic AI-callable validation tools for HaruQuant agents and workflows.
 
 Exported AI Tools:
     - validate_required_fields
@@ -12,6 +12,10 @@ Exported AI Tools:
     - validate_artifact_reference
     - validate_registry_entry
     - validate_blocked_actions
+    - validate_strategy_dataframe
+    - validate_trade_actions
+    - validate_strategy_actions
+    - normalize_signal_columns
 
 Internal Helpers:
     - _metadata
@@ -19,6 +23,7 @@ Internal Helpers:
     - _error_response
     - _validate_schema_subset
     - _parse_datetime
+    - indicator and strategy validation helpers
 
 Classes:
     None.
@@ -27,13 +32,18 @@ Classes:
 from __future__ import annotations
 
 import time
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 import pandas as pd
 
 from tools.utils.logger import logger
+from tools.utils.standard import execute_tool_boundary
+
+if TYPE_CHECKING:
+    from tools.strategy.contracts import TradeAction
 
 TOOL_VERSION = "1.0.0"
 TOOL_CATEGORY = "utils"
@@ -50,7 +60,38 @@ VALID_ENVIRONMENTS = frozenset(
     {"local", "development", "test", "staging", "production"}
 )
 VALID_TRADING_MODES = frozenset({"research", "backtest", "paper", "live"})
-REQUIRED_OHLC_COLUMNS = frozenset({"open", "high", "low", "close"})
+REQUIRED_OHLC_COLUMNS = ("open", "high", "low", "close")
+SIGNAL_COLUMN_DEFAULTS: dict[str, Any] = {
+    "entry_signal": 0,
+    "exit_signal": 0,
+    "pending_signal": 0,
+    "cancel_pending_signal": 0,
+    "pending_signal_2": 0,
+    "cancel_pending_signal_2": 0,
+    "price": float("nan"),
+    "price_2": float("nan"),
+    "stop_loss": float("nan"),
+    "take_profit": float("nan"),
+    "signal_reason": "",
+    "setup_id": "",
+    "group_id": "",
+}
+ACTIVATOR_COLUMN_DEFAULTS: dict[str, bool] = {
+    "buy_setup_active": False,
+    "sell_setup_active": False,
+    "buy_add_active": False,
+    "sell_add_active": False,
+    "buy_exit_active": False,
+    "sell_exit_active": False,
+    "buy_pyramid_active": False,
+    "sell_pyramid_active": False,
+    "buy_martingale_active": False,
+    "sell_martingale_active": False,
+    "buy_decompose_active": False,
+    "sell_decompose_active": False,
+    "buy_trail_active": False,
+    "sell_trail_active": False,
+}
 
 
 def prepare_ohlcv_data(frame: pd.DataFrame) -> pd.DataFrame:
@@ -73,15 +114,205 @@ def prepare_ohlcv_data(frame: pd.DataFrame) -> pd.DataFrame:
 
     result = frame.copy()
     result.columns = [str(column).strip().lower() for column in result.columns]
-    missing = REQUIRED_OHLC_COLUMNS.difference(result.columns)
+    missing = set(REQUIRED_OHLC_COLUMNS).difference(result.columns)
     if missing:
         raise ValueError(f"frame is missing required OHLC columns: {sorted(missing)}")
 
-    for column in sorted(REQUIRED_OHLC_COLUMNS | {"volume", "spread"}):
+    for column in sorted(set(REQUIRED_OHLC_COLUMNS) | {"volume", "spread"}):
         if column in result.columns:
             result[column] = pd.to_numeric(result[column], errors="coerce")
 
     return result
+
+
+def ensure_dataframe(data: Any) -> pd.DataFrame:
+    """Normalize supported market-data input into a copied DataFrame.
+
+    Args:
+        data: DataFrame, list of row dictionaries, dictionary of columns, or an
+            object with a ``df`` DataFrame attribute.
+
+    Returns:
+        Copied DataFrame safe for mutation.
+
+    Raises:
+        TypeError: If input cannot be converted to a DataFrame.
+        ValueError: If the resulting DataFrame is empty.
+    """
+    if isinstance(data, pd.DataFrame):
+        frame = data.copy()
+    elif isinstance(data, Sequence) and not isinstance(data, (str, bytes)):
+        frame = pd.DataFrame(data)
+    elif isinstance(data, Mapping):
+        frame = pd.DataFrame(data)
+    elif isinstance(getattr(data, "df", None), pd.DataFrame):
+        frame = data.df.copy()
+    else:
+        raise TypeError("data must be a pandas DataFrame or DataFrame-like records")
+
+    if frame.empty:
+        raise ValueError("data must not be empty")
+    return frame
+
+
+def require_columns(frame: pd.DataFrame, columns: Iterable[str]) -> None:
+    """Require all columns to exist in a DataFrame."""
+    missing = sorted(set(columns) - set(frame.columns))
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
+
+
+def require_positive_int(value: int, *, name: str) -> None:
+    """Require a value to be a positive integer."""
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise TypeError(f"{name} must be a positive integer")
+    if value <= 0:
+        raise ValueError(f"{name} must be greater than zero")
+
+
+def require_positive_float(value: float, *, name: str) -> None:
+    """Require a value to be a positive int/float."""
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise TypeError(f"{name} must be numeric")
+    if float(value) <= 0:
+        raise ValueError(f"{name} must be greater than zero")
+
+
+def require_known_warmup_policy(policy: str) -> None:
+    """Validate the warmup policy used by an indicator."""
+    if policy not in {"nan", "fill", "drop"}:
+        raise ValueError("warmup_policy must be one of: nan, fill, drop")
+
+
+def apply_warmup_policy(
+    frame: pd.DataFrame,
+    columns: str | Iterable[str],
+    *,
+    warmup_policy: str = "nan",
+    fill_value: float | None = None,
+) -> pd.DataFrame:
+    """Apply a deterministic warmup policy to indicator output columns."""
+    require_known_warmup_policy(warmup_policy)
+    column_list = [columns] if isinstance(columns, str) else list(columns)
+
+    if warmup_policy == "nan":
+        return frame
+    if warmup_policy == "fill":
+        if fill_value is None:
+            raise ValueError("fill_value is required when warmup_policy='fill'")
+        frame[column_list] = frame[column_list].fillna(fill_value)
+        return frame
+    return frame.dropna(subset=column_list)
+
+
+def assert_dataframe(data: pd.DataFrame, *, min_rows: int = 1) -> None:
+    """Validate a non-empty pandas DataFrame."""
+    if not isinstance(data, pd.DataFrame):
+        raise ValueError("data must be a pandas DataFrame.")
+    if len(data) < min_rows:
+        raise ValueError(f"data must contain at least {min_rows} row(s).")
+
+
+def assert_ohlc_dataframe(data: pd.DataFrame, *, min_rows: int = 1) -> None:
+    """Validate required OHLC columns for strategy signal generation."""
+    assert_dataframe(data, min_rows=min_rows)
+    missing = [column for column in REQUIRED_OHLC_COLUMNS if column not in data.columns]
+    if missing:
+        raise ValueError(f"data is missing required OHLC columns: {missing}.")
+
+
+def ensure_signal_columns(
+    data: pd.DataFrame,
+    *,
+    include_activators: bool = False,
+    include_compat_columns: bool = True,
+) -> pd.DataFrame:
+    """Return a copy of data with canonical strategy signal columns."""
+    assert_dataframe(data)
+    out = data.copy(deep=True)
+    defaults: dict[str, Any] = dict(SIGNAL_COLUMN_DEFAULTS)
+    if include_activators:
+        defaults.update(ACTIVATOR_COLUMN_DEFAULTS)
+    if include_compat_columns:
+        defaults.update({"sl": 0.0, "tp": 0.0})
+    for column, default in defaults.items():
+        if column not in out.columns:
+            out[column] = default
+    return out
+
+
+def ensure_no_signal_columns(data: pd.DataFrame) -> pd.DataFrame:
+    """Return a copy of data with neutral strategy signal columns."""
+    out = ensure_signal_columns(data, include_activators=True)
+    for column in (
+        "entry_signal",
+        "exit_signal",
+        "pending_signal",
+        "cancel_pending_signal",
+        "pending_signal_2",
+        "cancel_pending_signal_2",
+    ):
+        out[column] = 0
+    for column in ("price", "price_2", "stop_loss", "take_profit"):
+        out[column] = float("nan")
+    for column in ("signal_reason", "setup_id", "group_id"):
+        out[column] = ""
+    for column in ACTIVATOR_COLUMN_DEFAULTS:
+        out[column] = False
+    out["sl"] = 0.0
+    out["tp"] = 0.0
+    return out
+
+
+def serialize_dataframe(data: pd.DataFrame) -> dict[str, Any]:
+    """Serialize a DataFrame to a JSON-friendly split-orient dictionary."""
+    out = data.copy()
+    out.index = out.index.map(str)
+    return {
+        "columns": list(out.columns),
+        "index": list(out.index),
+        "rows": out.where(pd.notna(out), None).to_dict(orient="records"),
+    }
+
+
+def validate_trade_action_object(
+    action: "TradeAction | dict[str, Any]",
+) -> dict[str, Any]:
+    """Validate a TradeAction or action dictionary and return a serializable dict."""
+    from tools.strategy.contracts import TradeAction
+
+    row = action.to_dict() if isinstance(action, TradeAction) else dict(action)
+    action_type = str(row.get("action_type", "")).upper()
+    if action_type not in {
+        "OPEN",
+        "CLOSE",
+        "REDUCE",
+        "MODIFY_SL",
+        "MODIFY_TP",
+        "MOVE_TO_BREAKEVEN",
+        "HOLD",
+    }:
+        raise ValueError(f"Unsupported action_type: {action_type!r}.")
+    symbol = str(row.get("symbol", "") or "").strip()
+    if not symbol:
+        raise ValueError("Trade action symbol is required.")
+    side = row.get("side")
+    if action_type in {"OPEN", "CLOSE", "REDUCE"} and side not in {"BUY", "SELL"}:
+        raise ValueError(f"Action {action_type} requires side BUY or SELL.")
+    volume = row.get("volume")
+    if action_type in {"OPEN", "CLOSE", "REDUCE"}:
+        if volume is None or float(volume) <= 0:
+            raise ValueError(f"Action {action_type} requires positive volume.")
+    if action_type in {
+        "CLOSE",
+        "REDUCE",
+        "MODIFY_SL",
+        "MODIFY_TP",
+        "MOVE_TO_BREAKEVEN",
+    }:
+        if not row.get("ticket"):
+            raise ValueError(f"Action {action_type} requires a ticket.")
+    return row
 
 
 def _metadata(
@@ -556,9 +787,133 @@ def validate_blocked_actions(
     )
 
 
+def validate_strategy_dataframe(
+    data: pd.DataFrame,
+    *,
+    min_rows: int = 1,
+    request_id: str | None = None,
+) -> dict[str, Any]:
+    """
+    Validate that market data can be consumed by a strategy.
+
+    Use this AI tool before running a vectorized strategy over OHLC data.
+    It checks the DataFrame type, minimum row count, and required OHLC columns.
+    """
+
+    def operation() -> dict[str, Any]:
+        assert_ohlc_dataframe(data, min_rows=min_rows)
+        return {"rows": len(data), "columns": list(data.columns), "valid": True}
+
+    return execute_tool_boundary(
+        tool_name="validate_strategy_dataframe",
+        request_id=request_id,
+        operation=operation,
+        success_message="Strategy DataFrame is valid.",
+    )
+
+
+def normalize_signal_columns(
+    data: pd.DataFrame,
+    *,
+    include_activators: bool = False,
+    request_id: str | None = None,
+) -> dict[str, Any]:
+    """
+    Add canonical signal columns to a DataFrame and return serialized data.
+
+    Use this AI tool when an agent or workflow needs data normalized to the
+    HaruQuant strategy signal schema before backtesting or validation.
+    """
+
+    def operation() -> dict[str, Any]:
+        normalized = ensure_signal_columns(data, include_activators=include_activators)
+        return serialize_dataframe(normalized)
+
+    return execute_tool_boundary(
+        tool_name="normalize_signal_columns",
+        request_id=request_id,
+        operation=operation,
+        success_message="Signal columns normalized.",
+    )
+
+
+def validate_trade_actions(
+    actions: "list[TradeAction | dict[str, Any]]",
+    *,
+    request_id: str | None = None,
+) -> dict[str, Any]:
+    """
+    Validate proposed stateful strategy TradeAction objects.
+
+    Use this AI tool after a stateful strategy proposes actions and before risk
+    or execution layers consume those actions. This tool does not execute trades.
+    """
+    return _validate_trade_action_payloads(
+        actions,
+        tool_name="validate_trade_actions",
+        success_message="Trade actions are valid.",
+        request_id=request_id,
+    )
+
+
+def validate_strategy_actions(
+    actions: "list[TradeAction | dict[str, Any]]",
+    *,
+    request_id: str | None = None,
+) -> dict[str, Any]:
+    """
+    Validate stateful strategy action payloads before risk/execution handoff.
+
+    Use this AI tool when a stateful strategy produces action dictionaries.
+    The tool validates shape and safety prerequisites but never executes trades.
+    """
+    return _validate_trade_action_payloads(
+        actions,
+        tool_name="validate_strategy_actions",
+        success_message="Strategy actions are valid.",
+        request_id=request_id,
+    )
+
+
+def _validate_trade_action_payloads(
+    actions: "list[TradeAction | dict[str, Any]]",
+    *,
+    tool_name: str,
+    success_message: str,
+    request_id: str | None,
+) -> dict[str, Any]:
+    """Validate trade/action payloads behind public action validation tools."""
+
+    def operation() -> dict[str, Any]:
+        if not isinstance(actions, list):
+            raise ValueError("actions must be a list.")
+        validated = [validate_trade_action_object(action) for action in actions]
+        return {"valid": True, "count": len(validated), "actions": validated}
+
+    return execute_tool_boundary(
+        tool_name=tool_name,
+        request_id=request_id,
+        operation=operation,
+        success_message=success_message,
+    )
+
+
 __all__ = [
+    "ACTIVATOR_COLUMN_DEFAULTS",
     "REQUIRED_OHLC_COLUMNS",
+    "SIGNAL_COLUMN_DEFAULTS",
+    "apply_warmup_policy",
+    "assert_dataframe",
+    "assert_ohlc_dataframe",
+    "ensure_dataframe",
+    "ensure_no_signal_columns",
+    "ensure_signal_columns",
     "prepare_ohlcv_data",
+    "require_columns",
+    "require_known_warmup_policy",
+    "require_positive_float",
+    "require_positive_int",
+    "serialize_dataframe",
     "validate_approval_packet",
     "validate_artifact_reference",
     "validate_blocked_actions",
@@ -570,4 +925,8 @@ __all__ = [
     "validate_output_schema",
     "validate_registry_entry",
     "validate_required_fields",
+    "validate_strategy_actions",
+    "validate_strategy_dataframe",
+    "validate_trade_action_object",
+    "validate_trade_actions",
 ]

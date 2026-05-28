@@ -17,8 +17,8 @@ from typing import Any
 
 import pandas as pd
 
-from tools.indicators.standard import ToolSpec, run_indicator_tool
-from tools.indicators.validation import ensure_dataframe, require_columns
+from tools.utils.standard import ToolSpec, run_indicator_tool
+from tools.utils.validators import ensure_dataframe, require_columns
 
 TOOL_VERSION = "1.0.0"
 TOOL_CATEGORY = "indicators"
