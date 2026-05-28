@@ -1,0 +1,115 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.junit_cache/
+
+# Type checking / linting
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pyre/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+data/logs/*
+!data/logs/.gitkeep
+
+# Runtime data
+data/cache/*
+!data/cache/.gitkeep
+data/database/*
+!data/database/.gitkeep
+data/market_data/*
+!data/market_data/.gitkeep
+data/research/cache/*
+!data/research/cache/.gitkeep
+
+# Generated reports / exports
+data/exports/*
+!data/exports/.gitkeep
+reports/
+artifacts/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node / Next.js UI
+ui/node_modules/
+ui/.next/
+ui/out/
+ui/dist/
+ui/build/
+ui/.turbo/
+ui/npm-debug.log*
+ui/yarn-debug.log*
+ui/yarn-error.log*
+ui/pnpm-debug.log*
+ui/.env
+ui/.env.*
+!ui/.env.example
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Local broker / secrets files
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
