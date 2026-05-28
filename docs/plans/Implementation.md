@@ -1,4 +1,5 @@
 <!-- markdownlint-disable MD024 -->
+
 <!-- cspell:words haruquantai dataframe backtests Runup -->
 
 # HaruQuantAI DDD Agile Implementation Plan
@@ -228,16 +229,16 @@ A bounded context is a domain area with its own language and responsibilities.
 
 Examples:
 
-| Bounded Context | Main Language |
-| --- | --- |
-| Data | bars, ticks, symbols, timeframes, spread, source, quality report |
-| Indicators | series, period, warmup, alignment, lookback |
-| Strategies | signals, entries, exits, state, version, registry |
-| Backtesting | orders, fills, positions, equity curve, simulation config |
-| Analytics | metrics, returns, drawdowns, ratios, distributions |
-| Risk | exposure, margin, VaR, CVaR, limits, risk decision, governor |
-| Execution | intent, approval, order router, broker bridge, receipt, reconciliation |
-| Agentic | agent, tool permission, evidence, workflow, approval gate |
+| Bounded Context | Main Language                                                          |
+| --------------- | ---------------------------------------------------------------------- |
+| Data            | bars, ticks, symbols, timeframes, spread, source, quality report       |
+| Indicators      | series, period, warmup, alignment, lookback                            |
+| Strategies      | signals, entries, exits, state, version, registry                      |
+| Backtesting     | orders, fills, positions, equity curve, simulation config              |
+| Analytics       | metrics, returns, drawdowns, ratios, distributions                     |
+| Risk            | exposure, margin, VaR, CVaR, limits, risk decision, governor           |
+| Execution       | intent, approval, order router, broker bridge, receipt, reconciliation |
+| Agentic         | agent, tool permission, evidence, workflow, approval gate              |
 
 ### 5.2 Aggregate
 
@@ -472,14 +473,14 @@ unless the sprint is actually working on those domains.
 
 ### Exit checklist
 
-- [ ] Repo structure exists.
-- [ ] `pytest` works.
-- [ ] Linting works.
-- [ ] Basic logging works.
-- [ ] Basic result wrapper works.
-- [ ] Rebuild charter exists.
-- [ ] Legacy-to-new map exists.
-- [ ] No future domain files have been created prematurely.
+- [X] Repo structure exists.
+- [X] `pytest` works.
+- [X] Linting works.
+- [X] Basic logging works.
+- [X] Basic result wrapper works.
+- [X] Rebuild charter exists.
+- [X] Legacy-to-new map exists.
+- [X] No future domain files have been created prematurely.
 
 ---
 

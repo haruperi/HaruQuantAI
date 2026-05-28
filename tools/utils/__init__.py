@@ -10,6 +10,7 @@ Official AI Tools:
     - configure_multiprocess_listener
 
 Utility Helpers:
+    - configuration loading
     - logger
     - Logger
     - StructlogAdapter
@@ -21,6 +22,21 @@ Utility Helpers:
     - shared exception and error taxonomy helpers
     - trace ID generation and validation helpers
 """
+
+# config.py utility helpers
+from tools.utils.config import (
+    DEFAULT_APP_NAME,
+    DEFAULT_ENV_FILE,
+    DEFAULT_ENVIRONMENT,
+    DEFAULT_LOG_LEVEL,
+    VALID_ENVIRONMENTS,
+    VALID_LOG_LEVELS,
+    Settings,
+    get_environment,
+    get_settings,
+    is_production,
+    is_test,
+)
 
 # errors.py utility helpers
 from tools.utils.errors import (
@@ -124,6 +140,18 @@ from tools.utils.result import (
 )
 
 __all__ = [
+    # config.py utilities
+    "DEFAULT_APP_NAME",
+    "DEFAULT_ENV_FILE",
+    "DEFAULT_ENVIRONMENT",
+    "DEFAULT_LOG_LEVEL",
+    "Settings",
+    "VALID_ENVIRONMENTS",
+    "VALID_LOG_LEVELS",
+    "get_environment",
+    "get_settings",
+    "is_production",
+    "is_test",
     # errors.py utilities
     "BrokerError",
     "ConfigurationError",
