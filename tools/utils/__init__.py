@@ -8,6 +8,9 @@ This package intentionally exposes both:
 Official AI Tools:
     - init_worker_logger
     - configure_multiprocess_listener
+    - load_runtime_settings
+    - load_runtime_settings_from_mapping
+    - inject_runtime_settings
 
 Utility Helpers:
     - configuration loading
@@ -26,16 +29,29 @@ Utility Helpers:
 # config.py utility helpers
 from tools.utils.config import (
     DEFAULT_APP_NAME,
+    DEFAULT_ENV_DIR,
     DEFAULT_ENV_FILE,
+    DEFAULT_ENV_PREFIX,
     DEFAULT_ENVIRONMENT,
     DEFAULT_LOG_LEVEL,
+    DEFAULT_RUNTIME_ENVIRONMENT,
     VALID_ENVIRONMENTS,
     VALID_LOG_LEVELS,
+    RuntimeSettings,
     Settings,
+    SettingsError,
+    collect_prefixed_values,
     get_environment,
     get_settings,
+    inject_runtime_settings,
     is_production,
     is_test,
+    load_runtime_settings,
+    load_runtime_settings_from_mapping,
+    normalize_environment,
+    normalize_log_level,
+    normalize_mapping,
+    parse_env_file,
 )
 
 # errors.py utility helpers
@@ -206,16 +222,29 @@ from tools.utils.validators import (
 __all__ = [
     # config.py utilities
     "DEFAULT_APP_NAME",
+    "DEFAULT_ENV_DIR",
     "DEFAULT_ENV_FILE",
+    "DEFAULT_ENV_PREFIX",
     "DEFAULT_ENVIRONMENT",
     "DEFAULT_LOG_LEVEL",
+    "DEFAULT_RUNTIME_ENVIRONMENT",
+    "RuntimeSettings",
     "Settings",
+    "SettingsError",
     "VALID_ENVIRONMENTS",
     "VALID_LOG_LEVELS",
+    "collect_prefixed_values",
     "get_environment",
     "get_settings",
+    "inject_runtime_settings",
     "is_production",
     "is_test",
+    "load_runtime_settings",
+    "load_runtime_settings_from_mapping",
+    "normalize_environment",
+    "normalize_log_level",
+    "normalize_mapping",
+    "parse_env_file",
     # errors.py utilities
     "BrokerError",
     "ConfigurationError",

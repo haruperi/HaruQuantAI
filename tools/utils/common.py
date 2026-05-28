@@ -1,7 +1,20 @@
-"""Shared utility helpers for HaruQuantAI modules.
+﻿"""Shared utility helpers for HaruQuantAI modules.
+
+Shared utility helpers for HaruQuantAI modules.
 
 This module contains small internal helpers used across production tools. It is
 not an official AI-tool module and does not expose agent-callable functions.
+
+Exported AI Tools:
+    None.
+
+Public Helpers:
+    - clear_dataframe_cache
+    - get_cached_dataframe
+    - bars_to_records
+
+Classes:
+    None.
 """
 
 from __future__ import annotations
@@ -26,14 +39,15 @@ def get_cached_dataframe(
     key: str,
     loader_func: Callable[[], pd.DataFrame],
 ) -> pd.DataFrame:
-    """Return a cached DataFrame or load and cache it.
+    """
+    Return a cached DataFrame or load and cache it.
 
     Args:
-        key: Unique cache key.
-        loader_func: Callable that returns a DataFrame on cache miss.
+        key (str): Unique cache key.
+        loader_func (Callable[[], pd.DataFrame]): Loader called on cache miss.
 
     Returns:
-        pd.DataFrame: Cached or freshly loaded DataFrame.
+        pd.DataFrame: Cached or freshly loaded DataFrame copy.
 
     Raises:
         ValueError: If the cache key is empty or the loader is not callable.
@@ -54,7 +68,18 @@ def get_cached_dataframe(
 
 
 def bars_to_records(frame: pd.DataFrame) -> list[dict[str, Any]]:
-    """Serialize a bar DataFrame into JSON-safe row dictionaries."""
+    """
+    Serialize a bar DataFrame into JSON-safe row dictionaries.
+
+    Args:
+        frame (pd.DataFrame): DataFrame to serialize.
+
+    Returns:
+        list[dict[str, Any]]: Row dictionaries.
+
+    Raises:
+        TypeError: If frame is not a DataFrame.
+    """
     if not isinstance(frame, pd.DataFrame):
         raise TypeError("frame must be a pandas DataFrame.")
     return cast(list[dict[str, Any]], frame.reset_index().to_dict(orient="records"))
