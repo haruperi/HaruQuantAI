@@ -1,6 +1,6 @@
 # HaruQuantAI runtime dependencies
 # Keep this file focused on application/runtime dependencies.
-# Development tools are configured in pyproject.toml optional dependencies.
+# Development tools are listed in requirements-dev.txt and pyproject.toml.
 
 # Core
 python-dotenv>=1.0.1

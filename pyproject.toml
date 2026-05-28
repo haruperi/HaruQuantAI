@@ -125,6 +125,15 @@ skip = [
     "dist",
     "data/logs",
     "data/cache",
+    "tests",
+    "./tests",
+    ".\\tests",
+    "tests/*",
+    "tests/**",
+    "tests\\*",
+    "tests\\**",
+    "*/tests/*",
+    "*\\tests\\*",
     "ui/node_modules",
     "ui/.next",
 ]
@@ -157,15 +166,38 @@ exclude = [
     "dist",
     "data/logs",
     "data/cache",
+    "tests",
+    "./tests",
+    ".\\tests",
+    "tests/*",
+    "tests/**",
+    "tests\\*",
+    "tests\\**",
+    "*/tests/*",
+    "*\\tests\\*",
     "ui/node_modules",
     "ui/.next",
 ]
 per-file-ignores = [
-    "tests/*:D",
-    "tests/**:D",
     "scripts/*:D",
     "scripts/**:D",
     "__init__.py:F401",
+]
+
+[tool.pylint.main]
+ignore-paths = [
+    "^tests/.*",
+    "^tests\\\\.*",
+]
+disable = [
+    "line-too-long",  # Flake8 owns line length.
+    "consider-using-with",  # Logger sinks intentionally stay open.
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-instance-attributes",
+    "too-many-lines",
+    "too-many-locals",
+    "too-many-return-statements",
 ]
 
 [tool.mypy]
@@ -190,6 +222,7 @@ exclude = [
     "^build/",
     "^dist/",
     "^\\.venv/",
+    "^tests/",
     "^venv/",
     "^env/",
 ]

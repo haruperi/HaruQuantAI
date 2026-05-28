@@ -1,0 +1,1 @@
+"""HaruQuantAI tool domains."""
