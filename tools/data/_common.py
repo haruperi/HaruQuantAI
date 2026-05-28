@@ -47,6 +47,14 @@ def _metadata_path(data_path: Path) -> Path:
     return data_path.with_suffix(f"{data_path.suffix}.metadata.json")
 
 
+def _normalized_extension(extension: str) -> str:
+    """Return a supported file extension without a leading dot."""
+    suffix = extension.lstrip(".").lower()
+    if suffix not in {"csv", "parquet"}:
+        raise ValueError(f"Unsupported data file extension: {extension}")
+    return suffix
+
+
 def _frame_from_payload(data: Data | Mapping[str, Any]) -> Data:
     """Convert supported payloads into a Data object."""
     if isinstance(data, Data):
@@ -93,6 +101,7 @@ def _save_data(
 ) -> dict[str, Any]:
     """Save market data and metadata to disk."""
     data_obj = _frame_from_payload(data)
+    suffix = _normalized_extension(extension)
     target_path = _saved_data_path(
         extension=extension,
         path=path,
@@ -100,7 +109,10 @@ def _save_data(
         timeframe=data_obj.timeframe,
     )
     target_path.parent.mkdir(parents=True, exist_ok=True)
-    data_obj.df.to_csv(target_path, index=False)
+    if suffix == "csv":
+        data_obj.df.to_csv(target_path, index=False)
+    else:
+        data_obj.df.to_parquet(target_path, index=False)
 
     metadata = _data_to_metadata(data_obj)
     metadata["is_initial"] = bool(is_initial)
@@ -125,6 +137,7 @@ def _load_saved_data(
     timeframe: str = "M1",
 ) -> Data:
     """Load a saved market-data artifact and its metadata."""
+    suffix = _normalized_extension(extension)
     target_path = _saved_data_path(
         extension=extension,
         path=path,
@@ -134,7 +147,10 @@ def _load_saved_data(
     if not target_path.exists():
         raise FileNotFoundError(f"Saved data file not found: {target_path}")
 
-    frame = pd.read_csv(target_path)
+    if suffix == "csv":
+        frame = pd.read_csv(target_path)
+    else:
+        frame = pd.read_parquet(target_path)
     sidecar_path = _metadata_path(target_path)
     metadata: dict[str, Any] = {}
     if sidecar_path.exists():
@@ -159,6 +175,7 @@ __all__ = [
     "Data",
     "_data_to_metadata",
     "_load_saved_data",
+    "_normalized_extension",
     "_save_data",
     "_saved_data_path",
     "_serialize_frame_records",
