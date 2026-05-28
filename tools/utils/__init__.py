@@ -139,6 +139,23 @@ from tools.utils.result import (
     success_result,
 )
 
+# validators.py utility helpers and AI tools
+from tools.utils.validators import (
+    REQUIRED_OHLC_COLUMNS,
+    prepare_ohlcv_data,
+    validate_approval_packet,
+    validate_artifact_reference,
+    validate_blocked_actions,
+    validate_data_freshness,
+    validate_environment_mode,
+    validate_evidence_pack,
+    validate_handoff_payload,
+    validate_input_schema,
+    validate_output_schema,
+    validate_registry_entry,
+    validate_required_fields,
+)
+
 __all__ = [
     # config.py utilities
     "DEFAULT_APP_NAME",
@@ -243,4 +260,18 @@ __all__ = [
     "needs_approval_result",
     "needs_clarification_result",
     "success_result",
+    # validators.py helpers and official AI tools
+    "REQUIRED_OHLC_COLUMNS",
+    "prepare_ohlcv_data",
+    "validate_approval_packet",
+    "validate_artifact_reference",
+    "validate_blocked_actions",
+    "validate_data_freshness",
+    "validate_environment_mode",
+    "validate_evidence_pack",
+    "validate_handoff_payload",
+    "validate_input_schema",
+    "validate_output_schema",
+    "validate_registry_entry",
+    "validate_required_fields",
 ]

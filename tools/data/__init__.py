@@ -60,6 +60,9 @@ from tools.data.scheduler import (
     scheduled_data_updater_update,
 )
 
+# validators.py tools
+from tools.data.validators import validate_ohlcv_quality
+
 __all__ = [
     # csv.py tools and helpers
     "CSVDataSource",
@@ -100,4 +103,6 @@ __all__ = [
     "scheduled_data_updater_status",
     "scheduled_data_updater_stop",
     "scheduled_data_updater_update",
+    # validators.py tools
+    "validate_ohlcv_quality",
 ]
