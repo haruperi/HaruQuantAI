@@ -234,7 +234,7 @@ def test_snapshot_payload_empty_and_freshness() -> None:
     assert payload["row_count"] == 0
     assert payload["start_at"] is None
     assert payload["end_at"] is None
-    assert snapshot.freshness()["is_fresh"] is True
+    assert snapshot.freshness()["data"]["is_fresh"] is True
 
 
 def test_dukascopy_validation_edge_cases() -> None:
@@ -413,8 +413,9 @@ def test_normalization_helpers() -> None:
     assert format_timestamp_z(aware).endswith("Z")
     with pytest.raises(TypeError):
         to_utc("not-a-date")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="non-negative"):
-        evaluate_freshness(aware, max_age_seconds=-1)
+    invalid = evaluate_freshness(aware, max_age_seconds=-1)
+    assert invalid["status"] == "error"
+    assert invalid["error"]["code"] == "INVALID_INPUT"
 
     class Clock:
         @staticmethod
@@ -426,7 +427,7 @@ def test_normalization_helpers() -> None:
         max_age_seconds=60,
         clock=Clock(),
     )
-    assert stale["is_fresh"] is False
+    assert stale["data"]["is_fresh"] is False
 
 
 def test_prepare_ohlcv_data_validation_and_numeric_conversion() -> None:

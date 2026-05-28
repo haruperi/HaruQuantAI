@@ -118,6 +118,32 @@ from tools.utils.logger import (
     logger,
 )
 
+# normalization.py utility helpers and AI tools
+from tools.utils.normalization import (
+    BOARD_BASELINE_TTL_POLICY,
+    BoardBaselineArtifactWindow,
+    BoardBaselineFreshnessEvaluation,
+    FixedClock,
+    FreshnessWindow,
+    SystemClock,
+    board_baseline_evaluation_to_dict,
+    board_baseline_window_to_dict,
+    ensure_dir,
+    ensure_parent_dir,
+    evaluate_board_baseline_freshness,
+    evaluate_freshness,
+    format_timestamp_z,
+    freshness_window_to_dict,
+    is_stale,
+    normalize_path,
+    normalize_timestamp,
+    normalize_timezone_for_series,
+    parse_datetime_value,
+    to_naive_utc_datetime,
+    to_utc,
+    to_utc_datetime,
+)
+
 # result.py utility helpers
 from tools.utils.result import (
     ERROR_APPROVAL_REQUIRED,
@@ -241,6 +267,29 @@ __all__ = [
     # logger.py official AI tools
     "configure_multiprocess_listener",
     "init_worker_logger",
+    # normalization.py helpers and official AI tools
+    "BOARD_BASELINE_TTL_POLICY",
+    "BoardBaselineArtifactWindow",
+    "BoardBaselineFreshnessEvaluation",
+    "FixedClock",
+    "FreshnessWindow",
+    "SystemClock",
+    "board_baseline_evaluation_to_dict",
+    "board_baseline_window_to_dict",
+    "ensure_dir",
+    "ensure_parent_dir",
+    "evaluate_board_baseline_freshness",
+    "evaluate_freshness",
+    "format_timestamp_z",
+    "freshness_window_to_dict",
+    "is_stale",
+    "normalize_path",
+    "normalize_timestamp",
+    "normalize_timezone_for_series",
+    "parse_datetime_value",
+    "to_naive_utc_datetime",
+    "to_utc",
+    "to_utc_datetime",
     # result.py constants
     "ERROR_APPROVAL_REQUIRED",
     "ERROR_INVALID_INPUT",
