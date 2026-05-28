@@ -6,6 +6,7 @@ It is an internal helper module, not an official AI-tool registry.
 
 from __future__ import annotations
 
+import fnmatch
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -45,6 +46,13 @@ def _saved_data_path(
 def _metadata_path(data_path: Path) -> Path:
     """Return the JSON sidecar metadata path for a data artifact."""
     return data_path.with_suffix(f"{data_path.suffix}.metadata.json")
+
+
+def _filter_symbols(symbols: list[str], pattern: str | None) -> list[str]:
+    """Filter symbol names using an optional shell-style pattern."""
+    if not pattern:
+        return list(symbols)
+    return [symbol for symbol in symbols if fnmatch.fnmatch(symbol, pattern)]
 
 
 def _normalized_extension(extension: str) -> str:
@@ -174,6 +182,7 @@ def _serialize_frame_records(frame: pd.DataFrame) -> list[dict[str, Any]]:
 __all__ = [
     "Data",
     "_data_to_metadata",
+    "_filter_symbols",
     "_load_saved_data",
     "_normalized_extension",
     "_save_data",

@@ -18,6 +18,21 @@ from tools.data.csv import (
     load_csv,
 )
 
+# dukascopy.py tools
+from tools.data.dukascopy import (
+    dukascopy_data_list_symbols,
+    dukascopy_data_load,
+    dukascopy_data_resolve_instrument,
+)
+
+# mt5.py tools
+from tools.data.mt5 import (
+    mt5_connection_check,
+    mt5_data_get_bars,
+    mt5_data_list_symbol_details,
+    mt5_data_list_symbols,
+)
+
 # parquet.py tools and helpers
 from tools.data.parquet import (
     get_data_dir,
@@ -39,6 +54,15 @@ __all__ = [
     "csv_data_saver_save",
     "get_cached_data",
     "load_csv",
+    # dukascopy.py tools
+    "dukascopy_data_list_symbols",
+    "dukascopy_data_load",
+    "dukascopy_data_resolve_instrument",
+    # mt5.py tools
+    "mt5_connection_check",
+    "mt5_data_get_bars",
+    "mt5_data_list_symbol_details",
+    "mt5_data_list_symbols",
     # parquet.py tools and helpers
     "get_data_dir",
     "load_parquet",

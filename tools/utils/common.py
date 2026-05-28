@@ -7,6 +7,7 @@ not an official AI-tool module and does not expose agent-callable functions.
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import Any, cast
 
 import pandas as pd
 
@@ -52,7 +53,15 @@ def get_cached_dataframe(
     return _DATAFRAME_CACHE[key].copy()
 
 
+def bars_to_records(frame: pd.DataFrame) -> list[dict[str, Any]]:
+    """Serialize a bar DataFrame into JSON-safe row dictionaries."""
+    if not isinstance(frame, pd.DataFrame):
+        raise TypeError("frame must be a pandas DataFrame.")
+    return cast(list[dict[str, Any]], frame.reset_index().to_dict(orient="records"))
+
+
 __all__ = [
+    "bars_to_records",
     "clear_dataframe_cache",
     "get_cached_dataframe",
 ]
