@@ -18,7 +18,49 @@ Utility Helpers:
     - blocked_result
     - needs_approval_result
     - needs_clarification_result
+    - shared exception and error taxonomy helpers
 """
+
+# errors.py utility helpers
+from tools.utils.errors import (
+    MT5_MESSAGES,
+    RETCODE_EXCEPTION_TYPES,
+    RETCODE_INFO,
+    SUCCESS_RETCODES,
+    UNKNOWN_ERROR_CODE,
+    BrokerError,
+    ConfigurationError,
+    DescriptorDict,
+    DomainError,
+    ErrorContext,
+    ErrorDescriptor,
+    ErrorEnvelope,
+    ErrorInfo,
+    ErrorPayload,
+    HaruError,
+    HaruQuantError,
+    InfrastructureError,
+    InvalidPriceError,
+    InvalidRequestError,
+    InvalidStopsError,
+    InvalidVolumeError,
+    MarketClosedError,
+    NoMoneyError,
+    NoQuotesError,
+    PolicyError,
+    TradeDisabledError,
+    TradeError,
+    ValidationError,
+    descriptor_from_payload,
+    descriptor_to_dict,
+    error_from_retcode,
+    error_info_to_dict,
+    error_name,
+    exception_from_descriptor,
+    is_success_retcode,
+    message_for,
+    raise_for_retcode,
+)
 
 # logger.py utilities and AI tools
 from tools.utils.logger import (
@@ -61,6 +103,44 @@ from tools.utils.result import (
 )
 
 __all__ = [
+    # errors.py utilities
+    "BrokerError",
+    "ConfigurationError",
+    "DescriptorDict",
+    "DomainError",
+    "ErrorContext",
+    "ErrorDescriptor",
+    "ErrorEnvelope",
+    "ErrorInfo",
+    "ErrorPayload",
+    "HaruError",
+    "HaruQuantError",
+    "InfrastructureError",
+    "InvalidPriceError",
+    "InvalidRequestError",
+    "InvalidStopsError",
+    "InvalidVolumeError",
+    "MarketClosedError",
+    "MT5_MESSAGES",
+    "NoMoneyError",
+    "NoQuotesError",
+    "PolicyError",
+    "RETCODE_EXCEPTION_TYPES",
+    "RETCODE_INFO",
+    "SUCCESS_RETCODES",
+    "TradeDisabledError",
+    "TradeError",
+    "UNKNOWN_ERROR_CODE",
+    "ValidationError",
+    "descriptor_from_payload",
+    "descriptor_to_dict",
+    "error_from_retcode",
+    "error_info_to_dict",
+    "error_name",
+    "exception_from_descriptor",
+    "is_success_retcode",
+    "message_for",
+    "raise_for_retcode",
     # logger.py utilities
     "CRITICAL",
     "DEBUG",
