@@ -142,3 +142,101 @@ def test_data_labeling() -> None:
     # For index 0, price at index 2 (1.1010) is greater than index 0 (1.1000)
     # by more than threshold
     assert labeled[0]["label"] == 1
+
+
+def test_to_native_types() -> None:
+    import numpy as np
+    from app.services.data.transforms import _clean_numpy_types
+    records = [
+        {"int_val": np.int64(42), "float_val": np.float64(3.14), "str_val": "hello"}
+    ]
+    res = _clean_numpy_types(records)
+    assert isinstance(res[0]["int_val"], int)
+    assert isinstance(res[0]["float_val"], float)
+
+
+def test_timeframe_to_pandas_freq_errors() -> None:
+    import pytest
+    from app.services.data.transforms import timeframe_to_pandas_freq
+    from app.utils.errors import ValidationError
+
+    # MN prefix
+    assert timeframe_to_pandas_freq("MN1") == "1ME"
+
+    # H prefix
+    assert timeframe_to_pandas_freq("H4") == "4h"
+
+    # D prefix
+    assert timeframe_to_pandas_freq("D1") == "1D"
+
+    # W prefix
+    assert timeframe_to_pandas_freq("W1") == "1W"
+
+    # Invalid timeframe value format
+    with pytest.raises(ValidationError, match="Invalid timeframe value format"):
+        timeframe_to_pandas_freq("Mabc")
+
+    # Invalid timeframe unit
+    with pytest.raises(ValidationError, match="Invalid timeframe unit"):
+        timeframe_to_pandas_freq("Z5")
+
+
+def test_timeframe_to_minutes_errors() -> None:
+    import pytest
+    from app.services.data.transforms import timeframe_to_minutes
+    from app.utils.errors import ValidationError
+
+    # MN prefix
+    assert timeframe_to_minutes("MN1") == 43200
+
+    # H prefix
+    assert timeframe_to_minutes("H4") == 240
+
+    # D prefix
+    assert timeframe_to_minutes("D1") == 1440
+
+    # W prefix
+    assert timeframe_to_minutes("W1") == 10080
+
+    # Invalid timeframe value format
+    with pytest.raises(ValidationError, match="Invalid timeframe value format"):
+        timeframe_to_minutes("Mabc")
+
+    # Invalid timeframe unit
+    with pytest.raises(ValidationError, match="Invalid timeframe unit"):
+        timeframe_to_minutes("Z5")
+
+
+def test_resample_ohlcv_errors_and_policies() -> None:
+    import pytest
+    from app.services.data.transforms import resample_ohlcv
+    from app.utils.errors import ValidationError
+
+    # Empty list returns empty list
+    assert resample_ohlcv([], "M5") == []
+
+    records = [
+        {
+            "timestamp": "2026-06-01T10:00:00Z",
+            "open": 1.1000,
+            "high": 1.1010,
+            "low": 1.0990,
+            "close": 1.1002,
+            "volume": 10,
+            "tick_volume": 10,
+            "real_volume": 0.0,
+            "spread": 1.5,
+            "source": "csv",
+            "symbol": "EURUSD",
+            "timeframe": "M1",
+        }
+    ]
+
+    # Invalid timeframe
+    with pytest.raises(ValidationError):
+        resample_ohlcv(records, "Z5")
+
+    # resample with custom spread_policy
+    res = resample_ohlcv(records, "M5", spread_policy="last")
+    assert len(res) == 1
+

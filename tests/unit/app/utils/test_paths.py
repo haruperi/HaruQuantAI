@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from app.utils.errors import SecurityError, ValidationError
 from app.utils.paths import ensure_dir, ensure_parent_dir, normalize_path
+from pytest_mock import MockerFixture
 
 
 def test_normalize_path_returns_path_without_creating_target(tmp_path: Path) -> None:
@@ -73,3 +74,68 @@ def test_ensure_parent_dir_rejects_traversal_before_creation(tmp_path: Path) -> 
         ensure_parent_dir("../escape/file.txt", base_dir=tmp_path)
 
     assert not (tmp_path.parent / "escape").exists()
+
+
+def test_coerce_path_empty() -> None:
+    # Empty Path object simulated via custom subclass
+    import sys
+    from pathlib import PosixPath, WindowsPath
+
+    if sys.platform == "win32":
+        class EmptyPathWin(WindowsPath):
+            def __str__(self) -> str:
+                return ""
+        empty_path = EmptyPathWin(".")
+    else:
+        class EmptyPathPosix(PosixPath):
+            def __str__(self) -> str:
+                return ""
+        empty_path = EmptyPathPosix(".")
+
+    with pytest.raises(ValidationError, match="path"):
+        normalize_path(empty_path, base_dir="data")
+
+
+def test_safe_join_and_validate_path(tmp_path: Path) -> None:
+    from app.utils.paths import safe_join, validate_path_within_root
+
+    # Safe joins
+    res = safe_join(tmp_path, "sub", "file.csv")
+    assert res == (tmp_path / "sub" / "file.csv").resolve(strict=False)
+
+    # Escapes base_dir
+    with pytest.raises(SecurityError):
+        safe_join(tmp_path, "../outside.csv")
+
+    # Validate path within root
+    res2 = validate_path_within_root(Path("sub/file.csv"), root=tmp_path)
+    assert res2 == (tmp_path / "sub" / "file.csv").resolve(strict=False)
+
+    # Escaping root
+    with pytest.raises(SecurityError):
+        validate_path_within_root("../outside.csv", root=tmp_path)
+
+
+def test_windows_prefix_formatting() -> None:
+    from app.utils.paths import _strip_windows_extended_prefix
+
+    # UNC prefix
+    unc_path = Path("\\\\?\\UNC\\server\\share\\file.txt")
+    expected = Path("\\\\server\\share\\file.txt")
+    assert _strip_windows_extended_prefix(unc_path) == expected
+
+    # standard extended prefix
+    ext_path = Path("\\\\?\\C:\\file.txt")
+    assert _strip_windows_extended_prefix(ext_path) == Path("C:\\file.txt")
+
+
+def test_ensure_dir_creation_failure(mocker: MockerFixture) -> None:
+    # Mock mkdir to raise OSError
+    mocker.patch("pathlib.Path.mkdir", side_effect=OSError("Permission denied"))
+
+    with pytest.raises(ValidationError, match="failed to create directory"):
+        ensure_dir("data/raw/temp_dir")
+
+    with pytest.raises(ValidationError, match="failed to create parent directory"):
+        ensure_parent_dir("data/raw/temp_dir/file.csv")
+

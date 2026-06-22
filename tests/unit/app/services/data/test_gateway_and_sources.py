@@ -584,3 +584,47 @@ def test_yahoo_adapter_gateway_errors(mocker: MockerFixture) -> None:
     mock_client.get_ticks.return_value = None
     assert adapter.get_market_data("AAPL", "H1", start, end) == []
     assert adapter.get_tick_data("AAPL", start, end) == []
+
+
+def test_check_rate_limit_exceeded() -> None:
+    from app.services.data.gateway import check_rate_limit, RATE_LIMITERS
+    limiter = RATE_LIMITERS["csv"]
+    old_tokens = limiter.tokens
+    old_rate = limiter.rate
+    try:
+        limiter.tokens = 0.0
+        limiter.rate = 0.0
+        with pytest.raises(ExternalServiceError, match="Rate limit exceeded"):
+            check_rate_limit("csv")
+    finally:
+        limiter.tokens = old_tokens
+        limiter.rate = old_rate
+
+
+def test_circuit_breaker_barrier_open() -> None:
+    from app.services.data.gateway import check_circuit_breaker_barrier, update_circuit_breaker
+    from datetime import datetime, UTC, timedelta
+    update_circuit_breaker(
+        source="csv",
+        state="open",
+        failures_count=5,
+        cooldown_expires=(datetime.now(UTC) + timedelta(hours=1)).isoformat()
+    )
+    with pytest.raises(ExternalServiceError, match="Circuit breaker is open"):
+        check_circuit_breaker_barrier("csv")
+
+
+def test_circuit_breaker_barrier_half_open() -> None:
+    from app.services.data.gateway import check_circuit_breaker_barrier, update_circuit_breaker, get_circuit_breaker
+    from datetime import datetime, UTC, timedelta
+    update_circuit_breaker(
+        source="csv",
+        state="open",
+        failures_count=5,
+        cooldown_expires=(datetime.now(UTC) - timedelta(hours=1)).isoformat()
+    )
+    # This should transition it to half-open and not raise the blocker exception
+    check_circuit_breaker_barrier("csv")
+    cb = get_circuit_breaker("csv")
+    assert cb["state"] == "half-open"
+

@@ -22,6 +22,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-007 | `app/utils` Module Documentation & Dependencies | Created the README of `app/utils` from the standard template, resolved missing `logger.py` and `event_bus.py` bridges, and added `pydantic`/`pydantic-settings` dependencies. |
 | ADD-008 | Broker Resolver | Added broker integration framework with support for Binance, Dukascopy, Yahoo, MT5, and cTrader providers. |
 | ADD-009 | Market Data Service Architecture | Added market data service architecture with multi-source support for market data fetching, caching, and time-series management. Usage examples in `tests/usage/app/services/02_data.py`. |
+| ADD-010 | Indicator Service library | Added technical indicator service library with support for various technical indicators and their usage examples in `tests/usage/app/services/03_indicators.py`. |
 
 
 

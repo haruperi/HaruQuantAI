@@ -157,3 +157,118 @@ def test_crash_recovery_sequence() -> None:
     status = get_data_update_job_status(job_name)
     assert status["state"] == "recovering"
     assert status["last_error"] == "SYSTEM_CRASH_DETECTION"
+
+
+def test_validate_job_creation_args_errors() -> None:
+    # Empty name
+    with pytest.raises(ValidationError, match="name cannot be empty"):
+        create_data_update_job(
+            name="",
+            source="csv",
+            symbols=["EURUSD"],
+            timeframes=["M5"],
+            data_kind="bars",
+            storage_format="csv",
+            storage_path="data/raw",
+            schedule="* * * * *",
+        )
+
+    # Empty source
+    with pytest.raises(ValidationError, match="Source identifier"):
+        create_data_update_job(
+            name="Job1",
+            source="",
+            symbols=["EURUSD"],
+            timeframes=["M5"],
+            data_kind="bars",
+            storage_format="csv",
+            storage_path="data/raw",
+            schedule="* * * * *",
+        )
+
+    # Empty symbols
+    with pytest.raises(ValidationError, match="Symbols list"):
+        create_data_update_job(
+            name="Job1",
+            source="csv",
+            symbols=[],
+            timeframes=["M5"],
+            data_kind="bars",
+            storage_format="csv",
+            storage_path="data/raw",
+            schedule="* * * * *",
+        )
+
+    # Empty timeframes
+    with pytest.raises(ValidationError, match="Timeframes list"):
+        create_data_update_job(
+            name="Job1",
+            source="csv",
+            symbols=["EURUSD"],
+            timeframes=[],
+            data_kind="bars",
+            storage_format="csv",
+            storage_path="data/raw",
+            schedule="* * * * *",
+        )
+
+    # Limit symbols exceeded
+    with pytest.raises(ValidationError, match="Max symbols"):
+        create_data_update_job(
+            name="Job1",
+            source="csv",
+            symbols=["S" + str(i) for i in range(505)],
+            timeframes=["M5"],
+            data_kind="bars",
+            storage_format="csv",
+            storage_path="data/raw",
+            schedule="* * * * *",
+        )
+
+
+def test_start_stop_job_errors() -> None:
+    # Start non-existent job
+    with pytest.raises(ValidationError, match=r"Job.*not found"):
+        start_data_update_job("NonExistentJob")
+
+    # Stop non-existent job
+    with pytest.raises(ValidationError, match=r"Job.*not found"):
+        stop_data_update_job("NonExistentJob")
+
+    # Get status of non-existent job
+    with pytest.raises(ValidationError, match=r"Job.*not found"):
+        get_data_update_job_status("NonExistentJob")
+
+    # Create and start a job, then start it again (already running)
+    job_name = "DoubleStartJob"
+    create_data_update_job(
+        name=job_name,
+        source="csv",
+        symbols=["EURUSD"],
+        timeframes=["M5"],
+        data_kind="bars",
+        storage_format="csv",
+        storage_path="data/raw",
+        schedule="* * * * *",
+    )
+    res_start1 = start_data_update_job(job_name)
+    assert res_start1["state"] == "running"
+    res_start2 = start_data_update_job(job_name)
+    assert res_start2["state"] == "running"
+
+    # Stop stopped job
+    res_stop1 = stop_data_update_job(job_name)
+    assert res_stop1["state"] == "stopped"
+    res_stop2 = stop_data_update_job(job_name)
+    assert res_stop2["state"] == "stopped"
+
+
+def test_feed_status_errors() -> None:
+    # Feed not found
+    with pytest.raises(ValidationError, match="No matching real-time feeds found"):
+        get_feed_status("NonExistentFeed")
+
+    # Handle overflow for non-existent feed
+    with pytest.raises(ValidationError, match=r"Feed.*not found"):
+        handle_feed_overflow("NonExistentFeed", "halt")
+

@@ -97,3 +97,111 @@ def test_cache_hits_and_misses() -> None:
     # Confirm cache is cleared
     cached_post = get_cached_data(key, "refresh_and_return")
     assert cached_post is None
+
+
+def test_database_helper_migrations(tmp_path: Path) -> None:
+    from app.services.data.storage import DatabaseHelper
+    temp_db = str(tmp_path / "temp_migration_test.db")
+    helper = DatabaseHelper(db_path=temp_db)
+    # Check that database connection successfully resolved WAL journaling mode
+    with helper.get_connection() as conn:
+        cursor = conn.execute("PRAGMA journal_mode;")
+        journal_mode = cursor.fetchone()[0]
+        assert journal_mode.lower() == "wal"
+
+
+def test_validate_storage_path_errors() -> None:
+    # Empty path
+    with pytest.raises(ValidationError, match="Path cannot be empty"):
+        validate_storage_path("")
+
+    # Hidden folder
+    with pytest.raises(ValidationError, match="Hidden files or directories"):
+        validate_storage_path("data/raw/.hidden/file.csv")
+
+    # Normalization error
+    from unittest.mock import patch
+    with patch("app.services.data.storage.normalize_path") as mock_norm:
+        mock_norm.side_effect = Exception("Mock Normalization Error")
+        with pytest.raises(ValidationError, match="Invalid path"):
+            validate_storage_path("data/raw/invalid.csv")
+
+
+def test_atomic_file_write_errors() -> None:
+    # Empty list supplied
+    with pytest.raises(ValidationError, match="No data records supplied"):
+        save_market_data([], "data/raw/temp.csv", "csv")
+
+    # Duplicate file without overwrite
+    target_file = "data/raw/duplicate_check.csv"
+    save_market_data([{"x": 1}], target_file, "csv", overwrite=True)
+    with pytest.raises(ValidationError, match="File already exists"):
+        save_market_data([{"x": 1}], target_file, "csv", overwrite=False)
+
+    # Cleanup
+    file_path = Path(target_file)
+    if file_path.exists():
+        file_path.unlink()
+
+    # Unsupported format
+    with pytest.raises(ValidationError, match="unsupported"):
+        save_market_data([{"x": 1}], "data/raw/test.csv", "txt")
+
+
+def test_load_local_dataset_errors() -> None:
+    # Non-existent file
+    with pytest.raises(ValidationError, match="Local file not found"):
+        load_local_dataset("data/raw/non_existent.csv")
+
+    # Unsupported extension
+    with pytest.raises(ValidationError, match=r"[Ee]xtension"):
+        load_local_dataset("data/raw/unsupported.txt")
+
+
+def test_cache_expiration_and_errors() -> None:
+
+    from app.services.data.storage import get_cached_data, set_cached_data
+
+    key = generate_cache_key("csv", "EURUSD", "M1", "2026-06-01", "2026-06-03")
+    records = [{"close": 1.10}]
+
+    # Set cache with negative TTL (already expired)
+    set_cached_data(
+        key, "csv", "EURUSD", "M1", "2026-06-01", "2026-06-03", records, -10
+    )
+
+    # Get cache with refresh_and_return should miss/return None
+    assert get_cached_data(key, "refresh_and_return") is None
+
+    # Get cache with return_stale should return stale warn
+    stale_res = get_cached_data(key, "return_stale")
+    assert stale_res is not None
+    assert stale_res["metadata"]["warning"] == "Data returned is stale from cache."
+
+    # Force invalid JSON decode path in DB
+    with db_helper.get_connection() as conn:
+        conn.execute(
+            "UPDATE data_cache SET records_json = 'invalid_json' WHERE key = ?;",
+            (key,),
+        )
+    assert get_cached_data(key, "return_stale") is None
+
+    # Database exceptions paths
+    from unittest.mock import patch
+    with patch("app.services.data.storage.db_helper.get_connection") as mock_conn:
+        mock_conn.side_effect = Exception("DB Cache Error")
+        assert get_cached_data(key, "return_stale") is None
+
+
+def test_clear_data_cache_errors() -> None:
+    # Invalid namespace
+    with pytest.raises(ValidationError, match="Only 'data_cache' namespace"):
+        clear_data_cache("invalid_ns")
+
+    # Database exceptions paths
+    from unittest.mock import patch
+    with patch("app.services.data.storage.db_helper.get_connection") as mock_conn:
+        mock_conn.side_effect = Exception("DB Clear Error")
+        with pytest.raises(ValidationError, match="Failed to clear cache"):
+            clear_data_cache("data_cache", dry_run=False)
+

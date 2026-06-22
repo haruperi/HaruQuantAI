@@ -40,3 +40,18 @@ def test_registry_import_side_effects() -> None:
     assert "pandas" not in sys.modules
     assert "cryptography" not in sys.modules
     assert "dotenv" not in sys.modules
+
+
+def test_lazy_settings_getattr() -> None:
+    import app.utils
+    # Access settings lazily
+    assert app.utils.settings is not None
+    assert app.utils.Settings is not None
+
+
+def test_invalid_getattr() -> None:
+    import pytest
+    import app.utils
+    with pytest.raises(AttributeError, match="module 'app.utils' has no attribute"):
+        _ = app.utils.non_existent_attribute
+
