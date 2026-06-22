@@ -23,6 +23,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-008 | Broker Resolver | Added broker integration framework with support for Binance, Dukascopy, Yahoo, MT5, and cTrader providers. |
 | ADD-009 | Market Data Service Architecture | Added market data service architecture with multi-source support for market data fetching, caching, and time-series management. Usage examples in `tests/usage/app/services/02_data.py`. |
 | ADD-010 | Indicator Service library | Added technical indicator service library with support for various technical indicators and their usage examples in `tests/usage/app/services/03_indicators.py`. |
+| ADD-011 | Strategy Service architecture | Added strategy service architecture with multi-source support for strategy execution, caching, and time-series management. Usage examples in `tests/usage/app/services/04_strategies.py`. |
 
 
 
