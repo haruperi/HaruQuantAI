@@ -1,0 +1,219 @@
+[project]
+name = "haruquantai"
+version = "0.1.0"
+description = "Quantitative Financial Trading System"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "coverage>=7.14.2",
+    "ctrader-open-api>=0.9.2",
+    "detect-secrets>=1.5.0",
+    "metatrader5>=5.0.5735",
+    "mypy>=2.1.0",
+    "numba>=0.65.1",
+    "pre-commit>=4.6.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.15.1",
+    "python-binance>=1.0.37",
+    "ruff>=0.15.18",
+    "service-identity>=24.2.0",
+    "yfinance>=1.4.1",
+]
+
+[tool.ruff]
+# Target Python version rules
+target-version = "py313"
+line-length = 88
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+# 1. ENABLING ALL REQUESTED RULE GROUPS
+select = [
+    "F",     # Pyflakes – detects syntax errors and basic mistakes
+    "E",     # Pycodestyle errors (style issues, including E501 line length)
+    "W",     # Pycodestyle warnings (style issues)
+    "C90",   # McCabe – complexity metric for functions
+    "I",     # isort – import ordering checks
+    "N",     # PEP8 Naming – naming conventions
+    "D",     # Pydocstyle – docstring formatting (including D1 mandatory checks)
+    "UP",    # Pyupgrade – upgrades syntax to newer Python versions
+    "YTT",   # Flake8-2020 – checks for misuse of sys.version and sys.version_info
+    "ASYNC", # Flake8-async – checks async/await usage
+    "S",     # Flake8-bandit – security issues
+    "BLE",   # Flake8-blind-except – flags bare excepts
+    "FBT",   # Flake8-boolean-trap – potential pitfalls with booleans
+    "B",     # Flake8-bugbear – common bug patterns
+    "A",     # Flake8-builtins – misuse of Python built-in names
+    "COM",   # Flake8-commas – trailing/comma issues
+    "C4",    # Flake8-comprehensions – best practices in comprehensions
+    "DTZ",   # Flake8-datetimez – requires timezone-aware datetime objects
+    "T10",   # Flake8-debugger – debugger statements (e.g. pdb)
+    "DJ",    # Flake8-django – Django-specific conventions
+    "EM",    # Flake8-errmsg – error message style
+    "EXE",   # Flake8-executable – executable file checks
+    "FA",    # Flake8-future-annotations – future import for annotations
+    "ISC",   # Flake8-implicit-str-concat – warns on implicit string concatenation
+    "ICN",   # Flake8-import-conventions – enforces conventional import aliases
+    "LOG",   # Flake8-logging – proper logging usage
+    "G",     # Flake8-logging-format – logging format string issues
+    "INP",   # Flake8-no-pep420 – requires __init__.py files
+    "PIE",   # Flake8-pie – Python improvement suggestions
+    "PYI",   # Flake8-pyi – checks for type stub (.pyi) consistency
+    "PT",    # Flake8-pytest-style – pytest best practices
+    "Q",     # Flake8-quotes – enforces quote style consistency
+    "RSE",   # Flake8-raise – proper raise statement usage
+    "RET",   # Flake8-return – return statement issues
+    "SLF",   # Flake8-self – flags instance methods that don't use self
+    "SLOT",  # Flake8-slots – suggests use of __slots__ where appropriate
+    "SIM",   # Flake8-simplify – code simplification hints
+    "TID",   # Flake8-tidy-imports – enforces specific import styles
+    "TC",    # Flake8-type-checking – proper import of typing in type checks
+    "INT",   # Flake8-gettext – checks for proper internationalization usage
+    "ARG",   # Flake8-unused-arguments – flags unused function arguments
+    "PTH",   # Flake8-use-pathlib – encourages pathlib over os.path
+    "TD",    # Flake8-todos – flags TODO comments
+    "FIX",   # Flake8-fixme – flags FIXME comments
+    "PD",    # Pandas-vet – checks pandas-specific code practices
+    "PGH",   # Pygrep-hooks – custom grep hooks for linting
+    "PL",    # Pylint – integration with Pylint conventions
+    "TRY",   # Tryceratops – try/except usage suggestions
+    "FLY",   # Flynt – f-string conversion suggestions
+    "NPY",   # NumPy-specific rules – ensures NumPy coding standards
+    "FAST",  # FastAPI – FastAPI-specific linting rules
+    "AIR",   # Airflow – Airflow-specific linting rules
+    "PERF",  # Perflint – performance-related checks
+    "FURB",  # Refurb – rules for code refurbishment
+    "RUF",   # Ruff-specific rules – additional Ruff checks
+    "ANN",   # Flake8-annotations - enforces type annotations
+]
+
+# 2. CAREFULLY FILTERED IGNORE LIST (D1 and E501 removed from here so they run!)
+ignore = [
+    "FBT003",  # Flake8-boolean-trap - boolean position value in function call
+    "D203",    # Pydocstyle - one blank line required before class docstring (conflicts with D211)
+    "D212",    # Pydocstyle - summary line should be immediately after opening quotes (conflicts with D213)
+    "D400",    # Pydocstyle - First line should end with a period
+    "D401",    # Pydocstyle - First line should be in an imperative mood
+    "D415",    # Pydocstyle - First line should end with a period, question mark, or exclamation point
+    "S311",    # Flake8-bandit - Pseudo-random generators warning (fine for quant simulations, non-crypto)
+    "PERF401", # Perflint - Checks for loops that can be replaced by a list comprehension
+    "RET504",  # Flake8-return - Checks for unnecessary variable assignments right before a return
+    "FA102",   # Flake8-future-annotations - Missing future annotations import but uses PEP 604
+    "TRY003",  # Tryceratops - Checks for long exception messages outside exception class
+    "EM101",   # Flake8-errmsg - Checks for string literals in exception constructors
+    "TC002",   # Flake8-type-checking - Checks for typing imports outside TYPE_CHECKING blocks
+    "TC003",   # Flake8-type-checking - Checks for imports from typing outside TYPE_CHECKING blocks
+    "UP047",   # Pyupgrade - PEP 695 generic functions are not supported by pinned mypy/pre-commit yet
+    "COM812",  # Flake8-commas - Formatter conflicts
+    "ISC001",  # Flake8-implicit-str-concat - Formatter conflicts
+    "PLC0415", # Pylint - deferred imports allowed for lazy-loading optional dependencies
+    "PLR0913", # Pylint - too many arguments in function definition (6 > 5) standard for API/Broker functions
+    "FBT001",  # Flake8-boolean-trap - boolean-typed positional argument in function definition (standard format selectors)
+    "FBT002",  # Flake8-boolean-trap - boolean default positional argument in function definition
+    "D107",    # Pydocstyle - Missing docstring in __init__
+    "TRY300",  # Tryceratops - Consider moving statement to an else block
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Rules to ignore only within test environments
+"test_*.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "ARG001", "PLC0415", "EM102", "ANN"]
+"*_test.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "ARG001", "PLC0415", "EM102", "ANN"]
+"conftest.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "ARG001", "PLC0415", "EM102", "ANN"]
+"tests/usage/**/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "ARG001", "PLC0415", "EM102", "ANN"]
+"scripts/*.py" = ["INP001", "D100", "D103", "ANN", "S603", "S607", "T201"]
+
+[tool.ruff.lint.mccabe]
+# Standard strict function complexity ceiling
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+# Standard docstring styling format
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=app.utils",
+    "--cov=app.services",
+    "--cov=agentic",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=80"
+]
+
+[tool.coverage.run]
+branch = true
+source = ["app/utils", "app/services", "agentic"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:"
+]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+mypy_path = "."
+exclude = ["^scripts/"]
+packages = ["app.utils", "app.services", "agentic"]
+warn_unused_configs = false
+warn_return_any = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+check_untyped_defs = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+module = "scripts.*"
+check_untyped_defs = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+module = [
+    "pandas",
+    "yfinance",
+    "binance.*",
+    "requests",
+    "pytest_mock",
+    "MetaTrader5",
+    "yaml",
+    "sklearn.*",
+    "scipy.*",
+    "sklearn",
+    "scipy",
+    "ctrader",
+    "ctrader_open_api",
+    "numba",
+    "numba.*",
+    "service_identity"
+]
+ignore_missing_imports = true
