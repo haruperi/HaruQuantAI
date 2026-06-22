@@ -4,13 +4,25 @@ Broker adapters are loaded lazily so optional provider SDKs are only required
 when their adapter is actually used.
 """
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.services.brokers.binance import BinanceClient, get_binance_client
+    from app.services.brokers.ctrader import CTraderClient, get_ctrader_client
+    from app.services.brokers.dukascopy import DukascopyClient, get_dukascopy_client
+    from app.services.brokers.mt5 import MT5Client, get_mt5_client
+    from app.services.brokers.router import get_active_broker_name, get_broker_module
+    from app.services.brokers.yahoo import YahooClient, get_yahoo_client
+
 __all__ = [
     "BinanceClient",
     "CTraderClient",
     "DukascopyClient",
     "MT5Client",
     "YahooClient",
+    "get_active_broker_name",
     "get_binance_client",
+    "get_broker_module",
     "get_ctrader_client",
     "get_dukascopy_client",
     "get_mt5_client",
@@ -28,6 +40,8 @@ _EXPORT_MODULES = {
     "get_mt5_client": "app.services.brokers.mt5",
     "YahooClient": "app.services.brokers.yahoo",
     "get_yahoo_client": "app.services.brokers.yahoo",
+    "get_active_broker_name": "app.services.brokers.router",
+    "get_broker_module": "app.services.brokers.router",
 }
 
 
