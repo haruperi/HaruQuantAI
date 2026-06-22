@@ -1,6 +1,6 @@
 # HaruQuantAI
 
-Quantitative Financial Trading System.
+Modular, AI-assisted quantitative trading platform designed for safe service-tool boundaries, governed trading, reproducible research, and strict risk controls.
 
 ---
 
@@ -10,11 +10,41 @@ Quantitative Financial Trading System.
 This project uses **[uv](https://github.com/astral-sh/uv)** for fast, reliable Python package management. Make sure `uv` is installed on your system.
 
 ### Installation
-Clone the repository and synchronize the environment (this will install the correct Python version and all dependencies into a local virtual environment):
-```bash
-uv sync --all-extras --dev
-```
+1.  **Install dependencies**:
+    Clone the repository and synchronize the environment (this will install the correct Python version and all dependencies into a local virtual environment):
+    ```bash
+    uv sync --all-extras --dev
+    ```
+2.  **Initialize Database**:
+    ```bash
+    uv run python scripts/init_db.py
+    ```
+3. **Install Frontend dependencies**:
+    ```bash
+    uv run npm install --prefix app/web
+    ```
+4.  **Run Backend**:
+    ```bash
+    uv run python app/api/main.py
+    ```
+5.  **Run Frontend**:
+    ```bash
+    uv run npm run dev --prefix app/web
+    ```
 
+---
+
+## Project Structure
+
+This repository is structured as a modular monolith containing a Python backend and a Next.js frontend:
+
+*   `app/api`: FastAPI backend gateways, routing, and middlewares.
+*   `app/web`: Next.js frontend workspace (TypeScript, Tailwind CSS, Radix UI).
+*   `app/services`: Core quantitative and trading logic modules (data, indicators, risk, simulation, etc.).
+*   `app/agentic`: AI Agent configuration, runtimes, security policies, and schemas.
+*   `/docs`: System architecture design, standard definitions, and requirements.
+
+For design details, module boundaries, and implementation invariants, see `docs/ARCHITECTURE.md`
 ---
 
 ## Local Development Quality Gates

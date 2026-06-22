@@ -19,7 +19,8 @@ All notable HaruQuantAI project changes should be recorded here.
 
 | ID | Functionality | Notes |
 | -- | ------------- | ----- |
-|    |               |       |
+| FIX-001 | Windows CI & Dependency Constraints | Configured CI quality gates to run on `windows-latest` and set `pyproject.toml` dependency management to target `sys_platform == 'win32'` and `platform_machine == 'x86_64'`. |
+
 
 ## Decisions
 
