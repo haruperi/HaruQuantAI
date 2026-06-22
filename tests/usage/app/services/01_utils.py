@@ -61,7 +61,7 @@ def example_02_error_handling_example() -> None:
     print("--- 2. Error Handling Example ---")
     print("=" * 100)
 
-    from app.utils.errors import (
+    from app.utils import (
         ValidationError,
         code_for_exception,
         details_for_exception,
@@ -124,7 +124,7 @@ def example_03_standard_tool_envelope_example() -> None:
 
     import time
 
-    from app.utils.standard import (
+    from app.utils import (
         build_metadata,
         canonical_json,
         error_response,
@@ -199,8 +199,8 @@ def example_04_safe_path_normalization_example() -> None:
 
     import shutil
 
-    from app.utils.errors import SecurityError
-    from app.utils.paths import (
+    from app.utils import (
+        SecurityError,
         ensure_dir,
         ensure_parent_dir,
         normalize_path,
@@ -256,7 +256,7 @@ def example_05_security_and_redaction() -> None:
     print("--- 5. Security and Redaction Example ---")
     print("=" * 100)
 
-    from app.utils.security import (
+    from app.utils import (
         classify_secret_key,
         decrypt_text,
         encrypt_text,
@@ -322,7 +322,7 @@ def example_06_runtime_settings() -> None:
     print("--- 6. Runtime Settings Example ---")
     print("=" * 100)
 
-    from app.utils.settings import (
+    from app.utils import (
         create_config,
         load_config,
         validate_config,
