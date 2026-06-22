@@ -13,13 +13,24 @@ All notable HaruQuantAI project changes should be recorded here.
 
 | ID | Functionality | Notes |
 | -- | ------------- | ----- |
-| ADD-001 | Loguru Structured Logging | Integrated `loguru` for structured application logging with rotating file handlers (`app.log`, `access.log`, `debug.log`, `errors.log`). See usage example `example_01_loguru_example()` in `tests/usage/app/services/01_utils.py`. |
+| ADD-001 | Loguru Structured Logging | Integrated `loguru` for structured application logging with rotating file handlers (`app.log`, `access.log`, `debug.log`, `errors.log`). Usage example `example_01_loguru_example()` in `tests/usage/app/services/01_utils.py`. |
+| ADD-002 | Deterministic Error Utility | Added comprehensive error handling utility and deterministic error code registry. Usage example `example_02_error_handling_example()` in `tests/usage/app/services/01_utils.py`. |
+| ADD-003 | Standard Tool Envelope | Added Standard tool envelopes and deterministic utility contracts. Usage example `example_03_standard_tool_envelope_example()` in `tests/usage/app/services/01_utils.py`. |
+| ADD-004 | Safe Path Normalization | Added Safe path normalization and explicit directory creation helpers. Usage example `example_04_safe_path_normalization_example()` in `tests/usage/app/services/01_utils.py`. |
+| ADD-005 | Security helpers | Added Security helpers for redaction, hashing, and optional encryption. Usage example `example_05_security_and_redaction()` in `tests/usage/app/services/01_utils.py`. |
+| ADD-006 | Runtime settings. | Added Runtime configuration and settings loading using Pydantic. Usage example `example_06_runtime_settings()` in `tests/usage/app/services/01_utils.py`. |
+| ADD-007 | `app/utils` Module Documentation & Dependencies | Created the README of `app/utils` from the standard template, resolved missing `logger.py` and `event_bus.py` bridges, and added `pydantic`/`pydantic-settings` dependencies. |
+
+
+
 
 ## Fixed
 
 | ID | Functionality | Notes |
 | -- | ------------- | ----- |
 | FIX-001 | Windows CI & Dependency Constraints | Configured CI quality gates to run on `windows-latest` and set `pyproject.toml` dependency management to target `sys_platform == 'win32'` and `platform_machine == 'AMD64'`. |
+| FIX-002 | `pytest` Import Collisions & Circularity | Resolved circular dependency between `errors.py` and `security.py` by making imports local, and configured `import_mode = "importlib"` in `pyproject.toml` to prevent test namespace pollution. |
+| FIX-003 | Logging Consolidation | Merged `logging.py` into `logger.py` to simplify logging namespaces and prevent multiple configuration files. |
 
 
 

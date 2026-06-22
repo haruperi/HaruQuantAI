@@ -1,13 +1,25 @@
-"""Logging configuration utility for HaruQuantAI."""
+"""Structured logging configuration and logger export for HaruQuantAI.
+
+This module provides the central loguru logger export and setup functions to
+configure file logging with rotation, retention, and compression policies.
+"""
+
+from __future__ import annotations
 
 import sys
 from pathlib import Path
 
 from loguru import logger
 
+__all__ = ["logger", "setup_logging"]
+
 
 def setup_logging() -> None:
-    """Configure loguru to log to stdout and rotating files under data/logs."""
+    """Configure loguru to log to stdout and rotating files under data/logs.
+
+    Creates rotating log files for application events, authentication/access
+    logs, raw debug statements, and high-severity errors.
+    """
     # Ensure logs directory exists
     log_dir = Path("data/logs")
     log_dir.mkdir(parents=True, exist_ok=True)
