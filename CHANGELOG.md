@@ -26,6 +26,8 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-011 | Strategy Service architecture | Added strategy service architecture with multi-source support for strategy execution, caching, and time-series management. Usage examples in `tests/usage/app/services/04_strategies.py`. |
 | ADD-012 | Trader Service Architecture | Added trader service architecture with support for account information, deal information, history order information, order information, position information, rate limiting, symbol information, and terminal information. Usage examples in `tests/usage/app/services/07_trading.py`. |
 | ADD-013 | Risk Management Service | Added risk management service with support for risk assessment, position sizing, portfolio management, and scenario analysis. Usage examples in `tests/usage/app/services/05_risk.py`. |
+| ADD-014 | Analytics Service | Added analytics service for performance evaluation, scenario analysis, and reporting. Usage examples in `tests/usage/app/services/06_analytics.py`. |
+
 
 
 
