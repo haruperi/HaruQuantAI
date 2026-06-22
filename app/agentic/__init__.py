@@ -1,1 +1,1 @@
-"""Agentic systems package for HaruQuantAI."""
+"""Agentic module initialization."""
