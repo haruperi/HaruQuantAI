@@ -149,7 +149,7 @@ addopts = [
     "--strict-config",
     "--cov=app.utils",
     "--cov=app.services",
-    "--cov=agentic",
+    "--cov=app.agentic",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-fail-under=80"
@@ -157,7 +157,7 @@ addopts = [
 
 [tool.coverage.run]
 branch = true
-source = ["app/utils", "app/services", "agentic"]
+source = ["app/utils", "app/services", "app/agentic"]
 
 [tool.coverage.report]
 show_missing = true
@@ -174,7 +174,7 @@ python_version = "3.14"
 strict = true
 mypy_path = "."
 exclude = ["^scripts/"]
-packages = ["app.utils", "app.services", "agentic"]
+packages = ["app.utils", "app.services", "app.agentic"]
 warn_unused_configs = false
 warn_return_any = true
 warn_unused_ignores = true
