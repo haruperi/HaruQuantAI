@@ -222,5 +222,5 @@ ignore_missing_imports = true
 
 [tool.uv]
 required-environments = [
-    "sys_platform == 'win32' and platform_machine == 'x86_64'"
+    "sys_platform == 'win32' and platform_machine == 'AMD64'"
 ]
