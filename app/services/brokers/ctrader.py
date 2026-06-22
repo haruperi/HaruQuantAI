@@ -214,7 +214,7 @@ class CTraderClient:
             self._symbol_map = {s.symbolName: s for s in res.symbol}
             self._symbol_id_to_name = {s.symbolId: s.symbolName for s in res.symbol}
         except Exception as e:
-            logger.warning("Failed to cache symbol list: %s", e)
+            logger.warning("Failed to cache symbol list: {}", e)
             self._symbol_map = {}
             self._symbol_id_to_name = {}
 
@@ -225,7 +225,7 @@ class CTraderClient:
             res = self.send_request(req, ProtoOAPayloadType.PROTO_OA_ASSET_LIST_RES)
             self._asset_map = {a.assetId: a.name for a in res.asset}
         except Exception as e:
-            logger.warning("Failed to cache asset list: %s", e)
+            logger.warning("Failed to cache asset list: {}", e)
             self._asset_map = {}
 
         return True
@@ -252,7 +252,7 @@ class CTraderClient:
             if self.client:
                 self.client.stopService()
         except Exception as e:
-            logger.warning("Error stopping cTrader Open API service: %s", e)
+            logger.warning("Error stopping cTrader Open API service: {}", e)
 
         self._is_connected = False
         self._is_app_authenticated = False
@@ -302,7 +302,7 @@ class CTraderClient:
 
     def _on_disconnected(self, _client: Any, reason: Any) -> None:
         """Callback triggered on socket disconnection."""
-        logger.warning("cTrader connection lost. Reason: %s", reason)
+        logger.warning("cTrader connection lost. Reason: {}", reason)
         self._is_connected = False
         self._is_app_authenticated = False
         self._is_account_authorized = False
@@ -317,7 +317,7 @@ class CTraderClient:
         try:
             extracted = Protobuf.extract(message)
         except Exception as e:
-            logger.error("Failed to extract cTrader protobuf payload: %s", e)
+            logger.error("Failed to extract cTrader protobuf payload: {}", e)
             return
 
         # Track spot events for ticks
@@ -329,7 +329,7 @@ class CTraderClient:
             try:
                 cb(extracted, payload_type)
             except Exception as e:
-                logger.error("Error in message callback: %s", e)
+                logger.error("Error in message callback: {}", e)
 
         if payload_type == ProtoOAPayloadType.PROTO_OA_APPLICATION_AUTH_RES:
             self._handle_app_auth_res()
@@ -394,7 +394,7 @@ class CTraderClient:
         else:
             self.account_id = self._accounts[0]["account_id"]
 
-        logger.info("Authorizing cTrader account %s...", self.account_id)
+        logger.info("Authorizing cTrader account {}...", self.account_id)
         try:
             req = ProtoOAAccountAuthReq()
             req.ctidTraderAccountId = self.account_id
@@ -407,7 +407,7 @@ class CTraderClient:
 
     def _handle_account_auth_res(self) -> None:
         """Handle account authorization success response."""
-        logger.info("cTrader account %s authorized successfully.", self.account_id)
+        logger.info("cTrader account {} authorized successfully.", self.account_id)
         self._is_account_authorized = True
 
         try:
@@ -429,7 +429,7 @@ class CTraderClient:
         """Handle cTrader error response."""
         err_msg = getattr(extracted, "description", "Unknown error response")
         err_code = getattr(extracted, "errorCode", "UNKNOWN")
-        logger.error("cTrader error response received: %s - %s", err_code, err_msg)
+        logger.error("cTrader error response received: {} - {}", err_code, err_msg)
         self._error = f"{err_code}: {err_msg}"
         self._auth_event.set()
 
@@ -533,7 +533,7 @@ class CTraderClient:
         """
         if symbol_name not in self._symbol_map:
             logger.warning(
-                "Symbol %s not found in symbol map for subscription", symbol_name
+                "Symbol {} not found in symbol map for subscription", symbol_name
             )
             return
         symbol_id = self._symbol_map[symbol_name].symbolId
@@ -547,12 +547,12 @@ class CTraderClient:
             self.send_request(req, ProtoOAPayloadType.PROTO_OA_SUBSCRIBE_SPOTS_RES)
             self._subscribed_symbols.add(symbol_id)
             logger.info(
-                "Subscribed to spot prices for symbol %s (ID %s)",
+                "Subscribed to spot prices for symbol {} (ID {})",
                 symbol_name,
                 symbol_id,
             )
         except Exception as e:
-            logger.error("Failed to subscribe to spots for %s: %s", symbol_name, e)
+            logger.error("Failed to subscribe to spots for {}: {}", symbol_name, e)
             raise
 
     def unsubscribe_spots(self, symbol_name: str) -> None:
@@ -574,12 +574,12 @@ class CTraderClient:
             self.send_request(req, ProtoOAPayloadType.PROTO_OA_UNSUBSCRIBE_SPOTS_RES)
             self._subscribed_symbols.discard(symbol_id)
             logger.info(
-                "Unsubscribed from spot prices for symbol %s (ID %s)",
+                "Unsubscribed from spot prices for symbol {} (ID {})",
                 symbol_name,
                 symbol_id,
             )
         except Exception as e:
-            logger.error("Failed to unsubscribe from spots for %s: %s", symbol_name, e)
+            logger.error("Failed to unsubscribe from spots for {}: {}", symbol_name, e)
 
     def last_error(self) -> str:
         """Get the last error message or code.
@@ -639,7 +639,7 @@ class CTraderClient:
                         close_price = (last_bar.low + last_bar.deltaClose) / 100000.0
                 except Exception as e:
                     logger.warning(
-                        "Failed to fetch fallback trendbar in symbol_info_tick for %s: %s",
+                        "Failed to fetch fallback trendbar in symbol_info_tick for {}: {}",
                         symbol_name,
                         e,
                     )
@@ -705,7 +705,7 @@ class CTraderClient:
             )
             return float(margin_val / money_div)
         except Exception as e:
-            logger.error("Failed to calculate expected margin: %s", e)
+            logger.error("Failed to calculate expected margin: {}", e)
             return None
 
     def order_calc_profit(
@@ -748,7 +748,7 @@ class CTraderClient:
             return float(diff * (volume * lot_size))
             return float(diff * (volume * lot_size))
         except Exception as e:
-            logger.error("Failed to calculate profit: %s", e)
+            logger.error("Failed to calculate profit: {}", e)
             return None
 
     def get_bars(
@@ -826,7 +826,7 @@ class CTraderClient:
             if res_sym.symbol:
                 digits = res_sym.symbol[0].digits
         except Exception as e:
-            logger.warning("Failed to fetch symbol digits for %s: %s", symbol, e)
+            logger.warning("Failed to fetch symbol digits for {}: {}", symbol, e)
 
         divisor = 10.0**digits
 
@@ -868,7 +868,7 @@ class CTraderClient:
                 req, ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES, timeout=10.0
             )
         except Exception as e:
-            logger.error("Failed to fetch cTrader trendbars: %s", e)
+            logger.error("Failed to fetch cTrader trendbars: {}", e)
             return pd.DataFrame(
                 columns=[
                     "Timestamp",
@@ -961,7 +961,7 @@ class CTraderClient:
             if res_sym.symbol:
                 digits = res_sym.symbol[0].digits
         except Exception as e:
-            logger.warning("Failed to fetch symbol digits for %s: %s", symbol, e)
+            logger.warning("Failed to fetch symbol digits for {}: {}", symbol, e)
 
         divisor = 10.0**digits
 
@@ -987,7 +987,7 @@ class CTraderClient:
             if res_bid and hasattr(res_bid, "tickData"):
                 bid_ticks = list(res_bid.tickData)
         except Exception as e:
-            logger.warning("Failed to fetch BID ticks: %s", e)
+            logger.warning("Failed to fetch BID ticks: {}", e)
 
         # Fetch ASK ticks
         ask_ticks = []
@@ -1004,7 +1004,7 @@ class CTraderClient:
             if res_ask and hasattr(res_ask, "tickData"):
                 ask_ticks = list(res_ask.tickData)
         except Exception as e:
-            logger.warning("Failed to fetch ASK ticks: %s", e)
+            logger.warning("Failed to fetch ASK ticks: {}", e)
 
         # Decode BID ticks (delta compression)
         bids = []
@@ -1201,7 +1201,7 @@ class CTraderSymbolInfo:
                     close_price = (last_bar.low + last_bar.deltaClose) / 100000.0
             except Exception as e:
                 logger.warning(
-                    "Failed to fetch fallback trendbar for %s: %s", self.name, e
+                    "Failed to fetch fallback trendbar for {}: {}", self.name, e
                 )
 
             if close_price is not None:
@@ -1440,7 +1440,7 @@ def get_symbol_info(symbol: str) -> CTraderSymbolInfo | None:
             return None
         return CTraderSymbolInfo(res.symbol[0], light_sym, client)
     except Exception as e:
-        logger.error("Failed to get symbol info for %s: %s", symbol, e)
+        logger.error("Failed to get symbol info for {}: {}", symbol, e)
         return None
 
 
@@ -1470,7 +1470,7 @@ def get_position_info(
             positions = [p for p in positions if p.symbol == symbol]
         return positions
     except Exception as e:
-        logger.error("Failed to get position info: %s", e)
+        logger.error("Failed to get position info: {}", e)
         return []
 
 
@@ -1500,7 +1500,7 @@ def get_order_info(
             orders = [o for o in orders if o.symbol == symbol]
         return orders
     except Exception as e:
-        logger.error("Failed to get order info: %s", e)
+        logger.error("Failed to get order info: {}", e)
         return []
 
 
@@ -1554,7 +1554,7 @@ def get_history_order_info(
             orders = [o for o in orders if clean_group in o.symbol.upper()]
         return orders
     except Exception as e:
-        logger.error("Failed to get history orders: %s", e)
+        logger.error("Failed to get history orders: {}", e)
         return []
 
 
@@ -1608,7 +1608,7 @@ def get_history_deal_info(
             deals = [d for d in deals if clean_group in d.symbol.upper()]
         return deals
     except Exception as e:
-        logger.error("Failed to get history deals: %s", e)
+        logger.error("Failed to get history deals: {}", e)
         return []
 
 

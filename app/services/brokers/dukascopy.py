@@ -453,7 +453,7 @@ class DukascopyClient:
                 limit=30000,
             )
         except Exception as e:
-            logger.error("Dukascopy fetch failed: %s", e)
+            logger.error("Dukascopy fetch failed: {}", e)
             return pd.DataFrame(
                 columns=[
                     "Timestamp",
@@ -544,7 +544,7 @@ class DukascopyClient:
                 limit=30000,
             )
         except Exception as e:
-            logger.error("Dukascopy tick fetch failed: %s", e)
+            logger.error("Dukascopy tick fetch failed: {}", e)
             return None
 
         if df.empty:

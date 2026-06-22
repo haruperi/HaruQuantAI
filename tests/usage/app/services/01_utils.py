@@ -359,6 +359,252 @@ def example_06_runtime_settings() -> None:
 
     assert True
 
+def example_07_dataframe_and_combinations() -> None:
+    """Demonstrate lazy alignment, data mapping, and grid parameter combinatorics."""
+    print("\n--- 7. DataFrames & Combinations Demo ---")
+    import pandas as pd
+    from app.utils import (
+        align_dataframe_datetime,
+        parameter_combinations,
+        serialize_dataframe_records,
+    )
+
+    # Parameter grid optimization helpers
+    grid = {
+        "fast_ema": [5, 10],
+        "slow_ema": [20, 30],
+    }
+    combinations = parameter_combinations(grid)
+    print(f"Parameter combinations for grid: {combinations}")
+
+    # DataFrame alignment and conversion
+    df = pd.DataFrame(
+        [
+            {"timestamp": "2026-06-16 10:00:00", "close": 1.1000},
+            {"timestamp": "2026-06-16 10:01:00", "close": 1.1005},
+        ]
+    )
+    aligned_df = align_dataframe_datetime(df, timestamp_column="timestamp")
+    records = serialize_dataframe_records(aligned_df)
+    print("Serialized records:", records)
+
+
+def example_08_data_quality() -> None:
+    """Demonstrate bar checks, volume checks, and data profiles creation."""
+    print("\n--- 8. Data Quality Checking Demo ---")
+    from typing import Any, cast
+    import pandas as pd
+    from app.utils import inspect_ohlcv_quality, validate_ohlcv_quality
+
+    records = [
+        {
+            "timestamp": "2026-06-16T10:00:00Z",
+            "open": 1.10,
+            "high": 1.11,
+            "low": 1.09,
+            "close": 1.10,
+            "volume": 100,
+        },
+        {
+            "timestamp": "2026-06-16T10:01:00Z",
+            "open": 1.10,
+            "high": 1.12,
+            "low": 1.08,
+            "close": 1.11,
+            "volume": 200,
+        },
+    ]
+
+    df = pd.DataFrame(records)
+    res = inspect_ohlcv_quality(df)
+    issues = cast("list[Any]", res.get("issues", []))
+    print(f"Data Quality Profiles: Passed={res['passed']}, Issues Count={len(issues)}")
+    resp = validate_ohlcv_quality(df)
+    print("Validate OHLCV Quality response status:", resp["status"])
+
+
+def example_09_validations() -> None:
+    """Demonstrate input and output validation checks."""
+    print("\n--- 9. Schema Validation Demo ---")
+    from app.utils import ValidationError, validate_input_schema
+
+    schema = {
+        "type": "object",
+        "properties": {
+            "symbol": {"type": "string", "minLength": 3},
+            "quantity": {"type": "number", "minimum": 0.1},
+        },
+        "required": ["symbol", "quantity"],
+    }
+
+    # Validate correct request
+    valid_input = {"symbol": "EURUSD", "quantity": 1.5}
+    validate_input_schema(valid_input, schema)
+    print("Valid inputs passed validation successfully.")
+
+    # Validate incorrect request
+    invalid_input = {"symbol": "EU", "quantity": 0.0}
+    try:
+        validate_input_schema(invalid_input, schema)
+    except ValidationError as ex:
+        print(f"Caught schema validation expected error: {ex}")
+
+
+def example_10_event_bus() -> None:
+    """Demonstrate internal Event Bus publisher/subscriber pattern."""
+    print("\n--- 10. Event Bus Pub/Sub Demo ---")
+    from typing import Any
+    from app.utils import (
+        InMemoryEventBus,
+        build_event_envelope,
+        publish_event,
+    )
+
+    bus = InMemoryEventBus(max_queue_size=100)
+
+    # Subscribe to target channel
+    def handle_signal(envelope: Any) -> None:
+        msg_str = (
+            f"Subscriber received event '{envelope['event_type']}' "
+            f"with payload: {envelope['payload']}"
+        )
+        print(msg_str)
+
+    bus.subscribe("strategy.signals", handle_signal)
+
+    # Dispatch/Publish signal event
+    envelope = build_event_envelope(
+        event_type="strategy.signals",
+        source="strategy_runner",
+        payload={"action": "BUY", "symbol": "EURUSD", "size": 0.1},
+    )
+    publish_event(bus, envelope)
+
+
+def example_11_circuit_breakers_and_observability() -> None:
+    """Demonstrate circuit-breaker triggers and telemetry counters."""
+    print("\n--- 11. Circuit Breakers & Metrics Demo ---")
+    from app.utils import (
+        CircuitBreaker,
+        build_metadata,
+        canonical_json,
+        circuit_open_response,
+    )
+
+    cb = CircuitBreaker(name="demo_breaker", failure_threshold=2, cooldown_seconds=1.0)
+
+    # First attempt: success
+    if cb.allow_request():
+        print("First request allowed.")
+        cb.record_success()
+
+    # Throw mock failures to open circuit
+    cb.record_failure()
+    cb.record_failure()
+
+    # Next attempt should block execution
+    if not cb.allow_request():
+        print("Third request blocked (circuit is OPEN).")
+        meta = build_metadata(tool_name="get_data")
+        resp = circuit_open_response(metadata=meta)
+        print("Circuit Open Response Envelope:", canonical_json(resp))
+
+
+def example_12_notifications() -> None:
+    """Demonstrate real notifications using settings credentials."""
+    print("\n--- 12. Notifications Router Demo (Real Adapters) ---")
+    from app.utils import (
+        DesktopNotificationAdapter,
+        EmailNotificationAdapter,
+        NotificationRouter,
+        TelegramNotificationAdapter,
+        route_notification,
+        load_config,
+    )
+    settings = load_config()
+    from app.utils.notifications import NotificationAdapter, NotificationChannel
+
+    adapters: dict[NotificationChannel, NotificationAdapter] = {
+        "desktop": DesktopNotificationAdapter(),
+        "telegram": TelegramNotificationAdapter(
+            bot_token=settings.telegram_bot_token,
+            chat_id=settings.telegram_chat_id,
+        ),
+        "email": EmailNotificationAdapter(
+            host=settings.smtp_host,
+            port=settings.smtp_port,
+            username=settings.smtp_username,
+            password=settings.smtp_password,
+            recipient=settings.smtp_recipient or settings.smtp_username,
+        ),
+    }
+    router = NotificationRouter(adapters=adapters)
+
+    # 1. Desktop Notification
+    print("Sending real Desktop notification...")
+    res_desktop = route_notification(
+        router,
+        channel="desktop",
+        title="HaruQuant Desktop Alert",
+        body="This is a real desktop notification from the utilities demo.",
+    )
+    print(
+        f"Desktop Result: status={res_desktop.status}, "
+        f"channel={res_desktop.channel}, provider={res_desktop.provider}"
+    )
+
+    # 2. Telegram Notification
+    if settings.telegram_bot_token and settings.telegram_chat_id:
+        print("Sending real Telegram notification...")
+        res_telegram = route_notification(
+            router,
+            channel="telegram",
+            title="HaruQuant Telegram Alert",
+            body="This is a real Telegram notification from the utilities demo.",
+        )
+        print(
+            f"Telegram Result: status={res_telegram.status}, "
+            f"channel={res_telegram.channel}, provider={res_telegram.provider}"
+        )
+    else:
+        print("Skipping Telegram (not configured in settings/env).")
+
+    # 3. Email Notification
+    if settings.smtp_username and settings.smtp_password:
+        print("Sending real Email notification...")
+        res_email = route_notification(
+            router,
+            channel="email",
+            title="HaruQuant Email Alert",
+            body="This is a real Email notification from the utilities demo.",
+        )
+        print(
+            f"Email Result: status={res_email.status}, "
+            f"channel={res_email.channel}, provider={res_email.provider}"
+        )
+    else:
+        print("Skipping Email (not configured in settings/env).")
+
+
+def example_13_paths() -> None:
+    """Demonstrate path creation and directory checks."""
+    print("\n--- 13. Safe Paths Demo ---")
+    import tempfile
+    from app.utils import ensure_parent_dir
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        target_file = Path(temp_dir) / "data" / "raw" / "EURUSD.csv"
+
+        # Automatically create nested parent directories safely
+        ensure_parent_dir(target_file)
+
+        # Write dummy data to confirm
+        with target_file.open("w") as f:
+            f.write("timestamp,close\n2026-06-16T12:00:00Z,1.1000")
+
+        assert target_file.exists()
+        print(f"Verified safe paths creation for target file: '{target_file}'")
+
 
 if __name__ == "__main__":
     print("==================================================")
@@ -371,6 +617,13 @@ if __name__ == "__main__":
     example_04_safe_path_normalization_example()
     example_05_security_and_redaction()
     example_06_runtime_settings()
+    example_07_dataframe_and_combinations()
+    example_08_data_quality()
+    example_09_validations()
+    example_10_event_bus()
+    example_11_circuit_breakers_and_observability()
+    example_12_notifications()
+    example_13_paths()
 
     print("==================================================")
     print("DEMO SCRIPT EXECUTED SUCCESSFULLY")

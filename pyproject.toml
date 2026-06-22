@@ -13,6 +13,7 @@ dependencies = [
     "mypy>=2.1.0",
     "numba>=0.65.1",
     "pre-commit>=4.6.0",
+    "pyarrow",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.14.2",
     "pytest>=9.1.1",

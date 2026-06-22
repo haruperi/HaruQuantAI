@@ -20,6 +20,9 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-005 | Security helpers | Added Security helpers for redaction, hashing, and optional encryption. Usage example `example_05_security_and_redaction()` in `tests/usage/app/services/01_utils.py`. |
 | ADD-006 | Runtime settings. | Added Runtime configuration and settings loading using Pydantic. Usage example `example_06_runtime_settings()` in `tests/usage/app/services/01_utils.py`. |
 | ADD-007 | `app/utils` Module Documentation & Dependencies | Created the README of `app/utils` from the standard template, resolved missing `logger.py` and `event_bus.py` bridges, and added `pydantic`/`pydantic-settings` dependencies. |
+| ADD-008 | Broker Resolver | Added broker integration framework with support for Binance, Dukascopy, Yahoo, MT5, and cTrader providers. |
+| ADD-009 | Market Data Service Architecture | Added market data service architecture with multi-source support for market data fetching, caching, and time-series management. Usage examples in `tests/usage/app/services/02_data.py`. |
+
 
 
 

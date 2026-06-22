@@ -175,7 +175,7 @@ class MT5Client:
             logger.error(msg)
             raise ExternalServiceError(msg, code="BROKER_UNAVAILABLE")
 
-        logger.info("Successfully logged in to MT5 account: %s", self.login)
+        logger.info("Successfully logged in to MT5 account: {}", self.login)
 
     def _select_default_symbols(self) -> None:
         """Add all default symbols to the terminal Market Watch."""
@@ -190,13 +190,13 @@ class MT5Client:
                     err_code = mt5.last_error()
                     failed_symbols.append((symbol, err_code))
                     logger.warning(
-                        "Failed to select symbol %s in Market Watch. Error code: %s",
+                        "Failed to select symbol {} in Market Watch. Error code: {}",
                         symbol,
                         err_code,
                     )
             except Exception as e:  # noqa: BLE001
                 failed_symbols.append((symbol, str(e)))
-                logger.warning("Exception while selecting symbol %s: %s", symbol, e)
+                logger.warning("Exception while selecting symbol {}: {}", symbol, e)
 
         logger.info(
             "Market Watch symbol selection complete",
@@ -220,7 +220,7 @@ class MT5Client:
                 return False
             return bool(terminal_info.connected)
         except Exception as e:  # noqa: BLE001
-            logger.debug("Error checking MT5 connection status: %s", e)
+            logger.debug("Error checking MT5 connection status: {}", e)
             return False
 
     def shutdown(self) -> None:
@@ -231,7 +231,7 @@ class MT5Client:
             logger.info("MetaTrader 5 terminal connection shut down successfully.")
         except Exception as e:  # noqa: BLE001
             logger.error(
-                "Error during MetaTrader 5 shutdown: %s",
+                "Error during MetaTrader 5 shutdown: {}",
                 e,
                 exc_info=True,
             )
@@ -392,7 +392,7 @@ class MT5Client:
             attr = getattr(mt5, name)
             if callable(attr) and not self.is_connected():
                 logger.info(
-                    "MT5 client not connected. Auto-connecting on delegated call: %s",
+                    "MT5 client not connected. Auto-connecting on delegated call: {}",
                     name,
                 )
                 self.connect()
