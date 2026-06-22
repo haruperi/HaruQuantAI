@@ -70,6 +70,7 @@
 ## 6. Documentation & Commands
 
 - **Update Rules**: Architecture/API/models → docs/ARCHITECTURE.md. Sprint state/decisions → CHANGELOG.md. AI workflow → AGENTS.md.
+- **Update Module/Service Documentation**: Add/update `app/services/<module>/README.md` for each module/service. If it doesn't exist, create it using `docs/templates/README.md`.
 - **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `pytest`, `ruff check .`, `mypy .`
 - **Restricted Commands (Require APPROVED: EXECUTE)**: `rm -rf`, `git reset`, `git clean`, `pip install`, `npm install`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.
 
