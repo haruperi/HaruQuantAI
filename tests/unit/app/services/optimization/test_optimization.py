@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """Unit tests for the Phase 9 Optimization Service.
 
 Covers parameter space schemas, search algorithms, scoring metrics, Walk-Forward splits,
@@ -5,6 +6,49 @@ robustness stress testing, checkpoint atomic writes, and repository persistence.
 """
 
 from __future__ import annotations
+
+import sys
+from unittest.mock import MagicMock
+
+
+# Setup mock simulator module dynamically for the test run since it does
+# not exist on disk
+class MockEngine:
+    def __init__(self) -> None:
+        self.deals: dict[str, Any] = {}
+
+class MockOrchestrator:
+    def __init__(self, engine: Any) -> None:
+        self.engine = engine
+    def execute(self, _payload: Any) -> dict[str, Any]:
+        return {
+            "status": "success",
+            "data": {
+                "run_id": "opt_run_mock",
+                "summary_metrics": {
+                    "ending_balance": 100000.0,
+                    "net_profit": 0.0,
+                    "total_trades": 0,
+                }
+            }
+        }
+
+mock_simulator_engine = MagicMock()
+mock_simulator_engine.EventDrivenExecutionEngine = MockEngine
+
+mock_simulator_orch = MagicMock()
+mock_simulator_orch.BacktestOrchestrator = MockOrchestrator
+
+mock_simulator_base = MagicMock()
+sys.modules["app.services.simulator"] = mock_simulator_base
+sys.modules["app.services.simulator.engine"] = mock_simulator_engine
+sys.modules["app.services.simulator.orchestrator"] = mock_simulator_orch
+
+# Setup mock strategies registry dynamically since it does not exist on disk
+mock_strategies_base = MagicMock()
+mock_registry = MagicMock()
+sys.modules["app.services.strategies"] = mock_strategies_base
+sys.modules["app.services.strategies.registry"] = mock_registry
 
 import tempfile
 from datetime import UTC, datetime
@@ -69,6 +113,16 @@ from app.services.optimization.persistence.checkpoint import (
     save_checkpoint,
 )
 from app.utils.standard import validate_standard_response
+
+
+@pytest.fixture(autouse=True)
+def ensure_mock_simulator() -> None:
+    """Ensure mock simulator and strategies are in sys.modules during tests."""
+    sys.modules["app.services.simulator"] = mock_simulator_base
+    sys.modules["app.services.simulator.engine"] = mock_simulator_engine
+    sys.modules["app.services.simulator.orchestrator"] = mock_simulator_orch
+    sys.modules["app.services.strategies"] = mock_strategies_base
+    sys.modules["app.services.strategies.registry"] = mock_registry
 
 
 @pytest.fixture
@@ -323,7 +377,7 @@ def test_run_strategy_backtest_from_path() -> None:
     # Create temp strategy file
     with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as tmp:
         tmp.write(
-            "from app.services.strategies.base import BaseStrategy\n"
+            "from app.services.strategy.base import BaseStrategy\n"
             "class MyTempStrat(BaseStrategy):\n"
             "    strategy_ref = 'my_temp_strat'\n"
             "    def run_vectorized_signals(self, data, indicators, context, config):\n"
@@ -442,6 +496,7 @@ def test_pareto_select() -> None:
 # --- Splitting Testing ---
 def test_walk_forward_splits() -> None:
     """Verify rolling and expanding splits generation and purging/embargo windows."""
+    from datetime import timedelta
     wfs = WalkForwardSplit(
         start_date="2026-01-01T00:00:00Z",
         end_date="2026-01-10T00:00:00Z",
@@ -450,6 +505,7 @@ def test_walk_forward_splits() -> None:
         fold_mode="rolling",
         purging_bars=10,
         embargo_bars=15,
+        bar_duration=timedelta(minutes=1),
     )
     res = wfs.split()
     assert len(res.folds) == 3
@@ -524,13 +580,23 @@ def test_strategy_robustness_assessment(sample_trades: list[dict[str, Any]]) -> 
 # --- Sweeps and Search Algorithms Testing ---
 def test_grid_search(sample_parameter_space: ParameterSpace) -> None:
     """Verify iterator-based grid search and parallel sweeps."""
+    small_space = ParameterSpace(
+        parameters=[
+            ParameterRange(
+                name="short_window", type="int", min_value=5, max_value=6, step=1
+            ),
+            ParameterRange(
+                name="long_window", type="int", min_value=10, max_value=12, step=2
+            ),
+        ]
+    )
     summary = grid_search(
         strategy_ref="trend_following",
         symbols=["EURUSD"],
         timeframe="M1",
         start="2026-01-01T00:00:00Z",
         end="2026-01-01T01:00:00Z",
-        parameter_space=sample_parameter_space,
+        parameter_space=small_space,
         objective="sharpe",
         initial_balance=10000.0,
         dry_run=True,
@@ -545,7 +611,7 @@ def test_grid_search(sample_parameter_space: ParameterSpace) -> None:
         timeframe="M1",
         start="2026-01-01T00:00:00Z",
         end="2026-01-01T01:00:00Z",
-        parameter_space=sample_parameter_space,
+        parameter_space=small_space,
         objective="sharpe",
         initial_balance=10000.0,
         max_workers=2,

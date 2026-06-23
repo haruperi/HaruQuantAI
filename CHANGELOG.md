@@ -28,7 +28,8 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-013 | Risk Management Service | Added risk management service with support for risk assessment, position sizing, portfolio management, and scenario analysis. Usage examples in `tests/usage/app/services/05_risk.py`. |
 | ADD-014 | Analytics Service | Added analytics service for performance evaluation, scenario analysis, and reporting. Usage examples in `tests/usage/app/services/06_analytics.py`. |
 | ADD-015 | Optimisation Service | Added optimisation service  with search algorithms, parameter tuning, and walk-forward analysis support. Usage examples in `tests/usage/app/services/08_optimisation.py`. |
-| ADD-016 | Live Trading Service | Added core live runtime monitoring services, including health tracking, incident management, and state reconciliation.. Usage examples in `tests/usage/app/services/10_live.py`. |
+| ADD-016 | Live Trading Service | Added core live runtime monitoring services, including health tracking, incident management, and state reconciliation. Usage examples in `tests/usage/app/services/10_live.py`. |
+| ADD-017 | Research Service | Added core research service, for data leakage detection, chronological splitting, and edge discovery studies. Usage examples in `tests/usage/app/services/09_research.py`. |
 
 
 

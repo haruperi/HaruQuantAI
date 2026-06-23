@@ -591,3 +591,14 @@ class EdgeResult(BaseModel):
     trades: list[TradeSample] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     audit_metadata: dict[str, object] = Field(default_factory=dict)
+
+
+def research_modeling_module() -> object:
+    """Resolve and return the research modeling service module dynamically.
+
+    Returns:
+        object: The research modeling service module (unsupervised).
+    """
+    from importlib import import_module
+
+    return import_module("app.services.research.studies.unsupervised")

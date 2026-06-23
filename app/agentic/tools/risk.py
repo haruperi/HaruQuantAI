@@ -173,7 +173,9 @@ def risk_tool(
                 )
             except Exception as e:  # noqa: BLE001
                 logger.error(
-                    f"Risk tool {name} error: {e}",
+                    "Risk tool {} error: {}",
+                    name,
+                    str(e),
                     extra={"request_id": request_id},
                 )
                 meta = build_metadata(
@@ -973,7 +975,7 @@ def generate_risk_report(
 
         return report_dict
     except Exception as e:  # noqa: BLE001
-        logger.error(f"Error generating risk report in tool: {e}")
+        logger.error("Error generating risk report in tool: {}", str(e))
         return {
             "status": "error",
             "message": f"Failed to generate risk report: {e}",

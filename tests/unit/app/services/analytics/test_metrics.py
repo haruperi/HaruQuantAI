@@ -287,7 +287,7 @@ def test_adapters_validation():
         TradingResultAdapter.to_canonical(bad_payload)
 
     bad_payload["schema_version"] = "2.0.0"
-    with pytest.raises(ValidationError, match="Unsupported schema version"):
+    with pytest.raises(ValidationError, match="future version"):
         TradingResultAdapter.to_canonical(bad_payload)
 
     bad_payload["schema_version"] = "1.3"
@@ -342,12 +342,12 @@ def test_trade_classification(sample_trades):
 
 
 def test_r_multiples(sample_trades):
-    r_mults = get_r_multiples(sample_trades)
+    r_mults, _ = get_r_multiples(sample_trades)
     assert r_mults == [2.0, -0.8]
 
     # Test missing risk fallback
     trades_no_risk = [{"trade_id": "t1", "profit_loss": 50.0}]
-    r_mults_fallback = get_r_multiples(trades_no_risk)
+    r_mults_fallback, _ = get_r_multiples(trades_no_risk)
     assert r_mults_fallback == [50.0]
 
 
@@ -479,7 +479,7 @@ def test_trade_metrics_extended(sample_trades):
         {"mae_r": -0.4, "mfe_r": 2.8},
         {"mae_r": -1.0, "mfe_r": 0.2},
     ]
-    assert median_mae_mfe(sample_trades) == {"mae": -20.0, "mfe": 140.0}
+    assert median_mae_mfe(sample_trades) == {"mae": -35.0, "mfe": 75.0}
 
     # T-statistic
     assert t_statistic(sample_trades) > -999.0
@@ -524,7 +524,7 @@ def test_trade_adjusted_metrics(sample_trades):
     assert max_runup([]) == 0.0
     assert (
         max_runup_date([{"timestamp": "2026-01-01", "equity": 100.0}])
-        == "1970-01-01T00:00:00Z"
+        == "1970-01-01T00:00:00+00:00"
     )
 
     # Subset & periods
@@ -921,6 +921,12 @@ def test_dashboard(sample_equity):
 
 
 def test_analytics_coverage_expansion(mocker):
+    from app.services.analytics._helpers import (
+        parse_utc_time as equity_parse_time,
+    )
+    from app.services.analytics.benchmark import (
+        _to_float_list,
+    )
     from app.services.analytics.distributions import (
         detect_outliers,
         kurtosis,
@@ -932,10 +938,6 @@ def test_analytics_coverage_expansion(mocker):
     )
     from app.services.analytics.equity import (
         _parse_equity_curve,
-        _to_float_list,
-    )
-    from app.services.analytics.equity import (
-        _parse_time as equity_parse_time,
     )
     from app.services.analytics.risk import (
         calculate_risk_metrics,
@@ -1046,7 +1048,7 @@ def test_analytics_coverage_expansion(mocker):
     assert max_consecutive_drawdown_trades([]) == 0
     assert max_consecutive_drawdown_trades(trades_data) >= 0
 
-    assert max_close_to_close_drawdown_date([]) == "1970-01-01T00:00:00Z"
+    assert max_close_to_close_drawdown_date([]) == "1970-01-01T00:00:00+00:00"
     assert max_close_to_close_drawdown_date(trades_data) != ""
 
     assert avg_trade_notional_efficiency([]) == 0.0

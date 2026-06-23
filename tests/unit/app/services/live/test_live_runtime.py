@@ -391,7 +391,7 @@ class TestLiveSession:
 class TestLiveGates:
     """Tests for the live gate evaluation chain."""
 
-    def _make_config(self, *, live_enabled: bool = True, live_mode: str = "shadow"):
+    def _make_config(self, *, live_enabled: bool = True, live_mode: str = "read_only"):
         from app.utils.settings import Settings
 
         cfg = Settings()
@@ -405,7 +405,7 @@ class TestLiveGates:
         from app.utils.settings import Settings
 
         cfg = Settings()  # live_enabled=False by default
-        results = evaluate_live_gate(action="submit_order", config=cfg)
+        results = evaluate_live_gate(action="sync_positions", config=cfg)
         assert len(results) >= 1
         assert results[0].decision == LiveGateDecision.BLOCK
         assert results[0].error_code == "LIVE_DISABLED"
@@ -416,7 +416,7 @@ class TestLiveGates:
 
         cfg = self._make_config()
         results = evaluate_live_gate(
-            action="submit_order",
+            action="sync_positions",
             config=cfg,
             session_active=True,
             reconciliation_clean=True,
@@ -430,7 +430,7 @@ class TestLiveGates:
 
         cfg = self._make_config()
         results = evaluate_live_gate(
-            action="submit_order",
+            action="sync_positions",
             config=cfg,
             session_active=False,
         )
@@ -445,7 +445,7 @@ class TestLiveGates:
         cfg = self._make_config()
         stale_timestamp = datetime.now(UTC) - timedelta(seconds=999)
         results = evaluate_live_gate(
-            action="submit_order",
+            action="sync_positions",
             config=cfg,
             session_active=True,
             context_timestamp=stale_timestamp,
@@ -460,7 +460,7 @@ class TestLiveGates:
 
         cfg = self._make_config()
         results = evaluate_live_gate(
-            action="submit_order",
+            action="sync_positions",
             config=cfg,
             session_active=True,
             reconciliation_clean=False,
@@ -476,7 +476,7 @@ class TestLiveGates:
 
         cfg = self._make_config()
         results = evaluate_live_gate(
-            action="submit_order",
+            action="sync_positions",
             config=cfg,
             session_active=True,
             reconciliation_clean=True,
@@ -595,7 +595,7 @@ class TestLiveGates:
 class TestLiveExecutor:
     """Tests for the live trade executor."""
 
-    def _make_config(self, *, live_enabled: bool = True, live_mode: str = "shadow"):
+    def _make_config(self, *, live_enabled: bool = True, live_mode: str = "read_only"):
         from app.utils.settings import Settings
 
         cfg = Settings()
@@ -626,7 +626,7 @@ class TestLiveExecutor:
 
         executor = LiveTradeExecutor(config=self._make_config())
         result = executor.execute(
-            action="submit_order",
+            action="sync_positions",
             request={"symbol": "EURUSD"},
             session_active=True,
             reconciliation_clean=True,
@@ -678,7 +678,7 @@ class TestLiveExecutor:
         ):
             executor = LiveTradeExecutor(config=self._make_config())
             result = executor.execute(
-                action="submit_order",
+                action="sync_positions",
                 request={"symbol": "EURUSD"},
                 session_active=True,
                 reconciliation_clean=True,

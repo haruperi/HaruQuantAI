@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 
 import pytest
-from agentic.tools.risk import (
+from app.agentic.tools.risk import (
     assess_risk_regime,
     build_portfolio_risk_snapshot,
     calculate_correlation_matrix,

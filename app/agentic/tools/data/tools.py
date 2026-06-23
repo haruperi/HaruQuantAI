@@ -212,7 +212,9 @@ def data_tool(
                 )
             except Exception as e:  # noqa: BLE001
                 logger.error(
-                    f"Tool {name} error: {e}",
+                    "Tool {} error: {}",
+                    name,
+                    str(e),
                     extra={"request_id": request_id},
                 )
                 meta = build_metadata(

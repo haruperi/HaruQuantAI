@@ -1,10 +1,22 @@
-# ruff: noqa: PLR0915
+# ruff: noqa: PLR0915, E402, SIM105, ICN001
 """Unit tests for the generic Trade classes."""
 
+import sys
 from unittest.mock import MagicMock
 
+# Eagerly import pandas before datetime.datetime gets patched
+try:
+    import pandas as _pd  # noqa: F401
+except ImportError:
+    pass
+
+# Mock app.services.simulator module since it does not exist on disk
+mock_sim = MagicMock()
+mock_sim.__name__ = "app.services.simulator"
+sys.modules["app.services.simulator"] = mock_sim
+
 import pytest
-from app.routes.brokers import get_broker_module
+from app.services.brokers import get_broker_module
 from app.services.trader import (
     AccountInfo,
     DealInfo,
@@ -17,6 +29,15 @@ from app.services.trader import (
 )
 from app.utils.errors import classify_broker_error, trading_retry_delay
 from pytest_mock import MockerFixture
+
+
+@pytest.fixture(autouse=True)
+def ensure_mock_simulator() -> None:
+    """Ensure mock simulator is always in sys.modules.
+
+    Protects against teardown pop pollution.
+    """
+    sys.modules["app.services.simulator"] = mock_sim
 
 
 @pytest.fixture(autouse=True)
@@ -218,7 +239,7 @@ def mock_broker(mocker: MockerFixture) -> MagicMock:
     trade_res.comment = "Request executed"
     mock_mod.trade.return_value = trade_res
 
-    mocker.patch("app.routes.brokers.get_broker_module", return_value=mock_mod)
+    mocker.patch("app.services.brokers.get_broker_module", return_value=mock_mod)
     mocker.patch(
         "app.services.trader.terminal_info.get_broker_module", return_value=mock_mod
     )
@@ -253,7 +274,7 @@ def test_resolver_mt5(mocker: MockerFixture) -> None:
     # Resolve resolver import locally
     import app.services.brokers.mt5 as mock_mt5
 
-    mocker.patch("app.routes.brokers.get_broker_module", return_value=mock_mt5)
+    mocker.patch("app.services.brokers.get_broker_module", return_value=mock_mt5)
 
     res = get_broker_module()
     assert res == mock_mt5
@@ -285,7 +306,8 @@ def test_resolver_actual_resolution(mocker: MockerFixture) -> None:
         "app.services.brokers.router.get_active_broker_name", return_value="simulator"
     )
     res_sim = get_broker_module()
-    from app.services import simulator
+    import sys
+    simulator = sys.modules["app.services.simulator"]
 
     assert res_sim == simulator
 
@@ -621,7 +643,7 @@ def test_kill_switch_actions(mock_broker: MagicMock) -> None:
 
 def test_service_router_matches_legacy_route(mocker: MockerFixture) -> None:
     """Service-level broker router remains compatible with legacy route wrapper."""
-    from app.routes.brokers import get_broker_module as get_route_broker
+    from app.services.brokers import get_broker_module as get_route_broker
     from app.services.brokers.router import get_broker_module as get_service_broker
 
     mocker.patch(

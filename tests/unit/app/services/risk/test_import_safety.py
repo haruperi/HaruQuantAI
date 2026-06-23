@@ -111,7 +111,7 @@ def test_missing_optional_dependencies() -> None:
 
 def test_agentic_tools_safety_metadata() -> None:
     """Verify that all tools in agentic/tools/risk.py do not place trades."""
-    import agentic.tools.risk as risk_tools
+    import app.agentic.tools.risk as risk_tools
 
     for tool_name in risk_tools.__all__:
         if tool_name in {"get_shared_governor", "get_shared_store"}:
@@ -121,9 +121,9 @@ def test_agentic_tools_safety_metadata() -> None:
         assert callable(tool_func), f"Tool {tool_name} is not callable"
 
         with (
-            patch("agentic.tools.risk.get_shared_governor") as mock_gov_getter,
-            patch("agentic.tools.risk.load_risk_config"),
-            patch("agentic.tools.risk._shared_store"),
+            patch("app.agentic.tools.risk.get_shared_governor") as mock_gov_getter,
+            patch("app.agentic.tools.risk.load_risk_config"),
+            patch("app.agentic.tools.risk._shared_store"),
         ):
             mock_gov = MagicMock()
             mock_gov_getter.return_value = mock_gov
