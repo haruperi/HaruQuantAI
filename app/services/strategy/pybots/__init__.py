@@ -1,14 +1,9 @@
-"""Strategy pybots sub-package.
+"""Bundled HaruQuant strategy implementations and discovery registry."""
 
-Exposes concrete algorithm implementations for live and paper trading.
-"""
-
-from app.services.strategy.pybots.trend_following import (
-    TrendFollowingState,
-    TrendFollowingStrategy,
+from app.services.strategy.pybots.registry import (
+    bundled_strategy_ids,
+    load_bundled_strategy,
+    strategy_from_config,
 )
 
-__all__ = [
-    "TrendFollowingState",
-    "TrendFollowingStrategy",
-]
+__all__ = ["bundled_strategy_ids", "load_bundled_strategy", "strategy_from_config"]

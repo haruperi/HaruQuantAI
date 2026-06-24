@@ -18,6 +18,7 @@ from typing import Any
 
 import pandas as pd
 
+from app.services.contracts.strategies import Bar
 from app.utils.errors import DataError, ValidationError
 from app.utils.logger import logger
 from app.utils.paths import ensure_parent_dir, normalize_path
@@ -536,3 +537,54 @@ def load_local_dataset(
         logger.error(f"Failed to load local dataset from {resolved_path}: {e}")
         err_load = f"Failed to load dataset: {e}"
         raise DataError(err_load) from e
+
+
+_TIME_COLUMNS = ("open_time", "time", "timestamp", "datetime", "date")
+
+
+def _parse_timezone_aware_datetime(val: str) -> datetime:
+    dt = datetime.fromisoformat(val)
+    if dt.tzinfo is None:
+        raise ValueError("Timestamp must include a timezone.")
+    return dt
+
+
+def load_ohlcv_csv(path: str | Path) -> tuple[Bar, ...]:
+    """Load canonical OHLCV bars from a UTF-8 CSV file.
+
+    The file must contain a timestamp column named one of ``open_time``,
+    ``time``, ``timestamp``, ``datetime``, or ``date``, plus ``open``, ``high``,
+    ``low``, and ``close``.  Timestamps must include an explicit timezone, for
+    example ``2026-01-01T00:00:00+00:00`` or a trailing ``Z``.
+    """
+    from app.services.data.validation import validate_bars
+
+    raw_records = load_local_dataset(str(path))
+    if not raw_records:
+        raise ValueError("At least one OHLCV bar is required.")
+
+    time_column = next((name for name in _TIME_COLUMNS if name in raw_records[0]), None)
+    if time_column is None:
+        msg = f"CSV needs one of timestamp columns: {_TIME_COLUMNS!r}."
+        raise ValueError(msg)
+
+    bars = []
+    for row in raw_records:
+        try:
+            raw_time = str(row[time_column]).strip().replace("Z", "+00:00")
+            open_time = _parse_timezone_aware_datetime(raw_time)
+            bars.append(
+                Bar(
+                    open_time=open_time,
+                    open=float(row["open"]),
+                    high=float(row["high"]),
+                    low=float(row["low"]),
+                    close=float(row["close"]),
+                    volume=float(row.get("volume", "0") or 0),
+                )
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            msg = f"Invalid OHLCV row: {row!r}"
+            raise ValueError(msg) from error
+
+    return validate_bars(bars)

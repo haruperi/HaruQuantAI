@@ -5,10 +5,12 @@ into a single data-validation layer.
 """
 
 import zoneinfo
+from collections.abc import Iterable
 from datetime import UTC, datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
+from app.services.contracts.strategies import Bar
 from app.services.data.storage import db_helper
 from app.utils.errors import ValidationError
 from app.utils.logger import logger
@@ -456,3 +458,18 @@ def validate_license(
         raise ValidationError("LICENSE_RESTRICTION: Redistribution limits.")
 
     return license_info
+
+
+def validate_bars(bars: Iterable[Bar]) -> tuple[Bar, ...]:
+    """Return bars as an increasing, non-empty tuple after validation."""
+    normalized = tuple(bars)
+    if not normalized:
+        raise ValueError("At least one OHLCV bar is required.")
+    previous: datetime | None = None
+    for bar in normalized:
+        if previous is not None and bar.open_time <= previous:
+            raise ValueError(
+                "Bar open times must be strictly increasing with no duplicates."
+            )
+        previous = bar.open_time
+    return normalized

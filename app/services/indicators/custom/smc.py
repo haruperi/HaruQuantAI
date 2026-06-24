@@ -1,9 +1,12 @@
 """Smart Money Concepts (SMC) Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class SMC(BaseIndicator):
     """Smart Money Concepts (SMC)
@@ -40,34 +43,34 @@ class SMC(BaseIndicator):
     ) -> pd.DataFrame:
         # Validate input DataFrame
         ohlc = self._validate_and_lowercase(df, "ohlc")
-        
+
         result_df = df.copy()
-        
+
         # FVG calculation
         fvg_res = self._fvg(ohlc, join_consecutive_fvg)
         result_df["fvg"] = fvg_res["FVG"].values
         result_df["fvg_top"] = fvg_res["Top"].values
         result_df["fvg_bottom"] = fvg_res["Bottom"].values
         result_df["fvg_mitigated"] = fvg_res["MitigatedIndex"].values
-        
+
         # Swing Highs/Lows calculation
         swings = self._swing_highs_lows(ohlc, swing_length)
         result_df["swing_high_low"] = swings["HighLow"].values
         result_df["swing_level"] = swings["Level"].values
-        
+
         # BOS / CHoCH calculation
         bc = self._bos_choch(ohlc, swings, close_break)
         result_df["bos"] = bc["BOS"].values
         result_df["choch"] = bc["CHOCH"].values
         result_df["structure_level"] = bc["Level"].values
         result_df["structure_broken"] = bc["BrokenIndex"].values
-        
+
         return result_df
 
     def _validate_and_lowercase(self, df: pd.DataFrame, columns_required: str = "ohlc") -> pd.DataFrame:
         df_copy = df.copy()
         df_copy.columns = [c.lower() for c in df_copy.columns]
-        
+
         inputs = {
             "o": "open",
             "h": "high",

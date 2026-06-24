@@ -1,9 +1,12 @@
 """Weighted Moving Average (WMA) Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class WMA(BaseIndicator):
     """Weighted Moving Average (WMA)
@@ -32,12 +35,12 @@ class WMA(BaseIndicator):
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
-        
+
         weights = np.arange(1, period + 1)
         sum_weights = weights.sum()
-        
+
         def linear_wma(x: np.ndarray[Any, Any]) -> Any:
             return np.dot(x, weights) / sum_weights
 

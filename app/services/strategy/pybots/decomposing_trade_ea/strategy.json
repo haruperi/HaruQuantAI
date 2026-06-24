@@ -1,0 +1,227 @@
+{
+  "schema_version": "1.0.0",
+  "strategy_manifest": {
+    "identity": {
+      "strategy_id": "decomposing_trade_ea",
+      "strategy_type": "rsi_decomposition_grid",
+      "description": "Faithful broker-neutral translation of Decomposing Trade EA: RSI triggers, balance-scaled lots, averaging, partial decompression and trailing stops.",
+      "author": "HaruQuantAI",
+      "created_at": "2026-06-23"
+    },
+    "version": "1.0.0",
+    "chart_requirements": {
+      "main": {
+        "symbol": "EURUSD",
+        "timeframe": "H1"
+      },
+      "other": {}
+    },
+    "supported_runtime_modes": [
+      "SIMULATOR",
+      "PAPER"
+    ],
+    "strategy_capabilities": [
+      "market_entry",
+      "hedging",
+      "partial_close",
+      "modify_positions",
+      "multi_position"
+    ],
+    "permissions": {
+      "lifecycle_status": "RESEARCH",
+      "permitted_environments": [
+        "SIMULATOR",
+        "PAPER"
+      ],
+      "risk_profile": {
+        "execution_authority": "Risk Governor"
+      }
+    }
+  },
+  "trading_profile": {
+    "magic_number": 767565,
+    "order_comment": "decomposing_trade_ea",
+    "symbols": {
+      "main": {
+        "symbol": "EURUSD",
+        "timeframe": "H1"
+      },
+      "other": {}
+    },
+    "simulation_defaults": {
+      "starting_balance": 10000.0
+    }
+  },
+  "parameters": {
+    "definitions": {
+      "rsi_period": {
+        "type": "integer",
+        "default": 14,
+        "description": "rsi_period setting."
+      },
+      "oversold": {
+        "type": "number",
+        "default": 30.0,
+        "description": "oversold setting."
+      },
+      "overbought": {
+        "type": "number",
+        "default": 70.0,
+        "description": "overbought setting."
+      },
+      "balance_increase": {
+        "type": "number",
+        "default": 3000.0,
+        "description": "balance_increase setting."
+      },
+      "volume_increase": {
+        "type": "number",
+        "default": 0.06,
+        "description": "volume_increase setting."
+      },
+      "volume_decrease": {
+        "type": "number",
+        "default": 0.02,
+        "description": "volume_decrease setting."
+      },
+      "when_to_trail_pips": {
+        "type": "number",
+        "default": 20.0,
+        "description": "when_to_trail_pips setting."
+      },
+      "trail_by_pips": {
+        "type": "number",
+        "default": 10.0,
+        "description": "trail_by_pips setting."
+      },
+      "trade_distance_pips": {
+        "type": "number",
+        "default": 20.0,
+        "description": "trade_distance_pips setting."
+      },
+      "pip_multiplier": {
+        "type": "number",
+        "default": 10.0,
+        "description": "pip_multiplier setting."
+      }
+    },
+    "values": {
+      "rsi_period": 14,
+      "oversold": 30.0,
+      "overbought": 70.0,
+      "balance_increase": 3000.0,
+      "volume_increase": 0.06,
+      "volume_decrease": 0.02,
+      "when_to_trail_pips": 20.0,
+      "trail_by_pips": 10.0,
+      "trade_distance_pips": 20.0,
+      "pip_multiplier": 10.0
+    },
+    "generation_metadata": {
+      "optimization_enabled": true
+    }
+  },
+  "risk_management": {
+    "strategy_sizing_hint": {
+      "mode": "strategy_formula",
+      "value": null,
+      "authoritative": false,
+      "note": "The Risk Governor approves final size and portfolio exposure."
+    }
+  },
+  "trading_options": {
+    "timezone": "UTC",
+    "warmup_bars": 16,
+    "max_trades_per_day": 0,
+    "schedule": {
+      "weekend": {
+        "enabled": false,
+        "start": {
+          "weekday": "FRIDAY",
+          "time": "00:00"
+        },
+        "end": {
+          "weekday": "SUNDAY",
+          "time": "23:59"
+        }
+      }
+    },
+    "end_of_day_exit": {
+      "enabled": false,
+      "time": "23:59"
+    },
+    "friday_exit": {
+      "enabled": false,
+      "time": "20:00"
+    },
+    "signal_time_range": {
+      "enabled": false,
+      "start": "00:00",
+      "end": "23:59",
+      "exit_at_end": false,
+      "orders_to_close": "ALL"
+    },
+    "session_restrictions": [],
+    "pending_order_distance": {
+      "enabled": false,
+      "max_distance_from_market_pct": 6.0
+    },
+    "stop_loss_bounds": {
+      "minimum_ticks": 0,
+      "maximum_ticks": 0
+    },
+    "profit_target_bounds": {
+      "minimum_ticks": 0,
+      "maximum_ticks": 0
+    },
+    "trading_filters": {
+      "allowed_directions": [
+        "LONG",
+        "SHORT"
+      ],
+      "max_open_positions": 0,
+      "max_spread_ticks": null,
+      "max_slippage_ticks": null
+    }
+  },
+  "signal_rules": {
+    "long_entry_signal": {},
+    "short_entry_signal": {},
+    "long_exit_signal": {},
+    "short_exit_signal": {}
+  },
+  "action_rules": {
+    "long_entry_action": {
+      "enabled": true,
+      "action": "OPEN",
+      "entry_type": "MARKET"
+    },
+    "short_entry_action": {
+      "enabled": true,
+      "action": "OPEN",
+      "entry_type": "MARKET"
+    },
+    "long_exit_action": {
+      "enabled": true,
+      "action": "CLOSE"
+    },
+    "short_exit_action": {
+      "enabled": true,
+      "action": "CLOSE"
+    },
+    "direction_conflict_policy": "REJECT_BOTH",
+    "entry_exit_conflict_policy": "EXIT_PRIORITY",
+    "duplicate_trade_policy": "ALLOW"
+  },
+  "protection_rules": {},
+  "state_contract": {
+    "last_processed_bar": true,
+    "idempotency_keys": true,
+    "custom_state": true
+  },
+  "required": [
+    "strategy_manifest.identity.strategy_id",
+    "trading_profile.symbols.main.symbol",
+    "parameters.values"
+  ]
+}

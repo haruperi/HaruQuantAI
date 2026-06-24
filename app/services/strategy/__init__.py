@@ -1,39 +1,34 @@
-"""Strategy Module public API.
+"""Shared contracts and base classes for HaruQuant strategies."""
 
-Exports the core models, base strategy classes, execution services,
-inspectors, and reference implementations.
-"""
-
-from app.services.strategy.base import BaseStrategy, StrategyProtocol
-from app.services.strategy.models import (
-    OrderSide,
-    OrderType,
-    PortfolioState,
-    StrategyConfig,
-    StrategyContext,
-    StrategyManifest,
-    StrategyResult,
+from app.services.contracts.strategies import (
+    AccountSnapshot,
+    Bar,
+    Direction,
+    EntryType,
+    IntentAction,
+    MarketContext,
+    PendingOrderSnapshot,
+    PositionSnapshot,
+    ProtectionRequest,
+    QuoteSnapshot,
+    RuntimeMode,
+    SignalSet,
+    StrategyDecision,
     TradeIntent,
 )
-from app.services.strategy.pybots import (
-    TrendFollowingState,
-    TrendFollowingStrategy,
+from app.services.strategy.base import BaseStrategy, StrategyPermissionError
+from app.services.strategy.config import (
+    ConfigurationError,
+    StrategyConfig,
+    load_strategy_config,
+    validate_strategy_config,
 )
-from app.services.strategy.service import StrategyService, TradeIntentInspector
+from app.services.strategy.state import StrategyState
 
 __all__ = [
-    "BaseStrategy",
-    "OrderSide",
-    "OrderType",
-    "PortfolioState",
-    "StrategyConfig",
-    "StrategyContext",
-    "StrategyManifest",
-    "StrategyProtocol",
-    "StrategyResult",
-    "StrategyService",
-    "TradeIntent",
-    "TradeIntentInspector",
-    "TrendFollowingState",
-    "TrendFollowingStrategy",
+    "AccountSnapshot", "Bar", "BaseStrategy", "ConfigurationError", "Direction",
+    "EntryType", "IntentAction", "MarketContext", "PendingOrderSnapshot",
+    "PositionSnapshot", "ProtectionRequest", "QuoteSnapshot", "RuntimeMode",
+    "SignalSet", "StrategyConfig", "StrategyDecision", "StrategyPermissionError",
+    "StrategyState", "TradeIntent", "load_strategy_config", "validate_strategy_config",
 ]

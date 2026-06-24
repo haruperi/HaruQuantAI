@@ -1,9 +1,12 @@
 """Inside Bar Candlestick Pattern Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class InsideBar(BaseIndicator):
     """Inside Bar Pattern
@@ -29,15 +32,15 @@ class InsideBar(BaseIndicator):
         for col in required_cols:
             if col not in df.columns:
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
-        
+
         result_df = df.copy()
-        
+
         high_prev = df["high"].shift(1)
         low_prev = df["low"].shift(1)
-        
+
         is_inside = (df["high"] <= high_prev) & (df["low"] >= low_prev)
         pattern = np.where(is_inside, 1, 0)
         pattern[0] = 0
-        
+
         result_df["candle_inside_bar"] = pattern
         return result_df

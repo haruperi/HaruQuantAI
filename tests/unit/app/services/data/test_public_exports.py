@@ -21,7 +21,7 @@ def clean_db() -> None:
 
 
 def test_public_exports_count() -> None:
-    """Verify that exactly 21 clean service APIs are exported."""
+    """Verify that exactly 23 clean service APIs are exported."""
     expected_service_apis = {
         "aggregate_ticks_to_bars",
         "align_multitimeframe_data",
@@ -39,14 +39,16 @@ def test_public_exports_count() -> None:
         "label_market_data",
         "list_symbols",
         "load_local_dataset",
+        "load_ohlcv_csv",
         "resample_ohlcv",
         "run_data_update_job_once",
         "save_market_data",
         "start_data_update_job",
         "stop_data_update_job",
+        "validate_bars",
     }
     assert set(data_all) == expected_service_apis
-    assert len(data_all) == 21
+    assert len(data_all) == 23
 
 
 def test_service_signatures_exist() -> None:

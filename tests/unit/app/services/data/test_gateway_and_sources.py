@@ -628,3 +628,49 @@ def test_circuit_breaker_barrier_half_open() -> None:
     cb = get_circuit_breaker("csv")
     assert cb["state"] == "half-open"
 
+
+def test_gateway_validation_and_failures() -> None:
+    from app.services.data.gateway import get_data, check_rate_limit, check_circuit_breaker_barrier, execute_gateway_request
+    from app.utils.standard import validate_standard_response
+
+    # Unsupported data_kind validation failure
+    with pytest.raises(ValidationError, match="Unsupported data_kind"):
+        get_data(
+            symbol="EURUSD",
+            start_time="2026-06-01T00:00:00Z",
+            end_time="2026-06-02T00:00:00Z",
+            data_kind="invalid_kind",
+        )
+
+    # Missing timeframe validation failure
+    with pytest.raises(ValidationError, match="timeframe is required"):
+        get_data(
+            symbol="EURUSD",
+            start_time="2026-06-01T00:00:00Z",
+            end_time="2026-06-02T00:00:00Z",
+            data_kind="ohlcv",
+            timeframe="",
+        )
+
+    # Unknown source check rate limit/circuit breaker should not fail
+    check_rate_limit("unknown_source_123")
+    check_circuit_breaker_barrier("unknown_source_123")
+
+    # execute_gateway_request with unknown source fallback
+    req = {
+        "symbol": "EURUSD",
+        "timeframe": "H1",
+        "start": "2026-06-01T00:00:00Z",
+        "end": "2026-06-02T00:00:00Z",
+        "source": "invalid_source_name",
+        "data_kind": "bars",
+    }
+    with pytest.raises(Exception):
+        execute_gateway_request(
+            request_id="req1",
+            correlation_id="corr1",
+            payload=req,
+            bypass_cache=True,
+        )
+
+

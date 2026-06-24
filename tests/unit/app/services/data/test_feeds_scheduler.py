@@ -272,3 +272,52 @@ def test_feed_status_errors() -> None:
     with pytest.raises(ValidationError, match=r"Feed.*not found"):
         handle_feed_overflow("NonExistentFeed", "halt")
 
+
+def test_async_job_execution_loops() -> None:
+    import asyncio
+    from app.services.data.scheduler import _execute_single_run, _run_job_loop, create_data_update_job, stop_data_update_job, start_data_update_job
+    from unittest.mock import patch, MagicMock
+
+    async def run_test() -> None:
+        job_name = "Async_Loop_Job"
+        create_data_update_job(
+            name=job_name,
+            source="csv",
+            symbols=["EURUSD"],
+            timeframes=["M5"],
+            data_kind="bars",
+            storage_format="csv",
+            storage_path="data/raw",
+            schedule="* * * * *",
+        )
+
+        # 1. Test execute single run success
+        await _execute_single_run(job_name)
+
+        # 2. Test execute single run database error path
+        with patch("app.services.data.storage.db_helper.get_connection") as mock_conn:
+            mock_conn.side_effect = [RuntimeError("DB Fail"), MagicMock()]
+            await _execute_single_run(job_name)  # Should catch exception and log it
+
+        # 3. Test run_job_loop disabled break path
+        # Set job state to disabled (not enabled)
+        stop_data_update_job(job_name)
+        await _run_job_loop(job_name)  # Should read db, see disabled, and break immediately
+
+        # 4. Test run_job_loop CancelledError path
+        # We will patch sleep to raise CancelledError
+        start_data_update_job(job_name)
+        with patch("asyncio.sleep", side_effect=asyncio.CancelledError):
+            await _run_job_loop(job_name)  # Should log cancellation and break
+
+        # 5. Test run_job_loop database exception path
+        # Patch db_helper to raise exception on first call, then patch sleep to raise CancelledError
+        # so it breaks out of the infinite loop
+        with patch("app.services.data.storage.db_helper.get_connection", side_effect=RuntimeError("DB Fail")):
+            with patch("asyncio.sleep", side_effect=[None, asyncio.CancelledError]):
+                try:
+                    await _run_job_loop(job_name)
+                except asyncio.CancelledError:
+                    pass
+
+    asyncio.run(run_test())

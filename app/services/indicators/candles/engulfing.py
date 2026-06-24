@@ -1,9 +1,12 @@
 """Engulfing Candle Pattern Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class Engulfing(BaseIndicator):
     """Engulfing Pattern
@@ -31,22 +34,22 @@ class Engulfing(BaseIndicator):
         for col in required_cols:
             if col not in df.columns:
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
-        
+
         result_df = df.copy()
-        
+
         open_val = df["open"]
         close_val = df["close"]
         open_prev = df["open"].shift(1)
         close_prev = df["close"].shift(1)
-        
+
         # Bullish Engulfing
         bullish = (close_prev < open_prev) & (close_val > open_val) & (close_val >= open_prev) & (open_val <= close_prev)
-        
+
         # Bearish Engulfing
         bearish = (close_prev > open_prev) & (close_val < open_val) & (close_val <= open_prev) & (open_val >= close_prev)
-        
+
         pattern = np.where(bullish, 1, np.where(bearish, -1, 0))
         pattern[0] = 0
-        
+
         result_df["candle_engulfing"] = pattern
         return result_df

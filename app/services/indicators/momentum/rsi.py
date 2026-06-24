@@ -1,8 +1,11 @@
 """Relative Strength Index (RSI) Indicator."""
 
 from typing import Any
+
 import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class RSI(BaseIndicator):
     """Relative Strength Index (RSI)
@@ -31,19 +34,19 @@ class RSI(BaseIndicator):
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
-        
+
         delta = df[column].diff()
         gain = delta.clip(lower=0)
         loss = -delta.clip(upper=0)
-        
+
         # Wilder's smoothing technique
         avg_gain = gain.ewm(alpha=1/period, adjust=False).mean()
         avg_loss = loss.ewm(alpha=1/period, adjust=False).mean()
-        
+
         rs = avg_gain / avg_loss.replace(0, 1e-10)
         rsi = 100 - (100 / (1 + rs))
-        
+
         result_df[f"rsi_{period}"] = rsi
         return result_df

@@ -1,8 +1,11 @@
 """Chaikin Money Flow (CMF) Indicator."""
 
 from typing import Any
+
 import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class CMF(BaseIndicator):
     """Chaikin Money Flow (CMF)
@@ -33,20 +36,20 @@ class CMF(BaseIndicator):
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
-        
+
         high_low_range = df["high"] - df["low"]
         mf_multiplier = ((df["close"] - df["low"]) - (df["high"] - df["close"])) / high_low_range.replace(0, 1e-10)
-        
+
         mf_multiplier = mf_multiplier.fillna(0)
-        
+
         mf_volume = mf_multiplier * df["volume"]
-        
+
         sum_mf_volume = mf_volume.rolling(window=period).sum()
         sum_volume = df["volume"].rolling(window=period).sum()
-        
+
         cmf = sum_mf_volume / sum_volume.replace(0, 1e-10)
-        
+
         result_df[f"cmf_{period}"] = cmf
         return result_df

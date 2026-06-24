@@ -21,6 +21,7 @@ from app.services.data.scheduler import (
 from app.services.data.storage import (
     clear_data_cache,
     load_local_dataset,
+    load_ohlcv_csv,
     save_market_data,
 )
 from app.services.data.transforms import (
@@ -34,6 +35,7 @@ from app.services.data.transforms import (
 from app.services.data.validation import (
     get_market_hours,
     get_trading_sessions,
+    validate_bars,
 )
 
 __all__ = [
@@ -53,9 +55,11 @@ __all__ = [
     "label_market_data",
     "list_symbols",
     "load_local_dataset",
+    "load_ohlcv_csv",
     "resample_ohlcv",
     "run_data_update_job_once",
     "save_market_data",
     "start_data_update_job",
     "stop_data_update_job",
+    "validate_bars",
 ]

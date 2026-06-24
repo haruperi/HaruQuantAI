@@ -1,9 +1,12 @@
 """Doji Candlestick Pattern Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class Doji(BaseIndicator):
     """Doji Pattern
@@ -34,14 +37,14 @@ class Doji(BaseIndicator):
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
         if threshold <= 0:
             raise ValueError("Threshold must be positive.")
-        
+
         result_df = df.copy()
-        
+
         h_range = df["high"] - df["low"]
         body = (df["close"] - df["open"]).abs()
-        
+
         is_doji = (body <= threshold * h_range) & (h_range > 0)
         pattern = np.where(is_doji, 1, 0)
-        
+
         result_df["candle_doji"] = pattern
         return result_df

@@ -1,8 +1,11 @@
 """Williams %R Indicator."""
 
 from typing import Any
+
 import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class WilliamsR(BaseIndicator):
     """Williams %R
@@ -31,14 +34,14 @@ class WilliamsR(BaseIndicator):
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
-        
+
         highest_high = df["high"].rolling(window=period).max()
         lowest_low = df["low"].rolling(window=period).min()
-        
+
         denom = highest_high - lowest_low
         will_r = (highest_high - df["close"]) / denom.replace(0, 1e-10) * -100
-        
+
         result_df[f"will_r_{period}"] = will_r
         return result_df

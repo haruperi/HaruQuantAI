@@ -1,9 +1,12 @@
 """Average True Range (ATR) Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class ATR(BaseIndicator):
     """Average True Range (ATR)
@@ -33,17 +36,17 @@ class ATR(BaseIndicator):
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
-        
+
         high_low = df["high"] - df["low"]
         high_prev_close = (df["high"] - df["close"].shift(1)).abs()
         low_prev_close = (df["low"] - df["close"].shift(1)).abs()
-        
+
         tr = pd.concat([high_low, high_prev_close, low_prev_close], axis=1).max(axis=1)
-        
+
         atr = tr.ewm(alpha=1/period, adjust=False).mean()
         atr.iloc[:period-1] = np.nan
-        
+
         result_df[f"atr_{period}"] = atr
         return result_df

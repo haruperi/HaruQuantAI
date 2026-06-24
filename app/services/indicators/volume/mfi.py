@@ -1,9 +1,12 @@
 """Money Flow Index (MFI) Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class MFI(BaseIndicator):
     """Money Flow Index (MFI)
@@ -35,22 +38,22 @@ class MFI(BaseIndicator):
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
-        
+
         typical_price = (df["high"] + df["low"] + df["close"]) / 3
         raw_money_flow = typical_price * df["volume"]
-        
+
         price_diff = typical_price.diff()
-        
+
         pos_flow = np.where(price_diff > 0, raw_money_flow, 0)
         neg_flow = np.where(price_diff < 0, raw_money_flow, 0)
-        
+
         pos_mf = pd.Series(pos_flow).rolling(window=period).sum()
         neg_mf = pd.Series(neg_flow).rolling(window=period).sum()
-        
+
         mfr = pos_mf / neg_mf.replace(0, 1e-10)
         mfi = 100 - (100 / (1 + mfr))
-        
+
         result_df[f"mfi_{period}"] = mfi
         return result_df

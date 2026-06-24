@@ -10,7 +10,6 @@ from __future__ import annotations
 from app.services.contracts.analytics import AnalyticsReport, PerformanceScorecard
 from app.services.contracts.audit import AuditEvent
 from app.services.contracts.base import Contract
-from app.services.contracts.indicators import IndicatorResult
 from app.services.contracts.live import KillSwitchState, LiveSessionState
 from app.services.contracts.market import (
     ERR_MALFORMED_PAYLOAD,
@@ -80,7 +79,6 @@ __all__ = [
     "ExecutionProvider",
     "ExecutionReport",
     "Fill",
-    "IndicatorResult",
     "KillSwitchState",
     "LiveSessionState",
     "MarketDataProvider",

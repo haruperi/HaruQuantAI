@@ -25,14 +25,13 @@ def test_get_broker_module_ctrader() -> None:
 
 
 def test_get_broker_module_simulator() -> None:
-    # Setup mock simulator module since it does not exist on disk
-    mock_sim = MagicMock()
-    mock_sim.__name__ = "app.services.simulator"
-    sys.modules["app.services.simulator"] = mock_sim
+    from app.services import simulator
+    with patch("app.utils.settings.settings.active_broker", "simulator"):
+        module = get_broker_module()
+        assert module == simulator
 
-    try:
-        with patch("app.utils.settings.settings.active_broker", "simulator"):
-            module = get_broker_module()
-            assert module == mock_sim
-    finally:
-        sys.modules.pop("app.services.simulator", None)
+
+def test_get_active_broker_name_import_error() -> None:
+    # Force ImportError on app.utils settings lookup
+    with patch.dict("sys.modules", {"app.utils": None, "app.core.config": None}):
+        assert get_active_broker_name() == "mt5"

@@ -1,9 +1,12 @@
 """Hull Moving Average (HMA) Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class HullMovingAverage(BaseIndicator):
     """Hull Moving Average (HMA)
@@ -36,17 +39,17 @@ class HullMovingAverage(BaseIndicator):
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 2:
             raise ValueError("Period must be greater than or equal to 2.")
-            
+
         result_df = df.copy()
-        
+
         half_period = int(period / 2)
         sqrt_period = int(np.sqrt(period))
-        
+
         wma_half = self._wma(df[column], half_period)
         wma_full = self._wma(df[column], period)
-        
+
         raw_hma = 2 * wma_half - wma_full
         hma = self._wma(raw_hma, sqrt_period)
-        
+
         result_df[f"hma_{period}"] = hma
         return result_df

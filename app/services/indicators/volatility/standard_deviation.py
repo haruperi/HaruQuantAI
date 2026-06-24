@@ -1,8 +1,11 @@
 """Standard Deviation Indicator."""
 
 from typing import Any
+
 import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class StandardDeviation(BaseIndicator):
     """Standard Deviation
@@ -30,7 +33,7 @@ class StandardDeviation(BaseIndicator):
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
         result_df[f"std_{period}"] = df[column].rolling(window=period).std()
         return result_df

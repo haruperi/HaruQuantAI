@@ -197,3 +197,57 @@ def test_indicator_validation_errors(sample_ohlcv_data):
     with pytest.raises(ValueError, match="Period must be greater than or equal to 1"):
         StandardDeviation().calculate(sample_ohlcv_data, period=0)
 
+
+def test_base_indicator_helpers() -> None:
+    from app.services.indicators.base import (
+        crossed_above,
+        crossed_below,
+        pips_to_price,
+        balance_scaled_volume,
+        arithmetic_average,
+        weighted_average,
+    )
+    from app.services.contracts.strategies import AccountSnapshot
+
+    # Crossovers
+    assert crossed_above(1.0, 1.0, 1.2, 1.1) is True
+    assert crossed_above(1.0, 1.1, 1.0, 1.1) is False
+    assert crossed_below(1.0, 1.0, 0.8, 0.9) is True
+    assert crossed_below(1.0, 0.9, 1.0, 0.9) is False
+
+    # Pips to price
+    assert pips_to_price(10.0, 0.0001) == 0.01
+    assert pips_to_price(10.0, 0.0001, 1.0) == 0.001
+
+    # Scaling volume
+    assert balance_scaled_volume(10000.0, 10000.0, 0.1, None) == 0.1
+    
+    # Scaling volume with AccountSnapshot bounds & steps
+    acc = AccountSnapshot(balance=10000.0, volume_min=0.1, volume_max=5.0, volume_step=0.1)
+    assert balance_scaled_volume(10000.0, 10000.0, 0.1, acc) == 0.1
+    # Test min clamp
+    assert balance_scaled_volume(1000.0, 10000.0, 0.1, acc) == 0.1
+    # Test max clamp
+    assert balance_scaled_volume(100000.0, 10000.0, 1.0, acc) == 5.0
+
+    # Scaling volume validation exceptions
+    with pytest.raises(ValueError, match="Balance and volume scaling inputs must be positive"):
+        balance_scaled_volume(10.0, -10.0, 0.1, None)
+    with pytest.raises(ValueError, match="Balance and volume scaling inputs must be positive"):
+        balance_scaled_volume(10.0, 10.0, -0.1, None)
+
+    # Arithmetic average
+    assert arithmetic_average([1.0, 2.0, 3.0]) == 2.0
+    with pytest.raises(ValueError, match="Cannot average an empty sequence"):
+        arithmetic_average([])
+
+    # Weighted average
+    assert weighted_average([10.0, 20.0], [1.0, 3.0]) == 17.5
+    with pytest.raises(ValueError, match="Weighted average requires non-empty aligned sequences"):
+        weighted_average([1.0], [1.0, 2.0])
+    with pytest.raises(ValueError, match="Weighted average requires non-empty aligned sequences"):
+        weighted_average([], [])
+    with pytest.raises(ValueError, match="Weighted average quantities must sum to a positive value"):
+        weighted_average([1.0, 2.0], [0.0, -1.0])
+
+

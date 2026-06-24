@@ -40,15 +40,10 @@ mock_simulator_orch = MagicMock()
 mock_simulator_orch.BacktestOrchestrator = MockOrchestrator
 
 mock_simulator_base = MagicMock()
-sys.modules["app.services.simulator"] = mock_simulator_base
-sys.modules["app.services.simulator.engine"] = mock_simulator_engine
-sys.modules["app.services.simulator.orchestrator"] = mock_simulator_orch
 
 # Setup mock strategies registry dynamically since it does not exist on disk
 mock_strategies_base = MagicMock()
 mock_registry = MagicMock()
-sys.modules["app.services.strategies"] = mock_strategies_base
-sys.modules["app.services.strategies.registry"] = mock_registry
 
 import tempfile
 from datetime import UTC, datetime
@@ -115,14 +110,31 @@ from app.services.optimization.persistence.checkpoint import (
 from app.utils.standard import validate_standard_response
 
 
-@pytest.fixture(autouse=True)
-def ensure_mock_simulator() -> None:
-    """Ensure mock simulator and strategies are in sys.modules during tests."""
+@pytest.fixture(scope="module", autouse=True)
+def mock_simulator_modules() -> None:
+    """Mock the simulator and strategies modules locally, restoring them on teardown."""
+    keys = [
+        "app.services.simulator",
+        "app.services.simulator.engine",
+        "app.services.simulator.orchestrator",
+        "app.services.strategies",
+        "app.services.strategies.registry",
+    ]
+    originals = {k: sys.modules[k] for k in keys if k in sys.modules}
+    
     sys.modules["app.services.simulator"] = mock_simulator_base
     sys.modules["app.services.simulator.engine"] = mock_simulator_engine
     sys.modules["app.services.simulator.orchestrator"] = mock_simulator_orch
     sys.modules["app.services.strategies"] = mock_strategies_base
     sys.modules["app.services.strategies.registry"] = mock_registry
+    
+    yield
+    
+    for k in keys:
+        if k in originals:
+            sys.modules[k] = originals[k]
+        else:
+            sys.modules.pop(k, None)
 
 
 @pytest.fixture

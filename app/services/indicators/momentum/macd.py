@@ -1,8 +1,11 @@
 """Moving Average Convergence Divergence (MACD) Indicator."""
 
 from typing import Any
+
 import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class MACD(BaseIndicator):
     """Moving Average Convergence Divergence (MACD)
@@ -34,19 +37,19 @@ class MACD(BaseIndicator):
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if fast_period < 1 or slow_period < 1 or signal_period < 1:
             raise ValueError("All periods must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
-        
+
         fast_ema = df[column].ewm(span=fast_period, adjust=False).mean()
         slow_ema = df[column].ewm(span=slow_period, adjust=False).mean()
-        
+
         macd_line = fast_ema - slow_ema
         signal_line = macd_line.ewm(span=signal_period, adjust=False).mean()
         macd_hist = macd_line - signal_line
-        
+
         suffix = f"{fast_period}_{slow_period}"
         result_df[f"macd_{suffix}"] = macd_line
         result_df[f"macd_signal_{suffix}_{signal_period}"] = signal_line
         result_df[f"macd_hist_{suffix}_{signal_period}"] = macd_hist
-        
+
         return result_df

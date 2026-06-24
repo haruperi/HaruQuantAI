@@ -1,9 +1,12 @@
 """Pinbar Candlestick Pattern Indicator."""
 
 from typing import Any
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class Pinbar(BaseIndicator):
     """Pinbar Pattern
@@ -32,19 +35,19 @@ class Pinbar(BaseIndicator):
         for col in required_cols:
             if col not in df.columns:
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
-        
+
         result_df = df.copy()
-        
+
         h_range = df["high"] - df["low"]
         body = (df["close"] - df["open"]).abs()
-        
+
         lower_shadow = df[["open", "close"]].min(axis=1) - df["low"]
         upper_shadow = df["high"] - df[["open", "close"]].max(axis=1)
-        
+
         bullish = (lower_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
         bearish = (upper_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
-        
+
         pattern = np.where(bullish, 1, np.where(bearish, -1, 0))
-        
+
         result_df["candle_pinbar"] = pattern
         return result_df

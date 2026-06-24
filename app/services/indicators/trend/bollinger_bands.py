@@ -1,8 +1,11 @@
 """Bollinger Bands Indicator."""
 
 from typing import Any
+
 import pandas as pd
+
 from app.services.indicators.base import BaseIndicator
+
 
 class BollingerBands(BaseIndicator):
     """Bollinger Bands
@@ -33,11 +36,11 @@ class BollingerBands(BaseIndicator):
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-        
+
         result_df = df.copy()
         middle = df[column].rolling(window=period).mean()
         std = df[column].rolling(window=period).std()
-        
+
         result_df[f"bb_middle_{period}"] = middle
         result_df[f"bb_upper_{period}_{std_dev}"] = middle + (std_dev * std)
         result_df[f"bb_lower_{period}_{std_dev}"] = middle - (std_dev * std)

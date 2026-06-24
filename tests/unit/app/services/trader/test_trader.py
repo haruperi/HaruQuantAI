@@ -10,12 +10,9 @@ try:
 except ImportError:
     pass
 
-# Mock app.services.simulator module since it does not exist on disk
-mock_sim = MagicMock()
-mock_sim.__name__ = "app.services.simulator"
-sys.modules["app.services.simulator"] = mock_sim
-
 import pytest
+import time
+from decimal import Decimal
 from app.services.brokers import get_broker_module
 from app.services.trader import (
     AccountInfo,
@@ -29,15 +26,6 @@ from app.services.trader import (
 )
 from app.utils.errors import classify_broker_error, trading_retry_delay
 from pytest_mock import MockerFixture
-
-
-@pytest.fixture(autouse=True)
-def ensure_mock_simulator() -> None:
-    """Ensure mock simulator is always in sys.modules.
-
-    Protects against teardown pop pollution.
-    """
-    sys.modules["app.services.simulator"] = mock_sim
 
 
 @pytest.fixture(autouse=True)
@@ -680,3 +668,118 @@ def test_trading_error_classification_and_retry_delay() -> None:
     assert error["classification"] == "transient"
     assert error["retcode"] == 10004
     assert 0.25 <= trading_retry_delay(0) <= 0.30
+
+
+def test_trader_concurrency_lock() -> None:
+    from app.services.trader.concurrency import ConcurrencyQueue
+    queue = ConcurrencyQueue.get_instance()
+    # Test lock_sync context manager
+    with queue.lock_sync("acc1", "EURUSD"):
+        pass
+
+
+def test_trader_concurrency_async_lock() -> None:
+    import asyncio
+    from app.services.trader.concurrency import ConcurrencyQueue
+    queue = ConcurrencyQueue.get_instance()
+    # Test lock async context manager
+    async def run_test() -> None:
+        async with queue.lock("acc1", "EURUSD"):
+            pass
+    asyncio.run(run_test())
+
+
+def test_trader_rate_limiter_edge_cases(mocker: MockerFixture) -> None:
+    from app.services.trader.rate_limiter import get_rate_limiter, RateLimiter
+    # 1. Default providers
+    lim_ctrader = get_rate_limiter("ctrader")
+    assert lim_ctrader.capacity == 30.0
+
+    lim_sim = get_rate_limiter("sim")
+    assert lim_sim.capacity == 100.0
+
+    # 2. Acquire when exhausted
+    lim = RateLimiter(capacity=1.0, fill_rate=0.0)
+    assert lim.acquire(1.0) is True
+    assert lim.acquire(1.0) is False
+
+    # 3. get_status method
+    status = lim.get_status()
+    assert status["capacity"] == 1.0
+
+    # 4. Utilization > 80% warning path
+    lim_warn = RateLimiter(capacity=10.0, fill_rate=0.0)
+    assert lim_warn.acquire(9.0) is True
+    # Utilization is now 90%. Call acquire again to set warning_start_time
+    assert lim_warn.acquire(0.1) is True
+    assert lim_warn.warning_start_time is not None
+    # Mock time.time in rate_limiter to be 6 minutes later (360 seconds)
+    mocker.patch("app.services.trader.rate_limiter.time.time", return_value=time.time() + 360)
+    # Call acquire again to trigger logging warn
+    lim_warn.acquire(0.1)
+
+
+def test_trader_readiness_failures(mock_broker: MagicMock) -> None:
+    from app.services.trader.readiness import ReadinessService
+    service = ReadinessService()
+
+    # Mock terminal disconnected
+    term_disc = MagicMock()
+    term_disc.connected.return_value = False
+    term_disc.trade_allowed.return_value = True
+
+    # Mock account trade allowed
+    acc = MagicMock()
+    acc.trade_allowed.return_value = False
+
+    res = service.run_execution_readiness_check("sim", "EURUSD", term_disc, acc)
+    assert res["passed"] is False
+    assert "not connected" in res["errors"][0]
+    assert "disabled for this account" in res["errors"][1]
+
+
+def test_trader_reconciliation_divergence() -> None:
+    from app.services.trader.reconciliation import ReconciliationService
+    from app.services.trader.store import InMemoryTradeStore
+
+    store = InMemoryTradeStore()
+    service = ReconciliationService(store)
+    service.set_block_trading_on_startup(False)
+
+    # Setup mismatched position in store
+    store.save_position(1111, {"ticket": 1111, "symbol": "EURUSD", "volume": 0.1, "type": 0, "profit": 100.0})
+    store.save_order(2222, {"ticket": 2222, "symbol": "EURUSD", "volume_current": 0.2})
+
+    # Reconcile with mismatch in volume, extra locally, missing locally, and large drift
+    live_pos = [
+        {"ticket": 1111, "symbol": "EURUSD", "volume": 0.5, "type": 0, "profit": -500.0},  # Mismatch + large profit drift
+        {"ticket": 9999, "symbol": "EURUSD", "volume": 0.1, "type": 0},  # Missing locally
+    ]
+    live_ord = [
+        {"ticket": 2222, "symbol": "EURUSD", "volume_current": 0.5},  # Mismatch
+        {"ticket": 8888, "symbol": "EURUSD", "volume_current": 0.1},  # Missing locally
+    ]
+
+    res = service.reconcile(live_pos, live_ord, account_equity=10000.0)
+    assert res["is_reconciled"] is True
+    assert res["p1_alert"] is True  # Drift is $600 > $500 threshold
+    assert res["total_drift"] == 600.0
+
+
+def test_trader_reporting() -> None:
+    from app.services.trader.reporting import ReportingService
+    from app.services.trader.store import InMemoryTradeStore
+
+    store = InMemoryTradeStore()
+    report = ReportingService.build_report(store)
+    assert "summary" in report
+
+
+def test_trader_validation_precision() -> None:
+    from app.services.trader.validation import ValidationService
+    service = ValidationService()
+
+    assert service.normalize_precision(0.0, 5) == Decimal("0.0")
+    assert service.normalize_precision(1.123456, 5) == Decimal("1.12346")
+    assert service.normalize_precision(1.123456, 0.01) == Decimal("1.12")
+

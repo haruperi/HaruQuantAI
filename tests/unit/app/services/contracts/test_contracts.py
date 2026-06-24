@@ -22,7 +22,6 @@ from app.services.contracts import (
     ExecutionProvider,
     ExecutionReport,
     Fill,
-    IndicatorResult,
     KillSwitchState,
     LiveSessionState,
     MarketDataProvider,
@@ -442,14 +441,6 @@ def test_all_other_models_instantiation() -> None:
         provider="mt5",
         retrieved_at="2026-06-18 10:00:00",
         normalized_at="2026-06-18 10:01:00",
-    )
-
-    # IndicatorResult
-    IndicatorResult(
-        name="sma",
-        version="1.0.0",
-        warmup_period=20,
-        input_hash="hash1",
     )
 
     # StrategyInput
@@ -1280,3 +1271,113 @@ def test_adapter_stub_protocol_conformance(adapter_class: type) -> None:
     assert isinstance(adapter, BrokerErrorMapper), (
         f"{adapter_class.__name__} must satisfy BrokerErrorMapper"
     )
+
+
+def test_protocol_ellipses_coverage() -> None:
+    class DummyMarketDataProvider(MarketDataProvider):
+        def get_bars(self, symbol: str, timeframe: str, start: str, end: str) -> Any:
+            return super().get_bars(symbol, timeframe, start, end)
+
+        def get_ticks(self, symbol: str, start: str, end: str) -> Any:
+            return super().get_ticks(symbol, start, end)
+
+    class DummyExecutionProvider(ExecutionProvider):
+        def execute_trade(self, request: Any) -> Any:
+            return super().execute_trade(request)
+
+        def cancel_order(self, request_id: str, order_id: str) -> Any:
+            return super().cancel_order(request_id, order_id)
+
+    class DummyAccountProvider(AccountProvider):
+        def get_account_snapshot(self) -> Any:
+            return super().get_account_snapshot()
+
+    class DummyPositionProvider(PositionProvider):
+        def get_open_positions(self) -> Any:
+            return super().get_open_positions()
+
+    class DummyOrderProvider(OrderProvider):
+        def get_active_orders(self) -> Any:
+            return super().get_active_orders()
+
+    class DummySymbolInfoProvider(SymbolInfoProvider):
+        def get_symbol_info(self, symbol: str) -> Any:
+            return super().get_symbol_info(symbol)
+
+    class DummyBrokerErrorMapper(BrokerErrorMapper):
+        def map_error(self, raw_error: object) -> Any:
+            return super().map_error(raw_error)
+
+    class DummyExecutionJournal(ExecutionJournal):
+        def record_report(self, report: Any) -> Any:
+            return super().record_report(report)
+
+        def record_fill(self, fill: Any) -> Any:
+            return super().record_fill(fill)
+
+    class DummyTradeStore(TradeStore):
+        def save_trade_result(self, result: Any) -> Any:
+            return super().save_trade_result(result)
+
+        def get_trade_result(self, trade_id: str) -> Any:
+            return super().get_trade_result(trade_id)
+
+        def save_position(self, position: Any) -> Any:
+            return super().save_position(position)
+
+        def get_position(self, position_id: str) -> Any:
+            return super().get_position(position_id)
+
+        def save_idempotency_key(self, key: str, trade_id: str) -> Any:
+            return super().save_idempotency_key(key, trade_id)
+
+        def get_idempotency_key(self, key: str) -> Any:
+            return super().get_idempotency_key(key)
+
+        def save_reconciliation_record(
+            self,
+            trade_id: str,
+            broker_state: dict[str, Any],
+            local_state: dict[str, Any],
+            status: str,
+        ) -> Any:
+            return super().save_reconciliation_record(
+                trade_id, broker_state, local_state, status
+            )
+
+    d_mdp = DummyMarketDataProvider()
+    assert d_mdp.get_bars("EURUSD", "M1", "", "") is None
+    assert d_mdp.get_ticks("EURUSD", "", "") is None
+
+    d_ep = DummyExecutionProvider()
+    assert d_ep.execute_trade(None) is None
+    assert d_ep.cancel_order("", "") is None
+
+    d_ap = DummyAccountProvider()
+    assert d_ap.get_account_snapshot() is None
+
+    d_pp = DummyPositionProvider()
+    assert d_pp.get_open_positions() is None
+
+    d_op = DummyOrderProvider()
+    assert d_op.get_active_orders() is None
+
+    d_sip = DummySymbolInfoProvider()
+    assert d_sip.get_symbol_info("EURUSD") is None
+
+    d_bem = DummyBrokerErrorMapper()
+    assert d_bem.map_error(None) is None
+
+    d_ej = DummyExecutionJournal()
+    assert d_ej.record_report(None) is None
+    assert d_ej.record_fill(None) is None
+
+    d_ts = DummyTradeStore()
+    assert d_ts.save_trade_result(None) is None
+    assert d_ts.get_trade_result("") is None
+    assert d_ts.save_position(None) is None
+    assert d_ts.get_position("") is None
+    assert d_ts.save_idempotency_key("", "") is None
+    assert d_ts.get_idempotency_key("") is None
+    assert d_ts.save_reconciliation_record("", {}, {}, "") is None
+

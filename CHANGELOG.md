@@ -21,15 +21,16 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-006 | Runtime settings. | Added Runtime configuration and settings loading using Pydantic. Usage example `example_06_runtime_settings()` in `tests/usage/app/services/01_utils.py`. |
 | ADD-007 | `app/utils` Module Documentation & Dependencies | Created the README of `app/utils` from the standard template, resolved missing `logger.py` and `event_bus.py` bridges, and added `pydantic`/`pydantic-settings` dependencies. |
 | ADD-008 | Broker Resolver | Added broker integration framework with support for Binance, Dukascopy, Yahoo, MT5, and cTrader providers. |
-| ADD-009 | Market Data Service Architecture | Added market data service architecture with multi-source support for market data fetching, caching, and time-series management. Usage examples in `tests/usage/app/services/02_data.py`. |
-| ADD-010 | Indicator Service library | Added technical indicator service library with support for various technical indicators and their usage examples in `tests/usage/app/services/03_indicators.py`. |
-| ADD-011 | Strategy Service architecture | Added strategy service architecture with multi-source support for strategy execution, caching, and time-series management. Usage examples in `tests/usage/app/services/04_strategies.py`. |
-| ADD-012 | Trader Service Architecture | Added trader service architecture with support for account information, deal information, history order information, order information, position information, rate limiting, symbol information, and terminal information. Usage examples in `tests/usage/app/services/07_trading.py`. |
-| ADD-013 | Risk Management Service | Added risk management service with support for risk assessment, position sizing, portfolio management, and scenario analysis. Usage examples in `tests/usage/app/services/05_risk.py`. |
-| ADD-014 | Analytics Service | Added analytics service for performance evaluation, scenario analysis, and reporting. Usage examples in `tests/usage/app/services/06_analytics.py`. |
-| ADD-015 | Optimisation Service | Added optimisation service  with search algorithms, parameter tuning, and walk-forward analysis support. Usage examples in `tests/usage/app/services/08_optimisation.py`. |
+| ADD-009 | Market Data Service Architecture | Added market data service architecture with multi-source support for market data fetching, caching, and time-series management. Module `app/services/data`. Usage examples in `tests/usage/app/services/02_data.py`. |
+| ADD-010 | Indicator Service library | Added technical indicator service library with support for various technical indicators and module `app/services/indicators`. Usage examples in `tests/usage/app/services/03_indicators.py`. |
+| ADD-011 | Strategy Service architecture | Added strategy service architecture with multi-source support for strategy execution, caching, and time-series management. Module `app/services/strategies`. Usage examples in `tests/usage/app/services/04_strategies.py`. |
+| ADD-012 | Trader Service Architecture | Added trader service architecture with support for account information, deal information, history order information, order information, position information, rate limiting, symbol information, and terminal information. Module `app/services/trading`. Usage examples in `tests/usage/app/services/07_trading.py`. |
+| ADD-013 | Risk Management Service | Added risk management service with support for risk assessment, position sizing, portfolio management, and scenario analysis. Module `app/services/risk`. Usage examples in `tests/usage/app/services/05_risk.py`. |
+| ADD-014 | Analytics Service | Added analytics service for performance evaluation, scenario analysis, and reporting. Module `app/services/analytics`. Usage examples in `tests/usage/app/services/06_analytics.py`. |
+| ADD-015 | Optimisation Service | Added optimisation service  with search algorithms, parameter tuning, and walk-forward analysis support. Module `app/services/optimisation`. Usage examples in `tests/usage/app/services/08_optimisation.py`. |
 | ADD-016 | Live Trading Service | Added core live runtime monitoring services, including health tracking, incident management, and state reconciliation. Usage examples in `tests/usage/app/services/10_live.py`. |
 | ADD-017 | Research Service | Added core research service, for data leakage detection, chronological splitting, and edge discovery studies. Usage examples in `tests/usage/app/services/09_research.py`. |
+| ADD-018 | Simulator Service | Added core simulator service for backtest execution, data simulation, and strategy backtesting. Module `app/services/simulator`. Usage examples in `tests/usage/app/services/08_simulator.py`. |
 
 
 

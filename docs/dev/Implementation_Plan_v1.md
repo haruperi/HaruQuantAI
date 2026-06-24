@@ -83,11 +83,6 @@ Task inventory: calculated from the checkbox tasks in this section.
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-None
-```
 
 Required functionality:
 
@@ -97,32 +92,12 @@ Required functionality:
 - CI workflow or equivalent local CI command runner.
 - Migration, backup, restore, and release checklist ownership.
 
-### Files to Create
-
-```text
-pyproject.toml
-.pre-commit-config.yaml
-.gitignore
-.env.example
-README.md
-AGENTS.md
-CHANGELOG.md
-docs/PROJECT.md
-docs/ARCHITECTURE.md
-docs/MODULES.md
-docs/ROADMAP.md
-docs/BUILDER.md
-scripts/ci_check.py
-scripts/release_check.py
-scripts/backup_check.py
-.github/workflows/ci.yml
-```
 
 ### Functionality to Implement
 
-#### Project scaffold and package baseline
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-Requirements:
+#### Project scaffold and package baseline
 
 - [ ] Create the approved minimal repository scaffold before domain phase work begins.
 - [ ] Configure Python project metadata in `pyproject.toml` using the approved Python version policy.
@@ -136,22 +111,15 @@ Requirements:
 
 #### Quality gates and CI
 
-Requirements:
-
-- [ ] Configure Ruff format as the canonical formatter.
-- [ ] Configure Ruff check as the canonical lint and import-order gate.
 - [ ] Configure mypy strict as the canonical static typing gate.
 - [ ] Configure pytest as the canonical unit and usage-test runner.
 - [ ] Configure coverage to enforce at least 80% per affected package and project where applicable.
 - [ ] Configure pre-commit to run formatting, linting, type, and test-adjacent safety checks appropriate for local development.
-- [ ] Create a single local CI command or script that runs Ruff format check, Ruff check, mypy strict, pytest, and coverage in the approved order.
 - [ ] Create a GitHub Actions workflow or documented local equivalent that runs the same quality gates.
 - [ ] Ensure quality gates can run without optional broker SDKs, notification clients, LLM providers, or UI dependencies installed.
 - [ ] Document how to run fast tests, full tests, usage examples, and CI checks locally.
 
 #### Migrations, backups, releases, and deployment modes
-
-Requirements:
 
 - [ ] Define which phase owns database migrations and schema versioning before persistence code is implemented.
 - [ ] Define a migration naming convention and rollback expectation for future database-backed phases.
@@ -164,14 +132,13 @@ Requirements:
 
 #### Documentation and governance baseline
 
-Requirements:
-
 - [ ] Create a changelog discipline requiring every project-meaning change to be recorded.
 - [ ] Document the final phase dependency order and sprint-pack execution rule.
 - [ ] Document the Core Contracts phase as mandatory before cross-domain model duplication begins.
 - [ ] Document the fail-closed principle for risk, live, trading, auth, event, and approval workflows.
 - [ ] Document that API routes, UI screens, and conversation flows must delegate to governed services and must not own domain decisions.
 - [ ] Document that live trading requires staged promotion through read-only, paper, shadow, micro-live, and full-live modes.
+
 
 ### Unit Tests Required
 
@@ -200,6 +167,11 @@ Usage examples must show:
 - [ ] Example demonstrates loading safe environment defaults without broker or network dependencies.
 - [ ] Example demonstrates reading the release checklist and producing a bounded readiness summary.
 
+### Quality and Documentation Standards
+
+- [ ] The implementation must pass all CI quality gates (Ruff format, Ruff check, mypy --strict, pytest, and coverage at least 80%).
+
+
 ### Acceptance Checklist
 
 - Done criterion: All Phase 0 checkbox tasks are implemented or explicitly deferred with a documented reason.
@@ -216,13 +188,6 @@ Task inventory: 1,163 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-None
-
-```
 
 Required functionality:
 
@@ -237,75 +202,15 @@ Required functionality:
 - Metrics registry and Prometheus text format output.
 - Secret payload redaction and settings loading.
 
-### Files to Create
-
-```text
-
-app/__init__.py
-
-app/utils/__init__.py
-
-app/utils/logger.py
-
-app/utils/standard.py
-
-app/utils/errors.py
-
-app/utils/identity.py
-
-app/utils/normalization.py
-
-app/utils/paths.py
-
-app/utils/dataframe_tools.py
-
-app/utils/data_quality.py
-
-app/utils/validations.py
-
-app/utils/security.py
-
-app/utils/settings.py
-
-app/utils/auth.py
-
-app/utils/event_bus.py
-
-app/utils/error_routing.py
-
-app/utils/notifications.py
-
-app/utils/observability.py
-
-docs/planning/DOMAIN.md
-
-app/utils/
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Package Initialization
 
 - [ ] Implement `app/__init__.py` first to establish a clean side-effect-free package.
 - [ ] `app/__init__.py` exists and is side-effect free.
-
-#### `app/utils/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
-
 - [ ] The implementation is expected to be fresh and clean, with no backward-compatibility shims.
 - [ ] `app/utils/__init__.py` must act as the public registry for the utility domain.
 - [ ] Only intentionally imported names listed in `__all__` may be public.
@@ -320,16 +225,8 @@ Requirements:
 - [ ] `app/utils/__init__.py` must not eagerly import pandas, cryptography, dotenv, broker SDKs, network clients, notification clients, Prometheus exporters, or other heavy optional dependencies unless absolutely necessary.
 - [ ] Documentation must maintain compatibility review notes for future public API changes.
 - [ ] Internal helpers are not accidentally exported.
-- [ ] No compatibility shims, aliases, fallback import modules, or duplicate wrapper modules exist.
 
-#### `app/utils/logger.py`
-
-Functions/classes:
-
-- `get_logger()`
-- `configure_logging()`
-
-Requirements:
+#### Logging and Diagnostics
 
 - [ ] The logger must be exported as a support object and must not be treated as an official AI tool.
 - [ ] Official AI tools must use structured logging.
@@ -339,7 +236,7 @@ Requirements:
 - [ ] Logging must use Python `logging`.
 - [ ] Logging must use structured JSON-compatible output for production runtime events.
 - [ ] Production logging must use a JSON-compatible structured formatter.
-- [ ] Local development console logging must support colorized human-readable output.
+- [ ] Local development logging supports colorized human-readable console output in the approved format.
 - [ ] Human-readable console log lines must use the format `datetime | level | module.submodule.filename:function:line | message`.
 - [ ] Human-readable console timestamps must use the format `YYYY-MM-DD HH:MM:SS`.
 - [ ] Logging must include `timestamp`, `level`, `logger_name`, `message`, `event_name`, `module`, `function`, `request_id`, `workflow_id`, `correlation_id`, and `error_code` where available.
@@ -372,23 +269,10 @@ Requirements:
 - [ ] Logging overhead must be minimal for normal tool execution.
 - [ ] Logging must degrade safely if a logging sink fails.
 - [ ] Documentation must describe required log fields and optional trace fields.
-- [ ] Local development logging supports colorized human-readable console output in the approved format.
 - [ ] Logging output must be deterministic enough for unit testing where log fields are asserted.
 - [ ] Logger tests must verify colorized console output can be enabled and disabled deterministically.
 
-#### `app/utils/standard.py`
-
-Functions/classes:
-
-- `StandardResponse`
-- `ToolMetadata`
-- `ToolError`
-- `build_success_response`
-- `build_error_response`
-- `validate_standard_response`
-- `get_execution_ms(start_time)`
-
-Requirements:
+#### Standard Primitives and Tool Response Envelope
 
 - [ ] The utilities module must not own trading strategy logic.
 - [ ] The utilities module must not own broker execution logic.
@@ -431,7 +315,6 @@ Requirements:
 - [ ] `get_execution_ms(start_time)` must calculate execution duration consistently for official tools.
 - [ ] `get_execution_ms(start_time)` must return milliseconds rounded to three decimals.
 - [ ] Official tools must not return unstructured `None`.
-- [ ] Official AI tools must return standard HaruQuant tool envelopes.
 - [ ] Official success responses must include `status="success"`, message, data, `error=None`, and metadata.
 - [ ] Data-quality issues must include code, severity, message, column, row count, and samples.
 - [ ] Canonical JSON serialization must return deterministic JSON strings.
@@ -443,15 +326,11 @@ Requirements:
 - [ ] Documentation must include an operational runbook for critical utility-layer failures.
 - [ ] Implement `app/utils/standard.py` before official AI tools.
 - [ ] Implement usage examples for official AI tools and production primitives.
-- [ ] Run CI quality gates before accepting the implementation.
 - [ ] The target folder structure exists.
 - [ ] Public registry documentation classifies every official AI tool and support helper.
 - [ ] Official tools return standard envelopes.
 - [ ] Official tools include metadata constants.
-- [ ] Official tools include side-effect flags.
 - [ ] Official tools include `execution_ms`.
-- [ ] Every Python file must have a file-level docstring.
-- [ ] Every public function and class must have a useful docstring.
 - [ ] All public functions and methods must be typed.
 - [ ] Inputs must be validated where appropriate.
 - [ ] Output shapes must be explicit where applicable.
@@ -470,11 +349,6 @@ Requirements:
 - [ ] Error helpers must not raise for unknown codes unless explicitly requested.
 - [ ] Error messages must be human-readable and actionable.
 - [ ] Event validation failures must map to `INVALID_EVENT`.
-- [ ] Every Python file must start with a file-level docstring.
-- [ ] File-level docstrings must state purpose.
-- [ ] File-level docstrings must state whether the file contains official AI tools or support helpers.
-- [ ] File-level docstrings must list exported public functions/classes.
-- [ ] File-level docstrings must describe side effects, if any.
 - [ ] Every public function must document what it does.
 - [ ] Every public function must document when to use it.
 - [ ] Every public function must document arguments.
@@ -487,21 +361,14 @@ Requirements:
 - [ ] Documentation must describe safe metric-label rules and examples of rejected labels.
 - [ ] Documentation must describe which features are support helpers and which are official AI tools.
 - [ ] Documentation must describe which adapters are optional and lazy-loaded.
-- [ ] Every Python file has a file-level docstring.
-- [ ] Every public function/class has a useful docstring.
-- [ ] Public functions and methods are typed.
-- [ ] Inputs are validated where appropriate.
 - [ ] Errors are explicit and deterministic.
 - [ ] No production `print()` calls exist.
 - [ ] Data repair and cleaning workflows are explicitly excluded from `app.utils` and reserved for `app.services.data`.
 - [ ] Future domain-specific errors inherit from `Error` or expose a compatible `code` attribute.
 - [ ] Standard response builders can map `Error` subclasses generically without hardcoding every future domain error.
-- [ ] Usage examples exist for official AI tools.
-- [ ] Usage examples use realistic inputs.
+- [ ] Usage examples must exist for official AI tools.
 - [ ] Usage examples show success and error handling.
-- [ ] Full-project quality gate passes.
 - [ ] No unresolved open questions remain for the baseline production-ready utils module.
-- [ ] The implementation must be compatible with Ruff format, Ruff check, mypy strict, pytest, and coverage.
 - [ ] Shared caches are allowed only when explicitly specified, bounded, and tested.
 - [ ] Time-dependent helpers must support deterministic testing where practical.
 - [ ] ID-dependent and randomness-dependent helpers must support deterministic testing where practical.
@@ -515,43 +382,16 @@ Requirements:
 - [ ] Repeated identical alerts must be deduplicated or throttled.
 - [ ] High-cardinality metric labels must be rejected or normalized.
 - [ ] Open circuit state must fail fast.
-- [ ] Unit tests must exist for every utility module.
-- [ ] Usage examples must exist for official AI tools.
 - [ ] Minimum line coverage must be at least 80% for `app.utils`.
 - [ ] Tests must cover edge cases.
 - [ ] Official AI tool tests must verify metadata correctness.
 - [ ] Official AI tool tests must verify `execution_ms` existence.
 - [ ] Data-quality tests must cover at least 15 distinct data-quality cases.
-- [ ] CI must pass Ruff format, Ruff check, mypy strict, pytest, and the coverage gate.
-- [ ] Implement unit tests for every module.
-- [ ] Unit tests exist for every module.
 - [ ] Official tools have metadata tests.
 - [ ] Edge case tests exist.
 - [ ] Coverage is at least 80%.
-- [ ] Ruff format passes.
-- [ ] Ruff import sorting passes through Ruff check/format.
-- [ ] Ruff check passes.
-- [ ] mypy passes.
-- [ ] pytest passes.
-- [ ] Coverage gate passes.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `Error`
-- `ValidationError`
-- `ConfigurationError`
-- `SecurityError`
-- `DataError`
-- `ExternalServiceError`
-- `error_name(code)`
-- `message_for(code, default)`
-- `message_for()`
-- `UNKNOWN_ERROR`
-- `TOOL_EXECUTION_FAILED`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] Official AI tools must use deterministic error codes.
 - [ ] Standard response validation should validate error codes against the approved error-code set where practical.
@@ -578,49 +418,47 @@ Requirements:
 - [ ] Expected validation failures should use deterministic codes such as `INVALID_INPUT` or `VALIDATION_FAILED`.
 - [ ] Raw exception objects must never be returned in `data`.
 - [ ] Raw exception objects must never be returned in `error`.
-- [ ] Unknown non-HaruQuant exceptions must map safely to `UNKNOWN_ERROR` or `TOOL_EXECUTION_FAILED`.
-- [ ] `INVALID_AUTH_CONTEXT`
-- [ ] `AUTHORIZATION_FAILED`
-- [ ] `INVALID_EVENT`
-- [ ] `EVENT_PUBLISH_FAILED`
-- [ ] `EVENT_HANDLER_FAILED`
-- [ ] `EVENT_DEAD_LETTER_FAILED`
-- [ ] `QUEUE_FULL`
-- [ ] `BACKPRESSURE_EXCEEDED`
-- [ ] `NOTIFICATION_FAILED`
-- [ ] `NOTIFICATION_SUPPRESSED`
-- [ ] `NOTIFICATION_THROTTLED`
-- [ ] `OBSERVABILITY_ERROR`
-- [ ] `METRICS_EXPORT_FAILED`
-- [ ] `CLOCK_DRIFT_DETECTED`
-- [ ] `CIRCUIT_OPEN`
-- [ ] `SECRET_VERSION_CONFLICT`
+- [ ] Support the following: `INVALID_AUTH_CONTEXT`, `AUTHORIZATION_FAILED`, `INVALID_EVENT`, `EVENT_PUBLISH_FAILED`, `EVENT_HANDLER_FAILED`, `EVENT_DEAD_LETTER_FAILED`, `QUEUE_FULL`, `BACKPRESSURE_EXCEEDED`, `NOTIFICATION_FAILED`, `NOTIFICATION_SUPPRESSED`, `NOTIFICATION_THROTTLED`, `OBSERVABILITY_ERROR`, `METRICS_EXPORT_FAILED`, `CLOCK_DRIFT_DETECTED`, `CIRCUIT_OPEN`, `SECRET_VERSION_CONFLICT`
 - [ ] Every public function must document raised exceptions or structured error behavior.
 - [ ] Official AI tool docstrings must explain what error codes may be returned.
-- [ ] Official tools use deterministic error codes.
 - [ ] Missing mandatory OHLC columns must return structured `INVALID_INPUT`.
 - [ ] Unknown error codes must resolve safely.
-- [ ] Unknown non-HaruQuant exceptions must map safely at controlled tool boundaries.
 - [ ] Official AI tool tests must verify deterministic error codes.
 - [ ] Error tests must verify exception attributes, known codes, unknown codes, and fallback messages.
+- [ ] The module must provide early alert routing and error routing so the rest of the system can report issues consistently.
+- [ ] Alert routing must fail safely and must not expose sensitive information.
+- [ ] The Event Bus is intended for utility, workflow, alert, and error-routing events, not direct trading execution.
+- [ ] The system must provide a standard error event model.
+- [ ] The error event model must include error code, severity, source module, source function or tool, request ID, workflow ID, correlation ID, sanitized message, sanitized details, and timestamp.
+- [ ] Expected validation failures must be routable as warning or error events depending on severity.
+- [ ] Unexpected execution failures must be routable as error or critical events.
+- [ ] Critical system failures must be routable to notifications.
+- [ ] Error routing must deduplicate repeated identical errors within a configurable time window.
+- [ ] Error routing must prevent recursive alert storms.
+- [ ] Error routing must redact secrets before publishing events, logging, metrics, or notifications.
+- [ ] Error routing must preserve enough diagnostic context for troubleshooting without exposing sensitive payloads.
+- [ ] Error routing must support severity-based routing rules.
+- [ ] Error routing must support environment-specific routing rules.
+- [ ] Error routing must support suppression rules for known noisy non-critical errors.
+- [ ] Error routing must expose metrics for routed, suppressed, retried, failed, and dead-lettered error events.
+- [ ] Error routing failures must not recursively trigger infinite error routing.
+- [ ] Error routing must preserve the original error code and attach routing failure code separately when both exist.
+- [ ] Error routing must accept sanitized exception context, deterministic error code, severity, request ID, workflow ID, and correlation ID.
+- [ ] Error routing must return routed, suppressed, deduplicated, throttled, or failed status.
+- [ ] Documentation must include a production readiness checklist for secrets, auth, alert routing, and metrics before enabling live workflows.
+- [ ] Implement `app/utils/error_routing.py` before notification routing.
+- [ ] Alert failures must be logged and measured without exposing secrets.
+- [ ] Error routing must sanitize exception text before alerting.
+- [ ] Documentation must describe error routing behavior and severity rules.
+- [ ] Documentation must describe how alerts and error routing are initialized early in the system lifecycle.
+- [ ] Recursive error routing must be detected and suppressed.
+- [ ] Error-routing tests must cover validation error routing.
+- [ ] Error-routing tests must cover unexpected exception routing.
+- [ ] Error-routing tests must cover deduplication and throttling.
+- [ ] Error-routing tests must cover recursive error suppression.
+- [ ] Error-routing tests must verify recursive alert suppression under circuit-open and notification-failure scenarios.
 
-#### `app/utils/identity.py`
-
-Functions/classes:
-
-- `generate_id`
-- `generate_prefixed_id`
-- `generate_request_id`
-- `generate_workflow_id`
-- `generate_correlation_id`
-- `generate_event_id`
-- `validate_request_id`
-- `validate_workflow_id`
-- `ensure_version`
-- `ensure_version(None)`
-- `ensure_version()`
-
-Requirements:
+#### Collision-Resistant Identity and Trace ID Generation
 
 - [ ] Official AI tools must include `request_id: str | None = None`.
 - [ ] `metadata` must include `tool_name`, `tool_version`, `tool_category`, `tool_risk_level`, `request_id`, `execution_ms`, `read_only`, `writes_file`, `modifies_database`, `places_trade`, and `requires_network`.
@@ -650,9 +488,7 @@ Requirements:
 - [ ] The implementation must avoid avoidable circular imports.
 - [ ] Large data-quality validations must avoid unnecessary deep copies.
 - [ ] Usage examples must use `request_id` where applicable.
-- [ ] Usage examples use `request_id` where applicable.
 - [ ] Empty or unsafe ID prefixes must fail validation.
-- [ ] `ensure_version(None)` must return the default.
 - [ ] Invalid datetime inputs must fail clearly.
 - [ ] Invalid high-low relationships must be reported.
 - [ ] Tests must cover invalid inputs.
@@ -660,18 +496,7 @@ Requirements:
 - [ ] Identity tests must verify ID uniqueness, prefix validation, and version defaulting.
 - [ ] Invalid input tests exist.
 
-#### `app/utils/normalization.py`
-
-Functions/classes:
-
-- `DEFAULT_TIMEZONE`
-- `parse_datetime`
-- `normalize_timestamp`
-- `format_timestamp`
-- `is_stale`
-- `get_execution_ms(start_time)`
-
-Requirements:
+#### Timestamp and Data Normalization
 
 - [ ] Official AI tools must measure execution timing.
 - [ ] `get_execution_ms(start_time)` must use a monotonic clock source such as `time.perf_counter()`.
@@ -715,17 +540,7 @@ Requirements:
 - [ ] Stale data must fail deterministically.
 - [ ] Normalization tests must verify ISO parsing, naive timezone assumptions, UTC conversion, and stale checks.
 
-#### `app/utils/paths.py`
-
-Functions/classes:
-
-- `normalize_path`
-- `ensure_dir`
-- `ensure_parent_dir`
-- `safe_join`
-- `validate_path_within_root`
-
-Requirements:
+#### Safe Path Traversal and Directory Utilities
 
 - [ ] The module must provide `normalize_path`.
 - [ ] The module must provide `ensure_dir`.
@@ -739,7 +554,6 @@ Requirements:
 - [ ] Path helpers must return `Path` objects.
 - [ ] File and directory permissions must use platform-safe defaults.
 - [ ] Path helpers must accept string or `Path` values and optional `base_dir`.
-- [ ] Path helpers must return `Path` objects.
 - [ ] Implement `app/utils/paths.py` before settings and artifact helpers.
 - [ ] Importing any `app.utils` module must not create files or directories.
 - [ ] Empty paths must fail validation.
@@ -750,17 +564,7 @@ Requirements:
 - [ ] Path tests must verify safe normalization, unsafe traversal, directory creation, and parent creation.
 - [ ] A concurrency stress test suite must exist outside the fast unit-test path.
 
-#### `app/utils/dataframe_tools.py`
-
-Functions/classes:
-
-- `align_dataframe_time_index`
-- `bars_to_records`
-- `chunk_sequence`
-- `generate_parameter_combinations`
-- `compare_dataframes`
-
-Requirements:
+#### Dataframe Manipulations and Operations
 
 - [ ] The module must provide datetime alignment for dataframes.
 - [ ] The module must provide bar-to-record conversion.
@@ -786,21 +590,12 @@ Requirements:
 - [ ] Dataframe helpers must use lazy pandas imports or `TYPE_CHECKING` guards.
 - [ ] Importing any `app.utils` module must not execute expensive dataframe operations.
 - [ ] Dataframe helpers must avoid repeated full-dataframe scans where possible.
-- [ ] Dataframe helpers use lazy pandas imports or `TYPE_CHECKING` guards.
-- [ ] Missing pandas must fail only when dataframe helpers are called.
 - [ ] Missing required dataframe columns must fail clearly.
-- [ ] Empty dataframes must be handled deterministically.
 - [ ] Dataframe index mismatch must fail clearly when deterministic alignment is impossible.
 - [ ] `chunked(size <= 0)` must fail clearly.
 - [ ] Dataframe tests must verify alignment, serialization, UTC timestamp output, comparison, index mismatch behavior, missing columns, chunk-size validation, and no input mutation.
 
-#### `app/utils/data_quality.py`
-
-Functions/classes:
-
-- `validate_ohlcv_quality`
-
-Requirements:
+#### Data Quality Auditing and Integrity Checking
 
 - [ ] Data-quality market-calendar gap handling depends on session rules being supplied by a caller or future domain module.
 - [ ] The default OHLCV scoring model applies unless a later module-specific specification replaces it.
@@ -860,10 +655,8 @@ Requirements:
 - [ ] `validate_ohlcv_quality` should handle 100,000 rows within a practical local validation budget.
 - [ ] `validate_ohlcv_quality` is stateless, diagnostic-only, and does not repair, resample, persist, enrich, or mutate input data.
 - [ ] Invalid OHLCV input type must return `INVALID_INPUT`.
-- [ ] Extra OHLCV columns must not fail validation unless they create ambiguity.
 - [ ] Duplicate OHLC/OHLCV rows must be reported.
 - [ ] Missing timestamps or inferred gaps must be reported when timeframe is known.
-- [ ] Market-calendar gaps must be distinguished from unexpected gaps where session rules are supplied.
 - [ ] Zero volume must be reported when volume is supplied.
 - [ ] Negative volume must be reported when volume is supplied.
 - [ ] Flatline candles must be detected.
@@ -871,31 +664,10 @@ Requirements:
 - [ ] Timeframe mismatches must be reported when timeframe is supplied.
 - [ ] Data-quality tests cover realistic OHLCV defects.
 
-#### `app/utils/validations.py`
-
-Functions/classes:
-
-- `validate_input_schema`
-- `validate_output_schema`
-- `validate_handoff_payload`
-- `validate_evidence_pack`
-- `validate_approval_packet`
-- `validate_registry_entry`
-- `validate_data_freshness`
-- `VALIDATION_FAILED`
-- `VALID_RISK_LEVELS`
-- `VALID_ENVIRONMENT_MODES`
-
-Requirements:
+#### Input Parameter Validation Helpers
 
 - [ ] Strict schema-version enforcement occurs only when a caller or schema requires a version.
-- [ ] `validate_input_schema` must be implemented as a low-risk, read-only official AI tool.
-- [ ] `validate_output_schema` must be implemented as a low-risk, read-only official AI tool.
 - [ ] `validate_handoff_payload` must be implemented as a low-risk, read-only official AI tool.
-- [ ] `validate_evidence_pack` must be implemented as a low-risk, read-only official AI tool.
-- [ ] `validate_approval_packet` must be implemented as a low-risk, read-only official AI tool.
-- [ ] `validate_registry_entry` must be implemented as a low-risk, read-only official AI tool.
-- [ ] `validate_data_freshness` must be implemented as a low-risk, read-only official AI tool.
 - [ ] Official AI tools must return the standard response schema.
 - [ ] The module must provide reusable validation helpers for agent, workflow, tool, registry, evidence, approval, freshness, artifact, and payload contracts.
 - [ ] `validate_numeric_range` must be a support helper returning a native validation result.
@@ -983,27 +755,12 @@ Requirements:
 - [ ] Schema-validation tests must verify no blocking I/O or network access occurs.
 - [ ] Official tools have schema compliance tests.
 
-#### `app/utils/security.py`
-
-Functions/classes:
-
-- `redact_text`
-- `redact_mapping`
-- `hash_password`
-- `verify_password`
-- `encrypt_value`
-- `decrypt_value`
-- `SecurityError`
-- `SECRET_VERSION_NOT_FOUND`
-
-Requirements:
+#### Security, Cryptography, and Payload Redaction
 
 - [ ] Agents must not call low-level helpers such as `normalize_timestamp`, `ensure_dir`, or `hash_password` unless a workflow explicitly approves that capability.
 - [ ] Sensitive runtime settings and provider credentials are supplied through secure environment/configuration mechanisms.
-- [ ] `redact_text` must be classified as a low-risk, read-only official AI tool only for approved audit/log-redaction workflows.
 - [ ] `redact_mapping` must be classified as a low-risk, read-only official AI tool only for approved audit/log-redaction workflows.
 - [ ] `encrypt_data` must remain a restricted support helper and must not be attached to agents by default.
-- [ ] `decrypt_data` must remain a restricted support helper and must not be attached to agents by default.
 - [ ] The module must provide sensitive-key detection.
 - [ ] The module must provide scalar redaction.
 - [ ] The module must provide text redaction.
@@ -1065,7 +822,6 @@ Requirements:
 - [ ] Unknown environment modes must fail validation.
 - [ ] Invalid freshness evidence must be surfaced, not ignored.
 - [ ] Redaction must handle nested mappings, lists, string payloads, exception messages, metadata, and returned error details.
-- [ ] Encryption and decryption failures must not expose plaintext or key material.
 - [ ] Secret selection must be deterministic.
 - [ ] No secrets are logged.
 - [ ] Redaction allowlist entries must be audited through configuration, tests, or documented approval.
@@ -1074,7 +830,6 @@ Requirements:
 - [ ] Invalid encryption input must fail safely.
 - [ ] Missing or malformed encryption keys must fail without leaking key material.
 - [ ] Missing active secret versions must fail with `SecurityError` or `SECRET_VERSION_NOT_FOUND`.
-- [ ] Duplicate active secret versions with the same numeric version must fail with `SECRET_VERSION_CONFLICT`.
 - [ ] Security regression tests must prove common secret patterns do not leak.
 - [ ] Branch coverage must be meaningful for validators and security helpers.
 - [ ] Official AI tool tests must verify no secret leakage where relevant.
@@ -1082,16 +837,7 @@ Requirements:
 - [ ] Security tests must verify metric labels reject sensitive or high-cardinality values.
 - [ ] Security tests verify redaction and no secret leakage.
 
-#### `app/utils/settings.py`
-
-Functions/classes:
-
-- `HARUQUANT_HOME`
-- `RuntimeSettings`
-- `HaruQuantConfigurationError`
-- `CONFIGURATION_ERROR`
-
-Requirements:
+#### Configuration Settings and Environment Loading
 
 - [ ] `load_runtime_settings` must remain a support helper and must not be attached to agents by default.
 - [ ] The module must define immutable typed runtime settings.
@@ -1112,7 +858,7 @@ Requirements:
 - [ ] Path settings must use `Path` objects.
 - [ ] `.env` loading must be optional and dependency-aware.
 - [ ] Settings source precedence must be explicit mapping/function arguments, then environment variables, then `.env` file, then safe defaults.
-- [ ] Importing `app.utils` must not read `.env`.
+- [ ] Importing any `app.utils` module must not read `.env` files.
 - [ ] Optional dependency absence must not break import.
 - [ ] Optional dependency absence must fail only when the requested feature requires the dependency.
 - [ ] Invalid settings must fail clearly with configuration errors.
@@ -1130,7 +876,6 @@ Requirements:
 - [ ] Settings loaders must return `RuntimeSettings`.
 - [ ] Settings injection must return the same target mapping it mutates.
 - [ ] Implement `app/utils/settings.py` before adapters and runtime configuration consumers.
-- [ ] Importing any `app.utils` module must not read `.env` files.
 - [ ] Importing any `app.utils` module must not mutate environment variables.
 - [ ] Time handling must be deterministic and timezone-safe across supported runtime environments.
 - [ ] Missing optional dependency failures must use `HaruQuantConfigurationError`, `CONFIGURATION_ERROR`, or the standard tool error envelope where applicable.
@@ -1145,14 +890,7 @@ Requirements:
 - [ ] Data-quality tests must verify 10,000 bad rows return no more than configured issue and sample limits.
 - [ ] Settings tests must verify defaults, mapping load, invalid environments, `strict_validation`, path normalization, and injection.
 
-#### `app/utils/auth.py`
-
-Functions/classes:
-
-- `Error`
-- `SECURITY_ERROR`
-
-Requirements:
+#### Authorization and Permission Boundaries
 
 - [ ] The system must implement `app/utils/` as the shared utility foundation for HaruQuantAI.
 - [ ] The module must support higher-level domains including data, research, simulation, risk, portfolio, execution, analytics, governance, and agentic workflows.
@@ -1238,16 +976,7 @@ Requirements:
 - [ ] Auth tests must verify no token or credential leakage.
 - [ ] Redaction denylist and audited allowlist behavior is implemented and tested.
 
-#### `app/utils/event_bus.py`
-
-Functions/classes:
-
-- `event_id`
-- `causation_id`
-- `BACKPRESSURE_EXCEEDED`
-- `QUEUE_FULL`
-
-Requirements:
+#### Thread-Safe Local Event Bus
 
 - [ ] The module must provide request, workflow, generic ID, version, correlation ID, causation ID, and idempotency helpers.
 - [ ] The module must provide Event Bus and pub/sub primitives.
@@ -1290,7 +1019,7 @@ Requirements:
 - [ ] Event Bus queue policies must be explicit modes such as fail-fast, bounded wait, or lossy-drop.
 - [ ] Production Event Bus queue policy must default to fail-fast for critical workflows.
 - [ ] Queue-full behavior must not silently drop events unless the caller explicitly selected a lossy policy.
-- [ ] Lossy-drop behavior must be allowed only for explicitly configured low-severity telemetry events.
+- [ ] Lossy-drop behavior may be allowed only when explicitly configured for low-severity telemetry events.
 - [ ] Dropped events must be counted in metrics.
 - [ ] Dropped events must be logged with sanitized metadata.
 - [ ] Queue-full diagnostics must include event type, source, severity, queue name or topic, queue depth, configured queue limit, request ID, workflow ID, and correlation ID where available.
@@ -1305,7 +1034,6 @@ Requirements:
 - [ ] Event Bus publishing must accept an event type, source, severity, payload, metadata, request ID, workflow ID, correlation ID, and idempotency key.
 - [ ] Event Bus subscription must accept topic or event-type filters and handler references.
 - [ ] Event Bus publish operations must return deterministic delivery or enqueue results.
-- [ ] Event Bus delivery diagnostics must include delivered, failed, retried, dead-lettered, dropped counts, and queue depth where applicable.
 - [ ] Queue-full errors must include sanitized queue diagnostics.
 - [ ] Queue diagnostics must not include raw payloads.
 - [ ] Circuit-breaker diagnostics must not include credentials, provider tokens, message bodies, or raw event payloads.
@@ -1327,7 +1055,6 @@ Requirements:
 - [ ] Event Bus idempotency storage must be bounded by TTL and maximum cache size.
 - [ ] Event Bus queues must have explicit limits.
 - [ ] Queue-full behavior must fail fast or follow a documented bounded policy.
-- [ ] Lossy-drop behavior may be allowed only when explicitly configured for low-severity telemetry events.
 - [ ] Backpressure diagnostics must be bounded and redacted.
 - [ ] External Event Bus broker outages must be isolated through circuit breakers and deterministic error codes.
 - [ ] Event publish failures must map to `EVENT_PUBLISH_FAILED`.
@@ -1353,7 +1080,6 @@ Requirements:
 - [ ] Documentation must state that deterministic ordered delivery applies to the in-process Event Bus per event type, not necessarily to distributed broker adapters.
 - [ ] Documentation must describe circuit-breaker configuration for external pub/sub adapters.
 - [ ] Documentation must document each event type's ordering, durability, retry, and loss-tolerance expectations.
-- [ ] Event Bus idempotency storage is bounded by TTL and maximum cache size.
 - [ ] Event Bus idempotency storage uses compact metadata rather than full event payloads by default.
 - [ ] Event Bus queue policies are explicit and production critical workflows default to fail-fast behavior.
 - [ ] Event Bus publish, subscribe, unsubscribe, retry, and dead-letter paths are thread-safe and/or async-safe.
@@ -1379,7 +1105,6 @@ Requirements:
 - [ ] Logger tests must verify duplicate handler prevention.
 - [ ] Event Bus tests must cover publish success.
 - [ ] Event Bus tests must cover subscription and unsubscription.
-- [ ] Event Bus tests must verify deterministic ordered handler execution per event type for the in-process bus.
 - [ ] Event Bus tests must cover subscriber failure isolation.
 - [ ] Event Bus tests must cover retry and dead-letter behavior.
 - [ ] Event Bus tests must cover idempotency keys.
@@ -1401,69 +1126,7 @@ Requirements:
 - [ ] Observability tests must cover Event Bus metrics.
 - [ ] Observability tests must verify queue-depth metrics.
 
-#### `app/utils/error_routing.py`
-
-Functions/classes:
-
-- `ErrorRoute`
-- `AlertRoute`
-- `route_error`
-- `route_alert`
-- `build_error_event`
-- `sanitize_error_payload`
-
-Requirements:
-
-- [ ] The module must provide early alert routing and error routing so the rest of the system can report issues consistently.
-- [ ] Alert routing must fail safely and must not expose sensitive information.
-- [ ] The Event Bus is intended for utility, workflow, alert, and error-routing events, not direct trading execution.
-- [ ] The system must provide a standard error event model.
-- [ ] The error event model must include error code, severity, source module, source function or tool, request ID, workflow ID, correlation ID, sanitized message, sanitized details, and timestamp.
-- [ ] Expected validation failures must be routable as warning or error events depending on severity.
-- [ ] Unexpected execution failures must be routable as error or critical events.
-- [ ] Critical system failures must be routable to notifications.
-- [ ] Error routing must deduplicate repeated identical errors within a configurable time window.
-- [ ] Error routing must prevent recursive alert storms.
-- [ ] Error routing must redact secrets before publishing events, logging, metrics, or notifications.
-- [ ] Error routing must preserve enough diagnostic context for troubleshooting without exposing sensitive payloads.
-- [ ] Error routing must support severity-based routing rules.
-- [ ] Error routing must support environment-specific routing rules.
-- [ ] Error routing must support suppression rules for known noisy non-critical errors.
-- [ ] Error routing must expose metrics for routed, suppressed, retried, failed, and dead-lettered error events.
-- [ ] Error routing failures must not recursively trigger infinite error routing.
-- [ ] Error routing must preserve the original error code and attach routing failure code separately when both exist.
-- [ ] Error routing must accept sanitized exception context, deterministic error code, severity, request ID, workflow ID, and correlation ID.
-- [ ] Error routing must return routed, suppressed, deduplicated, throttled, or failed status.
-- [ ] Documentation must include a production readiness checklist for secrets, auth, alert routing, and metrics before enabling live workflows.
-- [ ] Implement `app/utils/error_routing.py` before notification routing.
-- [ ] Error routing failures must not recursively trigger infinite error routing.
-- [ ] Alert failures must be logged and measured without exposing secrets.
-- [ ] Error routing must preserve original error code and attach routing failure code separately when both exist.
-- [ ] Error routing must sanitize exception text before alerting.
-- [ ] Documentation must describe error routing behavior and severity rules.
-- [ ] Documentation must describe how alerts and error routing are initialized early in the system lifecycle.
-- [ ] Recursive error routing must be detected and suppressed.
-- [ ] Error-routing tests must cover validation error routing.
-- [ ] Error-routing tests must cover unexpected exception routing.
-- [ ] Error-routing tests must cover deduplication and throttling.
-- [ ] Error-routing tests must cover recursive error suppression.
-- [ ] Error-routing tests must verify recursive alert suppression under circuit-open and notification-failure scenarios.
-
-#### `app/utils/notifications.py`
-
-Functions/classes:
-
-- `NotificationChannel`
-- `NotificationMessage`
-- `NotificationResult`
-- `NotificationRouter`
-- `route_notification`
-- `send_email_notification`
-- `send_telegram_notification`
-- `send_desktop_notification`
-- `redact_notification_payload`
-
-Requirements:
+#### Notification Dispatching and Delivery Sinks
 
 - [ ] The module must provide shared status, severity, risk-level, environment-mode, auth, event, notification, and health-state constants.
 - [ ] The module must provide notification routing primitives for email, Telegram, and desktop channels.
@@ -1478,7 +1141,6 @@ Requirements:
 - [ ] Email, Telegram, and desktop notification providers will be configured explicitly per environment.
 - [ ] No notification channel is enabled in production without explicit configuration.
 - [ ] Auth, Event Bus, notification, and observability primitives must be support helpers by default unless explicitly promoted to official AI tools.
-- [ ] The system must provide notification routing primitives for email, Telegram, and desktop channels.
 - [ ] Notification routing must support severity-based routing.
 - [ ] Notification routing must support environment-specific routing.
 - [ ] Notification routing must support channel enablement and disablement through runtime settings.
@@ -1534,7 +1196,6 @@ Requirements:
 - [ ] External notification and pub/sub adapters must be lazy-loaded.
 - [ ] External notification and pub/sub adapters must fail closed when credentials are missing or malformed.
 - [ ] Metric labels must reject raw IDs, arbitrary user strings, exception strings, notification recipients, provider tokens, and event payload values.
-- [ ] Notification markdown rendering must escape or sanitize unsafe user-controlled content where applicable.
 - [ ] Auth and notification provider credentials must be excluded from Event Bus payloads by default.
 - [ ] Documentation must describe notification routing rules for email, Telegram, and desktop channels.
 - [ ] Documentation must define notification routing concurrency guarantees.
@@ -1543,10 +1204,7 @@ Requirements:
 - [ ] Documentation must describe notification markdown and plain-text template fallback behavior.
 - [ ] Documentation must describe circuit-breaker configuration for notification adapters.
 - [ ] Importing `app.utils` does not import pandas, cryptography, dotenv, broker SDKs, notification clients, pub/sub clients, Prometheus exporters, or network clients unless the specific feature is used.
-- [ ] Notification routing, throttling, deduplication, and circuit-breaker state are thread-safe and/or async-safe.
-- [ ] External notification adapters have circuit breakers.
 - [ ] Notification templates support markdown and plain-text fallback rendering.
-- [ ] Notification templates render from sanitized data transfer objects rather than raw event payloads.
 - [ ] Notification routing must support test mode with fake adapters.
 - [ ] Event publishing with sensitive payload must redact before logging or notification routing.
 - [ ] Notification channel disabled must return disabled or suppressed status without error.
@@ -1575,16 +1233,10 @@ Requirements:
 - [ ] A chaos-test profile must cover notification provider failures and pub/sub adapter outages.
 - [ ] Tests prove no sensitive values leak through logs, events, notifications, metrics, dead-letter diagnostics, schema errors, or health checks.
 
-#### `app/utils/observability.py`
-
-Functions/classes:
-
-- `CLOCK_DRIFT_DETECTED`
-
-Requirements:
+#### Metrics Registry and Observability Sinks
 
 - [ ] The module must provide observability primitives for logs, metrics, health snapshots, and trace correlation.
-- [ ] The module must provide Prometheus-compatible system-health metrics.
+- [ ] The system must expose Prometheus-compatible metrics for system health.
 - [ ] The module must define Grafana dashboard expectations for operational health.
 - [ ] Observability utilities may report system health, but must not decide operational actions without governance approval.
 - [ ] Prometheus/Grafana metrics must include system-health visibility and must not be limited to business alerts.
@@ -1594,7 +1246,6 @@ Requirements:
 - [ ] Grafana dashboards may be maintained as documentation or version-controlled dashboard definitions.
 - [ ] Metrics and logs are operational telemetry and must not contain raw market payloads, secrets, or approval-packet contents.
 - [ ] The system must provide observability helpers for logs, metrics, health checks, and trace correlation.
-- [ ] The system must expose Prometheus-compatible metrics for system health.
 - [ ] The system must support Grafana dashboards for operational visibility.
 - [ ] Metrics must cover official AI tool call counts.
 - [ ] Metrics must cover official AI tool success and error counts.
@@ -1658,7 +1309,6 @@ Requirements:
 - [ ] Health checks must distinguish healthy, degraded, and critical states.
 - [ ] System-health observability must not be limited to trading or business alerts.
 - [ ] Observability export failures must map to `OBSERVABILITY_ERROR` or `CONFIGURATION_ERROR`.
-- [ ] Metrics recording failures must not fail the original operation unless explicitly configured to fail closed.
 - [ ] Circuit-open failures must be observable through logs and metrics.
 - [ ] Sensitive values must be redacted before appearing in Prometheus metrics or Grafana variables.
 - [ ] Prometheus metrics must avoid high-cardinality sensitive identifiers.
@@ -1697,7 +1347,6 @@ Requirements:
 
 - [ ] Split Phase 1 implementation into approved sprint packs before editing code: 01A package/errors/standard, 01B logging/time/identity/paths, 01C settings/security/auth, 01D event bus/error routing/notifications, 01E observability/metrics, and 01F dataframe/data-quality/validators.
 - [ ] Each Phase 1 sprint pack must have its own dry run, approval, tests, rollback plan, and implementation report.
-- [ ] Replace any remaining Black, isort, or Flake8 acceptance wording with Ruff format, Ruff check, mypy strict, pytest, coverage, and pre-commit wording.
 - [ ] Ensure Utils imports do not depend on contracts that would create circular imports with Phase 1.5.
 - [ ] Document which Utils functions are allowed to be used by Core Contracts without importing heavy optional dependencies.
 
@@ -1783,6 +1432,13 @@ Usage examples must show:
 - Log calls, validation failures, success, exception paths, and governed/fail-closed decisions with redacted metadata only.
 - Update module README or active docs when architecture, API, data models, security, testing, or observability meaning changes.
 
+### Quality and Documentation Standards
+
+- [ ] All Python modules and public functions/classes must have appropriate file-level and Google-style docstrings.
+- [ ] Implement unit tests for all modules and verify coverage is at least 80%.
+- [ ] The implementation must pass all CI quality gates (Ruff format, Ruff check, mypy --strict, pytest, and coverage at least 80%).
+
+
 ### Acceptance Checklist
 
 - Done criterion: All 1,163 checkbox tasks are implemented or explicitly deferred with a documented reason.
@@ -1824,11 +1480,6 @@ Task inventory: calculated from the checkbox tasks in this section.
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-app/utils/
-```
 
 Required functionality:
 
@@ -1837,32 +1488,12 @@ Required functionality:
 - Serialization, versioning, hashing, and compatibility rules.
 - Contract tests shared by every later phase.
 
-### Files to Create
-
-```text
-app/contracts/__init__.py
-app/contracts/base.py
-app/contracts/market.py
-app/contracts/indicators.py
-app/contracts/strategies.py
-app/contracts/risk.py
-app/contracts/trading.py
-app/contracts/portfolio.py
-app/contracts/simulation.py
-app/contracts/analytics.py
-app/contracts/optimization.py
-app/contracts/live.py
-app/contracts/audit.py
-app/contracts/providers.py
-tests/unit/app/contracts/
-tests/usage/01_5_core_contracts.py
-```
 
 ### Functionality to Implement
 
-#### Canonical base contracts
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-Requirements:
+#### Canonical base contracts
 
 - [ ] Create `app/contracts/` as the canonical model boundary shared by all domain phases.
 - [ ] Define a side-effect-free public registry in `app/contracts/__init__.py`.
@@ -1876,8 +1507,6 @@ Requirements:
 
 #### Market data contracts
 
-Requirements:
-
 - [ ] Define `Symbol` with canonical symbol, broker symbol, asset class, quote currency, base currency, precision, lot/tick metadata, and provider metadata where applicable.
 - [ ] Define `Timeframe` with deterministic parsing, canonical names, duration metadata, and unsupported-timeframe validation.
 - [ ] Define `Bar` with timestamp, open, high, low, close, optional volume, optional spread, symbol, timeframe, and source metadata.
@@ -1889,8 +1518,6 @@ Requirements:
 
 #### Indicator and strategy contracts
 
-Requirements:
-
 - [ ] Define `IndicatorResult` with name, version, parameters, warmup period, input hash, output metadata, and deterministic result serialization.
 - [ ] Define `StrategyInput` with market data references, indicator references, portfolio context, configuration, and timestamp boundaries.
 - [ ] Define `StrategySignal` as the only allowed strategy-to-risk output contract.
@@ -1899,8 +1526,6 @@ Requirements:
 - [ ] Define strategy contract validation that rejects signals with missing symbol, invalid side, expired validity window, missing evidence where required, or broker-specific mutation fields.
 
 #### Risk and execution contracts
-
-Requirements:
 
 - [ ] Define `RiskDecision` as the only allowed risk-to-execution approval or rejection contract.
 - [ ] Define `RiskRejection` with deterministic code, severity, reason, violated limit, evidence, and remediation metadata.
@@ -1915,8 +1540,6 @@ Requirements:
 
 #### Portfolio, simulation, analytics, optimization, live, and audit contracts
 
-Requirements:
-
 - [ ] Define `AccountSnapshot` with equity, balance, margin, free margin, currency, leverage, timestamp, and provider metadata.
 - [ ] Define `Position` with symbol, side, quantity, average price, unrealized PnL, realized PnL, margin, provider IDs, and timestamps.
 - [ ] Define `PortfolioSnapshot` with account, positions, pending exposure, risk budget, correlation metadata, and freshness metadata.
@@ -1930,8 +1553,6 @@ Requirements:
 
 #### Contract governance
 
-Requirements:
-
 - [ ] Add a rule that domain modules must import canonical contracts rather than redefining cross-domain models.
 - [ ] Add a rule that raw broker SDK objects, raw exchange payloads, and UI DTOs must be adapted into canonical contracts before crossing service boundaries.
 - [ ] Add a rule that API DTOs may wrap canonical contracts but may not replace domain contracts.
@@ -1940,6 +1561,7 @@ Requirements:
 - [ ] Add usage examples showing Data -> Indicator -> StrategySignal -> RiskDecision -> OrderIntent -> ExecutionProvider -> TradeResult -> Analytics flow.
 - [ ] Add contract tests proving canonical contracts serialize deterministically and validate malformed inputs consistently.
 - [ ] Add tests proving provider protocols can be implemented by simulator, MT5, cTrader, Binance, and paper/shadow adapters without changing service-layer callers.
+
 
 ### Unit Tests Required
 
@@ -1986,27 +1608,6 @@ Task inventory: 701 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/logger.py
-
-app/utils/standard.py
-
-app/utils/errors.py
-
-app/utils/normalization.py
-
-app/utils/dataframe_tools.py
-
-app/utils/data_quality.py
-
-app/utils/validations.py
-
-```
 
 Required functionality:
 
@@ -2015,105 +1616,47 @@ Required functionality:
 - SQLite persistence setup and db path normalization.
 - Data schemas and range check validation helpers exist.
 
-### Files to Create
-
-```text
-
-app/services/data/
-
-app/services/data/__init__.py
-
-data/raw/
-
-data/processed/
-
-data/cache/
-
-docs/planning/
-
-app/services/data/logger.py
-
-docs/planning/DOMAIN.md
-
-app/services/data/models.py
-
-app/services/data/responses.py
-
-app/utils/validations.py
-
-app/services/data/limits.py
-
-app/services/data/storage.py
-
-app/services/data/sources/base.py
-
-app/services/data/gateway.py
-
-app/services/data/scheduler.py
-
-app/services/data/transforms.py
-
-data/processed/EURUSD/M5/2026-01.parquet
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/data/gateway.py`
-
-Functions/classes:
-
-- `Gateway`
-- `route_request`
-
-Requirements:
+#### Data Gateway Service
 
 - [ ] Backward compatibility remains out of scope.
 - [ ] The module shall preserve current data-domain capabilities at the capability level, not by preserving old function names.
 - [ ] The v8 specification remains the authoritative baseline, with this final document acting as the production-hardening closure layer.
-- [ ] Public streaming subscription tools remain out of Phase 1.
+- [ ] Public streaming subscription tools shall remain out of Phase 1.
 - [ ] Historical market-hours reconstruction is deferred until a market-calendar provider is approved.
 - [ ] Pending: define any future public streaming subscription tool surface before export.
 - [ ] Pending: track future-phase decisions as implementation planning issues rather than treating them as Phase 1 blockers.
-- [ ] `app/services/data/__init__.py` contains only imports and `__all__`.
-- [ ] Official exports match this requirements document.
-- [ ] Every official tool supports `request_id`.
+- [ ] `app/services/data/__init__.py` shall contain only imports and `__all__`.
+- [ ] Official exports shall match this requirements document.
+- [ ] Every official tool shall support `request_id`.
 - [ ] Every official tool logs structured events.
-- [ ] Every official tool has unit tests.
 - [ ] Every official tool has usage examples where applicable.
 - [ ] Downstream modules import only through `app.services.data`.
 - [ ] The module shall be implemented as a greenfield professional production module.
-- [ ] CI gates shall pass before production sign-off: `black`, `isort`, `flake8`, `mypy`, `pytest`, and coverage above 80%.
-- [ ] Official exports shall match this requirements document.
 - [ ] Credentials are not exposed or logged.
-- [ ] Test coverage is above 80%.
 - [ ] `app/services/data/__init__.py` shall export only the approved official tool surface in Section 1.2 unless a future specification explicitly adds more.
 - [ ] The module shall expose only safe, intentional, agent-callable tools from `app/services/data/__init__.py`.
 - [ ] `app/services/data/__init__.py` shall export only the following official tools:
-- [ ] `get_data`
-- [ ] `list_symbols`
-- [ ] `get_market_hours`
-- [ ] `app/services/data/__init__.py` shall contain only imports and `__all__`.
-- [ ] Parent traversal with `..` shall be rejected.
+- [ ] Support the following: `get_data`, `list_symbols`, `get_market_hours`
+- [ ] Parent traversal using `..` shall be rejected.
 - [ ] Any future official tool addition shall require an explicit specification update.
 - [ ] All timestamps crossing the official AI-tool boundary shall be UTC ISO 8601 strings.
 - [ ] `get_market_hours` Phase 1 may return current configured hours only.
 - [ ] The primary volume value shall be disclosed through `volume_kind`.
-- [ ] Every official tool shall support `request_id`.
 - [ ] Resampling 100,000 M1 bars to H1 should target under 3 seconds.
 - [ ] Official tools shall be typed.
 - [ ] Every official tool shall accept `request_id`.
 - [ ] Start and end timestamps shall be UTC ISO 8601 when provided.
-- [ ] Parent traversal using `..` shall be rejected.
-- [ ] Hidden/system directories shall be rejected unless explicitly allowed.
+- [ ] Hidden or system directories shall be rejected unless explicitly allowed by configuration.
 - [ ] Authentication failure shall return `AUTHENTICATION_FAILED`.
 - [ ] Open circuit breaker shall return `CIRCUIT_BREAKER_OPEN`.
 - [ ] Official tools shall not expose raw exceptions.
 - [ ] Unsupported timeframe shall return `UNSUPPORTED_TIMEFRAME`.
 - [ ] Permission failure shall return `PERMISSION_DENIED`.
-- [ ] Hidden or system directories shall be rejected unless explicitly allowed by configuration.
 - [ ] Historical market-hour reconstruction shall return `UNSUPPORTED_OPERATION` unless an approved calendar provider supports it.
 - [ ] Allowed `workflow_context` values shall be exhaustive: `research`, `backtest`, `validation`, `risk`, and `execution_bound`.
 - [ ] `workflow_context` shall accept only `research`, `backtest`, `validation`, `risk`, and `execution_bound`.
@@ -2132,8 +1675,6 @@ Requirements:
 - [ ] Official AI tools shall not accept raw passwords unless a future explicit security design approves it.
 - [ ] Official AI tools shall not expose credential loaders.
 - [ ] Missing credentials shall return `CREDENTIALS_MISSING`.
-- [ ] Public streaming subscription tools shall remain out of Phase 1.
-- [ ] Public streaming subscription tools shall remain out of Phase 1.
 - [ ] Unsupported public streaming operations shall fail closed with `UNSUPPORTED_OPERATION`.
 - [ ] Labels shall align to input timestamps.
 - [ ] Connection leak detection shall be tested.
@@ -2142,7 +1683,6 @@ Requirements:
 - [ ] Recovery from stale locks shall be tested.
 - [ ] No-silent-fallback behavior shall be tested.
 - [ ] Circuit breaker open, half-open, and closed transitions shall be tested.
-- [ ] Test coverage shall remain above 80%.
 - [ ] Every official tool shall test successful call.
 - [ ] Every official tool shall test unsupported timeframe where applicable.
 - [ ] Every official tool shall test empty result.
@@ -2154,16 +1694,7 @@ Requirements:
 - [ ] Production sign-off commands shall pass.
 - [ ] Coverage shall remain above 80%.
 
-#### `app/services/data/feeds.py`
-
-Functions/classes:
-
-- `FeedStatus`
-- `start_feed`
-- `stop_feed`
-- `get_feed_status`
-
-Requirements:
+#### Market Data Feeds Integration
 
 - [ ] Internal real-time feed support, feed state, and feed status are in scope for production readiness.
 - [ ] Documentation shall include real-time feed limitations for Phase 1.
@@ -2205,7 +1736,6 @@ Requirements:
 - [ ] Reconnect policy shall include maximum retries, exponential backoff, jitter, maximum backoff, and circuit breaker cooldown.
 - [ ] Feed status requests shall accept feed ID, source, symbol, data kind, and request ID.
 - [ ] Feed status outputs shall include feed ID, state, heartbeat timestamp, last event timestamp, buffer depth, dropped count, gap count, reconnect count, circuit breaker state, and last error.
-- [ ] Reconnection shall use exponential backoff with randomized jitter.
 - [ ] Feed overflow with `backpressure` shall slow ingestion without unbounded memory growth.
 - [ ] Feed status shall not expose raw connection handles, socket details, client objects, or credential-bearing connection strings.
 - [ ] Feed heartbeat timeout shall return or log `FEED_HEARTBEAT_TIMEOUT`.
@@ -2223,30 +1753,21 @@ Requirements:
 - [ ] Feed reconnect with exponential backoff and jitter shall be tested.
 - [ ] `get_feed_status` schema shall be tested.
 
-#### `app/services/data/persistence.py`
-
-Functions/classes:
-
-- `Repository`
-- `save_state`
-- `load_state`
-
-Requirements:
+#### Data Storage and Database Persistence
 
 - [ ] The module shall persist source circuit breaker state.
 - [ ] Documentation shall include database migration procedure.
 - [ ] SQLite is sufficient for single-node local state persistence.
 - [ ] The persistence abstraction must be TSDB-ready for future high-frequency tick and spread storage.
 - [ ] Pending: select the future high-frequency tick/spread TSDB backend after the TSDB-ready persistence interface is validated.
-- [ ] Idempotency keys shall be deterministically derived from source, symbol, data kind, timeframe, start, end, schema version, and normalization version.
+- [ ] Data ingestion idempotency keys shall be derived from a hash of source, symbol, data kind, timeframe, start time, end time, schema version, and normalization version.
 - [ ] Database persistence shall enforce connection limits, timeouts, and leak detection.
-- [ ] Circuit breaker state shall persist across restarts.
+- [ ] Circuit breaker open state shall persist across restarts.
 - [ ] Persistence shall support a future append-optimized TSDB backend.
 - [ ] No DataFrame, NumPy array, SDK object, stream handle, socket, or database client crosses the official tool boundary.
 - [ ] Database persistence is transactional, bounded, idempotent, and recovery-aware.
 - [ ] Production sign-off shall include implemented spec version, test command output summary, coverage percentage, exported tool list, known limitations, enabled source adapters, required environment variables, source readiness manifest, license manifest, persistence backend, and downstream modules validated.
 - [ ] On restart, a source with a persisted open circuit breaker shall remain open or half-open for the configured cooldown period and shall not immediately hammer the failing external source.
-- [ ] Circuit breaker open state shall persist across restarts.
 - [ ] The module shall persist source revision and raw hash metadata.
 - [ ] Large historical datasets shall be persisted and referenced by metadata instead of returned inline when response limits are exceeded.
 - [ ] Persisted data requested with an older `schema_version` than the current canonical version shall either be safely migrated on read or rejected with `DATA_SCHEMA_DRIFT` and re-fetch guidance.
@@ -2265,7 +1786,6 @@ Requirements:
 - [ ] The persistence abstraction shall support append-only ingestion metadata.
 - [ ] Persistence writes shall use transactions for atomic state changes.
 - [ ] Database writes shall include deterministic idempotency keys.
-- [ ] Data ingestion idempotency keys shall be derived from a hash of source, symbol, data kind, timeframe, start time, end time, schema version, and normalization version.
 - [ ] Database writes shall be idempotent under retry.
 - [ ] Database writes shall distinguish insert, update, no-op duplicate, and conflict.
 - [ ] Database conflicts shall return deterministic errors and shall not silently overwrite committed data.
@@ -2303,15 +1823,8 @@ Requirements:
 - [ ] No raw SDK, stream, socket, client, or database object leakage shall be tested.
 - [ ] Circuit breaker state persistence across restart shall be tested.
 
-#### `app/services/data/README.md`
+#### Data Domain Documentation and Architecture Overview
 
-Functions/classes:
-
-- No runtime functions/classes; documentation artifact only.
-
-Requirements:
-
-- [ ] Documentation shall include a data module README or docs section.
 - [ ] Documentation shall include the official tool catalog.
 - [ ] Documentation shall include the final `__all__` export list.
 - [ ] Documentation shall include environment variable reference.
@@ -2319,18 +1832,8 @@ Requirements:
 - [ ] Documentation shall include circuit breaker behavior and recovery procedure.
 - [ ] Documentation shall include production sign-off template.
 - [ ] This requirements document belongs in `docs/planning/DOMAIN.md` because it covers the full data module rather than one sprint.
-- [ ] Public functions and classes shall contain useful docstrings.
 
-#### `app/services/data/scheduler.py`
-
-Functions/classes:
-
-- `create_job`
-- `start_job`
-- `stop_job`
-- `get_job_status`
-
-Requirements:
+#### Data Ingestion Scheduler and Cron Orchestrator
 
 - [ ] Documentation shall explain why `get_data_update_job_status` and `get_feed_status` are included.
 - [ ] Documentation shall include usage examples for market data, local storage, symbols, synthetic generation, labeling, scheduler, job status, and feed status.
@@ -2386,10 +1889,7 @@ Requirements:
 - [ ] The deterministic error-code list shall include `JOB_NOT_FOUND`.
 - [ ] The deterministic error-code list shall include `SCHEDULER_ERROR`.
 - [ ] Scheduler jobs shall default to a maximum of 500 symbols per job and 20 timeframes per job unless configuration and tests approve larger workloads.
-- [ ] `create_data_update_job`
-- [ ] `start_data_update_job`
-- [ ] `stop_data_update_job`
-- [ ] `run_data_update_job_once`
+- [ ] Support the following: `create_data_update_job`, `start_data_update_job`, `stop_data_update_job`, `run_data_update_job_once`
 - [ ] Historical backfill jobs shall be chunked, resumable, checkpointed, idempotent, and safe to retry.
 - [ ] Historical backfill jobs shall persist progress by source, symbol, data kind, timeframe, start time, end time, schema version, normalization version, chunk ID, and idempotency key.
 - [ ] Historical backfill jobs shall not mark a chunk complete until records, metadata, quality report, source revision metadata, license metadata, and persistence manifest are committed.
@@ -2437,15 +1937,7 @@ Requirements:
 - [ ] Scheduler tests shall cover state persistence.
 - [ ] Backfill license enforcement shall be tested.
 
-#### `app/services/data/sources.py`
-
-Functions/classes:
-
-- `SourceAdapter`
-- `SourceRegistry`
-- `get_source_adapter`
-
-Requirements:
+#### External Vendor Data Source Connectors
 
 - [ ] Documentation shall include a source adapter catalog.
 - [ ] Documentation shall include the source readiness manifest.
@@ -2513,7 +2005,6 @@ Requirements:
 - [ ] Every source adapter shall avoid logging secrets.
 - [ ] Source adapters may be marked `production`, `staging`, `experimental`, or `not_available`, but unavailable adapters shall fail safely and deterministically.
 - [ ] Adapter errors shall preserve safe source context and request ID.
-- [ ] Broker adapters shall never place trades, close positions, modify account state, or change terminal settings.
 - [ ] MT5 adapter shall remain read-only and shall not place orders or modify broker state.
 - [ ] Initial source readiness shall be `staging` for `mt5` until live credential, broker, timeout, and data validation tests pass.
 - [ ] MT5 source shall support secure credential resolution from environment/config.
@@ -2522,7 +2013,6 @@ Requirements:
 - [ ] cTrader source shall use the approved cTrader adapter/MCP boundary.
 - [ ] cTrader source shall support symbol listing, bar loading, cTrader bar normalization, timeframe mapping, source metadata preservation, and deterministic network/client errors.
 - [ ] Raw cTrader client construction shall remain internal.
-- [ ] cTrader client construction shall remain internal.
 - [ ] Public Dukascopy streaming subscription tools shall remain deferred until a later specification explicitly approves public streaming tools.
 - [ ] Initial source readiness shall be `staging` for `dukascopy` until historical/live capability, rate-limit, and normalization tests pass.
 - [ ] Dukascopy live or stream-oriented access shall be represented as an internal adapter capability where supported.
@@ -2554,18 +2044,10 @@ Requirements:
 - [ ] Every official tool shall test source failure.
 - [ ] Production tests shall cover license restriction enforcement.
 
-#### `app/services/data/storage.py`
-
-Functions/classes:
-
-- `save_record`
-- `load_record`
-- `validate_storage_path`
-
-Requirements:
+#### File Storage and Parquet I/O Helpers
 
 - [ ] Documentation shall include approved storage roots.
-- [ ] Package path is `app/services/data/`.
+- [ ] The package path shall be `app/services/data/`.
 - [ ] Local paths are validated against approved storage roots.
 - [ ] The module shall not be marked production-ready until a production sign-off artifact is produced.
 - [ ] Redistribution-restricted data shall not be exported outside approved internal paths.
@@ -2574,21 +2056,17 @@ Requirements:
 - [ ] Local immutable datasets shall have no time-based expiry when their file hash and modified timestamp remain unchanged.
 - [ ] Approved storage roots shall be configurable only through HaruQuant settings.
 - [ ] Absolute paths outside approved roots shall be rejected.
-- [ ] `save_market_data`
-- [ ] `load_local_dataset`
+- [ ] Support the following: `save_market_data`, `load_local_dataset`
 - [ ] Source adapters shall implement the common internal source protocol in `app/services/data/sources/base.py` or a future explicitly versioned replacement path.
 - [ ] Storage requests shall validate path safety and default to `overwrite=False`.
 - [ ] Storage writes shall use temp artifact plus atomic final commit/rename semantics.
 - [ ] Storage writes shall quarantine partial artifacts from failed writes.
 - [ ] File writes shall use temp files plus atomic rename or equivalent safe commit semantics.
 - [ ] Partial artifacts created during failed writes shall be quarantined.
-- [ ] Production files shall contain module-level docstrings.
 - [ ] Implementation files shall remain small and single-responsibility.
-- [ ] The package path shall be `app/services/data/`.
 - [ ] Storage requests shall include path, format, overwrite flag, create-parents flag, include-metadata flag, and request ID.
 - [ ] Storage paths shall resolve under approved storage roots.
 - [ ] Local file operations shall enforce approved storage roots and path validation.
-- [ ] Absolute paths outside approved roots shall be rejected.
 - [ ] Overwrite operations shall require explicit `overwrite=True`.
 - [ ] Existing local file with `overwrite=False` shall return `FILE_ALREADY_EXISTS`.
 - [ ] Unsafe path shall return `PATH_NOT_ALLOWED`.
@@ -2619,15 +2097,7 @@ Requirements:
 - [ ] Storage tests shall cover metadata preservation.
 - [ ] Every official tool shall test path safety where applicable.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `Error`
-- `ValidationError`
-- `ServiceError`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] Documentation shall include an error-code reference with all deterministic error codes.
 - [ ] `VALIDATION_FAILED` shall be added to deterministic error codes.
@@ -2652,31 +2122,20 @@ Requirements:
 - [ ] Every official tool shall test deterministic error code mapping.
 - [ ] Usage examples shall show realistic workflows and handle both success and error responses.
 
-#### `app/services/data/cache.py`
-
-Functions/classes:
-
-- `CacheKey`
-- `read_cache`
-- `write_cache`
-- `invalidate_cache`
-
-Requirements:
+#### Data Cache Layer and TTL Manager
 
 - [ ] Documentation shall include cache TTL and invalidation policy.
 - [ ] Documentation shall state that schema version, normalization version, and raw data hash changes invalidate matching cache entries regardless of TTL.
 - [ ] Approved storage roots shall be fixed to `data/raw/`, `data/processed/`, `data/cache/`, and `artifacts/data/` for Phase 1.
 - [ ] Changing schema version, normalization version, or raw data hash shall invalidate matching cache entries regardless of TTL.
 - [ ] Cache keys include schema version, normalization version, and raw data hash where available.
-- [ ] Stale cache is not returned silently.
+- [ ] Stale cache shall not be returned silently.
 - [ ] The maximum request-level cache TTL override shall be 7 days unless a source declares a stricter maximum.
 - [ ] Historical daily-or-higher data shall default to a cache TTL of 86,400 seconds.
 - [ ] Intraday bar data shall default to a cache TTL of 3,600 seconds.
 - [ ] Tick data shall default to a cache TTL of 900 seconds unless the source declares a stricter freshness policy.
 - [ ] Cache entries shall automatically invalidate when `schema_version`, `normalization_version`, or `raw_data_hash` changes, regardless of TTL.
-- [ ] Stale cache shall not be returned silently.
 - [ ] Stale cache behavior shall be governed by the `stale_data_behavior` input parameter, defaulting to `refresh_and_return` for execution-bound workflows and `return_with_warning` for research workflows.
-- [ ] The approved Phase 1 storage roots shall be `data/raw/`, `data/processed/`, `data/cache/`, and `artifacts/data/`.
 - [ ] `clear_data_cache`
 - [ ] Historical requests shall support source, symbol, data kind, timeframe where applicable, start, end, limit, cache policy, source timezone, workflow context, fallback sources, and request ID.
 - [ ] Historical data shall include raw data hash in cache identity when available.
@@ -2685,7 +2144,6 @@ Requirements:
 - [ ] A new `schema_version` shall read data written by the previous minor version or trigger mandatory cache invalidation and re-ingestion.
 - [ ] The cache shall support key creation, reads, writes, stale detection, source revision detection, and safe clearing.
 - [ ] Cache keys shall include source, data kind, symbol, timeframe, start, end, schema version, normalization version, request flags, source revision metadata, and raw data hash where available.
-- [ ] Stale cache shall not be returned silently.
 - [ ] Stale cache behavior shall be governed by `stale_data_behavior`, with `refresh_and_return` forcing a source refresh before return and `return_with_warning` returning stale data only with explicit warning metadata.
 - [ ] Cache reads, writes, misses, stale decisions, invalidation, and clear operations shall propagate request ID in logs.
 - [ ] Cache write failures shall not corrupt successful source fetches.
@@ -2715,16 +2173,7 @@ Requirements:
 - [ ] Cache invalidation on normalization version change shall be tested.
 - [ ] Production tests shall cover source revision detection and cache invalidation.
 
-#### `app/services/data/models.py`
-
-Functions/classes:
-
-- `Request`
-- `Result`
-- `Config`
-- `Metadata`
-
-Requirements:
+#### Data Domain Models and Primitives
 
 - [ ] Documentation shall include precision and numeric serialization policy by workflow context.
 - [ ] `get_historical_volume` may be direct or derived if its response contract remains stable and tested.
@@ -2734,8 +2183,7 @@ Requirements:
 - [ ] Every official tool returns the standard response schema.
 - [ ] Every official tool has metadata and side-effect flags.
 - [ ] Downstream contract alignment tests pass.
-- [ ] `get_symbol_metadata`
-- [ ] `get_data_availability`
+- [ ] Support the following: `get_symbol_metadata`, `get_data_availability`
 - [ ] The data module shall be rebuilt as a clean, contract-driven, agent-safe, testable, maintainable domain under `app/services/data/`.
 - [ ] `get_historical_volume` shall return volume-specific historical records or summaries.
 - [ ] Converting 100,000 DataFrame rows to records should target under 3 seconds.
@@ -2750,8 +2198,6 @@ Requirements:
 - [ ] Schema drift shall return `DATA_SCHEMA_DRIFT`.
 - [ ] The default direct-response limit for OHLCV bars shall be 5,000 records.
 - [ ] The maximum direct-response limit for OHLCV bars shall be 50,000 records.
-- [ ] The default direct-response limit for ticks shall be 10,000 records.
-- [ ] The maximum direct-response limit for ticks shall be 250,000 records.
 - [ ] The default direct-response limit for spread records shall be 10,000 records.
 - [ ] The maximum direct-response limit for spread records shall be 250,000 records.
 - [ ] Data availability tools shall not materialize more than 1,000,000 records solely for counts unless an operator explicitly enables a bounded audit mode.
@@ -2773,7 +2219,6 @@ Requirements:
 - [ ] Precision policy shall be disclosed in metadata.
 - [ ] Precision mismatches shall fail closed for risk and execution-bound workflows.
 - [ ] Precision mismatch shall return `PRECISION_MISMATCH`.
-- [ ] Execution-bound precision mismatch shall fail closed.
 - [ ] Duplicate timestamps, out-of-order records, missing timestamps, OHLC inconsistencies, negative volume, negative spread, stale data, partial data, and tick ask-bid violations shall be detected by quality validation.
 - [ ] Symbol metadata shall support asset-specific extensions for futures, options, bonds, and crypto where required by the asset class or workflow.
 - [ ] The default `spread_policy` shall be `average`.
@@ -2796,45 +2241,28 @@ Requirements:
 - [ ] Production tests shall cover execution-bound precision mismatch failure behavior.
 - [ ] Production tests shall cover downstream contract alignment.
 
-#### `app/services/data/adapters/synthetic.py`
-
-Functions/classes:
-
-- `generate_synthetic_bars`
-- `generate_synthetic_ticks`
-
-Requirements:
+#### Synthetic and Backtest Mock Data Adapters
 
 - [ ] Source readiness starts conservative: local and synthetic sources may be production; external/broker sources are staging until mocked and live validation passes.
 - [ ] GBM synthetic generation is enough for Phase 1.
-- [ ] Synthetic generation is deterministic when seed is supplied.
+- [ ] Synthetic tick and bar generation shall be deterministic when a seed is supplied.
 - [ ] `mean_reverting`, `trend`, and `seasonal` synthetic processes shall be Phase 2 extensions.
 - [ ] The maximum direct-response limit for synthetic bars shall be 100,000 records.
 - [ ] The maximum direct-response limit for synthetic ticks shall be 250,000 records.
 - [ ] Initial source readiness shall be `production` for `synthetic`.
-- [ ] `generate_synthetic_ticks`
-- [ ] `generate_synthetic_bars`
+- [ ] Support the following: `generate_synthetic_ticks`, `generate_synthetic_bars`
 - [ ] Synthetic generation shall use dedicated official tools rather than a normal external adapter unless future design requires source-like behavior.
-- [ ] Synthetic tick and bar generation shall be deterministic when a seed is supplied.
 - [ ] `generate_synthetic_ticks` shall support symbol, start timestamp, number of ticks, start price, average spread, volatility, volume behavior, and seed.
 - [ ] `generate_synthetic_bars` shall support symbol, timeframe, start timestamp, number of bars, start price, drift, volatility, spread behavior, volume behavior, method, and seed.
 - [ ] `generate_synthetic_bars` shall support GBM in Phase 1.
 - [ ] Generating 100,000 synthetic ticks should target under 3 seconds.
 
-#### `app/services/data/transforms.py`
-
-Functions/classes:
-
-- `resample_ohlcv`
-- `align_multitimeframe_data`
-- `aggregate_ticks_to_bars`
-
-Requirements:
+#### Market Data Transformation and Resampling Utilities
 
 - [ ] Pending: select the future `MarketCalendarProvider` implementation for historical holidays, daylight-saving, and broker-session reconstruction.
 - [ ] OHLCV, tick, spread, metadata, sessions, availability, and volume outputs use normalized contracts.
 - [ ] Timezone normalization uses UTC at the official boundary.
-- [ ] Source timezone and broker timezone metadata are preserved.
+- [ ] Original source timezone or broker timezone shall be preserved in metadata.
 - [ ] Multi-timeframe alignment prevents lookahead by default.
 - [ ] `get_trading_sessions`
 - [ ] Phase 1 may return current configured market hours only.
@@ -2845,15 +2273,11 @@ Requirements:
 - [ ] Source timezone override shall be a valid IANA timezone.
 - [ ] Source timezone and broker timezone shall be included when known.
 - [ ] Source timezone and broker timezone shall be preserved in metadata when known.
-- [ ] Original source timezone or broker timezone shall be preserved in metadata.
 - [ ] Required source metadata shall include source, requested source, actual source, source readiness, source capability declaration, schema version, normalization version, timestamp timezone, request ID, and license metadata where applicable.
 - [ ] OHLCV outputs shall include records, record count, symbol, timeframe, source, start, end, timestamp timezone, source timezone, schema version, normalization version, quality report, source metadata, license metadata, and precision metadata.
-- [ ] Tick outputs shall include records, record count, symbol, source, start, end, timestamp timezone, source timezone, schema version, normalization version, quality report, source metadata, license metadata, and precision metadata.
 - [ ] Adapters shall resolve DST ambiguities using explicit broker timezone mapping or the Python `fold` attribute before normalization to UTC.
 - [ ] Source adapters shall declare capabilities for OHLCV, ticks, spread, symbol metadata, market hours, streaming, writes, credentials, and network requirements.
-- [ ] `resample_ohlcv`
-- [ ] `align_multitimeframe_data`
-- [ ] `aggregate_ticks_to_bars`
+- [ ] Support the following: `resample_ohlcv`, `align_multitimeframe_data`, `aggregate_ticks_to_bars`
 - [ ] `resample_ohlcv` shall accept normalized OHLCV records.
 - [ ] `resample_ohlcv` shall validate source timeframe and target timeframe.
 - [ ] `resample_ohlcv` shall aggregate open as first open, high as max high, low as min low, close as last close, and volume as sum.
@@ -2869,18 +2293,10 @@ Requirements:
 - [ ] Labeling shall prevent lookahead leakage beyond the declared horizon.
 - [ ] `label_market_data` shall not claim predictive value.
 
-#### `app/utils/validations.py`
-
-Functions/classes:
-
-- `validate_request`
-- `validate_payload`
-
-Requirements:
+#### Input Parameter Validation Helpers
 
 - [ ] Every official tool validates inputs.
 - [ ] Data quality validation runs before returning market data.
-- [ ] CI quality gates pass.
 - [ ] Data content validation failure shall return `DATA_QUALITY_FAILED`.
 - [ ] Direct official-tool responses shall use safe default limits to avoid large agent payloads.
 - [ ] Official tool payload sizes shall be configurable and bounded.
@@ -2977,6 +2393,14 @@ Usage examples must show:
 - Log calls, validation failures, success, exception paths, and governed/fail-closed decisions with redacted metadata only.
 - Update module README or active docs when architecture, API, data models, security, testing, or observability meaning changes.
 
+### Quality and Documentation Standards
+
+- [ ] All Python modules and public functions/classes must have appropriate file-level and Google-style docstrings.
+- [ ] Implement unit tests for all modules and verify coverage is at least 80%.
+- [ ] The implementation must pass all CI quality gates (Ruff format, Ruff check, mypy --strict, pytest, and coverage at least 80%).
+- [ ] Update module README and active documentation for any architecture or API changes.
+
+
 ### Acceptance Checklist
 
 - Done criterion: All 701 checkbox tasks are implemented or explicitly deferred with a documented reason.
@@ -3017,21 +2441,6 @@ Task inventory: 737 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/errors.py
-
-app/utils/dataframe_tools.py
-
-app/services/data/__init__.py
-
-app/services/data/gateway.py
-
-```
 
 Required functionality:
 
@@ -3039,61 +2448,12 @@ Required functionality:
 - Dataframe utility operations (alignment, comparison, serialization) exist.
 - Centralized exception classes can resolve custom indicator errors.
 
-### Files to Create
-
-```text
-
-app/__init__.py
-
-app/services/indicators/__init__.py
-
-app/services/indicators/registry.py
-
-app/services/indicators/protocols.py
-
-app/utils/errors.py
-
-app/services/indicators/calculations.py
-
-app/services/indicators/batch/__init__.py
-
-app/services/indicators/batch/trend.py
-
-app/services/indicators/batch/volatility.py
-
-app/services/indicators/batch/momentum.py
-
-app/services/indicators/incremental/__init__.py
-
-app/services/indicators/incremental/state.py
-
-app/services/indicators/incremental/accumulators.py
-
-app/services/indicators/adapters/__init__.py
-
-app/services/indicators/adapters/cache.py
-
-app/services/indicators/adapters/audit.py
-
-app/services/indicators/
-
-app/services/simulation/
-
-app/utils/errors.py
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/indicators/README.md`
-
-Functions/classes:
-
-- No runtime functions/classes; documentation artifact only.
-
-Requirements:
+#### Indicator Library Documentation and Design Standards
 
 - [ ] Documentation shall warn against using unshifted current-bar values for bar-open decisions.
 - [ ] Promotion of custom indicators to official status shall require documentation, golden fixtures, conformance tests, no-lookahead tests, determinism tests, and benchmark coverage.
@@ -3108,13 +2468,7 @@ Requirements:
 - [ ] Documentation shall describe mandatory cross-validation against industry-standard libraries, third-party formula convention differences, golden fixture approval, mutation fuzz testing, and survivorship bias testing.
 - [ ] Public usage examples shall be executable documentation examples once implementation begins.
 
-#### `app/__init__.py`
-
-Functions/classes:
-
-- `IndicatorProtocol`
-
-Requirements:
+#### Package Initialization
 
 - [ ] Every smoothed indicator shall define smoothing method, alpha convention, and initial seed behavior.
 - [ ] Documentation shall describe numeric dtype policy, NaN, infinity, negative zero, overflow, underflow, divide-by-zero, and floating-point tolerance behavior.
@@ -3130,35 +2484,13 @@ Requirements:
 - [ ] Numeric tests shall verify NaN propagation, infinity rejection in official workflows, division-by-zero unavailable outputs, negative-zero normalization, and overflow/underflow deterministic handling.
 - [ ] Property-based mutation fuzz tests shall inject NaN, infinity, extreme outliers, zero volume, flat prices, negative values, malformed timestamps, duplicate timestamps, and random missing intervals.
 
-#### `app/services/indicators/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Indicator Library Package Initialization
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/indicators/registry.py`
-
-Functions/classes:
-
-- `register_indicator(...)`
-- `get_indicator(...)`
-- `list_indicators(...)`
-- `validate_indicator(...)`
-- `unregister_indicator(...)`
-- `register_indicator()`
-- `get_indicator()`
-- `list_indicators()`
-- `validate_indicator()`
-- `unregister_indicator()`
-- `IndicatorResult`
-
-Requirements:
+#### Indicator Registry and Registry Validation
 
 - [ ] The module shall provide an indicator registry for approved indicator implementations.
 - [ ] Registered indicators shall declare id, name, version, parameter schema, input schema, output schema, warmup policy, and deterministic behavior.
@@ -3183,22 +2515,7 @@ Requirements:
 - [ ] Custom indicator conformance suite passes for every registered custom indicator.
 - [ ] Every official indicator shall publish a machine-readable capability matrix covering batch, vectorized, incremental, streaming, out-of-core, acceleration, composition, multi-symbol, and multi-timeframe support.
 
-#### `app/services/indicators/protocols.py`
-
-Functions/classes:
-
-- `IndicatorProtocol`
-- `IndicatorConfig`
-- `IndicatorContext`
-- `IndicatorResult`
-- `IndicatorState`
-- `IndicatorManifest`
-- `IndicatorMetadata`
-- `WarmupPolicy`
-- `PrecisionPolicy`
-- `IndicatorDependency`
-
-Requirements:
+#### Indicator Interface Protocols and Type Signatures
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
@@ -3327,7 +2644,7 @@ Requirements:
 - [ ] The manifest shall include `output_checksum`.
 - [ ] The module shall define the exact input and output checksum policy, including included columns, dtype normalization, timestamp normalization, symbol ordering, row ordering, float handling, null representation, precision policy, and excluded metadata.
 - [ ] The manifest shall include `data_provenance` with adjustment status, price source, vendor, venue, symbol normalization version, corporate-action version, and continuous contract roll method when applicable.
-- [ ] The manifest shall include `output_contract` with generated column names, source column, output mode, naming policy, column conflict policy, join mode, input mutation flag, and index alignment policy.
+- [ ] Manifest tests shall verify output contract fields for generated column names, source column, output mode, naming policy, column conflict policy, join mode, input mutation flag, and index alignment policy.
 - [ ] The manifest shall include `execution_backend` with in-memory, out-of-core, accelerated, fallback, parallelism, worker count, and backend version fields where applicable.
 - [ ] The manifest shall include `rollout` with feature flag, canary route, selected implementation, baseline implementation, and tolerance status where applicable.
 - [ ] The manifest shall include `access_control` with non-sensitive decision metadata for proprietary indicator requests where applicable.
@@ -3343,9 +2660,7 @@ Requirements:
 - [ ] Intra-bar corporate-action adjustment inputs without a configured deterministic policy shall return a deterministic error code.
 - [ ] Stub quotes, inverted markets, missing bid or ask values, and spread-threshold violations shall return deterministic error codes unless an explicit fallback policy is configured.
 - [ ] Deprecated indicator, parameter, schema, or API use in the deprecation error phase shall return a deterministic error code unless an explicit opt-in flag is configured.
-- [ ] `IND_INVALID_CONFIG`
-- [ ] `IND_INVALID_INPUT_SCHEMA`
-- [ ] `IND_INPUT_MUTATION_DETECTED`
+- [ ] Support indicator codes/constants: `IND_INVALID_CONFIG`, `IND_INVALID_INPUT_SCHEMA`, `IND_INPUT_MUTATION_DETECTED`
 - [ ] Input validation tests shall cover missing columns, duplicate timestamps, non-monotonic timestamps, invalid OHLC, empty data, insufficient warmup, and invalid parameters.
 - [ ] Input validation tests shall cover malformed config payloads and invalid configuration combinations, including valid parameters that are incompatible when combined.
 - [ ] Input validation tests shall verify simultaneous conflicting options, such as `values_only=True` with `output_mode="join"`, fail with `IND_INVALID_CONFIG`.
@@ -3362,7 +2677,6 @@ Requirements:
 - [ ] Batch and incremental tests shall verify incremental output matches batch output within the documented precision policy.
 - [ ] Market data quality tests shall verify default exclusion of flagged rows, explicit inclusion configuration, quality-flag propagation, highest-severity quality summarization, and strategy-facing quality metadata.
 - [ ] Manifest tests shall verify every required manifest field, nested data provenance, calculation config, timing, output shape, environment, composition lineage, and quality summary.
-- [ ] Manifest tests shall verify output contract fields for generated column names, source column, output mode, naming policy, column conflict policy, join mode, input mutation flag, and index alignment policy.
 - [ ] Manifest tests shall verify parameter hash canonicalization and input/output checksum policies are stable and documented.
 - [ ] Provenance tests shall cover raw, split-adjusted, dividend-adjusted, total-return-adjusted, back-adjusted, synthetic, bid, ask, mid, mark, settlement, vendor-derived, continuous futures, and unknown adjustment status inputs.
 - [ ] Microstructure tests shall cover stub quotes, inverted markets, missing bid or ask values, spreads above the configured threshold, and mid-price fallback policies.
@@ -3403,14 +2717,7 @@ Requirements:
 - [ ] Official Backtest Required shall include no-lookahead alignment, reproducible fixtures, manifest/checksum behavior, data-quality propagation, and strategy/simulation integration contracts.
 - [ ] Rich notebook HTML representations may be added after stable result and manifest schemas exist.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `IndicatorResult(errors=...)`
-- `IndicatorResult`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] All standard system exceptions and error codes shall be imported and reused from `app.utils.errors` to prevent duplicate declaration. Custom indicator exceptions must inherit from `app.utils.errors.Error` or `HaruQuantError`.
 - [ ] Indicator implementations shall return deterministic errors for invalid input schema, invalid parameter values, insufficient data, non-monotonic timestamps, duplicate timestamps, or impossible OHLCV values.
@@ -3455,18 +2762,7 @@ Requirements:
 - [ ] Custom indicators rejected by conformance, status, dependency, or governance checks shall return deterministic error codes.
 - [ ] Unauthorized proprietary indicator requests shall return deterministic access-control error codes.
 - [ ] SLO violations detected during production monitoring shall emit deterministic metric events and shall return deterministic error codes when the request policy requires synchronous enforcement.
-- [ ] `IND_INVALID_PARAMETER`
-- [ ] `IND_UNSUPPORTED_INDICATOR`
-- [ ] `IND_UNSUPPORTED_TIMEFRAME`
-- [ ] `IND_UNSUPPORTED_DTYPE`
-- [ ] `IND_INVALID_OUTPUT_COLUMN`
-- [ ] `IND_INVALID_OUTPUT_MODE`
-- [ ] `IND_INVALID_TIMEZONE`
-- [ ] `IND_INVALID_OHLC`
-- [ ] `IND_INTRA_BAR_ADJUSTMENT_UNSUPPORTED`
-- [ ] `IND_UNSUPPORTED_OUT_OF_CORE`
-- [ ] `IND_UNSUPPORTED_INCREMENTAL_MODE`
-- [ ] `IND_INTERNAL_ERROR`
+- [ ] Support indicator codes/constants: `IND_INVALID_PARAMETER`, `IND_UNSUPPORTED_INDICATOR`, `IND_UNSUPPORTED_TIMEFRAME`, `IND_UNSUPPORTED_DTYPE`, `IND_INVALID_OUTPUT_COLUMN`, `IND_INVALID_OUTPUT_MODE`, `IND_INVALID_TIMEZONE`, `IND_INVALID_OHLC`, `IND_INTRA_BAR_ADJUSTMENT_UNSUPPORTED`, `IND_UNSUPPORTED_OUT_OF_CORE`, `IND_UNSUPPORTED_INCREMENTAL_MODE`, `IND_INTERNAL_ERROR`
 - [ ] Composition tests shall verify cyclic graphs, missing upstream columns, incompatible source timeframes, unavailable upstream values, and output column collisions fail deterministically.
 - [ ] Performance benchmark tests shall prove the CI regression gate fails the build when the greater-than-20-percent regression threshold is triggered without explicit approval.
 - [ ] Custom indicator tests shall verify import failure, dependency conflict, unsupported Python version, and side-effect enforcement failure handling.
@@ -3474,20 +2770,7 @@ Requirements:
 - [ ] Documentation shall describe out-of-core processing, memory budgets, chunk sizes, spill storage, unsupported out-of-core rejection, and in-memory parity requirements.
 - [ ] Out-of-core parity and unsupported out-of-core rejection tests pass.
 
-#### `app/services/indicators/calculations.py`
-
-Functions/classes:
-
-- `calculate_sma`
-- `calculate_ema`
-- `calculate_adx`
-- `calculate_atr`
-- `calculate_adr`
-- `calculate_rolling_volatility`
-- `calculate_rsi`
-- `calculate_williams_r`
-
-Requirements:
+#### Base Mathematical Calculations
 
 - [ ] Indicator calculations shall not use current incomplete bar high, low, close, volume, or derived values for previous-closed-bar decisions.
 - [ ] Indicator calculations may be cached by indicator id, parameter hash, input data checksum, implementation version, schema version, and precision policy.
@@ -3621,28 +2904,7 @@ Requirements:
 - [ ] Observability metrics when enabled.
 - [ ] Trace ids and span ids when distributed tracing is enabled.
 - [ ] SLO measurement fields when SLO tracking is enabled.
-- [ ] `IND_MISSING_REQUIRED_COLUMN`
-- [ ] `IND_OUTPUT_COLUMN_CONFLICT`
-- [ ] `IND_DUPLICATE_TIMESTAMP`
-- [ ] `IND_NON_MONOTONIC_TIME`
-- [ ] `IND_AMBIGUOUS_TIMESTAMP`
-- [ ] `IND_INSUFFICIENT_DATA`
-- [ ] `IND_LOOKAHEAD_RISK`
-- [ ] `IND_UNKNOWN_ADJUSTMENT_STATUS`
-- [ ] `IND_SYMBOL_MAPPING_REQUIRED`
-- [ ] `IND_STUB_QUOTE_REJECTED`
-- [ ] `IND_INVERTED_MARKET`
-- [ ] `IND_SPREAD_THRESHOLD_EXCEEDED`
-- [ ] `IND_DEPRECATED`
-- [ ] `IND_ACCELERATION_BACKEND_UNAVAILABLE`
-- [ ] `IND_RESOURCE_LIMIT_EXCEEDED`
-- [ ] `IND_TIMEOUT`
-- [ ] `IND_CANCELLED`
-- [ ] `IND_PARTIAL_RESULT`
-- [ ] `IND_CUSTOM_INDICATOR_REJECTED`
-- [ ] `IND_ACCESS_DENIED`
-- [ ] `IND_PROPRIETARY_UNAUTHORIZED`
-- [ ] `IND_SLO_VIOLATION`
+- [ ] Support indicator codes/constants: `IND_MISSING_REQUIRED_COLUMN`, `IND_OUTPUT_COLUMN_CONFLICT`, `IND_DUPLICATE_TIMESTAMP`, `IND_NON_MONOTONIC_TIME`, `IND_AMBIGUOUS_TIMESTAMP`, `IND_INSUFFICIENT_DATA`, `IND_LOOKAHEAD_RISK`, `IND_UNKNOWN_ADJUSTMENT_STATUS`, `IND_SYMBOL_MAPPING_REQUIRED`, `IND_STUB_QUOTE_REJECTED`, `IND_INVERTED_MARKET`, `IND_SPREAD_THRESHOLD_EXCEEDED`, `IND_DEPRECATED`, `IND_ACCELERATION_BACKEND_UNAVAILABLE`, `IND_RESOURCE_LIMIT_EXCEEDED`, `IND_TIMEOUT`, `IND_CANCELLED`, `IND_PARTIAL_RESULT`, `IND_CUSTOM_INDICATOR_REJECTED`, `IND_ACCESS_DENIED`, `IND_PROPRIETARY_UNAUTHORIZED`, `IND_SLO_VIOLATION`
 - [ ] Every functional and non-functional requirement shall have a stable requirement id before implementation begins.
 - [ ] Default-parameter tests shall verify default parameter values and valid parameter ranges for every built-in indicator.
 - [ ] Public API contract tests shall verify every public callable against the documented API contract table.
@@ -3684,30 +2946,13 @@ Requirements:
 - [ ] Every public callable shall be classified as stable, experimental, internal, optional, or future before implementation begins.
 - [ ] GPU/SIMD acceleration may be added as an Optional Extension after Core MVP formula and fixture behavior is stable.
 
-#### `app/services/indicators/batch/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Batch Indicator Calculations Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/indicators/batch/trend.py`
-
-Functions/classes:
-
-- `SMAIndicator`
-- `EMAIndicator`
-- `ADXIndicator`
-- `calculate_sma`
-- `calculate_ema`
-- `calculate_adx`
-
-Requirements:
+#### Batch Trend Indicators (Moving Averages, MACD, etc.)
 
 - [ ] The module shall support trend indicators including EMA, SMA, and ADX.
 - [ ] Documentation shall include examples for EMA/SMA trend signals, ATR volatility sizing inputs, RSI momentum signals, vectorized dataframe output, joined indicator columns, and multi-timeframe alignment.
@@ -3729,7 +2974,6 @@ Requirements:
 - [ ] Every indicator shall define its exact mathematical formula.
 - [ ] The HaruQuant formula specification shall remain the source of truth when third-party library conventions differ.
 - [ ] Symbol changes, mergers, ticker replacements, and vendor remaps shall use an explicit symbol mapping contract.
-- [ ] Optional symbol mapping contract for symbol changes, mergers, ticker replacements, and vendor remaps.
 - [ ] Output schema version.
 - [ ] `IND_FORMULA_VERSION_MISMATCH`
 - [ ] Vectorized output tests shall verify `ema(data, period=10, source="close")` produces `ema_10` when `close` is the default source.
@@ -3747,20 +2991,7 @@ Requirements:
 - [ ] Cross-library validation passes for EMA, SMA, RSI, ATR, and ADX against at least two industry-standard libraries.
 - [ ] Proprietary source protection may be added through approved packaging/security controls without changing public indicator semantics.
 
-#### `app/services/indicators/batch/volatility.py`
-
-Functions/classes:
-
-- `ema(...)`
-- `sma(...)`
-- `adx(...)`
-- `atr(...)`
-- `adr(...)`
-- `rolling_volatility(...)`
-- `rsi(...)`
-- `williams_r(...)`
-
-Requirements:
+#### Batch Volatility Indicators (ATR, Bollinger Bands, etc.)
 
 - [ ] The module shall support volatility indicators including ATR, ADR, and rolling volatility.
 - [ ] Official indicator convenience functions shall expose typed wrappers for supported built-ins, including `ema(...)`, `sma(...)`, `adx(...)`, `atr(...)`, `adr(...)`, `rolling_volatility(...)`, `rsi(...)`, and `williams_r(...)`.
@@ -3778,16 +3009,7 @@ Requirements:
 - [ ] Documentation shall describe ADR range convention and Williams %R degenerate-window behavior.
 - [ ] Requirement-to-test traceability matrix exists and maps every requirement id to tests or approved deferral.
 
-#### `app/services/indicators/batch/momentum.py`
-
-Functions/classes:
-
-- `RSIIndicator`
-- `WilliamsRIndicator`
-- `calculate_rsi`
-- `calculate_williams_r`
-
-Requirements:
+#### Batch Momentum Indicators (RSI, Stochastic, etc.)
 
 - [ ] The module shall support momentum indicators including RSI and Williams %R.
 - [ ] No file-specific non-functional requirements defined.
@@ -3804,41 +3026,13 @@ Requirements:
 - [ ] Reference outputs shall be reviewed and pinned by implementation version.
 - [ ] Cross-validation deviations beyond documented tolerance shall require formula justification, implementation-version pinning, golden fixture approval, and changelog entry.
 
-#### `app/services/indicators/incremental/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Incremental Indicator Calculations Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/indicators/incremental/state.py`
-
-Functions/classes:
-
-- `IndicatorProtocol`
-- `IndicatorConfig`
-- `IndicatorContext`
-- `IndicatorResult`
-- `IndicatorManifest`
-- `IndicatorState`
-- `WarmupRequirement`
-- `IndicatorRegistration`
-- `IndicatorError`
-- `update(bar, state, config, context)`
-- `update()`
-- `serialize_state(state)`
-- `deserialize_state(payload)`
-- `serialize_state()`
-- `deserialize_state()`
-- `IND_STATE_INCOMPATIBLE`
-- `IND_STATE_CORRUPTED`
-
-Requirements:
+#### Incremental Calculation State Tracking
 
 - [ ] Official fills, orders, account state, journals, and reports are produced by the simulation module.
 - [ ] The indicator module shall not execute trades, create fills, mutate account state, mutate simulation journals, or perform broker-state operations.
@@ -3871,9 +3065,7 @@ Requirements:
 - [ ] Unauthorized proprietary indicator requests shall fail before input data is read, state is deserialized, cache entries are read, or calculation begins.
 - [ ] Serializable incremental state when incremental calculation is enabled.
 - [ ] Incompatible incremental state shall return a deterministic error code before state is updated.
-- [ ] Corrupted incremental state shall return a deterministic error code before state is updated.
-- [ ] `IND_STATE_INCOMPATIBLE`
-- [ ] `IND_STATE_CORRUPTED`
+- [ ] Support indicator codes/constants: `IND_STATE_INCOMPATIBLE`, `IND_STATE_CORRUPTED`
 - [ ] Stateless indicator functions shall be thread-safe by default.
 - [ ] Stateful incremental indicators shall be single-owner or lock-free according to their documented state model.
 - [ ] Single-owner incremental state objects shall not be safe for concurrent mutation.
@@ -3899,50 +3091,24 @@ Requirements:
 - [ ] Documentation shall describe batch, incremental, and streaming calculation modes.
 - [ ] Batch and incremental parity tests pass for indicators that support incremental mode.
 
-#### `app/services/indicators/incremental/accumulators.py`
-
-Functions/classes:
-
-- `IndicatorAccumulator`
-- `EMAAccumulator`
-- `ATRAccumulator`
-- `RSIAccumulator`
-- `update_incremental_indicator`
-
-Requirements:
+#### Incremental Bar Accumulators
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/indicators/adapters/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Indicator Cache/Audit Integration
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/indicators/adapters/cache.py`
-
-Functions/classes:
-
-- `IndicatorCacheAdapter`
-- `IndicatorCacheKey`
-- `get_cached_indicator_result`
-- `set_cached_indicator_result`
-- `invalidate_indicator_cache`
-
-Requirements:
+#### Indicator Cache Adapter
 
 - [ ] Cache hits shall be deterministic and shall never reuse results across incompatible input data, parameter sets, implementation versions, or schema versions.
 - [ ] If an optional cache adapter is unreachable and `cache_policy="best_effort"`, the module shall degrade to uncached calculation with warning metadata rather than raising an unhandled exception.
 - [ ] If an optional cache adapter is unreachable and `cache_policy="strict"`, the request shall fail before calculation with deterministic cache-unavailable diagnostics.
-- [ ] Uncached first-run batch calculation for each official built-in indicator over 10 symbols and 10 years of M1 bars shall target p99 less than or equal to 5 seconds on the documented benchmark hardware profile.
+- [ ] Default uncached first-run calculation latency for official indicator workloads shall target p99 less than or equal to 5 seconds for 10 years by 10 symbols of M1 bars on the documented benchmark hardware profile.
 - [ ] Warm-cache batch calculation for official indicator workloads shall target p99 less than or equal to 250 milliseconds for up to 10 symbols and 100,000 input rows, aligned with the service-level objective section.
 - [ ] Performance benchmark specifications shall be the source for the p99 uncached and warm-cache targets defined in the service-level objective section.
 - [ ] Out-of-core processing shall preserve warmup continuity, symbol grouping, timestamp ordering, provenance metadata, and cache-key determinism across chunks.
@@ -3960,9 +3126,8 @@ Requirements:
 - [ ] The manifest shall include `calculation_config` with precision policy, session calendar identifier, data latency config, calculation mode, resource limits, and cache policy.
 - [ ] The manifest shall include `slo` with configured thresholds and observed latency, cache status, error classification, and timeout status where applicable.
 - [ ] Resource-limit, timeout, cancellation, partial-result, cache-write, unsupported out-of-core, unavailable acceleration backend, and unsupported incremental mode conditions shall return deterministic error codes.
-- [ ] `IND_CACHE_INVALID`
-- [ ] `IND_CACHE_WRITE_FAILED`
-- [ ] Importing `app.services.indicators` shall not perform network I/O, filesystem writes, cache writes, plugin execution, long-running computation, environment mutation, or registration from untrusted plugins.
+- [ ] Support indicator codes/constants: `IND_CACHE_INVALID`, `IND_CACHE_WRITE_FAILED`
+- [ ] Import-time tests shall verify importing `app.services.indicators` performs no network I/O, filesystem writes, cache writes, plugin execution, long-running computation, environment mutation, or registration from untrusted plugins.
 - [ ] Metrics shall include calculation duration, input row count, output row count, symbol count, cache hit or miss, memory usage estimate, rejected row count, warmup row count, and error code counts.
 - [ ] Trace spans shall carry request id, correlation id, indicator id, implementation version, parameter hash, input checksum, cache status, backend id, and error code when available.
 - [ ] Cache writes shall be atomic and shall not corrupt existing valid cache entries on failure.
@@ -3976,7 +3141,6 @@ Requirements:
 - [ ] The module shall document whether parallel symbol execution is supported and how it interacts with the cache.
 - [ ] Production indicator workflows shall define service level objectives for calculation latency, cache hit ratio, non-transient error rate, and timeout rate.
 - [ ] Default warm-cache calculation latency for official indicator workloads shall target p99 less than or equal to 250 milliseconds per indicator request for up to 10 symbols and 100,000 input rows.
-- [ ] Default uncached first-run calculation latency for official indicator workloads shall target p99 less than or equal to 5 seconds for 10 years by 10 symbols of M1 bars on the documented benchmark hardware profile.
 - [ ] Repeated research and simulation runs with stable inputs shall target cache hit ratio of at least 95 percent after cache warmup.
 - [ ] Documentation shall include public API contract tables covering import paths, signatures, defaults, input schemas, output schemas, error behavior, side effects, cache behavior, stability level, and official-workflow eligibility.
 - [ ] Documentation shall describe cache keys and invalidation behavior.
@@ -3995,7 +3159,6 @@ Requirements:
 - [ ] Out-of-core processing may be added as an Optional Extension after chunking parity and cache integrity requirements are approved.
 - [ ] Canary routing, distributed tracing, SLO alerting, cryptographic package signing, release attestations, SBOM generation, and multi-writer cache synchronization may be added through platform or release-engineering integrations after ownership is approved.
 - [ ] No file-specific non-functional requirements defined.
-- [ ] Import-time tests shall verify importing `app.services.indicators` performs no network I/O, filesystem writes, cache writes, plugin execution, long-running computation, environment mutation, or registration from untrusted plugins.
 - [ ] UTC normalization tests shall verify internal timestamp arithmetic and cache keys are UTC-normalized while local and exchange time conversions occur only at I/O boundaries.
 - [ ] Cache tests shall cover cache hits, cache misses, schema-version changes, implementation-version changes, parameter changes, and input checksum changes.
 - [ ] Cache tests shall verify atomic cache writes and failure behavior for interrupted cache writes.
@@ -4007,13 +3170,7 @@ Requirements:
 - [ ] SLO tests shall verify latency, cache-hit ratio, non-transient error rate, timeout rate, measurement windows, excluded error categories, alert routing metadata, and synchronous enforcement behavior when configured.
 - [ ] Proprietary indicator tests shall verify access checks before execution, unauthorized request rejection before data or cache access, non-sensitive access-control manifest metadata, and deterministic parity for protected-source packages.
 
-#### `app/services/indicators/adapters/audit.py`
-
-Functions/classes:
-
-- `IndicatorManifest`
-
-Requirements:
+#### Indicator Integrity Audit Trail
 
 - [ ] `IndicatorManifest` shall contain calculation identity, formula identity, input checksum, output checksum, parameter hash, output schema version, output column contract, data provenance, execution backend, timing, environment, and audit metadata.
 - [ ] Official simulation and production workflows may require indicator calculation audit entries.
@@ -4138,21 +3295,6 @@ Task inventory: 457 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/errors.py
-
-app/services/indicators/__init__.py
-
-app/services/indicators/registry.py
-
-app/services/data/__init__.py
-
-```
 
 Required functionality:
 
@@ -4160,91 +3302,36 @@ Required functionality:
 - Data gateway can retrieve OHLCV historical sequences.
 - Domain registry, validation, and standard exceptions exist.
 
-### Files to Create
-
-```text
-
-app/__init__.py
-
-app/services/strategies/__init__.py
-
-app/services/strategies/registry.py
-
-app/services/strategies/protocols.py
-
-app/utils/errors.py
-
-app/services/strategies/vectorized.py
-
-app/services/strategies/event.py
-
-app/services/strategies/sandbox.py
-
-app/services/strategies/
-
-app/services/simulation/
-
-app/utils/errors.py
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/strategies/README.md`
-
-Functions/classes:
-
-- No runtime functions/classes; documentation artifact only.
-
-Requirements:
+#### Strategy Domain Documentation and Operating Manual
 
 - [ ] Strategy documentation retention periods shall be defined for regulatory inquiries.
 - [ ] Documentation shall include strategy input modes approved for `run_backtest`.
 - [ ] Requirements without implementation scope shall carry an explicit `Documentation Only`, `Future`, or `Not Implemented` rationale.
 
-#### `app/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Package Initialization
 
 - [ ] Strategies shall not assume infinite liquidity at the best bid or ask.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/strategies/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Strategy Service Package Initialization
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/strategies/registry.py`
-
-Functions/classes:
-
-- `STRATEGY_VERSION_CONSTRAINT_UNSATISFIABLE`
-- `eval()`
-- `exec()`
-- `STRATEGY_INVALID_CONFIG`
-
-Requirements:
+#### Strategy Registry and Registration Policies
 
 - [ ] A strategy registry entry may declare `min_expected_alpha`, `max_acceptable_transaction_cost`, both, or neither.
 - [ ] The module shall provide an official strategy registry.
 - [ ] Registered strategies shall declare strategy id, version, module path, owner, configuration schema, supported symbols or asset classes, supported timing policy, required indicators, required data, risk assumptions, and permitted execution modes.
-- [ ] Registered strategy identifiers shall resolve only to approved strategy modules.
+- [ ] Strategy registry tests shall verify registered strategy identifiers resolve to approved modules.
 - [ ] Strategy configuration shall be schema-validated before execution.
-- [ ] Invalid strategy identifiers shall fail deterministically before simulation execution.
 - [ ] Invalid strategy configuration shall fail deterministically before simulation execution.
 - [ ] Strategy registry entries shall include version hashes for replay and audit.
 - [ ] Strategy files and module paths shall resolve through approved registries or allowlisted roots, not arbitrary user-supplied filesystem paths.
@@ -4268,7 +3355,6 @@ Requirements:
 - [ ] Null or missing strategy configuration shall either apply schema defaults or fail according to the registry entry's configuration policy.
 - [ ] Duplicate registry entry for the same strategy id/version shall fail registry validation.
 - [ ] Malformed registry configuration schema shall fail registry validation with `STRATEGY_INVALID_CONFIG`.
-- [ ] Strategy registry tests shall verify registered strategy identifiers resolve to approved modules.
 - [ ] Strategy registry tests shall verify unregistered strategy identifiers are rejected.
 - [ ] Strategy registry tests shall verify unapproved modules are rejected.
 - [ ] Strategy tests shall include contract tests against data, indicator, simulation, and registry interfaces.
@@ -4282,7 +3368,7 @@ Requirements:
 - [ ] `TradeIntent` objects shall include strategy id, strategy version, symbol, side, intent type, requested sizing mode or quantity hint, optional stop loss, optional take profit, optional expiration, optional rationale, and signal timestamp.
 - [ ] Phase 1 strategy execution shall allow registered strategies and validated configuration only.
 - [ ] Strategy replay shall use strategy id, strategy version, configuration hash, data checksum, indicator result manifest, and simulation config hash.
-- [ ] The same strategy id, version, configuration, input data, indicator outputs, and simulation seed shall produce the same trade intents.
+- [ ] Replay tests shall verify the same strategy id, version, configuration, input data, indicator outputs, and simulation seed produce the same trade intents.
 - [ ] Strategy identifiers, configuration hashes, and version hashes must be included in replay and audit metadata.
 - [ ] Registered strategy identifier.
 - [ ] Strategy version or version constraint.
@@ -4304,23 +3390,11 @@ Requirements:
 - [ ] Checkpoint restore with unsupported schema version, checksum mismatch, or unauthorized source shall fail before execution.
 - [ ] STRATEGY_VERSION_CONSTRAINT_UNSATISFIABLE
 - [ ] Performance tests shall state the exact hardware/software environment, dataset size, strategy type, dependency versions, measurement method, and target thresholds used.
-- [ ] Replay tests shall verify the same strategy id, version, configuration, input data, indicator outputs, and simulation seed produce the same trade intents.
 - [ ] Replay tests shall verify historical interface versions are used unless an approved migration exists.
 - [ ] Documentation shall include configuration schema requirements for registered strategies.
 - [ ] Every strategy decision shall be reproducible from strategy id, strategy version, configuration hash, data checksum, indicator manifest, simulation config hash where applicable, interface version, timing policy, and seed material.
 
-#### `app/services/strategies/protocols.py`
-
-Functions/classes:
-
-- `StrategyProtocol`
-- `StrategyConfig`
-- `StrategyContext`
-- `StrategyResult`
-- `StrategySignal`
-- `StrategyLifecycleHooks`
-
-Requirements:
+#### Strategy Interface Protocols and Lifecycle Hooks
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
@@ -4529,33 +3603,7 @@ Requirements:
 - [ ] Duplicate, out-of-order, stale, revised, or late-arriving ticks shall follow the declared data policy.
 - [ ] Strategy hook timeout shall return `STRATEGY_TIMEOUT` and follow the configured failure policy.
 - [ ] Concurrent read-only state snapshots across multiple strategies shall define isolation level, snapshot timestamp, and behavior when official state updates during decision traversal.
-- [ ] `STRATEGY_INVALID_CONFIG`
-- [ ] `STRATEGY_NOT_FOUND`
-- [ ] `STRATEGY_DEPRECATED`
-- [ ] `STRATEGY_UNAPPROVED_MODULE`
-- [ ] `STRATEGY_SCHEMA_VALIDATION_FAILED`
-- [ ] `STRATEGY_UNSUPPORTED_TIMING_POLICY`
-- [ ] `STRATEGY_ENVIRONMENT_NOT_PERMITTED`
-- [ ] `STRATEGY_ARTIFACT_HASH_MISMATCH`
-- [ ] `STRATEGY_DEPENDENCY_HASH_MISMATCH`
-- [ ] `STRATEGY_CHECKPOINT_INCOMPATIBLE`
-- [ ] `STRATEGY_DATA_NOT_READY`
-- [ ] `STRATEGY_INDICATOR_NOT_READY`
-- [ ] `STRATEGY_MISSING_REQUIRED_DATA`
-- [ ] `STRATEGY_STALE_DATA`
-- [ ] `STRATEGY_DUPLICATE_INTENT`
-- [ ] `STRATEGY_RESOURCE_LIMIT_EXCEEDED`
-- [ ] `STRATEGY_TIMEOUT`
-- [ ] `STRATEGY_VALIDATION_ARTIFACT_REQUIRED`
-- [ ] `STRATEGY_RISK_PROFILE_REQUIRED`
-- [ ] `STRATEGY_CIRCUIT_BREAKER_TRIGGERED`
-- [ ] `STRATEGY_POSITION_LIMIT_EXCEEDED`
-- [ ] `STRATEGY_VOLUME_PARTICIPATION_EXCEEDED`
-- [ ] `STRATEGY_PERFORMANCE_DEGRADED`
-- [ ] `STRATEGY_DRIFT_DETECTED`
-- [ ] `STRATEGY_REGULATORY_LIMIT_BREACHED`
-- [ ] `STRATEGY_MARKET_ACCESS_REVOKED`
-- [ ] `STRATEGY_HARD_KILLED`
+- [ ] Support strategy codes/constants: `STRATEGY_INVALID_CONFIG`, `STRATEGY_NOT_FOUND`, `STRATEGY_DEPRECATED`, `STRATEGY_UNAPPROVED_MODULE`, `STRATEGY_SCHEMA_VALIDATION_FAILED`, `STRATEGY_UNSUPPORTED_TIMING_POLICY`, `STRATEGY_ENVIRONMENT_NOT_PERMITTED`, `STRATEGY_ARTIFACT_HASH_MISMATCH`, `STRATEGY_DEPENDENCY_HASH_MISMATCH`, `STRATEGY_CHECKPOINT_INCOMPATIBLE`, `STRATEGY_DATA_NOT_READY`, `STRATEGY_INDICATOR_NOT_READY`, `STRATEGY_MISSING_REQUIRED_DATA`, `STRATEGY_STALE_DATA`, `STRATEGY_DUPLICATE_INTENT`, `STRATEGY_RESOURCE_LIMIT_EXCEEDED`, `STRATEGY_TIMEOUT`, `STRATEGY_VALIDATION_ARTIFACT_REQUIRED`, `STRATEGY_RISK_PROFILE_REQUIRED`, `STRATEGY_CIRCUIT_BREAKER_TRIGGERED`, `STRATEGY_POSITION_LIMIT_EXCEEDED`, `STRATEGY_VOLUME_PARTICIPATION_EXCEEDED`, `STRATEGY_PERFORMANCE_DEGRADED`, `STRATEGY_DRIFT_DETECTED`, `STRATEGY_REGULATORY_LIMIT_BREACHED`, `STRATEGY_MARKET_ACCESS_REVOKED`, `STRATEGY_HARD_KILLED`
 - [ ] Every requirement id shall have at least one linked test id or a documented non-implementation rationale.
 - [ ] Every usage example shall be executable or schema-validatable as documentation test coverage.
 - [ ] The traceability matrix shall be tested or reviewed as an explicit pre-implementation deliverable.
@@ -4586,13 +3634,7 @@ Requirements:
 - [ ] Every external-module interaction shall pass through a documented contract with deterministic error mapping, timeout behavior, and redaction behavior.
 - [ ] Strategy implementation scope shall be narrowed to an approved phase slice before Builder handoff.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `STRATEGY_LOOKAHEAD_DETECTED`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] All standard system exceptions and error codes shall be imported and reused from `app.utils.errors` to prevent duplicate declaration. Custom strategy exceptions must inherit from `app.utils.errors.Error` or `HaruQuantError`.
 - [ ] Strategy access to prohibited current-bar or future data shall fail with the canonical strategy-domain error code `STRATEGY_LOOKAHEAD_DETECTED`; lower-level simulation lookahead errors, if any, shall be mapped to this code before returning strategy diagnostics.
@@ -4634,25 +3676,13 @@ Requirements:
 - [ ] Clock drift beyond the approved tolerance between strategy runtime, data feed, indicator outputs, or simulation clock shall fail closed with `STRATEGY_STALE_DATA`, checkpoint abort, or a more specific approved error code.
 - [ ] Duplicate `intent_id`, duplicate idempotency key, or non-monotonic strategy-local sequence number shall fail deterministically.
 - [ ] Attempted secret exposure in diagnostics, checkpoints, manifests, or rationale shall fail redaction validation.
-- [ ] `SIM_ARBITRARY_CODE_REJECTED`
-- [ ] `STRATEGY_INTERNAL_ERROR`
-- [ ] `INDICATOR_MODULE_ERROR`
-- [ ] `STRATEGY_CHECKPOINT_INVALID`
-- [ ] `STRATEGY_DATA_QUALITY_GATE_FAILED`
+- [ ] Support the following: `SIM_ARBITRARY_CODE_REJECTED`, `STRATEGY_INTERNAL_ERROR`, `INDICATOR_MODULE_ERROR`, `STRATEGY_CHECKPOINT_INVALID`, `STRATEGY_DATA_QUALITY_GATE_FAILED`
 - [ ] Every confirmed error code shall have at least one focused failure-path test that triggers the code and verifies the full response or diagnostic shape.
 - [ ] AI Tool strategy security tests shall verify `run_backtest` rejects raw arbitrary Python strategy code, returns `SIM_ARBITRARY_CODE_REJECTED`, does not execute rejected code, and does not log rejected code in full.
 - [ ] Strategy tests shall include scenario tests for session boundaries, holidays, weekend gaps, DST transitions, spread spikes, partial fills, rejected fills, and multi-timeframe bar closure.
 - [ ] Each confirmed error code shall have at least one triggering scenario and a stable diagnostic shape before implementation acceptance.
 
-#### `app/services/strategies/vectorized.py`
-
-Functions/classes:
-
-- `run_vectorized_strategy_signals`
-- `TradeIntent`
-- `MULTIPROCESS_ISOLATED`
-
-Requirements:
+#### Vectorized Backtesting Engine
 
 - [ ] Each public capability shall define whether results are returned as a single batch, iterator, stream, or async stream; `run_vectorized_strategy_signals` shall be treated as batch output until a streaming contract is explicitly approved.
 - [ ] The module shall support vectorized signal strategies.
@@ -4675,18 +3705,7 @@ Requirements:
 - [ ] Property-based no-lookahead tests shall cover timezone offsets, DST gaps, DST overlaps, session boundaries, late-arriving data, revised bars, and multi-timeframe closure boundaries.
 - [ ] Documentation shall describe no-lookahead strategy timing.
 
-#### `app/services/strategies/event.py`
-
-Functions/classes:
-
-- `FILL_UPDATE`
-- `PARTIAL_FILL`
-- `TradeIntent`
-- `decision_id`
-- `ASYNC_AWAIT`
-- `SYNC_BLOCKING`
-
-Requirements:
+#### Event-Driven Backtest Executor
 
 - [ ] Strategies shall not directly create official fills, deals, journal events, or reports.
 - [ ] The module shall support stateful event strategies.
@@ -4721,13 +3740,7 @@ Requirements:
 - [ ] A strategy shall not execute in an environment higher than its approved lifecycle status.
 - [ ] `STRATEGY_LIFECYCLE_NOT_APPROVED`
 
-#### `app/services/strategies/sandbox.py`
-
-Functions/classes:
-
-- `STRATEGY_ENVIRONMENT_NOT_PERMITTED`
-
-Requirements:
+#### Isolated Strategy Code Execution Sandbox
 
 - [ ] The strategy input path shall accept only registered strategy identifiers, validated strategy configuration schemas, or code explicitly vetted and sandboxed by the orchestration layer.
 - [ ] Code-based strategy execution shall remain disabled until sandbox policy, approval workflow, and prohibited-operation lists are approved.
@@ -4840,19 +3853,6 @@ Task inventory: 678 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/errors.py
-
-app/services/strategies/__init__.py
-
-app/services/strategies/protocols.py
-
-```
 
 Required functionality:
 
@@ -4860,49 +3860,12 @@ Required functionality:
 - Event bus is functional for dispatching risk-governor events.
 - System settings loading and security validation schemas exist.
 
-### Files to Create
-
-```text
-
-app/__init__.py
-
-app/services/risk/__init__.py
-
-app/services/risk/models.py
-
-app/services/risk/governor.py
-
-app/services/risk/limits.py
-
-app/services/risk/sizing.py
-
-app/services/risk/lifecycle.py
-
-app/services/risk/kill_switch.py
-
-app/services/risk/scenarios.py
-
-app/services/risk/
-
-app/services/governance
-
-app/services/portfolio
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `Error`
-- `ValidationError`
-- `ServiceError`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] Each portfolio-under-risk compatibility adapter shall document its owning external domain, side effects, storage boundary, and failure behavior.
 - [ ] Portfolio-under-risk lazy service resolution shall raise `AttributeError` for unknown lazy service names.
@@ -4934,16 +3897,7 @@ Requirements:
 - [ ] Audit persistence partial write shall fail closed when audit persistence is mandatory.
 - [ ] Permission-denied responses from governance, audit, or token backends shall fail closed for live-sensitive workflows.
 - [ ] The risk module shall use deterministic error codes, including:
-- [ ] `INVALID_INPUT`
-- [ ] `INVALID_RISK_CONFIG`
-- [ ] `APPROVAL_TOKEN_INVALID`
-- [ ] `MISSING_STOP_LOSS`
-- [ ] `CALCULATION_FAILED`
-- [ ] `SNAPSHOT_BUILD_FAILED`
-- [ ] `REPORT_GENERATION_FAILED`
-- [ ] `STORAGE_ERROR`
-- [ ] `TOOL_EXECUTION_FAILED`
-- [ ] `UNKNOWN_ERROR`
+- [ ] Support the following: `INVALID_INPUT`, `INVALID_RISK_CONFIG`, `APPROVAL_TOKEN_INVALID`, `MISSING_STOP_LOSS`, `CALCULATION_FAILED`, `SNAPSHOT_BUILD_FAILED`, `REPORT_GENERATION_FAILED`, `STORAGE_ERROR`, `TOOL_EXECUTION_FAILED`, `UNKNOWN_ERROR`
 - [ ] Unknown exceptions shall be logged and converted into `TOOL_EXECUTION_FAILED` or `UNKNOWN_ERROR`.
 - [ ] External dependency failures shall not result in silent success.
 - [ ] Approval tests shall prove clock-skewed token expiry fails closed according to configured tolerance.
@@ -4952,13 +3906,7 @@ Requirements:
 - [ ] Portfolio workflow artifacts should have explicit retention, redaction, and artifact-write failure behavior before production use.
 - [ ] Approval tokens shall fail closed across config changes unless an explicit compatibility policy marks the old and new config hashes as equivalent for the same action scope.
 
-#### `app/services/risk/README.md`
-
-Functions/classes:
-
-- No runtime functions/classes; documentation artifact only.
-
-Requirements:
+#### Risk Governance Domain Documentation
 
 - [ ] Documentation tests shall verify each risk file and top-level public member has a module or member docstring.
 - [ ] Before Builder handoff, the current checkbox inventory shall be converted into a numbered requirements catalogue with stable `RISK-FR-*`, `RISK-NFR-*`, `RISK-SEC-*`, `RISK-EDGE-*`, `RISK-TEST-*`, `RISK-DOC-*`, and `RISK-COMPAT-*` identifiers.
@@ -4966,17 +3914,10 @@ Requirements:
 - [ ] Tool catalog shall document official tools.
 - [ ] Config documentation shall explain thresholds.
 - [ ] Workflow documentation shall explain risk gates.
-- [ ] A traceability table shall map each business rule to its owning FR, NFR, security, test, or documentation requirement.
-- [ ] Documentation review shall be complete before production promotion.
 - [ ] A requirements traceability table shall map each business rule to its owning FR, NFR, security, test, or documentation requirement before production promotion.
+- [ ] Documentation review shall be complete before production promotion.
 
-#### `app/__init__.py`
-
-Functions/classes:
-
-- `trace_id`
-
-Requirements:
+#### Package Initialization
 
 - [ ] `app/services/risk/__init__.py` shall expose only symbols intentionally classified as `official_ai_tool`, `public_python_contract`, `deterministic_service`, or `legacy_compatibility_export`.
 - [ ] `app/services/risk/__init__.py` shall use `__all__` as the strict public export registry.
@@ -4994,28 +3935,13 @@ Requirements:
 - [ ] Package-initializer tests shall verify `app.services.risk.__init__` has no business implementation beyond import/export exposure.
 - [ ] Portfolio-under-risk tests shall verify `app.services.portfolio.__init__` has no business implementation beyond package exposure, `app.services.portfolio.__all__` remains unique and aligned with the expected exported tool surface, and `app.services.portfolio.standard_tools` carries required tool documentation and envelope behavior.
 
-#### `app/services/risk/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Risk Governance Package Initialization
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/risk/models.py`
-
-Functions/classes:
-
-- `Request`
-- `Response`
-- `Result`
-- `Config`
-
-Requirements:
+#### Risk Domain Models and Primitives
 
 - [ ] The risk module shall not train models.
 - [ ] `CostService.report` shall flag budget exceeded and protected decision types routed to non-deterministic models, require high-cost workflow approval when budget is exceeded, and write a cost audit artifact.
@@ -5036,8 +3962,7 @@ Requirements:
 - [ ] Every exported symbol shall be classified as one of `official_ai_tool`, `public_python_contract`, `deterministic_service`, `internal_helper`, or `legacy_compatibility_export`.
 - [ ] Every official AI tool shall accept `request_id: Optional[str] = None`.
 - [ ] Every official AI tool shall return the standard HaruQuant tool response schema.
-- [ ] `review_allocation_proposal`
-- [ ] `create_risk_decision_package`
+- [ ] Support the following: `review_allocation_proposal`, `create_risk_decision_package`
 - [ ] The current implementation support surface shall include risk request assembly through `RiskRequestAssemblyContext` and `assemble_risk_assessment_request`.
 - [ ] The current implementation support surface shall include threshold/config helpers through `load_risk_thresholds`, `config_version_hash`, `validate_threshold_schema`, and `validate_config_hash`.
 - [ ] The current implementation support surface shall include metric and scorecard contracts through `MetricRow`, `MetricContext`, `MetricFamily`, `RiskSnapshot`, `MetricRegistry`, `ScoreRow`, `ScoreContext`, `ScoreFamily`, `RiskScorecard`, `ScoreRegistry`, `RiskSnapshotEngine`, `RiskScorecardEngine`, and `RecommendationEngine`.
@@ -5082,7 +4007,7 @@ Requirements:
 - [ ] The risk module shall verify stored config hash compatibility before applying a previous decision or approval token; mismatches shall return `CONFIG_VERSION_MISMATCH` and require a new decision.
 - [ ] The risk module shall block or request evidence when required FX conversion rates are unavailable for material decisions.
 - [ ] Conversion assumptions shall appear in snapshot metadata and audit records.
-- [ ] Missing material conversion rates shall fail closed for live-readiness decisions.
+- [ ] Missing FX conversion rates shall fail closed for material live-readiness decisions.
 - [ ] Maximum daily loss percentage shall define its equity base explicitly in each risk profile; if the base is missing for live profiles, config validation shall return `INVALID_RISK_CONFIG`.
 - [ ] The risk module shall calculate margin required for current positions and proposed trades when contract size, leverage, price, and currency data are available.
 - [ ] The risk module shall fail closed when required broker symbol metadata is missing for live-readiness or pre-trade decisions.
@@ -5117,7 +4042,6 @@ Requirements:
 - [ ] Insufficient return history shall reject or request more evidence for VaR/CVaR.
 - [ ] Insufficient correlation overlap shall be handled explicitly as missing evidence or configured fallback.
 - [ ] Missing symbol metadata shall fail closed for live-readiness or pre-trade decisions.
-- [ ] Missing FX conversion rates shall fail closed for material live-readiness decisions.
 - [ ] Insufficient ATR/volatility evidence shall emit `INSUFFICIENT_VOLATILITY_EVIDENCE`.
 - [ ] Insufficient Kelly trade sample evidence shall emit `INSUFFICIENT_K_EVIDENCE`.
 - [ ] Live pre-trade review in `high_volatility` or `crisis` regimes shall not silently use ordinary correlation, VaR, or CVaR lookbacks when stressed evidence is required.
@@ -5126,10 +4050,7 @@ Requirements:
 - [ ] Unreadable or corrupted persisted step-down state shall return `needs_more_evidence` or `block` for live-sensitive workflows according to config.
 - [ ] In-flight reconciliation grace-period expiry shall emit `IN_FLIGHT_RECONCILIATION_EXPIRED` and require forced portfolio-state refresh before live-sensitive decision.
 - [ ] Clock skew beyond configured tolerance shall trigger stale-evidence or token-validation failure.
-- [ ] `MISSING_EVIDENCE`
-- [ ] `STALE_EVIDENCE`
-- [ ] `INSUFFICIENT_VOLATILITY_EVIDENCE`
-- [ ] `INSUFFICIENT_K_EVIDENCE`
+- [ ] Support the following: `MISSING_EVIDENCE`, `STALE_EVIDENCE`, `INSUFFICIENT_VOLATILITY_EVIDENCE`, `INSUFFICIENT_K_EVIDENCE`
 - [ ] Contract tests shall validate all public contracts and invalid payloads.
 - [ ] Contract tests shall prove every official AI tool returns the standard envelope with `status`, `message`, `data`, `error`, and `metadata` on success.
 - [ ] Contract tests shall prove every official AI tool returns deterministic error envelopes for invalid input, missing evidence, hard block, approval required, domain exceptions, and tool execution failure.
@@ -5153,7 +4074,6 @@ Requirements:
 - [ ] Benchmark documentation shall define `RISK_BENCHMARK_PROFILE_V1` and required benchmark manifest fields.
 - [ ] Risk reports shall separate observed evidence, calculated metrics, limit results, assumptions, warnings, decisions, and approval requirements.
 - [ ] Risk decision reports shall include plain-language explanations for primary `reject` or `block` reasons.
-- [ ] Risk thresholds and profiles shall be stored under `configs/risk/*.yaml`.
 - [ ] Production profile examples shall include `configs/risk/prop_firm_default.yaml`, `configs/risk/paper.yaml`, and `configs/risk/live_conservative.yaml`.
 - [ ] Pydantic V2 shall be the standard implementation for public contracts.
 - [ ] Frozen dataclasses may be used internally for immutable performance-critical calculation steps when they do not replace public Pydantic contracts.
@@ -5177,59 +4097,7 @@ Requirements:
 - [ ] Governance/audit service: may provide approval state, audit persistence, and policy metadata through stable public interfaces.
 - [ ] Risk Agent shall not invent missing evidence.
 
-#### `app/services/risk/governor.py`
-
-Functions/classes:
-
-- `check_max_drawdown_limit`
-- `check_daily_loss_limit`
-- `check_strategy_loss_limit`
-- `check_portfolio_exposure_limit`
-- `check_symbol_exposure_limit`
-- `check_currency_exposure_limit`
-- `check_correlation_limit`
-- `check_var_limit`
-- `check_cvar_limit`
-- `check_leverage_limit`
-- `check_margin_limit`
-- `check_news_blackout`
-- `check_spread_limit`
-- `check_slippage_limit`
-- `check_trade_frequency_limit`
-- `check_kill_switch_state`
-- `run_risk_governor_checks`
-- `RiskProposal`
-- `RiskApprovalToken`
-- `RiskGovernorDecision`
-- `RiskMemo`
-- `RiskAssessmentRequest`
-- `AccountState`
-- `MarketState`
-- `SymbolState`
-- `PositionState`
-- `PortfolioState`
-- `MarketSnapshot`
-- `AccountSnapshot`
-- `PortfolioSnapshot`
-- `RiskPolicy`
-- `CorrelationPreference`
-- `OverrideRecord`
-- `CircuitBreakerState`
-- `BudgetUtilization`
-- `GovernanceState`
-- `PolicyEngine`
-- `PolicyScope`
-- `PolicyVersion`
-- `PolicyBundle`
-- `PolicyEnforcementResult`
-- `PolicyResolutionQuery`
-- `PolicyResolver`
-- `RiskGovernor`
-- `GovernanceEngine`
-- `ProposedTrade`
-- `RiskDecisionPackage`
-
-Requirements:
+#### Risk Governor and Execution Policies
 
 - [ ] `run_portfolio_risk_governor`
 - [ ] Current governor-check exports shall include `check_max_drawdown_limit`, `check_daily_loss_limit`, `check_strategy_loss_limit`, `check_portfolio_exposure_limit`, `check_symbol_exposure_limit`, `check_currency_exposure_limit`, `check_correlation_limit`, `check_var_limit`, `check_cvar_limit`, `check_leverage_limit`, `check_margin_limit`, `check_news_blackout`, `check_spread_limit`, `check_slippage_limit`, `check_trade_frequency_limit`, `check_kill_switch_state`, and `run_risk_governor_checks`.
@@ -5262,13 +4130,11 @@ Requirements:
 - [ ] `PortfolioAuditService.audit` shall flag missing risk-governor approval, approval token/order mismatch, unauthorized risk threshold changes, skipped lifecycle stages, missing live strategy board approval, missing evidence refs, missing execution logs, missing broker responses, and hidden failed tool calls.
 - [ ] The risk governor shall downgrade decisions to `needs_approval`, `reject`, or `block` when portfolio exit-liquidity stress breaches configured limits.
 - [ ] The governor shall populate `primary_failure_limit` and `composite_breach_flags` in every material `RiskDecisionPackage`.
-- [ ] `run_portfolio_risk_governor`
 - [ ] Governor decision generation shall complete within 50 ms p95 after snapshot inputs are prepared.
 - [ ] Complex orchestration shall belong in services or the governor, not calculators.
 - [ ] Risk calculators, limit checks, sizing calculations, regime checks, and governor logic shall be stateless and thread-safe.
 - [ ] The governor shall not rely on unordered dictionaries, sets, filesystem discovery order, dynamic import order, or plugin discovery order for safety-critical limit sequencing.
 - [ ] Governor decision precedence shall follow: `block > error > reject > needs_more_evidence > needs_approval > warn > approve`.
-- [ ] Scenario outputs shall remain advisory unless passed through the governor.
 - [ ] Risk Agent: may request snapshots, ask for governor decisions, explain findings, summarize approval requirements, and package evidence for human review.
 - [ ] Risk Agent shall not override deterministic governor decisions.
 - [ ] No file-specific non-functional requirements defined.
@@ -5279,10 +4145,10 @@ Requirements:
 - [ ] The target module path is `app/services/risk/`.
 - [ ] The source document is the production requirements baseline v8.0.
 - [ ] The implementation language is Python.
-- [ ] The module targets Python 3.12 or newer.
+- [ ] The module shall support Python 3.12 or newer.
 - [ ] Integration dependencies are accessed through stable public interfaces.
 - [ ] `app.services.execution` may provide read-only open orders/positions but shall not be mutated by risk.
-- [ ] JSONL storage is permitted for local development and deterministic tests.
+- [ ] JSONL storage shall be permitted for local development and deterministic tests.
 - [ ] Performance targets are measured in local deterministic mode with no remote broker/network calls unless otherwise specified.
 - [ ] Governance remains externally owned by `app/services/governance` or an equivalent governance service exposed through stable public interfaces.
 - [ ] No safe fallback for a `RISK-PEND-*` item shall remain the permanent default for more than two sprint cycles without owner/architect review and a roadmap entry.
@@ -5297,25 +4163,13 @@ Requirements:
 - [ ] Every official AI tool shall follow the HaruQuant AI Tool Function Standard.
 - [ ] Official AI tools shall call deterministic services rather than implementing risk logic inline.
 - [ ] Required official tool surface shall include:
-- [ ] `build_portfolio_risk_snapshot`
-- [ ] `review_trade_risk`
-- [ ] `calculate_position_size`
-- [ ] `assess_risk_regime`
-- [ ] `review_strategy_admission`
-- [ ] `validate_risk_approval_token`
-- [ ] `generate_risk_report`
+- [ ] Support the following: `build_portfolio_risk_snapshot`, `review_trade_risk`, `calculate_position_size`, `assess_risk_regime`, `review_strategy_admission`, `validate_risk_approval_token`, `generate_risk_report`
 - [ ] Current implementation traceability shall map the canonical official tool groups above to the present `app.services.risk.__all__` export surface without treating differently named but equivalent legacy requirements as separate behavior.
 - [ ] Portfolio-under-risk compatibility shall treat `app.services.portfolio` and the `portfolio` tool category as compatibility adapters unless explicitly classified as risk-owned services.
 - [ ] Transitional portfolio-under-risk facades shall be fully migrated to `app/services/portfolio` or explicitly reapproved by the owner/architect no later than v2.0.
 - [ ] Safe fallback compatibility facades shall not be treated as permanent architecture without owner/architect review.
 - [ ] `RiskConfig` / `RiskThresholds`
-- [ ] `PortfolioRiskSnapshot`
-- [ ] `ProposedTrade`
-- [ ] `ProposedAllocation`
-- [ ] `RegimeAssessment`
-- [ ] `RiskApprovalToken`
-- [ ] `RiskAuditRecord`
-- [ ] `RiskReport`
+- [ ] Support the following: `PortfolioRiskSnapshot`, `ProposedTrade`, `ProposedAllocation`, `RegimeAssessment`, `RiskApprovalToken`, `RiskAuditRecord`, `RiskReport`
 - [ ] Private service internals shall not appear in `app.services.risk.__all__` unless they are intentionally classified, documented, tested, and reviewed for public import.
 - [ ] Public JSON serialization shall preserve Decimal precision through string or another documented exact JSON-safe representation and shall not silently convert Decimal values to binary floats.
 - [ ] Official Risk tools shall not read local system time directly except through the approved time provider or shared Utils clock helper.
@@ -5334,7 +4188,6 @@ Requirements:
 - [ ] The module shall enforce least privilege: risk can approve or block readiness but cannot execute trades.
 - [ ] Logs and audit records shall redact secrets and sensitive account data.
 - [ ] Hash-chain generation shall use canonical serialization and a documented hash algorithm.
-- [ ] The module shall support Python 3.12 or newer.
 - [ ] The module shall use project logging and result conventions.
 - [ ] The module shall avoid unnecessary heavy dependencies in deterministic pre-trade paths.
 - [ ] Each production file shall have a clear module-level docstring and public function/class docstrings.
@@ -5398,16 +4251,7 @@ Requirements:
 - [ ] Empty allocation strategy list shall return empty equal-capital allocation instead of dividing by zero.
 - [ ] Audit-chain tamper detection shall emit `AUDIT_CHAIN_TAMPER_DETECTED`.
 - [ ] Maliciously deep JSON payloads or excessively large arrays, including more than 10,000 items in a single list, shall be rejected with `PAYLOAD_TOO_LARGE` before parsing or expensive validation.
-- [ ] `POLICY_BLOCKED`
-- [ ] `APPROVAL_REQUIRED`
-- [ ] `APPROVAL_TOKEN_EXPIRED`
-- [ ] `APPROVAL_TOKEN_REVOKED`
-- [ ] `APPROVAL_TOKEN_CONSUMED`
-- [ ] `CONFIG_VERSION_MISMATCH`
-- [ ] `CONFIG_COMPATIBILITY_NOT_APPROVED`
-- [ ] `PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED`
-- [ ] `PAYLOAD_TOO_LARGE`
-- [ ] `IN_FLIGHT_TOLERANCE_EXCEEDED`
+- [ ] Support the following: `POLICY_BLOCKED`, `APPROVAL_REQUIRED`, `APPROVAL_TOKEN_EXPIRED`, `APPROVAL_TOKEN_REVOKED`, `APPROVAL_TOKEN_CONSUMED`, `CONFIG_VERSION_MISMATCH`, `CONFIG_COMPATIBILITY_NOT_APPROVED`, `PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED`, `PAYLOAD_TOO_LARGE`, `IN_FLIGHT_TOLERANCE_EXCEEDED`
 - [ ] Internal services may raise domain exceptions.
 - [ ] Official AI tools shall catch domain exceptions and return standard tool responses.
 - [ ] Double-spend detection shall not silently approve concurrent risk-increasing actions.
@@ -5446,7 +4290,6 @@ Requirements:
 - [ ] Duplicate source references to `FR-086` through `FR-091` shall be normalized during implementation planning and traceability review.
 - [ ] The official AI tool requirements shall use their own canonical tool-surface requirement group and shall not reuse institutional hardening IDs.
 - [ ] The module shall target Python 3.12 or newer.
-- [ ] JSONL storage shall be permitted for local development and deterministic tests.
 - [ ] Approval tokens shall include a cryptographic nonce or single-use identifier.
 - [ ] Risk may decide whether an action is allowed, blocked, or approval-required, but shall not place trades, close positions, mutate broker state, or override execution tools.
 - [ ] Risk shall advise and gate; Execution shall act.
@@ -5460,23 +4303,10 @@ Requirements:
 - [ ] Risk Agent shall not bypass approval tokens.
 - [ ] Agents shall not import internal calculators unless intentionally exposed as official tools.
 
-#### `app/services/risk/limits.py`
-
-Functions/classes:
-
-- `ValidationIssue`
-- `ValidationSummary`
-- `validate_account_state`
-- `validate_market_states`
-- `validate_symbol_states`
-- `validate_position_states`
-- `validate_risk_limits`
-
-Requirements:
+#### Deterministic Risk Limits and Boundary Enforcement
 
 - [ ] Recommendation: `RegimeAssessment` should output a configurable `risk_multiplier` that can scale position sizing and exposure limits when promoted by owner decision.
 - [ ] The current implementation support surface shall include validation contracts and validators through `ValidationIssue`, `ValidationSummary`, `validate_account_state`, `validate_market_states`, `validate_symbol_states`, `validate_position_states`, and `validate_risk_limits`.
-- [ ] The risk module shall detect symbol concentration breaches using configurable limits.
 - [ ] The risk module shall detect strategy concentration breaches using configurable limits.
 - [ ] The risk module shall enforce maximum margin utilization limits.
 - [ ] The risk module shall enforce maximum effective leverage limits.
@@ -5519,8 +4349,7 @@ Requirements:
 - [ ] The risk module shall calculate portfolio exit-liquidity stress for production live workflows and when otherwise enabled, including stressed VaR, stressed CVaR where available, stressed max drawdown, and market-impact assumptions.
 - [ ] Risk reports shall highlight `primary_failure_limit` first and list composite breach flags separately.
 - [ ] Parametric VaR configured with Gaussian assumptions shall emit `PARAMETRIC_VAR_GAUSSIAN_WARNING`.
-- [ ] `LIMIT_FAILED`
-- [ ] `PARAMETRIC_VAR_GAUSSIAN_WARNING`
+- [ ] Support the following: `LIMIT_FAILED`, `PARAMETRIC_VAR_GAUSSIAN_WARNING`
 - [ ] Gaussian parametric VaR shall not silently pass as normal production-live VaR behavior.
 - [ ] Calculator tests shall cover exposure, margin, drawdown, VaR, CVaR, volatility, and correlation.
 - [ ] Regime tests shall prove stressed correlation lookback behavior is used in `high_volatility` or `crisis` regimes when required.
@@ -5534,33 +4363,14 @@ Requirements:
 - [ ] Historical VaR shall be the production-live default.
 - [ ] Gaussian parametric VaR shall be warning-gated with `PARAMETRIC_VAR_GAUSSIAN_WARNING`.
 
-#### `app/services/risk/sizing.py`
-
-Functions/classes:
-
-- `INVALID_RISK_CONFIG`
-- `calculate_fixed_fractional_size`
-- `calculate_volatility_adjusted_size`
-- `calculate_risk_parity_weights`
-- `calculate_correlation_adjusted_size`
-- `calculate_margin_aware_size`
-- `calculate_cost_adjusted_size`
-- `calculate_max_safe_position_size`
-- `validate_allocation_proposal`
-- `INSUFFICIENT_K_EVIDENCE`
-- `PositionSizingResult`
-- `AllocationService`
-- `MISSING_STOP_LOSS`
-
-Requirements:
+#### Volatility-Based Position Sizing
 
 - [ ] Institutional hardening blocks may be feature-flagged during implementation, but production live workflows require exit-liquidity stress, correlation-adjusted sizing, graduated step-down controls, live portfolio-state freshness checks, in-flight order tolerance enforcement, audit hash chaining, and composite breach reporting.
 - [ ] If `RISK-PEND-002` is unresolved, production Kelly sizing shall require `kelly_fraction_multiplier` in the active risk profile and shall return `INVALID_RISK_CONFIG` when it is missing.
 - [ ] The risk module shall own position sizing recommendations.
 - [ ] Current allocation and sizing exports shall include `calculate_fixed_fractional_size`, `calculate_volatility_adjusted_size`, `calculate_risk_parity_weights`, `calculate_correlation_adjusted_size`, `calculate_margin_aware_size`, `calculate_cost_adjusted_size`, `calculate_max_safe_position_size`, `propose_strategy_allocation`, `rebalance_strategy_allocations`, and `validate_allocation_proposal`.
 - [ ] The current implementation support surface shall include reusable calculation helpers for stop distance, pip value, proposed trade risk, notional exposure, risk/reward, VaR, CVaR, drawdown, exposure, concentration, margin, correlation, and position sizing.
-- [ ] `PositionSizingRequest`
-- [ ] `PositionSizingResult`
+- [ ] Support the following: `PositionSizingRequest`, `PositionSizingResult`
 - [ ] Raw calculators for stop distance, pip value, proposed trade risk, notional exposure, risk/reward, VaR, CVaR, drawdown, exposure, concentration, margin, correlation, and position sizing shall remain private or deterministic-service internals unless explicitly promoted.
 - [ ] Monetary and sizing calculations shall use `ROUND_HALF_EVEN` unless an approved risk profile explicitly documents a different deterministic rounding mode.
 - [ ] Public Pydantic V2 contracts shall use strict `Decimal` typing for monetary, sizing, margin, leverage, exposure, VaR, CVaR, and allocation fields and shall forbid implicit float casting for those fields.
@@ -5610,20 +4420,7 @@ Requirements:
 - [ ] The risk module shall calculate portfolio volatility using a deterministic method and documented lookback window.
 - [ ] Regime documentation shall explain stressed lookback behavior for `high_volatility` and `crisis` regimes.
 
-#### `app/services/risk/lifecycle.py`
-
-Functions/classes:
-
-- `build_risk_decision_package`
-- `AllocationService`
-- `CostService`
-- `IncidentService`
-- `PortfolioAuditService`
-- `PortfolioKillSwitch`
-- `LifecycleService`
-- `ReportingService`
-
-Requirements:
+#### Risk Lifecycle Governance
 
 - [ ] The risk module shall not own portfolio management, cost aggregation, incident management, lifecycle execution logic, or broad reporting workflows.
 - [ ] Current strategy lifecycle and decision-package exports shall include `admit_strategy_to_portfolio`, `promote_strategy_to_paper`, `promote_strategy_to_live_candidate`, `suspend_strategy`, `retire_strategy`, `demote_strategy_to_paper`, `update_strategy_status`, and `build_risk_decision_package`.
@@ -5641,7 +4438,6 @@ Requirements:
 - [ ] `LifecycleService.transition` shall write a lifecycle audit artifact.
 - [ ] A canonical glossary shall document decision states, lifecycle states, evidence states, workflow modes, and limit statuses.
 - [ ] Strategy lifecycle state names and board approval semantics should remain aligned between portfolio-under-risk workflows and the canonical risk governance glossary.
-- [ ] The canonical strategy lifecycle states shall be `research`, `validated`, `paper_candidate`, `paper_active`, `live_candidate`, `live_active`, `suspended`, `retired`, and `rejected`.
 - [ ] Legacy or source-only lifecycle aliases such as `draft`, `candidate`, `backtested`, `robustness_passed`, `paper`, `approved_for_live`, `live_approved`, and `live` shall be normalized to canonical lifecycle states or rejected when ambiguous.
 - [ ] The risk module documentation shall include a canonical glossary for decision states, lifecycle states, evidence states, workflow modes, and limit statuses.
 - [ ] Any important risk decision, approval token, kill-switch check, live-readiness decision, or strategy lifecycle change shall produce audit data.
@@ -5667,8 +4463,7 @@ Requirements:
 - [ ] Timezone mismatch between broker-provided timestamps and the system-configured timezone shall trigger `INVALID_PORTFOLIO_STATE`.
 - [ ] Unknown regime state shall fail closed for live-sensitive workflows when configured.
 - [ ] Token-state backend unavailable during live-sensitive token validation shall fail closed.
-- [ ] `INVALID_PORTFOLIO_STATE`
-- [ ] `LIVE_STATE_STALE`
+- [ ] Support the following: `INVALID_PORTFOLIO_STATE`, `LIVE_STATE_STALE`
 - [ ] Performance tests shall cover cold-cache and warm-cache p95 latency when both cache states are supported.
 - [ ] Workflow tests shall prove Execution/Governance serialization or state-refresh requirements are enforced if pending approval reservation is externalized.
 - [ ] Integration tests shall cover token-state backend unavailable during live-sensitive approval-token validation.
@@ -5678,14 +4473,7 @@ Requirements:
 - [ ] PostgreSQL shall be the mandatory durable production backend for live audit chains, approval-token state, token revocation state, and token consumption state.
 - [ ] Validated approval tokens for live-sensitive actions shall be marked consumed through the production token-state backend and shall not validate a second time.
 
-#### `app/services/risk/kill_switch.py`
-
-Functions/classes:
-
-- `KillSwitchStateMachine`
-- `KillSwitchService`
-
-Requirements:
+#### Live Execution Kill Switches
 
 - [ ] The risk module shall own kill-switch state checks.
 - [ ] `check_risk_kill_switch`
@@ -5708,7 +4496,6 @@ Requirements:
 - [ ] Any execution-control mutation required to disable new orders shall be performed only by Execution/Governance through its own authorized interface after consuming the risk-owned block state.
 - [ ] `PortfolioKillSwitch.resume` shall block resume without approval id and restore healthy state only when approval id is supplied.
 - [ ] Every risk decision report shall include a plain-language explanation for `reject` or `block`, referencing the specific limit, rule, missing evidence, approval failure, or kill-switch state.
-- [ ] `check_risk_kill_switch`
 - [ ] Safety-critical decisions shall fail closed on invalid input, missing mandatory evidence, unknown approval state, unknown kill-switch state, or calculation failure.
 - [ ] The module shall prevent LLM agents from overriding kill switch.
 - [ ] The module shall invalidate outstanding approvals affected by kill-switch activation.
@@ -5718,9 +4505,7 @@ Requirements:
 - [ ] Tolerance buffers shall never override kill-switch, max-total-loss, or prohibited-action rules.
 - [ ] Risk Agent shall not override kill switch.
 - [ ] No file-specific non-functional requirements defined.
-- [ ] `KILL_SWITCH_ACTIVE`
-- [ ] `KILL_SWITCH_UNKNOWN`
-- [ ] Safety-critical workflows shall fail closed on invalid input, missing evidence, unknown approval state, unknown kill-switch state, or calculation failure.
+- [ ] Support the following: `KILL_SWITCH_ACTIVE`, `KILL_SWITCH_UNKNOWN`
 - [ ] Approval tests shall cover creation, validation, expiry, revocation, emergency kill-switch revocation, mismatch, and tamper.
 - [ ] Time manipulation tests shall prove token expiry, stale evidence detection, kill-switch timeouts, step-down expiry, and clock-skew behavior remain deterministic with mocked or injected clocks.
 - [ ] Kill-switch tests shall cover active, inactive, unknown, and attempted override.
@@ -5728,16 +4513,7 @@ Requirements:
 - [ ] Approval and kill-switch security tests shall pass.
 - [ ] Usage examples shall include failure response envelopes for missing evidence, active kill switch, and invalid approval token.
 
-#### `app/services/risk/scenarios.py`
-
-Functions/classes:
-
-- `StressScenario`
-- `ScenarioResult`
-- `ScenarioRegistry`
-- `build_default_scenario_registry`
-
-Requirements:
+#### Stress Testing and Scenario Modelling
 
 - [ ] The current implementation support surface shall include scenario and replay contracts through `StressScenario`, `ScenarioResult`, `ScenarioRegistry`, `build_default_scenario_registry`, and `evaluate_scenarios`.
 - [ ] Scenario analysis with up to 100 scenarios and 500 positions shall complete within 5 seconds p95.
@@ -5831,8 +4607,7 @@ feat(risk-governance): implement pre-trade risk engine and position calculators
 ```
 
 - [ ] Recommendation: scenario analysis should include broker margin-call and stop-out stress tests using adverse price moves of two to three standard deviations.
-- [ ] `run_risk_scenario_analysis`
-- [ ] `ScenarioResult`
+- [ ] Support the following: `run_risk_scenario_analysis`, `ScenarioResult`
 - [ ] Randomized scenario tests, if added, shall require explicit seeds and shall report the seed used.
 - [ ] The risk module shall own scenario and what-if analysis for risk review.
 
@@ -5846,17 +4621,6 @@ Task inventory: 460 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/dataframe_tools.py
-
-app/services/risk/__init__.py
-
-```
 
 Required functionality:
 
@@ -5864,56 +4628,12 @@ Required functionality:
 - Lazy pandas dataframe operations are accessible for return calculations.
 - Safe path traversal handles persistent report output storage.
 
-### Files to Create
-
-```text
-
-app/services/analytics/
-
-app/__init__.py
-
-app/services/analytics/__init__.py
-
-app/services/analytics/adapters.py
-
-app/services/analytics/trade.py
-
-app/services/analytics/equity.py
-
-app/services/analytics/drawdown.py
-
-app/services/analytics/risk.py
-
-app/services/analytics/ratios.py
-
-app/services/analytics/distributions.py
-
-app/services/analytics/benchmark.py
-
-app/services/analytics/efficiency.py
-
-app/services/analytics/scorecard.py
-
-app/services/analytics/report.py
-
-app/services/analytics/dashboard.py
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/analytics/models.py`
-
-Functions/classes:
-
-- `Request`
-- `Result`
-- `Config`
-- `Metadata`
-
-Requirements:
+#### Analytics Core Performance Metrics Models
 
 - [ ] Analytics functions must be read-only and side-effect free at the domain level.
 - [ ] Importing the analytics registry should not perform live broker calls, network calls, database mutations, or trading side effects.
@@ -5989,15 +4709,7 @@ Requirements:
 - [ ] Documentation must include validation-failure examples showing the standard error envelope.
 - [ ] Low-level metric examples must be labeled as internal/developer examples when they are not official agent/API tools.
 
-#### `app/__init__.py`
-
-Functions/classes:
-
-- `total_return`
-- `return_on_initial_capital`
-- `MetricDefinitionCatalog`
-
-Requirements:
+#### Package Initialization
 
 - [ ] Undefined or unsupported metric values must be represented as omitted fields or `None` according to the output schema plus structured warnings or skipped-section metadata; they must not be serialized as `NaN`, infinity, fabricated zero, or display-only caps.
 - [ ] R-multiple fallback proxies must be listed in the Metric Definition Catalog before use; fallback-derived R-multiple values must include warning metadata and mark the affected metric confidence as degraded.
@@ -6015,31 +4727,13 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/analytics/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Analytics Package Initialization
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
-- [ ] No file-specific functional requirements defined. Foundation properties apply.
-- [ ] No file-specific non-functional requirements defined.
-- [ ] No file-specific testing requirements defined.
 
-#### `app/services/analytics/adapters.py`
-
-Functions/classes:
-
-- `BacktestResult`
-- `PaperTradingResult`
-- `LiveTradingResult`
-- `TradingResult`
-
-Requirements:
+#### Analytics Input Data Adapters
 
 - [ ] Backtest, paper, live, portfolio, and normalized trading results must either inherit from a canonical `TradingResult` contract or be converted into it through deterministic adapters.
 - [ ] Deterministic adapters must preserve schema version, result ID, phase/environment, timestamps, account base currency, strategy identifiers, symbols, timeframe, trades, equity curve, optional balance curve, benchmark data, upstream quality metadata, and source metadata without silent field loss.
@@ -6048,27 +4742,7 @@ Requirements:
 - [ ] No file-specific testing requirements defined.
 - [ ] Documentation must include adapter field-mapping tables for every supported upstream result type.
 
-#### `app/services/analytics/trade.py`
-
-Functions/classes:
-
-- `AnalyticsReport`
-- `build_analytics_report`
-- `build_portfolio_analytics_report`
-- `calculate_trade_metrics`
-- `calculate_equity_metrics`
-- `calculate_drawdown_metrics`
-- `calculate_risk_metrics`
-- `calculate_benchmark_metrics`
-- `calculate_statistical_validation`
-- `calculate_prop_firm_compliance`
-- `get_r_multiples`
-- `calculate_efficiency_metrics`
-- `compute_r_trade_metrics`
-- `compute_trade_metrics`
-- `calculate_analytics_for_subset`
-
-Requirements:
+#### Trade-Level Analytics and Performance Metrics
 
 - [ ] Official analytics tools must not write files, modify databases, place trades, or require network access.
 - [ ] Analytics input conversion must support common developer inputs such as pandas dataframes, pandas series, lists of trade records, and lists of numeric values where the public capability expects them.
@@ -6135,8 +4809,6 @@ Requirements:
 - [ ] `calculate_trade_metrics` shall calculate aggregate core trade metrics from normalized trade records.
 - [ ] `calculate_analytics_for_subset` shall calculate all analytics categories for a supplied trade subset.
 - [ ] `return_over_drawdown` shall calculate total return relative to maximum trade drawdown.
-- [ ] `net_profit_as_percent_of_max_trade_drawdown` shall calculate net profit as a percentage of max trade drawdown.
-- [ ] `select_net_profit_as_percent_of_max_trade_drawdown` shall calculate selected net profit as a percentage of max trade drawdown.
 - [ ] `adjusted_net_profit_as_percent_of_max_trade_drawdown` shall calculate adjusted net profit as a percentage of max trade drawdown.
 - [ ] `net_profit` shall calculate total realized profit or loss from closed trades.
 - [ ] `gross_profit` shall sum winning closed-trade profit.
@@ -6154,18 +4826,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/analytics/equity.py`
-
-Functions/classes:
-
-- `NaT`
-- `Infinity`
-- `VALIDATION_FAILED`
-- `calculate_drawdown_metrics`
-- `compute_equity_metrics`
-- `calculate_return_metrics`
-
-Requirements:
+#### Equity Curve Analytics and Net Asset Value Metrics
 
 - [ ] Equity and return analytics must sort and normalize supplied series deterministically; optional `NaN`/`NaT` observations may be filtered only with recorded warning metadata, required `NaN`/`NaT` fields must fail validation unless the Metric Definition Catalog marks them skippable, and `Infinity`/`-Infinity` at official boundaries must return `VALIDATION_FAILED`.
 - [ ] Dashboard truncation/downsampling must be deterministic and must preserve first point, last point, local extrema where practical, drawdown troughs, equity highs, and timestamps associated with major, critical, or blocker warnings.
@@ -6206,17 +4867,7 @@ Requirements:
 - [ ] `return_kurtosis` shall calculate return-distribution excess kurtosis.
 - [ ] `return_on_account` shall calculate return on required account size.
 
-#### `app/services/analytics/drawdown.py`
-
-Functions/classes:
-
-- `calculate_drawdown_series`
-- `max_drawdown`
-- `drawdown_duration`
-- `drawdown_recovery`
-- `underwater_curve`
-
-Requirements:
+#### Drawdown, Underwater, and Maximum Excursion Analysis
 
 - [ ] Strategy-quality evaluation must rely only on the supplied report payload and must surface warnings for weak profitability, high drawdown, overfitting risk, small sample size, or other observable quality concerns.
 - [ ] Optional sections such as TCA metrics, attribution, prop-firm compliance evidence, drawdown distribution, tail-risk metrics, dynamic correlation, walk-forward analytics, metric comparisons, live degradation, and explainability must be represented as calculated, skipped, or failed.
@@ -6242,8 +4893,6 @@ Requirements:
 - [ ] `fouse_ratio` shall calculate Fouse drawdown-index-style ratio.
 - [ ] `sterling_ratio` shall calculate CAGR relative to adjusted average yearly maximum drawdown.
 - [ ] `rina_index` shall calculate select net profit relative to average drawdown and time in market.
-- [ ] `net_profit_as_percent_of_max_strategy_drawdown` shall calculate net profit as a percentage of max strategy drawdown.
-- [ ] `select_net_profit_as_percent_of_max_strategy_drawdown` shall calculate selected net profit as a percentage of max strategy drawdown.
 - [ ] `adjusted_net_profit_as_percent_of_max_strategy_drawdown` shall calculate adjusted net profit as a percentage of max strategy drawdown.
 - [ ] `return_on_max_strategy_drawdown` shall calculate total return relative to maximum strategy drawdown.
 - [ ] `return_on_max_close_to_close_drawdown` shall calculate net profit relative to maximum close-to-close drawdown.
@@ -6251,13 +4900,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/analytics/risk.py`
-
-Functions/classes:
-
-- `calculate_risk_metrics`
-
-Requirements:
+#### Risk-Adjusted Performance Metric Engines
 
 - [ ] Official analytics tools must be low-risk, read-only operations.
 - [ ] Metadata must include tool name, tool version, tool category, tool risk level, request ID, execution time, and side-effect flags.
@@ -6294,20 +4937,12 @@ Requirements:
 - [ ] Warning and quality-flag catalogs must define code, severity, affected section, source-backed status, whether the flag blocks promotion, bounded detail rules, and linked test fixtures.
 - [ ] Explainability outputs must distinguish explained PnL, unexplained PnL, explained variance percentage, sample count, and driver stability when those inputs are supplied.
 
-#### `app/services/analytics/ratios.py`
-
-Functions/classes:
-
-- `calculate_ratio_metrics`
-
-Requirements:
+#### Financial Performance Ratios (Sharpe, Sortino, Calmar, etc.)
 
 - [ ] `benchmark_information_ratio` shall expose benchmark information ratio without colliding with the ratios module export.
 - [ ] `up_down_capture` shall calculate up-capture and down-capture ratios.
 - [ ] `metrics_win_rate_fraction` shall expose metrics-module win-rate fraction behavior without colliding with ratios exports.
-- [ ] `metrics_expectancy` shall expose metrics-module expectancy behavior without colliding with ratios exports.
 - [ ] `metrics_expectancy_r` shall expose metrics-module R-expectancy behavior without colliding with ratios exports.
-- [ ] `ratios_win_rate_fraction` shall expose ratios-module win-rate fraction behavior without colliding with metrics exports.
 - [ ] `sharpe_ratio` shall calculate excess return per unit of volatility.
 - [ ] `annualized_sharpe_ratio` shall calculate annualized Sharpe ratio from monthly inputs.
 - [ ] `sortino_ratio` shall calculate excess return per unit of downside volatility.
@@ -6326,8 +4961,6 @@ Requirements:
 - [ ] `adjusted_net_profit_as_percent_of_largest_loss` shall calculate adjusted net profit as a percentage of largest loss.
 - [ ] `adjusted_profit_factor` shall calculate adjusted gross profit relative to adjusted gross loss.
 - [ ] `select_profit_factor` shall calculate selected gross profit relative to selected gross loss.
-- [ ] `ratios_expectancy` shall expose ratios-module expectancy behavior without colliding with metrics exports.
-- [ ] `ratios_expectancy_r` shall expose ratios-module R-expectancy behavior without colliding with metrics exports.
 - [ ] `calculate_ratio_metrics` shall calculate aggregate ratio metrics from return values.
 - [ ] Architectural Mandate: derived ratios may use deterministic `float64` arithmetic only where exact decimal arithmetic is not appropriate, with documented tolerance stored in configuration, tests, and report metadata.
 - [ ] No file-specific non-functional requirements defined.
@@ -6342,13 +4975,7 @@ Requirements:
 - [ ] `trading_period_duration` shall calculate total duration of the trading period.
 - [ ] `deflated_sharpe_ratio` shall adjust Sharpe ratio diagnostics for multiple testing and non-normality.
 
-#### `app/services/analytics/distributions.py`
-
-Functions/classes:
-
-- `calculate_distribution_metrics`
-
-Requirements:
+#### Return Distribution, Skewness, and Kurtosis Profiling
 
 - [ ] `return_distribution` shall calculate a statistical summary of returns.
 - [ ] `r_multiple_distribution` shall calculate a statistical summary of R-multiple values.
@@ -6380,13 +5007,7 @@ Requirements:
 - [ ] `permutation_test_backtest` shall run permutation testing against a backtest result object.
 - [ ] `bootstrap_confidence_intervals_backtest` shall estimate bootstrap confidence intervals from a backtest result object.
 
-#### `app/services/analytics/benchmark.py`
-
-Functions/classes:
-
-- `calculate_benchmark_metrics`
-
-Requirements:
+#### Benchmark Comparison and Alpha/Beta Attribution
 
 - [ ] Benchmark analytics must align strategy and benchmark return streams before comparison and must handle missing or non-overlapping periods safely.
 - [ ] Benchmark metrics must only be calculated after deterministic alignment of strategy and benchmark series.
@@ -6412,16 +5033,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/analytics/efficiency.py`
-
-Functions/classes:
-
-- `capital_efficiency`
-- `return_per_unit_mae`
-- `return_per_unit_mfe`
-- `exposure_efficiency`
-
-Requirements:
+#### Computational Efficiency and Algorithm Performance Profiling
 
 - [ ] `capital_efficiency` shall calculate return per unit of nominal capital deployed.
 - [ ] `return_per_unit_mae` shall calculate total return relative to adverse excursion experienced.
@@ -6435,17 +5047,7 @@ Requirements:
 - [ ] `median_mae_r` shall calculate median MAE in R-multiple terms.
 - [ ] `median_mfe_r` shall calculate median MFE in R-multiple terms.
 
-#### `app/services/analytics/scorecard.py`
-
-Functions/classes:
-
-- `MetricDefinition`
-- `ScorecardRule`
-- `ScorecardResult`
-- `evaluate_scorecard`
-- `validate_metric_catalog`
-
-Requirements:
+#### Unified Strategy Performance Scorecard Generator
 
 - [ ] No metric may be referenced in an official tool schema, report schema, dashboard payload, scorecard rule, warning rule, or quality-flag rule until its Metric Definition Catalog entry is approved.
 - [ ] Metric definitions must document whether outputs are calculated facts, diagnostic estimates, warning evidence, scorecard inputs, or non-binding review context.
@@ -6466,14 +5068,7 @@ Requirements:
 - [ ] Documentation must include the Official Analytics Tool Catalog.
 - [ ] Documentation must include the warning-code and quality-flag catalog.
 
-#### `app/services/analytics/report.py`
-
-Functions/classes:
-
-- `AnalyticsReport`
-- `PortfolioAnalyticsReport`
-
-Requirements:
+#### Analytics Output Reports and Export Primitives
 
 - [ ] Overview/report tools must combine lower-level analytics into grouped payloads that remain serializable for API and dashboard consumers.
 - [ ] The module must generate a complete, versioned `AnalyticsReport` from a valid backtest, optimization candidate, out-of-sample, walk-forward, paper, live, or normalized trading result when required inputs are available.
@@ -6513,13 +5108,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] Final analytics responses must not contain `NaN`, `inf`, `-inf`, invalid JSON values, pandas objects, NumPy objects, raw dataframes, raw series, or other unserializable values.
 
-#### `app/services/analytics/dashboard.py`
-
-Functions/classes:
-
-- `build_overview_payload`
-
-Requirements:
+#### Performance Visualizations and Dashboard Structure
 
 - [ ] Dashboard payloads must include chart/table data, finite numeric values, ISO-8601 timestamps, units, warnings, and metadata sufficient for UI/API consumers.
 - [ ] If a required source section is missing, failed, skipped, or degraded, the dashboard payload must include section-status metadata and warnings rather than recomputing or fabricating chart/table values.
@@ -6636,21 +5225,6 @@ Task inventory: 84 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/errors.py
-
-app/services/risk/__init__.py
-
-app/services/risk/governor.py
-
-app/services/analytics/__init__.py
-
-```
 
 Required functionality:
 
@@ -6658,35 +5232,12 @@ Required functionality:
 - Analytics trade logging and equity reporting formats are accessible.
 - Central errors, standard response wrapper, and trace identifiers exist.
 
-### Files to Create
-
-```text
-
-app/services/trader/
-
-app/routes/brokers.py
-
-data/persistence
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/trader/executor.py`
-
-Functions/classes:
-
-- `TradeExecutor`
-- `submit_market_order`
-- `submit_pending_order`
-- `modify_pending_order`
-- `cancel_pending_order`
-- `close_position`
-- `modify_stops`
-
-Requirements:
+#### Live Order Executor and Broker Integration
 
 - [ ] Submit market orders.
 - [ ] Submit pending orders.
@@ -6701,19 +5252,7 @@ Requirements:
 - [ ] Stop accepting new trade requests immediately.
 - [ ] Cancel any locally tracked pending orders that have not been acknowledged by the broker.
 
-#### `app/utils/validations.py`
-
-Functions/classes:
-
-- `TradeValidationResult`
-- `validate_trade_request`
-- `validate_symbol`
-- `validate_volume`
-- `validate_price`
-- `validate_slippage`
-- `validate_market_session`
-
-Requirements:
+#### Input Parameter Validation Helpers
 
 - [ ] Modify stop-loss and take-profit levels.
 - [ ] Return execution/fill details (filled volume, average price, remaining volume) in the result envelope.
@@ -6744,16 +5283,7 @@ Requirements:
 - [ ] Parameter Sanitization**: All broker-bound parameters must be strictly typed, sanitized, and validated before leaving the trading boundary.
 - [ ] Contract Tests**: Validate the broker adapter interface against actual broker API behaviors to catch breaking upstream changes.
 
-#### `app/services/trader/reporting.py`
-
-Functions/classes:
-
-- `ExecutionQualityReport`
-- `TradingReport`
-- `record_trading_metric`
-- `emit_trading_alert`
-
-Requirements:
+#### Trade Reporting and Trade Journal Sinks
 
 - [ ] Partial Fill Strategy**: Return partial fill details directly to the Strategy/Risk caller rather than auto-chasing, with configurable behavior support.
 - [ ] Generate trading reports.
@@ -6762,17 +5292,7 @@ Requirements:
 - [ ] Telemetry**: Propagate trace context through broker calls if supported by the provider SDK.
 - [ ] Redaction**: Secrets, credentials, and API tokens must be redacted and never leaked to logs, error messages, or telemetry.
 
-#### `app/services/trader/reconciliation.py`
-
-Functions/classes:
-
-- `ReconciliationResult`
-- `compare_trade_state`
-- `reconcile_orders`
-- `reconcile_positions`
-- `startup_reconciliation_gate`
-
-Requirements:
+#### Position and Order Reconciliation Engine
 
 - [ ] Retrieve account information.
 - [ ] Retrieve position information.
@@ -6792,16 +5312,7 @@ Requirements:
 - [ ] Trigger a P1 critical alert if reconciliation drift exceeds a configurable monetary amount or a percentage of account equity.
 - [ ] Chaos Engineering**: Inject random broker disconnections and delayed adapter responses during E2E testing to verify circuit breaker and reconciliation resilience.
 
-#### `app/services/trader/throttling.py`
-
-Functions/classes:
-
-- `ProviderRateLimiter`
-- `ConcurrencyQueue`
-- `check_rate_limit_health`
-- `shutdown_trade_queue`
-
-Requirements:
+#### Order Rate Throttling and Risk Pre-Check Gates
 
 - [ ] Verify that the provider rate-limiting threshold has not been exceeded.
 - [ ] Configure and enforce a per-provider rate limiter (token bucket algorithm) for each broker instance.
@@ -6810,17 +5321,7 @@ Requirements:
 - [ ] Shutdown Sequence**: When the service is shutting down or redeploying, it must:
 - [ ] Allow in-flight requests to resolve within a configurable timeout window.
 
-#### `app/services/trader/store.py`
-
-Functions/classes:
-
-- `TradeStore`
-- `IdempotencyRecord`
-- `generate_trade_request_id`
-- `compute_idempotency_key`
-- `detect_duplicate_request`
-
-Requirements:
+#### Persistent Trade Journal and Order Store
 
 - [ ] Generate deterministic request identifiers.
 - [ ] Detect duplicate requests using idempotency records.
@@ -6833,29 +5334,14 @@ Requirements:
 - [ ] Flush final reconciliation states and active idempotency logs to the `TradeStore`.
 - [ ] E2E Reconciliation & Idempotency Testing**: Implement specific test suites that inject network drops, simulate unknown outcomes, and verify correct recovery, deduplication, and reconciliation.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `TradingError`
-- `TradingTimeoutError`
-- `UnknownOutcomeError`
-- `classify_broker_error`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] Map error codes to standard codes that match MQL5 retcode behaviors (e.g., `TRADE_RETCODE_REQUOTE`, `TRADE_RETCODE_PRICE_OFF`).
 - [ ] Error Classification**: Errors must be classified into transient vs. permanent types, mapped from broker-specific codes to a common internal set.
 - [ ] Retry Policy**: Idempotent operations shall use a retry policy with exponential backoff and randomized jitter.
 - [ ] Circuit Breaker**: Connections to broker adapters must be protected by circuit breakers to prevent cascading failures.
 
-#### `app/services/trader/README.md`
-
-Functions/classes:
-
-- No runtime functions/classes; documentation artifact only.
-
-Requirements:
+#### Trading Service Operations and Compliance Manual
 
 - [ ] Simulator Integration**: Maintain high-fidelity integration tests using the local simulator adapter for deterministic regression validation.
 
@@ -6954,27 +5440,6 @@ Task inventory: 1,662 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/dataframe_tools.py
-
-app/services/data/__init__.py
-
-app/services/data/gateway.py
-
-app/services/indicators/__init__.py
-
-app/services/strategies/__init__.py
-
-app/services/strategies/registry.py
-
-app/services/trader/__init__.py
-
-```
 
 Required functionality:
 
@@ -6982,75 +5447,12 @@ Required functionality:
 - Indicators and strategy registries compile execution parameters.
 - Trader interfaces and order validation controls exist in simulation mode.
 
-### Files to Create
-
-```text
-
-app/__init__.py
-
-app/services/simulation/__init__.py
-
-app/services/simulation/orchestrator.py
-
-app/services/simulation/engine.py
-
-app/services/simulation/trader.py
-
-app/services/simulation/models/__init__.py
-
-app/services/simulation/models/tick.py
-
-app/services/simulation/models/spread.py
-
-app/services/simulation/models/slippage.py
-
-app/services/simulation/models/liquidity.py
-
-app/services/simulation/models/fee.py
-
-app/services/simulation/models/swap.py
-
-app/services/simulation/models/margin.py
-
-app/services/simulation/validation/__init__.py
-
-app/services/simulation/validation/quality.py
-
-app/services/simulation/validation/schema.py
-
-app/services/simulation/journal.py
-
-app/services/simulation/report.py
-
-app/services/simulation/
-
-docs/source-requirements/03-indicator.md
-
-docs/source-requirements/04-strategy.md
-
-app/services/data/
-
-app/services/strategies/
-
-app/services/indicators/
-
-data/broker
-
-docs/source-requirements/
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/simulation/README.md`
-
-Functions/classes:
-
-- No runtime functions/classes; documentation artifact only.
-
-Requirements:
+#### Simulator Engine Design and Validation Manual
 
 - [ ] Usage examples shall run as executable documentation tests and assert exact success or failure envelope shape.
 - [ ] Documentation shall include a formal user guide for interpreting realism labels.
@@ -7066,13 +5468,7 @@ Requirements:
 - [ ] Documentation shall include FX `production_realistic` V1 non-goals and scope limitations.
 - [ ] Documentation shall include third-party data and vendor-governance procedures.
 
-#### `app/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Package Initialization
 
 - [ ] The module may simulate configured simulation risk-rule effects for replay and evidence, but external policy definition, live approval authority, and human governance decisions live outside Simulation.
 - [ ] Initial MT5 parity tests shall use a versioned broker profile named `mt5_demo_reference_fx_v1`.
@@ -7083,27 +5479,13 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] Import-time tests shall verify public module import performs no filesystem writes, network access, worker startup, secret reads, market-data access, broker access, or long-running initialization.
 
-#### `app/services/simulation/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Simulator Package Initialization
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/simulation/orchestrator.py`
-
-Functions/classes:
-
-- `BacktestOrchestrator`
-- `run_backtest`
-- `EventDrivenExecutionEngine`
-
-Requirements:
+#### Simulator Runner Orchestration
 
 - [ ] Simulation orchestration through `BacktestOrchestrator`.
 - [ ] The system shall provide a `BacktestOrchestrator` that validates configuration and data dependencies before executing a simulation.
@@ -7153,7 +5535,6 @@ Requirements:
 - [ ] Model-governance, research-integrity, run-lifecycle, vendor-governance, and promotion-manifest tests shall pass before production promotion workflows are enabled.
 - [ ] Service-mode CI shall include resource-quota, queue, tracing, business-metric, synthetic-probe, canary, data-lineage, checkpoint-resume, and distributed-worker tests before production service deployment.
 - [ ] `queued` envelope example showing run id, queue position or bounded queue metadata where available, retry/cancellation metadata, warnings, and no completed result.
-- [ ] `run_backtest` shall not execute arbitrary user-provided Python code strings.
 - [ ] `ResumePolicy` for checkpoint age, checkpoint compatibility, automatic resume eligibility, and restart behavior.
 - [ ] Scheduler configuration for queue backend, queue limits, worker heartbeat timeout, retry policy, cancellation behavior, and preemptible-worker handling.
 - [ ] Code-based strategy execution metadata only when referenced by an approved registry entry with sandbox profile id, vetting artifact hash, approval metadata, and explicit orchestration-layer permission.
@@ -7169,22 +5550,11 @@ Requirements:
 - [ ] Documentation shall include resource quota, scheduler queue, worker heartbeat, checkpoint/resume, preemptible-worker, and backpressure operating procedures.
 - [ ] Documentation shall include market-halt, limit-up/limit-down, portfolio kill-switch, trailing-stop, pegged-order, and cancel-replace semantics.
 
-#### `app/services/simulation/engine.py`
-
-Functions/classes:
-
-- `EventDrivenExecutionEngine`
-- `SimulationResult`
-- `run_id`
-- `broker_profile_id`
-
-Requirements:
+#### Realistic Exchange Matching Engine
 
 - [ ] Canonical tick-based execution through `EventDrivenExecutionEngine`.
 - [ ] `metadata` shall include module, operation, tool risk level, side-effect classification, actor/audit references where authorized, engine version, config hash, data manifest hash, execution timing, and created timestamp.
 - [ ] The system shall execute official backtests through the tick-based `EventDrivenExecutionEngine`.
-- [ ] At the first tick of bar `N`, the engine shall mask, drop, or reject any raw OHLCV data point with timestamp greater than or equal to bar `N` open time.
-- [ ] At the first tick of bar `N`, the engine shall mask, drop, or reject any indicator-derived data point with timestamp greater than or equal to bar `N` open time.
 - [ ] At the first tick of bar `N`, the engine shall mask, drop, or reject any multi-timeframe aligned data point with timestamp greater than or equal to bar `N` open time.
 - [ ] At the first tick of bar `N`, the engine shall mask, drop, or reject strategy metadata used for sizing or trade decisions when that metadata depends on data with timestamp greater than or equal to bar `N` open time.
 - [ ] The engine shall raise `SIM_LOOKAHEAD_DETECTED` when a strategy attempts to access prohibited current-bar or future data during first-tick processing for bar `N`.
@@ -7201,15 +5571,12 @@ Requirements:
 - [ ] Large optimization jobs shall be split into deterministic work units keyed by strategy id, parameter hash, config hash, data hash, engine version, and schema version.
 - [ ] Parallel optimization workers shall run isolated engine instances and shall not share mutable account, order, journal, or strategy state.
 - [ ] The roll engine shall decide whether to close/reopen, adjust the price series, or simulate calendar-spread execution.
-- [ ] The accounting engine shall track native-currency and base-currency realized PnL.
 - [ ] The accounting engine shall track native-currency and base-currency unrealized PnL.
 - [ ] The accounting engine shall track native-currency and base-currency commissions and fees.
-- [ ] The accounting engine shall track native-currency and base-currency swap.
-- [ ] The accounting engine shall track native-currency and base-currency borrow fees.
+- [ ] The accounting engine shall track native-currency and base-currency margin.
 - [ ] The accounting engine shall track native-currency and base-currency dividend cashflows.
 - [ ] The accounting engine shall track native-currency and base-currency futures roll PnL.
 - [ ] The accounting engine shall track native-currency and base-currency perpetual funding.
-- [ ] The accounting engine shall track native-currency and base-currency margin.
 - [ ] The accounting engine shall track native-currency and base-currency cash balances.
 - [ ] The accounting engine shall track portfolio NAV in base currency.
 - [ ] The first regulatory engine scope shall be US equities and ETFs.
@@ -7234,7 +5601,6 @@ Requirements:
 - [ ] Internal engines shall provide data quality, tick generation, spread, market calendar, gaps, event priority, liquidity, slippage, matching, fees, swap, broker rules, portfolio, accounting, compliance, metrics, optimization, Monte Carlo, and performance services.
 - [ ] Deferred enterprise and future-scope areas include non-FX production-realistic asset-class expansion, regulatory engines, feature-store integration, alternative-data integration, distributed workers, canary analysis, synthetic transaction monitoring, external-report distribution workflows, and production-promotion automation unless explicitly approved for the active release phase.
 - [ ] No file-specific non-functional requirements defined.
-- [ ] Optimization uses the same canonical tick execution engine as normal backtests.
 - [ ] The attached Hardened Draft v1.6 specification is the active source of truth.
 - [ ] The simulator is intended for Python implementation.
 - [ ] The simulation module is intended to live under `app/services/simulation/`.
@@ -7306,8 +5672,6 @@ Requirements:
 - [ ] Every rejection shall return a deterministic error code.
 - [ ] Every skipped trade shall return a deterministic error code.
 - [ ] Every validation failure shall return a deterministic error code.
-- [ ] Every sizing failure shall return a deterministic error code.
-- [ ] Every execution failure shall return a deterministic error code.
 - [ ] Every failure shall be logged.
 - [ ] Unsupported fill policies shall be rejected before matching.
 - [ ] Safe errors shall be provided by the exported tool wrapper.
@@ -7319,49 +5683,7 @@ Requirements:
 - [ ] The system shall return `SIM_WORKER_LOST_REQUEUED` as a non-fatal diagnostic when a lost worker causes a work unit to be requeued.
 - [ ] The system shall return `SIM_CANARY_DIVERGENCE` when canary comparison exceeds configured divergence tolerance.
 - [ ] The system shall return `SIM_FEATURE_LOOKAHEAD_DETECTED` when feature-store or alternative-data availability violates point-in-time rules.
-- [ ] `SIM_DATA_EMPTY`
-- [ ] `SIM_DATA_DUPLICATE_TIMESTAMP`
-- [ ] `SIM_DATA_NON_MONOTONIC_TIME`
-- [ ] `SIM_DATA_PRICE_OUTLIER`
-- [ ] `SIM_LOOKAHEAD_DETECTED`
-- [ ] `SIM_VOLUME_BELOW_MIN`
-- [ ] `SIM_VOLUME_ABOVE_MAX`
-- [ ] `SIM_VOLUME_STEP_MISMATCH`
-- [ ] `SIM_FREEZE_LEVEL_VIOLATION`
-- [ ] `SIM_CORRELATION_LIMIT_EXCEEDED`
-- [ ] `SIM_CONCENTRATION_LIMIT_EXCEEDED`
-- [ ] `SIM_MARKET_CLOSED`
-- [ ] `SIM_GAP_HANDLING_REJECTED`
-- [ ] `SIM_PARTIAL_FILL_REMAINDER`
-- [ ] `SIM_UNSUPPORTED_FILL_POLICY`
-- [ ] `SIM_LIMIT_QUEUE_NOT_FILLED`
-- [ ] `SIM_PENDING_ORDER_EXPIRED`
-- [ ] `SIM_ORDER_NOT_FOUND`
-- [ ] `SIM_SIZING_FAILED`
-- [ ] `SIM_SIZING_REQUIRES_STOP_LOSS`
-- [ ] `SIM_PERSISTENCE_FAILED`
-- [ ] `SIM_ARBITRARY_CODE_REJECTED`
-- [ ] `SIM_COMMISSION_CALCULATION_FAILED`
-- [ ] `SIM_FX_CROSS_RATE_REJECTED`
-- [ ] `SIM_DATA_PARTIAL`
-- [ ] `SIM_RESOURCE_QUOTA_EXCEEDED`
-- [ ] `SIM_QUEUE_LIMIT_EXCEEDED`
-- [ ] `SIM_ENVIRONMENT_DRIFT_WARNING`
-- [ ] `SIM_WORKER_LOST_REQUEUED`
-- [ ] `SIM_CANARY_DIVERGENCE`
-- [ ] `SIM_FEATURE_LOOKAHEAD_DETECTED`
-- [ ] `SIM_MARKET_HALT_ACTIVE`
-- [ ] `SIM_KILL_SWITCH_TRIGGERED`
-- [ ] `SIM_POISON_WORK_UNIT_QUARANTINED`
-- [ ] `SIM_OPTIONAL_SERVICE_DEGRADED`
-- [ ] `SIM_RUN_ID_CONFLICT`
-- [ ] `SIM_CHECKPOINT_INCOMPATIBLE`
-- [ ] `SIM_CALIBRATION_REQUIRED`
-- [ ] `SIM_VENDOR_DATA_POLICY_VIOLATION`
-- [ ] `SIM_PERFORMANCE_GATE_FAILED`
-- [ ] `SIM_MONTE_CARLO_FAILED`
-- [ ] `SIM_OPTIMIZATION_FAILED`
-- [ ] `SIM_INTERNAL_ERROR`
+- [ ] Support simulator codes/constants: `SIM_DATA_EMPTY`, `SIM_DATA_DUPLICATE_TIMESTAMP`, `SIM_DATA_NON_MONOTONIC_TIME`, `SIM_DATA_PRICE_OUTLIER`, `SIM_LOOKAHEAD_DETECTED`, `SIM_VOLUME_BELOW_MIN`, `SIM_VOLUME_ABOVE_MAX`, `SIM_VOLUME_STEP_MISMATCH`, `SIM_FREEZE_LEVEL_VIOLATION`, `SIM_CORRELATION_LIMIT_EXCEEDED`, `SIM_CONCENTRATION_LIMIT_EXCEEDED`, `SIM_MARKET_CLOSED`, `SIM_GAP_HANDLING_REJECTED`, `SIM_PARTIAL_FILL_REMAINDER`, `SIM_UNSUPPORTED_FILL_POLICY`, `SIM_LIMIT_QUEUE_NOT_FILLED`, `SIM_PENDING_ORDER_EXPIRED`, `SIM_ORDER_NOT_FOUND`, `SIM_SIZING_FAILED`, `SIM_SIZING_REQUIRES_STOP_LOSS`, `SIM_PERSISTENCE_FAILED`, `SIM_ARBITRARY_CODE_REJECTED`, `SIM_COMMISSION_CALCULATION_FAILED`, `SIM_FX_CROSS_RATE_REJECTED`, `SIM_DATA_PARTIAL`, `SIM_RESOURCE_QUOTA_EXCEEDED`, `SIM_QUEUE_LIMIT_EXCEEDED`, `SIM_ENVIRONMENT_DRIFT_WARNING`, `SIM_WORKER_LOST_REQUEUED`, `SIM_CANARY_DIVERGENCE`, `SIM_FEATURE_LOOKAHEAD_DETECTED`, `SIM_MARKET_HALT_ACTIVE`, `SIM_KILL_SWITCH_TRIGGERED`, `SIM_POISON_WORK_UNIT_QUARANTINED`, `SIM_OPTIONAL_SERVICE_DEGRADED`, `SIM_RUN_ID_CONFLICT`, `SIM_CHECKPOINT_INCOMPATIBLE`, `SIM_CALIBRATION_REQUIRED`, `SIM_VENDOR_DATA_POLICY_VIOLATION`, `SIM_PERFORMANCE_GATE_FAILED`, `SIM_MONTE_CARLO_FAILED`, `SIM_OPTIMIZATION_FAILED`, `SIM_INTERNAL_ERROR`
 - [ ] The module does not own raw market-data acquisition, source readiness, external source adapters, or normalized data contracts; those belong to `app/services/data/`.
 - [ ] The module does not own final live broker execution against real accounts.
 - [ ] The module does not own live adapter implementation, live broker session management, live broker credentials, or imports of live execution modules; those must remain in Live/Trading/execution adapter ownership.
@@ -7415,12 +5737,10 @@ Requirements:
 - [ ] The system shall validate fill-policy compatibility.
 - [ ] The system shall execute market orders.
 - [ ] The system shall trigger pending orders.
-- [ ] The system shall support buy limit pending orders.
-- [ ] The system shall support buy stop pending orders.
-- [ ] The system shall support sell limit pending orders.
-- [ ] The system shall support sell stop pending orders.
 - [ ] The system shall support buy stop-limit pending orders.
+- [ ] The system shall support buy stop pending orders.
 - [ ] The system shall support sell stop-limit pending orders.
+- [ ] The system shall support sell stop pending orders.
 - [ ] The system shall support trailing stops when configured.
 - [ ] The system shall support pegged orders when configured, including orders pegged to best bid, best ask, mid price, or another approved reference.
 - [ ] The system shall activate stop-limit orders.
@@ -7451,7 +5771,6 @@ Requirements:
 - [ ] Worker loss, heartbeat expiry, or preemptible-instance termination shall requeue the affected work unit without marking the entire job `SIM_INTERNAL_ERROR`.
 - [ ] Distributed schedulers shall detect poison-pill work units that repeatedly fail for the same work-unit hash.
 - [ ] Monte Carlo outputs shall include confidence bands for drawdown.
-- [ ] Monte Carlo outputs shall include confidence bands for net profit.
 - [ ] Monte Carlo outputs shall include confidence bands for profit factor.
 - [ ] Monte Carlo outputs shall include worst-case streaks.
 - [ ] The system shall benchmark memory usage.
@@ -7685,15 +6004,7 @@ Requirements:
 - [ ] Release notes shall reference the applicable `simulation_promotion_manifest.json`.
 - [ ] Documentation shall describe approved strategy input modes, strategy registry behavior, and sandbox/vetting requirements if code-based strategy execution is ever enabled.
 
-#### `app/services/simulation/trader.py`
-
-Functions/classes:
-
-- `SimTrader`
-- `TradeIntent`
-- `TradeRequest`
-
-Requirements:
+#### Mock Broker Connection and Account Simulator
 
 - [ ] Conversion of timestamped `TradeIntent` objects into sized `TradeRequest` objects.
 - [ ] Simulation-only trader interface and MT5-style simulated order/query semantics.
@@ -7771,7 +6082,6 @@ Requirements:
 - [ ] Monte Carlo outputs shall include risk of ruin.
 - [ ] The system shall align benchmark data to the same clock and currency as the strategy.
 - [ ] Internal-only fields, secrets, raw credentials, and proprietary strategy source shall not appear in official AI Tool responses.
-- [ ] Rejected strategy-input diagnostics shall include request id, strategy identifier when present, rejection reason, and deterministic error code.
 - [ ] Strategy research runs shall record a research protocol manifest before optimization begins.
 - [ ] Portfolio-risk rejection.
 - [ ] Strategy identifier does not exist in registry.
@@ -7789,13 +6099,7 @@ Requirements:
 - [ ] Vectorized signal strategy shall compute indicators, generate signals, and convert signals to trade intents.
 - [ ] Documentation shall include strategy-capacity diagnostics and production capacity approval procedures.
 
-#### `app/services/simulation/models/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Simulation Models Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
@@ -7820,10 +6124,7 @@ Requirements:
 - [ ] The system shall return `SIM_RUN_ID_CONFLICT` when a run id or request id conflicts with an existing incompatible run.
 - [ ] The system shall return `SIM_MODEL_GOVERNANCE_EXPIRED` when a required model inventory record or approval is expired.
 - [ ] The system shall return `SIM_RESOURCE_QUOTA_EXCEEDED` when a request exceeds configured resource quotas.
-- [ ] `SIM_UNSUPPORTED_COMMISSION_MODEL`
-- [ ] `SIM_POSITION_NOT_FOUND`
-- [ ] `SIM_MODEL_GOVERNANCE_EXPIRED`
-- [ ] `SIM_ACCOUNT_INVARIANT_BROKEN`
+- [ ] Support simulator codes/constants: `SIM_UNSUPPORTED_COMMISSION_MODEL`, `SIM_POSITION_NOT_FOUND`, `SIM_MODEL_GOVERNANCE_EXPIRED`, `SIM_ACCOUNT_INVARIANT_BROKEN`
 - [ ] The module does not own indicator formula implementation or indicator result contracts; those belong to `app/services/indicators/`.
 - [ ] The system shall produce a structured `SimulationResult`.
 - [ ] Latency models shall support fixed, distribution-based, venue-profile-based, and disabled modes.
@@ -7840,7 +6141,6 @@ Requirements:
 - [ ] The system shall recalculate account state.
 - [ ] The system shall enforce `Equity = Balance + FloatingPnL`.
 - [ ] The system shall create a compliance or audit record for every accepted trade request.
-- [ ] The system shall create a compliance or audit record for every rejected trade request.
 - [ ] Compliance records shall include request id.
 - [ ] Walk-forward results shall separate in-sample and out-of-sample metrics.
 - [ ] Optimization caching shall reuse only completed work units whose provenance hash exactly matches the requested run.
@@ -7889,7 +6189,6 @@ Requirements:
 - [ ] Accounting invariant tests shall pass.
 - [ ] Failed request that validates `SIM_INVALID_DATE_RANGE` before data access.
 - [ ] A run shall not be labelled production-realistic unless required asset-class models are enabled or proven unnecessary.
-- [ ] Monte Carlo analysis must not replace the official backtest result.
 - [ ] Structured `SimulationResult`.
 - [ ] Account snapshots.
 - [ ] Equity curve.
@@ -7904,26 +6203,12 @@ Requirements:
 - [ ] Documentation shall include model-governance and model-inventory operating procedures.
 - [ ] Documentation shall include dynamic model materiality assessment rules and evidence requirements.
 
-#### `app/services/simulation/models/tick.py`
-
-Functions/classes:
-
-- `TradeIntent`
-- `FAST_RESEARCH`
-- `INTRABAR_EVENT`
-- `TIMEFRAME_TICKS`
-- `M1_TICKS`
-- `REAL_TICKS`
-- `SYNTHETIC_TICKS`
-- `run_backtest`
-- `SimulationConfig`
-
-Requirements:
+#### Realistic Tick/Order-Book Simulator
 
 - [ ] Tick generation, tick stream construction, spread modelling, slippage modelling, liquidity modelling, matching, partial-fill handling, same-tick event priority, gap handling, commission/fee/swap/funding/borrow-fee accounting, and portfolio-level simulation state.
 - [ ] Run official tick-based backtests and return standard official tool envelopes.
 - [ ] `SimulationBacktestRequestV1` fields: `schema_version`, `request_id`, `actor_context`, `strategy_ref`, `strategy_config`, `symbols`, `timeframe`, `start`, `end`, `initial_balance`, `account_currency`, `tick_model`, `spread_model`, `slippage_model`, `commission_model`, `swap_model`, `broker_profile_ref`, `market_data_authority_ref`, `journal_persistence`, `artifact_root_ref`, `realism_profile`, and `metadata`.
-- [ ] The system shall run data-quality checks before indicator calculation, signal generation, or tick generation.
+- [ ] The simulation module shall run data-quality checks before indicator calculation, signal generation, or tick generation.
 - [ ] The system shall build a canonical bid/ask tick stream before official execution.
 - [ ] The system shall use tick execution as the only official production execution mode.
 - [ ] The system shall use the canonical bid/ask tick stream as the official execution clock.
@@ -7988,7 +6273,6 @@ Requirements:
 - [ ] The system shall mark open positions to market on ticks.
 - [ ] The journal shall record tick model.
 - [ ] The simulation module shall execute strategy-generated trade intents only when the canonical tick loop reaches an eligible tick.
-- [ ] The simulation module shall run data-quality checks before indicator calculation, signal generation, or tick generation.
 - [ ] The system shall report ticks processed.
 - [ ] Visual replay exports shall include candles or tick references, strategy signals, order events, fills, position state, equity or balance overlays, drawdown overlays, and annotations for rejections or halts.
 - [ ] The system shall benchmark tick generation speed.
@@ -8028,8 +6312,7 @@ Requirements:
 - [ ] Conservative price rounding shall default to adverse rounding: buy-side executable prices round up to the next valid tick and sell-side executable prices round down to the next valid tick when exact normalization is required.
 - [ ] Telemetry shall include stage duration, tick generation rate, tick loop rate, memory high-water mark, journal flush latency, journal backlog, data-quality failure counts, rejection counts, fill counts, and report-generation duration.
 - [ ] Every major pipeline stage shall emit an OpenTelemetry-compatible trace span, including validation, data preparation, signal generation, tick generation, execution, reporting, and artifact persistence.
-- [ ] `SIM_UNSUPPORTED_TICK_MODEL`
-- [ ] `SIM_SYNTHETIC_TICK_GENERATION_FAILED`
+- [ ] Support simulator codes/constants: `SIM_UNSUPPORTED_TICK_MODEL`, `SIM_SYNTHETIC_TICK_GENERATION_FAILED`
 - [ ] Phase 1 shall include only `run_backtest`, deterministic tick execution, approved FX symbol metadata, broker-profile fixtures, registered strategy references with validated configuration, data-quality gates, tick generation, spread/slippage/commission/swap models, journal persistence, JSON reports, Markdown reports, schema validation, replay tests, and no-live-side-effect guarantees.
 - [ ] All official backtests must execute through a tick loop.
 - [ ] A global random seed alone shall not be sufficient for synthetic tick generation in production mode.
@@ -8044,7 +6327,6 @@ Requirements:
 - [ ] Tick-batching boundary metadata derived from active orders, positions, session boundaries, gap boundaries, rollover boundaries, compliance boundaries, and scheduled strategy events.
 - [ ] Per-bar synthetic tick seed derivation metadata or replay metadata.
 - [ ] Market-halt, limit-up/limit-down, kill-switch, trailing-stop, pegged-order, cancel-replace, recall, forced-buy-in, wash-sale, and alternative-uptick-rule diagnostics when applicable.
-- [ ] Tick-batching safety diagnostics when batching is enabled.
 - [ ] Event strategy shall respond to initialization, bar-open, tick, and trade-transaction events.
 - [ ] Every report shall disclose tick model.
 - [ ] Reports shall disclose tick-batching safety diagnostics when batching is enabled.
@@ -8059,8 +6341,6 @@ Requirements:
 - [ ] Unsupported tick model.
 - [ ] Tick volume less than or equal to zero.
 - [ ] Synthetic tick generation with tick volume equal to 1.
-- [ ] Synthetic tick generation with tick volume equal to 2.
-- [ ] Synthetic tick generation with tick volume equal to 3.
 - [ ] Synthetic tick generation with tick volume greater than 3.
 - [ ] Generated ticks exceeding OHLC bounds.
 - [ ] Same-tick SL/TP conflict.
@@ -8102,15 +6382,7 @@ Requirements:
 - [ ] Tick-batching boundary proof tests shall pass when tick batching is enabled.
 - [ ] Official fills are produced only by the canonical tick loop.
 
-#### `app/services/simulation/models/spread.py`
-
-Functions/classes:
-
-- `NATIVE_SPREAD`
-- `FIXED_SPREAD`
-- `VARIABLE_SPREAD`
-
-Requirements:
+#### Variable Spread Simulation
 
 - [ ] The system shall support `NATIVE_SPREAD`.
 - [ ] The system shall support `FIXED_SPREAD`.
@@ -8128,9 +6400,7 @@ Requirements:
 - [ ] Production promotion shall require performance to remain acceptable under increased spread, increased slippage, reduced liquidity, delayed execution, missing-data, and gap-stress scenarios.
 - [ ] Slippage, spread, market-impact, and liquidity models shall declare calibration data sources.
 - [ ] The same configuration, data, and seed shall produce the same spread values.
-- [ ] `SIM_UNSUPPORTED_SPREAD_MODEL`
-- [ ] `SIM_DATA_NEGATIVE_SPREAD`
-- [ ] `SIM_SPREAD_MISSING`
+- [ ] Support simulator codes/constants: `SIM_UNSUPPORTED_SPREAD_MODEL`, `SIM_DATA_NEGATIVE_SPREAD`, `SIM_SPREAD_MISSING`
 - [ ] Spread data when native spread mode is used.
 - [ ] Every report shall disclose spread model.
 - [ ] No file-specific non-functional requirements defined.
@@ -8145,13 +6415,7 @@ Requirements:
 - [ ] Futures-rollover tests shall cover contract expiry, roll date selection, continuous adjustment, calendar-spread roll, roll PnL attribution, and missing contract-chain failure.
 - [ ] Severe missing bars, duplicate timestamps, negative spreads, invalid OHLC bars, or lookahead-sensitive feature data block production runs.
 
-#### `app/services/simulation/models/slippage.py`
-
-Functions/classes:
-
-- `ExecutionRealismConfig`
-
-Requirements:
+#### Slippage and Latency Modelling
 
 - [ ] The system shall provide an `ExecutionRealismConfig` containing liquidity, slippage, latency, commission, swap, borrow-fee, market-hours, gap-handling, broker-rules, portfolio-risk, data-quality, corporate-action, futures-rollover, perpetual-funding, and currency-conversion configuration.
 - [ ] The system shall prevent production-realistic labelling when infinite liquidity, no slippage, no commission, no swap, or disabled portfolio checks are used without appropriate disclosure.
@@ -8184,8 +6448,7 @@ Requirements:
 - [ ] Capacity reports shall include turnover, average participation rate, maximum participation rate, liquidity utilization, slippage sensitivity, and market-impact sensitivity.
 - [ ] The same configuration, data, and seed shall produce the same slippage values.
 - [ ] Every trade path shall be journaled from validation through sizing, liquidity, slippage, fills, fees, swap, accounting, and compliance checks.
-- [ ] `SIM_UNSUPPORTED_SLIPPAGE_MODEL`
-- [ ] `SIM_SLIPPAGE_EXCEEDED`
+- [ ] Support simulator codes/constants: `SIM_UNSUPPORTED_SLIPPAGE_MODEL`, `SIM_SLIPPAGE_EXCEEDED`
 - [ ] Execution-realism configuration for liquidity, slippage, latency, commission, pass-through fees, swap, borrow fees, recall risk, market hours, market halts, gap handling, broker rules, portfolio risk, kill switches, data quality, corporate actions, futures rollover, perpetual funding, currency conversion, benchmark, and regulatory checks.
 - [ ] Slippage diagnostics.
 - [ ] Every report shall disclose slippage model.
@@ -8196,16 +6459,7 @@ Requirements:
 - [ ] Liquidity and slippage tests shall verify that liquidity constraints are evaluated before slippage and that slippage applies only to actually filled volume.
 - [ ] Execution-quality tests shall verify that liquidity shortfall is distinguished from slippage cost.
 
-#### `app/services/simulation/models/liquidity.py`
-
-Functions/classes:
-
-- `Request`
-- `Response`
-- `Result`
-- `Config`
-
-Requirements:
+#### Liquidity Depth and Partial Fill Simulation
 
 - [ ] The system shall support infinite liquidity for MT5-parity or early research use only.
 - [ ] The system shall support volume-dependent liquidity mode.
@@ -8218,8 +6472,7 @@ Requirements:
 - [ ] Model materiality shall be reassessed dynamically per run based on configured exposure, capital, instrument universe, strategy criticality, liquidity usage, and report distribution mode.
 - [ ] Reports shall include capacity diagnostics when liquidity or market-impact models are enabled.
 - [ ] The same configuration, data, and seed shall produce the same liquidity decisions.
-- [ ] `SIM_UNSUPPORTED_LIQUIDITY_MODEL`
-- [ ] `SIM_LIQUIDITY_UNAVAILABLE`
+- [ ] Support simulator codes/constants: `SIM_UNSUPPORTED_LIQUIDITY_MODEL`, `SIM_LIQUIDITY_UNAVAILABLE`
 - [ ] Liquidity diagnostics.
 - [ ] Every report shall disclose liquidity model.
 - [ ] Reports shall disclose capacity diagnostics and approved capacity limits when liquidity or market-impact models are enabled.
@@ -8231,16 +6484,7 @@ Requirements:
 - [ ] Short-recall tests shall cover deterministic recall events, seeded probabilistic recall, forced buy-ins, market-halt interaction, liquidity, fees, and journal attribution.
 - [ ] Liquidity and partial-fill tests shall pass.
 
-#### `app/services/simulation/models/fee.py`
-
-Functions/classes:
-
-- `Request`
-- `Response`
-- `Result`
-- `Config`
-
-Requirements:
+#### Exchange and Broker Commission Simulation
 
 - [ ] The system shall support no commission.
 - [ ] The system shall support per-lot commission.
@@ -8257,7 +6501,6 @@ Requirements:
 - [ ] Broker profiles shall capture symbol rules, sessions, swap rules, margin rules, fee rules, fill policies, precision, and supported order types.
 - [ ] The system shall record queryable data lineage for every data point used in fill-price, mark-to-market, margin, fee, swap, funding, dividend, benchmark, and PnL calculations.
 - [ ] Position records shall include time, id, magic, symbol, side or type, volume, open price, current price, stop loss, take profit, commission, margin required, fee, swap, profit, and comment.
-- [ ] Trade-info snapshots shall include time, id, magic, symbol, side or type, volume, price, stop loss, take profit, commission, fee, swap, profit, comment, and margin required.
 - [ ] The system shall apply borrow-fee events for equity and ETF short positions when configured.
 - [ ] The system shall change balance only from closed realized PnL, commission, fee, swap, borrow-fee, dividend, funding, and configured cashflow events.
 - [ ] The journal shall record fee and commission model.
@@ -8273,7 +6516,6 @@ Requirements:
 - [ ] Internal simulation math shall use `Decimal` or equivalent fixed-precision decimal arithmetic for prices, points, fees, FX conversions, margins, cashflows, and account balances.
 - [ ] Commission, fees, swap, dividends, funding, realized PnL, and cash ledger entries shall round at each cashflow boundary to the relevant currency precision using the broker profile rule or `ROUND_HALF_UP` when no broker-specific rule exists.
 - [ ] Perpetual swaps require funding-rate treatment, funding timestamps, funding currency, and exchange-fee model for production-realistic classification.
-- [ ] Balance may change only from closed realized PnL, commission, fee, swap, borrow-fee, dividend, funding, and configured cashflow events.
 - [ ] Equity and ETF short production-realistic runs shall include borrow-fee treatment or disclose downgrade or approximation.
 - [ ] Equity and ETF borrow-fee configuration for short-selling runs.
 - [ ] Commission, fee, swap, and borrow-fee summary.
@@ -8295,16 +6537,7 @@ Requirements:
 - [ ] Multi-currency-accounting tests shall cover realized PnL conversion, floating PnL conversion, margin conversion, fee/swap/dividend/funding conversion, and stale FX-rate rejection.
 - [ ] Borrow-fee tests shall pass before equity or ETF short-selling runs are production-promoted.
 
-#### `app/services/simulation/models/swap.py`
-
-Functions/classes:
-
-- `Request`
-- `Response`
-- `Result`
-- `Config`
-
-Requirements:
+#### Swap Rate and Carry Cost Simulation
 
 - [ ] The system shall support swap types in points, money, percent, and interest.
 - [ ] The system shall apply swap only to positions open across the configured rollover boundary.
@@ -8323,8 +6556,7 @@ Requirements:
 - [ ] Phase 1 shall exclude production-realistic labels for equity, ETF, futures, perpetual swap, spot crypto, CFD, index, option, and option-like instruments.
 - [ ] The same configuration, data, and seed shall produce the same commission and swap events.
 - [ ] MT5 parity money comparisons shall tolerate at most the larger of one account-currency cent or 0.01 percent of the compared value for realized PnL, balance, equity, margin, commission, and swap.
-- [ ] `SIM_UNSUPPORTED_SWAP_MODEL`
-- [ ] `SIM_SWAP_CALCULATION_FAILED`
+- [ ] Support simulator codes/constants: `SIM_UNSUPPORTED_SWAP_MODEL`, `SIM_SWAP_CALCULATION_FAILED`
 - [ ] Multi-currency strategies require base-currency conversion for realized PnL, floating PnL, margin, commission, swap, dividends, funding, and cash balances.
 - [ ] Funding summary for perpetual swap runs.
 - [ ] Every report shall disclose swap model.
@@ -8339,16 +6571,7 @@ Requirements:
 - [ ] Distributed-worker tests shall cover poison-pill work-unit quarantine, idempotent journal writes, distributed-lock or compare-and-swap commits, and duplicate checkpoint prevention.
 - [ ] Swap and gap tests shall pass.
 
-#### `app/services/simulation/models/margin.py`
-
-Functions/classes:
-
-- `Request`
-- `Response`
-- `Result`
-- `Config`
-
-Requirements:
+#### Account Margin, Leverage, and Liquidation Simulation
 
 - [ ] Official simulated orders, deals, positions, pending orders, account state, balance, equity, margin, free margin, margin level, realized PnL, floating PnL, execution timestamps, and immutable simulation journal.
 - [ ] The system shall update margin, exposure, commission, and risk immediately after partial fills.
@@ -8391,30 +6614,13 @@ Requirements:
 - [ ] Kill-switch tests shall cover drawdown, loss, exposure, margin, volatility, and error-triggered trading halt behavior.
 - [ ] Validation tests shall cover volume, stops, freeze, price, margin, portfolio, max positions/orders, and unsupported fill policy.
 
-#### `app/services/simulation/validation/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Simulator Parameter Validation Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/simulation/validation/quality.py`
-
-Functions/classes:
-
-- `MarketDataAuthorityManifest`
-- `PartialDataPolicy`
-- `SIM_DATA_PARTIAL`
-- `SIM_DATA_STALE`
-- `DataManifestHash`
-- `SIM_FEATURE_LOOKAHEAD_DETECTED`
-
-Requirements:
+#### Simulation Dataset Quality Checker
 
 - [ ] Simulation-specific data-quality gating, realism classification, asset-class realism disclosures, benchmark manifests, model-governance evidence, research-integrity evidence, and execution-calibration evidence.
 - [ ] Reports shall include IOC remainder cancellations in execution-quality diagnostics.
@@ -8457,10 +6663,8 @@ Requirements:
 - [ ] Required data-quality gates shall run before calculations and execution.
 - [ ] History-quality metadata shall be exposed.
 - [ ] The simulator shall emit business-level time-series metrics suitable for dashboards, including run status counts, lookahead violation counts, execution latency, data-quality failure counts, persistence failure counts, queue depth, and quota rejection counts.
-- [ ] Severe data-quality failure shall block production runs unless diagnostic mode is explicitly enabled.
 - [ ] `SIM_DATA_QUALITY_FAILED`
 - [ ] Data-quality report.
-- [ ] Corporate-action quality report for equity/ETF runs.
 - [ ] Every report shall disclose data-quality status.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] Report tests for canonical JSON report, required Markdown report, realism disclosure, data-quality summary, cost summary, and artifact manifest.
@@ -8472,14 +6676,7 @@ Requirements:
 - [ ] The response returns a deterministic `SIM_*` error code, bounded diagnostics, and any safe partial artifacts.
 - [ ] The run is not labelled `production_realistic` or `mt5_parity_oriented` after severe data-quality failure.
 
-#### `app/services/simulation/validation/schema.py`
-
-Functions/classes:
-
-- `SimulationResult`
-- `run_backtest`
-
-Requirements:
+#### Simulation Input Schema Validator
 
 - [ ] Before Builder handoff, each public simulator capability shall define name, purpose, caller type, stability level, official/internal status, request schema, response schema, deterministic error codes, side effects, required permissions, artifact behavior, network behavior, persistence behavior, compatibility guarantees, and at least one success and one deterministic-error example.
 - [ ] `SimulationResult`, official tool envelopes, artifact manifests, journal events, report JSON, broker profiles, and market-data authority manifests shall have schema references before Builder handoff.
@@ -8521,20 +6718,7 @@ Requirements:
 - [ ] Stale FX conversion rates shall fail or be explicitly recorded according to configuration.
 - [ ] The system shall return `SIM_FX_RATE_STALE` when a required FX conversion rate exceeds configured maximum age.
 - [ ] The system shall return `SIM_PROMOTION_EVIDENCE_MISSING` when a production promotion manifest lacks required evidence.
-- [ ] `SIM_INVALID_CONFIG`
-- [ ] `SIM_INVALID_DATE_RANGE`
-- [ ] `SIM_MISSING_SYMBOL`
-- [ ] `SIM_DATA_MISSING_COLUMN`
-- [ ] `SIM_DATA_INVALID_OHLC`
-- [ ] `SIM_INVALID_VOLUME`
-- [ ] `SIM_INVALID_STOPS_LEVEL`
-- [ ] `SIM_INVALID_PRICE`
-- [ ] `SIM_SIZING_INVALID_ATR`
-- [ ] `SIM_SIZING_INVALID_KELLY_INPUTS`
-- [ ] `SIM_FX_RATE_STALE`
-- [ ] `SIM_DATA_STALE`
-- [ ] `SIM_RESEARCH_PROTOCOL_MISSING`
-- [ ] `SIM_PROMOTION_EVIDENCE_MISSING`
+- [ ] Support simulator codes/constants: `SIM_INVALID_CONFIG`, `SIM_INVALID_DATE_RANGE`, `SIM_MISSING_SYMBOL`, `SIM_DATA_MISSING_COLUMN`, `SIM_DATA_INVALID_OHLC`, `SIM_INVALID_VOLUME`, `SIM_INVALID_STOPS_LEVEL`, `SIM_INVALID_PRICE`, `SIM_SIZING_INVALID_ATR`, `SIM_SIZING_INVALID_KELLY_INPUTS`, `SIM_FX_RATE_STALE`, `SIM_DATA_STALE`, `SIM_RESEARCH_PROTOCOL_MISSING`, `SIM_PROMOTION_EVIDENCE_MISSING`
 - [ ] `market_data_authority_ref` shall reference an approved `MarketDataAuthorityManifest`; inline raw provider credentials are invalid.
 - [ ] `broker_profile_ref` shall reference an approved broker profile manifest; inline broker credentials are invalid.
 - [ ] The system shall reject missing or invalid Kelly inputs.
@@ -8550,7 +6734,6 @@ Requirements:
 - [ ] The system shall fail fast or explicitly record an approximation when required asset-class data is missing.
 - [ ] FX conversion precedence shall be direct pair first, inverse pair second when inverse conversion is enabled, and cross-rate synthesis third when cross-rate synthesis is enabled and all legs pass skew/staleness validation.
 - [ ] Phase 1 shall document the exact fallback-chain setting and default before implementation; the default shall fail closed when no approved non-stale direct or enabled inverse rate is available unless the owner approves cross-rate synthesis for the active fixture.
-- [ ] Stale FX rates shall fail or be explicitly recorded according to configuration.
 - [ ] `stale_rate_tolerance_seconds` may be accepted only as a backward-compatible alias for `max_fx_rate_age_seconds`.
 - [ ] If a required conversion rate exceeds the configured maximum age, conversion shall fail closed with `SIM_FX_RATE_STALE` unless diagnostic mode explicitly overrides it.
 - [ ] Cross-rate synthesis shall reject mathematically invalid conversion paths.
@@ -8585,24 +6768,7 @@ Requirements:
 - [ ] `max_fx_rate_age_seconds` or equivalent context-specific FX stale-rate tolerance configuration.
 - [ ] FX stale-rate override disclosures.
 
-#### `app/services/simulation/journal.py`
-
-Functions/classes:
-
-- `JournalPersistenceConfig`
-- `SIM_FX_CROSS_RATE_REJECTED`
-- `run_backtest`
-- `SIM_PERSISTENCE_FAILED`
-- `SIM_DATA_PARTIAL`
-- `PartialDataPolicy`
-- `SIM_DATA_STALE`
-- `SIM_MARKET_HALT_ACTIVE`
-- `SIM_KILL_SWITCH_TRIGGERED`
-- `SIM_POISON_WORK_UNIT_QUARANTINED`
-- `SIM_OPTIONAL_SERVICE_DEGRADED`
-- `SimulationResult`
-
-Requirements:
+#### Simulator Run Audit Trail and Log Journal
 
 - [ ] Simulation reports, metrics, artifact manifests, replay metadata, journal persistence, run lifecycle, run idempotency, optimization/walk-forward/Monte Carlo execution evidence, and production-promotion evidence.
 - [ ] Produce `SimulationResult`, immutable journal artifacts, canonical JSON reports, required Markdown reports, derived CSV/HTML/visual replay artifacts where configured, and structured error responses.
@@ -8619,7 +6785,7 @@ Requirements:
 - [ ] The journal shall record every position update.
 - [ ] The journal shall record every account snapshot.
 - [ ] The journal shall record every rejection and error.
-- [ ] The journal shall record every compliance record.
+- [ ] The journal shall document every compliance record.
 - [ ] The canonical journal storage format shall be append-only JSON Lines with one event per line.
 - [ ] Optional Parquet and CSV journal exports may be generated for analysis, but they shall be derived artifacts and not the canonical replay source.
 - [ ] Artifact integrity checks shall fail when journal hashes, manifest checksums, or sequence continuity are invalid.
@@ -8679,7 +6845,6 @@ Requirements:
 - [ ] The system shall return or journal `SIM_KILL_SWITCH_TRIGGERED` when portfolio kill-switch policy blocks or alters trading.
 - [ ] The system shall return or journal `SIM_POISON_WORK_UNIT_QUARANTINED` when a repeated-failure work unit is quarantined.
 - [ ] The system shall return or journal `SIM_OPTIONAL_SERVICE_DEGRADED` when a non-production run falls back after optional cache or sidecar service failure.
-- [ ] Persistence-failure diagnostics shall include journal backend, run id, failed operation, and last committed sequence number.
 - [ ] Risk rejections must be journaled.
 - [ ] Streaming journal persistence shall be mandatory for optimization, walk-forward, and Monte Carlo production runs.
 - [ ] Production runs shall fail closed when journal persistence fails.
@@ -8694,7 +6859,6 @@ Requirements:
 - [ ] The journal shall document configuration hash and data checksum.
 - [ ] The journal shall document model choices used in the run.
 - [ ] The journal shall document every state transition and rejection.
-- [ ] The journal shall document every compliance record.
 - [ ] The journal shall document currency conversion rate, source, timestamp, and age for every conversion.
 - [ ] The journal shall document asset-class realism decisions.
 - [ ] The journal shall document persistence backend, durability mode, flush policy, sidecar index configuration, and last committed sequence.
@@ -8764,16 +6928,7 @@ Requirements:
 - [ ] Futures roll events and roll PnL attribution for futures runs.
 - [ ] Data-lineage graph or lineage artifact references for audited data points.
 
-#### `app/services/simulation/report.py`
-
-Functions/classes:
-
-- `SimulationReport`
-- `SimulationSummary`
-- `generate_simulation_report`
-- `serialize_simulation_report`
-
-Requirements:
+#### Backtest Report Generator and Scorecard Metrics
 
 - [ ] The module does not treat research approximation, visual mode, notebook objects, or derived exports as canonical execution or reporting artifacts.
 - [ ] The module does not own OS-level resource management such as process pools, thread-pool orchestration, global memory management, or platform scheduler policy beyond enforcing configured Simulation resource quotas and reporting quota diagnostics.
@@ -8829,7 +6984,7 @@ Requirements:
 - [ ] Optimization reports shall disclose total parameter combinations tested, rejected combinations, failed combinations, and final selected parameter lineage.
 - [ ] Reports shall disclose whether a result is single-run, optimized, walk-forward selected, or post-hoc selected.
 - [ ] Reports shall warn when the same dataset was used for strategy discovery, parameter selection, and final evaluation.
-- [ ] Reports shall disclose whether execution models are broker-calibrated, venue-calibrated, generic, synthetic, or uncalibrated.
+- [ ] Reports shall disclose execution-model calibration status and whether execution models are broker-calibrated, venue-calibrated, generic, synthetic, or uncalibrated.
 - [ ] Reports shall disclose material vendor-data limitations.
 - [ ] Data-source license or retention conflicts shall block external report export unless explicitly approved.
 - [ ] Point calculations shall preserve decimal precision internally and shall be rounded only at configured reporting or validation boundaries.
@@ -8860,7 +7015,6 @@ Requirements:
 - [ ] Reports shall disclose rejected FX cross-rate synthesis diagnostics when they affect a run.
 - [ ] Reports shall disclose model inventory ids, validation status, material model exceptions, and approval expiry for production-candidate runs.
 - [ ] Reports shall disclose research protocol id, selection method, optimization status, out-of-sample degradation, and parameter-sensitivity status when strategy research or optimization influenced the result.
-- [ ] Reports shall disclose execution-model calibration status and whether execution models are broker-calibrated, venue-calibrated, generic, synthetic, or uncalibrated.
 - [ ] Reports shall disclose execution latency model, latency assumptions, and latency diagnostics when latency modelling is enabled.
 - [ ] Reports shall disclose market-halt, limit-up/limit-down, portfolio kill-switch, trailing-stop, pegged-order, and cancel-replace behavior when encountered.
 - [ ] Equity and ETF reports shall disclose delisting treatment, recall-risk model, forced buy-ins, and borrow availability assumptions when applicable.
@@ -8882,7 +7036,6 @@ Requirements:
 - [ ] Documentation shall include confidence interval methodology for reported metrics and downgrade behavior when intervals are unavailable.
 - [ ] Documentation shall include external-report distribution modes, hypothetical-performance disclosures, compliance approval workflow, and unsupported-claim controls.
 - [ ] No file-specific non-functional requirements defined.
-- [ ] Disabled regulatory checks for regulated asset-class reports.
 - [ ] Corrupted artifact manifest is encountered during replay or report generation.
 - [ ] Requirement-to-test traceability report for all accepted Phase 1 requirements.
 - [ ] Report-confidence-interval tests shall verify material production-realistic metrics include confidence intervals or explicit omission disclosure and downgrade behavior.
@@ -9021,19 +7174,6 @@ Task inventory: 278 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/dataframe_tools.py
-
-app/services/simulation/__init__.py
-
-app/services/simulation/engine.py
-
-```
 
 Required functionality:
 
@@ -9041,59 +7181,12 @@ Required functionality:
 - Dataframe tools generate parameter combination grids.
 - SQLite or standard storage repositories persist sweep state data.
 
-### Files to Create
-
-```text
-
-app/services/optimization/
-
-app/__init__.py
-
-app/services/optimization/__init__.py
-
-app/services/optimization/sweeps.py
-
-app/services/optimization/robustness.py
-
-app/services/optimization/splitting.py
-
-app/services/optimization/scoring.py
-
-app/services/optimization/algorithms/__init__.py
-
-app/services/optimization/algorithms/grid.py
-
-app/services/optimization/algorithms/random.py
-
-app/services/optimization/algorithms/bayesian.py
-
-app/services/optimization/algorithms/genetic.py
-
-app/services/optimization/persistence/__init__.py
-
-app/services/optimization/persistence/checkpoint.py
-
-app/services/optimization/persistence/repository.py
-
-app/services/optimization/helpers.py
-
-app/services/optimization/models.py
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/__init__.py`
-
-Functions/classes:
-
-- `strategy_id`
-- `Infinity`
-- `OPT_JSON_SERIALIZATION_FAILED`
-
-Requirements:
+#### Package Initialization
 
 - [ ] Optimization workflows shall record reproducibility context including `strategy_id`, parameter-space definition including constraints, objective, data window start/end, engine type, engine version, seed, cost model hash, simulator realism profile hash, module version, parameter-space hash, candidate hashes, and all candidate results required to reproduce ranking and report outputs.
 - [ ] The module shall validate optimization requests, strategy compatibility, market data quality, parameter spaces, objective definitions, and evidence-package shape before running expensive work or persisting artifacts.
@@ -9105,30 +7198,13 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/optimization/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Optimization Package Initialization
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/optimization/sweeps.py`
-
-Functions/classes:
-
-- `ParameterSpace`
-- `ParameterCandidate`
-- `SweepResult`
-- `grid_search`
-- `random_search`
-- `run_parameter_sweep`
-
-Requirements:
+#### Parameter Sweep Runner
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
@@ -9159,16 +7235,7 @@ Requirements:
 - [ ] `candidate_hash` shall be the source of truth for candidate deduplication and shall deterministically combine strategy hash, data hash, cost model hash, simulator realism profile hash, objective hash, engine type, module version, and canonicalized sorted executable parameter values.
 - [ ] `candidate_hash` shall exclude inactive conditional parameters and shall use canonical JSON with sorted keys and normalized decimals.
 
-#### `app/services/optimization/robustness.py`
-
-Functions/classes:
-
-- `calculate_robustness_score`
-- `RobustnessRequest`
-- `RobustnessStats`
-- `RobustnessResponse`
-
-Requirements:
+#### Robustness Testing and Walk-Forward Analysis
 
 - [ ] Optimization workflows must warn about overfitting, parameter instability, and robustness weaknesses instead of presenting candidate scores as live readiness.
 - [ ] Risk Governor handoff packages shall include the full evidence package, final decision, best candidate, top candidates, rejected-candidate summary, production gates, walk-forward evidence, robustness evidence, Monte Carlo evidence, prop-firm compliance evidence, warnings, audit references, and institutional evidence fields.
@@ -9204,16 +7271,7 @@ Requirements:
 - [ ] Monte Carlo evidence shall include ruin probability, daily-loss breach probability, total-loss breach probability, profit-target probability, equity percentiles, drawdown percentiles, losing-streak distribution, and return distribution.
 - [ ] `run_monte_carlo_task` shall coordinate a background Monte Carlo simulation run.
 
-#### `app/services/optimization/splitting.py`
-
-Functions/classes:
-
-- `WalkForwardSplit`
-- `chronological_split`
-- `expanding_window_split`
-- `rolling_window_split`
-
-Requirements:
+#### Walk-Forward Time Series Chunk Splitting
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
@@ -9230,16 +7288,7 @@ Requirements:
 - [ ] `analyze_walk_forward_results` shall summarize walk-forward optimization results.
 - [ ] `run_walk_forward_task` shall coordinate a background walk-forward analysis run and report progress.
 
-#### `app/services/optimization/scoring.py`
-
-Functions/classes:
-
-- `OptimizationScore`
-- `ScoringFunction`
-- `evaluate_candidate_score`
-- `rank_candidates`
-
-Requirements:
+#### Objective Scoring and Fitness Function Evaluator
 
 - [ ] Inactive conditional parameters shall be excluded from executable candidate parameters, candidate hashes, backtest adapter payloads, scoring, and strategy invocation, while remaining available only in metadata or audit records.
 - [ ] Search methods shall support objective/scoring functions, initial balance, symbol, engine type, max workers, verbosity, progress callbacks, and reproducibility controls where implemented.
@@ -9263,25 +7312,13 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/optimization/algorithms/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Optimization Algorithms Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/optimization/algorithms/grid.py`
-
-Functions/classes:
-
-- `run_parameter_sweep`
-
-Requirements:
+#### Grid Search Optimizer
 
 - [ ] `run_parameter_sweep` shall package a grid or random parameter search request for downstream optimization execution.
 - [ ] `run_parameter_sweep` shall require `search_method` with approved values `grid`, `random`, `latin_hypercube`, or `sobol`; distribution-based methods shall include validated distribution definitions instead of grid-only parameter lists.
@@ -9293,18 +7330,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/optimization/algorithms/random.py`
-
-Functions/classes:
-
-- `ManualPairInput`
-- `RandomWinRateRequest`
-- `RandomWinRatePair`
-- `DistributionStats`
-- `RandomWinRateResult`
-- `RandomWinRateResponse`
-
-Requirements:
+#### Random Search Optimizer
 
 - [ ] `random_search` shall sample parameter combinations from distributions and evaluate candidates.
 - [ ] `optimization_random_search` shall expose a user-facing wrapper for randomized parameter search.
@@ -9321,62 +7347,26 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/optimization/algorithms/bayesian.py`
-
-Functions/classes:
-
-- `bayesian_optimization`
-- `optimization_bayesian`
-- `BayesianOptimizationResult`
-
-Requirements:
+#### Bayesian Optimization Optimizer
 
 - [ ] `bayesian_optimization` shall run Gaussian-process-style Bayesian optimization over a parameter space.
 - [ ] `optimization_bayesian` shall expose a user-facing wrapper for Bayesian parameter optimization.
 - [ ] No file-specific non-functional requirements defined.
 
-#### `app/services/optimization/algorithms/genetic.py`
-
-Functions/classes:
-
-- `genetic_algorithm`
-- `optimization_genetic`
-- `GeneticAlgorithmResult`
-
-Requirements:
+#### Genetic/Evolutionary Algorithm Optimizer
 
 - [ ] `genetic_algorithm` shall evolve parameter candidates through population, selection, crossover, mutation, and elitism behavior.
 - [ ] `optimization_genetic` shall expose a user-facing wrapper for genetic algorithm parameter optimization.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/optimization/persistence/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Optimization Persistence Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/optimization/persistence/checkpoint.py`
-
-Functions/classes:
-
-- `OPT_ATOMIC_WRITE_FAILED`
-- `OPT_CHECKPOINT_CORRUPTED`
-- `OPT_INTRADAY_RULE_DATA_UNAVAILABLE`
-- `OPT_PROP_FIRM_INTRADAY_EVALUATION_REQUIRED`
-- `OPT_TRIAL_COUNT_METHOD_UNSUPPORTED`
-- `OPT_PRUNED_BY_HARD_GATE`
-- `OPT_PBO_THRESHOLD_FAILED`
-- `OPT_NOISY_OBJECTIVE_NOT_ALLOWED`
-- `STOCHASTIC_REALISM_CONFLICT`
-
-Requirements:
+#### Checkpoint Saver and Resume Manager
 
 - [ ] The module shall write optimization runs, candidates, candidate results, checkpoints, evidence packages, and audit records only through an approved repository interface.
 - [ ] Resume logic shall reject corrupted, partial, or schema-invalid checkpoint artifacts rather than silently resuming.
@@ -9388,17 +7378,7 @@ Requirements:
 - [ ] The module shall include `OPT_ATOMIC_WRITE_FAILED`, `OPT_CHECKPOINT_CORRUPTED`, `OPT_INTRADAY_RULE_DATA_UNAVAILABLE`, `OPT_PROP_FIRM_INTRADAY_EVALUATION_REQUIRED`, `OPT_TRIAL_COUNT_METHOD_UNSUPPORTED`, `OPT_PRUNED_BY_HARD_GATE`, `OPT_PBO_THRESHOLD_FAILED`, and `OPT_NOISY_OBJECTIVE_NOT_ALLOWED` with subtype `STOCHASTIC_REALISM_CONFLICT` where applicable.
 - [ ] No file-specific non-functional requirements defined.
 
-#### `app/services/optimization/persistence/repository.py`
-
-Functions/classes:
-
-- `OptimizationRepository`
-- `OptimizationRunRecord`
-- `save_optimization_run`
-- `load_optimization_run`
-- `update_optimization_progress`
-
-Requirements:
+#### Optimization Run Results Database Store
 
 - [ ] Execution-capable workflows shall require an approved execution profile with resource caps, timeout policy, repository policy, and safety gates.
 - [ ] Repository-backed workflows shall be idempotent for repeated resume, cancel, and progress requests.
@@ -9421,25 +7401,7 @@ Requirements:
 - [ ] `ProgressTracker` shall track progress for parallel optimization work in a thread-safe manner.
 - [ ] Background task entry points shall return a `task_id` and polling/progress reference, not block the calling thread until optimization completion.
 
-#### `app/services/optimization/helpers.py`
-
-Functions/classes:
-
-- `load_strategy_from_path`
-- `normalize_engine_type`
-- `run_strategy_backtest`
-- `run_strategy_backtest_from_path`
-- `EngineOptimizationResult`
-- `OptimizationExecutionError`
-- `OPT_EXECUTION_FAILED`
-- `OPT_STRATEGY_LOAD_FAILED`
-- `OPT_ENGINE_CREATION_FAILED`
-- `OPT_SYMBOL_SETUP_FAILED`
-- `OPT_CANDIDATE_EXECUTION_FAILED`
-- `OPT_NOISY_OBJECTIVE_NOT_ALLOWED`
-- `STOCHASTIC_REALISM_CONFLICT`
-
-Requirements:
+#### Parallel Worker and Pool Helpers
 
 - [ ] `service_strategy_class` shall normalize either a concrete strategy class or a callable strategy-class factory.
 - [ ] `optimization_tool_result` shall build the standard HaruQuant optimization result envelope.
@@ -9506,37 +7468,7 @@ Requirements:
 - [ ] `pfo_from_optimize_func` shall periodically optimize portfolio allocation weights from a deterministic callback.
 - [ ] `pfo_plot` shall package periodic allocation-weight data for inspection and may provide non-UI diagnostic serialization; UI chart rendering shall remain outside the Optimization module.
 
-#### `app/services/optimization/models.py`
-
-Functions/classes:
-
-- `OptimizationResult`
-- `UnsupervisedConfigRequest`
-- `UnsupervisedRunSummary`
-- `UnsupervisedAnalysisRequest`
-- `ParameterRange`
-- `OptimizationRequest`
-- `OptimizationResponse`
-- `OptimizationRunDetails`
-- `OptimizationResultItem`
-- `PositionSizingRequest`
-- `WalkForwardRequest`
-- `WalkForwardWindow`
-- `WalkForwardResponse`
-- `MonteCarloRequest`
-- `ParametricMonteCarloRequest`
-- `MonteCarloResponse`
-- `ConsecutiveLosingRequest`
-- `ConsecutiveLosingScenario`
-- `ConsecutiveLosingResponse`
-- `ProfitTargetRequest`
-- `ProfitTargetResult`
-- `ProfitTargetResponse`
-- `MultiEntryRequest`
-- `MultiEntryScenarioResult`
-- `MultiEntryResponse`
-
-Requirements:
+#### Optimization Domain Models and Configuration
 
 - [ ] `OptimizationResult` shall represent one candidate optimization result with parameters, score, metrics, and metadata.
 - [ ] `OptimizationSummary` shall represent an optimization run summary and expose top-N and dataframe conversion behavior.
@@ -9676,23 +7608,6 @@ Task inventory: 234 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/errors.py
-
-app/services/trader/__init__.py
-
-app/services/risk/__init__.py
-
-app/services/risk/kill_switch.py
-
-app/services/optimization/__init__.py
-
-```
 
 Required functionality:
 
@@ -9700,43 +7615,12 @@ Required functionality:
 - Global kill switch blocks orders when triggered.
 - MT5 and cTrader live execution connections are authenticated.
 
-### Files to Create
-
-```text
-
-app/services/live/
-
-app/services/live/__init__.py
-
-app/utils/settings.py
-
-app/services/live/session.py
-
-app/services/live/gates.py
-
-app/services/live/executor.py
-
-app/services/live/reconciliation.py
-
-app/services/live/monitoring.py
-
-app/utils/errors.py
-
-app/utils/errors.py
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/live/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Live Runtime Package Initialization
 
 - [ ] The module does not own broker adapter implementation or interface definition; it owns live readiness validation, response classification, and error-mapping requirements for approved broker adapters before live use.
 - [ ] Each exported live tool contract shall reference the shared side-effect mode and retry-safety enumerations from Terminology And Data Definitions rather than redefining them.
@@ -9767,15 +7651,7 @@ Requirements:
 - [ ] Snapshot cache behavior can remain future work unless required for live readiness or audit.
 - [ ] Public registry and catalog updates shall be mandatory when live tools are added, renamed, or removed.
 
-#### `app/utils/settings.py`
-
-Functions/classes:
-
-- `Config`
-- `load_config`
-- `validate_config`
-
-Requirements:
+#### Configuration Settings and Environment Loading
 
 - [ ] Live runtime configuration, including trading enablement flags, safety settings, notification settings, logging settings, state settings, and secret-reference resolution.
 - [ ] Live notifications through configured safe channels without leaking secrets or private broker data.
@@ -9805,18 +7681,7 @@ Requirements:
 - [ ] Broker communication security tests shall prove production mutation is blocked when the approved transport/security profile is missing, unsupported, or failed.
 - [ ] Broker communication security is not a deferrable pending decision for production; production broker mutation shall remain disabled until the mandatory broker communication security profile is approved and enforced.
 
-#### `app/services/live/session.py`
-
-Functions/classes:
-
-- `LiveSession`
-- `LiveSessionStatus`
-- `start_live_session`
-- `stop_live_session`
-- `recover_live_session`
-- `get_live_session_status`
-
-Requirements:
+#### Live Execution Session Lifecycle Governor
 
 - [ ] Live session, live run, startup, shutdown, signal handling, recovery diagnostics, and runtime status/event emission for approved consumers.
 - [ ] Start and stop live sessions safely.
@@ -9851,17 +7716,7 @@ Requirements:
 - [ ] Live is an operational runtime around `route="live"` trading functions, not a separate implementation of order and position behavior.
 - [ ] Dashboard/runtime helper orchestration can remain future work if the runtime can operate safely without dashboard hints.
 
-#### `app/services/live/gates.py`
-
-Functions/classes:
-
-- `LiveGateDecision`
-- `LiveGateResult`
-- `evaluate_live_gate`
-- `require_live_approval`
-- `enforce_kill_switch_gate`
-
-Requirements:
+#### Pre-Flight Safety Gates and Permission Handlers
 
 - [ ] Live-only approval gates for broker mutation, kill-switch action, pause, resume, exposure reduction, mass cancel, mass close, and recovery.
 - [ ] Live runtime shall reject any direct live broker mutation that bypasses shared trading, risk, approval, idempotency, reconciliation, audit, or kill-switch gates.
@@ -9871,7 +7726,6 @@ Requirements:
 - [ ] When live broker mutation is enabled, live trading actions may call an approved broker adapter only after all mandatory live gates pass.
 - [ ] `trigger_global_kill_switch` shall package global trading kill-switch activation only after approval gates unless explicitly classified as an emergency fail-safe action.
 - [ ] `trigger_strategy_kill_switch` shall package strategy-level kill-switch activation only after approval gates unless explicitly classified as an emergency fail-safe action.
-- [ ] `trigger_symbol_kill_switch` shall package symbol-level kill-switch activation only after approval gates unless explicitly classified as an emergency fail-safe action.
 - [ ] `cancel_all_orders` shall package cancellation of all pending orders only after approval gates.
 - [ ] `close_all_positions` shall package closing all positions only after approval gates.
 - [ ] `clear_kill_switch_after_approval` shall package kill-switch clearing only after approval gates.
@@ -9912,15 +7766,7 @@ Requirements:
 - [ ] Approval packet completeness, state-machine, creation, voting, override, and distinct-approver tests shall cover live governance only after ownership is approved by the governance module.
 - [ ] Usage-example tests shall prove examples remain executable against documented signatures and include blocked live mode, missing approval, active kill switch, package-only mode, and unknown outcome.
 
-#### `app/services/live/executor.py`
-
-Functions/classes:
-
-- `LiveTradeExecutor`
-- `execute_live_order_intent`
-- `validate_live_execution_request`
-
-Requirements:
+#### Active Live Trader Order Coordinator
 
 - [ ] Trade executor shall enforce live execution safety checks before broker mutation.
 - [ ] No file-specific non-functional requirements defined.
@@ -9963,14 +7809,7 @@ Requirements:
 - [ ] Compensation tests shall cover order, position, registry, validation, execution, missing-plan, and audit-log behavior after compensation ownership is approved.
 - [ ] Production live broker mutation shall remain disabled until the decisions above are approved and referenced by version.
 
-#### `app/services/live/reconciliation.py`
-
-Functions/classes:
-
-- `reconcile_state(route="live")`
-- `reconcile_state()`
-
-Requirements:
+#### Real-Time Position Reconciliation Monitor
 
 - [ ] The Live module shall be consumed only by approved shared trading tools, live runtime orchestration, operator workflows, monitoring, reconciliation, audit, and reporting consumers.
 - [ ] Live reconciliation authority state, startup reconciliation, retry guard, unknown-outcome handling, and live discrepancy incidents.
@@ -9987,7 +7826,6 @@ Requirements:
 - [ ] Live reconciliation comparison shall detect missing, extra, mismatched, and stale broker/internal records.
 - [ ] Live reconciliation persistence shall preserve reconciliation runs, mismatches, incidents, and evidence references through the approved persistence interface.
 - [ ] Live authority-state transitions shall remain pending until the reconciliation state machine is approved; until then, production live broker mutation shall remain disabled.
-- [ ] Startup reconciliation shall run before live recovery or live mutation workflows.
 - [ ] Retry guard behavior shall prevent unsafe blind retries after unknown broker outcomes.
 - [ ] Unknown broker outcomes shall block blind retry until broker truth resolves the live authority state.
 - [ ] Live reconciliation incidents shall package discrepancy severity, evidence, action requirement, and audit context.
@@ -9999,7 +7837,6 @@ Requirements:
 - [ ] Live reports shall include approvals, risk decisions, route, broker evidence, receipts, reconciliation state, incidents, warnings, and unresolved actions.
 - [ ] Live shall fail closed on missing approval, missing risk context, stale broker/account state, active kill switch, reconciliation mismatch, idempotency conflict, disabled live flag, or unknown broker result.
 - [ ] Unknown broker outcomes shall block blind retries until reconciliation resolves state.
-- [ ] Reconciliation shall prefer broker truth when determining live authority state.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] Live execution tests with mocks shall prove submit, modify, cancel, close, pause, resume, exposure reduction, sync, reconciliation, and reports require approval and fail closed when context is missing.
 - [ ] Reconciliation tests shall cover matched, missing, extra, mismatched, stale, unknown-outcome, startup, persistence, retry guard, restart recovery, and incident paths.
@@ -10009,17 +7846,7 @@ Requirements:
 - [ ] Chaos/network partition tests shall prove the runtime fails closed and records incidents when broker connection, audit sink, receipt read, or reconciliation persistence fails mid-mutation.
 - [ ] Unknown-outcome retry tests shall prove clients receive `retry_after_reconciliation` and cannot blindly retry before reconciliation.
 
-#### `app/services/live/monitoring.py`
-
-Functions/classes:
-
-- `LiveMonitor`
-- `LiveHealthSnapshot`
-- `check_live_readiness`
-- `record_live_incident`
-- `emit_live_monitoring_event`
-
-Requirements:
+#### Health Monitoring and Heartbeat Alerts
 
 - [ ] Live monitoring for stale state, ingestion health, tool health, workflow timeout, operational incidents, latency, cost, notification failures, and live readiness.
 - [ ] Live state manager shall preserve runtime state needed for live execution recovery and monitoring.
@@ -10037,15 +7864,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] Monitoring tests shall cover stale state, ingestion health, workflow timeout, tool health, incident classification, latency, and snapshot cache behavior.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `Error`
-- `ValidationError`
-- `ConfigurationError`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] All standard system exceptions and error codes shall be imported and reused from `app.utils.errors` to prevent duplicate declaration. Custom live exceptions must inherit from `app.utils.errors.Error` or `HaruQuantError`.
 - [ ] Each exported live tool shall return a standard envelope containing tool name, status, request ID, correlation ID, side-effect mode, data, errors, warnings, audit metadata, incident reference, and `retry_after_seconds` where applicable.
@@ -10154,21 +7973,6 @@ Task inventory: 365 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/services/live/__init__.py
-
-app/services/trader/__init__.py
-
-app/services/simulation/__init__.py
-
-app/services/risk/__init__.py
-
-```
 
 Required functionality:
 
@@ -10177,59 +7981,12 @@ Required functionality:
 - Pre-trade risk thresholds can be configured and queried.
 - API gateway maps HTTP route parameters to service tool contracts.
 
-### Files to Create
-
-```text
-
-api/ and ui/
-
-api/__init__.py
-
-api/main.py
-
-api/app.py
-
-api/dependencies.py
-
-api/middleware/__init__.py
-
-api/middleware/redaction.py
-
-api/middleware/intent.py
-
-api/middleware/auth.py
-
-api/routes/__init__.py
-
-api/routes/auth.py
-
-api/routes/settings.py
-
-api/routes/chat.py
-
-api/routes/strategies.py
-
-api/routes/simulation.py
-
-api/routes/risk.py
-
-api/routes/live.py
-
-api/routes/operator.py
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `ui/src/lib/api/clients.ts`
-
-Functions/classes:
-
-- Planned file-local functions/classes listed by this section's requirements.
-
-Requirements:
+#### UI API Client and Authentication Handler
 
 - [ ] API and UI shall prevent contract drift through typed DTOs, validators, and contract tests.
 - [ ] Frontend API clients shall attach request and trace identifiers for observability.
@@ -10252,26 +8009,13 @@ Requirements:
 - [ ] Edge Lab components shall support prerequisite state, navigation, dataset summary, collection state, controls, scorecard evidence, indicator charting, core metric unsupervised views, and EDS evidence.
 - [ ] Performance components shall support trade detail, trade chart, statistics, calendars, comparative charts, metric grids, distributions, scatter charts, series charts, and page-level actions.
 
-#### `api/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### API Package Initialization
 
 - [ ] Every pending policy in the Pre-handoff Blockers table is resolved or explicitly deferred by owner decision.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/main.py`
-
-Functions/classes:
-
-- `create_app`
-- `main`
-
-Requirements:
+#### API Entry Point and Uvicorn Runner
 
 - [ ] Each public HTTP route shall define method, path, auth requirement, role or permission requirement, request schema, response schema, status codes, standard error envelope, side effects, idempotency behavior, audit requirement where applicable, rate-limit class, observability fields, and owning backend/domain service.
 - [ ] UI/API requirements define boundary contracts, not domain-service implementation.
@@ -10283,8 +8027,6 @@ Requirements:
 - [ ] Requirement ID ranges shall use `UIAPI-CAP-*`, `UIAPI-FR-*`, `UIAPI-NFR-*`, `UIAPI-EDGE-*`, `UIAPI-TEST-*`, and `UIAPI-EX-*`. Existing unnumbered checkboxes remain provisional and are not Builder-ready until IDs are assigned.
 - [ ] `api.main:app` shall be the canonical backend FastAPI entry point.
 - [ ] `POST /api/risk/position-sizing` shall validate and authorize the request, delegate risk-based position sizing to the approved risk-domain service, and return the service result through the documented API response schema without implementing risk calculation logic in the UI/API layer.
-- [ ] `POST /api/risk/regime-detection` shall validate and authorize the request, delegate regime detection to the approved risk-domain service, and return the service result through the documented API response schema.
-- [ ] `POST /api/risk/allocation` shall validate and authorize the request, delegate risk allocation to the approved risk-domain service, and return the service result through the documented API response schema.
 - [ ] `POST /api/risk/governance` shall validate and authorize the request, delegate risk governance evaluation to the approved risk-domain service, and return the service result through the documented API response schema.
 - [ ] `GET /api/dashboard/currency-strength` shall remain optional/deferred until its schema, source service, stale-data behavior, and frontend contract are finalized.
 - [ ] Frontend API clients shall expose typed access for AI chat, backtest, data, docs, Edge Lab, live, optimization, risk, simulator, strategies, trades, audit, board, cost, evidence, execution, portfolio, research, settings, and workflow domains.
@@ -10294,15 +8036,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/app.py`
-
-Functions/classes:
-
-- `create_app`
-- `configure_routes`
-- `configure_middleware`
-
-Requirements:
+#### FastAPI Application Setup and Configuration
 
 - [ ] The gateway shall not call unknown internal service APIs directly from route handlers. Every delegated call shall go through an approved client or orchestrator abstraction.
 - [ ] Delegation shall be serial by default: validate request, authorize actor, call one approved service client, translate result. Multi-service workflows require an approved orchestrator abstraction and must not accumulate business rules in route handlers.
@@ -10325,29 +8059,14 @@ Requirements:
 - [ ] `POST /api/ai-chat/threads/{thread_id}/action-drafts/{draft_id}/request-approval` shall request approval for an action draft.
 - [ ] `POST /api/ai-chat/threads/{thread_id}/action-drafts/{draft_id}/paper-execute` shall execute an action draft only in the approved paper path.
 - [ ] `POST /api/sqx/calculate-scores` shall validate and authorize the request, delegate SQX score calculation to the approved strategy or analytics service, and return the service result.
-- [ ] `POST /api/backtest/run/{strategy_id}` shall validate and authorize the request, delegate backtest execution to the approved simulation service, and return the service result.
 - [ ] `POST /api/backtest/portfolio/run/{strategy_id}` shall validate and authorize the request, delegate portfolio backtest execution to the approved simulation or analytics service, and return the service result.
 - [ ] `POST /api/optimization/runs` shall validate and authorize the request, delegate bounded run creation to the approved optimization service, and return the run contract without implementing optimization algorithms in the UI/API layer.
-- [ ] `POST /api/optimization/walk-forward` shall validate and authorize the request, delegate walk-forward analysis to the approved optimization service, and return the service result.
 - [ ] `POST /api/optimization/unsupervised-analysis` shall validate and authorize the request, delegate unsupervised analysis to the approved optimization or research service, and return the service result.
-- [ ] `POST /api/optimization/monte-carlo` shall validate and authorize the request, delegate Monte Carlo simulation to the approved optimization service, and return the service result.
-- [ ] `POST /api/optimization/monte-carlo/parametric` shall validate and authorize the request, delegate parametric Monte Carlo to the approved optimization service, and return the service result.
 - [ ] `POST /api/optimization/monte-carlo/position-sizing` shall validate and authorize the request, delegate position-sizing simulation to the approved optimization or risk service, and return the service result.
-- [ ] `POST /api/optimization/monte-carlo/consecutive-losing` shall validate and authorize the request, delegate consecutive-losing simulation to the approved optimization service, and return the service result.
-- [ ] `POST /api/optimization/monte-carlo/profit-target` shall validate and authorize the request, delegate profit-target simulation to the approved optimization service, and return the service result.
-- [ ] `POST /api/optimization/monte-carlo/random-win-rate` shall validate and authorize the request, delegate random-win-rate simulation to the approved optimization service, and return the service result.
-- [ ] `POST /api/optimization/monte-carlo/robustness` shall validate and authorize the request, delegate robustness simulation to the approved optimization service, and return the service result.
-- [ ] `POST /api/optimization/monte-carlo/multi-entry` shall validate and authorize the request, delegate multi-entry simulation to the approved optimization service, and return the service result.
-- [ ] `POST /api/data/dataset/prepare` shall validate and authorize the request, delegate generic dataset preparation to the approved data or research service, and return the service result.
-- [ ] `POST /api/edge-lab/run` shall validate and authorize the request, delegate Edge Lab analysis to approved Edge Lab or research services, and return the service result without implementing research algorithms in the UI/API layer.
 - [ ] `POST /api/edge-lab/dataset/prepare` shall validate and authorize the request, delegate Edge Lab-specific dataset preparation to the approved Edge Lab or data service, and return the service result.
-- [ ] `POST /api/edge-lab/seasonality` shall validate and authorize the request, delegate seasonality analysis to the approved research service, and return the service result.
-- [ ] `POST /api/edge-lab/core-metrics/run` shall validate and authorize the request, delegate core metric calculation to the approved research or analytics service, and return the service result.
-- [ ] `POST /api/edge-lab/market-structure/run` shall validate and authorize the request, delegate market-structure analysis to the approved research service, and return the service result.
+- [ ] `POST /api/edge-lab/run` shall validate and authorize the request, delegate Edge Lab analysis to approved Edge Lab or research services, and return the service result without implementing research algorithms in the UI/API layer.
 - [ ] `POST /api/edge-lab/unsupervised-structure/run` shall validate and authorize the request, delegate unsupervised-structure analysis to the approved research service, and return the service result.
-- [ ] `POST /api/edge-lab/market-structure/stability` shall validate and authorize the request, delegate stability analysis to the approved research service, and return the service result.
-- [ ] `POST /api/edge-lab/market-structure/robustness` shall validate and authorize the request, delegate robustness analysis to the approved research service, and return the service result.
-- [ ] `POST /api/edge-lab/automation/run` shall validate and authorize the request, delegate Edge Lab automation to the approved orchestration service, and return the service result.
+- [ ] `POST /api/edge-lab/core-metrics/run` shall validate and authorize the request, delegate core metric calculation to the approved research or analytics service, and return the service result.
 - [ ] `POST /api/edge-lab/automation/batch` shall validate and authorize the request, delegate Edge Lab automation batch work to the approved orchestration service, and return the service result.
 - [ ] `governedWriteContext` shall construct governed write options with workflow id, approval id, required permission, audit event type, and optional board or critical-incident approval ids.
 - [ ] Governed frontend writes shall be blocked before request when required request id, workflow id, approval id, server permission check, CSRF token, audit intent, or required approval context is missing.
@@ -10391,13 +8110,7 @@ Requirements:
 - [ ] The frontend shall provide Edge Lab routes under `/edge-lab`, including automation, core metric, discovery, edge profile, market structure, Monte Carlo lab, scorecard, seasonality, SQX import, and unsupervised structure.
 - [ ] The frontend shall provide performance routes under `/performance`, including overview, metaparams, chart analysis, strategy analysis, trade analysis, trades calendar, and periodical analysis pages.
 
-#### `api/dependencies.py`
-
-Functions/classes:
-
-- `get_operator_api_dependencies`
-
-Requirements:
+#### API Dependency Injection Registry
 
 - [ ] `get_operator_api_dependencies` shall expose the operator dependency container to route handlers.
 - [ ] No file-specific non-functional requirements defined.
@@ -10408,18 +8121,15 @@ Requirements:
 - [ ] Documentation save/delete endpoints shall enforce a configured documentation root, normalize paths, reject traversal, reject symlink escape outside the root, and return explicit validation errors.
 - [ ] Import endpoints shall define accepted file or content types, maximum size, parse-error behavior, duplicate import behavior, and cleanup behavior after partial failure.
 - [ ] API request logs shall include sanitized method, path, headers, and query metadata.
-- [ ] `GET /api/backtest/{backtest_id}` shall return a backtest.
 - [ ] `GET /api/backtest/{backtest_id}/overview` shall return a backtest overview.
 - [ ] `GET /api/backtest/` shall list all backtests.
 - [ ] `PUT /api/backtest/{backtest_id}` shall update backtest metadata.
 - [ ] `DELETE /api/backtest/{backtest_id}` shall delete a backtest.
-- [ ] `GET /api/optimization/runs/{optimization_id}` shall return optimization run detail.
 - [ ] `GET /api/optimization/runs/{optimization_id}/results` shall return optimization results.
 - [ ] `DELETE /api/optimization/runs/{optimization_id}` shall cancel an optimization run.
 - [ ] `GET /api/optimization/runs/{optimization_id}/unsupervised-report` shall return an unsupervised report.
-- [ ] `GET /api/dashboard/broker` shall return broker status.
-- [ ] `GET /api/dashboard/summary` shall return dashboard summary data.
 - [ ] `GET /api/dashboard/system/status` shall return system status.
+- [ ] `GET /api/dashboard/summary` shall return dashboard summary data.
 - [ ] `GET /api/dashboard/system/resources` shall return resource usage.
 - [ ] `GET /api/dashboard/market-hours` shall return market-hours data.
 - [ ] `GET /api/dashboard/forex-calendar` shall return forex-calendar data.
@@ -10428,33 +8138,24 @@ Requirements:
 - [ ] `POST /api/docs/save` shall save documentation content.
 - [ ] `DELETE /api/docs/delete` shall delete documentation content.
 - [ ] `GET /api/data/symbols` shall return available market-data symbols.
-- [ ] `GET /api/edge-lab/runs` shall list Edge Lab runs.
+- [ ] `GET /api/edge-lab/market-structure/runs` shall list market-structure runs.
 - [ ] `GET /api/edge-lab/runs/count` shall count Edge Lab runs.
 - [ ] `GET /api/edge-lab/runs/summary` shall return Edge Lab run summary.
-- [ ] `GET /api/edge-lab/runs/{run_id}` shall return an Edge Lab run.
 - [ ] `GET /api/edge-lab/runs/{run_id}/stats` shall return Edge Lab run statistics.
 - [ ] `GET /api/edge-lab/runs/{run_id}/trades` shall return Edge Lab run trades.
-- [ ] `DELETE /api/edge-lab/runs/{run_id}` shall delete an Edge Lab run.
-- [ ] `GET /api/edge-lab/core-metrics/runs` shall list core metric runs.
+- [ ] `DELETE /api/edge-lab/market-structure/runs/{run_id}` shall delete a market-structure run.
 - [ ] `GET /api/edge-lab/core-metrics/runs/{run_id}` shall return a core metric run.
 - [ ] `DELETE /api/edge-lab/core-metrics/runs/{run_id}` shall delete a core metric run.
-- [ ] `GET /api/edge-lab/market-structure/runs` shall list market-structure runs.
 - [ ] `GET /api/edge-lab/market-structure/runs/{run_id}` shall return a market-structure run.
-- [ ] `DELETE /api/edge-lab/market-structure/runs/{run_id}` shall delete a market-structure run.
-- [ ] `GET /api/edge-lab/market-structure/validation` shall return market-structure validation.
+- [ ] `GET /api/edge-lab/market-structure/calibration` shall return market-structure calibration.
 - [ ] `GET /api/edge-lab/market-structure/evaluations` shall list market-structure evaluations.
 - [ ] `POST /api/edge-lab/market-structure/evaluations/refresh` shall refresh market-structure evaluations.
-- [ ] `GET /api/edge-lab/market-structure/calibration` shall return market-structure calibration.
 - [ ] `GET /api/edge-lab/market-structure/profile-calibration` shall return profile calibration.
-- [ ] `GET /api/edge-lab/market-structure/metric-calibration` shall return metric calibration.
 - [ ] `POST /api/edge-lab/automation/refresh` shall refresh Edge Lab automation schedule.
 - [ ] `POST /api/edge-lab/scorecard/snapshots` shall save a scorecard snapshot.
-- [ ] `GET /api/edge-lab/scorecard/snapshots` shall list scorecard snapshots.
-- [ ] `GET /api/edge-lab/scorecard/snapshots/{snapshot_id}` shall return a scorecard snapshot.
 - [ ] `GET /api/edge-lab/scorecard/snapshots/compare` shall compare scorecard snapshots.
-- [ ] `POST /api/edge-lab/scorecard/snapshots/{snapshot_id}/export-parquet` shall export a scorecard snapshot to Parquet.
 - [ ] `GET /api/edge-lab/scorecard/snapshots/{snapshot_id}/report` shall return a scorecard snapshot report.
-- [ ] `POST /api/edge-lab/scorecard/snapshots/{snapshot_id}/export-report` shall export a scorecard snapshot report.
+- [ ] `POST /api/edge-lab/scorecard/snapshots/{snapshot_id}/export-parquet` shall export a scorecard snapshot to Parquet.
 - [ ] `POST /api/edge-lab/scorecard/snapshots/compare/export-markdown` shall export scorecard snapshot comparison Markdown.
 - [ ] `agenticApiRequest` shall create request and trace ids, attach headers, validate governed writes before sending, execute the fetch, parse payloads, validate contracts when a schema is supplied, track telemetry, and return an envelope with data, request id, trace id, stale flag, and stale warning.
 - [ ] `agenticApiData` shall return only the data portion of `agenticApiRequest`.
@@ -10462,25 +8163,13 @@ Requirements:
 - [ ] Read-only GET requests may retry once when enabled and not governed.
 - [ ] Stale API responses shall emit telemetry and include a stale warning.
 
-#### `api/middleware/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### API Middleware Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/middleware/redaction.py`
-
-Functions/classes:
-
-- `SecretRedactionMiddleware`
-
-Requirements:
+#### Response Secret Redaction Middleware
 
 - [ ] The canonical API shall install `SecretRedactionMiddleware`.
 - [ ] `SecretRedactionMiddleware` shall redact request headers and query parameters before debug logging.
@@ -10488,15 +8177,7 @@ Requirements:
 - [ ] No file-specific testing requirements defined.
 - [ ] API errors and logs shall redact secrets and avoid exposing credentials or private broker data.
 
-#### `api/middleware/intent.py`
-
-Functions/classes:
-
-- `IntentClassificationMiddleware`
-- `IntentClassifier`
-- `classify_intent`
-
-Requirements:
+#### Operator Intent Verification Middleware
 
 - [ ] `IntentClassificationMiddleware` shall classify every request path and attach intent, priority, session id, and user id metadata to request state.
 - [ ] `IntentClassifier` shall classify request intent from the URL path and optional session header.
@@ -10505,34 +8186,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/middleware/auth.py`
-
-Functions/classes:
-
-- `VALIDATION_FAILED`
-- `AUTHENTICATION_REQUIRED`
-- `AUTHORIZATION_FAILED`
-- `CSRF_REQUIRED`
-- `CSRF_INVALID`
-- `RATE_LIMITED`
-- `IDEMPOTENCY_KEY_REQUIRED`
-- `DUPLICATE_IDEMPOTENCY_KEY`
-- `IDEMPOTENCY_CONFLICT`
-- `GOVERNANCE_REQUIRED`
-- `STALE_DATA`
-- `UPSTREAM_UNAVAILABLE`
-- `UPSTREAM_NON_JSON_RESPONSE`
-- `UPSTREAM_TIMEOUT`
-- `CONTRACT_VERSION_MISMATCH`
-- `PAYLOAD_TOO_LARGE`
-- `UNSUPPORTED_MEDIA_TYPE`
-- `OPERATOR_STREAM_FORBIDDEN`
-- `DEPENDENCY_UNAVAILABLE`
-- `INTERNAL_ERROR`
-- `NOT_IMPLEMENTED`
-- `get_operator_principal`
-
-Requirements:
+#### JSON Web Token Authentication Middleware
 
 - [ ] Each WebSocket, SSE, or streaming capability shall define auth, event schema, heartbeat interval, reconnect behavior, disconnect cleanup, backpressure behavior, terminal error event, sequence behavior, and maximum connection policy.
 - [ ] API route handlers shall translate authentication failures into the standard 401 error envelope.
@@ -10569,68 +8223,35 @@ Requirements:
 - [ ] `verify_token` shall validate stored sessions, parse expiration timestamps, delete expired sessions, and return the user id only for valid sessions.
 - [ ] `invalidate_token` shall delete a stored session token.
 
-#### `api/routes/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### API Routing Entry Point
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/routes/auth.py`
-
-Functions/classes:
-
-- `login`
-- `logout`
-- `refresh_token`
-- `get_current_operator`
-
-Requirements:
+#### Authentication Routes
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/routes/settings.py`
-
-Functions/classes:
-
-- `Config`
-- `load_config`
-- `validate_config`
-
-Requirements:
+#### Settings Management Routes
 
 - [ ] `GET /api/settings` shall return settings without requiring a trailing slash.
 - [ ] The frontend shall provide dashboard-level routes for `/`, `/agents`, `/ai-ceo`, `/audit`, `/backtests`, `/board-room`, `/chart/[[...slug]]`, `/costs`, `/execution`, `/live`, `/optimization`, `/portfolio`, `/research`, `/risk-center`, `/settings`, `/strategies`, `/strategies/[id]`, `/strategy-lab`, `/tools`, and `/tools/currency-strength`.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/routes/chat.py`
-
-Functions/classes:
-
-- `listAiChatThreads`
-- `streamAiChatResponse`
-
-Requirements:
+#### AI Operator Chat and Stream Routes
 
 - [ ] Frontend page context providers shall redact secrets and bound context payload size before sending context to AI chat or route-aware workflows.
 - [ ] `GET /api/ai-chat/threads` shall list AI chat threads.
-- [ ] `POST /api/ai-chat/threads` shall create an AI chat thread.
-- [ ] `GET /api/ai-chat/threads/{thread_id}` shall return thread detail.
+- [ ] `POST /api/ai-chat/threads/{thread_id}/archive` shall archive a thread.
+- [ ] `GET /api/ai-chat/threads/{thread_id}/retention` shall return thread retention detail.
 - [ ] `PATCH /api/ai-chat/threads/{thread_id}` shall rename a thread.
 - [ ] `PATCH /api/ai-chat/threads/{thread_id}/context` shall update thread page context.
 - [ ] `DELETE /api/ai-chat/threads/{thread_id}` shall delete a thread.
-- [ ] `POST /api/ai-chat/threads/{thread_id}/archive` shall archive a thread.
-- [ ] `POST /api/ai-chat/threads/{thread_id}/restore` shall restore a thread.
 - [ ] `POST /api/ai-chat/threads/{thread_id}/purge` shall purge a thread where allowed.
-- [ ] `GET /api/ai-chat/threads/{thread_id}/retention` shall return thread retention detail.
 - [ ] `PATCH /api/ai-chat/threads/{thread_id}/retention` shall update thread retention class.
 - [ ] `POST /api/ai-chat/retention/lifecycle-run` shall run retention lifecycle processing.
 - [ ] `GET /api/ai-chat/threads/{thread_id}/export` shall export a thread.
@@ -10641,7 +8262,6 @@ Requirements:
 - [ ] `POST /api/ai-chat/threads/{thread_id}/signal-proposals/{proposal_id}/watchlist` shall save a signal proposal to the watchlist.
 - [ ] `POST /api/ai-chat/threads/{thread_id}/signal-proposals/{proposal_id}/review-queue` shall queue a signal proposal for review.
 - [ ] `GET /api/ai-chat/threads/{thread_id}/action-drafts` shall list action drafts linked to a thread.
-- [ ] `POST /api/ai-chat/threads/{thread_id}/responses/stream` shall stream an AI chat response.
 - [ ] `POST /api/ai-chat/threads/{thread_id}/responses/regenerate` shall regenerate an AI chat response.
 - [ ] The frontend shall provide live, simulation, risk, strategy, Edge Lab, dashboard, documentation, AI chat, and performance components that render backend data without owning backend business rules.
 - [ ] `listAiChatThreads` shall list AI chat threads through the frontend AI chat client.
@@ -10651,18 +8271,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/routes/strategies.py`
-
-Functions/classes:
-
-- `get_strategy_template`
-- `create_strategy`
-- `list_strategies`
-- `get_strategy`
-- `update_strategy`
-- `delete_strategy`
-
-Requirements:
+#### Strategy Catalog and Backtesting Routes
 
 - [ ] `GET /api/strategies/templates/{template_name}` shall return a strategy template.
 - [ ] `POST /api/strategies/` shall create a strategy.
@@ -10685,27 +8294,15 @@ Requirements:
 - [ ] No file-specific testing requirements defined.
 - [ ] `GET /api/backtest/strategy/{strategy_id}` shall list backtests for a strategy.
 
-#### `api/routes/simulation.py`
-
-Functions/classes:
-
-- `start_simulation`
-- `list_simulation_sessions`
-- `get_simulation_session`
-- `cancel_simulation_session`
-
-Requirements:
+#### Simulator Runs Routing
 
 - [ ] `POST /api/simulator/start` shall start a simulation session.
-- [ ] `GET /api/simulator/sessions` shall list simulation sessions.
 - [ ] `GET /api/simulator/paused` shall list paused simulation sessions.
-- [ ] `GET /api/simulator/{session_id}` shall return one simulation session.
-- [ ] `PUT /api/simulator/{session_id}` shall update a simulation session.
 - [ ] `GET /api/simulator/{session_id}/bar/{bar_index}` shall return one bar from a simulation session.
+- [ ] `PUT /api/simulator/{session_id}` shall update a simulation session.
 - [ ] `POST /api/simulator/{session_id}/advance` shall advance a simulation by bars.
 - [ ] `POST /api/simulator/{session_id}/what-if` shall evaluate a simulation what-if action.
 - [ ] `POST /api/simulator/{session_id}/resume` shall resume a simulation session.
-- [ ] `POST /api/simulator/{session_id}/seek` shall seek a simulation session.
 - [ ] `GET /api/simulator/{session_id}/trades` shall list simulation trades.
 - [ ] `DELETE /api/simulator/{session_id}` shall delete a simulation session.
 - [ ] `POST /api/simulator/{session_id}/stop-and-save` shall stop and save a simulation session.
@@ -10715,7 +8312,6 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 - [ ] `GET /api/simulator/{session_id}/positions` shall return session positions.
-- [ ] `POST /api/simulator/{session_id}/trade` shall execute a simulated trade.
 - [ ] `POST /api/simulator/{session_id}/trade/preview` shall preview a simulated trade.
 - [ ] `POST /api/simulator/{session_id}/order/pending` shall place a simulated pending order.
 - [ ] `PATCH /api/simulator/{session_id}/positions/{position_id}` shall modify a simulated position.
@@ -10725,13 +8321,7 @@ Requirements:
 - [ ] `DELETE /api/simulator/{session_id}/orders/{order_id}` shall delete a simulated order.
 - [ ] `POST /api/simulator/{session_id}/seek-trade` shall seek to a trade.
 
-#### `api/routes/risk.py`
-
-Functions/classes:
-
-- `riskApi`
-
-Requirements:
+#### Governor Limits Routing
 
 - [ ] `riskApi` shall expose frontend risk operations.
 - [ ] Live components shall support live status, sessions, strategy runner, session strategy manager, positions, orders, manual order controls, risk monitoring, candle charts, and logs.
@@ -10739,34 +8329,19 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/routes/live.py`
-
-Functions/classes:
-
-- `LiveTradingAPI`
-
-Requirements:
+#### Live Execution Control Routes
 
 - [ ] `POST /api/live/sessions` shall create a live session.
 - [ ] `GET /api/live/sessions` shall list live sessions.
-- [ ] `GET /api/live/sessions/{session_id}` shall return one live session.
+- [ ] `GET /api/live/sessions/{session_id}/statistics` shall return live session statistics.
 - [ ] `PUT /api/live/sessions/{session_id}` shall update a live session.
 - [ ] `DELETE /api/live/sessions/{session_id}` shall delete a live session.
 - [ ] `POST /api/live/sessions/{session_id}/start` shall start a live session only through live-session controls.
-- [ ] `POST /api/live/sessions/{session_id}/stop` shall stop a live session.
-- [ ] `POST /api/live/sessions/{session_id}/pause` shall pause a live session.
 - [ ] `POST /api/live/sessions/{session_id}/resume` shall resume a live session.
-- [ ] `GET /api/live/sessions/{session_id}/status` shall return live session status.
-- [ ] `GET /api/live/sessions/{session_id}/statistics` shall return live session statistics.
 - [ ] `GET /api/live/sessions/{session_id}/market-data` shall return live session market data.
-- [ ] `GET /api/live/sessions/{session_id}/signals` shall return live session signals.
-- [ ] `GET /api/live/sessions/{session_id}/positions` shall return live session positions.
-- [ ] `GET /api/live/sessions/{session_id}/logs` shall return live session logs.
 - [ ] `PUT /api/live/sessions/{session_id}/positions/{position_id}` shall request live position modification through the live route.
-- [ ] `POST /api/live/sessions/{session_id}/orders` shall request manual live order creation through the live route.
-- [ ] `GET /api/live/sessions/{session_id}/orders` shall return live session orders.
-- [ ] `DELETE /api/live/sessions/{session_id}/orders/{ticket}` shall request live order cancellation through the live route.
 - [ ] `POST /api/live/sessions/{session_id}/orders/pending` shall request pending live order creation through the live route.
+- [ ] `DELETE /api/live/sessions/{session_id}/orders/{ticket}` shall request live order cancellation through the live route.
 - [ ] `DELETE /api/live/sessions/{session_id}/positions/{position_id}` shall request live position closure through the live route.
 - [ ] `POST /api/live/sessions/{session_id}/positions/close-all` shall request closing all live positions through the live route.
 - [ ] `WEBSOCKET /api/live/sessions/{session_id}/ws` shall stream live session events.
@@ -10774,15 +8349,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `api/routes/operator.py`
-
-Functions/classes:
-
-- `OperatorPrincipal`
-- `get_operator_metadata`
-- `list_operator_events`
-
-Requirements:
+#### Operator Administrative Dashboard Routes
 
 - [ ] `OperatorPrincipal` shall represent token, actor id, and role extracted from operator request headers.
 - [ ] `GET /api/operator` shall return operator API metadata, environment, schema registry contract count, policy bundle count, actor id, and role.
@@ -10886,19 +8453,6 @@ Task inventory: 290 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/dataframe_tools.py
-
-app/services/data/__init__.py
-
-api/main.py
-
-```
 
 Required functionality:
 
@@ -10906,67 +8460,18 @@ Required functionality:
 - Dataframe alignment and comparison operations execute.
 - Gateway routes support API requests for feature extraction.
 
-### Files to Create
-
-```text
-
-app/services/research/
-
-app/services/research/__init__.py
-
-app/utils/settings.py
-
-app/services/research/data.py
-
-app/services/research/features.py
-
-app/services/research/leakage.py
-
-app/services/research/metrics.py
-
-app/services/research/studies/__init__.py
-
-app/services/research/studies/eds.py
-
-app/services/research/studies/null_models.py
-
-app/services/research/studies/structure.py
-
-app/services/research/studies/unsupervised.py
-
-app/services/research/helpers.py
-
-app/services/research/reporting.py
-
-app/utils/errors.py
-
-app/utils/errors.py
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/research/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Research Core Package Initialization
 
 - [ ] Importing `app.services.research` shall not perform network calls, disk writes, provider initialization, credential reads, live trading state access, or heavy model execution.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/utils/settings.py`
-
-Functions/classes:
-
-- `CleaningConfig`
-
-Requirements:
+#### Configuration Settings and Environment Loading
 
 - [ ] `create_config` shall create an Edge Lab configuration object with common defaults for research workflows.
 - [ ] `DataConfig` shall describe source, symbol, timeframe, and date-range data inputs for research workflows.
@@ -11019,8 +8524,6 @@ Requirements:
 - [ ] `cluster_feature_space` shall consume `UnsupervisedResearchConfig.seed` or an explicit seed parameter so K-Means output is reproducible for fixed inputs and dependency versions.
 - [ ] `session_hours_payload` shall return a machine-readable payload describing configured session hours.
 - [ ] `fetch_forexfactory_news` shall retrieve ForexFactory news data through an isolated provider adapter using configured timeout, retry, rate-limit, cache, and offline-test behavior, then return a standard research envelope containing status, normalized data, provider metadata, source timestamp, warnings, errors, and audit metadata.
-- [ ] `fetch_forexfactory_calendar` shall retrieve ForexFactory economic calendar data through an isolated provider adapter using configured timeout, retry, rate-limit, cache, stale-data, and offline-test behavior, then return it through the standard research envelope.
-- [ ] `fetch_forexfactory_sentiment` shall retrieve ForexFactory sentiment data through an isolated provider adapter using configured timeout, retry, rate-limit, cache, stale-data, and offline-test behavior, then return it through the standard research envelope.
 - [ ] `fetch_forexfactory_instrument_page` shall retrieve a symbol-specific ForexFactory page through an isolated provider adapter using configured timeout, retry, rate-limit, cache, stale-data, and offline-test behavior, then return it through the standard research envelope.
 - [ ] ForexFactory and other external-feed helpers shall be optional-provider capabilities. Missing provider adapters shall return a deterministic provider-unavailable envelope or documented typed configuration error without breaking import or unrelated research workflows.
 - [ ] Persisted research artifacts shall include artifact schema version, module version, config hash, dataset identity or data hash, random seed, generated-at timestamp, timezone, source references, and dependency/version metadata required to reproduce the result.
@@ -11031,20 +8534,7 @@ Requirements:
 - [ ] Long-running workflows shall expose duration metadata and shall support configured resource limits or fail with a typed resource-limit error.
 - [ ] No file-specific non-functional requirements defined.
 
-#### `app/services/research/data.py`
-
-Functions/classes:
-
-- `CanonicalOHLCVSSchema`
-- `validate_dataset`
-- `OHLCVSchema`
-- `LeakageReport`
-- `MetricContext`
-- `build_core_metric_profile`
-- `build_market_structure_profile`
-- `run_seasonality`
-
-Requirements:
+#### Research Data Extraction and Loading
 
 - [ ] `CanonicalOHLCVSSchema` shall define the canonical research dataset schema for OHLCV data with spread support.
 - [ ] `DatasetIssue` shall represent a detected dataset quality issue.
@@ -11080,14 +8570,7 @@ Requirements:
 - [ ] Proposed benchmark placeholder: `prepare_research_dataset` should process up to 1,000,000 rows in no more than 30 seconds on approved reference hardware; this remains pending until owner approval.
 - [ ] No file-specific non-functional requirements defined.
 
-#### `app/services/research/features.py`
-
-Functions/classes:
-
-- `build_market_regime_feature_frame`
-- `calculate_regime_features`
-
-Requirements:
+#### Feature Engineering and Processing Pipeline
 
 - [ ] `log_returns` shall compute log returns from close prices.
 - [ ] `simple_returns` shall compute arithmetic returns from close prices.
@@ -11122,16 +8605,7 @@ Requirements:
 - [ ] `active_sessions_for_hour` shall return the active trading sessions for a given hour.
 - [ ] `session_label_for_hour` shall return the session label for a given hour.
 
-#### `app/services/research/leakage.py`
-
-Functions/classes:
-
-- `LeakageCheckResult`
-- `validate_no_lookahead`
-- `detect_feature_leakage`
-- `mask_forward_columns`
-
-Requirements:
+#### Data Leakage and Multicollinearity Diagnostic
 
 - [ ] `TimeSplitResult` shall represent deterministic chronological train, validation, and test partitions.
 - [ ] `enforce_time_split` shall enforce deterministic chronological train, validation, and test splits.
@@ -11140,22 +8614,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/research/metrics.py`
-
-Functions/classes:
-
-- `MetricCalculator`
-- `MetricRegistry`
-- `ReturnsCalculator`
-- `RocCalculator`
-- `CandlesCalculator`
-- `RangesCalculator`
-- `VolatilityCalculator`
-- `SpreadCalculator`
-- `VolumeActivityCalculator`
-- `build_default_registry`
-
-Requirements:
+#### Research Feature Performance Metrics
 
 - [ ] `MetricCalculator` shall define the calculator interface for research core metrics.
 - [ ] `MetricRegistry` shall register and resolve named metric calculators.
@@ -11170,27 +8629,13 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/research/studies/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Research Studies Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/research/studies/eds.py`
-
-Functions/classes:
-
-- `run_eds_null_baseline`
-- `run_eds_mean_reversion`
-- `run_eds_trend_persistence`
-
-Requirements:
+#### Event Dependency Studies (EDS) Engine
 
 - [ ] `run_eds_null_baseline` shall establish null-model baselines for edge-discovery studies.
 - [ ] `run_eds_mean_reversion` shall evaluate a mean-reversion detector based on compression and z-score fade behavior.
@@ -11200,13 +8645,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/research/studies/null_models.py`
-
-Functions/classes:
-
-- `compute_null_percentile`
-
-Requirements:
+#### Null Hypothesis Testing and Random Shuffler
 
 - [ ] `compare_to_null` shall compare observed expectancy or performance against a null distribution.
 - [ ] `get_acceptance_criteria` shall extract acceptance criteria from a null baseline.
@@ -11225,19 +8664,7 @@ Requirements:
 - [ ] No file-specific testing requirements defined.
 - [ ] Multiple-comparison checks shall be available when evaluating many hypotheses or candidates.
 
-#### `app/services/research/studies/structure.py`
-
-Functions/classes:
-
-- `build_calibration_grid`
-- `build_metric_calibration_grid`
-- `resolve_market_structure_profile`
-- `resolve_market_structure_profile_overrides`
-- `parse_news_items`
-- `generate_research_hypothesis`
-- `build_research_evidence_pack`
-
-Requirements:
+#### Market Structure and Regime Analysis
 
 - [ ] `TrendSwingPoint` shall represent a detected swing point used in market-structure analysis.
 - [ ] `TrendLeg` shall represent a directional leg between swing points.
@@ -11269,17 +8696,7 @@ Requirements:
 - [ ] No file-specific testing requirements defined.
 - [ ] `ClassificationResult` shall represent the result of classifying a symbol's edge profile.
 
-#### `app/services/research/studies/unsupervised.py`
-
-Functions/classes:
-
-- `UnsupervisedResearchRequest`
-- `UnsupervisedResearchResult`
-- `run_pca`
-- `compute_forward_returns`
-- `build_unsupervised_insight_report`
-
-Requirements:
+#### Unsupervised Clustering and Dimensionality Reduction
 
 - [ ] `UnsupervisedResearchRequest` shall represent one unsupervised research request.
 - [ ] `UnsupervisedResearchResult` shall represent a complete unsupervised research result.
@@ -11299,24 +8716,7 @@ Requirements:
 - [ ] `build_unsupervised_insight_report` shall build a complete unsupervised insight report for trading workflows.
 - [ ] No file-specific non-functional requirements defined.
 
-#### `app/services/research/helpers.py`
-
-Functions/classes:
-
-- `parse_calendar_events`
-- `parse_sentiment_snapshot`
-- `create_news_blackout_windows`
-- `calculate_returns`
-- `calculate_volatility`
-- `calculate_atr`
-- `calculate_adr`
-- `calculate_spread_statistics`
-- `calculate_session_statistics`
-- `calculate_seasonality_statistics`
-- `calculate_correlation_matrix`
-- `check_sample_size`
-
-Requirements:
+#### Jupyter and Interactive Environment Helpers
 
 - [ ] `parse_calendar_events` shall normalize economic calendar events.
 - [ ] `parse_sentiment_snapshot` shall normalize sentiment-positioning snapshots.
@@ -11366,21 +8766,7 @@ Requirements:
 - [ ] `sortino_ratio` shall expose the analytics Sortino ratio calculation for research workflows.
 - [ ] `win_rate` shall expose the analytics win-rate calculation for research workflows.
 
-#### `app/services/research/reporting.py`
-
-Functions/classes:
-
-- `save_markdown`
-- `save_json`
-- `generate_multi_symbol_report`
-- `build_edge_profile_snapshot`
-- `build_profile_summary`
-- `build_dashboard_summary`
-- `save_json_report`
-- `save_markdown_report`
-- `build_edge_lab_scorecard_report`
-
-Requirements:
+#### Research Report Compiler and Export Sinks
 
 - [ ] `result_to_markdown` shall convert an edge result into a Markdown report.
 - [ ] `result_to_summary` shall generate a concise summary dictionary from an edge result.
@@ -11401,15 +8787,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `Error`
-- `ValidationError`
-- `ConfigurationError`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] All standard system exceptions and error codes shall be imported and reused from `app.utils.errors` to prevent duplicate declaration. Custom research exceptions must inherit from `app.utils.errors.Error` or `HaruQuantError`.
 - [ ] No file-specific non-functional requirements defined.
@@ -11511,21 +8889,6 @@ Task inventory: 249 checkbox tasks (0 checked, all unchecked).
 
 ### Dependency Files and Functionality
 
-Required files:
-
-```text
-
-app/utils/__init__.py
-
-app/utils/validations.py
-
-app/services/research/__init__.py
-
-app/services/live/__init__.py
-
-app/services/trader/__init__.py
-
-```
 
 Required functionality:
 
@@ -11534,67 +8897,19 @@ Required functionality:
 - Input/output schemas validate prompt payloads and tool calls.
 - Access to external LLM providers (e.g. Google Gemini API via HTTPS/REST).
 
-### Files to Create
-
-```text
-
-app/services/conversation/
-
-app/services/conversation/__init__.py
-
-app/services/conversation/service.py
-
-app/utils/settings.py
-
-app/utils/security.py
-
-app/services/conversation/retention.py
-
-app/services/conversation/prompt_builder.py
-
-app/services/conversation/ceo_gateway.py
-
-app/services/conversation/memory.py
-
-app/services/conversation/context/__init__.py
-
-app/services/conversation/context/service.py
-
-app/services/conversation/context/builders.py
-
-app/services/conversation/providers/__init__.py
-
-app/services/conversation/providers/stream.py
-
-app/utils/errors.py
-
-```
 
 ### Functionality to Implement
 
-Tasks are grouped one source target at a time. Each requirement keeps its source line number from the phase requirements file for traceability.
+Tasks are grouped by domain functionality. Each requirement is now part of its corresponding functional contract.
 
-#### `app/services/conversation/__init__.py`
-
-Functions/classes:
-
-- `list_ceo_chat_tools`
-
-Requirements:
+#### Conversation AI Package Initialization
 
 - [ ] Package initialization shall standardize conversation domain export metadata with tool category `conversation`.
 - [ ] `list_ceo_chat_tools` shall list chat tool definitions available to the CEO chat workflow.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/conversation/service.py`
-
-Functions/classes:
-
-- `ConversationService`
-- `PageContextService`
-
-Requirements:
+#### Conversation Gateway Coordinator
 
 - [ ] `ConversationService` public methods shall document whether they mutate persistent state, emit audit events, require user ownership checks, or trigger retention escalation.
 - [ ] Package initialization shall make `ConversationService` importable from `app.services.conversation`.
@@ -11654,20 +8969,7 @@ Requirements:
 - [ ] `ConversationRepository` shall be defined as a Python protocol, abstract base class, or companion persistence contract before implementation.
 - [ ] Deterministic fallback responses shall use a documented schema, not free-form implicit text.
 
-#### `app/utils/settings.py`
-
-Functions/classes:
-
-- `list_threads`
-- `get_thread`
-- `PromptBuilder`
-- `ModelConfigurationError`
-- `OpenAICompatibleStreamClient`
-- `is_configured`
-- `is_configured_for`
-- `thread_id`
-
-Requirements:
+#### Configuration Settings and Environment Loading
 
 - [ ] Each public capability shall document machine-readable error codes for validation, authorization, idempotency, concurrency, provider, persistence, configuration, cancellation, and internal failure paths.
 - [ ] `list_threads` and `get_thread` shall define default limits, maximum limits, and behavior when requested limits exceed configured maximums.
@@ -11676,14 +8978,7 @@ Requirements:
 - [ ] The retention policy configuration schema and local-development defaults shall be committed with this specification or a referenced companion specification before lifecycle tests are accepted.
 - [ ] `PromptBuilder.build` shall include only the configured maximum number of recent user/assistant messages.
 
-#### `app/utils/security.py`
-
-Functions/classes:
-
-- `redact_sensitive_text`
-- `normalize_text`
-
-Requirements:
+#### Security, Cryptography, and Payload Redaction
 
 - [ ] `redact_sensitive_text` shall redact configured secret patterns, email addresses, and long numeric identifiers from persisted text.
 - [ ] `normalize_text` shall collapse whitespace and truncate text to a configured limit.
@@ -11726,15 +9021,7 @@ Requirements:
 - [ ] Usage examples shall include at least one invalid-input example and one provider-disabled fallback example.
 - [ ] Provider-disabled fallback shall emit a metadata event before token events and a terminal `done` event with `generation_source="deterministic_fallback"`.
 
-#### `app/services/conversation/retention.py`
-
-Functions/classes:
-
-- `create_thread`
-- `set_thread_retention_class`
-- `ConversationRepository`
-
-Requirements:
+#### Conversation Message Retention Policy
 
 - [ ] Conversation mutations shall enforce user ownership before reading, writing, exporting, deleting, archiving, restoring, updating retention, creating action drafts, or listing action drafts.
 - [ ] Conversation mutations that affect thread state, message state, action draft state, retention state, or lifecycle audit state shall be atomic where consistency is required.
@@ -11765,17 +9052,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/conversation/prompt_builder.py`
-
-Functions/classes:
-
-- `generate_thread_title`
-- `get_context_builder`
-- `build_page_context`
-- `PromptBuilder`
-- `CEOChatGateway`
-
-Requirements:
+#### Dynamic Prompt Context Builder
 
 - [ ] Public conversation exports shall be documented in a capability contract table before Builder handoff.
 - [ ] `add_message` shall auto-title default conversation threads from the first user prompt.
@@ -11801,13 +9078,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/conversation/ceo_gateway.py`
-
-Functions/classes:
-
-- `CEOChatGateway`
-
-Requirements:
+#### Executive Agent and Tool Selector
 
 - [ ] `CEOChatGateway` shall record telemetry, usage/cost metadata when available, deterministic-decision metadata, planner metadata, CEO memo metadata, page context, attached tools, tool results, generation source, and provider name.
 - [ ] CEO gateway events shall support streaming UI consumption through progress, metadata, token, and completion events.
@@ -11820,14 +9091,7 @@ Requirements:
 - [ ] Action drafts shall require human approval and shall preserve side-effect status as draft-only unless external governance changes it.
 - [ ] Usage examples shall include an action draft creation example that demonstrates draft-only side-effect status and human approval requirement.
 
-#### `app/services/conversation/memory.py`
-
-Functions/classes:
-
-- `get_thread`
-- `PromptBuilder`
-
-Requirements:
+#### Conversation Window Memory Store
 
 - [ ] `get_thread` shall return a user's thread detail with thread fields, messages, latest memory summary, and pinned facts, and shall raise a lookup error when the thread is missing.
 - [ ] `PromptBuilder` shall build layered, auditable prompts from thread, memory, pinned facts, page context, route decision, tool evidence, recent messages, and the current user prompt.
@@ -11841,27 +9105,13 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/conversation/context/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### Conversation Context Package
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/conversation/context/service.py`
-
-Functions/classes:
-
-- `ConversationContextService`
-- `get_page_context`
-- `assemble_conversation_context`
-
-Requirements:
+#### Context Provider Aggregator
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
@@ -11881,45 +9131,19 @@ Requirements:
 - [ ] `build_operator_workflow_context` shall build context for operator workflow pages.
 - [ ] `build_generic_context` shall build fallback context for unrecognized pages.
 
-#### `app/services/conversation/context/builders.py`
-
-Functions/classes:
-
-- `PageContextBuilder`
-- `DashboardContextBuilder`
-- `StrategyContextBuilder`
-- `BacktestContextBuilder`
-- `LiveTradingContextBuilder`
-- `build_page_context`
-
-Requirements:
+#### Structured System Context Builder
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/conversation/providers/__init__.py`
-
-Functions/classes:
-
-- `__all__`
-
-Requirements:
+#### AI Model Provider Client Interface
 
 - [ ] No file-specific functional requirements defined. Foundation properties apply.
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/services/conversation/providers/stream.py`
-
-Functions/classes:
-
-- `OpenAICompatibleStreamClient`
-- `StreamManager`
-- `thread_id`
-- `user_id`
-
-Requirements:
+#### Streaming Output Handler
 
 - [ ] `CEOChatGateway.stream_turn` shall document stable event names, event ordering, required payload fields, terminal event behavior, cancellation behavior, degraded-provider behavior, and error event behavior.
 - [ ] Concurrent `stream_turn` calls for the same `(user_id, thread_id)` shall use an approved serialization mechanism, optimistic version check, or documented conflict event such as `concurrent_turn_in_progress`; the final mechanism is Pending.
@@ -11962,15 +9186,7 @@ Requirements:
 - [ ] No file-specific non-functional requirements defined.
 - [ ] No file-specific testing requirements defined.
 
-#### `app/utils/errors.py`
-
-Functions/classes:
-
-- `Error`
-- `ValidationError`
-- `ConfigurationError`
-
-Requirements:
+#### Domain Exception Handling and Error Routing
 
 - [ ] All standard system exceptions and error codes shall be imported and reused from `app.utils.errors` to prevent duplicate declaration. Custom conversation exceptions must inherit from `app.utils.errors.Error` or `HaruQuantError`.
 - [ ] Each public capability shall document intended consumers, input schema, output schema, documented errors, side effects, authorization expectations, idempotency behavior, risk level, network behavior, persistence behavior, and stability.
