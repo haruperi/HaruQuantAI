@@ -1313,13 +1313,20 @@ Requirement Title: **7 mapped requirement(s)** — `ANL-NFR-064`, `ANL-NFR-065`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-064**: `whites_reality_check` shall assess data-snooping bias with White's Reality Check.
-- **ANL-NFR-065**: `probability_of_backtest_overfitting` shall estimate probability of backtest overfitting.
-- **ANL-NFR-066**: `walk_forward_degradation_score` shall measure performance decay from in-sample to out-of-sample scores.
-- **ANL-NFR-067**: `bonferroni_correction` shall apply Bonferroni correction for multiple hypothesis testing.
-- **ANL-NFR-068**: `benjamini_hochberg_correction` shall apply Benjamini-Hochberg false-discovery-rate control.
-- **ANL-NFR-069**: `stability_score` shall calculate performance consistency across walk-forward windows.
-- **ANL-NFR-070**: `whites_reality_check_backtests` shall run White's Reality Check against backtest result objects.
+- [X] **ANL-NFR-064**: `whites_reality_check` shall assess data-snooping bias with White's Reality Check.  
+  *Evidence: app/services/analytics/statistics/multiple_testing.py (`whites_reality_check`)*
+- [X] **ANL-NFR-065**: `probability_of_backtest_overfitting` shall estimate probability of backtest overfitting.  
+  *Evidence: app/services/analytics/statistics/multiple_testing.py (`probability_of_backtest_overfitting`)*
+- [X] **ANL-NFR-066**: `walk_forward_degradation_score` shall measure performance decay from in-sample to out-of-sample scores.  
+  *Evidence: app/services/analytics/statistics/multiple_testing.py (`walk_forward_degradation_score`)*
+- [X] **ANL-NFR-067**: `bonferroni_correction` shall apply Bonferroni correction for multiple hypothesis testing.  
+  *Evidence: app/services/analytics/statistics/multiple_testing.py (`bonferroni_correction`)*
+- [X] **ANL-NFR-068**: `benjamini_hochberg_correction` shall apply Benjamini-Hochberg false-discovery-rate control.  
+  *Evidence: app/services/analytics/statistics/multiple_testing.py (`benjamini_hochberg_correction`)*
+- [X] **ANL-NFR-069**: `stability_score` shall calculate performance consistency across walk-forward windows.  
+  *Evidence: app/services/analytics/statistics/multiple_testing.py (`stability_score`)*
+- [X] **ANL-NFR-070**: `whites_reality_check_backtests` shall run White's Reality Check against backtest result objects.  
+  *Evidence: app/services/analytics/statistics/multiple_testing.py (`whites_reality_check_backtests`)*
 
 Target Class/Function:
 - `whites_reality_check(values: Sequence[Decimal | float], config: StatisticalConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1339,26 +1346,46 @@ Requirement Title: **20 mapped requirement(s)** — `ANL-NFR-316`, `ANL-NFR-317`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-316**: `return_distribution` shall calculate a statistical summary of returns.
-- **ANL-NFR-317**: `r_multiple_distribution` shall calculate a statistical summary of R-multiple values.
-- **ANL-NFR-319**: `percentile_summary` shall return selected percentile values.
-- **ANL-NFR-320**: `upside_downside_summary` shall summarize positive and negative outcome distributions.
-- **ANL-NFR-321**: `skewness` shall calculate return or value skewness.
-- **ANL-NFR-322**: `kurtosis` shall calculate excess kurtosis.
-- **ANL-NFR-323**: `higher_moments` shall calculate detailed skewness and kurtosis context.
-- **ANL-NFR-324**: `fat_tail_score` shall estimate tail heaviness relative to normal behavior.
-- **ANL-NFR-325**: `tail_ratio` shall calculate the ratio between upper-tail and lower-tail percentile magnitudes.
-- **ANL-NFR-326**: `jarque_bera_test` shall run a Jarque-Bera normality diagnostic.
-- **ANL-NFR-327**: `shapiro_wilk_test` shall run a Shapiro-Wilk normality diagnostic.
-- **ANL-NFR-328**: `qq_plot_data` shall generate theoretical and actual quantile data for Q-Q plotting.
-- **ANL-NFR-329**: `fit_distribution` shall fit a theoretical distribution and return fit parameters.
-- **ANL-NFR-330**: `distribution_fit_quality` shall return fit-quality diagnostics such as likelihood and information criteria.
-- **ANL-NFR-331**: `histogram_data` shall generate histogram bin data for plotting.
-- **ANL-NFR-332**: `detect_outliers` shall identify outliers with the requested method and threshold.
-- **ANL-NFR-333**: `outlier_ratio` shall calculate the percentage of data points flagged as outliers.
-- **ANL-NFR-334**: `calculate_distribution_metrics` shall calculate aggregate distribution metrics from numeric values.
-- **ANL-NFR-335**: No file-specific non-functional requirements defined.
-- **ANL-NFR-336**: No file-specific testing requirements defined.
+- [X] **ANL-NFR-316**: `return_distribution` shall calculate a statistical summary of returns.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`return_distribution`)*
+- [X] **ANL-NFR-317**: `r_multiple_distribution` shall calculate a statistical summary of R-multiple values.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`r_multiple_distribution`)*
+- [X] **ANL-NFR-319**: `percentile_summary` shall return selected percentile values.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`percentile_summary`)*
+- [X] **ANL-NFR-320**: `upside_downside_summary` shall summarize positive and negative outcome distributions.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`upside_downside_summary`)*
+- [X] **ANL-NFR-321**: `skewness` shall calculate return or value skewness.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`skewness`)*
+- [X] **ANL-NFR-322**: `kurtosis` shall calculate excess kurtosis.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`kurtosis`)*
+- [X] **ANL-NFR-323**: `higher_moments` shall calculate detailed skewness and kurtosis context.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`higher_moments`)*
+- [X] **ANL-NFR-324**: `fat_tail_score` shall estimate tail heaviness relative to normal behavior.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`fat_tail_score`)*
+- [X] **ANL-NFR-325**: `tail_ratio` shall calculate the ratio between upper-tail and lower-tail percentile magnitudes.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`tail_ratio`)*
+- [X] **ANL-NFR-326**: `jarque_bera_test` shall run a Jarque-Bera normality diagnostic.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`jarque_bera_test`)*
+- [X] **ANL-NFR-327**: `shapiro_wilk_test` shall run a Shapiro-Wilk normality diagnostic.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`shapiro_wilk_test`)*
+- [X] **ANL-NFR-328**: `qq_plot_data` shall generate theoretical and actual quantile data for Q-Q plotting.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`qq_plot_data`)*
+- [X] **ANL-NFR-329**: `fit_distribution` shall fit a theoretical distribution and return fit parameters.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`fit_distribution`)*
+- [X] **ANL-NFR-330**: `distribution_fit_quality` shall return fit-quality diagnostics such as likelihood and information criteria.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`distribution_fit_quality`)*
+- [X] **ANL-NFR-331**: `histogram_data` shall generate histogram bin data for plotting.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`histogram_data`)*
+- [X] **ANL-NFR-332**: `detect_outliers` shall identify outliers with the requested method and threshold.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`detect_outliers`)*
+- [X] **ANL-NFR-333**: `outlier_ratio` shall calculate the percentage of data points flagged as outliers.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`outlier_ratio`)*
+- [X] **ANL-NFR-334**: `calculate_distribution_metrics` shall calculate aggregate distribution metrics from numeric values.  
+  *Evidence: app/services/analytics/statistics/distributions.py (`calculate_distribution_metrics`)*
+- [X] **ANL-NFR-335**: No file-specific non-functional requirements defined.  
+  *Evidence: app/services/analytics/statistics/distributions.py (Inherited scope)*
+- [X] **ANL-NFR-336**: No file-specific testing requirements defined.  
+  *Evidence: app/services/analytics/statistics/distributions.py (Inherited scope)*
 
 Target Class/Function:
 - `return_distribution(values: Sequence[Decimal | float], config: StatisticalConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1389,13 +1416,20 @@ Requirement Title: **7 mapped requirement(s)** — `ANL-NFR-337`, `ANL-NFR-338`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-337**: Analytics behavior must be deterministic for the same inputs except where Monte Carlo, bootstrap, or permutation features intentionally use randomness; those features should support explicit seeds.
-- **ANL-NFR-338**: Statistical validation tools must expose deterministic options such as seeds, bootstrap/permutation counts, block sizes, confidence levels, alpha levels, and sample-size thresholds where supported.
-- **ANL-NFR-340**: `permutation_test` shall run significance testing through random reshuffling or sign-flipping.
-- **ANL-NFR-341**: `bootstrap_confidence_intervals` shall estimate metric uncertainty with non-parametric bootstrap.
-- **ANL-NFR-342**: `bootstrap_probability_above_threshold` shall estimate probability that a bootstrapped metric exceeds a threshold.
-- **ANL-NFR-343**: `permutation_test_backtest` shall run permutation testing against a backtest result object.
-- **ANL-NFR-344**: `bootstrap_confidence_intervals_backtest` shall estimate bootstrap confidence intervals from a backtest result object.
+- [X] **ANL-NFR-337**: Analytics behavior must be deterministic for the same inputs except where Monte Carlo, bootstrap, or permutation features intentionally use randomness; those features should support explicit seeds.  
+  *Evidence: app/services/analytics/statistics/resampling.py (Seeded `random.Random`)*
+- [X] **ANL-NFR-338**: Statistical validation tools must expose deterministic options such as seeds, bootstrap/permutation counts, block sizes, confidence levels, alpha levels, and sample-size thresholds where supported.  
+  *Evidence: app/services/analytics/statistics/resampling.py (Configurable seeds & iterations)*
+- [X] **ANL-NFR-340**: `permutation_test` shall run significance testing through random reshuffling or sign-flipping.  
+  *Evidence: app/services/analytics/statistics/resampling.py (`permutation_test`)*
+- [X] **ANL-NFR-341**: `bootstrap_confidence_intervals` shall estimate metric uncertainty with non-parametric bootstrap.  
+  *Evidence: app/services/analytics/statistics/resampling.py (`bootstrap_confidence_intervals`)*
+- [X] **ANL-NFR-342**: `bootstrap_probability_above_threshold` shall estimate probability that a bootstrapped metric exceeds a threshold.  
+  *Evidence: app/services/analytics/statistics/resampling.py (`bootstrap_probability_above_threshold`)*
+- [X] **ANL-NFR-343**: `permutation_test_backtest` shall run permutation testing against a backtest result object.  
+  *Evidence: app/services/analytics/statistics/resampling.py (`permutation_test_backtest`)*
+- [X] **ANL-NFR-344**: `bootstrap_confidence_intervals_backtest` shall estimate bootstrap confidence intervals from a backtest result object.  
+  *Evidence: app/services/analytics/statistics/resampling.py (`bootstrap_confidence_intervals_backtest`)*
 
 Target Class/Function:
 - `permutation_test(values: Sequence[Decimal | float], config: StatisticalConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).

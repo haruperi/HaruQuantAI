@@ -1,13 +1,13 @@
-import pytest
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime
 
-from app.utils.errors import ValidationError
+import pytest
 from app.services.analytics._helpers import (
-    validate_request_id_strict,
+    parse_utc_time,
     to_float_list,
     to_trade_list,
-    parse_utc_time,
+    validate_request_id_strict,
 )
+from app.utils.errors import ValidationError
 
 
 class MockPandasSeries:
@@ -39,13 +39,13 @@ class MockDictObject:
 def test_validate_request_id_strict():
     validate_request_id_strict(None)
     validate_request_id_strict("valid-id")
-    
+
     with pytest.raises(ValidationError):
         validate_request_id_strict("")
-    
+
     with pytest.raises(ValidationError):
         validate_request_id_strict("   ")
-        
+
     with pytest.raises(ValidationError):
         validate_request_id_strict(123)
 
@@ -60,34 +60,34 @@ def test_to_float_list():
 def test_to_trade_list():
     assert to_trade_list(None) == []
     assert to_trade_list(MockPandasDataFrame([{"id": 1}])) == [{"id": 1}]
-    
+
     dict_trade = {"id": 2}
     pydantic_trade = MockPydanticModel({"id": 3})
     dict_obj_trade = MockDictObject({"id": 4})
     tuple_trade = [("id", 5)]
-    
+
     trades = [dict_trade, pydantic_trade, dict_obj_trade, tuple_trade]
     result = to_trade_list(trades)
-    
+
     assert result == [{"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}]
     assert to_trade_list("invalid") == []
 
 
 def test_parse_utc_time():
     assert parse_utc_time(None) is None
-    
+
     # datetime
     dt_naive = datetime(2026, 1, 1)
     assert parse_utc_time(dt_naive) == datetime(2026, 1, 1, tzinfo=UTC)
-    
-    dt_aware = datetime(2026, 1, 1, tzinfo=timezone.utc)
+
+    dt_aware = datetime(2026, 1, 1, tzinfo=UTC)
     assert parse_utc_time(dt_aware) == dt_aware
-    
+
     # string
     assert parse_utc_time("2026-01-01T00:00:00Z") == datetime(2026, 1, 1, tzinfo=UTC)
     assert parse_utc_time("2026-01-01T00:00:00") == datetime(2026, 1, 1, tzinfo=UTC)
     assert parse_utc_time("invalid") is None
-    
+
     # int / float
     assert parse_utc_time(0) == datetime(1970, 1, 1, tzinfo=UTC)
     assert parse_utc_time(0.0) == datetime(1970, 1, 1, tzinfo=UTC)

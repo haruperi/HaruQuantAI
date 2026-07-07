@@ -135,7 +135,7 @@ def tail_ratio(
     ret_list = _parse_returns(returns)
     if not ret_list:
         return MetricResult(value=0.0)
-    from app.services.analytics.distributions import tail_ratio as dist_tail_ratio
+    from app.services.analytics.statistics.distributions import tail_ratio as dist_tail_ratio
 
     val = dist_tail_ratio(ret_list)
     return MetricResult(value=val)

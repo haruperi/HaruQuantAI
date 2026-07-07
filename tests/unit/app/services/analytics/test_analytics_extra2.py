@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_analytics_extra2():
     # analytics/risk.py

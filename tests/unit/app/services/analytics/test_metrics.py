@@ -23,40 +23,6 @@ from app.services.analytics.benchmark import (
     tracking_error,
 )
 from app.services.analytics.dashboard import _downsample_curve, build_overview_payload
-from app.services.analytics.distributions import (
-    benjamini_hochberg_correction,
-    bonferroni_correction,
-    bootstrap_confidence_intervals,
-    bootstrap_confidence_intervals_backtest,
-    bootstrap_probability_above_threshold,
-    calculate_distribution_metrics,
-    deflated_sharpe_ratio,
-    detect_outliers,
-    distribution_fit_quality,
-    fat_tail_score,
-    fit_distribution,
-    higher_moments,
-    histogram_data,
-    jarque_bera_test,
-    kurtosis,
-    outlier_ratio,
-    percentile_summary,
-    permutation_test,
-    permutation_test_backtest,
-    probability_of_backtest_overfitting,
-    qq_plot_data,
-    r_multiple_distribution,
-    return_distribution,
-    sample_size_warning,
-    shapiro_wilk_test,
-    skewness,
-    stability_score,
-    tail_ratio,
-    upside_downside_summary,
-    walk_forward_degradation_score,
-    whites_reality_check,
-    whites_reality_check_backtests,
-)
 from app.services.analytics.drawdown import (
     account_size_required,
     adjusted_net_profit_as_percent_of_max_strategy_drawdown,
@@ -150,6 +116,40 @@ from app.services.analytics.risk import (
     upside_potential_ratio,
     value_at_risk,
     volatility,
+)
+from app.services.analytics.statistics import (
+    benjamini_hochberg_correction,
+    bonferroni_correction,
+    bootstrap_confidence_intervals,
+    bootstrap_confidence_intervals_backtest,
+    bootstrap_probability_above_threshold,
+    calculate_distribution_metrics,
+    deflated_sharpe_ratio,
+    detect_outliers,
+    distribution_fit_quality,
+    fat_tail_score,
+    fit_distribution,
+    higher_moments,
+    histogram_data,
+    jarque_bera_test,
+    kurtosis,
+    outlier_ratio,
+    percentile_summary,
+    permutation_test,
+    permutation_test_backtest,
+    probability_of_backtest_overfitting,
+    qq_plot_data,
+    r_multiple_distribution,
+    return_distribution,
+    sample_size_warning,
+    shapiro_wilk_test,
+    skewness,
+    stability_score,
+    tail_ratio,
+    upside_downside_summary,
+    walk_forward_degradation_score,
+    whites_reality_check,
+    whites_reality_check_backtests,
 )
 from app.services.analytics.trade import (
     adjusted_gross_loss,
@@ -927,12 +927,6 @@ def test_analytics_coverage_expansion(mocker):
     from app.services.analytics.benchmark import (
         _to_float_list,
     )
-    from app.services.analytics.distributions import (
-        detect_outliers,
-        kurtosis,
-        outlier_ratio,
-        skewness,
-    )
     from app.services.analytics.drawdown import (
         drawdown_probability,
     )
@@ -944,6 +938,12 @@ def test_analytics_coverage_expansion(mocker):
         compounding_risk_of_ruin,
         historical_var_by_symbol,
         portfolio_var_from_covariance,
+    )
+    from app.services.analytics.statistics import (
+        detect_outliers,
+        kurtosis,
+        outlier_ratio,
+        skewness,
     )
     from app.services.analytics.trade import (
         avg_return_per_risk_unit,

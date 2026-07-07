@@ -24,7 +24,7 @@ from app.services.analytics.benchmark import (
     up_down_capture,
 )
 from app.services.analytics.dashboard import build_overview_payload
-from app.services.analytics.distributions import (
+from app.services.analytics.statistics import (
     benjamini_hochberg_correction,
     bonferroni_correction,
     bootstrap_confidence_intervals,
