@@ -197,9 +197,12 @@ from app.services.analytics.risk import (
     value_at_risk,
     volatility,
 )
-from app.services.analytics.scorecard import (
+from app.services.analytics.scorecards import (
+    NonBindingRecommendation,
     ScorecardResult,
     ScorecardRule,
+    StrategyQualityAssessment,
+    StrategyQualityConfig,
     evaluate_strategy_quality,
 )
 from app.services.analytics.trade import (
@@ -357,6 +360,7 @@ __all__ = [
     "MetricDefinition",
     "MetricDefinitionCatalog",
     "OFFICIAL_ANALYTICS_TOOL_CATALOG",
+    "NonBindingRecommendation",
     "PaperTradingResult",
     "PortfolioAnalyticsReport",
     "Request",
@@ -364,6 +368,8 @@ __all__ = [
     "SCHEMA_COMPATIBILITY_MATRIX",
     "ScorecardResult",
     "ScorecardRule",
+    "StrategyQualityAssessment",
+    "StrategyQualityConfig",
     "ToolDefinition",
     "TradingResult",
     "TradingResultAdapter",

@@ -26,7 +26,7 @@ from app.services.analytics.models import (
     validate_metric_catalog,
 )
 from app.services.analytics.report import AnalyticsReport, PortfolioAnalyticsReport
-from app.services.analytics.scorecard import ScorecardResult, ScorecardRule
+from app.services.analytics.scorecards import ScorecardResult, ScorecardRule
 from app.utils.errors import ValidationError
 
 PROJECT_ROOT = Path(__file__).resolve().parents[5]

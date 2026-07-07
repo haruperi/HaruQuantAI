@@ -5,7 +5,14 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from app.services.analytics.scorecard import evaluate_strategy_quality
+from app.services.analytics.scorecards import (
+    evaluate_strategy_quality,
+    NonBindingRecommendation,
+    sample_size_warning,
+    sqn,
+    StrategyQualityAssessment,
+    StrategyQualityConfig,
+)
 from app.utils.errors import ValidationError
 
 
@@ -102,3 +109,30 @@ def test_scorecard_validation_errors():
     resp = evaluate_strategy_quality(None, request_id="req_test")
     assert resp["status"] == "error"
     assert resp["error"]["code"] == "VALIDATION_FAILED"
+
+
+def test_scorecard_sqn_assessment(mock_good_report, mock_poor_report):
+    # Test sqn calculation and assessment
+    # Update mock report to have an sqn value
+    mock_good_report["sections"]["ratio_metrics"]["sqn"] = 4.5
+    assessment = sqn(mock_good_report)
+    assert assessment.score == 100.0
+    assert "Superb System Quality Number" in assessment.strengths[0]
+
+    mock_poor_report["sections"]["ratio_metrics"]["sqn"] = 1.2
+    assessment_poor = sqn(mock_poor_report)
+    assert assessment_poor.score == 80.0
+    assert "Average or low System Quality Number" in assessment_poor.warnings[0]
+
+
+def test_scorecard_sample_size_warning(mock_good_report, mock_poor_report):
+    config = StrategyQualityConfig(trades_min=40, trades_robust=100)
+    
+    assessment_good = sample_size_warning(mock_good_report, config)
+    assert assessment_good.score == 100.0
+    assert "Sufficient sample size" in assessment_good.strengths[0]
+
+    assessment_poor = sample_size_warning(mock_poor_report, config)
+    assert assessment_poor.score == 70.0
+    assert "Critically small sample size" in assessment_poor.warnings[0]
+

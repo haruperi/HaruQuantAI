@@ -1521,9 +1521,12 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-381`, `ANL-NFR-393`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-381**: `evaluate_strategy_quality` shall evaluate a supplied analytics report and return strategy-quality decision context, score, strengths, warnings, and recommended action.
-- **ANL-NFR-393**: `sqn` shall calculate system quality number.
-- **ANL-NFR-394**: `sample_size_warning` shall assess metric reliability based on sample size.
+- [X] **ANL-NFR-381**: `evaluate_strategy_quality` shall evaluate a supplied analytics report and return strategy-quality decision context, score, strengths, warnings, and recommended action.  
+  *Evidence: app/services/analytics/scorecards/quality.py (`evaluate_strategy_quality`)*
+- [X] **ANL-NFR-393**: `sqn` shall calculate system quality number.  
+  *Evidence: app/services/analytics/scorecards/quality.py (`sqn`)*
+- [X] **ANL-NFR-394**: `sample_size_warning` shall assess metric reliability based on sample size.  
+  *Evidence: app/services/analytics/scorecards/quality.py (`sample_size_warning`)*
 
 Target Class/Function:
 - `evaluate_strategy_quality(report: AnalyticsReport, config: StrategyQualityConfig) -> StrategyQualityAssessment` — Pure (no database, network, broker, or filesystem side effects).
@@ -1539,24 +1542,42 @@ Requirement Title: **18 mapped requirement(s)** — `ANL-NFR-217`, `ANL-NFR-218`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-217**: Strategy-quality evaluation must rely only on the supplied report payload and must surface warnings for weak profitability, high drawdown, overfitting risk, small sample size, or other observable quality concerns.
-- **ANL-NFR-218**: Optional sections such as TCA metrics, attribution, prop-firm compliance evidence, drawdown distribution, tail-risk metrics, dynamic correlation, walk-forward analytics, metric comparisons, live degradation, and explainability must be represented as calculated, skipped, or failed.
-- **ANL-NFR-219**: Formula definitions must be explicit for Sharpe, Sortino, Calmar, Jensen alpha, beta, tracking error, information ratio, VaR, CVaR, expected shortfall, SQN, Kelly, drawdown duration, CAGR, profit factor, expectancy, and R-multiple metrics before those metrics are locked as official contracts.
-- **ANL-NFR-379**: No metric may be referenced in an official tool schema, report schema, dashboard payload, scorecard rule, warning rule, or quality-flag rule until its Metric Definition Catalog entry is approved.
-- **ANL-NFR-380**: Metric definitions must document whether outputs are calculated facts, diagnostic estimates, warning evidence, scorecard inputs, or non-binding review context.
-- **ANL-NFR-382**: No file-specific non-functional requirements defined.
-- **ANL-NFR-383**: No file-specific testing requirements defined.
-- **ANL-NFR-384**: Public registry changes must remain auditable through tests and catalog updates.
-- **ANL-NFR-385**: The module must separate calculated facts from warnings, caveats, decisions, and recommended actions.
-- **ANL-NFR-386**: Official agent/API-facing analytics tools must be high-level, documented, typed, schema-compliant, traceable, and listed in the Official Analytics Tool Catalog.
-- **ANL-NFR-387**: Every official analytics tool must have a documented input schema and output schema, including required fields, optional fields, default values, accepted aliases, units, validation errors, warning codes, and JSON-safe serialization behavior.
-- **ANL-NFR-388**: Low-level metric kernels must not be exposed as official agent/API tools unless explicitly approved in the Official Analytics Tool Catalog.
-- **ANL-NFR-389**: Official analytics tools must log call start, validation failure, successful completion, controlled warning, and execution failure without logging secrets or full raw private payloads.
-- **ANL-NFR-390**: Warning severity must support at least informational, warning, major, critical, and blocker-level meanings.
-- **ANL-NFR-391**: Quality flags must separate raw metrics, normalized score inputs, penalty flags, hard blockers, recommendation evidence, and final governance decisions.
-- **ANL-NFR-392**: Strategy-quality and prop-firm outputs must be labeled as non-binding analytics evidence or decision context only.
-- **ANL-NFR-395**: Documentation must include the Official Analytics Tool Catalog.
-- **ANL-NFR-396**: Documentation must include the warning-code and quality-flag catalog.
+- [X] **ANL-NFR-217**: Strategy-quality evaluation must rely only on the supplied report payload and must surface warnings for weak profitability, high drawdown, overfitting risk, small sample size, or other observable quality concerns.  
+  *Evidence: app/services/analytics/scorecards/quality.py (Strictly evaluates based on report fields)*
+- [X] **ANL-NFR-218**: Optional sections such as TCA metrics, attribution, prop-firm compliance evidence, drawdown distribution, tail-risk metrics, dynamic correlation, walk-forward analytics, metric comparisons, live degradation, and explainability must be represented as calculated, skipped, or failed.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-219**: Formula definitions must be explicit for Sharpe, Sortino, Calmar, Jensen alpha, beta, tracking error, information ratio, VaR, CVaR, expected shortfall, SQN, Kelly, drawdown duration, CAGR, profit factor, expectancy, and R-multiple metrics before those metrics are locked as official contracts.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-379**: No metric may be referenced in an official tool schema, report schema, dashboard payload, scorecard rule, warning rule, or quality-flag rule until its Metric Definition Catalog entry is approved.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-380**: Metric definitions must document whether outputs are calculated facts, diagnostic estimates, warning evidence, scorecard inputs, or non-binding review context.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-382**: No file-specific non-functional requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-383**: No file-specific testing requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-384**: Public registry changes must remain auditable through tests and catalog updates.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-385**: The module must separate calculated facts from warnings, caveats, decisions, and recommended actions.  
+  *Evidence: app/services/analytics/scorecards/quality.py (`StrategyQualityAssessment`)*
+- [X] **ANL-NFR-386**: Official agent/API-facing analytics tools must be high-level, documented, typed, schema-compliant, traceable, and listed in the Official Analytics Tool Catalog.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-387**: Every official analytics tool must have a documented input schema and output schema, including required fields, optional fields, default values, accepted aliases, units, validation errors, warning codes, and JSON-safe serialization behavior.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-388**: Low-level metric kernels must not be exposed as official agent/API tools unless explicitly approved in the Official Analytics Tool Catalog.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-389**: Official analytics tools must log call start, validation failure, successful completion, controlled warning, and execution failure without logging secrets or full raw private payloads.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-390**: Warning severity must support at least informational, warning, major, critical, and blocker-level meanings.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-391**: Quality flags must separate raw metrics, normalized score inputs, penalty flags, hard blockers, recommendation evidence, and final governance decisions.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-392**: Strategy-quality and prop-firm outputs must be labeled as non-binding analytics evidence or decision context only.  
+  *Evidence: app/services/analytics/scorecards/quality.py (`StrategyQualityAssessment` disclaimer)*
+- [X] **ANL-NFR-395**: Documentation must include the Official Analytics Tool Catalog.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- [X] **ANL-NFR-396**: Documentation must include the warning-code and quality-flag catalog.  
+  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
 
 Target Class/Function:
 - scorecards_policy_boundary() -> None — Pure architectural boundary declaration.
