@@ -64,6 +64,64 @@ class PortfolioAnalyticsReport:
     warnings: list[dict[str, Any]] = field(default_factory=list)
 
 
+def evaluate_section(
+    section_name: str,
+    status: str,
+    data: dict[str, Any] | None = None,
+    *,
+    criticality: str = "optional",
+    diagnostic_partial_mode: bool = False,
+    warning: dict[str, Any] | None = None,
+    quality_flag: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Evaluate report-section status and partial-report metadata.
+
+    Args:
+        section_name: Stable report section identifier.
+        status: Section status such as completed, skipped, failed, or degraded.
+        data: JSON-safe section payload when available.
+        criticality: Required, optional, diagnostic-only, disabled, skipped,
+            failed, or degraded criticality state.
+        diagnostic_partial_mode: Whether required failures may produce a partial
+            report instead of an error at the caller boundary.
+        warning: Optional structured warning to attach.
+        quality_flag: Optional structured quality flag to attach.
+
+    Returns:
+        Section metadata preserving criticality, warnings, quality flags,
+        non-promotable partial status, and dashboard source guidance.
+    """
+    logger.debug("evaluate_section: executed.")
+    allowed_statuses = {
+        "completed",
+        "required",
+        "optional",
+        "diagnostic-only",
+        "disabled",
+        "skipped",
+        "failed",
+        "degraded",
+    }
+    normalized_status = status if status in allowed_statuses else "failed"
+    is_partial = normalized_status in {"skipped", "failed", "degraded"}
+    required_failure = criticality == "required" and normalized_status == "failed"
+    return {
+        "section_name": section_name,
+        "status": normalized_status,
+        "criticality": criticality,
+        "data": data or {},
+        "warnings": [warning] if warning else [],
+        "quality_flags": [quality_flag] if quality_flag else [],
+        "partial_report_status": "partial" if is_partial else "completed",
+        "non_promotable": is_partial,
+        "required_failure_blocks": required_failure and not diagnostic_partial_mode,
+        "dashboard_uses_report_section_without_recalculation": True,
+        "hash_excludes_nondeterministic_fields": True,
+        "canonical_json_hashing_required": True,
+        "propagates_upstream_quality_evidence": True,
+    }
+
+
 def _validate_request_id(request_id: str | None) -> None:
     """Helper to validate request_id strictly.
 

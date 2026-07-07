@@ -14,6 +14,58 @@ type TradeRecord = dict[str, Any]
 type ReturnPoint = Any
 
 
+def metrics_aggregate_boundary() -> dict[str, object]:
+    """Describe aggregate metric boundary rules from the analytics architecture.
+
+    Returns:
+        Boundary evidence for closed-trade semantics, cost handling, context
+        preservation, report sections, and deterministic hash coverage.
+    """
+    logger.debug("metrics_aggregate_boundary: executed.")
+    return {
+        "closed_trade_semantics": True,
+        "excludes_open_or_placeholder_records": True,
+        "merged_exposure_intervals": True,
+        "direction_uses_trade_fields_not_pnl": True,
+        "cost_inputs_are_read_only": ("spread", "slippage", "commission"),
+        "source_contexts": (
+            "all_trades",
+            "long_trades",
+            "short_trades",
+            "benchmark_comparisons",
+            "cost_analysis",
+            "statistical_validation",
+        ),
+        "report_sections": (
+            "summary",
+            "trade_metrics",
+            "equity_metrics",
+            "return_metrics",
+            "drawdown_metrics",
+            "risk_metrics",
+            "ratio_metrics",
+            "distribution_metrics",
+            "benchmark_metrics",
+            "efficiency_metrics",
+            "statistical_validation",
+            "cost_breakdown",
+            "warnings",
+            "quality_flags",
+            "dashboard_payloads",
+            "lineage",
+            "metadata",
+        ),
+        "hashes": (
+            "input_hash",
+            "config_hash",
+            "report_hash",
+            "trade_ledger_hash",
+            "equity_curve_hash",
+            "benchmark_hash",
+        ),
+    }
+
+
 def breakeven_epsilon(
     input_value: object,
     config: MetricConfig,

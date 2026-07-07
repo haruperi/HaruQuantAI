@@ -1,315 +1,292 @@
 # Analytics Service Module
 
-The Analytics Service provides read-only performance calculations, metrics, canonical report builders, quality scorecard evaluation, and dashboard payload formatters for strategy backtests, simulations, paper trading, and historical live results.
+Analytics V2 is the read-only performance, diagnostics, reporting, scorecard,
+and dashboard service for HaruQuantAI. It consumes backtest, simulation, paper
+trading, and historical live-trading results, then produces deterministic
+analytics evidence for humans, agents, APIs, and UI surfaces.
+
+The service does not place trades, mutate risk state, write broker state, call
+brokers, or approve live readiness. Scorecards, prop-firm compliance checks,
+and dashboard outputs are non-binding analytics evidence only.
 
 ---
 
-## 1. Overview & Architectural Boundaries
+## 1. Service Boundaries
 
-* **Read-Only Guarantee**: This service is strictly downstream of Strategies, Risk, and Persisted Data. It is completely side-effect-free: it **does not** write files, modify databases, place trades, or make direct network/broker requests.
-* **Standardized Responses**: All official tools wrap their data payloads in standard `StandardResponse` JSON envelopes (defined in `app.utils.standard`), which contain `status`, `message`, `data`, `error`, and `metadata` (tracking `request_id`, execution duration, and permission boundaries).
-* **Lineage & Timezones**: All timestamps must be timezone-aware or explicitly normalized to UTC before calculations, benchmark alignment, report hashing, or dashboard payload generation.
-
----
-
-## 2. Core Module Layout
-
-* **[adapters.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/adapters.py)**: Deserializes and normalizes raw backtest, paper, or live payloads into a canonical `TradingResult` view containing symbol parameters and timezone-aware transaction timestamps.
-* **[trade.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/trade.py)**: Implements trade stats such as win rates, consecutive win/loss streaks, duration summaries, MFE/MAE efficiency capture, and R-multiples.
-* **[equity.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/equity.py)**: Implements equity and return series calculations (percentage/log returns, daily/weekly/monthly/annual grouping).
-* **[drawdown.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/drawdown.py)**: Implements peak-to-valley drawdown depth, recovery factors, drawdown duration in hours, pain index, and ulcer index.
-* **[risk.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/risk.py)**: Implements Volatility, Value at Risk (VaR), Conditional VaR (CVaR), and compounding risk of ruin Monte Carlo simulations.
-* **[ratios.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/ratios.py)**: Implements Sharpe, Sortino, Omega, Gain-to-Pain, Edge, Expectancy, and Kappa ratios.
-* **[distributions.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/distributions.py)**: Implements skewness, excess kurtosis, Jarque-Bera and Shapiro-Wilk normality tests, and outlier flags.
-* **[benchmark.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/benchmark.py)**: Performs UTC-first chronological alignment of strategy and benchmark streams, calculating Beta, annualized Jensen Alpha, Tracking Error, and Information Ratio.
-* **[efficiency.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/efficiency.py)**: Implements capital deployment efficiency (return per adverse excursion mae/mfe and calendar days).
-* **[scorecard.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/scorecard.py)**: Scorecard evaluator assigning a quality score between `0` and `100`, listing strategy strengths, warnings, and recommendations.
-* **[report.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/report.py)**: Orchestrates individual report building (`AnalyticsReport`) or portfolio report building (`PortfolioAnalyticsReport`).
-* **[dashboard.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/analytics/dashboard.py)**: Formats reports and curves into dashboard-ready JSON structures (extrema downsampling, summary cards, returns heatmap).
+- **Read-only by design**: Analytics is downstream of data, strategies,
+  simulator, trading, and risk services.
+- **No live side effects**: No order placement, broker mutation, email, network
+  sends, database writes, or risk-limit changes are performed by this module.
+- **Standard envelopes**: Public tool functions return `StandardResponse`
+  dictionaries with `status`, `message`, `data`, `error`, and `metadata`.
+- **Deterministic outputs**: Hashing, truncation, catalog validation, schema
+  checks, and examples are deterministic for reproducible audits.
+- **Fail-closed validation**: Unsupported schema versions, malformed catalogs,
+  invalid requests, non-finite numeric results, and configured workload-limit
+  breaches fail closed.
+- **Precision policy**: Money-like values use `Decimal` conversion where
+  required by contracts; ratios and returns are float64-style calculations with
+  documented tolerances.
 
 ---
 
-## 3. Official AI Tools & Facade API
+## 2. V2 Package Layout
 
-Exposed at the root service level (`from app.services.analytics import ...`):
+| Package | Purpose |
+| ------- | ------- |
+| `adapters/` | Protocols, canonicalization, and journal adapters that convert external result payloads into the analytics trading-result shape. |
+| `benchmarks/` | Strategy-vs-benchmark alignment and relative metrics such as alpha, beta, tracking error, information ratio, batting average, and capture ratios. |
+| `boundaries/` | Request validation, workload limits, response envelopes, numeric casting, request IDs, and redaction helpers. |
+| `contracts/` | Versioned models, metric catalogs, official tool catalog, schema compatibility matrix, warning catalogs, quality flags, and JSON-safe serialization. |
+| `dashboards/` | Overview payload builders, summary-card projections, typed dashboard payloads, and deterministic truncation/downsampling. |
+| `metrics/` | Metric kernels for trades, position exposure, costs, efficiency, time analysis, PnL, curves, equity/returns, drawdown, risk, ratios, distributions, R-multiples, and aggregation. |
+| `registry/` | Lightweight active-request registry helpers for traceable analytics execution. |
+| `reports/` | Report orchestration, section status handling, portfolio reports, comparisons, compliance evidence, formatting, serialization, and report hashing. |
+| `scorecards/` | Non-binding strategy quality labels, rules, SQN checks, warnings, and recommended action evidence. |
+| `statistics/` | Distribution diagnostics, multiple-testing controls, bootstrap confidence intervals, permutation tests, and overfitting diagnostics. |
+| `tool_api.py` | Architecture-approved public read-only tool facade for agents and API layers. |
 
-* **`build_analytics_report`**: Generates a complete structured report from a raw backtest/trading result.
-* **`build_portfolio_analytics_report`**: Merges multiple trading results into a single portfolio performance report.
-* **`evaluate_strategy_quality`**: Evaluates strategy quality metrics and assigns a quality score using `scorecard.py`.
-* **`compare_analytics_reports`**: Compares a candidate report against a baseline report to compute differences.
-* **`calculate_trade_metrics`**: Computes core realized trade stats.
-* **`calculate_equity_metrics`**: Computes total returns and maximum drawdowns from equity curves.
-* **`calculate_drawdown_metrics`**: Computes detailed ulcer, pain, and drawdown stats.
-* **`calculate_risk_metrics`**: Computes VaR, CVaR, and returns volatilities.
-* **`calculate_benchmark_metrics`**: Aligns streams and computes alpha, beta, and information ratios.
-* **`calculate_statistical_validation`**: Computes deflated Sharpe ratio, backtest overfitting probability, and permutation tests.
-* **`calculate_prop_firm_compliance`**: Evaluates compliance checks (daily drawdown limits, sizing, consistency).
-* **`get_analytics_overview`**: Provides an overview split into long/short/all trade subsets.
-* **`sample_size_warning`**: Warns when sample size is below recommended minimums.
-* **`bootstrap_probability_above_threshold`**: Estimates metric probabilities using bootstrapping.
+The package root `app.services.analytics` re-exports the approved public
+surface for convenient imports while the subpackages remain the source of truth
+for implementation ownership.
 
 ---
 
-## 4. Component Architecture & Class Relationships
+## 3. Public Tool Facade
 
-The diagram below outlines how raw trading results are adapted into canonical schemas, processed by separate specialized metrics kernels, and compiled by orchestrators into standardized envelopes, scorecard evaluations, or downsampled dashboard payloads.
+Use `app.services.analytics.tool_api` for the architecture-approved high-level
+tool boundary:
 
-```mermaid
-classDiagram
-    class TradingResultAdapter {
-        <<Adapter>>
-        +REQUIRED_KEYS: set
-        +to_canonical(source_payload: dict) dict$
-    }
+- `get_analytics_overview(request, request_id=None)`
+- `build_analytics_report(request, request_id=None)`
+- `build_portfolio_analytics_report(portfolio_result, request_id=None)`
+- `compare_analytics_reports(reference_report, candidate_report, request_id=None)`
+- `evaluate_strategy_quality(report, request_id=None)`
+- `calculate_trade_metrics(trades, request_id=None)`
+- `calculate_equity_metrics(equity_curve, request_id=None)`
+- `calculate_drawdown_metrics(equity_curve, request_id=None)`
+- `calculate_risk_metrics(returns, request_id=None)`
+- `calculate_benchmark_metrics(strategy_returns, benchmark_returns, request_id=None)`
+- `calculate_statistical_validation(returns, request_id=None)`
+- `calculate_prop_firm_compliance(report, request_id=None)`
 
-    class AnalyticsReportOrchestrator {
-        <<Orchestrator>>
-        +build_analytics_report(trading_result: dict, diagnostic_partial_mode: bool, request_id: str) StandardResponse
-        +build_portfolio_analytics_report(portfolio_result: dict, request_id: str) StandardResponse
-        +compare_analytics_reports(reference_report: dict, candidate_report: dict, request_id: str) StandardResponse
-        +calculate_statistical_validation(returns: list, request_id: str) StandardResponse
-        +calculate_prop_firm_compliance(report: dict, request_id: str) StandardResponse
-    }
+The facade adds default configuration-source metadata and marks analytics
+outputs as non-binding evidence. It also records forbidden claims such as final
+approval, live readiness, prop-firm enforcement, and risk-limit approval.
 
-    class MetricKernels {
-        <<Kernels>>
-        +calculate_trade_metrics(trades: list) StandardResponse
-        +calculate_equity_metrics(equity_curve: list) StandardResponse
-        +calculate_drawdown_metrics(equity_curve: list) StandardResponse
-        +calculate_risk_metrics(returns_series: list) StandardResponse
-        +calculate_ratio_metrics(returns_series: list) StandardResponse
-        +calculate_distribution_metrics(returns_series: list) StandardResponse
-        +calculate_benchmark_metrics(strategy_returns: list, benchmark_returns: list) StandardResponse
-    }
+---
 
-    class ScorecardEvaluator {
-        <<Evaluator>>
-        +evaluate_strategy_quality(report: dict, request_id: str) StandardResponse
-    }
+## 4. Contracts and Catalogs
 
-    class DashboardFormatter {
-        <<Formatter>>
-        +build_overview_payload(report: dict, request_id: str) StandardResponse
-        -_downsample_curve(curve: list, max_points: int) dict
-    }
+Analytics V2 exposes durable contracts from `app.services.analytics.contracts`.
 
-    class StandardResponse {
-        <<Data Envelope>>
-        +status: str
-        +message: str
-        +data: dict
-        +error: dict
-        +metadata: dict
-    }
+| Contract | Description |
+| -------- | ----------- |
+| `MetricConfig` | Calculation configuration, metadata, annualization, risk-free rate, tolerances, and sample-size controls. |
+| `MetricResult` | Standard metric result container with value, unit, warnings, confidence, and metadata. |
+| `TradingResult` | Canonical trading-result model used after adapter normalization. |
+| `AnalyticsReport` | Versioned analytics report contract. |
+| `PortfolioAnalyticsReport` | Portfolio-level report contract. |
+| `DashboardPayload` | Dashboard-ready payload contract. |
+| `ToolEnvelope` | Tool-facing response envelope contract. |
+| `PrecisionPolicy` | JSON-safe and decimal precision behavior. |
 
-    TradingResultAdapter ..> AnalyticsReportOrchestrator : prepares dict input
-    AnalyticsReportOrchestrator --> MetricKernels : coordinates calculations
-    AnalyticsReportOrchestrator ..> ScorecardEvaluator : reports evaluated by
-    AnalyticsReportOrchestrator ..> DashboardFormatter : reports formatted by
-    MetricKernels ..> StandardResponse : returns
-    AnalyticsReportOrchestrator ..> StandardResponse : returns
-    ScorecardEvaluator ..> StandardResponse : returns
-    DashboardFormatter ..> StandardResponse : returns
+Important catalogs and validators:
+
+- `METRIC_DEFINITION_CATALOG` records approved metric formulas, units, input
+  requirements, undefined-result behavior, confidence metadata, aliases, and
+  fixture expectations.
+- `OFFICIAL_ANALYTICS_TOOL_CATALOG` records public tool contracts,
+  side-effect profiles, stability labels, error codes, and test evidence paths.
+- `SCHEMA_COMPATIBILITY_MATRIX` classifies accepted, deprecated,
+  legacy-adapted, rejected, and future schema versions.
+- `WARNING_CATALOG` and `QUALITY_FLAG_CATALOG` keep warnings separate from
+  calculated facts.
+- `validate_metric_catalog()` and `validate_schema_version()` are the normal
+  fail-closed validation entry points.
+
+R-multiple fallback behavior is cataloged before use. Fallback-derived
+R-multiple values carry warning metadata and degraded confidence.
+
+---
+
+## 5. Metrics Surface
+
+The metric kernels are intentionally split by domain so tests and audit
+evidence can stay precise.
+
+| File | Main responsibility |
+| ---- | ------------------- |
+| `metrics/position_exposure.py` | Position size, open PnL, time in market, slippage, commission, and swap exposure. |
+| `metrics/trade_outcomes.py` | Closed-trade filtering, win/loss classification, streaks, expectancy, entropy, and outcome stability. |
+| `metrics/r_multiples.py` | R-multiple extraction and R-based trade summaries. |
+| `metrics/costs.py` | Spread, slippage, and commission impact. |
+| `metrics/efficiency.py` | MAE/MFE capture, capital efficiency, loss containment, and return per time unit. |
+| `metrics/time_analysis.py` | Period, session, duration, and long/short time analysis. |
+| `metrics/pnl.py` | Net/gross PnL, return on capital, CAGR, runup, and drawdown-linked PnL selectors. |
+| `metrics/curves.py` | Balance and equity curve construction from closed trades. |
+| `metrics/equity.py` | Equity returns, return grouping, volatility helpers, benchmark returns, and return metrics. |
+| `metrics/drawdown.py` | Drawdown series, durations, ulcer/pain metrics, recovery factors, and drawdown probabilities. |
+| `metrics/risk.py` | Volatility, VaR, CVaR, expected shortfall, risk of ruin, exposure, and portfolio risk helpers. |
+| `metrics/ratios.py` | Sharpe, Sortino, Omega, profit factor, SQN, Kappa, gain-to-pain, edge, and related ratios. |
+| `metrics/aggregate.py` | Subset-level aggregation and report-facing trade metric composition. |
+| `metrics/distribution.py` | Metric-level distribution summaries, bootstrapping, false-discovery, and tail diagnostics. |
+| `metrics/exports.py` | Compatibility aliases for shared analytics metric names. |
+
+`metrics/equity.py` is the canonical equity and returns module. V2 does not
+keep a separate compatibility module for equity returns.
+
+---
+
+## 6. Reports, Scorecards, and Dashboards
+
+Reports are built in `reports/sections.py` and serialized in
+`reports/formatters.py`. Report hashes are produced by `reports/hashes.py` so
+report evidence can be reproduced and compared.
+
+Report builders support:
+
+- Full analytics reports from canonical trading-result payloads.
+- Portfolio analytics reports.
+- Candidate-vs-baseline report comparison.
+- Statistical validation evidence.
+- Prop-firm compliance evidence.
+- Backtest report formatting for downstream consumers.
+- Markdown, JSON-safe, and row-oriented summary serialization helpers.
+
+Scorecards in `scorecards/quality.py` evaluate strategy quality without
+granting approval. They may emit labels, sample-size warnings, strengths,
+warnings, and recommended actions.
+
+Dashboards in `dashboards/overview.py` and `dashboards/truncation.py` convert
+reports into UI-ready payloads with summary cards, curves, warnings, quality
+flags, status metadata, and deterministic truncation metadata. Truncated series
+include original count, returned count, max points, truncation flag, and method.
+
+---
+
+## 7. Usage Examples
+
+The executable walkthrough lives in `tests/usage/06_analytics.py`. It uses
+deterministic in-memory payloads only and demonstrates:
+
+1. Contracts, schema compatibility, metric catalog validation, warnings,
+   serialization, and registry helpers.
+2. Adapter protocols, canonicalization, and journal adapters.
+3. Position exposure metrics.
+4. Trade outcome metrics.
+5. R-multiple metrics.
+6. Cost impact metrics.
+7. Efficiency metrics.
+8. Time analysis metrics.
+9. PnL metrics.
+10. Curve construction.
+11. Equity and return metrics.
+12. Drawdown metrics.
+13. Risk metrics.
+14. Ratio metrics.
+15. Aggregate analytics.
+16. Boundary validation, limits, redaction, and numeric casting.
+17. Multiple-testing diagnostics.
+18. Distribution diagnostics.
+19. Resampling diagnostics.
+20. Benchmark metrics.
+21. Scorecards.
+22. Reports, formatting, hashing, comparisons, and compliance evidence.
+23. Dashboard payloads and truncation.
+
+Run it with:
+
+```powershell
+uv run python tests\usage\06_analytics.py
 ```
 
----
-
-## 5. Usage Examples
-
-Below is a walkthrough of typical programmatic interactions with the Analytics service facade. All facade functions return standard, typed envelopes.
-
-### 5.1 Realizing Trade & Curve Metrics Directly
-
-You can calculate individual performance indicators from trade logs and curves:
+Minimal high-level tool example:
 
 ```python
-from app.services.analytics import calculate_trade_metrics, calculate_equity_metrics
-
-# 1. Closed trades list
-trades = [
-    {
-        "trade_id": "t1",
-        "symbol": "EURUSD",
-        "direction": "long",
-        "open_time": "2026-01-02T00:00:00Z",
-        "close_time": "2026-01-02T04:00:00Z",
-        "net_pnl": 150.0,
-        "initial_risk": 50.0,
-        "mae": -10.0,
-        "mfe": 200.0,
-    },
-    {
-        "trade_id": "t2",
-        "symbol": "EURUSD",
-        "direction": "short",
-        "open_time": "2026-01-03T00:00:00Z",
-        "close_time": "2026-01-03T06:00:00Z",
-        "net_pnl": -50.0,
-        "initial_risk": 50.0,
-        "mae": -60.0,
-        "mfe": 5.0,
-    }
-]
-
-trade_res = calculate_trade_metrics(trades, request_id="req_trade_01")
-if trade_res["status"] == "success":
-    stats = trade_res["data"]
-    print(f"Total Trades: {stats['total_trades']}")
-    print(f"Win Rate: {stats['win_rate']}")
-    print(f"Profit Factor: {stats['profit_factor']}")
-
-# 2. Equity curves list
-equity_curve = [
-    {"timestamp": "2026-01-01T00:00:00Z", "equity": 10000.0},
-    {"timestamp": "2026-01-02T04:00:00Z", "equity": 10150.0},
-    {"timestamp": "2026-01-03T06:00:00Z", "equity": 10100.0},
-]
-
-equity_res = calculate_equity_metrics(equity_curve, request_id="req_eq_01")
-if equity_res["status"] == "success":
-    eq_stats = equity_res["data"]
-    print(f"Total Return %: {eq_stats['total_return_percent']}")
-    print(f"Total Return USD: {eq_stats['total_return_usd']}")
-```
-
-### 5.2 Building a Full Analytics Report
-
-Use the orchestrator tool to build a complete canonical report, perform timezone normalizations, generate quality flags, and compute ratios, drawdowns, and distribution summaries:
-
-```python
-from app.services.analytics import build_analytics_report
+from app.services.analytics.tool_api import build_analytics_report
 
 trading_result = {
     "schema_version": "1.3.1",
-    "result_id": "bt_run_example_06",
+    "result_id": "bt_run_example",
     "phase": "backtest",
-    "strategy_id": "strategy_trend_follower",
-    "strategy_version": "v1.2",
+    "strategy_id": "strategy_example",
+    "strategy_version": "v1",
     "account_base_currency": "USD",
-    "start_time": "2026-01-01T00:00:00Z",
-    "end_time": "2026-01-31T23:59:59Z",
     "symbols": ["EURUSD"],
     "timeframe": "H1",
-    "trades": trades,
-    "equity_curve": equity_curve,
-    "benchmark_curve": [
-        {"timestamp": "2026-01-01T00:00:00Z", "equity": 10000.0},
-        {"timestamp": "2026-01-02T04:00:00Z", "equity": 10050.0},
-        {"timestamp": "2026-01-03T06:00:00Z", "equity": 10020.0},
+    "trades": [
+        {
+            "trade_id": "t1",
+            "symbol": "EURUSD",
+            "direction": "long",
+            "open_time": "2026-01-01T00:00:00Z",
+            "close_time": "2026-01-01T04:00:00Z",
+            "profit_loss": 100.0,
+            "net_pnl": 100.0,
+            "initial_risk": 50.0,
+            "mae": -20.0,
+            "mfe": 140.0,
+        }
     ],
-    "metadata": {"data_quality_status": "passed"},
+    "equity_curve": [
+        {"timestamp": "2026-01-01T00:00:00Z", "equity": 10000.0},
+        {"timestamp": "2026-01-01T04:00:00Z", "equity": 10100.0},
+    ],
 }
 
-report_res = build_analytics_report(trading_result, request_id="req_report_01")
-if report_res["status"] == "success":
-    report = report_res["data"]
-    print(f"Report ID: {report['report_id']}")
-    print(f"Report Status: {report['report_status']}")
-```
-
-### 5.3 Quality Scorecard and Dashboard Payload Preparation
-
-You can check whether a report meets promotion guidelines and formatting requirements for visual rendering:
-
-```python
-from app.services.analytics import evaluate_strategy_quality, build_overview_payload
-
-if report_res["status"] == "success":
-    report = report_res["data"]
-
-    # 1. Evaluate quality
-    scorecard_res = evaluate_strategy_quality(report, request_id="req_scorecard_01")
-    if scorecard_res["status"] == "success":
-        card = scorecard_res["data"]
-        print(f"Quality Score: {card['score']}/100")
-        print(f"Strengths: {card['strengths']}")
-        print(f"Warnings: {card['warnings']}")
-        print(f"Action: {card['recommended_action']}")
-
-    # 2. Format for Dashboard (reduces equity curve points down to 100)
-    dashboard_res = build_overview_payload(report, request_id="req_dash_01")
-    if dashboard_res["status"] == "success":
-        payload = dashboard_res["data"]
-        print(f"Summary Cards: {payload['summary_cards']}")
-        print(f"Chart Points: {payload['equity_curve_chart']['returned_count']}")
+response = build_analytics_report(trading_result, request_id="readme-example")
+if response["status"] == "success":
+    report = response["data"]
+    print(report["report_id"])
 ```
 
 ---
 
-## 6. Catalogs, Schemas, and Limits
+## 8. Architecture Flow
 
-The Analytics service exposes durable catalog objects from `app.services.analytics`
-so agents and APIs can inspect approved public behavior without deep imports.
+```mermaid
+flowchart LR
+    Source["Backtest, simulation, paper, or historical live result"]
+    Adapters["adapters/*"]
+    Contracts["contracts/*"]
+    Boundaries["boundaries/*"]
+    Metrics["metrics/* and statistics/*"]
+    Reports["reports/*"]
+    Scorecards["scorecards/*"]
+    Dashboards["dashboards/*"]
+    Facade["tool_api.py"]
+    Consumers["Agents, APIs, UI, tests"]
 
-### 6.1 Official Analytics Tool Catalog
-
-`OFFICIAL_ANALYTICS_TOOL_CATALOG` maps every approved high-level tool to:
-
-- input schema summary
-- output schema summary
-- stable error codes
-- side-effect profile
-- stability label (`stable`, `approved_experimental`, `deprecated`, or `internal_support_only`)
-- agent/API safety
-- test evidence paths
-
-Approved high-level tools include `build_analytics_report`,
-`build_portfolio_analytics_report`, `evaluate_strategy_quality`,
-`calculate_trade_metrics`, `calculate_equity_metrics`,
-`calculate_drawdown_metrics`, `calculate_risk_metrics`,
-`calculate_benchmark_metrics`, `calculate_statistical_validation`,
-`calculate_prop_firm_compliance`, and `build_overview_payload`.
-
-Low-level metric kernels remain developer/internal helpers unless they are listed
-in the catalog as agent/API-safe tools.
-
-### 6.2 Metric Definition Catalog
-
-`METRIC_DEFINITION_CATALOG` records formulas, units, required inputs, optional
-inputs, aliases, return scale, annualization basis, sample convention, minimum
-sample size, undefined-result behavior, golden-fixture expectations, role, and
-confidence for approved metrics. R-multiple proxy behavior is explicitly listed
-as degraded confidence under `r_multiple_proxy_profit_loss`.
-
-Use `validate_metric_catalog()` to fail closed if a catalog entry is malformed.
-
-### 6.3 Schema Compatibility Matrix
-
-`SCHEMA_COMPATIBILITY_MATRIX` classifies report/result schemas as `accepted`,
-`deprecated`, `legacy_adapted`, `rejected`, or `unsupported_future`. The current
-accepted analytics schema version is `1.3.1`; older compatible 1.x schemas are
-treated as legacy-adapted or deprecated, and future major versions are rejected
-until explicitly approved.
-
-### 6.4 Warning and Quality Flags
-
-Warnings and quality flags are separated from calculated facts. Supported
-severity meanings are `informational`, `warning`, `major`, `critical`, and
-`blocker`. Strategy-quality and prop-firm outputs are non-binding analytics
-evidence only; they do not approve live trading or mutate risk/trading state.
-
-### 6.5 Dashboard Payload Classes and Truncation
-
-Required dashboard payload classes are summary cards, equity curve charts,
-drawdown section status, warnings, quality flags, and metadata. Optional classes
-include monthly return heatmaps, rolling ratios, rolling drawdown, trade
-distribution, cost breakdown, and symbol contribution. Future classes must be
-added to the catalog before becoming public.
-
-Dashboard truncation is deterministic. Truncated series include whether
-truncation occurred, original count, returned count, max points, and the
-downsample method.
+    Source --> Adapters
+    Adapters --> Contracts
+    Contracts --> Boundaries
+    Boundaries --> Metrics
+    Metrics --> Reports
+    Reports --> Scorecards
+    Reports --> Dashboards
+    Reports --> Facade
+    Scorecards --> Facade
+    Dashboards --> Facade
+    Facade --> Consumers
+```
 
 ---
 
-## 7. Run Verification Tests & Examples
+## 9. Verification
 
-To run the full suite of unit tests verifying all calculators and standard envelopes:
-```bash
-.venv\Scripts\pytest tests/unit/app/services/analytics/ -o addopts="" --cov=app/services/analytics --cov-report=term-missing
+Run the analytics usage example:
+
+```powershell
+uv run python tests\usage\06_analytics.py
 ```
 
-To run the comprehensive end-to-end usage example showing tool execution:
-```bash
-.venv\Scripts\python tests/usage/app/services/06_analytics.py
+Run the analytics unit and traceability suite with per-file coverage:
+
+```powershell
+uv run pytest tests\unit\app\services\analytics tests\services\analytics --cov-reset --cov=app.services.analytics --cov-report=term-missing --no-cov-on-fail
 ```
+
+Current V2 expectation: every file under `app/services/analytics` remains above
+the 80% coverage gate, and the module-level analytics coverage remains above
+80%.

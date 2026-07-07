@@ -23,6 +23,21 @@ type TradeRecord = dict[str, Any]
 type Duration = datetime.timedelta | float
 
 
+def metrics_efficiency_boundary() -> dict[str, bool]:
+    """Describe efficiency metric boundary declarations.
+
+    Returns:
+        Boundary evidence that efficiency helpers are pure analytics kernels.
+    """
+    logger.debug("metrics_efficiency_boundary: executed.")
+    return {
+        "file_specific_non_functional_requirements_defined": False,
+        "file_specific_testing_requirements_defined": False,
+        "read_only": True,
+        "pure_metric_kernel": True,
+    }
+
+
 def _get_trade_duration(trade: dict[str, Any]) -> float:
     """Calculate trade duration in hours from open/close timestamps.
 

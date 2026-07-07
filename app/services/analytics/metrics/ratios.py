@@ -1238,3 +1238,42 @@ def calculate_ratio_metrics(
             reads=True,
         )
         return response_from_exception(exception=e, metadata=meta)
+
+
+def up_down_capture(
+    strategy_returns: Sequence[float],
+    benchmark_returns: Sequence[float],
+) -> dict[str, float]:
+    """Calculate up-capture and down-capture ratios.
+
+    Args:
+        strategy_returns: Strategy return sequence.
+        benchmark_returns: Benchmark return sequence.
+
+    Returns:
+        Up-capture and down-capture ratios.
+    """
+    logger.debug("ratios.up_down_capture: executed.")
+    from app.services.analytics.benchmarks.metrics import (
+        up_down_capture as benchmark_up_down_capture,
+    )
+
+    return benchmark_up_down_capture(strategy_returns, benchmark_returns)
+
+
+def deflated_sharpe_ratio(sharpe: float, returns: list[float]) -> float:
+    """Adjust Sharpe ratio diagnostics for multiple testing and non-normality.
+
+    Args:
+        sharpe: Observed Sharpe ratio.
+        returns: Return sequence used for diagnostic context.
+
+    Returns:
+        Deflated Sharpe diagnostic value.
+    """
+    logger.debug("ratios.deflated_sharpe_ratio: executed.")
+    from app.services.analytics.statistics.multiple_testing import (
+        deflated_sharpe_ratio as statistics_deflated_sharpe_ratio,
+    )
+
+    return statistics_deflated_sharpe_ratio(sharpe, returns)

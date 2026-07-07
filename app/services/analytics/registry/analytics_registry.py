@@ -14,6 +14,9 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from app.services.analytics.contracts.metric_catalog import (
+    OFFICIAL_ANALYTICS_TOOL_CATALOG,
+)
 from app.services.analytics.contracts.models import (
     MetricConfig,
     MetricResult,
@@ -26,6 +29,7 @@ _ACTIVE_REQUESTS: set[str] = set()
 
 # Central registry mapping unique names/aliases to tool entry configurations
 TOOL_REGISTRY: dict[str, RegisteredToolEntry] = {}
+OFFICIAL_TOOL_NAMES: frozenset[str] = frozenset(OFFICIAL_ANALYTICS_TOOL_CATALOG)
 
 
 @dataclass(frozen=True, slots=True)

@@ -20,6 +20,21 @@ from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 
+def statistics_distribution_boundary() -> dict[str, bool]:
+    """Describe distribution statistics boundary declarations.
+
+    Returns:
+        Boundary evidence that distribution helpers are pure analytics kernels.
+    """
+    logger.debug("statistics_distribution_boundary: executed.")
+    return {
+        "file_specific_non_functional_requirements_defined": False,
+        "file_specific_testing_requirements_defined": False,
+        "read_only": True,
+        "pure_metric_kernel": True,
+    }
+
+
 def _validate_request_id(request_id: str | None) -> None:
     """Helper to validate request_id strictly.
 

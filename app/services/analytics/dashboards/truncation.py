@@ -116,8 +116,9 @@ def truncate_series(
             trough_val = val
             trough_idx = i
 
-    # Step-based decimation
-    step = max(n // (max_points - 4), 1)
+    # Step-based decimation, reserving room for first/last and extrema.
+    decimation_slots = max(max_points - 4, 1)
+    step = max(n // decimation_slots, 1)
     indices = {0, n - 1, peak_idx, trough_idx}
     for i in range(0, n, step):
         indices.add(i)

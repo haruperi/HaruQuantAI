@@ -44,6 +44,10 @@ All notable HaruQuantAI project changes should be recorded here.
 | FIX-001 | Windows CI & Dependency Constraints | Configured CI quality gates to run on `windows-latest` and set `pyproject.toml` dependency management to target `sys_platform == 'win32'` and `platform_machine == 'AMD64'`. |
 | FIX-002 | `pytest` Import Collisions & Circularity | Resolved circular dependency between `errors.py` and `security.py` by making imports local, and configured `import_mode = "importlib"` in `pyproject.toml` to prevent test namespace pollution. |
 | FIX-003 | Logging Consolidation | Merged `logging.py` into `logger.py` to simplify logging namespaces and prevent multiple configuration files. |
+| FIX-004 | Analytics Requirement Traceability | Completed analytics requirement traceability anchors, restored analytics test collection, added architecture-required catalog/test paths, and documented the full analytics audit evidence report. |
+| FIX-005 | Analytics Usage Examples | Reworked `tests/usage/06_analytics.py` into 23 executable analytics examples, aligned equity-return traceability to `equity.py`, and fixed dashboard truncation for small point limits. |
+| FIX-006 | Analytics Per-File Coverage | Added analytics usage and metric-surface pytest coverage so every file under `app/services/analytics` is above the 80% coverage gate. |
+| FIX-007 | Analytics V2 README | Rewrote `app/services/analytics/README.md` to document the V2 package layout, public tool facade, contracts, metric surface, usage examples, reports, dashboards, and verification commands. |
 
 
 

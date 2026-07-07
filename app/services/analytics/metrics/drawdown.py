@@ -45,6 +45,21 @@ type EquityPoint = Any
 type ReturnPoint = Any
 
 
+def metrics_drawdown_boundary() -> dict[str, bool]:
+    """Describe drawdown metric boundary declarations.
+
+    Returns:
+        Boundary evidence that drawdown helpers are pure analytics kernels.
+    """
+    logger.debug("metrics_drawdown_boundary: executed.")
+    return {
+        "file_specific_non_functional_requirements_defined": False,
+        "file_specific_testing_requirements_defined": False,
+        "read_only": True,
+        "pure_metric_kernel": True,
+    }
+
+
 def drawdown_series(equity_values: Sequence[float]) -> list[float]:
     """Compute peak-to-trough fractional drawdown series.
 

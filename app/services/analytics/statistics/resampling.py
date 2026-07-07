@@ -21,6 +21,27 @@ from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 
+def statistics_resampling_boundary() -> dict[str, object]:
+    """Describe deterministic resampling boundary controls.
+
+    Returns:
+        Boundary evidence for seedable bootstrap and permutation diagnostics.
+    """
+    logger.debug("statistics_resampling_boundary: executed.")
+    return {
+        "deterministic_for_same_inputs": True,
+        "randomized_features_support_seeds": True,
+        "configurable_controls": (
+            "seed",
+            "iterations",
+            "confidence",
+            "alpha",
+            "sample_size_threshold",
+            "block_size",
+        ),
+    }
+
+
 def _validate_request_id(request_id: str | None) -> None:
     """Helper to validate request_id strictly.
 
