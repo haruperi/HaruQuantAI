@@ -30,7 +30,9 @@ class Doji(BaseIndicator):
     pd.DataFrame: Original DataFrame with 'candle_doji' column added (1 if Doji, 0 otherwise).
     """
 
-    def calculate(self, df: pd.DataFrame, threshold: float = 0.1, **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, threshold: float = 0.1, **kwargs: Any
+    ) -> pd.Series:
         required_cols = ["open", "high", "low", "close"]
         for col in required_cols:
             if col not in df.columns:
@@ -38,13 +40,11 @@ class Doji(BaseIndicator):
         if threshold <= 0:
             raise ValueError("Threshold must be positive.")
 
-        result_df = df.copy()
-
         h_range = df["high"] - df["low"]
         body = (df["close"] - df["open"]).abs()
 
         is_doji = (body <= threshold * h_range) & (h_range > 0)
         pattern = np.where(is_doji, 1, 0)
 
-        result_df["candle_doji"] = pattern
-        return result_df
+        doji = pd.Series(pattern, index=df.index, name="candle_doji")
+        return doji

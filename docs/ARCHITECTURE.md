@@ -1,85 +1,199 @@
-# HaruQuantAI Architecture Specification (Compressed)
+# HaruQuantAI System Architecture (Dense Reference)
 
-## 1. Vision & Architecture
-**Purpose:** A modular, AI-assisted quantitative trading platform prioritizing safe service boundaries, governed execution, reproducible research, and strict kill-switches. 
-**Architecture:** Modular monolith with strict service-oriented boundaries.
-*   **Layer 1:** UI / Conversation / Research
-*   **Layer 2:** API Gateway / Auth / Tool Access Control
-*   **Layer 3:** Optimization / Simulation / Analytics
-*   **Layer 4:** Trading / Risk / Strategy / Indicator
-*   **Layer 5:** Data / Broker Adapters / State Persistence
-*   **Layer 6:** Utils (Settings, logging, event bus, security)
+## System Overview & Tech Stack
 
-## 2. Actors & Core Workflows
-**Actors:** 
-*   *Human:* Owner, Operator, Researcher, Strategy Dev, Risk Manager, Compliance, Viewer.
-*   *System:* AI Agent (bounded by policy), Service Account, Broker Adapter (external boundary).
+* **Architectural Pattern**: Modular monolith with service-oriented module boundaries. Aligns research, simulation, paper, and live environments while preventing any bypass of system controllers.
+* **Production Stack Baseline**:
+  * *Backend*: Python 3.14, managed with `uv`. FastAPI, Pydantic, Uvicorn (introduced once the API Gateway module lands).
+  * *Frontend*: Next.js, React, TypeScript, Tailwind CSS, Radix UI (introduced once the UI module lands).
+  * *Persistence*: SQLite (launch baseline); SQL migrations tracked under `data/database/migrations/`.
+  * *Data Science*: `pandas`, `numpy`, `scipy`, `scikit-learn`, `numba`, approved `pyarrow`/`fastparquet`.
+  * *Broker Gate*: MetaTrader5 (MT5).
+  * *Quality Gate*: `ruff` (lint + format), `mypy` (static types), `pytest` (tests/coverage), `pre-commit` (enforced hook chain).
 
-**Core Trading Pipeline:** `Strategy (Signal)` → `Risk (Decision)` → `Trading (Order Intent)` → `Broker (Receipt)`
+* **Runtime Execution Modes**:
+  * `Research`: Data and feature exploration. Zero live broker mutations.
+  * `Simulation`: Historical backtests via the core trading path. Simulated side effects.
+  * `Paper`: Live paths executed against demo infrastructure. Paper side effects.
+  * `Live`: Real capital transaction. Disabled by default; mandates all functional safety gates. Explicit toggle: `ALLOW_LIVE_MUTATIONS=false`.
 
-**Workflows:**
-1.  **Research:** Load data → Explore → Versioned spec → Simulate → Governed promotion.
-2.  **Paper Trade:** Signal → Risk eval → Order intent → Paper execution → Audit.
-3.  **Live Trade:** Auth → Signal → Risk/Gates → Order intent → **Broker execution (only if explicitly enabled)** → Reconciliation.
-4.  **AI Conversation:** Prompt → Redacted action draft → Governance approval → Backend execution.
+---
 
-## 3. Runtime & Environments
-*   **Stack:** FastAPI/Pydantic (BE), Next.js/TS (FE), SQLite (State), MetaTrader5 (Baseline Broker).
-*   **Execution Modes:** 
-    *   `Research`: No broker mutation. 
-    *   `Simulation`: Simulated side-effects only. 
-    *   `Paper`: Demo side-effects only. 
-    *   `Live`: **Disabled by default.** Requires full safety gates and explicit approval.
-*   **Key Config:** `ALLOW_LIVE_MUTATIONS=false` (default), `ENVIRONMENT`, `DATABASE_URL`, `LOG_LEVEL`.
-*   **Folder Structure:** `app/` (core), `agentic/` (AI runtime/policy), `data/` (SQLite/migrations), `ui/` (Next.js), `tests/`, `scripts/`, `docs/`.
+## Current Implementation State
 
-## 4. Global Invariants & Non-Negotiables
-*   **Strict Boundaries:** Strategies emit *Signals* (never orders). Risk intercepts *all* signals. Trading creates deterministic *Order Intents*. AI drafts *Actions* (never executes directly). Utils are shared foundation only.
-*   **Fail-Closed:** Live trading fails closed by default. Missing context, stale data, or active kill-switches block execution.
-*   **Traceability & Idempotency:** All cross-module/financial actions require `request_id`, `correlation_id`, and `workflow_id`. Financial paths require idempotency keys.
-*   **Data Rules:** UUID4/ULID IDs, UTC timestamps, `*_json` suffixes, strict table namespaces (`core_`, `risk_`, `gov_`, `audit_`, etc.), no casual floats for prices.
-*   **Security & Safety:** Validate *before* side-effects. Redact secrets in logs/errors. Retry *only* known safe transients. 
+> This section tracks reality; the rest of this document describes the target architecture. Update it as modules land — see [docs/CHANGELOG.md](CHANGELOG.md) for history.
 
-## 5. Module Contracts & I/O
+* Project scaffolded with `uv` (Python 3.14, `pyproject.toml`, `uv.lock`).
+* Tooling configured: `ruff` (full rule set), `mypy`, `pytest`, `pre-commit` (hygiene checks, ruff, ruff-format, detect-secrets, mypy).
+* Code present: `app/` package (`app/__init__.py`, `app/main.py`) — placeholder entrypoint only. No domain modules (data, indicator, strategy, risk, trading, etc.) implemented yet.
+* No `api/`, `agentic/`, `ui/`, `data/`, or `tests/` directories yet.
 
-| Module | Inputs | Outputs | Key Constraints & Contracts |
-| :--- | :--- | :--- | :--- |
-| **Data** | Feeds, broker reads, files | Normalized bars/ticks, state | Foundation layer. No business logic. |
-| **Indicator** | Data, params | Indicator values | Pure functions. |
-| **Strategy** | Data, indicators, lifecycle | **Signals**, metadata | Emits intent, never broker orders. |
-| **Risk** | Proposals, state, policies | **Decisions**, kill-switch state | Modular engines (VaR, Margin, Drawdown). Cryptographic audit chaining. Enforces lifecycle gates (research → full-live). |
-| **Trading** | Risk decisions | **Order Intents** | Owns broker routing. Enforces rate limits. Carries trace IDs. |
-| **Analytics** | Logs, returns, benchmarks | Reports, scorecards | **Strictly read-only.** No side-effects. Governed by metric/schema catalogs. |
-| **Simulator** | History, intents | Sim trades, metrics | **No live side-effects.** In-memory. Deterministic replay. Supports advanced orders/sizing gates. |
-| **Optimization**| Data, strategy | Optimized params | Grid/Random/GA/Bayesian. Strict time-series splitting (no leakage). Atomic checkpointing. |
-| **Live** | Intents, state | Executions, receipts | **11 deterministic gates.** Single-session guard. Strict reconciliation authority. |
-| **Research** | Data | Insights, reports | Read-only/live. Strict leakage/bias gating. Statistical sign-off (bootstrapping/FDR). |
+---
 
-## 6. Interface Envelopes
-**API Response (Mandatory):**
+## Folder Topology & Dependency Flow
+
+### Workspace Directory Layout (Target)
+
+* `api/`: FastAPI apps, routes, middleware, auth, WS/session layers, API composition.
+* `app/`: Core domain modules (utils, data, indicator, strategy, risk, analytics, trading, simulation, optimization, live, research, conversation).
+* `agentic/`: Agent runtimes, explicit tool permission states, workflow schemas, provider configs.
+* `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
+* `ui/`: Next.js frontend application environment.
+* `tests/`: Unit, integration, usage, and system contract test suites.
+* `scripts/`: DB initialization, migration runners, validation tools, operational utilities.
+* `docs/`: Documented project truth.
+
+### Module Boundary Pipeline
+
+Dependencies flow strictly downward; reverse routing or bypass loops are prohibited:
+
+```
+Conversation / Research / UI
+        |
+        v
+API Gateway / Auth / Access Control
+        |
+        v
+Optimization / Simulation / Analytics
+        |
+        v
+Trading / Risk / Strategy / Indicator
+        |
+        v
+Data / Broker Adapters / State Repositories
+        |
+        v
+Utils (Shared Infrastructure Foundations)
+```
+
+---
+
+## Technical Contracts & Envelopes
+
+### Public Registry & Module File Framework (`app/utils/`)
+
+* **Public Registry Rule**: Handled strictly via `app/utils/__init__.py` using explicit public exposure lists (`__all__`). No fallback imports, shims, or duplicate modules are permitted.
+* **Submodule Footprint**: `logger`, `standard`, `errors`, `identity`, `normalization`, `paths`, `dataframe_tools`, `data_quality`, `schema_validation`, `security`, `settings`, `auth`, `event_bus`, `error_routing`, `notifications`, `observability`.
+
+### Standard AI Tool Response Contract
+
+Every official utility or domain tool exposed to AI layers must return five root fields:
+
 ```json
 {
-  "status": "success|error", "message": "...", "data": {}, 
-  "error": null | {"code": "...", "details": "..."},
+  "status": "success | error",
+  "message": "Human-readable execution outcome description.",
+  "data": {},
+  "error": null,
   "metadata": {
-    "request_id": "...", "correlation_id": "...", "api_version": "...", 
-    "module": "...", "risk_level": "governed", "side_effects": "none",
-    "execution_time_ms": 42, "created_at": "ISO-8601"
+    "tool_name": "string",
+    "tool_version": "string",
+    "tool_category": "string",
+    "tool_risk_level": "string",
+    "request_id": "string",
+    "execution_ms": "float (monotonic timer rounded to 3 decimals)",
+    "read_only": "boolean",
+    "writes_file": "boolean",
+    "modifies_database": "boolean",
+    "places_trade": "boolean",
+    "requires_network": "boolean"
   }
 }
 ```
-**Event Bus:** `event_id`, `event_type`, `schema_version`, `source_module`, `timestamp`, `request_id`, `correlation_id`, `causation_id`, `payload_json` (redacted), `audit_level`.
 
-## 7. Implementation Standards
-*   **Validation:** Reject unknown fields for sensitive mutations. Fail-closed on missing auth, stale prices, or reconciliation mismatches.
-*   **Testing:** Coverage scales with risk. Utils/Data (deterministic) → Strategy/Risk (contracts) → Sim/Live (safety-gated) → UI/Conv (redaction/drafts).
-*   **Observability:** Structured JSON logs. Health monitoring (readiness, DB, clock drift). Audit trails for token logs and approvals.
-*   **Utility Layer:** Standard helpers (envelopes, validators, redaction) are support infrastructure. They do not own strategy, portfolio, or trading decisions. Lazy-load optional adapters.
+### Core Event Bus Envelope
 
-## 8. Pending Architecture Decisions
-1. Event bus durability phases.
-2. Exact API schema/versioning format.
-3. Deployment topology & Worker/job model for heavy compute.
-4. SQLite migration path & Retention windows for regulated artifacts.
-5. AI provider interface details & Final identity provider.
-6. Risk threshold signing and approval process.
+```json
+{
+  "event_id": "TEXT (Traceable string-safe UUID4/ULID)",
+  "event_type": "TEXT",
+  "schema_version": "TEXT",
+  "source_module": "TEXT",
+  "timestamp": "TEXT (UTC ISO string with 'Z')",
+  "request_id": "TEXT",
+  "correlation_id": "TEXT",
+  "causation_id": "TEXT",
+  "payload_json": "TEXT (Redacted payload mapping)",
+  "audit_level": "TEXT"
+}
+```
+
+### Shared Authentication Context
+
+```json
+{
+  "principal_id": "TEXT",
+  "principal_type": "USER | SERVICE_ACCOUNT | AGENT",
+  "roles": "ARRAY[TEXT]",
+  "permissions": "ARRAY[TEXT]",
+  "scopes": "ARRAY[TEXT]",
+  "tenant_or_environment": "TEXT",
+  "request_id": "TEXT",
+  "workflow_id": "TEXT",
+  "correlation_id": "TEXT"
+}
+```
+
+---
+
+## Data Models & Schema Management
+
+* **Data Layout Conventions**: Core cross-module database tracking identifiers must use `TEXT` format. SQLite boolean fields enforce strict `0` or `1` constraints. JSON text structures map to an explicit `*_json` suffix name.
+* **Precision Standard**: Structural or broker-critical price, size, volume, and balance mathematics must bypass standard floating-point operations. Requires `decimal.Decimal` parsing to ensure transaction immutability.
+* **Table Namespace Prefixes**: System storage isolates data types using specific table identifiers: `core_`, `risk_`, `gov_`, `audit_`, `research_`, `ref_`, `ai_chat_`, and `agent_`.
+* **Migration Invariance**: Database tracking updates via additive structure migrations. Modifying applied structural migrations is prohibited without an explicit baseline reset approval.
+
+---
+
+## System Control Policies
+
+### Validation Strategy
+
+* Enforce absolute schema checking prior to triggering downstream system side effects.
+* Fail closed immediately if tracking context data is missing or corrupted during risk checks, live trade execution, or security evaluation.
+* Enforce exact field parsing for sensitive updates; reject unknown or unmapped properties.
+
+### Error & Automatic Retry Paradigm
+
+* Every error object crossing module borders must remain structured, fully trace-tagged, and redacted.
+* **Blind Retry Ban**: Automated retries apply only to verified transient transport anomalies. Unknown broker state responses block automated processing; execution loops freeze until state validation completes.
+* **Fail-Closed Baseline**: System stops operations instantly if it encounters active kill switches, validation failures, token expiration, or structural mismatch flags.
+
+### Core Security Mandates
+
+* Plaintext application passwords, live API keys, provider access configurations, and cryptographic seeds are classified as system secrets.
+* Redact sensitive patterns from execution dumps, trace events, log lines, and metrics payloads case-insensitively before persistence.
+* AI modules can evaluate patterns or generate action draft states; they are blocked from direct interaction execution.
+
+---
+
+## Deployment Configuration Reference
+
+| Target Group | Explicit Key Identifiers |
+| --- | --- |
+| **Application Environment** | `APP_NAME`, `ENVIRONMENT`, `API_HOST`, `API_PORT`, `UI_ORIGIN` |
+| **System Persistence** | `DATABASE_URL`, `DATA_DIR`, `ARTIFACT_DIR`, `DATA_CACHE_PATH` |
+| **Operational Protection** | `ALLOW_LIVE_MUTATIONS` (Defaults to `false`), `PROFILE` |
+| **System Observability** | `LOG_LEVEL`, `LOG_RENDER`, `EVENT_BUS_BACKEND`, `METRICS_ENABLED`, `METRICS_PORT` |
+| **Broker Integration (MT5)** | `MT5_ENABLED`, `MT5_LOGIN`, `MT5_PASSWORD`, `MT5_SERVER`, `MT5_TERMINAL_PATH` |
+| **Email Service Routes** | `NOTIFICATION_EMAIL_ENABLED`, SMTP host/port/user/password/from/to records |
+| **Telegram Alert Gate** | `NOTIFICATION_TELEGRAM_ENABLED`, `NOTIFICATION_TELEGRAM_BOT_TOKEN`, `NOTIFICATION_TELEGRAM_CHAT_IDS` |
+| **AI Layer Interfaces** | `HARUQUANTAI_CHAT_ENABLED`, provider type, model spec target, API key, base URL |
+
+---
+
+## Core System Quality Gates
+
+CI runners validate module engineering standards via targeted verification commands:
+
+```bash
+# Linting & Formatting Check
+uv run ruff check .
+uv run ruff format --check .
+
+# Static Type Verification
+uv run mypy .
+
+# Unit Testing & Coverage Gates
+uv run pytest --cov=app --cov-fail-under=80
+```

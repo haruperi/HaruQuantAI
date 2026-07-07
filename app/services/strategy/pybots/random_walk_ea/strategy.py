@@ -41,10 +41,10 @@ class RandomWalkStrategy(BaseStrategy):
     ) -> pd.DataFrame:
         """The original EA has no directional signal calculation."""
         del context
-        df["long_entry"] = False
-        df["short_entry"] = False
-        df["long_exit"] = False
-        df["short_exit"] = False
+        df["long_entry"] = 0
+        df["short_entry"] = 0
+        df["long_exit"] = 0
+        df["short_exit"] = 0
         return df
 
     def build_custom_decision(self, context: MarketContext) -> StrategyDecision | None:

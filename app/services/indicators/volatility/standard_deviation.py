@@ -28,12 +28,14 @@ class StandardDeviation(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'std_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 20, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 20, column: str = "close", **kwargs: Any
+    ) -> pd.Series:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
 
-        result_df = df.copy()
-        result_df[f"std_{period}"] = df[column].rolling(window=period).std()
-        return result_df
+        std = df[column].rolling(window=period).std()
+        std.name = f"std_{period}"
+        return std

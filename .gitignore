@@ -1,5 +1,5 @@
 # ============================================================================
-# HaruQuant System .gitignore
+# HaruQuantAI System .gitignore
 # ============================================================================
 
 # ============================================================================
@@ -763,8 +763,8 @@ mt5_exports/
 .benchmarks/
 artifacts/
 .aider*
-!ui/src/lib/
-!ui/src/lib/**
+!app/web/src/lib/
+!app/web/src/lib/**
 # Root data now contains the database package and strategy source artifacts.
 # Keep source/control files trackable while runtime-heavy stores remain ignored.
 !/data/

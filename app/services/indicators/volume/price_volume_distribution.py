@@ -32,7 +32,9 @@ class PriceVolumeDistribution(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'pvd_poc_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 20, bins: int = 10, **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 20, bins: int = 10, **kwargs: Any
+    ) -> pd.Series:
         required_cols = ["high", "low", "close", "volume"]
         for col in required_cols:
             if col not in df.columns:
@@ -42,7 +44,6 @@ class PriceVolumeDistribution(BaseIndicator):
         if bins < 1:
             raise ValueError("Bins must be greater than or equal to 1.")
 
-        result_df = df.copy()
         poc_series = []
 
         close_arr = df["close"].values
@@ -83,5 +84,5 @@ class PriceVolumeDistribution(BaseIndicator):
             poc_price = (bin_edges[max_bin_idx] + bin_edges[max_bin_idx + 1]) / 2
             poc_series.append(poc_price)
 
-        result_df[f"pvd_poc_{period}"] = poc_series
-        return result_df
+        poc = pd.Series(poc_series, index=df.index, name=f"pvd_poc_{period}")
+        return poc

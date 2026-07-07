@@ -59,15 +59,15 @@ class MarketStructureStrategy(BaseStrategy):
         self, df: pd.DataFrame, context: MarketContext
     ) -> pd.DataFrame:
         """Calculate market structure signals on the DataFrame."""
-        df["long_entry"] = False
-        df["short_entry"] = False
-        df["long_exit"] = False
-        df["short_exit"] = False
+        df["long_entry"] = 0
+        df["short_entry"] = 0
+        df["long_exit"] = 0
+        df["short_exit"] = 0
 
         bullish, bearish, _ = self._structure(context)
         if len(df) > 0:
-            df.loc[df.index[-1], "long_entry"] = bullish
-            df.loc[df.index[-1], "short_entry"] = bearish
+            df.loc[df.index[-1], "long_entry"] = int(bullish)
+            df.loc[df.index[-1], "short_entry"] = int(bearish)
 
         return df
 
@@ -134,20 +134,30 @@ class MarketStructureStrategy(BaseStrategy):
             next_sell = self.state.get_custom("next_sell")  # pragma: no cover
             volume = self._volume(context)  # pragma: no cover
             first_buy_exists = any(  # pragma: no cover
-                position.comment == "FirstBuy" for position in positions  # pragma: no cover
+                position.comment == "FirstBuy"
+                for position in positions  # pragma: no cover
             )  # pragma: no cover
             first_sell_exists = any(  # pragma: no cover
-                position.comment == "FirstSell" for position in positions  # pragma: no cover
+                position.comment == "FirstSell"
+                for position in positions  # pragma: no cover
             )  # pragma: no cover
             buy_step = (  # pragma: no cover
-                float(self.state.get_custom("buy_hedge_distance", 0.0))  # pragma: no cover
+                float(
+                    self.state.get_custom("buy_hedge_distance", 0.0)
+                )  # pragma: no cover
                 if first_buy_exists  # pragma: no cover
-                else float(self.state.get_custom("sell_hedge_distance", 0.0))  # pragma: no cover
+                else float(
+                    self.state.get_custom("sell_hedge_distance", 0.0)
+                )  # pragma: no cover
             )  # pragma: no cover
             sell_step = (  # pragma: no cover
-                float(self.state.get_custom("sell_hedge_distance", 0.0))  # pragma: no cover
+                float(
+                    self.state.get_custom("sell_hedge_distance", 0.0)
+                )  # pragma: no cover
                 if first_sell_exists  # pragma: no cover
-                else float(self.state.get_custom("buy_hedge_distance", 0.0))  # pragma: no cover
+                else float(
+                    self.state.get_custom("buy_hedge_distance", 0.0)
+                )  # pragma: no cover
             )  # pragma: no cover
             if next_buy is not None:  # pragma: no cover
                 intents.append(  # pragma: no cover
@@ -161,7 +171,9 @@ class MarketStructureStrategy(BaseStrategy):
                         operation_key="create_ca_buy",  # pragma: no cover
                     )  # pragma: no cover
                 )  # pragma: no cover
-                self.state.set_custom("next_buy", float(next_buy) - buy_step)  # pragma: no cover
+                self.state.set_custom(
+                    "next_buy", float(next_buy) - buy_step
+                )  # pragma: no cover
             if next_sell is not None:  # pragma: no cover
                 intents.append(  # pragma: no cover
                     self._make_open_intent(  # pragma: no cover
@@ -174,7 +186,9 @@ class MarketStructureStrategy(BaseStrategy):
                         operation_key="create_ca_sell",  # pragma: no cover
                     )  # pragma: no cover
                 )  # pragma: no cover
-                self.state.set_custom("next_sell", float(next_sell) + sell_step)  # pragma: no cover
+                self.state.set_custom(
+                    "next_sell", float(next_sell) + sell_step
+                )  # pragma: no cover
         if len(buys) > 1:
             intents.extend(  # pragma: no cover
                 self._basket_and_cancel(
@@ -201,10 +215,17 @@ class MarketStructureStrategy(BaseStrategy):
             return False, False, {}
         values = [float(item) for item in raw[:8]]  # pragma: no cover
         if values[0] > values[1]:  # pragma: no cover
-            high0, low0, high1, low1, high2, low2, high3, low3 = values  # pragma: no cover
+            high0, low0, high1, low1, high2, low2, high3, low3 = (
+                values  # pragma: no cover
+            )
         else:  # pragma: no cover
-            low0, high0, low1, high1, low2, high2, low3, high3 = values  # pragma: no cover
-        previous_close, current_close = context.bars[-2].close, context.bars[-1].close  # pragma: no cover
+            low0, high0, low1, high1, low2, high2, low3, high3 = (
+                values  # pragma: no cover
+            )
+        previous_close, current_close = (
+            context.bars[-2].close,
+            context.bars[-1].close,
+        )  # pragma: no cover
         bullish = (  # pragma: no cover
             current_close > high1  # pragma: no cover
             and previous_close < high1  # pragma: no cover
@@ -253,7 +274,9 @@ class MarketStructureStrategy(BaseStrategy):
                     Direction.LONG,  # pragma: no cover
                     entry_type=EntryType.MARKET,  # pragma: no cover
                     requested_quantity=volume,  # pragma: no cover
-                    protection=ProtectionRequest(profit_target_price=ask + delta),  # pragma: no cover
+                    protection=ProtectionRequest(
+                        profit_target_price=ask + delta
+                    ),  # pragma: no cover
                     comment="FirstBuy",  # pragma: no cover
                     operation_key="first_buy",  # pragma: no cover
                 ),  # pragma: no cover
@@ -283,7 +306,9 @@ class MarketStructureStrategy(BaseStrategy):
                     Direction.SHORT,  # pragma: no cover
                     entry_type=EntryType.MARKET,  # pragma: no cover
                     requested_quantity=volume,  # pragma: no cover
-                    protection=ProtectionRequest(profit_target_price=bid - delta),  # pragma: no cover
+                    protection=ProtectionRequest(
+                        profit_target_price=bid - delta
+                    ),  # pragma: no cover
                     comment="FirstSell",  # pragma: no cover
                     operation_key="first_sell",  # pragma: no cover
                 ),  # pragma: no cover
@@ -345,7 +370,9 @@ class MarketStructureStrategy(BaseStrategy):
                 )  # pragma: no cover
             )  # pragma: no cover
             if buy_distance > 0:  # pragma: no cover
-                self.state.set_custom("next_buy", float(next_buy) - buy_distance)  # pragma: no cover
+                self.state.set_custom(
+                    "next_buy", float(next_buy) - buy_distance
+                )  # pragma: no cover
         if len(sells) > 1 and next_sell is not None and bid >= float(next_sell):
             intents.append(  # pragma: no cover
                 self._make_open_intent(  # pragma: no cover
@@ -358,7 +385,9 @@ class MarketStructureStrategy(BaseStrategy):
                 )  # pragma: no cover
             )  # pragma: no cover
             if sell_distance > 0:  # pragma: no cover
-                self.state.set_custom("next_sell", float(next_sell) + sell_distance)  # pragma: no cover
+                self.state.set_custom(
+                    "next_sell", float(next_sell) + sell_distance
+                )  # pragma: no cover
         return intents
 
     def _basket_and_cancel(
@@ -373,10 +402,14 @@ class MarketStructureStrategy(BaseStrategy):
             self._make_modify_intent(  # pragma: no cover
                 context,  # pragma: no cover
                 direction,  # pragma: no cover
-                tuple(position.position_id for position in positions),  # pragma: no cover
+                tuple(
+                    position.position_id for position in positions
+                ),  # pragma: no cover
                 ProtectionRequest(  # pragma: no cover
                     profit_target_price=arithmetic_average(  # pragma: no cover
-                        [entry_price(position) for position in positions]  # pragma: no cover
+                        [
+                            entry_price(position) for position in positions
+                        ]  # pragma: no cover
                     )  # pragma: no cover
                 ),  # pragma: no cover
                 operation_key=f"basket_tp_{direction}",  # pragma: no cover
@@ -440,7 +473,9 @@ class MarketStructureStrategy(BaseStrategy):
 
     def _volume(self, context: MarketContext) -> float:
         if context.account is None:
-            raise ValueError("MarketStructureStrategy requires MarketContext.account.")  # pragma: no cover
+            raise ValueError(
+                "MarketStructureStrategy requires MarketContext.account."
+            )  # pragma: no cover
         return balance_scaled_volume(
             context.account.balance,
             float(self.config.parameter("balance_increase")),

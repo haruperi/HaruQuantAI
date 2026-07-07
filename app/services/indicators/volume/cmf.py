@@ -29,7 +29,7 @@ class CMF(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'cmf_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 20, **kwargs: Any) -> pd.DataFrame:
+    def calculate(self, df: pd.DataFrame, period: int = 20, **kwargs: Any) -> pd.Series:
         required_cols = ["high", "low", "close", "volume"]
         for col in required_cols:
             if col not in df.columns:
@@ -37,10 +37,10 @@ class CMF(BaseIndicator):
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
 
-        result_df = df.copy()
-
         high_low_range = df["high"] - df["low"]
-        mf_multiplier = ((df["close"] - df["low"]) - (df["high"] - df["close"])) / high_low_range.replace(0, 1e-10)
+        mf_multiplier = (
+            (df["close"] - df["low"]) - (df["high"] - df["close"])
+        ) / high_low_range.replace(0, 1e-10)
 
         mf_multiplier = mf_multiplier.fillna(0)
 
@@ -50,6 +50,5 @@ class CMF(BaseIndicator):
         sum_volume = df["volume"].rolling(window=period).sum()
 
         cmf = sum_mf_volume / sum_volume.replace(0, 1e-10)
-
-        result_df[f"cmf_{period}"] = cmf
-        return result_df
+        cmf.name = f"cmf_{period}"
+        return cmf

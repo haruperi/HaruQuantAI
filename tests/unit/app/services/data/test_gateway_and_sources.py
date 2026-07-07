@@ -2,6 +2,7 @@
 
 import sqlite3
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -12,7 +13,7 @@ from app.services.data.gateway import (
     get_symbol_metadata,
 )
 from app.services.data.validation import register_license
-from app.utils.errors import ExternalServiceError, ValidationError
+from app.utils.errors import DataError, ExternalServiceError, ValidationError
 from app.utils.logger import logger
 from pytest_mock import MockerFixture
 
@@ -99,29 +100,45 @@ def test_gateway_licensing_restrictions() -> None:
     assert "LICENSE_RESTRICTION" in str(ex.value)
 
 
-def test_gateway_fallback_sources(mocker: MockerFixture) -> None:
-    """Test fallback logic when primary source fails."""
+def test_gateway_source_failure_reports_error(mocker: MockerFixture) -> None:
+    """Test requested source failure is reported without fallback."""
     mocker.patch(
-        "app.services.data.gateway.DukascopyAdapter.get_market_data",
+        "app.services.data.sources.DukascopyAdapter.get_market_data",
         side_effect=Exception("Dukascopy service offline"),
     )
-    # Dukascopy is staging and throws service unavailable, fallback should try synthetic
-    records = get_data(
-        symbol="EURUSD",
-        timeframe="M1",
-        start_time="2026-06-01T00:00:00Z",
-        end_time="2026-06-01T01:00:00Z",
-        data_kind="ohlcv",
-        source="dukascopy",
-        fallback_sources=["synthetic"],
-    )
-    assert len(records) > 0
-    assert records[0]["source"] == "synthetic"
+    with pytest.raises(DataError, match="Dukascopy service offline"):
+        get_data(
+            symbol="EURUSD",
+            timeframe="M1",
+            start_time="2026-06-01T00:00:00Z",
+            end_time="2026-06-01T01:00:00Z",
+            data_kind="ohlcv",
+            source="dukascopy",
+        )
 
 
-def test_csv_adapter_retrieval() -> None:
+def _write_placeholder(path: Path) -> None:
+    path.write_text("placeholder", encoding="utf-8")
+
+
+def test_csv_adapter_retrieval(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Test retrieving and normalizing market data from CSV file."""
     csv_adapter = get_source_adapter("csv")
+    monkeypatch.setattr(csv_adapter, "paths", (str(tmp_path),))
+    _write_placeholder(tmp_path / "EURUSD_H1.csv")
+    monkeypatch.setattr(
+        "app.services.data.sources.load_local_dataset",
+        lambda *_args, **_kwargs: [
+            {
+                "timestamp": "2025-01-02T00:00:00Z",
+                "open": 1.035,
+                "high": 1.036,
+                "low": 1.034,
+                "close": 1.03552,
+                "volume": 100,
+            }
+        ],
+    )
     start_time = pd.to_datetime("2025-01-02T00:00:00Z").to_pydatetime()
     end_time = pd.to_datetime("2025-01-02T01:00:00Z").to_pydatetime()
 
@@ -132,9 +149,26 @@ def test_csv_adapter_retrieval() -> None:
     assert records[0]["timestamp"].startswith("2025-01-02T00:00:00")
 
 
-def test_parquet_adapter_retrieval() -> None:
+def test_parquet_adapter_retrieval(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Test retrieving and normalizing market data from Parquet file."""
     pq_adapter = get_source_adapter("parquet")
+    monkeypatch.setattr(pq_adapter, "paths", (str(tmp_path),))
+    _write_placeholder(tmp_path / "EURUSD_H1.parquet")
+    monkeypatch.setattr(
+        "app.services.data.sources.load_local_dataset",
+        lambda *_args, **_kwargs: [
+            {
+                "timestamp": "2025-01-02T00:00:00Z",
+                "open": 1.035,
+                "high": 1.036,
+                "low": 1.034,
+                "close": 1.03552,
+                "volume": 100,
+            }
+        ],
+    )
     start_time = pd.to_datetime("2025-01-02T00:00:00Z").to_pydatetime()
     end_time = pd.to_datetime("2025-01-02T01:00:00Z").to_pydatetime()
 
@@ -145,10 +179,20 @@ def test_parquet_adapter_retrieval() -> None:
     assert records[0]["timestamp"].startswith("2025-01-02T00:00:00")
 
 
-def test_file_adapters_discovery() -> None:
+def test_file_adapters_discovery(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Test symbol listing and metadata for CSV and Parquet adapters."""
     csv_adapter = get_source_adapter("csv")
     pq_adapter = get_source_adapter("parquet")
+    csv_path = tmp_path / "csv"
+    parquet_path = tmp_path / "parquet"
+    csv_path.mkdir()
+    parquet_path.mkdir()
+    _write_placeholder(csv_path / "EURUSD_H1.csv")
+    _write_placeholder(parquet_path / "EURUSD_H1.parquet")
+    monkeypatch.setattr(csv_adapter, "paths", (str(csv_path),))
+    monkeypatch.setattr(pq_adapter, "paths", (str(parquet_path),))
 
     symbols_csv = csv_adapter.list_symbols()
     assert "EURUSD" in symbols_csv
@@ -587,7 +631,8 @@ def test_yahoo_adapter_gateway_errors(mocker: MockerFixture) -> None:
 
 
 def test_check_rate_limit_exceeded() -> None:
-    from app.services.data.gateway import check_rate_limit, RATE_LIMITERS
+    from app.services.data.gateway import RATE_LIMITERS, check_rate_limit
+
     limiter = RATE_LIMITERS["csv"]
     old_tokens = limiter.tokens
     old_rate = limiter.rate
@@ -602,26 +647,37 @@ def test_check_rate_limit_exceeded() -> None:
 
 
 def test_circuit_breaker_barrier_open() -> None:
-    from app.services.data.gateway import check_circuit_breaker_barrier, update_circuit_breaker
-    from datetime import datetime, UTC, timedelta
+    from datetime import UTC, datetime, timedelta
+
+    from app.services.data.gateway import (
+        check_circuit_breaker_barrier,
+        update_circuit_breaker,
+    )
+
     update_circuit_breaker(
         source="csv",
         state="open",
         failures_count=5,
-        cooldown_expires=(datetime.now(UTC) + timedelta(hours=1)).isoformat()
+        cooldown_expires=(datetime.now(UTC) + timedelta(hours=1)).isoformat(),
     )
     with pytest.raises(ExternalServiceError, match="Circuit breaker is open"):
         check_circuit_breaker_barrier("csv")
 
 
 def test_circuit_breaker_barrier_half_open() -> None:
-    from app.services.data.gateway import check_circuit_breaker_barrier, update_circuit_breaker, get_circuit_breaker
-    from datetime import datetime, UTC, timedelta
+    from datetime import UTC, datetime, timedelta
+
+    from app.services.data.gateway import (
+        check_circuit_breaker_barrier,
+        get_circuit_breaker,
+        update_circuit_breaker,
+    )
+
     update_circuit_breaker(
         source="csv",
         state="open",
         failures_count=5,
-        cooldown_expires=(datetime.now(UTC) - timedelta(hours=1)).isoformat()
+        cooldown_expires=(datetime.now(UTC) - timedelta(hours=1)).isoformat(),
     )
     # This should transition it to half-open and not raise the blocker exception
     check_circuit_breaker_barrier("csv")
@@ -630,8 +686,12 @@ def test_circuit_breaker_barrier_half_open() -> None:
 
 
 def test_gateway_validation_and_failures() -> None:
-    from app.services.data.gateway import get_data, check_rate_limit, check_circuit_breaker_barrier, execute_gateway_request
-    from app.utils.standard import validate_standard_response
+    from app.services.data.gateway import (
+        check_circuit_breaker_barrier,
+        check_rate_limit,
+        execute_gateway_request,
+        get_data,
+    )
 
     # Unsupported data_kind validation failure
     with pytest.raises(ValidationError, match="Unsupported data_kind"):
@@ -656,21 +716,14 @@ def test_gateway_validation_and_failures() -> None:
     check_rate_limit("unknown_source_123")
     check_circuit_breaker_barrier("unknown_source_123")
 
-    # execute_gateway_request with unknown source fallback
-    req = {
-        "symbol": "EURUSD",
-        "timeframe": "H1",
-        "start": "2026-06-01T00:00:00Z",
-        "end": "2026-06-02T00:00:00Z",
-        "source": "invalid_source_name",
-        "data_kind": "bars",
-    }
-    with pytest.raises(Exception):
+    # execute_gateway_request with unknown source fails directly.
+    with pytest.raises(ValidationError):
         execute_gateway_request(
+            source="invalid_source_name",
+            symbol="EURUSD",
+            timeframe="H1",
+            start_time=datetime(2026, 6, 1, tzinfo=UTC),
+            end_time=datetime(2026, 6, 2, tzinfo=UTC),
+            data_kind="ohlcv",
             request_id="req1",
-            correlation_id="corr1",
-            payload=req,
-            bypass_cache=True,
         )
-
-

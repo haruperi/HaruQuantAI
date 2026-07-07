@@ -262,7 +262,6 @@ def get_market_data(
     limit: int | None = None,
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
-    fallback_sources: list[str] | None = None,
     request_id: str | None = None,
 ) -> list[dict[str, Any]]:
     """Retrieve normalized historical OHLCV bar records."""
@@ -276,7 +275,6 @@ def get_market_data(
         limit=limit,
         stale_data_behavior=stale_data_behavior,
         workflow_context=workflow_context,
-        fallback_sources=fallback_sources,
         request_id=request_id,
     )
 
@@ -290,7 +288,6 @@ def get_tick_data(
     limit: int | None = None,
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
-    fallback_sources: list[str] | None = None,
     request_id: str | None = None,
 ) -> list[dict[str, Any]]:
     """Retrieve normalized historical tick records."""
@@ -303,7 +300,6 @@ def get_tick_data(
         limit=limit,
         stale_data_behavior=stale_data_behavior,
         workflow_context=workflow_context,
-        fallback_sources=fallback_sources,
         request_id=request_id,
     )
 
@@ -317,7 +313,6 @@ def get_spread_data(
     limit: int | None = None,
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
-    fallback_sources: list[str] | None = None,
     request_id: str | None = None,
 ) -> list[dict[str, Any]]:
     """Retrieve normalized historical spread records."""
@@ -330,7 +325,6 @@ def get_spread_data(
         limit=limit,
         stale_data_behavior=stale_data_behavior,
         workflow_context=workflow_context,
-        fallback_sources=fallback_sources,
         request_id=request_id,
     )
 
@@ -345,7 +339,6 @@ def get_historical_volume(
     limit: int | None = None,
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
-    fallback_sources: list[str] | None = None,
     request_id: str | None = None,
 ) -> list[dict[str, Any]]:
     """Return volume-specific historical records or summaries."""
@@ -359,7 +352,6 @@ def get_historical_volume(
         limit=limit,
         stale_data_behavior=stale_data_behavior,
         workflow_context=workflow_context,
-        fallback_sources=fallback_sources,
         request_id=request_id,
     )
 

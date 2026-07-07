@@ -32,13 +32,19 @@ class MACD(BaseIndicator):
     pd.DataFrame: Original DataFrame with 'macd_{fast}_{slow}', 'macd_signal_{fast}_{slow}_{signal}', and 'macd_hist_{fast}_{slow}_{signal}' columns added.
     """
 
-    def calculate(self, df: pd.DataFrame, fast_period: int = 12, slow_period: int = 26, signal_period: int = 9, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self,
+        df: pd.DataFrame,
+        fast_period: int = 12,
+        slow_period: int = 26,
+        signal_period: int = 9,
+        column: str = "close",
+        **kwargs: Any,
+    ) -> pd.DataFrame:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if fast_period < 1 or slow_period < 1 or signal_period < 1:
             raise ValueError("All periods must be greater than or equal to 1.")
-
-        result_df = df.copy()
 
         fast_ema = df[column].ewm(span=fast_period, adjust=False).mean()
         slow_ema = df[column].ewm(span=slow_period, adjust=False).mean()
@@ -47,9 +53,9 @@ class MACD(BaseIndicator):
         signal_line = macd_line.ewm(span=signal_period, adjust=False).mean()
         macd_hist = macd_line - signal_line
 
+        macd_df = pd.DataFrame(index=df.index)
         suffix = f"{fast_period}_{slow_period}"
-        result_df[f"macd_{suffix}"] = macd_line
-        result_df[f"macd_signal_{suffix}_{signal_period}"] = signal_line
-        result_df[f"macd_hist_{suffix}_{signal_period}"] = macd_hist
-
-        return result_df
+        macd_df[f"macd_{suffix}"] = macd_line
+        macd_df[f"macd_signal_{suffix}_{signal_period}"] = signal_line
+        macd_df[f"macd_hist_{suffix}_{signal_period}"] = macd_hist
+        return macd_df

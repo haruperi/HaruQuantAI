@@ -1,9 +1,7 @@
-import app.agentic.tools.data
 from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from app.agentic.tools.data.tools import (
     aggregate_ticks_to_bars,
     align_multitimeframe_data,
@@ -59,7 +57,6 @@ def test_get_market_data_success(mock_get_data: MagicMock) -> None:
         limit=None,
         stale_data_behavior="refresh_and_return",
         workflow_context="research",
-        fallback_sources=None,
         request_id=None,
     )
 
@@ -68,7 +65,10 @@ def test_get_market_data_success(mock_get_data: MagicMock) -> None:
 def test_get_market_data_error(mock_get_data: MagicMock) -> None:
     mock_get_data.side_effect = ValueError("Invalid inputs")
     result = get_market_data(
-        symbol="EURUSD", timeframe="INVALID", start_time="2026-01-01", end_time="2026-01-02"
+        symbol="EURUSD",
+        timeframe="INVALID",
+        start_time="2026-01-01",
+        end_time="2026-01-02",
     )
     assert result["status"] == "error"
     assert "Invalid inputs" in str(result)
@@ -88,7 +88,6 @@ def test_get_tick_data(mock_get_data: MagicMock) -> None:
         limit=None,
         stale_data_behavior="refresh_and_return",
         workflow_context="research",
-        fallback_sources=None,
         request_id=None,
     )
 
@@ -107,7 +106,6 @@ def test_get_spread_data(mock_get_data: MagicMock) -> None:
         limit=None,
         stale_data_behavior="refresh_and_return",
         workflow_context="research",
-        fallback_sources=None,
         request_id=None,
     )
 
@@ -129,7 +127,6 @@ def test_get_historical_volume(mock_get_data: MagicMock) -> None:
         limit=None,
         stale_data_behavior="refresh_and_return",
         workflow_context="research",
-        fallback_sources=None,
         request_id=None,
     )
 
@@ -145,9 +142,7 @@ def test_resample_ohlcv(mock_resample: MagicMock) -> None:
 @patch("app.agentic.tools.data.tools._align_multitimeframe_data")
 def test_align_multitimeframe_data(mock_align: MagicMock) -> None:
     mock_align.return_value = {"H1": [], "H4": []}
-    result = align_multitimeframe_data(
-        {"H1": [{"timestamp": "2026-01-01"}]}, "H1"
-    )
+    result = align_multitimeframe_data({"H1": [{"timestamp": "2026-01-01"}]}, "H1")
     assert result["status"] == "success"
     mock_align.assert_called_once()
 

@@ -47,9 +47,9 @@ def get_broker_module() -> ModuleType:
         return ctrader
 
     if active == "simulator":
-        from app.services import simulator  # type: ignore[attr-defined]
+        from app.services import simulator
 
-        return simulator  # type: ignore[no-any-return]
+        return simulator
 
     from app.services.brokers import mt5
 

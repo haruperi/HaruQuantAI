@@ -61,19 +61,19 @@ class DecomposingTradeStrategy(BaseStrategy):
         oversold = float(self.config.parameter("oversold"))
         overbought = float(self.config.parameter("overbought"))
 
-        from app.services.indicators import RSI
+        from app.services.indicators import rsi
 
-        df = RSI().calculate(df, period=period, column="close")
+        df[f"rsi_{period}"] = rsi.calculate(df, period=period, column="close")
         rsi_col = f"rsi_{period}"
         rsi = df[rsi_col]
         rsi_prev = rsi.shift(1)
 
-        df["long_entry"] = (rsi >= oversold) & (rsi_prev < oversold)
-        df["short_entry"] = (rsi <= overbought) & (rsi_prev > overbought)
-        df["oppose_buy"] = (rsi <= oversold) & (rsi_prev > oversold)
-        df["oppose_sell"] = (rsi >= overbought) & (rsi_prev < overbought)
-        df["long_exit"] = False
-        df["short_exit"] = False
+        df["long_entry"] = ((rsi >= oversold) & (rsi_prev < oversold)).astype(int)
+        df["short_entry"] = ((rsi <= overbought) & (rsi_prev > overbought)).astype(int)
+        df["oppose_buy"] = ((rsi <= oversold) & (rsi_prev > oversold)).astype(int)
+        df["oppose_sell"] = ((rsi >= overbought) & (rsi_prev < overbought)).astype(int)
+        df["long_exit"] = 0
+        df["short_exit"] = 0
 
         return df
 
@@ -141,7 +141,9 @@ class DecomposingTradeStrategy(BaseStrategy):
 
     def _base_volume(self, context: MarketContext) -> float:
         if context.account is None:
-            raise ValueError("DecomposingTradeStrategy requires MarketContext.account.")  # pragma: no cover
+            raise ValueError(
+                "DecomposingTradeStrategy requires MarketContext.account."
+            )  # pragma: no cover
         return balance_scaled_volume(
             context.account.balance,
             float(self.config.parameter("balance_increase")),
@@ -199,14 +201,19 @@ class DecomposingTradeStrategy(BaseStrategy):
         ]  # pragma: no cover
         weighted_prices = [  # pragma: no cover
             entry_price(position)  # pragma: no cover
-            for position, quantity in zip(positions, remaining_quantities, strict=True)  # pragma: no cover
+            for position, quantity in zip(
+                positions, remaining_quantities, strict=True
+            )  # pragma: no cover
             if quantity > 0  # pragma: no cover
         ]  # pragma: no cover
         weighted_quantities = [  # pragma: no cover
-            quantity for quantity in remaining_quantities if quantity > 0  # pragma: no cover
+            quantity
+            for quantity in remaining_quantities
+            if quantity > 0  # pragma: no cover
         ]  # pragma: no cover
         expected_target_base = weighted_average(  # pragma: no cover
-            [*weighted_prices, market_price], [*weighted_quantities, new_volume]  # pragma: no cover
+            [*weighted_prices, market_price],
+            [*weighted_quantities, new_volume],  # pragma: no cover
         )  # pragma: no cover
         offset = pip_value(  # pragma: no cover
             context,  # pragma: no cover
@@ -258,7 +265,9 @@ class DecomposingTradeStrategy(BaseStrategy):
         if not positions:
             return []
         marker = "CBuy" if direction is Direction.LONG else "CSell"  # pragma: no cover
-        if any(marker.lower() in position.comment.lower() for position in positions):  # pragma: no cover
+        if any(
+            marker.lower() in position.comment.lower() for position in positions
+        ):  # pragma: no cover
             return []  # pragma: no cover
         activation = pip_value(  # pragma: no cover
             context,  # pragma: no cover

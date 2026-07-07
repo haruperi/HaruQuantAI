@@ -25,7 +25,6 @@ def pip_value(context: MarketContext, pips: float, multiplier: float) -> float:
     return pips_to_price(pips, require_quote(context).point_size, multiplier)
 
 
-
 def by_direction(
     positions: Sequence[PositionSnapshot], direction: Direction
 ) -> tuple[PositionSnapshot, ...]:

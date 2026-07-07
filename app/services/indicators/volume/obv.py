@@ -29,18 +29,18 @@ class OBV(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'obv' added.
     """
 
-    def calculate(self, df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
+    def calculate(self, df: pd.DataFrame, **kwargs: Any) -> pd.Series:
         required_cols = ["close", "volume"]
         for col in required_cols:
             if col not in df.columns:
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
 
-        result_df = df.copy()
-
         close_diff = df["close"].diff()
-        volume_direction = np.where(close_diff > 0, df["volume"], np.where(close_diff < 0, -df["volume"], 0))
+        volume_direction = np.where(
+            close_diff > 0, df["volume"], np.where(close_diff < 0, -df["volume"], 0)
+        )
         # Initialize first element to 0
         volume_direction[0] = 0
 
-        result_df["obv"] = volume_direction.cumsum()
-        return result_df
+        obv = pd.Series(volume_direction.cumsum(), index=df.index, name="obv")
+        return obv

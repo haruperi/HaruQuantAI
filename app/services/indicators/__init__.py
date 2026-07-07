@@ -31,27 +31,50 @@ from app.services.indicators.volume.price_volume_distribution import (
     PriceVolumeDistribution,
 )
 
+# Singletons (instantiated behind the scenes)
+atr = ATR()
+cmf = CMF()
+ema = EMA()
+macd = MACD()
+mfi = MFI()
+obv = OBV()
+rsi = RSI()
+sma = SMA()
+smc = SMC()
+wma = WMA()
+bollinger_bands = BollingerBands()
+doji = Doji()
+engulfing = Engulfing()
+hull_moving_average = HullMovingAverage()
+inside_bar = InsideBar()
+pinbar = Pinbar()
+price_volume_distribution = PriceVolumeDistribution()
+standard_deviation = StandardDeviation()
+williams_r = WilliamsR()
+
 __all__ = [
-    "ATR",
-    "CMF",
-    "EMA",
-    "MACD",
-    "MFI",
-    "OBV",
-    "RSI",
-    "SMA",
-    "SMC",
-    "WMA",
     "BaseIndicator",
-    "BollingerBands",
-    "Doji",
-    "Engulfing",
-    "HullMovingAverage",
-    "InsideBar",
-    "Pinbar",
-    "PriceVolumeDistribution",
-    "StandardDeviation",
-    "WilliamsR",
+    # Singletons
+    "atr",
+    "cmf",
+    "ema",
+    "macd",
+    "mfi",
+    "obv",
+    "rsi",
+    "sma",
+    "smc",
+    "wma",
+    "bollinger_bands",
+    "doji",
+    "engulfing",
+    "hull_moving_average",
+    "inside_bar",
+    "pinbar",
+    "price_volume_distribution",
+    "standard_deviation",
+    "williams_r",
+    # Helpers
     "arithmetic_average",
     "balance_scaled_volume",
     "crossed_above",

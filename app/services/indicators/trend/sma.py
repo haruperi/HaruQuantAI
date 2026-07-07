@@ -28,12 +28,14 @@ class SMA(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'sma_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 10, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 10, column: str = "close", **kwargs: Any
+    ) -> pd.Series:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
 
-        result_df = df.copy()
-        result_df[f"sma_{period}"] = df[column].rolling(window=period).mean()
-        return result_df
+        sma = df[column].rolling(window=period).mean()
+        sma.name = f"sma_{period}"
+        return sma

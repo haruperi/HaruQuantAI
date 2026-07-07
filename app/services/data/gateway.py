@@ -1,16 +1,13 @@
-"""Market data gateway router and source adapters.
+"""Market data gateway router.
 
 Orchestrates historical, real-time, local, synthetic, and broker data queries.
-Consolidates source adapters (CSV, Parquet, MT5, cTrader, etc.), persistent circuit
-breakers, and the single data query service API.
+Delegates source-specific fetching to data source adapters and owns cache,
+license, rate limit, and response validation policy.
 """
 
 import json
-from datetime import UTC, datetime, timedelta
-from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
-
-import pandas as pd
+from datetime import UTC, datetime
+from typing import Any
 
 from app.services.data.models import (
     DataAvailability,
@@ -19,16 +16,28 @@ from app.services.data.models import (
     SymbolMetadata,
     TickRecord,
 )
+from app.services.data.normalization import normalize_file_records
+from app.services.data.sources import (
+    ADAPTER_REGISTRY,
+    BinanceAdapter,
+    CSVAdapter,
+    CTraderAdapter,
+    DukascopyAdapter,
+    MT5Adapter,
+    ParquetAdapter,
+    SourceAdapterProtocol,
+    SyntheticAdapter,
+    YahooAdapter,
+    check_circuit_breaker_barrier,
+    get_circuit_breaker,
+    get_source_adapter,
+    update_circuit_breaker,
+)
 from app.services.data.storage import (
     db_helper,
     generate_cache_key,
     get_cached_data,
-    load_local_dataset,
     set_cached_data,
-)
-from app.services.data.transforms import (
-    generate_synthetic_bars,
-    generate_synthetic_ticks,
 )
 from app.services.data.validation import (
     DEFAULT_OHLCV_LIMIT,
@@ -46,51 +55,32 @@ from app.utils.errors import DataError, ExternalServiceError, ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import normalize_timestamp
 
-
-# --- 1. Source Adapter Protocol ---
-@runtime_checkable
-class SourceAdapterProtocol(Protocol):
-    """Common internal source adapter protocol for all data providers."""
-
-    def is_ready(self) -> bool:
-        """Check if source adapter is ready/configured."""
-        ...
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Fetch normalized historical OHLCV data."""
-        ...
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Fetch normalized historical tick data."""
-        ...
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List symbols discovered from the source."""
-        ...
-
-    def get_symbol_metadata(
-        self, symbol: str, *, request_id: str | None = None
-    ) -> dict[str, Any]:
-        """Retrieve symbol metadata."""
-        ...
+__all__ = [
+    "ADAPTER_REGISTRY",
+    "BinanceAdapter",
+    "CSVAdapter",
+    "CTraderAdapter",
+    "DukascopyAdapter",
+    "MT5Adapter",
+    "ParquetAdapter",
+    "SourceAdapterProtocol",
+    "SyntheticAdapter",
+    "YahooAdapter",
+    "check_circuit_breaker_barrier",
+    "check_rate_limit",
+    "execute_gateway_request",
+    "get_circuit_breaker",
+    "get_data",
+    "get_data_availability",
+    "get_source_adapter",
+    "get_symbol_metadata",
+    "list_symbols",
+    "normalize_file_records",
+    "update_circuit_breaker",
+]
 
 
-# --- 2. Rate Limiters ---
+# --- 1. Rate Limiters ---
 class TokenBucketLimiter:
     """A thread-safe simple Token Bucket rate limiter."""
 
@@ -135,1274 +125,7 @@ def check_rate_limit(source: str) -> None:
             raise ExternalServiceError(msg, code="BACKPRESSURE_EXCEEDED")
 
 
-# --- 3. Circuit Breaker Handlers ---
-def get_circuit_breaker(source: str) -> dict[str, Any]:
-    """Retrieve persisted circuit breaker state for a source."""
-    try:
-        with db_helper.get_connection() as conn:
-            cursor = conn.execute(
-                "SELECT * FROM circuit_breakers WHERE source = ?;", (source,)
-            )
-            row = cursor.fetchone()
-            if row:
-                return {
-                    "source": row["source"],
-                    "state": row["state"],
-                    "last_state_change": row["last_state_change"],
-                    "failures_count": int(row["failures_count"]),
-                    "cooldown_expires": row["cooldown_expires"],
-                }
-    except Exception as e:  # noqa: BLE001
-        logger.warning(f"Failed to query circuit breaker for {source}: {e}")
-
-    return {
-        "source": source,
-        "state": "closed",
-        "last_state_change": datetime.now(UTC).isoformat(),
-        "failures_count": 0,
-        "cooldown_expires": None,
-    }
-
-
-def update_circuit_breaker(
-    source: str,
-    state: str,
-    failures_count: int,
-    cooldown_expires: str | None = None,
-) -> None:
-    """Update and persist circuit breaker state."""
-    logger.info(
-        f"Updating circuit breaker: source={source}, state={state}, "
-        f"failures={failures_count}"
-    )
-    try:
-        with db_helper.get_connection() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO circuit_breakers (
-                    source, state, last_state_change, failures_count, cooldown_expires
-                ) VALUES (?, ?, ?, ?, ?);
-                """,
-                (
-                    source,
-                    state,
-                    datetime.now(UTC).isoformat(),
-                    failures_count,
-                    cooldown_expires,
-                ),
-            )
-    except Exception as e:  # noqa: BLE001
-        logger.error(f"Failed to save circuit breaker state for {source}: {e}")
-
-
-def check_circuit_breaker_barrier(source: str) -> None:
-    """Check if the source's circuit breaker blocks execution."""
-    cb = get_circuit_breaker(source)
-    if cb["state"] == "open":
-        expires = cb["cooldown_expires"]
-        if expires and datetime.now(UTC) > datetime.fromisoformat(expires):
-            logger.info(
-                f"Circuit breaker cooldown expired for {source}. "
-                "Transitioning to half-open."
-            )
-            update_circuit_breaker(source, "half-open", cb["failures_count"])
-        else:
-            msg = f"Circuit breaker is open for source: {source} (blocked)."
-            raise ExternalServiceError(msg, code="CIRCUIT_OPEN")
-
-
-def _normalize_mt5_record(
-    r: dict[str, Any], symbol: str, timeframe: str, source: str
-) -> dict[str, Any]:
-    """Normalize a single MT5-style raw record."""
-    date_val = r.get("<DATE>") or r.get("DATE") or ""
-    time_val = r.get("<TIME>") or r.get("TIME") or "00:00:00"
-    date_val = str(date_val).replace(".", "-")
-    dt_str = f"{date_val} {time_val}"
-    try:
-        dt = pd.to_datetime(dt_str)
-        dt = dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.tz_convert(UTC)
-        ts_str = dt.isoformat()
-    except (ValueError, TypeError):
-        ts_str = dt_str
-
-    def get_float(key: str) -> float:
-        val = r.get(key)
-        if val is None:
-            return 0.0
-        try:
-            return float(val)
-        except (ValueError, TypeError):
-            return 0.0
-
-    op = get_float("<OPEN>")
-    hi = get_float("<HIGH>")
-    lo = get_float("<LOW>")
-    cl = get_float("<CLOSE>")
-    tick_vol = get_float("<TICKVOL>")
-    real_vol = get_float("<VOL>")
-    spread_val = get_float("<SPREAD>")
-
-    return {
-        "timestamp": ts_str,
-        "open": op,
-        "high": hi,
-        "low": lo,
-        "close": cl,
-        "volume": tick_vol,
-        "tick_volume": tick_vol,
-        "real_volume": real_vol,
-        "spread": spread_val,
-        "source": source,
-        "symbol": symbol,
-        "timeframe": timeframe,
-    }
-
-
-def _normalize_std_record(
-    r: dict[str, Any], symbol: str, timeframe: str, source: str
-) -> dict[str, Any]:
-    """Normalize a single standard-style record."""
-    norm_r = dict(r)
-    if "timestamp" in norm_r:
-        try:
-            dt = pd.to_datetime(norm_r["timestamp"])
-            dt = dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.tz_convert(UTC)
-            norm_r["timestamp"] = dt.isoformat()
-        except (ValueError, TypeError) as ex:
-            logger.warning(f"Failed to parse timestamp {norm_r.get('timestamp')}: {ex}")
-    norm_r.setdefault("source", source)
-    norm_r.setdefault("symbol", symbol)
-    norm_r.setdefault("timeframe", timeframe)
-    norm_r.setdefault("tick_volume", norm_r.get("volume", 0.0))
-    norm_r.setdefault("real_volume", 0.0)
-    norm_r.setdefault("spread", 0.0)
-    if "volume" not in norm_r:
-        norm_r["volume"] = norm_r.get("tick_volume", 0.0)
-    return norm_r
-
-
-def normalize_file_records(
-    records: list[dict[str, Any]],
-    symbol: str,
-    timeframe: str,
-    source: str,
-) -> list[dict[str, Any]]:
-    """Normalize raw or MT5 file records to standard OHLCV schema."""
-    if not records:
-        return []
-
-    first = records[0]
-    is_mt5_style = any(str(k).startswith("<") and str(k).endswith(">") for k in first)
-
-    normalized = []
-    for r in records:
-        if is_mt5_style:
-            norm_r = _normalize_mt5_record(r, symbol, timeframe, source)
-        else:
-            norm_r = _normalize_std_record(r, symbol, timeframe, source)
-        normalized.append(norm_r)
-    return normalized
-
-
-class CSVAdapter:
-    """CSV File Data Source Adapter."""
-
-    def is_ready(self) -> bool:
-        """Check if ready."""
-        return True
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Fetch market data."""
-        filename = f"{symbol}_{timeframe}.csv"
-        paths = [
-            "data/processed",
-            "data/raw",
-            "data/processed/csv",
-            "data/raw/csv",
-        ]
-        for p in paths:
-            target_path = Path(p) / filename
-            if target_path.exists():
-                raw_records = load_local_dataset(
-                    str(target_path), request_id=request_id
-                )
-                records = normalize_file_records(raw_records, symbol, timeframe, "csv")
-                filtered = []
-                for r in records:
-                    ts = pd.to_datetime(r["timestamp"])
-                    if start_time.tzinfo is None:
-                        start_comp = start_time.replace(tzinfo=UTC)
-                    else:
-                        start_comp = start_time
-                    if end_time.tzinfo is None:
-                        end_comp = end_time.replace(tzinfo=UTC)
-                    else:
-                        end_comp = end_time
-
-                    ts_utc = ts.tz_convert(UTC) if ts.tzinfo else ts.replace(tzinfo=UTC)
-                    if start_comp <= ts_utc <= end_comp:
-                        filtered.append(r)
-                return filtered
-        return []
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Fetch tick data."""
-        filename = f"{symbol}_ticks.csv"
-        paths = [
-            "data/processed",
-            "data/raw",
-            "data/processed/csv",
-            "data/raw/csv",
-        ]
-        for p in paths:
-            target_path = Path(p) / filename
-            if target_path.exists():
-                records = load_local_dataset(str(target_path), request_id=request_id)
-                filtered = []
-                for r in records:
-                    ts = pd.to_datetime(r["timestamp"])
-                    ts_utc = ts.tz_convert(UTC) if ts.tzinfo else ts.replace(tzinfo=UTC)
-                    start_comp = (
-                        start_time.replace(tzinfo=UTC)
-                        if start_time.tzinfo is None
-                        else start_time
-                    )
-                    end_comp = (
-                        end_time.replace(tzinfo=UTC)
-                        if end_time.tzinfo is None
-                        else end_time
-                    )
-                    if start_comp <= ts_utc <= end_comp:
-                        filtered.append(r)
-                return filtered
-        return []
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List symbols."""
-        _ = request_id
-        symbols = set()
-        paths = [
-            "data/processed",
-            "data/raw",
-            "data/processed/csv",
-            "data/raw/csv",
-        ]
-        for p in paths:
-            path_obj = Path(p)
-            if path_obj.exists():
-                for f in path_obj.glob("*.csv"):
-                    symbol = f.name.split("_")[0]
-                    symbols.add(symbol)
-        return sorted(symbols)
-
-    def get_symbol_metadata(
-        self,
-        symbol: str,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> dict[str, Any]:
-        """Get symbol metadata."""
-        return {
-            "symbol": symbol,
-            "source": "csv",
-            "ready": True,
-            "license": "Open",
-            "attribution": "Local CSV Files",
-        }
-
-
-class ParquetAdapter:
-    """Parquet File Data Source Adapter."""
-
-    def is_ready(self) -> bool:
-        """Check if ready."""
-        return True
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Fetch market data."""
-        filename = f"{symbol}_{timeframe}.parquet"
-        paths = [
-            "data/processed",
-            "data/raw",
-            "data/processed/parquet",
-            "data/raw/parquet",
-        ]
-        for p in paths:
-            target_path = Path(p) / filename
-            if target_path.exists():
-                raw_records = load_local_dataset(
-                    str(target_path), request_id=request_id
-                )
-                records = normalize_file_records(
-                    raw_records, symbol, timeframe, "parquet"
-                )
-                filtered = []
-                for r in records:
-                    ts = pd.to_datetime(r["timestamp"])
-                    ts_utc = ts.tz_convert(UTC) if ts.tzinfo else ts.replace(tzinfo=UTC)
-                    start_comp = (
-                        start_time.replace(tzinfo=UTC)
-                        if start_time.tzinfo is None
-                        else start_time
-                    )
-                    end_comp = (
-                        end_time.replace(tzinfo=UTC)
-                        if end_time.tzinfo is None
-                        else end_time
-                    )
-                    if start_comp <= ts_utc <= end_comp:
-                        filtered.append(r)
-                return filtered
-        return []
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Fetch tick data."""
-        filename = f"{symbol}_ticks.parquet"
-        paths = [
-            "data/processed",
-            "data/raw",
-            "data/processed/parquet",
-            "data/raw/parquet",
-        ]
-        for p in paths:
-            target_path = Path(p) / filename
-            if target_path.exists():
-                records = load_local_dataset(str(target_path), request_id=request_id)
-                filtered = []
-                for r in records:
-                    ts = pd.to_datetime(r["timestamp"])
-                    ts_utc = ts.tz_convert(UTC) if ts.tzinfo else ts.replace(tzinfo=UTC)
-                    start_comp = (
-                        start_time.replace(tzinfo=UTC)
-                        if start_time.tzinfo is None
-                        else start_time
-                    )
-                    end_comp = (
-                        end_time.replace(tzinfo=UTC)
-                        if end_time.tzinfo is None
-                        else end_time
-                    )
-                    if start_comp <= ts_utc <= end_comp:
-                        filtered.append(r)
-                return filtered
-        return []
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List symbols."""
-        _ = request_id
-        symbols = set()
-        paths = [
-            "data/processed",
-            "data/raw",
-            "data/processed/parquet",
-            "data/raw/parquet",
-        ]
-        for p in paths:
-            path_obj = Path(p)
-            if path_obj.exists():
-                for f in path_obj.glob("*.parquet"):
-                    symbol = f.name.split("_")[0]
-                    symbols.add(symbol)
-        return sorted(symbols)
-
-    def get_symbol_metadata(
-        self,
-        symbol: str,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> dict[str, Any]:
-        """Get symbol metadata."""
-        return {
-            "symbol": symbol,
-            "source": "parquet",
-            "ready": True,
-            "license": "Open",
-            "attribution": "Local Parquet Files",
-        }
-
-
-class SyntheticAdapter:
-    """Synthetic Data Source Adapter."""
-
-    def is_ready(self) -> bool:
-        """Check if ready."""
-        return True
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,  # noqa: ARG002
-        *,
-        request_id: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Fetch market data."""
-        start_str = start_time.isoformat()
-        return generate_synthetic_bars(
-            symbol=symbol,
-            timeframe=timeframe,
-            start_time=start_str,
-            num_bars=100,
-            start_price=1.10,
-            drift=0.0,
-            volatility=0.01,
-            seed=42,
-            request_id=request_id,
-        )
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,  # noqa: ARG002
-        *,
-        request_id: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Fetch tick data."""
-        start_str = start_time.isoformat()
-        return generate_synthetic_ticks(
-            symbol=symbol,
-            start_time=start_str,
-            num_ticks=250,
-            start_price=1.10,
-            average_spread=0.0002,
-            volatility=0.0001,
-            seed=42,
-            request_id=request_id,
-        )
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List symbols."""
-        _ = request_id
-        return ["EURUSD", "GBPUSD", "USDJPY", "SPX500", "XAUUSD"]
-
-    def get_symbol_metadata(
-        self,
-        symbol: str,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> dict[str, Any]:
-        """Get symbol metadata."""
-        asset_class = "forex"
-        if symbol == "SPX500":
-            asset_class = "indices"
-        elif symbol == "XAUUSD":
-            asset_class = "metals"
-        return {
-            "symbol": symbol,
-            "source": "synthetic",
-            "ready": True,
-            "license": "Permissive",
-            "attribution": "Synthetic Bar Generator",
-            "asset_class": asset_class,
-        }
-
-
-class MT5Adapter:
-    """MetaTrader 5 Active Source Adapter."""
-
-    def is_ready(self) -> bool:
-        """Check if ready."""
-        return True
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch market data."""
-        check_circuit_breaker_barrier("mt5")
-
-        try:
-            from app.services.brokers.mt5 import get_mt5_client
-
-            client = get_mt5_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"MT5 initialization failed: {e}")
-            cb = get_circuit_breaker("mt5")
-            update_circuit_breaker(
-                "mt5",
-                "open" if cb["failures_count"] >= 4 else "closed",  # noqa: PLR2004
-                cb["failures_count"] + 1,
-                (datetime.now(UTC) + timedelta(seconds=60)).isoformat(),
-            )
-            msg = f"MetaTrader 5 terminal is not available: {e}"
-            raise ExternalServiceError(msg, code="BROKER_UNAVAILABLE") from e
-
-        if not client.is_connected():
-            msg = "MT5 Client failed to connect to live broker."
-            raise ExternalServiceError(msg, code="BROKER_UNAVAILABLE")
-
-        df = client.get_bars(
-            symbol=symbol,
-            timeframe=timeframe,
-            date_from=start_time,
-            date_to=end_time,
-        )
-        if df is None or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "open": float(row["Open"]),
-                    "high": float(row["High"]),
-                    "low": float(row["Low"]),
-                    "close": float(row["Close"]),
-                    "volume": float(row["Volume"]),
-                    "tick_volume": float(row["Volume"]),
-                    "real_volume": 0.0,
-                    "spread": float(row["Spread"]),
-                    "source": "mt5",
-                    "symbol": symbol,
-                    "timeframe": timeframe,
-                }
-            )
-        return records
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch tick data."""
-        check_circuit_breaker_barrier("mt5")
-        try:
-            from app.services.brokers.mt5 import get_mt5_client
-
-            client = get_mt5_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"MT5 initialization failed: {e}")
-            msg = f"MetaTrader 5 terminal is not available: {e}"
-            raise ExternalServiceError(msg, code="BROKER_UNAVAILABLE") from e
-
-        df = client.get_ticks(
-            symbol=symbol,
-            start=start_time,
-            end=end_time,
-            as_dataframe=True,
-        )
-        if df is None or not isinstance(df, pd.DataFrame) or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            time_msc = int(row.get("time_msc", 0))
-            if time_msc > 0:
-                dt = pd.to_datetime(time_msc, unit="ms", utc=True)
-            else:
-                dt = pd.to_datetime(int(row.get("time", 0)), unit="s", utc=True)
-
-            bid = float(row.get("bid", 0.0))
-            ask = float(row.get("ask", 0.0))
-            spread = ask - bid
-
-            records.append(
-                {
-                    "timestamp": dt.isoformat(),
-                    "bid": bid,
-                    "ask": ask,
-                    "last": float(row.get("last", 0.0)),
-                    "volume": float(row.get("volume", 0.0)),
-                    "spread": spread,
-                    "source": "mt5",
-                    "symbol": symbol,
-                }
-            )
-        return records
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List symbols."""
-        _ = request_id
-        return ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "XAUUSD", "SPX500"]
-
-    def get_symbol_metadata(
-        self,
-        symbol: str,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> dict[str, Any]:
-        """Get symbol metadata."""
-        asset_class = "forex"
-        sym_upper = symbol.upper()
-        if sym_upper == "SPX500":
-            asset_class = "indices"
-        elif sym_upper == "XAUUSD":
-            asset_class = "metals"
-        return {
-            "symbol": symbol,
-            "source": "mt5",
-            "ready": True,
-            "license": "Proprietary",
-            "attribution": "MetaTrader 5 Terminal Gateway Data",
-            "asset_class": asset_class,
-        }
-
-
-class CTraderAdapter:
-    """cTrader OpenAPI Active Source Adapter."""
-
-    def is_ready(self) -> bool:
-        """Check if ready."""
-        return True
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch market data."""
-        check_circuit_breaker_barrier("ctrader")
-
-        try:
-            from app.services.brokers.ctrader import get_ctrader_client
-
-            client = get_ctrader_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"cTrader initialization failed: {e}")
-            cb = get_circuit_breaker("ctrader")
-            update_circuit_breaker(
-                "ctrader",
-                "open" if cb["failures_count"] >= 4 else "closed",  # noqa: PLR2004
-                cb["failures_count"] + 1,
-                (datetime.now(UTC) + timedelta(seconds=60)).isoformat(),
-            )
-            msg = f"cTrader OpenAPI client is not available: {e}"
-            raise ExternalServiceError(msg, code="BROKER_UNAVAILABLE") from e
-
-        if not client.is_connected():
-            msg = "cTrader Client failed to connect to live broker."
-            raise ExternalServiceError(msg, code="BROKER_UNAVAILABLE")
-
-        df = client.get_bars(
-            symbol=symbol,
-            timeframe=timeframe,
-            date_from=start_time,
-            date_to=end_time,
-        )
-        if df is None or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "open": float(row["Open"]),
-                    "high": float(row["High"]),
-                    "low": float(row["Low"]),
-                    "close": float(row["Close"]),
-                    "volume": float(row["Volume"]),
-                    "tick_volume": float(row["Volume"]),
-                    "real_volume": 0.0,
-                    "spread": float(row["Spread"]),
-                    "source": "ctrader",
-                    "symbol": symbol,
-                    "timeframe": timeframe,
-                }
-            )
-        return records
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch tick data."""
-        check_circuit_breaker_barrier("ctrader")
-        try:
-            from app.services.brokers.ctrader import get_ctrader_client
-
-            client = get_ctrader_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"cTrader initialization failed: {e}")
-            msg = f"cTrader OpenAPI client is not available: {e}"
-            raise ExternalServiceError(msg, code="BROKER_UNAVAILABLE") from e
-
-        df = client.get_ticks(
-            symbol=symbol,
-            start=start_time,
-            end=end_time,
-            as_dataframe=True,
-        )
-        if df is None or not isinstance(df, pd.DataFrame) or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "bid": float(row["bid"]),
-                    "ask": float(row["ask"]),
-                    "last": float(row["last"]),
-                    "volume": float(row["volume"]),
-                    "spread": float(row["spread"]),
-                    "source": "ctrader",
-                    "symbol": symbol,
-                }
-            )
-        return records
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List symbols."""
-        _ = request_id
-        return ["EURUSD", "GBPUSD"]
-
-    def get_symbol_metadata(
-        self,
-        symbol: str,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> dict[str, Any]:
-        """Get symbol metadata."""
-        return {
-            "symbol": symbol,
-            "source": "ctrader",
-            "ready": True,
-            "license": "Proprietary",
-            "attribution": "cTrader OpenAPI Client Feed",
-        }
-
-
-class DukascopyAdapter:
-    """Dukascopy HTTP Active Source Adapter."""
-
-    def is_ready(self) -> bool:
-        """Check if ready."""
-        return True
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch market data."""
-        check_circuit_breaker_barrier("dukascopy")
-
-        try:
-            from app.services.brokers.dukascopy import (
-                get_dukascopy_client,
-            )
-
-            client = get_dukascopy_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"Dukascopy client initialization failed: {e}")
-            cb = get_circuit_breaker("dukascopy")
-            update_circuit_breaker(
-                "dukascopy",
-                "open" if cb["failures_count"] >= 4 else "closed",  # noqa: PLR2004
-                cb["failures_count"] + 1,
-                (datetime.now(UTC) + timedelta(seconds=60)).isoformat(),
-            )
-            msg = f"Dukascopy service is not available: {e}"
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE") from e
-
-        if not client.is_connected():
-            msg = "Dukascopy Client failed to connect."
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE")
-
-        df = client.get_bars(
-            symbol=symbol,
-            timeframe=timeframe,
-            date_from=start_time,
-            date_to=end_time,
-        )
-        if df is None or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "open": float(row["Open"]),
-                    "high": float(row["High"]),
-                    "low": float(row["Low"]),
-                    "close": float(row["Close"]),
-                    "volume": float(row["Volume"]),
-                    "tick_volume": float(row["Volume"]),
-                    "real_volume": 0.0,
-                    "spread": float(row["Spread"]),
-                    "source": "dukascopy",
-                    "symbol": symbol,
-                    "timeframe": timeframe,
-                }
-            )
-        return records
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch tick data."""
-        check_circuit_breaker_barrier("dukascopy")
-        try:
-            from app.services.brokers.dukascopy import (
-                get_dukascopy_client,
-            )
-
-            client = get_dukascopy_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"Dukascopy client initialization failed: {e}")
-            msg = f"Dukascopy service is not available: {e}"
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE") from e
-
-        df = client.get_ticks(
-            symbol=symbol,
-            start=start_time,
-            end=end_time,
-            as_dataframe=True,
-        )
-        if df is None or not isinstance(df, pd.DataFrame) or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "bid": float(row["bid"]),
-                    "ask": float(row["ask"]),
-                    "last": float(row["last"]),
-                    "volume": float(row["volume"]),
-                    "spread": float(row["spread"]),
-                    "source": "dukascopy",
-                    "symbol": symbol,
-                }
-            )
-        return records
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List symbols."""
-        _ = request_id
-        return ["EURUSD", "GBPUSD", "USDJPY"]
-
-    def get_symbol_metadata(
-        self,
-        symbol: str,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> dict[str, Any]:
-        """Get symbol metadata."""
-        return {
-            "symbol": symbol,
-            "source": "dukascopy",
-            "ready": True,
-            "license": "Restricted",
-            "attribution": "Dukascopy Community Feed",
-        }
-
-
-class BinanceAdapter:
-    """Binance Active Source Adapter."""
-
-    def is_ready(self) -> bool:
-        """Check if adapter is ready."""
-        return True
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch historical bars."""
-        check_circuit_breaker_barrier("binance")
-
-        try:
-            from app.services.brokers.binance import get_binance_client
-
-            client = get_binance_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"Binance client initialization failed: {e}")
-            cb = get_circuit_breaker("binance")
-            update_circuit_breaker(
-                "binance",
-                "open" if cb["failures_count"] >= 4 else "closed",  # noqa: PLR2004
-                cb["failures_count"] + 1,
-                (datetime.now(UTC) + timedelta(seconds=60)).isoformat(),
-            )
-            msg = f"Binance service is not available: {e}"
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE") from e
-
-        if not client.is_connected():
-            msg = "Binance Client failed to connect."
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE")
-
-        df = client.get_bars(
-            symbol=symbol,
-            timeframe=timeframe,
-            date_from=start_time,
-            date_to=end_time,
-        )
-        if df is None or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "open": float(row["Open"]),
-                    "high": float(row["High"]),
-                    "low": float(row["Low"]),
-                    "close": float(row["Close"]),
-                    "volume": float(row["Volume"]),
-                    "tick_volume": float(row["Volume"]),
-                    "real_volume": 0.0,
-                    "spread": float(row["Spread"]),
-                    "source": "binance",
-                    "symbol": symbol,
-                    "timeframe": timeframe,
-                }
-            )
-        return records
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch tick data."""
-        check_circuit_breaker_barrier("binance")
-        try:
-            from app.services.brokers.binance import get_binance_client
-
-            client = get_binance_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"Binance client initialization failed: {e}")
-            msg = f"Binance service is not available: {e}"
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE") from e
-
-        df = client.get_ticks(
-            symbol=symbol,
-            start=start_time,
-            end=end_time,
-            as_dataframe=True,
-        )
-        if df is None or not isinstance(df, pd.DataFrame) or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "bid": float(row["bid"]),
-                    "ask": float(row["ask"]),
-                    "last": float(row["last"]),
-                    "volume": float(row["volume"]),
-                    "spread": float(row["spread"]),
-                    "source": "binance",
-                    "symbol": symbol,
-                }
-            )
-        return records
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List all symbols from Binance."""
-        _ = request_id
-        return ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
-
-    def get_symbol_metadata(
-        self,
-        symbol: str,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> dict[str, Any]:
-        """Retrieve symbol metadata."""
-        return {
-            "symbol": symbol,
-            "source": "binance",
-            "ready": True,
-            "license": "Restricted",
-            "attribution": "Binance Discovery Feed",
-        }
-
-
-class YahooAdapter:
-    """Yahoo Finance Active Source Adapter."""
-
-    def is_ready(self) -> bool:
-        """Check if ready."""
-        return True
-
-    def get_market_data(
-        self,
-        symbol: str,
-        timeframe: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch market data."""
-        check_circuit_breaker_barrier("yahoo")
-
-        try:
-            from app.services.brokers.yahoo import get_yahoo_client
-
-            client = get_yahoo_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"Yahoo Finance client initialization failed: {e}")
-            cb = get_circuit_breaker("yahoo")
-            update_circuit_breaker(
-                "yahoo",
-                "open" if cb["failures_count"] >= 4 else "closed",  # noqa: PLR2004
-                cb["failures_count"] + 1,
-                (datetime.now(UTC) + timedelta(seconds=60)).isoformat(),
-            )
-            msg = f"Yahoo Finance service is not available: {e}"
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE") from e
-
-        if not client.is_connected():
-            msg = "Yahoo Finance Client failed to connect."
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE")
-
-        df = client.get_bars(
-            symbol=symbol,
-            timeframe=timeframe,
-            date_from=start_time,
-            date_to=end_time,
-        )
-        if df is None or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "open": float(row["Open"]),
-                    "high": float(row["High"]),
-                    "low": float(row["Low"]),
-                    "close": float(row["Close"]),
-                    "volume": float(row["Volume"]),
-                    "tick_volume": float(row["Volume"]),
-                    "real_volume": 0.0,
-                    "spread": float(row["Spread"]),
-                    "source": "yahoo",
-                    "symbol": symbol,
-                    "timeframe": timeframe,
-                }
-            )
-        return records
-
-    def get_tick_data(
-        self,
-        symbol: str,
-        start_time: datetime,
-        end_time: datetime,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
-        """Fetch tick data."""
-        check_circuit_breaker_barrier("yahoo")
-        try:
-            from app.services.brokers.yahoo import get_yahoo_client
-
-            client = get_yahoo_client()
-            if not client.is_connected():
-                client.connect()
-        except Exception as e:
-            logger.warning(f"Yahoo Finance client initialization failed: {e}")
-            msg = f"Yahoo Finance service is not available: {e}"
-            raise ExternalServiceError(msg, code="SERVICE_UNAVAILABLE") from e
-
-        df = client.get_ticks(
-            symbol=symbol,
-            start=start_time,
-            end=end_time,
-            as_dataframe=True,
-        )
-        if df is None or not isinstance(df, pd.DataFrame) or df.empty:
-            return []
-
-        records = []
-        for _, row in df.iterrows():
-            ts = row["Timestamp"]
-            if hasattr(ts, "isoformat"):
-                ts_str = ts.isoformat()
-            else:
-                ts_str = pd.to_datetime(ts).isoformat()
-            records.append(
-                {
-                    "timestamp": ts_str,
-                    "bid": float(row["bid"]),
-                    "ask": float(row["ask"]),
-                    "last": float(row["last"]),
-                    "volume": float(row["volume"]),
-                    "spread": float(row["spread"]),
-                    "source": "yahoo",
-                    "symbol": symbol,
-                }
-            )
-        return records
-
-    def list_symbols(self, *, request_id: str | None = None) -> list[str]:
-        """List symbols."""
-        _ = request_id
-        return ["AAPL", "MSFT", "SPY"]
-
-    def get_symbol_metadata(
-        self,
-        symbol: str,
-        *,
-        request_id: str | None = None,  # noqa: ARG002
-    ) -> dict[str, Any]:
-        """Get symbol metadata."""
-        return {
-            "symbol": symbol,
-            "source": "yahoo",
-            "ready": True,
-            "license": "Restricted",
-            "attribution": "Yahoo Finance Public Feed",
-        }
-
-
-# Adapter registry
-ADAPTER_REGISTRY: dict[str, SourceAdapterProtocol] = {
-    "csv": CSVAdapter(),
-    "parquet": ParquetAdapter(),
-    "synthetic": SyntheticAdapter(),
-    "mt5": MT5Adapter(),
-    "ctrader": CTraderAdapter(),
-    "dukascopy": DukascopyAdapter(),
-    "binance": BinanceAdapter(),
-    "yahoo": YahooAdapter(),
-}
-
-
-def get_source_adapter(source: str) -> SourceAdapterProtocol:
-    """Retrieve the registered adapter for a source."""
-    source_lower = source.lower()
-    if source_lower not in ADAPTER_REGISTRY:
-        msg = f"Unknown or unregistered source: {source}"
-        raise ValidationError(msg)
-    return ADAPTER_REGISTRY[source_lower]
-
-
+# --- 2. Gateway Record Validation ---
 def _normalize_and_validate_records(
     records: list[dict[str, Any]],
     data_kind: str,
@@ -1505,7 +228,7 @@ def _download_from_adapter(
 
 
 # --- 5. Unified Gateway Core Execution ---
-def execute_gateway_request(  # noqa: C901
+def execute_gateway_request(
     source: str,
     symbol: str,
     timeframe: str | None,
@@ -1514,113 +237,86 @@ def execute_gateway_request(  # noqa: C901
     data_kind: str,
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
-    fallback_sources: list[str] | None = None,
     request_id: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Internal gateway request execution, routing through adapters with cache."""
-    sources_to_try = [source]
-    if fallback_sources:
-        for f in fallback_sources:
-            if f not in sources_to_try:
-                sources_to_try.append(f)
+    """Internal single-source gateway execution, routing through cache."""
+    logger.info(
+        f"Gateway routing request: source={source}, symbol={symbol}, kind={data_kind}",
+        extra={"request_id": request_id},
+    )
 
-    last_exception = None
+    try:
+        validate_license(source, symbol, workflow_context, request_id=request_id)
+        check_rate_limit(source)
 
-    for current_source in sources_to_try:
-        try:
-            logger.info(
-                f"Gateway routing request: source={current_source}, symbol={symbol}, "
-                f"kind={data_kind}",
-                extra={"request_id": request_id},
-            )
+        cache_key, cache_tf, cached_records = _check_gateway_cache(
+            source,
+            symbol,
+            timeframe,
+            start_time,
+            end_time,
+            stale_data_behavior,
+            request_id=request_id,
+        )
+        if cached_records is not None:
+            logger.info(f"Cache hit for key {cache_key}")
+            return cached_records
 
-            # 1. Enforce licensing validation (fail closed)
-            validate_license(
-                current_source, symbol, workflow_context, request_id=request_id
-            )
+        records = _download_from_adapter(
+            source,
+            symbol,
+            timeframe,
+            start_time,
+            end_time,
+            data_kind,
+            request_id=request_id,
+        )
 
-            # 2. Consume rate limits
-            check_rate_limit(current_source)
-
-            # 3. Cache checks (only for historical queries)
-            cache_key, cache_tf, cached_records = _check_gateway_cache(
-                current_source,
-                symbol,
-                timeframe,
-                start_time,
-                end_time,
-                stale_data_behavior,
-                request_id=request_id,
-            )
-            if cached_records is not None:
-                logger.info(f"Cache hit for key {cache_key}")
-                return cached_records
-
-            # 4. Resolve adapter and download
-            records = _download_from_adapter(
-                current_source,
-                symbol,
-                timeframe,
-                start_time,
-                end_time,
-                data_kind,
-                request_id=request_id,
-            )
-
-            if not records:
-                set_cached_data(
-                    cache_key,
-                    current_source,
-                    symbol,
-                    cache_tf,
-                    start_time.isoformat(),
-                    end_time.isoformat(),
-                    [],
-                    ttl_seconds=60,
-                    request_id=request_id,
-                )
-                return []
-
-            # 5. Validate schemas and normalize
-            validated = _normalize_and_validate_records(
-                records=records,
-                data_kind=data_kind,
-                symbol=symbol,
-                source=current_source,
-                workflow_context=workflow_context,
-            )
-
-            # 6. Cache validated records
-            ttl = 900
-            if data_kind == "ohlcv":
-                ttl = 3600 if timeframe != "D1" else 86400
-
+        if not records:
             set_cached_data(
                 cache_key,
-                current_source,
+                source,
                 symbol,
                 cache_tf,
                 start_time.isoformat(),
                 end_time.isoformat(),
-                validated,
-                ttl_seconds=ttl,
+                [],
+                ttl_seconds=60,
                 request_id=request_id,
             )
-        except Exception as e:  # noqa: BLE001
-            logger.warning(
-                f"Request failed on source {current_source}: {e}. Trying fallback."
-            )
-            last_exception = e
-        else:
-            return validated
+            return []
 
-    if last_exception:
-        if isinstance(last_exception, ValidationError | ExternalServiceError):
-            raise last_exception
-        err_msg = f"Gateway request failed: {last_exception}"
-        raise DataError(err_msg) from last_exception
+        validated = _normalize_and_validate_records(
+            records=records,
+            data_kind=data_kind,
+            symbol=symbol,
+            source=source,
+            workflow_context=workflow_context,
+        )
 
-    return []
+        ttl = 900
+        if data_kind == "ohlcv":
+            ttl = 3600 if timeframe != "D1" else 86400
+
+        set_cached_data(
+            cache_key,
+            source,
+            symbol,
+            cache_tf,
+            start_time.isoformat(),
+            end_time.isoformat(),
+            validated,
+            ttl_seconds=ttl,
+            request_id=request_id,
+        )
+    except (ValidationError, ExternalServiceError):
+        raise
+    except Exception as e:
+        logger.warning(f"Request failed on source {source}: {e}")
+        err_msg = f"Gateway request failed for source {source}: {e}"
+        raise DataError(err_msg) from e
+
+    return validated
 
 
 # --- 6. Clean Service APIs ---
@@ -1634,7 +330,6 @@ def get_data(
     limit: int | None = None,
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
-    fallback_sources: list[str] | None = None,
     request_id: str | None = None,
 ) -> list[dict[str, Any]]:
     """Retrieve normalized market data records (ohlcv, ticks, spreads, or volume).
@@ -1649,7 +344,6 @@ def get_data(
         limit: Max query limit parameter.
         stale_data_behavior: Expired cache lookup policy.
         workflow_context: rounding/validation execution context.
-        fallback_sources: explicit lists of fallbacks on failure.
         request_id: Optional tracking identifier.
 
     Returns:
@@ -1677,7 +371,6 @@ def get_data(
             "ohlcv",
             stale_data_behavior,
             workflow_context,
-            fallback_sources,
             request_id,
         )
         return records[:valid_limit]
@@ -1693,7 +386,6 @@ def get_data(
             "ticks",
             stale_data_behavior,
             workflow_context,
-            fallback_sources,
             request_id,
         )
         return records[:valid_limit]
@@ -1709,7 +401,6 @@ def get_data(
             "spreads",
             stale_data_behavior,
             workflow_context,
-            fallback_sources,
             request_id,
         )
         return records[:valid_limit]
@@ -1728,7 +419,6 @@ def get_data(
             limit=limit,
             stale_data_behavior=stale_data_behavior,
             workflow_context=workflow_context,
-            fallback_sources=fallback_sources,
             request_id=request_id,
         )
         volume_records = []

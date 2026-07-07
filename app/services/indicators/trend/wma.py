@@ -30,13 +30,13 @@ class WMA(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'wma_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 10, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 10, column: str = "close", **kwargs: Any
+    ) -> pd.Series:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-
-        result_df = df.copy()
 
         weights = np.arange(1, period + 1)
         sum_weights = weights.sum()
@@ -44,5 +44,6 @@ class WMA(BaseIndicator):
         def linear_wma(x: np.ndarray[Any, Any]) -> Any:
             return np.dot(x, weights) / sum_weights
 
-        result_df[f"wma_{period}"] = df[column].rolling(window=period).apply(linear_wma, raw=True)
-        return result_df
+        wma = df[column].rolling(window=period).apply(linear_wma, raw=True)
+        wma.name = f"wma_{period}"
+        return wma

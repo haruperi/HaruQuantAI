@@ -20,7 +20,7 @@ class BaseIndicator(ABC):
     """Base class for all technical indicators."""
 
     @abstractmethod
-    def calculate(self, df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:  # noqa: ANN401
+    def calculate(self, df: pd.DataFrame, **kwargs: Any) -> pd.Series | pd.DataFrame:  # noqa: ANN401
         """Calculate the indicator and return the DataFrame with the new columns added.
 
         Args:
@@ -31,7 +31,6 @@ class BaseIndicator(ABC):
         Returns:
             pd.DataFrame: The input DataFrame with the computed indicator columns added.
         """
-
 
 
 def crossed_above(
@@ -52,7 +51,6 @@ def crossed_below(
 ) -> bool:
     """Return a strict downward crossover using two fully completed observations."""
     return previous_left >= previous_right and current_left < current_right
-
 
 
 def pips_to_price(

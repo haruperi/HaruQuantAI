@@ -60,17 +60,17 @@ class WhiteFairyStrategy(BaseStrategy):
         oversold = float(self.config.parameter("oversold"))
         overbought = float(self.config.parameter("overbought"))
 
-        from app.services.indicators import RSI
+        from app.services.indicators import rsi
 
-        df = RSI().calculate(df, period=period, column="close")
+        df[f"rsi_{period}"] = rsi.calculate(df, period=period, column="close")
         rsi_col = f"rsi_{period}"
         rsi = df[rsi_col]
         rsi_prev = rsi.shift(1)
 
-        df["long_entry"] = (rsi >= oversold) & (rsi_prev < oversold)
-        df["short_entry"] = (rsi <= overbought) & (rsi_prev > overbought)
-        df["long_exit"] = False
-        df["short_exit"] = False
+        df["long_entry"] = ((rsi >= oversold) & (rsi_prev < oversold)).astype(int)
+        df["short_entry"] = ((rsi <= overbought) & (rsi_prev > overbought)).astype(int)
+        df["long_exit"] = 0
+        df["short_exit"] = 0
 
         return df
 
@@ -78,7 +78,6 @@ class WhiteFairyStrategy(BaseStrategy):
         """Build the custom decision for White Fairy using the precalculated signals."""
         if self.df_signals is None or len(self.df_signals) < len(context.bars):
             self.precalculate_signals(context)
-
 
         current_idx = len(context.bars) - 1
         if self.df_signals is not None and 0 <= current_idx < len(self.df_signals):
@@ -98,14 +97,22 @@ class WhiteFairyStrategy(BaseStrategy):
         if self._entries_allowed_now(context):  # pragma: no cover
             if buy_signal and not buys:
                 intents.append(  # pragma: no cover
-                    self._first_intent(context, Direction.LONG, quote.ask, base)  # pragma: no cover
+                    self._first_intent(
+                        context, Direction.LONG, quote.ask, base
+                    )  # pragma: no cover
                 )  # pragma: no cover
-                self._seed_levels(context, Direction.LONG, quote.ask, base)  # pragma: no cover
+                self._seed_levels(
+                    context, Direction.LONG, quote.ask, base
+                )  # pragma: no cover
             if sell_signal and not sells:
                 intents.append(  # pragma: no cover
-                    self._first_intent(context, Direction.SHORT, quote.bid, base)  # pragma: no cover
+                    self._first_intent(
+                        context, Direction.SHORT, quote.bid, base
+                    )  # pragma: no cover
                 )  # pragma: no cover
-                self._seed_levels(context, Direction.SHORT, quote.bid, base)  # pragma: no cover
+                self._seed_levels(
+                    context, Direction.SHORT, quote.bid, base
+                )  # pragma: no cover
             intents.extend(
                 self._countertrend_intents(
                     context, buys, Direction.LONG, quote.ask, buy_signal, base
@@ -130,7 +137,9 @@ class WhiteFairyStrategy(BaseStrategy):
 
     def _base_volume(self, context: MarketContext) -> float:
         if context.account is None:
-            raise ValueError("WhiteFairyStrategy requires MarketContext.account.")  # pragma: no cover
+            raise ValueError(
+                "WhiteFairyStrategy requires MarketContext.account."
+            )  # pragma: no cover
         return balance_scaled_volume(
             context.account.balance,
             float(self.config.parameter("balance_increase")),
@@ -161,16 +170,24 @@ class WhiteFairyStrategy(BaseStrategy):
     def _seed_levels(
         self, context: MarketContext, direction: Direction, price: float, base: float
     ) -> None:
-        counter = self._distance(context, "counter_trade_distance_pips")  # pragma: no cover
-        pyramid = self._distance(context, "pyramid_trade_distance_pips")  # pragma: no cover
+        counter = self._distance(
+            context, "counter_trade_distance_pips"
+        )  # pragma: no cover
+        pyramid = self._distance(
+            context, "pyramid_trade_distance_pips"
+        )  # pragma: no cover
         key = "buy" if direction is Direction.LONG else "sell"  # pragma: no cover
         self.state.set_custom(  # pragma: no cover
             f"c_next_{key}",  # pragma: no cover
-            price - counter if direction is Direction.LONG else price + counter,  # pragma: no cover
+            price - counter
+            if direction is Direction.LONG
+            else price + counter,  # pragma: no cover
         )  # pragma: no cover
         self.state.set_custom(  # pragma: no cover
             f"p_next_{key}",  # pragma: no cover
-            price + pyramid if direction is Direction.LONG else price - pyramid,  # pragma: no cover
+            price + pyramid
+            if direction is Direction.LONG
+            else price - pyramid,  # pragma: no cover
         )  # pragma: no cover
         self.state.set_custom(  # pragma: no cover
             f"p_lot_{key}", base / float(self.config.parameter("lot_divisor"))
@@ -190,7 +207,9 @@ class WhiteFairyStrategy(BaseStrategy):
         key = "buy" if direction is Direction.LONG else "sell"  # pragma: no cover
         next_level = self.state.get_custom(f"c_next_{key}")  # pragma: no cover
         if next_level is None:  # pragma: no cover
-            self._seed_levels(context, direction, entry_price(positions[-1]), base)  # pragma: no cover
+            self._seed_levels(
+                context, direction, entry_price(positions[-1]), base
+            )  # pragma: no cover
             next_level = self.state.get_custom(f"c_next_{key}")  # pragma: no cover
         triggered = (  # pragma: no cover
             price <= float(next_level)  # pragma: no cover
@@ -199,16 +218,22 @@ class WhiteFairyStrategy(BaseStrategy):
         )  # pragma: no cover
         if not triggered:  # pragma: no cover
             return []  # pragma: no cover
-        counter_distance = self._distance(context, "counter_trade_distance_pips")  # pragma: no cover
+        counter_distance = self._distance(
+            context, "counter_trade_distance_pips"
+        )  # pragma: no cover
         self.state.set_custom(  # pragma: no cover
             f"c_next_{key}",  # pragma: no cover
             price - counter_distance  # pragma: no cover
             if direction is Direction.LONG  # pragma: no cover
             else price + counter_distance,  # pragma: no cover
         )  # pragma: no cover
-        target = arithmetic_average([*(entry_price(p) for p in positions), price])  # pragma: no cover
+        target = arithmetic_average(
+            [*(entry_price(p) for p in positions), price]
+        )  # pragma: no cover
         comment = (  # pragma: no cover
-            "C.Averaging Buy" if direction is Direction.LONG else "C.Averaging Sell"  # pragma: no cover
+            "C.Averaging Buy"
+            if direction is Direction.LONG
+            else "C.Averaging Sell"  # pragma: no cover
         )  # pragma: no cover
         return [  # pragma: no cover
             self._make_open_intent(
@@ -253,13 +278,20 @@ class WhiteFairyStrategy(BaseStrategy):
         lot = float(  # pragma: no cover
             self.state.get_custom(  # pragma: no cover
                 f"p_lot_{key}",  # pragma: no cover
-                positions[-1].quantity / float(self.config.parameter("lot_divisor")),  # pragma: no cover
+                positions[-1].quantity
+                / float(self.config.parameter("lot_divisor")),  # pragma: no cover
             )  # pragma: no cover
         )  # pragma: no cover
-        distance = self._distance(context, "pyramid_trade_distance_pips")  # pragma: no cover
-        stop_displacement = self._distance(context, "stop_loss_displacement_pips")  # pragma: no cover
+        distance = self._distance(
+            context, "pyramid_trade_distance_pips"
+        )  # pragma: no cover
+        stop_displacement = self._distance(
+            context, "stop_loss_displacement_pips"
+        )  # pragma: no cover
         last_price = (  # pragma: no cover
-            price - distance if direction is Direction.LONG else price + distance  # pragma: no cover
+            price - distance
+            if direction is Direction.LONG
+            else price + distance  # pragma: no cover
         )  # pragma: no cover
         new_stop = (  # pragma: no cover
             last_price + stop_displacement  # pragma: no cover
@@ -268,14 +300,20 @@ class WhiteFairyStrategy(BaseStrategy):
         )  # pragma: no cover
         self.state.set_custom(  # pragma: no cover
             f"p_next_{key}",  # pragma: no cover
-            price + distance if direction is Direction.LONG else price - distance,  # pragma: no cover
+            price + distance
+            if direction is Direction.LONG
+            else price - distance,  # pragma: no cover
         )  # pragma: no cover
         self.state.set_custom(  # pragma: no cover
-            f"p_lot_{key}", lot / float(self.config.parameter("lot_divisor"))  # pragma: no cover
+            f"p_lot_{key}",
+            lot / float(self.config.parameter("lot_divisor")),  # pragma: no cover
         )  # pragma: no cover
-        comment = "Pyrammid Buy" if direction is Direction.LONG else "Pyrammid Sell"  # pragma: no cover
+        comment = (
+            "Pyrammid Buy" if direction is Direction.LONG else "Pyrammid Sell"
+        )  # pragma: no cover
         protection = ProtectionRequest(  # pragma: no cover
-            stop_loss_price=new_stop, clear_profit_target=True  # pragma: no cover
+            stop_loss_price=new_stop,
+            clear_profit_target=True,  # pragma: no cover
         )  # pragma: no cover
         return [  # pragma: no cover
             self._make_open_intent(

@@ -1,179 +1,222 @@
-import pytest
-import pandas as pd
 import numpy as np
-from app.services.indicators.base import BaseIndicator
+import pandas as pd
+import pytest
+from app.services.indicators import (
+    BaseIndicator,
+    atr,
+    bollinger_bands,
+    cmf,
+    doji,
+    ema,
+    engulfing,
+    hull_moving_average,
+    inside_bar,
+    macd,
+    mfi,
+    obv,
+    pinbar,
+    price_volume_distribution,
+    rsi,
+    sma,
+    smc,
+    standard_deviation,
+    williams_r,
+    wma,
+)
+from app.services.indicators.candles.doji import Doji
+from app.services.indicators.candles.engulfing import Engulfing
+from app.services.indicators.candles.inside_bar import InsideBar
+from app.services.indicators.candles.pinbar import Pinbar
+from app.services.indicators.custom.hull_moving_average import HullMovingAverage
+from app.services.indicators.custom.smc import SMC
+from app.services.indicators.momentum.macd import MACD
+from app.services.indicators.momentum.rsi import RSI
+from app.services.indicators.momentum.will_r import WilliamsR
+from app.services.indicators.trend.bollinger_bands import BollingerBands
 from app.services.indicators.trend.ema import EMA
 from app.services.indicators.trend.sma import SMA
 from app.services.indicators.trend.wma import WMA
-from app.services.indicators.trend.bollinger_bands import BollingerBands
-from app.services.indicators.momentum.rsi import RSI
-from app.services.indicators.momentum.macd import MACD
-from app.services.indicators.momentum.will_r import WilliamsR
-from app.services.indicators.volume.obv import OBV
-from app.services.indicators.volume.mfi import MFI
-from app.services.indicators.volume.cmf import CMF
-from app.services.indicators.volume.price_volume_distribution import PriceVolumeDistribution
 from app.services.indicators.volatility.atr import ATR
 from app.services.indicators.volatility.standard_deviation import StandardDeviation
-from app.services.indicators.candles.engulfing import Engulfing
-from app.services.indicators.candles.pinbar import Pinbar
-from app.services.indicators.candles.doji import Doji
-from app.services.indicators.candles.inside_bar import InsideBar
-from app.services.indicators.custom.smc import SMC
-from app.services.indicators.custom.hull_moving_average import HullMovingAverage
+from app.services.indicators.volume.cmf import CMF
+from app.services.indicators.volume.mfi import MFI
+from app.services.indicators.volume.obv import OBV
+from app.services.indicators.volume.price_volume_distribution import (
+    PriceVolumeDistribution,
+)
+
 
 @pytest.fixture
 def sample_ohlcv_data():
     np.random.seed(42)
     rows = 120  # increased size for lookback ranges like SMC swing_length
     dates = pd.date_range(start="2026-01-01", periods=rows, freq="1D")
-    
+
     close = np.cumprod(1.0 + np.random.normal(0, 0.01, rows)) * 100.0
     open_val = close + np.random.normal(0, 0.5, rows)
     high = np.maximum(open_val, close) + np.random.uniform(0.1, 2.0, rows)
     low = np.minimum(open_val, close) - np.random.uniform(0.1, 2.0, rows)
     volume = np.random.uniform(1000, 5000, rows)
-    
-    df = pd.DataFrame({
-        "open": open_val,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": volume
-    }, index=dates)
+
+    df = pd.DataFrame(
+        {"open": open_val, "high": high, "low": low, "close": close, "volume": volume},
+        index=dates,
+    )
     return df
+
 
 def test_base_inheritance():
     # Verify all indicators inherit from BaseIndicator
     indicators = [
-        EMA(), SMA(), WMA(), BollingerBands(),
-        RSI(), MACD(), WilliamsR(),
-        OBV(), MFI(), CMF(), PriceVolumeDistribution(),
-        ATR(), StandardDeviation(),
-        Engulfing(), Pinbar(), Doji(), InsideBar(),
-        SMC(), HullMovingAverage()
+        EMA(),
+        SMA(),
+        WMA(),
+        BollingerBands(),
+        RSI(),
+        MACD(),
+        WilliamsR(),
+        OBV(),
+        MFI(),
+        CMF(),
+        PriceVolumeDistribution(),
+        ATR(),
+        StandardDeviation(),
+        Engulfing(),
+        Pinbar(),
+        Doji(),
+        InsideBar(),
+        SMC(),
+        HullMovingAverage(),
     ]
     for ind in indicators:
         assert isinstance(ind, BaseIndicator)
 
+
 def test_trend_indicators(sample_ohlcv_data):
     # Test EMA
-    ema = EMA()
-    df_ema = ema.calculate(sample_ohlcv_data, period=10)
-    assert "ema_10" in df_ema.columns
-    assert len(df_ema) == len(sample_ohlcv_data)
-    
+    res_ema = ema.calculate(sample_ohlcv_data, period=10)
+    assert isinstance(res_ema, pd.Series)
+    assert res_ema.name == "ema_10"
+    assert len(res_ema) == len(sample_ohlcv_data)
+
     # Test SMA
-    sma = SMA()
-    df_sma = sma.calculate(sample_ohlcv_data, period=10)
-    assert "sma_10" in df_sma.columns
-    
+    res_sma = sma.calculate(sample_ohlcv_data, period=10)
+    assert isinstance(res_sma, pd.Series)
+    assert res_sma.name == "sma_10"
+
     # Test WMA
-    wma = WMA()
-    df_wma = wma.calculate(sample_ohlcv_data, period=10)
-    assert "wma_10" in df_wma.columns
-    
+    res_wma = wma.calculate(sample_ohlcv_data, period=10)
+    assert isinstance(res_wma, pd.Series)
+    assert res_wma.name == "wma_10"
+
     # Test Bollinger Bands
-    bb = BollingerBands()
-    df_bb = bb.calculate(sample_ohlcv_data, period=20, std_dev=2.0)
-    assert "bb_middle_20" in df_bb.columns
-    assert "bb_upper_20_2.0" in df_bb.columns
-    assert "bb_lower_20_2.0" in df_bb.columns
+    res_bb = bollinger_bands.calculate(sample_ohlcv_data, period=20, std_dev=2.0)
+    assert isinstance(res_bb, pd.DataFrame)
+    assert "bb_middle_20" in res_bb.columns
+    assert "bb_upper_20_2.0" in res_bb.columns
+    assert "bb_lower_20_2.0" in res_bb.columns
+
 
 def test_momentum_indicators(sample_ohlcv_data):
     # Test RSI
-    rsi = RSI()
-    df_rsi = rsi.calculate(sample_ohlcv_data, period=14)
-    assert "rsi_14" in df_rsi.columns
-    
+    res_rsi = rsi.calculate(sample_ohlcv_data, period=14)
+    assert isinstance(res_rsi, pd.Series)
+    assert res_rsi.name == "rsi_14"
+
     # Test MACD
-    macd = MACD()
-    df_macd = macd.calculate(sample_ohlcv_data, fast_period=12, slow_period=26, signal_period=9)
-    assert "macd_12_26" in df_macd.columns
-    assert "macd_signal_12_26_9" in df_macd.columns
-    assert "macd_hist_12_26_9" in df_macd.columns
-    
+    res_macd = macd.calculate(
+        sample_ohlcv_data, fast_period=12, slow_period=26, signal_period=9
+    )
+    assert isinstance(res_macd, pd.DataFrame)
+    assert "macd_12_26" in res_macd.columns
+    assert "macd_signal_12_26_9" in res_macd.columns
+    assert "macd_hist_12_26_9" in res_macd.columns
+
     # Test Williams %R
-    will_r = WilliamsR()
-    df_wr = will_r.calculate(sample_ohlcv_data, period=14)
-    assert "will_r_14" in df_wr.columns
+    res_wr = williams_r.calculate(sample_ohlcv_data, period=14)
+    assert isinstance(res_wr, pd.Series)
+    assert res_wr.name == "will_r_14"
+
 
 def test_volume_indicators(sample_ohlcv_data):
     # Test OBV
-    obv = OBV()
-    df_obv = obv.calculate(sample_ohlcv_data)
-    assert "obv" in df_obv.columns
-    
+    res_obv = obv.calculate(sample_ohlcv_data)
+    assert isinstance(res_obv, pd.Series)
+    assert res_obv.name == "obv"
+
     # Test MFI
-    mfi = MFI()
-    df_mfi = mfi.calculate(sample_ohlcv_data, period=14)
-    assert "mfi_14" in df_mfi.columns
-    
+    res_mfi = mfi.calculate(sample_ohlcv_data, period=14)
+    assert isinstance(res_mfi, pd.Series)
+    assert res_mfi.name == "mfi_14"
+
     # Test CMF
-    cmf = CMF()
-    df_cmf = cmf.calculate(sample_ohlcv_data, period=20)
-    assert "cmf_20" in df_cmf.columns
-    
+    res_cmf = cmf.calculate(sample_ohlcv_data, period=20)
+    assert isinstance(res_cmf, pd.Series)
+    assert res_cmf.name == "cmf_20"
+
     # Test Price Volume Distribution
-    pvd = PriceVolumeDistribution()
-    df_pvd = pvd.calculate(sample_ohlcv_data, period=20, bins=10)
-    assert "pvd_poc_20" in df_pvd.columns
+    res_pvd = price_volume_distribution.calculate(sample_ohlcv_data, period=20, bins=10)
+    assert isinstance(res_pvd, pd.Series)
+    assert res_pvd.name == "pvd_poc_20"
+
 
 def test_volatility_indicators(sample_ohlcv_data):
     # Test ATR
-    atr = ATR()
-    df_atr = atr.calculate(sample_ohlcv_data, period=14)
-    assert "atr_14" in df_atr.columns
-    
+    res_atr = atr.calculate(sample_ohlcv_data, period=14)
+    assert isinstance(res_atr, pd.Series)
+    assert res_atr.name == "atr_14"
+
     # Test Standard Deviation
-    std = StandardDeviation()
-    df_std = std.calculate(sample_ohlcv_data, period=20)
-    assert "std_20" in df_std.columns
+    res_std = standard_deviation.calculate(sample_ohlcv_data, period=20)
+    assert isinstance(res_std, pd.Series)
+    assert res_std.name == "std_20"
+
 
 def test_candles_indicators(sample_ohlcv_data):
     # Test Engulfing
-    eng = Engulfing()
-    df_eng = eng.calculate(sample_ohlcv_data)
-    assert "candle_engulfing" in df_eng.columns
-    assert set(df_eng["candle_engulfing"].unique()).issubset({-1, 0, 1})
-    
+    res_eng = engulfing.calculate(sample_ohlcv_data)
+    assert isinstance(res_eng, pd.Series)
+    assert res_eng.name == "candle_engulfing"
+    assert set(res_eng.unique()).issubset({-1, 0, 1})
+
     # Test Pinbar
-    pb = Pinbar()
-    df_pb = pb.calculate(sample_ohlcv_data)
-    assert "candle_pinbar" in df_pb.columns
-    assert set(df_pb["candle_pinbar"].unique()).issubset({-1, 0, 1})
-    
+    res_pb = pinbar.calculate(sample_ohlcv_data)
+    assert isinstance(res_pb, pd.Series)
+    assert res_pb.name == "candle_pinbar"
+    assert set(res_pb.unique()).issubset({-1, 0, 1})
+
     # Test Doji
-    doji = Doji()
-    df_doji = doji.calculate(sample_ohlcv_data, threshold=0.1)
-    assert "candle_doji" in df_doji.columns
-    assert set(df_doji["candle_doji"].unique()).issubset({0, 1})
-    
+    res_doji = doji.calculate(sample_ohlcv_data, threshold=0.1)
+    assert isinstance(res_doji, pd.Series)
+    assert res_doji.name == "candle_doji"
+    assert set(res_doji.unique()).issubset({0, 1})
+
     # Test Inside Bar
-    ib = InsideBar()
-    df_ib = ib.calculate(sample_ohlcv_data)
-    assert "candle_inside_bar" in df_ib.columns
-    assert set(df_ib["candle_inside_bar"].unique()).issubset({0, 1})
+    res_ib = inside_bar.calculate(sample_ohlcv_data)
+    assert isinstance(res_ib, pd.Series)
+    assert res_ib.name == "candle_inside_bar"
+    assert set(res_ib.unique()).issubset({0, 1})
+
 
 def test_custom_indicators(sample_ohlcv_data):
     # Test SMC
-    smc = SMC()
-    df_smc = smc.calculate(sample_ohlcv_data, swing_length=10)
-    assert "fvg" in df_smc.columns
-    assert "fvg_top" in df_smc.columns
-    assert "fvg_bottom" in df_smc.columns
-    assert "fvg_mitigated" in df_smc.columns
-    assert "swing_high_low" in df_smc.columns
-    assert "swing_level" in df_smc.columns
-    assert "bos" in df_smc.columns
-    assert "choch" in df_smc.columns
-    assert "structure_level" in df_smc.columns
-    assert "structure_broken" in df_smc.columns
-    
+    res_smc = smc.calculate(sample_ohlcv_data, swing_length=10)
+    assert isinstance(res_smc, pd.DataFrame)
+    assert "fvg" in res_smc.columns
+    assert "fvg_top" in res_smc.columns
+    assert "fvg_bottom" in res_smc.columns
+    assert "fvg_mitigated" in res_smc.columns
+    assert "swing_high_low" in res_smc.columns
+    assert "swing_level" in res_smc.columns
+    assert "bos" in res_smc.columns
+    assert "choch" in res_smc.columns
+    assert "structure_level" in res_smc.columns
+    assert "structure_broken" in res_smc.columns
+
     # Test Hull Moving Average
-    hma = HullMovingAverage()
-    df_hma = hma.calculate(sample_ohlcv_data, period=9)
-    assert "hma_9" in df_hma.columns
+    res_hma = hull_moving_average.calculate(sample_ohlcv_data, period=9)
+    assert isinstance(res_hma, pd.Series)
+    assert res_hma.name == "hma_9"
 
 
 def test_indicator_validation_errors(sample_ohlcv_data):
@@ -199,15 +242,15 @@ def test_indicator_validation_errors(sample_ohlcv_data):
 
 
 def test_base_indicator_helpers() -> None:
+    from app.services.contracts.strategies import AccountSnapshot
     from app.services.indicators.base import (
+        arithmetic_average,
+        balance_scaled_volume,
         crossed_above,
         crossed_below,
         pips_to_price,
-        balance_scaled_volume,
-        arithmetic_average,
         weighted_average,
     )
-    from app.services.contracts.strategies import AccountSnapshot
 
     # Crossovers
     assert crossed_above(1.0, 1.0, 1.2, 1.1) is True
@@ -221,9 +264,11 @@ def test_base_indicator_helpers() -> None:
 
     # Scaling volume
     assert balance_scaled_volume(10000.0, 10000.0, 0.1, None) == 0.1
-    
+
     # Scaling volume with AccountSnapshot bounds & steps
-    acc = AccountSnapshot(balance=10000.0, volume_min=0.1, volume_max=5.0, volume_step=0.1)
+    acc = AccountSnapshot(
+        balance=10000.0, volume_min=0.1, volume_max=5.0, volume_step=0.1
+    )
     assert balance_scaled_volume(10000.0, 10000.0, 0.1, acc) == 0.1
     # Test min clamp
     assert balance_scaled_volume(1000.0, 10000.0, 0.1, acc) == 0.1
@@ -231,9 +276,13 @@ def test_base_indicator_helpers() -> None:
     assert balance_scaled_volume(100000.0, 10000.0, 1.0, acc) == 5.0
 
     # Scaling volume validation exceptions
-    with pytest.raises(ValueError, match="Balance and volume scaling inputs must be positive"):
+    with pytest.raises(
+        ValueError, match="Balance and volume scaling inputs must be positive"
+    ):
         balance_scaled_volume(10.0, -10.0, 0.1, None)
-    with pytest.raises(ValueError, match="Balance and volume scaling inputs must be positive"):
+    with pytest.raises(
+        ValueError, match="Balance and volume scaling inputs must be positive"
+    ):
         balance_scaled_volume(10.0, 10.0, -0.1, None)
 
     # Arithmetic average
@@ -243,11 +292,15 @@ def test_base_indicator_helpers() -> None:
 
     # Weighted average
     assert weighted_average([10.0, 20.0], [1.0, 3.0]) == 17.5
-    with pytest.raises(ValueError, match="Weighted average requires non-empty aligned sequences"):
+    with pytest.raises(
+        ValueError, match="Weighted average requires non-empty aligned sequences"
+    ):
         weighted_average([1.0], [1.0, 2.0])
-    with pytest.raises(ValueError, match="Weighted average requires non-empty aligned sequences"):
+    with pytest.raises(
+        ValueError, match="Weighted average requires non-empty aligned sequences"
+    ):
         weighted_average([], [])
-    with pytest.raises(ValueError, match="Weighted average quantities must sum to a positive value"):
+    with pytest.raises(
+        ValueError, match="Weighted average quantities must sum to a positive value"
+    ):
         weighted_average([1.0, 2.0], [0.0, -1.0])
-
-

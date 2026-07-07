@@ -30,13 +30,11 @@ class Pinbar(BaseIndicator):
     pd.DataFrame: Original DataFrame with 'candle_pinbar' column added (1 for bullish, -1 for bearish, 0 otherwise).
     """
 
-    def calculate(self, df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
+    def calculate(self, df: pd.DataFrame, **kwargs: Any) -> pd.Series:
         required_cols = ["open", "high", "low", "close"]
         for col in required_cols:
             if col not in df.columns:
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
-
-        result_df = df.copy()
 
         h_range = df["high"] - df["low"]
         body = (df["close"] - df["open"]).abs()
@@ -44,10 +42,14 @@ class Pinbar(BaseIndicator):
         lower_shadow = df[["open", "close"]].min(axis=1) - df["low"]
         upper_shadow = df["high"] - df[["open", "close"]].max(axis=1)
 
-        bullish = (lower_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
-        bearish = (upper_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
+        bullish = (
+            (lower_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
+        )
+        bearish = (
+            (upper_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
+        )
 
         pattern = np.where(bullish, 1, np.where(bearish, -1, 0))
 
-        result_df["candle_pinbar"] = pattern
-        return result_df
+        pinbar = pd.Series(pattern, index=df.index, name="candle_pinbar")
+        return pinbar

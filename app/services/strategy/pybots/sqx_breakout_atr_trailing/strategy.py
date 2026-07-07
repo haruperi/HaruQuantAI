@@ -28,17 +28,17 @@ class SQXBreakoutAtrTrailingStrategy(BaseStrategy):
         highest_prior = df["high"].shift(2).rolling(window=lookback).max()
         lowest_prior = df["low"].shift(2).rolling(window=lookback).min()
 
-        df["long_entry"] = (df["open"] > highest_signal) & (
-            df["open"].shift(1) <= highest_prior
-        )
-        df["short_entry"] = (df["open"] < lowest_signal) & (
-            df["open"].shift(1) >= lowest_prior
-        )
-        df["long_exit"] = False
-        df["short_exit"] = False
+        df["long_entry"] = (
+            (df["open"] > highest_signal) & (df["open"].shift(1) <= highest_prior)
+        ).astype(int)
+        df["short_entry"] = (
+            (df["open"] < lowest_signal) & (df["open"].shift(1) >= lowest_prior)
+        ).astype(int)
+        df["long_exit"] = 0
+        df["short_exit"] = 0
 
         # Precalculate ATR columns for trailing SL distance in build_protection_request
-        from app.services.indicators import ATR
+        from app.services.indicators import atr
 
         atr_stop_period = int(self.config.parameter("atr_stop_period"))
         trailing_stop_atr_period = int(
@@ -48,9 +48,13 @@ class SQXBreakoutAtrTrailingStrategy(BaseStrategy):
             self.config.parameter("trailing_activation_atr_period")
         )
 
-        df = ATR().calculate(df, period=atr_stop_period)
-        df = ATR().calculate(df, period=trailing_stop_atr_period)
-        df = ATR().calculate(df, period=trailing_activation_atr_period)
+        df[f"atr_{atr_stop_period}"] = atr.calculate(df, period=atr_stop_period)
+        df[f"atr_{trailing_stop_atr_period}"] = atr.calculate(
+            df, period=trailing_stop_atr_period
+        )
+        df[f"atr_{trailing_activation_atr_period}"] = atr.calculate(
+            df, period=trailing_activation_atr_period
+        )
 
         return df
 

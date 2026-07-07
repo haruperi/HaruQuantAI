@@ -27,13 +27,11 @@ class InsideBar(BaseIndicator):
     pd.DataFrame: Original DataFrame with 'candle_inside_bar' column added (1 if inside bar, 0 otherwise).
     """
 
-    def calculate(self, df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
+    def calculate(self, df: pd.DataFrame, **kwargs: Any) -> pd.Series:
         required_cols = ["high", "low"]
         for col in required_cols:
             if col not in df.columns:
                 raise ValueError(f"Column '{col}' not found in DataFrame.")
-
-        result_df = df.copy()
 
         high_prev = df["high"].shift(1)
         low_prev = df["low"].shift(1)
@@ -42,5 +40,5 @@ class InsideBar(BaseIndicator):
         pattern = np.where(is_inside, 1, 0)
         pattern[0] = 0
 
-        result_df["candle_inside_bar"] = pattern
-        return result_df
+        inside_bar = pd.Series(pattern, index=df.index, name="candle_inside_bar")
+        return inside_bar

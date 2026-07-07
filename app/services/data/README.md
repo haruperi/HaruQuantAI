@@ -6,7 +6,7 @@ The `app/services/data` package is the core **Layer 5 (Service Layer)** module r
 
 ## 1. System Architecture & Flow
 
-The service orchestrates data flows across multiple sub-components (Adapters, Cache, Database, Transforms, and Scheduler) under a single consolidated gateway interface.
+The service orchestrates data flows across multiple sub-components (Sources, Cache, Database, Transforms, and Scheduler) under a single consolidated gateway interface.
 
 ```mermaid
 graph TD
@@ -14,7 +14,7 @@ graph TD
     Gateway --> LicenseCheck{validation.py: validate_license}
     LicenseCheck -- Allowed --> CacheCheck{storage.py: Cache Hit?}
     CacheCheck -- Yes --> ReturnCache[Return Cached JSON]
-    CacheCheck -- No --> Adapter[gateway.py: Source Adapters]
+    CacheCheck -- No --> Adapter[sources.py: Source Resolver]
     Adapter --> SourceFetch[Dukascopy/MT5/cTrader/CSV/Synthetic]
     SourceFetch --> SaveCache[storage.py: set_cached_data]
     SourceFetch --> SaveDB[storage.py: save_market_data]
@@ -26,15 +26,17 @@ graph TD
 
 ## 2. Core Modules
 
-The service is compacted into 7 highly-focused modules:
+The service is compacted into 9 highly-focused modules:
 
 1. **[__init__.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/__init__.py)**: Exposes the 21 clean Layer 5 service functions. It contains no implementation details.
-2. **[gateway.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/gateway.py)**: Router gateway and source adapters. Orchestrates historical, real-time, local, synthetic, and broker data queries. Consolidates source adapters (`CSVAdapter`, `ParquetAdapter`, `DukascopyAdapter`, `MT5Adapter`, `CTraderAdapter`, `SyntheticAdapter`).
-3. **[models.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/models.py)**: Houses Pydantic schemas and standard data models (`OHLCVRecord`, `TickRecord`, `SpreadRecord`, `SymbolMetadata`, `DataAvailability`, `FeedStatus`, `JobConfig`, `JobStatus`).
-4. **[storage.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/storage.py)**: Interface for persistent storage (SQLite) and caching (SQLite-backed caching tables). Includes transaction-isolated writes and cache key generation.
-5. **[scheduler.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/scheduler.py)**: Managed background scheduler to fetch recurring updates, run once-off syncs, track feed status, and handle queue concurrency.
-6. **[transforms.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/transforms.py)**: Pure mathematical and structural operations. Manages tick aggregation, pandas resampling, timeframe alignment, indicators labeling, and NumPy type cleaning.
-7. **[validation.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/validation.py)**: Enforcement of safety boundaries, including timeframe format checks, volume/spread limits validation, licensing context verification, and timezone-aware market hours.
+2. **[gateway.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/gateway.py)**: Thin router gateway. Orchestrates request validation, licensing, rate limits, caching, source dispatch, and final schema validation.
+3. **[sources.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/sources.py)**: Data source resolver and adapters for local files, synthetic data, and broker-backed sources.
+4. **[normalization.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/normalization.py)**: Shared provider/file normalization helpers for OHLCV and tick records.
+5. **[models.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/models.py)**: Houses Pydantic schemas and standard data models (`OHLCVRecord`, `TickRecord`, `SpreadRecord`, `SymbolMetadata`, `DataAvailability`, `FeedStatus`, `JobConfig`, `JobStatus`).
+6. **[storage.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/storage.py)**: Interface for persistent storage (SQLite) and caching (SQLite-backed caching tables). Includes transaction-isolated writes and cache key generation.
+7. **[scheduler.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/scheduler.py)**: Managed background scheduler to fetch recurring updates, run once-off syncs, track feed status, and handle queue concurrency.
+8. **[transforms.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/transforms.py)**: Pure mathematical and structural operations. Manages tick aggregation, pandas resampling, timeframe alignment, indicators labeling, and NumPy type cleaning.
+9. **[validation.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/data/validation.py)**: Enforcement of safety boundaries, including timeframe format checks, volume/spread limits validation, licensing context verification, and timezone-aware market hours.
 
 ---
 
@@ -88,7 +90,8 @@ All public functions return clean Python primitives (`dict`, `list`, etc.) and t
 ### Gateway Queries (`gateway.py`)
 
 #### `get_data`
-Fetch historical OHLCV, tick, or spread records from cache or adapters.
+Fetch historical OHLCV, tick, or spread records from cache or the requested source.
+Fallback sources are intentionally unsupported: if the requested source fails, the gateway reports that error so the source problem can be fixed.
 
 ```python
 from app.services.data import get_data
@@ -163,7 +166,7 @@ Below is a detailed breakdown of all fields, accepted options, and execution beh
     * Days / Weeks / Months: `"D1"`, `"W1"`, `"MN1"`
 
 * **`source`** (`str`): Optional. Default is `"csv"`.
-  * **Description**: The primary adapter or channel utilized to fetch records.
+  * **Description**: The authoritative adapter or channel utilized to fetch records. Requests never fall back to another source.
   * **Allowed Options**:
     * `"csv"`: Reads from raw local CSV files located under the `data/raw/csv/` directory (e.g. `data/raw/csv/EURUSD_H1.csv`). Supports automatic tab/comma delimiter detection.
     * `"parquet"`: Reads from local Apache Parquet archives under the `data/raw/parquet/` directory (e.g. `data/raw/parquet/EURUSD_H1.parquet`).
@@ -196,10 +199,6 @@ Below is a detailed breakdown of all fields, accepted options, and execution beh
     * `"validation"`: Enforces licensing verification. Numbers are returned as decimal strings.
     * `"risk"`: Fail-closed context. Rejects queries on redistribution-restricted sources (like proprietary MT5/cTrader data feeds) to avoid regulatory violation. Returns decimal strings.
     * `"execution_bound"`: Highest security context. Full compliance licensing validation. Rejects restricted redistributions and returns decimal strings.
-
-* **`fallback_sources`** (`list[str] | None`): Optional. Default is `None`.
-  * **Description**: An explicit list of alternative source adapter strings to query sequentially if the primary `source` fails or raises an error.
-  * **Example**: `fallback_sources=["yahoo", "synthetic"]`
 
 * **`request_id`** (`str | None`): Optional. Default is `None`.
   * **Description**: Traceability tracking UUID/correlation identifier to link logs, DB queries, and audits.

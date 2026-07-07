@@ -39,7 +39,9 @@ def bundled_strategy_ids() -> tuple[str, ...]:
     return tuple(sorted(STRATEGY_TYPES))
 
 
-def load_bundled_strategy(strategy_id: str, state: StrategyState | None = None) -> BaseStrategy:
+def load_bundled_strategy(
+    strategy_id: str, state: StrategyState | None = None
+) -> BaseStrategy:
     """Load a bundled config and construct its matching implementation class."""
     try:
         strategy_type = STRATEGY_TYPES[strategy_id]
@@ -49,7 +51,9 @@ def load_bundled_strategy(strategy_id: str, state: StrategyState | None = None) 
     return strategy_type(config, state)
 
 
-def strategy_from_config(config: StrategyConfig, state: StrategyState | None = None) -> BaseStrategy:
+def strategy_from_config(
+    config: StrategyConfig, state: StrategyState | None = None
+) -> BaseStrategy:
     """Construct a bundled implementation from an already validated config."""
     try:
         return STRATEGY_TYPES[config.strategy_id](config, state)

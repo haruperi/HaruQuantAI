@@ -135,14 +135,16 @@ class HarrietHedgingStrategy(BaseStrategy):
         )
         merged.index = df_temp.index
 
-        df["long_entry"] = df["lower_low_confirm"] & merged[
-            "higher_low_confirm"
-        ].fillna(False).astype(bool)
-        df["short_entry"] = df["lower_high_confirm"] & merged[
-            "lower_high_confirm"
-        ].fillna(False).astype(bool)
-        df["long_exit"] = False
-        df["short_exit"] = False
+        df["long_entry"] = (
+            df["lower_low_confirm"]
+            & merged["higher_low_confirm"].fillna(False).astype(bool)
+        ).astype(int)
+        df["short_entry"] = (
+            df["lower_high_confirm"]
+            & merged["lower_high_confirm"].fillna(False).astype(bool)
+        ).astype(int)
+        df["long_exit"] = 0
+        df["short_exit"] = 0
 
         return df
 
@@ -184,7 +186,8 @@ class HarrietHedgingStrategy(BaseStrategy):
                         entry_type=EntryType.MARKET,  # pragma: no cover
                         requested_quantity=volume,  # pragma: no cover
                         protection=ProtectionRequest(  # pragma: no cover
-                            profit_target_price=quote.ask + target_distance  # pragma: no cover
+                            profit_target_price=quote.ask
+                            + target_distance  # pragma: no cover
                         ),  # pragma: no cover
                         comment="Buy",  # pragma: no cover
                         operation_key="structure_buy",  # pragma: no cover
@@ -199,7 +202,8 @@ class HarrietHedgingStrategy(BaseStrategy):
                         entry_type=EntryType.MARKET,  # pragma: no cover
                         requested_quantity=volume,  # pragma: no cover
                         protection=ProtectionRequest(  # pragma: no cover
-                            profit_target_price=quote.bid - target_distance  # pragma: no cover
+                            profit_target_price=quote.bid
+                            - target_distance  # pragma: no cover
                         ),  # pragma: no cover
                         comment="Sell",  # pragma: no cover
                         operation_key="structure_sell",  # pragma: no cover
@@ -218,7 +222,9 @@ class HarrietHedgingStrategy(BaseStrategy):
 
     def _volume(self, context: MarketContext) -> float:
         if context.account is None:
-            raise ValueError("HarrietHedgingStrategy requires MarketContext.account.")  # pragma: no cover
+            raise ValueError(
+                "HarrietHedgingStrategy requires MarketContext.account."
+            )  # pragma: no cover
         return balance_scaled_volume(
             context.account.balance,
             float(self.config.parameter("balance_increase")),
@@ -249,8 +255,12 @@ class HarrietHedgingStrategy(BaseStrategy):
                     self._make_modify_intent(  # pragma: no cover
                         context,  # pragma: no cover
                         direction,  # pragma: no cover
-                        tuple(position.position_id for position in positions),  # pragma: no cover
-                        ProtectionRequest(profit_target_price=target),  # pragma: no cover
+                        tuple(
+                            position.position_id for position in positions
+                        ),  # pragma: no cover
+                        ProtectionRequest(
+                            profit_target_price=target
+                        ),  # pragma: no cover
                         operation_key=f"basket_tp_{direction}",  # pragma: no cover
                         comment="Basket average TP",  # pragma: no cover
                     )  # pragma: no cover
@@ -270,7 +280,9 @@ class HarrietHedgingStrategy(BaseStrategy):
         if not active:  # pragma: no cover
             return []  # pragma: no cover
         lower = context.bars[-1]  # pragma: no cover
-        new_stop = lower.low if direction is Direction.LONG else lower.high  # pragma: no cover
+        new_stop = (
+            lower.low if direction is Direction.LONG else lower.high
+        )  # pragma: no cover
         improve = position.stop_loss_price is None or (  # pragma: no cover
             new_stop > position.stop_loss_price  # pragma: no cover
             if direction is Direction.LONG  # pragma: no cover

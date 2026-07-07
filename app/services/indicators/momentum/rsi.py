@@ -29,24 +29,23 @@ class RSI(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'rsi_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 14, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 14, column: str = "close", **kwargs: Any
+    ) -> pd.Series:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
-
-        result_df = df.copy()
 
         delta = df[column].diff()
         gain = delta.clip(lower=0)
         loss = -delta.clip(upper=0)
 
         # Wilder's smoothing technique
-        avg_gain = gain.ewm(alpha=1/period, adjust=False).mean()
-        avg_loss = loss.ewm(alpha=1/period, adjust=False).mean()
+        avg_gain = gain.ewm(alpha=1 / period, adjust=False).mean()
+        avg_loss = loss.ewm(alpha=1 / period, adjust=False).mean()
 
         rs = avg_gain / avg_loss.replace(0, 1e-10)
         rsi = 100 - (100 / (1 + rs))
-
-        result_df[f"rsi_{period}"] = rsi
-        return result_df
+        rsi.name = f"rsi_{period}"
+        return rsi

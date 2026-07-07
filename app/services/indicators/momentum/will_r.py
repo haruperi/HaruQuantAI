@@ -27,7 +27,7 @@ class WilliamsR(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'will_r_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 14, **kwargs: Any) -> pd.DataFrame:
+    def calculate(self, df: pd.DataFrame, period: int = 14, **kwargs: Any) -> pd.Series:
         required_cols = ["high", "low", "close"]
         for col in required_cols:
             if col not in df.columns:
@@ -35,13 +35,10 @@ class WilliamsR(BaseIndicator):
         if period < 1:
             raise ValueError("Period must be greater than or equal to 1.")
 
-        result_df = df.copy()
-
         highest_high = df["high"].rolling(window=period).max()
         lowest_low = df["low"].rolling(window=period).min()
 
         denom = highest_high - lowest_low
         will_r = (highest_high - df["close"]) / denom.replace(0, 1e-10) * -100
-
-        result_df[f"will_r_{period}"] = will_r
-        return result_df
+        will_r.name = f"will_r_{period}"
+        return will_r

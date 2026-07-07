@@ -39,35 +39,37 @@ class SMC(BaseIndicator):
         swing_length: int = 50,
         join_consecutive_fvg: bool = False,
         close_break: bool = True,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> pd.DataFrame:
         # Validate input DataFrame
         ohlc = self._validate_and_lowercase(df, "ohlc")
 
-        result_df = df.copy()
+        smc_df = pd.DataFrame(index=df.index)
 
         # FVG calculation
         fvg_res = self._fvg(ohlc, join_consecutive_fvg)
-        result_df["fvg"] = fvg_res["FVG"].values
-        result_df["fvg_top"] = fvg_res["Top"].values
-        result_df["fvg_bottom"] = fvg_res["Bottom"].values
-        result_df["fvg_mitigated"] = fvg_res["MitigatedIndex"].values
+        smc_df["fvg"] = fvg_res["FVG"].values
+        smc_df["fvg_top"] = fvg_res["Top"].values
+        smc_df["fvg_bottom"] = fvg_res["Bottom"].values
+        smc_df["fvg_mitigated"] = fvg_res["MitigatedIndex"].values
 
         # Swing Highs/Lows calculation
         swings = self._swing_highs_lows(ohlc, swing_length)
-        result_df["swing_high_low"] = swings["HighLow"].values
-        result_df["swing_level"] = swings["Level"].values
+        smc_df["swing_high_low"] = swings["HighLow"].values
+        smc_df["swing_level"] = swings["Level"].values
 
         # BOS / CHoCH calculation
         bc = self._bos_choch(ohlc, swings, close_break)
-        result_df["bos"] = bc["BOS"].values
-        result_df["choch"] = bc["CHOCH"].values
-        result_df["structure_level"] = bc["Level"].values
-        result_df["structure_broken"] = bc["BrokenIndex"].values
+        smc_df["bos"] = bc["BOS"].values
+        smc_df["choch"] = bc["CHOCH"].values
+        smc_df["structure_level"] = bc["Level"].values
+        smc_df["structure_broken"] = bc["BrokenIndex"].values
 
-        return result_df
+        return smc_df
 
-    def _validate_and_lowercase(self, df: pd.DataFrame, columns_required: str = "ohlc") -> pd.DataFrame:
+    def _validate_and_lowercase(
+        self, df: pd.DataFrame, columns_required: str = "ohlc"
+    ) -> pd.DataFrame:
         df_copy = df.copy()
         df_copy.columns = [c.lower() for c in df_copy.columns]
 
@@ -148,7 +150,9 @@ class SMC(BaseIndicator):
             axis=1,
         )
 
-    def _swing_highs_lows(self, ohlc: pd.DataFrame, swing_length: int = 50) -> pd.DataFrame:
+    def _swing_highs_lows(
+        self, ohlc: pd.DataFrame, swing_length: int = 50
+    ) -> pd.DataFrame:
         swing_length *= 2
         swing_highs_lows = np.where(
             ohlc["high"]
@@ -218,7 +222,12 @@ class SMC(BaseIndicator):
             axis=1,
         )
 
-    def _bos_choch(self, ohlc: pd.DataFrame, swing_highs_lows: pd.DataFrame, close_break: bool = True) -> pd.DataFrame:
+    def _bos_choch(
+        self,
+        ohlc: pd.DataFrame,
+        swing_highs_lows: pd.DataFrame,
+        close_break: bool = True,
+    ) -> pd.DataFrame:
         swing_highs_lows = swing_highs_lows.copy()
 
         level_order = []

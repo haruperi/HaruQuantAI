@@ -32,11 +32,11 @@ class NaiveMATrendStrategy(BaseStrategy):
         slow = int(self.config.parameter("slow_ma_period"))
         trend = int(self.config.parameter("filter_ma_period"))
 
-        from app.services.indicators import SMA
+        from app.services.indicators import sma
 
-        df = SMA().calculate(df, period=fast, column="close")
-        df = SMA().calculate(df, period=slow, column="close")
-        df = SMA().calculate(df, period=trend, column="close")
+        df[f"sma_{fast}"] = sma.calculate(df, period=fast, column="close")
+        df[f"sma_{slow}"] = sma.calculate(df, period=slow, column="close")
+        df[f"sma_{trend}"] = sma.calculate(df, period=trend, column="close")
 
         fast_ma = df[f"sma_{fast}"]
         slow_ma = df[f"sma_{slow}"]
@@ -48,9 +48,9 @@ class NaiveMATrendStrategy(BaseStrategy):
         up_cross = (fast_ma > slow_ma) & (fast_prev <= slow_prev)
         down_cross = (fast_ma < slow_ma) & (fast_prev >= slow_prev)
 
-        df["long_entry"] = up_cross & (slow_ma > trend_ma)
-        df["short_entry"] = down_cross & (slow_ma < trend_ma)
-        df["long_exit"] = down_cross
-        df["short_exit"] = up_cross
+        df["long_entry"] = (up_cross & (slow_ma > trend_ma)).astype(int)
+        df["short_entry"] = (down_cross & (slow_ma < trend_ma)).astype(int)
+        df["long_exit"] = down_cross.astype(int)
+        df["short_exit"] = up_cross.astype(int)
 
         return df
