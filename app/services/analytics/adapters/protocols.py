@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any, Protocol, TypedDict
 
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 
 class TradingResultDict(TypedDict, total=False):
@@ -75,11 +76,24 @@ class TradingResultAdapter(Protocol):
         self,
         source_payload: dict[str, Any],
     ) -> dict[str, Any]:
-        """Convert a raw dictionary source payload to a canonical dictionary format."""
+        """Convert a raw dictionary source payload to a canonical dictionary format.
+
+        Args:
+            source_payload (dict[str, Any]): Input parameter `source_payload`.
+
+        Returns:
+            Calculated dict[str, Any] value.
+        """
         ...
 
 
 def validate_adapter_contract(adapter: Any) -> None:  # noqa: ANN401
+    """Validate that an adapter class or instance conforms to the Protocol.
+
+    Args:
+        adapter (Any): Input parameter `adapter`.
+    """
+    logger.debug("validate_adapter_contract: executed.")
     """Validate that an adapter class or instance conforms to the Protocol.
 
     Args:
@@ -88,9 +102,7 @@ def validate_adapter_contract(adapter: Any) -> None:  # noqa: ANN401
     Raises:
         ValidationError: If the adapter is missing the required methods.
     """
-    if not hasattr(adapter, "to_canonical") or not callable(
-        adapter.to_canonical
-    ):
+    if not hasattr(adapter, "to_canonical") or not callable(adapter.to_canonical):
         msg = (
             "Adapter contract validation failed: missing callable method "
             "'to_canonical'."

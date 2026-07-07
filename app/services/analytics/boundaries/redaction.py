@@ -8,6 +8,8 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Any
 
+from app.utils.logger import logger
+
 
 class RedactionPolicy(StrEnum):
     """Policies for level of redaction coverage."""
@@ -20,7 +22,16 @@ def redact(
     value: object,
     policy: RedactionPolicy = RedactionPolicy.STANDARD,
 ) -> object:
-    """Recursively redact secrets and credentials from data payloads."""
+    """Recursively redact secrets and credentials from data payloads.
+
+    Args:
+        value (object): Input parameter `value`.
+        policy (RedactionPolicy): Input parameter `policy`.
+
+    Returns:
+        Calculated object value.
+    """
+    logger.debug("redact: executed.")
     sensitive_keys = {
         "secret",
         "token",

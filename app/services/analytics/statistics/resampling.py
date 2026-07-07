@@ -18,10 +18,16 @@ from app.utils import (
     success_response,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 
 def _validate_request_id(request_id: str | None) -> None:
-    """Helper to validate request_id strictly."""
+    """Helper to validate request_id strictly.
+
+    Args:
+        request_id (str | None): Input parameter `request_id`.
+    """
+    logger.debug("_validate_request_id: executed.")
     if request_id is not None and (
         not isinstance(request_id, str) or not request_id.strip()
     ):
@@ -29,6 +35,15 @@ def _validate_request_id(request_id: str | None) -> None:
 
 
 def _to_float_list(series: object) -> list[float]:
+    """Expose behavior for `_to_float_list`.
+
+    Args:
+        series (object): Input parameter `series`.
+
+    Returns:
+        Calculated list[float] value.
+    """
+    logger.debug("_to_float_list: executed.")
     if series is None:
         return []
     if hasattr(series, "tolist"):
@@ -47,7 +62,18 @@ def bootstrap_confidence_intervals(
     iterations: int = 1000,
     seed: int = 42,
 ) -> tuple[float, float]:
-    """Estimate metric uncertainty with non-parametric bootstrap."""
+    """Estimate metric uncertainty with non-parametric bootstrap.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+        confidence (float): Input parameter `confidence`.
+        iterations (int): Input parameter `iterations`.
+        seed (int): Input parameter `seed`.
+
+    Returns:
+        Calculated tuple[float, float] value.
+    """
+    logger.debug("bootstrap_confidence_intervals: executed.")
     f_list = _to_float_list(values)
     if not f_list:
         return 0.0, 0.0
@@ -70,7 +96,18 @@ def permutation_test(
     iterations: int = 1000,
     seed: int = 42,
 ) -> float:
-    """Run significance testing through random reshuffling or sign-flipping."""
+    """Run significance testing through random reshuffling or sign-flipping.
+
+    Args:
+        group1 (Sequence[float] | object): Input parameter `group1`.
+        group2 (Sequence[float] | object): Input parameter `group2`.
+        iterations (int): Input parameter `iterations`.
+        seed (int): Input parameter `seed`.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("permutation_test: executed.")
     f_group1 = _to_float_list(group1)
     f_group2 = _to_float_list(group2)
     if not f_group1 or not f_group2:
@@ -96,14 +133,31 @@ def permutation_test(
 def permutation_test_backtest(
     _report1: dict[str, Any], _report2: dict[str, Any]
 ) -> float:
-    """Run permutation testing against backtest result objects."""
+    """Run permutation testing against backtest result objects.
+
+    Args:
+        _report1 (dict[str, Any]): Input parameter `_report1`.
+        _report2 (dict[str, Any]): Input parameter `_report2`.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("permutation_test_backtest: executed.")
     return 0.05
 
 
 def bootstrap_confidence_intervals_backtest(
     _report: dict[str, Any],
 ) -> tuple[float, float]:
-    """Estimate bootstrap confidence intervals from a backtest result object."""
+    """Estimate bootstrap confidence intervals from a backtest result object.
+
+    Args:
+        _report (dict[str, Any]): Input parameter `_report`.
+
+    Returns:
+        Calculated tuple[float, float] value.
+    """
+    logger.debug("bootstrap_confidence_intervals_backtest: executed.")
     return 1.2, 1.8
 
 
@@ -113,7 +167,18 @@ def bootstrap_probability_above_threshold(
     seed: int = 42,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Estimate probability that a bootstrapped metric exceeds a threshold."""
+    """Estimate probability that a bootstrapped metric exceeds a threshold.
+
+    Args:
+        values (object): Sequence of numeric values.
+        threshold (float): Input parameter `threshold`.
+        seed (int): Input parameter `seed`.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("bootstrap_probability_above_threshold: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="bootstrap_probability_above_threshold",

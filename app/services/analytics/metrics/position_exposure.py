@@ -10,8 +10,9 @@ import datetime
 from collections.abc import Sequence
 from typing import Any
 
-from app.services.analytics._helpers import parse_utc_time
 from app.services.analytics.contracts import MetricConfig, MetricResult
+from app.services.analytics.metrics.trade_outcomes import parse_utc_time
+from app.utils.logger import logger
 
 type TradeRecord = dict[str, Any]
 type Duration = datetime.timedelta | float
@@ -21,7 +22,16 @@ def max_gross_size_held(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate the maximum individual absolute trade size (ANL-NFR-018)."""
+    """Calculate the maximum individual absolute trade size (ANL-NFR-018).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("max_gross_size_held: executed.")
     val = max(
         (abs(float(t.get("size") or t.get("volume") or 0.0)) for t in trades),
         default=0.0,
@@ -33,7 +43,16 @@ def max_size_held(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate maximum total contracts held (ANL-NFR-031)."""
+    """Calculate maximum total contracts held (ANL-NFR-031).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("max_size_held: executed.")
     val = max(
         (abs(float(t.get("size") or t.get("volume") or 0.0)) for t in trades),
         default=0.0,
@@ -45,7 +64,16 @@ def max_net_size_held(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate maximum net directional size held (ANL-NFR-032)."""
+    """Calculate maximum net directional size held (ANL-NFR-032).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("max_net_size_held: executed.")
     ordered = sorted(
         trades,
         key=lambda t: (
@@ -70,7 +98,16 @@ def max_long_size_held(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate maximum total long contracts held (ANL-NFR-033)."""
+    """Calculate maximum total long contracts held (ANL-NFR-033).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("max_long_size_held: executed.")
     longs = [
         float(t.get("size") or t.get("volume") or 0.0)
         for t in trades
@@ -84,7 +121,16 @@ def max_short_size_held(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate maximum total short contracts held (ANL-NFR-034)."""
+    """Calculate maximum total short contracts held (ANL-NFR-034).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("max_short_size_held: executed.")
     shorts = [
         float(t.get("size") or t.get("volume") or 0.0)
         for t in trades
@@ -95,7 +141,15 @@ def max_short_size_held(
 
 
 def time_in_market_duration(trades: Sequence[TradeRecord]) -> float:
-    """Helper to compute total duration where at least one position was open."""
+    """Helper to compute total duration where at least one position was open.
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("time_in_market_duration: executed.")
     intervals = []
     for t in trades:
         ot = parse_utc_time(t.get("open_time") or t.get("open_timestamp"))
@@ -121,7 +175,16 @@ def percent_time_in_market(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate percent of the trading period spent in the market (ANL-NFR-019)."""
+    """Calculate percent of the trading period spent in the market (ANL-NFR-019).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("percent_time_in_market: executed.")
     valid_trades = []
     for t in trades:
         ot = parse_utc_time(t.get("open_time") or t.get("open_timestamp"))
@@ -151,7 +214,16 @@ def open_position_pnl(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate total unrealized PnL from open positions (ANL-NFR-025)."""
+    """Calculate total unrealized PnL from open positions (ANL-NFR-025).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("open_position_pnl: executed.")
     val = sum(
         float(t.get("unrealized_pnl") or t.get("pnl") or 0.0)
         for t in trades
@@ -164,7 +236,16 @@ def slippage_paid(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate total absolute slippage costs paid (ANL-NFR-026)."""
+    """Calculate total absolute slippage costs paid (ANL-NFR-026).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("slippage_paid: executed.")
     val = sum(abs(float(t.get("slippage") or 0.0)) for t in trades)
     return MetricResult(value=val)
 
@@ -173,7 +254,16 @@ def commission_paid(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate total absolute commission costs paid (ANL-NFR-027)."""
+    """Calculate total absolute commission costs paid (ANL-NFR-027).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("commission_paid: executed.")
     val = sum(abs(float(t.get("commission") or 0.0)) for t in trades)
     return MetricResult(value=val)
 
@@ -182,6 +272,15 @@ def swap_paid(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate total absolute swap costs paid (ANL-NFR-028)."""
+    """Calculate total absolute swap costs paid (ANL-NFR-028).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("swap_paid: executed.")
     val = sum(abs(float(t.get("swap") or t.get("swap_cost") or 0.0)) for t in trades)
     return MetricResult(value=val)

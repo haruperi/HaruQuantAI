@@ -1,6 +1,6 @@
 from typing import Any
 
-from app.services.analytics.trade import (
+from tests.unit.app.services.analytics.compat_test_helper import (
     adjusted_net_profit_as_percent_of_max_trade_drawdown,
     net_profit_as_percent_of_max_trade_drawdown,
     runs_test_zscore,
@@ -10,7 +10,7 @@ from app.services.analytics.trade import (
     select_net_profit_as_percent_of_max_trade_drawdown,
     win_after_win_probability,
 )
-from app.services.analytics.trade import (
+from tests.unit.app.services.analytics.compat_test_helper import (
     rolling_expectancy_stability as expectancy_std,
 )
 

@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Trading result canonicalization engine (ANL-NFR-092, ANL-NFR-093).
 
 Converts various dictionary formats, Pydantic objects, and other shapes into
@@ -23,6 +24,7 @@ from app.services.contracts.simulation import (
     BacktestResult as UpstreamBacktestResult,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 # Define type aliases for alternative source formats (ANL-NFR-092)
 type BacktestResult = UpstreamBacktestResult | dict[str, Any]
@@ -36,21 +38,29 @@ _VALID_PHASES = frozenset({"backtest", "paper", "live", "simulation"})
 class TradingResultAdapter:
     """Class-level adapter mapping raw dictionary structures to canonical dicts."""
 
-    REQUIRED_KEYS: frozenset[str] = frozenset({
-        "schema_version",
-        "result_id",
-        "phase",
-        "trades",
-        "equity_curve",
-    })
+    REQUIRED_KEYS: frozenset[str] = frozenset(
+        {
+            "schema_version",
+            "result_id",
+            "phase",
+            "trades",
+            "equity_curve",
+        }
+    )
 
     @classmethod
     def _check_schema_version(cls, schema_version: str) -> list[str]:
-        """Validate schema version against standard compatibility rules."""
+        """Validate schema version against standard compatibility rules.
+
+        Args:
+            schema_version (str): Input parameter `schema_version`.
+
+        Returns:
+            Calculated list[str] value.
+        """
+        logger.debug("_check_schema_version: executed.")
         # Use our contracts validator to check status
-        status = validate_schema_version(
-            schema_version, SCHEMA_COMPATIBILITY_MATRIX
-        )
+        status = validate_schema_version(schema_version, SCHEMA_COMPATIBILITY_MATRIX)
 
         warnings: list[str] = []
         if status == "deprecated":
@@ -67,11 +77,17 @@ class TradingResultAdapter:
 
     @classmethod
     def to_canonical(cls, source_payload: dict[str, Any]) -> dict[str, Any]:
-        """Convert a raw dictionary source payload to a canonical dict."""
+        """Convert a raw dictionary source payload to a canonical dict.
+
+        Args:
+            source_payload (dict[str, Any]): Input parameter `source_payload`.
+
+        Returns:
+            Calculated dict[str, Any] value.
+        """
+        logger.debug("to_canonical: executed.")
         if not isinstance(source_payload, dict):
-            raise ValidationError(
-                "Trading result source_payload must be a dictionary."
-            )
+            raise ValidationError("Trading result source_payload must be a dictionary.")
 
         missing_keys = cls.REQUIRED_KEYS - source_payload.keys()
         if missing_keys:
@@ -79,9 +95,7 @@ class TradingResultAdapter:
                 "Missing required keys for canonical TradingResult:"
                 f" {sorted(missing_keys)}"
             )
-            raise ValidationError(
-                msg
-            )
+            raise ValidationError(msg)
 
         schema_version = source_payload.get("schema_version")
         if not isinstance(schema_version, str) or not schema_version.strip():
@@ -96,9 +110,7 @@ class TradingResultAdapter:
         phase = source_payload.get("phase")
         if phase not in _VALID_PHASES:
             msg = f"phase must be one of: {sorted(_VALID_PHASES)}"
-            raise ValidationError(
-                msg
-            )
+            raise ValidationError(msg)
 
         trades = source_payload.get("trades")
         if not isinstance(trades, list):
@@ -131,32 +143,32 @@ class TradingResultAdapter:
 
 
 def to_canonical(source_payload: dict[str, Any]) -> dict[str, Any]:
-    """Module-level convenience wrapper for TradingResultAdapter.to_canonical."""
+    """Module-level convenience wrapper for TradingResultAdapter.to_canonical.
+
+    Args:
+        source_payload (dict[str, Any]): Input parameter `source_payload`.
+
+    Returns:
+        Calculated dict[str, Any] value.
+    """
+    logger.debug("to_canonical: executed.")
     return TradingResultAdapter.to_canonical(source_payload)
 
 
 def to_trading_result(
     source: (
-        BacktestResult
-        | PaperResult
-        | LiveResult
-        | PortfolioResult
-        | TradingResult
+        BacktestResult | PaperResult | LiveResult | PortfolioResult | TradingResult
     ),
 ) -> TradingResult:
     """Convert raw trading/backtest results into the canonical TradingResult dataclass.
 
-    This preserves all details without silent field loss (ANL-NFR-093, ANL-NFR-094).
-
     Args:
-        source: A dictionary, dataclass, or Pydantic result model.
+        source (BacktestResult | PaperResult | LiveResult | PortfolioResult | TradingResult): Input parameter `source`.
 
     Returns:
-        A canonical TradingResult dataclass.
-
-    Raises:
-        ValidationError: If input fields are missing or malformed.
+        Calculated TradingResult value.
     """
+    logger.debug("to_trading_result: executed.")
     if isinstance(source, TradingResult):
         return source
 
@@ -168,9 +180,7 @@ def to_trading_result(
     elif isinstance(source, dict):
         data = source
     else:
-        msg = (
-            f"Unsupported type for canonicalization: {type(source).__name__}."
-        )
+        msg = f"Unsupported type for canonicalization: {type(source).__name__}."
         raise ValidationError(msg)
 
     # Validate and default standard fields

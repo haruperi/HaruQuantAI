@@ -10,6 +10,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from app.utils.logger import logger
+
 
 @dataclass(frozen=True, slots=True)
 class ChartPoint:
@@ -62,7 +64,16 @@ def truncate_series(
     points: Sequence[ChartPoint] | list[dict[str, Any]],
     policy: TruncationPolicy | None = None,
 ) -> TruncatedSeries:
-    """Deterministic downsampling of series points preserving key extrema."""
+    """Deterministic downsampling of series points preserving key extrema.
+
+    Args:
+        points (Sequence[ChartPoint] | list[dict[str, Any]]): Input parameter `points`.
+        policy (TruncationPolicy | None): Input parameter `policy`.
+
+    Returns:
+        Calculated TruncatedSeries value.
+    """
+    logger.debug("truncate_series: executed.")
     pol = policy or TruncationPolicy()
     max_points = pol.max_points
     n = len(points)
@@ -84,10 +95,12 @@ def truncate_series(
             curve_dicts.append(p)
         else:
             is_object = True
-            curve_dicts.append({
-                "time": getattr(p, "time", 0.0),
-                "equity": getattr(p, "equity", 0.0),
-            })
+            curve_dicts.append(
+                {
+                    "time": getattr(p, "time", 0.0),
+                    "equity": getattr(p, "equity", 0.0),
+                }
+            )
 
     # Find peak and trough indexes
     peak_idx = 0
@@ -131,7 +144,16 @@ def truncate_series(
 def _downsample_curve(
     curve: list[dict[str, Any]], max_points: int = 100
 ) -> dict[str, Any]:
-    """Backward-compatible wrapper for downsampling a curve dict list."""
+    """Backward-compatible wrapper for downsampling a curve dict list.
+
+    Args:
+        curve (list[dict[str, Any]]): Input parameter `curve`.
+        max_points (int): Input parameter `max_points`.
+
+    Returns:
+        Calculated dict[str, Any] value.
+    """
+    logger.debug("_downsample_curve: executed.")
     res = truncate_series(curve, TruncationPolicy(max_points=max_points))
     return {
         "curve": res.curve,
@@ -141,4 +163,3 @@ def _downsample_curve(
         "truncation_method": res.truncation_method,
         "truncation_reason": res.truncation_reason,
     }
-

@@ -249,12 +249,9 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-198`, `ANL-NFR-428`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-198**: No file-specific non-functional requirements defined.  
-  *Evidence: app/services/analytics/contracts/models.py (Inherited scope)*
-- [X] **ANL-NFR-428**: `TradingResult`, `AnalyticsReport`, `PortfolioAnalyticsReport`, dashboard payloads, warning objects, quality flags, and error envelopes have versioned schemas.  
-  *Evidence: app/services/analytics/contracts/models.py line 62-248*
-- [X] **ANL-BR-002**: Analytics outputs used by UI/API must remain backward-compatible or be versioned when payload structure changes.  
-  *Evidence: app/services/analytics/contracts/models.py line 271-314*
+- **ANL-NFR-198**: No file-specific non-functional requirements defined.
+- **ANL-NFR-428**: `TradingResult`, `AnalyticsReport`, `PortfolioAnalyticsReport`, dashboard payloads, warning objects, quality flags, and error envelopes have versioned schemas.
+- **ANL-BR-002**: Analytics outputs used by UI/API must remain backward-compatible or be versioned when payload structure changes.
 
 Target Class/Function:
 - validate_schema_version(version: str, matrix: SchemaCompatibilityMatrix) -> SchemaCompatibility — Pure.
@@ -268,28 +265,17 @@ Requirement Title: **11 mapped requirement(s)** — `ANL-NFR-074`, `ANL-NFR-075`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-074**: Undefined or unsupported metric values must be represented as omitted fields or `None` according to the output schema plus structured warnings or skipped-section metadata; they must not be serialized as `NaN`, infinity, fabricated zero, or display-only caps.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (undefined_behavior attributes)*
-- [X] **ANL-NFR-075**: R-multiple fallback proxies must be listed in the Metric Definition Catalog before use; fallback-derived R-multiple values must include warning metadata and mark the affected metric confidence as degraded.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 606-635 (r_multiple & r_multiple_proxy_profit_loss)*
-- [X] **ANL-NFR-076**: Every official metric must define formula, units, required inputs, optional inputs, accepted aliases, return scale, annualization basis, sample/population convention, minimum sample size, undefined-result behavior, and golden-fixture expectations.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (MetricDefinition slots)*
-- [X] **ANL-NFR-079**: Numeric outputs must avoid misleading precision and must handle empty, missing, non-finite, zero-denominator, and insufficient-sample scenarios consistently.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (MetricDefinition specifications)*
-- [X] **ANL-NFR-080**: Documentation must include the Metric Definition Catalog.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (METRIC_DEFINITION_CATALOG docstrings)*
-- [X] **ANL-NFR-081**: Official Analytics Tool Catalog is approved and maps every official tool to schemas, errors, metadata, side effects, stability, and tests.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 780-891 (OFFICIAL_ANALYTICS_TOOL_CATALOG)*
-- [X] **ANL-NFR-082**: Metric Definition Catalog is approved and no official schema references uncataloged metrics.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 1121-1165 (validate_metric_catalog)*
-- [X] **ANL-NFR-083**: Public/internal export classification is approved, including compatibility aliases and deprecated exports.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 780-891 (ToolDefinition and OFFICIAL_ANALYTICS_TOOL_CATALOG)*
-- [X] **ANL-NFR-084**: Analytics-owned private canonical metric-kernel model is documented and enforced through public/internal export classification tests.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (MetricDefinition catalog entries)*
-- [X] **ANL-NFR-085**: Schema compatibility matrix defines accepted, deprecated, legacy-adapted, rejected, and unsupported future versions.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 20-28 (SCHEMA_COMPATIBILITY_MATRIX)*
-- [X] **ANL-NFR-086**: Decimal monetary precision mandate and deterministic derived-ratio tolerance policy are documented in schemas, metadata, and tests.  
-  *Evidence: app/services/analytics/contracts/metric_catalog.py line 38-42 (DECIMAL_PRECISION_POLICY)*
+- **ANL-NFR-074**: Undefined or unsupported metric values must be represented as omitted fields or `None` according to the output schema plus structured warnings or skipped-section metadata; they must not be serialized as `NaN`, infinity, fabricated zero, or display-only caps.
+- **ANL-NFR-075**: R-multiple fallback proxies must be listed in the Metric Definition Catalog before use; fallback-derived R-multiple values must include warning metadata and mark the affected metric confidence as degraded.
+- **ANL-NFR-076**: Every official metric must define formula, units, required inputs, optional inputs, accepted aliases, return scale, annualization basis, sample/population convention, minimum sample size, undefined-result behavior, and golden-fixture expectations.
+- **ANL-NFR-079**: Numeric outputs must avoid misleading precision and must handle empty, missing, non-finite, zero-denominator, and insufficient-sample scenarios consistently.
+- **ANL-NFR-080**: Documentation must include the Metric Definition Catalog.
+- **ANL-NFR-081**: Official Analytics Tool Catalog is approved and maps every official tool to schemas, errors, metadata, side effects, stability, and tests.
+- **ANL-NFR-082**: Metric Definition Catalog is approved and no official schema references uncataloged metrics.
+- **ANL-NFR-083**: Public/internal export classification is approved, including compatibility aliases and deprecated exports.
+- **ANL-NFR-084**: Analytics-owned private canonical metric-kernel model is documented and enforced through public/internal export classification tests.
+- **ANL-NFR-085**: Schema compatibility matrix defines accepted, deprecated, legacy-adapted, rejected, and unsupported future versions.
+- **ANL-NFR-086**: Decimal monetary precision mandate and deterministic derived-ratio tolerance policy are documented in schemas, metadata, and tests.
 
 Target Class/Function:
 - `None(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -303,16 +289,11 @@ Requirement Title: **5 mapped requirement(s)** — `ANL-NFR-276`, `ANL-NFR-277`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-276**: Redaction rules must apply to sensitive keys and sensitive-looking values in inputs, warnings, errors, logs, metadata, and diagnostic details.  
-  *Evidence: app/services/analytics/contracts/warnings.py lines 142-166 (redact_sensitive_info)*
-- [X] **ANL-NFR-277**: Low-level metric helpers such as individual average, skewness, kurtosis, tail-ratio, tracking-error, ulcer-index, omega-ratio, payoff-ratio, and date helper functions must remain internal/support-only unless explicitly promoted by the Official Analytics Tool Catalog.  
-  *Evidence: app/services/analytics/contracts/__init__.py (low-level helpers are kept private and excluded from public package exports)*
-- [X] **ANL-NFR-278**: Warnings and quality flags must include code, severity, affected section, source context, and enough bounded detail for downstream review.  
-  *Evidence: app/services/analytics/contracts/warnings.py lines 169-266 (build_warning and build_quality_flag)*
-- [X] **ANL-NFR-279**: Warning and quality-flag catalogs must define code, severity, affected section, source-backed status, whether the flag blocks promotion, bounded detail rules, and linked test fixtures.  
-  *Evidence: app/services/analytics/contracts/warnings.py lines 68-139 (WARNING_CATALOG & QUALITY_FLAG_CATALOG)*
-- [X] **ANL-NFR-280**: Explainability outputs must distinguish explained PnL, unexplained PnL, explained variance percentage, sample count, and driver stability when those inputs are supplied.  
-  *Evidence: app/services/analytics/contracts/models.py lines 434-453 (ExplainabilityOutput)*
+- **ANL-NFR-276**: Redaction rules must apply to sensitive keys and sensitive-looking values in inputs, warnings, errors, logs, metadata, and diagnostic details.
+- **ANL-NFR-277**: Low-level metric helpers such as individual average, skewness, kurtosis, tail-ratio, tracking-error, ulcer-index, omega-ratio, payoff-ratio, and date helper functions must remain internal/support-only unless explicitly promoted by the Official Analytics Tool Catalog.
+- **ANL-NFR-278**: Warnings and quality flags must include code, severity, affected section, source context, and enough bounded detail for downstream review.
+- **ANL-NFR-279**: Warning and quality-flag catalogs must define code, severity, affected section, source-backed status, whether the flag blocks promotion, bounded detail rules, and linked test fixtures.
+- **ANL-NFR-280**: Explainability outputs must distinguish explained PnL, unexplained PnL, explained variance percentage, sample count, and driver stability when those inputs are supplied.
 
 Target Class/Function:
 - build_warning(code: str, severity: WarningSeverity, section: str, detail: Mapping[str, object]) -> AnalyticsWarning — Pure.
@@ -326,10 +307,8 @@ Requirement Title: **2 mapped requirement(s)** — `ANL-NFR-432`, `ANL-NFR-433`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-432**: No file-specific non-functional requirements defined.  
-  *Evidence: app/services/analytics/contracts/serialization.py (scope declared and followed)*
-- [X] **ANL-NFR-433**: Final analytics responses must not contain `NaN`, `inf`, `-inf`, invalid JSON values, pandas objects, NumPy objects, raw dataframes, raw series, or other unserializable values.  
-  *Evidence: app/services/analytics/contracts/serialization.py lines 37-111 (to_json_safe and canonical_json recursively convert pandas/numpy/decimal structures and explicitly reject non-finite values)*
+- **ANL-NFR-432**: No file-specific non-functional requirements defined.
+- **ANL-NFR-433**: Final analytics responses must not contain `NaN`, `inf`, `-inf`, invalid JSON values, pandas objects, NumPy objects, raw dataframes, raw series, or other unserializable values.
 
 Target Class/Function:
 - to_json_safe(value: object, precision: PrecisionPolicy) -> JsonValue — Pure.
@@ -348,18 +327,12 @@ Requirement Title: **6 mapped requirement(s)** — `ANL-NFR-008`, `ANL-NFR-009`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-008**: The analytics registry must expose only intentional public analytics tools and must not hide colliding function names; duplicate concepts must use module-qualified aliases where needed.  
-  *Evidence: app/services/analytics/registry/analytics_registry.py lines 63-125 (register_tool checks for name and alias collisions)*
-- [X] **ANL-NFR-009**: Every official exported analytics tool must be callable, documented, and accept a `request_id` parameter for traceability.  
-  *Evidence: app/services/analytics/registry/analytics_registry.py lines 139-198 (request_id processing and validation)*
-- [X] **ANL-NFR-010**: Each official public capability must be labeled as stable, approved experimental, deprecated, or internal-support-only.  
-  *Evidence: app/services/analytics/registry/analytics_registry.py lines 46-51 (stability field in RegisteredToolEntry)*
-- [X] **ANL-NFR-011**: Each official public capability must document whether it is safe for agent/API use.  
-  *Evidence: app/services/analytics/registry/analytics_registry.py line 52 (safe_for_agent_api field in RegisteredToolEntry)*
-- [X] **ANL-NFR-012**: The analytics registry must distinguish official tools, internal metric kernels, compatibility aliases, and deprecated exports.  
-  *Evidence: app/services/analytics/registry/analytics_registry.py lines 53-58 (category classification field in RegisteredToolEntry)*
-- [X] **ANL-NFR-013**: Agentic workflows must import analytics capabilities from `app.services.analytics` rather than deep module files.  
-  *Evidence: app/services/analytics/__init__.py and app/services/analytics/registry/__init__.py (exposes exports cleanly at the package root level)*
+- **ANL-NFR-008**: The analytics registry must expose only intentional public analytics tools and must not hide colliding function names; duplicate concepts must use module-qualified aliases where needed.
+- **ANL-NFR-009**: Every official exported analytics tool must be callable, documented, and accept a `request_id` parameter for traceability.
+- **ANL-NFR-010**: Each official public capability must be labeled as stable, approved experimental, deprecated, or internal-support-only.
+- **ANL-NFR-011**: Each official public capability must document whether it is safe for agent/API use.
+- **ANL-NFR-012**: The analytics registry must distinguish official tools, internal metric kernels, compatibility aliases, and deprecated exports.
+- **ANL-NFR-013**: Agentic workflows must import analytics capabilities from `app.services.analytics` rather than deep module files.
 
 Target Class/Function:
 - `request_id(input_value: object, config: MetricConfig) -> MetricResult[object]` — State-mutating (bounded local registry/cache/observability only).
@@ -377,10 +350,8 @@ Requirement Title: **2 mapped requirement(s)** — `ANL-NFR-095`, `ANL-NFR-096`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-095**: No file-specific non-functional requirements defined.  
-  *Evidence: app/services/analytics/adapters/protocols.py (scope declared and followed)*
-- [X] **ANL-NFR-096**: No file-specific testing requirements defined.  
-  *Evidence: app/services/analytics/adapters/protocols.py (testing scope followed)*
+- **ANL-NFR-095**: No file-specific non-functional requirements defined.
+- **ANL-NFR-096**: No file-specific testing requirements defined.
 
 Target Class/Function:
 - validate_adapter_contract(adapter: TradingResultAdapter) -> None — Pure.
@@ -394,12 +365,9 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-092`, `ANL-NFR-093`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-092**: Backtest, paper, live, portfolio, and normalized trading results must either inherit from a canonical `TradingResult` contract or be converted into it through deterministic adapters.  
-  *Evidence: app/services/analytics/adapters/canonicalize.py lines 145-240 (to_trading_result)*
-- [X] **ANL-NFR-093**: Deterministic adapters must preserve schema version, result ID, phase/environment, timestamps, account base currency, strategy identifiers, symbols, timeframe, trades, equity curve, optional balance curve, benchmark data, upstream quality metadata, and source metadata without silent field loss.  
-  *Evidence: app/services/analytics/adapters/canonicalize.py lines 145-240 (to_trading_result maps and preserves all source details)*
-- [X] **ANL-NFR-094**: Deterministic adapters must define source-to-canonical field mappings, required fields, optional fields, defaulting behavior, unsupported-field behavior, lossless metadata preservation rules, and warning/error behavior for missing or incompatible fields.  
-  *Evidence: app/services/analytics/adapters/canonicalize.py lines 36-142 (TradingResultAdapter)*
+- **ANL-NFR-092**: Backtest, paper, live, portfolio, and normalized trading results must either inherit from a canonical `TradingResult` contract or be converted into it through deterministic adapters.
+- **ANL-NFR-093**: Deterministic adapters must preserve schema version, result ID, phase/environment, timestamps, account base currency, strategy identifiers, symbols, timeframe, trades, equity curve, optional balance curve, benchmark data, upstream quality metadata, and source metadata without silent field loss.
+- **ANL-NFR-094**: Deterministic adapters must define source-to-canonical field mappings, required fields, optional fields, defaulting behavior, unsupported-field behavior, lossless metadata preservation rules, and warning/error behavior for missing or incompatible fields.
 
 Target Class/Function:
 - to_trading_result(source: BacktestResult | PaperResult | LiveResult | PortfolioResult | TradingResult) -> TradingResult — Pure.
@@ -413,14 +381,10 @@ Requirement Title: **4 mapped requirement(s)** — `ANL-NFR-448`, `ANL-NFR-449`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-448**: Adopt Phase 1.5 contracts for TradeResult, ExecutionReport, Fill, PortfolioSnapshot, BacktestResult, RiskDecision, and AuditEvent analytics inputs.  
-  *Evidence: app/services/analytics/adapters/journal_adapters.py lines 15-20 (imports Phase 1.5 contracts)*
-- [X] **ANL-NFR-449**: Define analytics adapters that consume simulation journals and live trade journals through the same canonical event/result model.  
-  *Evidence: app/services/analytics/adapters/journal_adapters.py lines 60-129 (from_simulation_journal and from_live_trade_journal)*
-- [X] **ANL-NFR-450**: Prohibit Analytics from reading raw broker SDK payloads, UI DTOs, or conversation memory as primary metric sources.  
-  *Evidence: app/services/analytics/adapters/journal_adapters.py (only converts typed simulation/live journals and models into canonical TradingResult)*
-- [X] **ANL-NFR-451**: Define metric provenance using run ID, strategy ID, dataset hash, cost model, fill model, risk policy version, and journal reference.  
-  *Evidence: app/services/analytics/adapters/journal_adapters.py lines 75-83 and 109-117 (Lineage mapping)*
+- **ANL-NFR-448**: Adopt Phase 1.5 contracts for TradeResult, ExecutionReport, Fill, PortfolioSnapshot, BacktestResult, RiskDecision, and AuditEvent analytics inputs.
+- **ANL-NFR-449**: Define analytics adapters that consume simulation journals and live trade journals through the same canonical event/result model.
+- **ANL-NFR-450**: Prohibit Analytics from reading raw broker SDK payloads, UI DTOs, or conversation memory as primary metric sources.
+- **ANL-NFR-451**: Define metric provenance using run ID, strategy ID, dataset hash, cost model, fill model, risk policy version, and journal reference.
 
 Target Class/Function:
 - from_simulation_journal(journal: SimulationJournal) -> TradingResult — Pure.
@@ -439,26 +403,16 @@ Requirement Title: **10 mapped requirement(s)** — `ANL-NFR-016`, `ANL-NFR-017`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-016**: `common_avg_loss` shall expose the common-module average-loss function without colliding with metrics exports.  
-  *Evidence: app/services/analytics/metrics/exports.py (`common_avg_loss`)*
-- [X] **ANL-NFR-017**: `common_get_r_multiples` shall expose the common-module R-multiple function without colliding with metrics exports.  
-  *Evidence: app/services/analytics/metrics/exports.py (`common_get_r_multiples`)*
-- [X] **ANL-NFR-020**: `metrics_get_r_multiples` shall expose metrics-module R-multiple behavior without colliding with common exports.  
-  *Evidence: app/services/analytics/metrics/exports.py (`metrics_get_r_multiples`)*
-- [X] **ANL-NFR-029**: `metrics_avg_loss` shall expose metrics-module average-loss behavior without colliding with common exports.  
-  *Evidence: app/services/analytics/metrics/exports.py (`metrics_avg_loss`)*
-- [X] **ANL-NFR-281**: `benchmark_information_ratio` shall expose benchmark information ratio without colliding with the ratios module export.  
-  *Evidence: app/services/analytics/metrics/exports.py (`benchmark_information_ratio`)*
-- [X] **ANL-NFR-283**: `metrics_win_rate_fraction` shall expose metrics-module win-rate fraction behavior without colliding with ratios exports.  
-  *Evidence: app/services/analytics/metrics/exports.py (`metrics_win_rate_fraction`)*
-- [X] **ANL-NFR-284**: `metrics_expectancy_r` shall expose metrics-module R-expectancy behavior without colliding with ratios exports.  
-  *Evidence: app/services/analytics/metrics/exports.py (`metrics_expectancy_r`)*
-- [X] **ANL-NFR-288**: `ratios_information_ratio` shall expose ratios-module information ratio without colliding with benchmark exports.  
-  *Evidence: app/services/analytics/metrics/exports.py (`ratios_information_ratio`)*
-- [X] **ANL-NFR-318**: `distributions_r_multiple_distribution` shall expose distribution-module R-multiple distribution behavior without colliding with metrics exports.  
-  *Evidence: app/services/analytics/metrics/exports.py (`distributions_r_multiple_distribution`)*
-- [X] **ANL-NFR-339**: `metrics_r_multiple_distribution` shall calculate R-multiple distribution statistics.  
-  *Evidence: app/services/analytics/metrics/exports.py (`metrics_r_multiple_distribution`)*
+- **ANL-NFR-016**: `common_avg_loss` shall expose the common-module average-loss function without colliding with metrics exports.
+- **ANL-NFR-017**: `common_get_r_multiples` shall expose the common-module R-multiple function without colliding with metrics exports.
+- **ANL-NFR-020**: `metrics_get_r_multiples` shall expose metrics-module R-multiple behavior without colliding with common exports.
+- **ANL-NFR-029**: `metrics_avg_loss` shall expose metrics-module average-loss behavior without colliding with common exports.
+- **ANL-NFR-281**: `benchmark_information_ratio` shall expose benchmark information ratio without colliding with the ratios module export.
+- **ANL-NFR-283**: `metrics_win_rate_fraction` shall expose metrics-module win-rate fraction behavior without colliding with ratios exports.
+- **ANL-NFR-284**: `metrics_expectancy_r` shall expose metrics-module R-expectancy behavior without colliding with ratios exports.
+- **ANL-NFR-288**: `ratios_information_ratio` shall expose ratios-module information ratio without colliding with benchmark exports.
+- **ANL-NFR-318**: `distributions_r_multiple_distribution` shall expose distribution-module R-multiple distribution behavior without colliding with metrics exports.
+- **ANL-NFR-339**: `metrics_r_multiple_distribution` shall calculate R-multiple distribution statistics.
 
 Target Class/Function:
 - `common_avg_loss(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -481,26 +435,16 @@ Requirement Title: **10 mapped requirement(s)** — `ANL-NFR-018`, `ANL-NFR-019`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-018**: `max_gross_size_held` shall calculate the maximum absolute total size held across positions.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`max_gross_size_held`)*
-- [X] **ANL-NFR-019**: `percent_time_in_market` shall calculate percent of the trading period spent in the market.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`percent_time_in_market`)*
-- [X] **ANL-NFR-025**: `open_position_pnl` shall calculate total unrealized PnL from open positions.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`open_position_pnl`)*
-- [X] **ANL-NFR-026**: `slippage_paid` shall calculate total absolute slippage costs paid.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`slippage_paid`)*
-- [X] **ANL-NFR-027**: `commission_paid` shall calculate total absolute commission costs paid.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`commission_paid`)*
-- [X] **ANL-NFR-028**: `swap_paid` shall calculate total absolute swap costs paid.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`swap_paid`)*
-- [X] **ANL-NFR-031**: `max_size_held` shall calculate maximum total contracts held.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`max_size_held`)*
-- [X] **ANL-NFR-032**: `max_net_size_held` shall calculate maximum net directional size held.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`max_net_size_held`)*
-- [X] **ANL-NFR-033**: `max_long_size_held` shall calculate maximum total long contracts held.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`max_long_size_held`)*
-- [X] **ANL-NFR-034**: `max_short_size_held` shall calculate maximum total short contracts held.  
-  *Evidence: app/services/analytics/metrics/position_exposure.py (`max_short_size_held`)*
+- **ANL-NFR-018**: `max_gross_size_held` shall calculate the maximum absolute total size held across positions.
+- **ANL-NFR-019**: `percent_time_in_market` shall calculate percent of the trading period spent in the market.
+- **ANL-NFR-025**: `open_position_pnl` shall calculate total unrealized PnL from open positions.
+- **ANL-NFR-026**: `slippage_paid` shall calculate total absolute slippage costs paid.
+- **ANL-NFR-027**: `commission_paid` shall calculate total absolute commission costs paid.
+- **ANL-NFR-028**: `swap_paid` shall calculate total absolute swap costs paid.
+- **ANL-NFR-031**: `max_size_held` shall calculate maximum total contracts held.
+- **ANL-NFR-032**: `max_net_size_held` shall calculate maximum net directional size held.
+- **ANL-NFR-033**: `max_long_size_held` shall calculate maximum total long contracts held.
+- **ANL-NFR-034**: `max_short_size_held` shall calculate maximum total short contracts held.
 
 Target Class/Function:
 - `max_gross_size_held(trades: Sequence[TradeRecord], config: MetricConfig) -> MetricResult[Decimal | float | int | Duration | Mapping[str, object]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -523,82 +467,44 @@ Requirement Title: **38 mapped requirement(s)** — `ANL-NFR-021`, `ANL-NFR-022`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-021**: `win_rate_fraction` shall calculate win rate on a 0-to-1 scale.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`win_rate_fraction`)*
-- [X] **ANL-NFR-022**: `avg_win_loss` shall calculate mean winning and losing outcomes.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`avg_win_loss`)*
-- [X] **ANL-NFR-023**: `consecutive_wins_losses` shall calculate maximum consecutive wins and losses from numeric outcomes.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`consecutive_wins_losses`)*
-- [X] **ANL-NFR-024**: `t_statistic` shall calculate the t-statistic for mean outcome.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`t_statistic`)*
-- [X] **ANL-NFR-030**: `expectancy_r` shall calculate R-expectancy.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`expectancy_r`)*
-- [X] **ANL-NFR-035**: `avg_r_multiple` shall calculate average R-multiple.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`avg_r_multiple`)*
-- [X] **ANL-NFR-036**: `median_r_multiple` shall calculate median R-multiple.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`median_r_multiple`)*
-- [X] **ANL-NFR-037**: `r_expectancy` shall calculate R-space expectancy.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`r_expectancy`)*
-- [X] **ANL-NFR-038**: `max_r_multiple` shall calculate maximum R-multiple.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`max_r_multiple`)*
-- [X] **ANL-NFR-039**: `min_r_multiple` shall calculate minimum R-multiple.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`min_r_multiple`)*
-- [X] **ANL-NFR-040**: `avg_consecutive_wins` shall calculate average length of winning streaks.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`avg_consecutive_wins`)*
-- [X] **ANL-NFR-041**: `avg_consecutive_losses` shall calculate average length of losing streaks.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`avg_consecutive_losses`)*
-- [X] **ANL-NFR-042**: `r_signal_to_noise` shall calculate mean R relative to R volatility.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`r_signal_to_noise`)*
-- [X] **ANL-NFR-043**: `rolling_expectancy_stability` shall calculate expectancy stability over a rolling window.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`rolling_expectancy_stability`)*
-- [X] **ANL-NFR-044**: `win_after_win_probability` shall calculate probability that a win follows a win.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`win_after_win_probability`)*
-- [X] **ANL-NFR-045**: `runs_test_zscore` shall calculate Wald-Wolfowitz runs-test z-score.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`runs_test_zscore`)*
-- [X] **ANL-NFR-111**: `get_closed_trades` shall filter trade records to realized closed trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`get_closed_trades`)*
-- [X] **ANL-NFR-112**: `classify_trades` shall classify trades into wins, losses, and breakevens using a consistent threshold.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`classify_trades`)*
-- [X] **ANL-NFR-113**: `avg_loss` shall calculate the mean loss of losing trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`avg_loss`)*
-- [X] **ANL-NFR-133**: `get_ordered_closed_trades` shall filter closed trades and sort them for sequence-dependent metrics.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`get_ordered_closed_trades`)*
-- [X] **ANL-NFR-134**: `total_trades` shall count closed trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`total_trades`)*
-- [X] **ANL-NFR-135**: `winning_trades` shall count closed winning trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`winning_trades`)*
-- [X] **ANL-NFR-136**: `losing_trades` shall count closed losing trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`losing_trades`)*
-- [X] **ANL-NFR-137**: `breakeven_trades` shall count closed breakeven trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`breakeven_trades`)*
-- [X] **ANL-NFR-138**: `long_trades` shall count closed long trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`long_trades`)*
-- [X] **ANL-NFR-139**: `short_trades` shall count closed short trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`short_trades`)*
-- [X] **ANL-NFR-140**: `count_open_trades` shall count currently open trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`count_open_trades`)*
-- [X] **ANL-NFR-141**: `win_rate` shall calculate percentage of winning trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`win_rate`)*
-- [X] **ANL-NFR-142**: `loss_rate` shall calculate percentage of losing trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`loss_rate`)*
-- [X] **ANL-NFR-143**: `avg_win` shall calculate mean profit of winning trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`avg_win`)*
-- [X] **ANL-NFR-144**: `largest_win` shall calculate maximum single-trade profit.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`largest_win`)*
-- [X] **ANL-NFR-145**: `largest_loss` shall calculate maximum single-trade loss.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`largest_loss`)*
-- [X] **ANL-NFR-146**: `median_win` shall calculate median PnL of winning trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`median_win`)*
-- [X] **ANL-NFR-147**: `median_loss` shall calculate median PnL of losing trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`median_loss`)*
-- [X] **ANL-NFR-148**: `expectancy` shall calculate trade expectancy.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`expectancy`)*
-- [X] **ANL-NFR-149**: `max_consecutive_wins` shall calculate maximum consecutive winning trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`max_consecutive_wins`)*
-- [X] **ANL-NFR-150**: `max_consecutive_losses` shall calculate maximum consecutive losing trades.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`max_consecutive_losses`)*
-- [X] **ANL-NFR-158**: `trade_outcome_entropy` shall calculate Shannon entropy of trade outcomes.  
-  *Evidence: app/services/analytics/metrics/trade_outcomes.py (`shannon_entropy`)*
+- **ANL-NFR-021**: `win_rate_fraction` shall calculate win rate on a 0-to-1 scale.
+- **ANL-NFR-022**: `avg_win_loss` shall calculate mean winning and losing outcomes.
+- **ANL-NFR-023**: `consecutive_wins_losses` shall calculate maximum consecutive wins and losses from numeric outcomes.
+- **ANL-NFR-024**: `t_statistic` shall calculate the t-statistic for mean outcome.
+- **ANL-NFR-030**: `expectancy_r` shall calculate R-expectancy.
+- **ANL-NFR-035**: `avg_r_multiple` shall calculate average R-multiple.
+- **ANL-NFR-036**: `median_r_multiple` shall calculate median R-multiple.
+- **ANL-NFR-037**: `r_expectancy` shall calculate R-space expectancy.
+- **ANL-NFR-038**: `max_r_multiple` shall calculate maximum R-multiple.
+- **ANL-NFR-039**: `min_r_multiple` shall calculate minimum R-multiple.
+- **ANL-NFR-040**: `avg_consecutive_wins` shall calculate average length of winning streaks.
+- **ANL-NFR-041**: `avg_consecutive_losses` shall calculate average length of losing streaks.
+- **ANL-NFR-042**: `r_signal_to_noise` shall calculate mean R relative to R volatility.
+- **ANL-NFR-043**: `rolling_expectancy_stability` shall calculate expectancy stability over a rolling window.
+- **ANL-NFR-044**: `win_after_win_probability` shall calculate probability that a win follows a win.
+- **ANL-NFR-045**: `runs_test_zscore` shall calculate Wald-Wolfowitz runs-test z-score.
+- **ANL-NFR-111**: `get_closed_trades` shall filter trade records to realized closed trades.
+- **ANL-NFR-112**: `classify_trades` shall classify trades into wins, losses, and breakevens using a consistent threshold.
+- **ANL-NFR-113**: `avg_loss` shall calculate the mean loss of losing trades.
+- **ANL-NFR-133**: `get_ordered_closed_trades` shall filter closed trades and sort them for sequence-dependent metrics.
+- **ANL-NFR-134**: `total_trades` shall count closed trades.
+- **ANL-NFR-135**: `winning_trades` shall count closed winning trades.
+- **ANL-NFR-136**: `losing_trades` shall count closed losing trades.
+- **ANL-NFR-137**: `breakeven_trades` shall count closed breakeven trades.
+- **ANL-NFR-138**: `long_trades` shall count closed long trades.
+- **ANL-NFR-139**: `short_trades` shall count closed short trades.
+- **ANL-NFR-140**: `count_open_trades` shall count currently open trades.
+- **ANL-NFR-141**: `win_rate` shall calculate percentage of winning trades.
+- **ANL-NFR-142**: `loss_rate` shall calculate percentage of losing trades.
+- **ANL-NFR-143**: `avg_win` shall calculate mean profit of winning trades.
+- **ANL-NFR-144**: `largest_win` shall calculate maximum single-trade profit.
+- **ANL-NFR-145**: `largest_loss` shall calculate maximum single-trade loss.
+- **ANL-NFR-146**: `median_win` shall calculate median PnL of winning trades.
+- **ANL-NFR-147**: `median_loss` shall calculate median PnL of losing trades.
+- **ANL-NFR-148**: `expectancy` shall calculate trade expectancy.
+- **ANL-NFR-149**: `max_consecutive_wins` shall calculate maximum consecutive winning trades.
+- **ANL-NFR-150**: `max_consecutive_losses` shall calculate maximum consecutive losing trades.
+- **ANL-NFR-158**: `trade_outcome_entropy` shall calculate Shannon entropy of trade outcomes.
 
 Target Class/Function:
 - `win_rate_fraction(trades: Sequence[TradeRecord], config: MetricConfig) -> MetricResult[Decimal | float | int | Duration | Mapping[str, object]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -649,14 +555,10 @@ Requirement Title: **4 mapped requirement(s)** — `ANL-NFR-114`, `ANL-NFR-122`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-114**: `get_r_multiples` shall calculate R-multiples for trades.  
-  *Evidence: app/services/analytics/metrics/r_multiples.py (`get_r_multiples`)*
-- [X] **ANL-NFR-122**: `avg_return_per_risk_unit` shall calculate average R-multiple per closed trade.  
-  *Evidence: app/services/analytics/metrics/r_multiples.py (`avg_return_per_risk_unit`)*
-- [X] **ANL-NFR-155**: `compute_r_trade_metrics` shall calculate trade metrics from R-multiple inputs.  
-  *Evidence: app/services/analytics/metrics/r_multiples.py (`compute_r_trade_metrics`)*
-- [X] **ANL-NFR-156**: `compute_trade_metrics` shall calculate trade metrics from numeric R values and optional MAE/MFE arrays.  
-  *Evidence: app/services/analytics/metrics/r_multiples.py (`compute_trade_metrics`)*
+- **ANL-NFR-114**: `get_r_multiples` shall calculate R-multiples for trades.
+- **ANL-NFR-122**: `avg_return_per_risk_unit` shall calculate average R-multiple per closed trade.
+- **ANL-NFR-155**: `compute_r_trade_metrics` shall calculate trade metrics from R-multiple inputs.
+- **ANL-NFR-156**: `compute_trade_metrics` shall calculate trade metrics from numeric R values and optional MAE/MFE arrays.
 
 Target Class/Function:
 - `get_r_multiples(trades: Sequence[TradeRecord], config: TradeFilterConfig) -> tuple[TradeRecord, ...]` — Pure (no database, network, broker, or filesystem side effects).
@@ -673,12 +575,9 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-047`, `ANL-NFR-048`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-047**: `calculate_spread_cost_impact` shall calculate spread cost drag.  
-  *Evidence: app/services/analytics/metrics/costs.py (`calculate_spread_cost_impact`)*
-- [X] **ANL-NFR-048**: `calculate_slippage_impact` shall calculate slippage cost drag.  
-  *Evidence: app/services/analytics/metrics/costs.py (`calculate_slippage_impact`)*
-- [X] **ANL-NFR-049**: `calculate_commission_impact` shall calculate commission cost drag.  
-  *Evidence: app/services/analytics/metrics/costs.py (`calculate_commission_impact`)*
+- **ANL-NFR-047**: `calculate_spread_cost_impact` shall calculate spread cost drag.
+- **ANL-NFR-048**: `calculate_slippage_impact` shall calculate slippage cost drag.
+- **ANL-NFR-049**: `calculate_commission_impact` shall calculate commission cost drag.
 
 Target Class/Function:
 - `calculate_spread_cost_impact(trades: Sequence[TradeRecord], config: MetricConfig) -> MetricResult[Decimal | float | int | Duration | Mapping[str, object]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -694,54 +593,30 @@ Requirement Title: **24 mapped requirement(s)** — `ANL-NFR-121`, `ANL-NFR-123`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-121**: `avg_trade_notional_efficiency` shall provide the capital-efficiency metric under a clearer average-trade-notional name.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`avg_trade_notional_efficiency`)*
-- [X] **ANL-NFR-123**: `return_per_trade_hour` shall calculate net profit per hour spent in active trades.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`return_per_trade_hour`)*
-- [X] **ANL-NFR-124**: `return_per_market_hour` shall calculate net profit per hour where at least one trade was open.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`return_per_market_hour`)*
-- [X] **ANL-NFR-125**: `trades_per_day` shall calculate average number of closed trades per calendar day in the test period.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`trades_per_day`)*
-- [X] **ANL-NFR-126**: `profit_per_trade_per_day` shall calculate net profit normalized by both number of trades and calendar days.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`profit_per_trade_per_day`)*
-- [X] **ANL-NFR-127**: `mfe_efficiency` shall calculate average percentage of MFE captured by winning trades.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`mfe_efficiency`)*
-- [X] **ANL-NFR-128**: `aggregate_mfe_capture_ratio` shall calculate aggregate MFE capture ratio for winning trades.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`aggregate_mfe_capture_ratio`)*
-- [X] **ANL-NFR-129**: `mae_efficiency` shall calculate realized-loss-to-MAE efficiency for losing trades.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`mae_efficiency`)*
-- [X] **ANL-NFR-130**: `aggregate_loss_containment_efficiency` shall calculate aggregate loss containment for losing trades.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`aggregate_loss_containment_efficiency`)*
-- [X] **ANL-NFR-131**: `position_size_efficiency` shall calculate relationship between position size and normalized trade outcome.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`position_size_efficiency`)*
-- [X] **ANL-NFR-132**: `calculate_efficiency_metrics` shall calculate aggregate MAE/MFE efficiency context from trades.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`calculate_efficiency_metrics`)*
-- [X] **ANL-NFR-157**: `trade_efficiency` shall calculate realized outcome relative to maximum favorable excursion.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`trade_efficiency`)*
-- [X] **ANL-NFR-159**: `longest_flat_period_duration` shall calculate longest period without an active trade.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`longest_flat_period_duration`)*
-- [X] **ANL-NFR-368**: `capital_efficiency` shall calculate return per unit of nominal capital deployed.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`capital_efficiency`)*
-- [X] **ANL-NFR-369**: `return_per_unit_mae` shall calculate total return relative to adverse excursion experienced.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`return_per_unit_mae`)*
-- [X] **ANL-NFR-370**: `return_per_calendar_day` shall calculate net profit per calendar day in the test period.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`return_per_calendar_day`)*
-- [X] **ANL-NFR-371**: `exit_efficiency` shall calculate combined win-capture and loss-containment efficiency.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`exit_efficiency`)*
-- [X] **ANL-NFR-372**: `loss_containment_efficiency` shall calculate how well realized losses stayed above their adverse excursion.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`loss_containment_efficiency`)*
-- [X] **ANL-NFR-373**: No file-specific non-functional requirements defined.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (Inherited scope)*
-- [X] **ANL-NFR-374**: No file-specific testing requirements defined.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (Inherited scope)*
-- [X] **ANL-NFR-375**: `median_mae_mfe` shall calculate median MAE and MFE values.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`median_mae_mfe`)*
-- [X] **ANL-NFR-376**: `get_mae_mfe_r` shall calculate MAE and MFE normalized to R-space.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`get_mae_mfe_r`)*
-- [X] **ANL-NFR-377**: `median_mae_r` shall calculate median MAE in R-multiple terms.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`median_mae_r`)*
-- [X] **ANL-NFR-378**: `median_mfe_r` shall calculate median MFE in R-multiple terms.  
-  *Evidence: app/services/analytics/metrics/efficiency.py (`median_mfe_r`)*
+- **ANL-NFR-121**: `avg_trade_notional_efficiency` shall provide the capital-efficiency metric under a clearer average-trade-notional name.
+- **ANL-NFR-123**: `return_per_trade_hour` shall calculate net profit per hour spent in active trades.
+- **ANL-NFR-124**: `return_per_market_hour` shall calculate net profit per hour where at least one trade was open.
+- **ANL-NFR-125**: `trades_per_day` shall calculate average number of closed trades per calendar day in the test period.
+- **ANL-NFR-126**: `profit_per_trade_per_day` shall calculate net profit normalized by both number of trades and calendar days.
+- **ANL-NFR-127**: `mfe_efficiency` shall calculate average percentage of MFE captured by winning trades.
+- **ANL-NFR-128**: `aggregate_mfe_capture_ratio` shall calculate aggregate MFE capture ratio for winning trades.
+- **ANL-NFR-129**: `mae_efficiency` shall calculate realized-loss-to-MAE efficiency for losing trades.
+- **ANL-NFR-130**: `aggregate_loss_containment_efficiency` shall calculate aggregate loss containment for losing trades.
+- **ANL-NFR-131**: `position_size_efficiency` shall calculate relationship between position size and normalized trade outcome.
+- **ANL-NFR-132**: `calculate_efficiency_metrics` shall calculate aggregate MAE/MFE efficiency context from trades.
+- **ANL-NFR-157**: `trade_efficiency` shall calculate realized outcome relative to maximum favorable excursion.
+- **ANL-NFR-159**: `longest_flat_period_duration` shall calculate longest period without an active trade.
+- **ANL-NFR-368**: `capital_efficiency` shall calculate return per unit of nominal capital deployed.
+- **ANL-NFR-369**: `return_per_unit_mae` shall calculate total return relative to adverse excursion experienced.
+- **ANL-NFR-370**: `return_per_calendar_day` shall calculate net profit per calendar day in the test period.
+- **ANL-NFR-371**: `exit_efficiency` shall calculate combined win-capture and loss-containment efficiency.
+- **ANL-NFR-372**: `loss_containment_efficiency` shall calculate how well realized losses stayed above their adverse excursion.
+- **ANL-NFR-373**: No file-specific non-functional requirements defined.
+- **ANL-NFR-374**: No file-specific testing requirements defined.
+- **ANL-NFR-375**: `median_mae_mfe` shall calculate median MAE and MFE values.
+- **ANL-NFR-376**: `get_mae_mfe_r` shall calculate MAE and MFE normalized to R-space.
+- **ANL-NFR-377**: `median_mae_r` shall calculate median MAE in R-multiple terms.
+- **ANL-NFR-378**: `median_mfe_r` shall calculate median MFE in R-multiple terms.
 
 Target Class/Function:
 - `avg_trade_notional_efficiency(trades: Sequence[TradeRecord], config: MetricConfig) -> MetricResult[Decimal | float | int | Duration | Mapping[str, object]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -776,24 +651,15 @@ Requirement Title: **9 mapped requirement(s)** — `ANL-NFR-061`, `ANL-NFR-062`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-061**: `calculate_period_analysis` shall calculate performance by timestamp bucket.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`calculate_period_analysis`)*
-- [X] **ANL-NFR-062**: `calculate_long_short_split` shall calculate long-versus-short profit split.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`calculate_long_short_split`)*
-- [X] **ANL-NFR-063**: `calculate_session_performance` shall calculate session performance from timestamped records.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`calculate_session_performance`)*
-- [X] **ANL-NFR-151**: `avg_time_in_trade` shall calculate average trade duration.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`avg_time_in_trade`)*
-- [X] **ANL-NFR-152**: `median_time_in_trade` shall calculate median trade duration.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`median_time_in_trade`)*
-- [X] **ANL-NFR-153**: `max_time_in_trade` shall calculate maximum trade duration.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`max_time_in_trade`)*
-- [X] **ANL-NFR-154**: `min_time_in_trade` shall calculate minimum trade duration.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`min_time_in_trade`)*
-- [X] **ANL-NFR-313**: `time_in_market_duration` shall calculate total duration where at least one position was open.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`time_in_market_duration`)*
-- [X] **ANL-NFR-314**: `trading_period_duration` shall calculate total duration of the trading period.  
-  *Evidence: app/services/analytics/metrics/time_analysis.py (`trading_period_duration`)*
+- **ANL-NFR-061**: `calculate_period_analysis` shall calculate performance by timestamp bucket.
+- **ANL-NFR-062**: `calculate_long_short_split` shall calculate long-versus-short profit split.
+- **ANL-NFR-063**: `calculate_session_performance` shall calculate session performance from timestamped records.
+- **ANL-NFR-151**: `avg_time_in_trade` shall calculate average trade duration.
+- **ANL-NFR-152**: `median_time_in_trade` shall calculate median trade duration.
+- **ANL-NFR-153**: `max_time_in_trade` shall calculate maximum trade duration.
+- **ANL-NFR-154**: `min_time_in_trade` shall calculate minimum trade duration.
+- **ANL-NFR-313**: `time_in_market_duration` shall calculate total duration where at least one position was open.
+- **ANL-NFR-314**: `trading_period_duration` shall calculate total duration of the trading period.
 
 Target Class/Function:
 - `calculate_period_analysis(trades: Sequence[TradeRecord], config: MetricConfig) -> MetricResult[Decimal | float | int | Duration | Mapping[str, object]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -815,42 +681,24 @@ Requirement Title: **18 mapped requirement(s)** — `ANL-NFR-050`, `ANL-NFR-051`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-050**: `cagr` shall calculate compound annual growth rate.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`cagr`)*
-- [X] **ANL-NFR-051**: `compound_monthly_growth_rate` shall calculate compound monthly growth rate.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`compound_monthly_growth_rate`)*
-- [X] **ANL-NFR-052**: `buy_and_hold_cagr` shall calculate buy-and-hold CAGR from price data.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`buy_and_hold_cagr`)*
-- [X] **ANL-NFR-053**: `adjusted_gross_profit` shall calculate adjusted gross profit.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`adjusted_gross_profit`)*
-- [X] **ANL-NFR-054**: `adjusted_gross_loss` shall calculate adjusted gross loss.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`adjusted_gross_loss`)*
-- [X] **ANL-NFR-055**: `adjusted_net_profit` shall calculate adjusted net profit.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`adjusted_net_profit`)*
-- [X] **ANL-NFR-056**: `select_net_profit` shall calculate net profit after outlier selection.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`select_net_profit`)*
-- [X] **ANL-NFR-057**: `select_gross_profit` shall calculate gross profit after outlier selection.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`select_gross_profit`)*
-- [X] **ANL-NFR-058**: `select_gross_loss` shall calculate gross loss after outlier selection.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`select_gross_loss`)*
-- [X] **ANL-NFR-059**: `max_runup` shall calculate maximum gain from valley to peak.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`max_runup`)*
-- [X] **ANL-NFR-060**: `max_runup_date` shall identify the timestamp of maximum runup peak.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`max_runup_date`)*
-- [X] **ANL-NFR-077**: `total_return` shall calculate total return as a percentage of initial capital.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`total_return`)*
-- [X] **ANL-NFR-078**: `return_on_initial_capital` shall calculate net profit as a percentage of initial capital.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`return_on_initial_capital`)*
-- [X] **ANL-NFR-162**: `return_over_drawdown` shall calculate total return relative to maximum trade drawdown.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`return_over_drawdown`)*
-- [X] **ANL-NFR-163**: `adjusted_net_profit_as_percent_of_max_trade_drawdown` shall calculate adjusted net profit as a percentage of max trade drawdown.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`adjusted_net_profit_as_percent_of_max_trade_drawdown`)*
-- [X] **ANL-NFR-164**: `net_profit` shall calculate total realized profit or loss from closed trades.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`net_profit`)*
-- [X] **ANL-NFR-165**: `gross_profit` shall sum winning closed-trade profit.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`gross_profit`)*
-- [X] **ANL-NFR-166**: `gross_loss` shall sum losing closed-trade loss.  
-  *Evidence: app/services/analytics/metrics/pnl.py (`gross_loss`)*
+- **ANL-NFR-050**: `cagr` shall calculate compound annual growth rate.
+- **ANL-NFR-051**: `compound_monthly_growth_rate` shall calculate compound monthly growth rate.
+- **ANL-NFR-052**: `buy_and_hold_cagr` shall calculate buy-and-hold CAGR from price data.
+- **ANL-NFR-053**: `adjusted_gross_profit` shall calculate adjusted gross profit.
+- **ANL-NFR-054**: `adjusted_gross_loss` shall calculate adjusted gross loss.
+- **ANL-NFR-055**: `adjusted_net_profit` shall calculate adjusted net profit.
+- **ANL-NFR-056**: `select_net_profit` shall calculate net profit after outlier selection.
+- **ANL-NFR-057**: `select_gross_profit` shall calculate gross profit after outlier selection.
+- **ANL-NFR-058**: `select_gross_loss` shall calculate gross loss after outlier selection.
+- **ANL-NFR-059**: `max_runup` shall calculate maximum gain from valley to peak.
+- **ANL-NFR-060**: `max_runup_date` shall identify the timestamp of maximum runup peak.
+- **ANL-NFR-077**: `total_return` shall calculate total return as a percentage of initial capital.
+- **ANL-NFR-078**: `return_on_initial_capital` shall calculate net profit as a percentage of initial capital.
+- **ANL-NFR-162**: `return_over_drawdown` shall calculate total return relative to maximum trade drawdown.
+- **ANL-NFR-163**: `adjusted_net_profit_as_percent_of_max_trade_drawdown` shall calculate adjusted net profit as a percentage of max trade drawdown.
+- **ANL-NFR-164**: `net_profit` shall calculate total realized profit or loss from closed trades.
+- **ANL-NFR-165**: `gross_profit` shall sum winning closed-trade profit.
+- **ANL-NFR-166**: `gross_loss` shall sum losing closed-trade loss.
 
 Target Class/Function:
 - `cagr(trades: Sequence[TradeRecord], config: MetricConfig) -> MetricResult[Decimal | float | int | Duration | Mapping[str, object]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -881,12 +729,9 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-167`, `ANL-NFR-168`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-167**: `balance_curve_from_closed_trades` shall generate a realized balance curve from closed trades.  
-  *Evidence: app/services/analytics/metrics/curves.py (`balance_curve_from_closed_trades`)*
-- [X] **ANL-NFR-168**: `balance_curve` shall expose balance-curve behavior as an alias of closed-trade balance curve generation.  
-  *Evidence: app/services/analytics/metrics/curves.py (`balance_curve`)*
-- [X] **ANL-NFR-169**: `equity_curve` shall expose equity-curve behavior for common orchestration using the closed-trade curve.  
-  *Evidence: app/services/analytics/metrics/curves.py (`equity_curve`)*
+- **ANL-NFR-167**: `balance_curve_from_closed_trades` shall generate a realized balance curve from closed trades.
+- **ANL-NFR-168**: `balance_curve` shall expose balance-curve behavior as an alias of closed-trade balance curve generation.
+- **ANL-NFR-169**: `equity_curve` shall expose equity-curve behavior for common orchestration using the closed-trade curve.
 
 Target Class/Function:
 - `balance_curve_from_closed_trades(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -902,52 +747,29 @@ Requirement Title: **23 mapped requirement(s)** — `ANL-NFR-181`, `ANL-NFR-190`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-181**: `benchmark_returns` shall generate a return series from benchmark equity or price values.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`benchmark_returns`)*
-- [X] **ANL-NFR-190**: `total_return_usd` shall calculate total return in currency units from an equity curve.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`total_return_usd`)*
-- [X] **ANL-NFR-191**: `returns_series` shall calculate percentage returns between equity points.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`returns_series`)*
-- [X] **ANL-NFR-192**: `log_returns_series` shall calculate logarithmic returns between equity points.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`log_returns_series`)*
-- [X] **ANL-NFR-193**: `daily_returns` shall calculate daily percentage returns from an equity curve.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`daily_returns`)*
-- [X] **ANL-NFR-194**: `weekly_returns` shall calculate weekly percentage returns from an equity curve.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`weekly_returns`)*
-- [X] **ANL-NFR-195**: `monthly_returns` shall calculate monthly percentage returns from an equity curve.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`monthly_returns`)*
-- [X] **ANL-NFR-196**: `annual_returns` shall calculate annual percentage returns from an equity curve.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`annual_returns`)*
-- [X] **ANL-NFR-197**: `calculate_return_metrics` shall calculate aggregate cumulative and average returns from an equity curve.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`calculate_return_metrics`)*
-- [X] **ANL-NFR-203**: `win_loss_streaks` shall return winning and losing streak sequences.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`win_loss_streaks`)*
-- [X] **ANL-NFR-204**: `kelly_criterion` shall calculate Kelly criterion percentage from R-multiples or returns.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`kelly_criterion`)*
-- [X] **ANL-NFR-205**: `avg_monthly_return` shall calculate arithmetic average monthly return.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`avg_monthly_return`)*
-- [X] **ANL-NFR-206**: `monthly_return_stddev` shall calculate monthly return volatility.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`monthly_return_stddev`)*
-- [X] **ANL-NFR-207**: `annualized_return` shall calculate geometric annualized return.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`annualized_return`)*
-- [X] **ANL-NFR-208**: `geometric_mean_return` shall calculate geometric mean return.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`geometric_mean_return`)*
-- [X] **ANL-NFR-209**: `best_return` shall calculate best single-period return.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`best_return`)*
-- [X] **ANL-NFR-210**: `worst_return` shall calculate worst single-period return.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`worst_return`)*
-- [X] **ANL-NFR-211**: `buy_and_hold_return` shall calculate total buy-and-hold return from price data.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`buy_and_hold_return`)*
-- [X] **ANL-NFR-212**: `return_volatility` shall calculate return standard deviation.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`return_volatility`)*
-- [X] **ANL-NFR-213**: `downside_return_volatility` shall calculate volatility of returns below target.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`downside_return_volatility`)*
-- [X] **ANL-NFR-214**: `return_skewness` shall calculate return-distribution skewness.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`return_skewness`)*
-- [X] **ANL-NFR-215**: `return_kurtosis` shall calculate return-distribution excess kurtosis.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`return_kurtosis`)*
-- [X] **ANL-NFR-216**: `return_on_account` shall calculate return on required account size.  
-  *Evidence: app/services/analytics/metrics/equity_returns.py (`return_on_account`)*
+- **ANL-NFR-181**: `benchmark_returns` shall generate a return series from benchmark equity or price values.
+- **ANL-NFR-190**: `total_return_usd` shall calculate total return in currency units from an equity curve.
+- **ANL-NFR-191**: `returns_series` shall calculate percentage returns between equity points.
+- **ANL-NFR-192**: `log_returns_series` shall calculate logarithmic returns between equity points.
+- **ANL-NFR-193**: `daily_returns` shall calculate daily percentage returns from an equity curve.
+- **ANL-NFR-194**: `weekly_returns` shall calculate weekly percentage returns from an equity curve.
+- **ANL-NFR-195**: `monthly_returns` shall calculate monthly percentage returns from an equity curve.
+- **ANL-NFR-196**: `annual_returns` shall calculate annual percentage returns from an equity curve.
+- **ANL-NFR-197**: `calculate_return_metrics` shall calculate aggregate cumulative and average returns from an equity curve.
+- **ANL-NFR-203**: `win_loss_streaks` shall return winning and losing streak sequences.
+- **ANL-NFR-204**: `kelly_criterion` shall calculate Kelly criterion percentage from R-multiples or returns.
+- **ANL-NFR-205**: `avg_monthly_return` shall calculate arithmetic average monthly return.
+- **ANL-NFR-206**: `monthly_return_stddev` shall calculate monthly return volatility.
+- **ANL-NFR-207**: `annualized_return` shall calculate geometric annualized return.
+- **ANL-NFR-208**: `geometric_mean_return` shall calculate geometric mean return.
+- **ANL-NFR-209**: `best_return` shall calculate best single-period return.
+- **ANL-NFR-210**: `worst_return` shall calculate worst single-period return.
+- **ANL-NFR-211**: `buy_and_hold_return` shall calculate total buy-and-hold return from price data.
+- **ANL-NFR-212**: `return_volatility` shall calculate return standard deviation.
+- **ANL-NFR-213**: `downside_return_volatility` shall calculate volatility of returns below target.
+- **ANL-NFR-214**: `return_skewness` shall calculate return-distribution skewness.
+- **ANL-NFR-215**: `return_kurtosis` shall calculate return-distribution excess kurtosis.
+- **ANL-NFR-216**: `return_on_account` shall calculate return on required account size.
 
 Target Class/Function:
 - `benchmark_returns(equity: Sequence[EquityPoint], config: EquityMetricConfig) -> MetricResult[Decimal | float | tuple[SeriesPoint, ...] | Mapping[str, object]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -983,86 +805,46 @@ Requirement Title: **40 mapped requirement(s)** — `ANL-NFR-115`, `ANL-NFR-116`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-115**: `trade_pnl_distribution` shall calculate a statistical summary of realized trade PnL.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`trade_pnl_distribution`)*
-- [X] **ANL-NFR-116**: `trade_level_drawdowns` shall calculate cumulative PnL drawdowns at trade close points.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`trade_level_drawdowns`)*
-- [X] **ANL-NFR-117**: `max_close_to_close_drawdown` shall calculate maximum trade-level peak-to-valley decline including excursion context where available.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_close_to_close_drawdown`)*
-- [X] **ANL-NFR-118**: `avg_trade_drawdown` shall calculate mean trade-level close-to-close drawdown depth.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`avg_trade_drawdown`)*
-- [X] **ANL-NFR-119**: `max_consecutive_drawdown_trades` shall calculate maximum number of consecutive trades inside a strategy drawdown.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_consecutive_drawdown_trades`)*
-- [X] **ANL-NFR-120**: `max_close_to_close_drawdown_date` shall identify the timestamp of deepest trade-level valley.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_close_to_close_drawdown_date`)*
-- [X] **ANL-NFR-182**: `relative_drawdown_series` shall generate relative underperformance between strategy and benchmark equity.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`relative_drawdown_series`)*
-- [X] **ANL-NFR-183**: `drawdown_series` shall calculate drawdown values from an equity curve.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`drawdown_series`)*
-- [X] **ANL-NFR-184**: `drawdown_duration_series` shall calculate drawdown duration values from an equity curve.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`drawdown_duration_series`)*
-- [X] **ANL-NFR-185**: `max_drawdown_duration_from_equity` shall calculate maximum drawdown duration from equity values.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_drawdown_duration_from_equity`)*
-- [X] **ANL-NFR-186**: `max_strategy_drawdown_date` shall identify the timestamp of deepest strategy equity valley.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_strategy_drawdown_date`)*
-- [X] **ANL-NFR-187**: `avg_underwater_drawdown_percent` shall calculate average drawdown depth while equity is below peak.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`avg_underwater_drawdown_percent`)*
-- [X] **ANL-NFR-188**: `calculate_drawdown_metrics` shall calculate aggregate drawdown metrics from an equity curve.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`calculate_drawdown_metrics`)*
-- [X] **ANL-NFR-220**: `max_relative_drawdown_percent` shall calculate maximum relative underperformance as a positive percentage.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_relative_drawdown_percent`)*
-- [X] **ANL-NFR-221**: `max_strategy_drawdown` shall calculate deepest peak-to-valley decline in currency units.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_strategy_drawdown`)*
-- [X] **ANL-NFR-222**: `max_strategy_drawdown_percent` shall calculate deepest percentage decline relative to running peak.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_strategy_drawdown_percent`)*
-- [X] **ANL-NFR-223**: `max_drawdown` shall calculate maximum drawdown from returns.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_drawdown`)*
-- [X] **ANL-NFR-224**: `avg_drawdown` shall calculate average drawdown depth.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`avg_drawdown`)*
-- [X] **ANL-NFR-225**: `drawdown_distribution` shall calculate detailed drawdown distribution statistics.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`drawdown_distribution`)*
-- [X] **ANL-NFR-226**: `max_drawdown_duration_from_returns` shall calculate maximum drawdown duration from return values.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_drawdown_duration_from_returns`)*
-- [X] **ANL-NFR-227**: `max_drawdown_duration` shall calculate maximum drawdown duration from the selected input type.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_drawdown_duration`)*
-- [X] **ANL-NFR-228**: `avg_drawdown_duration` shall calculate average duration of drawdown episodes.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`avg_drawdown_duration`)*
-- [X] **ANL-NFR-229**: `time_to_recovery` shall calculate recovery periods for unique drawdowns.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`time_to_recovery`)*
-- [X] **ANL-NFR-230**: `recovery_factor` shall calculate net profit relative to maximum drawdown.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`recovery_factor`)*
-- [X] **ANL-NFR-231**: `max_close_to_close_drawdown_percent` shall calculate close-to-close drawdown as a percentage.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`max_close_to_close_drawdown_percent`)*
-- [X] **ANL-NFR-232**: `account_size_required` shall estimate capital required to withstand max close-to-close dips.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`account_size_required`)*
-- [X] **ANL-NFR-233**: `avg_yearly_max_drawdown` shall average the maximum drawdown observed in each year.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`avg_yearly_max_drawdown`)*
-- [X] **ANL-NFR-234**: `ulcer_index` shall calculate squared-drawdown-based ulcer index.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`ulcer_index`)*
-- [X] **ANL-NFR-235**: `pain_index` shall calculate mean absolute percentage drawdown.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`pain_index`)*
-- [X] **ANL-NFR-236**: `pain_ratio` shall calculate return relative to pain index.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`pain_ratio`)*
-- [X] **ANL-NFR-237**: `calmar_ratio` shall calculate annualized return relative to maximum drawdown.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`calmar_ratio`)*
-- [X] **ANL-NFR-238**: `fouse_ratio` shall calculate Fouse drawdown-index-style ratio.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`fouse_ratio`)*
-- [X] **ANL-NFR-239**: `sterling_ratio` shall calculate CAGR relative to adjusted average yearly maximum drawdown.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`sterling_ratio`)*
-- [X] **ANL-NFR-240**: `rina_index` shall calculate select net profit relative to average drawdown and time in market.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`rina_index`)*
-- [X] **ANL-NFR-241**: `adjusted_net_profit_as_percent_of_max_strategy_drawdown` shall calculate adjusted net profit as a percentage of max strategy drawdown.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`adjusted_net_profit_as_percent_of_max_strategy_drawdown`)*
-- [X] **ANL-NFR-242**: `return_on_max_strategy_drawdown` shall calculate total return relative to maximum strategy drawdown.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`return_on_max_strategy_drawdown`)*
-- [X] **ANL-NFR-243**: `return_on_max_close_to_close_drawdown` shall calculate net profit relative to maximum close-to-close drawdown.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`return_on_max_close_to_close_drawdown`)*
-- [X] **ANL-NFR-244**: `drawdown_probability` shall calculate probability of drawdown exceeding a threshold.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (`drawdown_probability`)*
-- [X] **ANL-NFR-245**: No file-specific non-functional requirements defined.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (Inherited scope)*
-- [X] **ANL-NFR-246**: No file-specific testing requirements defined.  
-  *Evidence: app/services/analytics/metrics/drawdown.py (Inherited scope)*
+- **ANL-NFR-115**: `trade_pnl_distribution` shall calculate a statistical summary of realized trade PnL.
+- **ANL-NFR-116**: `trade_level_drawdowns` shall calculate cumulative PnL drawdowns at trade close points.
+- **ANL-NFR-117**: `max_close_to_close_drawdown` shall calculate maximum trade-level peak-to-valley decline including excursion context where available.
+- **ANL-NFR-118**: `avg_trade_drawdown` shall calculate mean trade-level close-to-close drawdown depth.
+- **ANL-NFR-119**: `max_consecutive_drawdown_trades` shall calculate maximum number of consecutive trades inside a strategy drawdown.
+- **ANL-NFR-120**: `max_close_to_close_drawdown_date` shall identify the timestamp of deepest trade-level valley.
+- **ANL-NFR-182**: `relative_drawdown_series` shall generate relative underperformance between strategy and benchmark equity.
+- **ANL-NFR-183**: `drawdown_series` shall calculate drawdown values from an equity curve.
+- **ANL-NFR-184**: `drawdown_duration_series` shall calculate drawdown duration values from an equity curve.
+- **ANL-NFR-185**: `max_drawdown_duration_from_equity` shall calculate maximum drawdown duration from equity values.
+- **ANL-NFR-186**: `max_strategy_drawdown_date` shall identify the timestamp of deepest strategy equity valley.
+- **ANL-NFR-187**: `avg_underwater_drawdown_percent` shall calculate average drawdown depth while equity is below peak.
+- **ANL-NFR-188**: `calculate_drawdown_metrics` shall calculate aggregate drawdown metrics from an equity curve.
+- **ANL-NFR-220**: `max_relative_drawdown_percent` shall calculate maximum relative underperformance as a positive percentage.
+- **ANL-NFR-221**: `max_strategy_drawdown` shall calculate deepest peak-to-valley decline in currency units.
+- **ANL-NFR-222**: `max_strategy_drawdown_percent` shall calculate deepest percentage decline relative to running peak.
+- **ANL-NFR-223**: `max_drawdown` shall calculate maximum drawdown from returns.
+- **ANL-NFR-224**: `avg_drawdown` shall calculate average drawdown depth.
+- **ANL-NFR-225**: `drawdown_distribution` shall calculate detailed drawdown distribution statistics.
+- **ANL-NFR-226**: `max_drawdown_duration_from_returns` shall calculate maximum drawdown duration from return values.
+- **ANL-NFR-227**: `max_drawdown_duration` shall calculate maximum drawdown duration from the selected input type.
+- **ANL-NFR-228**: `avg_drawdown_duration` shall calculate average duration of drawdown episodes.
+- **ANL-NFR-229**: `time_to_recovery` shall calculate recovery periods for unique drawdowns.
+- **ANL-NFR-230**: `recovery_factor` shall calculate net profit relative to maximum drawdown.
+- **ANL-NFR-231**: `max_close_to_close_drawdown_percent` shall calculate close-to-close drawdown as a percentage.
+- **ANL-NFR-232**: `account_size_required` shall estimate capital required to withstand max close-to-close dips.
+- **ANL-NFR-233**: `avg_yearly_max_drawdown` shall average the maximum drawdown observed in each year.
+- **ANL-NFR-234**: `ulcer_index` shall calculate squared-drawdown-based ulcer index.
+- **ANL-NFR-235**: `pain_index` shall calculate mean absolute percentage drawdown.
+- **ANL-NFR-236**: `pain_ratio` shall calculate return relative to pain index.
+- **ANL-NFR-237**: `calmar_ratio` shall calculate annualized return relative to maximum drawdown.
+- **ANL-NFR-238**: `fouse_ratio` shall calculate Fouse drawdown-index-style ratio.
+- **ANL-NFR-239**: `sterling_ratio` shall calculate CAGR relative to adjusted average yearly maximum drawdown.
+- **ANL-NFR-240**: `rina_index` shall calculate select net profit relative to average drawdown and time in market.
+- **ANL-NFR-241**: `adjusted_net_profit_as_percent_of_max_strategy_drawdown` shall calculate adjusted net profit as a percentage of max strategy drawdown.
+- **ANL-NFR-242**: `return_on_max_strategy_drawdown` shall calculate total return relative to maximum strategy drawdown.
+- **ANL-NFR-243**: `return_on_max_close_to_close_drawdown` shall calculate net profit relative to maximum close-to-close drawdown.
+- **ANL-NFR-244**: `drawdown_probability` shall calculate probability of drawdown exceeding a threshold.
+- **ANL-NFR-245**: No file-specific non-functional requirements defined.
+- **ANL-NFR-246**: No file-specific testing requirements defined.
 
 Target Class/Function:
 - `trade_pnl_distribution(equity: Sequence[EquityPoint], config: EquityMetricConfig) -> MetricResult[Decimal | float | tuple[SeriesPoint, ...] | Mapping[str, object]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1113,54 +895,30 @@ Requirement Title: **24 mapped requirement(s)** — `ANL-NFR-170`, `ANL-NFR-171`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-170**: `max_loss_probability` shall calculate probability of a single trade loss exceeding a threshold.  
-  *Evidence: app/services/analytics/metrics/risk.py (`max_loss_probability`)*
-- [X] **ANL-NFR-171**: `risk_of_ruin` shall estimate ruin probability through Monte Carlo simulation of trade outcomes.  
-  *Evidence: app/services/analytics/metrics/risk.py (`risk_of_ruin`)*
-- [X] **ANL-NFR-172**: `avg_trade_nominal_exposure` shall calculate average nominal exposure per trade.  
-  *Evidence: app/services/analytics/metrics/risk.py (`avg_trade_nominal_exposure`)*
-- [X] **ANL-NFR-173**: `max_single_trade_margin_utilization` shall calculate maximum margin used by a single trade as a percentage of equity.  
-  *Evidence: app/services/analytics/metrics/risk.py (`max_single_trade_margin_utilization`)*
-- [X] **ANL-NFR-174**: `avg_single_trade_margin_utilization` shall calculate average margin used per trade as a percentage of equity.  
-  *Evidence: app/services/analytics/metrics/risk.py (`avg_single_trade_margin_utilization`)*
-- [X] **ANL-NFR-175**: `risk_of_ruin_with_custom_horizon` shall estimate ruin probability over a fixed future trade horizon.  
-  *Evidence: app/services/analytics/metrics/risk.py (`risk_of_ruin_with_custom_horizon`)*
-- [X] **ANL-NFR-254**: `risk_adjusted_efficiency` shall calculate return relative to total defined initial risk.  
-  *Evidence: app/services/analytics/metrics/risk.py (`risk_adjusted_efficiency`)*
-- [X] **ANL-NFR-255**: `profit_per_pip_risk` shall calculate reward-to-risk based on profit pips relative to MAE pips.  
-  *Evidence: app/services/analytics/metrics/risk.py (`profit_per_pip_risk`)*
-- [X] **ANL-NFR-256**: `upside_potential_ratio` shall calculate upside potential relative to downside risk.  
-  *Evidence: app/services/analytics/metrics/risk.py (`upside_potential_ratio`)*
-- [X] **ANL-NFR-257**: `volatility` shall calculate return standard deviation as a positive percentage.  
-  *Evidence: app/services/analytics/metrics/risk.py (`volatility`)*
-- [X] **ANL-NFR-258**: `annualized_volatility` shall calculate annualized volatility as a positive percentage.  
-  *Evidence: app/services/analytics/metrics/risk.py (`annualized_volatility`)*
-- [X] **ANL-NFR-259**: `downside_volatility` shall calculate downside deviation as a positive percentage.  
-  *Evidence: app/services/analytics/metrics/risk.py (`downside_volatility`)*
-- [X] **ANL-NFR-260**: `value_at_risk` shall calculate value-at-risk as a positive percentage.  
-  *Evidence: app/services/analytics/metrics/risk.py (`value_at_risk`)*
-- [X] **ANL-NFR-261**: `conditional_var` shall calculate conditional value-at-risk as a positive percentage.  
-  *Evidence: app/services/analytics/metrics/risk.py (`conditional_var`)*
-- [X] **ANL-NFR-262**: `expected_shortfall` shall calculate expected shortfall.  
-  *Evidence: app/services/analytics/metrics/risk.py (`expected_shortfall`)*
-- [X] **ANL-NFR-263**: `max_nominal_exposure_simple` shall calculate maximum nominal exposure held at one time.  
-  *Evidence: app/services/analytics/metrics/risk.py (`max_nominal_exposure_simple`)*
-- [X] **ANL-NFR-264**: `max_gross_exposure` shall calculate maximum gross nominal exposure.  
-  *Evidence: app/services/analytics/metrics/risk.py (`max_gross_exposure`)*
-- [X] **ANL-NFR-265**: `exposure_time_ratio` shall calculate percentage of total period spent in market.  
-  *Evidence: app/services/analytics/metrics/risk.py (`exposure_time_ratio`)*
-- [X] **ANL-NFR-266**: `time_weighted_avg_exposure` shall calculate time-weighted average notional exposure.  
-  *Evidence: app/services/analytics/metrics/risk.py (`time_weighted_avg_exposure`)*
-- [X] **ANL-NFR-267**: `portfolio_margin_utilization_curve` shall generate portfolio margin-utilization curve over time.  
-  *Evidence: app/services/analytics/metrics/risk.py (`portfolio_margin_utilization_curve`)*
-- [X] **ANL-NFR-268**: `compounding_risk_of_ruin` shall estimate ruin probability with dynamic compounding risk.  
-  *Evidence: app/services/analytics/metrics/risk.py (`compounding_risk_of_ruin`)*
-- [X] **ANL-NFR-269**: `historical_var_by_symbol` shall calculate historical value-at-risk by symbol.  
-  *Evidence: app/services/analytics/metrics/risk.py (`historical_var_by_symbol`)*
-- [X] **ANL-NFR-270**: `portfolio_var_from_covariance` shall calculate portfolio value-at-risk from covariance and weights.  
-  *Evidence: app/services/analytics/metrics/risk.py (`portfolio_var_from_covariance`)*
-- [X] **ANL-NFR-271**: `calculate_risk_metrics` shall calculate aggregate risk metrics such as VaR, CVaR, and volatility.  
-  *Evidence: app/services/analytics/metrics/risk.py (`calculate_risk_metrics`)*
+- **ANL-NFR-170**: `max_loss_probability` shall calculate probability of a single trade loss exceeding a threshold.
+- **ANL-NFR-171**: `risk_of_ruin` shall estimate ruin probability through Monte Carlo simulation of trade outcomes.
+- **ANL-NFR-172**: `avg_trade_nominal_exposure` shall calculate average nominal exposure per trade.
+- **ANL-NFR-173**: `max_single_trade_margin_utilization` shall calculate maximum margin used by a single trade as a percentage of equity.
+- **ANL-NFR-174**: `avg_single_trade_margin_utilization` shall calculate average margin used per trade as a percentage of equity.
+- **ANL-NFR-175**: `risk_of_ruin_with_custom_horizon` shall estimate ruin probability over a fixed future trade horizon.
+- **ANL-NFR-254**: `risk_adjusted_efficiency` shall calculate return relative to total defined initial risk.
+- **ANL-NFR-255**: `profit_per_pip_risk` shall calculate reward-to-risk based on profit pips relative to MAE pips.
+- **ANL-NFR-256**: `upside_potential_ratio` shall calculate upside potential relative to downside risk.
+- **ANL-NFR-257**: `volatility` shall calculate return standard deviation as a positive percentage.
+- **ANL-NFR-258**: `annualized_volatility` shall calculate annualized volatility as a positive percentage.
+- **ANL-NFR-259**: `downside_volatility` shall calculate downside deviation as a positive percentage.
+- **ANL-NFR-260**: `value_at_risk` shall calculate value-at-risk as a positive percentage.
+- **ANL-NFR-261**: `conditional_var` shall calculate conditional value-at-risk as a positive percentage.
+- **ANL-NFR-262**: `expected_shortfall` shall calculate expected shortfall.
+- **ANL-NFR-263**: `max_nominal_exposure_simple` shall calculate maximum nominal exposure held at one time.
+- **ANL-NFR-264**: `max_gross_exposure` shall calculate maximum gross nominal exposure.
+- **ANL-NFR-265**: `exposure_time_ratio` shall calculate percentage of total period spent in market.
+- **ANL-NFR-266**: `time_weighted_avg_exposure` shall calculate time-weighted average notional exposure.
+- **ANL-NFR-267**: `portfolio_margin_utilization_curve` shall generate portfolio margin-utilization curve over time.
+- **ANL-NFR-268**: `compounding_risk_of_ruin` shall estimate ruin probability with dynamic compounding risk.
+- **ANL-NFR-269**: `historical_var_by_symbol` shall calculate historical value-at-risk by symbol.
+- **ANL-NFR-270**: `portfolio_var_from_covariance` shall calculate portfolio value-at-risk from covariance and weights.
+- **ANL-NFR-271**: `calculate_risk_metrics` shall calculate aggregate risk metrics such as VaR, CVaR, and volatility.
 
 Target Class/Function:
 - `max_loss_probability(returns: Sequence[ReturnPoint], config: ReturnMetricConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1197,46 +955,26 @@ Requirement Title: **20 mapped requirement(s)** — `ANL-NFR-282`, `ANL-NFR-285`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-282**: `up_down_capture` shall calculate up-capture and down-capture ratios.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`up_down_capture`)*
-- [X] **ANL-NFR-285**: `sharpe_ratio` shall calculate excess return per unit of volatility.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`sharpe_ratio`)*
-- [X] **ANL-NFR-286**: `annualized_sharpe_ratio` shall calculate annualized Sharpe ratio from monthly inputs.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`annualized_sharpe_ratio`)*
-- [X] **ANL-NFR-287**: `sortino_ratio` shall calculate excess return per unit of downside volatility.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`sortino_ratio`)*
-- [X] **ANL-NFR-289**: `omega_ratio` shall calculate probability-weighted gains relative to losses.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`omega_ratio`)*
-- [X] **ANL-NFR-290**: `gain_to_pain_ratio` shall calculate gains relative to absolute negative returns.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`gain_to_pain_ratio`)*
-- [X] **ANL-NFR-291**: `kappa_ratio` shall calculate generalized Sortino-style Kappa ratio.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`kappa_ratio`)*
-- [X] **ANL-NFR-292**: `profit_factor` shall calculate gross profit relative to gross loss.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`profit_factor`)*
-- [X] **ANL-NFR-293**: `payoff_ratio` shall calculate average win relative to average loss.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`payoff_ratio`)*
-- [X] **ANL-NFR-294**: `edge_ratio` shall calculate payoff edge adjusted by win rate.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`edge_ratio`)*
-- [X] **ANL-NFR-295**: `profit_to_mae_ratio` shall calculate profit capture relative to adverse excursion.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`profit_to_mae_ratio`)*
-- [X] **ANL-NFR-296**: `mfe_to_mae_ratio` shall calculate favorable excursion relative to adverse excursion.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`mfe_to_mae_ratio`)*
-- [X] **ANL-NFR-297**: `expectancy_over_std` shall calculate expectancy stability relative to standard deviation.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`expectancy_over_std`)*
-- [X] **ANL-NFR-298**: `net_profit_as_percent_of_largest_loss` shall calculate net profit as a percentage of largest loss.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`net_profit_as_percent_of_largest_loss`)*
-- [X] **ANL-NFR-299**: `select_net_profit_as_percent_of_largest_loss` shall calculate selected net profit as a percentage of largest loss.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`select_net_profit_as_percent_of_largest_loss`)*
-- [X] **ANL-NFR-300**: `adjusted_net_profit_as_percent_of_largest_loss` shall calculate adjusted net profit as a percentage of largest loss.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`adjusted_net_profit_as_percent_of_largest_loss`)*
-- [X] **ANL-NFR-301**: `adjusted_profit_factor` shall calculate adjusted gross profit relative to adjusted gross loss.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`adjusted_profit_factor`)*
-- [X] **ANL-NFR-302**: `select_profit_factor` shall calculate selected gross profit relative to selected gross loss.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`select_profit_factor`)*
-- [X] **ANL-NFR-303**: `calculate_ratio_metrics` shall calculate aggregate ratio metrics from return values.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`calculate_ratio_metrics`)*
-- [X] **ANL-NFR-315**: `deflated_sharpe_ratio` shall adjust Sharpe ratio diagnostics for multiple testing and non-normality.  
-  *Evidence: app/services/analytics/metrics/ratios.py (`deflated_sharpe_ratio`)*
+- **ANL-NFR-282**: `up_down_capture` shall calculate up-capture and down-capture ratios.
+- **ANL-NFR-285**: `sharpe_ratio` shall calculate excess return per unit of volatility.
+- **ANL-NFR-286**: `annualized_sharpe_ratio` shall calculate annualized Sharpe ratio from monthly inputs.
+- **ANL-NFR-287**: `sortino_ratio` shall calculate excess return per unit of downside volatility.
+- **ANL-NFR-289**: `omega_ratio` shall calculate probability-weighted gains relative to losses.
+- **ANL-NFR-290**: `gain_to_pain_ratio` shall calculate gains relative to absolute negative returns.
+- **ANL-NFR-291**: `kappa_ratio` shall calculate generalized Sortino-style Kappa ratio.
+- **ANL-NFR-292**: `profit_factor` shall calculate gross profit relative to gross loss.
+- **ANL-NFR-293**: `payoff_ratio` shall calculate average win relative to average loss.
+- **ANL-NFR-294**: `edge_ratio` shall calculate payoff edge adjusted by win rate.
+- **ANL-NFR-295**: `profit_to_mae_ratio` shall calculate profit capture relative to adverse excursion.
+- **ANL-NFR-296**: `mfe_to_mae_ratio` shall calculate favorable excursion relative to adverse excursion.
+- **ANL-NFR-297**: `expectancy_over_std` shall calculate expectancy stability relative to standard deviation.
+- **ANL-NFR-298**: `net_profit_as_percent_of_largest_loss` shall calculate net profit as a percentage of largest loss.
+- **ANL-NFR-299**: `select_net_profit_as_percent_of_largest_loss` shall calculate selected net profit as a percentage of largest loss.
+- **ANL-NFR-300**: `adjusted_net_profit_as_percent_of_largest_loss` shall calculate adjusted net profit as a percentage of largest loss.
+- **ANL-NFR-301**: `adjusted_profit_factor` shall calculate adjusted gross profit relative to adjusted gross loss.
+- **ANL-NFR-302**: `select_profit_factor` shall calculate selected gross profit relative to selected gross loss.
+- **ANL-NFR-303**: `calculate_ratio_metrics` shall calculate aggregate ratio metrics from return values.
+- **ANL-NFR-315**: `deflated_sharpe_ratio` shall adjust Sharpe ratio diagnostics for multiple testing and non-normality.
 
 Target Class/Function:
 - `up_down_capture(returns: Sequence[ReturnPoint], config: ReturnMetricConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1269,30 +1007,18 @@ Requirement Title: **12 mapped requirement(s)** — `ANL-NFR-100`, `ANL-NFR-101`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-100**: Trade-oriented tools must use closed-trade semantics when a metric is defined over realized results.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-101**: Closed-trade filtering must exclude records explicitly marked as still open or end-of-data placeholders and must ignore records without close timestamps when close timestamps are required.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-102**: Trade classification must distinguish wins, losses, and breakevens using a configured `breakeven_epsilon` from the Metric Definition Catalog or numeric policy ADR so near-zero PnL does not become a false win or loss.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-103**: Exposure and time-in-market analytics must merge overlapping trade intervals so simultaneous positions are measured as market presence once for duration metrics.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-104**: Long/short split analytics must classify direction using the supplied trade direction/type fields and must not infer trade direction from PnL.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-105**: Cost-impact analytics must quantify spread, slippage, and commission drag from supplied cost and gross-profit inputs without mutating the source trades.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-106**: Aggregated analytics must preserve source context enough for downstream consumers to know whether inputs came from all trades, long trades, short trades, benchmark comparisons, cost analysis, or statistical validation.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-107**: `AnalyticsReport` output must include summary, trade metrics, equity metrics, return metrics, drawdown metrics, risk metrics, ratio metrics, distribution metrics, benchmark metrics, efficiency metrics, statistical validation, cost breakdown, warnings, quality flags, dashboard payloads, lineage, and metadata when those sections are applicable.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-108**: Report hashes must include deterministic input hash, config hash, report hash, trade ledger hash, equity curve hash, and optional benchmark hash where the source material exists.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (Inherited scope)*
-- [X] **ANL-NFR-160**: `calculate_trade_metrics` shall calculate aggregate core trade metrics from normalized trade records.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (`calculate_trade_metrics`)*
-- [X] **ANL-NFR-161**: `calculate_analytics_for_subset` shall calculate all analytics categories for a supplied trade subset.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (`calculate_analytics_for_subset`)*
-- [X] **ANL-NFR-189**: `compute_equity_metrics` shall calculate equity metrics from return inputs.  
-  *Evidence: app/services/analytics/metrics/aggregate.py (`compute_equity_metrics`)*
+- **ANL-NFR-100**: Trade-oriented tools must use closed-trade semantics when a metric is defined over realized results.
+- **ANL-NFR-101**: Closed-trade filtering must exclude records explicitly marked as still open or end-of-data placeholders and must ignore records without close timestamps when close timestamps are required.
+- **ANL-NFR-102**: Trade classification must distinguish wins, losses, and breakevens using a configured `breakeven_epsilon` from the Metric Definition Catalog or numeric policy ADR so near-zero PnL does not become a false win or loss.
+- **ANL-NFR-103**: Exposure and time-in-market analytics must merge overlapping trade intervals so simultaneous positions are measured as market presence once for duration metrics.
+- **ANL-NFR-104**: Long/short split analytics must classify direction using the supplied trade direction/type fields and must not infer trade direction from PnL.
+- **ANL-NFR-105**: Cost-impact analytics must quantify spread, slippage, and commission drag from supplied cost and gross-profit inputs without mutating the source trades.
+- **ANL-NFR-106**: Aggregated analytics must preserve source context enough for downstream consumers to know whether inputs came from all trades, long trades, short trades, benchmark comparisons, cost analysis, or statistical validation.
+- **ANL-NFR-107**: `AnalyticsReport` output must include summary, trade metrics, equity metrics, return metrics, drawdown metrics, risk metrics, ratio metrics, distribution metrics, benchmark metrics, efficiency metrics, statistical validation, cost breakdown, warnings, quality flags, dashboard payloads, lineage, and metadata when those sections are applicable.
+- **ANL-NFR-108**: Report hashes must include deterministic input hash, config hash, report hash, trade ledger hash, equity curve hash, and optional benchmark hash where the source material exists.
+- **ANL-NFR-160**: `calculate_trade_metrics` shall calculate aggregate core trade metrics from normalized trade records.
+- **ANL-NFR-161**: `calculate_analytics_for_subset` shall calculate all analytics categories for a supplied trade subset.
+- **ANL-NFR-189**: `compute_equity_metrics` shall calculate equity metrics from return inputs.
 
 Target Class/Function:
 - `breakeven_epsilon(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1313,20 +1039,13 @@ Requirement Title: **7 mapped requirement(s)** — `ANL-NFR-064`, `ANL-NFR-065`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-064**: `whites_reality_check` shall assess data-snooping bias with White's Reality Check.  
-  *Evidence: app/services/analytics/statistics/multiple_testing.py (`whites_reality_check`)*
-- [X] **ANL-NFR-065**: `probability_of_backtest_overfitting` shall estimate probability of backtest overfitting.  
-  *Evidence: app/services/analytics/statistics/multiple_testing.py (`probability_of_backtest_overfitting`)*
-- [X] **ANL-NFR-066**: `walk_forward_degradation_score` shall measure performance decay from in-sample to out-of-sample scores.  
-  *Evidence: app/services/analytics/statistics/multiple_testing.py (`walk_forward_degradation_score`)*
-- [X] **ANL-NFR-067**: `bonferroni_correction` shall apply Bonferroni correction for multiple hypothesis testing.  
-  *Evidence: app/services/analytics/statistics/multiple_testing.py (`bonferroni_correction`)*
-- [X] **ANL-NFR-068**: `benjamini_hochberg_correction` shall apply Benjamini-Hochberg false-discovery-rate control.  
-  *Evidence: app/services/analytics/statistics/multiple_testing.py (`benjamini_hochberg_correction`)*
-- [X] **ANL-NFR-069**: `stability_score` shall calculate performance consistency across walk-forward windows.  
-  *Evidence: app/services/analytics/statistics/multiple_testing.py (`stability_score`)*
-- [X] **ANL-NFR-070**: `whites_reality_check_backtests` shall run White's Reality Check against backtest result objects.  
-  *Evidence: app/services/analytics/statistics/multiple_testing.py (`whites_reality_check_backtests`)*
+- **ANL-NFR-064**: `whites_reality_check` shall assess data-snooping bias with White's Reality Check.
+- **ANL-NFR-065**: `probability_of_backtest_overfitting` shall estimate probability of backtest overfitting.
+- **ANL-NFR-066**: `walk_forward_degradation_score` shall measure performance decay from in-sample to out-of-sample scores.
+- **ANL-NFR-067**: `bonferroni_correction` shall apply Bonferroni correction for multiple hypothesis testing.
+- **ANL-NFR-068**: `benjamini_hochberg_correction` shall apply Benjamini-Hochberg false-discovery-rate control.
+- **ANL-NFR-069**: `stability_score` shall calculate performance consistency across walk-forward windows.
+- **ANL-NFR-070**: `whites_reality_check_backtests` shall run White's Reality Check against backtest result objects.
 
 Target Class/Function:
 - `whites_reality_check(values: Sequence[Decimal | float], config: StatisticalConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1346,46 +1065,26 @@ Requirement Title: **20 mapped requirement(s)** — `ANL-NFR-316`, `ANL-NFR-317`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-316**: `return_distribution` shall calculate a statistical summary of returns.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`return_distribution`)*
-- [X] **ANL-NFR-317**: `r_multiple_distribution` shall calculate a statistical summary of R-multiple values.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`r_multiple_distribution`)*
-- [X] **ANL-NFR-319**: `percentile_summary` shall return selected percentile values.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`percentile_summary`)*
-- [X] **ANL-NFR-320**: `upside_downside_summary` shall summarize positive and negative outcome distributions.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`upside_downside_summary`)*
-- [X] **ANL-NFR-321**: `skewness` shall calculate return or value skewness.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`skewness`)*
-- [X] **ANL-NFR-322**: `kurtosis` shall calculate excess kurtosis.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`kurtosis`)*
-- [X] **ANL-NFR-323**: `higher_moments` shall calculate detailed skewness and kurtosis context.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`higher_moments`)*
-- [X] **ANL-NFR-324**: `fat_tail_score` shall estimate tail heaviness relative to normal behavior.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`fat_tail_score`)*
-- [X] **ANL-NFR-325**: `tail_ratio` shall calculate the ratio between upper-tail and lower-tail percentile magnitudes.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`tail_ratio`)*
-- [X] **ANL-NFR-326**: `jarque_bera_test` shall run a Jarque-Bera normality diagnostic.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`jarque_bera_test`)*
-- [X] **ANL-NFR-327**: `shapiro_wilk_test` shall run a Shapiro-Wilk normality diagnostic.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`shapiro_wilk_test`)*
-- [X] **ANL-NFR-328**: `qq_plot_data` shall generate theoretical and actual quantile data for Q-Q plotting.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`qq_plot_data`)*
-- [X] **ANL-NFR-329**: `fit_distribution` shall fit a theoretical distribution and return fit parameters.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`fit_distribution`)*
-- [X] **ANL-NFR-330**: `distribution_fit_quality` shall return fit-quality diagnostics such as likelihood and information criteria.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`distribution_fit_quality`)*
-- [X] **ANL-NFR-331**: `histogram_data` shall generate histogram bin data for plotting.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`histogram_data`)*
-- [X] **ANL-NFR-332**: `detect_outliers` shall identify outliers with the requested method and threshold.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`detect_outliers`)*
-- [X] **ANL-NFR-333**: `outlier_ratio` shall calculate the percentage of data points flagged as outliers.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`outlier_ratio`)*
-- [X] **ANL-NFR-334**: `calculate_distribution_metrics` shall calculate aggregate distribution metrics from numeric values.  
-  *Evidence: app/services/analytics/statistics/distributions.py (`calculate_distribution_metrics`)*
-- [X] **ANL-NFR-335**: No file-specific non-functional requirements defined.  
-  *Evidence: app/services/analytics/statistics/distributions.py (Inherited scope)*
-- [X] **ANL-NFR-336**: No file-specific testing requirements defined.  
-  *Evidence: app/services/analytics/statistics/distributions.py (Inherited scope)*
+- **ANL-NFR-316**: `return_distribution` shall calculate a statistical summary of returns.
+- **ANL-NFR-317**: `r_multiple_distribution` shall calculate a statistical summary of R-multiple values.
+- **ANL-NFR-319**: `percentile_summary` shall return selected percentile values.
+- **ANL-NFR-320**: `upside_downside_summary` shall summarize positive and negative outcome distributions.
+- **ANL-NFR-321**: `skewness` shall calculate return or value skewness.
+- **ANL-NFR-322**: `kurtosis` shall calculate excess kurtosis.
+- **ANL-NFR-323**: `higher_moments` shall calculate detailed skewness and kurtosis context.
+- **ANL-NFR-324**: `fat_tail_score` shall estimate tail heaviness relative to normal behavior.
+- **ANL-NFR-325**: `tail_ratio` shall calculate the ratio between upper-tail and lower-tail percentile magnitudes.
+- **ANL-NFR-326**: `jarque_bera_test` shall run a Jarque-Bera normality diagnostic.
+- **ANL-NFR-327**: `shapiro_wilk_test` shall run a Shapiro-Wilk normality diagnostic.
+- **ANL-NFR-328**: `qq_plot_data` shall generate theoretical and actual quantile data for Q-Q plotting.
+- **ANL-NFR-329**: `fit_distribution` shall fit a theoretical distribution and return fit parameters.
+- **ANL-NFR-330**: `distribution_fit_quality` shall return fit-quality diagnostics such as likelihood and information criteria.
+- **ANL-NFR-331**: `histogram_data` shall generate histogram bin data for plotting.
+- **ANL-NFR-332**: `detect_outliers` shall identify outliers with the requested method and threshold.
+- **ANL-NFR-333**: `outlier_ratio` shall calculate the percentage of data points flagged as outliers.
+- **ANL-NFR-334**: `calculate_distribution_metrics` shall calculate aggregate distribution metrics from numeric values.
+- **ANL-NFR-335**: No file-specific non-functional requirements defined.
+- **ANL-NFR-336**: No file-specific testing requirements defined.
 
 Target Class/Function:
 - `return_distribution(values: Sequence[Decimal | float], config: StatisticalConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1416,20 +1115,13 @@ Requirement Title: **7 mapped requirement(s)** — `ANL-NFR-337`, `ANL-NFR-338`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-337**: Analytics behavior must be deterministic for the same inputs except where Monte Carlo, bootstrap, or permutation features intentionally use randomness; those features should support explicit seeds.  
-  *Evidence: app/services/analytics/statistics/resampling.py (Seeded `random.Random`)*
-- [X] **ANL-NFR-338**: Statistical validation tools must expose deterministic options such as seeds, bootstrap/permutation counts, block sizes, confidence levels, alpha levels, and sample-size thresholds where supported.  
-  *Evidence: app/services/analytics/statistics/resampling.py (Configurable seeds & iterations)*
-- [X] **ANL-NFR-340**: `permutation_test` shall run significance testing through random reshuffling or sign-flipping.  
-  *Evidence: app/services/analytics/statistics/resampling.py (`permutation_test`)*
-- [X] **ANL-NFR-341**: `bootstrap_confidence_intervals` shall estimate metric uncertainty with non-parametric bootstrap.  
-  *Evidence: app/services/analytics/statistics/resampling.py (`bootstrap_confidence_intervals`)*
-- [X] **ANL-NFR-342**: `bootstrap_probability_above_threshold` shall estimate probability that a bootstrapped metric exceeds a threshold.  
-  *Evidence: app/services/analytics/statistics/resampling.py (`bootstrap_probability_above_threshold`)*
-- [X] **ANL-NFR-343**: `permutation_test_backtest` shall run permutation testing against a backtest result object.  
-  *Evidence: app/services/analytics/statistics/resampling.py (`permutation_test_backtest`)*
-- [X] **ANL-NFR-344**: `bootstrap_confidence_intervals_backtest` shall estimate bootstrap confidence intervals from a backtest result object.  
-  *Evidence: app/services/analytics/statistics/resampling.py (`bootstrap_confidence_intervals_backtest`)*
+- **ANL-NFR-337**: Analytics behavior must be deterministic for the same inputs except where Monte Carlo, bootstrap, or permutation features intentionally use randomness; those features should support explicit seeds.
+- **ANL-NFR-338**: Statistical validation tools must expose deterministic options such as seeds, bootstrap/permutation counts, block sizes, confidence levels, alpha levels, and sample-size thresholds where supported.
+- **ANL-NFR-340**: `permutation_test` shall run significance testing through random reshuffling or sign-flipping.
+- **ANL-NFR-341**: `bootstrap_confidence_intervals` shall estimate metric uncertainty with non-parametric bootstrap.
+- **ANL-NFR-342**: `bootstrap_probability_above_threshold` shall estimate probability that a bootstrapped metric exceeds a threshold.
+- **ANL-NFR-343**: `permutation_test_backtest` shall run permutation testing against a backtest result object.
+- **ANL-NFR-344**: `bootstrap_confidence_intervals_backtest` shall estimate bootstrap confidence intervals from a backtest result object.
 
 Target Class/Function:
 - `permutation_test(values: Sequence[Decimal | float], config: StatisticalConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1451,26 +1143,16 @@ Requirement Title: **10 mapped requirement(s)** — `ANL-NFR-345`, `ANL-NFR-346`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-345**: Benchmark analytics must align strategy and benchmark return streams before comparison and must handle missing or non-overlapping periods safely.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`_align_series`)*
-- [X] **ANL-NFR-346**: Benchmark metrics must only be calculated after deterministic alignment of strategy and benchmark series.  
-  *Evidence: app/services/analytics/benchmarks/metrics.py (Calculated after `_align_series`)*
-- [X] **ANL-NFR-347**: Strategy and benchmark timestamps must be normalized to UTC before alignment.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
-- [X] **ANL-NFR-348**: Benchmark data must be restricted to the strategy analytics window unless explicit lookback is configured and recorded.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
-- [X] **ANL-NFR-349**: Missing benchmark currency metadata must emit a warning and restrict calculations to currency-neutral metrics unless a validated currency policy exists.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
-- [X] **ANL-NFR-350**: Portfolio analytics must not sum raw PnL across different profit currencies.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
-- [X] **ANL-NFR-351**: Portfolio, TCA, and base-currency analytics must require validated FX conversion data when source money values are in different currencies.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
-- [X] **ANL-NFR-352**: Missing required FX conversion data must produce blocker-level quality evidence for affected multi-currency portfolio or TCA sections.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
-- [X] **ANL-NFR-353**: Stale FX rates must be identified when FX age limits are configured, and affected converted values must be marked as estimated when stale data is used.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
-- [X] **ANL-NFR-354**: All money fields must include explicit currency or inherit a validated account base currency with lineage explaining the inheritance.  
-  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
+- **ANL-NFR-345**: Benchmark analytics must align strategy and benchmark return streams before comparison and must handle missing or non-overlapping periods safely.
+- **ANL-NFR-346**: Benchmark metrics must only be calculated after deterministic alignment of strategy and benchmark series.
+- **ANL-NFR-347**: Strategy and benchmark timestamps must be normalized to UTC before alignment.
+- **ANL-NFR-348**: Benchmark data must be restricted to the strategy analytics window unless explicit lookback is configured and recorded.
+- **ANL-NFR-349**: Missing benchmark currency metadata must emit a warning and restrict calculations to currency-neutral metrics unless a validated currency policy exists.
+- **ANL-NFR-350**: Portfolio analytics must not sum raw PnL across different profit currencies.
+- **ANL-NFR-351**: Portfolio, TCA, and base-currency analytics must require validated FX conversion data when source money values are in different currencies.
+- **ANL-NFR-352**: Missing required FX conversion data must produce blocker-level quality evidence for affected multi-currency portfolio or TCA sections.
+- **ANL-NFR-353**: Stale FX rates must be identified when FX age limits are configured, and affected converted values must be marked as estimated when stale data is used.
+- **ANL-NFR-354**: All money fields must include explicit currency or inherit a validated account base currency with lineage explaining the inheritance.
 
 Target Class/Function:
 - bench_alignment_boundary() -> None — Pure architectural boundary declaration.
@@ -1484,20 +1166,13 @@ Requirement Title: **7 mapped requirement(s)** — `ANL-NFR-355`, `ANL-NFR-356`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-355**: `beta` shall calculate the strategy beta coefficient relative to benchmark returns.  
-  *Evidence: app/services/analytics/benchmarks/metrics.py (`beta`)*
-- [X] **ANL-NFR-356**: `alpha` shall calculate annualized Jensen-style alpha relative to benchmark returns.  
-  *Evidence: app/services/analytics/benchmarks/metrics.py (`alpha`)*
-- [X] **ANL-NFR-357**: `r_squared` shall calculate coefficient of determination between strategy and benchmark returns.  
-  *Evidence: app/services/analytics/benchmarks/metrics.py (`r_squared`)*
-- [X] **ANL-NFR-358**: `tracking_error` shall calculate annualized tracking error between strategy and benchmark returns.  
-  *Evidence: app/services/analytics/benchmarks/metrics.py (`tracking_error`)*
-- [X] **ANL-NFR-359**: `information_ratio` shall calculate relative Sharpe-style information ratio.  
-  *Evidence: app/services/analytics/benchmarks/metrics.py (`information_ratio`)*
-- [X] **ANL-NFR-360**: `batting_average` shall calculate the percentage of periods where the strategy outperformed the benchmark.  
-  *Evidence: app/services/analytics/benchmarks/metrics.py (`batting_average`)*
-- [X] **ANL-NFR-361**: `calculate_benchmark_metrics` shall calculate combined benchmark-relative metrics such as alpha and beta.  
-  *Evidence: app/services/analytics/benchmarks/metrics.py (`calculate_benchmark_metrics`)*
+- **ANL-NFR-355**: `beta` shall calculate the strategy beta coefficient relative to benchmark returns.
+- **ANL-NFR-356**: `alpha` shall calculate annualized Jensen-style alpha relative to benchmark returns.
+- **ANL-NFR-357**: `r_squared` shall calculate coefficient of determination between strategy and benchmark returns.
+- **ANL-NFR-358**: `tracking_error` shall calculate annualized tracking error between strategy and benchmark returns.
+- **ANL-NFR-359**: `information_ratio` shall calculate relative Sharpe-style information ratio.
+- **ANL-NFR-360**: `batting_average` shall calculate the percentage of periods where the strategy outperformed the benchmark.
+- **ANL-NFR-361**: `calculate_benchmark_metrics` shall calculate combined benchmark-relative metrics such as alpha and beta.
 
 Target Class/Function:
 - `beta(strategy_returns: Sequence[ReturnPoint], benchmark_returns: Sequence[ReturnPoint], config: BenchmarkConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1521,12 +1196,9 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-381`, `ANL-NFR-393`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-381**: `evaluate_strategy_quality` shall evaluate a supplied analytics report and return strategy-quality decision context, score, strengths, warnings, and recommended action.  
-  *Evidence: app/services/analytics/scorecards/quality.py (`evaluate_strategy_quality`)*
-- [X] **ANL-NFR-393**: `sqn` shall calculate system quality number.  
-  *Evidence: app/services/analytics/scorecards/quality.py (`sqn`)*
-- [X] **ANL-NFR-394**: `sample_size_warning` shall assess metric reliability based on sample size.  
-  *Evidence: app/services/analytics/scorecards/quality.py (`sample_size_warning`)*
+- **ANL-NFR-381**: `evaluate_strategy_quality` shall evaluate a supplied analytics report and return strategy-quality decision context, score, strengths, warnings, and recommended action.
+- **ANL-NFR-393**: `sqn` shall calculate system quality number.
+- **ANL-NFR-394**: `sample_size_warning` shall assess metric reliability based on sample size.
 
 Target Class/Function:
 - `evaluate_strategy_quality(report: AnalyticsReport, config: StrategyQualityConfig) -> StrategyQualityAssessment` — Pure (no database, network, broker, or filesystem side effects).
@@ -1542,42 +1214,24 @@ Requirement Title: **18 mapped requirement(s)** — `ANL-NFR-217`, `ANL-NFR-218`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-217**: Strategy-quality evaluation must rely only on the supplied report payload and must surface warnings for weak profitability, high drawdown, overfitting risk, small sample size, or other observable quality concerns.  
-  *Evidence: app/services/analytics/scorecards/quality.py (Strictly evaluates based on report fields)*
-- [X] **ANL-NFR-218**: Optional sections such as TCA metrics, attribution, prop-firm compliance evidence, drawdown distribution, tail-risk metrics, dynamic correlation, walk-forward analytics, metric comparisons, live degradation, and explainability must be represented as calculated, skipped, or failed.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-219**: Formula definitions must be explicit for Sharpe, Sortino, Calmar, Jensen alpha, beta, tracking error, information ratio, VaR, CVaR, expected shortfall, SQN, Kelly, drawdown duration, CAGR, profit factor, expectancy, and R-multiple metrics before those metrics are locked as official contracts.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-379**: No metric may be referenced in an official tool schema, report schema, dashboard payload, scorecard rule, warning rule, or quality-flag rule until its Metric Definition Catalog entry is approved.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-380**: Metric definitions must document whether outputs are calculated facts, diagnostic estimates, warning evidence, scorecard inputs, or non-binding review context.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-382**: No file-specific non-functional requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-383**: No file-specific testing requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-384**: Public registry changes must remain auditable through tests and catalog updates.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-385**: The module must separate calculated facts from warnings, caveats, decisions, and recommended actions.  
-  *Evidence: app/services/analytics/scorecards/quality.py (`StrategyQualityAssessment`)*
-- [X] **ANL-NFR-386**: Official agent/API-facing analytics tools must be high-level, documented, typed, schema-compliant, traceable, and listed in the Official Analytics Tool Catalog.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-387**: Every official analytics tool must have a documented input schema and output schema, including required fields, optional fields, default values, accepted aliases, units, validation errors, warning codes, and JSON-safe serialization behavior.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-388**: Low-level metric kernels must not be exposed as official agent/API tools unless explicitly approved in the Official Analytics Tool Catalog.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-389**: Official analytics tools must log call start, validation failure, successful completion, controlled warning, and execution failure without logging secrets or full raw private payloads.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-390**: Warning severity must support at least informational, warning, major, critical, and blocker-level meanings.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-391**: Quality flags must separate raw metrics, normalized score inputs, penalty flags, hard blockers, recommendation evidence, and final governance decisions.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-392**: Strategy-quality and prop-firm outputs must be labeled as non-binding analytics evidence or decision context only.  
-  *Evidence: app/services/analytics/scorecards/quality.py (`StrategyQualityAssessment` disclaimer)*
-- [X] **ANL-NFR-395**: Documentation must include the Official Analytics Tool Catalog.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
-- [X] **ANL-NFR-396**: Documentation must include the warning-code and quality-flag catalog.  
-  *Evidence: app/services/analytics/scorecards/labels.py (`scorecards_policy_boundary`)*
+- **ANL-NFR-217**: Strategy-quality evaluation must rely only on the supplied report payload and must surface warnings for weak profitability, high drawdown, overfitting risk, small sample size, or other observable quality concerns.
+- **ANL-NFR-218**: Optional sections such as TCA metrics, attribution, prop-firm compliance evidence, drawdown distribution, tail-risk metrics, dynamic correlation, walk-forward analytics, metric comparisons, live degradation, and explainability must be represented as calculated, skipped, or failed.
+- **ANL-NFR-219**: Formula definitions must be explicit for Sharpe, Sortino, Calmar, Jensen alpha, beta, tracking error, information ratio, VaR, CVaR, expected shortfall, SQN, Kelly, drawdown duration, CAGR, profit factor, expectancy, and R-multiple metrics before those metrics are locked as official contracts.
+- **ANL-NFR-379**: No metric may be referenced in an official tool schema, report schema, dashboard payload, scorecard rule, warning rule, or quality-flag rule until its Metric Definition Catalog entry is approved.
+- **ANL-NFR-380**: Metric definitions must document whether outputs are calculated facts, diagnostic estimates, warning evidence, scorecard inputs, or non-binding review context.
+- **ANL-NFR-382**: No file-specific non-functional requirements defined.
+- **ANL-NFR-383**: No file-specific testing requirements defined.
+- **ANL-NFR-384**: Public registry changes must remain auditable through tests and catalog updates.
+- **ANL-NFR-385**: The module must separate calculated facts from warnings, caveats, decisions, and recommended actions.
+- **ANL-NFR-386**: Official agent/API-facing analytics tools must be high-level, documented, typed, schema-compliant, traceable, and listed in the Official Analytics Tool Catalog.
+- **ANL-NFR-387**: Every official analytics tool must have a documented input schema and output schema, including required fields, optional fields, default values, accepted aliases, units, validation errors, warning codes, and JSON-safe serialization behavior.
+- **ANL-NFR-388**: Low-level metric kernels must not be exposed as official agent/API tools unless explicitly approved in the Official Analytics Tool Catalog.
+- **ANL-NFR-389**: Official analytics tools must log call start, validation failure, successful completion, controlled warning, and execution failure without logging secrets or full raw private payloads.
+- **ANL-NFR-390**: Warning severity must support at least informational, warning, major, critical, and blocker-level meanings.
+- **ANL-NFR-391**: Quality flags must separate raw metrics, normalized score inputs, penalty flags, hard blockers, recommendation evidence, and final governance decisions.
+- **ANL-NFR-392**: Strategy-quality and prop-firm outputs must be labeled as non-binding analytics evidence or decision context only.
+- **ANL-NFR-395**: Documentation must include the Official Analytics Tool Catalog.
+- **ANL-NFR-396**: Documentation must include the warning-code and quality-flag catalog.
 
 Target Class/Function:
 - scorecards_policy_boundary() -> None — Pure architectural boundary declaration.
@@ -1595,38 +1249,22 @@ Requirement Title: **16 mapped requirement(s)** — `ANL-NFR-397`, `ANL-NFR-398`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-397**: Overview/report tools must combine lower-level analytics into grouped payloads that remain serializable for API and dashboard consumers.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report`)*
-- [X] **ANL-NFR-398**: The module must generate a complete, versioned `AnalyticsReport` from a valid backtest, optimization candidate, out-of-sample, walk-forward, paper, live, or normalized trading result when required inputs are available.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report`)*
-- [X] **ANL-NFR-399**: Report building must validate inputs, normalize result data, run required metric groups, run optional metric groups, collect warnings and quality flags, build dashboard payloads, validate output, compute hashes, and return a standard tool response.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report`)*
-- [X] **ANL-NFR-400**: Missing optional inputs must produce warnings or skipped-section metadata rather than fabricated metric values.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` skips benchmark if missing)*
-- [X] **ANL-NFR-401**: Critical metric group failures must return an error unless diagnostic partial mode is explicitly configured.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` fails on critical failures)*
-- [X] **ANL-NFR-402**: Partial reports must include `report_status = "partial"`, affected sections, skipped/failed/degraded section metadata, warnings, quality flags, lineage, and JSON-safe values.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` return details)*
-- [X] **ANL-NFR-403**: Report generation must define section criticality as required, optional, diagnostic-only, disabled, skipped, failed, or degraded.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` sections dictionary)*
-- [X] **ANL-NFR-404**: Required-section failure must return an error unless diagnostic partial mode is explicitly enabled.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` required error checks)*
-- [X] **ANL-NFR-405**: Optional-section failure must produce skipped or failed section metadata without fabricating the missing section.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` benchmark failures)*
-- [X] **ANL-NFR-406**: Partial reports must be marked non-promotable and must not be consumed as final approval evidence.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` sets blocks_promotion warnings)*
-- [X] **ANL-NFR-407**: Report metadata must preserve `request_id`, optional `workflow_id`, run IDs, strategy identifiers, strategy version, schema version, analytics engine version, annualization settings, optional-section status, source context, and creation time.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` metadata)*
-- [X] **ANL-NFR-408**: Hashing rules must exclude non-deterministic fields such as generation timestamps unless explicitly documented.  
-  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` filters metadata)*
-- [X] **ANL-NFR-409**: Hashes must be computed from canonical JSON serialization with deterministic key ordering, documented numeric normalization, and documented exclusion rules for non-deterministic fields.  
-  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` sorted keys)*
-- [X] **ANL-NFR-410**: Analytics must propagate upstream data-quality and bias evidence into report warnings and quality flags.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` warning lists)*
-- [X] **ANL-NFR-411**: Dashboard payload builders must consume validated `AnalyticsReport` sections and must not recompute core metrics.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` extracts values)*
-- [X] **ANL-NFR-429**: Report section criticality and partial-report non-promotable behavior are approved.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` logic)*
+- **ANL-NFR-397**: Overview/report tools must combine lower-level analytics into grouped payloads that remain serializable for API and dashboard consumers.
+- **ANL-NFR-398**: The module must generate a complete, versioned `AnalyticsReport` from a valid backtest, optimization candidate, out-of-sample, walk-forward, paper, live, or normalized trading result when required inputs are available.
+- **ANL-NFR-399**: Report building must validate inputs, normalize result data, run required metric groups, run optional metric groups, collect warnings and quality flags, build dashboard payloads, validate output, compute hashes, and return a standard tool response.
+- **ANL-NFR-400**: Missing optional inputs must produce warnings or skipped-section metadata rather than fabricated metric values.
+- **ANL-NFR-401**: Critical metric group failures must return an error unless diagnostic partial mode is explicitly configured.
+- **ANL-NFR-402**: Partial reports must include `report_status = "partial"`, affected sections, skipped/failed/degraded section metadata, warnings, quality flags, lineage, and JSON-safe values.
+- **ANL-NFR-403**: Report generation must define section criticality as required, optional, diagnostic-only, disabled, skipped, failed, or degraded.
+- **ANL-NFR-404**: Required-section failure must return an error unless diagnostic partial mode is explicitly enabled.
+- **ANL-NFR-405**: Optional-section failure must produce skipped or failed section metadata without fabricating the missing section.
+- **ANL-NFR-406**: Partial reports must be marked non-promotable and must not be consumed as final approval evidence.
+- **ANL-NFR-407**: Report metadata must preserve `request_id`, optional `workflow_id`, run IDs, strategy identifiers, strategy version, schema version, analytics engine version, annualization settings, optional-section status, source context, and creation time.
+- **ANL-NFR-408**: Hashing rules must exclude non-deterministic fields such as generation timestamps unless explicitly documented.
+- **ANL-NFR-409**: Hashes must be computed from canonical JSON serialization with deterministic key ordering, documented numeric normalization, and documented exclusion rules for non-deterministic fields.
+- **ANL-NFR-410**: Analytics must propagate upstream data-quality and bias evidence into report warnings and quality flags.
+- **ANL-NFR-411**: Dashboard payload builders must consume validated `AnalyticsReport` sections and must not recompute core metrics.
+- **ANL-NFR-429**: Report section criticality and partial-report non-promotable behavior are approved.
 
 Target Class/Function:
 - `request_id(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1640,24 +1278,15 @@ Requirement Title: **9 mapped requirement(s)** — `ANL-NFR-415`, `ANL-NFR-416`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-415**: Report generation must be idempotent for the same input, configuration, and analytics engine version.  
-  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` is a pure function)*
-- [X] **ANL-NFR-416**: Reports must include reproducibility metadata, input hashes, configuration hashes, report hashes, and lineage.  
-  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash`)*
-- [X] **ANL-NFR-417**: Annualized metrics must use explicit annualization settings stored in configuration and report metadata; the module must not silently guess annualization when frequency cannot be inferred safely.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` metadata)*
-- [X] **ANL-NFR-418**: Cache hits, misses, evictions, and concurrent duplicate requests must not change metric values, warning order, report hashes, dashboard payloads, or quality-flag outcomes.  
-  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` pure function behavior)*
-- [X] **ANL-NFR-419**: Sequential and parallel execution over the same report inputs must not change metric values, warning order, report hashes, dashboard payloads, or quality-flag outcomes.  
-  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` pure function)*
-- [X] **ANL-NFR-420**: Warning and quality-flag ordering must be deterministic where output hashes, dashboard payloads, report comparison, or tests depend on order.  
-  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` deterministic serialization)*
-- [X] **ANL-NFR-421**: Architectural Mandate: canonical monetary sums, cost aggregation, and base-currency aggregation must use `Decimal` normalization for hashing and report contracts.  
-  *Evidence: app/services/analytics/reports/hashes.py (`_decimal_default` converts Decimal inputs)*
-- [X] **ANL-NFR-422**: Report metadata must identify the monetary precision mode used, such as `decimal` or `float64_with_tolerance`.  
-  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` schema configuration)*
-- [X] **ANL-NFR-423**: The module must define concrete runtime limits for bootstrap, permutation, Monte Carlo, distribution fitting, dashboard downsampling, and report generation before production handoff.  
-  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` and dashboards downsampling)*
+- **ANL-NFR-415**: Report generation must be idempotent for the same input, configuration, and analytics engine version.
+- **ANL-NFR-416**: Reports must include reproducibility metadata, input hashes, configuration hashes, report hashes, and lineage.
+- **ANL-NFR-417**: Annualized metrics must use explicit annualization settings stored in configuration and report metadata; the module must not silently guess annualization when frequency cannot be inferred safely.
+- **ANL-NFR-418**: Cache hits, misses, evictions, and concurrent duplicate requests must not change metric values, warning order, report hashes, dashboard payloads, or quality-flag outcomes.
+- **ANL-NFR-419**: Sequential and parallel execution over the same report inputs must not change metric values, warning order, report hashes, dashboard payloads, or quality-flag outcomes.
+- **ANL-NFR-420**: Warning and quality-flag ordering must be deterministic where output hashes, dashboard payloads, report comparison, or tests depend on order.
+- **ANL-NFR-421**: Architectural Mandate: canonical monetary sums, cost aggregation, and base-currency aggregation must use `Decimal` normalization for hashing and report contracts.
+- **ANL-NFR-422**: Report metadata must identify the monetary precision mode used, such as `decimal` or `float64_with_tolerance`.
+- **ANL-NFR-423**: The module must define concrete runtime limits for bootstrap, permutation, Monte Carlo, distribution fitting, dashboard downsampling, and report generation before production handoff.
 
 Target Class/Function:
 - compute_report_hash(report: AnalyticsReportDraft, policy: HashPolicy) -> str — Pure.
@@ -1671,12 +1300,9 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-412`, `ANL-NFR-413`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-412**: `format_summary_as_rows` shall format raw summary data into report/display rows.  
-  *Evidence: app/services/analytics/reports/formatters.py (`format_summary_as_rows`)*
-- [X] **ANL-NFR-413**: `build_backtest_report` shall build a structured backtest analytics report payload.  
-  *Evidence: app/services/analytics/reports/formatters.py (`build_backtest_report`)*
-- [X] **ANL-NFR-414**: `print_statistical_validation_report` shall package a comprehensive statistical validation report.  
-  *Evidence: app/services/analytics/reports/formatters.py (`print_statistical_validation_report`)*
+- **ANL-NFR-412**: `format_summary_as_rows` shall format raw summary data into report/display rows.
+- **ANL-NFR-413**: `build_backtest_report` shall build a structured backtest analytics report payload.
+- **ANL-NFR-414**: `print_statistical_validation_report` shall package a comprehensive statistical validation report.
 
 Target Class/Function:
 - `format_summary_as_rows(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1697,24 +1323,15 @@ Requirement Title: **9 mapped requirement(s)** — `ANL-NFR-110`, `ANL-NFR-434`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-110**: Candidate dashboard payloads include summary cards, equity curve chart, drawdown curve chart, monthly returns heatmap, rolling ratio charts, rolling drawdown chart, trade distribution chart, cost breakdown chart, symbol contribution chart, warning table, and quality flag table when source sections exist.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` implementation)*
-- [X] **ANL-NFR-434**: Dashboard payloads must include chart/table data, finite numeric values, ISO-8601 timestamps, units, warnings, and metadata sufficient for UI/API consumers.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` maps summary cards and downsampled charts)*
-- [X] **ANL-NFR-435**: If a required source section is missing, failed, skipped, or degraded, the dashboard payload must include section-status metadata and warnings rather than recomputing or fabricating chart/table values.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` uses default fallbacks and preserves warnings)*
-- [X] **ANL-NFR-436**: Dashboard/UI consumers must not need to recalculate core metrics.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` returns exact values from sections)*
-- [X] **ANL-NFR-437**: Dashboard payload support must be classified by chart/table type as required, optional, or future before Builder implementation.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` design)*
-- [X] **ANL-NFR-439**: `build_overview_payload` shall build the API/dashboard analytics overview payload.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload`)*
-- [X] **ANL-NFR-440**: Result payloads must be JSON-safe or convertible to JSON-safe structures for API and dashboard consumers.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` returns serialized fields)*
-- [X] **ANL-NFR-446**: No file-specific non-functional requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-447**: No file-specific testing requirements defined.  
-  *Evidence: Inherited scope declaration*
+- **ANL-NFR-110**: Candidate dashboard payloads include summary cards, equity curve chart, drawdown curve chart, monthly returns heatmap, rolling ratio charts, rolling drawdown chart, trade distribution chart, cost breakdown chart, symbol contribution chart, warning table, and quality flag table when source sections exist.
+- **ANL-NFR-434**: Dashboard payloads must include chart/table data, finite numeric values, ISO-8601 timestamps, units, warnings, and metadata sufficient for UI/API consumers.
+- **ANL-NFR-435**: If a required source section is missing, failed, skipped, or degraded, the dashboard payload must include section-status metadata and warnings rather than recomputing or fabricating chart/table values.
+- **ANL-NFR-436**: Dashboard/UI consumers must not need to recalculate core metrics.
+- **ANL-NFR-437**: Dashboard payload support must be classified by chart/table type as required, optional, or future before Builder implementation.
+- **ANL-NFR-439**: `build_overview_payload` shall build the API/dashboard analytics overview payload.
+- **ANL-NFR-440**: Result payloads must be JSON-safe or convertible to JSON-safe structures for API and dashboard consumers.
+- **ANL-NFR-446**: No file-specific non-functional requirements defined.
+- **ANL-NFR-447**: No file-specific testing requirements defined.
 
 Target Class/Function:
 - `build_overview_payload(report: AnalyticsReport, config: DashboardConfig) -> DashboardPayload` — Pure (no database, network, broker, or filesystem side effects).
@@ -1728,20 +1345,13 @@ Requirement Title: **7 mapped requirement(s)** — `ANL-NFR-180`, `ANL-NFR-438`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-180**: Dashboard truncation/downsampling must be deterministic and must preserve first point, last point, local extrema where practical, drawdown troughs, equity highs, and timestamps associated with major, critical, or blocker warnings.  
-  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series`)*
-- [X] **ANL-NFR-438**: Truncated payload metadata must include whether truncation occurred, original point count, returned point count, truncation method or algorithm, and truncation reason.  
-  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series`)*
-- [X] **ANL-NFR-441**: Dashboard payloads must obey configured size limits and deterministic truncation policies when limits are defined.  
-  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series`)*
-- [X] **ANL-NFR-442**: The module must define concrete maximum response payload size and deterministic truncation behavior for dashboard and API payloads before production handoff.  
-  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series`)*
-- [X] **ANL-NFR-443**: Documentation must include required, optional, and future dashboard payload classes.  
-  *Evidence: app/services/analytics/dashboards/overview.py (`DashboardPayload` docstring)*
-- [X] **ANL-NFR-444**: Documentation must include dashboard truncation examples showing truncation metadata.  
-  *Evidence: app/services/analytics/dashboards/truncation.py (`TruncatedSeries` docstring)*
-- [X] **ANL-NFR-445**: Concrete input-size, runtime, memory, response-size, dashboard truncation, statistical iteration, and performance targets are approved with a hardware/profile context.  
-  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series` limit logic)*
+- **ANL-NFR-180**: Dashboard truncation/downsampling must be deterministic and must preserve first point, last point, local extrema where practical, drawdown troughs, equity highs, and timestamps associated with major, critical, or blocker warnings.
+- **ANL-NFR-438**: Truncated payload metadata must include whether truncation occurred, original point count, returned point count, truncation method or algorithm, and truncation reason.
+- **ANL-NFR-441**: Dashboard payloads must obey configured size limits and deterministic truncation policies when limits are defined.
+- **ANL-NFR-442**: The module must define concrete maximum response payload size and deterministic truncation behavior for dashboard and API payloads before production handoff.
+- **ANL-NFR-443**: Documentation must include required, optional, and future dashboard payload classes.
+- **ANL-NFR-444**: Documentation must include dashboard truncation examples showing truncation metadata.
+- **ANL-NFR-445**: Concrete input-size, runtime, memory, response-size, dashboard truncation, statistical iteration, and performance targets are approved with a hardware/profile context.
 
 Target Class/Function:
 - truncate_series(points: Sequence[ChartPoint], policy: TruncationPolicy) -> TruncatedSeries — Pure.
@@ -1759,56 +1369,31 @@ Requirement Title: **25 mapped requirement(s)** — `ANL-NFR-001`, `ANL-NFR-002`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-001**: Analytics functions must be read-only and side-effect free at the domain level.  
-  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` is read-only)*
-- [X] **ANL-NFR-002**: Importing the analytics registry should not perform live broker calls, network calls, database mutations, or trading side effects.  
-  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` does not execute live side-effects)*
-- [X] **ANL-NFR-003**: Official tools must be stateless, retry-safe, and safe for parallel optimization or portfolio workflows.  
-  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` is stateless)*
-- [X] **ANL-NFR-004**: Metric kernels must not depend on mutable global calculation state.  
-  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` doesn't use global state)*
-- [X] **ANL-NFR-005**: Local/read-through caches, if implemented, must define TTL, maximum size, eviction behavior, invalidation keys, lock timeout, stale-read behavior, and single-flight or equivalent thundering-herd prevention before Builder handoff.  
-  *Evidence: Inherited scope declaration (no cache implemented)*
-- [X] **ANL-NFR-006**: Distributed caching, distributed invalidation services, message queues, and async background workers must not be implemented inside Analytics.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-007**: Portfolio aggregation must fail closed when required base-currency conversion is unavailable.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-014**: Strategy-version mismatch must be handled explicitly during degradation pairing and must not be hidden inside aggregate scores.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-015**: Low-sample explainability drivers must not appear in ranked driver lists.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-098**: Official analytics tools must not write files, modify databases, place trades, or require network access.  
-  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` contains no IO or side-effects)*
-- [X] **ANL-NFR-099**: Analytics input conversion must support common developer inputs such as pandas dataframes, pandas series, lists of trade records, and lists of numeric values where the public capability expects them.  
-  *Evidence: Inherited scope declaration (`_helpers.py` coercions)*
-- [X] **ANL-NFR-179**: Equity and return analytics must sort and normalize supplied series deterministically; optional `NaN`/`NaT` observations may be filtered only with recorded warning metadata, required `NaN`/`NaT` fields must fail validation unless the Metric Definition Catalog marks them skippable, and `Infinity`/`-Infinity` at official boundaries must return `VALIDATION_FAILED`.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-199**: Official analytics tools must validate `request_id`; missing, empty, malformed, or unsafe request IDs must return a structured validation error envelope.  
-  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` raises ValidationError)*
-- [X] **ANL-NFR-200**: Official analytics tools must return the standard tool envelope on success and on controlled validation failure.  
-  *Evidence: app/services/analytics/boundaries/envelopes.py (`success_envelope` / `error_envelope`)*
-- [X] **ANL-NFR-201**: Date/time analytics must parse supplied open/close timestamps, support both datetime-like and numeric timestamp inputs where implemented, and return JSON-safe values for durations and timestamps.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-202**: Live-vs-backtest and paper-vs-backtest degradation comparisons must validate strategy ID, strategy version, symbols, timeframe or return frequency, evaluation window, account base currency, and comparable cost/slippage model metadata before pairing.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-304**: Architectural Mandate: derived ratios may use deterministic `float64` arithmetic only where exact decimal arithmetic is not appropriate, with documented tolerance stored in configuration, tests, and report metadata.  
-  *Evidence: app/services/analytics/boundaries/request_validation.py (`float64` wrapper)*
-- [X] **ANL-NFR-305**: No file-specific non-functional requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-306**: No file-specific testing requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-307**: The module must degrade safely when optional acceleration libraries are unavailable.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-308**: Calculations over large datasets must use vectorized operations where feasible and must degrade to bounded chunked processing with warnings when vectorization or memory limits are exceeded.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-309**: Shared caches, if implemented, must be concurrency-safe or read-through and keyed by input hash, configuration hash, and analytics engine version.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-310**: Long-series cumulative operations must use numerically stable methods where feasible and must document any approximation or chunking behavior.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-311**: Duplicate timestamps must be rejected or resolved deterministically according to configuration and recorded in diagnostics.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-312**: Invalid or missing required inputs must fail with a structured error envelope, not an uncaught exception. Custom analytics exceptions and error codes must inherit and reuse exceptions from `app.utils.errors` to prevent duplicate declaration.  
-  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` checks inputs)*
+- **ANL-NFR-001**: Analytics functions must be read-only and side-effect free at the domain level.
+- **ANL-NFR-002**: Importing the analytics registry should not perform live broker calls, network calls, database mutations, or trading side effects.
+- **ANL-NFR-003**: Official tools must be stateless, retry-safe, and safe for parallel optimization or portfolio workflows.
+- **ANL-NFR-004**: Metric kernels must not depend on mutable global calculation state.
+- **ANL-NFR-005**: Local/read-through caches, if implemented, must define TTL, maximum size, eviction behavior, invalidation keys, lock timeout, stale-read behavior, and single-flight or equivalent thundering-herd prevention before Builder handoff.
+- **ANL-NFR-006**: Distributed caching, distributed invalidation services, message queues, and async background workers must not be implemented inside Analytics.
+- **ANL-NFR-007**: Portfolio aggregation must fail closed when required base-currency conversion is unavailable.
+- **ANL-NFR-014**: Strategy-version mismatch must be handled explicitly during degradation pairing and must not be hidden inside aggregate scores.
+- **ANL-NFR-015**: Low-sample explainability drivers must not appear in ranked driver lists.
+- **ANL-NFR-098**: Official analytics tools must not write files, modify databases, place trades, or require network access.
+- **ANL-NFR-099**: Analytics input conversion must support common developer inputs such as pandas dataframes, pandas series, lists of trade records, and lists of numeric values where the public capability expects them.
+- **ANL-NFR-179**: Equity and return analytics must sort and normalize supplied series deterministically; optional `NaN`/`NaT` observations may be filtered only with recorded warning metadata, required `NaN`/`NaT` fields must fail validation unless the Metric Definition Catalog marks them skippable, and `Infinity`/`-Infinity` at official boundaries must return `VALIDATION_FAILED`.
+- **ANL-NFR-199**: Official analytics tools must validate `request_id`; missing, empty, malformed, or unsafe request IDs must return a structured validation error envelope.
+- **ANL-NFR-200**: Official analytics tools must return the standard tool envelope on success and on controlled validation failure.
+- **ANL-NFR-201**: Date/time analytics must parse supplied open/close timestamps, support both datetime-like and numeric timestamp inputs where implemented, and return JSON-safe values for durations and timestamps.
+- **ANL-NFR-202**: Live-vs-backtest and paper-vs-backtest degradation comparisons must validate strategy ID, strategy version, symbols, timeframe or return frequency, evaluation window, account base currency, and comparable cost/slippage model metadata before pairing.
+- **ANL-NFR-304**: Architectural Mandate: derived ratios may use deterministic `float64` arithmetic only where exact decimal arithmetic is not appropriate, with documented tolerance stored in configuration, tests, and report metadata.
+- **ANL-NFR-305**: No file-specific non-functional requirements defined.
+- **ANL-NFR-306**: No file-specific testing requirements defined.
+- **ANL-NFR-307**: The module must degrade safely when optional acceleration libraries are unavailable.
+- **ANL-NFR-308**: Calculations over large datasets must use vectorized operations where feasible and must degrade to bounded chunked processing with warnings when vectorization or memory limits are exceeded.
+- **ANL-NFR-309**: Shared caches, if implemented, must be concurrency-safe or read-through and keyed by input hash, configuration hash, and analytics engine version.
+- **ANL-NFR-310**: Long-series cumulative operations must use numerically stable methods where feasible and must document any approximation or chunking behavior.
+- **ANL-NFR-311**: Duplicate timestamps must be rejected or resolved deterministically according to configuration and recorded in diagnostics.
+- **ANL-NFR-312**: Invalid or missing required inputs must fail with a structured error envelope, not an uncaught exception. Custom analytics exceptions and error codes must inherit and reuse exceptions from `app.utils.errors` to prevent duplicate declaration.
 
 Target Class/Function:
 - `request_id(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1824,14 +1409,10 @@ Requirement Title: **4 mapped requirement(s)** — `ANL-NFR-272`, `ANL-NFR-273`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-272**: Tool metadata must consistently identify the category as `analytics` and risk level as `low`.  
-  *Evidence: app/services/analytics/boundaries/envelopes.py (`success_envelope` maps standard low risk fields)*
-- [X] **ANL-NFR-273**: Analytics input and output contracts must remain aligned with Simulation, Optimization, Risk, Portfolio, Trading receipt, and UI/API contracts.  
-  *Evidence: app/services/analytics/boundaries/envelopes.py (`success_envelope` wraps standard contract tool envelopes)*
-- [X] **ANL-NFR-274**: No file-specific non-functional requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-275**: No file-specific testing requirements defined.  
-  *Evidence: Inherited scope declaration*
+- **ANL-NFR-272**: Tool metadata must consistently identify the category as `analytics` and risk level as `low`.
+- **ANL-NFR-273**: Analytics input and output contracts must remain aligned with Simulation, Optimization, Risk, Portfolio, Trading receipt, and UI/API contracts.
+- **ANL-NFR-274**: No file-specific non-functional requirements defined.
+- **ANL-NFR-275**: No file-specific testing requirements defined.
 
 Target Class/Function:
 - success_envelope(data: JsonValue, metadata: AnalyticsMetadata) -> ToolEnvelope[JsonValue] — Pure.
@@ -1846,24 +1427,15 @@ Requirement Title: **9 mapped requirement(s)** — `ANL-NFR-176`, `ANL-NFR-177`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-NFR-176**: The module must define concrete maximum accepted input sizes for trades, equity points, benchmark points, portfolio components, dashboard payloads, and statistical observations before production handoff.  
-  *Evidence: app/services/analytics/boundaries/limits.py (`AnalyticsLimits` fields)*
-- [X] **ANL-NFR-177**: No file-specific non-functional requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-178**: No file-specific testing requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-362**: The module must not overstate strategy quality, robustness, or live readiness; report outputs should expose caveats where sample size, overfitting, missing benchmark, or partial data weaken confidence.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-363**: All timestamps must be timezone-aware or explicitly normalized to UTC before metric calculation, benchmark alignment, report hashing, or dashboard payload generation.  
-  *Evidence: Inherited scope declaration (`_helpers.py` parses timezone-aware dates)*
-- [X] **ANL-NFR-364**: ADR Required: `ADR-ANALYTICS-LIMITS` must record exact maximum input sizes, response payload limits, runtime budgets, memory budgets, statistical iteration limits, dashboard point limits, reference hardware, and benchmark method before Builder handoff.  
-  *Evidence: app/services/analytics/boundaries/limits.py (`AnalyticsLimits` config)*
-- [X] **ANL-NFR-365**: Performance benchmark tests must fail the handoff gate until `ADR-ANALYTICS-LIMITS` supplies exact dataset sizes, hardware profile, benchmark method, runtime thresholds, memory thresholds, and statistical-validation iteration limits.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-366**: No file-specific non-functional requirements defined.  
-  *Evidence: Inherited scope declaration*
-- [X] **ANL-NFR-367**: No file-specific testing requirements defined.  
-  *Evidence: Inherited scope declaration*
+- **ANL-NFR-176**: The module must define concrete maximum accepted input sizes for trades, equity points, benchmark points, portfolio components, dashboard payloads, and statistical observations before production handoff.
+- **ANL-NFR-177**: No file-specific non-functional requirements defined.
+- **ANL-NFR-178**: No file-specific testing requirements defined.
+- **ANL-NFR-362**: The module must not overstate strategy quality, robustness, or live readiness; report outputs should expose caveats where sample size, overfitting, missing benchmark, or partial data weaken confidence.
+- **ANL-NFR-363**: All timestamps must be timezone-aware or explicitly normalized to UTC before metric calculation, benchmark alignment, report hashing, or dashboard payload generation.
+- **ANL-NFR-364**: ADR Required: `ADR-ANALYTICS-LIMITS` must record exact maximum input sizes, response payload limits, runtime budgets, memory budgets, statistical iteration limits, dashboard point limits, reference hardware, and benchmark method before Builder handoff.
+- **ANL-NFR-365**: Performance benchmark tests must fail the handoff gate until `ADR-ANALYTICS-LIMITS` supplies exact dataset sizes, hardware profile, benchmark method, runtime thresholds, memory thresholds, and statistical-validation iteration limits.
+- **ANL-NFR-366**: No file-specific non-functional requirements defined.
+- **ANL-NFR-367**: No file-specific testing requirements defined.
 
 Target Class/Function:
 - enforce_limits(shape: WorkloadShape, limits: AnalyticsLimits) -> None — Pure.
@@ -1877,8 +1449,7 @@ Requirement Title: **1 mapped requirement(s)** — `ANL-BR-001`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- [X] **ANL-BR-001**: Analytics output must not include secrets, credentials, broker tokens, authorization headers, or private raw provider payloads.  
-  *Evidence: app/services/analytics/boundaries/redaction.py (`redact` recursively filters keys and authorization prefixes)*
+- **ANL-BR-001**: Analytics output must not include secrets, credentials, broker tokens, authorization headers, or private raw provider payloads.
 
 Target Class/Function:
 - redact(value: object, policy: RedactionPolicy) -> object — Pure.

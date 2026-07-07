@@ -15,6 +15,7 @@ from app.services.analytics.reports.sections import (
     AnalyticsReport,
     build_analytics_report,
 )
+from app.utils.logger import logger
 
 
 class ReportFormat(StrEnum):
@@ -41,7 +42,16 @@ def format_summary_as_rows(
     report: object,  # noqa: ARG001
     config: MetricConfig | None = None,
 ) -> list[dict[str, Any]] | MetricResult[object]:
-    """Format raw summary data into display rows."""
+    """Format raw summary data into display rows.
+
+    Args:
+        report (object): Input parameter `report`.
+        config (MetricConfig | None): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated object value.
+    """
+    logger.debug("format_summary_as_rows: executed.")
     if config is not None:
         return MetricResult(value=[])
     return []
@@ -51,7 +61,16 @@ def build_backtest_report(
     trading_result: dict[str, Any],
     config: MetricConfig | None = None,
 ) -> dict[str, Any] | MetricResult[object]:
-    """Build a structured backtest report dict payload."""
+    """Build a structured backtest report dict payload.
+
+    Args:
+        trading_result (dict[str, Any]): Input parameter `trading_result`.
+        config (MetricConfig | None): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated object value.
+    """
+    logger.debug("build_backtest_report: executed.")
     if config is not None:
         return MetricResult(value={})
     resp = build_analytics_report(trading_result)
@@ -66,7 +85,16 @@ def print_statistical_validation_report(
     returns: object,  # noqa: ARG001
     config: MetricConfig | None = None,
 ) -> str | MetricResult[object]:
-    """Package a statistical validation report as text."""
+    """Package a statistical validation report as text.
+
+    Args:
+        returns (object): Sequence of return floats.
+        config (MetricConfig | None): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated object value.
+    """
+    logger.debug("print_statistical_validation_report: executed.")
     if config is not None:
         return MetricResult(value="")
     return ""
@@ -76,7 +104,16 @@ def serialize_report(
     report: AnalyticsReport | dict[str, Any],
     report_format: ReportFormat,
 ) -> SerializedReport:
-    """Serialize report object or dict representation deterministically."""
+    """Serialize report object or dict representation deterministically.
+
+    Args:
+        report (AnalyticsReport | dict[str, Any]): Input parameter `report`.
+        report_format (ReportFormat): Input parameter `report_format`.
+
+    Returns:
+        Calculated SerializedReport value.
+    """
+    logger.debug("serialize_report: executed.")
     # Convert report to dict safely
     rep_dict: dict[str, Any] = {}
     if isinstance(report, dict):

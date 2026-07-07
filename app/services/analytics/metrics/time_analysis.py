@@ -7,7 +7,6 @@ import datetime
 from collections.abc import Sequence
 from typing import Any
 
-from app.services.analytics._helpers import parse_utc_time
 from app.services.analytics.contracts import MetricConfig, MetricResult
 from app.services.analytics.metrics.efficiency import (
     _get_trade_duration,
@@ -18,7 +17,9 @@ from app.services.analytics.metrics.trade_outcomes import (
     _get_trade_pnl,
     get_closed_trades,
     get_ordered_closed_trades,
+    parse_utc_time,
 )
+from app.utils.logger import logger
 
 type TradeRecord = dict[str, Any]
 type Duration = datetime.timedelta | float
@@ -28,7 +29,16 @@ def calculate_period_analysis(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Aggregate net PnL per calendar bucket (ANL-NFR-061)."""
+    """Aggregate net PnL per calendar bucket (ANL-NFR-061).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("calculate_period_analysis: executed.")
     bucket = config.metadata.get("bucket", "monthly")
     ordered = get_ordered_closed_trades(trades)
     results: dict[str, float] = {}
@@ -45,7 +55,16 @@ def calculate_long_short_split(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Split net PnL into long and short components (ANL-NFR-062)."""
+    """Split net PnL into long and short components (ANL-NFR-062).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("calculate_long_short_split: executed.")
     closed = get_closed_trades(trades)
     longs = [
         t for t in closed if str(t.get("direction", "")).lower() in ("long", "buy")
@@ -64,7 +83,16 @@ def calculate_session_performance(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Aggregate PnL per trading session (ANL-NFR-063)."""
+    """Aggregate PnL per trading session (ANL-NFR-063).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("calculate_session_performance: executed.")
     ordered = get_ordered_closed_trades(trades)
     sessions = {"asian": 0.0, "london": 0.0, "newyork": 0.0}
     for t in ordered:
@@ -85,7 +113,16 @@ def avg_time_in_trade(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate average trade duration in hours (ANL-NFR-191)."""
+    """Calculate average trade duration in hours (ANL-NFR-191).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_time_in_trade: executed.")
     durations = [_get_trade_duration(t) for t in get_closed_trades(trades)]
     if not durations:
         return MetricResult(value=0.0)
@@ -97,7 +134,16 @@ def median_time_in_trade(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate median trade duration in hours (ANL-NFR-192)."""
+    """Calculate median trade duration in hours (ANL-NFR-192).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("median_time_in_trade: executed.")
     durations = sorted(_get_trade_duration(t) for t in get_closed_trades(trades))
     val = _sorted_median(durations)
     return MetricResult(value=val)
@@ -107,7 +153,16 @@ def max_time_in_trade(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate maximum trade duration in hours (ANL-NFR-193)."""
+    """Calculate maximum trade duration in hours (ANL-NFR-193).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("max_time_in_trade: executed.")
     val = max(
         (_get_trade_duration(t) for t in get_closed_trades(trades)),
         default=0.0,
@@ -119,7 +174,16 @@ def min_time_in_trade(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate minimum trade duration in hours (ANL-NFR-194)."""
+    """Calculate minimum trade duration in hours (ANL-NFR-194).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("min_time_in_trade: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -131,7 +195,16 @@ def time_in_market_duration_metric(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate total duration where at least one position was open in hours (ANL-NFR-313)."""
+    """Calculate total duration where at least one position was open in hours (ANL-NFR-313).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("time_in_market_duration_metric: executed.")
     val = time_in_market_duration(trades)
     return MetricResult(value=val)
 
@@ -140,7 +213,16 @@ def trading_period_duration(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate total duration of the trading period in hours (ANL-NFR-314)."""
+    """Calculate total duration of the trading period in hours (ANL-NFR-314).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("trading_period_duration: executed.")
     ordered = get_ordered_closed_trades(trades)
     if len(ordered) < 2:
         return MetricResult(value=0.0)

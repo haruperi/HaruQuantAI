@@ -16,6 +16,7 @@ from app.services.analytics.contracts.models import (
     ToolDefinition,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 # Schema compatibility matrix definitions (ANL-NFR-085)
 SCHEMA_COMPATIBILITY_MATRIX: SchemaCompatibilityMatrix = {
@@ -92,8 +93,7 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         annualization_basis="years elapsed",
         minimum_sample_size=1,
         undefined_behavior=(
-            "return None when initial_value, final_value, or years is "
-            "non-positive"
+            "return None when initial_value, final_value, or years is non-positive"
         ),
         golden_fixture="10 000 → 12 000 over 2 years ≈ 9.54 %",
     ),
@@ -105,8 +105,7 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         optional_inputs=("periods_per_year",),
         return_scale="percent",
         annualization_basis=(
-            "configured periods "
-            "(AnalyticsConfig.annualization_periods)"
+            "configured periods (AnalyticsConfig.annualization_periods)"
         ),
         minimum_sample_size=2,
         undefined_behavior=(
@@ -564,8 +563,7 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         return_scale="percent",
         minimum_sample_size=2,
         undefined_behavior=(
-            "return 0.0 when equity curve has no drawdown "
-            "or insufficient data"
+            "return 0.0 when equity curve has no drawdown or insufficient data"
         ),
         role="scorecard_input",
     ),
@@ -604,8 +602,7 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         required_inputs=("annualized_return", "max_drawdown"),
         return_scale="ratio",
         annualization_basis=(
-            "configured periods "
-            "(AnalyticsConfig.annualization_periods)"
+            "configured periods (AnalyticsConfig.annualization_periods)"
         ),
         minimum_sample_size=2,
         undefined_behavior="return 0.0 when max_drawdown is zero",
@@ -646,14 +643,12 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         optional_inputs=("risk_free_rate",),
         return_scale="ratio",
         annualization_basis=(
-            "configured periods "
-            "(AnalyticsConfig.annualization_periods)"
+            "configured periods (AnalyticsConfig.annualization_periods)"
         ),
         sample_convention="sample",
         minimum_sample_size=2,
         undefined_behavior=(
-            "return 0.0 for insufficient variance "
-            "or fewer than 2 returns"
+            "return 0.0 for insufficient variance or fewer than 2 returns"
         ),
         role="scorecard_input",
         golden_fixture="daily returns with mean 0.001, std 0.01 → Sharpe ≈ 0.1",
@@ -666,14 +661,12 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         optional_inputs=("risk_free_rate", "periods"),
         return_scale="ratio",
         annualization_basis=(
-            "configured periods "
-            "(AnalyticsConfig.annualization_periods)"
+            "configured periods (AnalyticsConfig.annualization_periods)"
         ),
         sample_convention="sample",
         minimum_sample_size=2,
         undefined_behavior=(
-            "return 0.0 for insufficient variance "
-            "or fewer than 2 returns"
+            "return 0.0 for insufficient variance or fewer than 2 returns"
         ),
     ),
     "sortino_ratio": MetricDefinition(
@@ -686,8 +679,7 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         sample_convention="sample",
         minimum_sample_size=2,
         undefined_behavior=(
-            "return 0.0 when downside deviation is zero "
-            "or insufficient data"
+            "return 0.0 when downside deviation is zero or insufficient data"
         ),
     ),
     "volatility": MetricDefinition(
@@ -708,8 +700,7 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         optional_inputs=("periods",),
         return_scale="percent",
         annualization_basis=(
-            "configured periods "
-            "(AnalyticsConfig.annualization_periods)"
+            "configured periods (AnalyticsConfig.annualization_periods)"
         ),
         sample_convention="sample",
         minimum_sample_size=2,
@@ -767,23 +758,20 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         sample_convention="sample",
         minimum_sample_size=2,
         undefined_behavior=(
-            "return 1.0 when benchmark variance is zero "
-            "or fewer than 2 aligned returns"
+            "return 1.0 when benchmark variance is zero or fewer than 2 aligned returns"
         ),
     ),
     "alpha": MetricDefinition(
         name="alpha",
         formula=(
-            "(E[R_s] - [R_f + beta * (E[R_b] - R_f)]) "
-            "* annualization_periods * 100"
+            "(E[R_s] - [R_f + beta * (E[R_b] - R_f)]) * annualization_periods * 100"
         ),
         units="percent",
         required_inputs=("strategy_returns", "benchmark_returns"),
         optional_inputs=("risk_free_rate",),
         return_scale="percent",
         annualization_basis=(
-            "configured periods "
-            "(AnalyticsConfig.annualization_periods)"
+            "configured periods (AnalyticsConfig.annualization_periods)"
         ),
         minimum_sample_size=2,
         undefined_behavior="return 0.0 when no aligned returns are available",
@@ -799,14 +787,12 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         required_inputs=("strategy_returns", "benchmark_returns"),
         return_scale="ratio",
         annualization_basis=(
-            "configured periods "
-            "(AnalyticsConfig.annualization_periods)"
+            "configured periods (AnalyticsConfig.annualization_periods)"
         ),
         sample_convention="sample",
         minimum_sample_size=2,
         undefined_behavior=(
-            "return 0.0 when tracking error is zero "
-            "or fewer than 2 aligned returns"
+            "return 0.0 when tracking error is zero or fewer than 2 aligned returns"
         ),
     ),
     "tracking_error": MetricDefinition(
@@ -819,8 +805,7 @@ METRIC_DEFINITION_CATALOG: Mapping[str, MetricDefinition] = {
         required_inputs=("strategy_returns", "benchmark_returns"),
         return_scale="percent",
         annualization_basis=(
-            "configured periods "
-            "(AnalyticsConfig.annualization_periods)"
+            "configured periods (AnalyticsConfig.annualization_periods)"
         ),
         sample_convention="sample",
         minimum_sample_size=2,
@@ -1148,14 +1133,12 @@ def get_metric_definition(name: str) -> MetricDefinition:
     """Retrieve an approved metric definition by name (ANL-NFR-075, ANL-NFR-076).
 
     Args:
-        name: The stable metric name matching the catalog key.
+        name (str): Input parameter `name`.
 
     Returns:
-        The MetricDefinition object.
-
-    Raises:
-        ValidationError: If the metric name is not found in the catalog.
+        Calculated MetricDefinition value.
     """
+    logger.debug("get_metric_definition: executed.")
     definition = METRIC_DEFINITION_CATALOG.get(name)
     if definition is None:
         msg = f"Unknown or uncataloged metric: {name!r}."
@@ -1169,16 +1152,12 @@ def validate_metric_catalog(
     """Validate that metric catalog entries are complete and unique (ANL-NFR-082).
 
     Args:
-        catalog: Optional catalog to validate. Defaults to
-            ``METRIC_DEFINITION_CATALOG``.
+        catalog (Mapping[str, MetricDefinition] | None): Input parameter `catalog`.
 
     Returns:
-        JSON-safe validation summary with ``status``, ``metric_count``,
-        and ``metrics``.
-
-    Raises:
-        ValidationError: If a catalog entry is malformed or duplicated.
+        Calculated dict[str, Any] value.
     """
+    logger.debug("validate_metric_catalog: executed.")
     active = METRIC_DEFINITION_CATALOG if catalog is None else catalog
     if not isinstance(active, dict) and not isinstance(active, Mapping):
         msg = "metric catalog must be a Mapping or dictionary."

@@ -1,3 +1,4 @@
+# ruff: noqa: ARG001
 """Report composition orchestrations for Analytics.
 
 Coordinates trade, equity, drawdown, risk, ratios, and benchmark calculations
@@ -14,19 +15,21 @@ from typing import Any, cast
 from app.services.analytics.adapters import TradingResultAdapter
 from app.services.analytics.benchmarks import calculate_benchmark_metrics
 from app.services.analytics.contracts import MetricConfig, MetricResult
-from app.services.analytics.drawdown import calculate_drawdown_metrics
-from app.services.analytics.equity import (
+from app.services.analytics.metrics.aggregate import calculate_trade_metrics
+from app.services.analytics.metrics.drawdown import (
+    _raw_calculate_drawdown_metrics as calculate_drawdown_metrics,
+)
+from app.services.analytics.metrics.equity import (
     _parse_equity_curve,
     calculate_equity_metrics,
     returns_series,
 )
-from app.services.analytics.ratios import calculate_ratio_metrics
-from app.services.analytics.risk import calculate_risk_metrics
+from app.services.analytics.metrics.ratios import calculate_ratio_metrics
+from app.services.analytics.metrics.risk import calculate_risk_metrics
 from app.services.analytics.statistics import (
     bootstrap_confidence_intervals,
     calculate_distribution_metrics,
 )
-from app.services.analytics.trade import calculate_trade_metrics
 from app.utils import (
     StandardResponse,
     build_metadata,
@@ -35,6 +38,7 @@ from app.utils import (
     success_response,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,9 +64,13 @@ class PortfolioAnalyticsReport:
     warnings: list[dict[str, Any]] = field(default_factory=list)
 
 
-
 def _validate_request_id(request_id: str | None) -> None:
-    """Helper to validate request_id strictly."""
+    """Helper to validate request_id strictly.
+
+    Args:
+        request_id (str | None): Input parameter `request_id`.
+    """
+    logger.debug("_validate_request_id: executed.")
     if request_id is not None and (
         not isinstance(request_id, str) or not request_id.strip()
     ):
@@ -70,6 +78,15 @@ def _validate_request_id(request_id: str | None) -> None:
 
 
 def _to_float_list(series: object) -> list[float]:
+    """Expose behavior for `_to_float_list`.
+
+    Args:
+        series (object): Input parameter `series`.
+
+    Returns:
+        Calculated list[float] value.
+    """
+    logger.debug("_to_float_list: executed.")
     if series is None:
         return []
     if hasattr(series, "tolist"):
@@ -83,7 +100,16 @@ def _to_float_list(series: object) -> list[float]:
 
 
 def request_id(input_value: object, config: MetricConfig) -> MetricResult[object]:
-    """Architecture boundary wrapper for request metadata mapping."""
+    """Architecture boundary wrapper for request metadata mapping.
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated object value.
+    """
+    logger.debug("request_id: executed.")
     return MetricResult(value=input_value)
 
 
@@ -92,7 +118,17 @@ def build_analytics_report(  # noqa: PLR0915
     diagnostic_partial_mode: bool = False,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Build a structured backtest or live trading analytics report."""
+    """Build a structured backtest or live trading analytics report.
+
+    Args:
+        trading_result (dict[str, Any]): Input parameter `trading_result`.
+        diagnostic_partial_mode (bool): Input parameter `diagnostic_partial_mode`.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("build_analytics_report: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="build_analytics_report",
@@ -116,7 +152,7 @@ def build_analytics_report(  # noqa: PLR0915
         equity_curve = canonical.get("equity_curve", [])
 
         # Run required groups
-        trade_resp = calculate_trade_metrics(trades)
+        trade_resp = cast("StandardResponse", calculate_trade_metrics(trades))
         if trade_resp["status"] != "success":
             return response_from_exception(
                 exception=ValidationError(
@@ -151,7 +187,7 @@ def build_analytics_report(  # noqa: PLR0915
         equities = [eq for dt, eq in parsed_eq]
         ret_series = returns_series(equities)
 
-        risk_resp = calculate_risk_metrics(ret_series)
+        risk_resp = cast("StandardResponse", calculate_risk_metrics(ret_series))
         ratio_resp = calculate_ratio_metrics(ret_series)
         dist_resp = calculate_distribution_metrics(ret_series)
 
@@ -280,7 +316,16 @@ def build_portfolio_analytics_report(
     portfolio_result: dict[str, Any],
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Build an aggregated portfolio report from component strategy results."""
+    """Build an aggregated portfolio report from component strategy results.
+
+    Args:
+        portfolio_result (dict[str, Any]): Input parameter `portfolio_result`.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("build_portfolio_analytics_report: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="build_portfolio_analytics_report",
@@ -347,7 +392,17 @@ def compare_analytics_reports(
     candidate_report: dict[str, Any],
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Compare performance metrics between two strategy run reports."""
+    """Compare performance metrics between two strategy run reports.
+
+    Args:
+        reference_report (dict[str, Any]): Input parameter `reference_report`.
+        candidate_report (dict[str, Any]): Input parameter `candidate_report`.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("compare_analytics_reports: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="compare_analytics_reports",
@@ -381,7 +436,16 @@ def calculate_statistical_validation(
     returns: object,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Package a comprehensive statistical validation report."""
+    """Package a comprehensive statistical validation report.
+
+    Args:
+        returns (object): Sequence of return floats.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("calculate_statistical_validation: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="calculate_statistical_validation",
@@ -415,10 +479,19 @@ def calculate_statistical_validation(
 
 
 def calculate_prop_firm_compliance(
-    report: dict[str, Any],  # noqa: ARG001
+    report: dict[str, Any],
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Verify strategy compliance metrics against standard prop firm limits."""
+    """Verify strategy compliance metrics against standard prop firm limits.
+
+    Args:
+        report (dict[str, Any]): Input parameter `report`.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("calculate_prop_firm_compliance: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="calculate_prop_firm_compliance",

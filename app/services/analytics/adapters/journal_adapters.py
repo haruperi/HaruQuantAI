@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 from app.services.analytics.contracts.models import Lineage, TradingResult
 from app.services.contracts.trading import ExecutionReport, Fill, TradeResult
+from app.utils.logger import logger
 
 if TYPE_CHECKING:
     from app.services.contracts.audit import AuditEvent
@@ -71,7 +72,15 @@ class LiveTradeJournal:
 
 
 def _extract_trades_from_events(events: tuple[Any, ...]) -> tuple[dict[str, Any], ...]:
-    """Helper to extract closed trades from event stream."""
+    """Helper to extract closed trades from event stream.
+
+    Args:
+        events (tuple[Any, ...]): Input parameter `events`.
+
+    Returns:
+        Calculated tuple[dict[str, Any], ...] value.
+    """
+    logger.debug("_extract_trades_from_events: executed.")
     trades_list = []
     for event in events:
         if isinstance(event, TradeResult):
@@ -84,14 +93,13 @@ def _extract_trades_from_events(events: tuple[Any, ...]) -> tuple[dict[str, Any]
 def from_simulation_journal(journal: SimulationJournal) -> TradingResult:
     """Convert a SimulationJournal into a canonical TradingResult (ANL-NFR-449).
 
-    This strictly formats metric provenance fields (ANL-NFR-451).
-
     Args:
-        journal: SimulationJournal instance.
+        journal (SimulationJournal): Input parameter `journal`.
 
     Returns:
-        Canonical TradingResult.
+        Calculated TradingResult value.
     """
+    logger.debug("from_simulation_journal: executed.")
     trades = _extract_trades_from_events(journal.events)
 
     lineage = Lineage(
@@ -119,14 +127,13 @@ def from_simulation_journal(journal: SimulationJournal) -> TradingResult:
 def from_live_trade_journal(journal: LiveTradeJournal) -> TradingResult:
     """Convert a LiveTradeJournal into a canonical TradingResult (ANL-NFR-449).
 
-    This maps provenance fields from the live session environment (ANL-NFR-451).
-
     Args:
-        journal: LiveTradeJournal instance.
+        journal (LiveTradeJournal): Input parameter `journal`.
 
     Returns:
-        Canonical TradingResult.
+        Calculated TradingResult value.
     """
+    logger.debug("from_live_trade_journal: executed.")
     trades = _extract_trades_from_events(journal.events)
 
     lineage = Lineage(

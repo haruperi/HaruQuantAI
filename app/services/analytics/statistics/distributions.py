@@ -17,10 +17,16 @@ from app.utils import (
     success_response,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 
 def _validate_request_id(request_id: str | None) -> None:
-    """Helper to validate request_id strictly."""
+    """Helper to validate request_id strictly.
+
+    Args:
+        request_id (str | None): Input parameter `request_id`.
+    """
+    logger.debug("_validate_request_id: executed.")
     if request_id is not None and (
         not isinstance(request_id, str) or not request_id.strip()
     ):
@@ -28,6 +34,15 @@ def _validate_request_id(request_id: str | None) -> None:
 
 
 def _to_float_list(series: object) -> list[float]:
+    """Expose behavior for `_to_float_list`.
+
+    Args:
+        series (object): Input parameter `series`.
+
+    Returns:
+        Calculated list[float] value.
+    """
+    logger.debug("_to_float_list: executed.")
     if series is None:
         return []
     if hasattr(series, "tolist"):
@@ -44,7 +59,15 @@ def _to_float_list(series: object) -> list[float]:
 
 
 def skewness(values: Sequence[float] | object) -> float:
-    """Compute the Fisher-Pearson coefficient of skewness."""
+    """Compute the Fisher-Pearson coefficient of skewness.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("skewness: executed.")
     f_list = _to_float_list(values)
     n = len(f_list)
     if n < 3:  # noqa: PLR2004
@@ -58,7 +81,15 @@ def skewness(values: Sequence[float] | object) -> float:
 
 
 def kurtosis(values: Sequence[float] | object) -> float:
-    """Compute the excess kurtosis."""
+    """Compute the excess kurtosis.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("kurtosis: executed.")
     f_list = _to_float_list(values)
     n = len(f_list)
     if n < 4:  # noqa: PLR2004
@@ -72,7 +103,15 @@ def kurtosis(values: Sequence[float] | object) -> float:
 
 
 def higher_moments(values: Sequence[float] | object) -> dict[str, float]:
-    """Compute standard higher moments (mean, std, skewness, kurtosis)."""
+    """Compute standard higher moments (mean, std, skewness, kurtosis).
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("higher_moments: executed.")
     f_list = _to_float_list(values)
     n = len(f_list)
     if n == 0:
@@ -88,7 +127,15 @@ def higher_moments(values: Sequence[float] | object) -> dict[str, float]:
 
 
 def percentile_summary(values: Sequence[float] | object) -> dict[str, float]:
-    """Return selected percentile values."""
+    """Return selected percentile values.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("percentile_summary: executed.")
     f_list = _to_float_list(values)
     if not f_list:
         return {}
@@ -106,7 +153,15 @@ def percentile_summary(values: Sequence[float] | object) -> dict[str, float]:
 def upside_downside_summary(
     values: Sequence[float] | object,
 ) -> dict[str, float | int]:
-    """Summarize positive and negative outcome distributions."""
+    """Summarize positive and negative outcome distributions.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float | int] value.
+    """
+    logger.debug("upside_downside_summary: executed.")
     f_list = _to_float_list(values)
     upside = [x for x in f_list if x > 0]
     downside = [x for x in f_list if x < 0]
@@ -121,12 +176,27 @@ def upside_downside_summary(
 
 
 def fat_tail_score(values: Sequence[float] | object) -> float:
-    """Estimate tail heaviness relative to normal behavior (excess kurtosis)."""
+    """Estimate tail heaviness relative to normal behavior (excess kurtosis).
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated float value.
+    """
     return kurtosis(values)
 
 
 def tail_ratio(values: Sequence[float] | object) -> float:
-    """Calculate ratio between upper-tail and lower-tail percentile magnitudes."""
+    """Calculate ratio between upper-tail and lower-tail percentile magnitudes.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("tail_ratio: executed.")
     f_list = _to_float_list(values)
     if not f_list:
         return 0.0
@@ -139,7 +209,15 @@ def tail_ratio(values: Sequence[float] | object) -> float:
 
 
 def jarque_bera_test(values: Sequence[float] | object) -> dict[str, float]:
-    """Run a Jarque-Bera normality diagnostic."""
+    """Run a Jarque-Bera normality diagnostic.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("jarque_bera_test: executed.")
     f_list = _to_float_list(values)
     n = len(f_list)
     if n < 4:  # noqa: PLR2004
@@ -152,7 +230,15 @@ def jarque_bera_test(values: Sequence[float] | object) -> dict[str, float]:
 
 
 def shapiro_wilk_test(values: Sequence[float] | object) -> dict[str, float]:
-    """Run a Shapiro-Wilk normality diagnostic approximation."""
+    """Run a Shapiro-Wilk normality diagnostic approximation.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("shapiro_wilk_test: executed.")
     f_list = _to_float_list(values)
     n = len(f_list)
     if n < 3:  # noqa: PLR2004
@@ -163,7 +249,15 @@ def shapiro_wilk_test(values: Sequence[float] | object) -> dict[str, float]:
 
 
 def qq_plot_data(values: Sequence[float] | object) -> list[dict[str, float]]:
-    """Generate theoretical and actual quantile data for Q-Q plotting."""
+    """Generate theoretical and actual quantile data for Q-Q plotting.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated list[dict[str, float]] value.
+    """
+    logger.debug("qq_plot_data: executed.")
     f_list = _to_float_list(values)
     n = len(f_list)
     if not f_list:
@@ -187,7 +281,15 @@ def qq_plot_data(values: Sequence[float] | object) -> list[dict[str, float]]:
 
 
 def fit_distribution(values: Sequence[float] | object) -> dict[str, float]:
-    """Fit a theoretical distribution and return fit parameters."""
+    """Fit a theoretical distribution and return fit parameters.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("fit_distribution: executed.")
     f_list = _to_float_list(values)
     if not f_list:
         return {}
@@ -199,7 +301,15 @@ def fit_distribution(values: Sequence[float] | object) -> dict[str, float]:
 def distribution_fit_quality(
     values: Sequence[float] | object,
 ) -> dict[str, float]:
-    """Return fit-quality diagnostics (likelihood and information criteria)."""
+    """Return fit-quality diagnostics (likelihood and information criteria).
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("distribution_fit_quality: executed.")
     f_list = _to_float_list(values)
     fit = fit_distribution(f_list)
     if not fit:
@@ -221,7 +331,16 @@ def distribution_fit_quality(
 def histogram_data(
     values: Sequence[float] | object, bins: int = 10
 ) -> dict[str, list[float]]:
-    """Generate histogram bin data for plotting."""
+    """Generate histogram bin data for plotting.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+        bins (int): Input parameter `bins`.
+
+    Returns:
+        Calculated dict[str, list[float]] value.
+    """
+    logger.debug("histogram_data: executed.")
     f_list = _to_float_list(values)
     if not f_list:
         return {"bins": [], "counts": []}
@@ -246,7 +365,17 @@ def detect_outliers(
     _method: str = "iqr",
     threshold: float = 1.5,
 ) -> list[int]:
-    """Identify outliers with the requested method and threshold."""
+    """Identify outliers with the requested method and threshold.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+        _method (str): Input parameter `_method`.
+        threshold (float): Input parameter `threshold`.
+
+    Returns:
+        Calculated list[int] value.
+    """
+    logger.debug("detect_outliers: executed.")
     f_list = _to_float_list(values)
     n = len(f_list)
     if n < 4:  # noqa: PLR2004
@@ -269,7 +398,17 @@ def outlier_ratio(
     method: str = "iqr",
     threshold: float = 1.5,
 ) -> float:
-    """Calculate percentage of data points flagged as outliers."""
+    """Calculate percentage of data points flagged as outliers.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+        method (str): Input parameter `method`.
+        threshold (float): Input parameter `threshold`.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("outlier_ratio: executed.")
     f_list = _to_float_list(values)
     if not f_list:
         return 0.0
@@ -277,14 +416,30 @@ def outlier_ratio(
 
 
 def return_distribution(values: Sequence[float] | object) -> dict[str, float]:
-    """Calculate a statistical summary of returns."""
+    """Calculate a statistical summary of returns.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("return_distribution: executed.")
     return higher_moments(values)
 
 
 def r_multiple_distribution(
     values: Sequence[float] | object,
 ) -> dict[str, float]:
-    """Calculate a statistical summary of R-multiple values."""
+    """Calculate a statistical summary of R-multiple values.
+
+    Args:
+        values (Sequence[float] | object): Sequence of numeric values.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("r_multiple_distribution: executed.")
     return higher_moments(values)
 
 
@@ -296,7 +451,17 @@ def sample_size_warning(
     min_recommended: int = 100,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Assess metric reliability based on sample size and return warnings."""
+    """Assess metric reliability based on sample size and return warnings.
+
+    Args:
+        n (int): Input parameter `n`.
+        min_recommended (int): Input parameter `min_recommended`.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("sample_size_warning: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="sample_size_warning",
@@ -329,7 +494,16 @@ def sample_size_warning(
 def calculate_distribution_metrics(
     values: object, request_id: str | None = None
 ) -> StandardResponse:
-    """Calculate aggregate distribution statistics."""
+    """Calculate aggregate distribution statistics.
+
+    Args:
+        values (object): Sequence of numeric values.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("calculate_distribution_metrics: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="calculate_distribution_metrics",

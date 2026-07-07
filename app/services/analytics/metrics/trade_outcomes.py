@@ -8,24 +8,98 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
+from datetime import UTC, datetime
 from typing import Any
 
-from app.services.analytics._helpers import parse_utc_time
 from app.services.analytics.contracts import MetricConfig, MetricResult
+from app.utils.logger import logger
+
+
+def parse_utc_time(t_val: Any) -> datetime | None:  # noqa: PLR0911, ANN401
+    """Parse any timestamp representation to a UTC-aware ``datetime``.
+
+    Never returns a timezone-naive ``datetime``.  Returns ``None`` when the
+    input cannot be parsed.
+
+    Supported input types:
+    * ``datetime``  - returned as-is when already timezone-aware; localised
+                      to UTC when naive.
+    * ``str``       - parsed via ``datetime.fromisoformat``; ``"Z"`` suffix
+                      is rewritten to ``"+00:00"``.
+    * ``int|float`` - interpreted as a POSIX timestamp in UTC.
+
+    Args:
+        t_val: Timestamp in any supported representation.
+
+    Returns:
+        A UTC-aware ``datetime``, or ``None`` if parsing fails.
+
+    Side effects:
+        None.
+    """
+    if isinstance(t_val, datetime):
+        if t_val.tzinfo is None:
+            return t_val.replace(tzinfo=UTC)
+        return t_val.astimezone(UTC)
+    if isinstance(t_val, str):
+        try:
+            normalised = t_val.replace("Z", "+00:00")
+            parsed = datetime.fromisoformat(normalised)
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=UTC)
+            return parsed.astimezone(UTC)
+        except (ValueError, AttributeError):
+            return None
+    if isinstance(t_val, (int, float)):
+        try:
+            return datetime.fromtimestamp(float(t_val), tz=UTC)
+        except (OSError, OverflowError, ValueError):
+            return None
+    return None
+
 
 type TradeRecord = dict[str, Any]
 
 
 def _get_trade_pnl(t: TradeRecord) -> float:
-    """Helper to retrieve PnL of a trade record."""
-    return float(t.get("pnl") or t.get("profit") or t.get("realized_pnl") or 0.0)
+    """Helper to retrieve PnL of a trade record.
+
+    Args:
+        t (TradeRecord): Input parameter `t`.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("_get_trade_pnl: executed.")
+    for key in (
+        "pnl",
+        "profit_loss",
+        "profit",
+        "realized_pnl",
+        "net_pnl",
+        "profit_loss_usd",
+    ):
+        if key in t:
+            val = t[key]
+            if val is not None:
+                return float(val)
+    return 0.0
 
 
 def get_closed_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig | None = None,
 ) -> tuple[TradeRecord, ...]:
-    """Filter to closed trades (ANL-NFR-111, ANL-NFR-101)."""
+    """Filter to closed trades (ANL-NFR-111, ANL-NFR-101).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig | None): Metric configuration.
+
+    Returns:
+        Calculated tuple[TradeRecord, ...] value.
+    """
+    logger.debug("get_closed_trades: executed.")
     closed = []
     for t in trades:
         close_time = t.get("close_time") or t.get("close_timestamp")
@@ -38,10 +112,27 @@ def get_ordered_closed_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig | None = None,
 ) -> tuple[TradeRecord, ...]:
-    """Sort closed trades chronologically (ANL-NFR-133)."""
+    """Sort closed trades chronologically (ANL-NFR-133).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig | None): Metric configuration.
+
+    Returns:
+        Calculated tuple[TradeRecord, ...] value.
+    """
     closed = get_closed_trades(trades)
 
     def _close_ts(t: dict[str, Any]) -> float:
+        """Expose behavior for `_close_ts`.
+
+        Args:
+            t (dict[str, Any]): Input parameter `t`.
+
+        Returns:
+            Calculated float value.
+        """
+        logger.debug("_close_ts: executed.")
         ct = t.get("close_time") or t.get("close_timestamp")
         dt = parse_utc_time(ct)
         return dt.timestamp() if dt else 0.0
@@ -53,7 +144,16 @@ def classify_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> dict[str, list[TradeRecord]]:
-    """Partition trades into wins, losses, and breakevens (ANL-NFR-112, ANL-NFR-102)."""
+    """Partition trades into wins, losses, and breakevens (ANL-NFR-112, ANL-NFR-102).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        Calculated dict[str, list[TradeRecord]] value.
+    """
+    logger.debug("classify_trades: executed.")
     eps = config.breakeven_epsilon if config is not None else 1e-9
     wins: list[TradeRecord] = []
     losses: list[TradeRecord] = []
@@ -73,7 +173,16 @@ def win_rate_fraction(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate win rate on a 0-to-1 scale (ANL-NFR-021)."""
+    """Calculate win rate on a 0-to-1 scale (ANL-NFR-021).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("win_rate_fraction: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -86,7 +195,16 @@ def avg_win_loss(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate ratio of mean winning to mean losing outcomes (ANL-NFR-022)."""
+    """Calculate ratio of mean winning to mean losing outcomes (ANL-NFR-022).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_win_loss: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -107,7 +225,16 @@ def consecutive_wins_losses(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[dict[str, int]]:
-    """Calculate maximum consecutive wins and losses from numeric outcomes (ANL-NFR-023)."""
+    """Calculate maximum consecutive wins and losses from numeric outcomes (ANL-NFR-023).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, int value.
+    """
+    logger.debug("consecutive_wins_losses: executed.")
     ordered = get_ordered_closed_trades(trades)
     if not ordered:
         return MetricResult(value={"wins": 0, "losses": 0})
@@ -136,7 +263,16 @@ def t_statistic(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate the t-statistic for mean outcome (ANL-NFR-024)."""
+    """Calculate the t-statistic for mean outcome (ANL-NFR-024).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("t_statistic: executed.")
     closed = get_closed_trades(trades)
     n = len(closed)
     if n < 2:
@@ -154,7 +290,16 @@ def expectancy_r(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate R-expectancy (ANL-NFR-030)."""
+    """Calculate R-expectancy (ANL-NFR-030).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("expectancy_r: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -173,7 +318,16 @@ def avg_r_multiple(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate average R-multiple (ANL-NFR-035)."""
+    """Calculate average R-multiple (ANL-NFR-035).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_r_multiple: executed.")
     return expectancy_r(trades, config)
 
 
@@ -181,7 +335,16 @@ def median_r_multiple(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate median R-multiple (ANL-NFR-036)."""
+    """Calculate median R-multiple (ANL-NFR-036).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("median_r_multiple: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -205,7 +368,16 @@ def r_expectancy(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate R-space expectancy (ANL-NFR-037)."""
+    """Calculate R-space expectancy (ANL-NFR-037).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("r_expectancy: executed.")
     return expectancy_r(trades, config)
 
 
@@ -213,7 +385,16 @@ def max_r_multiple(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate maximum R-multiple (ANL-NFR-038)."""
+    """Calculate maximum R-multiple (ANL-NFR-038).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("max_r_multiple: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -230,7 +411,16 @@ def min_r_multiple(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate minimum R-multiple (ANL-NFR-039)."""
+    """Calculate minimum R-multiple (ANL-NFR-039).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("min_r_multiple: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -247,7 +437,16 @@ def avg_consecutive_wins(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate average length of winning streaks (ANL-NFR-040)."""
+    """Calculate average length of winning streaks (ANL-NFR-040).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_consecutive_wins: executed.")
     ordered = get_ordered_closed_trades(trades)
     if not ordered:
         return MetricResult(value=0.0)
@@ -270,7 +469,16 @@ def avg_consecutive_losses(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate average length of losing streaks (ANL-NFR-041)."""
+    """Calculate average length of losing streaks (ANL-NFR-041).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_consecutive_losses: executed.")
     ordered = get_ordered_closed_trades(trades)
     if not ordered:
         return MetricResult(value=0.0)
@@ -293,7 +501,16 @@ def r_signal_to_noise(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate mean R relative to R volatility (ANL-NFR-042)."""
+    """Calculate mean R relative to R volatility (ANL-NFR-042).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("r_signal_to_noise: executed.")
     closed = get_closed_trades(trades)
     if len(closed) < 2:
         return MetricResult(value=0.0)
@@ -314,9 +531,20 @@ def rolling_expectancy_stability(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate expectancy stability over a rolling window (ANL-NFR-043)."""
+    """Calculate expectancy stability over a rolling window (ANL-NFR-043).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("rolling_expectancy_stability: executed.")
     # Assuming window size = 10 (or dynamically configured)
-    window = 10
+    window = (
+        int(config.metadata.get("window", 10)) if config and config.metadata else 10
+    )
     closed = get_ordered_closed_trades(trades)
     if len(closed) < window:
         return MetricResult(value=0.0)
@@ -337,7 +565,16 @@ def win_after_win_probability(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate probability that a win follows a win (ANL-NFR-044)."""
+    """Calculate probability that a win follows a win (ANL-NFR-044).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("win_after_win_probability: executed.")
     ordered = get_ordered_closed_trades(trades)
     if len(ordered) < 2:
         return MetricResult(value=0.0)
@@ -357,7 +594,16 @@ def runs_test_zscore(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate Wald-Wolfowitz runs-test z-score (ANL-NFR-045)."""
+    """Calculate Wald-Wolfowitz runs-test z-score (ANL-NFR-045).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("runs_test_zscore: executed.")
     ordered = get_ordered_closed_trades(trades)
     n = len(ordered)
     if n < 2:
@@ -384,7 +630,16 @@ def avg_loss(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate the mean loss of losing trades (ANL-NFR-113)."""
+    """Calculate the mean loss of losing trades (ANL-NFR-113).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_loss: executed.")
     closed = get_closed_trades(trades)
     classes = classify_trades(closed, config)
     losses = classes["losses"]
@@ -398,7 +653,16 @@ def total_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Count closed trades (ANL-NFR-134)."""
+    """Count closed trades (ANL-NFR-134).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("total_trades: executed.")
     val = len(get_closed_trades(trades))
     return MetricResult(value=val)
 
@@ -407,7 +671,16 @@ def winning_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Count closed winning trades (ANL-NFR-135)."""
+    """Count closed winning trades (ANL-NFR-135).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("winning_trades: executed.")
     closed = get_closed_trades(trades)
     classes = classify_trades(closed, config)
     val = len(classes["wins"])
@@ -418,7 +691,16 @@ def losing_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Count closed losing trades (ANL-NFR-136)."""
+    """Count closed losing trades (ANL-NFR-136).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("losing_trades: executed.")
     closed = get_closed_trades(trades)
     classes = classify_trades(closed, config)
     val = len(classes["losses"])
@@ -429,7 +711,16 @@ def breakeven_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Count closed breakeven trades (ANL-NFR-137)."""
+    """Count closed breakeven trades (ANL-NFR-137).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("breakeven_trades: executed.")
     closed = get_closed_trades(trades)
     classes = classify_trades(closed, config)
     val = len(classes["breakevens"])
@@ -440,7 +731,16 @@ def long_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Count closed long trades (ANL-NFR-138)."""
+    """Count closed long trades (ANL-NFR-138).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("long_trades: executed.")
     closed = get_closed_trades(trades)
     val = sum(
         1 for t in closed if str(t.get("direction", "")).lower() in ("long", "buy")
@@ -452,7 +752,16 @@ def short_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Count closed short trades (ANL-NFR-139)."""
+    """Count closed short trades (ANL-NFR-139).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("short_trades: executed.")
     closed = get_closed_trades(trades)
     val = sum(
         1 for t in closed if str(t.get("direction", "")).lower() in ("short", "sell")
@@ -464,7 +773,16 @@ def count_open_trades(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Count currently open trades (ANL-NFR-140)."""
+    """Count currently open trades (ANL-NFR-140).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("count_open_trades: executed.")
     val = sum(
         1 for t in trades if t.get("is_open", False) or t.get("close_time") is None
     )
@@ -475,7 +793,16 @@ def win_rate(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate percentage of winning trades (ANL-NFR-141)."""
+    """Calculate percentage of winning trades (ANL-NFR-141).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("win_rate: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -488,7 +815,16 @@ def loss_rate(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate percentage of losing trades (ANL-NFR-142)."""
+    """Calculate percentage of losing trades (ANL-NFR-142).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("loss_rate: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -501,7 +837,16 @@ def avg_win(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate mean profit of winning trades (ANL-NFR-143)."""
+    """Calculate mean profit of winning trades (ANL-NFR-143).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_win: executed.")
     closed = get_closed_trades(trades)
     classes = classify_trades(closed, config)
     wins = classes["wins"]
@@ -515,7 +860,16 @@ def largest_win(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate maximum single-trade profit (ANL-NFR-144)."""
+    """Calculate maximum single-trade profit (ANL-NFR-144).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("largest_win: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -527,7 +881,16 @@ def largest_loss(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate maximum single-trade loss (ANL-NFR-145)."""
+    """Calculate maximum single-trade loss (ANL-NFR-145).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("largest_loss: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -539,7 +902,16 @@ def median_win(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate median PnL of winning trades (ANL-NFR-146)."""
+    """Calculate median PnL of winning trades (ANL-NFR-146).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("median_win: executed.")
     closed = get_closed_trades(trades)
     classes = classify_trades(closed, config)
     wins = sorted([_get_trade_pnl(t) for t in classes["wins"]])
@@ -554,7 +926,16 @@ def median_loss(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate median PnL of losing trades (ANL-NFR-147)."""
+    """Calculate median PnL of losing trades (ANL-NFR-147).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("median_loss: executed.")
     closed = get_closed_trades(trades)
     classes = classify_trades(closed, config)
     losses = sorted([_get_trade_pnl(t) for t in classes["losses"]])
@@ -569,7 +950,16 @@ def expectancy(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate trade expectancy (ANL-NFR-148)."""
+    """Calculate trade expectancy (ANL-NFR-148).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("expectancy: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -581,7 +971,16 @@ def max_consecutive_wins(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Calculate maximum consecutive winning trades (ANL-NFR-149)."""
+    """Calculate maximum consecutive winning trades (ANL-NFR-149).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("max_consecutive_wins: executed.")
     res = consecutive_wins_losses(trades, config)
     # Extract the dictionary value
     val = res.value["wins"] if res.value else 0
@@ -592,7 +991,16 @@ def max_consecutive_losses(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[int]:
-    """Calculate maximum consecutive losing trades (ANL-NFR-150)."""
+    """Calculate maximum consecutive losing trades (ANL-NFR-150).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated int value.
+    """
+    logger.debug("max_consecutive_losses: executed.")
     res = consecutive_wins_losses(trades, config)
     val = res.value["losses"] if res.value else 0
     return MetricResult(value=val)
@@ -602,7 +1010,16 @@ def trade_outcome_entropy(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate Shannon entropy of trade outcomes (ANL-NFR-158)."""
+    """Calculate Shannon entropy of trade outcomes (ANL-NFR-158).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("trade_outcome_entropy: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -624,7 +1041,16 @@ def avg_win_metric(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose average win as MetricResult."""
+    """Expose average win as MetricResult.
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_win_metric: executed.")
     return avg_win(trades, config)
 
 
@@ -632,7 +1058,16 @@ def avg_loss_metric(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose average loss as MetricResult."""
+    """Expose average loss as MetricResult.
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_loss_metric: executed.")
     return avg_loss(trades, config)
 
 
@@ -640,7 +1075,16 @@ def expectancy_metric(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose trade expectancy as MetricResult."""
+    """Expose trade expectancy as MetricResult.
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("expectancy_metric: executed.")
     return expectancy(trades, config)
 
 
@@ -648,9 +1092,17 @@ def loss_rate_fraction(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose loss rate fraction as MetricResult."""
+    """Expose loss rate fraction as MetricResult.
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("loss_rate_fraction: executed.")
     return loss_rate(trades, config)
 
 
 shannon_entropy = trade_outcome_entropy
-

@@ -8,7 +8,6 @@ import math
 from collections.abc import Sequence
 from typing import Any
 
-from app.services.analytics._helpers import parse_utc_time
 from app.services.analytics.contracts import MetricConfig, MetricResult
 from app.services.analytics.metrics.position_exposure import time_in_market_duration
 from app.services.analytics.metrics.trade_outcomes import (
@@ -16,14 +15,24 @@ from app.services.analytics.metrics.trade_outcomes import (
     classify_trades,
     get_closed_trades,
     get_ordered_closed_trades,
+    parse_utc_time,
 )
+from app.utils.logger import logger
 
 type TradeRecord = dict[str, Any]
 type Duration = datetime.timedelta | float
 
 
 def _get_trade_duration(trade: dict[str, Any]) -> float:
-    """Calculate trade duration in hours from open/close timestamps."""
+    """Calculate trade duration in hours from open/close timestamps.
+
+    Args:
+        trade (dict[str, Any]): Input parameter `trade`.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("_get_trade_duration: executed.")
     ot = parse_utc_time(trade.get("open_time") or trade.get("open_timestamp"))
     ct = parse_utc_time(trade.get("close_time") or trade.get("close_timestamp"))
     if ot and ct:
@@ -32,6 +41,15 @@ def _get_trade_duration(trade: dict[str, Any]) -> float:
 
 
 def _sorted_median(values: list[float]) -> float:
+    """Expose behavior for `_sorted_median`.
+
+    Args:
+        values (list[float]): Sequence of numeric values.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("_sorted_median: executed.")
     n = len(values)
     if n == 0:
         return 0.0
@@ -44,7 +62,16 @@ def avg_trade_notional_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate mean PnL per unit of notional exposure (ANL-NFR-121)."""
+    """Calculate mean PnL per unit of notional exposure (ANL-NFR-121).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_trade_notional_efficiency: executed.")
     closed = get_closed_trades(trades)
     if not closed:
         return MetricResult(value=0.0)
@@ -64,7 +91,16 @@ def return_per_trade_hour(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate net profit per hour spent in active trades (ANL-NFR-123)."""
+    """Calculate net profit per hour spent in active trades (ANL-NFR-123).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("return_per_trade_hour: executed.")
     closed = get_closed_trades(trades)
     pnl = sum(_get_trade_pnl(t) for t in closed)
     tot_hours = sum(_get_trade_duration(t) for t in closed)
@@ -76,7 +112,16 @@ def return_per_market_hour(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate net profit per hour where at least one trade was open (ANL-NFR-124)."""
+    """Calculate net profit per hour where at least one trade was open (ANL-NFR-124).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("return_per_market_hour: executed.")
     closed = get_closed_trades(trades)
     pnl = sum(_get_trade_pnl(t) for t in closed)
     tot_hours = time_in_market_duration(trades)
@@ -88,7 +133,16 @@ def trades_per_day(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate average number of closed trades per calendar day (ANL-NFR-125)."""
+    """Calculate average number of closed trades per calendar day (ANL-NFR-125).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("trades_per_day: executed.")
     closed = get_closed_trades(trades)
     # Default 30.0 days if not set
     duration_days = float(
@@ -104,7 +158,16 @@ def profit_per_trade_per_day(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate net profit normalized by both trades and calendar days (ANL-NFR-126)."""
+    """Calculate net profit normalized by both trades and calendar days (ANL-NFR-126).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("profit_per_trade_per_day: executed.")
     closed = get_closed_trades(trades)
     duration_days = float(
         config.metadata.get("duration_days", 30.0) if config else 30.0
@@ -121,7 +184,16 @@ def mfe_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate average percentage of MFE captured by winning trades (ANL-NFR-127)."""
+    """Calculate average percentage of MFE captured by winning trades (ANL-NFR-127).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("mfe_efficiency: executed.")
     wins = classify_trades(trades, config)["wins"]
     if not wins:
         return MetricResult(value=1.0)
@@ -139,7 +211,16 @@ def aggregate_mfe_capture_ratio(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate aggregate MFE capture ratio for winning trades (ANL-NFR-128)."""
+    """Calculate aggregate MFE capture ratio for winning trades (ANL-NFR-128).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("aggregate_mfe_capture_ratio: executed.")
     return mfe_efficiency(trades, config)
 
 
@@ -147,7 +228,16 @@ def mae_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate realized-loss-to-MAE efficiency for losing trades (ANL-NFR-129)."""
+    """Calculate realized-loss-to-MAE efficiency for losing trades (ANL-NFR-129).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("mae_efficiency: executed.")
     losses = classify_trades(trades, config)["losses"]
     if not losses:
         return MetricResult(value=1.0)
@@ -165,7 +255,16 @@ def aggregate_loss_containment_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate aggregate loss containment for losing trades (ANL-NFR-130)."""
+    """Calculate aggregate loss containment for losing trades (ANL-NFR-130).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("aggregate_loss_containment_efficiency: executed.")
     losses = classify_trades(trades, config)["losses"]
     if not losses:
         return MetricResult(value=1.0)
@@ -184,7 +283,16 @@ def position_size_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate relationship between position size and normalized trade outcome (ANL-NFR-131)."""
+    """Calculate relationship between position size and normalized trade outcome (ANL-NFR-131).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("position_size_efficiency: executed.")
     closed = get_closed_trades(trades)
     if len(closed) < 2:
         return MetricResult(value=0.0)
@@ -206,7 +314,16 @@ def calculate_efficiency_metrics(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Calculate aggregate MAE/MFE efficiency context from trades (ANL-NFR-132)."""
+    """Calculate aggregate MAE/MFE efficiency context from trades (ANL-NFR-132).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("calculate_efficiency_metrics: executed.")
     mfe_eff = mfe_efficiency(trades, config).value or 0.0
     mae_eff = mae_efficiency(trades, config).value or 0.0
     return MetricResult(value={"mfe_efficiency": mfe_eff, "mae_efficiency": mae_eff})
@@ -216,7 +333,16 @@ def trade_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate realized outcome relative to maximum favorable excursion (ANL-NFR-157)."""
+    """Calculate realized outcome relative to maximum favorable excursion (ANL-NFR-157).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("trade_efficiency: executed.")
     # Note: Target signature uses Sequence[TradeRecord] but expects single trade.
     # We will handle both cases: if trades has elements, evaluate first element.
     if not trades:
@@ -234,7 +360,16 @@ def longest_flat_period_duration(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate longest period without an active trade (ANL-NFR-159)."""
+    """Calculate longest period without an active trade (ANL-NFR-159).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("longest_flat_period_duration: executed.")
     ordered = get_ordered_closed_trades(trades)
     if not ordered:
         return MetricResult(value=0.0)
@@ -261,7 +396,16 @@ def capital_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate return per unit of nominal capital deployed (ANL-NFR-368)."""
+    """Calculate return per unit of nominal capital deployed (ANL-NFR-368).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("capital_efficiency: executed.")
     closed = get_closed_trades(trades)
     net_p = sum(_get_trade_pnl(t) for t in closed)
     nominal_capital_deployed = float(
@@ -277,7 +421,16 @@ def return_per_unit_mae(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate total return relative to adverse excursion experienced (ANL-NFR-369)."""
+    """Calculate total return relative to adverse excursion experienced (ANL-NFR-369).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("return_per_unit_mae: executed.")
     closed = get_closed_trades(trades)
     net_prof = sum(_get_trade_pnl(t) for t in closed)
     total_mae = sum(abs(float(t.get("mae") or 0.0)) for t in closed)
@@ -291,7 +444,16 @@ def return_per_calendar_day(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate net profit per calendar day in the test period (ANL-NFR-370)."""
+    """Calculate net profit per calendar day in the test period (ANL-NFR-370).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("return_per_calendar_day: executed.")
     closed = get_closed_trades(trades)
     net_p = sum(_get_trade_pnl(t) for t in closed)
     duration_days = float(
@@ -307,7 +469,16 @@ def exit_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate combined win-capture and loss-containment efficiency (ANL-NFR-371)."""
+    """Calculate combined win-capture and loss-containment efficiency (ANL-NFR-371).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("exit_efficiency: executed.")
     win_eff = mfe_efficiency(trades, config).value or 0.0
     loss_eff = aggregate_loss_containment_efficiency(trades, config).value or 0.0
     val = (win_eff + loss_eff) / 2.0
@@ -318,7 +489,16 @@ def loss_containment_efficiency(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate how well realized losses stayed above their adverse excursion (ANL-NFR-372)."""
+    """Calculate how well realized losses stayed above their adverse excursion (ANL-NFR-372).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("loss_containment_efficiency: executed.")
     return aggregate_loss_containment_efficiency(trades, config)
 
 
@@ -326,7 +506,16 @@ def median_mae_mfe(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Calculate median MAE and MFE values (ANL-NFR-375)."""
+    """Calculate median MAE and MFE values (ANL-NFR-375).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("median_mae_mfe: executed.")
     maes = sorted(float(t.get("mae") or 0.0) for t in trades if "mae" in t)
     mfes = sorted(float(t.get("mfe") or 0.0) for t in trades if "mfe" in t)
     val = {"mae": _sorted_median(maes), "mfe": _sorted_median(mfes)}
@@ -337,7 +526,16 @@ def get_mae_mfe_r(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> tuple[dict[str, float], ...]:
-    """Calculate MAE and MFE normalized to R-space (ANL-NFR-376)."""
+    """Calculate MAE and MFE normalized to R-space (ANL-NFR-376).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        Calculated tuple[dict[str, float], ...] value.
+    """
+    logger.debug("get_mae_mfe_r: executed.")
     result = []
     for t in trades:
         risk = float(t.get("initial_risk") or 1.0)
@@ -351,7 +549,16 @@ def median_mae_r(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate median MAE in R-multiple terms (ANL-NFR-377)."""
+    """Calculate median MAE in R-multiple terms (ANL-NFR-377).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("median_mae_r: executed.")
     r_maes = sorted(
         float(t.get("mae") or 0.0) / float(t.get("initial_risk") or 1.0) for t in trades
     )
@@ -363,7 +570,16 @@ def median_mfe_r(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate median MFE in R-multiple terms (ANL-NFR-378)."""
+    """Calculate median MFE in R-multiple terms (ANL-NFR-378).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("median_mfe_r: executed.")
     r_mfes = sorted(
         float(t.get("mfe") or 0.0) / float(t.get("initial_risk") or 1.0) for t in trades
     )

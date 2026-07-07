@@ -12,6 +12,7 @@ from typing import Any
 
 from app.services.analytics.contracts import MetricConfig, MetricResult
 from app.services.analytics.metrics.trade_outcomes import _get_trade_pnl
+from app.utils.logger import logger
 
 type TradeRecord = dict[str, Any]
 
@@ -20,7 +21,16 @@ def get_r_multiples(
     trades: Sequence[TradeRecord],
     config: MetricConfig | None = None,
 ) -> tuple[list[float], list[str]]:
-    """Calculate R-multiples for each trade (ANL-NFR-114)."""
+    """Calculate R-multiples for each trade (ANL-NFR-114).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig | None): Metric configuration.
+
+    Returns:
+        Calculated tuple[list[float], list[str]] value.
+    """
+    logger.debug("get_r_multiples: executed.")
     r_multiples: list[float] = []
     warnings: list[str] = []
     proxy_count = 0
@@ -46,7 +56,16 @@ def avg_return_per_risk_unit(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Calculate average R-multiple per closed trade (ANL-NFR-122)."""
+    """Calculate average R-multiple per closed trade (ANL-NFR-122).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("avg_return_per_risk_unit: executed.")
     r_mults, _ = get_r_multiples(trades, config)
     val = sum(r_mults) / len(r_mults) if r_mults else 0.0
     return MetricResult(value=val)
@@ -56,7 +75,16 @@ def compute_r_trade_metrics(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Calculate trade metrics from R-multiple inputs (ANL-NFR-155)."""
+    """Calculate trade metrics from R-multiple inputs (ANL-NFR-155).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("compute_r_trade_metrics: executed.")
     r_multiples, _ = get_r_multiples(trades, config)
     if not r_multiples:
         return MetricResult(value={"avg": 0.0, "std": 0.0, "expectancy": 0.0})
@@ -71,5 +99,27 @@ def compute_trade_metrics(
     trades: Sequence[TradeRecord],
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Calculate trade metrics from numeric R values and optional MAE/MFE arrays (ANL-NFR-156)."""
+    """Calculate trade metrics from numeric R values and optional MAE/MFE arrays (ANL-NFR-156).
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("compute_trade_metrics: executed.")
     return compute_r_trade_metrics(trades, config)
+
+
+def _get_r_multiples_flat(trades: Sequence[TradeRecord]) -> list[float]:
+    """Helper to extract a flat list of R-multiples.
+
+    Args:
+        trades (Sequence[TradeRecord]): Sequence of trade record dictionaries.
+
+    Returns:
+        List of float R-multiples.
+    """
+    logger.debug("_get_r_multiples_flat: executed.")
+    return get_r_multiples(trades)[0]

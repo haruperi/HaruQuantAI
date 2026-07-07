@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Analytics Registry module.
 
 This module houses the registry for official tools, metric kernel visibility,
@@ -18,6 +19,7 @@ from app.services.analytics.contracts.models import (
     MetricResult,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 # Active request IDs cache/registry (observability/traceability)
 _ACTIVE_REQUESTS: set[str] = set()
@@ -80,21 +82,28 @@ def register_tool(
     """Decorator to register a capability in the central registry (ANL-NFR-008).
 
     Args:
-        name: Unique identifier of the tool.
-        stability: Stability status.
-        safe_for_agent_api: Safety flag.
-        category: Class category classification.
-        aliases: Compatibility alternate identifiers.
+        name (str): Input parameter `name`.
+        stability (Literal['stable', 'approved_experimental', 'deprecated', 'internal_support_only']): Input parameter `stability`.
+        safe_for_agent_api (bool): Input parameter `safe_for_agent_api`.
+        category (Literal['official_tool', 'internal_metric_kernel', 'compatibility_alias', 'deprecated_export']): Input parameter `category`.
+        aliases (tuple[str, ...]): Input parameter `aliases`.
 
     Returns:
-        The decorator function wrapping the callable.
-
-    Raises:
-        ValidationError: If name or any alias collides with an existing entry.
+        Calculated Callable[[Any], Any] value.
     """
+    logger.debug("register_tool: executed.")
 
     def decorator(func: Any) -> Any:  # noqa: ANN401
         # Validate name collision
+        """Expose behavior for `decorator`.
+
+        Args:
+            func (Any): Input parameter `func`.
+
+        Returns:
+            Calculated Any value.
+        """
+        logger.debug("decorator: executed.")
         if name in TOOL_REGISTRY:
             msg = f"Duplicate registry name collision: {name!r}."
             raise ValidationError(msg)
@@ -128,13 +137,15 @@ def get_active_requests() -> set[str]:
     """Retrieve active requests registered in the local observability log.
 
     Returns:
-        A copy of the active request IDs set.
+        Calculated set[str] value.
     """
+    logger.debug("get_active_requests: executed.")
     return _ACTIVE_REQUESTS.copy()
 
 
 def clear_active_requests() -> None:
     """Clear all active requests in the local observability log."""
+    logger.debug("clear_active_requests: executed.")
     _ACTIVE_REQUESTS.clear()
 
 
@@ -144,16 +155,14 @@ def request_id(
 ) -> MetricResult[object]:
     """Extract, validate, and record request_id for traceability (ANL-NFR-009).
 
-    This pseudo-metric extracts the request ID from the input_value or config,
-    validates it for safety, and registers it in the active requests log.
-
     Args:
-        input_value: Incoming dictionary, string, or object payload.
-        config: Configuration structure for the metric run.
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
 
     Returns:
-        MetricResult containing the processed request ID value.
+        MetricResult containing the calculated object value.
     """
+    logger.debug("request_id: executed.")
     req_id: Any = None
     if isinstance(input_value, str):
         req_id = input_value
@@ -169,23 +178,29 @@ def request_id(
     warnings_list = []
     if not req_id:
         req_id = "UNKNOWN_REQUEST_ID"
-        warnings_list.append({
-            "code": "MISSING_REQUEST_ID",
-            "message": "Traceability request_id was not supplied or is empty.",
-        })
+        warnings_list.append(
+            {
+                "code": "MISSING_REQUEST_ID",
+                "message": "Traceability request_id was not supplied or is empty.",
+            }
+        )
     elif not isinstance(req_id, str):
         req_id = str(req_id)
-        warnings_list.append({
-            "code": "INVALID_REQUEST_ID_TYPE",
-            "message": f"Expected string for request_id, got {type(req_id).__name__}.",
-        })
+        warnings_list.append(
+            {
+                "code": "INVALID_REQUEST_ID_TYPE",
+                "message": f"Expected string for request_id, got {type(req_id).__name__}.",
+            }
+        )
 
     # Enforce standard formatting safety (alphanumeric, underscores, hyphens)
     if isinstance(req_id, str) and not re.match(r"^[a-zA-Z0-9_\-]+$", req_id):
-        warnings_list.append({
-            "code": "UNSAFE_REQUEST_ID",
-            "message": "Request ID contains potentially unsafe characters.",
-        })
+        warnings_list.append(
+            {
+                "code": "UNSAFE_REQUEST_ID",
+                "message": "Request ID contains potentially unsafe characters.",
+            }
+        )
 
     # Cache in observability log
     _ACTIVE_REQUESTS.add(req_id)

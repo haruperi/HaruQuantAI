@@ -20,6 +20,7 @@ from app.utils import (
     success_response,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 if TYPE_CHECKING:
     from app.services.analytics.reports.sections import AnalyticsReport
@@ -81,7 +82,12 @@ class DashboardPayload:
 
 
 def _validate_request_id(request_id: str | None) -> None:
-    """Helper to validate request_id strictly."""
+    """Helper to validate request_id strictly.
+
+    Args:
+        request_id (str | None): Input parameter `request_id`.
+    """
+    logger.debug("_validate_request_id: executed.")
     if request_id is not None and (
         not isinstance(request_id, str) or not request_id.strip()
     ):
@@ -93,7 +99,17 @@ def build_overview_payload(
     config: DashboardConfig | str | None = None,
     request_id: str | None = None,
 ) -> StandardResponse | DashboardPayload:
-    """Format a report into UI cards, tables, and downsampled curves."""
+    """Format a report into UI cards, tables, and downsampled curves.
+
+    Args:
+        report (AnalyticsReport | dict[str, Any] | None): Input parameter `report`.
+        config (DashboardConfig | str | None): Metric configuration.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse | DashboardPayload value.
+    """
+    logger.debug("build_overview_payload: executed.")
     if isinstance(config, str):
         request_id = config
         config = None

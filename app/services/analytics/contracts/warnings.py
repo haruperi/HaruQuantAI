@@ -18,6 +18,7 @@ from app.services.analytics.contracts.models import (
     QualityFlag,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 # Patterns for sensitive keys and sensitive-looking string values (ANL-NFR-276)
 SENSITIVE_KEYS_RE = re.compile(
@@ -143,11 +144,12 @@ def redact_sensitive_info(data: Any) -> Any:  # noqa: ANN401
     """Recursively redact sensitive keys and values from payloads (ANL-NFR-276).
 
     Args:
-        data: Any python object to scan.
+        data (Any): Input parameter `data`.
 
     Returns:
-        The redacted object structure.
+        Calculated Any value.
     """
+    logger.debug("redact_sensitive_info: executed.")
     if isinstance(data, dict):
         new_dict = {}
         for k, v in data.items():
@@ -176,16 +178,14 @@ def build_warning(
     """Build a validated AnalyticsWarning (ANL-NFR-278, ANL-NFR-279).
 
     Args:
-        code: Unique warning catalog code.
-        source_context: Context message.
-        detail: Raw diagnostic detail payload.
+        code (str): Input parameter `code`.
+        source_context (str | None): Input parameter `source_context`.
+        detail (dict[str, Any] | None): Input parameter `detail`.
 
     Returns:
-        A validated AnalyticsWarning object.
-
-    Raises:
-        ValidationError: If code is not cataloged or detail keys are not bounded.
+        Calculated AnalyticsWarning value.
     """
+    logger.debug("build_warning: executed.")
     entry = WARNING_CATALOG.get(code)
     if entry is None:
         msg = f"Unknown warning catalog code: {code!r}."
@@ -198,9 +198,7 @@ def build_warning(
             raise ValidationError(msg)
 
     redacted_detail = redact_sensitive_info(raw_detail)
-    redacted_context = (
-        redact_sensitive_info(source_context) if source_context else None
-    )
+    redacted_context = redact_sensitive_info(source_context) if source_context else None
 
     if not isinstance(redacted_detail, dict):
         msg = "Redacted details must be a dictionary."
@@ -223,16 +221,14 @@ def build_quality_flag(
     """Build a validated QualityFlag (ANL-NFR-278, ANL-NFR-279).
 
     Args:
-        code: Unique quality flag catalog code.
-        source_context: Context message.
-        detail: Raw diagnostic detail payload.
+        code (str): Input parameter `code`.
+        source_context (str | None): Input parameter `source_context`.
+        detail (dict[str, Any] | None): Input parameter `detail`.
 
     Returns:
-        A validated QualityFlag object.
-
-    Raises:
-        ValidationError: If code is not cataloged or detail keys are not bounded.
+        Calculated QualityFlag value.
     """
+    logger.debug("build_quality_flag: executed.")
     entry = QUALITY_FLAG_CATALOG.get(code)
     if entry is None:
         msg = f"Unknown quality flag catalog code: {code!r}."
@@ -245,9 +241,7 @@ def build_quality_flag(
             raise ValidationError(msg)
 
     redacted_detail = redact_sensitive_info(raw_detail)
-    redacted_context = (
-        redact_sensitive_info(source_context) if source_context else None
-    )
+    redacted_context = redact_sensitive_info(source_context) if source_context else None
 
     if not isinstance(redacted_detail, dict):
         msg = "Redacted details must be a dictionary."

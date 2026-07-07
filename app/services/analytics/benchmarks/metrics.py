@@ -17,10 +17,16 @@ from app.utils import (
     success_response,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 
 def _validate_request_id(request_id: str | None) -> None:
-    """Helper to validate request_id strictly."""
+    """Helper to validate request_id strictly.
+
+    Args:
+        request_id (str | None): Input parameter `request_id`.
+    """
+    logger.debug("_validate_request_id: executed.")
     if request_id is not None and (
         not isinstance(request_id, str) or not request_id.strip()
     ):
@@ -28,16 +34,25 @@ def _validate_request_id(request_id: str | None) -> None:
 
 
 def beta(strategy_returns: object, benchmark_returns: object) -> float:
-    """Calculate the strategy beta coefficient relative to benchmark returns."""
+    """Calculate the strategy beta coefficient relative to benchmark returns.
+
+    Args:
+        strategy_returns (object): Sequence of return floats.
+        benchmark_returns (object): Sequence of return floats.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("beta: executed.")
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
     if n < 2:  # noqa: PLR2004
         return 1.0
     mean_s = sum(s_aligned) / n
     mean_b = sum(b_aligned) / n
-    cov = sum(
-        (s_aligned[i] - mean_s) * (b_aligned[i] - mean_b) for i in range(n)
-    ) / (n - 1)
+    cov = sum((s_aligned[i] - mean_s) * (b_aligned[i] - mean_b) for i in range(n)) / (
+        n - 1
+    )
     var_b = sum((b_aligned[i] - mean_b) ** 2 for i in range(n)) / (n - 1)
     if var_b == 0:
         return 1.0
@@ -49,7 +64,17 @@ def alpha(
     benchmark_returns: object,
     risk_free_rate: float = 0.0,
 ) -> float:
-    """Calculate annualized Jensen-style alpha relative to benchmark returns."""
+    """Calculate annualized Jensen-style alpha relative to benchmark returns.
+
+    Args:
+        strategy_returns (object): Sequence of return floats.
+        benchmark_returns (object): Sequence of return floats.
+        risk_free_rate (float): Risk-free rate.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("alpha: executed.")
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
     if n == 0:
@@ -61,23 +86,31 @@ def alpha(
     # Alpha = E(R_s) - [R_f + Beta * (E(R_b) - R_f)]
     # Daily alpha:
     daily_alpha = mean_s - (
-        risk_free_rate / 252.0
-        + b_coef * (mean_b - risk_free_rate / 252.0)
+        risk_free_rate / 252.0 + b_coef * (mean_b - risk_free_rate / 252.0)
     )
     return daily_alpha * 252.0 * 100.0
 
 
 def r_squared(strategy_returns: object, benchmark_returns: object) -> float:
-    """Calculate coefficient of determination between strategy and benchmark returns."""
+    """Calculate coefficient of determination between strategy and benchmark returns.
+
+    Args:
+        strategy_returns (object): Sequence of return floats.
+        benchmark_returns (object): Sequence of return floats.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("r_squared: executed.")
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
     if n < 2:  # noqa: PLR2004
         return 0.0
     mean_s = sum(s_aligned) / n
     mean_b = sum(b_aligned) / n
-    cov = sum(
-        (s_aligned[i] - mean_s) * (b_aligned[i] - mean_b) for i in range(n)
-    ) / (n - 1)
+    cov = sum((s_aligned[i] - mean_s) * (b_aligned[i] - mean_b) for i in range(n)) / (
+        n - 1
+    )
     var_s = sum((s_aligned[i] - mean_s) ** 2 for i in range(n)) / (n - 1)
     var_b = sum((b_aligned[i] - mean_b) ** 2 for i in range(n)) / (n - 1)
     if var_s == 0 or var_b == 0:
@@ -87,7 +120,16 @@ def r_squared(strategy_returns: object, benchmark_returns: object) -> float:
 
 
 def tracking_error(strategy_returns: object, benchmark_returns: object) -> float:
-    """Calculate annualized tracking error between strategy and benchmark returns."""
+    """Calculate annualized tracking error between strategy and benchmark returns.
+
+    Args:
+        strategy_returns (object): Sequence of return floats.
+        benchmark_returns (object): Sequence of return floats.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("tracking_error: executed.")
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
     if n < 2:  # noqa: PLR2004
@@ -99,10 +141,17 @@ def tracking_error(strategy_returns: object, benchmark_returns: object) -> float
     return math.sqrt(var_diff) * math.sqrt(252) * 100.0
 
 
-def information_ratio(
-    strategy_returns: object, benchmark_returns: object
-) -> float:
-    """Calculate relative Sharpe-style information ratio."""
+def information_ratio(strategy_returns: object, benchmark_returns: object) -> float:
+    """Calculate relative Sharpe-style information ratio.
+
+    Args:
+        strategy_returns (object): Sequence of return floats.
+        benchmark_returns (object): Sequence of return floats.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("information_ratio: executed.")
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
     if n < 2:  # noqa: PLR2004
@@ -118,7 +167,16 @@ def information_ratio(
 
 
 def batting_average(strategy_returns: object, benchmark_returns: object) -> float:
-    """Calculate the percentage of periods where strategy outperformed benchmark."""
+    """Calculate the percentage of periods where strategy outperformed benchmark.
+
+    Args:
+        strategy_returns (object): Sequence of return floats.
+        benchmark_returns (object): Sequence of return floats.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("batting_average: executed.")
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
     if n == 0:
@@ -131,7 +189,16 @@ def up_down_capture(
     strategy_returns: object,
     benchmark_returns: object,
 ) -> dict[str, float]:
-    """Calculate up-capture and down-capture ratios."""
+    """Calculate up-capture and down-capture ratios.
+
+    Args:
+        strategy_returns (object): Sequence of return floats.
+        benchmark_returns (object): Sequence of return floats.
+
+    Returns:
+        Calculated dict[str, float] value.
+    """
+    logger.debug("up_down_capture: executed.")
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     up_pairs = [
         (s_ret, b_ret)
@@ -167,7 +234,17 @@ def calculate_benchmark_metrics(
     benchmark_returns: object,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Calculate combined benchmark-relative metrics (alpha, beta, IR)."""
+    """Calculate combined benchmark-relative metrics (alpha, beta, IR).
+
+    Args:
+        strategy_returns (object): Sequence of return floats.
+        benchmark_returns (object): Sequence of return floats.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("calculate_benchmark_metrics: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="calculate_benchmark_metrics",

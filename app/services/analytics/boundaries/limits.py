@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,9 +59,11 @@ def enforce_limits(
 ) -> None:
     """Verify shape boundaries against the limits configurations.
 
-    Raises:
-        ValidationError: If any shape dimension exceeds the limit.
+    Args:
+        shape (WorkloadShape): Input parameter `shape`.
+        limits (AnalyticsLimits): Input parameter `limits`.
     """
+    logger.debug("enforce_limits: executed.")
     if shape.trades_count > limits.max_trades:
         msg = f"Trades count {shape.trades_count} exceeds limit {limits.max_trades}."
         raise ValidationError(msg)

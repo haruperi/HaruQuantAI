@@ -11,6 +11,8 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Any
 
+from app.utils.logger import logger
+
 
 class HashPolicy(StrEnum):
     """Policies for computing report verification hashes."""
@@ -20,6 +22,15 @@ class HashPolicy(StrEnum):
 
 
 def _decimal_default(obj: object) -> float:
+    """Expose behavior for `_decimal_default`.
+
+    Args:
+        obj (object): Input parameter `obj`.
+
+    Returns:
+        Calculated float value.
+    """
+    logger.debug("_decimal_default: executed.")
     if isinstance(obj, Decimal):
         return float(obj)
     msg = f"Object of type {type(obj)} is not JSON serializable"
@@ -30,7 +41,16 @@ def compute_report_hash(
     report: dict[str, Any] | object,
     policy: HashPolicy | None = None,
 ) -> str:
-    """Compute deterministic hash of report sections, excluding metadata."""
+    """Compute deterministic hash of report sections, excluding metadata.
+
+    Args:
+        report (dict[str, Any] | object): Input parameter `report`.
+        policy (HashPolicy | None): Input parameter `policy`.
+
+    Returns:
+        Calculated str value.
+    """
+    logger.debug("compute_report_hash: executed.")
     rep_dict: dict[str, Any] = {}
     if report is not None:
         if isinstance(report, dict):

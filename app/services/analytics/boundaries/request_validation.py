@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from app.services.analytics.contracts import MetricConfig, MetricResult
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 if TYPE_CHECKING:
     from app.services.analytics.boundaries.limits import AnalyticsLimits
@@ -18,7 +19,16 @@ def request_id(
     input_value: object,
     config: MetricConfig,  # noqa: ARG001
 ) -> MetricResult[object]:
-    """Validate and wrap request ID into a MetricResult wrapper."""
+    """Validate and wrap request ID into a MetricResult wrapper.
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated object value.
+    """
+    logger.debug("request_id: executed.")
     if input_value is not None and (
         not isinstance(input_value, str) or not input_value.strip()
     ):
@@ -31,7 +41,16 @@ def float64(
     input_value: object,
     config: MetricConfig,  # noqa: ARG001
 ) -> MetricResult[object]:
-    """Float64 validation and casting boundary wrapper."""
+    """Float64 validation and casting boundary wrapper.
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated object value.
+    """
+    logger.debug("float64: executed.")
     try:
         val = float(input_value)  # type: ignore[arg-type]
         return MetricResult(value=val)
@@ -45,7 +64,14 @@ def validate_request(
     request_id_val: str,
     limits: AnalyticsLimits,
 ) -> None:
-    """Validate request trace ID and workload limits shape before processing."""
+    """Validate request trace ID and workload limits shape before processing.
+
+    Args:
+        request (object): Input parameter `request`.
+        request_id_val (str): Input parameter `request_id_val`.
+        limits (AnalyticsLimits): Input parameter `limits`.
+    """
+    logger.debug("validate_request: executed.")
     if not isinstance(request_id_val, str) or not request_id_val.strip():
         msg = "request_id must be a non-empty string."
         raise ValidationError(msg)

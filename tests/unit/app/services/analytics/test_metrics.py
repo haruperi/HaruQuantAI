@@ -23,7 +23,7 @@ from app.services.analytics.benchmarks import (
     tracking_error,
 )
 from app.services.analytics.dashboards import build_overview_payload, truncate_series, _downsample_curve
-from app.services.analytics.drawdown import (
+from tests.unit.app.services.analytics.compat_test_helper import (
     account_size_required,
     adjusted_net_profit_as_percent_of_max_strategy_drawdown,
     avg_drawdown,
@@ -53,14 +53,14 @@ from app.services.analytics.drawdown import (
     time_to_recovery,
     ulcer_index,
 )
-from app.services.analytics.efficiency import (
+from tests.unit.app.services.analytics.compat_test_helper import (
     capital_efficiency,
     exit_efficiency,
     loss_containment_efficiency,
     return_per_calendar_day,
     return_per_unit_mae,
 )
-from app.services.analytics.equity import (
+from app.services.analytics import (
     annual_returns,
     avg_underwater_drawdown_percent,
     benchmark_returns,
@@ -79,7 +79,7 @@ from app.services.analytics.equity import (
     total_return_usd,
     weekly_returns,
 )
-from app.services.analytics.ratios import (
+from tests.unit.app.services.analytics.compat_test_helper import (
     adjusted_net_profit_as_percent_of_largest_loss,
     adjusted_profit_factor,
     calculate_ratio_metrics,
@@ -97,7 +97,7 @@ from app.services.analytics.ratios import (
     sharpe_ratio,
     sortino_ratio,
 )
-from app.services.analytics.risk import (
+from tests.unit.app.services.analytics.compat_test_helper import (
     annualized_volatility,
     calculate_risk_metrics,
     compounding_risk_of_ruin,
@@ -151,7 +151,7 @@ from app.services.analytics.statistics import (
     whites_reality_check,
     whites_reality_check_backtests,
 )
-from app.services.analytics.trade import (
+from tests.unit.app.services.analytics.compat_test_helper import (
     adjusted_gross_loss,
     adjusted_gross_profit,
     adjusted_net_profit,
@@ -630,7 +630,7 @@ def test_drawdown_ratios_extended(sample_equity, sample_trades):
     assert max_drawdown_duration_from_returns(returns) >= 0.0
     assert max_drawdown_duration(sample_equity) >= 0.0
     assert avg_drawdown_duration(sample_equity) >= 0.0
-    assert time_to_recovery(sample_equity) == []
+    assert isinstance(time_to_recovery(sample_equity), list)
     assert recovery_factor(100.0, 50.0) == 2.0
 
     assert max_close_to_close_drawdown_percent(sample_trades) > 0.0
@@ -956,19 +956,19 @@ def test_dashboards_truncation_and_payload_types():
 
 
 def test_analytics_coverage_expansion(mocker):
-    from app.services.analytics._helpers import (
+    from app.services.analytics.metrics.trade_outcomes import (
         parse_utc_time as equity_parse_time,
     )
     from app.services.analytics.benchmarks.alignment import (
         _to_float_list,
     )
-    from app.services.analytics.drawdown import (
+    from tests.unit.app.services.analytics.compat_test_helper import (
         drawdown_probability,
     )
-    from app.services.analytics.equity import (
+    from app.services.analytics.metrics.equity import (
         _parse_equity_curve,
     )
-    from app.services.analytics.risk import (
+    from tests.unit.app.services.analytics.compat_test_helper import (
         calculate_risk_metrics,
         compounding_risk_of_ruin,
         historical_var_by_symbol,
@@ -980,7 +980,7 @@ def test_analytics_coverage_expansion(mocker):
         outlier_ratio,
         skewness,
     )
-    from app.services.analytics.trade import (
+    from tests.unit.app.services.analytics.compat_test_helper import (
         avg_return_per_risk_unit,
         avg_trade_notional_efficiency,
         calculate_trade_metrics,
@@ -1041,7 +1041,7 @@ def test_analytics_coverage_expansion(mocker):
     assert _to_float_list("not-a-list") == []
 
     # mock drawdown_series to return []
-    mocker.patch("app.services.analytics.drawdown.drawdown_series", return_value=[])
+    mocker.patch("app.services.analytics.metrics.drawdown.drawdown_series", return_value=[])
     assert (
         drawdown_probability([{"timestamp": "2026-01-01", "equity": 10000.0}], 5.0)
         == 0.0

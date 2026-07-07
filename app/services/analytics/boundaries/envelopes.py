@@ -9,9 +9,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from app.services.analytics.contracts import ErrorPayload, ToolEnvelope
+from app.utils.logger import logger
 
 if TYPE_CHECKING:
-    from app.services.analytics.models import AnalyticsMetadata
+    from app.services.analytics.contracts import AnalyticsMetadata
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,7 +27,16 @@ def success_envelope(
     data: object,
     metadata: AnalyticsMetadata,
 ) -> ToolEnvelope:
-    """Wrap output data inside a standard success envelope."""
+    """Wrap output data inside a standard success envelope.
+
+    Args:
+        data (object): Input parameter `data`.
+        metadata (AnalyticsMetadata): Input parameter `metadata`.
+
+    Returns:
+        Calculated ToolEnvelope value.
+    """
+    logger.debug("success_envelope: executed.")
     meta_dict = {
         "tool_name": "analytics_tool",
         "tool_category": "analytics",
@@ -48,7 +58,16 @@ def error_envelope(
     error: AnalyticsError,
     metadata: AnalyticsMetadata,
 ) -> ToolEnvelope:
-    """Wrap structured error info inside a standard error envelope."""
+    """Wrap structured error info inside a standard error envelope.
+
+    Args:
+        error (AnalyticsError): Input parameter `error`.
+        metadata (AnalyticsMetadata): Input parameter `metadata`.
+
+    Returns:
+        Calculated ToolEnvelope value.
+    """
+    logger.debug("error_envelope: executed.")
     meta_dict = {
         "tool_name": "analytics_tool",
         "tool_category": "analytics",

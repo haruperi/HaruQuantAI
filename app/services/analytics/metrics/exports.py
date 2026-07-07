@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from app.services.analytics.contracts import MetricConfig, MetricResult
+from app.utils.logger import logger
 
 type TradeRecord = dict[str, Any]
 type ReturnPoint = Any
@@ -16,7 +17,16 @@ def common_avg_loss(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose common-module average-loss behavior without collision (ANL-NFR-016)."""
+    """Expose common-module average-loss behavior without collision (ANL-NFR-016).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("common_avg_loss: executed.")
     from app.services.analytics.metrics.trade_outcomes import avg_loss
 
     trades = input_value if isinstance(input_value, Sequence) else ()
@@ -27,7 +37,16 @@ def common_get_r_multiples(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[tuple[float, ...]]:
-    """Expose common-module R-multiple behavior without collision (ANL-NFR-017)."""
+    """Expose common-module R-multiple behavior without collision (ANL-NFR-017).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated tuple[float, ... value.
+    """
+    logger.debug("common_get_r_multiples: executed.")
     from app.services.analytics.metrics.r_multiples import get_r_multiples
 
     trades = input_value if isinstance(input_value, Sequence) else ()
@@ -39,7 +58,16 @@ def metrics_get_r_multiples(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[tuple[float, ...]]:
-    """Expose metrics-module R-multiple behavior without collision (ANL-NFR-020)."""
+    """Expose metrics-module R-multiple behavior without collision (ANL-NFR-020).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated tuple[float, ... value.
+    """
+    logger.debug("metrics_get_r_multiples: executed.")
     return common_get_r_multiples(input_value, config)
 
 
@@ -47,7 +75,16 @@ def metrics_avg_loss(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose metrics-module average-loss behavior without collision (ANL-NFR-029)."""
+    """Expose metrics-module average-loss behavior without collision (ANL-NFR-029).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("metrics_avg_loss: executed.")
     from app.services.analytics.metrics.trade_outcomes import avg_loss_metric
 
     trades = input_value if isinstance(input_value, Sequence) else ()
@@ -58,7 +95,16 @@ def benchmark_information_ratio(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose benchmark information ratio without colliding with ratios module export (ANL-NFR-281)."""
+    """Expose benchmark information ratio without colliding with ratios module export (ANL-NFR-281).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("benchmark_information_ratio: executed.")
     from app.services.analytics.metrics.ratios import information_ratio
 
     returns = input_value if isinstance(input_value, Sequence) else ()
@@ -69,7 +115,16 @@ def metrics_win_rate_fraction(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose metrics-module win-rate fraction behavior without ratios collision (ANL-NFR-283)."""
+    """Expose metrics-module win-rate fraction behavior without ratios collision (ANL-NFR-283).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("metrics_win_rate_fraction: executed.")
     from app.services.analytics.metrics.trade_outcomes import win_rate_fraction
 
     trades = input_value if isinstance(input_value, Sequence) else ()
@@ -80,7 +135,16 @@ def metrics_expectancy_r(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose metrics-module R-expectancy behavior without ratios collision (ANL-NFR-284)."""
+    """Expose metrics-module R-expectancy behavior without ratios collision (ANL-NFR-284).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("metrics_expectancy_r: executed.")
     from app.services.analytics.metrics.trade_outcomes import expectancy_r
 
     trades = input_value if isinstance(input_value, Sequence) else ()
@@ -91,7 +155,16 @@ def ratios_information_ratio(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[float]:
-    """Expose ratios-module information ratio without benchmark collision (ANL-NFR-288)."""
+    """Expose ratios-module information ratio without benchmark collision (ANL-NFR-288).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated float value.
+    """
+    logger.debug("ratios_information_ratio: executed.")
     return benchmark_information_ratio(input_value, config)
 
 
@@ -99,7 +172,16 @@ def distributions_r_multiple_distribution(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Expose distribution-module R-multiple distribution behavior without collision (ANL-NFR-318)."""
+    """Expose distribution-module R-multiple distribution behavior without collision (ANL-NFR-318).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("distributions_r_multiple_distribution: executed.")
     trades = input_value if isinstance(input_value, Sequence) else ()
     from app.services.analytics.metrics.r_multiples import get_r_multiples
 
@@ -113,5 +195,14 @@ def metrics_r_multiple_distribution(
     input_value: object,
     config: MetricConfig,
 ) -> MetricResult[dict[str, float]]:
-    """Calculate R-multiple distribution statistics (ANL-NFR-339)."""
+    """Calculate R-multiple distribution statistics (ANL-NFR-339).
+
+    Args:
+        input_value (object): Input value or sequence of values.
+        config (MetricConfig): Metric configuration.
+
+    Returns:
+        MetricResult containing the calculated dict[str, float value.
+    """
+    logger.debug("metrics_r_multiple_distribution: executed.")
     return distributions_r_multiple_distribution(input_value, config)

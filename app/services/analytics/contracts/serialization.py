@@ -17,14 +17,13 @@ import numpy as np
 import pandas as pd
 
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 if TYPE_CHECKING:
     from app.services.analytics.contracts.models import PrecisionPolicy
 
 # JSON serializable value type alias
-type JsonValue = (
-    dict[str, Any] | list[Any] | str | int | float | bool | None
-)
+type JsonValue = dict[str, Any] | list[Any] | str | int | float | bool | None
 
 
 def to_json_safe(  # noqa: C901, PLR0911, PLR0912
@@ -34,17 +33,13 @@ def to_json_safe(  # noqa: C901, PLR0911, PLR0912
     """Recursively convert any python object to a JSON-safe format (ANL-NFR-433).
 
     Args:
-        value: Any Python object, pandas structure, numpy structure,
-            or custom dataclass.
-        precision: Active precision policy configuration.
+        value (Any): Input parameter `value`.
+        precision (PrecisionPolicy): Input parameter `precision`.
 
     Returns:
-        A JSON-safe primitive (dict, list, str, int, float, bool, or None).
-
-    Raises:
-        ValidationError: If the structure contains non-finite floats/decimals
-            or other unsafely unserializable structures.
+        Calculated JsonValue value.
     """
+    logger.debug("to_json_safe: executed.")
     if value is None:
         return None
 
@@ -112,11 +107,12 @@ def canonical_json(value: JsonValue) -> str:
     """Generate sorted, whitespace-free canonical JSON representation (ANL-NFR-433).
 
     Args:
-        value: Cleaned JSON-safe value payload.
+        value (JsonValue): Input parameter `value`.
 
     Returns:
-        Sorted, space-free JSON string.
+        Calculated str value.
     """
+    logger.debug("canonical_json: executed.")
     return json.dumps(
         value,
         sort_keys=True,

@@ -16,8 +16,7 @@ from app.services.analytics.boundaries import (
     success_envelope,
     validate_request,
 )
-from app.services.analytics.contracts import MetricConfig, ToolEnvelope
-from app.services.analytics.models import AnalyticsMetadata
+from app.services.analytics.contracts import AnalyticsMetadata, MetricConfig, ToolEnvelope
 from app.utils.errors import ValidationError
 
 

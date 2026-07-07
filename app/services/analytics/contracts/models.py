@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 # Define types for schema version status and capability metadata
 SchemaCompatibility = Literal[
@@ -395,17 +396,13 @@ def validate_schema_version(
     """Validate a schema version against a compatibility matrix.
 
     Args:
-        version: The schema version string to validate.
-        matrix: The mapping of supported schema versions to their status.
+        version (str): Input parameter `version`.
+        matrix (SchemaCompatibilityMatrix): Input parameter `matrix`.
 
     Returns:
-        The compatibility status of the validated version.
-
-    Raises:
-        ValidationError: If the schema version is explicitly rejected, is an
-            unsupported future version, or is not defined in the matrix and
-            cannot be resolved to a legacy_adapted version using major.minor.
+        Calculated SchemaCompatibility value.
     """
+    logger.debug("validate_schema_version: executed.")
     status = matrix.get(version)
     if status is not None:
         if status == "rejected":
@@ -452,6 +449,9 @@ class ExplainabilityOutput:
     driver_stability: str | None = None
 
 
+MetricDefinitionCatalog = dict[str, MetricDefinition]
+
+
 @dataclass(frozen=True, slots=True)
 class PrecisionPolicy:
     """Precision policy configurations for rounding and formatting (ANL-NFR-086).
@@ -465,3 +465,61 @@ class PrecisionPolicy:
     derived_ratio_tolerance: float = 1e-9
 
 
+@dataclass(frozen=True, slots=True)
+class AnalyticsMetadata:
+    """Trace and reproducibility metadata for analytics payloads.
+
+    Attributes:
+        request_id: Optional request trace identifier.
+        workflow_id: Optional workflow trace identifier.
+        schema_version: Version of the analytics schema.
+        analytics_engine_version: Version of the analytics engine.
+        source_context: Source lineage or run context.
+    """
+
+    request_id: str | None = None
+    workflow_id: str | None = None
+    schema_version: str = "1.3.1"
+    analytics_engine_version: str = "1.0.0"
+    source_context: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class AnalyticsRequest:
+    """Canonical analytics request wrapper.
+
+    Attributes:
+        payload: Input payload to analyse.
+        config: Deterministic analytics configuration.
+        metadata: Trace and reproducibility metadata.
+    """
+
+    payload: dict[str, Any]
+    config: AnalyticsConfig = field(default_factory=AnalyticsConfig)
+    metadata: AnalyticsMetadata = field(default_factory=AnalyticsMetadata)
+
+
+@dataclass(frozen=True, slots=True)
+class AnalyticsResult:
+    """Canonical analytics result wrapper.
+
+    Attributes:
+        status: Result status string.
+        data: JSON-safe analytics payload.
+        warnings: Warning objects emitted during calculation.
+        quality_flags: Quality flags emitted during calculation.
+        metadata: Trace and reproducibility metadata.
+    """
+
+    status: Literal["completed", "partial", "failed"]
+    data: dict[str, Any]
+    warnings: tuple[Any, ...] = field(default_factory=tuple)
+    quality_flags: tuple[Any, ...] = field(default_factory=tuple)
+    metadata: AnalyticsMetadata = field(default_factory=AnalyticsMetadata)
+
+
+# Compatibility aliases
+Config = AnalyticsConfig
+Metadata = AnalyticsMetadata
+Request = AnalyticsRequest
+Result = AnalyticsResult

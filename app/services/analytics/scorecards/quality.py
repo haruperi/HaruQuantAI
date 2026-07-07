@@ -18,6 +18,7 @@ from app.utils import (
     success_response,
 )
 from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 if TYPE_CHECKING:
     from app.services.analytics.reports import AnalyticsReport
@@ -132,7 +133,12 @@ class ScorecardResult:
 
 
 def _validate_request_id(request_id: str | None) -> None:
-    """Helper to validate request_id strictly."""
+    """Helper to validate request_id strictly.
+
+    Args:
+        request_id (str | None): Input parameter `request_id`.
+    """
+    logger.debug("_validate_request_id: executed.")
     if request_id is not None and (
         not isinstance(request_id, str) or not request_id.strip()
     ):
@@ -143,7 +149,16 @@ def sqn(
     report: AnalyticsReport | dict[str, Any] | None,
     _config: StrategyQualityConfig | None = None,
 ) -> StrategyQualityAssessment:
-    """Calculate and assess System Quality Number (SQN)."""
+    """Calculate and assess System Quality Number (SQN).
+
+    Args:
+        report (AnalyticsReport | dict[str, Any] | None): Input parameter `report`.
+        _config (StrategyQualityConfig | None): Metric configuration.
+
+    Returns:
+        Calculated StrategyQualityAssessment value.
+    """
+    logger.debug("sqn: executed.")
     # Extract report sections safely
     sections: dict[str, Any] = {}
     if report is not None:
@@ -164,9 +179,7 @@ def sqn(
     elif sqn_val >= 2.0:  # noqa: PLR2004
         strengths.append(f"Good System Quality Number (SQN: {sqn_val:.2f})")
     elif sqn_val > 0:
-        warnings.append(
-            f"Average or low System Quality Number (SQN: {sqn_val:.2f})"
-        )
+        warnings.append(f"Average or low System Quality Number (SQN: {sqn_val:.2f})")
         score -= 20.0
     else:
         warnings.append("System Quality Number (SQN) is zero or negative.")
@@ -174,8 +187,7 @@ def sqn(
 
     score = max(min(score, 100.0), 0.0)
     rec_action = (
-        "Review SQN performance and trade distribution before live sandbox "
-        "promotion."
+        "Review SQN performance and trade distribution before live sandbox promotion."
     )
     return StrategyQualityAssessment(
         score=score,
@@ -189,7 +201,16 @@ def sample_size_warning(
     report: AnalyticsReport | dict[str, Any] | None,
     config: StrategyQualityConfig | None = None,
 ) -> StrategyQualityAssessment:
-    """Assess metric reliability based on trade sample size."""
+    """Assess metric reliability based on trade sample size.
+
+    Args:
+        report (AnalyticsReport | dict[str, Any] | None): Input parameter `report`.
+        config (StrategyQualityConfig | None): Metric configuration.
+
+    Returns:
+        Calculated StrategyQualityAssessment value.
+    """
+    logger.debug("sample_size_warning: executed.")
     cfg = config or StrategyQualityConfig()
     sections: dict[str, Any] = {}
     if report is not None:
@@ -238,7 +259,17 @@ def evaluate_strategy_quality(
     config: StrategyQualityConfig | None = None,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Evaluate a strategy report to provide a non-binding quality score."""
+    """Evaluate a strategy report to provide a non-binding quality score.
+
+    Args:
+        report (AnalyticsReport | dict[str, Any] | None): Input parameter `report`.
+        config (StrategyQualityConfig | None): Metric configuration.
+        request_id (str | None): Input parameter `request_id`.
+
+    Returns:
+        Calculated StandardResponse value.
+    """
+    logger.debug("evaluate_strategy_quality: executed.")
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="evaluate_strategy_quality",
