@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Any, cast
 
 from app.services.analytics.adapters import TradingResultAdapter
-from app.services.analytics.benchmark import calculate_benchmark_metrics
+from app.services.analytics.benchmarks import calculate_benchmark_metrics
 from app.services.analytics.statistics import (
     bootstrap_confidence_intervals,
     calculate_distribution_metrics,

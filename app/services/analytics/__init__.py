@@ -13,7 +13,7 @@ from app.services.analytics.adapters import (
     TradingResult,
     TradingResultAdapter,
 )
-from app.services.analytics.benchmark import (
+from app.services.analytics.benchmarks import (
     alpha,
     batting_average,
     beta,

@@ -1,14 +1,15 @@
 """Benchmark comparison metrics for Analytics.
 
 Implements Beta, Alpha, R-Squared, Tracking Error,
-and Information Ratios against benchmark inputs.
+Information Ratios, and capture ratios relative to benchmark returns.
+All functions are stateless pure functions.
 """
 
 from __future__ import annotations
 
 import math
-from typing import Any, cast
 
+from app.services.analytics.benchmarks.alignment import _align_series
 from app.utils import (
     StandardResponse,
     build_metadata,
@@ -26,51 +27,17 @@ def _validate_request_id(request_id: str | None) -> None:
         raise ValidationError("request_id must be a non-empty string.")
 
 
-def _to_float_list(series: Any) -> list[float]:
-    if series is None:
-        return []
-    if hasattr(series, "tolist"):
-        return cast("list[float]", series.tolist())
-    if isinstance(series, list):
-        return [float(x) for x in series]
-    return []
-
-
-def _align_series(
-    strategy_returns: Any, benchmark_returns: Any
-) -> tuple[list[float], list[float]]:
-    """Align strategy and benchmark returns chronologically, truncating if necessary."""
-    s_list = _to_float_list(strategy_returns)
-    b_list = _to_float_list(benchmark_returns)
-
-    # Try using pandas alignment if they are pandas objects
-    if hasattr(strategy_returns, "align") and hasattr(benchmark_returns, "align"):
-        import pandas as pd
-
-        s_ser = pd.Series(strategy_returns)
-        b_ser = pd.Series(benchmark_returns)
-        s_aligned, b_aligned = s_ser.align(b_ser, join="inner")
-        return [float(x) for x in s_aligned.tolist()], [
-            float(x) for x in b_aligned.tolist()
-        ]
-
-    n = min(len(s_list), len(b_list))
-    return s_list[:n], b_list[:n]
-
-
-# --- Core Kernels ---
-
-
-def beta(strategy_returns: list[float], benchmark_returns: list[float]) -> float:
+def beta(strategy_returns: object, benchmark_returns: object) -> float:
+    """Calculate the strategy beta coefficient relative to benchmark returns."""
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
-    if n < 2:
+    if n < 2:  # noqa: PLR2004
         return 1.0
     mean_s = sum(s_aligned) / n
     mean_b = sum(b_aligned) / n
-    cov = sum((s_aligned[i] - mean_s) * (b_aligned[i] - mean_b) for i in range(n)) / (
-        n - 1
-    )
+    cov = sum(
+        (s_aligned[i] - mean_s) * (b_aligned[i] - mean_b) for i in range(n)
+    ) / (n - 1)
     var_b = sum((b_aligned[i] - mean_b) ** 2 for i in range(n)) / (n - 1)
     if var_b == 0:
         return 1.0
@@ -78,10 +45,11 @@ def beta(strategy_returns: list[float], benchmark_returns: list[float]) -> float
 
 
 def alpha(
-    strategy_returns: list[float],
-    benchmark_returns: list[float],
+    strategy_returns: object,
+    benchmark_returns: object,
     risk_free_rate: float = 0.0,
 ) -> float:
+    """Calculate annualized Jensen-style alpha relative to benchmark returns."""
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
     if n == 0:
@@ -93,21 +61,23 @@ def alpha(
     # Alpha = E(R_s) - [R_f + Beta * (E(R_b) - R_f)]
     # Daily alpha:
     daily_alpha = mean_s - (
-        risk_free_rate / 252.0 + b_coef * (mean_b - risk_free_rate / 252.0)
+        risk_free_rate / 252.0
+        + b_coef * (mean_b - risk_free_rate / 252.0)
     )
-    return daily_alpha * 252.0 * 100.0  # Annualized %
+    return daily_alpha * 252.0 * 100.0
 
 
-def r_squared(strategy_returns: list[float], benchmark_returns: list[float]) -> float:
+def r_squared(strategy_returns: object, benchmark_returns: object) -> float:
+    """Calculate coefficient of determination between strategy and benchmark returns."""
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
-    if n < 2:
+    if n < 2:  # noqa: PLR2004
         return 0.0
     mean_s = sum(s_aligned) / n
     mean_b = sum(b_aligned) / n
-    cov = sum((s_aligned[i] - mean_s) * (b_aligned[i] - mean_b) for i in range(n)) / (
-        n - 1
-    )
+    cov = sum(
+        (s_aligned[i] - mean_s) * (b_aligned[i] - mean_b) for i in range(n)
+    ) / (n - 1)
     var_s = sum((s_aligned[i] - mean_s) ** 2 for i in range(n)) / (n - 1)
     var_b = sum((b_aligned[i] - mean_b) ** 2 for i in range(n)) / (n - 1)
     if var_s == 0 or var_b == 0:
@@ -116,26 +86,26 @@ def r_squared(strategy_returns: list[float], benchmark_returns: list[float]) -> 
     return r**2
 
 
-def tracking_error(
-    strategy_returns: list[float], benchmark_returns: list[float]
-) -> float:
+def tracking_error(strategy_returns: object, benchmark_returns: object) -> float:
+    """Calculate annualized tracking error between strategy and benchmark returns."""
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
-    if n < 2:
+    if n < 2:  # noqa: PLR2004
         return 0.0
     diff = [s_aligned[i] - b_aligned[i] for i in range(n)]
     mean_diff = sum(diff) / n
     var_diff = sum((x - mean_diff) ** 2 for x in diff) / (n - 1)
     # Annualized tracking error
-    return math.sqrt(var_diff) * math.sqrt(252) * 100.0  # Annualized %
+    return math.sqrt(var_diff) * math.sqrt(252) * 100.0
 
 
 def information_ratio(
-    strategy_returns: list[float], benchmark_returns: list[float]
+    strategy_returns: object, benchmark_returns: object
 ) -> float:
+    """Calculate relative Sharpe-style information ratio."""
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
-    if n < 2:
+    if n < 2:  # noqa: PLR2004
         return 0.0
     diff = [s_aligned[i] - b_aligned[i] for i in range(n)]
     mean_diff = sum(diff) / n
@@ -147,9 +117,8 @@ def information_ratio(
     return (mean_diff / std_diff) * math.sqrt(252)
 
 
-def batting_average(
-    strategy_returns: list[float], benchmark_returns: list[float]
-) -> float:
+def batting_average(strategy_returns: object, benchmark_returns: object) -> float:
+    """Calculate the percentage of periods where strategy outperformed benchmark."""
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     n = len(s_aligned)
     if n == 0:
@@ -159,19 +128,10 @@ def batting_average(
 
 
 def up_down_capture(
-    strategy_returns: list[float],
-    benchmark_returns: list[float],
+    strategy_returns: object,
+    benchmark_returns: object,
 ) -> dict[str, float]:
-    """Calculate up-capture and down-capture ratios.
-
-    Args:
-        strategy_returns: Strategy return series.
-        benchmark_returns: Benchmark return series.
-
-    Returns:
-        Mapping with ``up_capture`` and ``down_capture`` ratios. Undefined
-        denominators return ``0.0``.
-    """
+    """Calculate up-capture and down-capture ratios."""
     s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
     up_pairs = [
         (s_ret, b_ret)
@@ -203,11 +163,11 @@ def up_down_capture(
 
 
 def calculate_benchmark_metrics(
-    strategy_returns: Any,
-    benchmark_returns: Any,
+    strategy_returns: object,
+    benchmark_returns: object,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Calculate combined benchmark-relative metrics such as alpha, beta, and information ratio."""
+    """Calculate combined benchmark-relative metrics (alpha, beta, IR)."""
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="calculate_benchmark_metrics",
@@ -219,8 +179,11 @@ def calculate_benchmark_metrics(
     try:
         s_aligned, b_aligned = _align_series(strategy_returns, benchmark_returns)
         if not s_aligned:
-            raise ValidationError(
-                "Aligned returns series must contain at least one valid data point."
+            return response_from_exception(
+                exception=ValidationError(
+                    "Aligned returns series must contain at least one valid data point."
+                ),
+                metadata=meta,
             )
 
         data = {
@@ -237,5 +200,5 @@ def calculate_benchmark_metrics(
             data=data,
             metadata=meta,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return response_from_exception(exception=e, metadata=meta)

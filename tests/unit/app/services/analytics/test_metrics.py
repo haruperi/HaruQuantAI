@@ -13,7 +13,7 @@ from typing import Any
 import pandas as pd
 import pytest
 from app.services.analytics.adapters import TradingResultAdapter
-from app.services.analytics.benchmark import (
+from app.services.analytics.benchmarks import (
     alpha,
     batting_average,
     beta,
@@ -924,7 +924,7 @@ def test_analytics_coverage_expansion(mocker):
     from app.services.analytics._helpers import (
         parse_utc_time as equity_parse_time,
     )
-    from app.services.analytics.benchmark import (
+    from app.services.analytics.benchmarks.alignment import (
         _to_float_list,
     )
     from app.services.analytics.drawdown import (

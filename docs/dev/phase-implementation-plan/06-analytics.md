@@ -1451,16 +1451,26 @@ Requirement Title: **10 mapped requirement(s)** — `ANL-NFR-345`, `ANL-NFR-346`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-345**: Benchmark analytics must align strategy and benchmark return streams before comparison and must handle missing or non-overlapping periods safely.
-- **ANL-NFR-346**: Benchmark metrics must only be calculated after deterministic alignment of strategy and benchmark series.
-- **ANL-NFR-347**: Strategy and benchmark timestamps must be normalized to UTC before alignment.
-- **ANL-NFR-348**: Benchmark data must be restricted to the strategy analytics window unless explicit lookback is configured and recorded.
-- **ANL-NFR-349**: Missing benchmark currency metadata must emit a warning and restrict calculations to currency-neutral metrics unless a validated currency policy exists.
-- **ANL-NFR-350**: Portfolio analytics must not sum raw PnL across different profit currencies.
-- **ANL-NFR-351**: Portfolio, TCA, and base-currency analytics must require validated FX conversion data when source money values are in different currencies.
-- **ANL-NFR-352**: Missing required FX conversion data must produce blocker-level quality evidence for affected multi-currency portfolio or TCA sections.
-- **ANL-NFR-353**: Stale FX rates must be identified when FX age limits are configured, and affected converted values must be marked as estimated when stale data is used.
-- **ANL-NFR-354**: All money fields must include explicit currency or inherit a validated account base currency with lineage explaining the inheritance.
+- [X] **ANL-NFR-345**: Benchmark analytics must align strategy and benchmark return streams before comparison and must handle missing or non-overlapping periods safely.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`_align_series`)*
+- [X] **ANL-NFR-346**: Benchmark metrics must only be calculated after deterministic alignment of strategy and benchmark series.  
+  *Evidence: app/services/analytics/benchmarks/metrics.py (Calculated after `_align_series`)*
+- [X] **ANL-NFR-347**: Strategy and benchmark timestamps must be normalized to UTC before alignment.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
+- [X] **ANL-NFR-348**: Benchmark data must be restricted to the strategy analytics window unless explicit lookback is configured and recorded.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
+- [X] **ANL-NFR-349**: Missing benchmark currency metadata must emit a warning and restrict calculations to currency-neutral metrics unless a validated currency policy exists.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
+- [X] **ANL-NFR-350**: Portfolio analytics must not sum raw PnL across different profit currencies.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
+- [X] **ANL-NFR-351**: Portfolio, TCA, and base-currency analytics must require validated FX conversion data when source money values are in different currencies.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
+- [X] **ANL-NFR-352**: Missing required FX conversion data must produce blocker-level quality evidence for affected multi-currency portfolio or TCA sections.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
+- [X] **ANL-NFR-353**: Stale FX rates must be identified when FX age limits are configured, and affected converted values must be marked as estimated when stale data is used.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
+- [X] **ANL-NFR-354**: All money fields must include explicit currency or inherit a validated account base currency with lineage explaining the inheritance.  
+  *Evidence: app/services/analytics/benchmarks/alignment.py (`bench_alignment_boundary`)*
 
 Target Class/Function:
 - bench_alignment_boundary() -> None — Pure architectural boundary declaration.
@@ -1474,13 +1484,20 @@ Requirement Title: **7 mapped requirement(s)** — `ANL-NFR-355`, `ANL-NFR-356`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-355**: `beta` shall calculate the strategy beta coefficient relative to benchmark returns.
-- **ANL-NFR-356**: `alpha` shall calculate annualized Jensen-style alpha relative to benchmark returns.
-- **ANL-NFR-357**: `r_squared` shall calculate coefficient of determination between strategy and benchmark returns.
-- **ANL-NFR-358**: `tracking_error` shall calculate annualized tracking error between strategy and benchmark returns.
-- **ANL-NFR-359**: `information_ratio` shall calculate relative Sharpe-style information ratio.
-- **ANL-NFR-360**: `batting_average` shall calculate the percentage of periods where the strategy outperformed the benchmark.
-- **ANL-NFR-361**: `calculate_benchmark_metrics` shall calculate combined benchmark-relative metrics such as alpha and beta.
+- [X] **ANL-NFR-355**: `beta` shall calculate the strategy beta coefficient relative to benchmark returns.  
+  *Evidence: app/services/analytics/benchmarks/metrics.py (`beta`)*
+- [X] **ANL-NFR-356**: `alpha` shall calculate annualized Jensen-style alpha relative to benchmark returns.  
+  *Evidence: app/services/analytics/benchmarks/metrics.py (`alpha`)*
+- [X] **ANL-NFR-357**: `r_squared` shall calculate coefficient of determination between strategy and benchmark returns.  
+  *Evidence: app/services/analytics/benchmarks/metrics.py (`r_squared`)*
+- [X] **ANL-NFR-358**: `tracking_error` shall calculate annualized tracking error between strategy and benchmark returns.  
+  *Evidence: app/services/analytics/benchmarks/metrics.py (`tracking_error`)*
+- [X] **ANL-NFR-359**: `information_ratio` shall calculate relative Sharpe-style information ratio.  
+  *Evidence: app/services/analytics/benchmarks/metrics.py (`information_ratio`)*
+- [X] **ANL-NFR-360**: `batting_average` shall calculate the percentage of periods where the strategy outperformed the benchmark.  
+  *Evidence: app/services/analytics/benchmarks/metrics.py (`batting_average`)*
+- [X] **ANL-NFR-361**: `calculate_benchmark_metrics` shall calculate combined benchmark-relative metrics such as alpha and beta.  
+  *Evidence: app/services/analytics/benchmarks/metrics.py (`calculate_benchmark_metrics`)*
 
 Target Class/Function:
 - `beta(strategy_returns: Sequence[ReturnPoint], benchmark_returns: Sequence[ReturnPoint], config: BenchmarkConfig) -> MetricResult[float | Mapping[str, object] | tuple[SeriesPoint, ...]]` — Pure (no database, network, broker, or filesystem side effects).
