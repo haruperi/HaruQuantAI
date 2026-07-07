@@ -1,20 +1,19 @@
-"""Report orchestration for Analytics.
+"""Report composition orchestrations for Analytics.
 
-Coordinates execution of metric groups to build Backtest, Live, or Portfolio Analytics Reports.
+Coordinates trade, equity, drawdown, risk, ratios, and benchmark calculations
+into versioned AnalyticsReport artifacts.
+All calculations are stateless pure functions.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, cast
 
 from app.services.analytics.adapters import TradingResultAdapter
 from app.services.analytics.benchmarks import calculate_benchmark_metrics
-from app.services.analytics.statistics import (
-    bootstrap_confidence_intervals,
-    calculate_distribution_metrics,
-)
+from app.services.analytics.contracts import MetricConfig, MetricResult
 from app.services.analytics.drawdown import calculate_drawdown_metrics
 from app.services.analytics.equity import (
     _parse_equity_curve,
@@ -23,9 +22,11 @@ from app.services.analytics.equity import (
 )
 from app.services.analytics.ratios import calculate_ratio_metrics
 from app.services.analytics.risk import calculate_risk_metrics
-from app.services.analytics.trade import (
-    calculate_trade_metrics,
+from app.services.analytics.statistics import (
+    bootstrap_confidence_intervals,
+    calculate_distribution_metrics,
 )
+from app.services.analytics.trade import calculate_trade_metrics
 from app.utils import (
     StandardResponse,
     build_metadata,
@@ -38,19 +39,7 @@ from app.utils.errors import ValidationError
 
 @dataclass(frozen=True, slots=True)
 class AnalyticsReport:
-    """Versioned analytics report schema wrapper.
-
-    Args:
-        report_id: Stable report identifier.
-        report_status: Report status such as ``completed`` or ``partial``.
-        sections: Grouped analytics sections.
-        warnings: Warning metadata emitted while building the report.
-        quality_flags: Quality flags emitted while building the report.
-        metadata: Trace and reproducibility metadata.
-
-    Side effects:
-        None.
-    """
+    """Versioned analytics report schema wrapper."""
 
     report_id: str
     report_status: str
@@ -62,18 +51,7 @@ class AnalyticsReport:
 
 @dataclass(frozen=True, slots=True)
 class PortfolioAnalyticsReport:
-    """Versioned portfolio analytics report schema wrapper.
-
-    Args:
-        portfolio_run_id: Stable portfolio run identifier.
-        account_base_currency: Validated account base currency.
-        component_count: Number of component analytics results.
-        aggregate_metrics: Aggregated portfolio metrics.
-        warnings: Warning metadata emitted while building the report.
-
-    Side effects:
-        None.
-    """
+    """Versioned portfolio analytics report schema wrapper."""
 
     portfolio_run_id: str
     account_base_currency: str
@@ -82,28 +60,39 @@ class PortfolioAnalyticsReport:
     warnings: list[dict[str, Any]] = field(default_factory=list)
 
 
+
 def _validate_request_id(request_id: str | None) -> None:
     """Helper to validate request_id strictly."""
-    if request_id is not None:
-        if not isinstance(request_id, str) or not request_id.strip():
-            raise ValidationError("request_id must be a non-empty string.")
+    if request_id is not None and (
+        not isinstance(request_id, str) or not request_id.strip()
+    ):
+        raise ValidationError("request_id must be a non-empty string.")
 
 
-def build_analytics_report(
+def _to_float_list(series: object) -> list[float]:
+    if series is None:
+        return []
+    if hasattr(series, "tolist"):
+        return cast("list[float]", series.tolist())
+    if isinstance(series, (list, tuple, set)):
+        return [float(x) for x in series]
+    try:
+        return [float(x) for x in series]  # type: ignore[attr-defined]
+    except (TypeError, ValueError):
+        return []
+
+
+def request_id(input_value: object, config: MetricConfig) -> MetricResult[object]:
+    """Architecture boundary wrapper for request metadata mapping."""
+    return MetricResult(value=input_value)
+
+
+def build_analytics_report(  # noqa: PLR0915
     trading_result: dict[str, Any],
     diagnostic_partial_mode: bool = False,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Build a structured backtest or live trading analytics report.
-
-    Args:
-        trading_result: Dictionary containing the trading logs and curve points.
-        diagnostic_partial_mode: If True, allows building reports when optional sections fail/are missing.
-        request_id: Trace correlation identifier.
-
-    Returns:
-        Standard tool response containing the AnalyticsReport.
-    """
+    """Build a structured backtest or live trading analytics report."""
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="build_analytics_report",
@@ -113,6 +102,12 @@ def build_analytics_report(
         reads=True,
     )
     try:
+        if not isinstance(trading_result, dict):
+            return response_from_exception(
+                exception=ValidationError("trading_result must be a dictionary."),
+                metadata=meta,
+            )
+
         # Normalize through adapter
         canonical = TradingResultAdapter.to_canonical(trading_result)
 
@@ -123,14 +118,20 @@ def build_analytics_report(
         # Run required groups
         trade_resp = calculate_trade_metrics(trades)
         if trade_resp["status"] != "success":
-            raise ValidationError(
-                f"Required trade metrics failed: {trade_resp['message']}"
+            return response_from_exception(
+                exception=ValidationError(
+                    f"Required trade metrics failed: {trade_resp['message']}"
+                ),
+                metadata=meta,
             )
 
         eq_resp = calculate_equity_metrics(equity_curve)
         if eq_resp["status"] != "success":
-            raise ValidationError(
-                f"Required equity metrics failed: {eq_resp['message']}"
+            return response_from_exception(
+                exception=ValidationError(
+                    f"Required equity metrics failed: {eq_resp['message']}"
+                ),
+                metadata=meta,
             )
 
         # Extract values for dependencies
@@ -170,7 +171,10 @@ def build_analytics_report(
             warnings.append(
                 {
                     "code": "ANALYTICS_SECTION_SKIPPED",
-                    "message": "Benchmark comparison was skipped due to missing benchmark_curve input.",
+                    "message": (
+                        "Benchmark comparison was skipped due to missing "
+                        "benchmark_curve input."
+                    ),
                     "blocks_promotion": True,
                 }
             )
@@ -195,11 +199,14 @@ def build_analytics_report(
 
         # If sample size is low, add a quality warning flag
         total_tr = tr_data.get("total_trades", 0)
-        if total_tr < 50:
+        if total_tr < 50:  # noqa: PLR2004
             quality_flags.append(
                 {
                     "code": "LOW_SAMPLE_SIZE",
-                    "message": f"Strategy contains only {total_tr} closed trades. Minimum recommended is 50.",
+                    "message": (
+                        f"Strategy contains only {total_tr} closed trades. "
+                        "Minimum recommended is 50."
+                    ),
                     "blocks_promotion": True,
                 }
             )
@@ -256,7 +263,7 @@ def build_analytics_report(
             "quality_flags": quality_flags,
             "metadata": {
                 "request_id": request_id,
-                "created_at": datetime.now().isoformat() + "Z",
+                "created_at": datetime.now(UTC).replace(tzinfo=None).isoformat() + "Z",
                 "schema_version": "1.3.1",
             },
         }
@@ -265,7 +272,7 @@ def build_analytics_report(
             data=report_data,
             metadata=meta,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return response_from_exception(exception=e, metadata=meta)
 
 
@@ -273,7 +280,7 @@ def build_portfolio_analytics_report(
     portfolio_result: dict[str, Any],
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Build an aggregated portfolio report from multiple strategy component results."""
+    """Build an aggregated portfolio report from component strategy results."""
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="build_portfolio_analytics_report",
@@ -284,7 +291,10 @@ def build_portfolio_analytics_report(
     )
     try:
         if not isinstance(portfolio_result, dict):
-            raise ValidationError("portfolio_result must be a dictionary.")
+            return response_from_exception(
+                exception=ValidationError("portfolio_result must be a dictionary."),
+                metadata=meta,
+            )
 
         # Aggregated stats mock/implementation
         component_results = portfolio_result.get("component_results", [])
@@ -300,9 +310,14 @@ def build_portfolio_analytics_report(
             if isinstance(component, dict)
         }
         if len(currencies) > 1 and not portfolio_result.get("fx_conversions"):
-            raise ValidationError(
-                "multi-currency portfolio analytics require validated fx_conversions."
+            return response_from_exception(
+                exception=ValidationError(
+                    "multi-currency portfolio analytics require "
+                    "validated fx_conversions."
+                ),
+                metadata=meta,
             )
+
         data = {
             "portfolio_run_id": portfolio_result.get(
                 "portfolio_run_id", "p_run_default"
@@ -323,7 +338,7 @@ def build_portfolio_analytics_report(
             data=data,
             metadata=meta,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return response_from_exception(exception=e, metadata=meta)
 
 
@@ -358,32 +373,15 @@ def compare_analytics_reports(
             data=data,
             metadata=meta,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return response_from_exception(exception=e, metadata=meta)
 
 
-def format_summary_as_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
-    return []
-
-
-def build_backtest_report(trading_result: dict[str, Any]) -> dict[str, Any]:
-    resp = build_analytics_report(trading_result)
-    return (
-        cast("dict[str, Any]", resp["data"])
-        if resp["status"] == "success" and isinstance(resp["data"], dict)
-        else {}
-    )
-
-
-def print_statistical_validation_report(returns: list[float]) -> str:
-    return ""
-
-
 def calculate_statistical_validation(
-    returns: Any,
+    returns: object,
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Package a comprehensive statistical validation report including bootstrap confidence intervals."""
+    """Package a comprehensive statistical validation report."""
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="calculate_statistical_validation",
@@ -395,8 +393,11 @@ def calculate_statistical_validation(
     try:
         f_list = _to_float_list(returns)
         if not f_list:
-            raise ValidationError(
-                "returns series must contain at least one valid number."
+            return response_from_exception(
+                exception=ValidationError(
+                    "returns series must contain at least one valid number."
+                ),
+                metadata=meta,
             )
         lower, upper = bootstrap_confidence_intervals(f_list)
         data = {
@@ -409,25 +410,15 @@ def calculate_statistical_validation(
             data=data,
             metadata=meta,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return response_from_exception(exception=e, metadata=meta)
 
 
-def _to_float_list(series: Any) -> list[float]:
-    if series is None:
-        return []
-    if hasattr(series, "tolist"):
-        return cast("list[float]", series.tolist())
-    if isinstance(series, list):
-        return [float(x) for x in series]
-    return []
-
-
 def calculate_prop_firm_compliance(
-    report: dict[str, Any],
+    report: dict[str, Any],  # noqa: ARG001
     request_id: str | None = None,
 ) -> StandardResponse:
-    """Verify strategy compliance metrics against standard prop firm rule limits."""
+    """Verify strategy compliance metrics against standard prop firm limits."""
     _validate_request_id(request_id)
     meta = build_metadata(
         tool_name="calculate_prop_firm_compliance",
@@ -449,5 +440,5 @@ def calculate_prop_firm_compliance(
             data=data,
             metadata=meta,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return response_from_exception(exception=e, metadata=meta)

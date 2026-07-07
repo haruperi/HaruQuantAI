@@ -20,7 +20,7 @@ from app.utils import (
 from app.utils.errors import ValidationError
 
 if TYPE_CHECKING:
-    from app.services.analytics.report import AnalyticsReport
+    from app.services.analytics.reports import AnalyticsReport
 
 
 @dataclass(frozen=True, slots=True)

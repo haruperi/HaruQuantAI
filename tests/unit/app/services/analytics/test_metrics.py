@@ -22,7 +22,7 @@ from app.services.analytics.benchmarks import (
     r_squared,
     tracking_error,
 )
-from app.services.analytics.dashboard import _downsample_curve, build_overview_payload
+from app.services.analytics.dashboards import build_overview_payload, truncate_series, _downsample_curve
 from app.services.analytics.drawdown import (
     account_size_required,
     adjusted_net_profit_as_percent_of_max_strategy_drawdown,
@@ -918,6 +918,41 @@ def test_dashboard(sample_equity):
     assert resp["status"] == "success"
     assert resp["data"]["summary_cards"]["net_profit"] == 150.0
     assert resp["data"]["summary_cards"]["win_rate"] == 0.5
+
+
+def test_dashboards_truncation_and_payload_types():
+    from app.services.analytics.dashboards import (
+        DashboardConfig,
+        DashboardPayload,
+        ChartPoint,
+        TruncationPolicy,
+        truncate_series,
+        build_overview_payload,
+    )
+    # ChartPoint and truncate_series
+    pts = [ChartPoint(time=str(i), equity=float(i)) for i in range(150)]
+    res = truncate_series(pts, TruncationPolicy(max_points=50))
+    assert res.truncated is True
+    assert res.original_count == 150
+    assert res.returned_count <= 54
+
+    # build_overview_payload with DashboardConfig
+    report_data = {
+        "sections": {
+            "trade_metrics": {"data": {"win_rate": 0.6, "total_trades": 10}},
+            "ratio_metrics": {"data": {"profit_factor": 2.0, "sharpe_ratio": 1.5}},
+            "drawdown_metrics": {"data": {"max_drawdown_percent": 10.0}},
+            "equity_metrics": {"data": {"total_return_usd": 500.0}},
+        },
+        "equity_curve": [{"time": "2026-01-01", "equity": 1000.0}],
+    }
+    cfg = DashboardConfig(max_points=10)
+    payload = build_overview_payload(report_data, config=cfg)
+    assert isinstance(payload, DashboardPayload)
+    assert payload.schema_version == "1.3.1"
+    assert payload.tables["summary_cards"]["net_profit"] == 500.0
+    assert payload.tables["summary_cards"]["profit_factor"] == 2.0
+
 
 
 def test_analytics_coverage_expansion(mocker):

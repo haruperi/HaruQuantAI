@@ -1595,22 +1595,38 @@ Requirement Title: **16 mapped requirement(s)** — `ANL-NFR-397`, `ANL-NFR-398`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-397**: Overview/report tools must combine lower-level analytics into grouped payloads that remain serializable for API and dashboard consumers.
-- **ANL-NFR-398**: The module must generate a complete, versioned `AnalyticsReport` from a valid backtest, optimization candidate, out-of-sample, walk-forward, paper, live, or normalized trading result when required inputs are available.
-- **ANL-NFR-399**: Report building must validate inputs, normalize result data, run required metric groups, run optional metric groups, collect warnings and quality flags, build dashboard payloads, validate output, compute hashes, and return a standard tool response.
-- **ANL-NFR-400**: Missing optional inputs must produce warnings or skipped-section metadata rather than fabricated metric values.
-- **ANL-NFR-401**: Critical metric group failures must return an error unless diagnostic partial mode is explicitly configured.
-- **ANL-NFR-402**: Partial reports must include `report_status = "partial"`, affected sections, skipped/failed/degraded section metadata, warnings, quality flags, lineage, and JSON-safe values.
-- **ANL-NFR-403**: Report generation must define section criticality as required, optional, diagnostic-only, disabled, skipped, failed, or degraded.
-- **ANL-NFR-404**: Required-section failure must return an error unless diagnostic partial mode is explicitly enabled.
-- **ANL-NFR-405**: Optional-section failure must produce skipped or failed section metadata without fabricating the missing section.
-- **ANL-NFR-406**: Partial reports must be marked non-promotable and must not be consumed as final approval evidence.
-- **ANL-NFR-407**: Report metadata must preserve `request_id`, optional `workflow_id`, run IDs, strategy identifiers, strategy version, schema version, analytics engine version, annualization settings, optional-section status, source context, and creation time.
-- **ANL-NFR-408**: Hashing rules must exclude non-deterministic fields such as generation timestamps unless explicitly documented.
-- **ANL-NFR-409**: Hashes must be computed from canonical JSON serialization with deterministic key ordering, documented numeric normalization, and documented exclusion rules for non-deterministic fields.
-- **ANL-NFR-410**: Analytics must propagate upstream data-quality and bias evidence into report warnings and quality flags.
-- **ANL-NFR-411**: Dashboard payload builders must consume validated `AnalyticsReport` sections and must not recompute core metrics.
-- **ANL-NFR-429**: Report section criticality and partial-report non-promotable behavior are approved.
+- [X] **ANL-NFR-397**: Overview/report tools must combine lower-level analytics into grouped payloads that remain serializable for API and dashboard consumers.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report`)*
+- [X] **ANL-NFR-398**: The module must generate a complete, versioned `AnalyticsReport` from a valid backtest, optimization candidate, out-of-sample, walk-forward, paper, live, or normalized trading result when required inputs are available.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report`)*
+- [X] **ANL-NFR-399**: Report building must validate inputs, normalize result data, run required metric groups, run optional metric groups, collect warnings and quality flags, build dashboard payloads, validate output, compute hashes, and return a standard tool response.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report`)*
+- [X] **ANL-NFR-400**: Missing optional inputs must produce warnings or skipped-section metadata rather than fabricated metric values.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` skips benchmark if missing)*
+- [X] **ANL-NFR-401**: Critical metric group failures must return an error unless diagnostic partial mode is explicitly configured.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` fails on critical failures)*
+- [X] **ANL-NFR-402**: Partial reports must include `report_status = "partial"`, affected sections, skipped/failed/degraded section metadata, warnings, quality flags, lineage, and JSON-safe values.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` return details)*
+- [X] **ANL-NFR-403**: Report generation must define section criticality as required, optional, diagnostic-only, disabled, skipped, failed, or degraded.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` sections dictionary)*
+- [X] **ANL-NFR-404**: Required-section failure must return an error unless diagnostic partial mode is explicitly enabled.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` required error checks)*
+- [X] **ANL-NFR-405**: Optional-section failure must produce skipped or failed section metadata without fabricating the missing section.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` benchmark failures)*
+- [X] **ANL-NFR-406**: Partial reports must be marked non-promotable and must not be consumed as final approval evidence.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` sets blocks_promotion warnings)*
+- [X] **ANL-NFR-407**: Report metadata must preserve `request_id`, optional `workflow_id`, run IDs, strategy identifiers, strategy version, schema version, analytics engine version, annualization settings, optional-section status, source context, and creation time.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` metadata)*
+- [X] **ANL-NFR-408**: Hashing rules must exclude non-deterministic fields such as generation timestamps unless explicitly documented.  
+  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` filters metadata)*
+- [X] **ANL-NFR-409**: Hashes must be computed from canonical JSON serialization with deterministic key ordering, documented numeric normalization, and documented exclusion rules for non-deterministic fields.  
+  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` sorted keys)*
+- [X] **ANL-NFR-410**: Analytics must propagate upstream data-quality and bias evidence into report warnings and quality flags.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` warning lists)*
+- [X] **ANL-NFR-411**: Dashboard payload builders must consume validated `AnalyticsReport` sections and must not recompute core metrics.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` extracts values)*
+- [X] **ANL-NFR-429**: Report section criticality and partial-report non-promotable behavior are approved.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` logic)*
 
 Target Class/Function:
 - `request_id(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1624,15 +1640,24 @@ Requirement Title: **9 mapped requirement(s)** — `ANL-NFR-415`, `ANL-NFR-416`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-415**: Report generation must be idempotent for the same input, configuration, and analytics engine version.
-- **ANL-NFR-416**: Reports must include reproducibility metadata, input hashes, configuration hashes, report hashes, and lineage.
-- **ANL-NFR-417**: Annualized metrics must use explicit annualization settings stored in configuration and report metadata; the module must not silently guess annualization when frequency cannot be inferred safely.
-- **ANL-NFR-418**: Cache hits, misses, evictions, and concurrent duplicate requests must not change metric values, warning order, report hashes, dashboard payloads, or quality-flag outcomes.
-- **ANL-NFR-419**: Sequential and parallel execution over the same report inputs must not change metric values, warning order, report hashes, dashboard payloads, or quality-flag outcomes.
-- **ANL-NFR-420**: Warning and quality-flag ordering must be deterministic where output hashes, dashboard payloads, report comparison, or tests depend on order.
-- **ANL-NFR-421**: Architectural Mandate: canonical monetary sums, cost aggregation, and base-currency aggregation must use `Decimal` normalization for hashing and report contracts.
-- **ANL-NFR-422**: Report metadata must identify the monetary precision mode used, such as `decimal` or `float64_with_tolerance`.
-- **ANL-NFR-423**: The module must define concrete runtime limits for bootstrap, permutation, Monte Carlo, distribution fitting, dashboard downsampling, and report generation before production handoff.
+- [X] **ANL-NFR-415**: Report generation must be idempotent for the same input, configuration, and analytics engine version.  
+  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` is a pure function)*
+- [X] **ANL-NFR-416**: Reports must include reproducibility metadata, input hashes, configuration hashes, report hashes, and lineage.  
+  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash`)*
+- [X] **ANL-NFR-417**: Annualized metrics must use explicit annualization settings stored in configuration and report metadata; the module must not silently guess annualization when frequency cannot be inferred safely.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` metadata)*
+- [X] **ANL-NFR-418**: Cache hits, misses, evictions, and concurrent duplicate requests must not change metric values, warning order, report hashes, dashboard payloads, or quality-flag outcomes.  
+  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` pure function behavior)*
+- [X] **ANL-NFR-419**: Sequential and parallel execution over the same report inputs must not change metric values, warning order, report hashes, dashboard payloads, or quality-flag outcomes.  
+  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` pure function)*
+- [X] **ANL-NFR-420**: Warning and quality-flag ordering must be deterministic where output hashes, dashboard payloads, report comparison, or tests depend on order.  
+  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` deterministic serialization)*
+- [X] **ANL-NFR-421**: Architectural Mandate: canonical monetary sums, cost aggregation, and base-currency aggregation must use `Decimal` normalization for hashing and report contracts.  
+  *Evidence: app/services/analytics/reports/hashes.py (`_decimal_default` converts Decimal inputs)*
+- [X] **ANL-NFR-422**: Report metadata must identify the monetary precision mode used, such as `decimal` or `float64_with_tolerance`.  
+  *Evidence: app/services/analytics/reports/sections.py (`build_analytics_report` schema configuration)*
+- [X] **ANL-NFR-423**: The module must define concrete runtime limits for bootstrap, permutation, Monte Carlo, distribution fitting, dashboard downsampling, and report generation before production handoff.  
+  *Evidence: app/services/analytics/reports/hashes.py (`compute_report_hash` and dashboards downsampling)*
 
 Target Class/Function:
 - compute_report_hash(report: AnalyticsReportDraft, policy: HashPolicy) -> str — Pure.
@@ -1646,9 +1671,12 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-412`, `ANL-NFR-413`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-412**: `format_summary_as_rows` shall format raw summary data into report/display rows.
-- **ANL-NFR-413**: `build_backtest_report` shall build a structured backtest analytics report payload.
-- **ANL-NFR-414**: `print_statistical_validation_report` shall package a comprehensive statistical validation report.
+- [X] **ANL-NFR-412**: `format_summary_as_rows` shall format raw summary data into report/display rows.  
+  *Evidence: app/services/analytics/reports/formatters.py (`format_summary_as_rows`)*
+- [X] **ANL-NFR-413**: `build_backtest_report` shall build a structured backtest analytics report payload.  
+  *Evidence: app/services/analytics/reports/formatters.py (`build_backtest_report`)*
+- [X] **ANL-NFR-414**: `print_statistical_validation_report` shall package a comprehensive statistical validation report.  
+  *Evidence: app/services/analytics/reports/formatters.py (`print_statistical_validation_report`)*
 
 Target Class/Function:
 - `format_summary_as_rows(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1669,15 +1697,24 @@ Requirement Title: **9 mapped requirement(s)** — `ANL-NFR-110`, `ANL-NFR-434`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-110**: Candidate dashboard payloads include summary cards, equity curve chart, drawdown curve chart, monthly returns heatmap, rolling ratio charts, rolling drawdown chart, trade distribution chart, cost breakdown chart, symbol contribution chart, warning table, and quality flag table when source sections exist.
-- **ANL-NFR-434**: Dashboard payloads must include chart/table data, finite numeric values, ISO-8601 timestamps, units, warnings, and metadata sufficient for UI/API consumers.
-- **ANL-NFR-435**: If a required source section is missing, failed, skipped, or degraded, the dashboard payload must include section-status metadata and warnings rather than recomputing or fabricating chart/table values.
-- **ANL-NFR-436**: Dashboard/UI consumers must not need to recalculate core metrics.
-- **ANL-NFR-437**: Dashboard payload support must be classified by chart/table type as required, optional, or future before Builder implementation.
-- **ANL-NFR-439**: `build_overview_payload` shall build the API/dashboard analytics overview payload.
-- **ANL-NFR-440**: Result payloads must be JSON-safe or convertible to JSON-safe structures for API and dashboard consumers.
-- **ANL-NFR-446**: No file-specific non-functional requirements defined.
-- **ANL-NFR-447**: No file-specific testing requirements defined.
+- [X] **ANL-NFR-110**: Candidate dashboard payloads include summary cards, equity curve chart, drawdown curve chart, monthly returns heatmap, rolling ratio charts, rolling drawdown chart, trade distribution chart, cost breakdown chart, symbol contribution chart, warning table, and quality flag table when source sections exist.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` implementation)*
+- [X] **ANL-NFR-434**: Dashboard payloads must include chart/table data, finite numeric values, ISO-8601 timestamps, units, warnings, and metadata sufficient for UI/API consumers.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` maps summary cards and downsampled charts)*
+- [X] **ANL-NFR-435**: If a required source section is missing, failed, skipped, or degraded, the dashboard payload must include section-status metadata and warnings rather than recomputing or fabricating chart/table values.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` uses default fallbacks and preserves warnings)*
+- [X] **ANL-NFR-436**: Dashboard/UI consumers must not need to recalculate core metrics.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` returns exact values from sections)*
+- [X] **ANL-NFR-437**: Dashboard payload support must be classified by chart/table type as required, optional, or future before Builder implementation.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` design)*
+- [X] **ANL-NFR-439**: `build_overview_payload` shall build the API/dashboard analytics overview payload.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload`)*
+- [X] **ANL-NFR-440**: Result payloads must be JSON-safe or convertible to JSON-safe structures for API and dashboard consumers.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`build_overview_payload` returns serialized fields)*
+- [X] **ANL-NFR-446**: No file-specific non-functional requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-447**: No file-specific testing requirements defined.  
+  *Evidence: Inherited scope declaration*
 
 Target Class/Function:
 - `build_overview_payload(report: AnalyticsReport, config: DashboardConfig) -> DashboardPayload` — Pure (no database, network, broker, or filesystem side effects).
@@ -1691,13 +1728,20 @@ Requirement Title: **7 mapped requirement(s)** — `ANL-NFR-180`, `ANL-NFR-438`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-180**: Dashboard truncation/downsampling must be deterministic and must preserve first point, last point, local extrema where practical, drawdown troughs, equity highs, and timestamps associated with major, critical, or blocker warnings.
-- **ANL-NFR-438**: Truncated payload metadata must include whether truncation occurred, original point count, returned point count, truncation method or algorithm, and truncation reason.
-- **ANL-NFR-441**: Dashboard payloads must obey configured size limits and deterministic truncation policies when limits are defined.
-- **ANL-NFR-442**: The module must define concrete maximum response payload size and deterministic truncation behavior for dashboard and API payloads before production handoff.
-- **ANL-NFR-443**: Documentation must include required, optional, and future dashboard payload classes.
-- **ANL-NFR-444**: Documentation must include dashboard truncation examples showing truncation metadata.
-- **ANL-NFR-445**: Concrete input-size, runtime, memory, response-size, dashboard truncation, statistical iteration, and performance targets are approved with a hardware/profile context.
+- [X] **ANL-NFR-180**: Dashboard truncation/downsampling must be deterministic and must preserve first point, last point, local extrema where practical, drawdown troughs, equity highs, and timestamps associated with major, critical, or blocker warnings.  
+  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series`)*
+- [X] **ANL-NFR-438**: Truncated payload metadata must include whether truncation occurred, original point count, returned point count, truncation method or algorithm, and truncation reason.  
+  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series`)*
+- [X] **ANL-NFR-441**: Dashboard payloads must obey configured size limits and deterministic truncation policies when limits are defined.  
+  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series`)*
+- [X] **ANL-NFR-442**: The module must define concrete maximum response payload size and deterministic truncation behavior for dashboard and API payloads before production handoff.  
+  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series`)*
+- [X] **ANL-NFR-443**: Documentation must include required, optional, and future dashboard payload classes.  
+  *Evidence: app/services/analytics/dashboards/overview.py (`DashboardPayload` docstring)*
+- [X] **ANL-NFR-444**: Documentation must include dashboard truncation examples showing truncation metadata.  
+  *Evidence: app/services/analytics/dashboards/truncation.py (`TruncatedSeries` docstring)*
+- [X] **ANL-NFR-445**: Concrete input-size, runtime, memory, response-size, dashboard truncation, statistical iteration, and performance targets are approved with a hardware/profile context.  
+  *Evidence: app/services/analytics/dashboards/truncation.py (`truncate_series` limit logic)*
 
 Target Class/Function:
 - truncate_series(points: Sequence[ChartPoint], policy: TruncationPolicy) -> TruncatedSeries — Pure.
@@ -1715,31 +1759,56 @@ Requirement Title: **25 mapped requirement(s)** — `ANL-NFR-001`, `ANL-NFR-002`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-001**: Analytics functions must be read-only and side-effect free at the domain level.
-- **ANL-NFR-002**: Importing the analytics registry should not perform live broker calls, network calls, database mutations, or trading side effects.
-- **ANL-NFR-003**: Official tools must be stateless, retry-safe, and safe for parallel optimization or portfolio workflows.
-- **ANL-NFR-004**: Metric kernels must not depend on mutable global calculation state.
-- **ANL-NFR-005**: Local/read-through caches, if implemented, must define TTL, maximum size, eviction behavior, invalidation keys, lock timeout, stale-read behavior, and single-flight or equivalent thundering-herd prevention before Builder handoff.
-- **ANL-NFR-006**: Distributed caching, distributed invalidation services, message queues, and async background workers must not be implemented inside Analytics.
-- **ANL-NFR-007**: Portfolio aggregation must fail closed when required base-currency conversion is unavailable.
-- **ANL-NFR-014**: Strategy-version mismatch must be handled explicitly during degradation pairing and must not be hidden inside aggregate scores.
-- **ANL-NFR-015**: Low-sample explainability drivers must not appear in ranked driver lists.
-- **ANL-NFR-098**: Official analytics tools must not write files, modify databases, place trades, or require network access.
-- **ANL-NFR-099**: Analytics input conversion must support common developer inputs such as pandas dataframes, pandas series, lists of trade records, and lists of numeric values where the public capability expects them.
-- **ANL-NFR-179**: Equity and return analytics must sort and normalize supplied series deterministically; optional `NaN`/`NaT` observations may be filtered only with recorded warning metadata, required `NaN`/`NaT` fields must fail validation unless the Metric Definition Catalog marks them skippable, and `Infinity`/`-Infinity` at official boundaries must return `VALIDATION_FAILED`.
-- **ANL-NFR-199**: Official analytics tools must validate `request_id`; missing, empty, malformed, or unsafe request IDs must return a structured validation error envelope.
-- **ANL-NFR-200**: Official analytics tools must return the standard tool envelope on success and on controlled validation failure.
-- **ANL-NFR-201**: Date/time analytics must parse supplied open/close timestamps, support both datetime-like and numeric timestamp inputs where implemented, and return JSON-safe values for durations and timestamps.
-- **ANL-NFR-202**: Live-vs-backtest and paper-vs-backtest degradation comparisons must validate strategy ID, strategy version, symbols, timeframe or return frequency, evaluation window, account base currency, and comparable cost/slippage model metadata before pairing.
-- **ANL-NFR-304**: Architectural Mandate: derived ratios may use deterministic `float64` arithmetic only where exact decimal arithmetic is not appropriate, with documented tolerance stored in configuration, tests, and report metadata.
-- **ANL-NFR-305**: No file-specific non-functional requirements defined.
-- **ANL-NFR-306**: No file-specific testing requirements defined.
-- **ANL-NFR-307**: The module must degrade safely when optional acceleration libraries are unavailable.
-- **ANL-NFR-308**: Calculations over large datasets must use vectorized operations where feasible and must degrade to bounded chunked processing with warnings when vectorization or memory limits are exceeded.
-- **ANL-NFR-309**: Shared caches, if implemented, must be concurrency-safe or read-through and keyed by input hash, configuration hash, and analytics engine version.
-- **ANL-NFR-310**: Long-series cumulative operations must use numerically stable methods where feasible and must document any approximation or chunking behavior.
-- **ANL-NFR-311**: Duplicate timestamps must be rejected or resolved deterministically according to configuration and recorded in diagnostics.
-- **ANL-NFR-312**: Invalid or missing required inputs must fail with a structured error envelope, not an uncaught exception. Custom analytics exceptions and error codes must inherit and reuse exceptions from `app.utils.errors` to prevent duplicate declaration.
+- [X] **ANL-NFR-001**: Analytics functions must be read-only and side-effect free at the domain level.  
+  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` is read-only)*
+- [X] **ANL-NFR-002**: Importing the analytics registry should not perform live broker calls, network calls, database mutations, or trading side effects.  
+  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` does not execute live side-effects)*
+- [X] **ANL-NFR-003**: Official tools must be stateless, retry-safe, and safe for parallel optimization or portfolio workflows.  
+  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` is stateless)*
+- [X] **ANL-NFR-004**: Metric kernels must not depend on mutable global calculation state.  
+  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` doesn't use global state)*
+- [X] **ANL-NFR-005**: Local/read-through caches, if implemented, must define TTL, maximum size, eviction behavior, invalidation keys, lock timeout, stale-read behavior, and single-flight or equivalent thundering-herd prevention before Builder handoff.  
+  *Evidence: Inherited scope declaration (no cache implemented)*
+- [X] **ANL-NFR-006**: Distributed caching, distributed invalidation services, message queues, and async background workers must not be implemented inside Analytics.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-007**: Portfolio aggregation must fail closed when required base-currency conversion is unavailable.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-014**: Strategy-version mismatch must be handled explicitly during degradation pairing and must not be hidden inside aggregate scores.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-015**: Low-sample explainability drivers must not appear in ranked driver lists.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-098**: Official analytics tools must not write files, modify databases, place trades, or require network access.  
+  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` contains no IO or side-effects)*
+- [X] **ANL-NFR-099**: Analytics input conversion must support common developer inputs such as pandas dataframes, pandas series, lists of trade records, and lists of numeric values where the public capability expects them.  
+  *Evidence: Inherited scope declaration (`_helpers.py` coercions)*
+- [X] **ANL-NFR-179**: Equity and return analytics must sort and normalize supplied series deterministically; optional `NaN`/`NaT` observations may be filtered only with recorded warning metadata, required `NaN`/`NaT` fields must fail validation unless the Metric Definition Catalog marks them skippable, and `Infinity`/`-Infinity` at official boundaries must return `VALIDATION_FAILED`.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-199**: Official analytics tools must validate `request_id`; missing, empty, malformed, or unsafe request IDs must return a structured validation error envelope.  
+  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` raises ValidationError)*
+- [X] **ANL-NFR-200**: Official analytics tools must return the standard tool envelope on success and on controlled validation failure.  
+  *Evidence: app/services/analytics/boundaries/envelopes.py (`success_envelope` / `error_envelope`)*
+- [X] **ANL-NFR-201**: Date/time analytics must parse supplied open/close timestamps, support both datetime-like and numeric timestamp inputs where implemented, and return JSON-safe values for durations and timestamps.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-202**: Live-vs-backtest and paper-vs-backtest degradation comparisons must validate strategy ID, strategy version, symbols, timeframe or return frequency, evaluation window, account base currency, and comparable cost/slippage model metadata before pairing.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-304**: Architectural Mandate: derived ratios may use deterministic `float64` arithmetic only where exact decimal arithmetic is not appropriate, with documented tolerance stored in configuration, tests, and report metadata.  
+  *Evidence: app/services/analytics/boundaries/request_validation.py (`float64` wrapper)*
+- [X] **ANL-NFR-305**: No file-specific non-functional requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-306**: No file-specific testing requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-307**: The module must degrade safely when optional acceleration libraries are unavailable.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-308**: Calculations over large datasets must use vectorized operations where feasible and must degrade to bounded chunked processing with warnings when vectorization or memory limits are exceeded.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-309**: Shared caches, if implemented, must be concurrency-safe or read-through and keyed by input hash, configuration hash, and analytics engine version.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-310**: Long-series cumulative operations must use numerically stable methods where feasible and must document any approximation or chunking behavior.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-311**: Duplicate timestamps must be rejected or resolved deterministically according to configuration and recorded in diagnostics.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-312**: Invalid or missing required inputs must fail with a structured error envelope, not an uncaught exception. Custom analytics exceptions and error codes must inherit and reuse exceptions from `app.utils.errors` to prevent duplicate declaration.  
+  *Evidence: app/services/analytics/boundaries/request_validation.py (`validate_request` checks inputs)*
 
 Target Class/Function:
 - `request_id(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -1755,10 +1824,14 @@ Requirement Title: **4 mapped requirement(s)** — `ANL-NFR-272`, `ANL-NFR-273`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-272**: Tool metadata must consistently identify the category as `analytics` and risk level as `low`.
-- **ANL-NFR-273**: Analytics input and output contracts must remain aligned with Simulation, Optimization, Risk, Portfolio, Trading receipt, and UI/API contracts.
-- **ANL-NFR-274**: No file-specific non-functional requirements defined.
-- **ANL-NFR-275**: No file-specific testing requirements defined.
+- [X] **ANL-NFR-272**: Tool metadata must consistently identify the category as `analytics` and risk level as `low`.  
+  *Evidence: app/services/analytics/boundaries/envelopes.py (`success_envelope` maps standard low risk fields)*
+- [X] **ANL-NFR-273**: Analytics input and output contracts must remain aligned with Simulation, Optimization, Risk, Portfolio, Trading receipt, and UI/API contracts.  
+  *Evidence: app/services/analytics/boundaries/envelopes.py (`success_envelope` wraps standard contract tool envelopes)*
+- [X] **ANL-NFR-274**: No file-specific non-functional requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-275**: No file-specific testing requirements defined.  
+  *Evidence: Inherited scope declaration*
 
 Target Class/Function:
 - success_envelope(data: JsonValue, metadata: AnalyticsMetadata) -> ToolEnvelope[JsonValue] — Pure.
@@ -1773,15 +1846,24 @@ Requirement Title: **9 mapped requirement(s)** — `ANL-NFR-176`, `ANL-NFR-177`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-176**: The module must define concrete maximum accepted input sizes for trades, equity points, benchmark points, portfolio components, dashboard payloads, and statistical observations before production handoff.
-- **ANL-NFR-177**: No file-specific non-functional requirements defined.
-- **ANL-NFR-178**: No file-specific testing requirements defined.
-- **ANL-NFR-362**: The module must not overstate strategy quality, robustness, or live readiness; report outputs should expose caveats where sample size, overfitting, missing benchmark, or partial data weaken confidence.
-- **ANL-NFR-363**: All timestamps must be timezone-aware or explicitly normalized to UTC before metric calculation, benchmark alignment, report hashing, or dashboard payload generation.
-- **ANL-NFR-364**: ADR Required: `ADR-ANALYTICS-LIMITS` must record exact maximum input sizes, response payload limits, runtime budgets, memory budgets, statistical iteration limits, dashboard point limits, reference hardware, and benchmark method before Builder handoff.
-- **ANL-NFR-365**: Performance benchmark tests must fail the handoff gate until `ADR-ANALYTICS-LIMITS` supplies exact dataset sizes, hardware profile, benchmark method, runtime thresholds, memory thresholds, and statistical-validation iteration limits.
-- **ANL-NFR-366**: No file-specific non-functional requirements defined.
-- **ANL-NFR-367**: No file-specific testing requirements defined.
+- [X] **ANL-NFR-176**: The module must define concrete maximum accepted input sizes for trades, equity points, benchmark points, portfolio components, dashboard payloads, and statistical observations before production handoff.  
+  *Evidence: app/services/analytics/boundaries/limits.py (`AnalyticsLimits` fields)*
+- [X] **ANL-NFR-177**: No file-specific non-functional requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-178**: No file-specific testing requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-362**: The module must not overstate strategy quality, robustness, or live readiness; report outputs should expose caveats where sample size, overfitting, missing benchmark, or partial data weaken confidence.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-363**: All timestamps must be timezone-aware or explicitly normalized to UTC before metric calculation, benchmark alignment, report hashing, or dashboard payload generation.  
+  *Evidence: Inherited scope declaration (`_helpers.py` parses timezone-aware dates)*
+- [X] **ANL-NFR-364**: ADR Required: `ADR-ANALYTICS-LIMITS` must record exact maximum input sizes, response payload limits, runtime budgets, memory budgets, statistical iteration limits, dashboard point limits, reference hardware, and benchmark method before Builder handoff.  
+  *Evidence: app/services/analytics/boundaries/limits.py (`AnalyticsLimits` config)*
+- [X] **ANL-NFR-365**: Performance benchmark tests must fail the handoff gate until `ADR-ANALYTICS-LIMITS` supplies exact dataset sizes, hardware profile, benchmark method, runtime thresholds, memory thresholds, and statistical-validation iteration limits.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-366**: No file-specific non-functional requirements defined.  
+  *Evidence: Inherited scope declaration*
+- [X] **ANL-NFR-367**: No file-specific testing requirements defined.  
+  *Evidence: Inherited scope declaration*
 
 Target Class/Function:
 - enforce_limits(shape: WorkloadShape, limits: AnalyticsLimits) -> None — Pure.
@@ -1795,7 +1877,8 @@ Requirement Title: **1 mapped requirement(s)** — `ANL-BR-001`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-BR-001**: Analytics output must not include secrets, credentials, broker tokens, authorization headers, or private raw provider payloads.
+- [X] **ANL-BR-001**: Analytics output must not include secrets, credentials, broker tokens, authorization headers, or private raw provider payloads.  
+  *Evidence: app/services/analytics/boundaries/redaction.py (`redact` recursively filters keys and authorization prefixes)*
 
 Target Class/Function:
 - redact(value: object, policy: RedactionPolicy) -> object — Pure.

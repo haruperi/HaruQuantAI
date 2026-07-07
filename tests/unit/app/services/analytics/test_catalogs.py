@@ -25,7 +25,7 @@ from app.services.analytics.models import (
     MetricDefinition,
     validate_metric_catalog,
 )
-from app.services.analytics.report import AnalyticsReport, PortfolioAnalyticsReport
+from app.services.analytics.reports import AnalyticsReport, PortfolioAnalyticsReport
 from app.services.analytics.scorecards import ScorecardResult, ScorecardRule
 from app.utils.errors import ValidationError
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from app.services.analytics.report import (
+from app.services.analytics.reports import (
     build_analytics_report,
     build_backtest_report,
     build_portfolio_analytics_report,
@@ -163,3 +163,40 @@ def test_calculate_prop_firm_compliance():
 
     resp_none = calculate_prop_firm_compliance(None, request_id="req_test")
     assert resp_none["status"] == "success"
+
+
+def test_report_serialization_and_hashing():
+    from app.services.analytics.reports import (
+        serialize_report,
+        compute_report_hash,
+        ReportFormat,
+        HashPolicy,
+    )
+    report_dict = {
+        "report_id": "rep_test_01",
+        "report_status": "completed",
+        "sections": {"trade_metrics": {"status": "completed"}},
+        "metadata": {"created_at": "2026-01-01"},
+    }
+
+    # Serialization JSON
+    ser_json = serialize_report(report_dict, ReportFormat.JSON)
+    assert ser_json.format == ReportFormat.JSON
+    assert "rep_test_01" in ser_json.content
+
+    # Serialization Markdown
+    ser_md = serialize_report(report_dict, ReportFormat.MARKDOWN)
+    assert ser_md.format == ReportFormat.MARKDOWN
+    assert "# Performance Report: rep_test_01" in ser_md.content
+
+    # Hashing (Deterministic and excludes metadata)
+    hash_sha = compute_report_hash(report_dict, HashPolicy.SHA256)
+    hash_md5 = compute_report_hash(report_dict, HashPolicy.MD5)
+    assert len(hash_sha) == 64
+    assert len(hash_md5) == 32
+
+    # Verify metadata exclusion: altering metadata does not change hash
+    report_dict_alt = dict(report_dict)
+    report_dict_alt["metadata"] = {"created_at": "2026-12-31", "request_id": "req_xyz"}
+    assert compute_report_hash(report_dict_alt, HashPolicy.SHA256) == hash_sha
+
