@@ -1,0 +1,97 @@
+"""Analytics contracts package.
+
+This package exposes the approved, versioned analytics models, dataclasses,
+definitions, and validation functions.
+"""
+
+from __future__ import annotations
+
+from app.services.analytics.contracts.metric_catalog import (
+    DECIMAL_PRECISION_POLICY,
+    METRIC_DEFINITION_CATALOG,
+    OFFICIAL_ANALYTICS_TOOL_CATALOG,
+    SCHEMA_COMPATIBILITY_MATRIX,
+    WARNING_SEVERITY_LEVELS,
+    get_metric_definition,
+    validate_metric_catalog,
+)
+from app.services.analytics.contracts.models import (
+    AnalyticsConfig,
+    AnalyticsReport,
+    AnalyticsWarning,
+    BenchmarkData,
+    CapabilityStability,
+    DashboardPayload,
+    ErrorPayload,
+    ExplainabilityOutput,
+    Lineage,
+    MetricConfig,
+    MetricDefinition,
+    MetricResult,
+    MetricRole,
+    PortfolioAnalyticsReport,
+    PrecisionPolicy,
+    QualityFlag,
+    ReproducibilityHashes,
+    SchemaCompatibility,
+    SchemaCompatibilityMatrix,
+    ToolDefinition,
+    ToolEnvelope,
+    TradingResult,
+    TruncationMetadata,
+    validate_schema_version,
+)
+from app.services.analytics.contracts.serialization import (
+    JsonValue,
+    canonical_json,
+    to_json_safe,
+)
+from app.services.analytics.contracts.warnings import (
+    QUALITY_FLAG_CATALOG,
+    WARNING_CATALOG,
+    build_quality_flag,
+    build_warning,
+    redact_sensitive_info,
+)
+
+__all__ = [
+    "DECIMAL_PRECISION_POLICY",
+    "METRIC_DEFINITION_CATALOG",
+    "OFFICIAL_ANALYTICS_TOOL_CATALOG",
+    "QUALITY_FLAG_CATALOG",
+    "SCHEMA_COMPATIBILITY_MATRIX",
+    "WARNING_CATALOG",
+    "WARNING_SEVERITY_LEVELS",
+    "AnalyticsConfig",
+    "AnalyticsReport",
+    "AnalyticsWarning",
+    "BenchmarkData",
+    "CapabilityStability",
+    "DashboardPayload",
+    "ErrorPayload",
+    "ExplainabilityOutput",
+    "JsonValue",
+    "Lineage",
+    "MetricConfig",
+    "MetricDefinition",
+    "MetricResult",
+    "MetricRole",
+    "PortfolioAnalyticsReport",
+    "PrecisionPolicy",
+    "QualityFlag",
+    "ReproducibilityHashes",
+    "SchemaCompatibility",
+    "SchemaCompatibilityMatrix",
+    "ToolDefinition",
+    "ToolEnvelope",
+    "TradingResult",
+    "TruncationMetadata",
+    "build_quality_flag",
+    "build_warning",
+    "canonical_json",
+    "get_metric_definition",
+    "redact_sensitive_info",
+    "to_json_safe",
+    "validate_metric_catalog",
+    "validate_schema_version",
+]

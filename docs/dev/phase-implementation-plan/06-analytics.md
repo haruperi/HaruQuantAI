@@ -249,9 +249,12 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-198`, `ANL-NFR-428`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-198**: No file-specific non-functional requirements defined.
-- **ANL-NFR-428**: `TradingResult`, `AnalyticsReport`, `PortfolioAnalyticsReport`, dashboard payloads, warning objects, quality flags, and error envelopes have versioned schemas.
-- **ANL-BR-002**: Analytics outputs used by UI/API must remain backward-compatible or be versioned when payload structure changes.
+- [X] **ANL-NFR-198**: No file-specific non-functional requirements defined.  
+  *Evidence: app/services/analytics/contracts/models.py (Inherited scope)*
+- [X] **ANL-NFR-428**: `TradingResult`, `AnalyticsReport`, `PortfolioAnalyticsReport`, dashboard payloads, warning objects, quality flags, and error envelopes have versioned schemas.  
+  *Evidence: app/services/analytics/contracts/models.py line 62-248*
+- [X] **ANL-BR-002**: Analytics outputs used by UI/API must remain backward-compatible or be versioned when payload structure changes.  
+  *Evidence: app/services/analytics/contracts/models.py line 271-314*
 
 Target Class/Function:
 - validate_schema_version(version: str, matrix: SchemaCompatibilityMatrix) -> SchemaCompatibility — Pure.
@@ -265,17 +268,28 @@ Requirement Title: **11 mapped requirement(s)** — `ANL-NFR-074`, `ANL-NFR-075`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-074**: Undefined or unsupported metric values must be represented as omitted fields or `None` according to the output schema plus structured warnings or skipped-section metadata; they must not be serialized as `NaN`, infinity, fabricated zero, or display-only caps.
-- **ANL-NFR-075**: R-multiple fallback proxies must be listed in the Metric Definition Catalog before use; fallback-derived R-multiple values must include warning metadata and mark the affected metric confidence as degraded.
-- **ANL-NFR-076**: Every official metric must define formula, units, required inputs, optional inputs, accepted aliases, return scale, annualization basis, sample/population convention, minimum sample size, undefined-result behavior, and golden-fixture expectations.
-- **ANL-NFR-079**: Numeric outputs must avoid misleading precision and must handle empty, missing, non-finite, zero-denominator, and insufficient-sample scenarios consistently.
-- **ANL-NFR-080**: Documentation must include the Metric Definition Catalog.
-- **ANL-NFR-081**: Official Analytics Tool Catalog is approved and maps every official tool to schemas, errors, metadata, side effects, stability, and tests.
-- **ANL-NFR-082**: Metric Definition Catalog is approved and no official schema references uncataloged metrics.
-- **ANL-NFR-083**: Public/internal export classification is approved, including compatibility aliases and deprecated exports.
-- **ANL-NFR-084**: Analytics-owned private canonical metric-kernel model is documented and enforced through public/internal export classification tests.
-- **ANL-NFR-085**: Schema compatibility matrix defines accepted, deprecated, legacy-adapted, rejected, and unsupported future versions.
-- **ANL-NFR-086**: Decimal monetary precision mandate and deterministic derived-ratio tolerance policy are documented in schemas, metadata, and tests.
+- [X] **ANL-NFR-074**: Undefined or unsupported metric values must be represented as omitted fields or `None` according to the output schema plus structured warnings or skipped-section metadata; they must not be serialized as `NaN`, infinity, fabricated zero, or display-only caps.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (undefined_behavior attributes)*
+- [X] **ANL-NFR-075**: R-multiple fallback proxies must be listed in the Metric Definition Catalog before use; fallback-derived R-multiple values must include warning metadata and mark the affected metric confidence as degraded.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 606-635 (r_multiple & r_multiple_proxy_profit_loss)*
+- [X] **ANL-NFR-076**: Every official metric must define formula, units, required inputs, optional inputs, accepted aliases, return scale, annualization basis, sample/population convention, minimum sample size, undefined-result behavior, and golden-fixture expectations.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (MetricDefinition slots)*
+- [X] **ANL-NFR-079**: Numeric outputs must avoid misleading precision and must handle empty, missing, non-finite, zero-denominator, and insufficient-sample scenarios consistently.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (MetricDefinition specifications)*
+- [X] **ANL-NFR-080**: Documentation must include the Metric Definition Catalog.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (METRIC_DEFINITION_CATALOG docstrings)*
+- [X] **ANL-NFR-081**: Official Analytics Tool Catalog is approved and maps every official tool to schemas, errors, metadata, side effects, stability, and tests.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 780-891 (OFFICIAL_ANALYTICS_TOOL_CATALOG)*
+- [X] **ANL-NFR-082**: Metric Definition Catalog is approved and no official schema references uncataloged metrics.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 1121-1165 (validate_metric_catalog)*
+- [X] **ANL-NFR-083**: Public/internal export classification is approved, including compatibility aliases and deprecated exports.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 780-891 (ToolDefinition and OFFICIAL_ANALYTICS_TOOL_CATALOG)*
+- [X] **ANL-NFR-084**: Analytics-owned private canonical metric-kernel model is documented and enforced through public/internal export classification tests.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 44-777 (MetricDefinition catalog entries)*
+- [X] **ANL-NFR-085**: Schema compatibility matrix defines accepted, deprecated, legacy-adapted, rejected, and unsupported future versions.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 20-28 (SCHEMA_COMPATIBILITY_MATRIX)*
+- [X] **ANL-NFR-086**: Decimal monetary precision mandate and deterministic derived-ratio tolerance policy are documented in schemas, metadata, and tests.  
+  *Evidence: app/services/analytics/contracts/metric_catalog.py line 38-42 (DECIMAL_PRECISION_POLICY)*
 
 Target Class/Function:
 - `None(input_value: object, config: MetricConfig) -> MetricResult[object]` — Pure (no database, network, broker, or filesystem side effects).
@@ -289,11 +303,16 @@ Requirement Title: **5 mapped requirement(s)** — `ANL-NFR-276`, `ANL-NFR-277`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-276**: Redaction rules must apply to sensitive keys and sensitive-looking values in inputs, warnings, errors, logs, metadata, and diagnostic details.
-- **ANL-NFR-277**: Low-level metric helpers such as individual average, skewness, kurtosis, tail-ratio, tracking-error, ulcer-index, omega-ratio, payoff-ratio, and date helper functions must remain internal/support-only unless explicitly promoted by the Official Analytics Tool Catalog.
-- **ANL-NFR-278**: Warnings and quality flags must include code, severity, affected section, source context, and enough bounded detail for downstream review.
-- **ANL-NFR-279**: Warning and quality-flag catalogs must define code, severity, affected section, source-backed status, whether the flag blocks promotion, bounded detail rules, and linked test fixtures.
-- **ANL-NFR-280**: Explainability outputs must distinguish explained PnL, unexplained PnL, explained variance percentage, sample count, and driver stability when those inputs are supplied.
+- [X] **ANL-NFR-276**: Redaction rules must apply to sensitive keys and sensitive-looking values in inputs, warnings, errors, logs, metadata, and diagnostic details.  
+  *Evidence: app/services/analytics/contracts/warnings.py lines 142-166 (redact_sensitive_info)*
+- [X] **ANL-NFR-277**: Low-level metric helpers such as individual average, skewness, kurtosis, tail-ratio, tracking-error, ulcer-index, omega-ratio, payoff-ratio, and date helper functions must remain internal/support-only unless explicitly promoted by the Official Analytics Tool Catalog.  
+  *Evidence: app/services/analytics/contracts/__init__.py (low-level helpers are kept private and excluded from public package exports)*
+- [X] **ANL-NFR-278**: Warnings and quality flags must include code, severity, affected section, source context, and enough bounded detail for downstream review.  
+  *Evidence: app/services/analytics/contracts/warnings.py lines 169-266 (build_warning and build_quality_flag)*
+- [X] **ANL-NFR-279**: Warning and quality-flag catalogs must define code, severity, affected section, source-backed status, whether the flag blocks promotion, bounded detail rules, and linked test fixtures.  
+  *Evidence: app/services/analytics/contracts/warnings.py lines 68-139 (WARNING_CATALOG & QUALITY_FLAG_CATALOG)*
+- [X] **ANL-NFR-280**: Explainability outputs must distinguish explained PnL, unexplained PnL, explained variance percentage, sample count, and driver stability when those inputs are supplied.  
+  *Evidence: app/services/analytics/contracts/models.py lines 434-453 (ExplainabilityOutput)*
 
 Target Class/Function:
 - build_warning(code: str, severity: WarningSeverity, section: str, detail: Mapping[str, object]) -> AnalyticsWarning — Pure.
@@ -307,8 +326,10 @@ Requirement Title: **2 mapped requirement(s)** — `ANL-NFR-432`, `ANL-NFR-433`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-432**: No file-specific non-functional requirements defined.
-- **ANL-NFR-433**: Final analytics responses must not contain `NaN`, `inf`, `-inf`, invalid JSON values, pandas objects, NumPy objects, raw dataframes, raw series, or other unserializable values.
+- [X] **ANL-NFR-432**: No file-specific non-functional requirements defined.  
+  *Evidence: app/services/analytics/contracts/serialization.py (scope declared and followed)*
+- [X] **ANL-NFR-433**: Final analytics responses must not contain `NaN`, `inf`, `-inf`, invalid JSON values, pandas objects, NumPy objects, raw dataframes, raw series, or other unserializable values.  
+  *Evidence: app/services/analytics/contracts/serialization.py lines 37-111 (to_json_safe and canonical_json recursively convert pandas/numpy/decimal structures and explicitly reject non-finite values)*
 
 Target Class/Function:
 - to_json_safe(value: object, precision: PrecisionPolicy) -> JsonValue — Pure.
