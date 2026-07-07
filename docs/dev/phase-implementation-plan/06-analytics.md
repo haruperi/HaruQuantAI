@@ -377,8 +377,10 @@ Requirement Title: **2 mapped requirement(s)** — `ANL-NFR-095`, `ANL-NFR-096`
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-095**: No file-specific non-functional requirements defined.
-- **ANL-NFR-096**: No file-specific testing requirements defined.
+- [X] **ANL-NFR-095**: No file-specific non-functional requirements defined.  
+  *Evidence: app/services/analytics/adapters/protocols.py (scope declared and followed)*
+- [X] **ANL-NFR-096**: No file-specific testing requirements defined.  
+  *Evidence: app/services/analytics/adapters/protocols.py (testing scope followed)*
 
 Target Class/Function:
 - validate_adapter_contract(adapter: TradingResultAdapter) -> None — Pure.
@@ -392,9 +394,12 @@ Requirement Title: **3 mapped requirement(s)** — `ANL-NFR-092`, `ANL-NFR-093`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-092**: Backtest, paper, live, portfolio, and normalized trading results must either inherit from a canonical `TradingResult` contract or be converted into it through deterministic adapters.
-- **ANL-NFR-093**: Deterministic adapters must preserve schema version, result ID, phase/environment, timestamps, account base currency, strategy identifiers, symbols, timeframe, trades, equity curve, optional balance curve, benchmark data, upstream quality metadata, and source metadata without silent field loss.
-- **ANL-NFR-094**: Deterministic adapters must define source-to-canonical field mappings, required fields, optional fields, defaulting behavior, unsupported-field behavior, lossless metadata preservation rules, and warning/error behavior for missing or incompatible fields.
+- [X] **ANL-NFR-092**: Backtest, paper, live, portfolio, and normalized trading results must either inherit from a canonical `TradingResult` contract or be converted into it through deterministic adapters.  
+  *Evidence: app/services/analytics/adapters/canonicalize.py lines 145-240 (to_trading_result)*
+- [X] **ANL-NFR-093**: Deterministic adapters must preserve schema version, result ID, phase/environment, timestamps, account base currency, strategy identifiers, symbols, timeframe, trades, equity curve, optional balance curve, benchmark data, upstream quality metadata, and source metadata without silent field loss.  
+  *Evidence: app/services/analytics/adapters/canonicalize.py lines 145-240 (to_trading_result maps and preserves all source details)*
+- [X] **ANL-NFR-094**: Deterministic adapters must define source-to-canonical field mappings, required fields, optional fields, defaulting behavior, unsupported-field behavior, lossless metadata preservation rules, and warning/error behavior for missing or incompatible fields.  
+  *Evidence: app/services/analytics/adapters/canonicalize.py lines 36-142 (TradingResultAdapter)*
 
 Target Class/Function:
 - to_trading_result(source: BacktestResult | PaperResult | LiveResult | PortfolioResult | TradingResult) -> TradingResult — Pure.
@@ -408,10 +413,14 @@ Requirement Title: **4 mapped requirement(s)** — `ANL-NFR-448`, `ANL-NFR-449`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-448**: Adopt Phase 1.5 contracts for TradeResult, ExecutionReport, Fill, PortfolioSnapshot, BacktestResult, RiskDecision, and AuditEvent analytics inputs.
-- **ANL-NFR-449**: Define analytics adapters that consume simulation journals and live trade journals through the same canonical event/result model.
-- **ANL-NFR-450**: Prohibit Analytics from reading raw broker SDK payloads, UI DTOs, or conversation memory as primary metric sources.
-- **ANL-NFR-451**: Define metric provenance using run ID, strategy ID, dataset hash, cost model, fill model, risk policy version, and journal reference.
+- [X] **ANL-NFR-448**: Adopt Phase 1.5 contracts for TradeResult, ExecutionReport, Fill, PortfolioSnapshot, BacktestResult, RiskDecision, and AuditEvent analytics inputs.  
+  *Evidence: app/services/analytics/adapters/journal_adapters.py lines 15-20 (imports Phase 1.5 contracts)*
+- [X] **ANL-NFR-449**: Define analytics adapters that consume simulation journals and live trade journals through the same canonical event/result model.  
+  *Evidence: app/services/analytics/adapters/journal_adapters.py lines 60-129 (from_simulation_journal and from_live_trade_journal)*
+- [X] **ANL-NFR-450**: Prohibit Analytics from reading raw broker SDK payloads, UI DTOs, or conversation memory as primary metric sources.  
+  *Evidence: app/services/analytics/adapters/journal_adapters.py (only converts typed simulation/live journals and models into canonical TradingResult)*
+- [X] **ANL-NFR-451**: Define metric provenance using run ID, strategy ID, dataset hash, cost model, fill model, risk policy version, and journal reference.  
+  *Evidence: app/services/analytics/adapters/journal_adapters.py lines 75-83 and 109-117 (Lineage mapping)*
 
 Target Class/Function:
 - from_simulation_journal(journal: SimulationJournal) -> TradingResult — Pure.
