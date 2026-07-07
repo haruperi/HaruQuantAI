@@ -366,6 +366,7 @@ class AnalyticsConfig:
     max_dashboard_points: int = 500
     risk_free_rate: float = 0.0
     min_sample_size: int = 30
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 # MetricConfig is the approved alias for AnalyticsConfig

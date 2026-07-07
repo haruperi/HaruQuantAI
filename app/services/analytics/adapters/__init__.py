@@ -6,8 +6,9 @@ various format execution structures to canonical TradingResult models.
 
 from __future__ import annotations
 
+from typing import Any
+
 from app.services.analytics.adapters.canonicalize import (
-    BacktestResult,
     LiveResult,
     PaperResult,
     PortfolioResult,
@@ -30,9 +31,10 @@ from app.services.analytics.adapters.protocols import (
 )
 
 # Compatibility backward-compatible aliases
-TradingResult = dict
-PaperTradingResult = dict
-LiveTradingResult = dict
+TradingResult = dict[str, Any]
+BacktestResult = dict[str, Any]
+PaperTradingResult = dict[str, Any]
+LiveTradingResult = dict[str, Any]
 
 __all__ = [
     "BacktestResult",

@@ -47,7 +47,7 @@ def test_validate_request_id_strict():
         validate_request_id_strict("   ")
         
     with pytest.raises(ValidationError):
-        validate_request_id_strict(123)  # type: ignore
+        validate_request_id_strict(123)
 
 
 def test_to_float_list():
