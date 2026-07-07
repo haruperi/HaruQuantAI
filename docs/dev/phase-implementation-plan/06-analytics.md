@@ -348,12 +348,18 @@ Requirement Title: **6 mapped requirement(s)** — `ANL-NFR-008`, `ANL-NFR-009`,
 Description: This file is the single cohesion point for the following exact source obligations. Requirements labelled “No file-specific …” are preserved as inherited-scope declarations, not fabricated work items.
 
 Requirements:
-- **ANL-NFR-008**: The analytics registry must expose only intentional public analytics tools and must not hide colliding function names; duplicate concepts must use module-qualified aliases where needed.
-- **ANL-NFR-009**: Every official exported analytics tool must be callable, documented, and accept a `request_id` parameter for traceability.
-- **ANL-NFR-010**: Each official public capability must be labeled as stable, approved experimental, deprecated, or internal-support-only.
-- **ANL-NFR-011**: Each official public capability must document whether it is safe for agent/API use.
-- **ANL-NFR-012**: The analytics registry must distinguish official tools, internal metric kernels, compatibility aliases, and deprecated exports.
-- **ANL-NFR-013**: Agentic workflows must import analytics capabilities from `app.services.analytics` rather than deep module files.
+- [X] **ANL-NFR-008**: The analytics registry must expose only intentional public analytics tools and must not hide colliding function names; duplicate concepts must use module-qualified aliases where needed.  
+  *Evidence: app/services/analytics/registry/analytics_registry.py lines 63-125 (register_tool checks for name and alias collisions)*
+- [X] **ANL-NFR-009**: Every official exported analytics tool must be callable, documented, and accept a `request_id` parameter for traceability.  
+  *Evidence: app/services/analytics/registry/analytics_registry.py lines 139-198 (request_id processing and validation)*
+- [X] **ANL-NFR-010**: Each official public capability must be labeled as stable, approved experimental, deprecated, or internal-support-only.  
+  *Evidence: app/services/analytics/registry/analytics_registry.py lines 46-51 (stability field in RegisteredToolEntry)*
+- [X] **ANL-NFR-011**: Each official public capability must document whether it is safe for agent/API use.  
+  *Evidence: app/services/analytics/registry/analytics_registry.py line 52 (safe_for_agent_api field in RegisteredToolEntry)*
+- [X] **ANL-NFR-012**: The analytics registry must distinguish official tools, internal metric kernels, compatibility aliases, and deprecated exports.  
+  *Evidence: app/services/analytics/registry/analytics_registry.py lines 53-58 (category classification field in RegisteredToolEntry)*
+- [X] **ANL-NFR-013**: Agentic workflows must import analytics capabilities from `app.services.analytics` rather than deep module files.  
+  *Evidence: app/services/analytics/__init__.py and app/services/analytics/registry/__init__.py (exposes exports cleanly at the package root level)*
 
 Target Class/Function:
 - `request_id(input_value: object, config: MetricConfig) -> MetricResult[object]` — State-mutating (bounded local registry/cache/observability only).
