@@ -2211,6 +2211,96 @@ def example_22_decision_synthesis() -> None:
     print(f"Is eligible for decision token? {is_decision_token_eligible(decision)}")
 
 
+def example_23_audit_layer() -> None:
+    """Demonstrate V2 cryptographic audit event hash-chaining and decision token validations."""
+    print_header(23, "Cryptographic Audit Layer V2")
+
+    from app.services.risk.audit import (
+        AuditContext,
+        AuditRedactionPolicy,
+        DefaultTokenSigner,
+        RequiredActionScope,
+        TokenValidationContext,
+        build_canonical_audit_payload,
+        create_risk_audit_event,
+        create_risk_decision_token,
+        redact_audit_payload,
+        require_valid_audit_chain,
+        validate_risk_approval_token,
+        verify_risk_audit_chain,
+    )
+    from app.services.risk.models import ProposedTrade, RiskDecisionPackage
+    from app.services.risk.models.enums import RiskDecisionStatus, RiskMode
+
+    # 1. Payload Redaction Policy
+    policy = AuditRedactionPolicy()
+    sensitive_data = {
+        "api_key": "secret_key_12345",
+        "symbol": "EURUSD",
+        "password": "super_secret_password",
+        "volume": Decimal("1.5"),
+    }
+    redacted = redact_audit_payload(sensitive_data, policy)
+    print(f"Redaction Demo: api_key={redacted.get('api_key')}, password={redacted.get('password')}, symbol={redacted.get('symbol')}")
+
+    # 2. Canonical Payload and Event Chaining
+    decision = RiskDecisionPackage(
+        decision_id="dec_audit_v2_01",
+        request_id="req_audit_v2_01",
+        workflow_id="wf_audit_v2_01",
+        status=RiskDecisionStatus.APPROVE,
+        rule_key="news_blackout",
+        snapshot_as_of=datetime.now(UTC),
+        config_hash="cfg_hash_01",
+        reason="Approved",
+        composite_breach_flags=[],
+        calculated_volume=Decimal("1.5"),
+        policy_hash="pol_hash_01",
+        policy_version="1.0.0",
+        policy_scope={},
+        details={"proposed_action": {"strategy_id": "strat_audit", "symbol": "EURUSD", "volume": 1.5, "environment": "live"}},
+    )
+
+    trade = ProposedTrade(strategy_id="strat_audit", symbol="EURUSD", side="buy", volume=Decimal("1.5"))
+    context = AuditContext(proposed_action=trade, previous_hash="0" * 64)
+    event1 = create_risk_audit_event(decision, context)
+    print(f"Chained Event 1 Created: ID={event1.event_id}, hash={event1.hash[:16]}..., prev_hash={event1.previous_hash[:16]}...")
+
+    # Chain Event 2
+    decision2 = decision.model_copy(update={"decision_id": "dec_audit_v2_02"})
+    context2 = AuditContext(proposed_action=trade, previous_hash=event1.hash)
+    event2 = create_risk_audit_event(decision2, context2)
+    print(f"Chained Event 2 Created: ID={event2.event_id}, hash={event2.hash[:16]}..., prev_hash={event2.previous_hash[:16]}...")
+
+    # 3. Chain Verification
+    verification = verify_risk_audit_chain([event1, event2])
+    print(f"Chain Verification Result: valid={verification.valid}, tampered={verification.tampered}")
+
+    req_res = require_valid_audit_chain(verification, RiskMode.MICRO_LIVE)
+    print(f"Fail-closed requirement check (live mode): valid={req_res['valid']}, code={req_res['code']}")
+
+    # 4. Decision Token Signing and Validation
+    signer = DefaultTokenSigner()
+    token = create_risk_decision_token(decision, signer, datetime.now(UTC))
+    print(f"Decision Token signed successfully: ID={token.token_id}, signature={token.signature[:16]}...")
+
+    scope = RequiredActionScope(
+        action="execute_trade",
+        strategy_id="strat_audit",
+        symbol="EURUSD",
+        environment="live",
+    )
+    val_context = TokenValidationContext(
+        active_config_hash=decision.config_hash,
+        active_policy_hash=decision.policy_hash,
+        required_scope=scope,
+        now_utc=datetime.now(UTC),
+    )
+
+    val_res = validate_risk_approval_token(token, val_context, signer)
+    print(f"Decision Token validation: valid={val_res.valid}, code={val_res.code}")
+
+
 if __name__ == "__main__":
     """Execute all risk governance usage examples."""
     print("==================================================")
@@ -2240,6 +2330,7 @@ if __name__ == "__main__":
     example_20_observability_metrics_and_reporting()
     example_21_readiness()
     example_22_decision_synthesis()
+    example_23_audit_layer()
 
     print("==================================================")
     print("ALL RISK GOVERNANCE USAGE EXAMPLES COMPLETED")

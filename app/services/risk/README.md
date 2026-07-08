@@ -494,3 +494,29 @@ The governor package orchestrates the pre-trade risk evaluation, capital allocat
    - **`aggregate_reductions(results)`**: Combines lot size reductions suggested across sizing, correlation, exposure, drawdown, and stress testing gates into a unified plan.
    - **`is_decision_token_eligible(decision)`**: Validates if a synthesized decision is eligible to receive a cryptographic approval token.
 
+
+---
+
+## 22. Cryptographic Audit Layer (Phase 16)
+
+The Cryptographic Audit Layer provides a blockchain-style, cryptographically secure trail of all pre-trade decisions, ensuring complete transparency and preventing unauthorized signal execution. The code is organized under `app/services/risk/audit/`:
+
+### Core Components & Modules
+
+1. **Audit Event Sanitization & Redaction (`events.py`)**:
+   - **`AuditRedactionPolicy`**: Statelessly redacts sensitive parameters (like API keys, passwords, client secrets) before serialization to protect user privacy.
+   - **`build_canonical_audit_payload`**: Generates a deterministic, stable JSON representation of decision metadata to ensure hash consistency.
+   - **`create_risk_audit_event`**: Compiles decision logs and signs them with a parent hash. Automatically exposes fallback handlers for legacy V1 audits.
+
+2. **Blockchain-style Hash Chaining (`hash_chain.py`)**:
+   - **`build_genesis_hash`**: Generates the initial seed hash for an empty state.
+   - **`append_audit_hash`**: Links a new event to the tail of the existing chain by computing `SHA256(payload + previous_hash)`.
+   - **`verify_risk_audit_chain`**: Scans audit blocks to detect any modification or deletion of past decisions.
+   - **`require_valid_audit_chain`**: A fail-closed integrity gate. In live trading modes, any detected tampering automatically triggers a global locked kill switch.
+
+3. **Cryptographic Tokens & Scope Boundaries (`tokens.py`)**:
+   - **`RiskDecisionTokenSigner`**: Signs decision payloads with HMAC-SHA256. Dual-mode instantiation supports V2 structures and transient V1 keys.
+   - **`create_risk_decision_token`**: Signs eligible approvals. Maps requests dynamically to V2 `RiskDecisionToken` or V1 `RiskApprovalToken`.
+   - **`validate_risk_approval_token`**: Checks tokens for expiration, configuration/policy hash compatibility, scope alignment, and signature verification. Supports `@overload` signatures for clean static analysis compatibility.
+
+
