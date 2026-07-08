@@ -714,10 +714,10 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-139**: Create deterministic limits module with explicit ordered checks.
-- **RISK-FR-140**: Define `ORDERED_LIMIT_CHECKS` as a tuple, not a set or unordered mapping.
-- **RISK-FR-141**: Define `LimitCheck` contract.
-- **RISK-FR-142**: Define `LimitResult` contract.
+- [X] **RISK-FR-139**: Create deterministic limits module with explicit ordered checks. *Evidence: app/services/risk/limits/contracts.py line 1-119*
+- [X] **RISK-FR-140**: Define `ORDERED_LIMIT_CHECKS` as a tuple, not a set or unordered mapping. *Evidence: app/services/risk/limits/engine.py line 52-174 (assembled here, not contracts.py, to avoid a contracts→checks circular import; contracts.py defines the `LimitCheck` type it is built from)*
+- [X] **RISK-FR-141**: Define `LimitCheck` contract. *Evidence: app/services/risk/limits/contracts.py line 57-77*
+- [X] **RISK-FR-142**: Define `LimitResult` contract. *Evidence: app/services/risk/limits/contracts.py line 27-44*
 
 **Target Class/Function:**
 
@@ -735,26 +735,26 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-143**: Implement kill-switch state limit check.
-- **RISK-FR-144**: Implement stale-evidence limit check.
-- **RISK-FR-145**: Implement max daily loss limit check.
-- **RISK-FR-146**: Implement max total drawdown limit check.
-- **RISK-FR-147**: Implement max strategy loss limit check.
-- **RISK-FR-148**: Implement portfolio exposure limit check.
-- **RISK-FR-149**: Implement symbol exposure limit check.
-- **RISK-FR-150**: Implement currency exposure limit check.
-- **RISK-FR-151**: Implement correlated cluster exposure limit check.
-- **RISK-FR-152**: Implement VaR limit check.
-- **RISK-FR-153**: Implement Expected Shortfall limit check.
-- **RISK-FR-154**: Implement stress loss limit check.
-- **RISK-FR-155**: Implement leverage limit check.
-- **RISK-FR-156**: Implement margin usage limit check.
-- **RISK-FR-157**: Implement news blackout limit check.
-- **RISK-FR-158**: Implement rollover blackout limit check.
-- **RISK-FR-159**: Implement spread limit check.
-- **RISK-FR-160**: Implement slippage limit check.
-- **RISK-FR-161**: Implement trade frequency limit check.
-- **RISK-FR-162**: Implement pending order limit check.
+- [X] **RISK-FR-143**: Implement kill-switch state limit check. *Evidence: app/services/risk/limits/checks.py line 63-160 (V1), line 1531-1552 (V2 canonical)*
+- [X] **RISK-FR-144**: Implement stale-evidence limit check. *Evidence: app/services/risk/limits/checks.py line 163-238 (V1), line 1569-1614 (V2 canonical)*
+- [X] **RISK-FR-145**: Implement max daily loss limit check. *Evidence: app/services/risk/limits/checks.py line 319-396 (V1), line 1626-1651 (V2 canonical)*
+- [X] **RISK-FR-146**: Implement max total drawdown limit check. *Evidence: app/services/risk/limits/checks.py line 241-316 (V1), line 1665-1691 (V2 canonical)*
+- [X] **RISK-FR-147**: Implement max strategy loss limit check. *Evidence: app/services/risk/limits/checks.py line 399-464*
+- [X] **RISK-FR-148**: Implement portfolio exposure limit check. *Evidence: app/services/risk/limits/checks.py line 805-882 (V1), line 1707-1747 (V2 canonical)*
+- [X] **RISK-FR-149**: Implement symbol exposure limit check. *Evidence: app/services/risk/limits/checks.py line 885-977*
+- [X] **RISK-FR-150**: Implement currency exposure limit check. *Evidence: app/services/risk/limits/checks.py line 980-1050*
+- [X] **RISK-FR-151**: Implement correlated cluster exposure limit check. *Evidence: app/services/risk/limits/checks.py line 1053-1158*
+- [X] **RISK-FR-152**: Implement VaR limit check. *Evidence: app/services/risk/limits/checks.py line 1161-1235 (V1), line 1759-1783 (V2 canonical)*
+- [X] **RISK-FR-153**: Implement Expected Shortfall limit check. *Evidence: app/services/risk/limits/checks.py line 1238-1316 (V1), line 1785-1802 (V2 canonical)*
+- [X] **RISK-FR-154**: Implement stress loss limit check. *Evidence: app/services/risk/limits/checks.py line 1319-1399 (V1), line 1804-1821 (V2 canonical)*
+- [X] **RISK-FR-155**: Implement leverage limit check. *Evidence: app/services/risk/limits/checks.py line 1402-1459*
+- [X] **RISK-FR-156**: Implement margin usage limit check. *Evidence: app/services/risk/limits/checks.py line 1462-1528*
+- [X] **RISK-FR-157**: Implement news blackout limit check. *Evidence: app/services/risk/limits/checks.py line 467-499*
+- [X] **RISK-FR-158**: Implement rollover blackout limit check. *Evidence: app/services/risk/limits/checks.py line 502-534*
+- [X] **RISK-FR-159**: Implement spread limit check. *Evidence: app/services/risk/limits/checks.py line 537-595*
+- [X] **RISK-FR-160**: Implement slippage limit check. *Evidence: app/services/risk/limits/checks.py line 598-656*
+- [X] **RISK-FR-161**: Implement trade frequency limit check. *Evidence: app/services/risk/limits/checks.py line 659-730*
+- [X] **RISK-FR-162**: Implement pending order limit check. *Evidence: app/services/risk/limits/checks.py line 733-802*
 
 **Target Class/Function:**
 
@@ -776,12 +776,12 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-163**: Implement limit aggregation with configured precedence.
-- **RISK-FR-164**: Implement stable primary failure selection.
-- **RISK-FR-165**: Implement composite breach flags.
-- **RISK-FR-166**: Add tests for pass, warn, fail, and missing evidence for every limit.
-- **RISK-FR-167**: Add multi-breach deterministic order regression tests.
-- **RISK-FR-168**: Document limit ordering and breach aggregation.
+- [X] **RISK-FR-163**: Implement limit aggregation with configured precedence. *Evidence: app/services/risk/limits/engine.py line 335-420 (V1 run_limit_checks), line 491-534 (V2 evaluate_ordered_limits)*
+- [X] **RISK-FR-164**: Implement stable primary failure selection. *Evidence: app/services/risk/limits/engine.py line 440-467*
+- [X] **RISK-FR-165**: Implement composite breach flags. *Evidence: app/services/risk/limits/engine.py line 469-489*
+- [X] **RISK-FR-166**: Add tests for pass, warn, fail, and missing evidence for every limit. *Evidence: tests/unit/app/services/risk/test_limits.py line 78-981*
+- [X] **RISK-FR-167**: Add multi-breach deterministic order regression tests. *Evidence: tests/unit/app/services/risk/test_limits.py line 176-259*
+- [X] **RISK-FR-168**: Document limit ordering and breach aggregation. *Evidence: app/services/risk/README.md line 134-156*
 
 **Target Class/Function:**
 

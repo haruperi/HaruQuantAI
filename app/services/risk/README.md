@@ -133,7 +133,11 @@ In live-sensitive environments, the engine enforces strict news calendar checks.
 
 ## 8. Pre-Trade Deterministic Limits & Aggregation
 
-The deterministic limits engine evaluates candidate execution payloads sequentially against 20 configured limits.
+The deterministic limits engine is organized as a modular package under [limits/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/limits/) and evaluates candidate execution payloads sequentially against 20 configured limits.
+
+* **`contracts.py`**: Defines `LimitResult` (single check outcome), `LimitCheck` (typed limit-name/required-evidence/severity/precedence/evaluator registry entry), `LimitAssessment` (aggregated outcome), and the `LimitContext`/`LimitPrecedence` type aliases.
+* **`checks.py`**: Pure evaluators for every limit (kill-switch, evidence freshness, loss, exposure, tail-risk, margin, session, execution, frequency), plus a canonical V2 surface (`check_kill_switch`, `check_evidence_freshness`, `check_daily_loss`, `check_total_drawdown`, `check_exposure_limits`, `check_tail_risk_limits`, `check_execution_limits`) operating on typed snapshots (`PortfolioRiskSnapshot`, `VaRSnapshot`, `ExpectedShortfallSnapshot`, `StressSummary`, `ExecutionRiskSnapshot`) and an `EffectiveRiskPolicy` instead of a raw `market_context` dict.
+* **`engine.py`**: Assembles `ORDERED_LIMIT_CHECKS` (the immutable `tuple[LimitCheck, ...]` registry — built here rather than in `contracts.py` to avoid a circular import back into `checks.py`), `LimitEngine`, `run_limit_checks`/`check_risk_limits` (V1 orchestration), and the V2 `evaluate_ordered_limits`/`select_primary_failure`/`build_composite_breach_flags` pure aggregation functions.
 
 ### Execution Sequence Precedence
 Limit checks are ordered strictly as follows:
@@ -147,6 +151,7 @@ When multiple limits fail simultaneously:
 * The consolidated status uses the highest severity precedence: `BLOCK > REJECT > NEEDS_MORE_EVIDENCE > NEEDS_APPROVAL > REDUCE_SIZE > APPROVE`.
 * The `primary_failure_limit` reports the first limit breached according to the deterministic check sequence.
 * A sorted composite list of `composite_breach_flags` lists all triggered limit violations.
+* The V2 `evaluate_ordered_limits(context)` returns a single `LimitAssessment` combining the same `results`, an aggregated `status`, a `primary_failure` (`LimitResult | None`, selected via `select_primary_failure` against `DEFAULT_LIMIT_PRECEDENCE`), and `composite_breach_flags` as a `frozenset[RiskReasonCode]` (rather than limit-name strings).
 
 ---
 

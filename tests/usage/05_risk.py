@@ -1320,6 +1320,50 @@ def example_12_deterministic_limits_governance() -> None:
     )
     print(f"  Primary failure resolved: {primary!r}")
 
+    # 3. [V2] Canonical typed limits API (limits/contracts.py, limits/engine.py)
+    from app.services.risk import (
+        LimitCheck,
+        build_composite_breach_flags,
+        evaluate_ordered_limits,
+        select_primary_failure,
+    )
+
+    request.market_context["portfolio_gross_exposure"] = 100000.0
+    request.market_context["daily_loss_pct"] = 0.0
+    request.market_context["kill_switch_active"] = False
+
+    assessment = evaluate_ordered_limits(request)
+    print(
+        f"\n[V2] LimitAssessment status: {assessment.status} "
+        f"(expected APPROVE), results count: {len(assessment.results)}"
+    )
+
+    request.market_context["kill_switch_active"] = True
+    assessment_fail = evaluate_ordered_limits(request)
+    print(
+        f"[V2] LimitAssessment status after kill switch: {assessment_fail.status} "
+        f"(expected BLOCK)"
+    )
+    print(
+        f"  [V2] Primary failure: "
+        f"{assessment_fail.primary_failure.limit_name if assessment_fail.primary_failure else None}"
+    )
+    print(
+        f"  [V2] Composite breach reason codes: {assessment_fail.composite_breach_flags}"
+    )
+
+    print(
+        f"[V2] select_primary_failure: "
+        f"{select_primary_failure(assessment_fail.results).limit_name}"
+    )
+    print(
+        f"[V2] build_composite_breach_flags: "
+        f"{build_composite_breach_flags(assessment_fail.results)}"
+    )
+    print(
+        f"[V2] LimitCheck sample metadata: {LimitCheck.__name__} carries limit_name/severity/precedence/evaluator fields."
+    )
+
 
 def example_13_margin_liquidity_and_leverage_limits() -> None:
     """Demonstrate margin requirement projections, leverage limitations, and exit liquidity stress check (margin.py)."""

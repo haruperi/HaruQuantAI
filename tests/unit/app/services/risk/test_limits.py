@@ -395,7 +395,7 @@ def test_limit_engine_calculation_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test how LimitEngine wraps limit check runtime calculation failures."""
-    from app.services.risk.limits import LimitEngine
+    from app.services.risk.limits import LimitCheck, LimitEngine
 
     def mock_check(req: RiskAssessmentRequest, conf: RiskConfig) -> LimitResult:
         raise ValueError("Simulated calculation error")
@@ -405,7 +405,7 @@ def test_limit_engine_calculation_failure(
     monkeypatch.setattr(
         sys.modules[LimitEngine.__module__],
         "ORDERED_LIMIT_CHECKS",
-        (mock_check,),
+        (LimitCheck(limit_name="mock_check", evaluator=mock_check),),
     )
 
     engine = LimitEngine(config=base_config)
@@ -742,3 +742,240 @@ def test_check_margin_limit(
     base_request.portfolio_state.equity = Decimal("0.00")
     res_neg = check_margin_limit(base_request, base_config)
     assert res_neg.status == RiskDecisionStatus.BLOCK
+
+
+def test_check_kill_switch_canonical() -> None:
+    """Test canonical kill-switch state check against KillSwitchStateEnum."""
+    from app.services.risk.limits import check_kill_switch
+    from app.services.risk.models import KillSwitchStateEnum
+
+    res_ok = check_kill_switch(KillSwitchStateEnum.INACTIVE)
+    assert res_ok.status == RiskDecisionStatus.APPROVE
+
+    for state in (
+        KillSwitchStateEnum.ACTIVE,
+        KillSwitchStateEnum.LOCKED,
+        KillSwitchStateEnum.TRIGGERED,
+        KillSwitchStateEnum.UNKNOWN,
+    ):
+        res_blocked = check_kill_switch(state)
+        assert res_blocked.status == RiskDecisionStatus.BLOCK
+        assert res_blocked.reason_code == RiskReasonCode.KILL_SWITCH_ACTIVE
+
+
+def test_check_evidence_freshness_canonical(
+    base_request: RiskAssessmentRequest, base_config: RiskConfig
+) -> None:
+    """Test canonical evidence freshness check against a resolved policy."""
+    from app.services.risk.limits import check_evidence_freshness
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    policy = EffectiveRiskPolicy(
+        policy_id="test-policy", resolved_config=base_config, policy_hash="test-hash"
+    )
+
+    now = utc_now()
+    res = check_evidence_freshness(base_request, policy, now)
+    assert res.status == RiskDecisionStatus.APPROVE
+
+    base_request.freshness = now - timedelta(seconds=120)
+    res_stale = check_evidence_freshness(base_request, policy, now)
+    assert res_stale.status == RiskDecisionStatus.REJECT
+    assert res_stale.reason_code == RiskReasonCode.STALE_EVIDENCE
+
+    base_request.freshness = None
+    res_missing = check_evidence_freshness(base_request, policy, now)
+    assert res_missing.status == RiskDecisionStatus.BLOCK
+
+
+def test_check_daily_loss_and_total_drawdown_canonical(base_config: RiskConfig) -> None:
+    """Test canonical daily-loss and total-drawdown checks on a snapshot."""
+    from app.services.risk.limits import check_daily_loss, check_total_drawdown
+    from app.services.risk.models import PortfolioRiskSnapshot
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    policy = EffectiveRiskPolicy(
+        policy_id="test-policy", resolved_config=base_config, policy_hash="test-hash"
+    )
+
+    safe_snapshot = PortfolioRiskSnapshot(
+        exposure=Decimal("0.0"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.001"),
+    )
+    assert check_daily_loss(safe_snapshot, policy).status == RiskDecisionStatus.APPROVE
+    assert (
+        check_total_drawdown(safe_snapshot, policy).status == RiskDecisionStatus.APPROVE
+    )
+
+    breached_snapshot = PortfolioRiskSnapshot(
+        exposure=Decimal("0.0"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.99"),
+    )
+    assert (
+        check_daily_loss(breached_snapshot, policy).status == RiskDecisionStatus.BLOCK
+    )
+    assert (
+        check_total_drawdown(breached_snapshot, policy).status
+        == RiskDecisionStatus.BLOCK
+    )
+
+
+def test_check_exposure_limits_canonical(base_config: RiskConfig) -> None:
+    """Test canonical portfolio exposure check on a projected snapshot."""
+    from app.services.risk.limits import check_exposure_limits
+    from app.services.risk.models import PortfolioRiskSnapshot
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    policy = EffectiveRiskPolicy(
+        policy_id="test-policy", resolved_config=base_config, policy_hash="test-hash"
+    )
+
+    safe_snapshot = PortfolioRiskSnapshot(
+        exposure=Decimal("0.001"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.0"),
+    )
+    results = check_exposure_limits(safe_snapshot, policy)
+    assert len(results) == 1
+    assert results[0].status == RiskDecisionStatus.APPROVE
+
+    breached_snapshot = PortfolioRiskSnapshot(
+        exposure=Decimal("999.0"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.0"),
+    )
+    results_fail = check_exposure_limits(breached_snapshot, policy)
+    assert results_fail[0].status == RiskDecisionStatus.REJECT
+
+
+def test_check_tail_risk_limits_canonical(base_config: RiskConfig) -> None:
+    """Test canonical VaR/ES/stress tail-risk checks together."""
+    from app.services.risk.limits import check_tail_risk_limits
+    from app.services.risk.models import ExpectedShortfallSnapshot, VaRSnapshot
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+    from app.services.risk.stress.contracts import StressSummary
+
+    policy = EffectiveRiskPolicy(
+        policy_id="test-policy", resolved_config=base_config, policy_hash="test-hash"
+    )
+
+    var_snap = VaRSnapshot(
+        method="parametric",
+        confidence=Decimal("0.95"),
+        portfolio_volatility=Decimal("0.01"),
+        exposure=Decimal("100000.0"),
+        result=Decimal("500.0"),
+        assumptions={},
+    )
+    es_snap = ExpectedShortfallSnapshot(
+        confidence=Decimal("0.95"),
+        threshold_loss=Decimal("500.0"),
+        average_tail_loss=Decimal("700.0"),
+        sample_count=100,
+        method="parametric",
+    )
+    stress_summary = StressSummary(results=[], pass_status=True, reason_codes=[])
+
+    var_res, es_res, stress_res = check_tail_risk_limits(
+        var_snap, es_snap, stress_summary, policy
+    )
+    assert var_res.status == RiskDecisionStatus.APPROVE
+    assert es_res.status == RiskDecisionStatus.APPROVE
+    assert stress_res.status == RiskDecisionStatus.APPROVE
+
+    failing_stress = StressSummary(
+        results=[], pass_status=False, reason_codes=["STRESS_BREACH"]
+    )
+    _, _, stress_res_fail = check_tail_risk_limits(
+        var_snap, es_snap, failing_stress, policy
+    )
+    assert stress_res_fail.status == RiskDecisionStatus.REJECT
+    assert stress_res_fail.reason_code == RiskReasonCode.STRESS_BREACH
+
+
+def test_check_execution_limits_canonical(base_config: RiskConfig) -> None:
+    """Test canonical marketability and spread checks from an execution snapshot."""
+    from app.services.risk.limits import check_execution_limits
+    from app.services.risk.models import ExecutionRiskSnapshot
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    policy = EffectiveRiskPolicy(
+        policy_id="test-policy", resolved_config=base_config, policy_hash="test-hash"
+    )
+
+    open_snapshot = ExecutionRiskSnapshot(
+        spread=Decimal("0.0002"),
+        slippage=Decimal("0.0005"),
+        stop_level=Decimal("0.0"),
+        freeze_level=Decimal("0.0"),
+        lot_step=Decimal("0.01"),
+        marketability=True,
+    )
+    marketability_res, spread_res = check_execution_limits(open_snapshot, policy)
+    assert marketability_res.status == RiskDecisionStatus.APPROVE
+    assert spread_res.status == RiskDecisionStatus.APPROVE
+
+    closed_snapshot = open_snapshot.model_copy(update={"marketability": False})
+    marketability_res_fail, _ = check_execution_limits(closed_snapshot, policy)
+    assert marketability_res_fail.status == RiskDecisionStatus.REJECT
+
+
+def test_evaluate_ordered_limits_and_selection(
+    base_request: RiskAssessmentRequest,
+) -> None:
+    """Test evaluate_ordered_limits, select_primary_failure, and breach flags."""
+    from app.services.risk.limits import (
+        evaluate_ordered_limits,
+        select_primary_failure,
+    )
+
+    assessment = evaluate_ordered_limits(base_request)
+    assert assessment.status == RiskDecisionStatus.APPROVE
+    assert assessment.primary_failure is None
+    assert len(assessment.results) == 20
+
+    base_request.market_context["kill_switch_active"] = True
+    assessment_fail = evaluate_ordered_limits(base_request)
+    assert assessment_fail.status == RiskDecisionStatus.BLOCK
+    assert assessment_fail.primary_failure is not None
+    assert assessment_fail.primary_failure.limit_name == "kill_switch_state"
+    assert RiskReasonCode.KILL_SWITCH_ACTIVE in assessment_fail.composite_breach_flags
+
+    primary = select_primary_failure(assessment_fail.results)
+    assert primary is not None
+    assert primary.limit_name == "kill_switch_state"
+
+    primary_none = select_primary_failure(assessment.results)
+    assert primary_none is None
+
+
+def test_build_composite_breach_flags() -> None:
+    """Test composite breach flag composition from mixed limit results."""
+    from app.services.risk.limits import LimitResult, build_composite_breach_flags
+
+    results = [
+        LimitResult(
+            limit_name="a",
+            status=RiskDecisionStatus.APPROVE,
+            reason_code=RiskReasonCode.OK,
+            message="ok",
+            severity=RiskSeverity.INFO,
+            breached=False,
+        ),
+        LimitResult(
+            limit_name="b",
+            status=RiskDecisionStatus.REJECT,
+            reason_code=RiskReasonCode.MARGIN_BREACH,
+            message="breach",
+            severity=RiskSeverity.HARD_BREACH,
+            breached=True,
+        ),
+    ]
+    flags = build_composite_breach_flags(results)
+    assert flags == frozenset({RiskReasonCode.MARGIN_BREACH})

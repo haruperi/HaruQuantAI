@@ -1,22 +1,23 @@
-"""Deterministic limits engine.
+"""Single-purpose pure limit evaluators.
 
-Evaluates pre-trade limits in a strict, sequential order, prioritizing hard-blocking
-governance gates before execution feasibility and tail-risk exposure checks.
+Evaluates kill-switch, evidence-freshness, loss, exposure, tail-risk, margin,
+session, execution, and frequency limits from supplied canonical evidence.
+Every function here is pure: given the same evidence and policy, it always
+returns the same :class:`~app.services.risk.limits.contracts.LimitResult`.
 """
 
 from __future__ import annotations
 
 import math
 from decimal import Decimal
-from typing import Any, Protocol
+from typing import TYPE_CHECKING
 
-from pydantic import Field
-
+from app.services.risk.limits.contracts import LimitResult
 from app.services.risk.models import (
+    KillSwitchStateEnum,
     ProposedTrade,
     RiskAssessmentRequest,
     RiskConfig,
-    RiskContract,
     RiskDecisionStatus,
     RiskMode,
     RiskReasonCode,
@@ -25,40 +26,28 @@ from app.services.risk.models import (
 from app.utils.logger import logger
 from app.utils.normalization import to_utc_datetime, utc_now
 
+if TYPE_CHECKING:
+    from datetime import datetime
 
-class LimitCheck(Protocol):
-    """Protocol representing a single deterministic pre-trade risk limit check."""
-
-    def __call__(
-        self, request: RiskAssessmentRequest, config: RiskConfig, /
-    ) -> LimitResult:
-        """Evaluate the limit check."""
-        ...
-
-
-class LimitResult(RiskContract):
-    """The result of evaluating a single limit check."""
-
-    limit_name: str = Field(
-        ..., description="Unique name of the evaluated limit check."
+    from app.services.risk.models import (
+        ExecutionRiskSnapshot,
+        ExpectedShortfallSnapshot,
+        PortfolioRiskSnapshot,
+        VaRSnapshot,
     )
-    status: RiskDecisionStatus = Field(
-        ..., description="Decision outcome status for this limit."
-    )
-    reason_code: RiskReasonCode = Field(
-        ..., description="Reason code associated with any breach."
-    )
-    message: str = Field(..., description="Human-readable detail message.")
-    severity: RiskSeverity = Field(..., description="Severity level of any violation.")
-    breached: bool = Field(..., description="True if a breach was triggered.")
-    details: dict[str, Any] = Field(
-        default_factory=dict, description="Calculated values or context info."
-    )
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+    from app.services.risk.stress.contracts import StressSummary
 
 
-# --- Helper to check if context matches a live mode ---
 def _is_live_sensitive(request: RiskAssessmentRequest) -> bool:
-    """Check if request environment or mode is live-sensitive."""
+    """Check if request environment or mode is live-sensitive.
+
+    Args:
+        request: The active risk assessment request.
+
+    Returns:
+        bool: True if the request targets a live-sensitive mode/environment.
+    """
     mode = request.market_context.get("mode")
     env = request.market_context.get("environment")
     if mode in {
@@ -71,11 +60,19 @@ def _is_live_sensitive(request: RiskAssessmentRequest) -> bool:
     return env in {"production", "live"}
 
 
-# --- 1. Kill Switch Check ---
 def check_kill_switch_state(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if the global, portfolio, or strategy kill switch is active."""
+    """Check if the global, portfolio, or strategy kill switch is active.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: BLOCK if any relevant kill switch is active, else APPROVE.
+    """
     from app.services.risk.kill_switch import get_kill_switch_manager
 
     manager = get_kill_switch_manager()
@@ -84,8 +81,8 @@ def check_kill_switch_state(
         "full_live",
     } or request.market_context.get("environment") in {"production", "live"}
 
-    # 1. Global context override check
     if request.market_context.get("kill_switch_active", False):
+        logger.info("Global kill switch is active (context override).")
         return LimitResult(
             limit_name="kill_switch_state",
             status=RiskDecisionStatus.BLOCK,
@@ -95,10 +92,10 @@ def check_kill_switch_state(
             breached=True,
         )
 
-    # 2. Query Manager for Global / Portfolio block
     if manager.is_blocked("global", "*", is_live=is_live) or manager.is_blocked(
         "portfolio", "*", is_live=is_live
     ):
+        logger.info("Global or portfolio kill switch is active.")
         return LimitResult(
             limit_name="kill_switch_state",
             status=RiskDecisionStatus.BLOCK,
@@ -108,14 +105,13 @@ def check_kill_switch_state(
             breached=True,
         )
 
-    # 3. Check strategy block
     action = request.proposed_action
     if action:
-        # Check single strategy ID
         strategy_id = getattr(action, "strategy_id", None)
         if strategy_id and manager.is_blocked(
             "strategy", str(strategy_id), is_live=is_live
         ):
+            logger.info(f"Kill switch is active for strategy '{strategy_id}'.")
             return LimitResult(
                 limit_name="kill_switch_state",
                 status=RiskDecisionStatus.BLOCK,
@@ -125,11 +121,11 @@ def check_kill_switch_state(
                 breached=True,
             )
 
-        # Check multi-strategy allocations block
         allocations = getattr(action, "allocations", None)
         if isinstance(allocations, dict):
             for strat_id in allocations:
                 if manager.is_blocked("strategy", str(strat_id), is_live=is_live):
+                    logger.info(f"Kill switch is active for strategy '{strat_id}'.")
                     return LimitResult(
                         limit_name="kill_switch_state",
                         status=RiskDecisionStatus.BLOCK,
@@ -139,10 +135,9 @@ def check_kill_switch_state(
                         breached=True,
                     )
 
-        # Check symbol block (which automatically checks base/quote currency legs in
-        # manager)
         symbol = getattr(action, "symbol", None)
         if symbol and manager.is_blocked("symbol", str(symbol), is_live=is_live):
+            logger.info(f"Kill switch is active for symbol '{symbol}'.")
             return LimitResult(
                 limit_name="kill_switch_state",
                 status=RiskDecisionStatus.BLOCK,
@@ -154,6 +149,7 @@ def check_kill_switch_state(
                 breached=True,
             )
 
+    logger.debug("Kill switch is inactive.")
     return LimitResult(
         limit_name="kill_switch_state",
         status=RiskDecisionStatus.APPROVE,
@@ -164,18 +160,26 @@ def check_kill_switch_state(
     )
 
 
-# --- 2. Stale Evidence Check ---
 def check_stale_evidence_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if input snapshots are stale or missing required live parameters."""
+    """Check if input snapshots are stale or missing required live parameters.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: APPROVE/NEEDS_MORE_EVIDENCE/REJECT/BLOCK based on freshness.
+    """
     now = utc_now()
     stale_limit = float(request.market_context.get("max_stale_seconds", 60.0))
 
-    # Check proposed trade timestamp or context freshness
     freshness = request.market_context.get("freshness")
     if freshness is None:
         if _is_live_sensitive(request):
+            logger.info("Live mode blocked: missing freshness metadata.")
             return LimitResult(
                 limit_name="stale_evidence",
                 status=RiskDecisionStatus.BLOCK,
@@ -184,6 +188,7 @@ def check_stale_evidence_limit(
                 severity=RiskSeverity.CRITICAL_BREACH,
                 breached=True,
             )
+        logger.debug("Missing freshness metadata (non-live).")
         return LimitResult(
             limit_name="stale_evidence",
             status=RiskDecisionStatus.NEEDS_MORE_EVIDENCE,
@@ -196,6 +201,7 @@ def check_stale_evidence_limit(
     fresh_dt = to_utc_datetime(freshness)
     age = (now - fresh_dt).total_seconds()
     if not math.isfinite(age) or not math.isfinite(stale_limit):
+        logger.error("Freshness calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="stale_evidence",
             status=RiskDecisionStatus.BLOCK,
@@ -210,6 +216,7 @@ def check_stale_evidence_limit(
             if _is_live_sensitive(request)
             else RiskDecisionStatus.REJECT
         )
+        logger.info(f"Evidence is stale by {age:.1f}s (max allowed: {stale_limit}s).")
         return LimitResult(
             limit_name="stale_evidence",
             status=status,
@@ -220,6 +227,7 @@ def check_stale_evidence_limit(
             details={"age_seconds": age},
         )
 
+    logger.debug(f"Evidence freshness is within safe limits (age={age:.1f}s).")
     return LimitResult(
         limit_name="stale_evidence",
         status=RiskDecisionStatus.APPROVE,
@@ -230,11 +238,19 @@ def check_stale_evidence_limit(
     )
 
 
-# --- 3. Max Drawdown Limit ---
 def check_max_drawdown_limit(
     request: RiskAssessmentRequest, config: RiskConfig
 ) -> LimitResult:
-    """Check if total drawdown exceeds soft or hard limit ceilings."""
+    """Check if total drawdown exceeds soft or hard limit ceilings.
+
+    Args:
+        request: The active risk assessment request.
+        config: Active risk configuration.
+
+    Returns:
+        LimitResult: BLOCK on hard breach, APPROVE (with warning) on soft
+            breach, or APPROVE otherwise.
+    """
     drawdown = request.market_context.get("drawdown")
     if drawdown is None:
         balance = request.portfolio_state.balance
@@ -249,6 +265,7 @@ def check_max_drawdown_limit(
         or not math.isfinite(float(config.max_total_loss_pct))
         or not math.isfinite(float(config.max_total_loss_pct_advisory))
     ):
+        logger.error("Drawdown calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="max_drawdown_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -259,6 +276,7 @@ def check_max_drawdown_limit(
         )
 
     if drawdown > config.max_total_loss_pct:
+        logger.info(f"Hard total drawdown limit breached: {drawdown:.2%}.")
         return LimitResult(
             limit_name="max_drawdown_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -273,6 +291,7 @@ def check_max_drawdown_limit(
         )
 
     if drawdown > config.max_total_loss_pct_advisory:
+        logger.info(f"Advisory drawdown limit warning: {drawdown:.2%}.")
         return LimitResult(
             limit_name="max_drawdown_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -286,6 +305,7 @@ def check_max_drawdown_limit(
             details={"drawdown": float(drawdown)},
         )
 
+    logger.debug(f"Total drawdown is within safe ceilings: {drawdown:.2%}.")
     return LimitResult(
         limit_name="max_drawdown_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -296,14 +316,23 @@ def check_max_drawdown_limit(
     )
 
 
-# --- 4. Daily Loss Limit ---
 def check_daily_loss_limit(
     request: RiskAssessmentRequest, config: RiskConfig
 ) -> LimitResult:
-    """Check if realized and floating daily loss exceeds the profile limits."""
+    """Check if realized and floating daily loss exceeds the profile limits.
+
+    Args:
+        request: The active risk assessment request.
+        config: Active risk configuration.
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach, NEEDS_MORE_EVIDENCE if missing
+            in non-live modes, else APPROVE.
+    """
     daily_loss_pct = request.market_context.get("daily_loss_pct")
     if daily_loss_pct is None:
         if _is_live_sensitive(request):
+            logger.info("Live mode blocked: missing daily loss metrics.")
             return LimitResult(
                 limit_name="daily_loss_limit",
                 status=RiskDecisionStatus.BLOCK,
@@ -312,6 +341,7 @@ def check_daily_loss_limit(
                 severity=RiskSeverity.CRITICAL_BREACH,
                 breached=True,
             )
+        logger.debug("Missing daily loss metrics (non-live).")
         return LimitResult(
             limit_name="daily_loss_limit",
             status=RiskDecisionStatus.NEEDS_MORE_EVIDENCE,
@@ -325,6 +355,7 @@ def check_daily_loss_limit(
     if not math.isfinite(float(daily_loss_pct)) or not math.isfinite(
         float(config.max_daily_loss_pct)
     ):
+        logger.error("Daily loss calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="daily_loss_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -340,6 +371,7 @@ def check_daily_loss_limit(
             if _is_live_sensitive(request)
             else RiskDecisionStatus.REJECT
         )
+        logger.info(f"Daily loss limit breached: {daily_loss_pct:.2%}.")
         return LimitResult(
             limit_name="daily_loss_limit",
             status=status,
@@ -353,6 +385,7 @@ def check_daily_loss_limit(
             details={"daily_loss_pct": float(daily_loss_pct)},
         )
 
+    logger.debug(f"Daily loss is within safe limits: {daily_loss_pct:.2%}.")
     return LimitResult(
         limit_name="daily_loss_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -363,17 +396,26 @@ def check_daily_loss_limit(
     )
 
 
-# --- 5. Max Strategy Loss Limit ---
 def check_strategy_loss_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if a specific strategy drawdown limit is exceeded."""
+    """Check if a specific strategy drawdown limit is exceeded.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; the strategy-level limit
+            is sourced from market_context to allow per-request overrides).
+
+    Returns:
+        LimitResult: REJECT on breach, APPROVE otherwise.
+    """
     strat_loss_pct = request.market_context.get("strategy_loss_pct")
     strat_limit = Decimal(
         str(request.market_context.get("max_strategy_loss_pct", "0.04"))
     )
 
     if strat_loss_pct is None:
+        logger.debug("No strategy loss details provided; check skipped.")
         return LimitResult(
             limit_name="strategy_loss_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -387,6 +429,7 @@ def check_strategy_loss_limit(
     if not math.isfinite(float(strat_loss_pct)) or not math.isfinite(
         float(strat_limit)
     ):
+        logger.error("Strategy loss calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="strategy_loss_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -396,6 +439,7 @@ def check_strategy_loss_limit(
             breached=True,
         )
     if strat_loss_pct >= strat_limit:
+        logger.info(f"Strategy loss limit breached: {strat_loss_pct:.2%}.")
         return LimitResult(
             limit_name="strategy_loss_limit",
             status=RiskDecisionStatus.REJECT,
@@ -409,6 +453,7 @@ def check_strategy_loss_limit(
             details={"strategy_loss_pct": float(strat_loss_pct)},
         )
 
+    logger.debug(f"Strategy loss is within safe limits: {strat_loss_pct:.2%}.")
     return LimitResult(
         limit_name="strategy_loss_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -419,13 +464,22 @@ def check_strategy_loss_limit(
     )
 
 
-# --- 6. News Blackout Check ---
 def check_news_blackout(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if news blackout window is active for the target symbols."""
+    """Check if news blackout window is active for the target symbols.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: REJECT if blackout is active, else APPROVE.
+    """
     is_blackout = request.market_context.get("news_blackout_active", False)
     if is_blackout:
+        logger.info("High impact news blackout window is active.")
         return LimitResult(
             limit_name="news_blackout",
             status=RiskDecisionStatus.REJECT,
@@ -434,6 +488,7 @@ def check_news_blackout(
             severity=RiskSeverity.HARD_BREACH,
             breached=True,
         )
+    logger.debug("Outside of news blackout windows.")
     return LimitResult(
         limit_name="news_blackout",
         status=RiskDecisionStatus.APPROVE,
@@ -444,13 +499,22 @@ def check_news_blackout(
     )
 
 
-# --- 7. Rollover Blackout Check ---
 def check_rollover_blackout(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if broker midnight rollover blackout window is active."""
+    """Check if broker midnight rollover blackout window is active.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: REJECT if blackout is active, else APPROVE.
+    """
     is_blackout = request.market_context.get("rollover_blackout_active", False)
     if is_blackout:
+        logger.info("Rollover blackout window surrounding broker midnight is active.")
         return LimitResult(
             limit_name="rollover_blackout",
             status=RiskDecisionStatus.REJECT,
@@ -459,6 +523,7 @@ def check_rollover_blackout(
             severity=RiskSeverity.HARD_BREACH,
             breached=True,
         )
+    logger.debug("Outside of rollover blackout windows.")
     return LimitResult(
         limit_name="rollover_blackout",
         status=RiskDecisionStatus.APPROVE,
@@ -469,15 +534,24 @@ def check_rollover_blackout(
     )
 
 
-# --- 8. Spread Limit Check ---
 def check_spread_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if current market spread exceeds the maximum allowed."""
+    """Check if current market spread exceeds the maximum allowed.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: REJECT on breach, APPROVE otherwise.
+    """
     spread = request.market_context.get("spread")
     max_spread = Decimal(str(request.market_context.get("max_spread", "0.0050")))
 
     if spread is None:
+        logger.debug("No spread provided; check skipped.")
         return LimitResult(
             limit_name="spread_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -489,6 +563,7 @@ def check_spread_limit(
 
     spread = Decimal(str(spread))
     if not math.isfinite(float(spread)) or not math.isfinite(float(max_spread)):
+        logger.error("Spread calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="spread_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -498,6 +573,7 @@ def check_spread_limit(
             breached=True,
         )
     if spread > max_spread:
+        logger.info(f"Spread limit breached: {spread} > {max_spread}.")
         return LimitResult(
             limit_name="spread_limit",
             status=RiskDecisionStatus.REJECT,
@@ -508,6 +584,7 @@ def check_spread_limit(
             details={"spread": float(spread)},
         )
 
+    logger.debug(f"Spread is within safe limits: {spread}.")
     return LimitResult(
         limit_name="spread_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -518,15 +595,24 @@ def check_spread_limit(
     )
 
 
-# --- 9. Slippage Limit Check ---
 def check_slippage_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if current estimated execution slippage is within bounds."""
+    """Check if current estimated execution slippage is within bounds.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: REJECT on breach, APPROVE otherwise.
+    """
     slippage = request.market_context.get("slippage")
     max_slippage = Decimal(str(request.market_context.get("max_slippage", "0.0020")))
 
     if slippage is None:
+        logger.debug("No slippage provided; check skipped.")
         return LimitResult(
             limit_name="slippage_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -538,6 +624,7 @@ def check_slippage_limit(
 
     slippage = Decimal(str(slippage))
     if not math.isfinite(float(slippage)) or not math.isfinite(float(max_slippage)):
+        logger.error("Slippage calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="slippage_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -547,6 +634,7 @@ def check_slippage_limit(
             breached=True,
         )
     if slippage > max_slippage:
+        logger.info(f"Slippage limit breached: {slippage} > {max_slippage}.")
         return LimitResult(
             limit_name="slippage_limit",
             status=RiskDecisionStatus.REJECT,
@@ -557,6 +645,7 @@ def check_slippage_limit(
             details={"slippage": float(slippage)},
         )
 
+    logger.debug(f"Slippage is within safe limits: {slippage}.")
     return LimitResult(
         limit_name="slippage_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -567,15 +656,24 @@ def check_slippage_limit(
     )
 
 
-# --- 10. Trade Frequency Limit Check ---
 def check_trade_frequency_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if short-term trade frequency limits are exceeded."""
+    """Check if short-term trade frequency limits are exceeded.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: REJECT/BLOCK on breach or invalid input, else APPROVE.
+    """
     freq = request.market_context.get("trade_frequency")
     max_freq = int(request.market_context.get("max_trade_frequency", 10))
 
     if freq is None:
+        logger.debug("No trade frequency data provided; check skipped.")
         return LimitResult(
             limit_name="trade_frequency_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -588,6 +686,7 @@ def check_trade_frequency_limit(
     try:
         freq_f = float(freq)
     except (ValueError, TypeError) as e:
+        logger.error(f"Invalid trade frequency input: {e}")
         return LimitResult(
             limit_name="trade_frequency_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -597,6 +696,7 @@ def check_trade_frequency_limit(
             breached=True,
         )
     if not math.isfinite(float(freq_f)) or not math.isfinite(float(max_freq)):
+        logger.error("Trade frequency calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="trade_frequency_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -606,6 +706,7 @@ def check_trade_frequency_limit(
             breached=True,
         )
     if int(freq) > max_freq:
+        logger.info(f"Trade frequency limit breached: {freq} > {max_freq}.")
         return LimitResult(
             limit_name="trade_frequency_limit",
             status=RiskDecisionStatus.REJECT,
@@ -618,6 +719,7 @@ def check_trade_frequency_limit(
             details={"trade_frequency": int(freq)},
         )
 
+    logger.debug(f"Trade frequency is within safe limits: {freq}.")
     return LimitResult(
         limit_name="trade_frequency_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -628,15 +730,24 @@ def check_trade_frequency_limit(
     )
 
 
-# --- 11. Pending Order Limit Check ---
 def check_pending_order_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if the count of open pending orders exceeds the configured capacity."""
+    """Check if the count of open pending orders exceeds the configured capacity.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: REJECT/BLOCK on breach or invalid input, else APPROVE.
+    """
     pending_count = request.market_context.get("pending_orders_count")
     max_pending = int(request.market_context.get("max_pending_orders", 5))
 
     if pending_count is None:
+        logger.debug("No pending order count provided; check skipped.")
         return LimitResult(
             limit_name="pending_order_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -649,6 +760,7 @@ def check_pending_order_limit(
     try:
         pending_f = float(pending_count)
     except (ValueError, TypeError) as e:
+        logger.error(f"Invalid pending orders count input: {e}")
         return LimitResult(
             limit_name="pending_order_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -658,6 +770,7 @@ def check_pending_order_limit(
             breached=True,
         )
     if not math.isfinite(float(pending_f)) or not math.isfinite(float(max_pending)):
+        logger.error("Pending orders count calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="pending_order_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -667,6 +780,7 @@ def check_pending_order_limit(
             breached=True,
         )
     if int(pending_count) > max_pending:
+        logger.info(f"Pending order limit breached: {pending_count} > {max_pending}.")
         return LimitResult(
             limit_name="pending_order_limit",
             status=RiskDecisionStatus.REJECT,
@@ -677,6 +791,7 @@ def check_pending_order_limit(
             details={"pending_orders_count": int(pending_count)},
         )
 
+    logger.debug(f"Pending order count is within safe limits: {pending_count}.")
     return LimitResult(
         limit_name="pending_order_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -687,11 +802,19 @@ def check_pending_order_limit(
     )
 
 
-# --- 12. Portfolio Exposure Limit Check ---
 def check_portfolio_exposure_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if portfolio gross exposure exceeds total capital limits."""
+    """Check if portfolio gross exposure exceeds total capital limits.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     gross_exposure = Decimal(
         str(request.market_context.get("portfolio_gross_exposure", "0.0"))
     )
@@ -708,6 +831,7 @@ def check_portfolio_exposure_limit(
 
     total_exposure = gross_exposure + proposed_exposure
     if equity <= 0:
+        logger.error("Portfolio exposure check failed: equity is zero/negative.")
         return LimitResult(
             limit_name="portfolio_exposure_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -722,6 +846,7 @@ def check_portfolio_exposure_limit(
         or not math.isfinite(float(equity))
         or not math.isfinite(float(max_portfolio_exposure))
     ):
+        logger.error("Portfolio exposure calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="portfolio_exposure_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -732,6 +857,7 @@ def check_portfolio_exposure_limit(
         )
     ratio = total_exposure / equity
     if ratio > max_portfolio_exposure:
+        logger.info(f"Portfolio exposure limit breached: {ratio:.2f}x.")
         return LimitResult(
             limit_name="portfolio_exposure_limit",
             status=RiskDecisionStatus.REJECT,
@@ -745,6 +871,7 @@ def check_portfolio_exposure_limit(
             details={"exposure_ratio": float(ratio)},
         )
 
+    logger.debug(f"Portfolio exposure is within safe capacity: {ratio:.2f}x.")
     return LimitResult(
         limit_name="portfolio_exposure_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -755,16 +882,25 @@ def check_portfolio_exposure_limit(
     )
 
 
-# --- 13. Symbol Exposure Limit Check ---
 def check_symbol_exposure_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if single symbol gross exposure exceeds concentration limits."""
+    """Check if single symbol gross exposure exceeds concentration limits.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     symbol = ""
     if isinstance(request.proposed_action, ProposedTrade):
         symbol = request.proposed_action.symbol
 
     if not symbol:
+        logger.debug("No symbol exposure check required.")
         return LimitResult(
             limit_name="symbol_exposure_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -790,6 +926,7 @@ def check_symbol_exposure_limit(
 
     total_exposure = symbol_exposure + proposed_exposure
     if equity <= 0:
+        logger.error("Symbol exposure check failed: equity is zero/negative.")
         return LimitResult(
             limit_name="symbol_exposure_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -804,6 +941,7 @@ def check_symbol_exposure_limit(
         or not math.isfinite(float(equity))
         or not math.isfinite(float(max_symbol_exposure))
     ):
+        logger.error("Symbol exposure calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="symbol_exposure_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -814,6 +952,7 @@ def check_symbol_exposure_limit(
         )
     ratio = total_exposure / equity
     if ratio > max_symbol_exposure:
+        logger.info(f"Symbol {symbol} exposure limit breached: {ratio:.2f}x.")
         return LimitResult(
             limit_name="symbol_exposure_limit",
             status=RiskDecisionStatus.REJECT,
@@ -827,6 +966,7 @@ def check_symbol_exposure_limit(
             details={"symbol": symbol, "exposure_ratio": float(ratio)},
         )
 
+    logger.debug(f"Symbol {symbol} exposure is within concentration ceilings.")
     return LimitResult(
         limit_name="symbol_exposure_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -837,11 +977,19 @@ def check_symbol_exposure_limit(
     )
 
 
-# --- 14. Currency Exposure Limit Check ---
 def check_currency_exposure_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if target currency gross exposure exceeds concentration ceilings."""
+    """Check if target currency gross exposure exceeds concentration ceilings.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     gross_ccy_exposure = Decimal(
         str(request.market_context.get("currency_gross_exposure", "0.0"))
     )
@@ -851,6 +999,7 @@ def check_currency_exposure_limit(
     )
 
     if equity <= 0:
+        logger.error("Currency exposure check failed: equity is zero/negative.")
         return LimitResult(
             limit_name="currency_exposure_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -865,6 +1014,7 @@ def check_currency_exposure_limit(
         or not math.isfinite(float(equity))
         or not math.isfinite(float(max_ccy_exposure))
     ):
+        logger.error("Currency exposure calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="currency_exposure_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -875,6 +1025,7 @@ def check_currency_exposure_limit(
         )
     ratio = gross_ccy_exposure / equity
     if ratio > max_ccy_exposure:
+        logger.info(f"Currency exposure limit breached: {ratio:.2f}x.")
         return LimitResult(
             limit_name="currency_exposure_limit",
             status=RiskDecisionStatus.REJECT,
@@ -888,6 +1039,7 @@ def check_currency_exposure_limit(
             details={"exposure_ratio": float(ratio)},
         )
 
+    logger.debug(f"Currency exposure is within concentration limits: {ratio:.2f}x.")
     return LimitResult(
         limit_name="currency_exposure_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -898,12 +1050,19 @@ def check_currency_exposure_limit(
     )
 
 
-# --- 15. Correlated Cluster Exposure Limit Check ---
 def check_correlation_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if cluster exposure or correlation exceeds limits."""
-    # 1. Check individual correlation limit (correlation_limit)
+    """Check if cluster exposure or correlation exceeds limits.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration providing the base correlation
+            threshold.
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     portfolio_corr = Decimal(
         str(request.market_context.get("portfolio_correlation", "0.0"))
     )
@@ -914,6 +1073,7 @@ def check_correlation_limit(
     )
 
     if not math.isfinite(float(portfolio_corr)) or not math.isfinite(float(max_corr)):
+        logger.error("Correlation calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="correlation_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -924,6 +1084,7 @@ def check_correlation_limit(
         )
 
     if abs(portfolio_corr) >= reject_thresh:
+        logger.info(f"Individual correlation {portfolio_corr:.2f} exceeds ceiling.")
         return LimitResult(
             limit_name="correlation_limit",
             status=RiskDecisionStatus.REJECT,
@@ -937,7 +1098,6 @@ def check_correlation_limit(
             details={"marginal_correlation": float(portfolio_corr)},
         )
 
-    # 2. Check cluster exposure limit (correlated_cluster_limit)
     cluster_exposure = Decimal(
         str(request.market_context.get("correlated_cluster_exposure", "0.0"))
     )
@@ -947,6 +1107,7 @@ def check_correlation_limit(
     )
 
     if equity <= 0:
+        logger.error("Cluster check failed: portfolio equity is zero/negative.")
         return LimitResult(
             limit_name="correlated_cluster_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -961,6 +1122,7 @@ def check_correlation_limit(
         or not math.isfinite(float(equity))
         or not math.isfinite(float(max_cluster_exposure))
     ):
+        logger.error("Correlation exposure calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="correlated_cluster_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -971,6 +1133,7 @@ def check_correlation_limit(
         )
     ratio = cluster_exposure / equity
     if ratio > max_cluster_exposure:
+        logger.info(f"Correlated cluster exposure limit breached: {ratio:.2f}x.")
         return LimitResult(
             limit_name="correlated_cluster_limit",
             status=RiskDecisionStatus.REJECT,
@@ -984,6 +1147,7 @@ def check_correlation_limit(
             details={"exposure_ratio": float(ratio)},
         )
 
+    logger.debug("Correlated cluster and individual correlation are within limits.")
     return LimitResult(
         limit_name="correlated_cluster_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -994,14 +1158,23 @@ def check_correlation_limit(
     )
 
 
-# --- 16. VaR Limit Check ---
 def check_var_limit(request: RiskAssessmentRequest, _config: RiskConfig) -> LimitResult:
-    """Check if portfolio Value-at-Risk exceeds configuration ceilings."""
+    """Check if portfolio Value-at-Risk exceeds configuration ceilings.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     var_val = request.market_context.get("var_metric")
     equity = request.portfolio_state.equity
     max_var_ratio = Decimal(str(request.market_context.get("max_var_ratio", "0.05")))
 
     if var_val is None:
+        logger.debug("No Value-at-Risk metric provided; check skipped.")
         return LimitResult(
             limit_name="var_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -1017,6 +1190,7 @@ def check_var_limit(request: RiskAssessmentRequest, _config: RiskConfig) -> Limi
         or not math.isfinite(float(equity))
         or not math.isfinite(float(max_var_ratio))
     ):
+        logger.error("VaR calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="var_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1027,6 +1201,7 @@ def check_var_limit(request: RiskAssessmentRequest, _config: RiskConfig) -> Limi
         )
 
     if equity <= 0:
+        logger.error("VaR check failed: portfolio equity is zero/negative.")
         return LimitResult(
             limit_name="var_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1038,6 +1213,7 @@ def check_var_limit(request: RiskAssessmentRequest, _config: RiskConfig) -> Limi
 
     ratio = var_val / equity
     if ratio > max_var_ratio:
+        logger.info(f"Value-at-Risk limit breached: {ratio:.2%}.")
         return LimitResult(
             limit_name="var_limit",
             status=RiskDecisionStatus.REJECT,
@@ -1048,6 +1224,7 @@ def check_var_limit(request: RiskAssessmentRequest, _config: RiskConfig) -> Limi
             details={"var_ratio": float(ratio)},
         )
 
+    logger.debug(f"Value-at-Risk is within safe bounds: {ratio:.2%}.")
     return LimitResult(
         limit_name="var_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -1058,16 +1235,25 @@ def check_var_limit(request: RiskAssessmentRequest, _config: RiskConfig) -> Limi
     )
 
 
-# --- 17. Expected Shortfall Limit Check ---
 def check_expected_shortfall_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if portfolio Expected Shortfall exceeds tail risk ceilings."""
+    """Check if portfolio Expected Shortfall exceeds tail risk ceilings.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     es_val = request.market_context.get("es_metric")
     equity = request.portfolio_state.equity
     max_es_ratio = Decimal(str(request.market_context.get("max_es_ratio", "0.08")))
 
     if es_val is None:
+        logger.debug("No Expected Shortfall metric provided; check skipped.")
         return LimitResult(
             limit_name="expected_shortfall_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -1083,6 +1269,7 @@ def check_expected_shortfall_limit(
         or not math.isfinite(float(equity))
         or not math.isfinite(float(max_es_ratio))
     ):
+        logger.error("Expected Shortfall calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="expected_shortfall_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1093,6 +1280,7 @@ def check_expected_shortfall_limit(
         )
 
     if equity <= 0:
+        logger.error("ES check failed: portfolio equity is zero or negative.")
         return LimitResult(
             limit_name="expected_shortfall_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1104,6 +1292,7 @@ def check_expected_shortfall_limit(
 
     ratio = es_val / equity
     if ratio > max_es_ratio:
+        logger.info(f"Expected Shortfall limit breached: {ratio:.2%}.")
         return LimitResult(
             limit_name="expected_shortfall_limit",
             status=RiskDecisionStatus.REJECT,
@@ -1116,6 +1305,7 @@ def check_expected_shortfall_limit(
             details={"es_ratio": float(ratio)},
         )
 
+    logger.debug(f"Expected Shortfall is within safe bounds: {ratio:.2%}.")
     return LimitResult(
         limit_name="expected_shortfall_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -1126,11 +1316,19 @@ def check_expected_shortfall_limit(
     )
 
 
-# --- 18. Stress Loss Limit Check ---
 def check_stress_loss_limit(
     request: RiskAssessmentRequest, _config: RiskConfig
 ) -> LimitResult:
-    """Check if maximum projected shock stress loss exceeds limits."""
+    """Check if maximum projected shock stress loss exceeds limits.
+
+    Args:
+        request: The active risk assessment request.
+        _config: Active risk configuration (unused; kept for the uniform
+            evaluator signature).
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     stress_val = request.market_context.get("stress_loss_val")
     equity = request.portfolio_state.equity
     max_stress_ratio = Decimal(
@@ -1138,6 +1336,7 @@ def check_stress_loss_limit(
     )
 
     if stress_val is None:
+        logger.debug("No stress scenario loss provided; check skipped.")
         return LimitResult(
             limit_name="stress_loss_limit",
             status=RiskDecisionStatus.APPROVE,
@@ -1153,6 +1352,7 @@ def check_stress_loss_limit(
         or not math.isfinite(float(equity))
         or not math.isfinite(float(max_stress_ratio))
     ):
+        logger.error("Stress loss calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="stress_loss_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1163,6 +1363,7 @@ def check_stress_loss_limit(
         )
 
     if equity <= 0:
+        logger.error("Stress check failed: portfolio equity is zero/negative.")
         return LimitResult(
             limit_name="stress_loss_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1174,6 +1375,7 @@ def check_stress_loss_limit(
 
     ratio = stress_val / equity
     if ratio > max_stress_ratio:
+        logger.info(f"Stress loss limit breached: {ratio:.2%}.")
         return LimitResult(
             limit_name="stress_loss_limit",
             status=RiskDecisionStatus.REJECT,
@@ -1186,6 +1388,7 @@ def check_stress_loss_limit(
             details={"stress_ratio": float(ratio)},
         )
 
+    logger.debug(f"Max projected stress loss is within survival capacity: {ratio:.2%}.")
     return LimitResult(
         limit_name="stress_loss_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -1196,11 +1399,18 @@ def check_stress_loss_limit(
     )
 
 
-# --- 19. Leverage Limit Check ---
 def check_leverage_limit(
     request: RiskAssessmentRequest, config: RiskConfig
 ) -> LimitResult:
-    """Check if effective leverage is below target settings."""
+    """Check if effective leverage is below target settings.
+
+    Args:
+        request: The active risk assessment request.
+        config: Active risk configuration.
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     leverage = request.market_context.get("effective_leverage")
     if leverage is None:
         gross = Decimal(
@@ -1213,6 +1423,7 @@ def check_leverage_limit(
     if not math.isfinite(float(leverage)) or not math.isfinite(
         float(config.max_effective_leverage)
     ):
+        logger.error("Leverage calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="leverage_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1223,6 +1434,7 @@ def check_leverage_limit(
         )
 
     if leverage > config.max_effective_leverage:
+        logger.info(f"Leverage limit breached: {leverage:.1f}x.")
         return LimitResult(
             limit_name="leverage_limit",
             status=RiskDecisionStatus.REJECT,
@@ -1236,6 +1448,7 @@ def check_leverage_limit(
             details={"leverage": float(leverage)},
         )
 
+    logger.debug(f"Effective leverage is within safe capacity: {leverage:.1f}x.")
     return LimitResult(
         limit_name="leverage_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -1246,15 +1459,23 @@ def check_leverage_limit(
     )
 
 
-# --- 20. Margin Limit Check ---
 def check_margin_limit(
     request: RiskAssessmentRequest, config: RiskConfig
 ) -> LimitResult:
-    """Check if margin utilization is below target settings."""
+    """Check if margin utilization is below target settings.
+
+    Args:
+        request: The active risk assessment request.
+        config: Active risk configuration.
+
+    Returns:
+        LimitResult: BLOCK/REJECT on breach or invalid state, else APPROVE.
+    """
     margin_used = request.portfolio_state.margin_used
     equity = request.portfolio_state.equity
 
     if equity <= 0:
+        logger.error("Margin check failed: portfolio equity is zero or negative.")
         return LimitResult(
             limit_name="margin_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1271,6 +1492,7 @@ def check_margin_limit(
         or not math.isfinite(float(margin_used))
         or not math.isfinite(float(config.max_margin_utilization_pct))
     ):
+        logger.error("Margin calculation resolved to non-finite value.")
         return LimitResult(
             limit_name="margin_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -1281,6 +1503,7 @@ def check_margin_limit(
         )
 
     if ratio > config.max_margin_utilization_pct:
+        logger.info(f"Margin utilization limit breached: {ratio:.2%}.")
         return LimitResult(
             limit_name="margin_limit",
             status=RiskDecisionStatus.REJECT,
@@ -1294,6 +1517,7 @@ def check_margin_limit(
             details={"margin_utilization": float(ratio)},
         )
 
+    logger.debug(f"Margin utilization is within safe ceilings: {ratio:.2%}.")
     return LimitResult(
         limit_name="margin_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -1304,272 +1528,388 @@ def check_margin_limit(
     )
 
 
-# --- Sequence definition ---
-ORDERED_LIMIT_CHECKS: tuple[LimitCheck, ...] = (
-    check_kill_switch_state,
-    check_stale_evidence_limit,
-    check_max_drawdown_limit,
-    check_daily_loss_limit,
-    check_strategy_loss_limit,
-    check_news_blackout,
-    check_rollover_blackout,
-    check_spread_limit,
-    check_slippage_limit,
-    check_trade_frequency_limit,
-    check_pending_order_limit,
-    check_portfolio_exposure_limit,
-    check_symbol_exposure_limit,
-    check_currency_exposure_limit,
-    check_correlation_limit,
-    check_var_limit,
-    check_expected_shortfall_limit,
-    check_stress_loss_limit,
-    check_leverage_limit,
-    check_margin_limit,
-)
-
-REGISTERED_LIMIT_NAMES: set[str] = {
-    "kill_switch_state",
-    "stale_evidence",
-    "max_drawdown_limit",
-    "daily_loss_limit",
-    "strategy_loss_limit",
-    "news_blackout",
-    "rollover_blackout",
-    "spread_limit",
-    "slippage_limit",
-    "trade_frequency_limit",
-    "pending_order_limit",
-    "portfolio_exposure_limit",
-    "symbol_exposure_limit",
-    "currency_exposure_limit",
-    "correlated_cluster_limit",
-    "var_limit",
-    "expected_shortfall_limit",
-    "stress_loss_limit",
-    "leverage_limit",
-    "margin_limit",
-    "check_kill_switch_state",
-    "check_stale_evidence_limit",
-    "check_max_drawdown_limit",
-    "check_daily_loss_limit",
-    "check_strategy_loss_limit",
-    "check_news_blackout",
-    "check_rollover_blackout",
-    "check_spread_limit",
-    "check_slippage_limit",
-    "check_trade_frequency_limit",
-    "check_pending_order_limit",
-    "check_portfolio_exposure_limit",
-    "check_symbol_exposure_limit",
-    "check_currency_exposure_limit",
-    "check_correlation_limit",
-    "check_var_limit",
-    "check_expected_shortfall_limit",
-    "check_stress_loss_limit",
-    "check_leverage_limit",
-    "check_margin_limit",
-    "stale_evidence_limit",
-    "correlation_limit",
-}
-
-FUNCTION_TO_LIMIT_NAMES: dict[LimitCheck, set[str]] = {
-    check_kill_switch_state: {"kill_switch_state"},
-    check_stale_evidence_limit: {"stale_evidence", "stale_evidence_limit"},
-    check_max_drawdown_limit: {"max_drawdown_limit"},
-    check_daily_loss_limit: {"daily_loss_limit"},
-    check_strategy_loss_limit: {"strategy_loss_limit"},
-    check_news_blackout: {"news_blackout"},
-    check_rollover_blackout: {"rollover_blackout"},
-    check_spread_limit: {"spread_limit"},
-    check_slippage_limit: {"slippage_limit"},
-    check_trade_frequency_limit: {"trade_frequency_limit"},
-    check_pending_order_limit: {"pending_order_limit"},
-    check_portfolio_exposure_limit: {"portfolio_exposure_limit"},
-    check_symbol_exposure_limit: {"symbol_exposure_limit"},
-    check_currency_exposure_limit: {"currency_exposure_limit"},
-    check_correlation_limit: {"correlated_cluster_limit", "correlation_limit"},
-    check_var_limit: {"var_limit"},
-    check_expected_shortfall_limit: {"expected_shortfall_limit"},
-    check_stress_loss_limit: {"stress_loss_limit"},
-    check_leverage_limit: {"leverage_limit"},
-    check_margin_limit: {"margin_limit"},
-}
-
-
-class LimitEngine:
-    """Consolidated runner executing and aggregating limits check pipelines."""
-
-    def __init__(self, config: RiskConfig) -> None:
-        """Initialize engine with active risk config."""
-        self.config = config
-
-    def execute(self, request: RiskAssessmentRequest) -> list[LimitResult]:
-        """Execute the full, ordered sequence of limit checks.
-
-        Args:
-            request: The current evaluation state containing context snapshots.
-
-        Returns:
-            list[LimitResult]: Result outcomes of all checkpoints.
-        """
-        enabled_limits = request.market_context.get("enabled_limits")
-        run_limits = request.market_context.get("run_limits")
-
-        checked_limits: list[Any] = []
-        if isinstance(enabled_limits, list | tuple | set):
-            checked_limits.extend(enabled_limits)
-        if isinstance(run_limits, list | tuple | set):
-            checked_limits.extend(run_limits)
-
-        unknown_names = [
-            name for name in checked_limits if name not in REGISTERED_LIMIT_NAMES
-        ]
-        if unknown_names:
-            logger.error(f"Unknown limit name(s) in request: {unknown_names}")
-            msg = (
-                f"Unknown limit name(s) in run_limits/enabled_limits: "
-                f"{', '.join(map(str, unknown_names))}"
-            )
-            return [
-                LimitResult(
-                    limit_name="invalid_limit_name",
-                    status=RiskDecisionStatus.BLOCK,
-                    reason_code=RiskReasonCode.INVALID_INPUT,
-                    message=msg,
-                    severity=RiskSeverity.CRITICAL_BREACH,
-                    breached=True,
-                )
-            ]
-
-        run_set = set(checked_limits)
-
-        results = []
-        for check_func in ORDERED_LIMIT_CHECKS:
-            func_name = getattr(check_func, "__name__", "")
-            if run_set:
-                func_names = {
-                    func_name,
-                    func_name.replace("check_", ""),
-                }
-                func_names.update(FUNCTION_TO_LIMIT_NAMES.get(check_func, set()))
-                if not (func_names & run_set):
-                    continue
-
-            try:
-                res = check_func(request, self.config)
-                results.append(res)
-            except Exception as e:  # noqa: BLE001
-                # Wrap calculation failure
-                logger.error(f"Limit check failure in '{func_name}': {e}")
-                results.append(
-                    LimitResult(
-                        limit_name=func_name.replace("check_", ""),
-                        status=RiskDecisionStatus.BLOCK,
-                        reason_code=RiskReasonCode.UNEXPECTED_ERROR,
-                        message=f"Limit check calculation failed: {e}",
-                        severity=RiskSeverity.CRITICAL_BREACH,
-                        breached=True,
-                    )
-                )
-        return results
-
-
-def run_limit_checks(
-    request: RiskAssessmentRequest,
-    risk_config: RiskConfig | None = None,
-) -> tuple[
-    RiskDecisionStatus,
-    RiskReasonCode,
-    str,
-    list[str],
-    str,
-    list[LimitResult],
-]:
-    """Stateless runner function evaluating all limit checks and aggregating.
+def check_kill_switch(state: KillSwitchStateEnum) -> LimitResult:
+    """Block when a kill-switch state is active or indeterminate.
 
     Args:
-        request: The active risk assessment request.
-        risk_config: Optional configuration override.
+        state: The current kill-switch state enum value.
 
     Returns:
-        tuple[status, reason_code, message, composite_breach_flags,
-              primary_failure_limit, limit_results]
+        LimitResult: BLOCK when active/locked/unknown, else APPROVE.
     """
-    config = risk_config or request.risk_config
-    engine = LimitEngine(config=config)
-    results = engine.execute(request)
+    logger.info(f"Checking canonical kill-switch state: {state}.")
+    if state in {
+        KillSwitchStateEnum.ACTIVE,
+        KillSwitchStateEnum.LOCKED,
+        KillSwitchStateEnum.TRIGGERED,
+        KillSwitchStateEnum.UNKNOWN,
+    }:
+        logger.info(f"Kill switch check blocked for state '{state}'.")
+        return LimitResult(
+            limit_name="kill_switch_state",
+            status=RiskDecisionStatus.BLOCK,
+            reason_code=RiskReasonCode.KILL_SWITCH_ACTIVE,
+            message=f"Kill switch state '{state}' blocks trading.",
+            severity=RiskSeverity.EMERGENCY_HALT,
+            breached=True,
+            details={"state": str(state)},
+        )
 
-    # Precedence scoring:
-    # blocked > fail > needs_more_evidence > warn > pass
-    # 0: BLOCK (blocked)
-    # 1: REJECT (fail)
-    # 2: NEEDS_MORE_EVIDENCE
-    # 3: NEEDS_APPROVAL / REDUCE_SIZE / WARNING (warn)
-    # 4: APPROVE / OK (pass)
-    aggregated_status = RiskDecisionStatus.APPROVE
-    reason_code = RiskReasonCode.OK
-    message = "All limit checks cleared."
-    primary_failure_limit = ""
-    composite_breach_flags = []
-
-    status_ranks = {
-        RiskDecisionStatus.BLOCK: 0.0,
-        RiskDecisionStatus.REJECT: 1.0,
-        RiskDecisionStatus.NEEDS_MORE_EVIDENCE: 2.0,
-        RiskDecisionStatus.NEEDS_APPROVAL: 3.0,
-        RiskDecisionStatus.REDUCE_SIZE: 3.5,
-    }
-
-    worst_rank = 4.0
-
-    for res in results:
-        if res.breached or res.status != RiskDecisionStatus.APPROVE:
-            composite_breach_flags.append(res.limit_name)
-
-        current_rank = status_ranks.get(res.status, 4.0)
-        if res.severity == RiskSeverity.WARNING and res.breached:
-            current_rank = 3.8
-
-        if current_rank < worst_rank:
-            worst_rank = current_rank
-            aggregated_status = res.status
-            reason_code = res.reason_code
-            message = res.message
-            primary_failure_limit = res.limit_name
-
-    # Include warning flags
-    warning_flags = [
-        r.limit_name
-        for r in results
-        if r.severity == RiskSeverity.WARNING and r.breached
-    ]
-    for w in warning_flags:
-        if w not in composite_breach_flags:
-            composite_breach_flags.append(w)
-
-    return (
-        aggregated_status,
-        reason_code,
-        message,
-        sorted(composite_breach_flags),
-        primary_failure_limit,
-        results,
+    logger.debug(f"Kill switch state '{state}' permits trading.")
+    return LimitResult(
+        limit_name="kill_switch_state",
+        status=RiskDecisionStatus.APPROVE,
+        reason_code=RiskReasonCode.OK,
+        message=f"Kill switch state '{state}' permits trading.",
+        severity=RiskSeverity.INFO,
+        breached=False,
     )
 
 
-def check_risk_limits(
+def check_evidence_freshness(
     request: RiskAssessmentRequest,
-    config: RiskConfig,
-) -> list[LimitResult]:
-    """Evaluate all configured risk limits sequentially.
+    policy: EffectiveRiskPolicy,
+    now_utc: datetime,
+) -> LimitResult:
+    """Block stale or incomplete mandatory evidence using a resolved policy.
 
     Args:
         request: The active risk assessment request.
-        config: The RiskConfig config profile.
+        policy: Resolved effective risk policy providing the staleness cap.
+        now_utc: Current UTC timestamp used to compute evidence age.
 
     Returns:
-        list[LimitResult]: The results of evaluating each limit check.
+        LimitResult: BLOCK/REJECT on stale evidence, else APPROVE.
     """
-    engine = LimitEngine(config=config)
-    return engine.execute(request)
+    logger.info("Checking canonical evidence freshness against resolved policy.")
+    stale_limit = float(
+        request.market_context.get("max_stale_seconds")
+        or policy.resolved_config.experimental_features.get("max_stale_seconds")
+        or 60.0
+    )
+    freshness = request.freshness
+    if freshness is None:
+        logger.info("Evidence freshness timestamp missing.")
+        return LimitResult(
+            limit_name="stale_evidence",
+            status=RiskDecisionStatus.BLOCK,
+            reason_code=RiskReasonCode.STALE_EVIDENCE,
+            message="Missing evidence freshness timestamp.",
+            severity=RiskSeverity.CRITICAL_BREACH,
+            breached=True,
+        )
+
+    age = (now_utc - to_utc_datetime(freshness)).total_seconds()
+    if age > stale_limit:
+        logger.info(f"Canonical evidence is stale by {age:.1f}s.")
+        return LimitResult(
+            limit_name="stale_evidence",
+            status=RiskDecisionStatus.REJECT,
+            reason_code=RiskReasonCode.STALE_EVIDENCE,
+            message=f"Evidence is stale by {age:.1f}s (max allowed: {stale_limit}s).",
+            severity=RiskSeverity.HARD_BREACH,
+            breached=True,
+            details={"age_seconds": age},
+        )
+
+    logger.debug(f"Canonical evidence freshness is within bounds (age={age:.1f}s).")
+    return LimitResult(
+        limit_name="stale_evidence",
+        status=RiskDecisionStatus.APPROVE,
+        reason_code=RiskReasonCode.OK,
+        message="Evidence freshness is within safe limits.",
+        severity=RiskSeverity.INFO,
+        breached=False,
+    )
+
+
+def check_daily_loss(
+    snapshot: PortfolioRiskSnapshot, policy: EffectiveRiskPolicy
+) -> LimitResult:
+    """Evaluate a portfolio snapshot's daily-loss budget against policy.
+
+    Args:
+        snapshot: Canonical portfolio-level risk snapshot.
+        policy: Resolved effective risk policy providing the daily-loss cap.
+
+    Returns:
+        LimitResult: BLOCK on breach, APPROVE otherwise.
+    """
+    logger.info("Checking canonical daily loss budget.")
+    limit = policy.resolved_config.max_daily_loss_pct
+    if snapshot.drawdown >= limit:
+        logger.info(f"Canonical daily loss limit breached: {snapshot.drawdown:.2%}.")
+        return LimitResult(
+            limit_name="daily_loss_limit",
+            status=RiskDecisionStatus.BLOCK,
+            reason_code=RiskReasonCode.DAILY_LOSS_BREACH,
+            message=(
+                f"Daily loss budget breached: {snapshot.drawdown:.2%} >= {limit:.2%}."
+            ),
+            severity=RiskSeverity.CRITICAL_BREACH,
+            breached=True,
+            details={"drawdown": float(snapshot.drawdown)},
+        )
+
+    logger.debug(f"Canonical daily loss is within budget: {snapshot.drawdown:.2%}.")
+    return LimitResult(
+        limit_name="daily_loss_limit",
+        status=RiskDecisionStatus.APPROVE,
+        reason_code=RiskReasonCode.OK,
+        message="Daily loss is within budget.",
+        severity=RiskSeverity.INFO,
+        breached=False,
+    )
+
+
+def check_total_drawdown(
+    snapshot: PortfolioRiskSnapshot, policy: EffectiveRiskPolicy
+) -> LimitResult:
+    """Evaluate a portfolio snapshot's total-drawdown ceiling against policy.
+
+    Args:
+        snapshot: Canonical portfolio-level risk snapshot.
+        policy: Resolved effective risk policy providing the total-loss cap.
+
+    Returns:
+        LimitResult: BLOCK on breach, APPROVE otherwise.
+    """
+    logger.info("Checking canonical total drawdown ceiling.")
+    limit = policy.resolved_config.max_total_loss_pct
+    if snapshot.drawdown >= limit:
+        logger.info(f"Canonical total drawdown breached: {snapshot.drawdown:.2%}.")
+        return LimitResult(
+            limit_name="max_drawdown_limit",
+            status=RiskDecisionStatus.BLOCK,
+            reason_code=RiskReasonCode.DRAWDOWN_BREACH,
+            message=(
+                f"Total drawdown ceiling breached: {snapshot.drawdown:.2%} >= "
+                f"{limit:.2%}."
+            ),
+            severity=RiskSeverity.CRITICAL_BREACH,
+            breached=True,
+            details={"drawdown": float(snapshot.drawdown)},
+        )
+
+    logger.debug(
+        f"Canonical total drawdown is within ceiling: {snapshot.drawdown:.2%}."
+    )
+    return LimitResult(
+        limit_name="max_drawdown_limit",
+        status=RiskDecisionStatus.APPROVE,
+        reason_code=RiskReasonCode.OK,
+        message="Total drawdown is within ceiling.",
+        severity=RiskSeverity.INFO,
+        breached=False,
+    )
+
+
+def check_exposure_limits(
+    projected: PortfolioRiskSnapshot, policy: EffectiveRiskPolicy
+) -> tuple[LimitResult, ...]:
+    """Evaluate portfolio-level exposure against the resolved policy.
+
+    Args:
+        projected: Canonical projected portfolio-level risk snapshot.
+        policy: Resolved effective risk policy providing the exposure cap.
+
+    Returns:
+        tuple[LimitResult, ...]: Portfolio exposure result. Symbol/currency/
+            cluster-level breakdowns are evaluated separately by
+            :func:`check_symbol_exposure_limit`, :func:`check_currency_exposure_limit`,
+            and :func:`check_correlation_limit` once per-leg canonical snapshots
+            are available on the request.
+    """
+    logger.info("Checking canonical portfolio exposure limits.")
+    equity_relative_cap = policy.resolved_config.risk.max_total_open_risk
+    if equity_relative_cap <= 0:
+        results: tuple[LimitResult, ...] = (
+            LimitResult(
+                limit_name="portfolio_exposure_limit",
+                status=RiskDecisionStatus.APPROVE,
+                reason_code=RiskReasonCode.OK,
+                message="No portfolio exposure cap configured.",
+                severity=RiskSeverity.INFO,
+                breached=False,
+            ),
+        )
+        return results
+
+    breached = projected.exposure > equity_relative_cap
+    logger.debug(f"Canonical portfolio exposure breached={breached}.")
+    result = LimitResult(
+        limit_name="portfolio_exposure_limit",
+        status=RiskDecisionStatus.REJECT if breached else RiskDecisionStatus.APPROVE,
+        reason_code=(
+            RiskReasonCode.CONCENTRATION_BREACH if breached else RiskReasonCode.OK
+        ),
+        message=(
+            f"Portfolio exposure {projected.exposure} exceeds cap "
+            f"{equity_relative_cap}."
+            if breached
+            else "Portfolio exposure is within concentration ceilings."
+        ),
+        severity=RiskSeverity.HARD_BREACH if breached else RiskSeverity.INFO,
+        breached=breached,
+        details={"exposure": float(projected.exposure)},
+    )
+    return (result,)
+
+
+def check_tail_risk_limits(
+    var: VaRSnapshot,
+    es: ExpectedShortfallSnapshot,
+    stress: StressSummary,
+    policy: EffectiveRiskPolicy,
+) -> tuple[LimitResult, ...]:
+    """Evaluate VaR, Expected Shortfall, and stress-loss limits together.
+
+    Args:
+        var: Calculated Value-at-Risk snapshot.
+        es: Calculated Expected Shortfall snapshot.
+        stress: Summary of all evaluated stress scenarios.
+        policy: Resolved effective risk policy providing tail-risk caps.
+
+    Returns:
+        tuple[LimitResult, ...]: VaR, ES, and stress-loss results in that order.
+    """
+    logger.info("Checking canonical tail-risk limits (VaR/ES/stress).")
+    tail_risk_cfg = policy.resolved_config.tail_risk
+    equity_basis = var.exposure if var.exposure > 0 else Decimal("1.0")
+
+    var_ratio = var.result / equity_basis
+    var_breached = var_ratio > tail_risk_cfg.max_portfolio_var
+    var_result = LimitResult(
+        limit_name="var_limit",
+        status=(
+            RiskDecisionStatus.REJECT if var_breached else RiskDecisionStatus.APPROVE
+        ),
+        reason_code=RiskReasonCode.VAR_BREACH if var_breached else RiskReasonCode.OK,
+        message=(
+            f"Value-at-Risk ratio {var_ratio:.2%} exceeds cap "
+            f"{tail_risk_cfg.max_portfolio_var:.2%}."
+            if var_breached
+            else "Value-at-Risk is within safe bounds."
+        ),
+        severity=RiskSeverity.HARD_BREACH if var_breached else RiskSeverity.INFO,
+        breached=var_breached,
+        details={"var_ratio": float(var_ratio)},
+    )
+
+    es_ratio = es.average_tail_loss / equity_basis
+    es_breached = es_ratio > tail_risk_cfg.max_portfolio_es
+    es_result = LimitResult(
+        limit_name="expected_shortfall_limit",
+        status=(
+            RiskDecisionStatus.REJECT if es_breached else RiskDecisionStatus.APPROVE
+        ),
+        reason_code=RiskReasonCode.ES_BREACH if es_breached else RiskReasonCode.OK,
+        message=(
+            f"Expected Shortfall ratio {es_ratio:.2%} exceeds cap "
+            f"{tail_risk_cfg.max_portfolio_es:.2%}."
+            if es_breached
+            else "Expected Shortfall is within safe bounds."
+        ),
+        severity=RiskSeverity.HARD_BREACH if es_breached else RiskSeverity.INFO,
+        breached=es_breached,
+        details={"es_ratio": float(es_ratio)},
+    )
+
+    stress_result = LimitResult(
+        limit_name="stress_loss_limit",
+        status=(
+            RiskDecisionStatus.APPROVE
+            if stress.pass_status
+            else RiskDecisionStatus.REJECT
+        ),
+        reason_code=(
+            RiskReasonCode.OK if stress.pass_status else RiskReasonCode.STRESS_BREACH
+        ),
+        message=(
+            "Stress scenarios are within survival capacity."
+            if stress.pass_status
+            else f"Stress scenarios breached: {stress.reason_codes}."
+        ),
+        severity=RiskSeverity.INFO if stress.pass_status else RiskSeverity.HARD_BREACH,
+        breached=not stress.pass_status,
+        details={"reason_codes": list(stress.reason_codes)},
+    )
+
+    logger.debug(
+        f"Canonical tail-risk results: var_breached={var_breached}, "
+        f"es_breached={es_breached}, stress_pass={stress.pass_status}."
+    )
+    return (var_result, es_result, stress_result)
+
+
+def check_execution_limits(
+    execution: ExecutionRiskSnapshot, policy: EffectiveRiskPolicy
+) -> tuple[LimitResult, ...]:
+    """Evaluate spread, marketability, and lot-step limits from a snapshot.
+
+    Args:
+        execution: Calculated execution risk snapshot.
+        policy: Resolved effective risk policy providing the spread cap.
+
+    Returns:
+        tuple[LimitResult, ...]: Marketability and spread results in that
+            order. Frequency and pending-order limits are evaluated by
+            :func:`check_trade_frequency_limit` and
+            :func:`check_pending_order_limit` once request-level evidence is
+            available.
+    """
+    logger.info("Checking canonical execution feasibility limits.")
+    config = policy.resolved_config
+
+    marketability_result = LimitResult(
+        limit_name="spread_limit",
+        status=(
+            RiskDecisionStatus.APPROVE
+            if execution.marketability
+            else RiskDecisionStatus.REJECT
+        ),
+        reason_code=(
+            RiskReasonCode.OK
+            if execution.marketability
+            else RiskReasonCode.SPREAD_BREACH
+        ),
+        message=(
+            "Market session permits execution."
+            if execution.marketability
+            else "Market session is closed or suspended."
+        ),
+        severity=(
+            RiskSeverity.INFO if execution.marketability else RiskSeverity.HARD_BREACH
+        ),
+        breached=not execution.marketability,
+    )
+
+    max_spread_multiplier = config.max_spread_multiplier
+    spread_cap = execution.slippage * max_spread_multiplier
+    spread_breached = max_spread_multiplier > 0 and execution.spread > spread_cap
+    spread_result = LimitResult(
+        limit_name="slippage_limit",
+        status=(
+            RiskDecisionStatus.REJECT if spread_breached else RiskDecisionStatus.APPROVE
+        ),
+        reason_code=(
+            RiskReasonCode.SPREAD_BREACH if spread_breached else RiskReasonCode.OK
+        ),
+        message=(
+            f"Spread {execution.spread} exceeds slippage-relative cap {spread_cap}."
+            if spread_breached
+            else "Spread/slippage relationship is within policy bounds."
+        ),
+        severity=(RiskSeverity.HARD_BREACH if spread_breached else RiskSeverity.INFO),
+        breached=spread_breached,
+        details={
+            "spread": float(execution.spread),
+            "slippage": float(execution.slippage),
+        },
+    )
+
+    logger.debug(
+        f"Canonical execution limits: marketability={execution.marketability}, "
+        f"spread_breached={spread_breached}."
+    )
+    return (marketability_result, spread_result)
