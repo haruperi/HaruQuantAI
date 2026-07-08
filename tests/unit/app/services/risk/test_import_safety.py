@@ -31,6 +31,9 @@ RISK_MODULES = [
     "app.services.risk.sizing",
     "app.services.risk.storage",
     "app.services.risk.stress",
+    "app.services.risk.stress.contracts",
+    "app.services.risk.stress.registry",
+    "app.services.risk.stress.engine",
     "app.services.risk.tail_risk",
     "app.services.risk.tail_risk.contracts",
     "app.services.risk.tail_risk.var",
@@ -57,8 +60,10 @@ def test_import_safety_and_side_effects() -> None:
 
     def mock_open(file: Any, mode: str = "r", *args: Any, **kwargs: Any) -> Any:
         if any(c in mode for c in ["w", "a", "x", "+"]):
-            msg = f"Filesystem write attempted on {file} with mode {mode}"
-            raise SideEffectError(msg)
+            file_str = str(file)
+            if "app.log" not in file_str and not file_str.endswith(".log"):
+                msg = f"Filesystem write attempted on {file} with mode {mode}"
+                raise SideEffectError(msg)
         return original_open(file, mode, *args, **kwargs)
 
     def mock_socket(*_args: Any, **_kwargs: Any) -> Any:

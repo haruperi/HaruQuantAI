@@ -907,6 +907,43 @@ def example_07_portfolio_stress_scenario_testing() -> None:
         f"  Evaluation result - Projected Equity: {res_custom.projected_equity:.2f} USD (Impact: {res_custom.impact_pct * 100:.2f}%)"
     )
 
+    # 5. Demonstrate new V2 Declarative Stress Engine APIs
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+    from app.services.risk.stress import StressScenarioRegistry
+    from app.services.risk.stress.contracts import StressContext, StressScenario
+    from app.services.risk.stress.engine import evaluate_stress_scenarios
+
+    print("\n[V2] Declarative Stress Engine evaluation:")
+    v2_registry = StressScenarioRegistry()
+    # Register V2 declarative stress scenario
+    v2_scenario = StressScenario(
+        scenario_id="extreme_eur_down_v2",
+        name="EURUSD Down 10%",
+        price_shocks={"EURUSD": Decimal("-0.10")},
+    )
+    v2_registry.scenarios[v2_scenario.scenario_id] = v2_scenario
+
+    v2_context = StressContext(
+        portfolio_state=portfolio,
+        proposed_trade=None,
+        market_context=market_context,
+    )
+    v2_policy = EffectiveRiskPolicy(
+        policy_id="v2_usage_policy",
+        resolved_config=config,
+        policy_hash="default_hash",
+    )
+    v2_summary = evaluate_stress_scenarios(
+        context=v2_context,
+        registry=v2_registry,
+        policy=v2_policy,
+    )
+    print(f"  V2 evaluation summary status: {v2_summary.pass_status}")
+    for res_v2 in v2_summary.results:
+        print(
+            f"  V2 Scenario: {res_v2.scenario_name:<20} | Pass: {res_v2.pass_status:<5} | Loss: {res_v2.impact_pct * 100:.2f}%"
+        )
+
 
 # ==============================================================================
 # PHASE 3: ALLOCATION & LIFECYCLE

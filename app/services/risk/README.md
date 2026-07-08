@@ -267,10 +267,15 @@ The Value-at-Risk (VaR) and Expected Shortfall (ES) Engine computes portfolio ta
 
 ## 14. Stress Testing Engine
 
-The Stress Testing Engine under [stress/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/stress/) evaluates portfolio and candidate trade resilience under extreme macro shocks and execution failures.
+The Stress Testing Engine is organized as a modular package under [stress/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/stress/) and evaluates portfolio and candidate trade resilience under extreme macro shocks and execution failures.
+
+* **`contracts.py`**: Defines Pydantic model schemas for declarative stress scenarios, execution contexts, projected portfolios, and summary results (`StressScenario`, `ProjectedPortfolio`, `StressScenarioResult`, etc.).
+* **`registry.py`**: Manages the scenario registry, validation checks, and lookup facades (`StressScenarioRegistry`).
+* **`engine.py`**: Implements the V2 stress calculation logic, standard stress loss, GBP volatility calculations, and threshold comparisons (`evaluate_stress_scenarios`).
+* **`__init__.py`**: Exposes legacy compatibility wrappers (e.g. `PriceShockScenario`, `USDShockScenario`, `evaluate_portfolio`, `validate_custom_scenario`) to support version 1 interfaces.
 
 ### Default Scenarios
-The default registry contains 12 pre-loaded scenarios:
+The default registry contains 13 pre-loaded scenarios:
 1. **USD Shock Up / Down**: Shocks USD exchange rates by $\pm 10\%$.
 2. **JPY Risk-Off**: Appreciation of JPY by $10\%$ against other currencies.
 3. **GBP Volatility Shock**: Doubling of GBP spreads and $\pm 15\%$ worst-case price shocks.
@@ -283,6 +288,14 @@ The default registry contains 12 pre-loaded scenarios:
 10. **Platform Disconnect**: Fail-closed scenario simulating terminal disconnection.
 11. **Stale Quote Check**: Blocks proposals when incoming quotes are stale ($>120\text{s}$).
 12. **Forced Liquidation Proximity**: Verifies stop-out safety margins.
+13. **JPY Risk-Off (V2)**: Specific JPY risk-off scenario matching version 2 requirements.
+
+### Optimized Performance
+To meet the strict performance boundary (< 50.0ms for 100 scenarios across 500 positions under heavy load), the engine employs the following optimizations:
+1. **`QuickProjectedPortfolio`**: A lightweight plain-Python container class that bypasses Pydantic's slow schema validation and default value resolution checks inside the scenario loop.
+2. **Pre-calculated Multipliers**: Caches quantity, contract size, currency conversion rates, and position direction sign values to the portfolio state, saving nested loop calculation overhead.
+3. **Pre-allocated Decimal Constants**: Reuses module-level pre-allocated Decimal constants (`_DECIMAL_ZERO`, `_DECIMAL_ONE`) to eliminate heavy Decimal string-parsing overhead.
+4. **Log Suppression**: Suppresses Loguru frame-inspection overhead for large portfolio runs.
 
 ### Custom Scenarios & Safety
 Custom scenarios can be dynamically parsed and validated using `validate_custom_scenario(config)`. The configuration restricts inputs to numeric percentage shocks within $\pm 100\%$ boundaries, preventing any arbitrary code execution or out-of-bounds inputs.

@@ -1149,18 +1149,18 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-289**: Create stress testing module with registered scenario evaluation.
-- **RISK-FR-290**: Define `StressScenario` contract.
-- **RISK-FR-291**: Define `StressScenarioResult` contract.
-- **RISK-FR-292**: Define `StressScenarioRegistry`.
-- **RISK-FR-293**: Build default scenario registry.
+- [X] **RISK-FR-289**: Create stress testing module with registered scenario evaluation. *Evidence: app/services/risk/stress/__init__.py line 1*
+- [X] **RISK-FR-290**: Define `StressScenario` contract. *Evidence: app/services/risk/stress/contracts.py line 32*
+- [X] **RISK-FR-291**: Define `StressScenarioResult` contract. *Evidence: app/services/risk/models/contracts.py line 800*
+- [X] **RISK-FR-292**: Define `StressScenarioRegistry`. *Evidence: app/services/risk/stress/registry.py line 18*
+- [X] **RISK-FR-293**: Build default scenario registry. *Evidence: app/services/risk/stress/registry.py line 148*
 
 **Target Class/Function:**
 
-- `class StressScenario` — declarative scenario ID, shocks, eligibility, and threshold inputs; **Pure contract validation**.
-- `class StressScenarioResult` — account-currency estimated loss, pass/fail, reason codes, and assumptions; **Pure contract**.
-- `class StressScenarioRegistry` — immutable validated set of approved scenarios; **Pure after construction**.
-- `build_default_stress_registry() -> StressScenarioRegistry` — returns approved default scenarios; **Pure**.
+- `class StressScenario` — declarative scenario ID, shocks, eligibility, and threshold inputs; **Pure contract validation**. *Evidence: app/services/risk/stress/contracts.py line 32*
+- `class StressScenarioResult` — account-currency estimated loss, pass/fail, reason codes, and assumptions; **Pure contract**. *Evidence: app/services/risk/models/contracts.py line 800*
+- `class StressScenarioRegistry` — immutable validated set of approved scenarios; **Pure after construction**. *Evidence: app/services/risk/stress/registry.py line 18*
+- `build_default_stress_registry() -> StressScenarioRegistry` — returns approved default scenarios; **Pure**. *Evidence: app/services/risk/stress/registry.py line 148*
 
 #### 📄 File: `registry.py`
 
@@ -1172,19 +1172,19 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-292**: Define `StressScenarioRegistry`.
-- **RISK-FR-293**: Build default scenario registry.
-- **RISK-FR-306**: Validate custom scenario config without arbitrary code execution.
-- **RISK-FR-312**: Add tests for every default scenario.
-- **RISK-FR-313**: Add tests for custom scenario validation.
+- [X] **RISK-FR-292**: Define `StressScenarioRegistry`. *Evidence: app/services/risk/stress/registry.py line 18*
+- [X] **RISK-FR-293**: Build default scenario registry. *Evidence: app/services/risk/stress/registry.py line 148*
+- [X] **RISK-FR-306**: Validate custom scenario config without arbitrary code execution. *Evidence: app/services/risk/stress/registry.py line 307*
+- [X] **RISK-FR-312**: Add tests for every default scenario. *Evidence: tests/unit/app/services/risk/test_stress.py line 22*
+- [X] **RISK-FR-313**: Add tests for custom scenario validation. *Evidence: tests/unit/app/services/risk/test_stress.py line 380*
 
 **Target Class/Function:**
 
-- `class StressScenarioRegistry` — immutable validated set of approved scenarios with deterministic lookup order; **Pure after construction**.
-- `build_default_stress_registry() -> StressScenarioRegistry` — returns approved default scenarios; **Pure**.
-- `register_stress_scenario(registry: StressScenarioRegistry, scenario: StressScenario) -> StressScenarioRegistry` — returns a new registry after duplicate and safety validation; **Pure**.
-- `get_stress_scenario(registry: StressScenarioRegistry, scenario_id: str) -> StressScenario` — resolves a scenario deterministically or fails closed; **Pure**.
-- `validate_custom_scenario_definition(scenario: Mapping[str, JsonValue]) -> StressScenario` — rejects imperative or arbitrary-code constructs; **Pure**.
+- `class StressScenarioRegistry` — immutable validated set of approved scenarios with deterministic lookup order; **Pure after construction**. *Evidence: app/services/risk/stress/registry.py line 18*
+- `build_default_stress_registry() -> StressScenarioRegistry` — returns approved default scenarios; **Pure**. *Evidence: app/services/risk/stress/registry.py line 148*
+- `register_stress_scenario(registry: StressScenarioRegistry, scenario: StressScenario) -> StressScenarioRegistry` — returns a new registry after duplicate and safety validation; **Pure**. *Evidence: app/services/risk/stress/registry.py line 89*
+- `get_stress_scenario(registry: StressScenarioRegistry, scenario_id: str) -> StressScenario` — resolves a scenario deterministically or fails closed; **Pure**. *Evidence: app/services/risk/stress/registry.py line 131*
+- `validate_custom_scenario_definition(scenario: Mapping[str, JsonValue]) -> StressScenario` — rejects imperative or arbitrary-code constructs; **Pure**. *Evidence: app/services/risk/stress/registry.py line 307*
 
 #### 📄 File: `engine.py`
 
@@ -1196,40 +1196,40 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-294**: Implement USD shock scenario.
-- **RISK-FR-295**: Implement JPY risk-off shock scenario.
-- **RISK-FR-296**: Implement GBP volatility shock scenario.
-- **RISK-FR-297**: Implement spread widening shock scenario.
-- **RISK-FR-298**: Implement slippage shock scenario.
-- **RISK-FR-299**: Implement correlation-to-one shock scenario.
-- **RISK-FR-300**: Implement news candle shock scenario.
-- **RISK-FR-301**: Implement rollover liquidity shock scenario.
-- **RISK-FR-302**: Implement margin spike shock scenario.
-- **RISK-FR-303**: Implement platform disconnect shock scenario.
-- **RISK-FR-304**: Implement stale quote shock scenario.
-- **RISK-FR-305**: Implement forced liquidation stress scenario.
-- **RISK-FR-306**: Validate custom scenario config without arbitrary code execution.
-- **RISK-FR-307**: Calculate stress loss in account currency.
-- **RISK-FR-308**: Compare stress loss against profile threshold.
-- **RISK-FR-309**: Reject trades passing VaR but failing stress survival.
-- **RISK-FR-310**: Return scenario-level reason codes.
-- **RISK-FR-311**: Return summary pass/fail status for audit.
-- **RISK-FR-312**: Add tests for every default scenario.
-- **RISK-FR-313**: Add tests for custom scenario validation.
-- **RISK-FR-314**: Add tests for stress failure causing rejection.
-- **RISK-FR-315**: Add tests for stress warning causing reduction.
-- **RISK-FR-316**: Add performance test for 100 scenarios and 500 positions.
-- **RISK-FR-317**: Document stress scenario methodology.
-- **RISK-FR-318**: Add usage example for stress analysis.
+- [X] **RISK-FR-294**: Implement USD shock scenario. *Evidence: app/services/risk/stress/engine.py line 456*
+- [X] **RISK-FR-295**: Implement JPY risk-off shock scenario. *Evidence: app/services/risk/stress/engine.py line 451*
+- [X] **RISK-FR-296**: Implement GBP volatility shock scenario. *Evidence: app/services/risk/stress/engine.py line 546*
+- [X] **RISK-FR-297**: Implement spread widening shock scenario. *Evidence: app/services/risk/stress/engine.py line 517*
+- [X] **RISK-FR-298**: Implement slippage shock scenario. *Evidence: app/services/risk/stress/engine.py line 547*
+- [X] **RISK-FR-299**: Implement correlation-to-one shock scenario. *Evidence: app/services/risk/stress/engine.py line 283*
+- [X] **RISK-FR-300**: Implement news candle shock scenario. *Evidence: app/services/risk/stress/engine.py line 469*
+- [X] **RISK-FR-301**: Implement rollover liquidity shock scenario. *Evidence: app/services/risk/stress/engine.py line 369*
+- [X] **RISK-FR-302**: Implement margin spike shock scenario. *Evidence: app/services/risk/stress/engine.py line 378*
+- [X] **RISK-FR-303**: Implement platform disconnect shock scenario. *Evidence: app/services/risk/stress/engine.py line 232*
+- [X] **RISK-FR-304**: Implement stale quote shock scenario. *Evidence: app/services/risk/stress/engine.py line 240*
+- [X] **RISK-FR-305**: Implement forced liquidation stress scenario. *Evidence: app/services/risk/stress/engine.py line 256*
+- [X] **RISK-FR-306**: Validate custom scenario config without arbitrary code execution. *Evidence: app/services/risk/stress/registry.py line 307*
+- [X] **RISK-FR-307**: Calculate stress loss in account currency. *Evidence: app/services/risk/stress/engine.py line 555*
+- [X] **RISK-FR-308**: Compare stress loss against profile threshold. *Evidence: app/services/risk/stress/engine.py line 332*
+- [X] **RISK-FR-309**: Reject trades passing VaR but failing stress survival. *Evidence: app/services/risk/stress/engine.py line 357*
+- [X] **RISK-FR-310**: Return scenario-level reason codes. *Evidence: app/services/risk/stress/engine.py line 359*
+- [X] **RISK-FR-311**: Return summary pass/fail status for audit. *Evidence: app/services/risk/stress/engine.py line 411*
+- [X] **RISK-FR-312**: Add tests for every default scenario. *Evidence: tests/unit/app/services/risk/test_stress.py line 22*
+- [X] **RISK-FR-313**: Add tests for custom scenario validation. *Evidence: tests/unit/app/services/risk/test_stress.py line 380*
+- [X] **RISK-FR-314**: Add tests for stress failure causing rejection. *Evidence: tests/unit/app/services/risk/test_stress.py line 421*
+- [X] **RISK-FR-315**: Add tests for stress warning causing reduction. *Evidence: tests/unit/app/services/risk/test_stress.py line 403*
+- [X] **RISK-FR-316**: Add performance test for 100 scenarios and 500 positions. *Evidence: tests/unit/app/services/risk/test_stress.py line 440*
+- [X] **RISK-FR-317**: Document stress scenario methodology. *Evidence: app/services/risk/README.md line 268*
+- [X] **RISK-FR-318**: Add usage example for stress analysis. *Evidence: tests/usage/05_risk.py line 837*
 
 **Target Class/Function:**
 
-- `class StressTestingEngine` — registered scenario evaluation façade; **Pure when portfolio evidence is supplied**.
-- `evaluate_stress_scenarios(context: StressContext, registry: StressScenarioRegistry, policy: EffectiveRiskPolicy) -> StressSummary` — evaluates all applicable scenarios; **Pure**.
-- `apply_market_shock(portfolio: ProjectedPortfolio, scenario: StressScenario) -> ProjectedPortfolio` — applies declarative price/cost/liquidity shocks; **Pure**.
-- `calculate_stress_loss(portfolio: ProjectedPortfolio, account_currency: str) -> Decimal` — derives estimated account-currency loss; **Pure**.
-- `compare_stress_loss_to_policy(loss: Decimal, policy: EffectiveRiskPolicy) -> LimitResult` — returns pass/reduce/reject evidence; **Pure**.
-- `validate_custom_scenario_definition(scenario: Mapping[str, JsonValue]) -> StressScenario` — rejects imperative or arbitrary-code constructs; **Pure**.
+- `class StressTestingEngine` — registered scenario evaluation façade; **Pure when portfolio evidence is supplied**. *Evidence: app/services/risk/stress/engine.py line 131*
+- `evaluate_stress_scenarios(context: StressContext, registry: StressScenarioRegistry, policy: EffectiveRiskPolicy) -> StressSummary` — evaluates all applicable scenarios; **Pure**. *Evidence: app/services/risk/stress/engine.py line 150*
+- `apply_market_shock(portfolio: ProjectedPortfolio, scenario: StressScenario) -> ProjectedPortfolio` — applies declarative price/cost/liquidity shocks; **Pure**. *Evidence: app/services/risk/stress/engine.py line 422*
+- `calculate_stress_loss(portfolio: ProjectedPortfolio, account_currency: str) -> Decimal` — derives estimated account-currency loss; **Pure**. *Evidence: app/services/risk/stress/engine.py line 555*
+- `compare_stress_loss_to_policy(loss: Decimal, policy: EffectiveRiskPolicy) -> LimitResult` — returns pass/reduce/reject evidence; **Pure**. *Evidence: app/services/risk/stress/engine.py line 882*
+- `validate_custom_scenario_definition(scenario: Mapping[str, JsonValue]) -> StressScenario` — rejects imperative or arbitrary-code constructs; **Pure**. *Evidence: app/services/risk/stress/registry.py line 307*
 
 ### 📂 Module: `app/services/risk/feasibility`
 
