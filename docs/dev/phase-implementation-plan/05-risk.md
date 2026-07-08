@@ -466,15 +466,15 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-079**: Create risk config profiles with side-effect-free imports.
-- **RISK-FR-080**: Create default.yaml with safe simulation defaults.
-- **RISK-FR-081**: Create `prop_firm_default.yaml` with conservative prop-firm controls.
-- **RISK-FR-082**: Create `paper.yaml` with paper-trading validation controls.
-- **RISK-FR-083**: Create `live_conservative.yaml` with full fail-closed live controls.
-- **RISK-FR-084**: Define strict schema for risk config profiles.
-- **RISK-FR-085**: Reject unknown config keys by default.
-- **RISK-FR-086**: Reject unsafe threshold values above configured maximums.
-- **RISK-FR-087**: Reject live profiles that lack explicit live authority fields.
+- [x] **RISK-FR-079**: Create risk config profiles with side-effect-free imports. *app/services/risk/config/profiles.py:23*
+- [x] **RISK-FR-080**: Create default.json with safe simulation defaults. *app/services/risk/configs/default.json:1*
+- [x] **RISK-FR-081**: Create `prop_firm_default.json` with conservative prop-firm controls. *app/services/risk/configs/prop_firm_default.json:1*
+- [x] **RISK-FR-082**: Create `paper.json` with paper-trading validation controls. *app/services/risk/configs/paper.json:1*
+- [x] **RISK-FR-083**: Create `live_conservative.json` with full fail-closed live controls. *app/services/risk/configs/live_conservative.json:1*
+- [x] **RISK-FR-084**: Define strict schema for risk config profiles. *app/services/risk/config/schema.py:37*
+- [x] **RISK-FR-085**: Reject unknown config keys by default. *app/services/risk/config/schema.py:70*
+- [x] **RISK-FR-086**: Reject unsafe threshold values above configured maximums. *app/services/risk/config/schema.py:84*
+- [x] **RISK-FR-087**: Reject live profiles that lack explicit live authority fields. *app/services/risk/config/schema.py:126*
 
 **Target Class/Function:**
 
@@ -495,8 +495,8 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-088**: Compute stable risk config hashes.
-- **RISK-FR-089**: Add hash regression tests for identical and changed configs.
+- [x] **RISK-FR-088**: Compute stable risk config hashes. *app/services/risk/config/loader.py:100*
+- [x] **RISK-FR-089**: Add hash regression tests for identical and changed configs. *tests/unit/app/services/risk/test_config.py:564*
 
 **Target Class/Function:**
 
@@ -513,8 +513,8 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-088**: Compute stable risk config hashes.
-- **RISK-FR-089**: Add hash regression tests for identical and changed configs.
+- [x] **RISK-FR-088**: Compute stable risk config hashes. *app/services/risk/config/hashing.py:52*
+- [x] **RISK-FR-089**: Add hash regression tests for identical and changed configs. *tests/unit/app/services/risk/test_config.py:564*
 
 **Target Class/Function:**
 
@@ -533,11 +533,11 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-079**: Create risk config profiles with side-effect-free imports.
-- **RISK-FR-080**: Create default.yaml with safe simulation defaults.
-- **RISK-FR-081**: Create `prop_firm_default.yaml` with conservative prop-firm controls.
-- **RISK-FR-082**: Create `paper.yaml` with paper-trading validation controls.
-- **RISK-FR-083**: Create `live_conservative.yaml` with full fail-closed live controls.
+- [x] **RISK-FR-079**: Create risk config profiles with side-effect-free imports. *app/services/risk/config/profiles.py:23*
+- [x] **RISK-FR-080**: Create default.json with safe simulation defaults. *app/services/risk/configs/default.json:1*
+- [x] **RISK-FR-081**: Create `prop_firm_default.json` with conservative prop-firm controls. *app/services/risk/configs/prop_firm_default.json:1*
+- [x] **RISK-FR-082**: Create `paper.json` with paper-trading validation controls. *app/services/risk/configs/paper.json:1*
+- [x] **RISK-FR-083**: Create `live_conservative.json` with full fail-closed live controls. *app/services/risk/configs/live_conservative.json:1*
 
 **Target Class/Function:**
 
@@ -1998,20 +1998,20 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 
 **NFR-ID and actual requirement text:**
 
-- **RISK-NFR-051**: Create risk configs with safe offline/simulation defaults.
-- **RISK-NFR-052**: Create risk configs with conservative prop-firm risk controls.
-- **RISK-NFR-053**: Create risk configs with paper-trading validation gates.
-- **RISK-NFR-054**: Create risk configs with full fail-closed live controls.
-- **RISK-NFR-055**: Validate risk configs against a strict schema before use.
-- **RISK-NFR-056**: Compute a stable config hash for each loaded risk profile.
-- **RISK-NFR-057**: Reject configs with unknown keys unless explicitly marked experimental and disabled by default.
-- **RISK-NFR-058**: Reject configs with limits above allowed safety maximums.
-- **RISK-NFR-059**: Reject configs that enable live mode without explicit operator approval fields.
-- **RISK-NFR-060**: Support environment-specific overrides only through approved keys.
-- **RISK-NFR-061**: Ensure config changes invalidate stale approval tokens unless governed compatibility explicitly allows them.
-- **RISK-NFR-062**: Include defaults for VaR, Expected Shortfall, stress loss, correlation, currency buckets, drawdown step-down, margin, spread, slippage, and rollover blackout.
-- **RISK-NFR-063**: Include risk policy defaults for the automated M1 micro-scalping system: volatility-adaptive sizing, spread-to-Ïƒ filters, and broker-midnight blackout.
-- **RISK-NFR-064**: Test config loading, schema validation, hash stability, unknown-key rejection, unsafe-threshold rejection, and profile-specific overrides.
+- [x] **RISK-NFR-051**: Create risk configs with safe offline/simulation defaults. *app/services/risk/configs/default.json:1*
+- [x] **RISK-NFR-052**: Create risk configs with conservative prop-firm risk controls. *app/services/risk/configs/prop_firm_default.json:1*
+- [x] **RISK-NFR-053**: Create risk configs with paper-trading validation gates. *app/services/risk/configs/paper.json:1*
+- [x] **RISK-NFR-054**: Create risk configs with full fail-closed live controls. *app/services/risk/configs/live_conservative.json:1*
+- [x] **RISK-NFR-055**: Validate risk configs against a strict schema before use. *app/services/risk/config/schema.py:37*
+- [x] **RISK-NFR-056**: Compute a stable config hash for each loaded risk profile. *app/services/risk/config/hashing.py:52*
+- [x] **RISK-NFR-057**: Reject configs with unknown keys unless explicitly marked experimental and disabled by default. *app/services/risk/config/schema.py:70*
+- [x] **RISK-NFR-058**: Reject configs with limits above allowed safety maximums. *app/services/risk/config/schema.py:84*
+- [x] **RISK-NFR-059**: Reject configs that enable live mode without explicit operator approval fields. *app/services/risk/config/schema.py:126*
+- [x] **RISK-NFR-060**: Support environment-specific overrides only through approved keys. *app/services/risk/config/loader.py:44*
+- [x] **RISK-NFR-061**: Ensure config changes invalidate stale approval tokens unless governed compatibility explicitly allows them. *app/services/risk/policy.py:383*
+- [x] **RISK-NFR-062**: Include defaults for VaR, Expected Shortfall, stress loss, correlation, currency buckets, drawdown step-down, margin, spread, slippage, and rollover blackout. *app/services/risk/configs/default.json:1*
+- [x] **RISK-NFR-063**: Include risk policy defaults for the automated M1 micro-scalping system: volatility-adaptive sizing, spread-to-σ filters, and broker-midnight blackout. *app/services/risk/configs/default.json:70*
+- [x] **RISK-NFR-064**: Test config loading, schema validation, hash stability, unknown-key rejection, unsafe-threshold rejection, and profile-specific overrides. *tests/unit/app/services/risk/test_config.py:17*
 
 **Architectural Pattern:** File/Module Wrapper Boundary
 

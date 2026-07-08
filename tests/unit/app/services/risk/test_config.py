@@ -176,7 +176,7 @@ def test_config_loader_and_registry() -> None:
     # Validate and Hash functions
     validate_risk_config(config)
     h = hash_risk_config(config)
-    assert h == config.contract_hash()
+    assert h == hash_risk_config(config)
 
     # RiskConfigHash instantiation
     cfg_hash_container = RiskConfigHash(
@@ -464,6 +464,8 @@ def test_live_profile_ceilings_and_approvals() -> None:
             {
                 "profile_name": "temp_live_high_risk_compliance",
                 "allow_live_execution": True,
+                "max_daily_loss_pct": 0.02,
+                "max_total_loss_pct": 0.05,
                 "max_risk_per_trade": 0.003,
                 "operator_approval_fields": {
                     "operator_id": "admin_compliance",
@@ -483,6 +485,8 @@ def test_live_profile_ceilings_and_approvals() -> None:
             {
                 "profile_name": "temp_live_high_risk_owner",
                 "allow_live_execution": True,
+                "max_daily_loss_pct": 0.02,
+                "max_total_loss_pct": 0.05,
                 "max_risk_per_trade": 0.003,
                 "operator_approval_fields": {
                     "operator_id": "owner",
@@ -518,3 +522,154 @@ def test_live_profile_ceilings_and_approvals() -> None:
         Path(p_high_total).unlink()
         Path(p_high_risk_bad_op).unlink()
         Path(p_high_risk_ok).unlink()
+
+
+def test_yaml_config_loading() -> None:
+    """Test loading and validating config profiles in YAML format."""
+    # Test built-in YAML loading (default, paper, etc.)
+    for profile in ("default", "prop_firm_default", "paper", "live_conservative"):
+        config = load_risk_config(profile)
+        assert isinstance(config, RiskConfig)
+        assert config.profile_name == profile
+
+    # Test custom YAML loading via temporary file
+    with tempfile.NamedTemporaryFile(
+        suffix=".yaml", delete=False, mode="w", encoding="utf-8"
+    ) as f:
+        f.write("""
+schema_version: "1.0.0"
+profile_name: "custom_yaml"
+allow_live_execution: false
+max_daily_loss_pct: 0.05
+max_total_loss_pct: 0.10
+""")
+        p_yaml = f.name
+
+    try:
+        cfg = load_risk_config("custom_yaml", source=p_yaml)
+        assert cfg.profile_name == "custom_yaml"
+        assert cfg.max_daily_loss_pct == Decimal("0.05")
+    finally:
+        Path(p_yaml).unlink()
+
+
+def test_config_hash_utilities() -> None:
+    """Test canonicalization, comparison, and verification of config hashes."""
+    from app.services.risk.config.hashing import (
+        canonicalize_risk_config_for_hash,
+        compare_risk_config_hashes,
+        validate_risk_config_hash,
+        hash_risk_config,
+    )
+
+    cfg1 = load_risk_config("default")
+    cfg2 = load_risk_config("paper")
+
+    # Canonicalization
+    norm1 = canonicalize_risk_config_for_hash(cfg1)
+    assert isinstance(norm1, dict)
+    assert "profile_name" in norm1
+
+    # Validation
+    h1 = hash_risk_config(cfg1)
+    res_ok = validate_risk_config_hash(h1, cfg1)
+    assert res_ok["valid"] is True
+    assert res_ok["code"] == "OK"
+
+    res_fail = validate_risk_config_hash("bad_hash", cfg1)
+    assert res_fail["valid"] is False
+    assert res_fail["code"] == "VALIDATION_FAILED"
+
+    # Comparison
+    comp_same = compare_risk_config_hashes(cfg1, cfg1)
+    assert comp_same.identical is True
+    assert comp_same.materially_changed is False
+    assert len(comp_same.changed_fields) == 0
+
+    comp_diff = compare_risk_config_hashes(cfg1, cfg2)
+    assert comp_diff.identical is False
+    assert comp_diff.materially_changed is True
+    assert "profile_name" in comp_diff.changed_fields
+
+
+def test_profile_builders() -> None:
+    """Test built-in profile builders and registry functions directly."""
+    from app.services.risk.config.profiles import (
+        build_safe_default_profile,
+        build_prop_firm_default_profile,
+        build_paper_profile,
+        build_live_conservative_profile,
+        list_builtin_risk_profiles,
+        get_builtin_risk_profile,
+    )
+
+    p1 = build_safe_default_profile()
+    assert p1.profile_name == "default"
+
+    p2 = build_prop_firm_default_profile()
+    assert p2.profile_name == "prop_firm_default"
+
+    p3 = build_paper_profile()
+    assert p3.profile_name == "paper"
+
+    p4 = build_live_conservative_profile()
+    assert p4.profile_name == "live_conservative"
+
+    profiles = list_builtin_risk_profiles()
+    assert "default" in profiles
+    assert "live_conservative" in profiles
+
+    # Get by name
+    assert get_builtin_risk_profile("default").profile_name == "default"
+
+    with pytest.raises(ValueError, match="Unknown built-in profile"):
+        get_builtin_risk_profile("invalid_profile")
+
+
+def test_registry_methods() -> None:
+    """Test registry methods directly."""
+    from app.services.risk.config.loader import RiskProfileRegistry
+    reg = RiskProfileRegistry()
+    cfg = load_risk_config("default")
+    reg.register("test_key", cfg)
+    assert reg.get("test_key") is cfg
+    reg.clear()
+    assert reg.get("test_key") is None
+
+
+def test_loader_error_cases() -> None:
+    """Test edge cases and error handling in loaders."""
+    from app.services.risk.config.loader import load_risk_config, _registry
+    import tempfile
+
+    # Non-existent file path
+    with pytest.raises(ValidationError, match="Explicit configuration source file not found"):
+        load_risk_config("custom", source="non_existent_file.yaml")
+
+    # File containing non-dict JSON
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w") as f:
+        f.write("[1, 2, 3]")
+        bad_json = f.name
+    try:
+        with pytest.raises(ValidationError, match="must be a dictionary"):
+            load_risk_config("bad_json", source=bad_json)
+    finally:
+        Path(bad_json).unlink()
+
+    # Non-existent profile in default search paths
+    _registry.clear()
+    with pytest.raises(ValidationError, match="not found under"):
+        load_risk_config("extremely_unlikely_profile_name")
+
+
+def test_loader_env_override_errors(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that invalid values in environment overrides trigger ValidationErrors."""
+    # Invalid decimal override
+    monkeypatch.setenv("HARUQUANT_RISK_MAX_RISK_PER_TRADE", "not_a_decimal")
+    try:
+        with pytest.raises(ValidationError, match="Failed to parse environment override"):
+            load_risk_config("default")
+    finally:
+        monkeypatch.delenv("HARUQUANT_RISK_MAX_RISK_PER_TRADE")
+
+

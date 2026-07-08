@@ -77,9 +77,11 @@ from app.services.risk import (
     volatility_parity_allocation,
 )
 from app.services.risk.config import (
+    compare_risk_config_hashes,
     hash_risk_config,
     load_risk_config,
     validate_risk_config,
+    validate_risk_config_hash,
 )
 from app.services.risk.models.serialization import (
     from_canonical_risk_payload,
@@ -224,8 +226,16 @@ def example_02_system_config_profiles() -> None:
     print(f"Hashed config: {config_hash}")
 
     # 3. Validate config
-    validate_risk_config(default_config)
-    print("Validate config check passed successfully")
+    validation_res = validate_risk_config(default_config)
+    print(f"Validate config check: valid={validation_res['valid']}, message={validation_res['message']}")
+
+    # 4. Hash comparison & Validation
+    paper_config = load_risk_config("paper")
+    comparison = compare_risk_config_hashes(default_config, paper_config)
+    print(f"Compare default vs paper: materially_changed={comparison.materially_changed}, changed_fields={comparison.changed_fields}")
+
+    hash_res = validate_risk_config_hash(config_hash, default_config)
+    print(f"Validate config hash: valid={hash_res['valid']}, code={hash_res['code']}")
 
 
 def example_03_policy_resolution_engine() -> None:

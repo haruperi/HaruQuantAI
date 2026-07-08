@@ -50,7 +50,7 @@ Risk profiles are stored as JSON configurations under `app/services/risk/configs
 
 ## 3. Hard Safety Ceilings & Live Profile Guardrails
 
-To prevent accidental overrides from setting extreme or dangerous limits, the configuration parser validates all values against hard-coded global ceilings defined in [config.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/risk/config.py):
+To prevent accidental overrides from setting extreme or dangerous limits, the configuration parser validates all values against hard-coded global ceilings defined in [schema.py](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/config/schema.py):
 
 | Limit Parameter | Hard Ceiling Value | Description |
 | :--- | :--- | :--- |

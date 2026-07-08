@@ -375,12 +375,14 @@ def validate_risk_policy(config: RiskConfig) -> None:
     Raises:
         ValidationError: If any safety ceiling is breached or validation fails.
     """
-    from app.services.risk.config import _validate_ceilings
+    from app.services.risk.config import validate_risk_config
     from app.utils.errors import ValidationError
 
     if not isinstance(config, RiskConfig):
         raise ValidationError("Invalid RiskConfig object.")
-    _validate_ceilings(config.model_dump())
+    res = validate_risk_config(config)
+    if not res["valid"]:
+        raise ValidationError(res["message"])
 
 
 class RiskPolicy(RiskContract):
