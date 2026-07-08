@@ -713,3 +713,114 @@ def test_correlation_matrix_and_cluster_models() -> None:
 
     assert cluster.cluster_id == "Cluster_0"
     assert cluster.exposure == Decimal("172500.00")
+
+
+def test_correlation_v2_features() -> None:
+    """Verify newly introduced V2 modular correlation engine functions."""
+    from datetime import UTC, datetime
+    from decimal import Decimal
+
+    import pytest
+    from app.services.risk.correlation.contracts import (
+        ClosedBar,
+        CorrelationAlignmentPolicy,
+        CorrelationFallbackContext,
+        CorrelationMethod,
+        ReturnMethod,
+    )
+    from app.services.risk.correlation.engine import (
+        build_correlation_clusters,
+        calculate_cluster_exposure,
+        calculate_component_risk_contribution,
+        calculate_correlation_matrix,
+    )
+    from app.services.risk.correlation.fallbacks import (
+        build_conservative_correlation_snapshot,
+        resolve_correlation_fallback,
+        should_fail_closed_for_missing_correlation,
+    )
+    from app.services.risk.correlation.returns import (
+        align_return_series,
+        build_return_series,
+        validate_correlation_inputs,
+    )
+    from app.utils.errors import ValidationError
+
+    # 1. build_return_series
+    bars = [
+        ClosedBar(time=datetime(2026, 6, 18, 10, 0, tzinfo=UTC), open=Decimal("1.10"), close=Decimal("1.11")),
+        ClosedBar(time=datetime(2026, 6, 18, 10, 1, tzinfo=UTC), open=Decimal("1.11"), close=Decimal("1.12")),
+        ClosedBar(time=datetime(2026, 6, 18, 10, 2, tzinfo=UTC), open=Decimal("1.12"), close=Decimal("1.13")),
+    ]
+    ret_series = build_return_series(bars, ReturnMethod.CLOSE_TO_CLOSE)
+    assert ret_series.symbol == ""
+    assert len(ret_series.returns) == 2
+
+    ret_series_log = build_return_series(bars, ReturnMethod.LOG)
+    assert len(ret_series_log.returns) == 2
+
+    ret_series_otc = build_return_series(bars, ReturnMethod.OPEN_TO_CLOSE)
+    assert len(ret_series_otc.returns) == 3
+
+    # 2. align_return_series V2
+    series_map = {
+        "A": ret_series,
+        "B": ret_series
+    }
+    aligned = align_return_series(series_map, CorrelationAlignmentPolicy.INTERSECT)
+    assert len(aligned.timestamps) == 2
+    assert "A" in aligned.returns
+
+    # 3. validate_correlation_inputs
+    val_ok = validate_correlation_inputs(aligned, minimum_samples=1)
+    assert val_ok["valid"] is True
+    val_fail = validate_correlation_inputs(aligned, minimum_samples=5)
+    assert val_fail["valid"] is False
+
+    # 4. should_fail_closed_for_missing_correlation
+    ctx_ok = CorrelationFallbackContext(
+        symbols=["A", "B"], mode="paper", sample_count=10, minimum_samples=20
+    )
+    assert should_fail_closed_for_missing_correlation(ctx_ok, None) is False
+
+    ctx_fail = CorrelationFallbackContext(
+        symbols=["A", "B"], mode="full_live", sample_count=10, minimum_samples=20
+    )
+    assert should_fail_closed_for_missing_correlation(ctx_fail, None) is True
+
+    # 5. build_conservative_correlation_snapshot
+    fallback_snap = build_conservative_correlation_snapshot(["A", "B"], Decimal("0.5"))
+    assert fallback_snap.matrix["A"]["B"] == Decimal("0.5")
+    assert fallback_snap.matrix["A"]["A"] == Decimal("1.0")
+
+    # 6. resolve_correlation_fallback
+    with pytest.raises(ValidationError):
+        resolve_correlation_fallback(ctx_fail, None)
+
+    resolved_snap = resolve_correlation_fallback(ctx_ok, None)
+    assert resolved_snap.matrix["A"]["B"] == Decimal("0.0")
+
+    # 7. calculate_correlation_matrix
+    snapshot = calculate_correlation_matrix(aligned, CorrelationMethod.PEARSON)
+    assert snapshot.matrix["A"]["B"] == pytest.approx(Decimal("1.0"), abs=1e-4)
+
+    # 8. build_correlation_clusters
+    clusters = build_correlation_clusters(snapshot, threshold=Decimal("0.8"))
+    assert len(clusters) == 1
+    assert clusters[0].symbols == ["A", "B"]
+
+    # 9. calculate_cluster_exposure V2
+    exposures = {"A": Decimal("10000.0"), "B": Decimal("5000.0")}
+    cl_exp = calculate_cluster_exposure(clusters, exposures)
+    assert cl_exp.exposures["Cluster_0"] == Decimal("15000.0")
+
+    # 10. calculate_component_risk_contribution
+    from app.services.risk.correlation.contracts import CovarianceMatrix
+    cov = CovarianceMatrix(matrix={
+        "A": {"A": Decimal("0.04"), "B": Decimal("0.02")},
+        "B": {"A": Decimal("0.02"), "B": Decimal("0.09")},
+    })
+    weights = [Decimal("0.6"), Decimal("0.4")]
+    contribs = calculate_component_risk_contribution(cov, weights)
+    assert len(contribs.contributions) == 2
+

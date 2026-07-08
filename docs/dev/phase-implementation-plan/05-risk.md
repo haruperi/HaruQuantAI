@@ -969,22 +969,22 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-229**: Create correlation engine with closed-bar correlation calculations.
-- **RISK-FR-230**: Define correlation method enum.
-- **RISK-FR-231**: Define return series alignment helper.
-- **RISK-FR-232**: Implement log returns.
-- **RISK-FR-233**: Implement close-to-close returns.
-- **RISK-FR-234**: Implement open-to-close returns.
-- **RISK-FR-235**: Implement σ-normalized returns.
-- **RISK-FR-236**: Align return series by identical opening timestamps.
-- **RISK-FR-237**: Skip current open bar in correlation calculations.
-- **RISK-FR-238**: Support M1 execution correlation window.
+- [X] **RISK-FR-229**: Create correlation engine with closed-bar correlation calculations. *Evidence: app/services/risk/correlation/engine.py line 47-88*
+- [X] **RISK-FR-230**: Define correlation method enum. *Evidence: app/services/risk/correlation/contracts.py line 24-26*
+- [X] **RISK-FR-231**: Define return series alignment helper. *Evidence: app/services/risk/correlation/returns.py line 191-235*
+- [X] **RISK-FR-232**: Implement log returns. *Evidence: app/services/risk/correlation/returns.py line 89-114*
+- [X] **RISK-FR-233**: Implement close-to-close returns. *Evidence: app/services/risk/correlation/returns.py line 77-86*
+- [X] **RISK-FR-234**: Implement open-to-close returns. *Evidence: app/services/risk/correlation/returns.py line 67-74*
+- [X] **RISK-FR-235**: Implement σ-normalized returns. *Evidence: app/services/risk/correlation/returns.py line 117-146*
+- [X] **RISK-FR-236**: Align return series by identical opening timestamps. *Evidence: app/services/risk/correlation/returns.py line 191-235*
+- [X] **RISK-FR-237**: Skip current open bar in correlation calculations. *Evidence: app/services/risk/correlation/returns.py line 259-268*
+- [X] **RISK-FR-238**: Support M1 execution correlation window. *Evidence: app/services/risk/correlation/engine.py line 71-76*
 
 **Target Class/Function:**
 
-- `build_return_series(bars: Sequence[ClosedBar], method: ReturnMethod) -> ReturnSeries` — derives log, close-to-close, open-to-close, or σ-normalized returns; **Pure**.
-- `align_return_series(series: Mapping[str, ReturnSeries], policy: CorrelationAlignmentPolicy) -> AlignedReturns` — aligns only identical opening timestamps and documented missing-data treatment; **Pure**.
-- `validate_correlation_inputs(aligned: AlignedReturns, minimum_samples: int) -> ValidationResult` — rejects inadequate or stale/partial inputs; **Pure**.
+- `build_return_series(bars: Sequence[ClosedBar], method: ReturnMethod) -> ReturnSeries` — derives log, close-to-close, open-to-close, or σ-normalized returns; **Pure**. *Evidence: app/services/risk/returns.py line 130-168*
+- `align_return_series(series: Mapping[str, ReturnSeries], policy: CorrelationAlignmentPolicy) -> AlignedReturns` — aligns only identical opening timestamps and documented missing-data treatment; **Pure**. *Evidence: app/services/risk/returns.py line 191-235*
+- `validate_correlation_inputs(aligned: AlignedReturns, minimum_samples: int) -> ValidationResult` — rejects inadequate or stale/partial inputs; **Pure**. *Evidence: app/services/risk/returns.py line 238-246*
 
 #### 📄 File: `engine.py`
 
@@ -996,35 +996,35 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-239**: Support M5/M15 intraday cluster correlation window.
-- **RISK-FR-240**: Support H1 regime correlation window.
-- **RISK-FR-241**: Reject insufficient sample size unless conservative fallback is configured.
-- **RISK-FR-242**: Implement conservative fallback correlation for production.
-- **RISK-FR-243**: Implement dynamic correlation spike detection.
-- **RISK-FR-244**: Implement marginal correlation impact of proposed trade.
-- **RISK-FR-245**: Implement correlation-adjusted sizing multiplier.
-- **RISK-FR-246**: Implement cluster exposure calculation.
-- **RISK-FR-247**: Implement correlation threshold reduce behavior.
-- **RISK-FR-248**: Implement correlation threshold reject behavior.
-- **RISK-FR-249**: Add tests for timestamp alignment.
-- **RISK-FR-250**: Add tests for closed-bar exclusion.
-- **RISK-FR-251**: Add tests for insufficient samples.
-- **RISK-FR-252**: Add tests for perfect positive correlation.
-- **RISK-FR-253**: Add tests for perfect negative correlation.
-- **RISK-FR-254**: Add tests for dynamic correlation spikes.
-- **RISK-FR-255**: Add tests for cluster exposure.
-- **RISK-FR-256**: Add tests for correlation-adjusted sizing.
-- **RISK-FR-257**: Add tests for conservative fallback behavior.
-- **RISK-FR-258**: Document correlation assumptions and limitations.
+- [X] **RISK-FR-239**: Support M5/M15 intraday cluster correlation window. *Evidence: app/services/risk/correlation/engine.py line 721-766*
+- [X] **RISK-FR-240**: Support H1 regime correlation window. *Evidence: app/services/risk/correlation/engine.py line 721-766*
+- [X] **RISK-FR-241**: Reject insufficient sample size unless conservative fallback is configured. *Evidence: app/services/risk/correlation/fallbacks.py line 82-105*
+- [X] **RISK-FR-242**: Implement conservative fallback correlation for production. *Evidence: app/services/risk/correlation/fallbacks.py line 82-105*
+- [X] **RISK-FR-243**: Implement dynamic correlation spike detection. *Evidence: app/services/risk/correlation/engine.py line 433-448*
+- [X] **RISK-FR-244**: Implement marginal correlation impact of proposed trade. *Evidence: app/services/risk/correlation/engine.py line 365-414*
+- [X] **RISK-FR-245**: Implement correlation-adjusted sizing multiplier. *Evidence: app/services/risk/correlation/engine.py line 417-430*
+- [X] **RISK-FR-246**: Implement cluster exposure calculation. *Evidence: app/services/risk/correlation/engine.py line 177-195*
+- [X] **RISK-FR-247**: Implement correlation threshold reduce behavior. *Evidence: app/services/risk/correlation/engine.py line 451-540*
+- [X] **RISK-FR-248**: Implement correlation threshold reject behavior. *Evidence: app/services/risk/correlation/engine.py line 451-540*
+- [X] **RISK-FR-249**: Add tests for timestamp alignment. *Evidence: tests/unit/app/services/risk/test_correlation.py line 550-575*
+- [X] **RISK-FR-250**: Add tests for closed-bar exclusion. *Evidence: tests/unit/app/services/risk/test_correlation.py line 123-129*
+- [X] **RISK-FR-251**: Add tests for insufficient samples. *Evidence: tests/unit/app/services/risk/test_correlation.py line 177-202*
+- [X] **RISK-FR-252**: Add tests for perfect positive correlation. *Evidence: tests/unit/app/services/risk/test_correlation.py line 149-175*
+- [X] **RISK-FR-253**: Add tests for perfect negative correlation. *Evidence: tests/unit/app/services/risk/test_correlation.py line 149-175*
+- [X] **RISK-FR-254**: Add tests for dynamic correlation spikes. *Evidence: tests/unit/app/services/risk/test_correlation.py line 203-236*
+- [X] **RISK-FR-255**: Add tests for cluster exposure. *Evidence: tests/unit/app/services/risk/test_correlation.py line 334-431*
+- [X] **RISK-FR-256**: Add tests for correlation-adjusted sizing. *Evidence: tests/unit/app/services/risk/test_correlation.py line 313-333*
+- [X] **RISK-FR-257**: Add tests for conservative fallback behavior. *Evidence: tests/unit/app/services/risk/test_correlation.py line 594-659*
+- [X] **RISK-FR-258**: Document correlation assumptions and limitations. *Evidence: app/services/risk/README.md line 221-250*
 
 **Target Class/Function:**
 
-- `class CorrelationEngine` — deterministic correlation and clustering façade; **Pure when aligned returns are supplied**.
-- `calculate_correlation_matrix(returns: AlignedReturns, method: CorrelationMethod) -> CorrelationSnapshot` — computes reproducible correlation matrix and metadata; **Pure**.
-- `build_correlation_clusters(snapshot: CorrelationSnapshot, threshold: Decimal) -> tuple[CorrelationCluster, ...]` — identifies shared-risk clusters; **Pure**.
-- `calculate_cluster_exposure(clusters: Sequence[CorrelationCluster], exposures: ProjectedExposure) -> ClusterExposureAssessment` — computes cluster concentration; **Pure**.
-- `resolve_correlation_fallback(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> CorrelationSnapshot` — returns approved conservative fallback or explicit rejection; **Pure**.
-- `calculate_component_risk_contribution(covariance: CovarianceMatrix, weights: Sequence[Decimal]) -> ComponentRiskContribution` — computes contribution evidence; **Pure**.
+- `class CorrelationEngine` — deterministic correlation and clustering façade; **Pure when aligned returns are supplied**. *Evidence: app/services/risk/correlation/engine.py line 543-614*
+- `calculate_correlation_matrix(returns: AlignedReturns, method: CorrelationMethod) -> CorrelationSnapshot` — computes reproducible correlation matrix and metadata; **Pure**. *Evidence: app/services/risk/correlation/engine.py line 47-88*
+- `build_correlation_clusters(snapshot: CorrelationSnapshot, threshold: Decimal) -> tuple[CorrelationCluster, ...]` — identifies shared-risk clusters; **Pure**. *Evidence: app/services/risk/correlation/engine.py line 131-155*
+- `calculate_cluster_exposure(clusters: Sequence[CorrelationCluster], exposures: ProjectedExposure) -> ClusterExposureAssessment` — computes cluster concentration; **Pure**. *Evidence: app/services/risk/correlation/engine.py line 177-195*
+- `resolve_correlation_fallback(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> CorrelationSnapshot` — returns approved conservative fallback or explicit rejection; **Pure**. *Evidence: app/services/risk/correlation/fallbacks.py line 82-105*
+- `calculate_component_risk_contribution(covariance: CovarianceMatrix, weights: Sequence[Decimal]) -> ComponentRiskContribution` — computes contribution evidence; **Pure**. *Evidence: app/services/risk/correlation/engine.py line 275-312*
 
 #### 📄 File: `fallbacks.py`
 
@@ -1036,16 +1036,16 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-241**: Reject insufficient sample size unless conservative fallback is configured.
-- **RISK-FR-242**: Implement conservative fallback correlation for production.
-- **RISK-FR-257**: Add tests for conservative fallback behavior.
+- [X] **RISK-FR-241**: Reject insufficient sample size unless conservative fallback is configured. *Evidence: app/services/risk/correlation/fallbacks.py line 82-105*
+- [X] **RISK-FR-242**: Implement conservative fallback correlation for production. *Evidence: app/services/risk/correlation/fallbacks.py line 82-105*
+- [X] **RISK-FR-257**: Add tests for conservative fallback behavior. *Evidence: tests/unit/app/services/risk/test_correlation.py line 594-659*
 
 **Target Class/Function:**
 
-- `class CorrelationFallbackContext` — carries missing/insufficient-sample evidence, mode, profile, and request metadata; **Pure contract validation**.
-- `resolve_correlation_fallback(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> CorrelationSnapshot` — returns approved conservative fallback or explicit rejection evidence; **Pure**.
-- `build_conservative_correlation_snapshot(symbols: Sequence[str], assumed_correlation: Decimal) -> CorrelationSnapshot` — builds deterministic conservative fallback matrix; **Pure**.
-- `should_fail_closed_for_missing_correlation(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> bool` — determines whether missing correlation evidence must block/reject; **Pure**.
+- `class CorrelationFallbackContext` — carries missing/insufficient-sample evidence, mode, profile, and request metadata; **Pure contract validation**. *Evidence: app/services/risk/correlation/contracts.py line 83-90*
+- `resolve_correlation_fallback(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> CorrelationSnapshot` — returns approved conservative fallback or explicit rejection evidence; **Pure**. *Evidence: app/services/risk/correlation/fallbacks.py line 82-105*
+- `build_conservative_correlation_snapshot(symbols: Sequence[str], assumed_correlation: Decimal) -> CorrelationSnapshot` — builds deterministic conservative fallback matrix; **Pure**. *Evidence: app/services/risk/correlation/fallbacks.py line 42-79*
+- `should_fail_closed_for_missing_correlation(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> bool` — determines whether missing correlation evidence must block/reject; **Pure**. *Evidence: app/services/risk/correlation/fallbacks.py line 11-39*
 
 ### 📂 Module: `app/services/risk/tail_risk`
 

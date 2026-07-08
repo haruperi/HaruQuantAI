@@ -575,6 +575,64 @@ def example_05_portfolio_correlation_dynamics() -> None:
     print("\nProposed Trade Correlation Evaluation:")
     print(f"  Status: {status}, Adjusted Volume: {vol:.2f}, Reason: {msg}")
 
+    # 5. Demonstrate new V2 Correlation Engine functions
+    from app.services.risk.correlation.contracts import (
+        ClosedBar,
+        CorrelationAlignmentPolicy,
+        CorrelationFallbackContext,
+        CorrelationMethod,
+        ReturnMethod,
+    )
+    from app.services.risk.correlation.engine import (
+        build_correlation_clusters,
+        calculate_cluster_exposure,
+        calculate_correlation_matrix,
+    )
+    from app.services.risk.correlation.fallbacks import resolve_correlation_fallback
+    from app.services.risk.correlation.returns import (
+        align_return_series,
+        build_return_series,
+        validate_correlation_inputs,
+    )
+
+    print("\n[V2] Correlation Engine calculations:")
+    # Build ClosedBar models
+    v2_bars_a = [
+        ClosedBar(time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"])))
+        for b in bars_a
+    ]
+    v2_bars_b = [
+        ClosedBar(time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"])))
+        for b in bars_b
+    ]
+
+    series_a = build_return_series(v2_bars_a, ReturnMethod.CLOSE_TO_CLOSE)
+    series_b = build_return_series(v2_bars_b, ReturnMethod.CLOSE_TO_CLOSE)
+
+    series_map = {"EURUSD": series_a, "GBPUSD": series_b}
+    aligned_v2 = align_return_series(series_map, CorrelationAlignmentPolicy.INTERSECT)
+    print(f"  [V2] Aligned timestamps count: {len(aligned_v2.timestamps)}")
+
+    val_res = validate_correlation_inputs(aligned_v2, minimum_samples=5)
+    print(f"  [V2] Input validation: valid={val_res['valid']}")
+
+    matrix_v2 = calculate_correlation_matrix(aligned_v2, CorrelationMethod.PEARSON)
+    print(f"  [V2] Matrix correlation: {matrix_v2.matrix['EURUSD']['GBPUSD']:.4f}")
+
+    clusters_v2 = build_correlation_clusters(matrix_v2, threshold=Decimal("0.50"))
+    print(f"  [V2] Correlation clusters: {[c.symbols for c in clusters_v2]}")
+
+    exposures_v2 = {"EURUSD": Decimal("110000.0"), "GBPUSD": Decimal("125000.0")}
+    c_exp_v2 = calculate_cluster_exposure(clusters_v2, exposures_v2)
+    print(f"  [V2] Cluster exposures: {dict(c_exp_v2.exposures)}")
+
+    fallback_ctx = CorrelationFallbackContext(
+        symbols=["EURUSD", "GBPUSD"], mode="paper", sample_count=2, minimum_samples=10
+    )
+    fallback_res = resolve_correlation_fallback(fallback_ctx, config)
+    print(f"  [V2] Fallback matrix resolved under paper mode: EURUSD-GBPUSD corr={fallback_res.matrix['EURUSD']['GBPUSD']:.2f}")
+
+
 
 def example_06_value_at_risk_and_expected_shortfall() -> None:
     """Demonstrate Parametric & Historical Value-at-Risk (VaR) and Expected Shortfall (ES) (var_es.py)."""

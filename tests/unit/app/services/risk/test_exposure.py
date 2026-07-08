@@ -850,5 +850,5 @@ def test_v2_extra_helpers() -> None:
     assert totals["net"] == Decimal("200.0")
 
     assert enforce_currency_rounding(Decimal("123.456"), "USD") == Decimal("123.46")
-    assert enforce_currency_rounding(Decimal("123.456"), "JPY") == Decimal("123")
+    assert enforce_currency_rounding(Decimal("123.456"), "JPY") == Decimal(123)
 

@@ -220,14 +220,23 @@ The FX Currency Exposure Engine decomposes portfolios, pending orders, and propo
 
 ## 12. Correlation and Cluster Risk Engine
 
-The Correlation and Cluster Risk Engine computes price returns, aligns timeseries across multiple assets, calculates Pearson correlation matrices, detects correlation spikes, groups assets into connected-component clusters, and determines sizing multipliers or threshold-based rejections for proposed trades.
+The Correlation and Cluster Risk Engine computes price returns, aligns timeseries across multiple assets, calculates Pearson correlation matrices, detects correlation spikes, groups assets into connected-component clusters, and determines sizing multipliers or threshold-based rejections for proposed trades. It is organized as a modular package under `app/services/risk/correlation/`:
 
-### Key Components
-1. **Returns Computation (`calculate_returns`)**: Supports close-to-close, log, open-to-close, and standard deviation (sigma) normalized returns.
-2. **Alignment & Exclusions (`align_return_series`)**: Aligns series by UTC opening timestamps and skips the current open bar to prevent lookahead bias.
-3. **Correlation Snapshot (`calculate_correlation_snapshot`)**: Computes rolling Pearson correlation matrices over configurable lookbacks (M1, M5, H1 timeframes). Falls back to a conservative default value in production if history is insufficient.
-4. **Connected Cluster Exposures (`calculate_cluster_exposures`)**: Groups symbols into clusters based on pairwise correlation thresholds and computes the sum of gross exposures per cluster.
-5. **Marginal Sizing & Trade Resolution (`evaluate_proposed_trade_correlation`)**: Evaluates a candidate trade's marginal correlation to the active portfolio to determine if the trade should be approved, scaled down using the sizing multiplier, or rejected.
+* **`returns.py`**: Handles return construction, timestamp alignment, and input eligibility checks.
+  * **`build_return_series`**: Derives log, close-to-close, open-to-close, or σ-normalized returns from closed-bar series.
+  * **`align_return_series`**: Aligns multiple return series by matching opening timestamps (supporting intersection alignment). Also provides V1 dual signature compatibility.
+  * **`validate_correlation_inputs`**: Rejects or flags aligned arrays if sample counts are insufficient.
+* **`fallbacks.py`**: Implements fail-closed checks and conservative correlation matrices when sample sizes are inadequate.
+  * **`should_fail_closed_for_missing_correlation`**: Determines if missing historical correlation must reject/block.
+  * **`build_conservative_correlation_snapshot`**: Generates a matrix with perfect self-correlation (1.0) and policy-governed assumed correlation for cross-asset entries.
+  * **`resolve_correlation_fallback`**: Rejects execution under live fail-closed policies or returns a conservative fallback matrix.
+* **`engine.py`**: Computes correlation snapshots, groups assets, analyzes exposures, and calculates marginal contributions.
+  * **`calculate_correlation_matrix`**: Computes pairwise Pearson correlation matrices (supporting V1 & V2 signatures).
+  * **`build_correlation_clusters`**: Performs connected-component graph clustering based on absolute correlation thresholds.
+  * **`calculate_cluster_exposure`**: Computes aggregate gross portfolio exposures per correlated cluster.
+  * **`calculate_component_risk_contribution`**: Analyzes the marginal and component risk contributions from covariance matrix and portfolio weights.
+  * **`evaluate_proposed_trade_correlation`**: Recommends `APPROVE`, `REDUCE_SIZE`, or `REJECT` status based on marginal correlation thresholds.
+
 
 ---
 

@@ -39,6 +39,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-024 | Risk Regime V2 modular package | Transitioned legacy flat regime logic into a structured package `app/services/risk/regime/` containing `assessor.py` (regime classification, spread, volatility, liquidity, news, rollover blackouts) and `validation.py` (inputs validation and reason codes). |
 | ADD-025 | Risk Sizing V2 modular package | Transitioned position sizing engine from single flat `sizing.py` to modular package `sizing/` (`contracts.py`, `normalization.py`, `calculators.py`) with stateless lot-sizing calculations. |
 | ADD-026 | Risk Exposure V2 modular package | Modularized currency exposure engine from flat `exposure.py` into package `exposure/` (`fx_legs.py`, `aggregation.py`), introducing pure FX pair parsing, leg decomposition, and currency conversion validation. |
+| ADD-027 | Risk Correlation V2 modular package | Transitioned correlation and cluster risk engine from legacy flat `correlation.py` to structured package `correlation/` (`contracts.py`, `returns.py`, `fallbacks.py`, `engine.py`), implementing pure returns construction, alignment policies, and connected cluster exposures. |
 
 
 
