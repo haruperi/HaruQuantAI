@@ -16,8 +16,13 @@ from app.services.risk import (
     RiskGovernor,
 )
 from app.services.risk.reports import (
-    RISK_METRICS_REGISTRY,
     generate_risk_report,
+    RiskReportEvidence,
+    RiskReportOptions,
+    RiskReportBuilder,
+    AuthorizedReportPath,
+    write_risk_report,
+    validate_report_export_destination,
 )
 from app.utils.errors import ValidationError
 
@@ -64,7 +69,6 @@ def test_generate_report_success():
     )
     req.request_id = "req_report_test"
 
-    # Make a couple of decisions
     gov.review_trade_risk(req)
 
     # Generate the report
@@ -100,8 +104,6 @@ def test_report_file_output_and_traversal_guard():
 
     # Test valid path write
     with tempfile.TemporaryDirectory():
-        # We must write inside the workspace (current folder)
-        # So we write to a temporary file inside a folder under the project root
         report_file = Path("report_temp_test.json").resolve()
         try:
             report = generate_risk_report(
@@ -114,64 +116,8 @@ def test_report_file_output_and_traversal_guard():
             content = report_file.read_text()
             assert report.report_id in content
         finally:
-            # Clean up
             if report_file.exists():
                 report_file.unlink()
-
-
-def test_observability_registry_recording():
-    """Verify metrics are successfully registered in RISK_METRICS_REGISTRY."""
-    store = InMemoryRiskStateStore()
-    gov = RiskGovernor(
-        state_store=store,
-        audit_sink=store,
-        policy_store=store,
-        decision_store=store,
-    )
-
-    # Clear registry records before check
-    RISK_METRICS_REGISTRY.records.clear()
-
-    trade = ProposedTrade(
-        strategy_id="strat_1",
-        symbol="EURUSD",
-        side="buy",
-        volume=Decimal("0.1"),
-    )
-    portfolio = PortfolioState(
-        account_id="acc_1",
-        balance=Decimal("10000.00"),
-        equity=Decimal("10000.00"),
-        margin_used=Decimal("0.00"),
-        free_margin=Decimal("10000.00"),
-        floating_pnl=Decimal("0.00"),
-        realized_pnl=Decimal("0.00"),
-        currency="USD",
-        as_of=datetime.now(UTC),
-    )
-    req = RiskAssessmentRequest(
-        proposed_action=trade,
-        portfolio_state=portfolio,
-        risk_config=RiskConfig(profile_name="default"),
-        calendar_evidence=[],
-        market_context={
-            "mode": "paper",
-            "environment": "local",
-            "freshness": datetime.now(UTC).isoformat(),
-            "daily_loss_pct": 0.0,
-            "max_stress_ratio": 2.0,
-        },
-    )
-    req.request_id = "req_metrics_test"
-
-    gov.review_trade_risk(req)
-
-    # Verify metrics exist
-    metric_names = [m["name"] for m in RISK_METRICS_REGISTRY.records]
-    assert "haruquant_risk_governor_latency_ms" in metric_names
-    assert "haruquant_risk_decision_total" in metric_names
-    assert "haruquant_risk_audit_persistence_health" in metric_names
-    assert "haruquant_risk_kill_switch_state" in metric_names
 
 
 def test_report_warnings_and_breaches():
@@ -219,11 +165,9 @@ def test_report_warnings_and_breaches():
 
     decision = gov.review_trade_risk(req)
 
-    # Check that warning_flags exists in decision details
     assert "warning_flags" in decision.details
     assert "max_drawdown_limit" in decision.details["warning_flags"]
 
-    # Generate report
     report = generate_risk_report(
         state_store=store,
         audit_sink=store,
@@ -274,11 +218,8 @@ def test_report_json_serialization_and_redaction():
 
     json_str = report.to_json()
     assert "[REDACTED]" in json_str
-    # Verify metadata JWT is redacted
     assert "eyJhbGci" not in json_str
-    # Verify reason password is redacted
     assert "my_secret_pwd" not in json_str
-    # Verify config_hash is preserved
     assert "abc123config_hash_of_64_chars_length_long_enough" in json_str
 
 
@@ -328,10 +269,8 @@ def test_report_no_recompute_and_fallback():
 
     decision = gov.review_trade_risk(req)
 
-    # Clear audit events to replace with our modified decision event
     store._audit_events.clear()
 
-    # Manually delete metrics from details to force fallback to risk_snapshot
     if "var" in decision.details:
         del decision.details["var"]
     if "stress_loss" in decision.details:
@@ -350,12 +289,10 @@ def test_report_no_recompute_and_fallback():
     )
     store.save_decision(decision)
 
-    # Write a new audit event with the modified decision
     from app.services.risk.audit import create_risk_audit_event
 
     create_risk_audit_event(decision, req.proposed_action, store)
 
-    # Generate report and check fallbacks
     report = generate_risk_report(
         state_store=store,
         audit_sink=store,
@@ -365,3 +302,51 @@ def test_report_no_recompute_and_fallback():
     assert report.portfolio_exposure == 9999.0
     assert report.var == 123.45
     assert report.stress_loss == 0.5
+
+
+def test_exporter_safe_writes():
+    """Verify exporter path validation and writing logic."""
+    from app.services.risk.reports import RiskReport
+
+    report = RiskReport(
+        report_id="report_test_export",
+        generated_at=datetime.now(UTC),
+        policy_profile="default",
+        breaches=[],
+        warnings=[],
+        decisions=[],
+    )
+
+    # 1. Invalid extensions
+    dest_invalid_ext = AuthorizedReportPath(
+        root=str(Path.cwd()),
+        relative_path="test_report.exe",
+        overwrite=True,
+    )
+    val_res = validate_report_export_destination(dest_invalid_ext)
+    assert not val_res["valid"]
+    assert "Unsafe file extension" in val_res["message"]
+
+    # 2. Overwrite protection
+    with tempfile.TemporaryDirectory() as tmpdir:
+        existing_file = Path(tmpdir) / "exists.json"
+        existing_file.write_text("{}")
+        
+        dest_no_overwrite = AuthorizedReportPath(
+            root=str(tmpdir),
+            relative_path="exists.json",
+            overwrite=False,
+        )
+        val_res = validate_report_export_destination(dest_no_overwrite)
+        assert not val_res["valid"]
+        assert "already exists" in val_res["message"]
+
+        # Success case
+        dest_ok = AuthorizedReportPath(
+            root=str(tmpdir),
+            relative_path="report_new.json",
+            overwrite=False,
+        )
+        receipt = write_risk_report(report, dest_ok)
+        assert receipt.report_id == "report_test_export"
+        assert Path(receipt.destination_path).exists()

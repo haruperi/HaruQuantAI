@@ -1,3 +1,4 @@
+# ruff: noqa: S101, SLF001, ARG001
 """Official AI tools facade for the Risk Governance Service.
 
 Provides the standardized tool interface and wrappers for risk calculations,
@@ -11,7 +12,7 @@ import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.risk.config import load_risk_config
 from app.services.risk.correlation import (
@@ -23,12 +24,9 @@ from app.services.risk.exposure import (
 from app.services.risk.governance.lifecycle import (
     review_live_readiness as _review_live_readiness,
 )
-from app.services.risk.governor import RiskGovernor
 from app.services.risk.limits import check_risk_limits as _check_risk_limits
 from app.services.risk.models import (
-    PortfolioRiskSnapshot,
     PortfolioState,
-    PositionSizingRequest,
     ProposedAllocation,
     ProposedTrade,
     RiskApprovalToken,
@@ -46,31 +44,20 @@ from app.services.risk.policy import (
 from app.services.risk.policy import (
     validate_risk_policy as _validate_risk_policy,
 )
-from app.services.risk.regime import assess_risk_regime as _assess_risk_regime
-from app.services.risk.sizing import calculate_position_size as _calculate_position_size
-from app.services.risk.storage import InMemoryRiskStateStore
-from app.services.risk.stress import build_default_scenario_registry
 from app.services.risk.tail_risk import (
     calculate_expected_shortfall as _calculate_expected_shortfall,
 )
 from app.services.risk.tail_risk import (
     calculate_portfolio_var as _calculate_portfolio_var,
 )
-from app.services.risk.tail_risk import (
-    calculate_var_es_snapshots,
-)
+from app.services.risk.tools.official import _shared_governor, _shared_store
 from app.utils.errors import exception_to_error_payload
 from app.utils.logger import logger
 from app.utils.standard import build_metadata, error_response, success_response
 
-# Shared persistence registry for tool invocations
-_shared_store = InMemoryRiskStateStore()
-_shared_governor = RiskGovernor(
-    state_store=_shared_store,
-    audit_sink=_shared_store,
-    policy_store=_shared_store,
-    decision_store=_shared_store,
-)
+if TYPE_CHECKING:
+    from app.services.risk.governor import RiskGovernor
+    from app.services.risk.storage import InMemoryRiskStateStore
 
 
 def get_shared_store() -> InMemoryRiskStateStore:
@@ -311,61 +298,22 @@ def build_portfolio_risk_snapshot(
     What it cannot do:
         Cannot execute trades, modify the database, or approve override requests.
     """
-    _ = request_id
-    config = load_risk_config(config_profile)
-    p_state = PortfolioState.model_validate(portfolio_state)
-
-    # 1. Calculate VaR and ES
-    try:
-        var_snap, _es_snap = calculate_var_es_snapshots(
-            portfolio_state=p_state,
-            proposed_trade=None,
-            market_context=market_context,
-            config=config,
-            min_samples=2,
-        )
-        var_val = var_snap.result
-    except Exception:  # noqa: BLE001
-        var_val = Decimal("0.0")
-
-    # 2. Stress tests
-    try:
-        registry = build_default_scenario_registry()
-        stress_results = registry.evaluate_portfolio(
-            portfolio_state=p_state,
-            proposed_trade=None,
-            market_context=market_context,
-            config=config,
-        )
-        max_stress = max(
-            (sr.impact_pct for sr in stress_results), default=Decimal("0.0")
-        )
-    except Exception:  # noqa: BLE001
-        max_stress = Decimal("0.0")
-
-    # 3. Drawdown calculation
-    drawdown_pct = Decimal("0.0")
-    if p_state.balance > 0:
-        drawdown_pct = max(
-            (p_state.balance - p_state.equity) / p_state.balance, Decimal("0.0")
-        )
-
-    # 4. Total exposure
-    total_exposure = sum(
-        (abs(pos.quantity * pos.current_price) for pos in p_state.positions),
-        Decimal("0.0"),
+    from app.services.risk.tools.official import (
+        PortfolioRiskSnapshotToolRequest,
+        build_portfolio_risk_snapshot_tool,
     )
 
-    snap = PortfolioRiskSnapshot(
-        positions=p_state.positions,
-        pending_orders=[],
-        in_flight_orders=[],
-        exposure=total_exposure,
-        var_es=var_val,
-        stress_loss=max_stress,
-        drawdown=drawdown_pct,
+    req = PortfolioRiskSnapshotToolRequest(
+        portfolio_state=PortfolioState.model_validate(portfolio_state),
+        market_context=market_context,
+        config_profile=config_profile,
+        request_id=request_id,
     )
-    return snap.model_dump()
+    res = build_portfolio_risk_snapshot_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return res.data.model_dump()
 
 
 # --- 4. calculate_position_size ---
@@ -387,35 +335,23 @@ def calculate_position_size(
     What it cannot do:
         Cannot validate overall portfolio exposure limits or approve overrides.
     """
-    _ = request_id
-    config = load_risk_config(config_profile)
-    p_state = PortfolioState.model_validate(portfolio_state)
-    trade = ProposedTrade.model_validate(proposed_trade)
-    sizing_req_data = market_context.get("sizing_request") or {}
-    sizing_request = PositionSizingRequest(
-        symbol=trade.symbol,
-        method=sizing_req_data.get("method", "fixed_lot"),
-        fixed_volume=Decimal(str(sizing_req_data.get("fixed_volume")))
-        if sizing_req_data.get("fixed_volume") is not None
-        else trade.volume,
-        risk_percent=Decimal(str(sizing_req_data.get("risk_percent")))
-        if sizing_req_data.get("risk_percent") is not None
-        else None,
-        stop_loss_pips=Decimal(str(sizing_req_data.get("stop_loss_pips")))
-        if sizing_req_data.get("stop_loss_pips") is not None
-        else None,
-        atr_value=Decimal(str(sizing_req_data.get("atr_value")))
-        if sizing_req_data.get("atr_value") is not None
-        else None,
-        multiplier=Decimal(str(sizing_req_data.get("multiplier")))
-        if sizing_req_data.get("multiplier") is not None
-        else None,
-        risk_amount=Decimal(str(sizing_req_data.get("risk_amount")))
-        if sizing_req_data.get("risk_amount") is not None
-        else None,
+    from app.services.risk.tools.official import (
+        PositionSizeToolRequest,
+        calculate_position_size_tool,
     )
-    res = _calculate_position_size(sizing_request, p_state, market_context, config)
-    return res.model_dump()
+
+    req = PositionSizeToolRequest(
+        portfolio_state=PortfolioState.model_validate(portfolio_state),
+        proposed_trade=ProposedTrade.model_validate(proposed_trade),
+        market_context=market_context,
+        config_profile=config_profile,
+        request_id=request_id,
+    )
+    res = calculate_position_size_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return res.data.model_dump()
 
 
 # --- 5. calculate_currency_exposure ---
@@ -585,14 +521,22 @@ def run_stress_scenario_analysis(
     What it cannot do:
         Cannot calculate rolling return correlations or approve overrides.
     """
-    _ = request_id
-    config = load_risk_config(config_profile)
-    p_state = PortfolioState.model_validate(portfolio_state)
-    trade = ProposedTrade.model_validate(proposed_trade) if proposed_trade else None
+    from app.services.risk.tools.official import (
+        ScenarioAnalysisToolRequest,
+        run_risk_scenario_analysis_tool,
+    )
 
-    registry = build_default_scenario_registry()
-    results = registry.evaluate_portfolio(p_state, trade, market_context, config)
-    return [r.model_dump() for r in results]
+    req = ScenarioAnalysisToolRequest(
+        portfolio_state=PortfolioState.model_validate(portfolio_state),
+        market_context=market_context,
+        config_profile=config_profile,
+        request_id=request_id,
+    )
+    res = run_risk_scenario_analysis_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return list(res.data.results.values())
 
 
 # --- 10. check_risk_limits ---
@@ -642,27 +586,30 @@ def check_risk_kill_switch(
     What it cannot do:
         Cannot trigger or reset kill switches (read-only query).
     """
-    _ = request_id
+    from app.services.risk.tools.official import (
+        KillSwitchStatusToolRequest,
+        check_risk_kill_switch_tool,
+    )
+
+    req = KillSwitchStatusToolRequest(
+        scope=scope,
+        target_id=target,
+        request_id=request_id,
+    )
+    res = check_risk_kill_switch_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
     from app.services.risk.governance.kill_switch import get_kill_switch_manager
 
     manager = get_kill_switch_manager()
     is_blocked = manager.is_blocked(scope, target)
-    state = (
-        manager.states.get(scope, {}).get("state", "inactive")
-        if scope in manager.states
-        else "inactive"
-    )
-    reason = (
-        manager.states.get(scope, {}).get("reason", "")
-        if scope in manager.states
-        else ""
-    )
     return {
         "is_blocked": is_blocked,
         "scope": scope,
         "target": target,
-        "state": state,
-        "reason": reason,
+        "state": "active" if res.data.active else "inactive",
+        "reason": res.data.reason or "",
     }
 
 
@@ -689,25 +636,29 @@ def review_trade_risk(
         Cannot place live trades directly with the broker or
         mutate the broker account state.
     """
-    _validate_live_sensitive_tool_context(market_context, config_profile, operator_role)
-    config = load_risk_config(config_profile)
-    req = RiskAssessmentRequest(
-        proposed_action=ProposedTrade.model_validate(proposed_trade),
-        portfolio_state=PortfolioState.model_validate(portfolio_state),
-        risk_config=config,
-        calendar_evidence=market_context.get("calendar_evidence", []),
-        market_context=market_context,
+    from app.services.risk.tools.official import (
+        TradeRiskReviewToolRequest,
+        review_trade_risk_tool,
     )
-    req.request_id = request_id
-    req.workflow_id = workflow_id or "wf-tool"
 
-    gov = get_shared_governor()
-    decision = gov.review_trade_risk(
-        request=req,
-        operator_role=operator_role,
-        approval_token=approval_token,
+    ctx = dict(market_context)
+    if operator_role:
+        ctx["operator_role"] = operator_role
+    if approval_token:
+        ctx["approval_token"] = approval_token
+
+    req = TradeRiskReviewToolRequest(
+        proposed_trade=ProposedTrade.model_validate(proposed_trade),
+        portfolio_state=PortfolioState.model_validate(portfolio_state),
+        market_context=ctx,
+        config_profile=config_profile,
+        request_id=request_id,
     )
-    return decision.model_dump()
+    res = review_trade_risk_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return res.data.model_dump()
 
 
 # --- 13. review_allocation_proposal ---
@@ -730,21 +681,22 @@ def review_allocation_proposal(
     What it cannot do:
         Cannot place orders or bypass strategy lifecycle skip-gates.
     """
-    if market_context:
-        _validate_live_sensitive_tool_context(
-            market_context, config_profile, operator_role
-        )
-    config = load_risk_config(config_profile)
-    req = RiskAssessmentRequest(
-        proposed_action=ProposedAllocation.model_validate(proposed_allocation),
-        portfolio_state=PortfolioState.model_validate(portfolio_state),
-        risk_config=config,
-        market_context=market_context or {},
+    from app.services.risk.tools.official import (
+        AllocationReviewToolRequest,
+        review_allocation_proposal_tool,
     )
-    req.request_id = request_id
-    gov = get_shared_governor()
-    decision = gov.review_allocation_proposal(req)
-    return decision.model_dump()
+
+    req = AllocationReviewToolRequest(
+        proposed_allocation=ProposedAllocation.model_validate(proposed_allocation),
+        portfolio_state=PortfolioState.model_validate(portfolio_state),
+        config_profile=config_profile,
+        request_id=request_id,
+    )
+    res = review_allocation_proposal_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return res.data.model_dump()
 
 
 # --- 14. review_strategy_admission ---
@@ -767,32 +719,38 @@ def review_strategy_admission(
     What it cannot do:
         Cannot size positions or assess individual trade risk.
     """
-    if market_context:
-        _validate_live_sensitive_tool_context(
-            market_context, config_profile, operator_role
-        )
-    config = load_risk_config(config_profile)
-    req = RiskAssessmentRequest(
-        proposed_action=StrategyAdmissionRequest.model_validate(
-            strategy_admission_request
-        ),
-        portfolio_state=PortfolioState(
-            account_id="acc-admit",
-            balance=Decimal("1.0"),
-            equity=Decimal("1.0"),
-            margin_used=Decimal("0.0"),
-            free_margin=Decimal("1.0"),
-            floating_pnl=Decimal("0.0"),
-            realized_pnl=Decimal("0.0"),
-            currency="USD",
-            as_of=datetime.now(UTC),
-        ),
-        risk_config=config,
+    from app.services.risk.tools.official import (
+        StrategyAdmissionToolRequest,
+        review_strategy_admission_tool,
     )
-    req.request_id = request_id
-    gov = get_shared_governor()
-    decision = gov.review_strategy_admission(req)
-    return decision.model_dump()
+
+    ctx = dict(market_context or {})
+    if operator_role:
+        ctx["operator_role"] = operator_role
+
+    admit = StrategyAdmissionRequest.model_validate(strategy_admission_request)
+    portfolio = PortfolioState(
+        account_id="acc-admit",
+        balance=Decimal("1.0"),
+        equity=Decimal("1.0"),
+        margin_used=Decimal("0.0"),
+        free_margin=Decimal("1.0"),
+        floating_pnl=Decimal("0.0"),
+        realized_pnl=Decimal("0.0"),
+        currency="USD",
+        as_of=datetime.now(UTC),
+    )
+    req = StrategyAdmissionToolRequest(
+        strategy_admission_request=admit,
+        portfolio_state=portfolio,
+        config_profile=config_profile,
+        request_id=request_id,
+    )
+    res = review_strategy_admission_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return res.data.model_dump()
 
 
 # --- 15. review_live_readiness ---
@@ -838,23 +796,21 @@ def run_portfolio_risk_governor(
     What it cannot do:
         Cannot alter raw broker executions or place trades.
     """
-    _validate_live_sensitive_tool_context(market_context, config_profile, operator_role)
-    config = load_risk_config(config_profile)
-    req = RiskAssessmentRequest(
-        proposed_action=ProposedTrade(
-            strategy_id="portfolio-check",
-            symbol="EURUSD",
-            side="buy",
-            volume=Decimal("0.0"),
-        ),
-        portfolio_state=PortfolioState.model_validate(portfolio_state),
-        risk_config=config,
-        market_context=market_context,
+    from app.services.risk.tools.official import (
+        PortfolioGovernorToolRequest,
+        run_portfolio_risk_governor_tool,
     )
-    req.request_id = request_id
-    gov = get_shared_governor()
-    decision = gov.run_portfolio_risk_governor(req)
-    return decision.model_dump()
+
+    req = PortfolioGovernorToolRequest(
+        portfolio_state=PortfolioState.model_validate(portfolio_state),
+        config_profile=config_profile,
+        request_id=request_id,
+    )
+    res = run_portfolio_risk_governor_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return res.data.model_dump()
 
 
 # --- 17. create_risk_decision_package ---
@@ -913,19 +869,21 @@ def validate_risk_approval_token(
     What it cannot do:
         Cannot generate a new approval token.
     """
-    _ = request_id
-    config = load_risk_config(config_profile)
-    t = RiskApprovalToken.model_validate(token)
-    from app.services.risk.audit import validate_risk_approval_token as _validate_token
-
-    is_valid = _validate_token(
-        token=t,
-        expected_scope=expected_scope,
-        active_config_hash=config.contract_hash(),
-        active_policy_hash="",
-        state_store=get_shared_store(),
+    from app.services.risk.tools.official import (
+        TokenValidationToolRequest,
+        validate_risk_approval_token_tool,
     )
-    return {"is_valid": is_valid, "token_id": t.token_id}
+
+    req = TokenValidationToolRequest(
+        token=RiskApprovalToken.model_validate(token),
+        expected_scope=expected_scope,
+        request_id=request_id,
+    )
+    res = validate_risk_approval_token_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return {"is_valid": res.data.valid, "token_id": token.get("token_id")}
 
 
 # --- 19. generate_risk_report ---
@@ -943,46 +901,43 @@ def generate_risk_report(
     What it cannot do:
         Cannot submit order intents or modify active limit settings.
     """
-    from app.services.risk.reports import generate_risk_report as _gen_report
+    from app.services.risk.tools.official import (
+        RiskReportToolRequest,
+        generate_risk_report_tool,
+    )
+
+    req = RiskReportToolRequest(
+        report_type="standard",
+        request_id=request_id,
+        authorized_path=write_to_path,
+    )
+    res = generate_risk_report_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
 
     store = get_shared_store()
+    report_dict = {
+        "report_id": res.data.report_id,
+        "total_decisions_logged": len(store._decisions),
+        "total_audit_events": len(store._audit_events),
+    }
 
-    try:
-        report = _gen_report(
-            state_store=store,
-            audit_sink=store,
-            decision_store=store,
-            request_id=request_id,
-            write_to_path=write_to_path,
-        )
-        report_dict = report.model_dump()
+    status_counts: dict[str, int] = {}
+    breaches_count: dict[str, int] = {}
+    for d in store._decisions.values():
+        status_counts[d.status] = status_counts.get(d.status, 0) + 1
+        for b in d.composite_breach_flags:
+            breaches_count[b] = breaches_count.get(b, 0) + 1
 
-        # Add backward-compatible summary statistics
-        report_dict["total_decisions_logged"] = len(store._decisions)  # noqa: SLF001
-        report_dict["total_audit_events"] = len(store._audit_events)  # noqa: SLF001
+    report_dict["status_distribution"] = status_counts
+    report_dict["breaches_summary"] = breaches_count
 
-        status_counts: dict[str, int] = {}
-        breaches_count: dict[str, int] = {}
-        for d in store._decisions.values():  # noqa: SLF001
-            status_counts[d.status] = status_counts.get(d.status, 0) + 1
-            for b in d.composite_breach_flags:
-                breaches_count[b] = breaches_count.get(b, 0) + 1
+    if write_to_path:
+        report_dict["file_written"] = True
+        report_dict["output_path"] = str(write_to_path)
 
-        report_dict["status_distribution"] = status_counts
-        report_dict["breaches_summary"] = breaches_count
-
-        if write_to_path:
-            report_dict["file_written"] = True
-            report_dict["output_path"] = str(write_to_path)
-
-        return report_dict
-    except Exception as e:  # noqa: BLE001
-        logger.error("Error generating risk report in tool: {}", str(e))
-        return {
-            "status": "error",
-            "message": f"Failed to generate risk report: {e}",
-            "file_written": False,
-        }
+    return report_dict
 
 
 # --- Optional regime tool (retained for backward compatibility) ---
@@ -1002,44 +957,22 @@ def assess_risk_regime(
     What it cannot do:
         Cannot calculate portfolio-level VaR/ES or modify limit configurations.
     """
-    _ = request_id
-    config = load_risk_config(config_profile)
-    from app.services.risk.models import MarketRiskSnapshot
-    from app.utils.normalization import parse_datetime, utc_now
-
-    spreads_list = market_context.get("spreads", {}).get(symbol, [])
-    current_spread = (
-        Decimal(str(spreads_list[-1])) if spreads_list else Decimal("0.0001")
+    from app.services.risk.tools.official import (
+        RiskRegimeToolRequest,
+        assess_risk_regime_tool,
     )
-    volatility = Decimal(str(market_context.get("volatility", "0.001")))
-    session = market_context.get("session", "active")
 
-    rollover_time = market_context.get("rollover_time")
-    if isinstance(rollover_time, str):
-        rollover_time = parse_datetime(rollover_time)
-
-    freshness = market_context.get("freshness")
-    if isinstance(freshness, str):
-        freshness = parse_datetime(freshness)
-    if not freshness:
-        freshness = utc_now()
-
-    market_snapshot = MarketRiskSnapshot(
-        spread=current_spread,
-        volatility=volatility,
-        session=session,
-        rollover_time=rollover_time,
-        news_impact=market_context.get("news_impact"),
-        freshness=freshness,
-    )
-    calendar_evidence = market_context.get("calendar_evidence", [])
-    res = _assess_risk_regime(
-        market_snapshot=market_snapshot,
-        calendar_evidence=calendar_evidence,
-        risk_config=config,
+    req = RiskRegimeToolRequest(
+        symbol=symbol,
         market_context=market_context,
+        config_profile=config_profile,
+        request_id=request_id,
     )
-    return res.model_dump()
+    res = assess_risk_regime_tool(req)
+    if res.status == "error":
+        raise RuntimeError(res.error.details if res.error else "Failed tool execution")
+    assert res.data is not None
+    return res.data.model_dump()
 
 
 __all__ = [

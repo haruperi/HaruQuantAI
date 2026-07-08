@@ -1289,3 +1289,122 @@ def test_governor_uncovered_paths(monkeypatch: pytest.MonkeyPatch) -> None:  # n
     req.request_id = None
     res = gov.review_trade_risk(req)
     assert req.market_context.get("correlation_cluster_reduction") is not None
+
+
+def test_governor_v2_orchestration_and_observability():
+    from app.services.risk.governance.lifecycle import LiveReadinessRequest
+    from app.services.risk.observability.metrics import RISK_METRICS_REGISTRY
+
+    store = InMemoryRiskStateStore()
+    gov = RiskGovernor(
+        state_store=store,
+        audit_sink=store,
+        policy_store=store,
+        decision_store=store,
+    )
+
+    portfolio = PortfolioState(
+        account_id="acc_1",
+        balance=Decimal("10000.00"),
+        equity=Decimal("10000.00"),
+        margin_used=Decimal("0.00"),
+        free_margin=Decimal("10000.00"),
+        floating_pnl=Decimal("0.00"),
+        realized_pnl=Decimal("0.00"),
+        currency="USD",
+        as_of=datetime.now(UTC),
+    )
+
+    # Test 1: review_trade
+    trade = ProposedTrade(
+        strategy_id="strat_1",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("0.1"),
+    )
+    m_data = {
+        "EURUSD": [
+            {"time": "2026-06-19T12:00:00Z", "open": 1.10, "close": 1.11},
+            {"time": "2026-06-19T12:01:00Z", "open": 1.11, "close": 1.10},
+            {"time": "2026-06-19T12:02:00Z", "open": 1.10, "close": 1.09},
+            {"time": "2026-06-19T12:03:00Z", "open": 1.09, "close": 1.10},
+            {"time": "2026-06-19T12:04:00Z", "open": 1.10, "close": 1.11},
+        ],
+    }
+    req_trade = RiskAssessmentRequest(
+        proposed_action=trade,
+        portfolio_state=portfolio,
+        risk_config=RiskConfig(profile_name="default"),
+        market_context={
+            "mode": "paper",
+            "environment": "local",
+            "freshness": datetime.now(UTC).isoformat(),
+            "daily_loss_pct": 0.0,
+            "max_stress_ratio": 2.0,
+            "market_data": m_data,
+            "correlation_lookback": 5,
+            "timeframe": "M1",
+            "min_correlation_samples": 2,
+            "var_lookback": 5,
+            "min_samples": 2,
+            "EURUSD_price": 1.10,
+            "EURUSD_contract_size": 100000.0,
+        },
+    )
+    # Clear metric registry state
+    RISK_METRICS_REGISTRY.records.clear()
+
+    decision = gov.review_trade(req_trade)
+    assert decision.status == RiskDecisionStatus.APPROVE
+    # Verify metric was emitted
+    latencies = [
+        rec
+        for rec in RISK_METRICS_REGISTRY.records
+        if rec["name"] == "haruquant_risk_review_trade_latency_ms"
+    ]
+    assert len(latencies) > 0
+
+    # Test 2: review_allocation
+    alloc = ProposedAllocation(
+        allocations={"strat_1": Decimal("5000.0")},
+        as_of=datetime.now(UTC),
+    )
+    req_alloc = RiskAssessmentRequest(
+        proposed_action=alloc,
+        portfolio_state=portfolio,
+        risk_config=RiskConfig(profile_name="default"),
+        market_context={
+            "mode": "paper",
+            "approval_token_valid": True,
+            "strategy_evidence": {
+                "strat_1": {
+                    "trade_count": 120,
+                    "sharpe_ratio": 1.6,
+                    "max_drawdown": 0.12,
+                }
+            },
+        },
+    )
+    decision_alloc = gov.review_allocation(req_alloc)
+    assert decision_alloc.status == RiskDecisionStatus.APPROVE
+
+    # Test 3: review_live_readiness (V2)
+    readiness_action = LiveReadinessRequest(
+        strategy_id="strat_1",
+        proposed_stage="shadow",
+        market_context={
+            "mode": "shadow",
+            "audit_persistence_active": True,
+            "kill_switch_configured": True,
+            "portfolio_reconciliation_active": True,
+            "idempotency_evidence_present": True,
+        },
+    )
+    req_readiness = RiskAssessmentRequest(
+        proposed_action=readiness_action,
+        portfolio_state=portfolio,
+        risk_config=RiskConfig(profile_name="default"),
+        market_context={"mode": "shadow"},
+    )
+    decision_readiness = gov.review_live_readiness(req_readiness)
+    assert decision_readiness.status == RiskDecisionStatus.APPROVE

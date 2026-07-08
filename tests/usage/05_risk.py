@@ -292,10 +292,7 @@ def example_03_policy_resolution_engine() -> None:
                 overrides={"max_daily_loss_pct": Decimal("0.06")},
             )
         ],
-        provenance={
-            "policy_version": "2.0.0",
-            "policy_scope": {"environment": "local"},
-        },
+        authority="risk_manager",
     )
 
     context = {
@@ -325,7 +322,6 @@ def example_03_policy_resolution_engine() -> None:
         as_of=now,
     )
     req = RiskAssessmentRequest(
-        strategy_id="strat-1",
         proposed_action=ProposedAllocation(
             allocations={"strat-1": Decimal("0.0001")}, as_of=now
         ),
@@ -611,13 +607,13 @@ def example_05_portfolio_correlation_dynamics() -> None:
     # Build ClosedBar models
     v2_bars_a = [
         ClosedBar(
-            time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"]))
+            time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"]))  # type: ignore
         )
         for b in bars_a
     ]
     v2_bars_b = [
         ClosedBar(
-            time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"]))
+            time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"]))  # type: ignore
         )
         for b in bars_b
     ]
@@ -1176,13 +1172,13 @@ def example_09_strategy_lifecycle_promotion() -> None:
     # flat name; the governance module's dual-dispatch version is distinct.
     from app.services.risk.governance.lifecycle import (
         LifecycleEvidence,
-        LiveReadinessRequest,
         StrategyLifecycleState,
         requires_lifecycle_approval,
         review_live_readiness,
         review_strategy_admission,
         validate_lifecycle_transition,
     )
+    from app.services.risk.models import LiveReadinessRequest
     from app.services.risk.models import StrategyAdmissionRequest
     from app.services.risk.policy.contracts import EffectiveRiskPolicy
 
@@ -1406,7 +1402,7 @@ def example_11_fx_currency_and_cluster_exposures() -> None:
 
     # V2 Validation of conversion requirements
     conversion_validation = validate_currency_conversion_requirements(
-        v2_legs, {"EURUSD": Decimal("1.10")}, "USD"
+        list(v2_legs), {"EURUSD": Decimal("1.10")}, "USD"
     )
     print(f"Currency conversion validation result: {conversion_validation['reason']}")
 
@@ -1504,9 +1500,10 @@ def example_12_deterministic_limits_governance() -> None:
         f"  [V2] Composite breach reason codes: {assessment_fail.composite_breach_flags}"
     )
 
+    primary_fail = select_primary_failure(assessment_fail.results)
     print(
         f"[V2] select_primary_failure: "
-        f"{select_primary_failure(assessment_fail.results).limit_name}"
+        f"{primary_fail.limit_name if primary_fail else 'None'}"
     )
     print(
         f"[V2] build_composite_breach_flags: "
@@ -2221,7 +2218,6 @@ def example_23_audit_layer() -> None:
         DefaultTokenSigner,
         RequiredActionScope,
         TokenValidationContext,
-        build_canonical_audit_payload,
         create_risk_audit_event,
         create_risk_decision_token,
         redact_audit_payload,
@@ -2240,8 +2236,10 @@ def example_23_audit_layer() -> None:
         "password": "super_secret_password",
         "volume": Decimal("1.5"),
     }
-    redacted = redact_audit_payload(sensitive_data, policy)
-    print(f"Redaction Demo: api_key={redacted.get('api_key')}, password={redacted.get('password')}, symbol={redacted.get('symbol')}")
+    redacted = redact_audit_payload(sensitive_data, policy)  # type: ignore
+    print(
+        f"Redaction Demo: api_key={redacted.get('api_key')}, password={redacted.get('password')}, symbol={redacted.get('symbol')}"
+    )
 
     # 2. Canonical Payload and Event Chaining
     decision = RiskDecisionPackage(
@@ -2258,31 +2256,50 @@ def example_23_audit_layer() -> None:
         policy_hash="pol_hash_01",
         policy_version="1.0.0",
         policy_scope={},
-        details={"proposed_action": {"strategy_id": "strat_audit", "symbol": "EURUSD", "volume": 1.5, "environment": "live"}},
+        details={
+            "proposed_action": {
+                "strategy_id": "strat_audit",
+                "symbol": "EURUSD",
+                "volume": 1.5,
+                "environment": "live",
+            }
+        },
     )
 
-    trade = ProposedTrade(strategy_id="strat_audit", symbol="EURUSD", side="buy", volume=Decimal("1.5"))
+    trade = ProposedTrade(
+        strategy_id="strat_audit", symbol="EURUSD", side="buy", volume=Decimal("1.5")
+    )
     context = AuditContext(proposed_action=trade, previous_hash="0" * 64)
     event1 = create_risk_audit_event(decision, context)
-    print(f"Chained Event 1 Created: ID={event1.event_id}, hash={event1.hash[:16]}..., prev_hash={event1.previous_hash[:16]}...")
+    print(
+        f"Chained Event 1 Created: ID={event1.event_id}, hash={event1.hash[:16]}..., prev_hash={event1.previous_hash[:16]}..."
+    )
 
     # Chain Event 2
     decision2 = decision.model_copy(update={"decision_id": "dec_audit_v2_02"})
     context2 = AuditContext(proposed_action=trade, previous_hash=event1.hash)
     event2 = create_risk_audit_event(decision2, context2)
-    print(f"Chained Event 2 Created: ID={event2.event_id}, hash={event2.hash[:16]}..., prev_hash={event2.previous_hash[:16]}...")
+    print(
+        f"Chained Event 2 Created: ID={event2.event_id}, hash={event2.hash[:16]}..., prev_hash={event2.previous_hash[:16]}..."
+    )
 
     # 3. Chain Verification
     verification = verify_risk_audit_chain([event1, event2])
-    print(f"Chain Verification Result: valid={verification.valid}, tampered={verification.tampered}")
+    print(
+        f"Chain Verification Result: valid={verification.valid}, tampered={verification.tampered}"
+    )
 
     req_res = require_valid_audit_chain(verification, RiskMode.MICRO_LIVE)
-    print(f"Fail-closed requirement check (live mode): valid={req_res['valid']}, code={req_res['code']}")
+    print(
+        f"Fail-closed requirement check (live mode): valid={req_res['valid']}, code={req_res['code']}"
+    )
 
     # 4. Decision Token Signing and Validation
     signer = DefaultTokenSigner()
     token = create_risk_decision_token(decision, signer, datetime.now(UTC))
-    print(f"Decision Token signed successfully: ID={token.token_id}, signature={token.signature[:16]}...")
+    print(
+        f"Decision Token signed successfully: ID={token.token_id}, signature={token.signature[:16]}..."
+    )
 
     scope = RequiredActionScope(
         action="execute_trade",
@@ -2292,7 +2309,7 @@ def example_23_audit_layer() -> None:
     )
     val_context = TokenValidationContext(
         active_config_hash=decision.config_hash,
-        active_policy_hash=decision.policy_hash,
+        active_policy_hash=decision.policy_hash or "pol_hash_01",
         required_scope=scope,
         now_utc=datetime.now(UTC),
     )

@@ -193,6 +193,16 @@ class StrategyAdmissionRequest(RiskContract):
     )
 
 
+class LiveReadinessRequest(RiskContract):
+    """Canonical request envelope for a V2 live readiness review."""
+
+    strategy_id: str = Field(..., description="Target strategy.")
+    proposed_stage: str = Field(..., description="Stage requested.")
+    market_context: dict[str, Any] = Field(
+        default_factory=dict, description="Injected runtime parameters."
+    )
+
+
 class PositionState(RiskContract):
     """Current state snapshot of an open position."""
 
@@ -546,7 +556,7 @@ class RiskConfig(RiskContract):
 class RiskAssessmentRequest(RiskContract):
     """Input encapsulation for a complete governor evaluation run."""
 
-    proposed_action: ProposedTrade | ProposedAllocation | StrategyAdmissionRequest = (
+    proposed_action: ProposedTrade | ProposedAllocation | StrategyAdmissionRequest | LiveReadinessRequest = (
         Field(..., description="Candidate action under evaluation.")
     )
     portfolio_state: PortfolioState = Field(

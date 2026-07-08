@@ -1,64 +1,32 @@
-"""Risk reporting and metrics registration module.
+"""Risk report builder module.
 
-Defines schemas and builders for generating JSON-safe and file-written reports
-summarizing risk configurations, metrics, and pre-trade decisions.
+Assembles JSON-safe, redacted, evidence-only risk reports from stored evidence
+without recomputing metrics or performing active market checks.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Sequence
+from decimal import Decimal
 
 from pydantic import Field
 
 from app.services.risk.models import (
+    DrawdownState,
     PortfolioRiskSnapshot,
     PortfolioState,
     RiskContract,
     RiskDecisionPackage,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import utc_now
-from app.utils.observability import MetricRegistry
 from app.utils.security import redact_mapping, redact_text
+from app.utils.standard import canonical_json, stable_identifier
 
 if TYPE_CHECKING:
-    from app.services.risk.storage import (
-        RiskAuditSink,
-        RiskDecisionStore,
-        RiskStateStore,
-    )
-
-# Global metric registry for risk events and performance
-RISK_METRICS_REGISTRY = MetricRegistry()
-
-
-class RiskDecisionSummary(RiskContract):
-    """Summary of a single pre-trade risk decision.
-
-    Args:
-        decision_id: Unique decision ID.
-        request_id: Associated request ID.
-        status: Synthesized decision status.
-        rule_key: Policy rule key matching the decision.
-        reason: Explanation text.
-        timestamp: Time of decision.
-        symbol: Traded symbol.
-        volume: Approved trade volume in lots.
-    """
-
-    decision_id: str = Field(..., description="Unique decision ID.")
-    request_id: str = Field(..., description="Associated request ID.")
-    status: str = Field(..., description="Synthesized decision status.")
-    rule_key: str = Field(..., description="Primary rule key applied.")
-    reason: str = Field(..., description="Explanation of decision.")
-    timestamp: datetime = Field(..., description="Time of decision.")
-    symbol: str | None = Field(default=None, description="Traded symbol.")
-    volume: float | None = Field(
-        default=None, description="Approved trade volume in lots."
-    )
+    from app.services.risk.models.enums import RiskDecisionStatus
 
 
 class PortfolioRiskReport(RiskContract):
@@ -90,6 +58,32 @@ class PortfolioRiskReport(RiskContract):
     )
     drawdown: float | None = Field(
         default=None, description="Current portfolio drawdown percentage."
+    )
+
+
+class RiskDecisionSummary(RiskContract):
+    """Summary of a single pre-trade risk decision.
+
+    Args:
+        decision_id: Unique decision ID.
+        request_id: Associated request ID.
+        status: Synthesized decision status.
+        rule_key: Policy rule key matching the decision.
+        reason: Explanation text.
+        timestamp: Time of decision.
+        symbol: Traded symbol.
+        volume: Approved trade volume in lots.
+    """
+
+    decision_id: str = Field(..., description="Unique decision ID.")
+    request_id: str = Field(..., description="Associated request ID.")
+    status: str = Field(..., description="Synthesized decision status.")
+    rule_key: str = Field(..., description="Primary rule key applied.")
+    reason: str = Field(..., description="Explanation of decision.")
+    timestamp: datetime = Field(..., description="Time of decision.")
+    symbol: str | None = Field(default=None, description="Traded symbol.")
+    volume: float | None = Field(
+        default=None, description="Approved trade volume in lots."
     )
 
 
@@ -164,22 +158,17 @@ class RiskReport(RiskContract):
 
     def to_json(self) -> str:
         """Serialize and redact sensitive fields, returning a JSON string."""
-        from app.utils.security import redact_mapping, redact_text
-        from app.utils.standard import canonical_json
-
+        logger.debug(f"Serializing RiskReport {self.report_id} to JSON.")
         dump = self.model_dump()
 
-        # Explicitly redact the description/reason strings in decisions list
         if "decisions" in dump:
             for dec in dump["decisions"]:
                 if dec.get("reason"):
                     dec["reason"] = redact_text(dec["reason"])
 
-        # Explicitly redact the metadata dictionary
         if dump.get("metadata"):
             dump["metadata"] = redact_mapping(dump["metadata"])
 
-        # Explicitly redact the drawdown state dictionary
         if dump.get("drawdown_state"):
             dump["drawdown_state"] = redact_mapping(dump["drawdown_state"])
 
@@ -188,8 +177,6 @@ class RiskReport(RiskContract):
 
 def _coerce_report_value(v: Any) -> Any:  # noqa: ANN401
     """Coerce Decimal to float and datetime to ISO format recursively."""
-    from decimal import Decimal
-
     if isinstance(v, Decimal):
         return float(v)
     if isinstance(v, datetime):
@@ -234,6 +221,7 @@ def build_risk_decision_summary(
     Returns:
         RiskDecisionSummary: Summarized pre-trade decision.
     """
+    logger.debug(f"Building summary for decision: {decision.decision_id}")
     details = decision.details or {}
     proposed_action = details.get("proposed_action") or {}
     if isinstance(proposed_action, dict):
@@ -257,46 +245,98 @@ def build_risk_decision_summary(
     )
 
 
+class RiskReportEvidence(RiskContract):
+    """Durable evidence object for compiling reports.
+
+    Args:
+        decisions: Immutable sequence of decisions.
+        drawdown_state: Drawdown details or None.
+        events: Immutable sequence of audit events.
+    """
+
+    decisions: Sequence[RiskDecisionPackage] = Field(default_factory=list)
+    drawdown_state: DrawdownState | None = None
+    events: Sequence[Any] = Field(default_factory=list)
+
+
+class ReportRedactionPolicy:
+    """Redaction configuration for report compilation."""
+
+    def __init__(self, redact: bool = True) -> None:
+        """Initialize redaction policy."""
+        self.redact = redact
+        logger.debug(f"ReportRedactionPolicy created: redact={redact}")
+
+
+class RiskReportOptions(RiskContract):
+    """Configuration options for report generation.
+
+    Args:
+        request_id: Request identification string.
+        redact_sensitive: True if fields must be redacted.
+    """
+
+    request_id: str | None = None
+    redact_sensitive: bool = True
+
+
 class RiskReportBuilder:
     """Builder class for assembling a RiskReport from stored evidence."""
 
-    def __init__(
-        self,
-        state_store: RiskStateStore,
-        audit_sink: RiskAuditSink,
-        decision_store: RiskDecisionStore,
-    ) -> None:
-        """Initialize with storage ports.
+    def __init__(self, evidence: RiskReportEvidence) -> None:
+        """Initialize with report evidence.
 
         Args:
-            state_store: State and kill switch port.
-            audit_sink: Audit sink port.
-            decision_store: Decision store port.
+            evidence: The gathered report evidence.
         """
-        self.state_store = state_store
-        self.audit_sink = audit_sink
-        self.decision_store = decision_store
+        self.evidence = evidence
+        logger.debug("RiskReportBuilder initialized with evidence.")
 
     def _parse_events(
-        self, events: list[Any]
+        self,
     ) -> tuple[
         list[RiskDecisionSummary], set[str], set[str], RiskDecisionPackage | None
     ]:
         """Parse decisions and gather breaches/warnings from audit events."""
+        logger.debug("Parsing decisions and events.")
         decisions_list: list[RiskDecisionSummary] = []
         breaches: set[str] = set()
         warnings: set[str] = set()
         latest_decision: RiskDecisionPackage | None = None
 
-        for event in events:
+        # Parse decisions explicitly from evidence decisions
+        for dec in self.evidence.decisions:
+            summary = build_risk_decision_summary(dec)
+            decisions_list.append(summary)
+
+            dec_details = dec.details or {}
+            dec_warnings = (
+                dec_details.get("warning_flags")
+                or dec_details.get("warnings")
+                or []
+            )
+            for flag in dec_warnings:
+                warnings.add(flag)
+
+            for flag in dec.composite_breach_flags:
+                if flag not in dec_warnings:
+                    breaches.add(flag)
+
+            if (
+                latest_decision is None
+                or dec.snapshot_as_of > latest_decision.snapshot_as_of
+            ):
+                latest_decision = dec
+
+        # Parse additional events if decisions list is empty
+        for event in self.evidence.events:
             decision_data = event.details.get("decision")
-            if decision_data:
+            if decision_data and not self.evidence.decisions:
                 try:
                     dec = RiskDecisionPackage.model_validate(decision_data)
                     summary = build_risk_decision_summary(dec)
                     decisions_list.append(summary)
 
-                    # Gather warnings from details if present
                     dec_details = dec.details or {}
                     dec_warnings = (
                         dec_details.get("warning_flags")
@@ -306,35 +346,38 @@ class RiskReportBuilder:
                     for flag in dec_warnings:
                         warnings.add(flag)
 
-                    # Gather breaches from decision (excluding warnings)
                     for flag in dec.composite_breach_flags:
                         if flag not in dec_warnings:
                             breaches.add(flag)
 
-                    # Update latest
                     if (
                         latest_decision is None
                         or dec.snapshot_as_of > latest_decision.snapshot_as_of
                     ):
                         latest_decision = dec
                 except (ValueError, TypeError) as e:
-                    logger.warning(f"Error parsing decision from audit event: {e}")
+                    logger.warning(
+                        f"Error parsing decision from audit event: {e}"
+                    )
 
         return decisions_list, breaches, warnings, latest_decision
 
-    def build(self, request_id: str | None = None) -> RiskReport:
+    def build(self, options: RiskReportOptions) -> RiskReport:
         """Build and populate the RiskReport.
 
         Args:
-            request_id: Request ID context.
+            options: Configuration options for report generation.
 
         Returns:
             RiskReport: Populated report.
         """
-        events = self.audit_sink.get_all_events()
-        decisions_list, breaches, warnings, latest_decision = self._parse_events(events)
+        logger.info(
+            f"Building report under request ID: {options.request_id}"
+        )
+        decisions_list, breaches, warnings, latest_decision = (
+            self._parse_events()
+        )
 
-        # Extract stats from latest decision details to prevent recomputing
         policy_profile = None
         config_hash = None
         mode = None
@@ -359,7 +402,6 @@ class RiskReportBuilder:
             stress_loss_val = details.get("stress_loss")
             margin_usage_val = details.get("margin_usage")
 
-            # Fallback to risk_snapshot if fields are missing in details
             snap = latest_decision.risk_snapshot
             if snap:
                 if portfolio_exposure is None:
@@ -369,8 +411,7 @@ class RiskReportBuilder:
                 if stress_loss_val is None:
                     stress_loss_val = snap.stress_loss
 
-        # Fallback to store if latest_decision lacks drawdown
-        drawdown = self.state_store.get_drawdown_state()
+        drawdown = self.evidence.drawdown_state
         drawdown_dict = None
         if drawdown:
             drawdown_dict = {
@@ -383,13 +424,10 @@ class RiskReportBuilder:
             drawdown_dict = latest_decision.details.get("drawdown_state")
 
         meta: dict[str, Any] = {
-            "risk.request_id": request_id or "",
+            "risk.request_id": options.request_id or "",
             "risk.schema_version": "1.0.0",
         }
         meta = redact_mapping(meta)
-
-        # Build final report_id
-        from app.utils.standard import stable_identifier
 
         report_id = stable_identifier(
             {
@@ -421,57 +459,126 @@ class RiskReportBuilder:
 
 
 def generate_risk_report(
-    state_store: RiskStateStore,
-    audit_sink: RiskAuditSink,
-    decision_store: RiskDecisionStore,
+    evidence: Any = None,
+    options: Any = None,
+    *,
+    state_store: Any = None,
+    audit_sink: Any = None,
+    decision_store: Any = None,
     request_id: str | None = None,
     write_to_path: str | None = None,
 ) -> RiskReport:
-    """Generate a risk report from stored evidence.
+    """Generate a risk report from stored evidence or store facades.
 
     Args:
-        state_store: Drawdown, kill switch, and token store.
-        audit_sink: Audit event sink.
-        decision_store: Decision package store.
-        request_id: Trace correlation ID.
-        write_to_path: Optional path to write JSON report to.
+        evidence: The gathered report evidence (RiskReportEvidence) or state_store.
+        options: Configuration options (RiskReportOptions) or None.
+        state_store: Deprecated store interface.
+        audit_sink: Deprecated audit trail interface.
+        decision_store: Deprecated decision storage.
+        request_id: Tracing correlation ID.
+        write_to_path: Target path to write JSON report output.
 
     Returns:
         RiskReport: Generated report.
     """
-    builder = RiskReportBuilder(state_store, audit_sink, decision_store)
-    report = builder.build(request_id)
+    logger.info("Generating risk report.")
+    
+    # Dual-signature check
+    if evidence is not None and not isinstance(evidence, RiskReportEvidence):
+        state_store = evidence
+        evidence = None
 
-    if write_to_path:
-        # Traversal guard (allow workspace root or system temporary directory)
-        import tempfile
+    if evidence is None:
+        decisions = []
+        if decision_store is not None:
+            decisions = decision_store.list_decisions()
+        
+        drawdown_state = None
+        if state_store is not None:
+            if hasattr(state_store, "get_drawdown_state"):
+                drawdown_state = state_store.get_drawdown_state()
 
-        resolved_path = Path(write_to_path).resolve()
-        workspace_root = Path.cwd().resolve()
-        temp_dir = Path(tempfile.gettempdir()).resolve()
+        events = []
+        if audit_sink is not None:
+            if hasattr(audit_sink, "list_audit_events"):
+                events = audit_sink.list_audit_events()
+            elif hasattr(audit_sink, "_audit_events"):
+                events = audit_sink._audit_events
 
-        in_workspace = str(resolved_path).startswith(str(workspace_root))
-        in_temp = str(resolved_path).startswith(str(temp_dir))
+        evidence = RiskReportEvidence(
+            decisions=decisions,
+            drawdown_state=drawdown_state,
+            events=events,
+        )
 
-        if not (in_workspace or in_temp):
-            err_msg = (
-                "Path traversal detected: path is outside the "
-                "authorized workspace directory."
-            )
-            raise ValidationError(err_msg)
+    if options is None:
+        options = RiskReportOptions(request_id=request_id)
 
-        # Ensure directory exists
-        resolved_path.parent.mkdir(parents=True, exist_ok=True)
+    builder = RiskReportBuilder(evidence)
+    report = builder.build(options)
 
-        try:
-            with resolved_path.open("w") as f:
-                f.write(report.to_json())
-        except (OSError, ValidationError) as e:
-            logger.error(f"Failed to write risk report file: {e}")
-            err_msg = f"Failed to write risk report file: {e}"
-            raise ValidationError(err_msg) from e
+    if options.redact_sensitive:
+        report = redact_risk_report(report)
+
+    if write_to_path is not None:
+        from app.services.risk.reports.exporter import AuthorizedReportPath, write_risk_report
+        
+        path_obj = Path(write_to_path)
+        if path_obj.is_absolute():
+            if str(path_obj).startswith(str(Path.cwd())):
+                rel = str(path_obj.relative_to(Path.cwd()))
+                root_dir = str(Path.cwd())
+            else:
+                root_dir = str(path_obj.anchor)
+                rel = str(path_obj.relative_to(path_obj.anchor))
+        else:
+            root_dir = str(Path.cwd())
+            rel = write_to_path
+
+        dest = AuthorizedReportPath(
+            root=root_dir,
+            relative_path=rel,
+            overwrite=True,
+            request_id=options.request_id,
+        )
+        write_risk_report(report, dest)
 
     return report
+
+
+
+def redact_risk_report(
+    report: RiskReport,
+    policy: ReportRedactionPolicy | None = None,
+) -> RiskReport:
+    """Remove sensitive fields from the report.
+
+    Args:
+        report: The report to redact.
+        policy: The optional redaction policy config.
+
+    Returns:
+        RiskReport: Redacted report copy.
+    """
+    logger.info(f"Redacting risk report: {report.report_id}")
+    active_policy = policy or ReportRedactionPolicy()
+    if not active_policy.redact:
+        return report
+
+    copied = report.model_copy(deep=True)
+
+    for dec in copied.decisions:
+        if dec.reason:
+            dec.reason = redact_text(dec.reason)
+
+    if copied.metadata:
+        copied.metadata = redact_mapping(copied.metadata)
+
+    if copied.drawdown_state:
+        copied.drawdown_state = redact_mapping(copied.drawdown_state)
+
+    return copied
 
 
 def build_portfolio_risk_snapshot(
@@ -481,8 +588,6 @@ def build_portfolio_risk_snapshot(
 ) -> PortfolioRiskSnapshot:
     """Compile a complete portfolio risk snapshot.
 
-    Includes VaR, ES, stress tests, and drawdowns.
-
     Args:
         portfolio_state: Account balance, equity, and position lists.
         market_context: Active market quotes and returns databases.
@@ -490,14 +595,9 @@ def build_portfolio_risk_snapshot(
 
     Returns:
         PortfolioRiskSnapshot: The compiled portfolio risk snapshot.
-
-    Raises:
-        ValidationError: If parsing or calculations fail.
     """
-    from decimal import Decimal
-
+    logger.info("Compiling portfolio risk snapshot.")
     from app.services.risk.config import load_risk_config
-    from app.services.risk.models import PortfolioRiskSnapshot, PortfolioState
     from app.services.risk.stress import build_default_scenario_registry
     from app.services.risk.tail_risk import calculate_var_es_snapshots
 
@@ -508,7 +608,6 @@ def build_portfolio_risk_snapshot(
 
     config = load_risk_config(config_profile)
 
-    # 1. Calculate VaR and ES
     try:
         var_snap, _es_snap = calculate_var_es_snapshots(
             portfolio_state=p_state,
@@ -518,10 +617,10 @@ def build_portfolio_risk_snapshot(
             min_samples=2,
         )
         var_val = var_snap.result
-    except Exception:  # noqa: BLE001
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"VaR/ES snapshot calculation failed: {e}")
         var_val = Decimal("0.0")
 
-    # 2. Stress tests
     try:
         registry = build_default_scenario_registry()
         stress_results = registry.evaluate_portfolio(
@@ -533,17 +632,16 @@ def build_portfolio_risk_snapshot(
         max_stress = max(
             (sr.impact_pct for sr in stress_results), default=Decimal("0.0")
         )
-    except Exception:  # noqa: BLE001
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"Stress scenarios evaluation failed: {e}")
         max_stress = Decimal("0.0")
 
-    # 3. Drawdown calculation
     drawdown_pct = Decimal("0.0")
     if p_state.balance > 0:
         drawdown_pct = max(
             (p_state.balance - p_state.equity) / p_state.balance, Decimal("0.0")
         )
 
-    # 4. Total exposure
     total_exposure = sum(
         (abs(pos.quantity * pos.current_price) for pos in p_state.positions),
         Decimal("0.0"),

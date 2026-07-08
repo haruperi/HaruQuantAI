@@ -449,6 +449,20 @@ class InMemoryRiskStateStore(
             logger.debug(f"Decision resolved by request_id: {result is not None}")
             return result
 
+    def list_decisions(self) -> list[RiskDecisionPackage]:
+        """List all stored decisions.
+
+        Returns:
+            list[RiskDecisionPackage]: All stored decisions in memory.
+
+        Raises:
+            DataError: When simulated failure is enabled.
+        """
+        logger.debug("Listing all decisions.")
+        self._check_failure()
+        with self._lock:
+            return list(self._decisions.values())
+
     def get_decision_by_key(
         self,
         request_id: str,

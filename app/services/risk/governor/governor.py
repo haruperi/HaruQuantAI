@@ -78,6 +78,8 @@ if TYPE_CHECKING:
 
 from app.utils.normalization import utc_now
 from app.utils.standard import stable_identifier
+from app.services.risk.observability.decorators import risk_observed
+from app.services.risk.observability.metrics import RISK_METRICS_REGISTRY
 
 RiskGovernorDecision = RiskDecisionPackage
 
@@ -113,6 +115,20 @@ class RiskGovernor:
             self.kill_switch_manager = get_kill_switch_manager()
         else:
             self.kill_switch_manager = kill_switch_manager
+
+    @risk_observed("review_trade", RISK_METRICS_REGISTRY)
+    def review_trade(
+        self,
+        request: RiskAssessmentRequest,
+        operator_role: str | None = None,
+        approval_token: str | None = None,
+    ) -> RiskDecisionPackage:
+        """Review trade request, delegating to review_trade_risk."""
+        return self.review_trade_risk(
+            request=request,
+            operator_role=operator_role,
+            approval_token=approval_token,
+        )
 
     def review_trade_risk(  # noqa: C901, PLR0912, PLR0915
         self,
@@ -449,7 +465,7 @@ class RiskGovernor:
                         )
 
                 corr_latency = (time.perf_counter() - t0_corr) * 1000.0
-                from app.services.risk.reports import RISK_METRICS_REGISTRY
+                from app.services.risk.observability.metrics import RISK_METRICS_REGISTRY
 
                 RISK_METRICS_REGISTRY.record(
                     name="haruquant_risk_correlation_latency_ms",
@@ -507,7 +523,7 @@ class RiskGovernor:
         request.proposed_action.volume = calculated_vol
 
         # 5. Inject calculated metrics (VaR/ES and Stress loss) into market context
-        from app.services.risk.reports import RISK_METRICS_REGISTRY
+        from app.services.risk.observability.metrics import RISK_METRICS_REGISTRY
 
         try:
             t0 = time.perf_counter()
@@ -1023,6 +1039,14 @@ class RiskGovernor:
 
         return decision
 
+    @risk_observed("review_allocation", RISK_METRICS_REGISTRY)
+    def review_allocation(
+        self,
+        request: RiskAssessmentRequest,
+    ) -> RiskDecisionPackage:
+        """Review strategy budget capital allocation updates."""
+        return self.review_allocation_proposal(request)
+
     def review_allocation_proposal(
         self,
         request: RiskAssessmentRequest,
@@ -1086,6 +1110,7 @@ class RiskGovernor:
         create_risk_audit_event(decision, request.proposed_action, self.audit_sink)
         return decision
 
+    @risk_observed("review_strategy_admission", RISK_METRICS_REGISTRY)
     def review_strategy_admission(
         self,
         request: RiskAssessmentRequest,
@@ -1170,6 +1195,7 @@ class RiskGovernor:
         create_risk_audit_event(decision, request.proposed_action, self.audit_sink)
         return decision
 
+    @risk_observed("run_portfolio_risk_governor", RISK_METRICS_REGISTRY)
     def run_portfolio_risk_governor(
         self,
         request: RiskAssessmentRequest,
@@ -1262,39 +1288,95 @@ class RiskGovernor:
         """
         action = request.proposed_action
         if isinstance(action, ProposedTrade):
-            return self.review_trade_risk(
+            return self.review_trade(
                 request=request,
                 operator_role=operator_role,
                 approval_token=approval_token,
             )
         if isinstance(action, ProposedAllocation):
-            return self.review_allocation_proposal(request=request)
+            return self.review_allocation(request=request)
         if isinstance(action, StrategyAdmissionRequest):
             return self.review_strategy_admission(request=request)
         return self.run_portfolio_risk_governor(request=request)
 
+    @risk_observed("review_live_readiness", RISK_METRICS_REGISTRY)
     def review_live_readiness(
         self,
-        strategy_id: str,
-        proposed_stage: str,
-        market_context: dict[str, Any],
-        config: RiskConfig,
-    ) -> LiveReadinessReview:
-        """Review live readiness parameters for strategy promotion.
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        """Review live readiness for strategy promotion.
 
-        Args:
-            strategy_id: Target strategy.
-            proposed_stage: Stage requested.
-            market_context: Injected runtime parameters.
-            config: Target risk configuration.
-
-        Returns:
-            LiveReadinessReview: Outcome of the check.
+        Supports both V1 and V2 signatures:
+        V1: (strategy_id: str, proposed_stage: str, market_context: dict, config: RiskConfig) -> LiveReadinessReview
+        V2: (request: RiskAssessmentRequest) -> RiskDecisionPackage
         """
-        from app.services.risk.governance.lifecycle import (
-            review_live_readiness as _review_live_readiness,
-        )
+        first = args[0] if args else kwargs.get("request")
+        if isinstance(first, RiskAssessmentRequest):
+            request = first
+            from app.services.risk.governance.lifecycle import LiveReadinessRequest
+            proposed_action = request.proposed_action
+            if not isinstance(proposed_action, LiveReadinessRequest):
+                raise ValidationError("proposed_action must be LiveReadinessRequest for live readiness review.")
 
+            request_id = request.request_id or stable_identifier(
+                {"action": "live_readiness"}, prefix="req"
+            )
+            decision_id = stable_identifier({"req": request_id}, prefix="dec")
+            workflow_id = request.workflow_id or "wf-readiness"
+
+            # Resolve policy
+            rules = self.policy_store.get_rules()
+            policy_res = resolve_policy(
+                request.risk_config, rules, {"action": "live_readiness"}
+            )
+            resolved_config = policy_res.resolved_config
+
+            from app.services.risk.policy.contracts import EffectiveRiskPolicy
+            effective_policy = EffectiveRiskPolicy(
+                policy_id="policy-readiness",
+                resolved_config=resolved_config,
+                policy_hash=policy_res.policy_hash or "hash",
+            )
+
+            from app.services.risk.governance.lifecycle import review_live_readiness as _review_live_readiness
+            assessment = _review_live_readiness(proposed_action, effective_policy)
+
+            # Build a RiskDecisionPackage from the LifecycleAssessment
+            decision = RiskDecisionPackage(
+                decision_id=decision_id,
+                request_id=request_id,
+                workflow_id=workflow_id,
+                status=assessment.status,
+                rule_key=assessment.reason_code,
+                snapshot_as_of=utc_now(),
+                config_hash=resolved_config.contract_hash(),
+                reason=assessment.message,
+                composite_breach_flags=assessment.breaches,
+                calculated_volume=None,
+                policy_hash=policy_res.policy_hash,
+                policy_version=policy_res.policy_version,
+                policy_scope=policy_res.policy_scope,
+            )
+            decision.details = {
+                "proposed_action": proposed_action.model_dump(),
+                "policy_hash": policy_res.policy_hash,
+                "policy_version": policy_res.policy_version,
+                "policy_scope": policy_res.policy_scope,
+                "assessment": assessment.model_dump(),
+            }
+
+            self.decision_store.save_decision(decision)
+            create_risk_audit_event(decision, proposed_action, self.audit_sink)
+            return decision
+
+        # Otherwise, fall back to V1 signature
+        strategy_id = kwargs.get("strategy_id", args[0] if len(args) > 0 else None)
+        proposed_stage = kwargs.get("proposed_stage", args[1] if len(args) > 1 else None)
+        market_context = kwargs.get("market_context", args[2] if len(args) > 2 else {})
+        config = kwargs.get("config", args[3] if len(args) > 3 else None)
+
+        from app.services.risk.governance.lifecycle import review_live_readiness as _review_live_readiness
         return _review_live_readiness(
             strategy_id=strategy_id,
             proposed_stage=proposed_stage,
@@ -1341,6 +1423,20 @@ class RiskGovernor:
         )
 
 
+def review_trade(
+    request: RiskAssessmentRequest,
+    operator_role: str | None = None,
+    approval_token: str | None = None,
+) -> RiskDecisionPackage:
+    """Execute pre-trade risk checks for a candidate ProposedTrade (V2)."""
+    from app.agentic.tools.risk import get_shared_governor
+    return get_shared_governor().review_trade(
+        request=request,
+        operator_role=operator_role,
+        approval_token=approval_token,
+    )
+
+
 def review_trade_risk(
     request: RiskAssessmentRequest,
     operator_role: str | None = None,
@@ -1363,6 +1459,14 @@ def review_trade_risk(
         operator_role=operator_role,
         approval_token=approval_token,
     )
+
+
+def review_allocation(
+    request: RiskAssessmentRequest,
+) -> RiskDecisionPackage:
+    """Evaluate budget allocation proposal changes (V2)."""
+    from app.agentic.tools.risk import get_shared_governor
+    return get_shared_governor().review_allocation(request)
 
 
 def review_allocation_proposal(
@@ -1438,30 +1542,13 @@ def run_risk_governor_checks(
 
 
 def review_live_readiness(
-    strategy_id: str,
-    proposed_stage: str,
-    market_context: dict[str, Any],
-    config: RiskConfig,
-) -> LiveReadinessReview:
-    """Review live readiness parameters for strategy promotion.
-
-    Args:
-        strategy_id: Target strategy.
-        proposed_stage: Stage requested.
-        market_context: Injected runtime parameters.
-        config: Target risk configuration.
-
-    Returns:
-        LiveReadinessReview: Outcome of the check.
-    """
+    *args: Any,
+    **kwargs: Any,
+) -> Any:
+    """Review live readiness parameters for strategy promotion (supports V1 and V2)."""
     from app.agentic.tools.risk import get_shared_governor
 
-    return get_shared_governor().review_live_readiness(
-        strategy_id=strategy_id,
-        proposed_stage=proposed_stage,
-        market_context=market_context,
-        config=config,
-    )
+    return get_shared_governor().review_live_readiness(*args, **kwargs)
 
 
 def review_mode_promotion(

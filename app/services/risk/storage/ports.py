@@ -317,6 +317,17 @@ class RiskDecisionStore(Protocol):
         """
         ...
 
+    def list_decisions(self) -> list[RiskDecisionPackage]:
+        """List all stored decisions.
+
+        Returns:
+            list[RiskDecisionPackage]: All stored decisions.
+
+        Raises:
+            DataError: If storage is unavailable.
+        """
+        ...
+
     def get_decision_by_key(
         self,
         request_id: str,

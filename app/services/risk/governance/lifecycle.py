@@ -22,6 +22,7 @@ from pydantic import Field
 
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
+    LiveReadinessRequest,
     RiskConfig,
     RiskContract,
     RiskDecisionStatus,
@@ -125,16 +126,6 @@ class ModePromotionReview(RiskContract):
     )
     checked_at: datetime = Field(
         default_factory=utc_now, description="Review timestamp."
-    )
-
-
-class LiveReadinessRequest(RiskContract):
-    """Canonical request envelope for a V2 live readiness review."""
-
-    strategy_id: str = Field(..., description="Target strategy.")
-    proposed_stage: str = Field(..., description="Stage requested.")
-    market_context: dict[str, Any] = Field(
-        default_factory=dict, description="Injected runtime parameters."
     )
 
 
