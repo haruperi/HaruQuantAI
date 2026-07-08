@@ -33,6 +33,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-018 | Simulator Service | Added core simulator service for backtest execution, data simulation, and strategy backtesting. Module `app/services/simulator`. Usage examples in `tests/usage/app/services/08_simulator.py`. |
 | ADD-019 | Risk Models V2 modular package | Transitioned from a single flat `models.py` file to a multi-file package `app/services/risk/models/` containing `enums.py`, `contracts.py`, and `serialization.py` to support cleaner extension and clear separation of concerns. |
 | ADD-020 | Risk Config V2 modular package | Migrated `app/services/risk/config.py` to modular sub-package `app/services/risk/config/` (`schema.py`, `loader.py`, `profiles.py`, `hashing.py`), transitioning default JSON config profiles to YAML formats with JSON fallback compatibility. |
+| ADD-021 | Risk Storage V2 modular package | Decoupled the persistence layer from core risk governance by introducing a structured package `app/services/risk/storage/` containing `ports.py` (Protocols for drawdown state, kill switches, audit, policies, and decisions), `in_memory.py` (thread-safe, lock-isolated state store with simulated fault injection), and init package exports. |
 
 
 

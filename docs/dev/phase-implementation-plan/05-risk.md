@@ -1623,11 +1623,11 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-459**: Implement idempotent decision persistence.
-- **RISK-FR-460**: Implement duplicate same-material request handling.
-- **RISK-FR-461**: Implement duplicate different-material request rejection.
-- **RISK-FR-462**: Implement schema-version compatibility checks.
-- **RISK-FR-463**: Fail closed when mandatory live audit persistence is unavailable.
+- [x] **RISK-FR-459**: Implement idempotent decision persistence. *app/services/risk/storage/ports.py:385*
+- [x] **RISK-FR-460**: Implement duplicate same-material request handling. *app/services/risk/storage/ports.py:419*
+- [x] **RISK-FR-461**: Implement duplicate different-material request rejection. *app/services/risk/storage/ports.py:411*
+- [x] **RISK-FR-462**: Implement schema-version compatibility checks. *app/services/risk/storage/ports.py:476*
+- [x] **RISK-FR-463**: Fail closed when mandatory live audit persistence is unavailable. *app/services/risk/storage/ports.py:523*
 
 **Target Class/Function:**
 
@@ -1649,11 +1649,11 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-464**: Add audit hash stability tests.
-- **RISK-FR-465**: Add tamper detection tests.
-- **RISK-FR-466**: Add token validation tests.
-- **RISK-FR-467**: Add storage failure tests.
-- **RISK-FR-468**: Document audit, token, and storage behavior.
+- [x] **RISK-FR-464**: Add audit hash stability tests. *tests/unit/app/services/risk/test_audit.py:110*
+- [x] **RISK-FR-465**: Add tamper detection tests. *tests/unit/app/services/risk/test_audit.py:110*
+- [x] **RISK-FR-466**: Add token validation tests. *tests/unit/app/services/risk/test_storage.py:88*
+- [x] **RISK-FR-467**: Add storage failure tests. *tests/unit/app/services/risk/test_storage.py:154*
+- [x] **RISK-FR-468**: Document audit, token, and storage behavior. *app/services/risk/README.md:374*
 
 **Target Class/Function:**
 

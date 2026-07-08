@@ -370,3 +370,26 @@ The governor records metrics to a thread-safe local registry exported to Prometh
 * `haruquant_risk_stale_evidence_failures_total`: Counter for fail-closed stale context halts.
 * `haruquant_risk_kill_switch_state`: Gauges for global/portfolio/symbol kill switches.
 * `haruquant_risk_audit_persistence_health`: Gauge representing cryptographic audit-chain integrity.
+
+---
+
+## 19. Storage Architecture & Persistence (Sprint 5.17)
+
+The risk governance storage layer is structured as a dedicated package under `app/services/risk/storage/` which decouples the persistence layer from the core business logic using explicit ports and interfaces.
+
+### Key Components
+
+1. **Storage Ports (`ports.py`)**:
+   - **`RiskStateStore`**: Repository protocol for saving and retrieving strategy drawdown states, active kill switches, and cryptographic tokens.
+   - **`RiskAuditSink`**: Repository protocol for recording sequential blockchain-style audit blocks.
+   - **`RiskPolicyStore`**: Interface for persisting active risk rules and policy-as-code parameter overrides.
+   - **`RiskDecisionStore`**: Interface for persisting and performing compound-key idempotency checks on pre-trade governor decisions.
+   - **Idempotency Key Checks (`persist_risk_decision`)**: Idempotently persists decisions using a compound key `(request_id, workflow_id, signal_id, decision_material_hash)` to protect against double-spend or duplicate executions.
+   - **Schema & Live Guards**:
+     - `validate_storage_schema_compatibility`: Verifies major-version schema matching (expects major version 1) to prevent serialization mismatches.
+     - `require_live_audit_persistence`: Enforces fail-closed rules where live trading mode is active but the target storage engine lacks durability or audit-trail support.
+
+2. **In-Memory Implementation (`in_memory.py`)**:
+   - **`InMemoryRiskStateStore`**: Thread-safe repository implementing all four storage protocols using local python dicts protected by re-entrant locks (`threading.RLock`).
+   - **Fault Injection (`simulate_storage_failure`)**: Exposes simulated failure interfaces to test domain-level fail-closed robustness against database/file storage outages.
+
