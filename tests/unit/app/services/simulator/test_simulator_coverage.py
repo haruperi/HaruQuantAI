@@ -2,16 +2,13 @@
 
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
-import pytest
 
+import pytest
 from app.services.contracts.strategies import (
     Bar,
     Direction,
     EntryType,
     IntentAction,
-    QuoteSnapshot,
-    RuntimeMode,
-    TradeIntent,
     ProtectionRequest,
 )
 from app.services.simulator import (
@@ -19,9 +16,8 @@ from app.services.simulator import (
     SimpleBacktestEngine,
 )
 from app.services.simulator.engine import (
-    _timeframe_duration,
     _gross_pnl,
-    _find_position,
+    _timeframe_duration,
 )
 from app.services.strategy import BaseStrategy
 from app.services.strategy.config import StrategyConfig

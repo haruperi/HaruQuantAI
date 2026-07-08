@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_data_extra2():
     # data/gateway.py

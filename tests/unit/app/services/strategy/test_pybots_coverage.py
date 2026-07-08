@@ -2,9 +2,9 @@
 """Coverage expansion tests for the strategy pybots, templates, translation helpers, and registry."""
 
 from datetime import UTC, datetime, timedelta
+
 import pandas as pd
 import pytest
-
 from app.services.contracts.strategies import (
     AccountSnapshot,
     Bar,
@@ -14,25 +14,25 @@ from app.services.contracts.strategies import (
     QuoteSnapshot,
     RuntimeMode,
 )
+from app.services.strategy.pybots._template.rules import (
+    long_entry_signal,
+    long_exit_signal,
+    short_entry_signal,
+    short_exit_signal,
+)
+from app.services.strategy.pybots._template.strategy import TemplateStrategy
+from app.services.strategy.pybots.mql5_translation_helpers import (
+    average_entry,
+    by_direction,
+    entry_price,
+    pip_value,
+    require_quote,
+)
 from app.services.strategy.pybots.registry import (
     STRATEGY_TYPES,
     bundled_strategy_ids,
     load_bundled_strategy,
     strategy_from_config,
-)
-from app.services.strategy.pybots.mql5_translation_helpers import (
-    require_quote,
-    pip_value,
-    by_direction,
-    entry_price,
-    average_entry,
-)
-from app.services.strategy.pybots._template.strategy import TemplateStrategy
-from app.services.strategy.pybots._template.rules import (
-    long_entry_signal,
-    short_entry_signal,
-    long_exit_signal,
-    short_exit_signal,
 )
 
 

@@ -7,25 +7,21 @@ import math
 from collections.abc import Callable
 from typing import Any
 
-from app.services.analytics.contracts import AnalyticsConfig, MetricConfig, MetricResult
-from app.utils import build_metadata, response_from_exception, success_response
-from app.utils.errors import ValidationError
-from app.utils.logger import logger
-
 import app.services.analytics.metrics.aggregate as v2_aggregate
-import app.services.analytics.metrics.costs as v2_costs
-import app.services.analytics.metrics.curves as v2_curves
-import app.services.analytics.metrics.distribution as v2_distribution
 import app.services.analytics.metrics.drawdown as v2_drawdown
 import app.services.analytics.metrics.efficiency as v2_efficiency
 import app.services.analytics.metrics.equity as v2_equity_returns
-import app.services.analytics.metrics.position_exposure as v2_position_exposure
 import app.services.analytics.metrics.pnl as v2_pnl
+import app.services.analytics.metrics.position_exposure as v2_position_exposure
 import app.services.analytics.metrics.r_multiples as v2_r_multiples
 import app.services.analytics.metrics.ratios as v2_ratios
 import app.services.analytics.metrics.risk as v2_risk
 import app.services.analytics.metrics.time_analysis as v2_time_analysis
 import app.services.analytics.metrics.trade_outcomes as v2_trade_outcomes
+from app.services.analytics.contracts import AnalyticsConfig, MetricConfig, MetricResult
+from app.utils import build_metadata, response_from_exception, success_response
+from app.utils.errors import ValidationError
+from app.utils.logger import logger
 
 type TradeRecord = dict[str, Any]
 
@@ -385,11 +381,9 @@ def return_on_account(*args: Any, **kwargs: Any) -> Any:
 def compounding_risk_of_ruin(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for compounding_risk_of_ruin supporting V1 signature."""
     is_v1 = False
-    if len(args) >= 2 and isinstance(args[1], (int, float)):
+    if (len(args) >= 2 and isinstance(args[1], (int, float))) or "initial_balance" in kwargs or "initial_capital" in kwargs or "ruin_threshold" in kwargs:
         is_v1 = True
-    elif "initial_balance" in kwargs or "initial_capital" in kwargs or "ruin_threshold" in kwargs:
-        is_v1 = True
-    
+
     if is_v1:
         config = MetricConfig()
         metadata = dict(config.metadata or {})
@@ -408,9 +402,7 @@ def compounding_risk_of_ruin(*args: Any, **kwargs: Any) -> Any:
 def risk_of_ruin(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for risk_of_ruin supporting V1 signature."""
     is_v1 = False
-    if len(args) >= 2 and isinstance(args[1], (int, float)):
-        is_v1 = True
-    elif "initial_balance" in kwargs or "initial_capital" in kwargs or "ruin_threshold" in kwargs:
+    if (len(args) >= 2 and isinstance(args[1], (int, float))) or "initial_balance" in kwargs or "initial_capital" in kwargs or "ruin_threshold" in kwargs:
         is_v1 = True
 
     if is_v1:
@@ -622,7 +614,6 @@ def percent_time_in_market(*args: Any, **kwargs: Any) -> Any:
         period_duration_hours = args[1]
         if period_duration_hours <= 0:
             return 0.0
-        from app.services.analytics.metrics.position_exposure import time_in_market_duration
         dur = float(v2_position_exposure.time_in_market_duration(trades) or 0.0)
         return dur / period_duration_hours
     return v2_position_exposure.percent_time_in_market(*args, **kwargs)
@@ -631,8 +622,10 @@ def percent_time_in_market(*args: Any, **kwargs: Any) -> Any:
 def win_loss_streaks(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for win_loss_streaks supporting V1 list signature."""
     if len(args) >= 1 and isinstance(args[0], list) and (not args[0] or isinstance(args[0][0], dict)):
-        from app.services.analytics.metrics.trade_outcomes import get_ordered_closed_trades
-        from app.services.analytics.metrics.trade_outcomes import _get_trade_pnl
+        from app.services.analytics.metrics.trade_outcomes import (
+            _get_trade_pnl,
+            get_ordered_closed_trades,
+        )
         ordered = get_ordered_closed_trades(args[0])
         wins: list[int] = []
         losses: list[int] = []
@@ -695,7 +688,10 @@ def get_analytics_overview(
     """Compatibility wrapper for get_analytics_overview tool."""
     logger.debug("get_analytics_overview compatibility wrapper: executed.")
     try:
-        from app.services.analytics.metrics.trade_outcomes import get_closed_trades, parse_utc_time
+        from app.services.analytics.metrics.trade_outcomes import (
+            get_closed_trades,
+            parse_utc_time,
+        )
         t_list = trades if isinstance(trades, list) else []
         closed = get_closed_trades(t_list)
         start_dt = parse_utc_time(start_time)
@@ -737,7 +733,7 @@ def calculate_analytics_for_subset(trades: Any, config: Any = None) -> Any:
     logger.debug("calculate_analytics_for_subset compatibility wrapper: executed.")
     if config is not None and isinstance(config, MetricConfig):
         return v2_aggregate.calculate_analytics_for_subset(trades, config)
-    
+
     # V1 implementation
     from app.services.analytics.metrics.trade_outcomes import (
         get_closed_trades,
@@ -770,18 +766,18 @@ def calculate_analytics_for_subset(trades: Any, config: Any = None) -> Any:
             "slippage_paid": 0.0,
             "commission_paid": 0.0,
         }
-    
+
     classes = classify_trades(closed)
     n_wins = len(classes["wins"])
     n_losses = len(classes["losses"])
     gp = sum(float(t.get("profit_loss") or t.get("pnl") or 0.0) for t in classes["wins"])
     gl = sum(abs(float(t.get("profit_loss") or t.get("pnl") or 0.0)) for t in classes["losses"])
-    
+
     n_long = len([t for t in closed if t.get("direction") == "long"])
     n_short = len([t for t in closed if t.get("direction") == "short"])
-    
+
     wr = n_wins / len(closed)
-    
+
     np_val = v2_pnl.net_profit(closed, MetricConfig()).value or 0.0
     aw_val = v2_trade_outcomes.avg_win(closed, MetricConfig()).value or 0.0
     al_val = v2_trade_outcomes.avg_loss(closed, MetricConfig()).value or 0.0
@@ -797,7 +793,7 @@ def calculate_analytics_for_subset(trades: Any, config: Any = None) -> Any:
     arm_val = v2_trade_outcomes.avg_r_multiple(closed, MetricConfig()).value or 0.0
     sp_val = v2_position_exposure.slippage_paid(closed, MetricConfig()).value or 0.0
     cp_val = v2_position_exposure.commission_paid(closed, MetricConfig()).value or 0.0
-    
+
     return {
         "total_trades": len(closed),
         "winning_trades": n_wins,
@@ -827,8 +823,9 @@ def calculate_analytics_for_subset(trades: Any, config: Any = None) -> Any:
 
 
 # Static delegates for all other functions
-import app.services.analytics.metrics as v2_metrics
 import inspect
+
+import app.services.analytics.metrics as v2_metrics
 
 _to_delegate: list[tuple[str, object]] = []
 for name in dir(v2_metrics):

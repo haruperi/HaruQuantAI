@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_live_extra2():
     # live/gates.py
@@ -40,35 +40,45 @@ def test_trader_extra2():
 def test_pybots_extra2():
     # pybots
     try:
-        from app.services.strategy.pybots.decomposing_trade_ea.strategy import DecomposingTradeEA
+        from app.services.strategy.pybots.decomposing_trade_ea.strategy import (
+            DecomposingTradeEA,
+        )
         dtea = DecomposingTradeEA()
         dtea.execute(MagicMock())
     except Exception:
         pass
 
     try:
-        from app.services.strategy.pybots.harriet_hedging_ea.strategy import HarrietHedgingEA
+        from app.services.strategy.pybots.harriet_hedging_ea.strategy import (
+            HarrietHedgingEA,
+        )
         hhea = HarrietHedgingEA()
         hhea.execute(MagicMock())
     except Exception:
         pass
 
     try:
-        from app.services.strategy.pybots.market_structure_ea.strategy import MarketStructureEA
+        from app.services.strategy.pybots.market_structure_ea.strategy import (
+            MarketStructureEA,
+        )
         msea = MarketStructureEA()
         msea.execute(MagicMock())
     except Exception:
         pass
 
     try:
-        from app.services.strategy.pybots.sqx_breakout_atr_trailing.rules import SQXRules
+        from app.services.strategy.pybots.sqx_breakout_atr_trailing.rules import (
+            SQXRules,
+        )
         sqxr = SQXRules()
         sqxr.evaluate(MagicMock())
     except Exception:
         pass
 
     try:
-        from app.services.strategy.pybots.sqx_breakout_atr_trailing.strategy import SQXBreakoutEA
+        from app.services.strategy.pybots.sqx_breakout_atr_trailing.strategy import (
+            SQXBreakoutEA,
+        )
         sqxea = SQXBreakoutEA()
         sqxea.execute(MagicMock())
     except Exception:

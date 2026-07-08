@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_trader_extra_coverage():
     try:

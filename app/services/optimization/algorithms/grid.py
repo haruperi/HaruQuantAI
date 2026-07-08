@@ -87,7 +87,7 @@ _MAX_PENDING_FUTURES: int = 500
 class _ConstraintNodeValidator(ast.NodeVisitor):
     """AST visitor that rejects unsafe node types in constraint expressions."""
 
-    def visit_Call(self, node: ast.Call) -> None:  # noqa: N802
+    def visit_Call(self, node: ast.Call) -> None:
         """Allow only whitelisted built-in function names.
 
         Args:
@@ -106,7 +106,7 @@ class _ConstraintNodeValidator(ast.NodeVisitor):
             raise ValueError(msg)  # pragma: no cover
         self.generic_visit(node)  # pragma: no cover
 
-    def visit_Attribute(self, node: ast.Attribute) -> None:  # noqa: ARG002,N802
+    def visit_Attribute(self, node: ast.Attribute) -> None:  # noqa: ARG002
         """Block attribute access.
 
         Args:
@@ -117,7 +117,7 @@ class _ConstraintNodeValidator(ast.NodeVisitor):
         """
         raise ValueError("Attribute access is not permitted in constraints.")
 
-    def visit_Subscript(self, node: ast.Subscript) -> None:  # noqa: ARG002,N802
+    def visit_Subscript(self, node: ast.Subscript) -> None:  # noqa: ARG002
         """Block subscript access.
 
         Args:

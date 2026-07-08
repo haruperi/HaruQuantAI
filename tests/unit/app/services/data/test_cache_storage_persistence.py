@@ -212,7 +212,7 @@ def test_load_local_dataset_exception_handling(tmp_path: Path) -> None:
     corrupt_file = tmp_path / "corrupt.csv"
     corrupt_file.write_text("invalid,csv,data\n1,2", encoding="utf-8")
     # This should trigger DataError inside load_local_dataset
-    from app.services.data.storage import load_local_dataset, DataError
+    from app.services.data.storage import DataError, load_local_dataset
     with patch("app.services.data.storage.validate_storage_path", return_value=corrupt_file):
         with patch("pandas.read_csv", side_effect=Exception("Read CSV Error")):
             with pytest.raises(DataError):

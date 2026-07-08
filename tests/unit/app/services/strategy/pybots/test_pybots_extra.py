@@ -1,23 +1,29 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_pybots_coverage_boost():
     try:
-        from app.services.strategy.pybots.decomposing_trade_ea.strategy import DecomposingTradeEA
+        from app.services.strategy.pybots.decomposing_trade_ea.strategy import (
+            DecomposingTradeEA,
+        )
         ea = DecomposingTradeEA()
         ea.on_tick(MagicMock())
     except Exception:
         pass
 
     try:
-        from app.services.strategy.pybots.harriet_hedging_ea.strategy import HarrietHedgingEA
+        from app.services.strategy.pybots.harriet_hedging_ea.strategy import (
+            HarrietHedgingEA,
+        )
         ea = HarrietHedgingEA()
         ea.on_tick(MagicMock())
     except Exception:
         pass
 
     try:
-        from app.services.strategy.pybots.market_structure_ea.strategy import MarketStructureEA
+        from app.services.strategy.pybots.market_structure_ea.strategy import (
+            MarketStructureEA,
+        )
         ea = MarketStructureEA()
         ea.on_tick(MagicMock())
     except Exception:
@@ -38,14 +44,18 @@ def test_pybots_coverage_boost():
         pass
 
     try:
-        from app.services.strategy.pybots.sqx_breakout_atr_trailing.rules import BreakoutRules
+        from app.services.strategy.pybots.sqx_breakout_atr_trailing.rules import (
+            BreakoutRules,
+        )
         rules = BreakoutRules()
         rules.evaluate(MagicMock())
     except Exception:
         pass
 
     try:
-        from app.services.strategy.pybots.sqx_breakout_atr_trailing.strategy import SqxBreakoutAtrTrailingEA
+        from app.services.strategy.pybots.sqx_breakout_atr_trailing.strategy import (
+            SqxBreakoutAtrTrailingEA,
+        )
         ea = SqxBreakoutAtrTrailingEA()
         ea.on_tick(MagicMock())
     except Exception:
@@ -66,7 +76,7 @@ def test_pybots_coverage_boost():
         pass
 
     try:
-        from app.services.strategy.pybots.registry import register_pybot, get_pybot
+        from app.services.strategy.pybots.registry import get_pybot, register_pybot
         register_pybot("test_pybot", MagicMock())
         get_pybot("test_pybot")
     except Exception:

@@ -121,15 +121,15 @@ def mock_simulator_modules() -> None:
         "app.services.strategies.registry",
     ]
     originals = {k: sys.modules[k] for k in keys if k in sys.modules}
-    
+
     sys.modules["app.services.simulator"] = mock_simulator_base
     sys.modules["app.services.simulator.engine"] = mock_simulator_engine
     sys.modules["app.services.simulator.orchestrator"] = mock_simulator_orch
     sys.modules["app.services.strategies"] = mock_strategies_base
     sys.modules["app.services.strategies.registry"] = mock_registry
-    
+
     yield
-    
+
     for k in keys:
         if k in originals:
             sys.modules[k] = originals[k]

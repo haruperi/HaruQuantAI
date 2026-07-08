@@ -1,90 +1,88 @@
-# ruff: noqa: E501, PLR2004, D, ANN, S101
+# ruff: noqa: E501, D, ANN, S101
 """Coverage expansion tests for Research Service."""
 
-import datetime
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
-
-from app.utils.errors import ValidationError
-from app.utils.settings import EdgeLabConfig, EdgeResult, EdgeStats
+from app.services.research.data import (
+    build_core_metric_profile,
+    build_market_structure_profile,
+    prepare_research_dataset,
+    run_seasonality,
+    validate_dataset,
+)
 from app.services.research.helpers import (
-    parse_sentiment_snapshot,
-    filter_events_by_symbol,
-    calculate_returns,
-    calculate_volatility,
-    calculate_atr,
     calculate_adr,
-    calculate_spread_statistics,
-    calculate_session_statistics,
-    calculate_seasonality_statistics,
+    calculate_atr,
     calculate_correlation_matrix,
-    check_lookahead_bias_risk,
-    check_hypothesis_testability,
-    check_contradictory_evidence,
-    run_session_breakout_strategy,
-    run_session_fade_strategy,
+    calculate_returns,
+    calculate_seasonality_statistics,
+    calculate_session_statistics,
+    calculate_spread_statistics,
+    calculate_volatility,
     calmar_ratio,
+    check_contradictory_evidence,
+    check_hypothesis_testability,
+    check_lookahead_bias_risk,
     expectancy,
+    filter_events_by_symbol,
     max_drawdown,
     median_mae_mfe,
+    parse_sentiment_snapshot,
     profit_factor,
+    run_session_breakout_strategy,
+    run_session_fade_strategy,
     sharpe_ratio,
     sortino_ratio,
     win_rate,
-    ResearchResourceLimits,
 )
-from app.services.research.data import (
-    validate_dataset,
-    prepare_research_dataset,
-    build_core_metric_profile,
-    build_market_structure_profile,
-    run_seasonality,
+from app.services.research.reporting import (
+    _safe_write,
+    build_edge_lab_scorecard_report,
+    generate_multi_symbol_report,
+    save_json_report,
+    save_markdown_report,
+)
+from app.services.research.studies.null_models import (
+    compare_to_null,
+    compute_null_percentile,
+    get_acceptance_criteria,
+    null_distribution_stats,
+    r_space_null,
+    random_entry_null,
+    session_randomized_null,
+    shuffle_returns_null,
+)
+from app.services.research.studies.structure import (
+    build_market_structure_stability_report,
+    build_metric_calibration_grid,
+    build_research_evidence_pack,
+    build_validation_summary,
+    confidence_bucket,
+    detect_swing_points,
+    evaluate_metric_calibration_candidates,
+    evaluate_profile_calibration,
+    generate_research_hypothesis,
+    label_realized_market_behavior,
+    parse_news_items,
+    resolve_market_structure_profile_overrides,
+    symbol_class,
+    timeframe_bucket,
 )
 from app.services.research.studies.unsupervised import (
     UnsupervisedResearchRequest,
     UnsupervisedResearchResult,
-    compute_forward_returns,
-    analyze_cluster_outperformance,
     adapt_signals_by_cluster,
+    analyze_cluster_outperformance,
     build_unsupervised_insight_report,
-    run_pca,
     cluster_feature_space,
+    compute_forward_returns,
+    run_pca,
 )
-from app.services.research.studies.null_models import (
-    compute_null_percentile,
-    compare_to_null,
-    get_acceptance_criteria,
-    random_entry_null,
-    r_space_null,
-    session_randomized_null,
-    shuffle_returns_null,
-    null_distribution_stats,
-)
-from app.services.research.studies.structure import (
-    detect_swing_points,
-    build_metric_calibration_grid,
-    evaluate_metric_calibration_candidates,
-    evaluate_profile_calibration,
-    timeframe_bucket,
-    symbol_class,
-    resolve_market_structure_profile_overrides,
-    confidence_bucket,
-    label_realized_market_behavior,
-    build_validation_summary,
-    build_market_structure_stability_report,
-    parse_news_items,
-    generate_research_hypothesis,
-    build_research_evidence_pack,
-)
-from app.services.research.reporting import (
-    _safe_write,
-    generate_multi_symbol_report,
-    save_json_report,
-    save_markdown_report,
-    build_edge_lab_scorecard_report,
-)
+from app.utils.errors import ValidationError
+from app.utils.settings import EdgeLabConfig, EdgeResult, EdgeStats
 
 
 @pytest.fixture

@@ -1,17 +1,17 @@
-import pytest
 from unittest.mock import MagicMock
 
 from app.services.live.gates import (
+    cancel_all_orders,
+    check_kill_switch_conditions,
+    close_all_positions,
+    evaluate_live_gate,
+    record_kill_switch_event,
     trigger_global_kill_switch,
     trigger_strategy_kill_switch,
     trigger_symbol_kill_switch,
-    cancel_all_orders,
-    close_all_positions,
-    check_kill_switch_conditions,
-    record_kill_switch_event,
-    evaluate_live_gate
 )
 from app.utils.settings import settings
+
 
 def test_live_gates_functions():
     try:
@@ -38,7 +38,7 @@ def test_live_gates_functions():
         close_all_positions("test_reason")
     except Exception:
         pass
-        
+
     try:
         check_kill_switch_conditions()
     except Exception:

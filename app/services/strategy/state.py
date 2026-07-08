@@ -43,7 +43,7 @@ class StrategyState:
         }
 
     @classmethod
-    def from_dict(cls, value: dict[str, Any]) -> "StrategyState":
+    def from_dict(cls, value: dict[str, Any]) -> StrategyState:
         cooldown_raw = value.get("cooldown_until")
         cooldown = datetime.fromisoformat(cooldown_raw) if isinstance(cooldown_raw, str) else None
         return cls(

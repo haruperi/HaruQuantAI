@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_optimization_extra2():
     # algorithms/bayesian.py
@@ -53,7 +53,9 @@ def test_optimization_extra2():
 
     # persistence/repository.py
     try:
-        from app.services.optimization.persistence.repository import OptimizationRepository
+        from app.services.optimization.persistence.repository import (
+            OptimizationRepository,
+        )
         orp = OptimizationRepository()
         orp.save(MagicMock())
         orp.load(MagicMock())

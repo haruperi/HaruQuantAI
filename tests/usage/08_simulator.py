@@ -4,7 +4,6 @@
 from __future__ import annotations
 import sys
 from pathlib import Path
-import pandas as pd
 
 # Add project root to sys.path to allow execution without PYTHONPATH issues
 project_root = str(Path(__file__).resolve().parents[2])

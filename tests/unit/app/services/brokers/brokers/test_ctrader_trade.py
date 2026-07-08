@@ -1,13 +1,12 @@
-import pytest
 from unittest.mock import MagicMock
 
 from app.services.brokers.ctrader import CTraderClient
-from app.utils.errors import ExternalServiceError
+
 
 def test_ctrader_trade_functions():
     client = CTraderClient()
     client._is_connected = True
-    
+
     # Mock send_request to return mock responses
     def mock_send_request(req, response_payload_type, **kwargs):
         # Return a generic success mock
@@ -17,15 +16,15 @@ def test_ctrader_trade_functions():
         mock_res.executedVolume = 1000
         mock_res.executionPrice = 1.05
         return mock_res
-        
+
     client.send_request = mock_send_request
-    
+
     # Trade (order_send)
     try:
         res = client.order_send("EURUSD", 0, 1000, 1.0, 10)
     except Exception:
         pass
-        
+
     try:
         res = client.order_calc_profit(0, "EURUSD", 1000, 1.0, 1.1)
     except Exception:

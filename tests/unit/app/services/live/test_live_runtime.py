@@ -991,8 +991,14 @@ class TestReconciliation:
         assert result.missing_count >= 1
 
     def test_reconciliation_additional_coverage(self):
-        from app.services.live.reconciliation import ReconciliationStartupGuard, reconcile_state, _extract_timestamp, _check_stale
         from datetime import UTC, datetime, timedelta
+
+        from app.services.live.reconciliation import (
+            ReconciliationStartupGuard,
+            _check_stale,
+            _extract_timestamp,
+            reconcile_state,
+        )
 
         # 1. ReconciliationStartupGuard
         guard = ReconciliationStartupGuard()
@@ -1298,7 +1304,7 @@ class TestLivePortsCoverage:
     """Explicitly test ports.py runtime checkable protocols and cover ellipsis."""
 
     def test_ports_protocol_definitions(self):
-        from app.services.live.ports import LiveStateStore, AuditSink, IdempotencyStore
+        from app.services.live.ports import AuditSink, IdempotencyStore, LiveStateStore
 
         class DummyStateStore(LiveStateStore):
             def save_session_state(self, *, session_id: str, state: dict, schema_version: int = 1) -> None:

@@ -1,15 +1,21 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_others_no_pandas():
     # Optimization
-    from app.services.optimization.algorithms.random import random_search, parallel_random_search
+    from app.services.optimization.algorithms.random import (
+        parallel_random_search,
+        random_search,
+    )
     try: random_search(MagicMock(), MagicMock(), 5)
     except Exception: pass
     try: parallel_random_search(MagicMock(), MagicMock(), 5, 2)
     except Exception: pass
 
-    from app.services.optimization.algorithms.grid import grid_search, parallel_grid_search
+    from app.services.optimization.algorithms.grid import (
+        grid_search,
+        parallel_grid_search,
+    )
     try: grid_search(MagicMock(), MagicMock())
     except Exception: pass
     try: parallel_grid_search(MagicMock(), MagicMock(), 2)
@@ -23,7 +29,10 @@ def test_others_no_pandas():
     try: optimization_genetic(MagicMock(), MagicMock(), 5, 2)
     except Exception: pass
 
-    from app.services.optimization.helpers import _sample_parameter_random, _evaluate_candidate
+    from app.services.optimization.helpers import (
+        _evaluate_candidate,
+        _sample_parameter_random,
+    )
     try: _sample_parameter_random(MagicMock())
     except Exception: pass
     try: _evaluate_candidate(MagicMock(), MagicMock(), MagicMock())

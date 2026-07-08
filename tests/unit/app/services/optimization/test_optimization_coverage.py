@@ -1,8 +1,9 @@
-# ruff: noqa: E402, E501, PLR2004, D, ANN, S101
+# ruff: noqa: E402, E501, D, ANN, S101
 """Coverage expansion tests for Optimization Service."""
 
 import sys
 from unittest.mock import MagicMock, patch
+
 
 # Setup mock simulator module dynamically for the test run
 class MockEngine:
@@ -51,7 +52,7 @@ def setup_module(module) -> None:
     sys.modules["app.services.strategies"] = mock_strategies_base
     sys.modules["app.services.strategies.registry"] = mock_registry
 
-    import app.services.optimization.sweeps as sweeps
+    from app.services.optimization import sweeps
     global _original_evaluate_single_fold
     _original_evaluate_single_fold = sweeps._evaluate_single_fold
 
@@ -66,7 +67,7 @@ def setup_module(module) -> None:
     sweeps._evaluate_single_fold = mock_evaluate_single_fold
 
 def teardown_module(module) -> None:
-    import app.services.optimization.sweeps as sweeps
+    from app.services.optimization import sweeps
     global _original_evaluate_single_fold
     if _original_evaluate_single_fold is not None:
         sweeps._evaluate_single_fold = _original_evaluate_single_fold
@@ -77,45 +78,40 @@ def teardown_module(module) -> None:
         else:
             sys.modules[name] = orig
 
+
 import pytest
-from datetime import timedelta
+from app.services.optimization.algorithms.bayesian import bayesian_optimization
+from app.services.optimization.algorithms.genetic import genetic_algorithm
 from app.services.optimization.models import (
-    ParameterSpace,
+    OptimizationSummary,
     ParameterRange,
+    ParameterSpace,
     WalkForwardRequest,
     WalkForwardResponse,
-    WalkForwardWindow,
-    OptimizationSummary,
-    OptimizationResultItem,
 )
-from app.services.optimization.sweeps import (
-    compare_optimization_runs,
-    walk_forward,
-    parallel_walk_forward,
-    optimization_walk_forward,
-    run_optimization_task,
-    run_walk_forward_task,
-    analyze_walk_forward_results,
-    analyze_parallel_results,
-    save_optimization_result,
-    build_optimization_report,
+from app.services.optimization.robustness import (
+    optimization_monte_carlo,
+    run_commission_stress_test,
+    run_slippage_stress_test,
+    run_spread_stress_test,
 )
 from app.services.optimization.splitting import (
     expanding_window_split,
-    run_walk_forward_optimization,
     run_walk_forward_matrix,
+    run_walk_forward_optimization,
 )
-from app.services.optimization.robustness import (
-    assess_strategy_robustness,
-    run_slippage_stress_test,
-    run_spread_stress_test,
-    run_commission_stress_test,
-    optimization_monte_carlo,
+from app.services.optimization.sweeps import (
+    analyze_parallel_results,
+    analyze_walk_forward_results,
+    build_optimization_report,
+    compare_optimization_runs,
+    optimization_walk_forward,
+    parallel_walk_forward,
+    run_optimization_task,
+    run_walk_forward_task,
+    save_optimization_result,
+    walk_forward,
 )
-from app.services.optimization.algorithms.bayesian import bayesian_optimization
-from app.services.optimization.algorithms.genetic import genetic_algorithm
-from app.services.optimization.algorithms.grid import grid_search, parallel_grid_search
-from app.services.optimization.algorithms.random import random_search, parallel_random_search
 
 
 @pytest.fixture

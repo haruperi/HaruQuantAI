@@ -558,8 +558,8 @@ def test_config_hash_utilities() -> None:
     from app.services.risk.config.hashing import (
         canonicalize_risk_config_for_hash,
         compare_risk_config_hashes,
-        validate_risk_config_hash,
         hash_risk_config,
+        validate_risk_config_hash,
     )
 
     cfg1 = load_risk_config("default")
@@ -595,12 +595,12 @@ def test_config_hash_utilities() -> None:
 def test_profile_builders() -> None:
     """Test built-in profile builders and registry functions directly."""
     from app.services.risk.config.profiles import (
-        build_safe_default_profile,
-        build_prop_firm_default_profile,
-        build_paper_profile,
         build_live_conservative_profile,
-        list_builtin_risk_profiles,
+        build_paper_profile,
+        build_prop_firm_default_profile,
+        build_safe_default_profile,
         get_builtin_risk_profile,
+        list_builtin_risk_profiles,
     )
 
     p1 = build_safe_default_profile()
@@ -639,8 +639,9 @@ def test_registry_methods() -> None:
 
 def test_loader_error_cases() -> None:
     """Test edge cases and error handling in loaders."""
-    from app.services.risk.config.loader import load_risk_config, _registry
     import tempfile
+
+    from app.services.risk.config.loader import _registry, load_risk_config
 
     # Non-existent file path
     with pytest.raises(ValidationError, match="Explicit configuration source file not found"):

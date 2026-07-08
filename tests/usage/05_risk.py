@@ -22,6 +22,7 @@ from app.agentic.tools.risk import build_portfolio_risk_snapshot
 from app.services.risk import (
     STAGE_SEQUENCE,
     AccountRiskSnapshot,
+    DependencyStatus,
     DrawdownState,
     ExpectedShortfallMethod,
     InMemoryRiskStateStore,
@@ -33,6 +34,7 @@ from app.services.risk import (
     PositionState,
     ProposedAllocation,
     ProposedTrade,
+    ReadinessDeliveryPlan,
     ReturnType,
     RiskAction,
     RiskApprovalToken,
@@ -42,11 +44,14 @@ from app.services.risk import (
     RiskDecisionStatus,
     RiskGovernor,
     RiskMode,
+    RiskModeMatrix,
+    RiskReadinessManifest,
     RiskReasonCode,
     SizingMethod,
     VaRMethod,
     assess_risk_regime,
     build_default_scenario_registry,
+    build_readiness_dry_run,
     calculate_correlation_snapshot,
     calculate_currency_exposure,
     calculate_daily_drawdown,
@@ -69,6 +74,9 @@ from app.services.risk import (
     get_kill_switch_manager,
     run_limit_checks,
     validate_custom_scenario,
+    validate_delivery_plan,
+    validate_phase_dependencies,
+    validate_risk_mode_matrix,
     verify_allocation_limits,
     verify_drawdown_limits,
     verify_execution_limits,
@@ -1389,6 +1397,92 @@ def example_20_observability_metrics_and_reporting() -> None:
     print(f"\nAI Tool Status: {tool_res.get('status')}")
 
 
+def example_21_readiness() -> None:
+    """Demonstrate readiness checks validation."""
+    print_header(21, "Readiness checks validation")
+
+    # 1. Dependency status mapping
+    deps = {
+        "ports": DependencyStatus(
+            file_path="app/services/risk/storage/ports.py",
+            implemented=True,
+            importable=True,
+            side_effect_safe=True,
+            covered_by_tests=True,
+        ),
+        "resolver": DependencyStatus(
+            file_path="app/services/risk/policy/resolver.py",
+            implemented=True,
+            importable=True,
+            side_effect_safe=True,
+            covered_by_tests=True,
+        ),
+    }
+
+    dep_assessment = validate_phase_dependencies(deps)
+    print(f"Dependency readiness assessment: ready={dep_assessment.ready}")
+    print(f"Failure reasons: {dep_assessment.failure_reasons}")
+
+    # 2. Mode Matrix validation
+    matrix = RiskModeMatrix(
+        covered_modes=[
+            "offline",
+            "simulation",
+            "paper",
+            "shadow",
+            "read-only live",
+            "micro-live",
+            "full-live",
+        ],
+        policies_mapped={
+            "offline": "default",
+            "simulation": "default",
+            "paper": "paper",
+            "shadow": "live_conservative",
+            "read-only live": "live_conservative",
+            "micro-live": "live_conservative",
+            "full-live": "live_conservative",
+        },
+    )
+    matrix_res = validate_risk_mode_matrix(matrix)
+    print(
+        f"Risk mode matrix validation result: valid={matrix_res['valid']}, "
+        f"message={matrix_res['message']}"
+    )
+
+    # 3. Delivery Plan verification
+    plan = ReadinessDeliveryPlan(
+        traceability_matrix_present=True,
+        synthetic_fixtures_only=True,
+        deterministic_seeds={"stress": 42},
+        benchmark_dataset_shapes={"var": (100, 10)},
+        redaction_rules_defined=True,
+        tool_classifications={"validate_phase_dependencies": "helper"},
+        audit_failure_policy="fail-closed",
+    )
+    plan_res = validate_delivery_plan(plan)
+    print(
+        f"Delivery plan validation result: valid={plan_res['valid']}, "
+        f"message={plan_res['message']}"
+    )
+
+    # 4. Manifest and Dry-run Compilation
+    manifest = RiskReadinessManifest(
+        dependencies=deps,
+        mode_matrix=matrix,
+        delivery_plan=plan,
+        author="agentic-builder",
+    )
+    print(
+        f"Readiness manifest instantiated. Author: {manifest.author}, "
+        f"Created: {manifest.created_at}"
+    )
+
+    report = build_readiness_dry_run(manifest)
+    print(f"Dry-run report files to change: {report.files_to_change}")
+    print(f"Dry-run planned commands: {report.commands_planned}")
+
+
 if __name__ == "__main__":
     """Execute all risk governance usage examples."""
     print("==================================================")
@@ -1415,6 +1509,7 @@ if __name__ == "__main__":
     example_18_state_persistence_stores()
     example_19_cryptographic_audit_hash_chain()
     example_20_observability_metrics_and_reporting()
+    example_21_readiness()
 
     print("==================================================")
     print("ALL RISK GOVERNANCE USAGE EXAMPLES COMPLETED")

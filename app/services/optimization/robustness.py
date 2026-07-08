@@ -312,7 +312,9 @@ def run_randomize_parameters_mc(
     Returns:
         list[float]: Total-return scores across perturbed configurations.
     """
-    from app.services.optimization.helpers import run_strategy_backtest  # pragma: no cover
+    from app.services.optimization.helpers import (
+        run_strategy_backtest,  # pragma: no cover
+    )
     from app.services.optimization.scoring import total_return_score  # pragma: no cover
 
     rng = random.Random(seed)  # pragma: no cover
@@ -417,7 +419,9 @@ def run_cross_market_test(
     Returns:
         dict[str, float]: Total-return score keyed by symbol.
     """
-    from app.services.optimization.helpers import run_strategy_backtest  # pragma: no cover
+    from app.services.optimization.helpers import (
+        run_strategy_backtest,  # pragma: no cover
+    )
     from app.services.optimization.scoring import total_return_score  # pragma: no cover
 
     results: dict[str, float] = {}  # pragma: no cover
@@ -461,7 +465,9 @@ def run_cross_timeframe_test(
     Returns:
         dict[str, float]: Total-return score keyed by timeframe string.
     """
-    from app.services.optimization.helpers import run_strategy_backtest  # pragma: no cover
+    from app.services.optimization.helpers import (
+        run_strategy_backtest,  # pragma: no cover
+    )
     from app.services.optimization.scoring import total_return_score  # pragma: no cover
 
     results: dict[str, float] = {}  # pragma: no cover
@@ -505,7 +511,9 @@ def run_second_oos_test(
     Returns:
         float: Total-return score on the OOS slice, or 0.0 on failure.
     """
-    from app.services.optimization.helpers import run_strategy_backtest  # pragma: no cover
+    from app.services.optimization.helpers import (
+        run_strategy_backtest,  # pragma: no cover
+    )
     from app.services.optimization.scoring import total_return_score  # pragma: no cover
 
     try:  # pragma: no cover

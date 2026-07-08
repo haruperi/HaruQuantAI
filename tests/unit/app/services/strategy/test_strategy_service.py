@@ -565,34 +565,34 @@ def test_strategy_state_coverage() -> None:
     from app.services.strategy.state import StrategyState
 
     state = StrategyState()
-    
+
     # Test entry count
     assert state.entry_count_for("2026-06-23") == 0
     state.increment_entry_count("2026-06-23")
     assert state.entry_count_for("2026-06-23") == 1
-    
+
     # Test custom dictionary
     assert state.get_custom("foo") is None
     assert state.get_custom("foo", "default") == "default"
     state.set_custom("foo", "bar")
     assert state.get_custom("foo") == "bar"
-    
+
     # Test to_dict / from_dict with cooldown
     state.cooldown_until = datetime(2026, 6, 23, 15, 0, tzinfo=UTC)
     state.emitted_intent_ids.add("i1")
     state.processed_event_ids.add("e1")
-    
+
     serialized = state.to_dict()
     assert serialized["custom"]["foo"] == "bar"
     assert serialized["cooldown_until"] == "2026-06-23T15:00:00+00:00"
-    
+
     restored = StrategyState.from_dict(serialized)
     assert restored.get_custom("foo") == "bar"
     assert restored.cooldown_until == state.cooldown_until
     assert restored.entry_count_for("2026-06-23") == 1
     assert "i1" in restored.emitted_intent_ids
     assert "e1" in restored.processed_event_ids
-    
+
     # Test from_dict without cooldown
     serialized["cooldown_until"] = None
     restored_no_cooldown = StrategyState.from_dict(serialized)

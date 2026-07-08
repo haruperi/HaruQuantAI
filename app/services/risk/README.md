@@ -393,3 +393,21 @@ The risk governance storage layer is structured as a dedicated package under `ap
    - **`InMemoryRiskStateStore`**: Thread-safe repository implementing all four storage protocols using local python dicts protected by re-entrant locks (`threading.RLock`).
    - **Fault Injection (`simulate_storage_failure`)**: Exposes simulated failure interfaces to test domain-level fail-closed robustness against database/file storage outages.
 
+---
+
+## 20. Readiness and Delivery Plan Validation (Sprint 5.18)
+
+The readiness module proves that readiness verification starts only with canonical dependencies, explicit scope boundaries, safe fixtures, documented mode behavior, and an auditable delivery plan. It is a pre-runtime governance boundary and never evaluates a trade.
+
+### Key Components
+
+1. **Dependency Status Mapping (`validate_phase_dependencies`)**:
+   Verifies that required dependencies (e.g. storage ports, policy engines, and calculators) are implemented, importable, side-effect safe, and covered by tests.
+2. **Trading Mode Matrix (`validate_risk_mode_matrix`)**:
+   Enforces that the implementation covers all safety and operational environments (offline, simulation, paper, shadow, read-only live, micro-live, full-live).
+3. **Delivery Plan Validation (`validate_delivery_plan`)**:
+   Verifies requirements traceability, restricts fixtures to synthetic-only datasets, checks for deterministic seeds, and enforces fail-closed policies for live-sensitive staging.
+4. **Dry-Run Compilation (`build_readiness_dry_run`)**:
+   Takes a validated manifest and outputs a detailed `DryRunReport` detailing the files to read, files to change, planned commands, active scopes, blockers, and rollback boundaries.
+
+

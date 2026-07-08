@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_optimization_coverage_boost():
     # Algorithms
@@ -9,7 +9,7 @@ def test_optimization_coverage_boost():
         opt.optimize(MagicMock(), MagicMock(), 10)
     except Exception:
         pass
-        
+
     try:
         from app.services.optimization.algorithms.grid import GridSearchOptimizer
         opt = GridSearchOptimizer()
@@ -33,14 +33,19 @@ def test_optimization_coverage_boost():
 
     # Persistence
     try:
-        from app.services.optimization.persistence.checkpoint import save_checkpoint, load_checkpoint
+        from app.services.optimization.persistence.checkpoint import (
+            load_checkpoint,
+            save_checkpoint,
+        )
         save_checkpoint(MagicMock(), "test_path")
         load_checkpoint("test_path")
     except Exception:
         pass
 
     try:
-        from app.services.optimization.persistence.repository import OptimizationRepository
+        from app.services.optimization.persistence.repository import (
+            OptimizationRepository,
+        )
         repo = OptimizationRepository()
         repo.save_result(MagicMock())
     except Exception:

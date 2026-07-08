@@ -6,12 +6,10 @@ from typing import Any
 
 import pytest
 from app.services.analytics.scorecards import (
+    StrategyQualityConfig,
     evaluate_strategy_quality,
-    NonBindingRecommendation,
     sample_size_warning,
     sqn,
-    StrategyQualityAssessment,
-    StrategyQualityConfig,
 )
 from app.utils.errors import ValidationError
 
@@ -127,7 +125,7 @@ def test_scorecard_sqn_assessment(mock_good_report, mock_poor_report):
 
 def test_scorecard_sample_size_warning(mock_good_report, mock_poor_report):
     config = StrategyQualityConfig(trades_min=40, trades_robust=100)
-    
+
     assessment_good = sample_size_warning(mock_good_report, config)
     assert assessment_good.score == 100.0
     assert "Sufficient sample size" in assessment_good.strengths[0]

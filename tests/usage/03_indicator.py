@@ -46,6 +46,7 @@ from app.services.indicators import (
 from app.utils.logger import logger
 from app.utils.settings import settings
 
+
 def print_header(title: str) -> None:
     """Print the header for an example section."""
     print(f"\n{'=' * 100}")

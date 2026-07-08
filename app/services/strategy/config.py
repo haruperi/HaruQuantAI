@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import json
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, cast
-
+from typing import Any, cast
 
 JsonObject = dict[str, Any]
 
@@ -341,4 +341,4 @@ def _validate_numeric_definition(name: str, field: str, value: Any) -> None:
 
 def _copy_json_object(value: Mapping[str, Any]) -> JsonObject:
     """Deep copy through JSON to prevent callers mutating validated config in place."""
-    return cast(JsonObject, json.loads(json.dumps(value)))
+    return cast("JsonObject", json.loads(json.dumps(value)))

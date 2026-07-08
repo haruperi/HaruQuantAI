@@ -3,8 +3,8 @@
 import tempfile
 from pathlib import Path
 from typing import Any
-import pytest
 
+import pytest
 from app.services.strategy.config import (
     ConfigurationError,
     StrategyConfig,
@@ -182,7 +182,7 @@ def test_strategy_config_helper_methods() -> None:
     assert config.strategy_id == "test"
     assert config.version == "1.0.0"
     assert config.permitted_environments == frozenset(["SIMULATOR"])
-    
+
     assert config.section("trading_options") == {"timezone": "UTC"}
     with pytest.raises(ConfigurationError, match="Expected section 'schema_version' to be an object"):
         config.section("schema_version")
@@ -274,12 +274,12 @@ def test_validate_parameter_min_max_violation() -> None:
     base["parameters"]["definitions"] = {
         "period": {"type": "integer", "default": 10, "description": "desc", "minimum": 5, "maximum": 15}
     }
-    
+
     # Violation of min
     base["parameters"]["values"] = {"period": 4}
     with pytest.raises(ConfigurationError, match="must be >= 5"):
         validate_strategy_config(base)
-        
+
     # Violation of max
     base["parameters"]["values"] = {"period": 16}
     with pytest.raises(ConfigurationError, match="must be <= 15"):

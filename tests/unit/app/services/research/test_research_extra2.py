@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_research_extra2():
     # research/studies/null_models.py

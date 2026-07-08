@@ -50,8 +50,8 @@ def test_lazy_settings_getattr() -> None:
 
 
 def test_invalid_getattr() -> None:
-    import pytest
     import app.utils
+    import pytest
     with pytest.raises(AttributeError, match="module 'app.utils' has no attribute"):
         _ = app.utils.non_existent_attribute
 

@@ -1,4 +1,3 @@
-# ruff: noqa: A005
 """Optimization random search algorithm and Monte Carlo simulators.
 
 Implements random, Sobol, and Latin Hypercube sampling sweeps, trade order

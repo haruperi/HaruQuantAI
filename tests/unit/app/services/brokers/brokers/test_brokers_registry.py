@@ -1,8 +1,8 @@
 # ruff: noqa: D, ANN, S101
 """Unit tests for the app.services.brokers package registry exports."""
 
-import pytest
 import app.services.brokers
+import pytest
 
 
 def test_brokers_registry_lazy_resolution() -> None:

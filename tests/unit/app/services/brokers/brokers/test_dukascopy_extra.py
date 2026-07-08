@@ -1,25 +1,24 @@
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from app.services.brokers.dukascopy import DukascopyClient
-from app.utils.errors import ExternalServiceError
+
 
 def test_dukascopy_trade_functions():
     client = DukascopyClient()
     client._is_connected = True
-    
+
     # Mock send_request to return mock responses
     def mock_send_request(req, **kwargs):
         # Return a generic success mock
         return MagicMock()
-        
+
     client.send_request = mock_send_request
-    
+
     try:
         res = client.order_send("EURUSD", 0, 1000, 1.0, 10)
     except Exception:
         pass
-        
+
     try:
         res = client.order_calc_profit(0, "EURUSD", 1000, 1.0, 1.1)
     except Exception:

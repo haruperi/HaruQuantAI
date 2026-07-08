@@ -1,8 +1,7 @@
 # ruff: noqa: D, ANN, S101
 """Unit tests for the app.services.brokers.router module."""
 
-import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from app.services.brokers.router import get_active_broker_name, get_broker_module
 

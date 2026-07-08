@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+
 
 def test_brokers_extra2():
     # brokers/ctrader.py

@@ -275,8 +275,15 @@ def test_feed_status_errors() -> None:
 
 def test_async_job_execution_loops() -> None:
     import asyncio
-    from app.services.data.scheduler import _execute_single_run, _run_job_loop, create_data_update_job, stop_data_update_job, start_data_update_job
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
+
+    from app.services.data.scheduler import (
+        _execute_single_run,
+        _run_job_loop,
+        create_data_update_job,
+        start_data_update_job,
+        stop_data_update_job,
+    )
 
     async def run_test() -> None:
         job_name = "Async_Loop_Job"

@@ -68,19 +68,12 @@ Side effects:
 
 from __future__ import annotations
 
-# -- Port contracts --
-from app.services.live.ports import (
-    AuditSink,
-    IdempotencyStore,
-    LiveStateStore,
-)
-
-# -- Policy --
-from app.services.live.policy import (
-    LIVE_ACTION_POLICY_MATRIX,
-    LIVE_POLICY_UNDEFINED,
-    LiveActionPolicy,
-    get_action_policy,
+# -- Executor --
+from app.services.live.executor import (
+    LiveSideEffectMode,
+    LiveTradeExecutor,
+    execute_live_order_intent,
+    validate_live_execution_request,
 )
 
 # -- Gates --
@@ -100,14 +93,6 @@ from app.services.live.gates import (
     trigger_symbol_kill_switch,
 )
 
-# -- Executor --
-from app.services.live.executor import (
-    LiveSideEffectMode,
-    LiveTradeExecutor,
-    execute_live_order_intent,
-    validate_live_execution_request,
-)
-
 # -- Monitoring --
 from app.services.live.monitoring import (
     LiveHealthSnapshot,
@@ -115,6 +100,21 @@ from app.services.live.monitoring import (
     check_live_readiness,
     emit_live_monitoring_event,
     record_live_incident,
+)
+
+# -- Policy --
+from app.services.live.policy import (
+    LIVE_ACTION_POLICY_MATRIX,
+    LIVE_POLICY_UNDEFINED,
+    LiveActionPolicy,
+    get_action_policy,
+)
+
+# -- Port contracts --
+from app.services.live.ports import (
+    AuditSink,
+    IdempotencyStore,
+    LiveStateStore,
 )
 
 # -- Reconciliation --

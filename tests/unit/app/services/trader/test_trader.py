@@ -1,4 +1,4 @@
-# ruff: noqa: PLR0915, E402, SIM105, ICN001
+# ruff: noqa: PLR0915, SIM105, ICN001
 """Unit tests for the generic Trade classes."""
 
 import sys
@@ -10,9 +10,10 @@ try:
 except ImportError:
     pass
 
-import pytest
 import time
 from decimal import Decimal
+
+import pytest
 from app.services.brokers import get_broker_module
 from app.services.trader import (
     AccountInfo,
@@ -294,7 +295,6 @@ def test_resolver_actual_resolution(mocker: MockerFixture) -> None:
         "app.services.brokers.router.get_active_broker_name", return_value="simulator"
     )
     res_sim = get_broker_module()
-    import sys
     simulator = sys.modules["app.services.simulator"]
 
     assert res_sim == simulator
@@ -680,6 +680,7 @@ def test_trader_concurrency_lock() -> None:
 
 def test_trader_concurrency_async_lock() -> None:
     import asyncio
+
     from app.services.trader.concurrency import ConcurrencyQueue
     queue = ConcurrencyQueue.get_instance()
     # Test lock async context manager
@@ -690,7 +691,7 @@ def test_trader_concurrency_async_lock() -> None:
 
 
 def test_trader_rate_limiter_edge_cases(mocker: MockerFixture) -> None:
-    from app.services.trader.rate_limiter import get_rate_limiter, RateLimiter
+    from app.services.trader.rate_limiter import RateLimiter, get_rate_limiter
     # 1. Default providers
     lim_ctrader = get_rate_limiter("ctrader")
     assert lim_ctrader.capacity == 30.0

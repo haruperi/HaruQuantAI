@@ -167,10 +167,10 @@ def test_calculate_prop_firm_compliance():
 
 def test_report_serialization_and_hashing():
     from app.services.analytics.reports import (
-        serialize_report,
-        compute_report_hash,
-        ReportFormat,
         HashPolicy,
+        ReportFormat,
+        compute_report_hash,
+        serialize_report,
     )
     report_dict = {
         "report_id": "rep_test_01",

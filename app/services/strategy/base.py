@@ -303,7 +303,7 @@ class BaseStrategy(ABC):
         return not (
             enforce_duplicate_policy
             and not self._duplicate_policy_allows(context, direction)
-        )  # noqa: E501
+        )
 
     def _is_weekend_blocked(self, current: datetime) -> bool:
         weekend = self.config.option("schedule", "weekend", default={})

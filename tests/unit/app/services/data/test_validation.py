@@ -1,7 +1,6 @@
 # ruff: noqa: D, ANN, S101, BLE001
 """Unit tests for the data validation routines."""
 
-from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest

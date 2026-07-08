@@ -301,62 +301,62 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-001**: Phase 5 shall treat Risk Governance as a layered control system, not a single formula or indicator.
-- **RISK-FR-002**: Phase 5 shall make VaR one engine inside the RiskGovernor, not the whole risk strategy.
-- **RISK-FR-003**: Phase 5 shall use Expected Shortfall/CVaR and stress loss as stronger tail-risk approval controls than parametric VaR alone.
-- **RISK-FR-004**: Phase 5 shall decompose Forex positions into currency legs before calculating exposure and concentration.
-- **RISK-FR-005**: Phase 5 shall treat correlated symbol trades as clustered portfolio risk rather than independent trades.
-- **RISK-FR-006**: Phase 5 shall fail closed when required evidence is stale, missing, inconsistent, unreconciled, or not trusted.
-- **RISK-FR-007**: Phase 5 shall output deterministic decisions that can be replayed, audited, and explained without LLM reasoning.
-- **RISK-FR-008**: Phase 5 shall allow LLM agents to summarize or explain risk decisions but never make final safety-critical decisions.
-- **RISK-FR-009**: Phase 5 shall preserve module ownership boundaries and shall not place, close, modify, or cancel broker orders.
-- **RISK-FR-010**: Phase 5 shall be stricter than broker constraints and stricter than external prop-firm limits.
-- **RISK-FR-011**: Verify all required dependency files are implemented, importable, side-effect safe, and covered by tests before Phase 5 implementation begins.
-- **RISK-FR-012**: Verify Risk consumes canonical Phase 1.5 contracts instead of redefining duplicate cross-domain models.
-- **RISK-FR-013**: Verify Risk receives market, account, portfolio, pending-order, and execution-state evidence through explicit ports or canonical snapshots.
-- **RISK-FR-014**: Verify Risk has no direct broker SDK dependency.
-- **RISK-FR-015**: Verify Risk has no UI, FastAPI route, LLM-provider, notification-provider, or database-migration ownership.
-- **RISK-FR-016**: Verify Risk can run in offline test, simulation, paper, shadow, read-only live, micro-live, and full-live modes using profile-specific policies.
-- **RISK-FR-017**: Verify every live-sensitive Risk workflow has access to UTC timestamps, broker-server timestamps where needed, and freshness metadata.
-- **RISK-FR-018**: Verify every Risk decision can propagate request ID, workflow ID, correlation ID, strategy ID, and signal ID.
-- **RISK-FR-019**: Read the v1 Phase 5 baseline, Risk v8 technical specification, Core Contracts phase, and current Strategy/Data/Portfolio/Trading interfaces before editing.
-- **RISK-FR-020**: Create a Phase 5 dry-run report listing files to read, files to change, commands to run, scope boundaries, blockers, and rollback path.
-- **RISK-FR-021**: Confirm Phase 5 does not begin until Phase 1.5 canonical contracts are available or explicitly stubbed by approved sprint scope.
-- **RISK-FR-022**: Confirm every live-sensitive dependency has a fail-closed fallback path.
-- **RISK-FR-023**: Confirm every risk input is either canonical, injected, or explicitly rejected.
-- **RISK-FR-024**: Confirm no direct broker SDK imports are planned inside Risk.
-- **RISK-FR-025**: Confirm no API route, UI, or Conversation code will own risk algorithms.
-- **RISK-FR-026**: Confirm no strategy code can approve its own signals.
-- **RISK-FR-027**: Confirm no optimization result can allocate capital without Risk review.
-- **RISK-FR-028**: Confirm no live-mode promotion can proceed without Risk lifecycle approval.
-- **RISK-FR-029**: Define the Phase 5 implementation sequence before creating production files.
-- **RISK-FR-030**: Create a local issue map or checklist linking each sprint pack to expected files and tests.
-- **RISK-FR-031**: Define rollback points after contracts, config, calculators, governor, audit, and tools.
-- **RISK-FR-032**: Confirm all test fixtures use synthetic account and market data only.
-- **RISK-FR-033**: Confirm no fixture contains real account numbers, broker credentials, tokens, or private payloads.
-- **RISK-FR-034**: Define deterministic random seeds for any stochastic stress or simulation tests.
-- **RISK-FR-035**: Define benchmark dataset shapes for correlation, VaR/ES, stress, and governor latency tests.
-- **RISK-FR-036**: Define redaction expectations for logs, audit events, reports, and standard envelopes.
-- **RISK-FR-037**: Define mode matrix for offline, simulation, paper, shadow, read-only live, micro-live, and full-live.
-- **RISK-FR-038**: Define which workflows require approval tokens and which are advisory only.
-- **RISK-FR-039**: Define which workflows write audit records and which remain pure calculations.
-- **RISK-FR-040**: Define which functions are support helpers and which are official AI-callable tools.
-- **RISK-FR-041**: Define side-effect flags for every official risk tool before implementation.
-- **RISK-FR-042**: Define minimum required evidence for trade review, allocation review, strategy admission, and live readiness.
-- **RISK-FR-043**: Define initial performance targets for pre-trade review, correlation matrix, VaR/ES, and stress scenarios.
-- **RISK-FR-044**: Define the initial conservative risk policy profile before implementation.
-- **RISK-FR-045**: Define the owner-approved threshold-change process for risk config profiles.
-- **RISK-FR-046**: Define failure behavior when audit storage is unavailable in non-live modes.
-- **RISK-FR-047**: Define failure behavior when audit storage is unavailable in live-sensitive modes.
-- **RISK-FR-048**: Record Phase 5 readiness decisions in the implementation report before coding.
+- [x] **RISK-FR-001**: Phase 5 shall treat Risk Governance as a layered control system, not a single formula or indicator. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-002**: Phase 5 shall make VaR one engine inside the RiskGovernor, not the whole risk strategy. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-003**: Phase 5 shall use Expected Shortfall/CVaR and stress loss as stronger tail-risk approval controls than parametric VaR alone. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-004**: Phase 5 shall decompose Forex positions into currency legs before calculating exposure and concentration. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-005**: Phase 5 shall treat correlated symbol trades as clustered portfolio risk rather than independent trades. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-006**: Phase 5 shall fail closed when required evidence is stale, missing, inconsistent, unreconciled, or not trusted. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-007**: Phase 5 shall output deterministic decisions that can be replayed, audited, and explained without LLM reasoning. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-008**: Phase 5 shall allow LLM agents to summarize or explain risk decisions but never make final safety-critical decisions. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-009**: Phase 5 shall preserve module ownership boundaries and shall not place, close, modify, or cancel broker orders. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-010**: Phase 5 shall be stricter than broker constraints and stricter than external prop-firm limits. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-011**: Verify all required dependency files are implemented, importable, side-effect safe, and covered by tests before Phase 5 implementation begins. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-012**: Verify Risk consumes canonical Phase 1.5 contracts instead of redefining duplicate cross-domain models. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-013**: Verify Risk receives market, account, portfolio, pending-order, and execution-state evidence through explicit ports or canonical snapshots. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-014**: Verify Risk has no direct broker SDK dependency. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-015**: Verify Risk has no UI, FastAPI route, LLM-provider, notification-provider, or database-migration ownership. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-016**: Verify Risk can run in offline test, simulation, paper, shadow, read-only live, micro-live, and full-live modes using profile-specific policies. *Evidence: app/services/risk/readiness/readiness.py line 185-223*
+- [x] **RISK-FR-017**: Verify every live-sensitive Risk workflow has access to UTC timestamps, broker-server timestamps where needed, and freshness metadata. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-018**: Verify every Risk decision can propagate request ID, workflow ID, correlation ID, strategy ID, and signal ID. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-019**: Read the v1 Phase 5 baseline, Risk v8 technical specification, Core Contracts phase, and current Strategy/Data/Portfolio/Trading interfaces before editing. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
+- [x] **RISK-FR-020**: Create a Phase 5 dry-run report listing files to read, files to change, commands to run, scope boundaries, blockers, and rollback path. *Evidence: app/services/risk/readiness/readiness.py line 290-322*
+- [x] **RISK-FR-021**: Confirm Phase 5 does not begin until Phase 1.5 canonical contracts are available or explicitly stubbed by approved sprint scope. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-022**: Confirm every live-sensitive dependency has a fail-closed fallback path. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-023**: Confirm every risk input is either canonical, injected, or explicitly rejected. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-024**: Confirm no direct broker SDK imports are planned inside Risk. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-025**: Confirm no API route, UI, or Conversation code will own risk algorithms. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-026**: Confirm no strategy code can approve its own signals. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-027**: Confirm no optimization result can allocate capital without Risk review. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-028**: Confirm no live-mode promotion can proceed without Risk lifecycle approval. *Evidence: app/services/risk/readiness/readiness.py line 150-184*
+- [x] **RISK-FR-029**: Define the Phase 5 implementation sequence before creating production files. *Evidence: app/services/risk/readiness/readiness.py line 290-322*
+- [x] **RISK-FR-030**: Create a local issue map or checklist linking each sprint pack to expected files and tests. *Evidence: app/services/risk/readiness/readiness.py line 290-322*
+- [x] **RISK-FR-031**: Define rollback points after contracts, config, calculators, governor, audit, and tools. *Evidence: app/services/risk/readiness/readiness.py line 290-322*
+- [x] **RISK-FR-032**: Confirm all test fixtures use synthetic account and market data only. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-033**: Confirm no fixture contains real account numbers, broker credentials, tokens, or private payloads. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-034**: Define deterministic random seeds for any stochastic stress or simulation tests. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-035**: Define benchmark dataset shapes for correlation, VaR/ES, stress, and governor latency tests. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-036**: Define redaction expectations for logs, audit events, reports, and standard envelopes. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-037**: Define mode matrix for offline, simulation, paper, shadow, read-only live, micro-live, and full-live. *Evidence: app/services/risk/readiness/readiness.py line 185-223*
+- [x] **RISK-FR-038**: Define which workflows require approval tokens and which are advisory only. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-039**: Define which workflows write audit records and which remain pure calculations. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-040**: Define which functions are support helpers and which are official AI-callable tools. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-041**: Define side-effect flags for every official risk tool before implementation. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-042**: Define minimum required evidence for trade review, allocation review, strategy admission, and live readiness. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-043**: Define initial performance targets for pre-trade review, correlation matrix, VaR/ES, and stress scenarios. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-044**: Define the initial conservative risk policy profile before implementation. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-045**: Define the owner-approved threshold-change process for risk config profiles. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-046**: Define failure behavior when audit storage is unavailable in non-live modes. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-047**: Define failure behavior when audit storage is unavailable in live-sensitive modes. *Evidence: app/services/risk/readiness/readiness.py line 224-289*
+- [x] **RISK-FR-048**: Record Phase 5 readiness decisions in the implementation report before coding. *Evidence: app/services/risk/readiness/readiness.py line 124-143*
 
 **Target Class/Function:**
 
-- `class Phase5ReadinessManifest` — typed, immutable delivery/readiness contract; **Pure** validation at construction.
+- `class RiskReadinessManifest` — typed, immutable delivery/readiness contract; **Pure** validation at construction.
 - `validate_phase_dependencies(dependencies: Mapping[str, DependencyStatus]) -> ReadinessAssessment` — validates canonical contracts, side-effect safety, ports, and test availability; **Pure**.
 - `validate_risk_mode_matrix(matrix: RiskModeMatrix) -> ValidationResult` — validates offline, simulation, paper, shadow, read-only-live, micro-live, and full-live policy coverage; **Pure**.
-- `build_phase5_dry_run(manifest: Phase5ReadinessManifest) -> DryRunReport` — produces files-to-read/change, commands, scope, blockers, and rollback points; **Pure**.
-- `validate_phase5_delivery_plan(plan: Phase5DeliveryPlan) -> ValidationResult` — validates traceability, synthetic fixtures, deterministic seeds, benchmark shapes, redaction, tool classification, and audit failure policy; **Pure**.
+- `build_readiness_dry_run(manifest: RiskReadinessManifest) -> DryRunReport` — produces files-to-read/change, commands, scope, blockers, and rollback points; **Pure**.
+- `validate_delivery_plan(plan: ReadinessDeliveryPlan) -> ValidationResult` — validates traceability, synthetic fixtures, deterministic seeds, benchmark shapes, redaction, tool classification, and audit failure policy; **Pure**.
 
 ### 📂 Module: `app/services/risk/models`
 

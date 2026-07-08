@@ -393,6 +393,7 @@ def example_08_data_quality() -> None:
     """Demonstrate bar checks, volume checks, and data profiles creation."""
     print("\n--- 8. Data Quality Checking Demo ---")
     from typing import Any, cast
+
     import pandas as pd
     from app.utils import inspect_ohlcv_quality, validate_ohlcv_quality
 
@@ -454,6 +455,7 @@ def example_10_event_bus() -> None:
     """Demonstrate internal Event Bus publisher/subscriber pattern."""
     print("\n--- 10. Event Bus Pub/Sub Demo ---")
     from typing import Any
+
     from app.utils import (
         InMemoryEventBus,
         build_event_envelope,
@@ -518,8 +520,8 @@ def example_12_notifications() -> None:
         EmailNotificationAdapter,
         NotificationRouter,
         TelegramNotificationAdapter,
-        route_notification,
         load_config,
+        route_notification,
     )
     settings = load_config()
     from app.utils.notifications import NotificationAdapter, NotificationChannel
@@ -590,6 +592,7 @@ def example_13_paths() -> None:
     """Demonstrate path creation and directory checks."""
     print("\n--- 13. Safe Paths Demo ---")
     import tempfile
+
     from app.utils import ensure_parent_dir
 
     with tempfile.TemporaryDirectory() as temp_dir:

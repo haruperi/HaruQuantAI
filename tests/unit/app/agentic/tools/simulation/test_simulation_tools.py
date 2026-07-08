@@ -1,9 +1,7 @@
-import pytest
-from typing import Any
 from unittest.mock import MagicMock, patch
 
-import app.agentic.tools.simulation
 from app.agentic.tools.simulation.tools import run_backtest
+
 
 @patch("app.agentic.tools.simulation.tools._run_backtest")
 def test_run_backtest(mock_run: MagicMock) -> None:
@@ -15,9 +13,9 @@ def test_run_backtest(mock_run: MagicMock) -> None:
         start="2026-01-01",
         end="2026-01-02",
     )
-    
+
     assert result == {"status": "success", "data": {}}
-    
+
     # Check that payload contains defaults where we didn't specify them
     mock_run.assert_called_once()
     payload = mock_run.call_args[0][0]

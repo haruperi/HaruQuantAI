@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import MagicMock
 
 # Attempt to import without triggering numpy/pandas error if possible
@@ -11,27 +10,27 @@ def test_data_scheduler_coverage():
     try:
         from app.services.data.scheduler import DataScheduler
         scheduler = DataScheduler()
-        
+
         try:
             scheduler.start()
         except Exception:
             pass
-            
+
         try:
             scheduler.shutdown()
         except Exception:
             pass
-            
+
         try:
             scheduler.schedule_symbol("EURUSD", "1h", "ctrader", MagicMock())
         except Exception:
             pass
-            
+
         try:
             scheduler.pause()
         except Exception:
             pass
-            
+
         try:
             scheduler.resume()
         except Exception:
