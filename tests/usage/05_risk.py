@@ -2147,6 +2147,70 @@ def example_21_readiness() -> None:
     print(f"Dry-run planned commands: {report.commands_planned}")
 
 
+def example_22_decision_synthesis() -> None:
+    """Demonstrate final RiskGovernor decision synthesis logic (decision_synthesis.py)."""
+    print_header(22, "Risk Decision Synthesis")
+
+    from app.services.risk.governor.decision_synthesis import (
+        GateResult,
+        GovernorEvaluationContext,
+        is_decision_token_eligible,
+        synthesize_decision,
+    )
+    from app.services.risk.models import ProposedTrade, RiskConfig, RiskSeverity
+    from app.services.risk.models.enums import RiskDecisionStatus, RiskReasonCode
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    # 1. Build policy and action context
+    policy = EffectiveRiskPolicy(
+        policy_id="policy-synth-demo",
+        resolved_config=RiskConfig(profile_name="default"),
+        policy_hash="synth-policy-hash",
+        applied_rules=[],
+        provenance={"policy_version": "v1.0.0"},
+    )
+    trade = ProposedTrade(
+        strategy_id="strat_synth", symbol="GBPUSD", side="sell", volume=Decimal("1.5")
+    )
+
+    # 2. Simulated gate results (one size reduction and one approval)
+    results = [
+        GateResult(
+            gate_name="sizing",
+            status=RiskDecisionStatus.REDUCE_SIZE,
+            reason_code=RiskReasonCode.OK,
+            message="Sized recommended lot",
+            severity=RiskSeverity.INFO,
+            breached=False,
+            calculated_volume=Decimal("1.2"),
+        ),
+        GateResult(
+            gate_name="correlation",
+            status=RiskDecisionStatus.APPROVE,
+            reason_code=RiskReasonCode.OK,
+            message="No correlation clustering breach",
+            severity=RiskSeverity.INFO,
+            breached=False,
+        ),
+    ]
+
+    context = GovernorEvaluationContext(
+        decision_id="dec_synth_demo",
+        request_id="req_synth_demo",
+        workflow_id="wf_synth_demo",
+        proposed_action=trade,
+        policy=policy,
+        gate_results=results,
+        requested_size=Decimal("1.5"),
+    )
+
+    # 3. Run synthesis and check eligibility
+    decision = synthesize_decision(context)
+    print(f"Synthesized decision status: {decision.status}")
+    print(f"Synthesized approved volume: {decision.approved_size}")
+    print(f"Is eligible for decision token? {is_decision_token_eligible(decision)}")
+
+
 if __name__ == "__main__":
     """Execute all risk governance usage examples."""
     print("==================================================")
@@ -2175,6 +2239,7 @@ if __name__ == "__main__":
     example_19_cryptographic_audit_hash_chain()
     example_20_observability_metrics_and_reporting()
     example_21_readiness()
+    example_22_decision_synthesis()
 
     print("==================================================")
     print("ALL RISK GOVERNANCE USAGE EXAMPLES COMPLETED")

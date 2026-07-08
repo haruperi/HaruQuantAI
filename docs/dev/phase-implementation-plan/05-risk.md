@@ -1506,15 +1506,15 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-427**: Implement final decision synthesis.
-- **RISK-FR-428**: Implement approve outcome.
-- **RISK-FR-429**: Implement reduce-size outcome.
-- **RISK-FR-430**: Implement reject outcome.
-- **RISK-FR-431**: Implement block outcome.
-- **RISK-FR-432**: Implement needs-more-evidence outcome.
-- **RISK-FR-433**: Implement needs-approval outcome.
-- **RISK-FR-434**: Implement halt-strategy outcome.
-- **RISK-FR-435**: Implement halt-all outcome.
+- [x] **RISK-FR-427**: Implement final decision synthesis. *Evidence: app/services/risk/governor/decision_synthesis.py line 266-340*
+- [x] **RISK-FR-428**: Implement approve outcome. *Evidence: app/services/risk/governor/decision_synthesis.py line 82, 106-107, 305*
+- [x] **RISK-FR-429**: Implement reduce-size outcome. *Evidence: app/services/risk/governor/decision_synthesis.py line 81, 305*
+- [x] **RISK-FR-430**: Implement reject outcome. *Evidence: app/services/risk/governor/decision_synthesis.py line 78*
+- [x] **RISK-FR-431**: Implement block outcome. *Evidence: app/services/risk/governor/decision_synthesis.py line 77*
+- [x] **RISK-FR-432**: Implement needs-more-evidence outcome. *Evidence: app/services/risk/governor/decision_synthesis.py line 79*
+- [x] **RISK-FR-433**: Implement needs-approval outcome. *Evidence: app/services/risk/governor/decision_synthesis.py line 80*
+- [x] **RISK-FR-434**: Implement halt-strategy outcome. *Evidence: app/services/risk/governor/decision_synthesis.py line 76*
+- [x] **RISK-FR-435**: Implement halt-all outcome. *Evidence: app/services/risk/governor/decision_synthesis.py line 75*
 
 **Target Class/Function:**
 

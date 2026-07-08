@@ -860,9 +860,8 @@ def test_governor_live_mode_audit_chain_failure(
     store = InMemoryRiskStateStore()
     gov = RiskGovernor(store, store, store, store)
 
-    # Mock verify_risk_audit_chain to return False
     monkeypatch.setattr(
-        "app.services.risk.governor.verify_risk_audit_chain", lambda _: False
+        "app.services.risk.governor.governor.verify_risk_audit_chain", lambda _: False
     )
 
     portfolio = PortfolioState(
@@ -1196,7 +1195,7 @@ def test_governor_uncovered_paths(monkeypatch: pytest.MonkeyPatch) -> None:  # n
         raise ValueError("Simulated stress error")
 
     monkeypatch.setattr(
-        "app.services.risk.governor.build_default_scenario_registry", mock_eval_stress
+        "app.services.risk.governor.governor.build_default_scenario_registry", mock_eval_stress
     )
     req.request_id = None
     res = gov.review_trade_risk(req)
@@ -1207,7 +1206,7 @@ def test_governor_uncovered_paths(monkeypatch: pytest.MonkeyPatch) -> None:  # n
         raise ValueError("Simulated sizing calculation error")
 
     monkeypatch.setattr(
-        "app.services.risk.governor.calculate_position_size", mock_calc_pos_size
+        "app.services.risk.governor.governor.calculate_position_size", mock_calc_pos_size
     )
     req.market_context["sizing_request"] = {"method": "fixed_lot", "fixed_volume": 1.0}
     req.request_id = None
@@ -1221,7 +1220,7 @@ def test_governor_uncovered_paths(monkeypatch: pytest.MonkeyPatch) -> None:  # n
     mock_sizing_res.calculated_volume = Decimal("0.0")
     mock_sizing_res.constraints_applied = ["max_risk_limit"]
     monkeypatch.setattr(
-        "app.services.risk.governor.calculate_position_size",
+        "app.services.risk.governor.governor.calculate_position_size",
         lambda *_, **__: mock_sizing_res,
     )
     req.request_id = None

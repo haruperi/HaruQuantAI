@@ -478,3 +478,19 @@ The readiness module proves that readiness verification starts only with canonic
    Verifies requirements traceability, restricts fixtures to synthetic-only datasets, checks for deterministic seeds, and enforces fail-closed policies for live-sensitive staging.
 4. **Dry-Run Compilation (`build_readiness_dry_run`)**:
    Takes a validated manifest and outputs a detailed `DryRunReport` detailing the files to read, files to change, planned commands, active scopes, blockers, and rollback boundaries.
+
+---
+
+## 21. Governor & Decision Synthesis (Sprint 5.15)
+
+The governor package orchestrates the pre-trade risk evaluation, capital allocation, strategy admission, and live readiness checks. The final decision status and parameters are synthesized into a single package.
+
+### Key Components
+
+1. **Decision Synthesis (`decision_synthesis.py`)**:
+   - **`synthesize_decision(context)`**: Synthesizes the final `RiskDecisionPackage` from the ordered list of gate results without performing state mutations or audit writes.
+   - **`determine_decision_status(results, policy)`**: Implements precedence rules for decision status (e.g. `HALT_ALL` > `HALT_STRATEGY` > `BLOCK` > `REJECT` > `NEEDS_MORE_EVIDENCE` > `NEEDS_APPROVAL` > `REDUCE_SIZE` > `APPROVE`).
+   - **`select_primary_risk_reason(results)`**: Deterministically selects the primary warning or failure reason code based on status and severity rank.
+   - **`aggregate_reductions(results)`**: Combines lot size reductions suggested across sizing, correlation, exposure, drawdown, and stress testing gates into a unified plan.
+   - **`is_decision_token_eligible(decision)`**: Validates if a synthesized decision is eligible to receive a cryptographic approval token.
+
