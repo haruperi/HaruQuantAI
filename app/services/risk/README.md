@@ -170,7 +170,7 @@ To run verification checks:
 
 ## 10. Position Sizing Engine
 
-The Position Sizing Engine calculates safe, risk-budgeted position volumes under [sizing.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/risk/sizing.py).
+The Position Sizing Engine calculates safe, risk-budgeted position volumes under [sizing/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/sizing/).
 
 ### Sizing Methods (`SizingMethod`)
 1. **Fixed Lot (`fixed_lot`)**: Returns a fixed trade volume.
@@ -242,17 +242,23 @@ The Correlation and Cluster Risk Engine computes price returns, aligns timeserie
 
 ## 13. Value-at-Risk (VaR) and Expected Shortfall (ES) Engine
 
-The Value-at-Risk (VaR) and Expected Shortfall (ES) Engine under [var_es.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/risk/var_es.py) computes portfolio tail-risk metrics.
+The Value-at-Risk (VaR) and Expected Shortfall (ES) Engine computes portfolio tail-risk metrics and is organized as a modular package under [tail_risk/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/tail_risk/):
 
-### Key Capabilities
-1. **Parametric Portfolio VaR & ES**: Computes analytics-based VaR and Expected Shortfall assuming normally distributed return series using a covariance matrix (with optional EWMA decay and diagonal shrinkage).
-2. **Historical Portfolio VaR & ES**: Computes non-parametric VaR and Expected Shortfall (CVaR) directly from historical return percentiles and tail averages, avoiding normal distribution assumptions.
-3. **Euler Risk Decomposition**: Computes Marginal Risk Contributions (MRC) and Component Risk Contributions (CRC) to decompose total portfolio tail risk into individual asset contributions.
-4. **Covariance Matrix Estimation**:
-   - Sample covariance.
-   - EWMA (Exponentially Weighted Moving Average) covariance.
-   - Diagonal Shrinkage (Ledoit-Wolf style shrinkage towards the identity/diagonal) to ensure the covariance matrix is well-conditioned.
-5. **Validation Gates**: Rejects calculations if the covariance matrix is asymmetric, has non-positive diagonal variances, or if results are non-finite.
+* **`contracts.py`**: Defines the data models for tail-risk estimation.
+  * **`VaRCalculationRequest`**: Carries inputs for VaR estimation (portfolio state, market context, confidence, method, lookback).
+  * **`ExpectedShortfallRequest`**: Carries inputs for Expected Shortfall estimation.
+  * **`VaRResult` & `ExpectedShortfallResult`**: Encapsulate legacy V1 result parameters.
+* **`var.py`**: Handles Value-at-Risk estimation, component risk contributions, and covariance mathematics.
+  * **`calculate_parametric_var`**: Computes covariance/volatility-based parametric VaR.
+  * **`calculate_historical_var`**: Computes empirical return-based historical VaR.
+  * **`calculate_portfolio_volatility`**: Calculates portfolio volatility from covariance matrix and weights.
+  * **`calculate_var_component_contribution`**: Decomposes total portfolio tail risk into asset-level Component Risk Contributions (CRC).
+  * **`PortfolioVaREngine`**: Wrapper class façade for VaR estimation.
+* **`expected_shortfall.py`**: Handles Expected Shortfall (CVaR) calculations and validation of tail assumptions.
+  * **`calculate_expected_shortfall`**: Computes average loss in the tail beyond the VaR threshold.
+  * **`select_tail_losses`**: Filters and returns worst-performing returns in the tail.
+  * **`validate_tail_risk_assumptions`**: Validates tail-risk relations and rejects insufficient return windows.
+  * **`ExpectedShortfallEngine`**: Wrapper class façade for Expected Shortfall estimation.
 
 ### Role in Limits & Approvals
 - **VaR Limit**: Evaluated as a warning or hard block based on profile settings.
@@ -261,7 +267,7 @@ The Value-at-Risk (VaR) and Expected Shortfall (ES) Engine under [var_es.py](fil
 
 ## 14. Stress Testing Engine
 
-The Stress Testing Engine under [stress.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/risk/stress.py) evaluates portfolio and candidate trade resilience under extreme macro shocks and execution failures.
+The Stress Testing Engine under [stress/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/stress/) evaluates portfolio and candidate trade resilience under extreme macro shocks and execution failures.
 
 ### Default Scenarios
 The default registry contains 12 pre-loaded scenarios:
@@ -346,7 +352,7 @@ Allocation and Lifecycle Governance manages the capital budget distributed to st
 
 ## 17. Safety Kill Switches
 
-The Safety Kill Switches engine under [kill_switch.py](file:///c:/Users/rharu/Documents/MyApplications/Quant/app/services/risk/kill_switch.py) implements fail-closed trading halts, persistent tracking, and governed resume deactivation limits.
+The Safety Kill Switches engine under [kill_switch.py](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/governance/kill_switch.py) implements fail-closed trading halts, persistent tracking, and governed resume deactivation limits.
 
 ### Hierarchical Scopes
 Trading blocks are evaluated in a hierarchical sequence where higher-level switches block lower-level targets:

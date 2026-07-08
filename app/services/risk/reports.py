@@ -499,7 +499,7 @@ def build_portfolio_risk_snapshot(
     from app.services.risk.config import load_risk_config
     from app.services.risk.models import PortfolioRiskSnapshot, PortfolioState
     from app.services.risk.stress import build_default_scenario_registry
-    from app.services.risk.var_es import calculate_var_es_snapshots
+    from app.services.risk.tail_risk import calculate_var_es_snapshots
 
     if isinstance(portfolio_state, dict):
         p_state = PortfolioState.model_validate(portfolio_state)

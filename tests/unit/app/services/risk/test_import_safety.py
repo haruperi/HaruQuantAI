@@ -31,7 +31,10 @@ RISK_MODULES = [
     "app.services.risk.sizing",
     "app.services.risk.storage",
     "app.services.risk.stress",
-    "app.services.risk.var_es",
+    "app.services.risk.tail_risk",
+    "app.services.risk.tail_risk.contracts",
+    "app.services.risk.tail_risk.var",
+    "app.services.risk.tail_risk.expected_shortfall",
 ]
 
 

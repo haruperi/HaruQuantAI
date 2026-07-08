@@ -40,6 +40,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-025 | Risk Sizing V2 modular package | Transitioned position sizing engine from single flat `sizing.py` to modular package `sizing/` (`contracts.py`, `normalization.py`, `calculators.py`) with stateless lot-sizing calculations. |
 | ADD-026 | Risk Exposure V2 modular package | Modularized currency exposure engine from flat `exposure.py` into package `exposure/` (`fx_legs.py`, `aggregation.py`), introducing pure FX pair parsing, leg decomposition, and currency conversion validation. |
 | ADD-027 | Risk Correlation V2 modular package | Transitioned correlation and cluster risk engine from legacy flat `correlation.py` to structured package `correlation/` (`contracts.py`, `returns.py`, `fallbacks.py`, `engine.py`), implementing pure returns construction, alignment policies, and connected cluster exposures. |
+| ADD-028 | Risk Tail Risk V2 modular package | Upgraded legacy flat Value-at-Risk & Expected Shortfall engine into structured package `app/services/risk/tail_risk/` (`contracts.py`, `var.py`, `expected_shortfall.py`), implementing parametric/historical VaR calculators, CVaR calculations, risk contributions, and validation checks. |
 
 
 

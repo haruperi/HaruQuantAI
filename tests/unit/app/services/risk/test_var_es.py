@@ -32,7 +32,7 @@ from app.services.risk import (
     calculate_risk_contribution,
     calculate_var_es_snapshots,
 )
-from app.services.risk.var_es import (
+from app.services.risk.tail_risk import (
     calculate_covariance,
     calculate_ewma_covariance,
     calculate_historical_var_es,

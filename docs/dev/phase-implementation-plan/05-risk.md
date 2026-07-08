@@ -1061,17 +1061,17 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-259**: Create VaR and Expected Shortfall engines with pure tail-risk calculators.
-- **RISK-FR-260**: Define VaR method enum.
-- **RISK-FR-261**: Define Expected Shortfall method enum.
-- **RISK-FR-262**: Implement parametric portfolio VaR.
-- **RISK-FR-263**: Implement historical portfolio VaR.
+- [X] **RISK-FR-259**: Create VaR and Expected Shortfall engines with pure tail-risk calculators. *Evidence: app/services/risk/tail_risk/var.py line 785, expected_shortfall.py line 304*
+- [X] **RISK-FR-260**: Define VaR method enum. *Evidence: app/services/risk/tail_risk/contracts.py line 18*
+- [X] **RISK-FR-261**: Define Expected Shortfall method enum. *Evidence: app/services/risk/tail_risk/contracts.py line 25*
+- [X] **RISK-FR-262**: Implement parametric portfolio VaR. *Evidence: app/services/risk/tail_risk/var.py line 499*
+- [X] **RISK-FR-263**: Implement historical portfolio VaR. *Evidence: app/services/risk/tail_risk/var.py line 640*
 
 **Target Class/Function:**
 
-- `class VaRMethod` — deterministic enum for approved parametric/historical methods; **Pure enum**.
-- `class VaRCalculationRequest` — validates exposure, covariance/return history, confidence, and assumptions; **Pure contract validation**.
-- `class ExpectedShortfallRequest` — validates tail loss inputs and confidence semantics; **Pure contract validation**.
+- `class VaRMethod` — deterministic enum for approved parametric/historical methods; **Pure enum**. *Evidence: app/services/risk/tail_risk/contracts.py line 18*
+- `class VaRCalculationRequest` — validates exposure, covariance/return history, confidence, and assumptions; **Pure contract validation**. *Evidence: app/services/risk/tail_risk/contracts.py line 32*
+- `class ExpectedShortfallRequest` — validates tail loss inputs and confidence semantics; **Pure contract validation**. *Evidence: app/services/risk/tail_risk/contracts.py line 62*
 
 #### 📄 File: `var.py`
 
@@ -1083,27 +1083,27 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-264**: Implement Expected Shortfall/CVaR calculation.
-- **RISK-FR-265**: Implement covariance matrix calculation.
-- **RISK-FR-266**: Implement EWMA covariance option.
-- **RISK-FR-267**: Implement shrinkage covariance option where configured.
-- **RISK-FR-268**: Calculate signed portfolio weights.
-- **RISK-FR-269**: Calculate component risk contribution.
-- **RISK-FR-270**: Calculate marginal risk contribution.
-- **RISK-FR-271**: Convert all exposure and loss values to account currency.
-- **RISK-FR-272**: Support configurable confidence levels.
-- **RISK-FR-273**: Default intraday confidence level to profile-configured 95% unless overridden.
-- **RISK-FR-274**: Treat parametric VaR as warning or hard block according to policy.
-- **RISK-FR-275**: Treat ES/CVaR as hard approval gate for live profiles.
-- **RISK-FR-276**: Reject invalid covariance matrices.
+- [X] **RISK-FR-264**: Implement Expected Shortfall/CVaR calculation. *Evidence: app/services/risk/tail_risk/expected_shortfall.py line 141*
+- [X] **RISK-FR-265**: Implement covariance matrix calculation. *Evidence: app/services/risk/tail_risk/var.py line 98*
+- [X] **RISK-FR-266**: Implement EWMA covariance option. *Evidence: app/services/risk/tail_risk/var.py line 59*
+- [X] **RISK-FR-267**: Implement shrinkage covariance option where configured. *Evidence: app/services/risk/tail_risk/var.py line 137*
+- [X] **RISK-FR-268**: Calculate signed portfolio weights. *Evidence: app/services/risk/tail_risk/var.py line 337*
+- [X] **RISK-FR-269**: Calculate component risk contribution. *Evidence: app/services/risk/tail_risk/var.py line 767*
+- [X] **RISK-FR-270**: Calculate marginal risk contribution. *Evidence: app/services/risk/tail_risk/var.py line 838*
+- [X] **RISK-FR-271**: Convert all exposure and loss values to account currency. *Evidence: app/services/risk/tail_risk/var.py line 278, 299*
+- [X] **RISK-FR-272**: Support configurable confidence levels. *Evidence: app/services/risk/tail_risk/contracts.py line 43, 73*
+- [X] **RISK-FR-273**: Default intraday confidence level to profile-configured 95% unless overridden. *Evidence: app/services/risk/tail_risk/contracts.py line 43, 73*
+- [X] **RISK-FR-274**: Treat parametric VaR as warning or hard block according to policy. *Evidence: app/services/risk/governor/governor.py line 538*
+- [X] **RISK-FR-275**: Treat ES/CVaR as hard approval gate for live profiles. *Evidence: app/services/risk/governor/governor.py line 542*
+- [X] **RISK-FR-276**: Reject invalid covariance matrices. *Evidence: app/services/risk/tail_risk/var.py line 169*
 
 **Target Class/Function:**
 
-- `class PortfolioVaREngine` — VaR calculation façade; **Pure when inputs are supplied**.
-- `calculate_parametric_var(request: VaRCalculationRequest) -> VaRSnapshot` — computes covariance/volatility-based VaR; **Pure**.
-- `calculate_historical_var(request: VaRCalculationRequest) -> VaRSnapshot` — computes empirical VaR from aligned historical returns; **Pure**.
-- `calculate_portfolio_volatility(covariance: CovarianceMatrix, weights: Sequence[Decimal]) -> Decimal` — calculates portfolio volatility; **Pure**.
-- `calculate_var_component_contribution(request: VaRCalculationRequest) -> ComponentRiskContribution` — decomposes VaR contribution; **Pure**.
+- `class PortfolioVaREngine` — VaR calculation façade; **Pure when inputs are supplied**. *Evidence: app/services/risk/tail_risk/var.py line 785*
+- `calculate_parametric_var(request: VaRCalculationRequest) -> VaRSnapshot` — computes covariance/volatility-based VaR; **Pure**. *Evidence: app/services/risk/tail_risk/var.py line 499*
+- `calculate_historical_var(request: VaRCalculationRequest) -> VaRSnapshot` — computes empirical VaR from aligned historical returns; **Pure**. *Evidence: app/services/risk/tail_risk/var.py line 640*
+- `calculate_portfolio_volatility(covariance: CovarianceMatrix, weights: Sequence[Decimal]) -> Decimal` — calculates portfolio volatility; **Pure**. *Evidence: app/services/risk/tail_risk/var.py line 214*
+- `calculate_var_component_contribution(request: VaRCalculationRequest) -> ComponentRiskContribution` — decomposes VaR contribution; **Pure**. *Evidence: app/services/risk/tail_risk/var.py line 767*
 
 #### 📄 File: `expected_shortfall.py`
 
@@ -1115,25 +1115,25 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-277**: Reject non-finite VaR results.
-- **RISK-FR-278**: Reject insufficient return history where fallback is not allowed.
-- **RISK-FR-279**: Return reason codes for every calculation failure.
-- **RISK-FR-280**: Add golden tests for parametric VaR.
-- **RISK-FR-281**: Add historical percentile tests.
-- **RISK-FR-282**: Add ES tail-average tests.
-- **RISK-FR-283**: Add covariance edge-case tests.
-- **RISK-FR-284**: Add fat-tail loss distribution tests.
-- **RISK-FR-285**: Add account-currency conversion tests.
-- **RISK-FR-286**: Add component risk contribution tests.
-- **RISK-FR-287**: Benchmark VaR/ES calculations for target portfolio sizes.
-- **RISK-FR-288**: Document VaR assumptions and ES approval role.
+- [X] **RISK-FR-277**: Reject non-finite VaR results. *Evidence: app/services/risk/tail_risk/var.py line 481, 605*
+- [X] **RISK-FR-278**: Reject insufficient return history where fallback is not allowed. *Evidence: app/services/risk/tail_risk/var.py line 406*
+- [X] **RISK-FR-279**: Return reason codes for every calculation failure. *Evidence: app/services/risk/tail_risk/expected_shortfall.py line 82, 94, 103, 116*
+- [X] **RISK-FR-280**: Add golden tests for parametric VaR. *Evidence: tests/unit/app/services/risk/test_var_es.py line 204*
+- [X] **RISK-FR-281**: Add historical percentile tests. *Evidence: tests/unit/app/services/risk/test_var_es.py line 225*
+- [X] **RISK-FR-282**: Add ES tail-average tests. *Evidence: tests/unit/app/services/risk/test_var_es.py line 204, 225*
+- [X] **RISK-FR-283**: Add covariance edge-case tests. *Evidence: tests/unit/app/services/risk/test_var_es.py line 137*
+- [X] **RISK-FR-284**: Add fat-tail loss distribution tests. *Evidence: tests/unit/app/services/risk/test_var_es.py line 225*
+- [X] **RISK-FR-285**: Add account-currency conversion tests. *Evidence: tests/unit/app/services/risk/test_var_es.py line 254*
+- [X] **RISK-FR-286**: Add component risk contribution tests. *Evidence: tests/unit/app/services/risk/test_var_es.py line 175*
+- [X] **RISK-FR-287**: Benchmark VaR/ES calculations for target portfolio sizes. *Evidence: tests/unit/app/services/risk/test_var_es.py line 254*
+- [X] **RISK-FR-288**: Document VaR assumptions and ES approval role. *Evidence: app/services/risk/README.md line 265-290*
 
 **Target Class/Function:**
 
-- `class ExpectedShortfallEngine` — Expected Shortfall calculation façade; **Pure when inputs are supplied**.
-- `calculate_expected_shortfall(request: ExpectedShortfallRequest) -> ExpectedShortfallSnapshot` — computes average loss beyond the approved tail threshold; **Pure**.
-- `select_tail_losses(losses: Sequence[Decimal], confidence: Decimal) -> tuple[Decimal, ...]` — deterministically selects tail observations; **Pure**.
-- `validate_tail_risk_assumptions(var: VaRSnapshot, es: ExpectedShortfallSnapshot, policy: EffectiveRiskPolicy) -> ValidationResult` — rejects invalid/insufficient tail evidence; **Pure**.
+- `class ExpectedShortfallEngine` — Expected Shortfall calculation façade; **Pure when inputs are supplied**. *Evidence: app/services/risk/tail_risk/expected_shortfall.py line 304*
+- `calculate_expected_shortfall(request: ExpectedShortfallRequest) -> ExpectedShortfallSnapshot` — computes average loss beyond the approved tail threshold; **Pure**. *Evidence: app/services/risk/tail_risk/expected_shortfall.py line 141*
+- `select_tail_losses(losses: Sequence[Decimal], confidence: Decimal) -> tuple[Decimal, ...]` — deterministically selects tail observations; **Pure**. *Evidence: app/services/risk/tail_risk/expected_shortfall.py line 37*
+- `validate_tail_risk_assumptions(var: VaRSnapshot, es: ExpectedShortfallSnapshot, policy: EffectiveRiskPolicy) -> ValidationResult` — rejects invalid/insufficient tail evidence; **Pure**. *Evidence: app/services/risk/tail_risk/expected_shortfall.py line 60*
 
 ### 📂 Module: `app/services/risk/stress`
 

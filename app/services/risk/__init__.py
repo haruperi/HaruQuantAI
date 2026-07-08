@@ -298,7 +298,7 @@ from app.services.risk.stress import (
     run_stress_scenario_analysis,
     validate_custom_scenario,
 )
-from app.services.risk.var_es import (
+from app.services.risk.tail_risk import (
     ExpectedShortfallEngine,
     ExpectedShortfallMethod,
     ExpectedShortfallResult,

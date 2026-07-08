@@ -598,11 +598,15 @@ def example_05_portfolio_correlation_dynamics() -> None:
     print("\n[V2] Correlation Engine calculations:")
     # Build ClosedBar models
     v2_bars_a = [
-        ClosedBar(time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"])))
+        ClosedBar(
+            time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"]))
+        )
         for b in bars_a
     ]
     v2_bars_b = [
-        ClosedBar(time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"])))
+        ClosedBar(
+            time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"]))
+        )
         for b in bars_b
     ]
 
@@ -630,8 +634,9 @@ def example_05_portfolio_correlation_dynamics() -> None:
         symbols=["EURUSD", "GBPUSD"], mode="paper", sample_count=2, minimum_samples=10
     )
     fallback_res = resolve_correlation_fallback(fallback_ctx, config)
-    print(f"  [V2] Fallback matrix resolved under paper mode: EURUSD-GBPUSD corr={fallback_res.matrix['EURUSD']['GBPUSD']:.2f}")
-
+    print(
+        f"  [V2] Fallback matrix resolved under paper mode: EURUSD-GBPUSD corr={fallback_res.matrix['EURUSD']['GBPUSD']:.2f}"
+    )
 
 
 def example_06_value_at_risk_and_expected_shortfall() -> None:
@@ -698,7 +703,7 @@ def example_06_value_at_risk_and_expected_shortfall() -> None:
     }
     config = RiskConfig(profile_name="usage_profile")
 
-    # 1. Parametric VaR / ES
+    # 1. Parametric VaR / ES via V2 snapshots helper
     var_snap, es_snap = calculate_var_es_snapshots(
         portfolio_state=portfolio,
         proposed_trade=None,
@@ -716,7 +721,7 @@ def example_06_value_at_risk_and_expected_shortfall() -> None:
     print(f"  Parametric VaR: {var_snap.result:.2f} USD")
     print(f"  Parametric ES: {es_snap.average_tail_loss:.2f} USD")
 
-    # 2. Historical VaR / ES
+    # 2. Historical VaR / ES via V2 snapshots helper
     var_hist, es_hist = calculate_var_es_snapshots(
         portfolio_state=portfolio,
         proposed_trade=None,
@@ -731,6 +736,102 @@ def example_06_value_at_risk_and_expected_shortfall() -> None:
     )
     print(f"\nHistorical VaR: {var_hist.result:.2f} USD")
     print(f"Historical ES: {es_hist.average_tail_loss:.2f} USD")
+
+    # 3. [V2 Pure API] Parametric & Historical calculators using Request Contracts
+    from app.services.risk.tail_risk.contracts import (
+        ExpectedShortfallRequest,
+        VaRCalculationRequest,
+    )
+    from app.services.risk.tail_risk.expected_shortfall import (
+        calculate_expected_shortfall,
+    )
+    from app.services.risk.tail_risk.var import (
+        calculate_historical_var,
+        calculate_parametric_var,
+        calculate_var_component_contribution,
+    )
+
+    var_req = VaRCalculationRequest(
+        portfolio_state=portfolio,
+        market_context=market_context,
+        proposed_trade=None,
+        lookback=15,
+        confidence=Decimal("0.95"),
+        method=VaRMethod.PARAMETRIC,
+        cov_method="parametric",
+        min_samples=10,
+        exclude_last=False,
+    )
+    v2_var_parametric = calculate_parametric_var(var_req)
+    print(
+        f"\n[V2 Pure API] Parametric VaR Snapshot Result: {v2_var_parametric.result:.2f} USD"
+    )
+
+    var_req_hist = VaRCalculationRequest(
+        portfolio_state=portfolio,
+        market_context=market_context,
+        proposed_trade=None,
+        lookback=15,
+        confidence=Decimal("0.95"),
+        method=VaRMethod.HISTORICAL,
+        min_samples=10,
+        exclude_last=False,
+    )
+    v2_var_historical = calculate_historical_var(var_req_hist)
+    print(
+        f"[V2 Pure API] Historical VaR Snapshot Result: {v2_var_historical.result:.2f} USD"
+    )
+
+    es_req = ExpectedShortfallRequest(
+        portfolio_state=portfolio,
+        market_context=market_context,
+        proposed_trade=None,
+        lookback=15,
+        confidence=Decimal("0.95"),
+        method=ExpectedShortfallMethod.HISTORICAL,
+        min_samples=10,
+        exclude_last=False,
+    )
+    v2_es = calculate_expected_shortfall(es_req)
+    print(
+        f"[V2 Pure API] Expected Shortfall Snapshot Result: {v2_es.average_tail_loss:.2f} USD"
+    )
+
+    # Component contributions
+    contribs = calculate_var_component_contribution(var_req)
+    print(f"[V2 Pure API] Component Contributions: {contribs.contributions}")
+
+    # 4. [V2 Engine API] Using PortfolioVaREngine and ExpectedShortfallEngine wrappers
+    from app.services.risk.tail_risk.expected_shortfall import ExpectedShortfallEngine
+    from app.services.risk.tail_risk.var import PortfolioVaREngine
+
+    var_engine = PortfolioVaREngine(config)
+    legacy_var_res = var_engine.calculate_var(
+        portfolio_state=portfolio,
+        market_context=market_context,
+        lookback=15,
+        confidence=Decimal("0.95"),
+        method="parametric",
+        min_samples=10,
+        exclude_last=False,
+    )
+    print(
+        f"\n[V2 Engine API] PortfolioVaREngine Result: {legacy_var_res.result:.2f} USD"
+    )
+
+    es_engine = ExpectedShortfallEngine(config)
+    legacy_es_res = es_engine.calculate_es(
+        portfolio_state=portfolio,
+        market_context=market_context,
+        lookback=15,
+        confidence=Decimal("0.95"),
+        method="historical",
+        min_samples=10,
+        exclude_last=False,
+    )
+    print(
+        f"[V2 Engine API] ExpectedShortfallEngine Result: {legacy_es_res.average_tail_loss:.2f} USD"
+    )
 
 
 def example_07_portfolio_stress_scenario_testing() -> None:

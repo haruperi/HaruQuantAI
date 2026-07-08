@@ -53,7 +53,7 @@ from app.services.risk.stress import (
     StressTestingEngine,  # noqa: F401
     build_default_scenario_registry,
 )
-from app.services.risk.var_es import (
+from app.services.risk.tail_risk import (
     ExpectedShortfallEngine,  # noqa: F401
     PortfolioVaREngine,  # noqa: F401
     calculate_var_es_snapshots,

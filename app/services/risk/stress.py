@@ -532,7 +532,7 @@ class CorrelationToOneScenario:
             vols[s] = Decimal(str(vol_raw))
 
         # 2. Compute exposures and weights
-        from app.services.risk.var_es import _compute_exposures_and_weights
+        from app.services.risk.tail_risk.var import _compute_exposures_and_weights
 
         account_ccy = portfolio_state.currency.upper()
         total_gross, weights = _compute_exposures_and_weights(

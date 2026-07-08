@@ -48,13 +48,9 @@ from app.services.risk.regime import assess_risk_regime as _assess_risk_regime
 from app.services.risk.sizing import calculate_position_size as _calculate_position_size
 from app.services.risk.storage import InMemoryRiskStateStore
 from app.services.risk.stress import build_default_scenario_registry
-from app.services.risk.var_es import (
+from app.services.risk.tail_risk import (
     calculate_expected_shortfall as _calculate_expected_shortfall,
-)
-from app.services.risk.var_es import (
     calculate_portfolio_var as _calculate_portfolio_var,
-)
-from app.services.risk.var_es import (
     calculate_var_es_snapshots,
 )
 from app.utils.errors import exception_to_error_payload
