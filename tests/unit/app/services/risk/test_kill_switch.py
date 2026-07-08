@@ -20,10 +20,22 @@ from app.services.risk import (
     RiskReasonCode,
     RiskSeverity,
 )
-from app.services.risk.kill_switch import (
+from app.services.risk.governance.kill_switch import (
+    ApprovalContext,
+    KillSwitchAssessment,
     KillSwitchManager,
+    KillSwitchResumeRequest,
+    KillSwitchScope,
+    KillSwitchService,
+    KillSwitchState,
+    KillSwitchTriggerRequest,
+    check_risk_kill_switch,
+    clear_kill_switch_after_approval,
     get_kill_switch_manager,
+    request_kill_switch_trigger,
+    validate_resume_request,
 )
+from app.services.risk.storage import InMemoryRiskStateStore
 from app.utils.errors import ValidationError
 from app.utils.event_bus import InMemoryEventBus
 
@@ -384,18 +396,24 @@ def test_pending_resume_still_blocked(manager: KillSwitchManager) -> None:
     assert manager.is_blocked("strategy", "any_strat")
 
 
-def test_trigger_kill_switch_fn(temp_persistence_path: Any) -> None:
+def test_trigger_kill_switch_fn(
+    temp_persistence_path: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Module-level trigger_kill_switch() must delegate to the global singleton."""
-    import app.services.risk.kill_switch as ks_module
-    from app.services.risk.kill_switch import (
+    import sys
+
+    ks_module = sys.modules["app.services.risk.governance.kill_switch"]
+    from app.services.risk.governance.kill_switch import (
         _manager_lock,
         trigger_kill_switch,
     )
 
     # Force a fresh singleton with a temp path for isolation
     with _manager_lock:
-        ks_module._global_kill_switch_manager = KillSwitchManager(
-            persistence_path=temp_persistence_path
+        monkeypatch.setattr(
+            ks_module,
+            "_global_kill_switch_manager",
+            KillSwitchManager(persistence_path=temp_persistence_path),
         )
 
     trigger_kill_switch(
@@ -406,18 +424,24 @@ def test_trigger_kill_switch_fn(temp_persistence_path: Any) -> None:
     assert mgr.is_blocked("strategy", "strat_fn")
 
 
-def test_resume_after_kill_switch_fn(temp_persistence_path: Any) -> None:
+def test_resume_after_kill_switch_fn(
+    temp_persistence_path: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Module-level resume_after_kill_switch() must delegate to the global singleton."""
-    import app.services.risk.kill_switch as ks_module
-    from app.services.risk.kill_switch import (
+    import sys
+
+    ks_module = sys.modules["app.services.risk.governance.kill_switch"]
+    from app.services.risk.governance.kill_switch import (
         _manager_lock,
         resume_after_kill_switch,
         trigger_kill_switch,
     )
 
     with _manager_lock:
-        ks_module._global_kill_switch_manager = KillSwitchManager(
-            persistence_path=temp_persistence_path
+        monkeypatch.setattr(
+            ks_module,
+            "_global_kill_switch_manager",
+            KillSwitchManager(persistence_path=temp_persistence_path),
         )
 
     trigger_kill_switch(
@@ -456,7 +480,7 @@ def test_no_bypass_without_token_or_role(manager: KillSwitchManager) -> None:
 
 def test_risk_kill_switch_dataclass() -> None:
     """RiskKillSwitch typed snapshot carries correct fields and is immutable."""
-    from app.services.risk.kill_switch import KillSwitchScope, RiskKillSwitch
+    from app.services.risk.governance.kill_switch import KillSwitchScope, RiskKillSwitch
 
     snap = RiskKillSwitch(
         scope=KillSwitchScope.SYMBOL,
@@ -478,7 +502,10 @@ def test_risk_kill_switch_dataclass() -> None:
 
 def test_portfolio_kill_switch_dataclass() -> None:
     """PortfolioKillSwitch is a typed subclass of RiskKillSwitch."""
-    from app.services.risk.kill_switch import KillSwitchScope, PortfolioKillSwitch
+    from app.services.risk.governance.kill_switch import (
+        KillSwitchScope,
+        PortfolioKillSwitch,
+    )
 
     snap = PortfolioKillSwitch(
         scope=KillSwitchScope.PORTFOLIO,
@@ -488,7 +515,7 @@ def test_portfolio_kill_switch_dataclass() -> None:
         triggered_at=None,
         triggered_by="reconciliation_service",
     )
-    from app.services.risk.kill_switch import RiskKillSwitch
+    from app.services.risk.governance.kill_switch import RiskKillSwitch
 
     assert isinstance(snap, RiskKillSwitch)
     assert snap.scope == KillSwitchScope.PORTFOLIO
@@ -497,7 +524,10 @@ def test_portfolio_kill_switch_dataclass() -> None:
 
 def test_strategy_kill_switch_dataclass() -> None:
     """StrategyKillSwitch is a typed subclass of RiskKillSwitch."""
-    from app.services.risk.kill_switch import KillSwitchScope, StrategyKillSwitch
+    from app.services.risk.governance.kill_switch import (
+        KillSwitchScope,
+        StrategyKillSwitch,
+    )
 
     snap = StrategyKillSwitch(
         scope=KillSwitchScope.STRATEGY,
@@ -507,8 +537,146 @@ def test_strategy_kill_switch_dataclass() -> None:
         triggered_at=None,
         triggered_by="limit_engine",
     )
-    from app.services.risk.kill_switch import RiskKillSwitch
+    from app.services.risk.governance.kill_switch import RiskKillSwitch
 
     assert isinstance(snap, RiskKillSwitch)
     assert snap.scope == KillSwitchScope.STRATEGY
     assert snap.state == KillSwitchStateEnum.PENDING_RESUME
+
+
+def test_check_risk_kill_switch_v1_dispatch(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify check_risk_kill_switch V1 (scope: str, target: str) -> bool path.
+
+    Patches the target module resolved through `sys.modules` (matching how
+    `check_risk_kill_switch.__globals__` resolves names) rather than via a
+    fresh `import ... as` statement: other tests that reload risk submodules
+    (e.g. test_import_safety.py) can leave the parent package's submodule
+    *attribute* pointing at a different (stale) module object than the one
+    registered in `sys.modules`, which would make an `import ... as ks_module`
+    alias diverge from the module `check_risk_kill_switch` actually runs in.
+    """
+    import sys
+    from unittest.mock import MagicMock
+
+    ks_module = sys.modules["app.services.risk.governance.kill_switch"]
+
+    mock_manager = MagicMock()
+    mock_manager.is_blocked.return_value = True
+    monkeypatch.setattr(
+        ks_module, "get_kill_switch_manager", lambda *_a, **_kw: mock_manager
+    )
+
+    result = check_risk_kill_switch("strategy", "strat_x")
+    assert result is True
+    mock_manager.is_blocked.assert_called_once_with("strategy", "strat_x")
+
+
+def test_check_risk_kill_switch_v2_dispatch() -> None:
+    """Verify check_risk_kill_switch V2 (scope, state) -> KillSwitchAssessment."""
+    inactive_state = KillSwitchState(state=KillSwitchStateEnum.INACTIVE)
+    assessment = check_risk_kill_switch(KillSwitchScope.GLOBAL, inactive_state)
+    assert isinstance(assessment, KillSwitchAssessment)
+    assert assessment.blocked is False
+    assert assessment.reason_code == RiskReasonCode.OK
+
+    active_state = KillSwitchState(state=KillSwitchStateEnum.ACTIVE)
+    assessment_active = check_risk_kill_switch(KillSwitchScope.GLOBAL, active_state)
+    assert assessment_active.blocked is True
+    assert assessment_active.reason_code == RiskReasonCode.KILL_SWITCH_ACTIVE
+
+    unknown_state = KillSwitchState(state=KillSwitchStateEnum.UNKNOWN)
+    assessment_unknown = check_risk_kill_switch(KillSwitchScope.GLOBAL, unknown_state)
+    assert assessment_unknown.blocked is True
+
+
+def test_request_kill_switch_trigger_and_clear_after_approval() -> None:
+    """Verify canonical trigger/clear round-trip through a RiskStateStore."""
+    store = InMemoryRiskStateStore()
+    trigger_request = KillSwitchTriggerRequest(
+        scope=KillSwitchScope.STRATEGY,
+        target="strat_canonical",
+        reason="Canonical test halt",
+        triggered_by="tester",
+    )
+    triggered_state = request_kill_switch_trigger(trigger_request, store)
+    assert triggered_state.state == KillSwitchStateEnum.ACTIVE
+
+    persisted = store.get_kill_switch_state("strategy", "strat_canonical")
+    assert persisted[0] == KillSwitchStateEnum.ACTIVE
+
+    resume_request = KillSwitchResumeRequest(
+        scope=KillSwitchScope.STRATEGY,
+        target="strat_canonical",
+        operator_role="admin",
+    )
+    cleared_state = clear_kill_switch_after_approval(resume_request, store)
+    assert cleared_state.state == KillSwitchStateEnum.INACTIVE
+    persisted_after = store.get_kill_switch_state("strategy", "strat_canonical")
+    assert persisted_after[0] == KillSwitchStateEnum.INACTIVE
+
+
+def test_validate_resume_request_canonical() -> None:
+    """Verify canonical governed resume validation for locked and active states."""
+    resume_request = KillSwitchResumeRequest(
+        scope=KillSwitchScope.GLOBAL, target="*", operator_role=None
+    )
+
+    locked_state = KillSwitchState(state=KillSwitchStateEnum.LOCKED)
+    denied = validate_resume_request(resume_request, locked_state, None)
+    assert not denied["valid"]
+    assert denied["code"] == "PERMISSION_DENIED"
+
+    approved_locked = validate_resume_request(
+        resume_request, locked_state, ApprovalContext(operator_role="compliance")
+    )
+    assert approved_locked["valid"]
+
+    active_state = KillSwitchState(state=KillSwitchStateEnum.ACTIVE)
+    denied_active = validate_resume_request(resume_request, active_state, None)
+    assert not denied_active["valid"]
+    assert denied_active["code"] == "APPROVAL_REQUIRED"
+
+    approved_active = validate_resume_request(
+        resume_request,
+        active_state,
+        ApprovalContext(approval_token="tok-123"),
+    )
+    assert approved_active["valid"]
+
+
+def test_kill_switch_service_canonical_facade() -> None:
+    """Verify the KillSwitchService façade check/trigger/resume flow."""
+    store = InMemoryRiskStateStore()
+    service = KillSwitchService(store)
+
+    initial = service.check(KillSwitchScope.STRATEGY, "strat_service")
+    assert initial.blocked is False
+
+    service.trigger(
+        KillSwitchTriggerRequest(
+            scope=KillSwitchScope.STRATEGY,
+            target="strat_service",
+            reason="Service-level halt",
+        )
+    )
+    triggered = service.check(KillSwitchScope.STRATEGY, "strat_service")
+    assert triggered.blocked is True
+
+    # Resume without approval is denied
+    with pytest.raises(ValidationError):
+        service.resume(
+            KillSwitchResumeRequest(
+                scope=KillSwitchScope.STRATEGY, target="strat_service"
+            )
+        )
+
+    # Resume with admin role succeeds
+    service.resume(
+        KillSwitchResumeRequest(
+            scope=KillSwitchScope.STRATEGY,
+            target="strat_service",
+            operator_role="admin",
+        )
+    )
+    resumed = service.check(KillSwitchScope.STRATEGY, "strat_service")
+    assert resumed.blocked is False

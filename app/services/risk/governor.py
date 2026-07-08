@@ -11,10 +11,6 @@ import time
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from app.services.risk.allocation import (  # noqa: F401
-    RiskAllocator,
-    verify_allocation_limits,
-)
 from app.services.risk.audit import (
     create_risk_audit_event,
     create_risk_decision_token,
@@ -26,6 +22,10 @@ from app.services.risk.feasibility import (  # noqa: F401
     DrawdownGovernor,
     ExecutionRiskGate,
     MarginRiskEngine,
+)
+from app.services.risk.governance.allocation import (  # noqa: F401
+    RiskAllocator,
+    verify_allocation_limits,
 )
 from app.services.risk.limits import (  # noqa: F401
     LimitEngine,
@@ -64,8 +64,8 @@ from app.utils.errors import DataError, ValidationError
 from app.utils.logger import logger
 
 if TYPE_CHECKING:
-    from app.services.risk.kill_switch import KillSwitchManager
-    from app.services.risk.lifecycle import (
+    from app.services.risk.governance.kill_switch import KillSwitchManager
+    from app.services.risk.governance.lifecycle import (
         LiveReadinessReview,
         ModePromotionReview,
     )
@@ -108,7 +108,7 @@ class RiskGovernor:
         self.decision_store = decision_store
 
         if kill_switch_manager is None:
-            from app.services.risk.kill_switch import get_kill_switch_manager
+            from app.services.risk.governance.kill_switch import get_kill_switch_manager
 
             self.kill_switch_manager = get_kill_switch_manager()
         else:
@@ -1291,7 +1291,7 @@ class RiskGovernor:
         Returns:
             LiveReadinessReview: Outcome of the check.
         """
-        from app.services.risk.lifecycle import (
+        from app.services.risk.governance.lifecycle import (
             review_live_readiness as _review_live_readiness,
         )
 
@@ -1326,7 +1326,7 @@ class RiskGovernor:
         Returns:
             ModePromotionReview: Outcome of the gating check.
         """
-        from app.services.risk.lifecycle import (
+        from app.services.risk.governance.lifecycle import (
             review_mode_promotion as _review_mode_promotion,
         )
 

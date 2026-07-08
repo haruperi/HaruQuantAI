@@ -53,7 +53,10 @@ from app.services.live.policy import (
     LIVE_POLICY_UNDEFINED,
     get_action_policy,
 )
-from app.services.risk.kill_switch import KillSwitchScope, check_risk_kill_switch
+from app.services.risk.governance.kill_switch import (
+    KillSwitchScope,
+    check_risk_kill_switch,
+)
 from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
@@ -344,8 +347,7 @@ def evaluate_live_gate(  # noqa: PLR0911, PLR0912, PLR0915, C901
         results.append(approval_result)
         if _is_blocked(approval_result):
             logger.warning(
-                "live_gate.blocked.approval_failed action=%r "
-                "request_id=%r",
+                "live_gate.blocked.approval_failed action=%r request_id=%r",
                 action,
                 request_id,
             )
@@ -369,8 +371,7 @@ def evaluate_live_gate(  # noqa: PLR0911, PLR0912, PLR0915, C901
     # side-effect ceiling. Full integration requires the risk module's
     # approved contract.
     if (
-        policy.side_effect_ceiling
-        not in {"none", "packaged_only"}
+        policy.side_effect_ceiling not in {"none", "packaged_only"}
         and risk_decision_ref is None
     ):
         results.append(  # pragma: no cover
@@ -546,10 +547,10 @@ def evaluate_live_gate(  # noqa: PLR0911, PLR0912, PLR0915, C901
     # When live mutation is enabled an AuditSink must be provided.
     # A write failure blocks mutation as fail-closed.
     audit_ref: str | None = None
-    live_mutation_enabled = (
-        config.live_enabled
-        and config.live_mode not in {"read_only", "package_only"}
-    )
+    live_mutation_enabled = config.live_enabled and config.live_mode not in {
+        "read_only",
+        "package_only",
+    }
     if live_mutation_enabled and audit_sink is None:
         results.append(
             _block(
@@ -588,8 +589,7 @@ def evaluate_live_gate(  # noqa: PLR0911, PLR0912, PLR0915, C901
             )
         except Exception as exc:  # noqa: BLE001
             logger.error(
-                "live_gate.audit_write_failed action=%r "
-                "error=%r request_id=%r",
+                "live_gate.audit_write_failed action=%r error=%r request_id=%r",
                 action,
                 str(exc),
                 request_id,
@@ -636,9 +636,7 @@ def evaluate_live_gate(  # noqa: PLR0911, PLR0912, PLR0915, C901
     )
 
     elapsed_ms = (time.perf_counter() - start) * 1000
-    all_passed = all(
-        r.decision == LiveGateDecision.PASS for r in results
-    )
+    all_passed = all(r.decision == LiveGateDecision.PASS for r in results)
     logger.info(
         "live_gate.evaluation_complete action=%r gate_count=%r "
         "elapsed_ms=%r all_passed=%r request_id=%r",
@@ -708,9 +706,7 @@ def require_live_approval(  # noqa: PLR0911
         return _block(
             "approval_validation",
             error_code="LIVE_APPROVAL_REQUIRED",
-            message=(
-                f"Approval context is missing required fields: {missing}."
-            ),
+            message=(f"Approval context is missing required fields: {missing}."),
             request_id=request_id,
             correlation_id=correlation_id,
         )
@@ -758,17 +754,13 @@ def require_live_approval(  # noqa: PLR0911
         return _block(  # pragma: no cover
             "approval_validation",
             error_code="INVALID_INPUT",
-            message=(
-                "Approval expiration_timestamp is not a valid "
-                "ISO 8601 datetime."
-            ),
+            message=("Approval expiration_timestamp is not a valid ISO 8601 datetime."),
             request_id=request_id,
             correlation_id=correlation_id,
         )
 
     logger.info(
-        "live_gate.approval_validated approval_id=%r "
-        "action_type=%r request_id=%r",
+        "live_gate.approval_validated approval_id=%r action_type=%r request_id=%r",
         approval_context.get("approval_id"),
         required_action,
         request_id,
@@ -835,8 +827,7 @@ def enforce_kill_switch_gate(
 
     if is_active:
         logger.warning(
-            "live_gate.blocked.kill_switch_active scope=%r "
-            "target=%r request_id=%r",
+            "live_gate.blocked.kill_switch_active scope=%r target=%r request_id=%r",
             scope,
             target,
             request_id,
@@ -890,9 +881,7 @@ def trigger_global_kill_switch(
         "scope": "global",
         "target": "*",
         "reason": reason,
-        "emergency_fail_safe": (
-            policy.emergency_fail_safe if policy else False
-        ),
+        "emergency_fail_safe": (policy.emergency_fail_safe if policy else False),
         "side_effect_mode": "packaged_only",
         "request_id": request_id,
         "correlation_id": correlation_id,
@@ -927,9 +916,7 @@ def trigger_strategy_kill_switch(
         "scope": "strategy",
         "target": strategy_id,
         "reason": reason,
-        "emergency_fail_safe": (
-            policy.emergency_fail_safe if policy else False
-        ),
+        "emergency_fail_safe": (policy.emergency_fail_safe if policy else False),
         "side_effect_mode": "packaged_only",
         "request_id": request_id,
         "correlation_id": correlation_id,
@@ -964,9 +951,7 @@ def trigger_symbol_kill_switch(
         "scope": "symbol",
         "target": symbol,
         "reason": reason,
-        "emergency_fail_safe": (
-            policy.emergency_fail_safe if policy else False
-        ),
+        "emergency_fail_safe": (policy.emergency_fail_safe if policy else False),
         "side_effect_mode": "packaged_only",
         "request_id": request_id,
         "correlation_id": correlation_id,

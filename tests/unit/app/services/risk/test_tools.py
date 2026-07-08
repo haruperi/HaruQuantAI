@@ -26,7 +26,7 @@ from app.agentic.tools.risk import (
     validate_risk_approval_token,
     validate_risk_policy,
 )
-from app.services.risk.kill_switch import get_kill_switch_manager
+from app.services.risk.governance.kill_switch import get_kill_switch_manager
 from app.services.risk.models import KillSwitchStateEnum
 
 

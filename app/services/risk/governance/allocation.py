@@ -1,15 +1,25 @@
+# ruff: noqa: PLR2004
 """Strategy capital allocation governance.
 
 Handles equal-risk budgets, volatility parity budgets, correlation-adjusted parity,
-drawdown adjustments, and proposed allocation limit validations.
+drawdown adjustments, and proposed allocation limit validations. Also exposes a
+pure, canonically-typed V2 calculation surface (:func:`calculate_equal_risk_allocation`,
+:func:`calculate_volatility_parity_allocation`,
+:func:`calculate_correlation_adjusted_allocation`,
+:func:`apply_regime_and_drawdown_adjustments`) operating on :class:`AllocatableRisk`/
+:class:`AllocationPlan` alongside a dual-dispatch :func:`review_allocation_proposal`
+that accepts either the V1 ``AllocationReviewRequest`` calling convention or the
+canonical V2 ``ProposedAllocation``/``PortfolioRiskSnapshot``/``EffectiveRiskPolicy``
+convention.
 """
 
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any
+from typing import TYPE_CHECKING, Any, overload
 
 from pydantic import Field
 
@@ -23,6 +33,16 @@ from app.services.risk.models import (
     RiskReasonCode,
     RiskSeverity,
 )
+from app.utils.logger import logger
+
+if TYPE_CHECKING:
+    from app.services.risk.models import (
+        CorrelationSnapshot,
+        DrawdownState,
+        PortfolioRiskSnapshot,
+    )
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+    from app.services.risk.regime.assessor import RegimeAssessment
 
 # Confidence level float constants for VaR/ES calculations
 CONF_99 = 0.99
@@ -78,6 +98,34 @@ class AllocationReviewResult(RiskContract):
     )
 
 
+AllocationAssessment = AllocationReviewResult
+"""Type alias: the canonical V2 allocation assessment reuses the same
+result shape as the V1 `AllocationReviewResult` (status/reason/message/
+severity/breached/details already cover the spec's assessment contract)."""
+
+
+class AllocatableRisk(RiskContract):
+    """A single strategy's risk-allocation inputs (V2 canonical)."""
+
+    strategy_id: str = Field(..., description="Target strategy identifier.")
+    volatility: Decimal = Field(
+        default=Decimal("0.02"), description="Rolling strategy volatility.", gt=0
+    )
+
+
+class AllocationPlan(RiskContract):
+    """A normalized capital-weight allocation plan (V2 canonical).
+
+    Weights sum to 1.0 across all included strategies; callers scale by a
+    total budget to obtain dollar allocations.
+    """
+
+    allocations: dict[str, Decimal] = Field(
+        default_factory=dict, description="Strategy ID to normalized weight."
+    )
+    method: str = Field(..., description="Allocation method used to derive weights.")
+
+
 def equal_risk_allocation(
     strategies: list[str], total_budget: Decimal
 ) -> dict[str, Decimal]:
@@ -90,6 +138,7 @@ def equal_risk_allocation(
     Returns:
         dict[str, Decimal]: Map of strategy ID to allocated capital.
     """
+    logger.info(f"Calculating equal-risk allocation for {len(strategies)} strategies.")
     if not strategies:
         return {}
     if total_budget <= Decimal("0.0"):
@@ -97,6 +146,7 @@ def equal_risk_allocation(
 
     num_strategies = Decimal(str(len(strategies)))
     equal_share = total_budget / num_strategies
+    logger.debug(f"Equal-risk share per strategy: {equal_share}.")
 
     return dict.fromkeys(strategies, equal_share)
 
@@ -114,6 +164,9 @@ def volatility_parity_allocation(
     Returns:
         dict[str, Decimal]: Map of strategy ID to allocated capital.
     """
+    logger.info(
+        f"Calculating volatility-parity allocation for {len(strategies)} strategies."
+    )
     if not strategies:
         return {}
     if total_budget <= Decimal("0.0"):
@@ -132,6 +185,7 @@ def volatility_parity_allocation(
         sum_inv_vol += inv_vol
 
     if sum_inv_vol <= Decimal("0.0"):
+        logger.debug("Sum of inverse volatilities non-positive; falling back to equal.")
         return equal_risk_allocation(strategies, total_budget)
 
     allocations: dict[str, Decimal] = {}
@@ -162,6 +216,10 @@ def correlation_adjusted_risk_parity_allocation(
     Returns:
         dict[str, Decimal]: Map of strategy ID to allocated capital.
     """
+    logger.info(
+        "Calculating correlation-adjusted risk-parity allocation for "
+        f"{len(strategies)} strategies."
+    )
     if not strategies:
         return {}
     if total_budget <= Decimal("0.0"):
@@ -177,7 +235,6 @@ def correlation_adjusted_risk_parity_allocation(
         if vol <= Decimal("0.0"):
             vol = default_vol
 
-        # Compute average correlation with other active strategies
         corr_sum = Decimal("0.0")
         corr_count = 0
         strat_corrs = correlation_matrix.get(strat, {})
@@ -193,7 +250,6 @@ def correlation_adjusted_risk_parity_allocation(
             corr_sum / Decimal(str(corr_count)) if corr_count > 0 else Decimal("0.0")
         )
 
-        # Denominator represents volatility adjusted by diversification factor
         denom = vol * (Decimal("1.0") + avg_corr)
         if denom <= Decimal("0.0"):
             denom = Decimal("0.0001")
@@ -203,6 +259,7 @@ def correlation_adjusted_risk_parity_allocation(
         sum_inv_factor += inv_factor
 
     if sum_inv_factor <= Decimal("0.0"):
+        logger.debug("Sum of inverse factors non-positive; falling back to equal.")
         return equal_risk_allocation(strategies, total_budget)
 
     allocations: dict[str, Decimal] = {}
@@ -225,6 +282,7 @@ def apply_regime_weighting(
     Returns:
         dict[str, Decimal]: Adjusted allocations.
     """
+    logger.debug(f"Applying regime weighting multiplier: {regime_multiplier}.")
     return {strat: alloc * regime_multiplier for strat, alloc in allocations.items()}
 
 
@@ -240,6 +298,7 @@ def apply_drawdown_adjustment(
     Returns:
         dict[str, Decimal]: Adjusted allocations.
     """
+    logger.debug("Applying per-strategy drawdown adjustment multipliers.")
     adjusted: dict[str, Decimal] = {}
     for strat, alloc in allocations.items():
         multiplier = strategy_drawdown_multipliers.get(strat, Decimal("1.0"))
@@ -293,6 +352,7 @@ class RiskAllocator:
     def __init__(self, config: RiskConfig) -> None:
         """Initialize the allocator engine with active configuration profile."""
         self.config = config
+        logger.debug("RiskAllocator initialized.")
 
     def calculate_allocated_budget(
         self,
@@ -362,6 +422,7 @@ class RiskAllocator:
             res = calculate_correlation_adjusted_budget(
                 strategies, volatilities, correlation_matrix, total_budget
             )
+        logger.info(f"Calculated allocated budget using method '{method}'.")
         return res
 
     def review_allocation(
@@ -375,6 +436,7 @@ class RiskAllocator:
         Returns:
             AllocationReviewResult: Outcome of the check.
         """
+        logger.info("Reviewing allocation proposal against governance checks.")
         portfolio_state = request.portfolio_state
         proposal = request.proposal
         market_context = request.market_context
@@ -382,6 +444,7 @@ class RiskAllocator:
 
         equity = portfolio_state.equity
         if equity <= Decimal("0.0"):
+            logger.error("Cannot allocate budget with zero or negative account equity.")
             return AllocationReviewResult(
                 status=RiskDecisionStatus.BLOCK,
                 reason_code=RiskReasonCode.MARGIN_BREACH,
@@ -406,8 +469,10 @@ class RiskAllocator:
         for check in checkers:
             res = check(portfolio_state, proposal, market_context, config)
             if res is not None:
+                logger.info(f"Allocation review breached at '{check.__name__}'.")
                 return res
 
+        logger.info("Allocation proposal approved: complies with all limits.")
         return AllocationReviewResult(
             status=RiskDecisionStatus.APPROVE,
             reason_code=RiskReasonCode.OK,
@@ -946,17 +1011,10 @@ class RiskAllocator:
         return None
 
 
-def review_allocation_proposal(
+def _review_allocation_proposal_v1(
     request: AllocationReviewRequest,
 ) -> AllocationReviewResult:
-    """Evaluate budget allocation proposal changes across multiple strategies.
-
-    Args:
-        request: The risk assessment request containing proposed allocation.
-
-    Returns:
-        AllocationReviewResult: Synthesized final decision package.
-    """
+    """V1 allocation review path operating on a full request envelope."""
     config = request.config
     if config is None:
         from app.services.risk.config import load_risk_config
@@ -965,6 +1023,233 @@ def review_allocation_proposal(
 
     allocator = RiskAllocator(config)
     return allocator.review_allocation(request)
+
+
+def _review_allocation_proposal_v2(
+    proposal: ProposedAllocation,
+    portfolio: PortfolioRiskSnapshot,
+    policy: EffectiveRiskPolicy,
+) -> AllocationAssessment:
+    """V2 canonical allocation review operating on typed snapshots.
+
+    Since `PortfolioRiskSnapshot` does not carry an equity figure, proposed
+    allocation values are treated as fractional risk weights and checked
+    directly against the resolved policy's risk-budget caps.
+    """
+    logger.info("Reviewing canonical allocation proposal against policy caps.")
+    config = policy.resolved_config
+    _ = portfolio
+
+    total_proposed = sum(proposal.allocations.values(), Decimal("0.0"))
+    total_cap = config.risk.max_total_open_risk
+    if total_cap > 0 and total_proposed > total_cap:
+        logger.info(
+            f"Canonical total allocation breach: {total_proposed} > {total_cap}."
+        )
+        return AllocationAssessment(
+            status=RiskDecisionStatus.REJECT,
+            reason_code=RiskReasonCode.ALLOCATION_LIMIT_BREACH,
+            message=(
+                f"Total proposed allocation weight {total_proposed} exceeds policy "
+                f"cap {total_cap}."
+            ),
+            severity=RiskSeverity.HARD_BREACH,
+            breached=True,
+            details={"total_proposed": float(total_proposed)},
+        )
+
+    strategy_cap = config.max_strategy_allocation_pct
+    for strat_id, weight in proposal.allocations.items():
+        if strategy_cap > 0 and weight > strategy_cap:
+            logger.info(f"Canonical strategy allocation breach for '{strat_id}'.")
+            return AllocationAssessment(
+                status=RiskDecisionStatus.REJECT,
+                reason_code=RiskReasonCode.ALLOCATION_LIMIT_BREACH,
+                message=(
+                    f"Proposed allocation weight for '{strat_id}' ({weight}) exceeds "
+                    f"policy strategy cap {strategy_cap}."
+                ),
+                severity=RiskSeverity.HARD_BREACH,
+                breached=True,
+                details={"strategy_id": strat_id, "weight": float(weight)},
+            )
+
+    logger.info("Canonical allocation proposal approved.")
+    return AllocationAssessment(
+        status=RiskDecisionStatus.APPROVE,
+        reason_code=RiskReasonCode.OK,
+        message="Proposed allocation weights comply with policy caps.",
+        severity=RiskSeverity.INFO,
+        breached=False,
+    )
+
+
+@overload
+def review_allocation_proposal(
+    request: AllocationReviewRequest,
+) -> AllocationReviewResult: ...
+
+
+@overload
+def review_allocation_proposal(
+    proposal: ProposedAllocation,
+    portfolio: PortfolioRiskSnapshot,
+    policy: EffectiveRiskPolicy,
+) -> AllocationAssessment: ...
+
+
+def review_allocation_proposal(*args: Any, **kwargs: Any) -> Any:
+    """Evaluate a budget allocation proposal, supporting V1 and V2 signatures.
+
+    Args:
+        *args: Positional arguments. For V1, the sole argument is an
+            `AllocationReviewRequest`. For V2, the arguments are
+            (proposal: ProposedAllocation, portfolio: PortfolioRiskSnapshot,
+            policy: EffectiveRiskPolicy).
+        **kwargs: Keyword arguments mirroring the positional forms above
+            (`request` for V1; `proposal`/`portfolio`/`policy` for V2).
+
+    Returns:
+        AllocationReviewResult | AllocationAssessment: The review outcome.
+    """
+    logger.info("review_allocation_proposal entry.")
+    first = args[0] if args else kwargs.get("request", kwargs.get("proposal"))
+    if isinstance(first, ProposedAllocation):
+        proposal = first
+        portfolio: Any = kwargs.get("portfolio", args[1] if len(args) > 1 else None)
+        policy: Any = kwargs.get("policy", args[2] if len(args) > 2 else None)
+        return _review_allocation_proposal_v2(proposal, portfolio, policy)
+
+    request: Any = kwargs.get("request", args[0] if args else None)
+    return _review_allocation_proposal_v1(request)
+
+
+def calculate_equal_risk_allocation(
+    items: Sequence[AllocatableRisk],
+) -> AllocationPlan:
+    """Derive an equal-risk allocation plan across the supplied items.
+
+    Args:
+        items: Sequence of allocatable strategy risk inputs.
+
+    Returns:
+        AllocationPlan: Normalized weights summing to 1.0.
+    """
+    logger.info(f"Calculating canonical equal-risk allocation for {len(items)} items.")
+    if not items:
+        return AllocationPlan(allocations={}, method=AllocationMethod.EQUAL_RISK)
+
+    weight = Decimal("1.0") / Decimal(str(len(items)))
+    allocations = {item.strategy_id: weight for item in items}
+    return AllocationPlan(allocations=allocations, method=AllocationMethod.EQUAL_RISK)
+
+
+def calculate_volatility_parity_allocation(
+    items: Sequence[AllocatableRisk],
+) -> AllocationPlan:
+    """Derive a volatility-parity allocation plan across the supplied items.
+
+    Args:
+        items: Sequence of allocatable strategy risk inputs.
+
+    Returns:
+        AllocationPlan: Normalized weights inversely proportional to volatility.
+    """
+    logger.info(
+        f"Calculating canonical volatility-parity allocation for {len(items)} items."
+    )
+    if not items:
+        return AllocationPlan(allocations={}, method=AllocationMethod.VOLATILITY_PARITY)
+
+    inv_vols = {item.strategy_id: Decimal("1.0") / item.volatility for item in items}
+    total = sum(inv_vols.values(), Decimal("0.0"))
+    if total <= Decimal("0.0"):
+        return calculate_equal_risk_allocation(items)
+
+    allocations = {sid: inv / total for sid, inv in inv_vols.items()}
+    return AllocationPlan(
+        allocations=allocations, method=AllocationMethod.VOLATILITY_PARITY
+    )
+
+
+def calculate_correlation_adjusted_allocation(
+    items: Sequence[AllocatableRisk],
+    correlation: CorrelationSnapshot,
+) -> AllocationPlan:
+    """Derive a correlation-adjusted risk-parity allocation plan.
+
+    Reduces the weight of strategies with high average correlation to the
+    other supplied items, reducing shared-cluster exposure.
+
+    Args:
+        items: Sequence of allocatable strategy risk inputs.
+        correlation: Rolling correlation matrix snapshot.
+
+    Returns:
+        AllocationPlan: Normalized, correlation-adjusted weights.
+    """
+    logger.info(
+        f"Calculating canonical correlation-adjusted allocation for {len(items)} items."
+    )
+    if not items:
+        return AllocationPlan(
+            allocations={}, method=AllocationMethod.CORRELATION_ADJUSTED_PARITY
+        )
+
+    strategy_ids = [item.strategy_id for item in items]
+    inv_factors: dict[str, Decimal] = {}
+    for item in items:
+        row = correlation.matrix.get(item.strategy_id, {})
+        others = [sid for sid in strategy_ids if sid != item.strategy_id]
+        avg_corr = (
+            sum((row.get(o, Decimal("0.0")) for o in others), Decimal("0.0"))
+            / Decimal(str(len(others)))
+            if others
+            else Decimal("0.0")
+        )
+        denom = item.volatility * (Decimal("1.0") + avg_corr)
+        if denom <= Decimal("0.0"):
+            denom = Decimal("0.0001")
+        inv_factors[item.strategy_id] = Decimal("1.0") / denom
+
+    total = sum(inv_factors.values(), Decimal("0.0"))
+    if total <= Decimal("0.0"):
+        return calculate_equal_risk_allocation(items)
+
+    allocations = {sid: factor / total for sid, factor in inv_factors.items()}
+    return AllocationPlan(
+        allocations=allocations, method=AllocationMethod.CORRELATION_ADJUSTED_PARITY
+    )
+
+
+def apply_regime_and_drawdown_adjustments(
+    plan: AllocationPlan,
+    regime: RegimeAssessment,
+    drawdown: DrawdownState,
+) -> AllocationPlan:
+    """Apply deterministic regime and drawdown scale-down multipliers.
+
+    Args:
+        plan: The base allocation plan to adjust.
+        regime: Current market regime assessment.
+        drawdown: Current portfolio drawdown state.
+
+    Returns:
+        AllocationPlan: The adjusted (not renormalized) allocation plan.
+    """
+    logger.info("Applying regime and drawdown adjustments to allocation plan.")
+    regime_multiplier = {
+        RiskDecisionStatus.APPROVE: Decimal("1.0"),
+        RiskDecisionStatus.REDUCE_SIZE: Decimal("0.5"),
+    }.get(regime.status, Decimal("0.0"))
+
+    combined_multiplier = regime_multiplier * drawdown.multiplier
+    logger.debug(f"Combined regime/drawdown multiplier: {combined_multiplier}.")
+
+    adjusted = {
+        sid: weight * combined_multiplier for sid, weight in plan.allocations.items()
+    }
+    return AllocationPlan(allocations=adjusted, method=plan.method)
 
 
 def verify_allocation_limits(
@@ -984,13 +1269,14 @@ def verify_allocation_limits(
     Returns:
         LimitResult: Outcome of the allocation check.
     """
+    logger.info("Verifying allocation limits (V1 legacy wrapper).")
     request = AllocationReviewRequest(
         portfolio_state=portfolio_state,
         proposal=proposal,
         market_context=market_context,
         config=config,
     )
-    result = review_allocation_proposal(request)
+    result = _review_allocation_proposal_v1(request)
     return LimitResult(
         limit_name="verify_allocation_limits",
         status=result.status,

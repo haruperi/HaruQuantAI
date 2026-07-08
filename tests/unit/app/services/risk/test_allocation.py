@@ -25,11 +25,17 @@ from app.services.risk import (
     calculate_regime_weighted_budget,
     calculate_volatility_parity_budget,
 )
-from app.services.risk.allocation import (
+from app.services.risk.governance.allocation import (
+    AllocatableRisk,
     apply_drawdown_adjustment,
+    apply_regime_and_drawdown_adjustments,
     apply_regime_weighting,
+    calculate_correlation_adjusted_allocation,
+    calculate_equal_risk_allocation,
+    calculate_volatility_parity_allocation,
     correlation_adjusted_risk_parity_allocation,
     equal_risk_allocation,
+    review_allocation_proposal,
     verify_allocation_limits,
     volatility_parity_allocation,
 )
@@ -435,3 +441,126 @@ def test_risk_allocator_review_limits(
     res = allocator.review_allocation(req)
     assert res.status == RiskDecisionStatus.REJECT
     assert res.reason_code == RiskReasonCode.DRAWDOWN_BREACH
+
+
+def test_calculate_equal_risk_allocation_canonical() -> None:
+    """Verify canonical equal-risk allocation produces normalized weights."""
+    items = [
+        AllocatableRisk(strategy_id="strat1", volatility=Decimal("0.02")),
+        AllocatableRisk(strategy_id="strat2", volatility=Decimal("0.04")),
+    ]
+    plan = calculate_equal_risk_allocation(items)
+    assert plan.allocations["strat1"] == Decimal("0.5")
+    assert plan.allocations["strat2"] == Decimal("0.5")
+    assert plan.method == AllocationMethod.EQUAL_RISK
+
+    empty_plan = calculate_equal_risk_allocation([])
+    assert empty_plan.allocations == {}
+
+
+def test_calculate_volatility_parity_allocation_canonical() -> None:
+    """Verify canonical volatility-parity allocation weights inversely by vol."""
+    items = [
+        AllocatableRisk(strategy_id="strat1", volatility=Decimal("0.01")),
+        AllocatableRisk(strategy_id="strat2", volatility=Decimal("0.03")),
+    ]
+    plan = calculate_volatility_parity_allocation(items)
+    assert plan.allocations["strat1"] == pytest.approx(Decimal("0.75"))
+    assert plan.allocations["strat2"] == pytest.approx(Decimal("0.25"))
+
+
+def test_calculate_correlation_adjusted_allocation_canonical() -> None:
+    """Verify canonical correlation-adjusted allocation reduces correlated weight."""
+    from app.services.risk.models import CorrelationSnapshot
+
+    items = [
+        AllocatableRisk(strategy_id="strat1", volatility=Decimal("0.02")),
+        AllocatableRisk(strategy_id="strat2", volatility=Decimal("0.02")),
+        AllocatableRisk(strategy_id="strat3", volatility=Decimal("0.02")),
+    ]
+    correlation = CorrelationSnapshot(
+        matrix={
+            "strat1": {"strat2": Decimal("0.8"), "strat3": Decimal("0.8")},
+            "strat2": {"strat1": Decimal("0.8"), "strat3": Decimal("0.0")},
+            "strat3": {"strat1": Decimal("0.8"), "strat2": Decimal("0.0")},
+        },
+        lookback=20,
+        timeframe="H1",
+        method="pearson",
+        sample_count=20,
+        fallback_status=False,
+    )
+    plan = calculate_correlation_adjusted_allocation(items, correlation)
+    assert plan.allocations["strat1"] < plan.allocations["strat2"]
+    assert plan.allocations["strat2"] == pytest.approx(plan.allocations["strat3"])
+
+
+def test_apply_regime_and_drawdown_adjustments_canonical() -> None:
+    """Verify canonical regime/drawdown scale-down on an allocation plan."""
+    from app.services.risk.models import DrawdownState
+    from app.services.risk.regime.assessor import RegimeAssessment
+
+    plan = calculate_equal_risk_allocation(
+        [
+            AllocatableRisk(strategy_id="strat1"),
+            AllocatableRisk(strategy_id="strat2"),
+        ]
+    )
+    regime = RegimeAssessment.model_construct(
+        regime="normal",
+        spread_regime="normal",
+        volatility_regime="normal",
+        liquidity_regime="normal",
+        news_regime="clear",
+        session_regime="open",
+        rollover_regime="clear",
+        status=RiskDecisionStatus.REDUCE_SIZE,
+        reason="caution",
+        reason_code=RiskReasonCode.OK,
+        timestamp=datetime.now(UTC),
+    )
+    drawdown = DrawdownState(
+        current_drawdown=Decimal("0.05"),
+        soft_limit=Decimal("0.05"),
+        hard_limit=Decimal("0.10"),
+        multiplier=Decimal("0.5"),
+    )
+    adjusted = apply_regime_and_drawdown_adjustments(plan, regime, drawdown)
+    # regime REDUCE_SIZE multiplier 0.5 * drawdown multiplier 0.5 = 0.25
+    assert adjusted.allocations["strat1"] == pytest.approx(Decimal("0.125"))
+
+
+def test_review_allocation_proposal_v2_canonical() -> None:
+    """Verify canonical review_allocation_proposal dispatch and policy caps."""
+    from app.services.risk.models import PortfolioRiskSnapshot
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    canonical_config = RiskConfig(
+        profile_name="canonical_alloc_test",
+        max_strategy_allocation_pct=Decimal("0.50"),
+    )
+    canonical_config.risk.max_total_open_risk = Decimal("1.0")
+    policy = EffectiveRiskPolicy(
+        policy_id="test-alloc-policy",
+        resolved_config=canonical_config,
+        policy_hash="test-hash",
+    )
+    portfolio = PortfolioRiskSnapshot(
+        exposure=Decimal("0.0"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.0"),
+    )
+
+    safe_proposal = ProposedAllocation(
+        allocations={"strat1": Decimal("0.10")}, as_of=datetime.now(UTC)
+    )
+    res = review_allocation_proposal(safe_proposal, portfolio, policy)
+    assert res.status == RiskDecisionStatus.APPROVE
+
+    breaching_proposal = ProposedAllocation(
+        allocations={"strat1": Decimal("0.90")}, as_of=datetime.now(UTC)
+    )
+    res_fail = review_allocation_proposal(breaching_proposal, portfolio, policy)
+    assert res_fail.status == RiskDecisionStatus.REJECT
+    assert res_fail.reason_code == RiskReasonCode.ALLOCATION_LIMIT_BREACH

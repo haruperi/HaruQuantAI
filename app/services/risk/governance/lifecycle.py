@@ -1,6 +1,14 @@
+# ruff: noqa: PLR2004
 """Strategy lifecycle promotion and live readiness governance.
 
-Enforces strict gates for strategy transitions from backtesting to live-sensitive modes.
+Enforces strict gates for strategy transitions from backtesting to live-sensitive
+modes. Also exposes a pure, canonically-typed V2 calculation surface
+(:class:`LifecycleAssessment`, :func:`validate_lifecycle_transition`,
+:func:`requires_lifecycle_approval`) and dual-dispatch
+:func:`review_strategy_admission`/:func:`review_live_readiness` that accept
+either the original V1 positional-argument calling convention or the
+canonical V2 ``StrategyAdmissionRequest``/``LiveReadinessRequest``/
+``EffectiveRiskPolicy`` convention.
 """
 
 from __future__ import annotations
@@ -8,7 +16,7 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any
+from typing import TYPE_CHECKING, Any, overload
 
 from pydantic import Field
 
@@ -19,8 +27,14 @@ from app.services.risk.models import (
     RiskDecisionStatus,
     RiskReasonCode,
     RiskSeverity,
+    StrategyAdmissionRequest,
 )
+from app.utils.logger import logger
 from app.utils.normalization import utc_now
+
+if TYPE_CHECKING:
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+    from app.utils.validations import ValidationResult
 
 # Master sequence of lifecycle stages for progression tracking
 STAGE_SEQUENCE = [
@@ -44,6 +58,11 @@ class RiskLifecycleState(StrEnum):
     LIVE_READONLY = "live-read-only"
     MICRO_LIVE = "micro-live"
     FULL_LIVE = "full-live"
+
+
+StrategyLifecycleState = RiskLifecycleState
+"""Type alias: the canonical V2 lifecycle-state type reuses the same
+stage enum defined for V1 (no separate concept is introduced)."""
 
 
 class StrategyAdmissionReview(RiskContract):
@@ -106,6 +125,52 @@ class ModePromotionReview(RiskContract):
     )
     checked_at: datetime = Field(
         default_factory=utc_now, description="Review timestamp."
+    )
+
+
+class LiveReadinessRequest(RiskContract):
+    """Canonical request envelope for a V2 live readiness review."""
+
+    strategy_id: str = Field(..., description="Target strategy.")
+    proposed_stage: str = Field(..., description="Stage requested.")
+    market_context: dict[str, Any] = Field(
+        default_factory=dict, description="Injected runtime parameters."
+    )
+
+
+class LifecycleEvidence(RiskContract):
+    """Canonical evidence bundle for a V2 lifecycle transition check."""
+
+    trade_count: int = Field(default=0, description="Number of closed trades.")
+    sharpe_ratio: Decimal = Field(default=Decimal("0.0"), description="Sharpe ratio.")
+    profit_factor: Decimal = Field(
+        default=Decimal("0.0"), description="Gross profit / gross loss ratio."
+    )
+    max_drawdown: Decimal = Field(
+        default=Decimal("1.0"), description="Maximum observed drawdown."
+    )
+    duration_days: int = Field(
+        default=0, description="Duration spent in the current stage, in days."
+    )
+    tracking_error: Decimal = Field(
+        default=Decimal("1.0"), description="Shadow-mode tracking error."
+    )
+
+
+class LifecycleAssessment(RiskContract):
+    """Canonical outcome of a V2 lifecycle review (admission or readiness)."""
+
+    strategy_id: str = Field(..., description="Target strategy.")
+    status: RiskDecisionStatus = Field(..., description="Outcome status.")
+    reason_code: RiskReasonCode = Field(..., description="Outcome reason code.")
+    message: str = Field(..., description="Outcome message details.")
+    severity: RiskSeverity = Field(..., description="Decision severity.")
+    breached: bool = Field(..., description="True if checks failed.")
+    breaches: list[str] = Field(
+        default_factory=list, description="Detail list of all breaches."
+    )
+    target_stage: str | None = Field(
+        default=None, description="Requested stage, if applicable."
     )
 
 
@@ -381,6 +446,7 @@ class RiskLifecycleGate:
         config: RiskConfig,
     ) -> StrategyAdmissionReview:
         """Evaluate whether a strategy is admitted to receive capital allocations."""
+        logger.info(f"Evaluating strategy admission for '{strategy_id}'.")
         required_keys = [
             "backtest",
             "walk_forward",
@@ -395,6 +461,7 @@ class RiskLifecycleGate:
                 breaches.append(f"Missing required evidence package: '{kebab}'")
 
         if breaches:
+            logger.info(f"Strategy admission rejected for '{strategy_id}': {breaches}.")
             return StrategyAdmissionReview(
                 strategy_id=strategy_id,
                 status=RiskDecisionStatus.REJECT,
@@ -447,6 +514,9 @@ class RiskLifecycleGate:
             )
 
         if breaches:
+            logger.info(
+                f"Strategy admission rejected for '{strategy_id}' (thresholds)."
+            )
             return StrategyAdmissionReview(
                 strategy_id=strategy_id,
                 status=RiskDecisionStatus.REJECT,
@@ -461,6 +531,7 @@ class RiskLifecycleGate:
                 breaches=breaches,
             )
 
+        logger.info(f"Strategy admission approved for '{strategy_id}'.")
         return StrategyAdmissionReview(
             strategy_id=strategy_id,
             status=RiskDecisionStatus.APPROVE,
@@ -480,12 +551,14 @@ class RiskLifecycleGate:
         _config: RiskConfig,
     ) -> LiveReadinessReview:
         """Check readiness requirements before live modes can be enabled."""
+        logger.info(f"Checking live readiness for '{strategy_id}' -> {proposed_stage}.")
         stage = proposed_stage.lower().strip().replace("_", "-")
         if stage == "live-readonly":
             stage = "live-read-only"
 
         live_sensitive_stages = {"shadow", "live-read-only", "micro-live", "full-live"}
         if stage not in live_sensitive_stages:
+            logger.debug(f"Stage '{stage}' is not live-sensitive; skipping checks.")
             return LiveReadinessReview(
                 strategy_id=strategy_id,
                 proposed_stage=proposed_stage,
@@ -513,7 +586,6 @@ class RiskLifecycleGate:
             if not market_context.get(key, False):
                 breaches.append(error_msg)
 
-        # Check new requirements (default to True for compatibility)
         if not market_context.get("broker_metadata_available", True):
             breaches.append("broker metadata is unavailable")
         if not market_context.get("risk_config_available", True):
@@ -522,6 +594,7 @@ class RiskLifecycleGate:
             breaches.append("policy enforcement is unavailable")
 
         if breaches:
+            logger.info(f"Live readiness blocked for '{strategy_id}': {breaches}.")
             return LiveReadinessReview(
                 strategy_id=strategy_id,
                 proposed_stage=proposed_stage,
@@ -537,6 +610,7 @@ class RiskLifecycleGate:
                 breaches=breaches,
             )
 
+        logger.info(f"Live readiness approved for '{strategy_id}'.")
         return LiveReadinessReview(
             strategy_id=strategy_id,
             proposed_stage=proposed_stage,
@@ -563,6 +637,10 @@ class RiskLifecycleGate:
         approval_token: object = None,
     ) -> ModePromotionReview:
         """Evaluate transition between lifecycle stages."""
+        logger.info(
+            f"Evaluating mode promotion for '{strategy_id}': "
+            f"{current_stage} -> {target_stage}."
+        )
         stage_list = [
             "research",
             "simulation",
@@ -577,6 +655,7 @@ class RiskLifecycleGate:
         t_stage = _normalize_stage(target_stage)
 
         if c_stage not in stage_list or t_stage not in stage_list:
+            logger.error(f"Invalid stage name(s): {current_stage} / {target_stage}.")
             return ModePromotionReview(
                 strategy_id=strategy_id,
                 current_stage=current_stage,
@@ -615,6 +694,7 @@ class RiskLifecycleGate:
         t_ord = order.get(t_orig, 0)
 
         if t_ord <= c_ord:
+            logger.debug("Lifecycle transition is a maintenance/demotion; approved.")
             return ModePromotionReview(
                 strategy_id=strategy_id,
                 current_stage=current_stage,
@@ -641,6 +721,7 @@ class RiskLifecycleGate:
                 f"Lifecycle skip-gate transition blocked: "
                 f"'{current_stage}' -> '{target_stage}'"
             )
+            logger.info(msg)
             return ModePromotionReview(
                 strategy_id=strategy_id,
                 current_stage=current_stage,
@@ -656,6 +737,7 @@ class RiskLifecycleGate:
 
         m_ctx = market_context or {}
         if not _check_high_risk_approval(t_stage, m_ctx, config, approval_token):
+            logger.info(f"High-risk transition to '{target_stage}' needs approval.")
             return ModePromotionReview(
                 strategy_id=strategy_id,
                 current_stage=current_stage,
@@ -681,6 +763,7 @@ class RiskLifecycleGate:
         _check_live_mode_transitions(c_stage, t_stage, evidence, config, breaches)
 
         if breaches:
+            logger.info(f"Mode promotion rejected for '{strategy_id}': {breaches}.")
             return ModePromotionReview(
                 strategy_id=strategy_id,
                 current_stage=current_stage,
@@ -697,6 +780,7 @@ class RiskLifecycleGate:
                 breaches=breaches,
             )
 
+        logger.info(f"Mode promotion approved for '{strategy_id}'.")
         return ModePromotionReview(
             strategy_id=strategy_id,
             current_stage=current_stage,
@@ -713,23 +797,159 @@ class RiskLifecycleGate:
         )
 
 
-def review_strategy_admission(
+def _review_strategy_admission_v1(
     strategy_id: str,
     evidence: dict[str, Any],
     config: RiskConfig,
 ) -> StrategyAdmissionReview:
-    """Review strategy walk-forward and promotion checks for strategy admission."""
+    """V1 strategy admission review operating on raw positional arguments."""
     return RiskLifecycleGate.admit_strategy(strategy_id, evidence, config)
 
 
-def review_live_readiness(
+def _review_strategy_admission_v2(
+    request: StrategyAdmissionRequest, policy: EffectiveRiskPolicy
+) -> LifecycleAssessment:
+    """V2 canonical strategy admission review operating on typed evidence."""
+    logger.info(f"Reviewing canonical strategy admission for '{request.strategy_id}'.")
+    evidence: dict[str, Any] = dict(request.evidence)
+    if request.research_evidence:
+        evidence.setdefault("backtest", request.research_evidence)
+    if request.simulation_evidence:
+        evidence.update(request.simulation_evidence)
+    if request.risk_evidence:
+        evidence.update(request.risk_evidence)
+
+    v1_review = RiskLifecycleGate.admit_strategy(
+        request.strategy_id, evidence, policy.resolved_config
+    )
+    return LifecycleAssessment(
+        strategy_id=v1_review.strategy_id,
+        status=v1_review.status,
+        reason_code=v1_review.reason_code,
+        message=v1_review.message,
+        severity=v1_review.severity,
+        breached=v1_review.breached,
+        breaches=v1_review.breaches,
+    )
+
+
+@overload
+def review_strategy_admission(
+    strategy_id: str,
+    evidence: dict[str, Any],
+    config: RiskConfig,
+) -> StrategyAdmissionReview: ...
+
+
+@overload
+def review_strategy_admission(
+    request: StrategyAdmissionRequest, policy: EffectiveRiskPolicy
+) -> LifecycleAssessment: ...
+
+
+def review_strategy_admission(*args: Any, **kwargs: Any) -> Any:
+    """Review strategy admission, supporting V1 and V2 signatures.
+
+    Args:
+        *args: Positional arguments. For V1: (strategy_id: str,
+            evidence: dict, config: RiskConfig). For V2: (request:
+            StrategyAdmissionRequest, policy: EffectiveRiskPolicy).
+        **kwargs: Keyword arguments mirroring the positional forms above.
+
+    Returns:
+        StrategyAdmissionReview | LifecycleAssessment: The review outcome.
+    """
+    logger.info("review_strategy_admission entry.")
+    first = args[0] if args else kwargs.get("request", kwargs.get("strategy_id"))
+    if isinstance(first, StrategyAdmissionRequest):
+        request = first
+        policy: Any = kwargs.get("policy", args[1] if len(args) > 1 else None)
+        return _review_strategy_admission_v2(request, policy)
+
+    strategy_id: Any = kwargs.get("strategy_id", args[0] if args else None)
+    evidence: Any = kwargs.get("evidence", args[1] if len(args) > 1 else None)
+    config: Any = kwargs.get("config", args[2] if len(args) > 2 else None)
+    return _review_strategy_admission_v1(strategy_id, evidence, config)
+
+
+def _review_live_readiness_v1(
     strategy_id: str,
     proposed_stage: str,
     market_context: dict[str, Any],
     config: RiskConfig,
 ) -> LiveReadinessReview:
-    """Review live readiness parameters for strategy promotion."""
+    """V1 live readiness review operating on raw positional arguments."""
     return RiskLifecycleGate.check_readiness(
+        strategy_id, proposed_stage, market_context, config
+    )
+
+
+def _review_live_readiness_v2(
+    request: LiveReadinessRequest, policy: EffectiveRiskPolicy
+) -> LifecycleAssessment:
+    """V2 canonical live readiness review operating on a typed request."""
+    logger.info(f"Reviewing canonical live readiness for '{request.strategy_id}'.")
+    v1_review = RiskLifecycleGate.check_readiness(
+        request.strategy_id,
+        request.proposed_stage,
+        request.market_context,
+        policy.resolved_config,
+    )
+    return LifecycleAssessment(
+        strategy_id=v1_review.strategy_id,
+        status=v1_review.status,
+        reason_code=v1_review.reason_code,
+        message=v1_review.message,
+        severity=v1_review.severity,
+        breached=v1_review.breached,
+        breaches=v1_review.breaches,
+        target_stage=v1_review.proposed_stage,
+    )
+
+
+@overload
+def review_live_readiness(
+    strategy_id: str,
+    proposed_stage: str,
+    market_context: dict[str, Any],
+    config: RiskConfig,
+) -> LiveReadinessReview: ...
+
+
+@overload
+def review_live_readiness(
+    request: LiveReadinessRequest, policy: EffectiveRiskPolicy
+) -> LifecycleAssessment: ...
+
+
+def review_live_readiness(*args: Any, **kwargs: Any) -> Any:
+    """Review live readiness, supporting V1 and V2 signatures.
+
+    Args:
+        *args: Positional arguments. For V1: (strategy_id: str,
+            proposed_stage: str, market_context: dict, config: RiskConfig).
+            For V2: (request: LiveReadinessRequest, policy: EffectiveRiskPolicy).
+        **kwargs: Keyword arguments mirroring the positional forms above.
+
+    Returns:
+        LiveReadinessReview | LifecycleAssessment: The review outcome.
+    """
+    logger.info("review_live_readiness entry.")
+    first = args[0] if args else kwargs.get("request", kwargs.get("strategy_id"))
+    if isinstance(first, LiveReadinessRequest):
+        request = first
+        policy: Any = kwargs.get("policy", args[1] if len(args) > 1 else None)
+        return _review_live_readiness_v2(request, policy)
+
+    strategy_id: Any = kwargs.get("strategy_id", args[0] if args else None)
+    proposed_stage: Any = kwargs.get(
+        "proposed_stage", args[1] if len(args) > 1 else None
+    )
+    market_context: Any = kwargs.get(
+        "market_context", args[2] if len(args) > 2 else None
+    )
+    config: Any = kwargs.get("config", args[3] if len(args) > 3 else None)
+    return _review_live_readiness_v1(
         strategy_id, proposed_stage, market_context, config
     )
 
@@ -763,7 +983,7 @@ def evaluate_lifecycle_promotion(
     config: RiskConfig,
 ) -> LimitResult:
     """Validate if a strategy is eligible to promote to the target lifecycle stage."""
-    # Legacy wrapper bypasses high-risk approval token verification
+    logger.info(f"Evaluating lifecycle promotion (legacy wrapper) for '{strategy_id}'.")
     review = review_mode_promotion(
         strategy_id=strategy_id,
         current_stage=current_stage,
@@ -789,11 +1009,9 @@ def evaluate_live_readiness(
     _config: RiskConfig,
 ) -> LimitResult:
     """Enforce audit, kill switch and reconciliation readiness checks."""
-    review = review_live_readiness(
-        strategy_id=strategy_id,
-        proposed_stage=proposed_stage,
-        market_context=market_context,
-        config=_config,
+    logger.info(f"Evaluating live readiness (legacy wrapper) for '{strategy_id}'.")
+    review = _review_live_readiness_v1(
+        strategy_id, proposed_stage, market_context, _config
     )
     return LimitResult(
         limit_name="live_readiness",
@@ -803,3 +1021,85 @@ def evaluate_live_readiness(
         severity=review.severity,
         breached=review.breached,
     )
+
+
+def validate_lifecycle_transition(
+    current: StrategyLifecycleState,
+    target: StrategyLifecycleState,
+    evidence: LifecycleEvidence,
+) -> ValidationResult:
+    """Reject unauthorized lifecycle stage promotion.
+
+    Args:
+        current: Current canonical lifecycle stage.
+        target: Requested canonical lifecycle stage.
+        evidence: Typed evidence bundle backing the transition.
+
+    Returns:
+        ValidationResult: Validation outcome with message and details.
+    """
+    logger.info(f"Validating lifecycle transition: {current} -> {target}.")
+    c_orig = str(current.value)
+    t_orig = str(target.value)
+
+    if _check_skip_gate(c_orig, t_orig):
+        msg = f"Skip-gate transition blocked: '{c_orig}' -> '{t_orig}'."
+        logger.info(msg)
+        return {
+            "valid": False,
+            "message": msg,
+            "code": "LIFECYCLE_GATES_BREACH",
+            "details": {"current": c_orig, "target": t_orig},
+        }
+
+    breaches: list[str] = []
+    default_config = RiskConfig(profile_name="lifecycle_validation")
+    evidence_dict = evidence.model_dump()
+    _check_research_transition(c_orig, t_orig, evidence_dict, default_config, breaches)
+    _check_simulation_transition(
+        c_orig, t_orig, evidence_dict, default_config, breaches
+    )
+    _check_shadow_transition(
+        c_orig, t_orig, t_orig, evidence_dict, default_config, breaches
+    )
+    _check_live_mode_transitions(
+        c_orig, t_orig, evidence_dict, default_config, breaches
+    )
+
+    if breaches:
+        msg = f"Lifecycle transition rejected: {', '.join(breaches)}"
+        logger.info(msg)
+        return {
+            "valid": False,
+            "message": msg,
+            "code": "LIFECYCLE_GATES_BREACH",
+            "details": {"breaches": breaches},
+        }
+
+    logger.debug(f"Lifecycle transition validated: {c_orig} -> {t_orig}.")
+    return {
+        "valid": True,
+        "message": f"Lifecycle transition '{c_orig}' -> '{t_orig}' is valid.",
+        "code": "OK",
+        "details": {},
+    }
+
+
+def requires_lifecycle_approval(
+    assessment: LifecycleAssessment, policy: EffectiveRiskPolicy
+) -> bool:
+    """Determine whether a lifecycle assessment requires governed approval.
+
+    Args:
+        assessment: The canonical lifecycle review outcome.
+        policy: Resolved effective risk policy (retained for interface
+            symmetry with the architecture's escalation contract).
+
+    Returns:
+        bool: True if the assessment requires operator/compliance approval.
+    """
+    logger.info("Determining lifecycle approval escalation requirement.")
+    _ = policy
+    requires_approval = assessment.status == RiskDecisionStatus.NEEDS_APPROVAL
+    logger.debug(f"Lifecycle approval required: {requires_approval}.")
+    return requires_approval

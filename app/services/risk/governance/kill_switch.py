@@ -1,13 +1,22 @@
-# ruff: noqa: C901, PLR0911, PLR0912, PLR2004, PLW0603, BLE001, EM102, E501, TC001
+# ruff: noqa: ANN401, C901, PLR0911, PLR0912, PLR2004, PLW0603, BLE001, EM102, E501, TC001
 """Emergency kill switch service and state manager.
 
 Handles global, portfolio, strategy, symbol, and currency-level halts.
 Supports persistence, gated resume approvals, and auto-triggering on breaches.
+Also exposes a pure, canonically-typed V2 calculation surface
+(:class:`KillSwitchService`, :func:`request_kill_switch_trigger`,
+:func:`validate_resume_request`, :func:`clear_kill_switch_after_approval`) and
+a dual-dispatch :func:`check_risk_kill_switch` that accepts either the V1
+``(scope: str, target: str) -> bool`` calling convention or the canonical V2
+``(scope: KillSwitchScope, state: KillSwitchState) -> KillSwitchAssessment``
+convention.
 
 Exports:
     KillSwitchScope, KillSwitchManager, RiskKillSwitch, PortfolioKillSwitch,
     StrategyKillSwitch, get_kill_switch_manager, trigger_kill_switch,
-    resume_after_kill_switch, check_risk_kill_switch.
+    resume_after_kill_switch, check_risk_kill_switch, KillSwitchService,
+    KillSwitchState, KillSwitchAssessment, KillSwitchTriggerRequest,
+    KillSwitchResumeRequest, ApprovalContext.
 """
 
 from __future__ import annotations
@@ -18,29 +27,46 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from threading import RLock
-from typing import Any
+from typing import TYPE_CHECKING, Any, overload
+
+from pydantic import Field
 
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
     KillSwitchStateEnum,
     RiskAssessmentRequest,
+    RiskContract,
     RiskDecisionStatus,
+    RiskReasonCode,
     RiskSeverity,
 )
 from app.utils.errors import ValidationError
 from app.utils.event_bus import InMemoryEventBus, build_event_envelope
 from app.utils.logger import logger
 
+if TYPE_CHECKING:
+    from app.services.risk.storage.ports import RiskStateStore
+    from app.utils.validations import ValidationResult
+
 __all__ = [
+    "ApprovalContext",
+    "KillSwitchAssessment",
     "KillSwitchManager",
+    "KillSwitchResumeRequest",
     "KillSwitchScope",
+    "KillSwitchService",
+    "KillSwitchState",
+    "KillSwitchTriggerRequest",
     "PortfolioKillSwitch",
     "RiskKillSwitch",
     "StrategyKillSwitch",
     "check_risk_kill_switch",
+    "clear_kill_switch_after_approval",
     "get_kill_switch_manager",
+    "request_kill_switch_trigger",
     "resume_after_kill_switch",
     "trigger_kill_switch",
+    "validate_resume_request",
 ]
 
 
@@ -128,6 +154,7 @@ class KillSwitchManager:
             "currencies": {},  # currency -> dict
         }
         self.load()
+        logger.debug("KillSwitchManager initialized.")
 
     def load(self) -> None:
         """Load states from local JSON persistence path.
@@ -374,7 +401,7 @@ class KillSwitchManager:
         """
         clean_scope = scope.lower().strip()
 
-        def _is_active(record: Any) -> bool:  # noqa: ANN401
+        def _is_active(record: Any) -> bool:
             if not isinstance(record, dict):
                 return is_live  # Fail closed in live modes if shape is corrupted
             state = record.get("state")
@@ -666,18 +693,332 @@ def resume_after_kill_switch(
     )
 
 
-def check_risk_kill_switch(
-    scope: str,
-    target: str,
-) -> bool:
-    """Check if a kill switch is active for a target scope and target identifier.
+class KillSwitchState(RiskContract):
+    """Typed canonical snapshot of a kill-switch state record (V2)."""
 
-    Args:
-        scope: Kill switch scope (e.g. 'global', 'strategy').
-        target: Target identifier (e.g. symbol name, strategy ID).
+    state: KillSwitchStateEnum = Field(..., description="Current kill-switch state.")
+    reason: str | None = Field(default=None, description="Trigger reason, if any.")
+    triggered_at: datetime | None = Field(
+        default=None, description="UTC timestamp of the last state change."
+    )
+    triggered_by: str | None = Field(
+        default=None, description="Operator or system component that triggered."
+    )
 
-    Returns:
-        bool: True if trading is blocked, otherwise False.
-    """
+
+class KillSwitchAssessment(RiskContract):
+    """Outcome of a canonical kill-switch scope/state evaluation (V2)."""
+
+    scope: KillSwitchScope = Field(..., description="Evaluated kill-switch scope.")
+    target: str = Field(..., description="Evaluated target identifier.")
+    blocked: bool = Field(..., description="True if trading is blocked.")
+    state: KillSwitchStateEnum = Field(..., description="Evaluated kill-switch state.")
+    reason_code: RiskReasonCode = Field(..., description="Stable reason code.")
+    message: str = Field(..., description="Human-readable outcome message.")
+
+
+class KillSwitchTriggerRequest(RiskContract):
+    """Canonical request to trigger a governed kill-switch transition (V2)."""
+
+    scope: KillSwitchScope = Field(..., description="Target kill-switch scope.")
+    target: str = Field(..., description="Target identifier.")
+    reason: str = Field(..., description="Human-readable trigger reason.")
+    triggered_by: str = Field(
+        default="system", description="Operator or system component."
+    )
+
+
+class KillSwitchResumeRequest(RiskContract):
+    """Canonical request to resume a governed kill-switch after approval (V2)."""
+
+    scope: KillSwitchScope = Field(..., description="Target kill-switch scope.")
+    target: str = Field(..., description="Target identifier.")
+    approval_token: str | None = Field(
+        default=None, description="Optional governed approval token."
+    )
+    operator_role: str | None = Field(
+        default=None, description="Optional operator role (e.g. 'admin')."
+    )
+
+
+class ApprovalContext(RiskContract):
+    """Canonical operator/approval context for a resume request (V2)."""
+
+    operator_role: str | None = Field(default=None, description="Operator role.")
+    approval_token: str | None = Field(
+        default=None, description="Governed approval token."
+    )
+
+
+_BLOCKING_STATES = frozenset(
+    {
+        KillSwitchStateEnum.ACTIVE,
+        KillSwitchStateEnum.LOCKED,
+        KillSwitchStateEnum.TRIGGERED,
+        KillSwitchStateEnum.PENDING_RESUME,
+        KillSwitchStateEnum.UNKNOWN,
+    }
+)
+
+
+def _check_risk_kill_switch_v1(scope: str, target: str) -> bool:
+    """V1 kill-switch check delegating to the global manager singleton."""
     manager = get_kill_switch_manager()
     return manager.is_blocked(scope, target)
+
+
+def _check_risk_kill_switch_v2(
+    scope: KillSwitchScope, state: KillSwitchState
+) -> KillSwitchAssessment:
+    """V2 canonical kill-switch check from an already-resolved state snapshot."""
+    blocked = state.state in _BLOCKING_STATES
+    logger.info(f"Canonical kill switch check: scope={scope}, blocked={blocked}.")
+    return KillSwitchAssessment(
+        scope=scope,
+        target="*",
+        blocked=blocked,
+        state=state.state,
+        reason_code=(
+            RiskReasonCode.KILL_SWITCH_ACTIVE if blocked else RiskReasonCode.OK
+        ),
+        message=(
+            f"Kill switch state '{state.state}' blocks trading."
+            if blocked
+            else f"Kill switch state '{state.state}' permits trading."
+        ),
+    )
+
+
+@overload
+def check_risk_kill_switch(scope: str, target: str) -> bool: ...
+
+
+@overload
+def check_risk_kill_switch(
+    scope: KillSwitchScope, state: KillSwitchState
+) -> KillSwitchAssessment: ...
+
+
+def check_risk_kill_switch(*args: Any, **kwargs: Any) -> Any:
+    """Check kill-switch status, supporting V1 and V2 signatures.
+
+    Args:
+        *args: Positional arguments. For V1: (scope: str, target: str).
+            For V2: (scope: KillSwitchScope, state: KillSwitchState).
+        **kwargs: Keyword arguments mirroring the positional forms above.
+
+    Returns:
+        bool | KillSwitchAssessment: For V1, True if blocked. For V2, the
+            canonical assessment.
+    """
+    logger.info("check_risk_kill_switch entry.")
+    second = args[1] if len(args) > 1 else kwargs.get("state", kwargs.get("target"))
+    if isinstance(second, KillSwitchState):
+        scope: Any = kwargs.get("scope", args[0] if args else None)
+        return _check_risk_kill_switch_v2(scope, second)
+
+    scope = kwargs.get("scope", args[0] if args else None)
+    target: Any = kwargs.get("target", args[1] if len(args) > 1 else None)
+    return _check_risk_kill_switch_v1(scope, target)
+
+
+def request_kill_switch_trigger(
+    request: KillSwitchTriggerRequest, store: RiskStateStore
+) -> KillSwitchState:
+    """Record a governed risk kill-switch transition through a storage port.
+
+    Args:
+        request: The canonical trigger request.
+        store: Injected risk state storage port.
+
+    Returns:
+        KillSwitchState: The persisted, now-active kill-switch state.
+    """
+    logger.warning(
+        f"Requesting kill switch trigger: scope={request.scope}, "
+        f"target={request.target}, reason={request.reason}."
+    )
+    triggered_at = datetime.now(UTC)
+    store.save_kill_switch_state(
+        scope=str(request.scope),
+        target=request.target,
+        state=KillSwitchStateEnum.ACTIVE,
+        reason=None,
+        triggered_at=triggered_at,
+        triggered_by=request.triggered_by,
+    )
+    return KillSwitchState(
+        state=KillSwitchStateEnum.ACTIVE,
+        reason=request.reason,
+        triggered_at=triggered_at,
+        triggered_by=request.triggered_by,
+    )
+
+
+def validate_resume_request(
+    request: KillSwitchResumeRequest,
+    state: KillSwitchState,
+    approval: ApprovalContext | None,
+) -> ValidationResult:
+    """Require governed approval before a kill switch may be resumed.
+
+    Args:
+        request: The canonical resume request.
+        state: The current kill-switch state being resumed.
+        approval: Optional operator/approval context.
+
+    Returns:
+        ValidationResult: Validation outcome with message and details.
+    """
+    logger.info(f"Validating kill switch resume request for scope={request.scope}.")
+    operator_role = (
+        approval.operator_role if approval else None
+    ) or request.operator_role
+    approval_token = (
+        approval.approval_token if approval else None
+    ) or request.approval_token
+
+    if state.state == KillSwitchStateEnum.LOCKED:
+        if operator_role not in {"admin", "compliance"}:
+            msg = "Cannot resume locked kill switch without compliance or admin role."
+            logger.info(msg)
+            return {
+                "valid": False,
+                "message": msg,
+                "code": "PERMISSION_DENIED",
+                "details": {"scope": str(request.scope), "target": request.target},
+            }
+        return {
+            "valid": True,
+            "message": "Locked resume approved.",
+            "code": "OK",
+            "details": {},
+        }
+
+    has_privilege = operator_role in {"admin", "compliance"}
+    has_token = bool(approval_token and approval_token.strip())
+    if not has_privilege and not has_token:
+        msg = (
+            "Governed resume requires a valid approval token or "
+            "compliance/admin operator role."
+        )
+        logger.info(msg)
+        return {
+            "valid": False,
+            "message": msg,
+            "code": "APPROVAL_REQUIRED",
+            "details": {"scope": str(request.scope), "target": request.target},
+        }
+
+    logger.debug("Kill switch resume request approved.")
+    return {"valid": True, "message": "Resume approved.", "code": "OK", "details": {}}
+
+
+def clear_kill_switch_after_approval(
+    request: KillSwitchResumeRequest, store: RiskStateStore
+) -> KillSwitchState:
+    """Persist an approved kill-switch resume state through a storage port.
+
+    Args:
+        request: The canonical resume request (already validated).
+        store: Injected risk state storage port.
+
+    Returns:
+        KillSwitchState: The persisted, now-inactive kill-switch state.
+    """
+    logger.info(
+        f"Clearing kill switch after approval: scope={request.scope}, "
+        f"target={request.target}."
+    )
+    store.save_kill_switch_state(
+        scope=str(request.scope),
+        target=request.target,
+        state=KillSwitchStateEnum.INACTIVE,
+        reason=None,
+        triggered_at=None,
+        triggered_by=None,
+    )
+    return KillSwitchState(state=KillSwitchStateEnum.INACTIVE)
+
+
+class KillSwitchService:
+    """Kill-switch state and scoped evaluation façade (V2).
+
+    State-mutating only through an injected `RiskStateStore`; never mutates
+    broker state and never places, closes, or modifies orders.
+    """
+
+    def __init__(self, store: RiskStateStore) -> None:
+        """Initialize the service with an injected risk state store.
+
+        Args:
+            store: Risk state storage port used for persistence.
+        """
+        self.store = store
+        logger.debug("KillSwitchService initialized.")
+
+    def check(self, scope: KillSwitchScope, target: str) -> KillSwitchAssessment:
+        """Check the current kill-switch assessment for a scope/target.
+
+        Args:
+            scope: The kill-switch scope to check.
+            target: The target identifier within that scope.
+
+        Returns:
+            KillSwitchAssessment: The canonical scoped assessment.
+        """
+        logger.info(f"KillSwitchService checking scope={scope}, target={target}.")
+        state_enum, reason, triggered_at, triggered_by = (
+            self.store.get_kill_switch_state(str(scope), target)
+        )
+        state = KillSwitchState(
+            state=state_enum,
+            reason=str(reason) if reason else None,
+            triggered_at=triggered_at,
+            triggered_by=triggered_by,
+        )
+        assessment = _check_risk_kill_switch_v2(scope, state)
+        return assessment.model_copy(update={"target": target})
+
+    def trigger(self, request: KillSwitchTriggerRequest) -> KillSwitchState:
+        """Trigger a governed kill-switch transition.
+
+        Args:
+            request: The canonical trigger request.
+
+        Returns:
+            KillSwitchState: The persisted, now-active kill-switch state.
+        """
+        return request_kill_switch_trigger(request, self.store)
+
+    def resume(
+        self,
+        request: KillSwitchResumeRequest,
+        approval: ApprovalContext | None = None,
+    ) -> KillSwitchState:
+        """Resume a kill switch after validating governed approval.
+
+        Args:
+            request: The canonical resume request.
+            approval: Optional operator/approval context.
+
+        Returns:
+            KillSwitchState: The persisted, now-inactive kill-switch state.
+
+        Raises:
+            ValidationError: If approval requirements are not satisfied.
+        """
+        state_enum, reason, triggered_at, triggered_by = (
+            self.store.get_kill_switch_state(str(request.scope), request.target)
+        )
+        current_state = KillSwitchState(
+            state=state_enum,
+            reason=str(reason) if reason else None,
+            triggered_at=triggered_at,
+            triggered_by=triggered_by,
+        )
+        validation = validate_resume_request(request, current_state, approval)
+        if not validation["valid"]:
+            logger.error(f"Kill switch resume denied: {validation['message']}")
+            raise ValidationError(validation["message"], code=validation["code"])
+        return clear_kill_switch_after_approval(request, self.store)

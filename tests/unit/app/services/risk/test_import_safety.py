@@ -12,7 +12,6 @@ import pytest
 # List of all modules under app.services.risk
 RISK_MODULES = [
     "app.services.risk",
-    "app.services.risk.allocation",
     "app.services.risk.audit",
     "app.services.risk.config",
     "app.services.risk.correlation",
@@ -21,9 +20,11 @@ RISK_MODULES = [
     "app.services.risk.feasibility.drawdown",
     "app.services.risk.feasibility.execution_gate",
     "app.services.risk.feasibility.margin",
+    "app.services.risk.governance",
+    "app.services.risk.governance.allocation",
+    "app.services.risk.governance.kill_switch",
+    "app.services.risk.governance.lifecycle",
     "app.services.risk.governor",
-    "app.services.risk.kill_switch",
-    "app.services.risk.lifecycle",
     "app.services.risk.limits",
     "app.services.risk.models",
     "app.services.risk.policy",

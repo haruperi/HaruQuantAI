@@ -20,8 +20,10 @@ from app.services.risk.correlation import (
 from app.services.risk.exposure import (
     calculate_currency_exposure as _calculate_currency_exposure,
 )
+from app.services.risk.governance.lifecycle import (
+    review_live_readiness as _review_live_readiness,
+)
 from app.services.risk.governor import RiskGovernor
-from app.services.risk.lifecycle import review_live_readiness as _review_live_readiness
 from app.services.risk.limits import check_risk_limits as _check_risk_limits
 from app.services.risk.models import (
     PortfolioRiskSnapshot,
@@ -50,7 +52,11 @@ from app.services.risk.storage import InMemoryRiskStateStore
 from app.services.risk.stress import build_default_scenario_registry
 from app.services.risk.tail_risk import (
     calculate_expected_shortfall as _calculate_expected_shortfall,
+)
+from app.services.risk.tail_risk import (
     calculate_portfolio_var as _calculate_portfolio_var,
+)
+from app.services.risk.tail_risk import (
     calculate_var_es_snapshots,
 )
 from app.utils.errors import exception_to_error_payload
@@ -637,7 +643,7 @@ def check_risk_kill_switch(
         Cannot trigger or reset kill switches (read-only query).
     """
     _ = request_id
-    from app.services.risk.kill_switch import get_kill_switch_manager
+    from app.services.risk.governance.kill_switch import get_kill_switch_manager
 
     manager = get_kill_switch_manager()
     is_blocked = manager.is_blocked(scope, target)

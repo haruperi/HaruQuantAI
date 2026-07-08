@@ -1022,6 +1022,99 @@ def example_08_risk_budgeting_allocation() -> None:
         f"\nAllocation Limit Verification: Status={alloc_res.status}, Message={alloc_res.message}"
     )
 
+    # 3. [V2] Canonical typed allocation API (governance/allocation.py)
+    # Imported directly from governance.allocation (not the top-level
+    # app.services.risk package) because governor.py also exports a
+    # single-argument `review_allocation_proposal` wrapper under the same
+    # flat name; the governance module's dual-dispatch version is distinct.
+    from app.services.risk.governance.allocation import (
+        AllocatableRisk,
+        apply_regime_and_drawdown_adjustments,
+        calculate_correlation_adjusted_allocation,
+        calculate_equal_risk_allocation,
+        calculate_volatility_parity_allocation,
+        review_allocation_proposal,
+    )
+    from app.services.risk.models import (
+        CorrelationSnapshot,
+        DrawdownState,
+        PortfolioRiskSnapshot,
+    )
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+    from app.services.risk.regime.assessor import RegimeAssessment
+
+    items = [AllocatableRisk(strategy_id=s, volatility=vols[s]) for s in strategies]
+    equal_plan = calculate_equal_risk_allocation(items)
+    vol_plan = calculate_volatility_parity_allocation(items)
+    print(f"\n[V2] Equal-risk weights: {equal_plan.allocations}")
+    print(f"[V2] Volatility-parity weights: {vol_plan.allocations}")
+
+    correlation_snapshot = CorrelationSnapshot(
+        matrix=correlation_matrix,
+        lookback=20,
+        timeframe="H1",
+        method="pearson",
+        sample_count=20,
+        fallback_status=False,
+    )
+    corr_plan = calculate_correlation_adjusted_allocation(items, correlation_snapshot)
+    print(f"[V2] Correlation-adjusted weights: {corr_plan.allocations}")
+
+    regime = RegimeAssessment.model_construct(
+        regime="normal",
+        spread_regime="normal",
+        volatility_regime="normal",
+        liquidity_regime="normal",
+        news_regime="clear",
+        session_regime="open",
+        rollover_regime="clear",
+        status=RiskDecisionStatus.REDUCE_SIZE,
+        reason="elevated volatility",
+        reason_code=RiskReasonCode.OK,
+        timestamp=datetime.now(UTC),
+    )
+    drawdown_state = DrawdownState(
+        current_drawdown=Decimal("0.05"),
+        soft_limit=Decimal("0.05"),
+        hard_limit=Decimal("0.10"),
+        multiplier=Decimal("0.5"),
+    )
+    adjusted_plan = apply_regime_and_drawdown_adjustments(
+        corr_plan, regime, drawdown_state
+    )
+    print(f"[V2] Regime/drawdown-adjusted weights: {adjusted_plan.allocations}")
+
+    v2_policy = EffectiveRiskPolicy(
+        policy_id="v2_alloc_policy", resolved_config=config, policy_hash="alloc_hash"
+    )
+    v2_portfolio = PortfolioRiskSnapshot(
+        exposure=Decimal("0.0"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.0"),
+    )
+    # Within the policy's default max_total_open_risk (1.5%) -> approved
+    v2_proposal = ProposedAllocation(
+        allocations={"strat1": Decimal("0.01")}, as_of=datetime.now(UTC)
+    )
+    v2_assessment = review_allocation_proposal(v2_proposal, v2_portfolio, v2_policy)
+    print(
+        f"[V2] Canonical allocation review status (within policy caps): "
+        f"{v2_assessment.status}"
+    )
+
+    # Exceeds max_total_open_risk -> rejected
+    v2_proposal_large = ProposedAllocation(
+        allocations={"strat1": Decimal("0.10")}, as_of=datetime.now(UTC)
+    )
+    v2_assessment_fail = review_allocation_proposal(
+        v2_proposal_large, v2_portfolio, v2_policy
+    )
+    print(
+        f"[V2] Canonical allocation review status (exceeds policy caps): "
+        f"{v2_assessment_fail.status}"
+    )
+
 
 def example_09_strategy_lifecycle_promotion() -> None:
     """Demonstrate strategy staging sequence, walk-forward gates, and live readiness checks (lifecycle.py)."""
@@ -1075,6 +1168,65 @@ def example_09_strategy_lifecycle_promotion() -> None:
     print(
         f"Live readiness review: Status={readiness_res.status}, Message={readiness_res.message}"
     )
+
+    # 3. [V2] Canonical typed lifecycle API (governance/lifecycle.py)
+    # Imported directly from governance.lifecycle (not the top-level
+    # app.services.risk package) because governor.py also exports a
+    # single-argument `review_strategy_admission` wrapper under the same
+    # flat name; the governance module's dual-dispatch version is distinct.
+    from app.services.risk.governance.lifecycle import (
+        LifecycleEvidence,
+        LiveReadinessRequest,
+        StrategyLifecycleState,
+        requires_lifecycle_approval,
+        review_live_readiness,
+        review_strategy_admission,
+        validate_lifecycle_transition,
+    )
+    from app.services.risk.models import StrategyAdmissionRequest
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    v2_policy = EffectiveRiskPolicy(
+        policy_id="v2_lifecycle_policy", resolved_config=config, policy_hash="lc_hash"
+    )
+    admission_request = StrategyAdmissionRequest(
+        strategy_id="strat1",
+        evidence={"walk_forward": {}, "out_of_sample": {}, "risk_metrics": {}},
+        research_evidence={
+            "trade_count": 120,
+            "sharpe_ratio": "1.8",
+            "max_drawdown": "0.12",
+        },
+        simulation_evidence={"simulation": {}},
+    )
+    admission_assessment = review_strategy_admission(admission_request, v2_policy)
+    print(f"\n[V2] Canonical strategy admission: Status={admission_assessment.status}")
+
+    readiness_request = LiveReadinessRequest(
+        strategy_id="strat1",
+        proposed_stage="shadow",
+        market_context={
+            "audit_persistence_active": True,
+            "kill_switch_configured": True,
+            "portfolio_reconciliation_active": True,
+            "idempotency_evidence_present": True,
+        },
+    )
+    readiness_assessment = review_live_readiness(readiness_request, v2_policy)
+    print(f"[V2] Canonical live readiness: Status={readiness_assessment.status}")
+    print(
+        f"[V2] Requires governed approval: "
+        f"{requires_lifecycle_approval(readiness_assessment, v2_policy)}"
+    )
+
+    transition_result = validate_lifecycle_transition(
+        StrategyLifecycleState.RESEARCH,
+        StrategyLifecycleState.SIMULATION,
+        LifecycleEvidence(
+            trade_count=60, sharpe_ratio=Decimal("1.5"), profit_factor=Decimal("1.5")
+        ),
+    )
+    print(f"[V2] validate_lifecycle_transition: valid={transition_result['valid']}")
 
 
 # ==============================================================================
@@ -1706,6 +1858,39 @@ def example_17_kill_switch_halting_protocols() -> None:
 
         # Reset states for cleanup
         manager.resume(scope="symbol", target="GBPUSD", operator_role="admin")
+
+    # 4. [V2] Canonical typed KillSwitchService facade (governance/kill_switch.py)
+    from app.services.risk.governance.kill_switch import (
+        ApprovalContext,
+        KillSwitchResumeRequest,
+        KillSwitchScope,
+        KillSwitchService,
+        KillSwitchTriggerRequest,
+    )
+
+    v2_store = InMemoryRiskStateStore()
+    service = KillSwitchService(v2_store)
+
+    print("\n[V2] KillSwitchService canonical flow:")
+    before = service.check(KillSwitchScope.STRATEGY, "strat_v2_demo")
+    print(f"  [V2] Before trigger, blocked={before.blocked}")
+
+    service.trigger(
+        KillSwitchTriggerRequest(
+            scope=KillSwitchScope.STRATEGY,
+            target="strat_v2_demo",
+            reason="Canonical demo halt",
+        )
+    )
+    after = service.check(KillSwitchScope.STRATEGY, "strat_v2_demo")
+    print(f"  [V2] After trigger, blocked={after.blocked}, reason={after.reason_code}")
+
+    service.resume(
+        KillSwitchResumeRequest(scope=KillSwitchScope.STRATEGY, target="strat_v2_demo"),
+        approval=ApprovalContext(operator_role="admin"),
+    )
+    resumed = service.check(KillSwitchScope.STRATEGY, "strat_v2_demo")
+    print(f"  [V2] After governed resume, blocked={resumed.blocked}")
 
 
 def example_18_state_persistence_stores() -> None:

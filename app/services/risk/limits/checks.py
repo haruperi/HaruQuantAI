@@ -73,7 +73,7 @@ def check_kill_switch_state(
     Returns:
         LimitResult: BLOCK if any relevant kill switch is active, else APPROVE.
     """
-    from app.services.risk.kill_switch import get_kill_switch_manager
+    from app.services.risk.governance.kill_switch import get_kill_switch_manager
 
     manager = get_kill_switch_manager()
     is_live = request.market_context.get("mode") in {

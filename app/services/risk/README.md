@@ -348,27 +348,34 @@ Each file exposes two calculation surfaces:
 
 ## 16. Allocation and Lifecycle Governance
 
-Allocation and Lifecycle Governance manages the capital budget distributed to strategies and controls the stage progression of strategies from backtesting up to live execution.
+Allocation and Lifecycle Governance manages the capital budget distributed to strategies and controls the stage progression of strategies from backtesting up to live execution. Non-trade governance workflows (allocation review, lifecycle gating, and kill switches) are organized as a modular package under [governance/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/governance/).
 
-### Capital Allocation Governance (`allocation.py`)
+Each file exposes two calculation surfaces:
+* A **V1 surface** operating on the original request envelopes (`AllocationReviewRequest`, positional `strategy_id`/`evidence`/`config` arguments) — the richer path preserved for `RiskGovernor` orchestration and backward-compatible callers.
+* A **V2 pure surface** operating on canonical typed contracts (`ProposedAllocation`/`PortfolioRiskSnapshot`/`EffectiveRiskPolicy`, `StrategyAdmissionRequest`/`LiveReadinessRequest`, `AllocatableRisk`/`AllocationPlan`, `LifecycleEvidence`/`LifecycleAssessment`) matching the architecture's `Target Class/Function` contracts.
+
+### Capital Allocation Governance (`governance/allocation.py`)
 1. **Allocation Parity Methods**:
-   - **Equal-Risk Allocation**: Equally divides capital budgets among active strategies.
-   - **Volatility Parity Allocation**: Allocates budgets inversely proportional to strategy rolling volatilities.
-   - **Correlation-Adjusted Parity Allocation**: Volatility parity weights adjusted by the mean correlation of strategy returns.
+   - **Equal-Risk Allocation**: Equally divides capital budgets among active strategies (`equal_risk_allocation`; canonical `calculate_equal_risk_allocation` operates on `AllocatableRisk` items and returns a normalized `AllocationPlan`).
+   - **Volatility Parity Allocation**: Allocates budgets inversely proportional to strategy rolling volatilities (`volatility_parity_allocation`; canonical `calculate_volatility_parity_allocation`).
+   - **Correlation-Adjusted Parity Allocation**: Volatility parity weights adjusted by the mean correlation of strategy returns (`correlation_adjusted_risk_parity_allocation`; canonical `calculate_correlation_adjusted_allocation`).
 2. **Multipliers & Adjustments**:
-   - **Regime Weighting**: Scales allocations based on market regimes.
-   - **Drawdown Adjustments**: Scales allocations down individually using strategy-specific drawdown multipliers.
+   - **Regime Weighting**: Scales allocations based on market regimes (`apply_regime_weighting`).
+   - **Drawdown Adjustments**: Scales allocations down individually using strategy-specific drawdown multipliers (`apply_drawdown_adjustment`; combined canonical helper `apply_regime_and_drawdown_adjustments`).
 3. **Allocation Limits Gate**:
-   - Rejects proposed allocations if the total allocation exceeds total account equity or if a single strategy exceeds the configured maximum strategy allocation cap (`max_strategy_allocation_pct`).
-   - Requires historic performance evidence (Sharpe ratio and trade count) before allowing any strategy allocation increase.
-   - Requires a valid governed approval token if the allocation increase exceeds `max_allocation_increase_pct`.
+   - `review_allocation_proposal` is dual-dispatch: called with an `AllocationReviewRequest` it runs the full V1 `RiskAllocator` review (portfolio/strategy/symbol/currency budget, correlation cluster, VaR/ES, stress, margin, drawdown, and performance-evidence checks) and returns an `AllocationReviewResult`; called with `(proposal: ProposedAllocation, portfolio: PortfolioRiskSnapshot, policy: EffectiveRiskPolicy)` it checks proposed weights directly against the resolved policy's `risk.max_total_open_risk` and `max_strategy_allocation_pct` caps and returns an `AllocationAssessment` (a type alias of `AllocationReviewResult`).
+   - Requires historic performance evidence (Sharpe ratio and trade count) before allowing any strategy allocation increase (V1 path).
+   - Requires a valid governed approval token if the allocation increase exceeds `max_allocation_increase_pct` (V1 path).
 
-### Lifecycle Staging and Promotion (`lifecycle.py`)
-1. **Sequential Stages**: Defines standard progression sequence: `backtest` -> `walk-forward` -> `simulation` -> `paper` -> `shadow` -> `micro-live` -> `full-live`.
+### Lifecycle Staging and Promotion (`governance/lifecycle.py`)
+1. **Sequential Stages**: Defines standard progression sequence: `backtest` -> `walk-forward` -> `simulation` -> `paper` -> `shadow` -> `micro-live` -> `full-live`. The canonical `RiskLifecycleState`/`StrategyLifecycleState` enum exposes the newer `research` -> `simulation` -> `paper` -> `shadow` -> `live-read-only` -> `micro-live` -> `full-live` naming for V2 callers.
 2. **Promotion Gate Verification**:
-   - Prevents skipping stages.
-   - Validates that promotion evidence (e.g. Sharpe ratio, trade count, duration, out-of-sample performance, or tracking error) meets profile-configured minimum requirements for each transition step.
+   - `review_strategy_admission` is dual-dispatch: called with `(strategy_id, evidence, config)` it delegates to the V1 `RiskLifecycleGate.admit_strategy` and returns a `StrategyAdmissionReview`; called with `(request: StrategyAdmissionRequest, policy: EffectiveRiskPolicy)` it merges the request's evidence buckets and returns a canonical `LifecycleAssessment`.
+   - `validate_lifecycle_transition(current, target, evidence: LifecycleEvidence)` runs the same skip-gate, high-risk-approval, and per-stage evidence checks as the V1 gate against a typed `LifecycleEvidence` bundle, returning a `ValidationResult`.
+   - `requires_lifecycle_approval(assessment, policy)` reports whether a `LifecycleAssessment` requires a governed approval token (`status == NEEDS_APPROVAL`).
+   - Prevents skipping stages; validates that promotion evidence (e.g. Sharpe ratio, trade count, duration, out-of-sample performance, or tracking error) meets profile-configured minimum requirements for each transition step.
 3. **Live Readiness Gate**:
+   - `review_live_readiness` is dual-dispatch: called with `(strategy_id, proposed_stage, market_context, config)` it delegates to the V1 `RiskLifecycleGate.check_readiness` and returns a `LiveReadinessReview`; called with `(request: LiveReadinessRequest, policy: EffectiveRiskPolicy)` it returns a canonical `LifecycleAssessment`.
    - Validates that live-sensitive stages (`shadow`, `micro-live`, `full-live`) meet system integration requirements:
      - Audit persistence must be active (`audit_persistence_active`).
      - Kill switch must be configured (`kill_switch_configured`).
@@ -377,7 +384,13 @@ Allocation and Lifecycle Governance manages the capital budget distributed to st
 
 ## 17. Safety Kill Switches
 
-The Safety Kill Switches engine under [kill_switch.py](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/governance/kill_switch.py) implements fail-closed trading halts, persistent tracking, and governed resume deactivation limits.
+The Safety Kill Switches engine under [governance/kill_switch.py](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/governance/kill_switch.py) implements fail-closed trading halts, persistent tracking, and governed resume deactivation limits. It exposes both the original V1 manager API and a canonical V2 surface (`KillSwitchState`, `KillSwitchAssessment`, `KillSwitchService`) built on the same `KillSwitchManager` singleton and `RiskStateStore` persistence port.
+
+### V1/V2 Dual API Surface
+* `check_risk_kill_switch` is dual-dispatch: called with `(scope: str, target: str)` it returns a plain `bool` (True if blocked), delegating to the global `KillSwitchManager` singleton; called with `(scope: KillSwitchScope, state: KillSwitchState)` it evaluates an already-resolved state snapshot against the canonical `_BLOCKING_STATES` set (`ACTIVE`, `LOCKED`, `TRIGGERED`, `PENDING_RESUME`, `UNKNOWN`) and returns a `KillSwitchAssessment`. `UNKNOWN` always fails closed.
+* `request_kill_switch_trigger(request: KillSwitchTriggerRequest) -> KillSwitchState` and `clear_kill_switch_after_approval(request: KillSwitchResumeRequest, approval: ApprovalContext | None) -> KillSwitchState` provide canonical typed entry points over `trigger_kill_switch`/`resume_after_kill_switch`.
+* `validate_resume_request(request, approval) -> bool` checks whether a resume request carries the operator role required to clear the current blocking state (`compliance`/`admin` for `locked`, any operator role otherwise).
+* `KillSwitchService(store: RiskStateStore)` is a thin object-oriented facade (`check`, `trigger`, `resume`) over the module-level functions, for callers that inject a `RiskStateStore` port directly instead of relying on the global singleton/local-JSON persistence path.
 
 ### Hierarchical Scopes
 Trading blocks are evaluated in a hierarchical sequence where higher-level switches block lower-level targets:

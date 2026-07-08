@@ -1334,21 +1334,21 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-349**: Create allocation review engine with allocation review workflows.
-- **RISK-FR-350**: Create lifecycle engine with lifecycle gates.
-- **RISK-FR-351**: Implement equal-risk budget allocation review.
-- **RISK-FR-352**: Implement volatility parity budget allocation review.
-- **RISK-FR-353**: Implement correlation-adjusted risk parity review.
-- **RISK-FR-354**: Implement regime-weighted budget review.
-- **RISK-FR-355**: Implement drawdown-adjusted budget review.
-- **RISK-FR-356**: Default live allocation to conservative correlation-adjusted volatility risk parity.
-- **RISK-FR-357**: Require evidence before increasing strategy allocation.
-- **RISK-FR-358**: Require governed approval for allocation increases above threshold.
-- **RISK-FR-359**: Reject allocations breaching symbol limits.
-- **RISK-FR-360**: Reject allocations breaching currency limits.
-- **RISK-FR-361**: Reject allocations breaching cluster limits.
-- **RISK-FR-362**: Reject allocations breaching VaR/ES limits.
-- **RISK-FR-363**: Reject allocations breaching stress loss limits.
+- [X] **RISK-FR-349**: Create allocation review engine with allocation review workflows. *Evidence: app/services/risk/governance/allocation.py line 349-486*
+- [X] **RISK-FR-350**: Create lifecycle engine with lifecycle gates. *Evidence: app/services/risk/governance/lifecycle.py line 439-799*
+- [X] **RISK-FR-351**: Implement equal-risk budget allocation review. *Evidence: app/services/risk/governance/allocation.py line 129-151, 1127-1146*
+- [X] **RISK-FR-352**: Implement volatility parity budget allocation review. *Evidence: app/services/risk/governance/allocation.py line 154-196, 1147-1174*
+- [X] **RISK-FR-353**: Implement correlation-adjusted risk parity review. *Evidence: app/services/risk/governance/allocation.py line 199-271, 1175-1224*
+- [X] **RISK-FR-354**: Implement regime-weighted budget review. *Evidence: app/services/risk/governance/allocation.py line 273-288, 335-348*
+- [X] **RISK-FR-355**: Implement drawdown-adjusted budget review. *Evidence: app/services/risk/governance/allocation.py line 289-308*
+- [X] **RISK-FR-356**: Default live allocation to conservative correlation-adjusted volatility risk parity. *Evidence: app/services/risk/governance/allocation.py line 357-427*
+- [X] **RISK-FR-357**: Require evidence before increasing strategy allocation. *Evidence: app/services/risk/governance/allocation.py line 900-984*
+- [X] **RISK-FR-358**: Require governed approval for allocation increases above threshold. *Evidence: app/services/risk/governance/allocation.py line 986-1010*
+- [X] **RISK-FR-359**: Reject allocations breaching symbol limits. *Evidence: app/services/risk/governance/allocation.py line 552-589*
+- [X] **RISK-FR-360**: Reject allocations breaching currency limits. *Evidence: app/services/risk/governance/allocation.py line 590-626*
+- [X] **RISK-FR-361**: Reject allocations breaching cluster limits. *Evidence: app/services/risk/governance/allocation.py line 627-683*
+- [X] **RISK-FR-362**: Reject allocations breaching VaR/ES limits. *Evidence: app/services/risk/governance/allocation.py line 684-782*
+- [X] **RISK-FR-363**: Reject allocations breaching stress loss limits. *Evidence: app/services/risk/governance/allocation.py line 783-821*
 
 **Target Class/Function:**
 
@@ -1369,21 +1369,21 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-364**: Reject allocations breaching margin limits.
-- **RISK-FR-365**: Implement strategy admission review.
-- **RISK-FR-366**: Require backtest evidence for strategy admission where applicable.
-- **RISK-FR-367**: Require walk-forward or out-of-sample evidence for promotion where applicable.
-- **RISK-FR-368**: Require simulation evidence before paper budget.
-- **RISK-FR-369**: Require paper evidence before shadow mode.
-- **RISK-FR-370**: Require shadow evidence before micro-live.
-- **RISK-FR-371**: Require micro-live evidence before full-live.
-- **RISK-FR-372**: Implement live readiness review.
-- **RISK-FR-373**: Reject live readiness without audit persistence.
-- **RISK-FR-374**: Reject live readiness without kill switch.
-- **RISK-FR-375**: Reject live readiness without reconciliation and idempotency evidence.
-- **RISK-FR-376**: Add allocation review tests.
-- **RISK-FR-377**: Add lifecycle gate tests.
-- **RISK-FR-378**: Document allocation and lifecycle governance.
+- [X] **RISK-FR-364**: Reject allocations breaching margin limits. *Evidence: app/services/risk/governance/allocation.py line 822-859*
+- [X] **RISK-FR-365**: Implement strategy admission review. *Evidence: app/services/risk/governance/lifecycle.py line 443-544, 850-873*
+- [X] **RISK-FR-366**: Require backtest evidence for strategy admission where applicable. *Evidence: app/services/risk/governance/lifecycle.py line 450-477, 505-514*
+- [X] **RISK-FR-367**: Require walk-forward or out-of-sample evidence for promotion where applicable. *Evidence: app/services/risk/governance/lifecycle.py line 308-334*
+- [X] **RISK-FR-368**: Require simulation evidence before paper budget. *Evidence: app/services/risk/governance/lifecycle.py line 335-368*
+- [X] **RISK-FR-369**: Require paper evidence before shadow mode. *Evidence: app/services/risk/governance/lifecycle.py line 369-404*
+- [X] **RISK-FR-370**: Require shadow evidence before micro-live. *Evidence: app/services/risk/governance/lifecycle.py line 405-438*
+- [X] **RISK-FR-371**: Require micro-live evidence before full-live. *Evidence: app/services/risk/governance/lifecycle.py line 405-438*
+- [X] **RISK-FR-372**: Implement live readiness review. *Evidence: app/services/risk/governance/lifecycle.py line 547-627, 911-950*
+- [X] **RISK-FR-373**: Reject live readiness without audit persistence. *Evidence: app/services/risk/governance/lifecycle.py line 577-611*
+- [X] **RISK-FR-374**: Reject live readiness without kill switch. *Evidence: app/services/risk/governance/lifecycle.py line 579, 596-611*
+- [X] **RISK-FR-375**: Reject live readiness without reconciliation and idempotency evidence. *Evidence: app/services/risk/governance/lifecycle.py line 580-581, 596-611*
+- [X] **RISK-FR-376**: Add allocation review tests. *Evidence: tests/unit/app/services/risk/test_allocation.py*
+- [X] **RISK-FR-377**: Add lifecycle gate tests. *Evidence: tests/unit/app/services/risk/test_lifecycle.py*
+- [X] **RISK-FR-378**: Document allocation and lifecycle governance. *Evidence: app/services/risk/README.md line 349-383*
 
 **Target Class/Function:**
 
@@ -1402,36 +1402,36 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-379**: Create kill switch engine with fail-closed kill switches.
-- **RISK-FR-380**: Define global kill switch.
-- **RISK-FR-381**: Define portfolio kill switch.
-- **RISK-FR-382**: Define strategy kill switch.
-- **RISK-FR-383**: Define symbol kill switch.
-- **RISK-FR-384**: Define currency-bucket kill switch.
-- **RISK-FR-385**: Define kill-switch states.
-- **RISK-FR-386**: Define kill-switch reason codes.
-- **RISK-FR-387**: Implement trigger behavior.
-- **RISK-FR-388**: Implement resume request behavior.
-- **RISK-FR-389**: Require governed approval for resume where configured.
-- **RISK-FR-390**: Fail closed on unknown kill-switch state in live-sensitive modes.
-- **RISK-FR-391**: Block approvals while kill switch is active.
-- **RISK-FR-392**: Block approvals while kill switch state is locked.
-- **RISK-FR-393**: Support emergency halt-all decision.
-- **RISK-FR-394**: Trigger on hard daily loss breach.
-- **RISK-FR-395**: Trigger on total drawdown breach.
-- **RISK-FR-396**: Trigger on audit-chain failure.
-- **RISK-FR-397**: Trigger on extreme spread event.
-- **RISK-FR-398**: Trigger on unreconciled portfolio state.
-- **RISK-FR-399**: Trigger on broker disconnect where live mode requires broker health.
-- **RISK-FR-400**: Trigger on margin emergency.
-- **RISK-FR-401**: Trigger on manual operator halt.
-- **RISK-FR-402**: Persist kill-switch state through storage port.
-- **RISK-FR-403**: Emit kill-switch audit event.
-- **RISK-FR-404**: Emit kill-switch metric.
-- **RISK-FR-405**: Add active/inactive tests.
-- **RISK-FR-406**: Add unknown-state fail-closed tests.
-- **RISK-FR-407**: Add attempted override tests.
-- **RISK-FR-408**: Add resume approval tests.
+- [X] **RISK-FR-379**: Create kill switch engine with fail-closed kill switches. *Evidence: app/services/risk/governance/kill_switch.py line 122-158, 194-202*
+- [X] **RISK-FR-380**: Define global kill switch. *Evidence: app/services/risk/governance/kill_switch.py line 73-81*
+- [X] **RISK-FR-381**: Define portfolio kill switch. *Evidence: app/services/risk/governance/kill_switch.py line 105-112*
+- [X] **RISK-FR-382**: Define strategy kill switch. *Evidence: app/services/risk/governance/kill_switch.py line 114-120*
+- [X] **RISK-FR-383**: Define symbol kill switch. *Evidence: app/services/risk/governance/kill_switch.py line 440-454*
+- [X] **RISK-FR-384**: Define currency-bucket kill switch. *Evidence: app/services/risk/governance/kill_switch.py line 446-456*
+- [X] **RISK-FR-385**: Define kill-switch states. *Evidence: app/services/risk/models/enums.py line 137-150*
+- [X] **RISK-FR-386**: Define kill-switch reason codes. *Evidence: app/services/risk/models/enums.py line 153-163*
+- [X] **RISK-FR-387**: Implement trigger behavior. *Evidence: app/services/risk/governance/kill_switch.py line 217-285*
+- [X] **RISK-FR-388**: Implement resume request behavior. *Evidence: app/services/risk/governance/kill_switch.py line 287-386*
+- [X] **RISK-FR-389**: Require governed approval for resume where configured. *Evidence: app/services/risk/governance/kill_switch.py line 330-347, 858-914*
+- [X] **RISK-FR-390**: Fail closed on unknown kill-switch state in live-sensitive modes. *Evidence: app/services/risk/governance/kill_switch.py line 404-421*
+- [X] **RISK-FR-391**: Block approvals while kill switch is active. *Evidence: app/services/risk/governance/kill_switch.py line 412-413*
+- [X] **RISK-FR-392**: Block approvals while kill switch state is locked. *Evidence: app/services/risk/governance/kill_switch.py line 414-415*
+- [X] **RISK-FR-393**: Support emergency halt-all decision. *Evidence: app/services/risk/governance/kill_switch.py line 481-490*
+- [X] **RISK-FR-394**: Trigger on hard daily loss breach. *Evidence: app/services/risk/governance/kill_switch.py line 537-549*
+- [X] **RISK-FR-395**: Trigger on total drawdown breach. *Evidence: app/services/risk/governance/kill_switch.py line 551-569*
+- [X] **RISK-FR-396**: Trigger on audit-chain failure. *Evidence: app/services/risk/governance/kill_switch.py line 492-506*
+- [X] **RISK-FR-397**: Trigger on extreme spread event. *Evidence: app/services/risk/governance/kill_switch.py line 571-588*
+- [X] **RISK-FR-398**: Trigger on unreconciled portfolio state. *Evidence: app/services/risk/governance/kill_switch.py line 508-519*
+- [X] **RISK-FR-399**: Trigger on broker disconnect where live mode requires broker health. *Evidence: app/services/risk/governance/kill_switch.py line 521-530*
+- [X] **RISK-FR-400**: Trigger on margin emergency. *Evidence: app/services/risk/governance/kill_switch.py line 590-602*
+- [X] **RISK-FR-401**: Trigger on manual operator halt. *Evidence: app/services/risk/governance/kill_switch.py line 481-490*
+- [X] **RISK-FR-402**: Persist kill-switch state through storage port. *Evidence: app/services/risk/governance/kill_switch.py line 825-855, 917-943*
+- [X] **RISK-FR-403**: Emit kill-switch audit event. *Evidence: app/services/risk/governance/kill_switch.py line 265-285*
+- [X] **RISK-FR-404**: Emit kill-switch metric. *Evidence: app/services/risk/governance/kill_switch.py line 265-285*
+- [X] **RISK-FR-405**: Add active/inactive tests. *Evidence: tests/unit/app/services/risk/test_kill_switch.py*
+- [X] **RISK-FR-406**: Add unknown-state fail-closed tests. *Evidence: tests/unit/app/services/risk/test_kill_switch.py*
+- [X] **RISK-FR-407**: Add attempted override tests. *Evidence: tests/unit/app/services/risk/test_kill_switch.py*
+- [X] **RISK-FR-408**: Add resume approval tests. *Evidence: tests/unit/app/services/risk/test_kill_switch.py*
 
 **Target Class/Function:**
 

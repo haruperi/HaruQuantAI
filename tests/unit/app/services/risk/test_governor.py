@@ -4,8 +4,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
+from app.services.risk.governance.kill_switch import get_kill_switch_manager
 from app.services.risk.governor import RiskGovernor
-from app.services.risk.kill_switch import get_kill_switch_manager
 from app.services.risk.models import (
     KillSwitchStateEnum,
     PortfolioState,
@@ -710,7 +710,7 @@ def test_governor_constructor_with_custom_kill_switch() -> None:
     """Test constructor with explicitly injected kill switch manager."""
     from pathlib import Path
 
-    from app.services.risk.kill_switch import KillSwitchManager
+    from app.services.risk.governance.kill_switch import KillSwitchManager
     from app.services.risk.storage import InMemoryRiskStateStore
 
     store = InMemoryRiskStateStore()

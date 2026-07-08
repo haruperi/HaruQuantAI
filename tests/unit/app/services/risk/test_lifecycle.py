@@ -10,15 +10,26 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
-from app.services.risk import RiskConfig, RiskDecisionStatus, RiskReasonCode
-from app.services.risk.lifecycle import (
+from app.services.risk import (
+    RiskConfig,
+    RiskDecisionStatus,
+    RiskReasonCode,
+    RiskSeverity,
+)
+from app.services.risk.governance.lifecycle import (
+    LifecycleEvidence,
+    LiveReadinessRequest,
     RiskLifecycleState,
+    StrategyLifecycleState,
     evaluate_lifecycle_promotion,
     evaluate_live_readiness,
+    requires_lifecycle_approval,
     review_live_readiness,
     review_mode_promotion,
     review_strategy_admission,
+    validate_lifecycle_transition,
 )
+from app.services.risk.models import StrategyAdmissionRequest
 
 
 @pytest.fixture
@@ -398,3 +409,101 @@ def test_mode_promotion_new_transitions(base_config: RiskConfig) -> None:
         market_context={"approval_token_valid": True},
     )
     assert res.status == RiskDecisionStatus.APPROVE
+
+
+def test_review_strategy_admission_v2_canonical(base_config: RiskConfig) -> None:
+    """Verify canonical strategy admission review dispatch."""
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    policy = EffectiveRiskPolicy(
+        policy_id="test-lifecycle-policy",
+        resolved_config=base_config,
+        policy_hash="test-hash",
+    )
+    request = StrategyAdmissionRequest(
+        strategy_id="strat1",
+        evidence={
+            "walk_forward": {},
+            "out_of_sample": {},
+            "risk_metrics": {},
+        },
+        research_evidence={
+            "trade_count": 120,
+            "sharpe_ratio": "1.8",
+            "max_drawdown": "0.12",
+        },
+        simulation_evidence={"simulation": {}},
+    )
+    assessment = review_strategy_admission(request, policy)
+    assert assessment.strategy_id == "strat1"
+    assert assessment.status == RiskDecisionStatus.APPROVE
+    assert not assessment.breached
+
+
+def test_review_live_readiness_v2_canonical(base_config: RiskConfig) -> None:
+    """Verify canonical live readiness review dispatch."""
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    policy = EffectiveRiskPolicy(
+        policy_id="test-readiness-policy",
+        resolved_config=base_config,
+        policy_hash="test-hash",
+    )
+    request = LiveReadinessRequest(
+        strategy_id="strat1",
+        proposed_stage="shadow",
+        market_context={
+            "audit_persistence_active": True,
+            "kill_switch_configured": True,
+            "portfolio_reconciliation_active": True,
+            "idempotency_evidence_present": True,
+        },
+    )
+    assessment = review_live_readiness(request, policy)
+    assert assessment.status == RiskDecisionStatus.APPROVE
+    assert assessment.target_stage == "shadow"
+
+
+def test_validate_lifecycle_transition_canonical() -> None:
+    """Verify canonical lifecycle transition validation."""
+    good_evidence = LifecycleEvidence(
+        trade_count=60, sharpe_ratio=Decimal("1.5"), profit_factor=Decimal("1.5")
+    )
+    result = validate_lifecycle_transition(
+        StrategyLifecycleState.RESEARCH,
+        StrategyLifecycleState.SIMULATION,
+        good_evidence,
+    )
+    assert result["valid"]
+
+    skip_result = validate_lifecycle_transition(
+        StrategyLifecycleState.RESEARCH, StrategyLifecycleState.SHADOW, good_evidence
+    )
+    assert not skip_result["valid"]
+    assert skip_result["code"] == "LIFECYCLE_GATES_BREACH"
+
+
+def test_requires_lifecycle_approval_canonical(base_config: RiskConfig) -> None:
+    """Verify requires_lifecycle_approval reflects the assessment status."""
+    from app.services.risk.governance.lifecycle import LifecycleAssessment
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    policy = EffectiveRiskPolicy(
+        policy_id="test-approval-policy",
+        resolved_config=base_config,
+        policy_hash="test-hash",
+    )
+    needs_approval = LifecycleAssessment(
+        strategy_id="strat1",
+        status=RiskDecisionStatus.NEEDS_APPROVAL,
+        reason_code=RiskReasonCode.APPROVAL_REQUIRED,
+        message="needs approval",
+        severity=RiskSeverity.WARNING,
+        breached=True,
+    )
+    assert requires_lifecycle_approval(needs_approval, policy) is True
+
+    approved = needs_approval.model_copy(
+        update={"status": RiskDecisionStatus.APPROVE, "breached": False}
+    )
+    assert requires_lifecycle_approval(approved, policy) is False
