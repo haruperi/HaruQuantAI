@@ -48,13 +48,16 @@ from app.services.risk import (
     RiskReadinessManifest,
     RiskReasonCode,
     SizingMethod,
+    SymbolRiskMetadata,
     VaRMethod,
+    VolatilitySizingEngine,
     assess_risk_regime,
     build_default_scenario_registry,
     build_readiness_dry_run,
     calculate_correlation_snapshot,
     calculate_currency_exposure,
     calculate_daily_drawdown,
+    calculate_fixed_risk_size,
     calculate_position_size,
     calculate_returns,
     calculate_total_drawdown,
@@ -919,6 +922,39 @@ def example_10_position_sizing_engines() -> None:
     res_vol = calculate_position_size(req_vol, portfolio, eurusd_context, base_config)
     print(
         f"Volatility-Adjusted: Calculated Volume={res_vol.calculated_volume} lots, Stop Distance (pips)={res_vol.stop_distance_pips}"
+    )
+
+    # 3. VolatilitySizingEngine Class coordinator
+    engine = VolatilitySizingEngine(base_config)
+    res_engine = engine.calculate_position_size(req_fixed, portfolio, eurusd_context)
+    print(
+        f"VolatilitySizingEngine: Calculated Volume={res_engine.calculated_volume} lots, Risk={res_engine.risk_contribution} USD"
+    )
+
+    # 4. Pure Stateless Calculator direct call
+    symbol_metadata = SymbolRiskMetadata(
+        symbol="EURUSD",
+        volume_min=Decimal(str(eurusd_context["volume_min"])),
+        volume_max=Decimal(str(eurusd_context["volume_max"])),
+        volume_step=Decimal(str(eurusd_context["volume_step"])),
+        contract_size=Decimal(str(eurusd_context["contract_size"])),
+        digits=int(eurusd_context["digits"]),
+        tick_size=Decimal(str(eurusd_context["tick_size"])),
+        tick_value=Decimal(str(eurusd_context["tick_value"])),
+        conversion_rate=Decimal(str(eurusd_context["conversion_rate"])),
+    )
+    res_pure = calculate_fixed_risk_size(
+        request=req_fixed,
+        portfolio_equity=portfolio.equity,
+        symbol_metadata=symbol_metadata,
+        config=base_config,
+        drawdown_step_down_multiplier=Decimal("1.0"),
+        currency_exposure_reduction=Decimal("1.0"),
+        correlation_cluster_reduction=Decimal("1.0"),
+        market_context=eurusd_context,
+    )
+    print(
+        f"Pure calculate_fixed_risk_size: Calculated Volume={res_pure.calculated_volume} lots, Risk={res_pure.risk_contribution} USD"
     )
 
 
