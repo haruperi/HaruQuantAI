@@ -562,10 +562,10 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-090**: Create policy module with deterministic policy resolution.
-- **RISK-FR-091**: Define policy scope by environment, mode, account, strategy, symbol, currency, workflow, and operator role.
-- **RISK-FR-092**: Define policy precedence rules for global, account, strategy, symbol, and workflow scopes.
-- **RISK-FR-095**: Implement policy enforcement result model.
+- [x] **RISK-FR-090**: Create policy module with deterministic policy resolution. *app/services/risk/policy/contracts.py:1*
+- [x] **RISK-FR-091**: Define policy scope by environment, mode, account, strategy, symbol, currency, workflow, and operator role. *app/services/risk/models/contracts.py:30*
+- [x] **RISK-FR-092**: Define policy precedence rules for global, account, strategy, symbol, and workflow scopes. *app/services/risk/policy/contracts.py:105*
+- [x] **RISK-FR-095**: Implement policy enforcement result model. *app/services/risk/models/contracts.py:902*
 
 **Target Class/Function:**
 
@@ -586,13 +586,13 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-090**: Create policy module with deterministic policy resolution.
-- **RISK-FR-091**: Define policy scope by environment, mode, account, strategy, symbol, currency, workflow, and operator role.
-- **RISK-FR-092**: Define policy precedence rules for global, account, strategy, symbol, and workflow scopes.
-- **RISK-FR-093**: Implement policy resolution with missing-policy fail-closed behavior.
-- **RISK-FR-094**: Implement policy hash propagation into decisions.
-- **RISK-FR-095**: Implement policy enforcement result model.
-- **RISK-FR-096**: Implement risk budget policy gates.
+- [x] **RISK-FR-090**: Create policy module with deterministic policy resolution. *app/services/risk/policy/resolver.py:330*
+- [x] **RISK-FR-091**: Define policy scope by environment, mode, account, strategy, symbol, currency, workflow, and operator role. *app/services/risk/policy/resolver.py:38*
+- [x] **RISK-FR-092**: Define policy precedence rules for global, account, strategy, symbol, and workflow scopes. *app/services/risk/policy/resolver.py:308*
+- [x] **RISK-FR-093**: Implement policy resolution with missing-policy fail-closed behavior. *app/services/risk/policy/resolver.py:380*
+- [x] **RISK-FR-094**: Implement policy hash propagation into decisions. *app/services/risk/policy/resolver.py:434*
+- [x] **RISK-FR-095**: Implement policy enforcement result model. *app/services/risk/models/contracts.py:902*
+- [x] **RISK-FR-096**: Implement risk budget policy gates. *app/services/risk/policy/resolver.py:460*
 
 **Target Class/Function:**
 
@@ -611,18 +611,18 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-097**: Implement risk threshold override request validation.
-- **RISK-FR-098**: Implement governed approval requirement for high-risk overrides.
-- **RISK-FR-099**: Implement config compatibility checks for approval tokens.
-- **RISK-FR-100**: Implement policy expiry handling where policies are time-bounded.
-- **RISK-FR-101**: Implement safe default policy for offline tests.
-- **RISK-FR-102**: Implement stricter default policy for live-sensitive modes.
-- **RISK-FR-103**: Add policy resolution tests for every scope.
-- **RISK-FR-104**: Add policy precedence tests.
-- **RISK-FR-105**: Add missing policy fail-closed tests.
-- **RISK-FR-106**: Add unsafe config rejection tests.
-- **RISK-FR-107**: Add override authorization tests.
-- **RISK-FR-108**: Document config and policy behavior in the Risk README.
+- [x] **RISK-FR-097**: Implement risk threshold override request validation. *app/services/risk/policy/overrides.py:138*
+- [x] **RISK-FR-098**: Implement governed approval requirement for high-risk overrides. *app/services/risk/policy/overrides.py:95*
+- [x] **RISK-FR-099**: Implement config compatibility checks for approval tokens. *app/services/risk/policy/overrides.py:33*
+- [x] **RISK-FR-100**: Implement policy expiry handling where policies are time-bounded. *app/services/risk/policy/resolver.py:359*
+- [x] **RISK-FR-101**: Implement safe default policy for offline tests. *app/services/risk/config/profiles.py:23*
+- [x] **RISK-FR-102**: Implement stricter default policy for live-sensitive modes. *app/services/risk/policy/overrides.py:101*
+- [x] **RISK-FR-103**: Add policy resolution tests for every scope. *tests/unit/app/services/risk/test_policy.py:348*
+- [x] **RISK-FR-104**: Add policy precedence tests. *tests/unit/app/services/risk/test_policy.py:417*
+- [x] **RISK-FR-105**: Add missing policy fail-closed tests. *tests/unit/app/services/risk/test_policy.py:403*
+- [x] **RISK-FR-106**: Add unsafe config rejection tests. *tests/unit/app/services/risk/test_policy.py:411*
+- [x] **RISK-FR-107**: Add override authorization tests. *tests/unit/app/services/risk/test_policy.py:591*
+- [x] **RISK-FR-108**: Document config and policy behavior in the Risk README. *app/services/risk/README.md:81*
 
 **Target Class/Function:**
 

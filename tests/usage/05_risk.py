@@ -88,10 +88,16 @@ from app.services.risk.models.serialization import (
     to_canonical_risk_payload,
     validate_risk_model_round_trip,
 )
-from app.services.risk.policy import resolve_policy, validate_override_token
+from app.services.risk.policy import (
+    RiskOverrideRequest,
+    RiskPolicy,
+    evaluate_risk_budget,
+    requires_override_approval,
+    resolve_effective_policy,
+    validate_risk_override_request,
+)
 from app.services.risk.reports import RISK_METRICS_REGISTRY
 from app.services.risk.stress import PriceShockScenario
-from pydantic import ValidationError
 
 
 def print_header(example_num: int, title: str) -> None:
@@ -227,12 +233,16 @@ def example_02_system_config_profiles() -> None:
 
     # 3. Validate config
     validation_res = validate_risk_config(default_config)
-    print(f"Validate config check: valid={validation_res['valid']}, message={validation_res['message']}")
+    print(
+        f"Validate config check: valid={validation_res['valid']}, message={validation_res['message']}"
+    )
 
     # 4. Hash comparison & Validation
     paper_config = load_risk_config("paper")
     comparison = compare_risk_config_hashes(default_config, paper_config)
-    print(f"Compare default vs paper: materially_changed={comparison.materially_changed}, changed_fields={comparison.changed_fields}")
+    print(
+        f"Compare default vs paper: materially_changed={comparison.materially_changed}, changed_fields={comparison.changed_fields}"
+    )
 
     hash_res = validate_risk_config_hash(config_hash, default_config)
     print(f"Validate config hash: valid={hash_res['valid']}, code={hash_res['code']}")
@@ -240,87 +250,93 @@ def example_02_system_config_profiles() -> None:
 
 def example_03_policy_resolution_engine() -> None:
     """Demonstrate policy overrides precedence, override token verification, and safeguards (policy.py)."""
-    print_header(3, "Policy Resolution Engine")
+    print_header(3, "Policy Resolution Engine (V2)")
 
-    default_config = load_risk_config("default")
-    live_config = load_risk_config("live_conservative")
+    # 1. Resolve Effective Policy from Policy Bundle
+    now = datetime.now(UTC)
+    base_policy = RiskPolicy(
+        policy_id="pol-global",
+        profile_name="default",
+        rules=[
+            PolicyRule(
+                rule_id="rule-symbol-eurusd",
+                scope=PolicyScope(symbol="EURUSD"),
+                requires_approval=True,
+                overrides={"max_daily_loss_pct": Decimal("0.06")},
+            )
+        ],
+        provenance={
+            "policy_version": "2.0.0",
+            "policy_scope": {"environment": "local"},
+        },
+    )
 
-    # 1. Precedence Resolution
-    rules = [
-        PolicyRule(
-            rule_id="rule-global-account",
-            scope=PolicyScope(account_id="acc-001"),
-            overrides={"max_daily_loss_pct": 0.04},
-        ),
-        PolicyRule(
-            rule_id="rule-symbol-specific",
-            scope=PolicyScope(symbol="EURUSD"),
-            overrides={"max_daily_loss_pct": 0.08, "max_effective_leverage": 25.0},
-        ),
-    ]
     context = {
-        "account_id": "acc-001",
         "symbol": "EURUSD",
         "environment": "local",
     }
-    enforcement = resolve_policy(default_config, rules, context)
-    print(f"Resolved Status: {enforcement.status}")
-    print(
-        f"Resolved Daily Loss Limit: {enforcement.resolved_config.max_daily_loss_pct} (expected 0.08 due to higher specificity)"
-    )
-    print(
-        f"Resolved Leverage: {enforcement.resolved_config.max_effective_leverage} (expected 25.0)"
-    )
 
-    # 2. Validation ceilings
-    print("\nCeiling Validation Check:")
-    try:
-        # Resolve rules with daily loss pct > 0.20 ceiling limit
-        bad_rules = [
-            PolicyRule(
-                rule_id="unsafe_rule",
-                scope=PolicyScope(symbol="EURUSD"),
-                overrides={"max_daily_loss_pct": 0.25},
-            )
-        ]
-        resolve_policy(default_config, bad_rules, context)
-    except ValidationError as e:
-        print(f"  Successfully caught ceiling breach on resolve: {e}")
+    effective_policy = resolve_effective_policy(context, [base_policy])
+    print(f"Effective Policy resolved: {effective_policy.policy_id}")
+    print(
+        f"Resolved daily loss pct: {effective_policy.resolved_config.max_daily_loss_pct}"
+    )
+    print(f"Applied rules count: {len(effective_policy.applied_rules)}")
 
-    # 3. Override Token Verification
-    print("\nOverride Token Verification:")
-    now = datetime.now(UTC)
+    # 2. Evaluate Risk Budget gates
+    from app.services.risk.models import PortfolioState
+
+    portfolio_state = PortfolioState(
+        account_id="acc-001",
+        balance=Decimal("10000.0"),
+        equity=Decimal("10000.0"),
+        margin_used=Decimal("0.0"),
+        free_margin=Decimal("10000.0"),
+        floating_pnl=Decimal("0.0"),
+        realized_pnl=Decimal("0.0"),
+        currency="USD",
+        as_of=now,
+    )
+    req = RiskAssessmentRequest(
+        strategy_id="strat-1",
+        proposed_action=ProposedAllocation(
+            allocations={"strat-1": Decimal("0.0001")}, as_of=now
+        ),
+        portfolio_state=portfolio_state,
+        risk_config=effective_policy.resolved_config,
+    )
+    budget_result = evaluate_risk_budget(effective_policy, req)
+    print(f"\nBudget gate evaluation status: {budget_result.status}")
+
+    # 3. Check and validate a Limit Override Request
     token = RiskApprovalToken(
-        token_id="tok-999",
-        request_id="req-999",
-        workflow_id="wf-999",
-        approved_action="override_limits",
+        token_id="tok-001",
+        request_id="req-123",
+        workflow_id="wf-123",
+        approved_action="override",
         approver="risk_manager",
         expiry_time=now + timedelta(hours=1),
-        config_hash=default_config.contract_hash(),
-        decision_hash="dec-999",
+        config_hash=effective_policy.resolved_config.content_hash(),
+        decision_hash="dec-123",
+        nonce="nonce-123",
+        signature="sig-123",
         scope={"symbol": "EURUSD"},
-        nonce="nonce-999",
-        signature="sig-999",
     )
-    is_valid = validate_override_token(
+
+    override_request = RiskOverrideRequest(
+        request_id="req-123",
         token=token,
-        expected_scope={"symbol": "EURUSD"},
-        active_config_hash=default_config.contract_hash(),
-    )
-    print(f"  Token validation status: {is_valid} (expected True)")
-
-    # 4. Live Safeguards
-    print("\nLive Safeguards Check:")
-    live_context = {"environment": "production", "mode": RiskMode.FULL_LIVE}
-    res_default_in_live = resolve_policy(default_config, [], live_context)
-    print(
-        f"  Default config in live environment resolved status: {res_default_in_live.status} (expected BLOCK)"
+        target_overrides={"max_daily_loss_pct": Decimal("0.08")},
     )
 
-    res_live_in_live = resolve_policy(live_config, [], live_context)
+    # Check if approval is required
+    needs_approval = requires_override_approval(override_request, effective_policy)
+    print(f"\nOverride requires approval: {needs_approval}")
+
+    # Validate the override request
+    validation = validate_risk_override_request(override_request, effective_policy)
     print(
-        f"  Live config in live environment resolved status: {res_live_in_live.status} (expected APPROVE)"
+        f"Override validation: valid={validation['valid']}, code={validation['code']}, msg={validation['message']}"
     )
 
 
