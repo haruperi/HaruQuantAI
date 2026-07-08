@@ -9,8 +9,8 @@ import datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
-from app.services.trader.account_info import AccountInfo
-from app.services.trader.symbol_info import SymbolInfo
+from app.services.trader.info.account import AccountInfo
+from app.services.trader.info.symbol import SymbolInfo
 from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
@@ -295,13 +295,13 @@ class ValidationService:
         # Enrich order_type and price if not provided for modification and stop actions
         if "type" not in request:
             if position_id:
-                from app.services.trader.position_info import PositionInfo
+                from app.services.trader.info.position import PositionInfo
 
                 pos = PositionInfo()
                 if pos.select_by_ticket(position_id):  # pragma: no cover
                     order_type = pos.type()
             elif order_id:  # pragma: no cover
-                from app.services.trader.order_info import OrderInfo
+                from app.services.trader.info.order import OrderInfo
 
                 ord_info = OrderInfo()
                 if ord_info.select(order_id):  # pragma: no cover
@@ -309,13 +309,13 @@ class ValidationService:
 
         if price <= 0.0:
             if position_id:
-                from app.services.trader.position_info import PositionInfo
+                from app.services.trader.info.position import PositionInfo
 
                 pos = PositionInfo()
                 if pos.select_by_ticket(position_id):  # pragma: no cover
                     price = pos.price_open()
             elif order_id:  # pragma: no cover
-                from app.services.trader.order_info import OrderInfo
+                from app.services.trader.info.order import OrderInfo
 
                 ord_info = OrderInfo()
                 if ord_info.select(order_id):  # pragma: no cover
@@ -323,9 +323,13 @@ class ValidationService:
 
         if is_execution:
             if not isinstance(volume, int | float) or volume <= 0.0:
-                raise ValidationError("Volume must be a positive number.")  # pragma: no cover
+                raise ValidationError(
+                    "Volume must be a positive number."
+                )  # pragma: no cover
             if not isinstance(price, int | float) or price < 0.0:
-                raise ValidationError("Price must be a non-negative number.")  # pragma: no cover
+                raise ValidationError(
+                    "Price must be a non-negative number."
+                )  # pragma: no cover
 
         # 1. Dealing mode checks
         self.validate_dealing_mode_compatibility(action, position_id, account_info)

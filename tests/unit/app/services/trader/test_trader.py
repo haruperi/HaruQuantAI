@@ -230,26 +230,26 @@ def mock_broker(mocker: MockerFixture) -> MagicMock:
 
     mocker.patch("app.services.brokers.get_broker_module", return_value=mock_mod)
     mocker.patch(
-        "app.services.trader.terminal_info.get_broker_module", return_value=mock_mod
+        "app.services.trader.info.terminal.get_broker_module", return_value=mock_mod
     )
     mocker.patch(
-        "app.services.trader.account_info.get_broker_module", return_value=mock_mod
+        "app.services.trader.info.account.get_broker_module", return_value=mock_mod
     )
     mocker.patch(
-        "app.services.trader.symbol_info.get_broker_module", return_value=mock_mod
+        "app.services.trader.info.symbol.get_broker_module", return_value=mock_mod
     )
     mocker.patch(
-        "app.services.trader.order_info.get_broker_module", return_value=mock_mod
+        "app.services.trader.info.order.get_broker_module", return_value=mock_mod
     )
     mocker.patch(
-        "app.services.trader.history_order_info.get_broker_module",
+        "app.services.trader.info.history_order.get_broker_module",
         return_value=mock_mod,
     )
     mocker.patch(
-        "app.services.trader.position_info.get_broker_module", return_value=mock_mod
+        "app.services.trader.info.position.get_broker_module", return_value=mock_mod
     )
     mocker.patch(
-        "app.services.trader.deal_info.get_broker_module", return_value=mock_mod
+        "app.services.trader.info.deal.get_broker_module", return_value=mock_mod
     )
     mocker.patch("app.services.trader.trade.get_broker_module", return_value=mock_mod)
     mocker.patch("app.services.trader.trade.get_active_broker_name", return_value="mt5")
@@ -672,6 +672,7 @@ def test_trading_error_classification_and_retry_delay() -> None:
 
 def test_trader_concurrency_lock() -> None:
     from app.services.trader.concurrency import ConcurrencyQueue
+
     queue = ConcurrencyQueue.get_instance()
     # Test lock_sync context manager
     with queue.lock_sync("acc1", "EURUSD"):
@@ -682,16 +683,20 @@ def test_trader_concurrency_async_lock() -> None:
     import asyncio
 
     from app.services.trader.concurrency import ConcurrencyQueue
+
     queue = ConcurrencyQueue.get_instance()
+
     # Test lock async context manager
     async def run_test() -> None:
         async with queue.lock("acc1", "EURUSD"):
             pass
+
     asyncio.run(run_test())
 
 
 def test_trader_rate_limiter_edge_cases(mocker: MockerFixture) -> None:
     from app.services.trader.rate_limiter import RateLimiter, get_rate_limiter
+
     # 1. Default providers
     lim_ctrader = get_rate_limiter("ctrader")
     assert lim_ctrader.capacity == 30.0
@@ -715,13 +720,16 @@ def test_trader_rate_limiter_edge_cases(mocker: MockerFixture) -> None:
     assert lim_warn.acquire(0.1) is True
     assert lim_warn.warning_start_time is not None
     # Mock time.time in rate_limiter to be 6 minutes later (360 seconds)
-    mocker.patch("app.services.trader.rate_limiter.time.time", return_value=time.time() + 360)
+    mocker.patch(
+        "app.services.trader.rate_limiter.time.time", return_value=time.time() + 360
+    )
     # Call acquire again to trigger logging warn
     lim_warn.acquire(0.1)
 
 
 def test_trader_readiness_failures(mock_broker: MagicMock) -> None:
     from app.services.trader.readiness import ReadinessService
+
     service = ReadinessService()
 
     # Mock terminal disconnected
@@ -748,13 +756,27 @@ def test_trader_reconciliation_divergence() -> None:
     service.set_block_trading_on_startup(False)
 
     # Setup mismatched position in store
-    store.save_position(1111, {"ticket": 1111, "symbol": "EURUSD", "volume": 0.1, "type": 0, "profit": 100.0})
+    store.save_position(
+        1111,
+        {"ticket": 1111, "symbol": "EURUSD", "volume": 0.1, "type": 0, "profit": 100.0},
+    )
     store.save_order(2222, {"ticket": 2222, "symbol": "EURUSD", "volume_current": 0.2})
 
     # Reconcile with mismatch in volume, extra locally, missing locally, and large drift
     live_pos = [
-        {"ticket": 1111, "symbol": "EURUSD", "volume": 0.5, "type": 0, "profit": -500.0},  # Mismatch + large profit drift
-        {"ticket": 9999, "symbol": "EURUSD", "volume": 0.1, "type": 0},  # Missing locally
+        {
+            "ticket": 1111,
+            "symbol": "EURUSD",
+            "volume": 0.5,
+            "type": 0,
+            "profit": -500.0,
+        },  # Mismatch + large profit drift
+        {
+            "ticket": 9999,
+            "symbol": "EURUSD",
+            "volume": 0.1,
+            "type": 0,
+        },  # Missing locally
     ]
     live_ord = [
         {"ticket": 2222, "symbol": "EURUSD", "volume_current": 0.5},  # Mismatch
@@ -778,9 +800,9 @@ def test_trader_reporting() -> None:
 
 def test_trader_validation_precision() -> None:
     from app.services.trader.validation import ValidationService
+
     service = ValidationService()
 
     assert service.normalize_precision(0.0, 5) == Decimal("0.0")
     assert service.normalize_precision(1.123456, 5) == Decimal("1.12346")
     assert service.normalize_precision(1.123456, 0.01) == Decimal("1.12")
-

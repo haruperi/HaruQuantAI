@@ -6,9 +6,9 @@ and rate limiting availability before allowing order placement.
 
 from typing import Any
 
-from app.services.trader.account_info import AccountInfo
+from app.services.trader.info.account import AccountInfo
+from app.services.trader.info.terminal import TerminalInfo
 from app.services.trader.rate_limiter import get_rate_limiter
-from app.services.trader.terminal_info import TerminalInfo
 from app.utils.logger import logger
 
 

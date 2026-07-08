@@ -133,8 +133,7 @@ else:
 
 ### Emergency Switch and Flattening Flow
 ```python
-from app.services.trader import Trade
-from app.services.trader.position_info import PositionInfo
+from app.services.trader import PositionInfo, Trade
 
 trade = Trade()
 

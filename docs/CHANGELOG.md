@@ -6,8 +6,8 @@ All notable HaruQuantAI project changes should be recorded here.
 
 | ID | Functionality | Notes |
 | -- | ------------- | ----- |
-|    |               |       |
-|    |               |       |
+| REF-001 | Relocate all trader info files to info/ | Relocated all generic trader *Info wrapper files to app/services/trader/info/ and renamed them dropping the _info suffix. Updated all codebase references. |
+
 
 ## Added
 

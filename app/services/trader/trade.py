@@ -12,10 +12,12 @@ import time
 from typing import Any
 
 from app.services.brokers.router import get_active_broker_name, get_broker_module
-from app.services.trader.account_info import AccountInfo
 from app.services.trader.concurrency import ConcurrencyQueue
 from app.services.trader.idempotency import IdempotencyService
-from app.services.trader.position_info import PositionInfo
+from app.services.trader.info.account import AccountInfo
+from app.services.trader.info.position import PositionInfo
+from app.services.trader.info.symbol import SymbolInfo
+from app.services.trader.info.terminal import TerminalInfo
 from app.services.trader.rate_limiter import get_rate_limiter
 from app.services.trader.readiness import ReadinessService
 from app.services.trader.reconciliation import ReconciliationService
@@ -25,8 +27,6 @@ from app.services.trader.result import (
     ResultBuilder,
 )
 from app.services.trader.store import TradeStore, get_default_store
-from app.services.trader.symbol_info import SymbolInfo
-from app.services.trader.terminal_info import TerminalInfo
 from app.services.trader.validation import ValidationService
 
 
@@ -210,7 +210,7 @@ class Trade:
                 order_ticket = request.get("order")
                 position_ticket = request.get("position")
                 if order_ticket:
-                    from app.services.trader.order_info import OrderInfo
+                    from app.services.trader.info.order import OrderInfo
 
                     ord_info = OrderInfo()
                     if ord_info.select(order_ticket):
