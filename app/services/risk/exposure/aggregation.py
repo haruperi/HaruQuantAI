@@ -1,25 +1,22 @@
-"""FX Currency Exposure Engine.
-
-Decomposes assets and portfolios into base/quote currency legs, calculates
-gross/net exposures, and evaluates projected exposures under pending-order policies.
-"""
+"""Currency exposure aggregation services."""
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from app.services.risk.models import (
+from app.services.risk.models.contracts import (
     CurrencyExposure,
     CurrencyLegExposure,
-    PortfolioState,
-    ProposedTrade,
-    RiskConfig,
-    RiskMode,
     SymbolExposure,
 )
+from app.services.risk.models.enums import RiskMode
 from app.utils.errors import ValidationError
 from app.utils.logger import logger
+
+if TYPE_CHECKING:
+    from app.services.risk.models import PortfolioState, ProposedTrade, RiskConfig
 
 FX_SYMBOL_LENGTH = 6
 
@@ -129,7 +126,7 @@ def _resolve_conversion_rate(
 
 
 def decompose_position(
-    symbol: str,  # noqa: ARG001
+    symbol: str,
     side: str,
     quantity: Decimal,
     price: Decimal,
@@ -137,7 +134,24 @@ def decompose_position(
     base_ccy: str,
     quote_ccy: str,
 ) -> list[CurrencyLegExposure]:
-    """Decompose a position/order on a symbol into its base and quote currency legs."""
+    """Decompose a position/order on a symbol into its base and quote currency legs.
+
+    Args:
+        symbol: Target symbol.
+        side: Position side (e.g. 'long', 'short').
+        quantity: Order/position standard lot quantity.
+        price: Price rate.
+        contract_size: Standard contract multiplier value.
+        base_ccy: Base currency ISO code.
+        quote_ccy: Quote currency ISO code.
+
+    Returns:
+        list[CurrencyLegExposure]: Decomposed base and quote currency legs.
+
+    Raises:
+        ValueError: If side direction is invalid.
+    """
+    logger.debug("Decomposing position %s: qty=%s, price=%s", symbol, quantity, price)
     side_norm = side.lower()
     if side_norm in {"buy", "long"}:
         base_amt = quantity * contract_size
@@ -330,10 +344,7 @@ def _calculate_policy_weight(
     o_prob: Decimal | None,
     market_context: dict[str, Any],
 ) -> Decimal | None:
-    """Calculate the weight of a pending order under a policy.
-
-    Returns None if skipped.
-    """
+    """Calculate the weight of a pending order under a policy."""
     if policy == "near-market-only":
         resolved_dist = _resolve_order_distance(
             o_symbol, o_price_dec, o_dist, market_context
@@ -535,7 +546,19 @@ def calculate_currency_exposure(
     """Decompose and aggregate gross/net exposures per currency.
 
     Can be filtered to aggregate by a specific strategy_id or symbol.
+
+    Args:
+        portfolio_state: Active portfolio snapshot.
+        proposed_trade: Proposed transaction order details.
+        config: System limits configuration profiles.
+        market_context: Live volatility and spec conversion parameters.
+        strategy_id: Filter by a target strategy.
+        symbol: Filter by a target symbol.
+
+    Returns:
+        dict[str, CurrencyExposure]: Map of currency code to gross/net exposures.
     """
+    logger.info("calculate_currency_exposure called.")
     _check_live_status(market_context, config)
 
     account_ccy = portfolio_state.currency.upper()
@@ -569,7 +592,6 @@ def calculate_currency_exposure(
         account_ccy,
     )
 
-    # Populate final output
     result: dict[str, CurrencyExposure] = {}
     for ccy, vals in exposures.items():
         result[ccy] = CurrencyExposure(
@@ -583,19 +605,57 @@ def calculate_currency_exposure(
     return result
 
 
-def calculate_currency_leg_exposure(
-    symbol: str,
-    side: str,
-    quantity: Decimal,
-    price: Decimal,
-    contract_size: Decimal,
-    base_ccy: str,
-    quote_ccy: str,
-) -> list[CurrencyLegExposure]:
-    """Calculate the currency leg decomposition for a single trade/position."""
-    return decompose_position(
-        symbol, side, quantity, price, contract_size, base_ccy, quote_ccy
-    )
+def aggregate_currency_legs(
+    legs: Sequence[CurrencyLegExposure],
+) -> Mapping[str, Decimal]:
+    """Aggregate signed leg exposures by ISO currency code.
+
+    Args:
+        legs: Sequence of decomposed currency leg exposures.
+
+    Returns:
+        Mapping[str, Decimal]: Aggregated signed exposures.
+    """
+    logger.info("Aggregating currency legs.")
+    totals: dict[str, Decimal] = {}
+    for leg in legs:
+        ccy = leg.currency.upper()
+        totals[ccy] = totals.get(ccy, Decimal("0.0")) + leg.signed_amount
+    return totals
+
+
+def calculate_gross_and_net_exposure(
+    exposure: Mapping[str, Decimal],
+) -> dict[str, Decimal]:
+    """Calculate gross and net exposure totals from currency leg amounts.
+
+    Args:
+        exposure: Mapping of currency ISO code to signed exposure.
+
+    Returns:
+        dict[str, Decimal]: dict containing 'gross' and 'net' total exposures.
+    """
+    logger.info("Calculating gross and net exposure totals.")
+    gross = sum(abs(val) for val in exposure.values())
+    net = sum(val for val in exposure.values())
+    return {"gross": gross, "net": net}
+
+
+def enforce_currency_rounding(value: Decimal, currency: str) -> Decimal:
+    """Enforce currency-specific rounding precision.
+
+    Args:
+        value: Exposure value to round.
+        currency: Currency ISO code.
+
+    Returns:
+        Decimal: Rounded value.
+    """
+    logger.info("Rounding value for currency %s", currency)
+    ccy = currency.upper()
+    if ccy == "JPY":
+        return value.quantize(Decimal(1))
+    return value.quantize(Decimal("0.01"))
 
 
 def _add_symbol_exposure_amt(
@@ -732,7 +792,19 @@ def calculate_symbol_exposure(
     market_context: dict[str, Any],
     strategy_id: str | None = None,
 ) -> dict[str, SymbolExposure]:
-    """Calculate and aggregate exposures per symbol."""
+    """Calculate and aggregate exposures per symbol.
+
+    Args:
+        portfolio_state: Active portfolio snapshot.
+        proposed_trade: Proposed transaction order details.
+        config: System limits configuration profiles.
+        market_context: Live volatility and spec conversion parameters.
+        strategy_id: Filter by a target strategy.
+
+    Returns:
+        dict[str, SymbolExposure]: Map of symbol to symbol exposures.
+    """
+    logger.info("calculate_symbol_exposure called.")
     _check_live_status(market_context, config)
 
     account_ccy = portfolio_state.currency.upper()
@@ -781,7 +853,20 @@ def calculate_net_currency_exposure(
     strategy_id: str | None = None,
     symbol: str | None = None,
 ) -> dict[str, Decimal]:
-    """Calculate net exposures per currency (in account currency equivalent)."""
+    """Calculate net exposures per currency (in account currency equivalent).
+
+    Args:
+        portfolio_state: Active portfolio snapshot.
+        proposed_trade: Proposed transaction order details.
+        config: System limits configuration profiles.
+        market_context: Live volatility and spec conversion parameters.
+        strategy_id: Filter by a target strategy.
+        symbol: Filter by a target symbol.
+
+    Returns:
+        dict[str, Decimal]: Map of currency code to net exposure.
+    """
+    logger.info("calculate_net_currency_exposure called.")
     exposures = calculate_currency_exposure(
         portfolio_state, proposed_trade, config, market_context, strategy_id, symbol
     )
@@ -796,7 +881,20 @@ def calculate_projected_exposure(
     strategy_id: str | None = None,
     symbol: str | None = None,
 ) -> dict[str, CurrencyExposure]:
-    """Calculate projected exposures under pending policy."""
+    """Calculate projected exposures under pending policy.
+
+    Args:
+        portfolio_state: Active portfolio snapshot.
+        proposed_trade: Proposed transaction order details.
+        config: System limits configuration profiles.
+        market_context: Live volatility and spec conversion parameters.
+        strategy_id: Filter by a target strategy.
+        symbol: Filter by a target symbol.
+
+    Returns:
+        dict[str, CurrencyExposure]: Map of currency code to projected exposures.
+    """
+    logger.info("calculate_projected_exposure called.")
     return calculate_currency_exposure(
         portfolio_state, proposed_trade, config, market_context, strategy_id, symbol
     )
@@ -818,7 +916,18 @@ def detect_hidden_concentration(
     config: RiskConfig,
     market_context: dict[str, Any],
 ) -> list[str]:
-    """Detect hidden exposure concentrations across multiple quote pairs."""
+    """Detect hidden exposure concentrations across multiple quote pairs.
+
+    Args:
+        portfolio_state: Active portfolio snapshot.
+        proposed_trade: Proposed transaction order details.
+        config: System limits configuration profiles.
+        market_context: Live volatility and spec conversion parameters.
+
+    Returns:
+        list[str]: Collection of hidden concentration warnings.
+    """
+    logger.info("detect_hidden_concentration called.")
     usd_short_symbols = []
 
     # 1. Open positions
@@ -865,6 +974,11 @@ class CurrencyExposureEngine:
     """Engine for calculating portfolio currency-level exposure."""
 
     def __init__(self, config: RiskConfig) -> None:
+        """Initialize engine.
+
+        Args:
+            config: Target risk limits config.
+        """
         self.config = config
 
     def calculate_exposure(
@@ -875,7 +989,19 @@ class CurrencyExposureEngine:
         strategy_id: str | None = None,
         symbol: str | None = None,
     ) -> dict[str, CurrencyExposure]:
-        """Decompose and aggregate exposures per currency."""
+        """Decompose and aggregate exposures per currency.
+
+        Args:
+            portfolio_state: Active portfolio snapshot.
+            proposed_trade: Proposed transaction order details.
+            market_context: Live volatility and spec conversion parameters.
+            strategy_id: Filter by a target strategy.
+            symbol: Filter by a target symbol.
+
+        Returns:
+            dict[str, CurrencyExposure]: Map of currency code to exposures.
+        """
+        logger.info("CurrencyExposureEngine.calculate_exposure called.")
         return calculate_currency_exposure(
             portfolio_state,
             proposed_trade,
@@ -890,6 +1016,11 @@ class SymbolExposureEngine:
     """Engine for calculating symbol-level exposures."""
 
     def __init__(self, config: RiskConfig) -> None:
+        """Initialize engine.
+
+        Args:
+            config: Target risk limits config.
+        """
         self.config = config
 
     def calculate_exposure(
@@ -899,7 +1030,18 @@ class SymbolExposureEngine:
         market_context: dict[str, Any],
         strategy_id: str | None = None,
     ) -> dict[str, SymbolExposure]:
-        """Calculate and aggregate exposures per symbol."""
+        """Calculate and aggregate exposures per symbol.
+
+        Args:
+            portfolio_state: Active portfolio snapshot.
+            proposed_trade: Proposed transaction order details.
+            market_context: Live volatility and spec conversion parameters.
+            strategy_id: Filter by a target strategy.
+
+        Returns:
+            dict[str, SymbolExposure]: Map of symbol code to exposures.
+        """
+        logger.info("SymbolExposureEngine.calculate_exposure called.")
         return calculate_symbol_exposure(
             portfolio_state, proposed_trade, self.config, market_context, strategy_id
         )
@@ -909,6 +1051,11 @@ class ClusterExposureEngine:
     """Engine for calculating currency cluster exposures."""
 
     def __init__(self, config: RiskConfig) -> None:
+        """Initialize engine.
+
+        Args:
+            config: Target risk limits config.
+        """
         self.config = config
 
     def calculate_exposure(
@@ -919,7 +1066,19 @@ class ClusterExposureEngine:
         strategy_id: str | None = None,
         symbol: str | None = None,
     ) -> dict[str, CurrencyExposure]:
-        """Filter portfolio currency exposures to custom config clusters."""
+        """Filter portfolio currency exposures to custom config clusters.
+
+        Args:
+            portfolio_state: Active portfolio snapshot.
+            proposed_trade: Proposed transaction order details.
+            market_context: Live volatility and spec conversion parameters.
+            strategy_id: Filter by a target strategy.
+            symbol: Filter by a target symbol.
+
+        Returns:
+            dict[str, CurrencyExposure]: Map of cluster name to exposures.
+        """
+        logger.info("ClusterExposureEngine.calculate_exposure called.")
         exposures = calculate_currency_exposure(
             portfolio_state,
             proposed_trade,
@@ -938,6 +1097,11 @@ class ExposureSnapshotBuilder:
     """Builder for compiling comprehensive exposure snapshots."""
 
     def __init__(self, config: RiskConfig) -> None:
+        """Initialize builder.
+
+        Args:
+            config: Target risk limits config.
+        """
         self.config = config
 
     def build_snapshot(
@@ -946,7 +1110,17 @@ class ExposureSnapshotBuilder:
         proposed_trade: ProposedTrade | None,
         market_context: dict[str, Any],
     ) -> dict[str, Any]:
-        """Build a comprehensive exposure snapshot."""
+        """Build a comprehensive exposure snapshot.
+
+        Args:
+            portfolio_state: Active portfolio snapshot.
+            proposed_trade: Proposed transaction order details.
+            market_context: Live volatility and spec conversion parameters.
+
+        Returns:
+            dict[str, Any]: Full nested exposure metrics dictionary.
+        """
+        logger.info("ExposureSnapshotBuilder.build_snapshot called.")
         currency_exp = calculate_currency_exposure(
             portfolio_state, proposed_trade, self.config, market_context
         )
@@ -997,3 +1171,38 @@ class ExposureSnapshotBuilder:
             "account_exposures": account_exp,
             "hidden_concentrations": hidden_concentrations,
         }
+
+
+def calculate_currency_leg_exposure(
+    symbol: str,
+    side: str,
+    quantity: Decimal,
+    price: Decimal,
+    contract_size: Decimal,
+    base_ccy: str,
+    quote_ccy: str,
+) -> list[CurrencyLegExposure]:
+    """Calculate the currency leg decomposition for a single trade/position.
+
+    Args:
+        symbol: Target symbol.
+        side: Position side (e.g. 'long', 'short').
+        quantity: Order/position standard lot quantity.
+        price: Price rate.
+        contract_size: Standard contract multiplier value.
+        base_ccy: Base currency ISO code.
+        quote_ccy: Quote currency ISO code.
+
+    Returns:
+        list[CurrencyLegExposure]: Decomposed base and quote currency legs.
+    """
+    logger.info("calculate_currency_leg_exposure called.")
+    return decompose_position(
+        symbol=symbol,
+        side=side,
+        quantity=quantity,
+        price=price,
+        contract_size=contract_size,
+        base_ccy=base_ccy,
+        quote_ccy=quote_ccy,
+    )

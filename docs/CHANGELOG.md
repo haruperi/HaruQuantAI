@@ -37,6 +37,9 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-022 | Risk Policy V2 modular package | Transitioned legacy flat policy logic into a structured package `app/services/risk/policy/` containing `contracts.py` (policy scopes, precedence, rules, and override results), `resolver.py` (precedence specificity scoring, time-bounded validation, and budget gate checks), and `overrides.py` (cryptographic override token compatibility checks and ceilings validation). |
 | ADD-023 | Risk Readiness V2 modular package | Introduced structured package `app/services/risk/readiness/` containing `readiness.py` to perform system integration and pre-runtime readiness validation checks, including dependency status checking, safety modes coverage matrix validation, delivery plan constraints verification, and dry-run report compilation. |
 | ADD-024 | Risk Regime V2 modular package | Transitioned legacy flat regime logic into a structured package `app/services/risk/regime/` containing `assessor.py` (regime classification, spread, volatility, liquidity, news, rollover blackouts) and `validation.py` (inputs validation and reason codes). |
+| ADD-025 | Risk Sizing V2 modular package | Transitioned position sizing engine from single flat `sizing.py` to modular package `sizing/` (`contracts.py`, `normalization.py`, `calculators.py`) with stateless lot-sizing calculations. |
+| ADD-026 | Risk Exposure V2 modular package | Modularized currency exposure engine from flat `exposure.py` into package `exposure/` (`fx_legs.py`, `aggregation.py`), introducing pure FX pair parsing, leg decomposition, and currency conversion validation. |
+
 
 
 

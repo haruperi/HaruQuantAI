@@ -22,6 +22,7 @@ from app.agentic.tools.risk import build_portfolio_risk_snapshot
 from app.services.risk import (
     STAGE_SEQUENCE,
     AccountRiskSnapshot,
+    ContractSpecification,
     DependencyStatus,
     DrawdownState,
     ExpectedShortfallMethod,
@@ -63,6 +64,7 @@ from app.services.risk import (
     calculate_total_drawdown,
     calculate_var_es_snapshots,
     correlation_adjusted_risk_parity_allocation,
+    decompose_fx_trade,
     decompose_position,
     detect_correlation_spikes,
     determine_drawdown_throttling,
@@ -75,7 +77,9 @@ from app.services.risk import (
     exit_liquidity_stress_check,
     generate_risk_report,
     get_kill_switch_manager,
+    parse_fx_symbol,
     run_limit_checks,
+    validate_currency_conversion_requirements,
     validate_custom_scenario,
     validate_delivery_plan,
     validate_phase_dependencies,
@@ -1019,6 +1023,32 @@ def example_11_fx_currency_and_cluster_exposures() -> None:
     print("FX Legs decomposition:")
     for leg in legs:
         print(f"  Currency: {leg.currency}, Signed Amount: {leg.signed_amount}")
+
+    # V2 Symbol parsing example
+    fx_pair = parse_fx_symbol("EUR_USD")
+    print(f"\nParsed base/quote from EUR_USD: {fx_pair.base}/{fx_pair.quote}")
+
+    # V2 Trade decomposition example
+    proposed = ProposedTrade(
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.5"),
+        strategy_id="strat-1",
+        price=Decimal("1.10"),
+    )
+    contract_spec = ContractSpecification(
+        symbol="EURUSD", contract_size=Decimal("100000.0")
+    )
+    v2_legs = decompose_fx_trade(proposed, Decimal("1.10"), contract_spec)
+    print("V2 Decomposed ProposedTrade Legs:")
+    for leg in v2_legs:
+        print(f"  Currency: {leg.currency}, Signed Amount: {leg.signed_amount}")
+
+    # V2 Validation of conversion requirements
+    conversion_validation = validate_currency_conversion_requirements(
+        v2_legs, {"EURUSD": Decimal("1.10")}, "USD"
+    )
+    print(f"Currency conversion validation result: {conversion_validation['reason']}")
 
     # 2. Currency Exposure Calculations (ignore pending order vs full potential)
     base_config.pending_order_policy = "ignore"

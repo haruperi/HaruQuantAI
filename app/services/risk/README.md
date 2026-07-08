@@ -191,17 +191,30 @@ The Position Sizing Engine calculates safe, risk-budgeted position volumes under
 
 ## 11. FX Currency Exposure Engine
 
-The FX Currency Exposure Engine decomposes portfolios, pending orders, and proposed trades into their underlying base and quote currency legs to calculate gross and net currency exposures, as well as account-currency equivalent exposures.
+The FX Currency Exposure Engine decomposes portfolios, pending orders, and proposed trades into their underlying base and quote currency legs to calculate gross and net currency exposures, as well as account-currency equivalent exposures. It is organized as a modular package under `app/services/risk/exposure/`:
 
-### Key Components
-1. **Decomposition (`decompose_position`)**: Splits a standard lot or size position into its base (long/short asset) and quote (short/long asset) legs. E.g., buying EURUSD is long EUR and short USD.
-2. **Rate Resolution (`_resolve_conversion_rate`)**: Dynamically converts any leg amount to the base account currency using conversion rates from `market_context` or static fallbacks.
-3. **Pending Order Policies**: Evaluates projected exposure of pending orders according to active policies:
-   * `ignore`: Excludes all pending orders from exposure.
-   * `full-potential`: Counts all pending orders at 100% size.
-   * `near-market-only`: Includes pending orders only if their distance to the current market price is below a threshold.
-   * `probability-weighted`: Scales the exposure by the order's configured trigger probability.
-4. **Live fail-closed checks**: Rejects calculations if the portfolio is unreconciled or quote status is unknown in live mode.
+* **`fx_legs.py`**: Decomposes trade proposals and positions into their base and quote currency components. Implements pure, stateless symbol parsing.
+* **`aggregation.py`**: Aggregates exposures at the portfolio level, implements pending-order exposure policies, and evaluates hidden USD or major currency concentrations.
+* **`__init__.py`**: Exposes the public functional facade and orchestrator engines.
+
+### Key Components & Functions
+
+1. **Symbol Parsing & Leg Decomposition (`fx_legs.py`)**:
+   * **`parse_fx_symbol`**: Decomposes standard (e.g. `EURUSD`, `USDJPY`) and custom FX symbols to identify base/quote currency codes.
+   * **`decompose_fx_trade`**: Purely decomposes a trade proposal into signed base and quote leg amounts.
+     * *Buy Trade*: Base Leg gets `+ quantity * contract_size`; Quote Leg gets `- quantity * contract_size * price`.
+     * *Sell Trade*: Base Leg gets `- quantity * contract_size`; Quote Leg gets `+ quantity * contract_size * price`.
+   * **`validate_currency_conversion_requirements`**: Rejects validation if any of the target currency legs lack a corresponding rate to convert back to the account base currency.
+
+2. **Exposure Aggregation & Policies (`aggregation.py`)**:
+   * **`calculate_currency_exposure`**: Aggregates total exposure from positions, pending orders, and proposed trades under the configured pending order policy:
+     * `ignore`: Pending and in-flight orders are ignored.
+     * `full-potential`: Pending orders are aggregated at 100% potential.
+     * `near-market-only`: Includes pending orders only if their distance to current market price is below a threshold.
+     * `probability-weighted`: Pending orders are weighted by their historical fill probability (defaulting to 0.50).
+   * **`detect_hidden_concentration`**: Scans active positions and trade proposals to detect hidden short USD exposure concentrations across multiple quote-USD currency pairs (e.g., EURUSD, GBPUSD, AUDUSD, NZDUSD).
+   * **Live fail-closed checks**: Rejects calculations if the portfolio is unreconciled or quote status is unknown in live mode.
+
 
 ---
 

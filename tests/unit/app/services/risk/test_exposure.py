@@ -741,3 +741,114 @@ def test_hidden_concentration_with_orders(
     )
     assert len(warnings) == 1
     assert "Hidden USD short concentration detected" in warnings[0]
+
+
+def test_v2_parse_fx_symbol() -> None:
+    """Test parse_fx_symbol with standard and non-standard symbols."""
+    from app.services.risk.exposure import parse_fx_symbol
+
+    pair = parse_fx_symbol("EURUSD")
+    assert pair.base == "EUR"
+    assert pair.quote == "USD"
+
+    pair2 = parse_fx_symbol("EUR_USD")
+    assert pair2.base == "EUR"
+    assert pair2.quote == "USD"
+
+    pair3 = parse_fx_symbol("USDJPY")
+    assert pair3.base == "USD"
+    assert pair3.quote == "JPY"
+
+    pair4 = parse_fx_symbol("GBPCHF")
+    assert pair4.base == "GBP"
+    assert pair4.quote == "CHF"
+
+    with pytest.raises(ValueError, match="Invalid FX symbol format"):
+        parse_fx_symbol("INVALID")
+
+
+def test_v2_decompose_fx_trade() -> None:
+    """Test decompose_fx_trade with buy and sell sides."""
+    from app.services.risk.exposure import (
+        ContractSpecification,
+        decompose_fx_trade,
+    )
+
+    trade = ProposedTrade(
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.5"),
+        strategy_id="strat-1",
+        price=Decimal("1.10"),
+    )
+    contract = ContractSpecification(symbol="EURUSD", contract_size=Decimal("100000.0"))
+
+    base, quote = decompose_fx_trade(trade, Decimal("1.10"), contract)
+    assert base.currency == "EUR"
+    assert base.signed_amount == Decimal("150000.0")
+    assert quote.currency == "USD"
+    assert quote.signed_amount == Decimal("-165000.0")
+
+    trade_sell = ProposedTrade(
+        symbol="USDJPY",
+        side="sell",
+        volume=Decimal("0.5"),
+        strategy_id="strat-1",
+        price=Decimal("150.0"),
+    )
+    contract2 = ContractSpecification(symbol="USDJPY", contract_size=Decimal("100000.0"))
+    base2, quote2 = decompose_fx_trade(trade_sell, Decimal("150.0"), contract2)
+    assert base2.currency == "USD"
+    assert base2.signed_amount == Decimal("-50000.0")
+    assert quote2.currency == "JPY"
+    assert quote2.signed_amount == Decimal("7500000.0")
+
+
+def test_v2_validate_currency_conversion_requirements() -> None:
+    """Test validate_currency_conversion_requirements."""
+    from app.services.risk import CurrencyLegExposure
+    from app.services.risk.exposure import (
+        validate_currency_conversion_requirements,
+    )
+
+    exposures = [
+        CurrencyLegExposure(currency="EUR", signed_amount=Decimal("1000.0")),
+        CurrencyLegExposure(currency="JPY", signed_amount=Decimal("20000.0")),
+    ]
+    rates = {"EURUSD": Decimal("1.10"), "USDJPY": Decimal("150.0")}
+
+    res = validate_currency_conversion_requirements(exposures, rates, "USD")
+    assert res["valid"] is True
+
+    # Missing JPY conversion
+    bad_rates = {"EURUSD": Decimal("1.10")}
+    res_bad = validate_currency_conversion_requirements(exposures, bad_rates, "USD")
+    assert res_bad["valid"] is False
+    assert "JPY" in res_bad["reason"]
+
+
+def test_v2_extra_helpers() -> None:
+    """Test extra pure exposure helpers."""
+    from app.services.risk import CurrencyLegExposure
+    from app.services.risk.exposure import (
+        aggregate_currency_legs,
+        calculate_gross_and_net_exposure,
+        enforce_currency_rounding,
+    )
+
+    legs = [
+        CurrencyLegExposure(currency="EUR", signed_amount=Decimal("1000.0")),
+        CurrencyLegExposure(currency="EUR", signed_amount=Decimal("-300.0")),
+        CurrencyLegExposure(currency="USD", signed_amount=Decimal("-500.0")),
+    ]
+    aggregated = aggregate_currency_legs(legs)
+    assert aggregated["EUR"] == Decimal("700.0")
+    assert aggregated["USD"] == Decimal("-500.0")
+
+    totals = calculate_gross_and_net_exposure(aggregated)
+    assert totals["gross"] == Decimal("1200.0")
+    assert totals["net"] == Decimal("200.0")
+
+    assert enforce_currency_rounding(Decimal("123.456"), "USD") == Decimal("123.46")
+    assert enforce_currency_rounding(Decimal("123.456"), "JPY") == Decimal("123")
+
