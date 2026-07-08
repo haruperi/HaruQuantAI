@@ -31,6 +31,8 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-016 | Live Trading Service | Added core live runtime monitoring services, including health tracking, incident management, and state reconciliation. Usage examples in `tests/usage/app/services/10_live.py`. |
 | ADD-017 | Research Service | Added core research service, for data leakage detection, chronological splitting, and edge discovery studies. Usage examples in `tests/usage/app/services/09_research.py`. |
 | ADD-018 | Simulator Service | Added core simulator service for backtest execution, data simulation, and strategy backtesting. Module `app/services/simulator`. Usage examples in `tests/usage/app/services/08_simulator.py`. |
+| ADD-019 | Risk Models V2 modular package | Transitioned from a single flat `models.py` file to a multi-file package `app/services/risk/models/` containing `enums.py`, `contracts.py`, and `serialization.py` to support cleaner extension and clear separation of concerns. |
+
 
 
 

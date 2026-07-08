@@ -81,6 +81,11 @@ from app.services.risk.config import (
     load_risk_config,
     validate_risk_config,
 )
+from app.services.risk.models.serialization import (
+    from_canonical_risk_payload,
+    to_canonical_risk_payload,
+    validate_risk_model_round_trip,
+)
 from app.services.risk.policy import resolve_policy, validate_override_token
 from app.services.risk.reports import RISK_METRICS_REGISTRY
 from app.services.risk.stress import PriceShockScenario
@@ -183,6 +188,20 @@ def example_01_core_models_and_contracts() -> None:
         f"Snapshots created: Base Currency={account_snap.base_currency}, Volatility={market_snap.volatility}, Decision Status={decision.status}"
     )
 
+    # 5. Canonical Serialization & Round-trip Validation
+    payload = to_canonical_risk_payload(decision)
+    print(
+        f"\nCanonical payload generated (calculated_volume is float): {payload.get('calculated_volume')} ({type(payload.get('calculated_volume')).__name__})"
+    )
+
+    restored_decision = from_canonical_risk_payload(payload, RiskDecisionPackage)
+    print(
+        f"Restored decision calculated_volume is Decimal: {restored_decision.calculated_volume} ({type(restored_decision.calculated_volume).__name__})"
+    )
+
+    rt_res = validate_risk_model_round_trip(decision)
+    print(f"Round-trip validation result: {rt_res}")
+
 
 def example_02_system_config_profiles() -> None:
     """Demonstrate configuration loading, profile validation, and config hashing (config.py)."""
@@ -205,8 +224,8 @@ def example_02_system_config_profiles() -> None:
     print(f"Hashed config: {config_hash}")
 
     # 3. Validate config
-    is_valid = validate_risk_config(default_config)
-    print(f"Validate config check: {is_valid}")
+    validate_risk_config(default_config)
+    print("Validate config check passed successfully")
 
 
 def example_03_policy_resolution_engine() -> None:

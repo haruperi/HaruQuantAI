@@ -24,6 +24,15 @@ graph TD
 
 ---
 
+## 1.1 Core Models & Serialization
+
+Canonical risk models, enums, Pydantic contracts, and serialization helpers are organized as a modular package under `app/services/risk/models/`:
+* **`enums.py`**: Defines all risk enums (`RiskDecisionStatus`, `RiskMode`, `RiskAction`, `RiskSeverity`, `RiskReasonCode`, `KillSwitchStateEnum`, `KillSwitchReason`).
+* **`contracts.py`**: Defines Pydantic model schemas for all inputs, outputs, snapshots, and tokens (e.g. `ProposedTrade`, `PortfolioState`, `RiskConfig`, `RiskApprovalToken`, `RiskDecisionPackage`). Enforces finite Decimal validation and handles bi-directional field-syncing validators.
+* **`serialization.py`**: Implements JSON-safe type coercion and round-trip verification helpers.
+
+---
+
 ## 2. Configuration Profiles (`configs/`)
 
 Risk profiles are stored as JSON configurations under `app/services/risk/configs/`. Each profile defines defaults for daily loss, total loss, effective leverage, and live execution authorization.

@@ -1,7 +1,7 @@
-"""Risk governance models and enums module.
+"""Risk governance canonical contracts and models.
 
-Defines all Pydantic models for inputs, intermediate calculations, snapshots,
-and decision packages used by the RiskGovernor.
+Defines all validated Pydantic contract models representing inputs, outputs,
+snapshots, decisions, and tokens that cross the Risk Governance boundary.
 """
 
 from __future__ import annotations
@@ -9,118 +9,233 @@ from __future__ import annotations
 import contextlib
 from datetime import UTC, datetime
 from decimal import Decimal
-from enum import StrEnum
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import Field, model_validator
 
 from app.services.contracts.base import Contract
+from app.services.risk.models.enums import (
+    RiskDecisionStatus,
+    RiskMode,
+)
+from app.utils.logger import logger
 
-
-class RiskDecisionStatus(StrEnum):
-    """Canonical outcomes of the risk review process."""
-
-    APPROVE = "approve"
-    REDUCE_SIZE = "reduce_size"
-    REJECT = "reject"
-    BLOCK = "block"
-    NEEDS_MORE_EVIDENCE = "needs_more_evidence"
-    NEEDS_APPROVAL = "needs_approval"
-    HALT_STRATEGY = "halt_strategy"
-    HALT_ALL = "halt_all"
-
-
-class RiskMode(StrEnum):
-    """Execution mode of the trading system."""
-
-    OFFLINE = "offline"
-    SIMULATION = "simulation"
-    PAPER = "paper"
-    SHADOW = "shadow"
-    LIVE_READONLY = "live_readonly"
-    MICRO_LIVE = "micro_live"
-    FULL_LIVE = "full_live"
-
-
-class RiskAction(StrEnum):
-    """Governed actions requiring risk approval."""
-
-    EXECUTE_TRADE = "execute_trade"
-    ALLOCATE_CAPITAL = "allocate_capital"
-    ADMIT_STRATEGY = "admit_strategy"
-    PROMOTE_MODE = "promote_mode"
-
-
-class RiskSeverity(StrEnum):
-    """Severity levels for violations or events."""
-
-    INFO = "info"
-    WARNING = "warning"
-    SOFT_BREACH = "soft_breach"
-    HARD_BREACH = "hard_breach"
-    CRITICAL_BREACH = "critical_breach"
-    EMERGENCY_HALT = "emergency_halt"
-
-
-class RiskReasonCode(StrEnum):
-    """Deterministic reasons for decisions."""
-
-    OK = "OK"
-    NEWS_BLACKOUT = "NEWS_BLACKOUT"
-    ROLLOVER_BLACKOUT = "ROLLOVER_BLACKOUT"
-    KILL_SWITCH_ACTIVE = "KILL_SWITCH_ACTIVE"
-    STALE_EVIDENCE = "STALE_EVIDENCE"
-    DRAWDOWN_BREACH = "DRAWDOWN_BREACH"
-    DAILY_LOSS_BREACH = "DAILY_LOSS_BREACH"
-    LEVERAGE_BREACH = "LEVERAGE_BREACH"
-    MARGIN_BREACH = "MARGIN_BREACH"
-    CONCENTRATION_BREACH = "CONCENTRATION_BREACH"
-    CURRENCY_BREACH = "CURRENCY_BREACH"
-    CORRELATION_BREACH = "CORRELATION_BREACH"
-    VAR_BREACH = "VAR_BREACH"
-    ES_BREACH = "ES_BREACH"
-    STRESS_BREACH = "STRESS_BREACH"
-    SLIPPAGE_BREACH = "SLIPPAGE_BREACH"
-    SPREAD_BREACH = "SPREAD_BREACH"
-    FREQUENCY_BREACH = "FREQUENCY_BREACH"
-    INVALID_INPUT = "INVALID_INPUT"
-    UNEXPECTED_ERROR = "UNEXPECTED_ERROR"
-    PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED = "PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED"
-    ALLOCATION_LIMIT_BREACH = "ALLOCATION_LIMIT_BREACH"
-    LIFECYCLE_GATES_BREACH = "LIFECYCLE_GATES_BREACH"
-    APPROVAL_REQUIRED = "APPROVAL_REQUIRED"
+if TYPE_CHECKING:
+    from app.utils.validations import ValidationResult
 
 
 class RiskContract(Contract):
-    """Base model for risk contracts.
+    """Base class for all risk contracts, enforcing finite Decimal values."""
 
-    Supports Decimal serialization to float in JSON.
-    """
+    @model_validator(mode="after")
+    def validate_finite_decimals(self) -> RiskContract:
+        """Ensure all Decimal values within the model are finite numbers.
+
+        Raises:
+            ValueError: If NaN or infinity is detected in any Decimal field.
+
+        Returns:
+            RiskContract: The validated model instance.
+        """
+        for field_name, value in self.__dict__.items():
+            if isinstance(value, Decimal):
+                if value.is_nan() or value.is_infinite():
+                    msg = f"Field {field_name} must be a finite Decimal."
+                    raise ValueError(msg)
+            elif isinstance(value, dict):
+                for k, val in value.items():
+                    if isinstance(val, Decimal) and (val.is_nan() or val.is_infinite()):
+                        msg_dict = (
+                            f"Nested field {field_name}[{k}] must be a finite Decimal."
+                        )
+                        raise ValueError(msg_dict)
+            elif isinstance(value, list):
+                for idx, val in enumerate(value):
+                    if isinstance(val, Decimal) and (val.is_nan() or val.is_infinite()):
+                        msg_list = (
+                            f"Nested field {field_name}[{idx}] "
+                            "must be a finite Decimal."
+                        )
+                        raise ValueError(msg_list)
+        return self
 
     def to_json(self) -> str:
-        """Serialize contract to deterministic canonical JSON string."""
+        """Serialize contract to deterministic canonical JSON string.
+
+        Returns:
+            str: Canonical JSON string.
+        """
+        from app.services.risk.models.serialization import _coerce_types
         from app.utils.errors import ValidationError
         from app.utils.standard import canonical_json
 
         try:
-            dump = self.model_dump()
-
-            # Helper to recursively convert Decimal and datetime objects
-            def _coerce_types(v: Any) -> Any:  # noqa: ANN401
-                if isinstance(v, Decimal):
-                    return float(v)
-                if isinstance(v, datetime):
-                    return v.isoformat()
-                if isinstance(v, dict):
-                    return {k: _coerce_types(val) for k, val in v.items()}
-                if isinstance(v, list):
-                    return [_coerce_types(val) for val in v]
-                return v
-
-            return canonical_json(_coerce_types(dump))
+            return canonical_json(_coerce_types(self.model_dump()))
         except Exception as e:
             msg = f"Failed to serialize contract: {e}"
             raise ValidationError(msg) from e
+
+    def content_hash(self) -> str:
+        """Calculate a stable SHA256 hash over business-data fields only.
+
+        Returns:
+            str: SHA256 hex digest.
+        """
+        import hashlib
+
+        from app.services.contracts.base import _TRACE_FIELDS
+        from app.services.risk.models.serialization import _coerce_types
+        from app.utils.standard import canonical_json
+
+        payload = {k: v for k, v in self.model_dump().items() if k not in _TRACE_FIELDS}
+        try:
+            return hashlib.sha256(
+                canonical_json(_coerce_types(payload)).encode("utf-8")
+            ).hexdigest()
+        except Exception as e:
+            from app.utils.errors import ValidationError
+
+            msg = f"Failed to hash contract: {e}"
+            raise ValidationError(msg) from e
+
+
+class RiskEvidenceRef(RiskContract):
+    """Reference tracking data source or external snapshot proof."""
+
+    source: str = Field(..., description="Source system or category.")
+    reference_id: str = Field(..., description="Source unique identifier.")
+    timestamp: datetime = Field(..., description="Source creation timestamp.")
+
+
+class ProposedTrade(RiskContract):
+    """Details of a candidate trade proposed for risk validation."""
+
+    strategy_id: str = Field(..., description="Target strategy.")
+    symbol: str = Field(..., description="Trade symbol.")
+    side: Literal["buy", "sell"] = Field(..., description="Order side.")
+    volume: Decimal = Field(..., description="Requested volume in lots.")
+    price: Decimal = Field(
+        default=Decimal("0.0"), description="Intended entry execution price."
+    )
+    stop_loss: Decimal | None = Field(
+        default=None, description="Intended stop loss price."
+    )
+    requires_live_execution: bool = Field(
+        default=False, description="True if evaluating live execution environment."
+    )
+    requested_size: Decimal | None = Field(
+        default=None, description="Requested trade volume size in lots."
+    )
+    order_type: str | None = Field(
+        default=None, description="Order type (e.g. buy_limit, sell_stop)."
+    )
+    intended_stop: Decimal | None = Field(
+        default=None, description="Intended stop loss price."
+    )
+    intended_target: Decimal | None = Field(
+        default=None, description="Intended take profit target price."
+    )
+
+    signal_id: str | None = Field(
+        default=None, description="Associated signal identifier."
+    )
+    timestamp: datetime | None = Field(
+        default=None, description="Proposed trade creation timestamp."
+    )
+    expected_holding_period: float | None = Field(
+        default=None, description="Expected holding duration in seconds."
+    )
+    evidence_references: list[RiskEvidenceRef] | None = Field(
+        default=None, description="Associated evidence references."
+    )
+
+    @model_validator(mode="after")
+    def sync_trade_fields(self) -> ProposedTrade:
+        """Synchronize alias fields for ProposedTrade.
+
+        Returns:
+            ProposedTrade: The synchronized trade model.
+        """
+        if self.requested_size is None:
+            self.requested_size = self.volume
+        if self.intended_stop is None:
+            self.intended_stop = self.stop_loss
+        return self
+
+
+class ProposedAllocation(RiskContract):
+    """Candidate strategy capital allocation budgets."""
+
+    allocations: dict[str, Decimal] = Field(
+        ..., description="Desired strategy-to-capital mapping."
+    )
+    as_of: datetime = Field(..., description="Calculation timestamp.")
+    evidence_references: list[RiskEvidenceRef] | None = Field(
+        default=None, description="Associated evidence references."
+    )
+
+
+class StrategyAdmissionRequest(RiskContract):
+    """Request to admit a new strategy to the system registry."""
+
+    strategy_id: str = Field(..., description="Strategy identifier.")
+    evidence: dict[str, Any] = Field(
+        default_factory=dict, description="Performance and validation metrics."
+    )
+    research_evidence: dict[str, Any] | None = Field(
+        default=None, description="Research phase evidence."
+    )
+    simulation_evidence: dict[str, Any] | None = Field(
+        default=None, description="Backtest/simulation results."
+    )
+    risk_evidence: dict[str, Any] | None = Field(
+        default=None, description="Risk profile metrics."
+    )
+
+
+class PositionState(RiskContract):
+    """Current state snapshot of an open position."""
+
+    position_id: str = Field(..., description="Unique position identifier.")
+    symbol: str = Field(..., description="Symbol being traded.")
+    direction: Literal["long", "short"] = Field(..., description="Position direction.")
+    quantity: Decimal = Field(..., description="Position size in lots.")
+    entry_price: Decimal = Field(..., description="Average position entry price.")
+    current_price: Decimal = Field(..., description="Current market price.")
+    floating_pnl: Decimal = Field(..., description="Current unrealized PnL.")
+    margin_required: Decimal = Field(..., description="Margin requirement.")
+    strategy_id: str = Field(
+        ..., description="ID of the strategy owning this position."
+    )
+    open_time: datetime = Field(
+        ..., description="Timestamp of when the position opened."
+    )
+
+
+class PortfolioState(RiskContract):
+    """Consolidated state snapshot of the trading account and positions."""
+
+    account_id: str = Field(..., description="Unique account identifier.")
+    balance: Decimal = Field(..., description="Current cash balance.")
+    equity: Decimal = Field(..., description="Current net equity.")
+    margin_used: Decimal = Field(..., description="Total margin utilized.")
+    free_margin: Decimal = Field(..., description="Available free margin.")
+    floating_pnl: Decimal = Field(..., description="Total floating unrealized PnL.")
+    realized_pnl: Decimal = Field(..., description="Total realized transaction PnL.")
+    currency: str = Field(..., description="Account base currency.")
+    historical_returns: list[Decimal] = Field(
+        default_factory=list, description="Historical portfolio returns for VaR."
+    )
+    as_of: datetime = Field(..., description="Snapshot calculation timestamp.")
+    positions: list[PositionState] = Field(
+        default_factory=list, description="List of currently active positions."
+    )
+    orders: list[Any] = Field(
+        default_factory=list, description="List of pending/active orders."
+    )
+    strategy_allocations: dict[str, Decimal] = Field(
+        default_factory=dict, description="Capital allocation details by strategy."
+    )
 
 
 class RiskSubConfig(RiskContract):
@@ -428,303 +543,6 @@ class RiskConfig(RiskContract):
         return self
 
 
-class PositionState(RiskContract):
-    """Current state snapshot of an open position."""
-
-    position_id: str = Field(..., description="Unique position identifier.")
-    symbol: str = Field(..., description="Symbol being traded.")
-    direction: Literal["long", "short"] = Field(..., description="Position direction.")
-    quantity: Decimal = Field(..., description="Position size in lots.")
-    entry_price: Decimal = Field(..., description="Average position entry price.")
-    current_price: Decimal = Field(..., description="Current market price.")
-    floating_pnl: Decimal = Field(..., description="Current unrealized PnL.")
-    margin_required: Decimal = Field(..., description="Margin requirement.")
-    strategy_id: str = Field(
-        ..., description="ID of the strategy owning this position."
-    )
-    open_time: datetime = Field(
-        ..., description="Timestamp of when the position opened."
-    )
-
-
-class PortfolioState(RiskContract):
-    """Consolidated state snapshot of the trading account and positions."""
-
-    account_id: str = Field(..., description="Unique account identifier.")
-    balance: Decimal = Field(..., description="Current cash balance.")
-    equity: Decimal = Field(..., description="Current net equity.")
-    margin_used: Decimal = Field(..., description="Total margin utilized.")
-    free_margin: Decimal = Field(..., description="Available free margin.")
-    floating_pnl: Decimal = Field(..., description="Total floating unrealized PnL.")
-    realized_pnl: Decimal = Field(..., description="Total realized transaction PnL.")
-    currency: str = Field(..., description="Account base currency.")
-    historical_returns: list[Decimal] = Field(
-        default_factory=list, description="Historical portfolio returns for VaR."
-    )
-    as_of: datetime = Field(..., description="Snapshot calculation timestamp.")
-    positions: list[PositionState] = Field(
-        default_factory=list, description="List of currently active positions."
-    )
-    orders: list[Any] = Field(
-        default_factory=list, description="List of pending/active orders."
-    )
-    strategy_allocations: dict[str, Decimal] = Field(
-        default_factory=dict, description="Capital allocation details by strategy."
-    )
-
-
-class ProposedTrade(RiskContract):
-    """Details of a candidate trade proposed for risk validation."""
-
-    strategy_id: str = Field(..., description="Target strategy.")
-    symbol: str = Field(..., description="Trade symbol.")
-    side: Literal["buy", "sell"] = Field(..., description="Order side.")
-    volume: Decimal = Field(..., description="Requested volume in lots.")
-    price: Decimal = Field(
-        default=Decimal("0.0"), description="Intended entry execution price."
-    )
-    stop_loss: Decimal | None = Field(
-        default=None, description="Intended stop loss price."
-    )
-    requires_live_execution: bool = Field(
-        default=False, description="True if evaluating live execution environment."
-    )
-
-    # Added to fully meet checklist requirements
-    requested_size: Decimal | None = Field(
-        default=None, description="Requested trade volume size in lots."
-    )
-    order_type: str | None = Field(
-        default=None, description="Order type (e.g. buy_limit, sell_stop)."
-    )
-    intended_stop: Decimal | None = Field(
-        default=None, description="Intended stop loss price."
-    )
-    intended_target: Decimal | None = Field(
-        default=None, description="Intended take profit target price."
-    )
-    signal_id: str | None = Field(
-        default=None, description="Associated signal identifier."
-    )
-    timestamp: datetime | None = Field(
-        default=None, description="Proposed trade creation timestamp."
-    )
-    expected_holding_period: float | None = Field(
-        default=None, description="Expected holding duration in seconds."
-    )
-    evidence_references: list[RiskEvidenceRef] | None = Field(
-        default=None, description="Associated evidence references."
-    )
-
-    @model_validator(mode="after")
-    def sync_trade_fields(self) -> ProposedTrade:
-        """Synchronize alias fields for ProposedTrade."""
-        if self.requested_size is None:
-            self.requested_size = self.volume
-        if self.intended_stop is None:
-            self.intended_stop = self.stop_loss
-        return self
-
-
-class ProposedAllocation(RiskContract):
-    """Candidate strategy capital allocation budgets."""
-
-    allocations: dict[str, Decimal] = Field(
-        ..., description="Desired strategy-to-capital mapping."
-    )
-    as_of: datetime = Field(..., description="Calculation timestamp.")
-
-
-class PositionSizingRequest(RiskContract):
-    """Details needed to calculate position size options."""
-
-    symbol: str = Field(..., description="Symbol for the trade.")
-    method: str = Field(..., description="Sizing method to evaluate.")
-    fixed_volume: Decimal | None = Field(
-        default=None, description="Static size for fixed_lot."
-    )
-    risk_percent: Decimal | None = Field(
-        default=None, description="Risk budget allocation percent."
-    )
-    stop_loss_pips: Decimal | None = Field(
-        default=None, description="Stop loss distance in pips."
-    )
-    atr_value: Decimal | None = Field(
-        default=None, description="Current ATR value for volatility sizing."
-    )
-    multiplier: Decimal | None = Field(
-        default=None, description="ATR multiplier factor."
-    )
-    risk_amount: Decimal | None = Field(
-        default=None, description="Fixed dollar risk amount."
-    )
-
-
-class PositionSizingResult(RiskContract):
-    """Output calculated by the position sizing engine."""
-
-    calculated_volume: Decimal = Field(..., description="Calculated lot volume.")
-    stop_distance_pips: Decimal | None = Field(
-        default=None, description="Evaluated pip stop distance."
-    )
-    kelly_fraction_applied: Decimal | None = Field(
-        default=None, description="Applied Kelly fraction modifier."
-    )
-    sizing_method: str = Field(
-        default="fixed_lot", description="Applied calculator type."
-    )
-    constraints_applied: list[str] = Field(
-        default_factory=list, description="Names of constraints evaluated."
-    )
-    risk_contribution: Decimal = Field(
-        default=Decimal("0.0"), description="Portfolio risk or margin contribution."
-    )
-
-
-class RiskApprovalToken(RiskContract):
-    """Cryptographically signed approval token allowing order routing."""
-
-    token_id: str = Field(..., description="Unique token ID.")
-    request_id: str = Field(..., description="Associated request ID.")
-    workflow_id: str = Field(..., description="Associated workflow run identifier.")
-    approved_action: str = Field(..., description="Approved action payload reference.")
-    approver: str = Field(..., description="Authorized approver name/system.")
-    expiry_time: datetime = Field(..., description="Expiration timestamp.")
-    config_hash: str = Field(..., description="Evaluated risk configuration hash.")
-    decision_hash: str = Field(..., description="Evaluated decision payload hash.")
-    policy_hash: str | None = Field(
-        default=None, description="Active policy signature hash."
-    )
-    scope: dict[str, Any] = Field(
-        default_factory=dict, description="Scope restriction parameters."
-    )
-    nonce: str = Field(..., description="Anti-replay nonce.")
-    signature: str = Field(..., description="Crypto approval signature.")
-
-
-class RiskDecisionPackage(RiskContract):
-    """Canonical output envelope for all Risk Governor reviews."""
-
-    decision_id: str = Field(..., description="Unique decision ID.")
-    request_id: str = Field(..., description="Associated request ID.")
-    workflow_id: str = Field(..., description="Associated workflow ID.")
-    status: str = Field(..., description="Status (approve, reject, block, etc.).")
-    rule_key: str = Field(..., description="Key of the primary limiting policy rule.")
-    snapshot_as_of: datetime = Field(..., description="Data snapshot timestamp.")
-    config_hash: str = Field(..., description="Active configuration hash.")
-    reason: str = Field(..., description="Explanation of decision.")
-    composite_breach_flags: list[str] = Field(
-        default_factory=list, description="Identifiers of all breached constraints."
-    )
-    calculated_volume: Decimal | None = Field(
-        default=None, description="Optionally approved sized volume."
-    )
-    details: dict[str, Any] = Field(
-        default_factory=dict, description="Arbitrary decision details."
-    )
-
-    # Added to fully meet checklist requirements
-    requested_size: Decimal | None = Field(
-        default=None, description="Requested lot volume."
-    )
-    approved_size: Decimal | None = Field(
-        default=None, description="Optionally approved lot volume."
-    )
-    max_allowed_size: Decimal | None = Field(
-        default=None, description="Maximum allowed volume."
-    )
-    action: str | None = Field(default=None, description="Evaluation action category.")
-    reason_codes: list[str] | None = Field(
-        default=None, description="Breached constraint codes."
-    )
-    risk_snapshot: PortfolioRiskSnapshot | None = Field(
-        default=None, description="Summarized risk snapshot parameters."
-    )
-    policy_hash: str | None = Field(
-        default=None, description="Active policy signature hash."
-    )
-    decision_token: RiskDecisionToken | None = Field(
-        default=None, description="Cryptographically signed approval token."
-    )
-    expiry: datetime | None = Field(
-        default=None, description="Decision validity expiration timestamp."
-    )
-    audit_hash_reference: str | None = Field(
-        default=None, description="Audit trail link reference hash."
-    )
-    policy_version: str | None = Field(
-        default=None, description="Active policy version identifier."
-    )
-    policy_scope: dict[str, Any] | None = Field(
-        default=None, description="Active policy scope attributes."
-    )
-
-    @model_validator(mode="after")
-    def sync_package_fields(self) -> RiskDecisionPackage:  # noqa: C901, PLR0912
-        """Synchronize alias fields for RiskDecisionPackage."""
-        if self.approved_size is None:
-            self.approved_size = self.calculated_volume
-        if self.reason_codes is None:
-            self.reason_codes = list(self.composite_breach_flags)
-        if self.requested_size is None and self.details:
-            vol = self.details.get("requested_volume") or self.details.get("volume")
-            if vol is not None:
-                self.requested_size = Decimal(str(vol))
-        if self.max_allowed_size is None and self.details:
-            max_vol = self.details.get("max_volume") or self.details.get(
-                "max_allowed_volume"
-            )
-            if max_vol is not None:
-                self.max_allowed_size = Decimal(str(max_vol))
-        if self.action is None and self.details:
-            self.action = self.details.get("action")
-        if self.policy_hash is None and self.details:
-            self.policy_hash = self.details.get("policy_hash")
-        if self.decision_token is None and self.details:
-            token_dict = self.details.get("decision_token") or self.details.get("token")
-            if isinstance(token_dict, dict):
-                with contextlib.suppress(Exception):
-                    self.decision_token = RiskDecisionToken.model_validate(token_dict)
-        if self.expiry is None and self.details:
-            exp = self.details.get("expiry_time") or self.details.get("expiry")
-            if isinstance(exp, str):
-                from app.utils.normalization import parse_datetime
-
-                with contextlib.suppress(Exception):
-                    self.expiry = parse_datetime(exp)
-            elif isinstance(exp, datetime):
-                self.expiry = exp
-        if self.audit_hash_reference is None and self.details:
-            self.audit_hash_reference = self.details.get(
-                "audit_hash"
-            ) or self.details.get("hash")
-        if self.policy_version is None and self.details:
-            self.policy_version = self.details.get("policy_version")
-        if self.policy_scope is None and self.details:
-            self.policy_scope = self.details.get("policy_scope") or self.details.get(
-                "scope"
-            )
-        return self
-
-
-class StressScenario(RiskContract):
-    """Hypothetical macro market shock parameter sets."""
-
-    name: str = Field(..., description="Scenario identifier name.")
-    price_shocks: dict[str, Decimal] = Field(
-        default_factory=dict, description="Symbol-to-pct price shift map."
-    )
-
-
-class StrategyAdmissionRequest(RiskContract):
-    """Request to admit a new strategy to the system registry."""
-
-    strategy_id: str = Field(..., description="Strategy identifier.")
-    evidence: dict[str, Any] = Field(
-        default_factory=dict, description="Performance and validation metrics."
-    )
-
-
 class RiskAssessmentRequest(RiskContract):
     """Input encapsulation for a complete governor evaluation run."""
 
@@ -741,8 +559,6 @@ class RiskAssessmentRequest(RiskContract):
     market_context: dict[str, Any] = Field(
         default_factory=dict, description="Live market spreads, slippage, volatility."
     )
-
-    # Added to fully meet checklist requirements
     account_state: dict[str, Any] | None = Field(
         default=None, description="Consolidated account balance and parameters."
     )
@@ -767,7 +583,11 @@ class RiskAssessmentRequest(RiskContract):
 
     @model_validator(mode="after")
     def sync_request_fields(self) -> RiskAssessmentRequest:  # noqa: C901
-        """Synchronize alias fields for RiskAssessmentRequest."""
+        """Synchronize alias fields for RiskAssessmentRequest.
+
+        Returns:
+            RiskAssessmentRequest: The synchronized request.
+        """
         if self.account_state is None:
             self.account_state = {
                 "balance": float(self.portfolio_state.balance),
@@ -815,28 +635,8 @@ class RiskAssessmentRequest(RiskContract):
         return self
 
 
-class RiskPolicyProfile(RiskContract):
-    """Policy profile metadata wrapping config parameters."""
-
-    profile_name: str = Field(..., description="Configuration profile name.")
-    description: str | None = Field(
-        default=None, description="Optional profile description."
-    )
-    config: RiskConfig = Field(
-        ..., description="Associated risk limits config parameters."
-    )
-
-
 class RiskSnapshot(RiskContract):
     """Base class for all risk governance snapshots."""
-
-
-class RiskEvidenceRef(RiskContract):
-    """Reference tracking data source or external snapshot proof."""
-
-    source: str = Field(..., description="Source system or category.")
-    reference_id: str = Field(..., description="Source unique identifier.")
-    timestamp: datetime = Field(..., description="Source creation timestamp.")
 
 
 class AccountRiskSnapshot(RiskSnapshot):
@@ -845,8 +645,8 @@ class AccountRiskSnapshot(RiskSnapshot):
     equity: Decimal = Field(..., description="Net asset equity.")
     balance: Decimal = Field(..., description="Cash balance.")
     free_margin: Decimal = Field(..., description="Available free margin.")
-    margin_used: Decimal = Field(..., description="Total used margin.")
-    leverage: Decimal = Field(..., description="Account leverage.")
+    margin_used: Decimal = Field(..., description="Total used margin.", ge=0)
+    leverage: Decimal = Field(..., description="Account leverage.", gt=0)
     base_currency: str = Field(..., description="Base currency.")
     timestamp: datetime = Field(..., description="Calculation timestamp.")
 
@@ -854,8 +654,8 @@ class AccountRiskSnapshot(RiskSnapshot):
 class MarketRiskSnapshot(RiskSnapshot):
     """Sub-snapshot capturing market regime parameters."""
 
-    spread: Decimal = Field(..., description="Current symbol spread.")
-    volatility: Decimal = Field(..., description="Current volatility metric.")
+    spread: Decimal = Field(..., description="Current symbol spread.", ge=0)
+    volatility: Decimal = Field(..., description="Current volatility metric.", ge=0)
     session: str = Field(..., description="Market session name.")
     rollover_time: datetime | None = Field(
         default=None, description="Expected next rollover time."
@@ -864,6 +664,29 @@ class MarketRiskSnapshot(RiskSnapshot):
         default=None, description="Current near news event impact level."
     )
     freshness: datetime = Field(..., description="Timestamp of quotes freshness.")
+
+
+class PositionRiskSnapshot(RiskSnapshot):
+    """Risk breakdown of a single open position."""
+
+    position_id: str = Field(..., description="Position ID.")
+    signed_size: Decimal = Field(
+        ..., description="Position size (positive long, negative short)."
+    )
+    entry_price: Decimal = Field(..., description="Entry price level.", gt=0)
+    current_price: Decimal = Field(..., description="Current market price.", gt=0)
+    pnl: Decimal = Field(..., description="Floating unrealized PnL.")
+    risk: Decimal = Field(..., description="Stop loss risk amount.", ge=0)
+    margin: Decimal = Field(..., description="Margin requirement.", ge=0)
+    strategy_id: str = Field(..., description="Strategy identifier.")
+    timestamp: datetime = Field(..., description="As-of timestamp.")
+
+
+class PendingOrderRiskSnapshot(RiskSnapshot):
+    """Exposure details of a pending order."""
+
+    order_id: str = Field(..., description="Order identifier.")
+    exposure: Decimal = Field(..., description="Order potential exposure.", ge=0)
 
 
 class PortfolioRiskSnapshot(RiskSnapshot):
@@ -878,33 +701,12 @@ class PortfolioRiskSnapshot(RiskSnapshot):
     in_flight_orders: list[Any] = Field(
         default_factory=list, description="Currently executing orders."
     )
-    exposure: Decimal = Field(..., description="Total gross exposure.")
-    var_es: Decimal = Field(..., description="Portfolio Value-at-Risk.")
-    stress_loss: Decimal = Field(..., description="Max projected stress test loss.")
-    drawdown: Decimal = Field(..., description="Current drawdown percentage.")
-
-
-class PositionRiskSnapshot(RiskSnapshot):
-    """Risk breakdown of a single open position."""
-
-    position_id: str = Field(..., description="Position ID.")
-    signed_size: Decimal = Field(
-        ..., description="Position size (positive long, negative short)."
+    exposure: Decimal = Field(..., description="Total gross exposure.", ge=0)
+    var_es: Decimal = Field(..., description="Portfolio Value-at-Risk.", ge=0)
+    stress_loss: Decimal = Field(
+        ..., description="Max projected stress test loss.", ge=0
     )
-    entry_price: Decimal = Field(..., description="Entry price level.")
-    current_price: Decimal = Field(..., description="Current market price.")
-    pnl: Decimal = Field(..., description="Floating unrealized PnL.")
-    risk: Decimal = Field(..., description="Stop loss risk amount.")
-    margin: Decimal = Field(..., description="Margin requirement.")
-    strategy_id: str = Field(..., description="Strategy identifier.")
-    timestamp: datetime = Field(..., description="As-of timestamp.")
-
-
-class PendingOrderRiskSnapshot(RiskSnapshot):
-    """Exposure details of a pending order."""
-
-    order_id: str = Field(..., description="Order identifier.")
-    exposure: Decimal = Field(..., description="Order potential exposure.")
+    drawdown: Decimal = Field(..., description="Current drawdown percentage.", ge=0)
 
 
 class CurrencyLegExposure(RiskContract):
@@ -917,7 +719,7 @@ class CurrencyLegExposure(RiskContract):
 class CurrencyExposure(RiskContract):
     """Portfolio currency leg exposure breakdown."""
 
-    gross: Decimal = Field(..., description="Gross exposure amount.")
+    gross: Decimal = Field(..., description="Gross exposure amount.", ge=0)
     net: Decimal = Field(..., description="Net exposure amount.")
     account_currency_equivalent: Decimal = Field(
         ..., description="Exposure in account currency."
@@ -929,7 +731,7 @@ class SymbolExposure(RiskContract):
 
     symbol: str = Field(..., description="Target symbol.")
     signed_amount: Decimal = Field(..., description="Signed symbol amount.")
-    gross: Decimal = Field(..., description="Gross exposure amount.")
+    gross: Decimal = Field(..., description="Gross exposure amount.", ge=0)
     net: Decimal = Field(..., description="Net exposure amount.")
     account_currency_equivalent: Decimal = Field(
         ..., description="Exposure in account currency."
@@ -942,10 +744,10 @@ class CorrelationSnapshot(RiskSnapshot):
     matrix: dict[str, dict[str, Decimal]] = Field(
         default_factory=dict, description="Correlation values table."
     )
-    lookback: int = Field(..., description="Lookback window length.")
+    lookback: int = Field(..., description="Lookback window length.", gt=0)
     timeframe: str = Field(..., description="Bar timeframe evaluated.")
     method: str = Field(..., description="Correlation formula method.")
-    sample_count: int = Field(..., description="Total samples aligned.")
+    sample_count: int = Field(..., description="Total samples aligned.", ge=0)
     fallback_status: bool = Field(
         ..., description="True if default fallback was applied."
     )
@@ -966,7 +768,7 @@ class CorrelationCluster(RiskContract):
     cluster_id: str = Field(..., description="Unique identifier for the cluster.")
     symbols: list[str] = Field(..., description="Symbols included in this cluster.")
     exposure: Decimal = Field(
-        ..., description="Aggregated gross exposure in account currency."
+        ..., description="Aggregated gross exposure in account currency.", ge=0
     )
 
 
@@ -974,10 +776,12 @@ class VaRSnapshot(RiskSnapshot):
     """Calculated Value-at-Risk parameters."""
 
     method: str = Field(..., description="Method used (e.g. parametric, historical).")
-    confidence: Decimal = Field(..., description="Confidence level (e.g. 0.95).")
-    portfolio_volatility: Decimal = Field(..., description="Portfolio volatility.")
-    exposure: Decimal = Field(..., description="Evaluated exposure size.")
-    result: Decimal = Field(..., description="VaR value.")
+    confidence: Decimal = Field(..., description="Confidence level (e.g. 0.95).", ge=0)
+    portfolio_volatility: Decimal = Field(
+        ..., description="Portfolio volatility.", ge=0
+    )
+    exposure: Decimal = Field(..., description="Evaluated exposure size.", ge=0)
+    result: Decimal = Field(..., description="VaR value.", ge=0)
     assumptions: dict[str, Any] = Field(
         default_factory=dict, description="Underlying model assumptions."
     )
@@ -986,10 +790,10 @@ class VaRSnapshot(RiskSnapshot):
 class ExpectedShortfallSnapshot(RiskSnapshot):
     """Calculated Expected Shortfall metrics."""
 
-    confidence: Decimal = Field(..., description="Confidence level (e.g. 0.95).")
-    threshold_loss: Decimal = Field(..., description="Threshold loss level.")
-    average_tail_loss: Decimal = Field(..., description="Average loss in tail.")
-    sample_count: int = Field(..., description="Return samples evaluated.")
+    confidence: Decimal = Field(..., description="Confidence level (e.g. 0.95).", ge=0)
+    threshold_loss: Decimal = Field(..., description="Threshold loss level.", ge=0)
+    average_tail_loss: Decimal = Field(..., description="Average loss in tail.", ge=0)
+    sample_count: int = Field(..., description="Return samples evaluated.", ge=0)
     method: str = Field(..., description="Expected shortfall method name.")
 
 
@@ -1015,33 +819,189 @@ class MarginRiskSnapshot(RiskSnapshot):
     """Margin metrics snapshot."""
 
     projected_margin: Decimal = Field(
-        ..., description="Projected total margin after trade."
+        ..., description="Projected total margin after trade.", ge=0
     )
     free_margin: Decimal = Field(..., description="Free margin available.")
-    margin_usage: Decimal = Field(..., description="Margin usage percentage.")
-    leverage: Decimal = Field(..., description="Active leverage multiplier.")
+    margin_usage: Decimal = Field(..., description="Margin usage percentage.", ge=0)
+    leverage: Decimal = Field(..., description="Active leverage multiplier.", gt=0)
 
 
 class DrawdownState(RiskContract):
     """Drawdown throttling status metrics."""
 
-    current_drawdown: Decimal = Field(..., description="Current drawdown percentage.")
-    soft_limit: Decimal = Field(..., description="Advisory soft limit percentage.")
-    hard_limit: Decimal = Field(..., description="Hard blocking limit percentage.")
-    multiplier: Decimal = Field(..., description="Applied risk scale step-down factor.")
+    current_drawdown: Decimal = Field(
+        ..., description="Current drawdown percentage.", ge=0
+    )
+    soft_limit: Decimal = Field(
+        ..., description="Advisory soft limit percentage.", ge=0
+    )
+    hard_limit: Decimal = Field(
+        ..., description="Hard blocking limit percentage.", ge=0
+    )
+    multiplier: Decimal = Field(
+        ..., description="Applied risk scale step-down factor.", ge=0
+    )
 
 
 class ExecutionRiskSnapshot(RiskSnapshot):
     """Execution feasibility conditions."""
 
-    spread: Decimal = Field(..., description="Active spread.")
-    slippage: Decimal = Field(..., description="Active slippage.")
-    stop_level: Decimal = Field(..., description="Broker minimum stop level.")
-    freeze_level: Decimal = Field(..., description="Broker order modify freeze level.")
-    lot_step: Decimal = Field(..., description="Lot size minimum step granularity.")
+    spread: Decimal = Field(..., description="Active spread.", ge=0)
+    slippage: Decimal = Field(..., description="Active slippage.", ge=0)
+    stop_level: Decimal = Field(..., description="Broker minimum stop level.", ge=0)
+    freeze_level: Decimal = Field(
+        ..., description="Broker order modify freeze level.", ge=0
+    )
+    lot_step: Decimal = Field(
+        ..., description="Lot size minimum step granularity.", gt=0
+    )
     marketability: bool = Field(
         ..., description="True if conditions permit order entries."
     )
+
+
+class RiskApprovalToken(RiskContract):
+    """Cryptographically signed approval token allowing order routing."""
+
+    token_id: str = Field(..., description="Unique token ID.")
+    request_id: str = Field(..., description="Associated request ID.")
+    workflow_id: str = Field(..., description="Associated workflow run identifier.")
+    approved_action: str = Field(..., description="Approved action payload reference.")
+    approver: str = Field(..., description="Authorized approver name/system.")
+    expiry_time: datetime = Field(..., description="Expiration timestamp.")
+    config_hash: str = Field(..., description="Evaluated risk configuration hash.")
+    decision_hash: str = Field(..., description="Evaluated decision payload hash.")
+    policy_hash: str | None = Field(
+        default=None, description="Active policy signature hash."
+    )
+    scope: dict[str, Any] = Field(
+        default_factory=dict, description="Scope restriction parameters."
+    )
+    nonce: str = Field(..., description="Anti-replay nonce.")
+    signature: str = Field(..., description="Crypto approval signature.")
+
+
+class RiskDecisionToken(RiskContract):
+    """Token representing risk decision."""
+
+    token_id: str = Field(..., description="Unique token ID.")
+    expiry: datetime = Field(..., description="Expiration timestamp.")
+    policy_hash: str = Field(..., description="Policy hash.")
+    config_hash: str = Field(..., description="Active configuration hash.")
+    signature: str = Field(..., description="Approval signature.")
+    revoked: bool = Field(default=False, description="True if token is revoked.")
+    scope: dict[str, Any] = Field(
+        default_factory=dict, description="Scope restriction parameters."
+    )
+
+
+class RiskDecisionPackage(RiskContract):
+    """Canonical output envelope for all Risk Governor reviews."""
+
+    decision_id: str = Field(..., description="Unique decision ID.")
+    request_id: str = Field(..., description="Associated request ID.")
+    workflow_id: str = Field(..., description="Associated workflow ID.")
+    status: RiskDecisionStatus = Field(
+        ..., description="Status (approve, reject, block, etc.)."
+    )
+    rule_key: str = Field(..., description="Key of the primary limiting policy rule.")
+    snapshot_as_of: datetime = Field(..., description="Data snapshot timestamp.")
+    config_hash: str = Field(..., description="Active configuration hash.")
+    reason: str = Field(..., description="Explanation of decision.")
+    composite_breach_flags: list[str] = Field(
+        default_factory=list, description="Identifiers of all breached constraints."
+    )
+    calculated_volume: Decimal | None = Field(
+        default=None, description="Optionally approved sized volume.", ge=0
+    )
+    details: dict[str, Any] = Field(
+        default_factory=dict, description="Arbitrary decision details."
+    )
+    requested_size: Decimal | None = Field(
+        default=None, description="Requested lot volume.", ge=0
+    )
+    approved_size: Decimal | None = Field(
+        default=None, description="Optionally approved lot volume.", ge=0
+    )
+    max_allowed_size: Decimal | None = Field(
+        default=None, description="Maximum allowed volume.", ge=0
+    )
+    action: str | None = Field(default=None, description="Evaluation action category.")
+    reason_codes: list[str] | None = Field(
+        default=None, description="Breached constraint codes."
+    )
+    risk_snapshot: PortfolioRiskSnapshot | None = Field(
+        default=None, description="Summarized risk snapshot parameters."
+    )
+    policy_hash: str | None = Field(
+        default=None, description="Active policy signature hash."
+    )
+    decision_token: RiskDecisionToken | None = Field(
+        default=None, description="Cryptographically signed approval token."
+    )
+    expiry: datetime | None = Field(
+        default=None, description="Decision validity expiration timestamp."
+    )
+    audit_hash_reference: str | None = Field(
+        default=None, description="Audit trail link reference hash."
+    )
+    policy_version: str | None = Field(
+        default=None, description="Active policy version identifier."
+    )
+    policy_scope: dict[str, Any] | None = Field(
+        default=None, description="Active policy scope attributes."
+    )
+
+    @model_validator(mode="after")
+    def sync_package_fields(self) -> RiskDecisionPackage:  # noqa: C901, PLR0912
+        """Synchronize alias fields for RiskDecisionPackage.
+
+        Returns:
+            RiskDecisionPackage: The synchronized package.
+        """
+        if self.approved_size is None:
+            self.approved_size = self.calculated_volume
+        if self.reason_codes is None:
+            self.reason_codes = list(self.composite_breach_flags)
+        if self.requested_size is None and self.details:
+            vol = self.details.get("requested_volume") or self.details.get("volume")
+            if vol is not None:
+                self.requested_size = Decimal(str(vol))
+        if self.max_allowed_size is None and self.details:
+            max_vol = self.details.get("max_volume") or self.details.get(
+                "max_allowed_volume"
+            )
+            if max_vol is not None:
+                self.max_allowed_size = Decimal(str(max_vol))
+        if self.action is None and self.details:
+            self.action = self.details.get("action")
+        if self.policy_hash is None and self.details:
+            self.policy_hash = self.details.get("policy_hash")
+        if self.decision_token is None and self.details:
+            token_dict = self.details.get("decision_token") or self.details.get("token")
+            if isinstance(token_dict, dict):
+                with contextlib.suppress(Exception):
+                    self.decision_token = RiskDecisionToken.model_validate(token_dict)
+        if self.expiry is None and self.details:
+            exp = self.details.get("expiry_time") or self.details.get("expiry")
+            if isinstance(exp, str):
+                from app.utils.normalization import parse_datetime
+
+                with contextlib.suppress(Exception):
+                    self.expiry = parse_datetime(exp)
+            elif isinstance(exp, datetime):
+                self.expiry = exp
+        if self.audit_hash_reference is None and self.details:
+            self.audit_hash_reference = self.details.get(
+                "audit_hash"
+            ) or self.details.get("hash")
+        if self.policy_version is None and self.details:
+            self.policy_version = self.details.get("policy_version")
+        if self.policy_scope is None and self.details:
+            self.policy_scope = self.details.get("policy_scope") or self.details.get(
+                "scope"
+            )
+        return self
 
 
 class RiskRejection(RiskContract):
@@ -1069,7 +1029,7 @@ class RiskWarning(RiskContract):
 class RiskReduction(RiskContract):
     """Details of a volume scale-down suggestion."""
 
-    reduced_volume: Decimal = Field(..., description="Target scaled lot size.")
+    reduced_volume: Decimal = Field(..., description="Target scaled lot size.", ge=0)
     reason: str = Field(..., description="Reason for reduction.")
 
 
@@ -1083,14 +1043,14 @@ class RiskBudget(RiskContract):
     """Strategy allocation limit limits."""
 
     strategy_id: str = Field(..., description="Strategy identifier.")
-    limit_pct: Decimal = Field(..., description="Allocation ceiling percentage.")
+    limit_pct: Decimal = Field(..., description="Allocation ceiling percentage.", ge=0)
 
 
 class RiskBudgetUtilization(RiskContract):
     """Strategy budget utilization snapshot."""
 
     strategy_id: str = Field(..., description="Strategy identifier.")
-    utilized_pct: Decimal = Field(..., description="Allocation usage percentage.")
+    utilized_pct: Decimal = Field(..., description="Allocation usage percentage.", ge=0)
 
 
 class RiskAuditEvent(RiskContract):
@@ -1112,20 +1072,6 @@ class RiskAuditEvent(RiskContract):
     )
     details: dict[str, Any] = Field(
         default_factory=dict, description="Detailed request/outcome payload context."
-    )
-
-
-class RiskDecisionToken(RiskContract):
-    """Token representing risk decision."""
-
-    token_id: str = Field(..., description="Unique token ID.")
-    expiry: datetime = Field(..., description="Expiration timestamp.")
-    policy_hash: str = Field(..., description="Policy hash.")
-    config_hash: str = Field(..., description="Active configuration hash.")
-    signature: str = Field(..., description="Approval signature.")
-    revoked: bool = Field(default=False, description="True if token is revoked.")
-    scope: dict[str, Any] = Field(
-        default_factory=dict, description="Scope restriction parameters."
     )
 
 
@@ -1197,33 +1143,134 @@ class PolicyEnforcementResult(RiskContract):
     )
 
 
-class KillSwitchStateEnum(StrEnum):
-    """Safety kill-switch states.
+class PositionSizingRequest(RiskContract):
+    """Details needed to calculate position size options."""
 
-    States progress: INACTIVE → TRIGGERED → ACTIVE → PENDING_RESUME → INACTIVE.
-    LOCKED is a special terminal state requiring admin/compliance intervention.
-    UNKNOWN signals an indeterminate state and must always fail closed.
+    symbol: str = Field(..., description="Symbol for the trade.")
+    method: str = Field(..., description="Sizing method to evaluate.")
+    fixed_volume: Decimal | None = Field(
+        default=None, description="Static size for fixed_lot."
+    )
+    risk_percent: Decimal | None = Field(
+        default=None, description="Risk budget allocation percent."
+    )
+    stop_loss_pips: Decimal | None = Field(
+        default=None, description="Stop loss distance in pips."
+    )
+    atr_value: Decimal | None = Field(
+        default=None, description="Current ATR value for volatility sizing."
+    )
+    multiplier: Decimal | None = Field(
+        default=None, description="ATR multiplier factor."
+    )
+    risk_amount: Decimal | None = Field(
+        default=None, description="Fixed dollar risk amount."
+    )
+
+
+class PositionSizingResult(RiskContract):
+    """Output calculated by the position sizing engine."""
+
+    calculated_volume: Decimal = Field(..., description="Calculated lot volume.", ge=0)
+    stop_distance_pips: Decimal | None = Field(
+        default=None, description="Evaluated pip stop distance.", ge=0
+    )
+    kelly_fraction_applied: Decimal | None = Field(
+        default=None, description="Applied Kelly fraction modifier.", ge=0
+    )
+    sizing_method: str = Field(
+        default="fixed_lot", description="Applied calculator type."
+    )
+    constraints_applied: list[str] = Field(
+        default_factory=list, description="Names of constraints evaluated."
+    )
+    risk_contribution: Decimal = Field(
+        default=Decimal("0.0"), description="Portfolio risk or margin contribution."
+    )
+
+
+class StressScenario(RiskContract):
+    """Hypothetical macro market shock parameter sets."""
+
+    name: str = Field(..., description="Scenario identifier name.")
+    price_shocks: dict[str, Decimal] = Field(
+        default_factory=dict, description="Symbol-to-pct price shift map."
+    )
+
+
+class RiskPolicyProfile(RiskContract):
+    """Policy profile metadata wrapping config parameters."""
+
+    profile_name: str = Field(..., description="Configuration profile name.")
+    description: str | None = Field(
+        default=None, description="Optional profile description."
+    )
+    config: RiskConfig = Field(
+        ..., description="Associated risk limits config parameters."
+    )
+
+
+def validate_risk_assessment_request(
+    request: RiskAssessmentRequest,
+) -> ValidationResult:
+    """Rejects missing or invalid canonical evidence before calculation.
+
+    Args:
+        request: The risk assessment request to validate.
+
+    Returns:
+        ValidationResult: The validation result.
     """
+    logger.info("Validating RiskAssessmentRequest: %s", request.request_id)
+    if not request.portfolio_state:
+        logger.warning("Validation failed: Missing portfolio_state.")
+        return {
+            "valid": False,
+            "message": "Missing portfolio_state.",
+            "code": "MISSING_EVIDENCE",
+            "details": {},
+        }
+    if not request.risk_config:
+        logger.warning("Validation failed: Missing risk_config.")
+        return {
+            "valid": False,
+            "message": "Missing risk_config.",
+            "code": "MISSING_EVIDENCE",
+            "details": {},
+        }
 
-    INACTIVE = "inactive"
-    ACTIVE = "active"
-    LOCKED = "locked"
-    UNKNOWN = "unknown"  # state cannot be determined → always fail closed
-    TRIGGERED = "triggered"  # halt signalled, not yet fully propagated
-    PENDING_RESUME = "pending_resume"  # awaiting governed approval to deactivate
+    # Check freshness of market snapshot if in live mode
+    if request.mode in (RiskMode.MICRO_LIVE, RiskMode.FULL_LIVE):
+        if not request.freshness:
+            logger.warning(
+                "Validation failed: Missing freshness timestamp for live mode."
+            )
+            return {
+                "valid": False,
+                "message": "Missing freshness timestamp for live mode.",
+                "code": "STALE_EVIDENCE",
+                "details": {},
+            }
+        from app.utils.normalization import utc_now
 
+        max_freshness_age_seconds = 60
+        age = (utc_now() - request.freshness).total_seconds()
+        if age > max_freshness_age_seconds:
+            logger.warning("Validation failed: Stale market context (age %s s).", age)
+            return {
+                "valid": False,
+                "message": f"Stale market context (age {age} s).",
+                "code": "STALE_EVIDENCE",
+                "details": {"age_seconds": age},
+            }
 
-class KillSwitchReason(StrEnum):
-    """Reason codes explaining why a kill switch was triggered."""
-
-    MANUAL_HALT = "manual_halt"
-    DAILY_LOSS_BREACH = "daily_loss_breach"
-    DRAWDOWN_BREACH = "drawdown_breach"
-    AUDIT_FAILURE = "audit_failure"
-    EXTREME_SPREAD = "extreme_spread"
-    PORTFOLIO_UNRECONCILED = "portfolio_unreconciled"
-    BROKER_DISCONNECT = "broker_disconnect"
-    MARGIN_EMERGENCY = "margin_emergency"
+    logger.info("RiskAssessmentRequest validated successfully.")
+    return {
+        "valid": True,
+        "message": "Validation passed.",
+        "code": "OK",
+        "details": {},
+    }
 
 
 def create_risk_decision_package(
@@ -1257,7 +1304,7 @@ def create_risk_decision_package(
     """
     from app.utils.normalization import utc_now
 
-    return RiskDecisionPackage(
+    pkg = RiskDecisionPackage(
         decision_id=decision_id,
         request_id=request_id,
         workflow_id=workflow_id,
@@ -1270,8 +1317,16 @@ def create_risk_decision_package(
         calculated_volume=calculated_volume,
         details=details or {},
     )
+    logger.info(
+        "Created RiskDecisionPackage: %s, status: %s, reason: %s",
+        decision_id,
+        status,
+        reason,
+    )
+    return pkg
 
 
+# Rebuild dynamic Pydantic structures for self-referential definitions
 ProposedTrade.model_rebuild()
 RiskAssessmentRequest.model_rebuild()
 RiskDecisionPackage.model_rebuild()

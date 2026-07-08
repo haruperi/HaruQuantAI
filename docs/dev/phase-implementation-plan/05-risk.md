@@ -1,10 +1,12 @@
-# Risk Governance - Architecture Requirements Document
+# Risk Governance - Architecture Requirements Document V2
 
 **Source of truth:** `05-risk-governance.md` only. This document translates its requirements into a Python architecture without introducing runtime features from outside the source material.
 
 **Coverage note:** The source headline declares **876 checkbox tasks**, but the file contains **865 labelled checkbox requirements**: 498 `RISK-FR`, 271 `RISK-NFR`, 35 `RISK-TEST`, and 61 `RISK-EX`. This document maps all 865 labelled requirements. The 11-task difference is retained as a source-inventory discrepancy for owner resolution; no requirement has been invented to close it.
 
 **Domain authority:** Risk is the final deterministic authority before Trading or Live mutation. It returns approved, reduced, rejected, blocked, evidence-needed, approval-needed, or halt decisions. It does not place, close, modify, or cancel broker orders.
+
+**Revision note:** Audit fix applied: every non-`__init__.py` file listed in the System Boundary Diagram now has its own Section 3 `#### 📄 File:` subsection, and repeated `### 📂 Module:` headers in Section 3 have been consolidated.
 
 ## 1. System Boundary Diagram (file structure)
 
@@ -13,7 +15,7 @@ app/services/risk/
 ├── __init__.py                         # Strict public gate; no import-time I/O; intentional exports only
 ├── readiness/                          # Phase-entry and delivery-readiness evidence
 │   ├── __init__.py
-│   └── phase_readiness.py
+│   └── readiness.py
 ├── models/                             # Canonical risk contracts and JSON-safe serialization
 │   ├── __init__.py
 │   ├── enums.py
@@ -289,7 +291,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Boundary Role:** Proves that Phase 5 starts only with canonical dependencies, explicit scope boundaries, safe fixtures, documented mode behavior, and an auditable delivery plan. It is a pre-runtime governance boundary and never evaluates a trade.
 
-#### 📄 File: `phase_readiness.py`
+#### 📄 File: `readiness.py`
 
 **File Boundary:** Phase-entry validation, dependency capability inspection, risk-mode coverage, and deterministic readiness reporting.
 
@@ -298,6 +300,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Establishes Risk as the deterministic pre-execution authority while preventing unauthorized domain ownership, hidden live dependencies, unsafe fixtures, and unplanned implementation work.
 
 **Requirements:**
+
 - **RISK-FR-001**: Phase 5 shall treat Risk Governance as a layered control system, not a single formula or indicator.
 - **RISK-FR-002**: Phase 5 shall make VaR one engine inside the RiskGovernor, not the whole risk strategy.
 - **RISK-FR-003**: Phase 5 shall use Expected Shortfall/CVaR and stress loss as stronger tail-risk approval controls than parametric VaR alone.
@@ -348,6 +351,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-048**: Record Phase 5 readiness decisions in the implementation report before coding.
 
 **Target Class/Function:**
+
 - `class Phase5ReadinessManifest` — typed, immutable delivery/readiness contract; **Pure** validation at construction.
 - `validate_phase_dependencies(dependencies: Mapping[str, DependencyStatus]) -> ReadinessAssessment` — validates canonical contracts, side-effect safety, ports, and test availability; **Pure**.
 - `validate_risk_mode_matrix(matrix: RiskModeMatrix) -> ValidationResult` — validates offline, simulation, paper, shadow, read-only-live, micro-live, and full-live policy coverage; **Pure**.
@@ -358,6 +362,29 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Boundary Role:** Defines the canonical, serializable contracts that cross the Risk boundary. It owns validation and canonicalization; it does not query brokers, stores, or other domains.
 
+#### 📄 File: `enums.py`
+
+**File Boundary:** Deterministic string enums and ordered severity/status catalogs used by all Risk contracts, policies, tools, and reports.
+
+**Requirement Title:** Risk enum catalogs
+
+**Description:** Defines deterministic enum values separately from data contracts so status, reason, and severity meanings remain stable across serialization, audit, policy, and tool boundaries.
+
+**Requirements:**
+
+- [x] **RISK-FR-050**: Define all risk enums with deterministic string values. *app/services/risk/models/enums.py:14*
+- [x] **RISK-FR-051**: Define `RiskDecisionStatus` and cover all allowed outcomes. *app/services/risk/models/enums.py:14*
+- [x] **RISK-FR-052**: Define `RiskReasonCode` catalog with stable names and descriptions. *app/services/risk/models/enums.py:59*
+- [x] **RISK-FR-053**: Define `RiskSeverity` catalog with stable ordering. *app/services/risk/models/enums.py:48*
+
+**Target Class/Function:**
+
+- `class RiskDecisionStatus` — deterministic string enum for `approve`, `reduce_size`, `reject`, `block`, `needs_more_evidence`, `needs_approval`, `halt_strategy`, and `halt_all`; **Pure enum**.
+- `class RiskReasonCode` — deterministic reason-code catalog with stable names and descriptions; **Pure enum/catalog**.
+- `class RiskSeverity` — deterministic ordered severity catalog for warning/error/blocking/critical outcomes; **Pure enum**.
+- `list_risk_reason_codes() -> tuple[RiskReasonCode, ...]` — returns the stable reason-code catalogue in deterministic order; **Pure**.
+- `risk_severity_rank(severity: RiskSeverity) -> int` — returns stable ordering rank for aggregation and primary-failure selection; **Pure**.
+
 #### 📄 File: `contracts.py`
 
 **File Boundary:** Typed request, snapshot, proposal, decision, evidence, warning, reduction, and audit-event contracts.
@@ -367,44 +394,42 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Creates the models that make every risk input, calculation result, decision, rejection, and token scope explicit, validated, serializable, and replayable.
 
 **Requirements:**
-- **RISK-FR-049**: Create risk models with file-level purpose, exports, and side-effect docstring.
-- **RISK-FR-050**: Define all risk enums with deterministic string values.
-- **RISK-FR-051**: Define `RiskDecisionStatus` and cover all allowed outcomes.
-- **RISK-FR-052**: Define `RiskReasonCode` catalog with stable names and descriptions.
-- **RISK-FR-053**: Define `RiskSeverity` catalog with stable ordering.
-- **RISK-FR-054**: Define `RiskEvidenceRef` for source-traceable evidence references.
-- **RISK-FR-055**: Define `ProposedTrade` with validation for symbol, side, size, order type, stops, targets, timestamps, and strategy metadata.
-- **RISK-FR-056**: Define `ProposedAllocation` with strategy, symbol, currency, requested budget, and evidence metadata.
-- **RISK-FR-057**: Define `StrategyAdmissionRequest` with required research, simulation, and risk evidence fields.
-- **RISK-FR-058**: Define `RiskAssessmentRequest` with mode, policy profile, account state, market state, portfolio state, pending orders, open positions, and freshness metadata.
-- **RISK-FR-059**: Define `AccountRiskSnapshot` with equity, balance, free margin, margin used, leverage, base currency, and timestamp.
-- **RISK-FR-060**: Define `MarketRiskSnapshot` with spreads, volatility, session, rollover, news, symbol metadata, and freshness fields.
-- **RISK-FR-061**: Define `PortfolioRiskSnapshot` with open positions, pending orders, in-flight orders, exposure, VaR/ES, stress, and drawdown fields.
-- **RISK-FR-062**: Define `PositionRiskSnapshot` with signed size, entry, current price, PnL, risk, margin, strategy ID, and timestamps.
-- **RISK-FR-063**: Define `PendingOrderRiskSnapshot` with pending-order exposure policy fields.
-- **RISK-FR-064**: Define `CurrencyLegExposure` with signed base and quote currency amounts.
-- **RISK-FR-065**: Define `CurrencyExposure` with gross, net, and account-currency equivalent exposure.
-- **RISK-FR-066**: Define `CorrelationSnapshot` with matrix, lookback, timeframe, method, sample count, and fallback status.
-- **RISK-FR-067**: Define `VaRSnapshot` with method, confidence, portfolio volatility, exposure, result, and assumptions.
-- **RISK-FR-068**: Define `ExpectedShortfallSnapshot` with confidence, threshold loss, average tail loss, sample count, and method.
-- **RISK-FR-069**: Define `StressScenarioResult` with scenario ID, shock assumptions, estimated loss, pass/fail status, and reason codes.
-- **RISK-FR-070**: Define `MarginRiskSnapshot` with projected margin, free margin, margin usage, leverage, and broker constraints.
-- **RISK-FR-071**: Define `DrawdownState` with current state, soft/hard limits, step-down multiplier, and persistence metadata.
-- **RISK-FR-072**: Define `ExecutionRiskSnapshot` with spread, slippage, stop-level, freeze-level, lot-step, and marketability checks.
-- **RISK-FR-073**: Define `RiskDecisionToken` with scope, expiry, policy hash, config hash, signature metadata, and revocation fields.
-- **RISK-FR-074**: Define `RiskDecisionPackage` as the single canonical output from Risk reviews.
+
+- [x] **RISK-FR-049**: Create risk models with file-level purpose, exports, and side-effect docstring. *app/services/risk/models/contracts.py:1*
+- [x] **RISK-FR-050**: Define all risk enums with deterministic string values. *app/services/risk/models/enums.py:14*
+- [x] **RISK-FR-051**: Define `RiskDecisionStatus` and cover all allowed outcomes. *app/services/risk/models/enums.py:14*
+- [x] **RISK-FR-052**: Define `RiskReasonCode` catalog with stable names and descriptions. *app/services/risk/models/enums.py:59*
+- [x] **RISK-FR-053**: Define `RiskSeverity` catalog with stable ordering. *app/services/risk/models/enums.py:48*
+- [x] **RISK-FR-054**: Define `RiskEvidenceRef` for source-traceable evidence references. *app/services/risk/models/contracts.py:102*
+- [x] **RISK-FR-055**: Define `ProposedTrade` with validation for symbol, side, size, order type, stops, targets, timestamps, and strategy metadata. *app/services/risk/models/contracts.py:110*
+- [x] **RISK-FR-056**: Define `ProposedAllocation` with strategy, symbol, currency, requested budget, and evidence metadata. *app/services/risk/models/contracts.py:166*
+- [x] **RISK-FR-057**: Define `StrategyAdmissionRequest` with required research, simulation, and risk evidence fields. *app/services/risk/models/contracts.py:178*
+- [x] **RISK-FR-058**: Define `RiskAssessmentRequest` with mode, policy profile, account state, market state, portfolio state, pending orders, open positions, and freshness metadata. *app/services/risk/models/contracts.py:546*
+- [x] **RISK-FR-059**: Define `AccountRiskSnapshot` with equity, balance, free margin, margin used, leverage, base currency, and timestamp. *app/services/risk/models/contracts.py:642*
+- [x] **RISK-FR-060**: Define `MarketRiskSnapshot` with spreads, volatility, session, rollover, news, symbol metadata, and freshness fields. *app/services/risk/models/contracts.py:654*
+- [x] **RISK-FR-061**: Define `PortfolioRiskSnapshot` with open positions, pending orders, in-flight orders, exposure, VaR/ES, stress, and drawdown fields. *app/services/risk/models/contracts.py:692*
+- [x] **RISK-FR-062**: Define `PositionRiskSnapshot` with signed size, entry, current price, PnL, risk, margin, strategy ID, and timestamps. *app/services/risk/models/contracts.py:669*
+- [x] **RISK-FR-063**: Define `PendingOrderRiskSnapshot` with pending-order exposure policy fields. *app/services/risk/models/contracts.py:685*
+- [x] **RISK-FR-064**: Define `CurrencyLegExposure` with signed base and quote currency amounts. *app/services/risk/models/contracts.py:712*
+- [x] **RISK-FR-065**: Define `CurrencyExposure` with gross, net, and account-currency equivalent exposure. *app/services/risk/models/contracts.py:719*
+- [x] **RISK-FR-066**: Define `CorrelationSnapshot` with matrix, lookback, timeframe, method, sample count, and fallback status. *app/services/risk/models/contracts.py:741*
+- [x] **RISK-FR-067**: Define `VaRSnapshot` with method, confidence, portfolio volatility, exposure, result, and assumptions. *app/services/risk/models/contracts.py:775*
+- [x] **RISK-FR-068**: Define `ExpectedShortfallSnapshot` with confidence, threshold loss, average tail loss, sample count, and method. *app/services/risk/models/contracts.py:790*
+- [x] **RISK-FR-069**: Define `StressScenarioResult` with scenario ID, shock assumptions, estimated loss, pass/fail status, and reason codes. *app/services/risk/models/contracts.py:800*
+- [x] **RISK-FR-070**: Define `MarginRiskSnapshot` with projected margin, free margin, margin usage, leverage, and broker constraints. *app/services/risk/models/contracts.py:818*
+- [x] **RISK-FR-071**: Define `DrawdownState` with current state, soft/hard limits, step-down multiplier, and persistence metadata. *app/services/risk/models/contracts.py:829*
+- [x] **RISK-FR-072**: Define `ExecutionRiskSnapshot` with spread, slippage, stop-level, freeze-level, lot-step, and marketability checks. *app/services/risk/models/contracts.py:846*
+- [x] **RISK-FR-073**: Define `RiskDecisionToken` with scope, expiry, policy hash, config hash, signature metadata, and revocation fields. *app/services/risk/models/contracts.py:884*
+- [x] **RISK-FR-074**: Define `RiskDecisionPackage` as the single canonical output from Risk reviews. *app/services/risk/models/contracts.py:898*
 
 **Target Class/Function:**
+
 - `class ProposedTrade` — validates symbol, side, requested size, order type, stops, targets, timestamps, and strategy metadata; **Pure contract validation**.
 - `class ProposedAllocation` — validates requested strategy/symbol/currency budgets and evidence references; **Pure contract validation**.
 - `class StrategyAdmissionRequest` — validates research, simulation, and risk evidence inputs; **Pure contract validation**.
 - `class RiskAssessmentRequest` — aggregates mode, policy profile, account, market, portfolio, pending-order, open-position, and freshness evidence; **Pure contract validation**.
 - `class RiskDecisionPackage` — canonical decision output with decision status, limits, warnings, evidence, token, expiry, and audit reference; **Pure contract validation**.
 - `validate_risk_assessment_request(request: RiskAssessmentRequest) -> ValidationResult` — rejects missing or invalid canonical evidence before calculation; **Pure**.
-
-### 📂 Module: `app/services/risk/models`
-
-**Boundary Role:** Defines the canonical, serializable contracts that cross the Risk boundary. It owns validation and canonicalization; it does not query brokers, stores, or other domains.
 
 #### 📄 File: `serialization.py`
 
@@ -415,12 +440,14 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Ensures all public risk contracts have deterministic JSON boundaries and explicit validation behavior.
 
 **Requirements:**
-- **RISK-FR-075**: Add canonical serialization helpers for all risk models.
-- **RISK-FR-076**: Add validation tests for all model success paths.
-- **RISK-FR-077**: Add validation tests for invalid financial values and missing required fields.
-- **RISK-FR-078**: Add JSON round-trip and canonicalization tests for every model crossing public boundaries.
+
+- [x] **RISK-FR-075**: Add canonical serialization helpers for all risk models. *app/services/risk/models/serialization.py:23*
+- [x] **RISK-FR-076**: Add validation tests for all model success paths. *tests/unit/app/services/risk/test_contracts.py:16*
+- [x] **RISK-FR-077**: Add validation tests for invalid financial values and missing required fields. *tests/unit/app/services/risk/test_contracts.py:90*
+- [x] **RISK-FR-078**: Add JSON round-trip and canonicalization tests for every model crossing public boundaries. *tests/unit/app/services/risk/test_serialization.py:16*
 
 **Target Class/Function:**
+
 - `to_canonical_risk_payload(model: RiskSerializable) -> dict[str, JsonValue]` — emits stable, JSON-safe fields for a canonical risk model; **Pure**.
 - `from_canonical_risk_payload(payload: Mapping[str, JsonValue], model_type: type[RiskModelT]) -> RiskModelT` — validates and restores a known model type; **Pure**.
 - `validate_risk_model_round_trip(model: RiskSerializable) -> ValidationResult` — verifies canonicalization and round-trip integrity; **Pure**.
@@ -438,6 +465,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Defines safe simulation, prop-firm, paper, and conservative live profiles before policy resolution.
 
 **Requirements:**
+
 - **RISK-FR-079**: Create risk config profiles with side-effect-free imports.
 - **RISK-FR-080**: Create default.yaml with safe simulation defaults.
 - **RISK-FR-081**: Create `prop_firm_default.yaml` with conservative prop-firm controls.
@@ -449,16 +477,13 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-087**: Reject live profiles that lack explicit live authority fields.
 
 **Target Class/Function:**
+
 - `class RiskConfig` — strict typed risk profile including mode authority, limits, evidence, audit, and approval requirements; **Pure contract validation**.
 - `validate_risk_config(config: RiskConfig) -> ValidationResult` — rejects unknown keys, unsafe thresholds, and live profiles missing explicit authority; **Pure**.
 - `build_safe_default_profile() -> RiskConfig` — returns the approved offline/simulation baseline; **Pure**.
 - `build_prop_firm_default_profile() -> RiskConfig` — returns conservative prop-firm controls; **Pure**.
 - `build_paper_profile() -> RiskConfig` — returns paper-validation controls; **Pure**.
 - `build_live_conservative_profile() -> RiskConfig` — returns the fail-closed live baseline; **Pure**.
-
-### 📂 Module: `app/services/risk/config`
-
-**Boundary Role:** Owns validated policy-profile configuration and stable configuration identity. It does not decide whether a request passes policy.
 
 #### 📄 File: `loader.py`
 
@@ -469,16 +494,87 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Loads approved profiles only through explicit invocation and derives stable hashes used by decisions and tokens.
 
 **Requirements:**
+
 - **RISK-FR-088**: Compute stable risk config hashes.
 - **RISK-FR-089**: Add hash regression tests for identical and changed configs.
 
 **Target Class/Function:**
+
 - `load_risk_config(profile_name: str, source: RiskConfigSource) -> RiskConfig` — reads an explicitly injected configuration source and validates the selected profile; **Read-only I/O boundary**.
 - `hash_risk_config(config: RiskConfig) -> str` — generates a stable, canonical config hash; **Pure**.
+
+#### 📄 File: `hashing.py`
+
+**File Boundary:** Stable, canonical, order-invariant hashing for validated risk configuration profiles.
+
+**Requirement Title:** Risk configuration reproducibility hash
+
+**Description:** Isolates reproducibility identity from loading logic so decisions, tokens, approvals, and audit records can reference the exact effective configuration without depending on file order or YAML formatting.
+
+**Requirements:**
+
+- **RISK-FR-088**: Compute stable risk config hashes.
+- **RISK-FR-089**: Add hash regression tests for identical and changed configs.
+
+**Target Class/Function:**
+
+- `canonicalize_risk_config_for_hash(config: RiskConfig) -> dict[str, JsonValue]` — normalizes a validated risk config into sorted JSON-safe hash material; **Pure**.
+- `hash_risk_config(config: RiskConfig) -> str` — generates a stable hash for decisions, tokens, audit events, and replay; **Pure**.
+- `compare_risk_config_hashes(left: RiskConfig, right: RiskConfig) -> ConfigHashComparison` — reports whether two configs are identical or materially changed; **Pure**.
+- `validate_risk_config_hash(expected_hash: str, config: RiskConfig) -> ValidationResult` — verifies compatibility with approval tokens and stored decisions; **Pure**.
+
+#### 📄 File: `profiles.py`
+
+**File Boundary:** Approved built-in profile builders and profile-name registry for safe simulation, prop-firm, paper, and conservative live operation.
+
+**Requirement Title:** Approved risk profile builders
+
+**Description:** Keeps built-in profile construction separate from strict schema validation and external loading. These builders return validated profile objects and perform no import-time I/O.
+
+**Requirements:**
+
+- **RISK-FR-079**: Create risk config profiles with side-effect-free imports.
+- **RISK-FR-080**: Create default.yaml with safe simulation defaults.
+- **RISK-FR-081**: Create `prop_firm_default.yaml` with conservative prop-firm controls.
+- **RISK-FR-082**: Create `paper.yaml` with paper-trading validation controls.
+- **RISK-FR-083**: Create `live_conservative.yaml` with full fail-closed live controls.
+
+**Target Class/Function:**
+
+- `build_safe_default_profile() -> RiskConfig` — returns the approved offline/simulation baseline; **Pure**.
+- `build_prop_firm_default_profile() -> RiskConfig` — returns conservative prop-firm controls; **Pure**.
+- `build_paper_profile() -> RiskConfig` — returns paper-trading validation controls; **Pure**.
+- `build_live_conservative_profile() -> RiskConfig` — returns the fail-closed live baseline with explicit live authority fields; **Pure**.
+- `list_builtin_risk_profiles() -> tuple[str, ...]` — returns stable built-in profile names; **Pure**.
+- `get_builtin_risk_profile(name: str) -> RiskConfig` — resolves an approved built-in profile by name or fails deterministically; **Pure**.
 
 ### 📂 Module: `app/services/risk/policy`
 
 **Boundary Role:** Resolves policy-as-code deterministically across approved scopes and validates governed override requests. It never performs execution.
+
+#### 📄 File: `contracts.py`
+
+**File Boundary:** Policy scope, precedence, enforcement-result, expiry, and effective-policy contracts.
+
+**Requirement Title:** Policy-as-code contracts
+
+**Description:** Defines the immutable policy objects consumed by the resolver and override validators so policy semantics are not hidden in orchestration code.
+
+**Requirements:**
+
+- **RISK-FR-090**: Create policy module with deterministic policy resolution.
+- **RISK-FR-091**: Define policy scope by environment, mode, account, strategy, symbol, currency, workflow, and operator role.
+- **RISK-FR-092**: Define policy precedence rules for global, account, strategy, symbol, and workflow scopes.
+- **RISK-FR-095**: Implement policy enforcement result model.
+
+**Target Class/Function:**
+
+- `class PolicyScope` — validates environment, mode, account, strategy, symbol, currency, workflow, and operator role selectors; **Pure contract validation**.
+- `class RiskPolicy` — immutable policy record with thresholds, authority, expiry, scope, and policy hash material; **Pure contract validation**.
+- `class EffectiveRiskPolicy` — resolved policy applied to a request with provenance and precedence evidence; **Pure contract validation**.
+- `class PolicyEnforcementResult` — pass/warn/fail result for policy gates and budget checks; **Pure contract**.
+- `class PolicyPrecedenceRule` — explicit global/account/strategy/symbol/workflow ordering record; **Pure contract**.
+- `validate_policy_scope(scope: PolicyScope) -> ValidationResult` — rejects malformed or ambiguous policy scopes; **Pure**.
 
 #### 📄 File: `resolver.py`
 
@@ -489,6 +585,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Resolves the applicable policy by environment, mode, account, strategy, symbol, currency, workflow, and operator role before any risk calculation.
 
 **Requirements:**
+
 - **RISK-FR-090**: Create policy module with deterministic policy resolution.
 - **RISK-FR-091**: Define policy scope by environment, mode, account, strategy, symbol, currency, workflow, and operator role.
 - **RISK-FR-092**: Define policy precedence rules for global, account, strategy, symbol, and workflow scopes.
@@ -498,14 +595,11 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-096**: Implement risk budget policy gates.
 
 **Target Class/Function:**
+
 - `class RiskPolicyEngine` — deterministic policy resolution façade; **Pure when policy records are injected**.
 - `resolve_effective_policy(context: PolicyContext, policies: Sequence[RiskPolicy]) -> EffectiveRiskPolicy` — applies approved scope/precedence rules or fails closed; **Pure**.
 - `evaluate_risk_budget(policy: EffectiveRiskPolicy, request: RiskAssessmentRequest) -> PolicyEnforcementResult` — evaluates policy budget gates; **Pure**.
 - `validate_policy_expiry(policy: RiskPolicy, now_utc: datetime) -> ValidationResult` — validates time-bounded policies; **Pure**.
-
-### 📂 Module: `app/services/risk/policy`
-
-**Boundary Role:** Resolves policy-as-code deterministically across approved scopes and validates governed override requests. It never performs execution.
 
 #### 📄 File: `overrides.py`
 
@@ -516,6 +610,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Keeps any threshold override outside core calculations and requires deterministic validation plus governed approval.
 
 **Requirements:**
+
 - **RISK-FR-097**: Implement risk threshold override request validation.
 - **RISK-FR-098**: Implement governed approval requirement for high-risk overrides.
 - **RISK-FR-099**: Implement config compatibility checks for approval tokens.
@@ -530,6 +625,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-108**: Document config and policy behavior in the Risk README.
 
 **Target Class/Function:**
+
 - `validate_risk_override_request(request: RiskOverrideRequest, policy: EffectiveRiskPolicy) -> OverrideValidationResult` — validates override scope and maximum threshold bounds; **Pure**.
 - `requires_override_approval(request: RiskOverrideRequest, policy: EffectiveRiskPolicy) -> bool` — determines whether approval is mandatory; **Pure**.
 - `validate_token_config_compatibility(token: RiskDecisionToken, config_hash: str) -> ValidationResult` — rejects configuration-incompatible approval tokens; **Pure**.
@@ -547,6 +643,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Classifies market conditions and provides deterministic warnings or blockers before sizing or portfolio-risk computation.
 
 **Requirements:**
+
 - **RISK-FR-109**: Create market regime gate with deterministic regime assessment.
 - **RISK-FR-110**: Define `RiskRegime` enum and regime result contract.
 - **RISK-FR-111**: Implement spread regime classification using spread-to-Ïƒ thresholds.
@@ -569,16 +666,13 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-128**: Ensure regime checks do not mutate inputs.
 
 **Target Class/Function:**
+
 - `class RegimeRiskEngine` — façade for deterministic regime evaluation; **Pure when snapshots are supplied**.
 - `assess_risk_regime(market: MarketRiskSnapshot, policy: EffectiveRiskPolicy, now_utc: datetime) -> RegimeAssessment` — classifies spread, volatility, liquidity, sessions, rollover, and news conditions; **Pure**.
 - `classify_spread_regime(spread: Decimal, sigma: Decimal, thresholds: SpreadSigmaThresholds) -> RiskRegime` — classifies spread-to-volatility condition; **Pure**.
 - `classify_volatility_regime(short_sigma: Decimal, medium_sigma: Decimal, long_sigma: Decimal, thresholds: VolatilityThresholds) -> RiskRegime` — classifies volatility state; **Pure**.
 - `validate_market_freshness(market: MarketRiskSnapshot, policy: EffectiveRiskPolicy, now_utc: datetime) -> ValidationResult` — detects stale/inconsistent market evidence; **Pure**.
 - `is_rollover_blackout(server_time: datetime, policy: EffectiveRiskPolicy) -> bool` — evaluates broker-midnight blackout boundaries; **Pure**.
-
-### 📂 Module: `app/services/risk/regime`
-
-**Boundary Role:** Assesses current market operating conditions using supplied, freshness-qualified evidence. It never fetches market data.
 
 #### 📄 File: `validation.py`
 
@@ -589,6 +683,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Provides reusable pure checks that support fail-closed regime decisions and guarantee that no regime check mutates input evidence.
 
 **Requirements:**
+
 - **RISK-FR-129**: Add normal regime tests.
 - **RISK-FR-130**: Add low-volatility regime tests.
 - **RISK-FR-131**: Add high-volatility regime tests.
@@ -601,6 +696,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-138**: Add docs and usage example for the market regime gate.
 
 **Target Class/Function:**
+
 - `validate_regime_inputs(market: MarketRiskSnapshot) -> ValidationResult` — rejects invalid bid/ask, stale quote, missing calendar evidence, invalid session, or unsupported evidence; **Pure**.
 - `build_regime_reason_codes(assessment: RegimeAssessment) -> tuple[RiskReasonCode, ...]` — produces stable warning/block reason ordering; **Pure**.
 
@@ -617,19 +713,17 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Creates explicit typed units for every limit check so ordering, severities, and failure selection cannot be implicit.
 
 **Requirements:**
+
 - **RISK-FR-139**: Create deterministic limits module with explicit ordered checks.
 - **RISK-FR-140**: Define `ORDERED_LIMIT_CHECKS` as a tuple, not a set or unordered mapping.
 - **RISK-FR-141**: Define `LimitCheck` contract.
 - **RISK-FR-142**: Define `LimitResult` contract.
 
 **Target Class/Function:**
+
 - `class LimitCheck` — typed limit-name, required-evidence, severity, evaluator, and precedence contract; **Pure contract**.
 - `class LimitResult` — typed pass/warn/fail result with reason code, observed value, threshold, and evidence references; **Pure contract**.
 - `ORDERED_LIMIT_CHECKS: tuple[LimitCheck, ...]` — immutable deterministic evaluation sequence; **Pure constant**.
-
-### 📂 Module: `app/services/risk/limits`
-
-**Boundary Role:** Runs deterministic, ordered, fail-closed limit checks and returns a traceable aggregate; it does not calculate raw market risk metrics.
 
 #### 📄 File: `checks.py`
 
@@ -640,6 +734,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Evaluates every configured hard and advisory policy limit from supplied canonical snapshots.
 
 **Requirements:**
+
 - **RISK-FR-143**: Implement kill-switch state limit check.
 - **RISK-FR-144**: Implement stale-evidence limit check.
 - **RISK-FR-145**: Implement max daily loss limit check.
@@ -662,6 +757,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-162**: Implement pending order limit check.
 
 **Target Class/Function:**
+
 - `check_kill_switch(state: KillSwitchState) -> LimitResult` — blocks when a relevant kill switch is active or uncertain; **Pure**.
 - `check_evidence_freshness(request: RiskAssessmentRequest, policy: EffectiveRiskPolicy, now_utc: datetime) -> LimitResult` — blocks stale or incomplete mandatory evidence; **Pure**.
 - `check_daily_loss(snapshot: PortfolioRiskSnapshot, policy: EffectiveRiskPolicy) -> LimitResult` — evaluates daily-loss budget; **Pure**.
@@ -669,10 +765,6 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - `check_exposure_limits(projected: ProjectedRiskSnapshot, policy: EffectiveRiskPolicy) -> tuple[LimitResult, ...]` — evaluates portfolio, symbol, currency, and cluster limits; **Pure**.
 - `check_tail_risk_limits(var: VaRSnapshot, es: ExpectedShortfallSnapshot, stress: StressSummary, policy: EffectiveRiskPolicy) -> tuple[LimitResult, ...]` — evaluates VaR, ES, and stress limits; **Pure**.
 - `check_execution_limits(execution: ExecutionRiskSnapshot, policy: EffectiveRiskPolicy) -> tuple[LimitResult, ...]` — evaluates spread, slippage, frequency, pending-order, news, and rollover limits; **Pure**.
-
-### 📂 Module: `app/services/risk/limits`
-
-**Boundary Role:** Runs deterministic, ordered, fail-closed limit checks and returns a traceable aggregate; it does not calculate raw market risk metrics.
 
 #### 📄 File: `engine.py`
 
@@ -683,6 +775,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Combines check results in a stable order so the governor receives a repeatable and explainable limit outcome.
 
 **Requirements:**
+
 - **RISK-FR-163**: Implement limit aggregation with configured precedence.
 - **RISK-FR-164**: Implement stable primary failure selection.
 - **RISK-FR-165**: Implement composite breach flags.
@@ -691,6 +784,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-168**: Document limit ordering and breach aggregation.
 
 **Target Class/Function:**
+
 - `class LimitEngine` — ordered limit-evaluation façade; **Pure when checks and evidence are supplied**.
 - `evaluate_ordered_limits(context: LimitContext, checks: tuple[LimitCheck, ...]) -> LimitAssessment` — runs the immutable sequence and aggregates outcomes; **Pure**.
 - `select_primary_failure(results: Sequence[LimitResult], precedence: LimitPrecedence) -> LimitResult | None` — selects the stable principal failure; **Pure**.
@@ -709,19 +803,17 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Defines strict inputs and outputs for all supported sizing methods.
 
 **Requirements:**
+
 - **RISK-FR-169**: Create position sizing module with pure sizing calculators.
 - **RISK-FR-170**: Define `SizingMethod` enum.
 - **RISK-FR-171**: Define `PositionSizingRequest` contract.
 - **RISK-FR-172**: Define `PositionSizingResult` contract.
 
 **Target Class/Function:**
+
 - `class SizingMethod` — deterministic enum for fixed-risk, fixed-fractional, volatility-adjusted, correlation-adjusted, milestone, and advisory Kelly-reference sizing; **Pure enum**.
 - `class PositionSizingRequest` — validates account risk inputs, stop/evidence, symbol metadata, and policy caps; **Pure contract validation**.
 - `class PositionSizingResult` — returns requested/approved size, risk amount, normalized quantity, warnings, and calculation evidence; **Pure contract**.
-
-### 📂 Module: `app/services/risk/sizing`
-
-**Boundary Role:** Calculates policy-bounded trade size from risk evidence. It never routes an order or mutates account state.
 
 #### 📄 File: `calculators.py`
 
@@ -732,6 +824,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Calculates an initial safe size and produces deterministic reductions when sizing evidence or portfolio conditions require them.
 
 **Requirements:**
+
 - **RISK-FR-173**: Implement fixed-risk sizing.
 - **RISK-FR-174**: Implement fixed-fractional sizing.
 - **RISK-FR-175**: Implement volatility-adjusted sizing.
@@ -760,6 +853,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-198**: Document sizing assumptions and defaults.
 
 **Target Class/Function:**
+
 - `calculate_fixed_risk_size(request: PositionSizingRequest) -> PositionSizingResult` — derives size from a fixed monetary risk budget; **Pure**.
 - `calculate_fixed_fractional_size(request: PositionSizingRequest) -> PositionSizingResult` — derives size from permitted equity fraction; **Pure**.
 - `calculate_volatility_adjusted_size(request: PositionSizingRequest) -> PositionSizingResult` — applies M1 σ/ATR/approved volatility input; **Pure**.
@@ -769,6 +863,28 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - `calculate_stop_distance(request: PositionSizingRequest) -> Decimal` — converts M1 σ/ATR/pip/tick stop definition into a distance; **Pure**.
 - `convert_stop_distance_to_account_risk(distance: Decimal, symbol: SymbolRiskMetadata, account_currency: str) -> Decimal` — converts price risk to account-currency risk; **Pure**.
 - `normalize_volume(size: Decimal, symbol: SymbolRiskMetadata) -> Decimal` — floors/rounds only by approved lot-step and precision rules; **Pure**.
+
+#### 📄 File: `normalization.py`
+
+**File Boundary:** Broker-compatible quantity precision, lot-step flooring, and invalid symbol-metadata rejection after pure sizing math.
+
+**Requirement Title:** Volume normalization and broker precision constraints
+
+**Description:** Separates final volume normalization from sizing formulas so financial risk math remains pure and broker-step rounding is deterministic and auditable.
+
+**Requirements:**
+
+- **RISK-FR-188**: Round final size to broker lot step after risk math.
+- **RISK-FR-189**: Reject missing symbol metadata.
+- **RISK-FR-193**: Return reject when no valid size satisfies risk and broker constraints.
+- **RISK-FR-197**: Add tests for broker lot-step rounding.
+
+**Target Class/Function:**
+
+- `validate_symbol_volume_metadata(symbol: SymbolRiskMetadata) -> ValidationResult` — rejects missing min/max/step/precision metadata before normalization; **Pure**.
+- `normalize_volume(size: Decimal, symbol: SymbolRiskMetadata) -> Decimal` — floors or rounds only by approved lot-step and precision rules; **Pure**.
+- `validate_normalized_volume(size: Decimal, symbol: SymbolRiskMetadata) -> ValidationResult` — rejects below-minimum, above-maximum, and step-mismatch volumes; **Pure**.
+- `build_volume_rejection(size: Decimal, symbol: SymbolRiskMetadata, reason: RiskReasonCode) -> PositionSizingResult` — returns deterministic reject evidence when no broker-valid size exists; **Pure**.
 
 ### 📂 Module: `app/services/risk/exposure`
 
@@ -783,6 +899,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Turns symbols into signed currency exposures before concentration and portfolio risk are measured.
 
 **Requirements:**
+
 - **RISK-FR-199**: Create FX currency exposure engine with pure exposure calculators.
 - **RISK-FR-200**: Define symbol exposure calculation.
 - **RISK-FR-201**: Define currency-leg exposure calculation.
@@ -795,13 +912,10 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-208**: Support custom currency clusters from config.
 
 **Target Class/Function:**
+
 - `parse_fx_symbol(symbol: str, metadata: SymbolRiskMetadata) -> FxPair` — validates canonical base/quote currency identity; **Pure**.
 - `decompose_fx_trade(trade: ProposedTrade, price: Decimal, contract: ContractSpecification) -> tuple[CurrencyLegExposure, CurrencyLegExposure]` — emits signed base and quote legs; **Pure**.
 - `validate_currency_conversion_requirements(exposures: Sequence[CurrencyLegExposure], rates: Mapping[CurrencyPair, Decimal]) -> ValidationResult` — rejects missing conversion evidence; **Pure**.
-
-### 📂 Module: `app/services/risk/exposure`
-
-**Boundary Role:** Decomposes FX proposals and portfolio positions into currency legs and concentration measures. It does not fetch FX prices or submit trades.
 
 #### 📄 File: `aggregation.py`
 
@@ -812,6 +926,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Computes gross, net, account-currency equivalent, per-currency, and projected exposure without treating offsetting symbols as automatically independent.
 
 **Requirements:**
+
 - **RISK-FR-209**: Include open positions in current exposure.
 - **RISK-FR-210**: Include pending orders in projected exposure.
 - **RISK-FR-211**: Include in-flight orders in projected exposure.
@@ -834,6 +949,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-228**: Document FX exposure model with examples.
 
 **Target Class/Function:**
+
 - `calculate_currency_exposure(positions: Sequence[PositionRiskSnapshot], pending: Sequence[PendingOrderRiskSnapshot], proposal: ProposedTrade | None, rates: Mapping[CurrencyPair, Decimal], account_currency: str) -> CurrencyExposure` — computes current and projected currency exposure; **Pure**.
 - `aggregate_currency_legs(legs: Sequence[CurrencyLegExposure]) -> Mapping[str, Decimal]` — aggregates signed legs by ISO currency; **Pure**.
 - `calculate_gross_and_net_exposure(exposure: Mapping[str, Decimal]) -> ExposureTotals` — derives deterministic gross/net exposure; **Pure**.
@@ -852,6 +968,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Builds comparable, no-lookahead return series before calculating correlation.
 
 **Requirements:**
+
 - **RISK-FR-229**: Create correlation engine with closed-bar correlation calculations.
 - **RISK-FR-230**: Define correlation method enum.
 - **RISK-FR-231**: Define return series alignment helper.
@@ -864,13 +981,10 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-238**: Support M1 execution correlation window.
 
 **Target Class/Function:**
+
 - `build_return_series(bars: Sequence[ClosedBar], method: ReturnMethod) -> ReturnSeries` — derives log, close-to-close, open-to-close, or σ-normalized returns; **Pure**.
 - `align_return_series(series: Mapping[str, ReturnSeries], policy: CorrelationAlignmentPolicy) -> AlignedReturns` — aligns only identical opening timestamps and documented missing-data treatment; **Pure**.
 - `validate_correlation_inputs(aligned: AlignedReturns, minimum_samples: int) -> ValidationResult` — rejects inadequate or stale/partial inputs; **Pure**.
-
-### 📂 Module: `app/services/risk/correlation`
-
-**Boundary Role:** Produces reproducible closed-bar correlation and cluster-risk evidence from injected time series. It does not load market data.
 
 #### 📄 File: `engine.py`
 
@@ -881,6 +995,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Treats correlated trades as shared portfolio risk, with deterministic fallback or fail-closed behavior when the data cannot support a reliable matrix.
 
 **Requirements:**
+
 - **RISK-FR-239**: Support M5/M15 intraday cluster correlation window.
 - **RISK-FR-240**: Support H1 regime correlation window.
 - **RISK-FR-241**: Reject insufficient sample size unless conservative fallback is configured.
@@ -903,12 +1018,34 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-258**: Document correlation assumptions and limitations.
 
 **Target Class/Function:**
+
 - `class CorrelationEngine` — deterministic correlation and clustering façade; **Pure when aligned returns are supplied**.
 - `calculate_correlation_matrix(returns: AlignedReturns, method: CorrelationMethod) -> CorrelationSnapshot` — computes reproducible correlation matrix and metadata; **Pure**.
 - `build_correlation_clusters(snapshot: CorrelationSnapshot, threshold: Decimal) -> tuple[CorrelationCluster, ...]` — identifies shared-risk clusters; **Pure**.
 - `calculate_cluster_exposure(clusters: Sequence[CorrelationCluster], exposures: ProjectedExposure) -> ClusterExposureAssessment` — computes cluster concentration; **Pure**.
 - `resolve_correlation_fallback(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> CorrelationSnapshot` — returns approved conservative fallback or explicit rejection; **Pure**.
 - `calculate_component_risk_contribution(covariance: CovarianceMatrix, weights: Sequence[Decimal]) -> ComponentRiskContribution` — computes contribution evidence; **Pure**.
+
+#### 📄 File: `fallbacks.py`
+
+**File Boundary:** Conservative fallback-correlation policy, insufficient-sample behavior, and explicit fail-closed fallback decisions.
+
+**Requirement Title:** Correlation fallback control
+
+**Description:** Keeps fallback behavior explicit and policy governed so missing correlation evidence cannot silently make a trade look safer than it is.
+
+**Requirements:**
+
+- **RISK-FR-241**: Reject insufficient sample size unless conservative fallback is configured.
+- **RISK-FR-242**: Implement conservative fallback correlation for production.
+- **RISK-FR-257**: Add tests for conservative fallback behavior.
+
+**Target Class/Function:**
+
+- `class CorrelationFallbackContext` — carries missing/insufficient-sample evidence, mode, profile, and request metadata; **Pure contract validation**.
+- `resolve_correlation_fallback(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> CorrelationSnapshot` — returns approved conservative fallback or explicit rejection evidence; **Pure**.
+- `build_conservative_correlation_snapshot(symbols: Sequence[str], assumed_correlation: Decimal) -> CorrelationSnapshot` — builds deterministic conservative fallback matrix; **Pure**.
+- `should_fail_closed_for_missing_correlation(context: CorrelationFallbackContext, policy: EffectiveRiskPolicy) -> bool` — determines whether missing correlation evidence must block/reject; **Pure**.
 
 ### 📂 Module: `app/services/risk/tail_risk`
 
@@ -923,6 +1060,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Defines reproducible, validated boundaries for parametric and historical tail-risk calculations.
 
 **Requirements:**
+
 - **RISK-FR-259**: Create VaR and Expected Shortfall engines with pure tail-risk calculators.
 - **RISK-FR-260**: Define VaR method enum.
 - **RISK-FR-261**: Define Expected Shortfall method enum.
@@ -930,13 +1068,10 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-263**: Implement historical portfolio VaR.
 
 **Target Class/Function:**
+
 - `class VaRMethod` — deterministic enum for approved parametric/historical methods; **Pure enum**.
 - `class VaRCalculationRequest` — validates exposure, covariance/return history, confidence, and assumptions; **Pure contract validation**.
 - `class ExpectedShortfallRequest` — validates tail loss inputs and confidence semantics; **Pure contract validation**.
-
-### 📂 Module: `app/services/risk/tail_risk`
-
-**Boundary Role:** Calculates portfolio VaR and Expected Shortfall/CVaR from canonical positions, returns, covariance, and policy inputs. It does not own portfolio state.
 
 #### 📄 File: `var.py`
 
@@ -947,6 +1082,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Computes VaR as one bounded, transparent risk engine; it cannot alone approve a trade.
 
 **Requirements:**
+
 - **RISK-FR-264**: Implement Expected Shortfall/CVaR calculation.
 - **RISK-FR-265**: Implement covariance matrix calculation.
 - **RISK-FR-266**: Implement EWMA covariance option.
@@ -962,15 +1098,12 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-276**: Reject invalid covariance matrices.
 
 **Target Class/Function:**
+
 - `class PortfolioVaREngine` — VaR calculation façade; **Pure when inputs are supplied**.
 - `calculate_parametric_var(request: VaRCalculationRequest) -> VaRSnapshot` — computes covariance/volatility-based VaR; **Pure**.
 - `calculate_historical_var(request: VaRCalculationRequest) -> VaRSnapshot` — computes empirical VaR from aligned historical returns; **Pure**.
 - `calculate_portfolio_volatility(covariance: CovarianceMatrix, weights: Sequence[Decimal]) -> Decimal` — calculates portfolio volatility; **Pure**.
 - `calculate_var_component_contribution(request: VaRCalculationRequest) -> ComponentRiskContribution` — decomposes VaR contribution; **Pure**.
-
-### 📂 Module: `app/services/risk/tail_risk`
-
-**Boundary Role:** Calculates portfolio VaR and Expected Shortfall/CVaR from canonical positions, returns, covariance, and policy inputs. It does not own portfolio state.
 
 #### 📄 File: `expected_shortfall.py`
 
@@ -981,6 +1114,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Computes and validates tail-loss evidence that is stricter than VaR-only approval.
 
 **Requirements:**
+
 - **RISK-FR-277**: Reject non-finite VaR results.
 - **RISK-FR-278**: Reject insufficient return history where fallback is not allowed.
 - **RISK-FR-279**: Return reason codes for every calculation failure.
@@ -995,6 +1129,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-288**: Document VaR assumptions and ES approval role.
 
 **Target Class/Function:**
+
 - `class ExpectedShortfallEngine` — Expected Shortfall calculation façade; **Pure when inputs are supplied**.
 - `calculate_expected_shortfall(request: ExpectedShortfallRequest) -> ExpectedShortfallSnapshot` — computes average loss beyond the approved tail threshold; **Pure**.
 - `select_tail_losses(losses: Sequence[Decimal], confidence: Decimal) -> tuple[Decimal, ...]` — deterministically selects tail observations; **Pure**.
@@ -1013,6 +1148,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Defines safe, declarative scenario inputs and eliminates arbitrary-code custom scenarios.
 
 **Requirements:**
+
 - **RISK-FR-289**: Create stress testing module with registered scenario evaluation.
 - **RISK-FR-290**: Define `StressScenario` contract.
 - **RISK-FR-291**: Define `StressScenarioResult` contract.
@@ -1020,14 +1156,35 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-293**: Build default scenario registry.
 
 **Target Class/Function:**
+
 - `class StressScenario` — declarative scenario ID, shocks, eligibility, and threshold inputs; **Pure contract validation**.
 - `class StressScenarioResult` — account-currency estimated loss, pass/fail, reason codes, and assumptions; **Pure contract**.
 - `class StressScenarioRegistry` — immutable validated set of approved scenarios; **Pure after construction**.
 - `build_default_stress_registry() -> StressScenarioRegistry` — returns approved default scenarios; **Pure**.
 
-### 📂 Module: `app/services/risk/stress`
+#### 📄 File: `registry.py`
 
-**Boundary Role:** Evaluates registered deterministic stress scenarios against supplied portfolio evidence. It never executes an emergency trade or calls a broker.
+**File Boundary:** Immutable scenario registry construction, default scenario publication, duplicate rejection, and custom-scenario registration validation.
+
+**Requirement Title:** Stress scenario registry
+
+**Description:** Keeps scenario discovery and validation separate from stress execution. The registry permits only declarative scenarios and rejects arbitrary-code stress definitions.
+
+**Requirements:**
+
+- **RISK-FR-292**: Define `StressScenarioRegistry`.
+- **RISK-FR-293**: Build default scenario registry.
+- **RISK-FR-306**: Validate custom scenario config without arbitrary code execution.
+- **RISK-FR-312**: Add tests for every default scenario.
+- **RISK-FR-313**: Add tests for custom scenario validation.
+
+**Target Class/Function:**
+
+- `class StressScenarioRegistry` — immutable validated set of approved scenarios with deterministic lookup order; **Pure after construction**.
+- `build_default_stress_registry() -> StressScenarioRegistry` — returns approved default scenarios; **Pure**.
+- `register_stress_scenario(registry: StressScenarioRegistry, scenario: StressScenario) -> StressScenarioRegistry` — returns a new registry after duplicate and safety validation; **Pure**.
+- `get_stress_scenario(registry: StressScenarioRegistry, scenario_id: str) -> StressScenario` — resolves a scenario deterministically or fails closed; **Pure**.
+- `validate_custom_scenario_definition(scenario: Mapping[str, JsonValue]) -> StressScenario` — rejects imperative or arbitrary-code constructs; **Pure**.
 
 #### 📄 File: `engine.py`
 
@@ -1038,6 +1195,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Requires a proposed trade to survive configured market, execution, liquidity, margin, stale-quote, and liquidation scenarios—not merely VaR.
 
 **Requirements:**
+
 - **RISK-FR-294**: Implement USD shock scenario.
 - **RISK-FR-295**: Implement JPY risk-off shock scenario.
 - **RISK-FR-296**: Implement GBP volatility shock scenario.
@@ -1065,6 +1223,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-318**: Add usage example for stress analysis.
 
 **Target Class/Function:**
+
 - `class StressTestingEngine` — registered scenario evaluation façade; **Pure when portfolio evidence is supplied**.
 - `evaluate_stress_scenarios(context: StressContext, registry: StressScenarioRegistry, policy: EffectiveRiskPolicy) -> StressSummary` — evaluates all applicable scenarios; **Pure**.
 - `apply_market_shock(portfolio: ProjectedPortfolio, scenario: StressScenario) -> ProjectedPortfolio` — applies declarative price/cost/liquidity shocks; **Pure**.
@@ -1085,6 +1244,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Ensures a proposed risk allocation remains financially feasible under account and portfolio margin limits.
 
 **Requirements:**
+
 - **RISK-FR-319**: Create margin engine with margin calculations.
 - **RISK-FR-320**: Create drawdown governor.
 - **RISK-FR-321**: Create execution feasibility checks.
@@ -1101,15 +1261,12 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-332**: Calculate total drawdown.
 
 **Target Class/Function:**
+
 - `class MarginRiskEngine` — margin feasibility façade; **Pure when account/symbol evidence is supplied**.
 - `calculate_current_margin_usage(account: AccountRiskSnapshot, portfolio: PortfolioRiskSnapshot) -> MarginRiskSnapshot` — derives current margin state; **Pure**.
 - `calculate_projected_margin_usage(account: AccountRiskSnapshot, portfolio: PortfolioRiskSnapshot, proposal: ProposedTrade) -> MarginRiskSnapshot` — projects post-proposal margin; **Pure**.
 - `calculate_free_margin_after_reservations(account: AccountRiskSnapshot, pending: Sequence[PendingOrderRiskSnapshot], inflight: Sequence[InFlightOrderRiskSnapshot]) -> Decimal` — reserves pending/in-flight exposure; **Pure**.
 - `check_margin_limits(snapshot: MarginRiskSnapshot, policy: EffectiveRiskPolicy) -> tuple[LimitResult, ...]` — checks account and portfolio caps; **Pure**.
-
-### 📂 Module: `app/services/risk/feasibility`
-
-**Boundary Role:** Evaluates available margin, drawdown controls, liquidity, and order feasibility after portfolio risk and before final decision. It does not perform broker account queries.
 
 #### 📄 File: `drawdown.py`
 
@@ -1120,6 +1277,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Reduces risk before hard drawdown limits and exposes deterministic state/recovery semantics.
 
 **Requirements:**
+
 - **RISK-FR-333**: Calculate strategy drawdown.
 - **RISK-FR-334**: Implement normal drawdown state.
 - **RISK-FR-335**: Implement caution drawdown state.
@@ -1130,14 +1288,11 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-340**: Reject catch-up or revenge risk behavior.
 
 **Target Class/Function:**
+
 - `class DrawdownGovernor` — drawdown throttle façade; **Pure when snapshots and prior state are supplied**.
 - `determine_drawdown_state(snapshot: PortfolioRiskSnapshot, prior: DrawdownState | None, policy: EffectiveRiskPolicy) -> DrawdownState` — classifies normal/caution/defensive/recovery/halted state; **Pure**.
 - `calculate_drawdown_multiplier(state: DrawdownState, policy: EffectiveRiskPolicy) -> Decimal` — returns approved risk step-down multiplier; **Pure**.
 - `apply_drawdown_throttle(size: Decimal, state: DrawdownState, policy: EffectiveRiskPolicy) -> Decimal` — reduces sizing without exceeding policy caps; **Pure**.
-
-### 📂 Module: `app/services/risk/feasibility`
-
-**Boundary Role:** Evaluates available margin, drawdown controls, liquidity, and order feasibility after portfolio risk and before final decision. It does not perform broker account queries.
 
 #### 📄 File: `execution_gate.py`
 
@@ -1148,6 +1303,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Prevents a mathematically acceptable position from being approved when the intended order is not feasible or is operationally unsafe.
 
 **Requirements:**
+
 - **RISK-FR-341**: Check spread-to-σ execution feasibility.
 - **RISK-FR-342**: Check slippage-to-σ execution feasibility.
 - **RISK-FR-343**: Check stop-level and freeze-level feasibility.
@@ -1158,6 +1314,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-348**: Document margin, drawdown, and execution feasibility behavior.
 
 **Target Class/Function:**
+
 - `class ExecutionRiskGate` — execution-feasibility façade; **Pure when execution evidence is supplied**.
 - `assess_execution_feasibility(trade: ProposedTrade, market: MarketRiskSnapshot, metadata: SymbolRiskMetadata, policy: EffectiveRiskPolicy) -> ExecutionRiskSnapshot` — calculates feasibility and reason codes; **Pure**.
 - `validate_stop_and_freeze_levels(trade: ProposedTrade, metadata: SymbolRiskMetadata) -> ValidationResult` — validates stop/freeze geometry; **Pure**.
@@ -1176,6 +1333,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Evaluates proposed allocation increases as governed risk decisions, including correlation and drawdown adjustments.
 
 **Requirements:**
+
 - **RISK-FR-349**: Create allocation review engine with allocation review workflows.
 - **RISK-FR-350**: Create lifecycle engine with lifecycle gates.
 - **RISK-FR-351**: Implement equal-risk budget allocation review.
@@ -1193,16 +1351,13 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-363**: Reject allocations breaching stress loss limits.
 
 **Target Class/Function:**
+
 - `class RiskAllocator` — allocation review façade; **Pure when evidence and policy are supplied**.
 - `review_allocation_proposal(request: ProposedAllocation, portfolio: PortfolioRiskSnapshot, policy: EffectiveRiskPolicy) -> AllocationAssessment` — evaluates strategy/symbol/currency/portfolio budgets; **Pure**.
 - `calculate_equal_risk_allocation(items: Sequence[AllocatableRisk]) -> AllocationPlan` — derives equal-risk allocation; **Pure**.
 - `calculate_volatility_parity_allocation(items: Sequence[AllocatableRisk]) -> AllocationPlan` — derives volatility-parity allocation; **Pure**.
 - `calculate_correlation_adjusted_allocation(items: Sequence[AllocatableRisk], correlation: CorrelationSnapshot) -> AllocationPlan` — reduces shared-cluster exposure; **Pure**.
 - `apply_regime_and_drawdown_adjustments(plan: AllocationPlan, regime: RegimeAssessment, drawdown: DrawdownState) -> AllocationPlan` — applies deterministic policy multipliers; **Pure**.
-
-### 📂 Module: `app/services/risk/governance`
-
-**Boundary Role:** Gates strategy admission and live-mode transitions from evidence packages and policy. It does not promote a strategy or enable live execution.
 
 #### 📄 File: `lifecycle.py`
 
@@ -1213,6 +1368,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Prevents research, optimization, or paper evidence from becoming a capital allocation or live mode without a formal risk review.
 
 **Requirements:**
+
 - **RISK-FR-364**: Reject allocations breaching margin limits.
 - **RISK-FR-365**: Implement strategy admission review.
 - **RISK-FR-366**: Require backtest evidence for strategy admission where applicable.
@@ -1230,14 +1386,11 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-378**: Document allocation and lifecycle governance.
 
 **Target Class/Function:**
+
 - `review_strategy_admission(request: StrategyAdmissionRequest, policy: EffectiveRiskPolicy) -> LifecycleAssessment` — checks mandatory research/simulation/risk evidence; **Pure**.
 - `review_live_readiness(request: LiveReadinessRequest, policy: EffectiveRiskPolicy) -> LifecycleAssessment` — validates live-sensitive evidence and approval requirements; **Pure**.
 - `validate_lifecycle_transition(current: StrategyLifecycleState, target: StrategyLifecycleState, evidence: LifecycleEvidence) -> ValidationResult` — rejects unauthorized promotion; **Pure**.
 - `requires_lifecycle_approval(assessment: LifecycleAssessment, policy: EffectiveRiskPolicy) -> bool` — determines governance escalation; **Pure**.
-
-### 📂 Module: `app/services/risk/governance`
-
-**Boundary Role:** Owns risk-gated kill-switch state, scope resolution, deterministic blocked decisions, and governed resume workflow. It never cancels or closes broker orders itself.
 
 #### 📄 File: `kill_switch.py`
 
@@ -1248,6 +1401,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Ensures every relevant kill-switch state blocks risk approval regardless of strategy quality or operator convenience.
 
 **Requirements:**
+
 - **RISK-FR-379**: Create kill switch engine with fail-closed kill switches.
 - **RISK-FR-380**: Define global kill switch.
 - **RISK-FR-381**: Define portfolio kill switch.
@@ -1280,6 +1434,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-408**: Add resume approval tests.
 
 **Target Class/Function:**
+
 - `class KillSwitchService` — kill-switch state and scoped evaluation façade; **State-mutating only through injected RiskStateStore**.
 - `check_risk_kill_switch(scope: KillSwitchScope, state: KillSwitchState) -> KillSwitchAssessment` — determines active/unknown/locked/pending-resume status; **Pure**.
 - `request_kill_switch_trigger(request: KillSwitchTriggerRequest, store: RiskStateStore) -> KillSwitchState` — records a governed risk kill-switch transition; **State-mutating (store write only; no broker mutation)**.
@@ -1299,6 +1454,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Composes policy, regime, sizing, exposures, limits, tail risk, stress, feasibility, drawdown, allocation, and lifecycle gates into one final `RiskDecisionPackage`.
 
 **Requirements:**
+
 - **RISK-FR-409**: Create risk governance engine as the canonical orchestration layer.
 - **RISK-FR-410**: Implement `RiskGovernor` constructor with explicit dependency injection.
 - **RISK-FR-411**: Implement request schema validation as first step.
@@ -1331,6 +1487,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-438**: Add full-path governor tests for every outcome.
 
 **Target Class/Function:**
+
 - `class RiskGovernor` — canonical orchestrator receiving injected engines and ports; **State-mutating only for audit/decision persistence and event emission**.
 - `review_trade(request: RiskAssessmentRequest) -> RiskDecisionPackage` — executes the fixed pre-trade decision flow; **State-mutating at audit/token boundary only; never broker-mutating**.
 - `review_allocation(request: RiskAssessmentRequest) -> RiskDecisionPackage` — governs allocation proposals; **State-mutating at audit/token boundary only**.
@@ -1338,6 +1495,34 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - `review_live_readiness(request: RiskAssessmentRequest) -> RiskDecisionPackage` — governs live-sensitive readiness; **State-mutating at audit/token boundary only**.
 - `run_portfolio_risk_governor(request: RiskAssessmentRequest) -> RiskDecisionPackage` — runs portfolio-risk review without execution; **State-mutating at audit/token boundary only**.
 - `synthesize_decision(context: GovernorEvaluationContext) -> RiskDecisionPackage` — creates approve/reduce/reject/block/evidence/approval/halt outcome from ordered results; **Pure**.
+
+#### 📄 File: `decision_synthesis.py`
+
+**File Boundary:** Final deterministic decision selection, primary reason selection, reduction aggregation, approval-token eligibility, and decision-package assembly.
+
+**Requirement Title:** Final RiskGovernor decision synthesis
+
+**Description:** Converts ordered gate outputs into one canonical `RiskDecisionPackage` without performing audit writes, signing, persistence, or broker mutation.
+
+**Requirements:**
+
+- **RISK-FR-427**: Implement final decision synthesis.
+- **RISK-FR-428**: Implement approve outcome.
+- **RISK-FR-429**: Implement reduce-size outcome.
+- **RISK-FR-430**: Implement reject outcome.
+- **RISK-FR-431**: Implement block outcome.
+- **RISK-FR-432**: Implement needs-more-evidence outcome.
+- **RISK-FR-433**: Implement needs-approval outcome.
+- **RISK-FR-434**: Implement halt-strategy outcome.
+- **RISK-FR-435**: Implement halt-all outcome.
+
+**Target Class/Function:**
+
+- `synthesize_decision(context: GovernorEvaluationContext) -> RiskDecisionPackage` — creates approve/reduce/reject/block/evidence/approval/halt outcome from ordered results; **Pure**.
+- `select_primary_risk_reason(results: Sequence[GateResult]) -> RiskReasonCode` — selects deterministic primary failure/warning reason; **Pure**.
+- `aggregate_reductions(results: Sequence[GateResult]) -> RiskReductionPlan` — combines sizing, correlation, exposure, drawdown, and stress reductions; **Pure**.
+- `determine_decision_status(results: Sequence[GateResult], policy: EffectiveRiskPolicy) -> RiskDecisionStatus` — applies precedence for halt/block/reject/evidence/approval/reduce/approve; **Pure**.
+- `is_decision_token_eligible(decision: RiskDecisionPackage) -> bool` — returns true only for bounded approved/reduced outcomes; **Pure**.
 
 ### 📂 Module: `app/services/risk/audit`
 
@@ -1352,6 +1537,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Makes each risk request and outcome traceable without exposing secrets, private broker payloads, or full approval packets.
 
 **Requirements:**
+
 - **RISK-FR-439**: Create audit engine with tamper-evident audit events.
 - **RISK-FR-440**: Create storage engine with storage ports.
 - **RISK-FR-441**: Define `RiskStateStore` port.
@@ -1367,6 +1553,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-451**: Implement tamper detection fail-closed behavior for live-sensitive workflows.
 
 **Target Class/Function:**
+
 - `build_canonical_audit_payload(decision: RiskDecisionPackage, context: AuditContext) -> dict[str, JsonValue]` — builds stable, redacted audit material; **Pure**.
 - `redact_audit_payload(payload: Mapping[str, JsonValue], policy: AuditRedactionPolicy) -> dict[str, JsonValue]` — removes protected values before persistence/logging; **Pure**.
 - `build_genesis_hash(payload: Mapping[str, JsonValue]) -> str` — computes the first-record hash; **Pure**.
@@ -1374,9 +1561,27 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - `verify_risk_audit_chain(events: Sequence[RiskAuditEvent]) -> AuditChainVerification` — validates genesis, sequence, and tamper state; **Pure**.
 - `create_risk_audit_event(decision: RiskDecisionPackage, context: AuditContext) -> RiskAuditEvent` — produces immutable audit record; **Pure**.
 
-### 📂 Module: `app/services/risk/audit`
+#### 📄 File: `hash_chain.py`
 
-**Boundary Role:** Creates tamper-evident, redacted audit records and bounded approval tokens. It owns evidence integrity—not broker execution.
+**File Boundary:** Audit-chain genesis hash, append hash, sequence verification, and tamper-detection result construction.
+
+**Requirement Title:** Tamper-evident audit hash chain
+
+**Description:** Separates chain integrity from audit event construction so live-sensitive workflows can fail closed when historical decision evidence is altered or incomplete.
+
+**Requirements:**
+
+- **RISK-FR-448**: Implement audit-chain genesis hash.
+- **RISK-FR-449**: Implement audit hash chaining.
+- **RISK-FR-450**: Implement audit-chain verification.
+- **RISK-FR-451**: Implement tamper detection fail-closed behavior for live-sensitive workflows.
+
+**Target Class/Function:**
+
+- `build_genesis_hash(payload: Mapping[str, JsonValue]) -> str` — computes the first-record hash; **Pure**.
+- `append_audit_hash(previous_hash: str, payload: Mapping[str, JsonValue]) -> str` — computes deterministic chain hash; **Pure**.
+- `verify_risk_audit_chain(events: Sequence[RiskAuditEvent]) -> AuditChainVerification` — validates genesis, sequence continuity, payload hashes, and tamper state; **Pure**.
+- `require_valid_audit_chain(verification: AuditChainVerification, mode: RiskMode) -> ValidationResult` — fails closed for live-sensitive modes when tampering is detected; **Pure**.
 
 #### 📄 File: `tokens.py`
 
@@ -1387,6 +1592,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Issues tokens only for bounded approved/reduced decisions and provides cryptographically verifiable pre-execution authorization evidence.
 
 **Requirements:**
+
 - **RISK-FR-452**: Implement decision token signer interface.
 - **RISK-FR-453**: Implement decision token validation.
 - **RISK-FR-454**: Implement token expiry validation.
@@ -1396,6 +1602,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-458**: Implement config hash validation for tokens.
 
 **Target Class/Function:**
+
 - `class RiskDecisionTokenSigner` — abstract signer/verifier port; **Side-effect boundary only if backed by an external key service**.
 - `create_risk_decision_token(decision: RiskDecisionPackage, signer: RiskDecisionTokenSigner, now_utc: datetime) -> RiskDecisionToken` — signs an eligible bounded approval; **Pure relative to injected signer**.
 - `validate_risk_approval_token(token: RiskDecisionToken, context: TokenValidationContext, verifier: RiskDecisionTokenSigner) -> TokenValidationResult` — checks signature, expiry, revocation, scope, policy hash, config hash, and schema; **Pure relative to injected verifier**.
@@ -1415,6 +1622,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Isolates all durable state from calculations and makes missing mandatory live storage a governed fail-closed condition.
 
 **Requirements:**
+
 - **RISK-FR-459**: Implement idempotent decision persistence.
 - **RISK-FR-460**: Implement duplicate same-material request handling.
 - **RISK-FR-461**: Implement duplicate different-material request rejection.
@@ -1422,6 +1630,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-463**: Fail closed when mandatory live audit persistence is unavailable.
 
 **Target Class/Function:**
+
 - `class RiskStateStore(Protocol)` — loads/persists kill-switch and drawdown state through explicit typed methods; **State-mutating port**.
 - `class RiskAuditSink(Protocol)` — appends verified `RiskAuditEvent` records; **State-mutating port**.
 - `class RiskPolicyStore(Protocol)` — reads approved policy records; **Read-only I/O port**.
@@ -1429,10 +1638,6 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - `persist_risk_decision(decision: RiskDecisionPackage, key: DecisionIdempotencyKey, store: RiskDecisionStore) -> PersistenceResult` — handles same-material duplicate/no-op and different-material rejection; **State-mutating**.
 - `validate_storage_schema_compatibility(record: StoredRiskRecord, expected_version: str) -> ValidationResult` — validates record compatibility; **Pure**.
 - `require_live_audit_persistence(capability: StorageCapability, mode: RiskMode) -> ValidationResult` — fails closed where audit storage is mandatory; **Pure**.
-
-### 📂 Module: `app/services/risk/storage`
-
-**Boundary Role:** Defines repository ports and controlled persistence adapters for risk state, decisions, audits, policies, kill switches, drawdowns, and revocations. It does not own schema migrations.
 
 #### 📄 File: `in_memory.py`
 
@@ -1443,6 +1648,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Provides reproducible persistence behavior without adding database-migration ownership to Risk.
 
 **Requirements:**
+
 - **RISK-FR-464**: Add audit hash stability tests.
 - **RISK-FR-465**: Add tamper detection tests.
 - **RISK-FR-466**: Add token validation tests.
@@ -1450,6 +1656,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-468**: Document audit, token, and storage behavior.
 
 **Target Class/Function:**
+
 - `class InMemoryRiskStateStore` — test/offline implementation of risk state and decision ports; **State-mutating in-memory state**.
 - `create_in_memory_risk_store() -> InMemoryRiskStateStore` — creates isolated test/simulation storage; **State-mutating object creation only**.
 - `simulate_storage_failure(store: FailingStore, operation: StorageOperation) -> PersistenceResult` — deterministic test-support fault injection; **State-mutating test support**.
@@ -1467,6 +1674,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Produces explainable risk reports from already-created decision/audit evidence, never filling gaps by recomputation or invented narrative.
 
 **Requirements:**
+
 - **RISK-EX-001**: Create reports engine for risk reporting.
 - **RISK-EX-002**: Generate reports from stored evidence only.
 - **RISK-EX-003**: Prevent reports from recomputing missing evidence.
@@ -1485,11 +1693,86 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-EX-016**: Emit metrics for audit persistence health.
 
 **Target Class/Function:**
+
 - `class RiskReportBuilder` — evidence-to-report builder; **Pure when stored evidence is supplied**.
 - `generate_risk_report(evidence: RiskReportEvidence, options: RiskReportOptions) -> RiskReport` — builds JSON-safe report without recomputation; **Pure**.
 - `redact_risk_report(report: RiskReport, policy: ReportRedactionPolicy) -> RiskReport` — removes sensitive fields; **Pure**.
 - `write_risk_report(report: RiskReport, destination: AuthorizedReportPath) -> ReportWriteReceipt` — writes only when an explicit path authorization exists; **State-mutating (file write)**.
 - `emit_risk_metrics(event: RiskObservabilityEvent, sink: MetricsSink) -> None` — emits counts/rates/latency/health metrics; **Side-effecting metrics emission**.
+
+#### 📄 File: `exporter.py`
+
+**File Boundary:** Explicitly authorized report file output, safe destination validation, write receipts, and overwrite policy enforcement.
+
+**Requirement Title:** Authorized risk report export
+
+**Description:** Keeps file-system mutation out of report construction. Exports occur only through a dedicated side-effect boundary with explicit authorization and bounded paths.
+
+**Requirements:**
+
+- **RISK-EX-005**: Implement optional file output with explicit write authorization.
+- **RISK-EX-006**: Redact sensitive fields in reports.
+
+**Target Class/Function:**
+
+- `class AuthorizedReportPath` — validated destination contract carrying root, relative path, overwrite policy, and request metadata; **Pure contract validation**.
+- `validate_report_export_destination(destination: AuthorizedReportPath) -> ValidationResult` — rejects traversal, unauthorized roots, unsafe extensions, and accidental overwrite; **Pure**.
+- `write_risk_report(report: RiskReport, destination: AuthorizedReportPath) -> ReportWriteReceipt` — writes only when explicit authorization exists; **State-mutating (file write)**.
+- `build_report_write_receipt(report: RiskReport, destination: AuthorizedReportPath, checksum: str) -> ReportWriteReceipt` — creates deterministic export audit evidence; **Pure**.
+
+### 📂 Module: `app/services/risk/observability`
+
+**Boundary Role:** TBD from System Boundary Diagram; audit-fix inserted boundary.
+
+#### 📄 File: `decorators.py`
+
+**File Boundary:** Logging, latency, error, and metrics decorators applied at service/tool boundaries, never inside pure risk math.
+
+**Requirement Title:** Observability decorator boundary
+
+**Description:** Isolates timing and structured lifecycle logging from risk calculations so NFR behavior does not pollute policy, sizing, correlation, VaR/ES, or stress kernels.
+
+**Requirements:**
+
+- **RISK-EX-010**: Emit latency metrics for governor reviews.
+- **RISK-EX-011**: Emit latency metrics for correlation calculations.
+- **RISK-EX-012**: Emit latency metrics for VaR/ES calculations.
+- **RISK-EX-013**: Emit latency metrics for stress scenario analysis.
+
+**Target Class/Function:**
+
+- `risk_observed(operation: str, metrics: MetricsSink, logger: RiskLogger) -> Callable[[RiskCallableT], RiskCallableT]` — wraps public boundaries with start/completion/failure logging and timing; **Decorator boundary with side-effecting logs/metrics**.
+- `measure_risk_latency(operation: str, metrics: MetricsSink) -> Callable[[RiskCallableT], RiskCallableT]` — records duration through an injected sink; **Decorator boundary with side-effecting metrics**.
+- `log_risk_boundary_event(event: RiskBoundaryEvent, logger: RiskLogger) -> None` — emits structured logs without raw secrets or private payloads; **Side-effecting logging**.
+
+#### 📄 File: `metrics.py`
+
+**File Boundary:** Metric event contracts, in-memory/offline metric sink, counter/rate/latency emission, and audit-persistence health metric helpers.
+
+**Requirement Title:** Risk metrics emission
+
+**Description:** Emits aggregate observability events without changing risk decisions, recomputing evidence, or exposing private account/broker payloads.
+
+**Requirements:**
+
+- **RISK-EX-007**: Emit metrics for risk decision counts.
+- **RISK-EX-008**: Emit metrics for approval, reduction, rejection, and halt rates.
+- **RISK-EX-009**: Emit metrics for top reason codes.
+- **RISK-EX-010**: Emit latency metrics for governor reviews.
+- **RISK-EX-011**: Emit latency metrics for correlation calculations.
+- **RISK-EX-012**: Emit latency metrics for VaR/ES calculations.
+- **RISK-EX-013**: Emit latency metrics for stress scenario analysis.
+- **RISK-EX-014**: Emit metrics for stale evidence failures.
+- **RISK-EX-015**: Emit metrics for kill-switch state.
+- **RISK-EX-016**: Emit metrics for audit persistence health.
+
+**Target Class/Function:**
+
+- `class MetricsSink(Protocol)` — injected metric sink for counters, gauges, rates, and latency observations; **Side-effecting port**.
+- `class InMemoryRiskMetricsSink` — deterministic offline/test metrics sink; **State-mutating in-memory state**.
+- `emit_risk_metrics(event: RiskObservabilityEvent, sink: MetricsSink) -> None` — emits counts, rates, latency, stale-evidence, kill-switch, and audit-health metrics; **Side-effecting metrics emission**.
+- `build_decision_metrics(decision: RiskDecisionPackage) -> tuple[RiskObservabilityEvent, ...]` — produces count/rate/reason-code events from a decision; **Pure**.
+- `build_latency_metric(operation: str, duration_ms: Decimal) -> RiskObservabilityEvent` — produces a bounded latency metric event; **Pure**.
 
 ### 📂 Module: `app/services/risk`
 
@@ -1504,17 +1787,45 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Keeps package initialization side-effect free and limits public imports to approved capabilities.
 
 **Requirements:**
+
 - **RISK-FR-470**: Create risk as public registry only.
 - **RISK-FR-471**: Export approved support capabilities only.
 - **RISK-FR-472**: Export approved official AI tools only.
 
 **Target Class/Function:**
+
 - `__all__: tuple[str, ...]` — explicit public export catalogue; **Pure declaration, no import-time I/O**.
 - `validate_public_risk_exports(exports: Sequence[str], catalogue: RiskToolCatalogue) -> ValidationResult` — verifies approved support/tool exports only; **Pure**.
 
 ### 📂 Module: `app/services/risk/tools`
 
 **Boundary Role:** Exposes only approved, JSON-safe Risk tool contracts. Tool wrappers validate, call approved services, construct standard envelopes, and never place broker trades.
+
+#### 📄 File: `registry.py`
+
+**File Boundary:** Official risk tool catalogue, metadata validation, public-tool discovery, and registry-drift detection.
+
+**Requirement Title:** Official risk tool registry
+
+**Description:** Defines the only approved agent-callable Risk tool surface and validates side-effect metadata before tools are exported through `app.services.risk` or attached to agents.
+
+**Requirements:**
+
+- **RISK-FR-469**: Create risk tools module for official AI-callable risk tools.
+- **RISK-FR-484**: Set places_trade to false for every risk tool.
+- **RISK-FR-485**: Set read_only metadata accurately for every risk tool.
+- **RISK-FR-486**: Set writes_file metadata accurately for report tools.
+- **RISK-FR-487**: Set modifies_database metadata accurately for audit-writing tools.
+- **RISK-FR-494**: Add metadata tests for every tool.
+- **RISK-FR-498**: Document official tool catalog.
+
+**Target Class/Function:**
+
+- `class RiskToolDefinition` — immutable official tool metadata including name, request schema, response schema, side effects, and risk level; **Pure contract validation**.
+- `build_risk_tool_registry() -> RiskToolRegistry` — returns the approved official tool catalogue; **Pure**.
+- `list_risk_tools(registry: RiskToolRegistry) -> tuple[RiskToolDefinition, ...]` — exposes deterministic public tool metadata; **Pure**.
+- `get_risk_tool_definition(name: str, registry: RiskToolRegistry) -> RiskToolDefinition` — resolves an approved tool or fails deterministically; **Pure**.
+- `validate_risk_tool_metadata(definition: RiskToolDefinition) -> ValidationResult` — verifies `places_trade`, `read_only`, `writes_file`, and `modifies_database` metadata are accurate; **Pure**.
 
 #### 📄 File: `official.py`
 
@@ -1525,6 +1836,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 **Description:** Provides the only agent-facing Risk surface, with complete metadata, input validation, envelope semantics, and fail-closed live-sensitive behavior.
 
 **Requirements:**
+
 - **RISK-FR-469**: Create risk tools module for official AI-callable risk tools.
 - **RISK-FR-473**: Implement `build_portfolio_risk_snapshot_tool`.
 - **RISK-FR-474**: Implement `review_trade_risk_tool`.
@@ -1554,6 +1866,7 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - **RISK-FR-498**: Document official tool catalog.
 
 **Target Class/Function:**
+
 - `build_portfolio_risk_snapshot_tool(request: PortfolioRiskSnapshotToolRequest) -> ToolResponse[RiskSnapshotPayload]` — builds a JSON-safe snapshot; **Read-only**.
 - `review_trade_risk_tool(request: TradeRiskReviewToolRequest) -> ToolResponse[RiskDecisionPayload]` — runs governed trade review and records required audit evidence; **State-mutating (audit/decision persistence only; `places_trade=False`)**.
 - `calculate_position_size_tool(request: PositionSizeToolRequest) -> ToolResponse[PositionSizingPayload]` — calculates policy-bounded size; **Read-only**.
@@ -1566,13 +1879,42 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 - `run_risk_scenario_analysis_tool(request: ScenarioAnalysisToolRequest) -> ToolResponse[StressPayload]` — evaluates stored/injected evidence; **Read-only**.
 - `generate_risk_report_tool(request: RiskReportToolRequest) -> ToolResponse[RiskReportPayload]` — builds report and may write only through explicit authorization; **State-mutating only for explicitly authorized report output**.
 
-## 3. Non-Functional Requirements (NFR) Architecture Map
+### 📂 Module: `agentic/tools`
+
+**Boundary Role:** Provides narrow agent attachment adapters for approved Risk tools. It does not own risk decisions or expose internal engines.
+
+#### 📄 File: `risk.py`
+
+**File Boundary:** Narrow agent-attachment adapter that imports only the official Risk tool registry and never exposes internal engines.
+
+**Requirement Title:** Agent-facing risk tool attachment adapter
+
+**Description:** Bridges approved Risk tool definitions into agent workflows while preserving the Risk package registry, standard envelopes, and non-bypass guarantees.
+
+**Requirements:**
+
+- **RISK-FR-469**: Create risk tools module for official AI-callable risk tools.
+- **RISK-FR-488**: Validate all tool inputs.
+- **RISK-FR-489**: Return standard success envelopes.
+- **RISK-FR-490**: Return standard error envelopes.
+- **RISK-FR-491**: Propagate request ID and workflow ID.
+- **RISK-FR-492**: Prevent raw model object leakage.
+- **RISK-FR-493**: Prevent raw exception leakage.
+
+**Target Class/Function:**
+
+- `load_agentic_risk_tools(registry: RiskToolRegistry) -> tuple[AgentToolDefinition, ...]` — adapts approved risk tools for agent attachment without exporting internal engines; **Pure**.
+- `validate_agentic_risk_tool_attachment(tool: AgentToolDefinition) -> ValidationResult` — rejects unapproved, broker-mutating, raw-object, or non-envelope tools; **Pure**.
+- `invoke_agentic_risk_tool(name: str, payload: Mapping[str, JsonValue], registry: RiskToolRegistry) -> ToolResponse[JsonObject]` — invokes only approved official wrappers and returns a standard envelope; **Side-effecting only according to the underlying tool metadata**.
+
+## 4. Non-Functional Requirements (NFR) Architecture Map
 
 The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an explicit structural pattern. The patterns intentionally keep observability, resilience, security, testability, and compliance controls outside mathematical business kernels.
 
 ### Delivery, release, and acceptance hardening
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-001**: Create a Phase 5 implementation report after completion.
 - **RISK-NFR-002**: Create a Phase 5 rollback report after completion.
 - **RISK-NFR-003**: Verify all unit tests pass.
@@ -1609,6 +1951,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Official public capability containment
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-027**: Export only approved public capabilities through risk tools.
 - **RISK-NFR-028**: Export official AI-callable tools only through risk tools.
 - **RISK-NFR-029**: Every official AI-callable tool shall return the standard HaruQuant response envelope.
@@ -1628,21 +1971,22 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Model determinism, validation, and serialization
 
 **NFR-ID and actual requirement text:**
-- **RISK-NFR-036**: Define all canonical risk enums with deterministic serialization.
-- **RISK-NFR-037**: Define `RiskDecisionStatus` values: `approve`, `reduce_size`, `reject`, `block`, `needs_more_evidence`, `needs_approval`, `halt_strategy`, and `halt_all`.
-- **RISK-NFR-038**: Define `RiskSeverity` values for info, warning, soft breach, hard breach, critical breach, and emergency halt.
-- **RISK-NFR-039**: Define stable `RiskReasonCode` values for every deterministic rejection, warning, reduction, and halt reason.
-- **RISK-NFR-040**: Model `ProposedTrade` with symbol, side, requested size, order type, intended stop, intended target, strategy ID, signal ID, timestamp, expected holding period, and evidence references.
-- **RISK-NFR-041**: Model `RiskAssessmentRequest` with proposed action, account state, portfolio state, market state, pending orders, open positions, policy profile, mode, and freshness metadata.
-- **RISK-NFR-042**: Model `RiskDecisionPackage` as the single response object for approvals, reductions, rejections, warnings, approval-required states, and halts.
-- **RISK-NFR-043**: Ensure `RiskDecisionPackage` includes requested size, approved size, max allowed size, action, reason codes, risk snapshot, policy hash, config hash, decision token, expiry, and audit hash reference.
-- **RISK-NFR-044**: Ensure `RiskDecisionPackage` is JSON-safe and stable across serialization/deserialization.
-- **RISK-NFR-045**: Ensure rejected decisions include deterministic `RiskRejection` details instead of free-text-only explanations.
-- **RISK-NFR-046**: Ensure approved decisions produce bounded `OrderIntent` metadata without becoming an execution order.
-- **RISK-NFR-047**: Ensure all financial values include units, account currency, quote currency, or explicit conversion metadata.
-- **RISK-NFR-048**: Ensure model validation rejects NaN, infinity, negative prices where invalid, zero stop distance, impossible leverage, missing currency, stale timestamps, and unknown symbols.
-- **RISK-NFR-049**: Ensure models support closed-bar-only market evidence for risk calculations that require historical bars.
-- **RISK-NFR-050**: Ensure every model has tests for valid input, invalid input, JSON serialization, equality/canonicalization, and redaction.
+
+- [x] **RISK-NFR-036**: Define all canonical risk enums with deterministic serialization. *app/services/risk/models/enums.py:14*
+- [x] **RISK-NFR-037**: Define `RiskDecisionStatus` values: `approve`, `reduce_size`, `reject`, `block`, `needs_more_evidence`, `needs_approval`, `halt_strategy`, and `halt_all`. *app/services/risk/models/enums.py:14*
+- [x] **RISK-NFR-038**: Define `RiskSeverity` values for info, warning, soft breach, hard breach, critical breach, and emergency halt. *app/services/risk/models/enums.py:48*
+- [x] **RISK-NFR-039**: Define stable `RiskReasonCode` values for every deterministic rejection, warning, reduction, and halt reason. *app/services/risk/models/enums.py:59*
+- [x] **RISK-NFR-040**: Model `ProposedTrade` with symbol, side, requested size, order type, intended stop, intended target, strategy ID, signal ID, timestamp, expected holding period, and evidence references. *app/services/risk/models/contracts.py:110*
+- [x] **RISK-NFR-041**: Model `RiskAssessmentRequest` with proposed action, account state, portfolio state, market state, pending orders, open positions, policy profile, mode, and freshness metadata. *app/services/risk/models/contracts.py:546*
+- [x] **RISK-NFR-042**: Model `RiskDecisionPackage` as the single response object for approvals, reductions, rejections, warnings, approval-required states, and halts. *app/services/risk/models/contracts.py:898*
+- [x] **RISK-NFR-043**: Ensure `RiskDecisionPackage` includes requested size, approved size, max allowed size, action, reason codes, risk snapshot, policy hash, config hash, decision token, expiry, and audit hash reference. *app/services/risk/models/contracts.py:898*
+- [x] **RISK-NFR-044**: Ensure `RiskDecisionPackage` is JSON-safe and stable across serialization/deserialization. *app/services/risk/models/serialization.py:23*
+- [x] **RISK-NFR-045**: Ensure rejected decisions include deterministic `RiskRejection` details instead of free-text-only explanations. *app/services/risk/models/contracts.py:1007*
+- [x] **RISK-NFR-046**: Ensure approved decisions produce bounded `OrderIntent` metadata without becoming an execution order. *app/services/risk/models/contracts.py:110*
+- [x] **RISK-NFR-047**: Ensure all financial values include units, account currency, quote currency, or explicit conversion metadata. *app/services/risk/models/contracts.py:719*
+- [x] **RISK-NFR-048**: Ensure model validation rejects NaN, infinity, negative prices where invalid, zero stop distance, impossible leverage, missing currency, stale timestamps, and unknown symbols. *app/services/risk/models/contracts.py:28*
+- [x] **RISK-NFR-049**: Ensure models support closed-bar-only market evidence for risk calculations that require historical bars. *app/services/risk/models/contracts.py:654*
+- [x] **RISK-NFR-050**: Ensure every model has tests for valid input, invalid input, JSON serialization, equality/canonicalization, and redaction. *tests/unit/app/services/risk/test_contracts.py:16*
 
 **Architectural Pattern:** Type Contract Boundary
 
@@ -1653,6 +1997,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Configuration safety and policy profiles
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-051**: Create risk configs with safe offline/simulation defaults.
 - **RISK-NFR-052**: Create risk configs with conservative prop-firm risk controls.
 - **RISK-NFR-053**: Create risk configs with paper-trading validation gates.
@@ -1677,6 +2022,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Deterministic policy-as-code
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-065**: Implement risk policy as deterministic policy-as-code.
 - **RISK-NFR-066**: Resolve policies by environment, trading mode, strategy, symbol, account, operator role, and workflow scope.
 - **RISK-NFR-067**: Enforce maximum daily loss, maximum total drawdown, maximum per-trade risk, maximum strategy risk, maximum symbol risk, maximum currency exposure, maximum correlated cluster risk, maximum margin usage, and maximum live-mode authority.
@@ -1697,6 +2043,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Market regime freshness and safety gate
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-075**: Implement market regime assessment before sizing and portfolio checks.
 - **RISK-NFR-076**: Classify spread regime using spread-to-Ïƒ thresholds.
 - **RISK-NFR-077**: Classify volatility regime using short, medium, and long rolling volatility windows.
@@ -1717,6 +2064,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Ordered deterministic limit evaluation
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-085**: Define `ORDERED_LIMIT_CHECKS` as an explicit deterministic sequence.
 - **RISK-NFR-086**: Run hard-blocking limits before advisory warnings.
 - **RISK-NFR-087**: Run kill-switch, stale-evidence, policy, and authority checks before sizing-dependent checks.
@@ -1740,6 +2088,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Position sizing purity and numerical controls
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-098**: Implement volatility-based position sizing as the default production sizing model.
 - **RISK-NFR-099**: Calculate initial risk amount from account equity, risk profile, drawdown state, strategy budget, and policy caps.
 - **RISK-NFR-100**: Calculate stop distance from volatility units such as M1 Ïƒ/ATR when used by the strategy.
@@ -1763,6 +2112,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### FX currency-leg and concentration controls
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-111**: Decompose every FX trade into base-currency and quote-currency legs.
 - **RISK-NFR-112**: Calculate signed symbol exposure, signed currency-leg exposure, gross exposure, net exposure, and account-currency equivalent exposure.
 - **RISK-NFR-113**: Treat long EURUSD as long EUR and short USD.
@@ -1785,6 +2135,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Correlation, clustering, and fallback control
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-123**: Calculate correlation on returns, not raw prices.
 - **RISK-NFR-124**: Support log returns, close-to-close returns, open-to-close returns, and σ-normalized returns where configured.
 - **RISK-NFR-125**: Align bars by identical opening timestamps and use closed bars only.
@@ -1806,6 +2157,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### VaR and Expected Shortfall tail-risk control
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-134**: Implement fast parametric portfolio VaR for real-time pre-trade checks.
 - **RISK-NFR-135**: Implement historical VaR from empirical portfolio return distributions.
 - **RISK-NFR-136**: Implement Expected Shortfall/CVaR as the primary tail-risk approval metric.
@@ -1829,6 +2181,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Stress-test gate
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-147**: Implement stress testing as a mandatory live-profile approval gate.
 - **RISK-NFR-148**: Include default stress scenarios for USD shock, JPY risk-off shock, GBP volatility shock, spread widening, slippage shock, correlation-to-one, news candle, rollover liquidity, margin spike, platform disconnect, stale quote, and forced liquidation.
 - **RISK-NFR-149**: Allow custom stress scenarios to be registered through config without arbitrary code execution.
@@ -1849,6 +2202,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Margin, drawdown, and execution-feasibility gates
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-157**: Calculate current and projected margin usage before approval.
 - **RISK-NFR-158**: Calculate free margin after proposed trade, pending orders, and in-flight execution reservations.
 - **RISK-NFR-159**: Enforce maximum margin usage per account, symbol, strategy, currency bucket, and portfolio.
@@ -1886,6 +2240,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Allocation and lifecycle governance
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-184**: Implement allocation review for strategy, symbol, currency, and portfolio budgets.
 - **RISK-NFR-185**: Support equal-risk, volatility parity, correlation-adjusted risk parity, regime-weighted, and drawdown-adjusted allocation methods.
 - **RISK-NFR-186**: Default live allocation shall be conservative correlation-adjusted volatility risk parity unless profile overrides.
@@ -1912,6 +2267,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Kill-switch containment and non-bypass enforcement
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-200**: Implement global, portfolio, strategy, symbol, and currency-bucket kill switches.
 - **RISK-NFR-201**: Kill switches shall block approvals regardless of signal quality, optimization evidence, or operator convenience.
 - **RISK-NFR-202**: Kill switches shall support active, inactive, unknown, triggered, pending resume, and locked states.
@@ -1930,6 +2286,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Governor orchestration, determinism, and audit emission
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-208**: Implement `RiskGovernor` as the canonical orchestration layer for pre-trade, allocation, admission, live-readiness, and lifecycle reviews.
 - **RISK-NFR-209**: `RiskGovernor` shall validate the request schema before any calculation.
 - **RISK-NFR-210**: `RiskGovernor` shall resolve policy before any sizing or portfolio calculation.
@@ -1960,6 +2317,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Audit integrity and token validation
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-228**: Create one audit event for every risk request and decision.
 - **RISK-NFR-229**: Include signal ID, strategy ID, symbol, side, requested size, approved size, reason codes, policy hash, config hash, risk snapshot, VaR, ES, stress loss, exposure, margin, drawdown state, and decision status in audit events.
 - **RISK-NFR-230**: Redact secrets, broker account identifiers, raw private payloads, and full approval packets from logs and reports.
@@ -1980,6 +2338,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Persistence contracts, idempotency, and failure isolation
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-238**: Define storage ports for risk state, audit events, policies, decisions, kill-switch state, drawdown state, and token revocation state.
 - **RISK-NFR-239**: Provide an in-memory store for tests and offline simulation.
 - **RISK-NFR-240**: Do not own durable database migrations unless explicitly assigned by the Data or platform persistence phase.
@@ -1997,6 +2356,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Evidence-only reports and redacted exports
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-245**: Generate risk reports from stored decisions, snapshots, and audit events without recomputing or fabricating evidence.
 - **RISK-NFR-246**: Include policy profile, config hash, mode, portfolio exposure, currency exposure, correlation clusters, VaR, ES, stress loss, drawdown state, margin usage, breaches, warnings, and decisions.
 - **RISK-NFR-247**: Support JSON-safe report output.
@@ -2013,6 +2373,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Official tool envelope and metadata safety
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-251**: Wrap approved risk capabilities in official AI-tool functions with standard response envelopes.
 - **RISK-NFR-252**: Set `places_trade=False` for every risk tool.
 - **RISK-NFR-253**: Set `read_only=False` only for tools that write audit, report, or decision state.
@@ -2031,6 +2392,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Cross-domain ownership and non-bypass rules
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-259**: Risk shall consume Strategy signals but shall not own strategy generation or strategy execution.
 - **RISK-NFR-260**: Risk shall consume Data market snapshots but shall not own market-data ingestion, cleaning, repair, enrichment, or persistence.
 - **RISK-NFR-261**: Risk shall consume Portfolio state but shall not own full portfolio accounting unless explicitly assigned by the Portfolio phase.
@@ -2050,6 +2412,7 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 ### Conservative default policy baselines
 
 **NFR-ID and actual requirement text:**
+
 - **RISK-NFR-268**: Encode institutional default values in config profiles with strict validation.
 - **RISK-NFR-269**: Document that default values are conservative baselines and not optimized promises.
 - **RISK-NFR-270**: Require owner approval before increasing risk thresholds above conservative defaults.
@@ -2061,13 +2424,14 @@ The following groups map every `RISK-NFR-001` through `RISK-NFR-271` to an expli
 
 **Implementation Strategy:** Encode conservative defaults only in named profile data with strict maximum validation and owner-governed escalation. Engines never hardcode prop-firm thresholds; all threshold values flow from an immutable resolved profile and configuration hash.
 
-## 4. Verification, Example, Documentation, and Operational Requirements
+## 5. Verification, Example, Documentation, and Operational Requirements
 
 This section maps every `RISK-TEST-*` and `RISK-EX-*` requirement to non-production verification, reporting, documentation, and example boundaries. These requirements are part of the implementation acceptance surface, but they do not belong inside decision math.
 
 ### Unit and package verification requirements
 
 **Requirement IDs and actual requirement text:**
+
 - **RISK-TEST-001**: Cover every requirement in this phase with normal, edge, invalid-input, fail-closed, logging, schema, and regression tests as applicable.
 - **RISK-TEST-002**: Preserve the project gate of at least 80% coverage for each affected file and package.
 - **RISK-TEST-003**: Verify standard envelopes, deterministic error codes, import behavior, and ownership boundaries.
@@ -2084,6 +2448,7 @@ This section maps every `RISK-TEST-*` and `RISK-EX-*` requirement to non-product
 ### Cross-domain integration verification requirements
 
 **Requirement IDs and actual requirement text:**
+
 - **RISK-TEST-009**: Test signal-to-risk-decision workflow.
 - **RISK-TEST-010**: Test pre-trade risk review workflow with Strategy, Data, Portfolio, and Execution metadata snapshots.
 - **RISK-TEST-011**: Test volatility sizing plus currency exposure plus correlation plus VaR/ES plus stress approval path.
@@ -2103,6 +2468,7 @@ This section maps every `RISK-TEST-*` and `RISK-EX-*` requirement to non-product
 ### Scenario, security, chaos, and performance verification requirements
 
 **Requirement IDs and actual requirement text:**
+
 - **RISK-TEST-020**: Scenario test: USD shock across multiple USD-short pairs forces reduction or rejection.
 - **RISK-TEST-021**: Scenario test: JPY risk-off shock across JPY crosses forces cluster-risk reduction or rejection.
 - **RISK-TEST-022**: Scenario test: spread widening beyond spread-to-Ïƒ limit blocks M1 scalping entries.
@@ -2127,6 +2493,7 @@ This section maps every `RISK-TEST-*` and `RISK-EX-*` requirement to non-product
 ### Reports, observability, and runnable example requirements
 
 **Requirement IDs and actual requirement text:**
+
 - **RISK-EX-001**: Create reports engine for risk reporting.
 - **RISK-EX-002**: Generate reports from stored evidence only.
 - **RISK-EX-003**: Prevent reports from recomputing missing evidence.
@@ -2177,6 +2544,7 @@ This section maps every `RISK-TEST-*` and `RISK-EX-*` requirement to non-product
 ### Documentation, logging, and operational runbook requirements
 
 **Requirement IDs and actual requirement text:**
+
 - **RISK-EX-043**: Document Phase 5 as the final deterministic authority before execution.
 - **RISK-EX-044**: Document module purpose, non-goals, ownership boundaries, and integration boundaries in `app/services/risk/README.md`.
 - **RISK-EX-045**: Document official public capability catalog and import pattern.
@@ -2201,15 +2569,24 @@ This section maps every `RISK-TEST-*` and `RISK-EX-*` requirement to non-product
 
 **Implementation Strategy:** Document ownership, public APIs, profiles, limit order, policies, methodology, state machines, error codes, and tokens. Centralized logging/redaction wrappers record only bounded redacted metadata, while metrics record decision/latency/staleness/tail-risk/kill-switch/audit health signals.
 
-## 5. Requirement Coverage Ledger
+### 5.6 Section 3 Structural Audit Fix
 
-| Requirement family | Source range | Labelled requirement count | Architecture location |
-|---|---:|---:|---|
-| Functional | `RISK-FR-001`–`RISK-FR-498` | 498 | Section 3 |
-| Non-functional | `RISK-NFR-001`–`RISK-NFR-271` | 271 | Section 3 NFR Map |
-| Tests | `RISK-TEST-001`–`RISK-TEST-035` | 35 | Section 4 |
-| Examples / documentation / observability | `RISK-EX-001`–`RISK-EX-061` | 61 | Section 3 reports + Section 4 |
-| **Total labelled requirements mapped** | — | **865** | **All sections above** |
+The following audit correction is intentionally structural, not a new product feature:
+
+- Every non-`__init__.py` file listed in Section 1 now has a matching `#### 📄 File:` subsection under Section 3.
+- Repeated `### 📂 Module:` headers in Section 3 have been consolidated into one module header per module.
+- Requirements that were previously grouped under a neighboring file now have an explicit file-level boundary subsection for the owning component.
+- The affected files are: `models/enums.py`, `config/hashing.py`, `config/profiles.py`, `policy/contracts.py`, `sizing/normalization.py`, `correlation/fallbacks.py`, `stress/registry.py`, `governor/decision_synthesis.py`, `audit/hash_chain.py`, `reports/exporter.py`, `observability/decorators.py`, `observability/metrics.py`, `tools/registry.py`, and `agentic/tools/risk.py`.
+
+## 6. Requirement Coverage Ledger
+
+| Requirement family                           |                         Source range | Labelled requirement count | Architecture location         |
+| -------------------------------------------- | -----------------------------------: | -------------------------: | ----------------------------- |
+| Functional                                   |     `RISK-FR-001`–`RISK-FR-498` |                        498 | Section 3                     |
+| Non-functional                               |   `RISK-NFR-001`–`RISK-NFR-271` |                        271 | Section 3 NFR Map             |
+| Tests                                        | `RISK-TEST-001`–`RISK-TEST-035` |                         35 | Section 4                     |
+| Examples / documentation / observability     |     `RISK-EX-001`–`RISK-EX-061` |                         61 | Section 3 reports + Section 4 |
+| **Total labelled requirements mapped** |                                   — |              **865** | **All sections above**  |
 
 ### Traceability checks for Builder handoff
 
@@ -2218,4 +2595,3 @@ This section maps every `RISK-TEST-*` and `RISK-EX-*` requirement to non-product
 - `RiskGovernor` is the only coordinator allowed to create final `RiskDecisionPackage` outcomes; audit/token work is delegated to explicit ports.
 - All live-sensitive failures are fail-closed: missing/invalid/stale/unreconciled evidence, invalid policy, kill-switch uncertainty, token failure, audit-chain failure, and mandatory persistence outage block approval.
 - Every official Risk tool has `places_trade=False`; Trading and Live remain responsible for revalidating a fresh, scoped, compatible token immediately before broker mutation.
-
