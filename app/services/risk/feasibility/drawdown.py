@@ -1,7 +1,13 @@
-"""Drawdown Governor Engine.
+# ruff: noqa: PLR2004
+"""Drawdown governor engine.
 
 Calculates total, daily, and strategy-level drawdowns, manages state transitions,
-persists throttling states, and checks for revenge/catch-up risk behavior.
+persists throttling states, and checks for revenge/catch-up risk behavior. Also
+exposes a pure, canonically-typed V2 calculation surface
+(:func:`determine_drawdown_state`, :func:`calculate_drawdown_multiplier`) and a
+dual-dispatch :func:`apply_drawdown_throttle` that accepts either the original
+V1 ``PortfolioState``/``market_context`` calling convention or the canonical
+V2 ``size``/``DrawdownState``/``EffectiveRiskPolicy`` convention.
 """
 
 from __future__ import annotations
@@ -10,11 +16,12 @@ import json
 from decimal import Decimal
 from enum import StrEnum
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, overload
 
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
     DrawdownState,
+    PortfolioRiskSnapshot,
     PortfolioState,
     ProposedTrade,
     RiskConfig,
@@ -24,6 +31,9 @@ from app.services.risk.models import (
 )
 from app.utils.errors import ValidationError
 from app.utils.logger import logger
+
+if TYPE_CHECKING:
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
 
 
 class RiskStepDownState(StrEnum):
@@ -54,11 +64,14 @@ def calculate_daily_drawdown(
         Decimal daily drawdown percentage.
     """
     if daily_start_balance <= Decimal("0.0"):
+        logger.debug("Daily start balance is non-positive; daily drawdown is 0.")
         return Decimal("0.0")
-    return max(
+    drawdown = max(
         Decimal("0.0"),
         (daily_start_balance - portfolio_state.equity) / daily_start_balance,
     )
+    logger.info(f"Calculated daily drawdown: {drawdown:.4f}.")
+    return drawdown
 
 
 def calculate_total_drawdown(
@@ -74,8 +87,13 @@ def calculate_total_drawdown(
         Decimal total drawdown percentage.
     """
     if peak_balance <= Decimal("0.0"):
+        logger.debug("Peak balance is non-positive; total drawdown is 0.")
         return Decimal("0.0")
-    return max(Decimal("0.0"), (peak_balance - portfolio_state.equity) / peak_balance)
+    drawdown = max(
+        Decimal("0.0"), (peak_balance - portfolio_state.equity) / peak_balance
+    )
+    logger.info(f"Calculated total drawdown: {drawdown:.4f}.")
+    return drawdown
 
 
 def calculate_strategy_drawdown(
@@ -102,11 +120,14 @@ def calculate_strategy_drawdown(
     current_strat_equity = allocation + strat_pnl
 
     if strategy_peak_equity <= Decimal("0.0"):
+        logger.debug(f"Strategy '{strategy_id}' peak equity is non-positive.")
         return Decimal("0.0")
-    return max(
+    drawdown = max(
         Decimal("0.0"),
         (strategy_peak_equity - current_strat_equity) / strategy_peak_equity,
     )
+    logger.info(f"Calculated strategy '{strategy_id}' drawdown: {drawdown:.4f}.")
+    return drawdown
 
 
 def determine_drawdown_throttling(
@@ -122,23 +143,23 @@ def determine_drawdown_throttling(
     Returns:
         tuple containing (DrawdownThrottlingState, multiplier)
     """
-    # 1. Halted state: drawdown meets or exceeds hard limit
     if drawdown >= hard_limit:
+        logger.info(f"Drawdown {drawdown:.4f} halted (>= hard limit {hard_limit}).")
         return DrawdownThrottlingState.HALTED, Decimal("0.0")
 
-    # 2. Recovery-only state: drawdown is close to hard limit (within 80%)
     if drawdown >= hard_limit * Decimal("0.8"):
+        logger.info(f"Drawdown {drawdown:.4f} in recovery-only state.")
         return DrawdownThrottlingState.RECOVERY_ONLY, Decimal("0.2")
 
-    # 3. Defensive state: drawdown has breached soft limit
     if drawdown >= soft_limit:
+        logger.info(f"Drawdown {drawdown:.4f} in defensive state.")
         return DrawdownThrottlingState.DEFENSIVE, Decimal("0.5")
 
-    # 4. Caution state: drawdown is elevated but below soft limit (within 50%)
     if drawdown >= soft_limit * Decimal("0.5"):
+        logger.info(f"Drawdown {drawdown:.4f} in caution state.")
         return DrawdownThrottlingState.CAUTION, Decimal("0.8")
 
-    # 5. Normal state
+    logger.info(f"Drawdown {drawdown:.4f} is normal.")
     return DrawdownThrottlingState.NORMAL, Decimal("1.0")
 
 
@@ -152,8 +173,8 @@ def persist_drawdown_state(state: DrawdownState, file_path: str | Path) -> None:
     path = Path(file_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
-        # Pydantic JSON serialization helper
         f.write(state.to_json())
+    logger.info(f"Persisted drawdown state to {path}.")
 
 
 def restore_drawdown_state(file_path: str | Path) -> DrawdownState | None:
@@ -169,6 +190,7 @@ def restore_drawdown_state(file_path: str | Path) -> DrawdownState | None:
     """
     path = Path(file_path)
     if not path.exists():
+        logger.debug(f"Drawdown state file does not exist: {path}.")
         return None
     try:
         with path.open("r", encoding="utf-8") as f:
@@ -182,12 +204,14 @@ def restore_drawdown_state(file_path: str | Path) -> DrawdownState | None:
             )
             return None
 
-        return DrawdownState(
+        state = DrawdownState(
             current_drawdown=Decimal(str(data["current_drawdown"])),
             soft_limit=Decimal(str(data["soft_limit"])),
             hard_limit=Decimal(str(data["hard_limit"])),
             multiplier=Decimal(str(data["multiplier"])),
         )
+        logger.info(f"Restored drawdown state from {path}.")
+        return state
     except Exception as e:  # noqa: BLE001
         logger.warning(f"Failed to restore drawdown state from {file_path}: {e}")
         return None
@@ -214,10 +238,9 @@ def check_revenge_trading(
         tuple (revenge_detected: bool, reason_message: str)
     """
     if proposed_trade is None:
+        logger.debug("No proposed trade; revenge trading check skipped.")
         return False, ""
 
-    # Allow revenge/catch-up trade bypass under simulation policy
-    # if explicitly configured
     is_simulation = (
         market_context.get("mode") == "simulation"
         or market_context.get("environment") == "simulation"
@@ -227,6 +250,7 @@ def check_revenge_trading(
         and config.experimental_features.get("allow_revenge_trading") is True
     )
     if is_simulation and allow_revenge:
+        logger.debug("Revenge trading check bypassed under simulation policy.")
         return False, ""
 
     if drawdown_state.multiplier >= Decimal("1.0"):
@@ -237,6 +261,7 @@ def check_revenge_trading(
         f"{symbol}_historical_avg_volume"
     ) or market_context.get("historical_avg_volume")
     if avg_vol_raw is None:
+        logger.debug(f"No historical average volume metadata for {symbol}.")
         return False, ""
 
     avg_vol = Decimal(str(avg_vol_raw))
@@ -249,6 +274,7 @@ def check_revenge_trading(
             f"(historical average: {avg_vol} lots, "
             f"multiplier: {drawdown_state.multiplier})."
         )
+        logger.info(msg)
         return True, msg
     return False, ""
 
@@ -263,6 +289,7 @@ def _check_reset_approval(market_context: dict[str, Any]) -> LimitResult | None:
         market_context.get("approval_token_valid")
         or market_context.get("approval_token")
     ):
+        logger.info("Drawdown reset requested without a valid approval token.")
         return LimitResult(
             limit_name="max_drawdown_limit",
             status=RiskDecisionStatus.BLOCK,
@@ -285,6 +312,7 @@ def _check_daily_loss(
         daily_start_balance = Decimal(str(daily_start_raw))
         daily_dd = calculate_daily_drawdown(portfolio_state, daily_start_balance)
         if daily_dd >= config.max_daily_loss_pct:
+            logger.info(f"Daily hard loss limit breached: {daily_dd:.2%}.")
             return LimitResult(
                 limit_name="max_drawdown_limit",
                 status=RiskDecisionStatus.BLOCK,
@@ -328,6 +356,9 @@ def _check_strategy_loss(
     if strat_peak > 0:
         strat_dd = calculate_strategy_drawdown(strategy_id, portfolio_state, strat_peak)
         if strat_dd >= max_strat_loss:
+            logger.info(
+                f"Strategy loss limit breached for '{strategy_id}': {strat_dd:.2%}."
+            )
             return LimitResult(
                 limit_name="max_drawdown_limit",
                 status=RiskDecisionStatus.REJECT,
@@ -342,7 +373,7 @@ def _check_strategy_loss(
     return None
 
 
-def apply_drawdown_throttle(
+def _apply_drawdown_throttle_v1(
     portfolio_state: PortfolioState,
     proposed_trade: ProposedTrade | None,
     market_context: dict[str, Any],
@@ -354,20 +385,16 @@ def apply_drawdown_throttle(
     strategy-level limits, daily hard loss limits, revenge trading
     behaviors, and reset approval requirements.
     """
-    # 1. Reset approval check
     result = _check_reset_approval(market_context)
 
-    # 2. Daily hard loss limit check
     if result is None:
         result = _check_daily_loss(portfolio_state, market_context, config)
 
-    # 3. Strategy-level loss limit check
     if result is None:
         result = _check_strategy_loss(
             portfolio_state, proposed_trade, market_context, config
         )
 
-    # 4. Total Drawdown and Revenge Checks
     if result is None:
         peak_balance_raw = market_context.get("peak_balance")
         if peak_balance_raw is None:
@@ -379,7 +406,6 @@ def apply_drawdown_throttle(
         soft_limit = config.max_total_loss_pct_advisory
         hard_limit = config.max_total_loss_pct
 
-        # Determine state and scale-down multiplier
         throttling_state, multiplier = determine_drawdown_throttling(
             drawdown, soft_limit, hard_limit
         )
@@ -391,8 +417,8 @@ def apply_drawdown_throttle(
             multiplier=multiplier,
         )
 
-        # 4.1. Hard halt limit check
         if throttling_state == DrawdownThrottlingState.HALTED:
+            logger.info(f"Total drawdown halt threshold breached: {drawdown:.2%}.")
             result = LimitResult(
                 limit_name="max_drawdown_limit",
                 status=RiskDecisionStatus.BLOCK,
@@ -406,7 +432,6 @@ def apply_drawdown_throttle(
                 details=state.model_dump(),
             )
         else:
-            # 4.2. Check for revenge/catch-up trade behavior
             is_revenge, revenge_msg = check_revenge_trading(
                 proposed_trade, state, market_context, config
             )
@@ -420,12 +445,15 @@ def apply_drawdown_throttle(
                     breached=True,
                     details=state.model_dump(),
                 )
-            # If in warning or scaled states, return advisory warnings
             elif throttling_state in {
                 DrawdownThrottlingState.CAUTION,
                 DrawdownThrottlingState.DEFENSIVE,
                 DrawdownThrottlingState.RECOVERY_ONLY,
             }:
+                logger.info(
+                    f"Drawdown throttling active ({throttling_state.value}): "
+                    f"multiplier {multiplier}."
+                )
                 result = LimitResult(
                     limit_name="max_drawdown_limit",
                     status=RiskDecisionStatus.REDUCE_SIZE,
@@ -461,8 +489,141 @@ def verify_drawdown_limits(
     """Enforce total drawdown limits and check for revenge trading behavior.
 
     Delegates check sequence directly to apply_drawdown_throttle.
+
+    Args:
+        portfolio_state: Current portfolio snapshot.
+        proposed_trade: Optional candidate proposed trade.
+        market_context: Market details.
+        config: Active risk configuration.
+
+    Returns:
+        LimitResult: Outcome of the drawdown-aware throttling sequence.
     """
-    return apply_drawdown_throttle(
+    logger.info("Verifying drawdown limits via throttle sequence.")
+    return _apply_drawdown_throttle_v1(
+        portfolio_state, proposed_trade, market_context, config
+    )
+
+
+def determine_drawdown_state(
+    snapshot: PortfolioRiskSnapshot,
+    prior: DrawdownState | None,
+    policy: EffectiveRiskPolicy,
+) -> DrawdownState:
+    """Classify normal/caution/defensive/recovery/halted drawdown state.
+
+    Args:
+        snapshot: Canonical portfolio-level risk snapshot carrying the
+            current drawdown percentage.
+        prior: Optional previously persisted drawdown state (unused for
+            classification, retained for auditability of state transitions).
+        policy: Resolved effective risk policy providing soft/hard limits.
+
+    Returns:
+        DrawdownState: Classified drawdown state with applied multiplier.
+    """
+    logger.info("Determining canonical drawdown state from portfolio snapshot.")
+    config = policy.resolved_config
+    soft_limit = config.max_total_loss_pct_advisory
+    hard_limit = config.max_total_loss_pct
+    drawdown = snapshot.drawdown
+
+    _, multiplier = determine_drawdown_throttling(drawdown, soft_limit, hard_limit)
+    logger.debug(
+        f"Canonical drawdown state resolved: drawdown={drawdown}, "
+        f"multiplier={multiplier}, prior_present={prior is not None}."
+    )
+
+    return DrawdownState(
+        current_drawdown=drawdown,
+        soft_limit=soft_limit,
+        hard_limit=hard_limit,
+        multiplier=multiplier,
+    )
+
+
+def calculate_drawdown_multiplier(
+    state: DrawdownState, policy: EffectiveRiskPolicy
+) -> Decimal:
+    """Return the approved risk step-down multiplier for a drawdown state.
+
+    Args:
+        state: Classified drawdown state.
+        policy: Resolved effective risk policy (retained for interface
+            symmetry; the multiplier is already embedded in `state`).
+
+    Returns:
+        Decimal: The risk-scaling multiplier to apply to proposed sizing.
+    """
+    logger.info(f"Resolving drawdown multiplier: {state.multiplier}.")
+    _ = policy
+    return state.multiplier
+
+
+@overload
+def apply_drawdown_throttle(
+    portfolio_state: PortfolioState,
+    proposed_trade: ProposedTrade | None,
+    market_context: dict[str, Any],
+    config: RiskConfig,
+) -> LimitResult: ...
+
+
+@overload
+def apply_drawdown_throttle(
+    size: Decimal,
+    state: DrawdownState,
+    policy: EffectiveRiskPolicy,
+) -> Decimal: ...
+
+
+def apply_drawdown_throttle(*args: Any, **kwargs: Any) -> Any:
+    """Apply drawdown-aware risk throttling, supporting V1 and V2 signatures.
+
+    Args:
+        *args: Positional arguments. For V2, the arguments are
+            (size: Decimal, state: DrawdownState, policy: EffectiveRiskPolicy).
+            For V1, the arguments are
+            (portfolio_state: PortfolioState, proposed_trade: ProposedTrade | None,
+            market_context: dict[str, Any], config: RiskConfig).
+        **kwargs: Keyword arguments mirroring the positional forms above.
+
+    Returns:
+        Decimal | LimitResult: For V2, the throttled size. For V1, the
+            aggregated LimitResult of the throttling sequence.
+    """
+    logger.info("apply_drawdown_throttle entry.")
+
+    is_v2 = ("size" in kwargs and isinstance(kwargs["size"], Decimal)) or (
+        len(args) > 0 and isinstance(args[0], Decimal)
+    )
+
+    if is_v2:
+        size: Any = kwargs.get("size", args[0] if len(args) > 0 else None)
+        state: Any = kwargs.get("state", args[1] if len(args) > 1 else None)
+        policy: Any = kwargs.get("policy", args[2] if len(args) > 2 else None)
+        max_size_cap = policy.resolved_config.max_risk_per_trade
+        reduced = size * state.multiplier
+        if max_size_cap > Decimal("0.0"):
+            reduced = min(reduced, size)
+        logger.debug(
+            f"V2 drawdown throttle applied: size={size}, "
+            f"multiplier={state.multiplier} -> {reduced}."
+        )
+        return reduced
+
+    portfolio_state: Any = kwargs.get(
+        "portfolio_state", args[0] if len(args) > 0 else None
+    )
+    proposed_trade: Any = kwargs.get(
+        "proposed_trade", args[1] if len(args) > 1 else None
+    )
+    market_context: Any = kwargs.get(
+        "market_context", args[2] if len(args) > 2 else None
+    )
+    config: Any = kwargs.get("config", args[3] if len(args) > 3 else None)
+
+    return _apply_drawdown_throttle_v1(
         portfolio_state, proposed_trade, market_context, config
     )
 
@@ -480,6 +641,7 @@ class DrawdownGovernor:
             config: Optional active risk config profile.
         """
         self.config = config
+        logger.debug("DrawdownGovernor initialized.")
 
     def calculate_daily_drawdown(
         self, portfolio_state: PortfolioState, daily_start_balance: Decimal
@@ -520,10 +682,10 @@ class DrawdownGovernor:
         """Implement drawdown-aware risk throttling before hard loss limits are hit."""
         active_config = config or self.config
         if active_config is None:
-            raise ValidationError(
-                "DrawdownGovernor requires a RiskConfig to apply throttling."
-            )
-        return apply_drawdown_throttle(
+            msg = "DrawdownGovernor requires a RiskConfig to apply throttling."
+            logger.error(msg)
+            raise ValidationError(msg)
+        return _apply_drawdown_throttle_v1(
             portfolio_state, proposed_trade, market_context, active_config
         )
 

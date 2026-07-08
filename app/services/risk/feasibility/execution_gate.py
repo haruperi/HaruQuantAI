@@ -1,20 +1,25 @@
-"""Execution Feasibility Gate Engine.
+"""Execution feasibility gate engine.
 
 Validates spread, slippage, stop levels, freeze levels, lot size granularities,
-market session states, and strategy trade frequencies.
+market session states, and strategy trade frequencies. Also exposes a pure,
+canonically-typed V2 calculation surface (:func:`assess_execution_feasibility`,
+:func:`validate_stop_and_freeze_levels`, :func:`validate_micro_scalping_costs`)
+built on top of the same broker constraint evidence used by the original V1
+``PortfolioState``/``market_context`` calculation surface.
 """
 
 from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import Field
 
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
     ExecutionRiskSnapshot,
+    MarketRiskSnapshot,
     PortfolioState,
     ProposedTrade,
     RiskConfig,
@@ -23,6 +28,11 @@ from app.services.risk.models import (
     RiskReasonCode,
     RiskSeverity,
 )
+from app.utils.logger import logger
+
+if TYPE_CHECKING:
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+    from app.utils.validations import ValidationResult
 
 
 class SlippagePolicy(RiskContract):
@@ -129,6 +139,7 @@ def check_spread_limit(
         msg = (
             f"Spread {spread} exceeds absolute max spread limit of {policy.max_spread}."
         )
+        logger.debug(msg)
         return False, msg
 
     if volatility > Decimal("0.0"):
@@ -143,6 +154,7 @@ def check_spread_limit(
                 f"Spread {spread} exceeds volatility limit of {limit} "
                 f"({multiplier}x sigma)."
             )
+            logger.debug(msg)
             return False, msg
 
     return True, ""
@@ -168,6 +180,7 @@ def check_slippage_limit(
             f"Slippage {slippage} exceeds absolute max slippage limit of "
             f"{policy.max_slippage}."
         )
+        logger.debug(msg)
         return False, msg
 
     if volatility > Decimal("0.0"):
@@ -177,6 +190,7 @@ def check_slippage_limit(
                 f"Slippage allowance {slippage} exceeds volatility threshold of "
                 f"{limit} ({policy.slippage_sigma_multiplier}x sigma)."
             )
+            logger.debug(msg)
             return False, msg
 
     return True, ""
@@ -214,7 +228,6 @@ def check_stop_distance_validity(
 
     tolerance = Decimal("1e-9")
 
-    # Stop Loss checks
     if sl is not None and sl != Decimal("0.0"):
         remainder_sl = sl % pip_size
         if remainder_sl > tolerance and abs(remainder_sl - pip_size) > tolerance:
@@ -222,6 +235,7 @@ def check_stop_distance_validity(
                 f"Stop loss price {sl} cannot be represented under broker "
                 f"point size of {pip_size}."
             )
+            logger.debug(msg)
             return False, msg
 
         distance = abs(price - sl)
@@ -234,6 +248,7 @@ def check_stop_distance_validity(
                 f"is below broker stop_level threshold of {min_dist} "
                 f"({stop_level} pips)."
             )
+            logger.debug(msg)
             return False, msg
 
         if distance < min_freeze:
@@ -242,9 +257,9 @@ def check_stop_distance_validity(
                 f"is inside broker freeze_level threshold of {min_freeze} "
                 f"({freeze_level} pips)."
             )
+            logger.debug(msg)
             return False, msg
 
-    # Take Profit checks
     if tp is not None and tp != Decimal("0.0"):
         remainder_tp = tp % pip_size
         if remainder_tp > tolerance and abs(remainder_tp - pip_size) > tolerance:
@@ -252,6 +267,7 @@ def check_stop_distance_validity(
                 f"Target price {tp} cannot be represented under broker "
                 f"point size of {pip_size}."
             )
+            logger.debug(msg)
             return False, msg
 
     return True, ""
@@ -294,7 +310,6 @@ def check_lot_step_validity(
             None,
         )
 
-    # Granularity step check
     remainder = (volume - volume_min) % volume_step
     tolerance = Decimal("1e-9")
     if remainder > tolerance and abs(remainder - volume_step) > tolerance:
@@ -457,6 +472,7 @@ def _resolve_metadata_and_defaults(
     missing = [k for k in keys if raw_vals[k] is None]
     if missing:
         msg = f"Broker metadata is missing fields: {', '.join(missing)}."
+        logger.error(msg)
         res = ExecutionFeasibilityResult(
             status=RiskDecisionStatus.REJECT,
             reason_code=RiskReasonCode.INVALID_INPUT,
@@ -583,7 +599,6 @@ def _evaluate_spread_and_slippage(
     )
     slippage = slippage_pips * pip_size
 
-    # Non-live multiplier defaults to 10.0
     mult_default = "10.0" if not is_live else "2.0"
     slippage_policy = SlippagePolicy(
         max_slippage=Decimal(str(market_context.get("max_slippage")))
@@ -620,7 +635,6 @@ def _evaluate_trade_constraints(
     vol_step: Decimal,
     pip_size: Decimal,
 ) -> ExecutionFeasibilityResult | None:
-    # Stop distance & price representation limits
     stop_pass, stop_msg = check_stop_distance_validity(
         proposed_trade, stop_level, freeze_level, pip_size
     )
@@ -633,7 +647,6 @@ def _evaluate_trade_constraints(
             breached=True,
         )
 
-    # Lot step & volume step granularity limits
     vol_pass, vol_msg, reduced = check_lot_step_validity(
         proposed_trade.volume, vol_min, vol_max, vol_step
     )
@@ -657,7 +670,6 @@ def _evaluate_trade_constraints(
             reduced_volume=reduced,
         )
 
-    # Filling mode limit checks
     symbol = proposed_trade.symbol
     filling_mode = market_context.get(f"{symbol}_filling_mode") or market_context.get(
         "filling_mode"
@@ -679,7 +691,6 @@ def _evaluate_trade_constraints(
                     breached=True,
                 )
 
-    # Max holding-time checks
     hold_pass, hold_msg = check_holding_time_limit(proposed_trade, market_context)
     if not hold_pass:
         return ExecutionFeasibilityResult(
@@ -690,7 +701,6 @@ def _evaluate_trade_constraints(
             breached=True,
         )
 
-    # Trade frequency limits
     freq_pass, freq_msg = check_trade_frequency_limit(
         portfolio_state, proposed_trade, market_context
     )
@@ -737,7 +747,6 @@ def _evaluate_metadata_status(
         "full_live",
     } or market_context.get("environment") in {"production", "live"}
 
-    # Check if any broker metadata is provided (prefixed or base)
     metadata_keys = [
         f"{symbol}_stop_level",
         "stop_level",
@@ -831,6 +840,7 @@ def check_execution_feasibility(  # noqa: PLR0911
     Returns:
         ExecutionFeasibilityResult showing feasibility approval status.
     """
+    logger.info("Evaluating execution feasibility sequence.")
     _skip_checks, is_live, err_res = _evaluate_metadata_status(
         proposed_trade, market_context
     )
@@ -847,7 +857,6 @@ def check_execution_feasibility(  # noqa: PLR0911
         )
     symbol = proposed_trade.symbol
 
-    # 2. Presence & consistency check helper
     (
         stop_level,
         freeze_level,
@@ -860,7 +869,6 @@ def check_execution_feasibility(  # noqa: PLR0911
     if err_res is not None:
         return err_res
 
-    # Narrow Decimal | None → Decimal after guard (guaranteed by _resolve)
     stop_level = cast("Decimal", stop_level)
     freeze_level = cast("Decimal", freeze_level)
     vol_min = cast("Decimal", vol_min)
@@ -868,13 +876,13 @@ def check_execution_feasibility(  # noqa: PLR0911
     vol_step = cast("Decimal", vol_step)
     pip_size = cast("Decimal", pip_size)
 
-    # 3. Check market open / session constraints
     session_open = market_context.get(f"{symbol}_session_open", True)
     tradable = market_context.get(f"{symbol}_tradable", True)
     session = market_context.get("session", "OPEN")
     market_open = session != "CLOSED" and session_open and tradable
     if not market_open:
         msg = f"Execution gate rejected: {symbol} market is closed or suspended."
+        logger.info(msg)
         return ExecutionFeasibilityResult(
             status=RiskDecisionStatus.REJECT,
             reason_code=RiskReasonCode.SPREAD_BREACH,
@@ -883,14 +891,12 @@ def check_execution_feasibility(  # noqa: PLR0911
             breached=True,
         )
 
-    # 4. Spread and slippage check helper
     spread, slippage, err_res = _evaluate_spread_and_slippage(
         symbol, market_context, config, pip_size, is_live
     )
     if err_res is not None:
         return err_res
 
-    # 5. Trade constraints checks helper
     err_res = _evaluate_trade_constraints(
         proposed_trade,
         portfolio_state,
@@ -905,7 +911,6 @@ def check_execution_feasibility(  # noqa: PLR0911
     if err_res is not None:
         return err_res
 
-    # Build snapshot details
     details = {
         "spread": float(spread),
         "slippage": float(slippage),
@@ -918,6 +923,7 @@ def check_execution_feasibility(  # noqa: PLR0911
     if proposed_trade.expected_holding_period is not None:
         details["expected_holding_period"] = proposed_trade.expected_holding_period
 
+    logger.info(f"Execution feasibility checks passed successfully for {symbol}.")
     return ExecutionFeasibilityResult(
         status=RiskDecisionStatus.APPROVE,
         reason_code=RiskReasonCode.OK,
@@ -937,6 +943,7 @@ class ExecutionRiskGate:
     def __init__(self, config: RiskConfig) -> None:
         """Initialize risk gate with active configuration profile."""
         self.config = config
+        logger.debug("ExecutionRiskGate initialized.")
 
     def check_execution_feasibility(
         self,
@@ -948,9 +955,6 @@ class ExecutionRiskGate:
         return check_execution_feasibility(
             portfolio_state, proposed_trade, market_context, self.config
         )
-
-
-# --- Backward compatibility wrappers ---
 
 
 def check_spread_to_sigma(
@@ -970,7 +974,9 @@ def check_spread_to_sigma(
     """
     if volatility <= Decimal("0.0"):
         return True
-    return spread <= volatility * multiplier
+    result = spread <= volatility * multiplier
+    logger.debug(f"check_spread_to_sigma result={result}.")
+    return result
 
 
 def check_slippage_to_sigma(
@@ -990,7 +996,9 @@ def check_slippage_to_sigma(
     """
     if volatility <= Decimal("0.0"):
         return True
-    return slippage <= volatility * multiplier
+    result = slippage <= volatility * multiplier
+    logger.debug(f"check_slippage_to_sigma result={result}.")
+    return result
 
 
 def check_stop_freeze_level(
@@ -1070,10 +1078,7 @@ def check_volume_feasibility(
             f"Volume {volume} exceeds broker maximum of {volume_max}.",
         )
 
-    # Granularity step check
     remainder = (volume - volume_min) % volume_step
-    # Handle floating point inaccuracies safely by checking if remainder
-    # is close to 0 or step
     tolerance = Decimal("1e-9")
     if remainder > tolerance and abs(remainder - volume_step) > tolerance:
         return (
@@ -1108,7 +1113,6 @@ def check_trade_frequency(
     for pos in portfolio_state.positions:
         if pos.strategy_id != strategy_id:
             continue
-        # Convert open_time to offset-aware UTC if needed
         open_time = pos.open_time
         if open_time.tzinfo is None:
             open_time = open_time.replace(tzinfo=UTC)
@@ -1137,15 +1141,18 @@ def evaluate_execution_feasibility(
     """Evaluate all execution feasibility metrics and return a snapshot.
 
     Args:
-        portfolio_state: Current portfolio state.
+        _portfolio_state: Current portfolio state (unused; retained for the
+            established calling convention shared with other feasibility checks).
         proposed_trade: Candidate proposed trade.
         market_context: Market details.
-        config: Active risk configuration.
+        _config: Active risk configuration (unused; retained for the
+            established calling convention shared with other feasibility checks).
 
     Returns:
         ExecutionRiskSnapshot containing metrics.
     """
     if proposed_trade is None:
+        logger.debug("No proposed trade; returning default execution snapshot.")
         return ExecutionRiskSnapshot(
             spread=Decimal("0.0"),
             slippage=Decimal("0.0"),
@@ -1158,7 +1165,6 @@ def evaluate_execution_feasibility(
     symbol = proposed_trade.symbol
     spread = Decimal(str(market_context.get(f"{symbol}_spread", "0.0002")))
 
-    # Slippage allowance (default 3.0 pips)
     slippage_pips = Decimal(
         str(
             market_context.get(f"{symbol}_slippage_limit")
@@ -1172,12 +1178,12 @@ def evaluate_execution_feasibility(
     freeze_level = Decimal(str(market_context.get(f"{symbol}_freeze_level", "0.0")))
     lot_step = Decimal(str(market_context.get(f"{symbol}_volume_step", "0.01")))
 
-    # Resolve market session states
     session_open = market_context.get(f"{symbol}_session_open", True)
     tradable = market_context.get(f"{symbol}_tradable", True)
     session = market_context.get("session", "OPEN")
     marketability = session != "CLOSED" and session_open and tradable
 
+    logger.info(f"Evaluated execution feasibility snapshot for {symbol}.")
     return ExecutionRiskSnapshot(
         spread=spread,
         slippage=slippage,
@@ -1220,8 +1226,8 @@ def verify_execution_limits(  # noqa: PLR0911
         portfolio_state, proposed_trade, market_context, config
     )
 
-    # 1. Marketability session check
     if not snapshot.marketability:
+        logger.info(f"Execution gate rejected: {symbol} market is closed or suspended.")
         return LimitResult(
             limit_name="spread_limit",
             status=RiskDecisionStatus.REJECT,
@@ -1232,7 +1238,6 @@ def verify_execution_limits(  # noqa: PLR0911
             details=snapshot.model_dump(),
         )
 
-    # 2. Spread-to-sigma check
     volatility = Decimal(str(market_context.get(f"{symbol}_volatility", "0.0")))
     if volatility > Decimal("0.0"):
         spread_multiplier = Decimal(
@@ -1252,7 +1257,6 @@ def verify_execution_limits(  # noqa: PLR0911
                 details=snapshot.model_dump(),
             )
 
-        # 3. Slippage-to-sigma check
         slippage_multiplier = Decimal(
             str(market_context.get("slippage_sigma_multiplier", "2.0"))
         )
@@ -1273,7 +1277,6 @@ def verify_execution_limits(  # noqa: PLR0911
                 details=snapshot.model_dump(),
             )
 
-    # 4. Stop and freeze level compliance
     pip_size = Decimal(str(market_context.get(f"{symbol}_pip_size", "0.0001")))
     stop_pass, stop_msg = check_stop_freeze_level(
         proposed_trade, snapshot.stop_level, snapshot.freeze_level, pip_size
@@ -1289,7 +1292,6 @@ def verify_execution_limits(  # noqa: PLR0911
             details=snapshot.model_dump(),
         )
 
-    # 5. Volume granularities
     volume_min = Decimal(str(market_context.get(f"{symbol}_volume_min", "0.01")))
     volume_max = Decimal(str(market_context.get(f"{symbol}_volume_max", "100.0")))
     vol_pass, vol_msg = check_volume_feasibility(
@@ -1306,7 +1308,6 @@ def verify_execution_limits(  # noqa: PLR0911
             details=snapshot.model_dump(),
         )
 
-    # 6. Trade frequency limit
     max_freq = int(market_context.get("max_trades_per_minute", 5))
     freq_pass, freq_msg = check_trade_frequency(
         portfolio_state, proposed_trade.strategy_id, max_freq
@@ -1322,6 +1323,7 @@ def verify_execution_limits(  # noqa: PLR0911
             details=snapshot.model_dump(),
         )
 
+    logger.info(f"Execution limits verification approved for {symbol}.")
     return LimitResult(
         limit_name="spread_limit",
         status=RiskDecisionStatus.APPROVE,
@@ -1330,4 +1332,127 @@ def verify_execution_limits(  # noqa: PLR0911
         severity=RiskSeverity.INFO,
         breached=False,
         details=snapshot.model_dump(),
+    )
+
+
+def assess_execution_feasibility(
+    trade: ProposedTrade,
+    market: MarketRiskSnapshot,
+    metadata: BrokerConstraintSnapshot,
+    policy: EffectiveRiskPolicy,
+) -> ExecutionRiskSnapshot:
+    """Calculate execution feasibility and reason codes from canonical evidence.
+
+    Args:
+        trade: Candidate proposed trade.
+        market: Canonical market-level risk snapshot (spread/volatility/session).
+        metadata: Broker constraint snapshot (stop/freeze levels, lot step,
+            session and tradability status).
+        policy: Resolved effective risk policy providing slippage configuration.
+
+    Returns:
+        ExecutionRiskSnapshot: Calculated spread, slippage, stop/freeze levels,
+            lot step, and marketability status.
+    """
+    logger.info(f"Assessing canonical execution feasibility for {trade.symbol}.")
+    config = policy.resolved_config
+    slippage = config.max_slippage_pips * metadata.pip_size
+    marketability = metadata.session_open and metadata.tradable
+    logger.debug(
+        f"Canonical execution snapshot: spread={market.spread}, "
+        f"slippage={slippage}, marketability={marketability}."
+    )
+    return ExecutionRiskSnapshot(
+        spread=market.spread,
+        slippage=slippage,
+        stop_level=metadata.stop_level,
+        freeze_level=metadata.freeze_level,
+        lot_step=metadata.volume_step,
+        marketability=marketability,
+    )
+
+
+def validate_stop_and_freeze_levels(
+    trade: ProposedTrade, metadata: BrokerConstraintSnapshot
+) -> ValidationResult:
+    """Validate stop/freeze geometry against broker constraint metadata.
+
+    Args:
+        trade: Candidate proposed trade.
+        metadata: Broker constraint snapshot carrying stop/freeze/pip metadata.
+
+    Returns:
+        ValidationResult: Validation outcome with message and details.
+    """
+    logger.info(f"Validating stop and freeze levels for {trade.symbol}.")
+    passed, msg = check_stop_distance_validity(
+        trade, metadata.stop_level, metadata.freeze_level, metadata.pip_size
+    )
+    logger.debug(f"Stop/freeze validation passed={passed}.")
+    return {
+        "valid": passed,
+        "message": msg or "Stop/freeze level geometry is valid.",
+        "code": "OK" if passed else "VALIDATION_FAILED",
+        "details": {"symbol": trade.symbol},
+    }
+
+
+def validate_micro_scalping_costs(
+    execution: ExecutionRiskSnapshot,
+    sigma: Decimal,
+    policy: EffectiveRiskPolicy,
+) -> LimitResult:
+    """Enforce M1 spread/slippage-to-sigma limits for micro-scalping profiles.
+
+    Args:
+        execution: Calculated execution risk snapshot.
+        sigma: Rolling price standard deviation for the M1 timeframe.
+        policy: Resolved effective risk policy providing M1 thresholds.
+
+    Returns:
+        LimitResult: Approval or rejection of the M1 micro-scalping cost checks.
+    """
+    logger.info("Validating M1 micro-scalping spread/slippage costs.")
+    config = policy.resolved_config
+    spread_policy = SpreadPolicy(
+        spread_sigma_multiplier=config.m1_spread_to_sigma_ratio_filter,
+        m1_spread_to_sigma_ratio_filter=config.m1_spread_to_sigma_ratio_filter,
+    )
+    spread_pass, spread_msg = check_spread_limit(
+        execution.spread, sigma, spread_policy, is_m1=True
+    )
+    if not spread_pass:
+        logger.info(f"M1 spread-to-sigma check failed: {spread_msg}")
+        return LimitResult(
+            limit_name="spread_limit",
+            status=RiskDecisionStatus.REJECT,
+            reason_code=RiskReasonCode.SPREAD_BREACH,
+            message=spread_msg,
+            severity=RiskSeverity.HARD_BREACH,
+            breached=True,
+        )
+
+    slippage_policy = SlippagePolicy(slippage_sigma_multiplier=Decimal("2.0"))
+    slippage_pass, slippage_msg = check_slippage_limit(
+        execution.slippage, sigma, slippage_policy
+    )
+    if not slippage_pass:
+        logger.info(f"M1 slippage-to-sigma check failed: {slippage_msg}")
+        return LimitResult(
+            limit_name="slippage_limit",
+            status=RiskDecisionStatus.REJECT,
+            reason_code=RiskReasonCode.SLIPPAGE_BREACH,
+            message=slippage_msg,
+            severity=RiskSeverity.HARD_BREACH,
+            breached=True,
+        )
+
+    logger.info("M1 micro-scalping cost checks passed.")
+    return LimitResult(
+        limit_name="spread_limit",
+        status=RiskDecisionStatus.APPROVE,
+        reason_code=RiskReasonCode.OK,
+        message="M1 micro-scalping cost checks passed.",
+        severity=RiskSeverity.INFO,
+        breached=False,
     )

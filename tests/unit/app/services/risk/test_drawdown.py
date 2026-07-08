@@ -21,18 +21,22 @@ from app.services.risk import (
     RiskDecisionStatus,
     RiskReasonCode,
 )
-from app.services.risk.drawdown import (
+from app.services.risk.feasibility.drawdown import (
     DrawdownThrottlingState,
     apply_drawdown_throttle,
     calculate_daily_drawdown,
+    calculate_drawdown_multiplier,
     calculate_strategy_drawdown,
     calculate_total_drawdown,
     check_revenge_trading,
+    determine_drawdown_state,
     determine_drawdown_throttling,
     persist_drawdown_state,
     restore_drawdown_state,
     verify_drawdown_limits,
 )
+from app.services.risk.models import PortfolioRiskSnapshot
+from app.services.risk.policy.contracts import EffectiveRiskPolicy
 
 
 @pytest.fixture
@@ -271,7 +275,10 @@ def test_drawdown_governor(
     tmp_path: Any, base_portfolio: PortfolioState, base_config: RiskConfig
 ) -> None:
     """Verify DrawdownGovernor class orchestration wrapper behaves as expected."""
-    from app.services.risk.drawdown import DrawdownGovernor, RiskStepDownState
+    from app.services.risk.feasibility.drawdown import (
+        DrawdownGovernor,
+        RiskStepDownState,
+    )
     from app.services.risk.models import DrawdownState
 
     gov = DrawdownGovernor(base_config)
@@ -459,3 +466,46 @@ def test_revenge_trading_simulation_bypass(
     )
     assert res_bypass.status == RiskDecisionStatus.REDUCE_SIZE
     assert not res_bypass.breached
+
+
+def test_determine_drawdown_state_and_multiplier(base_config: RiskConfig) -> None:
+    """Verify canonical drawdown state classification and multiplier resolution."""
+    policy = EffectiveRiskPolicy(
+        policy_id="test-drawdown-policy",
+        resolved_config=base_config,
+        policy_hash="test-hash",
+    )
+    # Defensive: drawdown (6%) >= soft_limit (5%)
+    snapshot = PortfolioRiskSnapshot(
+        exposure=Decimal("0.0"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.06"),
+    )
+    state = determine_drawdown_state(snapshot, None, policy)
+    assert state.multiplier == Decimal("0.5")
+    assert state.soft_limit == base_config.max_total_loss_pct_advisory
+    assert state.hard_limit == base_config.max_total_loss_pct
+
+    multiplier = calculate_drawdown_multiplier(state, policy)
+    assert multiplier == Decimal("0.5")
+
+
+def test_apply_drawdown_throttle_v2_dispatch(base_config: RiskConfig) -> None:
+    """Verify apply_drawdown_throttle V2 pure-size dispatch path."""
+    policy = EffectiveRiskPolicy(
+        policy_id="test-drawdown-policy-v2",
+        resolved_config=base_config,
+        policy_hash="test-hash",
+    )
+    state = DrawdownState(
+        current_drawdown=Decimal("0.06"),
+        soft_limit=Decimal("0.05"),
+        hard_limit=Decimal("0.10"),
+        multiplier=Decimal("0.5"),
+    )
+    reduced = apply_drawdown_throttle(size=Decimal("1.0"), state=state, policy=policy)
+    assert reduced == Decimal("0.5")
+
+    reduced_positional = apply_drawdown_throttle(Decimal("2.0"), state, policy)
+    assert reduced_positional == Decimal("1.0")

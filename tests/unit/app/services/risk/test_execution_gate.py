@@ -26,15 +26,21 @@ from app.services.risk import (
     check_spread_limit,
     check_stop_distance_validity,
 )
-from app.services.risk.execution_gate import (
+from app.services.risk.feasibility.execution_gate import (
+    BrokerConstraintSnapshot,
+    assess_execution_feasibility,
     check_holding_time_limit,
     check_slippage_to_sigma,
     check_spread_to_sigma,
     check_stop_freeze_level,
     check_trade_frequency,
     check_volume_feasibility,
+    validate_micro_scalping_costs,
+    validate_stop_and_freeze_levels,
     verify_execution_limits,
 )
+from app.services.risk.models import ExecutionRiskSnapshot, MarketRiskSnapshot
+from app.services.risk.policy.contracts import EffectiveRiskPolicy
 
 
 @pytest.fixture
@@ -509,3 +515,100 @@ def test_execution_risk_gate_orchestrator_failures(
     assert res_freq.status == RiskDecisionStatus.REJECT
     assert res_freq.reason_code == RiskReasonCode.FREQUENCY_BREACH
     assert "Trade frequency limit breached for symbol" in res_freq.message
+
+
+@pytest.fixture
+def broker_constraints() -> BrokerConstraintSnapshot:
+    """Fixture for a canonical BrokerConstraintSnapshot."""
+    return BrokerConstraintSnapshot(
+        symbol="EURUSD",
+        stop_level=Decimal("5.0"),
+        freeze_level=Decimal("2.0"),
+        volume_min=Decimal("0.01"),
+        volume_max=Decimal("100.0"),
+        volume_step=Decimal("0.01"),
+        session_open=True,
+        tradable=True,
+        pip_size=Decimal("0.0001"),
+    )
+
+
+def test_assess_execution_feasibility(
+    broker_constraints: BrokerConstraintSnapshot, base_config: RiskConfig
+) -> None:
+    """Verify canonical execution feasibility snapshot assessment."""
+    market = MarketRiskSnapshot(
+        spread=Decimal("0.0002"),
+        volatility=Decimal("0.0001"),
+        session="NY",
+        freshness=datetime.now(UTC),
+    )
+    trade = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.0"),
+        price=Decimal("1.1000"),
+        stop_loss=Decimal("1.0900"),
+    )
+    policy = EffectiveRiskPolicy(
+        policy_id="test-exec-policy",
+        resolved_config=base_config,
+        policy_hash="test-hash",
+    )
+
+    snapshot = assess_execution_feasibility(trade, market, broker_constraints, policy)
+    assert snapshot.spread == Decimal("0.0002")
+    assert snapshot.stop_level == Decimal("5.0")
+    assert snapshot.marketability
+
+    stop_validation = validate_stop_and_freeze_levels(trade, broker_constraints)
+    assert stop_validation["valid"]
+
+    bad_trade = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.0"),
+        price=Decimal("1.1000"),
+        stop_loss=Decimal("1.0997"),
+    )
+    bad_validation = validate_stop_and_freeze_levels(bad_trade, broker_constraints)
+    assert not bad_validation["valid"]
+
+
+def test_validate_micro_scalping_costs(base_config: RiskConfig) -> None:
+    """Verify M1 micro-scalping spread/slippage cost checks."""
+    policy = EffectiveRiskPolicy(
+        policy_id="test-m1-policy",
+        resolved_config=base_config,
+        policy_hash="test-hash",
+    )
+    passing_snapshot = evaluate_execution_feasibility_snapshot(
+        spread=Decimal("0.0001"), slippage=Decimal("0.0001")
+    )
+    result = validate_micro_scalping_costs(passing_snapshot, Decimal("0.0001"), policy)
+    assert result.status == RiskDecisionStatus.APPROVE
+
+    failing_snapshot = evaluate_execution_feasibility_snapshot(
+        spread=Decimal("0.0010"), slippage=Decimal("0.0001")
+    )
+    result_fail = validate_micro_scalping_costs(
+        failing_snapshot, Decimal("0.0001"), policy
+    )
+    assert result_fail.status == RiskDecisionStatus.REJECT
+    assert result_fail.reason_code == RiskReasonCode.SPREAD_BREACH
+
+
+def evaluate_execution_feasibility_snapshot(
+    spread: Decimal, slippage: Decimal
+) -> ExecutionRiskSnapshot:
+    """Build a minimal ExecutionRiskSnapshot for micro-scalping cost tests."""
+    return ExecutionRiskSnapshot(
+        spread=spread,
+        slippage=slippage,
+        stop_level=Decimal("0.0"),
+        freeze_level=Decimal("0.0"),
+        lot_step=Decimal("0.01"),
+        marketability=True,
+    )

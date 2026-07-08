@@ -21,15 +21,17 @@ from app.services.risk.audit import (
     verify_risk_audit_chain,
 )
 from app.services.risk.correlation import CorrelationEngine  # noqa: F401
-from app.services.risk.drawdown import DrawdownGovernor  # noqa: F401
-from app.services.risk.execution_gate import ExecutionRiskGate  # noqa: F401
 from app.services.risk.exposure import CurrencyExposureEngine  # noqa: F401
+from app.services.risk.feasibility import (  # noqa: F401
+    DrawdownGovernor,
+    ExecutionRiskGate,
+    MarginRiskEngine,
+)
 from app.services.risk.limits import (  # noqa: F401
     LimitEngine,
     LimitResult,
     run_limit_checks,
 )
-from app.services.risk.margin import MarginRiskEngine  # noqa: F401
 from app.services.risk.models import (
     PortfolioRiskSnapshot,
     PositionSizingRequest,
@@ -606,7 +608,7 @@ class RiskGovernor:
                 status in {RiskDecisionStatus.APPROVE, RiskDecisionStatus.REDUCE_SIZE}
                 and request.proposed_action
             ):
-                from app.services.risk.execution_gate import ExecutionRiskGate
+                from app.services.risk.feasibility import ExecutionRiskGate
 
                 gate = ExecutionRiskGate(resolved_config)
                 exec_res = gate.check_execution_feasibility(
@@ -853,7 +855,7 @@ class RiskGovernor:
         margin_usage_val = None
         if request.portfolio_state:
             try:
-                from app.services.risk.margin import evaluate_margin_governance
+                from app.services.risk.feasibility import evaluate_margin_governance
 
                 margin_snap = evaluate_margin_governance(
                     request.portfolio_state,

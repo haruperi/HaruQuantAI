@@ -305,17 +305,22 @@ Stress test results evaluate against the configuration's `max_total_loss_pct_adv
 
 ## 15. Margin, Drawdown, and Execution Feasibility Gates
 
-The Margin, Drawdown, and Execution Feasibility Gates evaluate capital requirements, account-level performance drawdowns, and broker-level execution constraints prior to trade execution.
+The Margin, Drawdown, and Execution Feasibility Gates evaluate capital requirements, account-level performance drawdowns, and broker-level execution constraints prior to trade execution. They are organized as a modular package under [feasibility/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/feasibility/) and never perform broker account queries or order mutation.
+
+Each file exposes two calculation surfaces:
+* A **V1 surface** operating on `PortfolioState`/`ProposedTrade`/`market_context: dict`/`RiskConfig` — the original, richer calculation path preserved for the `RiskGovernor` orchestration flow and backward-compatible callers.
+* A **V2 pure surface** operating on the canonical typed snapshots (`AccountRiskSnapshot`, `PortfolioRiskSnapshot`, `EffectiveRiskPolicy`, `DrawdownState`, `MarketRiskSnapshot`, `BrokerConstraintSnapshot`) matching the architecture's `Target Class/Function` contracts.
 
 ### Key Components
 
-1. **Margin Governance (`margin.py`)**:
-   - **Current & Projected Margin**: Computes active margin requirements and projects margin usage after executing proposed candidate trades.
+1. **Margin Governance (`feasibility/margin.py`)**:
+   - **Current & Projected Margin**: Computes active margin requirements and projects margin usage after executing proposed candidate trades (`calculate_current_margin`, `calculate_projected_margin`, `evaluate_margin_governance`).
    - **Free Margin After Orders**: Calculates remaining free margin while accounting for pending orders under different policies (`ignore`, `full-potential`, `near-market-only`, `probability-weighted`).
    - **Margin & Leverage Limits**: Rejects trades if projected margin utilization breaches the account threshold (`max_margin_utilization_pct`) or if effective leverage exceeds the cap (`max_effective_leverage`).
    - **Exit Liquidity Stress Check**: Simulates cost impact of selling all active positions under spread spikes (e.g., 5x spread shock) to ensure account solvency.
+   - **V2 canonical API**: `calculate_current_margin_usage`, `calculate_projected_margin_usage`, and `calculate_free_margin_after_reservations` operate directly on `AccountRiskSnapshot`/`PortfolioRiskSnapshot`/`PendingOrderRiskSnapshot` evidence; `check_margin_limits` evaluates a `MarginRiskSnapshot` against an `EffectiveRiskPolicy` and returns ordered `LimitResult` tuples for account margin and leverage caps.
 
-2. **Drawdown Governor (`drawdown.py`)**:
+2. **Drawdown Governor (`feasibility/drawdown.py`)**:
    - **Drawdown Metrics**: Computes daily drawdown, lifetime total drawdown, and strategy-specific drawdown.
    - **Throttling Transitions**: Automatically maps drawdown levels to throttling states:
      - `NORMAL` (drawdown < 50% of soft limit): Multiplier `1.0`.
@@ -325,13 +330,15 @@ The Margin, Drawdown, and Execution Feasibility Gates evaluate capital requireme
      - `HALTED` (drawdown >= hard limit): Multiplier `0.0` (trading blocked).
    - **State Persistence**: Serializes and restores drawdown states to/from local JSON storage to survive restarts, handling corruption gracefully.
    - **Revenge Trading Check**: Rejects trades whose volumes exceed drawdown-scaled average volumes.
+   - **V2 canonical API**: `determine_drawdown_state(snapshot, prior, policy)` classifies a `PortfolioRiskSnapshot` against an `EffectiveRiskPolicy`; `calculate_drawdown_multiplier` resolves the approved step-down multiplier. `apply_drawdown_throttle` is dual-dispatch: called with `(portfolio_state, proposed_trade, market_context, config)` it runs the full V1 `LimitResult` sequence; called with `(size, state, policy)` (a bare `Decimal` first argument) it returns the throttled `Decimal` size directly.
 
-3. **Execution Feasibility Gate (`execution_gate.py`)**:
+3. **Execution Feasibility Gate (`feasibility/execution_gate.py`)**:
    - **Spread & Slippage Checks**: Validates that current spreads or slippage thresholds do not exceed multipliers of rolling volatility standard deviations.
    - **Stop Compliance Check**: Ensures that proposed stop-loss and take-profit distances are outside broker minimum stop levels (`stop_level`) and modification freeze levels (`freeze_level`).
    - **Volume Check**: Verifies that proposed lot volume sizes fall within broker minimum and maximum limits, and align with the broker lot step size.
    - **Session Status**: Blocks execution if the symbol's market session is closed or trading is suspended.
    - **Frequency Check**: Limits trades per strategy over a lookback window (e.g., max 5 trades per minute) to prevent runaway automated trading loops.
+   - **V2 canonical API**: `assess_execution_feasibility(trade, market, metadata, policy)` builds an `ExecutionRiskSnapshot` from a `MarketRiskSnapshot` and `BrokerConstraintSnapshot`; `validate_stop_and_freeze_levels` returns a `ValidationResult`; `validate_micro_scalping_costs(execution, sigma, policy)` enforces the M1 spread/slippage-to-sigma ratio filter as a `LimitResult`.
 
 
 ## 16. Allocation and Lifecycle Governance
@@ -453,5 +460,3 @@ The readiness module proves that readiness verification starts only with canonic
    Verifies requirements traceability, restricts fixtures to synthetic-only datasets, checks for deterministic seeds, and enforces fail-closed policies for live-sensitive staging.
 4. **Dry-Run Compilation (`build_readiness_dry_run`)**:
    Takes a validated manifest and outputs a detailed `DryRunReport` detailing the files to read, files to change, planned commands, active scopes, blockers, and rollback boundaries.
-
-

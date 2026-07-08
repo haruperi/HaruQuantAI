@@ -28,13 +28,24 @@ from app.services.risk import (
     check_leverage_limit,
     check_margin_usage,
 )
-from app.services.risk.margin import (
+from app.services.risk.feasibility.margin import (
     calculate_current_margin,
+    calculate_current_margin_usage,
     calculate_free_margin_after_orders,
+    calculate_free_margin_after_reservations,
     calculate_projected_margin,
+    calculate_projected_margin_usage,
+    check_margin_limits,
+    check_strategy_margin_limit,
     exit_liquidity_stress_check,
     verify_margin_limits,
 )
+from app.services.risk.models import (
+    AccountRiskSnapshot,
+    PendingOrderRiskSnapshot,
+    PortfolioRiskSnapshot,
+)
+from app.services.risk.policy.contracts import EffectiveRiskPolicy
 from app.utils.errors import ValidationError
 
 
@@ -363,3 +374,302 @@ def test_margin_risk_engine_evaluation(
     assert isinstance(liq_snap, LiquiditySnapshot)
     assert liq_snap.exit_liquidity_loss == Decimal("200.00")
     assert liq_snap.pass_status
+
+
+@pytest.fixture
+def account_snapshot() -> AccountRiskSnapshot:
+    """Fixture for a canonical AccountRiskSnapshot."""
+    return AccountRiskSnapshot(
+        equity=Decimal("10000.00"),
+        balance=Decimal("10000.00"),
+        free_margin=Decimal("9000.00"),
+        margin_used=Decimal("1000.00"),
+        leverage=Decimal("30.0"),
+        base_currency="USD",
+        timestamp=datetime.now(UTC),
+    )
+
+
+@pytest.fixture
+def portfolio_snapshot() -> PortfolioRiskSnapshot:
+    """Fixture for a canonical PortfolioRiskSnapshot."""
+    return PortfolioRiskSnapshot(
+        exposure=Decimal("110000.00"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.0"),
+    )
+
+
+@pytest.fixture
+def effective_policy(base_config: RiskConfig) -> EffectiveRiskPolicy:
+    """Fixture for a resolved EffectiveRiskPolicy wrapping base_config."""
+    return EffectiveRiskPolicy(
+        policy_id="test-margin-policy",
+        resolved_config=base_config,
+        policy_hash="test-hash",
+    )
+
+
+def test_calculate_current_margin_usage(
+    account_snapshot: AccountRiskSnapshot, portfolio_snapshot: PortfolioRiskSnapshot
+) -> None:
+    """Verify canonical current margin usage snapshot calculation."""
+    snap = calculate_current_margin_usage(account_snapshot, portfolio_snapshot)
+    assert snap.projected_margin == Decimal("1000.00")
+    assert snap.margin_usage == pytest.approx(Decimal("0.10"))
+    assert snap.leverage == Decimal("30.0")
+
+
+def test_calculate_projected_margin_usage(
+    account_snapshot: AccountRiskSnapshot, portfolio_snapshot: PortfolioRiskSnapshot
+) -> None:
+    """Verify canonical projected margin usage snapshot calculation."""
+    proposal = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.0"),
+        price=Decimal("1.1000"),
+    )
+    snap = calculate_projected_margin_usage(
+        account_snapshot, portfolio_snapshot, proposal
+    )
+    # proposed_margin = (1.0 * 100000 * 1.10) / 30 = 3666.67; projected = 1000 + 3666.67
+    assert snap.projected_margin == pytest.approx(Decimal("4666.6667"))
+    assert snap.free_margin == pytest.approx(Decimal("5333.3333"))
+
+
+def test_calculate_free_margin_after_reservations(
+    account_snapshot: AccountRiskSnapshot,
+) -> None:
+    """Verify free margin reservation calculation for pending/in-flight orders."""
+    pending = [PendingOrderRiskSnapshot(order_id="p1", exposure=Decimal("1000.0"))]
+    inflight = [PendingOrderRiskSnapshot(order_id="i1", exposure=Decimal("500.0"))]
+    remaining = calculate_free_margin_after_reservations(
+        account_snapshot, pending, inflight
+    )
+    assert remaining == Decimal("7500.0")
+
+    # Reservations exceeding free margin clamp to zero
+    big_pending = [PendingOrderRiskSnapshot(order_id="p2", exposure=Decimal("50000.0"))]
+    remaining_zero = calculate_free_margin_after_reservations(
+        account_snapshot, big_pending, []
+    )
+    assert remaining_zero == Decimal("0.0")
+
+
+def test_check_margin_limits(
+    account_snapshot: AccountRiskSnapshot,
+    portfolio_snapshot: PortfolioRiskSnapshot,
+    effective_policy: EffectiveRiskPolicy,
+) -> None:
+    """Verify margin/leverage limit checks against a resolved policy."""
+    snap = calculate_current_margin_usage(account_snapshot, portfolio_snapshot)
+    results = check_margin_limits(snap, effective_policy)
+    assert len(results) == 2
+    assert all(r.status == RiskDecisionStatus.APPROVE for r in results)
+
+    breaching_policy = effective_policy.model_copy(
+        update={
+            "resolved_config": effective_policy.resolved_config.model_copy(
+                update={"max_margin_utilization_pct": Decimal("0.01")}
+            )
+        }
+    )
+    breach_results = check_margin_limits(snap, breaching_policy)
+    assert breach_results[0].status == RiskDecisionStatus.REJECT
+    assert breach_results[0].reason_code == RiskReasonCode.MARGIN_BREACH
+
+
+def test_margin_none_trade_and_price_fallbacks(
+    base_portfolio: PortfolioState,
+    base_config: RiskConfig,
+    market_context: dict[str, Any],
+) -> None:
+    """Verify None-trade and proposed-price resolution fallback branches."""
+    # No proposed trade: projected margin equals current margin.
+    proj = calculate_projected_margin(base_portfolio, None, market_context, base_config)
+    assert proj == Decimal("1000.0")
+
+    lev_res = check_leverage_limit(base_portfolio, None, market_context, base_config)
+    assert lev_res.status == RiskDecisionStatus.APPROVE
+
+    # Proposed trade with zero price resolves from a matching open position.
+    trade_zero_price = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.0"),
+        price=Decimal("0.0"),
+    )
+    proj_resolved = calculate_projected_margin(
+        base_portfolio, trade_zero_price, market_context, base_config
+    )
+    assert proj_resolved > Decimal("1000.0")
+
+    # Proposed trade with zero price and no matching position resolves from
+    # a market_context "<symbol>_price" key.
+    trade_gbp = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="GBPUSD",
+        side="buy",
+        volume=Decimal("1.0"),
+        price=Decimal("0.0"),
+    )
+    ctx_with_price = dict(market_context)
+    ctx_with_price["GBPUSD_price"] = 1.25
+    ctx_with_price["GBPUSD_contract_size"] = 100000.0
+    proj_gbp = calculate_projected_margin(
+        base_portfolio, trade_gbp, ctx_with_price, base_config
+    )
+    assert proj_gbp > Decimal("1000.0")
+
+    lev_gbp = check_leverage_limit(
+        base_portfolio, trade_gbp, ctx_with_price, base_config
+    )
+    assert lev_gbp.status == RiskDecisionStatus.APPROVE
+
+
+def test_free_margin_near_market_only_and_inactive_orders(
+    base_portfolio: PortfolioState,
+    base_config: RiskConfig,
+    market_context: dict[str, Any],
+) -> None:
+    """Verify near-market-only pending order policy and inactive order skipping."""
+    base_config.pending_order_policy = "near-market-only"
+    base_portfolio.orders = [
+        {
+            "symbol": "EURUSD",
+            "status": "inactive",
+            "quantity": 5.0,
+            "price": 1.1000,
+        },
+        {
+            "symbol": "EURUSD",
+            "status": "active",
+            "quantity": 1.0,
+            "price": 1.1000,
+            "distance_pips": 10.0,
+        },
+        {
+            "symbol": "EURUSD",
+            "status": "active",
+            "quantity": 1.0,
+            "price": 1.1000,
+            "distance_pips": 200.0,
+        },
+    ]
+    free = calculate_free_margin_after_orders(
+        base_portfolio, None, market_context, base_config
+    )
+    # Only the near-market order (10 pips) contributes; inactive and far
+    # (200 pips) orders are excluded.
+    assert free == pytest.approx(Decimal("5333.3333"))
+
+
+def test_check_exit_liquidity_rejection(
+    base_portfolio: PortfolioState,
+    base_config: RiskConfig,
+    market_context: dict[str, Any],
+) -> None:
+    """Verify check_exit_liquidity rejects when simulated exit loss is too high."""
+    trade = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.0"),
+        price=Decimal("1.1000"),
+    )
+    res = check_exit_liquidity(
+        base_portfolio,
+        trade,
+        market_context,
+        base_config,
+        spread_multiplier=Decimal("150.0"),
+    )
+    assert res.status == RiskDecisionStatus.REJECT
+    assert res.reason_code == RiskReasonCode.MARGIN_BREACH
+
+
+def test_check_margin_usage_metadata_error(
+    base_portfolio: PortfolioState,
+    base_config: RiskConfig,
+) -> None:
+    """Verify check_margin_usage blocks on missing broker margin metadata."""
+    trade = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.0"),
+        price=Decimal("1.1000"),
+    )
+    res = check_margin_usage(base_portfolio, trade, {}, base_config)
+    assert res.status == RiskDecisionStatus.BLOCK
+    assert res.reason_code == RiskReasonCode.INVALID_INPUT
+
+
+def test_check_strategy_margin_limit_branches(
+    base_portfolio: PortfolioState,
+    base_config: RiskConfig,
+    market_context: dict[str, Any],
+) -> None:
+    """Verify strategy margin limit no-trade, no-cap, and breach branches."""
+    trade = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("1.0"),
+        price=Decimal("1.1000"),
+    )
+
+    # No proposed trade: skipped.
+    assert (
+        check_strategy_margin_limit(base_portfolio, None, market_context, base_config)
+        is None
+    )
+
+    # No strategy cap configured: skipped.
+    base_portfolio.strategy_allocations = {}
+    assert (
+        check_strategy_margin_limit(base_portfolio, trade, market_context, base_config)
+        is None
+    )
+
+    # Strategy cap configured and breached.
+    base_portfolio.strategy_allocations = {"TF-01": Decimal("500.00")}
+    result = check_strategy_margin_limit(
+        base_portfolio, trade, market_context, base_config
+    )
+    assert result is not None
+    assert result.status == RiskDecisionStatus.REJECT
+    assert result.reason_code == RiskReasonCode.CONCENTRATION_BREACH
+
+
+def test_verify_margin_limits_strategy_and_exit_breaches(
+    base_portfolio: PortfolioState,
+    base_config: RiskConfig,
+    market_context: dict[str, Any],
+) -> None:
+    """Verify verify_margin_limits surfaces strategy and exit-liquidity breaches."""
+    trade = ProposedTrade(
+        strategy_id="TF-01",
+        symbol="EURUSD",
+        side="buy",
+        volume=Decimal("0.1"),
+        price=Decimal("1.1000"),
+    )
+
+    # Strategy breach path (margin/leverage pass, strategy cap is tiny).
+    base_portfolio.strategy_allocations = {"TF-01": Decimal("1.00")}
+    res_strat = verify_margin_limits(base_portfolio, trade, market_context, base_config)
+    assert res_strat.status == RiskDecisionStatus.REJECT
+    assert res_strat.reason_code == RiskReasonCode.CONCENTRATION_BREACH
+
+    # Exit-liquidity breach path (no strategy cap; extreme spread in context).
+    base_portfolio.strategy_allocations = {}
+    ctx_wide_spread = dict(market_context)
+    ctx_wide_spread["EURUSD_spread"] = 0.05
+    res_exit = verify_margin_limits(base_portfolio, trade, ctx_wide_spread, base_config)
+    assert res_exit.status == RiskDecisionStatus.REJECT
+    assert res_exit.reason_code == RiskReasonCode.MARGIN_BREACH

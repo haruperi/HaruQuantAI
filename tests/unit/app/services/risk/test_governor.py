@@ -1185,7 +1185,7 @@ def test_governor_uncovered_paths(monkeypatch: pytest.MonkeyPatch) -> None:  # n
         raise ValueError("Simulated margin error")
 
     monkeypatch.setattr(
-        "app.services.risk.margin.evaluate_margin_governance", mock_eval_margin
+        "app.services.risk.feasibility.evaluate_margin_governance", mock_eval_margin
     )
     req.request_id = None
     res = gov.review_trade_risk(req)

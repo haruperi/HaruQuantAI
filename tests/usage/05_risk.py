@@ -30,6 +30,7 @@ from app.services.risk import (
     MarketRiskSnapshot,
     PolicyRule,
     PolicyScope,
+    PortfolioRiskSnapshot,
     PortfolioState,
     PositionSizingRequest,
     PositionState,
@@ -52,21 +53,28 @@ from app.services.risk import (
     SymbolRiskMetadata,
     VaRMethod,
     VolatilitySizingEngine,
+    apply_drawdown_throttle,
+    assess_execution_feasibility,
     assess_risk_regime,
     build_default_scenario_registry,
     build_readiness_dry_run,
     calculate_correlation_snapshot,
     calculate_currency_exposure,
     calculate_daily_drawdown,
+    calculate_drawdown_multiplier,
     calculate_fixed_risk_size,
+    calculate_free_margin_after_reservations,
     calculate_position_size,
+    calculate_projected_margin_usage,
     calculate_returns,
     calculate_total_drawdown,
     calculate_var_es_snapshots,
+    check_margin_limits,
     correlation_adjusted_risk_parity_allocation,
     decompose_fx_trade,
     decompose_position,
     detect_correlation_spikes,
+    determine_drawdown_state,
     determine_drawdown_throttling,
     equal_risk_allocation,
     evaluate_execution_feasibility,
@@ -82,8 +90,10 @@ from app.services.risk import (
     validate_currency_conversion_requirements,
     validate_custom_scenario,
     validate_delivery_plan,
+    validate_micro_scalping_costs,
     validate_phase_dependencies,
     validate_risk_mode_matrix,
+    validate_stop_and_freeze_levels,
     verify_allocation_limits,
     verify_drawdown_limits,
     verify_execution_limits,
@@ -98,6 +108,8 @@ from app.services.risk.config import (
     validate_risk_config,
     validate_risk_config_hash,
 )
+from app.services.risk.feasibility.execution_gate import BrokerConstraintSnapshot
+from app.services.risk.models import PendingOrderRiskSnapshot
 from app.services.risk.models.serialization import (
     from_canonical_risk_payload,
     to_canonical_risk_payload,
@@ -1362,6 +1374,45 @@ def example_13_margin_liquidity_and_leverage_limits() -> None:
         f"Exit Liquidity stress (5x spread): Pass={pass_liquid}, Loss={est_loss:.2f} USD"
     )
 
+    # 3. [V2] Canonical typed margin API (feasibility/margin.py)
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    account_snap = AccountRiskSnapshot(
+        equity=portfolio.equity,
+        balance=portfolio.balance,
+        free_margin=portfolio.free_margin,
+        margin_used=portfolio.margin_used,
+        leverage=Decimal("30.0"),
+        base_currency="USD",
+        timestamp=datetime.now(UTC),
+    )
+    portfolio_snap = PortfolioRiskSnapshot(
+        exposure=Decimal("110000.0"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=Decimal("0.0"),
+    )
+    v2_policy = EffectiveRiskPolicy(
+        policy_id="v2_margin_policy", resolved_config=config, policy_hash="margin_hash"
+    )
+    projected_snap = calculate_projected_margin_usage(
+        account_snap, portfolio_snap, trade
+    )
+    print(
+        f"\n[V2] Projected Margin Usage Snapshot: usage={projected_snap.margin_usage:.2%}"
+    )
+    for res in check_margin_limits(projected_snap, v2_policy):
+        print(f"  [V2] {res.limit_name}: {res.status}")
+
+    remaining_free = calculate_free_margin_after_reservations(
+        account_snap,
+        pending=[PendingOrderRiskSnapshot(order_id="ord-1", exposure=Decimal("500.0"))],
+        inflight=[],
+    )
+    print(
+        f"[V2] Free margin after pending-order reservations: {remaining_free:.2f} USD"
+    )
+
 
 def example_14_drawdown_governor_and_throttling() -> None:
     """Demonstrate drawdown computation and dynamic risk throttling logic (drawdown.py)."""
@@ -1415,6 +1466,27 @@ def example_14_drawdown_governor_and_throttling() -> None:
     print(
         f"Drawdown Limits verification result: Status={drawdown_limits_res.status}, Reason={drawdown_limits_res.reason_code}"
     )
+
+    # 3. [V2] Canonical drawdown state and multiplier resolution (feasibility/drawdown.py)
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    portfolio_snap = PortfolioRiskSnapshot(
+        exposure=Decimal("0.0"),
+        var_es=Decimal("0.0"),
+        stress_loss=Decimal("0.0"),
+        drawdown=total_dd,
+    )
+    v2_policy = EffectiveRiskPolicy(
+        policy_id="v2_drawdown_policy", resolved_config=config, policy_hash="dd_hash"
+    )
+    v2_state = determine_drawdown_state(portfolio_snap, None, v2_policy)
+    print(
+        f"\n[V2] Canonical Drawdown State: multiplier={calculate_drawdown_multiplier(v2_state, v2_policy)}"
+    )
+    reduced_size = apply_drawdown_throttle(
+        size=Decimal("1.0"), state=v2_state, policy=v2_policy
+    )
+    print(f"[V2] Throttled size for a 1.0 lot proposal: {reduced_size}")
 
 
 def example_15_execution_gate_and_broker_feasibility() -> None:
@@ -1470,6 +1542,38 @@ def example_15_execution_gate_and_broker_feasibility() -> None:
     print(
         f"Execution Gate Verification: Status={limits_res.status}, Reason={limits_res.reason_code}"
     )
+
+    # 3. [V2] Canonical execution feasibility assessment (feasibility/execution_gate.py)
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    broker_meta = BrokerConstraintSnapshot(
+        symbol="EURUSD",
+        stop_level=Decimal("5.0"),
+        freeze_level=Decimal("2.0"),
+        volume_min=Decimal("0.01"),
+        volume_max=Decimal("100.0"),
+        volume_step=Decimal("0.01"),
+        pip_size=Decimal("0.0001"),
+    )
+    market_snap = MarketRiskSnapshot(
+        spread=Decimal("0.0002"),
+        volatility=Decimal("0.0001"),
+        session="NY",
+        freshness=datetime.now(UTC),
+    )
+    v2_policy = EffectiveRiskPolicy(
+        policy_id="v2_exec_policy", resolved_config=config, policy_hash="exec_hash"
+    )
+    v2_snap = assess_execution_feasibility(trade, market_snap, broker_meta, v2_policy)
+    print(
+        f"\n[V2] Canonical Execution Snapshot: marketability={v2_snap.marketability}, slippage={v2_snap.slippage:.5f}"
+    )
+
+    stop_validation = validate_stop_and_freeze_levels(trade, broker_meta)
+    print(f"[V2] Stop/Freeze validation: valid={stop_validation['valid']}")
+
+    scalp_result = validate_micro_scalping_costs(v2_snap, Decimal("0.0001"), v2_policy)
+    print(f"[V2] M1 micro-scalping cost check: {scalp_result.status}")
 
 
 # ==============================================================================

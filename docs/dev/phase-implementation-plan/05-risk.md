@@ -1245,20 +1245,20 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-319**: Create margin engine with margin calculations.
-- **RISK-FR-320**: Create drawdown governor.
-- **RISK-FR-321**: Create execution feasibility checks.
-- **RISK-FR-322**: Calculate current margin usage.
-- **RISK-FR-323**: Calculate projected margin usage after proposed trade.
-- **RISK-FR-324**: Calculate free margin after open, pending, and in-flight orders.
-- **RISK-FR-325**: Enforce max margin usage by account.
-- **RISK-FR-326**: Enforce max margin usage by portfolio.
-- **RISK-FR-327**: Enforce max margin usage by strategy where configured.
-- **RISK-FR-328**: Enforce leverage caps stricter than broker maximum.
-- **RISK-FR-329**: Reject missing broker margin metadata.
-- **RISK-FR-330**: Implement exit-liquidity stress check.
-- **RISK-FR-331**: Calculate daily drawdown.
-- **RISK-FR-332**: Calculate total drawdown.
+- [X] **RISK-FR-319**: Create margin engine with margin calculations. *Evidence: app/services/risk/feasibility/margin.py line 872-1020*
+- [X] **RISK-FR-320**: Create drawdown governor. *Evidence: app/services/risk/feasibility/drawdown.py line 633-700*
+- [X] **RISK-FR-321**: Create execution feasibility checks. *Evidence: app/services/risk/feasibility/execution_gate.py line 937-955*
+- [X] **RISK-FR-322**: Calculate current margin usage. *Evidence: app/services/risk/feasibility/margin.py line 101-114 (V1), line 1023-1053 (V2 canonical)*
+- [X] **RISK-FR-323**: Calculate projected margin usage after proposed trade. *Evidence: app/services/risk/feasibility/margin.py line 144-217 (V1), line 1056-1102 (V2 canonical)*
+- [X] **RISK-FR-324**: Calculate free margin after open, pending, and in-flight orders. *Evidence: app/services/risk/feasibility/margin.py line 220-329 (V1 open/pending), line 1105-1129 (V2 canonical pending/in-flight reservations)*
+- [X] **RISK-FR-325**: Enforce max margin usage by account. *Evidence: app/services/risk/feasibility/margin.py line 524-591 (V1), line 1132-1206 (V2 check_margin_limits)*
+- [X] **RISK-FR-326**: Enforce max margin usage by portfolio. *Evidence: app/services/risk/feasibility/margin.py line 1132-1206*
+- [X] **RISK-FR-327**: Enforce max margin usage by strategy where configured. *Evidence: app/services/risk/feasibility/margin.py line 724-799*
+- [X] **RISK-FR-328**: Enforce leverage caps stricter than broker maximum. *Evidence: app/services/risk/feasibility/margin.py line 594-671*
+- [X] **RISK-FR-329**: Reject missing broker margin metadata. *Evidence: app/services/risk/feasibility/margin.py line 175-186*
+- [X] **RISK-FR-330**: Implement exit-liquidity stress check. *Evidence: app/services/risk/feasibility/margin.py line 413-468, 674-721*
+- [X] **RISK-FR-331**: Calculate daily drawdown. *Evidence: app/services/risk/feasibility/drawdown.py line 52-74*
+- [X] **RISK-FR-332**: Calculate total drawdown. *Evidence: app/services/risk/feasibility/drawdown.py line 77-96*
 
 **Target Class/Function:**
 
@@ -1278,14 +1278,14 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-333**: Calculate strategy drawdown.
-- **RISK-FR-334**: Implement normal drawdown state.
-- **RISK-FR-335**: Implement caution drawdown state.
-- **RISK-FR-336**: Implement defensive drawdown state.
-- **RISK-FR-337**: Implement recovery-only drawdown state.
-- **RISK-FR-338**: Implement halted drawdown state.
-- **RISK-FR-339**: Persist and restore drawdown step-down state.
-- **RISK-FR-340**: Reject catch-up or revenge risk behavior.
+- [X] **RISK-FR-333**: Calculate strategy drawdown. *Evidence: app/services/risk/feasibility/drawdown.py line 99-130*
+- [X] **RISK-FR-334**: Implement normal drawdown state. *Evidence: app/services/risk/feasibility/drawdown.py line 133-163, 508-543*
+- [X] **RISK-FR-335**: Implement caution drawdown state. *Evidence: app/services/risk/feasibility/drawdown.py line 133-163, 508-543*
+- [X] **RISK-FR-336**: Implement defensive drawdown state. *Evidence: app/services/risk/feasibility/drawdown.py line 133-163, 508-543*
+- [X] **RISK-FR-337**: Implement recovery-only drawdown state. *Evidence: app/services/risk/feasibility/drawdown.py line 133-163, 508-543*
+- [X] **RISK-FR-338**: Implement halted drawdown state. *Evidence: app/services/risk/feasibility/drawdown.py line 133-163, 508-543*
+- [X] **RISK-FR-339**: Persist and restore drawdown step-down state. *Evidence: app/services/risk/feasibility/drawdown.py line 166-217*
+- [X] **RISK-FR-340**: Reject catch-up or revenge risk behavior. *Evidence: app/services/risk/feasibility/drawdown.py line 220-270*
 
 **Target Class/Function:**
 
@@ -1304,14 +1304,14 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-341**: Check spread-to-σ execution feasibility.
-- **RISK-FR-342**: Check slippage-to-σ execution feasibility.
-- **RISK-FR-343**: Check stop-level and freeze-level feasibility.
-- **RISK-FR-344**: Check lot-step and min/max volume feasibility.
-- **RISK-FR-345**: Check market-open and symbol-tradable feasibility.
-- **RISK-FR-346**: Check trade-frequency limits.
-- **RISK-FR-347**: Add tests for margin, drawdown, execution feasibility, and restored state corruption.
-- **RISK-FR-348**: Document margin, drawdown, and execution feasibility behavior.
+- [X] **RISK-FR-341**: Check spread-to-σ execution feasibility. *Evidence: app/services/risk/feasibility/execution_gate.py line 121-160, 960-980*
+- [X] **RISK-FR-342**: Check slippage-to-σ execution feasibility. *Evidence: app/services/risk/feasibility/execution_gate.py line 163-196, 982-1002*
+- [X] **RISK-FR-343**: Check stop-level and freeze-level feasibility. *Evidence: app/services/risk/feasibility/execution_gate.py line 199-273*
+- [X] **RISK-FR-344**: Check lot-step and min/max volume feasibility. *Evidence: app/services/risk/feasibility/execution_gate.py line 276-329*
+- [X] **RISK-FR-345**: Check market-open and symbol-tradable feasibility. *Evidence: app/services/risk/feasibility/execution_gate.py line 878-886*
+- [X] **RISK-FR-346**: Check trade-frequency limits. *Evidence: app/services/risk/feasibility/execution_gate.py line 332-401*
+- [X] **RISK-FR-347**: Add tests for margin, drawdown, execution feasibility, and restored state corruption. *Evidence: tests/unit/app/services/risk/test_margin.py, tests/unit/app/services/risk/test_drawdown.py line 142-176, tests/unit/app/services/risk/test_execution_gate.py*
+- [X] **RISK-FR-348**: Document margin, drawdown, and execution feasibility behavior. *Evidence: app/services/risk/README.md line 306-343*
 
 **Target Class/Function:**
 
