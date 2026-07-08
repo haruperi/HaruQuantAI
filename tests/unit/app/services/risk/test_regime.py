@@ -356,3 +356,157 @@ def test_config_based_rollover_blackout(
     assert res.rollover_regime == RolloverRegime.BLACKOUT
     assert res.regime == RiskRegime.ROLLOVER_BLACKOUT
     assert res.status == RiskDecisionStatus.REJECT
+
+
+def test_direct_spread_regime_classification() -> None:
+    """Test classify_spread_regime directly."""
+    from app.services.risk.regime import (
+        SpreadRegime,
+        SpreadSigmaThresholds,
+        classify_spread_regime,
+    )
+
+    thresholds = SpreadSigmaThresholds(
+        threshold_normal=Decimal("1.5"), threshold_wide=Decimal("3.0")
+    )
+    # Z-score = (0.0004 - 0.0002) / 0.0001 = 2.0 -> WIDE
+    assert (
+        classify_spread_regime(
+            Decimal("0.0004"), Decimal("0.0001"), thresholds, Decimal("0.0002")
+        )
+        == SpreadRegime.WIDE
+    )
+    # Z-score = (0.0001 - 0.0002) / 0.0001 = 1.0 -> NORMAL
+    assert (
+        classify_spread_regime(
+            Decimal("0.0001"), Decimal("0.0001"), thresholds, Decimal("0.0002")
+        )
+        == SpreadRegime.NORMAL
+    )
+    # Z-score = (0.0006 - 0.0002) / 0.0001 = 4.0 -> EXTREME
+    assert (
+        classify_spread_regime(
+            Decimal("0.0006"), Decimal("0.0001"), thresholds, Decimal("0.0002")
+        )
+        == SpreadRegime.EXTREME
+    )
+    # Sigma <= 0 -> NORMAL
+    assert (
+        classify_spread_regime(
+            Decimal("0.0006"), Decimal("0.0"), thresholds, Decimal("0.0002")
+        )
+        == SpreadRegime.NORMAL
+    )
+
+
+def test_direct_volatility_regime_classification() -> None:
+    """Test classify_volatility_regime directly."""
+    from app.services.risk.regime import (
+        VolatilityRegime,
+        VolatilityThresholds,
+        classify_volatility_regime,
+    )
+
+    thresholds = VolatilityThresholds(
+        spike_multiplier=Decimal("2.0"),
+        high_multiplier=Decimal("1.3"),
+        low_multiplier=Decimal("0.5"),
+    )
+    # ratio = 2.5 -> SPIKE
+    assert (
+        classify_volatility_regime(
+            Decimal("0.025"), Decimal("0.010"), Decimal("0.010"), thresholds
+        )
+        == VolatilityRegime.SPIKE
+    )
+    # ratio = 1.5 -> HIGH
+    assert (
+        classify_volatility_regime(
+            Decimal("0.015"), Decimal("0.010"), Decimal("0.010"), thresholds
+        )
+        == VolatilityRegime.HIGH
+    )
+    # ratio = 0.4 -> LOW
+    assert (
+        classify_volatility_regime(
+            Decimal("0.004"), Decimal("0.010"), Decimal("0.010"), thresholds
+        )
+        == VolatilityRegime.LOW
+    )
+    # ratio = 1.0 -> NORMAL
+    assert (
+        classify_volatility_regime(
+            Decimal("0.010"), Decimal("0.010"), Decimal("0.010"), thresholds
+        )
+        == VolatilityRegime.NORMAL
+    )
+    # long_sigma <= 0 -> SPIKE (short > 0) or LOW (short == 0)
+    assert (
+        classify_volatility_regime(
+            Decimal("0.010"), Decimal("0.010"), Decimal("0.0"), thresholds
+        )
+        == VolatilityRegime.SPIKE
+    )
+    assert (
+        classify_volatility_regime(
+            Decimal("0.0"), Decimal("0.0"), Decimal("0.0"), thresholds
+        )
+        == VolatilityRegime.LOW
+    )
+
+
+def test_validate_regime_inputs() -> None:
+    """Test validate_regime_inputs helper."""
+    from app.services.risk.models import MarketRiskSnapshot
+    from app.services.risk.regime import validate_regime_inputs
+    from app.utils.normalization import utc_now
+
+    valid_snap = MarketRiskSnapshot(
+        spread=Decimal("0.0002"),
+        volatility=Decimal("0.0150"),
+        session="NY",
+        freshness=utc_now(),
+    )
+    assert validate_regime_inputs(valid_snap)["valid"] is True
+
+    invalid_spread = valid_snap.model_copy(update={"spread": Decimal("-0.0001")})
+    assert validate_regime_inputs(invalid_spread)["valid"] is False
+
+    invalid_vol = valid_snap.model_copy(update={"volatility": Decimal("-0.0001")})
+    assert validate_regime_inputs(invalid_vol)["valid"] is False
+
+    invalid_session = valid_snap.model_copy(update={"session": ""})
+    assert validate_regime_inputs(invalid_session)["valid"] is False
+
+
+def test_build_regime_reason_codes() -> None:
+    """Test build_regime_reason_codes helper."""
+    from app.services.risk.models import RiskDecisionStatus, RiskReasonCode
+    from app.services.risk.regime import (
+        RegimeAssessment,
+        RiskRegime,
+        build_regime_reason_codes,
+    )
+    from app.utils.normalization import utc_now
+
+    assessment = RegimeAssessment(
+        regime=RiskRegime.NORMAL,
+        spread_regime=SpreadRegime.NORMAL,
+        volatility_regime=VolatilityRegime.NORMAL,
+        liquidity_regime=LiquidityRegime.NORMAL,
+        news_regime=NewsRegime.NORMAL,
+        session_regime=SessionRegime.ACTIVE,
+        rollover_regime=RolloverRegime.NORMAL,
+        status=RiskDecisionStatus.APPROVE,
+        reason="OK",
+        reason_code=RiskReasonCode.OK,
+        timestamp=utc_now(),
+    )
+    assert build_regime_reason_codes(assessment) == ()
+
+    failed_assessment = assessment.model_copy(
+        update={"reason_code": RiskReasonCode.NEWS_BLACKOUT}
+    )
+    assert build_regime_reason_codes(failed_assessment) == (
+        RiskReasonCode.NEWS_BLACKOUT,
+    )

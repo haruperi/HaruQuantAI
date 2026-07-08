@@ -410,6 +410,75 @@ def example_04_market_regime_classification() -> None:
     print(f"\nRollover Blackout Status: {result_rollover.status} (expected REJECT)")
 
 
+def example_06_regime() -> None:
+    """Demonstrate market regime assessors and validation rules (regime module)."""
+    print_header(6, "Market Regime Gate & Assessors")
+
+    base_config = load_risk_config("default")
+    from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
+    policy = EffectiveRiskPolicy(
+        policy_id="example-policy-id",
+        resolved_config=base_config,
+        policy_hash="example-policy-hash",
+    )
+
+    from app.services.risk.regime import (
+        SpreadSigmaThresholds,
+        VolatilityThresholds,
+        classify_spread_regime,
+        classify_volatility_regime,
+        is_rollover_blackout,
+        validate_market_freshness,
+    )
+
+    # 1. Spread regime classification directly
+    spread_thresholds = SpreadSigmaThresholds(
+        threshold_normal=Decimal("1.5"), threshold_wide=Decimal("3.0")
+    )
+    spread_status = classify_spread_regime(
+        spread=Decimal("0.0004"),
+        sigma=Decimal("0.0001"),
+        thresholds=spread_thresholds,
+        mean=Decimal("0.0002"),
+    )
+    print(f"Direct Spread Regime Class: {spread_status} (expected wide)")
+
+    # 2. Volatility regime classification directly
+    vol_thresholds = VolatilityThresholds(
+        spike_multiplier=Decimal("2.0"),
+        high_multiplier=Decimal("1.3"),
+        low_multiplier=Decimal("0.5"),
+    )
+    vol_status = classify_volatility_regime(
+        short_sigma=Decimal("0.025"),
+        medium_sigma=Decimal("0.010"),
+        long_sigma=Decimal("0.010"),
+        thresholds=vol_thresholds,
+    )
+    print(f"Direct Volatility Regime Class: {vol_status} (expected spike)")
+
+    # 3. Freshness validation
+    snap = MarketRiskSnapshot(
+        spread=Decimal("0.0002"),
+        volatility=Decimal("0.0150"),
+        session="NY",
+        freshness=datetime.now(UTC) - timedelta(seconds=120),
+    )
+    fresh_res = validate_market_freshness(
+        snap, policy, datetime.now(UTC), {"max_stale_seconds": 60}
+    )
+    print(
+        f"Freshness check with 120s old data: valid={fresh_res['valid']} "
+        f"(expected False)"
+    )
+
+    # 4. UTC Rollover blackout window check
+    now = datetime.now(UTC)
+    rollover_status = is_rollover_blackout(now, policy)
+    print(f"Is currently in rollover blackout: {rollover_status}")
+
+
 def example_05_portfolio_correlation_dynamics() -> None:
     """Demonstrate returns calculation, alignment, correlation matrix estimation, and proposed trade impacts (correlation.py)."""
     print_header(5, "Portfolio Correlation Dynamics")
@@ -1494,6 +1563,7 @@ if __name__ == "__main__":
     example_03_policy_resolution_engine()
     example_04_market_regime_classification()
     example_05_portfolio_correlation_dynamics()
+    example_06_regime()
     example_06_value_at_risk_and_expected_shortfall()
     example_07_portfolio_stress_scenario_testing()
     example_08_risk_budgeting_allocation()

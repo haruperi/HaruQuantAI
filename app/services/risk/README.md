@@ -113,7 +113,10 @@ Ad-hoc limit overrides require cryptographically signed `RiskApprovalToken` stru
 
 ## 7. Market Regime Gate
 
-The Market Regime Gate validates current market conditions against historic baselines and calendar events, blocking or rejecting proposals when conditions are unsafe.
+The Market Regime Gate package (`app/services/risk/regime/`) validates current market conditions against historic baselines and calendar events, blocking or rejecting proposals when conditions are unsafe. It is composed of the following files:
+
+* **`assessor.py`**: Implements pure assessors for spread, volatility, news calendar, and rollover blackout classifications, including `assess_risk_regime` (supporting V1 & V2 signatures), `RegimeRiskEngine`, `classify_spread_regime`, `classify_volatility_regime`, `is_rollover_blackout`, and `validate_market_freshness`.
+* **`validation.py`**: Implements input validation checks (`validate_regime_inputs`) and stable reason code builders (`build_regime_reason_codes`).
 
 ### Classification Categories
 1. **Spread Regime (`SpreadRegime`)**: Classifies current spread as `NORMAL`, `WIDE`, or `EXTREME` based on rolling spread statistics and z-score thresholds. `EXTREME` breaches fail the gate with `RiskDecisionStatus.REJECT` and reason code `SPREAD_BREACH`.

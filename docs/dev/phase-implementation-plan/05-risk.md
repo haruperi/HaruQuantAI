@@ -644,26 +644,26 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-109**: Create market regime gate with deterministic regime assessment.
-- **RISK-FR-110**: Define `RiskRegime` enum and regime result contract.
-- **RISK-FR-111**: Implement spread regime classification using spread-to-Ïƒ thresholds.
-- **RISK-FR-112**: Implement volatility regime classification using short rolling windows.
-- **RISK-FR-113**: Implement volatility regime classification using medium rolling windows.
-- **RISK-FR-114**: Implement volatility regime classification using long rolling windows.
-- **RISK-FR-115**: Implement liquidity regime classification from quote freshness and missing bars.
-- **RISK-FR-116**: Implement session regime classification for always-on trading.
-- **RISK-FR-117**: Implement broker-midnight rollover regime detection.
-- **RISK-FR-118**: Implement configured rollover blackout before broker midnight.
-- **RISK-FR-119**: Implement configured rollover blackout after broker midnight.
-- **RISK-FR-120**: Implement news regime classification from injected trusted calendar evidence.
-- **RISK-FR-121**: Fail closed when live profile requires calendar evidence and it is missing.
-- **RISK-FR-122**: Throttle or reject extreme volatility spikes.
-- **RISK-FR-123**: Reject stale quotes and stale market data snapshots.
-- **RISK-FR-124**: Reject invalid spreads and inverted bid/ask data.
-- **RISK-FR-125**: Reject entries in market-closed or symbol-suspended states.
-- **RISK-FR-126**: Expose reason codes for each regime warning or blocker.
-- **RISK-FR-127**: Ensure regime checks use closed bars where required.
-- **RISK-FR-128**: Ensure regime checks do not mutate inputs.
+- [X] **RISK-FR-109**: Create market regime gate with deterministic regime assessment. *Evidence: app/services/risk/regime/assessor.py line 393-525*
+- [X] **RISK-FR-110**: Define `RiskRegime` enum and regime result contract. *Evidence: app/services/risk/regime/assessor.py line 25-40, 95-108*
+- [X] **RISK-FR-111**: Implement spread regime classification using spread-to-σ thresholds. *Evidence: app/services/risk/regime/assessor.py line 208-233, 583-625*
+- [X] **RISK-FR-112**: Implement volatility regime classification using short rolling windows. *Evidence: app/services/risk/regime/assessor.py line 236-281, 659-697*
+- [X] **RISK-FR-113**: Implement volatility regime classification using medium rolling windows. *Evidence: app/services/risk/regime/assessor.py line 236-281, 659-697*
+- [X] **RISK-FR-114**: Implement volatility regime classification using long rolling windows. *Evidence: app/services/risk/regime/assessor.py line 236-281, 659-697*
+- [X] **RISK-FR-115**: Implement liquidity regime classification from quote freshness and missing bars. *Evidence: app/services/risk/regime/assessor.py line 700-752*
+- [X] **RISK-FR-116**: Implement session regime classification for always-on trading. *Evidence: app/services/risk/regime/assessor.py line 465-482*
+- [X] **RISK-FR-117**: Implement broker-midnight rollover regime detection. *Evidence: app/services/risk/regime/assessor.py line 284-331, 855-885*
+- [X] **RISK-FR-118**: Implement configured rollover blackout before broker midnight. *Evidence: app/services/risk/regime/assessor.py line 284-331, 855-885*
+- [X] **RISK-FR-119**: Implement configured rollover blackout after broker midnight. *Evidence: app/services/risk/regime/assessor.py line 284-331, 855-885*
+- [X] **RISK-FR-120**: Implement news regime classification from injected trusted calendar evidence. *Evidence: app/services/risk/regime/assessor.py line 799-850*
+- [X] **RISK-FR-121**: Fail closed when live profile requires calendar evidence and it is missing. *Evidence: app/services/risk/regime/assessor.py line 505-515*
+- [X] **RISK-FR-122**: Throttle or reject extreme volatility spikes. *Evidence: app/services/risk/regime/assessor.py line 559-563*
+- [X] **RISK-FR-123**: Reject stale quotes and stale market data snapshots. *Evidence: app/services/risk/regime/assessor.py line 334-375, 448-463*
+- [X] **RISK-FR-124**: Reject invalid spreads and inverted bid/ask data. *Evidence: app/services/risk/regime/validation.py line 23-84, app/services/risk/regime/assessor.py line 414-424*
+- [X] **RISK-FR-125**: Reject entries in market-closed or symbol-suspended states. *Evidence: app/services/risk/regime/assessor.py line 465-482*
+- [X] **RISK-FR-126**: Expose reason codes for each regime warning or blocker. *Evidence: app/services/risk/regime/validation.py line 87-104, app/services/risk/regime/assessor.py line 550-580*
+- [X] **RISK-FR-127**: Ensure regime checks use closed bars where required. *Evidence: app/services/risk/regime/assessor.py line 426-438, 717-742*
+- [X] **RISK-FR-128**: Ensure regime checks do not mutate inputs. *Evidence: app/services/risk/regime/validation.py line 23-84, app/services/risk/regime/assessor.py line 393-525*
 
 **Target Class/Function:**
 
@@ -684,16 +684,16 @@ The following groups map every `RISK-FR-001` through `RISK-FR-498` to one physic
 
 **Requirements:**
 
-- **RISK-FR-129**: Add normal regime tests.
-- **RISK-FR-130**: Add low-volatility regime tests.
-- **RISK-FR-131**: Add high-volatility regime tests.
-- **RISK-FR-132**: Add spread-widening tests.
-- **RISK-FR-133**: Add rollover blackout tests.
-- **RISK-FR-134**: Add stale-data fail-closed tests.
-- **RISK-FR-135**: Add missing-news-evidence tests.
-- **RISK-FR-136**: Add invalid quote tests.
-- **RISK-FR-137**: Add session behavior tests.
-- **RISK-FR-138**: Add docs and usage example for the market regime gate.
+- [X] **RISK-FR-129**: Add normal regime tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 53-77*
+- [X] **RISK-FR-130**: Add low-volatility regime tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 156-165*
+- [X] **RISK-FR-131**: Add high-volatility regime tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 166-177*
+- [X] **RISK-FR-132**: Add spread-widening tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 122-154*
+- [X] **RISK-FR-133**: Add rollover blackout tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 218-233, 334-359*
+- [X] **RISK-FR-134**: Add stale-data fail-closed tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 90-102*
+- [X] **RISK-FR-135**: Add missing-news-evidence tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 235-246*
+- [X] **RISK-FR-136**: Add invalid quote tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 79-88*
+- [X] **RISK-FR-137**: Add session behavior tests. *Evidence: tests/unit/app/services/risk/test_regime.py line 104-120*
+- [X] **RISK-FR-138**: Add docs and usage example for the market regime gate. *Evidence: app/services/risk/README.md line 114-129, tests/usage/05_risk.py line 413-481*
 
 **Target Class/Function:**
 

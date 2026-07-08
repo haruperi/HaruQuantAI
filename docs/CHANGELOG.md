@@ -36,6 +36,8 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-021 | Risk Storage V2 modular package | Decoupled the persistence layer from core risk governance by introducing a structured package `app/services/risk/storage/` containing `ports.py` (Protocols for drawdown state, kill switches, audit, policies, and decisions), `in_memory.py` (thread-safe, lock-isolated state store with simulated fault injection), and init package exports. |
 | ADD-022 | Risk Policy V2 modular package | Transitioned legacy flat policy logic into a structured package `app/services/risk/policy/` containing `contracts.py` (policy scopes, precedence, rules, and override results), `resolver.py` (precedence specificity scoring, time-bounded validation, and budget gate checks), and `overrides.py` (cryptographic override token compatibility checks and ceilings validation). |
 | ADD-023 | Risk Readiness V2 modular package | Introduced structured package `app/services/risk/readiness/` containing `readiness.py` to perform system integration and pre-runtime readiness validation checks, including dependency status checking, safety modes coverage matrix validation, delivery plan constraints verification, and dry-run report compilation. |
+| ADD-024 | Risk Regime V2 modular package | Transitioned legacy flat regime logic into a structured package `app/services/risk/regime/` containing `assessor.py` (regime classification, spread, volatility, liquidity, news, rollover blackouts) and `validation.py` (inputs validation and reason codes). |
+
 
 
 
