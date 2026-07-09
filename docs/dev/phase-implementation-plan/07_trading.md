@@ -545,23 +545,37 @@ stateDiagram-v2
 
 #### 📄 File: `state/idempotency.py`
 
-- [ ] **TRD-FR-143:** Generate idempotency keys using a SHA-256 hash over canonical JSON representation of: account ID, strategy ID, route, promotion stage, broker, symbol, action, type, side, volume, price, stop limit price, SL, TP, deviation, TIF, expiration, magic number, client order ID, risk ID, approval ID, and allocation vector.
-- [ ] **TRD-FR-144:** Idempotency records must survive process restart for live routes. In-progress leases must carry explicit TTLs, and expired leases must transition to reconciliation-required rather than auto-retrying.
-- [ ] **TRD-FR-145:** In-progress duplicates must be rejected. Completed duplicates must return the cached execution envelope.
+- [X] **TRD-FR-143:** Generate idempotency keys using a SHA-256 hash over canonical JSON representation of: account ID, strategy ID, route, promotion stage, broker, symbol, action, type, side, volume, price, stop limit price, SL, TP, deviation, TIF, expiration, magic number, client order ID, risk ID, approval ID, and allocation vector.
+  *Evidence: app/services/trading/state/idempotency.py line 31-246*
+- [X] **TRD-FR-144:** Idempotency records must survive process restart for live routes. In-progress leases must carry explicit TTLs, and expired leases must transition to reconciliation-required rather than auto-retrying.
+  *Evidence: app/services/trading/state/idempotency.py line 256-446*
+- [X] **TRD-FR-145:** In-progress duplicates must be rejected. Completed duplicates must return the cached execution envelope.
+  *Evidence: app/services/trading/state/idempotency.py line 275-446*
 
 #### 📄 File: `state/event_journal.py`
 
-- [ ] **TRD-FR-146:** Implement an append-only, non-mutable journal recording all commands, gate decisions, broker dispatches, broker responses, execution reports, reconciliation events, and operator interventions.
-- [ ] **TRD-FR-147:** Every journal event must carry an `event_id`, `previous_event_hash`, `event_hash`, `schema_version`, `timestamp_utc`, `monotonic_timestamp`, `request_id`, `correlation_id`, `route`, `account_id`, `symbol`, and `actor` to support forensic replayability.
-- [ ] **TRD-FR-148 (Logical Clocks & Sequence IDs):** Every journal event and execution report event must carry a monotonically increasing `sequence_id` (logical clock sequence). The `state_machine.py` and `TradeStore` projections must utilize this sequence ID as the absolute source of truth for event ordering to prevent physical clock jitter/out-of-order errors.
-- [ ] **TRD-FR-149:** On startup, before any session enters `running`, the runtime SHALL scan the event journal for commands that were journaled as accepted (`TradingCommandAccepted` / `BrokerDispatchEvent`) but carry no terminal event (`ExecutionReportEvent` terminal state, `TradingCommandRejected`, or `ReconciliationResolutionEvent`). Every such in-flight command MUST force a per-scope (account, symbol) reconciliation lock; those scopes remain blocked for mutation until the reconciliation service resolves the true broker outcome.
-- [ ] **TRD-FR-150:** Implement periodic durable state snapshots (configurable: every N journal events or T minutes). A projection rebuild MUST be reproducible as `snapshot + replay of subsequent journal events`, and a rebuild-from-snapshot routine SHALL be exposed for recovery and for forensic reconstruction.
-- [ ] **TRD-FR-151:** Model journal compaction and retention policy as configuration: pre-snapshot segments MAY be compacted/archived after a configured retention window. Retention windows are route-aware (e.g., years for `live` to satisfy audit obligations; days for `sim`/`paper`). Compaction MUST preserve the hash chain across segment boundaries (segment-seal events carrying the terminal hash of the sealed segment).
-- [ ] **TRD-FR-152:** A scheduled integrity job SHALL re-verify the `previous_event_hash` chain (full or incremental). A broken chain is a critical incident: emit a critical operational signal, block live mutation, and require documented operator clearance to resume.
-- [ ] **TRD-FR-153:** Every session-start event and every journal event SHALL record `software_version`, VCS commit hash, dirty-tree flag, and the active config hash (per TRD-FR-058). The promotion preconditions MAY (policy-configurable) block `full_live` when the runtime is built from a dirty or untagged tree. Forensic replay MUST be able to answer "which exact code and config produced this event."
-- [ ] **TRD-FR-154 (Reconstructive Replay Builder):** Expose a `replay_builder` utility in `state/` that accepts a historical state snapshot and a sequence of subsequent journal events, re-materializing the exact `TradeStore` projections (portfolio state, balance, open positions, P&L, and risk exposure) at any specific historical timestamp.
-- [ ] **TRD-FR-155 (At-Rest Journal Encryption & Detached Signatures):** Persisted journal segments, snapshots, and audit sinks SHALL be encrypted at rest using an injected `EncryptionProvider` protocol. Periodic integrity validation (TRD-FR-152) SHALL implement a "seal-then-verify" procedure that writes a detached cryptographic signature of each closed journal segment to a separate, tamper-evident monitoring log.
-- [ ] **TRD-FR-156 (WORM Audit Compliance):** The `AuditSink` and `EventJournal` storage protocols must enforce WORM (Write Once Read Many) immutability compliance. The `replay_builder` (TRD-FR-154) must be capable of cryptographically verifying the immutable journal hash chain to prove that no historical records have been modified.
+- [X] **TRD-FR-146:** Implement an append-only, non-mutable journal recording all commands, gate decisions, broker dispatches, broker responses, execution reports, reconciliation events, and operator interventions.
+  *Evidence: app/services/trading/state/event_journal.py line 238-342*
+- [X] **TRD-FR-147:** Every journal event must carry an `event_id`, `previous_event_hash`, `event_hash`, `schema_version`, `timestamp_utc`, `monotonic_timestamp`, `request_id`, `correlation_id`, `route`, `account_id`, `symbol`, and `actor` to support forensic replayability.
+  *Evidence: app/services/trading/state/event_journal.py line 59-140*
+- [X] **TRD-FR-148 (Logical Clocks & Sequence IDs):** Every journal event and execution report event must carry a monotonically increasing `sequence_id` (logical clock sequence). The `state_machine.py` and `TradeStore` projections must utilize this sequence ID as the absolute source of truth for event ordering to prevent physical clock jitter/out-of-order errors.
+  *Evidence: app/services/trading/state/event_journal.py line 269-342*
+- [X] **TRD-FR-149:** On startup, before any session enters `running`, the runtime SHALL scan the event journal for commands that were journaled as accepted (`TradingCommandAccepted` / `BrokerDispatchEvent`) but carry no terminal event (`ExecutionReportEvent` terminal state, `TradingCommandRejected`, or `ReconciliationResolutionEvent`). Every such in-flight command MUST force a per-scope (account, symbol) reconciliation lock; those scopes remain blocked for mutation until the reconciliation service resolves the true broker outcome.
+  *Evidence: app/services/trading/state/event_journal.py line 343-382*
+- [X] **TRD-FR-150:** Implement periodic durable state snapshots (configurable: every N journal events or T minutes). A projection rebuild MUST be reproducible as `snapshot + replay of subsequent journal events`, and a rebuild-from-snapshot routine SHALL be exposed for recovery and for forensic reconstruction.
+  *Evidence: app/services/trading/state/event_journal.py line 384-450*
+- [X] **TRD-FR-151:** Model journal compaction and retention policy as configuration: pre-snapshot segments MAY be compacted/archived after a configured retention window. Retention windows are route-aware (e.g., years for `live` to satisfy audit obligations; days for `sim`/`paper`). Compaction MUST preserve the hash chain across segment boundaries (segment-seal events carrying the terminal hash of the sealed segment).
+  *Evidence: app/services/trading/state/event_journal.py line 218-535*
+- [X] **TRD-FR-152:** A scheduled integrity job SHALL re-verify the `previous_event_hash` chain (full or incremental). A broken chain is a critical incident: emit a critical operational signal, block live mutation, and require documented operator clearance to resume.
+  *Evidence: app/services/trading/state/event_journal.py line 453-478*
+- [X] **TRD-FR-153:** Every session-start event and every journal event SHALL record `software_version`, VCS commit hash, dirty-tree flag, and the active config hash (per TRD-FR-058). The promotion preconditions MAY (policy-configurable) block `full_live` when the runtime is built from a dirty or untagged tree. Forensic replay MUST be able to answer "which exact code and config produced this event."
+  *Evidence: app/services/trading/state/event_journal.py line 31-342*
+- [X] **TRD-FR-154 (Reconstructive Replay Builder):** Expose a `replay_builder` utility in `state/` that accepts a historical state snapshot and a sequence of subsequent journal events, re-materializing the exact `TradeStore` projections (portfolio state, balance, open positions, P&L, and risk exposure) at any specific historical timestamp.
+  *Evidence: app/services/trading/state/event_journal.py line 429-591*
+- [X] **TRD-FR-155 (At-Rest Journal Encryption & Detached Signatures):** Persisted journal segments, snapshots, and audit sinks SHALL be encrypted at rest using an injected `EncryptionProvider` protocol. Periodic integrity validation (TRD-FR-152) SHALL implement a "seal-then-verify" procedure that writes a detached cryptographic signature of each closed journal segment to a separate, tamper-evident monitoring log.
+  *Evidence: app/services/trading/state/event_journal.py line 384-501*
+- [X] **TRD-FR-156 (WORM Audit Compliance):** The `AuditSink` and `EventJournal` storage protocols must enforce WORM (Write Once Read Many) immutability compliance. The `replay_builder` (TRD-FR-154) must be capable of cryptographically verifying the immutable journal hash chain to prove that no historical records have been modified.
+  *Evidence: app/services/trading/state/event_journal.py line 238-478*
 
 ---
 

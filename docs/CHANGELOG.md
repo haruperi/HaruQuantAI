@@ -50,6 +50,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-035 | Public Package Export & Agentic Facade Adapter | Configured top-level public package exports in `app/services/risk/__init__.py` and delegated all 11 tool functions in `app/agentic/tools/risk.py` to their official V2 equivalents. |
 | ADD-036 | Trading Runtime Configuration & Security Controls | Added trading runtime configuration and security controls, including immutable config models, reload policy enforcement, secret-reference resolution, credential-rotation handling, notification routing, and broker security profile validation. |
 | ADD-037 | Trading Runtime Security Boundaries | Added trading runtime security boundaries for standard public error mapping, recursive redaction, write-ahead dead-letter logging, exactly-once dead-letter recovery, and poison-pill manual review isolation. |
+| ADD-038 | Trading Runtime Persistence | Added trading runtime idempotency leases, canonical duplicate detection, append-only encrypted event journals, logical sequence ordering, snapshots, replay reconstruction, retention seals, and detached signature validation support. |
 
 
 

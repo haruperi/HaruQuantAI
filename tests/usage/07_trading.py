@@ -3,7 +3,7 @@
 
 import sys
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -46,7 +46,15 @@ from app.services.trading.security import (
     map_exception_to_trading_error,
     redact_for_boundary,
 )
-from app.services.trading.state import RNG, Clock
+from app.services.trading.state import (
+    RNG,
+    AppendOnlyEventJournal,
+    Clock,
+    EncryptionProvider,
+    IdempotencyMaterial,
+    JournalBuildMetadata,
+    JsonlIdempotencyStore,
+)
 from app.utils.settings import settings
 
 # Shared state across trading examples
@@ -84,6 +92,22 @@ class ExampleRNG:
     def randint(self, lower_inclusive: int, upper_inclusive: int) -> int:
         """Return deterministic pseudo-random integer."""
         return lower_inclusive + (upper_inclusive - lower_inclusive) // 2
+
+
+class ExampleEncryptionProvider:
+    """Usage-example deterministic encryption provider."""
+
+    def encrypt(self, plaintext: str) -> str:
+        """Encrypt deterministic plaintext for usage output."""
+        return f"enc:{plaintext}"
+
+    def decrypt(self, ciphertext: str) -> str:
+        """Decrypt deterministic ciphertext for usage output."""
+        return ciphertext.removeprefix("enc:")
+
+    def sign(self, payload: str) -> str:
+        """Return a deterministic detached signature."""
+        return f"sig:{payload}"
 
 
 def example_01_contracts() -> None:
@@ -229,6 +253,73 @@ def example_04_security_boundaries_error_redaction() -> None:
     print(f"Redacted payload:   {boundary.payload}")
     print(f"DLQ event:          {write_result.record.event_id}")
     print(f"Blocked scopes:     {write_result.blocked_live_scopes}")
+
+
+def example_05_persistence_implementations() -> None:
+    """Demonstrate idempotency leases and append-only journal replay."""
+    print("\n" + "=" * 100)
+    print("--- 4. Trading Persistence Implementations ---")
+    print("=" * 100)
+
+    clock = ExampleClock()
+    encryption: EncryptionProvider = ExampleEncryptionProvider()
+    material = IdempotencyMaterial(
+        account_id="usage-account",
+        strategy_id="usage-strategy",
+        route=TradingRoute.PAPER,
+        promotion_stage=PromotionStage.PAPER_TRADING.value,
+        broker="mt5",
+        symbol="EURUSD",
+        action=TradingAction.SUBMIT_ORDER,
+        side="buy",
+        volume="0.10",
+        price="1.1000",
+    )
+    store = JsonlIdempotencyStore(
+        path=Path("build/trading_usage_idempotency.jsonl"),
+        clock=clock,
+    )
+    reservation = store.reserve(
+        route=TradingRoute.PAPER,
+        tenant_id="usage-tenant",
+        material=material,
+        ttl=timedelta(minutes=5),
+    )
+    journal = AppendOnlyEventJournal(
+        path=Path("build/trading_usage_journal.jsonl"),
+        snapshot_path=Path("build/trading_usage_snapshots.jsonl"),
+        signature_path=Path("build/trading_usage_signatures.jsonl"),
+        clock=clock,
+        encryption_provider=encryption,
+        build_metadata=JournalBuildMetadata(
+            software_version="usage-1.0.0",
+            vcs_commit_hash="usage-commit",
+            dirty_tree=False,
+            active_config_hash="usage-config-hash",
+        ),
+    )
+    event = journal.append_event(
+        event_type="TradingCommandAccepted",
+        request_id="usage-trd-005",
+        correlation_id="usage-corr-005",
+        route=TradingRoute.PAPER,
+        account_id="usage-account",
+        symbol="EURUSD",
+        actor="usage",
+        payload={"idempotency_key": reservation.record.key},
+    )
+    snapshot = journal.write_snapshot(
+        route=TradingRoute.PAPER,
+        account_id="usage-account",
+        state={"orders": [], "positions": []},
+    )
+    seal = journal.seal_segment()
+
+    print(f"Reservation:        {reservation.decision.value}")
+    print(f"Idempotency key:    {reservation.record.key}")
+    print(f"Journal sequence:   {event.sequence_id}")
+    print(f"Snapshot sequence:  {snapshot.sequence_id}")
+    print(f"Segment signature:  {seal.signature[:24]}...")
 
 
 def get_client() -> Any:
@@ -800,6 +891,7 @@ if __name__ == "__main__":
     example_02_state_ports()
     example_03_configurations_security_controls()
     example_04_security_boundaries_error_redaction()
+    example_05_persistence_implementations()
     example_01_connect()
     example_02_terminal()
     example_03_account()
