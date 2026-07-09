@@ -34,6 +34,13 @@ from app.services.trading import (
     TradingRoute,
     get_trading_public_catalog,
 )
+from app.services.trading.config import (
+    NotificationChannel,
+    NotificationConfig,
+    build_config_change_event,
+    build_notification_payload,
+    load_trading_config,
+)
 from app.services.trading.state import RNG, Clock
 from app.utils.settings import settings
 
@@ -123,6 +130,57 @@ def example_02_state_ports() -> None:
     print(f"Monotonic:          {clock.monotonic()}")
     print(f"Random draw:        {rng.random()}")
     print(f"Random int:         {rng.randint(1, 5)}")
+
+
+def example_03_configurations_security_controls() -> None:
+    """Demonstrate config loading, hashing, and notification redaction."""
+    print("\n" + "=" * 100)
+    print("--- 3. Trading Runtime Configuration & Security Controls ---")
+    print("=" * 100)
+
+    config = load_trading_config(
+        {
+            "config_version": "1.0.0",
+            "active_broker": "mt5",
+            "store_targets": {
+                "trade_store_ref": "store://trade",
+                "state_store_ref": "store://state",
+                "audit_sink_ref": "store://audit",
+                "idempotency_store_ref": "store://idempotency",
+                "event_journal_ref": "store://journal",
+            },
+            "secret_references": {
+                "broker_credentials": {"reference": "vault://broker"},
+                "database_credentials": {"reference": "vault://database"},
+            },
+        }
+    )
+    event = build_config_change_event(
+        config=config,
+        actor="usage-operator",
+        effective_at="2026-07-09T10:00:00Z",
+    )
+    notifications = NotificationConfig(
+        channels=(
+            NotificationChannel(
+                name="ops",
+                kind="email",
+                approved=True,
+                target_ref="notify://ops",
+            ),
+        )
+    )
+    payload = build_notification_payload(
+        config=notifications,
+        channel_name="ops",
+        event_type="config_loaded",
+        payload={"api_key": "abcdefabcdefabcdefabcdefabcdef12", "status": "ok"},
+    )
+
+    print(f"Live side effect:   {config.live_mutation_side_effect().value}")
+    print(f"Config hash:        {event.config_hash}")
+    print(f"Redacted secret:    {event.redacted_config['secret_references']}")
+    print(f"Notify payload:     {payload['payload']}")
 
 
 def get_client() -> Any:
@@ -692,6 +750,7 @@ def example_17_shutdown() -> None:
 if __name__ == "__main__":
     example_01_contracts()
     example_02_state_ports()
+    example_03_configurations_security_controls()
     example_01_connect()
     example_02_terminal()
     example_03_account()

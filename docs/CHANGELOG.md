@@ -48,6 +48,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-033 | Risk Governor & Decision Synthesis V2 modular package | Created structured package `app/services/risk/governor/` (`decision_synthesis.py`, `governor.py`, `__init__.py`) to support modular decision synthesis, precedence checks, size reduction aggregation, and token eligibility verification, with 100% unit test coverage. |
 | ADD-034 | Official AI Risk Tools Registry | Created `app/services/risk/tools/registry.py` and `official.py` defining registry constraints and 11 official tool wrappers with namespaced metadata and strict safety gates (`places_trade=False`). |
 | ADD-035 | Public Package Export & Agentic Facade Adapter | Configured top-level public package exports in `app/services/risk/__init__.py` and delegated all 11 tool functions in `app/agentic/tools/risk.py` to their official V2 equivalents. |
+| ADD-036 | Trading Runtime Configuration & Security Controls | Added trading runtime configuration and security controls, including immutable config models, reload policy enforcement, secret-reference resolution, credential-rotation handling, notification routing, and broker security profile validation. |
 
 
 

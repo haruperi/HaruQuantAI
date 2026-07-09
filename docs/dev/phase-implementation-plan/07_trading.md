@@ -350,28 +350,28 @@ stateDiagram-v2
 
 #### 📄 File: `config/models.py`
 
-- [ ] **TRD-FR-054:** Config models shall require parameters for route enablement, live mutation enablement, active broker selection, rate-limit settings, cost budgets, timeout limits, stale states, and secret references.
-- [ ] **TRD-FR-055:** Live mutation (`ALLOW_LIVE_MUTATIONS=false`) shall be disabled by default. If disabled, a passing gate pipeline must return a `packaged_only` status and block broker communication.
-- [ ] **TRD-FR-056:** Enforce that broker capability evidence snapshots have a configured Time-To-Live (TTL). Stale capabilities check must fail closed.
+- [X] **TRD-FR-054:** Config models shall require parameters for route enablement, live mutation enablement, active broker selection, rate-limit settings, cost budgets, timeout limits, stale states, and secret references. *Evidence: app/services/trading/config/models.py line 74-222*
+- [X] **TRD-FR-055:** Live mutation (`ALLOW_LIVE_MUTATIONS=false`) shall be disabled by default. If disabled, a passing gate pipeline must return a `packaged_only` status and block broker communication. *Evidence: app/services/trading/config/models.py line 74-110; app/services/trading/config/models.py line 224-232*
+- [X] **TRD-FR-056:** Enforce that broker capability evidence snapshots have a configured Time-To-Live (TTL). Stale capabilities check must fail closed. *Evidence: app/services/trading/config/models.py line 167-185; tests/services/trading/config/test_config_controls.py line 92-104*
 
 #### 📄 File: `config/loader.py`
 
-- [ ] **TRD-FR-057:** Enforce strict validation of configuration keys at startup. Config loading must fail closed if any required secret reference is missing or if configuration structure is malformed.
-- [ ] **TRD-FR-058:** Effective runtime configuration SHALL be versioned. Every configuration change that takes effect emits a journal event containing the actor, timestamp, and a hash of the effective (redacted) configuration. Reports and incidents reference the config version active at the time.
-- [ ] **TRD-FR-059:** The following keys are immutable while any live session is in `running` state: `ALLOW_LIVE_MUTATIONS`, the fat-finger ceiling, active broker selection, promotion-stage assignments, and store connection targets. Changing them requires session stop, the change, operator approval evidence, and session restart. Hot-reload of all other keys is permitted only through the validated loader path, never by direct mutation.
+- [X] **TRD-FR-057:** Enforce strict validation of configuration keys at startup. Config loading must fail closed if any required secret reference is missing or if configuration structure is malformed. *Evidence: app/services/trading/config/loader.py line 44-82; app/services/trading/config/models.py line 187-222; tests/services/trading/config/test_config_controls.py line 106-120*
+- [X] **TRD-FR-058:** Effective runtime configuration SHALL be versioned. Every configuration change that takes effect emits a journal event containing the actor, timestamp, and a hash of the effective (redacted) configuration. Reports and incidents reference the config version active at the time. *Evidence: app/services/trading/config/loader.py line 31-39; app/services/trading/config/loader.py line 85-124; tests/services/trading/config/test_config_controls.py line 122-134*
+- [X] **TRD-FR-059:** The following keys are immutable while any live session is in `running` state: `ALLOW_LIVE_MUTATIONS`, the fat-finger ceiling, active broker selection, promotion-stage assignments, and store connection targets. Changing them requires session stop, the change, operator approval evidence, and session restart. Hot-reload of all other keys is permitted only through the validated loader path, never by direct mutation. *Evidence: app/services/trading/config/loader.py line 18-29; app/services/trading/config/loader.py line 127-206; tests/services/trading/config/test_config_controls.py line 136-171*
 
 #### 📄 File: `config/secrets.py`
 
-- [ ] **TRD-FR-060:** Secrets resolution must retrieve credentials using indirection and references. Under no circumstances shall raw secret values be stored in configuration model properties, written to log files, or returned in public envelopes.
-- [ ] **TRD-FR-061:** Credential/token expiry or rotation mid-session SHALL be handled via the broker adapter's re-authentication path without classifying the interruption as an unknown trade outcome. Failed rotation transitions the session to `read_only` with a high-severity signal; it MUST NOT crash the runtime or silently retry with stale credentials.
+- [X] **TRD-FR-060:** Secrets resolution must retrieve credentials using indirection and references. Under no circumstances shall raw secret values be stored in configuration model properties, written to log files, or returned in public envelopes. *Evidence: app/services/trading/config/models.py line 30-72; app/services/trading/config/secrets.py line 15-87; tests/services/trading/config/test_config_controls.py line 173-181*
+- [X] **TRD-FR-061:** Credential/token expiry or rotation mid-session SHALL be handled via the broker adapter's re-authentication path without classifying the interruption as an unknown trade outcome. Failed rotation transitions the session to `read_only` with a high-severity signal; it MUST NOT crash the runtime or silently retry with stale credentials. *Evidence: app/services/trading/config/secrets.py line 25-31; app/services/trading/config/secrets.py line 92-123; tests/services/trading/config/test_config_controls.py line 183-197*
 
 #### 📄 File: `config/notifications.py`
 
-- [ ] **TRD-FR-062:** Construct notification payloads with strict redaction. Operational notifications (including executions, incidents, and failures) must route only to configured, approved channels.
+- [X] **TRD-FR-062:** Construct notification payloads with strict redaction. Operational notifications (including executions, incidents, and failures) must route only to configured, approved channels. *Evidence: app/services/trading/config/notifications.py line 17-91; tests/services/trading/config/test_config_controls.py line 199-229*
 
 #### 📄 File: `config/security_profile.py`
 
-- [ ] **TRD-FR-063:** Live route mutation requires a valid broker communication security profile verifying encrypted transport expectations, certificate validation rules where supported, logging restrictions, and adapter compliance.
+- [X] **TRD-FR-063:** Live route mutation requires a valid broker communication security profile verifying encrypted transport expectations, certificate validation rules where supported, logging restrictions, and adapter compliance. *Evidence: app/services/trading/config/security_profile.py line 11-59; tests/services/trading/config/test_config_controls.py line 231-248*
 
 ---
 

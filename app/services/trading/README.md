@@ -23,6 +23,8 @@ implementations must be injected from infrastructure layers outside
   `EncryptionProvider`.
 - `tool_registry.py`: pure registry construction for AI-facing trading action
   drafts. The registry exposes no broker mutation tool.
+- `config/`: immutable route, timeout, rate-limit, secret-reference,
+  notification, credential-rotation, and broker security profile contracts.
 - `__init__.py`: explicit public import gate with pure registry accessors.
 
 ## Inputs
@@ -48,6 +50,14 @@ Binance, or broker-specific mutation clients.
 Trading runtime code must use injected `Clock` and `RNG` ports for all time and
 nondeterministic behavior. Direct calls to wall-clock or random APIs are
 excluded from this package.
+
+## Configuration And Security
+
+Runtime configuration stores only secret references, never raw secret values.
+Live mutation is disabled by default and resolves to `packaged_only` behavior
+until policy enables mutation. Configuration reloads are validated through the
+loader, versioned with a redacted hash, and immutable live-session keys are
+blocked while a session is running.
 
 ## Pending Runtime Areas
 
