@@ -123,6 +123,16 @@ from app.services.trading.security import (
     map_exception_to_trading_error,
     redact_for_boundary,
 )
+from app.services.trading.promotion import (
+    PROMOTION_SEQUENCE,
+    ROUTE_CAPABILITY_MATRIX,
+    compute_canonical_promotion_hash,
+    evaluate_promotion_stage_gate,
+    validate_preactivation_conditions,
+    validate_promotion_transition,
+    validate_sim_metadata_lookup,
+    validate_route_stage_capability,
+)
 from app.services.trading.state import (
     RNG,
     AppendOnlyEventJournal,
@@ -1212,6 +1222,139 @@ def example_12_monitoring() -> None:
     print(f"Circuit breaker tripped? {status['circuit_breaker_tripped']}")
 
 
+def example_13_promotion() -> None:
+    """Demonstrate the Promotion Submodule validations and checks."""
+    print("\n" + "=" * 100)
+    print("--- 13. Promotion Submodule: Ladder & Preconditions ---")
+    print("=" * 100)
+
+    # 1. Compatibility Matrix Check
+    print("\n[Matrix compatibility checks]")
+    try:
+        validate_route_stage_capability(
+            TradingRoute.SIM, PromotionStage.OFFLINE_TEST, MutationCapability.READ_ONLY
+        )
+        print("OK: (sim, offline_test, read_only) compatibility validation passed.")
+    except Exception as e:
+        print(f"FAIL: Compatibility check failed: {e}")
+
+    try:
+        validate_route_stage_capability(
+            TradingRoute.LIVE, PromotionStage.MICRO_LIVE, MutationCapability.FULL_LIVE
+        )
+        print("OK: (live, micro_live, full_live) compatibility validation passed.")
+    except Exception as e:
+        print(f"Expected Failure: (live, micro_live, full_live) is invalid: {e}")
+
+    # 2. Gate 3 (evaluate_promotion_stage_gate)
+    print("\n[Gate 3: evaluate_promotion_stage_gate]")
+    valid_req = TradingRequestEnvelope(
+        route=TradingRoute.LIVE,
+        action=TradingAction.SUBMIT_ORDER,
+        promotion_stage=PromotionStage.MICRO_LIVE,
+        mutation_capability=MutationCapability.MICRO_LIVE,
+        request_id="req-promo-1",
+        correlation_id="corr-promo-1",
+        symbol="EURUSD",
+        quote_snapshot=QuoteSnapshot(
+            symbol="EURUSD",
+            bid=Decimal("1.1000"),
+            ask=Decimal("1.1002"),
+            spread=Decimal("0.0002"),
+            timestamp="2026-07-09T10:00:00Z",
+            source="test",
+            freshness_age_ms=10,
+        ),
+    )
+    result = evaluate_promotion_stage_gate(request=valid_req)
+    print(f"Valid request Gate 3 status: {result.status} (Reason: {result.reason_code})")
+
+    # 3. Transitions
+    print("\n[Promotion Transition checks]")
+    class SimpleClock:
+        def now_utc(self):
+            return datetime.now(UTC)
+    clock = SimpleClock()
+
+    # Generate Operator approval tokens
+    r_hash = compute_canonical_promotion_hash(
+        strategy_id="strat-promo-1",
+        current_stage=PromotionStage.OFFLINE_TEST,
+        target_stage=PromotionStage.SIMULATION,
+    )
+    app_token = OperatorApprovalToken(
+        approval_id="app-p-1",
+        operator_id="op-p-1",
+        governed_action_id="promote_to_simulation",
+        scope=ApprovalScope(strategy_id="strat-promo-1"),
+        canonical_request_hash=r_hash,
+        issued_at=datetime.now(UTC).isoformat(),
+        expires_at=(datetime.now(UTC) + timedelta(minutes=5)).isoformat(),
+    )
+
+    try:
+        # Promotion with proper approvals and healthy prerequisites
+        validate_promotion_transition(
+            strategy_id="strat-promo-1",
+            current_stage=PromotionStage.OFFLINE_TEST,
+            target_stage=PromotionStage.SIMULATION,
+            approvals=(app_token,),
+            clock=clock,
+            risk_policy_ok=True,
+            reconciliation_state_ok=True,
+            audit_sinks_ok=True,
+        )
+        print("OK: Strategy promotion transition (offline_test -> simulation) validated successfully.")
+    except Exception as e:
+        print(f"FAIL: Strategy promotion failed: {e}")
+
+    try:
+        # Self promotion
+        validate_promotion_transition(
+            strategy_id="strat-promo-1",
+            current_stage=PromotionStage.OFFLINE_TEST,
+            target_stage=PromotionStage.SIMULATION,
+            approvals=(),
+            clock=clock,
+            risk_policy_ok=True,
+            reconciliation_state_ok=True,
+            audit_sinks_ok=True,
+        )
+        print("FAIL: Self-promotion succeeded (Unexpected).")
+    except Exception as e:
+        print(f"OK: Self-promotion blocked (Expected): {e}")
+
+    # 4. Preactivation Conditions
+    print("\n[Preactivation checks]")
+    try:
+        # MicroLive promotion check with active kill switches
+        validate_preactivation_conditions(
+            route=TradingRoute.LIVE,
+            stage=PromotionStage.MICRO_LIVE,
+            active_kill_switches=True,
+            reconciliation_blocked=False,
+            context_is_stale=False,
+            security_profile_missing=False,
+        )
+        print("FAIL: Preactivation with kill switches passed (Unexpected).")
+    except Exception as e:
+        print(f"OK: Preactivation blocked by active kill switch (Expected): {e}")
+
+    # 5. Metadata Lookups
+    print("\n[Metadata lookup checks]")
+    try:
+        validate_sim_metadata_lookup(mode="historical_backtest", has_captured_snapshot=False)
+        print("FAIL: Historical backtest lookup without snapshot succeeded (Unexpected).")
+    except Exception as e:
+        print(f"OK: Historical backtest without snapshot blocked (Expected): {e}")
+
+    try:
+        validate_sim_metadata_lookup(mode="historical_backtest", has_captured_snapshot=True)
+        print("OK: Historical backtest with snapshot allowed successfully.")
+    except Exception as e:
+        print(f"FAIL: Historical backtest with snapshot failed: {e}")
+
+
 def get_client() -> Any:
     """Helper to fetch the underlying broker client."""
     broker = get_broker_module()
@@ -1789,6 +1932,7 @@ if __name__ == "__main__":
     example_10_execution_coordinator_and_reporting()
     example_11_reconciliation()
     example_12_monitoring()
+    example_13_promotion()
     example_01_connect()
     example_02_terminal()
     example_03_account()

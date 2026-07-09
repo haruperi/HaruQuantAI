@@ -667,14 +667,19 @@ stateDiagram-v2
 
 #### 📄 File: `promotion/ladder.py`
 
-- [ ] **TRD-FR-182:** Enforce the mandatory promotion ladder stages and map them to their corresponding routes and capabilities.
-- [ ] **TRD-FR-183:** Promotion transitions require explicit, documented operator approval evidence and cannot skip steps.
-- [ ] **TRD-FR-184:** Strategies cannot self-promote. Transition checks must verify that all prerequisites (risk policy, reconciliation state, audit sinks) are fully met.
+- [X] **TRD-FR-182:** Enforce the mandatory promotion ladder stages and map them to their corresponding routes and capabilities.
+  *Evidence: app/services/trading/promotion/ladder.py line 83-184*
+- [X] **TRD-FR-183:** Promotion transitions require explicit, documented operator approval evidence and cannot skip steps.
+  *Evidence: app/services/trading/promotion/ladder.py line 214-350*
+- [X] **TRD-FR-184:** Strategies cannot self-promote. Transition checks must verify that all prerequisites (risk policy, reconciliation state, audit sinks) are fully met.
+  *Evidence: app/services/trading/promotion/ladder.py line 281-304, 306-349*
 
 #### 📄 File: `promotion/preconditions.py`
 
-- [ ] **TRD-FR-185:** Validate pre-activation conditions. Production live mutation remains hard-blocked if active kill switches, unresolved reconciliation state, stale context, or missing security profiles exist.
-- [ ] **TRD-FR-186:** Enforce that the `sim` route may perform broker read-only metadata lookups only during configuration, calibration, or explicitly enabled live-metadata simulation mode. Deterministic historical backtests must use captured metadata snapshots to preserve reproducibility.
+- [X] **TRD-FR-185:** Validate pre-activation conditions. Production live mutation remains hard-blocked if active kill switches, unresolved reconciliation state, stale context, or missing security profiles exist.
+  *Evidence: app/services/trading/promotion/preconditions.py line 17-88*
+- [X] **TRD-FR-186:** Enforce that the `sim` route may perform broker read-only metadata lookups only during configuration, calibration, or explicitly enabled live-metadata simulation mode. Deterministic historical backtests must use captured metadata snapshots to preserve reproducibility.
+  *Evidence: app/services/trading/promotion/preconditions.py line 91-146*
 
 ---
 
@@ -706,7 +711,8 @@ stateDiagram-v2
 
 ## 4. Non-Functional Requirements (NFR)
 
-- [ ] **TRD-NFR-001 (Safe Promotion):** Transitioning between promotion ladder stages requires explicit, authenticated operator approval. Self-promotion via strategy code, UI client, or AI agent is strictly blocked.
+- [X] **TRD-NFR-001 (Safe Promotion):** Transitioning between promotion ladder stages requires explicit, authenticated operator approval. Self-promotion via strategy code, UI client, or AI agent is strictly blocked.
+  *Evidence: app/services/trading/promotion/ladder.py line 214-350*
 - [ ] **TRD-NFR-002 (Read-Only Mode Enforcement):** The `read_only_broker_connection` stage must permit read operations via the info wrappers but block all mutation actions inside `actions/orders.py` and `actions/positions.py` at the very first gate.
 - [ ] **TRD-NFR-003 (Fail-Closed Gate Pipeline):** If any pre-flight gate in `gates/pipeline.py` experiences an error, missing evidence, or latency timeout, it must evaluate to `BLOCKED`.
 - [ ] **TRD-NFR-004 (Graceful Session Shutdown):** On shutdown, the `session_manager` must atomically block new incoming trading candidates, verify that in-flight request counters reach zero, flush audit records, and run a final reconciliation snapshot.

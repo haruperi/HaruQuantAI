@@ -195,6 +195,9 @@ implementations must be injected from infrastructure layers outside
 - `security/`: public trading exception mapping, recursive redaction
   boundaries, and write-ahead dead-letter queue helpers for failed critical
   broker or audit events.
+- `reconciliation/`: state snapshot comparison, unknown-outcome authority guards, and startup sync coordination.
+- `monitoring/`: dynamic operational metrics, heartbeats, timeouts, circuit breakers, tool health, and incident taxonomy.
+- `promotion/`: mandatory linear promotion sequence/matrix checks, Gate 3 compatibility middleware, transition validations with operator approvals (single/dual operator), pre-activation conditions blocking, and simulation metadata lookup.
 - `__init__.py`: explicit public import gate with pure registry accessors.
 
 ## Inputs
@@ -251,23 +254,4 @@ signatures support tamper-evidence checks.
 
 ## Pending Runtime Areas
 
-Reconciliation, monitoring, run-session management, and promotion are
-intentionally pending and should be implemented in later dependency-safe
-units. `actions/` exposes documented injection seams (`gate_pipeline`,
-`idempotency_store`, `event_journal`, `trade_store`) for those future units
-to wire in without changing the action call signatures. `gates/pipeline.py`'s
-`evaluate_seam_gate` similarly fails closed for the route/promotion,
-session-status, concurrency-lease, and reconciliation-authority steps until
-their backing modules exist and inject a real evaluator — a route="live"
-request can never silently clear the full 16-step pipeline before every gate
-is genuinely implemented. `execution/coordinator.py`'s async dispatch,
-client-order-id propagation, allocation planning, two-step protection,
-residual handling, non-atomic modify safety, OCO/multi-leg watchdogs, cost
-capture, in-flight counting, and post-response finalization (TRD-FR-102
-through TRD-FR-114) are fully implemented as broker-independent primitives;
-wiring a real broker adapter, `runtime/coordination.py` concurrency leases,
-and `runtime/session_manager.py` heartbeat/session control remains future
-work. `execution/reporting.py` builds structured reports and
-execution-quality events (TRD-FR-132) from caller-supplied projections;
-sourcing those projections live from `TradeStore` at report-generation time
-is the future responsibility of `runtime/session_manager.py`.
+Run-session management is intentionally pending and should be implemented in later dependency-safe units. `actions/` exposes documented injection seams (`gate_pipeline`, `idempotency_store`, `event_journal`, `trade_store`) for those future units to wire in without changing the action call signatures. `gates/pipeline.py`'s `evaluate_seam_gate` similarly fails closed for the session-status and concurrency-lease steps until their backing modules exist and inject a real evaluator — a route="live" request can never silently clear the full 16-step pipeline before every gate is genuinely implemented. `execution/coordinator.py`'s async dispatch, client-order-id propagation, allocation planning, two-step protection, residual handling, non-atomic modify safety, OCO/multi-leg watchdogs, cost capture, in-flight counting, and post-response finalization (TRD-FR-102 through TRD-FR-114) are fully implemented as broker-independent primitives; wiring a real broker adapter, `runtime/coordination.py` concurrency leases, and `runtime/session_manager.py` heartbeat/session control remains future work. `execution/reporting.py` builds structured reports and execution-quality events (TRD-FR-132) from caller-supplied projections; sourcing those projections live from `TradeStore` at report-generation time is the future responsibility of `runtime/session_manager.py`.
