@@ -192,7 +192,8 @@ class ReconciliationSettings(TradingConfigModel):
         volume_drift_threshold: Absolute volume drift threshold.
         balance_drift_threshold: Absolute balance drift threshold.
         margin_drift_threshold: Absolute margin drift threshold.
-        orphan_deal_policy: Policy for orphan/external deals ("block" or "adopt-quarantine").
+        orphan_deal_policy: Policy for orphan/external deals
+            ("block" or "adopt-quarantine").
     """
 
     price_drift_threshold: Decimal = Field(default=Decimal("0.01"), ge=0)
@@ -219,6 +220,70 @@ class ReconciliationSettings(TradingConfigModel):
         return self
 
 
+class MonitoringSettings(TradingConfigModel):
+    """Configuration settings for trading monitoring and health check.
+
+    Attributes:
+        consecutive_rejects_limit: Max consecutive broker rejects
+            before circuit breaker.
+        unknown_outcomes_limit: Max unknown outcomes in window
+            before circuit breaker.
+        unknown_outcomes_window_seconds: Rolling window size for unknown outcomes.
+        latency_p95_limit_ms: Max allowed p95 latency in ms before downgrade.
+        latency_window_samples: Bounded sample count for latency calculation.
+        latency_downgrade_duration_seconds: Duration that latency must
+            exceed threshold before downgrade.
+        life_to_live_seconds: "Life-to-live" time window for pending orders.
+        heartbeat_interval_seconds: Periodic interval to emit liveness heartbeat.
+        heartbeat_watchdog_url: Watchdog node URL for dead man's switch.
+        tool_health_consecutive_failures_limit: Consecutive timeouts
+            before tool health degradation.
+        runbook_registry: Dictionary mapping incident class name to runbook ID.
+        escalation_chain: Escalation routing settings mapping severity
+            to chain of channels.
+    """
+
+    consecutive_rejects_limit: int = Field(default=5, ge=1)
+    unknown_outcomes_limit: int = Field(default=3, ge=1)
+    unknown_outcomes_window_seconds: int = Field(default=300, ge=10)
+    latency_p95_limit_ms: float = Field(default=500.0, ge=0.0)
+    latency_window_samples: int = Field(default=100, ge=10)
+    latency_downgrade_duration_seconds: int = Field(default=60, ge=1)
+    life_to_live_seconds: int = Field(default=120, ge=1)
+    heartbeat_interval_seconds: int = Field(default=30, ge=1)
+    heartbeat_watchdog_url: str = Field(default="http://localhost:8080/heartbeat")
+    tool_health_consecutive_failures_limit: int = Field(default=3, ge=1)
+    runbook_registry: dict[str, str] = Field(default_factory=dict)
+    escalation_chain: dict[str, list[str]] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_monitoring_settings(self) -> MonitoringSettings:
+        """Validate monitoring settings and incident taxonomy constraints.
+
+        Returns:
+            MonitoringSettings: Validated settings.
+
+        Raises:
+            ValueError: If invalid fields exist.
+        """
+        logger.info("Validating monitoring settings and incident taxonomy.")
+        # Ensure default runbooks exist for required incident classes
+        required_classes = {
+            "stale_order",
+            "circuit_breaker",
+            "reconciliation_mismatch",
+            "latency_downgrade",
+            "stream_gap",
+            "durability_failure",
+            "heartbeat_failure",
+        }
+        for cls in required_classes:
+            if cls not in self.runbook_registry:
+                # Add default placeholder runbook ID if missing
+                self.runbook_registry[cls] = f"RB-{cls.upper()}-001"
+        return self
+
+
 class TradingRuntimeConfig(TradingConfigModel):
     """Effective trading runtime configuration."""
 
@@ -232,6 +297,7 @@ class TradingRuntimeConfig(TradingConfigModel):
     reconciliation: ReconciliationSettings = Field(
         default_factory=ReconciliationSettings
     )
+    monitoring: MonitoringSettings = Field(default_factory=MonitoringSettings)
     store_targets: StoreConnectionTargets
     secret_references: dict[str, SecretReference] = Field(default_factory=dict)
     broker_capability_evidence: BrokerCapabilityEvidence | None = None

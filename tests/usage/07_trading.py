@@ -108,6 +108,11 @@ from app.services.trading.gates import (
     validate_operator_approval,
 )
 from app.services.trading.gates._common import GateName
+from app.services.trading.monitoring import (
+    HeartbeatEmitter,
+    MonitoringService,
+    OperationalSignalsManager,
+)
 from app.services.trading.reconciliation import (
     AuthorityAndRetryGuard,
     ReconciliationService,
@@ -1087,6 +1092,126 @@ def example_11_reconciliation() -> None:
     print(f"Gate status after clear:  {gate_passed_after.status.value}")
 
 
+def example_12_monitoring() -> None:
+    """Demonstrate Trading Runtime state monitoring and circuit breaker triggers."""
+    print("\n" + "=" * 100)
+    print("--- 12. State Monitoring & Health Controls ---")
+    print("=" * 100)
+
+    config = load_trading_config(
+        {
+            "config_version": "1.0.0",
+            "active_broker": "mt5",
+            "store_targets": {
+                "trade_store_ref": "store://trade",
+                "state_store_ref": "store://state",
+                "audit_sink_ref": "sink://audit",
+                "idempotency_store_ref": "store://idempotency",
+                "event_journal_ref": "journal://event",
+            },
+            "secret_references": {
+                "broker_credentials": {"reference": "vault://broker"},
+                "database_credentials": {"reference": "vault://db"},
+            },
+            "monitoring": {
+                "consecutive_rejects_limit": 5,
+                "unknown_outcomes_limit": 3,
+                "unknown_outcomes_window_seconds": 300,
+                "latency_p95_limit_ms": 500.0,
+                "latency_window_samples": 10,
+                "latency_downgrade_duration_seconds": 60,
+                "life_to_live_seconds": 120,
+                "heartbeat_interval_seconds": 30,
+                "runbook_registry": {
+                    "stale_order": "RB-STALE-ORDER-001",
+                    "circuit_breaker": "RB-CB-001",
+                },
+                "escalation_chain": {
+                    "high": ["pagerduty", "ops-channel"],
+                    "critical": ["pagerduty", "telephony", "slack-emergency"],
+                },
+            },
+        }
+    )
+
+    class DummyClock:
+        def __init__(self) -> None:
+            self._now = datetime(2026, 7, 9, 12, 0, tzinfo=UTC)
+            self._monotonic = 100.0
+
+        def now_utc(self) -> datetime:
+            return self._now
+
+        def now_ptp(self) -> datetime:
+            return self._now
+
+        def monotonic(self) -> float:
+            return self._monotonic
+
+        def advance(self, seconds: float) -> None:
+            self._now += timedelta(seconds=seconds)
+            self._monotonic += seconds
+
+    clock = DummyClock()
+
+    signals_manager = OperationalSignalsManager(
+        runbook_registry=config.monitoring.runbook_registry,
+        escalation_chain=config.monitoring.escalation_chain,
+        clock=clock,
+    )
+
+    # Heartbeat emitter
+    heartbeat_emitter = HeartbeatEmitter(
+        watchdog_url="http://localhost:8080/hb",
+        clock=clock,
+    )
+
+    # Initialize the orchestrator service
+    service = MonitoringService(
+        config=config,
+        clock=clock,
+        signals_manager=signals_manager,
+        heartbeat_emitter=heartbeat_emitter,
+    )
+
+    # Record some successful latencies
+    print("Recording execution latencies...")
+    for latency in [
+        120.0,
+        150.0,
+        110.0,
+        130.0,
+        140.0,
+        115.0,
+        125.0,
+        135.0,
+        105.0,
+        122.0,
+    ]:
+        service.record_broker_success(latency)
+
+    status = service.get_monitoring_status()
+    print(
+        f"Monitoring status: p95_latency_ms={status['metrics']['p95_latency_ms']}ms, capability={status['current_capability']}"
+    )
+
+    # Simulating consecutive rejects limit breach
+    print("\nSimulating consecutive rejects limit breach...")
+    for _ in range(5):
+        service.record_broker_reject()
+
+    status = service.get_monitoring_status()
+    print(
+        f"Circuit breaker tripped? {status['circuit_breaker_tripped']} (Reason: {status['circuit_breaker_reason']})"
+    )
+
+    # Reset breaker
+    print("Resetting circuit breaker...")
+    service.reset_circuit_breaker()
+    status = service.get_monitoring_status()
+    print(f"Circuit breaker tripped? {status['circuit_breaker_tripped']}")
+
+
 def get_client() -> Any:
     """Helper to fetch the underlying broker client."""
     broker = get_broker_module()
@@ -1663,6 +1788,7 @@ if __name__ == "__main__":
     example_09_gates_pipeline()
     example_10_execution_coordinator_and_reporting()
     example_11_reconciliation()
+    example_12_monitoring()
     example_01_connect()
     example_02_terminal()
     example_03_account()

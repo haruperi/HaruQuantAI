@@ -610,33 +610,34 @@ stateDiagram-v2
 
 #### 📄 File: `monitoring/service.py`
 
-- [ ] **TRD-FR-167:** Aggregate status metrics including tool health, timeouts, stale states, cost budgets, and reconciliation discrepancies into structured status events.
-- [ ] **TRD-FR-168:** Implement automatic operational circuit breakers that pause live mutations after:
+- [X] **TRD-FR-167:** Aggregate status metrics including tool health, timeouts, stale states, cost budgets, and reconciliation discrepancies into structured status events. *Evidence: app/services/trading/monitoring/service.py line 219-244*
+- [X] **TRD-FR-168:** Implement automatic operational circuit breakers that pause live mutations after:
   * N consecutive broker rejects.
   * N unknown outcomes in a rolling window.
   * Reconciliation drift exceeds thresholds.
   * Broker latency exceeds the p95 threshold for configured durations.
   * Event stream gaps or sequence gaps are detected.
   * Audit sink or trade store durability failures.
-- [ ] **TRD-FR-169 (Dynamic Latency Route Downgrade):** The monitoring service must evaluate the broker adapter's p95 execution latency. If the p95 latency exceeds a configured high-latency threshold, the service must automatically downgrade the session mutation capability from `full_live` to `micro_live` (with reduced size caps) or `read_only`, upgrading it back to full capability only when the latency stabilizes.
+  *Evidence: app/services/trading/monitoring/service.py line 255-272*
+- [X] **TRD-FR-169 (Dynamic Latency Route Downgrade):** The monitoring service must evaluate the broker adapter's p95 execution latency. If the p95 latency exceeds a configured high-latency threshold, the service must automatically downgrade the session mutation capability from `full_live` to `micro_live` (with reduced size caps) or `read_only`, upgrading it back to full capability only when the latency stabilizes. *Evidence: app/services/trading/monitoring/service.py line 274-325*
 
 #### 📄 File: `monitoring/tool_health.py`
 
-- [ ] **TRD-FR-170:** Degrade tool health status dynamically after a configured number of consecutive timeouts or adapter failures.
+- [X] **TRD-FR-170:** Degrade tool health status dynamically after a configured number of consecutive timeouts or adapter failures. *Evidence: app/services/trading/monitoring/tool_health.py line 34-73*
 
 #### 📄 File: `monitoring/timeouts_and_staleness.py`
 
-- [ ] **TRD-FR-171:** Track execution latency and staleness metrics. Latency summaries must be calculated using bounded samples (e.g., rolling window) to prevent unbounded in-memory history retention.
-- [ ] **TRD-FR-172 (Lost-Order Recovery Protocol):** Maintain a global, configurable "life-to-live" time-window for all pending/working orders. If an order remains in an unconfirmed or non-terminal state for longer than the life-to-live threshold without receiving a broker execution report, the monitoring service SHALL raise a stale-order alert, transition the order status to `stale`, and force reconciliation for the affected instrument scope with a special `STALE_ORDER` incident classification.
+- [X] **TRD-FR-171:** Track execution latency and staleness metrics. Latency summaries must be calculated using bounded samples (e.g., rolling window) to prevent unbounded in-memory history retention. *Evidence: app/services/trading/monitoring/timeouts_and_staleness.py line 32-84*
+- [X] **TRD-FR-172 (Lost-Order Recovery Protocol):** Maintain a global, configurable "life-to-live" time-window for all pending/working orders. If an order remains in an unconfirmed or non-terminal state for longer than the life-to-live threshold without receiving a broker execution report, the monitoring service SHALL raise a stale-order alert, transition the order status to `stale`, and force reconciliation for the affected instrument scope with a special `STALE_ORDER` incident classification. *Evidence: app/services/trading/monitoring/timeouts_and_staleness.py line 87-157*
 
 #### 📄 File: `monitoring/operational_signals.py`
 
-- [ ] **TRD-FR-173 (Escalation Policy):** Operational signals SHALL carry severity tiers (`info`, `warning`, `high`, `critical`). Notification dispatch MUST apply per-incident-class deduplication and rate limiting so an incident storm cannot flood channels into uselessness, and MUST implement a configured escalation chain (e.g., channel → repeat → secondary channel) for `high`/`critical` signals not acknowledged within a configured window.
-- [ ] **TRD-FR-174:** Every incident class emitted by the monitoring service SHALL reference a documented operator runbook ID; emitting an incident class with no registered runbook reference is itself a `warning` signal. The incident taxonomy (class → severity → runbook → escalation chain) is a required configuration artifact validated at startup by the config loader.
+- [X] **TRD-FR-173 (Escalation Policy):** Operational signals SHALL carry severity tiers (`info`, `warning`, `high`, `critical`). Notification dispatch MUST apply per-incident-class deduplication and rate limiting so an incident storm cannot flood channels into uselessness, and MUST implement a configured escalation chain (e.g., channel → repeat → secondary channel) for `high`/`critical` signals not acknowledged within a configured window. *Evidence: app/services/trading/monitoring/operational_signals.py line 125-189*
+- [X] **TRD-FR-174:** Every incident class emitted by the monitoring service SHALL reference a documented operator runbook ID; emitting an incident class with no registered runbook reference is itself a `warning` signal. The incident taxonomy (class → severity → runbook → escalation chain) is a required configuration artifact validated at startup by the config loader. *Evidence: app/services/trading/monitoring/operational_signals.py line 90-123*
 
 #### 📄 File: `monitoring/heartbeat_watchdog.py`
 
-- [ ] **TRD-FR-175 (Dead Man's Switch):** The monitoring service SHALL emit a periodic liveness heartbeat to an **external** watchdog endpoint/channel (outside the trading process). The external side alerts on heartbeat silence beyond a threshold. The trading-side requirement is limited to emitting the heartbeat and exposing its configuration; the watchdog implementation is external infrastructure.
+- [X] **TRD-FR-175 (Dead Man's Switch):** The monitoring service SHALL emit a periodic liveness heartbeat to an **external** watchdog endpoint/channel (outside the trading process). The external side alerts on heartbeat silence beyond a threshold. The trading-side requirement is limited to emitting the heartbeat and exposing its configuration; the watchdog implementation is external infrastructure. *Evidence: app/services/trading/monitoring/heartbeat_watchdog.py line 38-106*
 
 ---
 
