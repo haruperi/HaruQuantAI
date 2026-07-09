@@ -184,6 +184,41 @@ class BrokerCapabilityEvidence(TradingConfigModel):
             raise ValueError("broker capability evidence is stale.")
 
 
+class ReconciliationSettings(TradingConfigModel):
+    """Reconciliation drift thresholds and policy settings.
+
+    Attributes:
+        price_drift_threshold: Absolute price drift threshold.
+        volume_drift_threshold: Absolute volume drift threshold.
+        balance_drift_threshold: Absolute balance drift threshold.
+        margin_drift_threshold: Absolute margin drift threshold.
+        orphan_deal_policy: Policy for orphan/external deals ("block" or "adopt-quarantine").
+    """
+
+    price_drift_threshold: Decimal = Field(default=Decimal("0.01"), ge=0)
+    volume_drift_threshold: Decimal = Field(default=Decimal("0.001"), ge=0)
+    balance_drift_threshold: Decimal = Field(default=Decimal("0.10"), ge=0)
+    margin_drift_threshold: Decimal = Field(default=Decimal("0.10"), ge=0)
+    orphan_deal_policy: str = Field(default="block")
+
+    @model_validator(mode="after")
+    def validate_reconciliation_settings(self) -> ReconciliationSettings:
+        """Validate settings.
+
+        Returns:
+            ReconciliationSettings: Validated settings.
+
+        Raises:
+            ValueError: If orphan_deal_policy is invalid.
+        """
+        logger.info("Validating reconciliation settings.")
+        if self.orphan_deal_policy not in ("block", "adopt-quarantine"):
+            raise ValueError(
+                "orphan_deal_policy must be either 'block' or 'adopt-quarantine'."
+            )
+        return self
+
+
 class TradingRuntimeConfig(TradingConfigModel):
     """Effective trading runtime configuration."""
 
@@ -194,6 +229,9 @@ class TradingRuntimeConfig(TradingConfigModel):
     timeouts: TimeoutSettings = Field(default_factory=TimeoutSettings)
     cost_budgets: CostBudgetSettings = Field(default_factory=CostBudgetSettings)
     staleness: StalenessSettings = Field(default_factory=StalenessSettings)
+    reconciliation: ReconciliationSettings = Field(
+        default_factory=ReconciliationSettings
+    )
     store_targets: StoreConnectionTargets
     secret_references: dict[str, SecretReference] = Field(default_factory=dict)
     broker_capability_evidence: BrokerCapabilityEvidence | None = None

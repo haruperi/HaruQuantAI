@@ -223,6 +223,82 @@ class TradeStore(Protocol):
         logger.debug("TradeStore.apply_corporate_action protocol placeholder invoked.")
         raise NotImplementedError
 
+    def get_order_state(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+        order_id: str,
+    ) -> JsonObject | None:
+        """Retrieve an order state projection by ID.
+
+        Args:
+            route: Runtime route.
+            tenant_id: Tenant or session namespace.
+            order_id: Local order identifier.
+
+        Returns:
+            JsonObject | None: The order state projection or None if not found.
+        """
+        logger.debug("TradeStore.get_order_state protocol placeholder invoked.")
+        raise NotImplementedError
+
+    def get_position_state(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+        position_id: str,
+    ) -> JsonObject | None:
+        """Retrieve a position state projection by ID.
+
+        Args:
+            route: Runtime route.
+            tenant_id: Tenant or session namespace.
+            position_id: Local position identifier.
+
+        Returns:
+            JsonObject | None: The position state projection or None if not found.
+        """
+        logger.debug("TradeStore.get_position_state protocol placeholder invoked.")
+        raise NotImplementedError
+
+    def list_order_states(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+    ) -> list[JsonObject]:
+        """List all active or historical order states for the tenant.
+
+        Args:
+            route: Runtime route.
+            tenant_id: Tenant or session namespace.
+
+        Returns:
+            list[JsonObject]: List of order states.
+        """
+        logger.debug("TradeStore.list_order_states protocol placeholder invoked.")
+        raise NotImplementedError
+
+    def list_position_states(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+    ) -> list[JsonObject]:
+        """List all active or historical position states for the tenant.
+
+        Args:
+            route: Runtime route.
+            tenant_id: Tenant or session namespace.
+
+        Returns:
+            list[JsonObject]: List of position states.
+        """
+        logger.debug("TradeStore.list_position_states protocol placeholder invoked.")
+        raise NotImplementedError
+
 
 @runtime_checkable
 class TradingStateStore(Protocol):

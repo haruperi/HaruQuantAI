@@ -108,6 +108,11 @@ from app.services.trading.gates import (
     validate_operator_approval,
 )
 from app.services.trading.gates._common import GateName
+from app.services.trading.reconciliation import (
+    AuthorityAndRetryGuard,
+    ReconciliationService,
+    evaluate_reconciliation_authority_gate,
+)
 from app.services.trading.security import (
     WriteAheadDeadLetterQueue,
     map_exception_to_trading_error,
@@ -941,6 +946,147 @@ def example_10_execution_coordinator_and_reporting() -> None:
     print(f"Report cost entries:  {len(report.cost_entries)}")
 
 
+def example_11_reconciliation() -> None:
+    """Demonstrate state reconciliation sync coordination, snapshots comparison,
+    and unknown outcome authority lockout guards.
+    """
+    print("\n" + "=" * 100)
+    print("--- 10. State Reconciliation & Authority Guard ---")
+    print("=" * 100)
+
+    config = load_trading_config(
+        {
+            "config_version": "1.0.0",
+            "active_broker": "mt5",
+            "store_targets": {
+                "trade_store_ref": "store://trade",
+                "state_store_ref": "store://state",
+                "audit_sink_ref": "sink://audit",
+                "idempotency_store_ref": "store://idempotency",
+                "event_journal_ref": "journal://event",
+            },
+            "secret_references": {
+                "broker_credentials": {"reference": "vault://broker"},
+                "database_credentials": {"reference": "vault://db"},
+            },
+            "reconciliation": {
+                "price_drift_threshold": "0.01",
+                "volume_drift_threshold": "0.001",
+                "balance_drift_threshold": "0.10",
+                "margin_drift_threshold": "0.10",
+                "orphan_deal_policy": "block",
+            },
+        }
+    )
+
+    class DummyClock:
+        def now_utc(self) -> datetime:
+            return datetime(2026, 7, 9, 12, 0, tzinfo=UTC)
+
+        def monotonic(self) -> float:
+            return 123.45
+
+    class DummyTradeStore:
+        def list_order_states(
+            self, *, route: TradingRoute, tenant_id: str
+        ) -> list[JsonObject]:
+            return [
+                {
+                    "order_id": "ord-1",
+                    "symbol": "EURUSD",
+                    "state": "NEW",
+                    "remaining_volume": "1.0",
+                    "vwap": "1.10",
+                }
+            ]
+
+        def list_position_states(
+            self, *, route: TradingRoute, tenant_id: str
+        ) -> list[JsonObject]:
+            return [
+                {
+                    "position_id": "pos-1",
+                    "symbol": "EURUSD",
+                    "volume": "1.5",
+                    "vwap": "1.10",
+                }
+            ]
+
+        def save_position_state(
+            self,
+            *,
+            route: TradingRoute,
+            tenant_id: str,
+            position_state: JsonObject,
+            expected_version: int | None,
+        ) -> str:
+            return "pos-ref"
+
+    class DummyStateStore:
+        def load_state(
+            self, *, route: TradingRoute, tenant_id: str, snapshot_id: str
+        ) -> JsonObject | None:
+            return {"balance": "1000.00", "margin": "200.00"}
+
+    guard = AuthorityAndRetryGuard()
+    clock = ExampleClock()
+    encryption = ExampleEncryptionProvider()
+
+    journal = AppendOnlyEventJournal(
+        path=Path("build/trading_reconciliation_journal.jsonl"),
+        snapshot_path=Path("build/trading_reconciliation_snapshots.jsonl"),
+        signature_path=Path("build/trading_reconciliation_signatures.jsonl"),
+        clock=clock,
+        encryption_provider=encryption,
+        build_metadata=JournalBuildMetadata(
+            software_version="usage-1.0.0",
+            vcs_commit_hash="usage-commit",
+            dirty_tree=False,
+            active_config_hash="usage-config-hash",
+        ),
+    )
+
+    service = ReconciliationService(
+        trade_store=DummyTradeStore(),
+        state_store=DummyStateStore(),
+        journal=journal,
+        authority_guard=guard,
+        clock=DummyClock(),
+        config=config,
+    )
+
+    try:
+        report = service.run_reconciliation(
+            route=TradingRoute.LIVE,
+            tenant_id="tenant-1",
+            account_id="acct-1",
+            run_type="periodic",
+        )
+        print(f"Reconciliation run:   status={report.status}")
+    except Exception as e:
+        print(f"Reconciliation run:   failed ({e})")
+
+    gate_passed_before = evaluate_reconciliation_authority_gate(
+        guard=guard, account_id="acct-1", symbol="EURUSD"
+    )
+
+    guard.report_stream_gap("acct-1", "EURUSD")
+    gate_blocked_after = evaluate_reconciliation_authority_gate(
+        guard=guard, account_id="acct-1", symbol="EURUSD"
+    )
+
+    guard.resolve_scope("acct-1", "EURUSD")
+    gate_passed_after = evaluate_reconciliation_authority_gate(
+        guard=guard, account_id="acct-1", symbol="EURUSD"
+    )
+
+    print(f"Gate status before gap:  {gate_passed_before.status.value}")
+    print(
+        f"Gate status after gap:   {gate_blocked_after.status.value} (Reason: {gate_blocked_after.reason_code})"
+    )
+    print(f"Gate status after clear:  {gate_passed_after.status.value}")
+
+
 def get_client() -> Any:
     """Helper to fetch the underlying broker client."""
     broker = get_broker_module()
@@ -1516,6 +1662,7 @@ if __name__ == "__main__":
     example_08_execution_primitives()
     example_09_gates_pipeline()
     example_10_execution_coordinator_and_reporting()
+    example_11_reconciliation()
     example_01_connect()
     example_02_terminal()
     example_03_account()

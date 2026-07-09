@@ -106,6 +106,40 @@ class DummyTradeStore:
             "audit_ref": audit_ref,
         }
 
+    def get_order_state(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+        order_id: str,
+    ) -> dict[str, object] | None:
+        return {"id": order_id, "route": route, "tenant_id": tenant_id}
+
+    def get_position_state(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+        position_id: str,
+    ) -> dict[str, object] | None:
+        return {"id": position_id, "route": route, "tenant_id": tenant_id}
+
+    def list_order_states(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+    ) -> list[dict[str, object]]:
+        return []
+
+    def list_position_states(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+    ) -> list[dict[str, object]]:
+        return []
+
 
 class DummyTradingStateStore:
     def save_state(

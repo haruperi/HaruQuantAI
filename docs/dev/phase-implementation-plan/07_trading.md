@@ -587,22 +587,22 @@ stateDiagram-v2
 
 #### 📄 File: `reconciliation/service.py`
 
-- [ ] **TRD-FR-157:** Support startup, pre-trade, periodic, post-unknown outcome, and shutdown reconciliation runs.
-- [ ] **TRD-FR-158:** Reconciliation must compare local state against broker snapshots for open positions, pending orders, balance, and margin. Broker truth is the absolute authority.
-- [ ] **TRD-FR-159:** If startup reconciliation detects a mismatch, block live mutation until state is synchronized or operator clearance is provided.
-- [ ] **TRD-FR-160:** Mismatches (missing local, extra local, field discrepancies, stale states) must trigger high-severity alerts on configured drift threshold breaches.
-- [ ] **TRD-FR-161 (Orphan/External Deal Policy):** Deals or positions discovered at the broker with no matching `client_order_id`, magic number, or `owner_strategy_id` (e.g., manual trades placed directly in the broker terminal) SHALL be handled by an explicit policy-matrix rule with exactly two permitted behaviors: (a) **adopt-quarantine** — assign `owner=external`, exclude from all strategy logic and strategy-scoped actions, and surface prominently in reconciliation reports; or (b) **block** — hold live mutation for the affected scope until an operator classifies the position. Absence of a configured policy fails closed to (b).
-- [ ] **TRD-FR-162:** External/broker-initiated events MUST be included in reconciliation drift accounting but MUST NOT be auto-attributed to any strategy's performance records.
+- [X] **TRD-FR-157:** Support startup, pre-trade, periodic, post-unknown outcome, and shutdown reconciliation runs. *Evidence: app/services/trading/reconciliation/service.py line 117-174*
+- [X] **TRD-FR-158:** Reconciliation must compare local state against broker snapshots for open positions, pending orders, balance, and margin. Broker truth is the absolute authority. *Evidence: app/services/trading/reconciliation/service.py line 126-174*
+- [X] **TRD-FR-159:** If startup reconciliation detects a mismatch, block live mutation until state is synchronized or operator clearance is provided. *Evidence: app/services/trading/reconciliation/service.py line 226-230*
+- [X] **TRD-FR-160:** Mismatches (missing local, extra local, field discrepancies, stale states) must trigger high-severity alerts on configured drift threshold breaches. *Evidence: app/services/trading/reconciliation/snapshots_and_compare.py line 490-535*
+- [X] **TRD-FR-161 (Orphan/External Deal Policy):** Deals or positions discovered at the broker with no matching `client_order_id`, magic number, or `owner_strategy_id` (e.g., manual trades placed directly in the broker terminal) SHALL be handled by an explicit policy-matrix rule with exactly two permitted behaviors: (a) **adopt-quarantine** — assign `owner=external`, exclude from all strategy logic and strategy-scoped actions, and surface prominently in reconciliation reports; or (b) **block** — hold live mutation for the affected scope until an operator classifies the position. Absence of a configured policy fails closed to (b). *Evidence: app/services/trading/reconciliation/service.py line 245-320*
+- [X] **TRD-FR-162:** External/broker-initiated events MUST be included in reconciliation drift accounting but MUST NOT be auto-attributed to any strategy's performance records. *Evidence: app/services/trading/reconciliation/service.py line 286-320*
 
 #### 📄 File: `reconciliation/snapshots_and_compare.py`
 
-- [ ] **TRD-FR-163:** Mismatch severity: Mismatches must be computed dynamically using absolute price and volume drift thresholds. The reconciliation module must consume thresholds from configuration and must not invent them.
+- [X] **TRD-FR-163:** Mismatch severity: Mismatches must be computed dynamically using absolute price and volume drift thresholds. The reconciliation module must consume thresholds from configuration and must not invent them. *Evidence: app/services/trading/reconciliation/snapshots_and_compare.py line 186-218, 360-388*
 
 #### 📄 File: `reconciliation/authority_and_retry_guard.py`
 
-- [ ] **TRD-FR-164:** If a broker transaction yields an unknown outcome (such as a socket timeout), the reconciliation authority state must transition to `UNRESOLVED`.
-- [ ] **TRD-FR-165:** While in `UNRESOLVED` authority status, all further mutation attempts for the affected account and instrument scope are blocked. The block remains in place until reconciliation service verifies the execution status of the timed-out request.
-- [ ] **TRD-FR-166:** Stream Gap Gating: Missing or out-of-order execution events must trigger a stream-gap incident, immediately halting live mutations and forcing a snapshot reconciliation before resumption. Duplicate execution events (identical `broker_event_id`) SHALL be idempotently dropped and counted in operational metrics; they are **not** stream-gap incidents.
+- [X] **TRD-FR-164:** If a broker transaction yields an unknown outcome (such as a socket timeout), the reconciliation authority state must transition to `UNRESOLVED`. *Evidence: app/services/trading/reconciliation/authority_and_retry_guard.py line 32-45*
+- [X] **TRD-FR-165:** While in `UNRESOLVED` authority status, all further mutation attempts for the affected account and instrument scope are blocked. The block remains in place until reconciliation service verifies the execution status of the timed-out request. *Evidence: app/services/trading/reconciliation/authority_and_retry_guard.py line 80-108*
+- [X] **TRD-FR-166:** Stream Gap Gating: Missing or out-of-order execution events must trigger a stream-gap incident, immediately halting live mutations and forcing a snapshot reconciliation before resumption. Duplicate execution events (identical `broker_event_id`) SHALL be idempotently dropped and counted in operational metrics; they are **not** stream-gap incidents. *Evidence: app/services/trading/reconciliation/authority_and_retry_guard.py line 47-53, 70-78*
 
 ---
 
