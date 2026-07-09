@@ -339,10 +339,10 @@ stateDiagram-v2
 
 ### 3.3 Info Facades (`trading/info/`)
 
-- [ ] **TRD-FR-050:** Expose MQL5-compatible read-only wrappers for `AccountInfo`, `SymbolInfo`, `PositionInfo`, `OrderInfo`, `DealInfo`, `HistoryOrderInfo`, and `TerminalInfo`.
-- [ ] **TRD-FR-051:** Wrappers shall resolve the active broker only via `get_broker_module()` and perform no mutations, orders, or state modifications.
-- [ ] **TRD-FR-052:** Info wrappers shall return safe defaults, neutral values, or structured absence errors when broker terminals are disconnected or data is unavailable.
-- [ ] **TRD-FR-053:** Exclude raw broker SDK credentials, tokens, or private structures from wrapper payloads; all returned metadata must be filtered by the redaction boundary.
+- [X] **TRD-FR-050:** Expose MQL5-compatible read-only wrappers for `AccountInfo`, `SymbolInfo`, `PositionInfo`, `OrderInfo`, `DealInfo`, `HistoryOrderInfo`, and `TerminalInfo`. *Evidence: app/services/trading/info/__init__.py line 5-24*
+- [X] **TRD-FR-051:** Wrappers shall resolve the active broker only via `get_broker_module()` and perform no mutations, orders, or state modifications. *Evidence: app/services/trading/info/_common.py line 17-38*
+- [X] **TRD-FR-052:** Info wrappers shall return safe defaults, neutral values, or structured absence errors when broker terminals are disconnected or data is unavailable. *Evidence: app/services/trading/info/_common.py line 56-80*
+- [X] **TRD-FR-053:** Exclude raw broker SDK credentials, tokens, or private structures from wrapper payloads; all returned metadata must be filtered by the redaction boundary. *Evidence: app/services/trading/info/_common.py line 83-93*
 
 ---
 

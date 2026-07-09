@@ -51,6 +51,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-036 | Trading Runtime Configuration & Security Controls | Added trading runtime configuration and security controls, including immutable config models, reload policy enforcement, secret-reference resolution, credential-rotation handling, notification routing, and broker security profile validation. |
 | ADD-037 | Trading Runtime Security Boundaries | Added trading runtime security boundaries for standard public error mapping, recursive redaction, write-ahead dead-letter logging, exactly-once dead-letter recovery, and poison-pill manual review isolation. |
 | ADD-038 | Trading Runtime Persistence | Added trading runtime idempotency leases, canonical duplicate detection, append-only encrypted event journals, logical sequence ordering, snapshots, replay reconstruction, retention seals, and detached signature validation support. |
+| ADD-039 | Trading Runtime Read-Only Info Facades | Added MQL5-compatible read-only trading info facades for account, symbol, position, order, deal, historical order, and terminal metadata with broker-resolver access, neutral offline defaults, and redacted payload exports. |
 
 
 

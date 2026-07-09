@@ -33,6 +33,10 @@ implementations must be injected from infrastructure layers outside
   drafts. The registry exposes no broker mutation tool.
 - `config/`: immutable route, timeout, rate-limit, secret-reference,
   notification, credential-rotation, and broker security profile contracts.
+- `info/`: MQL5-compatible read-only facades for account, symbol, position,
+  order, deal, historical order, and terminal metadata. Facades resolve the
+  active broker through `get_broker_module()`, avoid broker mutation calls,
+  return neutral values when data is unavailable, and redact exported payloads.
 - `security/`: public trading exception mapping, recursive redaction
   boundaries, and write-ahead dead-letter queue helpers for failed critical
   broker or audit events.
@@ -54,7 +58,8 @@ The package depends on:
 - `app.utils.logger.logger` for operational logging.
 
 The package must not import provider SDKs such as `MetaTrader5`, cTrader,
-Binance, or broker-specific mutation clients.
+Binance, or broker-specific mutation clients. Read-only broker metadata access
+is isolated to `info/` and must pass through the active broker resolver.
 
 ## Determinism
 
@@ -91,7 +96,6 @@ signatures support tamper-evidence checks.
 
 ## Pending Runtime Areas
 
-Actions, validations, execution coordination, gates, idempotency primitives,
-reconciliation, monitoring, promotion, and MQL5-compatible read-only info
-facades are intentionally pending and should be implemented in later
-dependency-safe units.
+Actions, validations, execution coordination, gates, reconciliation,
+monitoring, and promotion are intentionally pending and should be implemented
+in later dependency-safe units.

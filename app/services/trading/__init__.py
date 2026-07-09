@@ -39,6 +39,15 @@ from app.services.trading.contracts import (
     TradingToolRegistry,
 )
 from app.services.trading.execution import ExecutionCoordinator
+from app.services.trading.info import (
+    AccountInfo,
+    DealInfo,
+    HistoryOrderInfo,
+    OrderInfo,
+    PositionInfo,
+    SymbolInfo,
+    TerminalInfo,
+)
 from app.services.trading.tool_registry import (
     build_trading_tool_registry,
     list_trading_tools,
@@ -68,17 +77,22 @@ def get_trading_public_catalog() -> tuple[TradingToolDefinition, ...]:
 
 
 __all__ = [
+    "AccountInfo",
     "AllocationVector",
     "BrokerAcknowledgementEvent",
     "BrokerDispatchEvent",
+    "DealInfo",
     "ExecutionCoordinator",
     "ExecutionReportEvent",
     "FixExecutionState",
+    "HistoryOrderInfo",
     "JsonObject",
     "JsonValue",
     "MutationCapability",
     "NormalizedTradeResult",
+    "OrderInfo",
     "OrderState",
+    "PositionInfo",
     "PositionState",
     "PromotionStage",
     "QuoteSnapshot",
@@ -86,6 +100,8 @@ __all__ = [
     "RegulatoryTags",
     "RetrySafety",
     "SideEffectMode",
+    "SymbolInfo",
+    "TerminalInfo",
     "TimeInForce",
     "TradingAction",
     "TradingCommandAccepted",

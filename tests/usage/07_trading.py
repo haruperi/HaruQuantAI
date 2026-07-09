@@ -14,21 +14,19 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from app.services.brokers import get_broker_module
-from app.services.trader import (
+from app.services.trader import Trade
+from app.services.trading import (
     AccountInfo,
+    AllocationVector,
     DealInfo,
     HistoryOrderInfo,
+    MutationCapability,
     OrderInfo,
     PositionInfo,
-    SymbolInfo,
-    TerminalInfo,
-    Trade,
-)
-from app.services.trading import (
-    AllocationVector,
-    MutationCapability,
     PromotionStage,
     QuoteSnapshot,
+    SymbolInfo,
+    TerminalInfo,
     TradingAction,
     TradingRequestEnvelope,
     TradingRoute,
@@ -320,6 +318,33 @@ def example_05_persistence_implementations() -> None:
     print(f"Journal sequence:   {event.sequence_id}")
     print(f"Snapshot sequence:  {snapshot.sequence_id}")
     print(f"Segment signature:  {seal.signature[:24]}...")
+
+
+def example_06_read_only_info_facades() -> None:
+    """Demonstrate read-only MQL5-compatible information facades."""
+    print("\n" + "=" * 100)
+    print("--- 5. Trading Read-Only Info Facades ---")
+    print("=" * 100)
+
+    terminal = TerminalInfo()
+    account = AccountInfo()
+    symbol = SymbolInfo("EURUSD")
+    order = OrderInfo()
+    position = PositionInfo()
+    deal = DealInfo()
+    history = HistoryOrderInfo()
+
+    print(f"Terminal connected: {terminal.connected()}")
+    print(f"Account balance:    {account.balance():.2f}")
+    print(f"Account leverage:   {account.leverage()}")
+    print(f"Symbol refreshed:   {symbol.refresh()}")
+    print(f"Symbol tick size:   {symbol.tick_size()}")
+    print(f"Symbol min/max vol: {symbol.volume_min()} / {symbol.volume_max()}")
+    print(f"Order ticket:       {order.ticket()}")
+    print(f"Position ticket:    {position.ticket()}")
+    print(f"Deal ticket:        {deal.ticket()}")
+    print(f"History ticket:     {history.ticket()}")
+    print(f"Redacted account:   {account.payload()}")
 
 
 def get_client() -> Any:
@@ -892,6 +917,7 @@ if __name__ == "__main__":
     example_03_configurations_security_controls()
     example_04_security_boundaries_error_redaction()
     example_05_persistence_implementations()
+    example_06_read_only_info_facades()
     example_01_connect()
     example_02_terminal()
     example_03_account()
