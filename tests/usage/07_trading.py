@@ -19,9 +19,11 @@ from app.services.trading import (
     AccountInfo,
     AllocationVector,
     DealInfo,
+    FixExecutionState,
     HistoryOrderInfo,
     JsonObject,
     MutationCapability,
+    NormalizedTradeResult,
     OrderInfo,
     PositionInfo,
     PromotionStage,
@@ -52,6 +54,60 @@ from app.services.trading.config import (
     build_notification_payload,
     load_trading_config,
 )
+from app.services.trading.config.models import RateLimitSettings
+from app.services.trading.execution import (
+    AmendmentKind,
+    BrokerCapabilityProfile,
+    ExecutionCoordinator,
+    LifecycleKind,
+    MultiLegExecutionCoordinator,
+    OcoWatchdog,
+    ProviderRateLimiterRegistry,
+    TransactionCostFacts,
+    apply_execution_report,
+    begin_non_atomic_modify,
+    build_client_order_id_mapping,
+    build_execution_quality_event,
+    build_trading_report,
+    capture_transaction_cost,
+    classify_broker_initiated_event,
+    classify_broker_outcome,
+    classify_corporate_action,
+    compare_shadow_fill,
+    evaluate_amendment,
+    generate_client_order_id,
+    initialize_transition_record,
+    normalize_broker_response,
+    record_cancel_confirmed,
+    record_cancel_dispatched,
+    record_replace_dispatched,
+    record_shadow_intent,
+    requires_cancel_on_disconnect_failsafe,
+    resolve_replace_outcome,
+    validate_broker_capabilities,
+)
+from app.services.trading.gates import (
+    ApprovalScope,
+    BrokerReadinessEvidence,
+    ClockDriftEvidence,
+    ComplianceEvidence,
+    KillSwitchScope,
+    KillSwitchState,
+    MarketTurbulenceMonitor,
+    OperatorApprovalToken,
+    PolicyMatrix,
+    PolicyMatrixEntry,
+    compute_canonical_request_hash,
+    evaluate_adapter_permission_gate,
+    evaluate_compliance_gate,
+    evaluate_kill_switches,
+    record_pre_mutation_audit,
+    resolve_policy,
+    run_gate_pipeline,
+    run_live_readiness_dry_run,
+    validate_operator_approval,
+)
+from app.services.trading.gates._common import GateName
 from app.services.trading.security import (
     WriteAheadDeadLetterQueue,
     map_exception_to_trading_error,
@@ -508,6 +564,381 @@ def example_07_actions_and_validation() -> None:
     print(f"Kill switch status:  {kill_switch_response.status.value}")
     print(f"Kill switch journal: {kill_switch_response.audit_ref}")
     print(f"Flatten status:      {flatten_response.status.value}")
+
+
+def example_08_execution_primitives() -> None:
+    """Demonstrate state machine, response classification, rate limiting,
+    capability validation, and shadow comparison execution primitives.
+    """
+    print("\n" + "=" * 100)
+    print("--- 7. Trading Execution Primitives & State Machine ---")
+    print("=" * 100)
+
+    record = initialize_transition_record(
+        entity_id="usage-order-1", kind=LifecycleKind.ORDER, volume=Decimal("1.0")
+    )
+    fill_result = apply_execution_report(
+        record=record,
+        report_state=FixExecutionState.PARTIALLY_FILLED,
+        broker_event_id="usage-evt-1",
+        event_source="broker_execution_report",
+        timestamp="2026-07-09T10:00:00Z",
+        request_id="usage-exec-001",
+        correlation_id="usage-corr-007",
+        dedup_window_size=10,
+        filled_volume_delta=Decimal("0.40"),
+        vwap=Decimal("1.10000"),
+    )
+    amendment = evaluate_amendment(
+        record=fill_result.record,
+        expected_state_version=1,
+        amendment_kind=AmendmentKind.CANCEL,
+    )
+
+    normalized = normalize_broker_response(
+        provider="mt5",
+        raw_response={
+            "retcode": "10009",
+            "deal": "9001",
+            "volume": "0.40",
+            "comment": "stop out",
+        },
+        request_id="usage-exec-001",
+    )
+    outcome = classify_broker_outcome(normalized=normalized)
+    broker_event = classify_broker_initiated_event(normalized=normalized)
+    corporate_action = classify_corporate_action(
+        raw_event={
+            "action_type": "split",
+            "symbol": trading_symbol,
+            "ratio": "2",
+            "effective_at": "2026-07-09",
+        },
+    )
+
+    registry = ProviderRateLimiterRegistry(clock=ExampleClock())
+    registry.configure_provider(
+        provider="mt5",
+        settings=RateLimitSettings(max_requests=5, per_seconds=Decimal("1.0"), burst=2),
+    )
+    acquisitions = [registry.try_acquire(provider="mt5") for _ in range(3)]
+
+    profile = BrokerCapabilityProfile(
+        provider="mt5",
+        supported_order_types=("market", "limit", "stop"),
+        supported_filling_modes=("IOC", "FOK"),
+        price_precision_digits=5,
+        volume_precision_step=Decimal("0.01"),
+        max_requests_per_second=Decimal(10),
+        supports_cancel_on_disconnect=False,
+    )
+    capability_result = validate_broker_capabilities(
+        profile=profile,
+        order_type="market",
+        filling_mode="IOC",
+        price=Decimal("1.10000"),
+        volume=Decimal("0.10"),
+    )
+    needs_cod_failsafe = requires_cancel_on_disconnect_failsafe(profile=profile)
+
+    shadow_intent = record_shadow_intent(
+        request_id="usage-shadow-001",
+        symbol=trading_symbol,
+        side="buy",
+        volume=Decimal("0.10"),
+        expected_price=Decimal("1.10000"),
+        recorded_at="2026-07-09T10:00:00Z",
+    )
+    shadow_comparison = compare_shadow_fill(
+        intent=shadow_intent,
+        live_reference_price=Decimal("1.10050"),
+        expected_balance_after=Decimal("10000.00"),
+        live_balance=Decimal("9999.50"),
+    )
+
+    print(
+        f"Fill version/state:  {fill_result.record.version} / {fill_result.record.state.value}"
+    )
+    print(
+        f"Amendment outcome:   {amendment.outcome.value} / {amendment.retry_safety.value}"
+    )
+    print(f"Normalized retcode:  {normalized.retcode}")
+    print(f"Broker outcome:      {outcome.status.value}")
+    print(
+        f"Broker event kind:   {broker_event.kind.value} "
+        f"critical={broker_event.requires_critical_incident}"
+    )
+    print(
+        f"Corporate action:    {corporate_action.kind.value} ratio={corporate_action.ratio}"
+    )
+    print(f"Rate limit attempts: {[decision.allowed for decision in acquisitions]}")
+    print(
+        f"Capability passed:   {capability_result.passed}, needs CoD failsafe={needs_cod_failsafe}"
+    )
+    print(f"Shadow price drift:  {shadow_comparison.price_drift_bps} bps")
+
+
+class ExampleAuditSink:
+    """Usage-example in-memory audit sink port."""
+
+    def __init__(self) -> None:
+        """Initialize the empty in-memory audit event list."""
+        self.events: list[JsonObject] = []
+
+    def append(self, *, event: JsonObject, recorded_at: datetime) -> str:
+        """Append an audit event and return a synthetic reference."""
+        self.events.append(event)
+        return f"usage-audit-{len(self.events)}"
+
+    def flush(self) -> None:
+        """No-op flush for this usage-example double."""
+        return
+
+
+class ExampleSyncExecutor:
+    """Usage-example synchronous AsyncDispatchExecutor double."""
+
+    def submit(self, dispatch_callable):
+        """Run the dispatch callable immediately and wrap it in a Future."""
+        from concurrent.futures import Future
+
+        future: Future = Future()
+        try:
+            result = dispatch_callable()
+        except Exception as exc:
+            future.set_exception(exc)
+        else:
+            future.set_result(result)
+        return future
+
+
+def example_09_gates_pipeline() -> None:
+    """Demonstrate policy matrix, approval, readiness, kill-switch, audit,
+    and the composed 16-step live gate pipeline orchestration.
+    """
+    print("\n" + "=" * 100)
+    print("--- 8. Trading Gate Pipeline & Policy Matrix ---")
+    print("=" * 100)
+
+    matrix = PolicyMatrix(
+        entries={
+            TradingAction.SUBMIT_ORDER: PolicyMatrixEntry(
+                action=TradingAction.SUBMIT_ORDER
+            ),
+            TradingAction.CANCEL_ALL_ORDERS: PolicyMatrixEntry(
+                action=TradingAction.CANCEL_ALL_ORDERS,
+                emergency_allowed_under_kill_switch=True,
+            ),
+        }
+    )
+    policy_entry = resolve_policy(matrix=matrix, action=TradingAction.SUBMIT_ORDER)
+
+    request_hash = compute_canonical_request_hash(
+        symbol=trading_symbol,
+        account_id="usage-account",
+        side="buy",
+        volume="0.10",
+        price=None,
+        sl=None,
+        tp=None,
+        route="live",
+        strategy_id="usage-strategy",
+    )
+    approval = OperatorApprovalToken(
+        approval_id="usage-appr-001",
+        operator_id="usage-operator",
+        governed_action_id="submit_order",
+        scope=ApprovalScope(),
+        canonical_request_hash=request_hash,
+        issued_at="2026-07-09T09:00:00Z",
+        expires_at="2026-07-09T23:00:00Z",
+    )
+    validate_operator_approval(
+        token=approval,
+        now=ExampleClock().now_utc(),
+        expected_request_hash=request_hash,
+        expected_scope=ApprovalScope(),
+    )
+
+    kill_switch_evaluation = evaluate_kill_switches(
+        switches=(KillSwitchState(scope=KillSwitchScope.GLOBAL, active=False),),
+        action=TradingAction.SUBMIT_ORDER,
+        policy_entry=policy_entry,
+    )
+
+    readiness_result = run_live_readiness_dry_run(
+        broker_evidence=BrokerReadinessEvidence(
+            connected=True,
+            trade_allowed=True,
+            account_permissions_ok=True,
+            rate_limit_available=True,
+        ),
+        clock_evidence=ClockDriftEvidence(offset_ms=Decimal(10)),
+        symbol_metadata_present=True,
+        stores_durable=True,
+    )
+
+    audit_sink = ExampleAuditSink()
+    audit_ref = record_pre_mutation_audit(
+        audit_sink=audit_sink,
+        event={"action": "submit_order", "symbol": trading_symbol},
+        recorded_at=ExampleClock().now_utc(),
+    )
+
+    turbulence_monitor = MarketTurbulenceMonitor(
+        window_size=5, velocity_threshold_bps=Decimal(50)
+    )
+    turbulence_monitor.observe(symbol=trading_symbol, mid_price=Decimal("1.10000"))
+
+    capability_profile = BrokerCapabilityProfile(
+        provider="mt5",
+        supported_order_types=("market",),
+        supported_filling_modes=("IOC",),
+        price_precision_digits=5,
+        volume_precision_step=Decimal("0.01"),
+        max_requests_per_second=Decimal(10),
+    )
+
+    clock = ExampleClock()
+    steps = (
+        (
+            GateName.COMPLIANCE,
+            lambda: evaluate_compliance_gate(
+                evidence=ComplianceEvidence(), symbol=trading_symbol
+            ),
+        ),
+        (
+            GateName.MARKET_TURBULENCE,
+            lambda: turbulence_monitor.observe(
+                symbol=trading_symbol, mid_price=Decimal("1.10010")
+            ),
+        ),
+        (
+            GateName.ADAPTER_PERMISSION,
+            lambda: evaluate_adapter_permission_gate(
+                profile=capability_profile,
+                order_type="market",
+                filling_mode="IOC",
+                price=Decimal("1.10000"),
+                volume=Decimal("0.10"),
+            ),
+        ),
+    )
+    decision = run_gate_pipeline(
+        steps=steps,
+        clock=clock,
+        deadline=clock.now_utc() + timedelta(seconds=1),
+    )
+
+    print(f"Policy entry:        approval_required={policy_entry.requires_approval}")
+    print(f"Kill switch check:   blocked={kill_switch_evaluation.blocked}")
+    print(f"Readiness dry run:   passed={readiness_result.passed}")
+    print(f"Audit reference:     {audit_ref}")
+    print(f"Pipeline status:     {decision.status.value}")
+    print(f"Pipeline steps:      {[step.gate.value for step in decision.steps]}")
+
+
+def example_10_execution_coordinator_and_reporting() -> None:
+    """Demonstrate asynchronous dispatch coordination, client-order-id
+    propagation, OCO/multi-leg watchdogs, non-atomic modify safety, and
+    structured trading report / execution-quality event construction.
+    """
+    print("\n" + "=" * 100)
+    print("--- 9. Execution Coordinator & Reporting ---")
+    print("=" * 100)
+
+    coordinator = ExecutionCoordinator()
+    rng = ExampleRNG()
+    client_order_id = generate_client_order_id(request_id="usage-req-010", rng=rng)
+    client_order_id_mapping = build_client_order_id_mapping(
+        client_order_id=client_order_id,
+        comment_max_length=26,
+        external_id_max_length=12,
+    )
+
+    completions: list[object] = []
+
+    def dispatch_callable() -> NormalizedTradeResult:
+        return NormalizedTradeResult(
+            retcode="10009", request_id="usage-req-010", provider="mt5"
+        )
+
+    accepted = coordinator.dispatch_async(
+        request_id="usage-req-010",
+        action=TradingAction.SUBMIT_ORDER,
+        accepted_at=ExampleClock().now_utc().isoformat(),
+        executor=ExampleSyncExecutor(),
+        dispatch_callable=dispatch_callable,
+        on_complete=completions.append,
+    )
+
+    watchdog = OcoWatchdog()
+    watchdog.register_group(group_id="usage-oco-1", order_ids=("ord-1", "ord-2"))
+    siblings_to_cancel = watchdog.on_execution_report(
+        group_id="usage-oco-1", order_id="ord-1", execution_state="Filled"
+    )
+
+    multi_leg = MultiLegExecutionCoordinator(partial_fill_tolerance=Decimal("0.1"))
+    multi_leg.register_legs(group_id="usage-spread-1", leg_order_ids=("leg-1", "leg-2"))
+    rollback_decision = multi_leg.on_leg_outcome(
+        group_id="usage-spread-1",
+        leg_order_id="leg-1",
+        rejected=True,
+        unfilled_fraction=Decimal(0),
+    )
+
+    modify_state = begin_non_atomic_modify(order_id="usage-ord-mod-1")
+    modify_state = record_cancel_dispatched(state=modify_state)
+    modify_state = record_cancel_confirmed(state=modify_state)
+    modify_state = record_replace_dispatched(state=modify_state)
+    modify_resolution = resolve_replace_outcome(
+        state=modify_state, replace_succeeded=True, reentry_allowed=True
+    )
+
+    cost_facts = TransactionCostFacts(commission=Decimal("0.35"), swap=Decimal("0.05"))
+    cost_event = capture_transaction_cost(
+        order_id="usage-ord-mod-1",
+        cost_facts=cost_facts,
+        recorded_at=ExampleClock().now_utc().isoformat(),
+    )
+
+    quote_snapshot = QuoteSnapshot(
+        symbol=trading_symbol,
+        bid=Decimal("1.10000"),
+        ask=Decimal("1.10020"),
+        spread=Decimal("0.00020"),
+        timestamp=ExampleClock().now_utc().isoformat(),
+        source="mt5",
+        freshness_age_ms=5,
+    )
+    quality_event = build_execution_quality_event(
+        order_id="usage-ord-mod-1",
+        symbol=trading_symbol,
+        quote_snapshot=quote_snapshot,
+        executed_price=Decimal("1.10025"),
+        decision_price=Decimal("1.10015"),
+        side="buy",
+        fill_latency_ms=Decimal(85),
+        partial_fill_count=0,
+        cost_facts=cost_facts,
+    )
+
+    report = build_trading_report(
+        report_id="usage-report-1",
+        generated_at=ExampleClock().now_utc().isoformat(),
+        tenant_id="usage-tenant",
+        cost_entries=(cost_event,),
+    )
+
+    print(f"Client order id:      {client_order_id_mapping.client_order_id}")
+    print(f"Broker comment field: {client_order_id_mapping.comment}")
+    print(f"Dispatch accepted:    command_id={accepted.command_id}")
+    print(f"In-flight after done: {coordinator.in_flight.current()}")
+    print(f"OCO siblings to cancel: {siblings_to_cancel}")
+    print(f"Multi-leg rollback:   {rollback_decision.rollback_required}")
+    print(f"Modify resolution:    {modify_resolution.state.stage.value}")
+    print(f"Realized slippage:    {quality_event.realized_slippage_bps} bps")
+    print(f"Report cost entries:  {len(report.cost_entries)}")
 
 
 def get_client() -> Any:
@@ -1082,6 +1513,9 @@ if __name__ == "__main__":
     example_05_persistence_implementations()
     example_06_read_only_info_facades()
     example_07_actions_and_validation()
+    example_08_execution_primitives()
+    example_09_gates_pipeline()
+    example_10_execution_coordinator_and_reporting()
     example_01_connect()
     example_02_terminal()
     example_03_account()

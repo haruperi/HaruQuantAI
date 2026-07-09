@@ -48,6 +48,127 @@ implementations must be injected from infrastructure layers outside
     `gates/pipeline.py` unit wires for `route="live"` gate evaluation. Until
     that pipeline is injected, every action fails closed to a
     `packaged_only` response (TRD-FR-055).
+- `execution/`: broker-call coordination primitives.
+  - `execution/state_machine.py`: the canonical order/position lifecycle
+    transition table (illegal paths such as `Filled` → `Submitted` fail
+    closed), version-gated amendment resolution (`evaluate_amendment`
+    returns `accepted`/`too_late_to_cancel`/`too_late_to_modify`/
+    `amended_after_partial_fill`, always `do_not_retry` on a stale version),
+    and idempotent execution-report deduplication on `broker_event_id` within
+    a bounded window (`apply_execution_report`). 100% branch-covered.
+  - `execution/response_classifier.py`: normalizes provider-specific broker
+    responses and streamed execution events into
+    `NormalizedTradeResult` (`normalize_broker_response`/
+    `classify_stream_event`), classifies unknown/timeout outcomes so callers
+    force reconciliation and block retries (`classify_broker_outcome`),
+    classifies broker-initiated (non-commanded) events — including
+    `stop_out`/`margin_call_action`, which flag a required critical incident
+    and a recommended `close_only` session transition — and classifies
+    corporate-action notifications (splits, symbol/name changes). Reuses
+    `app.utils.errors.classify_broker_error` rather than duplicating retcode
+    maps.
+  - `execution/rate_limiter.py`: deterministic per-provider token-bucket rate
+    limiters (`TokenBucketRateLimiter`/`ProviderRateLimiterRegistry`) driven
+    by an injected `Clock`, blocking exhausted requests locally before broker
+    dispatch.
+  - `execution/broker_capability_validation.py`: validates order type,
+    filling mode, and price/volume precision against a declared
+    `BrokerCapabilityProfile`, failing closed on any mismatch, and reports
+    whether the adapter lacks native Cancel-on-Disconnect support
+    (`requires_cancel_on_disconnect_failsafe`) — actually running the local
+    heartbeat failsafe is the future responsibility of
+    `runtime/session_manager.py`.
+  - `execution/shadow.py`: records shadow-route intents and compares expected
+    fills/balances against live evidence without ever dispatching a broker
+    mutation.
+  - `execution/coordinator.py`: broker-independent request-packaging helper
+    consumed by `actions/_common.py`'s `dispatch_or_package` seam
+    (`ExecutionCoordinator.build_broker_dispatch_payload`); resolves the
+    route-based dispatch handler target (`resolve_dispatch_target`); runs
+    asynchronous, non-blocking dispatch that returns a `TradingCommandAccepted`
+    immediately and resolves a caller-supplied completion callback off an
+    injected `AsyncDispatchExecutor` Future (`ExecutionCoordinator.dispatch_async`,
+    backed by a thread-safe `InFlightRequestCounter`); generates and
+    deterministically truncates globally unique `client_order_id`s for
+    broker comment/external-ID/magic-number metadata fields
+    (`generate_client_order_id`/`truncate_client_order_id`/
+    `build_client_order_id_mapping`); plans multi-account
+    `AllocationVector` dispatch as either a native block transaction or
+    sliced per-account child payloads (`plan_allocation_dispatch`);
+    evaluates two-step open-then-protect SL/TP outcomes, flagging a critical
+    incident when an open succeeds without confirmed protection
+    (`evaluate_two_step_protection_outcome`); resolves partial-fill residual
+    handling actions (`apply_residual_policy`); models the non-atomic
+    cancel-then-replace modify workflow as an explicit staged state machine
+    that fails closed on out-of-sequence transitions and recommends
+    re-entry or dead-letter escalation on replace failure
+    (`begin_non_atomic_modify`/`record_cancel_dispatched`/
+    `record_cancel_confirmed`/`record_replace_dispatched`/
+    `resolve_replace_outcome`); resolves OCO/bracket execution mode and
+    fails closed with `OCO_UNSUPPORTED` when neither native nor synthetic
+    support is available (`resolve_oco_execution_mode`/
+    `require_oco_submission_allowed`), and runs a client-side mutual-
+    cancellation watchdog that resolves sibling cancellations exactly once
+    per group on a fill or partial fill (`OcoWatchdog`); runs a synthetic
+    `MultiLegExecutionCoordinator` watchdog that triggers rollback of every
+    other registered leg once any leg rejects or breaches its fill
+    tolerance; captures transaction cost facts and later adjustments
+    (`capture_transaction_cost`); and finalizes post-response state by
+    saving to `TradeStore`, releasing an optional concurrency-lease
+    callback, and completing the idempotency lease
+    (`finalize_dispatch_outcome`).
+  - `execution/reporting.py`: constructs structured trading reports
+    bundling positions, orders, execution latency breakdowns, cost entries,
+    and reconciliation discrepancies (`build_trading_report`); and builds
+    standardized, versioned execution-quality events — realized slippage
+    against the mandatory `quote_snapshot`, direction-adjusted
+    implementation shortfall, fill latency, partial-fill counts, and
+    transaction cost facts — flagging `owner="external"` events so
+    analytics excludes them from strategy performance attribution
+    (`build_execution_quality_event`). Trading performs no metric
+    aggregation of its own; analytics consumes this contract.
+- `gates/`: deterministic `route="live"` pre-flight middleware. 100%
+  branch-covered as a whole package.
+  - `gates/policy_matrix.py`: `resolve_policy` looks up per-action
+    permission/approval/emergency/side-effect rules from the injected
+    `PolicyMatrix`, failing closed with `TRADING_POLICY_UNDEFINED` when an
+    action has no configured entry.
+  - `gates/approval.py`: verifies operator approval tokens (expiry, revoked/
+    consumed status, account/strategy/symbol scope matching) and validates
+    that a token's `canonical_request_hash` is bound to the exact order
+    parameters it was issued for (`compute_canonical_request_hash`).
+    `requires_dual_approval`/`validate_dual_operator_approval` enforce two
+    distinct authenticated operators for clearing the global kill switch,
+    promotion to `full_live`, and raising any hard cap, regardless of policy
+    matrix configuration.
+  - `gates/readiness.py`: validates broker connection/trading-allowance/
+    permissions/rate-capacity evidence (`validate_broker_readiness`), local
+    clock drift and PTP end-to-end latency against configured thresholds
+    (`validate_clock_drift`), and exposes a non-mutating
+    `run_live_readiness_dry_run`.
+  - `gates/kill_switch.py`: `evaluate_kill_switches` blocks non-emergency
+    mutations while any switch is active, exempting only policy-matrix
+    approved emergency/protective actions — never a caller-supplied flag.
+    `clear_kill_switch_after_approval` requires dual approval for the global
+    switch. `restore_kill_switch_state`/`persist_kill_switch_state` durably
+    round-trip switch state through the injected `TradingStateStore`.
+  - `gates/audit_and_compensation.py`: `record_pre_mutation_audit` blocks the
+    mutation immediately if the injected audit sink write fails.
+  - `gates/pipeline.py`: owns `ComplianceGate` (restricted-symbol fail-closed
+    block) and `MarketTurbulenceMonitor` (bounded per-symbol mid-price
+    velocity circuit breaker that suspends a symbol and blocks further
+    mutations once triggered), a thin wrapper exposing
+    `execution/broker_capability_validation.py` as gate 15, and the generic
+    `run_gate_pipeline` orchestrator: short-circuits on the first blocking
+    gate (downstream steps are recorded as explicit `SKIPPED`/
+    `diagnostic_after_failure` results, never executed), and fails closed
+    with `DEADLINE_EXCEEDED`/`QUOTE_STALE` if the configured deadline or
+    mandatory quote-snapshot TTL is exceeded mid-pipeline. Steps whose
+    backing module is future work (route/promotion compatibility, session
+    status, concurrency lease, reconciliation authority) use
+    `evaluate_seam_gate`, which fails closed with `LIVE_GATE_FAILED` until a
+    real evaluator is injected — the pipeline can never silently pass a gate
+    it does not yet implement.
 - `contracts.py`: route/action enums, promotion and mutation capability enums,
   TIF and FIX execution states, request/response envelopes, quote snapshots,
   allocation vectors, regulatory tags, normalized broker result wrappers,
@@ -67,7 +188,7 @@ implementations must be injected from infrastructure layers outside
   drafts. The registry exposes no broker mutation tool.
 - `config/`: immutable route, timeout, rate-limit, secret-reference,
   notification, credential-rotation, and broker security profile contracts.
-- `info/`: MQL5-compatible read-only facades for account, symbol, position,
+- `info/`: broker-neutral read-only facades for account, symbol, position,
   order, deal, historical order, and terminal metadata. Facades resolve the
   active broker through `get_broker_module()`, avoid broker mutation calls,
   return neutral values when data is unavailable, and redact exported payloads.
@@ -130,9 +251,23 @@ signatures support tamper-evidence checks.
 
 ## Pending Runtime Areas
 
-Execution coordination (beyond request packaging), gates middleware,
-reconciliation, monitoring, run-session management, and promotion are
+Reconciliation, monitoring, run-session management, and promotion are
 intentionally pending and should be implemented in later dependency-safe
 units. `actions/` exposes documented injection seams (`gate_pipeline`,
 `idempotency_store`, `event_journal`, `trade_store`) for those future units
-to wire in without changing the action call signatures.
+to wire in without changing the action call signatures. `gates/pipeline.py`'s
+`evaluate_seam_gate` similarly fails closed for the route/promotion,
+session-status, concurrency-lease, and reconciliation-authority steps until
+their backing modules exist and inject a real evaluator — a route="live"
+request can never silently clear the full 16-step pipeline before every gate
+is genuinely implemented. `execution/coordinator.py`'s async dispatch,
+client-order-id propagation, allocation planning, two-step protection,
+residual handling, non-atomic modify safety, OCO/multi-leg watchdogs, cost
+capture, in-flight counting, and post-response finalization (TRD-FR-102
+through TRD-FR-114) are fully implemented as broker-independent primitives;
+wiring a real broker adapter, `runtime/coordination.py` concurrency leases,
+and `runtime/session_manager.py` heartbeat/session control remains future
+work. `execution/reporting.py` builds structured reports and
+execution-quality events (TRD-FR-132) from caller-supplied projections;
+sourcing those projections live from `TradeStore` at report-generation time
+is the future responsibility of `runtime/session_manager.py`.

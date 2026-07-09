@@ -1,0 +1,1 @@
+"""Trading gate middleware tests."""

@@ -460,6 +460,8 @@ class TradingRequestEnvelope(TradingContract):
         oco_group_id: Optional One-Cancels-Other group identifier.
         linked_order_ids: Optional sibling order IDs for bracket/OCO groups.
         quote_snapshot: Quote evidence mandatory for live mutations.
+        deadline_utc: Optional pipeline evaluation deadline. When absent, the
+            gate pipeline defaults it from the configured gate budget.
     """
 
     route: TradingRoute
@@ -475,6 +477,7 @@ class TradingRequestEnvelope(TradingContract):
     oco_group_id: str | None = None
     linked_order_ids: tuple[str, ...] = Field(default_factory=tuple)
     quote_snapshot: QuoteSnapshot | None = None
+    deadline_utc: str | None = None
 
     @model_validator(mode="after")
     def validate_request(self) -> TradingRequestEnvelope:

@@ -309,6 +309,15 @@ APPROVED_ERROR_CODES = frozenset(
         "LIVE_COST_BUDGET_EXCEEDED",
         "WORKFLOW_TIMEOUT",
         "RETRY_AFTER_RECONCILIATION",
+        # Custom Trading Runtime Gate Codes
+        "TRADING_POLICY_UNDEFINED",
+        "DEADLINE_EXCEEDED",
+        "QUOTE_STALE",
+        # Custom Trading Runtime Execution Coordinator Codes
+        "OCO_UNSUPPORTED",
+        "LIVE_PROTECTIVE_MODIFY_FAILED",
+        "LIVE_NON_ATOMIC_MODIFY_ESCALATED",
+        "LIVE_MULTI_LEG_ROLLBACK_TRIGGERED",
     }
 )
 
@@ -554,6 +563,21 @@ ERROR_MESSAGES: dict[str, str] = {
     "LIVE_COST_BUDGET_EXCEEDED": "Live cost budget exceeded; broker mutation is blocked.",
     "WORKFLOW_TIMEOUT": "Live workflow exceeded configured timeout limit.",
     "RETRY_AFTER_RECONCILIATION": "Retry is not safe until broker reconciliation resolves the outcome.",
+    "TRADING_POLICY_UNDEFINED": "No policy matrix entry is defined for this action.",
+    "DEADLINE_EXCEEDED": "The gate pipeline exceeded its configured deadline.",
+    "QUOTE_STALE": "The mandatory quote snapshot aged beyond its freshness TTL.",
+    "OCO_UNSUPPORTED": (
+        "Broker adapter lacks native OCO support and synthetic emulation is disabled."
+    ),
+    "LIVE_PROTECTIVE_MODIFY_FAILED": (
+        "Position opened but the protective SL/TP modify failed; critical incident."
+    ),
+    "LIVE_NON_ATOMIC_MODIFY_ESCALATED": (
+        "Non-atomic modify replace step failed after cancellation; critical incident."
+    ),
+    "LIVE_MULTI_LEG_ROLLBACK_TRIGGERED": (
+        "A multi-leg execution leg failed or breached fill tolerance; rollback triggered."
+    ),
 }
 
 
