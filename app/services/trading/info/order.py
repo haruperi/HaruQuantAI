@@ -1,4 +1,4 @@
-"""MQL5-compatible read-only pending order facade."""
+"""Read-only pending order facade."""
 
 from __future__ import annotations
 
@@ -124,7 +124,7 @@ class OrderInfo(TicketInfoFacade):
         return safe_attr(self._data, "price_stoplimit", 0.0, float)
 
     def info_double(self, prop_id: int) -> float:
-        """Return MQL5-compatible order float property."""
+        """Return order float property."""
         logger.info("Reading order double property {}.", prop_id)
         return {
             0: self.volume_initial,

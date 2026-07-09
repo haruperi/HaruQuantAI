@@ -1,4 +1,4 @@
-"""Read-only MQL5-compatible trading information facades."""
+"""Read-only trading information facades."""
 
 from __future__ import annotations
 

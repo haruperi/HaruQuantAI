@@ -95,7 +95,7 @@ class TicketInfoFacade:
         return safe_attr(self._data, "comment", "", str)
 
     def info_integer(self, prop_id: int) -> int:
-        """Return MQL5-compatible integer property."""
+        """Return integer property."""
         logger.info("Reading ticket integer property {}.", prop_id)
         return {
             0: self.ticket,
@@ -106,12 +106,12 @@ class TicketInfoFacade:
         }.get(prop_id, lambda: 0)()
 
     def info_double(self, prop_id: int) -> float:
-        """Return MQL5-compatible float property."""
+        """Return float property."""
         logger.info("Reading ticket double property {}.", prop_id)
         return {0: self.volume, 1: self.price}.get(prop_id, lambda: 0.0)()
 
     def info_string(self, prop_id: int) -> str:
-        """Return MQL5-compatible string property."""
+        """Return string property."""
         logger.info("Reading ticket string property {}.", prop_id)
         return {0: self.symbol, 1: self.comment}.get(prop_id, lambda: "")()
 

@@ -1,4 +1,4 @@
-"""MQL5-compatible read-only account information facade."""
+"""Read-only account information facade."""
 # ruff: noqa: TC001
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ class AccountInfo:
         return safe_attr(self._data, "login", 0, int)
 
     def trade_mode(self) -> int:
-        """Return account trade mode as MQL5-compatible integer."""
+        """Return account trade mode as integer."""
         logger.info("Reading account trade mode.")
         self._refresh()
         server = safe_attr(self._data, "server", "", str).upper()
@@ -75,7 +75,7 @@ class AccountInfo:
         return 0
 
     def margin_mode(self) -> int:
-        """Return margin mode as MQL5-compatible integer."""
+        """Return margin mode as integer."""
         logger.info("Reading account margin mode.")
         self._refresh()
         mode = safe_attr(self._data, "margin_mode", "Hedging", str).upper()
@@ -165,7 +165,7 @@ class AccountInfo:
         return safe_attr(self._data, "company", "", str)
 
     def info_integer(self, prop_id: int) -> int:
-        """Return MQL5-compatible integer property."""
+        """Return integer property."""
         logger.info("Reading account integer property {}.", prop_id)
         return {
             0: self.login,
@@ -178,7 +178,7 @@ class AccountInfo:
         }.get(prop_id, lambda: 0)()
 
     def info_double(self, prop_id: int) -> float:
-        """Return MQL5-compatible float property."""
+        """Return float property."""
         logger.info("Reading account double property {}.", prop_id)
         return {
             0: self.balance,
@@ -191,7 +191,7 @@ class AccountInfo:
         }.get(prop_id, lambda: 0.0)()
 
     def info_string(self, prop_id: int) -> str:
-        """Return MQL5-compatible string property."""
+        """Return string property."""
         logger.info("Reading account string property {}.", prop_id)
         return {
             0: self.name,

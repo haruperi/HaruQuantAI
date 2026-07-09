@@ -1,4 +1,4 @@
-"""MQL5-compatible read-only terminal information facade."""
+"""Read-only terminal information facade."""
 # ruff: noqa: TC001
 
 from __future__ import annotations
@@ -92,7 +92,7 @@ class TerminalInfo:
         return safe_attr(self._data, "ping_last", 0, int)
 
     def info_integer(self, prop_id: int) -> int:
-        """Return MQL5-compatible integer property."""
+        """Return integer property."""
         logger.info("Reading terminal integer property {}.", prop_id)
         return {
             0: self.build,
@@ -103,7 +103,7 @@ class TerminalInfo:
         }.get(prop_id, lambda: 0)()
 
     def info_string(self, prop_id: int) -> str:
-        """Return MQL5-compatible string property."""
+        """Return string property."""
         logger.info("Reading terminal string property {}.", prop_id)
         return {
             0: self.language,

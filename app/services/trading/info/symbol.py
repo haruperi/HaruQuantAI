@@ -1,4 +1,4 @@
-"""MQL5-compatible read-only symbol information facade."""
+"""Read-only symbol information facade."""
 # ruff: noqa: TC001
 
 from __future__ import annotations
@@ -160,7 +160,7 @@ class SymbolInfo:
         return safe_attr(self._data, "spread", 0, int)
 
     def info_integer(self, prop_id: int) -> int:
-        """Return MQL5-compatible integer property."""
+        """Return integer property."""
         logger.info("Reading symbol integer property {}.", prop_id)
         return {
             0: self.digits,
@@ -170,7 +170,7 @@ class SymbolInfo:
         }.get(prop_id, lambda: 0)()
 
     def info_double(self, prop_id: int) -> float:
-        """Return MQL5-compatible float property."""
+        """Return float property."""
         logger.info("Reading symbol double property {}.", prop_id)
         return {
             0: self.point,
@@ -187,7 +187,7 @@ class SymbolInfo:
         }.get(prop_id, lambda: 0.0)()
 
     def info_string(self, prop_id: int) -> str:
-        """Return MQL5-compatible string property."""
+        """Return string property."""
         logger.info("Reading symbol string property {}.", prop_id)
         self.refresh()
         return {

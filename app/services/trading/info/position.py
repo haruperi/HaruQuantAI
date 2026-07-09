@@ -1,4 +1,4 @@
-"""MQL5-compatible read-only open position facade."""
+"""Read-only open position facade."""
 
 from __future__ import annotations
 
@@ -70,7 +70,7 @@ class PositionInfo(TicketInfoFacade):
         return safe_attr(self._data, "profit", 0.0, float)
 
     def info_double(self, prop_id: int) -> float:
-        """Return MQL5-compatible position float property."""
+        """Return position float property."""
         logger.info("Reading position double property {}.", prop_id)
         return {
             0: self.volume,

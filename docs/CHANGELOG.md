@@ -7,6 +7,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ID | Functionality | Notes |
 | -- | ------------- | ----- |
 | REF-001 | Relocate all trader info files to info/ | Relocated all generic trader *Info wrapper files to app/services/trader/info/ and renamed them dropping the _info suffix. Updated all codebase references. |
+| REF-002 | Neutralize trading info docstrings | Removed all 'MQL5-compatible' references in app/services/trading/info/ docstrings to align with the broker/platform neutral design. |
 
 
 ## Added

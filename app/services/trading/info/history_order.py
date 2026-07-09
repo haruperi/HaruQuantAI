@@ -1,4 +1,4 @@
-"""MQL5-compatible read-only historical order facade."""
+"""Read-only historical order facade."""
 
 from __future__ import annotations
 
