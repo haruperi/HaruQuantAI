@@ -1,4 +1,4 @@
-# ruff: noqa: E501, BLE001, E402, PLW0603, ARG002
+# ruff: noqa: E501, BLE001, E402, PLW0603, ARG002, PLR0915
 """Unified usage example for generic Trade classes working with MT5 and cTrader."""
 
 import sys
@@ -115,33 +115,29 @@ from app.services.trading.monitoring import (
     MonitoringService,
     OperationalSignalsManager,
 )
+from app.services.trading.promotion import (
+    compute_canonical_promotion_hash,
+    evaluate_promotion_stage_gate,
+    validate_preactivation_conditions,
+    validate_promotion_transition,
+    validate_route_stage_capability,
+    validate_sim_metadata_lookup,
+)
 from app.services.trading.reconciliation import (
     AuthorityAndRetryGuard,
     ReconciliationService,
     evaluate_reconciliation_authority_gate,
 )
+from app.services.trading.runtime import (
+    ConcurrencyLockManager,
+    CostController,
+    SessionManager,
+    SignalProcessor,
+)
 from app.services.trading.security import (
     WriteAheadDeadLetterQueue,
     map_exception_to_trading_error,
     redact_for_boundary,
-)
-from app.services.trading.promotion import (
-    PROMOTION_SEQUENCE,
-    ROUTE_CAPABILITY_MATRIX,
-    compute_canonical_promotion_hash,
-    evaluate_promotion_stage_gate,
-    validate_preactivation_conditions,
-    validate_promotion_transition,
-    validate_sim_metadata_lookup,
-    validate_route_stage_capability,
-)
-from app.services.trading.runtime import (
-    SessionManager,
-    SessionState,
-    OperationalMode,
-    ConcurrencyLockManager,
-    CostController,
-    SignalProcessor,
 )
 from app.services.trading.state import (
     RNG,
@@ -1072,11 +1068,11 @@ def example_11_reconciliation() -> None:
     )
 
     service = ReconciliationService(
-        trade_store=DummyTradeStore(),
-        state_store=DummyStateStore(),
+        trade_store=DummyTradeStore(),  # type: ignore[arg-type]
+        state_store=DummyStateStore(),  # type: ignore[arg-type]
         journal=journal,
         authority_guard=guard,
-        clock=DummyClock(),
+        clock=DummyClock(),  # type: ignore[arg-type]
         config=config,
     )
 
@@ -1277,13 +1273,17 @@ def example_13_promotion() -> None:
         ),
     )
     result = evaluate_promotion_stage_gate(request=valid_req)
-    print(f"Valid request Gate 3 status: {result.status} (Reason: {result.reason_code})")
+    print(
+        f"Valid request Gate 3 status: {result.status} (Reason: {result.reason_code})"
+    )
 
     # 3. Transitions
     print("\n[Promotion Transition checks]")
+
     class SimpleClock:
         def now_utc(self):
             return datetime.now(UTC)
+
     clock = SimpleClock()
 
     # Generate Operator approval tokens
@@ -1309,12 +1309,14 @@ def example_13_promotion() -> None:
             current_stage=PromotionStage.OFFLINE_TEST,
             target_stage=PromotionStage.SIMULATION,
             approvals=(app_token,),
-            clock=clock,
+            clock=clock,  # type: ignore[arg-type]
             risk_policy_ok=True,
             reconciliation_state_ok=True,
             audit_sinks_ok=True,
         )
-        print("OK: Strategy promotion transition (offline_test -> simulation) validated successfully.")
+        print(
+            "OK: Strategy promotion transition (offline_test -> simulation) validated successfully."
+        )
     except Exception as e:
         print(f"FAIL: Strategy promotion failed: {e}")
 
@@ -1325,7 +1327,7 @@ def example_13_promotion() -> None:
             current_stage=PromotionStage.OFFLINE_TEST,
             target_stage=PromotionStage.SIMULATION,
             approvals=(),
-            clock=clock,
+            clock=clock,  # type: ignore[arg-type]
             risk_policy_ok=True,
             reconciliation_state_ok=True,
             audit_sinks_ok=True,
@@ -1353,13 +1355,19 @@ def example_13_promotion() -> None:
     # 5. Metadata Lookups
     print("\n[Metadata lookup checks]")
     try:
-        validate_sim_metadata_lookup(mode="historical_backtest", has_captured_snapshot=False)
-        print("FAIL: Historical backtest lookup without snapshot succeeded (Unexpected).")
+        validate_sim_metadata_lookup(
+            mode="historical_backtest", has_captured_snapshot=False
+        )
+        print(
+            "FAIL: Historical backtest lookup without snapshot succeeded (Unexpected)."
+        )
     except Exception as e:
         print(f"OK: Historical backtest without snapshot blocked (Expected): {e}")
 
     try:
-        validate_sim_metadata_lookup(mode="historical_backtest", has_captured_snapshot=True)
+        validate_sim_metadata_lookup(
+            mode="historical_backtest", has_captured_snapshot=True
+        )
         print("OK: Historical backtest with snapshot allowed successfully.")
     except Exception as e:
         print(f"FAIL: Historical backtest with snapshot failed: {e}")
@@ -1372,14 +1380,24 @@ def example_14_runtime_coordination() -> None:
     print("=" * 100)
 
     class StubStateStore:
-        def save_state(self, route: Any, tenant_id: str, snapshot: JsonObject, expected_version: int | None) -> str:
+        def save_state(
+            self,
+            route: Any,
+            tenant_id: str,
+            snapshot: JsonObject,
+            expected_version: int | None,
+        ) -> str:
             return "snap-usage-1"
-        def load_state(self, route: Any, tenant_id: str, snapshot_id: str) -> JsonObject | None:
+
+        def load_state(
+            self, route: Any, tenant_id: str, snapshot_id: str
+        ) -> JsonObject | None:
             return {"mode": "normal", "halted_symbols": ["USDJPY"]}
 
     class UsageClock:
         def now_utc(self) -> datetime:
             return datetime.now(UTC)
+
         def monotonic(self) -> float:
             return time.monotonic()
 
@@ -1392,7 +1410,7 @@ def example_14_runtime_coordination() -> None:
         scope="usage-acct-1",
         route=TradingRoute.SIM,
         state_store=store,
-        clock=clock,
+        clock=clock,  # type: ignore[arg-type]
     )
     mgr.start_session()
     print(f"Session started. State: {mgr.state}, Mode: {mgr.mode}")
@@ -1438,13 +1456,15 @@ def example_14_runtime_coordination() -> None:
         "session_max": Decimal("200.0"),
     }
     print("Validating budget under limit...")
-    cost_ctrl.validate_pre_dispatch_budget(request=req, estimated_cost=Decimal("20.0"), limits=limits)
+    cost_ctrl.validate_pre_dispatch_budget(
+        request=req, estimated_cost=Decimal("20.0"), limits=limits
+    )
     print("Pre-dispatch budget validation passed.")
 
     # 4. Signal Processor
     print("\n[Signal Processor Demo]")
     sig_proc = SignalProcessor()
-    
+
     def dummy_pipeline_runner(envelope: TradingRequestEnvelope) -> GatePipelineDecision:
         print(f"Gating pipeline executed for request: {envelope.request_id}")
         return GatePipelineDecision(
@@ -1467,7 +1487,9 @@ def example_14_runtime_coordination() -> None:
         signal=signal,
         gate_pipeline_runner=dummy_pipeline_runner,
     )
-    print(f"Processed signal to envelope request_id: {envelope.request_id}, Decision status: {decision.status.value}")
+    print(
+        f"Processed signal to envelope request_id: {envelope.request_id}, Decision status: {decision.status.value}"
+    )
 
 
 def get_client() -> Any:
@@ -1480,10 +1502,10 @@ def get_client() -> Any:
     )
 
 
-def example_01_connect() -> None:
+def example_15_connect() -> None:
     """Demonstrate connection to the active broker."""
     print("\n" + "=" * 100)
-    print(f"--- 1. Connecting to Active Broker: {settings.active_broker.upper()} ---")
+    print(f"--- 15. Connecting to Active Broker: {settings.active_broker.upper()} ---")
     print("=" * 100)
 
     client = get_client()
@@ -1498,10 +1520,10 @@ def example_01_connect() -> None:
         print(f"Failed to connect to {settings.active_broker.upper()}.")
 
 
-def example_02_terminal() -> None:
+def example_16_terminal() -> None:
     """Demonstrate printing terminal information using TerminalInfo."""
     print("\n" + "=" * 100)
-    print("--- 2. Fetching Terminal Info ---")
+    print("--- 16. Fetching Terminal Info ---")
     print("=" * 100)
 
     term = TerminalInfo()
@@ -1521,10 +1543,10 @@ def example_02_terminal() -> None:
         print(f"Failed to fetch terminal info: {e}")
 
 
-def example_03_account() -> None:
+def example_17_account() -> None:
     """Demonstrate printing account information using AccountInfo."""
     print("\n" + "=" * 100)
-    print("--- 3. Fetching Account Information ---")
+    print("--- 17. Fetching Account Information ---")
     print("=" * 100)
 
     acc = AccountInfo()
@@ -1569,10 +1591,10 @@ def example_03_account() -> None:
         print(f"Failed to fetch account info: {e}")
 
 
-def example_04_symbol() -> None:
+def example_18_symbol() -> None:
     """Demonstrate printing symbol specification info using SymbolInfo."""
     print("\n" + "=" * 100)
-    print(f"--- 4. Fetching Symbol Information for {trading_symbol} ---")
+    print(f"--- 18. Fetching Symbol Information for {trading_symbol} ---")
     print("=" * 100)
 
     sym = SymbolInfo(trading_symbol)
@@ -1610,10 +1632,10 @@ def example_04_symbol() -> None:
         print(f"Failed to fetch symbol info: {e}")
 
 
-def example_05_position() -> None:
+def example_19_position() -> None:
     """Demonstrate printing open position list using PositionInfo."""
     print("\n" + "=" * 100)
-    print("--- 5. Fetching Active Positions ---")
+    print("--- 19. Fetching Active Positions ---")
     print("=" * 100)
 
     try:
@@ -1648,10 +1670,10 @@ def example_05_position() -> None:
         print(f"Failed to select positions: {e}")
 
 
-def example_06_order() -> None:
+def example_20_order() -> None:
     """Demonstrate printing pending orders list using OrderInfo."""
     print("\n" + "=" * 100)
-    print("--- 6. Fetching Active Pending Orders ---")
+    print("--- 20. Fetching Active Pending Orders ---")
     print("=" * 100)
 
     try:
@@ -1680,10 +1702,10 @@ def example_06_order() -> None:
         print(f"Failed to select pending orders: {e}")
 
 
-def example_07_history_order() -> None:
+def example_21_history_order() -> None:
     """Demonstrate listing historical orders using HistoryOrderInfo."""
     print("\n" + "=" * 100)
-    print("--- 7. Fetching History Orders ---")
+    print("--- 21. Fetching History Orders ---")
     print("=" * 100)
 
     try:
@@ -1712,10 +1734,10 @@ def example_07_history_order() -> None:
         print(f"Failed to query history orders: {e}")
 
 
-def example_08_history_deal() -> None:
+def example_22_history_deal() -> None:
     """Demonstrate listing deals using DealInfo."""
     print("\n" + "=" * 100)
-    print("--- 8. Fetching Historical Deals ---")
+    print("--- 22. Fetching Historical Deals ---")
     print("=" * 100)
 
     try:
@@ -1742,11 +1764,11 @@ def example_08_history_deal() -> None:
         print(f"Failed to query history deals: {e}")
 
 
-def example_09_open_position() -> None:
+def example_23_open_position() -> None:
     """Demonstrate opening a position using generic Trade class."""
     global pos_ticket, buy_price, used_filling_mode
     print("\n" + "=" * 100)
-    print(f"--- 9. Opening Position (Buy 0.02 {trading_symbol}) ---")
+    print(f"--- 23. Opening Position (Buy 0.02 {trading_symbol}) ---")
     print("=" * 100)
 
     sym = SymbolInfo(trading_symbol)
@@ -1785,10 +1807,10 @@ def example_09_open_position() -> None:
         print(f"Exception during buy trade order: {e}")
 
 
-def example_10_calc_profit_margin() -> None:
+def example_24_calc_profit_margin() -> None:
     """Demonstrate calculating expected profit and required margin."""
     print("\n" + "=" * 100)
-    print("--- 10. Pre-trade Profit and Margin Calculation ---")
+    print("--- 24. Pre-trade Profit and Margin Calculation ---")
     print("=" * 100)
 
     client = get_client()
@@ -1827,14 +1849,14 @@ def example_10_calc_profit_margin() -> None:
         print(f"Exception during calculation: {e}")
 
 
-def example_11_modify_position() -> None:
+def example_25_modify_position() -> None:
     """Demonstrate modifying the Stop Loss / Take Profit of an active position."""
     print("\n" + "=" * 100)
-    print("--- 11. Modifying Active Position SL/TP ---")
+    print("--- 25. Modifying Active Position SL/TP ---")
     print("=" * 100)
 
     if pos_ticket == 0:
-        print("No active position from Example 9. Skipping modification.")
+        print("No active position from Example 23. Skipping modification.")
         return
 
     sym = SymbolInfo(trading_symbol)
@@ -1859,14 +1881,14 @@ def example_11_modify_position() -> None:
         print(f"Exception during position modification: {e}")
 
 
-def example_12_close_partial_position() -> None:
+def example_26_close_partial_position() -> None:
     """Demonstrate partial close of an active position (Closing 0.01 lot)."""
     print("\n" + "=" * 100)
-    print("--- 12. Partial Closing Active Position (0.01 lot) ---")
+    print("--- 26. Partial Closing Active Position (0.01 lot) ---")
     print("=" * 100)
 
     if pos_ticket == 0:
-        print("No active position from Example 9. Skipping partial close.")
+        print("No active position from Example 23. Skipping partial close.")
         return
 
     sym = SymbolInfo(trading_symbol)
@@ -1903,14 +1925,14 @@ def example_12_close_partial_position() -> None:
         print(f"Exception during partial close: {e}")
 
 
-def example_13_close_position() -> None:
+def example_27_close_position() -> None:
     """Demonstrate closing the remaining active position fully."""
     print("\n" + "=" * 100)
-    print("--- 13. Closing Remaining Position Fully ---")
+    print("--- 27. Closing Remaining Position Fully ---")
     print("=" * 100)
 
     if pos_ticket == 0:
-        print("No active position from Example 9. Skipping close.")
+        print("No active position from Example 23. Skipping close.")
         return
 
     time.sleep(1)
@@ -1929,11 +1951,11 @@ def example_13_close_position() -> None:
         print(f"Exception during position close: {e}")
 
 
-def example_14_pending_orders() -> None:
+def example_28_pending_orders() -> None:
     """Demonstrate placing a Buy Limit pending order."""
     global ord_ticket, limit_price
     print("\n" + "=" * 100)
-    print("--- 14. Placing Pending Order (Buy Limit) ---")
+    print("--- 28. Placing Pending Order (Buy Limit) ---")
     print("=" * 100)
 
     sym = SymbolInfo(trading_symbol)
@@ -1963,14 +1985,14 @@ def example_14_pending_orders() -> None:
         print(f"Exception placing pending order: {e}")
 
 
-def example_15_modify_pending_orders() -> None:
+def example_29_modify_pending_orders() -> None:
     """Demonstrate modifying a placed pending order."""
     print("\n" + "=" * 100)
-    print("--- 15. Modifying Pending Order ---")
+    print("--- 29. Modifying Pending Order ---")
     print("=" * 100)
 
     if ord_ticket == 0:
-        print("No active pending order from Example 14. Skipping modification.")
+        print("No active pending order from Example 28. Skipping modification.")
         return
 
     sym = SymbolInfo(trading_symbol)
@@ -1994,14 +2016,14 @@ def example_15_modify_pending_orders() -> None:
         print(f"Exception modifying pending order: {e}")
 
 
-def example_16_delete_pending_orders() -> None:
+def example_30_delete_pending_orders() -> None:
     """Demonstrate deleting / cancelling a pending order."""
     print("\n" + "=" * 100)
-    print("--- 16. Deleting/Cancelling Pending Order ---")
+    print("--- 30. Deleting/Cancelling Pending Order ---")
     print("=" * 100)
 
     if ord_ticket == 0:
-        print("No active pending order from Example 14. Skipping deletion.")
+        print("No active pending order from Example 28. Skipping deletion.")
         return
 
     time.sleep(1)
@@ -2017,10 +2039,10 @@ def example_16_delete_pending_orders() -> None:
         print(f"Exception deleting pending order: {e}")
 
 
-def example_17_shutdown() -> None:
+def example_31_shutdown() -> None:
     """Demonstrate shutting down connection to active broker."""
     print("\n" + "=" * 100)
-    print(f"--- 17. Shutting down connection to {settings.active_broker.upper()} ---")
+    print(f"--- 31. Shutting down connection to {settings.active_broker.upper()} ---")
     print("=" * 100)
 
     client = get_client()
@@ -2049,20 +2071,20 @@ if __name__ == "__main__":
     example_12_monitoring()
     example_13_promotion()
     example_14_runtime_coordination()
-    example_01_connect()
-    example_02_terminal()
-    example_03_account()
-    example_04_symbol()
-    example_05_position()
-    example_06_order()
-    example_07_history_order()
-    example_08_history_deal()
-    example_09_open_position()
-    example_10_calc_profit_margin()
-    example_11_modify_position()
-    example_12_close_partial_position()
-    example_13_close_position()
-    example_14_pending_orders()
-    example_15_modify_pending_orders()
-    example_16_delete_pending_orders()
-    example_17_shutdown()
+    example_15_connect()
+    example_16_terminal()
+    example_17_account()
+    example_18_symbol()
+    example_19_position()
+    example_20_order()
+    example_21_history_order()
+    example_22_history_deal()
+    example_23_open_position()
+    example_24_calc_profit_margin()
+    example_25_modify_position()
+    example_26_close_partial_position()
+    example_27_close_position()
+    example_28_pending_orders()
+    example_29_modify_pending_orders()
+    example_30_delete_pending_orders()
+    example_31_shutdown()
