@@ -33,6 +33,7 @@ from app.services.trading import (
     TradingAction,
     TradingRequestEnvelope,
     TradingRoute,
+    TradingStatus,
     get_trading_public_catalog,
 )
 from app.services.trading.actions import (
@@ -108,6 +109,7 @@ from app.services.trading.gates import (
     validate_operator_approval,
 )
 from app.services.trading.gates._common import GateName
+from app.services.trading.gates.pipeline import GatePipelineDecision
 from app.services.trading.monitoring import (
     HeartbeatEmitter,
     MonitoringService,
@@ -132,6 +134,14 @@ from app.services.trading.promotion import (
     validate_promotion_transition,
     validate_sim_metadata_lookup,
     validate_route_stage_capability,
+)
+from app.services.trading.runtime import (
+    SessionManager,
+    SessionState,
+    OperationalMode,
+    ConcurrencyLockManager,
+    CostController,
+    SignalProcessor,
 )
 from app.services.trading.state import (
     RNG,
@@ -1355,6 +1365,111 @@ def example_13_promotion() -> None:
         print(f"FAIL: Historical backtest with snapshot failed: {e}")
 
 
+def example_14_runtime_coordination() -> None:
+    """Demonstrate Session Runtime Coordination module services."""
+    print("\n" + "=" * 100)
+    print("--- 14. SESSION RUNTIME COORDINATION ---")
+    print("=" * 100)
+
+    class StubStateStore:
+        def save_state(self, route: Any, tenant_id: str, snapshot: JsonObject, expected_version: int | None) -> str:
+            return "snap-usage-1"
+        def load_state(self, route: Any, tenant_id: str, snapshot_id: str) -> JsonObject | None:
+            return {"mode": "normal", "halted_symbols": ["USDJPY"]}
+
+    class UsageClock:
+        def now_utc(self) -> datetime:
+            return datetime.now(UTC)
+        def monotonic(self) -> float:
+            return time.monotonic()
+
+    clock = UsageClock()
+    store = StubStateStore()
+
+    # 1. Session Manager
+    print("\n[Session Manager Demo]")
+    mgr = SessionManager(
+        scope="usage-acct-1",
+        route=TradingRoute.SIM,
+        state_store=store,
+        clock=clock,
+    )
+    mgr.start_session()
+    print(f"Session started. State: {mgr.state}, Mode: {mgr.mode}")
+    print(f"Is USDJPY halted initially? {mgr.is_symbol_halted('USDJPY')}")
+    mgr.halt_symbol("EURUSD")
+    print(f"Is EURUSD halted? {mgr.is_symbol_halted('EURUSD')}")
+    mgr.resume_symbol("EURUSD")
+
+    print("\n[Reconnection Resync Demo]")
+    # Reconnection auto-resync triggers read-only paused mode
+    mgr.update_connection_state(True)
+    print(f"Reconnected. State: {mgr.state}, Mode: {mgr.mode}")
+    mgr.complete_reconciliation()
+    print(f"Reconciliation completed. State: {mgr.state}, Mode: {mgr.mode}")
+
+    # 2. Concurrency Locks
+    print("\n[Concurrency Lock Manager Demo]")
+    lock_mgr = ConcurrencyLockManager()
+    acq1 = lock_mgr.acquire_lock("acct-1", "GBPUSD", timeout=0.1)
+    print(f"First lock acquisition on GBPUSD: {acq1}")
+    acq2 = lock_mgr.acquire_lock("acct-1", "GBPUSD", timeout=0.05)
+    print(f"Second (duplicate) lock acquisition: {acq2} (Expected: False)")
+    lock_mgr.release_lock("acct-1", "GBPUSD")
+    acq3 = lock_mgr.acquire_lock("acct-1", "GBPUSD", timeout=0.1)
+    print(f"Re-acquiring after release: {acq3}")
+    lock_mgr.release_lock("acct-1", "GBPUSD")
+
+    # 3. Cost Control
+    print("\n[Cost Controller Demo]")
+    cost_ctrl = CostController()
+    req = TradingRequestEnvelope(
+        route=TradingRoute.SIM,
+        action=TradingAction.SUBMIT_ORDER,
+        promotion_stage=PromotionStage.SIMULATION,
+        mutation_capability=MutationCapability.READ_ONLY,
+        request_id="req-1",
+        correlation_id="wf-1",
+        payload={"strategy_id": "strat-1", "tenant_id": "acct-1"},
+    )
+    limits = {
+        "request_max": Decimal("50.0"),
+        "strategy_max": Decimal("100.0"),
+        "session_max": Decimal("200.0"),
+    }
+    print("Validating budget under limit...")
+    cost_ctrl.validate_pre_dispatch_budget(request=req, estimated_cost=Decimal("20.0"), limits=limits)
+    print("Pre-dispatch budget validation passed.")
+
+    # 4. Signal Processor
+    print("\n[Signal Processor Demo]")
+    sig_proc = SignalProcessor()
+    
+    def dummy_pipeline_runner(envelope: TradingRequestEnvelope) -> GatePipelineDecision:
+        print(f"Gating pipeline executed for request: {envelope.request_id}")
+        return GatePipelineDecision(
+            status=TradingStatus.ACCEPTED,
+            steps=(),
+            total_latency_ms=Decimal("0.5"),
+        )
+
+    signal = {
+        "route": "sim",
+        "action": "submit_order",
+        "promotion_stage": "simulation",
+        "mutation_capability": "read_only",
+        "request_id": "sig-req-999",
+        "correlation_id": "sig-corr-999",
+        "symbol": "GBPUSD",
+        "strategy_id": "strat-1",
+    }
+    envelope, decision = sig_proc.process_strategy_signal(
+        signal=signal,
+        gate_pipeline_runner=dummy_pipeline_runner,
+    )
+    print(f"Processed signal to envelope request_id: {envelope.request_id}, Decision status: {decision.status.value}")
+
+
 def get_client() -> Any:
     """Helper to fetch the underlying broker client."""
     broker = get_broker_module()
@@ -1933,6 +2048,7 @@ if __name__ == "__main__":
     example_11_reconciliation()
     example_12_monitoring()
     example_13_promotion()
+    example_14_runtime_coordination()
     example_01_connect()
     example_02_terminal()
     example_03_account()

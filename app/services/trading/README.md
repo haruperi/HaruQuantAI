@@ -198,6 +198,11 @@ implementations must be injected from infrastructure layers outside
 - `reconciliation/`: state snapshot comparison, unknown-outcome authority guards, and startup sync coordination.
 - `monitoring/`: dynamic operational metrics, heartbeats, timeouts, circuit breakers, tool health, and incident taxonomy.
 - `promotion/`: mandatory linear promotion sequence/matrix checks, Gate 3 compatibility middleware, transition validations with operator approvals (single/dual operator), pre-activation conditions blocking, and simulation metadata lookup.
+- `runtime/`: session runtime coordination services.
+  - `runtime/session_manager.py`: coordinates explicit session states (`starting`, `running`, `paused`, `stopped`, `recovering`) and six operational modes. Enforces one active live session per scope, runs local heartbeats when Cancel-on-Disconnect is unsupported, handles ambiguous state loading by failing closed to `read_only` paused state, runs local GTD/DAY order expiry watchdog, maintains a thread-safe `HaltedSymbols` set, and blocks mutations to force reconciliation upon reconnection.
+  - `runtime/coordination.py`: optimistic concurrency locks per `(account_id, symbol)` with queues and timeouts to prevent unbounded queueing, enforces strategy ownership constraints, and evaluates cross-strategy counter policies.
+  - `runtime/cost_control.py`: evaluates and tracks pre-dispatch budget ceilings per request, workflow, strategy, account, and session, and records actual costs post-dispatch (raising critical incident signals on breach).
+  - `runtime/signal_processor.py`: transforms approved strategy signals into canonical request envelopes, validating all stage, capability, and risk reference evidence before execution through the gate pipeline.
 - `__init__.py`: explicit public import gate with pure registry accessors.
 
 ## Inputs
@@ -248,10 +253,10 @@ their cached envelopes, and expired live leases transition to reconciliation
 instead of retrying automatically.
 
 Journal records are append-only encrypted JSONL entries with logical sequence
-IDs and hash-chain links. Snapshots and replay helpers rebuild projections for
+IDs and hash-chain records. Snapshots and replay helpers rebuild projections for
 recovery or forensic reconstruction, while segment seals and detached
 signatures support tamper-evidence checks.
 
-## Pending Runtime Areas
+## Pending Broker Connection Integration
 
-Run-session management is intentionally pending and should be implemented in later dependency-safe units. `actions/` exposes documented injection seams (`gate_pipeline`, `idempotency_store`, `event_journal`, `trade_store`) for those future units to wire in without changing the action call signatures. `gates/pipeline.py`'s `evaluate_seam_gate` similarly fails closed for the session-status and concurrency-lease steps until their backing modules exist and inject a real evaluator — a route="live" request can never silently clear the full 16-step pipeline before every gate is genuinely implemented. `execution/coordinator.py`'s async dispatch, client-order-id propagation, allocation planning, two-step protection, residual handling, non-atomic modify safety, OCO/multi-leg watchdogs, cost capture, in-flight counting, and post-response finalization (TRD-FR-102 through TRD-FR-114) are fully implemented as broker-independent primitives; wiring a real broker adapter, `runtime/coordination.py` concurrency leases, and `runtime/session_manager.py` heartbeat/session control remains future work. `execution/reporting.py` builds structured reports and execution-quality events (TRD-FR-132) from caller-supplied projections; sourcing those projections live from `TradeStore` at report-generation time is the future responsibility of `runtime/session_manager.py`.
+Wiring a real broker adapter/executor into the session manager and coordinator remains future work.
