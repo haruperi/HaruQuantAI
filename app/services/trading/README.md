@@ -25,6 +25,9 @@ implementations must be injected from infrastructure layers outside
   drafts. The registry exposes no broker mutation tool.
 - `config/`: immutable route, timeout, rate-limit, secret-reference,
   notification, credential-rotation, and broker security profile contracts.
+- `security/`: public trading exception mapping, recursive redaction
+  boundaries, and write-ahead dead-letter queue helpers for failed critical
+  broker or audit events.
 - `__init__.py`: explicit public import gate with pure registry accessors.
 
 ## Inputs
@@ -58,6 +61,13 @@ Live mutation is disabled by default and resolves to `packaged_only` behavior
 until policy enables mutation. Configuration reloads are validated through the
 loader, versioned with a redacted hash, and immutable live-session keys are
 blocked while a session is running.
+
+Security boundaries map raw SDK, network, validation, permission, and
+persistence exceptions into standard public error codes with request and
+correlation IDs. Exported logs, alerts, events, reports, and chat payloads pass
+through recursive redaction. Failed critical broker or audit payloads are
+written to a redacted JSONL dead-letter log before recovery, and retry
+thresholds relocate poison-pill events to manual review.
 
 ## Pending Runtime Areas
 

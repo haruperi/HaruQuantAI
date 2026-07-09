@@ -626,15 +626,21 @@ stateDiagram-v2
 
 #### 📄 File: `security/error_mapping.py`
 
-- [ ] **TRD-FR-176:** Inherit all trading exceptions from a standard base exception (`TradingError`).
-- [ ] **TRD-FR-177:** Map all raw SDK exceptions and network errors into standard error codes (e.g., `VALIDATION_FAILED`, `BROKER_UNAVAILABLE`, `TIMEOUT`, `PERMISSION_DENIED`, `DATABASE_ERROR`) and include request and correlation IDs. Under no circumstances shall raw SDK exception traces or secrets leak in public error messages.
+- [X] **TRD-FR-176:** Inherit all trading exceptions from a standard base exception (`TradingError`).
+  *Evidence: app/services/trading/security/error_mapping.py line 21-122*
+- [X] **TRD-FR-177:** Map all raw SDK exceptions and network errors into standard error codes (e.g., `VALIDATION_FAILED`, `BROKER_UNAVAILABLE`, `TIMEOUT`, `PERMISSION_DENIED`, `DATABASE_ERROR`) and include request and correlation IDs. Under no circumstances shall raw SDK exception traces or secrets leak in public error messages.
+  *Evidence: app/services/trading/security/error_mapping.py line 125-224*
 
 #### 📄 File: `security/redaction_boundary.py`
 
-- [ ] **TRD-FR-178:** Implement a recursive redaction boundary. All data exported to logs, notifications, events, report documents, or chat terminals must be parsed and case-insensitively redacted for secrets, private tokens, passwords, and private account details.
-- [ ] **TRD-FR-179:** Expose a durable dead-letter queue. If a critical broker event or audit payload cannot be parsed or persisted, route it to a dead-letter queue, redact/secure the raw payload, block affected live scopes, and alert the operator.
-- [ ] **TRD-FR-180 (Exactly-Once Dead-Letter Recovery):** The dead-letter queue mechanism must guarantee exactly-once processing: any event failing to persist to the primary store must be immediately written to a redundant, crash-resilient write-ahead dead-letter log. On restart, the session manager must block all new strategy inputs and fully replay/reconcile the dead-letter log before enabling mutation capabilities.
-- [ ] **TRD-FR-181 (Poison Pill DLQ Isolation):** Implement a maximum retry threshold ($N$) for DLQ events. If a recovery event repeatedly fails to process $N$ times, the recovery manager must relocate it to a separate `ManualReviewDLQ` and raise a high-severity alert, allowing the session to bypass the poison pill and resume normal execution.
+- [X] **TRD-FR-178:** Implement a recursive redaction boundary. All data exported to logs, notifications, events, report documents, or chat terminals must be parsed and case-insensitively redacted for secrets, private tokens, passwords, and private account details.
+  *Evidence: app/services/trading/security/redaction_boundary.py line 394-455*
+- [X] **TRD-FR-179:** Expose a durable dead-letter queue. If a critical broker event or audit payload cannot be parsed or persisted, route it to a dead-letter queue, redact/secure the raw payload, block affected live scopes, and alert the operator.
+  *Evidence: app/services/trading/security/redaction_boundary.py line 174-267*
+- [X] **TRD-FR-180 (Exactly-Once Dead-Letter Recovery):** The dead-letter queue mechanism must guarantee exactly-once processing: any event failing to persist to the primary store must be immediately written to a redundant, crash-resilient write-ahead dead-letter log. On restart, the session manager must block all new strategy inputs and fully replay/reconcile the dead-letter log before enabling mutation capabilities.
+  *Evidence: app/services/trading/security/redaction_boundary.py line 269-324*
+- [X] **TRD-FR-181 (Poison Pill DLQ Isolation):** Implement a maximum retry threshold ($N$) for DLQ events. If a recovery event repeatedly fails to process $N$ times, the recovery manager must relocate it to a separate `ManualReviewDLQ` and raise a high-severity alert, allowing the session to bypass the poison pill and resume normal execution.
+  *Evidence: app/services/trading/security/redaction_boundary.py line 119-359*
 
 ---
 

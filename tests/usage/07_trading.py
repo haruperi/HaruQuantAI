@@ -41,6 +41,11 @@ from app.services.trading.config import (
     build_notification_payload,
     load_trading_config,
 )
+from app.services.trading.security import (
+    WriteAheadDeadLetterQueue,
+    map_exception_to_trading_error,
+    redact_for_boundary,
+)
 from app.services.trading.state import RNG, Clock
 from app.utils.settings import settings
 
@@ -181,6 +186,49 @@ def example_03_configurations_security_controls() -> None:
     print(f"Config hash:        {event.config_hash}")
     print(f"Redacted secret:    {event.redacted_config['secret_references']}")
     print(f"Notify payload:     {payload['payload']}")
+
+
+def example_04_security_boundaries_error_redaction() -> None:
+    """Demonstrate public error mapping and write-ahead DLQ redaction."""
+    print("\n" + "=" * 100)
+    print("--- 3. Trading Security Boundaries & Error Redaction ---")
+    print("=" * 100)
+
+    mapped_error = map_exception_to_trading_error(
+        TimeoutError("broker timeout token=abcdefabcdefabcdefabcdefabcdef12"),
+        request_id="usage-trd-004",
+        correlation_id="usage-corr-004",
+        provider="mt5",
+    )
+    boundary = redact_for_boundary(
+        {
+            "event": "broker_audit_failure",
+            "account": {"login": "123456", "password": "raw-password"},
+            "authorization": "Bearer abcdefabcdefabcdefabcdefabcdef12",
+        },
+        blocked_live_scopes=("strategy:example",),
+        alert_message="critical broker payload moved to DLQ",
+    )
+    dlq_path = Path("build/trading_usage_dlq.jsonl")
+    manual_path = Path("build/trading_usage_manual_dlq.jsonl")
+    dlq = WriteAheadDeadLetterQueue(
+        path=dlq_path,
+        manual_review_path=manual_path,
+        clock=ExampleClock(),
+        max_retries=2,
+    )
+    write_result = dlq.write_failed_event(
+        source="usage",
+        reason="audit persistence failed password=hidden",
+        payload=boundary.payload,
+        affected_live_scopes=boundary.blocked_live_scopes,
+    )
+
+    print(f"Mapped error:       {mapped_error.code}")
+    print(f"Error details:      {mapped_error.details}")
+    print(f"Redacted payload:   {boundary.payload}")
+    print(f"DLQ event:          {write_result.record.event_id}")
+    print(f"Blocked scopes:     {write_result.blocked_live_scopes}")
 
 
 def get_client() -> Any:
@@ -751,6 +799,7 @@ if __name__ == "__main__":
     example_01_contracts()
     example_02_state_ports()
     example_03_configurations_security_controls()
+    example_04_security_boundaries_error_redaction()
     example_01_connect()
     example_02_terminal()
     example_03_account()
