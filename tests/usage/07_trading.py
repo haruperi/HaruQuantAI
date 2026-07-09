@@ -4,6 +4,7 @@
 import sys
 import time
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,17 @@ from app.services.trader import (
     TerminalInfo,
     Trade,
 )
+from app.services.trading import (
+    AllocationVector,
+    MutationCapability,
+    PromotionStage,
+    QuoteSnapshot,
+    TradingAction,
+    TradingRequestEnvelope,
+    TradingRoute,
+    get_trading_public_catalog,
+)
+from app.services.trading.state import RNG, Clock
 from app.utils.settings import settings
 
 # Shared state across trading examples
@@ -32,6 +44,85 @@ ord_ticket = 0
 buy_price = 0.0
 limit_price = 0.0
 used_filling_mode = 0
+
+
+class ExampleClock:
+    """Usage-example deterministic clock."""
+
+    def now_utc(self) -> datetime:
+        """Return a deterministic UTC timestamp."""
+        return datetime(2026, 7, 9, 10, 0, tzinfo=UTC)
+
+    def now_ptp(self) -> datetime:
+        """Return a deterministic PTP-aligned timestamp."""
+        return datetime(2026, 7, 9, 10, 0, tzinfo=UTC)
+
+    def monotonic(self) -> float:
+        """Return deterministic elapsed time."""
+        return 10.0
+
+
+class ExampleRNG:
+    """Usage-example deterministic pseudo-random generator."""
+
+    def random(self) -> float:
+        """Return deterministic pseudo-random draw."""
+        return 0.25
+
+    def randint(self, lower_inclusive: int, upper_inclusive: int) -> int:
+        """Return deterministic pseudo-random integer."""
+        return lower_inclusive + (upper_inclusive - lower_inclusive) // 2
+
+
+def example_01_contracts() -> None:
+    """Demonstrate creating a broker-independent trading request envelope."""
+    print("\n" + "=" * 100)
+    print("--- 0. Trading Runtime Contracts ---")
+    print("=" * 100)
+
+    request = TradingRequestEnvelope(
+        route=TradingRoute.LIVE,
+        action=TradingAction.SUBMIT_ORDER,
+        promotion_stage=PromotionStage.MICRO_LIVE,
+        mutation_capability=MutationCapability.MICRO_LIVE,
+        request_id="usage-trd-001",
+        correlation_id="usage-corr-001",
+        symbol="EURUSD",
+        allocation_vector=AllocationVector(weights={"child-a": Decimal("1.0")}),
+        quote_snapshot=QuoteSnapshot(
+            symbol="EURUSD",
+            bid=Decimal("1.1000"),
+            ask=Decimal("1.1002"),
+            spread=Decimal("0.0002"),
+            timestamp="2026-07-09T10:00:00Z",
+            source="usage-example",
+            freshness_age_ms=20,
+            wire_timestamp="2026-07-09T10:00:00.000001Z",
+        ),
+    )
+    catalog = get_trading_public_catalog()
+
+    print(f"Request route:      {request.route.value}")
+    print(f"Request action:     {request.action.value}")
+    if request.quote_snapshot is not None:
+        print(f"Quote source:       {request.quote_snapshot.source}")
+    print(f"Registered tools:   {[tool.name for tool in catalog]}")
+
+
+def example_02_state_ports() -> None:
+    """Demonstrate injected Clock and RNG port conformance."""
+    print("\n" + "=" * 100)
+    print("--- 0. Trading Runtime State Ports ---")
+    print("=" * 100)
+
+    clock: Clock = ExampleClock()
+    rng: RNG = ExampleRNG()
+
+    print(f"UTC clock:          {clock.now_utc().isoformat()}")
+    print(f"PTP clock:          {clock.now_ptp().isoformat()}")
+    print(f"Monotonic:          {clock.monotonic()}")
+    print(f"Random draw:        {rng.random()}")
+    print(f"Random int:         {rng.randint(1, 5)}")
 
 
 def get_client() -> Any:
@@ -599,6 +690,8 @@ def example_17_shutdown() -> None:
 
 
 if __name__ == "__main__":
+    example_01_contracts()
+    example_02_state_ports()
     example_01_connect()
     example_02_terminal()
     example_03_account()
