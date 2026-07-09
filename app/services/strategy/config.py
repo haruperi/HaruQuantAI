@@ -43,9 +43,7 @@ class StrategyConfig:
 
     @property
     def strategy_id(self) -> str:
-        return str(
-            self.raw["strategy_manifest"]["identity"]["strategy_id"]
-        )
+        return str(self.raw["strategy_manifest"]["identity"]["strategy_id"])
 
     @property
     def version(self) -> str:
@@ -93,7 +91,9 @@ def load_strategy_config(path: str | Path) -> StrategyConfig:
     try:
         value = json.loads(config_path.read_text(encoding="utf-8"))
     except FileNotFoundError as error:
-        raise ConfigurationError(f"Strategy config does not exist: {config_path}") from error
+        raise ConfigurationError(
+            f"Strategy config does not exist: {config_path}"
+        ) from error
     except json.JSONDecodeError as error:
         raise ConfigurationError(
             f"Strategy config is not valid JSON: {config_path}: {error.msg}"
@@ -109,7 +109,9 @@ def validate_strategy_config(value: Mapping[str, Any]) -> StrategyConfig:
     missing = _REQUIRED_TOP_LEVEL_KEYS.difference(value)
     if missing:
         joined = ", ".join(sorted(missing))
-        raise ConfigurationError(f"Strategy configuration is missing top-level keys: {joined}.")
+        raise ConfigurationError(
+            f"Strategy configuration is missing top-level keys: {joined}."
+        )
 
     unexpected = set(value).difference(_REQUIRED_TOP_LEVEL_KEYS)
     if unexpected:
@@ -150,7 +152,9 @@ def _validate_manifest(manifest: Mapping[str, Any]) -> None:
             )
 
     if not isinstance(manifest["version"], str) or not manifest["version"].strip():
-        raise ConfigurationError("strategy_manifest.version must be a non-empty string.")
+        raise ConfigurationError(
+            "strategy_manifest.version must be a non-empty string."
+        )
 
     runtime_modes = manifest["supported_runtime_modes"]
     if not isinstance(runtime_modes, list) or not runtime_modes:
@@ -159,9 +163,7 @@ def _validate_manifest(manifest: Mapping[str, Any]) -> None:
         )
     _validate_members(runtime_modes, _RUNTIME_MODES, "supported_runtime_modes")
 
-    permissions = _as_mapping(
-        manifest["permissions"], "strategy_manifest.permissions"
-    )
+    permissions = _as_mapping(manifest["permissions"], "strategy_manifest.permissions")
     _require_keys(
         permissions,
         {"lifecycle_status", "permitted_environments", "risk_profile"},
@@ -281,13 +283,17 @@ def _validate_parameter_value(
 
 
 def _validate_required_paths(value: Mapping[str, Any], required: Any) -> None:
-    if not isinstance(required, list) or not all(isinstance(path, str) for path in required):
+    if not isinstance(required, list) or not all(
+        isinstance(path, str) for path in required
+    ):
         raise ConfigurationError("required must be a list of configuration dot paths.")
     for path in required:
         current: Any = value
         for segment in path.split("."):
             if not isinstance(current, Mapping) or segment not in current:
-                raise ConfigurationError(f"Required configuration path is missing: {path}.")
+                raise ConfigurationError(
+                    f"Required configuration path is missing: {path}."
+                )
             current = current[segment]
         if current is None:
             raise ConfigurationError(f"Required configuration path is null: {path}.")
@@ -327,7 +333,9 @@ def _validate_members(values: list[Any], allowed: set[str], name: str) -> None:
         raise ConfigurationError(f"{name} must contain strings only.")
     unexpected = set(values).difference(allowed)
     if unexpected:
-        raise ConfigurationError(f"{name} has unsupported values: {sorted(unexpected)}.")
+        raise ConfigurationError(
+            f"{name} has unsupported values: {sorted(unexpected)}."
+        )
     if len(values) != len(set(values)):
         raise ConfigurationError(f"{name} cannot contain duplicates.")
 

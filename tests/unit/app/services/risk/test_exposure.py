@@ -796,7 +796,9 @@ def test_v2_decompose_fx_trade() -> None:
         strategy_id="strat-1",
         price=Decimal("150.0"),
     )
-    contract2 = ContractSpecification(symbol="USDJPY", contract_size=Decimal("100000.0"))
+    contract2 = ContractSpecification(
+        symbol="USDJPY", contract_size=Decimal("100000.0")
+    )
     base2, quote2 = decompose_fx_trade(trade_sell, Decimal("150.0"), contract2)
     assert base2.currency == "USD"
     assert base2.signed_amount == Decimal("-50000.0")
@@ -851,4 +853,3 @@ def test_v2_extra_helpers() -> None:
 
     assert enforce_currency_rounding(Decimal("123.456"), "USD") == Decimal("123.46")
     assert enforce_currency_rounding(Decimal("123.456"), "JPY") == Decimal(123)
-

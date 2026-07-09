@@ -82,14 +82,18 @@ def test_coerce_path_empty() -> None:
     from pathlib import PosixPath, WindowsPath
 
     if sys.platform == "win32":
+
         class EmptyPathWin(WindowsPath):
             def __str__(self) -> str:
                 return ""
+
         empty_path = EmptyPathWin(".")
     else:
+
         class EmptyPathPosix(PosixPath):
             def __str__(self) -> str:
                 return ""
+
         empty_path = EmptyPathPosix(".")
 
     with pytest.raises(ValidationError, match="path"):
@@ -138,4 +142,3 @@ def test_ensure_dir_creation_failure(mocker: MockerFixture) -> None:
 
     with pytest.raises(ValidationError, match="failed to create parent directory"):
         ensure_parent_dir("data/raw/temp_dir/file.csv")
-

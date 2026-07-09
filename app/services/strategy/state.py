@@ -36,7 +36,9 @@ class StrategyState:
             "last_processed_signal_bar": self.last_processed_signal_bar,
             "daily_trade_count": dict(self.daily_trade_count),
             "open_signal_order_identifiers": dict(self.open_signal_order_identifiers),
-            "cooldown_until": self.cooldown_until.isoformat() if self.cooldown_until else None,
+            "cooldown_until": self.cooldown_until.isoformat()
+            if self.cooldown_until
+            else None,
             "emitted_intent_ids": sorted(self.emitted_intent_ids),
             "processed_event_ids": sorted(self.processed_event_ids),
             "custom": self.custom,
@@ -45,11 +47,17 @@ class StrategyState:
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> StrategyState:
         cooldown_raw = value.get("cooldown_until")
-        cooldown = datetime.fromisoformat(cooldown_raw) if isinstance(cooldown_raw, str) else None
+        cooldown = (
+            datetime.fromisoformat(cooldown_raw)
+            if isinstance(cooldown_raw, str)
+            else None
+        )
         return cls(
             last_processed_signal_bar=value.get("last_processed_signal_bar"),
             daily_trade_count=dict(value.get("daily_trade_count", {})),
-            open_signal_order_identifiers=dict(value.get("open_signal_order_identifiers", {})),
+            open_signal_order_identifiers=dict(
+                value.get("open_signal_order_identifiers", {})
+            ),
             cooldown_until=cooldown,
             emitted_intent_ids=set(value.get("emitted_intent_ids", [])),
             processed_event_ids=set(value.get("processed_event_ids", [])),

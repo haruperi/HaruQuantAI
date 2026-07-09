@@ -136,9 +136,7 @@ def test_validate_metric_catalog_edge_cases() -> None:
     assert "must not use a negative minimum sample size" in str(exc_info.value)
 
     # Test non-MetricDefinition object
-    invalid_object_catalog = {
-        "metric_a": {"not": "a_metric_definition"}
-    }
+    invalid_object_catalog = {"metric_a": {"not": "a_metric_definition"}}
     with pytest.raises(ValidationError) as exc_info:
         validate_metric_catalog(invalid_object_catalog)  # type: ignore[arg-type]
     assert "is invalid" in str(exc_info.value)

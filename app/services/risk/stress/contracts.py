@@ -102,9 +102,7 @@ class StressContext(RiskContract):
     """
 
     portfolio_state: PortfolioState = Field(..., description="Current portfolio state.")
-    market_context: dict[str, Any] = Field(
-        ..., description="Standard market context."
-    )
+    market_context: dict[str, Any] = Field(..., description="Standard market context.")
     proposed_trade: ProposedTrade | None = Field(
         default=None, description="Candidate proposed trade."
     )
@@ -151,9 +149,7 @@ class ProjectedPortfolio(RiskContract):
     is_disconnected: bool = Field(
         default=False, description="True if platform connection is lost."
     )
-    is_stale: bool = Field(
-        default=False, description="True if quotes are stale."
-    )
+    is_stale: bool = Field(default=False, description="True if quotes are stale.")
     is_correlation_to_one: bool = Field(
         default=False, description="True if correlation collapse is simulated."
     )

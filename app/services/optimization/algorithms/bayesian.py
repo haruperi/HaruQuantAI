@@ -126,7 +126,9 @@ def bayesian_optimization(
             c.metadata["fallback_reason"] = "Optuna/scikit-optimize not installed"
         return summary
 
-    logger.info("Bayesian optimization using backend: %s", backend_name)  # pragma: no cover
+    logger.info(
+        "Bayesian optimization using backend: %s", backend_name
+    )  # pragma: no cover
     summary = random_search(  # pragma: no cover
         strategy_ref=strategy_ref,  # pragma: no cover
         symbols=symbols,  # pragma: no cover
@@ -143,7 +145,9 @@ def bayesian_optimization(
     for c in summary.candidates:  # pragma: no cover
         c.metadata["bayesian_backend"] = backend_name  # pragma: no cover
 
-    _ = time.perf_counter() - start_time  # runtime available for future use  # pragma: no cover
+    _ = (
+        time.perf_counter() - start_time
+    )  # runtime available for future use  # pragma: no cover
     return summary  # pragma: no cover
 
 
@@ -200,11 +204,14 @@ def optimization_bayesian(
         runtime_ms = (time.perf_counter() - start_time) * 1000  # pragma: no cover
 
         fallback_used = any(  # pragma: no cover
-            c.metadata.get("bayesian_fallback", False) for c in summary.candidates  # pragma: no cover
+            c.metadata.get("bayesian_fallback", False)
+            for c in summary.candidates  # pragma: no cover
         )  # pragma: no cover
         fallback_reason: str | None = None  # pragma: no cover
         if fallback_used and summary.candidates:  # pragma: no cover
-            fallback_reason = summary.candidates[0].metadata.get("fallback_reason")  # pragma: no cover
+            fallback_reason = summary.candidates[0].metadata.get(
+                "fallback_reason"
+            )  # pragma: no cover
 
         typed_result = BayesianOptimizationResult(  # pragma: no cover
             best_parameters=summary.best_candidate.parameters,  # pragma: no cover

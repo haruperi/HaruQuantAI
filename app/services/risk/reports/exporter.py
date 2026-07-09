@@ -6,8 +6,8 @@ policies, and builds write receipt evidence upon export completion.
 
 from __future__ import annotations
 
-from datetime import datetime
 import hashlib
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -54,9 +54,7 @@ class ReportWriteReceipt(RiskContract):
     report_id: str = Field(..., description="Unique report ID.")
     destination_path: str = Field(..., description="Absolute destination path.")
     checksum: str = Field(..., description="SHA256 checksum of written report.")
-    written_at: datetime = Field(
-        ..., description="Timestamp of write operation."
-    )
+    written_at: datetime = Field(..., description="Timestamp of write operation.")
 
 
 def validate_report_export_destination(

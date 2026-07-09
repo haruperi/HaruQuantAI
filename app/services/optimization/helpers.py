@@ -280,7 +280,9 @@ def run_strategy_backtest(
     if response.get("status") == "error":
         err = response.get("error") or {}  # pragma: no cover
         code = err.get("code") or "OPT_CANDIDATE_EXECUTION_FAILED"  # pragma: no cover
-        details = err.get("details") or response.get("message") or "Backtest run failed"  # pragma: no cover
+        details = (
+            err.get("details") or response.get("message") or "Backtest run failed"
+        )  # pragma: no cover
         raise OptimizationExecutionError(details, code=code)  # pragma: no cover
 
     data = response.get("data") or {}
@@ -342,7 +344,9 @@ def _pair_deals_into_trades(
         if "buy" in side.lower():  # pragma: no cover
             if open_sells.get(sym):  # pragma: no cover
                 match = open_sells[sym].pop(0)  # pragma: no cover
-                profit = (match["price"] - price) * vol * 100000.0 - (  # pragma: no cover
+                profit = (
+                    match["price"] - price
+                ) * vol * 100000.0 - (  # pragma: no cover
                     comm + match["commission"]  # pragma: no cover
                 )  # pragma: no cover
                 realized_trades.append(  # pragma: no cover
@@ -642,7 +646,9 @@ def json_safe_serialize(obj: Any) -> Any:  # noqa: ANN401,C901,PLR0911,PLR0912
     if isinstance(obj, date):
         return obj.isoformat()  # pragma: no cover
     if isinstance(obj, dict):
-        return {str(k): json_safe_serialize(v) for k, v in obj.items()}  # pragma: no cover
+        return {
+            str(k): json_safe_serialize(v) for k, v in obj.items()
+        }  # pragma: no cover
     if isinstance(obj, list | tuple):
         return [json_safe_serialize(v) for v in obj]  # pragma: no cover
     if isinstance(obj, set | frozenset):

@@ -103,10 +103,12 @@ def test_to_json_safe_numpy_and_pandas() -> None:
         series = pd.Series([10, 20, 30])
         assert to_json_safe(series, policy) == [10, 20, 30]
 
-        df = pd.DataFrame([
-            {"a": 1, "b": Decimal("2.2")},
-            {"a": 3, "b": Decimal("4.4")},
-        ])
+        df = pd.DataFrame(
+            [
+                {"a": 1, "b": Decimal("2.2")},
+                {"a": 3, "b": Decimal("4.4")},
+            ]
+        )
         assert to_json_safe(df, policy) == [
             {"a": 1, "b": 2.2},
             {"a": 3, "b": 4.4},

@@ -748,9 +748,21 @@ def test_correlation_v2_features() -> None:
 
     # 1. build_return_series
     bars = [
-        ClosedBar(time=datetime(2026, 6, 18, 10, 0, tzinfo=UTC), open=Decimal("1.10"), close=Decimal("1.11")),
-        ClosedBar(time=datetime(2026, 6, 18, 10, 1, tzinfo=UTC), open=Decimal("1.11"), close=Decimal("1.12")),
-        ClosedBar(time=datetime(2026, 6, 18, 10, 2, tzinfo=UTC), open=Decimal("1.12"), close=Decimal("1.13")),
+        ClosedBar(
+            time=datetime(2026, 6, 18, 10, 0, tzinfo=UTC),
+            open=Decimal("1.10"),
+            close=Decimal("1.11"),
+        ),
+        ClosedBar(
+            time=datetime(2026, 6, 18, 10, 1, tzinfo=UTC),
+            open=Decimal("1.11"),
+            close=Decimal("1.12"),
+        ),
+        ClosedBar(
+            time=datetime(2026, 6, 18, 10, 2, tzinfo=UTC),
+            open=Decimal("1.12"),
+            close=Decimal("1.13"),
+        ),
     ]
     ret_series = build_return_series(bars, ReturnMethod.CLOSE_TO_CLOSE)
     assert ret_series.symbol == ""
@@ -763,10 +775,7 @@ def test_correlation_v2_features() -> None:
     assert len(ret_series_otc.returns) == 3
 
     # 2. align_return_series V2
-    series_map = {
-        "A": ret_series,
-        "B": ret_series
-    }
+    series_map = {"A": ret_series, "B": ret_series}
     aligned = align_return_series(series_map, CorrelationAlignmentPolicy.INTERSECT)
     assert len(aligned.timestamps) == 2
     assert "A" in aligned.returns
@@ -816,11 +825,13 @@ def test_correlation_v2_features() -> None:
 
     # 10. calculate_component_risk_contribution
     from app.services.risk.correlation.contracts import CovarianceMatrix
-    cov = CovarianceMatrix(matrix={
-        "A": {"A": Decimal("0.04"), "B": Decimal("0.02")},
-        "B": {"A": Decimal("0.02"), "B": Decimal("0.09")},
-    })
+
+    cov = CovarianceMatrix(
+        matrix={
+            "A": {"A": Decimal("0.04"), "B": Decimal("0.02")},
+            "B": {"A": Decimal("0.02"), "B": Decimal("0.09")},
+        }
+    )
     weights = [Decimal("0.6"), Decimal("0.4")]
     contribs = calculate_component_risk_contribution(cov, weights)
     assert len(contribs.contributions) == 2
-

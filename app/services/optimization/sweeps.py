@@ -247,7 +247,9 @@ def _evaluate_single_fold(
                 **kwargs,  # pragma: no cover
             )  # pragma: no cover
             oos_res = evaluate_candidate_score(  # pragma: no cover
-                bt_res.trades, request.initial_balance, request.objective  # pragma: no cover
+                bt_res.trades,
+                request.initial_balance,
+                request.objective,  # pragma: no cover
             )  # pragma: no cover
         except Exception:  # noqa: BLE001  # pragma: no cover
             oos_res = evaluate_candidate_score(  # pragma: no cover
@@ -499,8 +501,12 @@ def print_optimization_report(summary: OptimizationSummary) -> str:
     for idx, cand in enumerate(top_cands):
         lines.append(f"### Rank {idx + 1}")  # pragma: no cover
         lines.append(f"- **Score:** {cand.score:.4f}")  # pragma: no cover
-        lines.append(f"- **Net Profit:** {cand.metrics.get('net_profit', 0.0):.2f}")  # pragma: no cover
-        lines.append(f"- **Drawdown:** {cand.metrics.get('max_drawdown', 0.0):.2%}")  # pragma: no cover
+        lines.append(
+            f"- **Net Profit:** {cand.metrics.get('net_profit', 0.0):.2f}"
+        )  # pragma: no cover
+        lines.append(
+            f"- **Drawdown:** {cand.metrics.get('max_drawdown', 0.0):.2%}"
+        )  # pragma: no cover
         lines.append(f"- **Parameters:** `{cand.parameters}`")  # pragma: no cover
         lines.append("")  # pragma: no cover
     return "\n".join(lines)

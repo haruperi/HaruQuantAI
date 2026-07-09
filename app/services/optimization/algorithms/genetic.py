@@ -241,7 +241,9 @@ def genetic_algorithm(  # noqa: C901, PLR0912, PLR0915
                     metadata={"candidate_hash": cand_hash},  # pragma: no cover
                 )  # pragma: no cover
             except OptimizationExecutionError as exc:  # pragma: no cover
-                logger.error("Candidate execution failed in GA: %s", exc)  # pragma: no cover
+                logger.error(
+                    "Candidate execution failed in GA: %s", exc
+                )  # pragma: no cover
                 return None  # pragma: no cover
 
         evaluated_cache[cand_hash] = result_item

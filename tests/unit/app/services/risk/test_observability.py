@@ -1,7 +1,16 @@
 """Unit tests for the Risk Governance observability module."""
 
 from decimal import Decimal
+
 import pytest
+from app.services.risk.models import RiskDecisionPackage
+from app.services.risk.models.enums import RiskDecisionStatus
+from app.services.risk.observability.decorators import (
+    RiskBoundaryEvent,
+    log_risk_boundary_event,
+    measure_risk_latency,
+    risk_observed,
+)
 from app.services.risk.observability.metrics import (
     InMemoryRiskMetricsSink,
     RiskObservabilityEvent,
@@ -9,14 +18,6 @@ from app.services.risk.observability.metrics import (
     build_latency_metric,
     emit_risk_metrics,
 )
-from app.services.risk.observability.decorators import (
-    RiskBoundaryEvent,
-    log_risk_boundary_event,
-    measure_risk_latency,
-    risk_observed,
-)
-from app.services.risk.models import RiskDecisionPackage
-from app.services.risk.models.enums import RiskDecisionStatus
 
 
 class DummyLogger:

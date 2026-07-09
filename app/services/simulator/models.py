@@ -71,7 +71,11 @@ class BacktestConfig:
             raise ValueError("spread_points and slippage_points cannot be negative.")
         if self.contract_size <= 0 or self.default_quantity <= 0:
             raise ValueError("contract_size and default_quantity must be positive.")
-        if self.volume_min <= 0 or self.volume_max < self.volume_min or self.volume_step <= 0:
+        if (
+            self.volume_min <= 0
+            or self.volume_max < self.volume_min
+            or self.volume_step <= 0
+        ):
             raise ValueError("Invalid volume constraints.")
 
     @property

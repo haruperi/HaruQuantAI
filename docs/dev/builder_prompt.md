@@ -1,41 +1,42 @@
-# Prompt for Building Phase 5: Risk Governance Upgrade
+# Prompt for Building Phase 7: Trading Runtime
 
-Copy and paste this prompt when starting the AI build session for the Risk Governance upgrade.
+Copy and paste this prompt when starting the AI build session for the Trading Runtime module.
 
 ---
 
 ## Task Objective
-You are tasked with upgrading the existing Risk Governance domain (`app/services/risk/` v1) to the new structure specified in the architecture requirements document: [05-risk.md](file:///c:/Users/rharu/AppDev/HaruquantAI/docs/dev/phase-implementation-plan/05-risk.md).
+You are tasked with building the new Trading Runtime domain (`app/services/trading/`) from scratch as specified in the architecture requirements document: [07_trading.md](file:///c:/Users/rharu/AppDev/HaruquantAI/docs/dev/phase-implementation-plan/07_trading.md).
 
-This is a modular upgrade. We are transitioning from a single-folder flat list of files in v1 to a structured, multi-module package. 
-* **Precedence:** Precedence is given to the functional requirements of version 2.
-* **No Backward Compatibility:** Do not keep backward compatibility where v2 overrides v1.
-* **No Skipped Functionality:** Ensure that all business logic and capabilities covered in version 1 are preserved and integrated into the corresponding version 2 files.
+Since this module is being built completely from scratch, there are no legacy files to clean up in the folder.
+* **Precedence:** Precedence is given to the functional requirements defined in [07_trading.md](file:///c:/Users/rharu/AppDev/HaruquantAI/docs/dev/phase-implementation-plan/07_trading.md).
+* **Strict Integrity:** Enforce all 186 functional requirements (`TRD-FR-001` through `TRD-FR-186`), 19 non-functional requirements (`TRD-NFR-001` through `TRD-NFR-019`), and all 10 cross-module contract requirements (`TRD-XM-001` through `TRD-XM-010`).
+* **Design Parity:** All MQL5-compatible wrappers under `trading/info/` must align with the read-only facades defined in the specification.
 
 ---
 
 ## 10-Step Workflow per Module
 Execute this sequence module-by-module. Do not start a new module until the current module is fully completed, tested, and validated.
 
-1. **Implement Functional Requirements:** Create or update the v2 module files as specified in Section 3 of [05-risk.md](file:///c:/Users/rharu/AppDev/HaruquantAI/docs/dev/phase-implementation-plan/05-risk.md).
-2. **Review v1 Logic & Cleanup:** Open the corresponding old v1 file(s). Compare the logic to ensure no functionality is skipped. Port any missing v1 business logic to the new v2 files, then **delete** the old v1 file(s) from the root of `app/services/risk/`.
+1. **Implement Functional Requirements:** Create the module files as specified in Section 3 of [07_trading.md](file:///c:/Users/rharu/AppDev/HaruquantAI/docs/dev/phase-implementation-plan/07_trading.md).
+2. **Double Check Requirements:** Verify that every requirement tag mapped to this file is fully satisfied without shortcuts.
 3. **Google Standard Docstrings:** Document all modules, classes, and functions using the Google Python Style Guide docstring format (including types, arguments, returns, and exceptions raised).
 4. **Strict Logging:** Log every function using the custom system logger (`from app.utils.logger import logger`).
    * Every function must have at least one log.
    * If a function has no specific steps to log, log what the function did (e.g. input/output summary).
-   * Use `info` level for routine operational milestones (e.g., successful policy resolution or gate validation).
-   * Use `debug` level for granular information (e.g., intermediate matrix steps or calculations).
-5. **Unit Tests (> 80% Coverage):** Add or update unit tests under `tests/risk/unit/`. Run tests and ensure the coverage for each new/modified file is greater than 80%.
-6. **Usage Examples:** Add a dedicated function inside [05_risk.py](file:///c:/Users/rharu/AppDev/HaruquantAI/tests/usage/05_risk.py) for the current module.
-   * Use the naming convention: `example_{#}_{module_name}()` (e.g., `example_01_readiness()`).
+   * Use `info` level for routine operational milestones (e.g., successful order validations, gate decisions, or state transitions).
+   * Use `debug` level for granular information (e.g., tick/price details, internal bucket fills, or lock updates).
+5. **Unit Tests (Coverage Target >= 80% / 100% Branch Coverage for Critical Files):** Add unit tests under `tests/services/trading/`. Ensure coverage is >= 80%.
+   * **CRITICAL:** The modules `gates/`, `execution/state_machine.py`, `state/idempotency.py`, and `reconciliation/` MUST achieve **100% branch coverage**, verified in isolation using separate `--cov-branch --cov-fail-under=100` checks.
+6. **Usage Examples:** Add a dedicated function inside [07_trading.py](file:///c:/Users/rharu/AppDev/HaruquantAI/tests/usage/07_trading.py) for the current module.
+   * Use the naming convention: `example_{#}_{module_name}()` (e.g., `example_01_contracts()`).
    * Structure it so it can be run independently or sequentially. Reference [02_data.py](file:///c:/Users/rharu/AppDev/HaruquantAI/tests/usage/02_data.py) for the style.
-7. **Update Module README:** Add or update a README inside the module folder explaining its boundary role, interfaces, and options.
-8. **Update Changelog & Traceability:** Document the structural changes and functionality updates in `docs/dev/phase-implementation-plan/CHANGELOG.md`. Also, update the implementation file [05-risk.md](file:///c:/Users/rharu/AppDev/HaruquantAI/docs/dev/phase-implementation-plan/05-risk.md) by marking `[X]` for all completed requirements and sub-items. For each completed requirement, add implementation proof directly in the format `*Evidence: <file_path> line <start>-<end>*` (e.g. `*Evidence: app/services/risk/models/contracts.py line 96-113*`). For requirements with multiple grouped items, write evidence on each item. Ensure line numbers are exact rather than referencing the entire file.
+7. **Update Module README:** Add a README inside the module folder explaining its boundary role, interface inputs, and dependencies.
+8. **Update Changelog & Traceability:** Document structural changes and implementation updates in `docs/dev/phase-implementation-plan/CHANGELOG.md`. Also, update [07_trading.md](file:///c:/Users/rharu/AppDev/HaruquantAI/docs/dev/phase-implementation-plan/07_trading.md) by marking `[X]` for all completed requirements and sub-items. For each completed requirement, add implementation proof directly in the format `*Evidence: <file_path> line <start>-<end>*` (e.g., `*Evidence: app/services/trading/contracts.py line 40-62*`). Ensure line numbers are exact.
 9. **Quality Checks:** Run the following commands in the workspace and verify all checks pass:
-   * `uv run ruff check --fix .`
-   * `uv run ruff format .`
-   * `uv run mypy .`
-   * `pre-commit run --all-files` (or relevant pre-commit checks).
+   * `uv run ruff check --fix app/services/trading`
+   * `uv run ruff format app/services/trading`
+   * `uv run mypy app/services/trading`
+   * `pre-commit run --all-files`
 10. **Draft Commit Message:** Output a clean, structured git commit message summarizing the changes for this module. **Do NOT run `git commit` automatically; the user will review and commit manually.**
 
 ---
@@ -45,251 +46,218 @@ Execute this sequence module-by-module. Do not start a new module until the curr
 * **Formatters:** Double quotes, magic trailing commas. Run order: `ruff check --fix` -> `ruff format` -> `mypy`.
 * **Typing:** Explicit type hints on all signatures. No generic `Any` types where specific models/collections can be typed.
 * **Imports:** Always use absolute imports.
+* **Clock/RNG Parity:** Enforce that all timestamps, staleness checks, and randomizations leverage the injected `Clock` and `RNG` dependencies (`TRD-FR-138/140`). Direct imports of `datetime.now`, `time.time`, or similar are strictly prohibited.
 
 ---
 
-Below is the recommended **dependency-safe implementation order** for all modules and files listed under Functional Requirements in the `05-risk.md`.
+## Dependency-Safe Implementation Order
+Always build from the bottom up, following this rule:
 
-The rule is:
+> **Contracts first → Ports & Configs → Primitives (Idempotency, Journal, Error Redaction) → Info Facades → Actions & Validations → Execution & Coordination → Gates Middleware → Reconciliation & Authority → Monitoring & Watchdogs → Run Session Management → Tool Registry & Exports.**
 
-> **Contracts first → pure engines → gate aggregation → governed orchestration → side-effect ports → reports/tools/adapters.**
+Below is the recommended step-by-step order:
 
-## 0. Package skeleton first
-### Section -> 📂 Module: `app/services/risk`
+### 0. Package skeleton first
+Create the folders and lightweight empty `__init__.py` files to define the workspace structure.
 
-Create the folders and lightweight `__init__.py` files first, but keep them mostly empty until the public registry is finalized.
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 0.1 | `app/services/trading/__init__.py` | Create placeholder init (final exports will be added last). |
 
-| Order | File                            | Why first                                                                                                      | Old V1 File to Clean |
-| ----: | ------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------- |
-|   0.1 | `app/services/risk/__init__.py` | Create as a safe placeholder only. Final exports should be added near the end after official tools are stable. | Keep placeholder (do not delete yet) |
+---
 
-## 1. Core models and deterministic primitives
-### Section -> 📂 Module: `app/services/risk/models`
+### 1. Contracts & Interfaces (Data & State Models)
+Defines all shared request/response models, allocations, and type-safe enums.
 
-Everything else depends on these contracts, enums, and serialization helpers.
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 1.1 | `app/services/trading/contracts.py` | Defines routes, TIFs, AllocationVector, RegulatoryTags, NormalizedTradeResult, and error envelope structures. <br>**Tracked:** `TRD-FR-004`, `TRD-FR-005`, `TRD-FR-006`, `TRD-FR-007`, `TRD-FR-008`, `TRD-FR-009`, `TRD-FR-010`, `TRD-FR-011`, `TRD-FR-012`, `TRD-FR-013`, `TRD-FR-014`, `TRD-FR-015`, `TRD-FR-016`, `TRD-FR-017`, `TRD-FR-018`. |
+| 1.2 | `app/services/trading/state/ports.py` | Declares protocols/abstract interfaces for TradeStore, TradingStateStore, AuditSink, IdempotencyStore, EventJournal, Clock, RNG, and EncryptionProvider. <br>**Tracked:** `TRD-FR-133`, `TRD-FR-134`, `TRD-FR-135`, `TRD-FR-136`, `TRD-FR-137`, `TRD-FR-138`, `TRD-FR-139`, `TRD-FR-140`, `TRD-FR-141`, `TRD-FR-142`. |
 
-| Order | File                      | Purpose                                                                                             | Old V1 File to Clean |
-| ----: | ------------------------- | --------------------------------------------------------------------------------------------------- | -------------------- |
-|   1.1 | `models/enums.py`         | Risk statuses, reason codes, severity ordering, modes, lifecycle enums.                             | `app/services/risk/models.py` |
-|   1.2 | `models/contracts.py`     | Canonical models: requests, snapshots, proposed trades, decisions, tokens, evidence refs, warnings. | `app/services/risk/models.py` |
-|   1.3 | `models/serialization.py` | Canonical JSON-safe serialization, stable payloads, round-trip helpers.                             | `app/services/risk/models.py` |
+---
 
-Build tests immediately for enum values, model validation, and JSON round-trips.
+### 2. Configurations & Security Controls
+Handles secrets validation, hot-reloading boundaries, and credential mapping.
 
-## 2. Configuration profiles and hashing
-### Section -> 📂 Module: `app/services/risk/config`
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 2.1 | `app/services/trading/config/models.py` | Holds route settings, rate limits, timeouts, and secrets references. <br>**Tracked:** `TRD-FR-054`, `TRD-FR-055`, `TRD-FR-056`. |
+| 2.2 | `app/services/trading/config/loader.py` | Validates configuration constraints, supports immutable configs, and enforces reloading policies. <br>**Tracked:** `TRD-FR-057`, `TRD-FR-058`, `TRD-FR-059`. |
+| 2.3 | `app/services/trading/config/secrets.py` | Resolves database credentials/tokens via references without leaking strings. <br>**Tracked:** `TRD-FR-060`, `TRD-FR-061`. |
+| 2.4 | `app/services/trading/config/notifications.py` | Manages operational notifications channel parameters. <br>**Tracked:** `TRD-FR-062`. |
+| 2.5 | `app/services/trading/config/security_profile.py` | Defines encryption/security transport profiles. <br>**Tracked:** `TRD-FR-063`. |
 
-Policy, governor decisions, audit records, and tokens all depend on stable config hashes.
+---
 
-| Order | File                 | Purpose                                                                | Old V1 File to Clean |
-| ----: | -------------------- | ---------------------------------------------------------------------- | -------------------- |
-|   2.1 | `config/schema.py`   | Strict config schema and validation rules.                             | `app/services/risk/config.py` |
-|   2.2 | `config/profiles.py` | Built-in profiles: safe default, prop firm, paper, live conservative.  | `app/services/risk/config.py` |
-|   2.3 | `config/hashing.py`  | Stable config canonicalization and hash generation.                    | `app/services/risk/config.py` |
-|   2.4 | `config/loader.py`   | Explicit config loading from approved sources. No import-time loading. | `app/services/risk/config.py` |
+### 3. Security Boundaries & Error Redaction
+Constructs the recursive redaction boundaries and exception mapping structures.
 
-## 3. Storage ports and offline stores
-### Section -> 📂 Module: `app/services/risk/storage`
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 3.1 | `app/services/trading/security/error_mapping.py` | Translates raw SDK errors into standard error codes. <br>**Tracked:** `TRD-FR-176`, `TRD-FR-177`. |
+| 3.2 | `app/services/trading/security/redaction_boundary.py` | Redacts sensitive credentials recursively; exposes a crash-resilient write-ahead DLQ logger. <br>**Tracked:** `TRD-FR-178`, `TRD-FR-179`, `TRD-FR-180`, `TRD-FR-181`. |
 
-Define side-effect boundaries early, but keep actual business logic independent from persistence.
+---
 
-| Order | File                   | Purpose                                                                    | Old V1 File to Clean |
-| ----: | ---------------------- | -------------------------------------------------------------------------- | -------------------- |
-|   3.1 | `storage/ports.py`     | Protocols for state store, audit sink, policy store, decision store.       | `app/services/risk/storage.py` |
-|   3.2 | `storage/in_memory.py` | Deterministic in-memory implementation for tests, offline, and simulation. | `app/services/risk/storage.py` |
+### 4. Persistence Implementations (Idempotency & Event Journal)
+Ensures state transitions are durable, duplicate-free, and forensics-replayable.
 
-## 4. Policy-as-code layer
-### Section -> 📂 Module: `app/services/risk/policy`
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 4.1 | `app/services/trading/state/idempotency.py` | Computes JSON-canonical key hashes and tracks active in-progress leases. <br>**Tracked:** `TRD-FR-143`, `TRD-FR-144`, `TRD-FR-145`. |
+| 4.2 | `app/services/trading/state/event_journal.py` | Implements append-only journals, logical clock ordering sequence, state snapshots, replay builders, and detached signatures. <br>**Tracked:** `TRD-FR-146`, `TRD-FR-147`, `TRD-FR-148`, `TRD-FR-149`, `TRD-FR-150`, `TRD-FR-151`, `TRD-FR-152`, `TRD-FR-153`, `TRD-FR-154`, `TRD-FR-155`, `TRD-FR-156`. |
+| 4.3 | `app/services/trading/state/manager.py` | Exposes local state update coordinators. |
 
-Most downstream gates need an effective policy.
+---
 
-| Order | File                  | Purpose                                                                      | Old V1 File to Clean |
-| ----: | --------------------- | ---------------------------------------------------------------------------- | -------------------- |
-|   4.1 | `policy/contracts.py` | Policy scope, precedence, expiry, enforcement result contracts.              | `app/services/risk/policy.py` |
-|   4.2 | `policy/resolver.py`  | Resolve effective policy by account, strategy, symbol, mode, workflow, role. | `app/services/risk/policy.py` |
-|   4.3 | `policy/overrides.py` | Override validation, approval requirement, token/config compatibility.       | `app/services/risk/policy.py` |
+### 5. Read-Only Info Facades
+Exposes MQL5-compatible read-only wrappers for terminal indicators, accounts, symbols, and historical orders.
 
-## 5. Phase readiness and implementation readiness checks
-### Section -> 📂 Module: `app/services/risk/readiness`
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 5.1 | `app/services/trading/info/account.py` | Exposes read-only account balance, margin, leverage. <br>**Tracked:** `TRD-FR-050`, `TRD-FR-051`, `TRD-FR-052`, `TRD-FR-053` (collectively across all `info/*` facades). |
+| 5.2 | `app/services/trading/info/symbol.py` | Resolves symbol trade sessions, min/max volume limits, tick sizes. <br>**Tracked:** `TRD-FR-050`, `TRD-FR-051`, `TRD-FR-052`, `TRD-FR-053` (collectively). |
+| 5.3 | `app/services/trading/info/position.py` | Wraps active broker positions. <br>**Tracked:** `TRD-FR-050`, `TRD-FR-051`, `TRD-FR-052`, `TRD-FR-053` (collectively). |
+| 5.4 | `app/services/trading/info/order.py` | Exposes pending order tickets. <br>**Tracked:** `TRD-FR-050`, `TRD-FR-051`, `TRD-FR-052`, `TRD-FR-053` (collectively). |
+| 5.5 | `app/services/trading/info/deal.py` | Resolves transaction execution details. <br>**Tracked:** `TRD-FR-050`, `TRD-FR-051`, `TRD-FR-052`, `TRD-FR-053` (collectively). |
+| 5.6 | `app/services/trading/info/history_order.py` | Fetches closed historical orders. <br>**Tracked:** `TRD-FR-050`, `TRD-FR-051`, `TRD-FR-052`, `TRD-FR-053` (collectively). |
+| 5.7 | `app/services/trading/info/terminal.py` | Exposes broker terminal connection state. <br>**Tracked:** `TRD-FR-050`, `TRD-FR-051`, `TRD-FR-052`, `TRD-FR-053` (collectively). |
 
-This can now use models, config, and dependency-status contracts safely.
+---
 
-| Order | File                           | Purpose                                                                                    | Old V1 File to Clean |
-| ----: | ------------------------------ | ------------------------------------------------------------------------------------------ | -------------------- |
-|   5.1 | `readiness/phase_readiness.py` | Phase 5 readiness report, dependency validation, dry-run planning, mode matrix validation. | None |
+### 6. Validation & Action Primitives
+Implements local parameter validation, fat-finger ceilings, and symbol blocklists.
 
-## 6. Market regime gate
-### Section -> 📂 Module: `app/services/risk/regime`
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 6.1 | `app/services/trading/actions/validation.py` | Handles Decimal normalization, stops distance, margin math, account conversion rates, and short locate validation checks. <br>**Tracked:** `TRD-FR-037`, `TRD-FR-038`, `TRD-FR-039`, `TRD-FR-040`, `TRD-FR-041`, `TRD-FR-042`, `TRD-FR-043`, `TRD-FR-044`, `TRD-FR-045`, `TRD-FR-046`, `TRD-FR-047`, `TRD-FR-048`, `TRD-FR-049`. |
+| 6.2 | `app/services/trading/actions/orders.py` | Defines basic buy, sell, limit, stop, modify, and delete actions. <br>**Tracked:** `TRD-FR-021`, `TRD-FR-022`, `TRD-FR-023`, `TRD-FR-024`, `TRD-FR-025`. |
+| 6.3 | `app/services/trading/actions/positions.py` | Coordinates position modifications, SL/TP setups, and exposure reductions. <br>**Tracked:** `TRD-FR-026`, `TRD-FR-027`. |
+| 6.4 | `app/services/trading/actions/controls.py` | Defines strategy pause, resume, shutdown, and kill switches. <br>**Tracked:** `TRD-FR-028`, `TRD-FR-029`, `TRD-FR-030`, `TRD-FR-031`, `TRD-FR-032`, `TRD-FR-033`, `TRD-FR-034`. |
+| 6.5 | `app/services/trading/actions/emergency.py` | Coordinates emergency cancel-all and flatten commands. <br>**Tracked:** `TRD-FR-035`, `TRD-FR-036`. |
 
-Build this before limits and the governor because regime status influences throttling, rejection, and allocation.
+---
 
-| Order | File                   | Purpose                                                                                   | Old V1 File to Clean |
-| ----: | ---------------------- | ----------------------------------------------------------------------------------------- | -------------------- |
-|   6.1 | `regime/validation.py` | Validate market evidence, freshness, quote shape, closed-bar assumptions.                 | `app/services/risk/regime.py` |
-|   6.2 | `regime/assessor.py`   | Spread, volatility, liquidity, rollover, session, news, stale-data regime classification. | `app/services/risk/regime.py` |
+### 7. Execution Primitives & State Machine
+Enforces state machine rules, commission calculation, and provider code classification.
 
-## 7. Position sizing engine
-### Section -> 📂 Module: `app/services/risk/sizing`
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 7.1 | `app/services/trading/execution/state_machine.py` | Maps valid order/position lifecycle transitions, version-gated amendments, and duplicate report deduplication. <br>**Tracked:** `TRD-FR-126`, `TRD-FR-127`, `TRD-FR-128`, `TRD-FR-129`, `TRD-FR-130`, `TRD-FR-131`. |
+| 7.2 | `app/services/trading/execution/response_classifier.py` | Standardizes broker return codes, server stop-out events, and corporate actions. <br>**Tracked:** `TRD-FR-117`, `TRD-FR-118`, `TRD-FR-119`, `TRD-FR-120`, `TRD-FR-121`, `TRD-FR-122`. |
+| 7.3 | `app/services/trading/execution/rate_limiter.py` | Implements client-side token-bucket rate limits per broker provider. <br>**Tracked:** `TRD-FR-123`, `TRD-FR-124`. |
+| 7.4 | `app/services/trading/execution/broker_capability_validation.py` | Resolves supported order capabilities (native OCO, CoD, attachment support). <br>**Tracked:** `TRD-FR-115`, `TRD-FR-116`. |
+| 7.5 | `app/services/trading/execution/shadow.py` | Implements shadow-routing comparison models. <br>**Tracked:** `TRD-FR-125`. |
 
-Sizing should stay pure and deterministic. Normalization is separate so broker-compatible rounding does not pollute sizing math.
+---
 
-| Order | File                      | Purpose                                                                                              | Old V1 File to Clean |
-| ----: | ------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------- |
-|   7.1 | `sizing/contracts.py`     | Sizing request/result contracts and sizing method enum.                                              | `app/services/risk/sizing.py` |
-|   7.2 | `sizing/normalization.py` | Volume precision, lot-step flooring, symbol metadata validation.                                     | `app/services/risk/sizing.py` |
-|   7.3 | `sizing/calculators.py`   | Fixed-risk, fractional, volatility-adjusted, correlation-adjusted, milestone, advisory Kelly sizing. | `app/services/risk/sizing.py` |
+### 8. Gating Middleware (Policy Matrix & Pre-Flight Checks)
+Implements the 16 canonical pre-flight gates, dual approvals, and turbulence halts.
 
-## 8. Currency exposure engine
-### Section -> 📂 Module: `app/services/risk/exposure`
-
-Portfolio exposure and concentration gates depend on this.
-
-| Order | File                      | Purpose                                                                             | Old V1 File to Clean |
-| ----: | ------------------------- | ----------------------------------------------------------------------------------- | -------------------- |
-|   8.1 | `exposure/fx_legs.py`     | FX symbol parsing and base/quote leg decomposition.                                 | `app/services/risk/exposure.py` |
-|   8.2 | `exposure/aggregation.py` | Currency exposure aggregation across open, pending, in-flight, and proposed trades. | `app/services/risk/exposure.py` |
-
-## 9. Correlation engine
-### Section -> 📂 Module: `app/services/risk/correlation`
-
-Correlation depends on return-series construction and fallback behavior.
-
-| Order | File                       | Purpose                                                                       | Old V1 File to Clean |
-| ----: | -------------------------- | ----------------------------------------------------------------------------- | -------------------- |
-|   9.1 | `correlation/returns.py`   | Closed-bar returns, alignment, minimum-sample validation.                     | `app/services/risk/correlation.py` |
-|   9.2 | `correlation/fallbacks.py` | Missing-data and insufficient-sample fallback resolution.                     | `app/services/risk/correlation.py` |
-|   9.3 | `correlation/engine.py`    | Correlation matrix, cluster exposure, correlation impact, dynamic thresholds. | `app/services/risk/correlation.py` |
-
-## 10. Tail-risk engines
-### Section -> 📂 Module: `app/services/risk/tail_risk`
-
-VaR and Expected Shortfall are independent pure calculators and are needed by limits and governor review.
-
-| Order | File                              | Purpose                                                           | Old V1 File to Clean |
-| ----: | --------------------------------- | ----------------------------------------------------------------- | -------------------- |
-|  10.1 | `tail_risk/contracts.py`          | VaR/ES request, snapshot, method, and assumptions contracts.      | `app/services/risk/var_es.py` |
-|  10.2 | `tail_risk/var.py`                | Parametric, historical, and Monte Carlo VaR calculations.         | `app/services/risk/var_es.py` |
-|  10.3 | `tail_risk/expected_shortfall.py` | Historical and parametric Expected Shortfall / CVaR calculations. | `app/services/risk/var_es.py` |
-
-## 11. Stress testing engine
-### Section -> 📂 Module: `app/services/risk/stress`
-
-Stress results are stronger tail-risk gates than VaR alone, so this must be ready before final limit checks.
-
-| Order | File                  | Purpose                                                        | Old V1 File to Clean |
-| ----: | --------------------- | -------------------------------------------------------------- | -------------------- |
-|  11.1 | `stress/contracts.py` | Stress scenario, request, result, and summary contracts.       | `app/services/risk/stress.py` |
-|  11.2 | `stress/registry.py`  | Built-in stress scenario registry and scenario lookup.         | `app/services/risk/stress.py` |
-|  11.3 | `stress/engine.py`    | Scenario application, stress-loss calculation, stress summary. | `app/services/risk/stress.py` |
-
-## 12. Feasibility gates
-### Section -> 📂 Module: `app/services/risk/feasibility`
-
-These are practical execution feasibility checks, still without broker mutation.
-
-| Order | File                            | Purpose                                                                       | Old V1 File to Clean |
-| ----: | ------------------------------- | ----------------------------------------------------------------------------- | -------------------- |
-|  12.1 | `feasibility/margin.py`         | Margin projection, free-margin impact, leverage and broker-constraint checks. | `app/services/risk/margin.py` |
-|  12.2 | `feasibility/drawdown.py`       | Drawdown state, throttling multiplier, daily/total drawdown gates.            | `app/services/risk/drawdown.py` |
-|  12.3 | `feasibility/execution_gate.py` | Spread, slippage, stop-level, freeze-level, marketability checks.             | `app/services/risk/execution_gate.py` |
-
-## 13. Limit engine
-### Section -> 📂 Module: `app/services/risk/limits`
-
-Build contracts first, then individual checks, then ordered aggregation.
-
-| Order | File                  | Purpose                                                                                                 | Old V1 File to Clean |
-| ----: | --------------------- | ------------------------------------------------------------------------------------------------------- | -------------------- |
-|  13.1 | `limits/contracts.py` | Limit check/result contracts and ordered-check registry shape.                                          | `app/services/risk/limits.py` |
-|  13.2 | `limits/checks.py`    | Pure checks: kill-switch, stale evidence, loss, exposure, VaR/ES, stress, margin, execution, frequency. | `app/services/risk/limits.py` |
-|  13.3 | `limits/engine.py`    | Ordered limit evaluation, primary failure selection, composite breach flags.                            | `app/services/risk/limits.py` |
-
-## 14. Governance-specific review modules
-### Section -> 📂 Module: `app/services/risk/governance`
-
-These support non-trade workflows and special governance states.
-
-| Order | File                        | Purpose                                                                                       | Old V1 File to Clean |
-| ----: | --------------------------- | --------------------------------------------------------------------------------------------- | -------------------- |
-|  14.1 | `governance/allocation.py`  | Allocation review, equal-risk allocation, volatility parity, correlation-adjusted allocation. | `app/services/risk/allocation.py` |
-|  14.2 | `governance/lifecycle.py`   | Strategy admission, live readiness, lifecycle transition validation.                          | `app/services/risk/lifecycle.py` |
-|  14.3 | `governance/kill_switch.py` | Kill-switch state checks, trigger requests, resume validation, approval-cleared recovery.     | `app/services/risk/kill_switch.py` |
-
-## 15. Decision synthesis
-### Section -> 📂 Module: `app/services/risk/governor`
-
-This should come before the full governor because it converts many gate results into one deterministic decision package.
-
-| Order | File                             | Purpose                                                                                          | Old V1 File to Clean |
-| ----: | -------------------------------- | ------------------------------------------------------------------------------------------------ | -------------------- |
-|  15.1 | `governor/decision_synthesis.py` | Final decision status, primary reason, reductions, token eligibility, decision package assembly. | `app/services/risk/governor.py` |
-
-## 16. Audit and decision-token layer
-### Section -> 📂 Module: `app/services/risk/audit`
-
-These are governed side-effect support systems. They should not be needed by pure engines.
-
-| Order | File                  | Purpose                                                                             | Old V1 File to Clean |
-| ----: | --------------------- | ----------------------------------------------------------------------------------- | -------------------- |
-|  16.1 | `audit/hash_chain.py` | Genesis hash, append hash, chain verification, tamper detection.                    | `app/services/risk/audit.py` |
-|  16.2 | `audit/tokens.py`     | Decision-token signing, expiry, scope, revocation, policy/config hash verification. | `app/services/risk/audit.py` |
-|  16.3 | `audit/events.py`     | Redacted audit payloads, audit event creation, hash-chain attachment.               | `app/services/risk/audit.py` |
-
-## 17. Observability boundary
-### Section -> 📂 Module: `app/services/risk/observability`
-
-Apply observability at service/tool boundaries, not inside pure calculators.
-
-| Order | File                          | Purpose                                                                         | Old V1 File to Clean |
-| ----: | ----------------------------- | ------------------------------------------------------------------------------- | -------------------- |
-|  17.1 | `observability/metrics.py`    | Metrics sink protocol, decision metrics, latency metrics, audit-health metrics. | None |
-|  17.2 | `observability/decorators.py` | Logging, latency, error, and metrics decorators for public boundaries.          | None |
-
-## 18. Reports
-### Section -> 📂 Module: `app/services/risk/reports`
-
-Build report composition first, then explicit file export.
-
-| Order | File                  | Purpose                                                                            | Old V1 File to Clean |
-| ----: | --------------------- | ---------------------------------------------------------------------------------- | -------------------- |
-|  18.1 | `reports/builder.py`  | Build JSON-safe, redacted risk reports from stored evidence.                       | `app/services/risk/reports.py` |
-|  18.2 | `reports/exporter.py` | Authorized report writing, safe path validation, overwrite policy, write receipts. | `app/services/risk/reports.py` |
-
-## 19. Canonical governor orchestration
-### Section -> 📂 Module: `app/services/risk/governor`
-
-Now all downstream engines and side-effect boundaries exist.
-
-| Order | File                   | Purpose                                                                                                              | Old V1 File to Clean |
-| ----: | ---------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------- |
-|  19.1 | `governor/governor.py` | Canonical orchestration for trade review, allocation review, strategy admission, live readiness, portfolio governor. | `app/services/risk/governor.py` |
-
-This file should not implement new math. It should coordinate previously built modules.
-
-## 20. Official tool boundary
-### Section -> 📂 Module: `app/services/risk/tools`
-
-Only after the governor and pure engines are stable should you expose public tool wrappers.
-
-| Order | File                | Purpose                                                             | Old V1 File to Clean |
-| ----: | ------------------- | ------------------------------------------------------------------- | -------------------- |
-|  20.1 | `tools/registry.py` | Official risk tool catalogue, metadata validation, drift detection. | None |
-|  20.2 | `tools/official.py` | Official AI-callable risk tools returning standard envelopes.       | None |
-
-## 21. Public package export
-### Section -> 📂 Module: `app/services/risk`
-
-Finalize the root package only after official tools and registry are stable.
-
-| Order | File                            | Purpose                                                 | Old V1 File to Clean |
-| ----: | ------------------------------- | ------------------------------------------------------- | -------------------- |
-|  21.1 | `app/services/risk/__init__.py` | Final explicit public exports and `__all__` validation. | Delete old root file at step completion |
-
-## 22. Agentic adapter last
-### Section -> `agentic/tools/risk.py`
-
-This must be last because it should only attach already-approved official tools.
-
-| Order | File                    | Purpose                                                                 | Old V1 File to Clean |
-| ----: | ----------------------- | ----------------------------------------------------------------------- | -------------------- |
-|  22.1 | `agentic/tools/risk.py` | Narrow agent adapter that imports the official Risk tool registry only. | None |
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 8.1 | `app/services/trading/gates/policy_matrix.py` | Resolves allowed permission boundaries and emergency rules. <br>**Tracked:** `TRD-FR-089`. |
+| 8.2 | `app/services/trading/gates/approval.py` | Verifies single/dual operator approvals and request hash binding validations. <br>**Tracked:** `TRD-FR-090`, `TRD-FR-091`, `TRD-FR-092`. |
+| 8.3 | `app/services/trading/gates/readiness.py` | Validates local clock drift and PTP synchronization offset ceilings. <br>**Tracked:** `TRD-FR-093`, `TRD-FR-094`, `TRD-FR-095`, `TRD-FR-096`. |
+| 8.4 | `app/services/trading/gates/kill_switch.py` | Evaluates persistent kill-switch matrices. <br>**Tracked:** `TRD-FR-097`, `TRD-FR-098`, `TRD-FR-099`, `TRD-FR-100`. |
+| 8.5 | `app/services/trading/gates/audit_and_compensation.py` | Persists pre-mutation audit logs before dispatching. <br>**Tracked:** `TRD-FR-101`. |
+| 8.6 | `app/services/trading/gates/pipeline.py` | Orchestrates the 16 canonical gates, ComplianceGate, and MarketTurbulenceGate price velocity checks. <br>**Tracked:** `TRD-FR-083`, `TRD-FR-084`, `TRD-FR-085`, `TRD-FR-086`, `TRD-FR-087`, `TRD-FR-088`. |
+
+---
+
+### 9. Core Coordinator & Reporting
+Orchestrates async execution threads, client order IDs, and TCAs.
+
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 9.1 | `app/services/trading/execution/coordinator.py` | Dispatches requests asynchronously, maps allocations, manages synthetic OCO watchdogs, multi-leg spreads, and cancel-and-replace modify recoveries. <br>**Tracked:** `TRD-FR-102`, `TRD-FR-103`, `TRD-FR-104`, `TRD-FR-105`, `TRD-FR-106`, `TRD-FR-107`, `TRD-FR-108`, `TRD-FR-109`, `TRD-FR-110`, `TRD-FR-111`, `TRD-FR-112`, `TRD-FR-113`, `TRD-FR-114`. |
+| 9.2 | `app/services/trading/execution/reporting.py` | Exports execution cost entries, slippages, and latencies. <br>**Tracked:** `TRD-FR-132`. |
+
+---
+
+### 10. State Reconciliation
+Performs snapshots comparison, unknown outcome lockouts, and orphan deals quarantine.
+
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 10.1 | `app/services/trading/reconciliation/snapshots_and_compare.py` | Compares local TradeStore states against broker query dumps. <br>**Tracked:** `TRD-FR-163`. |
+| 10.2 | `app/services/trading/reconciliation/authority_and_retry_guard.py` | Restricts mutations on unresolved socket timeouts or stream gaps. <br>**Tracked:** `TRD-FR-164`, `TRD-FR-165`, `TRD-FR-166`. |
+| 10.3 | `app/services/trading/reconciliation/service.py` | Coordinates periodic/startup syncs and enforces external deal quarantine rules. <br>**Tracked:** `TRD-FR-157`, `TRD-FR-158`, `TRD-FR-159`, `TRD-FR-160`, `TRD-FR-161`, `TRD-FR-162`. |
+
+---
+
+### 11. Monitoring & Health
+Alerts on drift breaches, triggers circuit breakers, and runs heartbeat heartbeats.
+
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 11.1 | `app/services/trading/monitoring/timeouts_and_staleness.py` | Calculates latency distributions; implements lost-order recovery watchdog. <br>**Tracked:** `TRD-FR-171`, `TRD-FR-172`. |
+| 11.2 | `app/services/trading/monitoring/operational_signals.py` | Declares severity signals taxonomy and escalation runbooks. <br>**Tracked:** `TRD-FR-173`, `TRD-FR-174`. |
+| 11.3 | `app/services/trading/monitoring/heartbeat_watchdog.py` | Emits liveness heartbeats to external watchdog nodes. <br>**Tracked:** `TRD-FR-175`. |
+| 11.4 | `app/services/trading/monitoring/tool_health.py` | Degrades tool status dynamically on consecutive broker timeouts. <br>**Tracked:** `TRD-FR-170`. |
+| 11.5 | `app/services/trading/monitoring/service.py` | Evaluates circuit breakers and latencies to downgrade routes dynamically. <br>**Tracked:** `TRD-FR-167`, `TRD-FR-168`, `TRD-FR-169`. |
+
+---
+
+### 12. Promotion Ladder & Preconditions
+Controls strategy route mutations promotion sequences.
+
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 12.1 | `app/services/trading/promotion/ladder.py` | Enforces stage matrix promotion validations. <br>**Tracked:** `TRD-FR-182`, `TRD-FR-183`, `TRD-FR-184`. |
+| 12.2 | `app/services/trading/promotion/preconditions.py` | Restricts activation when switches or unresolved drifts exist. <br>**Tracked:** `TRD-FR-185`, `TRD-FR-186`. |
+
+---
+
+### 13. Session Runtime Coordination
+Controls multi-tenant locks, session scopes, and budget allocations.
+
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 13.1 | `app/services/trading/runtime/session_manager.py` | Manages session lifecycle states, cancel-on-disconnect heartbeats, and reconnect resync loops. <br>**Tracked:** `TRD-FR-064`, `TRD-FR-065`, `TRD-FR-066`, `TRD-FR-067`, `TRD-FR-068`, `TRD-FR-069`, `TRD-FR-070`, `TRD-FR-071`, `TRD-FR-072`. |
+| 13.2 | `app/services/trading/runtime/coordination.py` | Resolves optimistic concurrency locks and cross-strategy counter policies. <br>**Tracked:** `TRD-FR-073`, `TRD-FR-074`, `TRD-FR-075`, `TRD-FR-076`. |
+| 13.3 | `app/services/trading/runtime/cost_control.py` | Evaluates session/strategy budget caps. <br>**Tracked:** `TRD-FR-077`, `TRD-FR-078`, `TRD-FR-079`. |
+| 13.4 | `app/services/trading/runtime/signal_processor.py` | Translates strategy signals into request envelopes. <br>**Tracked:** `TRD-FR-080`, `TRD-FR-081`, `TRD-FR-082`. |
+
+---
+
+### 14. Tools & Registry
+Registers tools, exports callable wrappers, and validates input envelopes.
+
+| Order | File | Purpose & Requirements Tracked |
+|---|---|---|
+| 14.1 | `app/services/trading/tool_registry.py` | Registers callable trading tools, schemas, and metadata. <br>**Tracked:** `TRD-FR-019`, `TRD-FR-020`. |
+| 14.2 | `app/services/trading/__init__.py` | Finalizes public export definitions and `__all__` hooks. <br>**Tracked:** `TRD-FR-001`, `TRD-FR-002`, `TRD-FR-003`. |
+
+---
+
+## Cross-Module (XM) & Non-Functional (NFR) Requirements Tracking
+
+To ensure complete coverage, all peer cross-module and non-functional requirements are allocated and verified as follows:
+
+### 🔗 Cross-Module Requirements (`TRD-XM-###`)
+
+*   **TRD-XM-001 (Simulator - Validation Parity):** Validated in `tests/services/trading/actions/test_validation.py` & verified during simulator execution calls.
+*   **TRD-XM-002 (Simulator - Paper Fill Ingestion):** Handled in `execution/coordinator.py` under the `paper` handler integration test.
+*   **TRD-XM-003 (Data - Session Calendars):** Verified inside `actions/validation.py` session gate test.
+*   **TRD-XM-003A (Data - Corporate Splits):** Applied inside `reconciliation/service.py` and `state/ports.py` adjustments test.
+*   **TRD-XM-003B (Data - Halt Statuses):** Checked in `runtime/session_manager.py` halt update tests.
+*   **TRD-XM-004 (Analytics - TCA logs):** Emitted from `execution/reporting.py` audit sink.
+*   **TRD-XM-005 (Risk - Delta pre-check):** Queried inside `gates/pipeline.py` (Gate 7 precheck validation).
+*   **TRD-XM-005A (Risk - Post-trade breaches):** Handled in `runtime/session_manager.py` risk event subscription tests.
+*   **TRD-XM-006 (Risk/Data - HTB Locates):** Loaded in `actions/validation.py` locate gate test.
+*   **TRD-XM-007 (Simulator - Slippage Injection):** Injected in `execution/coordinator.py` test suite.
+
+### ⚙️ Non-Functional Requirements (`TRD-NFR-###`)
+
+*   **TRD-NFR-001 to TRD-NFR-003 (Safe Gates):** Handled inside `gates/pipeline.py` and `promotion/ladder.py`.
+*   **TRD-NFR-004 (Shutdown):** Handled inside `runtime/session_manager.py`.
+*   **TRD-NFR-005 (Idempotency):** Handled inside `state/idempotency.py`.
+*   **TRD-NFR-006 to TRD-NFR-007 (Redaction & Telemetry):** Handled inside `security/redaction_boundary.py`.
+*   **TRD-NFR-008 to TRD-NFR-009 (Independence & Async):** Implemented in `execution/coordinator.py`.
+*   **TRD-NFR-010 (Isolation):** Verified in `state/ports.py`.
+*   **TRD-NFR-011 to TRD-NFR-012 (Branch & Replay determinism):** Enforced in unit tests configurations.
+*   **TRD-NFR-013 to TRD-NFR-015 (Chaos & Parity):** Covered in integration testing profiles.
+*   **TRD-NFR-016 to TRD-NFR-017 (Tiers Matrix):** Checked in package checklist validations.
+*   **TRD-NFR-018 (Non-Goals):** Kept as static boundary checks.
+*   **TRD-NFR-019 (Quorum Lease):** Implemented in `state/ports.py` concurrency and state store locks.

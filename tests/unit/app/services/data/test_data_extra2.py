@@ -5,6 +5,7 @@ def test_data_extra2():
     # data/gateway.py
     try:
         from app.services.data.gateway import DataGateway
+
         dg = DataGateway(MagicMock())
         dg.get_data(MagicMock())
         dg.save_data(MagicMock())
@@ -14,6 +15,7 @@ def test_data_extra2():
     # data/scheduler.py
     try:
         from app.services.data.scheduler import DataScheduler
+
         ds = DataScheduler()
         ds.schedule_job(MagicMock(), MagicMock())
         ds.run_pending()
@@ -23,6 +25,7 @@ def test_data_extra2():
     # data/transforms.py
     try:
         from app.services.data.transforms import DataTransforms
+
         dt = DataTransforms()
         dt.transform(MagicMock(), MagicMock())
         dt.normalize(MagicMock())

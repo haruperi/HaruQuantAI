@@ -75,7 +75,7 @@ class PriceVolumeDistribution(BaseIndicator):
             bin_edges = np.linspace(min_p, max_p, bins + 1)
             bin_volumes = np.zeros(bins)
 
-            for c_val, v_val in zip(w_close, w_volume):
+            for c_val, v_val in zip(w_close, w_volume, strict=False):
                 bin_idx = np.searchsorted(bin_edges, c_val) - 1
                 bin_idx = max(0, min(bin_idx, bins - 1))
                 bin_volumes[bin_idx] += v_val

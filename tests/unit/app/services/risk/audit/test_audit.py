@@ -4,11 +4,9 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-
 from app.services.risk.audit.events import (
     AuditContext,
     AuditRedactionPolicy,
@@ -27,7 +25,6 @@ from app.services.risk.audit.tokens import (
     DefaultTokenSigner,
     RequiredActionScope,
     TokenValidationContext,
-    TokenValidationResult,
     create_risk_decision_token,
     revoke_risk_approval_token,
     validate_risk_approval_token,
@@ -35,12 +32,10 @@ from app.services.risk.audit.tokens import (
     validate_token_scope,
 )
 from app.services.risk.models import (
-    PortfolioRiskSnapshot,
     ProposedTrade,
     RiskAuditEvent,
     RiskDecisionPackage,
     RiskDecisionToken,
-    RiskSeverity,
 )
 from app.services.risk.models.enums import RiskDecisionStatus, RiskMode
 from app.utils.errors import ValidationError

@@ -318,12 +318,18 @@ def parallel_random_search(  # noqa: C901
     attempts = 0  # pragma: no cover
     max_attempts = max_candidates * 10  # pragma: no cover
 
-    while len(seen_hashes) < max_candidates and attempts < max_attempts:  # pragma: no cover
+    while (
+        len(seen_hashes) < max_candidates and attempts < max_attempts
+    ):  # pragma: no cover
         attempts += 1  # pragma: no cover
-        params = {p.name: sample_parameter(p, rng) for p in parameter_space.parameters}  # pragma: no cover
+        params = {
+            p.name: sample_parameter(p, rng) for p in parameter_space.parameters
+        }  # pragma: no cover
 
         try:  # pragma: no cover
-            if not check_constraints(params, parameter_space.constraints):  # pragma: no cover
+            if not check_constraints(
+                params, parameter_space.constraints
+            ):  # pragma: no cover
                 continue  # pragma: no cover
         except ValidationError:  # pragma: no cover
             raise  # pragma: no cover
@@ -354,13 +360,19 @@ def parallel_random_search(  # noqa: C901
         params, cand_hash = item  # pragma: no cover
         if dry_run:  # pragma: no cover
             res = evaluate_candidate_score(  # pragma: no cover
-                [], initial_balance, objective, trial_count=total_candidates  # pragma: no cover
+                [],
+                initial_balance,
+                objective,
+                trial_count=total_candidates,  # pragma: no cover
             )  # pragma: no cover
             return OptimizationResult(  # pragma: no cover
                 parameters=params,  # pragma: no cover
                 score=res["score"],  # pragma: no cover
                 metrics=res,  # pragma: no cover
-                metadata={"candidate_hash": cand_hash, "dry_run": True},  # pragma: no cover
+                metadata={
+                    "candidate_hash": cand_hash,
+                    "dry_run": True,
+                },  # pragma: no cover
             )  # pragma: no cover
         try:  # pragma: no cover
             bt_res = run_strategy_backtest(  # pragma: no cover
@@ -386,7 +398,9 @@ def parallel_random_search(  # noqa: C901
                 metadata={"candidate_hash": cand_hash},  # pragma: no cover
             )  # pragma: no cover
         except Exception as exc:  # noqa: BLE001  # pragma: no cover
-            logger.error("Parallel random candidate evaluation failed: %s", exc)  # pragma: no cover
+            logger.error(
+                "Parallel random candidate evaluation failed: %s", exc
+            )  # pragma: no cover
             return None  # pragma: no cover
 
     candidates_results: list[OptimizationResult] = []  # pragma: no cover
@@ -395,7 +409,9 @@ def parallel_random_search(  # noqa: C901
             if result is not None:  # pragma: no cover
                 candidates_results.append(result)  # pragma: no cover
 
-    best_cand, best_score = select_best_candidate(candidates_results)  # pragma: no cover
+    best_cand, best_score = select_best_candidate(
+        candidates_results
+    )  # pragma: no cover
     runtime_ms = (time.perf_counter() - start_time) * 1000  # pragma: no cover
     return OptimizationSummary(  # pragma: no cover
         best_candidate=best_cand,

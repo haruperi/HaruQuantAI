@@ -358,4 +358,3 @@ The built-in validator verifies that every listed path exists and is not `null`.
 - [ ] Schedule/weekend/session filters are tested.
 - [ ] Stop, target, trailing, and time-exit formulas are tested.
 - [ ] State serializes and restores correctly.
-

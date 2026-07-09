@@ -66,7 +66,6 @@ from app.utils.logger import logger
 if TYPE_CHECKING:
     from app.services.risk.governance.kill_switch import KillSwitchManager
     from app.services.risk.governance.lifecycle import (
-        LiveReadinessReview,
         ModePromotionReview,
     )
     from app.services.risk.storage import (
@@ -76,10 +75,10 @@ if TYPE_CHECKING:
         RiskStateStore,
     )
 
-from app.utils.normalization import utc_now
-from app.utils.standard import stable_identifier
 from app.services.risk.observability.decorators import risk_observed
 from app.services.risk.observability.metrics import RISK_METRICS_REGISTRY
+from app.utils.normalization import utc_now
+from app.utils.standard import stable_identifier
 
 RiskGovernorDecision = RiskDecisionPackage
 
@@ -465,7 +464,9 @@ class RiskGovernor:
                         )
 
                 corr_latency = (time.perf_counter() - t0_corr) * 1000.0
-                from app.services.risk.observability.metrics import RISK_METRICS_REGISTRY
+                from app.services.risk.observability.metrics import (
+                    RISK_METRICS_REGISTRY,
+                )
 
                 RISK_METRICS_REGISTRY.record(
                     name="haruquant_risk_correlation_latency_ms",
@@ -1315,9 +1316,12 @@ class RiskGovernor:
         if isinstance(first, RiskAssessmentRequest):
             request = first
             from app.services.risk.governance.lifecycle import LiveReadinessRequest
+
             proposed_action = request.proposed_action
             if not isinstance(proposed_action, LiveReadinessRequest):
-                raise ValidationError("proposed_action must be LiveReadinessRequest for live readiness review.")
+                raise ValidationError(
+                    "proposed_action must be LiveReadinessRequest for live readiness review."
+                )
 
             request_id = request.request_id or stable_identifier(
                 {"action": "live_readiness"}, prefix="req"
@@ -1333,13 +1337,17 @@ class RiskGovernor:
             resolved_config = policy_res.resolved_config
 
             from app.services.risk.policy.contracts import EffectiveRiskPolicy
+
             effective_policy = EffectiveRiskPolicy(
                 policy_id="policy-readiness",
                 resolved_config=resolved_config,
                 policy_hash=policy_res.policy_hash or "hash",
             )
 
-            from app.services.risk.governance.lifecycle import review_live_readiness as _review_live_readiness
+            from app.services.risk.governance.lifecycle import (
+                review_live_readiness as _review_live_readiness,
+            )
+
             assessment = _review_live_readiness(proposed_action, effective_policy)
 
             # Build a RiskDecisionPackage from the LifecycleAssessment
@@ -1372,11 +1380,16 @@ class RiskGovernor:
 
         # Otherwise, fall back to V1 signature
         strategy_id = kwargs.get("strategy_id", args[0] if len(args) > 0 else None)
-        proposed_stage = kwargs.get("proposed_stage", args[1] if len(args) > 1 else None)
+        proposed_stage = kwargs.get(
+            "proposed_stage", args[1] if len(args) > 1 else None
+        )
         market_context = kwargs.get("market_context", args[2] if len(args) > 2 else {})
         config = kwargs.get("config", args[3] if len(args) > 3 else None)
 
-        from app.services.risk.governance.lifecycle import review_live_readiness as _review_live_readiness
+        from app.services.risk.governance.lifecycle import (
+            review_live_readiness as _review_live_readiness,
+        )
+
         return _review_live_readiness(
             strategy_id=strategy_id,
             proposed_stage=proposed_stage,
@@ -1430,6 +1443,7 @@ def review_trade(
 ) -> RiskDecisionPackage:
     """Execute pre-trade risk checks for a candidate ProposedTrade (V2)."""
     from app.agentic.tools.risk import get_shared_governor
+
     return get_shared_governor().review_trade(
         request=request,
         operator_role=operator_role,
@@ -1466,6 +1480,7 @@ def review_allocation(
 ) -> RiskDecisionPackage:
     """Evaluate budget allocation proposal changes (V2)."""
     from app.agentic.tools.risk import get_shared_governor
+
     return get_shared_governor().review_allocation(request)
 
 

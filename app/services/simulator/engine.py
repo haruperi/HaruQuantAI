@@ -99,13 +99,21 @@ class SimpleBacktestEngine:
         self._reset_ids()
 
         resolved_symbol = symbol or str(
-            strategy.config.section("trading_profile").get("symbols", {}).get("main", {}).get("symbol", "")
+            strategy.config.section("trading_profile")
+            .get("symbols", {})
+            .get("main", {})
+            .get("symbol", "")
         )
         resolved_timeframe = timeframe or str(
-            strategy.config.section("trading_profile").get("symbols", {}).get("main", {}).get("timeframe", "")
+            strategy.config.section("trading_profile")
+            .get("symbols", {})
+            .get("main", {})
+            .get("timeframe", "")
         )
         if not resolved_symbol or not resolved_timeframe:
-            raise ValueError("symbol and timeframe must be supplied or configured in strategy.json.")
+            raise ValueError(
+                "symbol and timeframe must be supplied or configured in strategy.json."
+            )
         main_duration = _timeframe_duration(resolved_timeframe)
         auxiliary = {
             key: validate_bars(value)
@@ -128,6 +136,7 @@ class SimpleBacktestEngine:
 
         if main_bars:  # pragma: no cover
             import pandas as pd
+
             df_all = pd.DataFrame(
                 {
                     "open": [b.open for b in main_bars],
@@ -269,7 +278,9 @@ class SimpleBacktestEngine:
                 )
             if decision.intents:
                 if index + 1 < len(main_bars):
-                    queued_intents[index + 1].extend((intent, False) for intent in decision.intents)
+                    queued_intents[index + 1].extend(
+                        (intent, False) for intent in decision.intents
+                    )
                 else:
                     diagnostics.append(
                         f"Discarded {len(decision.intents)} final-bar intent(s): no next bar exists for no-lookahead execution."
@@ -313,7 +324,9 @@ class SimpleBacktestEngine:
                     pending_order_count=0,
                 )
 
-        metrics = _build_metrics(self.config.initial_balance, balance, closed_trades, equity_curve)
+        metrics = _build_metrics(
+            self.config.initial_balance, balance, closed_trades, equity_curve
+        )
         return BacktestResult(
             strategy_id=strategy.config.strategy_id,
             symbol=resolved_symbol,
@@ -353,58 +366,168 @@ class SimpleBacktestEngine:
             IntentAction.MODIFY: 3,
             IntentAction.OPEN: 4,
         }
-        ordered = sorted((item[0] for item in queued), key=lambda intent: priority[intent.action])
+        ordered = sorted(
+            (item[0] for item in queued), key=lambda intent: priority[intent.action]
+        )
         for intent in ordered:
             if not intent.symbol:
-                events.append(BacktestEvent(now, "IGNORED_INTENT", "Intent has an invalid symbol.", intent.intent_id))  # pragma: no cover
+                events.append(
+                    BacktestEvent(
+                        now,
+                        "IGNORED_INTENT",
+                        "Intent has an invalid symbol.",
+                        intent.intent_id,
+                    )
+                )  # pragma: no cover
                 continue  # pragma: no cover
             if intent.action is IntentAction.CANCEL_PENDING:
-                removed = self._cancel_pending(intent, pending_orders)  # pragma: no cover
-                events.append(BacktestEvent(now, "CANCEL_PENDING", f"Cancelled {removed} pending order(s).", intent.intent_id))  # pragma: no cover
+                removed = self._cancel_pending(
+                    intent, pending_orders
+                )  # pragma: no cover
+                events.append(
+                    BacktestEvent(
+                        now,
+                        "CANCEL_PENDING",
+                        f"Cancelled {removed} pending order(s).",
+                        intent.intent_id,
+                    )
+                )  # pragma: no cover
             elif intent.action is IntentAction.CLOSE:
                 targets = self._target_positions(intent, positions)  # pragma: no cover
                 for position in tuple(targets):  # pragma: no cover
-                    exit_price = self._market_exit_price(quote, position.direction)  # pragma: no cover
-                    balance = self._close_position(position, position.quantity, exit_price, now, FillReason.SIGNAL_CLOSE, positions, closed_trades, balance)  # pragma: no cover
-                events.append(BacktestEvent(now, "CLOSE", f"Closed {len(targets)} position(s).", intent.intent_id))  # pragma: no cover
+                    exit_price = self._market_exit_price(
+                        quote, position.direction
+                    )  # pragma: no cover
+                    balance = self._close_position(
+                        position,
+                        position.quantity,
+                        exit_price,
+                        now,
+                        FillReason.SIGNAL_CLOSE,
+                        positions,
+                        closed_trades,
+                        balance,
+                    )  # pragma: no cover
+                events.append(
+                    BacktestEvent(
+                        now,
+                        "CLOSE",
+                        f"Closed {len(targets)} position(s).",
+                        intent.intent_id,
+                    )
+                )  # pragma: no cover
             elif intent.action is IntentAction.PARTIAL_CLOSE:
-                quantity_left = self._quantity(intent.requested_quantity)  # pragma: no cover
+                quantity_left = self._quantity(
+                    intent.requested_quantity
+                )  # pragma: no cover
                 if quantity_left is not None and quantity_left > 0:  # pragma: no cover
-                    targets = self._target_positions(intent, positions)  # pragma: no cover
+                    targets = self._target_positions(
+                        intent, positions
+                    )  # pragma: no cover
                     closed_count = 0  # pragma: no cover
                     for position in tuple(targets):  # pragma: no cover
                         if quantity_left <= 0:  # pragma: no cover
                             break  # pragma: no cover
-                        quantity = min(position.quantity, quantity_left)  # pragma: no cover
-                        exit_price = self._market_exit_price(quote, position.direction)  # pragma: no cover
-                        balance = self._close_position(position, quantity, exit_price, now, FillReason.PARTIAL_CLOSE, positions, closed_trades, balance)  # pragma: no cover
+                        quantity = min(
+                            position.quantity, quantity_left
+                        )  # pragma: no cover
+                        exit_price = self._market_exit_price(
+                            quote, position.direction
+                        )  # pragma: no cover
+                        balance = self._close_position(
+                            position,
+                            quantity,
+                            exit_price,
+                            now,
+                            FillReason.PARTIAL_CLOSE,
+                            positions,
+                            closed_trades,
+                            balance,
+                        )  # pragma: no cover
                         quantity_left -= quantity  # pragma: no cover
                         closed_count += 1  # pragma: no cover
-                    events.append(BacktestEvent(now, "PARTIAL_CLOSE", f"Partially closed {closed_count} position(s).", intent.intent_id))  # pragma: no cover
+                    events.append(
+                        BacktestEvent(
+                            now,
+                            "PARTIAL_CLOSE",
+                            f"Partially closed {closed_count} position(s).",
+                            intent.intent_id,
+                        )
+                    )  # pragma: no cover
             elif intent.action is IntentAction.MODIFY:
                 targets = self._target_positions(intent, positions)  # pragma: no cover
                 for position in targets:  # pragma: no cover
-                    _apply_protection_to_position(position, intent.protection)  # pragma: no cover
-                events.append(BacktestEvent(now, "MODIFY", f"Modified {len(targets)} position(s).", intent.intent_id))  # pragma: no cover
+                    _apply_protection_to_position(
+                        position, intent.protection
+                    )  # pragma: no cover
+                events.append(
+                    BacktestEvent(
+                        now,
+                        "MODIFY",
+                        f"Modified {len(targets)} position(s).",
+                        intent.intent_id,
+                    )
+                )  # pragma: no cover
             elif intent.action is IntentAction.OPEN:  # pragma: no cover
                 if intent.entry_type in (EntryType.MARKET, EntryType.REVERSE):
-                    new_pos = self._open_market_position(intent, bar_index, now, quote, balance)
+                    new_pos = self._open_market_position(
+                        intent, bar_index, now, quote, balance
+                    )
                     if new_pos is None:
-                        events.append(BacktestEvent(now, "IGNORED_INTENT", "Invalid market quantity.", intent.intent_id))  # pragma: no cover
+                        events.append(
+                            BacktestEvent(
+                                now,
+                                "IGNORED_INTENT",
+                                "Invalid market quantity.",
+                                intent.intent_id,
+                            )
+                        )  # pragma: no cover
                     else:
                         positions.append(new_pos)
                         balance -= new_pos.entry_commission
                         fill_event_ids.append(f"fill:{new_pos.position_id}")
-                        events.append(BacktestEvent(now, "MARKET_FILL", "Opened market position.", intent.intent_id, new_pos.position_id))
+                        events.append(
+                            BacktestEvent(
+                                now,
+                                "MARKET_FILL",
+                                "Opened market position.",
+                                intent.intent_id,
+                                new_pos.position_id,
+                            )
+                        )
                 elif intent.entry_type in (EntryType.LIMIT, EntryType.STOP):
-                    order = self._place_pending_order(intent, now, pending_activation_index)
+                    order = self._place_pending_order(
+                        intent, now, pending_activation_index
+                    )
                     if order is None:
-                        events.append(BacktestEvent(now, "IGNORED_INTENT", "Pending order requires a valid price and quantity.", intent.intent_id))  # pragma: no cover
+                        events.append(
+                            BacktestEvent(
+                                now,
+                                "IGNORED_INTENT",
+                                "Pending order requires a valid price and quantity.",
+                                intent.intent_id,
+                            )
+                        )  # pragma: no cover
                     else:
                         pending_orders.append(order)
-                        events.append(BacktestEvent(now, "PENDING_PLACED", "Placed pending order.", intent.intent_id, order.order_id))
+                        events.append(
+                            BacktestEvent(
+                                now,
+                                "PENDING_PLACED",
+                                "Placed pending order.",
+                                intent.intent_id,
+                                order.order_id,
+                            )
+                        )
                 else:
-                    events.append(BacktestEvent(now, "IGNORED_INTENT", "Unsupported entry type.", intent.intent_id))  # pragma: no cover
+                    events.append(
+                        BacktestEvent(
+                            now,
+                            "IGNORED_INTENT",
+                            "Unsupported entry type.",
+                            intent.intent_id,
+                        )
+                    )  # pragma: no cover
         return fill_event_ids, balance
 
     def _open_market_position(
@@ -439,8 +562,17 @@ class SimpleBacktestEngine:
         activation_bar_index: int,
     ) -> SimPendingOrder | None:
         quantity = self._quantity(intent.requested_quantity)
-        requested_price = intent.limit_price if intent.entry_type is EntryType.LIMIT else intent.stop_price
-        if quantity is None or requested_price is None or requested_price <= 0 or intent.entry_type is None:
+        requested_price = (
+            intent.limit_price
+            if intent.entry_type is EntryType.LIMIT
+            else intent.stop_price
+        )
+        if (
+            quantity is None
+            or requested_price is None
+            or requested_price <= 0
+            or intent.entry_type is None
+        ):
             return None  # pragma: no cover
         self._order_counter += 1
         protection = intent.protection
@@ -516,9 +648,20 @@ class SimpleBacktestEngine:
             )
             positions.append(position)
             balance -= position.entry_commission
-            reason = FillReason.LIMIT if order.entry_type is EntryType.LIMIT else FillReason.STOP
+            reason = (
+                FillReason.LIMIT
+                if order.entry_type is EntryType.LIMIT
+                else FillReason.STOP
+            )
             fill_ids.append(f"fill:{position.position_id}")
-            events.append(BacktestEvent(bar.open_time, f"{reason}_FILL", "Filled pending order.", entity_id=position.position_id))
+            events.append(
+                BacktestEvent(
+                    bar.open_time,
+                    f"{reason}_FILL",
+                    "Filled pending order.",
+                    entity_id=position.position_id,
+                )
+            )
         return fill_ids, balance
 
     def _pending_fill_price(self, order: SimPendingOrder, bar: Bar) -> float | None:
@@ -539,7 +682,9 @@ class SimpleBacktestEngine:
                 return price + self.config.slippage_price if high >= price else None
             if open_price <= price:  # pragma: no cover
                 return open_price - self.config.slippage_price  # pragma: no cover
-            return price - self.config.slippage_price if low <= price else None  # pragma: no cover
+            return (
+                price - self.config.slippage_price if low <= price else None
+            )  # pragma: no cover
         return None
 
     def _process_protective_exits(
@@ -555,31 +700,81 @@ class SimpleBacktestEngine:
         for position in tuple(positions):
             _, high, low, _ = self._side_ohlc(bar, position.direction, for_entry=False)
             stop_hit = position.stop_loss_price is not None and (
-                low <= position.stop_loss_price if position.direction is Direction.LONG else high >= position.stop_loss_price
+                low <= position.stop_loss_price
+                if position.direction is Direction.LONG
+                else high >= position.stop_loss_price
             )
             target_hit = position.profit_target_price is not None and (
-                high >= position.profit_target_price if position.direction is Direction.LONG else low <= position.profit_target_price
+                high >= position.profit_target_price
+                if position.direction is Direction.LONG
+                else low <= position.profit_target_price
             )
             if not stop_hit and not target_hit:
                 continue
-            if stop_hit and (not target_hit or self.config.intrabar_conflict_policy is IntrabarConflictPolicy.STOP_FIRST):  # pragma: no cover
+            if stop_hit and (
+                not target_hit
+                or self.config.intrabar_conflict_policy
+                is IntrabarConflictPolicy.STOP_FIRST
+            ):  # pragma: no cover
                 assert position.stop_loss_price is not None  # pragma: no cover
-                price = self._protection_exit_price(bar, position.direction, position.stop_loss_price, is_stop=True)  # pragma: no cover
-                balance = self._close_position(position, position.quantity, price, bar.open_time, FillReason.STOP_LOSS, positions, closed_trades, balance)  # pragma: no cover
-                events.append(BacktestEvent(bar.open_time, "STOP_LOSS", "Closed position at stop loss.", entity_id=position.position_id))  # pragma: no cover
+                price = self._protection_exit_price(
+                    bar, position.direction, position.stop_loss_price, is_stop=True
+                )  # pragma: no cover
+                balance = self._close_position(
+                    position,
+                    position.quantity,
+                    price,
+                    bar.open_time,
+                    FillReason.STOP_LOSS,
+                    positions,
+                    closed_trades,
+                    balance,
+                )  # pragma: no cover
+                events.append(
+                    BacktestEvent(
+                        bar.open_time,
+                        "STOP_LOSS",
+                        "Closed position at stop loss.",
+                        entity_id=position.position_id,
+                    )
+                )  # pragma: no cover
             else:  # pragma: no cover
                 assert position.profit_target_price is not None  # pragma: no cover
-                price = self._protection_exit_price(bar, position.direction, position.profit_target_price, is_stop=False)  # pragma: no cover
-                balance = self._close_position(position, position.quantity, price, bar.open_time, FillReason.PROFIT_TARGET, positions, closed_trades, balance)  # pragma: no cover
-                events.append(BacktestEvent(bar.open_time, "PROFIT_TARGET", "Closed position at profit target.", entity_id=position.position_id))  # pragma: no cover
+                price = self._protection_exit_price(
+                    bar, position.direction, position.profit_target_price, is_stop=False
+                )  # pragma: no cover
+                balance = self._close_position(
+                    position,
+                    position.quantity,
+                    price,
+                    bar.open_time,
+                    FillReason.PROFIT_TARGET,
+                    positions,
+                    closed_trades,
+                    balance,
+                )  # pragma: no cover
+                events.append(
+                    BacktestEvent(
+                        bar.open_time,
+                        "PROFIT_TARGET",
+                        "Closed position at profit target.",
+                        entity_id=position.position_id,
+                    )
+                )  # pragma: no cover
         return balance
 
-    def _update_trailing_stops(self, bar: Bar, positions: Sequence[SimPosition]) -> None:
+    def _update_trailing_stops(
+        self, bar: Bar, positions: Sequence[SimPosition]
+    ) -> None:
         for position in positions:
             if position.trailing_distance is None:
                 continue
-            _, high, low, _ = self._side_ohlc(bar, position.direction, for_entry=False)  # pragma: no cover
-            activation = position.trailing_activation_distance or 0.0  # pragma: no cover
+            _, high, low, _ = self._side_ohlc(
+                bar, position.direction, for_entry=False
+            )  # pragma: no cover
+            activation = (
+                position.trailing_activation_distance or 0.0
+            )  # pragma: no cover
             activated = (  # pragma: no cover
                 high >= position.entry_price + activation  # pragma: no cover
                 if position.direction is Direction.LONG  # pragma: no cover
@@ -587,9 +782,15 @@ class SimpleBacktestEngine:
             )  # pragma: no cover
             if not activated:  # pragma: no cover
                 continue  # pragma: no cover
-            candidate = high - position.trailing_distance if position.direction is Direction.LONG else low + position.trailing_distance  # pragma: no cover
+            candidate = (
+                high - position.trailing_distance
+                if position.direction is Direction.LONG
+                else low + position.trailing_distance
+            )  # pragma: no cover
             improves = position.stop_loss_price is None or (  # pragma: no cover
-                candidate > position.stop_loss_price if position.direction is Direction.LONG else candidate < position.stop_loss_price  # pragma: no cover
+                candidate > position.stop_loss_price
+                if position.direction is Direction.LONG
+                else candidate < position.stop_loss_price  # pragma: no cover
             )  # pragma: no cover
             if improves:  # pragma: no cover
                 position.stop_loss_price = candidate  # pragma: no cover
@@ -634,8 +835,17 @@ class SimpleBacktestEngine:
             )
             decision = strategy.evaluate_execution_event(context, event_id)
             if decision.intents:
-                queued_intents[next_index].extend((intent, True) for intent in decision.intents)  # pragma: no cover
-                events.append(BacktestEvent(as_of, "EXECUTION_REACTION", f"Queued {len(decision.intents)} event-reaction intent(s).", entity_id=event_id))  # pragma: no cover
+                queued_intents[next_index].extend(
+                    (intent, True) for intent in decision.intents
+                )  # pragma: no cover
+                events.append(
+                    BacktestEvent(
+                        as_of,
+                        "EXECUTION_REACTION",
+                        f"Queued {len(decision.intents)} event-reaction intent(s).",
+                        entity_id=event_id,
+                    )
+                )  # pragma: no cover
             diagnostics.extend(decision.diagnostics)
 
     def _make_context(
@@ -654,7 +864,11 @@ class SimpleBacktestEngine:
         feature_provider: FeatureProvider | None,
         feature_index: int,
     ) -> MarketContext:
-        features = dict(feature_provider(feature_index, history, as_of)) if feature_provider else {}
+        features = (
+            dict(feature_provider(feature_index, history, as_of))
+            if feature_provider
+            else {}
+        )
         chart_bars = {}
         for key, values in auxiliary.items():
             duration = auxiliary_durations[key]
@@ -687,23 +901,36 @@ class SimpleBacktestEngine:
             features=features,
         )
 
-    def _target_positions(self, intent: TradeIntent, positions: Sequence[SimPosition]) -> list[SimPosition]:
+    def _target_positions(
+        self, intent: TradeIntent, positions: Sequence[SimPosition]
+    ) -> list[SimPosition]:
         if intent.target_position_ids:
             identifiers = set(intent.target_position_ids)
-            return [position for position in positions if position.position_id in identifiers]
+            return [
+                position
+                for position in positions
+                if position.position_id in identifiers
+            ]
         return [  # pragma: no cover
             position
             for position in positions
             if position.symbol == intent.symbol
             and position.direction is intent.direction
-            and (position.strategy_id == intent.strategy_id or position.magic_number == intent.magic_number)
+            and (
+                position.strategy_id == intent.strategy_id
+                or position.magic_number == intent.magic_number
+            )
         ]
 
-    def _cancel_pending(self, intent: TradeIntent, pending_orders: list[SimPendingOrder]) -> int:
+    def _cancel_pending(
+        self, intent: TradeIntent, pending_orders: list[SimPendingOrder]
+    ) -> int:
         if intent.target_pending_order_ids:
             identifiers = set(intent.target_pending_order_ids)
             before = len(pending_orders)
-            pending_orders[:] = [order for order in pending_orders if order.order_id not in identifiers]
+            pending_orders[:] = [
+                order for order in pending_orders if order.order_id not in identifiers
+            ]
             return before - len(pending_orders)
         before = len(pending_orders)  # pragma: no cover
         pending_orders[:] = [  # pragma: no cover
@@ -712,7 +939,10 @@ class SimpleBacktestEngine:
             if not (  # pragma: no cover
                 order.symbol == intent.symbol  # pragma: no cover
                 and order.direction is intent.direction  # pragma: no cover
-                and (order.strategy_id == intent.strategy_id or order.magic_number == intent.magic_number)  # pragma: no cover
+                and (
+                    order.strategy_id == intent.strategy_id
+                    or order.magic_number == intent.magic_number
+                )  # pragma: no cover
             )  # pragma: no cover
         ]  # pragma: no cover
         return before - len(pending_orders)  # pragma: no cover
@@ -729,7 +959,9 @@ class SimpleBacktestEngine:
     ) -> SimPosition:
         self._position_counter += 1
         protection = intent.protection
-        stop, target = _initial_protection_prices(intent.direction, entry_price, protection)
+        stop, target = _initial_protection_prices(
+            intent.direction, entry_price, protection
+        )
         return SimPosition(
             position_id=f"pos-{self._position_counter:07d}",
             strategy_id=intent.strategy_id,
@@ -766,7 +998,13 @@ class SimpleBacktestEngine:
         original_quantity = position.quantity
         entry_commission = position.entry_commission * quantity / original_quantity
         exit_commission = quantity * self.config.commission_per_unit
-        gross = _gross_pnl(position.direction, position.entry_price, exit_price, quantity, self.config.contract_size)
+        gross = _gross_pnl(
+            position.direction,
+            position.entry_price,
+            exit_price,
+            quantity,
+            self.config.contract_size,
+        )
         net = gross - entry_commission - exit_commission
         self._trade_counter += 1
         closed_trades.append(
@@ -797,7 +1035,9 @@ class SimpleBacktestEngine:
             positions.remove(position)
         return balance
 
-    def _unrealized_pnl(self, positions: Sequence[SimPosition], quote: QuoteSnapshot) -> float:
+    def _unrealized_pnl(
+        self, positions: Sequence[SimPosition], quote: QuoteSnapshot
+    ) -> float:
         return sum(
             _gross_pnl(
                 position.direction,
@@ -817,10 +1057,14 @@ class SimpleBacktestEngine:
             point_size=self.config.point_size,
         )
 
-    def _side_ohlc(self, bar: Bar, direction: Direction, *, for_entry: bool) -> tuple[float, float, float, float]:
+    def _side_ohlc(
+        self, bar: Bar, direction: Direction, *, for_entry: bool
+    ) -> tuple[float, float, float, float]:
         half_spread = self.config.spread_price / 2.0
         # Long entry and short exit use ask.  Short entry and long exit use bid.
-        use_ask = (direction is Direction.LONG and for_entry) or (direction is Direction.SHORT and not for_entry)
+        use_ask = (direction is Direction.LONG and for_entry) or (
+            direction is Direction.SHORT and not for_entry
+        )
         adjustment = half_spread if use_ask else -half_spread
         return (
             bar.open + adjustment,
@@ -831,14 +1075,26 @@ class SimpleBacktestEngine:
 
     def _market_exit_price(self, quote: QuoteSnapshot, direction: Direction) -> float:
         price = quote.exit_price(direction)
-        return price - self.config.slippage_price if direction is Direction.LONG else price + self.config.slippage_price
+        return (
+            price - self.config.slippage_price
+            if direction is Direction.LONG
+            else price + self.config.slippage_price
+        )
 
-    def _protection_exit_price(self, bar: Bar, direction: Direction, trigger: float, *, is_stop: bool) -> float:
-        open_price, _, _, _ = self._side_ohlc(bar, direction, for_entry=False)  # pragma: no cover
+    def _protection_exit_price(
+        self, bar: Bar, direction: Direction, trigger: float, *, is_stop: bool
+    ) -> float:
+        open_price, _, _, _ = self._side_ohlc(
+            bar, direction, for_entry=False
+        )  # pragma: no cover
         if is_stop:  # pragma: no cover
             if direction is Direction.LONG:  # pragma: no cover
-                return min(open_price, trigger) - self.config.slippage_price  # pragma: no cover
-            return max(open_price, trigger) + self.config.slippage_price  # pragma: no cover
+                return (
+                    min(open_price, trigger) - self.config.slippage_price
+                )  # pragma: no cover
+            return (
+                max(open_price, trigger) + self.config.slippage_price
+            )  # pragma: no cover
         if direction is Direction.LONG:  # pragma: no cover
             return max(open_price, trigger)  # pragma: no cover
         return min(open_price, trigger)  # pragma: no cover
@@ -850,7 +1106,9 @@ class SimpleBacktestEngine:
         if value < self.config.volume_min - 1e-12:
             return None  # pragma: no cover
         bounded = min(value, self.config.volume_max)
-        steps = floor((bounded - self.config.volume_min) / self.config.volume_step + 1e-9)
+        steps = floor(
+            (bounded - self.config.volume_min) / self.config.volume_step + 1e-9
+        )
         return round(self.config.volume_min + steps * self.config.volume_step, 10)
 
     def _reset_ids(self) -> None:
@@ -867,13 +1125,23 @@ def _initial_protection_prices(
     stop = protection.stop_loss_price
     target = protection.profit_target_price
     if stop is None and protection.stop_loss_distance is not None:
-        stop = entry_price - protection.stop_loss_distance if direction is Direction.LONG else entry_price + protection.stop_loss_distance  # pragma: no cover
+        stop = (
+            entry_price - protection.stop_loss_distance
+            if direction is Direction.LONG
+            else entry_price + protection.stop_loss_distance
+        )  # pragma: no cover
     if target is None and protection.profit_target_distance is not None:
-        target = entry_price + protection.profit_target_distance if direction is Direction.LONG else entry_price - protection.profit_target_distance  # pragma: no cover
+        target = (
+            entry_price + protection.profit_target_distance
+            if direction is Direction.LONG
+            else entry_price - protection.profit_target_distance
+        )  # pragma: no cover
     return stop, target
 
 
-def _apply_protection_to_position(position: SimPosition, protection: ProtectionRequest) -> None:
+def _apply_protection_to_position(
+    position: SimPosition, protection: ProtectionRequest
+) -> None:
     if protection.clear_stop_loss:
         position.stop_loss_price = None
     elif protection.stop_loss_price is not None:  # pragma: no cover
@@ -881,7 +1149,9 @@ def _apply_protection_to_position(position: SimPosition, protection: ProtectionR
     if protection.clear_profit_target:
         position.profit_target_price = None
     elif protection.profit_target_price is not None:  # pragma: no cover
-        position.profit_target_price = protection.profit_target_price  # pragma: no cover
+        position.profit_target_price = (
+            protection.profit_target_price
+        )  # pragma: no cover
     if protection.trailing_distance is not None:  # pragma: no cover
         position.trailing_distance = protection.trailing_distance
     if protection.trailing_activation_distance is not None:  # pragma: no cover
@@ -919,16 +1189,36 @@ def _pending_snapshot(order: SimPendingOrder) -> PendingOrderSnapshot:
     )
 
 
-def _find_position(positions: Sequence[SimPosition], position_id: str) -> SimPosition | None:
-    return next((position for position in positions if position.position_id == position_id), None)
+def _find_position(
+    positions: Sequence[SimPosition], position_id: str
+) -> SimPosition | None:
+    return next(
+        (position for position in positions if position.position_id == position_id),
+        None,
+    )
 
 
-def _gross_pnl(direction: Direction, entry_price: float, exit_price: float, quantity: float, contract_size: float) -> float:
-    difference = exit_price - entry_price if direction is Direction.LONG else entry_price - exit_price
+def _gross_pnl(
+    direction: Direction,
+    entry_price: float,
+    exit_price: float,
+    quantity: float,
+    contract_size: float,
+) -> float:
+    difference = (
+        exit_price - entry_price
+        if direction is Direction.LONG
+        else entry_price - exit_price
+    )
     return difference * quantity * contract_size
 
 
-def _build_metrics(initial_balance: float, final_balance: float, closed: Sequence[ClosedTrade], equity_curve: Sequence[EquityPoint]) -> BacktestMetrics:
+def _build_metrics(
+    initial_balance: float,
+    final_balance: float,
+    closed: Sequence[ClosedTrade],
+    equity_curve: Sequence[EquityPoint],
+) -> BacktestMetrics:
     wins = [trade for trade in closed if trade.net_pnl > 0]
     losses = [trade for trade in closed if trade.net_pnl < 0]
     gross_profit = sum(trade.net_pnl for trade in wins)
@@ -948,7 +1238,9 @@ def _build_metrics(initial_balance: float, final_balance: float, closed: Sequenc
         initial_balance=initial_balance,
         final_balance=final_balance,
         net_profit=final_balance - initial_balance,
-        return_pct=((final_balance / initial_balance - 1.0) * 100.0) if initial_balance else 0.0,
+        return_pct=((final_balance / initial_balance - 1.0) * 100.0)
+        if initial_balance
+        else 0.0,
         total_closed_trades=total,
         winning_trades=len(wins),
         losing_trades=len(losses),

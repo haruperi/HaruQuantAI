@@ -520,7 +520,11 @@ def calculate_drawdown_metrics(
         return MetricResult(value=val)
 
     # V1 compatibility path
-    if request_id is None and config is not None and not isinstance(config, MetricConfig):
+    if (
+        request_id is None
+        and config is not None
+        and not isinstance(config, MetricConfig)
+    ):
         request_id = config
     parsed = _parse_equity_curve(equity)
     if not parsed:

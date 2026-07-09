@@ -129,9 +129,7 @@ class ReconciliationStartupGuard:
     startup_reconciliation_id: str | None = None
     startup_completed_at: datetime | None = None
 
-    def record_startup_reconciliation(
-        self, result: ReconciliationResult
-    ) -> bool:
+    def record_startup_reconciliation(self, result: ReconciliationResult) -> bool:
         """Record the outcome of the startup reconciliation run.
 
         Marks startup as complete only when the result status is
@@ -152,8 +150,7 @@ class ReconciliationStartupGuard:
             self.startup_reconciliation_id = result.reconciliation_id
             self.startup_completed_at = result.completed_at
             logger.info(
-                "reconciliation.startup_guard.cleared "
-                "reconciliation_id=%r",
+                "reconciliation.startup_guard.cleared reconciliation_id=%r",
                 result.reconciliation_id,
             )
             return True
@@ -352,14 +349,8 @@ def reconcile_state(  # noqa: PLR0912, PLR0915, C901
     stale_count = 0
 
     # ── Position reconciliation ───────────────────────────────────────
-    int_pos_map = {
-        str(p.get("position_id", i)): p
-        for i, p in enumerate(int_positions)
-    }
-    brk_pos_map = {
-        str(p.get("position_id", i)): p
-        for i, p in enumerate(brk_positions)
-    }
+    int_pos_map = {str(p.get("position_id", i)): p for i, p in enumerate(int_positions)}
+    brk_pos_map = {str(p.get("position_id", i)): p for i, p in enumerate(brk_positions)}
 
     for pid, brk_pos in brk_pos_map.items():
         if pid not in int_pos_map:
@@ -380,11 +371,7 @@ def reconcile_state(  # noqa: PLR0912, PLR0915, C901
             mismatch_fields: list[str] = [
                 key
                 for key in ("volume", "symbol", "type")
-                if (
-                    key in brk_pos
-                    and key in int_pos
-                    and brk_pos[key] != int_pos[key]
-                )
+                if (key in brk_pos and key in int_pos and brk_pos[key] != int_pos[key])
             ]
             if mismatch_fields:
                 mismatches.append(
@@ -392,12 +379,8 @@ def reconcile_state(  # noqa: PLR0912, PLR0915, C901
                         mismatch_type="field_mismatch",
                         entity_type="position",
                         entity_id=pid,
-                        internal_value={
-                            k: int_pos.get(k) for k in mismatch_fields
-                        },
-                        broker_value={
-                            k: brk_pos.get(k) for k in mismatch_fields
-                        },
+                        internal_value={k: int_pos.get(k) for k in mismatch_fields},
+                        broker_value={k: brk_pos.get(k) for k in mismatch_fields},
                         severity="warning",
                         details={"mismatched_fields": mismatch_fields},
                     )
@@ -407,9 +390,7 @@ def reconcile_state(  # noqa: PLR0912, PLR0915, C901
                 matched_count += 1
 
             # Stale check on broker position record.
-            stale = _check_stale(
-                brk_pos, pid, "position", now, max_staleness_seconds
-            )
+            stale = _check_stale(brk_pos, pid, "position", now, max_staleness_seconds)
             if stale is not None:
                 mismatches.append(stale)
                 stale_count += 1
@@ -430,12 +411,8 @@ def reconcile_state(  # noqa: PLR0912, PLR0915, C901
             extra_count += 1
 
     # ── Order reconciliation ──────────────────────────────────────────
-    int_ord_map = {
-        str(o.get("order_id", i)): o for i, o in enumerate(int_orders)
-    }
-    brk_ord_map = {
-        str(o.get("order_id", i)): o for i, o in enumerate(brk_orders)
-    }
+    int_ord_map = {str(o.get("order_id", i)): o for i, o in enumerate(int_orders)}
+    brk_ord_map = {str(o.get("order_id", i)): o for i, o in enumerate(brk_orders)}
 
     for oid, brk_ord in brk_ord_map.items():
         if oid not in int_ord_map:
@@ -454,9 +431,7 @@ def reconcile_state(  # noqa: PLR0912, PLR0915, C901
         else:
             matched_count += 1
             # Stale check on broker order record.
-            stale = _check_stale(
-                brk_ord, oid, "order", now, max_staleness_seconds
-            )
+            stale = _check_stale(brk_ord, oid, "order", now, max_staleness_seconds)
             if stale is not None:
                 mismatches.append(stale)
                 stale_count += 1
@@ -477,12 +452,8 @@ def reconcile_state(  # noqa: PLR0912, PLR0915, C901
             )
 
     # ── Determine status ──────────────────────────────────────────────
-    critical_mismatches = [
-        m for m in mismatches if m.severity == "critical"
-    ]
-    error_mismatches = [
-        m for m in mismatches if m.severity == "error"
-    ]
+    critical_mismatches = [m for m in mismatches if m.severity == "critical"]
+    error_mismatches = [m for m in mismatches if m.severity == "error"]
 
     if critical_mismatches:
         status = "incident"
@@ -514,9 +485,7 @@ def reconcile_state(  # noqa: PLR0912, PLR0915, C901
     completed_at = datetime.now(UTC)
     elapsed_ms = (time.perf_counter() - start) * 1000
     retry_safety = (
-        "retry_after_reconciliation"
-        if status != "clean"
-        else "safe_to_retry"
+        "retry_after_reconciliation" if status != "clean" else "safe_to_retry"
     )
 
     logger.info(

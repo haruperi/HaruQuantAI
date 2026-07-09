@@ -458,7 +458,9 @@ def parallel_grid_search(  # noqa: C901
                 metadata={"candidate_hash": cand_hash},  # pragma: no cover
             )  # pragma: no cover
         except Exception as exc:  # noqa: BLE001  # pragma: no cover
-            logger.error("Parallel candidate evaluation failed: %s", exc)  # pragma: no cover
+            logger.error(
+                "Parallel candidate evaluation failed: %s", exc
+            )  # pragma: no cover
             return None  # pragma: no cover
 
     candidates_results: list[OptimizationResult] = []

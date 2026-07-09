@@ -591,6 +591,7 @@ class TestLiveGates:
     @patch("app.services.live.gates.check_risk_kill_switch", return_value=False)
     def test_evaluate_gate_undefined_policy_blocks(self, mock_ks):
         from app.services.live.gates import LiveGateDecision, evaluate_live_gate
+
         cfg = self._make_config()
         results = evaluate_live_gate(action="undefined_action_name", config=cfg)
         block = next((r for r in results if r.decision == LiveGateDecision.BLOCK), None)
@@ -600,6 +601,7 @@ class TestLiveGates:
     @patch("app.services.live.gates.check_risk_kill_switch", return_value=False)
     def test_evaluate_gate_approval_required_without_context_blocks(self, mock_ks):
         from app.services.live.gates import LiveGateDecision, evaluate_live_gate
+
         cfg = self._make_config()
         results = evaluate_live_gate(
             action="cancel_all_orders",
@@ -610,11 +612,15 @@ class TestLiveGates:
         )
         block = next((r for r in results if r.decision == LiveGateDecision.BLOCK), None)
         assert block is not None
-        assert block.error_code == "LIVE_APPROVAL_REQUIRED" or block.error_code == "LIVE_GATE_FAILED"
+        assert (
+            block.error_code == "LIVE_APPROVAL_REQUIRED"
+            or block.error_code == "LIVE_GATE_FAILED"
+        )
 
     @patch("app.services.live.gates.check_risk_kill_switch", return_value=False)
     def test_evaluate_gate_risk_decision_ref_required_blocks(self, mock_ks):
         from app.services.live.gates import LiveGateDecision, evaluate_live_gate
+
         cfg = self._make_config()
         results = evaluate_live_gate(
             action="cancel_all_orders",
@@ -625,7 +631,9 @@ class TestLiveGates:
                 "approval_id": "apv-001",
                 "action_type": "cancel_all_orders",
                 "approval_state": "approved",
-                "expiration_timestamp": (datetime.now(UTC) + timedelta(hours=1)).isoformat(),
+                "expiration_timestamp": (
+                    datetime.now(UTC) + timedelta(hours=1)
+                ).isoformat(),
                 "approver_identity_ref": "user-123",
                 "audit_metadata": {},
             },
@@ -637,6 +645,7 @@ class TestLiveGates:
     @patch("app.services.live.gates.check_risk_kill_switch", return_value=False)
     def test_evaluate_gate_audit_sink_required_when_mutation_enabled(self, mock_ks):
         from app.services.live.gates import LiveGateDecision, evaluate_live_gate
+
         cfg = self._make_config(live_mode="read_write")
         results = evaluate_live_gate(
             action="submit_order",
@@ -648,7 +657,9 @@ class TestLiveGates:
                 "approval_id": "apv-001",
                 "action_type": "submit_order",
                 "approval_state": "approved",
-                "expiration_timestamp": (datetime.now(UTC) + timedelta(hours=1)).isoformat(),
+                "expiration_timestamp": (
+                    datetime.now(UTC) + timedelta(hours=1)
+                ).isoformat(),
                 "approver_identity_ref": "user-123",
                 "audit_metadata": {"approved_by": "governor"},
             },
@@ -663,11 +674,14 @@ class TestLiveGates:
     def test_evaluate_gate_audit_sink_write_exception(self, mock_ks):
         from app.services.live.gates import LiveGateDecision, evaluate_live_gate
         from app.services.live.ports import AuditSink
+
         class FailingAuditSink(AuditSink):
             def write_pre_event(self, **kwargs):
                 raise RuntimeError("write error")
+
             def write_post_event(self, **kwargs):
                 pass
+
         cfg = self._make_config(live_mode="read_write")
         results = evaluate_live_gate(
             action="submit_order",
@@ -679,7 +693,9 @@ class TestLiveGates:
                 "approval_id": "apv-001",
                 "action_type": "submit_order",
                 "approval_state": "approved",
-                "expiration_timestamp": (datetime.now(UTC) + timedelta(hours=1)).isoformat(),
+                "expiration_timestamp": (
+                    datetime.now(UTC) + timedelta(hours=1)
+                ).isoformat(),
                 "approver_identity_ref": "user-123",
                 "audit_metadata": {"approved_by": "governor"},
             },
@@ -693,6 +709,7 @@ class TestLiveGates:
     @patch("app.services.live.gates.check_risk_kill_switch", return_value=False)
     def test_evaluate_gate_idempotency_required_without_key(self, mock_ks):
         from app.services.live.gates import LiveGateDecision, evaluate_live_gate
+
         cfg = self._make_config()
         results = evaluate_live_gate(
             action="submit_order",
@@ -704,7 +721,9 @@ class TestLiveGates:
                 "approval_id": "apv-001",
                 "action_type": "submit_order",
                 "approval_state": "approved",
-                "expiration_timestamp": (datetime.now(UTC) + timedelta(hours=1)).isoformat(),
+                "expiration_timestamp": (
+                    datetime.now(UTC) + timedelta(hours=1)
+                ).isoformat(),
                 "approver_identity_ref": "user-123",
                 "audit_metadata": {"approved_by": "governor"},
             },
@@ -713,8 +732,6 @@ class TestLiveGates:
         block = next((r for r in results if r.decision == LiveGateDecision.BLOCK), None)
         assert block is not None
         assert block.error_code == "INVALID_INPUT"
-
-
 
 
 # ── Executor tests ────────────────────────────────────────────────────────────
@@ -1008,7 +1025,9 @@ class TestReconciliation:
         assert guard.record_startup_reconciliation(clean_res) is True
         assert guard.is_startup_complete is True
 
-        mismatch_res = reconcile_state(broker_positions=[{"position_id": "pos-missing"}])
+        mismatch_res = reconcile_state(
+            broker_positions=[{"position_id": "pos-missing"}]
+        )
         guard2 = ReconciliationStartupGuard()
         assert guard2.record_startup_reconciliation(mismatch_res) is False
 
@@ -1030,14 +1049,20 @@ class TestReconciliation:
         # 3. _check_stale
         stale_time = now - timedelta(seconds=1000)
         record = {"timestamp": stale_time}
-        mismatch = _check_stale(record, "id-1", "position", now, max_staleness_seconds=100)
+        mismatch = _check_stale(
+            record, "id-1", "position", now, max_staleness_seconds=100
+        )
         assert mismatch is not None
         assert mismatch.mismatch_type == "stale"
 
         fresh_time = now - timedelta(seconds=10)
         record_fresh = {"timestamp": fresh_time}
-        assert _check_stale(record_fresh, "id-1", "position", now, max_staleness_seconds=100) is None
-
+        assert (
+            _check_stale(
+                record_fresh, "id-1", "position", now, max_staleness_seconds=100
+            )
+            is None
+        )
 
 
 # ── Monitoring tests ──────────────────────────────────────────────────────────
@@ -1307,20 +1332,50 @@ class TestLivePortsCoverage:
         from app.services.live.ports import AuditSink, IdempotencyStore, LiveStateStore
 
         class DummyStateStore(LiveStateStore):
-            def save_session_state(self, *, session_id: str, state: dict, schema_version: int = 1) -> None:
+            def save_session_state(
+                self, *, session_id: str, state: dict, schema_version: int = 1
+            ) -> None:
                 pass
-            def load_session_state(self, *, session_id: str, schema_version: int = 1) -> dict | None:
+
+            def load_session_state(
+                self, *, session_id: str, schema_version: int = 1
+            ) -> dict | None:
                 return None
 
         class DummyAuditSink(AuditSink):
-            def write_pre_event(self, *, request_id: str, action: str, gate_results: list, audit_metadata: dict, recorded_at: datetime) -> str:
+            def write_pre_event(
+                self,
+                *,
+                request_id: str,
+                action: str,
+                gate_results: list,
+                audit_metadata: dict,
+                recorded_at: datetime,
+            ) -> str:
                 return "ref"
-            def write_post_event(self, *, audit_ref: str, side_effect_mode: str, outcome: str, broker_response_ref: str | None, recorded_at: datetime) -> None:
+
+            def write_post_event(
+                self,
+                *,
+                audit_ref: str,
+                side_effect_mode: str,
+                outcome: str,
+                broker_response_ref: str | None,
+                recorded_at: datetime,
+            ) -> None:
                 pass
 
         class DummyIdempotencyStore(IdempotencyStore):
-            def record_intent(self, *, idempotency_key: str, action: str, request_hash: str, recorded_at: datetime) -> bool:
+            def record_intent(
+                self,
+                *,
+                idempotency_key: str,
+                action: str,
+                request_hash: str,
+                recorded_at: datetime,
+            ) -> bool:
                 return True
+
             def resolve_intent(self, *, idempotency_key: str, outcome: str) -> None:
                 pass
 
@@ -1337,10 +1392,30 @@ class TestLivePortsCoverage:
         LiveStateStore.load_session_state(store, session_id="test")
 
         from datetime import UTC, datetime
+
         now = datetime.now(UTC)
-        AuditSink.write_pre_event(sink, request_id="test", action="test", gate_results=[], audit_metadata={}, recorded_at=now)
-        AuditSink.write_post_event(sink, audit_ref="test", side_effect_mode="test", outcome="test", broker_response_ref=None, recorded_at=now)
+        AuditSink.write_pre_event(
+            sink,
+            request_id="test",
+            action="test",
+            gate_results=[],
+            audit_metadata={},
+            recorded_at=now,
+        )
+        AuditSink.write_post_event(
+            sink,
+            audit_ref="test",
+            side_effect_mode="test",
+            outcome="test",
+            broker_response_ref=None,
+            recorded_at=now,
+        )
 
-        IdempotencyStore.record_intent(idem, idempotency_key="test", action="test", request_hash="test", recorded_at=now)
+        IdempotencyStore.record_intent(
+            idem,
+            idempotency_key="test",
+            action="test",
+            request_hash="test",
+            recorded_at=now,
+        )
         IdempotencyStore.resolve_intent(idem, idempotency_key="test", outcome="test")
-

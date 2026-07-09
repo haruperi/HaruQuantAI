@@ -36,12 +36,9 @@ def test_pybots_real_extra():
 
     try:
         sqx = SQXBreakoutAtrTrailingStrategy(mock_config)
-        df = pd.DataFrame({
-            "high": [10]*10,
-            "low": [5]*10,
-            "open": [7]*10,
-            "close": [8]*10
-        })
+        df = pd.DataFrame(
+            {"high": [10] * 10, "low": [5] * 10, "open": [7] * 10, "close": [8] * 10}
+        )
         sqx.calculate_signals(df, mock_context)
     except Exception:
         pass
@@ -50,6 +47,7 @@ def test_pybots_real_extra():
         from app.services.strategy.pybots.market_structure_ea.strategy import (
             MarketStructureEA,
         )
+
         ms = MarketStructureEA(mock_config)
         ms.calculate_signals(df, mock_context)
     except Exception:
@@ -57,6 +55,7 @@ def test_pybots_real_extra():
 
     try:
         from app.services.strategy.pybots.white_fairy_ea.strategy import WhiteFairyEA
+
         wf = WhiteFairyEA(mock_config)
         wf.calculate_signals(df, mock_context)
     except Exception:
@@ -66,6 +65,7 @@ def test_pybots_real_extra():
         from app.services.strategy.pybots.decomposing_trade_ea.strategy import (
             DecomposingTradeEA,
         )
+
         dt = DecomposingTradeEA(mock_config)
         dt.calculate_signals(df, mock_context)
     except Exception:
@@ -75,6 +75,7 @@ def test_pybots_real_extra():
         from app.services.strategy.pybots.harriet_hedging_ea.strategy import (
             HarrietHedgingEA,
         )
+
         hh = HarrietHedgingEA(mock_config)
         hh.calculate_signals(df, mock_context)
     except Exception:

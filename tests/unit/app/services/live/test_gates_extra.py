@@ -61,8 +61,7 @@ def test_live_gates_functions():
             correlation_id="corr1",
             session_active=True,
             risk_decision_ref="risk1",
-            audit_sink=None
+            audit_sink=None,
         )
     except Exception:
         pass
-

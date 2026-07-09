@@ -6,10 +6,11 @@ without recomputing metrics or performing active market checks.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Sequence
 from decimal import Decimal
+from pathlib import Path
+from typing import Any
 
 from pydantic import Field
 
@@ -24,9 +25,6 @@ from app.utils.logger import logger
 from app.utils.normalization import utc_now
 from app.utils.security import redact_mapping, redact_text
 from app.utils.standard import canonical_json, stable_identifier
-
-if TYPE_CHECKING:
-    from app.services.risk.models.enums import RiskDecisionStatus
 
 
 class PortfolioRiskReport(RiskContract):
@@ -311,9 +309,7 @@ class RiskReportBuilder:
 
             dec_details = dec.details or {}
             dec_warnings = (
-                dec_details.get("warning_flags")
-                or dec_details.get("warnings")
-                or []
+                dec_details.get("warning_flags") or dec_details.get("warnings") or []
             )
             for flag in dec_warnings:
                 warnings.add(flag)
@@ -356,9 +352,7 @@ class RiskReportBuilder:
                     ):
                         latest_decision = dec
                 except (ValueError, TypeError) as e:
-                    logger.warning(
-                        f"Error parsing decision from audit event: {e}"
-                    )
+                    logger.warning(f"Error parsing decision from audit event: {e}")
 
         return decisions_list, breaches, warnings, latest_decision
 
@@ -371,12 +365,8 @@ class RiskReportBuilder:
         Returns:
             RiskReport: Populated report.
         """
-        logger.info(
-            f"Building report under request ID: {options.request_id}"
-        )
-        decisions_list, breaches, warnings, latest_decision = (
-            self._parse_events()
-        )
+        logger.info(f"Building report under request ID: {options.request_id}")
+        decisions_list, breaches, warnings, latest_decision = self._parse_events()
 
         policy_profile = None
         config_hash = None
@@ -483,7 +473,7 @@ def generate_risk_report(
         RiskReport: Generated report.
     """
     logger.info("Generating risk report.")
-    
+
     # Dual-signature check
     if evidence is not None and not isinstance(evidence, RiskReportEvidence):
         state_store = evidence
@@ -493,7 +483,7 @@ def generate_risk_report(
         decisions = []
         if decision_store is not None:
             decisions = decision_store.list_decisions()
-        
+
         drawdown_state = None
         if state_store is not None:
             if hasattr(state_store, "get_drawdown_state"):
@@ -522,8 +512,11 @@ def generate_risk_report(
         report = redact_risk_report(report)
 
     if write_to_path is not None:
-        from app.services.risk.reports.exporter import AuthorizedReportPath, write_risk_report
-        
+        from app.services.risk.reports.exporter import (
+            AuthorizedReportPath,
+            write_risk_report,
+        )
+
         path_obj = Path(write_to_path)
         if path_obj.is_absolute():
             if str(path_obj).startswith(str(Path.cwd())):
@@ -545,7 +538,6 @@ def generate_risk_report(
         write_risk_report(report, dest)
 
     return report
-
 
 
 def redact_risk_report(

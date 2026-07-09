@@ -44,6 +44,7 @@ def test_registry_import_side_effects() -> None:
 
 def test_lazy_settings_getattr() -> None:
     import app.utils
+
     # Access settings lazily
     assert app.utils.settings is not None
     assert app.utils.Settings is not None
@@ -52,6 +53,6 @@ def test_lazy_settings_getattr() -> None:
 def test_invalid_getattr() -> None:
     import app.utils
     import pytest
+
     with pytest.raises(AttributeError, match="module 'app.utils' has no attribute"):
         _ = app.utils.non_existent_attribute
-

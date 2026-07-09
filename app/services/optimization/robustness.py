@@ -344,7 +344,9 @@ def run_randomize_parameters_mc(
                 parameters=perturbed,  # pragma: no cover
                 initial_balance=initial_balance,  # pragma: no cover
             )  # pragma: no cover
-            scores.append(total_return_score(res.trades, initial_balance))  # pragma: no cover
+            scores.append(
+                total_return_score(res.trades, initial_balance)
+            )  # pragma: no cover
         except Exception:  # noqa: BLE001  # pragma: no cover
             scores.append(0.0)  # pragma: no cover
     return scores  # pragma: no cover
@@ -436,7 +438,9 @@ def run_cross_market_test(
                 parameters=parameters,  # pragma: no cover
                 initial_balance=initial_balance,  # pragma: no cover
             )  # pragma: no cover
-            results[sym] = total_return_score(res.trades, initial_balance)  # pragma: no cover
+            results[sym] = total_return_score(
+                res.trades, initial_balance
+            )  # pragma: no cover
         except Exception:  # noqa: BLE001  # pragma: no cover
             results[sym] = 0.0  # pragma: no cover
     return results  # pragma: no cover
@@ -482,7 +486,9 @@ def run_cross_timeframe_test(
                 parameters=parameters,  # pragma: no cover
                 initial_balance=initial_balance,  # pragma: no cover
             )  # pragma: no cover
-            results[tf] = total_return_score(res.trades, initial_balance)  # pragma: no cover
+            results[tf] = total_return_score(
+                res.trades, initial_balance
+            )  # pragma: no cover
         except Exception:  # noqa: BLE001  # pragma: no cover
             results[tf] = 0.0  # pragma: no cover
     return results  # pragma: no cover

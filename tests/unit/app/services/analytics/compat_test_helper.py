@@ -35,6 +35,7 @@ def make_compat(v2_func: Callable[..., MetricResult[Any] | Any]) -> Callable[...
     Returns:
         Calculated Callable[..., Any] value.
     """
+
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         logger.debug(f"make_compat wrapper: executing for {v2_func.__name__}")
         has_config = False
@@ -54,9 +55,7 @@ def make_compat(v2_func: Callable[..., MetricResult[Any] | Any]) -> Callable[...
         if len(args) > 1:
             metadata["window"] = args[1]
 
-        config = MetricConfig(
-            metadata=metadata
-        )
+        config = MetricConfig(metadata=metadata)
         res = v2_func(args[0], config)
         if isinstance(res, MetricResult):
             return res.value
@@ -74,7 +73,9 @@ def make_success_response(data: Any, tool_name: str, request_id: str | None) -> 
         request_id=request_id,
         reads=True,
     )
-    return success_response(message="Tool executed successfully.", data=data, metadata=meta)
+    return success_response(
+        message="Tool executed successfully.", data=data, metadata=meta
+    )
 
 
 def make_error_response(e: Exception, tool_name: str, request_id: str | None) -> Any:
@@ -113,7 +114,12 @@ def calculate_drawdown_metrics(
 def max_close_to_close_drawdown_percent(equity: Any, config: Any = None) -> Any:
     """Compatibility wrapper for max_close_to_close_drawdown_percent."""
     logger.debug("max_close_to_close_drawdown_percent compatibility wrapper: executed.")
-    if isinstance(equity, list) and len(equity) > 0 and isinstance(equity[0], dict) and "open_time" in equity[0]:
+    if (
+        isinstance(equity, list)
+        and len(equity) > 0
+        and isinstance(equity[0], dict)
+        and "open_time" in equity[0]
+    ):
         balance = 10000.0
         balances = [balance]
         for t in equity:
@@ -134,7 +140,9 @@ def max_close_to_close_drawdown_percent(equity: Any, config: Any = None) -> Any:
     return v2_drawdown.max_close_to_close_drawdown_percent(equity, config_obj).value
 
 
-def account_size_required(equity: Any, config: Any = None, initial_balance: float = 10000.0) -> Any:
+def account_size_required(
+    equity: Any, config: Any = None, initial_balance: float = 10000.0
+) -> Any:
     """Compatibility wrapper for account_size_required."""
     logger.debug("account_size_required compatibility wrapper: executed.")
     init_bal = initial_balance
@@ -142,7 +150,12 @@ def account_size_required(equity: Any, config: Any = None, initial_balance: floa
         init_bal = float(config)
         config = None
 
-    if isinstance(equity, list) and len(equity) > 0 and isinstance(equity[0], dict) and "open_time" in equity[0]:
+    if (
+        isinstance(equity, list)
+        and len(equity) > 0
+        and isinstance(equity[0], dict)
+        and "open_time" in equity[0]
+    ):
         balance = init_bal
         balances = [balance]
         for t in equity:
@@ -209,14 +222,20 @@ def sterling_ratio(annualized_return: Any, max_drawdown: Any = None) -> Any:
     """Compatibility wrapper for sterling_ratio."""
     logger.debug("sterling_ratio compatibility wrapper: executed.")
     if isinstance(annualized_return, (int, float)):
-        return float(annualized_return) / (float(max_drawdown) + 10.0) if max_drawdown is not None else 0.0
+        return (
+            float(annualized_return) / (float(max_drawdown) + 10.0)
+            if max_drawdown is not None
+            else 0.0
+        )
     if isinstance(max_drawdown, MetricConfig):
         return v2_drawdown.sterling_ratio(annualized_return, max_drawdown)
     config = MetricConfig()
     return v2_drawdown.sterling_ratio(annualized_return, config).value
 
 
-def rina_index(select_net_profit: Any, average_drawdown: Any = None, time_in_market: Any = None) -> Any:
+def rina_index(
+    select_net_profit: Any, average_drawdown: Any = None, time_in_market: Any = None
+) -> Any:
     """Compatibility wrapper for rina_index."""
     logger.debug("rina_index compatibility wrapper: executed.")
     if isinstance(select_net_profit, (int, float)):
@@ -229,37 +248,59 @@ def rina_index(select_net_profit: Any, average_drawdown: Any = None, time_in_mar
     return v2_drawdown.rina_index(select_net_profit, config).value
 
 
-def return_on_max_strategy_drawdown(annualized_return: Any, max_drawdown: Any = None) -> Any:
+def return_on_max_strategy_drawdown(
+    annualized_return: Any, max_drawdown: Any = None
+) -> Any:
     """Compatibility wrapper for return_on_max_strategy_drawdown."""
     logger.debug("return_on_max_strategy_drawdown compatibility wrapper: executed.")
     if isinstance(annualized_return, (int, float)):
         return float(annualized_return) / float(max_drawdown) if max_drawdown else 0.0
     if isinstance(max_drawdown, MetricConfig):
-        return v2_drawdown.return_on_max_strategy_drawdown(annualized_return, max_drawdown)
+        return v2_drawdown.return_on_max_strategy_drawdown(
+            annualized_return, max_drawdown
+        )
     config = MetricConfig()
     return v2_drawdown.return_on_max_strategy_drawdown(annualized_return, config).value
 
 
-def return_on_max_close_to_close_drawdown(net_profit: Any, max_drawdown: Any = None) -> Any:
+def return_on_max_close_to_close_drawdown(
+    net_profit: Any, max_drawdown: Any = None
+) -> Any:
     """Compatibility wrapper for return_on_max_close_to_close_drawdown."""
-    logger.debug("return_on_max_close_to_close_drawdown compatibility wrapper: executed.")
+    logger.debug(
+        "return_on_max_close_to_close_drawdown compatibility wrapper: executed."
+    )
     if isinstance(net_profit, (int, float)):
         return float(net_profit) / float(max_drawdown) if max_drawdown else 0.0
     if isinstance(max_drawdown, MetricConfig):
-        return v2_drawdown.return_on_max_close_to_close_drawdown(net_profit, max_drawdown)
+        return v2_drawdown.return_on_max_close_to_close_drawdown(
+            net_profit, max_drawdown
+        )
     config = MetricConfig()
     return v2_drawdown.return_on_max_close_to_close_drawdown(net_profit, config).value
 
 
-def adjusted_net_profit_as_percent_of_max_strategy_drawdown(adjusted_net_profit: Any, max_drawdown: Any = None) -> Any:
+def adjusted_net_profit_as_percent_of_max_strategy_drawdown(
+    adjusted_net_profit: Any, max_drawdown: Any = None
+) -> Any:
     """Compatibility wrapper for adjusted_net_profit_as_percent_of_max_strategy_drawdown."""
-    logger.debug("adjusted_net_profit_as_percent_of_max_strategy_drawdown compatibility wrapper: executed.")
+    logger.debug(
+        "adjusted_net_profit_as_percent_of_max_strategy_drawdown compatibility wrapper: executed."
+    )
     if isinstance(adjusted_net_profit, (int, float)):
-        return float(adjusted_net_profit) / float(max_drawdown) * 100.0 if max_drawdown else 0.0
+        return (
+            float(adjusted_net_profit) / float(max_drawdown) * 100.0
+            if max_drawdown
+            else 0.0
+        )
     if isinstance(max_drawdown, MetricConfig):
-        return v2_drawdown.adjusted_net_profit_as_percent_of_max_strategy_drawdown(adjusted_net_profit, max_drawdown)
+        return v2_drawdown.adjusted_net_profit_as_percent_of_max_strategy_drawdown(
+            adjusted_net_profit, max_drawdown
+        )
     config = MetricConfig()
-    return v2_drawdown.adjusted_net_profit_as_percent_of_max_strategy_drawdown(adjusted_net_profit, config).value
+    return v2_drawdown.adjusted_net_profit_as_percent_of_max_strategy_drawdown(
+        adjusted_net_profit, config
+    ).value
 
 
 # Compatibility wrappers for tool functions returning StandardResponse
@@ -322,9 +363,12 @@ def calculate_risk_metrics(returns: Any, request_id: Any = None) -> Any:
         return v2_risk.calculate_risk_metrics(returns, request_id)
     try:
         from app.services.analytics.statistics.distributions import _to_float_list
+
         ret_list = _to_float_list(returns)
         if not ret_list:
-            raise ValidationError("returns series must contain at least one valid number.")
+            raise ValidationError(
+                "returns series must contain at least one valid number."
+            )
         config = MetricConfig()
         res = v2_risk.calculate_risk_metrics(ret_list, config)
         return make_success_response(res.value, "calculate_risk_metrics", request_id)
@@ -337,9 +381,12 @@ def calculate_ratio_metrics(returns: Any, request_id: Any = None) -> Any:
     logger.debug("calculate_ratio_metrics compatibility wrapper: executed.")
     try:
         from app.services.analytics.statistics.distributions import _to_float_list
+
         ret_list = _to_float_list(returns)
         if not ret_list:
-            raise ValidationError("returns series must contain at least one valid number.")
+            raise ValidationError(
+                "returns series must contain at least one valid number."
+            )
         meta = build_metadata(
             tool_name="calculate_ratio_metrics",
             tool_category="analytics",
@@ -348,15 +395,24 @@ def calculate_ratio_metrics(returns: Any, request_id: Any = None) -> Any:
             reads=True,
         )
         data = {
-            "sharpe_ratio": v2_ratios.sharpe_ratio(ret_list, MetricConfig()).value or 0.0,
-            "annualized_sharpe_ratio": v2_ratios.annualized_sharpe_ratio(ret_list) or 0.0,
-            "sortino_ratio": v2_ratios.sortino_ratio(ret_list, MetricConfig()).value or 0.0,
+            "sharpe_ratio": v2_ratios.sharpe_ratio(ret_list, MetricConfig()).value
+            or 0.0,
+            "annualized_sharpe_ratio": v2_ratios.annualized_sharpe_ratio(ret_list)
+            or 0.0,
+            "sortino_ratio": v2_ratios.sortino_ratio(ret_list, MetricConfig()).value
+            or 0.0,
             "omega_ratio": v2_ratios.omega_ratio(ret_list, MetricConfig()).value or 0.0,
             "gain_to_pain_ratio": v2_ratios.gain_to_pain_ratio(ret_list) or 0.0,
         }
-        return success_response(message="Successfully calculated ratio metrics.", data=data, metadata=meta)
+        return success_response(
+            message="Successfully calculated ratio metrics.", data=data, metadata=meta
+        )
     except Exception as e:
-        return make_error_response(e, "calculate_ratio_metrics", request_id if isinstance(request_id, str) else None)
+        return make_error_response(
+            e,
+            "calculate_ratio_metrics",
+            request_id if isinstance(request_id, str) else None,
+        )
 
 
 def classify_trades(trades: Any, config: Any = None) -> Any:
@@ -381,13 +437,22 @@ def return_on_account(*args: Any, **kwargs: Any) -> Any:
 def compounding_risk_of_ruin(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for compounding_risk_of_ruin supporting V1 signature."""
     is_v1 = False
-    if (len(args) >= 2 and isinstance(args[1], (int, float))) or "initial_balance" in kwargs or "initial_capital" in kwargs or "ruin_threshold" in kwargs:
+    if (
+        (len(args) >= 2 and isinstance(args[1], (int, float)))
+        or "initial_balance" in kwargs
+        or "initial_capital" in kwargs
+        or "ruin_threshold" in kwargs
+    ):
         is_v1 = True
 
     if is_v1:
         config = MetricConfig()
         metadata = dict(config.metadata or {})
-        initial_cap = args[1] if len(args) > 1 else kwargs.get("initial_balance") or kwargs.get("initial_capital", 10000.0)
+        initial_cap = (
+            args[1]
+            if len(args) > 1
+            else kwargs.get("initial_balance") or kwargs.get("initial_capital", 10000.0)
+        )
         metadata["initial_capital"] = initial_cap
         ruin_th = args[2] if len(args) > 2 else kwargs.get("ruin_threshold", 5000.0)
         metadata["ruin_threshold"] = ruin_th
@@ -402,13 +467,22 @@ def compounding_risk_of_ruin(*args: Any, **kwargs: Any) -> Any:
 def risk_of_ruin(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for risk_of_ruin supporting V1 signature."""
     is_v1 = False
-    if (len(args) >= 2 and isinstance(args[1], (int, float))) or "initial_balance" in kwargs or "initial_capital" in kwargs or "ruin_threshold" in kwargs:
+    if (
+        (len(args) >= 2 and isinstance(args[1], (int, float)))
+        or "initial_balance" in kwargs
+        or "initial_capital" in kwargs
+        or "ruin_threshold" in kwargs
+    ):
         is_v1 = True
 
     if is_v1:
         config = MetricConfig()
         metadata = dict(config.metadata or {})
-        initial_cap = args[1] if len(args) > 1 else kwargs.get("initial_balance") or kwargs.get("initial_capital", 10000.0)
+        initial_cap = (
+            args[1]
+            if len(args) > 1
+            else kwargs.get("initial_balance") or kwargs.get("initial_capital", 10000.0)
+        )
         metadata["initial_capital"] = initial_cap
         ruin_th = args[2] if len(args) > 2 else kwargs.get("ruin_threshold", 5000.0)
         metadata["ruin_threshold"] = ruin_th
@@ -445,7 +519,9 @@ def capital_efficiency(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for capital_efficiency supporting V1 float signature."""
     if len(args) >= 1 and isinstance(args[0], (int, float)):
         net_profit = args[0]
-        initial_capital = args[1] if len(args) > 1 else kwargs.get("initial_capital", 1.0)
+        initial_capital = (
+            args[1] if len(args) > 1 else kwargs.get("initial_capital", 1.0)
+        )
         if initial_capital <= 0:
             return 0.0
         return net_profit / initial_capital
@@ -487,7 +563,11 @@ def profit_per_pip_risk(*args: Any, **kwargs: Any) -> Any:
 
 def compute_r_trade_metrics(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for compute_r_trade_metrics supporting V1 float list signature."""
-    if len(args) >= 1 and isinstance(args[0], list) and all(isinstance(x, (int, float)) for x in args[0]):
+    if (
+        len(args) >= 1
+        and isinstance(args[0], list)
+        and all(isinstance(x, (int, float)) for x in args[0])
+    ):
         r_multiples = args[0]
         if not r_multiples:
             return {"avg": 0.0, "std": 0.0, "expectancy": 0.0}
@@ -500,7 +580,11 @@ def compute_r_trade_metrics(*args: Any, **kwargs: Any) -> Any:
 
 def compute_trade_metrics(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for compute_trade_metrics supporting V1 float list signature."""
-    if len(args) >= 1 and isinstance(args[0], list) and all(isinstance(x, (int, float)) for x in args[0]):
+    if (
+        len(args) >= 1
+        and isinstance(args[0], list)
+        and all(isinstance(x, (int, float)) for x in args[0])
+    ):
         return compute_r_trade_metrics(*args, **kwargs)
     return v2_r_multiples.compute_trade_metrics(*args, **kwargs)
 
@@ -528,6 +612,7 @@ def max_single_trade_margin_utilization(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for max_single_trade_margin_utilization supporting V1 list signature."""
     if len(args) >= 1 and isinstance(args[0], list):
         from app.services.analytics.metrics.trade_outcomes import get_closed_trades
+
         closed = get_closed_trades(args[0])
         return max((float(t.get("margin") or 0.0) for t in closed), default=0.0)
     return v2_risk.max_single_trade_margin_utilization(*args, **kwargs)
@@ -537,6 +622,7 @@ def avg_single_trade_margin_utilization(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for avg_single_trade_margin_utilization supporting V1 list signature."""
     if len(args) >= 1 and isinstance(args[0], list):
         from app.services.analytics.metrics.trade_outcomes import get_closed_trades
+
         closed = get_closed_trades(args[0])
         margins = [float(t.get("margin") or 0.0) for t in closed]
         return sum(margins) / len(margins) if margins else 0.0
@@ -621,11 +707,16 @@ def percent_time_in_market(*args: Any, **kwargs: Any) -> Any:
 
 def win_loss_streaks(*args: Any, **kwargs: Any) -> Any:
     """Compatibility wrapper for win_loss_streaks supporting V1 list signature."""
-    if len(args) >= 1 and isinstance(args[0], list) and (not args[0] or isinstance(args[0][0], dict)):
+    if (
+        len(args) >= 1
+        and isinstance(args[0], list)
+        and (not args[0] or isinstance(args[0][0], dict))
+    ):
         from app.services.analytics.metrics.trade_outcomes import (
             _get_trade_pnl,
             get_ordered_closed_trades,
         )
+
         ordered = get_ordered_closed_trades(args[0])
         wins: list[int] = []
         losses: list[int] = []
@@ -692,6 +783,7 @@ def get_analytics_overview(
             get_closed_trades,
             parse_utc_time,
         )
+
         t_list = trades if isinstance(trades, list) else []
         closed = get_closed_trades(t_list)
         start_dt = parse_utc_time(start_time)
@@ -738,6 +830,7 @@ def calculate_analytics_for_subset(trades: Any, config: Any = None) -> Any:
     from app.services.analytics.metrics.trade_outcomes import (
         get_closed_trades,
     )
+
     closed = get_closed_trades(trades)
     if not closed:
         return {
@@ -770,8 +863,13 @@ def calculate_analytics_for_subset(trades: Any, config: Any = None) -> Any:
     classes = classify_trades(closed)
     n_wins = len(classes["wins"])
     n_losses = len(classes["losses"])
-    gp = sum(float(t.get("profit_loss") or t.get("pnl") or 0.0) for t in classes["wins"])
-    gl = sum(abs(float(t.get("profit_loss") or t.get("pnl") or 0.0)) for t in classes["losses"])
+    gp = sum(
+        float(t.get("profit_loss") or t.get("pnl") or 0.0) for t in classes["wins"]
+    )
+    gl = sum(
+        abs(float(t.get("profit_loss") or t.get("pnl") or 0.0))
+        for t in classes["losses"]
+    )
 
     n_long = len([t for t in closed if t.get("direction") == "long"])
     n_short = len([t for t in closed if t.get("direction") == "short"])
@@ -788,7 +886,9 @@ def calculate_analytics_for_subset(trades: Any, config: Any = None) -> Any:
     sqn_val = v2_ratios.sqn(closed, MetricConfig()).value or 0.0
     kelly_val = v2_equity_returns.kelly_criterion(closed, MetricConfig()).value or 0.0
     mcw_val = v2_trade_outcomes.max_consecutive_wins(closed, MetricConfig()).value or 0
-    mcl_val = v2_trade_outcomes.max_consecutive_losses(closed, MetricConfig()).value or 0
+    mcl_val = (
+        v2_trade_outcomes.max_consecutive_losses(closed, MetricConfig()).value or 0
+    )
     att_val = v2_time_analysis.avg_time_in_trade(closed, MetricConfig()).value or 0.0
     arm_val = v2_trade_outcomes.avg_r_multiple(closed, MetricConfig()).value or 0.0
     sp_val = v2_position_exposure.slippage_paid(closed, MetricConfig()).value or 0.0

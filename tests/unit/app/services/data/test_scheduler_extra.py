@@ -6,9 +6,11 @@ try:
 except ImportError:
     pass
 
+
 def test_data_scheduler_coverage():
     try:
         from app.services.data.scheduler import DataScheduler
+
         scheduler = DataScheduler()
 
         try:
@@ -43,6 +45,7 @@ def test_data_scheduler_coverage():
 
         try:
             from app.services.data.scheduler import get_scheduler
+
             s = get_scheduler()
             assert s is not None
         except Exception:

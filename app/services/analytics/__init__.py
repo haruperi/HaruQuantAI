@@ -163,9 +163,6 @@ from app.services.analytics.statistics import (
 
 __all__: tuple[str, ...] = tuple(
     sorted(
-        name
-        for name in globals()
-        if not name.startswith("_")
-        and name != "annotations"
+        name for name in globals() if not name.startswith("_") and name != "annotations"
     )
 )

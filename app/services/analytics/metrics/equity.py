@@ -578,7 +578,9 @@ def annualized_return(
             return MetricResult(value=0.0)
         eq_vals = [eq for _, eq in parsed]
         rets = returns_series(eq_vals)
-        periods_per_year = int(config_or_periods.annualization_periods if config_or_periods else 252)
+        periods_per_year = int(
+            config_or_periods.annualization_periods if config_or_periods else 252
+        )
         if not rets:
             return MetricResult(value=0.0)
         product = 1.0
@@ -596,7 +598,7 @@ def annualized_return(
         return 0.0
     product = 1.0
     for r in returns:
-        product *= (1.0 + r)
+        product *= 1.0 + r
     if product <= 0:
         return 0.0
     return (math.pow(product, periods / len(returns)) - 1.0) * 100.0
@@ -788,6 +790,7 @@ def return_skewness(
     # V1 compatibility path
     returns = equity_or_returns
     from app.services.analytics.metrics.distribution import skewness
+
     return skewness(returns)
 
 
@@ -823,6 +826,7 @@ def return_kurtosis(
     # V1 compatibility path
     returns = equity_or_returns
     from app.services.analytics.metrics.distribution import kurtosis
+
     return kurtosis(returns)
 
 
@@ -939,10 +943,12 @@ def calculate_equity_metrics(
         ret_metrics = calculate_return_metrics(equity_curve)
 
         from app.services.analytics.metrics.drawdown import calculate_drawdown_metrics
+
         dd_metrics = calculate_drawdown_metrics(equity_curve)
 
         pct_returns = returns_series(equities)
         from app.services.analytics.metrics.distribution import kurtosis, skewness
+
         data = {
             "total_return_percent": ret_metrics.get("total_return_percent", 0.0),
             "total_return_usd": ret_metrics.get("total_return_usd", 0.0),

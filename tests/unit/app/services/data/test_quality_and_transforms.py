@@ -147,6 +147,7 @@ def test_data_labeling() -> None:
 def test_to_native_types() -> None:
     import numpy as np
     from app.services.data.transforms import _clean_numpy_types
+
     records = [
         {"int_val": np.int64(42), "float_val": np.float64(3.14), "str_val": "hello"}
     ]
@@ -239,4 +240,3 @@ def test_resample_ohlcv_errors_and_policies() -> None:
     # resample with custom spread_policy
     res = resample_ohlcv(records, "M5", spread_policy="last")
     assert len(res) == 1
-

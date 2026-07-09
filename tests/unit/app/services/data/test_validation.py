@@ -86,17 +86,13 @@ def test_licensing_database_operations() -> None:
     symbol = "BTCUSD"
 
     # Register and validate
-    register_license(
-        source, symbol, "commercial", redistribution_restricted=False
-    )
+    register_license(source, symbol, "commercial", redistribution_restricted=False)
     lic = validate_license(source, symbol, "research")
     assert lic["license_type"] == "commercial"
     assert lic["redistribution_restricted"] is False
 
     # redistribution restricted workflow context rejection
-    register_license(
-        source, symbol, "commercial", redistribution_restricted=True
-    )
+    register_license(source, symbol, "commercial", redistribution_restricted=True)
     with pytest.raises(ValidationError, match="Redistribution limits"):
         validate_license(source, symbol, "risk")
 

@@ -1380,4 +1380,3 @@ def test_protocol_ellipses_coverage() -> None:
     assert d_ts.save_idempotency_key("", "") is None
     assert d_ts.get_idempotency_key("") is None
     assert d_ts.save_reconciliation_record("", {}, {}, "") is None
-

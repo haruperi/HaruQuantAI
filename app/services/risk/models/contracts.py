@@ -556,9 +556,12 @@ class RiskConfig(RiskContract):
 class RiskAssessmentRequest(RiskContract):
     """Input encapsulation for a complete governor evaluation run."""
 
-    proposed_action: ProposedTrade | ProposedAllocation | StrategyAdmissionRequest | LiveReadinessRequest = (
-        Field(..., description="Candidate action under evaluation.")
-    )
+    proposed_action: (
+        ProposedTrade
+        | ProposedAllocation
+        | StrategyAdmissionRequest
+        | LiveReadinessRequest
+    ) = Field(..., description="Candidate action under evaluation.")
     portfolio_state: PortfolioState = Field(
         ..., description="Current portfolio snapshot."
     )

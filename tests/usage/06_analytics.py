@@ -342,7 +342,10 @@ def example_01_contracts_and_registry() -> None:
     print_header("1. Contracts & Registry")
     config = MetricConfig()
 
-    print_kv("1.1 schema status", validate_schema_version("1.3.1", SCHEMA_COMPATIBILITY_MATRIX))
+    print_kv(
+        "1.1 schema status",
+        validate_schema_version("1.3.1", SCHEMA_COMPATIBILITY_MATRIX),
+    )
     print_kv("1.2 catalog count", validate_metric_catalog()["metric_count"])
     print_kv("1.2 metric formula", get_metric_definition("r_multiple").formula)
 
@@ -405,7 +408,14 @@ def example_03_position_exposure() -> None:
     print_kv("time in market hours", time_in_market_duration(closed_trades()))
     print_kv("percent time in market", percent_time_in_market(closed_trades(), 24.0))
     print_kv("open pnl", open_position_pnl(trades, MetricConfig()).value)
-    print_kv("costs", {"slippage": slippage_paid(trades, MetricConfig()).value, "commission": commission_paid(trades, MetricConfig()).value, "swap": swap_paid(trades, MetricConfig()).value})
+    print_kv(
+        "costs",
+        {
+            "slippage": slippage_paid(trades, MetricConfig()).value,
+            "commission": commission_paid(trades, MetricConfig()).value,
+            "swap": swap_paid(trades, MetricConfig()).value,
+        },
+    )
 
 
 def example_04_trade_outcomes() -> None:
@@ -418,8 +428,20 @@ def example_04_trade_outcomes() -> None:
     print_kv("total trades", total_trades(trades, MetricConfig()).value)
     print_kv("win rate", win_rate(trades, MetricConfig()).value)
     print_kv("expectancy", expectancy(trades, MetricConfig()).value)
-    print_kv("largest win/loss", (largest_win(trades, MetricConfig()).value, largest_loss(trades, MetricConfig()).value))
-    print_kv("streaks", (max_consecutive_wins(trades, MetricConfig()).value, max_consecutive_losses(trades, MetricConfig()).value))
+    print_kv(
+        "largest win/loss",
+        (
+            largest_win(trades, MetricConfig()).value,
+            largest_loss(trades, MetricConfig()).value,
+        ),
+    )
+    print_kv(
+        "streaks",
+        (
+            max_consecutive_wins(trades, MetricConfig()).value,
+            max_consecutive_losses(trades, MetricConfig()).value,
+        ),
+    )
 
 
 def example_05_r_multiples() -> None:
@@ -476,7 +498,14 @@ def example_09_pnl() -> None:
     print_header("9. PnL")
     trades = closed_trades()
     equity = sample_equity_curve()
-    print_kv("net/gross", {"net": net_profit(trades, MetricConfig()).value, "gross_profit": gross_profit(trades, MetricConfig()).value, "gross_loss": gross_loss(trades, MetricConfig()).value})
+    print_kv(
+        "net/gross",
+        {
+            "net": net_profit(trades, MetricConfig()).value,
+            "gross_profit": gross_profit(trades, MetricConfig()).value,
+            "gross_loss": gross_loss(trades, MetricConfig()).value,
+        },
+    )
     print_kv("total return", total_return(equity))
     print_kv("return on initial", return_on_initial_capital(equity))
     print_kv("CAGR", cagr(10000.0, 10140.0, 1.0))
@@ -508,9 +537,15 @@ def example_11_equity_returns() -> None:
     print_kv("daily returns", daily_returns(equity))
     print_kv("benchmark returns", benchmark_returns([10000.0, 10050.0, 10030.0]))
     print_kv("return metrics", calculate_return_metrics(equity))
-    print_kv("equity tool", calculate_equity_metrics(equity, request_id="usage-equity")["status"])
+    print_kv(
+        "equity tool",
+        calculate_equity_metrics(equity, request_id="usage-equity")["status"],
+    )
     print_kv("annualized return", annualized_return(returns))
-    print_kv("vol/downside", (return_volatility(returns), downside_return_volatility(returns)))
+    print_kv(
+        "vol/downside",
+        (return_volatility(returns), downside_return_volatility(returns)),
+    )
     print_kv("return on account", return_on_account(equity, MetricConfig()).value)
     print_kv("streaks", win_loss_streaks(equity, MetricConfig()).value)
 
@@ -532,7 +567,9 @@ def example_12_drawdown() -> None:
             MetricConfig(metadata={"drawdown_threshold": 0.01}),
         ).value,
     )
-    print_kv("tool", calculate_drawdown_metrics(equity, request_id="usage-dd")["status"])
+    print_kv(
+        "tool", calculate_drawdown_metrics(equity, request_id="usage-dd")["status"]
+    )
 
 
 def example_13_risk() -> None:
@@ -540,8 +577,16 @@ def example_13_risk() -> None:
     print_header("13. Risk")
     returns = sample_returns()
     print_kv("volatility", volatility(returns, MetricConfig()).value)
-    print_kv("annualized volatility", annualized_volatility(returns, MetricConfig()).value)
-    print_kv("VaR/CVaR", (value_at_risk(returns, MetricConfig()).value, conditional_var(returns, MetricConfig()).value))
+    print_kv(
+        "annualized volatility", annualized_volatility(returns, MetricConfig()).value
+    )
+    print_kv(
+        "VaR/CVaR",
+        (
+            value_at_risk(returns, MetricConfig()).value,
+            conditional_var(returns, MetricConfig()).value,
+        ),
+    )
     print_kv("expected shortfall", expected_shortfall(returns, MetricConfig()).value)
     print_kv("tool", calculate_risk_metrics(returns, "usage-risk")["status"])
 
@@ -553,10 +598,18 @@ def example_14_ratios() -> None:
     trades = closed_trades()
     print_kv("sharpe", sharpe_ratio(returns, MetricConfig()).value)
     print_kv("annualized sharpe", annualized_sharpe_ratio(returns))
-    print_kv("sortino/omega", (sortino_ratio(returns, MetricConfig()).value, omega_ratio(returns, MetricConfig()).value))
+    print_kv(
+        "sortino/omega",
+        (
+            sortino_ratio(returns, MetricConfig()).value,
+            omega_ratio(returns, MetricConfig()).value,
+        ),
+    )
     print_kv("profit factor", profit_factor(trades))
     print_kv("deflated sharpe", deflated_sharpe_ratio(1.25, returns))
-    print_kv("tool", calculate_ratio_metrics(returns, request_id="usage-ratio")["status"])
+    print_kv(
+        "tool", calculate_ratio_metrics(returns, request_id="usage-ratio")["status"]
+    )
 
 
 def example_15_aggregate() -> None:
@@ -565,9 +618,14 @@ def example_15_aggregate() -> None:
     trades = closed_trades()
     print_kv("boundary", metrics_aggregate_boundary())
     print_kv("breakeven epsilon", breakeven_epsilon(None, MetricConfig()).value)
-    print_kv("trade metrics", calculate_trade_metrics(trades, "usage-aggregate")["data"])
+    print_kv(
+        "trade metrics", calculate_trade_metrics(trades, "usage-aggregate")["data"]
+    )
     print_kv("subset", calculate_analytics_for_subset(trades, MetricConfig()).value)
-    print_kv("equity aggregate", aggregate_compute_equity_metrics(sample_returns(), MetricConfig()).value)
+    print_kv(
+        "equity aggregate",
+        aggregate_compute_equity_metrics(sample_returns(), MetricConfig()).value,
+    )
 
 
 def example_16_boundaries() -> None:
@@ -590,7 +648,9 @@ def example_17_multiple_testing() -> None:
     print_kv("PBO", probability_of_backtest_overfitting([returns]))
     print_kv("bonferroni", bonferroni_correction([0.01, 0.04]))
     print_kv("BH", benjamini_hochberg_correction([0.04, 0.01]))
-    print_kv("stability", stability_score([{"profit_factor": 1.5}, {"profit_factor": 1.4}]))
+    print_kv(
+        "stability", stability_score([{"profit_factor": 1.5}, {"profit_factor": 1.4}])
+    )
 
 
 def example_18_distributions() -> None:
@@ -604,7 +664,10 @@ def example_18_distributions() -> None:
     print_kv("fit quality", distribution_fit_quality(returns))
     print_kv("histogram", histogram_data(returns, bins=3))
     print_kv("outliers", detect_outliers([1.0, 2.0, 3.0, 100.0]))
-    print_kv("tool", calculate_distribution_metrics(returns, request_id="usage-dist")["status"])
+    print_kv(
+        "tool",
+        calculate_distribution_metrics(returns, request_id="usage-dist")["status"],
+    )
 
 
 def example_19_resampling() -> None:
@@ -612,9 +675,19 @@ def example_19_resampling() -> None:
     print_header("19. Resampling")
     returns = sample_returns()
     print_kv("boundary", statistics_resampling_boundary())
-    print_kv("bootstrap CI", bootstrap_confidence_intervals(returns, iterations=50, seed=7))
-    print_kv("permutation p", permutation_test(returns, [0.0, 0.001, -0.001], iterations=50, seed=7))
-    print_kv("prob above 0", bootstrap_probability_above_threshold(returns, threshold=0.0, seed=7, request_id="usage-boot")["data"])
+    print_kv(
+        "bootstrap CI", bootstrap_confidence_intervals(returns, iterations=50, seed=7)
+    )
+    print_kv(
+        "permutation p",
+        permutation_test(returns, [0.0, 0.001, -0.001], iterations=50, seed=7),
+    )
+    print_kv(
+        "prob above 0",
+        bootstrap_probability_above_threshold(
+            returns, threshold=0.0, seed=7, request_id="usage-boot"
+        )["data"],
+    )
 
 
 def example_20_benchmark() -> None:
@@ -628,7 +701,12 @@ def example_20_benchmark() -> None:
     print_kv("information ratio", information_ratio(returns, benchmark))
     print_kv("batting average", batting_average(returns, benchmark))
     print_kv("capture", up_down_capture(returns, benchmark))
-    print_kv("tool", calculate_benchmark_metrics(returns, benchmark, request_id="usage-bench")["status"])
+    print_kv(
+        "tool",
+        calculate_benchmark_metrics(returns, benchmark, request_id="usage-bench")[
+            "status"
+        ],
+    )
 
 
 def example_21_scorecards() -> None:
@@ -642,8 +720,14 @@ def example_21_scorecards() -> None:
         }
     }
     print_kv("sqn", sqn(report).score)
-    print_kv("sample warning", scorecard_sample_size_warning(report, StrategyQualityConfig()).warnings)
-    print_kv("quality tool", evaluate_strategy_quality(report, request_id="usage-score")["data"])
+    print_kv(
+        "sample warning",
+        scorecard_sample_size_warning(report, StrategyQualityConfig()).warnings,
+    )
+    print_kv(
+        "quality tool",
+        evaluate_strategy_quality(report, request_id="usage-score")["data"],
+    )
 
 
 def example_22_reports() -> None:
@@ -653,20 +737,39 @@ def example_22_reports() -> None:
     report_response = build_analytics_report(trading_result, request_id="usage-report")
     report = report_response["data"]
     print_kv("report status", report_response["status"])
-    print_kv("section eval", evaluate_section("benchmark_metrics", "skipped")["partial_report_status"])
+    print_kv(
+        "section eval",
+        evaluate_section("benchmark_metrics", "skipped")["partial_report_status"],
+    )
     print_kv("backtest report", build_backtest_report(trading_result)["report_status"])
     print_kv("summary rows", format_summary_as_rows(report))
-    print_kv("stats validation", calculate_statistical_validation(sample_returns(), request_id="usage-stat")["status"])
-    print_kv("comparison", compare_analytics_reports(report, report, request_id="usage-compare")["data"])
-    print_kv("compliance", calculate_prop_firm_compliance(report, request_id="usage-comply")["data"])
+    print_kv(
+        "stats validation",
+        calculate_statistical_validation(sample_returns(), request_id="usage-stat")[
+            "status"
+        ],
+    )
+    print_kv(
+        "comparison",
+        compare_analytics_reports(report, report, request_id="usage-compare")["data"],
+    )
+    print_kv(
+        "compliance",
+        calculate_prop_firm_compliance(report, request_id="usage-comply")["data"],
+    )
     print_kv("hash", compute_report_hash(report, HashPolicy.SHA256)[:12])
-    print_kv("markdown", serialize_report(report, ReportFormat.MARKDOWN).content.splitlines()[0])
+    print_kv(
+        "markdown",
+        serialize_report(report, ReportFormat.MARKDOWN).content.splitlines()[0],
+    )
 
 
 def example_23_dashboards() -> None:
     """Show dashboard projection and deterministic truncation."""
     print_header("23. Dashboards")
-    report_response = build_analytics_report(sample_trading_result(), request_id="usage-dashboard-report")
+    report_response = build_analytics_report(
+        sample_trading_result(), request_id="usage-dashboard-report"
+    )
     report = report_response["data"]
     report["equity_curve"] = sample_equity_curve()
     payload = build_overview_payload(report, request_id="usage-dashboard")
@@ -678,7 +781,10 @@ def example_23_dashboards() -> None:
     print_kv("dashboard status", payload["status"])
     print_kv("summary cards", payload["data"]["summary_cards"])
     print_kv("typed payload", typed_payload.schema_version)
-    print_kv("truncated", {"original": truncated.original_count, "returned": truncated.returned_count})
+    print_kv(
+        "truncated",
+        {"original": truncated.original_count, "returned": truncated.returned_count},
+    )
 
 
 if __name__ == "__main__":

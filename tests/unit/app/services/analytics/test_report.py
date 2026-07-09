@@ -172,6 +172,7 @@ def test_report_serialization_and_hashing():
         compute_report_hash,
         serialize_report,
     )
+
     report_dict = {
         "report_id": "rep_test_01",
         "report_status": "completed",
@@ -199,4 +200,3 @@ def test_report_serialization_and_hashing():
     report_dict_alt = dict(report_dict)
     report_dict_alt["metadata"] = {"created_at": "2026-12-31", "request_id": "req_xyz"}
     assert compute_report_hash(report_dict_alt, HashPolicy.SHA256) == hash_sha
-

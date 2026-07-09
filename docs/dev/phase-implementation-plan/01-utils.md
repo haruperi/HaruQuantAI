@@ -1,8 +1,8 @@
 # Utils Foundation - Architecture Requirements Document
 
-**Authoritative source:** `01-utils-foundation.md` only.  
-**Implementation target:** `app/utils/`  
-**Document type:** Architecture-to-requirements traceability specification.  
+**Authoritative source:** `01-utils-foundation.md` only.
+**Implementation target:** `app/utils/`
+**Document type:** Architecture-to-requirements traceability specification.
 **Rule:** This document defines interfaces, files, boundaries, and function contracts only. It intentionally contains no Python implementation code.
 
 ## Scope and Ownership

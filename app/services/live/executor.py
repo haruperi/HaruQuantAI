@@ -220,7 +220,8 @@ class LiveTradeExecutor:
             (
                 r
                 for r in gate_results
-                if r.decision in {
+                if r.decision
+                in {
                     LiveGateDecision.BLOCK,
                     LiveGateDecision.ERROR,
                 }
@@ -230,8 +231,7 @@ class LiveTradeExecutor:
         if failed_gate is not None:
             elapsed = (time.perf_counter() - start) * 1000
             logger.warning(
-                "live_executor.blocked action=%r gate=%r "
-                "error_code=%r request_id=%r",
+                "live_executor.blocked action=%r gate=%r error_code=%r request_id=%r",
                 action,
                 failed_gate.gate_name,
                 failed_gate.error_code,
@@ -255,8 +255,7 @@ class LiveTradeExecutor:
             (
                 r.audit_ref
                 for r in gate_results
-                if r.gate_name == "audit_pre_recording"
-                and r.audit_ref is not None
+                if r.gate_name == "audit_pre_recording" and r.audit_ref is not None
             ),
             None,
         )
@@ -267,8 +266,7 @@ class LiveTradeExecutor:
         # packaged_only.
         elapsed = (time.perf_counter() - start) * 1000
         logger.info(
-            "live_executor.packaged action=%r live_mode=%r "
-            "request_id=%r elapsed_ms=%r",
+            "live_executor.packaged action=%r live_mode=%r request_id=%r elapsed_ms=%r",
             action,
             self._config.live_mode,
             request_id,
@@ -371,8 +369,7 @@ def validate_live_execution_request(
     """
     if not isinstance(action, str) or not action.strip():
         logger.warning(
-            "live_executor.validation.invalid_action "
-            "action=%r request_id=%r",
+            "live_executor.validation.invalid_action action=%r request_id=%r",
             action,
             request_id,
         )
@@ -380,8 +377,7 @@ def validate_live_execution_request(
 
     if not isinstance(request, dict):
         logger.warning(
-            "live_executor.validation.invalid_request_type "
-            "action=%r request_id=%r",
+            "live_executor.validation.invalid_request_type action=%r request_id=%r",
             action,
             request_id,
         )
@@ -389,8 +385,7 @@ def validate_live_execution_request(
 
     if not request:
         logger.warning(
-            "live_executor.validation.empty_request "
-            "action=%r request_id=%r",
+            "live_executor.validation.empty_request action=%r request_id=%r",
             action,
             request_id,
         )

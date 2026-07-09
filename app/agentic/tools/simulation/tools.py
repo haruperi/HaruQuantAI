@@ -11,9 +11,13 @@ from typing import Any
 try:
     from app.services.simulator.orchestrator import run_backtest as _run_backtest  # type: ignore[import-not-found, unused-ignore]
 except ImportError:
+
     def _run_backtest(payload: dict[str, Any]) -> StandardResponse:
         from app.utils.standard import error_response
+
         return error_response(message="Not implemented", code="NOT_IMPLEMENTED")
+
+
 from app.utils.standard import StandardResponse
 
 

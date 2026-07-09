@@ -6,9 +6,10 @@ telemetry, latency metrics, and audit/persistence health indicators.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Mapping, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from app.utils.logger import logger
 from app.utils.observability import MetricRegistry
@@ -124,9 +125,7 @@ def build_decision_metrics(
     Returns:
         tuple[RiskObservabilityEvent, ...]: The derived events.
     """
-    logger.debug(
-        f"Building decision metrics for decision ID: {decision.decision_id}"
-    )
+    logger.debug(f"Building decision metrics for decision ID: {decision.decision_id}")
     details = decision.details or {}
     policy_profile = details.get("policy_profile") or "unknown"
     mode = details.get("mode") or "unknown"
@@ -167,8 +166,7 @@ def build_latency_metric(
         RiskObservabilityEvent: The latency event.
     """
     logger.debug(
-        f"Building latency metric for operation: {operation}, "
-        f"duration={duration_ms} ms"
+        f"Building latency metric for operation: {operation}, duration={duration_ms} ms"
     )
     metric_name = f"haruquant_risk_{operation}_latency_ms"
     return RiskObservabilityEvent(

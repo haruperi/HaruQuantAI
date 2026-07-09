@@ -1470,7 +1470,7 @@ Functional blocks below preserve every `SIM-FR-*` task verbatim. Each block maps
 
 - [ ] **SIM-FR-225**: The system shall require vectorized signal generation to shift current-bar conditions so that bar-open entries are based on previous closed-bar values.
 
-- [ ] **SIM-FR-288**: The simulator module shall consume indicator outputs through the indicator module 
+- [ ] **SIM-FR-288**: The simulator module shall consume indicator outputs through the indicator module
 
 - [ ] **SIM-FR-290**: The simulator module shall convert indicator-derived signals into timestamped trade intents before official execution.
 
@@ -2164,7 +2164,7 @@ Functional blocks below preserve every `SIM-FR-*` task verbatim. Each block maps
 
 - [ ] **SIM-FR-547**: Compliance records shall include optional strategy name and version.
 
-- [ ] **SIM-FR-548**: The simulator module shall consume strategy outputs through the strategy module 
+- [ ] **SIM-FR-548**: The simulator module shall consume strategy outputs through the strategy module
 
 - [ ] **SIM-FR-549**: Monte Carlo outputs shall include risk of ruin.
 
@@ -5518,4 +5518,3 @@ Usage examples must show:
 - [ ] **NFR isolation:** decorators/wrappers implement telemetry, quotas, authorization, persistence reliability, and redaction outside financial math.
 - [ ] **Public API discipline:** only names listed in `app.services.simulator.__all__` become official AI tools.
 - [ ] **Tests and examples:** all source-mandated tests, executable examples, and coverage gates are mapped before Builder handoff.
-

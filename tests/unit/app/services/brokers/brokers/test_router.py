@@ -25,6 +25,7 @@ def test_get_broker_module_ctrader() -> None:
 
 def test_get_broker_module_simulator() -> None:
     from app.services import simulator
+
     with patch("app.utils.settings.settings.active_broker", "simulator"):
         module = get_broker_module()
         assert module == simulator

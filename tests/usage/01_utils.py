@@ -359,6 +359,7 @@ def example_06_runtime_settings() -> None:
 
     assert True
 
+
 def example_07_dataframe_and_combinations() -> None:
     """Demonstrate lazy alignment, data mapping, and grid parameter combinatorics."""
     print("\n--- 7. DataFrames & Combinations Demo ---")
@@ -523,6 +524,7 @@ def example_12_notifications() -> None:
         load_config,
         route_notification,
     )
+
     settings = load_config()
     from app.utils.notifications import NotificationAdapter, NotificationChannel
 

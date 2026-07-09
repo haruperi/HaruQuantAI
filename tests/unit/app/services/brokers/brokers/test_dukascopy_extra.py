@@ -40,12 +40,16 @@ def test_dukascopy_trade_functions():
         pass
 
     try:
-        res = client.get_history_deal_info("2026-01-01T00:00:00Z", "2026-01-02T00:00:00Z")
+        res = client.get_history_deal_info(
+            "2026-01-01T00:00:00Z", "2026-01-02T00:00:00Z"
+        )
     except Exception:
         pass
 
     try:
-        res = client.get_history_order_info("2026-01-01T00:00:00Z", "2026-01-02T00:00:00Z")
+        res = client.get_history_order_info(
+            "2026-01-01T00:00:00Z", "2026-01-02T00:00:00Z"
+        )
     except Exception:
         pass
 

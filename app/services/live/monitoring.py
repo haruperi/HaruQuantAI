@@ -32,9 +32,7 @@ from app.utils.logger import logger
 _VALID_SEVERITIES = frozenset({"info", "warning", "error", "critical"})
 
 # Tool health state values.
-_VALID_HEALTH_STATES = frozenset(
-    {"healthy", "degraded", "failed", "unknown"}
-)
+_VALID_HEALTH_STATES = frozenset({"healthy", "degraded", "failed", "unknown"})
 
 # Consecutive failure thresholds for tool health degradation.
 _DEGRADED_THRESHOLD = 3
@@ -200,8 +198,7 @@ class LiveMonitor:
         self._snapshot_counter: int = 0
 
         logger.info(
-            "live_monitor.initialized live_enabled=%r "
-            "live_mode=%r cost_budget_usd=%r",
+            "live_monitor.initialized live_enabled=%r live_mode=%r cost_budget_usd=%r",
             live_enabled,
             live_mode,
             cost_budget_usd,
@@ -224,9 +221,7 @@ class LiveMonitor:
         now = datetime.now(UTC)
         record = self._tool_health.get(tool_name)
         if record is None:
-            record = ToolHealthRecord(
-                tool_name=tool_name, health_state="healthy"
-            )
+            record = ToolHealthRecord(tool_name=tool_name, health_state="healthy")
         record.health_state = "healthy"
         record.last_success_at = now
         record.consecutive_failure_count = 0
@@ -235,9 +230,7 @@ class LiveMonitor:
         if latency_ms is not None:
             self._latency_samples.append(float(latency_ms))
             if len(self._latency_samples) > _MAX_LATENCY_SAMPLES:
-                self._latency_samples = (
-                    self._latency_samples[-_MAX_LATENCY_SAMPLES:]
-                )
+                self._latency_samples = self._latency_samples[-_MAX_LATENCY_SAMPLES:]
 
     def record_tool_failure(
         self,
@@ -260,9 +253,7 @@ class LiveMonitor:
         now = datetime.now(UTC)
         record = self._tool_health.get(tool_name)
         if record is None:
-            record = ToolHealthRecord(
-                tool_name=tool_name, health_state="unknown"
-            )
+            record = ToolHealthRecord(tool_name=tool_name, health_state="unknown")
         record.last_failure_at = now
         record.consecutive_failure_count += 1
         if is_timeout:
@@ -312,8 +303,7 @@ class LiveMonitor:
         ):
             self._cost_budget_exceeded = True
             logger.warning(
-                "live_monitor.cost_budget_exceeded "
-                "accrued=%r budget=%r",
+                "live_monitor.cost_budget_exceeded accrued=%r budget=%r",
                 self._cost_accrued_usd,
                 self._cost_budget_usd,
             )
@@ -443,9 +433,7 @@ class LiveMonitor:
         if not cost_ok:
             readiness_blocks.append("Cost budget exceeded.")
         if self._workflow_timeout_detected:
-            readiness_blocks.append(
-                "One or more live workflows have exceeded timeout."
-            )
+            readiness_blocks.append("One or more live workflows have exceeded timeout.")
         for ft in failed_tools:
             readiness_blocks.append(f"Tool '{ft}' is in failed state.")
 
@@ -459,9 +447,7 @@ class LiveMonitor:
             overall = "degraded"
 
         active_incident_ids = [
-            inc.incident_id
-            for inc in self._incidents
-            if not inc.resolved
+            inc.incident_id for inc in self._incidents if not inc.resolved
         ]
 
         latency_p99: float | None = None

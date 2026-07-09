@@ -108,8 +108,13 @@ def sample_ohlcv_data() -> pd.DataFrame:
 # --- Helpers Tests ---
 def test_parse_sentiment_snapshot() -> None:
     raw = [
-        {"symbol": "EURUSD", "long_percentage": 60.0, "short_percentage": 40.0, "volume": 100.5},
-        {}
+        {
+            "symbol": "EURUSD",
+            "long_percentage": 60.0,
+            "short_percentage": 40.0,
+            "volume": 100.5,
+        },
+        {},
     ]
     parsed = parse_sentiment_snapshot(raw)
     assert len(parsed) == 2
@@ -121,7 +126,7 @@ def test_filter_events_by_symbol() -> None:
     events = [
         {"currency": "EUR", "title": "EUR event"},
         {"currency": "USD", "title": "USD event"},
-        {"currency": "GBP", "title": "GBP event"}
+        {"currency": "GBP", "title": "GBP event"},
     ]
     filtered = filter_events_by_symbol(events, "EURUSD")
     assert len(filtered) == 2
@@ -149,7 +154,11 @@ def test_calculate_spread_statistics_empty() -> None:
 
 def test_calculate_session_statistics_empty() -> None:
     df = pd.DataFrame({"returns": []})
-    assert calculate_session_statistics(df) == {"sample_size": 0, "mean": 0.0, "std": 0.0}
+    assert calculate_session_statistics(df) == {
+        "sample_size": 0,
+        "mean": 0.0,
+        "std": 0.0,
+    }
 
 
 def test_calculate_seasonality_statistics_empty() -> None:
@@ -206,24 +215,33 @@ def test_performance_indicators() -> None:
 # --- Data Prep Tests ---
 def test_validate_dataset_warnings() -> None:
     # Inconsistent high
-    df = pd.DataFrame({
-        "open": [1.10], "high": [1.05], "low": [1.00], "close": [1.08]
-    }, index=pd.date_range("2026-01-01", periods=1))
+    df = pd.DataFrame(
+        {"open": [1.10], "high": [1.05], "low": [1.00], "close": [1.08]},
+        index=pd.date_range("2026-01-01", periods=1),
+    )
     report = validate_dataset(df)
     assert any(i.code == "WARN_INCONSISTENT_HIGH" for i in report.issues)
 
     # Inconsistent low
-    df2 = pd.DataFrame({
-        "open": [1.10], "high": [1.20], "low": [1.15], "close": [1.18]
-    }, index=pd.date_range("2026-01-01", periods=1))
+    df2 = pd.DataFrame(
+        {"open": [1.10], "high": [1.20], "low": [1.15], "close": [1.18]},
+        index=pd.date_range("2026-01-01", periods=1),
+    )
     report2 = validate_dataset(df2)
     assert any(i.code == "WARN_INCONSISTENT_LOW" for i in report2.issues)
 
     # Negative volume/spread
-    df3 = pd.DataFrame({
-        "open": [1.10], "high": [1.20], "low": [1.00], "close": [1.15],
-        "volume": [-100.0], "spread": [-1.0]
-    }, index=pd.date_range("2026-01-01", periods=1))
+    df3 = pd.DataFrame(
+        {
+            "open": [1.10],
+            "high": [1.20],
+            "low": [1.00],
+            "close": [1.15],
+            "volume": [-100.0],
+            "spread": [-1.0],
+        },
+        index=pd.date_range("2026-01-01", periods=1),
+    )
     report3 = validate_dataset(df3)
     assert any(i.code == "WARN_NEGATIVE_VOLUME" for i in report3.issues)
     assert any(i.code == "WARN_NEGATIVE_SPREAD" for i in report3.issues)
@@ -231,13 +249,16 @@ def test_validate_dataset_warnings() -> None:
 
 def test_prepare_research_dataset_branches() -> None:
     dates = pd.date_range("2026-01-01", periods=5, tz="UTC")
-    df = pd.DataFrame({
-        "open": [1.0, 1.1, np.nan, 1.2, 1.3],
-        "high": [1.05, 1.15, np.nan, 1.25, 1.35],
-        "low": [0.95, 1.05, np.nan, 1.15, 1.25],
-        "close": [1.01, 1.11, np.nan, 1.21, 1.31],
-        "spread": [1.0, 2.0, np.nan, 105.0, 1.5]
-    }, index=dates)
+    df = pd.DataFrame(
+        {
+            "open": [1.0, 1.1, np.nan, 1.2, 1.3],
+            "high": [1.05, 1.15, np.nan, 1.25, 1.35],
+            "low": [0.95, 1.05, np.nan, 1.15, 1.25],
+            "close": [1.01, 1.11, np.nan, 1.21, 1.31],
+            "spread": [1.0, 2.0, np.nan, 105.0, 1.5],
+        },
+        index=dates,
+    )
 
     # timezone convert, drop na, cap spread
     config = EdgeLabConfig()
@@ -281,7 +302,9 @@ def test_unsupervised_models() -> None:
     req = UnsupervisedResearchRequest(feature_columns=["f1"])
     assert req.n_components == 2
 
-    res = UnsupervisedResearchResult(pca_explained_variance=[0.5, 0.3], cluster_centers=[[1.0]], seed=42)
+    res = UnsupervisedResearchResult(
+        pca_explained_variance=[0.5, 0.3], cluster_centers=[[1.0]], seed=42
+    )
     assert len(res.pca_explained_variance) == 2
 
 
@@ -303,9 +326,7 @@ def test_compute_forward_returns() -> None:
 
 
 def test_analyze_cluster_outperformance() -> None:
-    df = pd.DataFrame({
-        "research_forward_returns": [0.0005, -0.0005, 0.0]
-    })
+    df = pd.DataFrame({"research_forward_returns": [0.0005, -0.0005, 0.0]})
     labels = [0, 1, 2]
     with pytest.raises(ValidationError):
         analyze_cluster_outperformance(df, labels, "missing_col")
@@ -317,10 +338,7 @@ def test_analyze_cluster_outperformance() -> None:
 
 
 def test_adapt_signals_by_cluster() -> None:
-    perf = {
-        0: {"mean_forward_return": -0.0005},
-        1: {"mean_forward_return": 0.0005}
-    }
+    perf = {0: {"mean_forward_return": -0.0005}, 1: {"mean_forward_return": 0.0005}}
     rec = adapt_signals_by_cluster(perf)
     assert rec["recommendations"]["0"]["action"] == "reduce_exposure_advisory"
     assert rec["recommendations"]["1"]["action"] == "maintain_exposure_advisory"
@@ -382,11 +400,19 @@ def test_structure_studies_coverage(sample_ohlcv_data: pd.DataFrame) -> None:
     assert confidence_bucket(0.3) == "low"
 
     assert label_realized_market_behavior(pd.DataFrame({"close": []})) == "mixed"
-    assert label_realized_market_behavior(pd.DataFrame({"close": [1.0, 1.1]})) == "trend"
-    assert label_realized_market_behavior(pd.DataFrame({"close": [1.0, 1.00001]})) == "reversion"
+    assert (
+        label_realized_market_behavior(pd.DataFrame({"close": [1.0, 1.1]})) == "trend"
+    )
+    assert (
+        label_realized_market_behavior(pd.DataFrame({"close": [1.0, 1.00001]}))
+        == "reversion"
+    )
 
     assert build_validation_summary(sample_ohlcv_data)["rows_count"] == 100
-    assert build_market_structure_stability_report(sample_ohlcv_data)["stability_index"] == 0.85
+    assert (
+        build_market_structure_stability_report(sample_ohlcv_data)["stability_index"]
+        == 0.85
+    )
 
     news = [{"headline": "headline", "timestamp": "time"}]
     assert parse_news_items(news)[0]["headline"] == "headline"
@@ -425,7 +451,13 @@ def test_reporting_helpers() -> None:
     Path("report_test.md").unlink()
 
     config = EdgeLabConfig()
-    stats = EdgeStats(sample_size=10, win_rate=0.5, profit_factor=1.5, expectancy=0.5, sharpe_ratio=1.0)
+    stats = EdgeStats(
+        sample_size=10,
+        win_rate=0.5,
+        profit_factor=1.5,
+        expectancy=0.5,
+        sharpe_ratio=1.0,
+    )
     result = EdgeResult(study_name="test_study", config=config, stats=stats)
     card = build_edge_lab_scorecard_report("EURUSD", "H1", [result])
     assert card["symbol"] == "EURUSD"

@@ -37,7 +37,9 @@ class StressScenarioRegistry:
         )
 
     def register_scenario(
-        self, name: str, evaluator: Any  # noqa: ANN401
+        self,
+        name: str,
+        evaluator: Any,  # noqa: ANN401
     ) -> None:
         """Legacy compatibility helper to register scenario in-place.
 
@@ -113,9 +115,7 @@ def register_stress_scenario(
     new_scenarios = registry.scenarios.copy()
     new_scenarios[scenario.scenario_id] = scenario
 
-    logger.info(
-        f"Successfully registered stress scenario '{scenario.scenario_id}'."
-    )
+    logger.info(f"Successfully registered stress scenario '{scenario.scenario_id}'.")
     return StressScenarioRegistry(scenarios=new_scenarios)
 
 
@@ -291,9 +291,7 @@ def build_default_stress_registry() -> StressScenarioRegistry:
     return registry
 
 
-def validate_custom_scenario_definition(
-    scenario: Mapping[str, Any]
-) -> StressScenario:
+def validate_custom_scenario_definition(scenario: Mapping[str, Any]) -> StressScenario:
     """Validate a custom scenario configuration without arbitrary code execution.
 
     Args:
@@ -305,9 +303,7 @@ def validate_custom_scenario_definition(
     Raises:
         ValidationError: If the configuration contains invalid types or values.
     """
-    logger.debug(
-        "Validating custom scenario definition against safety constraints."
-    )
+    logger.debug("Validating custom scenario definition against safety constraints.")
     name = scenario.get("name")
     if not isinstance(name, str) or not name.strip():
         msg = "Custom scenario config must have a non-empty string 'name'."
@@ -349,9 +345,7 @@ def validate_custom_scenario_definition(
     safe_id = re.sub(r"[^a-zA-Z0-9_]", "_", name.strip().lower())
     scenario_id = f"custom_{safe_id}"
 
-    logger.info(
-        f"Custom scenario definition validated: {name} (ID: {scenario_id})"
-    )
+    logger.info(f"Custom scenario definition validated: {name} (ID: {scenario_id})")
     return StressScenario(
         scenario_id=scenario_id,
         name=name,

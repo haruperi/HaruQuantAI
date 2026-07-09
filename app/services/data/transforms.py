@@ -128,7 +128,9 @@ def resample_ohlcv(  # noqa: C901
     # Validate source timeframe from records
     source_tf = records[0].get("timeframe")
     if not source_tf:
-        raise ValidationError("Source records missing timeframe field.")  # pragma: no cover
+        raise ValidationError(
+            "Source records missing timeframe field."
+        )  # pragma: no cover
 
     validate_timeframe(source_tf)
 
@@ -145,7 +147,9 @@ def resample_ohlcv(  # noqa: C901
     # Convert to DataFrame
     df = pd.DataFrame(records)
     if "symbol" in df.columns and (df["symbol"] != df["symbol"].iloc[0]).any():
-        raise ValidationError("Cannot resample records containing multiple symbols.")  # pragma: no cover
+        raise ValidationError(
+            "Cannot resample records containing multiple symbols."
+        )  # pragma: no cover
 
     df["timestamp_dt"] = pd.to_datetime(df["timestamp"])
     df = df.set_index("timestamp_dt")
@@ -555,7 +559,9 @@ def generate_synthetic_bars(
     validate_timeframe(timeframe)
 
     if method.lower() != "gbm":
-        msg = f"Unsupported synthetic bar generation method: {method}"  # pragma: no cover
+        msg = (
+            f"Unsupported synthetic bar generation method: {method}"  # pragma: no cover
+        )
         raise ValidationError(msg)  # pragma: no cover
 
     rng = np.random.default_rng(seed)
@@ -667,7 +673,9 @@ def label_market_data(
 
     # Validate that close price is present in records
     if "close" not in records[0]:
-        raise ValidationError("Records missing mandatory close price column.")  # pragma: no cover
+        raise ValidationError(
+            "Records missing mandatory close price column."
+        )  # pragma: no cover
 
     prices = [float(r["close"]) for r in records]
     n = len(prices)

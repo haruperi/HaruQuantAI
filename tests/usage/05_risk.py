@@ -607,13 +607,17 @@ def example_05_portfolio_correlation_dynamics() -> None:
     # Build ClosedBar models
     v2_bars_a = [
         ClosedBar(
-            time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"]))  # type: ignore
+            time=b["time"],
+            open=Decimal(str(b["open"])),
+            close=Decimal(str(b["close"])),  # type: ignore
         )
         for b in bars_a
     ]
     v2_bars_b = [
         ClosedBar(
-            time=b["time"], open=Decimal(str(b["open"])), close=Decimal(str(b["close"]))  # type: ignore
+            time=b["time"],
+            open=Decimal(str(b["open"])),
+            close=Decimal(str(b["close"])),  # type: ignore
         )
         for b in bars_b
     ]
@@ -1178,8 +1182,7 @@ def example_09_strategy_lifecycle_promotion() -> None:
         review_strategy_admission,
         validate_lifecycle_transition,
     )
-    from app.services.risk.models import LiveReadinessRequest
-    from app.services.risk.models import StrategyAdmissionRequest
+    from app.services.risk.models import LiveReadinessRequest, StrategyAdmissionRequest
     from app.services.risk.policy.contracts import EffectiveRiskPolicy
 
     v2_policy = EffectiveRiskPolicy(

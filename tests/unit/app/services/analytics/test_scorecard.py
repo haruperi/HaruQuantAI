@@ -133,4 +133,3 @@ def test_scorecard_sample_size_warning(mock_good_report, mock_poor_report):
     assessment_poor = sample_size_warning(mock_poor_report, config)
     assert assessment_poor.score == 70.0
     assert "Critically small sample size" in assessment_poor.warnings[0]
-

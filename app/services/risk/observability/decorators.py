@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import functools
 import time
+from collections.abc import Callable
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Callable, Protocol, TypeVar
+from typing import TYPE_CHECKING, Any, Protocol, TypeVar
 
 from app.services.risk.observability.metrics import (
     build_latency_metric,
@@ -96,9 +97,7 @@ def risk_observed(
     def decorator(func: RiskCallableT) -> RiskCallableT:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            active_logger.info(
-                f"Starting risk boundary operation: {operation}"
-            )
+            active_logger.info(f"Starting risk boundary operation: {operation}")
             t_start = time.perf_counter()
             try:
                 res = func(*args, **kwargs)

@@ -924,6 +924,7 @@ def test_dashboards_truncation_and_payload_types():
         TruncationPolicy,
         build_overview_payload,
     )
+
     # ChartPoint and truncate_series
     pts = [ChartPoint(time=str(i), equity=float(i)) for i in range(150)]
     res = truncate_series(pts, TruncationPolicy(max_points=50))
@@ -947,7 +948,6 @@ def test_dashboards_truncation_and_payload_types():
     assert payload.schema_version == "1.3.1"
     assert payload.tables["summary_cards"]["net_profit"] == 500.0
     assert payload.tables["summary_cards"]["profit_factor"] == 2.0
-
 
 
 def test_analytics_coverage_expansion(mocker):
@@ -1032,7 +1032,9 @@ def test_analytics_coverage_expansion(mocker):
     assert _to_float_list("not-a-list") == []
 
     # mock drawdown_series to return []
-    mocker.patch("app.services.analytics.metrics.drawdown.drawdown_series", return_value=[])
+    mocker.patch(
+        "app.services.analytics.metrics.drawdown.drawdown_series", return_value=[]
+    )
     assert (
         drawdown_probability([{"timestamp": "2026-01-01", "equity": 10000.0}], 5.0)
         == 0.0

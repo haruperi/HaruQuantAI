@@ -5,6 +5,7 @@ def test_brokers_extra2():
     # brokers/ctrader.py
     try:
         from app.services.brokers.ctrader import CTraderClient
+
         client = CTraderClient(MagicMock())
         client.connect()
         client.disconnect()
@@ -18,6 +19,7 @@ def test_brokers_extra2():
     # brokers/dukascopy.py
     try:
         from app.services.brokers.dukascopy import DukascopyClient
+
         dclient = DukascopyClient(MagicMock())
         dclient.connect()
         dclient.disconnect()

@@ -1195,7 +1195,8 @@ def test_governor_uncovered_paths(monkeypatch: pytest.MonkeyPatch) -> None:  # n
         raise ValueError("Simulated stress error")
 
     monkeypatch.setattr(
-        "app.services.risk.governor.governor.build_default_scenario_registry", mock_eval_stress
+        "app.services.risk.governor.governor.build_default_scenario_registry",
+        mock_eval_stress,
     )
     req.request_id = None
     res = gov.review_trade_risk(req)
@@ -1206,7 +1207,8 @@ def test_governor_uncovered_paths(monkeypatch: pytest.MonkeyPatch) -> None:  # n
         raise ValueError("Simulated sizing calculation error")
 
     monkeypatch.setattr(
-        "app.services.risk.governor.governor.calculate_position_size", mock_calc_pos_size
+        "app.services.risk.governor.governor.calculate_position_size",
+        mock_calc_pos_size,
     )
     req.market_context["sizing_request"] = {"method": "fixed_lot", "fixed_volume": 1.0}
     req.request_id = None

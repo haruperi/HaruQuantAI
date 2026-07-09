@@ -328,7 +328,7 @@ def test_ports_schema_compatibility():
     record = StoredRiskRecord(
         schema_version="1.0.0",
         record_type="drawdown_state",
-        data={"some_key": "some_val"}
+        data={"some_key": "some_val"},
     )
     # Same major version compatibility should succeed
     res = validate_storage_schema_compatibility(record, "1.2.3")
@@ -373,7 +373,7 @@ def test_ports_persist_risk_decision():
         request_id="req_999",
         workflow_id="wf_999",
         signal_id="sig_999",
-        decision_material_hash="hash_999"
+        decision_material_hash="hash_999",
     )
     decision = RiskDecisionPackage(
         decision_id="dec_999",
@@ -415,7 +415,7 @@ def test_ports_persist_risk_decision():
         request_id="req_other",
         workflow_id="wf_999",
         signal_id="sig_999",
-        decision_material_hash="hash_999"
+        decision_material_hash="hash_999",
     )
     conflict_decision_key = RiskDecisionPackage(
         decision_id="dec_other2",
@@ -470,7 +470,7 @@ def test_compute_decision_material_hash_error():
         snapshot_as_of=datetime.now(UTC),
         config_hash="cfg_hash",
         reason="Limits cleared",
-        details={"proposed_action": {"bad_data": Unserializable()}}
+        details={"proposed_action": {"bad_data": Unserializable()}},
     )
     with pytest.raises(ValidationError):
         compute_decision_material_hash(decision)
@@ -520,5 +520,3 @@ def test_protocols_coverage():
     RiskDecisionStore.save_decision(None, None)
     RiskDecisionStore.get_decision_by_request_id(None, None)
     RiskDecisionStore.get_decision_by_key(None, None, None, None, None)
-
-

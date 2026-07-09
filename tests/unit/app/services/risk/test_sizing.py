@@ -370,14 +370,22 @@ def test_normalization_validation(standard_symbol: SymbolRiskMetadata) -> None:
 
     # 6. Validate normalized volume bounds
     assert validate_normalized_volume(Decimal("1.23"), standard_symbol)["valid"] is True
-    assert validate_normalized_volume(Decimal("0.005"), standard_symbol)["valid"] is False
-    assert validate_normalized_volume(Decimal("101.00"), standard_symbol)["valid"] is False
-    assert validate_normalized_volume(Decimal("1.2345"), standard_symbol)["valid"] is False
+    assert (
+        validate_normalized_volume(Decimal("0.005"), standard_symbol)["valid"] is False
+    )
+    assert (
+        validate_normalized_volume(Decimal("101.00"), standard_symbol)["valid"] is False
+    )
+    assert (
+        validate_normalized_volume(Decimal("1.2345"), standard_symbol)["valid"] is False
+    )
 
 
 def test_build_volume_rejection(standard_symbol: SymbolRiskMetadata) -> None:
     """Test build_volume_rejection helper."""
-    res = build_volume_rejection(Decimal("1.0"), standard_symbol, RiskReasonCode.INVALID_INPUT)
+    res = build_volume_rejection(
+        Decimal("1.0"), standard_symbol, RiskReasonCode.INVALID_INPUT
+    )
     assert res.calculated_volume == Decimal("0.0")
     assert any(c in res.constraints_applied for c in ("INVALID_INPUT", "invalid_input"))
 
@@ -399,7 +407,9 @@ def test_stop_distance_calculations(standard_symbol: SymbolRiskMetadata) -> None
         method=SizingMethod.VOLATILITY_ADJUSTED.value,
         multiplier=Decimal("2.5"),
     )
-    dist_vol = calculate_stop_distance(req_vol, standard_symbol, {"m1_volatility": 0.00040})
+    dist_vol = calculate_stop_distance(
+        req_vol, standard_symbol, {"m1_volatility": 0.00040}
+    )
     assert dist_vol == Decimal("0.00100")
 
     # 3. Volatility adaptive stops (ATR fallback)
@@ -421,21 +431,29 @@ def test_stop_distance_calculations(standard_symbol: SymbolRiskMetadata) -> None
         calculate_stop_distance(req_missing_vol, standard_symbol)
 
     # 5. Convert to account currency risk
-    risk_per_lot = convert_stop_distance_to_account_risk(Decimal("0.00150"), standard_symbol, "USD")
+    risk_per_lot = convert_stop_distance_to_account_risk(
+        Decimal("0.00150"), standard_symbol, "USD"
+    )
     assert risk_per_lot == Decimal("150.0")
 
     # 6. Default tick metadata fallbacks
-    symbol_default_tick = standard_symbol.model_copy(update={"tick_size": None, "tick_value": None})
-    risk_default = convert_stop_distance_to_account_risk(Decimal("0.00150"), symbol_default_tick, "USD")
+    symbol_default_tick = standard_symbol.model_copy(
+        update={"tick_size": None, "tick_value": None}
+    )
+    risk_default = convert_stop_distance_to_account_risk(
+        Decimal("0.00150"), symbol_default_tick, "USD"
+    )
     assert risk_default == Decimal("150.0")
 
     # 7. Zero stop distance cases
     assert calculate_stop_distance(
         PositionSizingRequest(symbol="EURUSD", method=SizingMethod.FIXED_LOT.value),
-        standard_symbol
+        standard_symbol,
     ) == Decimal("0.0")
 
-    assert convert_stop_distance_to_account_risk(Decimal("0.0"), standard_symbol, "USD") == Decimal("0.0")
+    assert convert_stop_distance_to_account_risk(
+        Decimal("0.0"), standard_symbol, "USD"
+    ) == Decimal("0.0")
 
 
 def test_calculate_fixed_risk_size_v2(
@@ -459,7 +477,9 @@ def test_calculate_fixed_risk_size_v2(
     assert res.risk_contribution == Decimal("500.00")
 
     # Percent-based risk (1.5% of $100k = $1500)
-    req_pct = req.model_copy(update={"risk_amount": None, "risk_percent": Decimal("0.015")})
+    req_pct = req.model_copy(
+        update={"risk_amount": None, "risk_percent": Decimal("0.015")}
+    )
     res_pct = calculate_fixed_risk_size(
         request=req_pct,
         portfolio_equity=Decimal("100000.00"),
@@ -469,7 +489,9 @@ def test_calculate_fixed_risk_size_v2(
     assert res_pct.calculated_volume == Decimal("15.00")
 
     # Risk cap applied (request 10% but max_risk_per_trade cap is 5%)
-    req_cap = req.model_copy(update={"risk_amount": None, "risk_percent": Decimal("0.10")})
+    req_cap = req.model_copy(
+        update={"risk_amount": None, "risk_percent": Decimal("0.10")}
+    )
     res_cap = calculate_fixed_risk_size(
         request=req_cap,
         portfolio_equity=Decimal("100000.00"),

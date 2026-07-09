@@ -17,9 +17,11 @@ class MockEngine:
     def __init__(self) -> None:
         self.deals: dict[str, Any] = {}
 
+
 class MockOrchestrator:
     def __init__(self, engine: Any) -> None:
         self.engine = engine
+
     def execute(self, _payload: Any) -> dict[str, Any]:
         return {
             "status": "success",
@@ -29,9 +31,10 @@ class MockOrchestrator:
                     "ending_balance": 100000.0,
                     "net_profit": 0.0,
                     "total_trades": 0,
-                }
-            }
+                },
+            },
         }
+
 
 mock_simulator_engine = MagicMock()
 mock_simulator_engine.EventDrivenExecutionEngine = MockEngine
@@ -509,6 +512,7 @@ def test_pareto_select() -> None:
 def test_walk_forward_splits() -> None:
     """Verify rolling and expanding splits generation and purging/embargo windows."""
     from datetime import timedelta
+
     wfs = WalkForwardSplit(
         start_date="2026-01-01T00:00:00Z",
         end_date="2026-01-10T00:00:00Z",

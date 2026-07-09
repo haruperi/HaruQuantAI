@@ -109,7 +109,9 @@ def _resample_to_nearest(
             microseconds=timestamp.microsecond,  # pragma: no cover
         )  # pragma: no cover
     if time_unit == TIME_UNIT_WEEK:  # pragma: no cover
-        subtraction = (timestamp.weekday() + 1) % (interval_value * 7)  # pragma: no cover
+        subtraction = (timestamp.weekday() + 1) % (
+            interval_value * 7
+        )  # pragma: no cover
         return timestamp - timedelta(  # pragma: no cover
             days=subtraction,  # pragma: no cover
             hours=timestamp.hour,  # pragma: no cover
@@ -119,11 +121,15 @@ def _resample_to_nearest(
         )  # pragma: no cover
     if time_unit == TIME_UNIT_MONTH:  # pragma: no cover
         month = (timestamp.month // interval_value) + 1  # pragma: no cover
-        return datetime(timestamp.year, month, 1, 0, 0, 0, 0, timestamp.tzinfo)  # pragma: no cover
+        return datetime(
+            timestamp.year, month, 1, 0, 0, 0, 0, timestamp.tzinfo
+        )  # pragma: no cover
     if time_unit == TIME_UNIT_TICK:  # pragma: no cover
         return timestamp  # pragma: no cover
 
-    raise NotImplementedError(f"resampling not implemented for {time_unit}")  # pragma: no cover
+    raise NotImplementedError(
+        f"resampling not implemented for {time_unit}"
+    )  # pragma: no cover
 
 
 def _get_dataframe_columns_for_timeunit(time_unit: str) -> list[str]:
@@ -441,7 +447,9 @@ class DukascopyClient:
             dt_from = dt_to - timedelta(hours=hours_needed * buffer_multiplier)
         else:
             dt_from = date_from  # pragma: no cover
-            dt_to = date_to if date_to is not None else datetime.now(UTC)  # pragma: no cover
+            dt_to = (
+                date_to if date_to is not None else datetime.now(UTC)
+            )  # pragma: no cover
 
         try:
             df = fetch(

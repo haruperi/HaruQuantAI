@@ -110,9 +110,9 @@ def _resolve_contract_size_cached(
     """Resolve contract size and convert to Decimal, with caching."""
     if symbol in _CONTRACT_SIZE_CACHE:
         return _CONTRACT_SIZE_CACHE[symbol]
-    c_size_raw = market_context.get(
-        f"{symbol}_contract_size"
-    ) or market_context.get("contract_size", "100000.0")
+    c_size_raw = market_context.get(f"{symbol}_contract_size") or market_context.get(
+        "contract_size", "100000.0"
+    )
     res = Decimal(str(c_size_raw))
     _CONTRACT_SIZE_CACHE[symbol] = res
     return res
@@ -194,9 +194,7 @@ def evaluate_stress_scenarios(
     _CONTRACT_SIZE_CACHE.clear()
     results = []
     config = policy.resolved_config
-    should_log = (
-        len(context.portfolio_state.positions) < _LOG_PORTFOLIO_SIZE_THRESHOLD
-    )
+    should_log = len(context.portfolio_state.positions) < _LOG_PORTFOLIO_SIZE_THRESHOLD
 
     multipliers = {}
     for pos in context.portfolio_state.positions:
@@ -255,7 +253,9 @@ def evaluate_stress_scenarios(
                     multipliers,
                 )
                 projected = apply_market_shock(
-                    portfolio, scenario, context.market_context  # type: ignore[arg-type]
+                    portfolio,
+                    scenario,
+                    context.market_context,  # type: ignore[arg-type]
                 )
 
                 if projected.is_disconnected:
@@ -273,20 +273,15 @@ def evaluate_stress_scenarios(
                     pass_status = not stale_detected
                     res = StressScenarioResult.model_construct(
                         scenario_name=scenario.name,
-                        impact_pct=(
-                            Decimal("0.0") if pass_status else Decimal("1.0")
-                        ),
+                        impact_pct=(Decimal("0.0") if pass_status else Decimal("1.0")),
                         projected_equity=context.portfolio_state.equity,
                         pass_status=pass_status,
-                        reason_codes=(
-                            [] if pass_status else ["STALE_QUOTE_BREACH"]
-                        ),
+                        reason_codes=([] if pass_status else ["STALE_QUOTE_BREACH"]),
                     )
                 elif projected.is_forced_liquidation_check:
                     equity = context.portfolio_state.equity
                     current_margin = sum(
-                        pos.margin_required
-                        for pos in context.portfolio_state.positions
+                        pos.margin_required for pos in context.portfolio_state.positions
                     )
                     stop_out_threshold = current_margin * Decimal("0.5")
                     proximity = equity - stop_out_threshold
@@ -294,11 +289,7 @@ def evaluate_stress_scenarios(
                     impact_pct = (
                         Decimal("0.0")
                         if pass_status
-                        else (
-                            abs(proximity) / equity
-                            if equity > 0
-                            else Decimal("1.0")
-                        )
+                        else (abs(proximity) / equity if equity > 0 else Decimal("1.0"))
                     )
                     res = StressScenarioResult.model_construct(
                         scenario_name=scenario.name,
@@ -311,9 +302,7 @@ def evaluate_stress_scenarios(
                     )
                 elif projected.is_correlation_to_one:
                     equity = context.portfolio_state.equity
-                    symbols = {
-                        pos.symbol for pos in context.portfolio_state.positions
-                    }
+                    symbols = {pos.symbol for pos in context.portfolio_state.positions}
                     if context.proposed_trade:
                         symbols.add(context.proposed_trade.symbol)
 
@@ -353,9 +342,7 @@ def evaluate_stress_scenarios(
                         loss = stress_vol * z * total_gross
 
                         projected_equity = max(Decimal("0.0"), equity - loss)
-                        impact_pct = (
-                            loss / equity if equity > 0 else Decimal("1.0")
-                        )
+                        impact_pct = loss / equity if equity > 0 else Decimal("1.0")
 
                         # Look up threshold from config
                         threshold = config.max_total_loss_pct_advisory
@@ -377,9 +364,7 @@ def evaluate_stress_scenarios(
                     )
                     equity = context.portfolio_state.equity
                     projected_equity = max(Decimal("0.0"), equity - loss)
-                    impact_pct = (
-                        loss / equity if equity > 0 else Decimal("1.0")
-                    )
+                    impact_pct = loss / equity if equity > 0 else Decimal("1.0")
 
                     # Look up threshold
                     threshold = config.max_total_loss_pct_advisory
@@ -442,9 +427,7 @@ def evaluate_stress_scenarios(
         pass_status=pass_status,
         reason_codes=list(dict.fromkeys(reason_codes)),
     )
-    logger.info(
-        f"Completed evaluate_stress_scenarios. Pass status: {pass_status}."
-    )
+    logger.info(f"Completed evaluate_stress_scenarios. Pass status: {pass_status}.")
     return summary
 
 
@@ -548,9 +531,7 @@ def apply_market_shock(
     shocked_spreads = {}
     if scenario.spread_multiplier != _DECIMAL_ONE:
         for sym in get_symbols():
-            spread_val = Decimal(
-                str(market_context.get(f"{sym}_spread", "0.0002"))
-            )
+            spread_val = Decimal(str(market_context.get(f"{sym}_spread", "0.0002")))
             shocked_spreads[sym] = spread_val * scenario.spread_multiplier
 
     shocked_margins = {}
@@ -575,7 +556,7 @@ def apply_market_shock(
     res.is_correlation_to_one = scenario.is_correlation_to_one
     res.is_forced_liquidation_check = scenario.is_forced_liquidation_check
     res.is_gbp_volatility = scenario.is_gbp_volatility
-    res.is_slippage_shock = (scenario.scenario_id == "Slippage Shock 50 pips")
+    res.is_slippage_shock = scenario.scenario_id == "Slippage Shock 50 pips"
 
     if len(portfolio.portfolio_state.positions) < _LOG_PORTFOLIO_SIZE_THRESHOLD:
         logger.debug("Market shock applied successfully.")
@@ -634,9 +615,7 @@ def calculate_stress_loss(
                 ) or market_context.get("contract_size", "100000.0")
                 contract_size = Decimal(str(c_size_raw))
                 cost_quote = pos.quantity * contract_size * spread_val
-                rate = _resolve_conversion_rate(
-                    quote, account_currency, market_context
-                )
+                rate = _resolve_conversion_rate(quote, account_currency, market_context)
                 spread_loss += cost_quote * rate
 
         total_loss = max_price_loss + spread_loss
@@ -673,23 +652,15 @@ def calculate_stress_loss(
                 str(market_context.get("max_effective_leverage") or "30.0")
             )
             _, quote_ccy = _resolve_base_quote(symbol, market_context)
-            rate = _resolve_conversion_rate(
-                quote_ccy, account_currency, market_context
-            )
-            proposed_margin = (
-                (trade.volume * contract_size * price / leverage) * rate
-            )
+            rate = _resolve_conversion_rate(quote_ccy, account_currency, market_context)
+            proposed_margin = (trade.volume * contract_size * price / leverage) * rate
 
         current_margin = sum(
             pos.margin_required for pos in portfolio.portfolio_state.positions
         )
-        total_margin = (
-            current_margin + proposed_margin
-        ) * portfolio.margin_multiplier
+        total_margin = (current_margin + proposed_margin) * portfolio.margin_multiplier
         free_margin = portfolio.portfolio_state.equity - total_margin
-        shortfall = (
-            -free_margin if free_margin < Decimal("0.0") else Decimal("0.0")
-        )
+        shortfall = -free_margin if free_margin < Decimal("0.0") else Decimal("0.0")
         logger.debug(f"Margin spike shortfall: {shortfall}")
         return shortfall
 
@@ -698,20 +669,14 @@ def calculate_stress_loss(
             return Decimal("0.0")
         trade = portfolio.proposed_trade
         symbol = trade.symbol
-        pip_size = Decimal(
-            str(market_context.get(f"{symbol}_pip_size", "0.0001"))
-        )
+        pip_size = Decimal(str(market_context.get(f"{symbol}_pip_size", "0.0001")))
         c_size_raw = market_context.get(
             f"{symbol}_contract_size"
         ) or market_context.get("contract_size", "100000.0")
         contract_size = Decimal(str(c_size_raw))
-        slippage_quote = (
-            Decimal("50.0") * pip_size * trade.volume * contract_size
-        )
+        slippage_quote = Decimal("50.0") * pip_size * trade.volume * contract_size
         _, quote_ccy = _resolve_base_quote(symbol, market_context)
-        rate = _resolve_conversion_rate(
-            quote_ccy, account_currency, market_context
-        )
+        rate = _resolve_conversion_rate(quote_ccy, account_currency, market_context)
         slippage_loss = slippage_quote * rate
         logger.debug(f"Slippage shock loss: {slippage_loss}")
         return slippage_loss
@@ -737,13 +702,9 @@ def calculate_stress_loss(
                 else Decimal("-1.0")
             )
             contract_size = _resolve_contract_size_cached(symbol, market_context)
-            pnl_quote = (
-                pos.quantity * contract_size * price_diff * direction_sign
-            )
+            pnl_quote = pos.quantity * contract_size * price_diff * direction_sign
             _, quote_ccy = _resolve_base_quote_cached(symbol, market_context)
-            rate = _resolve_conversion_rate(
-                quote_ccy, account_currency, market_context
-            )
+            rate = _resolve_conversion_rate(quote_ccy, account_currency, market_context)
             total_shock_pnl += pnl_quote * rate
 
     # Proposed trade PnL
@@ -771,17 +732,13 @@ def calculate_stress_loss(
         shocked_price = portfolio.shocked_prices[symbol]
         price_diff = shocked_price - price
         direction_sign = (
-            Decimal("1.0")
-            if trade.side.lower() in {"buy", "long"}
-            else Decimal("-1.0")
+            Decimal("1.0") if trade.side.lower() in {"buy", "long"} else Decimal("-1.0")
         )
 
         contract_size = _resolve_contract_size_cached(symbol, market_context)
         pnl_quote = trade.volume * contract_size * price_diff * direction_sign
         _, quote_ccy = _resolve_base_quote_cached(symbol, market_context)
-        rate = _resolve_conversion_rate(
-            quote_ccy, account_currency, market_context
-        )
+        rate = _resolve_conversion_rate(quote_ccy, account_currency, market_context)
         total_shock_pnl += pnl_quote * rate
 
     spread_loss = Decimal("0.0")
@@ -789,15 +746,11 @@ def calculate_stress_loss(
         add_factor = (portfolio.spread_multiplier - 1) / Decimal("2.0")
         for pos in portfolio.portfolio_state.positions:
             symbol = pos.symbol
-            spread_val = Decimal(
-                str(market_context.get(f"{symbol}_spread", "0.0002"))
-            )
+            spread_val = Decimal(str(market_context.get(f"{symbol}_spread", "0.0002")))
             contract_size = _resolve_contract_size_cached(symbol, market_context)
             cost_quote = pos.quantity * contract_size * spread_val * add_factor
             _, quote_ccy = _resolve_base_quote_cached(symbol, market_context)
-            rate = _resolve_conversion_rate(
-                quote_ccy, account_currency, market_context
-            )
+            rate = _resolve_conversion_rate(quote_ccy, account_currency, market_context)
             spread_loss += cost_quote * rate
 
     loss = -total_shock_pnl + spread_loss
@@ -830,13 +783,9 @@ def _calc_price_loss(
         )
 
         contract_size = _resolve_contract_size_cached(symbol, market_context)
-        pnl_quote = (
-            pos.quantity * contract_size * price_diff * direction_sign
-        )
+        pnl_quote = pos.quantity * contract_size * price_diff * direction_sign
         _, quote_ccy = _resolve_base_quote_cached(symbol, market_context)
-        rate = _resolve_conversion_rate(
-            quote_ccy, account_currency, market_context
-        )
+        rate = _resolve_conversion_rate(quote_ccy, account_currency, market_context)
         total_pnl += pnl_quote * rate
 
     if portfolio.proposed_trade:
@@ -872,9 +821,7 @@ def _calc_price_loss(
             contract_size = _resolve_contract_size_cached(symbol, market_context)
             pnl_quote = trade.volume * contract_size * price_diff * direction_sign
             _, quote_ccy = _resolve_base_quote_cached(symbol, market_context)
-            rate = _resolve_conversion_rate(
-                quote_ccy, account_currency, market_context
-            )
+            rate = _resolve_conversion_rate(quote_ccy, account_currency, market_context)
             total_pnl += pnl_quote * rate
 
     return max(Decimal("0.0"), -total_pnl)

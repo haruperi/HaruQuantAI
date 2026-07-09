@@ -44,11 +44,13 @@ TIMEFRAME = "H1"
 START_DATE = "2026-06-01"
 END_DATE = "2026-06-30"
 
+
 def print_header(title: str) -> None:
     """Print the header for an example section."""
     print(f"\n{'=' * 100}")
     print(f"--- {title} ---")
     print(f"{'=' * 100}")
+
 
 def print_tail_table(records: list[dict[str, Any]]) -> None:
     """Print the last 5 records formatted as a clean Pandas DataFrame table."""

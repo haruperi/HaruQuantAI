@@ -26,7 +26,10 @@ def get_valid_base_config() -> dict[str, Any]:
                 "created_at": "2026-06-23",
             },
             "version": "1.0.0",
-            "chart_requirements": {"main": {"symbol": "EURUSD", "timeframe": "M5"}, "other": {}},
+            "chart_requirements": {
+                "main": {"symbol": "EURUSD", "timeframe": "M5"},
+                "other": {},
+            },
             "supported_runtime_modes": ["SIMULATOR"],
             "strategy_capabilities": [],
             "permissions": {
@@ -49,7 +52,9 @@ def get_valid_base_config() -> dict[str, Any]:
 
 def test_validate_non_mapping() -> None:
     """Verify validate_strategy_config raises ConfigurationError for non-mapping input."""
-    with pytest.raises(ConfigurationError, match="Strategy configuration must be a JSON object"):
+    with pytest.raises(
+        ConfigurationError, match="Strategy configuration must be a JSON object"
+    ):
         validate_strategy_config([])  # type: ignore[arg-type]
 
 
@@ -79,7 +84,9 @@ def test_validate_manifest_identity() -> None:
     """Verify strategy manifest identity checks."""
     base = get_valid_base_config()
     base["strategy_manifest"]["identity"]["strategy_id"] = ""
-    with pytest.raises(ConfigurationError, match="strategy_id must be a non-empty string"):
+    with pytest.raises(
+        ConfigurationError, match="strategy_id must be a non-empty string"
+    ):
         validate_strategy_config(base)
 
 
@@ -95,7 +102,9 @@ def test_validate_manifest_runtime_modes() -> None:
     """Verify supported runtime modes checks."""
     base = get_valid_base_config()
     base["strategy_manifest"]["supported_runtime_modes"] = ["INVALID_MODE"]
-    with pytest.raises(ConfigurationError, match="supported_runtime_modes has unsupported values"):
+    with pytest.raises(
+        ConfigurationError, match="supported_runtime_modes has unsupported values"
+    ):
         validate_strategy_config(base)
 
 
@@ -108,7 +117,10 @@ def test_validate_manifest_permissions() -> None:
 
     base = get_valid_base_config()
     base["strategy_manifest"]["permissions"]["permitted_environments"] = ["LIVE"]
-    with pytest.raises(ConfigurationError, match="permitted_environments must be a subset of supported_runtime_modes"):
+    with pytest.raises(
+        ConfigurationError,
+        match="permitted_environments must be a subset of supported_runtime_modes",
+    ):
         validate_strategy_config(base)
 
 
@@ -123,9 +135,7 @@ def test_validate_parameters_definition_value() -> None:
                 "description": "Period length",
             }
         },
-        "values": {
-            "period": "invalid_string_instead_of_int"
-        },
+        "values": {"period": "invalid_string_instead_of_int"},
         "generation_metadata": {},
     }
     with pytest.raises(ConfigurationError, match="Parameter 'period' must be integer"):
@@ -146,9 +156,7 @@ def test_validate_parameter_bounds() -> None:
                 "step": 2,
             }
         },
-        "values": {
-            "period": 15
-        },
+        "values": {"period": 15},
         "generation_metadata": {},
     }
     with pytest.raises(ConfigurationError, match="does not align to step"):
@@ -159,7 +167,9 @@ def test_validate_required_paths() -> None:
     """Verify required paths list dots verification."""
     base = get_valid_base_config()
     base["required"] = ["trading_options.timezone"]
-    with pytest.raises(ConfigurationError, match="Required configuration path is missing"):
+    with pytest.raises(
+        ConfigurationError, match="Required configuration path is missing"
+    ):
         validate_strategy_config(base)
 
 
@@ -184,7 +194,9 @@ def test_strategy_config_helper_methods() -> None:
     assert config.permitted_environments == frozenset(["SIMULATOR"])
 
     assert config.section("trading_options") == {"timezone": "UTC"}
-    with pytest.raises(ConfigurationError, match="Expected section 'schema_version' to be an object"):
+    with pytest.raises(
+        ConfigurationError, match="Expected section 'schema_version' to be an object"
+    ):
         config.section("schema_version")
 
     assert config.parameter("period") == 14
@@ -200,12 +212,16 @@ def test_load_strategy_config() -> None:
     with pytest.raises(ConfigurationError, match="Strategy config does not exist"):
         load_strategy_config(Path("non_existent_file.json"))
 
-    with tempfile.NamedTemporaryFile(mode="w", delete=False, encoding="utf-8") as temp_file:
+    with tempfile.NamedTemporaryFile(
+        mode="w", delete=False, encoding="utf-8"
+    ) as temp_file:
         temp_file.write("{invalid_json}")
         temp_file_path = Path(temp_file.name)
 
     try:
-        with pytest.raises(ConfigurationError, match="Strategy config is not valid JSON"):
+        with pytest.raises(
+            ConfigurationError, match="Strategy config is not valid JSON"
+        ):
             load_strategy_config(temp_file_path)
     finally:
         temp_file_path.unlink()
@@ -215,7 +231,9 @@ def test_validate_manifest_runtime_modes_not_list() -> None:
     """Verify validate_strategy_config rejects non-list supported runtime modes."""
     base = get_valid_base_config()
     base["strategy_manifest"]["supported_runtime_modes"] = "not_a_list"
-    with pytest.raises(ConfigurationError, match="supported_runtime_modes must be a non-empty list"):
+    with pytest.raises(
+        ConfigurationError, match="supported_runtime_modes must be a non-empty list"
+    ):
         validate_strategy_config(base)
 
 
@@ -223,7 +241,9 @@ def test_validate_manifest_permitted_environments_not_list() -> None:
     """Verify validate_strategy_config rejects non-list permitted environments."""
     base = get_valid_base_config()
     base["strategy_manifest"]["permissions"]["permitted_environments"] = "not_a_list"
-    with pytest.raises(ConfigurationError, match="permitted_environments must be a non-empty list"):
+    with pytest.raises(
+        ConfigurationError, match="permitted_environments must be a non-empty list"
+    ):
         validate_strategy_config(base)
 
 
@@ -252,7 +272,12 @@ def test_validate_parameter_allowed_values_not_list() -> None:
     """Verify validate_strategy_config rejects non-list allowed_values."""
     base = get_valid_base_config()
     base["parameters"]["definitions"] = {
-        "period": {"type": "integer", "default": 10, "description": "desc", "allowed_values": "not_a_list"}
+        "period": {
+            "type": "integer",
+            "default": 10,
+            "description": "desc",
+            "allowed_values": "not_a_list",
+        }
     }
     with pytest.raises(ConfigurationError, match="allowed_values must be a list"):
         validate_strategy_config(base)
@@ -272,7 +297,13 @@ def test_validate_parameter_min_max_violation() -> None:
     """Verify validate_strategy_config enforces minimum and maximum bounds."""
     base = get_valid_base_config()
     base["parameters"]["definitions"] = {
-        "period": {"type": "integer", "default": 10, "description": "desc", "minimum": 5, "maximum": 15}
+        "period": {
+            "type": "integer",
+            "default": 10,
+            "description": "desc",
+            "minimum": 5,
+            "maximum": 15,
+        }
     }
 
     # Violation of min
@@ -290,7 +321,13 @@ def test_validate_parameter_min_greater_than_max() -> None:
     """Verify validate_strategy_config rejects minimum > maximum."""
     base = get_valid_base_config()
     base["parameters"]["definitions"] = {
-        "period": {"type": "number", "default": float("nan"), "description": "desc", "minimum": 15, "maximum": 5}
+        "period": {
+            "type": "number",
+            "default": float("nan"),
+            "description": "desc",
+            "minimum": 15,
+            "maximum": 5,
+        }
     }
     with pytest.raises(ConfigurationError, match="has minimum greater than maximum"):
         validate_strategy_config(base)
@@ -300,7 +337,13 @@ def test_validate_parameter_step_non_positive() -> None:
     """Verify validate_strategy_config rejects step <= 0."""
     base = get_valid_base_config()
     base["parameters"]["definitions"] = {
-        "period": {"type": "integer", "default": 10, "description": "desc", "minimum": 5, "step": -1}
+        "period": {
+            "type": "integer",
+            "default": 10,
+            "description": "desc",
+            "minimum": 5,
+            "step": -1,
+        }
     }
     with pytest.raises(ConfigurationError, match="step must be > 0"):
         validate_strategy_config(base)
@@ -319,7 +362,12 @@ def test_validate_numeric_constraints_non_numeric() -> None:
     """Verify validate_strategy_config rejects non-numeric bounds."""
     base = get_valid_base_config()
     base["parameters"]["definitions"] = {
-        "period": {"type": "integer", "default": 10, "description": "desc", "minimum": "not_numeric"}
+        "period": {
+            "type": "integer",
+            "default": 10,
+            "description": "desc",
+            "minimum": "not_numeric",
+        }
     }
     with pytest.raises(ConfigurationError, match="minimum must be numeric"):
         validate_strategy_config(base)
@@ -329,7 +377,9 @@ def test_validate_runtime_modes_non_string() -> None:
     """Verify validate_strategy_config rejects non-string members in supported runtime modes."""
     base = get_valid_base_config()
     base["strategy_manifest"]["supported_runtime_modes"] = [123]
-    with pytest.raises(ConfigurationError, match="supported_runtime_modes must contain strings only"):
+    with pytest.raises(
+        ConfigurationError, match="supported_runtime_modes must contain strings only"
+    ):
         validate_strategy_config(base)
 
 
@@ -337,7 +387,9 @@ def test_validate_runtime_modes_duplicates() -> None:
     """Verify validate_strategy_config rejects duplicate members in supported runtime modes."""
     base = get_valid_base_config()
     base["strategy_manifest"]["supported_runtime_modes"] = ["SIMULATOR", "SIMULATOR"]
-    with pytest.raises(ConfigurationError, match="supported_runtime_modes cannot contain duplicates"):
+    with pytest.raises(
+        ConfigurationError, match="supported_runtime_modes cannot contain duplicates"
+    ):
         validate_strategy_config(base)
 
 
@@ -345,7 +397,12 @@ def test_validate_parameter_value_not_in_allowed_values() -> None:
     """Verify validate_strategy_config rejects parameter values that violate allowed_values."""
     base = get_valid_base_config()
     base["parameters"]["definitions"] = {
-        "period": {"type": "integer", "default": 10, "description": "desc", "allowed_values": [5, 10, 15]}
+        "period": {
+            "type": "integer",
+            "default": 10,
+            "description": "desc",
+            "allowed_values": [5, 10, 15],
+        }
     }
     base["parameters"]["values"] = {"period": 12}
     with pytest.raises(ConfigurationError, match="must be one of"):
@@ -356,7 +413,9 @@ def test_validate_permitted_environments_non_string() -> None:
     """Verify validate_strategy_config rejects non-string members in permitted environments."""
     base = get_valid_base_config()
     base["strategy_manifest"]["permissions"]["permitted_environments"] = [123]
-    with pytest.raises(ConfigurationError, match="permitted_environments must contain strings only"):
+    with pytest.raises(
+        ConfigurationError, match="permitted_environments must contain strings only"
+    ):
         validate_strategy_config(base)
 
 
@@ -367,7 +426,9 @@ def test_validate_permitted_environments_duplicates() -> None:
         "SIMULATOR",
         "SIMULATOR",
     ]
-    with pytest.raises(ConfigurationError, match="permitted_environments cannot contain duplicates"):
+    with pytest.raises(
+        ConfigurationError, match="permitted_environments cannot contain duplicates"
+    ):
         validate_strategy_config(base)
 
 
@@ -375,7 +436,12 @@ def test_validate_minimum_boolean() -> None:
     """Verify validate_strategy_config rejects boolean values for minimum check."""
     base = get_valid_base_config()
     base["parameters"]["definitions"] = {
-        "period": {"type": "integer", "default": 10, "description": "desc", "minimum": True}
+        "period": {
+            "type": "integer",
+            "default": 10,
+            "description": "desc",
+            "minimum": True,
+        }
     }
     with pytest.raises(ConfigurationError, match="minimum must be numeric"):
         validate_strategy_config(base)
@@ -385,7 +451,9 @@ def test_validate_required_non_string() -> None:
     """Verify validate_strategy_config rejects non-string entries in required dot paths."""
     base = get_valid_base_config()
     base["required"] = [123]
-    with pytest.raises(ConfigurationError, match="required must be a list of configuration dot paths"):
+    with pytest.raises(
+        ConfigurationError, match="required must be a list of configuration dot paths"
+    ):
         validate_strategy_config(base)
 
 
@@ -393,6 +461,7 @@ def test_validate_parameter_various_types() -> None:
     """Verify type checking for number, boolean, list, and dict parameters."""
     base = get_valid_base_config()
     from collections.abc import Mapping
+
     base["parameters"]["definitions"] = {
         "p1": {"type": "number", "default": 1.5, "description": "desc"},
         "p2": {"type": "boolean", "default": True, "description": "desc"},

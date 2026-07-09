@@ -10,9 +10,11 @@ class MockEngine:
     def __init__(self) -> None:
         self.deals: dict = {}
 
+
 class MockOrchestrator:
     def __init__(self, engine) -> None:
         self.engine = engine
+
     def execute(self, payload) -> dict:
         return {
             "status": "success",
@@ -22,9 +24,10 @@ class MockOrchestrator:
                     "ending_balance": 100000.0,
                     "net_profit": 0.0,
                     "total_trades": 0,
-                }
-            }
+                },
+            },
         }
+
 
 mock_simulator_engine = MagicMock()
 mock_simulator_engine.EventDrivenExecutionEngine = MockEngine
@@ -37,13 +40,14 @@ mock_registry = MagicMock()
 _original_modules: dict = {}
 _original_evaluate_single_fold = None
 
+
 def setup_module(module) -> None:
     for name in [
         "app.services.simulator",
         "app.services.simulator.engine",
         "app.services.simulator.orchestrator",
         "app.services.strategies",
-        "app.services.strategies.registry"
+        "app.services.strategies.registry",
     ]:
         _original_modules[name] = sys.modules.get(name)
     sys.modules["app.services.simulator"] = mock_simulator_base
@@ -53,6 +57,7 @@ def setup_module(module) -> None:
     sys.modules["app.services.strategies.registry"] = mock_registry
 
     from app.services.optimization import sweeps
+
     global _original_evaluate_single_fold
     _original_evaluate_single_fold = sweeps._evaluate_single_fold
 
@@ -66,8 +71,10 @@ def setup_module(module) -> None:
 
     sweeps._evaluate_single_fold = mock_evaluate_single_fold
 
+
 def teardown_module(module) -> None:
     from app.services.optimization import sweeps
+
     global _original_evaluate_single_fold
     if _original_evaluate_single_fold is not None:
         sweeps._evaluate_single_fold = _original_evaluate_single_fold
@@ -126,7 +133,9 @@ def sample_space() -> ParameterSpace:
 
 # --- Sweeps Tests ---
 def test_compare_optimization_runs() -> None:
-    res = compare_optimization_runs(["run1"], [{"best_score": 1.5, "total_candidates": 10, "objective": "sharpe"}])
+    res = compare_optimization_runs(
+        ["run1"], [{"best_score": 1.5, "total_candidates": 10, "objective": "sharpe"}]
+    )
     assert res["run1"]["best_score"] == 1.5
 
 
@@ -143,20 +152,46 @@ def test_walk_forward_orchestration(sample_space: ParameterSpace) -> None:
         folds=2,
         fold_mode="rolling",
     )
-    res = walk_forward("trend_following", ["EURUSD"], "M1", "2026-01-01T00:00:00Z", "2026-01-05T00:00:00Z", req)
+    res = walk_forward(
+        "trend_following",
+        ["EURUSD"],
+        "M1",
+        "2026-01-01T00:00:00Z",
+        "2026-01-05T00:00:00Z",
+        req,
+    )
     assert res.walk_forward_score == 0.0
 
-    res_parallel = parallel_walk_forward("trend_following", ["EURUSD"], "M1", "2026-01-01T00:00:00Z", "2026-01-05T00:00:00Z", req, max_workers=2)
+    res_parallel = parallel_walk_forward(
+        "trend_following",
+        ["EURUSD"],
+        "M1",
+        "2026-01-01T00:00:00Z",
+        "2026-01-05T00:00:00Z",
+        req,
+        max_workers=2,
+    )
     assert res_parallel.walk_forward_score == 0.0
 
-    res_user = optimization_walk_forward("trend_following", ["EURUSD"], "M1", "2026-01-01T00:00:00Z", "2026-01-05T00:00:00Z", sample_space, folds=2)
+    res_user = optimization_walk_forward(
+        "trend_following",
+        ["EURUSD"],
+        "M1",
+        "2026-01-01T00:00:00Z",
+        "2026-01-05T00:00:00Z",
+        sample_space,
+        folds=2,
+    )
     print("res_user:", res_user)
     assert res_user["status"] == "success"
 
 
 def test_walk_forward_error_handling(sample_space: ParameterSpace) -> None:
     # Cause random_search to fail inside WFA evaluation
-    with patch("app.services.optimization.sweeps.random_search", side_effect=ValueError("Test Failure")):
+    with patch(
+        "app.services.optimization.sweeps.random_search",
+        side_effect=ValueError("Test Failure"),
+    ):
         req = WalkForwardRequest(
             strategy_ref="trend_following",
             symbols=["EURUSD"],
@@ -169,7 +204,16 @@ def test_walk_forward_error_handling(sample_space: ParameterSpace) -> None:
             folds=2,
             fold_mode="expanding",
         )
-        res_user = optimization_walk_forward("trend_following", ["EURUSD"], "M1", "2026-01-01T00:00:00Z", "2026-01-05T00:00:00Z", sample_space, fold_mode="expanding", folds=2)
+        res_user = optimization_walk_forward(
+            "trend_following",
+            ["EURUSD"],
+            "M1",
+            "2026-01-01T00:00:00Z",
+            "2026-01-05T00:00:00Z",
+            sample_space,
+            fold_mode="expanding",
+            folds=2,
+        )
         assert res_user["status"] == "error"
 
 
@@ -180,13 +224,22 @@ def test_background_task_orchestration() -> None:
     tid2 = run_walk_forward_task({"test": 2})
     assert tid2.startswith("task_wfa_")
 
-    wfar = WalkForwardResponse(run_id="wfa1", walk_forward_score=1.0, oos_retention_score=0.9, parameter_drift_score=0.1, walk_forward_efficiency=75.0, status="ready_for_risk_review", evidence={"ok": True})
+    wfar = WalkForwardResponse(
+        run_id="wfa1",
+        walk_forward_score=1.0,
+        oos_retention_score=0.9,
+        parameter_drift_score=0.1,
+        walk_forward_efficiency=75.0,
+        status="ready_for_risk_review",
+        evidence={"ok": True},
+    )
     assert analyze_walk_forward_results(wfar) == {"ok": True}
 
     assert "total_runs" in analyze_parallel_results([])
     assert save_optimization_result({})["saved"] is True
 
     from app.services.optimization.models import ParameterCandidate
+
     best_cand = ParameterCandidate(parameters={"short": 5}, candidate_hash="hash")
     summary = OptimizationSummary(
         objective="sharpe",
@@ -204,6 +257,7 @@ def test_background_task_orchestration() -> None:
 def test_expanding_window_split_branches() -> None:
     # Test expanding window split edge cases where train/test windows overlap or are truncated
     from datetime import datetime
+
     start = datetime(2026, 1, 1)
     end = datetime(2026, 1, 10)
     folds = expanding_window_split(start, end, folds=2, purging_bars=5, embargo_bars=10)
@@ -224,7 +278,10 @@ def test_run_walk_forward_optimization(sample_space: ParameterSpace) -> None:
     assert res["status"] == "success"
 
     # Exception path inside loop
-    with patch("app.services.optimization.algorithms.random.random_search", side_effect=ValueError("Random search fail")):
+    with patch(
+        "app.services.optimization.algorithms.random.random_search",
+        side_effect=ValueError("Random search fail"),
+    ):
         res_fail = run_walk_forward_optimization(
             strategy_ref="trend_following",
             symbols=["EURUSD"],
@@ -239,10 +296,20 @@ def test_run_walk_forward_optimization(sample_space: ParameterSpace) -> None:
 
 
 def test_run_walk_forward_matrix(sample_space: ParameterSpace) -> None:
-    with pytest.raises(ValueError, match="strategy_refs and parameter_spaces must have the same length"):
+    with pytest.raises(
+        ValueError, match="strategy_refs and parameter_spaces must have the same length"
+    ):
         run_walk_forward_matrix(["s1", "s2"], ["EURUSD"], "M1", "", "", [sample_space])
 
-    res = run_walk_forward_matrix(["s1"], ["EURUSD"], "M1", "2026-01-01T00:00:00Z", "2026-01-05T00:00:00Z", [sample_space], dry_run=True)
+    res = run_walk_forward_matrix(
+        ["s1"],
+        ["EURUSD"],
+        "M1",
+        "2026-01-01T00:00:00Z",
+        "2026-01-05T00:00:00Z",
+        [sample_space],
+        dry_run=True,
+    )
     assert res["status"] == "success"
     assert "s1" in res["data"]["matrix"]
 
@@ -256,14 +323,19 @@ def test_robustness_stress_shocks() -> None:
     assert len(run_commission_stress_test([], extra_commission_per_lot=5.0)) == 0
 
     # Ruin probability edge check
-    res = optimization_monte_carlo(trades, simulation_method="resample_trades", initial_balance=50.0)
+    res = optimization_monte_carlo(
+        trades, simulation_method="resample_trades", initial_balance=50.0
+    )
     assert 0.0 <= res.ruin_probability <= 1.0
 
 
 # --- Search Algorithms Coverage ---
 def test_bayesian_optimization_strict_backend(sample_space: ParameterSpace) -> None:
     from app.services.optimization.helpers import OptimizationExecutionError
-    with pytest.raises(OptimizationExecutionError, match="Bayesian optimization backend"):
+
+    with pytest.raises(
+        OptimizationExecutionError, match="Bayesian optimization backend"
+    ):
         bayesian_optimization(
             strategy_ref="trend_following",
             symbols=["EURUSD"],

@@ -68,5 +68,3 @@ def example_01_basic_backtest() -> None:
 
 if __name__ == "__main__":
     example_01_basic_backtest()
-
-

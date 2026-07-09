@@ -1054,9 +1054,7 @@ def run_risk_scenario_analysis_tool(
             scenario = registry.scenarios.get(request.scenario_name)
             if not scenario:
                 msg = f"Scenario '{request.scenario_name}' not found in registry."
-                raise ValidationError(
-                    msg
-                )
+                raise ValidationError(msg)
             res = scenario.evaluate(p_state, None, market_context, config)
             results[request.scenario_name] = res.model_dump()
         else:

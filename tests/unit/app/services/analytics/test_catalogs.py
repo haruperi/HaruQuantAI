@@ -152,7 +152,12 @@ def test_return_and_benchmark_helper_exports() -> None:
     capture = analytics.up_down_capture([0.02, -0.01], [0.01, -0.02])
     assert capture["up_capture"] == 2.0
     assert capture["down_capture"] == 0.5
-    assert analytics.metrics_r_multiple_distribution([{"pnl": 1.0}, {"pnl": 2.0}], analytics.MetricConfig()).value["mean"] == 1.5
+    assert (
+        analytics.metrics_r_multiple_distribution(
+            [{"pnl": 1.0}, {"pnl": 2.0}], analytics.MetricConfig()
+        ).value["mean"]
+        == 1.5
+    )
 
 
 def test_report_schema_wrappers() -> None:

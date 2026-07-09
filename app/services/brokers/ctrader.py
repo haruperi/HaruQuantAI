@@ -444,7 +444,11 @@ class CTraderClient:
         ask = getattr(extracted, "ask", None)  # pragma: no cover
 
         if name not in self._ticks:  # pragma: no cover
-            self._ticks[name] = {"bid": 0.0, "ask": 0.0, "last": 0.0}  # pragma: no cover
+            self._ticks[name] = {
+                "bid": 0.0,
+                "ask": 0.0,
+                "last": 0.0,
+            }  # pragma: no cover
 
         if bid is not None:  # pragma: no cover
             self._ticks[name]["bid"] = bid / 100000.0  # pragma: no cover
@@ -552,7 +556,9 @@ class CTraderClient:
                 symbol_id,
             )
         except Exception as e:  # pragma: no cover
-            logger.error("Failed to subscribe to spots for {}: {}", symbol_name, e)  # pragma: no cover
+            logger.error(
+                "Failed to subscribe to spots for {}: {}", symbol_name, e
+            )  # pragma: no cover
             raise  # pragma: no cover
 
     def unsubscribe_spots(self, symbol_name: str) -> None:
@@ -579,7 +585,9 @@ class CTraderClient:
                 symbol_id,
             )
         except Exception as e:  # pragma: no cover
-            logger.error("Failed to unsubscribe from spots for {}: {}", symbol_name, e)  # pragma: no cover
+            logger.error(
+                "Failed to unsubscribe from spots for {}: {}", symbol_name, e
+            )  # pragma: no cover
 
     def last_error(self) -> str:
         """Get the last error message or code.
@@ -620,7 +628,9 @@ class CTraderClient:
             close_price = None
             if light_sym:
                 try:  # pragma: no cover
-                    to_ts = int(datetime.now(UTC).timestamp() * 1000)  # pragma: no cover
+                    to_ts = int(
+                        datetime.now(UTC).timestamp() * 1000
+                    )  # pragma: no cover
                     from_ts = to_ts - (7 * 24 * 60 * 60 * 1000)  # pragma: no cover
 
                     req = ProtoOAGetTrendbarsReq()  # pragma: no cover
@@ -632,11 +642,15 @@ class CTraderClient:
                     req.count = 1  # pragma: no cover
 
                     res = self.send_request(  # pragma: no cover
-                        req, ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES, timeout=5.0  # pragma: no cover
+                        req,
+                        ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES,
+                        timeout=5.0,  # pragma: no cover
                     )  # pragma: no cover
                     if res.trendbar:  # pragma: no cover
                         last_bar = res.trendbar[-1]  # pragma: no cover
-                        close_price = (last_bar.low + last_bar.deltaClose) / 100000.0  # pragma: no cover
+                        close_price = (
+                            last_bar.low + last_bar.deltaClose
+                        ) / 100000.0  # pragma: no cover
                 except Exception as e:  # pragma: no cover
                     logger.warning(  # pragma: no cover
                         "Failed to fetch fallback trendbar in symbol_info_tick for {}: {}",
@@ -821,19 +835,25 @@ class CTraderClient:
             req_sym.ctidTraderAccountId = self.account_id  # pragma: no cover
             req_sym.symbolId.append(light_sym.symbolId)  # pragma: no cover
             res_sym = self.send_request(  # pragma: no cover
-                req_sym, ProtoOAPayloadType.PROTO_OA_SYMBOL_BY_ID_RES, timeout=5.0  # pragma: no cover
+                req_sym,
+                ProtoOAPayloadType.PROTO_OA_SYMBOL_BY_ID_RES,
+                timeout=5.0,  # pragma: no cover
             )  # pragma: no cover
             if res_sym.symbol:  # pragma: no cover
                 digits = res_sym.symbol[0].digits  # pragma: no cover
         except Exception as e:  # pragma: no cover
-            logger.warning("Failed to fetch symbol digits for {}: {}", symbol, e)  # pragma: no cover
+            logger.warning(
+                "Failed to fetch symbol digits for {}: {}", symbol, e
+            )  # pragma: no cover
 
         divisor = 10.0**digits  # pragma: no cover
 
         # Handle date range  # pragma: no cover
         if date_from is not None:  # pragma: no cover
             from_ts = int(date_from.timestamp() * 1000)  # pragma: no cover
-            to_ts = int((date_to or datetime.now(UTC)).timestamp() * 1000)  # pragma: no cover
+            to_ts = int(
+                (date_to or datetime.now(UTC)).timestamp() * 1000
+            )  # pragma: no cover
         else:  # pragma: no cover
             # period in milliseconds  # pragma: no cover
             period_ms = {  # pragma: no cover
@@ -852,9 +872,13 @@ class CTraderClient:
                 "W1": 604800000,  # pragma: no cover
                 "MN1": 2592000000,  # pragma: no cover
             }  # pragma: no cover
-            to_ts = int((date_to or datetime.now(UTC)).timestamp() * 1000)  # pragma: no cover
+            to_ts = int(
+                (date_to or datetime.now(UTC)).timestamp() * 1000
+            )  # pragma: no cover
             # Add some buffer to start_pos  # pragma: no cover
-            from_ts = to_ts - ((count + start_pos) * period_ms.get(tf_upper, 60000))  # pragma: no cover
+            from_ts = to_ts - (
+                (count + start_pos) * period_ms.get(tf_upper, 60000)
+            )  # pragma: no cover
 
         req = ProtoOAGetTrendbarsReq()  # pragma: no cover
         req.ctidTraderAccountId = self.account_id  # pragma: no cover
@@ -865,7 +889,9 @@ class CTraderClient:
 
         try:  # pragma: no cover
             res = self.send_request(  # pragma: no cover
-                req, ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES, timeout=10.0  # pragma: no cover
+                req,
+                ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES,
+                timeout=10.0,  # pragma: no cover
             )  # pragma: no cover
         except Exception as e:  # pragma: no cover
             logger.error("Failed to fetch cTrader trendbars: {}", e)  # pragma: no cover
@@ -892,7 +918,9 @@ class CTraderClient:
 
                 bars.append(  # pragma: no cover
                     {  # pragma: no cover
-                        "Timestamp": pd.to_datetime(ts_ms, unit="ms", utc=True),  # pragma: no cover
+                        "Timestamp": pd.to_datetime(
+                            ts_ms, unit="ms", utc=True
+                        ),  # pragma: no cover
                         "Open": bar_open,  # pragma: no cover
                         "High": bar_high,  # pragma: no cover
                         "Low": bar_low,  # pragma: no cover
@@ -919,7 +947,9 @@ class CTraderClient:
         if date_from is None:  # pragma: no cover
             df = df.tail(count)  # pragma: no cover
 
-        return df[["Timestamp", "Open", "High", "Low", "Close", "Volume", "Spread"]]  # pragma: no cover
+        return df[
+            ["Timestamp", "Open", "High", "Low", "Close", "Volume", "Spread"]
+        ]  # pragma: no cover
 
     def get_ticks(
         self,
@@ -956,20 +986,28 @@ class CTraderClient:
             req_sym.ctidTraderAccountId = self.account_id  # pragma: no cover
             req_sym.symbolId.append(symbol_id)  # pragma: no cover
             res_sym = self.send_request(  # pragma: no cover
-                req_sym, ProtoOAPayloadType.PROTO_OA_SYMBOL_BY_ID_RES, timeout=5.0  # pragma: no cover
+                req_sym,
+                ProtoOAPayloadType.PROTO_OA_SYMBOL_BY_ID_RES,
+                timeout=5.0,  # pragma: no cover
             )  # pragma: no cover
             if res_sym.symbol:  # pragma: no cover
                 digits = res_sym.symbol[0].digits  # pragma: no cover
         except Exception as e:  # pragma: no cover
-            logger.warning("Failed to fetch symbol digits for {}: {}", symbol, e)  # pragma: no cover
+            logger.warning(
+                "Failed to fetch symbol digits for {}: {}", symbol, e
+            )  # pragma: no cover
 
         divisor = 10.0**digits  # pragma: no cover
 
         if start is not None:  # pragma: no cover
             from_ts = int(start.timestamp() * 1000)  # pragma: no cover
-            to_ts = int((end or datetime.now(UTC)).timestamp() * 1000)  # pragma: no cover
+            to_ts = int(
+                (end or datetime.now(UTC)).timestamp() * 1000
+            )  # pragma: no cover
         else:  # pragma: no cover
-            to_ts = int((end or datetime.now(UTC)).timestamp() * 1000)  # pragma: no cover
+            to_ts = int(
+                (end or datetime.now(UTC)).timestamp() * 1000
+            )  # pragma: no cover
             from_ts = to_ts - 24 * 60 * 60 * 1000  # pragma: no cover
 
         # Fetch BID ticks  # pragma: no cover
@@ -982,7 +1020,9 @@ class CTraderClient:
             req_bid.fromTimestamp = from_ts  # pragma: no cover
             req_bid.toTimestamp = to_ts  # pragma: no cover
             res_bid = self.send_request(  # pragma: no cover
-                req_bid, ProtoOAPayloadType.PROTO_OA_GET_TICKDATA_RES, timeout=10.0  # pragma: no cover
+                req_bid,
+                ProtoOAPayloadType.PROTO_OA_GET_TICKDATA_RES,
+                timeout=10.0,  # pragma: no cover
             )  # pragma: no cover
             if res_bid and hasattr(res_bid, "tickData"):  # pragma: no cover
                 bid_ticks = list(res_bid.tickData)  # pragma: no cover
@@ -999,7 +1039,9 @@ class CTraderClient:
             req_ask.fromTimestamp = from_ts  # pragma: no cover
             req_ask.toTimestamp = to_ts  # pragma: no cover
             res_ask = self.send_request(  # pragma: no cover
-                req_ask, ProtoOAPayloadType.PROTO_OA_GET_TICKDATA_RES, timeout=10.0  # pragma: no cover
+                req_ask,
+                ProtoOAPayloadType.PROTO_OA_GET_TICKDATA_RES,
+                timeout=10.0,  # pragma: no cover
             )  # pragma: no cover
             if res_ask and hasattr(res_ask, "tickData"):  # pragma: no cover
                 ask_ticks = list(res_ask.tickData)  # pragma: no cover
@@ -1017,7 +1059,9 @@ class CTraderClient:
             else:  # pragma: no cover
                 last_ts += t.timestamp  # pragma: no cover
                 last_price += t.tick  # pragma: no cover
-            bids.append({"timestamp": last_ts, "bid": last_price / divisor})  # pragma: no cover
+            bids.append(
+                {"timestamp": last_ts, "bid": last_price / divisor}
+            )  # pragma: no cover
 
         # Decode ASK ticks (delta compression)  # pragma: no cover
         asks = []  # pragma: no cover
@@ -1030,7 +1074,9 @@ class CTraderClient:
             else:  # pragma: no cover
                 last_ts += t.timestamp  # pragma: no cover
                 last_price += t.tick  # pragma: no cover
-            asks.append({"timestamp": last_ts, "ask": last_price / divisor})  # pragma: no cover
+            asks.append(
+                {"timestamp": last_ts, "ask": last_price / divisor}
+            )  # pragma: no cover
 
         df_bid = pd.DataFrame(bids)  # pragma: no cover
         df_ask = pd.DataFrame(asks)  # pragma: no cover
@@ -1047,10 +1093,14 @@ class CTraderClient:
         else:  # pragma: no cover
             df_bid = df_bid.sort_values("timestamp")  # pragma: no cover
             df_ask = df_ask.sort_values("timestamp")  # pragma: no cover
-            df = pd.merge_asof(df_bid, df_ask, on="timestamp", direction="backward")  # pragma: no cover
+            df = pd.merge_asof(
+                df_bid, df_ask, on="timestamp", direction="backward"
+            )  # pragma: no cover
             df["ask"] = df["ask"].fillna(df["bid"] + 0.0002)  # pragma: no cover
 
-        df["Timestamp"] = pd.to_datetime(df["timestamp"], unit="ms", utc=True)  # pragma: no cover
+        df["Timestamp"] = pd.to_datetime(
+            df["timestamp"], unit="ms", utc=True
+        )  # pragma: no cover
         df["Spread"] = df["ask"] - df["bid"]  # pragma: no cover
         df["Last"] = (df["bid"] + df["ask"]) / 2.0  # pragma: no cover
         df["Volume"] = 1.0  # pragma: no cover
@@ -1065,7 +1115,9 @@ class CTraderClient:
                 "Spread": "spread",  # pragma: no cover
             }  # pragma: no cover
         )  # pragma: no cover
-        res_df = res_df[["Timestamp", "bid", "ask", "last", "volume", "spread"]]  # pragma: no cover
+        res_df = res_df[
+            ["Timestamp", "bid", "ask", "last", "volume", "spread"]
+        ]  # pragma: no cover
 
         if start is None:  # pragma: no cover
             res_df = res_df.tail(count)  # pragma: no cover

@@ -32,6 +32,7 @@ from app.services.risk.stress.registry import (
     register_stress_scenario,
     validate_custom_scenario_definition,
 )
+
 _DECIMAL_ZERO = Decimal("0.0")
 _DECIMAL_ONE = Decimal("1.0")
 from app.utils.logger import logger
@@ -438,16 +439,16 @@ class PriceShockScenario:
             is_news_candle=False,
         )
         projected = apply_market_shock(
-            portfolio, scenario, market_context  # type: ignore[arg-type]
+            portfolio,
+            scenario,
+            market_context,  # type: ignore[arg-type]
         )
         loss = calculate_stress_loss(
             projected, market_context, portfolio_state.currency
         )
         equity = portfolio_state.equity
         projected_equity = max(Decimal("0.0"), equity - loss)
-        impact_pct = (
-            loss / equity if equity > Decimal("0.0") else Decimal("1.0")
-        )
+        impact_pct = loss / equity if equity > Decimal("0.0") else Decimal("1.0")
 
         threshold = config.max_total_loss_pct_advisory
         pass_status = impact_pct <= threshold

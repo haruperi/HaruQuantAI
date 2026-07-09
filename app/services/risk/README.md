@@ -518,5 +518,3 @@ The Cryptographic Audit Layer provides a blockchain-style, cryptographically sec
    - **`RiskDecisionTokenSigner`**: Signs decision payloads with HMAC-SHA256. Dual-mode instantiation supports V2 structures and transient V1 keys.
    - **`create_risk_decision_token`**: Signs eligible approvals. Maps requests dynamically to V2 `RiskDecisionToken` or V1 `RiskApprovalToken`.
    - **`validate_risk_approval_token`**: Checks tokens for expiration, configuration/policy hash compatibility, scope alignment, and signature verification. Supports `@overload` signatures for clean static analysis compatibility.
-
-

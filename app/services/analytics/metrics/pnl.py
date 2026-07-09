@@ -93,7 +93,9 @@ def compound_monthly_growth_rate(
         months_val = float(config.metadata.get("months", 12.0) if config else 12.0)
         if initial_balance <= 0 or final_balance <= 0 or months_val <= 0:
             return MetricResult(value=0.0)
-        val = (math.pow(final_balance / initial_balance, 1.0 / months_val) - 1.0) * 100.0
+        val = (
+            math.pow(final_balance / initial_balance, 1.0 / months_val) - 1.0
+        ) * 100.0
         return MetricResult(value=val)
 
     # V1 compatibility path
@@ -103,7 +105,9 @@ def compound_monthly_growth_rate(
         return 0.0
     if float(months) <= 0 or float(initial_value) <= 0 or float(final_value) <= 0:
         return 0.0
-    return (math.pow(float(final_value) / float(initial_value), 1.0 / float(months)) - 1.0) * 100.0
+    return (
+        math.pow(float(final_value) / float(initial_value), 1.0 / float(months)) - 1.0
+    ) * 100.0
 
 
 def buy_and_hold_cagr(
@@ -379,6 +383,7 @@ def total_return(
 
     # V1 compatibility path
     from app.services.analytics.metrics.equity import _parse_equity_curve
+
     parsed = _parse_equity_curve(trades_or_equity)
     if len(parsed) < 2:
         return 0.0

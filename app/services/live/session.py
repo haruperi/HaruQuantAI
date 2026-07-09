@@ -177,10 +177,7 @@ def start_live_session(
         )
     session_id = session_id.strip()
 
-    if (
-        _active_session is not None
-        and _active_session.status in _BLOCKING_STATUSES
-    ):
+    if _active_session is not None and _active_session.status in _BLOCKING_STATUSES:
         raise RuntimeError(
             f"A live session is already active "
             f"(session_id={_active_session.session_id!r}). "
@@ -198,8 +195,7 @@ def start_live_session(
         )
         raise ValidationError(
             f"Live configuration is invalid "
-            f"({len(validation_errors)} error(s)): "
-            + "; ".join(validation_errors),
+            f"({len(validation_errors)} error(s)): " + "; ".join(validation_errors),
             code="CONFIGURATION_ERROR",
         )
 
@@ -210,12 +206,8 @@ def start_live_session(
         details={
             "live_enabled": config.live_enabled,
             "live_mode": config.live_mode,
-            "live_workflow_timeout_seconds": (
-                config.live_workflow_timeout_seconds
-            ),
-            "live_max_staleness_seconds": (
-                config.live_max_staleness_seconds
-            ),
+            "live_workflow_timeout_seconds": (config.live_workflow_timeout_seconds),
+            "live_max_staleness_seconds": (config.live_max_staleness_seconds),
         },
         request_id=request_id,
     )
@@ -234,8 +226,7 @@ def start_live_session(
 
     _active_session = session
     logger.info(
-        "live_session.started session_id=%r "
-        "live_enabled=%r live_mode=%r request_id=%r",
+        "live_session.started session_id=%r live_enabled=%r live_mode=%r request_id=%r",
         session_id,
         config.live_enabled,
         config.live_mode,
@@ -316,8 +307,7 @@ def stop_live_session(
 
     _active_session = None
     logger.info(
-        "live_session.stopped session_id=%r "
-        "reason=%r request_id=%r",
+        "live_session.stopped session_id=%r reason=%r request_id=%r",
         session_id,
         reason,
         request_id,
@@ -379,9 +369,7 @@ def recover_live_session(
 
     now = datetime.now(UTC)
     has_unknowns = recovery_context.get("has_unknown_outcomes", False)
-    has_reconciliation_pending = recovery_context.get(
-        "reconciliation_pending", False
-    )
+    has_reconciliation_pending = recovery_context.get("reconciliation_pending", False)
 
     if has_unknowns or has_reconciliation_pending:
         status = LiveSessionStatus.PAUSED
@@ -397,8 +385,7 @@ def recover_live_session(
     else:
         status = LiveSessionStatus.ACTIVE
         logger.info(
-            "live_session.recovery.active "
-            "session_id=%r request_id=%r",
+            "live_session.recovery.active session_id=%r request_id=%r",
             session_id,
             request_id,
         )
@@ -464,9 +451,7 @@ def get_live_session_status(
 
     accepting = _active_session.status == LiveSessionStatus.ACTIVE
     started_at_iso = (
-        _active_session.started_at.isoformat()
-        if _active_session.started_at
-        else None
+        _active_session.started_at.isoformat() if _active_session.started_at else None
     )
     return {
         "status": _active_session.status,

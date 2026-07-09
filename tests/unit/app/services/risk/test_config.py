@@ -629,6 +629,7 @@ def test_profile_builders() -> None:
 def test_registry_methods() -> None:
     """Test registry methods directly."""
     from app.services.risk.config.loader import RiskProfileRegistry
+
     reg = RiskProfileRegistry()
     cfg = load_risk_config("default")
     reg.register("test_key", cfg)
@@ -644,7 +645,9 @@ def test_loader_error_cases() -> None:
     from app.services.risk.config.loader import _registry, load_risk_config
 
     # Non-existent file path
-    with pytest.raises(ValidationError, match="Explicit configuration source file not found"):
+    with pytest.raises(
+        ValidationError, match="Explicit configuration source file not found"
+    ):
         load_risk_config("custom", source="non_existent_file.yaml")
 
     # File containing non-dict JSON
@@ -668,9 +671,9 @@ def test_loader_env_override_errors(monkeypatch: pytest.MonkeyPatch) -> None:
     # Invalid decimal override
     monkeypatch.setenv("HARUQUANT_RISK_MAX_RISK_PER_TRADE", "not_a_decimal")
     try:
-        with pytest.raises(ValidationError, match="Failed to parse environment override"):
+        with pytest.raises(
+            ValidationError, match="Failed to parse environment override"
+        ):
             load_risk_config("default")
     finally:
         monkeypatch.delenv("HARUQUANT_RISK_MAX_RISK_PER_TRADE")
-
-

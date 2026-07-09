@@ -102,6 +102,7 @@ def test_cache_hits_and_misses() -> None:
 
 def test_database_helper_migrations(tmp_path: Path) -> None:
     from app.services.data.storage import DatabaseHelper
+
     temp_db = str(tmp_path / "temp_migration_test.db")
     helper = DatabaseHelper(db_path=temp_db)
     # Check that database connection successfully resolved WAL journaling mode
@@ -122,6 +123,7 @@ def test_validate_storage_path_errors() -> None:
 
     # Normalization error
     from unittest.mock import patch
+
     with patch("app.services.data.storage.normalize_path") as mock_norm:
         mock_norm.side_effect = Exception("Mock Normalization Error")
         with pytest.raises(ValidationError, match="Invalid path"):
@@ -160,7 +162,6 @@ def test_load_local_dataset_errors() -> None:
 
 
 def test_cache_expiration_and_errors() -> None:
-
     from app.services.data.storage import get_cached_data, set_cached_data
 
     key = generate_cache_key("csv", "EURUSD", "M1", "2026-06-01", "2026-06-03")
@@ -189,6 +190,7 @@ def test_cache_expiration_and_errors() -> None:
 
     # Database exceptions paths
     from unittest.mock import patch
+
     with patch("app.services.data.storage.db_helper.get_connection") as mock_conn:
         mock_conn.side_effect = Exception("DB Cache Error")
         assert get_cached_data(key, "return_stale") is None
@@ -201,6 +203,7 @@ def test_clear_data_cache_errors() -> None:
 
     # Database exceptions paths
     from unittest.mock import patch
+
     with patch("app.services.data.storage.db_helper.get_connection") as mock_conn:
         mock_conn.side_effect = Exception("DB Clear Error")
         with pytest.raises(ValidationError, match="Failed to clear cache"):
@@ -213,7 +216,10 @@ def test_load_local_dataset_exception_handling(tmp_path: Path) -> None:
     corrupt_file.write_text("invalid,csv,data\n1,2", encoding="utf-8")
     # This should trigger DataError inside load_local_dataset
     from app.services.data.storage import DataError, load_local_dataset
-    with patch("app.services.data.storage.validate_storage_path", return_value=corrupt_file):
+
+    with patch(
+        "app.services.data.storage.validate_storage_path", return_value=corrupt_file
+    ):
         with patch("pandas.read_csv", side_effect=Exception("Read CSV Error")):
             with pytest.raises(DataError):
                 load_local_dataset("data/raw/corrupt.csv")
@@ -231,20 +237,40 @@ def test_load_ohlcv_csv_errors(tmp_path: Path) -> None:
 
     # Missing time column
     records_no_time = [{"open": 1.0, "high": 1.1, "low": 0.9, "close": 1.0}]
-    with patch("app.services.data.storage.load_local_dataset", return_value=records_no_time):
+    with patch(
+        "app.services.data.storage.load_local_dataset", return_value=records_no_time
+    ):
         with pytest.raises(ValueError, match="CSV needs one of timestamp columns"):
             load_ohlcv_csv("data/raw/missing_time.csv")
 
     # Naive timestamp (no timezone)
-    records_naive_time = [{"timestamp": "2026-06-23T12:00:00", "open": 1.0, "high": 1.1, "low": 0.9, "close": 1.0}]
-    with patch("app.services.data.storage.load_local_dataset", return_value=records_naive_time):
+    records_naive_time = [
+        {
+            "timestamp": "2026-06-23T12:00:00",
+            "open": 1.0,
+            "high": 1.1,
+            "low": 0.9,
+            "close": 1.0,
+        }
+    ]
+    with patch(
+        "app.services.data.storage.load_local_dataset", return_value=records_naive_time
+    ):
         with pytest.raises(ValueError, match="Invalid OHLCV row"):
             load_ohlcv_csv("data/raw/naive_time.csv")
 
     # Invalid price row (e.g. ValueError during float conversion)
-    records_bad_row = [{"timestamp": "2026-06-23T12:00:00Z", "open": "not_a_float", "high": 1.1, "low": 0.9, "close": 1.0}]
-    with patch("app.services.data.storage.load_local_dataset", return_value=records_bad_row):
+    records_bad_row = [
+        {
+            "timestamp": "2026-06-23T12:00:00Z",
+            "open": "not_a_float",
+            "high": 1.1,
+            "low": 0.9,
+            "close": 1.0,
+        }
+    ]
+    with patch(
+        "app.services.data.storage.load_local_dataset", return_value=records_bad_row
+    ):
         with pytest.raises(ValueError, match="Invalid OHLCV row"):
             load_ohlcv_csv("data/raw/bad_row.csv")
-
-

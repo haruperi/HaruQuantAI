@@ -5,6 +5,7 @@ def test_analytics_extra2():
     # analytics/risk.py
     try:
         from app.services.analytics.metrics import RiskAnalyzer
+
         analyzer = RiskAnalyzer()
         analyzer.analyze_risk(MagicMock(), MagicMock())
         analyzer.calculate_var(MagicMock())
@@ -15,6 +16,7 @@ def test_analytics_extra2():
     # analytics/trade.py
     try:
         from app.services.analytics.metrics import TradeAnalyzer
+
         ta = TradeAnalyzer()
         ta.analyze_trades(MagicMock())
         ta.calculate_metrics(MagicMock())

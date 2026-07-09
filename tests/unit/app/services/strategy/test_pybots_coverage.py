@@ -88,7 +88,9 @@ def test_registry_and_bundled_evaluations(mock_market_context: MarketContext) ->
     with pytest.raises(KeyError, match="No bundled implementation"):
         # Load a config and modify strategy_id to fail registry
         strategy = load_bundled_strategy("naive_ma_trend")
-        strategy.config.raw["strategy_manifest"]["identity"]["strategy_id"] = "non_existent_registry"
+        strategy.config.raw["strategy_manifest"]["identity"]["strategy_id"] = (
+            "non_existent_registry"
+        )
         strategy_from_config(strategy.config)
 
 
@@ -169,14 +171,25 @@ def test_template_strategy_and_rules(mock_market_context: MarketContext) -> None
     config_dict = {
         "schema_version": "1.0.0",
         "strategy_manifest": {
-            "identity": {"strategy_id": "template_strat", "strategy_type": "trend_following"},
+            "identity": {
+                "strategy_id": "template_strat",
+                "strategy_type": "trend_following",
+            },
             "version": "1.0.0",
-            "chart_requirements": {"main": {"symbol": "EURUSD", "timeframe": "H1"}, "other": {}},
+            "chart_requirements": {
+                "main": {"symbol": "EURUSD", "timeframe": "H1"},
+                "other": {},
+            },
             "supported_runtime_modes": ["SIMULATOR"],
             "strategy_capabilities": [],
-            "permissions": {"lifecycle_status": "RESEARCH", "permitted_environments": ["SIMULATOR"]},
+            "permissions": {
+                "lifecycle_status": "RESEARCH",
+                "permitted_environments": ["SIMULATOR"],
+            },
         },
-        "trading_profile": {"symbols": {"main": {"symbol": "EURUSD", "timeframe": "H1"}}},
+        "trading_profile": {
+            "symbols": {"main": {"symbol": "EURUSD", "timeframe": "H1"}}
+        },
         "parameters": {},
         "trading_options": {},
         "action_rules": {},
@@ -184,6 +197,7 @@ def test_template_strategy_and_rules(mock_market_context: MarketContext) -> None
         "protection_rules": {},
     }
     from app.services.strategy.config import StrategyConfig
+
     config = StrategyConfig(config_dict)
     strategy = TemplateStrategy(config)
 

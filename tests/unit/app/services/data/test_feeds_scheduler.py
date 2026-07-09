@@ -309,7 +309,9 @@ def test_async_job_execution_loops() -> None:
         # 3. Test run_job_loop disabled break path
         # Set job state to disabled (not enabled)
         stop_data_update_job(job_name)
-        await _run_job_loop(job_name)  # Should read db, see disabled, and break immediately
+        await _run_job_loop(
+            job_name
+        )  # Should read db, see disabled, and break immediately
 
         # 4. Test run_job_loop CancelledError path
         # We will patch sleep to raise CancelledError
@@ -320,7 +322,10 @@ def test_async_job_execution_loops() -> None:
         # 5. Test run_job_loop database exception path
         # Patch db_helper to raise exception on first call, then patch sleep to raise CancelledError
         # so it breaks out of the infinite loop
-        with patch("app.services.data.storage.db_helper.get_connection", side_effect=RuntimeError("DB Fail")):
+        with patch(
+            "app.services.data.storage.db_helper.get_connection",
+            side_effect=RuntimeError("DB Fail"),
+        ):
             with patch("asyncio.sleep", side_effect=[None, asyncio.CancelledError]):
                 try:
                     await _run_job_loop(job_name)
