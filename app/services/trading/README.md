@@ -14,6 +14,40 @@ implementations must be injected from infrastructure layers outside
 
 ## Implemented Surface
 
+- `actions/`: platform-independent shared trading action surface.
+  - `actions/validation.py`: broker-independent local parameter validation —
+    Decimal normalization to dynamic instrument precision, direction-aware
+    stop-loss/take-profit geometry, margin sufficiency, market session
+    evidence, time-in-force capability, execution protections (mandatory
+    slippage and price collars), the immutable fat-finger notional ceiling,
+    static defense-in-depth rails, and short-locate verification. Every
+    validator accepts explicit evidence inputs rather than reading broker
+    state directly, so it runs identically under `route="sim"` and
+    `route="live"` (TRD-XM-001).
+  - `actions/orders.py`: `buy`/`sell`/`buy_limit`/`sell_limit`/`buy_stop`/
+    `sell_stop`/`order_modify`/`order_delete`/`submit_oco_group`. Every order
+    action runs local validation first, then packages a request envelope
+    through the shared `dispatch_or_package` seam.
+  - `actions/positions.py`: `position_open`/`position_close`/
+    `position_modify`/`reduce_exposure` position lifecycle controls,
+    supporting Close-By-Ticket and Close-By-Symbol addressing under netting
+    and hedging account modes. `reduce_exposure` packages a pre-approved risk
+    decision only; it never computes sizing itself.
+  - `actions/controls.py`: `pause_strategy`/`resume_strategy` (local,
+    non-broker-mutating), `sync_positions` (read-only broker/local
+    synchronization), `shutdown` (graceful session flush), and
+    `trigger_global_kill_switch`/`trigger_strategy_kill_switch`/
+    `trigger_symbol_kill_switch` (idempotent, audited, journaled activation).
+  - `actions/emergency.py`: `cancel_all_orders`/`close_all_positions`/
+    `flatten_account`/`flatten_strategy`/`flatten_symbol` — pre/post-action
+    broker state snapshots, partial-completion tolerance, and per-child
+    action detail.
+  - `actions/_common.py`: the `TradingActionDependencies` bag (injected
+    Clock/RNG/tenant/idempotency-store/event-journal/trade-store) and the
+    `LiveGatePipeline` protocol — the documented seam the future
+    `gates/pipeline.py` unit wires for `route="live"` gate evaluation. Until
+    that pipeline is injected, every action fails closed to a
+    `packaged_only` response (TRD-FR-055).
 - `contracts.py`: route/action enums, promotion and mutation capability enums,
   TIF and FIX execution states, request/response envelopes, quote snapshots,
   allocation vectors, regulatory tags, normalized broker result wrappers,
@@ -96,6 +130,9 @@ signatures support tamper-evidence checks.
 
 ## Pending Runtime Areas
 
-Actions, validations, execution coordination, gates, reconciliation,
-monitoring, and promotion are intentionally pending and should be implemented
-in later dependency-safe units.
+Execution coordination (beyond request packaging), gates middleware,
+reconciliation, monitoring, run-session management, and promotion are
+intentionally pending and should be implemented in later dependency-safe
+units. `actions/` exposes documented injection seams (`gate_pipeline`,
+`idempotency_store`, `event_journal`, `trade_store`) for those future units
+to wire in without changing the action call signatures.

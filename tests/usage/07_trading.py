@@ -1,4 +1,4 @@
-# ruff: noqa: E501, BLE001, E402, PLW0603
+# ruff: noqa: E501, BLE001, E402, PLW0603, ARG002
 """Unified usage example for generic Trade classes working with MT5 and cTrader."""
 
 import sys
@@ -20,6 +20,7 @@ from app.services.trading import (
     AllocationVector,
     DealInfo,
     HistoryOrderInfo,
+    JsonObject,
     MutationCapability,
     OrderInfo,
     PositionInfo,
@@ -31,6 +32,18 @@ from app.services.trading import (
     TradingRequestEnvelope,
     TradingRoute,
     get_trading_public_catalog,
+)
+from app.services.trading.actions import (
+    AccountMarginContext,
+    DailyRailState,
+    DefenseInDepthRailLimits,
+    OrderValidationContext,
+    SymbolTradingConstraints,
+    TradingActionDependencies,
+    buy,
+    flatten_symbol,
+    pause_strategy,
+    trigger_symbol_kill_switch,
 )
 from app.services.trading.config import (
     NotificationChannel,
@@ -345,6 +358,156 @@ def example_06_read_only_info_facades() -> None:
     print(f"Deal ticket:        {deal.ticket()}")
     print(f"History ticket:     {history.ticket()}")
     print(f"Redacted account:   {account.payload()}")
+
+
+class ExampleIdempotencyStore:
+    """Usage-example in-memory idempotency store port."""
+
+    def __init__(self) -> None:
+        """Initialize the empty in-memory reservation table."""
+        self._seen: set[str] = set()
+
+    def reserve(
+        self,
+        *,
+        route: TradingRoute,
+        tenant_id: str,
+        key: str,
+        material_hash: str,
+        expires_at: datetime,
+    ) -> JsonObject:
+        """Reserve a key, reporting whether it was already seen."""
+        first = key not in self._seen
+        self._seen.add(key)
+        return {"decision": "reserved" if first else "duplicate"}
+
+    def resolve(self, **_: object) -> JsonObject | None:
+        """Return no cached resolution for this usage-example double."""
+        return None
+
+    def complete(self, **_: object) -> None:
+        """No-op completion for this usage-example double."""
+        return
+
+
+class ExampleEventJournal:
+    """Usage-example in-memory append-only event journal port."""
+
+    def __init__(self) -> None:
+        """Initialize the empty in-memory event list."""
+        self.events: list[JsonObject] = []
+
+    def append(self, *, event: JsonObject, recorded_at: datetime) -> str:
+        """Append an event and return a synthetic reference."""
+        self.events.append(event)
+        return f"usage-journal-{len(self.events)}"
+
+    def scan_unresolved(self, **_: object) -> tuple[JsonObject, ...]:
+        """Return no unresolved entries for this usage-example double."""
+        return ()
+
+
+def example_07_actions_and_validation() -> None:
+    """Demonstrate validated order, control, and emergency action primitives."""
+    print("\n" + "=" * 100)
+    print("--- 6. Trading Action Primitives & Validation ---")
+    print("=" * 100)
+
+    constraints = SymbolTradingConstraints(
+        symbol=trading_symbol,
+        digits=5,
+        volume_min=Decimal("0.01"),
+        volume_max=Decimal(100),
+        volume_step=Decimal("0.01"),
+        tick_size=Decimal("0.00001"),
+        min_stop_distance=Decimal("0.0005"),
+        contract_size=Decimal(100000),
+        quote_currency="USD",
+    )
+    account = AccountMarginContext(
+        account_currency="USD", leverage=100, free_margin=Decimal(10000)
+    )
+    context = OrderValidationContext(
+        route=TradingRoute.SIM,
+        reference_price=Decimal("1.10000"),
+        constraints=constraints,
+        account_margin=account,
+        fat_finger_ceiling=Decimal(50000),
+        rail_limits=DefenseInDepthRailLimits(
+            max_mutation_attempts_per_window=10,
+            window_seconds=60,
+            max_open_positions=5,
+            daily_notional_ceiling=Decimal(1000000),
+        ),
+        rail_state=DailyRailState(
+            mutation_attempts_in_window=0,
+            open_positions_count=0,
+            cumulative_daily_notional=Decimal(0),
+        ),
+    )
+    idempotency_store = ExampleIdempotencyStore()
+    event_journal = ExampleEventJournal()
+    deps = TradingActionDependencies(
+        clock=ExampleClock(),
+        rng=ExampleRNG(),
+        tenant_id="usage-tenant",
+        idempotency_store=idempotency_store,
+        event_journal=event_journal,
+    )
+
+    buy_response = buy(
+        symbol=trading_symbol,
+        volume=Decimal("0.10"),
+        sl=Decimal("1.09000"),
+        tp=Decimal("1.11000"),
+        deviation_points=10,
+        route=TradingRoute.SIM,
+        promotion_stage=PromotionStage.SIMULATION,
+        mutation_capability=MutationCapability.PACKAGED_ONLY,
+        request_id="usage-action-001",
+        correlation_id="usage-corr-006",
+        context=context,
+        deps=deps,
+    )
+    pause_response = pause_strategy(
+        strategy_id="usage-strategy",
+        reason="usage example pause",
+        route=TradingRoute.SIM,
+        promotion_stage=PromotionStage.SIMULATION,
+        mutation_capability=MutationCapability.PACKAGED_ONLY,
+        request_id="usage-action-002",
+        correlation_id="usage-corr-006",
+        deps=deps,
+    )
+    kill_switch_response = trigger_symbol_kill_switch(
+        symbol=trading_symbol,
+        reason="usage example incident",
+        actor="usage-operator",
+        route=TradingRoute.LIVE,
+        promotion_stage=PromotionStage.MICRO_LIVE,
+        request_id="usage-action-003",
+        correlation_id="usage-corr-006",
+        deps=deps,
+        idempotency_store=idempotency_store,
+        event_journal=event_journal,
+    )
+    flatten_response = flatten_symbol(
+        symbol=trading_symbol,
+        route=TradingRoute.SIM,
+        promotion_stage=PromotionStage.SIMULATION,
+        mutation_capability=MutationCapability.PACKAGED_ONLY,
+        request_id="usage-action-004",
+        correlation_id="usage-corr-006",
+        deps=deps,
+    )
+
+    print(
+        f"Buy status:          {buy_response.status.value} / {buy_response.side_effect_mode.value}"
+    )
+    print(f"Pause status:        {pause_response.status.value}")
+    print(f"Kill switch status:  {kill_switch_response.status.value}")
+    print(f"Kill switch journal: {kill_switch_response.audit_ref}")
+    print(f"Flatten status:      {flatten_response.status.value}")
 
 
 def get_client() -> Any:
@@ -918,6 +1081,7 @@ if __name__ == "__main__":
     example_04_security_boundaries_error_redaction()
     example_05_persistence_implementations()
     example_06_read_only_info_facades()
+    example_07_actions_and_validation()
     example_01_connect()
     example_02_terminal()
     example_03_account()

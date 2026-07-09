@@ -53,6 +53,21 @@ def first_or_none(value: object) -> object | None:
     return value
 
 
+def iter_or_empty(value: object) -> tuple[object, ...]:
+    """Return a type-narrowed tuple view of a broker collection.
+
+    Args:
+        value: Broker response value.
+
+    Returns:
+        tuple[object, ...]: Items when the value is iterable, else empty.
+    """
+    logger.debug("Coercing broker info response to an iterable tuple.")
+    if isinstance(value, Iterable) and not isinstance(value, str | bytes | dict):
+        return tuple(value)
+    return ()
+
+
 def safe_attr(
     data: object | None,
     name: str,
