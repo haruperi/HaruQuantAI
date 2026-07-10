@@ -13,7 +13,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.services.contracts.base import Contract
+from app.utils.contract import Contract
 
 # ---------------------------------------------------------------------------
 # Canonical workflow status values used across all optimization outputs.

@@ -19,7 +19,7 @@ from typing import Any
 
 import pandas as pd
 
-from app.services.contracts.strategies import Bar
+from app.services.strategy.contracts import Bar
 from app.utils.errors import DataError, ValidationError
 from app.utils.logger import logger
 from app.utils.paths import ensure_parent_dir, normalize_path

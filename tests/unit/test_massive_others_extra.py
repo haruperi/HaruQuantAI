@@ -119,19 +119,6 @@ def test_others_no_pandas():
     except Exception:
         pass
 
-    # Live
-    from app.services.live.gates import ExecutionGateManager
-
-    egm = ExecutionGateManager(MagicMock())
-    try:
-        egm.check_entry_allowed(MagicMock())
-    except Exception:
-        pass
-    try:
-        egm.check_exit_allowed(MagicMock())
-    except Exception:
-        pass
-
     # Risk
     from app.services.risk.reports import RiskReporter
 
@@ -141,15 +128,3 @@ def test_others_no_pandas():
     except Exception:
         pass
 
-    # Trader
-    from app.services.trader.validation import OrderValidator
-
-    ov = OrderValidator(MagicMock())
-    try:
-        ov.validate_new_order(MagicMock())
-    except Exception:
-        pass
-    try:
-        ov.validate_modification(MagicMock())
-    except Exception:
-        pass

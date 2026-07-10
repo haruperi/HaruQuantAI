@@ -10,7 +10,7 @@ from typing import Any
 
 import pandas as pd
 
-from app.services.contracts.strategies import (
+from app.services.strategy.contracts import (
     Direction,
     EntryType,
     IntentAction,

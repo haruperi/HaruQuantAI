@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
-from app.services.contracts.strategies import Bar
+from app.services.strategy.contracts import Bar
 from app.services.data.storage import db_helper
 from app.utils.errors import ValidationError
 from app.utils.logger import logger

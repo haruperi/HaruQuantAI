@@ -33,6 +33,7 @@ from app.services.trading.state.ports import (
     TradeStore,
     TradingStateStore,
 )
+from app.services.trading.state.trade_store import InMemoryTradeStore, JsonlTradeStore
 
 __all__ = [
     "IDEMPOTENCY_MATERIAL_FIELDS",
@@ -48,11 +49,13 @@ __all__ = [
     "IdempotencyReservation",
     "IdempotencyStatus",
     "IdempotencyStore",
+    "InMemoryTradeStore",
     "JournalBuildMetadata",
     "JournalEvent",
     "JournalIntegrityResult",
     "JournalRetentionPolicy",
     "JsonlIdempotencyStore",
+    "JsonlTradeStore",
     "LocalStateManager",
     "ReconciliationLock",
     "SegmentSeal",

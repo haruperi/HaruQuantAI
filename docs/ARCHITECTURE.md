@@ -25,8 +25,9 @@
 
 * Project scaffolded with `uv` (Python 3.14, `pyproject.toml`, `uv.lock`).
 * Tooling configured: `ruff` (full rule set), `mypy`, `pytest`, `pre-commit` (hygiene checks, ruff, ruff-format, detect-secrets, mypy).
-* Code present: `app/` package (`app/__init__.py`, `app/main.py`) — placeholder entrypoint only. No domain modules (data, indicator, strategy, risk, trading, etc.) implemented yet.
-* No `api/`, `agentic/`, `ui/`, `data/`, or `tests/` directories yet.
+* Code present: `app/` package with implemented service modules under `app/services/`, including Trading as the surviving live-route runtime and broker-dispatch owner.
+* The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
+* No `api/` or `ui/` application packages yet.
 
 ---
 
@@ -35,7 +36,7 @@
 ### Workspace Directory Layout (Target)
 
 * `api/`: FastAPI apps, routes, middleware, auth, WS/session layers, API composition.
-* `app/`: Core domain modules (utils, data, indicator, strategy, risk, analytics, trading, simulation, optimization, live, research, conversation).
+* `app/`: Core domain modules (utils, data, indicator, strategy, risk, analytics, trading, simulation, optimization, research, conversation). Live-route execution is owned by Trading.
 * `agentic/`: Agent runtimes, explicit tool permission states, workflow schemas, provider configs.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
 * `ui/`: Next.js frontend application environment.

@@ -1,6 +1,6 @@
 """Shared contracts and base classes for HaruQuant strategies."""
 
-from app.services.contracts.strategies import (
+from app.services.strategy.contracts import (
     AccountSnapshot,
     Bar,
     Direction,

@@ -4,7 +4,7 @@ from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from app.services.contracts.strategies import (
+from app.services.strategy.contracts import (
     Bar,
     Direction,
     EntryType,

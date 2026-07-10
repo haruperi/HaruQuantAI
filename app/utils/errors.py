@@ -321,6 +321,10 @@ APPROVED_ERROR_CODES = frozenset(
         "LIVE_PROTECTIVE_MODIFY_FAILED",
         "LIVE_NON_ATOMIC_MODIFY_ESCALATED",
         "LIVE_MULTI_LEG_ROLLBACK_TRIGGERED",
+        # Custom Trading Runtime State Store Codes
+        "LIVE_STATE_VERSION_CONFLICT",
+        # Custom Trading Runtime Dispatch Codes
+        "LIVE_BROKER_REJECTED",
     }
 )
 
@@ -584,6 +588,10 @@ ERROR_MESSAGES: dict[str, str] = {
     "LIVE_MULTI_LEG_ROLLBACK_TRIGGERED": (
         "A multi-leg execution leg failed or breached fill tolerance; rollback triggered."
     ),
+    "LIVE_STATE_VERSION_CONFLICT": (
+        "The state projection was modified concurrently; the expected version is stale."
+    ),
+    "LIVE_BROKER_REJECTED": "The broker rejected the trade request.",
 }
 
 

@@ -30,6 +30,13 @@ from app.services.trading.gates.kill_switch import (
     persist_kill_switch_state,
     restore_kill_switch_state,
 )
+from app.services.trading.gates.live_pipeline import (
+    DispatchOutcome,
+    LiveGateEvidence,
+    LiveGatePipelineImpl,
+    build_live_gate_pipeline,
+    passthrough_risk_evaluator,
+)
 from app.services.trading.gates.pipeline import (
     ComplianceEvidence,
     GatePipelineDecision,
@@ -63,6 +70,7 @@ __all__ = [
     "BrokerReadinessEvidence",
     "ClockDriftEvidence",
     "ComplianceEvidence",
+    "DispatchOutcome",
     "GateName",
     "GatePipelineDecision",
     "GateStep",
@@ -71,6 +79,8 @@ __all__ = [
     "KillSwitchEvaluation",
     "KillSwitchScope",
     "KillSwitchState",
+    "LiveGateEvidence",
+    "LiveGatePipelineImpl",
     "MarketTurbulenceMonitor",
     "OperationalMode",
     "OperatorApprovalToken",
@@ -79,6 +89,7 @@ __all__ = [
     "ReadinessCheckResult",
     "RiskDecisionEvidence",
     "blocked_step",
+    "build_live_gate_pipeline",
     "clear_kill_switch_after_approval",
     "compute_canonical_request_hash",
     "compute_effective_deadline",
@@ -88,6 +99,7 @@ __all__ = [
     "evaluate_kill_switches",
     "evaluate_seam_gate",
     "passed_step",
+    "passthrough_risk_evaluator",
     "persist_kill_switch_state",
     "record_pre_mutation_audit",
     "requires_dual_approval",

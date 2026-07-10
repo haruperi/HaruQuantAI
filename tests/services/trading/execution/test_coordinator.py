@@ -624,3 +624,23 @@ def test_execution_coordinator_dispatch_async_failure() -> None:
     assert coordinator.in_flight.current() == 0
     assert len(completions) == 1
     assert isinstance(completions[0], ValueError)
+
+
+def test_wait_drained_returns_true_when_already_drained() -> None:
+    counter = c.InFlightRequestCounter()
+    assert counter.wait_drained(timeout_seconds=0.05) is True
+
+
+def test_wait_drained_times_out_while_requests_are_in_flight() -> None:
+    counter = c.InFlightRequestCounter()
+    counter.increment()
+    assert counter.wait_drained(timeout_seconds=0.05, poll_seconds=0.01) is False
+
+
+def test_wait_drained_returns_true_once_the_counter_reaches_zero() -> None:
+    import threading
+
+    counter = c.InFlightRequestCounter()
+    counter.increment()
+    threading.Timer(0.02, counter.decrement).start()
+    assert counter.wait_drained(timeout_seconds=1.0, poll_seconds=0.01) is True

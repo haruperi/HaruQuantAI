@@ -3,7 +3,7 @@
 from datetime import UTC
 
 import pandas as pd
-from app.services.contracts.strategies import (
+from app.services.strategy.contracts import (
     AccountSnapshot,
     Bar,
     MarketContext,

@@ -12,14 +12,14 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from app.services.analytics.contracts.models import Lineage, TradingResult
-from app.services.contracts.trading import ExecutionReport, Fill, TradeResult
+from app.services.trading.contracts import ExecutionReport, Fill, TradeResult
 from app.utils.logger import logger
 
 if TYPE_CHECKING:
-    from app.services.contracts.audit import AuditEvent
-    from app.services.contracts.portfolio import PortfolioSnapshot
-    from app.services.contracts.risk import RiskDecision
-    from app.services.contracts.simulation import BacktestResult
+    from app.services.analytics.contracts.audit import AuditEvent
+    from app.services.analytics.contracts.portfolio import PortfolioSnapshot
+    from app.services.risk.contracts import RiskDecision
+    from app.services.simulator.contracts import BacktestResult
 
 
 @dataclass(frozen=True, slots=True)

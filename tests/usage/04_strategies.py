@@ -18,14 +18,14 @@ project_root = str(Path(__file__).resolve().parents[2])
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from app.services.contracts.strategies import (
+from app.services.data import get_data
+from app.services.strategy.contracts import (
     AccountSnapshot,
     Bar,
     MarketContext,
     QuoteSnapshot,
     RuntimeMode,
 )
-from app.services.data import get_data
 from app.services.strategy.pybots import load_bundled_strategy
 from app.utils.logger import logger
 

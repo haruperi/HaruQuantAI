@@ -10,6 +10,13 @@ from app.services.trading.execution.broker_capability_validation import (
     validate_precision_capability,
     validate_rate_limit_capability,
 )
+from app.services.trading.execution.broker_dispatch import (
+    SUCCESS_RETCODES,
+    active_broker_name,
+    build_broker_dispatch_callable,
+    is_success_retcode,
+    snapshot_broker_state,
+)
 from app.services.trading.execution.coordinator import (
     AllocationDispatchPlan,
     AsyncDispatchExecutor,
@@ -98,6 +105,7 @@ from app.services.trading.execution.state_machine import (
 )
 
 __all__ = [
+    "SUCCESS_RETCODES",
     "UNKNOWN_OUTCOME_RETCODE",
     "AllocationDispatchPlan",
     "AmendmentKind",
@@ -140,9 +148,11 @@ __all__ = [
     "TransitionApplyResult",
     "TransitionRecord",
     "TwoStepProtectionResult",
+    "active_broker_name",
     "apply_execution_report",
     "apply_residual_policy",
     "begin_non_atomic_modify",
+    "build_broker_dispatch_callable",
     "build_client_order_id_mapping",
     "build_execution_quality_event",
     "build_trading_report",
@@ -160,6 +170,7 @@ __all__ = [
     "finalize_dispatch_outcome",
     "generate_client_order_id",
     "initialize_transition_record",
+    "is_success_retcode",
     "is_terminal_state",
     "normalize_broker_response",
     "plan_allocation_dispatch",
@@ -173,6 +184,7 @@ __all__ = [
     "resolve_dispatch_target",
     "resolve_oco_execution_mode",
     "resolve_replace_outcome",
+    "snapshot_broker_state",
     "truncate_client_order_id",
     "validate_broker_capabilities",
     "validate_filling_mode_capability",

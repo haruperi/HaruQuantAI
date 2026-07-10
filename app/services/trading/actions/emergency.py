@@ -256,6 +256,107 @@ def close_all_positions(
     return dispatch_or_package(request=request, deps=deps)
 
 
+# Most-severe first. A flatten reports the worst thing that happened to any of
+# its children: an operator must never read "packaged_only" off a flatten whose
+# close leg actually reached the broker, nor "accepted" off one that was blocked.
+_SIDE_EFFECT_SEVERITY: tuple[SideEffectMode, ...] = (
+    SideEffectMode.UNKNOWN_OUTCOME,
+    SideEffectMode.BROKER_MUTATION_ATTEMPTED,
+    SideEffectMode.BROKER_MUTATION_REJECTED,
+    SideEffectMode.BROKER_MUTATION_CONFIRMED,
+    SideEffectMode.PACKAGED_ONLY,
+    SideEffectMode.NONE,
+)
+
+_STATUS_SEVERITY: tuple[TradingStatus, ...] = (
+    TradingStatus.ERROR,
+    TradingStatus.BLOCKED,
+    TradingStatus.REJECTED,
+    TradingStatus.SUCCESS,
+    TradingStatus.ACCEPTED,
+)
+
+_RETRY_SEVERITY: tuple[RetrySafety, ...] = (
+    RetrySafety.RETRY_AFTER_RECONCILIATION,
+    RetrySafety.DO_NOT_RETRY,
+    RetrySafety.RETRY_AFTER_DELAY,
+    RetrySafety.SAFE_TO_RETRY,
+)
+
+
+def _combine_side_effects(
+    children: tuple[TradingResponseEnvelope, ...],
+) -> SideEffectMode:
+    """Resolve the combined side effect of a flatten's child actions.
+
+    Args:
+        children: Child action response envelopes.
+
+    Returns:
+        SideEffectMode: The most severe side effect observed.
+    """
+    modes = {child.side_effect_mode for child in children}
+    for candidate in _SIDE_EFFECT_SEVERITY:
+        if candidate in modes:
+            return candidate
+    return SideEffectMode.NONE
+
+
+def _combine_statuses(children: tuple[TradingResponseEnvelope, ...]) -> TradingStatus:
+    """Resolve the combined status of a flatten's child actions.
+
+    Args:
+        children: Child action response envelopes.
+
+    Returns:
+        TradingStatus: The most severe status observed.
+    """
+    statuses = {child.status for child in children}
+    for candidate in _STATUS_SEVERITY:
+        if candidate in statuses:
+            return candidate
+    return TradingStatus.ACCEPTED
+
+
+def _combine_retry_safety(
+    children: tuple[TradingResponseEnvelope, ...],
+) -> RetrySafety:
+    """Resolve the combined retry safety of a flatten's child actions.
+
+    Args:
+        children: Child action response envelopes.
+
+    Returns:
+        RetrySafety: The most conservative retry classification observed.
+    """
+    safeties = {child.retry_safety for child in children}
+    for candidate in _RETRY_SEVERITY:
+        if candidate in safeties:
+            return candidate
+    return RetrySafety.DO_NOT_RETRY
+
+
+def _flatten_message(
+    *, scope: EmergencyScope, side_effect_mode: SideEffectMode
+) -> str:
+    """Describe what a flatten actually did, not what it intended to do.
+
+    Args:
+        scope: Emergency action scope classification.
+        side_effect_mode: Combined side effect of the child actions.
+
+    Returns:
+        str: Human-readable, redacted outcome message.
+    """
+    if side_effect_mode is SideEffectMode.PACKAGED_ONLY:
+        return f"Flatten packaged for scope {scope.value}."
+    if side_effect_mode is SideEffectMode.NONE:
+        return f"Flatten blocked for scope {scope.value}."
+    if side_effect_mode is SideEffectMode.UNKNOWN_OUTCOME:
+        return f"Flatten outcome unknown for scope {scope.value}; reconcile."
+    return f"Flatten dispatched for scope {scope.value}."
+
+
 def _flatten(
     *,
     scope: EmergencyScope,
@@ -307,18 +408,25 @@ def _flatten(
         deps=deps,
         quote_snapshot=quote_snapshot,
     )
+    children = (cancel_result, close_result)
+    side_effect_mode = _combine_side_effects(children)
+    status = _combine_statuses(children)
     return TradingResponseEnvelope(
-        status=TradingStatus.ACCEPTED,
-        message=f"Flatten packaged for scope {scope.value}.",
+        status=status,
+        message=_flatten_message(scope=scope, side_effect_mode=side_effect_mode),
         data={
             "cancel_result": cancel_result.model_dump(mode="json"),
             "close_result": close_result.model_dump(mode="json"),
         },
-        metadata=TradingMetadata(reads=True, writes=True),
+        metadata=TradingMetadata(
+            reads=True,
+            writes=True,
+            trades=any(child.metadata.trades for child in children),
+        ),
         route=route,
         action=TradingAction.CLOSE_ALL_POSITIONS,
-        side_effect_mode=SideEffectMode.PACKAGED_ONLY,
-        retry_safety=RetrySafety.DO_NOT_RETRY,
+        side_effect_mode=side_effect_mode,
+        retry_safety=_combine_retry_safety(children),
         request_id=request_id,
         correlation_id=correlation_id,
     )

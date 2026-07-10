@@ -369,7 +369,7 @@ class SessionManager:
             halts_list = list(self._halted_symbols)
 
         snapshot = cast(
-            JsonObject,
+            "JsonObject",
             {
                 "mode": self._mode.value,
                 "halted_symbols": halts_list,

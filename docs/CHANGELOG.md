@@ -8,6 +8,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | -- | ------------- | ----- |
 | REF-001 | Relocate all trader info files to info/ | Relocated all generic trader *Info wrapper files to app/services/trader/info/ and renamed them dropping the _info suffix. Updated all codebase references. |
 | REF-002 | Neutralize trading info docstrings | Removed all 'MQL5-compatible' references in app/services/trading/info/ docstrings to align with the broker/platform neutral design. |
+| REF-003 | Retire Live service into Trading | Deleted the old Live service after auditing functional coverage in `app/services/trading/`, migrating active docs/tests away from the old import surface, and preserving live-route execution as a Trading runtime responsibility. |
 
 
 ## Added
@@ -65,6 +66,11 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-049 | Data Brownfield Boundary Contracts | Added Data public API classification metadata, official tool name catalog, read-only broker market data port contracts, and characterization coverage for preserving current imports while formalizing broker/data ownership boundaries. |
 | ADD-050 | Data Broker Read Hardening | Hardened broker-backed Data adapters with read-only result validation, deterministic timeout/auth/schema error mapping, circuit-breaker failure recording, and fake broker contract tests. |
 | ADD-051 | Data Phase 2.0 Characterization Safety Net | Added brownfield characterization coverage for Data public import safety, synthetic gateway limits and request IDs, local Parquet round trips, lazy broker factories, and deterministic no-lookahead transforms. |
+| ADD-052 | Data Intended Workflows and Scenarios | Created the complete Intended Workflows and Scenarios Document reverse-engineering all 139 requirement IDs from 02-data.md with actor roles, capability map, 7 end-to-end workflows, 16 scenarios, relationships map, and detailed gap analysis. |
+| ADD-053 | Strategy Intended Workflows and Scenarios | Created the complete Intended Workflows and Scenarios Document reverse-engineering all 112 requirement IDs from 04-strategy.md with actor roles, capability map, 7 end-to-end workflows, 16 scenarios, relationships map, and detailed gap analysis. |
+| ADD-054 | Research Intended Workflows and Scenarios | Created the complete Intended Workflows and Scenarios Document reverse-engineering all 295 requirement IDs from 12-research.md with actor roles, capability map, 7 end-to-end workflows, 16 scenarios, relationships map, and detailed gap analysis. |
+| ADD-055 | Conversation AI Intended Workflows and Scenarios | Created the complete Intended Workflows and Scenarios Document reverse-engineering all 263 requirement IDs from 13-conversation-ai.md with actor roles, capability map, 7 end-to-end workflows, 16 scenarios, relationships map, and detailed gap analysis. |
+
 
 
 

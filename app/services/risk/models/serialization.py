@@ -11,7 +11,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, TypeVar
 
-from app.services.contracts.base import Contract
+from app.utils.contract import Contract
 from app.utils.logger import logger
 
 if TYPE_CHECKING:

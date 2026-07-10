@@ -51,6 +51,9 @@ DEFAULT_KILL_SWITCH_IDEMPOTENCY_TTL_SECONDS = 300
 WILDCARD_SCOPE = "*"
 
 
+DEFAULT_DRAIN_TIMEOUT_SECONDS = 5.0
+
+
 class ShutdownResult(TradingContract):
     """Structured outcome of a graceful session shutdown request.
 
@@ -59,13 +62,17 @@ class ShutdownResult(TradingContract):
             injected Clock.
         pending_request_count: In-flight request count observed at shutdown.
         flushed: Whether the injected flush callback ran successfully.
-        reconciliation_triggered: Whether final reconciliation was requested.
+        drained: Whether in-flight requests resolved within the drain timeout.
+        reconciliation_triggered: Whether a final reconciliation pass actually
+            ran to completion. False when no ``reconcile`` callback was
+            supplied, or when it raised.
     """
 
     initiated_at: str
     pending_request_count: int
     flushed: bool
-    reconciliation_triggered: bool
+    drained: bool = False
+    reconciliation_triggered: bool = False
 
 
 def pause_strategy(
@@ -334,14 +341,31 @@ def shutdown(
     pending_request_count: int,
     deps: TradingActionDependencies,
     flush: object | None = None,
+    drain: object | None = None,
+    reconcile: object | None = None,
+    drain_timeout_seconds: float = DEFAULT_DRAIN_TIMEOUT_SECONDS,
 ) -> ShutdownResult:
-    """Stop admitting new requests and flush state ahead of final shutdown.
+    """Stop admitting new requests, drain in-flight work, and flush state.
+
+    Ports ``trader``'s graceful shutdown: wait for in-flight requests to
+    resolve, then reconcile local state against the broker before exiting.
+
+    Every field of the returned :class:`ShutdownResult` reports what actually
+    happened. ``reconciliation_triggered`` is True only when a ``reconcile``
+    callback was supplied *and* completed without raising -- callers rely on it
+    to decide whether local state can be trusted on the next start.
 
     Args:
         pending_request_count: In-flight request count observed at shutdown.
         deps: Shared trading action dependencies.
         flush: Optional zero-argument callable that flushes audit/state
             records before shutdown completes.
+        drain: Optional callable taking a timeout in seconds and returning
+            whether in-flight requests drained within it. Typically bound to
+            ``ExecutionCoordinator.in_flight``.
+        reconcile: Optional zero-argument callable running a final
+            reconciliation pass against the broker.
+        drain_timeout_seconds: Seconds to allow in-flight requests to resolve.
 
     Returns:
         ShutdownResult: Structured shutdown outcome.
@@ -358,16 +382,41 @@ def shutdown(
             "pending_request_count must not be negative.",
             code="INVALID_INPUT",
         )
+
+    drained = pending_request_count == 0
+    if callable(drain):
+        drained = bool(drain(drain_timeout_seconds))
+        if not drained:
+            logger.warning(
+                "In-flight requests did not drain within {}s.", drain_timeout_seconds
+            )
+
     flushed = False
     if callable(flush):
         flush()
         flushed = True
         logger.debug("Shutdown flush callback completed.")
+
+    reconciliation_triggered = False
+    if callable(reconcile):
+        try:
+            reconcile()
+            reconciliation_triggered = True
+            logger.debug("Shutdown reconciliation completed.")
+        except Exception as exc:  # noqa: BLE001 -- shutdown must not raise.
+            logger.error("Shutdown reconciliation failed: {}.", exc)
+    else:
+        logger.warning(
+            "Shutdown ran without a reconcile callback; local state is unverified."
+        )
+
     if deps.event_journal is not None:
         deps.event_journal.append(
             event={
                 "event_type": "shutdown_initiated",
                 "pending_request_count": pending_request_count,
+                "drained": drained,
+                "reconciliation_triggered": reconciliation_triggered,
             },
             recorded_at=deps.clock.now_utc(),
         )
@@ -375,7 +424,8 @@ def shutdown(
         initiated_at=deps.clock.now_utc().isoformat(),
         pending_request_count=pending_request_count,
         flushed=flushed,
-        reconciliation_triggered=True,
+        drained=drained,
+        reconciliation_triggered=reconciliation_triggered,
     )
 
 

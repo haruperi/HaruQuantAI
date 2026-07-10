@@ -1,8 +1,13 @@
 # ruff: noqa: E501, BLE001, E402, PLW0603, ARG002, PLR0915
-"""Unified usage example for generic Trade classes working with MT5 and cTrader."""
+"""Unified usage example for the trading runtime working with MT5 and cTrader.
+
+Examples 23-30 mutate a real account through the 16-step live gate pipeline.
+Point the active broker at a demo account before running this file.
+"""
 
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -14,7 +19,6 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from app.services.brokers import get_broker_module
-from app.services.trader import Trade
 from app.services.trading import (
     AccountInfo,
     AllocationVector,
@@ -48,6 +52,13 @@ from app.services.trading.actions import (
     pause_strategy,
     trigger_symbol_kill_switch,
 )
+from app.services.trading.actions.orders import buy_limit, order_delete, order_modify
+from app.services.trading.actions.positions import (
+    NettingMode,
+    position_close,
+    position_modify,
+)
+from app.services.trading.actions.validation import MarketSessionEvidence
 from app.services.trading.config import (
     NotificationChannel,
     NotificationConfig,
@@ -109,6 +120,12 @@ from app.services.trading.gates import (
     validate_operator_approval,
 )
 from app.services.trading.gates._common import GateName
+from app.services.trading.gates.live_pipeline import (
+    LiveGateEvidence,
+    LiveGatePipelineImpl,
+    build_live_gate_pipeline,
+    passthrough_risk_evaluator,
+)
 from app.services.trading.gates.pipeline import GatePipelineDecision
 from app.services.trading.monitoring import (
     HeartbeatEmitter,
@@ -145,6 +162,7 @@ from app.services.trading.state import (
     Clock,
     EncryptionProvider,
     IdempotencyMaterial,
+    InMemoryTradeStore,
     JournalBuildMetadata,
     JsonlIdempotencyStore,
 )
@@ -156,7 +174,6 @@ pos_ticket = 0
 ord_ticket = 0
 buy_price = 0.0
 limit_price = 0.0
-used_filling_mode = 0
 
 
 class ExampleClock:
@@ -1763,10 +1780,257 @@ def example_22_history_deal() -> None:
     except Exception as e:
         print(f"Failed to query history deals: {e}")
 
+def _usage_symbol_constraints() -> SymbolTradingConstraints:
+    """Resolve live symbol constraints from the broker for order validation."""
+    sym = SymbolInfo(trading_symbol)
+    sym.refresh()
+    return SymbolTradingConstraints(
+        symbol=trading_symbol,
+        digits=sym.digits(),
+        volume_min=Decimal(str(sym.volume_min())),
+        volume_max=Decimal(str(sym.volume_max())),
+        volume_step=Decimal(str(sym.volume_step())),
+        tick_size=Decimal(str(sym.tick_size())),
+        min_stop_distance=Decimal("0.0005"),
+        contract_size=Decimal(str(sym.contract_size() or 100000)),
+        quote_currency="USD",
+        # `trader` had no price collar. Example 28 places a buy limit 200 pips
+        # below bid (~180 bps), which the 50 bps default would reject. Tune this
+        # per instrument in production rather than copying the demo value.
+        price_collar_bps=Decimal(300),
+    )
+
+
+def _usage_quote() -> QuoteSnapshot:
+    """Capture a fresh quote snapshot; live mutations require one."""
+    sym = SymbolInfo(trading_symbol)
+    sym.refresh()
+    bid = Decimal(str(sym.bid()))
+    ask = Decimal(str(sym.ask()))
+    return QuoteSnapshot(
+        symbol=trading_symbol,
+        bid=bid,
+        ask=ask,
+        spread=ask - bid,
+        timestamp=datetime.now(UTC).isoformat(),
+        source=settings.active_broker,
+        freshness_age_ms=1,
+    )
+
+
+def _usage_order_context() -> OrderValidationContext:
+    """Build the evidence bundle validating one order intent."""
+    acc = AccountInfo()
+    sym = SymbolInfo(trading_symbol)
+    sym.refresh()
+    return OrderValidationContext(
+        route=TradingRoute.LIVE,
+        reference_price=Decimal(str(sym.ask())),
+        constraints=_usage_symbol_constraints(),
+        account_margin=AccountMarginContext(
+            account_currency=acc.currency() or "USD",
+            leverage=acc.leverage() or 100,
+            free_margin=Decimal(str(max(acc.free_margin(), 0.0))),
+        ),
+        market_session=MarketSessionEvidence(
+            symbol=trading_symbol,
+            source=settings.active_broker,
+            is_open=True,
+            freshness_age_ms=10,
+            ttl_ms=60_000,
+        ),
+        fat_finger_ceiling=Decimal(50_000),
+        rail_limits=DefenseInDepthRailLimits(
+            max_mutation_attempts_per_window=20,
+            window_seconds=60,
+            max_open_positions=5,
+            daily_notional_ceiling=Decimal(1_000_000),
+        ),
+        rail_state=DailyRailState(
+            mutation_attempts_in_window=0,
+            open_positions_count=0,
+            cumulative_daily_notional=Decimal(0),
+        ),
+    )
+
+
+class UsageRuntimeClock:
+    """Wall-clock port for the live usage examples."""
+
+    def now_utc(self) -> datetime:
+        """Return the current UTC time."""
+        return datetime.now(UTC)
+
+    def now_ptp(self) -> datetime:
+        """Return the current UTC time; no PTP hardware in the usage example."""
+        return datetime.now(UTC)
+
+    def monotonic(self) -> float:
+        """Return a monotonic reading for latency and deadline math."""
+        return time.monotonic()
+
+
+class UsageThreadExecutor:
+    """AsyncDispatchExecutor backed by a thread pool.
+
+    A real thread pool, rather than inline execution, is what lets the
+    pipeline's five-second broker timeout actually fire -- matching the
+    retired ``trader.Trade._send_request`` behavior.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the single-worker dispatch pool."""
+        self._pool = ThreadPoolExecutor(max_workers=1)
+
+    def submit(self, dispatch_callable):
+        """Submit the dispatch callable to the pool."""
+        return self._pool.submit(dispatch_callable)
+
+
+class UsageStateStore:
+    """Minimal state store backing the usage session manager."""
+
+    def save_state(self, route, tenant_id, snapshot, expected_version) -> str:
+        """Persist a session snapshot reference."""
+        return "usage-session-1"
+
+    def load_state(self, route, tenant_id, snapshot_id) -> JsonObject | None:
+        """Return no prior snapshot, so the session starts clean."""
+        return None
+
+
+_usage_session: SessionManager | None = None
+
+
+def _usage_session_manager() -> SessionManager:
+    """Return the single live session for this process.
+
+    ``SessionManager`` enforces one active live session per scope, so the
+    session is created once and reused across examples 23-30 rather than
+    rebuilt per call.
+    """
+    global _usage_session
+    if _usage_session is None:
+        _usage_session = SessionManager(
+            scope="usage-live",
+            route=TradingRoute.LIVE,
+            state_store=UsageStateStore(),
+            clock=UsageRuntimeClock(),
+        )
+        _usage_session.start_session()
+    return _usage_session
+
+
+def _usage_live_pipeline(order_type: str = "market") -> LiveGatePipelineImpl:
+    """Assemble a live gate pipeline wired to the active broker.
+
+    This is the composition root the retired ``Trade`` class used to hide.
+    Every gate is named explicitly, including the RISK_DECISION passthrough,
+    which preserves ``trader``'s behavior of running no pre-trade risk checks.
+    Wire ``app/services/risk`` in here before trading real size.
+
+    Args:
+        order_type: Order type identifier the adapter-permission gate validates.
+
+    Returns:
+        LiveGatePipelineImpl: Pipeline bound to the active broker adapter.
+    """
+    clock = UsageRuntimeClock()
+    session = _usage_session_manager()
+
+    term = TerminalInfo()
+    acc = AccountInfo()
+    sym = SymbolInfo(trading_symbol)
+    sym.refresh()
+
+    evidence = LiveGateEvidence(
+        account_id=str(acc.login()),
+        strategy_id="usage-strategy",
+        compliance_evidence=ComplianceEvidence(),
+        broker_readiness=BrokerReadinessEvidence(
+            connected=term.connected(),
+            trade_allowed=term.trade_allowed(),
+            account_permissions_ok=acc.trade_allowed(),
+            rate_limit_available=True,
+        ),
+        clock_drift=ClockDriftEvidence(offset_ms=Decimal(0)),
+        capability_profile=BrokerCapabilityProfile(
+            provider=settings.active_broker,
+            supported_order_types=("market", "limit", "stop"),
+            supported_filling_modes=("IOC", "FOK"),
+            price_precision_digits=sym.digits(),
+            volume_precision_step=Decimal(str(sym.volume_step())),
+            max_requests_per_second=Decimal(10),
+        ),
+        order_type=order_type,
+        filling_mode="IOC",
+    )
+
+    # build_live_gate_pipeline defaults dispatch_callable_factory to the real
+    # broker boundary in execution/broker_dispatch.py.
+    return build_live_gate_pipeline(
+        clock=clock,
+        tenant_id="usage-tenant",
+        evidence=evidence,
+        policy_matrix=PolicyMatrix(
+            entries={
+                action: PolicyMatrixEntry(action=action, requires_approval=False)
+                for action in TradingAction
+            }
+        ),
+        session_manager=session,
+        turbulence_monitor=MarketTurbulenceMonitor(
+            window_size=5, velocity_threshold_bps=Decimal(500)
+        ),
+        idempotency_store=ExampleIdempotencyStore(),
+        lock_manager=ConcurrencyLockManager(),
+        authority_guard=AuthorityAndRetryGuard(),
+        audit_sink=ExampleAuditSink(),
+        trade_store=InMemoryTradeStore(),
+        dispatch_executor=UsageThreadExecutor(),
+        risk_evaluator=passthrough_risk_evaluator,
+        reconciliation_hook=lambda: None,
+    )
+
+
+def _usage_deps(pipeline: LiveGatePipelineImpl) -> TradingActionDependencies:
+    """Bind the live pipeline into the shared action dependency bag."""
+    return TradingActionDependencies(
+        clock=UsageRuntimeClock(),
+        rng=ExampleRNG(),
+        tenant_id="usage-tenant",
+        gate_pipeline=pipeline,
+        idempotency_store=ExampleIdempotencyStore(),
+        event_journal=ExampleEventJournal(),
+    )
+
+
+def _print_outcome(label: str, response) -> JsonObject:
+    """Print a dispatch outcome and return the normalized broker result.
+
+    Replaces ``trader``'s ``result_retcode()`` / ``result_deal()`` /
+    ``result_price()`` / ``result_comment()`` accessors, which are now fields on
+    the returned response envelope.
+    """
+    print(
+        f"{label} status:  "
+        f"{response.status.value} / {response.side_effect_mode.value}"
+    )
+    result = response.data.get("result", {}) if response.data else {}
+    if response.error is not None:
+        print(f"  Error code:      {response.error.code}")
+        print(f"  Details:         {response.error.details}")
+    if result:
+        print(f"  Retcode:         {result.get('retcode')}")
+        print(f"  Order ticket:    {result.get('order')}")
+        print(f"  Deal ticket:     {result.get('deal')}")
+        print(f"  Execution price: {result.get('price')}")
+    return result
+
 
 def example_23_open_position() -> None:
-    """Demonstrate opening a position using generic Trade class."""
-    global pos_ticket, buy_price, used_filling_mode
+    """Open a position through the trading runtime's live gate pipeline."""
+    global pos_ticket, buy_price
     print("\n" + "=" * 100)
     print(f"--- 23. Opening Position (Buy 0.02 {trading_symbol}) ---")
     print("=" * 100)
@@ -1776,33 +2040,27 @@ def example_23_open_position() -> None:
         print(f"Failed to fetch symbol info for {trading_symbol}")
         return
 
-    client = get_client()
-    used_filling_mode = client.ORDER_FILLING_FOK
-    if hasattr(sym, "_data") and sym._data:
-        filling_val = getattr(sym._data, "filling_mode", 3)
-        if filling_val & 2:  # IOC
-            used_filling_mode = client.ORDER_FILLING_IOC
-        elif filling_val & 1:  # FOK
-            used_filling_mode = client.ORDER_FILLING_FOK
-
-    trade = Trade()
-    trade.set_symbol(trading_symbol)
-    trade.set_expert_magic_number(99999)
-    trade.set_deviation_in_points(20)
-    trade.set_order_filling(used_filling_mode)
-
     try:
         buy_price = sym.ask()
-        success = trade.buy(0.02, price=buy_price, comment="Unified Usage Buy")
-        if success:
-            pos_ticket = trade.result_order()
+        response = buy(
+            symbol=trading_symbol,
+            volume=Decimal("0.02"),
+            deviation_points=20,
+            magic_number=99999,
+            comment="Unified Usage Buy",
+            route=TradingRoute.LIVE,
+            promotion_stage=PromotionStage.MICRO_LIVE,
+            mutation_capability=MutationCapability.MICRO_LIVE,
+            request_id="usage-live-023",
+            correlation_id="usage-live-corr",
+            context=_usage_order_context(),
+            deps=_usage_deps(_usage_live_pipeline()),
+            quote_snapshot=_usage_quote(),
+        )
+        result = _print_outcome("Open position", response)
+        if result.get("order"):
+            pos_ticket = int(result["order"])
             print(f"Position opened successfully! Ticket: {pos_ticket}")
-            print(f"  Execution Price: {trade.result_price()}")
-            print(f"  Deal Ticket:     {trade.result_deal()}")
-        else:
-            print("Failed to open position.")
-            print(f"  Result Code:     {trade.result_retcode()}")
-            print(f"  Comment:         {trade.result_comment()}")
     except Exception as e:
         print(f"Exception during buy trade order: {e}")
 
@@ -1850,7 +2108,7 @@ def example_24_calc_profit_margin() -> None:
 
 
 def example_25_modify_position() -> None:
-    """Demonstrate modifying the Stop Loss / Take Profit of an active position."""
+    """Modify the Stop Loss / Take Profit of an active position."""
     print("\n" + "=" * 100)
     print("--- 25. Modifying Active Position SL/TP ---")
     print("=" * 100)
@@ -1871,18 +2129,33 @@ def example_25_modify_position() -> None:
         sl = round(buy_price - 1000 * pip_val, sym.digits())
         tp = round(buy_price + 1000 * pip_val, sym.digits())
 
-        trade = Trade()
-        success = trade.position_modify(pos_ticket, sl=sl, tp=tp)
-        if success:
+        response = position_modify(
+            position_id=str(pos_ticket),
+            sl=Decimal(str(sl)),
+            tp=Decimal(str(tp)),
+            route=TradingRoute.LIVE,
+            promotion_stage=PromotionStage.MICRO_LIVE,
+            mutation_capability=MutationCapability.MICRO_LIVE,
+            request_id="usage-live-025",
+            correlation_id="usage-live-corr",
+            symbol=trading_symbol,
+            deps=_usage_deps(_usage_live_pipeline()),
+            quote_snapshot=_usage_quote(),
+        )
+        _print_outcome("Modify position", response)
+        if response.status is TradingStatus.SUCCESS:
             print(f"Position SL/TP modified successfully. SL: {sl}, TP: {tp}")
-        else:
-            print(f"Failed to modify position. Comment: {trade.result_comment()}")
     except Exception as e:
         print(f"Exception during position modification: {e}")
 
 
 def example_26_close_partial_position() -> None:
-    """Demonstrate partial close of an active position (Closing 0.01 lot)."""
+    """Partially close an active position (0.01 lot).
+
+    ``trader`` had no partial-close API, so this example used to reach into the
+    private ``Trade._send_request`` with a hand-built request dict.
+    ``position_close(volume=...)`` is the supported public replacement.
+    """
     print("\n" + "=" * 100)
     print("--- 26. Partial Closing Active Position (0.01 lot) ---")
     print("=" * 100)
@@ -1891,42 +2164,30 @@ def example_26_close_partial_position() -> None:
         print("No active position from Example 23. Skipping partial close.")
         return
 
-    sym = SymbolInfo(trading_symbol)
-    if not sym.refresh():
-        print(f"Failed to fetch symbol info for {trading_symbol}")
-        return
-
     time.sleep(1)
 
     try:
-        trade = Trade()
-        trade.set_order_filling(used_filling_mode)
-        # cTrader closed deals need sell type close for buys
-        client = get_client()
-        request = {
-            "action": client.TRADE_ACTION_DEAL,
-            "symbol": trading_symbol,
-            "volume": 0.01,
-            "type": client.ORDER_TYPE_SELL,
-            "position": pos_ticket,
-            "price": sym.bid(),
-            "deviation": 20,
-            "magic": 99999,
-            "comment": "Partial Close",
-            "type_time": client.ORDER_TIME_GTC,
-            "type_filling": used_filling_mode,
-        }
-        success = trade._send_request(request)
-        if success:
-            print(f"Partial close executed! Deal Ticket: {trade.result_deal()}")
-        else:
-            print(f"Failed partial close. Comment: {trade.result_comment()}")
+        response = position_close(
+            netting_mode=NettingMode.HEDGING,
+            ticket=str(pos_ticket),
+            volume=Decimal("0.01"),
+            deviation_points=20,
+            comment="Partial Close",
+            route=TradingRoute.LIVE,
+            promotion_stage=PromotionStage.MICRO_LIVE,
+            mutation_capability=MutationCapability.MICRO_LIVE,
+            request_id="usage-live-026",
+            correlation_id="usage-live-corr",
+            deps=_usage_deps(_usage_live_pipeline()),
+            quote_snapshot=_usage_quote(),
+        )
+        _print_outcome("Partial close", response)
     except Exception as e:
         print(f"Exception during partial close: {e}")
 
 
 def example_27_close_position() -> None:
-    """Demonstrate closing the remaining active position fully."""
+    """Close the remaining active position fully."""
     print("\n" + "=" * 100)
     print("--- 27. Closing Remaining Position Fully ---")
     print("=" * 100)
@@ -1938,21 +2199,26 @@ def example_27_close_position() -> None:
     time.sleep(1)
 
     try:
-        trade = Trade()
-        trade.set_order_filling(used_filling_mode)
-        success = trade.position_close(pos_ticket)
-        if success:
-            print(
-                f"Remaining position closed fully! Deal Ticket: {trade.result_deal()}"
-            )
-        else:
-            print(f"Failed to close position. Comment: {trade.result_comment()}")
+        response = position_close(
+            netting_mode=NettingMode.HEDGING,
+            ticket=str(pos_ticket),
+            deviation_points=20,
+            comment="Close position",
+            route=TradingRoute.LIVE,
+            promotion_stage=PromotionStage.MICRO_LIVE,
+            mutation_capability=MutationCapability.MICRO_LIVE,
+            request_id="usage-live-027",
+            correlation_id="usage-live-corr",
+            deps=_usage_deps(_usage_live_pipeline()),
+            quote_snapshot=_usage_quote(),
+        )
+        _print_outcome("Close position", response)
     except Exception as e:
         print(f"Exception during position close: {e}")
 
 
 def example_28_pending_orders() -> None:
-    """Demonstrate placing a Buy Limit pending order."""
+    """Place a Buy Limit pending order."""
     global ord_ticket, limit_price
     print("\n" + "=" * 100)
     print("--- 28. Placing Pending Order (Buy Limit) ---")
@@ -1969,24 +2235,31 @@ def example_28_pending_orders() -> None:
         pip_val = sym.point() * 10
         limit_price = round(sym.bid() - 200 * pip_val, sym.digits())
 
-        trade = Trade()
-        trade.set_symbol(trading_symbol)
-        trade.set_order_filling(used_filling_mode)
-
-        success = trade.buy_limit(
-            0.01, price=limit_price, comment="Unified Pending Limit"
+        response = buy_limit(
+            symbol=trading_symbol,
+            volume=Decimal("0.01"),
+            price=Decimal(str(limit_price)),
+            magic_number=99999,
+            comment="Unified Pending Limit",
+            route=TradingRoute.LIVE,
+            promotion_stage=PromotionStage.MICRO_LIVE,
+            mutation_capability=MutationCapability.MICRO_LIVE,
+            request_id="usage-live-028",
+            correlation_id="usage-live-corr",
+            context=_usage_order_context(),
+            deps=_usage_deps(_usage_live_pipeline(order_type="limit")),
+            quote_snapshot=_usage_quote(),
         )
-        if success:
-            ord_ticket = trade.result_order()
+        result = _print_outcome("Pending order", response)
+        if result.get("order"):
+            ord_ticket = int(result["order"])
             print(f"Pending Buy Limit placed successfully! Ticket: {ord_ticket}")
-        else:
-            print(f"Failed to place pending order. Comment: {trade.result_comment()}")
     except Exception as e:
         print(f"Exception placing pending order: {e}")
 
 
 def example_29_modify_pending_orders() -> None:
-    """Demonstrate modifying a placed pending order."""
+    """Modify a placed pending order."""
     print("\n" + "=" * 100)
     print("--- 29. Modifying Pending Order ---")
     print("=" * 100)
@@ -2006,18 +2279,27 @@ def example_29_modify_pending_orders() -> None:
         pip_val = sym.point() * 10
         new_limit_price = round(limit_price - 50 * pip_val, sym.digits())
 
-        trade = Trade()
-        success = trade.order_modify(ord_ticket, price=new_limit_price, sl=0.0, tp=0.0)
-        if success:
+        response = order_modify(
+            ticket=str(ord_ticket),
+            price=Decimal(str(new_limit_price)),
+            route=TradingRoute.LIVE,
+            promotion_stage=PromotionStage.MICRO_LIVE,
+            mutation_capability=MutationCapability.MICRO_LIVE,
+            request_id="usage-live-029",
+            correlation_id="usage-live-corr",
+            symbol=trading_symbol,
+            deps=_usage_deps(_usage_live_pipeline(order_type="limit")),
+            quote_snapshot=_usage_quote(),
+        )
+        _print_outcome("Modify pending", response)
+        if response.status is TradingStatus.SUCCESS:
             print(f"Pending order modified successfully! New Price: {new_limit_price}")
-        else:
-            print(f"Failed to modify pending order. Comment: {trade.result_comment()}")
     except Exception as e:
         print(f"Exception modifying pending order: {e}")
 
 
 def example_30_delete_pending_orders() -> None:
-    """Demonstrate deleting / cancelling a pending order."""
+    """Delete / cancel a pending order."""
     print("\n" + "=" * 100)
     print("--- 30. Deleting/Cancelling Pending Order ---")
     print("=" * 100)
@@ -2029,12 +2311,20 @@ def example_30_delete_pending_orders() -> None:
     time.sleep(1)
 
     try:
-        trade = Trade()
-        success = trade.order_delete(ord_ticket)
-        if success:
+        response = order_delete(
+            ticket=str(ord_ticket),
+            route=TradingRoute.LIVE,
+            promotion_stage=PromotionStage.MICRO_LIVE,
+            mutation_capability=MutationCapability.MICRO_LIVE,
+            request_id="usage-live-030",
+            correlation_id="usage-live-corr",
+            symbol=trading_symbol,
+            deps=_usage_deps(_usage_live_pipeline(order_type="limit")),
+            quote_snapshot=_usage_quote(),
+        )
+        _print_outcome("Delete pending", response)
+        if response.status is TradingStatus.SUCCESS:
             print(f"Pending order deleted successfully! Ticket: {ord_ticket}")
-        else:
-            print(f"Failed to delete pending order. Comment: {trade.result_comment()}")
     except Exception as e:
         print(f"Exception deleting pending order: {e}")
 

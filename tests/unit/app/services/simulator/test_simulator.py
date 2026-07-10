@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 import pytest
-from app.services.contracts.strategies import (
+from app.services.strategy.contracts import (
     Bar,
     MarketContext,
     QuoteSnapshot,

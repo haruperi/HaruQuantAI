@@ -19,7 +19,7 @@ from app.services.analytics.contracts.models import (
     Lineage,
     TradingResult,
 )
-from app.services.contracts.trading import TradeResult
+from app.services.trading.contracts import TradeResult
 from app.utils.errors import ValidationError
 
 

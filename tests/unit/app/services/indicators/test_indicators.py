@@ -242,7 +242,7 @@ def test_indicator_validation_errors(sample_ohlcv_data):
 
 
 def test_base_indicator_helpers() -> None:
-    from app.services.contracts.strategies import AccountSnapshot
+    from app.services.strategy.contracts import AccountSnapshot
     from app.services.indicators.base import (
         arithmetic_average,
         balance_scaled_volume,

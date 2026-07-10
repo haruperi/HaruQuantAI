@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import hashlib
 import threading
+import time
 from concurrent.futures import Future
 from decimal import Decimal
 from enum import StrEnum
@@ -148,6 +149,33 @@ class InFlightRequestCounter:
         drained = self.current() == 0
         logger.debug("In-flight request counter drained: {}.", drained)
         return drained
+
+    def wait_drained(self, timeout_seconds: float, poll_seconds: float = 0.1) -> bool:
+        """Block until no requests are in flight, or the timeout elapses.
+
+        Ports the in-flight drain loop ``trader.Trade.shutdown`` ran before
+        flushing state. Suitable as the ``drain`` callback of
+        :func:`~app.services.trading.actions.controls.shutdown`.
+
+        Args:
+            timeout_seconds: Maximum seconds to wait for the counter to reach
+                zero.
+            poll_seconds: Interval between checks.
+
+        Returns:
+            bool: True when the counter reached zero within the timeout.
+        """
+        logger.info("Waiting up to {}s for in-flight drain.", timeout_seconds)
+        deadline = time.monotonic() + timeout_seconds
+        while not self.is_drained():
+            if time.monotonic() >= deadline:
+                logger.warning(
+                    "In-flight drain timed out with {} request(s) pending.",
+                    self.current(),
+                )
+                return False
+            time.sleep(poll_seconds)
+        return True
 
 
 def generate_client_order_id(*, request_id: str, rng: RNG) -> str:

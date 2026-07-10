@@ -356,6 +356,7 @@ class JsonlIdempotencyStore:
         tenant_id: str,
         key: str,
         outcome: JsonObject,
+        completed_at: datetime | None = None,
     ) -> IdempotencyRecord:
         """Mark an in-progress idempotency record completed.
 
@@ -364,6 +365,10 @@ class JsonlIdempotencyStore:
             tenant_id: Tenant namespace.
             key: Idempotency key.
             outcome: Cached execution envelope.
+            completed_at: Completion timestamp from an injected Clock. Accepted
+                so this store satisfies the ``IdempotencyStore`` port, which
+                ``finalize_dispatch_outcome`` calls with an explicit timestamp.
+                Falls back to this store's own clock when omitted.
 
         Returns:
             IdempotencyRecord: Completed record.
@@ -375,10 +380,11 @@ class JsonlIdempotencyStore:
         record = self.resolve(route=route, tenant_id=tenant_id, key=key)
         if record is None:
             raise KeyError("idempotency record not found.")
+        resolved_at = completed_at or self._clock.now_utc()
         completed = record.model_copy(
             update={
                 "status": IdempotencyStatus.COMPLETED,
-                "completed_at": self._clock.now_utc().isoformat(),
+                "completed_at": resolved_at.isoformat(),
                 "outcome": outcome,
             },
         )

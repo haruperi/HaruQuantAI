@@ -12,6 +12,13 @@ resolution, background schedulers, or live mutation policy storage. Concrete
 implementations must be injected from infrastructure layers outside
 `app/services/trading/`.
 
+## Retired Live Package
+
+The retired Live package has been folded into this package. Live execution
+remains a runtime route and side-effect mode, but session coordination, gate
+evaluation, broker dispatch, reconciliation authority, monitoring, and
+emergency controls are all owned by `app/services/trading/`.
+
 ## Implemented Surface
 
 - `actions/`: platform-independent shared trading action surface.
@@ -44,10 +51,9 @@ implementations must be injected from infrastructure layers outside
     action detail.
   - `actions/_common.py`: the `TradingActionDependencies` bag (injected
     Clock/RNG/tenant/idempotency-store/event-journal/trade-store) and the
-    `LiveGatePipeline` protocol — the documented seam the future
-    `gates/pipeline.py` unit wires for `route="live"` gate evaluation. Until
-    that pipeline is injected, every action fails closed to a
-    `packaged_only` response (TRD-FR-055).
+    `LiveGatePipeline` protocol — the seam `gates/live_pipeline.py` implements
+    for `route="live"` gate evaluation. Until a pipeline is injected, every
+    action fails closed to a `packaged_only` response (TRD-FR-055).
 - `execution/`: broker-call coordination primitives.
   - `execution/state_machine.py`: the canonical order/position lifecycle
     transition table (illegal paths such as `Filled` → `Submitted` fail
@@ -163,12 +169,21 @@ implementations must be injected from infrastructure layers outside
     gate (downstream steps are recorded as explicit `SKIPPED`/
     `diagnostic_after_failure` results, never executed), and fails closed
     with `DEADLINE_EXCEEDED`/`QUOTE_STALE` if the configured deadline or
-    mandatory quote-snapshot TTL is exceeded mid-pipeline. Steps whose
-    backing module is future work (route/promotion compatibility, session
-    status, concurrency lease, reconciliation authority) use
-    `evaluate_seam_gate`, which fails closed with `LIVE_GATE_FAILED` until a
-    real evaluator is injected — the pipeline can never silently pass a gate
-    it does not yet implement.
+    mandatory quote-snapshot TTL is exceeded mid-pipeline. `evaluate_seam_gate`
+    remains available for any gate wired later; it fails closed with
+    `LIVE_GATE_FAILED` until a real evaluator is injected, so the pipeline can
+    never silently pass a gate it does not implement.
+  - `gates/live_pipeline.py`: `LiveGatePipelineImpl`, the concrete
+    `LiveGatePipeline` satisfying the `actions/_common.py` seam. It assembles
+    all sixteen gates in `GateName` order, hands them to `run_gate_pipeline`,
+    and performs the broker mutation at gate 16 under a five-second timeout.
+    A timeout is classified as an unknown outcome and triggers a forced
+    reconciliation pass rather than being reported as a failure. Also exports
+    `passthrough_risk_evaluator` — see **Risk Gate** below.
+- `execution/broker_dispatch.py`: **the only module in this package permitted
+  to call a broker mutation entrypoint.** It imports the active-broker
+  resolver, never a provider SDK. `grep -rl "brokers.router" app/services/trading`
+  must return exactly this module and the read-only `info/` layer.
 - `contracts.py`: route/action enums, promotion and mutation capability enums,
   TIF and FIX execution states, request/response envelopes, quote snapshots,
   allocation vectors, regulatory tags, normalized broker result wrappers,
@@ -176,6 +191,12 @@ implementations must be injected from infrastructure layers outside
 - `state/ports.py`: injected protocols for `TradeStore`, `TradingStateStore`,
   `AuditSink`, `IdempotencyStore`, `EventJournal`, `Clock`, `RNG`, and
   `EncryptionProvider`.
+- `state/trade_store.py`: `InMemoryTradeStore` for tests and non-live routes,
+  and `JsonlTradeStore` for durable projections that survive restart. Both
+  enforce `expected_version` optimistic concurrency, deduplicate fills on
+  `broker_event_id`, maintain Decimal VWAP and remaining-volume projections,
+  and namespace every record by `(route, tenant_id)` so non-live routes never
+  share storage with live.
 - `state/idempotency.py`: canonical SHA-256 idempotency material hashing,
   durable JSONL leases, duplicate rejection, completed-envelope caching, and
   reconciliation-required expiry handling.
@@ -257,6 +278,171 @@ IDs and hash-chain records. Snapshots and replay helpers rebuild projections for
 recovery or forensic reconstruction, while segment seals and detached
 signatures support tamper-evidence checks.
 
-## Pending Broker Connection Integration
+## Execution Lifecycle
 
-Wiring a real broker adapter/executor into the session manager and coordinator remains future work.
+Every live mutation (`buy`, `sell`, `position_close`, `order_delete`, …) packages
+a request envelope and hands it to the injected `LiveGatePipeline`. Without a
+pipeline the action fails closed to `packaged_only` and nothing reaches a broker.
+With `LiveGatePipelineImpl` injected, the envelope runs the canonical sixteen
+gates in order:
+
+```
+[Packaged Request]  (actions/*.py -> dispatch_or_package)
+        │
+        ▼
+ 1  local_schema_validation     payload present; symbol required for order submission
+ 2  compliance                  restricted-symbol list
+ 3  promotion_stage             route / stage / capability compatibility
+ 4  session_status              session RUNNING, mode admits mutation, symbol not halted
+ 5  kill_switch                 policy decides emergency bypass, not the caller
+ 6  operator_approval           token bound to the canonical request hash
+ 7  risk_decision               see "Risk Gate" below
+ 8  market_turbulence           mid-price velocity against the configured threshold
+ 9  broker_readiness            connection, trade permission, rate-limit capacity
+10  clock_drift                 local offset and optional PTP latency
+11  idempotency                 durable lease reserved before any mutation
+12  concurrency_lease           per (account_id, symbol) lock; released in a finally
+13  reconciliation_authority    unresolved stream-gap locks block the scope
+14  audit_pre_record            audit write failure blocks the mutation
+15  adapter_permission          broker capability profile for type/filling/precision
+        │
+        ▼
+16  dispatch                    execution/broker_dispatch.py, 5.0s timeout
+   ┌────┴────────────────┐
+   ▼ (Timeout)            ▼ (Broker responded)
+[Unknown Outcome]        [Normalize Response]  (execution/response_classifier.py)
+   │                      │
+[Forced Reconciliation]  [finalize_dispatch_outcome]  (TradeStore + idempotency)
+   │                      │
+   └──────────┬───────────┘
+              ▼
+   [Release Concurrency Lease]
+```
+
+`run_gate_pipeline` short-circuits on the first blocking gate; every downstream
+step is recorded as `SKIPPED` / `diagnostic_after_failure` and never executed.
+
+## Resilience And Operational Safety
+
+### Concurrency leases
+Requests serialize per `(account_id, symbol)` through `ConcurrencyLockManager`.
+Actions without a symbol — a ticket-addressed close, an account-wide flatten —
+resolve to a single `GLOBAL` lease rather than locking on an empty key. The lease
+is released in a `finally`, so a gate that blocks downstream of gate 12 cannot
+strand it.
+
+### Kill switch
+Kill-switch state is evaluated at gate 5. Whether an emergency or protective
+action may proceed under an active switch is decided solely by the policy matrix
+entry (`emergency_allowed_under_kill_switch`), never by a caller-supplied
+override flag. Emergency actions still traverse every other gate; the kill switch
+is not a bypass.
+
+### Graceful shutdown
+`actions/controls.py::shutdown` stops admitting requests, drains in-flight work
+through the injected `drain` callback (bind it to
+`ExecutionCoordinator.in_flight.wait_drained`), flushes state, and runs the
+injected `reconcile` callback. Every field of `ShutdownResult` reports what
+actually happened: `reconciliation_triggered` is True only when a reconcile
+callback was supplied *and* completed without raising.
+
+### Broker synchronous timeouts
+The broker call runs on an injected executor with a **5.0-second** timeout. On
+timeout the system cannot know whether the order reached the matching engine, so
+the outcome is classified `UNKNOWN_OUTCOME` with
+`retry_safety=RETRY_AFTER_RECONCILIATION`, and a forced reconciliation pass runs
+immediately. A timeout is never reported as a failure.
+
+### Unknown outcomes versus rejections
+A broker that responds with a non-success retcode is a **rejection**
+(`BROKER_MUTATION_REJECTED`, safe to retry). A broker that does not respond is an
+**unknown outcome** (`UNKNOWN_OUTCOME`, reconcile before retrying). The success
+retcode set is `{10009, 10008, 0}`.
+
+## Risk Gate
+
+Gate 7 (`RISK_DECISION`) currently ships with `passthrough_risk_evaluator`, which
+passes unconditionally and logs a warning containing the literal string
+`RISK_DECISION passthrough` on every live evaluation.
+
+This preserves exact behavioral parity with the retired `app/services/trader`
+package, which performed no pre-trade risk checks. **It is not a new gap; it is
+the existing gap, made visible.** `LiveGatePipelineImpl` takes `risk_evaluator`
+with no default, so every call site must name its choice explicitly.
+
+Wire `app/services/risk` into this gate before scaling live position size.
+
+## Usage
+
+```python
+from decimal import Decimal
+
+from app.services.trading.actions import TradingActionDependencies, buy
+from app.services.trading.contracts import (
+    MutationCapability, PromotionStage, TradingRoute,
+)
+from app.services.trading.gates.live_pipeline import (
+    LiveGateEvidence, LiveGatePipelineImpl, passthrough_risk_evaluator,
+)
+
+pipeline = LiveGatePipelineImpl(
+    clock=clock,
+    tenant_id="tenant-1",
+    evidence=LiveGateEvidence(...),
+    policy_matrix=policy_matrix,
+    session_manager=session_manager,
+    turbulence_monitor=turbulence_monitor,
+    idempotency_store=idempotency_store,
+    lock_manager=lock_manager,
+    authority_guard=authority_guard,
+    audit_sink=audit_sink,
+    trade_store=trade_store,
+    dispatch_executor=executor,
+    dispatch_callable_factory=broker_dispatch_factory,
+    risk_evaluator=passthrough_risk_evaluator,  # see "Risk Gate"
+)
+
+deps = TradingActionDependencies(
+    clock=clock, rng=rng, tenant_id="tenant-1", gate_pipeline=pipeline,
+)
+
+response = buy(
+    symbol="EURUSD",
+    volume=Decimal("0.10"),
+    deviation_points=20,
+    route=TradingRoute.LIVE,
+    promotion_stage=PromotionStage.MICRO_LIVE,
+    mutation_capability=MutationCapability.MICRO_LIVE,
+    request_id="req-1",
+    correlation_id="corr-1",
+    context=order_validation_context,
+    deps=deps,
+    quote_snapshot=quote,
+)
+
+print(response.status.value, response.side_effect_mode.value)
+print(response.data["result"]["deal"])
+```
+
+Omit `gate_pipeline` and the same call returns `packaged_only` without touching a
+broker. That is the intended default.
+
+A full runnable example, including an emergency flatten and a graceful shutdown,
+lives in `tests/usage/07_trading.py`.
+
+## MQL5 Emulation Wrappers
+
+To ease porting MetaTrader strategies, `info/` exposes read-only facades matching
+the standard MQL5 interface. They resolve the active broker through
+`get_broker_module()` and never mutate.
+
+- **`AccountInfo`** — login, balance, equity, margin, free margin, margin level,
+  leverage, trading permissions.
+- **`SymbolInfo`** — ask, bid, point size, digits, lot bounds, volume step, stop
+  levels, margin and profit calculations.
+- **`TerminalInfo`** — broker connection status, terminal build, path settings.
+- **`PositionInfo`** — active open positions (ticket, volume, price, type, profit,
+  sl, tp, comment).
+- **`OrderInfo`** — active pending orders awaiting execution.
+- **`HistoryOrderInfo`** — historical pending orders, filled or cancelled.
+- **`DealInfo`** — execution transactions corresponding to position transitions.

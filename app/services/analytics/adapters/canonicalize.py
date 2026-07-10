@@ -20,7 +20,7 @@ from app.services.analytics.contracts.models import (
     Lineage,
     TradingResult,
 )
-from app.services.contracts.simulation import (
+from app.services.simulator.contracts import (
     BacktestResult as UpstreamBacktestResult,
 )
 from app.utils.errors import ValidationError

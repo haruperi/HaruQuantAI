@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import Field, model_validator
 
-from app.services.contracts.base import Contract
+from app.utils.contract import Contract
 from app.services.risk.models.enums import (
     RiskDecisionStatus,
     RiskMode,
@@ -83,7 +83,7 @@ class RiskContract(Contract):
         """
         import hashlib
 
-        from app.services.contracts.base import _TRACE_FIELDS
+        from app.utils.contract import _TRACE_FIELDS
         from app.services.risk.models.serialization import _coerce_types
         from app.utils.standard import canonical_json
 

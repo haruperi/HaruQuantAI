@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 
 if TYPE_CHECKING:
-    from app.services.contracts.strategies import AccountSnapshot
+    from app.services.strategy.contracts import AccountSnapshot
 
 
 class BaseIndicator(ABC):

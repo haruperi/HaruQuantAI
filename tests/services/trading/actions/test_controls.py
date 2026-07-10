@@ -114,7 +114,9 @@ def test_shutdown_runs_flush_callback_and_journals() -> None:
     assert result.pending_request_count == 2
     assert result.flushed is True
     assert flushed["called"] is True
-    assert result.reconciliation_triggered is True
+    # No reconcile callback was supplied, so nothing was reconciled. This field
+    # previously reported True unconditionally (BF-TRD-005).
+    assert result.reconciliation_triggered is False
     assert len(journal.events) == 1
 
 
@@ -123,6 +125,51 @@ def test_shutdown_without_flush_callback() -> None:
     deps = build_deps()
     result = shutdown(pending_request_count=0, deps=deps)
     assert result.flushed is False
+
+
+def test_shutdown_reports_reconciliation_only_when_it_runs() -> None:
+    """reconciliation_triggered must reflect reality, not intent."""
+    deps = build_deps()
+    calls: list[str] = []
+    result = shutdown(
+        pending_request_count=0, deps=deps, reconcile=lambda: calls.append("ran")
+    )
+    assert calls == ["ran"]
+    assert result.reconciliation_triggered is True
+
+
+def test_shutdown_reports_false_when_reconciliation_raises() -> None:
+    """A failed reconciliation must not be reported as a successful one."""
+    deps = build_deps()
+
+    def boom() -> None:
+        raise RuntimeError("broker unreachable")
+
+    result = shutdown(pending_request_count=0, deps=deps, reconcile=boom)
+    assert result.reconciliation_triggered is False
+
+
+def test_shutdown_drains_in_flight_requests() -> None:
+    """shutdown reports whether in-flight work actually drained."""
+    deps = build_deps()
+    result = shutdown(
+        pending_request_count=3, deps=deps, drain=lambda _timeout: True
+    )
+    assert result.drained is True
+
+
+def test_shutdown_reports_undrained_requests() -> None:
+    deps = build_deps()
+    result = shutdown(
+        pending_request_count=3, deps=deps, drain=lambda _timeout: False
+    )
+    assert result.drained is False
+
+
+def test_shutdown_drain_defaults_to_zero_pending() -> None:
+    deps = build_deps()
+    assert shutdown(pending_request_count=0, deps=deps).drained is True
+    assert shutdown(pending_request_count=1, deps=deps).drained is False
 
 
 @pytest.mark.parametrize(

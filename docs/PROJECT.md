@@ -3,9 +3,9 @@
 ## Core System Axioms & Rules
 
 * **Architectural Philosophy**: Ambiguity = hard failure. System fails closed by default. If safety or context cannot be proven, block execution.
-* **Sequence Controls**: Strategies emit **Signals/Proposals**, *never* direct broker orders. **Risk** intercepts all proposals *before* Trading or Live execution. **Trading** converts approved proposals into deterministic **Order Intents**.
+* **Sequence Controls**: Strategies emit **Signals/Proposals**, *never* direct broker orders. **Risk** intercepts all proposals *before* Trading execution. **Trading** converts approved proposals into deterministic **Order Intents** and owns live-route runtime gates, broker dispatch, reconciliation, monitoring, and emergency controls.
 * **Data Integrity & Privacy**: Zero secret leakage permitted across logs, errors, events, notifications, metrics, or chat. Strict UTC-first time policy (`Z` suffix). Plaintext keys or payloads must be redacted case-insensitively using denylist-first matching.
-* **Build & Dependency Order**: Utils → Data → Indicator → Strategy → Risk → Analytics → Trading → Simulation → Optimization → Live → UI/API Gateway → Research → Conversation.
+* **Build & Dependency Order**: Utils → Data → Indicator → Strategy → Risk → Analytics → Trading → Simulation → Optimization → UI/API Gateway → Research → Conversation.
 * **AI Agent Constraints**: AI Agents can only execute approved, read-only tool plans via explicit allowlists; they can *never* directly execute governed, broker-affecting, or live mutation actions. Conversation layer only generates un-executed **Action Drafts**.
 
 ---
@@ -21,7 +21,7 @@
 
 ---
 
-## 13-Module Technical Registry
+## 12-Module Technical Registry
 
 > **Status**: This registry describes the target module map for HaruQuantAI. As of this writing the repository is a fresh scaffold (`app/` package, tooling only) — modules below are being built out incrementally per [docs/CHANGELOG.md](CHANGELOG.md).
 
@@ -77,8 +77,8 @@
 
 * **Inputs**: Risk decisions.
 * **Outputs**: Order Intents.
-* **Owns**: Order intent formulation, client order IDs, route-aware request packing (`sim` vs `live`), simulator state mutation (for `route="sim"` only).
-* **Boundaries**: Owns broker routing. Enforces rate limits. Carries trace IDs. *Does not own* signal creation, risk gates, live runtime authorization, or broker secret resolution.
+* **Owns**: Order intent formulation, client order IDs, route-aware request packing (`sim` vs `live`), simulator state mutation (for `route="sim"` only), live-route runtime orchestration, gate decisions, broker dispatch post-clearance, incident logging, monitoring, and reconciliation authority.
+* **Boundaries**: Owns broker routing and live-route runtime middleware. Enforces rate limits. Carries trace IDs. *Does not own* signal creation, risk policy drafting, or broker secret resolution.
 * **Key Limits**: Live actions require approved risk tokens and volume constraints. Precise decimal usage (minimum 28 digits, 8-decimal quantization). Idempotency material uses UTF-8 canonical JSON hashed via SHA-256. Broker operation timeout = 10s; check timeout = 5s.
 
 ### 8. Simulation
@@ -97,15 +97,7 @@
 * **Boundaries**: Grid/Random/GA/Bayesian. Strict time-series splitting (no leakage). Atomic checkpointing. *Does not own* live execution, automatic promotion, or database migrations.
 * **Key Limits**: Parameter ranges must be explicitly bounded. Omitted `dry_run` flags default to `True`. Optimization ties resolve deterministically via trade count and candidate hash. Oversized payloads rejected instantly via `OPT_PAYLOAD_TOO_LARGE`.
 
-### 10. Live
-
-* **Inputs**: Intents, state.
-* **Outputs**: Executions, receipts.
-* **Owns**: Live trading runtime orchestration, gate decisions, live adapter invocation post-clearance, incident logs, reconciliation state enforcement.
-* **Boundaries**: 11 deterministic gates. Single-session guard. Strict reconciliation authority. *Does not own* signal logic, risk policy drafting, or shared trading asset contracts. Middleware/gateway role only.
-* **Key Limits**: Live mutations default to disabled (package-only mode). Audit-write failure before mutation blocks execution. Unknown broker results freeze retries until automated/manual reconciliation resolves state. Rate limits map to `retry_after_seconds`.
-
-### 11. UI / API Gateway
+### 10. UI / API Gateway
 
 * **Inputs**: HTTP requests, WebSocket connections, client payloads.
 * **Outputs**: HTTP responses, WebSocket broadcasts, views/DTOs.
@@ -113,7 +105,7 @@
 * **Boundaries**: Pure presentation/delegation layer. Contains *zero* domain or calculation logic inline. Enforces auth/authz.
 * **Key Limits**: List endpoints require pagination (cursor-based default 50, max 200). 30-second endpoint timeouts apply. Preflight warnings expire after 30 seconds.
 
-### 12. Research
+### 11. Research
 
 * **Inputs**: Data.
 * **Outputs**: Insights, reports.
@@ -121,7 +113,7 @@
 * **Boundaries**: Read-only/live. Strict leakage/bias gating. Statistical sign-off (bootstrapping/FDR). Advisory only. *Does not own* live mutations, risk decisions, or roadmap code selection.
 * **Key Limits**: Re-exported analytics mirror upstream definitions. Non-deterministic routines require seed injection and output logs. Persistent files store SHA-256 configuration hashes. `CleaningConfig` explicitly forbids implicit or hidden data filling/dropping.
 
-### 13. Conversation (The AI Interface)
+### 12. Conversation (The AI Interface)
 
 * **Inputs**: User messages, tool execution responses, context parameters.
 * **Outputs**: Redacted response streams, action drafts, summarized threads, prompt payloads.
