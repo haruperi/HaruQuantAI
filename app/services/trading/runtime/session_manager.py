@@ -155,8 +155,7 @@ class SessionManager:
             self._state = SessionState.PAUSED
             if self.signals_manager and hasattr(self.signals_manager, "emit_signal"):
                 err_msg = (
-                    f"Session state restoration failed for scope "
-                    f"{self.scope}: {exc}"
+                    f"Session state restoration failed for scope {self.scope}: {exc}"
                 )
                 self.signals_manager.emit_signal(
                     incident_class="session_restoration_failed",
@@ -271,10 +270,7 @@ class SessionManager:
             and self.signals_manager
             and hasattr(self.signals_manager, "emit_signal")
         ):
-            sig_msg = (
-                f"Synthetic stop/OCO order monitoring is active: "
-                f"{active_orders}"
-            )
+            sig_msg = f"Synthetic stop/OCO order monitoring is active: {active_orders}"
             self.signals_manager.emit_signal(
                 incident_class="synthetic_orders_active",
                 severity="WARNING",
@@ -282,9 +278,7 @@ class SessionManager:
             )
 
         # Check loop timeout
-        elapsed = (
-            self.clock.monotonic() - self.synthetic_emulation_heartbeat_last_seen
-        )
+        elapsed = self.clock.monotonic() - self.synthetic_emulation_heartbeat_last_seen
         if elapsed > self.synthetic_emulation_heartbeat_ttl:
             logger.error(
                 "Synthetic monitoring loop heartbeat elapsed: {}s. "

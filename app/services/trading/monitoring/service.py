@@ -306,8 +306,7 @@ class MonitoringService:
                         incident_class="latency_downgrade",
                         severity="high",
                         message=(
-                            f"Execution latency high ({p95:.1f}ms). "
-                            "Route downgraded."
+                            f"Execution latency high ({p95:.1f}ms). Route downgraded."
                         ),
                     )
         else:

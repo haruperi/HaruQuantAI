@@ -7,15 +7,82 @@ telemetry, latency metrics, and audit/persistence health indicators.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Protocol
+from threading import RLock
+from typing import TYPE_CHECKING, Any, Literal, Protocol, TypedDict, cast
 
 from app.utils.logger import logger
-from app.utils.observability import MetricRegistry
+from app.utils.normalization import format_utc_timestamp, utc_now
+from app.utils.standard import (
+    ValidationError,
+    validate_metric_labels,
+)
 
 if TYPE_CHECKING:
     from app.services.risk.models import RiskDecisionPackage
+
+MetricKind = Literal["counter", "gauge", "histogram"]
+
+
+class MetricRecord(TypedDict):
+    """Stored metric sample."""
+
+    name: str
+    kind: MetricKind
+    value: float
+    labels: dict[str, str]
+    timestamp: str
+
+
+@dataclass
+class MetricRegistry:
+    """Thread-safe in-memory metric registry."""
+
+    records: list[MetricRecord] = field(default_factory=list)
+    _lock: RLock = field(default_factory=RLock)
+
+    def record(
+        self,
+        *,
+        name: str,
+        kind: str,
+        value: float,
+        labels: Mapping[str, object] | None = None,
+    ) -> MetricRecord:
+        """Record one metric sample after label validation."""
+        if kind not in {"counter", "gauge", "histogram"}:
+            raise ValidationError("metric kind is invalid.")
+        if not name.strip():
+            raise ValidationError("metric name must be non-empty.")
+        if isinstance(value, bool) or not isinstance(value, int | float):
+            raise ValidationError("metric value must be numeric.")
+        safe_labels = validate_metric_labels(labels or {})
+        record: MetricRecord = {
+            "name": name,
+            "kind": cast("MetricKind", kind),
+            "value": float(value),
+            "labels": safe_labels,
+            "timestamp": format_utc_timestamp(utc_now()),
+        }
+        with self._lock:
+            self.records.append(record)
+        return record
+
+    def export_prometheus_text(self) -> str:
+        """Export recorded metrics in Prometheus-compatible text format."""
+        with self._lock:
+            rows = list(self.records)
+        lines: list[str] = []
+        for record in rows:
+            labels = ",".join(
+                f'{key}="{value}"' for key, value in sorted(record["labels"].items())
+            )
+            suffix = f"{{{labels}}}" if labels else ""
+            lines.append(f"# TYPE {record['name']} {record['kind']}")
+            lines.append(f"{record['name']}{suffix} {record['value']}")
+        return "\n".join(lines)
+
 
 # Global metric registry for risk events and performance
 RISK_METRICS_REGISTRY = MetricRegistry()
@@ -31,7 +98,7 @@ class MetricsSink(Protocol):
         kind: str,
         value: float,
         labels: Mapping[str, object] | None = None,
-    ) -> None:
+    ) -> object:
         """Record a single metric sample.
 
         Args:

@@ -12,7 +12,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-from app.utils.errors import ValidationError
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils.logger import logger
 
 # Define types for schema version status and capability metadata

@@ -22,7 +22,7 @@ from app.services.risk.models import (
 from app.utils.logger import logger
 
 if TYPE_CHECKING:
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 # Re-export key contract models from domain contracts
 __all__ = [

@@ -15,6 +15,7 @@ from app.services.risk.correlation.contracts import (
     ComponentRiskContribution,
     CovarianceMatrix,
 )
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.exposure import (
     _resolve_base_quote,
     _resolve_conversion_rate,
@@ -28,7 +29,6 @@ from app.services.risk.tail_risk.contracts import (
     VaRCalculationRequest,
     VaRMethod,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 MIN_SAMPLES_FOR_COVARIANCE = 2

@@ -20,13 +20,13 @@ from app.services.risk.config.schema import (
     MAX_RISK_PER_TRADE,
     MAX_TOTAL_LOSS_PCT,
 )
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import (
     PolicyEnforcementResult,
     RiskConfig,
     RiskDecisionStatus,
 )
 from app.services.risk.policy.contracts import EffectiveRiskPolicy
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import utc_now
 
@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     )
     from app.services.risk.policy import PolicyBundle, PolicyResolutionQuery
     from app.services.risk.policy.contracts import RiskPolicy
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 EVALUATED_SCOPE_FIELDS = [
     "environment",

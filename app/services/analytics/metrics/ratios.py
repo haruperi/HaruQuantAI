@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from app.services.analytics.contracts import MetricConfig, MetricResult
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.services.analytics.metrics.drawdown import (
     ulcer_index,
 )
@@ -23,7 +24,6 @@ from app.services.analytics.metrics.trade_outcomes import (
     get_closed_trades,
 )
 from app.utils import StandardResponse  # noqa: TC001
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 type ReturnPoint = Any

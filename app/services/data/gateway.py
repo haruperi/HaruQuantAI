@@ -9,6 +9,9 @@ import json
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from app.services.data.errors import DataExternalServiceError as ExternalServiceError
+from app.services.data.errors import DataIntegrityError as DataError
+from app.services.data.errors import DataValidationError as ValidationError
 from app.services.data.models import (
     DataAvailability,
     OHLCVRecord,
@@ -62,7 +65,6 @@ from app.services.data.validation import (
     validate_timeframe,
     validate_workflow_context,
 )
-from app.utils.errors import DataError, ExternalServiceError, ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import normalize_timestamp
 
@@ -334,6 +336,47 @@ def execute_gateway_request(
 
 
 # --- 6. Clean Service APIs ---
+def _build_source_chain(
+    source: str,
+    fallback_sources: list[str] | None,
+    *,
+    request_id: str | None = None,
+) -> list[str]:
+    """Build the ordered, de-duplicated source chain for a retrieval request.
+
+    Fallback is strictly opt-in (FR-DATA-009): when `fallback_sources` is
+    None, retrieval is single-source and any failure propagates immediately.
+
+    Args:
+        source: Primary source adapter name.
+        fallback_sources: Optional explicit ordered fallback source names.
+        request_id: Optional tracking identifier.
+
+    Returns:
+        list[str]: Ordered source names to attempt, primary first.
+
+    Raises:
+        ValidationError: If `fallback_sources` is not a list of non-empty
+            source-name strings.
+    """
+    if fallback_sources is None:
+        return [source]
+    if not isinstance(fallback_sources, list) or not all(
+        isinstance(item, str) and item.strip() for item in fallback_sources
+    ):
+        err_msg = "fallback_sources must be a list of non-empty source names."
+        raise ValidationError(err_msg, code="INVALID_INPUT")
+    chain = [source]
+    for item in fallback_sources:
+        if item not in chain:
+            chain.append(item)
+    logger.debug(
+        f"_build_source_chain: chain={chain}",
+        extra={"request_id": request_id},
+    )
+    return chain
+
+
 def get_data(
     symbol: str,
     start_time: str,
@@ -345,6 +388,8 @@ def get_data(
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
     request_id: str | None = None,
+    *,
+    fallback_sources: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Retrieve normalized market data records (ohlcv, ticks, spreads, or volume).
 
@@ -359,6 +404,10 @@ def get_data(
         stale_data_behavior: Expired cache lookup policy.
         workflow_context: rounding/validation execution context.
         request_id: Optional tracking identifier.
+        fallback_sources: Optional explicit, ordered fallback source names
+            (FR-DATA-009). Fallback is opt-in only: input-validation failures
+            never fall back; only source-scoped failures (license, readiness,
+            broker/read, unknown source) advance to the next source.
 
     Returns:
         list[dict[str, Any]]: Clean list of normalized data records.
@@ -382,54 +431,6 @@ def get_data(
         err_msg = f"Unsupported data_kind: {data_kind}"
         raise ValidationError(err_msg, code="UNSUPPORTED_OPERATION")
 
-    if kind == "ohlcv":
-        if not timeframe:
-            raise ValidationError("timeframe is required for ohlcv data.")
-        tf = validate_timeframe(timeframe)
-        valid_limit = validate_limit(limit, MAX_OHLCV_LIMIT, DEFAULT_OHLCV_LIMIT)
-        records = execute_gateway_request(
-            source,
-            symbol,
-            tf,
-            t_start,
-            t_end,
-            "ohlcv",
-            stale_data_behavior,
-            workflow_context,
-            request_id,
-        )
-        return records[:valid_limit]
-
-    if kind == "ticks":
-        valid_limit = validate_limit(limit, MAX_TICK_LIMIT, DEFAULT_TICK_LIMIT)
-        records = execute_gateway_request(
-            source,
-            symbol,
-            None,
-            t_start,
-            t_end,
-            "ticks",
-            stale_data_behavior,
-            workflow_context,
-            request_id,
-        )
-        return records[:valid_limit]
-
-    if kind == "spreads":
-        valid_limit = validate_limit(limit, MAX_SPREAD_LIMIT, DEFAULT_SPREAD_LIMIT)
-        records = execute_gateway_request(
-            source,
-            symbol,
-            None,
-            t_start,
-            t_end,
-            "spreads",
-            stale_data_behavior,
-            workflow_context,
-            request_id,
-        )
-        return records[:valid_limit]
-
     if kind == "volume":
         if not timeframe:
             raise ValidationError("timeframe is required for volume data.")
@@ -445,6 +446,7 @@ def get_data(
             stale_data_behavior=stale_data_behavior,
             workflow_context=workflow_context,
             request_id=request_id,
+            fallback_sources=fallback_sources,
         )
         volume_records = []
         for b in bars:
@@ -456,12 +458,51 @@ def get_data(
                     "volume": b["volume"],
                     "tick_volume": b.get("tick_volume", 0.0),
                     "real_volume": b.get("real_volume", 0.0),
-                    "source": source,
+                    "source": b.get("source", source),
                 }
             )
         return volume_records
 
-    return []
+    gateway_tf: str | None
+    if kind == "ohlcv":
+        if not timeframe:
+            raise ValidationError("timeframe is required for ohlcv data.")
+        gateway_tf = validate_timeframe(timeframe)
+        valid_limit = validate_limit(limit, MAX_OHLCV_LIMIT, DEFAULT_OHLCV_LIMIT)
+    elif kind == "ticks":
+        gateway_tf = None
+        valid_limit = validate_limit(limit, MAX_TICK_LIMIT, DEFAULT_TICK_LIMIT)
+    else:  # spreads
+        gateway_tf = None
+        valid_limit = validate_limit(limit, MAX_SPREAD_LIMIT, DEFAULT_SPREAD_LIMIT)
+
+    source_chain = _build_source_chain(source, fallback_sources, request_id=request_id)
+    for index, src in enumerate(source_chain):
+        try:
+            records = execute_gateway_request(
+                src,
+                symbol,
+                gateway_tf,
+                t_start,
+                t_end,
+                kind,
+                stale_data_behavior,
+                workflow_context,
+                request_id,
+            )
+            return records[:valid_limit]
+        except (ValidationError, DataError, ExternalServiceError) as exc:
+            if index == len(source_chain) - 1:
+                raise
+            logger.warning(
+                f"Source '{src}' failed with "
+                f"code={getattr(exc, 'code', 'DATA_ERROR')}; falling back to "
+                f"'{source_chain[index + 1]}'.",
+                extra={"request_id": request_id},
+            )
+
+    err_msg = f"All sources in chain {source_chain} failed."  # pragma: no cover
+    raise DataError(err_msg)  # pragma: no cover - loop always returns or raises
 
 
 def get_data_with_metadata(
@@ -475,6 +516,8 @@ def get_data_with_metadata(
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
     request_id: str | None = None,
+    *,
+    fallback_sources: list[str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Retrieve normalized market data records together with result metadata.
 
@@ -493,13 +536,15 @@ def get_data_with_metadata(
         stale_data_behavior: Expired cache lookup policy.
         workflow_context: Rounding/validation execution context.
         request_id: Optional tracking identifier.
+        fallback_sources: Optional explicit, ordered fallback source names
+            (FR-DATA-009); attempts are disclosed in `fallback_attempts`.
 
     Returns:
         tuple[list[dict[str, Any]], dict[str, Any]]: Normalized records and a
-        JSON-safe result metadata mapping (source, symbol, timeframe,
-        data_kind, record_count, volume_kind, schema_version,
+        JSON-safe result metadata mapping (source, requested_source, symbol,
+        timeframe, data_kind, record_count, volume_kind, schema_version,
         normalization_version, raw_hash, cache_status, data_quality,
-        retrieval_timestamp, license, and warnings).
+        retrieval_timestamp, license, fallback_attempts, and warnings).
     """
     logger.debug(
         f"get_data_with_metadata: building result metadata for symbol={symbol} "
@@ -529,18 +574,35 @@ def get_data_with_metadata(
         except Exception as e:  # noqa: BLE001
             logger.debug(f"Cache status peek failed, defaulting to miss: {e}")
 
-    records = get_data(
-        symbol=symbol,
-        start_time=start_time,
-        end_time=end_time,
-        data_kind=data_kind,
-        timeframe=timeframe,
-        source=source,
-        limit=limit,
-        stale_data_behavior=stale_data_behavior,
-        workflow_context=workflow_context,
-        request_id=request_id,
-    )
+    source_chain = _build_source_chain(source, fallback_sources, request_id=request_id)
+    fallback_attempts: list[dict[str, str]] = []
+    used_source = source_chain[-1]
+    records: list[dict[str, Any]] = []
+    for index, src in enumerate(source_chain):
+        try:
+            records = get_data(
+                symbol=symbol,
+                start_time=start_time,
+                end_time=end_time,
+                data_kind=data_kind,
+                timeframe=timeframe,
+                source=src,
+                limit=limit,
+                stale_data_behavior=stale_data_behavior,
+                workflow_context=workflow_context,
+                request_id=request_id,
+            )
+            used_source = src
+            break
+        except (ValidationError, DataError, ExternalServiceError) as exc:
+            if index == len(source_chain) - 1:
+                raise
+            error_code = str(getattr(exc, "code", "DATA_ERROR"))
+            fallback_attempts.append({"source": src, "error_code": error_code})
+            warnings.append(
+                f"Source '{src}' failed ({error_code}); "
+                f"fell back to '{source_chain[index + 1]}'."
+            )
 
     if not records:
         warnings.append("No records were returned for the requested window.")
@@ -548,18 +610,19 @@ def get_data_with_metadata(
     license_info: dict[str, Any] = {}
     try:
         license_info = validate_license(
-            source, symbol, workflow_context, request_id=request_id
+            used_source, symbol, workflow_context, request_id=request_id
         )
     except (ValidationError, ExternalServiceError) as e:
         logger.debug(f"License metadata unavailable for result metadata: {e}")
 
     result_metadata: dict[str, Any] = {
-        "source": source,
+        "source": used_source,
+        "requested_source": source,
         "symbol": symbol,
         "timeframe": timeframe,
         "data_kind": kind,
         "record_count": len(records),
-        "volume_kind": resolve_volume_kind(source, kind),
+        "volume_kind": resolve_volume_kind(used_source, kind),
         "schema_version": DEFAULT_SCHEMA_VERSION,
         "normalization_version": DEFAULT_NORMALIZATION_VERSION,
         "raw_hash": None,
@@ -567,6 +630,7 @@ def get_data_with_metadata(
         "data_quality": summarize_data_quality(records),
         "retrieval_timestamp": datetime.now(UTC).isoformat(),
         "license": license_info,
+        "fallback_attempts": fallback_attempts,
         "warnings": warnings,
     }
     return records, result_metadata

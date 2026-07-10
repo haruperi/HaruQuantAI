@@ -11,16 +11,17 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, TypeVar
 
-from app.utils.contract import Contract
+from pydantic import BaseModel
+
 from app.utils.logger import logger
 
 if TYPE_CHECKING:
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
-RiskModelT = TypeVar("RiskModelT", bound=Contract)
+RiskModelT = TypeVar("RiskModelT", bound=BaseModel)
 
 
-def to_canonical_risk_payload(model: Contract) -> dict[str, object]:
+def to_canonical_risk_payload(model: BaseModel) -> dict[str, object]:
     """Emit stable, JSON-safe fields for a canonical risk model.
 
     Converts Decimal values to float, datetime values to ISO 8601 strings,
@@ -59,7 +60,7 @@ def from_canonical_risk_payload(
     return model
 
 
-def validate_risk_model_round_trip(model: Contract) -> ValidationResult:
+def validate_risk_model_round_trip(model: BaseModel) -> ValidationResult:
     """Verifies canonicalization and round-trip integrity for a risk model.
 
     Converts the model to a payload, restores it, and asserts equality.

@@ -21,7 +21,7 @@ from app.utils.logger import logger
 from app.utils.standard import canonical_json
 
 if TYPE_CHECKING:
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 class AuditChainVerification(RiskContract):

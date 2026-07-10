@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import Any
 
 from app.services.analytics.contracts import MetricConfig, MetricResult
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.services.analytics.metrics.efficiency import _sorted_median
 from app.services.analytics.metrics.equity import (
     _parse_equity_curve,
@@ -28,7 +29,6 @@ from app.utils import (
     response_from_exception,
     success_response,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 

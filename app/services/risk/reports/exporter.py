@@ -13,11 +13,11 @@ from typing import TYPE_CHECKING
 
 from pydantic import Field
 
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import RiskContract
-from app.utils.errors import ValidationError
+from app.services.risk.validations import ValidationResult, _fail, _ok
 from app.utils.logger import logger
 from app.utils.normalization import utc_now
-from app.utils.validations import ValidationResult, _fail, _ok
 
 if TYPE_CHECKING:
     from app.services.risk.reports.builder import RiskReport
@@ -97,7 +97,9 @@ def validate_report_export_destination(
             f"Workspace: {workspace_root}, Temp: {temp_dir}"
         )
         return _fail(
-            message="Path traversal detected: path is outside the authorized directories.",
+            message=(
+                "Path traversal detected: path is outside the authorized directories."
+            ),
             code="PERMISSION_DENIED",
             details={"target_path": str(target_path)},
         )

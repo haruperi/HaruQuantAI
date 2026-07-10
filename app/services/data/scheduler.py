@@ -5,24 +5,34 @@ and active feeds monitoring/heartbeat status checks.
 """
 
 import asyncio
-from datetime import UTC, datetime
+import json
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from app.services.data.errors import DataIntegrityError as DataError
+from app.services.data.errors import DataValidationError as ValidationError
 from app.services.data.feeds import (
     ACTIVE_FEEDS,
     get_feed_status,
     handle_feed_overflow,
     register_mock_feed,
 )
-from app.services.data.storage import db_helper
+from app.services.data.gateway import get_data
+from app.services.data.storage import db_helper, save_market_data
 from app.services.data.validation import (
+    DEFAULT_BACKFILL_OHLCV_CHUNK_DAYS,
+    DEFAULT_BACKFILL_OHLCV_CHUNK_RECORDS,
+    DEFAULT_BACKFILL_TICK_CHUNK_DAYS,
+    DEFAULT_BACKFILL_TICK_CHUNK_RECORDS,
+    MAX_OHLCV_LIMIT,
     MAX_SYMBOLS_PER_JOB,
+    MAX_TICK_LIMIT,
     MAX_TIMEFRAMES_PER_JOB,
     validate_license,
     validate_source_readiness,
 )
-from app.utils.errors import DataError, ValidationError
 from app.utils.logger import logger
+from app.utils.normalization import normalize_timestamp
 
 __all__ = [
     "ACTIVE_FEEDS",
@@ -278,20 +288,15 @@ async def _run_job_loop(job_name: str) -> None:
                 logger.info(f"Job '{job_name}' disabled. Stopping worker loop.")
                 break
 
-            # Process database updates simulated steps
+            # Execute one real chunked, checkpointed update cycle.
             now_str = datetime.now(UTC).isoformat()
             with db_helper.get_connection() as conn:
                 conn.execute(
-                    """
-                    UPDATE data_jobs
-                    SET state = 'running',
-                        last_run_status = 'success',
-                        last_checkpoint = ?,
-                        updated_at = ?
-                    WHERE name = ?;
-                    """,
-                    (now_str, now_str, job_name),
+                    "UPDATE data_jobs SET state = 'running', updated_at = ? "
+                    "WHERE name = ?;",
+                    (now_str, job_name),
                 )
+            await _execute_single_run(job_name)
 
             # Rest briefly
             await asyncio.sleep(60.0)
@@ -407,39 +412,241 @@ def stop_data_update_job(
     return {"job_id": job["id"], "state": "stopped"}
 
 
+def _normalize_job_data_kind(data_kind: str | None) -> str:
+    """Map a persisted job `data_kind` onto a gateway retrieval kind."""
+    kind = (data_kind or "ohlcv").lower()
+    if kind in ("ticks", "tick"):
+        return "ticks"
+    if kind in ("spreads", "spread"):
+        return "spreads"
+    # 'bars', 'ohlcv', and 'volume' all retrieve OHLCV bars.
+    return "ohlcv"
+
+
+def _chunk_windows(
+    start: datetime,
+    end: datetime,
+    chunk_days: int,
+) -> list[tuple[datetime, datetime]]:
+    """Split `[start, end)` into consecutive windows of at most `chunk_days`."""
+    windows: list[tuple[datetime, datetime]] = []
+    cursor = start
+    step = timedelta(days=chunk_days)
+    while cursor < end:
+        upper = min(cursor + step, end)
+        windows.append((cursor, upper))
+        cursor = upper
+    return windows
+
+
+def _build_chunk_plan(job: dict[str, Any]) -> tuple[list[dict[str, Any]], str]:
+    """Build the ordered symbol x timeframe x window chunk plan for a job.
+
+    Chunk windows are sized by `DEFAULT_BACKFILL_OHLCV_CHUNK_DAYS` for bar
+    kinds and `DEFAULT_BACKFILL_TICK_CHUNK_DAYS` for tick/spread kinds
+    (FR-DATA-044). Jobs without an explicit window default to one trailing
+    chunk ending now (incremental update).
+
+    Returns:
+        tuple[list[dict[str, Any]], str]: The chunk plan and normalized kind.
+    """
+    kind = _normalize_job_data_kind(job.get("data_kind"))
+    chunk_days = (
+        DEFAULT_BACKFILL_OHLCV_CHUNK_DAYS
+        if kind == "ohlcv"
+        else DEFAULT_BACKFILL_TICK_CHUNK_DAYS
+    )
+    end = (
+        normalize_timestamp(job["end_time"])
+        if job.get("end_time")
+        else datetime.now(UTC)
+    )
+    start = (
+        normalize_timestamp(job["start_time"])
+        if job.get("start_time")
+        else end - timedelta(days=chunk_days)
+    )
+    symbols = [s for s in (job.get("symbols") or "").split(",") if s]
+    timeframes: list[str | None]
+    if kind == "ohlcv":
+        timeframes = [t for t in (job.get("timeframes") or "").split(",") if t]
+    else:
+        timeframes = [None]
+
+    plan: list[dict[str, Any]] = []
+    for symbol in symbols:
+        for tf in timeframes:
+            for window_start, window_end in _chunk_windows(start, end, chunk_days):
+                plan.append(
+                    {
+                        "symbol": symbol,
+                        "timeframe": tf,
+                        "start": window_start,
+                        "end": window_end,
+                    }
+                )
+    return plan, kind
+
+
+def _resume_index(plan: list[dict[str, Any]], checkpoint_str: str | None) -> int:
+    """Return the plan index to resume from after the last committed checkpoint.
+
+    Unparseable or legacy checkpoints restart from the beginning; completed
+    chunks are cache-backed, so a restart is cheap and idempotent.
+    """
+    if not checkpoint_str:
+        return 0
+    try:
+        checkpoint = json.loads(checkpoint_str)
+    except (TypeError, ValueError):
+        return 0
+    if not isinstance(checkpoint, dict):
+        return 0
+    for index, chunk in enumerate(plan):
+        if (
+            chunk["symbol"] == checkpoint.get("symbol")
+            and (chunk["timeframe"] or "") == (checkpoint.get("timeframe") or "")
+            and chunk["end"].isoformat() == checkpoint.get("chunk_end")
+        ):
+            return index + 1
+    return 0
+
+
+def _commit_chunk_checkpoint(
+    name: str,
+    chunk: dict[str, Any],
+    index: int,
+    total: int,
+) -> None:
+    """Transactionally commit a completed chunk as the job's checkpoint."""
+    checkpoint = json.dumps(
+        {
+            "symbol": chunk["symbol"],
+            "timeframe": chunk["timeframe"],
+            "chunk_end": chunk["end"].isoformat(),
+            "chunk_index": index + 1,
+            "total_chunks": total,
+        }
+    )
+    now_str = datetime.now(UTC).isoformat()
+    with db_helper.get_connection() as conn:
+        conn.execute(
+            "UPDATE data_jobs SET last_checkpoint = ?, updated_at = ? WHERE name = ?;",
+            (checkpoint, now_str, name),
+        )
+
+
+def _chunk_dataset_path(
+    storage_path: str,
+    chunk: dict[str, Any],
+    kind: str,
+    extension: str,
+) -> str:
+    """Build the deterministic, idempotent dataset path for one chunk."""
+    label = chunk["timeframe"] or kind
+    file_name = (
+        f"{chunk['symbol']}_{label}_"
+        f"{chunk['start']:%Y%m%dT%H%M%S}_{chunk['end']:%Y%m%dT%H%M%S}.{extension}"
+    )
+    return f"{storage_path.rstrip('/')}/{file_name}"
+
+
 async def _execute_single_run(name: str) -> None:
-    """Internal implementation for run_once execution."""
+    """Execute one real, chunked, checkpoint-committed update run for a job.
+
+    Implements FR-DATA-043/FR-DATA-044: each symbol x timeframe window is
+    split into `DEFAULT_BACKFILL_*_CHUNK_DAYS` chunks; every chunk is
+    retrieved through the governed gateway (`WF-DATA-001`), bounded by
+    `DEFAULT_BACKFILL_*_CHUNK_RECORDS`, persisted atomically as its own
+    dataset file (`WF-DATA-021`), and committed as a checkpoint so a crashed
+    or failed run resumes from the last committed chunk.
+    """
     logger.info(f"Starting one-time execution run for job '{name}'...")
     now_str = datetime.now(UTC).isoformat()
     try:
-        await asyncio.sleep(0.2)
+        job: dict[str, Any] | None = None
+        with db_helper.get_connection() as conn:
+            cursor = conn.execute("SELECT * FROM data_jobs WHERE name = ?;", (name,))
+            row = cursor.fetchone()
+            if row:
+                job = dict(row)
+        if not job:
+            err_msg = f"Job '{name}' not found for execution."
+            raise DataError(err_msg)
+
+        plan, kind = _build_chunk_plan(job)
+        record_cap = (
+            DEFAULT_BACKFILL_OHLCV_CHUNK_RECORDS
+            if kind == "ohlcv"
+            else DEFAULT_BACKFILL_TICK_CHUNK_RECORDS
+        )
+        request_limit = min(
+            record_cap, MAX_OHLCV_LIMIT if kind == "ohlcv" else MAX_TICK_LIMIT
+        )
+        extension = (
+            "parquet"
+            if str(job.get("storage_format", "csv")).lower() == "parquet"
+            else "csv"
+        )
+        start_index = _resume_index(plan, job.get("last_checkpoint"))
+        total = len(plan)
+        logger.info(
+            f"Job '{name}': executing {total - start_index}/{total} chunk(s) "
+            f"(resume_index={start_index}, kind={kind})."
+        )
+
+        for index in range(start_index, total):
+            chunk = plan[index]
+            records = get_data(
+                symbol=chunk["symbol"],
+                start_time=chunk["start"].isoformat(),
+                end_time=chunk["end"].isoformat(),
+                data_kind=kind,
+                timeframe=chunk["timeframe"],
+                source=job["source"],
+                limit=request_limit,
+                stale_data_behavior="refresh_and_return",
+                workflow_context="research",
+            )
+            if len(records) > record_cap:
+                records = records[:record_cap]
+            if records:
+                dataset_path = _chunk_dataset_path(
+                    str(job["storage_path"]), chunk, kind, extension
+                )
+                save_market_data(records, dataset_path, extension, overwrite=True)
+            _commit_chunk_checkpoint(name, chunk, index, total)
+            await asyncio.sleep(0)
+
         with db_helper.get_connection() as conn:
             conn.execute(
                 """
                 UPDATE data_jobs
                 SET state = 'completed',
                     last_run_status = 'success',
-                    last_checkpoint = 'run_once_success',
                     last_error = NULL,
                     updated_at = ?
                 WHERE name = ?;
                 """,
-                (now_str, name),
+                (datetime.now(UTC).isoformat(), name),
             )
     except Exception as ex:  # noqa: BLE001
         logger.error(f"One-off execution failed for '{name}': {ex}")
-        with db_helper.get_connection() as conn:
-            conn.execute(
-                """
-                UPDATE data_jobs
-                SET state = 'failed',
-                    last_run_status = 'failed',
-                    last_error = ?,
-                    updated_at = ?
-                WHERE name = ?;
-                """,
-                (str(ex), now_str, name),
-            )
+        try:
+            with db_helper.get_connection() as conn:
+                conn.execute(
+                    """
+                    UPDATE data_jobs
+                    SET state = 'failed',
+                        last_run_status = 'failed',
+                        last_error = ?,
+                        updated_at = ?
+                    WHERE name = ?;
+                    """,
+                    (str(ex), now_str, name),
+                )
+        except Exception as db_ex:  # noqa: BLE001
+            logger.error(f"Failed to record job failure for '{name}': {db_ex}")
 
 
 def run_data_update_job_once(

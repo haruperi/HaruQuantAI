@@ -37,6 +37,7 @@ def get_data_tool(
     stale_data_behavior: str = "refresh_and_return",
     workflow_context: str = "research",
     *,
+    fallback_sources: list[str] | None = None,
     request_id: str | None = None,
 ) -> StandardResponse:
     """Retrieve normalized market data records as a standard tool envelope.
@@ -55,6 +56,9 @@ def get_data_tool(
         limit: Max query limit parameter.
         stale_data_behavior: Expired cache lookup policy.
         workflow_context: Rounding/validation execution context.
+        fallback_sources: Optional explicit, ordered fallback source names
+            (FR-DATA-009); attempts are disclosed in
+            `result_metadata.fallback_attempts`.
         request_id: Optional trace identifier.
 
     Returns:
@@ -87,6 +91,7 @@ def get_data_tool(
             stale_data_behavior=stale_data_behavior,
             workflow_context=workflow_context,
             request_id=request_id,
+            fallback_sources=fallback_sources,
         )
         logger.info(
             f"get_data_tool succeeded: record_count={len(records)}",

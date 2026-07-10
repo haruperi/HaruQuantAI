@@ -24,8 +24,7 @@ from typing import Final, Literal
 from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.utils.errors import ConfigurationError
-from app.utils.paths import normalize_path
+from app.utils.standard import ConfigurationError
 
 HARUQUANT_HOME: Final[str] = "HARUQUANT_HOME"
 CONFIGURATION_ERROR: Final[str] = "CONFIGURATION_ERROR"
@@ -41,6 +40,23 @@ LiveMode = Literal[
     "micro_live",  # Reduced size, strict limits, enhanced monitoring.
     "full_live",  # Full live broker mutation (requires approval).
 ]
+
+
+def _normalize_config_path(path: Path, *, base_dir: Path | None = None) -> Path:
+    """Resolve a configuration path and enforce an optional root boundary."""
+    normalized_base = base_dir.expanduser().resolve(strict=False) if base_dir else None
+    candidate = path.expanduser()
+    if normalized_base is not None and not candidate.is_absolute():
+        candidate = normalized_base / candidate
+    normalized = candidate.resolve(strict=False)
+    if normalized_base is None:
+        return normalized
+    try:
+        normalized.relative_to(normalized_base)
+    except ValueError as exc:
+        msg = "configured path is outside HARUQUANT_HOME."
+        raise ConfigurationError(msg, code=CONFIGURATION_ERROR) from exc
+    return normalized
 
 
 class Settings(BaseSettings):
@@ -219,7 +235,6 @@ class Settings(BaseSettings):
 
     # Mappings for extensible components
     auth: dict[str, object] = Field(default_factory=dict)
-    event_bus: dict[str, object] = Field(default_factory=dict)
     notifications: dict[str, object] = Field(default_factory=dict)
     observability: dict[str, object] = Field(default_factory=dict)
     ohlcv: dict[str, object] = Field(default_factory=dict)
@@ -338,13 +353,12 @@ class Settings(BaseSettings):
         self.log_level = self.log_level.upper()
 
         # Resolve home directory
-        home_path = normalize_path(self.haruquant_home)
+        home_path = _normalize_config_path(self.haruquant_home)
         self.haruquant_home = home_path
 
         # Resolve child directories under home if relative
         def _resolve(p: Path) -> Path:
-            resolved = p if p.is_absolute() else home_path / p
-            return normalize_path(resolved, base_dir=home_path)
+            return _normalize_config_path(p, base_dir=home_path)
 
         self.data_dir = _resolve(self.data_dir)
         self.cache_dir = _resolve(self.cache_dir)

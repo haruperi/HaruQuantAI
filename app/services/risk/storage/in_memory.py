@@ -11,6 +11,8 @@ from enum import StrEnum
 from threading import RLock
 from typing import Protocol
 
+from app.services.risk.errors import RiskDataError as DataError
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import (
     DrawdownState,
     KillSwitchReason,
@@ -28,7 +30,6 @@ from app.services.risk.storage.ports import (
     _check_schema_version,
     compute_decision_material_hash,
 )
-from app.utils.errors import DataError, ValidationError
 from app.utils.logger import logger
 
 

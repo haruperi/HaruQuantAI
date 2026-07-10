@@ -30,7 +30,7 @@ if TYPE_CHECKING:
         OverrideValidationResult,
         RiskOverrideRequest,
     )
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 def validate_token_config_compatibility(

@@ -10,7 +10,7 @@ Public exports:
     ToolMetadata, ToolError, StandardResponse, StandardEnvelope,
     build_metadata, success_response, build_success_response,
     error_response, build_error_response, validate_standard_response,
-    get_execution_ms, canonical_json, error_name, message_for,
+    get_execution_ms, canonical_json, error_name,
     stable_identifier, build_data_quality_issue, validate_ohlcv_records,
     circuit_open_response, build_error_event, validate_metric_labels,
     is_official_tool_allowed, AlertDeduplicator.
@@ -28,18 +28,62 @@ import json
 import math
 import re
 import time
+from collections import deque
 from collections.abc import Mapping
-from typing import Final, Literal, NotRequired, TypedDict
+from dataclasses import dataclass, field
+from typing import Final, Literal, NotRequired, Protocol, TypedDict
 
-from app.utils.errors import (
-    ErrorPayload,
-    SecurityError,
-    ValidationError,
-    exception_to_error_payload,
-    normalize_error_code,
-    validate_error_payload,
-)
 from app.utils.logger import logger as project_logger
+
+
+class Error(Exception):
+    """Base error class for utility errors."""
+
+    code = "UNKNOWN_ERROR"
+
+    def __init__(self, message: str, *, code: str | None = None) -> None:
+        super().__init__(message)
+        self.code = code if code is not None else self.code
+
+
+class ValidationError(Error):
+    """Input, payload, or output validation failure."""
+
+    code = "VALIDATION_FAILED"
+
+
+class SecurityError(Error):
+    """Permission, authorization, or redaction failure."""
+
+    code = "PERMISSION_DENIED"
+
+
+class ConfigurationError(Error):
+    """Invalid or missing runtime configuration."""
+
+    code = "SERVICE_UNAVAILABLE"
+
+
+class DataError(Error):
+    """Generic data access, persistence, or data feed failure."""
+
+    code = "DATA_NOT_FOUND"
+
+
+class ExternalServiceError(Error):
+    """External service, network, broker, or timeout failure."""
+
+    code = "SERVICE_UNAVAILABLE"
+
+
+class ErrorPayload(TypedDict):
+    """Structured error payload used by standard error envelopes."""
+
+    code: str
+    details: str
+
+
+
 
 # ---------------------------------------------------------------------------
 # Type aliases
@@ -1123,3 +1167,239 @@ def canonical_json(payload: object) -> str:
         raise ValidationError(
             f"payload must be canonical JSON serializable: {exc}"  # noqa: EM102
         ) from exc
+
+
+def _validate_code_text(code: object, field_name: str = "code") -> str:
+    """Return an uppercase stripped code string or raise on bad input."""
+    if not isinstance(code, str) or not code.strip():
+        message = f"{field_name} must be a non-empty string."
+        raise ValidationError(message)
+    return code.strip().upper()
+
+
+def normalize_error_code(
+    code: str | None,
+    *,
+    default: str = "UNKNOWN_ERROR",
+) -> str:
+    """Return a normalized error code."""
+    fallback = default.strip().upper() if isinstance(default, str) else "UNKNOWN_ERROR"
+    if not isinstance(code, str) or not code.strip():
+        return fallback
+    return code.strip().upper()
+
+
+def error_name(code: str) -> str:
+    """Return a deterministic human-readable name for an error code."""
+    normalized = normalize_error_code(_validate_code_text(code))
+    return normalized.replace("_", " ").title()
+
+
+def code_for_exception(
+    exception: BaseException,
+    *,
+    default: str = "TOOL_EXECUTION_FAILED",
+) -> str:
+    """Return a safe deterministic code for an exception."""
+    raw_code = getattr(exception, "code", None)
+    if isinstance(raw_code, str):
+        return normalize_error_code(raw_code, default=default)
+    return normalize_error_code(default)
+
+
+def details_for_exception(exception: BaseException) -> str:
+    """Return safe human-readable details for an exception."""
+    return f"{exception.__class__.__name__}: {exception}"
+
+
+def exception_to_error_payload(
+    exception: BaseException,
+    *,
+    default_code: str = "TOOL_EXECUTION_FAILED",
+) -> ErrorPayload:
+    """Map an exception to a standard error payload."""
+    return {
+        "code": code_for_exception(exception, default=default_code),
+        "details": details_for_exception(exception),
+    }
+
+
+def validate_error_payload(payload: Mapping[str, object]) -> ErrorPayload:
+    """Validate and normalize a mapping into an error payload."""
+    code = payload.get("code")
+    details = payload.get("details")
+    if set(payload) != {"code", "details"}:
+        raise ValidationError("error must contain exactly code and details.")
+    if not isinstance(details, str) or not details:
+        raise ValidationError("error.details must be a non-empty string.")
+    return {"code": normalize_error_code(_validate_code_text(code)), "details": details}
+
+
+# --- Error Routing Logic ---
+
+RouteStatus = Literal["routed", "suppressed", "failed"]
+_DeliveryStatus = Literal["delivered", "failed", "dropped", "duplicate", "conflict"]
+
+
+@dataclass(frozen=True, slots=True)
+class _PublishResult:
+    """Internal publish result for standard error routing."""
+
+    status: _DeliveryStatus
+    message: str
+    event_id: str | None
+
+
+class _ErrorAuditBus(Protocol):
+    """Minimal bus protocol required by ``ErrorRouter``."""
+
+    def publish(self, event: Mapping[str, object]) -> _PublishResult:
+        """Publish a sanitized error event."""
+
+
+@dataclass
+class _InMemoryErrorBus:
+    """Small bounded bus for local error routing."""
+
+    max_queue_size: int = 1000
+    _queue: deque[Mapping[str, object]] = field(default_factory=deque, init=False)
+    _idempotency: dict[str, str] = field(default_factory=dict, init=False)
+
+    def publish(self, event: Mapping[str, object]) -> _PublishResult:
+        """Publish a sanitized event to the local queue."""
+        event_id = event.get("event_id")
+        key = event.get("idempotency_key")
+        event_id_text = str(event_id) if event_id is not None else None
+        if isinstance(key, str) and key in self._idempotency:
+            if self._idempotency[key] == event_id_text:
+                return _PublishResult(
+                    "duplicate", "duplicate event ignored", event_id_text
+                )
+            return _PublishResult("conflict", "idempotency conflict", event_id_text)
+        if len(self._queue) >= self.max_queue_size:
+            return _PublishResult("dropped", "event queue is full", event_id_text)
+        self._queue.append(dict(event))
+        if isinstance(key, str) and event_id_text is not None:
+            self._idempotency[key] = event_id_text
+        return _PublishResult("delivered", "event published", event_id_text)
+
+
+def _build_error_route_event(
+    *,
+    code: str,
+    details: str,
+    source: str,
+    request_id: str | None,
+    metadata: Mapping[str, object],
+    idempotency_key: str,
+) -> dict[str, object]:
+    """Build the local event payload used by ``ErrorRouter``."""
+    event = build_error_event(
+        code=code,
+        details=details,
+        request_id=request_id,
+        metadata=metadata,
+    )
+    return {
+        "event_id": event["event_id"],
+        "event_type": event["event_type"],
+        "source": _validate_non_empty_string(source, "source"),
+        "severity": "error",
+        "request_id": request_id,
+        "idempotency_key": idempotency_key,
+        "payload": event["error"],
+        "metadata": event["metadata"],
+    }
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorRouteResult:
+    """Error routing result."""
+
+    status: RouteStatus
+    message: str
+    route_key: str
+    event_id: str | None
+
+
+@dataclass
+class ErrorRouter:
+    """Bounded deduplicating error router."""
+
+    bus: _ErrorAuditBus = field(default_factory=_InMemoryErrorBus)
+    dedupe_window_seconds: float = 60.0
+    _last_seen: dict[str, float] = field(default_factory=dict)
+
+    def route_error(
+        self,
+        *,
+        error: BaseException | ErrorPayload,
+        source: str,
+        request_id: str | None = None,
+        metadata: dict[str, object] | None = None,
+    ) -> ErrorRouteResult:
+        """Route an error event unless it is suppressed by deduplication.
+
+        Builds a deduplicated route key from ``source``, the normalised
+        error code, and redacted details. If the same key was routed
+        within ``dedupe_window_seconds``, the event is suppressed.
+        Otherwise the error is published to the configured event bus.
+
+        Args:
+            error: Exception or ``ErrorPayload`` mapping to route.
+            source: Stable string identifying the emitting component.
+            request_id: Optional trace identifier for correlation.
+            metadata: Optional additional structured metadata. All
+                values are recursively redacted before publishing.
+
+        Returns:
+            ``ErrorRouteResult`` with status ``'routed'``,
+            ``'suppressed'``, or ``'failed'``.
+
+        Raises:
+            TypeError: If ``error`` is neither a ``BaseException``
+                nor an ``ErrorPayload`` mapping.
+        """
+        payload = (
+            error if isinstance(error, dict) else exception_to_error_payload(error)
+        )
+        safe_details = _sanitize_text(payload["details"])
+        route_key = f"{source}:{payload['code']}:{safe_details}"
+        now = time.monotonic()
+        previous = self._last_seen.get(route_key)
+        if previous is not None and now - previous < self.dedupe_window_seconds:
+            return ErrorRouteResult(
+                "suppressed", "duplicate error suppressed", route_key, None
+            )
+        self._last_seen[route_key] = now
+        event = _build_error_route_event(
+            code=payload["code"],
+            details=safe_details,
+            source=source,
+            request_id=request_id,
+            metadata=metadata or {},
+            idempotency_key=route_key,
+        )
+        result = self.bus.publish(event)
+        if result.status in {"delivered", "duplicate"}:
+            return ErrorRouteResult(
+                "routed", "error routed", route_key, str(event["event_id"])
+            )
+        return ErrorRouteResult(
+            "failed",
+            result.message,
+            route_key,
+            str(event["event_id"]),
+        )
+
+
+def route_error(
+    error: BaseException | ErrorPayload,
+    *,
+    source: str,
+    bus: _ErrorAuditBus | None = None,
+    request_id: str | None = None,
+) -> ErrorRouteResult:
+    """Route an error through a caller-supplied or temporary in-memory bus."""
+    router = ErrorRouter(bus=bus or _InMemoryErrorBus())
+    return router.route_error(error=error, source=source, request_id=request_id)

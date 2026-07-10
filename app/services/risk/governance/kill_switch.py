@@ -22,15 +22,17 @@ Exports:
 from __future__ import annotations
 
 import json
+import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from threading import RLock
-from typing import TYPE_CHECKING, Any, overload
+from typing import TYPE_CHECKING, Any, Protocol, overload
 
 from pydantic import Field
 
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
     KillSwitchStateEnum,
@@ -40,13 +42,39 @@ from app.services.risk.models import (
     RiskReasonCode,
     RiskSeverity,
 )
-from app.utils.errors import ValidationError
-from app.utils.event_bus import InMemoryEventBus, build_event_envelope
 from app.utils.logger import logger
+from app.utils.security import redact_mapping
 
 if TYPE_CHECKING:
     from app.services.risk.storage.ports import RiskStateStore
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
+
+
+class _KillSwitchAuditBus(Protocol):
+    """Minimal audit bus protocol for kill-switch audit events."""
+
+    def publish(self, event: dict[str, object]) -> object:
+        """Publish an audit event."""
+
+
+def _build_kill_switch_event(
+    *,
+    event_type: str,
+    source: str,
+    severity: str,
+    payload: dict[str, object],
+) -> dict[str, object]:
+    """Build a redacted kill-switch audit event."""
+    return {
+        "event_id": f"event_{uuid.uuid4()}",
+        "event_type": event_type,
+        "source": source,
+        "severity": severity,
+        "timestamp": datetime.now(UTC).isoformat(),
+        "payload": redact_mapping(payload),
+        "metadata": {},
+    }
+
 
 __all__ = [
     "ApprovalContext",
@@ -220,7 +248,7 @@ class KillSwitchManager:
         target: str,
         reason: str,
         triggered_by: str = "system",
-        event_bus: InMemoryEventBus | None = None,
+        audit_bus: _KillSwitchAuditBus | None = None,
     ) -> None:
         """Trigger an emergency halt/kill switch for a target scope.
 
@@ -229,7 +257,7 @@ class KillSwitchManager:
             target: Identifier key (e.g. strategy ID, symbol name, '*' for global/portfolio).
             reason: Text detail explaining cause.
             triggered_by: Origin/initiator name.
-            event_bus: Optional event bus to publish trigger event.
+            audit_bus: Optional audit bus to publish trigger event.
 
         Raises:
             ValidationError: If target scope is unknown.
@@ -266,9 +294,9 @@ class KillSwitchManager:
             logger.warning(
                 f"Emergency kill switch triggered: scope={scope}, target={target}, reason={reason}"
             )
-            if event_bus:
+            if audit_bus:
                 try:
-                    event = build_event_envelope(
+                    event = _build_kill_switch_event(
                         event_type="risk.kill_switch.triggered",
                         source="kill_switch_governor",
                         severity="critical",
@@ -280,7 +308,7 @@ class KillSwitchManager:
                             "triggered_at": timestamp,
                         },
                     )
-                    event_bus.publish(event)
+                    audit_bus.publish(event)
                 except Exception as e:
                     logger.error(f"Failed to publish kill switch event: {e}")
 
@@ -290,7 +318,7 @@ class KillSwitchManager:
         target: str,
         approval_token: str | None = None,
         operator_role: str | None = None,
-        event_bus: InMemoryEventBus | None = None,
+        audit_bus: _KillSwitchAuditBus | None = None,
     ) -> None:
         """Deactivate a triggered kill switch after governed approval checks.
 
@@ -299,7 +327,7 @@ class KillSwitchManager:
             target: Identifier key.
             approval_token: Optional approval token validated by policy.
             operator_role: Optional role of the operator (e.g. 'admin', 'compliance').
-            event_bus: Optional event bus.
+            audit_bus: Optional audit bus.
 
         Raises:
             ValidationError: If approval requirements are not satisfied.
@@ -368,9 +396,9 @@ class KillSwitchManager:
             self.save()
 
             logger.info(f"Kill switch resumed: scope={scope}, target={target}")
-            if event_bus:
+            if audit_bus:
                 try:
-                    event = build_event_envelope(
+                    event = _build_kill_switch_event(
                         event_type="risk.kill_switch.resumed",
                         source="kill_switch_governor",
                         severity="info",
@@ -381,7 +409,7 @@ class KillSwitchManager:
                             "resumed_at": datetime.now(UTC).isoformat(),
                         },
                     )
-                    event_bus.publish(event)
+                    audit_bus.publish(event)
                 except Exception as e:
                     logger.error(f"Failed to publish resume event: {e}")
 
@@ -462,7 +490,7 @@ class KillSwitchManager:
         request: RiskAssessmentRequest,
         limit_results: list[LimitResult],
         is_live: bool = False,
-        event_bus: InMemoryEventBus | None = None,
+        audit_bus: _KillSwitchAuditBus | None = None,
     ) -> list[str]:
         """Statelessly parse request context and limit results to trigger switches.
 
@@ -470,7 +498,7 @@ class KillSwitchManager:
             request: Active pre-trade risk query payload.
             limit_results: Stateless list of limit checks executed.
             is_live: True if environment is live-sensitive.
-            event_bus: Optional event bus to dispatch audit payloads.
+            audit_bus: Optional audit bus to dispatch audit payloads.
 
         Returns:
             list[str]: Names of scopes triggered in this review.
@@ -485,7 +513,7 @@ class KillSwitchManager:
                 target="*",
                 reason="Manual operator halt requested",
                 triggered_by=ctx.get("operator_id", "operator"),
-                event_bus=event_bus,
+                audit_bus=audit_bus,
             )
             triggered_scopes.append("global")
 
@@ -514,7 +542,7 @@ class KillSwitchManager:
                 target="*",
                 reason="Portfolio reconciliation failure or inactive monitoring",
                 triggered_by="reconciliation_service",
-                event_bus=event_bus,
+                audit_bus=audit_bus,
             )
             triggered_scopes.append("portfolio")
 
@@ -525,7 +553,7 @@ class KillSwitchManager:
                 target="*",
                 reason="Broker terminal disconnected in live execution mode",
                 triggered_by="broker_monitor",
-                event_bus=event_bus,
+                audit_bus=audit_bus,
             )
             triggered_scopes.append("global")
 
@@ -544,7 +572,7 @@ class KillSwitchManager:
                     target="*",
                     reason=f"Hard daily loss threshold breached: {res.message}",
                     triggered_by="limit_engine",
-                    event_bus=event_bus,
+                    audit_bus=audit_bus,
                 )
                 triggered_scopes.append("global")
 
@@ -564,7 +592,7 @@ class KillSwitchManager:
                     target="*",
                     reason=f"Total drawdown limit breached: {res.message}",
                     triggered_by="limit_engine",
-                    event_bus=event_bus,
+                    audit_bus=audit_bus,
                 )
                 triggered_scopes.append("global")
 
@@ -583,7 +611,7 @@ class KillSwitchManager:
                     target=str(symbol),
                     reason=f"Extreme market spread event: {res.message}",
                     triggered_by="limit_engine",
-                    event_bus=event_bus,
+                    audit_bus=audit_bus,
                 )
                 triggered_scopes.append("symbol")
 
@@ -597,7 +625,7 @@ class KillSwitchManager:
                     target="*",
                     reason=f"Critical margin emergency triggered: {res.message}",
                     triggered_by="limit_engine",
-                    event_bus=event_bus,
+                    audit_bus=audit_bus,
                 )
                 triggered_scopes.append("portfolio")
 
@@ -634,7 +662,7 @@ def trigger_kill_switch(
     target: str,
     reason: str,
     triggered_by: str = "system",
-    event_bus: InMemoryEventBus | None = None,
+    audit_bus: _KillSwitchAuditBus | None = None,
 ) -> None:
     """Module-level convenience function to trigger a kill switch on the global manager.
 
@@ -647,7 +675,7 @@ def trigger_kill_switch(
         target: Target identifier (e.g. strategy ID, symbol name, or '*').
         reason: Human-readable explanation for the trigger.
         triggered_by: Identifier of the operator or system component.
-        event_bus: Optional event bus for audit event publication.
+        audit_bus: Optional audit bus for audit event publication.
     """
     manager = get_kill_switch_manager()
     manager.trigger(
@@ -655,7 +683,7 @@ def trigger_kill_switch(
         target=target,
         reason=reason,
         triggered_by=triggered_by,
-        event_bus=event_bus,
+        audit_bus=audit_bus,
     )
 
 
@@ -664,7 +692,7 @@ def resume_after_kill_switch(
     target: str,
     approval_token: str | None = None,
     operator_role: str | None = None,
-    event_bus: InMemoryEventBus | None = None,
+    audit_bus: _KillSwitchAuditBus | None = None,
 ) -> None:
     """Module-level convenience function to resume trading after a governed kill switch.
 
@@ -678,7 +706,7 @@ def resume_after_kill_switch(
         target: Target identifier to resume.
         approval_token: Optional approval token from a governed approval workflow.
         operator_role: Operator role (e.g. 'admin', 'compliance').
-        event_bus: Optional event bus for audit event publication.
+        audit_bus: Optional audit bus for audit event publication.
 
     Raises:
         ValidationError: If approval requirements are not satisfied.
@@ -689,7 +717,7 @@ def resume_after_kill_switch(
         target=target,
         approval_token=approval_token,
         operator_role=operator_role,
-        event_bus=event_bus,
+        audit_bus=audit_bus,
     )
 
 

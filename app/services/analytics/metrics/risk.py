@@ -641,13 +641,15 @@ def calculate_risk_metrics(
         }
         return MetricResult(value=val)
 
+    from app.services.analytics.errors import (
+        AnalyticsValidationError as ValidationError,
+    )
     from app.services.analytics.statistics.distributions import _to_float_list
     from app.utils import (
         build_metadata,
         response_from_exception,
         success_response,
     )
-    from app.utils.errors import ValidationError
 
     ret_list = _to_float_list(returns)
     if not ret_list:

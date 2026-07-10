@@ -27,7 +27,7 @@ from app.utils.logger import logger
 from app.utils.normalization import parse_datetime, to_utc_datetime, utc_now
 
 if TYPE_CHECKING:
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 class RiskRegime(StrEnum):

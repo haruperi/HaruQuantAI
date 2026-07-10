@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from app.utils.errors import ValidationError
+from app.services.research.errors import ResearchValidationError as ValidationError
 from app.utils.logger import logger
 from app.utils.security import redact_mapping
 from app.utils.settings import EdgeResult

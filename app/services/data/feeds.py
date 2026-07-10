@@ -9,11 +9,13 @@ credential-bearing connection strings.
 """
 
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
+from app.services.data.errors import DataIntegrityError as DataError
+from app.services.data.errors import DataValidationError as ValidationError
 from app.services.data.storage import db_helper
-from app.utils.errors import DataError, ValidationError, trading_retry_delay
+from app.services.trading.errors import trading_retry_delay
 from app.utils.logger import logger
 
 # In-memory active feed state.
@@ -250,6 +252,72 @@ def register_mock_feed(
         raise DataError(err_msg) from e
 
 
+_DEFAULT_GAP_LOOKBACK = timedelta(minutes=5)
+
+
+def _dispatch_gap_reconciliation(feed: dict[str, Any]) -> str | None:
+    """Dispatch a historical-backfill job for a dropped gap window.
+
+    Implements FR-DATA-054 (`WF-DATA-052`): when `drop_and_reconcile` drops
+    events, a scheduler backfill job is created (or re-run when it already
+    exists) covering the gap window from the feed's last observed event to
+    now. Dispatch failures are logged and never break overflow handling —
+    the gap stays visible through `gap_count` either way.
+
+    Args:
+        feed: Feed state mapping for the overflowing feed.
+
+    Returns:
+        str | None: The dispatched reconciliation job name, or None when
+        dispatch failed.
+    """
+    # Local import: scheduler imports feeds at module level.
+    from app.services.data import scheduler
+
+    feed_id = str(feed["feed_id"])
+    job_name = f"reconcile_{feed_id}"
+    gap_end = datetime.now(UTC)
+    last_event = feed.get("last_event") or feed.get("last_heartbeat")
+    try:
+        gap_start = (
+            datetime.fromisoformat(last_event)
+            if last_event
+            else gap_end - _DEFAULT_GAP_LOOKBACK
+        )
+    except (TypeError, ValueError):
+        gap_start = gap_end - _DEFAULT_GAP_LOOKBACK
+    if gap_start >= gap_end:
+        gap_start = gap_end - _DEFAULT_GAP_LOOKBACK
+
+    try:
+        try:
+            scheduler.create_data_update_job(
+                name=job_name,
+                source=str(feed["source"]),
+                symbols=[str(feed["symbol"])],
+                timeframes=["M1"],
+                data_kind=str(feed.get("data_kind") or "ohlcv"),
+                storage_format="csv",
+                storage_path="data/processed",
+                start_time=gap_start.isoformat(),
+                end_time=gap_end.isoformat(),
+            )
+        except ValidationError:
+            logger.info(
+                f"Reconciliation job '{job_name}' already exists; re-running it "
+                f"for the new gap window."
+            )
+        scheduler.run_data_update_job_once(job_name)
+    except Exception as e:  # noqa: BLE001
+        logger.error(f"Failed to dispatch gap reconciliation for {feed_id}: {e}")
+        return None
+    logger.warning(
+        f"Gap reconciliation dispatched for feed {feed_id}: job={job_name} "
+        f"window=[{gap_start.isoformat()}, {gap_end.isoformat()}]"
+    )
+    return job_name
+
+
 def handle_feed_overflow(
     feed_id: str,
     policy: OverflowPolicy,
@@ -274,6 +342,7 @@ def handle_feed_overflow(
         raise ValidationError(err_msg, code="JOB_NOT_FOUND")
 
     now_str = datetime.now(UTC).isoformat()
+    reconcile_job: str | None = None
     if policy == "halt":
         feed["state"] = "failed"
         feed["last_error"] = "BUFFER_OVERFLOW"
@@ -286,6 +355,7 @@ def handle_feed_overflow(
         feed["last_error"] = "BUFFER_OVERFLOW"
         msg = f"Feed {feed_id} overflow: dropping records and entering reconciliation."
         logger.warning(msg)
+        reconcile_job = _dispatch_gap_reconciliation(feed)
     elif policy == "backpressure":
         feed["state"] = "connected"
         msg = f"Feed {feed_id} applying backpressure."
@@ -318,13 +388,16 @@ def handle_feed_overflow(
     except Exception as e:  # noqa: BLE001
         logger.error(f"Failed to update database for feed {feed_id} overflow: {e}")
 
-    return {
+    result: dict[str, Any] = {
         "feed_id": feed_id,
         "action": policy,
         "state": feed["state"],
         "dropped_count": feed["dropped_count"],
         "gap_count": feed["gap_count"],
     }
+    if policy == "drop_and_reconcile":
+        result["reconcile_job"] = reconcile_job
+    return result
 
 
 def _filter_in_memory_feeds(

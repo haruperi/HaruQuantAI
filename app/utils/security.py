@@ -28,8 +28,12 @@ import time
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, Final, Literal, TypedDict
 
-if TYPE_CHECKING:
-    from app.utils.standard import StandardResponse
+from app.utils.standard import (
+    ConfigurationError,
+    SecurityError,
+    StandardResponse,
+    ValidationError,
+)
 
 TOOL_NAME = "redact_payload"
 TOOL_VERSION = "1.0.0"
@@ -58,6 +62,7 @@ SECRET_VALUE_PATTERN = re.compile(
 LONG_SECRET_PATTERN = re.compile(r"(?i)\b(?:[a-f0-9]{32,}|eyJ[A-Za-z0-9_.=-]+)\b")
 
 
+
 class RedactionDiagnostics(TypedDict):
     """Diagnostics describing redacted fields without exposing values."""
 
@@ -75,8 +80,6 @@ class SecretVersion(TypedDict, total=False):
 
 def redact_text(text: str, *, replacement: str = "[REDACTED]") -> str:
     """Return text with secret-like material redacted."""
-    from app.utils.errors import ValidationError
-
     if not isinstance(text, str):
         raise ValidationError("text must be a string.", code="INVALID_INPUT")
     redacted = SECRET_VALUE_PATTERN.sub(rf"\1{replacement}", text)
@@ -203,8 +206,6 @@ def _redact_mapping(
     max_depth: int,
 ) -> dict[str, object]:
     """Return a recursively redacted mapping copy."""
-    from app.utils.errors import SecurityError, ValidationError
-
     if max_depth < 0:
         raise ValidationError("max_depth must be non-negative.", code="INVALID_INPUT")
     if any("*" in item for item in allowlist):
@@ -233,8 +234,7 @@ def _redact_mapping(
 
 def _validate_redactable_payload(payload: object) -> Mapping[str, object] | str:
     """Return a supported redaction payload or raise validation."""
-    from app.utils.errors import ValidationError
-
+    
     if not isinstance(payload, str | Mapping):
         raise ValidationError(
             "payload must be a mapping or string.",
@@ -273,8 +273,7 @@ def hash_password(
     Side effects:
         None. Password value is never logged.
     """
-    from app.utils.errors import ValidationError
-
+    
     if not isinstance(password, str) or not password:
         raise ValidationError(
             "password must be a non-empty string.", code="INVALID_INPUT"
@@ -351,8 +350,7 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 def _fernet() -> object:
     """Return the Fernet class lazily."""
-    from app.utils.errors import ConfigurationError
-
+    
     try:
         return importlib.import_module("cryptography.fernet").Fernet
     except ImportError as exc:  # pragma: no cover - dependency exists in CI image
@@ -378,8 +376,7 @@ def load_encryption_key(environ: Mapping[str, str] | None = None) -> str:
     Raises:
         SecurityError: If the key is missing.
     """
-    from app.utils.errors import SecurityError
-
+    
     source = os.environ if environ is None else environ
     key = source.get("ENCRYPTION_KEY", "")
     if not key:
@@ -389,8 +386,7 @@ def load_encryption_key(environ: Mapping[str, str] | None = None) -> str:
 
 def encrypt_text(plaintext: str, *, key: str) -> str:
     """Encrypt text with a caller-supplied Fernet key."""
-    from app.utils.errors import SecurityError, ValidationError
-
+    
     if not plaintext:
         raise ValidationError("plaintext must be non-empty.", code="INVALID_INPUT")
     if not key:
@@ -417,8 +413,7 @@ def decrypt_text(ciphertext: str, *, key: str) -> str:
     Side effects:
         None.
     """
-    from app.utils.errors import SecurityError, ValidationError
-
+    
     if not ciphertext:
         raise ValidationError("ciphertext must be non-empty.", code="INVALID_INPUT")
     if not key:
@@ -459,8 +454,7 @@ def select_active_secret_version(
         SecurityError: If no active version exists or if the highest active
             numeric version is duplicated.
     """
-    from app.utils.errors import SecurityError, ValidationError
-
+    
     active: list[tuple[int, SecretVersion]] = []
     for item in versions.values():
         if not bool(item.get("active", False)):
@@ -526,7 +520,7 @@ def redact_payload(
         Emits structured tool call, success, and exception logs only.
         Secret values are never logged.
     """
-    from app.utils.errors import SecurityError, ValidationError
+    
     from app.utils.logger import logger
     from app.utils.standard import (
         build_metadata,
@@ -595,8 +589,7 @@ def redact_payload(
 
 def classify_secret_key(key: str) -> Literal["sensitive", "safe"]:
     """Classify whether a key name appears sensitive."""
-    from app.utils.errors import ValidationError
-
+    
     if not isinstance(key, str) or not key:
         raise ValidationError("key must be a non-empty string.", code="INVALID_INPUT")
     return "sensitive" if SENSITIVE_KEY_PATTERN.search(key) else "safe"

@@ -11,13 +11,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils import (
     StandardResponse,
     build_metadata,
     response_from_exception,
     success_response,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 if TYPE_CHECKING:

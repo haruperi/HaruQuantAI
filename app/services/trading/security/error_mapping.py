@@ -12,8 +12,7 @@ from collections.abc import Mapping
 from pydantic import ValidationError as PydanticValidationError
 
 from app.services.trading.contracts import JsonObject, JsonValue, TradingError
-from app.utils.errors import Error
-from app.utils.errors import TradingError as UtilityTradingError
+from app.services.trading.errors import TradingError as UtilityTradingError
 from app.utils.logger import logger
 from app.utils.security import redact_text, redact_value
 
@@ -195,7 +194,7 @@ def _classify_exception(error: BaseException) -> str:
     for exception_type, code in typed_codes:
         if isinstance(error, exception_type):
             return code
-    if isinstance(error, Error):
+    if isinstance(error, UtilityTradingError):
         return str(error.code)
 
     text_code = _classify_exception_text(str(error).lower())

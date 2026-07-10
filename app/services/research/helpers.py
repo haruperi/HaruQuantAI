@@ -12,7 +12,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from app.utils.errors import ValidationError
+from app.services.research.errors import ResearchValidationError as ValidationError
 
 
 # --- 1. External News & Event Normalization ---

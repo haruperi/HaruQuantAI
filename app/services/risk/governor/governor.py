@@ -17,6 +17,8 @@ from app.services.risk.audit import (
     verify_risk_audit_chain,
 )
 from app.services.risk.correlation import CorrelationEngine  # noqa: F401
+from app.services.risk.errors import RiskDataError as DataError
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.exposure import CurrencyExposureEngine  # noqa: F401
 from app.services.risk.feasibility import (  # noqa: F401
     DrawdownGovernor,
@@ -60,7 +62,6 @@ from app.services.risk.tail_risk import (
     PortfolioVaREngine,  # noqa: F401
     calculate_var_es_snapshots,
 )
-from app.utils.errors import DataError, ValidationError
 from app.utils.logger import logger
 
 if TYPE_CHECKING:

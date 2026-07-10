@@ -839,7 +839,7 @@ stateDiagram-v2
 
 ## 14. Gaps, Ambiguities, Contradictions, and Orphan Requirements
 
-### 1. Inprocess Event Bus schemas
+### 1. In-process audit event schemas
 - **Description**: Requirement `IND-FR-118` and `IND-FR-122` specify cache key invalidation on corporate-action/revision events, but the library boundary does not define an explicit in-process event publisher/listener interface or routing protocols.
 - **Severity**: Medium.
 - **Recommended Clarification**: Define an event consumer port inside the registry/cache interface so that external message brokers (e.g. RabbitMQ, Kafka) can bind cache invalidation events.

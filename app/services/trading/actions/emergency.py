@@ -336,9 +336,7 @@ def _combine_retry_safety(
     return RetrySafety.DO_NOT_RETRY
 
 
-def _flatten_message(
-    *, scope: EmergencyScope, side_effect_mode: SideEffectMode
-) -> str:
+def _flatten_message(*, scope: EmergencyScope, side_effect_mode: SideEffectMode) -> str:
     """Describe what a flatten actually did, not what it intended to do.
 
     Args:

@@ -49,7 +49,10 @@ from ctrader_open_api.protobuf import (  # type: ignore[import-untyped, unused-i
 )
 from twisted.internet import reactor
 
-from app.utils.errors import ConfigurationError, ExternalServiceError
+from app.services.brokers.errors import BrokerConfigurationError as ConfigurationError
+from app.services.brokers.errors import (
+    BrokerExternalServiceError as ExternalServiceError,
+)
 from app.utils.logger import logger
 from app.utils.settings import settings
 

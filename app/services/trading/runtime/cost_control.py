@@ -197,8 +197,7 @@ class CostController:
                         self.signals_manager, "emit_signal"
                     ):
                         err_msg = (
-                            f"Cost budget limit violated post-dispatch: "
-                            f"{violation_msg}"
+                            f"Cost budget limit violated post-dispatch: {violation_msg}"
                         )
                         self.signals_manager.emit_signal(
                             incident_class="cost_budget_breach",

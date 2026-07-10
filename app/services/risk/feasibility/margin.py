@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import Field
 
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.exposure import (
     _resolve_base_quote as _orig_resolve_base_quote,
 )
@@ -36,7 +37,6 @@ from app.services.risk.models import (
     RiskReasonCode,
     RiskSeverity,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 if TYPE_CHECKING:

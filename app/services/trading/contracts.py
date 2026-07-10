@@ -8,6 +8,8 @@ broker, database, secret, socket, thread, clock, or random-number side effects.
 
 from __future__ import annotations
 
+import hashlib
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
 from typing import Any, Literal
@@ -21,10 +23,14 @@ from pydantic import (
     model_validator,
 )
 
-from app.utils.contract import Contract
+from app.services.trading.errors import TradingValidationError as ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import normalize_timestamp
-from app.utils.standard import SENSITIVE_KEY_PATTERN, SENSITIVE_VALUE_PATTERN
+from app.utils.standard import (
+    SENSITIVE_KEY_PATTERN,
+    SENSITIVE_VALUE_PATTERN,
+    canonical_json,
+)
 
 SUPPORTED_SCHEMA_MAJOR = 1
 SCHEMA_VERSION = "1.0.0"
@@ -33,6 +39,91 @@ SCHEMA_VERSION_PARTS = 3
 type JsonPrimitive = str | int | float | bool | None
 type JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
 type JsonObject = dict[str, JsonValue]
+
+_SCHEMA_VERSION_MIN_PARTS = 2
+
+_TRACE_FIELDS: frozenset[str] = frozenset(
+    {"created_at", "request_id", "workflow_id", "correlation_id"}
+)
+
+
+class Contract(BaseModel):
+    """Local base model for canonical trading boundary contracts."""
+
+    schema_version: str = Field(default=SCHEMA_VERSION)
+    created_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
+    request_id: str | None = None
+    workflow_id: str | None = None
+    correlation_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("metadata")
+    @classmethod
+    def validate_metadata_structure(cls, value: dict[str, Any]) -> dict[str, Any]:
+        """Validate metadata namespacing and secret safety."""
+        for key in value:
+            if not isinstance(key, str):
+                raise TypeError("Metadata keys must be strings.")
+            if "." not in key and ":" not in key:
+                raise ValueError("Metadata keys must be namespaced.")
+            if SENSITIVE_KEY_PATTERN.search(key):
+                raise ValueError("Metadata key matches sensitive key pattern.")
+        try:
+            canonical_json(value)
+        except (TypeError, ValueError) as exc:
+            msg = f"Metadata is not deterministically serializable: {exc}"
+            raise ValueError(msg) from exc
+        return value
+
+    @model_validator(mode="after")
+    def validate_trace_identifiers(self) -> Contract:
+        """Validate trace identifier fields."""
+        for name in ("request_id", "workflow_id", "correlation_id"):
+            value = getattr(self, name)
+            if value is not None and (not isinstance(value, str) or not value.strip()):
+                msg = f"{name} must be a non-empty string or None."
+                raise ValueError(msg)
+        return self
+
+    def to_json(self) -> str:
+        """Serialize this contract to deterministic canonical JSON."""
+        try:
+            return canonical_json(self.model_dump())
+        except (TypeError, ValueError) as exc:
+            msg = f"Failed to serialize contract: {exc}"
+            raise ValidationError(msg) from exc
+
+    def content_hash(self) -> str:
+        """Calculate a stable SHA256 hash over business-data fields only."""
+        payload = {
+            key: value
+            for key, value in self.model_dump().items()
+            if key not in _TRACE_FIELDS
+        }
+        try:
+            serialized = canonical_json(payload)
+        except (TypeError, ValueError) as exc:
+            msg = f"Failed to compute content hash: {exc}"
+            raise ValidationError(msg) from exc
+        return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+    def contract_hash(self) -> str:
+        """Calculate SHA256 hash over the full serialized contract."""
+        return hashlib.sha256(self.to_json().encode("utf-8")).hexdigest()
+
+    def check_compatibility(self, target_version: str) -> bool:
+        """Check whether this contract version is compatible with a target."""
+        try:
+            current_parts = [int(part) for part in self.schema_version.split(".")]
+            target_parts = [int(part) for part in target_version.split(".")]
+            return (
+                len(current_parts) >= _SCHEMA_VERSION_MIN_PARTS
+                and len(target_parts) >= _SCHEMA_VERSION_MIN_PARTS
+                and current_parts[0] == target_parts[0]
+                and current_parts[1] >= target_parts[1]
+            )
+        except ValueError:
+            return False
 
 
 def validate_redacted_json_value(value: JsonValue, *, path: str = "$") -> None:

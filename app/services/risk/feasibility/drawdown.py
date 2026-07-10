@@ -18,6 +18,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, overload
 
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
     DrawdownState,
@@ -29,7 +30,6 @@ from app.services.risk.models import (
     RiskReasonCode,
     RiskSeverity,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 if TYPE_CHECKING:

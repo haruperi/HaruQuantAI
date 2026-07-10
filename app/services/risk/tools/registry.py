@@ -10,7 +10,7 @@ from typing import Any, Literal
 from pydantic import Field
 
 from app.services.risk.models import RiskContract
-from app.utils.validations import ValidationResult, _fail, _ok
+from app.services.risk.validations import ValidationResult, _fail, _ok
 
 
 class RiskToolDefinition(RiskContract):

@@ -1,133 +1,310 @@
-# [Module/Service Name] (`[path/to/module]`)
+# [Domain Name]
 
-## Overview
-[Briefly describe what this module is, its core responsibility, and its place in the broader system architecture. Mention any strict guarantees it provides, e.g., "import-safe", "thread-safe", "side-effect-free".]
+> **Package:** `[app/path/to/domain]`
+> **Domain ID:** `[DOM-XXX]`
+> **Status:** `[Planned | In Development | Stable | Deprecated]`
+> **Owner:** `[Team or owner]`
+> **Last updated:** `[YYYY-MM-DD]`
 
-## Design Philosophy & Non-Negotiable Rules
-[List the core principles that govern this module. These are rules that contributors must never break.]
-* **Rule 1 (e.g., Import Safety):** [Description of the rule and why it matters.]
-* **Rule 2 (e.g., No Domain Logic):** [Description.]
-* **Rule 3 (e.g., Unified Entry Point):** [Description of how external services should interact with this module.]
+---
 
-## Features
-[Break down the module into its core files/components. For each, provide a brief description and list the public API.]
+## 1. Domain Overview
 
-### `[filename_1.py]` — [Feature Name]
-[1-2 sentences describing what this file does.]
-**Key exports:** `FunctionA`, `ClassB`, `CONSTANT_C`
+### 1.1 Purpose
 
-### `[filename_2.py]` — [Feature Name]
-[1-2 sentences describing what this file does.]
-**Key exports:** `FunctionX`, `ClassY`
+[Explain the business or system purpose of this domain in 2–4 sentences.]
 
-## Installation
-### Prerequisites
-* `uv` installed and available globally.
+The domain is responsible for:
 
-### Dependencies
-* **Standard Library:** `[lib1]`, `[lib2]`
-* **Required Third-Party:** `[lib3]` — [Brief reason, e.g., "Used for X"]
-* **Optional Third-Party:** `[lib4]` — [Fallback behavior, e.g., "Falls back to Y if absent"]
+- [Primary responsibility]
+- [Secondary responsibility]
+- [Important outcome delivered to the wider system]
 
-**Install command:**
+### 1.2 Scope
+
+**In scope**
+
+- [Capability owned by this domain]
+- [Capability owned by this domain]
+- [Data or decisions owned by this domain]
+
+**Out of scope**
+
+- [Responsibility owned by another domain]
+- [Unsupported behaviour]
+- [Explicit architectural boundary]
+
+### 1.3 System Position
+
+[Explain which domains call this domain and which systems or domains it depends on.]
+
+```mermaid
+flowchart LR
+    A[Upstream Domain] --> B[[Domain Name]]
+    B --> C[Downstream Domain]
+    B --> D[External System]
+    E[Shared Infrastructure] --> B
+```
+
+---
+
+## 2. Architecture and Design Rules
+
+### 2.1 Architecture Summary
+
+[Describe the internal design, major layers, and dependency direction.]
+
+```mermaid
+flowchart TD
+    API[Public Domain API]
+    APP[Application / Workflow Coordination]
+    LOGIC[Domain Logic and Policies]
+    PORTS[Ports / Interfaces]
+    ADAPTERS[Adapters / Integrations]
+    STORE[Persistence]
+
+    API --> APP
+    APP --> LOGIC
+    APP --> PORTS
+    PORTS --> ADAPTERS
+    ADAPTERS --> STORE
+```
+
+## 3. Feature Catalogue
+
+Create one subsection for every feature or capability owned by this domain.
+
+---
+
+### 3.1 `[FEAT-001]` — [Feature Name]
+
+#### Purpose
+
+[Describe the value provided by this feature.]
+
+#### Scope
+
+**Included**
+
+- [Included behaviour]
+- [Included behaviour]
+
+**Excluded**
+
+- [Excluded behaviour]
+- [Behaviour owned by another feature or domain]
+
+#### Functional Requirements
+
+| ID               | Requirement                              |
+| ---------------- | ---------------------------------------- |
+| `FR-[DOM]-001` | The system shall [observable behaviour]. |
+| `FR-[DOM]-002` | The system shall [observable behaviour]. |
+| `FR-[DOM]-003` | The system shall [observable behaviour]. |
+
+---
+
+#### Non-Functional Requirements
+
+| ID                | Category        | Requirement                                                | Verification      |
+| ----------------- | --------------- | ---------------------------------------------------------- | ----------------- |
+| `NFR-[DOM]-001` | Performance     | [Latency, throughput, or resource requirement]             | Benchmark         |
+| `NFR-[DOM]-002` | Reliability     | [Retry, recovery, durability, or availability requirement] | Integration test  |
+| `NFR-[DOM]-003` | Security        | [Authorization, integrity, or confidentiality requirement] | Security test     |
+| `NFR-[DOM]-004` | Observability   | [Logging, metrics, tracing, or audit requirement]          | Inspection / test |
+| `NFR-[DOM]-005` | Maintainability | [Coverage, complexity, or dependency requirement]          | Static analysis   |
+
+---
+
+#### Workflows
+
+| Workflow ID      | Workflow        | Trigger   | Outcome   | Requirements                       |
+| ---------------- | --------------- | --------- | --------- | ---------------------------------- |
+| `WF-[DOM]-001` | [Workflow name] | [Trigger] | [Outcome] | `FR-[DOM]-001`, `FR-[DOM]-002` |
+| `WF-[DOM]-002` | [Workflow name] | [Trigger] | [Outcome] | `FR-[DOM]-003`                   |
+
+#### Workflow: `[WF-[DOM]-001]` — [Workflow Name]
+
+**Purpose:** [What this workflow accomplishes.]
+**Primary actor:** [User, service, event, scheduler, or external system.]
+**Trigger:** [What starts the workflow.]
+
+**Preconditions**
+
+- [Required state]
+- [Required input, authorization, or dependency]
+
+**Main flow**
+
+1. `[Actor]` submits or emits `[request/event]`.
+2. `[Entry point]` validates the request.
+3. `[Application service]` coordinates the operation.
+4. `[Domain component]` applies the business rules.
+5. `[Port or gateway]` performs the external interaction when required.
+6. `[Repository]` persists the result when required.
+7. The domain returns or publishes `[result/event]`.
+
+**Alternative flows**
+
+- **A1 — [Condition]:** [Alternative behaviour.]
+- **A2 — [Condition]:** [Alternative behaviour.]
+
+**Failure flows**
+
+- **F1 — Invalid input:** [Expected handling.]
+- **F2 — Dependency failure:** [Expected handling.]
+- **F3 — Unknown outcome:** [Expected recovery or reconciliation.]
+
+**Postconditions**
+
+- [Required state after success]
+- [Events, outputs, or audit records produced]
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API as Public API
+    participant Service as Application Service
+    participant Domain as Domain Logic
+    participant Port as Port / Gateway
+    participant Store
+
+    Client->>API: Submit request
+    API->>Service: Validated command
+    Service->>Domain: Apply rules
+    Domain-->>Service: Decision
+    Service->>Port: Perform operation
+    Port-->>Service: Result
+    Service->>Store: Persist outcome
+    Service-->>API: Response
+    API-->>Client: Final result
+```
+
+#### Configuration and Dependencies
+
+##### Prerequisites
+
+- Python `[version]`
+- `uv`
+- [External runtime or service]
+
+##### Dependencies
+
+| Dependency            | Type        | Purpose   | Required? |
+| --------------------- | ----------- | --------- | --------- |
+| `[library]`         | Third-party | [Purpose] | Yes       |
+| `[library]`         | Third-party | [Purpose] | Optional  |
+| `[internal-domain]` | Internal    | [Purpose] | Yes       |
+
 ```bash
 uv add [package_name]
 ```
 
-### Integration with `app` package
-Use of local modules
-```python
-# Correct — unified public registry
-from app.services.[module_name] import FunctionA, FunctionB
+##### Configuration
 
-# Incorrect — bypasses the registry and violates the design contract
-from app.services.[module_name].function_a import FunctionA  # Do not do this
-from app.services.[module_name].function_b import FunctionB  # Do not do this
-```
+| Setting            | Required | Default     | Description   |
+| ------------------ | -------: | ----------- | ------------- |
+| `[SETTING_NAME]` |      Yes | None        | [Description] |
+| `[SETTING_NAME]` |       No | `[value]` | [Description] |
 
-## Usage Examples
-[Provide code examples demonstrating the intended usage patterns. Highlight the "safe" or "recommended" way to interact with this module, referencing the rules in the Design Philosophy section.]
+---
 
-### Basic Usage
-This is like the "hello world" of this module.
+#### Public API and Implementation Map
 
 ```python
-# Example 1: [Description]
-from [module_path] import FunctionA
-
-result = FunctionA(param1, param2)
+from app.[path].[domain_name] import [PublicClass], [public_function]
 ```
 
-### Feature-Specific Usage
-[Describe any feature-specific usage patterns, such as using optional features, configuring the module, or working with edge cases. Reference relevant rules from the Design Philosophy section.]
+| Step | Module / File | Type             | Class         | Function / Method | Params                             | Returns           | Raises                         | Responsibility   | Side Effects |
+| ---: | ------------- | ---------------- | ------------- | ----------------- | ---------------------------------- | ----------------- | ------------------------------ | ---------------- | ------------ |
+|    1 | `[file.py]` | Class            | `[Class A]` |                   |                                    |                   |                                | Responsibility A | None         |
+|    2 | `[file.py]` | Function         | `[Class B]` | `[Function B]`  | `[param1: type1, param2: type2]` | `result : type` | `ValueError`: [Condition]    | Responsibility B | None         |
+|    3 | `[file.py]` | Model / Protocol | `[Class C]` |                   |                                    |                   | `[DomainError]`: [Condition] | Responsibility C | None         |
 
-```python
-# Example 2: [Description]
-from [module_path] import FunctionB
+---
 
-result = FunctionB(param1, param2)
+### 3.2 `[FEAT-002]` — [Feature Name]
+
+> Copy the complete feature structure from Section 4.1 for every additional feature.
+
+---
+
+## 4. Cross-Feature Workflows
+
+Use this section for workflows that coordinate multiple features within the domain.
+
+### 4.1 `[WF-[DOM]-100]` — [Cross-Feature Workflow Name]
+
+**Features involved**
+
+- `[FEAT-001]`
+- `[FEAT-002]`
+
+**Requirements covered**
+
+- `FR-[DOM]-001`
+- `FR-[DOM]-007`
+
+**Summary**
+
+[Explain how the features collaborate to produce an end-to-end result.]
+
+```mermaid
+flowchart LR
+    A[Feature A] --> B[Feature B]
+    B --> C[Domain Outcome]
 ```
 
-### Advanced Usage / Error Handling and Edge Cases
-[Describe how the module handles errors and edge cases. Mention any fallback behaviors, retry mechanisms, or error handling strategies. Reference relevant rules from the Design Philosophy section.]
+---
 
-```python
-# Example 3: [Description]
-from [module_path] import FunctionC
+## 5. Package and File Structure
 
-result = FunctionC(param1, param2)
+```text
+[domain_name]/
+├── __init__.py
+├── file1.py            # Single Responsibility
+├── file2.py            # Single Responsibility
+├── file3.py            # Single Responsibility
+├── module1/
+│   ├── __init__.py
+│   ├── file1.py        # Single Responsibility
+│   └── file2.py        # Single Responsibility
+└── README.md
 ```
 
-## API Reference
+---
 
-### `[Module]`
+## 6. Tests and Usage
 
-#### `FunctionA(param1: str, param2: int) -> str`
-[Brief description of what this function does, its parameters, and what it returns. Mention any important constraints or side effects.]
-
-**Parameters:**
-* `param1` (str): [Description]
-* `param2` (int): [Description]
-
-**Returns:**
-* `str`: [Description]
-
-**Raises:**
-* `ValueError`: [Description]
-* `TypeError`: [Description]
-
-**Example:**
-```python
-# Example usage
-from [module_path] import FunctionA
-
-result = FunctionA("hello", 42)
-print(result)
-```
-
-## Testing Strategy
-[Describe the testing strategy for this module. Mention any specific testing approaches, such as unit testing, integration testing, property-based testing, or contract testing. Reference relevant rules from the Design Philosophy section.]
-
-### Unit Tests
-[Describe the unit testing approach for this module. Mention any specific unit testing patterns, such as test-driven development, behavior-driven development, or test doubles. Reference relevant rules from the Design Philosophy section.]
-
-**Test command:**
 ```bash
-pytest tests/[module_path]/test_[function_name].py
+# Unit tests
+pytest tests/[domain]/unit
+
+# Workflow tests
+pytest tests/[domain]/workflows
+
+# Integration tests
+pytest tests/[domain]/integration
+
+# Usage examples tests
+pytest tests/[domain]/usage
 ```
 
-### Property-Based Tests
-[Describe any property-based testing approaches for this module. Mention any specific property-based testing frameworks or libraries used. Reference relevant rules from the Design Philosophy section.]
+---
 
-**Test command:**
-```bash
-pytest tests/[module_path]/test_property_based.py
-```
+## 7. Known Limitations
 
-### Integration Tests
-[Describe any integration testing approaches for this module. Mention any specific integration testing patterns, such as contract testing, component testing, or system testing. Reference relevant rules from the Design Philosophy section.]
+- [Current limitation]
+- [Unsupported scenario]
+- [Deferred capability]
 
-**Test command:**
-```bash
-pytest tests/[module_path]/test_integration.py
-```
+---
+
+## 8. Related Documentation
+
+- `[docs/PROJECT.md]`
+- `[docs/ARCHITECTURE.md]`
+- `[docs/MODULES.md]`
+- `[domain requirements document]`
+- `[workflow specification]`
+- `[API documentation]`

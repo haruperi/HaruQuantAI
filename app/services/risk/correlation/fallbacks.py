@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.services.risk.correlation.contracts import CorrelationFallbackContext
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models.contracts import CorrelationSnapshot
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 

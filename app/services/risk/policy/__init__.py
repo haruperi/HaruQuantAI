@@ -11,6 +11,7 @@ from typing import Any
 from pydantic import Field
 
 from app.services.risk.config import load_risk_config, validate_risk_config
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import (
     PolicyEnforcementResult,
     PolicyRule,
@@ -40,7 +41,6 @@ from app.services.risk.policy.resolver import (
     resolve_risk_policy,
     validate_policy_expiry,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import utc_now
 

@@ -6,18 +6,20 @@ Exported AI Tools:
 
 from __future__ import annotations
 
+import re
 import time
 from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Final, Literal
 
-from app.utils.errors import SecurityError, ValidationError, normalize_error_code
-from app.utils.identity import validate_request_id, validate_workflow_id
 from app.utils.logger import logger
 from app.utils.standard import (
+    SecurityError,
     StandardResponse,
+    ValidationError,
     build_metadata,
     error_response,
+    normalize_error_code,
     success_response,
 )
 
@@ -35,6 +37,59 @@ REQUIRES_NETWORK = False
 
 PrincipalType = Literal["owner", "operator", "service", "agent", "viewer"]
 DecisionStatus = Literal["allowed", "denied"]
+
+
+_ID_PATTERN: Final[re.Pattern[str]] = re.compile(r"^[a-z][a-z0-9-]{0,15}_[a-f0-9]{32}$")
+
+
+def _validate_id(value: object, expected_prefix: str) -> str:
+    """Validate and return a safe generated identifier."""
+    if not isinstance(value, str) or not value.strip():
+        logger.warning(
+            "identity validation failed",
+            extra={
+                "event_name": "identity_validation_failed",
+                "field_name": "id",
+                "error_code": "INVALID_INPUT",
+            },
+        )
+        raise ValidationError("id must be a non-empty string.", code="INVALID_INPUT")
+    safe_value = value.strip()
+    if not _ID_PATTERN.fullmatch(safe_value):
+        logger.warning(
+            "identity validation failed",
+            extra={
+                "event_name": "identity_validation_failed",
+                "field_name": "id",
+                "error_code": "INVALID_INPUT",
+            },
+        )
+        raise ValidationError(
+            "id must use prefix_uuid4hex format with safe characters only.",
+            code="INVALID_INPUT",
+        )
+    if not safe_value.startswith(f"{expected_prefix}_"):
+        logger.warning(
+            "identity validation failed",
+            extra={
+                "event_name": "identity_validation_failed",
+                "field_name": "id",
+                "error_code": "INVALID_INPUT",
+            },
+        )
+        raise ValidationError(
+            "id prefix does not match expected prefix.",
+            code="INVALID_INPUT",
+        )
+    return safe_value
+
+
+def _validate_request_id(value: object) -> str:
+    return _validate_id(value, expected_prefix="req")
+
+
+def _validate_workflow_id(value: object) -> str:
+    return _validate_id(value, expected_prefix="wf")
 
 
 def _string_set(value: object) -> set[str]:
@@ -92,8 +147,8 @@ def build_auth_context(
         roles=frozenset(roles),
         permissions=frozenset(permissions),
         scopes=frozenset(scopes),
-        request_id=validate_request_id(request_id),
-        workflow_id=validate_workflow_id(workflow_id),
+        request_id=_validate_request_id(request_id),
+        workflow_id=_validate_workflow_id(workflow_id),
         correlation_id=correlation_id,
     )
 

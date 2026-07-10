@@ -74,7 +74,8 @@ Utils (Shared Infrastructure Foundations)
 ### Public Registry & Module File Framework (`app/utils/`)
 
 * **Public Registry Rule**: Handled strictly via `app/utils/__init__.py` using explicit public exposure lists (`__all__`). No fallback imports, shims, or duplicate modules are permitted.
-* **Submodule Footprint**: `logger`, `standard`, `errors`, `identity`, `normalization`, `paths`, `dataframe_tools`, `data_quality`, `schema_validation`, `security`, `settings`, `auth`, `event_bus`, `error_routing`, `notifications`, `observability`.
+* **Submodule Footprint**: `logger`, `standard`, `errors`, `identity`, `normalization`, `dataframe_tools`, `data_quality`, `schema_validation`, `security`, `settings`, `auth`, `error_routing`, `notifications`, `observability`.
+* **Contract Ownership Rule**: Domain contract modules own their own base contract behavior locally. They must not inherit from or import a centralized utility contract base.
 
 ### Standard AI Tool Response Contract
 
@@ -102,7 +103,7 @@ Every official utility or domain tool exposed to AI layers must return five root
 }
 ```
 
-### Core Event Bus Envelope
+### Domain Audit Event Shape
 
 ```json
 {
@@ -175,7 +176,7 @@ Every official utility or domain tool exposed to AI layers must return five root
 | **Application Environment** | `APP_NAME`, `ENVIRONMENT`, `API_HOST`, `API_PORT`, `UI_ORIGIN` |
 | **System Persistence** | `DATABASE_URL`, `DATA_DIR`, `ARTIFACT_DIR`, `DATA_CACHE_PATH` |
 | **Operational Protection** | `ALLOW_LIVE_MUTATIONS` (Defaults to `false`), `PROFILE` |
-| **System Observability** | `LOG_LEVEL`, `LOG_RENDER`, `EVENT_BUS_BACKEND`, `METRICS_ENABLED`, `METRICS_PORT` |
+| **System Observability** | `LOG_LEVEL`, `LOG_RENDER`, `METRICS_ENABLED`, `METRICS_PORT` |
 | **Broker Integration (MT5)** | `MT5_ENABLED`, `MT5_LOGIN`, `MT5_PASSWORD`, `MT5_SERVER`, `MT5_TERMINAL_PATH` |
 | **Email Service Routes** | `NOTIFICATION_EMAIL_ENABLED`, SMTP host/port/user/password/from/to records |
 | **Telegram Alert Gate** | `NOTIFICATION_TELEGRAM_ENABLED`, `NOTIFICATION_TELEGRAM_BOT_TOKEN`, `NOTIFICATION_TELEGRAM_CHAT_IDS` |

@@ -1,5 +1,12 @@
 """Shared contracts and base classes for HaruQuant strategies."""
 
+from app.services.strategy.base import BaseStrategy, StrategyPermissionError
+from app.services.strategy.config import (
+    ConfigurationError,
+    StrategyConfig,
+    load_strategy_config,
+    validate_strategy_config,
+)
 from app.services.strategy.contracts import (
     AccountSnapshot,
     Bar,
@@ -15,13 +22,6 @@ from app.services.strategy.contracts import (
     SignalSet,
     StrategyDecision,
     TradeIntent,
-)
-from app.services.strategy.base import BaseStrategy, StrategyPermissionError
-from app.services.strategy.config import (
-    ConfigurationError,
-    StrategyConfig,
-    load_strategy_config,
-    validate_strategy_config,
 )
 from app.services.strategy.state import StrategyState
 

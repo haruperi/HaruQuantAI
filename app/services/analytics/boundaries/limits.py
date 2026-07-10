@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from app.utils.errors import ValidationError
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils.logger import logger
 
 

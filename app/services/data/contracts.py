@@ -7,22 +7,130 @@ objects across module boundaries.
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Callable
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Protocol, runtime_checkable
 
 import pandas as pd
-from pydantic import Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-from app.utils.contract import Contract
+from app.services.data.errors import DataValidationError as ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import normalize_timestamp
+from app.utils.standard import SENSITIVE_KEY_PATTERN, canonical_json
 
 type JsonScalar = str | int | float | bool | None
 type JsonValue = JsonScalar | list[JsonValue] | dict[str, JsonValue]
 type DataRecord = dict[str, JsonValue]
 type DataRecords = list[DataRecord]
 type SymbolMetadataRecord = dict[str, JsonValue]
+
+_SCHEMA_VERSION_MIN_PARTS = 2
+
+_TRACE_FIELDS: frozenset[str] = frozenset(
+    {"created_at", "request_id", "workflow_id", "correlation_id"}
+)
+
+
+class Contract(BaseModel):
+    """Local base model for data service contracts."""
+
+    schema_version: str = Field(
+        default="1.0.0",
+        description="Contract schema version (major.minor.patch).",
+    )
+    created_at: str = Field(
+        default_factory=lambda: datetime.now(UTC).isoformat(),
+        description="UTC ISO 8601 creation timestamp.",
+    )
+    request_id: str | None = Field(default=None, description="Correlation request ID.")
+    workflow_id: str | None = Field(
+        default=None, description="Associated workflow run identifier."
+    )
+    correlation_id: str | None = Field(
+        default=None, description="Causation correlation identifier."
+    )
+    metadata: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Namespaced adapter, provider, or experimental fields.",
+    )
+
+    @field_validator("metadata")
+    @classmethod
+    def validate_metadata_structure(cls, value: dict[str, Any]) -> dict[str, Any]:
+        """Validate metadata namespacing and secret safety."""
+        for key in value:
+            if not isinstance(key, str):
+                raise TypeError("Metadata keys must be strings.")
+            if "." not in key and ":" not in key:
+                msg = (
+                    f"Metadata key '{key}' is not namespaced. "
+                    "Keys must be namespaced with a '.' or ':' separator."
+                )
+                raise ValueError(msg)
+            if SENSITIVE_KEY_PATTERN.search(key):
+                msg = (
+                    f"Metadata key '{key}' matches sensitive key pattern "
+                    "and is not allowed."
+                )
+                raise ValueError(msg)
+        try:
+            canonical_json(value)
+        except (TypeError, ValueError) as exc:
+            msg = f"Metadata is not deterministically serializable: {exc}"
+            raise ValueError(msg) from exc
+        return value
+
+    @model_validator(mode="after")
+    def validate_trace_identifiers(self) -> Contract:
+        """Validate trace identifier fields."""
+        for name in ("request_id", "workflow_id", "correlation_id"):
+            value = getattr(self, name)
+            if value is not None and (not isinstance(value, str) or not value.strip()):
+                msg = f"{name} must be a non-empty string or None."
+                raise ValueError(msg)
+        return self
+
+    def to_json(self) -> str:
+        """Serialize this contract to deterministic canonical JSON."""
+        try:
+            return canonical_json(self.model_dump())
+        except (TypeError, ValueError) as exc:
+            msg = f"Failed to serialize contract: {exc}"
+            raise ValidationError(msg) from exc
+
+    def content_hash(self) -> str:
+        """Calculate a stable SHA256 hash over business-data fields only."""
+        payload = {
+            key: value
+            for key, value in self.model_dump().items()
+            if key not in _TRACE_FIELDS
+        }
+        try:
+            serialized = canonical_json(payload)
+        except (TypeError, ValueError) as exc:
+            msg = f"Failed to compute content hash: {exc}"
+            raise ValidationError(msg) from exc
+        return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+    def contract_hash(self) -> str:
+        """Calculate SHA256 hash over the full serialized contract."""
+        return hashlib.sha256(self.to_json().encode("utf-8")).hexdigest()
+
+    def check_compatibility(self, target_version: str) -> bool:
+        """Check whether this contract version is compatible with a target."""
+        min_parts = 2
+        try:
+            current_parts = [int(part) for part in self.schema_version.split(".")]
+            target_parts = [int(part) for part in target_version.split(".")]
+            if len(current_parts) < min_parts or len(target_parts) < min_parts:
+                return False
+            if current_parts[0] != target_parts[0]:
+                return False
+            return current_parts[1] >= target_parts[1]
+        except ValueError:
+            return False
 
 
 @runtime_checkable
@@ -306,7 +414,7 @@ def _validate_timestamp_iso(v: str) -> str:
         return normalize_timestamp(v).isoformat()
     except Exception as e:
         # Broad catch is intentional: normalize_timestamp may raise either
-        # stdlib ValueError/TypeError or app.utils.errors.ValidationError.
+        # stdlib ValueError/TypeError or app.utils.standard.ValidationError.
         # All failures must surface as ValueError for Pydantic field validators.
         msg = f"Invalid timestamp format: {v}"
         raise ValueError(msg) from e

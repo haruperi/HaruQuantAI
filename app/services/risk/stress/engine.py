@@ -560,7 +560,7 @@ def apply_market_shock(
 
     if len(portfolio.portfolio_state.positions) < _LOG_PORTFOLIO_SIZE_THRESHOLD:
         logger.debug("Market shock applied successfully.")
-    return cast(Any, res)
+    return cast("Any", res)
 
 
 def calculate_stress_loss(

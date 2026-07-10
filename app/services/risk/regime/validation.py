@@ -17,7 +17,7 @@ from app.utils.logger import logger
 
 if TYPE_CHECKING:
     from app.services.risk.regime.assessor import RegimeAssessment
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 def validate_regime_inputs(market: MarketRiskSnapshot) -> ValidationResult:

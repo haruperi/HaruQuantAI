@@ -17,7 +17,7 @@ from app.services.analytics.contracts.models import (
     AnalyticsWarning,
     QualityFlag,
 )
-from app.utils.errors import ValidationError
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils.logger import logger
 
 # Patterns for sensitive keys and sensitive-looking string values (ANL-NFR-276)

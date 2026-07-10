@@ -10,9 +10,9 @@ from datetime import UTC, datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
-from app.services.strategy.contracts import Bar
+from app.services.data.errors import DataValidationError as ValidationError
 from app.services.data.storage import db_helper
-from app.utils.errors import ValidationError
+from app.services.strategy.contracts import Bar
 from app.utils.logger import logger
 
 # --- 1. Limits Rules ---

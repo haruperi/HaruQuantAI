@@ -10,6 +10,7 @@ from typing import Any
 
 import pandas as pd
 
+from app.services.strategy.config import StrategyConfig
 from app.services.strategy.contracts import (
     Direction,
     EntryType,
@@ -22,7 +23,6 @@ from app.services.strategy.contracts import (
     StrategyDecision,
     TradeIntent,
 )
-from app.services.strategy.config import StrategyConfig
 from app.services.strategy.state import StrategyState
 
 

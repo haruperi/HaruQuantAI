@@ -12,6 +12,8 @@ from app.services.data.contracts import (
     DataRecords,
     SourceAdapterPort,
 )
+from app.services.data.errors import DataExternalServiceError as ExternalServiceError
+from app.services.data.errors import DataValidationError as ValidationError
 from app.services.data.normalization import (
     bars_dataframe_to_records,
     mt5_ticks_dataframe_to_records,
@@ -23,7 +25,6 @@ from app.services.data.transforms import (
     generate_synthetic_bars,
     generate_synthetic_ticks,
 )
-from app.utils.errors import ExternalServiceError, ValidationError
 from app.utils.logger import logger
 from app.utils.security import redact_text
 

@@ -13,8 +13,9 @@ from typing import TYPE_CHECKING, Any, Protocol, TypedDict
 
 from pydantic import Field
 
+from app.services.risk.errors import RiskDataError as DataError
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models.contracts import RiskContract
-from app.utils.errors import DataError, ValidationError
 from app.utils.logger import logger
 from app.utils.standard import canonical_json
 
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
         RiskDecisionPackage,
         RiskMode,
     )
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 class DecisionIdempotencyKey(RiskContract):

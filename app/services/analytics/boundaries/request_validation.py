@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from app.services.analytics.contracts import MetricConfig, MetricResult
-from app.utils.errors import ValidationError
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils.logger import logger
 
 if TYPE_CHECKING:

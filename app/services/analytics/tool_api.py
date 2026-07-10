@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any, cast
 
 from app.services.analytics.benchmarks import calculate_benchmark_metrics
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.services.analytics.metrics.aggregate import (
     calculate_analytics_for_subset,
     calculate_trade_metrics,
@@ -34,7 +35,6 @@ from app.utils import (
     response_from_exception,
     success_response,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 BuildAnalyticsReportRequest = dict[str, Any]

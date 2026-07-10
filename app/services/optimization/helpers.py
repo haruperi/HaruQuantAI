@@ -19,7 +19,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
-from app.utils.errors import Error
+from app.services.optimization.errors import OptimizationError as Error
 from app.utils.standard import StandardResponse, canonical_json
 
 if TYPE_CHECKING:

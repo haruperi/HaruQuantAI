@@ -29,9 +29,9 @@
 
 * **Inputs**: Raw logs, event payloads, alerts, metrics.
 * **Outputs**: Formatted JSON/colorized logs, Prometheus metrics, routed notifications, standard envelopes.
-* **Owns**: Structured logging (JSON for prod, colorized human-readable for dev), UTC time/timezone formatting, standard tool response envelopes, error mapping (`HaruQuantError`), prefixed IDs (UUID4/ULID), safe path normalization, canonical JSON serialization, in-process Event Bus (deterministic, ordered per event type), alert/notification routing (Email, Telegram, Desktop), Prometheus health metrics.
+* **Owns**: Structured logging (JSON for prod, colorized human-readable for dev), UTC time/timezone formatting, standard tool response envelopes, error mapping (`HaruQuantError`), prefixed IDs (UUID4/ULID), canonical JSON serialization, alert/notification routing (Email, Telegram, Desktop), Prometheus health metrics.
 * **Boundaries**: Strictly stateless and business-decision free. *Does not own* strategy logic, broker operations, risk rules, or persistence.
-* **Key Limits**: Idempotency keys use TTL/eviction tracking. Queue full returns immediate `BACKPRESSURE_EXCEEDED` or `QUEUE_FULL` (fail-fast for critical workflows).
+* **Key Limits**: Shared utilities remain stateless by default. Stateful audit/event behavior and domain contract base behavior are owned locally by the domain module that emits or defines them.
 
 ### 2. Data
 

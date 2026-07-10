@@ -32,7 +32,7 @@ from app.utils.logger import logger
 
 if TYPE_CHECKING:
     from app.services.risk.policy.contracts import EffectiveRiskPolicy
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 class SlippagePolicy(RiskContract):

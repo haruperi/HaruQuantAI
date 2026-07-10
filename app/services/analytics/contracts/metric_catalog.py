@@ -15,7 +15,7 @@ from app.services.analytics.contracts.models import (
     SchemaCompatibilityMatrix,
     ToolDefinition,
 )
-from app.utils.errors import ValidationError
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils.logger import logger
 
 # Schema compatibility matrix definitions (ANL-NFR-085)
@@ -1024,7 +1024,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_report.py",),
+        tests=("tests/analytics/unit/test_report.py",),
     ),
     "build_portfolio_analytics_report": ToolDefinition(
         name="build_portfolio_analytics_report",
@@ -1034,7 +1034,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="approved_experimental",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_report.py",),
+        tests=("tests/analytics/unit/test_report.py",),
     ),
     "evaluate_strategy_quality": ToolDefinition(
         name="evaluate_strategy_quality",
@@ -1044,7 +1044,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_scorecard.py",),
+        tests=("tests/analytics/unit/test_scorecard.py",),
     ),
     "calculate_trade_metrics": ToolDefinition(
         name="calculate_trade_metrics",
@@ -1054,7 +1054,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_metrics.py",),
+        tests=("tests/analytics/unit/test_metrics.py",),
     ),
     "calculate_equity_metrics": ToolDefinition(
         name="calculate_equity_metrics",
@@ -1064,7 +1064,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_metrics.py",),
+        tests=("tests/analytics/unit/test_metrics.py",),
     ),
     "calculate_drawdown_metrics": ToolDefinition(
         name="calculate_drawdown_metrics",
@@ -1074,7 +1074,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_metrics.py",),
+        tests=("tests/analytics/unit/test_metrics.py",),
     ),
     "calculate_risk_metrics": ToolDefinition(
         name="calculate_risk_metrics",
@@ -1084,7 +1084,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_metrics.py",),
+        tests=("tests/analytics/unit/test_metrics.py",),
     ),
     "calculate_benchmark_metrics": ToolDefinition(
         name="calculate_benchmark_metrics",
@@ -1094,7 +1094,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_metrics.py",),
+        tests=("tests/analytics/unit/test_metrics.py",),
     ),
     "calculate_statistical_validation": ToolDefinition(
         name="calculate_statistical_validation",
@@ -1104,7 +1104,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; deterministic when seeded helpers are used",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_report.py",),
+        tests=("tests/analytics/unit/test_report.py",),
     ),
     "calculate_prop_firm_compliance": ToolDefinition(
         name="calculate_prop_firm_compliance",
@@ -1114,7 +1114,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="approved_experimental",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_report.py",),
+        tests=("tests/analytics/unit/test_report.py",),
     ),
     "build_overview_payload": ToolDefinition(
         name="build_overview_payload",
@@ -1124,7 +1124,7 @@ OFFICIAL_ANALYTICS_TOOL_CATALOG: Mapping[str, ToolDefinition] = {
         side_effects="read-only; no writes, trades, database mutations, or network",
         stability="stable",
         agent_api_safe=True,
-        tests=("tests/unit/app/services/analytics/test_metrics.py",),
+        tests=("tests/analytics/unit/test_metrics.py",),
     ),
 }
 

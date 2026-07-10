@@ -9,6 +9,10 @@ All notable HaruQuantAI project changes should be recorded here.
 | REF-001 | Relocate all trader info files to info/ | Relocated all generic trader *Info wrapper files to app/services/trader/info/ and renamed them dropping the _info suffix. Updated all codebase references. |
 | REF-002 | Neutralize trading info docstrings | Removed all 'MQL5-compatible' references in app/services/trading/info/ docstrings to align with the broker/platform neutral design. |
 | REF-003 | Retire Live service into Trading | Deleted the old Live service after auditing functional coverage in `app/services/trading/`, migrating active docs/tests away from the old import surface, and preserving live-route execution as a Trading runtime responsibility. |
+| REF-004 | Retire `app.utils.paths` | Removed the shared path utility module, moved the small remaining caller-specific path normalization into local runtime modules, and removed the public `app.utils` path exports. |
+| REF-005 | Retire `app.utils.event_bus` | Removed the shared in-memory event bus module, moved the remaining error-routing and kill-switch audit event behavior into local callers, and removed the public `app.utils` event bus exports. |
+| REF-006 | Retire `app.utils.contract` | Removed the centralized contract base, moved contract serialization/hash/trace behavior into domain-owned contract modules, and deleted the shared utility contract file to support decoupled domain contracts. |
+| REF-007 | Retire `app.utils.validations` | Moved the remaining risk validation result helpers into `app/services/risk/validations.py`, removed the public utility validation exports, and deleted the centralized validation utility module. |
 
 
 ## Added
@@ -21,7 +25,7 @@ All notable HaruQuantAI project changes should be recorded here.
 | ADD-004 | Safe Path Normalization | Added Safe path normalization and explicit directory creation helpers. Usage example `example_04_safe_path_normalization_example()` in `tests/usage/app/services/01_utils.py`. |
 | ADD-005 | Security helpers | Added Security helpers for redaction, hashing, and optional encryption. Usage example `example_05_security_and_redaction()` in `tests/usage/app/services/01_utils.py`. |
 | ADD-006 | Runtime settings. | Added Runtime configuration and settings loading using Pydantic. Usage example `example_06_runtime_settings()` in `tests/usage/app/services/01_utils.py`. |
-| ADD-007 | `app/utils` Module Documentation & Dependencies | Created the README of `app/utils` from the standard template, resolved missing `logger.py` and `event_bus.py` bridges, and added `pydantic`/`pydantic-settings` dependencies. |
+| ADD-007 | `app/utils` Module Documentation & Dependencies | Created the README of `app/utils` from the standard template, resolved missing utility bridges, and added `pydantic`/`pydantic-settings` dependencies. |
 | ADD-008 | Broker Resolver | Added broker integration framework with support for Binance, Dukascopy, Yahoo, MT5, and cTrader providers. |
 | ADD-009 | Market Data Service Architecture | Added market data service architecture with multi-source support for market data fetching, caching, and time-series management. Module `app/services/data`. Usage examples in `tests/usage/app/services/02_data.py`. |
 | ADD-010 | Indicator Service library | Added technical indicator service library with support for various technical indicators and module `app/services/indicators`. Usage examples in `tests/usage/app/services/03_indicators.py`. |

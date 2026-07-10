@@ -14,7 +14,7 @@ from app.utils.standard import canonical_json
 
 if TYPE_CHECKING:
     from app.services.risk.models import RiskConfig
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 @dataclass(frozen=True)

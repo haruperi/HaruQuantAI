@@ -18,13 +18,13 @@ This document reverse-engineers the isolated architecture requirements defined i
 The `app/utils` module represents the shared, dependency-light foundation for deterministic technical primitives in HaruQuantAI (`UTIL-FR-116`). It provides standard envelopes, structured logging, clock normalization, safe path resolution, event distribution, notification routing, and telemetry reporting.
 
 ### Scope Boundaries
-* **In-Scope**: Structured JSON/console logging, standard tool envelopes, UTC timestamp normalization, safe path traversal and directory creation, read-only dataframe transformations and comparisons, stateless data-quality audits (OHLCV inspection), schema validations, denylist-first redaction, Argon2id hashing, Fernet symmetric encryption, settings loading/injection, authorization helper checks, in-process Event Bus, notification routing/throttling, and observability/metrics/health snapshots.
+* **In-Scope**: Structured JSON/console logging, standard tool envelopes, UTC timestamp normalization, safe path traversal and directory creation, read-only dataframe transformations and comparisons, stateless data-quality audits (OHLCV inspection), schema validations, denylist-first redaction, Argon2id hashing, Fernet symmetric encryption, settings loading/injection, authorization helper checks, in-process audit event, notification routing/throttling, and observability/metrics/health snapshots.
 * **Out-of-Scope**: Trading strategy logic, live broker execution, risk/allocation approval, portfolio decisions, database repositories, backtest engines, market data repair/cleaning/resampling, external identity provider ownership, and production-ready broker-backed event queues (e.g., RabbitMQ, Kafka) (`UTIL-FR-019`, `UTIL-FR-020`, `UTIL-FR-021`).
 
 ### Entry and Exit Points
 * **Entry Points**:
   * Agent-callable public wrappers (`validate_ohlcv_quality`, `validate_handoff_payload`, `redact_mapping`) (`UTIL-FR-022`, `public_tools.py`).
-  * In-process Event Bus publish APIs (`EventBus.publish`) (`UTIL-FR-127`).
+  * In-process audit event publish APIs (`AuditEventRouter.publish`) (`UTIL-FR-127`).
   * Runtime settings loading triggers (`load_runtime_settings`) (`UTIL-FR-109`).
   * Telemetry monitoring loops (clock drift checks, log rotation) (`UTIL-NFR-007`, `UTIL-FR-007`).
 * **Exit Points**:
@@ -170,11 +170,11 @@ Since this workflow is stateless and read-only, recovery requires the caller to 
 | **WF-001-SC-001** | Happy Path Tool Run | Active valid `AuthContext`, registered official tool `validate_ohlcv_quality` | The tool is invoked with a valid data payload | The tool execution completes, standard envelope is built with metadata and duration | State remains healthy; metrics incremented | `UTIL-FR-023`, `UTIL-FR-025`, `UTIL-FR-026`, `UTIL-FR-055` |
 | **WF-001-SC-002** | Unauthorized Agent Call | An agent context missing permissions for a tool | The agent invokes the tool | The wrapper rejects execution immediately returning `PERMISSION_DENIED` envelope | State is blocked/fail-closed; logs emitted | `UTIL-FR-119`–`UTIL-FR-121` |
 | **WF-001-SC-003** | Unexpected Boundary Error | Valid agent context, but capability throws unexpected exception | The tool runs and throws a DB error | The boundary catches the error and maps it safely to `TOOL_EXECUTION_FAILED` without leaking tracebacks | State is healthy; error logs are written | `UTIL-FR-025`, `UTIL-FR-039`, `UTIL-FR-101` |
-| **WF-002-SC-001** | Happy Path Event Delivery | Subscribed handler registered, unique event published | Publisher publishes event to Event Bus | Event is delivered to subscribers in deterministic order | Backlog returns to 0; cache populated | `UTIL-FR-129`, `UTIL-FR-130`, `UTIL-FR-139` |
-| **WF-002-SC-002** | Subscriber Error Isolation | Multiple subscribers registered, one subscriber throws exception | Event is published | The failing handler is isolated; the other handler runs successfully; error is routed | Failing handler logged; Event Bus continues | `UTIL-FR-129`, `UTIL-FR-136` |
-| **WF-002-SC-003** | Idempotency Key Match | Duplicate event published with the same `idempotency_key` | Event is published | The Event Bus returns the cached result without executing handlers again | State is unchanged; duplicate metrics updated | `UTIL-FR-130` |
+| **WF-002-SC-001** | Happy Path Event Delivery | Subscribed handler registered, unique event published | Publisher publishes event to audit event | Event is delivered to subscribers in deterministic order | Backlog returns to 0; cache populated | `UTIL-FR-129`, `UTIL-FR-130`, `UTIL-FR-139` |
+| **WF-002-SC-002** | Subscriber Error Isolation | Multiple subscribers registered, one subscriber throws exception | Event is published | The failing handler is isolated; the other handler runs successfully; error is routed | Failing handler logged; audit event continues | `UTIL-FR-129`, `UTIL-FR-136` |
+| **WF-002-SC-003** | Idempotency Key Match | Duplicate event published with the same `idempotency_key` | Event is published | The audit event returns the cached result without executing handlers again | State is unchanged; duplicate metrics updated | `UTIL-FR-130` |
 | **WF-002-SC-004** | Idempotency Key Conflict | Same `idempotency_key` published, but payload hashes differ | Event is published | The system fails closed, rejecting the publish with conflict diagnostics | State is unchanged; conflict warning logged | `UTIL-FR-130` |
-| **WF-002-SC-005** | Queue Backpressure | In-process queue depth exceeds max size under `fail_fast` | Event is published | The Event Bus rejects the event immediately, returning `QUEUE_FULL` | Queue depth remains maxed; error returned | `UTIL-FR-132`, `UTIL-FR-136` |
+| **WF-002-SC-005** | Queue Backpressure | In-process queue depth exceeds max size under `fail_fast` | Event is published | The audit event rejects the event immediately, returning `QUEUE_FULL` | Queue depth remains maxed; error returned | `UTIL-FR-132`, `UTIL-FR-136` |
 | **WF-003-SC-001** | Throttled Alerts (Alert Storm) | 50 identical error notifications triggered within 1 second | System routes notifications | Throttling mechanism deduplicates messages, routing only the first, suppressing the rest | Suppression metrics incremented | `UTIL-FR-144`, `UTIL-FR-150` |
 | **WF-003-SC-002** | Outbound Circuit Open | Notifications fail continuously due to provider timeout | Notifications are triggered | The circuit breaker transitions to `open`; subsequent calls fail fast with `CIRCUIT_OPEN` | Outbound calls blocked; health degrades | `UTIL-FR-146`, `UTIL-FR-151`, `UTIL-NFR-008` |
 | **WF-003-SC-003** | Template Rendering Fallback | Template renderer fails due to malformed payload | Message is compiled | The system generates a plain-text backup summary without throwing a crash | plain text alerts dispatched | `UTIL-FR-143`, `UTIL-FR-154` |
@@ -183,9 +183,9 @@ Since this workflow is stateless and read-only, recovery requires the caller to 
 | **WF-005-SC-002** | Missing Mandatory Columns | Input dataframe lacks `close` price column | `validate_ohlcv_quality` called | Returns `INVALID_INPUT` in error code, payload not mutated | State is healthy | `UTIL-FR-076` |
 | **WF-005-SC-003** | Dataset Quality Truncation | Input dataframe has 10,000 bad rows | `validate_ohlcv_quality` called | Report is compiled but issue lists are sliced to configured limits | Truncation flags set to `True` | `UTIL-FR-081`, `UTIL-FR-085` |
 | **WF-006-SC-001** | Handoff Version Compatibility Fail | Payload major version is `2.0.0`, schema version is `1.2.0` | `validate_handoff_payload` called | Returns `VALIDATION_FAILED` version mismatch error | State is healthy | `UTIL-FR-089` |
-| **WF-007-SC-001** | Clock Drift Degraded State | Monitored system clock offset is `5.0` seconds (threshold `2.0`s) | Drift check triggered | Health snapshot transitions to degraded; warnings published to Event Bus | Health degraded; warning events emitted | `UTIL-NFR-007` |
+| **WF-007-SC-001** | Clock Drift Degraded State | Monitored system clock offset is `5.0` seconds (threshold `2.0`s) | Drift check triggered | Health snapshot transitions to degraded; warnings published to audit event | Health degraded; warning events emitted | `UTIL-NFR-007` |
 | **WF-007-SC-002** | Offset Provider Unavailable | No time synchronization socket or provider config available | Drift check triggered | Monitor reports status explicitly as `unsupported`/`not_configured` | Health set to unsupported (never healthy) | `UTIL-NFR-007` |
-| **WF-008-SC-001** | Path Traversal Attempt | Target path contains relative parent escapes `../../etc` | `ensure_dir` called with `base_dir` | Traversal check blocks execution, raising `ValidationError` | Folder creation blocked; fails closed | `UTIL-FR-067` |
+| **WF-008-SC-001** | Path Traversal Attempt | Target path contains relative parent escapes `../../etc` | Domain-local filesystem boundary validates the target | Traversal check blocks execution, raising `ValidationError` | Folder creation blocked; fails closed | `UTIL-FR-067` |
 | **WF-009-SC-001** | Retention Pruning Filesystem Fail | Rotated log files are locked by OS process during cleanup | Retention routine triggered | Log deletion fails, exception caught safely, console fallback logs written | Fallback logs emitted; system does not crash | `UTIL-FR-008` |
 
 ---
@@ -196,11 +196,11 @@ Since this workflow is stateless and read-only, recovery requires the caller to 
 | **WF-001** (Tool Execution) | Invokes (Child) | **WF-005** (Data Quality Audit) | When the caller calls `validate_ohlcv_quality` |
 | **WF-001** (Tool Execution) | Invokes (Child) | **WF-006** (Payload Validation) | When the caller calls `validate_handoff_payload` |
 | **WF-001** (Tool Execution) | Invokes (Child) | **WF-008** (Path Resolution) | When configuring logging sinks |
-| **WF-002** (Event Bus) | Invokes (Child) | **WF-003** (Error Routing) | On subscriber execution failure |
-| **WF-003** (Error Routing) | Invokes (Child) | **WF-002** (Event Bus) | To publish notification outcome events |
+| **WF-002** (audit event) | Invokes (Child) | **WF-003** (Error Routing) | On subscriber execution failure |
+| **WF-003** (Error Routing) | Invokes (Child) | **WF-002** (audit event) | To publish notification outcome events |
 | **WF-004** (Settings Load) | Invokes (Child) | **WF-008** (Path Resolution) | To resolve data, cache, and audit directories |
 | **WF-004** (Settings Load) | Invokes (Child) | **WF-009** (Log Rotation) | During idempotent configuration of file handlers |
-| **WF-007** (Drift Monitor) | Invokes (Child) | **WF-002** (Event Bus) | To publish `CLOCK_DRIFT_DETECTED` warning events |
+| **WF-007** (Drift Monitor) | Invokes (Child) | **WF-002** (audit event) | To publish `CLOCK_DRIFT_DETECTED` warning events |
 
 ---
 
@@ -216,7 +216,7 @@ Tracks the operational status of external notification adapters (`UTIL-FR-146`, 
   * `HALF-OPEN` $\rightarrow$ `CLOSED`: Triggered when test calls succeed.
   * `HALF-OPEN` $\rightarrow$ `OPEN`: Triggered when any test call fails.
 
-### 2. In-Process Event Bus Queue Lifecycle (`events.in_process`)
+### 2. In-Process audit event Queue Lifecycle (`events.in_process`)
 Coordinates backpressure and message flows (`UTIL-FR-131`, `UTIL-FR-132`).
 * **States**: `IDLE` (no events), `PROCESSING` (delivery active), `BACKPRESSURE` (queue limits hit)
 * **Transitions**:
@@ -269,7 +269,7 @@ How different components interact during execution.
 | **UTIL-FR-008** | Log fails degrade safely, never write secrets | WF-009, WF-004 | WF-009-SC-001 | Step 4 | Fully represented |
 | **UTIL-FR-009** | Log level controllable by settings | WF-004 | WF-004-SC-001 | Step 5 | Fully represented |
 | **UTIL-FR-010** | Log tool calls, successes, failures, traces | WF-001 | WF-001-SC-001 | Step 4, Step 9 | Fully represented |
-| **UTIL-FR-011** | Log Event Bus publishes, subscriber errors, DLQs | WF-002 | WF-002-SC-001 | Step 8 | Fully represented |
+| **UTIL-FR-011** | Log audit event publishes, subscriber errors, DLQs | WF-002 | WF-002-SC-001 | Step 8 | Fully represented |
 | **UTIL-FR-012** | Log notification routing outcomes, redacted | WF-003 | WF-003-SC-001 | Step 10 | Fully represented |
 | **UTIL-FR-013** | Log auth validation & authorization decisions | WF-001, WF-004 | WF-001-SC-002 | Step 3, Step 4 | Fully represented |
 | **UTIL-FR-014** | Log metrics/health failure events | WF-007 | WF-007-SC-002 | Step 6 | Fully represented |
@@ -305,7 +305,7 @@ How different components interact during execution.
 | **UTIL-FR-044** | Error routing, severity evaluation, formatting | WF-003 | WF-003-SC-001 | Step 1 | Fully represented |
 | **UTIL-FR-045** | error deduplication and suppression rules | WF-003 | WF-003-SC-001 | Step 2 | Fully represented |
 | **UTIL-FR-046** | suppress alert storms | WF-003 | WF-003-SC-001 | Step 2 | Fully represented |
-| **UTIL-FR-047** | route events to Event Bus | WF-003 | WF-003-SC-001 | Step 9 | Fully represented |
+| **UTIL-FR-047** | route events to audit event | WF-003 | WF-003-SC-001 | Step 9 | Fully represented |
 | **UTIL-FR-048** | notification settings routing mappings | WF-003 | WF-003-SC-001 | Step 3 | Fully represented |
 | **UTIL-FR-049** | Document error routing rules | None | None | None | Supporting constraint |
 | **UTIL-FR-050** | Verify error routing tests | None | None | None | Supporting constraint |
@@ -385,7 +385,7 @@ How different components interact during execution.
 | **UTIL-FR-124** | Document auth context details | None | None | None | Supporting constraint |
 | **UTIL-FR-125** | Canonical JSON strings | WF-001 | WF-001-SC-001 | Step 8 | Fully represented |
 | **UTIL-FR-126** | Verify auth tests | None | None | None | Supporting constraint |
-| **UTIL-FR-127** | Event Bus pub/sub, in-process defaults | WF-002 | WF-002-SC-001 | Step 1 | Fully represented |
+| **UTIL-FR-127** | audit event pub/sub, in-process defaults | WF-002 | WF-002-SC-001 | Step 1 | Fully represented |
 | **UTIL-FR-128** | Event Envelope keys and payload serialization | WF-002 | WF-002-SC-001 | Step 1 | Fully represented |
 | **UTIL-FR-129** | Handler registration & error isolation | WF-002 | WF-002-SC-002 | Step 5, Step 7 | Fully represented |
 | **UTIL-FR-130** | Idempotency caches validation with hashes | WF-002 | WF-002-SC-003 | Step 2 | Fully represented |
@@ -394,11 +394,11 @@ How different components interact during execution.
 | **UTIL-FR-133** | external broker adapter circuit breaking | WF-002 | WF-002-SC-006 | Step 1 | Fully represented |
 | **UTIL-FR-134** | Concurrency safety, immutable copied payloads | WF-002 | WF-002-SC-001 | Step 4, Step 5 | Fully represented |
 | **UTIL-FR-135** | Diagnostic payload boundaries (hash only) | WF-002 | WF-002-SC-001 | Step 2 | Fully represented |
-| **UTIL-FR-136** | Event Bus error mappings (QUEUE_FULL) | WF-002 | WF-002-SC-005 | Step 7 | Fully represented |
-| **UTIL-FR-137** | Redact Event Bus details | WF-002 | WF-002-SC-001 | Step 1, Step 8 | Fully represented |
-| **UTIL-FR-138** | Document Event Bus properties | None | None | None | Supporting constraint |
-| **UTIL-FR-139** | In-process Event Bus test tools | WF-002 | WF-002-SC-001 | Step 5 | Fully represented |
-| **UTIL-FR-140** | Verify Event Bus tests | None | None | None | Supporting constraint |
+| **UTIL-FR-136** | audit event error mappings (QUEUE_FULL) | WF-002 | WF-002-SC-005 | Step 7 | Fully represented |
+| **UTIL-FR-137** | Redact audit event details | WF-002 | WF-002-SC-001 | Step 1, Step 8 | Fully represented |
+| **UTIL-FR-138** | Document audit event properties | None | None | None | Supporting constraint |
+| **UTIL-FR-139** | In-process audit event test tools | WF-002 | WF-002-SC-001 | Step 5 | Fully represented |
+| **UTIL-FR-140** | Verify audit event tests | None | None | None | Supporting constraint |
 | **UTIL-FR-141** | Notification sinks, routing definitions | WF-003 | WF-003-SC-001 | Step 1 | Fully represented |
 | **UTIL-FR-142** | Disable channels unless explicitly configured | WF-003 | WF-003-SC-001 | Step 4 | Fully represented |
 | **UTIL-FR-143** | severity-based routing, markdown fallback templates| WF-003 | WF-003-SC-003 | Step 4, Step 6 | Fully represented |
@@ -447,7 +447,7 @@ How different components interact during execution.
 * **G-001: Clock configuration bootstrap loop**
   * *Description*: `UTIL-FR-006` requires file logging to write only to normalized directories created through safe path handling (WF-008), while `UTIL-FR-109` states importing any utils package never reads settings or mutates environment variables. However, if path defaults are resolved during explicit load, the logger configuration depends on validation checks, which might attempt to trigger logs before the console or file handlers have been configured, resulting in unhandled console outputs or boot loops.
   * *Severity*: Medium
-* **G-002: In-Process Event Bus Synchronous vs Asynchronous Dual-Mode**
+* **G-002: In-Process audit event Synchronous vs Asynchronous Dual-Mode**
   * *Description*: `UTIL-FR-136` states that subscriber errors must not be misclassified as publish failures unless publish requires synchronous success. `UTIL-FR-138` requests documentation of whether the implementation is synchronous, asynchronous, or dual-mode. The specification does not clarify the API parameters or configuration flags that allow publishers to explicitly select a dual-mode behavior.
   * *Severity*: Low
 * **G-003: Headless Production Desktop Alerts**
@@ -467,7 +467,7 @@ How different components interact during execution.
 
 ## 15. Questions Requiring Stakeholder Decisions
 1. **Desktop Adapter degradation in Headless Production environments**: Should the system automatically convert Desktop notification channels to safe no-ops (writing to logs only) when the OS does not have a display server configured, even if explicitly enabled in environment settings?
-2. **Synchronous Publish interface**: How should a caller request synchronous all-handler success on `EventBus.publish` calls? Should it be a flag on the `EventEnvelope`, or determined by the event severity (e.g., critical errors are synchronous, debug telemetry is asynchronous)?
+2. **Synchronous Publish interface**: How should a caller request synchronous all-handler success on `AuditEventRouter.publish` calls? Should it be a flag on the `LocalAuditEvent`, or determined by the event severity (e.g., critical errors are synchronous, debug telemetry is asynchronous)?
 3. **Redaction Allowlist Audit Policy**: Who owns approval for allowlist exceptions that bypass denylist patterns (e.g. allowing logging of specific auth parameter keys)? Should this be managed in a version-controlled config file or explicitly checked in CI gates?
 
 ---

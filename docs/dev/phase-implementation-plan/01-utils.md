@@ -7,7 +7,7 @@
 
 ## Scope and Ownership
 
-Utils is the shared, dependency-light foundation for deterministic technical primitives. It owns cross-cutting support capabilities: structured logging, error and envelope contracts, UTC-first time handling, collision-resistant IDs, safe path operations, read-only dataframe diagnostics, validation, security/redaction, runtime settings, authorization helpers, local Event Bus primitives, notification routing primitives, and observability primitives.
+Utils is the shared, dependency-light foundation for deterministic technical primitives. It owns cross-cutting support capabilities: structured logging, error and envelope contracts, UTC-first time handling, collision-resistant IDs, safe path operations, read-only dataframe diagnostics, validation, security/redaction, runtime settings, authorization helpers, notification routing primitives, and observability primitives.
 
 It does **not** own strategy logic, broker execution, trade/risk/allocation approval, portfolio decisions, application orchestration, UI, persistence repositories, backtest engines, data cleaning/repair/resampling/enrichment, external identity-provider ownership, or production broker-backed event infrastructure. Those exclusions are enforced at package-export and dependency boundaries.
 
@@ -25,7 +25,7 @@ Only the following low-risk wrappers are official agent-callable tools in the in
 | `validate_handoff_payload` | Official AI tool | Read-only | Validate a structured handoff/payload against bounded schemas and return the standard envelope. |
 | `redact_mapping` | Conditional official AI tool | Read-only | Redact mapping payloads for approved audit/log-redaction workflows. |
 
-All other public support functions are importable native helpers but are **not** auto-attached to agents. `encrypt_data`, `decrypt_data`, password helpers, Event Bus publication, settings loading, notification delivery, and observability administration require an explicit higher-level workflow or authorization decision.
+All other public support functions are importable native helpers but are **not** auto-attached to agents. `encrypt_data`, `decrypt_data`, password helpers, settings loading, notification delivery, and observability administration require an explicit higher-level workflow or authorization decision.
 
 ## 1. System Boundary Diagram (file structure)
 
@@ -51,7 +51,7 @@ app/
     │   ├── exceptions.py                       # Error hierarchy
     │   ├── catalog.py                          # Code-to-name/message resolution
     │   ├── models.py                           # Sanitized error-event and routing result DTOs
-    │   └── router.py                           # Deduplication, suppression, Event Bus handoff
+    │   └── router.py                           # Deduplication and suppression
     ├── identity/                               # Collision-resistant IDs and deterministic validation
     │   ├── __init__.py
     │   ├── generators.py
@@ -131,8 +131,8 @@ examples/
 tests/
 ├── unit/utils/                                 # Isolated deterministic unit suites per utility module
 ├── contract/utils/                             # Official tool envelope/metadata/export contracts
-├── integration/utils/                          # Event Bus/notification fake-adapter integration tests
-└── stress/utils/                               # Opt-in concurrency and path/Event Bus stress suites
+├── integration/utils/                          # Notification fake-adapter integration tests
+└── stress/utils/                               # Opt-in concurrency and path stress suites
 ```
 
 ### Execution and dependency direction
@@ -142,7 +142,7 @@ Higher-level domain / agent / API boundary
   └─> app.utils.public_tools               [approved wrappers only]
        ├─> app.utils.auth                  [deny-by-default authorization]
        ├─> app.utils.validation | quality | security
-       ├─> app.utils.contracts              [standard response envelope]
+       ├─> domain-local contracts           [standard response envelope]
        ├─> app.utils.logging                [redacted lifecycle logging]
        └─> app.utils.observability          [best-effort metrics/health]
 
@@ -203,7 +203,6 @@ classDiagram
       +str environment
       +LoggingSettings logging
       +AuthSettings auth
-      +EventBusSettings event_bus
       +NotificationSettings notifications
       +ObservabilitySettings observability
     }
@@ -226,30 +225,6 @@ classDiagram
       +Mapping sanitized_details
     }
 
-    class EventEnvelope {
-      +str event_id
-      +str event_type
-      +str event_version
-      +str source
-      +str severity
-      +datetime timestamp
-      +Mapping payload
-      +Mapping metadata
-    }
-
-    class EventBus {
-      <<Protocol>>
-      +subscribe(event_type, handler) Subscription
-      +unsubscribe(subscription_id) bool
-      +publish(event) DeliveryResult
-    }
-
-    class InProcessEventBus {
-      +subscribe(event_type, handler) Subscription
-      +publish(event) DeliveryResult
-      +unsubscribe(subscription_id) bool
-    }
-
     class CircuitBreaker {
       +allow_request(now) CircuitDecision
       +record_success(now) CircuitState
@@ -267,9 +242,6 @@ classDiagram
     ToolResponse --> ToolMetadata
     RuntimeSettings --> AuthContext
     AuthContext --> AuthorizationDecision
-    EventBus <|.. InProcessEventBus
-    InProcessEventBus --> EventEnvelope
-    InProcessEventBus --> CircuitBreaker
     MetricRegistry --> CircuitBreaker
     HaruQuantError --> ToolError : mapped at boundary
 ```
@@ -308,24 +280,20 @@ sequenceDiagram
     end
 ```
 
-### 2.3 Event and notification collaboration
+### 2.3 Error and notification collaboration
 
 ```mermaid
 flowchart LR
-    A[Support / domain component] -->|sanitized ErrorEvent or EventEnvelope| B[InProcessEventBus]
-    B --> C[Subscriber handlers]
-    C -->|failure| D[ErrorRouter]
+    A[Support / domain component] -->|sanitized ErrorEvent| D[ErrorRouter]
     D -->|dedupe / suppress / severity policy| E[NotificationRouter]
     E --> F[Template renderer]
     F --> G[Lazy adapter: email / Telegram / desktop]
-    B --> H[MetricRegistry]
     D --> H
     E --> H
     H --> I[HealthSnapshot + optional Prometheus exporter]
     D --> J[Structured Logger]
 
     style A fill:#f4f4f4,stroke:#333
-    style B fill:#e7f0ff,stroke:#333
     style D fill:#fff5df,stroke:#333
     style E fill:#fce8e6,stroke:#333
     style I fill:#e8f5e9,stroke:#333
@@ -385,7 +353,7 @@ flowchart LR
 
 ### 📂 Module: `app/utils/logging`
 
-**Boundary Role:** Configure and emit redacted project-wide logs. This module is the sole owner of log formatting, handler lifecycle, safe file sink configuration, rotation/retention coordination, and logging lifecycle events. It does not own metrics, notification policy, authorization decisions, business decisions, or filesystem paths beyond delegating safe path validation to `app.utils.paths`.
+**Boundary Role:** Configure and emit redacted project-wide logs. This module is the sole owner of log formatting, handler lifecycle, safe file sink configuration, rotation/retention coordination, and logging lifecycle events. It does not own metrics, notification policy, authorization decisions, business decisions, or domain-specific filesystem validation.
 
 #### 📄 File: `formatters.py`
 
@@ -423,7 +391,7 @@ Requirements (verbatim from `01-utils-foundation.md`):
   - Production files log function/tool calls, validation failures, successful completions, recoverable warnings, and execution failures where applicable
   - Official AI tool logs distinguish start, completion, validation failure, recoverable warning, and execution failure lifecycle events
   - Official AI tool logs include request and workflow trace identifiers where available
-- [ ] **UTIL-FR-011**: Log Event Bus publish, subscribe, delivery failure, retry, dead-letter, queue-full, and dropped-event events.
+- [ ] **UTIL-FR-011**: Log audit event publish, subscribe, delivery failure, retry, dead-letter, queue-full, and dropped-event events.
 - [ ] **UTIL-FR-012**: Log notification routing decisions and delivery outcomes without exposing sensitive message bodies.
 - [ ] **UTIL-FR-013**: Log sanitized auth validation and authorization decisions.
 - [ ] **UTIL-FR-014**: Log metrics/export/health-check failures where detectable.
@@ -467,7 +435,7 @@ Requirements (verbatim from `01-utils-foundation.md`):
 - `log_tool_completed(tool_name: str, metadata: ToolMetadata, *, warning_count: int = 0) -> None` — **Side effect: logging sink only.**
 - `log_tool_validation_failed(tool_name: str, error: ToolError, metadata: ToolMetadata) -> None` — **Side effect: logging sink only; records deterministic validation lifecycle event.**
 - `log_tool_execution_failed(tool_name: str, error: ToolError, metadata: ToolMetadata) -> None` — **Side effect: logging sink only; records deterministic execution lifecycle event.**
-- `log_component_event(event_name: str, *, context: Mapping[str, object]) -> None` — **Side effect: logging sink only; supports Event Bus, notification, auth, metrics, and health diagnostic events after redaction.**
+- `log_component_event(event_name: str, *, context: Mapping[str, object]) -> None` — **Side effect: logging sink only; supports audit event, notification, auth, metrics, and health diagnostic events after redaction.**
 
 #### 📄 File: `retention.py`
 
@@ -618,7 +586,7 @@ Requirements (verbatim from `01-utils-foundation.md`):
 - [ ] **UTIL-FR-042**: Document every public function's raised exceptions or structured error behavior, including official AI tool docstrings explaining what error codes may be returned.
 - [ ] **UTIL-FR-043**: Write error tests verifying exception attributes, known codes, unknown codes, fallback messages, and official AI tool deterministic error codes.
 - [ ] **UTIL-FR-044**: Implement deterministic failure behavior routing, before notification routing, so the rest of the system can report issues consistently, failing safely without exposing sensitive information.
-  - Event Bus is intended for utility, workflow, alert, and error-routing events, not direct trading execution
+  - audit event is intended for utility, workflow, alert, and error-routing events, not direct trading execution
 - [ ] **UTIL-FR-045**: Implement the standard error event model including error code, severity, source module, source function or tool, request ID, workflow ID, correlation ID, sanitized message, sanitized details, and timestamp.
   - Expected validation failures route as warning or error events depending on severity
   - Unexpected execution failures route as error or critical events; critical system failures route to notifications
@@ -670,13 +638,13 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 #### 📄 File: `router.py`
 
-**File Boundary:** Error-routing coordinator; it applies severity/environment/suppression/deduplication policy before optional Event Bus and notification dispatch.
+**File Boundary:** Error-routing coordinator; it applies severity/environment/suppression/deduplication policy before optional audit event and notification dispatch.
 
 **Requirement Title:** Deduplicated non-recursive error routing and observability — `UTIL-FR-044` to `UTIL-FR-050`
 
 **Target Class/Function:**
 
-- `ErrorRouter.route(error_event: ErrorEvent, *, now: datetime | None = None) -> ErrorRoutingResult` — **State-mutating bounded in-memory routing/deduplication state; may publish redacted Event Bus events and invoke notification routing only according to policy.**
+- `ErrorRouter.route(error_event: ErrorEvent, *, now: datetime | None = None) -> ErrorRoutingResult` — **State-mutating bounded in-memory routing/deduplication state; may publish redacted audit event events and invoke notification routing only according to policy.**
 - `ErrorRouter.should_suppress(event: ErrorEvent, now: datetime) -> bool` — **Pure relative to immutable policy and supplied bounded state snapshot.**
 - `ErrorRouter.record_routing_attempt(event: ErrorEvent, result: ErrorRoutingResult, now: datetime) -> None` — **State-mutating bounded deduplication/throttling counters.**
 - `ErrorRouter.prevent_recursion(event: ErrorEvent) -> bool` — **State-mutating guarded recursion depth/context; never recursively publishes raw failures.**
@@ -801,8 +769,8 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 Requirements (verbatim from `01-utils-foundation.md`):
 
-- [ ] **UTIL-FR-066**: Implement safe path traversal and directory utilities, providing `normalize_path` (no side effects), `ensure_dir` (creates a directory when missing), and `ensure_parent_dir` (creates a parent directory when missing), accepting string or `Path` values and optional `base_dir`, and returning `Path` objects.
-  - Module provides `normalize_path`, `ensure_dir`, `ensure_parent_dir`
+- [ ] **UTIL-FR-066**: Retired from the shared Utils surface. Domain modules that require filesystem validation own small local path helpers at their boundary.
+  - Shared module-level path helpers are not part of `app.utils`
   - Path helpers accept string or `Path` values and optional `base_dir`, and return `Path` objects
 - [ ] **UTIL-FR-067**: Validate path inputs, reject empty paths, and reject path traversal outside `base_dir` when a base directory is supplied; use platform-safe file/directory permission defaults.
 - [ ] **UTIL-FR-068**: Ensure importing any `app.utils` module never creates files or directories as a side effect.
@@ -810,9 +778,7 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 **Target Class/Function:**
 
-- `normalize_path(path: str | Path, *, base_dir: str | Path | None = None) -> Path` — **Pure filesystem-path computation; rejects empty paths and paths escaping an approved base root.**
-- `ensure_dir(path: str | Path, *, base_dir: str | Path | None = None) -> Path` — **Filesystem-mutating; creates only the normalized approved target directory.**
-- `ensure_parent_dir(path: str | Path, *, base_dir: str | Path | None = None) -> Path` — **Filesystem-mutating; creates only the normalized approved parent directory.**
+- Domain-local path helpers — **Caller-owned filesystem-path computation and explicit directory creation at the relevant service boundary.**
 - `is_within_base(path: Path, base_dir: Path) -> bool` — **Pure; verifies resolved containment.**
 - `validate_path_permissions(path: Path) -> ValidationResult` — **Filesystem-read-only; validates platform-safe defaults without changing permissions unless a later explicit policy allows it.**
 
@@ -1056,7 +1022,7 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 - [ ] **UTIL-FR-097**: Implement security, cryptography, and payload redaction, providing sensitive-key detection, scalar/text/mapping redaction, password hashing and verification, encryption key loading, encryption, decryption, and active secret-version selection.
   - Module provides each listed security capability
-  - Agents must not call low-level helpers such as `normalize_timestamp`, `ensure_dir`, or `hash_password` unless a workflow explicitly approves that capability
+  - Agents must not call low-level helpers such as `normalize_timestamp` or `hash_password` unless a workflow explicitly approves that capability
   - `redact_mapping` is classified as a low-risk, read-only official AI tool only for approved audit/log-redaction workflows
   - `encrypt_data` remains a restricted support helper and is not attached to agents by default
 - [ ] **UTIL-FR-098**: Implement denylist-first, case-insensitive secret-key detection covering password, passwd, token, secret, key, credential, authorization, auth, API key, private key, access key, login, session, cookie, bearer, broker, and encryption-related patterns, with partial-key matching for common sensitive names.
@@ -1140,7 +1106,7 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 Requirements (verbatim from `01-utils-foundation.md`):
 
-- [ ] **UTIL-FR-108**: Implement configuration settings and environment loading, defining immutable typed `RuntimeSettings` including environment, log level, data directory, cache directory, audit directory, timezone, strict validation, logging configuration, auth configuration, Event Bus configuration, notification configuration, and observability configuration.
+- [ ] **UTIL-FR-108**: Implement configuration settings and environment loading, defining immutable typed `RuntimeSettings` including environment, log level, data directory, cache directory, audit directory, timezone, strict validation, logging configuration, auth configuration, audit event configuration, notification configuration, and observability configuration.
   - `load_runtime_settings` remains a support helper and is not attached to agents by default
   - Logging configuration includes optional log directory, file logging enablement, rotation max size, retained file count, retention deletion policy, console format selection, and color enablement
 - [ ] **UTIL-FR-109**: Load settings only through explicit calls, from mappings, with explicit precedence: mapping/function arguments, then environment variables, then `.env` file, then safe defaults; `.env` loading is optional and dependency-aware, and importing any utils package modules never reads `.env` files or mutates environment variables.
@@ -1153,10 +1119,10 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 **Target Class/Function:**
 
-- `RuntimeSettings(environment: str, log_level: str, data_directory: Path, cache_directory: Path, audit_directory: Path, timezone: str, strict_validation: bool, logging: LoggingSettings, auth: AuthSettings, event_bus: EventBusSettings, notifications: NotificationSettings, observability: ObservabilitySettings, quality: QualityInspectionConfig, validation_limits: ValidationLimits)` — **Immutable DTO; holds validated configuration only.**
+- `RuntimeSettings(environment: str, log_level: str, data_directory: Path, cache_directory: Path, audit_directory: Path, timezone: str, strict_validation: bool, logging: LoggingSettings, auth: AuthSettings, audit_events: AuditEventSettings, notifications: NotificationSettings, observability: ObservabilitySettings, quality: QualityInspectionConfig, validation_limits: ValidationLimits)` — **Immutable DTO; holds validated configuration only.**
 - `LoggingSettings(...)` — **Immutable DTO; includes opt-in file logging, rotation, retention, console format, and color settings.**
 - `AuthSettings(...)` — **Immutable DTO; includes tool allowlist and safe authorization policy data only.**
-- `EventBusSettings(...)` — **Immutable DTO; includes queue, retry, idempotency, and external-adapter policy only.**
+- `AuditEventSettings(...)` — **Immutable DTO; includes queue, retry, idempotency, and external-adapter policy only.**
 - `NotificationSettings(...)` — **Immutable DTO; includes channel enablement, recipient references, templates, throttling, and circuit-breaker policy without raw credential exposure.**
 - `ObservabilitySettings(...)` — **Immutable DTO; includes metrics/health/clock-drift policy without exporter initialization.**
 
@@ -1237,10 +1203,10 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 Requirements (verbatim from `01-utils-foundation.md`):
 
-- [ ] **UTIL-FR-127**: Implement event bus functionality, providing request/workflow/generic ID/version/correlation ID/causation ID/idempotency helpers and Event Bus pub/sub primitives, with the utils module providing Event Bus contracts and an in-process implementation while production broker-backed adapters live in infrastructure modules or optional adapters.
+- [ ] **UTIL-FR-127**: Implement audit event functionality, providing request/workflow/generic ID/version/correlation ID/causation ID/idempotency helpers and audit event pub/sub primitives, with the utils module providing audit event contracts and an in-process implementation while production broker-backed adapters live in infrastructure modules or optional adapters.
   - Event publisher: a module or workflow that emits validated events
   - Event subscriber: a handler that receives events by topic or event type
-  - Event Bus utilities route events but must not own application orchestration, place trades, approve trades, modify orders, activate live systems, or override kill switches
+  - audit event utilities route events but must not own application orchestration, place trades, approve trades, modify orders, activate live systems, or override kill switches
 - [ ] **UTIL-FR-128**: Define the standard event envelope including `event_id`, `event_type`, `event_version`, `source`, `severity`, `timestamp`, `request_id`, `workflow_id`, `correlation_id`, `causation_id`, `idempotency_key`, `payload`, and `metadata`; payloads must be JSON-serializable or fail validation clearly, and must be redacted before logging, metrics labeling, notification routing, audit serialization, or dead-letter forwarding.
 - [ ] **UTIL-FR-129**: Implement publish/subscribe with topic or event-type subscriptions, handler registration/unregistration, and error isolation so one failing subscriber does not silently prevent other subscribers from receiving the event; route subscriber failures to the error-routing mechanism with retry policy metadata and dead-letter routing for events that exceed retry limits.
   - Distributed broker adapters are not required to guarantee global ordering unless explicitly documented
@@ -1250,18 +1216,18 @@ Requirements (verbatim from `01-utils-foundation.md`):
 - [ ] **UTIL-FR-131**: Support correlation IDs across tool calls, logs, notifications, and metrics; expose bounded queue depth/handler backlog diagnostics including delivered, failed, retried, dead-lettered, dropped counts, and queue depth.
 - [ ] **UTIL-FR-132**: Implement explicit queue policies (fail-fast, bounded wait, or lossy-drop), with production defaulting to fail-fast for critical workflows, returning a deterministic `QUEUE_FULL` or `BACKPRESSURE_EXCEEDED` error immediately when the queue is full (`BACKPRESSURE_EXCEEDED` when the caller can retry, `QUEUE_FULL` for lower-level diagnostics), never silently dropping events unless the caller explicitly selected a lossy policy (allowed only for low-severity telemetry), with dropped events counted in metrics and logged with sanitized metadata.
   - Queue-full diagnostics include event type, source, severity, queue name/topic, queue depth, configured limit, request ID, workflow ID, and correlation ID, never raw event payloads by default
-- [ ] **UTIL-FR-133**: Keep the Event Bus import-light and dependency-aware: no network connections or external pub/sub client initialization at module import time; production external broker adapters are lazy-loaded, fail clearly when required optional dependencies are missing, and implement circuit breakers (a documented circuit-breaker pattern) whose diagnostics never include credentials, provider tokens, message bodies, or raw event payloads.
+- [ ] **UTIL-FR-133**: Keep the audit event import-light and dependency-aware: no network connections or external pub/sub client initialization at module import time; production external broker adapters are lazy-loaded, fail clearly when required optional dependencies are missing, and implement circuit breakers (a documented circuit-breaker pattern) whose diagnostics never include credentials, provider tokens, message bodies, or raw event payloads.
 - [ ] **UTIL-FR-134**: Ensure publish/subscribe/unregister/retry/dead-letter/idempotency-tracking operations are thread-safe and/or async-safe, handlers don't share mutable event payloads unless copied or contractually immutable, event versioning supports forward compatibility for consumers, and delivery diagnostics remain consistent under concurrent publishing.
-- [ ] **UTIL-FR-135**: Keep diagnostics and payloads bounded for large-scale use: avoid unnecessary deep copies, prefer summaries/counts/compact samples for agent-facing diagnostics, bound returned issue lists/samples, bound idempotency storage by TTL and max cache size, and bound Event Bus diagnostics to avoid oversized logs/metrics.
-- [ ] **UTIL-FR-136**: Map Event Bus failures to deterministic codes: `EVENT_PUBLISH_FAILED` for publish failures, `EVENT_HANDLER_FAILED` for subscriber failures, `EVENT_DEAD_LETTER_FAILED` for dead-letter routing failures; return queue-full errors immediately to publishers; keep backpressure errors distinct from subscriber execution errors, and don't misclassify subscriber execution errors as publish failures unless publish requires synchronous all-handler success.
-- [ ] **UTIL-FR-137**: Redact sensitive values before they appear in Event Bus payload logs or publication, ensure dead-letter event storage (if configured outside utils) receives redacted payloads by default, keep idempotency keys/event IDs/request IDs/workflow IDs/correlation IDs free of raw secrets and safe for logs/metrics, and ensure payload hashes used for idempotency conflict detection never allow reconstruction of sensitive payloads.
-- [ ] **UTIL-FR-138**: Document the Event Bus event envelope fields, idempotency TTL and max-cache-size behavior, queue-full/backpressure behavior, delivery/retry/dead-letter behavior, concurrency guarantees, whether the implementation is synchronous/asynchronous/dual-mode, that deterministic ordered delivery applies to the in-process Event Bus per event type (not necessarily distributed broker adapters), circuit-breaker configuration for external adapters, and each event type's ordering/durability/retry/loss-tolerance expectations.
+- [ ] **UTIL-FR-135**: Keep diagnostics and payloads bounded for large-scale use: avoid unnecessary deep copies, prefer summaries/counts/compact samples for agent-facing diagnostics, bound returned issue lists/samples, bound idempotency storage by TTL and max cache size, and bound audit event diagnostics to avoid oversized logs/metrics.
+- [ ] **UTIL-FR-136**: Map audit event failures to deterministic codes: `EVENT_PUBLISH_FAILED` for publish failures, `EVENT_HANDLER_FAILED` for subscriber failures, `EVENT_DEAD_LETTER_FAILED` for dead-letter routing failures; return queue-full errors immediately to publishers; keep backpressure errors distinct from subscriber execution errors, and don't misclassify subscriber execution errors as publish failures unless publish requires synchronous all-handler success.
+- [ ] **UTIL-FR-137**: Redact sensitive values before they appear in audit event payload logs or publication, ensure dead-letter event storage (if configured outside utils) receives redacted payloads by default, keep idempotency keys/event IDs/request IDs/workflow IDs/correlation IDs free of raw secrets and safe for logs/metrics, and ensure payload hashes used for idempotency conflict detection never allow reconstruction of sensitive payloads.
+- [ ] **UTIL-FR-138**: Document the audit event event envelope fields, idempotency TTL and max-cache-size behavior, queue-full/backpressure behavior, delivery/retry/dead-letter behavior, concurrency guarantees, whether the implementation is synchronous/asynchronous/dual-mode, that deterministic ordered delivery applies to the in-process audit event per event type (not necessarily distributed broker adapters), circuit-breaker configuration for external adapters, and each event type's ordering/durability/retry/loss-tolerance expectations.
 - [ ] **UTIL-FR-139**: Provide an in-process pub/sub mechanism suitable for local development, unit tests, and deterministic workflow tests, including disabled/no-op adapter behavior for tests/local development, guaranteed deterministic ordered handler execution per event type for reproducible test outcomes, and idempotency tracking testable with injected clocks or deterministic time controls.
-- [ ] **UTIL-FR-140**: Write Event Bus tests covering: publish success; subscription and unsubscription; subscriber failure isolation; retry and dead-letter behavior; idempotency keys, TTL expiration, max cache size enforcement, and duplicate key handling; concurrent publish, subscribe/unsubscribe, and retry/dead-letter behavior; payload serialization failure (missing event type, unserializable payload); queue-full behavior returning `QUEUE_FULL`/`BACKPRESSURE_EXCEEDED` and deterministic backpressure with dropped-event metrics and queue limit/backlog diagnostics; external adapter circuit-breaker closed/open/half-open states with fake adapters (including outage opening the circuit after threshold and half-open recovery not creating duplicate delivery); no secret leakage in event logs; fake clock/queue implementations for deterministic time/queue behavior; and disabled/no-op adapter behavior. Verify observability tests cover Event Bus metrics and queue-depth metrics, and that concurrent subscriber registration/unregistration during publishing does not corrupt handler lists or produce non-deterministic behavior.
+- [ ] **UTIL-FR-140**: Write audit event tests covering: publish success; subscription and unsubscription; subscriber failure isolation; retry and dead-letter behavior; idempotency keys, TTL expiration, max cache size enforcement, and duplicate key handling; concurrent publish, subscribe/unsubscribe, and retry/dead-letter behavior; payload serialization failure (missing event type, unserializable payload); queue-full behavior returning `QUEUE_FULL`/`BACKPRESSURE_EXCEEDED` and deterministic backpressure with dropped-event metrics and queue limit/backlog diagnostics; external adapter circuit-breaker closed/open/half-open states with fake adapters (including outage opening the circuit after threshold and half-open recovery not creating duplicate delivery); no secret leakage in event logs; fake clock/queue implementations for deterministic time/queue behavior; and disabled/no-op adapter behavior. Verify observability tests cover audit event metrics and queue-depth metrics, and that concurrent subscriber registration/unregistration during publishing does not corrupt handler lists or produce non-deterministic behavior.
 
 **Target Class/Function:**
 
-- `EventEnvelope(event_id: str, event_type: str, event_version: str, source: str, severity: str, timestamp: datetime, request_id: str | None, workflow_id: str | None, correlation_id: str | None, causation_id: str | None, idempotency_key: str | None, payload: Mapping[str, object], metadata: Mapping[str, object])` — **Immutable DTO; validates JSON-serializable/redacted payload and UTC timestamp.**
+- `LocalAuditEvent(event_id: str, event_type: str, event_version: str, source: str, severity: str, timestamp: datetime, request_id: str | None, workflow_id: str | None, correlation_id: str | None, causation_id: str | None, idempotency_key: str | None, payload: Mapping[str, object], metadata: Mapping[str, object])` — **Immutable DTO; validates JSON-serializable/redacted payload and UTC timestamp.**
 - `Subscription(subscription_id: str, event_type: str, handler_name: str)` — **Immutable DTO; no handler payload retained.**
 - `DeliveryResult(status: str, event_id: str, delivered_count: int, failed_count: int, retried_count: int, dead_lettered_count: int, dropped_count: int, queue_depth: int, error: ToolError | None)` — **Immutable DTO; bounded operational result.**
 - `QueuePolicy(mode: Literal["fail_fast", "bounded_wait", "lossy_drop"], max_depth: int, wait_timeout_seconds: float | None)` — **Immutable DTO; production critical defaults must select fail-fast.**
@@ -1269,17 +1235,17 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 #### 📄 File: `protocol.py`
 
-**File Boundary:** Event Bus/adapter structural contracts and event validation, separated from concrete in-process mutable state.
+**File Boundary:** audit event/adapter structural contracts and event validation, separated from concrete in-process mutable state.
 
 **Requirement Title:** Pub/sub contract, subscriber isolation, external adapter boundary, and event version compatibility — `UTIL-FR-127` to `UTIL-FR-129`, `UTIL-FR-133`, `UTIL-FR-134`, `UTIL-FR-138`
 
 **Target Class/Function:**
 
-- `EventHandler(event: EventEnvelope) -> None | Awaitable[None]` — **Protocol; may have controlled delivery side effects but receives immutable/redacted event contract.**
-- `EventBus.subscribe(event_type: str, handler: EventHandler) -> Subscription` — **Protocol; state-mutating registration operation.**
-- `EventBus.unsubscribe(subscription_id: str) -> bool` — **Protocol; state-mutating registration operation.**
-- `EventBus.publish(event: EventEnvelope) -> DeliveryResult | Awaitable[DeliveryResult]` — **Protocol; delivery side effect subject to queue/retry policy.**
-- `validate_event_envelope(event: EventEnvelope | Mapping[str, object]) -> ValidationResult` — **Pure; validates required fields and JSON-safe payload before publication.**
+- `AuditEventHandler(event: LocalAuditEvent) -> None | Awaitable[None]` — **Protocol; may have controlled delivery side effects but receives immutable/redacted event contract.**
+- `AuditEventRouter.subscribe(event_type: str, handler: AuditEventHandler) -> Subscription` — **Protocol; state-mutating registration operation.**
+- `AuditEventRouter.unsubscribe(subscription_id: str) -> bool` — **Protocol; state-mutating registration operation.**
+- `AuditEventRouter.publish(event: LocalAuditEvent) -> DeliveryResult | Awaitable[DeliveryResult]` — **Protocol; delivery side effect subject to queue/retry policy.**
+- `validate_event_envelope(event: LocalAuditEvent | Mapping[str, object]) -> ValidationResult` — **Pure; validates required fields and JSON-safe payload before publication.**
 
 #### 📄 File: `idempotency.py`
 
@@ -1298,17 +1264,17 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 **File Boundary:** Local deterministic pub/sub implementation with safe concurrency, ordered per-event-type handler execution, queues, retries, and dead-letter coordinator hooks.
 
-**Requirement Title:** Deterministic local Event Bus execution — `UTIL-FR-129` to `UTIL-FR-140`
+**Requirement Title:** Deterministic local audit event execution — `UTIL-FR-129` to `UTIL-FR-140`
 
 **Target Class/Function:**
 
-- `InProcessEventBus.subscribe(event_type: str, handler: EventHandler) -> Subscription` — **State-mutating bounded registration state; thread/async safe.**
-- `InProcessEventBus.unsubscribe(subscription_id: str) -> bool` — **State-mutating bounded registration state; thread/async safe.**
-- `InProcessEventBus.publish(event: EventEnvelope) -> DeliveryResult` — **State-mutating queue/idempotency state and handler side effects; preserves deterministic ordered handler execution for an event type.**
-- `InProcessEventBus.enqueue(event: EventEnvelope) -> QueueEnqueueResult` — **State-mutating bounded queue; emits deterministic `QUEUE_FULL`/`BACKPRESSURE_EXCEEDED` according to policy.**
-- `InProcessEventBus.deliver(event: EventEnvelope) -> DeliveryResult` — **Side effect: invokes registered handlers with immutable/redacted payload contract; one failure does not block unrelated handlers.**
-- `InProcessEventBus.retry_or_dead_letter(event: EventEnvelope, failure: Error) -> DeliveryResult` — **Side effect: controlled retry/dead-letter handoff with deterministic diagnostic code.**
-- `InProcessEventBus.snapshot_health() -> EventBusHealthSnapshot` — **Read-only state observation; bounded queue/backlog/counter diagnostic output.**
+- `DomainAuditRouter.subscribe(event_type: str, handler: AuditEventHandler) -> Subscription` — **State-mutating bounded registration state; thread/async safe.**
+- `DomainAuditRouter.unsubscribe(subscription_id: str) -> bool` — **State-mutating bounded registration state; thread/async safe.**
+- `DomainAuditRouter.publish(event: LocalAuditEvent) -> DeliveryResult` — **State-mutating queue/idempotency state and handler side effects; preserves deterministic ordered handler execution for an event type.**
+- `DomainAuditRouter.enqueue(event: LocalAuditEvent) -> QueueEnqueueResult` — **State-mutating bounded queue; emits deterministic `QUEUE_FULL`/`BACKPRESSURE_EXCEEDED` according to policy.**
+- `DomainAuditRouter.deliver(event: LocalAuditEvent) -> DeliveryResult` — **Side effect: invokes registered handlers with immutable/redacted payload contract; one failure does not block unrelated handlers.**
+- `DomainAuditRouter.retry_or_dead_letter(event: LocalAuditEvent, failure: Error) -> DeliveryResult` — **Side effect: controlled retry/dead-letter handoff with deterministic diagnostic code.**
+- `DomainAuditRouter.snapshot_health() -> AuditEventRouterHealthSnapshot` — **Read-only state observation; bounded queue/backlog/counter diagnostic output.**
 
 #### 📄 File: `external_adapters.py`
 
@@ -1318,8 +1284,8 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 **Target Class/Function:**
 
-- `load_event_bus_adapter(adapter_name: str, *, settings: EventBusSettings) -> EventBus` — **External side-effect boundary at explicit call time; lazy optional dependency, deterministic missing-dependency/config errors.**
-- `CircuitBrokenEventBus.publish(event: EventEnvelope) -> DeliveryResult` — **Side effect: guards optional provider call behind CircuitBreaker; exposes no credentials/message body in diagnostics.**
+- `load_audit_events_adapter(adapter_name: str, *, settings: AuditEventSettings) -> AuditEventRouter` — **External side-effect boundary at explicit call time; lazy optional dependency, deterministic missing-dependency/config errors.**
+- `CircuitBrokenAuditRouter.publish(event: LocalAuditEvent) -> DeliveryResult` — **Side effect: guards optional provider call behind CircuitBreaker; exposes no credentials/message body in diagnostics.**
 
 
 ### 📂 Module: `app/utils/notifications`
@@ -1338,23 +1304,23 @@ Requirements (verbatim from `01-utils-foundation.md`):
   - Notification recipient: a configured email, Telegram, or desktop recipient for alerts
   - Security/audit consumer: relies on redacted logs, metadata, tool responses, canonical JSON, events, notifications, and secret-safe error handling
   - Notification utilities may alert humans or systems but must not make trading, portfolio, risk, or strategy decisions
-  - Auth, Event Bus, notification, and observability primitives are support helpers by default unless explicitly promoted to official AI tools
+  - Auth, audit event, notification, and observability primitives are support helpers by default unless explicitly promoted to official AI tools
 - [ ] **UTIL-FR-142**: Disable email, Telegram, and desktop notifications unless explicitly configured for the current environment, with production desktop notifications disabled by default and no channel enabled in production without explicit per-environment configuration; configure notification recipients explicitly.
 - [ ] **UTIL-FR-143**: Implement severity-based, environment-specific notification routing with per-channel enablement/disablement through runtime settings, per-channel recipient configuration, and safe templates for alert title/summary/severity/source/timestamp/request ID/workflow ID/correlation ID rendered from sanitized data transfer objects rather than raw event payloads.
   - Templates support markdown and plain-text fallbacks for readability across email/Telegram/desktop clients, degrading to plain text when a channel doesn't support markdown
   - Markdown rendering escapes/sanitizes unsafe user-controlled content where applicable
   - Template rendering failures return deterministic notification failure diagnostics without exposing raw payloads
-- [ ] **UTIL-FR-144**: Redact secrets before message construction so routing never includes raw sensitive payloads; support rate limiting/throttling to avoid alert storms and deduplication of repeated alerts; produce delivery status results and publish notification success/failure events to the Event Bus; expose metrics for sent, failed, suppressed, throttled, and deduplicated notifications.
+- [ ] **UTIL-FR-144**: Redact secrets before message construction so routing never includes raw sensitive payloads; support rate limiting/throttling to avoid alert storms and deduplication of repeated alerts; produce delivery status results and publish notification success/failure events to the audit event; expose metrics for sent, failed, suppressed, throttled, and deduplicated notifications.
 - [ ] **UTIL-FR-145**: Implement email notifications with configurable SMTP/provider adapter settings and Telegram notifications with bot-token/chat-recipient configuration, neither logging credentials; keep desktop notifications disabled by default in production unless explicitly enabled.
 - [ ] **UTIL-FR-146**: Keep notification adapters lazy-loaded with no network client initialization at import time, implementing circuit breakers (a documented circuit-breaker pattern) for external adapters; notification delivery failures must not fail the original business operation unless the caller explicitly requires fail-closed alerting.
-- [ ] **UTIL-FR-147**: Accept alert severity, channel preferences, sanitized message template data, and routing policy as inputs; accept logging/notification/Event Bus/auth/observability configuration via runtime settings; return sent/suppressed/throttled/deduplicated/failed/disabled status; ensure desktop notification content never includes secrets.
-- [ ] **UTIL-FR-148**: Document runbook sections for Event Bus backpressure incidents, notification outage incidents, clock-drift incidents, and schema-validation performance regressions; expose Prometheus-compatible metrics including circuit-breaker state, queue depth, idempotency cache size, backpressure count, notification failures, and clock drift.
+- [ ] **UTIL-FR-147**: Accept alert severity, channel preferences, sanitized message template data, and routing policy as inputs; accept logging/notification/audit event/auth/observability configuration via runtime settings; return sent/suppressed/throttled/deduplicated/failed/disabled status; ensure desktop notification content never includes secrets.
+- [ ] **UTIL-FR-148**: Document runbook sections for audit event backpressure incidents, notification outage incidents, clock-drift incidents, and schema-validation performance regressions; expose Prometheus-compatible metrics including circuit-breaker state, queue depth, idempotency cache size, backpressure count, notification failures, and clock drift.
 - [ ] **UTIL-FR-149**: Ensure production code never leaks secrets in logs, errors, events, notifications, metrics, or health snapshots; importing any utils package modules never initializes notification clients; wall-clock timestamp serialization stays UTC-first and safe for logs/events/notifications/metrics/health snapshots/audit metadata.
 - [ ] **UTIL-FR-150**: Make notification routing, deduplication, throttling, rate-limit counters, and circuit-breaker state thread-safe and/or async-safe, with delivery diagnostics remaining consistent under concurrent alert bursts and routing remaining safe under repeated error bursts; keep optional notification provider dependencies lazy-loaded and isolate delivery failures from core utility functions unless explicitly configured otherwise; keep notification messages concise and actionable.
-- [ ] **UTIL-FR-151**: Isolate external notification provider outages through circuit breakers and deterministic error codes, with delivery observable through logs/metrics/sanitized events; map notification routing failures to `NOTIFICATION_FAILED` and configuration failures to `CONFIGURATION_ERROR`, distinguishing configuration failure, provider timeout, provider rejection, circuit-open state, throttling, and suppression; map unknown Event Bus/notification provider errors safely to deterministic error codes.
-- [ ] **UTIL-FR-152**: Redact sensitive values before they appear in notification templates; ensure authorization headers, email credentials, and Telegram bot tokens never appear in logs, metrics, events, or notifications; treat notification recipient lists as sensitive configuration; require explicit configuration for side-effecting notification/event adapter actions; ensure external notification/pub-sub adapters are lazy-loaded and fail closed when credentials are missing or malformed; reject metric labels containing raw IDs, arbitrary user strings, exception strings, notification recipients, provider tokens, or event payload values; exclude auth and notification provider credentials from Event Bus payloads by default.
+- [ ] **UTIL-FR-151**: Isolate external notification provider outages through circuit breakers and deterministic error codes, with delivery observable through logs/metrics/sanitized events; map notification routing failures to `NOTIFICATION_FAILED` and configuration failures to `CONFIGURATION_ERROR`, distinguishing configuration failure, provider timeout, provider rejection, circuit-open state, throttling, and suppression; map unknown audit event/notification provider errors safely to deterministic error codes.
+- [ ] **UTIL-FR-152**: Redact sensitive values before they appear in notification templates; ensure authorization headers, email credentials, and Telegram bot tokens never appear in logs, metrics, events, or notifications; treat notification recipient lists as sensitive configuration; require explicit configuration for side-effecting notification/event adapter actions; ensure external notification/pub-sub adapters are lazy-loaded and fail closed when credentials are missing or malformed; reject metric labels containing raw IDs, arbitrary user strings, exception strings, notification recipients, provider tokens, or event payload values; exclude auth and notification provider credentials from audit event payloads by default.
 - [ ] **UTIL-FR-153**: Document notification routing rules for email/Telegram/desktop channels, concurrency guarantees, whether each adapter is synchronous/asynchronous/dual-mode, throttling and deduplication behavior, markdown/plain-text fallback behavior, and circuit-breaker configuration; ensure importing utils never imports pandas, cryptography, dotenv, broker SDKs, notification clients, pub/sub clients, Prometheus exporters, or network clients unless the specific feature is used; support test mode with fake adapters.
-- [ ] **UTIL-FR-154**: Write notification tests covering email/Telegram/desktop routing with fake adapters, disabled channel behavior, missing credentials, provider failure/timeout behavior, throttling and deduplication, concurrent routing and concurrent suppression/throttling/deduplication/adapter-failure behavior, thread-safe/async-safe throttling and deduplication state, markdown rendering and plain-text fallback, provider circuit-breaker closed/open/half-open states with fake adapters, and that notification content never leaks secrets after template rendering (including sensitive payloads being redacted before logging/notification routing, channel-disabled returning disabled/suppressed status without error, missing credentials failing safely without leaking configuration, provider timeout returning failed status with metrics, markdown rendering failure falling back to plain text, and unsupported formatting not failing the original operation unless fail-closed alerting is configured). Verify observability tests cover notification metrics, Grafana documentation/review checks confirm dashboards cover system health/tool health/Event Bus/notifications/errors/auth failures, a chaos-test profile covers notification provider failures and pub/sub adapter outages, and tests prove no sensitive values leak through logs/events/notifications/metrics/dead-letter diagnostics/schema errors/health checks.
+- [ ] **UTIL-FR-154**: Write notification tests covering email/Telegram/desktop routing with fake adapters, disabled channel behavior, missing credentials, provider failure/timeout behavior, throttling and deduplication, concurrent routing and concurrent suppression/throttling/deduplication/adapter-failure behavior, thread-safe/async-safe throttling and deduplication state, markdown rendering and plain-text fallback, provider circuit-breaker closed/open/half-open states with fake adapters, and that notification content never leaks secrets after template rendering (including sensitive payloads being redacted before logging/notification routing, channel-disabled returning disabled/suppressed status without error, missing credentials failing safely without leaking configuration, provider timeout returning failed status with metrics, markdown rendering failure falling back to plain text, and unsupported formatting not failing the original operation unless fail-closed alerting is configured). Verify observability tests cover notification metrics, Grafana documentation/review checks confirm dashboards cover system health/tool health/audit event/notifications/errors/auth failures, a chaos-test profile covers notification provider failures and pub/sub adapter outages, and tests prove no sensitive values leak through logs/events/notifications/metrics/dead-letter diagnostics/schema errors/health checks.
 
 **Target Class/Function:**
 
@@ -1395,9 +1361,9 @@ Requirements (verbatim from `01-utils-foundation.md`):
 
 **Target Class/Function:**
 
-- `NotificationRouter.route(request: NotificationRequest, *, settings: NotificationSettings, now: datetime | None = None) -> tuple[NotificationDeliveryResult, ...]` — **Side-effect coordinator: may invoke adapters/Event Bus/logging/metrics; does not fail originating work unless explicit fail-closed policy applies.**
+- `NotificationRouter.route(request: NotificationRequest, *, settings: NotificationSettings, now: datetime | None = None) -> tuple[NotificationDeliveryResult, ...]` — **Side-effect coordinator: may invoke adapters/audit event/logging/metrics; does not fail originating work unless explicit fail-closed policy applies.**
 - `NotificationRouter.select_channels(request: NotificationRequest, settings: NotificationSettings) -> tuple[NotificationChannelPolicy, ...]` — **Pure; returns explicitly configured channels only.**
-- `NotificationRouter.publish_delivery_event(result: NotificationDeliveryResult, request: NotificationRequest) -> None` — **Side effect: publishes sanitized success/failure event through Event Bus if configured.**
+- `NotificationRouter.publish_delivery_event(result: NotificationDeliveryResult, request: NotificationRequest) -> None` — **Side effect: publishes sanitized success/failure event through audit event if configured.**
 - `NotificationRouter.record_delivery_metrics(result: NotificationDeliveryResult) -> None` — **Best-effort metric side effect; no effect on original operation by default.**
 
 #### 📄 File: `adapters.py`
@@ -1501,7 +1467,7 @@ The following requirements are applied at decorators, module wrappers, adapter s
 
 **NFR-ID and verbatim requirement:**
 
-- [ ] **UTIL-NFR-002**: Cover the following with metrics: official AI tool call counts, success/error counts, and execution latency; validation failure counts by error code and source; Event Bus events published/delivered/failed/retried/dead-lettered/dropped/backpressured and queue depth/backlog; Event Bus idempotency cache size, eviction count, duplicate count, and conflict count; notification sent/failed/suppressed/throttled/deduplicated counts and delivery latency; logging error counts where detectable; settings load failures; security redaction failures; encryption/decryption failures (without exposing plaintext or key material); auth validation/authorization failures; circuit-breaker state transitions and current state; and clock-drift status where available.
+- [ ] **UTIL-NFR-002**: Cover the following with metrics: official AI tool call counts, success/error counts, and execution latency; validation failure counts by error code and source; audit event events published/delivered/failed/retried/dead-lettered/dropped/backpressured and queue depth/backlog; audit event idempotency cache size, eviction count, duplicate count, and conflict count; notification sent/failed/suppressed/throttled/deduplicated counts and delivery latency; logging error counts where detectable; settings load failures; security redaction failures; encryption/decryption failures (without exposing plaintext or key material); auth validation/authorization failures; circuit-breaker state transitions and current state; and clock-drift status where available.
 
 **Architectural Pattern:** Decorator Boundary + Registry Boundary
 
@@ -1514,7 +1480,7 @@ The following requirements are applied at decorators, module wrappers, adapter s
 
 **NFR-ID and verbatim requirement:**
 
-- [ ] **UTIL-NFR-003**: Implement Prometheus-compatible alerting covering circuit-open state, queue saturation, dead-letter growth, notification failure rate, and clock drift where alerting is implemented; implement Grafana dashboards with panels for idempotency cache size, backpressure count, retry count, circuit-breaker state, and clock drift where dashboards are implemented, plus dashboard documentation covering system health, tool health, Event Bus health, notification health, error routing, auth failures, and data-quality validation health.
+- [ ] **UTIL-NFR-003**: Implement Prometheus-compatible alerting covering circuit-open state, queue saturation, dead-letter growth, notification failure rate, and clock drift where alerting is implemented; implement Grafana dashboards with panels for idempotency cache size, backpressure count, retry count, circuit-breaker state, and clock drift where dashboards are implemented, plus dashboard documentation covering system health, tool health, audit event health, notification health, error routing, auth failures, and data-quality validation health.
 
 **Architectural Pattern:** Adapter Boundary + Documentation Boundary
 
@@ -1644,7 +1610,7 @@ The following requirements are applied at decorators, module wrappers, adapter s
 
 **NFR-ID and verbatim requirement:**
 
-- [ ] **UTIL-NFR-013**: Split Phase 1 implementation into approved sprint packs before editing code: 01A package/errors/standard, 01B logging/time/identity/paths, 01C settings/security/auth, 01D event bus/error routing/notifications, 01E observability/metrics, and 01F dataframe/data-quality/validators.
+- [ ] **UTIL-NFR-013**: Split Phase 1 implementation into approved sprint packs before editing code: 01A package/errors/standard, 01B logging/time/identity/paths, 01C settings/security/auth, 01D audit event/error routing/notifications, 01E observability/metrics, and 01F dataframe/data-quality/validators.
 
 **Architectural Pattern:** Module Delivery Boundary
 
@@ -1733,8 +1699,8 @@ Test coverage:
 | `tests/unit/utils/security/test_crypto.py` | `test_argon2_optional_dependency_behavior`, `test_fernet_round_trip`, `test_invalid_ciphertext_leaks_nothing`, `test_active_secret_selection` | `UTIL-FR-102`–`UTIL-FR-107` |
 | `tests/unit/utils/settings/test_loader.py` | `test_precedence`, `test_strict_validation`, `test_path_defaults`, `test_injection_mutates_same_mapping_only` | `UTIL-FR-108`–`UTIL-FR-115` |
 | `tests/unit/utils/auth/test_authorization.py` | `test_missing_context_denied`, `test_role_permission_scope_required`, `test_tool_allowlist`, `test_auth_context_is_redacted` | `UTIL-FR-117`–`UTIL-FR-126` |
-| `tests/integration/utils/test_event_bus.py` | `test_subscribe_unsubscribe_and_order`, `test_handler_failure_isolated`, `test_retry_dead_letter`, `test_idempotency_ttl_and_conflict`, `test_queue_full` | `UTIL-FR-127`–`UTIL-FR-140` |
-| `tests/stress/utils/test_event_bus_concurrency.py` | `test_concurrent_publish_and_subscription_safety`, `test_no_handler_list_corruption` | `UTIL-FR-134`, `UTIL-FR-140` |
+| `tests/integration/utils/test_audit_events.py` | `test_subscribe_unsubscribe_and_order`, `test_handler_failure_isolated`, `test_retry_dead_letter`, `test_idempotency_ttl_and_conflict`, `test_queue_full` | `UTIL-FR-127`–`UTIL-FR-140` |
+| `tests/stress/utils/test_audit_events_concurrency.py` | `test_concurrent_publish_and_subscription_safety`, `test_no_handler_list_corruption` | `UTIL-FR-134`, `UTIL-FR-140` |
 | `tests/integration/utils/test_notifications.py` | `test_fake_email_telegram_desktop_routing`, `test_disabled_channel`, `test_timeout_circuit_breaker`, `test_template_fallback`, `test_no_secret_leak` | `UTIL-FR-141`–`UTIL-FR-154` |
 | `tests/unit/utils/observability/test_metrics.py` | `test_labels_reject_sensitive_high_cardinality_data`, `test_noop_without_prometheus`, `test_tool_counters_latency` | `UTIL-NFR-001`–`UTIL-NFR-005`, `UTIL-NFR-009`–`UTIL-NFR-012` |
 | `tests/unit/utils/observability/test_health.py` | `test_all_health_states`, `test_clock_drift_states`, `test_circuit_breaker_transitions` | `UTIL-NFR-006`–`UTIL-NFR-012` |
@@ -1764,7 +1730,7 @@ Usage examples must show:
 - [ ] **UTIL-EX-006**: `example_06_dataframe_and_combinations`: Demonstrate dataframe alignment, record serialization, chunking, and parameter-combination helpers.
 - [ ] **UTIL-EX-007**: `example_07_data_quality`: Demonstrate OHLCV diagnostics and standard-envelope quality validation for valid and invalid records.
 - [ ] **UTIL-EX-008**: `example_08_validations`: Demonstrate input/output schema validation, evidence validation, registry validation, and failure envelopes.
-- [ ] **UTIL-EX-009**: `example_09_event_bus`: Demonstrate event envelope creation, publish/subscribe behavior, idempotency handling, and queue failure behavior.
+- [ ] **UTIL-EX-009**: `example_09_audit_events`: Demonstrate event envelope creation, publish/subscribe behavior, idempotency handling, and queue failure behavior.
 - [ ] **UTIL-EX-010**: `example_10_circuit_breakers_and_observability`: Demonstrate circuit-breaker states, health snapshots, metric recording, and Prometheus text export.
 - [ ] **UTIL-EX-011**: `example_11_notifications`: Demonstrate fake/local notification routing, throttling, disabled channels, and redacted alert payloads.
 - [ ] **UTIL-EX-012**: `example_12_paths`: Demonstrate safe path normalization, parent directory creation, traversal rejection, and approved-root checks.
@@ -1781,7 +1747,7 @@ Usage examples must show:
 - `example_06_dataframe_and_combinations() -> None` — **Demonstration-only; alignment/serialization/chunking/parameter combinations.**
 - `example_07_data_quality() -> None` — **Demonstration-only; valid/invalid OHLCV diagnostics and envelope output.**
 - `example_08_validations() -> None` — **Demonstration-only; schema/evidence/registry validation and failures.**
-- `example_09_event_bus() -> None` — **Demonstration-only; local Event Bus, idempotency, queue failure.**
+- `example_09_audit_events() -> None` — **Demonstration-only; local audit event, idempotency, queue failure.**
 - `example_10_circuit_breakers_and_observability() -> None` — **Demonstration-only; state transitions, health, metrics, Prometheus text.**
 - `example_11_notifications() -> None` — **Demonstration-only; fake notification adapters and redacted payloads.**
 - `example_12_paths() -> None` — **Demonstration-only; approved-root normalization and traversal rejection.**
@@ -1848,7 +1814,7 @@ Usage examples must show:
 | 01A | Package, errors, standard envelopes | `__init__`, `contracts`, `errors` | Exports, error catalog, envelope, metadata, contract tests, rollback artifact approved. |
 | 01B | Logging, time, identity, paths | `logging`, `time`, `identity`, `paths` | Import-safe logging/time/ID/path contracts and tests pass. |
 | 01C | Settings, security, auth | `settings`, `security`, `auth` | Explicit config, redaction/crypto policy, deny-by-default auth tests pass. |
-| 01D | Event Bus, error routing, notifications | `events`, `errors.router`, `notifications` | Bounded queues/idempotency, fake adapter tests, recursive alert protection pass. |
+| 01D | audit event, error routing, notifications | `events`, `errors.router`, `notifications` | Bounded queues/idempotency, fake adapter tests, recursive alert protection pass. |
 | 01E | Observability and metrics | `observability` | Health/clock/circuit/metrics no-op and optional-export tests pass. |
 | 01F | Dataframes, data quality, validators | `dataframes`, `quality`, `validation` | Lazy pandas, no-mutation, bounded diagnostics, official tool contracts pass. |
 

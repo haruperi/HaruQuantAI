@@ -20,10 +20,10 @@ from app.services.analytics.contracts.models import (
     Lineage,
     TradingResult,
 )
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.services.simulator.contracts import (
     BacktestResult as UpstreamBacktestResult,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 # Define type aliases for alternative source formats (ANL-NFR-092)

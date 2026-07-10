@@ -18,6 +18,7 @@ from app.services.risk.audit.hash_chain import (
     append_audit_hash,
     verify_risk_audit_chain,
 )
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import (
     RiskAuditEvent,
     RiskContract,
@@ -25,7 +26,6 @@ from app.services.risk.models import (
     RiskSeverity,
 )
 from app.services.risk.models.enums import RiskDecisionStatus
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 from app.utils.standard import canonical_json, stable_identifier
 

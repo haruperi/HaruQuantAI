@@ -10,13 +10,13 @@ from __future__ import annotations
 import math
 
 from app.services.analytics.benchmarks.alignment import _align_series
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils import (
     StandardResponse,
     build_metadata,
     response_from_exception,
     success_response,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 

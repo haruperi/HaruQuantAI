@@ -73,7 +73,8 @@ from app.services.data import (
     stop_data_update_job as _stop_data_update_job,
 )
 from app.services.data.validation import validate_timeframe
-from app.utils.errors import ValidationError, exception_to_error_payload
+from app.utils.standard import exception_to_error_payload
+from app.utils.standard import ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import normalize_timestamp
 from app.utils.standard import build_metadata, error_response, success_response

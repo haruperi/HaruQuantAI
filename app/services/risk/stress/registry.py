@@ -11,8 +11,8 @@ from collections.abc import Mapping
 from decimal import Decimal
 from typing import Any, cast
 
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.stress.contracts import StressScenario
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 

@@ -170,9 +170,8 @@ class CrossStrategyPolicyEvaluator:
                 continue
 
             side = str(rec.get(side_key, "")).lower()
-            is_opposing = (
-                (is_buy_mutation and "sell" in side) or
-                (not is_buy_mutation and "buy" in side)
+            is_opposing = (is_buy_mutation and "sell" in side) or (
+                not is_buy_mutation and "buy" in side
             )
             if is_opposing:
                 has_conflict = True

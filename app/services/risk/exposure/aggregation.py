@@ -6,13 +6,13 @@ from collections.abc import Mapping, Sequence
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models.contracts import (
     CurrencyExposure,
     CurrencyLegExposure,
     SymbolExposure,
 )
 from app.services.risk.models.enums import RiskMode
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 if TYPE_CHECKING:

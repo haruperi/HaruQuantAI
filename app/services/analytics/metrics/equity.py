@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from app.services.analytics.contracts import MetricConfig, MetricResult
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.services.analytics.metrics.trade_outcomes import parse_utc_time
 from app.utils import (
     StandardResponse,
@@ -15,7 +16,6 @@ from app.utils import (
     response_from_exception,
     success_response,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 type TradeRecord = dict[str, Any]

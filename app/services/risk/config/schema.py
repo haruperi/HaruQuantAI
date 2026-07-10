@@ -13,7 +13,7 @@ from app.utils.logger import logger
 
 if TYPE_CHECKING:
     from app.services.risk.models import RiskConfig
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 # Hard ceiling constraints
 MAX_DAILY_LOSS_PCT = Decimal("0.20")

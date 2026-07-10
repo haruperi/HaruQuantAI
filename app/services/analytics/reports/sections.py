@@ -15,6 +15,7 @@ from typing import Any, cast
 from app.services.analytics.adapters import TradingResultAdapter
 from app.services.analytics.benchmarks import calculate_benchmark_metrics
 from app.services.analytics.contracts import MetricConfig, MetricResult
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.services.analytics.metrics.aggregate import calculate_trade_metrics
 from app.services.analytics.metrics.drawdown import (
     _raw_calculate_drawdown_metrics as calculate_drawdown_metrics,
@@ -37,7 +38,6 @@ from app.utils import (
     stable_identifier,
     success_response,
 )
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 

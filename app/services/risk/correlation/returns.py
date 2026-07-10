@@ -15,7 +15,7 @@ from app.services.risk.correlation.contracts import (
     ReturnMethod,
     ReturnSeries,
 )
-from app.utils.errors import ValidationError
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.utils.logger import logger
 
 MIN_BARS_FOR_RETURNS = 2

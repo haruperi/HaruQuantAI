@@ -7,25 +7,68 @@ snapshots, decisions, and tokens that cross the Risk Governance boundary.
 from __future__ import annotations
 
 import contextlib
+import hashlib
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-from app.utils.contract import Contract
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models.enums import (
     RiskDecisionStatus,
     RiskMode,
 )
 from app.utils.logger import logger
+from app.utils.standard import SENSITIVE_KEY_PATTERN, canonical_json
 
 if TYPE_CHECKING:
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
+
+_SCHEMA_VERSION_MIN_PARTS = 2
+
+_TRACE_FIELDS: frozenset[str] = frozenset(
+    {"created_at", "request_id", "workflow_id", "correlation_id"}
+)
 
 
-class RiskContract(Contract):
+class RiskContract(BaseModel):
     """Base class for all risk contracts, enforcing finite Decimal values."""
+
+    schema_version: str = Field(default="1.0.0")
+    created_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
+    request_id: str | None = None
+    workflow_id: str | None = None
+    correlation_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("metadata")
+    @classmethod
+    def validate_metadata_structure(cls, value: dict[str, Any]) -> dict[str, Any]:
+        """Validate metadata namespacing and secret safety."""
+        for key in value:
+            if not isinstance(key, str):
+                raise TypeError("Metadata keys must be strings.")
+            if "." not in key and ":" not in key:
+                raise ValueError("Metadata keys must be namespaced.")
+            if SENSITIVE_KEY_PATTERN.search(key):
+                raise ValueError("Metadata key matches sensitive key pattern.")
+        try:
+            canonical_json(value)
+        except (TypeError, ValueError) as exc:
+            msg = f"Metadata is not deterministically serializable: {exc}"
+            raise ValueError(msg) from exc
+        return value
+
+    @model_validator(mode="after")
+    def validate_trace_identifiers(self) -> RiskContract:
+        """Validate trace identifier fields."""
+        for name in ("request_id", "workflow_id", "correlation_id"):
+            value = getattr(self, name)
+            if value is not None and (not isinstance(value, str) or not value.strip()):
+                msg = f"{name} must be a non-empty string or None."
+                raise ValueError(msg)
+        return self
 
     @model_validator(mode="after")
     def validate_finite_decimals(self) -> RiskContract:
@@ -66,8 +109,6 @@ class RiskContract(Contract):
             str: Canonical JSON string.
         """
         from app.services.risk.models.serialization import _coerce_types
-        from app.utils.errors import ValidationError
-        from app.utils.standard import canonical_json
 
         try:
             return canonical_json(_coerce_types(self.model_dump()))
@@ -81,11 +122,7 @@ class RiskContract(Contract):
         Returns:
             str: SHA256 hex digest.
         """
-        import hashlib
-
-        from app.utils.contract import _TRACE_FIELDS
         from app.services.risk.models.serialization import _coerce_types
-        from app.utils.standard import canonical_json
 
         payload = {k: v for k, v in self.model_dump().items() if k not in _TRACE_FIELDS}
         try:
@@ -93,10 +130,28 @@ class RiskContract(Contract):
                 canonical_json(_coerce_types(payload)).encode("utf-8")
             ).hexdigest()
         except Exception as e:
-            from app.utils.errors import ValidationError
+            from app.services.risk.errors import RiskValidationError as ValidationError
 
             msg = f"Failed to hash contract: {e}"
             raise ValidationError(msg) from e
+
+    def contract_hash(self) -> str:
+        """Calculate SHA256 hash over the full serialized contract."""
+        return hashlib.sha256(self.to_json().encode("utf-8")).hexdigest()
+
+    def check_compatibility(self, target_version: str) -> bool:
+        """Check whether this contract version is compatible with a target."""
+        try:
+            current_parts = [int(part) for part in self.schema_version.split(".")]
+            target_parts = [int(part) for part in target_version.split(".")]
+            return (
+                len(current_parts) >= _SCHEMA_VERSION_MIN_PARTS
+                and len(target_parts) >= _SCHEMA_VERSION_MIN_PARTS
+                and current_parts[0] == target_parts[0]
+                and current_parts[1] >= target_parts[1]
+            )
+        except ValueError:
+            return False
 
 
 class RiskEvidenceRef(RiskContract):

@@ -17,7 +17,7 @@ from app.services.risk.models.contracts import RiskContract
 from app.utils.logger import logger
 
 if TYPE_CHECKING:
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 class DependencyStatus(RiskContract):
@@ -308,7 +308,7 @@ def build_readiness_dry_run(manifest: RiskReadinessManifest) -> DryRunReport:
             "app/services/risk/readiness/__init__.py",
         ],
         commands_planned=[
-            "uv run pytest tests/unit/app/services/risk/test_readiness.py",
+            "uv run pytest tests/risk/unit/test_readiness.py",
             "uv run ruff check .",
             "uv run mypy .",
         ],

@@ -13,6 +13,9 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from itertools import product
 from typing import Any
 
+from app.services.optimization.errors import (
+    OptimizationValidationError as ValidationError,
+)
 from app.services.optimization.helpers import (
     OptimizationExecutionError,
     build_candidate_hash,
@@ -25,7 +28,6 @@ from app.services.optimization.models import (
     ParameterSpace,
 )
 from app.services.optimization.scoring import evaluate_candidate_score
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 # ---------------------------------------------------------------------------

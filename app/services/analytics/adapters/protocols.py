@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Protocol, TypedDict
 
-from app.utils.errors import ValidationError
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils.logger import logger
 
 

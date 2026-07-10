@@ -17,6 +17,10 @@ Side effects:
 """
 
 from __future__ import annotations
+from app.utils.standard import ValidationError
+
+
+
 
 from collections.abc import Iterable, Mapping
 from datetime import UTC as DATETIME_UTC
@@ -24,7 +28,7 @@ from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from typing import Final, Literal, NoReturn, TypedDict
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from app.utils.errors import ValidationError
+
 from app.utils.logger import logger
 
 DEFAULT_TIMEZONE: Final[str] = "UTC"

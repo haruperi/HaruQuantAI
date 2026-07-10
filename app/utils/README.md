@@ -82,15 +82,6 @@ errors (`LIVE_*`). Includes broker error classification and exponential-backoff 
 
 ---
 
-### [`event_bus.py`](event_bus.py) — In-Memory Event Bus
-
-Thread-safe bounded in-memory pub/sub bus. Supports idempotency keys, back-pressure (fail-fast or drop-oldest), event
-deduplication, and subscriber fan-out. No external message broker dependency. All state lives inside caller-owned instances.
-
-**Key exports:** `EventEnvelope`, `PublishResult`, `InMemoryEventBus`, `build_event_envelope`, `publish_event`
-
----
-
 ### [`identity.py`](identity.py) — Identifier Generation & Validation
 
 Prefix-validated, collision-resistant ULID/UUID identifiers. Validates prefix format, ID structure, and version strings
@@ -146,15 +137,6 @@ private and accessible only through read-only properties. Sensitive keys are fil
 
 ---
 
-### [`paths.py`](paths.py) — Safe Path Utilities
-
-Path normalization, directory creation, and path-traversal protection. All path operations resolve candidates and validate
-that results remain inside the declared root boundary before returning.
-
-**Key exports:** `ensure_dir`, `ensure_parent_dir`, `normalize_path`, `safe_join`, `validate_path_within_root`
-
----
-
 ### [`security.py`](security.py) — Cryptography & Secret Redaction
 
 Cryptographic utilities and secret redaction tools. Password hashing attempts Argon2id first and falls back to
@@ -189,19 +171,6 @@ building, and circuit-open responses.
 `build_error_response`, `response_from_exception`, `circuit_open_response`, `validate_standard_response`, `canonical_json`,
 `stable_identifier`, `get_execution_ms`, `build_data_quality_issue`, `validate_ohlcv_records`, `build_error_event`,
 `validate_metric_labels`, `is_official_tool_allowed`
-
----
-
-### [`validations.py`](validations.py) — Schema & Range Validation
-
-Non-strict JSON schema and numeric range checking. Validates structured packets (evidence packs, approval packets, registry
-entries, handoff payloads). Returns `ValidationResult` TypedDicts rather than raising, enabling caller-controlled error
-handling.
-
-**Key exports:** `VALIDATION_FAILED`, `VALID_RISK_LEVELS`, `VALID_ENVIRONMENT_MODES`, `ValidationResult`,
-`validate_input_schema`, `validate_output_schema`, `validate_numeric_range`, `validate_required_fields`,
-`validate_mapping_schema`, `validate_schema_version`, `validate_data_freshness`, `validate_evidence_pack`,
-`validate_approval_packet`, `validate_registry_entry`, `validate_handoff_payload`, `validation_failed_paths`
 
 ---
 
@@ -421,27 +390,6 @@ resp = validate_ohlcv_quality(df, expected_symbol="EURUSD", timeframe="M1")
 print(resp["status"])     # "success"
 ```
 
-#### Event Bus
-
-```python
-from app.utils import InMemoryEventBus, build_event_envelope, publish_event
-
-bus = InMemoryEventBus(max_queue_size=500)
-
-def on_signal(envelope):
-    print(f"Signal: {envelope['payload']}")
-
-bus.subscribe("strategy.signal", on_signal)
-event  = build_event_envelope(
-    event_type="strategy.signal",
-    source="strategy_runner",
-    payload={"action": "BUY", "symbol": "EURUSD", "size": 0.1},
-)
-result = publish_event(bus, event)
-print(result.status)           # "delivered"
-print(result.delivered_count)  # 1
-```
-
 #### Circuit Breaker & Observability
 
 ```python
@@ -480,47 +428,6 @@ print(result.status)     # "sent"
 print(result.latency_ms)
 ```
 
-#### Schema Validation
-
-```python
-from app.utils import validate_input_schema, validate_numeric_range, ValidationError
-
-schema = {
-    "type": "object",
-    "properties": {
-        "symbol":   {"type": "string", "minLength": 3},
-        "quantity": {"type": "number", "minimum": 0.01},
-    },
-    "required": ["symbol", "quantity"],
-}
-
-validate_input_schema({"symbol": "EURUSD", "quantity": 1.5}, schema)  # OK
-
-try:
-    validate_input_schema({"symbol": "EU", "quantity": -1}, schema)
-except ValidationError as exc:
-    print(exc)
-
-validate_numeric_range(0.05, min_value=0.01, max_value=1.0, field_name="lot_size")
-```
-
-#### Safe Paths
-
-```python
-from pathlib import Path
-from app.utils import ensure_parent_dir, safe_join, validate_path_within_root
-
-base      = Path("/data/haruquant")
-safe_path = safe_join(base, "raw", "EURUSD", "2026.csv")
-
-ensure_parent_dir(safe_path)   # creates parent directories if absent
-
-try:
-    safe_join(base, "../../etc/passwd")
-except ValueError:
-    print("traversal blocked")
-```
-
 ### Advanced Usage / Edge Cases
 
 #### Lazy Settings Access
@@ -555,10 +462,9 @@ assert verify_password("wrong",  h) is False
 #### Error Router with Deduplication Window
 
 ```python
-from app.utils import InMemoryEventBus, ErrorRouter
+from app.utils import ErrorRouter
 
-bus    = InMemoryEventBus()
-router = ErrorRouter(bus=bus, dedupe_window_seconds=60.0)
+router = ErrorRouter(dedupe_window_seconds=60.0)
 
 exc = ValueError("DB write failed")
 r1  = router.route_error(error=exc, source="data_writer")  # "routed"

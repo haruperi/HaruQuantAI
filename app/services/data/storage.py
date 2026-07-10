@@ -19,10 +19,10 @@ from typing import Any
 
 import pandas as pd
 
+from app.services.data.errors import DataIntegrityError as DataError
+from app.services.data.errors import DataValidationError as ValidationError
 from app.services.strategy.contracts import Bar
-from app.utils.errors import DataError, ValidationError
 from app.utils.logger import logger
-from app.utils.paths import ensure_parent_dir, normalize_path
 
 APPROVED_STORAGE_ROOTS: list[str] = [
     "data/raw",
@@ -36,6 +36,25 @@ DB_FILE_PATH: str = "data/data_service.db"
 
 DEFAULT_SCHEMA_VERSION: str = "v1"
 DEFAULT_NORMALIZATION_VERSION: str = "v1"
+
+
+def _normalize_storage_path(path: str | Path) -> Path:
+    """Resolve a storage path without requiring the final target to exist."""
+    raw_path = Path(path)
+    if not str(raw_path):
+        raise ValidationError("Path cannot be empty.")
+    return raw_path.expanduser().resolve(strict=False)
+
+
+def _ensure_storage_parent_dir(path: str | Path) -> Path:
+    """Create the parent directory for a validated storage path."""
+    resolved_path = _normalize_storage_path(path)
+    try:
+        resolved_path.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        msg = f"failed to create parent directory: {resolved_path.parent}"
+        raise ValidationError(msg) from exc
+    return resolved_path
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,8 +97,7 @@ def validate_storage_path(path_str: str) -> Path:
             raise ValidationError("Hidden files or directories are forbidden.")
 
     try:
-        norm_path_str = normalize_path(path_str)
-        resolved_path = Path(norm_path_str).resolve()
+        resolved_path = _normalize_storage_path(path_str)
     except Exception as e:
         logger.error(f"Path normalization failure for {path_str}: {e}")
         err_path = f"Invalid path: {path_str}"
@@ -591,7 +609,7 @@ def save_market_data(
         err_fmt = f"Format {format_str} unsupported."
         raise ValidationError(err_fmt)
 
-    ensure_parent_dir(str(resolved_path))
+    _ensure_storage_parent_dir(resolved_path)
 
     df = pd.DataFrame(records)
 

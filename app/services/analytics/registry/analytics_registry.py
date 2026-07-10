@@ -21,7 +21,7 @@ from app.services.analytics.contracts.models import (
     MetricConfig,
     MetricResult,
 )
-from app.utils.errors import ValidationError
+from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils.logger import logger
 
 # Active request IDs cache/registry (observability/traceability)

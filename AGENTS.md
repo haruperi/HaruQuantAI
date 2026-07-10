@@ -71,7 +71,8 @@
 
 - **Update Rules**: Architecture/API/models → `docs/ARCHITECTURE.md`. Sprint state/decisions → `docs/CHANGELOG.md`. AI workflow → `AGENTS.md`.
 - **Update Module/Service Documentation**: Add/update a `README.md` for each module/service as it's built.
-- **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `uv run pytest`, `uv run ruff check .`, `uv run mypy .`
+- **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `uv run pytest <test_file_path>`, `uv run ruff check .`, `uv run mypy .`
+- **Targeted Testing**: Do not run the full `pytest` suite during iterative development, as the total number of tests is very large and full runs are time-consuming. Only run the specific test files associated with the code just created or edited to verify changes.
 - **Restricted Commands (Require `APPROVED: EXECUTE`)**: `rm -rf`, `git reset`, `git clean`, `uv add`/`uv remove`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.
 
 ## 8. Final Checklist (Must be satisfied before finishing)

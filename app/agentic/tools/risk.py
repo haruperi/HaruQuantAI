@@ -51,7 +51,7 @@ from app.services.risk.tail_risk import (
     calculate_portfolio_var as _calculate_portfolio_var,
 )
 from app.services.risk.tools.official import _shared_governor, _shared_store
-from app.utils.errors import exception_to_error_payload
+from app.utils.standard import exception_to_error_payload
 from app.utils.logger import logger
 from app.utils.standard import build_metadata, error_response, success_response
 
@@ -214,7 +214,7 @@ def _validate_live_sensitive_tool_context(
     Raises:
         ValidationError: If validation fails.
     """
-    from app.utils.errors import ValidationError
+    from app.utils.standard import ValidationError
 
     mode = market_context.get("mode", "paper")
     env = market_context.get("environment", "local")

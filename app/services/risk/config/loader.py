@@ -15,8 +15,8 @@ from typing import Any
 from pydantic import Field
 
 from app.services.risk.config.schema import validate_risk_config
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import RiskConfig, RiskContract
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 # PyYAML is used for YAML config parsing

@@ -10,7 +10,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from app.utils.errors import ValidationError
+from app.services.research.errors import ResearchValidationError as ValidationError
 
 
 def log_returns(close: pd.Series) -> pd.Series:

@@ -9,7 +9,7 @@ broker-initiated (non-commanded) execution events (TRD-FR-120, TRD-FR-122),
 and classifies corporate-action notifications (TRD-FR-121).
 
 Provider retcode-to-error-code mapping is delegated to
-``app.utils.errors.classify_broker_error`` (the single source of truth for
+``app.utils.standard.classify_broker_error`` (the single source of truth for
 deterministic error classification, per the project's error consolidation
 decision) rather than duplicated here.
 """
@@ -27,8 +27,8 @@ from app.services.trading.contracts import (
     RetrySafety,
     TradingContract,
 )
+from app.services.trading.errors import classify_broker_error
 from app.services.trading.security.error_mapping import TradingMappedError
-from app.utils.errors import classify_broker_error
 from app.utils.logger import logger
 
 UNKNOWN_OUTCOME_RETCODE = "10005"

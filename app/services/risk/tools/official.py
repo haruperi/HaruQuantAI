@@ -13,6 +13,7 @@ from typing import Any, Literal, TypeVar
 from pydantic import Field
 
 from app.services.risk.config import load_risk_config
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.governor import RiskGovernor
 from app.services.risk.models import (
     PortfolioState,
@@ -31,7 +32,18 @@ from app.services.risk.sizing import calculate_position_size
 from app.services.risk.storage import InMemoryRiskStateStore
 from app.services.risk.stress import build_default_scenario_registry
 from app.services.risk.tail_risk import calculate_var_es_snapshots
-from app.utils.errors import ValidationError, exception_to_error_payload
+
+
+def _exception_to_error_payload(
+    exception: Exception, default_code: str = "TOOL_EXECUTION_FAILED"
+) -> dict[str, str]:
+    raw_code = getattr(exception, "code", None)
+    code = raw_code if isinstance(raw_code, str) and raw_code.strip() else default_code
+    return {
+        "code": code,
+        "details": f"{exception.__class__.__name__}: {exception}",
+    }
+
 
 # Type variable for generics
 T = TypeVar("T", bound=RiskContract)
@@ -356,7 +368,7 @@ def build_portfolio_risk_snapshot_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to compile portfolio risk snapshot.",
@@ -431,7 +443,7 @@ def review_trade_risk_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to execute trade risk review.",
@@ -519,7 +531,7 @@ def calculate_position_size_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to calculate position size.",
@@ -615,7 +627,7 @@ def assess_risk_regime_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to assess risk regime.",
@@ -684,7 +696,7 @@ def review_strategy_admission_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to review strategy admission.",
@@ -760,7 +772,7 @@ def review_allocation_proposal_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to review allocation proposal.",
@@ -843,7 +855,7 @@ def run_portfolio_risk_governor_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to run portfolio risk governor.",
@@ -915,7 +927,7 @@ def validate_risk_approval_token_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to validate approval token.",
@@ -1025,7 +1037,7 @@ def check_risk_kill_switch_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to check kill switch status.",
@@ -1103,7 +1115,7 @@ def run_risk_scenario_analysis_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to run stress scenario analysis.",
@@ -1190,7 +1202,7 @@ def generate_risk_report_tool(
             "haruquant.trades": False,
             "haruquant.requires_network": False,
         }
-        err_info = exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
+        err_info = _exception_to_error_payload(e, default_code="TOOL_EXECUTION_FAILED")
         return ToolResponse(
             status="error",
             message="Failed to generate risk report.",

@@ -21,6 +21,7 @@ from app.services.risk.correlation.returns import (
     calculate_pearson,
     calculate_returns,
 )
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.exposure import (
     _resolve_base_quote,
     _resolve_conversion_rate,
@@ -32,7 +33,6 @@ from app.services.risk.models.contracts import (
     RiskConfig,
 )
 from app.services.risk.models.enums import RiskDecisionStatus
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 

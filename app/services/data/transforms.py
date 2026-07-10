@@ -11,8 +11,8 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from app.services.data.errors import DataValidationError as ValidationError
 from app.services.data.validation import validate_timeframe
-from app.utils.errors import ValidationError
 from app.utils.logger import logger
 
 

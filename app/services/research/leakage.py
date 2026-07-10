@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
 
-from app.utils.errors import ValidationError
+from app.services.research.errors import ResearchValidationError as ValidationError
 from app.utils.security import redact_mapping
 
 

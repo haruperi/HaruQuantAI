@@ -122,9 +122,7 @@ class SignalProcessor:
         self,
         *,
         signal: dict[str, Any],
-        gate_pipeline_runner: Callable[
-            [TradingRequestEnvelope], GatePipelineDecision
-        ],
+        gate_pipeline_runner: Callable[[TradingRequestEnvelope], GatePipelineDecision],
     ) -> tuple[TradingRequestEnvelope, GatePipelineDecision]:
         """Transform signal into envelope and validate via pipeline.
 

@@ -98,7 +98,7 @@ _Project-wide utilities: logging, contracts, errors, identity, time, paths, data
 14.1 Models — Standard event envelope, bounded queue diagnostics, and correlation/idempotency fields
 14.2 Protocol — Pub/sub contract, subscriber isolation, external adapter boundary, and event version compatibility
 14.3 Idempotency — Bounded event idempotency and deterministic eviction
-14.4 In Process — Deterministic local Event Bus execution
+14.4 In Process — Deterministic local audit event execution
 14.5 External Adapters — Optional external adapter safety
 
 **15. Notifications** — Decide how to route a sanitized alert under explicit environment/channel policy and optionally deliver it through lazy…

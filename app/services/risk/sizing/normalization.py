@@ -12,7 +12,7 @@ from app.utils.logger import logger
 if TYPE_CHECKING:
     from app.services.risk.models import RiskReasonCode
     from app.services.risk.sizing.contracts import SymbolRiskMetadata
-    from app.utils.validations import ValidationResult
+    from app.services.risk.validations import ValidationResult
 
 
 def validate_symbol_volume_metadata(

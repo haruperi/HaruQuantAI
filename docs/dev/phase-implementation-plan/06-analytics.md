@@ -77,7 +77,7 @@ docs/analytics/
 ├── architecture.md                     # Boundary, ownership, ADR/limit references
 └── catalogs.md                         # Metric/tool/warning/schema-compatibility catalogs
 
-tests/services/analytics/test_requirement_traceability.py
+tests/analytics/integration/test_requirement_traceability.py
 examples/analytics/analytics_examples.py
 ```
 
@@ -1946,7 +1946,7 @@ Description: This file is the single cohesion point for the following exact sour
 
 Requirements:
 - [X] **ANL-NFR-430**: Requirement-to-test traceability matrix maps every official tool, report contract, adapter mapping, warning/quality flag, and failure envelope to tests.
-  *Evidence: tests/services/analytics/test_requirement_traceability.py line 30-31 (validate_requirement_matrix)*
+  *Evidence: tests/analytics/integration/test_requirement_traceability.py line 30-31 (validate_requirement_matrix)*
 
 Target Class/Function:
 - validate_requirement_matrix(matrix: RequirementTestMatrix) -> TraceabilityReport — Pure test helper.
@@ -2349,7 +2349,7 @@ This map intentionally places cross-cutting concerns at decorators, adapters, co
 - [X] **ANL-NFR-427**: Documentation must include partial-report examples showing skipped, failed, and degraded section metadata.
   *Evidence: docs/analytics/catalogs.md line 3 (render_catalog_markdown)*
 - [X] **ANL-NFR-430**: Requirement-to-test traceability matrix maps every official tool, report contract, adapter mapping, warning/quality flag, and failure envelope to tests.
-  *Evidence: tests/services/analytics/test_requirement_traceability.py line 30-31 (validate_requirement_matrix)*
+  *Evidence: tests/analytics/integration/test_requirement_traceability.py line 30-31 (validate_requirement_matrix)*
 - [X] **ANL-NFR-431**: Usage examples cover success, validation failure, partial report, dashboard truncation, and request-ID traceability.
   *Evidence: docs/analytics/catalogs.md line 3 (render_catalog_markdown)*
 - [X] **ANL-NFR-443**: Documentation must include required, optional, and future dashboard payload classes.
@@ -2443,7 +2443,7 @@ These source items are retained to prove they were reviewed. They impose no new 
 
 - `docs/analytics/catalogs.md`: Metric Definition Catalog, Official Analytics Tool Catalog, warning/quality-flag catalog, schema compatibility matrix, partial-report behavior, and dashboard payload classifications.
 - `docs/analytics/architecture.md`: module ownership, canonical input boundary, source/consumer interface rules, non-binding scorecard posture, resource-limit ADR links, and migration/deprecation rules.
-- `tests/services/analytics/test_requirement_traceability.py`: maps every explicit `ANL-*` requirement ID to a named test or an explicit owner-approved deferral.
+- `tests/analytics/integration/test_requirement_traceability.py`: maps every explicit `ANL-*` requirement ID to a named test or an explicit owner-approved deferral.
 - Every Python module has a file-level docstring, and every public function/class has Google-style documentation covering arguments, return type, side effects, errors, and consumer safety.
 - Structured logging emits lifecycle events with redacted metadata only; source reports/dataframes, credentials, broker tokens, authorization headers, and raw provider payloads never enter public logs or output envelopes.
 
@@ -2890,7 +2890,7 @@ This register is the exhaustive accounting record for all explicit source checkl
 | ANL-NFR-427 | Analytics Output Reports and Export Primitives | Non-functional / governance | Documentation must include partial-report examples showing skipped, failed, and degraded section metadata. | `docs/analytics/catalogs.md` | `render_catalog_markdown` |
 | ANL-NFR-428 | Analytics Output Reports and Export Primitives | Functional / behavioural | `TradingResult`, `AnalyticsReport`, `PortfolioAnalyticsReport`, dashboard payloads, warning objects, quality flags, and error envelopes have versioned schemas. | `app/services/analytics/contracts/models.py` | `validate_schema_version` |
 | ANL-NFR-429 | Analytics Output Reports and Export Primitives | Functional / behavioural | Report section criticality and partial-report non-promotable behavior are approved. | `app/services/analytics/reports/sections.py` | `evaluate_section` |
-| ANL-NFR-430 | Analytics Output Reports and Export Primitives | Non-functional / governance | Requirement-to-test traceability matrix maps every official tool, report contract, adapter mapping, warning/quality flag, and failure envelope to tests. | `tests/services/analytics/test_requirement_traceability.py` | `validate_requirement_matrix` |
+| ANL-NFR-430 | Analytics Output Reports and Export Primitives | Non-functional / governance | Requirement-to-test traceability matrix maps every official tool, report contract, adapter mapping, warning/quality flag, and failure envelope to tests. | `tests/analytics/integration/test_requirement_traceability.py` | `validate_requirement_matrix` |
 | ANL-NFR-431 | Analytics Output Reports and Export Primitives | Non-functional / governance | Usage examples cover success, validation failure, partial report, dashboard truncation, and request-ID traceability. | `docs/analytics/catalogs.md` | `render_catalog_markdown` |
 | ANL-NFR-432 | Analytics Output Reports and Export Primitives | Scope declaration | No file-specific non-functional requirements defined. | `app/services/analytics/contracts/serialization.py` | `to_json_safe` |
 | ANL-NFR-433 | Analytics Output Reports and Export Primitives | Functional / behavioural | Final analytics responses must not contain `NaN`, `inf`, `-inf`, invalid JSON values, pandas objects, NumPy objects, raw dataframes, raw series, or other unserializable values. | `app/services/analytics/contracts/serialization.py` | `to_json_safe` |

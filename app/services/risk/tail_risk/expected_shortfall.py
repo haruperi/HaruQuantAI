@@ -9,6 +9,7 @@ from decimal import Decimal
 from statistics import NormalDist
 from typing import TYPE_CHECKING, Any, overload
 
+from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models.contracts import (
     ExpectedShortfallSnapshot,
     PortfolioState,
@@ -26,9 +27,8 @@ from app.services.risk.tail_risk.var import (
     shrink_covariance_matrix,
     validate_covariance_matrix,
 )
-from app.utils.errors import ValidationError
+from app.services.risk.validations import ValidationResult, _fail, _ok
 from app.utils.logger import logger
-from app.utils.validations import ValidationResult, _fail, _ok
 
 if TYPE_CHECKING:
     from app.services.risk.policy.contracts import EffectiveRiskPolicy
