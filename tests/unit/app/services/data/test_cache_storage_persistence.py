@@ -14,7 +14,7 @@ from app.services.data.storage import (
     set_cached_data,
     validate_storage_path,
 )
-from app.utils.errors import ValidationError
+from app.utils.errors import DataError, ValidationError
 
 
 def test_path_validation_locks() -> None:
@@ -215,14 +215,16 @@ def test_load_local_dataset_exception_handling(tmp_path: Path) -> None:
     corrupt_file = tmp_path / "corrupt.csv"
     corrupt_file.write_text("invalid,csv,data\n1,2", encoding="utf-8")
     # This should trigger DataError inside load_local_dataset
-    from app.services.data.storage import DataError, load_local_dataset
+    from app.services.data.storage import load_local_dataset
 
-    with patch(
-        "app.services.data.storage.validate_storage_path", return_value=corrupt_file
+    with (
+        patch(
+            "app.services.data.storage.validate_storage_path", return_value=corrupt_file
+        ),
+        patch("pandas.read_csv", side_effect=Exception("Read CSV Error")),
+        pytest.raises(DataError),
     ):
-        with patch("pandas.read_csv", side_effect=Exception("Read CSV Error")):
-            with pytest.raises(DataError):
-                load_local_dataset("data/raw/corrupt.csv")
+        load_local_dataset("data/raw/corrupt.csv")
 
 
 def test_load_ohlcv_csv_errors(tmp_path: Path) -> None:
@@ -231,17 +233,21 @@ def test_load_ohlcv_csv_errors(tmp_path: Path) -> None:
     # Empty raw records
     empty_file = tmp_path / "empty.csv"
     empty_file.write_text("open,high,low,close\n", encoding="utf-8")
-    with patch("app.services.data.storage.load_local_dataset", return_value=[]):
-        with pytest.raises(ValueError, match="At least one OHLCV bar is required"):
-            load_ohlcv_csv("data/raw/empty.csv")
+    with (
+        patch("app.services.data.storage.load_local_dataset", return_value=[]),
+        pytest.raises(ValueError, match="At least one OHLCV bar is required"),
+    ):
+        load_ohlcv_csv("data/raw/empty.csv")
 
     # Missing time column
     records_no_time = [{"open": 1.0, "high": 1.1, "low": 0.9, "close": 1.0}]
-    with patch(
-        "app.services.data.storage.load_local_dataset", return_value=records_no_time
+    with (
+        patch(
+            "app.services.data.storage.load_local_dataset", return_value=records_no_time
+        ),
+        pytest.raises(ValueError, match="CSV needs one of timestamp columns"),
     ):
-        with pytest.raises(ValueError, match="CSV needs one of timestamp columns"):
-            load_ohlcv_csv("data/raw/missing_time.csv")
+        load_ohlcv_csv("data/raw/missing_time.csv")
 
     # Naive timestamp (no timezone)
     records_naive_time = [
@@ -253,11 +259,14 @@ def test_load_ohlcv_csv_errors(tmp_path: Path) -> None:
             "close": 1.0,
         }
     ]
-    with patch(
-        "app.services.data.storage.load_local_dataset", return_value=records_naive_time
+    with (
+        patch(
+            "app.services.data.storage.load_local_dataset",
+            return_value=records_naive_time,
+        ),
+        pytest.raises(ValueError, match="Invalid OHLCV row"),
     ):
-        with pytest.raises(ValueError, match="Invalid OHLCV row"):
-            load_ohlcv_csv("data/raw/naive_time.csv")
+        load_ohlcv_csv("data/raw/naive_time.csv")
 
     # Invalid price row (e.g. ValueError during float conversion)
     records_bad_row = [
@@ -269,8 +278,10 @@ def test_load_ohlcv_csv_errors(tmp_path: Path) -> None:
             "close": 1.0,
         }
     ]
-    with patch(
-        "app.services.data.storage.load_local_dataset", return_value=records_bad_row
+    with (
+        patch(
+            "app.services.data.storage.load_local_dataset", return_value=records_bad_row
+        ),
+        pytest.raises(ValueError, match="Invalid OHLCV row"),
     ):
-        with pytest.raises(ValueError, match="Invalid OHLCV row"):
-            load_ohlcv_csv("data/raw/bad_row.csv")
+        load_ohlcv_csv("data/raw/bad_row.csv")

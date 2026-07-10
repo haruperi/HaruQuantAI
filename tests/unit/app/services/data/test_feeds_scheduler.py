@@ -1,6 +1,7 @@
 """Unit tests for scheduler leases, job states, feed overflows, and heartbeats."""
 
 import sqlite3
+from contextlib import suppress
 
 import pytest
 from app.services.data.scheduler import (
@@ -320,16 +321,16 @@ def test_async_job_execution_loops() -> None:
             await _run_job_loop(job_name)  # Should log cancellation and break
 
         # 5. Test run_job_loop database exception path
-        # Patch db_helper to raise exception on first call, then patch sleep to raise CancelledError
-        # so it breaks out of the infinite loop
-        with patch(
-            "app.services.data.storage.db_helper.get_connection",
-            side_effect=RuntimeError("DB Fail"),
+        # Patch db_helper to raise, then patch sleep to raise CancelledError
+        # so the infinite loop exits.
+        with (
+            patch(
+                "app.services.data.storage.db_helper.get_connection",
+                side_effect=RuntimeError("DB Fail"),
+            ),
+            patch("asyncio.sleep", side_effect=[None, asyncio.CancelledError]),
+            suppress(asyncio.CancelledError),
         ):
-            with patch("asyncio.sleep", side_effect=[None, asyncio.CancelledError]):
-                try:
-                    await _run_job_loop(job_name)
-                except asyncio.CancelledError:
-                    pass
+            await _run_job_loop(job_name)
 
     asyncio.run(run_test())

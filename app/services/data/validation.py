@@ -45,6 +45,10 @@ MAX_SYMBOLS_PER_JOB: int = 500
 MAX_TIMEFRAMES_PER_JOB: int = 20
 MIN_SCHEDULER_FREQUENCY_SECONDS: int = 60
 
+RESAMPLE_PERFORMANCE_BENCHMARK_BARS: int = 100000
+RESAMPLE_PERFORMANCE_THRESHOLD_SECONDS: float = 3.0
+"""Approved local benchmark: resampling 100,000 M1 bars to H1 stays under this."""
+
 
 def validate_limit(limit: int | None, max_allowed: int, default_value: int) -> int:
     """Validate and return a query limit.
@@ -210,15 +214,80 @@ SECONDS_IN_HOUR: int = 3600
 def validate_timeframe(timeframe: str) -> str:
     """Validate that a timeframe name is supported."""
     if not timeframe:
-        raise ValidationError("Timeframe cannot be empty.")
+        raise ValidationError(
+            "Timeframe cannot be empty.", code="UNSUPPORTED_TIMEFRAME"
+        )
 
     upper_tf = timeframe.upper()
     if upper_tf not in VALID_TIMEFRAMES:
         err_msg = f"Unsupported timeframe: {timeframe}"
         logger.error(err_msg)
-        raise ValidationError(err_msg)
+        raise ValidationError(err_msg, code="UNSUPPORTED_TIMEFRAME")
 
     return upper_tf
+
+
+VALID_WORKFLOW_CONTEXTS: frozenset[str] = frozenset(
+    {"research", "backtest", "validation", "risk", "execution_bound"}
+)
+"""Approved `workflow_context` values for gateway and tool boundary requests."""
+
+VALID_STALE_DATA_BEHAVIORS: frozenset[str] = frozenset(
+    {"refresh_and_return", "return_stale", "fail"}
+)
+"""Approved cache staleness policies for `get_data` and gateway requests."""
+
+
+def validate_workflow_context(
+    workflow_context: str, request_id: str | None = None
+) -> str:
+    """Validate that a workflow context is one of the approved values.
+
+    Args:
+        workflow_context: Requested execution context.
+        request_id: Optional tracking identifier.
+
+    Returns:
+        str: The validated workflow context, unchanged.
+
+    Raises:
+        ValidationError: If the workflow context is not approved.
+    """
+    logger.debug(
+        f"Validating workflow_context={workflow_context}",
+        extra={"request_id": request_id},
+    )
+    if workflow_context not in VALID_WORKFLOW_CONTEXTS:
+        err_msg = f"Unsupported workflow_context: {workflow_context}"
+        logger.error(err_msg, extra={"request_id": request_id})
+        raise ValidationError(err_msg, code="INVALID_INPUT")
+    return workflow_context
+
+
+def validate_stale_data_behavior(
+    stale_data_behavior: str, request_id: str | None = None
+) -> str:
+    """Validate that a stale-cache behavior policy is one of the approved values.
+
+    Args:
+        stale_data_behavior: Requested cache staleness policy.
+        request_id: Optional tracking identifier.
+
+    Returns:
+        str: The validated stale-data behavior, unchanged.
+
+    Raises:
+        ValidationError: If the policy is not approved.
+    """
+    logger.debug(
+        f"Validating stale_data_behavior={stale_data_behavior}",
+        extra={"request_id": request_id},
+    )
+    if stale_data_behavior not in VALID_STALE_DATA_BEHAVIORS:
+        err_msg = f"Unsupported stale_data_behavior: {stale_data_behavior}"
+        logger.error(err_msg, extra={"request_id": request_id})
+        raise ValidationError(err_msg, code="INVALID_INPUT")
+    return stale_data_behavior
 
 
 def validate_timezone(tz_name: str) -> str:
@@ -333,8 +402,87 @@ DEFAULT_LICENSE_REGISTRY: dict[str, dict[str, Any]] = {
 }
 
 
+# --- 5. Source Readiness Manifest ---
+VALID_SOURCE_READINESS_STATES: frozenset[str] = frozenset(
+    {"production", "staging", "experimental", "not_available"}
+)
+"""Approved source readiness classifications."""
+
+SOURCE_READINESS_REGISTRY: dict[str, str] = {
+    "csv": "production",
+    "parquet": "production",
+    "synthetic": "production",
+    "mt5": "staging",
+    "ctrader": "staging",
+    "dukascopy": "staging",
+    "binance": "staging",
+    "yahoo": "staging",
+}
+"""Declared readiness per source adapter.
+
+Local (`csv`, `parquet`) and `synthetic` sources are `production` because they
+require no live credentials and are fully covered by tests. Broker-backed
+sources (`mt5`, `ctrader`, `dukascopy`, `binance`, `yahoo`) are `staging`
+until a live-credential validation pass promotes them.
+"""
+
+_GATED_WORKFLOW_CONTEXTS: frozenset[str] = frozenset({"risk", "execution_bound"})
+"""Workflow contexts that require `production`-readiness sources."""
+
+
+def validate_source_readiness(
+    source: str,
+    workflow_context: str,
+    *,
+    request_id: str | None = None,
+) -> str:
+    """Enforce source readiness before retrieval, storage, or export.
+
+    Args:
+        source: Source adapter identifier.
+        workflow_context: Requested execution context.
+        request_id: Optional tracking identifier.
+
+    Returns:
+        str: The source's declared readiness state.
+
+    Raises:
+        ValidationError: If the source is `not_available`, or if a
+            `staging`/`experimental` source is used under a `risk` or
+            `execution_bound` workflow context.
+    """
+    readiness = SOURCE_READINESS_REGISTRY.get(source.lower(), "experimental")
+    logger.debug(
+        f"Validating source readiness: source={source}, readiness={readiness}, "
+        f"workflow_context={workflow_context}",
+        extra={"request_id": request_id},
+    )
+    if readiness == "not_available":
+        err_msg = f"Source {source} is not available."
+        logger.error(err_msg, extra={"request_id": request_id})
+        raise ValidationError(err_msg, code="UNSUPPORTED_OPERATION")
+    if readiness != "production" and workflow_context in _GATED_WORKFLOW_CONTEXTS:
+        err_msg = (
+            f"Source {source} has readiness={readiness}; only production-ready "
+            f"sources are permitted under workflow_context={workflow_context}."
+        )
+        logger.error(err_msg, extra={"request_id": request_id})
+        raise ValidationError(err_msg, code="LICENSE_RESTRICTION")
+    return readiness
+
+
+_LICENSING_TABLE_READY: bool = False
+
+
 def _ensure_licensing_table() -> None:
-    """Ensure data_licenses table exists in database."""
+    """Lazily ensure the data_licenses table exists in the database.
+
+    This runs on first use (register/validate license) instead of at module
+    import time, so importing `app.services.data` performs no database I/O.
+    """
+    global _LICENSING_TABLE_READY  # noqa: PLW0603
+    if _LICENSING_TABLE_READY:
+        return
     try:
         with db_helper.get_connection() as conn:
             conn.execute(
@@ -350,12 +498,9 @@ def _ensure_licensing_table() -> None:
                 );
                 """
             )
+        _LICENSING_TABLE_READY = True
     except Exception as e:  # noqa: BLE001
         logger.warning(f"Could not initialize data_licenses table: {e}")
-
-
-# Initialize table on load
-_ensure_licensing_table()
 
 
 def register_license(
@@ -372,6 +517,7 @@ def register_license(
         f"Registering license: source={source}, symbol={symbol}",
         extra={"request_id": request_id},
     )
+    _ensure_licensing_table()
 
     try:
         with db_helper.get_connection() as conn:
@@ -412,6 +558,7 @@ def validate_license(
         f"context={workflow_context}",
         extra={"request_id": request_id},
     )
+    _ensure_licensing_table()
 
     license_info = None
     try:

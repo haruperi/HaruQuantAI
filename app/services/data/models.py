@@ -171,6 +171,52 @@ class SymbolMetadata(BaseModel):
     )
 
 
+class DataQualitySummary(BaseModel):
+    """Pydantic model summarizing deterministic data-quality diagnostics.
+
+    Diagnostic-only: this model never repairs, interpolates, or silently
+    drops records. See `normalization.summarize_data_quality`.
+    """
+
+    flagged_record_count: int = Field(
+        0, description="Count of records with at least one quality flag."
+    )
+    flag_counts: dict[str, int] = Field(
+        default_factory=dict,
+        description="Mapping of quality-flag identifier to occurrence count.",
+    )
+
+
+class DataLineage(BaseModel):
+    """Pydantic model describing provenance metadata for a retrieved batch.
+
+    Downstream research/backtest/validation/risk/execution-bound consumers
+    use this to decide whether a batch is safe for their workflow.
+    """
+
+    source: str = Field(..., description="Source adapter identifier.")
+    symbol: str = Field(..., description="Trading symbol name.")
+    timeframe: str | None = Field(None, description="Bar timeframe, or None.")
+    data_kind: str = Field(..., description="'ohlcv', 'ticks', 'spreads', or 'volume'.")
+    record_count: int = Field(..., description="Number of records in the batch.")
+    volume_kind: str | None = Field(
+        None,
+        description=(
+            "'tick_volume', 'real_volume', 'broker_volume', "
+            "'synthetic_volume', or 'unknown'."
+        ),
+    )
+    schema_version: str = Field(..., description="Canonical record schema version.")
+    normalization_version: str = Field(
+        ..., description="Normalization pipeline version."
+    )
+    raw_hash: str | None = Field(
+        None, description="Hash of the pre-normalization payload."
+    )
+    cache_status: str = Field(..., description="'hit' or 'miss' cache resolution.")
+    retrieval_timestamp: str = Field(..., description="UTC ISO retrieval timestamp.")
+
+
 class DataAvailability(BaseModel):
     """Pydantic model indicating current historical database records coverage."""
 

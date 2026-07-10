@@ -6,7 +6,7 @@ license, rate limit, and response validation policy.
 """
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from app.services.data.models import (
@@ -16,7 +16,11 @@ from app.services.data.models import (
     SymbolMetadata,
     TickRecord,
 )
-from app.services.data.normalization import normalize_file_records
+from app.services.data.normalization import (
+    normalize_file_records,
+    resolve_volume_kind,
+    summarize_data_quality,
+)
 from app.services.data.sources import (
     ADAPTER_REGISTRY,
     BinanceAdapter,
@@ -34,11 +38,15 @@ from app.services.data.sources import (
     update_circuit_breaker,
 )
 from app.services.data.storage import (
+    DEFAULT_NORMALIZATION_VERSION,
+    DEFAULT_SCHEMA_VERSION,
+    compute_raw_hash,
     db_helper,
     generate_cache_key,
     get_cached_data,
     set_cached_data,
 )
+from app.services.data.transforms import timeframe_to_minutes
 from app.services.data.validation import (
     DEFAULT_OHLCV_LIMIT,
     DEFAULT_SPREAD_LIMIT,
@@ -49,7 +57,10 @@ from app.services.data.validation import (
     normalize_numeric,
     validate_license,
     validate_limit,
+    validate_source_readiness,
+    validate_stale_data_behavior,
     validate_timeframe,
+    validate_workflow_context,
 )
 from app.utils.errors import DataError, ExternalServiceError, ValidationError
 from app.utils.logger import logger
@@ -72,6 +83,7 @@ __all__ = [
     "get_circuit_breaker",
     "get_data",
     "get_data_availability",
+    "get_data_with_metadata",
     "get_source_adapter",
     "get_symbol_metadata",
     "list_symbols",
@@ -247,6 +259,7 @@ def execute_gateway_request(
 
     try:
         validate_license(source, symbol, workflow_context, request_id=request_id)
+        validate_source_readiness(source, workflow_context, request_id=request_id)
         check_rate_limit(source)
 
         cache_key, cache_tf, cached_records = _check_gateway_cache(
@@ -307,6 +320,7 @@ def execute_gateway_request(
             end_time.isoformat(),
             validated,
             ttl_seconds=ttl,
+            raw_hash=compute_raw_hash(records),
             request_id=request_id,
         )
     except (ValidationError, ExternalServiceError):
@@ -349,13 +363,24 @@ def get_data(
     Returns:
         list[dict[str, Any]]: Clean list of normalized data records.
     """
+    validate_workflow_context(workflow_context, request_id=request_id)
+    validate_stale_data_behavior(stale_data_behavior, request_id=request_id)
+
     t_start = normalize_timestamp(start_time)
     t_end = normalize_timestamp(end_time)
+
+    if t_start >= t_end:
+        err_order = (
+            f"start_time must be strictly before end_time: "
+            f"{t_start.isoformat()} >= {t_end.isoformat()}"
+        )
+        logger.error(err_order, extra={"request_id": request_id})
+        raise ValidationError(err_order, code="INVALID_INPUT")
 
     kind = data_kind.lower()
     if kind not in ("ohlcv", "ticks", "spreads", "volume"):
         err_msg = f"Unsupported data_kind: {data_kind}"
-        raise ValidationError(err_msg)
+        raise ValidationError(err_msg, code="UNSUPPORTED_OPERATION")
 
     if kind == "ohlcv":
         if not timeframe:
@@ -439,6 +464,114 @@ def get_data(
     return []
 
 
+def get_data_with_metadata(
+    symbol: str,
+    start_time: str,
+    end_time: str,
+    data_kind: str = "ohlcv",
+    timeframe: str | None = None,
+    source: str = "csv",
+    limit: int | None = None,
+    stale_data_behavior: str = "refresh_and_return",
+    workflow_context: str = "research",
+    request_id: str | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Retrieve normalized market data records together with result metadata.
+
+    Wraps `get_data` without changing its native return shape or behavior, so
+    existing internal callers of `get_data` remain unaffected. This function
+    is intended for the official `get_data_tool` boundary in `public_api.py`.
+
+    Args:
+        symbol: Financial symbol identifier.
+        start_time: UTC start time string.
+        end_time: UTC end time string.
+        data_kind: Kind of data ('ohlcv', 'ticks', 'spreads', 'volume').
+        timeframe: Bar timeframe (required for ohlcv/volume).
+        source: Primary source adapter.
+        limit: Max query limit parameter.
+        stale_data_behavior: Expired cache lookup policy.
+        workflow_context: Rounding/validation execution context.
+        request_id: Optional tracking identifier.
+
+    Returns:
+        tuple[list[dict[str, Any]], dict[str, Any]]: Normalized records and a
+        JSON-safe result metadata mapping (source, symbol, timeframe,
+        data_kind, record_count, volume_kind, schema_version,
+        normalization_version, raw_hash, cache_status, data_quality,
+        retrieval_timestamp, license, and warnings).
+    """
+    logger.debug(
+        f"get_data_with_metadata: building result metadata for symbol={symbol} "
+        f"source={source} kind={data_kind}",
+        extra={"request_id": request_id},
+    )
+    kind = data_kind.lower()
+    warnings: list[str] = []
+    cache_status = "miss"
+
+    if kind in ("ohlcv", "ticks", "spreads"):
+        try:
+            t_start = normalize_timestamp(start_time)
+            t_end = normalize_timestamp(end_time)
+            tf_for_cache = validate_timeframe(timeframe) if timeframe else None
+            _, _, cached = _check_gateway_cache(
+                source,
+                symbol,
+                tf_for_cache,
+                t_start,
+                t_end,
+                stale_data_behavior,
+                request_id=request_id,
+            )
+            if cached is not None:
+                cache_status = "hit"
+        except Exception as e:  # noqa: BLE001
+            logger.debug(f"Cache status peek failed, defaulting to miss: {e}")
+
+    records = get_data(
+        symbol=symbol,
+        start_time=start_time,
+        end_time=end_time,
+        data_kind=data_kind,
+        timeframe=timeframe,
+        source=source,
+        limit=limit,
+        stale_data_behavior=stale_data_behavior,
+        workflow_context=workflow_context,
+        request_id=request_id,
+    )
+
+    if not records:
+        warnings.append("No records were returned for the requested window.")
+
+    license_info: dict[str, Any] = {}
+    try:
+        license_info = validate_license(
+            source, symbol, workflow_context, request_id=request_id
+        )
+    except (ValidationError, ExternalServiceError) as e:
+        logger.debug(f"License metadata unavailable for result metadata: {e}")
+
+    result_metadata: dict[str, Any] = {
+        "source": source,
+        "symbol": symbol,
+        "timeframe": timeframe,
+        "data_kind": kind,
+        "record_count": len(records),
+        "volume_kind": resolve_volume_kind(source, kind),
+        "schema_version": DEFAULT_SCHEMA_VERSION,
+        "normalization_version": DEFAULT_NORMALIZATION_VERSION,
+        "raw_hash": None,
+        "cache_status": cache_status,
+        "data_quality": summarize_data_quality(records),
+        "retrieval_timestamp": datetime.now(UTC).isoformat(),
+        "license": license_info,
+        "warnings": warnings,
+    }
+    return records, result_metadata
+
+
 def get_symbol_metadata(
     symbol: str,
     source: str = "csv",
@@ -501,6 +634,7 @@ def get_data_availability(
     count = 0
     start_str = None
     end_str = None
+    all_timestamps: list[str] = []
     try:
         with db_helper.get_connection() as conn:
             cursor = conn.execute(
@@ -516,8 +650,13 @@ def get_data_availability(
                 end_str = row["end_time"]
                 records = json.loads(row["records_json"])
                 count += len(records)
+                all_timestamps.extend(
+                    r["timestamp"] for r in records if r.get("timestamp")
+                )
     except Exception as e:  # noqa: BLE001
         logger.warning(f"Failed to query data availability from database cache: {e}")
+
+    gap_windows = _detect_gap_windows(sorted(set(all_timestamps)), timeframe)
 
     availability = DataAvailability(
         symbol=symbol,
@@ -525,11 +664,55 @@ def get_data_availability(
         source=source,
         start_time=start_str,
         end_time=end_str,
-        gap_count=0,
-        gap_windows=[],
+        gap_count=len(gap_windows),
+        gap_windows=gap_windows,
         is_ready=True,
         record_count=count,
         metadata={"cache_queried": True},
     )
 
     return availability.model_dump()
+
+
+_MIN_TIMESTAMPS_FOR_GAP_DETECTION = 2
+
+
+def _detect_gap_windows(
+    sorted_timestamps: list[str],
+    timeframe: str,
+) -> list[dict[str, str]]:
+    """Detect internal gap windows exceeding 1.5x the expected bar interval.
+
+    This is a read-only diagnostic. It never fills, interpolates, or repairs
+    gaps; it only surfaces where they exist.
+
+    Args:
+        sorted_timestamps: Ascending, de-duplicated ISO timestamp strings.
+        timeframe: Timeframe identifier used to derive the expected interval.
+
+    Returns:
+        list[dict[str, str]]: Gap windows with `start` and `end` boundaries.
+    """
+    if len(sorted_timestamps) < _MIN_TIMESTAMPS_FOR_GAP_DETECTION:
+        return []
+    try:
+        interval_minutes = timeframe_to_minutes(timeframe)
+    except ValidationError:
+        return []
+    if interval_minutes <= 0:
+        return []
+
+    threshold = timedelta(minutes=interval_minutes * 1.5)
+    gaps: list[dict[str, str]] = []
+    previous_dt: datetime | None = None
+    for ts in sorted_timestamps:
+        try:
+            current_dt = datetime.fromisoformat(ts)
+        except ValueError:
+            continue
+        if previous_dt is not None and (current_dt - previous_dt) > threshold:
+            gaps.append(
+                {"start": previous_dt.isoformat(), "end": current_dt.isoformat()}
+            )
+        previous_dt = current_dt
+    return gaps

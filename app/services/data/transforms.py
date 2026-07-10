@@ -140,7 +140,8 @@ def resample_ohlcv(  # noqa: C901
     if tgt_mins < src_mins:
         msg = (  # pragma: no cover
             f"Cannot resample to a lower timeframe: "  # pragma: no cover
-            f"source={source_tf} ({src_mins}m), target={target_timeframe} ({tgt_mins}m)"  # pragma: no cover
+            f"source={source_tf} ({src_mins}m), "
+            f"target={target_timeframe} ({tgt_mins}m)"  # pragma: no cover
         )  # pragma: no cover
         raise ValidationError(msg)  # pragma: no cover
 
@@ -353,7 +354,9 @@ def aggregate_ticks_to_bars(  # noqa: C901, PLR0912
     elif "bid" in df.columns and df["bid"].notna().any():  # pragma: no cover
         price_col = "bid"  # pragma: no cover
     else:  # pragma: no cover
-        msg = "No valid price field (last, price, bid) found in ticks."  # pragma: no cover
+        msg = (  # pragma: no cover
+            "No valid price field (last, price, bid) found in ticks."
+        )
         raise ValidationError(msg)  # pragma: no cover
 
     # Floor timestamps to timeframe interval

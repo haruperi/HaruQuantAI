@@ -1,12 +1,17 @@
 """Data source resolver and provider adapters for the market data service."""
 
-from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
 import pandas as pd
 
+from app.services.data.contracts import (
+    BrokerMarketDataFactory,
+    BrokerMarketDataPort,
+    DataRecords,
+    SourceAdapterPort,
+)
 from app.services.data.normalization import (
     bars_dataframe_to_records,
     mt5_ticks_dataframe_to_records,
@@ -20,12 +25,13 @@ from app.services.data.transforms import (
 )
 from app.utils.errors import ExternalServiceError, ValidationError
 from app.utils.logger import logger
+from app.utils.security import redact_text
 
 CIRCUIT_OPEN_FAILURE_THRESHOLD = 4
 
 
 @runtime_checkable
-class SourceAdapterProtocol(Protocol):
+class SourceAdapterProtocol(SourceAdapterPort, Protocol):
     """Common internal source adapter protocol for all data providers."""
 
     def is_ready(self) -> bool:
@@ -383,7 +389,7 @@ class BrokerBackedAdapter:
     def __init__(
         self,
         source: str,
-        client_factory: Callable[[], Any],
+        client_factory: BrokerMarketDataFactory,
         unavailable_message: str,
         error_code: str,
         symbols: list[str],
@@ -412,18 +418,19 @@ class BrokerBackedAdapter:
         end_time: datetime,
         *,
         request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
+    ) -> DataRecords:
         """Fetch broker-backed market data."""
         client = self._connected_client()
-        df = client.get_bars(
+        records_frame = self._read_bars(
+            client=client,
             symbol=symbol,
             timeframe=timeframe,
-            date_from=start_time,
-            date_to=end_time,
+            start_time=start_time,
+            end_time=end_time,
         )
-        if df is None or df.empty:
+        if records_frame is None or records_frame.empty:
             return []
-        return bars_dataframe_to_records(df, symbol, timeframe, self.source)
+        return bars_dataframe_to_records(records_frame, symbol, timeframe, self.source)
 
     def get_tick_data(
         self,
@@ -432,20 +439,20 @@ class BrokerBackedAdapter:
         end_time: datetime,
         *,
         request_id: str | None = None,  # noqa: ARG002
-    ) -> list[dict[str, Any]]:
+    ) -> DataRecords:
         """Fetch broker-backed tick data."""
         client = self._connected_client()
-        df = client.get_ticks(
+        records_frame = self._read_ticks(
+            client=client,
             symbol=symbol,
-            start=start_time,
-            end=end_time,
-            as_dataframe=True,
+            start_time=start_time,
+            end_time=end_time,
         )
-        if df is None or not isinstance(df, pd.DataFrame) or df.empty:
+        if records_frame is None or records_frame.empty:
             return []
         if self._mt5_tick_schema:
-            return mt5_ticks_dataframe_to_records(df, symbol, self.source)
-        return ticks_dataframe_to_records(df, symbol, self.source)
+            return mt5_ticks_dataframe_to_records(records_frame, symbol, self.source)
+        return ticks_dataframe_to_records(records_frame, symbol, self.source)
 
     def list_symbols(self, *, request_id: str | None = None) -> list[str]:
         """List representative symbols for the source."""
@@ -464,22 +471,171 @@ class BrokerBackedAdapter:
         metadata["source"] = self.source
         return metadata
 
-    def _connected_client(self) -> Any:  # noqa: ANN401
+    def _connected_client(self) -> BrokerMarketDataPort:
         """Return a connected broker data client."""
+        logger.debug("Resolving broker market data client for source={}.", self.source)
         check_circuit_breaker_barrier(self.source)
         try:
             client = self._client_factory()
             if not client.is_connected():
+                logger.info(
+                    "Connecting broker market data client for source={}.",
+                    self.source,
+                )
                 client.connect()
         except Exception as e:
             self._record_connection_failure()
-            msg = f"{self._unavailable_message}: {e}"
-            raise ExternalServiceError(msg, code=self._error_code) from e
+            error_code = self._classify_broker_exception(e, self._error_code)
+            msg = f"{self._unavailable_message}: {redact_text(str(e))}"
+            raise ExternalServiceError(msg, code=error_code) from e
 
         if not client.is_connected():
             msg = f"{self._unavailable_message}."
             raise ExternalServiceError(msg, code=self._error_code)
         return client
+
+    def _read_bars(
+        self,
+        *,
+        client: BrokerMarketDataPort,
+        symbol: str,
+        timeframe: str,
+        start_time: datetime,
+        end_time: datetime,
+    ) -> pd.DataFrame | None:
+        """Read broker bars and classify provider failures.
+
+        Args:
+            client: Connected read-only broker market data client.
+            symbol: Requested symbol identifier.
+            timeframe: Requested timeframe.
+            start_time: Inclusive UTC start datetime.
+            end_time: Inclusive UTC end datetime.
+
+        Returns:
+            Broker bar DataFrame, or None when the provider returns no data.
+
+        Raises:
+            ExternalServiceError: If the broker read fails or returns an
+                unsupported payload shape.
+        """
+        logger.debug(
+            "Reading broker bars source={} symbol={} timeframe={}.",
+            self.source,
+            symbol,
+            timeframe,
+        )
+        try:
+            result = client.get_bars(
+                symbol=symbol,
+                timeframe=timeframe,
+                date_from=start_time,
+                date_to=end_time,
+            )
+        except Exception as exc:
+            self._record_connection_failure()
+            error_code = self._classify_broker_exception(exc, self._error_code)
+            safe_detail = redact_text(str(exc))
+            msg = f"Broker bar read failed for source {self.source}: {safe_detail}"
+            raise ExternalServiceError(msg, code=error_code) from exc
+        return self._coerce_broker_dataframe(result, operation="get_bars")
+
+    def _read_ticks(
+        self,
+        *,
+        client: BrokerMarketDataPort,
+        symbol: str,
+        start_time: datetime,
+        end_time: datetime,
+    ) -> pd.DataFrame | None:
+        """Read broker ticks and classify provider failures.
+
+        Args:
+            client: Connected read-only broker market data client.
+            symbol: Requested symbol identifier.
+            start_time: Inclusive UTC start datetime.
+            end_time: Inclusive UTC end datetime.
+
+        Returns:
+            Broker tick DataFrame, or None when the provider returns no data.
+
+        Raises:
+            ExternalServiceError: If the broker read fails or returns an
+                unsupported payload shape.
+        """
+        logger.debug(
+            "Reading broker ticks source={} symbol={}.",
+            self.source,
+            symbol,
+        )
+        try:
+            result = client.get_ticks(
+                symbol=symbol,
+                start=start_time,
+                end=end_time,
+                as_dataframe=True,
+            )
+        except Exception as exc:
+            self._record_connection_failure()
+            error_code = self._classify_broker_exception(exc, self._error_code)
+            safe_detail = redact_text(str(exc))
+            msg = f"Broker tick read failed for source {self.source}: {safe_detail}"
+            raise ExternalServiceError(msg, code=error_code) from exc
+        return self._coerce_broker_dataframe(result, operation="get_ticks")
+
+    def _coerce_broker_dataframe(
+        self,
+        result: pd.DataFrame | None,
+        *,
+        operation: str,
+    ) -> pd.DataFrame | None:
+        """Validate broker read result shape before normalization.
+
+        Args:
+            result: Broker result object returned by a read method.
+            operation: Broker read operation name for error context.
+
+        Returns:
+            A DataFrame or None.
+
+        Raises:
+            ExternalServiceError: If result is not None and not a DataFrame.
+        """
+        logger.debug(
+            "Validating broker result shape source={} operation={}.",
+            self.source,
+            operation,
+        )
+        if result is None:
+            return None
+        if not isinstance(result, pd.DataFrame):
+            msg = (
+                f"Broker read {operation} for source {self.source} returned "
+                f"unsupported payload type {type(result).__name__}."
+            )
+            raise ExternalServiceError(msg, code="DATA_SCHEMA_DRIFT")
+        return result
+
+    @staticmethod
+    def _classify_broker_exception(error: Exception, default_code: str) -> str:
+        """Map broker exceptions to deterministic data-layer error codes.
+
+        Args:
+            error: Broker exception raised by a read or connection call.
+            default_code: Fallback adapter-specific error code.
+
+        Returns:
+            Deterministic error code string.
+        """
+        logger.debug("Classifying broker exception type={}.", type(error).__name__)
+        message = str(error).lower()
+        if isinstance(error, TimeoutError) or "timeout" in message:
+            return "TIMEOUT"
+        if "credential" in message or "password" in message:
+            return "CREDENTIALS_MISSING"
+        if "auth" in message or "login" in message or "permission" in message:
+            return "AUTHENTICATION_FAILED"
+        return default_code
 
     def _record_connection_failure(self) -> None:
         """Record a connection failure in the source circuit breaker."""
@@ -495,36 +651,41 @@ class BrokerBackedAdapter:
         )
 
 
-def _get_mt5_client() -> Any:  # noqa: ANN401
+def _get_mt5_client() -> BrokerMarketDataPort:
     """Return the MT5 broker client."""
+    logger.debug("Resolving MT5 broker market data client.")
     from app.services.brokers.mt5 import get_mt5_client
 
     return get_mt5_client()
 
 
-def _get_ctrader_client() -> Any:  # noqa: ANN401
+def _get_ctrader_client() -> BrokerMarketDataPort:
     """Return the cTrader broker client."""
+    logger.debug("Resolving cTrader broker market data client.")
     from app.services.brokers.ctrader import get_ctrader_client
 
     return get_ctrader_client()
 
 
-def _get_dukascopy_client() -> Any:  # noqa: ANN401
+def _get_dukascopy_client() -> BrokerMarketDataPort:
     """Return the Dukascopy broker client."""
+    logger.debug("Resolving Dukascopy broker market data client.")
     from app.services.brokers.dukascopy import get_dukascopy_client
 
     return get_dukascopy_client()
 
 
-def _get_binance_client() -> Any:  # noqa: ANN401
+def _get_binance_client() -> BrokerMarketDataPort:
     """Return the Binance broker client."""
+    logger.debug("Resolving Binance broker market data client.")
     from app.services.brokers.binance import get_binance_client
 
     return get_binance_client()
 
 
-def _get_yahoo_client() -> Any:  # noqa: ANN401
+def _get_yahoo_client() -> BrokerMarketDataPort:
     """Return the Yahoo Finance broker client."""
+    logger.debug("Resolving Yahoo broker market data client.")
     from app.services.brokers.yahoo import get_yahoo_client
 
     return get_yahoo_client()

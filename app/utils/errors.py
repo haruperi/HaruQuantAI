@@ -99,6 +99,7 @@ APPROVED_ERROR_CODES = frozenset(
         "SECRET_VERSION_NOT_FOUND",
         "SECRET_VERSION_CONFLICT",
         "DATA_DROPPED",
+        "DATA_SCHEMA_DRIFT",
         "CIRCUIT_BREAKER_OPEN",
         "AUTHENTICATION_FAILED",
         "MISSING_ASSET_METADATA",
@@ -114,6 +115,8 @@ APPROVED_ERROR_CODES = frozenset(
         "SCHEDULER_ERROR",
         "LICENSE_RESTRICTION",
         "UNSUPPORTED_OPERATION",
+        "UNSUPPORTED_TIMEFRAME",
+        "DATA_SERIALIZATION_FAILED",
         # Custom Indicator Codes
         "IND_INVALID_CONFIG",
         "IND_INVALID_PARAMETER",
@@ -353,6 +356,7 @@ ERROR_MESSAGES: dict[str, str] = {
     "SECRET_VERSION_NOT_FOUND": "No active secret version was found.",  # pragma: allowlist secret
     "SECRET_VERSION_CONFLICT": "Secret conflict detected.",  # pragma: allowlist secret
     "DATA_DROPPED": "Data record was dropped due to buffer overflow or constraints.",
+    "DATA_SCHEMA_DRIFT": "Data payload shape does not match the expected schema.",
     "CIRCUIT_BREAKER_OPEN": "Circuit breaker is open for the source.",
     "AUTHENTICATION_FAILED": "Authentication failed for the data source.",
     "MISSING_ASSET_METADATA": "Asset/symbol metadata is missing.",
@@ -368,6 +372,8 @@ ERROR_MESSAGES: dict[str, str] = {
     "SCHEDULER_ERROR": "A scheduler/job error occurred.",
     "LICENSE_RESTRICTION": "Access denied due to license restrictions.",
     "UNSUPPORTED_OPERATION": "The requested operation is unsupported.",
+    "UNSUPPORTED_TIMEFRAME": "The requested timeframe is invalid or unsupported.",
+    "DATA_SERIALIZATION_FAILED": "Data payload could not be serialized safely.",
     # Custom Indicator Messages
     "IND_INVALID_CONFIG": "Indicator configuration combination checks failed.",
     "IND_INVALID_PARAMETER": "Formula parameter checks failed.",

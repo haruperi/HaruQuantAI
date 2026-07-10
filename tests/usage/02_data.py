@@ -15,6 +15,8 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from app.services.data import (
+    OFFICIAL_DATA_TOOL_NAMES,
+    PUBLIC_API_CLASSIFICATION,
     aggregate_ticks_to_bars,
     align_multitimeframe_data,
     clear_data_cache,
@@ -33,9 +35,25 @@ from app.services.data import (
     start_data_update_job,
     stop_data_update_job,
 )
+from app.services.data.contracts import BrokerMarketDataPort
+from app.services.data.feeds import (
+    ReconnectPolicy,
+    check_feed_buffer_capacity,
+    check_feed_heartbeat_timeout,
+    compute_reconnect_delay,
+    register_mock_feed,
+)
+from app.services.data.gateway import get_data_with_metadata
+from app.services.data.public_api import (
+    get_data_tool,
+    get_feed_status_tool,
+    get_market_hours_tool,
+    list_symbols_tool,
+)
 from app.services.data.storage import db_helper
 from app.utils.logger import logger
 from app.utils.normalization import normalize_timestamp
+from app.utils.standard import validate_standard_response
 
 _BACKGROUND_TASKS: set[asyncio.Task[Any]] = set()
 
@@ -569,6 +587,208 @@ def example_15_cleanup() -> None:
         print(f"Error clearing cache: {e}")
 
 
+def example_16_contracts() -> None:
+    """Demonstrate public-boundary classification and read-only broker contracts."""
+    print_header("16. Data Contracts & Brownfield Public Boundary")
+
+    try:
+        print("Official Data tool names:")
+        for name in sorted(OFFICIAL_DATA_TOOL_NAMES):
+            print(f"  - {name}: {PUBLIC_API_CLASSIFICATION[name]}")
+
+        support_names = [
+            name
+            for name, classification in PUBLIC_API_CLASSIFICATION.items()
+            if classification == "public_support_api"
+        ]
+        compatibility_names = [
+            name
+            for name, classification in PUBLIC_API_CLASSIFICATION.items()
+            if classification == "legacy_public_compatibility"
+        ]
+        print(f"\nPublic support APIs: {', '.join(sorted(support_names))}")
+        print(f"Compatibility APIs preserved: {len(compatibility_names)}")
+
+        broker_read_methods = {
+            name
+            for name, value in BrokerMarketDataPort.__dict__.items()
+            if callable(value)
+        }
+        print("\nBrokerMarketDataPort read methods:")
+        for method_name in sorted(broker_read_methods):
+            if not method_name.startswith("_"):
+                print(f"  - {method_name}")
+        print("Broker mutation methods are intentionally absent from the Data port.")
+
+    except Exception as e:
+        print(f"Error in contracts demonstration: {e}")
+
+
+def example_17_phase20_characterization() -> None:
+    """Demonstrate Phase 2.0 brownfield characterization checks."""
+    print_header("17. Phase 2.0 Brownfield Characterization")
+
+    try:
+        symbols = list_symbols(source="synthetic")
+        print(f"Synthetic source discovery returned {len(symbols)} symbols.")
+
+        bars = get_data(
+            symbol="EURUSD",
+            start_time="2026-01-01T00:00:00Z",
+            end_time="2026-01-01T01:00:00Z",
+            data_kind="ohlcv",
+            timeframe="M1",
+            source="synthetic",
+            limit=3,
+            request_id="usage-phase20-characterization",
+        )
+        print(f"Synthetic get_data limit returned {len(bars)} records.")
+
+        first = generate_synthetic_bars(
+            "EURUSD",
+            "M5",
+            "2026-01-01T00:00:00Z",
+            2,
+            1.1,
+            0.0,
+            0.01,
+            seed=42,
+            request_id="usage-phase20-characterization",
+        )
+        second = generate_synthetic_bars(
+            "EURUSD",
+            "M5",
+            "2026-01-01T00:00:00Z",
+            2,
+            1.1,
+            0.0,
+            0.01,
+            seed=42,
+            request_id="usage-phase20-characterization",
+        )
+        aligned = align_multitimeframe_data(
+            {"M5": first[:1]},
+            ["2026-01-01T00:06:00Z"],
+            request_id="usage-phase20-characterization",
+        )
+        print(f"Seeded synthetic bars are deterministic: {first == second}")
+        print(f"Aligned closed-bar close: {aligned['M5'][0].get('close')}")
+
+    except Exception as e:
+        print(f"Error in Phase 2.0 characterization demonstration: {e}")
+
+
+def example_18_public_api_tool_wrappers() -> None:
+    """Demonstrate official standard-envelope tool wrappers (public_api.py)."""
+    print_header("18. Official AI-Tool Wrappers (public_api.py)")
+
+    try:
+        response = get_data_tool(
+            symbol=SYMBOL,
+            start_time=START_DATE,
+            end_time=END_DATE,
+            data_kind="ohlcv",
+            timeframe=TIMEFRAME,
+            source="synthetic",
+            request_id="usage-example-18",
+        )
+        validate_standard_response(response)
+        print(f"get_data_tool status: {response['status']}")
+        print(f"get_data_tool message: {response['message']}")
+        if response["status"] == "success" and isinstance(response["data"], dict):
+            data = response["data"]
+            print(f"  record_count: {len(data['records'])}")
+            print(f"  result_metadata: {data['result_metadata']}")
+
+        symbols_response = list_symbols_tool(source="synthetic")
+        validate_standard_response(symbols_response)
+        print(f"\nlist_symbols_tool status: {symbols_response['status']}")
+
+        hours_response = get_market_hours_tool(symbol=SYMBOL)
+        validate_standard_response(hours_response)
+        print(f"get_market_hours_tool status: {hours_response['status']}")
+
+        # Deterministic error envelope for an unsupported data_kind.
+        error_response = get_data_tool(
+            symbol=SYMBOL,
+            start_time=START_DATE,
+            end_time=END_DATE,
+            data_kind="not_a_real_kind",
+            source="synthetic",
+        )
+        validate_standard_response(error_response)
+        print(f"\nExpected failure status: {error_response['status']}")
+        error_payload = error_response["error"]
+        if error_payload is not None:
+            print(f"Expected failure code: {error_payload['code']}")
+    except Exception as e:
+        print(f"Error in public API tool wrapper demonstration: {e}")
+
+
+def example_19_feeds_observability() -> None:
+    """Demonstrate bounded buffer, heartbeat timeout, and reconnect policy."""
+    print_header("19. Feed Observability (feeds.py)")
+
+    try:
+        feed_id = "usage_example_feed"
+        register_mock_feed(feed_id, "mt5", SYMBOL, "ticks", buffer_depth=5)
+
+        status_response = get_feed_status_tool(feed_id=feed_id)
+        validate_standard_response(status_response)
+        status_data = status_response["data"]
+        assert isinstance(status_data, dict)
+        feed = status_data["feeds"][0]
+        print(f"Feed status: {status_response['status']}")
+        print(f"  within_buffer_capacity: {feed['within_buffer_capacity']}")
+        print(f"  heartbeat_timed_out: {feed['heartbeat_timed_out']}")
+
+        near_full_feed = {"buffer_depth": 999999}
+        print(
+            f"\nBounded buffer check (near-full): "
+            f"{check_feed_buffer_capacity(near_full_feed)}"
+        )
+
+        stale_feed = {"last_heartbeat": "2020-01-01T00:00:00+00:00"}
+        print(
+            f"Heartbeat timeout check (stale): {check_feed_heartbeat_timeout(stale_feed)}"
+        )
+
+        policy = ReconnectPolicy(max_retries=3, base_backoff_seconds=0.1)
+        for attempt in range(policy.max_retries):
+            delay = compute_reconnect_delay(attempt, policy)
+            print(f"  Reconnect attempt {attempt}: delay={delay:.3f}s")
+    except Exception as e:
+        print(f"Error in feed observability demonstration: {e}")
+
+
+def example_20_data_quality_and_lineage() -> None:
+    """Demonstrate data-quality flag summaries and lineage metadata."""
+    print_header("20. Data Quality & Lineage Metadata")
+
+    try:
+        records, result_metadata = get_data_with_metadata(
+            symbol=SYMBOL,
+            start_time=START_DATE,
+            end_time=END_DATE,
+            data_kind="ohlcv",
+            timeframe=TIMEFRAME,
+            source="synthetic",
+            request_id="usage-example-20",
+        )
+        print(f"Retrieved {len(records)} records with lineage metadata:")
+        for key in (
+            "source",
+            "volume_kind",
+            "schema_version",
+            "normalization_version",
+            "cache_status",
+            "data_quality",
+        ):
+            print(f"  {key:22}: {result_metadata[key]}")
+    except Exception as e:
+        print(f"Error in data quality/lineage demonstration: {e}")
+
+
 if __name__ == "__main__":
     example_01_metadata_and_discovery()
     example_02_mt5()
@@ -585,3 +805,8 @@ if __name__ == "__main__":
     example_13_synthetic_generation()
     example_14_scheduling_jobs()
     example_15_cleanup()
+    example_16_contracts()
+    example_17_phase20_characterization()
+    example_18_public_api_tool_wrappers()
+    example_19_feeds_observability()
+    example_20_data_quality_and_lineage()

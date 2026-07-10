@@ -12,6 +12,7 @@ import sqlite3
 import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager, suppress
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -35,6 +36,21 @@ DB_FILE_PATH: str = "data/data_service.db"
 
 DEFAULT_SCHEMA_VERSION: str = "v1"
 DEFAULT_NORMALIZATION_VERSION: str = "v1"
+
+
+@dataclass(frozen=True, slots=True)
+class PersistenceResult:
+    """Outcome of a single persistence write operation.
+
+    Attributes:
+        operation: One of 'insert', 'update', 'no_op', or 'conflict'.
+        table: Target table name.
+        key: Primary key or identifier written.
+    """
+
+    operation: str
+    table: str
+    key: str
 
 
 def validate_storage_path(path_str: str) -> Path:
@@ -94,21 +110,43 @@ def validate_storage_path(path_str: str) -> Path:
 
 
 class DatabaseHelper:
-    """Manages SQLite connection configurations, table schemas, and migrations."""
+    """Manages SQLite connection configurations, table schemas, and migrations.
+
+    Initialization is lazy: constructing this class performs no filesystem or
+    database I/O. The database file, directories, and schema migrations are
+    created on first use of `get_connection()`, so importing `app.services.data`
+    never touches disk.
+    """
 
     def __init__(self, db_path: str = DB_FILE_PATH) -> None:
-        """Initialize and ensure database file exists."""
+        """Store database configuration without touching the filesystem."""
         self.db_path = db_path
+        self._initialized = False
+
+    def _ensure_initialized(self) -> None:
+        """Lazily create the database directory and apply migrations once."""
+        if self._initialized:
+            return
         db_parent = Path(self.db_path).parent
         db_parent.mkdir(parents=True, exist_ok=True)
-        self.init_database()
+        # Set before init_database(), which itself opens connections through
+        # get_connection() -> _ensure_initialized(); this flag prevents
+        # unbounded recursion on the first initializing call.
+        self._initialized = True
+        try:
+            self.init_database()
+        except Exception:
+            self._initialized = False
+            raise
 
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection]:
         """Context manager providing a configured SQLite connection.
 
         Applies WAL journaling mode, foreign keys, and busy timeout rules.
+        Triggers lazy database initialization on first call.
         """
+        self._ensure_initialized()
         conn = sqlite3.connect(self.db_path, timeout=5.0)
         conn.row_factory = sqlite3.Row
         try:
@@ -233,12 +271,56 @@ class DatabaseHelper:
             )
 
             conn.execute(
-                "INSERT INTO sys_migrations VALUES (?, ?, ?);",
+                "INSERT INTO sys_migrations "
+                "(migration_id, version, applied_at) VALUES (?, ?, ?);",
                 ("mig_001_core", 1, datetime.now(UTC).isoformat()),
+            )
+
+        if current < 2:  # noqa: PLR2004
+            logger.info("Applying migration version 2: Adding migration audit columns.")
+            conn.execute(
+                "ALTER TABLE sys_migrations ADD COLUMN source_version INTEGER;"
+            )
+            conn.execute(
+                "ALTER TABLE sys_migrations ADD COLUMN target_version INTEGER;"
+            )
+            conn.execute("ALTER TABLE sys_migrations ADD COLUMN rollback_notes TEXT;")
+            conn.execute(
+                "UPDATE sys_migrations SET source_version = 0, target_version = 1, "
+                "rollback_notes = ? WHERE migration_id = 'mig_001_core';",
+                ("DROP TABLE data_cache, data_jobs, feed_state, circuit_breakers;",),
+            )
+            conn.execute(
+                "INSERT INTO sys_migrations "
+                "(migration_id, version, applied_at, source_version, "
+                "target_version, rollback_notes) VALUES (?, ?, ?, ?, ?, ?);",
+                (
+                    "mig_002_migration_audit",
+                    2,
+                    datetime.now(UTC).isoformat(),
+                    1,
+                    2,
+                    "SQLite cannot drop columns; recreate sys_migrations without "
+                    "source_version/target_version/rollback_notes to roll back.",
+                ),
             )
 
 
 db_helper = DatabaseHelper()
+"""Shared lazily-initialized database helper. Constructing it performs no I/O."""
+
+
+def get_db_helper() -> DatabaseHelper:
+    """Return the shared lazily-initialized database helper singleton.
+
+    Prefer this accessor for new code; `db_helper` remains available as a
+    compatibility facade for existing internal call sites.
+
+    Returns:
+        DatabaseHelper: The shared database helper instance.
+    """
+    logger.debug("get_db_helper: returning shared database helper singleton.")
+    return db_helper
 
 
 # --- Caching Operations ---
@@ -314,6 +396,20 @@ def get_cached_data(
     return {"records": records, "metadata": meta}
 
 
+def compute_raw_hash(records: list[dict[str, Any]]) -> str:
+    """Compute a deterministic SHA256 hash over raw provider records.
+
+    Args:
+        records: Raw records as returned by a source adapter, prior to
+            validation or normalization.
+
+    Returns:
+        str: Hex-encoded SHA256 digest of the canonical JSON representation.
+    """
+    canonical = json.dumps(records, sort_keys=True, default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def set_cached_data(
     key: str,
     source: str,
@@ -327,8 +423,27 @@ def set_cached_data(
     normalization_version: str = DEFAULT_NORMALIZATION_VERSION,
     raw_hash: str | None = None,
     request_id: str | None = None,
-) -> None:
-    """Store data records into cache."""
+) -> PersistenceResult:
+    """Store data records into cache, distinguishing insert/update/no-op/conflict.
+
+    Args:
+        key: Deterministic cache key.
+        source: Source adapter identifier.
+        symbol: Financial symbol identifier.
+        timeframe: Bar timeframe or 'ticks'.
+        start_time: UTC start time string.
+        end_time: UTC end time string.
+        records: Normalized records to cache.
+        ttl_seconds: Cache time-to-live in seconds.
+        schema_version: Record schema version tag.
+        normalization_version: Normalization pipeline version tag.
+        raw_hash: Optional hash of the pre-normalization raw payload.
+        request_id: Optional tracking identifier.
+
+    Returns:
+        PersistenceResult: The write operation outcome ('insert', 'update',
+        'no_op' when content is unchanged, or 'conflict' on write failure).
+    """
     logger.debug(
         f"Storing data in cache: key={key}, TTL={ttl_seconds}s",
         extra={"request_id": request_id},
@@ -340,34 +455,52 @@ def set_cached_data(
     try:
         records_json = json.dumps(records)
         with db_helper.get_connection() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO data_cache (
-                    key, source, symbol, timeframe, start_time, end_time,
-                    schema_version, normalization_version, raw_hash,
-                    records_json, created_at, expires_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-                """,
-                (
-                    key,
-                    source,
-                    symbol,
-                    timeframe,
-                    start_time,
-                    end_time,
-                    schema_version,
-                    normalization_version,
-                    raw_hash,
-                    records_json,
-                    created_at.isoformat(),
-                    expires_at.isoformat(),
-                ),
+            cursor = conn.execute(
+                "SELECT records_json FROM data_cache WHERE key = ?;", (key,)
             )
+            existing = cursor.fetchone()
+            if existing is None:
+                operation = "insert"
+            elif existing["records_json"] == records_json:
+                operation = "no_op"
+            else:
+                operation = "update"
+
+            if operation != "no_op":
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO data_cache (
+                        key, source, symbol, timeframe, start_time, end_time,
+                        schema_version, normalization_version, raw_hash,
+                        records_json, created_at, expires_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    """,
+                    (
+                        key,
+                        source,
+                        symbol,
+                        timeframe,
+                        start_time,
+                        end_time,
+                        schema_version,
+                        normalization_version,
+                        raw_hash,
+                        records_json,
+                        created_at.isoformat(),
+                        expires_at.isoformat(),
+                    ),
+                )
+        logger.debug(
+            f"Cache write operation={operation} for key={key}",
+            extra={"request_id": request_id},
+        )
+        return PersistenceResult(operation=operation, table="data_cache", key=key)
     except Exception as e:  # noqa: BLE001
         logger.warning(
             f"Cache write failed. Cache operation bypassed safely: {e}",
             extra={"request_id": request_id},
         )
+        return PersistenceResult(operation="conflict", table="data_cache", key=key)
 
 
 def clear_data_cache(

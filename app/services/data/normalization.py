@@ -1,11 +1,166 @@
 """Shared normalization helpers for market data sources."""
 
+import math
 from datetime import UTC
 from typing import Any
 
 import pandas as pd
 
 from app.utils.logger import logger
+
+VOLUME_KIND_TICK: str = "tick_volume"
+VOLUME_KIND_REAL: str = "real_volume"
+VOLUME_KIND_BROKER: str = "broker_volume"
+VOLUME_KIND_SYNTHETIC: str = "synthetic_volume"
+VOLUME_KIND_UNKNOWN: str = "unknown"
+
+_BROKER_BACKED_SOURCES: frozenset[str] = frozenset(
+    {"mt5", "ctrader", "dukascopy", "binance", "yahoo"}
+)
+
+_PRICE_FIELDS: tuple[str, ...] = ("open", "high", "low", "close", "bid", "ask", "last")
+
+
+def resolve_volume_kind(source: str, data_kind: str) -> str:
+    """Disclose the volume kind represented by a source's bar/volume records.
+
+    Args:
+        source: Source adapter identifier (e.g. 'synthetic', 'mt5', 'csv').
+        data_kind: Requested data kind ('ohlcv', 'ticks', 'spreads', 'volume').
+
+    Returns:
+        str: One of 'tick_volume', 'real_volume', 'broker_volume',
+        'synthetic_volume', or 'unknown'.
+    """
+    if data_kind not in ("ohlcv", "volume"):
+        return VOLUME_KIND_UNKNOWN
+    if source == "synthetic":
+        return VOLUME_KIND_SYNTHETIC
+    if source in _BROKER_BACKED_SOURCES:
+        return VOLUME_KIND_BROKER
+    return VOLUME_KIND_TICK
+
+
+def _is_non_finite(value: float) -> bool:
+    """Return True for NaN or +/-infinity values."""
+    return math.isnan(value) or math.isinf(value)
+
+
+def _timestamp_flags(timestamp: Any, previous_timestamp: str | None) -> list[str]:  # noqa: ANN401
+    """Detect duplicate/non-monotonic timestamp ordering against the prior record."""
+    if previous_timestamp is None:
+        return []
+    try:
+        current_dt = pd.to_datetime(timestamp)
+        previous_dt = pd.to_datetime(previous_timestamp)
+    except (ValueError, TypeError):
+        return ["missing_field"]
+    if current_dt == previous_dt:
+        return ["duplicate_timestamp"]
+    if current_dt < previous_dt:
+        return ["non_monotonic_timestamp"]
+    return []
+
+
+def _price_field_flags(record: dict[str, Any]) -> list[str]:
+    """Detect non-finite, negative, or zero prices across known price fields."""
+    flags: list[str] = []
+    for price_field in _PRICE_FIELDS:
+        if price_field not in record:
+            continue
+        try:
+            value = float(record[price_field])
+        except (TypeError, ValueError):
+            continue
+        if _is_non_finite(value):
+            flags.append("non_finite_price")
+        elif value < 0:
+            flags.append("negative_price")
+        elif value == 0:
+            flags.append("zero_price")
+    return flags
+
+
+def _ohlc_range_flags(record: dict[str, Any]) -> list[str]:
+    """Detect out-of-range OHLC and inverted bid/ask boundaries."""
+    flags: list[str] = []
+    if "high" in record and "low" in record:
+        try:
+            if float(record["low"]) > float(record["high"]):
+                flags.append("out_of_range_ohlc")
+        except (TypeError, ValueError):
+            pass
+    if "bid" in record and "ask" in record:
+        try:
+            if float(record["ask"]) < float(record["bid"]):
+                flags.append("inverted_bid_ask")
+        except (TypeError, ValueError):
+            pass
+    return flags
+
+
+def build_data_quality_flags(
+    record: dict[str, Any],
+    *,
+    previous_timestamp: str | None = None,
+) -> list[str]:
+    """Compute deterministic data-quality flags for one normalized record.
+
+    This is a diagnostic-only helper: it reports issues, it never repairs,
+    interpolates, or silently drops fields.
+
+    Args:
+        record: Normalized OHLCV, tick, or spread record.
+        previous_timestamp: Immediately preceding record's timestamp string,
+            used to detect duplicate or non-monotonic timestamps.
+
+    Returns:
+        list[str]: Bounded, deterministic quality flag identifiers.
+    """
+    timestamp = record.get("timestamp")
+    if not timestamp:
+        return ["missing_field"]
+
+    return [
+        *_timestamp_flags(timestamp, previous_timestamp),
+        *_price_field_flags(record),
+        *_ohlc_range_flags(record),
+    ]
+
+
+def summarize_data_quality(records: list[dict[str, Any]]) -> dict[str, Any]:
+    """Summarize deterministic data-quality flags across a record batch.
+
+    Use this to expose quality evidence at the official tool boundary without
+    embedding per-record diagnostic keys into the native compatibility record
+    shape.
+
+    Args:
+        records: Normalized OHLCV, tick, or spread records.
+
+    Returns:
+        dict[str, Any]: Mapping with `flagged_record_count` and
+        `flag_counts` (flag identifier to occurrence count).
+    """
+    flag_counts: dict[str, int] = {}
+    flagged_record_count = 0
+    previous_timestamp: str | None = None
+    for record in records:
+        flags = build_data_quality_flags(record, previous_timestamp=previous_timestamp)
+        if flags:
+            flagged_record_count += 1
+            for flag in flags:
+                flag_counts[flag] = flag_counts.get(flag, 0) + 1
+        previous_timestamp = record.get("timestamp", previous_timestamp)
+
+    logger.debug(
+        f"summarize_data_quality: {flagged_record_count} of {len(records)} "
+        f"record(s) flagged across {len(flag_counts)} flag type(s)."
+    )
+    return {
+        "flagged_record_count": flagged_record_count,
+        "flag_counts": flag_counts,
+    }
 
 
 def normalize_timestamp_value(value: Any) -> str:  # noqa: ANN401
