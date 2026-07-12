@@ -1,310 +1,516 @@
 # [Domain Name]
 
-> **Package:** `[app/path/to/domain]`
-> **Domain ID:** `[DOM-XXX]`
-> **Status:** `[Planned | In Development | Stable | Deprecated]`
-> **Owner:** `[Team or owner]`
+> **Package:** `[app/path/to/package]`  
+> **Status:** `[Missing | Partial | Completed]`  
 > **Last updated:** `[YYYY-MM-DD]`
 
+> This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.  
+> Update this file before changing the code.
+
 ---
 
-## 1. Domain Overview
+## 1. Purpose and Boundary
 
-### 1.1 Purpose
+### Purpose
 
-[Explain the business or system purpose of this domain in 2–4 sentences.]
+[Describe the final outcome this package must deliver in 2–4 sentences.]
 
-The domain is responsible for:
+### Owns
 
-- [Primary responsibility]
-- [Secondary responsibility]
-- [Important outcome delivered to the wider system]
+- [Responsibility owned by this package]
+- [Responsibility owned by this package]
 
-### 1.2 Scope
+### Does not own
 
-**In scope**
+- [Responsibility owned by another package]
+- [Explicitly unsupported behaviour]
 
-- [Capability owned by this domain]
-- [Capability owned by this domain]
-- [Data or decisions owned by this domain]
+### Four-level structure
 
-**Out of scope**
+| Code level | Represents |
+|---|---|
+| **Package** | Domain |
+| **Module folder** | Feature / capability |
+| **File** | Use case or focused responsibility |
+| **Class / function / method** | Functional requirement behaviour |
 
-- [Responsibility owned by another domain]
-- [Unsupported behaviour]
-- [Explicit architectural boundary]
-
-### 1.3 System Position
-
-[Explain which domains call this domain and which systems or domains it depends on.]
-
-```mermaid
-flowchart LR
-    A[Upstream Domain] --> B[[Domain Name]]
-    B --> C[Downstream Domain]
-    B --> D[External System]
-    E[Shared Infrastructure] --> B
+```text
+Package
+└── Module folder
+    └── File
+        └── Class / Function / Method
 ```
 
----
 
-## 2. Architecture and Design Rules
+### Package capability map
 
-### 2.1 Architecture Summary
-
-[Describe the internal design, major layers, and dependency direction.]
+This diagram shows the package and its feature modules at a glance.
 
 ```mermaid
 flowchart TD
-    API[Public Domain API]
-    APP[Application / Workflow Coordination]
-    LOGIC[Domain Logic and Policies]
-    PORTS[Ports / Interfaces]
-    ADAPTERS[Adapters / Integrations]
-    STORE[Persistence]
+    DOMAIN[[Domain Package]]
 
-    API --> APP
-    APP --> LOGIC
-    APP --> PORTS
-    PORTS --> ADAPTERS
-    ADAPTERS --> STORE
+    DOMAIN --> MOD1[[Module 1: Feature / Capability]]
+    DOMAIN --> MOD2[[Module 2: Feature / Capability]]
+    DOMAIN --> MOD3[[Module 3: Feature / Capability]]
+
+    MOD1 --> FILE1[File: Use Case / Responsibility]
+    MOD1 --> FILE2[File: Use Case / Responsibility]
+    MOD2 --> FILE3[File: Use Case / Responsibility]
+    MOD3 --> FILE4[File: Use Case / Responsibility]
 ```
 
-## 3. Feature Catalogue
-
-Create one subsection for every feature or capability owned by this domain.
+Replace the placeholders with the real package, module, and file names.
 
 ---
 
-### 3.1 `[FEAT-001]` — [Feature Name]
+## 2. Final Package Structure
 
-#### Purpose
+Define the intended end state before implementation.
 
-[Describe the value provided by this feature.]
+Arrange module folders and files from the **lowest dependency to the highest dependency**. Their order in this README is also their implementation order.
 
-#### Scope
+```text
+[package_name]/
+├── __init__.py
+├── README.md
+├── [module_1]/                         # Feature: [Feature name]
+│   ├── __init__.py                     # Public feature exports
+│   ├── [file_1].py                     # Use case: [Responsibility]
+│   ├── [file_2].py                     # Use case: [Responsibility]
+│   └── [file_3].py                     # Use case: [Responsibility]
+└── [module_2]/                         # Feature: [Feature name]
+    ├── __init__.py
+    └── [file_4].py
+```
 
-**Included**
+### Module dependency diagram
 
-- [Included behaviour]
-- [Included behaviour]
+This diagram is required. It shows the implementation and dependency direction between feature modules.
 
-**Excluded**
+```mermaid
+flowchart LR
+    MOD1[[Module 1: Lowest dependency]]
+    MOD2[[Module 2]]
+    MOD3[[Module 3: Highest dependency]]
 
-- [Excluded behaviour]
-- [Behaviour owned by another feature or domain]
+    MOD1 --> MOD2
+    MOD1 --> MOD3
+    MOD2 --> MOD3
+```
 
-#### Functional Requirements
+Rules:
 
-| ID               | Requirement                              |
-| ---------------- | ---------------------------------------- |
-| `FR-[DOM]-001` | The system shall [observable behaviour]. |
-| `FR-[DOM]-002` | The system shall [observable behaviour]. |
-| `FR-[DOM]-003` | The system shall [observable behaviour]. |
+- Dependencies point from the required module to the module that consumes it.
+- The diagram must match the top-to-bottom order of module specifications in Section 4.
+- Circular dependencies are not allowed.
+
+### Structure rules
+
+- The package root normally contains only `README.md`, `__init__.py`, and module folders.
+- Each module folder represents one feature or capability.
+- Each file has one focused responsibility.
+- A public class, function, method, or constant represents required public behaviour or data.
+- Multiple functional requirements may be implemented in one file when they belong to the same focused responsibility.
+- Private helpers are implementation details and do not need requirement IDs unless they provide independently required behaviour.
+- Usage examples live under `tests/[domain]/usage/`, not inside the production package.
+- Add folders, files, classes, and design patterns only when a real requirement needs them.
 
 ---
 
-#### Non-Functional Requirements
+## 3. Workflows
 
-| ID                | Category        | Requirement                                                | Verification      |
-| ----------------- | --------------- | ---------------------------------------------------------- | ----------------- |
-| `NFR-[DOM]-001` | Performance     | [Latency, throughput, or resource requirement]             | Benchmark         |
-| `NFR-[DOM]-002` | Reliability     | [Retry, recovery, durability, or availability requirement] | Integration test  |
-| `NFR-[DOM]-003` | Security        | [Authorization, integrity, or confidentiality requirement] | Security test     |
-| `NFR-[DOM]-004` | Observability   | [Logging, metrics, tracing, or audit requirement]          | Inspection / test |
-| `NFR-[DOM]-005` | Maintainability | [Coverage, complexity, or dependency requirement]          | Static analysis   |
+Workflows show how public functions collaborate to deliver real value. They are behaviour descriptions, not an additional structural level.
 
----
+This section includes:
 
-#### Workflows
+- **Internal workflows:** Completed entirely inside this domain.
+- **Cross-domain workflows:** Workflows where this domain receives input from, or sends output to, another domain.
 
-| Workflow ID      | Workflow        | Trigger   | Outcome   | Requirements                       |
-| ---------------- | --------------- | --------- | --------- | ---------------------------------- |
-| `WF-[DOM]-001` | [Workflow name] | [Trigger] | [Outcome] | `FR-[DOM]-001`, `FR-[DOM]-002` |
-| `WF-[DOM]-002` | [Workflow name] | [Trigger] | [Outcome] | `FR-[DOM]-003`                   |
+For cross-domain workflows, document only this domain's participation:
 
-#### Workflow: `[WF-[DOM]-001]` — [Workflow Name]
+```text
+Input boundary
+→ this domain's responsibilities
+→ output boundary
+```
 
-**Purpose:** [What this workflow accomplishes.]
-**Primary actor:** [User, service, event, scheduler, or external system.]
-**Trigger:** [What starts the workflow.]
+Do not duplicate the internal implementation of other domains. The full multi-domain workflow may be documented in top-level system documentation when required.
 
-**Preconditions**
+### Status values
 
-- [Required state]
-- [Required input, authorization, or dependency]
+| Status | Meaning |
+|---|---|
+| **Missing** | Not implemented or not verified |
+| **Partial** | Partly implemented or tests are incomplete |
+| **Completed** | Implemented, tested, and verified |
 
-**Main flow**
+### Workflow scope values
 
-1. `[Actor]` submits or emits `[request/event]`.
-2. `[Entry point]` validates the request.
-3. `[Application service]` coordinates the operation.
-4. `[Domain component]` applies the business rules.
-5. `[Port or gateway]` performs the external interaction when required.
-6. `[Repository]` persists the result when required.
-7. The domain returns or publishes `[result/event]`.
+| Scope | Meaning |
+|---|---|
+| **Internal** | The complete workflow occurs within this domain. |
+| **Cross-domain** | This domain participates in a wider workflow involving other domains. |
 
-**Alternative flows**
+| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|
+| Missing | `WF-[DOM]-001` | Internal | [Workflow name] | [Internal trigger] | [Observable result] | `FR-[DOM]-001 → FR-[DOM]-002` |
+| Missing | `WF-[DOM]-002` | Cross-domain | [Workflow name] | [Input received from another domain] | [Output returned or published to another domain] | `FR-[DOM]-003 → FR-[DOM]-004` |
 
-- **A1 — [Condition]:** [Alternative behaviour.]
-- **A2 — [Condition]:** [Alternative behaviour.]
+### `WF-[DOM]-001` — [Workflow Name]
 
-**Failure flows**
+**Scope:** `[Internal | Cross-domain]`
 
-- **F1 — Invalid input:** [Expected handling.]
-- **F2 — Dependency failure:** [Expected handling.]
-- **F3 — Unknown outcome:** [Expected recovery or reconciliation.]
+**Input boundary:** [What enters this domain and where it comes from. Use `Internal` when not applicable.]
 
-**Postconditions**
+**Output boundary:** [What leaves this domain and where it goes. Use `Internal` when not applicable.]
 
-- [Required state after success]
-- [Events, outputs, or audit records produced]
+1. `[function_a()]` receives or retrieves [input].
+2. `[function_b()]` validates or transforms [input].
+3. `[function_c()]` performs [main action].
+4. The package returns, stores, or publishes [result].
+
+**Failure behaviour:**
+
+- [Condition] → [Expected response]
+- [Condition] → [Expected response]
+
+**Integration test:**  
+`tests/[domain]/integration/test_[workflow_name].py::test_[workflow_name]_[scenario]()`
+
+#### End-to-end workflow diagram
+
+Use a flowchart for a straightforward workflow:
+
+```mermaid
+flowchart LR
+    A[Trigger / Input]
+    B["FR-[DOM]-001: function_a"]
+    C["FR-[DOM]-002: function_b"]
+    D["FR-[DOM]-003: function_c"]
+    E[Final Outcome]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+```
+
+Use a sequence diagram when interactions, responses, or external dependencies are important:
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant API as Public API
-    participant Service as Application Service
-    participant Domain as Domain Logic
-    participant Port as Port / Gateway
-    participant Store
+    participant ModuleA
+    participant ModuleB
+    participant External
 
-    Client->>API: Submit request
-    API->>Service: Validated command
-    Service->>Domain: Apply rules
-    Domain-->>Service: Decision
-    Service->>Port: Perform operation
-    Port-->>Service: Result
-    Service->>Store: Persist outcome
-    Service-->>API: Response
-    API-->>Client: Final result
+    Client->>ModuleA: Call function_a()
+    ModuleA->>ModuleB: Call function_b()
+    ModuleB->>External: Perform operation
+    External-->>ModuleB: Return result
+    ModuleB-->>ModuleA: Return processed result
+    ModuleA-->>Client: Final outcome
 ```
 
-#### Configuration and Dependencies
+The diagram must show how the functional requirements collaborate.
 
-##### Prerequisites
+For a cross-domain workflow:
 
-- Python `[version]`
-- `uv`
-- [External runtime or service]
+- show the external domain only at the input or output boundary;
+- fully describe only this domain's functions and responsibilities;
+- do not describe another domain's internal steps.
 
-##### Dependencies
-
-| Dependency            | Type        | Purpose   | Required? |
-| --------------------- | ----------- | --------- | --------- |
-| `[library]`         | Third-party | [Purpose] | Yes       |
-| `[library]`         | Third-party | [Purpose] | Optional  |
-| `[internal-domain]` | Internal    | [Purpose] | Yes       |
-
-```bash
-uv add [package_name]
-```
-
-##### Configuration
-
-| Setting            | Required | Default     | Description   |
-| ------------------ | -------: | ----------- | ------------- |
-| `[SETTING_NAME]` |      Yes | None        | [Description] |
-| `[SETTING_NAME]` |       No | `[value]` | [Description] |
+> Add detailed steps only for workflows involving multiple functions or files.  
+> A simple one-function use case needs only a row in the workflow table.
 
 ---
 
-#### Public API and Implementation Map
+## 4. Module and Requirement Specifications
 
-```python
-from app.[path].[domain_name] import [PublicClass], [public_function]
-```
+This section is also the implementation plan.
 
-| Step | Module / File | Type             | Class         | Function / Method | Params                             | Returns           | Raises                         | Responsibility   | Side Effects |
-| ---: | ------------- | ---------------- | ------------- | ----------------- | ---------------------------------- | ----------------- | ------------------------------ | ---------------- | ------------ |
-|    1 | `[file.py]` | Class            | `[Class A]` |                   |                                    |                   |                                | Responsibility A | None         |
-|    2 | `[file.py]` | Function         | `[Class B]` | `[Function B]`  | `[param1: type1, param2: type2]` | `result : type` | `ValueError`: [Condition]    | Responsibility B | None         |
-|    3 | `[file.py]` | Model / Protocol | `[Class C]` |                   |                                    |                   | `[DomainError]`: [Condition] | Responsibility C | None         |
+Apply these ordering rules:
 
----
+1. Arrange module sections by dependency order.
+2. Inside each module, arrange file rows by dependency order.
+3. Inside each file, arrange functional requirements by dependency or execution order.
+4. Implement from the top of this section downward.
 
-### 3.2 `[FEAT-002]` — [Feature Name]
-
-> Copy the complete feature structure from Section 4.1 for every additional feature.
+Copy the following module block once for every module folder.
 
 ---
 
-## 4. Cross-Feature Workflows
+### 4.1 `[module_name]/` — [Feature / Capability]
 
-Use this section for workflows that coordinate multiple features within the domain.
+**Purpose:** [Describe the single capability this module provides.]
 
-### 4.1 `[WF-[DOM]-100]` — [Cross-Feature Workflow Name]
-
-**Features involved**
-
-- `[FEAT-001]`
-- `[FEAT-002]`
-
-**Requirements covered**
-
-- `FR-[DOM]-001`
-- `FR-[DOM]-007`
-
-**Summary**
-
-[Explain how the features collaborate to produce an end-to-end result.]
-
-```mermaid
-flowchart LR
-    A[Feature A] --> B[Feature B]
-    B --> C[Domain Outcome]
-```
-
----
-
-## 5. Package and File Structure
+**Module flow:**
 
 ```text
-[domain_name]/
-├── __init__.py
-├── file1.py            # Single Responsibility
-├── file2.py            # Single Responsibility
-├── file3.py            # Single Responsibility
-├── module1/
-│   ├── __init__.py
-│   ├── file1.py        # Single Responsibility
-│   └── file2.py        # Single Responsibility
-└── README.md
+[input]
+  → [file_a.function_a()]
+  → [file_b.function_b()]
+  → [result]
 ```
+
+### Files
+
+List files in implementation order.
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `[file_a].py` | [Single focused responsibility] | `[function_a]`, `[ClassA]`, `[CONSTANT_A]` | **Standard library:** `[decimal, datetime]`<br>**Required third-party:** `[pandas]`<br>**Local:** None |
+| Missing | `[file_b].py` | [Single focused responsibility] | `[function_b]` | **Standard library:** `[typing]`<br>**Required third-party:** `[MetaTrader5]`<br>**Local:** `[file_a].py → function_a` |
+| Missing | `__init__.py` | Expose the supported public feature API | `[function_a]`, `[ClassA]`, `[function_b]` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `[file_a].py → function_a, ClassA`; `[file_b].py → function_b` |
+
+### Dependency writing format
+
+Always list dependencies in this order:
+
+```text
+Standard library: [library names or None]
+Required third-party: [library names or None]
+Local: [file/module → imported class, function, or constant]
+```
+
+Example:
+
+```text
+Standard library: decimal, dataclasses
+Required third-party: pandas
+Local: validation.py → validate_order; models.py → OrderRequest
+```
+
+Do not list optional or unused imports.
+
+### Configuration and Limits Manifest
+
+Configuration and limits belong to the feature module that owns and enforces them.
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `[SETTING_NAME]` | `[str]` | `None` | Yes | `[Class.method()]` | [Purpose and enforced behaviour] |
+| Missing | `[MAX_LIMIT]` | `[Decimal]` | `[value]` | Yes | `[function_a()]` | [Maximum permitted value and failure behaviour] |
+| Missing | `[TIMEOUT_SECONDS]` | `[float]` | `[5.0]` | No | `[function_b()]` | [Operation timeout] |
+| Missing | `[ENABLE_FEATURE]` | `[bool]` | `False` | No | `[PublicClass]` | [Whether this feature is enabled] |
+
+Rules:
+
+- Define each feature-specific setting or limit once in this manifest.
+- Use the exact code constant, environment variable, or configuration field name.
+- `Used by` identifies the public classes, functions, or methods that consume or enforce it.
+- A limit must state what happens when it is exceeded.
+- Shared settings used by several modules belong in Section 5 as package-wide requirements or configuration.
+- Change a row to `Completed` only after the setting exists, is validated, and has tests.
 
 ---
 
-## 6. Tests and Usage
+#### `[file_a].py` — [Use Case / Focused Responsibility]
+
+**File responsibility:** [One sentence describing why this file exists.]
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-[DOM]-001` | The system shall [perform one observable behaviour]. | `[function_a](arg: Type) -> ResultType` | `[None | Read-only | Local state mutation | Persistence write | External API call | Broker mutation | Event publication]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::example_[file_a]_[function_a]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[function_a]_[scenario]()` |
+| Missing | `FR-[DOM]-002` | The system shall [perform one observable behaviour]. | `[ClassA.method](arg: Type) -> ResultType` | `[Side effect or None]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::example_[file_a]_[method]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[method]_[scenario]()` |
+| Missing | `FR-[DOM]-003` | The system shall expose [required public constant or contract]. | `[CONSTANT_A]: Type` | `None` | None | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::example_[file_a]_[constant_a]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[constant_a]_[scenario]()` |
+
+### Side-effect values
+
+Use the smallest accurate label:
+
+```text
+None
+Read-only
+Local state mutation
+Persistence write
+External API call
+Broker mutation
+Event publication
+```
+
+Combine labels only when necessary, for example: `Broker mutation; persistence write`.
+
+**Rules:**
+
+- [Validation, business, security, or failure rule]
+- [Important guarantee or side effect]
+- [Boundary that this file must preserve]
+
+**Implementation notes:**
+
+- [Minimal technical direction needed to implement correctly]
+- [Existing component that must be reused]
+- [Constraint that prevents duplication or unnecessary abstraction]
+
+---
+
+#### `[file_b].py` — [Use Case / Focused Responsibility]
+
+**File responsibility:** [One sentence describing why this file exists.]
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-[DOM]-004` | The system shall [perform one observable behaviour]. | `[function_b](arg: Type) -> ResultType` | `[Side effect or None]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::example_[file_b]_[function_b]()`<br>**Unit:** `tests/[domain]/unit/test_[file_b].py::test_[function_b]_[scenario]()` |
+
+**Rules:**
+
+- [Rule]
+- [Rule]
+
+**Implementation notes:**
+
+- [Minimal technical direction]
+
+---
+
+### Feature usage examples
+
+Keep all public feature examples under:
+
+```text
+tests/[domain]/usage/
+└── test_usage_[module_name].py
+```
+
+Use one example function for each public functional requirement:
+
+```python
+def example_[file_a]_[function_a]() -> None:
+    """Demonstrate FR-[DOM]-001."""
+    ...
+
+
+def example_[file_a]_[method]() -> None:
+    """Demonstrate FR-[DOM]-002."""
+    ...
+
+
+def example_[file_b]_[function_b]() -> None:
+    """Demonstrate FR-[DOM]-004."""
+    ...
+```
+
+Example functions must:
+
+- be independently runnable;
+- import only the documented public feature API;
+- demonstrate one functional requirement;
+- show realistic input and the expected result;
+- avoid duplicating implementation logic;
+- be collected or executed by pytest.
+
+---
+
+### 4.2 `[module_name]/` — [Feature / Capability]
+
+> Copy Section 4.1 for every additional module folder.  
+> Place this module after every module it depends on.
+
+---
+
+## 5. Package-Wide Requirements and Shared Configuration
+
+Use this section only for requirements, settings, or limits that apply across multiple modules.
+
+For shared configuration, use the same manifest columns as the module-level Configuration and Limits Manifest.
+
+| Status | Requirement ID | Type | Responsibility | Verification |
+|---|---|---|---|---|
+| Missing | `NFR-[DOM]-001` | Maintainability | Every file shall have one focused responsibility. | Structure review |
+| Missing | `NFR-[DOM]-002` | API boundary | Other packages shall use only documented public exports. | Import tests |
+| Missing | `NFR-[DOM]-003` | Testing | Automated tests shall cover every public functional requirement. | Test audit |
+| Missing | `NFR-[DOM]-004` | Performance | [Performance requirement.] | Benchmark |
+| Missing | `NFR-[DOM]-005` | Security | [Security requirement.] | Security test |
+| Missing | `NFR-[DOM]-006` | Reliability | [Reliability requirement.] | Failure-path test |
+
+---
+
+## 6. Open Decisions
+
+Use this section only for unresolved choices that would otherwise force the implementing agent to guess.
+
+| Status | Decision | Options / Notes |
+|---|---|---|
+| Open | [Decision still required] | [Available options, constraints, or missing information] |
+| Resolved | [Decision already made] | [Chosen approach and short reason] |
+
+Rules:
+
+- `Open` means implementation of the affected requirement must not begin.
+- `Resolved` records the final choice briefly.
+- Remove obsolete decisions instead of building a large historical decision log.
+- Do not add an entry when the README already defines the answer clearly.
+
+---
+
+## 7. Tests and Definition of Done
+
+### Test and usage locations
+
+```text
+tests/[domain]/
+├── unit/                         # Individual functions, methods, classes, and files
+├── integration/                  # Module and end-to-end workflow collaboration
+└── usage/                        # Runnable public usage examples
+```
+
+### Commands
 
 ```bash
-# Unit tests
-pytest tests/[domain]/unit
+uv run ruff check app/[path]/[package]
+uv run ruff format --check app/[path]/[package]
+uv run mypy app/[path]/[package]
 
-# Workflow tests
-pytest tests/[domain]/workflows
+uv run pytest tests/[domain]/unit
+uv run pytest tests/[domain]/integration
+uv run pytest tests/[domain]/usage
 
-# Integration tests
-pytest tests/[domain]/integration
-
-# Usage examples tests
-pytest tests/[domain]/usage
+uv run pytest tests/[domain]   --cov=app/[path]/[package]   --cov-fail-under=80
 ```
 
+### Required test levels
+
+- **Unit:** Verify each `FR-*` requirement and each file's failure paths.
+- **Integration:** Verify feature workflows and important workflows across module boundaries.
+- **Usage:** Run every documented public usage example as a test.
+
+### Package completion checklist
+
+- [ ] The actual package tree matches Section 2.
+- [ ] Module sections and file rows remain arranged in dependency order.
+- [ ] Every module folder represents one coherent feature.
+- [ ] Every file has one focused responsibility.
+- [ ] Every requirement table has a status of `Completed`.
+- [ ] Every workflow has a status of `Completed` and an integration test under `tests/[domain]/integration` when collaboration is involved.
+- [ ] Every package-wide requirement has a status of `Completed`.
+- [ ] Every public export is listed under `Key exports`.
+- [ ] Every dependency is documented in the required order.
+- [ ] Every public functional requirement has one example under `tests/[domain]/usage` and at least one unit test under `tests/[domain]/unit`.
+- [ ] No undocumented public class, function, method, or constant exists.
+- [ ] No planned file or public export is missing.
+- [ ] No unresolved `Open` decision affects completed requirements.
+- [ ] No unnecessary abstraction was introduced.
+- [ ] All tests and quality checks pass.
+
 ---
 
-## 7. Known Limitations
+## 8. Change Process
 
-- [Current limitation]
-- [Unsupported scenario]
-- [Deferred capability]
+For every future change:
 
----
+```text
+1. Update this README first.
+2. Add or change the workflow when system behaviour changes.
+3. Resolve or record any decision that would otherwise require guessing.
+4. Add or change the functional requirement row, including Side Effects.
+5. Update the file's key exports and dependencies.
+6. Reorder modules or files if dependency order changes.
+7. Implement the smallest code change.
+8. Add or update the usage example.
+9. Add or update tests.
+10. Change Status to Completed only after verification passes.
+```
 
-## 8. Related Documentation
-
-- `[docs/PROJECT.md]`
-- `[docs/ARCHITECTURE.md]`
-- `[docs/MODULES.md]`
-- `[domain requirements document]`
-- `[workflow specification]`
-- `[API documentation]`
+This keeps requirements, dependency order, implementation, usage examples, tests, and final documentation aligned in one file.
