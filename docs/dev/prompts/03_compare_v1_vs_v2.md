@@ -34,9 +34,10 @@ Classify each capability or requirement as:
 | **Merge**         | Several V1 items should become one simpler final capability                                      |
 | **Split**         | One V1 item contains unrelated responsibilities that should become separate focused capabilities |
 | **Defer**         | Valuable or proposed behaviour is intentionally postponed and excluded from the initial rebuild  |
+| **Reject**        | Proposed V2 behaviour or implementation is not accepted (applies to V2 requirements only)        |
 | **Open Decision** | Available evidence is insufficient to select the final direction safely                          |
 
-The output will be used in the next step to write the final domain README.
+The output will be used in the next pipeline step (04 — domain README) to write the final domain README.
 
 # IMPORTANT PRINCIPLES
 
@@ -90,8 +91,8 @@ Do not introduce services, managers, handlers, factories, repositories, ports, a
 
 Extract:
 
-* confirmed V1 capabilities;
-* actual workflows;
+* confirmed V1 capabilities (cite their `V1-CAP-[DOMAIN]-*` IDs);
+* actual workflows (cite their `V1-WF-[DOMAIN]-*` IDs);
 * public classes and functions;
 * valuable working behaviour;
 * side effects;
@@ -266,7 +267,7 @@ Identify where:
 
 Do not create the complete final file tree yet.
 
-Produce only a recommended capability-level structure for Step 4.
+Produce only a recommended capability-level structure for the next pipeline step (04 — domain README).
 
 ## Step 8 — Resolve conflicts
 
@@ -288,7 +289,7 @@ Record unresolved questions under Open Decisions.
 Create:
 
 ```text
-[DOMAIN_NAME]-v1-v2-reconciliation.md
+docs/dev/reconciliations/[DOMAIN_NAME]-v1-v2-reconciliation.md
 ```
 
 Use the following structure.
@@ -335,17 +336,19 @@ Keep one focused responsibility per file.
 
 | Capability ID   | Capability   | V1 evidence               | V2 requirement       | Gap          | Decision                                                             | Final behaviour            | Reuse approach                   | Reason   |
 | --------------- | ------------ | ------------------------- | -------------------- | ------------ | -------------------------------------------------------------------- | -------------------------- | -------------------------------- | -------- |
-| `CAP-[DOM]-001` | [Capability] | [V1 file/symbol/workflow] | [V2 requirement IDs] | [Difference] | Keep / Modify / Remove / Add / Merge / Split / Defer / Open Decision | [Approved final behaviour] | Reuse / Refactor / Replace / New | [Reason] |
+| `CAP-[DOM]-001` | [Capability] | [`V1-CAP-[DOMAIN]-*` / `V1-WF-[DOMAIN]-*` IDs plus file/symbol] | [V2 requirement IDs] | [Difference] | Keep / Modify / Remove / Add / Merge / Split / Defer / Open Decision | [Approved final behaviour] | Reuse / Refactor / Replace / New | [Reason] |
 
 This is the primary decision table.
 
+Rejected V2 requirements do not appear here as capabilities; they appear only in the V2 Requirement Disposition Register (Section 6).
+
 ## 5. V1 Disposition Register
 
-Every V1 capability must appear here.
+Every V1 capability must appear here, cited by its audit ID.
 
-| V1 capability | Current implementation | Current value                                                          | Decision                                       | Final destination          | Removal condition                       |
-| ------------- | ---------------------- | ---------------------------------------------------------------------- | ---------------------------------------------- | -------------------------- | --------------------------------------- |
-| [Capability]  | [File/symbol]          | Essential / Useful / Supporting / Questionable / No demonstrated value | Keep / Modify / Remove / Merge / Split / Defer | [Final capability or none] | [What must be verified before deletion] |
+| V1 capability ID | V1 capability | Current implementation | Current value                                                          | Decision                                       | Final destination          | Removal condition                       |
+| ---------------- | ------------- | ---------------------- | ---------------------------------------------------------------------- | ---------------------------------------------- | -------------------------- | --------------------------------------- |
+| `V1-CAP-[DOMAIN]-001` | [Capability]  | [File/symbol]          | Essential / Useful / Supporting / Questionable / No demonstrated value | Keep / Modify / Remove / Merge / Split / Defer | [Final capability or none] | [What must be verified before deletion] |
 
 ## 6. V2 Requirement Disposition Register
 
@@ -456,9 +459,15 @@ New
 
 Do not guess unresolved behaviour.
 
+Escalation rules:
+
+* An open decision affecting more than one domain must also be added to the top-level system document's Open Decisions section; it is resolved there (with an ADR) — not in this document.
+* A `Defer` decision that changes the system shape (actors, domains, cross-domain workflows, or shared contracts) must be reflected in the top-level system document's Deferred Capabilities section.
+* Purely domain-internal open decisions stay here.
+
 ## 12. Inputs for the Final Domain README
 
-Provide the approved inputs that Step 4 must use:
+Provide the approved inputs that the next pipeline step (04 — domain README) must use:
 
 ### Approved capabilities
 
@@ -508,6 +517,7 @@ Before completing the document, verify that:
 * the proposed direction follows the four-level minimal structure;
 * domain boundaries match the top-level system document;
 * unresolved conflicts are listed under Open Decisions;
+* open decisions and deferrals affecting more than one domain were escalated to the top-level system document;
 * no code was changed;
 * neither source document was modified;
 * the output is sufficient to write the final domain README.

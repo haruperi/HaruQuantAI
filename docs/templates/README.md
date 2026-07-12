@@ -25,6 +25,30 @@
 - [Responsibility owned by another package]
 - [Explicitly unsupported behaviour]
 
+### Shared contracts
+
+Contract definitions must match the name, version, and owner recorded in the top-level system document.
+
+**Owned by this domain** (commands/requests it receives, events/results it produces, channels it provides) — defined authoritatively here:
+
+| Status | Contract | Version | Counterparty | Purpose |
+|---|---|---|---|---|
+| Missing | `[ContractName]` | `v1` | `[Producing or consuming domain]` | [Purpose] |
+
+**Consumed from other domains** — referenced only, never redefined:
+
+| Contract | Version | Owner | Used for |
+|---|---|---|---|
+| `[ContractName]` | `v1` | `[Owning domain]` | [How this domain uses it] |
+
+### Persisted state
+
+Only for domains that persist state. Must match the data ownership table in the top-level system document. Only this domain writes this state; other domains read it through this domain's public contracts.
+
+| Status | State / Store | Read access (via contract) | Migration definitions |
+|---|---|---|---|
+| Missing | `[Table / artifact store]` | `[Consuming domains and contract]` | `[Path or None]` |
+
 ### Four-level structure
 
 | Code level | Represents |
@@ -161,6 +185,8 @@ Do not duplicate the internal implementation of other domains. The full multi-do
 
 **Scope:** `[Internal | Cross-domain]`
 
+**System workflow:** [`SYS-WF-*` ID(s) from the top-level system document this workflow participates in, or `None` for internal workflows.]
+
 **Input boundary:** [What enters this domain and where it comes from. Use `Internal` when not applicable.]
 
 **Output boundary:** [What leaves this domain and where it goes. Use `Internal` when not applicable.]
@@ -217,6 +243,7 @@ The diagram must show how the functional requirements collaborate.
 
 For a cross-domain workflow:
 
+- cite the `SYS-WF-*` ID(s) it participates in;
 - show the external domain only at the input or output boundary;
 - fully describe only this domain's functions and responsibilities;
 - do not describe another domain's internal steps.
@@ -312,9 +339,9 @@ Rules:
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-[DOM]-001` | The system shall [perform one observable behaviour]. | `[function_a](arg: Type) -> ResultType` | `[None | Read-only | Local state mutation | Persistence write | External API call | Broker mutation | Event publication]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::example_[file_a]_[function_a]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[function_a]_[scenario]()` |
-| Missing | `FR-[DOM]-002` | The system shall [perform one observable behaviour]. | `[ClassA.method](arg: Type) -> ResultType` | `[Side effect or None]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::example_[file_a]_[method]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[method]_[scenario]()` |
-| Missing | `FR-[DOM]-003` | The system shall expose [required public constant or contract]. | `[CONSTANT_A]: Type` | `None` | None | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::example_[file_a]_[constant_a]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[constant_a]_[scenario]()` |
+| Missing | `FR-[DOM]-001` | The system shall [perform one observable behaviour]. | `[function_a](arg: Type) -> ResultType` | `[Side-effect label from the list below]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::test_usage_[file_a]_[function_a]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[function_a]_[scenario]()` |
+| Missing | `FR-[DOM]-002` | The system shall [perform one observable behaviour]. | `[ClassA.method](arg: Type) -> ResultType` | `[Side effect or None]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::test_usage_[file_a]_[method]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[method]_[scenario]()` |
+| Missing | `FR-[DOM]-003` | The system shall expose [required public constant or contract]. | `[CONSTANT_A]: Type` | `None` | None | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::test_usage_[file_a]_[constant_a]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[constant_a]_[scenario]()` |
 
 ### Side-effect values
 
@@ -352,7 +379,7 @@ Combine labels only when necessary, for example: `Broker mutation; persistence w
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-[DOM]-004` | The system shall [perform one observable behaviour]. | `[function_b](arg: Type) -> ResultType` | `[Side effect or None]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::example_[file_b]_[function_b]()`<br>**Unit:** `tests/[domain]/unit/test_[file_b].py::test_[function_b]_[scenario]()` |
+| Missing | `FR-[DOM]-004` | The system shall [perform one observable behaviour]. | `[function_b](arg: Type) -> ResultType` | `[Side effect or None]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::test_usage_[file_b]_[function_b]()`<br>**Unit:** `tests/[domain]/unit/test_[file_b].py::test_[function_b]_[scenario]()` |
 
 **Rules:**
 
@@ -374,20 +401,20 @@ tests/[domain]/usage/
 └── test_usage_[module_name].py
 ```
 
-Use one example function for each public functional requirement:
+Use one example function for each public functional requirement, named `test_usage_*` so pytest collects it:
 
 ```python
-def example_[file_a]_[function_a]() -> None:
+def test_usage_[file_a]_[function_a]() -> None:
     """Demonstrate FR-[DOM]-001."""
     ...
 
 
-def example_[file_a]_[method]() -> None:
+def test_usage_[file_a]_[method]() -> None:
     """Demonstrate FR-[DOM]-002."""
     ...
 
 
-def example_[file_b]_[function_b]() -> None:
+def test_usage_[file_b]_[function_b]() -> None:
     """Demonstrate FR-[DOM]-004."""
     ...
 ```
@@ -399,7 +426,7 @@ Example functions must:
 - demonstrate one functional requirement;
 - show realistic input and the expected result;
 - avoid duplicating implementation logic;
-- be collected or executed by pytest.
+- be collected and executed by pytest (`test_usage_*` naming guarantees this).
 
 ---
 
@@ -440,6 +467,7 @@ Rules:
 
 - `Open` means implementation of the affected requirement must not begin.
 - `Resolved` records the final choice briefly.
+- A decision affecting more than one domain must be escalated to the Open Decisions section of the top-level system document (where it is resolved with an ADR) — record only a reference to it here.
 - Remove obsolete decisions instead of building a large historical decision log.
 - Do not add an entry when the README already defines the answer clearly.
 
@@ -486,6 +514,8 @@ uv run pytest tests/[domain]   --cov=app/[path]/[package]   --cov-fail-under=80
 - [ ] Every workflow has a status of `Completed` and an integration test under `tests/[domain]/integration` when collaboration is involved.
 - [ ] Every package-wide requirement has a status of `Completed`.
 - [ ] Every public export is listed under `Key exports`.
+- [ ] Contracts owned by this domain match the top-level system document (name, version, owner).
+- [ ] Persisted state matches the top-level data ownership table; no other domain's state is written.
 - [ ] Every dependency is documented in the required order.
 - [ ] Every public functional requirement has one example under `tests/[domain]/usage` and at least one unit test under `tests/[domain]/unit`.
 - [ ] No undocumented public class, function, method, or constant exists.

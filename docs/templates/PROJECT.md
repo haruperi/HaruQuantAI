@@ -59,45 +59,55 @@ flowchart TD
     D4 --> C4[Primary capability]
 ```
 
-### Domain registry
+### 2.1 Domain Registry
 
 List domains in dependency order, from lowest dependency to highest dependency.
 
-### 2.1 [Domain 1]
+#### 2.1.1 [Domain 1]
 
 * **Package**: [app/path/domain_1]
 * **Responsibility**: [One-line responsibility]
-* **Inputs**: [All inputs the the domain ingests]
-* **Outputs**:  [All outputs the the domain produces]
-* **Owns**: [Features ].
+* **Inputs**: [All inputs the domain ingests]
+* **Outputs**: [All outputs the domain produces]
+* **Owns**: [Features]
 * **Boundaries**: [What it does not own or do]
 * **Key Limits**: [The limits of what it can do both by design and env]
 * **Documentation**: [app/path/domain_1/README.md]
 
-### 2.2 [Domain 2]
+#### 2.1.2 [Domain 2]
 
 * **Package**: [app/path/domain_2]
 * **Responsibility**: [One-line responsibility]
-* **Inputs**: [All inputs the the domain ingests]
-* **Outputs**:  [All outputs the the domain produces]
-* **Owns**: [Features ].
+* **Inputs**: [All inputs the domain ingests]
+* **Outputs**: [All outputs the domain produces]
+* **Owns**: [Features]
 * **Boundaries**: [What it does not own or do]
 * **Key Limits**: [The limits of what it can do both by design and env]
 * **Documentation**: [app/path/domain_2/README.md]
 
-### 2.3 [Domain 3]
+#### 2.1.3 [Domain 3]
 
 * **Package**: [app/path/domain_3]
 * **Responsibility**: [One-line responsibility]
-* **Inputs**: [All inputs the the domain ingests]
-* **Outputs**:  [All outputs the the domain produces]
-* **Owns**: [Features ].
+* **Inputs**: [All inputs the domain ingests]
+* **Outputs**: [All outputs the domain produces]
+* **Owns**: [Features]
 * **Boundaries**: [What it does not own or do]
 * **Key Limits**: [The limits of what it can do both by design and env]
 * **Documentation**: [app/path/domain_3/README.md]
 
+#### 2.1.4 [Domain 4]
 
-### Domain ownership rule
+* **Package**: [app/path/domain_4]
+* **Responsibility**: [One-line responsibility]
+* **Inputs**: [All inputs the domain ingests]
+* **Outputs**: [All outputs the domain produces]
+* **Owns**: [Features]
+* **Boundaries**: [What it does not own or do]
+* **Key Limits**: [The limits of what it can do both by design and env]
+* **Documentation**: [app/path/domain_4/README.md]
+
+### 2.2 Domain ownership rule
 
 Each responsibility must have one clear owning domain.
 
@@ -245,19 +255,47 @@ Rules:
 
 Document only contracts crossing domain or external-system boundaries.
 
-| Status | Contract / Event | Producer | Consumer | Purpose | Schema / Type | Failure behaviour |
-|---|---|---|---|---|---|---|
-| Missing | `[ContractName]` | `[Domain A]` | `[Domain B]` | [Purpose] | `[Type / schema]` | [Failure handling] |
-| Missing | `[EventName]` | `[Domain B]` | `[Domain C]` | [Purpose] | `[Type / schema]` | [Failure handling] |
-| Missing | `[ExternalRequest]` | `[Domain C]` | `[External system]` | [Purpose] | `[Type / schema]` | [Failure handling] |
+| Status | Contract / Event | Version | Owner | Producer / Submitter | Consumer | Purpose | Schema / Type | Failure behaviour |
+|---|---|---|---|---|---|---|---|---|
+| Missing | `[ContractName]` | `v1` | `[Domain A]` | `[Domain A]` | `[Domain B]` | [Purpose] | `[Type / schema]` | [Failure handling] |
+| Missing | `[EventName]` | `v1` | `[Domain B]` | `[Domain B]` | `[Domain C]` | [Purpose] | `[Type / schema]` | [Failure handling] |
+| Missing | `[ExternalRequest]` | `v1` | `[Domain C]` | `[Domain C]` | `[External system]` | [Purpose] | `[Type / schema]` | [Failure handling] |
 
 ### Contract rules
 
-- The producer owns the contract definition.
-- Consumers depend only on the documented public contract.
+- **Commands and requests are owned by the receiving domain.**
+- **Events and results are owned by the producing domain.**
+- **Shared context/envelope contracts are owned by the lowest common shared domain.**
+- A submitting domain may create an instance of a command without owning its schema.
+- External connection/channel contracts are owned by the domain that provides and controls the resource.
+- Consumers depend only on the documented public contract and must not redefine it.
 - Raw provider or SDK objects must not cross domain boundaries.
 - Changes to shared contracts must be reflected in every affected domain README.
 - Backward compatibility requirements must be stated when needed.
+
+### Versioning and compatibility policy
+
+- Every shared contract carries an explicit version; all contracts start at `v1`.
+- The contract owner (per the rules above) owns the version.
+- Additive changes (new optional fields) do not require a version bump.
+- Breaking changes (removed/renamed fields, changed semantics) require a new version.
+- The owner must support the previous version until every consumer has migrated; state the deprecation window per contract.
+- Version bumps must update this table, the owner's README, and every consumer README in the same change.
+
+### Data ownership
+
+Document which domain owns each piece of persisted or long-lived state. Only the owner writes; others read through the owner's public contract.
+
+| Status | State / Store | Owning domain | Read access | Write access | Notes |
+|---|---|---|---|---|---|
+| Missing | `[Table / collection / cache]` | `[Domain A]` | `[Domain B, Domain C]` | `[Domain A only]` | [Retention, consistency, or migration notes] |
+| Missing | `[State / store]` | `[Domain B]` | `[Domain D]` | `[Domain B only]` | [Notes] |
+
+Rules:
+
+- Every persisted state has exactly one owning domain.
+- No domain writes to state it does not own.
+- Cross-domain reads go through the owner's documented contract, not direct store access.
 
 ---
 
@@ -305,8 +343,8 @@ Document external dependencies at the system boundary.
 
 | Status | External system | Used by domains | Purpose | Interaction type | Failure behaviour |
 |---|---|---|---|---|---|
-| Missing | `[Broker / Database / API]` | `[Domain A, Domain B]` | [Purpose] | `[Read | Write | Read/Write]` | [Expected handling] |
-| Missing | `[External service]` | `[Domain C]` | [Purpose] | `[Sync | Async | Event]` | [Expected handling] |
+| Missing | `[Broker / Database / API]` | `[Domain A, Domain B]` | [Purpose] | `[Read / Write / Read-Write]` | [Expected handling] |
+| Missing | `[External service]` | `[Domain C]` | [Purpose] | `[Sync / Async / Event]` | [Expected handling] |
 
 Rules:
 
@@ -316,7 +354,32 @@ Rules:
 
 ---
 
-## 9. System Usage
+## 9. Deployment and Runtime Topology
+
+Describe how the system runs in each environment: process model, hosting, and how domains map to running units.
+
+**Runtime model:** [Single process / modular monolith / multiple services / scheduled jobs / event-driven workers]
+
+| Runtime unit | Contains domains | Environment | Started by | Scaling / instances |
+|---|---|---|---|---|
+| `[Process / service / job]` | `[Domain A, Domain B]` | `[dev / staging / prod]` | `[command / scheduler / orchestrator]` | [Single instance, N replicas, etc.] |
+
+```mermaid
+flowchart LR
+    U[User / Trigger] --> P[[Runtime unit]]
+    P --> DB[(Store)]
+    P --> EXT[External system]
+```
+
+Rules:
+
+- Every domain must belong to at least one runtime unit.
+- Environment-specific configuration differences belong in Section 6 or the owning domain README.
+- If the topology differs between environments, show each difference explicitly.
+
+---
+
+## 10. System Usage
 
 Show one minimal example of how the complete system is started or invoked.
 
@@ -354,7 +417,7 @@ tests/system/usage/
 
 ---
 
-## 10. Verification
+## 11. Verification
 
 ### Test locations
 
@@ -401,24 +464,25 @@ uv run mypy app
 
 ---
 
-## 11. Open Decisions
+## 12. Open Decisions
 
 Use this section only for unresolved choices that affect more than one domain.
 
-| Status | Decision | Affected domains | Options / Notes |
-|---|---|---|---|
-| Open | [Decision still required] | `[Domain A, Domain B]` | [Options, constraints, or missing information] |
-| Resolved | [Decision already made] | `[Domain C]` | [Chosen approach and short reason] |
+| Status | Decision | Affected domains | Options / Notes | ADR |
+|---|---|---|---|---|
+| Open | [Decision still required] | `[Domain A, Domain B]` | [Options, constraints, or missing information] | — |
+| Resolved | [Decision already made] | `[Domain C]` | [Chosen approach and short reason] | `docs/adr/[NNNN-decision-name].md` |
 
 Rules:
 
 - `Open` means affected implementation must not proceed where guessing would be required.
 - Domain-specific decisions belong in the relevant domain README.
-- Remove obsolete decisions instead of maintaining a large historical log.
+- When a decision is resolved, record the full rationale as an ADR in `docs/adr/` and link it here.
+- Resolved rows may be pruned from this table once linked to an ADR; the ADR preserves the history.
 
 ---
 
-## 12. System Definition of Done
+## 13. System Definition of Done
 
 The system is complete only when:
 
@@ -429,18 +493,21 @@ The system is complete only when:
 - [ ] No circular domain dependencies exist.
 - [ ] Every important cross-domain workflow has status `Completed`.
 - [ ] Every `SYS-WF-*` workflow has a passing system integration test.
-- [ ] Shared contracts are documented and tested.
+- [ ] Shared contracts are documented, versioned, and tested.
+- [ ] Every persisted state has a documented owning domain.
+- [ ] The deployment topology matches how the system actually runs.
 - [ ] Shared configuration and limits are implemented and verified.
 - [ ] Every system-wide requirement has status `Completed`.
 - [ ] External-system failures have documented handling.
 - [ ] Full-system usage examples run successfully.
 - [ ] No unresolved `Open` decision affects completed work.
+- [ ] Every resolved cross-domain decision has a linked ADR.
 - [ ] No domain logic is duplicated across domains.
 - [ ] All tests and quality checks pass.
 
 ---
 
-## 13. Change Process
+## 14. Change Process
 
 For every system-level change:
 

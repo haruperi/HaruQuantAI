@@ -221,7 +221,7 @@ Do not fix these issues. Record them with evidence.
 Create:
 
 ```text
-[DOMAIN_NAME]-v1-audit.md
+docs/dev/audits/[DOMAIN_NAME]-v1-audit.md
 ```
 
 Use the following structure.
@@ -244,10 +244,15 @@ Use the following structure.
 Briefly state:
 
 * what the domain currently provides;
-* how many module folders, files, and public symbols exist;
 * which workflows appear operational;
 * the most important structural problems;
 * how trustworthy or complete the audit evidence is.
+
+Include an audit metrics line so audits are comparable across domains:
+
+```text
+Module folders: N | Files: N | Public symbols: N | Symbols with confirmed callers: N (X%) | Workflows found: N
+```
 
 ## 3. Actual Package Structure
 
@@ -311,38 +316,60 @@ Repeat for every confirmed or partially confirmed workflow.
 | Public symbol | Called from | Call type | Runtime or test | Evidence |
 | ------------- | ----------- | --------- | --------------- | -------- |
 
-## 8. Duplicate and Overlapping Behaviour
+## 8. Cross-Domain Surface
+
+Summarize this domain's dependency surface toward the rest of the Version 1 codebase. This feeds the Version 2 dependency diagram and boundary decisions.
+
+**Outbound (this domain depends on):**
+
+| Depends on (domain/package) | Symbols or capabilities consumed | Where used in this domain | Evidence |
+| --------------------------- | -------------------------------- | ------------------------- | -------- |
+
+**Inbound (others depend on this domain):**
+
+| Consuming domain/package | Symbols consumed from this domain | Purpose | Evidence |
+| ------------------------ | --------------------------------- | ------- | -------- |
+
+## 9. Duplicate and Overlapping Behaviour
 
 | Item A | Item B | Overlap | Evidence | Risk |
 | ------ | ------ | ------- | -------- | ---- |
 
-## 9. Unused or Questionable Items
+## 10. Unused or Questionable Items
 
 | Item | Finding | Searches performed | Confidence | Evidence |
 | ---- | ------- | ------------------ | ---------- | -------- |
 
-Do not call an item dead code unless the confidence is high.
+Use this confidence scale:
 
-## 10. Incomplete or Disconnected Workflows
+| Confidence | Meaning |
+| ---------- | ------- |
+| **High**   | All usage search categories from Step 4 were completed with no hits |
+| **Medium** | Static searches complete; dynamic or indirect usage could not be fully ruled out |
+| **Low**    | Searches were partial or evidence was inaccessible |
+
+Do not call an item dead code unless the confidence is **High**.
+
+## 11. Incomplete or Disconnected Workflows
 
 | Workflow / capability | Missing connection | Current impact | Evidence |
 | --------------------- | ------------------ | -------------- | -------- |
 
-## 11. Structural Problems
+## 12. Structural Problems
 
-| ID             | Problem   | Location        | Impact   | Evidence   |
-| -------------- | --------- | --------------- | -------- | ---------- |
-| `V1-ISSUE-001` | [Problem] | [Path / symbol] | [Impact] | [Evidence] |
+| ID | Problem | Location | Impact | Evidence |
+| -- | ------- | -------- | ------ | -------- |
+| `V1-ISSUE-[DOMAIN]-001` | [Problem] | [Path / symbol] | [Impact] | [Evidence] |
 
-## 12. V1 Capability Catalogue
+## 13. V1 Capability Catalogue
 
 This catalogue will later be compared with Version 2 requirements.
 
-| Capability ID | Capability   | Current implementation | Workflow(s) | Usage status | Value status | Notes   |
-| ------------- | ------------ | ---------------------- | ----------- | ------------ | ------------ | ------- |
-| `V1-CAP-001`  | [Capability] | [Files and symbols]    | `V1-WF-...` | Used         | Essential    | [Notes] |
+| Capability ID | Capability | Current implementation | Workflow(s) | Usage status | Value status | Notes |
+| ------------- | ---------- | ---------------------- | ----------- | ------------ | ------------ | ----- |
+| `V1-CAP-[DOMAIN]-001` | [Capability] | [Files and symbols] | `V1-WF-[DOMAIN]-...` | Used | Essential | [Notes] |
 
-## 13. Audit Conclusions
+## 14. Audit Conclusions
 
 Summarize:
 
@@ -361,6 +388,7 @@ Before completing the audit, verify that:
 * every documented public export exists in code;
 * every `__init__.py` export was checked;
 * callers were searched across the available codebase;
+* inbound and outbound cross-domain usage is summarized;
 * workflows are based on actual call paths;
 * production usage is distinguished from test-only usage;
 * uncertain findings are labelled clearly;

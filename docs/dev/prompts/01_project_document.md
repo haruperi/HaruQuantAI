@@ -59,17 +59,17 @@ docs/PROJECT.md
 
 Use the supplied top-level system documentation template as the structural base.
 
-For this first step, fully populate only:
+For this first step, fully populate only (numbering follows the template):
 
 ```text
-1. System Purpose and Boundary
-2. Domain Capability Map
-3. Domain Registry and Ownership Boundaries
-4. Domain Dependency Diagram
-5. Main Cross-Domain Workflows
-6. System Interfaces and Shared Contracts
-7. Shared Configuration and Limits Manifest
-8. Open Decisions affecting the system shape
+1.  System Purpose and Boundary
+2.  Domain Capability Map (including 2.1 Domain Registry and 2.2 Domain ownership rule)
+3.  Domain Dependency Diagram
+4.  Cross-Domain Workflows
+5.  System Interfaces and Contracts (including versioning and data ownership)
+6.  Shared Configuration and Limits Manifest
+8.  External Systems (boundary level only)
+12. Open Decisions affecting the system shape
 ```
 
 Leave implementation-dependent sections unpopulated or clearly marked `Missing`.
@@ -426,7 +426,7 @@ Market data enters Data
 → Analytics records the result
 ```
 
-## Step 9 — Define shared contracts
+## Step 9 — Define shared contracts and data ownership
 
 Document contracts, commands, events, or result types that cross domain boundaries.
 
@@ -435,12 +435,16 @@ For each contract define:
 ```text
 Status
 Contract or event name
-Authoritative producer
+Version
+Contract owner
+Producer / submitter
 Consumer
 Purpose
 High-level schema or type
 Failure behaviour
 ```
+
+All contracts start at version `v1`. Restate the template's versioning and compatibility policy in the document.
 
 At this stage, the schema should define only important fields or concepts.
 
@@ -464,12 +468,34 @@ Core information:
 decision ID, account, symbol, direction, size, expiry
 ```
 
-Rules:
+Ownership rules (default; refine per explicit project decision):
 
-* the producer owns the contract;
-* consumers must not redefine it;
+* commands and requests are owned by the receiving domain;
+* events and results are owned by the producing domain;
+* shared context/envelope contracts are owned by the lowest common shared domain;
+* consumers must not redefine a contract;
 * raw provider or SDK objects must not cross boundaries;
 * similar contracts should not be invented independently by several domains.
+
+### Data ownership
+
+Populate the template's data ownership table: every persisted or long-lived state must have exactly one owning domain.
+
+For each state or store define:
+
+```text
+Status
+State / store
+Owning domain
+Read access (via contract)
+Write access
+Notes
+```
+
+Rules:
+
+* only the owner writes its state;
+* cross-domain reads go through the owner's documented contract, never direct store access.
 
 ## Step 10 — Define shared configuration and limits
 
@@ -483,11 +509,12 @@ Setting or limit
 Type
 Default
 Required
+Owner
 Used by
 Description
-Owner
-Failure behaviour
 ```
+
+The description must state the enforced behaviour, including what happens on violation or when a limit is exceeded.
 
 Examples may include:
 
@@ -516,15 +543,19 @@ Add unresolved system-level decisions that affect:
 * shared settings;
 * major workflows.
 
-For each decision state:
+For each decision fill the template's table columns:
 
 ```text
-Decision required
+Status (Open | Resolved)
+Decision
 Affected domains
-Evidence available
-Options
-What cannot proceed until resolved
+Options / Notes
+ADR
 ```
+
+In Options / Notes, capture the evidence available, the candidate options, and what cannot proceed until the decision is resolved.
+
+For the ADR column: `Open` decisions get `—`. When a decision is resolved, record the full rationale as an ADR in `docs/adr/` and link it here.
 
 Do not allow unresolved decisions to be hidden as assumptions.
 
@@ -548,7 +579,7 @@ Do not assign order based only on domain numbering or the order in which source 
 
 # REQUIRED OUTPUT CONTENT
 
-Populate the template sections as follows.
+Populate the template sections as follows (numbering follows the template).
 
 ## 1. System Purpose and Boundary
 
@@ -564,8 +595,8 @@ Complete:
 Complete:
 
 * Mermaid capability map;
-* all domain registry subsections;
-* domain ownership rule.
+* all domain registry subsections (2.1.x);
+* domain ownership rule (2.2).
 
 ## 3. Domain Dependency Diagram
 
@@ -584,7 +615,12 @@ Avoid exhaustive edge-case workflows at this stage.
 
 ## 5. System Interfaces and Contracts
 
-Complete the initial list of cross-domain contracts.
+Complete:
+
+* the initial list of cross-domain contracts, each at version `v1`;
+* the contract ownership rules;
+* the versioning and compatibility policy;
+* the data ownership table.
 
 Mark insufficiently defined contracts as `Partial` or `Missing`.
 
@@ -594,23 +630,32 @@ Complete the initial system-wide manifest.
 
 Do not copy feature-specific settings here.
 
-## 7. Open Decisions
+## 8. External Systems
+
+Complete the boundary-level list only: which external systems, used by which domains, why, and expected failure behaviour.
+
+Provider-specific implementation details belong in domain READMEs.
+
+## 12. Open Decisions
 
 Populate unresolved system-shape decisions.
 
-If the supplied template places Open Decisions later, retain its existing section location.
+Link every `Resolved` decision to an ADR in `docs/adr/`.
 
 # SECTIONS TO LEAVE FOR LATER
 
 Do not attempt to fully populate implementation-dependent sections such as:
 
 ```text
-System-wide verification details
-Complete external-system implementation details
-Executable system usage
-Final Definition of Done status
+System-Wide Requirements (Section 7) beyond the template's standing rows
+Deployment and Runtime Topology (Section 9)
+Executable system usage (Section 10)
+System-wide verification details (Section 11)
+Final Definition of Done status (Section 13)
 Completed test results
 ```
+
+For Deployment and Runtime Topology, a planned runtime model may be sketched from known constraints, but the section stays `Missing` until confirmed against the actual runtime.
 
 Retain these template sections, but leave placeholders or status `Missing`.
 
@@ -631,7 +676,8 @@ Before returning the document, verify that:
 * there are no circular dependencies;
 * important system workflows connect domains end to end;
 * every cross-domain output has an intended consumer;
-* shared contracts have authoritative producers;
+* shared contracts have authoritative owners and carry a version;
+* every persisted or long-lived state has exactly one owning domain;
 * shared settings and limits have owners;
 * feature-specific details were not added;
 * no files, classes, functions, or methods were defined;

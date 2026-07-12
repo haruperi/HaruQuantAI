@@ -332,13 +332,15 @@ Do not describe another domain’s internal implementation.
 For every workflow define:
 
 * status;
-* workflow ID;
+* workflow ID (format: `WF-[DOM]-NNN`);
 * scope;
 * trigger or input boundary;
 * participating requirements;
 * final result or output boundary;
 * failure behaviour;
 * integration-test location.
+
+For every cross-domain workflow, cite the `SYS-WF-*` ID(s) from the top-level system document in which this domain participates.
 
 Use:
 
@@ -411,6 +413,12 @@ The module `__init__.py` must expose only the approved public feature API.
 
 The package `__init__.py` must expose only the approved domain-level API.
 
+### Shared contracts
+
+* Define fully every cross-domain contract this domain **owns** per the system contract table (commands/requests it receives, events/results it produces, channels it provides), including the contract version.
+* Reference — never redefine — contracts owned by other domains that this domain consumes.
+* Contract definitions here must match the name, version, and owner recorded in the top-level system document.
+
 ## Step 10 — Define dependencies
 
 For every file, list dependencies in this exact order:
@@ -463,6 +471,10 @@ Place settings shared by several modules under package-wide requirements and sha
 
 Do not duplicate the same setting in several module manifests.
 
+### Persisted state
+
+If the domain persists state, declare the tables, artifact schemas, and migration definitions it owns, consistent with the data ownership table in the top-level system document. Only this domain writes that state; other domains read it through this domain's public contracts.
+
 ## Step 12 — Write final functional requirements
 
 For every public symbol, create one requirement row containing:
@@ -476,6 +488,8 @@ Side Effects
 Raises
 Usage / Test
 ```
+
+Requirement IDs use the format `FR-[DOM]-NNN`.
 
 Write requirements as observable behaviour.
 
@@ -581,9 +595,11 @@ tests/[domain]/usage/test_usage_[module_name].py
 Use one example function per public requirement:
 
 ```python
-def example_[file]_[function]() -> None:
+def test_usage_[file]_[function]() -> None:
     """Demonstrate FR-[DOM]-NNN."""
 ```
+
+Name example functions `test_usage_*` so pytest collects them when `tests/[domain]/usage` is run as part of verification.
 
 The README must identify the intended usage-example function.
 
@@ -656,10 +672,15 @@ Do not design affected functions or files by guessing.
 
 An affected requirement must remain `Missing` until the decision is resolved.
 
+A decision affecting more than one domain must be escalated to the Open Decisions section of the top-level system document (where it is resolved with an ADR) — record only a reference to it here.
+
 ## Step 20 — Validate completeness
 
 Before returning the README, verify that:
 
+* the domain boundary matches the top-level system document;
+* all cross-domain inputs and outputs match the top-level system document;
+* no circular dependency is proposed;
 * every approved reconciliation capability appears;
 * no removed capability appears;
 * no rejected V2 requirement appears;

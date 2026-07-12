@@ -101,7 +101,7 @@ When they disagree, do not silently select one. Record the conflict and recommen
 9. Every responsibility must have one authoritative owner.
 10. A consumer may reference another domain’s capability but must not redefine it.
 11. Every cross-domain input must match a corresponding output.
-12. Every shared contract must have one producer and one authoritative definition.
+12. Every shared contract must have one authoritative owner and one authoritative definition — the receiver for commands/requests, the producer for events/results, the lowest common shared domain for context/envelope contracts.
 13. Every shared configuration or limit must have one owner.
 14. Circular domain dependencies are not allowed.
 15. Clearly distinguish confirmed conflicts from possible ambiguities.
@@ -233,20 +233,23 @@ contract or require an explicit conversion.
 
 For every shared contract or event, determine:
 
-* authoritative owner;
-* producer;
+* authoritative owner (per the ownership rules in the top-level system document);
+* producer / submitter;
 * consumers;
 * canonical name;
 * canonical type or schema;
-* versioning requirements where applicable;
+* version;
 * error behaviour;
 * compatibility expectations.
+
+Every contract must carry an explicit version. Verify that the version in each README's owned-contracts table matches the top-level system document's contract table.
 
 Identify:
 
 * duplicate contract definitions;
 * different names for the same contract;
 * same name with different fields;
+* contracts missing a version, or version mismatches between documents;
 * raw provider objects crossing boundaries;
 * contracts without an owner;
 * consumers expecting fields the producer does not provide.
@@ -255,7 +258,7 @@ Identify:
 
 For every cross-domain workflow in the top-level document:
 
-1. Find the participating workflow section in each domain README.
+1. Find the participating workflow section in each domain README, and verify the `SYS-WF-*` citations both ways: every README cross-domain workflow cites a real `SYS-WF-*` ID, and every domain listed in a `SYS-WF-*` chain has a matching `WF-[DOM]-*` entry.
 2. Verify the input boundary.
 3. Verify the domain’s documented responsibilities.
 4. Verify the output boundary.
@@ -294,7 +297,18 @@ Confirm that:
 * another domain’s internal functions are not duplicated;
 * top-level documentation does not contain file or function details.
 
-## Step 9 — Validate shared configuration and limits
+## Step 9 — Validate shared configuration, limits, and data ownership
+
+### Data ownership
+
+Cross-check every persisted or long-lived state:
+
+* every state in the top-level data ownership table has exactly one owning domain, and that domain's README declares it under Persisted state;
+* every README Persisted state entry appears in the top-level data ownership table;
+* no domain README plans to write state owned by another domain;
+* cross-domain reads go through the owner's documented contract, not direct store access.
+
+### Shared configuration and limits
 
 For each shared setting or limit, check:
 
@@ -398,7 +412,7 @@ Do not mark the system ready if:
 Create:
 
 ```text
-cross-domain-alignment-review.md
+docs/dev/reviews/cross-domain-alignment-review.md
 ```
 
 Use the following structure.
@@ -489,8 +503,8 @@ Proposed correction
 
 ## 8. Shared Contract Alignment
 
-| Contract / Event | Owner | Producer | Consumer(s) | Status | Conflict / correction |
-| ---------------- | ----- | -------- | ----------- | ------ | --------------------- |
+| Contract / Event | Version | Owner | Producer / Submitter | Consumer(s) | Status | Conflict / correction |
+| ---------------- | ------- | ----- | -------------------- | ----------- | ------ | --------------------- |
 
 ## 9. Cross-Domain Workflow Alignment
 
@@ -527,10 +541,15 @@ Domain A
 
 Repeat for every important cross-domain workflow.
 
-## 10. Shared Configuration and Limits Alignment
+## 10. Shared Configuration, Limits, and Data Ownership Alignment
 
 | Setting / Limit | Owner | Used by | Status | Finding | Required correction |
 | --------------- | ----- | ------- | ------ | ------- | ------------------- |
+
+### Data ownership alignment
+
+| State / Store | Owner (top-level) | Owner (README) | Writers found | Status | Finding / correction |
+| ------------- | ----------------- | -------------- | ------------- | ------ | -------------------- |
 
 ## 11. Terminology and Identifier Alignment
 
@@ -605,6 +624,8 @@ Implementation order cannot be confirmed until ALIGN-XXX is resolved.
 | ------ | ------------------- | ---------------- | --------------- |
 | Open   | [Decision required] | [Domains]        | [Options]       |
 
+Decisions affecting more than one domain that were discovered during this review must also be recorded in the top-level system document's Open Decisions section (where they are resolved with an ADR) — not only in this report.
+
 ## 18. Readiness Assessment
 
 ### Result
@@ -636,10 +657,14 @@ Confirm that:
 * every domain dependency is documented;
 * no circular dependency exists;
 * every cross-domain output has a matching input;
-* every shared contract has one authoritative owner;
+* every shared contract has one authoritative owner and an explicit version consistent across documents;
 * every cross-domain workflow connects end to end;
+* `SYS-WF-*` citations match between the top-level document and domain READMEs;
 * failure and recovery ownership is clear;
 * shared configurations have one owner;
+* every persisted state has one owning domain and no foreign writers;
+* every resolved cross-domain decision has a linked ADR;
+* every domain is assigned to a runtime unit in the deployment topology;
 * terminology is consistent;
 * duplicated responsibilities are identified;
 * missing responsibilities are identified;
