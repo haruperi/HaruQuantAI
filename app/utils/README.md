@@ -198,7 +198,11 @@ re-exports only the approved feature APIs below and is governed by
 `NFR-UTL-001`, `NFR-UTL-003`, and `NFR-UTL-005`; it owns no independent
 functional behavior.
 
-### 4.1 `contracts/`
+### 4.1 `contracts/` — Shared Context and Audit Contracts
+
+**Purpose:** Define the immutable authenticated principal, trace context, and redacted audit envelope shared across every domain.
+
+**Module flow:** `untrusted trace/identity mapping → strict contract-field validation → immutable AuthContext / AuditEvent`
 
 #### Files
 
@@ -210,13 +214,17 @@ functional behavior.
 
 #### Functional requirements
 
-| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
-|---|---|---|---|---|---|
-| Partial | `FR-UTL-001` | `auth.py` | Define immutable `AuthContext v1` with only `USER` and `SERVICE_ACCOUNT` principal types and complete trace context. | `AuthContext` | None |
-| Missing | `FR-UTL-002` | `audit.py` | Define immutable redacted `AuditEvent v1` with bounded JSON-safe payload. | `AuditEvent` | None |
-| Missing | `FR-UTL-003` | `audit.py` | Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity. | Strict contract-field validation used by `AuditEvent` and `AuthContext` | None |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-UTL-001` | Define immutable `AuthContext v1` with only `USER` and `SERVICE_ACCOUNT` principal types and complete trace context. | `AuthContext` | None | `ValidationError`: naive time, empty identity/trace field, or unsupported principal type | **Usage:** `tests/utils/usage/test_usage_contracts.py::test_usage_auth_context()`<br>**Unit:** `tests/utils/unit/test_auth.py::test_auth_context_rejects_naive_time()` |
+| Missing | `FR-UTL-002` | Define immutable redacted `AuditEvent v1` with bounded JSON-safe payload. | `AuditEvent` | None | `ValidationError`: naive timestamp, empty identity/trace field, or unsafe payload | **Usage:** `tests/utils/usage/test_usage_contracts.py::test_usage_audit_event()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_audit_event_requires_json_safe_payload()` |
+| Missing | `FR-UTL-003` | Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity. | Strict contract-field validation used by `AuditEvent` and `AuthContext` | None | `ValidationError`: naive time, empty field, unsupported principal type, or malformed schema identity | **Usage:** `tests/utils/usage/test_usage_contracts.py::test_usage_contract_field_validation()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_contract_field_validation_rejects_malformed_schema()` |
 
-### 4.2 `errors/`
+### 4.2 `errors/` — Shared Base Errors and Boundary Mapping
+
+**Purpose:** Provide the minimal shared exception hierarchy and secret-safe boundary mapping every domain extends.
+
+**Module flow:** `caught exception → deterministic shared base type → sanitized boundary evidence`
 
 #### Files
 
@@ -228,13 +236,17 @@ functional behavior.
 
 #### Functional requirements
 
-| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
-|---|---|---|---|---|---|
-| Partial | `FR-UTL-004` | `exceptions.py` | Provide focused shared base exceptions without domain-specific policy. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | None |
-| Partial | `FR-UTL-005` | `mapping.py` | Preserve deterministic code and sanitized detail while never returning a raw provider exception across a boundary. | `map_exception` | None |
-| Missing | `FR-UTL-006` | `exceptions.py` | Require domains to define their own codes and boundary mapping above the shared base hierarchy. | Shared exception extension contract | None |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-UTL-004` | Provide focused shared base exceptions without domain-specific policy. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | None | None | **Usage:** `tests/utils/usage/test_usage_errors.py::test_usage_shared_exceptions()`<br>**Unit:** `tests/utils/unit/test_exceptions.py::test_shared_exception_hierarchy()` |
+| Partial | `FR-UTL-005` | Preserve deterministic code and sanitized detail while never returning a raw provider exception across a boundary. | `map_exception` | None | None | **Usage:** `tests/utils/usage/test_usage_errors.py::test_usage_map_exception()`<br>**Unit:** `tests/utils/unit/test_mapping.py::test_map_exception_never_leaks_raw_provider_error()` |
+| Missing | `FR-UTL-006` | Require domains to define their own codes and boundary mapping above the shared base hierarchy. | Shared exception extension contract | None | None | **Usage:** `tests/utils/usage/test_usage_errors.py::test_usage_exception_extension()`<br>**Unit:** `tests/utils/unit/test_exceptions.py::test_domains_extend_shared_base()` |
 
-### 4.3 `identity/`
+### 4.3 `identity/` — Trace Identifiers
+
+**Purpose:** Generate, validate, and deterministically derive secret-free trace identifiers used across every domain.
+
+**Module flow:** `prefix/identity material → generation or validation → canonical secret-free identifier`
 
 #### Files
 
@@ -245,13 +257,17 @@ functional behavior.
 
 #### Functional requirements
 
-| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
-|---|---|---|---|---|---|
-| Partial | `FR-UTL-007` | `identifiers.py` | Generate prefixed UUID4 identifiers without embedded secrets. | `generate_id` | Entropy read |
-| Partial | `FR-UTL-008` | `identifiers.py` | Validate supported prefixes and canonical identifier syntax. | `validate_id` | None |
-| Missing | `FR-UTL-009` | `identifiers.py` | Derive deterministic SHA-256 identifiers from canonical, caller-supplied identity material. | `derive_stable_id` | None |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-UTL-007` | Generate prefixed UUID4 identifiers without embedded secrets. | `generate_id` | Entropy read | `ValidationError`: unsupported prefix | **Usage:** `tests/utils/usage/test_usage_identity.py::test_usage_generate_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_generate_id_is_prefixed_and_secret_free()` |
+| Partial | `FR-UTL-008` | Validate supported prefixes and canonical identifier syntax. | `validate_id` | None | `ValidationError`: unsupported prefix or malformed identifier | **Usage:** `tests/utils/usage/test_usage_identity.py::test_usage_validate_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_validate_id_rejects_malformed()` |
+| Missing | `FR-UTL-009` | Derive deterministic SHA-256 identifiers from canonical, caller-supplied identity material. | `derive_stable_id` | None | `ValidationError`: empty or non-canonical identity material | **Usage:** `tests/utils/usage/test_usage_identity.py::test_usage_derive_stable_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_derive_stable_id_is_deterministic()` |
 
-### 4.4 `time/`
+### 4.4 `time/` — UTC Clocks and Timestamps
+
+**Purpose:** Provide the injectable clock boundary and canonical UTC timestamp parsing, formatting, and freshness evaluation.
+
+**Module flow:** `injectable clock → aware UTC instant → parse/format/age/freshness result`
 
 #### Files
 
@@ -263,13 +279,17 @@ functional behavior.
 
 #### Functional requirements
 
-| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
-|---|---|---|---|---|---|
-| Partial | `FR-UTL-010` | `clocks.py` | Return aware UTC time from an injectable clock. | `Clock`, `SystemClock`, `utc_now` | Clock read |
-| Partial | `FR-UTL-011` | `timestamps.py` | Parse and format UTC timestamps using canonical `Z` output. | `parse_utc_timestamp`, `format_utc_timestamp` | None |
-| Missing | `FR-UTL-012` | `timestamps.py` | Calculate non-negative age and explicit freshness against an injected instant. | `age_seconds`, `is_fresh` | None |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-UTL-010` | Return aware UTC time from an injectable clock. | `Clock`, `SystemClock`, `utc_now` | Clock read | None | **Usage:** `tests/utils/usage/test_usage_time.py::test_usage_utc_now()`<br>**Unit:** `tests/utils/unit/test_clocks.py::test_system_clock_returns_aware_utc()` |
+| Partial | `FR-UTL-011` | Parse and format UTC timestamps using canonical `Z` output. | `parse_utc_timestamp`, `format_utc_timestamp` | None | `ValidationError`: naive, non-UTC, or malformed timestamp | **Usage:** `tests/utils/usage/test_usage_time.py::test_usage_parse_format_timestamp()`<br>**Unit:** `tests/utils/unit/test_timestamps.py::test_format_uses_canonical_z_suffix()` |
+| Missing | `FR-UTL-012` | Calculate non-negative age and explicit freshness against an injected instant. | `age_seconds`, `is_fresh` | None | `ValidationError`: naive or invalid reference instant | **Usage:** `tests/utils/usage/test_usage_time.py::test_usage_age_and_freshness()`<br>**Unit:** `tests/utils/unit/test_timestamps.py::test_age_seconds_is_non_negative()` |
 
-### 4.5 `serialization/`
+### 4.5 `serialization/` — Canonical Serialization
+
+**Purpose:** Convert supported values to deterministic JSON-safe data and produce canonical UTF-8 JSON with no hidden redaction.
+
+**Module flow:** `supported value → JSON-safe conversion → stable sorted-key UTF-8 JSON`
 
 #### Files
 
@@ -280,13 +300,17 @@ functional behavior.
 
 #### Functional requirements
 
-| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
-|---|---|---|---|---|---|
-| Partial | `FR-UTL-013` | `canonical.py` | Convert supported datetimes, decimals, enums, dataclasses, mappings, and sequences to deterministic JSON-safe values. | `to_json_safe` | None |
-| Partial | `FR-UTL-014` | `canonical.py` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction. | `canonical_json` | None |
-| Missing | `FR-UTL-015` | `canonical.py` | Reject unsupported, cyclic, non-finite, or unsafe values deterministically. | Serialization validation used by `to_json_safe` and `canonical_json` | None |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-UTL-013` | Convert supported datetimes, decimals, enums, dataclasses, mappings, and sequences to deterministic JSON-safe values. | `to_json_safe` | None | `ValidationError`: unsupported value type | **Usage:** `tests/utils/usage/test_usage_serialization.py::test_usage_to_json_safe()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_to_json_safe_converts_supported_types()` |
+| Partial | `FR-UTL-014` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction. | `canonical_json` | None | `ValidationError`: non-serializable value | **Usage:** `tests/utils/usage/test_usage_serialization.py::test_usage_canonical_json()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_canonical_json_sorts_keys()` |
+| Missing | `FR-UTL-015` | Reject unsupported, cyclic, non-finite, or unsafe values deterministically. | Serialization validation used by `to_json_safe` and `canonical_json` | None | `ValidationError`: unsupported, cyclic, or non-finite value | **Usage:** `tests/utils/usage/test_usage_serialization.py::test_usage_serialization_rejects_unsafe()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_serialization_rejects_cyclic_value()` |
 
-### 4.6 `security/`
+### 4.6 `security/` — Secret Redaction
+
+**Purpose:** Define denylist-first redaction policy and redact bounded text or JSON-safe mappings without mutating input or leaking secrets.
+
+**Module flow:** `redaction policy + text/mapping → denylist-first redaction → redacted value and diagnostics`
 
 #### Files
 
@@ -297,16 +321,20 @@ functional behavior.
 
 #### Functional requirements
 
-| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
-|---|---|---|---|---|---|
-| Missing | `FR-UTL-016` | `redaction.py` | Define immutable denylist-first redaction policy with narrow reviewed field-path allowlists. | `RedactionPolicy` | None |
-| Partial | `FR-UTL-017` | `redaction.py` | Detect sensitive keys case-insensitively. | `is_sensitive_key` | None |
-| Partial | `FR-UTL-018` | `redaction.py` | Redact bounded text without mutating input. | `redact_text_value` | None |
-| Partial | `FR-UTL-019` | `redaction.py` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None |
-| Missing | `FR-UTL-020` | `redaction.py` | Return redacted paths and truncation diagnostics without secret values. | `RedactionResult` | None |
-| Missing | `FR-UTL-021` | `redaction.py` | Reject policies that allow protected credential fields. | `RedactionPolicy` validation | None |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-UTL-016` | Define immutable denylist-first redaction policy with narrow reviewed field-path allowlists. | `RedactionPolicy` | None | `ValidationError`: malformed policy definition | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redaction_policy()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_policy_is_immutable()` |
+| Partial | `FR-UTL-017` | Detect sensitive keys case-insensitively. | `is_sensitive_key` | None | None | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_is_sensitive_key()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_is_sensitive_key_is_case_insensitive()` |
+| Partial | `FR-UTL-018` | Redact bounded text without mutating input. | `redact_text_value` | None | None | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redact_text_value()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_text_value_does_not_mutate_input()` |
+| Partial | `FR-UTL-019` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None | `ValidationError`: non-JSON-safe mapping | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redact_mapping_value()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_mapping_value_is_recursive()` |
+| Missing | `FR-UTL-020` | Return redacted paths and truncation diagnostics without secret values. | `RedactionResult` | None | None | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redaction_result()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_result_omits_secret_values()` |
+| Missing | `FR-UTL-021` | Reject policies that allow protected credential fields. | `RedactionPolicy` validation | None | `SecurityError`: policy allows a protected credential field | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_policy_rejects_protected_fields()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_policy_rejects_protected_credential_field()` |
 
-### 4.7 `settings/`
+### 4.7 `settings/` — Runtime Settings
+
+**Purpose:** Define immutable generic runtime/logging settings and load them, and resolve opaque secret references, only on explicit invocation.
+
+**Module flow:** `explicit values + environment → strict validation → immutable RuntimeSettings / resolved secret`
 
 #### Files
 
@@ -318,14 +346,18 @@ functional behavior.
 
 #### Functional requirements
 
-| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
-|---|---|---|---|---|---|
-| Partial | `FR-UTL-022` | `models.py` | Define immutable generic runtime and logging settings. | `RuntimeSettings`, `LoggingSettings` | None |
-| Partial | `FR-UTL-023` | `loader.py` | Load explicit values and environment in documented precedence order only when called. | `load_settings` | Environment read |
-| Missing | `FR-UTL-024` | `models.py` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None |
-| Missing | `FR-UTL-025` | `loader.py` | Resolve secret references at the composition root without logging or persisting secret material. | `resolve_secret_reference` | Explicit secret-source read |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-UTL-022` | Define immutable generic runtime and logging settings. | `RuntimeSettings`, `LoggingSettings` | None | `ConfigurationError`: invalid setting value | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_runtime_settings()`<br>**Unit:** `tests/utils/unit/test_models.py::test_runtime_settings_are_immutable()` |
+| Partial | `FR-UTL-023` | Load explicit values and environment in documented precedence order only when called. | `load_settings` | Environment read | `ConfigurationError`: unsupported or invalid value | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_load_settings()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
+| Missing | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_settings_reject_unknown()`<br>**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()` |
+| Missing | `FR-UTL-025` | Resolve secret references at the composition root without logging or persisting secret material. | `resolve_secret_reference` | Explicit secret-source read | `SecurityError`, `ConfigurationError`: unresolved or unsafe secret reference | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_resolve_secret_reference()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_resolve_secret_reference_never_logs_secret()` |
 
-### 4.8 `logging/`
+### 4.8 `logging/` — Structured Logging
+
+**Purpose:** Provide import-safe logger access and explicit redacted structured-handler configuration for every domain.
+
+**Module flow:** `named logger + explicit LoggingSettings → redact → structured record → configured sink`
 
 #### Files
 
@@ -336,16 +368,16 @@ functional behavior.
 
 #### Functional requirements
 
-| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
-|---|---|---|---|---|---|
-| Partial | `FR-UTL-026` | `logger.py` | Return stable child loggers without configuring handlers. | `get_logger` | None |
-| Partial | `FR-UTL-027` | `logger.py` | Configure deduplicated console and optional bounded rotating-file handlers only when called. | `configure_logging` | Logging configuration; optional file write |
-| Missing | `FR-UTL-028` | `logger.py` | Redact messages and structured context before formatting. | `RedactingFilter` | None |
-| Missing | `FR-UTL-029` | `logger.py` | Emit JSON or human-readable records with UTC time, level, logger, message, and trace IDs. | `StructuredFormatter` | None |
-| Missing | `FR-UTL-030` | `logger.py` | Surface sink failure through a bounded secret-safe fallback. | Logging failure handling in `configure_logging` | Fallback emission |
-| Missing | `FR-UTL-031` | `logger.py` | Prevent duplicate handler installation across repeated configuration calls. | Configuration idempotency in `configure_logging` | Logging configuration |
-| Missing | `FR-UTL-032` | `logger.py` | Keep import free of handler registration, environment reads, and filesystem writes. | Module import contract | None |
-| Missing | `FR-UTL-033` | `logger.py` | Respect the shared `LOG_LEVEL` setting without redefining domain observability policy. | Logging level application in `configure_logging` | Logging configuration |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-UTL-026` | Return stable child loggers without configuring handlers. | `get_logger` | None | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_get_logger()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_get_logger_configures_no_handlers()` |
+| Partial | `FR-UTL-027` | Configure deduplicated console and optional bounded rotating-file handlers only when called. | `configure_logging` | Logging configuration; optional file write | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_configure_logging()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_adds_console_handler()` |
+| Missing | `FR-UTL-028` | Redact messages and structured context before formatting. | `RedactingFilter` | None | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_redacting_filter()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_redacting_filter_runs_before_formatting()` |
+| Missing | `FR-UTL-029` | Emit JSON or human-readable records with UTC time, level, logger, message, and trace IDs. | `StructuredFormatter` | None | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_structured_formatter()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_structured_formatter_includes_trace_ids()` |
+| Missing | `FR-UTL-030` | Surface sink failure through a bounded secret-safe fallback. | Logging failure handling in `configure_logging` | Fallback emission | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_sink_failure_fallback()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_sink_failure_uses_safe_fallback()` |
+| Missing | `FR-UTL-031` | Prevent duplicate handler installation across repeated configuration calls. | Configuration idempotency in `configure_logging` | Logging configuration | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_configure_logging_idempotent()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_is_idempotent()` |
+| Missing | `FR-UTL-032` | Keep import free of handler registration, environment reads, and filesystem writes. | Module import contract | None | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_import_is_side_effect_free()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_import_registers_no_handlers()` |
+| Missing | `FR-UTL-033` | Respect the shared `LOG_LEVEL` setting without redefining domain observability policy. | Logging level application in `configure_logging` | Logging configuration | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_log_level_applied()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_applies_log_level()` |
 
 ---
 
