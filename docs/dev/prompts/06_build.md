@@ -197,6 +197,291 @@ After approval:
 - Stop and report any contract, dependency, or specification conflict.
 ```
 
+
+## Prompt 4: Full domain completion review
+
+Use this only after the entire domain README is marked `Completed` and implementation is believed finished.
+
+```
+Perform a strict, read-only completion review of the `[DOMAIN]` domain.
+
+Domain scope:
+- Domain README: `[DOMAIN README PATH]`
+- Implementation package: `[PACKAGE PATH]`
+- Tests: `[TEST PATH]`
+
+This is a verification task, not an implementation task. Do not modify files, update statuses, install dependencies, stage changes, or fix findings.
+
+Authoritative sources, in order:
+
+1. Owner instructions
+2. `AGENTS.md`
+3. `docs/PROJECT.md`
+4. `[DOMAIN README PATH]`
+5. `docs/ARCHITECTURE.md`
+6. `docs/CHANGELOG.md`
+7. Implemented code and tests as evidence of current reality
+
+Review objective:
+
+Determine whether the completed implementation strictly and fully satisfies the domain README, system architecture, cross-domain contracts, safety rules, quality standards, and Definition of Done.
+
+Do not infer compliance from a `Completed` status. Every completion claim must be proven by code and passing evidence.
+
+## Review procedure
+
+### 1. Purpose, ownership, and boundaries
+
+Verify Section 1 of the domain README against the implementation.
+
+Confirm:
+
+- Every owned capability is implemented.
+- No prohibited or excluded capability is implemented.
+- The domain does not assume another domain’s responsibility.
+- No provider object, database session, DataFrame, exception, or internal model crosses a prohibited boundary.
+- Cross-domain imports use documented public APIs only.
+- Receiver-owned requests are defined by the receiving domain.
+- No circular dependency or reverse ownership has been introduced.
+- Removed, rejected, legacy, compatibility, agent, or speculative capabilities are absent.
+
+Report every violation with exact file and line evidence.
+
+### 2. Final package structure
+
+Compare the actual package recursively with README Section 2.
+
+Verify:
+
+- Every specified folder and file exists.
+- No required file is missing.
+- No undocumented production file or parallel implementation exists.
+- Files appear in the documented dependency order.
+- Every file has the documented focused responsibility.
+- Legacy files, aliases, wrappers, and obsolete compatibility paths have been removed where the final structure excludes them.
+- Every `__init__.py` exposes exactly the documented public names through explicit imports and `__all__`.
+- Imports do not perform prohibited initialization or side effects.
+
+Produce an expected-versus-actual file inventory.
+
+### 3. Workflow verification
+
+Review every Section 3 `WF-[DOM]-*` workflow.
+
+For each workflow, verify:
+
+- The documented trigger and input boundary exist.
+- Every required step is implemented in the documented order.
+- The output boundary matches the specification.
+- Failure behavior is deterministic and fail-closed.
+- Side effects occur only at the documented boundary.
+- Required audit, trace, persistence, idempotency, freshness, and reconciliation behavior exists.
+- The integration test exercises the genuine end-to-end workflow rather than mocking away the behavior under review.
+- Every referenced `SYS-WF-*` chain matches `docs/PROJECT.md`.
+
+A workflow is compliant only when its complete integration test passes.
+
+### 4. File and functional-requirement traceability
+
+Review every Section 4 feature, file, and `FR-[DOM]-*` requirement.
+
+For each Files-table row, verify:
+
+- The file exists at the exact documented path.
+- Its responsibility matches the implementation.
+- Every documented key export exists.
+- No undocumented public export exists.
+- Standard-library, third-party, and local dependencies match the table.
+- No undeclared dependency or forbidden deep import exists.
+
+For every functional requirement, verify:
+
+- The mapped class, function, method, constant, or contract exists.
+- Its public signature and types match exactly.
+- Its observable behavior satisfies the full requirement.
+- Side effects match the documented side-effect classification.
+- Documented errors and failure conditions are implemented.
+- Validation occurs at the required boundary.
+- No hidden fallback, silent failure, guessed default, or unapproved behavior exists.
+- A focused unit test proves the requirement.
+- A runnable usage test exercises the supported public API.
+- The test would fail if the required behavior were removed or materially broken.
+
+Produce a complete traceability matrix with these columns:
+
+| Requirement | README location | Implementation location | Unit test | Usage test | Result | Finding |
+|---|---|---|---|---|---|---|
+
+Every declared `FR-*` must appear exactly once in this matrix.
+
+### 5. Package-wide requirements and configuration
+
+Review every Section 5 `NFR-[DOM]-*`, shared setting, feature limit, and policy.
+
+Verify:
+
+- Configuration fields exist with the documented type and ownership.
+- Defaults match exactly.
+- Required values cannot be omitted.
+- “No shared default” values require explicit profile configuration.
+- Bounds are validated before allocation, mutation, network access, or expensive work.
+- Exceeded limits produce the documented deterministic failure.
+- Secrets are never logged, persisted, returned, or embedded in identifiers.
+- Time handling is UTC-aware and deterministic.
+- Numeric behavior uses the required precision and rejects unsafe values.
+- Correlation and trace identifiers follow the prefixed UUID4 policy.
+- Import safety, determinism, serialization, reliability, and compatibility rules are enforced.
+- Persistent state, schemas, migrations, and write authority match `docs/PROJECT.md`.
+- The domain does not redefine shared settings or another domain’s policy.
+
+Produce a separate `NFR-*` compliance matrix with implementation and test evidence.
+
+### 6. Contract and persistence reconciliation
+
+Reconcile every owned and consumed contract with `docs/PROJECT.md` and relevant producer/consumer READMEs.
+
+Verify:
+
+- Name, owner, version, producer, consumer, and purpose match.
+- `contract_version` and `schema_id` are treated according to the specification.
+- The domain does not redefine consumed contracts.
+- All required fields, types, identities, timestamps, hashes, and failure semantics match.
+- Producer-consumer compatibility tests exist and pass.
+- Persisted-state ownership, read access, write authority, tables, artifacts, and migration definitions match the top-level registry.
+- No implementation bypasses the owning domain through direct storage access.
+
+### 7. Safety and security review
+
+Verify all applicable safety requirements, including:
+
+- Fail-closed behavior for missing, stale, invalid, unknown, or conflicting evidence.
+- No live mutation without deterministic approval.
+- No Risk, kill-switch, idempotency, reconciliation, or authority bypass.
+- No invented backtest results, performance values, broker fills, or provider evidence.
+- No secret leakage in logs, errors, events, reports, audit records, or tests.
+- No raw external exceptions crossing public boundaries.
+- No unsafe network, filesystem, subprocess, environment, wall-clock, or randomness access where prohibited.
+- No silent retry after an unknown mutation outcome.
+- No arbitrary code execution or unapproved dynamic imports.
+- No import-time external or persistent side effects.
+
+Treat any safety bypass or false success claim as a blocking finding.
+
+### 8. Code-quality review
+
+Verify the implementation follows `AGENTS.md` and repository configuration:
+
+- Google Python style.
+- Explicit typing on every signature.
+- Google-style module, class, and function docstrings.
+- Absolute and correctly grouped imports.
+- No bare `except`.
+- Logging instead of `print`.
+- No silent failures.
+- No unused compatibility code or speculative abstraction.
+- No duplicated domain logic.
+- No dependency version contradicting `pyproject.toml`.
+- No secrets or sensitive fixtures.
+- Public APIs are minimal and intentional.
+
+Inspect the implementation directly; do not rely only on lint output.
+
+### 9. Test and validation execution
+
+Run the domain-scoped validation required by its README and `AGENTS.md`.
+
+At minimum, where applicable:
+
+- Trailing-whitespace and final-newline checks.
+- `ruff check` for the domain package and its tests.
+- `ruff format --check` for the domain package and its tests.
+- `mypy` for the domain package and its tests.
+- Domain unit tests.
+- Domain usage tests.
+- Domain integration/workflow tests.
+- Contract-compatibility tests.
+- Security/import-side-effect tests.
+- Property or golden tests required by the README.
+- Domain coverage measurement.
+
+Do not run live broker operations, real external sends, destructive persistence actions, or other live side effects.
+
+Do not run the entire repository test suite unless the domain README explicitly requires it. Run the complete domain-scoped suite.
+
+Coverage must meet or exceed 80%, and every public requirement must have meaningful direct test evidence. Coverage alone does not prove requirement compliance.
+
+Record every command, exit result, and relevant test count.
+
+### 10. Status and checklist truthfulness
+
+Review every README status and checklist entry.
+
+Verify:
+
+- Every `Completed` file exists and matches its specification.
+- Every `Completed` requirement has implementation, unit-test, and usage evidence.
+- Every `Completed` workflow has a passing end-to-end integration test.
+- Every checked Definition of Done item is demonstrably true.
+- No `Missing` or `Partial` item remains if the domain claims completion.
+- No open decision, unresolved conflict, placeholder, TODO, deferred choice, or guessed behavior remains.
+- `docs/CHANGELOG.md` accurately records the implementation.
+
+A false or unsupported `Completed` status is a blocking documentation-integrity finding.
+
+## Finding classification
+
+Classify findings as:
+
+- `BLOCKING`: Safety violation, ownership violation, contract incompatibility, missing required capability, failed required test, false completion claim, persistence-authority violation, or behavior that can produce an incorrect/live side effect.
+- `HIGH`: Material requirement mismatch, workflow failure, undocumented public API, missing validation, deterministic-behavior failure, or major test gap.
+- `MEDIUM`: Localized implementation or traceability defect that does not currently violate a safety boundary.
+- `LOW`: Minor documentation, naming, maintainability, or test-clarity defect with no behavioral impact.
+
+Do not dilute findings by calling the domain “ready with corrections.”
+
+## Required final result
+
+Return exactly one result:
+
+- `READY`: Every required feature, file, requirement, workflow, contract, test, NFR, and checklist item is compliant, and all required validation passes.
+- `NOT READY`: One or more deviations, unsupported completion claims, test failures, missing requirements, or unresolved review findings exist.
+- `BLOCKED`: The review cannot be completed because required evidence, dependencies, files, or execution capability is unavailable.
+
+`READY` requires zero findings at every severity.
+
+## Required report structure
+
+1. **Result**
+2. **Executive reason**
+3. **Blocking and high findings**
+4. **Medium and low findings**
+5. **Expected-versus-actual package inventory**
+6. **Functional-requirement traceability matrix**
+7. **Non-functional-requirement compliance matrix**
+8. **Workflow and system-workflow verification**
+9. **Contract and persistence reconciliation**
+10. **Public API and dependency-boundary review**
+11. **Safety and security review**
+12. **Commands and validation results**
+13. **Coverage result**
+14. **README status/checklist accuracy**
+15. **Ordered correction plan**
+16. **Final review checklist**
+
+Every finding must include:
+
+- Finding ID
+- Severity
+- Requirement or rule violated
+- Exact file and line
+- Current behavior
+- Required behavior
+- Why it matters
+- Verification needed after correction
+
+Do not implement corrections during this review. End with an ordered, bounded correction plan that can be approved and executed in a separate task.
+```
+
 ## After all features in a domain
 
 Run a separate completion task that:
