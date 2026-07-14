@@ -83,7 +83,7 @@ flowchart TD
 ### Shared Utility Framework (`app/utils/`)
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
-* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors, identity/trace IDs, UTC time, canonical serialization, redaction, runtime settings, and structured logging. UI/API owns authentication and permission enforcement; Data owns DataFrame/OHLC processing and quality; each domain owns its paths, limits, validation, result types, and business contracts.
+* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors and immutable metadata, injected error routing, identity/trace IDs, UTC time, canonical serialization, redaction, password hashing, caller-keyed Fernet encryption, in-memory active-secret selection, runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and explicit shutdown. Logging configuration—not import—may create its configured sink directory. UI/API owns authentication, identity verification, credential persistence, and permission enforcement; callers own encryption-key storage and rotation; Data owns DataFrame/OHLC processing and quality; each domain owns its paths, limits, validation, result types, and business contracts.
 * **Contract Ownership Rule**: Domain contract modules own their own base contract behavior locally. They must not inherit from or import a centralized utility contract base.
 
 ### Domain Audit Event Shape
