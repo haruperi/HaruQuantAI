@@ -1,7 +1,7 @@
 # Utils
 
 > **Package:** `app/utils`
-> **Status:** `Partial`
+> **Status:** `Missing`
 > **Last updated:** `2026-07-14`
 
 > This README is the package's single source of truth for requirements, final
@@ -51,7 +51,7 @@ runtime settings, and structured logging. It makes no trading or domain decision
 
 | Status | Contract | Version | Producer | Consumers | Purpose |
 |---|---|---|---|---|---|
-| Partial | `AuthContext` | `v1` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio | Immutable authenticated principal and trace context. `principal_type` is exactly `USER` or `SERVICE_ACCOUNT`. |
+| Missing | `AuthContext` | `v1` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio | Immutable authenticated principal and trace context. `principal_type` is exactly `USER` or `SERVICE_ACCOUNT`. |
 | Missing | `AuditEvent` | `v1` | Every emitting domain | Data, Risk, Trading, Research, Portfolio, UI/API | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning. |
 
 `AuthContext v1` contains `contract_version`, `schema_id`, `principal_id`,
@@ -159,7 +159,7 @@ Usage examples live under `tests/utils/usage/`.
 
 | Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
 |---|---|---|---|---|---|---|
-| Partial | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033` |
+| Missing | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033` |
 | Missing | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-025` |
 | Missing | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-001`, `FR-UTL-017` through `FR-UTL-021` |
 
@@ -216,7 +216,7 @@ functional behavior.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-UTL-001` | Define immutable `AuthContext v1` with only `USER` and `SERVICE_ACCOUNT` principal types and complete trace context. | `AuthContext` | None | `ValidationError`: naive time, empty identity/trace field, or unsupported principal type | **Usage:** `tests/utils/usage/test_usage_contracts.py::test_usage_auth_context()`<br>**Unit:** `tests/utils/unit/test_auth.py::test_auth_context_rejects_naive_time()` |
+| Missing | `FR-UTL-001` | Define immutable `AuthContext v1` with only `USER` and `SERVICE_ACCOUNT` principal types and complete trace context. | `AuthContext` | None | `ValidationError`: naive time, empty identity/trace field, or unsupported principal type | **Usage:** `tests/utils/usage/test_usage_contracts.py::test_usage_auth_context()`<br>**Unit:** `tests/utils/unit/test_auth.py::test_auth_context_rejects_naive_time()` |
 | Missing | `FR-UTL-002` | Define immutable redacted `AuditEvent v1` with bounded JSON-safe payload. | `AuditEvent` | None | `ValidationError`: naive timestamp, empty identity/trace field, or unsafe payload | **Usage:** `tests/utils/usage/test_usage_contracts.py::test_usage_audit_event()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_audit_event_requires_json_safe_payload()` |
 | Missing | `FR-UTL-003` | Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity. | Strict contract-field validation used by `AuditEvent` and `AuthContext` | None | `ValidationError`: naive time, empty field, unsupported principal type, or malformed schema identity | **Usage:** `tests/utils/usage/test_usage_contracts.py::test_usage_contract_field_validation()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_contract_field_validation_rejects_malformed_schema()` |
 
@@ -238,8 +238,8 @@ functional behavior.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-UTL-004` | Provide focused shared base exceptions without domain-specific policy. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | None | None | **Usage:** `tests/utils/usage/test_usage_errors.py::test_usage_shared_exceptions()`<br>**Unit:** `tests/utils/unit/test_exceptions.py::test_shared_exception_hierarchy()` |
-| Partial | `FR-UTL-005` | Preserve deterministic code and sanitized detail while never returning a raw provider exception across a boundary. | `map_exception` | None | None | **Usage:** `tests/utils/usage/test_usage_errors.py::test_usage_map_exception()`<br>**Unit:** `tests/utils/unit/test_mapping.py::test_map_exception_never_leaks_raw_provider_error()` |
+| Missing | `FR-UTL-004` | Provide focused shared base exceptions without domain-specific policy. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | None | None | **Usage:** `tests/utils/usage/test_usage_errors.py::test_usage_shared_exceptions()`<br>**Unit:** `tests/utils/unit/test_exceptions.py::test_shared_exception_hierarchy()` |
+| Missing | `FR-UTL-005` | Preserve deterministic code and sanitized detail while never returning a raw provider exception across a boundary. | `map_exception` | None | None | **Usage:** `tests/utils/usage/test_usage_errors.py::test_usage_map_exception()`<br>**Unit:** `tests/utils/unit/test_mapping.py::test_map_exception_never_leaks_raw_provider_error()` |
 | Missing | `FR-UTL-006` | Require domains to define their own codes and boundary mapping above the shared base hierarchy. | Shared exception extension contract | None | None | **Usage:** `tests/utils/usage/test_usage_errors.py::test_usage_exception_extension()`<br>**Unit:** `tests/utils/unit/test_exceptions.py::test_domains_extend_shared_base()` |
 
 ### 4.3 `identity/` — Trace Identifiers
@@ -259,8 +259,8 @@ functional behavior.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-UTL-007` | Generate prefixed UUID4 identifiers without embedded secrets. | `generate_id` | Entropy read | `ValidationError`: unsupported prefix | **Usage:** `tests/utils/usage/test_usage_identity.py::test_usage_generate_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_generate_id_is_prefixed_and_secret_free()` |
-| Partial | `FR-UTL-008` | Validate supported prefixes and canonical identifier syntax. | `validate_id` | None | `ValidationError`: unsupported prefix or malformed identifier | **Usage:** `tests/utils/usage/test_usage_identity.py::test_usage_validate_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_validate_id_rejects_malformed()` |
+| Missing | `FR-UTL-007` | Generate prefixed UUID4 identifiers without embedded secrets. | `generate_id` | Entropy read | `ValidationError`: unsupported prefix | **Usage:** `tests/utils/usage/test_usage_identity.py::test_usage_generate_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_generate_id_is_prefixed_and_secret_free()` |
+| Missing | `FR-UTL-008` | Validate supported prefixes and canonical identifier syntax. | `validate_id` | None | `ValidationError`: unsupported prefix or malformed identifier | **Usage:** `tests/utils/usage/test_usage_identity.py::test_usage_validate_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_validate_id_rejects_malformed()` |
 | Missing | `FR-UTL-009` | Derive deterministic SHA-256 identifiers from canonical, caller-supplied identity material. | `derive_stable_id` | None | `ValidationError`: empty or non-canonical identity material | **Usage:** `tests/utils/usage/test_usage_identity.py::test_usage_derive_stable_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_derive_stable_id_is_deterministic()` |
 
 ### 4.4 `time/` — UTC Clocks and Timestamps
@@ -281,8 +281,8 @@ functional behavior.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-UTL-010` | Return aware UTC time from an injectable clock. | `Clock`, `SystemClock`, `utc_now` | Clock read | None | **Usage:** `tests/utils/usage/test_usage_time.py::test_usage_utc_now()`<br>**Unit:** `tests/utils/unit/test_clocks.py::test_system_clock_returns_aware_utc()` |
-| Partial | `FR-UTL-011` | Parse and format UTC timestamps using canonical `Z` output. | `parse_utc_timestamp`, `format_utc_timestamp` | None | `ValidationError`: naive, non-UTC, or malformed timestamp | **Usage:** `tests/utils/usage/test_usage_time.py::test_usage_parse_format_timestamp()`<br>**Unit:** `tests/utils/unit/test_timestamps.py::test_format_uses_canonical_z_suffix()` |
+| Missing | `FR-UTL-010` | Return aware UTC time from an injectable clock. | `Clock`, `SystemClock`, `utc_now` | Clock read | None | **Usage:** `tests/utils/usage/test_usage_time.py::test_usage_utc_now()`<br>**Unit:** `tests/utils/unit/test_clocks.py::test_system_clock_returns_aware_utc()` |
+| Missing | `FR-UTL-011` | Parse and format UTC timestamps using canonical `Z` output. | `parse_utc_timestamp`, `format_utc_timestamp` | None | `ValidationError`: naive, non-UTC, or malformed timestamp | **Usage:** `tests/utils/usage/test_usage_time.py::test_usage_parse_format_timestamp()`<br>**Unit:** `tests/utils/unit/test_timestamps.py::test_format_uses_canonical_z_suffix()` |
 | Missing | `FR-UTL-012` | Calculate non-negative age and explicit freshness against an injected instant. | `age_seconds`, `is_fresh` | None | `ValidationError`: naive or invalid reference instant | **Usage:** `tests/utils/usage/test_usage_time.py::test_usage_age_and_freshness()`<br>**Unit:** `tests/utils/unit/test_timestamps.py::test_age_seconds_is_non_negative()` |
 
 ### 4.5 `serialization/` — Canonical Serialization
@@ -302,8 +302,8 @@ functional behavior.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-UTL-013` | Convert supported datetimes, decimals, enums, dataclasses, mappings, and sequences to deterministic JSON-safe values. | `to_json_safe` | None | `ValidationError`: unsupported value type | **Usage:** `tests/utils/usage/test_usage_serialization.py::test_usage_to_json_safe()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_to_json_safe_converts_supported_types()` |
-| Partial | `FR-UTL-014` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction. | `canonical_json` | None | `ValidationError`: non-serializable value | **Usage:** `tests/utils/usage/test_usage_serialization.py::test_usage_canonical_json()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_canonical_json_sorts_keys()` |
+| Missing | `FR-UTL-013` | Convert supported datetimes, decimals, enums, dataclasses, mappings, and sequences to deterministic JSON-safe values. | `to_json_safe` | None | `ValidationError`: unsupported value type | **Usage:** `tests/utils/usage/test_usage_serialization.py::test_usage_to_json_safe()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_to_json_safe_converts_supported_types()` |
+| Missing | `FR-UTL-014` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction. | `canonical_json` | None | `ValidationError`: non-serializable value | **Usage:** `tests/utils/usage/test_usage_serialization.py::test_usage_canonical_json()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_canonical_json_sorts_keys()` |
 | Missing | `FR-UTL-015` | Reject unsupported, cyclic, non-finite, or unsafe values deterministically. | Serialization validation used by `to_json_safe` and `canonical_json` | None | `ValidationError`: unsupported, cyclic, or non-finite value | **Usage:** `tests/utils/usage/test_usage_serialization.py::test_usage_serialization_rejects_unsafe()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_serialization_rejects_cyclic_value()` |
 
 ### 4.6 `security/` — Secret Redaction
@@ -324,9 +324,9 @@ functional behavior.
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Missing | `FR-UTL-016` | Define immutable denylist-first redaction policy with narrow reviewed field-path allowlists. | `RedactionPolicy` | None | `ValidationError`: malformed policy definition | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redaction_policy()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_policy_is_immutable()` |
-| Partial | `FR-UTL-017` | Detect sensitive keys case-insensitively. | `is_sensitive_key` | None | None | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_is_sensitive_key()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_is_sensitive_key_is_case_insensitive()` |
-| Partial | `FR-UTL-018` | Redact bounded text without mutating input. | `redact_text_value` | None | None | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redact_text_value()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_text_value_does_not_mutate_input()` |
-| Partial | `FR-UTL-019` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None | `ValidationError`: non-JSON-safe mapping | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redact_mapping_value()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_mapping_value_is_recursive()` |
+| Missing | `FR-UTL-017` | Detect sensitive keys case-insensitively. | `is_sensitive_key` | None | None | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_is_sensitive_key()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_is_sensitive_key_is_case_insensitive()` |
+| Missing | `FR-UTL-018` | Redact bounded text without mutating input. | `redact_text_value` | None | None | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redact_text_value()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_text_value_does_not_mutate_input()` |
+| Missing | `FR-UTL-019` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None | `ValidationError`: non-JSON-safe mapping | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redact_mapping_value()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_mapping_value_is_recursive()` |
 | Missing | `FR-UTL-020` | Return redacted paths and truncation diagnostics without secret values. | `RedactionResult` | None | None | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_redaction_result()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_result_omits_secret_values()` |
 | Missing | `FR-UTL-021` | Reject policies that allow protected credential fields. | `RedactionPolicy` validation | None | `SecurityError`: policy allows a protected credential field | **Usage:** `tests/utils/usage/test_usage_security.py::test_usage_policy_rejects_protected_fields()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_policy_rejects_protected_credential_field()` |
 
@@ -348,8 +348,8 @@ functional behavior.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-UTL-022` | Define immutable generic runtime and logging settings. | `RuntimeSettings`, `LoggingSettings` | None | `ConfigurationError`: invalid setting value | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_runtime_settings()`<br>**Unit:** `tests/utils/unit/test_models.py::test_runtime_settings_are_immutable()` |
-| Partial | `FR-UTL-023` | Load explicit values and environment in documented precedence order only when called. | `load_settings` | Environment read | `ConfigurationError`: unsupported or invalid value | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_load_settings()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
+| Missing | `FR-UTL-022` | Define immutable generic runtime and logging settings. | `RuntimeSettings`, `LoggingSettings` | None | `ConfigurationError`: invalid setting value | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_runtime_settings()`<br>**Unit:** `tests/utils/unit/test_models.py::test_runtime_settings_are_immutable()` |
+| Missing | `FR-UTL-023` | Load explicit values and environment in documented precedence order only when called. | `load_settings` | Environment read | `ConfigurationError`: unsupported or invalid value | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_load_settings()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
 | Missing | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_settings_reject_unknown()`<br>**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()` |
 | Missing | `FR-UTL-025` | Resolve secret references at the composition root without logging or persisting secret material. | `resolve_secret_reference` | Explicit secret-source read | `SecurityError`, `ConfigurationError`: unresolved or unsafe secret reference | **Usage:** `tests/utils/usage/test_usage_settings.py::test_usage_resolve_secret_reference()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_resolve_secret_reference_never_logs_secret()` |
 
@@ -370,8 +370,8 @@ functional behavior.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-UTL-026` | Return stable child loggers without configuring handlers. | `get_logger` | None | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_get_logger()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_get_logger_configures_no_handlers()` |
-| Partial | `FR-UTL-027` | Configure deduplicated console and optional bounded rotating-file handlers only when called. | `configure_logging` | Logging configuration; optional file write | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_configure_logging()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_adds_console_handler()` |
+| Missing | `FR-UTL-026` | Return stable child loggers without configuring handlers. | `get_logger` | None | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_get_logger()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_get_logger_configures_no_handlers()` |
+| Missing | `FR-UTL-027` | Configure deduplicated console and optional bounded rotating-file handlers only when called. | `configure_logging` | Logging configuration; optional file write | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_configure_logging()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_adds_console_handler()` |
 | Missing | `FR-UTL-028` | Redact messages and structured context before formatting. | `RedactingFilter` | None | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_redacting_filter()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_redacting_filter_runs_before_formatting()` |
 | Missing | `FR-UTL-029` | Emit JSON or human-readable records with UTC time, level, logger, message, and trace IDs. | `StructuredFormatter` | None | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_structured_formatter()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_structured_formatter_includes_trace_ids()` |
 | Missing | `FR-UTL-030` | Surface sink failure through a bounded secret-safe fallback. | Logging failure handling in `configure_logging` | Fallback emission | None | **Usage:** `tests/utils/usage/test_usage_logging.py::test_usage_sink_failure_fallback()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_sink_failure_uses_safe_fallback()` |
@@ -386,21 +386,21 @@ functional behavior.
 | Status | Requirement ID | Type | Responsibility | Verification |
 |---|---|---|---|---|
 | Missing | `NFR-UTL-001` | Boundary | Other packages import only documented package or feature exports; no internal imports, aliases, or fallbacks. | Dependency tests |
-| Partial | `NFR-UTL-002` | Security | Redaction occurs before logs, errors, audit payloads, or returned diagnostics; canonical serialization remains pure. | Secret-leak tests |
+| Missing | `NFR-UTL-002` | Security | Redaction occurs before logs, errors, audit payloads, or returned diagnostics; canonical serialization remains pure. | Secret-leak tests |
 | Missing | `NFR-UTL-003` | Import safety | Imports perform no configuration, environment/file read, filesystem write, network call, handler registration, or client initialization. | Subprocess import tests |
-| Partial | `NFR-UTL-004` | Determinism | Serialization, time calculations, validation, and stable-ID derivation are deterministic with explicit clock/entropy inputs. | Replay tests |
+| Missing | `NFR-UTL-004` | Determinism | Serialization, time calculations, validation, and stable-ID derivation are deterministic with explicit clock/entropy inputs. | Replay tests |
 | Missing | `NFR-UTL-005` | Maintainability | Public signatures are typed and documented; files have one focused responsibility. | Ruff, mypy, and documentation review |
 | Missing | `NFR-UTL-006` | Testing | Every requirement has a usage example and targeted unit test; collaborative workflows have integration tests; coverage is at least 80%. | Traceability and coverage audit |
 | Missing | `NFR-UTL-007` | Persistence | Utils owns no durable business state or migration definition. | Ownership review |
 
 | Status | Setting | Type | Default | Required | Consumers | Description |
 |---|---|---|---|---|---|---|
-| Partial | `ENVIRONMENT` | `str` | `dev` | Yes | All domains | Exactly `dev`, `test`, `staging`, or `production`. |
+| Missing | `ENVIRONMENT` | `str` | `dev` | Yes | All domains | Exactly `dev`, `test`, `staging`, or `production`. |
 | Missing | `RUNTIME_PROFILE` | `str` | `research` | Yes | Strategy, Risk, Trading, Simulation, Portfolio, UI/API | Exactly `research`, `simulation`, `paper`, or `live`; route compatibility belongs to Trading. |
-| Partial | UTC-first policy | policy | `Z`-suffixed ISO 8601 | Yes | All domains | Non-UTC cross-domain timestamps are rejected. |
-| Partial | Trace-ID policy | policy | Prefixed UUID4 | Yes | All domains | Request, workflow, correlation, causation, and event IDs are secret-free strings. |
-| Partial | Secret-redaction policy | policy | Denylist-first, case-insensitive | Yes | All domains | Applied before persistence or emission. |
-| Partial | `LOG_LEVEL` | `str` | `INFO` | No | All domains | Used only after explicit logging configuration. |
+| Missing | UTC-first policy | policy | `Z`-suffixed ISO 8601 | Yes | All domains | Non-UTC cross-domain timestamps are rejected. |
+| Missing | Trace-ID policy | policy | Prefixed UUID4 | Yes | All domains | Request, workflow, correlation, causation, and event IDs are secret-free strings. |
+| Missing | Secret-redaction policy | policy | Denylist-first, case-insensitive | Yes | All domains | Applied before persistence or emission. |
+| Missing | `LOG_LEVEL` | `str` | `INFO` | No | All domains | Used only after explicit logging configuration. |
 
 ---
 

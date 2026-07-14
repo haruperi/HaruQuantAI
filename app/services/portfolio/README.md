@@ -174,8 +174,8 @@ flowchart TD
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified |
-| **Partial** | Partly implemented or tests are incomplete |
-| **Completed** | Implemented, tested, and verified |
+| **Missing** | Partly implemented or tests are incomplete |
+| **Missing** | Implemented, tested, and verified |
 
 ### Workflow scope values
 

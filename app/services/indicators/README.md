@@ -1,7 +1,7 @@
 # Indicators
 
 > **Package:** `app/services/indicators`
-> **Status:** `Partial`
+> **Status:** `Missing`
 > **Last updated:** `2026-07-13`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -203,14 +203,14 @@ No experimental, optional, or future callable is exported in the initial package
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified against the final contract. |
-| **Partial** | Useful V1 behavior exists, but final contracts, relocation, or tests remain incomplete. |
-| **Completed** | Implemented, tested, and verified against this README. |
+| **Missing** | Useful V1 behavior exists, but final contracts, relocation, or tests remain incomplete. |
+| **Missing** | Implemented, tested, and verified against this README. |
 
 ### Workflow register
 
 | Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
 |---|---|---|---|---|---|---|
-| Partial | `WF-INDI-001` | Internal | Core batch indicator calculation | Normalized `MarketDataset` values plus approved config | Atomic `IndicatorResult` with values, availability, quality, and manifest | `FR-INDI-014 → FR-INDI-015..022 → FR-INDI-007..010` |
+| Missing | `WF-INDI-001` | Internal | Core batch indicator calculation | Normalized `MarketDataset` values plus approved config | Atomic `IndicatorResult` with values, availability, quality, and manifest | `FR-INDI-014 → FR-INDI-015..022 → FR-INDI-007..010` |
 | Missing | `WF-INDI-002` | Cross-domain | Decision-time consumption | Trading or Simulation supplies Data-owned normalized input | `IndicatorSeries v1` returned for Strategy consumption | `FR-INDI-014 → FR-INDI-015..022 → FR-INDI-008` |
 | Missing | `WF-INDI-003` | Cross-domain | Warmup coordination | Caller queries an official `WarmupRequirement` and supplies sufficient history | Warmup rows retained and explicitly unavailable until safe | `FR-INDI-005 → FR-INDI-014 → FR-INDI-015..022` |
 | Missing | `WF-INDI-004` | Cross-domain | Availability-aware multi-timeframe calculation | Data supplies normalized/aligned primary and higher-timeframe observations | Result propagates closed-bar plus latency availability | `FR-INDI-014 → FR-INDI-015..022 → FR-INDI-007` |
@@ -365,7 +365,7 @@ indicator id + normalized data + config
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Partial | `errors.py` | Define the compact Core MVP error catalogue and one structured domain exception. | `IndicatorErrorCode`, `IndicatorError` | **Standard library:** `enum`, `typing`<br>**Required third-party:** None<br>**Local:** None |
+| Missing | `errors.py` | Define the compact Core MVP error catalogue and one structured domain exception. | `IndicatorErrorCode`, `IndicatorError` | **Standard library:** `enum`, `typing`<br>**Required third-party:** None<br>**Local:** None |
 | Missing | `contracts.py` | Define immutable calculation config, spec, warmup, and structural callable contracts. | `IndicatorConfig`, `IndicatorSpec`, `WarmupRequirement`, `IndicatorProtocol` | **Standard library:** `collections.abc`, `dataclasses`, `datetime`, `typing`<br>**Required third-party:** `pandas` (typing)<br>**Local:** `errors.py → IndicatorError` |
 | Missing | `results.py` | Define deterministic manifest/result fields and safe result projection/join behavior. | `IndicatorManifest`, `IndicatorResult` | **Standard library:** `dataclasses`, `typing`<br>**Required third-party:** `pandas`<br>**Local:** `contracts.py → IndicatorConfig`; `errors.py → IndicatorError` |
 | Missing | `registry.py` | Expose immutable official specs and capability metadata without importing feature implementations. | `get_indicator`, `list_indicators`, `get_capability_matrix` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `contracts.py → IndicatorSpec`; `errors.py → IndicatorError, IndicatorErrorCode` |
@@ -395,8 +395,8 @@ indicator id + normalized data + config
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-INDI-001` | The system shall expose exactly the approved Core MVP codes: `IND_INVALID_CONFIG`, `IND_INVALID_PARAMETER`, `IND_UNSUPPORTED_INDICATOR`, `IND_UNSUPPORTED_TIMEFRAME`, `IND_UNSUPPORTED_DTYPE`, `IND_INVALID_INPUT_SCHEMA`, `IND_MISSING_REQUIRED_COLUMN`, `IND_INVALID_OUTPUT_COLUMN`, `IND_OUTPUT_COLUMN_CONFLICT`, `IND_INVALID_OUTPUT_MODE`, `IND_INPUT_MUTATION_DETECTED`, `IND_DUPLICATE_TIMESTAMP`, `IND_NON_MONOTONIC_TIME`, `IND_AMBIGUOUS_TIMESTAMP`, `IND_INVALID_TIMEZONE`, `IND_INVALID_OHLC`, `IND_INSUFFICIENT_DATA`, `IND_LOOKAHEAD_RISK`, `IND_FORMULA_VERSION_MISMATCH`, `IND_RESOURCE_LIMIT_EXCEEDED`, `IND_TIMEOUT`, `IND_CANCELLED`, `IND_PARTIAL_RESULT`, and `IND_INTERNAL_ERROR`. | `IndicatorErrorCode: StrEnum` | None | None | **Usage:** `tests/indicators/usage/test_usage_core.py::test_usage_errors_error_codes()`<br>**Unit:** `tests/indicators/unit/test_errors.py::test_error_code_catalog_contains_only_core_codes()` |
-| Partial | `FR-INDI-002` | The system shall represent a deterministic, redacted failure with code, safe message, and structured details without exposing raw exceptions or sensitive input data. | `IndicatorError(code: IndicatorErrorCode, message: str, details: Mapping[str, object] | None = None)` | None | None | **Usage:** `tests/indicators/usage/test_usage_core.py::test_usage_errors_indicator_error()`<br>**Unit:** `tests/indicators/unit/test_errors.py::test_indicator_error_serializes_redacted_details()` |
+| Missing | `FR-INDI-001` | The system shall expose exactly the approved Core MVP codes: `IND_INVALID_CONFIG`, `IND_INVALID_PARAMETER`, `IND_UNSUPPORTED_INDICATOR`, `IND_UNSUPPORTED_TIMEFRAME`, `IND_UNSUPPORTED_DTYPE`, `IND_INVALID_INPUT_SCHEMA`, `IND_MISSING_REQUIRED_COLUMN`, `IND_INVALID_OUTPUT_COLUMN`, `IND_OUTPUT_COLUMN_CONFLICT`, `IND_INVALID_OUTPUT_MODE`, `IND_INPUT_MUTATION_DETECTED`, `IND_DUPLICATE_TIMESTAMP`, `IND_NON_MONOTONIC_TIME`, `IND_AMBIGUOUS_TIMESTAMP`, `IND_INVALID_TIMEZONE`, `IND_INVALID_OHLC`, `IND_INSUFFICIENT_DATA`, `IND_LOOKAHEAD_RISK`, `IND_FORMULA_VERSION_MISMATCH`, `IND_RESOURCE_LIMIT_EXCEEDED`, `IND_TIMEOUT`, `IND_CANCELLED`, `IND_PARTIAL_RESULT`, and `IND_INTERNAL_ERROR`. | `IndicatorErrorCode: StrEnum` | None | None | **Usage:** `tests/indicators/usage/test_usage_core.py::test_usage_errors_error_codes()`<br>**Unit:** `tests/indicators/unit/test_errors.py::test_error_code_catalog_contains_only_core_codes()` |
+| Missing | `FR-INDI-002` | The system shall represent a deterministic, redacted failure with code, safe message, and structured details without exposing raw exceptions or sensitive input data. | `IndicatorError(code: IndicatorErrorCode, message: str, details: Mapping[str, object] | None = None)` | None | None | **Usage:** `tests/indicators/usage/test_usage_core.py::test_usage_errors_indicator_error()`<br>**Unit:** `tests/indicators/unit/test_errors.py::test_indicator_error_serializes_redacted_details()` |
 
 **Rules:**
 
@@ -479,7 +479,7 @@ normalized values + config → Core validation → approved trend formula → In
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Partial | `moving_averages.py` | Compute EMA and SMA under approved formula contracts. | `ema`, `sma` | **Standard library:** None<br>**Required third-party:** `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
+| Missing | `moving_averages.py` | Compute EMA and SMA under approved formula contracts. | `ema`, `sma` | **Standard library:** None<br>**Required third-party:** `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
 | Missing | `directional.py` | Compute ADX and its directional components. | `adx` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
 | Missing | `__init__.py` | Expose the approved trend API. | `ema`, `sma`, `adx` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from files above |
 
@@ -511,8 +511,8 @@ The following formula conventions are authoritative for implementation.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-INDI-015` | The system shall calculate EMA per symbol from a validated source using the approved seed/smoothing contract, return `ema_{period}` (or source-qualified name), preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input. | `ema(data: pd.DataFrame, *, period: int, source: str = "close", config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_trend.py::test_usage_moving_averages_ema()`<br>**Unit:** `tests/indicators/unit/test_moving_averages.py::test_ema_matches_approved_golden_fixture()` |
-| Partial | `FR-INDI-016` | The system shall calculate SMA per symbol over the approved inclusive window, return deterministic source-qualified output, preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input. | `sma(data: pd.DataFrame, *, period: int, source: str = "close", config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_trend.py::test_usage_moving_averages_sma()`<br>**Unit:** `tests/indicators/unit/test_moving_averages.py::test_sma_matches_approved_golden_fixture()` |
+| Missing | `FR-INDI-015` | The system shall calculate EMA per symbol from a validated source using the approved seed/smoothing contract, return `ema_{period}` (or source-qualified name), preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input. | `ema(data: pd.DataFrame, *, period: int, source: str = "close", config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_trend.py::test_usage_moving_averages_ema()`<br>**Unit:** `tests/indicators/unit/test_moving_averages.py::test_ema_matches_approved_golden_fixture()` |
+| Missing | `FR-INDI-016` | The system shall calculate SMA per symbol over the approved inclusive window, return deterministic source-qualified output, preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input. | `sma(data: pd.DataFrame, *, period: int, source: str = "close", config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_trend.py::test_usage_moving_averages_sma()`<br>**Unit:** `tests/indicators/unit/test_moving_averages.py::test_sma_matches_approved_golden_fixture()` |
 
 **Implementation notes:** Refactor only the understandable V1 EMA/SMA kernels to these formulas. Do not preserve `BaseIndicator`, ignored `**kwargs`, raw Series returns, or duplicate singular/plural implementations.
 
@@ -542,7 +542,7 @@ normalized OHLC/source values → Core validation → approved volatility formul
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Partial | `ranges.py` | Compute ATR and ADR with explicit range conventions. | `atr`, `adr` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
+| Missing | `ranges.py` | Compute ATR and ADR with explicit range conventions. | `atr`, `adr` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
 | Missing | `rolling.py` | Compute explicitly specified return-based rolling volatility. | `rolling_volatility` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
 | Missing | `__init__.py` | Expose the approved volatility API. | `atr`, `adr`, `rolling_volatility` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from files above |
 
@@ -572,7 +572,7 @@ normalized OHLC/source values → Core validation → approved volatility formul
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-INDI-018` | The system shall calculate non-negative ATR per symbol from validated OHLC using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation. | `atr(data: pd.DataFrame, *, period: int, config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_volatility.py::test_usage_ranges_atr()`<br>**Unit:** `tests/indicators/unit/test_ranges.py::test_atr_matches_approved_gap_fixture()` |
+| Missing | `FR-INDI-018` | The system shall calculate non-negative ATR per symbol from validated OHLC using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation. | `atr(data: pd.DataFrame, *, period: int, config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_volatility.py::test_usage_ranges_atr()`<br>**Unit:** `tests/indicators/unit/test_ranges.py::test_atr_matches_approved_gap_fixture()` |
 | Missing | `FR-INDI-019` | The system shall calculate ADR per symbol using the owner-approved range and session/day convention, preserve warmup rows, and return deterministic availability and manifest metadata. | `adr(data: pd.DataFrame, *, period: int, config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_volatility.py::test_usage_ranges_adr()`<br>**Unit:** `tests/indicators/unit/test_ranges.py::test_adr_matches_approved_golden_fixture()` |
 
 **Implementation notes:** V1 ATR is a refactor reference only. ADR is new. Formula approval precedes code reuse.
@@ -605,7 +605,7 @@ normalized OHLC/source values → Core validation → approved oscillator formul
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Partial | `oscillators.py` | Compute RSI and Williams %R under approved conventions. | `rsi`, `williams_r` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
+| Missing | `oscillators.py` | Compute RSI and Williams %R under approved conventions. | `rsi`, `williams_r` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
 | Missing | `__init__.py` | Expose the approved momentum API. | `rsi`, `williams_r` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `oscillators.py → rsi, williams_r` |
 
 ### Configuration and Limits Manifest
@@ -633,8 +633,8 @@ normalized OHLC/source values → Core validation → approved oscillator formul
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-INDI-021` | The system shall calculate RSI per symbol using the approved gain/loss smoothing and seed contract, keep values within approved bounds, handle flat/zero-gain/zero-loss windows deterministically, and expose causal metadata. | `rsi(data: pd.DataFrame, *, period: int, source: str = "close", config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_momentum.py::test_usage_oscillators_rsi()`<br>**Unit:** `tests/indicators/unit/test_oscillators.py::test_rsi_matches_approved_flat_and_golden_fixtures()` |
-| Partial | `FR-INDI-022` | The system shall calculate Williams %R per symbol over the approved inclusive high/low window, enforce approved bounds and zero-range behavior, preserve warmup rows, and expose causal metadata. | `williams_r(data: pd.DataFrame, *, period: int, config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_momentum.py::test_usage_oscillators_williams_r()`<br>**Unit:** `tests/indicators/unit/test_oscillators.py::test_williams_r_matches_approved_zero_range_fixture()` |
+| Missing | `FR-INDI-021` | The system shall calculate RSI per symbol using the approved gain/loss smoothing and seed contract, keep values within approved bounds, handle flat/zero-gain/zero-loss windows deterministically, and expose causal metadata. | `rsi(data: pd.DataFrame, *, period: int, source: str = "close", config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_momentum.py::test_usage_oscillators_rsi()`<br>**Unit:** `tests/indicators/unit/test_oscillators.py::test_rsi_matches_approved_flat_and_golden_fixtures()` |
+| Missing | `FR-INDI-022` | The system shall calculate Williams %R per symbol over the approved inclusive high/low window, enforce approved bounds and zero-range behavior, preserve warmup rows, and expose causal metadata. | `williams_r(data: pd.DataFrame, *, period: int, config: IndicatorConfig | None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, timeout, or atomic calculation failure | **Usage:** `tests/indicators/usage/test_usage_momentum.py::test_usage_oscillators_williams_r()`<br>**Unit:** `tests/indicators/unit/test_oscillators.py::test_williams_r_matches_approved_zero_range_fixture()` |
 
 **Implementation notes:** Refactor V1 RSI and Williams %R to these formulas. Do not retain MACD in the initial module.
 
@@ -651,7 +651,7 @@ normalized OHLC/source values → Core validation → approved oscillator formul
 | Missing | `NFR-INDI-001` | Architecture | The package shall remain a pure, persistence-free calculation domain with no broker, network, filesystem, cache, audit-sink, telemetry-export, or mutable registry I/O. | Side-effect/dependency audit |
 | Missing | `NFR-INDI-002` | Determinism | Equivalent canonical inputs, parameters, versions, and policy shall produce byte-equivalent canonical values/checksums/manifests independent of call order. | Replay and checksum tests |
 | Missing | `NFR-INDI-003` | API boundary | Consumers shall use only documented root/feature exports; leaf modules, private helpers, DataFrames internal to other domains, and provider SDK objects are not cross-domain contracts. | Import contract tests |
-| Partial | `NFR-INDI-004` | Maintainability | Python shall follow Google style, explicit signature typing, Google docstrings, absolute imports, logging rules, and one focused responsibility per file. | Ruff, mypy, structure review |
+| Missing | `NFR-INDI-004` | Maintainability | Python shall follow Google style, explicit signature typing, Google docstrings, absolute imports, logging rules, and one focused responsibility per file. | Ruff, mypy, structure review |
 | Missing | `NFR-INDI-005` | Vectorization | Official batch formulas shall use vectorized pandas/NumPy operations except a documented mathematically stateful dependency that cannot be vectorized safely. | Implementation review and benchmark |
 | Missing | `NFR-INDI-006` | Numeric policy | Indicator values shall use float64 and approved absolute/relative tolerances; NaN, infinity, overflow, underflow, negative zero, null, and degenerate windows shall follow each approved formula table. | Golden/property/edge tests |
 | Missing | `NFR-INDI-007` | No-lookahead | Every row shall expose earliest-safe UTC `available_at` and source-window bounds; current/future data cannot be represented as already available. | Causality tests |

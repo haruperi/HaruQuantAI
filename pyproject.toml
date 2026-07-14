@@ -220,9 +220,7 @@ module = [
     "ctrader_open_api",
     "numba",
     "numba.*",
-    "service_identity",
-    "app.utils.logger",
-    "app.utils.security"
+    "service_identity"
 ]
 ignore_missing_imports = true
 

@@ -1,7 +1,7 @@
 # Simulation
 
 > **Package:** `app/services/simulator`
-> **Status:** `Partial`
+> **Status:** `Missing`
 > **Last updated:** `2026-07-13`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -234,8 +234,8 @@ flowchart LR
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified |
-| **Partial** | Partly implemented or tests are incomplete |
-| **Completed** | Implemented, tested, and verified |
+| **Missing** | Partly implemented or tests are incomplete |
+| **Missing** | Implemented, tested, and verified |
 
 ### Workflow scope values
 
@@ -821,7 +821,7 @@ its dependencies and claims are constrained.
 | Missing | `NFR-SIM-002` | Precision | Prices, volumes, costs, margin, balances, equity, and PnL shall use finite `Decimal` values with context precision at least 28 and documented quantization. | Unit/property tests |
 | Missing | `NFR-SIM-003` | No lookahead | Official execution shall use only evidence whose `available_at` is not later than the current execution time. | Timing boundary tests |
 | Missing | `NFR-SIM-004` | Safety | Importing or running Simulation shall perform no broker mutation, live-adapter import, credential resolution, network request, or unrequested filesystem write. | Import-safety and spy tests |
-| Partial | `NFR-SIM-005` | API boundary | Package and feature `__init__.py` files shall expose only documented public symbols; the current flat package exports additional V1 symbols and Data helpers. | Import-surface test |
+| Missing | `NFR-SIM-005` | API boundary | Package and feature `__init__.py` files shall expose only documented public symbols; the current flat package exports additional V1 symbols and Data helpers. | Import-surface test |
 | Missing | `NFR-SIM-006` | Security | Official requests shall reject arbitrary code and paths, redact secrets, bound payloads/diagnostics, and use vetted references only. | Security tests |
 | Missing | `NFR-SIM-007` | Reliability | Missing evidence, persistence failure, invariant failure, unknown state, or unsupported scope shall fail closed with a deterministic code and no published completed result. | Fault-injection tests |
 | Missing | `NFR-SIM-008` | Auditability | Every governed transition and rejection shall be traceable through correlation/causation IDs and the canonical hash-chained journal. | Journal audit test |
