@@ -543,19 +543,18 @@ Add unresolved system-level decisions that affect:
 * shared settings;
 * major workflows.
 
-For each decision fill the template's table columns:
+For each unresolved decision fill the template's table columns:
 
 ```text
-Status (Open | Resolved)
+Status (Open)
 Decision
 Affected domains
 Options / Notes
-ADR
 ```
 
 In Options / Notes, capture the evidence available, the candidate options, and what cannot proceed until the decision is resolved.
 
-For the ADR column: `Open` decisions get `—`. When a decision is resolved, record the full rationale as an ADR in `docs/adr/` and link it here.
+When a decision is resolved, encode the outcome directly in the authoritative system and domain specifications, delete the decision row, and record the documentation change in `docs/CHANGELOG.md`.
 
 Do not allow unresolved decisions to be hidden as assumptions.
 
@@ -639,8 +638,7 @@ Provider-specific implementation details belong in domain READMEs.
 ## 12. Open Decisions
 
 Populate unresolved system-shape decisions.
-
-Link every `Resolved` decision to an ADR in `docs/adr/`.
+Resolved choices must appear as ordinary specifications and must not remain in this section.
 
 # SECTIONS TO LEAVE FOR LATER
 

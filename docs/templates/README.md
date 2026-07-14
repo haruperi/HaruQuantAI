@@ -456,19 +456,18 @@ For shared configuration, use the same manifest columns as the module-level Conf
 
 ## 6. Open Decisions
 
-Use this section only for unresolved choices that would otherwise force the implementing agent to guess.
+Use this section only for unresolved choices that would otherwise force the implementer to guess.
 
 | Status | Decision | Options / Notes |
 |---|---|---|
 | Open | [Decision still required] | [Available options, constraints, or missing information] |
-| Resolved | [Decision already made] | [Chosen approach and short reason] |
 
 Rules:
 
 - `Open` means implementation of the affected requirement must not begin.
-- `Resolved` records the final choice briefly.
-- A decision affecting more than one domain must be escalated to the Open Decisions section of the top-level system document (where it is resolved with an ADR) — record only a reference to it here.
-- Remove obsolete decisions instead of building a large historical decision log.
+- A decision affecting more than one domain must also appear in the top-level system document's Open Decisions section.
+- When a decision is resolved, encode its outcome in the authoritative requirements, contracts, workflows, configuration, boundaries, or exclusions, then delete the decision row and any resolved issue entry.
+- Do not retain resolved, superseded, retired, or deferred-from-initial-scope decisions as history; record the documentation change in the changelog.
 - Do not add an entry when the README already defines the answer clearly.
 
 ---

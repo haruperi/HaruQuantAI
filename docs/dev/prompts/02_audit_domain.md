@@ -138,7 +138,6 @@ Search the full available codebase for:
 * command-line entry points;
 * scheduled tasks;
 * API routes;
-* agent tools;
 * event subscribers;
 * tests and examples.
 

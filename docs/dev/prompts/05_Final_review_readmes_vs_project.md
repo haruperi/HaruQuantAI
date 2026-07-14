@@ -66,6 +66,7 @@ The review must verify that:
 10. No required capability falls between domains.
 11. Domain implementation order remains valid.
 12. No domain README contradicts the top-level system document.
+13. Utils only contains what is called and shared in multiple domains only. Anything that is called by only one domain should be in that domain.
 
 # AUTHORITY ORDER
 
@@ -393,8 +394,8 @@ Identify requirements or workflow steps that:
 
 Assign one final readiness result:
 
-| Result                           | Meaning                                                                              |
-| -------------------------------- | ------------------------------------------------------------------------------------ |
+| Result                                 | Meaning                                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------------------ |
 | **Ready**                        | No material cross-domain conflicts remain                                            |
 | **Ready with minor corrections** | Small documentation corrections are required but implementation order is still clear |
 | **Not ready**                    | Contract, ownership, workflow, or dependency conflicts must be resolved first        |
@@ -405,7 +406,7 @@ Do not mark the system ready if:
 * shared contracts are incompatible;
 * important workflows are disconnected;
 * circular dependencies exist;
-* open decisions require the implementing agent to guess.
+* open decisions require the implementer to guess.
 
 # REQUIRED OUTPUT
 
@@ -570,9 +571,9 @@ Do not invent a proposed owner when the correct ownership requires a human decis
 
 ## 14. Conflicts Requiring Resolution
 
-| Priority | Conflict ID | Conflict   | Affected documents | Required decision |
-| -------: | ----------- | ---------- | ------------------ | ----------------- |
-|        1 | `ALIGN-001` | [Conflict] | [Documents]        | [Decision]        |
+| Priority | Conflict ID   | Conflict   | Affected documents | Required decision |
+| -------: | ------------- | ---------- | ------------------ | ----------------- |
+|        1 | `ALIGN-NNN` | [Conflict] | [Documents]        | [Decision]        |
 
 Priority:
 
@@ -624,7 +625,7 @@ Implementation order cannot be confirmed until ALIGN-XXX is resolved.
 | ------ | ------------------- | ---------------- | --------------- |
 | Open   | [Decision required] | [Domains]        | [Options]       |
 
-Decisions affecting more than one domain that were discovered during this review must also be recorded in the top-level system document's Open Decisions section (where they are resolved with an ADR) — not only in this report.
+Decisions affecting more than one domain that are discovered during this review must also be recorded in the top-level system document's Open Decisions section while unresolved. When resolved, encode the outcome in the authoritative specifications and delete both the decision row and the resolved alignment issue.
 
 ## 18. Readiness Assessment
 
@@ -663,7 +664,7 @@ Confirm that:
 * failure and recovery ownership is clear;
 * shared configurations have one owner;
 * every persisted state has one owning domain and no foreign writers;
-* every resolved cross-domain decision has a linked ADR;
+* every resolved choice is represented directly in the authoritative system and domain specifications and no resolved decision row remains;
 * every domain is assigned to a runtime unit in the deployment topology;
 * terminology is consistent;
 * duplicated responsibilities are identified;

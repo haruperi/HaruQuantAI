@@ -1,6 +1,6 @@
 # HaruQuantAI
 
-Modular, AI-assisted quantitative trading platform designed for safe service-tool boundaries, governed trading, reproducible research, and strict risk controls.
+Modular quantitative trading platform designed for typed service boundaries, governed trading, reproducible research, and strict risk controls.
 
 ---
 
@@ -41,7 +41,6 @@ This repository is structured as a modular monolith containing a Python backend 
 *   `app/api`: FastAPI backend gateways, routing, and middlewares.
 *   `app/web`: Next.js frontend workspace (TypeScript, Tailwind CSS, Radix UI).
 *   `app/services`: Core quantitative and trading logic modules (data, indicators, risk, simulation, etc.).
-*   `app/agentic`: AI Agent configuration, runtimes, security policies, and schemas.
 *   `/docs`: System architecture design, standard definitions, and requirements.
 
 For design details, module boundaries, and implementation invariants, see `docs/ARCHITECTURE.md`
@@ -132,7 +131,7 @@ A git `pre-commit` configuration is provided to run formatting, linting, type-ch
 ---
 
 ## Running Usage Examples
-To run usage examples (such as integration flows or sample agent setups) under the `tests/usage/` directory:
+To run usage examples (such as integration flows or sample domain workflows) under the `tests/usage/` directory:
 ```bash
 uv run pytest tests/usage
 ```

@@ -1,6 +1,6 @@
 # Instructions
 
-**Purpose**: Single AI/Builder operating guide for HaruQuantAI.
+**Purpose**: Single Builder operating guide for HaruQuantAI.
 
 ## 1. Mindset & Core Directives
 
@@ -37,55 +37,31 @@
 - **Quality**: 80% `pytest` coverage minimum. No bare `except:`. Use `logger` (no `print`). No silent failures.
 - **Security**: Never commit secrets. Redact sensitive values in logs. `.env.example` only.
 
-## 5. Architecture Standards
-
-### Tools (`agentic/tools/`)
-
-- **Imports**: Import from domain (`from agentic.<module>.services import ...`), never deep paths.
-- **Structure**: Must include metadata (`TOOL_NAME`, `TOOL_RISK_LEVEL`, etc.). Accept `request_id: str | None = None`. Validate inputs first.
-- **Return Schema**: Tools must **never** return `None` or raw exceptions. Always return:
-  ```json
-  {"status": "success|error", "message": str, "data": any, "error": null|{"code": "ERROR_CODE", "details": str}, "metadata": {"tool_name": str, "tool_version": str, "tool_category": str, "tool_risk_level": "low|medium|high|critical", "request_id": str|null, "execution_ms": float, "reads": bool, "writes": bool, "updates": bool, "deletes": bool, "trades": bool, "requires_network": bool}}
-  ```
-- **Error Codes**: `INVALID_INPUT`, `PERMISSION_DENIED`, `DATA_NOT_FOUND`, `EMPTY_RESULT`, `SERVICE_UNAVAILABLE`, `BROKER_UNAVAILABLE`, `DATABASE_ERROR`, `NETWORK_ERROR`, `TIMEOUT`, `VALIDATION_FAILED`, `TOOL_EXECUTION_FAILED`, `UNKNOWN_ERROR`.
-
-### Agents (`agentic/agents/`)
-
-- **Design**: Few agents, many tools. If it fetches/calculates/validates → Tool. If it decides/interprets/plans → Agent.
-- **Structure**: Must include metadata (`AGENT_NAME`, `AGENT_RISK_LEVEL`, permissions, `ALLOWED_TOOLS`). Instruction must contain 10 sections (Role, Responsibilities, Non-Goals, Allowed Tools, Blocked Actions, Required Evidence, Output Contract, Safety Rules, Uncertainty Behavior, Escalation Rules).
-- **Return Schema**: Normalize all outputs to:
-  ```json
-  {"status": "success|error", "message": str, "data": any, "error": null|{"code": "ERROR_CODE", "details": str}, "metadata": {"agent_name": str, "agent_version": str, "agent_category": str, "agent_risk_level": "low|medium|high|critical", "request_id": str|null, "execution_ms": float, "reads": bool, "writes": bool, "updates": bool, "deletes": bool, "trades": bool, "requires_network": bool}}
-  ```
-- **Error Codes**: `INVALID_INPUT`, `MISSING_EVIDENCE`, `STALE_EVIDENCE`, `CONFLICTING_EVIDENCE`, `TOOL_FAILURE`, `POLICY_BLOCKED`, `PERMISSION_DENIED`, `APPROVAL_REQUIRED`, `OUTPUT_CONTRACT_FAILED`, `AGENT_EXECUTION_FAILED`.
-
-## 6. Safety & Governance
+## 5. Safety & Governance
 
 - **Fail-Closed**: If policy is uncertain or evidence is missing, block the action.
 - **No Live Action by Default**: Live trading, risk changes, and execution state mutations require explicit, deterministic approval.
-- **Kill Switch**: Deterministic. An LLM cannot override or bypass a kill switch.
-- **No Invented Data**: Agents must never invent backtest results, live performance, or broker fills.
-- **Deterministic Policy**: LLMs explain policy; Python code enforces it.
+- **Kill Switch**: Deterministic. No caller can override or bypass a kill switch.
+- **No Invented Data**: The system must never invent backtest results, live performance, or broker fills.
+- **Deterministic Policy**: Python code is the sole policy-enforcement authority.
 
-## 7. Documentation & Commands
+## 6. Documentation & Commands
 
-- **Update Rules**: Architecture/API/models → `docs/ARCHITECTURE.md`. Sprint state/decisions → `docs/CHANGELOG.md`. AI workflow → `AGENTS.md`.
+- **Update Rules**: Architecture/API/models → `docs/ARCHITECTURE.md`. Sprint state and completed changes → `docs/CHANGELOG.md`. Builder workflow → `AGENTS.md`.
+- **Decision Hygiene**: Decision sections contain unresolved choices only. When an owner resolves a choice, write the outcome as an ordinary requirement, contract, workflow, configuration rule, boundary, or explicit exclusion in the authoritative specification, then delete the decision row and any resolved issue entry. Do not retain resolved, superseded, retired, or deferred-from-initial-scope rows as decision history; use the changelog to record the documentation change.
 - **Update Module/Service Documentation**: Add/update a `README.md` for each module/service as it's built.
+- **Checklist Evidence**: Every completed implementation-plan checklist item must end with the supporting code file path and line number.
 - **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `uv run pytest <test_file_path>`, `uv run ruff check .`, `uv run mypy .`
 - **Targeted Testing**: Do not run the full `pytest` suite during iterative development, as the total number of tests is very large and full runs are time-consuming. Only run the specific test files associated with the code just created or edited to verify changes.
 - **Restricted Commands (Require `APPROVED: EXECUTE`)**: `rm -rf`, `git reset`, `git clean`, `uv add`/`uv remove`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.
 
-## 8. Final Checklist (Must be satisfied before finishing)
+## 7. Final Checklist (Must be satisfied before finishing)
 
 - **Scope strictly followed**.
 - **Required docs read; no rules invented**.
 - **Code quality (Google style, types, docstrings, logging, 80% coverage) applied**.
-- **Tools/Agents follow compressed standards (schemas, metadata, imports)**.
 - **No secrets or live side effects introduced**.
 - **Affected active docs updated**.
 - **Validation/tests run and passed**.
 - **Rollback path identified and reported**.
 
-## Imported Claude Cowork project instructions
-
-First Read AGENTS.py before doing anything

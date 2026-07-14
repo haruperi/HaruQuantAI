@@ -25,7 +25,9 @@ This README will be the domain’s single source of truth for:
 
 # INPUT DOCUMENTS
 
-Use only the following sources:
+## Primary sources
+
+The README is written from these:
 
 1. **Top-level system documentation:**
    `[PATH_TO_SYSTEM_DOCUMENT]`
@@ -33,14 +35,20 @@ Use only the following sources:
 2. **Final domain README template:**
    `[PATH_TO_FINAL_README_TEMPLATE]`
 
-3. **Version 1 audit report:**
+3. **V1–V2 reconciliation document:**
+   `[PATH_TO_RECONCILIATION_DOCUMENT]`
+
+## Reference-only sources
+
+Consult these **only** to elaborate items the reconciliation has already approved — for example, exact signatures, side effects, error types, and configuration names of reused V1 code, or the full requirement text of retained V2 requirements:
+
+4. **Version 1 audit report:**
    `[PATH_TO_V1_AUDIT_REPORT]`
 
-4. **Version 2 requirements document:**
+5. **Version 2 requirements document:**
    `[PATH_TO_V2_REQUIREMENTS]`
 
-5. **V1–V2 reconciliation document:**
-   `[PATH_TO_RECONCILIATION_DOCUMENT]`
+Reference-only sources must never introduce, restore, or override behaviour. If the reconciliation removed, rejected, or deferred something, it stays out of the README regardless of what these documents say. If a needed decision is absent from the reconciliation, add it to Open Decisions — do not derive it from V1 or V2 directly.
 
 Do not modify any input document.
 
@@ -56,18 +64,22 @@ Use this authority order:
 2. V1–V2 reconciliation
    → Defines approved Keep, Modify, Remove, Add, Merge,
      Split, Defer, and Reject decisions.
+   → The only source of WHAT goes into the README.
 
-3. V1 audit report
-   → Provides evidence about existing behaviour, usage,
-     workflows, dependencies, and reusable code.
+3. V1 audit report (reference only)
+   → Supplies implementation detail — signatures, side effects,
+     errors, dependencies — for V1 behaviour the reconciliation
+     approved for reuse or modification.
 
-4. V2 requirements
-   → Provides the original proposed requirements and
-     additional detail when retained by reconciliation.
+4. V2 requirements (reference only)
+   → Supplies full requirement text for V2 requirements the
+     reconciliation retained.
 
 5. Final README template
    → Defines the required output format.
 ```
+
+Reference-only sources supply detail for approved decisions; they carry no decision authority of their own.
 
 When the documents conflict, do not silently choose one.
 
@@ -672,7 +684,7 @@ Do not design affected functions or files by guessing.
 
 An affected requirement must remain `Missing` until the decision is resolved.
 
-A decision affecting more than one domain must be escalated to the Open Decisions section of the top-level system document (where it is resolved with an ADR) — record only a reference to it here.
+A decision affecting more than one domain must also appear in the Open Decisions section of the top-level system document while unresolved. After resolution, encode the outcome in the authoritative specifications and delete the decision row.
 
 ## Step 20 — Validate completeness
 

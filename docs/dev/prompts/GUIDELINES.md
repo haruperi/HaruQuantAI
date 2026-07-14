@@ -100,8 +100,6 @@ For HaruQuantAI:
 09 Optimization
 10 Research
 11 UI/API
-12 AI Agents 
-13 Conversation AI Chatbot
 ```
 
 Each domain README then defines:

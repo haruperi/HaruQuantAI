@@ -1,1030 +1,1289 @@
-# Market Data
+# Data
 
 > **Package:** `app/services/data`
-> **Domain ID:** `DOM-002`
-> **Status:** `In Development`
-> **Owner:** `HaruQuant Core (Haruperi)`
-> **Last updated:** `2026-07-10`
+> **Status:** `Missing`
+> **Last updated:** `2026-07-13`
+
+> This README is the package's **single source of truth** for requirements,
+> final structure, implementation sequence, progress, usage examples, and tests.
+> Update this file before changing the code.
 
 ---
 
-# Part I — Orientation
+## 1. Purpose and Boundary
 
-## 1. What This Domain Does
+### Purpose
 
-The Market Data domain is the single retrieval, normalization, caching, and
-observability boundary for all historical and real-time market data consumed by
-HaruQuant. It hides provider-specific SDKs and payload shapes behind a uniform
-gateway that returns JSON-safe Python primitives (`list[dict]`), enforces
-licensing/readiness/limit policies before any download, and discloses data
-quality and lineage instead of silently repairing data. The one rule every
-consumer must know: only normalized JSON-safe records ever cross this boundary —
-never raw DataFrames, SDK objects, or unredacted provider errors.
+Data acquires, normalizes, stores, and serves trusted market data and read-only
+broker/account state. It owns the shared SQLite connection, locking, and migration
+execution infrastructure. All broker/provider access is strictly read-only and flows
+exclusively through the Brokers domain's canonical `BrokerAdapter` read capability
+traits (`MarketDataProvider`, `AccountProvider`, `CalculationProvider`) under the
+registered Brokers boundary. Data is a foundation domain: it provides
+evidence and controlled resources but makes no strategy, risk, simulation, or
+execution decision.
 
-## 2. Quick Start
+### Owns
 
-```python
-from datetime import datetime, timezone
-from app.services.data import get_data
+- Historical and real-time market-data acquisition, normalization, provenance,
+  quality validation, availability inspection, and multi-timeframe alignment.
+- Historical market/account data tables, local CSV/Parquet datasets, cache state,
+  source policy, job/checkpoint state, feed status, and durable audit storage.
+- Shared SQLite connections, path-scoped write locking, and migration execution;
+  each persistent domain still owns its own tables and migration definitions.
+- Normalization of raw broker/provider reads (obtained through Brokers' `BrokerAdapter`
+  read traits) into `MarketDataset`, `AccountStateSnapshot`,
+  `MarketContextEvidence`, and `FXConversionEvidence`.
+- Source capability, readiness, licensing, explicit-fallback, rate-limit, timeout,
+  circuit-breaker, and promotion policy.
+- Deterministic resampling, alignment, tick aggregation, and synthetic generation
+  (Research owns historical labeling).
+- Bounded update jobs/backfills, idempotency, leases, checkpoints, crash recovery,
+  and minimum internal feed lifecycle/status.
 
-records = get_data(
-    symbol="EURUSD",
-    start_time=datetime(2026, 1, 1, tzinfo=timezone.utc),
-    end_time=datetime(2026, 2, 1, tzinfo=timezone.utc),
-    data_kind="ohlcv",
-    timeframe="H1",
-    source="synthetic",   # csv | parquet | synthetic | mt5 | ctrader | dukascopy | binance | yahoo
-)
+### Does not own
+
+- Strategy evaluation, indicators, risk policy, position sizing, order formulation,
+  broker dispatch decisions, reconciliation authority, or simulated fills/state.
+- Broker/provider connections, adapters, sessions, or credentials: Brokers owns
+  connection/session lifecycle and adapters; secrets are resolved by the Utils
+  settings layer and injected via `BrokerConnectionConfig` at the composition root
+  boundary. Data never invokes `BrokerAdapter` mutation operations.
+- Another domain's tables, artifact schemas, or migration definitions.
+- Public streaming subscriptions, automatic feed-gap backfill, historical calendar
+  reconstruction, TSDB selection, or unapproved external-source promotion.
+- Raw DataFrames, provider SDK objects, sockets, streams, credentials, or database
+  sessions crossing the public API or a cross-domain boundary.
+- Silent source fallback, stale-cache use, gap repair, interpolation, schema migration,
+  or precision coercion in governed workflows.
+
+### Shared contracts
+
+Contract definitions must match the name, version, and owner recorded in
+`docs/PROJECT.md`.
+
+**Owned by this domain** — defined authoritatively here:
+
+| Status | Contract | Version | Counterparty | Purpose |
+|---|---|---|---|---|
+| Missing | `MarketDataset` | `v1` | Indicators, Strategy, Trading, Simulation, Analytics, Optimization, Research, Portfolio, UI/API (Risk consumes `MarketContextEvidence` / `AccountStateSnapshot` instead) | Normalized bars/ticks with `available_at`, quality, precision, provenance, schema, and normalization metadata. |
+| Missing | `AccountStateSnapshot` | `v1` | Strategy, Risk, Trading, Portfolio | Immutable read-only account, balance, position, margin, broker-state, and UTC snapshot evidence. |
+| Missing | `MarketContextEvidence` | `v1` | Risk; Trading (orchestrator carrier only), UI/API (views) | Immutable normalized session, calendar, spread, liquidity, volatility, correlation, crisis, timezone, freshness, provenance, and explicit-missingness evidence for fail-closed Risk evaluation. Only Risk interprets it. |
+| Missing | `FXConversionEvidence` | `v1` | Risk, Simulation, Analytics, Portfolio | Immutable ordered direct or synthesized conversion path, composite rate, freshness, path-policy version, and source provenance. Consumers apply but never synthesize it. |
+| Missing | `AuditEventQuery` / `AuditEventPage` | `v1` | UI/API, Risk | Governed bounded filters and a cursor page over Utils-owned `AuditEvent` envelopes; Data owns query semantics and durable access, not event payload meaning. |
+
+`MarketDataset v1` contains: `contract_version="v1"`,
+`schema_id="data.market_dataset.v1"`, `normalization_version`,
+`data_kind`, `symbol`, optional `timeframe`, immutable canonical `records`, UTC
+`start`/`end`, per-record or dataset `available_at`, `record_count`,
+`DataQualityReport`, source/provenance/license metadata, cache status, workflow
+context, and precision policy. Records never contain raw provider objects.
+
+`AccountStateSnapshot v1` contains: `contract_version="v1"`,
+`schema_id="data.account_state_snapshot.v1"`, account identifier,
+currency, balances/equity/margin values as exact decimal strings, normalized open
+positions and orders, broker connectivity/trading-allowance evidence, source,
+`snapshot_at` UTC, expiry/staleness metadata, and trace identifiers. Missing, stale,
+or unverifiable governed evidence fails closed.
+
+`MarketContextEvidence v1` carries separate `contract_version="v1"` and
+`schema_id="data.market_context_evidence.v1"`, bounded session/calendar state,
+spread/liquidity/volatility/correlation/crisis evidence, timezone, UTC `as_of`,
+freshness, provenance, and explicit missingness. Data owns normalization and
+freshness truth; Risk owns interpretation and policy decisions.
+
+`FXConversionEvidence v1` carries separate `contract_version="v1"` and
+`schema_id="data.fx_conversion_evidence.v1"`, source and target currencies,
+an ordered acyclic sequence of rate legs, exact decimal leg/composite rates, UTC
+`as_of`, request-supplied freshness limit, path-policy identifier/version,
+source provenance, and trace identifiers. Missing, stale, cyclic, disallowed, or
+unverifiable paths fail closed; consumers never synthesize or silently refresh it.
+
+`AuditEventQuery v1` contains separate contract version/schema ID, an ordered UTC
+range, optional domain/action/principal/correlation filters, an opaque cursor, and a
+positive bounded limit. `AuditEventPage v1` contains separate identifiers, an ordered
+tuple of Utils-owned `AuditEvent v1` values, and an opaque optional next cursor. The
+caller supplies `AuthContext` separately; unauthorized or unbounded queries fail closed.
+
+**Consumed from other domains** — referenced only, never redefined:
+
+| Contract | Version | Owner | Used for |
+|---|---|---|---|
+| `AuthContext` | `v1` | Utils | Authenticate and trace governed reads, source promotion, audit persistence, and audit queries. |
+| `AuditEvent` | `v1` | Utils | Persist redacted governed events in Data's durable audit store. |
+| `BrokerAdapter` (read traits) | `v1` | Brokers | Read-only market data, account state, and calculation reads via `MarketDataProvider`, `AccountProvider`, and `CalculationProvider`; Data never invokes mutation operations. |
+| `BrokerResult` / `BrokerError` | `v1` | Brokers | Canonical result envelope and error taxonomy for every provider read consumed by Data. |
+| `BrokerConnectionEvent` / subscription event DTOs | `v1` | Brokers | Bounded connection lifecycle and provider-event channels feeding Data's internal feed handling. |
+
+### Persisted state
+
+Only Data writes Data-owned state. Other domains read it through documented
+contracts. Other domains submit their own migrations to Data's execution framework
+but retain schema ownership.
+
+| Status | State / Store | Read access (via contract) | Migration definitions |
+|---|---|---|---|
+| Missing | Market/account data tables, range indexes, source revisions, and historical datasets | Consumers via `MarketDataset` / `AccountStateSnapshot` | `app/services/data/storage/migrations.py` |
+| Missing | Durable audit event store | UI/API audit views and Risk verification through approved queries | `app/services/data/storage/migrations.py` |
+| Partial | Versioned cache entries and manifests | Data APIs only; consumers receive cache metadata, never direct rows | `app/services/data/storage/migrations.py` |
+| Missing | Source readiness, capabilities, license policy, rate limits, and breaker state | Data source policy APIs | `app/services/data/storage/migrations.py` |
+| Missing | Update jobs, leases, idempotency keys, checkpoints, and recovery state | Data job APIs | `app/services/data/storage/migrations.py` |
+| Missing | Internal feed heartbeat, gap, buffer, reconnect, and circuit state | `get_feed_status` | `app/services/data/storage/migrations.py` |
+| Missing | Shared migration ledger and path-scoped lock records | Persistent domains through migration results; no direct table access | `app/services/data/storage/migrations.py` |
+
+### Four-level structure
+
+| Code level | Represents |
+|---|---|
+| **Package** | Data domain |
+| **Module folder** | Feature / capability |
+| **File** | Use case or focused responsibility |
+| **Class / function / method / constant** | Functional requirement behaviour |
+
+```text
+Package
+└── Module folder
+    └── File
+        └── Class / Function / Method / Constant
 ```
 
-```bash
-uv add pandas pyarrow pydantic
-```
-
-The call returns validated, cached, normalized OHLCV records as
-`list[dict[str, Any]]`. Use `get_data_with_metadata` for quality/lineage
-metadata, or the `get_data_tool` wrapper for the standard AI-tool envelope.
-See §6 for the full API surface and §9.1 for the retrieval workflow in detail.
-
-## 3. Capability Map
-
-One row per feature — the index for the whole document. Deep dives in Part IV.
-
-| ID         | Capability                          | One-line purpose                                                              | Primary entry points                                | Status | Details |
-| ---------- | ----------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------- | ------ | ------- |
-| `FEAT-001` | Market Data Retrieval Gateway       | Validated, cached, source-agnostic retrieval with quality/lineage disclosure   | `get_data`, `get_data_with_metadata`, `list_symbols` | In Dev | §9.1    |
-| `FEAT-002` | Source Adapters and Broker Boundary | Interchangeable source adapters behind a read-only broker port, fail-closed    | `get_data_source`, `BrokerMarketDataPort`            | In Dev | §9.2    |
-| `FEAT-003` | Caching, Persistence, Local Datasets| SQLite cache, migrations, atomic path-safe CSV/Parquet I/O with quarantine     | `save_market_data`, `load_local_dataset`             | In Dev | §9.3    |
-| `FEAT-004` | Transformations and Synthetic Data  | Deterministic, lookahead-free resampling, alignment, and seeded generation     | `resample_ohlcv`, `generate_synthetic_bars`          | In Dev | §9.4    |
-| `FEAT-005` | Scheduled Data Update Jobs          | Persistent lease-based job lifecycle with explicit startup crash recovery      | `create_data_update_job`, `run_data_update_job_once` | In Dev | §9.5    |
-| `FEAT-006` | Real-Time Feed Observability        | Read-only feed health: buffers, heartbeats, overflow policies, backoff         | `get_feed_status`, `ReconnectPolicy`                 | In Dev | §9.6    |
-| `FEAT-007` | Validation, Sessions, Data Quality  | Central limits/rules, licensing, sessions, and report-only quality diagnostics | `validate_ohlcv_quality`, `get_trading_sessions`     | In Dev | §9.7    |
-
----
-
-# Part II — Domain View
-
-## 4. Boundaries and System Position
-
-### 4.1 Scope
-
-**Owns**
-
-- Market data request validation (timeframes, limits, timezones, workflow contexts, stale-cache policies)
-- Source selection, adapter registry, per-source circuit breakers, and rate limiting
-- Read-only market-data calls to broker clients via the `BrokerMarketDataPort` protocol
-- Normalization into canonical records, data-quality diagnostics, and volume-kind disclosure
-- Caching (`data_cache` SQLite table), atomic local file I/O under approved storage roots, schema migrations
-- Scheduled data-update job lifecycle and crash recovery
-- Real-time feed status, buffer/heartbeat checks, overflow policies, and reconnect backoff
-- Licensing and source-readiness enforcement before retrieval, storage, or export
-
-**Does not own**
-
-- Broker SDK imports, terminal/client connection lifecycle, authentication, and credential resolution — owned by `app/services/brokers`
-- Order/position/account mutation, live-readiness gates, and reconciliation — owned by `app/services/trading`
-- Data repair, interpolation, or silent dropping of records — quality diagnostics are report-only
-- Strategy, indicator, simulation, and analytics computations — they consume Data outputs
-
-### 4.2 System Position
-
-Strategy, Indicators, Risk, Simulator, Optimization, Analytics, and agent-tool
-callers retrieve data through this domain. Data depends on `app/services/brokers`
-for read-only broker clients, on `app/utils` for the standard tool envelope,
-error taxonomy, logging, normalization, and path helpers, and on
-`app/services/strategy/contracts` for the canonical `Bar` used by
-`validate_bars`/`load_ohlcv_csv`.
-
-```mermaid
-flowchart LR
-    A[Strategy / Indicators / Simulator / Optimization / Analytics] --> B[[Market Data]]
-    T[AI Agent Tools] --> B
-    B --> C[app/services/brokers - read-only clients]
-    B --> D[(SQLite data/data_service.db)]
-    B --> E[(CSV / Parquet datasets under approved roots)]
-    F[app/utils - envelope, errors, logging] --> B
-```
-
-## 5. Architecture
-
-### 5.1 Layer Diagram
+### Package capability map
 
 ```mermaid
 flowchart TD
-    API[public_api.py / data_quality.py - official tool wrappers]
-    APP[gateway.py - validation, licensing, rate limit, cache routing]
-    LOGIC[validation.py / normalization.py / transforms.py - rules and transforms]
-    PORTS[contracts.py - BrokerMarketDataPort, SourceAdapterPort, canonical models]
-    ADAPTERS[sources.py - CSV, Parquet, Synthetic, MT5, cTrader, Dukascopy, Binance, Yahoo]
-    STORE[storage.py - SQLite cache, migrations, file I/O]
-    JOBS[scheduler.py / feeds.py - jobs and feed observability]
+    DATA[[app/services/data]]
+    DATA --> CONTRACTS[[contracts: canonical contracts and errors]]
+    DATA --> STORAGE[[storage: SQLite, files, cache, audit]]
+    DATA --> SOURCES[[sources: adapters, policy, broker lifecycle]]
+    DATA --> ACCESS[[access: retrieval and reference data]]
+    DATA --> PROCESSING[[processing: transforms, synthetic]]
+    DATA --> JOBS[[jobs: backfills and scheduling]]
+    DATA --> FEEDS[[feeds: internal live lifecycle and status]]
+    DATA --> API[[public_api: typed Data operations]]
 
-    API --> APP
-    APP --> LOGIC
-    APP --> PORTS
-    PORTS --> ADAPTERS
-    APP --> STORE
-    ADAPTERS --> STORE
-    JOBS --> APP
-    JOBS --> STORE
+    CONTRACTS --> CFILES[records.py; market.py; broker.py; sources.py; errors.py]
+    STORAGE --> STFILES[database.py; locking.py; datasets.py; cache.py; audit.py; migrations.py]
+    SOURCES --> SOFILES[protocol.py; registry.py; policy.py; broker.py; local.py; external.py]
+    ACCESS --> AFILES[historical.py; reference.py; sessions.py; account.py]
+    PROCESSING --> PFILES[timeframes.py; transforms.py; synthetic.py]
+    JOBS --> JFILES[models.py; backfill.py; scheduler.py]
+    FEEDS --> FFILES[models.py; runtime.py; status.py]
+    API --> APIFILES[retrieval.py; storage.py; processing.py; jobs.py; feeds.py; registry.py]
 ```
-
-Official AI-tool wrappers (`public_api.py`, `data_quality.validate_ohlcv_quality`)
-sit on top of native service functions; the gateway coordinates validation,
-licensing, rate limiting, cache routing, and adapter dispatch; adapters implement
-the `SourceAdapterPort`/`SourceAdapterProtocol` contracts and talk to local files,
-the synthetic generator, or broker clients through the read-only
-`BrokerMarketDataPort`; persistence owns the lazy SQLite helper and file I/O.
-Dependencies point strictly downward.
-
-### 5.2 Design Rules (Invariants)
-
-| ID         | Rule                                                                                                                                     |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `RULE-001` | Import safety: `import app.services.data` performs **no** database writes, schema migrations, broker connections, or background task creation. DB init, the licensing table, and scheduler recovery run lazily or on explicit startup calls. |
-| `RULE-002` | Boundary: only normalized JSON-safe primitives (`list[dict]`, native numeric types) cross the public boundary — never raw pandas DataFrames or provider SDK objects. |
-| `RULE-003` | Errors: native functions raise typed `app.utils.standard` exceptions; official tool wrappers map every failure through `errors.to_data_error_payload` to a deterministic, secret-redacted error envelope — no raw exception escapes. |
-| `RULE-004` | Broker isolation: nothing in the domain imports a broker SDK directly; broker access happens only through the read-only `BrokerMarketDataPort` (no mutation methods exist on the port by design). |
-| `RULE-005` | Quality is report-only: no repair, interpolation, or silent dropping of records anywhere in the domain — issues are flagged and disclosed. |
-| `RULE-006` | Path safety: every local file read/write passes `validate_storage_path` — approved roots only, no traversal or hidden paths, `.csv`/`.parquet` only. |
-| `RULE-007` | Governance first: license and source-readiness rules are enforced before any cache read/write, source download, or export.               |
-| `RULE-008` | Downward dependencies only: adapters never call the gateway; layers depend strictly on the layer below.                                   |
 
 ---
 
-# Part III — Reference Tables
+## 2. Final Package Structure
 
-> Single source of truth for lookups. Feature deep dives (Part IV) cite these tables by row and never repeat them.
-
-## 6. Public API Surface
-
-The complete importable surface of the domain, in one table.
-
-```python
-# Native functions
-from app.services.data import (
-    get_data, get_data_with_metadata, list_symbols, get_symbol_metadata, get_data_availability,
-    save_market_data, load_local_dataset, load_ohlcv_csv, clear_data_cache,
-    resample_ohlcv, aggregate_ticks_to_bars, align_multitimeframe_data,
-    generate_synthetic_bars, generate_synthetic_ticks, label_market_data,
-    create_data_update_job, start_data_update_job, stop_data_update_job,
-    run_data_update_job_once, get_data_update_job_status,
-    get_feed_status, get_market_hours, get_trading_sessions, validate_bars,
-)
-from app.services.data import OFFICIAL_DATA_TOOLS  # envelope wrappers catalog
-
-# Official tool wrappers, contracts, and support modules
-from app.services.data.public_api import get_data_tool, list_symbols_tool, get_feed_status_tool
-from app.services.data.contracts import BrokerMarketDataPort, SourceAdapterPort
-from app.services.data.sources import get_data_source, get_circuit_breaker
-from app.services.data.storage import get_db_helper, PersistenceResult
-from app.services.data.scheduler import recover_data_jobs_on_startup
-from app.services.data.feeds import ReconnectPolicy, compute_reconnect_delay, handle_feed_overflow
-from app.services.data.data_quality import validate_ohlcv_quality, inspect_ohlcv_quality
-from app.services.data.dataframe_tools import serialize_dataframe_records, compare_ohlcv
-```
-
-| Feature    | Module               | Type     | Class / Function                 | Params                                                        | Returns                       | Raises                                                | Responsibility                                  |
-| ---------- | -------------------- | -------- | -------------------------------- | -------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------ | ------------------------------------------------ |
-| `FEAT-001` | `gateway.py`         | Function | `get_data`                       | `symbol, start_time, end_time, data_kind, timeframe, source, limit, stale_data_behavior, workflow_context, request_id` | `list[dict[str, Any]]` | `ValidationError`, `DataError`, `ExternalServiceError` | Validated cached retrieval (cache read/write, logging) |
-| `FEAT-001` | `gateway.py`         | Function | `get_data_with_metadata`         | same as `get_data`                                              | `(records, result_metadata)`  | same as `get_data`                                      | Retrieval + quality/lineage metadata             |
-| `FEAT-001` | `gateway.py`         | Function | `list_symbols`                   | `source, request_id`                                            | `list[str]`                   | `ValidationError`, `DataError`                          | Symbol discovery per source                      |
-| `FEAT-001` | `gateway.py`         | Function | `get_symbol_metadata`            | `symbol, source, request_id`                                    | `dict[str, Any]`              | `ValidationError`, `DataError`                          | Normalized symbol specification                  |
-| `FEAT-001` | `gateway.py`         | Function | `get_data_availability`          | `symbol, timeframe, source, request_id`                         | `dict[str, Any]`              | `DataError`                                             | Coverage + gap-window report (cache read)        |
-| `FEAT-001` | `gateway.py`         | Class    | `TokenBucketLimiter`             | `rate, capacity`                                                |                               |                                                         | Thread-safe per-source rate limiting             |
-| `FEAT-001` | `public_api.py`      | Function | `get_data_tool`                  | `get_data` kwargs `+ request_id`                                | `StandardResponse`            | Never raises                                            | Official envelope wrapper                        |
-| `FEAT-001` | `public_api.py`      | Function | `list_symbols_tool`              | `source, request_id`                                            | `StandardResponse`            | Never raises                                            | Official envelope wrapper                        |
-| `FEAT-001` | `errors.py`          | Function | `to_data_error_payload`          | `exception, request_id`                                         | `ErrorPayload` (`{code, details}`) | Never raises                                       | Redacted deterministic error mapping             |
-| `FEAT-002` | `contracts.py`       | Protocol | `BrokerMarketDataPort`           |                                                                 |                               |                                                         | Read-only broker client contract                 |
-| `FEAT-002` | `contracts.py`       | Protocol | `SourceAdapterPort`              |                                                                 |                               |                                                         | Normalized source adapter contract               |
-| `FEAT-002` | `sources.py`         | Function | `get_data_source`                | `source: str`                                                   | `SourceAdapterProtocol`       | `ValidationError`: unknown source                       | Adapter resolution                               |
-| `FEAT-002` | `sources.py`         | Function | `get_source_adapter`             | `source: str`                                                   | `SourceAdapterProtocol`       | same as above                                           | Backward-compatible alias                        |
-| `FEAT-002` | `sources.py`         | Class    | `BrokerBackedAdapter`            | protocol methods: `get_market_data`, `get_tick_data`, `list_symbols`, `get_symbol_metadata` | `DataRecords` | `ExternalServiceError`: broker/read failure | Lazy broker reads, normalization (breaker updates) |
-| `FEAT-002` | `sources.py`         | Function | `get_circuit_breaker`            | `source: str`                                                   | `dict[str, Any]`              |                                                         | Breaker state report (DB read)                   |
-| `FEAT-002` | `sources.py`         | Function | `check_circuit_breaker_barrier`  | `source: str`                                                   | `None`                        | `ExternalServiceError`: breaker open                    | Fail-closed gate (DB read)                       |
-| `FEAT-003` | `storage.py`         | Class    | `DatabaseHelper.get_connection`  |                                                                 | ctx-managed `Connection`      | `DataError`: transaction failure                        | Lazy DB init, WAL, migrations                    |
-| `FEAT-003` | `storage.py`         | Function | `get_db_helper`                  |                                                                 | `DatabaseHelper`              |                                                         | Shared lazy singleton accessor                   |
-| `FEAT-003` | `storage.py`         | Function | `validate_storage_path`          | `path_str: str`                                                 | `Path`                        | `ValidationError`: unsafe path                          | Single path-safety gate                          |
-| `FEAT-003` | `storage.py`         | Function | `set_cached_data`                | `key, source, symbol, timeframe, times, records, ttl_seconds, …`| `PersistenceResult`           | Never raises (returns `conflict`)                       | Disclosing cache upsert (DB write)               |
-| `FEAT-003` | `storage.py`         | Function | `get_cached_data`                | `key, stale_data_behavior, request_id`                          | `dict \| None`                |                                                         | TTL-aware cache read                             |
-| `FEAT-003` | `storage.py`         | Function | `compute_raw_hash`               | `records`                                                       | `str` (SHA256 hex)            |                                                         | Raw payload lineage hash                         |
-| `FEAT-003` | `storage.py`         | Function | `save_market_data`               | `records, path_str, format_str, overwrite, …`                   | `{path, record_count}`        | `ValidationError`, `DataError`                          | Atomic dataset write + quarantine (file write)   |
-| `FEAT-003` | `storage.py`         | Function | `load_local_dataset`             | `path_str, request_id`                                          | `list[dict]`                  | `ValidationError`, `DataError`                          | CSV/Parquet load under approved roots            |
-| `FEAT-003` | `storage.py`         | Function | `load_ohlcv_csv`                 | `path`                                                          | `tuple[Bar, ...]`             | `ValueError`: bad rows/timestamps                       | Canonical bar loading + validation               |
-| `FEAT-003` | `storage.py`         | Function | `clear_data_cache`               | `namespace, source_filter, symbol_filter, dry_run`              | `dict[str, Any]`              | `ValidationError`                                       | Cache inspection/clearing (dry-run default)      |
-| `FEAT-004` | `transforms.py`      | Function | `resample_ohlcv`                 | `records, source_tf, target_tf, …`                              | `list[dict]`                  | `ValidationError`                                       | Deterministic timeframe conversion               |
-| `FEAT-004` | `transforms.py`      | Function | `aggregate_ticks_to_bars`        | `ticks, timeframe, …`                                           | `list[dict]`                  | `ValidationError`                                       | Tick → bar aggregation                           |
-| `FEAT-004` | `transforms.py`      | Function | `align_multitimeframe_data`      | `datasets: dict[str, list[dict]], …`                            | `dict[str, list]`             | `ValidationError`                                       | Lookahead-free alignment                         |
-| `FEAT-004` | `transforms.py`      | Function | `generate_synthetic_bars`        | `symbol, timeframe, count/range, seed, …`                       | `list[dict]`                  | `ValidationError`                                       | Seeded GBM bar generation                        |
-| `FEAT-004` | `transforms.py`      | Function | `generate_synthetic_ticks`       | `symbol, range, seed, …`                                        | `list[dict]`                  | `ValidationError`                                       | Seeded synthetic tick generation                 |
-| `FEAT-004` | `transforms.py`      | Function | `label_market_data`              | `records, labeling params`                                      | `list[dict]`                  | `ValidationError`                                       | Historical labeling                              |
-| `FEAT-005` | `scheduler.py`       | Function | `create_data_update_job`         | `name, source, symbols, timeframes, data_kind, storage, schedule, …` | `dict[str, Any]`         | `ValidationError`                                       | Validated job creation (DB write)                |
-| `FEAT-005` | `scheduler.py`       | Function | `start_data_update_job`          | `name, request_id`                                              | `dict[str, Any]`              | `ValidationError`                                       | Transition job to running                        |
-| `FEAT-005` | `scheduler.py`       | Function | `stop_data_update_job`           | `name, request_id`                                              | `dict[str, Any]`              | `ValidationError`                                       | Stop and release lease                           |
-| `FEAT-005` | `scheduler.py`       | Function | `run_data_update_job_once`       | `name, request_id`                                              | `dict[str, Any]`              | `ValidationError`, `DataError`                          | Single synchronous run (retrieval + writes)      |
-| `FEAT-005` | `scheduler.py`       | Function | `get_data_update_job_status`     | `name, request_id`                                              | `dict[str, Any]`              | `ValidationError`                                       | Job status report                                |
-| `FEAT-005` | `scheduler.py`       | Function | `recover_data_jobs_on_startup`   |                                                                 | `int` (recovered count)       |                                                         | Explicit crash recovery (alias `initialize_data_scheduler`) |
-| `FEAT-006` | `feeds.py`           | Function | `get_feed_status`                | `feed_id, source, symbol, data_kind, request_id`                | `dict \| list[dict]`          | `ValidationError`                                       | Read-only enriched feed diagnostics              |
-| `FEAT-006` | `feeds.py`           | Function | `check_feed_buffer_capacity`     | `feed, capacity`                                                | `bool`                        |                                                         | Bounded-buffer check                             |
-| `FEAT-006` | `feeds.py`           | Function | `check_feed_heartbeat_timeout`   | `feed, timeout_seconds`                                         | `bool`                        |                                                         | Heartbeat staleness check                        |
-| `FEAT-006` | `feeds.py`           | Function | `record_feed_heartbeat`          | `feed_id, request_id`                                           | `dict[str, Any]`              | `ValidationError`                                       | Heartbeat update                                 |
-| `FEAT-006` | `feeds.py`           | Function | `handle_feed_overflow`           | `feed_id, policy, …`                                            | `dict[str, Any]`              | `ValidationError`                                       | Explicit overflow policy application             |
-| `FEAT-006` | `feeds.py`           | Class    | `ReconnectPolicy`                | `max_retries, base/max backoff, jitter, cooldown`               |                               |                                                         | Deterministic backoff model                      |
-| `FEAT-006` | `feeds.py`           | Function | `compute_reconnect_delay`        | `attempt, policy`                                               | `float` seconds               | `ValidationError`                                       | Backoff computation                              |
-| `FEAT-006` | `public_api.py`      | Function | `get_feed_status_tool`           | filters `+ request_id`                                          | `StandardResponse`            | Never raises                                            | Official envelope wrapper                        |
-| `FEAT-007` | `validation.py`      | Function | `get_market_hours`               | `symbol, request_id`                                            | `dict[str, Any]`              |                                                         | Current configured hours (24/5 UTC)              |
-| `FEAT-007` | `validation.py`      | Function | `get_trading_sessions`           | `start_time, end_time, request_id`                              | `list[dict]`                  |                                                         | Session window labeling (Sydney/Tokyo/London/NY) |
-| `FEAT-007` | `validation.py`      | Function | `normalize_numeric`              | `value, digits, workflow_context`                               | `str \| float`                | `ValidationError`                                       | Per-workflow precision policy                    |
-| `FEAT-007` | `validation.py`      | Function | `validate_step_alignment`        | `value, step_size, workflow_context`                            | `None`                        | `ValidationError`: misaligned in risk contexts          | Fail-closed step check                           |
-| `FEAT-007` | `validation.py`      | Function | `validate_bars`                  | `bars: Iterable[Bar]`                                           | `tuple[Bar, ...]`             | `ValueError`: empty/non-increasing                      | Canonical bar-order validation                   |
-| `FEAT-007` | `validation.py`      | Function | `validate_license`               | `source, symbol, workflow_context, request_id`                  | `dict[str, Any]`              | `ValidationError`: `LICENSE_RESTRICTION`                | License enforcement (lazy DB read)               |
-| `FEAT-007` | `validation.py`      | Function | `validate_source_readiness`      | `source, workflow_context, request_id`                          | `str` (readiness)             | `ValidationError`                                       | Readiness gate                                   |
-| `FEAT-007` | `normalization.py`   | Function | `build_data_quality_flags`       | `record, previous_timestamp`                                    | `list[str]`                   |                                                         | Per-record quality flags (report-only)           |
-| `FEAT-007` | `normalization.py`   | Function | `summarize_data_quality`         | `records`                                                       | `dict[str, Any]`              |                                                         | Batch flag counts                                |
-| `FEAT-007` | `normalization.py`   | Function | `resolve_volume_kind`            | `source, data_kind`                                             | `str`                         |                                                         | Volume-kind disclosure                           |
-| `FEAT-007` | `data_quality.py`    | Function | `inspect_ohlcv_quality`          | `dataframe, expected_symbol, timestamp_column, issue_limit, sample_limit, quality_pass_threshold` | `dict[str, object]` | `ValidationError`                          | Deterministic scored diagnostics                 |
-| `FEAT-007` | `data_quality.py`    | Function | `validate_ohlcv_quality`         | same `+ timeframe, request_id`                                  | `StandardResponse`            | Never raises                                            | Official tool wrapper                            |
-| `FEAT-007` | `dataframe_tools.py` | Function | `serialize_dataframe_records`    | `dataframe, timestamp_columns, include_index, index_name`       | `list[dict]`                  | `ValidationError`                                       | JSON-safe serialization                          |
-| `FEAT-007` | `dataframe_tools.py` | Function | `compare_dataframes` / `compare_ohlc` / `compare_ohlcv` | `left, right, columns, tolerance`        | `dict[str, object]`           | `ValidationError`                                       | Deterministic frame comparison                   |
-| `FEAT-007` | `contracts.py`       | Model    | `Symbol`, `Timeframe`, `Bar`, `Tick`, `Spread`, `DataSlice` |                                      |                               | `ValueError`: constraint violations                     | Canonical validated market-data contracts        |
-| `FEAT-007` | `models.py`          | Model    | `OHLCVRecord`, `TickRecord`, `SpreadRecord`, `SymbolMetadata`, `DataQualitySummary`, `DataLineage`, `DataAvailability` | | | `ValueError`: constraint violations | Downstream record schemas                        |
-
-The official tool surface is the narrow `OFFICIAL_DATA_TOOLS` catalog
-(`get_data`, `list_symbols`, `get_market_hours`, `get_feed_status`); the broad
-root `__all__` (23 names) is legacy compatibility (see §12).
-
-## 7. Configuration, Dependencies, and Limits
-
-### 7.1 Prerequisites
-
-- Python `>=3.14`, `uv`
-- SQLite (bundled with Python); writable `data/` directory
-- Optional: MetaTrader 5 terminal, cTrader OpenAPI access, or network access for Dukascopy/Binance/Yahoo (broker-backed sources only)
-
-### 7.2 Dependencies
-
-| Dependency                        | Type        | Used by                    | Purpose                                          | Required? |
-| --------------------------------- | ----------- | -------------------------- | ------------------------------------------------ | --------- |
-| `pandas`                          | Third-party | `FEAT-001…004, 007`        | Adapter-internal frames, file I/O, resampling (lazy import in `dataframe_tools`) | Yes |
-| `pyarrow`                         | Third-party | `FEAT-001, 003`            | Parquet read/write                               | Yes       |
-| `pydantic>=2`                     | Third-party | `FEAT-001, 007`            | Record models and canonical contracts            | Yes       |
-| `numpy`                           | Third-party | `FEAT-004`                 | Synthetic generation (GBM)                       | Yes       |
-| `app/utils`                       | Internal    | all                        | Envelope, error taxonomy, logging, `redact_text` | Yes       |
-| `app/services/brokers`            | Internal    | `FEAT-001, 002`            | Read-only broker market-data clients             | Optional  |
-| `app/services/strategy/contracts` | Internal    | `FEAT-001, 003, 007`       | Canonical `Bar` for `validate_bars`/CSV loader   | Yes       |
-
-### 7.3 Configuration and Limits Manifest
-
-All settings and hard limits, defined once in code; hardening tests assert
-these values against their source constants.
-
-| Setting / Limit                                       | Feature    | Required | Default                                            | Description                                        |
-| ----------------------------------------------------- | ---------- | -------: | -------------------------------------------------- | -------------------------------------------------- |
-| `storage.DB_FILE_PATH`                                 | `FEAT-003` |       No | `data/data_service.db`                             | SQLite database file (lazy-created on first use).  |
-| `storage.APPROVED_STORAGE_ROOTS`                       | `FEAT-003` |       No | `data/raw`, `data/processed`, `data/cache`, `artifacts/data` | Only writable/readable dataset roots.    |
-| `storage.QUARANTINE_DIR`                               | `FEAT-003` |       No | `data/quarantine`                                  | Destination for failed partial writes.             |
-| `storage.DEFAULT_SCHEMA_VERSION`                       | `FEAT-003` |       No | `v1`                                               | Cache row schema tag.                              |
-| `sources.CIRCUIT_OPEN_FAILURE_THRESHOLD`               | `FEAT-002` |       No | `4`                                                | Consecutive failures before a breaker opens.       |
-| `validation.SOURCE_READINESS_REGISTRY`                 | `FEAT-007` |       No | csv/parquet/synthetic=production; brokers=staging  | Per-source readiness gate (see §7.4).              |
-| `validation.DEFAULT_LICENSE_REGISTRY`                  | `FEAT-007` |       No | Per-source license defaults                        | License metadata used when no DB row exists.       |
-| `validation.DEFAULT_OHLCV_LIMIT` / `MAX_OHLCV_LIMIT`   | `FEAT-007` |       No | `5000` / `50000`                                   | OHLCV records per `get_data` call.                 |
-| `validation.DEFAULT_TICK_LIMIT` / `MAX_TICK_LIMIT`     | `FEAT-007` |       No | `10000` / `250000`                                 | Tick records per `get_data` call.                  |
-| `validation.DEFAULT_SPREAD_LIMIT` / `MAX_SPREAD_LIMIT` | `FEAT-007` |       No | `10000` / `250000`                                 | Spread records per `get_data` call.                |
-| `validation.DEFAULT_BACKFILL_OHLCV_CHUNK_RECORDS` / `_DAYS` | `FEAT-007` |  No | `100000` / `30`                                    | OHLCV backfill chunking.                           |
-| `validation.DEFAULT_BACKFILL_TICK_CHUNK_RECORDS` / `_DAYS`  | `FEAT-007` |  No | `1000000` / `1`                                    | Tick backfill chunking.                            |
-| `validation.DEFAULT_CACHE_TTL_DAILY` / `_INTRADAY` / `_TICK` / `_LIVE` | `FEAT-007` | No | `86400` / `3600` / `900` / `0` s     | Cache TTLs by data kind.                           |
-| `validation.MAX_CACHE_TTL_OVERRIDE_DAYS`               | `FEAT-007` |       No | `7`                                                | Cache TTL override cap.                            |
-| `validation.RESAMPLE_PERFORMANCE_BENCHMARK_BARS` / `_THRESHOLD_SECONDS` | `FEAT-007` | No | `100000` / `3.0`                    | Resampling benchmark.                              |
-| `validation.MAX_SYNTHETIC_BARS`                        | `FEAT-004` |       No | `100000`                                           | Direct-response synthetic bar cap.                 |
-| `validation.MAX_SYNTHETIC_TICKS`                       | `FEAT-004` |       No | `250000`                                           | Direct-response synthetic tick cap.                |
-| `validation.MAX_PERSISTED_SYNTHETIC_SIZE`              | `FEAT-004` |       No | `1000000`                                          | Persisted synthetic dataset cap.                   |
-| `validation.MAX_SYMBOLS_PER_JOB`                       | `FEAT-005` |       No | `500`                                              | Symbol cap per job.                                |
-| `validation.MAX_TIMEFRAMES_PER_JOB`                    | `FEAT-005` |       No | `20`                                               | Timeframe cap per job.                             |
-| `validation.MIN_SCHEDULER_FREQUENCY_SECONDS`           | `FEAT-005` |       No | `60`                                               | Minimum job frequency.                             |
-| `feeds.DEFAULT_FEED_BUFFER_CAPACITY`                   | `FEAT-006` |       No | `10000`                                            | Max in-flight events before overflow.              |
-| `feeds.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS`              | `FEAT-006` |       No | `30.0`                                             | Heartbeat staleness threshold.                     |
-| `feeds.DEFAULT_RECONNECT_POLICY`                       | `FEAT-006` |       No | 5 retries, 0.5s/30s backoff, 0.2 jitter, 60s cooldown | Reconnect backoff.                              |
-| Broker credentials                                     | —          |       No | —                                                  | Resolved inside `app/services/brokers`, never here.|
-
-### 7.4 Source Readiness and License Manifest
-
-| Source      | Readiness  | License     | Redistribution restricted |
-| ----------- | ---------- | ----------- | ------------------------- |
-| `csv`       | production | Open        | No                        |
-| `parquet`   | production | Open        | No                        |
-| `synthetic` | production | Permissive  | No                        |
-| `mt5`       | staging    | Proprietary | Yes                       |
-| `ctrader`   | staging    | Proprietary | Yes                       |
-| `dukascopy` | staging    | Restricted  | Yes                       |
-| `binance`   | staging    | Restricted  | Yes                       |
-| `yahoo`     | staging    | Restricted  | Yes                       |
-
-`not_available` sources are always rejected (`UNSUPPORTED_OPERATION`);
-non-`production` sources are rejected under `risk`/`execution_bound` contexts
-(`LICENSE_RESTRICTION`). Both checks run before any cache read/write, download,
-or scheduler export (`RULE-007`).
-
-## 8. Package and File Structure
-
-Each file maps to the feature(s) it implements — tying the code tree back to the capability map (§3).
+Modules and files are ordered from lowest dependency to highest dependency.
 
 ```text
-data/
-├── __init__.py           # Public gate: native exports, OFFICIAL_DATA_TOOLS, PUBLIC_API_CLASSIFICATION   (all)
-├── public_api.py         # Official AI-tool wrappers returning the standard envelope                     (FEAT-001, FEAT-006)
-├── contracts.py          # Broker/adapter ports, JSON aliases, canonical Symbol/Timeframe/Bar/Tick/Spread/DataSlice (FEAT-002, FEAT-007)
-├── errors.py             # DATA_ERROR_CODES subset + to_data_error_payload redacted mapping              (FEAT-001)
-├── gateway.py            # Request validation, licensing, rate limiting, cache routing, source dispatch  (FEAT-001)
-├── sources.py            # Adapter registry (csv/parquet/synthetic/mt5/ctrader/dukascopy/binance/yahoo) + circuit breakers (FEAT-002)
-├── normalization.py      # Provider/file record normalization, quality flags, volume-kind disclosure     (FEAT-007)
-├── models.py             # Pydantic record schemas (OHLCV/Tick/Spread/SymbolMetadata/quality/lineage)     (FEAT-007)
-├── storage.py            # Lazy SQLite helper, migrations, cache ops, atomic file I/O, path safety        (FEAT-003)
-├── scheduler.py          # Data-update job lifecycle + explicit crash recovery                            (FEAT-005)
-├── feeds.py              # Feed state, buffer/heartbeat checks, overflow policies, reconnect backoff      (FEAT-006)
-├── transforms.py         # Resampling, tick aggregation, MTF alignment, synthetic generation, labeling    (FEAT-004)
-├── validation.py         # Limits manifest, precision/step rules, timeframes, sessions, licensing         (FEAT-007)
-├── data_quality.py       # Standalone OHLCV quality inspection + official tool wrapper                    (FEAT-007)
-├── dataframe_tools.py    # Lazy-pandas JSON-safe helpers (serialize, compare, chunk, param grids)         (FEAT-007)
-└── README.md
+app/services/data/
+├── __init__.py                         # Only the approved typed public operations
+├── README.md
+├── contracts/                          # Canonical Data-owned contracts
+│   ├── __init__.py
+│   ├── records.py                      # Bar, tick, and spread records
+│   ├── market.py                       # Request, dataset, quality, availability
+│   ├── broker.py                       # Account snapshot evidence
+│   ├── market_context.py               # Risk-ready market-context evidence
+│   ├── fx.py                           # FX conversion request/path evidence
+│   ├── sources.py                      # Source/readiness/license contracts
+│   └── errors.py                       # DataError and deterministic manifest
+├── storage/                            # Shared persistence infrastructure
+│   ├── __init__.py
+│   ├── database.py                     # Bounded SQLite transaction execution
+│   ├── locking.py                      # Exclusive path-scoped write locks
+│   ├── datasets.py                     # Atomic CSV/Parquet load/save
+│   ├── cache.py                        # One versioned TTL/revision cache
+│   ├── audit.py                        # Durable AuditEvent persistence and governed query
+│   └── migrations.py                   # Data migrations and shared runner
+├── sources/                            # Source capability and connection boundary
+│   ├── __init__.py
+│   ├── protocol.py                     # Small typed read-only source Protocol
+│   ├── registry.py                     # Lazy source registration/resolution
+│   ├── policy.py                       # Readiness, license, fallback, promotion
+│   ├── broker.py                       # Broker lifecycle, snapshots, channel issue
+│   ├── local.py                        # CSV/Parquet source implementations
+│   └── external.py                     # Staging external read adapters
+├── access/                             # Read orchestration
+│   ├── __init__.py
+│   ├── historical.py                   # Bars, ticks, and spreads
+│   ├── reference.py                    # Symbols, metadata, availability
+│   ├── sessions.py                     # Current hours/sessions and volume
+│   └── account.py                      # Read-only account snapshot access
+├── processing/                         # Deterministic market-data processing
+│   ├── __init__.py
+│   ├── timeframes.py                   # One timeframe source of truth
+│   ├── transforms.py                   # Resample, align, aggregate
+│   ├── tabular.py                      # Private DataFrame/OHLC conversion and comparison
+│   └── synthetic.py                    # Seeded bounded GBM bars/ticks
+├── jobs/                               # Update/backfill lifecycle
+│   ├── __init__.py
+│   ├── models.py                       # Job, chunk, lease, checkpoint state
+│   ├── backfill.py                     # Bounded idempotent ingestion chunks
+│   └── scheduler.py                    # Create/start/stop/run/status/recovery
+├── feeds/                              # Internal real-time lifecycle
+│   ├── __init__.py
+│   ├── models.py                       # Feed configuration and status
+│   ├── runtime.py                      # Buffer, heartbeat, reconnect, gaps
+│   └── status.py                       # Read-only status inspection
+└── public_api/                         # Typed Data-owned public boundary
+    ├── __init__.py
+    ├── retrieval.py                    # Retrieval/reference/session operations
+    ├── storage.py                      # Local dataset and cache operations
+    ├── processing.py                   # Transform and synthetic operations
+    ├── jobs.py                         # Update job operations
+    └── feeds.py                        # Feed status operation
 ```
+
+Usage examples live only under `tests/data/usage/`.
+
+### Module dependency diagram
+
+```mermaid
+flowchart LR
+    C[[contracts]]
+    S[[storage]]
+    R[[sources]]
+    A[[access]]
+    P[[processing]]
+    J[[jobs]]
+    F[[feeds]]
+    API[[api]]
+
+    C --> S
+    C --> R
+    C --> P
+    S --> R
+    S --> A
+    R --> A
+    S --> J
+    A --> J
+    P --> J
+    S --> F
+    R --> F
+    A --> API
+    P --> API
+    S --> API
+    R --> API
+    J --> API
+    F --> API
+```
+
+### Structure rules
+
+- `app/services/data/__init__.py` contains imports and `__all__` only.
+- Package-root `__all__` contains exactly the approved typed public operations.
+- Efficient internal APIs remain in focused submodules and do not appear in the
+  package-root export list.
+- Every source adapter is read-only. Synthetic generation is a processing capability,
+  not an external source adapter.
+- `external.py` lazy-loads optional dependencies; import never opens a connection,
+  creates a database, runs recovery, or performs network I/O.
+- No class named `DataGateway`, generic manager/service/repository layer, SQLite
+  connection pool, or TSDB abstraction is part of the initial design.
+- Simulation-specific trading-bar/M1/real tick reconstruction is absent; Simulation
+  owns it and consumes canonical Data output.
+
+### Reconciliation capability coverage
+
+This table proves that every reconciliation capability has one final destination or
+an explicit exclusion.
+
+| Capability | Decision | Final destination / treatment |
+|---|---|---|
+| `CAP-DATA-001` Typed public and internal API boundary | Modify | `contracts/`, focused typed submodules, `public_api/`, `FR-DATA-005/006/049–073` |
+| `CAP-DATA-002` Historical OHLCV/tick/spread retrieval | Modify | `access/historical.py`, typed retrieval operations, `WF-DATA-001/002` |
+| `CAP-DATA-003` Source protocol/registry/readiness/adapters | Modify | `sources/`, `FR-DATA-022–029` |
+| `CAP-DATA-004` Canonical records/UTC/versioning | Modify | `contracts/records.py`, `contracts/market.py` |
+| `CAP-DATA-005` Quality/gaps/availability/revision | Modify/Replace | `DataQualityReport`, `DataAvailability`, `inspect_availability`, `get_data_availability` |
+| `CAP-DATA-006` Versioned cache and safe clear | Modify | `storage/cache.py`, `clear_data_cache` |
+| `CAP-DATA-007` Local CSV/Parquet and atomic storage | Modify | `storage/datasets.py`, `save_market_data`, `load_local_dataset` |
+| `CAP-DATA-008` SQLite state and transactional infrastructure | Modify | `storage/database.py`, `locking.py`, `migrations.py`, `audit.py` |
+| `CAP-DATA-009` Jobs and resumable backfills | Modify/Replace | `jobs/`, typed job operations, `WF-DATA-007` |
+| `CAP-DATA-010` Internal real-time feed lifecycle | Add/Replace | `feeds/`, `get_feed_status`, `WF-DATA-008`; initial deterministic fake harness and specified informational limits |
+| `CAP-DATA-011` Timeframes/resampling/alignment/aggregation | Merge/Modify | `processing/timeframes.py`, `transforms.py`, typed transform operations |
+| `CAP-DATA-012` Deterministic synthetic generation | Modify | `processing/synthetic.py`, typed synthetic operations, `WF-DATA-005` |
+| `CAP-DATA-013` Historical labeling | Retired | Owned by Research; no Data implementation |
+| `CAP-DATA-014` Market hours/sessions/volume | Modify/Add | `access/sessions.py`, three typed retrieval operations, `WF-DATA-010` |
+| `CAP-DATA-015` License/fallback/rate/breaker/source safety | Modify | `sources/policy.py`, source manifests, `WF-DATA-011` |
+| `CAP-DATA-016` Symbol discovery and metadata | Modify | `access/reference.py`, typed metadata/discovery operations, `WF-DATA-009` |
+| `CAP-DATA-017` Errors/request correlation/audit/side effects | Add | `contracts/errors.py`, `storage/audit.py`, typed API rules, NFRs |
+| `CAP-DATA-018` Workflow-aware precision/serialization | Modify | Contract/API precision policy and `NFR-DATA-002–004` |
+| `CAP-DATA-019` Simulation tick-model boundary | Split | Data retains canonical/generic generation; Simulation owns model reconstruction; `WF-DATA-012` |
+| `CAP-DATA-020` Legacy implementation/facade cleanup | Remove | No legacy facade, aliases, duplicate cache, `_common.py`, or simulation tick model exists in the final tree. |
+| `CAP-DATA-021` Tests/benchmarks/production evidence | Add | Section 7 and `NFR-DATA-009/012`; benchmark results are informational until measured evidence supports binding thresholds |
+
+### Explicit exclusions
+
+| Treatment | Behavior |
+|---|---|
+| Remove | `_common.py`, broken/unbound exports, legacy aliases, duplicate caches/file savers/label entry points, superseded record-list gateway, mock production feed registration, status-only scheduler execution, and Data-owned simulation tick modelling after migration. |
+| Reject | Mandatory `DataGateway`, SQLite pool/leak detector, named TimescaleDB/InfluxDB direction, composite feed health score, hidden on-read migration, and mandatory multiprocessing. |
 
 ---
 
-# Part IV — Feature Deep Dives
+## 3. Workflows
 
-> Only what is unique to each feature: purpose, scope, requirements, workflows. API rows → §6, config → §7.3, files → §8.
+### Status values
 
-## 9. Feature Reference
+| Status | Meaning |
+|---|---|
+| **Missing** | Not implemented or not verified |
+| **Partial** | Useful V1 behavior exists but final contracts, placement, or tests differ |
+| **Completed** | Implemented in the final structure, tested, and verified |
 
-Every requirement and workflow row carries a **Status**: **Completed** (implemented and verified), **Partial** (implemented with a known gap), or **Missing** (specified but not yet implemented). The non-completed items, carried over from the Phase 2 traceability audit, are: `FR-DATA-009` (opt-in `fallback_sources` — Missing), `FR-DATA-043` / `WF-DATA-041` (job runs execute but record a simulated outcome, no real chunked download loop — Partial), `FR-DATA-044` / `WF-DATA-043` (chunked, checkpointed backfill — Missing; the `DEFAULT_BACKFILL_*` constants in §7.3 exist but nothing consumes them yet), and `FR-DATA-054` / `WF-DATA-052` (automatic gap-reconciliation backfill from `drop_and_reconcile` — Missing).
+### Workflow scope values
 
-### 9.1 `FEAT-001` — Market Data Retrieval Gateway
+| Scope | Meaning |
+|---|---|
+| **Internal** | The complete workflow occurs within Data. |
+| **Cross-domain** | Data receives input from or returns output to another domain. |
 
-**Purpose:** One validated, cached, source-agnostic entry point (`get_data` /
-`get_data_with_metadata`, plus the `get_data_tool` / `list_symbols_tool`
-official wrappers) for retrieving normalized OHLCV, tick, spread, and volume
-records with data-quality and lineage metadata.
+| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|
+| Partial | `WF-DATA-001` | Cross-domain | Historical bars/ticks/spreads retrieval | Consumer submits bounded source/range request | `MarketDataset v1` | `FR-DATA-006 → 026 → 030 → 049/050/051` |
+| Partial | `WF-DATA-002` | Cross-domain | Internal analytical data access | Approved Python consumer submits `MarketDataRequest` | Typed `MarketDataset`, never raw provider state | `FR-DATA-006 → 030 → 005` |
+| Partial | `WF-DATA-003` | Internal | Local dataset load/save | Approved CSV/Parquet path and normalized data | Validated dataset or atomic committed artifact/manifest | `FR-DATA-016 → 017/018 → 058/059` |
+| Partial | `WF-DATA-004` | Internal | Resample, align, and aggregate | Normalized datasets/ticks | Deterministic no-lookahead dataset | `FR-DATA-036 → 037/038 → 060/061/064` |
+| Partial | `WF-DATA-005` | Cross-domain | Synthetic generation | Bounded parameters and optional seed | Deterministic canonical bars/ticks | `FR-DATA-039 → 062/063` |
+| Retired | `WF-DATA-006` | — | Historical labeling | Owned by Research; no Data workflow | — | — |
+| Missing | `WF-DATA-007` | Internal | Update job and historical backfill | Job definition or run-once command | Committed chunks and resumable checkpoint | `FR-DATA-041 → 042 → 043/044 → 063–067` |
+| Missing | `WF-DATA-008` | Cross-domain | Internal real-time feed and status | Staging feed source emits event | Normalized bounded state and `get_feed_status` output | `FR-DATA-046 → 047 → 048 → 071` |
+| Partial | `WF-DATA-009` | Cross-domain | Symbol discovery, metadata, availability | Bounded source/symbol query | Provenanced metadata/page/availability result | `FR-DATA-023/024 → 031/032/033 → 052/053/054` |
+| Partial | `WF-DATA-010` | Cross-domain | Current hours, sessions, and volume | Current configured market request | UTC windows or bounded volume result | `FR-DATA-034/035 → 055/056/057` |
+| Missing | `WF-DATA-011` | Internal | Source readiness and promotion | Operator evidence package and `AuthContext` | Reversible readiness state | `FR-DATA-026 → 027` |
+| Missing | `WF-DATA-012` | Cross-domain | Simulation data-modelling boundary | Simulation requests canonical history | Data supplies canonical bars/ticks; Simulation reconstructs model-specific ticks | `FR-DATA-030 → 005` |
+| Missing | `WF-DATA-013` | Cross-domain | Account snapshot service | Strategy/Risk/Trading read-only account evidence request | `AccountStateSnapshot v1` (read-only; no mutation capability) | `FR-DATA-028 → 008` |
+| Missing | `WF-DATA-014` | Cross-domain | Risk market-context evidence | Risk requests current normalized context | `MarketContextEvidence v1` or explicit stale/missing failure | `FR-DATA-075 → 076` |
+| Missing | `WF-DATA-015` | Cross-domain | FX conversion evidence | Risk, Simulation, Analytics, or Portfolio requests a bounded conversion | `FXConversionEvidence v1` or explicit stale/path failure | `FR-DATA-078 → FR-DATA-079` |
 
-**Scope:** Includes request validation (data kind, timeframe, time ordering,
-limits, `workflow_context`, `stale_data_behavior`), license and
-source-readiness enforcement before any cache read/write or download,
-per-source token-bucket rate limiting, cache-first routing with TTL policy
-(intraday 3600s, daily 86400s, ticks 900s, empty results 60s), record
-normalization and result metadata (`source`, `schema_version`, `raw_hash`,
-`cache_status`, `data_quality`, `volume_kind`, `license`, `warnings`), symbol
-discovery, symbol metadata, and availability/gap reporting. Excludes
-multi-source failover in a single call (one source per request), data repair
-or interpolation (diagnostics only — `FEAT-007`), and broker credential
-resolution (owned by `app/services/brokers`).
+### `WF-DATA-001` — Historical Bars, Ticks, and Spreads
 
-#### Requirements
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`, `SYS-WF-003`, `SYS-WF-004`
+**Input boundary:** A consumer supplies a JSON request payload or typed
+`MarketDataRequest`; live/current reads used by `SYS-WF-002` use the same boundary.
+**Output boundary:** Data returns its documented typed result or `DataError`.
 
-| ID             | Type            | Requirement                                                                                                                                     | Verification      | Status |
-| -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | --------- |
-| `FR-DATA-001`  | Functional      | The system shall reject requests with unsupported `data_kind`, timeframe, non-positive/over-limit `limit`, or `start_time >= end_time`.           | Unit test         | Completed |
-| `FR-DATA-002`  | Functional      | The system shall validate `workflow_context` and `stale_data_behavior` against the approved registries before executing any retrieval.            | Unit test         | Completed |
-| `FR-DATA-003`  | Functional      | The system shall enforce license and source-readiness rules before every cache read/write, source download, or export.                            | Integration test  | Completed |
-| `FR-DATA-004`  | Functional      | The system shall serve cached records when a fresh cache row exists, and honor `refresh_and_return` / `return_stale` / `fail` on expiry.          | Integration test  | Completed |
-| `FR-DATA-005`  | Functional      | The system shall return only normalized JSON-safe records — never raw pandas DataFrames or provider SDK objects — from the domain boundary.       | Unit test         | Completed |
-| `FR-DATA-006`  | Functional      | The system shall expose `get_data_with_metadata` returning `(records, result_metadata)` including quality, lineage, and cache-status disclosure.  | Unit test         | Completed |
-| `FR-DATA-007`  | Functional      | The system shall compute real internal gap windows from committed cache records for `get_data_availability`.                                      | Integration test  | Completed |
-| `FR-DATA-008`  | Functional      | Official tool wrappers shall map every failure through `errors.to_data_error_payload` to a deterministic, redacted error envelope.                | Unit test         | Completed |
-| `FR-DATA-009`  | Functional      | The system shall support explicit, opt-in multi-source fallback via an optional `fallback_sources` list on retrieval requests (V1 `DATA-FR-053`).           | Unit test         | Missing |
-| `NFR-DATA-001` | Performance     | Per-source token-bucket rate limiting bounds outbound request rates.                                                                              | Unit test         | Completed |
-| `NFR-DATA-002` | Reliability     | Cache write failures return `PersistenceResult(operation="conflict")` and never corrupt the read path.                                            | Unit test         | Completed |
-| `NFR-DATA-003` | Security        | No raw password, token, or API key is accepted as a function parameter; error text is redacted twice.                                             | Security test     | Completed |
-| `NFR-DATA-004` | Observability   | All gateway calls log with optional `request_id` correlation; tool wrappers emit envelope metadata.                                               | Inspection / test | Completed |
-| `NFR-DATA-005` | Maintainability | Strict Mypy typing and Ruff lint/format across the package; unit coverage ≥ 80%.                                                                  | Static analysis   | Completed |
+1. Validate request bounds, UTC range, workflow context, precision, and fallback list.
+2. Enforce readiness, capability, license, rate, timeout, and breaker policy for the
+   requested source and each explicitly supplied fallback.
+3. Resolve cache identity from source revision, schema/normalization versions, raw
+   hash when known, request dimensions, and policy.
+4. Fetch from one lazy read adapter on cache miss, normalize UTC records, and create a
+   bounded quality report.
+5. Fail closed for blocking quality/precision violations; otherwise return the typed
+   dataset or JSON-safe envelope with attempted-source metadata.
 
-#### Workflows
+**Failure behaviour:** invalid input → `VALIDATION_FAILED`; undeclared fallback → no
+fallback; unavailable/staging-disallowed source → `SOURCE_UNAVAILABLE`; missing
+license → `LICENSE_RESTRICTION`; strict quality failure → `DATA_QUALITY_FAILED`;
+external timeout → `TIMEOUT`; empty valid range → `EMPTY_RESULT`. Cache-write failure
+is disclosed as a warning for read workflows and never changes returned records.
 
-| Workflow ID   | Workflow                 | Trigger                                 | Outcome                                     | Requirements                                 | Status |
-| ------------- | ------------------------ | --------------------------------------- | -------------------------------------------- | --------------------------------------------- | --------- |
-| `WF-DATA-001` | Retrieve market data     | Caller invokes `get_data(_tool)`        | Normalized records (+ metadata) returned     | `FR-DATA-001`…`FR-DATA-006`, `FR-DATA-008`    | Completed |
-| `WF-DATA-002` | Discover symbols         | Caller invokes `list_symbols(_tool)`    | Symbol list for the source returned          | `FR-DATA-005`, `FR-DATA-008`                  | Completed |
-| `WF-DATA-003` | Report data availability | Caller invokes `get_data_availability`  | Coverage window, record count, gap windows   | `FR-DATA-007`                                 | Completed |
-
-##### `WF-DATA-001` — Retrieve Market Data
-
-**Purpose:** Return validated, normalized, cached market data records for one symbol/source.
-**Actor / Trigger:** Downstream service or AI agent tool; call to `get_data`, `get_data_with_metadata`, or `get_data_tool`.
-**Preconditions:** Requested source exists in `sources.ADAPTER_REGISTRY`; source readiness and license rules permit the requested `workflow_context`.
-
-**Main flow**
-
-1. Caller submits symbol, time range, `data_kind`, `timeframe`, `source`, `limit`, `stale_data_behavior`, `workflow_context`.
-2. `gateway.get_data` validates the workflow context, stale-data policy, time ordering, data kind, timeframe, and limit.
-3. `gateway.execute_gateway_request` validates license (`validation.validate_license`) and source readiness (`validation.validate_source_readiness`), then consumes a rate-limit token.
-4. The gateway checks the cache (`storage.get_cached_data`) using a deterministic SHA256 key; a fresh hit returns immediately.
-5. On a miss, the resolved adapter (`sources.get_data_source`) downloads and returns normalized records.
-6. Records are normalized/validated (`_normalize_and_validate_records`) and written back to cache with a kind-appropriate TTL and `raw_hash`.
-7. The gateway returns the record list; `get_data_with_metadata` additionally returns quality/lineage `result_metadata`, and `get_data_tool` wraps everything in the standard envelope.
-
-**Alternative and failure flows**
-
-| ID | Condition                       | Behaviour                                                                                                                                          |
-| -- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1 | Fresh cache hit                 | Steps 5–6 skipped; cached records returned with `cache_status="hit"`.                                                                                |
-| A2 | `return_stale` on expired cache | Stale records returned with a staleness warning in metadata.                                                                                         |
-| A3 | Empty provider result           | An empty list is cached for 60 seconds and returned.                                                                                                 |
-| F1 | Invalid input                   | `ValidationError` (`INVALID_INPUT` / `UNSUPPORTED_TIMEFRAME` / `UNSUPPORTED_OPERATION`) raised before any I/O.                                       |
-| F2 | Dependency failure              | Broker/read failures surface as `ExternalServiceError` with deterministic codes (`TIMEOUT`, `CREDENTIALS_MISSING`, `AUTHENTICATION_FAILED`, `BROKER_UNAVAILABLE`, `DATA_SCHEMA_DRIFT`); other failures map to `DataError`. |
-| F3 | Unknown outcome                 | At the official tool boundary, any exception is mapped by `to_data_error_payload` to a redacted `{code, details}` error envelope — no raw exception escapes. |
-
-**Postconditions:** Cache row inserted/updated (or `no_op`/`conflict` recorded) with schema and normalization versions; structured logs with `request_id` correlation emitted.
+**Integration test:**
+`tests/data/integration/test_historical_retrieval.py::test_historical_retrieval_explicit_fallback()`
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant API as public_api.get_data_tool
-    participant Service as gateway.get_data
-    participant Domain as validation / normalization
-    participant Port as sources adapter
-    participant Store as storage (SQLite cache)
-
-    Client->>API: symbol, range, kind, source
-    API->>Service: validated kwargs
-    Service->>Domain: validate context, license, readiness, limits
-    Service->>Store: get_cached_data(key)
+    participant Consumer
+    participant Access
+    participant Policy
+    participant Cache
+    participant Source
+    Consumer->>Access: MarketDataRequest
+    Access->>Policy: readiness/license/capability
+    Access->>Cache: versioned lookup
     alt cache miss
-        Service->>Port: get_market_data / get_tick_data
-        Port-->>Service: normalized records
-        Service->>Domain: normalize + quality flags
-        Service->>Store: set_cached_data(records, ttl, raw_hash)
+        Access->>Source: bounded read
+        Source-->>Access: provider-neutral records
+        Access->>Access: normalize and quality-check
     end
-    Service-->>API: records (+ result_metadata)
-    API-->>Client: StandardResponse envelope
+    Access-->>Consumer: MarketDataset or structured error
 ```
+
+### `WF-DATA-003` — Local Dataset Load and Save
+
+**Scope:** `Internal`
+**System workflow:** `None`
+**Input boundary:** Approved relative path, `csv|parquet`, normalized dataset, and
+overwrite/manifest options.
+**Output boundary:** Loaded `MarketDataset` or committed artifact plus manifest.
+
+1. Resolve the path under configured approved roots and reject traversal, absolute
+   escape, and unapproved hidden/system paths.
+2. Acquire the exclusive path-scoped writer lock for writes.
+3. Validate/normalize records and license/export policy.
+4. Write a temporary artifact and versioned manifest, fsync as supported, then commit
+   atomically; quarantine failed temporary output.
+5. Verify file hash/schema on load and never perform hidden on-read migration.
+
+**Failure behaviour:** unsafe path → `PERMISSION_DENIED`; lock conflict →
+`CONCURRENT_WRITE_LOCKED`; corrupt artifact → `FILE_CORRUPTED`; invalid data →
+`DATA_QUALITY_FAILED`; write failure → `DB_WRITE_FAILED` or mapped filesystem error.
+
+**Integration test:**
+`tests/data/integration/test_local_dataset.py::test_local_dataset_atomic_round_trip()`
+
+### `WF-DATA-004` — Resample, Align, and Aggregate
+
+**Scope:** `Internal`
+**System workflow:** `SYS-WF-001`, `SYS-WF-003`
+**Input boundary:** Canonical datasets and declared source/target timeframes.
+**Output boundary:** Deterministic `MarketDataset` with updated provenance and
+`available_at`.
+
+The single timeframe manifest validates ordering. Resampling permits only supported
+higher-timeframe conversion; alignment selects only values available at each target
+timestamp; tick aggregation requires sorted canonical ticks and explicit spread
+policy. Any lookahead, disorder, overlap-policy, or unsupported-timeframe violation
+fails the operation atomically.
+
+**Integration test:**
+`tests/data/integration/test_processing.py::test_multitimeframe_alignment_has_no_lookahead()`
+
+### `WF-DATA-007` — Update Job and Historical Backfill
+
+**Scope:** `Internal`
+**System workflow:** `None`
+**Input boundary:** Persisted job definition or one-time bounded backfill request.
+**Output boundary:** Atomic chunk commits, checkpoints, and observable job state.
+
+1. Validate source/license/destination and derive an idempotency key from source,
+   symbol, kind, timeframe, range, schema, and normalization version.
+2. Acquire one active lease and divide the range into chunks no larger than 10,000
+   records or one source calendar day, whichever is smaller.
+3. For each chunk run retrieval → normalization → quality → persistence.
+4. Commit artifact/data, idempotency record, and checkpoint in one recoverable unit.
+5. On restart, validate the checkpoint and resume after the last committed chunk.
+
+**Failure behaviour:** duplicate active worker → `CONCURRENT_WRITE_LOCKED`; corrupt
+checkpoint → `CHECKPOINT_CORRUPTED`; failed chunk leaves no published partial chunk;
+recovery failure → `STATE_RECOVERY_FAILED`. A job never reports success without data
+movement or an explicit no-change result.
+
+**Integration test:**
+`tests/data/integration/test_backfill.py::test_backfill_resumes_after_last_committed_chunk()`
+
+### `WF-DATA-008` — Internal Real-Time Feed and Status
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-002`
+**Input boundary:** A configured staging/production source emits provider events to
+the internal runtime; no public subscription API exists.
+**Output boundary:** Consumers receive normalized internal events and operators receive
+bounded read-only `FeedStatus` data.
+
+The runtime normalizes events into a bounded buffer, updates heartbeats/counters,
+records gap windows and dropped-data evidence, and reconnects with bounded exponential
+backoff plus jitter. Overflow follows `halt`, `drop_and_reconcile`, or `backpressure`;
+no automatic historical reconciliation capability exists, so Phase 1 records and exposes the
+gap only. The initial source is the deterministic fake contract harness. Promotion to one MT5 demo feed for the Trading live/paper runtime occurs only after Trading exists and the promotion evidence passes.
+
+**Integration test:**
+`tests/data/integration/test_feed_runtime.py::test_feed_overflow_records_gap_without_hidden_backfill()`
+
+### `WF-DATA-011` — Source Readiness and Promotion
+
+**Scope:** `Internal`
+**System workflow:** `None`
+**Input boundary:** Authenticated operator submits mocked/live, normalization, quality,
+timeout, rate-limit, license, redaction, and sign-off evidence.
+**Output boundary:** Audited, reversible source readiness transition.
+
+CSV and Parquet begin `production`; synthetic generation is production processing.
+MT5, cTrader, Dukascopy, Binance discovery, and the real-time feed gateway begin
+`staging`. Promotion is rejected until every declared criterion is linked and valid;
+demotion is always allowed when evidence degrades.
+
+**Integration test:**
+`tests/data/integration/test_source_promotion.py::test_source_promotion_requires_complete_evidence()`
+
+### `WF-DATA-012` — Simulation Data-Modelling Boundary
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-001`
+**Input boundary:** Simulation requests canonical historical bars/ticks.
+**Output boundary:** Data returns `MarketDataset`; Simulation owns trading-bar, M1,
+generated/real tick reconstruction, fill models, and simulated state.
+
+**Failure behaviour:** Data-quality or no-lookahead violation aborts the dataset
+boundary; Data never returns a partially modeled simulation stream.
+
+**Integration test:**
+`tests/data/integration/test_simulation_boundary.py::test_data_excludes_simulation_tick_models()`
+
+### `WF-DATA-013` — Account Snapshot Service
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-002`
+**Input boundary:** Strategy/Risk/Trading request read-only account evidence.
+**Output boundary:** `AccountStateSnapshot v1`.
+
+Data reads raw account/broker state through Brokers' `BrokerAdapter` read traits
+(`AccountProvider`), then normalizes provider state, connectivity/trading-allowance
+evidence, and staleness metadata into an immutable snapshot. Data holds no mutation
+capability and issues none: broker mutations are dispatched by Trading directly
+through Brokers' `BrokerAdapter` mutation operations.
+
+**Integration test:**
+`tests/data/integration/test_broker_boundary.py::test_data_broker_access_is_read_only()`
+
+### `WF-DATA-014` — Risk Market-Context Evidence
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**Input boundary:** Risk requests current session, calendar, spread, liquidity,
+volatility, correlation, and crisis evidence for a declared symbol/account scope.
+**Output boundary:** `MarketContextEvidence v1` or a structured missing/stale error.
+
+Data obtains provider facts through Brokers read traits and Data-owned sources,
+normalizes timezones and freshness, preserves provenance and explicit missingness,
+and publishes no policy verdict. Risk alone decides whether the evidence permits an
+action. Missing mandatory evidence is never replaced with a fabricated default.
+
+**Integration test:**
+`tests/data/integration/test_market_context_boundary.py::test_risk_receives_owned_market_context_evidence()`
 
 ---
 
-### 9.2 `FEAT-002` — Source Adapters and Broker Boundary
+### `WF-DATA-015` — FX Conversion Evidence
 
-**Purpose:** A registry of interchangeable source adapters (`csv`, `parquet`,
-`synthetic`, `mt5`, `ctrader`, `dukascopy`, `binance`, `yahoo`) that normalize
-every provider/file payload into canonical records, isolate broker SDK
-ownership behind the read-only `BrokerMarketDataPort`, and fail closed through
-per-source circuit breakers.
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-001`, `SYS-WF-007`, `SYS-WF-008`
+**Input boundary:** a bounded source/target currency request, UTC `as_of`,
+explicit maximum age, and explicit allowed-path policy.
+**Output boundary:** `FXConversionEvidence v1` or a structured failure.
 
-**Scope:** Includes `SourceAdapterProtocol` (`is_ready`, `get_market_data`,
-`get_tick_data`, `list_symbols`, `get_symbol_metadata`); the
-`LocalFileAdapter` (CSV/Parquet), `SyntheticAdapter`, and `BrokerBackedAdapter`
-families; lazy broker-client resolution via `BrokerMarketDataFactory` callables
-(`_get_mt5_client`, `_get_ctrader_client`, …); persisted per-source circuit
-breakers (`get_circuit_breaker`, `update_circuit_breaker`,
-`check_circuit_breaker_barrier`); and mapping of provider failures to
-deterministic error codes with redacted messages. Excludes broker
-connection/session lifecycle and credentials (owned by `app/services/brokers`),
-any broker mutation method (absent from `BrokerMarketDataPort` by design —
-`RULE-004`), and returning raw DataFrames or SDK objects across the boundary.
+Data resolves provider truth through read-only sources, selects an allowed acyclic
+path deterministically, preserves every leg and provenance reference, calculates
+the exact composite rate, and validates freshness. Consumers may multiply by the
+published rate but may not reconstruct a different path. No synthetic/default rate
+is emitted.
 
-#### Requirements
-
-| ID             | Type            | Requirement                                                                                                                                    | Verification     | Status |
-| -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- | --------- |
-| `FR-DATA-010`  | Functional      | Every adapter shall implement `SourceAdapterProtocol` and return only `list[dict[str, Any]]` records.                                             | Unit test        | Completed |
-| `FR-DATA-011`  | Functional      | Broker-backed adapters shall resolve clients lazily; no broker connection occurs at import or registry-construction time.                         | Unit test        | Completed |
-| `FR-DATA-012`  | Functional      | Broker read failures shall map to deterministic codes (`TIMEOUT`, `CREDENTIALS_MISSING`, `AUTHENTICATION_FAILED`, `BROKER_UNAVAILABLE`, `DATA_SCHEMA_DRIFT`) with provider text redacted. | Unit test | Completed |
-| `FR-DATA-013`  | Functional      | A source shall trip to `open` after `CIRCUIT_OPEN_FAILURE_THRESHOLD` (4) consecutive connection failures and auto-transition to `half-open` after its cooldown expires. | Integration test | Completed |
-| `FR-DATA-014`  | Functional      | `check_circuit_breaker_barrier` shall block adapter calls while a source breaker is `open`.                                                       | Unit test        | Completed |
-| `NFR-DATA-010` | Reliability     | Circuit-breaker state persists in SQLite and survives process restarts.                                                                           | Integration test | Completed |
-| `NFR-DATA-011` | Security        | Provider exception text passes `redact_text` before embedding in error messages.                                                                  | Security test    | Completed |
-| `NFR-DATA-012` | Maintainability | Adapters are registered in one `ADAPTER_REGISTRY`; adding a source touches one file.                                                              | Static analysis  | Completed |
-
-#### Workflows
-
-| Workflow ID   | Workflow                     | Trigger                              | Outcome                                    | Requirements                   | Status |
-| ------------- | ---------------------------- | ------------------------------------ | ------------------------------------------- | ------------------------------- | --------- |
-| `WF-DATA-010` | Broker-backed read           | Gateway dispatches to broker adapter | Normalized records or deterministic error   | `FR-DATA-010`…`FR-DATA-012`    | Completed |
-| `WF-DATA-011` | Circuit-breaker trip/recover | Repeated connection failures         | Source blocked, then half-open retry        | `FR-DATA-013`, `FR-DATA-014`   | Completed |
-
-##### `WF-DATA-010` — Broker-Backed Read
-
-**Purpose:** Fetch bars/ticks from a broker source without leaking SDK objects or credentials.
-**Actor / Trigger:** `gateway.execute_gateway_request`; cache miss on a broker-backed source.
-**Preconditions:** Source circuit breaker is not `open`; broker client factory can resolve a connected client.
-
-**Main flow**
-
-1. Gateway resolves the adapter via `get_data_source(source)`.
-2. `BrokerBackedAdapter` calls `check_circuit_breaker_barrier(source)`.
-3. The adapter resolves its client lazily through its `BrokerMarketDataFactory`.
-4. The client's read-only `get_bars`/`get_ticks` is invoked with UTC datetimes.
-5. The provider DataFrame is normalized (`normalization.bars_dataframe_to_records` / `ticks_dataframe_to_records`) into JSON-safe records.
-6. Records are returned to the gateway for validation and caching.
-
-**Alternative and failure flows**
-
-| ID | Condition                    | Behaviour                                                                                                          |
-| -- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| A1 | Local file source            | `LocalFileAdapter` reads under approved roots and normalizes file records (steps 2–4 replaced by file I/O).          |
-| A2 | Synthetic source             | `SyntheticAdapter` deterministically generates records; no I/O.                                                      |
-| F1 | Invalid input                | Unknown source raises `ValidationError` at adapter resolution.                                                       |
-| F2 | Dependency failure           | Connection/read failure records `_record_connection_failure`, increments breaker state, and raises `ExternalServiceError` with a redacted, coded message. |
-| F3 | Unknown payload shape        | Unrecognized provider payload raises `DATA_SCHEMA_DRIFT` rather than returning partial data.                         |
-
-**Postconditions:** Circuit-breaker failure count reset on success or incremented on failure; no SDK object, socket, or credential crosses the boundary.
-
-```mermaid
-sequenceDiagram
-    participant GW as gateway
-    participant AD as BrokerBackedAdapter
-    participant CB as circuit_breakers (SQLite)
-    participant BR as BrokerMarketDataPort
-
-    GW->>AD: get_market_data(symbol, tf, range)
-    AD->>CB: check_circuit_breaker_barrier(source)
-    AD->>BR: lazy factory → get_bars(...)
-    alt success
-        BR-->>AD: provider DataFrame
-        AD-->>GW: normalized list[dict]
-    else failure
-        AD->>CB: _record_connection_failure
-        AD-->>GW: ExternalServiceError (redacted, coded)
-    end
-```
+**Integration test:**
+`tests/data/integration/test_fx_conversion_evidence.py::test_portfolio_receives_fresh_owned_fx_evidence()`
 
 ---
 
-### 9.3 `FEAT-003` — Caching, Persistence, and Local Datasets
+## 4. Module and Requirement Specifications
 
-**Purpose:** Own all Data-domain state: the lazily-initialized SQLite database
-(cache, jobs, feed state, circuit breakers, migrations),
-write-outcome-disclosing cache operations, and atomic, path-safe CSV/Parquet
-dataset I/O with quarantine of failed writes.
+Modules, files, and requirements below are the implementation order. Public and
+internal operations return typed Data contracts or raise `DataError` with a code
+from `DATA_ERROR_MANIFEST`. UI/API owns external transport mapping.
 
-**Scope:** Includes `DatabaseHelper` with lazy init, WAL mode, and forward-only
-audited migrations (`sys_migrations`); cache read/write with TTL and
-`insert`/`update`/`no_op`/`conflict` disclosure (`PersistenceResult`);
-deterministic cache keys and raw-payload hashing (`generate_cache_key`,
-`compute_raw_hash`); atomic `save_market_data` (temp file + rename, quarantine
-on failure), `load_local_dataset`, `load_ohlcv_csv`; the path safety gate
-`validate_storage_path` (`RULE-006`); and cache inspection/clearing
-(`clear_data_cache`, dry-run by default). Excludes backup automation (standard
-filesystem/DB tooling applies), deleting on-disk datasets (`clear_data_cache`
-targets the `data_cache` table only), and retention of raw provider payloads
-beyond their owning cache row.
+### 4.1 `contracts/` — Canonical Contracts and Errors
 
-#### Requirements
+**Purpose:** Define the complete typed, versioned, provider-neutral Data vocabulary.
 
-| ID             | Type          | Requirement                                                                                                             | Verification     | Status |
-| -------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------- | --------- |
-| `FR-DATA-020`  | Functional    | Constructing `DatabaseHelper` (and importing the package) shall perform no filesystem or database I/O.                      | Unit test        | Completed |
-| `FR-DATA-021`  | Functional    | `set_cached_data` shall report `insert`, `update`, `no_op` (identical payload), or `conflict` (failed write) outcomes.      | Unit test        | Completed |
-| `FR-DATA-022`  | Functional    | Every local file read/write shall pass `validate_storage_path`; paths outside approved roots shall be rejected.             | Security test    | Completed |
-| `FR-DATA-023`  | Functional    | `save_market_data` shall write atomically and quarantine partial files under `data/quarantine/` on failure.                 | Integration test | Completed |
-| `FR-DATA-024`  | Functional    | Schema migrations shall be forward-only and audited with `source_version`, `target_version`, and `rollback_notes`.          | Integration test | Completed |
-| `FR-DATA-025`  | Functional    | `load_ohlcv_csv` shall reject rows without timezone-aware timestamps and return strictly-increasing validated `Bar`s.       | Unit test        | Completed |
-| `FR-DATA-026`  | Functional    | Cache entries shall be invalidated automatically when `schema_version` or `normalization_version` changes (migration-driven eviction).       | Integration test | Completed |
-| `NFR-DATA-020` | Reliability   | SQLite runs in WAL mode with rollback on any transaction failure.                                                           | Integration test | Completed |
-| `NFR-DATA-021` | Security      | Parent traversal (`..`), hidden segments, and absolute escapes are rejected.                                                | Security test    | Completed |
-| `NFR-DATA-022` | Observability | Every persistence operation logs its outcome with optional `request_id`.                                                    | Inspection       | Completed |
+**Module flow:**
 
-#### Workflows
-
-| Workflow ID   | Workflow             | Trigger                                              | Outcome                                | Requirements                  | Status |
-| ------------- | -------------------- | ---------------------------------------------------- | --------------------------------------- | ------------------------------ | --------- |
-| `WF-DATA-020` | Cache write          | Gateway caches retrieval results                     | Row upserted with disclosed operation   | `FR-DATA-020`, `FR-DATA-021`  | Completed |
-| `WF-DATA-021` | Save dataset to file | Caller invokes `save_market_data`                    | Atomic CSV/Parquet write or quarantine  | `FR-DATA-022`, `FR-DATA-023`  | Completed |
-| `WF-DATA-022` | Load local dataset   | Caller invokes `load_local_dataset`/`load_ohlcv_csv` | Records / validated bars                | `FR-DATA-022`, `FR-DATA-025`  | Completed |
-| `WF-DATA-023` | Cache maintenance & invalidation | Operator invokes `clear_data_cache`; migration detects version change | Scoped clearing (dry-run default) / automatic eviction | `FR-DATA-021`, `FR-DATA-026` | Completed |
-
-##### `WF-DATA-021` — Save Dataset to File
-
-**Purpose:** Persist normalized records without ever leaving a corrupt file at the target path.
-**Actor / Trigger:** Downstream service or scheduler job; call to `save_market_data(records, path, format)`.
-**Preconditions:** Non-empty record list; target path inside an approved storage root; target file absent, or `overwrite=True`.
-
-**Main flow**
-
-1. `validate_storage_path` resolves and gates the target path.
-2. Records are framed with pandas and written to a temp file in the target directory.
-3. The temp file is atomically renamed/replaced onto the target path.
-4. `{path, record_count}` is returned.
-
-**Alternative and failure flows**
-
-| ID | Condition                          | Behaviour                                                                                                             |
-| -- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| A1 | Existing file with `overwrite=True`| `replace` swaps atomically.                                                                                                |
-| F1 | Invalid input                      | Empty records, bad extension, unapproved root, or existing file without overwrite → `ValidationError`.                     |
-| F2 | Dependency failure                 | Write failure moves the temp file to `data/quarantine/` and raises `DataError`; the target path is never left partially written. |
-
-**Postconditions:** Target file complete and readable, or quarantined artifact plus raised error.
-
-```mermaid
-sequenceDiagram
-    participant Caller
-    participant Store as storage.save_market_data
-    participant FS as Filesystem
-
-    Caller->>Store: records, path, format
-    Store->>Store: validate_storage_path(path)
-    Store->>FS: write temp file
-    alt write ok
-        Store->>FS: atomic rename → target
-        Store-->>Caller: {path, record_count}
-    else write fails
-        Store->>FS: move temp → data/quarantine/
-        Store-->>Caller: DataError
-    end
+```text
+untrusted source or request
+  → canonical record/request validation
+  → dataset/quality/source/broker contract
+  → internal or cross-domain consumer
 ```
+
+### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `records.py` | Validate immutable canonical market records. | `OHLCVRecord`, `TickRecord`, `SpreadRecord` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** None |
+| Missing | `market.py` | Define bounded requests, datasets, quality, and availability. | `DataQualityReport`, `MarketDataset`, `MarketDataRequest`, `DataAvailability` | **Standard library:** `datetime`, `decimal`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `records.py` → record contracts |
+| Missing | `broker.py` | Define read-only normalized account evidence. | `AccountStateSnapshot` | **Standard library:** `datetime`, `decimal`, `typing`<br>**Required third-party:** `pydantic`<br>**Local:** None; raw reads arrive via Brokers' `BrokerAdapter` read traits |
+| Missing | `market_context.py` | Define Risk-ready normalized market-context evidence without policy interpretation. | `MarketContextEvidence`, `MarketContextRequest` | **Standard library:** `datetime`, `decimal`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `sources.py`, `records.py` |
+| Missing | `fx.py` | Define bounded FX conversion requests and immutable conversion-path evidence. | `FXConversionRequest`, `FXRateLeg`, `FXConversionEvidence` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** `sources.py` |
+| Partial | `sources.py` | Define source readiness, capability, provenance, and license policy. | `SourceDescriptor`, `SourceLicensePolicy` | **Standard library:** `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** None |
+| Partial | `errors.py` | Define the only Data exception and deterministic code catalog. | `DataError`, `DATA_ERROR_MANIFEST` | **Standard library:** `dataclasses`, `collections.abc`<br>**Required third-party:** None<br>**Local:** None |
+| Missing | `__init__.py` | Expose the supported typed contract API. | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `MARKET_DATASET_SCHEMA` | `str` | `haruquant.data.market_dataset.v1` | Yes | `MarketDataset` | Stable contract identifier; breaking semantics require a new major version. |
+| Missing | `ACCOUNT_SNAPSHOT_SCHEMA` | `str` | `haruquant.data.account_state_snapshot.v1` | Yes | `AccountStateSnapshot` | Stable read-only account-evidence identifier. |
+| Missing | `MARKET_CONTEXT_SCHEMA` | `str` | `data.market_context_evidence.v1` | Yes | `MarketContextEvidence` | Stable schema identifier; compatibility is carried separately as `contract_version="v1"`. |
+| Missing | `FX_CONVERSION_EVIDENCE_SCHEMA` | `str` | `data.fx_conversion_evidence.v1` | Yes | `FXConversionEvidence` | Stable schema identifier; request supplies all freshness/path policy values. |
+| Missing | `NORMALIZATION_VERSION` | `str` | `v1` | Yes | all record/dataset contracts | Included in cache identity, manifests, and responses. |
+| Missing | `WORKFLOW_CONTEXTS` | `tuple[str, ...]` | `research, backtest, validation, risk, execution_bound` | Yes | `MarketDataRequest` | Unsupported values fail with `INVALID_INPUT`. |
+| Missing | `PRECISION_POLICIES` | `tuple[str, ...]` | `decimal_string, float_research_only, source_native_decimal, reject_on_missing_metadata` | Yes | `MarketDataset` | Official/persisted governed boundaries default to decimal strings; research float use is disclosed. |
+| Missing | `QUALITY_SAMPLE_LIMIT` | `int` | Configurable bounded value | Yes | `DataQualityReport` | Caps issue samples; exceeding it sets `truncated=true` rather than expanding payloads. |
+
+#### `records.py` — Canonical Records
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-DATA-001` | Validate UTC OHLCV with finite exact numerics, `low ≤ open/close ≤ high`, non-negative volume, provenance, and `available_at`. | `OHLCVRecord` | None | `DataError[VALIDATION_FAILED]`: field, UTC, order, or OHLC invariant fails | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_records_ohlcv_record()`<br>**Unit:** `tests/data/unit/test_records.py::test_ohlcv_record_rejects_invalid_range()` |
+| Partial | `FR-DATA-002` | Validate UTC ticks with finite bid/ask/last, `ask ≥ bid` when both exist, volume metadata, provenance, and `available_at`. | `TickRecord` | None | `DataError[VALIDATION_FAILED]`: invalid timestamp, numeric field, or bid/ask relation | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_records_tick_record()`<br>**Unit:** `tests/data/unit/test_records.py::test_tick_record_rejects_crossed_quote()` |
+| Partial | `FR-DATA-003` | Validate spread records with declared unit/scale, non-negative exact spread, UTC timestamp, provenance, and `available_at`. | `SpreadRecord` | None | `DataError[VALIDATION_FAILED]`: missing unit/scale or invalid spread | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_records_spread_record()`<br>**Unit:** `tests/data/unit/test_records.py::test_spread_record_requires_unit()` |
+
+**Rules:** Canonical timestamps are timezone-aware UTC. Broker-critical numerics use
+`Decimal` internally or lossless source-native values and serialize as decimal strings
+at official/persisted governed boundaries.
+
+**Implementation notes:** Refactor validated concepts from V1 `models.py`; do not copy
+provider defaults or expose mutable DataFrames as contracts.
+
+#### `market.py` — Requests, Datasets, Quality, and Availability
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-004` | Represent bounded quality evidence with status, score, issues, warnings, counts, truncation, schema version, UTC generation time, and governed blocking behavior. | `DataQualityReport` | None | `DataError[VALIDATION_FAILED]`: malformed or unbounded diagnostics | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_market_quality_report()`<br>**Unit:** `tests/data/unit/test_market_contracts.py::test_quality_report_bounds_samples()` |
+| Missing | `FR-DATA-005` | Expose immutable normalized records with availability, quality, provenance, license, cache, workflow, schema, normalization, and precision metadata. | `MarketDataset` | None | `DataError[DATA_QUALITY_FAILED]`: dataset violates blocking contract | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_market_dataset()`<br>**Unit:** `tests/data/unit/test_market_contracts.py::test_market_dataset_never_contains_provider_objects()` |
+| Missing | `FR-DATA-006` | Validate one typed internal request containing source, symbol, kind, optional timeframe/range/limit, cache/quality policies, UTC/IANA inputs, workflow, precision, explicit fallbacks, and request ID. | `MarketDataRequest` | None | `DataError[INVALID_INPUT]`: invalid enum/range/limit/timezone/fallback | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_market_data_request()`<br>**Unit:** `tests/data/unit/test_market_contracts.py::test_market_data_request_rejects_implicit_fallback()` |
+| Missing | `FR-DATA-007` | Represent indexed ranges, gaps, overlap/completeness evidence, record count, source revision/readiness, and provenance without materializing the full dataset. | `DataAvailability` | None | `DataError[VALIDATION_FAILED]`: inconsistent range or count evidence | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_market_availability()`<br>**Unit:** `tests/data/unit/test_market_contracts.py::test_availability_requires_measured_gaps()` |
+
+#### `broker.py` — Broker Boundary Contracts
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-008` | Expose immutable normalized account, balance, margin, position, order, connectivity, and staleness evidence with exact decimals and UTC snapshot time. | `AccountStateSnapshot` | None | `DataError[STALE_EVIDENCE]`: snapshot expired; `DataError[VALIDATION_FAILED]`: evidence incomplete | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_broker_account_snapshot()`<br>**Unit:** `tests/data/unit/test_broker_contracts.py::test_account_snapshot_rejects_stale_evidence()` |
+| Removed | `FR-DATA-009` | *(The restricted broker-execution channel is outside the architecture. Trading dispatches mutations directly through Brokers' `BrokerAdapter`; Data holds and issues no mutation capability.)* | — | None | — | — |
+
+#### `market_context.py` — Market-Context Evidence
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-075` | Validate a bounded request for session, calendar, spread, liquidity, volatility, correlation, and crisis evidence for one declared scope. | `MarketContextRequest` | None | `DataError[INVALID_INPUT]`: invalid scope, timezone, or evidence request | **Usage:** `tests/data/usage/test_usage_market_context.py::test_usage_market_context_request()`<br>**Unit:** `tests/data/unit/test_market_context.py::test_request_rejects_unknown_scope()` |
+| Missing | `FR-DATA-076` | Produce immutable `MarketContextEvidence v1` with separate contract version/schema ID, UTC freshness, provenance, and explicit missingness; never produce a Risk verdict. | `get_market_context_evidence(request: MarketContextRequest) -> MarketContextEvidence` | Read-only provider/source calls | `DataError[STALE_EVIDENCE|SOURCE_UNAVAILABLE|VALIDATION_FAILED]`: mandatory evidence unavailable, stale, or malformed | **Usage:** `tests/data/usage/test_usage_market_context.py::test_usage_get_market_context_evidence()`<br>**Unit:** `tests/data/unit/test_market_context.py::test_missing_evidence_is_explicit()` |
+
+#### `fx.py` — FX Conversion Evidence
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-078` | Validate source/target currencies, UTC `as_of`, explicit maximum age, and explicit allowed-path policy; reject same-leg cycles and unbounded discovery. | `FXConversionRequest` | None | `DataError[INVALID_INPUT, LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/test_usage_fx.py::test_usage_fx_request()`<br>**Unit:** `tests/data/unit/test_fx_contracts.py::test_request_requires_explicit_policy_and_freshness()` |
+| Missing | `FR-DATA-079` | Deterministically select an allowed acyclic direct/synthesized path and publish exact rates, UTC freshness, policy version, and source provenance as `FXConversionEvidence v1`; never fabricate a rate. | `get_fx_conversion_evidence(request: FXConversionRequest) -> FXConversionEvidence` | Read-only provider/source calls | `DataError[DATA_NOT_FOUND, STALE_EVIDENCE, SOURCE_UNAVAILABLE, VALIDATION_FAILED]` | **Usage:** `tests/data/usage/test_usage_fx.py::test_usage_fx_evidence()`<br>**Unit:** `tests/data/unit/test_fx_contracts.py::test_path_is_acyclic_exact_and_provenanced()` |
+
+#### `sources.py` — Source Contracts
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-010` | Declare source readiness, capabilities, credential/network/write requirements, schema/timezone/version metadata, promotion criteria, and sign-off evidence. | `SourceDescriptor` | None | `DataError[VALIDATION_FAILED]`: declaration incomplete or contradictory | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_sources_descriptor()`<br>**Unit:** `tests/data/unit/test_source_contracts.py::test_source_descriptor_requires_capabilities()` |
+| Partial | `FR-DATA-011` | Declare permitted workflow contexts, export/retention/attribution restrictions, enforcement behavior, and license status for each source. | `SourceLicensePolicy` | None | `DataError[LICENSE_RESTRICTION]`: metadata missing or use forbidden | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_sources_license_policy()`<br>**Unit:** `tests/data/unit/test_source_contracts.py::test_license_policy_fails_closed_for_validation()` |
+
+#### `errors.py` — Deterministic Errors
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-DATA-012` | Expose one redacted domain exception carrying a manifest code, safe details, retryability, severity, request ID, and operator action without raw exceptions. | `DataError` | None | None | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_errors_data_error()`<br>**Unit:** `tests/data/unit/test_errors.py::test_data_error_redacts_sensitive_details()` |
+| Missing | `FR-DATA-013` | Expose one immutable manifest for active deterministic codes and reserve `UNKNOWN_ERROR` for failures not otherwise mapped. | `DATA_ERROR_MANIFEST: Mapping[str, ErrorDefinition]` | None | None | **Usage:** `tests/data/usage/test_usage_contracts.py::test_usage_errors_manifest()`<br>**Unit:** `tests/data/unit/test_errors.py::test_error_manifest_is_complete_and_unique()` |
+
+```text
+INVALID_INPUT, VALIDATION_FAILED, DATA_QUALITY_FAILED, DATA_NOT_FOUND,
+EMPTY_RESULT, LIMIT_EXCEEDED, UNSUPPORTED_SOURCE, UNSUPPORTED_TIMEFRAME,
+UNSUPPORTED_OPERATION, SOURCE_UNAVAILABLE, SERVICE_UNAVAILABLE, NETWORK_ERROR,
+TIMEOUT, LICENSE_RESTRICTION, CREDENTIALS_MISSING, AUTHENTICATION_FAILED,
+PERMISSION_DENIED, POLICY_BLOCKED, STALE_EVIDENCE, CIRCUIT_BREAKER_OPEN, PRECISION_MISMATCH,
+MISSING_ASSET_METADATA, DATABASE_ERROR, DB_CONNECTION_ERROR, DB_WRITE_FAILED,
+CONCURRENT_WRITE_LOCKED, FILE_CORRUPTED, SCHEMA_MIGRATION_FAILED, JOB_NOT_FOUND,
+SCHEDULER_ERROR, CHECKPOINT_CORRUPTED, STATE_RECOVERY_FAILED, BUFFER_OVERFLOW,
+DATA_DROPPED, FEED_HEARTBEAT_TIMEOUT, UNKNOWN_ERROR
+```
+
+| Code | Exact condition |
+|---|---|
+| `INVALID_INPUT` | Required field missing, unknown field present, wrong JSON type, unsupported enum, malformed timestamp, or invalid range relation. |
+| `VALIDATION_FAILED` | Typed request/contract invariant fails after JSON shape validation. |
+| `DATA_QUALITY_FAILED` | Normalized content contains a quality issue marked blocking for the workflow. |
+| `DATA_NOT_FOUND` | Requested approved local/provider entity or indexed range does not exist. |
+| `EMPTY_RESULT` | A valid bounded request completes with no records and the contract requires non-empty output. |
+| `LIMIT_EXCEEDED` | Count/range/TTL/symbol/timeframe/chunk/payload exceeds its active manifest bound. |
+| `UNSUPPORTED_SOURCE` | Source name is not declared in the registry. |
+| `UNSUPPORTED_TIMEFRAME` | Timeframe is absent from the canonical manifest or conversion direction is invalid. |
+| `UNSUPPORTED_OPERATION` | Capability is explicitly out of Phase 1, including historical calendar reconstruction or public streaming. |
+| `SOURCE_UNAVAILABLE` | Declared source is disabled, not ready for the workflow, disconnected, or missing an optional dependency. |
+| `SERVICE_UNAVAILABLE` | Required shared infrastructure cannot serve a bounded request. |
+| `NETWORK_ERROR` | Classified provider transport failure occurs before a definitive response. |
+| `TIMEOUT` | Configured bounded provider/operation deadline expires. |
+| `LICENSE_RESTRICTION` | License metadata is missing where required or requested use/export/retention is forbidden. |
+| `CREDENTIALS_MISSING` | Enabled external source lacks a required secret reference. |
+| `AUTHENTICATION_FAILED` | Credential resolution or broker authentication fails without exposing secrets. |
+| `PERMISSION_DENIED` | Principal/scope/path is not authorized, including a non-Trading channel request. |
+| `POLICY_BLOCKED` | A deterministic safety policy forbids the requested operation. |
+| `STALE_EVIDENCE` | Snapshot/heartbeat/evidence is older than the governing freshness limit. |
+| `CIRCUIT_BREAKER_OPEN` | Persisted source breaker is open and cooldown/probe policy does not permit a call. |
+| `PRECISION_MISMATCH` | Value cannot satisfy declared digits/step/rounding policy without forbidden truncation or ambiguity. |
+| `MISSING_ASSET_METADATA` | Strict workflow needs symbol digits, step, unit, or scale that the source did not prove. |
+| `DATABASE_ERROR` | Classified SQLite operation fails outside more specific connection/write codes. |
+| `DB_CONNECTION_ERROR` | SQLite path/open/configuration prevents creation of a short-lived connection. |
+| `DB_WRITE_FAILED` | Transaction/artifact/cache/audit write cannot commit durably. |
+| `CONCURRENT_WRITE_LOCKED` | Another verified writer/worker holds the same path, migration, job, or chunk lease. |
+| `FILE_CORRUPTED` | Artifact cannot be decoded or its hash/manifest/schema evidence does not match. |
+| `SCHEMA_MIGRATION_FAILED` | Migration ownership/order/checksum/precondition/apply/rollback validation fails. |
+| `JOB_NOT_FOUND` | Requested persisted job identifier does not exist. |
+| `SCHEDULER_ERROR` | Valid job cannot make the requested lifecycle transition or scheduler mechanism fails. |
+| `CHECKPOINT_CORRUPTED` | Checkpoint identity/order/hash does not match committed chunk state. |
+| `STATE_RECOVERY_FAILED` | Interrupted job/feed/lock state cannot be proven safe for recovery. |
+| `BUFFER_OVERFLOW` | Feed buffer reaches capacity under `halt` or cannot apply configured backpressure. |
+| `DATA_DROPPED` | Feed overflow policy intentionally drops one or more events and records a gap. |
+| `FEED_HEARTBEAT_TIMEOUT` | No verified feed heartbeat/event arrives before the configured deadline. |
+| `UNKNOWN_ERROR` | An unexpected failure remains after deterministic classification; safe details only and not retryable by default. |
+
+### Feature usage examples
+
+`tests/data/usage/test_usage_contracts.py` contains one `test_usage_*` function per
+`FR-DATA-001` through `FR-DATA-013` and imports only `app.services.data.contracts`.
 
 ---
 
-### 9.4 `FEAT-004` — Transformations and Synthetic Data
+### 4.2 `storage/` — Shared Persistence Infrastructure
 
-**Purpose:** Deterministic, lookahead-free record transformations: OHLCV
-resampling, tick aggregation, multi-timeframe alignment, historical labeling,
-and seeded synthetic bar/tick generation (GBM) for tests and research.
+**Purpose:** Provide the single safe SQLite, file, cache, lock, migration, and audit
+infrastructure while preserving each domain's schema ownership.
 
-**Scope:** Includes `resample_ohlcv` (timeframe up-conversion),
-`aggregate_ticks_to_bars`, `align_multitimeframe_data` without lookahead
-leakage, `generate_synthetic_bars` / `generate_synthetic_ticks` (seeded,
-size-capped), and `label_market_data` for historical labeling. Excludes data
-repair/interpolation of quality issues (`RULE-005`) and indicator computation
-(owned by `app/services/indicators`).
+**Module flow:**
 
-#### Requirements
-
-| ID             | Type        | Requirement                                                                                                  | Verification | Status |
-| -------------- | ----------- | ------------------------------------------------------------------------------------------------------------ | ------------ | --------- |
-| `FR-DATA-030`  | Functional  | Resampling and aggregation shall be deterministic for identical inputs.                                        | Unit test    | Completed |
-| `FR-DATA-031`  | Functional  | Multi-timeframe alignment shall never expose future (lookahead) values to lower-timeframe rows.                | Unit test    | Completed |
-| `FR-DATA-032`  | Functional  | Synthetic generation shall be seed-reproducible and enforce `MAX_SYNTHETIC_BARS`/`MAX_SYNTHETIC_TICKS` caps.   | Unit test    | Completed |
-| `FR-DATA-033`  | Functional  | Transform outputs shall be JSON-safe records with native Python numeric types.                                 | Unit test    | Completed |
-| `NFR-DATA-030` | Performance | Resampling 100,000 M1 bars to H1 completes in under 3.0 seconds.                                               | Benchmark    | Completed |
-| `NFR-DATA-031` | Reliability | Invalid timeframe conversions fail with `ValidationError`, not silently.                                       | Unit test    | Completed |
-
-#### Workflows
-
-| Workflow ID   | Workflow                   | Trigger                            | Outcome                         | Requirements                  | Status |
-| ------------- | -------------------------- | ---------------------------------- | -------------------------------- | ------------------------------ | --------- |
-| `WF-DATA-030` | Resample OHLCV             | Caller invokes `resample_ohlcv`    | Higher-timeframe bars            | `FR-DATA-030`, `FR-DATA-033`  | Completed |
-| `WF-DATA-031` | Generate synthetic data    | Caller invokes generator functions | Seeded synthetic records         | `FR-DATA-032`, `FR-DATA-033`  | Completed |
-| `WF-DATA-032` | Align multi-timeframe data | Caller invokes alignment           | Lookahead-free aligned datasets  | `FR-DATA-031`                 | Completed |
-
-##### `WF-DATA-030` — Resample OHLCV
-
-**Purpose:** Convert bars to a higher timeframe deterministically.
-**Actor / Trigger:** Research/backtest workflow; call to `resample_ohlcv(records, source_tf, target_tf)`.
-**Preconditions:** Records are valid canonical OHLCV; target timeframe is a supported multiple of the source.
-
-**Main flow**
-
-1. Timeframes convert to pandas frequencies (`timeframe_to_pandas_freq`).
-2. Records frame with UTC index; OHLCV columns aggregate (first/max/min/last/sum).
-3. Numpy scalar types clean to native Python (`_clean_numpy_types`).
-4. Resampled JSON-safe records are returned.
-
-**Alternative and failure flows**
-
-| ID | Condition       | Behaviour                                                                              |
-| -- | --------------- | --------------------------------------------------------------------------------------- |
-| A1 | Tick input      | `aggregate_ticks_to_bars` builds bars from ticks with the same guarantees.               |
-| F1 | Invalid input   | Unsupported timeframe or malformed records raise `ValidationError`.                      |
-| F2 | Dependency failure | Not applicable — pure in-memory transform, deterministic function of its inputs.      |
-
-**Postconditions:** Output record count and boundaries consistent with the target timeframe; input untouched.
-
-```mermaid
-sequenceDiagram
-    participant Caller
-    participant TR as transforms.resample_ohlcv
-
-    Caller->>TR: records, source_tf, target_tf
-    TR->>TR: validate timeframes, frame with UTC index
-    TR->>TR: aggregate OHLCV, clean numpy types
-    TR-->>Caller: resampled JSON-safe records
+```text
+validated command or dataset
+  → path/transaction lock
+  → atomic operation
+  → committed result or complete rollback
 ```
+
+### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `database.py` | Execute bounded SQLite transactions without leaking connections. | `execute_transaction` | **Standard library:** `sqlite3`, `pathlib`, `collections.abc`<br>**Required third-party:** None<br>**Local:** `contracts.errors` |
+| Missing | `locking.py` | Enforce exclusive path-scoped write ownership. | `acquire_write_lock` | **Standard library:** `contextlib`, `pathlib`, `threading`, `time`<br>**Required third-party:** None<br>**Local:** `contracts.errors` |
+| Missing | `migrations.py` | Execute ordered domain-owned migrations and maintain the shared ledger. | `run_domain_migrations` | **Standard library:** `dataclasses`, `collections.abc`<br>**Required third-party:** None<br>**Local:** `database.py`, `locking.py`, `contracts.errors` |
+| Partial | `datasets.py` | Load and atomically save normalized CSV/Parquet artifacts and manifests. | `load_dataset`, `save_dataset` | **Standard library:** `hashlib`, `pathlib`<br>**Required third-party:** `pandas`, `pyarrow`<br>**Local:** `contracts`, `locking.py` |
+| Partial | `cache.py` | Read/write one versioned TTL/revision-aware cache. | `get_cache_entry`, `put_cache_entry` | **Standard library:** `datetime`, `hashlib`<br>**Required third-party:** None<br>**Local:** `database.py`, `contracts` |
+| Missing | `audit.py` | Persist Utils-owned redacted `AuditEvent` envelopes durably and expose a governed bounded query. | `persist_audit_event`, `query_audit_events` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `database.py`; Data audit query/page contracts; `app.utils` → `AuditEvent`, `AuthContext` |
+| Missing | `__init__.py` | Expose the supported persistence-infrastructure API. | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `DATABASE_URL` | `str` | None | Yes | database, migrations, cache, audit | SQLite URL; missing/unusable configuration fails initialization closed. |
+| Missing | `DATA_DIR` | `Path` | None | Yes | datasets, database | Owner-configured data root; never inferred from caller input. |
+| Partial | `APPROVED_STORAGE_ROOTS` | `tuple[Path, ...]` | `data/raw`, `data/processed`, `data/cache`, `artifacts/data` | Yes | `load_dataset`, `save_dataset` | Escaping, traversal, and unapproved hidden/system paths are rejected. |
+| Missing | `SQLITE_BUSY_TIMEOUT_SECONDS` | `float` | Configurable | Yes | `execute_transaction` | Bounds lock wait; expiry returns `CONCURRENT_WRITE_LOCKED`. |
+| Missing | `CACHE_TTL_MAX_SECONDS` | `int` | `604800` | Yes | cache operations | Request override ceiling; a source may declare a stricter value. |
+| Missing | `CACHE_TTL_DAILY_SECONDS` | `int` | `86400` | Yes | cache | Initial configurable daily-or-higher safety default. |
+| Missing | `CACHE_TTL_INTRADAY_SECONDS` | `int` | `3600` | Yes | cache | Initial configurable intraday-bar safety default. |
+| Missing | `CACHE_TTL_TICK_SECONDS` | `int` | `900` | Yes | cache | Initial configurable tick safety default. |
+
+#### `database.py`, `locking.py`, and `migrations.py`
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-DATA-014` | Execute a bounded caller-owned statement plan in one short-lived SQLite transaction, return normalized results without a connection/session, and roll back atomically on failure. | `execute_transaction(request: TransactionRequest) -> TransactionResult` | Persistence write | `DataError[DB_CONNECTION_ERROR|DATABASE_ERROR|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_database_execute_transaction()`<br>**Unit:** `tests/data/unit/test_database.py::test_execute_transaction_rolls_back_atomically()` |
+| Missing | `FR-DATA-015` | Validate ownership/order/checksums, acquire the shared lock, and execute domain-owned migration definitions exactly once while preserving an immutable ledger. | `run_domain_migrations(request: MigrationRequest) -> MigrationResult` | Persistence write | `DataError[SCHEMA_MIGRATION_FAILED|CONCURRENT_WRITE_LOCKED]` | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_migrations_run_domain_migrations()`<br>**Unit:** `tests/data/unit/test_migrations.py::test_run_domain_migrations_rejects_modified_applied_step()` |
+| Missing | `FR-DATA-016` | Grant at most one writer lease per resolved path, reject conflicts deterministically, and release it on exit or verified stale recovery. | `acquire_write_lock(path: Path, request_id: str | None = None) -> WriteLock` | Local state mutation; persistence write | `DataError[CONCURRENT_WRITE_LOCKED]` | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_locking_acquire_write_lock()`<br>**Unit:** `tests/data/unit/test_locking.py::test_write_lock_is_path_scoped_and_exclusive()` |
+
+#### `datasets.py`, `cache.py`, and `audit.py`
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-DATA-017` | Load CSV/Parquet plus manifest only from an approved root, verify hash/schema/normalization metadata, normalize records, and reject corruption without hidden migration. | `load_dataset(request: DatasetLoadRequest) -> MarketDataset` | Read-only | `DataError[PERMISSION_DENIED|FILE_CORRUPTED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_datasets_load_dataset()`<br>**Unit:** `tests/data/unit/test_datasets.py::test_load_dataset_rejects_hash_mismatch()` |
+| Partial | `FR-DATA-018` | Validate license/quality/path, lock the target, write artifact and manifest through a temporary file, and atomically commit or quarantine failure. | `save_dataset(request: DatasetSaveRequest) -> StorageManifest` | Persistence write | `DataError[PERMISSION_DENIED|CONCURRENT_WRITE_LOCKED|DATA_QUALITY_FAILED|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_datasets_save_dataset()`<br>**Unit:** `tests/data/unit/test_datasets.py::test_save_dataset_commits_artifact_and_manifest_atomically()` |
+| Partial | `FR-DATA-019` | Return a cache entry only when request dimensions, schema/normalization, source revision/raw hash, and stale policy match; stale data is never silent. | `get_cache_entry(request: CacheReadRequest) -> CacheEntry | None` | Read-only | `DataError[DATABASE_ERROR]`; stale policy may yield warning metadata or miss | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_cache_get_entry()`<br>**Unit:** `tests/data/unit/test_cache.py::test_cache_invalidates_on_source_revision()` |
+| Partial | `FR-DATA-020` | Write a bounded cache entry with complete identity/TTL metadata and surface an optional cache-write failure without corrupting a successful retrieval result. | `put_cache_entry(request: CacheWriteRequest) -> CacheWriteResult` | Persistence write | `DataError[DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_cache_put_entry()`<br>**Unit:** `tests/data/unit/test_cache.py::test_cache_write_failure_is_not_silent()` |
+| Missing | `FR-DATA-021` | Persist a redacted `AuditEvent v1` idempotently with trace identifiers and surface every persistence failure. | `persist_audit_event(event: AuditEvent) -> AuditPersistenceResult` | Persistence write | `DataError[DATABASE_ERROR|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_audit_persist_event()`<br>**Unit:** `tests/data/unit/test_audit_storage.py::test_persist_audit_event_is_idempotent()` |
+| Missing | `FR-DATA-077` | Authorize and execute a bounded, deterministically ordered audit query without exposing storage handles or unredacted payloads. | `query_audit_events(request: AuditEventQuery, auth_context: AuthContext) -> AuditEventPage` | Read-only | `DataError[PERMISSION_DENIED|INVALID_INPUT|LIMIT_EXCEEDED|DATABASE_ERROR]` | **Usage:** `tests/data/usage/test_usage_storage.py::test_usage_audit_query()`<br>**Unit:** `tests/data/unit/test_audit_storage.py::test_query_is_authorized_bounded_and_cursor_ordered()` |
+
+**Implementation notes:** Reuse V1 transaction, cache-key, approved-root, temporary
+write, and quarantine logic. Remove import-time schema creation, swallowed durability
+failures, duplicate cache semantics, and connection leakage. No pool or automatic
+on-read migration is allowed.
+
+### Feature usage examples
+
+`tests/data/usage/test_usage_storage.py` contains one example for each
+`FR-DATA-014` through `FR-DATA-021`.
 
 ---
 
-### 9.5 `FEAT-005` — Scheduled Data Update Jobs
+### 4.3 `sources/` — Source Policy and Broker Lifecycle
 
-**Purpose:** A persistent, lease-based job lifecycle (`data_jobs` table) for
-recurring or one-shot data updates — create, start, stop, run-once, status —
-with explicit crash recovery invoked at application startup, never at import
-time (`RULE-001`).
+**Purpose:** Isolate provider-specific reads behind a small typed protocol and enforce
+readiness, license, fallback, connection, and Trading-only broker capability policy.
 
-**Scope:** Includes job creation with validated symbols/timeframes/frequency
-bounds (`_validate_job_creation_args`); start/stop, single-run execution, and
-status reporting; crash recovery (`recover_crashed_jobs` /
-`recover_data_jobs_on_startup`, alias `initialize_data_scheduler`) transitioning
-orphaned `running` jobs to `recovering`; and re-export of `feeds.py`
-observability functions for compatibility. Excludes implicit import-time
-recovery or background task creation, and cross-process distributed scheduling
-(single-node leases only).
+**Module flow:**
 
-#### Requirements
-
-| ID             | Type          | Requirement                                                                                                | Verification     | Status |
-| -------------- | ------------- | ------------------------------------------------------------------------------------------------------------ | ---------------- | --------- |
-| `FR-DATA-040`  | Functional    | Job creation shall reject more than 500 symbols, more than 20 timeframes, or frequency below 60 seconds.      | Unit test        | Completed |
-| `FR-DATA-041`  | Functional    | Job state, checkpoints, leases, and errors shall persist in the `data_jobs` table.                            | Integration test | Completed |
-| `FR-DATA-042`  | Functional    | Startup recovery shall transition jobs left in `running` state to `recovering` only when explicitly invoked.  | Integration test | Completed |
-| `FR-DATA-043`  | Functional    | `run_data_update_job_once` shall execute a full job cycle synchronously and record its outcome.               | Integration test | Partial |
-| `FR-DATA-044`  | Functional    | Historical backfill shall run in chunks with per-chunk committed checkpoints, consuming the `DEFAULT_BACKFILL_*` constants (§7.3) and resuming from the last checkpoint (V1 `DATA-FR-037`/`038`). | Integration test | Missing |
-| `NFR-DATA-040` | Reliability   | Job state transitions are transactional; leases prevent double-runs.                                          | Integration test | Completed |
-| `NFR-DATA-041` | Observability | `get_data_update_job_status` reports state, checkpoint, last error.                                           | Unit test        | Completed |
-
-#### Workflows
-
-| Workflow ID   | Workflow         | Trigger                                   | Outcome                               | Requirements                  | Status |
-| ------------- | ---------------- | ----------------------------------------- | -------------------------------------- | ------------------------------ | --------- |
-| `WF-DATA-040` | Job lifecycle    | Caller creates/starts/stops a job         | Persisted job state transitions        | `FR-DATA-040`, `FR-DATA-041`  | Completed |
-| `WF-DATA-041` | Run job once     | Caller invokes `run_data_update_job_once` | One retrieval+persist cycle executed   | `FR-DATA-043`                 | Partial |
-| `WF-DATA-042` | Startup recovery | App startup calls recovery                | Orphaned jobs moved to `recovering`    | `FR-DATA-042`                 | Completed |
-| `WF-DATA-043` | Chunked historical backfill | Job cycle over a large historical range   | Chunked downloads with committed per-chunk checkpoints | `FR-DATA-044`                 | Missing |
-
-##### `WF-DATA-041` — Run Job Once
-
-**Purpose:** Execute one data-update cycle for a named job.
-**Actor / Trigger:** Scheduler caller or operator; `run_data_update_job_once(name)`.
-**Preconditions:** Job exists and is enabled; lease is available.
-
-**Main flow**
-
-1. Job definition loads from `data_jobs`.
-2. For each symbol × timeframe, the gateway retrieves fresh data (`WF-DATA-001`).
-3. Results persist to the job's configured storage path/format (`WF-DATA-021`).
-4. Checkpoint, `last_run_status`, and timestamps update transactionally.
-
-**Alternative and failure flows**
-
-| ID | Condition               | Behaviour                                                                                        |
-| -- | ----------------------- | --------------------------------------------------------------------------------------------------- |
-| A1 | No new data             | Cycle completes with a no-op checkpoint update.                                                       |
-| F1 | Invalid input           | Unknown job name raises `ValidationError`.                                                            |
-| F2 | Dependency failure      | Retrieval/persist errors record `last_error` and mark the run failed without corrupting job state.    |
-| F3 | Unknown outcome (crash) | Next explicit startup recovery moves the job from `running` to `recovering`.                          |
-
-**Postconditions:** Job row reflects the run outcome; datasets persisted under approved roots.
-
-```mermaid
-sequenceDiagram
-    participant Op as Operator / Scheduler
-    participant SCH as scheduler.run_data_update_job_once
-    participant GW as gateway
-    participant ST as storage
-
-    Op->>SCH: job name
-    SCH->>ST: load job from data_jobs
-    loop symbols × timeframes
-        SCH->>GW: get_data(...)
-        GW-->>SCH: records
-        SCH->>ST: save_market_data(...)
-    end
-    SCH->>ST: update checkpoint + last_run_status
-    SCH-->>Op: run result
+```text
+typed request
+  → source policy
+  → lazy registry resolution
+  → read-only adapter or broker lifecycle
+  → provider-neutral result
 ```
+
+### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `protocol.py` | Define the minimum read-only source behavior. | `MarketDataSource.fetch`, `.list_symbols`, `.get_symbol_metadata` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `contracts` |
+| Partial | `registry.py` | Register and lazily resolve declared sources without side effects. | `register_source` | **Standard library:** `collections.abc`, `threading`<br>**Required third-party:** None<br>**Local:** `protocol.py`, `contracts.sources` |
+| Partial | `policy.py` | Enforce source readiness/license/fallback and evidence-based promotion. | `evaluate_source_policy`, `promote_source` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts`, `storage` |
+| Missing | `broker.py` | Normalize read-only account snapshots from Brokers' `BrokerAdapter` account reads; Data owns no connection, credential, or mutation behavior. | `get_account_state_snapshot` | **Standard library:** None<br>**Required third-party:** None at import time<br>**Local:** `contracts`; `app.utils` → `AuthContext`; Brokers `BrokerAdapter` read traits |
+| Partial | `local.py` | Implement CSV/Parquet read adapters. | None; registered privately | **Standard library:** None<br>**Required third-party:** `pandas`, `pyarrow`<br>**Local:** `protocol.py`, `storage.datasets` |
+| Missing | `external.py` | Implement lazy staging provider read adapters over Brokers' `BrokerAdapter` read traits. | None; registered privately | **Standard library:** `importlib`<br>**Required third-party:** None (provider SDKs live in Brokers)<br>**Local:** `protocol.py`; Brokers registry/read traits |
+| Missing | `__init__.py` | Expose only the typed source/policy/broker API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `MT5_ENABLED` | `bool` | `False` | Yes | broker read adapters (via Brokers) | Brokers-owned toggle consumed here; disabled broker paths return `SOURCE_UNAVAILABLE`; they never fall back silently. |
+| Missing | `SOURCE_READINESS` | `Mapping[str, str]` | CSV/Parquet `production`; MT5/cTrader/Dukascopy/Binance discovery/feed gateway `staging` | Yes | policy/registry | Synthetic is production processing, not an adapter. |
+| Missing | `SOURCE_CALL_TIMEOUT_SECONDS` | `Mapping[str, float]` | Source-specific configurable | Yes | external adapters | Timeout maps to `TIMEOUT` and records breaker evidence. |
+| Missing | `SOURCE_RATE_LIMITS` | `Mapping[str, RateLimit]` | Source-specific configurable | Yes | policy/adapters | Global per-source limit; exhaustion fails deterministically. |
+| Missing | `CIRCUIT_BREAKER_POLICY` | `BreakerPolicy` | Configurable | Yes | policy/adapters | Persistent breaker blocks calls after threshold and survives restart. |
+
+#### Public source API
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-DATA-022` | Require every adapter to perform one bounded read and return provider-neutral raw records plus source metadata without broker mutation. | `MarketDataSource.fetch(request: SourceReadRequest) -> RawSourceBatch` | External API call or Read-only | `DataError[SOURCE_UNAVAILABLE|NETWORK_ERROR|TIMEOUT]` | **Usage:** `tests/data/usage/test_usage_sources.py::test_usage_protocol_fetch()`<br>**Unit:** `tests/data/unit/test_source_protocol.py::test_source_fetch_contract_is_read_only()` |
+| Partial | `FR-DATA-023` | Require bounded, deterministically ordered symbol discovery with cursor pagination and declared discovery capability. | `MarketDataSource.list_symbols(request: SymbolListRequest) -> SymbolPage` | External API call or Read-only | `DataError[UNSUPPORTED_OPERATION|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/test_usage_sources.py::test_usage_protocol_list_symbols()`<br>**Unit:** `tests/data/unit/test_source_protocol.py::test_list_symbols_is_bounded_and_ordered()` |
+| Partial | `FR-DATA-024` | Require normalized symbol metadata with provenance and explicit missing fields rather than optimistic defaults. | `MarketDataSource.get_symbol_metadata(request: SymbolMetadataRequest) -> SymbolMetadata` | External API call or Read-only | `DataError[DATA_NOT_FOUND|MISSING_ASSET_METADATA]` | **Usage:** `tests/data/usage/test_usage_sources.py::test_usage_protocol_symbol_metadata()`<br>**Unit:** `tests/data/unit/test_source_protocol.py::test_symbol_metadata_does_not_invent_fields()` |
+| Partial | `FR-DATA-025` | Register a source descriptor and lazy factory atomically, reject duplicate/conflicting declarations, and perform no I/O during registration/import. | `register_source(descriptor: SourceDescriptor, factory: SourceFactory) -> None` | Local state mutation | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/test_usage_sources.py::test_usage_registry_register_source()`<br>**Unit:** `tests/data/unit/test_source_registry.py::test_registry_is_lazy_and_duplicate_safe()` |
+| Partial | `FR-DATA-026` | Validate requested and explicit fallback sources in order against capability, readiness, license, context, timeout/rate, and breaker state and record every attempt. | `evaluate_source_policy(request: MarketDataRequest) -> SourcePlan` | Read-only | `DataError[LICENSE_RESTRICTION|SOURCE_UNAVAILABLE|CIRCUIT_BREAKER_OPEN]` | **Usage:** `tests/data/usage/test_usage_sources.py::test_usage_policy_evaluate_source()`<br>**Unit:** `tests/data/unit/test_source_policy.py::test_policy_never_invents_fallback()` |
+| Missing | `FR-DATA-027` | Change readiness only from a complete authenticated evidence package, record an audit event, and permit immediate reversible demotion. | `promote_source(request: SourcePromotionRequest, auth: AuthContext) -> SourceDescriptor` | Persistence write; Event publication | `DataError[PERMISSION_DENIED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/test_usage_sources.py::test_usage_policy_promote_source()`<br>**Unit:** `tests/data/unit/test_source_policy.py::test_promotion_requires_all_evidence()` |
+| Missing | `FR-DATA-028` | Return a fresh normalized `AccountStateSnapshot v1` from read-only Brokers `BrokerAdapter` account reads without exposing credentials/provider objects. | `get_account_state_snapshot(request: AccountSnapshotRequest) -> AccountStateSnapshot` | External API call (read-only, via Brokers) | `DataError[SOURCE_UNAVAILABLE|STALE_EVIDENCE|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/test_usage_sources.py::test_usage_broker_account_snapshot()`<br>**Unit:** `tests/data/unit/test_broker_source.py::test_account_snapshot_fails_closed_when_incomplete()` |
+| Removed | `FR-DATA-029` | *(Channel issuance is outside Data; Trading obtains mutation capability directly from Brokers' `BrokerAdapter`.)* | — | None | — | — |
+
+**Implementation notes:** Refactor V1 adapter routing, license gates, rate-limit intent,
+and persisted breakers. External adapters stay staging and lazy. Brokers owns broker
+clients and connection lifecycle; Data consumes only `BrokerAdapter`
+read traits, and no Data file imports `MetaTrader5` or any provider SDK directly.
+
+### Feature usage examples
+
+`tests/data/usage/test_usage_sources.py` contains one example for each
+`FR-DATA-022` through `FR-DATA-028`.
 
 ---
 
-### 9.6 `FEAT-006` — Real-Time Feed Observability
+### 4.4 `access/` — Market and Account Read Orchestration
 
-**Purpose:** A read-only, JSON-safe view of real-time feed health
-(`get_feed_status` native and `get_feed_status_tool` wrapper): buffer capacity,
-heartbeat freshness, overflow policy handling, and deterministic reconnect
-backoff — without ever exposing sockets, SDK objects, or credential-bearing
-connection strings.
+**Purpose:** Produce typed canonical datasets and reference evidence from policy,
+cache, source, normalization, and quality collaboration.
 
-**Scope:** Includes feed state persistence (`feed_state` table) plus in-memory
-mock feed registration (`register_mock_feed`) for tests; bounded buffer checks
-(`check_feed_buffer_capacity`, default capacity 10,000 events); heartbeat
-timeout detection (`check_feed_heartbeat_timeout`, default 30.0s) and
-`record_feed_heartbeat`; overflow policies `halt`, `drop_and_reconcile`,
-`backpressure` (`handle_feed_overflow`); and the `ReconnectPolicy` backoff
-model with `compute_reconnect_delay` (5 retries, 0.5s base / 30s max, 0.2
-jitter, 60s cooldown). Excludes actual streaming ingestion loops (no live
-subscription exists in this phase) and returning raw connection objects or
-credentials.
+**Module flow:**
 
-#### Requirements
-
-| ID             | Type          | Requirement                                                                                                     | Verification  | Status |
-| -------------- | ------------- | ------------------------------------------------------------------------------------------------------------------ | ------------- | --------- |
-| `FR-DATA-050`  | Functional    | `get_feed_status` shall return only bounded, JSON-safe diagnostic fields, filterable by feed/source/symbol/kind.    | Unit test     | Completed |
-| `FR-DATA-051`  | Functional    | Feed status shall include `within_buffer_capacity` and `heartbeat_timed_out` derived diagnostics.                   | Unit test     | Completed |
-| `FR-DATA-052`  | Functional    | Buffer overflow shall be handled by exactly one of the three explicit policies, never silently.                     | Unit test     | Completed |
-| `FR-DATA-053`  | Functional    | Reconnect delays shall follow the deterministic `ReconnectPolicy` backoff with jitter and cooldown.                 | Unit test     | Completed |
-| `FR-DATA-054`  | Functional    | `drop_and_reconcile` overflow shall trigger automatic historical-backfill reconciliation of the dropped gap window (V1 `DATA-FR-039`).                | Integration test | Missing |
-| `NFR-DATA-050` | Security      | No sockets, SDK objects, or connection strings cross the boundary.                                                  | Security test | Completed |
-| `NFR-DATA-051` | Observability | Overflow and heartbeat events increment persisted counters.                                                         | Unit test     | Completed |
-
-#### Workflows
-
-| Workflow ID   | Workflow             | Trigger                                 | Outcome                          | Requirements                  | Status |
-| ------------- | -------------------- | --------------------------------------- | --------------------------------- | ------------------------------ | --------- |
-| `WF-DATA-050` | Query feed status    | Caller invokes `get_feed_status(_tool)` | Enriched read-only diagnostics    | `FR-DATA-050`, `FR-DATA-051`  | Completed |
-| `WF-DATA-051` | Handle feed overflow | Buffer depth exceeds capacity           | Policy applied, counters updated  | `FR-DATA-052`, `FR-DATA-053`  | Completed |
-| `WF-DATA-052` | Gap reconciliation backfill | Feed enters `reconciling` after drop overflow | Backfill job dispatched for the dropped gap window | `FR-DATA-054`             | Missing |
-
-##### `WF-DATA-050` — Query Feed Status
-
-**Purpose:** Report the health of registered feeds.
-**Actor / Trigger:** Monitoring caller or AI agent tool; `get_feed_status(feed_id=None, source=None, symbol=None, data_kind=None)`.
-**Preconditions:** Zero or more feeds registered (in-memory mocks or `feed_state` rows).
-
-**Main flow**
-
-1. Filters apply to in-memory feeds and `feed_state` rows.
-2. Each feed enriches with `within_buffer_capacity` and `heartbeat_timed_out` (`_enrich_feed_observability`).
-3. A single feed dict (by `feed_id`) or list of feed dicts is returned; the tool wrapper always envelopes a `feeds` list.
-
-**Alternative and failure flows**
-
-| ID | Condition          | Behaviour                                                            |
-| -- | ------------------ | ----------------------------------------------------------------------- |
-| A1 | No matching feeds  | An empty list is returned (success, not an error).                       |
-| F1 | Invalid input      | Malformed filters raise `ValidationError`.                               |
-| F2 | Dependency failure | DB read failure maps to a deterministic error at the tool boundary.      |
-
-**Postconditions:** No state changed; diagnostics logged.
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant API as public_api.get_feed_status_tool
-    participant FD as feeds.get_feed_status
-    participant Store as feed_state (SQLite)
-
-    Client->>API: optional filters
-    API->>FD: get_feed_status(...)
-    FD->>Store: read matching feeds
-    FD->>FD: enrich buffer/heartbeat diagnostics
-    FD-->>API: feed dict(s)
-    API-->>Client: StandardResponse {feeds: [...]}
+```text
+MarketDataRequest
+  → source plan and cache
+  → source read
+  → normalization and quality
+  → typed result
 ```
+
+### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `historical.py` | Retrieve canonical bars, ticks, and spreads. | `fetch_market_dataset` | **Standard library:** None<br>**Required third-party:** `pandas` for internal frames only<br>**Local:** `contracts`, `sources`, `storage` |
+| Partial | `reference.py` | Discover symbols, normalize metadata, and inspect real availability. | `discover_symbols`, `fetch_symbol_metadata`, `inspect_availability` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts`, `sources`, `storage` |
+| Partial | `sessions.py` | Return current configured hours/sessions and bounded historical volume. | `get_current_schedule`, `fetch_historical_volume` | **Standard library:** `datetime`, `zoneinfo`<br>**Required third-party:** None<br>**Local:** `contracts`, `historical.py` |
+| Missing | `account.py` | Delegate read-only snapshot access through the broker lifecycle. | None; uses `sources.get_account_state_snapshot` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `sources.broker` |
+| Missing | `__init__.py` | Expose the typed read API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `OHLCV_DEFAULT_LIMIT` / `OHLCV_MAX_LIMIT` | `int` | `5000` / `50000` | Yes | historical/API | Initial configurable safety bounds; excess returns artifact reference or `LIMIT_EXCEEDED`. |
+| Missing | `TICK_DEFAULT_LIMIT` / `TICK_MAX_LIMIT` | `int` | `10000` / `250000` | Yes | historical/API | Initial configurable safety bounds validated by later benchmarks/source limits. |
+| Missing | `SPREAD_DEFAULT_LIMIT` / `SPREAD_MAX_LIMIT` | `int` | `10000` / `250000` | Yes | historical/API | Initial configurable safety bounds. |
+| Missing | `SYMBOL_LIST_DEFAULT_LIMIT` / `SYMBOL_LIST_MAX_LIMIT` | `int` | `1000` / `10000` | Yes | `discover_symbols` | Enforces deterministic bounded pagination. |
+| Missing | `AVAILABILITY_SCAN_MAX_RECORDS` | `int` | `1000000` | Yes | `inspect_availability` | Uses indexes/manifests first; excess audit materialization returns `LIMIT_EXCEEDED`. |
+| Missing | `VOLUME_RESPONSE_MODES` | `tuple[str, ...]` | `records, buckets, summary` | Yes | volume access | Unsupported values return `INVALID_INPUT`. |
+
+#### Public access API
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-DATA-030` | Execute bounded bars/ticks/spreads retrieval through explicit source policy, versioned cache, normalization, quality, and precision, returning `MarketDataset`. | `fetch_market_dataset(request: MarketDataRequest) -> MarketDataset` | Read-only; optional External API call and cache write | `DataError`: mapped retrieval/quality/policy code | **Usage:** `tests/data/usage/test_usage_access.py::test_usage_historical_fetch_market_dataset()`<br>**Unit:** `tests/data/unit/test_historical_access.py::test_fetch_market_dataset_reports_actual_source()` |
+| Partial | `FR-DATA-031` | Return a bounded deterministic symbol page with cursor, source readiness, and provenance. | `discover_symbols(request: SymbolListRequest) -> SymbolPage` | Read-only or External API call | `DataError[LIMIT_EXCEEDED|UNSUPPORTED_OPERATION|SOURCE_UNAVAILABLE]` | **Usage:** `tests/data/usage/test_usage_access.py::test_usage_reference_discover_symbols()`<br>**Unit:** `tests/data/unit/test_reference_access.py::test_discover_symbols_cursor_is_stable()` |
+| Partial | `FR-DATA-032` | Return normalized asset-aware metadata and explicitly mark unknown optional fields without provider-derived optimistic defaults. | `fetch_symbol_metadata(request: SymbolMetadataRequest) -> SymbolMetadata` | Read-only or External API call | `DataError[DATA_NOT_FOUND|MISSING_ASSET_METADATA]` | **Usage:** `tests/data/usage/test_usage_access.py::test_usage_reference_fetch_symbol_metadata()`<br>**Unit:** `tests/data/unit/test_reference_access.py::test_fetch_metadata_preserves_unknown_fields()` |
+| Missing | `FR-DATA-033` | Compute ranges, gaps, overlaps, completeness, count, revision, and readiness from manifests/indexes and bounded probing, never hard-code certainty. | `inspect_availability(request: AvailabilityRequest) -> DataAvailability` | Read-only; optional External API call | `DataError[LIMIT_EXCEEDED|SOURCE_UNAVAILABLE|DATABASE_ERROR]` | **Usage:** `tests/data/usage/test_usage_access.py::test_usage_reference_inspect_availability()`<br>**Unit:** `tests/data/unit/test_reference_access.py::test_availability_never_hardcodes_ready()` |
+| Partial | `FR-DATA-034` | Return current configured hours and normalized UTC sessions, advance cross-midnight windows correctly, and reject historical reconstruction. | `get_current_schedule(request: ScheduleRequest) -> MarketSchedule` | Read-only | `DataError[UNSUPPORTED_OPERATION|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/test_usage_access.py::test_usage_sessions_current_schedule()`<br>**Unit:** `tests/data/unit/test_sessions.py::test_current_schedule_advances_midnight_end()` |
+| Partial | `FR-DATA-035` | Return bounded source-native or derived volume as records, buckets, or summary with explicit volume kind/unit and provenance. | `fetch_historical_volume(request: VolumeRequest) -> VolumeResult` | Read-only; optional External API call/cache write | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/test_usage_access.py::test_usage_sessions_fetch_volume()`<br>**Unit:** `tests/data/unit/test_sessions.py::test_volume_modes_have_stable_contracts()` |
+
+**Implementation notes:** Split and refactor V1 `gateway.get_data`; retain vectorized
+internal frame processing but return only typed contracts. Replace the misleading V1
+availability stub and static/default-heavy discovery metadata.
+
+### Feature usage examples
+
+`tests/data/usage/test_usage_access.py` contains one example for each
+`FR-DATA-030` through `FR-DATA-035`.
 
 ---
 
-### 9.7 `FEAT-007` — Validation Rules, Sessions, and Data-Quality Diagnostics
+### 4.5 `processing/` — Deterministic Market-Data Processing
 
-**Purpose:** The domain's rulebook and diagnostics: central limits,
-precision/step-alignment policies, timeframe/timezone/context validation,
-market hours and trading sessions, license/readiness registries, per-record
-quality flags, and the standalone OHLCV quality inspection tool
-(`data_quality.py`) with its lazy-pandas support helpers
-(`dataframe_tools.py`).
+**Purpose:** Transform canonical datasets deterministically without I/O, lookahead,
+or simulation-specific behavior.
 
-**Scope:** Includes the central limits manifest (§7.3) and `validate_limit`;
-`normalize_numeric` per-workflow precision (decimal strings for
-`backtest`/`validation`/`risk`/`execution_bound`; floats for `research`) and
-`validate_step_alignment` (fail-closed for `risk`/`execution_bound`);
-`validate_timeframe`, `validate_timezone`, `validate_workflow_context`,
-`validate_stale_data_behavior`, `validate_bars`; `get_market_hours` (current
-configured hours only) and `get_trading_sessions` (Sydney/Tokyo/London/New York
-windows); license registration/validation and source readiness enforcement
-(§7.4); per-record quality flags (`normalization.build_data_quality_flags`,
-`summarize_data_quality`) and volume-kind disclosure (`resolve_volume_kind`);
-standalone OHLCV quality inspection (`inspect_ohlcv_quality` with
-severity-scored issues and bounded samples, `validate_ohlcv_quality` official
-wrapper); and JSON-safe dataframe helpers (`serialize_dataframe_records`,
-`bars_to_records`, `compare_dataframes`/`compare_ohlc`/`compare_ohlcv`,
-`chunked`, `parameter_combinations`, `align_dataframe_datetime`). Excludes any
-repair, interpolation, or dropping of flagged data (`RULE-005` — all
-diagnostics are report-only) and historical market-hours reconstruction
-(disclosed via `historical_hours_supported=False`).
+**Module flow:**
 
-#### Requirements
-
-| ID             | Type            | Requirement                                                                                                                 | Verification    | Status |
-| -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------- | --------- |
-| `FR-DATA-060`  | Functional      | The system shall enforce the central limits manifest on every request; no workflow may exceed the documented maximums.          | Unit test       | Completed |
-| `FR-DATA-061`  | Functional      | Precision normalization shall return decimal strings for `backtest`/`validation`/`risk`/`execution_bound` contexts and floats for `research`. | Unit test | Completed |
-| `FR-DATA-062`  | Functional      | Step misalignment shall fail closed (raise) under `risk`/`execution_bound` and warn otherwise.                                   | Unit test       | Completed |
-| `FR-DATA-063`  | Functional      | Quality diagnostics shall flag duplicate/non-monotonic timestamps, non-finite/negative/zero prices, out-of-range OHLC, and inverted bid/ask — without modifying records. | Unit test | Completed |
-| `FR-DATA-064`  | Functional      | `inspect_ohlcv_quality` shall score datasets deterministically (critical −40, error −20, warning −5, info −1) with bounded issue/sample lists. | Unit test | Completed |
-| `FR-DATA-065`  | Functional      | Redistribution-restricted sources shall be rejected under `risk`/`execution_bound` workflow contexts (`LICENSE_RESTRICTION`).    | Unit test       | Completed |
-| `NFR-DATA-060` | Maintainability | All limits are defined once in code and asserted by hardening tests.                                                             | Static analysis | Completed |
-| `NFR-DATA-061` | Reliability     | Quality inspection never mutates caller-owned dataframes (deep copies only).                                                     | Unit test       | Completed |
-| `NFR-DATA-062` | Performance     | Issue and sample lists are bounded (`issue_limit`, `sample_limit`).                                                              | Unit test       | Completed |
-
-#### Workflows
-
-| Workflow ID   | Workflow                  | Trigger                                 | Outcome                                | Requirements                  | Status |
-| ------------- | ------------------------- | --------------------------------------- | --------------------------------------- | ------------------------------ | --------- |
-| `WF-DATA-060` | Inspect OHLCV quality     | Caller invokes `validate_ohlcv_quality` | Scored pass/fail diagnostics envelope   | `FR-DATA-063`, `FR-DATA-064`  | Completed |
-| `WF-DATA-061` | Enforce license/readiness | Gateway pre-retrieval checks            | Request allowed or rejected with code   | `FR-DATA-065`                 | Completed |
-| `WF-DATA-062` | Report sessions/hours     | Caller invokes hours/sessions helpers   | UTC session windows / current hours     | `FR-DATA-060`                 | Completed |
-
-##### `WF-DATA-060` — Inspect OHLCV Quality
-
-**Purpose:** Score an OHLCV dataset and report bounded, deterministic issues.
-**Actor / Trigger:** Research workflow or AI agent tool; `validate_ohlcv_quality(dataframe, expected_symbol=..., quality_pass_threshold=90.0)`.
-**Preconditions:** Input is a pandas DataFrame (deep-copied internally; never mutated).
-
-**Main flow**
-
-1. Input and limits validate (`issue_limit > 0`, `sample_limit >= 0`, threshold in [0, 100]).
-2. Missing OHLCV columns, empty datasets, duplicate and non-monotonic timestamps flag first.
-3. Each row checks symbol mismatch, non-numeric/NaN/infinite values, non-positive prices, negative/zero volume, low>high, OHLC outside range, and flatline candles.
-4. The penalty model computes the score; `passed` requires zero critical/error issues and score ≥ threshold.
-5. The tool wrapper returns a standard envelope with issues, profile, and remediation notes.
-
-**Alternative and failure flows**
-
-| ID | Condition           | Behaviour                                                                              |
-| -- | ------------------- | ---------------------------------------------------------------------------------------- |
-| A1 | Issue limit reached | Iteration stops early and `summary.issues_truncated=True` is disclosed.                   |
-| F1 | Invalid input       | Non-DataFrame or bad limits → `ValidationError` mapped to an error envelope.              |
-| F2 | Dependency failure  | Missing pandas raises `ConfigurationError` with a clear message.                          |
-| F3 | Unknown outcome     | Any other exception maps to a standard error envelope; nothing escapes raw.               |
-
-**Postconditions:** Caller-owned dataframe unchanged; structured logs emitted.
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant API as data_quality.validate_ohlcv_quality
-    participant Core as inspect_ohlcv_quality
-
-    Client->>API: dataframe, expected_symbol, threshold
-    API->>Core: deep-copied frame
-    Core->>Core: column/timestamp/row checks
-    Core->>Core: penalty scoring (crit -40, err -20, warn -5, info -1)
-    Core-->>API: passed, score, issues, profile
-    API-->>Client: StandardResponse envelope
+```text
+MarketDataset
+  → timeframe/order validation
+  → resample, align, aggregate, generate, or label
+  → MarketDataset with updated provenance/quality
 ```
+
+### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `timeframes.py` | Provide one private canonical timeframe manifest and conversion rules. | None; consumed by this module | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `contracts.errors` |
+| Partial | `transforms.py` | Resample bars, align datasets, and aggregate ticks. | `resample_dataset`, `align_datasets`, `aggregate_ticks` | **Standard library:** None<br>**Required third-party:** `pandas`, `numpy`<br>**Local:** `contracts`, `timeframes.py` |
+| Partial | `synthetic.py` | Generate bounded deterministic GBM bars/ticks. | `generate_synthetic_dataset` | **Standard library:** `datetime`<br>**Required third-party:** `numpy`<br>**Local:** `contracts`, `timeframes.py` |
+| Retired | `labeling.py` | Removed: Research owns historical labeling. | — | — |
+| Missing | `__init__.py` | Expose the supported typed processing API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `TIMEFRAME_MANIFEST` | `Mapping[str, TimeframeSpec]` | Approved M/H/D/W/MN values | Yes | transforms/synthetic | One accepted set, duration, pandas frequency, and ordering source of truth. |
+| Missing | `SYNTHETIC_BAR_MAX_RECORDS` | `int` | `100000` | Yes | synthetic/API | Initial configurable direct-response bound; excess returns `LIMIT_EXCEEDED`. |
+| Missing | `SYNTHETIC_TICK_MAX_RECORDS` | `int` | `250000` | Yes | synthetic/API | Initial configurable direct-response bound. |
+| Missing | `SYNTHETIC_PERSIST_MAX_RECORDS` | `int` | `1000000` | Yes | synthetic + storage | Initial configurable persisted bound; increases require benchmarks/tests. |
+| Missing | `SYNTHETIC_METHODS` | `tuple[str, ...]` | `gbm` | Yes | synthetic | No other stochastic process is part of the Data design. |
+| Missing | `ALIGNMENT_POLICY` | `str` | `last_closed` | Yes | alignment | Uses only values whose `available_at` is at/before target; violation fails atomically. |
+
+#### Private tabular and OHLC implementation
+
+Data owns all tabular market-data behavior. The private `processing/tabular.py`
+module contains UTC alignment, bar/DataFrame record conversion, deterministic
+DataFrame comparison, and OHLC/OHLCV comparison. These functions are used only
+inside Data normalization, quality, storage, and test paths; raw DataFrames never
+cross the Data boundary.
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-DATA-080` | Align a private tabular market-data copy to an aware UTC datetime field/index without mutating caller input. | `align_dataframe_datetime` | None | `DataError[VALIDATION_FAILED]` | Unit alignment and immutability tests |
+| Partial | `FR-DATA-081` | Convert bar rows or private DataFrames to deterministic JSON-safe records with canonical UTC timestamps. | `bars_to_records`, `serialize_dataframe_records` | None | `DataError[VALIDATION_FAILED]` | Unit serialization tests |
+| Partial | `FR-DATA-082` | Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics. | `compare_dataframes` | None | `DataError[VALIDATION_FAILED\|LIMIT_EXCEEDED]` | Unit comparison tests |
+| Partial | `FR-DATA-083` | Compare OHLC or OHLCV columns only after schema and alignment validation. | `compare_ohlc`, `compare_ohlcv` | None | `DataError[VALIDATION_FAILED]` | Unit OHLC/OHLCV tests |
+| Missing | `FR-DATA-084` | Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper. | `execute_backfill_chunk` | Persistence write | Existing job errors | Backfill bound tests |
+
+#### Public processing API
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-DATA-036` | Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`. | `resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDataset` | None | `DataError[UNSUPPORTED_TIMEFRAME|VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/test_usage_processing.py::test_usage_transforms_resample_dataset()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_resample_dataset_is_deterministic()` |
+| Partial | `FR-DATA-037` | Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead. | `align_datasets(datasets: Mapping[str, MarketDataset], target: Sequence[datetime]) -> Mapping[str, MarketDataset]` | None | `DataError[VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/test_usage_processing.py::test_usage_transforms_align_datasets()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_align_datasets_prevents_lookahead()` |
+| Partial | `FR-DATA-038` | Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and spread policy, rejecting disorder or ambiguous spread units. | `aggregate_ticks(dataset: MarketDataset, timeframe: str, spread_policy: str) -> MarketDataset` | None | `DataError[VALIDATION_FAILED|UNSUPPORTED_TIMEFRAME]` | **Usage:** `tests/data/usage/test_usage_processing.py::test_usage_transforms_aggregate_ticks()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_aggregate_ticks_rejects_disordered_input()` |
+| Partial | `FR-DATA-039` | Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter. | `generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset` | None | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/test_usage_processing.py::test_usage_synthetic_generate_dataset()`<br>**Unit:** `tests/data/unit/test_synthetic.py::test_synthetic_dataset_replays_from_seed()` |
+| Retired | `FR-DATA-040` | Research owns historical labeling; no Data implementation. | — | — | — | — |
+
+**Implementation notes:** Merge V1 timeframe maps, resampling, aggregation, alignment,
+and seeded algorithms into one source of truth. Do not retain `TicksGenerator` or any
+trading-bar/M1/real backtest model in Data. Historical labeling is not implemented in Data because Research owns it.
+
+### Feature usage examples
+
+`tests/data/usage/test_usage_processing.py` contains one example for each
+`FR-DATA-036` through `FR-DATA-039`.
 
 ---
 
-# Part V — Cross-Feature Workflows
+### 4.6 `jobs/` — Update Jobs and Historical Backfills
 
-## 10. Cross-Feature Workflows
+**Purpose:** Execute real bounded ingestion work with deterministic identity, one
+active lease, atomic checkpoints, and crash recovery.
 
-### 10.1 `WF-DATA-100` — Governed Retrieval with Quality and Lineage Disclosure
+**Module flow:**
 
-**Features involved:** `FEAT-001` (gateway), `FEAT-002` (adapters), `FEAT-003` (cache), `FEAT-007` (validation and quality)
-**Requirements covered:** `FR-DATA-001`…`FR-DATA-006`, `FR-DATA-010`, `FR-DATA-021`, `FR-DATA-060`, `FR-DATA-063`, `FR-DATA-065`
-**Status:** Completed
-
-A single `get_data_tool` call exercises the whole domain: validation rules and
-the limits manifest gate the request; license and readiness registries reject
-restricted source/context combinations; the cache serves or the adapter
-downloads through the broker port; normalization flags quality issues without
-repairing them; and the response envelope discloses lineage (`raw_hash`,
-`schema_version`, `cache_status`, `volume_kind`, `license`, `data_quality`) so
-downstream Strategy/Simulator/Risk consumers can decide whether the batch is
-safe for their workflow.
-
-```mermaid
-flowchart LR
-    A[FEAT-007 Validation, License, Readiness] --> B[FEAT-001 Gateway]
-    B --> C[FEAT-003 Cache]
-    B --> D[FEAT-002 Source Adapters]
-    D --> C
-    B --> E[Records + Quality and Lineage Metadata]
+```text
+job definition
+  → idempotency and lease
+  → bounded retrieval/quality/persistence chunks
+  → checkpoint and status
 ```
 
-### 10.2 `WF-DATA-101` — Scheduled Backfill to Local Datasets
+### Files
 
-**Features involved:** `FEAT-005` (scheduler), `FEAT-001` (gateway), `FEAT-003` (persistence)
-**Requirements covered:** `FR-DATA-040`…`FR-DATA-044`, `FR-DATA-022`, `FR-DATA-023`
-**Status:** Partial — retrieval and atomic dataset writes work, but the backfill loop is simulated and not chunk-checkpointed (`FR-DATA-044`)
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `models.py` | Define private validated job, chunk, lease, and checkpoint state. | None; public results use Data-owned typed contracts | **Standard library:** `datetime`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts` |
+| Missing | `backfill.py` | Derive identity, execute one chunk, and recover committed progress. | `derive_backfill_key`, `execute_backfill_chunk`, `recover_update_jobs` | **Standard library:** `hashlib`<br>**Required third-party:** None<br>**Local:** `access`, `processing`, `storage`, `contracts` |
+| Partial | `scheduler.py` | Coordinate persisted create/start/stop/run-once/status lifecycle. | `schedule_update_job`, `read_update_job_status` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `backfill.py`, `storage`, `sources` |
+| Missing | `__init__.py` | Expose only the typed job runtime API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
 
-A data-update job repeatedly retrieves fresh data through the governed gateway
-and persists it atomically as CSV/Parquet under approved storage roots, with
-checkpoints and lease state recorded per run and crash recovery available at
-explicit application startup.
+### Configuration and Limits Manifest
 
-```mermaid
-flowchart LR
-    A[FEAT-005 Scheduler Job] --> B[FEAT-001 Gateway Retrieval]
-    B --> C[FEAT-003 Atomic Dataset Write]
-    C --> D[Checkpointed Job State]
-```
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `BACKFILL_MAX_RECORDS_PER_CHUNK` | `int` | `10000` | Yes | `execute_backfill_chunk` | Chunk stops at this value or one source day, whichever is smaller. |
+| Missing | `BACKFILL_MAX_SOURCE_SPAN` | `timedelta` | `1 day` | Yes | `execute_backfill_chunk` | Applies to bars, ticks, spreads, and derived volume; stricter source limits win. |
+| Missing | `JOB_MAX_SYMBOLS` | `int` | `500` | Yes | scheduler | Initial configurable safety bound; excess returns `LIMIT_EXCEEDED`. |
+| Missing | `JOB_MAX_TIMEFRAMES` | `int` | `20` | Yes | scheduler | Initial configurable safety bound. |
+| Missing | `JOB_MIN_INTERVAL_SECONDS` | `int` | `60` | Yes | recurring scheduler | More frequent ingestion belongs to feeds and is rejected. |
+| Missing | `JOB_LEASE_TIMEOUT_SECONDS` | `int` | Configurable | Yes | backfill/scheduler | Stale recovery requires proof; an active lease returns `CONCURRENT_WRITE_LOCKED`. |
+
+#### Public job runtime API
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-041` | Derive the stable SHA-256 idempotency key from source, symbol, kind, timeframe, start/end, schema version, and normalization version. | `derive_backfill_key(request: BackfillChunkRequest) -> str` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/test_usage_jobs.py::test_usage_backfill_derive_key()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_backfill_key_is_canonical()` |
+| Missing | `FR-DATA-042` | Execute retrieval, normalization, quality, persistence, and checkpoint for one bounded chunk as one recoverable unit, deduplicating a committed key. | `execute_backfill_chunk(request: BackfillChunkRequest) -> BackfillChunkResult` | External API call; persistence write | `DataError[CONCURRENT_WRITE_LOCKED|DATA_QUALITY_FAILED|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/test_usage_jobs.py::test_usage_backfill_execute_chunk()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_chunk_commit_and_checkpoint_are_atomic()` |
+| Missing | `FR-DATA-043` | Validate interrupted job leases/checkpoints at startup and resume only after the last committed chunk without publishing partial work. | `recover_update_jobs(request_id: str | None = None) -> RecoveryReport` | Persistence write | `DataError[CHECKPOINT_CORRUPTED|STATE_RECOVERY_FAILED]` | **Usage:** `tests/data/usage/test_usage_jobs.py::test_usage_backfill_recover_jobs()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_recovery_resumes_after_committed_chunk()` |
+| Missing | `FR-DATA-044` | Start or stop a persisted job only after state-transition, lease, source-policy, and schedule validation; recurring execution uses the single-node in-process asyncio loop, while `run_data_update_job_once` remains independently invokable by an OS scheduler. | `schedule_update_job(request: ScheduleJobRequest) -> JobStatus` | Local state mutation; persistence write | `DataError[JOB_NOT_FOUND|SCHEDULER_ERROR|POLICY_BLOCKED]` | **Usage:** `tests/data/usage/test_usage_jobs.py::test_usage_scheduler_schedule_job()`<br>**Unit:** `tests/data/unit/test_scheduler.py::test_scheduler_cannot_report_false_success()` |
+| Partial | `FR-DATA-045` | Return persisted job definition/state, enabled flag, run/checkpoint/error/next-run evidence, lease and recovery state, and request ID without mutation. | `read_update_job_status(request: JobStatusRequest) -> JobStatus` | Read-only | `DataError[JOB_NOT_FOUND|DATABASE_ERROR]` | **Usage:** `tests/data/usage/test_usage_jobs.py::test_usage_scheduler_read_status()`<br>**Unit:** `tests/data/unit/test_scheduler.py::test_job_status_reflects_committed_work()` |
+
+**Implementation notes:** Retain V1 job-definition/status persistence concepts but
+replace the status-only execution loop. Never mark a run successful merely because a
+timer completed. `run_data_update_job_once` remains independently invokable by an OS scheduler.
+
+### Feature usage examples
+
+`tests/data/usage/test_usage_jobs.py` contains one example for each `FR-DATA-041`
+through `FR-DATA-045`.
 
 ---
 
-# Part VI — Verification and Operations
+### 4.7 `feeds/` — Internal Real-Time Feed Lifecycle
 
-## 11. Tests
+**Purpose:** Normalize internal live events through bounded buffers and expose honest
+heartbeat, overflow, gap, reconnect, and breaker status without public streaming.
+
+**Module flow:**
+
+```text
+staging/production source event
+  → normalize and buffer
+  → heartbeat/gap/reconnect state
+  → internal consumer and read-only status
+```
+
+### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `models.py` | Define private feed configuration/event/status state. | None; status is serialized by API | **Standard library:** `datetime`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts` |
+| Missing | `runtime.py` | Start internal ingestion and normalize/buffer events. | `start_internal_feed`, `ingest_feed_event` | **Standard library:** `asyncio`, `collections`, `random`<br>**Required third-party:** None<br>**Local:** `sources`, `storage`, `contracts` |
+| Missing | `status.py` | Read persisted/in-memory feed evidence without mutation. | `read_feed_status` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `storage`, `contracts` |
+| Missing | `__init__.py` | Expose only the internal lifecycle/status API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `FEED_BUFFER_CAPACITY` | `int` | `10000` informational baseline | Yes | runtime | Hard memory bound; reaching it applies the selected overflow policy. |
+| Missing | `FEED_OVERFLOW_POLICIES` | `tuple[str, ...]` | `halt, drop_and_reconcile, backpressure` | Yes | runtime | `drop_and_reconcile` records a gap only; no automatic backfill capability exists. |
+| Missing | `FEED_HEARTBEAT_TIMEOUT_SECONDS` | `float` | `5` informational baseline | Yes | runtime/status | Expiry records `FEED_HEARTBEAT_TIMEOUT` and degrades/halts per source policy. |
+| Missing | `FEED_RECONNECT_POLICY` | `ReconnectPolicy` | exponential backoff from `1` to `60` seconds | Yes | runtime | Exhaustion opens the circuit; the exact sequence is deterministic. |
+
+#### Public feed runtime API
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-046` | Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle. | `start_internal_feed(config: FeedConfig) -> FeedStatus` | Local state mutation; persistence write; External API call | `DataError[SOURCE_UNAVAILABLE|POLICY_BLOCKED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/test_usage_feeds.py::test_usage_runtime_start_feed()`<br>**Unit:** `tests/data/unit/test_feed_runtime.py::test_start_feed_requires_declared_capability()` |
+| Missing | `FR-DATA-047` | Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair. | `ingest_feed_event(feed_id: str, event: RawFeedEvent) -> FeedEventResult` | Local state mutation; persistence write | `DataError[BUFFER_OVERFLOW|DATA_DROPPED|FEED_HEARTBEAT_TIMEOUT]` | **Usage:** `tests/data/usage/test_usage_feeds.py::test_usage_runtime_ingest_event()`<br>**Unit:** `tests/data/unit/test_feed_runtime.py::test_overflow_records_gap_without_backfill()` |
+| Missing | `FR-DATA-048` | Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state. | `read_feed_status(request: FeedStatusRequest) -> FeedStatus` | Read-only | `DataError[DATA_NOT_FOUND|DATABASE_ERROR]` | **Usage:** `tests/data/usage/test_usage_feeds.py::test_usage_status_read_feed()`<br>**Unit:** `tests/data/unit/test_feed_status.py::test_status_is_backed_by_real_runtime_state()` |
+
+**Implementation notes:** Replace V1 mock registration/counters. Do not add a
+composite health score or public subscription surface. Minimum source/consumer and numeric
+buffer, heartbeat, and reconnect values are informational baselines until measured evidence supports binding gates.
+
+### Feature usage examples
+
+`tests/data/usage/test_usage_feeds.py` contains one example for each `FR-DATA-046`
+through `FR-DATA-048`.
+
+---
+
+### 4.8 `public_api/` — Typed Domain Boundary
+
+**Purpose:** Expose the approved Data operations through typed Data-owned requests,
+results, and errors. This layer performs no generic wrapping and defines no parallel
+business logic.
+
+**Boundary rules:**
+
+- Public operations accept typed Data request contracts rather than unstructured
+  caller-controlled payloads.
+- Success returns the typed Data-owned result documented by the underlying feature.
+- Failure raises or returns the documented `DataError`; UI/API alone maps it to an
+  external HTTP response.
+- Every operation accepts an optional request ID where trace propagation is needed.
+- Package-root exports are explicit and contain no registry, metadata catalog, or
+  wrapper-only aliases.
+
+| Capability group | Public operations | Typed outcomes |
+|---|---|---|
+| Retrieval and reference | `get_market_data`, `get_tick_data`, `get_spread_data`, `get_symbol_metadata`, `list_symbols`, `get_data_availability`, `get_market_hours`, `get_trading_sessions`, `get_historical_volume` | `MarketDataset`, `DataAvailability`, source/reference result contracts |
+| Storage | `save_market_data`, `load_local_dataset`, `clear_data_cache` | `StorageManifest`, `MarketDataset`, `CacheClearResult` |
+| Processing | `resample_ohlcv`, `align_multitimeframe_data`, `generate_synthetic_ticks`, `generate_synthetic_bars`, `aggregate_ticks_to_bars` | `MarketDataset` |
+| Jobs | `create_data_update_job`, `start_data_update_job`, `stop_data_update_job`, `run_data_update_job_once`, `get_data_update_job_status` | Data-owned job definition, run, and status contracts |
+| Feeds | `get_feed_status` | Data-owned feed status contract |
+
+No labeling operation exists in Data; Research owns historical labeling.
+
+### Feature usage examples
+
+`tests/data/usage/test_usage_api.py` demonstrates typed success and documented
+failure behavior for every package-root operation.
+---
+
+## 5. Package-Wide Requirements and Shared Configuration
+
+| Status | Requirement ID | Type | Responsibility | Verification |
+|---|---|---|---|---|
+| Missing | `NFR-DATA-001` | Architecture | Other domains shall consume only documented Data contracts or focused public APIs; no provider, storage, cache, registry, or private-file imports cross the boundary. | Dependency/import audit |
+| Missing | `NFR-DATA-002` | Determinism | Given identical inputs, versions, source revision, and seed, normalization, quality, transforms, synthetic generation, cache identity, and historical processing shall be reproducible. | Replay/golden tests |
+| Missing | `NFR-DATA-003` | Time safety | All official/cross-domain timestamps shall be UTC and every aligned value shall expose `available_at`; lookahead or ambiguous timezone evidence fails atomically. | Boundary and no-lookahead tests |
+| Missing | `NFR-DATA-004` | Reliability | Missing safety/context/source/license/precision/account evidence shall fail closed; no partial dataset, chunk, migration, or audit write is published as successful. | Fault-injection tests |
+| Missing | `NFR-DATA-005` | Security | Sensitive values handled by Data shall be redacted before logs, errors, events, metrics, manifests, or responses; broker credentials are resolved by the Utils settings layer, never by Data. | Secret/redaction tests |
+| Missing | `NFR-DATA-006` | Broker safety | All Data broker/provider access shall be read-only through Brokers' `BrokerAdapter` read traits; Data shall never invoke a mutation operation or place a trade. | Capability/dependency audit |
+| Missing | `NFR-DATA-007` | Persistence | SQLite operations shall be transactional, bounded, idempotent where required, use one lock/migration framework, and never expose connections to another domain. | Concurrency/recovery tests |
+| Missing | `NFR-DATA-008` | Observability | Every governed operation shall propagate request/correlation IDs and emit bounded redacted source/cache/storage/job/feed evidence; failures are never swallowed. | Event/trace inspection |
+| Missing | `NFR-DATA-009` | Performance | Official responses shall obey configurable inline limits and use artifact references for larger results; latency, throughput, and memory measurements are informational until evidence supports binding gates. | Benchmark report |
+| Missing | `NFR-DATA-010` | Compatibility | Schema changes shall be additive within v1 or use a new major identifier; incompatible persisted data is explicitly migrated offline or invalidated/re-ingested. | Contract/migration tests |
+| Missing | `NFR-DATA-011` | Maintainability | Every file shall retain one focused responsibility, imports shall be absolute, and package/submodule `__all__` values shall list only approved public symbols. | Structure/import review |
+| Missing | `NFR-DATA-012` | Testing | Every `FR-DATA-*` shall have one runnable usage example and at least one unit test; every collaborative workflow shall have an integration test; coverage shall be at least 80%. | Traceability and coverage audit |
+
+### Shared Configuration and Limits Manifest
+
+These settings apply across several feature modules; module-specific values remain in
+their owning manifests.
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `DATABASE_URL` / `DATA_DIR` | `str` / `Path` | None | Yes | storage, sources, access, jobs, feeds | Shared connection/artifact-root configuration owned and validated by Data. |
+| Missing | `MT5_ENABLED` | `bool` | `False` | Yes | source reads (via Brokers) | Brokers-owned per-platform toggle consumed here; disabled paths fail closed and never resolve credentials. |
+| Missing | `DATA_SCHEMA_VERSION` | `str` | `v1` | Yes | all modules | Included in datasets, cache keys, manifests, migrations, jobs, and responses. |
+| Missing | `NORMALIZATION_VERSION` | `str` | `v1` | Yes | all data-producing modules | Change invalidates cache and incompatible persisted artifacts. |
+| Missing | `DATA_LIMITS_MANIFEST` | `LimitsManifest` | Initial values in module manifests | Yes | access, processing, jobs, feeds, API | Central configurable safety bounds; source-specific stricter values win. |
+| Missing | `PRECISION_ROUNDING_MODE` | `str` | `ROUND_HALF_EVEN` | Yes | contracts, access, processing, storage, API | Different source/symbol mode requires an explicit contract and disclosure. |
+| Missing | `REQUEST_ID_POLICY` | policy | Utils prefixed UUID4 | Yes | all modules | Caller value is propagated; generated value is returned when absent. |
+
+### Package-wide rules
+
+- Public operations return Data-owned typed contracts and documented `DataError` failures.
+- Official and persisted governed numeric boundaries use decimal strings. Internal
+  analytical frames may remain numeric; research-only float use is explicit in
+  metadata. Missing precision metadata fails validation/risk/execution-bound work.
+- Public source fallback occurs only through the caller-supplied ordered list, which
+  defaults empty. Response metadata records requested/actual source, fallback reason,
+  and every attempted source.
+- Live/stream data cache TTL defaults to zero. Immutable local data has no time expiry
+  while hash and modified time remain unchanged. Stale cache is never silent.
+- Blind retries are forbidden. Only classified transient transport failures may use a
+  bounded retry policy; unknown broker state blocks mutation and is Trading's concern.
+- Historical calendar, public subscription, automatic feed-gap repair, and generic
+  TSDB capabilities are absent from the architecture.
+
+---
+
+## 6. Open Decisions
+
+No open decisions.
+
+---
+
+## 7. Tests and Definition of Done
+
+### Test and usage locations
+
+```text
+tests/data/
+├── unit/                         # Every public symbol and failure path
+├── integration/                  # WF-DATA-* collaboration and boundaries
+└── usage/                        # One runnable test_usage_* per FR-DATA-*
+```
+
+### Commands
 
 ```bash
-# Unit tests (with coverage; keep >= 80%)
-uv run pytest tests/data/unit --cov=app.services.data
-
-# Usage examples (runnable, numbered; no live broker credentials required)
-uv run pytest tests/data/usage
-
-# Static quality
 uv run ruff check app/services/data
 uv run ruff format --check app/services/data
 uv run mypy app/services/data
+
+uv run pytest tests/data/unit
+uv run pytest tests/data/integration
+uv run pytest tests/data/usage
+
+uv run pytest tests/data --cov=app/services/data --cov-fail-under=80
 ```
 
-Golden fixtures generated from the seeded synthetic adapter live under
-`tests/data/fixtures/` so downstream modules can regression-test against the
-same canonical records. Broker-backed sources fail closed with deterministic
-errors when credentials are unavailable, so all examples run offline.
+During implementation, run only the targeted file(s) for the feature being changed;
+run the complete Data set at the feature/slice completion gate.
 
-## 12. Known Limitations
+### Required test levels
 
-- `get_market_hours` returns only the current configured schedule (24/5 UTC placeholder); historical market-hour reconstruction is unsupported (`historical_hours_supported=False`, callers attempting it receive `UNSUPPORTED_OPERATION`).
-- Broker-backed sources (`mt5`, `ctrader`, `dukascopy`, `binance`, `yahoo`) remain `staging` until a live-credential validation pass promotes them; they are rejected under `risk`/`execution_bound` contexts.
-- Feed observability covers registered feed state only — there is no live streaming ingestion loop in this phase (`register_mock_feed` exists for tests).
-- Quality diagnostics are report-only by design; no repair, interpolation, or dropping is performed anywhere in the domain.
-- Gap detection in `get_data_availability` derives from committed cache records, not from provider-side coverage queries.
-- The broad root exports in `__all__` (23 name
+- **Contract:** producer/consumer compatibility for `MarketDataset` and
+  `AccountStateSnapshot`, plus consumer compatibility against Brokers'
+  `BrokerAdapter` read traits and `BrokerResult`/`BrokerError`.
+- **Unit:** success, validation, exact errors, side effects, bounds, retained V1
+  behavior, and modified/new behavior for every `FR-DATA-*`.
+- **Integration:** every `WF-DATA-*`, including fake source/broker contracts,
+  transaction/lock/recovery faults, and no-lookahead/source-policy boundaries.
+- **Usage:** every documented `test_usage_*` function runs and imports only the
+  documented package or feature API.
+- **Security:** secret/redaction, path escape, read-only broker-access enforcement,
+  provider-object leakage, and dependency-boundary tests.
+- **Performance:** local/synthetic baseline and feed soak evidence; thresholds remain
+  informational until measured evidence supports binding thresholds.
+
+### README specification checklist
+
+- [x] Domain boundary matches `docs/PROJECT.md` and resolved ADRs.
+- [x] Every approved reconciliation capability has a destination.
+- [x] Removed or rejected behavior is absent from the architecture.
+- [x] All 12 reconciled workflows plus the required broker boundary are represented.
+- [x] Every intended public symbol has one functional requirement row.
+- [x] Every requirement has a typed signature, side-effect classification, errors,
+  usage example location, and unit-test location.
+- [x] Configuration ownership, persisted state, and dependency direction are explicit.
+- [x] Every architecture choice is an explicit requirement or exclusion; missing evidence fails closed.
+
+### Package completion checklist
+
+- [ ] The actual package tree matches Section 2.
+- [ ] Module sections and files remain in dependency order without cycles.
+- [ ] Every requirement, workflow, and package-wide requirement is `Completed`.
+- [ ] Package root exports exactly the approved typed public operations and nothing else.
+- [ ] Contracts match `docs/PROJECT.md` name, version, owner, and consumers.
+- [ ] Data writes only Data-owned state; other domain migrations preserve ownership.
+- [ ] Every dependency is documented in standard/third-party/local order.
+- [ ] Every public requirement has a passing usage example and unit test.
+- [ ] Every collaborative workflow has a passing integration test.
+- [X] No unresolved Open Decision affects a completed requirement.
+- [ ] No raw provider/database object, secret, live trade path, or silent failure exists.
+- [ ] Ruff, format check, strict mypy, targeted/full Data tests, and ≥80% coverage pass.
+- [ ] Source promotion and production evidence are approved for every enabled source.
+
+Current implementation status: `Missing`. Valuable V1 code exists under the legacy
+`app/services/data` path, but the final package, contracts, workflows, and tests do not
+yet satisfy this specification.
+
+---
+
+## 8. Change Process
+
+For every future change:
+
+```text
+1. Update this README first.
+2. Add or change the workflow when system behavior changes.
+3. Resolve or record any decision that would otherwise require guessing.
+4. Add or change the functional requirement row, including Side Effects.
+5. Update file exports, dependencies, configuration, and persisted-state ownership.
+6. Reorder modules or files if dependency order changes.
+7. Implement the smallest approved code change.
+8. Add or update the usage example and targeted tests.
+9. Run targeted validation, then the Data completion gate for the finished slice.
+10. Change Status to Completed only after implementation and verification exist.
+```
+
+Architecture/API/model changes also update `docs/ARCHITECTURE.md`; sprint state and
+decisions update `docs/CHANGELOG.md`.
+
+This keeps requirements, dependency order, implementation, usage examples, tests,
+and documentation aligned.

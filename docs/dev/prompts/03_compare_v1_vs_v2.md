@@ -8,9 +8,10 @@ Use only:
 
 1. **Version 1 audit report:** `[PATH_TO_V1_AUDIT_REPORT]`
 2. **Version 2 requirements document:** `[PATH_TO_V2_REQUIREMENTS]`
-3. **Top-level system documentation:** `[PATH_TO_SYSTEM_DOCUMENT]` if available
 
 Do not inspect or modify code during this step unless explicitly instructed.
+
+This step compares V1 against V2 only. Alignment of the resulting domain design with the top-level system document is verified later, in the cross-domain alignment review (pipeline step 05).
 
 # DOMAIN
 
@@ -218,7 +219,6 @@ Use `Reject` when a V2 requirement:
 * duplicates another requirement;
 * prescribes unnecessary architecture;
 * belongs to another domain;
-* conflicts with the top-level system boundaries;
 * has no supporting workflow or use case.
 
 No V2 requirement may be silently omitted.
@@ -303,7 +303,6 @@ Use the following structure.
 * Domain:
 * V1 audit report:
 * V2 requirements:
-* Top-level system document:
 * Comparison limitations:
 
 ## 2. Executive Summary
@@ -461,7 +460,8 @@ Do not guess unresolved behaviour.
 
 Escalation rules:
 
-* An open decision affecting more than one domain must also be added to the top-level system document's Open Decisions section; it is resolved there (with an ADR) — not in this document.
+* An open decision affecting more than one domain must also be added to the top-level system document's Open Decisions section.
+* When a decision is resolved, encode the outcome in the authoritative specifications and delete the decision row; do not retain it as decision history.
 * A `Defer` decision that changes the system shape (actors, domains, cross-domain workflows, or shared contracts) must be reflected in the top-level system document's Deferred Capabilities section.
 * Purely domain-internal open decisions stay here.
 
@@ -515,7 +515,7 @@ Before completing the document, verify that:
 * unused V1 behaviour was not preserved without reason;
 * V2 implementation complexity was not accepted automatically;
 * the proposed direction follows the four-level minimal structure;
-* domain boundaries match the top-level system document;
+* capabilities suspected to belong to another domain are flagged (final boundary verification happens in the cross-domain alignment review, pipeline step 05);
 * unresolved conflicts are listed under Open Decisions;
 * open decisions and deferrals affecting more than one domain were escalated to the top-level system document;
 * no code was changed;

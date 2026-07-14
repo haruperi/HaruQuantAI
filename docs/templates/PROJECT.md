@@ -35,7 +35,7 @@
 | Actor | Uses the system to |
 |---|---|
 | `[Actor]` | [Primary goal] |
-| `[Service / Agent]` | [Primary goal] |
+| `[Service]` | [Primary goal] |
 | `[Operator]` | [Primary goal] |
 
 ---
@@ -466,19 +466,18 @@ uv run mypy app
 
 ## 12. Open Decisions
 
-Use this section only for unresolved choices that affect more than one domain.
+Use this section only for unresolved choices that affect more than one domain and would otherwise force an implementer to guess.
 
-| Status | Decision | Affected domains | Options / Notes | ADR |
-|---|---|---|---|---|
-| Open | [Decision still required] | `[Domain A, Domain B]` | [Options, constraints, or missing information] | — |
-| Resolved | [Decision already made] | `[Domain C]` | [Chosen approach and short reason] | `docs/adr/[NNNN-decision-name].md` |
+| Status | Decision | Affected domains | Options / missing evidence |
+|---|---|---|---|
+| Open | [Decision still required] | `[Domain A, Domain B]` | [Options, constraints, or missing information] |
 
 Rules:
 
 - `Open` means affected implementation must not proceed where guessing would be required.
-- Domain-specific decisions belong in the relevant domain README.
-- When a decision is resolved, record the full rationale as an ADR in `docs/adr/` and link it here.
-- Resolved rows may be pruned from this table once linked to an ADR; the ADR preserves the history.
+- Domain-specific unresolved decisions belong in the relevant domain README's Open Decisions section.
+- When a decision is resolved, encode its outcome in the authoritative requirements, contracts, workflows, configuration, boundaries, or exclusions, then delete the decision row and any resolved issue entry.
+- Do not retain resolved, superseded, retired, or deferred-from-initial-scope decisions as history; record the documentation change in the changelog.
 
 ---
 
@@ -501,7 +500,7 @@ The system is complete only when:
 - [ ] External-system failures have documented handling.
 - [ ] Full-system usage examples run successfully.
 - [ ] No unresolved `Open` decision affects completed work.
-- [ ] Every resolved cross-domain decision has a linked ADR.
+- [ ] Every resolved choice is represented directly in the authoritative system and domain specifications.
 - [ ] No domain logic is duplicated across domains.
 - [ ] All tests and quality checks pass.
 

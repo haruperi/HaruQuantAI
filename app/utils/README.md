@@ -1,648 +1,466 @@
-# Shared Utilities (`app/utils`)
+# Utils
 
-## Overview
+> **Package:** `app/utils`
+> **Status:** `Partial`
+> **Last updated:** `2026-07-14`
 
-`app/utils` is the **foundational infrastructure layer** of the HaruQuantAI system. It provides every primitive that upper-layer
-domains (live runtime, simulation, risk, strategy, research) depend on for identity generation, envelope formatting, secret
-handling, datetime normalization, observability, and authorization — without pulling in domain business logic. Every module is
-**import-safe and side-effect-free**: importing a utility file never configures logging, reads environment variables, opens
-network connections, or mutates shared state. This guarantee is enforced by design and verified on every CI run.
-
-All 16 modules share a single public contract: other services throughout the application import exclusively from `app.utils`
-(e.g. `from app.utils import logger, success_response`) rather than from sub-files directly. Heavy optional dependencies such
-as `pandas`, `pydantic-settings`, and `argon2-cffi` are either lazy-loaded on first use or gated behind the `__getattr__`
-mechanism in `__init__.py`, keeping the package lightweight. It enforces a deny-by-default authorization model, a UTC-first
-timestamp policy, and a deterministic approved error-code registry — all three apply uniformly across every tool boundary.
+> This README is the package's single source of truth for requirements, final
+> structure, implementation sequence, progress, usage examples, and tests.
+> Update this file before changing the code.
 
 ---
 
-## Design Philosophy & Non-Negotiable Rules
+## 1. Purpose and Boundary
 
-All modules within `app/utils` must adhere strictly to these principles:
+### Purpose
 
-1. **Import Safety & Side-Effect Free**: Importing any utility file must never trigger side effects. No logging initialization,
-   no database queries, no automatic environment variable reads, and no external network operations.
-2. **Standard Library + Safe Imports**: Keep dependency requirements minimal. Heavy third-party imports (like `pandas`) must be
-   lazy-loaded or used only in specific dedicated modules (such as `dataframe_tools.py`).
-3. **No Domain Business Logic**: Utilities must provide generic infrastructure support (ID generation, schema checking, date
-   formatting, structure envelopes). They must **never** contain broker, portfolio, risk management, strategy, or live-trading
-   logic.
-4. **Unified Entry Point**: All public interfaces must be registered and re-exported in `app/utils/__init__.py`. Other services
-   must import from `app/utils` directly, not from sub-files (e.g. `from app.utils import logger`, not
-   `from app.utils.logger import logger`).
+Utils provides the smallest business-neutral surface that is demonstrably shared
+by multiple HaruQuantAI domains. It owns shared context and audit contracts, base
+errors, trace identifiers, UTC handling, canonical serialization, redaction,
+runtime settings, and structured logging. It makes no trading or domain decision.
 
----
+### Owns
 
-## Features
+- `AuthContext v1` and `AuditEvent v1`.
+- Shared base errors and boundary-safe error mapping primitives.
+- Request, workflow, correlation, causation, and event identifiers.
+- UTC clocks, timestamps, and freshness calculations.
+- Deterministic canonical JSON serialization.
+- Denylist-first secret redaction.
+- Immutable runtime settings and explicit settings loading.
+- Import-safe structured logging.
+- Resolution of broker/provider secret references at the composition root; the
+  resulting `BrokerConnectionConfig v1` schema remains Brokers-owned.
 
-### [`auth.py`](auth.py) — Authentication & Authorization
+### Does not own
 
-Deny-by-default access control and context tracking. Validates `principal_id`, `principal_type`, roles, permissions, and scopes
-against immutable `AuthContext` objects. `authorize_action` returns a structured decision without raising;
-`require_authorization` raises `SecurityError` on denial.
+- Domain contracts, domain result types, business validation, or business limits.
+- Authentication, credential verification, permission enforcement, or session
+  state; UI/API owns these capabilities and produces `AuthContext v1`.
+- DataFrame, OHLC, OHLCV, market-data quality, conversion, comparison, chunking,
+  repair, resampling, persistence, or cache behavior; Data owns these capabilities.
+- Encryption, secret-version selection, password hashing, or credential storage.
+- Safe-path abstractions; each filesystem-writing domain owns and validates its
+  allowed roots and paths.
+- Metrics exporters, health providers, public registries,
+  generic validation façades, or wrapper response envelopes.
+- Import-time configuration, filesystem writes, environment-file reads, network
+  connections, compatibility aliases, or fallback modules.
 
-**Key exports:** `AuthContext`, `AuthorizationDecision`, `PrincipalType`, `DecisionStatus`,
-`build_auth_context`, `authorize_action`, `require_authorization`, `validate_auth_context`
+### Shared contracts
 
----
+| Status | Contract | Version | Producer | Consumers | Purpose |
+|---|---|---|---|---|---|
+| Partial | `AuthContext` | `v1` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio | Immutable authenticated principal and trace context. `principal_type` is exactly `USER` or `SERVICE_ACCOUNT`. |
+| Missing | `AuditEvent` | `v1` | Every emitting domain | Data, Risk, Trading, Research, Portfolio, UI/API | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning. |
 
-### [`data_quality.py`](data_quality.py) — OHLCV Data Quality
+`AuthContext v1` contains `contract_version`, `schema_id`, `principal_id`,
+`principal_type`, roles, permissions, scopes, tenant/environment, request ID,
+workflow ID, correlation ID, and UTC issue time. Missing or invalid context fails
+closed at the receiving domain.
 
-Non-persisted OHLCV diagnostics for pricing bounds, volume, timestamps, and bar structure. Applies a penalty scoring model
-(`critical×40 + error×20 + warning×5 + info×1`). Detects NaN, Infinity, negative prices, flatline candles, zero volume,
-OHLC inversion, and symbol mismatches. Pass/fail gate is controlled by configurable `quality_pass_threshold`.
+`AuditEvent v1` contains `contract_version`, `schema_id`, event ID, UTC timestamp,
+domain, action, optional principal ID, request ID, correlation ID, optional causation
+ID, and a redacted JSON-safe payload. Emission or persistence failure is surfaced.
 
-**Key exports:** `QualityProfile`, `QualityIssue`, `prepare_ohlcv_data`, `inspect_ohlcv_quality`, `validate_ohlcv_quality`
+### Capability-to-consumer evidence
 
----
+Every retained capability has at least two explicit domain consumers.
 
-### [`dataframe_tools.py`](dataframe_tools.py) — DataFrame Utilities
+| Retained capability | Named consuming domain READMEs |
+|---|---|
+| `AuthContext` / `AuditEvent` | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, UI/API |
+| Shared base errors | Brokers, Risk, Trading, Simulation, Analytics, Research, Portfolio, UI/API |
+| Trace identifiers | Brokers, Data, Strategy, Trading, Simulation, Optimization, Analytics, UI/API |
+| UTC time | Brokers, Data, Strategy, Risk, Trading, Simulation, Research, Portfolio |
+| Canonical serialization | Strategy, Trading, Analytics, Optimization, Research |
+| Secret redaction | Brokers, Data, Strategy, Risk, Trading, Simulation, Analytics, Optimization, Research, Portfolio, UI/API |
+| Runtime settings | Data, Trading, Simulation, UI/API |
+| Structured logging | Brokers, Risk, Trading, Data |
 
-Lazy-loaded pandas utilities for alignment, serialization, grid combinatorics, and bar conversion. All pandas imports are
-deferred until first call. Contract aliases (`align_dataframe_time_index`, `chunk_sequence`, `generate_parameter_combinations`,
-`bars_to_records`) match the public specification.
+### Transferred ownership
 
-**Key exports:** `OHLC_COLUMNS`, `OHLCV_COLUMNS`, `align_dataframe_datetime`, `align_dataframe_time_index`, `bar_to_record`,
-`bars_to_records`, `chunk_sequence`, `chunked`, `compare_dataframes`, `compare_ohlc`, `compare_ohlcv`, `dataframe_columns`,
-`generate_parameter_combinations`, `iter_dataframe_records`, `parameter_combinations`, `serialize_dataframe_records`
+Data owns the behavior previously proposed as shared DataFrame/OHLC helpers:
 
----
+- UTC alignment of internal tabular market data.
+- Bar and DataFrame record serialization.
+- Deterministic DataFrame and OHLC/OHLCV comparison.
+- OHLCV quality validation and evidence.
+- Bounded ingestion chunking used by Data workflows.
 
-### [`errors.py`](errors.py) — Exception Hierarchy & Error Registry
+These are private Data implementation capabilities. Raw DataFrames never become a
+cross-domain contract. Generic sequence chunking is not part of Utils.
 
-Application-wide deterministic exception hierarchy and approved error-code registry. Covers base utility errors, indicator
-domain errors (`IND_*`), strategy domain errors (`STRATEGY_*`), risk errors, simulation errors (`SIM_*`), and live runtime
-errors (`LIVE_*`). Includes broker error classification and exponential-backoff retry helpers.
+### Persisted state
 
-**Key exports:** `APPROVED_ERROR_CODES`, `ERROR_MESSAGES`, `Error`, `ValidationError`, `ConfigurationError`, `SecurityError`,
-`DataError`, `ExternalServiceError`, `TradingError`, `TradingTimeoutError`, `UnknownOutcomeError`, `IndicatorError`,
-`StrategyError`, `ErrorPayload`, `ErrorRouteResult`, `ErrorRouter`, `normalize_error_code`, `raise_for_invalid_code`,
-`error_name`, `message_for`, `code_for_exception`, `details_for_exception`, `exception_to_error_payload`,
-`validate_error_payload`, `route_error`, `classify_broker_error`, `trading_retry_delay`, `map_exception_to_strategy_error`
-
----
-
-### [`identity.py`](identity.py) — Identifier Generation & Validation
-
-Prefix-validated, collision-resistant ULID/UUID identifiers. Validates prefix format, ID structure, and version strings
-against compiled regex patterns. Every ID type has a dedicated generator and a matching validator.
-
-**Key exports:** `DEFAULT_VERSION`, `ID_PREFIXES`, `generate_id`, `generate_prefixed_id`, `generate_request_id`,
-`generate_workflow_id`, `generate_correlation_id`, `generate_causation_id`, `generate_event_id`, `generate_idempotency_id`,
-`validate_id`, `validate_request_id`, `validate_workflow_id`, `ensure_version`
-
----
-
-### [`logger.py`](logger.py) — Structured Logging
-
-Production-grade structured logging with colorized local output and JSON production format. Supports file rotation,
-log-level configuration, and thread-local trace context injection (`request_id`, `workflow_id`, `correlation_id`).
-
-Output format: `timestamp | level | module.submodule.function:line | message`
-
-**Key exports:** `logger`, `configure_logging`, `get_logger`, `set_trace_context`, `clear_trace_context`
-
----
-
-### [`normalization.py`](normalization.py) — Datetime & UTC Normalization
-
-UTC-first datetime normalization, staleness checks, clock-drift detection, and timestamp sequence validation. All outputs are
-UTC-aware `datetime` objects. Naive inputs are assumed UTC. Includes `format_timestamp` alias for cross-module compatibility.
-
-**Key exports:** `UTC`, `DEFAULT_TIMEZONE`, `ClockDriftStatus`, `TimestampIssue`, `utc_now`, `parse_datetime`,
-`normalize_timestamp`, `to_utc_datetime`, `to_naive_utc`, `format_utc_timestamp`, `format_timestamp`, `is_stale`,
-`check_clock_drift`, `normalize_timestamp_column`, `normalize_timestamp_sequence`, `validate_timestamp_sequence`
+Utils owns no durable business state, tables, artifacts, or migrations.
 
 ---
 
-### [`notifications.py`](notifications.py) — Notification Routing
+## 2. Final Package Structure
 
-Throttled, deduplicated notification routing to caller-supplied adapters. Redacts secrets from titles, bodies, and metadata
-before dispatch. Supports per-channel throttle windows and deduplication keys. Includes `FakeNotificationAdapter` for tests.
+Folders are ordered from lowest to highest dependency.
 
-**Key exports:** `NotificationMessage`, `NotificationResult`, `NotificationAdapter`, `FakeNotificationAdapter`,
-`NotificationRouter`, `render_notification`, `route_notification`, `broadcast_notification`
-
----
-
-### [`observability.py`](observability.py) — Metrics & Circuit Breaker
-
-In-memory metric registry, Prometheus text export, clock-drift health checks, and a thread-safe circuit breaker with
-`closed`/`open`/`half_open` states. All state is caller-owned with no module globals. Circuit breaker internal state is
-private and accessible only through read-only properties. Sensitive keys are filtered from health snapshots via
-`SENSITIVE_KEY_PATTERN`.
-
-**Key exports:** `GRAFANA_DASHBOARD_EXPECTATIONS`, `MetricRecord`, `HealthSnapshot`, `MetricRegistry`, `CircuitBreaker`,
-`record_metric`, `record_tool_call_metric`, `build_health_snapshot`, `check_clock_drift_health`, `export_prometheus_metrics`
-
----
-
-### [`security.py`](security.py) — Cryptography & Secret Redaction
-
-Cryptographic utilities and secret redaction tools. Password hashing attempts Argon2id first and falls back to
-PBKDF2-HMAC-SHA256. Fernet symmetric encryption with `InvalidToken` guard. Regex-based sensitive key filtering via
-`SENSITIVE_KEY_PATTERN`. Multi-version secret selection with conflict detection.
-
-**Key exports:** `SENSITIVE_KEY_PATTERN`, `MAX_REDACTION_DEPTH`, `SECRET_VERSION_NOT_FOUND`, `RedactionDiagnostics`,
-`SecretVersion`, `hash_password`, `verify_password`, `encrypt_text`, `decrypt_text`, `encrypt_value`, `decrypt_value`,
-`generate_encryption_key`, `load_encryption_key`, `redact_payload`, `redact_mapping`, `redact_mapping_with_diagnostics`,
-`redact_text`, `redact_value`, `classify_secret_key`, `select_active_secret_version`
-
----
-
-### [`settings.py`](settings.py) — Application Configuration
-
-Pydantic-settings application configuration loaded from environment variables and `.env`. Lazy-loaded via `__getattr__` to
-prevent eager dotenv scanning on import. `validate_config` returns a `ValidationResult`-compatible dict rather than raising.
-
-**Key exports:** `Settings`, `settings`, `load_config`, `validate_config`, `HARUQUANT_HOME`, `CONFIGURATION_ERROR`,
-`HaruQuantConfigurationError`
-
----
-
-### [`standard.py`](standard.py) — Standard Envelopes
-
-Standard `{status, message, data, error, metadata}` envelope builders for all official AI tools. Provides deterministic JSON
-serialization, metadata construction, OHLCV record validation, metric label validation, alert deduplication, error event
-building, and circuit-open responses.
-
-**Key exports:** `StandardResponse`, `StandardEnvelope`, `StandardMetadata`, `ToolMetadata`, `ToolError`, `DataQualityIssue`,
-`ErrorEvent`, `AlertDeduplicator`, `build_metadata`, `success_response`, `build_success_response`, `error_response`,
-`build_error_response`, `response_from_exception`, `circuit_open_response`, `validate_standard_response`, `canonical_json`,
-`stable_identifier`, `get_execution_ms`, `build_data_quality_issue`, `validate_ohlcv_records`, `build_error_event`,
-`validate_metric_labels`, `is_official_tool_allowed`
-
----
-
-## Installation
-
-### Prerequisites
-
-Ensure the parent project dependencies are installed. This package requires:
-
-**Standard library** (no installation needed):
-- `hashlib`, `hmac`, `secrets`, `uuid`, `re`, `json`, `math`, `time`, `threading`, `collections`, `dataclasses`, `typing`,
-  `importlib`
-
-**Required third-party packages** (installed with the project):
-```
-cryptography       # Fernet symmetric encryption (encrypt_text / decrypt_text)
-pydantic           # TypedDict and model validation
-pydantic-settings  # Settings / load_config — lazy-loaded on first access only
+```text
+utils/
+|-- __init__.py
+|-- README.md
+|-- contracts/
+|   |-- __init__.py
+|   |-- audit.py
+|   `-- auth.py
+|-- errors/
+|   |-- __init__.py
+|   |-- exceptions.py
+|   `-- mapping.py
+|-- identity/
+|   |-- __init__.py
+|   `-- identifiers.py
+|-- time/
+|   |-- __init__.py
+|   |-- clocks.py
+|   `-- timestamps.py
+|-- serialization/
+|   |-- __init__.py
+|   `-- canonical.py
+|-- security/
+|   |-- __init__.py
+|   `-- redaction.py
+|-- settings/
+|   |-- __init__.py
+|   |-- models.py
+|   `-- loader.py
+`-- logging/
+    |-- __init__.py
+    `-- logger.py
 ```
 
-**Optional third-party packages** (graceful fallback if absent):
+Package and feature `__init__.py` files expose only documented public names through
+explicit `__all__` declarations. No optional heavy dependency is imported by Utils.
+
+```mermaid
+flowchart LR
+    C[contracts] --> E[errors]
+    E --> I[identity]
+    E --> T[time]
+    E --> S[serialization]
+    E --> R[redaction]
+    E --> SET[settings]
+    T --> L[logging]
+    R --> L
+    SET --> L
 ```
-argon2-cffi   # Argon2id password hashing — falls back to PBKDF2-HMAC-SHA256
-pandas        # DataFrame utilities in dataframe_tools.py — lazy-imported
+
+Usage examples live under `tests/utils/usage/`.
+
+---
+
+## 3. Workflows
+
+| Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
+|---|---|---|---|---|---|---|
+| Partial | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033` |
+| Missing | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-025` |
+| Missing | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-001`, `FR-UTL-017` through `FR-UTL-021` |
+
+### `WF-UTL-001` — Structured Logging and Redaction
+
+1. The caller obtains an import-safe named logger.
+2. The caller supplies a structured, JSON-safe context.
+3. Redaction runs before formatting or emission.
+4. Explicit configuration selects console or bounded rotating-file output.
+5. Configuration or sink failure is surfaced without exposing the source payload.
+
+### `WF-UTL-002` — Shared Settings Bootstrap
+
+1. The composition root supplies explicit values and environment input.
+2. The loader validates the supported deployment and runtime settings.
+3. The loader returns an immutable settings object without mutating caller input.
+4. Broker secret references are resolved at the composition root and injected into
+   a Brokers-owned `BrokerConnectionConfig v1` instance.
+
+Imports never read the environment, a file, or a secret store.
+
+### `WF-UTL-003` — Audit-Event Construction
+
+1. The emitting domain supplies its action, trace context, and payload meaning.
+2. IDs and UTC timestamps are validated.
+3. The payload is redacted and canonicalized.
+4. A bounded `AuditEvent v1` is constructed.
+5. Data persists the event through its owned audit-storage boundary.
+
+---
+
+## 4. Module and Requirement Specifications
+
+This section is the implementation plan. The package-level `utils/__init__.py`
+re-exports only the approved feature APIs below and is governed by
+`NFR-UTL-001`, `NFR-UTL-003`, and `NFR-UTL-005`; it owns no independent
+functional behavior.
+
+### 4.1 `contracts/`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
+| Missing | `auth.py` | Define immutable authenticated principal and trace context. | `AuthContext` | **Standard library:** `datetime`, `enum`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `audit.py` → strict contract-field validation |
+| Missing | `__init__.py` | Expose the supported shared-contract API. | `AuthContext`, `AuditEvent` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
+
+#### Functional requirements
+
+| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
+|---|---|---|---|---|---|
+| Partial | `FR-UTL-001` | `auth.py` | Define immutable `AuthContext v1` with only `USER` and `SERVICE_ACCOUNT` principal types and complete trace context. | `AuthContext` | None |
+| Missing | `FR-UTL-002` | `audit.py` | Define immutable redacted `AuditEvent v1` with bounded JSON-safe payload. | `AuditEvent` | None |
+| Missing | `FR-UTL-003` | `audit.py` | Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity. | Strict contract-field validation used by `AuditEvent` and `AuthContext` | None |
+
+### 4.2 `errors/`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `exceptions.py` | Define the minimal shared exception hierarchy and domain-extension boundary. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None |
+| Missing | `mapping.py` | Convert caught exceptions to deterministic secret-safe shared error evidence. | `map_exception` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `exceptions.py` → shared base exceptions |
+| Missing | `__init__.py` | Expose the supported shared-error API. | Shared exceptions and `map_exception` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `exceptions.py`, `mapping.py` → approved exports |
+
+#### Functional requirements
+
+| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
+|---|---|---|---|---|---|
+| Partial | `FR-UTL-004` | `exceptions.py` | Provide focused shared base exceptions without domain-specific policy. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | None |
+| Partial | `FR-UTL-005` | `mapping.py` | Preserve deterministic code and sanitized detail while never returning a raw provider exception across a boundary. | `map_exception` | None |
+| Missing | `FR-UTL-006` | `exceptions.py` | Require domains to define their own codes and boundary mapping above the shared base hierarchy. | Shared exception extension contract | None |
+
+### 4.3 `identity/`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `identifiers.py` | Generate, validate, and deterministically derive secret-free identifiers. | `generate_id`, `validate_id`, `derive_stable_id` | **Standard library:** `hashlib`, `re`, `uuid`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
+| Missing | `__init__.py` | Expose the supported identity API. | `generate_id`, `validate_id`, `derive_stable_id` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `identifiers.py` → approved exports |
+
+#### Functional requirements
+
+| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
+|---|---|---|---|---|---|
+| Partial | `FR-UTL-007` | `identifiers.py` | Generate prefixed UUID4 identifiers without embedded secrets. | `generate_id` | Entropy read |
+| Partial | `FR-UTL-008` | `identifiers.py` | Validate supported prefixes and canonical identifier syntax. | `validate_id` | None |
+| Missing | `FR-UTL-009` | `identifiers.py` | Derive deterministic SHA-256 identifiers from canonical, caller-supplied identity material. | `derive_stable_id` | None |
+
+### 4.4 `time/`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `clocks.py` | Define the injectable clock boundary and UTC system clock. | `Clock`, `SystemClock`, `utc_now` | **Standard library:** `collections.abc`, `datetime`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
+| Missing | `timestamps.py` | Parse, format, age, and evaluate canonical UTC timestamps. | `parse_utc_timestamp`, `format_utc_timestamp`, `age_seconds`, `is_fresh` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `clocks.py` → `Clock`; `errors/exceptions.py` → `ValidationError` |
+| Missing | `__init__.py` | Expose the supported time API. | All clock and timestamp exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `clocks.py`, `timestamps.py` → approved exports |
+
+#### Functional requirements
+
+| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
+|---|---|---|---|---|---|
+| Partial | `FR-UTL-010` | `clocks.py` | Return aware UTC time from an injectable clock. | `Clock`, `SystemClock`, `utc_now` | Clock read |
+| Partial | `FR-UTL-011` | `timestamps.py` | Parse and format UTC timestamps using canonical `Z` output. | `parse_utc_timestamp`, `format_utc_timestamp` | None |
+| Missing | `FR-UTL-012` | `timestamps.py` | Calculate non-negative age and explicit freshness against an injected instant. | `age_seconds`, `is_fresh` | None |
+
+### 4.5 `serialization/`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `canonical.py` | Convert supported values to JSON-safe data and produce canonical UTF-8 JSON. | `to_json_safe`, `canonical_json` | **Standard library:** `dataclasses`, `datetime`, `decimal`, `enum`, `json`, `math`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
+| Missing | `__init__.py` | Expose the supported serialization API. | `to_json_safe`, `canonical_json` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `canonical.py` → approved exports |
+
+#### Functional requirements
+
+| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
+|---|---|---|---|---|---|
+| Partial | `FR-UTL-013` | `canonical.py` | Convert supported datetimes, decimals, enums, dataclasses, mappings, and sequences to deterministic JSON-safe values. | `to_json_safe` | None |
+| Partial | `FR-UTL-014` | `canonical.py` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction. | `canonical_json` | None |
+| Missing | `FR-UTL-015` | `canonical.py` | Reject unsupported, cyclic, non-finite, or unsafe values deterministically. | Serialization validation used by `to_json_safe` and `canonical_json` | None |
+
+### 4.6 `security/`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `redaction.py` | Define redaction policy/results and redact bounded text or JSON-safe mappings. | `RedactionPolicy`, `RedactionResult`, `is_sensitive_key`, `redact_text_value`, `redact_mapping_value` | **Standard library:** `collections.abc`, `dataclasses`, `re`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `SecurityError`, `ValidationError` |
+| Missing | `__init__.py` | Expose the supported redaction API. | All redaction exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `redaction.py` → approved exports |
+
+#### Functional requirements
+
+| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
+|---|---|---|---|---|---|
+| Missing | `FR-UTL-016` | `redaction.py` | Define immutable denylist-first redaction policy with narrow reviewed field-path allowlists. | `RedactionPolicy` | None |
+| Partial | `FR-UTL-017` | `redaction.py` | Detect sensitive keys case-insensitively. | `is_sensitive_key` | None |
+| Partial | `FR-UTL-018` | `redaction.py` | Redact bounded text without mutating input. | `redact_text_value` | None |
+| Partial | `FR-UTL-019` | `redaction.py` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None |
+| Missing | `FR-UTL-020` | `redaction.py` | Return redacted paths and truncation diagnostics without secret values. | `RedactionResult` | None |
+| Missing | `FR-UTL-021` | `redaction.py` | Reject policies that allow protected credential fields. | `RedactionPolicy` validation | None |
+
+### 4.7 `settings/`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `models.py` | Define immutable generic runtime/logging settings and their strict validation. | `RuntimeSettings`, `LoggingSettings` | **Standard library:** `enum`<br>**Required third-party:** `pydantic>=2.13.4`, `pydantic-settings>=2.14.2`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
+| Missing | `loader.py` | Load settings on explicit invocation and resolve opaque secret references through an injected source. | `load_settings`, `resolve_secret_reference` | **Standard library:** `collections.abc`, `os`<br>**Required third-party:** `pydantic-settings>=2.14.2`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError`, `SecurityError` |
+| Missing | `__init__.py` | Expose the supported settings API. | Settings models and loader functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
+
+#### Functional requirements
+
+| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
+|---|---|---|---|---|---|
+| Partial | `FR-UTL-022` | `models.py` | Define immutable generic runtime and logging settings. | `RuntimeSettings`, `LoggingSettings` | None |
+| Partial | `FR-UTL-023` | `loader.py` | Load explicit values and environment in documented precedence order only when called. | `load_settings` | Environment read |
+| Missing | `FR-UTL-024` | `models.py` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None |
+| Missing | `FR-UTL-025` | `loader.py` | Resolve secret references at the composition root without logging or persisting secret material. | `resolve_secret_reference` | Explicit secret-source read |
+
+### 4.8 `logging/`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `logger.py` | Provide side-effect-free logger access and explicit redacted structured-handler configuration. | `get_logger`, `configure_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** `json`, `logging`, `logging.handlers`, `pathlib`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py`; `time/timestamps.py` → `format_utc_timestamp`; `security/redaction.py` → redaction functions; `settings/models.py` → `LoggingSettings` |
+| Missing | `__init__.py` | Expose the supported logging API without configuring logging. | `get_logger`, `configure_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `logger.py` → approved exports |
+
+#### Functional requirements
+
+| Status | Requirement ID | File | Responsibility | Class / Function / Method | Side effects |
+|---|---|---|---|---|---|
+| Partial | `FR-UTL-026` | `logger.py` | Return stable child loggers without configuring handlers. | `get_logger` | None |
+| Partial | `FR-UTL-027` | `logger.py` | Configure deduplicated console and optional bounded rotating-file handlers only when called. | `configure_logging` | Logging configuration; optional file write |
+| Missing | `FR-UTL-028` | `logger.py` | Redact messages and structured context before formatting. | `RedactingFilter` | None |
+| Missing | `FR-UTL-029` | `logger.py` | Emit JSON or human-readable records with UTC time, level, logger, message, and trace IDs. | `StructuredFormatter` | None |
+| Missing | `FR-UTL-030` | `logger.py` | Surface sink failure through a bounded secret-safe fallback. | Logging failure handling in `configure_logging` | Fallback emission |
+| Missing | `FR-UTL-031` | `logger.py` | Prevent duplicate handler installation across repeated configuration calls. | Configuration idempotency in `configure_logging` | Logging configuration |
+| Missing | `FR-UTL-032` | `logger.py` | Keep import free of handler registration, environment reads, and filesystem writes. | Module import contract | None |
+| Missing | `FR-UTL-033` | `logger.py` | Respect the shared `LOG_LEVEL` setting without redefining domain observability policy. | Logging level application in `configure_logging` | Logging configuration |
+
+---
+
+## 5. Package-Wide Requirements and Shared Configuration
+
+| Status | Requirement ID | Type | Responsibility | Verification |
+|---|---|---|---|---|
+| Missing | `NFR-UTL-001` | Boundary | Other packages import only documented package or feature exports; no internal imports, aliases, or fallbacks. | Dependency tests |
+| Partial | `NFR-UTL-002` | Security | Redaction occurs before logs, errors, audit payloads, or returned diagnostics; canonical serialization remains pure. | Secret-leak tests |
+| Missing | `NFR-UTL-003` | Import safety | Imports perform no configuration, environment/file read, filesystem write, network call, handler registration, or client initialization. | Subprocess import tests |
+| Partial | `NFR-UTL-004` | Determinism | Serialization, time calculations, validation, and stable-ID derivation are deterministic with explicit clock/entropy inputs. | Replay tests |
+| Missing | `NFR-UTL-005` | Maintainability | Public signatures are typed and documented; files have one focused responsibility. | Ruff, mypy, and documentation review |
+| Missing | `NFR-UTL-006` | Testing | Every requirement has a usage example and targeted unit test; collaborative workflows have integration tests; coverage is at least 80%. | Traceability and coverage audit |
+| Missing | `NFR-UTL-007` | Persistence | Utils owns no durable business state or migration definition. | Ownership review |
+
+| Status | Setting | Type | Default | Required | Consumers | Description |
+|---|---|---|---|---|---|---|
+| Partial | `ENVIRONMENT` | `str` | `dev` | Yes | All domains | Exactly `dev`, `test`, `staging`, or `production`. |
+| Missing | `RUNTIME_PROFILE` | `str` | `research` | Yes | Strategy, Risk, Trading, Simulation, Portfolio, UI/API | Exactly `research`, `simulation`, `paper`, or `live`; route compatibility belongs to Trading. |
+| Partial | UTC-first policy | policy | `Z`-suffixed ISO 8601 | Yes | All domains | Non-UTC cross-domain timestamps are rejected. |
+| Partial | Trace-ID policy | policy | Prefixed UUID4 | Yes | All domains | Request, workflow, correlation, causation, and event IDs are secret-free strings. |
+| Partial | Secret-redaction policy | policy | Denylist-first, case-insensitive | Yes | All domains | Applied before persistence or emission. |
+| Partial | `LOG_LEVEL` | `str` | `INFO` | No | All domains | Used only after explicit logging configuration. |
+
+---
+
+## 6. Open Decisions
+
+No open decisions.
+
+---
+
+## 7. Tests and Definition of Done
+
+### Test locations
+
+```text
+tests/utils/
+|-- unit/
+|-- integration/
+`-- usage/
 ```
 
-Install all project dependencies:
+### Required validation
 
-```bash
-pip install -r requirements.txt
-```
+- Targeted tests for every changed capability.
+- Import-side-effect checks for every package and feature module.
+- Contract compatibility tests for `AuthContext v1` and `AuditEvent v1` producers
+  and consumers.
+- Secret-leak tests covering logging, errors, audit payloads, and diagnostics.
+- Determinism tests for canonical JSON, stable IDs, and UTC calculations.
+- Dependency checks proving DataFrame/OHLC, path, limit, business validation,
+  permission, and domain-result behavior is absent from Utils.
+- `uv run ruff check app/utils tests/utils`
+- `uv run ruff format --check app/utils tests/utils`
+- `uv run mypy app/utils tests/utils`
+- Targeted `pytest` commands for the affected Utils test files.
 
-### Integration
+### Definition of done
 
-Import exclusively from the `app.utils` package, never from sub-files:
+- [ ] The final package tree exists exactly as specified.
+- [ ] Public exports contain only the retained shared surface.
+- [ ] Every retained capability has at least two domain README consumers.
+- [ ] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract.
+- [ ] UI/API owns authentication and permission enforcement.
+- [ ] Utils imports have no side effects.
+- [ ] No secret appears in logs, errors, audit records, or diagnostics.
+- [ ] Every requirement has targeted tests and a usage example.
+- [ ] Coverage is at least 80%.
+- [ ] Ruff, formatting, mypy, and targeted tests pass.
+
+---
+
+## 8. Usage Examples
+
+### Shared context
 
 ```python
-# Correct — unified public registry
-from app.utils import logger, success_response, build_metadata, ValidationError
+from datetime import datetime, timezone
 
-# Incorrect — bypasses the registry and violates the design contract
-from app.utils.logger import logger             # Do not do this
-from app.utils.standard import success_response  # Do not do this
-```
+from app.utils import AuthContext
 
----
-
-## Usage Examples
-
-For fully-runnable end-to-end scripts that exercise all feature groups, see:
-
-**[`tests/usage/app/services/01_utils.py`](../../tests/usage/app/services/01_utils.py)**
-
-Run it directly:
-
-```bash
-python tests/usage/app/services/01_utils.py
-```
-
-The examples below demonstrate each feature group concisely. They match the patterns used in the usage script above.
-
-### Basic Usage
-
-Emit a structured log message and wrap a result in the standard envelope:
-
-```python
-from app.utils import logger, build_metadata, success_response
-
-logger.info("Service started", extra={"component": "market_data"})
-
-metadata = build_metadata(tool_name="get_rates_tool")
-response = success_response(
-    message="Rates loaded.",
-    data={"EURUSD": 1.1023},
-    metadata=metadata,
+context = AuthContext(
+    contract_version="v1",
+    schema_id="utils.auth_context.v1",
+    principal_id="user-123",
+    principal_type="USER",
+    roles=("operator",),
+    permissions=("backtest:run",),
+    scopes=("portfolio:demo",),
+    tenant_or_environment="dev",
+    request_id="req-8be20911-572d-42f7-bc52-e6844f8d2125",
+    workflow_id="wf-f4bccf77-6121-44e0-a480-17ae2043868d",
+    correlation_id="cor-0d5ab3cf-4003-47ec-a797-f70db66418a4",
+    issued_at=datetime.now(timezone.utc),
 )
-print(response["status"])   # "success"
-print(response["data"])     # {"EURUSD": 1.1023}
 ```
 
-### Feature Usage
-
-#### Trace Context & Logging
+### Canonical serialization and redaction
 
 ```python
-from app.utils import (
-    logger, configure_logging, set_trace_context, clear_trace_context,
-    generate_request_id, generate_workflow_id, generate_correlation_id,
+from app.utils import canonical_json, redact_mapping_value
+
+safe_payload = redact_mapping_value(
+    {"account": "demo", "api_token": "secret"},
 )
-
-configure_logging(level="INFO")
-set_trace_context(
-    request_id=generate_request_id(),
-    workflow_id=generate_workflow_id(),
-    correlation_id=generate_correlation_id(),
-)
-logger.info("Processing request", extra={"symbol": "EURUSD"})
-# 2026-06-21T10:30:00.123Z | INFO | app.service.run:42 | Processing request
-clear_trace_context()
+serialized = canonical_json(safe_payload)
 ```
 
-#### Standard Envelopes
+### Explicit logging configuration
 
 ```python
-from app.utils import build_metadata, success_response, error_response, response_from_exception
-
-meta = build_metadata(tool_name="fetch_bars", reads=True)
-
-resp = success_response(message="Bars fetched.", data={"count": 100}, metadata=meta)
-
-err = error_response(
-    code="VALIDATION_FAILED",
-    message="Timeframe M10 is not supported.",
-    details="Supported timeframes: M1, M5, M15, H1, H4, D1.",
-    metadata=meta,
-)
-
-try:
-    raise RuntimeError("broker disconnected")
-except Exception as exc:
-    fail = response_from_exception(exception=exc, metadata=meta)
-```
-
-#### Identifiers
-
-```python
-from app.utils import (
-    generate_request_id, generate_workflow_id, generate_prefixed_id,
-    validate_id, validate_request_id,
-)
-
-req_id = generate_request_id()          # "req_01j2k..."
-wf_id  = generate_workflow_id()         # "wf_01j2k..."
-custom = generate_prefixed_id("hedge")  # "hedge_01j2k..."
-
-assert validate_request_id(req_id) == req_id
-assert validate_id(custom, expected_prefix="hedge") == custom
-```
-
-#### Datetime Normalization
-
-```python
-from datetime import timedelta
-from app.utils import utc_now, parse_datetime, to_naive_utc, to_utc_datetime, is_stale, format_utc_timestamp
-
-now    = utc_now()
-fmt    = format_utc_timestamp(now)   # "2026-06-21T10:30:00.000000Z"
-parsed = parse_datetime("2026-06-21T10:00:00Z")
-naive  = to_naive_utc(parsed)
-aware  = to_utc_datetime(naive)
-assert parsed == aware
-
-old_ts = utc_now() - timedelta(minutes=10)
-assert is_stale(old_ts, max_age_seconds=300) is True
-```
-
-#### Security & Redaction
-
-```python
-from app.utils import hash_password, verify_password, generate_encryption_key, encrypt_text, decrypt_text, redact_payload
-
-# Argon2id preferred, PBKDF2-HMAC-SHA256 fallback
-h = hash_password("MyPassword123")
-assert verify_password("MyPassword123", h) is True
-
-key    = generate_encryption_key()
-cipher = encrypt_text("strategy_params_v3", key=key)
-plain  = decrypt_text(cipher, key=key)
-assert plain == "strategy_params_v3"
-
-safe = redact_payload({"api_key": "sk-abc123", "symbol": "EURUSD"})
-# {"api_key": "[REDACTED]", "symbol": "EURUSD"}
-```
-
-#### Authorization
-
-```python
-from app.utils import (
-    build_auth_context, authorize_action, require_authorization,
-    generate_request_id, generate_workflow_id,
-)
-
-ctx = build_auth_context(
-    principal_id="agent-001",
-    principal_type="agent",
-    roles={"trader"},
-    permissions={"market_data:read", "orders:write"},
-    scopes={"live"},
-    request_id=generate_request_id(),
-    workflow_id=generate_workflow_id(),
-)
-
-decision = authorize_action(ctx, required_permissions={"orders:write"})
-print(decision.allowed)   # True
-print(decision.status)    # "allowed"
-
-# Raises SecurityError(AUTHORIZATION_FAILED) when denied
-require_authorization(ctx, required_permissions={"admin:delete"})
-```
-
-#### Data Quality
-
-```python
-import pandas as pd
-from app.utils import inspect_ohlcv_quality, validate_ohlcv_quality
-
-df = pd.DataFrame([
-    {"timestamp": "2026-06-21T10:00:00Z", "open": 1.10, "high": 1.11, "low": 1.09, "close": 1.105, "volume": 100},
-    {"timestamp": "2026-06-21T10:01:00Z", "open": 1.105, "high": 1.12, "low": 1.08, "close": 1.11, "volume": 200},
-])
-
-profile = inspect_ohlcv_quality(df, quality_pass_threshold=90.0)
-print(profile["passed"])  # True
-print(profile["score"])   # 100.0
-
-resp = validate_ohlcv_quality(df, expected_symbol="EURUSD", timeframe="M1")
-print(resp["status"])     # "success"
-```
-
-#### Circuit Breaker & Observability
-
-```python
-from app.utils import CircuitBreaker, MetricRegistry, record_tool_call_metric, export_prometheus_metrics
-
-registry = MetricRegistry()
-cb = CircuitBreaker(name="broker_feed", failure_threshold=3, cooldown_seconds=30.0, registry=registry)
-
-if cb.allow_request():
-    try:
-        pass  # broker call
-        cb.record_success()
-    except Exception:
-        cb.record_failure()
-
-record_tool_call_metric(registry, tool_name="get_ticks", status="success", latency_ms=12.4)
-print(export_prometheus_metrics(registry))
-```
-
-#### Notifications
-
-```python
-from app.utils import FakeNotificationAdapter, NotificationRouter, route_notification
-
-adapters = {"desktop": FakeNotificationAdapter(channel="desktop")}
-router   = NotificationRouter(adapters=adapters, throttle_seconds=5.0)
-
-result = route_notification(
-    router, channel="desktop",
-    title="Feed Heartbeat Missed",
-    body="EURUSD feed has not ticked in 60 seconds.",
-    severity="warning",
-    dedupe_key="feed.heartbeat.EURUSD",
-)
-print(result.status)     # "sent"
-print(result.latency_ms)
-```
-
-### Advanced Usage / Edge Cases
-
-#### Lazy Settings Access
-
-`settings.py` is never imported eagerly. Dotenv scanning triggers only on first attribute access:
-
-```python
-import os
-os.environ["HARUQUANT_HOME"] = "/opt/haruquant"
-
-from app.utils import settings, validate_config
-
-cfg    = settings   # triggers dotenv scan once; subsequent accesses are cached
-result = validate_config(cfg)
-if not result["valid"]:
-    print(result["details"])   # {"errors": ["..."]}
-```
-
-#### Argon2id → PBKDF2 Hash Format Detection
-
-`verify_password` automatically routes by hash prefix:
-
-```python
-from app.utils import hash_password, verify_password
-
-h = hash_password("secret")
-# "$argon2id$..." if argon2-cffi is installed, else "pbkdf2_sha256$..."
-assert verify_password("secret", h) is True
-assert verify_password("wrong",  h) is False
-```
-
-#### Error Router with Deduplication Window
-
-```python
-from app.utils import ErrorRouter
-
-router = ErrorRouter(dedupe_window_seconds=60.0)
-
-exc = ValueError("DB write failed")
-r1  = router.route_error(error=exc, source="data_writer")  # "routed"
-r2  = router.route_error(error=exc, source="data_writer")  # "suppressed"
-```
-
-#### Circuit Breaker Half-Open Probe
-
-```python
-import time
-from app.utils import CircuitBreaker
-
-cb = CircuitBreaker(name="test", failure_threshold=2, cooldown_seconds=0.1)
-cb.record_failure()
-cb.record_failure()
-assert cb.state == "open"
-
-time.sleep(0.15)
-allowed = cb.allow_request()   # True — transitions to "half_open"
-assert cb.state == "half_open"
-
-cb.record_success()            # closes the circuit
-assert cb.state == "closed"
-```
-
-#### Broadcast to Multiple Notification Channels
-
-```python
-from app.utils import FakeNotificationAdapter, NotificationRouter, broadcast_notification
-
-adapters = {
-    "desktop": FakeNotificationAdapter(channel="desktop"),
-    "email":   FakeNotificationAdapter(channel="email"),
-}
-router  = NotificationRouter(adapters=adapters)
-results = broadcast_notification(
-    router,
-    channels=["desktop", "email"],
-    title="Kill Switch Triggered",
-    body="All live positions have been closed.",
-    severity="critical",
-)
-for r in results:
-    print(r.channel, r.status)
-```
-
-#### Alert Deduplication
-
-```python
-from app.utils import AlertDeduplicator
-
-dedup = AlertDeduplicator(window_seconds=30.0, max_entries=64)
-assert dedup.allow("feed.stale.EURUSD") is True
-assert dedup.allow("feed.stale.EURUSD") is False   # suppressed within window
-```
-
----
-
-## API Reference
-
-### StandardResponse Schema
-
-Every official tool response wraps its payload in this five-key envelope:
-
-```python
-{
-    "status":   "success" | "error",
-    "message":  str,
-    "data":     object | None,                        # None on error
-    "error":    {"code": str, "details": str} | None, # None on success
-    "metadata": {
-        "tool_name":         str,
-        "tool_version":      str,
-        "tool_category":     str,
-        "tool_risk_level":   "low" | "medium" | "high" | "critical",
-        "request_id":        str | None,
-        "execution_ms":      float,
-        "reads":             bool,
-        "writes":            bool,
-        "updates":           bool,
-        "deletes":           bool,
-        "trades":            bool,
-        "requires_network":  bool,
-        "read_only":         bool,
-        "writes_file":       bool,
-        "modifies_database": bool,
-        "places_trade":      bool,
-    },
-}
-```
-
-### Error Hierarchy
-
-```
-Error
-├── ValidationError          (VALIDATION_FAILED)
-│   ├── ToolError            (TOOL_EXECUTION_FAILED)
-│   ├── IndicatorError       (IND_* codes)
-│   ├── StrategyError        (STRATEGY_* codes)
-│   └── RiskError            (risk-specific codes)
-├── ConfigurationError       (SERVICE_UNAVAILABLE)
-├── SecurityError            (PERMISSION_DENIED)
-├── DataError                (DATA_NOT_FOUND)
-└── ExternalServiceError     (SERVICE_UNAVAILABLE)
-    └── TradingError         (BROKER_UNAVAILABLE)
-        ├── TradingTimeoutError   (TIMEOUT)
-        └── UnknownOutcomeError   (CIRCUIT_OPEN)
-```
-
-### Key Envelope Builders (`standard.py`)
-
-| Function | Returns | Description |
-| :--- | :--- | :--- |
-| `build_metadata(tool_name, ...)` | `StandardMetadata` | Build required tool metadata |
-| `success_response(message, data, metadata)` | `StandardResponse` | Wrap a successful result |
-| `error_response(code, message, details, metadata)` | `StandardResponse` | Wrap a known validation or execution error |
-| `response_from_exception(exception, metadata)` | `StandardResponse` | Map a caught exception to an error envelope |
-| `circuit_open_response(metadata, ...)` | `StandardResponse` | Fail-fast circuit-open error envelope |
-| `validate_standard_response(response)` | `None` | Assert envelope structure and metadata are valid |
-| `canonical_json(payload)` | `str` | Deterministic JSON with sorted keys and compact separators |
-| `stable_identifier(payload, prefix)` | `str` | Reproducible SHA-256 fingerprint identifier |
-
-### Secret Redaction Policy
-
-Production code must **never** log or expose the following in any envelope, log line, or event payload:
-
-- Passwords or password hashes
-- API keys, broker credentials, or authorization headers
-- Encryption keys or Fernet tokens
-- Raw approval packets or private evidence payloads
-- Telegram bot tokens or notification provider credentials
-
-Use `redact_payload(mapping)` or `redact_text(string)` at every system boundary where external data enters.
-
----
-
-## Testing
-
-### Usage / Integration Script
-
-The full end-to-end demonstration covering all 12 feature groups is at:
-
-```
-tests/usage/app/services/01_utils.py
-```
-
-Run it directly:
-
-```bash
-python tests/usage/app/services/01_utils.py
-```
-
-Expected output ends with:
-
-```
-==================================================
-DEMO SCRIPT EXECUTED SUCCESSFULLY
-==================================================
-```
-
-### Unit Tests
-
-Run the dedicated unit test suite for this module:
-
-```bash
-# Run all utils unit tests
-pytest tests/unit/app/utils/ -v
-
-# Run a specific module
-pytest tests/unit/app/utils/test_standard.py -v
-pytest tests/unit/app/utils/test_errors.py -v
-pytest tests/unit/app/utils/test_security.py -v
-```
-
-### Import Safety Verification
-
-Confirm the package produces no side effects on import:
-
-```bash
-python -c "import app.utils; print('import-safe: OK')"
+from app.utils import LoggingSettings, configure_logging, get_logger
+
+configure_logging(LoggingSettings(level="INFO", render="json"))
+logger = get_logger("haruquant.data")
+logger.info("dataset_ready", extra={"request_id": "req-example"})
 ```

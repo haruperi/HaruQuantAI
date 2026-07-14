@@ -1,520 +1,967 @@
-# Risk Governance Service
+# Risk
 
-The `app/services/risk/` package is the core **Layer 4 (Trading/Risk/Strategy Layer)** module responsible for pre-trade risk checks, stateless position sizing, stress scenario evaluations, policy-as-code resolution, and execution-risk gating.
+> **Package:** `app/services/risk`
+> **Status:** `Partial`
+> **Last updated:** `2026-07-13`
 
----
-
-## 1. System Architecture & Flow
-
-The service acts as the single deterministic gatekeeper before order generation or execution. All signals must pass through the `RiskGovernor` to be approved, reduced, rejected, or blocked.
-
-```mermaid
-graph TD
-    Signal[Strategy Signal] --> Governor[RiskGovernor]
-    Governor --> PolicyGate[Policy Resolution & Precedence]
-    PolicyGate -- resolved config --> CeilingCheck{Ceiling limits check}
-    CeilingCheck -- Pass --> Sizing[Volatility & Capital Sizing]
-    CeilingCheck -- Breach --> Reject[Reject / Block]
-    Sizing --> Exposure[FX Currency Exposure Leg Decomposition]
-    Exposure --> VaRES[Portfolio VaR / ES Tail Analysis]
-    VaRES --> Stress[Stress Scenario Shocks]
-    Stress --> MarginCheck[Margin & Leverage Gates]
-    MarginCheck -- Approved --> RiskDecision[RiskDecisionPackage + Token]
-```
+> This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
+> Update this file before changing the code.
 
 ---
 
-## 1.1 Core Models & Serialization
+## 1. Purpose and Boundary
 
-Canonical risk models, enums, Pydantic contracts, and serialization helpers are organized as a modular package under `app/services/risk/models/`:
-* **`enums.py`**: Defines all risk enums (`RiskDecisionStatus`, `RiskMode`, `RiskAction`, `RiskSeverity`, `RiskReasonCode`, `KillSwitchStateEnum`, `KillSwitchReason`).
-* **`contracts.py`**: Defines Pydantic model schemas for all inputs, outputs, snapshots, and tokens (e.g. `ProposedTrade`, `PortfolioState`, `RiskConfig`, `RiskApprovalToken`, `RiskDecisionPackage`). Enforces finite Decimal validation and handles bi-directional field-syncing validators.
-* **`serialization.py`**: Implements JSON-safe type coercion and round-trip verification helpers.
+### Purpose
 
----
+Risk is HaruQuantAI's independent, deterministic master gate for risk-increasing actions. It converts immutable point-in-time evidence and policy into reproducible portfolio measurements, sizing recommendations, risk decisions, approval-token results, kill-switch state, scenarios, audit records, and focused explanations. Missing, stale, invalid, or unverifiable safety evidence fails closed; Risk never executes a trade.
 
-## 2. Configuration Profiles (`configs/`)
+### Owns
 
-Risk profiles are stored as JSON configurations under `app/services/risk/configs/`. Each profile defines defaults for daily loss, total loss, effective leverage, and live execution authorization.
+- Interception and deterministic review of every `TradeIntent` before execution.
+- Final approved or capped position size, safety limits, exposure, concentration, drawdown, margin, leverage, historical VaR/CVaR, and correlation-impact evaluation.
+- Risk policy/profile validation, stable configuration hashes, fixed decision precedence, and canonical reason/error codes.
+- Canonical `RiskDecision` production through the concrete `RiskDecisionPackage` v1 schema.
+- Kill-switch policy, `global > portfolio > strategy > symbol` hierarchy, canonical active state,
+  block-state evaluation, clearance, and recovery eligibility.
+- Approval-attestation validation, action-policy verdicts, approval-token issuance,
+  validation, revocation, scope binding, expiry, and atomic durable single-use reservation.
+- Strategy operational-eligibility decisions for exact registered versions/scopes, without owning technical registration.
+- Allocation approval/capping/rejection, authoritative portfolio risk-budget projections, and budget activation, without constructing or executing allocations.
+- Deterministic regime assessment, advisory scenario/what-if analysis, risk summaries, and risk-owned audit-chain records.
 
-* **`default.json`**: Safe defaults for local testing and simulations. Live execution disabled.
-* **`prop_firm_default.json`**: Conservative limits adhering to standard prop-firm constraints.
-* **`paper.json`**: Standard limits for paper-trading environments.
-* **`live_conservative.json`**: Stricter limits with `allow_live_execution` set to `true`.
+### Does not own
 
-> [!IMPORTANT]
-> All default values in these configuration profiles are conservative safety baselines designed to protect capital and enforce safe operational boundaries. They are not optimized for trading performance, and should not be interpreted as optimized target parameters or performance promises.
+- Market, broker, account, position, pending-order, calendar, session, liquidity, or execution-state acquisition.
+- Strategy signal generation or registry mutation; Portfolio-owned construction, allocation versioning, drift detection, or rebalance planning; portfolio execution, broker submission, fills, reconciliation, or emergency execution mutation.
+- MT5 connections, provider SDK objects, broker credentials, database connection/locking infrastructure, broad performance reporting, cost reporting, incident management, or enterprise audit services.
+- Full replay/timeline/cockpit infrastructure, ranked recommendation engines, parametric VaR, exit-liquidity stress, or graduated step-down controls in the initial build.
+- Live approval from unverified text or any override of deterministic policy or kill-switch state.
 
+### Shared contracts
 
----
+Contract names, versions, and owners follow `docs/PROJECT.md`. The package path is `app/services/risk`, matching the top-level registry.
 
-## 3. Hard Safety Ceilings & Live Profile Guardrails
+**Owned by this domain** — defined authoritatively here:
+| Status | Contract | Version | Counterparty | Purpose |
+|---|---|---|---|---|
+| Missing | `RiskDecision`, represented by `RiskDecisionPackage` | `v1` | Trading, UI/API, Simulation | Return an independent verdict, approved size, reasons, evidence/config provenance, expiry, and optional approval token. |
+| Missing | `ActionPolicyVerdict` | `v1` | Trading, UI/API | Return a Risk-owned allowed/denied action classification bound to approval, policy version, scope, and expiry. |
+| Partial | `KillSwitchCommand` | `v1` | UI/API | Request authorized activation or clearance of Risk's canonical kill-switch state. |
+| Partial | `KillSwitchState` | `v1` | Trading, UI/API | Publish canonical active/inactive state, scope, reason, version, and update time. |
+| Missing | `ApprovalAttestation` | `v1` | UI/API | Authenticated human approval evidence containing action/scope, policy reference/version, issue/expiry times, principal, and trace IDs. |
+| Missing | `StrategyOperationalEligibilityRequest` | `v1` | UI/API, Portfolio submit; Risk receives | Request deterministic operational review of an exact registered strategy version and scope. |
+| Missing | `StrategyOperationalEligibilityDecision` | `v1` | Portfolio, Trading, UI/API | Publish scoped approval, conditions, suspension, expiry, or rejection without altering Strategy registration. |
+| Missing | `AllocationReviewRequest` | `v1` | Portfolio submits; Risk receives | Request independent review of a Portfolio construction result or rebalance plan. |
+| Missing | `AllocationRiskDecision` | `v1` | Portfolio, Trading, UI/API | Publish approval/caps/conditions/rejection and the authoritative risk-budget projection. |
+| Missing | `AllocationBudgetActivationRequest` | `v1` | Portfolio submits; Risk receives | Activate the Risk-owned budget projection for one approved immutable allocation version. |
 
-To prevent accidental overrides from setting extreme or dangerous limits, the configuration parser validates all values against hard-coded global ceilings defined in [schema.py](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/config/schema.py):
+Each registered Risk contract carries `contract_version="v1"` and a separate
+stable `risk.<contract_name>.v1` `schema_id`, including the eligibility,
+allocation-review, and budget-activation family above. Compatibility is evaluated
+only from `contract_version`.
 
-| Limit Parameter | Hard Ceiling Value | Description |
-| :--- | :--- | :--- |
-| `max_daily_loss_pct` | `0.20` (20%) | Absolute limit on daily drawdown before halt. |
-| `max_total_loss_pct` | `0.50` (50%) | Absolute lifetime drawdown threshold. |
-| `max_margin_utilization_pct` | `1.00` (100%) | Capped margin usage. |
-| `max_effective_leverage` | `500.0` | Capped account leverage. |
-| `max_risk_per_trade` | `0.10` (10%) | Maximum capital risk allocation for a single trade. |
+**Consumed from other domains** — referenced only:
 
-Any override rule or profile value exceeding these ceilings triggers an immediate `ValidationError` or evaluates to a `REJECT` state.
+| Contract | Version | Owner | Used for |
+|---|---|---|---|
+| `TradeIntent` | `v1` | Strategy | Source proposal converted without loss into `ProposedTrade` for review. |
+| `AccountStateSnapshot` | `v1` | Data | Read-only account, position, margin, and snapshot-time evidence. |
+| `MarketContextEvidence` | `v1` | Data | Normalized session, calendar, spread, liquidity, volatility, correlation, crisis, freshness, provenance, and missingness evidence. |
+| `FXConversionEvidence` | `v1` | Data | Fresh Data-owned conversion path/rate evidence; Risk never synthesizes rates. |
+| Strategy registry reference | `v1` | Strategy | Verify exact immutable technical registration before operational eligibility review. |
+| `PortfolioConstructionResult` / `PortfolioRebalancePlan` | `v1` | Portfolio | Review a complete immutable construction or rebalance proposal without mutating it. |
+| `PortfolioAllocationEvidence` | `v1` | Analytics | Consume non-binding performance/dependence/concentration evidence without delegating policy. |
+| `AuthContext` | `v1` | Utils | Authenticated principal, roles/scopes, workflow, request, and correlation context. |
+| `AuditEvent` | `v1` | Utils | Redacted common envelope through which Risk submits audit payloads to Data's durable audit storage. |
 
-### Live Profile Guardrails
-For live configurations (`allow_live_execution` set to `true`), the following additional constraints are enforced strictly during validation:
-1. **Prop-Firm Drawdown Limits**: Live profiles daily loss limit must remain strictly below `0.04` (4.0%) daily drawdown and total loss limit below `0.08` (8.0%) total drawdown to comply with standard external prop-firm limits.
-2. **Owner/Admin Approval for Increased Limits**: Any increase of risk parameters above conservative default baselines (defined by `CONSERVATIVE_DEFAULTS`, e.g. `max_risk_per_trade` > `0.002` or `max_effective_leverage` > `5.0`) requires explicit owner or admin role signatures within `operator_approval_fields.operator_id`.
+No raw DataFrame, provider object, socket, database session, or broker client may cross the Risk boundary.
 
+### Persisted state
 
----
+Data owns database connections, locking, and migration execution. Risk owns the following schemas and is their only semantic writer; concrete persistence occurs through injected narrow interfaces.
 
-## 4. Configuration Hashing
+| Status | State / Store | Read access (via contract) | Migration definitions |
+|---|---|---|---|
+| Partial | Risk policy versions and configuration hashes | Risk; UI/API through approved policy views | `app/services/risk/audit/migrations.py` |
+| Partial | Canonical kill-switch state | Trading and UI/API through `KillSwitchState` v1 | `app/services/risk/audit/migrations.py` |
+| Missing | Approval-token issuance, revocation, nonce, and atomic reservation/consumption state | Risk validation only; validation result returned to caller | `app/services/risk/audit/migrations.py` |
+| Missing | Decision audit chain, including `previous_hash` and `record_hash` | Trading/UI/API through `RiskDecision` and audit views through `AuditEvent` | `app/services/risk/audit/migrations.py` |
+| Missing | Operational-eligibility decisions and suspension/expiry history | Portfolio, Trading, UI/API through `StrategyOperationalEligibilityDecision` | `app/services/risk/audit/migrations.py` |
+| Missing | Allocation decisions and active authoritative risk-budget projections | Portfolio, Trading, UI/API through `AllocationRiskDecision` and approved Risk views | `app/services/risk/audit/migrations.py` |
+| Missing | Optional decision/snapshot records enabled by an approved profile | Callers through Risk-owned result contracts only | `app/services/risk/audit/migrations.py` |
 
-Configuration models support deterministic, stable cryptographic hashing.
-* Instantiation timestamps (`created_at`) are normalized during config loading to ensure identical configurations yield the exact same SHA256 signature.
-* Config signatures are embedded in all emitted `RiskDecisionToken` structures for audit trails, ensuring executing modules cannot run under altered settings.
+### Four-level structure
 
----
-
-## 5. Policy-as-Code Resolution & Precedence
-
-Scoped overrides are specified as `PolicyRule` configurations containing matching scopes and target limit overrides. When resolving active policies for an execution context, rules are matched and sorted based on specificity scoring:
+| Code level | Represents |
+|---|---|
+| **Package** | Risk domain |
+| **Module folder** | One Risk feature/capability |
+| **File** | One use case or focused responsibility |
+| **Class / function / method** | Observable functional requirement |
 
 ```text
-Precedence Score = (workflow_id * 10000)
-                 + (symbol * 1000)
-                 + (strategy_id * 100)
-                 + (account_id * 10)
-                 + (currency * 5)
-                 + (operator_role * 2)
-                 + (mode * 1)
-                 + (environment * 1)
+Risk package
+└── Capability module
+    └── Focused file
+        └── Public class / function / method / constant
 ```
 
-Rules are sorted by ascending specificity score. The most general rules (lowest scores) are applied first, and the most specific rules (highest scores) are applied last, overwriting more general limits (e.g., a symbol-specific override overrides a strategy-level or account-level limit).
+### Package capability map
 
-### Live sensitive fail-closed behavior
-* If the context matches a live environment/mode (e.g. `full_live`), and the resolved configuration has `allow_live_execution: false`, the policy resolution automatically fails closed with a `BLOCK` status.
-* If a request lacks a resolved policy or default configuration, the gate fails closed by default.
+```mermaid
+flowchart TD
+    RISK[[Risk Package]]
+    RISK --> CONTRACTS[[contracts]]
+    RISK --> CONFIG[[config]]
+    RISK --> PORTFOLIO[[portfolio]]
+    RISK --> SIZING[[sizing]]
+    RISK --> POLICY[[policy]]
+    RISK --> REGIMES[[regimes]]
+    RISK --> AUDIT[[audit]]
+    RISK --> APPROVALS[[approvals]]
+    RISK --> DECISIONS[[decisions]]
+    RISK --> SCENARIOS[[scenarios]]
+    RISK --> REPORTING[[reporting]]
 
----
-
-## 6. Override Token Verification
-
-Ad-hoc limit overrides require cryptographically signed `RiskApprovalToken` structures. Token validation enforces:
-1. **Time-bounded Expiration**: Rejects expired tokens.
-2. **Configuration Compatibility**: Checks that the token's `config_hash` matches the current active `RiskConfig` hash to prevent applying old overrides to new profiles.
-3. **Scope Alignment**: Validates that scope parameters (like `symbol` or `strategy_id`) match the target execution context.
-4. **Authority Checks**: Live staging/production overrides require an authorized approver role (`risk_manager`, `admin`, or `compliance_officer`). Lower privilege roles (like `strategy_developer`) are blocked.
-
----
-
-## 7. Market Regime Gate
-
-The Market Regime Gate package (`app/services/risk/regime/`) validates current market conditions against historic baselines and calendar events, blocking or rejecting proposals when conditions are unsafe. It is composed of the following files:
-
-* **`assessor.py`**: Implements pure assessors for spread, volatility, news calendar, and rollover blackout classifications, including `assess_risk_regime` (supporting V1 & V2 signatures), `RegimeRiskEngine`, `classify_spread_regime`, `classify_volatility_regime`, `is_rollover_blackout`, and `validate_market_freshness`.
-* **`validation.py`**: Implements input validation checks (`validate_regime_inputs`) and stable reason code builders (`build_regime_reason_codes`).
-
-### Classification Categories
-1. **Spread Regime (`SpreadRegime`)**: Classifies current spread as `NORMAL`, `WIDE`, or `EXTREME` based on rolling spread statistics and z-score thresholds. `EXTREME` breaches fail the gate with `RiskDecisionStatus.REJECT` and reason code `SPREAD_BREACH`.
-2. **Volatility Regime (`VolatilityRegime`)**: Uses short and long rolling standard deviation windows to detect low volatility (`LOW`), normal (`NORMAL`), high volatility (`HIGH`), or an abnormal volatility spike (`SPIKE`). `SPIKE` outcomes reject the trade with reason code `DAILY_LOSS_BREACH`.
-3. **Liquidity Regime (`LiquidityRegime`)**: Checks quote age, tick frequency, and missing bars. Stale, thin, or illiquid states resolve to `ILLIQUID` or `THIN`. Illiquidity rejects execution with reason code `STALE_EVIDENCE`.
-4. **Session Regime (`SessionRegime`)**: Rejects trades if the target market session is `CLOSED` or symbol is `SUSPENDED`.
-5. **Rollover Regime (`RolloverRegime`)**: Enforces blackout windows surrounding broker midnight. Active rollover windows reject the trade with reason code `ROLLOVER_BLACKOUT`.
-6. **News Regime (`NewsRegime`)**: Parses high-impact news calendar schedules. High impact news within the blackout range triggers a blackout regime, rejecting the proposal with reason code `NEWS_BLACKOUT`.
-
-### Live Fail-Closed Calendars
-In live-sensitive environments, the engine enforces strict news calendar checks. If a live profile requires news calendar coverage and the calendar evidence is missing or empty, the gate fails closed with a `BLOCK` decision and reason code `STALE_EVIDENCE` to prevent trading into unmonitored macro events.
+    CONTRACTS --> CFILES[Enums, errors, evidence, requests, results]
+    CONFIG --> CFGFILES[Profiles and config hashes]
+    PORTFOLIO --> PFILES[Evidence normalization and snapshot]
+    SIZING --> SFILES[Position sizing]
+    POLICY --> POFILES[Limits, market context, admission, allocation]
+    REGIMES --> RFILES[Regime assessment]
+    AUDIT --> AFILES[Hash chain, persistence interface, migrations]
+    APPROVALS --> APFILES[Token lifecycle and state interface]
+    DECISIONS --> DFILES[Governor, validity, kill switch]
+    SCENARIOS --> SCFILES[Scenario and what-if analysis]
+    REPORTING --> RPFILES[Markdown and JSON summaries]
+```
 
 ---
 
-## 8. Pre-Trade Deterministic Limits & Aggregation
+## 2. Final Package Structure
 
-The deterministic limits engine is organized as a modular package under [limits/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/limits/) and evaluates candidate execution payloads sequentially against 20 configured limits.
+Modules and files are ordered from lowest dependency to highest dependency. Private helpers may be added inside the listed focused files; they are not public requirements.
 
-* **`contracts.py`**: Defines `LimitResult` (single check outcome), `LimitCheck` (typed limit-name/required-evidence/severity/precedence/evaluator registry entry), `LimitAssessment` (aggregated outcome), and the `LimitContext`/`LimitPrecedence` type aliases.
-* **`checks.py`**: Pure evaluators for every limit (kill-switch, evidence freshness, loss, exposure, tail-risk, margin, session, execution, frequency), plus a canonical V2 surface (`check_kill_switch`, `check_evidence_freshness`, `check_daily_loss`, `check_total_drawdown`, `check_exposure_limits`, `check_tail_risk_limits`, `check_execution_limits`) operating on typed snapshots (`PortfolioRiskSnapshot`, `VaRSnapshot`, `ExpectedShortfallSnapshot`, `StressSummary`, `ExecutionRiskSnapshot`) and an `EffectiveRiskPolicy` instead of a raw `market_context` dict.
-* **`engine.py`**: Assembles `ORDERED_LIMIT_CHECKS` (the immutable `tuple[LimitCheck, ...]` registry — built here rather than in `contracts.py` to avoid a circular import back into `checks.py`), `LimitEngine`, `run_limit_checks`/`check_risk_limits` (V1 orchestration), and the V2 `evaluate_ordered_limits`/`select_primary_failure`/`build_composite_breach_flags` pure aggregation functions.
+```text
+risk/
+├── __init__.py                         # Strict domain-level exports
+├── README.md
+├── contracts/                          # Versioned public contracts and errors
+│   ├── __init__.py
+│   ├── enums.py
+│   ├── errors.py
+│   ├── evidence.py
+│   ├── requests.py
+│   └── results.py
+├── config/                             # Validated profiles and stable hashes
+│   ├── __init__.py
+│   └── profiles.py
+├── portfolio/                          # Evidence normalization and risk snapshot
+│   ├── __init__.py
+│   └── snapshot.py
+├── sizing/                             # Position sizing recommendations
+│   ├── __init__.py
+│   └── calculator.py
+├── policy/                             # Limits and non-trade risk gates
+│   ├── __init__.py
+│   ├── limits.py
+│   ├── admission.py
+│   └── allocation.py
+├── regimes/                            # Regime assessment and tightening
+│   ├── __init__.py
+│   └── assessment.py
+├── audit/                              # Risk audit chain and persistence boundary
+│   ├── __init__.py
+│   ├── chain.py
+│   ├── storage.py
+│   └── migrations.py
+├── approvals/                          # Approval-token lifecycle
+│   ├── __init__.py
+│   ├── state.py
+│   └── tokens.py
+├── decisions/                          # Canonical governor and block-state decisions
+│   ├── __init__.py
+│   ├── governor.py
+│   ├── validity.py
+│   └── kill_switch.py
+├── scenarios/                          # Advisory scenario and what-if analysis
+│   ├── __init__.py
+│   └── analysis.py
+└── reporting/                          # Focused Risk summaries
+│   ├── __init__.py
+│   └── reports.py
+```
 
-### Execution Sequence Precedence
-Limit checks are ordered strictly as follows:
-1. **Governance & Switch Gates**: `kill_switch_state` -> `stale_evidence` -> `max_drawdown_limit` -> `daily_loss_limit` -> `strategy_loss_limit` -> `news_blackout` -> `rollover_blackout`
-2. **Execution Feasibility Gates**: `spread_limit` -> `slippage_limit` -> `trade_frequency_limit` -> `pending_order_limit`
-3. **Exposure & Concentration Gates**: `portfolio_exposure_limit` -> `symbol_exposure_limit` -> `currency_exposure_limit` -> `correlated_cluster_limit`
-4. **Tail-Risk & Financial Leverage Gates**: `var_limit` -> `expected_shortfall_limit` -> `stress_loss_limit` -> `leverage_limit` -> `margin_limit`
+### Module dependency diagram
 
-### Breach Decision Aggregation
-When multiple limits fail simultaneously:
-* The consolidated status uses the highest severity precedence: `BLOCK > REJECT > NEEDS_MORE_EVIDENCE > NEEDS_APPROVAL > REDUCE_SIZE > APPROVE`.
-* The `primary_failure_limit` reports the first limit breached according to the deterministic check sequence.
-* A sorted composite list of `composite_breach_flags` lists all triggered limit violations.
-* The V2 `evaluate_ordered_limits(context)` returns a single `LimitAssessment` combining the same `results`, an aggregated `status`, a `primary_failure` (`LimitResult | None`, selected via `select_primary_failure` against `DEFAULT_LIMIT_PRECEDENCE`), and `composite_breach_flags` as a `frozenset[RiskReasonCode]` (rather than limit-name strings).
+Arrows point from a required module to its consumer.
+
+```mermaid
+flowchart LR
+    C[[contracts]] --> CFG[[config]]
+    C --> P[[portfolio]]
+    CFG --> P
+    C --> S[[sizing]]
+    CFG --> S
+    P --> S
+    C --> POL[[policy]]
+    CFG --> POL
+    P --> POL
+    C --> R[[regimes]]
+    CFG --> R
+    P --> R
+    C --> A[[audit]]
+    CFG --> A
+    C --> AP[[approvals]]
+    CFG --> AP
+    A --> AP
+    C --> D[[decisions]]
+    CFG --> D
+    P --> D
+    S --> D
+    POL --> D
+    R --> D
+    A --> D
+    AP --> D
+    C --> SC[[scenarios]]
+    CFG --> SC
+    P --> SC
+    C --> REP[[reporting]]
+    D --> REP
+    SC --> REP
+    A --> REP
+```
+
+### Structure rules
+
+- Package and feature `__init__.py` files contain explicit imports and `__all__` only.
+- Root `__all__` exposes only versioned public contracts and typed domain operations; it exposes no calculator, persistence backend, signer, repository, or provider object.
+- Functions are preferred for stateless behavior. `RiskGovernor`, `ApprovalTokenService`, and `RiskAuditChain` are classes because they own injected dependencies and coordinated state.
+- `core/`, `api/`, `models/`, `simulation/`, `safety/`, generic `storage/`, generic `validators/`, and `workflows/` compatibility layers are not part of the target.
+- No module imports Trading, MT5, a broker adapter, Data internals, or another domain's persistence implementation.
+- Usage examples live only under `tests/risk/usage/`.
 
 ---
 
-## 9. Testing & Quality Assurance
+## 3. Workflows
 
-All risk components implement strict static type annotations checked with Mypy, and Ruff formatting/lint guidelines.
+### Status values
 
-To run verification checks:
+| Status | Meaning |
+|---|---|
+| **Missing** | Not implemented, incompatible with the target, or not verified. |
+| **Partial** | Useful V1 behavior exists but contracts, relocation, validation, persistence, or tests remain. |
+| **Completed** | Target behavior, location, callers, tests, and boundaries are all verified. |
+
+### Workflow scope values
+
+| Scope | Meaning |
+|---|---|
+| **Internal** | Complete inside Risk. |
+| **Cross-domain** | Risk receives or returns a documented cross-domain contract. |
+
+| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|
+| Partial | `WF-RISK-001` | Internal with Data input | Build portfolio risk snapshot | Data/account and bounded market evidence | Risk-internal immutable `PortfolioRiskSnapshot` | `FR-RISK-004 → FR-RISK-005 → FR-RISK-025` |
+| Partial | `WF-RISK-002` | Cross-domain | Calculate position size | Sizing request plus portfolio/symbol evidence | `PositionSizingResult`; never approval | `FR-RISK-007 → FR-RISK-008 → FR-RISK-026` |
+| Partial | `WF-RISK-003` | Cross-domain | Assess risk regime | Bounded external market/context evidence | `RegimeAssessment` and limit modifiers | `FR-RISK-011 → FR-RISK-031` |
+| Partial | `WF-RISK-004` | Cross-domain | Review proposed trade risk | `TradeIntent`, fresh evidence, config, governance state | `RiskDecision` v1 / `RiskDecisionPackage` | `FR-RISK-006 → FR-RISK-027 → FR-RISK-031 → FR-RISK-040` |
+| Partial | `WF-RISK-005` | Cross-domain | Run current portfolio governor | Current snapshot, config, kill-switch evidence | Current-state `RiskDecisionPackage`; caller remediates | `FR-RISK-005 → FR-RISK-044 → FR-RISK-041` |
+| Missing | `WF-RISK-006` | Cross-domain | Review strategy operational eligibility | Exact registered strategy/version, evidence, policy, route/profile, approval context | `StrategyOperationalEligibilityDecision v1` | `FR-RISK-010 → FR-RISK-029` |
+| Missing | `WF-RISK-007` | Cross-domain | Review/activate allocation risk | Portfolio construction/rebalance reference plus fresh evidence and approval context | `AllocationRiskDecision v1` and budget activation result | `FR-RISK-009 → FR-RISK-030` |
+| Partial | `WF-RISK-008` | Cross-domain | Validate approval token | Token, expected scope/action/config, injected time | Durable validation/consumption result | `FR-RISK-015 → FR-RISK-020 → FR-RISK-037` |
+| Partial | `WF-RISK-009` | Cross-domain | Apply/check kill-switch state | Authorized command or current state and scope | Canonical state or block/recovery decision | `FR-RISK-016 → FR-RISK-043 → FR-RISK-017 → FR-RISK-044` |
+| Partial | `WF-RISK-010` | Cross-domain | Run scenario or what-if analysis | Immutable snapshot and scenario definitions | Advisory `ScenarioResult` | `FR-RISK-012 → FR-RISK-013 → FR-RISK-045` |
+| Partial | `WF-RISK-011` | Internal/Cross-domain | Generate risk decision summary | Snapshot, decision, or scenario result | Markdown/JSON `RiskReport` | `FR-RISK-019 → FR-RISK-046` |
+| Missing | `WF-RISK-012` | Cross-domain | Persist risk audit and token state | Material decision/token event | Durable hash-chain/token state or fail-closed result | `FR-RISK-018 → FR-RISK-033 → FR-RISK-037` |
+| Partial | `WF-RISK-014` | Cross-domain | Revalidate decision/evidence before reuse | Prior decision/token plus current evidence/config/time | Reuse validity result; refresh or block | `FR-RISK-042 → FR-RISK-037` |
+
+### Workflow details
+
+#### `WF-RISK-001` — Build portfolio risk snapshot
+
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**Input boundary:** `AccountStateSnapshot` v1 plus explicit position, pending-order, symbol, return-history, FX-conversion, and provenance evidence supplied by owning domains.
+**Output boundary:** immutable `PortfolioRiskSnapshot` retained inside Risk for sizing,
+limits, regime assessment, decision synthesis, scenarios, and reporting. Cross-domain
+callers receive registered `RiskDecision` contracts or UI/API-owned views, never the
+snapshot directly.
+
+1. Validate contract versions, timestamps, numeric finiteness, and profile/config hash.
+2. Normalize evidence without inventing missing values or mutating inputs.
+3. Include pending exposure and calculate base-currency exposure, drawdown, margin/leverage, historical VaR/CVaR, correlation, and contributions where evidence is sufficient.
+4. Return calculations, assumptions, coverage, missing-evidence markers, and provenance.
+
+**Failure behaviour:** invalid input raises `RiskDomainError(INVALID_PORTFOLIO_STATE)`; missing material conversion/metadata remains explicit and blocks live-sensitive consumers; calculation failure never creates a synthetic safe value.
+**Integration test:** `tests/risk/integration/test_build_portfolio_snapshot.py::test_build_portfolio_snapshot_from_external_evidence()`
+
+#### `WF-RISK-002` — Calculate position size
+
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**Input boundary:** `PositionSizingRequest` (a Risk-internal type, not a registered cross-domain contract) plus portfolio, symbol, stop, broker-constraint, volatility/correlation, and performance evidence.
+**Output boundary:** `PositionSizingResult` only (Risk-internal; cross-domain consumers receive sizing outcomes only inside `RiskDecision v1`).
+
+The calculator supports fixed-lot, fixed-risk, milestone, fractional-Kelly, volatility, and fixed-fractional methods; it clamps or rejects against supplied constraints and never returns the V1 `0.1`-lot failure fallback. Missing stop distance, zero equity, insufficient volatility/Kelly evidence, or unapproved full Kelly produces a deterministic failure or an explicitly configured fixed-risk fallback.
+
+**Integration test:** `tests/risk/integration/test_position_sizing.py::test_position_sizing_requires_governor_after_result()`
+
+#### `WF-RISK-003` — Assess risk regime
+
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**Input boundary:** external volatility, liquidity, correlation, drawdown, crisis, news, and session evidence.
+**Output boundary:** `RegimeAssessment` with transition evidence and configured tightening modifiers.
+
+Unknown or required-missing regime evidence fails closed for live-sensitive workflows. Data supplies `MarketContextEvidence v1`; Risk profiles interpret it using a default stressed lookback of 252 trading days and named UTC crisis windows, without fetching or extrapolating evidence.
+
+**Integration test:** `tests/risk/integration/test_regime_assessment.py::test_high_risk_regime_tightens_limits()`
+
+#### `WF-RISK-004` — Review proposed trade risk
+
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**Input boundary:** Strategy `TradeIntent`, Data `AccountStateSnapshot`, external market/governance evidence, `AuthContext`, and validated config.
+**Output boundary:** `RiskDecision` v1, concretely serialized as `RiskDecisionPackage`.
+
+```mermaid
+flowchart LR
+    I[TradeIntent + evidence] --> V["Validate request, state, config"]
+    V --> K["Kill-switch and freshness"]
+    K --> R["Regime and ordered limits"]
+    R --> C["Concurrent-capacity gate"]
+    C --> A["Approval-token eligibility"]
+    A --> D["RiskDecisionPackage"]
+    D --> H["Audit-chain write"]
+    H --> O[Trading or Simulation boundary]
+```
+
+The fixed precedence is validation/config → kill switch → missing/stale evidence → hard limits → policy restrictions → approval requirement → final verdict. Every material result includes `primary_failure_limit` and ordered `composite_breach_flags`. No forced/manual override is accepted.
+
+**Failure behaviour:** any unknown safety state, unavailable mandatory audit/token state, or unresolved live double-spend protection blocks approval.
+**Integration test:** `tests/risk/integration/test_trade_review.py::test_trade_review_uses_fixed_precedence_and_fails_closed()`
+
+#### `WF-RISK-005` — Run current portfolio governor
+
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`, `SYS-WF-005`
+**Input boundary:** current snapshot, config, regime, kill-switch, and governance evidence.
+**Output boundary:** current-state compliance `RiskDecisionPackage`; Trading/UI/API owns remediation.
+
+Risk detects breaches and recommends block/reduction/review without cancelling orders, closing positions, or changing execution controls.
+
+**Integration test:** `tests/risk/integration/test_portfolio_governor.py::test_portfolio_governor_has_no_execution_side_effect()`
+
+#### `WF-RISK-006` — Review strategy admission
+
+**System workflow:** `SYS-WF-006`
+**Input boundary:** `StrategyOperationalEligibilityRequest v1`, exact Strategy
+registration reference, required Data evidence, policy, route/profile, and approval
+context.
+**Output boundary:** `StrategyOperationalEligibilityDecision v1`.
+
+Risk approves, conditions, expires, suspends, or rejects operational use without
+altering Strategy's registry. Registration alone never authorizes allocation or
+execution; missing or stale evidence fails closed.
+
+#### `WF-RISK-007` — Review allocation proposal
+
+**System workflows:** `SYS-WF-007`, `SYS-WF-008`
+**Input boundary:** `AllocationReviewRequest v1` referencing an immutable
+`PortfolioConstructionResult` or `PortfolioRebalancePlan` plus current
+eligibility, account, market, FX, Analytics, policy, and approval evidence.
+**Output boundary:** `AllocationRiskDecision v1` and, after a valid
+`AllocationBudgetActivationRequest v1`, the active authoritative risk-budget
+projection.
+
+Risk may approve, cap, condition, expire, or reject. It never constructs Portfolio
+weights, activates Portfolio state, or executes a rebalance. Capital weights remain
+Portfolio metadata; the Risk budget projection is the binding control.
+
+#### `WF-RISK-008` — Validate approval token
+
+**System workflow:** `SYS-WF-002`
+**Input boundary:** token plus expected decision, action, account, strategy, symbol,
+config, Risk-owned and UI/API-produced `ApprovalAttestation`, audit requirement, and injected time.
+**Output boundary:** `ApprovalValidationResult`; caller proceeds only when valid and durably consumed.
+
+Schema, HMAC-or-stronger signature, scope, decision/config binding, expiry,
+revocation, nonce, single use, authorized attestation, and mandatory audit write are
+checked atomically. Risk reserves token + workflow + action scope + expiry before a
+live-success path; concurrent or conflicting reservation fails closed.
+
+**Integration test:** `tests/risk/integration/test_approval_tokens.py::test_live_token_is_consumed_once_durably()`
+
+#### `WF-RISK-009` — Apply or check kill-switch state
+
+**System workflow:** `SYS-WF-005`
+**Input boundary:** UI/API `KillSwitchCommand` plus `AuthContext`, or an existing `KillSwitchState` and requested scope.
+**Output boundary:** canonical `KillSwitchState` and deterministic block/recovery decision consumed by Trading/UI/API.
+
+Active or unknown state blocks live risk increase. `global` state overrides
+`strategy`, which overrides `symbol`; an inactive child cannot override an active
+parent. Risk persists canonical state and revokes affected approvals; only Trading
+mutates execution controls. Clearance requires a valid Risk-owned, UI/API-produced
+`ApprovalAttestation`, and Trading resumes only after all applicable scopes are
+inactive and reconciliation succeeds.
+
+**Integration test:** `tests/risk/integration/test_kill_switch.py::test_kill_switch_command_blocks_trading_without_execution_mutation()`
+
+#### `WF-RISK-010` — Run scenario or what-if analysis
+
+**System workflow:** None registered.
+**Input boundary:** immutable snapshot plus bounded `ScenarioDefinition` values.
+**Output boundary:** advisory baseline/projected comparison.
+
+No live state changes. Scenario output cannot claim approval and must pass through the canonical governor before any action.
+
+**Integration test:** `tests/risk/integration/test_scenario_analysis.py::test_scenario_analysis_is_deterministic_and_advisory()`
+
+#### `WF-RISK-011` — Generate risk decision summary
+
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`, `SYS-WF-005`
+**Input boundary:** completed snapshot, decision, or scenario result.
+**Output boundary:** focused Markdown/JSON `RiskReport`.
+
+Evidence, calculations, assumptions, warnings, decisions, and recommendations are separated. Rejections/blocks identify the primary failure first. Live approval is claimed only when a valid decision and token are present.
+
+**Integration test:** `tests/risk/integration/test_risk_reporting.py::test_report_separates_evidence_and_decision()`
+
+#### `WF-RISK-012` — Persist risk audit and token state
+
+**System workflow:** `SYS-WF-002`, `SYS-WF-005`
+**Input boundary:** material decision, kill-switch, audit, or token event.
+**Output boundary:** Risk-owned record persisted through Data-owned infrastructure or a fail-closed live result.
+
+Canonical JSON and SHA-256-or-stronger hashing bind each record to `previous_hash`; genesis defaults to 64 zeroes unless deployment config specifies another constant. Partial writes, tamper, or mandatory-store unavailability block live-sensitive success.
+
+**Integration test:** `tests/risk/integration/test_risk_persistence.py::test_audit_and_token_state_fail_closed_atomically()`
+
+#### `WF-RISK-014` — Revalidate decision/evidence before reuse
+
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**Input boundary:** prior decision/token plus current proposal, evidence, config, and injected time.
+**Output boundary:** reusable/refresh-required/blocked validation result.
+
+Material scope change, expiry, clock skew, stale evidence, config mismatch, in-flight reconciliation expiry, revoked token, or consumed token invalidates reuse.
+
+**Integration test:** `tests/risk/integration/test_decision_revalidation.py::test_material_change_requires_new_decision()`
+
+---
+
+## 4. Module and Requirement Specifications
+
+Requirements are ordered by implementation dependency. Each public symbol appears in exactly one `FR-RISK-*` row.
+Manifest identifiers are configuration fields or private implementation constants unless a file's `Key exports` explicitly lists them; they do not create additional public symbols.
+Shortened test references are relative to the module's documented `tests/risk/usage/test_usage_*.py` file or to `tests/risk/unit/`; together with the module's `Usage file` line they identify one exact pytest node.
+
+### 4.1 `contracts/` — Versioned Contracts and Deterministic Errors
+
+**Purpose:** Define strict Pydantic V2 contracts, exact Decimal serialization, canonical enums, and one coded domain exception without business I/O.
+
+**Module flow:** `untrusted mapping → strict contract/version/finite-value validation → immutable typed value or coded error`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `enums.py` | Canonical stable enum values | `DecisionState`, `LimitStatus`, `RiskErrorCode` | **Standard library:** enum<br>**Required third-party:** None<br>**Local:** None |
+| Missing | `errors.py` | Coded domain exception | `RiskDomainError` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `enums.py → RiskErrorCode` |
+| Partial | `evidence.py` | Immutable normalized portfolio evidence and compatibility validation for Data-owned market-context evidence | `PortfolioState`, `PortfolioRiskSnapshot`, `validate_market_context_evidence` | **Standard library:** datetime, decimal<br>**Required third-party:** pydantic 2.13.4<br>**Local:** `enums.py → LimitStatus`; Data public API → `MarketContextEvidence` |
+| Partial | `requests.py` | Versioned Risk-owned request contracts | `ProposedTrade`, `PositionSizingRequest`, `ProposedAllocation`, `StrategyAdmissionRequest`, `ScenarioDefinition`, `KillSwitchCommand` | **Standard library:** datetime, decimal<br>**Required third-party:** pydantic 2.13.4<br>**Local:** `enums.py → DecisionState` |
+| Partial | `results.py` | Versioned Risk-owned result/state contracts | `RiskLimitResult`, `PositionSizingResult`, `RegimeAssessment`, `ScenarioResult`, `RiskDecisionPackage`, `ActionPolicyVerdict`, `RiskApprovalToken`, `KillSwitchState`, `RiskAuditRecord`, `RiskReport`, `ApprovalValidationResult` | **Standard library:** datetime, decimal<br>**Required third-party:** pydantic 2.13.4<br>**Local:** `enums.py`, `evidence.py`, `requests.py` |
+| Missing | `__init__.py` | Expose the approved contract API | All symbols above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `SCHEMA_VERSION` | `str` | `v1` | Yes | Every public model | Reject unsupported breaking contract versions. |
+| Missing | `DECIMAL_ROUNDING` | rounding mode | `ROUND_HALF_EVEN` | Yes | Monetary/sizing validators | Different mode requires an approved profile. |
+| Missing | `ALLOW_INF_NAN` | `bool` | `False` | Yes | Every public model | Non-finite values are rejected. |
+
+#### Functional requirements
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-RISK-001` | Define `approve`, `warn`, `needs_approval`, `needs_more_evidence`, `reject`, `block`, and `error` exactly. | `DecisionState` | None | None | **Usage:** `tests/risk/usage/test_usage_contracts.py::test_usage_enums_decision_state()`<br>**Unit:** `tests/risk/unit/test_enums.py::test_decision_state_values_are_stable()` |
+| Missing | `FR-RISK-002` | Define `pass`, `warn`, `needs_more_evidence`, `fail`, and `blocked` exactly. | `LimitStatus` | None | None | **Usage:** `test_usage_contracts.py::test_usage_enums_limit_status()`<br>**Unit:** `test_enums.py::test_limit_status_values_are_stable()` |
+| Missing | `FR-RISK-003` | Define every accepted deterministic Risk error code; historical VaR/CVaR is the sole supported VaR method. | `RiskErrorCode` | None | None | **Usage:** `test_usage_contracts.py::test_usage_errors_codes()`<br>**Unit:** `test_errors.py::test_error_code_catalog()` |
+| Partial | `FR-RISK-004` | Carry immutable account/position/pending-order/symbol/market evidence with UTC `as_of`, provenance, missingness, and schema version. | `PortfolioState` | None | `ValidationError`: invalid version, naive time, non-finite Decimal, or malformed evidence | **Usage:** `test_usage_contracts.py::test_usage_evidence_portfolio_state()`<br>**Unit:** `test_evidence.py::test_portfolio_state_preserves_missingness()` |
+| Partial | `FR-RISK-005` | Carry reproducible base-currency metrics, limit results, assumptions, coverage, regime, request/workflow IDs, evidence refs, and config hash. | `PortfolioRiskSnapshot` | None | `ValidationError`: invalid or non-finite result | **Usage:** `test_usage_contracts.py::test_usage_evidence_portfolio_snapshot()`<br>**Unit:** `test_evidence.py::test_snapshot_serializes_decimal_exactly()` |
+| Missing | `FR-RISK-058` | Validate the consumed Data-owned `MarketContextEvidence v1` version, UTC freshness, provenance, bounded values, and explicit missingness without redefining or fetching it. | `validate_market_context_evidence(evidence: MarketContextEvidence, *, now: datetime) -> None` | None | `RiskDomainError(MISSING_EVIDENCE, STALE_EVIDENCE, VALIDATION_FAILED)`: incompatible, stale, or malformed evidence | **Usage:** `test_usage_contracts.py::test_usage_evidence_market_context()`<br>**Unit:** `test_evidence.py::test_market_context_uses_data_owned_contract()` |
+| Missing | `FR-RISK-059` | Return `ActionPolicyVerdict v1` bound to action, scope, policy version, approval attestation, decision, reservation, expiry, reasons, and trace IDs. | `ActionPolicyVerdict` | None | `ValidationError`: inconsistent, unbound, or non-UTC verdict | **Usage:** `test_usage_contracts.py::test_usage_results_action_policy()`<br>**Unit:** `test_results.py::test_action_policy_verdict_requires_reservation()` |
+| Partial | `FR-RISK-060` | Carry one ordered limit result with status, observed/threshold values, reason code, evidence refs, and precedence without granting approval. | `RiskLimitResult` | None | `ValidationError`: inconsistent status/reason or non-finite value | **Usage:** `test_usage_contracts.py::test_usage_results_limit()`<br>**Unit:** `test_results.py::test_limit_result_invariants()` |
+| Partial | `FR-RISK-006` | Represent one non-executable risk-increasing proposal with intent reference, scope, direction, requested size, price/stop evidence, validity, and provenance. | `ProposedTrade` | None | `ValidationError`: invalid size/scope or required stop evidence absent | **Usage:** `test_usage_contracts.py::test_usage_requests_proposed_trade()`<br>**Unit:** `test_requests.py::test_proposed_trade_requires_fixed_risk_stop()` |
+| Partial | `FR-RISK-007` | Represent one of six sizing methods and its complete evidence/config references. | `PositionSizingRequest` | None | `ValidationError`: unknown method or incomplete method evidence | **Usage:** `test_usage_contracts.py::test_usage_requests_sizing()`<br>**Unit:** `test_requests.py::test_sizing_request_is_method_strict()` |
+| Partial | `FR-RISK-008` | Return exact requested/normalized size, constraints applied, evidence gaps, fallback disclosure, and no approval claim. | `PositionSizingResult` | None | `ValidationError`: non-finite result | **Usage:** `test_usage_contracts.py::test_usage_results_sizing()`<br>**Unit:** `test_results.py::test_sizing_result_cannot_claim_approval()` |
+| Missing | `FR-RISK-009` | Validate and review `AllocationReviewRequest v1` without constructing or applying a Portfolio allocation. | `review_allocation_proposal` | None | Structured rejection on missing/stale/incompatible evidence | **Verification:** `SYS-WF-007`/`SYS-WF-008` compatibility tests. |
+| Missing | `FR-RISK-010` | Validate `StrategyOperationalEligibilityRequest v1` for an exact registered strategy/version and scope. | `review_strategy_admission` | None | Structured rejection on registration/evidence/policy failure | **Verification:** `SYS-WF-006` compatibility test. |
+| Partial | `FR-RISK-011` | Return classified volatility/liquidity/correlation/drawdown/crisis/news/session states, transition evidence, modifiers, and missingness. | `RegimeAssessment` | None | `ValidationError`: invalid regime value | **Usage:** `test_usage_contracts.py::test_usage_results_regime()`<br>**Unit:** `test_results.py::test_regime_assessment_carries_transition()` |
+| Partial | `FR-RISK-012` | Define a bounded immutable advisory scenario with deterministic shocks and optional explicit seed. | `ScenarioDefinition` | None | `ValidationError`: unsupported/non-finite shock or unseeded randomness | **Usage:** `test_usage_contracts.py::test_usage_requests_scenario()`<br>**Unit:** `test_requests.py::test_scenario_requires_seed_if_randomized()` |
+| Partial | `FR-RISK-013` | Return baseline/projected risk comparison and state that the output is advisory and not approved. | `ScenarioResult` | None | `ValidationError`: invalid projection | **Usage:** `test_usage_contracts.py::test_usage_results_scenario()`<br>**Unit:** `test_results.py::test_scenario_result_is_advisory()` |
+| Missing | `FR-RISK-014` | Implement `RiskDecision` v1 with verdict, approved size, ordered checks, primary/composite reasons, provenance, expiry, concurrency disclosure, and optional token. | `RiskDecisionPackage` | None | `ValidationError`: inconsistent verdict/token or missing provenance | **Usage:** `test_usage_contracts.py::test_usage_results_decision()`<br>**Unit:** `test_results.py::test_decision_package_invariants()` |
+| Partial | `FR-RISK-015` | Carry signed token scope, decision/config hashes, approver, expiry, nonce, schema version, and no secret key. | `RiskApprovalToken` | None | `ValidationError`: incomplete or non-UTC token | **Usage:** `test_usage_contracts.py::test_usage_results_token()`<br>**Unit:** `test_results.py::test_token_contract_has_required_bindings()` |
+| Partial | `FR-RISK-016` | Implement `KillSwitchCommand` v1 with action, principal/authorization context reference, reason, timestamp, and correlation ID. | `KillSwitchCommand` | None | `ValidationError`: invalid action/context | **Usage:** `test_usage_contracts.py::test_usage_requests_kill_switch()`<br>**Unit:** `test_requests.py::test_kill_switch_command_requires_reason()` |
+| Partial | `FR-RISK-017` | Implement `KillSwitchState` v1 with scope, active/unknown state, reason, version, and UTC update time. | `KillSwitchState` | None | `ValidationError`: invalid transition data | **Usage:** `test_usage_contracts.py::test_usage_results_kill_switch()`<br>**Unit:** `test_results.py::test_kill_switch_unknown_is_representable()` |
+| Partial | `FR-RISK-018` | Carry canonical redacted audit payload, evidence/config/decision provenance, sequence, previous hash, and record hash. | `RiskAuditRecord` | None | `ValidationError`: secret-like field, invalid hash, or incomplete provenance | **Usage:** `test_usage_contracts.py::test_usage_results_audit()`<br>**Unit:** `test_results.py::test_audit_record_redacts_secrets()` |
+| Partial | `FR-RISK-019` | Carry Markdown or exact JSON summary with separated evidence, assumptions, warnings, decision, and recommendations. | `RiskReport` | None | `ValidationError`: invalid format or false approval state | **Usage:** `test_usage_contracts.py::test_usage_results_report()`<br>**Unit:** `test_results.py::test_report_contract_separates_sections()` |
+| Missing | `FR-RISK-020` | Return token validity, consumption state, reason code, and audit reference without exposing secrets. | `ApprovalValidationResult` | None | `ValidationError`: inconsistent valid/reason state | **Usage:** `test_usage_contracts.py::test_usage_results_token_validation()`<br>**Unit:** `test_results.py::test_validation_result_invariants()` |
+| Missing | `FR-RISK-021` | Raise one redacted domain exception carrying a `RiskErrorCode` and safe details for boundary mapping. | `RiskDomainError(code: RiskErrorCode, details: str)` | None | None | **Usage:** `test_usage_contracts.py::test_usage_errors_domain_error()`<br>**Unit:** `test_errors.py::test_domain_error_redacts_details()` |
+
+**Rules and implementation notes:**
+
+- Pydantic models use strict mode, `extra="forbid"`, `allow_inf_nan=False`, UTC-aware timestamps, immutable public results, and exact Decimal-to-string JSON serialization.
+- Keep useful V1 contract semantics but merge duplicate `domain/models` types; no compatibility namespace is canonical.
+- `RiskErrorCode` includes `INVALID_INPUT`, `INVALID_PORTFOLIO_STATE`, `INVALID_RISK_CONFIG`, `MISSING_EVIDENCE`, `STALE_EVIDENCE`, `LIMIT_FAILED`, `POLICY_BLOCKED`, `PERMISSION_DENIED`, `KILL_SWITCH_ACTIVE`, `KILL_SWITCH_UNKNOWN`, `APPROVAL_REQUIRED`, token invalid/expired/revoked/consumed codes, config mismatch codes, `PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED`, `PAYLOAD_TOO_LARGE`, sizing/evidence codes, `LIVE_STATE_STALE`, `IN_FLIGHT_TOLERANCE_EXCEEDED`, `IN_FLIGHT_RECONCILIATION_EXPIRED`, `AUDIT_CHAIN_TAMPER_DETECTED`, `CALCULATION_FAILED`, `SNAPSHOT_BUILD_FAILED`, `GOVERNOR_DECISION_FAILED`, `REPORT_GENERATION_FAILED`, `STORAGE_ERROR`, `TOOL_EXECUTION_FAILED`, and `UNKNOWN_ERROR`.
+
+**Usage file:** `tests/risk/usage/test_usage_contracts.py`
+
+### 4.2 `config/` — Risk Profiles and Stable Configuration
+
+**Purpose:** Load, validate, select, and hash profile-driven Risk configuration without inventing trading thresholds.
+
+**Module flow:** `configs/risk/*.yaml → strict RiskConfig → canonical JSON → config hash`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `profiles.py` | Profile contract, load/validation, and hashing | `RiskConfig`, `load_risk_config`, `compute_config_hash` | **Standard library:** hashlib, json, pathlib<br>**Required third-party:** pydantic 2.13.4; PyYAML 6.0.3 (lockfile; direct declaration Pending)<br>**Local:** `contracts` |
+| Missing | `__init__.py` | Expose config API | symbols above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `profiles.py` |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Partial | `RISK_PROFILE` | `str` | `research` | Yes | `load_risk_config()` | Selects an approved profile; missing live profile fails closed. |
+| Missing | `CONFIG_ROOT` | `Path` | `configs/risk` | Yes | `load_risk_config()` | Path is bounded and may not escape the approved root. |
+| Missing | `PENDING_ORDER_EXPOSURE_POLICY` | enum | None | Live: Yes | snapshot/governor | Missing policy with pending orders blocks review. |
+| Missing | `EVIDENCE_MAX_AGE_SECONDS` | mapping | None | Live: Yes | snapshot/governor/token validity | No default is invented; stale evidence fails closed. |
+| Missing | `CLOCK_SKEW_TOLERANCE_SECONDS` | `Decimal` | None | Live: Yes | validity/token checks | Exceeding tolerance invalidates evidence/token. |
+| Missing | `AUDIT_PERSISTENCE_REQUIRED` | `bool` | `True` for live | Yes | governor/audit/token | Mandatory-store failure blocks live success. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-RISK-022` | Define strict profile fields, thresholds, modes, freshness, rounding, concurrency, audit, and dependency timeouts with stable schema version. | `RiskConfig` | None | `ValidationError`: missing/invalid values | **Usage:** `tests/risk/usage/test_usage_config.py::test_usage_profiles_config()`<br>**Unit:** `tests/risk/unit/test_profiles.py::test_live_profile_requires_all_safety_values()` |
+| Partial | `FR-RISK-023` | Load only the selected YAML profile from the bounded root and fail closed on missing/invalid live configuration. | `load_risk_config(profile: str, config_root: Path) -> RiskConfig` | Read-only | `RiskDomainError(INVALID_RISK_CONFIG)`: file/schema/path failure | **Usage:** `test_usage_config.py::test_usage_profiles_load()`<br>**Unit:** `test_profiles.py::test_missing_live_profile_fails_closed()` |
+| Partial | `FR-RISK-024` | Hash canonical exact serialization so any material config change changes the SHA-256 hash. | `compute_config_hash(config: RiskConfig) -> str` | None | `RiskDomainError(INVALID_RISK_CONFIG)`: canonicalization failure | **Usage:** `test_usage_config.py::test_usage_profiles_hash()`<br>**Unit:** `test_profiles.py::test_config_hash_is_stable_and_sensitive()` |
+
+**Rules and implementation notes:**
+
+- Preserve V1 threshold/hash logic only after consolidation; remove hidden defaults and direct environment/provider reads.
+- Numeric risk limits are owner policy. This README records only reconciliation-approved baselines; live values remain profile-required where semantics or owner approval is absent.
+
+**Usage file:** `tests/risk/usage/test_usage_config.py`
+
+### 4.3 `portfolio/` — Evidence Normalization and Portfolio Risk Snapshot
+
+**Purpose:** Produce one immutable, reproducible snapshot from supplied evidence using private deterministic calculators.
+
+**Module flow:** `PortfolioState + RiskConfig → validate/normalize → exposure/drawdown/margin/historical tail risk/correlation → PortfolioRiskSnapshot`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `snapshot.py` | Normalize evidence and calculate the canonical snapshot | `build_portfolio_risk_snapshot` | **Standard library:** datetime, decimal, math, statistics<br>**Required third-party:** None<br>**Local:** `contracts`, `config` |
+| Missing | `__init__.py` | Expose snapshot API | `build_portfolio_risk_snapshot` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `snapshot.py` |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `VAR_METHOD` | enum | `historical` | Yes | `build_portfolio_risk_snapshot()` | Parametric methods are excluded initially. |
+| Partial | `VAR_CONFIDENCE` | `Decimal` | `0.95` | Yes | snapshot | Outside (0,1) is invalid. |
+| Missing | `VAR_MIN_OBSERVATIONS` | `int` | None | Live: Yes | snapshot | Insufficient data returns missing evidence; missing live config is invalid. |
+| Missing | `VAR_LOOKBACK` | `int` | None | Yes | snapshot | Must be documented in assumptions/coverage. |
+| Partial | `MAX_CORRELATION` | `Decimal` | `0.50` FX baseline | Yes | snapshot/policy | Breach becomes an ordered limit result. |
+| Missing | `PSD_POLICY` | enum | None | Yes | snapshot | Deterministically sanitize or reject a non-PSD matrix. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-RISK-025` | Build an immutable snapshot containing pending-order-aware gross/net exposure by dimension, account-currency conversions, drawdown/loss state, margin/leverage, volatility, historical VaR/CVaR, pair/portfolio correlation, incremental contribution, assumptions, coverage, and explicit gaps. | `build_portfolio_risk_snapshot(state: PortfolioState, config: RiskConfig, *, now: datetime) -> PortfolioRiskSnapshot` | None | `RiskDomainError(INVALID_PORTFOLIO_STATE, MISSING_EVIDENCE, SNAPSHOT_BUILD_FAILED)`: corresponding condition | **Usage:** `tests/risk/usage/test_usage_portfolio.py::test_usage_snapshot_build()`<br>**Unit:** `tests/risk/unit/test_snapshot.py::test_snapshot_includes_pending_and_conversion_evidence()` |
+
+**Rules and implementation notes:**
+
+- Reuse V1 state normalization, exposure, drawdown, margin, historical VaR/CVaR, covariance, contribution math, and decision-relevant metric/score aggregation after Decimal/evidence refactoring; merge scores into snapshot/decision summaries without a public registry or recommendation engine.
+- Never fetch broker/market data, infer contract size/pip value/conversion rates, return infinity, or mutate source evidence.
+- Monthly-target fields are excluded from the public Risk contract; stressed crisis calculations fail closed rather than using ordinary lookbacks.
+
+**Usage file:** `tests/risk/usage/test_usage_portfolio.py`
+
+### 4.4 `sizing/` — Position Sizing Recommendations
+
+**Purpose:** Calculate deterministic, evidence-driven position sizing without granting trade approval.
+
+**Module flow:** `PositionSizingRequest + snapshot + constraints → method calculation → normalization/caps → PositionSizingResult`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `calculator.py` | Execute the six approved sizing methods | `calculate_position_size` | **Standard library:** decimal<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `portfolio` |
+| Missing | `__init__.py` | Expose sizing API | `calculate_position_size` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `calculator.py` |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Partial | `MIN_KELLY_TRADES` | `int` | `30` | Kelly: Yes | `calculate_position_size()` | Fewer observations emit `INSUFFICIENT_K_EVIDENCE`. |
+| Missing | `FRACTIONAL_KELLY_MULTIPLIER` | `Decimal` | None | Kelly: Yes | calculator | Every approved profile must provide an explicit value; no system default exists. |
+| Missing | `ALLOW_FULL_KELLY` | `bool` | `False` | Yes | calculator | Full Kelly requires a documented waiver. |
+| Missing | `KELLY_INSUFFICIENT_EVIDENCE_MODE` | enum | None | Kelly: Yes | calculator | Either reject or explicit fixed-risk fallback. |
+| Missing | `CORRELATION_SIZE_PENALTY` | enum/config | None | If enabled | calculator | Missing correlation evidence cannot silently apply no penalty. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-RISK-026` | Calculate fixed-lot, fixed-risk, milestone, fractional-Kelly, volatility, or fixed-fractional size; enforce stop/equity/evidence rules; disclose fallback/correlation adjustment; normalize against explicit broker and risk constraints; return no non-zero failure fallback and no approval. | `calculate_position_size(request: PositionSizingRequest, snapshot: PortfolioRiskSnapshot, config: RiskConfig) -> PositionSizingResult` | None | `RiskDomainError(MISSING_STOP_LOSS, INSUFFICIENT_VOLATILITY_EVIDENCE, INSUFFICIENT_K_EVIDENCE, CALCULATION_FAILED)`: corresponding condition | **Usage:** `tests/risk/usage/test_usage_sizing.py::test_usage_calculator_position_size()`<br>**Unit:** `tests/risk/unit/test_calculator.py::test_all_six_methods_and_no_point_one_fallback()` |
+
+**Implementation notes:** Refactor V1 `PositionSizer` formulas; remove provider reads, float arithmetic, inferred stop distance, full-Kelly default, and catch-all `0.1` result.
+
+**Usage file:** `tests/risk/usage/test_usage_sizing.py`
+
+### 4.5 `policy/` — Limits, Market Context, Admission, and Allocation Gates
+
+**Purpose:** Evaluate deterministic configured constraints and return ordered results without execution or lifecycle authority.
+
+**Module flow:** `typed evidence + config → focused checks → ordered limit/decision package`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `limits.py` | Portfolio and external market-context limit evaluation | `evaluate_portfolio_limits`, `evaluate_market_context` | **Standard library:** datetime, decimal<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `portfolio` |
+| Missing | `admission.py` | Strategy admission/demotion risk gate | `review_strategy_admission` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `portfolio` |
+| Partial | `allocation.py` | Allocation constraint review | `review_allocation_proposal` | **Standard library:** decimal<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `portfolio` |
+| Missing | `__init__.py` | Expose policy API | symbols above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Partial | `MAX_DAILY_LOSS` | `Decimal` | `0.05` baseline | Yes | portfolio limits | Equity base must be explicit; breach fails. |
+| Partial | `MAX_TOTAL_LOSS` | `Decimal` | `0.10` baseline | Yes | portfolio limits | Breach fails/blocks by profile. |
+| Missing | `MONTHLY_TARGET` | `Decimal` | `0.10` baseline | Optional | portfolio limits | Non-production until reset/accounting semantics resolve. |
+| Missing | `MAX_MARGIN_UTILIZATION` | `Decimal` | None | Live: Yes | portfolio limits | Missing metadata/config blocks live review. |
+| Missing | `MAX_EFFECTIVE_LEVERAGE` | `Decimal` | None | Live: Yes | portfolio limits | Breach fails. |
+| Missing | `MAX_SPREAD` | mapping | None | Profile-defined | market context | Breach fails/warns per policy. |
+| Missing | `NEWS_BLACKOUT_BEFORE_MINUTES` / `AFTER` | `int` | `10` / `10` baseline | If enabled | market context | Applies only to supplied calendar evidence. |
+| Missing | `MISSING_CALENDAR_MODE` | enum | None | Live if rule enabled | market context | `ignore`, `warn`, `needs_more_evidence`, or `block`. |
+| Missing | `SESSION_TIMEZONE` | IANA timezone | None | If enabled | market context | Conversion failure blocks live review. |
+| Missing | Allocation/strategy/symbol/cluster caps | `Decimal` mappings | None | Allocation review: Yes | allocation | No numeric cap is invented. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-RISK-027` | Evaluate daily/total loss, drawdown state, consistency, exposure/concentration, margin/leverage, historical tail risk, correlation, and freshness in deterministic precedence, returning primary and composite failures. | `evaluate_portfolio_limits(snapshot: PortfolioRiskSnapshot, config: RiskConfig) -> tuple[RiskLimitResult, ...]` | None | `RiskDomainError(INVALID_RISK_CONFIG, MISSING_EVIDENCE, LIMIT_FAILED)` | **Usage:** `tests/risk/usage/test_usage_policy.py::test_usage_limits_portfolio()`<br>**Unit:** `tests/risk/unit/test_limits.py::test_limit_order_and_composite_failures()` |
+| Partial | `FR-RISK-028` | Evaluate supplied spread, slippage, liquidity, session, and calendar evidence without external fetches or naive/aware datetime comparison. | `evaluate_market_context(evidence: MarketContextEvidence, config: RiskConfig, *, now: datetime) -> tuple[RiskLimitResult, ...]` | None | `RiskDomainError(MISSING_EVIDENCE, POLICY_BLOCKED)` | **Usage:** `test_usage_policy.py::test_usage_limits_market_context()`<br>**Unit:** `test_limits.py::test_timezone_failure_blocks_live()` |
+| Missing | `FR-RISK-029` | Produce and persist `StrategyOperationalEligibilityDecision v1` with exact scope, conditions, evidence/policy lineage, issue/expiry, and suspension semantics; never mutate Strategy state. | `review_strategy_admission` | Risk decision/audit stores | Structured fail-closed error | **Verification:** eligibility contract and persistence tests. |
+| Missing | `FR-RISK-030` | Produce `AllocationRiskDecision v1`, enforce caps, and atomically activate the authoritative risk-budget projection only for the exact approved Portfolio version. | `review_allocation_proposal`, budget activation API | Risk budget/audit stores | Version/expiry/kill-switch conflict blocks activation | **Verification:** allocation and concurrency tests. |
+
+**Implementation notes:** Merge V1 limit/policy calculations; do not preserve root check wrappers, `AllocationService`, lifecycle mutation, forced decisions, or policy-manager layers.
+
+**Usage file:** `tests/risk/usage/test_usage_policy.py`
+
+### 4.6 `regimes/` — Regime Assessment and Limit Tightening
+
+**Purpose:** Classify supplied market/risk context and derive deterministic stricter limit modifiers.
+
+**Module flow:** `PortfolioRiskSnapshot + MarketContextEvidence + RiskConfig → classify/transition → RegimeAssessment`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `assessment.py` | Regime classification, transitions, and modifiers | `assess_risk_regime` | **Standard library:** datetime, decimal<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `portfolio` |
+| Missing | `__init__.py` | Expose regime API | `assess_risk_regime` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `assessment.py` |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `REGIME_ASSESSMENT_ENABLED` | `bool` | Profile-defined | Yes | `assess_risk_regime()` | Disabled state is explicit. |
+| Missing | Regime thresholds/modifiers | mapping | None | If enabled | assessment | High-risk modifiers may only tighten limits. |
+| Missing | Stressed evidence/lookback policy | contract/config | No shared default | Crisis live: Yes | Every crisis-live profile must supply and validate an explicit stressed evidence/lookback policy; omission blocks assessment. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-RISK-031` | Classify volatility, liquidity, correlation, drawdown, crisis, news, and session regimes; record deterministic transitions/evidence; return only equal-or-stricter modifiers; fail closed on required missing/unknown live evidence. | `assess_risk_regime(snapshot: PortfolioRiskSnapshot, evidence: MarketContextEvidence, config: RiskConfig, *, now: datetime) -> RegimeAssessment` | None | `RiskDomainError(MISSING_EVIDENCE, STALE_EVIDENCE, CALCULATION_FAILED)` | **Usage:** `tests/risk/usage/test_usage_regimes.py::test_usage_assessment_regime()`<br>**Unit:** `tests/risk/unit/test_assessment.py::test_high_risk_modifiers_only_tighten()` |
+
+**Implementation notes:** Reuse V1 detectors/transition logic; do not silently use ordinary lookbacks where stressed evidence is required.
+
+**Usage file:** `tests/risk/usage/test_usage_regimes.py`
+
+### 4.7 `audit/` — Tamper-Evident Risk Audit Boundary
+
+**Purpose:** Canonically serialize, hash-chain, verify, and persist Risk-owned records through Data-owned infrastructure.
+
+**Module flow:** `material Risk event → redaction/canonical JSON → previous-hash chain → durable append/verification`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `storage.py` | Private injected persistence Protocol; no public export | None | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** `contracts` |
+| Missing | `chain.py` | Stateful audit-chain coordination | `RiskAuditChain`, `RiskAuditChain.append`, `RiskAuditChain.verify` | **Standard library:** collections.abc, datetime, hashlib<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, private storage port |
+| Missing | `migrations.py` | Risk-owned table/index migration definitions | None | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None |
+| Missing | `__init__.py` | Expose audit coordinator only | `RiskAuditChain` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `chain.py` |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `AUDIT_HASH_ALGORITHM` | `str` | `sha256` | Yes | `RiskAuditChain` | Must be SHA-256 or stronger. |
+| Missing | `AUDIT_GENESIS_HASH` | `str` | 64 zeroes | Yes | chain | Deterministic deployment constant. |
+| Missing | `AUDIT_TIMEOUT_SECONDS` | `Decimal` | None | Live: Yes | append/verify | Timeout blocks mandatory live persistence. |
+| Missing | `AUDIT_RETRY_POLICY` | config | None | Yes | append | Only idempotent writes retry; exhaustion is surfaced. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-RISK-032` | Own injected canonical serializer, clock, storage port, and deterministic chain configuration without owning database infrastructure. | `RiskAuditChain(config: RiskConfig, store: _RiskAuditStore, clock: Callable[[], datetime])` | Local state mutation | `RiskDomainError(INVALID_RISK_CONFIG)` | **Usage:** `tests/risk/usage/test_usage_audit.py::test_usage_chain_create()`<br>**Unit:** `tests/risk/unit/test_chain.py::test_chain_requires_deterministic_genesis()` |
+| Missing | `FR-RISK-033` | Redact, canonicalize, hash, and durably append a material record with previous-hash continuity. | `RiskAuditChain.append(record: RiskAuditRecord) -> RiskAuditRecord` | Persistence write | `RiskDomainError(STORAGE_ERROR)`: partial/unavailable/permission failure | **Usage:** `test_usage_audit.py::test_usage_chain_append()`<br>**Unit:** `test_chain.py::test_append_hashes_and_fails_closed()` |
+| Missing | `FR-RISK-034` | Verify genesis, sequence, previous hash, and record hash; identify tamper deterministically. | `RiskAuditChain.verify(records: Sequence[RiskAuditRecord]) -> bool` | Read-only | `RiskDomainError(AUDIT_CHAIN_TAMPER_DETECTED, STORAGE_ERROR)` | **Usage:** `test_usage_audit.py::test_usage_chain_verify()`<br>**Unit:** `test_chain.py::test_verify_detects_tamper()` |
+
+**Implementation notes:** Refactor focused V1 audit/signature behavior; remove generic repository hierarchy and broad audit/report ownership.
+
+**Usage file:** `tests/risk/usage/test_usage_audit.py`
+
+### 4.8 `approvals/` — Durable Approval-Token Lifecycle
+
+**Purpose:** Issue, validate, consume, revoke, and invalidate signed scoped tokens through durable state.
+
+**Module flow:** `eligible decision + authenticated approver → signed/scoped token → durable state/audit → atomic validation/consumption or revocation`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `state.py` | Private durable token-state Protocol; no public export | None | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** `contracts` |
+| Partial | `tokens.py` | Coordinated signing and durable lifecycle | `ApprovalTokenService` and its public methods | **Standard library:** collections.abc, datetime, hashlib, hmac, secrets<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `audit`, private state port |
+| Missing | `__init__.py` | Expose token coordinator | `ApprovalTokenService` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `tokens.py` |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `APPROVAL_TOKEN_TTL_SECONDS` | `Decimal` | None | Yes | issue/validate | Expired tokens fail deterministically. |
+| Missing | `APPROVAL_SIGNING_KEY_REF` | secret reference | None | Yes | issue/validate | Secret value is never logged or serialized. |
+| Missing | `APPROVAL_SIGNING_ALGORITHM` | `str` | HMAC-SHA-256 minimum | Yes | service | Weaker algorithms are invalid. |
+| Missing | `TOKEN_STATE_TIMEOUT_SECONDS` | `Decimal` | None | Live: Yes | validate/revoke | Unavailable backend fails closed. |
+| Missing | Config compatibility policy | exact hash-pair/scope/expiry rules | deny | Yes | validate | Unapproved config mismatch fails closed. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-RISK-035` | Own injected signer/secret resolver, clock, durable state port, authorization verifier, and audit chain. | `ApprovalTokenService(config: RiskConfig, state: _TokenStateStore, audit: RiskAuditChain, clock: Callable[[], datetime])` | Local state mutation | `RiskDomainError(INVALID_RISK_CONFIG, STORAGE_ERROR)` | **Usage:** `tests/risk/usage/test_usage_approvals.py::test_usage_tokens_create_service()`<br>**Unit:** `tests/risk/unit/test_tokens.py::test_service_never_exposes_key()` |
+| Partial | `FR-RISK-036` | Validate Risk-owned, UI/API-produced `ApprovalAttestation v1`, then issue a tamper-evident token only for an eligible decision, binding request/workflow/action/account/strategy/symbol/config/decision/approver/expiry/nonce and writing audit/state durably. | `ApprovalTokenService.issue(decision: RiskDecisionPackage, attestation: ApprovalAttestation, *, now: datetime) -> RiskApprovalToken` | Persistence write | `RiskDomainError(APPROVAL_REQUIRED, PERMISSION_DENIED, STORAGE_ERROR)` | **Usage:** `test_usage_approvals.py::test_usage_tokens_issue()`<br>**Unit:** `test_tokens.py::test_issue_requires_valid_ui_approval_attestation()` |
+| Partial | `FR-RISK-037` | Atomically verify schema/signature/scope/hashes/attestation/time/revocation/nonce, reserve token + workflow + action scope + expiry, persist single-use consumption before live success, and audit the result. | `ApprovalTokenService.validate_reserve_and_consume(token: RiskApprovalToken, attestation: ApprovalAttestation, expected: Mapping[str, str], *, now: datetime) -> ApprovalValidationResult` | Persistence write | `RiskDomainError(APPROVAL_TOKEN_INVALID, APPROVAL_TOKEN_EXPIRED, APPROVAL_TOKEN_REVOKED, APPROVAL_TOKEN_CONSUMED, PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED, CONFIG_VERSION_MISMATCH, STORAGE_ERROR)` | **Usage:** `test_usage_approvals.py::test_usage_tokens_validate()`<br>**Unit:** `test_tokens.py::test_concurrent_reservation_succeeds_once()` |
+| Missing | `FR-RISK-038` | Revoke every outstanding token intersecting an activated global/portfolio/strategy/symbol scope and write a material audit event. | `ApprovalTokenService.revoke_scope(scope: Mapping[str, str], reason: str, *, now: datetime) -> int` | Persistence write | `RiskDomainError(STORAGE_ERROR, PERMISSION_DENIED)` | **Usage:** `test_usage_approvals.py::test_usage_tokens_revoke_scope()`<br>**Unit:** `test_tokens.py::test_kill_switch_revokes_affected_scope()` |
+
+**Implementation notes:** Reuse V1 signing/material-change/expiry logic; replace
+hard-coded identity and process-global replay sets. UI/API owns approval attestation;
+Risk owns validation, token issuance, reservation, consumption, and action-policy
+verdicts under the registered market-context, approval-attestation, reservation, and execution-governance contracts.
+
+**Usage file:** `tests/risk/usage/test_usage_approvals.py`
+
+### 4.9 `decisions/` — Canonical Governor, Validity, and Kill Switch
+
+**Purpose:** Produce one fixed-order decision path and canonical Risk-owned kill-switch state.
+
+**Module flow:** `proposal/current state + config/evidence → validity/kill switch/regime/limits/capacity/approval → audited RiskDecisionPackage`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `governor.py` | Pre-trade and current-state decision orchestration | `RiskGovernor`, `RiskGovernor.review_trade_risk`, `RiskGovernor.run_portfolio_risk_governor` | **Standard library:** collections.abc, datetime<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `portfolio`, `sizing`, `policy`, `regimes`, `audit`, `approvals`; `app.utils → AuthContext` |
+| Partial | `validity.py` | Decision/evidence/config reuse checks | `revalidate_risk_decision` | **Standard library:** datetime<br>**Required third-party:** None<br>**Local:** `contracts`, `config` |
+| Partial | `kill_switch.py` | Apply authorized commands and evaluate block/recovery state | `apply_kill_switch_command`, `check_risk_kill_switch` | **Standard library:** collections.abc, datetime<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `audit`, `approvals`; `app.utils → AuthContext` |
+| Missing | `__init__.py` | Expose decisions API | symbols above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `DECISION_TTL_SECONDS` | `Decimal` | None | Yes | governor/validity | Expired decisions require refresh. |
+| Missing | `IN_FLIGHT_TOLERANCE` | config | None | Live if used | governor | Exceeding buffer blocks; use is disclosed. |
+| Missing | `IN_FLIGHT_GRACE_SECONDS` | `Decimal` | None | Live if used | validity | Expiry forces state refresh. |
+| Missing | `DOUBLE_SPEND_OWNER` | enum | None | Live: Yes | governor | No owner causes `PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED`. |
+| Missing | Kill-switch trigger/recovery policy | config | None | Yes | kill-switch | Unknown state blocks; recovery follows external authority policy. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-RISK-039` | Own immutable config plus injected token, audit, clock, and optional configured concurrency protection dependencies. | `RiskGovernor(config: RiskConfig, approvals: ApprovalTokenService, audit: RiskAuditChain, clock: Callable[[], datetime], capacity_guard: _CapacityGuard | None = None)` | Local state mutation | `RiskDomainError(INVALID_RISK_CONFIG)` | **Usage:** `tests/risk/usage/test_usage_decisions.py::test_usage_governor_create()`<br>**Unit:** `tests/risk/unit/test_governor.py::test_governor_requires_live_dependencies()` |
+| Partial | `FR-RISK-040` | Validate and review one proposed trade in fixed precedence, include regime/projected risks/final capped size/concurrency disclosure, attach token only when eligible, and audit the decision. | `RiskGovernor.review_trade_risk(proposal: ProposedTrade, snapshot: PortfolioRiskSnapshot, market: MarketContextEvidence, regime: RegimeAssessment, auth: AuthContext, *, now: datetime) -> RiskDecisionPackage` | Persistence write | `RiskDomainError(GOVERNOR_DECISION_FAILED, STORAGE_ERROR)` | **Usage:** `test_usage_decisions.py::test_usage_governor_trade_review()`<br>**Unit:** `test_governor.py::test_trade_review_truth_table_and_precedence()` |
+| Partial | `FR-RISK-041` | Evaluate current portfolio compliance and return a remediation recommendation without changing execution state. | `RiskGovernor.run_portfolio_risk_governor(snapshot: PortfolioRiskSnapshot, market: MarketContextEvidence, regime: RegimeAssessment, auth: AuthContext, *, now: datetime) -> RiskDecisionPackage` | Persistence write | `RiskDomainError(GOVERNOR_DECISION_FAILED, STORAGE_ERROR)` | **Usage:** `test_usage_decisions.py::test_usage_governor_portfolio()`<br>**Unit:** `test_governor.py::test_portfolio_governor_no_execution_mutation()` |
+| Partial | `FR-RISK-042` | Compare proposal/evidence/config/time with a prior decision and invalidate material changes, expiry, skew, stale state, config mismatch, or reconciliation expiry. | `revalidate_risk_decision(decision: RiskDecisionPackage, proposal: ProposedTrade, snapshot: PortfolioRiskSnapshot, config: RiskConfig, *, now: datetime) -> ApprovalValidationResult` | None | `RiskDomainError(STALE_EVIDENCE, CONFIG_VERSION_MISMATCH, IN_FLIGHT_RECONCILIATION_EXPIRED)` | **Usage:** `test_usage_decisions.py::test_usage_validity_revalidate()`<br>**Unit:** `tests/risk/unit/test_validity.py::test_material_change_invalidates()` |
+| Partial | `FR-RISK-043` | Validate `ApprovalAttestation v1`, apply authorized activation/clearance under `global > portfolio > strategy > symbol` precedence, revoke affected approvals on activation, and never mutate execution controls. | `apply_kill_switch_command(command: KillSwitchCommand, current: KillSwitchState, attestation: ApprovalAttestation, auth: AuthContext, approvals: ApprovalTokenService, audit: RiskAuditChain, *, now: datetime) -> KillSwitchState` | Persistence write | `RiskDomainError(PERMISSION_DENIED, POLICY_BLOCKED, STORAGE_ERROR)` | **Usage:** `test_usage_decisions.py::test_usage_kill_switch_apply()`<br>**Unit:** `tests/risk/unit/test_kill_switch.py::test_child_clear_cannot_override_active_parent()` |
+| Partial | `FR-RISK-044` | Return deterministic block/recovery eligibility; active or unknown applicable state blocks live risk increase, and recovery requires all applicable scopes inactive plus Trading reconciliation. | `check_risk_kill_switch(states: Sequence[KillSwitchState], scope: Mapping[str, str], *, reconciled: bool, now: datetime) -> RiskDecisionPackage` | None | `RiskDomainError(KILL_SWITCH_ACTIVE, KILL_SWITCH_UNKNOWN, POLICY_BLOCKED)` | **Usage:** `test_usage_decisions.py::test_usage_kill_switch_check()`<br>**Unit:** `test_kill_switch.py::test_recovery_requires_clear_hierarchy_and_reconciliation()` |
+
+**Implementation notes:** Merge V1 `GovernanceEngine` and `RiskGovernor`, preserve execution-used validity and entry-block logic, and remove forced/manual decisions, broker reads, synthetic approvals, and execution-control mutation.
+
+**Usage file:** `tests/risk/usage/test_usage_decisions.py`
+
+### 4.10 `scenarios/` — Advisory Scenario and What-If Analysis
+
+**Purpose:** Project bounded immutable scenarios without live mutation or approval authority.
+
+**Module flow:** `immutable snapshot + bounded scenario definitions → projected snapshot metrics → advisory comparisons`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `analysis.py` | Baseline/projected scenario comparison | `run_risk_scenario_analysis` | **Standard library:** datetime<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `portfolio` |
+| Missing | `__init__.py` | Expose scenario API | `run_risk_scenario_analysis` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `analysis.py` |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `MAX_SCENARIOS_PER_RUN` | `int` | `100` supported baseline | Yes | scenario analysis | Excess is rejected before calculation. |
+| Missing | `MAX_POSITIONS_PER_SCENARIO_RUN` | `int` | `500` supported baseline | Yes | scenario analysis | Excess is rejected or bounded. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-RISK-045` | Deterministically apply bounded scenarios to immutable snapshot evidence, return baseline/projected risk differences, preserve explicit seed, and mark every result advisory. | `run_risk_scenario_analysis(snapshot: PortfolioRiskSnapshot, scenarios: Sequence[ScenarioDefinition], config: RiskConfig, *, now: datetime) -> tuple[ScenarioResult, ...]` | None | `RiskDomainError(PAYLOAD_TOO_LARGE, CALCULATION_FAILED)` | **Usage:** `tests/risk/usage/test_usage_scenarios.py::test_usage_analysis_scenarios()`<br>**Unit:** `tests/risk/unit/test_analysis.py::test_analysis_is_immutable_and_deterministic()` |
+
+**Implementation notes:** Refactor V1 `WhatIfEngine` and scenario registry behavior; exclude replay clock/timeline/cockpit/recommendation infrastructure.
+
+**Usage file:** `tests/risk/usage/test_usage_scenarios.py`
+
+### 4.11 `reporting/` — Focused Risk Decision Summaries
+
+**Purpose:** Render Risk-owned Markdown/JSON explanations, not broad portfolio performance reports.
+
+**Module flow:** `snapshot/decision/scenario result → deterministic sectioned renderer → RiskReport`
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Partial | `reports.py` | Focused deterministic summary rendering | `generate_risk_report` | **Standard library:** collections.abc, json, typing<br>**Required third-party:** None<br>**Local:** `contracts`, `audit`, `decisions`, `scenarios` |
+| Missing | `__init__.py` | Expose reporting API | `generate_risk_report` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `reports.py` |
+
+#### Configuration and Limits Manifest
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `RISK_REPORT_FORMAT` | enum | `markdown` | Yes | `generate_risk_report()` | Supported: Markdown or exact JSON. |
+| Missing | `REPORT_TIMEOUT_SECONDS` | `Decimal` | None | Yes | report generation | Failure is surfaced and never hides the decision. |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Partial | `FR-RISK-046` | Render evidence, calculations, assumptions, warnings, decision, and recommendations separately; show primary failure first; never claim live approval without valid decision/token evidence. | `generate_risk_report(source: PortfolioRiskSnapshot | RiskDecisionPackage | Sequence[ScenarioResult], format: Literal["markdown", "json"]) -> RiskReport` | None | `RiskDomainError(REPORT_GENERATION_FAILED)` | **Usage:** `tests/risk/usage/test_usage_reporting.py::test_usage_reports_generate()`<br>**Unit:** `tests/risk/unit/test_reports.py::test_report_has_no_false_approval_claim()` |
+
+**Implementation notes:** Reuse focused V1 Markdown/JSON renderers; remove filesystem saving and broad performance/reporting infrastructure from Risk.
+
+**Usage file:** `tests/risk/usage/test_usage_reporting.py`
+
+### 4.12 Public Risk API
+
+Risk exposes only the typed domain operations defined by the owning capability
+modules. Public operations accept Risk-owned contracts, return Risk-owned results,
+and surface `RiskDomainError` failures. No wrapper-only API, metadata catalog, or
+parallel payload-mapping layer exists. UI/API alone adapts Risk results to external
+transport responses.
+---
+
+## 5. Package-Wide Requirements and Shared Configuration
+
+### Shared configuration
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `RUNTIME_PROFILE` | enum | `research` | Yes | config, governor, public API | Consumed from Utils; live requires complete safety configuration. |
+| Missing | `EXECUTION_ROUTE` | enum | `none` | Yes | governor | Consumed from Trading; incompatible profile/route fails closed. |
+| Missing | `DATABASE_URL` / `DATA_DIR` | `str` / path | System configuration | Yes | audit, approval, and Risk state persistence | Data owns connection, locking, and migration execution infrastructure; Risk owns its schemas and records. |
+| Missing | UTC-first time policy | policy | ISO 8601 `Z` | Yes | all time-sensitive symbols | Naive time is invalid. |
+| Missing | Decimal precision | context | ≥28 digits | Yes | all financial calculations | Exact Decimal, documented quantization, half-even default. |
+| Missing | Correlation/trace IDs | policy | prefixed UUID4 | Yes | all material workflows | Propagated into decisions, logs, audits, and public results. |
+| Missing | Secret redaction | policy | denylist-first, case-insensitive | Yes | all outputs | Applied before logs, errors, metrics, reports, and audit persistence. |
+
+### Non-functional requirements
+
+| Status | Requirement ID | Type | Responsibility | Verification |
+|---|---|---|---|---|
+| Missing | `NFR-RISK-001` | API boundary | Cross-domain callers use only documented versioned contracts; root `__all__` is explicit and contains only approved contracts and public operations. | Import/API tests |
+| Partial | `NFR-RISK-002` | Determinism | Identical inputs, config hash, explicit time, seed, and dependency versions produce identical exact results and decision packages. | Reproduction tests |
+| Missing | `NFR-RISK-003` | Precision | All broker-critical money/size/exposure/tail-risk fields use strict finite Decimal and exact JSON serialization. | Contract/property tests |
+| Partial | `NFR-RISK-004` | Reliability | Invalid input, missing/stale mandatory evidence, unknown approval/kill-switch state, calculation failure, or mandatory persistence failure never yields approval. | Failure-path tests |
+| Missing | `NFR-RISK-005` | Concurrency | Stateless calculations are thread-safe; shared token/audit/capacity state is synchronized and tested; concurrent requests cannot collectively overspend stale capacity. | Concurrent integration tests |
+| Missing | `NFR-RISK-006` | Security | HMAC-or-stronger signing, least privilege, scope binding, payload guards, and redaction prevent prompt/token/payload bypass and secret exposure. | Security tests |
+| Missing | `NFR-RISK-007` | Observability | Every material decision logs request/workflow/correlation IDs, verdict, reason codes, latency, evidence/config refs, and emits a serializable redacted audit record. | Log/audit inspection |
+| Missing | `NFR-RISK-008` | Performance | Support 500 positions, 100 strategies, 5,000 return points, and 100 scenarios; normal pre-trade work is no worse than O(n²). Exact p95 gates remain proposed until baselined. | Representative benchmarks |
+| Missing | `NFR-RISK-009` | Maintainability | Python ≥3.14, Google-style module/public docstrings, explicit type hints, focused files, no generic layer without demonstrated need, and project logging/result conventions. | Ruff/mypy/structure review |
+| Missing | `NFR-RISK-010` | Testing | Every public symbol has one usage example and unit coverage; every collaborative workflow has an integration test; package coverage is at least 80%. | Test/traceability audit |
+| Missing | `NFR-RISK-011` | Persistence | Risk owns schemas/semantics while Data owns connection/locking/migration execution; retries are idempotent and exhaustion is surfaced. | Persistence contract tests |
+| Missing | `NFR-RISK-012` | Safety | Risk operations never place or close trades, mutate broker state, or override execution controls; only deterministic approved commands can authorize live actions or clear the kill switch. | Permission/side-effect tests |
+
+The V2 timing observations—100 ms pre-trade, 250 ms snapshot, 50 ms prepared governor, 25 ms sizing, 50 ms correlation sizing, 5 s scenario, 1 s report, and 2 s/10,000-record chain verification—are diagnostic benchmark references, not acceptance gates. Benchmarks must record hardware, Python/dependency versions, data shape, cache state, and variance.
+
+---
+
+## 6. Open Decisions
+
+No open decisions. Historical VaR/CVaR is the only initial VaR method; parametric, Student-t, filtered-historical-simulation, and Gaussian-waiver support are outside the initial scope.
+
+---
+
+## 7. Tests and Definition of Done
+
+### Test and usage locations
+
+```text
+tests/risk/
+├── unit/
+├── integration/
+└── usage/
+```
+
+### Commands
+
 ```bash
-# Run unit tests
-.venv\Scripts\pytest tests/unit/app/services/risk/
+uv run ruff check app/services/risk tests/risk
+uv run ruff format --check app/services/risk tests/risk
+uv run mypy app/services/risk
 
-# Run Ruff check
-.venv\Scripts\ruff check app/services/risk/
+uv run pytest tests/risk/unit
+uv run pytest tests/risk/integration
+uv run pytest tests/risk/usage
 
-# Run Mypy checks
-.venv\Scripts\mypy .
+uv run pytest tests/risk --cov=app/services/risk --cov-fail-under=80
 ```
 
----
+During iterative implementation, run only the specific changed test files. Run the complete Risk package command at the verification milestone.
 
-## 10. Position Sizing Engine
+### Required test levels
 
-The Position Sizing Engine calculates safe, risk-budgeted position volumes under [sizing/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/sizing/).
+- **Unit:** success, validation, exact errors, side effects, boundaries, retained V1 math, concurrency primitives, and all `FR-RISK-*` rows.
+- **Integration:** all fourteen `WF-RISK-*` workflows, persistence failure, producer/consumer compatibility, and no broker/execution side effects.
+- **Usage:** one independently runnable `test_usage_*` function per public symbol, importing only the documented feature API.
+- **Security:** payload limits, secret redaction, prompt/argument bypass, token tamper/replay/scope, and kill-switch non-bypass.
+- **Performance:** representative baselines before any proposed p95 value becomes a hard gate.
 
-### Sizing Methods (`SizingMethod`)
-1. **Fixed Lot (`fixed_lot`)**: Returns a fixed trade volume.
-2. **Fixed Risk (`fixed_risk`)**: Sizes volume based on a target risk capital amount (or percentage of equity) and the stop loss distance.
-3. **Fixed Fractional (`fixed_fractional`)**: Sizes volume as a fixed fraction of total portfolio equity.
-4. **Volatility Adjusted (`volatility_adjusted`)**: Uses rolling ATR or M1 standard deviation volatility measurements to dynamically size the stop distance and resulting position.
-5. **Correlation Adjusted (`correlation_adjusted`)**: Reduces position size dynamically based on the proposed asset's correlation to the active portfolio.
-6. **Milestone (`milestone`)**: Gradually scales down sizing based on trade/milestone targets.
-7. **Kelly Sizing (`kelly`)**: Computes the optimal statistical sizing fraction based on historical win rates and win-loss ratios. Enforced as advisory-only if trade history count is below the configured threshold (default 30).
+### Package completion checklist
 
-### Verification and Constraints
-* **Lot Step Formatting**: Sizing outputs are formatted to match broker-specific minimums, maximums, and step increments.
-* **Risk Budget Ceilings**: Sizing respects global and policy-specific risk percent boundaries before rounding.
-* **Reductions**: Applies step-down multipliers for active drawdown states, currency exposure concentrations, and correlation cluster risks prior to final sizing.
-* **Rejection Conditions**: Zero or negative stop distance, missing symbol metadata, or calculated sizes below broker minimums result in a rejection or zero lot volume.
+- [ ] The actual package tree matches Section 2 in dependency order.
+- [ ] Every module is one coherent capability and every file one focused responsibility.
+- [ ] Every workflow and every `FR-RISK-*` / `NFR-RISK-*` row is `Completed` with mapped tests.
+- [ ] Every public export appears in exactly one requirement row and root `__all__` is exact.
+- [ ] Owned/consumed contracts match PROJECT names, versions, and ownership.
+- [ ] Risk-owned persisted state uses Data-owned infrastructure through narrow interfaces.
+- [ ] Every setting/limit has an owner, enforcement symbol, and exceeded behavior.
+- [ ] No broker/provider/database-session object crosses the boundary.
+- [ ] No removed or rejected capability appears in the architecture or implementation.
+- [X] No unresolved decision affects a completed requirement.
+- [ ] Google style, types, docstrings, logging, exact Decimal policy, and ≥80% coverage pass.
+- [ ] Targeted tests and final Risk quality commands pass.
 
----
+### README specification validation
 
-## 11. FX Currency Exposure Engine
-
-The FX Currency Exposure Engine decomposes portfolios, pending orders, and proposed trades into their underlying base and quote currency legs to calculate gross and net currency exposures, as well as account-currency equivalent exposures. It is organized as a modular package under `app/services/risk/exposure/`:
-
-* **`fx_legs.py`**: Decomposes trade proposals and positions into their base and quote currency components. Implements pure, stateless symbol parsing.
-* **`aggregation.py`**: Aggregates exposures at the portfolio level, implements pending-order exposure policies, and evaluates hidden USD or major currency concentrations.
-* **`__init__.py`**: Exposes the public functional facade and orchestrator engines.
-
-### Key Components & Functions
-
-1. **Symbol Parsing & Leg Decomposition (`fx_legs.py`)**:
-   * **`parse_fx_symbol`**: Decomposes standard (e.g. `EURUSD`, `USDJPY`) and custom FX symbols to identify base/quote currency codes.
-   * **`decompose_fx_trade`**: Purely decomposes a trade proposal into signed base and quote leg amounts.
-     * *Buy Trade*: Base Leg gets `+ quantity * contract_size`; Quote Leg gets `- quantity * contract_size * price`.
-     * *Sell Trade*: Base Leg gets `- quantity * contract_size`; Quote Leg gets `+ quantity * contract_size * price`.
-   * **`validate_currency_conversion_requirements`**: Rejects validation if any of the target currency legs lack a corresponding rate to convert back to the account base currency.
-
-2. **Exposure Aggregation & Policies (`aggregation.py`)**:
-   * **`calculate_currency_exposure`**: Aggregates total exposure from positions, pending orders, and proposed trades under the configured pending order policy:
-     * `ignore`: Pending and in-flight orders are ignored.
-     * `full-potential`: Pending orders are aggregated at 100% potential.
-     * `near-market-only`: Includes pending orders only if their distance to current market price is below a threshold.
-     * `probability-weighted`: Pending orders are weighted by their historical fill probability (defaulting to 0.50).
-   * **`detect_hidden_concentration`**: Scans active positions and trade proposals to detect hidden short USD exposure concentrations across multiple quote-USD currency pairs (e.g., EURUSD, GBPUSD, AUDUSD, NZDUSD).
-   * **Live fail-closed checks**: Rejects calculations if the portfolio is unreconciled or quote status is unknown in live mode.
-
+- [X] Domain boundary and system contracts were reconciled against PROJECT.
+- [X] All approved reconciliation capabilities have a destination.
+- [X] All fourteen approved workflows are represented.
+- [X] Removed or rejected behavior is absent from the architecture.
+- [X] Every intended public symbol has one typed functional-requirement row.
+- [X] Every functional requirement maps to usage and unit-test locations.
+- [X] Every collaborative workflow maps to an integration-test location.
+- [X] Diagrams, tree, module order, and dependency direction agree.
+- [X] No unresolved specification conflict remains; affected behavior stays Missing until implementation evidence exists.
 
 ---
 
-## 12. Correlation and Cluster Risk Engine
-
-The Correlation and Cluster Risk Engine computes price returns, aligns timeseries across multiple assets, calculates Pearson correlation matrices, detects correlation spikes, groups assets into connected-component clusters, and determines sizing multipliers or threshold-based rejections for proposed trades. It is organized as a modular package under `app/services/risk/correlation/`:
-
-* **`returns.py`**: Handles return construction, timestamp alignment, and input eligibility checks.
-  * **`build_return_series`**: Derives log, close-to-close, open-to-close, or σ-normalized returns from closed-bar series.
-  * **`align_return_series`**: Aligns multiple return series by matching opening timestamps (supporting intersection alignment). Also provides V1 dual signature compatibility.
-  * **`validate_correlation_inputs`**: Rejects or flags aligned arrays if sample counts are insufficient.
-* **`fallbacks.py`**: Implements fail-closed checks and conservative correlation matrices when sample sizes are inadequate.
-  * **`should_fail_closed_for_missing_correlation`**: Determines if missing historical correlation must reject/block.
-  * **`build_conservative_correlation_snapshot`**: Generates a matrix with perfect self-correlation (1.0) and policy-governed assumed correlation for cross-asset entries.
-  * **`resolve_correlation_fallback`**: Rejects execution under live fail-closed policies or returns a conservative fallback matrix.
-* **`engine.py`**: Computes correlation snapshots, groups assets, analyzes exposures, and calculates marginal contributions.
-  * **`calculate_correlation_matrix`**: Computes pairwise Pearson correlation matrices (supporting V1 & V2 signatures).
-  * **`build_correlation_clusters`**: Performs connected-component graph clustering based on absolute correlation thresholds.
-  * **`calculate_cluster_exposure`**: Computes aggregate gross portfolio exposures per correlated cluster.
-  * **`calculate_component_risk_contribution`**: Analyzes the marginal and component risk contributions from covariance matrix and portfolio weights.
-  * **`evaluate_proposed_trade_correlation`**: Recommends `APPROVE`, `REDUCE_SIZE`, or `REJECT` status based on marginal correlation thresholds.
-
-
----
-
-## 13. Value-at-Risk (VaR) and Expected Shortfall (ES) Engine
-
-The Value-at-Risk (VaR) and Expected Shortfall (ES) Engine computes portfolio tail-risk metrics and is organized as a modular package under [tail_risk/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/tail_risk/):
-
-* **`contracts.py`**: Defines the data models for tail-risk estimation.
-  * **`VaRCalculationRequest`**: Carries inputs for VaR estimation (portfolio state, market context, confidence, method, lookback).
-  * **`ExpectedShortfallRequest`**: Carries inputs for Expected Shortfall estimation.
-  * **`VaRResult` & `ExpectedShortfallResult`**: Encapsulate legacy V1 result parameters.
-* **`var.py`**: Handles Value-at-Risk estimation, component risk contributions, and covariance mathematics.
-  * **`calculate_parametric_var`**: Computes covariance/volatility-based parametric VaR.
-  * **`calculate_historical_var`**: Computes empirical return-based historical VaR.
-  * **`calculate_portfolio_volatility`**: Calculates portfolio volatility from covariance matrix and weights.
-  * **`calculate_var_component_contribution`**: Decomposes total portfolio tail risk into asset-level Component Risk Contributions (CRC).
-  * **`PortfolioVaREngine`**: Wrapper class façade for VaR estimation.
-* **`expected_shortfall.py`**: Handles Expected Shortfall (CVaR) calculations and validation of tail assumptions.
-  * **`calculate_expected_shortfall`**: Computes average loss in the tail beyond the VaR threshold.
-  * **`select_tail_losses`**: Filters and returns worst-performing returns in the tail.
-  * **`validate_tail_risk_assumptions`**: Validates tail-risk relations and rejects insufficient return windows.
-  * **`ExpectedShortfallEngine`**: Wrapper class façade for Expected Shortfall estimation.
-
-### Role in Limits & Approvals
-- **VaR Limit**: Evaluated as a warning or hard block based on profile settings.
-- **Expected Shortfall Limit**: Acts as a hard tail-risk approval gate for live trading profiles, ensuring potential average tail losses are capped.
-
-
-## 14. Stress Testing Engine
-
-The Stress Testing Engine is organized as a modular package under [stress/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/stress/) and evaluates portfolio and candidate trade resilience under extreme macro shocks and execution failures.
-
-* **`contracts.py`**: Defines Pydantic model schemas for declarative stress scenarios, execution contexts, projected portfolios, and summary results (`StressScenario`, `ProjectedPortfolio`, `StressScenarioResult`, etc.).
-* **`registry.py`**: Manages the scenario registry, validation checks, and lookup facades (`StressScenarioRegistry`).
-* **`engine.py`**: Implements the V2 stress calculation logic, standard stress loss, GBP volatility calculations, and threshold comparisons (`evaluate_stress_scenarios`).
-* **`__init__.py`**: Exposes legacy compatibility wrappers (e.g. `PriceShockScenario`, `USDShockScenario`, `evaluate_portfolio`, `validate_custom_scenario`) to support version 1 interfaces.
-
-### Default Scenarios
-The default registry contains 13 pre-loaded scenarios:
-1. **USD Shock Up / Down**: Shocks USD exchange rates by $\pm 10\%$.
-2. **JPY Risk-Off**: Appreciation of JPY by $10\%$ against other currencies.
-3. **GBP Volatility Shock**: Doubling of GBP spreads and $\pm 15\%$ worst-case price shocks.
-4. **Spread Widening 5x**: Multiplies spreads by $5$ to evaluate liquidity stress.
-5. **Slippage Shock 50 pips**: Assesses slippage impact on proposed executions.
-6. **Correlation to One**: Simulates tail risk under perfect asset correlation.
-7. **News Candle 5% Shock**: Instant $5\%$ unfavorable price movement against all positions.
-8. **Rollover Liquidity Shock**: Widens spreads by $10\text{x}$ to check rollover risk.
-9. **Margin Requirement Spike 2x**: Broker doubles margin requirements, checking for shortfall.
-10. **Platform Disconnect**: Fail-closed scenario simulating terminal disconnection.
-11. **Stale Quote Check**: Blocks proposals when incoming quotes are stale ($>120\text{s}$).
-12. **Forced Liquidation Proximity**: Verifies stop-out safety margins.
-13. **JPY Risk-Off (V2)**: Specific JPY risk-off scenario matching version 2 requirements.
-
-### Optimized Performance
-To meet the strict performance boundary (< 50.0ms for 100 scenarios across 500 positions under heavy load), the engine employs the following optimizations:
-1. **`QuickProjectedPortfolio`**: A lightweight plain-Python container class that bypasses Pydantic's slow schema validation and default value resolution checks inside the scenario loop.
-2. **Pre-calculated Multipliers**: Caches quantity, contract size, currency conversion rates, and position direction sign values to the portfolio state, saving nested loop calculation overhead.
-3. **Pre-allocated Decimal Constants**: Reuses module-level pre-allocated Decimal constants (`_DECIMAL_ZERO`, `_DECIMAL_ONE`) to eliminate heavy Decimal string-parsing overhead.
-4. **Log Suppression**: Suppresses Loguru frame-inspection overhead for large portfolio runs.
-
-### Custom Scenarios & Safety
-Custom scenarios can be dynamically parsed and validated using `validate_custom_scenario(config)`. The configuration restricts inputs to numeric percentage shocks within $\pm 100\%$ boundaries, preventing any arbitrary code execution or out-of-bounds inputs.
-
-Stress test results evaluate against the configuration's `max_total_loss_pct_advisory` threshold to determine pass/fail status.
-
-
-## 15. Margin, Drawdown, and Execution Feasibility Gates
-
-The Margin, Drawdown, and Execution Feasibility Gates evaluate capital requirements, account-level performance drawdowns, and broker-level execution constraints prior to trade execution. They are organized as a modular package under [feasibility/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/feasibility/) and never perform broker account queries or order mutation.
-
-Each file exposes two calculation surfaces:
-* A **V1 surface** operating on `PortfolioState`/`ProposedTrade`/`market_context: dict`/`RiskConfig` — the original, richer calculation path preserved for the `RiskGovernor` orchestration flow and backward-compatible callers.
-* A **V2 pure surface** operating on the canonical typed snapshots (`AccountRiskSnapshot`, `PortfolioRiskSnapshot`, `EffectiveRiskPolicy`, `DrawdownState`, `MarketRiskSnapshot`, `BrokerConstraintSnapshot`) matching the architecture's `Target Class/Function` contracts.
-
-### Key Components
-
-1. **Margin Governance (`feasibility/margin.py`)**:
-   - **Current & Projected Margin**: Computes active margin requirements and projects margin usage after executing proposed candidate trades (`calculate_current_margin`, `calculate_projected_margin`, `evaluate_margin_governance`).
-   - **Free Margin After Orders**: Calculates remaining free margin while accounting for pending orders under different policies (`ignore`, `full-potential`, `near-market-only`, `probability-weighted`).
-   - **Margin & Leverage Limits**: Rejects trades if projected margin utilization breaches the account threshold (`max_margin_utilization_pct`) or if effective leverage exceeds the cap (`max_effective_leverage`).
-   - **Exit Liquidity Stress Check**: Simulates cost impact of selling all active positions under spread spikes (e.g., 5x spread shock) to ensure account solvency.
-   - **V2 canonical API**: `calculate_current_margin_usage`, `calculate_projected_margin_usage`, and `calculate_free_margin_after_reservations` operate directly on `AccountRiskSnapshot`/`PortfolioRiskSnapshot`/`PendingOrderRiskSnapshot` evidence; `check_margin_limits` evaluates a `MarginRiskSnapshot` against an `EffectiveRiskPolicy` and returns ordered `LimitResult` tuples for account margin and leverage caps.
-
-2. **Drawdown Governor (`feasibility/drawdown.py`)**:
-   - **Drawdown Metrics**: Computes daily drawdown, lifetime total drawdown, and strategy-specific drawdown.
-   - **Throttling Transitions**: Automatically maps drawdown levels to throttling states:
-     - `NORMAL` (drawdown < 50% of soft limit): Multiplier `1.0`.
-     - `CAUTION` (drawdown >= 50% of soft limit): Multiplier `0.8`.
-     - `DEFENSIVE` (drawdown >= soft limit): Multiplier `0.5`.
-     - `RECOVERY_ONLY` (drawdown >= 80% of hard limit): Multiplier `0.2`.
-     - `HALTED` (drawdown >= hard limit): Multiplier `0.0` (trading blocked).
-   - **State Persistence**: Serializes and restores drawdown states to/from local JSON storage to survive restarts, handling corruption gracefully.
-   - **Revenge Trading Check**: Rejects trades whose volumes exceed drawdown-scaled average volumes.
-   - **V2 canonical API**: `determine_drawdown_state(snapshot, prior, policy)` classifies a `PortfolioRiskSnapshot` against an `EffectiveRiskPolicy`; `calculate_drawdown_multiplier` resolves the approved step-down multiplier. `apply_drawdown_throttle` is dual-dispatch: called with `(portfolio_state, proposed_trade, market_context, config)` it runs the full V1 `LimitResult` sequence; called with `(size, state, policy)` (a bare `Decimal` first argument) it returns the throttled `Decimal` size directly.
-
-3. **Execution Feasibility Gate (`feasibility/execution_gate.py`)**:
-   - **Spread & Slippage Checks**: Validates that current spreads or slippage thresholds do not exceed multipliers of rolling volatility standard deviations.
-   - **Stop Compliance Check**: Ensures that proposed stop-loss and take-profit distances are outside broker minimum stop levels (`stop_level`) and modification freeze levels (`freeze_level`).
-   - **Volume Check**: Verifies that proposed lot volume sizes fall within broker minimum and maximum limits, and align with the broker lot step size.
-   - **Session Status**: Blocks execution if the symbol's market session is closed or trading is suspended.
-   - **Frequency Check**: Limits trades per strategy over a lookback window (e.g., max 5 trades per minute) to prevent runaway automated trading loops.
-   - **V2 canonical API**: `assess_execution_feasibility(trade, market, metadata, policy)` builds an `ExecutionRiskSnapshot` from a `MarketRiskSnapshot` and `BrokerConstraintSnapshot`; `validate_stop_and_freeze_levels` returns a `ValidationResult`; `validate_micro_scalping_costs(execution, sigma, policy)` enforces the M1 spread/slippage-to-sigma ratio filter as a `LimitResult`.
-
-
-## 16. Allocation and Lifecycle Governance
-
-Allocation and Lifecycle Governance manages the capital budget distributed to strategies and controls the stage progression of strategies from backtesting up to live execution. Non-trade governance workflows (allocation review, lifecycle gating, and kill switches) are organized as a modular package under [governance/](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/governance/).
-
-Each file exposes two calculation surfaces:
-* A **V1 surface** operating on the original request envelopes (`AllocationReviewRequest`, positional `strategy_id`/`evidence`/`config` arguments) — the richer path preserved for `RiskGovernor` orchestration and backward-compatible callers.
-* A **V2 pure surface** operating on canonical typed contracts (`ProposedAllocation`/`PortfolioRiskSnapshot`/`EffectiveRiskPolicy`, `StrategyAdmissionRequest`/`LiveReadinessRequest`, `AllocatableRisk`/`AllocationPlan`, `LifecycleEvidence`/`LifecycleAssessment`) matching the architecture's `Target Class/Function` contracts.
-
-### Capital Allocation Governance (`governance/allocation.py`)
-1. **Allocation Parity Methods**:
-   - **Equal-Risk Allocation**: Equally divides capital budgets among active strategies (`equal_risk_allocation`; canonical `calculate_equal_risk_allocation` operates on `AllocatableRisk` items and returns a normalized `AllocationPlan`).
-   - **Volatility Parity Allocation**: Allocates budgets inversely proportional to strategy rolling volatilities (`volatility_parity_allocation`; canonical `calculate_volatility_parity_allocation`).
-   - **Correlation-Adjusted Parity Allocation**: Volatility parity weights adjusted by the mean correlation of strategy returns (`correlation_adjusted_risk_parity_allocation`; canonical `calculate_correlation_adjusted_allocation`).
-2. **Multipliers & Adjustments**:
-   - **Regime Weighting**: Scales allocations based on market regimes (`apply_regime_weighting`).
-   - **Drawdown Adjustments**: Scales allocations down individually using strategy-specific drawdown multipliers (`apply_drawdown_adjustment`; combined canonical helper `apply_regime_and_drawdown_adjustments`).
-3. **Allocation Limits Gate**:
-   - `review_allocation_proposal` is dual-dispatch: called with an `AllocationReviewRequest` it runs the full V1 `RiskAllocator` review (portfolio/strategy/symbol/currency budget, correlation cluster, VaR/ES, stress, margin, drawdown, and performance-evidence checks) and returns an `AllocationReviewResult`; called with `(proposal: ProposedAllocation, portfolio: PortfolioRiskSnapshot, policy: EffectiveRiskPolicy)` it checks proposed weights directly against the resolved policy's `risk.max_total_open_risk` and `max_strategy_allocation_pct` caps and returns an `AllocationAssessment` (a type alias of `AllocationReviewResult`).
-   - Requires historic performance evidence (Sharpe ratio and trade count) before allowing any strategy allocation increase (V1 path).
-   - Requires a valid governed approval token if the allocation increase exceeds `max_allocation_increase_pct` (V1 path).
-
-### Lifecycle Staging and Promotion (`governance/lifecycle.py`)
-1. **Sequential Stages**: Defines standard progression sequence: `backtest` -> `walk-forward` -> `simulation` -> `paper` -> `shadow` -> `micro-live` -> `full-live`. The canonical `RiskLifecycleState`/`StrategyLifecycleState` enum exposes the newer `research` -> `simulation` -> `paper` -> `shadow` -> `live-read-only` -> `micro-live` -> `full-live` naming for V2 callers.
-2. **Promotion Gate Verification**:
-   - `review_strategy_admission` is dual-dispatch: called with `(strategy_id, evidence, config)` it delegates to the V1 `RiskLifecycleGate.admit_strategy` and returns a `StrategyAdmissionReview`; called with `(request: StrategyAdmissionRequest, policy: EffectiveRiskPolicy)` it merges the request's evidence buckets and returns a canonical `LifecycleAssessment`.
-   - `validate_lifecycle_transition(current, target, evidence: LifecycleEvidence)` runs the same skip-gate, high-risk-approval, and per-stage evidence checks as the V1 gate against a typed `LifecycleEvidence` bundle, returning a `ValidationResult`.
-   - `requires_lifecycle_approval(assessment, policy)` reports whether a `LifecycleAssessment` requires a governed approval token (`status == NEEDS_APPROVAL`).
-   - Prevents skipping stages; validates that promotion evidence (e.g. Sharpe ratio, trade count, duration, out-of-sample performance, or tracking error) meets profile-configured minimum requirements for each transition step.
-3. **Live Readiness Gate**:
-   - `review_live_readiness` is dual-dispatch: called with `(strategy_id, proposed_stage, market_context, config)` it delegates to the V1 `RiskLifecycleGate.check_readiness` and returns a `LiveReadinessReview`; called with `(request: LiveReadinessRequest, policy: EffectiveRiskPolicy)` it returns a canonical `LifecycleAssessment`.
-   - Validates that live-sensitive stages (`shadow`, `micro-live`, `full-live`) meet system integration requirements:
-     - Audit persistence must be active (`audit_persistence_active`).
-     - Kill switch must be configured (`kill_switch_configured`).
-     - Reconciliation and idempotency checks must be active (`portfolio_reconciliation_active`, `idempotency_evidence_present`).
-
-
-## 17. Safety Kill Switches
-
-The Safety Kill Switches engine under [governance/kill_switch.py](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/risk/governance/kill_switch.py) implements fail-closed trading halts, persistent tracking, and governed resume deactivation limits. It exposes both the original V1 manager API and a canonical V2 surface (`KillSwitchState`, `KillSwitchAssessment`, `KillSwitchService`) built on the same `KillSwitchManager` singleton and `RiskStateStore` persistence port.
-
-### V1/V2 Dual API Surface
-* `check_risk_kill_switch` is dual-dispatch: called with `(scope: str, target: str)` it returns a plain `bool` (True if blocked), delegating to the global `KillSwitchManager` singleton; called with `(scope: KillSwitchScope, state: KillSwitchState)` it evaluates an already-resolved state snapshot against the canonical `_BLOCKING_STATES` set (`ACTIVE`, `LOCKED`, `TRIGGERED`, `PENDING_RESUME`, `UNKNOWN`) and returns a `KillSwitchAssessment`. `UNKNOWN` always fails closed.
-* `request_kill_switch_trigger(request: KillSwitchTriggerRequest) -> KillSwitchState` and `clear_kill_switch_after_approval(request: KillSwitchResumeRequest, approval: ApprovalContext | None) -> KillSwitchState` provide canonical typed entry points over `trigger_kill_switch`/`resume_after_kill_switch`.
-* `validate_resume_request(request, approval) -> bool` checks whether a resume request carries the operator role required to clear the current blocking state (`compliance`/`admin` for `locked`, any operator role otherwise).
-* `KillSwitchService(store: RiskStateStore)` is a thin object-oriented facade (`check`, `trigger`, `resume`) over the module-level functions, for callers that inject a `RiskStateStore` port directly instead of relying on the global singleton/local-JSON persistence path.
-
-### Hierarchical Scopes
-Trading blocks are evaluated in a hierarchical sequence where higher-level switches block lower-level targets:
-* **`global`**: Halts all system execution across all accounts and strategies.
-* **`portfolio`**: Halts all executions on a target account/portfolio.
-* **`strategy`**: Halts all orders originating from a specific strategy ID.
-* **`symbol`**: Halts execution for a specific asset (e.g. `EURUSD`), or if base/quote currency legs of that asset are halted.
-* **`currency`**: Halts trading for any symbols containing the currency leg (e.g. halting `EUR` blocks `EURUSD` and `EURGBP` but not `GBPUSD`).
-
-### Switch States
-* **`inactive`**: Normal operation. Trading is authorized.
-* **`active`**: Halted/blocked. Trading is blocked. Requires administrative operator credentials or a valid approval token to resume.
-* **`locked`**: Critical state. Triggered by severe failures (e.g. persistence corruption or audit-chain failure). Resuming is locked and strictly requires an explicit operator role of `compliance` or `admin` (cannot be bypassed by approval token alone).
-
-### Persistence & Fail-Closed Behavior
-* States are written to local JSON storage (by default `data/risk/kill_switch_state.json`).
-* If the persistence file is missing or corrupted at launch, the system **fails closed**, transitioning to a `locked` global active state to block any trade submissions.
-
-### Automated Trigger Events
-The `evaluate_triggers` function statelessly parses pre-trade assessment requests and limit results, pulling kill switches automatically on:
-1. **Daily Loss Breach**: Global active state.
-2. **Drawdown Breach**: Global active state.
-3. **Audit-Chain Failure**: Global locked state.
-4. **Extreme Spread Widening**: Symbol active state.
-5. **Portfolio Reconciliation Failure**: Portfolio active state.
-6. **Broker Terminal Disconnect**: Global active state (in live mode).
-7. **Margin Emergency**: Portfolio active state.
-8. **Manual Operator Halt**: Global active state.
-
----
-
-## 18. Risk Reporting & Observability (Sprint 5.16)
-
-The reporting module provides structured, JSON-safe compilation of risk assessments, breaches, and historical decisions without recomputing or fabricating evidence. Observability metrics track calculation performance, decision distributions, and safety gate states.
-
-### Risk Report Builder (`reports.py`)
-* **Data Sources**: Generates consolidated reports exclusively from stored decisions, snapshots, and audit events.
-* **Redaction Policy**: Strips private account numbers, credentials, and raw broker response packets.
-* **Path Traversal Guard**: Gated write-to-path operations reject outputs directed outside the workspace directory or temporary system directories.
-
-### Recorded Observability Metrics (`RISK_METRICS_REGISTRY`)
-The governor records metrics to a thread-safe local registry exported to Prometheus:
-* `haruquant_risk_governor_latency_ms`: p95 latency tracking for pre-trade reviews.
-* `haruquant_risk_var_es_latency_ms` & `haruquant_risk_stress_latency_ms`: Latency of complex portfolio evaluations.
-* `haruquant_risk_decision_total`: Counters of approvals, reductions, and rejections.
-* `haruquant_risk_stale_evidence_failures_total`: Counter for fail-closed stale context halts.
-* `haruquant_risk_kill_switch_state`: Gauges for global/portfolio/symbol kill switches.
-* `haruquant_risk_audit_persistence_health`: Gauge representing cryptographic audit-chain integrity.
-
----
-
-## 19. Storage Architecture & Persistence (Sprint 5.17)
-
-The risk governance storage layer is structured as a dedicated package under `app/services/risk/storage/` which decouples the persistence layer from the core business logic using explicit ports and interfaces.
-
-### Key Components
-
-1. **Storage Ports (`ports.py`)**:
-   - **`RiskStateStore`**: Repository protocol for saving and retrieving strategy drawdown states, active kill switches, and cryptographic tokens.
-   - **`RiskAuditSink`**: Repository protocol for recording sequential blockchain-style audit blocks.
-   - **`RiskPolicyStore`**: Interface for persisting active risk rules and policy-as-code parameter overrides.
-   - **`RiskDecisionStore`**: Interface for persisting and performing compound-key idempotency checks on pre-trade governor decisions.
-   - **Idempotency Key Checks (`persist_risk_decision`)**: Idempotently persists decisions using a compound key `(request_id, workflow_id, signal_id, decision_material_hash)` to protect against double-spend or duplicate executions.
-   - **Schema & Live Guards**:
-     - `validate_storage_schema_compatibility`: Verifies major-version schema matching (expects major version 1) to prevent serialization mismatches.
-     - `require_live_audit_persistence`: Enforces fail-closed rules where live trading mode is active but the target storage engine lacks durability or audit-trail support.
-
-2. **In-Memory Implementation (`in_memory.py`)**:
-   - **`InMemoryRiskStateStore`**: Thread-safe repository implementing all four storage protocols using local python dicts protected by re-entrant locks (`threading.RLock`).
-   - **Fault Injection (`simulate_storage_failure`)**: Exposes simulated failure interfaces to test domain-level fail-closed robustness against database/file storage outages.
-
----
-
-## 20. Readiness and Delivery Plan Validation (Sprint 5.18)
-
-The readiness module proves that readiness verification starts only with canonical dependencies, explicit scope boundaries, safe fixtures, documented mode behavior, and an auditable delivery plan. It is a pre-runtime governance boundary and never evaluates a trade.
-
-### Key Components
-
-1. **Dependency Status Mapping (`validate_phase_dependencies`)**:
-   Verifies that required dependencies (e.g. storage ports, policy engines, and calculators) are implemented, importable, side-effect safe, and covered by tests.
-2. **Trading Mode Matrix (`validate_risk_mode_matrix`)**:
-   Enforces that the implementation covers all safety and operational environments (offline, simulation, paper, shadow, read-only live, micro-live, full-live).
-3. **Delivery Plan Validation (`validate_delivery_plan`)**:
-   Verifies requirements traceability, restricts fixtures to synthetic-only datasets, checks for deterministic seeds, and enforces fail-closed policies for live-sensitive staging.
-4. **Dry-Run Compilation (`build_readiness_dry_run`)**:
-   Takes a validated manifest and outputs a detailed `DryRunReport` detailing the files to read, files to change, planned commands, active scopes, blockers, and rollback boundaries.
-
----
-
-## 21. Governor & Decision Synthesis (Sprint 5.15)
-
-The governor package orchestrates the pre-trade risk evaluation, capital allocation, strategy admission, and live readiness checks. The final decision status and parameters are synthesized into a single package.
-
-### Key Components
-
-1. **Decision Synthesis (`decision_synthesis.py`)**:
-   - **`synthesize_decision(context)`**: Synthesizes the final `RiskDecisionPackage` from the ordered list of gate results without performing state mutations or audit writes.
-   - **`determine_decision_status(results, policy)`**: Implements precedence rules for decision status (e.g. `HALT_ALL` > `HALT_STRATEGY` > `BLOCK` > `REJECT` > `NEEDS_MORE_EVIDENCE` > `NEEDS_APPROVAL` > `REDUCE_SIZE` > `APPROVE`).
-   - **`select_primary_risk_reason(results)`**: Deterministically selects the primary warning or failure reason code based on status and severity rank.
-   - **`aggregate_reductions(results)`**: Combines lot size reductions suggested across sizing, correlation, exposure, drawdown, and stress testing gates into a unified plan.
-   - **`is_decision_token_eligible(decision)`**: Validates if a synthesized decision is eligible to receive a cryptographic approval token.
-
-
----
-
-## 22. Cryptographic Audit Layer (Phase 16)
-
-The Cryptographic Audit Layer provides a blockchain-style, cryptographically secure trail of all pre-trade decisions, ensuring complete transparency and preventing unauthorized signal execution. The code is organized under `app/services/risk/audit/`:
-
-### Core Components & Modules
-
-1. **Audit Event Sanitization & Redaction (`events.py`)**:
-   - **`AuditRedactionPolicy`**: Statelessly redacts sensitive parameters (like API keys, passwords, client secrets) before serialization to protect user privacy.
-   - **`build_canonical_audit_payload`**: Generates a deterministic, stable JSON representation of decision metadata to ensure hash consistency.
-   - **`create_risk_audit_event`**: Compiles decision logs and signs them with a parent hash. Automatically exposes fallback handlers for legacy V1 audits.
-
-2. **Blockchain-style Hash Chaining (`hash_chain.py`)**:
-   - **`build_genesis_hash`**: Generates the initial seed hash for an empty state.
-   - **`append_audit_hash`**: Links a new event to the tail of the existing chain by computing `SHA256(payload + previous_hash)`.
-   - **`verify_risk_audit_chain`**: Scans audit blocks to detect any modification or deletion of past decisions.
-   - **`require_valid_audit_chain`**: A fail-closed integrity gate. In live trading modes, any detected tampering automatically triggers a global locked kill switch.
-
-3. **Cryptographic Tokens & Scope Boundaries (`tokens.py`)**:
-   - **`RiskDecisionTokenSigner`**: Signs decision payloads with HMAC-SHA256. Dual-mode instantiation supports V2 structures and transient V1 keys.
-   - **`create_risk_decision_token`**: Signs eligible approvals. Maps requests dynamically to V2 `RiskDecisionToken` or V1 `RiskApprovalToken`.
-   - **`validate_risk_approval_token`**: Checks tokens for expiration, configuration/policy hash compatibility, scope alignment, and signature verification. Supports `@overload` signatures for clean static analysis compatibility.
+## 8. Change Process
+
+For every future change:
+
+```text
+1. Update this README first.
+2. Update the workflow and cross-domain contract when behavior changes.
+3. Resolve or record decisions that would otherwise require guessing.
+4. Add or change exactly one functional requirement per public symbol.
+5. Update key exports, dependencies, configuration, side effects, and errors.
+6. Reorder modules/files if dependency order changes.
+7. Implement the smallest approved change.
+8. Add or update the usage example and targeted tests.
+9. Run targeted verification, then the Risk package quality gate.
+10. Mark Completed only after implementation, callers, tests, and boundaries are verified.
+```
+
+This keeps Risk's requirements, implementation sequence, contracts, safety boundary, examples, tests, and evidence-based status aligned.

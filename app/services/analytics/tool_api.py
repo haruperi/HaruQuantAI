@@ -50,7 +50,7 @@ DEFAULT_CONFIGURATION_SOURCES: dict[str, str] = {
     "risk_free_rate": "MetricConfig.risk_free_rate",
     "breakeven_tolerance": "MetricConfig.breakeven_epsilon",
     "minimum_sample_size": "MetricConfig.min_sample_size",
-    "bootstrap_count_limits": "docs/adr/ADR-ANALYTICS-LIMITS.md",
+    "bootstrap_count_limits": "docs/PROJECT.md section 12 (OD-28) and app/services/analytics/README.md Decisions",
     "dashboard_limits": "AnalyticsLimits.max_dashboard_points",
     "fx_stale_rate_limits": "caller-supplied validated fx_conversions",
     "confidence_alpha_levels": "statistical tool arguments",

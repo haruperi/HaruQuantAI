@@ -775,8 +775,8 @@ Rules:
 * affected requirements remain `Missing`;
 * do not invent affected signatures or behaviour;
 * do not add trivial decisions;
-* remove obsolete decisions after resolution;
-* a decision affecting more than one domain must be escalated to the Open Decisions section of `docs/PROJECT.md` (where it is resolved with an ADR) — record only a reference to it here.
+* after resolution, encode the outcome in the authoritative specification and delete the decision row;
+* a decision affecting more than one domain must also appear in the Open Decisions section of `docs/PROJECT.md` while unresolved.
 
 # WORKFLOW DESIGN GUIDANCE
 
