@@ -899,7 +899,7 @@ During iterative implementation, run only the specific files associated with the
 
 ### Package completion checklist
 
-- [x] The package path is `app/services/simulator`; no path migration or compatibility alias is required.
+- [ ] The package path is `app/services/simulator`; no path migration or compatibility alias is required.
 - [ ] Exact external contracts and Phase 1 specifications are implemented and verified before their requirements become `Completed`.
 - [ ] The actual package tree matches Section 2 in dependency order without cycles.
 - [ ] Every module folder represents one coherent capability and every file one focused responsibility.
@@ -915,7 +915,7 @@ During iterative implementation, run only the specific files associated with the
 - [ ] Rejected behavior is absent from the architecture and active package surface.
 - [ ] Current flat V1 files/tests/callers are migrated only after replacement equivalence is proven.
 
-Current checklist status: `Partial`. The existing bar engine and tests are evidence for migration, but the final package structure, contracts, workflows, and verification are not implemented.
+Current checklist status: `Missing`. The existing bar engine and tests are evidence for migration, but the final package structure, contracts, workflows, and verification are not implemented.
 
 ---
 
