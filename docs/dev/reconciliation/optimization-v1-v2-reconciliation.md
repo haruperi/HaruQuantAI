@@ -954,4 +954,3 @@ optimization/
 * [x] the output is sufficient to draft the final domain README once listed blocking open decisions are resolved.
 
 **Top-level escalation status:** Identified but not applied in this step because the top-level system document was outside the permitted inputs and output. Pipeline step 05 must copy and resolve the marked cross-domain/system-shape items.
-

@@ -1,13 +1,13 @@
 # [System Name]
 
-> **System path:** `[repository/root]`  
-> **Status:** `[Missing | Partial | Completed]`  
+> **System path:** `[repository/root]`
+> **Status:** `[Missing | Partial | Completed]`
 > **Last updated:** `[YYYY-MM-DD]`
 
-> This document is the system-level source of truth.  
+> This document is the system-level source of truth.
 > It defines how domains fit together, how cross-domain workflows operate, which rules apply system-wide, and how the complete system is verified.
 >
-> Domain internals belong in each domain's own `README.md`.  
+> Domain internals belong in each domain's own `README.md`.
 > Do not duplicate domain-level requirements, files, functions, or implementation details here.
 
 ---

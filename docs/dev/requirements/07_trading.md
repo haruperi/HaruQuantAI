@@ -752,4 +752,3 @@ classDiagram
 - [ ] Shadow-trading behavior is strictly read-only with respect to live state and is mathematically prohibited from mutating live broker, account, position, order, approval, risk, or kill-switch state.
 - [ ] Full cTrader bridge behavior, automatic live compensation execution, and shadow-trading expected-versus-realized reporting may be staged after the first Trading implementation slice unless explicitly approved earlier.
 - [ ] Public registry and catalog updates are mandatory when trading tools are added, renamed, or removed.
-

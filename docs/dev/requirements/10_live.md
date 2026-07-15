@@ -553,4 +553,3 @@ if attempt["metadata"]["side_effect_mode"] == "unknown_outcome":
 - [ ] UI/dashboard rendering and websocket connection management are strictly out of scope for Live. Live may emit structured JSON events for approved consumers; rendering, websocket transport, and dashboard orchestration belong to API/UI or other consumer modules.
 - [ ] Snapshot cache behavior can remain future work unless required for live readiness or audit.
 - [ ] Public registry and catalog updates shall be mandatory when live tools are added, renamed, or removed.
-

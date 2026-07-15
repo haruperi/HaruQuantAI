@@ -806,4 +806,3 @@ The following capabilities are internal rebuild support and are not public calla
 - Pending: exact optional optimizer dependency versions, Sobol/LHS implementation libraries, repository backend approval per deployment tier, approved artifact roots, benchmark environment, firm-specific prop-firm profiles, and resource override workflow owners require owner/architect approval before production implementation.
 - Pending: numeric production limits other than audit-proposed PBO defaults remain owner/risk decisions and must not be treated as live trading approval.
 - Non-blocking future improvements: optional Optuna or scikit-optimize backends, future Ray, Dask, or Celery adapters, full prop-firm profile libraries, PostgreSQL-compatible multi-user backend support, topology-adjusted effective-trial estimation, and UI rendering owned by UI/API.
-

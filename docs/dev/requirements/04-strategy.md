@@ -1089,4 +1089,3 @@ This matrix is the v1.0 planning baseline. It maps every stable Strategy require
 | Lifecycle promotion gates, validation evidence, runbook readiness, monitoring readiness, and sign-off route. | Owner/Architect/Risk | Pending | Paper/live promotion. |
 | Strategy governance and operations extraction for legal, compliance, runbook, model-governance, and business-continuity material. | Owner/Architect | Pending | Clean separation of module behavior from governance standards. |
 | Strategy interfaces, schemas, and deprecation policies under semantic versioning and documented migration guides. | Architect | Pending | Stable external consumption. |
-

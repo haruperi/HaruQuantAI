@@ -820,4 +820,3 @@ sequenceDiagram
 - Frontend governed-write checks are useful user-side protection, but backend authorization and safety gates must remain authoritative.
 - Future improvements may add deeper end-to-end workflow coverage after the minimum route contract, OpenAPI snapshot, WebSocket lifecycle, and frontend/API drift checks are documented and accepted.
 - Known limitation: the current document is a route inventory plus strengthened handoff requirements, not yet a complete route-by-route schema appendix.
-

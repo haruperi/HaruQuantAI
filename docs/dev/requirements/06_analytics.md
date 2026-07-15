@@ -1016,4 +1016,3 @@ classDiagram
 - ADR Required: `ADR-ANALYTICS-DASHBOARD` must select a deterministic, auditable dashboard downsampling algorithm before production handoff.
 - Architectural Mandate: maintain a warning and quality-flag catalog with code, severity, affected sections, blocks-promotion status, source-backed/recommended status, and linked test fixture.
 - Architectural Mandate: maintain a requirement-to-test traceability matrix for Analytics once the official tool surface and schema contracts are approved.
-

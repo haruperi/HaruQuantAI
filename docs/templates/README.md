@@ -1,10 +1,10 @@
 # [Domain Name]
 
-> **Package:** `[app/path/to/package]`  
-> **Status:** `[Missing | Partial | Completed]`  
+> **Package:** `[app/path/to/package]`
+> **Status:** `[Missing | Partial | Completed]`
 > **Last updated:** `[YYYY-MM-DD]`
 
-> This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.  
+> This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
 
 ---
@@ -201,7 +201,7 @@ Do not duplicate the internal implementation of other domains. The full multi-do
 - [Condition] → [Expected response]
 - [Condition] → [Expected response]
 
-**Integration test:**  
+**Integration test:**
 `tests/[domain]/integration/test_[workflow_name].py::test_[workflow_name]_[scenario]()`
 
 #### End-to-end workflow diagram
@@ -248,7 +248,7 @@ For a cross-domain workflow:
 - fully describe only this domain's functions and responsibilities;
 - do not describe another domain's internal steps.
 
-> Add detailed steps only for workflows involving multiple functions or files.  
+> Add detailed steps only for workflows involving multiple functions or files.
 > A simple one-function use case needs only a row in the workflow table.
 
 ---
@@ -432,7 +432,7 @@ Example functions must:
 
 ### 4.2 `[module_name]/` — [Feature / Capability]
 
-> Copy Section 4.1 for every additional module folder.  
+> Copy Section 4.1 for every additional module folder.
 > Place this module after every module it depends on.
 
 ---

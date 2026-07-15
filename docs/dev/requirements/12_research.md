@@ -607,4 +607,3 @@ Minimum envelope shape:
 ```
 
 `errors` and `warnings` entries must include `code`, `message`, `severity`, optional `field_path`, optional `retryable`, and bounded `details`. Envelope schema version, exact status enum, allowed side-effect enum, and canonical error-code names remain pending approval before Builder handoff.
-

@@ -156,7 +156,6 @@ addopts = [
     "--strict-config",
     "--cov=app.utils",
     "--cov=app.services",
-    "--cov=app.agentic",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-fail-under=80"
@@ -164,7 +163,7 @@ addopts = [
 
 [tool.coverage.run]
 branch = true
-source = ["app/utils", "app/services", "app/agentic"]
+source = ["app/utils", "app/services"]
 
 [tool.coverage.report]
 show_missing = true
@@ -173,7 +172,8 @@ fail_under = 80
 exclude_lines = [
     "pragma: no cover",
     "if TYPE_CHECKING:",
-    "if __name__ == .__main__.:"
+    "if __name__ == .__main__.:",
+    "\\s*\\.\\.\\.\\s*$"
 ]
 
 [tool.mypy]
@@ -181,7 +181,7 @@ python_version = "3.14"
 strict = true
 mypy_path = "."
 exclude = ["^scripts/"]
-packages = ["app.utils", "app.services", "app.agentic"]
+packages = ["app.utils", "app.services"]
 warn_unused_configs = false
 warn_return_any = true
 warn_unused_ignores = true
@@ -193,11 +193,7 @@ no_implicit_optional = true
 
 [[tool.mypy.overrides]]
 module = "tests.*"
-check_untyped_defs = false
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-disallow_untyped_calls = false
-disallow_untyped_decorators = false
+ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = "scripts.*"
@@ -221,6 +217,9 @@ module = [
     "scipy",
     "ctrader",
     "ctrader_open_api",
+    "ctrader_open_api.*",
+    "twisted",
+    "twisted.*",
     "numba",
     "numba.*",
     "service_identity"

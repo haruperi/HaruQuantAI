@@ -1,10 +1,10 @@
 # Broker Domain — Functional Requirements
 
-> **System:** HaruQuantAI  
-> **Domain:** Brokers  
-> **Target package:** `app/services/brokers`  
-> **Status:** Canonical merged draft  
-> **Requirement type:** Functional requirements and mandatory domain-boundary rules  
+> **System:** HaruQuantAI
+> **Domain:** Brokers
+> **Target package:** `app/services/brokers`
+> **Status:** Canonical merged draft
+> **Requirement type:** Functional requirements and mandatory domain-boundary rules
 > **Source basis:** Current Brokers V1 audit plus the approved decision to move broker connectivity out of Data
 
 ---
@@ -736,7 +736,7 @@ Multiple adapter instances must not share mutable connection/account/subscriptio
 
 ### BRK-FR-CON-014 — Account selection concurrency and session isolation
 
-The primary architectural design requires that one adapter instance represents one immutable provider, account, and environment session. Creating a new adapter instance is the preferred method for switching accounts. 
+The primary architectural design requires that one adapter instance represents one immutable provider, account, and environment session. Creating a new adapter instance is the preferred method for switching accounts.
 
 Where the adapter supports runtime account switching via `select_account()`, it must prevent race conditions and state corruption under concurrent execution by implementing:
 1. **Exclusive lifecycle lock**: The adapter must use an exclusive lock during the account switch transition.
@@ -786,7 +786,7 @@ If a provider protocol requires periodic pings or heartbeats to keep a session (
 
 ### BRK-FR-CON-023 — Explicit Connection Lifecycle State Machine
 
-To prevent race conditions, state corruption, or duplicate socket allocations under concurrent asynchronous execution, the adapter must implement an internal, thread-safe lifecycle state machine. 
+To prevent race conditions, state corruption, or duplicate socket allocations under concurrent asynchronous execution, the adapter must implement an internal, thread-safe lifecycle state machine.
 1. **Explicit States**: The state machine must support at least the following states:
    - `DISCONNECTED`: Initial state; no resources allocated.
    - `CONNECTING`: Transport socket or terminal connection is being established.
@@ -966,7 +966,7 @@ The adapter must not persist event streams or subscription data.
 
 ### BRK-FR-SUB-008 — Bounded Event Buffer and Overflow Semantics
 
-The adapter must implement a bounded event buffer per subscription, with a size configurable via the `stream_buffer_size` parameter in `BrokerConnectionConfig`. For market-critical streams, silently dropping the oldest event is forbidden. 
+The adapter must implement a bounded event buffer per subscription, with a size configurable via the `stream_buffer_size` parameter in `BrokerConnectionConfig`. For market-critical streams, silently dropping the oldest event is forbidden.
 When buffer overflow occurs (e.g. because a consumer falls behind):
 1. **Emit Backpressure Event**: The adapter must immediately emit a `BROKER_BACKPRESSURE` event containing the lost sequence range.
 2. **Degrade Lifecycle State**: The state machine must transition to `DEGRADED`.
@@ -1326,4 +1326,3 @@ This requirement changes the current system-level design and therefore requires:
 8. Update account/market-data workflows so the provider call is `Data → Brokers → external provider`.
 9. Create an ADR superseding the previous MT5-access split and connection-ownership decision.
 10. Create `app/services/brokers/README.md` as the authoritative domain document.
-

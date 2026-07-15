@@ -92,12 +92,19 @@ Domain-readiness audit
   → Next domain
 ```
 
-## Prompt 1: Domain implementation roadmap
+## Prompt 1: Domain audit and feature implementation
 
-Use this once at the beginning of each domain. It is read-only.
+Use this for the default implementation path (feature-level tasks).
 
 ```
-Perform a read-only implementation-readiness audit for the `[DOMAIN]` domain.
+Implement `[DOMAIN README PATH]` Section `[4.X]`, `[FEATURE NAME]`.
+
+Approved scope:
+- Feature: `[FEATURE NAME]`
+- Files: `[EXACT FILE LIST FROM THE FILES TABLE]`
+- Requirements: `[EXACT FR-ID RANGE OR LIST]`
+- Tests: the targeted unit, usage, and feature-integration tests required by the README
+- Documentation: update only the affected README statuses/checklists and `docs/CHANGELOG.md`
 
 Authoritative sources:
 - `AGENTS.md`
@@ -107,10 +114,10 @@ Authoritative sources:
 - `[DOMAIN README PATH]`
 - The READMEs of every declared upstream dependency
 
-Do not modify files.
+---
 
-Determine:
-
+### Step 1: Initial Domain Audit (Only if this is the FIRST feature in this domain)
+Perform a read-only implementation-readiness audit for the `[DOMAIN]` domain. Do not modify files. Determine:
 1. The domain’s ownership and prohibited responsibilities.
 2. Its owned and consumed contracts, including owners and versions.
 3. The Section 4 feature implementation order.
@@ -123,22 +130,11 @@ Determine:
 10. The recommended sequence of bounded implementation tasks.
 
 Return a dependency-ordered implementation roadmap. Do not guess through missing specifications. Report any missing or conflicting requirement as a blocker.
-```
 
-## Prompt 2: Implement one feature—recommended default
+---
 
-```
-Implement `[DOMAIN README PATH]` Section `[4.X]`, `[FEATURE NAME]`.
-
-Approved scope:
-- Feature: `[FEATURE NAME]`
-- Files: `[EXACT FILE LIST FROM THE FILES TABLE]`
-- Requirements: `[EXACT FR-ID RANGE OR LIST]`
-- Tests: the targeted unit, usage, and feature-integration tests required by the README
-- Documentation: update only the affected README statuses/checklists and `docs/CHANGELOG.md`
-
+### Step 2: Feature-Level Dry Run (Required for ALL features)
 Before editing:
-
 1. Read `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`, the complete domain README, and the READMEs of direct dependencies.
 2. Verify that all upstream features and consumed contracts required by this feature are available.
 3. Inspect existing code and tests for reusable behavior and conflicts.
@@ -152,8 +148,9 @@ Before editing:
    - rollback path.
 5. Wait for the exact phrase `APPROVED: EXECUTE`.
 
-After approval:
+---
 
+### Step 3: Execution and Implementation (After approval)
 1. Implement files in the exact order listed in the feature’s Files table.
 2. Implement only the mapped `FR-*` requirements.
 3. Preserve domain boundaries and receiver-owned contract rules.
@@ -168,7 +165,7 @@ After approval:
 If the specification is incomplete or conflicts with `docs/PROJECT.md`, stop and report the contradiction instead of choosing an interpretation.
 ```
 
-## Prompt 3: Implement one file—only for a large feature
+## Prompt 2: Implement one file—only for a large feature
 
 ```
 Implement `[FILE PATH]` within `[DOMAIN README PATH]` Section `[4.X]`.
@@ -197,8 +194,7 @@ After approval:
 - Stop and report any contract, dependency, or specification conflict.
 ```
 
-
-## Prompt 4: Full domain completion review
+## Prompt 3: Full domain completion review
 
 Use this only after the entire domain README is marked `Completed` and implementation is believed finished.
 
@@ -260,6 +256,8 @@ Verify:
 - Every file has the documented focused responsibility.
 - Legacy files, aliases, wrappers, and obsolete compatibility paths have been removed where the final structure excludes them.
 - Every `__init__.py` exposes exactly the documented public names through explicit imports and `__all__`.
+- Every module, class, and function is properly fitted with Google-style docstrings
+- Every function is properly logged using system-wide logger (from app.utils import logger). Every important step is logged and each function has at least one logger stating what is being done in that function.
 - Imports do not perform prohibited initialization or side effects.
 
 Produce an expected-versus-actual file inventory.

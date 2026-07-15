@@ -1123,4 +1123,3 @@ Every requirement in this file shall be classified before implementation begins 
 - [ ] Rich notebook HTML representations may be added after stable result and manifest schemas exist.
 - [ ] Proprietary source protection may be added through approved packaging/security controls without changing public indicator semantics.
 - [ ] Canary routing, distributed tracing, SLO alerting, cryptographic package signing, release attestations, SBOM generation, and multi-writer cache synchronization may be added through platform or release-engineering integrations after ownership is approved.
-

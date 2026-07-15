@@ -1,7 +1,7 @@
 # Analytics — Version 1 Code Audit
 
-**Repository:** `haruperi/HaruQuant`  
-**Audited commit:** `a39d26498e14772c571d75fa9a5f0e477a1dd912`  
+**Repository:** `haruperi/HaruQuant`
+**Audited commit:** `a39d26498e14772c571d75fa9a5f0e477a1dd912`
 **Audit type:** Evidence-based Version 1 code audit; no Version 2 comparison or redesign.
 
 ## 1. Audit Scope

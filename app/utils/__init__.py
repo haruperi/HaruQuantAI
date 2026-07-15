@@ -43,7 +43,9 @@ from app.utils.serialization import canonical_json, to_json_safe
 from app.utils.settings import (
     LoggingSettings,
     RuntimeSettings,
+    load_dotenv_file,
     load_settings,
+    resolve_named_secrets,
     resolve_secret_reference,
 )
 from app.utils.time import (
@@ -91,6 +93,7 @@ __all__ = [
     "hash_password",
     "is_fresh",
     "is_sensitive_key",
+    "load_dotenv_file",
     "load_settings",
     "logger",
     "map_exception",
@@ -98,6 +101,7 @@ __all__ = [
     "parse_utc_timestamp",
     "redact_mapping_value",
     "redact_text_value",
+    "resolve_named_secrets",
     "resolve_secret_reference",
     "route_error_event",
     "select_active_secret_version",

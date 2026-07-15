@@ -75,16 +75,16 @@
 
 The Version 1 execution domain contains **four substantially different systems inside one package**:
 
-1. **Agent-facing tool wrappers**  
+1. **Agent-facing tool wrappers**
    Fifty-three root exports present broker checks, readiness checks, paper operations, live operations, and kill-switch actions. Most wrappers either perform small deterministic validation or merely package a request into a standard response. They do **not** perform the broker or persistence side effects implied by their names.
 
-2. **A deterministic execution-governance service set**  
+2. **A deterministic execution-governance service set**
    Approval, readiness, intent assembly, idempotency, send dispatch, send-attempt persistence, receipt normalization, authority state, and reconciliation are implemented as separate services. These components provide real isolated value, but their intended end-to-end paper workflow is not operational through the current package facade.
 
-3. **An active live-trading runtime**  
+3. **An active live-trading runtime**
    `app.services.execution.live` is used by `app/api/routes/live.py`. It manages live sessions, strategy loading, bar monitoring, signal generation, position tracking, direct MT5-oriented trade execution, local state files, notifications, and status output. This is the clearest confirmed production/runtime value in the domain.
 
-4. **Legacy broker/simulator compatibility implementations**  
+4. **Legacy broker/simulator compatibility implementations**
    `trading.py` provides a large MQL5-style `Trade` API and flat broker functions. `core.py` provides a broker-like in-memory simulation core. These overlap with `app/services/trading`, the live runtime, simulation code, and the newer send-service pipeline.
 
 ### Operational workflows

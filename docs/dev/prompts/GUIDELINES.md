@@ -184,5 +184,3 @@ Package
 ```
 
 Several old files may become one focused file. One bloated old file may become two focused files.
-
-
