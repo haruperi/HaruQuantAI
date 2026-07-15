@@ -100,6 +100,19 @@ _TARGETS: Mapping[BrokerId, set[BrokerCapabilityId]] = MappingProxyType(
 )
 
 
+# Credential-gated release evidence. MT5 has a verified real demo-account
+# connection (see README "Current implementation evidence"), so its
+# implemented capabilities are released for the skeleton build. Live-order
+# safety remains enforced downstream by Trading's runtime gates
+# (ALLOW_LIVE_MUTATIONS) and Risk's kill switch; this table only stops
+# adapters whose provider connection has never been verified.
+_RELEASED: Mapping[BrokerId, frozenset[BrokerCapabilityId]] = MappingProxyType(
+    {
+        BrokerId.MT5: frozenset(_MT5),
+    }
+)
+
+
 def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapability:
     implemented = operation in _TARGETS[broker]
     is_write = operation in _WRITE
@@ -112,10 +125,11 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
         BrokerCapabilityId.CONNECT,
         BrokerCapabilityId.IS_CONNECTED,
     }
+    released = implemented and operation in _RELEASED.get(broker, frozenset())
     return BrokerCapability(
         capability=operation,
         implementation_status="IMPLEMENTED" if implemented else "NOT_IMPLEMENTED",
-        availability="AVAILABLE" if connect_ready else "UNAVAILABLE",
+        availability="AVAILABLE" if (connect_ready or released) else "UNAVAILABLE",
         access_mode="WRITE" if is_write else "READ",
         requirement=(
             "PERMISSION"
@@ -128,7 +142,7 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
         execution_model="LOCAL" if operation in _LOCAL else "PROVIDER_CALL",
         reason=(
             None
-            if connect_ready
+            if (connect_ready or released)
             else "Release evidence is not recorded"
             if implemented
             else "Operation is not implemented for this profile"

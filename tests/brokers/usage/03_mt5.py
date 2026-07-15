@@ -1,15 +1,11 @@
 """Demonstrate the MT5 adapter against a real configured demo account.
 
-Reads real ``MT5_*`` credentials from the repository ``.env`` (or the
-process environment) through the shared ``app.utils.settings`` dotenv/
-credential helpers, then performs a genuine terminal connection, account
-read, and disconnect. Prints exactly what the account returns rather than a
-scripted fixture. If no demo credentials are configured, this prints a clear
-notice and exits without fabricating success.
+Typed shared settings load the real ``MT5_*`` profile. The examples perform a
+genuine terminal connection, account read, and disconnect. If the profile is
+incomplete, the script reports a skip and never fabricates success.
 """
 
 import asyncio
-import os
 import sys
 from pathlib import Path
 
@@ -24,43 +20,47 @@ from app.services.brokers import (
     create_broker_adapter,
 )
 from app.services.brokers.mt5.adapter import MT5BrokerAdapter
-from app.utils import load_dotenv_file, resolve_named_secrets
+from app.utils import logger
 
-_ENV_PATH = Path(__file__).resolve().parents[3] / ".env"
-_LOGIN_KEY = "MT5_LOGIN"
-
-
-def _environment() -> dict[str, str]:
-    values = load_dotenv_file(_ENV_PATH)
-    values.update(os.environ)
-    return values
+from tests.brokers.provider_settings import ProviderTestSettings
 
 
-def _mt5_credentials() -> dict[str, str] | None:
-    values = _environment()
-    if values.get("MT5_ENABLED", "").casefold() != "true":
+def _mt5_credentials() -> ProviderTestSettings | None:
+    """Return typed MT5 settings only when the required profile is complete."""
+    logger.info("Checking the typed MT5 demo settings profile")
+    settings = ProviderTestSettings()
+    if not settings.mt5_enabled:
         return None
-    required = (_LOGIN_KEY, "MT5_PASSWORD", "MT5_SERVER")
-    if not all(values.get(key) for key in required):
+    if (
+        settings.mt5_login is None
+        or settings.mt5_password is None
+        or settings.mt5_server is None
+    ):
         return None
-    return values
+    return settings
 
 
-def _config(values: dict[str, str]) -> BrokerConnectionConfig:
-    credentials = resolve_named_secrets(
-        {
-            "login": _LOGIN_KEY,
-            "password": "MT5_PASSWORD",
-            "server": "MT5_SERVER",
-            "terminal_path": "MT5_TERMINAL_PATH",
-        },
-        values,
-    )
+def _config(settings: ProviderTestSettings) -> BrokerConnectionConfig:
+    """Build a validated MT5 config without exposing credential values."""
+    logger.info("Building the typed MT5 connection configuration")
+    if (
+        settings.mt5_login is None
+        or settings.mt5_password is None
+        or settings.mt5_server is None
+    ):
+        raise ValueError("MT5 settings are incomplete")
+    credentials = {
+        "login": settings.mt5_login,
+        "password": settings.mt5_password,
+        "server": settings.mt5_server,
+    }
+    if settings.mt5_terminal_path is not None:
+        credentials["terminal_path"] = settings.mt5_terminal_path
     return BrokerConnectionConfig(
         broker_id=BrokerId.MT5,
         environment=(
             BrokerEnvironment.LIVE
-            if values.get("MT5_ENVIRONMENT", "demo").casefold() == "live"
+            if settings.mt5_environment == "live"
             else BrokerEnvironment.DEMO
         ),
         provider_enabled=True,
@@ -71,35 +71,37 @@ def _config(values: dict[str, str]) -> BrokerConnectionConfig:
         circuit_failure_threshold=3,
         circuit_recovery_timeout_sec=5,
         circuit_half_open_max_calls=1,
-        account_reference=values[_LOGIN_KEY],
+        account_reference=settings.mt5_login.get_secret_value(),
         credentials=credentials,
     )
 
 
 def example_registry_adapter_connects_to_a_real_demo_account(
-    values: dict[str, str],
+    settings: ProviderTestSettings,
 ) -> None:
     """Connect and disconnect a registry-created adapter against a real terminal."""
-    print("\n1. Registry adapter connects to a real MT5 demo terminal")
+    logger.info("Example 1: registry adapter connects to a real MT5 demo terminal")
 
     async def exercise() -> None:
-        adapter = create_broker_adapter(BrokerId.MT5, _config(values)).data
+        """Exercise one genuine registry-created MT5 connection lifecycle."""
+        logger.info("Connecting the registry-created MT5 adapter")
+        adapter = create_broker_adapter(BrokerId.MT5, _config(settings)).data
         if adapter is None:
             raise AssertionError("registry did not return an adapter")
         connected = await adapter.connect()
-        print("connect():", connected.status, connected.error)
+        logger.info("connect() status=%s error=%s", connected.status, connected.error)
         if not connected.is_success:
             raise AssertionError("real MT5 connect failed")
         status = await adapter.is_connected()
-        print("is_connected():", status.data)
+        logger.info("is_connected()=%s", status.data)
         await adapter.disconnect()
 
     asyncio.run(exercise())
 
 
-def example_adapter_maps_real_account_state(values: dict[str, str]) -> None:
+def example_adapter_maps_real_account_state(settings: ProviderTestSettings) -> None:
     """Map a genuine demo account into the canonical account DTO."""
-    print("\n2. Adapter maps real account state")
+    logger.info("Example 2: adapter maps real account state")
     capabilities = {
         operation: BrokerCapability(
             capability=operation,
@@ -112,20 +114,19 @@ def example_adapter_maps_real_account_state(values: dict[str, str]) -> None:
         )
         for operation in BrokerCapabilityId
     }
-    adapter = MT5BrokerAdapter(_config(values), capabilities)
+    adapter = MT5BrokerAdapter(_config(settings), capabilities)
 
     async def exercise() -> None:
+        """Connect, read the real account DTO, and disconnect."""
+        logger.info("Reading the genuine MT5 account state")
         connected = await adapter.connect()
         if not connected.is_success:
             raise AssertionError("real MT5 connect failed")
         account = await adapter.get_account_info()
-        print(
-            "Account:",
-            "id=",
+        logger.info(
+            "Account id=%s currency=%s balance=%s",
             account.data.account_id if account.data else None,
-            "currency=",
             account.data.currency if account.data else None,
-            "balance=",
             account.data.balance if account.data else None,
         )
         if not account.is_success or account.data is None:
@@ -136,9 +137,9 @@ def example_adapter_maps_real_account_state(values: dict[str, str]) -> None:
 
 
 if __name__ == "__main__":
-    demo_values = _mt5_credentials()
-    if demo_values is None:
-        print("MT5 demo credentials are not configured in .env — skipping.")
+    demo_settings = _mt5_credentials()
+    if demo_settings is None:
+        logger.info("MT5 demo credentials are not configured; skipping")
     else:
-        example_registry_adapter_connects_to_a_real_demo_account(demo_values)
-        example_adapter_maps_real_account_state(demo_values)
+        example_registry_adapter_connects_to_a_real_demo_account(demo_settings)
+        example_adapter_maps_real_account_state(demo_settings)

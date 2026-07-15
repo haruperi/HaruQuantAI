@@ -7,6 +7,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.utils.errors.exceptions import ConfigurationError
 
@@ -15,6 +16,20 @@ LogRender = Literal["json", "human"]
 LogCompression = Literal["zip", "none"]
 Environment = Literal["dev", "test", "staging", "production"]
 RuntimeProfile = Literal["research", "simulation", "paper", "live"]
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
+
+
+class AppSettings(BaseSettings):
+    """Immutable base for typed settings loaded from the central environment."""
+
+    model_config = SettingsConfigDict(
+        env_file=_REPOSITORY_ROOT / ".env",
+        env_file_encoding="utf-8",
+        env_ignore_empty=True,
+        case_sensitive=False,
+        extra="ignore",
+        frozen=True,
+    )
 
 
 class _ConfigurationModel(BaseModel):

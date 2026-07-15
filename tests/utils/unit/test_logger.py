@@ -6,6 +6,7 @@ import sys
 import time
 import zipfile
 from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -65,6 +66,66 @@ def test_default_configuration_creates_all_sinks(
     assert not console_output.startswith("\033[")
     assert "| \033[32mINFO    \033[0m |" in console_output
     assert " - \033[32mdefault profile\033[0m" in console_output
+
+
+def test_first_bound_log_activates_default_profile(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    global_logger.info("lazy default profile")
+    shutdown_logging()
+
+    assert "lazy default profile" in capsys.readouterr().out
+    assert {path.name for path in (tmp_path / "data" / "logs").iterdir()} == {
+        "access.log",
+        "app.log",
+        "debug.log",
+        "errors.log",
+    }
+
+
+def test_first_bound_log_is_thread_safe(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        list(
+            executor.map(global_logger.info, (f"record-{index}" for index in range(8)))
+        )
+    flush_logging()
+
+    owned = [
+        handler
+        for handler in logging.getLogger("haruquant").handlers
+        if handler.__class__.__module__ == "app.utils.logging.logger"
+    ]
+    assert len(owned) == 1
+    app_log = (tmp_path / "data" / "logs" / "app.log").read_text(encoding="utf-8")
+    assert all(f"record-{index}" in app_log for index in range(8))
+
+
+def test_explicit_configuration_is_not_replaced_by_lazy_default(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    configure_logging(
+        LoggingSettings(
+            level="ERROR",
+            log_directory=None,
+            enqueue=False,
+        )
+    )
+
+    global_logger.info("suppressed by explicit profile")
+
+    assert logging.getLogger("haruquant").level == logging.ERROR
+    assert not (tmp_path / "data" / "logs").exists()
 
 
 def test_redacting_filter_runs_before_formatting() -> None:
@@ -177,6 +238,34 @@ def test_import_registers_no_handlers() -> None:
         text=True,
     )
     assert completed.stdout.strip() == "0"
+
+
+def test_import_time_bound_log_does_not_activate_defaults(tmp_path: Path) -> None:
+    probe = tmp_path / "lazy_logging_probe.py"
+    probe.write_text(
+        "from app.utils import logger\nlogger.info('import-time record')\n",
+        encoding="utf-8",
+    )
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = os.pathsep.join(
+        filter(None, (str(tmp_path), environment.get("PYTHONPATH", "")))
+    )
+    command = (
+        "import logging; import lazy_logging_probe; "
+        "print(len(logging.getLogger('haruquant').handlers))"
+    )
+
+    completed = subprocess.run(  # noqa: S603 - fixed interpreter and source.
+        [sys.executable, "-c", command],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=Path(__file__).parents[3],
+        env=environment,
+    )
+
+    assert completed.stdout.strip() == "0"
+    assert not (tmp_path / "data" / "logs").exists()
 
 
 def test_configure_logging_applies_log_level() -> None:

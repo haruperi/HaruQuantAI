@@ -6,6 +6,7 @@ from pathlib import Path
 import app.utils
 
 _EXPECTED_EXPORTS = {
+    "AppSettings",
     "AuditEvent",
     "AuthContext",
     "BoundLogger",

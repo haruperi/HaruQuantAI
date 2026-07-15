@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import re
 from collections.abc import Callable, Mapping
 
@@ -10,7 +9,7 @@ from pydantic import SecretStr
 from pydantic import ValidationError as PydanticValidationError
 
 from app.utils.errors.exceptions import ConfigurationError, SecurityError
-from app.utils.settings.models import LoggingSettings, RuntimeSettings
+from app.utils.settings.models import AppSettings, LoggingSettings, RuntimeSettings
 
 _SUPPORTED_KEYS = frozenset(
     {
@@ -29,6 +28,50 @@ _SUPPORTED_KEYS = frozenset(
     }
 )
 _SECRET_REFERENCE = re.compile(r"secret://[A-Za-z0-9._/-]{1,255}\Z")
+
+
+class _EnvironmentSettings(AppSettings):
+    """Raw supported environment values loaded through the settings boundary."""
+
+    environment: str | None = None
+    runtime_profile: str | None = None
+    log_level: str | None = None
+    log_render: str | None = None
+    log_file_path: str | None = None
+    log_directory: str | None = None
+    log_max_bytes: str | None = None
+    log_backup_count: str | None = None
+    log_retention_days: str | None = None
+    log_compression: str | None = None
+    log_enqueue: str | None = None
+    log_colorize: str | None = None
+
+
+_ENVIRONMENT_FIELDS = {
+    "ENVIRONMENT": "environment",
+    "RUNTIME_PROFILE": "runtime_profile",
+    "LOG_LEVEL": "log_level",
+    "LOG_RENDER": "log_render",
+    "LOG_FILE_PATH": "log_file_path",
+    "LOG_DIRECTORY": "log_directory",
+    "LOG_MAX_BYTES": "log_max_bytes",
+    "LOG_BACKUP_COUNT": "log_backup_count",
+    "LOG_RETENTION_DAYS": "log_retention_days",
+    "LOG_COMPRESSION": "log_compression",
+    "LOG_ENQUEUE": "log_enqueue",
+    "LOG_COLORIZE": "log_colorize",
+}
+
+
+def _load_environment_settings() -> dict[str, str]:
+    """Return supported dotenv/process values through one typed settings model."""
+    settings = _EnvironmentSettings()
+    values: dict[str, str] = {}
+    for environment_name, field_name in _ENVIRONMENT_FIELDS.items():
+        value = getattr(settings, field_name)
+        if value is not None:
+            values[environment_name] = value
+    return values
 
 
 def _select_environment(environment: Mapping[str, str]) -> dict[str, object]:
@@ -105,7 +148,7 @@ def load_settings(
 
     Args:
         explicit_values: Optional exact uppercase settings.
-        environment: Optional environment mapping; ``os.environ`` when omitted.
+        environment: Optional explicit mapping; centralized settings when omitted.
 
     Returns:
         Validated immutable runtime settings.
@@ -117,7 +160,9 @@ def load_settings(
     unknown = set(explicit) - _SUPPORTED_KEYS
     if unknown:
         raise ConfigurationError("CONFIGURATION_UNKNOWN_KEY")
-    source_environment = os.environ if environment is None else environment
+    source_environment = (
+        _load_environment_settings() if environment is None else environment
+    )
     merged = _select_environment(source_environment)
     merged.update(explicit)
 

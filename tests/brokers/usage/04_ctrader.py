@@ -1,17 +1,11 @@
-"""Demonstrate the cTrader adapter against real configured demo credentials.
+"""Demonstrate cTrader adapter behavior with real configured credentials.
 
-Reads real ``CTRADER_*`` credentials from the repository ``.env`` (or the
-process environment). Unlike MT5, ``ctrader/transport.py`` has no concrete
-network implementation yet: ``_CTraderTransport`` only accepts an injected
-``sender`` callable, and no Twisted/reactor-based client to Spotware's
-servers exists anywhere in this codebase. This script is honest about that:
-it proves the real credentials construct a valid, validated adapter, then
-genuinely attempts ``connect()`` and prints the real (fail-closed) outcome —
-it does not fabricate a live handshake.
+Typed shared settings load the real ``CTRADER_*`` profile. The current adapter
+has no concrete network sender, so this honestly demonstrates construction and
+the genuine fail-closed connection outcome without fabricating a handshake.
 """
 
 import asyncio
-import os
 import sys
 from pathlib import Path
 
@@ -20,48 +14,51 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
 from app.services.brokers.ctrader.adapter import CTraderBrokerAdapter
 from app.services.brokers.registry.catalogue import get_broker_capability_catalogue
-from app.utils import load_dotenv_file, resolve_named_secrets
+from app.utils import logger
 
-_ENV_PATH = Path(__file__).resolve().parents[3] / ".env"
-_ACCOUNT_ID_KEY = "CTRADER_ACCOUNT_ID"
-
-
-def _environment() -> dict[str, str]:
-    values = load_dotenv_file(_ENV_PATH)
-    values.update(os.environ)
-    return values
+from tests.brokers.provider_settings import ProviderTestSettings
 
 
-def _ctrader_credentials() -> dict[str, str] | None:
-    values = _environment()
-    if values.get("CTRADER_ENABLED", "").casefold() != "true":
+def _ctrader_credentials() -> ProviderTestSettings | None:
+    """Return typed cTrader settings only when the profile is complete."""
+    logger.info("Checking the typed cTrader demo settings profile")
+    settings = ProviderTestSettings()
+    if not settings.ctrader_enabled:
         return None
-    required = (
-        _ACCOUNT_ID_KEY,
-        "CTRADER_CLIENT_ID",
-        "CTRADER_CLIENT_SECRET",
-        "CTRADER_ACCESS_TOKEN",
-    )
-    if not all(values.get(key) for key in required):
+    if any(
+        value is None
+        for value in (
+            settings.ctrader_account_id,
+            settings.ctrader_client_id,
+            settings.ctrader_client_secret,
+            settings.ctrader_access_token,
+        )
+    ):
         return None
-    return values
+    return settings
 
 
-def _config(values: dict[str, str]) -> BrokerConnectionConfig:
-    credentials = resolve_named_secrets(
-        {
-            "client_id": "CTRADER_CLIENT_ID",
-            "client_secret": "CTRADER_CLIENT_SECRET",
-            "access_token": "CTRADER_ACCESS_TOKEN",
-            "account_id": _ACCOUNT_ID_KEY,
-        },
-        values,
-    )
+def _config(settings: ProviderTestSettings) -> BrokerConnectionConfig:
+    """Build a validated cTrader config without exposing credential values."""
+    logger.info("Building the typed cTrader connection configuration")
+    if (
+        settings.ctrader_account_id is None
+        or settings.ctrader_client_id is None
+        or settings.ctrader_client_secret is None
+        or settings.ctrader_access_token is None
+    ):
+        raise ValueError("cTrader settings are incomplete")
+    credentials = {
+        "client_id": settings.ctrader_client_id,
+        "client_secret": settings.ctrader_client_secret,
+        "access_token": settings.ctrader_access_token,
+        "account_id": settings.ctrader_account_id,
+    }
     return BrokerConnectionConfig(
         broker_id=BrokerId.CTRADER,
         environment=(
             BrokerEnvironment.LIVE
-            if values.get("CTRADER_ENVIRONMENT", "demo").casefold() == "live"
+            if settings.ctrader_environment == "live"
             else BrokerEnvironment.DEMO
         ),
         provider_enabled=True,
@@ -72,44 +69,48 @@ def _config(values: dict[str, str]) -> BrokerConnectionConfig:
         circuit_failure_threshold=3,
         circuit_recovery_timeout_sec=5,
         circuit_half_open_max_calls=1,
-        account_reference=values[_ACCOUNT_ID_KEY],
+        account_reference=settings.ctrader_account_id.get_secret_value(),
         credentials=credentials,
     )
 
 
-def example_real_demo_credentials_build_a_valid_adapter(values: dict[str, str]) -> None:
-    """Real demo credentials pass construction-time validation."""
-    print("\n1. Real cTrader demo credentials build a valid adapter")
+def example_real_demo_credentials_build_a_valid_adapter(
+    settings: ProviderTestSettings,
+) -> None:
+    """Prove real demo credentials pass construction-time validation."""
+    logger.info("Example 1: real cTrader credentials build a valid adapter")
     capabilities = {
         entry.capability: entry
         for entry in get_broker_capability_catalogue()[BrokerId.CTRADER]
     }
-    adapter = CTraderBrokerAdapter(_config(values), capabilities)
-    print("Adapter constructed:", type(adapter).__name__)
+    adapter = CTraderBrokerAdapter(_config(settings), capabilities)
+    logger.info("Adapter constructed=%s", type(adapter).__name__)
 
 
 def example_connect_reports_the_real_missing_transport_outcome(
-    values: dict[str, str],
+    settings: ProviderTestSettings,
 ) -> None:
-    """Attempt a genuine connect() and print the real fail-closed outcome."""
-    print("\n2. connect() genuinely attempted (no fabricated success)")
+    """Attempt a genuine connect and report the real fail-closed outcome."""
+    logger.info("Example 2: connect is genuinely attempted without fake success")
     capabilities = {
         entry.capability: entry
         for entry in get_broker_capability_catalogue()[BrokerId.CTRADER]
     }
-    adapter = CTraderBrokerAdapter(_config(values), capabilities)
+    adapter = CTraderBrokerAdapter(_config(settings), capabilities)
 
     async def exercise() -> None:
+        """Run the actual cTrader connection boundary once."""
+        logger.info("Calling the cTrader adapter connection boundary")
         result = await adapter.connect()
-        print("connect():", result.status, result.error)
+        logger.info("connect() status=%s error=%s", result.status, result.error)
 
     asyncio.run(exercise())
 
 
 if __name__ == "__main__":
-    demo_values = _ctrader_credentials()
-    if demo_values is None:
-        print("cTrader demo credentials are not configured in .env — skipping.")
+    demo_settings = _ctrader_credentials()
+    if demo_settings is None:
+        logger.info("cTrader demo credentials are not configured; skipping")
     else:
-        example_real_demo_credentials_build_a_valid_adapter(demo_values)
-        example_connect_reports_the_real_missing_transport_outcome(demo_values)
+        example_real_demo_credentials_build_a_valid_adapter(demo_settings)
+        example_connect_reports_the_real_missing_transport_outcome(demo_settings)

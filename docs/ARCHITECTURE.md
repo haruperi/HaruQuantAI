@@ -30,6 +30,13 @@
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
 * `app/services/api/README.md` defines the approved gateway/UI boundary, state ownership, and synchronous initial Simulation/Optimization surface; no API runtime code or `ui/` application package has landed yet.
 * `app/services/portfolio/README.md` now defines the approved Portfolio target architecture; the package code is not yet implemented. Portfolio is the thirteenth domain and its status remains `Missing`.
+* `app/services/data/` implements the completed Data domain: immutable contracts,
+  bounded SQLite/file/cache/audit persistence, explicit read-only sources and durable
+  policy, historical/reference/context/FX access, deterministic processing,
+  recoverable jobs, internal feed status, and exactly 23 typed package-root
+  operations. The lock ledger is the sole call-time bootstrap schema exception
+  because migrations consume the lock; every other Data schema is migration-owned.
+  Provider and broker sessions remain caller-owned and injected.
 
 ---
 
@@ -83,7 +90,7 @@ flowchart TD
 ### Shared Utility Framework (`app/utils/`)
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
-* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors and immutable metadata, injected error routing, identity/trace IDs, UTC time, canonical serialization, redaction, password hashing, caller-keyed Fernet encryption, in-memory active-secret selection, runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and explicit shutdown. Logging configuration—not import—may create its configured sink directory. UI/API owns authentication, identity verification, credential persistence, and permission enforcement; callers own encryption-key storage and rotation; Data owns DataFrame/OHLC processing and quality; each domain owns its paths, limits, validation, result types, and business contracts.
+* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors and immutable metadata, injected error routing, identity/trace IDs, UTC time, canonical serialization, redaction, password hashing, caller-keyed Fernet encryption, in-memory active-secret selection, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. `app.utils.AppSettings` is the sole repository `.env` loading boundary; domains inherit it for typed owned settings and never parse dotenv files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, identity verification, credential persistence, and permission enforcement; callers own encryption-key storage and rotation; Data owns DataFrame/OHLC processing and quality; each domain owns its paths, limits, validation, result types, and business contracts.
 * **Contract Ownership Rule**: Domain contract modules own their own base contract behavior locally. They must not inherit from or import a centralized utility contract base.
 
 ### Domain Audit Event Shape
@@ -125,6 +132,20 @@ flowchart TD
 
 Registered domain contracts keep `contract_version` separate from namespaced `schema_id`; compatibility is never inferred by parsing the schema identifier.
 
+### Data Domain Contract Boundary
+
+- Data's canonical cross-domain schema identifiers are
+  `data.market_dataset.v1`, `data.account_state_snapshot.v1`,
+  `data.market_context_evidence.v1`, and `data.fx_conversion_evidence.v1`.
+- Data contract modules contain immutable schemas and deterministic validation only.
+  They perform no source, broker, network, storage, cache, scheduling, or feed-runtime
+  acquisition.
+- Data evidence acquisition belongs in `app.services.data.access`; canonical/friendly
+  identity and provider-symbol mapping belongs in `app.services.data.sources`.
+- External broker/provider reads use injected Brokers `BrokerAdapter` read traits.
+  Data owns no SDK session, credential resolution, connection lifecycle, or mutation
+  capability; only Trading may invoke broker mutations.
+
 Portfolio collaboration is contract-governed:
 
 - Strategy owns immutable registration; Risk separately owns `StrategyOperationalEligibilityRequest/Decision v1`.
@@ -160,6 +181,17 @@ Portfolio collaboration is contract-governed:
 * **Portfolio Activation Baseline**: Simulation-profile activation is automatic only within explicit simulation policy. Paper/live activation requires human approval plus current Risk authorization. Active kill switches block activation and rebalance.
 * **Allocation Safety Baseline**: Capital weights are Portfolio metadata; Risk budgets are authoritative. Existing over-budget exposure creates a Risk-reviewed reduce-only plan, and the system never opens a position solely to match a target weight.
 
+### Operational Logging Boundary
+
+* Governed external I/O, persistence, lifecycle/state transitions, and classified
+  failures emit bounded redacted start/outcome/failure evidence with request and
+  correlation identifiers.
+* Data functions, validators, deterministic transforms, and private helpers use the
+  system logger with bounded redacted messages; imports themselves emit no log,
+  telemetry, network, or persistence side effect.
+* Logging dependencies are explicit and never carry raw provider/database exceptions
+  or sensitive values across a public boundary.
+
 ### Core Security Mandates
 
 * Plaintext application passwords, live API keys, provider access configurations, and cryptographic seeds are classified as system secrets.
@@ -175,6 +207,7 @@ Portfolio collaboration is contract-governed:
 | **System Persistence** | `DATABASE_URL`, `DATA_DIR`, `ARTIFACT_DIR`, `DATA_CACHE_PATH` |
 | **Operational Protection** | `ALLOW_LIVE_MUTATIONS` (defaults to `false`), `RUNTIME_PROFILE`, `EXECUTION_ROUTE` |
 | **Structured Logging** | `LOG_LEVEL`, `LOG_RENDER` |
+| **Settings Loading** | Repository `.env` and process overrides are read only by typed classes inheriting `app.utils.AppSettings`; ordinary modules consume settings objects. |
 | **Broker Integration** | Provider-neutral adapter selection/readiness plus adapter-specific MT5, cTrader, or Binance settings; secrets are resolved at the composition root and injected as Brokers-owned `BrokerConnectionConfig` instances. |
 
 ---

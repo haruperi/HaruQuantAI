@@ -1,3 +1,20 @@
+## Three-agent pipeline
+
+Each domain is built by three agents in sequence, each super-focused on one stage. This saves tokens and doubles as a review process—no single agent does everything from A to Z.
+
+| Stage                           | Agent            | Prompt                                                          | Touches code?                       |
+| ------------------------------- | ---------------- | --------------------------------------------------------------- | ----------------------------------- |
+| 1. Pre-build readiness audit    | **Claude** | Prompt 1                                                        | No—read-only                       |
+| 2. Implementation               | **Gemini** | Prompt 2a (feature by feature, recommended) or 2b (full domain) | Yes—the only agent that edits code |
+| 3. Post-build completion review | **Codex**  | Prompt 3                                                        | No—read-only                       |
+
+Rules of the pipeline:
+
+- **Claude (Prompt 1)** verifies everything is in order before the next domain is built. It never modifies files. Its output (roadmap plus any blocker fixes) is handed to Gemini as the input for Prompt 2.
+- **Gemini (Prompt 2a or 2b)** is the only agent permitted to create or modify code and documentation. It builds from Claude's readiness audit and executes fix instructions handed over from Claude or Codex.
+- **Codex (Prompt 3)** performs the final review after the build. It never modifies files.
+- When Claude or Codex finds any issue or blocker, it must not fix it. Instead, it ends its report with a **Gemini handoff report**: for every issue, the correct recommendation and exact step-by-step implementation instructions, written so the report can be copy-pasted directly into Gemini for execution.
+
 The best implementation unit is normally one complete Section 4 feature—not the whole domain and not an isolated file.
 
 For example: “Implement Utils Section 4.1 `contracts/`, including `audit.py`, `auth.py`, `__init__.py`, and `FR-UTL-001` through `FR-UTL-003`.”
@@ -6,16 +23,16 @@ That unit is cohesive, small enough to verify, and contains the file order, expo
 
 ## How the README drives implementation
 
-| README section | Implementation purpose |
-|---|---|
-| Section 1 | Defines ownership and boundaries—what may and may not be built |
-| Section 2 | Defines the final package tree and dependency order |
-| Section 3 | Defines workflows that must work after the underlying features exist |
-| Section 4 | Primary implementation plan: features → files → functions/requirements |
-| Section 5 | Package-wide configuration, security, performance, and architecture rules |
-| Section 6 | Must contain no unresolved decision affecting the work |
-| Section 7 | Tests, completion evidence, and definition of done |
-| Section 8 | Change process or usage examples, depending on the README |
+| README section | Implementation purpose                                                    |
+| -------------- | ------------------------------------------------------------------------- |
+| Section 1      | Defines ownership and boundaries—what may and may not be built           |
+| Section 2      | Defines the final package tree and dependency order                       |
+| Section 3      | Defines workflows that must work after the underlying features exist      |
+| Section 4      | Primary implementation plan: features → files → functions/requirements  |
+| Section 5      | Package-wide configuration, security, performance, and architecture rules |
+| Section 6      | Must contain no unresolved decision affecting the work                    |
+| Section 7      | Tests, completion evidence, and definition of done                        |
+| Section 8      | Change process or usage examples, depending on the README                 |
 
 Section 4 tells you what to implement, but the implementer must read Sections 1, 3, 5, and 7 before changing anything. Otherwise, a locally correct function can violate a domain boundary or workflow.
 
@@ -76,27 +93,31 @@ Never prompt only “implement `audit.py`.” Include its domain, feature, requi
 
 ## Recommended task organization
 
-Use one Codex task per domain. Inside that task, implement one feature per approval cycle.
+Use one Gemini build task per domain. Inside that task, implement one feature per approval cycle.
 
 That gives the task enough domain context without allowing it to accumulate unrelated domains. Repository documentation remains the memory between tasks.
 
 A good rhythm is:
 
 ```text
-Domain-readiness audit
-  → Feature 4.1
-  → Feature 4.2
+Claude: domain-readiness audit (Prompt 1)
+  → Gemini: Feature 4.1 (Prompt 2a; or the whole domain via Prompt 2b)
+  → Gemini: Feature 4.2
   → ...
-  → Section 3 workflow integration
-  → Section 7 package completion
+  → Gemini: Section 3 workflow integration
+  → Gemini: Section 7 package completion
+  → Codex: full domain completion review (Prompt 3)
+  → Gemini: execute Codex's handoff report (if findings)
   → Next domain
 ```
 
-## Prompt 1: Domain implementation roadmap
+## Prompt 1: Domain implementation roadmap — Claude (pre-build)
 
-Use this once at the beginning of each domain. It is read-only.
+Run this in **Claude** once at the beginning of each domain. It is read-only.
 
 ```
+You are the pre-build review agent. Your role is strictly limited to auditing and reporting: verify that everything up to this point is in order before the `[DOMAIN]` domain is built. You must NOT create, modify, or delete any file or code. Implementation is handled by a separate build agent (Gemini); your output is its input.
+
 Perform a read-only implementation-readiness audit for the `[DOMAIN]` domain.
 
 Authoritative sources:
@@ -123,11 +144,30 @@ Determine:
 10. The recommended sequence of bounded implementation tasks.
 
 Return a dependency-ordered implementation roadmap. Do not guess through missing specifications. Report any missing or conflicting requirement as a blocker.
+
+If you find any blocker or issue that must be fixed before building can start, do not fix it yourself. Instead, end your report with a section titled `GEMINI HANDOFF REPORT` containing, for each issue:
+
+1. Issue ID and severity.
+2. What is wrong, with exact file and line evidence.
+3. The correct recommendation for resolving it.
+4. Exact step-by-step implementation instructions (files to edit, changes to make, tests to run, validation to perform).
+
+Write the handoff report as a self-contained prompt that can be copy-pasted directly into the build agent (Gemini) without additional context.
 ```
 
-## Prompt 2: Implement one feature—recommended default
+## Prompt 2a: Implement one feature—recommended default — Gemini (build)
+
+Run this in **Gemini**. Gemini is the only agent in the pipeline that touches code. Paste Claude's Prompt 1 roadmap (and any handoff report) into the placeholder below. This is the recommended path: one feature per run, repeated in roadmap order until the domain is complete.
 
 ```
+You are the build agent and the only agent permitted to create or modify code and documentation in this pipeline. A read-only pre-build audit (Prompt 1, run by Claude) has already verified readiness; its roadmap is your authoritative input. A separate read-only review agent (Codex) will verify your work afterward—do not perform your own final domain review.
+
+Pre-build audit input:
+
+[PASTE CLAUDE'S PROMPT 1 ROADMAP AND ANY GEMINI HANDOFF REPORT HERE]
+
+If a handoff report is included above, execute its fix instructions exactly as specified before or as part of the approved scope. Do not re-litigate its findings; if an instruction is impossible or conflicts with the specs, stop and report it.
+
 Implement `[DOMAIN README PATH]` Section `[4.X]`, `[FEATURE NAME]`.
 
 Approved scope:
@@ -158,21 +198,112 @@ After approval:
 2. Implement only the mapped `FR-*` requirements.
 3. Preserve domain boundaries and receiver-owned contract rules.
 4. Do not add compatibility aliases, speculative abstractions, dependencies, defaults, trading rules, or unrelated refactors.
-5. Update feature and package exports only after their implementation exists.
-6. Add a targeted unit test and runnable usage example for every public requirement.
-7. Run targeted formatting, linting, mypy, tests, and applicable security/import checks.
-8. Mark a requirement `Completed` only when implementation, usage evidence, and tests pass.
-9. Update the affected workflow status only if its complete end-to-end integration test now passes.
-10. Report files changed, requirement status, tests, validation, risks, and selective rollback instructions.
+5. Fit every module, class, and function with a proper Google-style docstring—no missing or non-standard docstrings.
+6. Log every function using the system-wide logger (`from app.utils import logger`): every important step is logged, and every function contains at least one logger call stating what that function is doing.
+7. Update feature and package exports only after their implementation exists.
+8. Add a targeted unit test and runnable usage example for every public requirement.
+9. Run targeted formatting, linting, mypy, tests, and applicable security/import checks.
+10. Mark a requirement `Completed` only when implementation, usage evidence, and tests pass.
+11. Update the affected workflow status only if its complete end-to-end integration test now passes.
+12. Report files changed, requirement status, tests, validation, risks, and selective rollback instructions.
 
 If the specification is incomplete or conflicts with `docs/PROJECT.md`, stop and report the contradiction instead of choosing an interpretation.
 ```
 
-## Prompt 3: Full domain completion review
+### Prompt 2a follow-up: next feature in the same task
 
-Use this only after the entire domain README is marked `Completed` and implementation is believed finished.
+Use this for every feature after the first, inside the same Gemini domain task. The full Prompt 2a is only needed once per domain—the roadmap, documentation, and rules are already in the task's context, so do not re-paste them and do not re-run Claude's audit.
 
 ```
+Continue the `[DOMAIN]` domain build. Implement the next feature from the approved roadmap: `[DOMAIN README PATH]` Section `[4.X]`, `[FEATURE NAME]`.
+
+Approved scope:
+- Feature: `[FEATURE NAME]`
+- Files: `[EXACT FILE LIST FROM THE FILES TABLE]`
+- Requirements: `[EXACT FR-ID RANGE OR LIST]`
+- Tests: the targeted unit, usage, and feature-integration tests required by the README
+- Documentation: update only the affected README statuses/checklists and `docs/CHANGELOG.md`
+
+Before editing:
+
+1. Confirm the previous feature is fully complete: its checks passed and its README statuses are truthful. If not, stop and report instead of starting this feature.
+2. Verify that all upstream features and consumed contracts required by this feature are available, including features built earlier in this task.
+3. Re-read only the README sections relevant to this feature; rely on the context already established in this task for the rest.
+4. Produce the required dry run (files read; files created/changed; requirements implemented; commands/tests planned; scope boundaries; blockers/risks; rollback path).
+5. Wait for the exact phrase `APPROVED: EXECUTE`.
+
+After approval, apply exactly the same implementation rules as the previous feature: Files-table order, mapped `FR-*` only, domain boundaries, no speculative additions, Google-style docstrings on every module/class/function, system-wide logger (`from app.utils import logger`) with at least one logger call per function, exports last, targeted tests and validation, truthful statuses, and the standard completion report.
+
+If the specification is incomplete or conflicts with `docs/PROJECT.md`, stop and report the contradiction instead of choosing an interpretation.
+```
+
+## Prompt 2b: Implement the full domain in one go — Gemini (build)
+
+Run this in **Gemini** when you want the entire domain built in a single task instead of feature by feature. Use it only when the domain is small or Claude's roadmap reports zero blockers; Prompt 2a remains the recommended default. Paste Claude's Prompt 1 roadmap (and any handoff report) into the placeholder below.
+
+```
+You are the build agent and the only agent permitted to create or modify code and documentation in this pipeline. A read-only pre-build audit (Prompt 1, run by Claude) has already verified readiness; its roadmap is your authoritative input. A separate read-only review agent (Codex) will verify your work afterward—do not perform your own final domain review.
+
+Pre-build audit input:
+
+[PASTE CLAUDE'S PROMPT 1 ROADMAP AND ANY GEMINI HANDOFF REPORT HERE]
+
+If a handoff report is included above, execute its fix instructions exactly as specified before starting implementation. Do not re-litigate its findings; if an instruction is impossible or conflicts with the specs, stop and report it.
+
+Implement the complete `[DOMAIN]` domain per `[DOMAIN README PATH]`: every Section 4 feature, every mapped `FR-*` requirement, every Section 3 workflow, and the Section 7 Definition of Done.
+
+Approved scope:
+- Features: all Section 4 features, in the dependency order given by the roadmap
+- Files: exactly the files in each feature's Files table—no additions
+- Requirements: every declared `FR-*`, each implemented once
+- Tests: the targeted unit, usage, feature-integration, and Section 3 workflow-integration tests required by the README
+- Documentation: update only the affected README statuses/checklists and `docs/CHANGELOG.md`
+
+Before editing:
+
+1. Read `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`, the complete domain README, and the READMEs of direct dependencies.
+2. Verify that all upstream domains and consumed contracts required by this domain are available.
+3. Inspect existing code and tests for reusable behavior and conflicts.
+4. Produce a single dry run for the whole domain:
+   - the feature-by-feature build order;
+   - files created/changed per feature;
+   - requirements implemented per feature;
+   - commands/tests planned;
+   - scope boundaries;
+   - blockers/risks;
+   - rollback path.
+5. Wait for the exact phrase `APPROVED: EXECUTE`.
+
+After approval, build one feature at a time in roadmap order. For each feature:
+
+1. Implement its files in the exact order listed in its Files table.
+2. Implement only the mapped `FR-*` requirements.
+3. Preserve domain boundaries and receiver-owned contract rules.
+4. Do not add compatibility aliases, speculative abstractions, dependencies, defaults, trading rules, or unrelated refactors.
+5. Fit every module, class, and function with a proper Google-style docstring—no missing or non-standard docstrings.
+6. Log every function using the system-wide logger (`from app.utils import logger`): every important step is logged, and every function contains at least one logger call stating what that function is doing.
+7. Update feature exports only after their implementation exists; update the package `__init__.py` last.
+8. Add a targeted unit test and runnable usage example for every public requirement.
+9. Run targeted formatting, linting, mypy, tests, and applicable security/import checks before moving to the next feature. Do not start a feature while the previous one has failing checks.
+10. Mark a requirement `Completed` only when implementation, usage evidence, and tests pass.
+
+After all features exist:
+
+1. Implement and run every Section 3 workflow integration test; update workflow statuses only when the complete end-to-end test passes.
+2. Run the full domain-scoped validation suite and the Section 7 Definition of Done.
+3. Do not create empty scaffolding ahead of the feature being implemented.
+4. Report, per feature: files changed, requirement status, tests, and validation—plus domain-level workflow results, risks, and selective rollback instructions.
+
+If any feature's specification is incomplete or conflicts with `docs/PROJECT.md`, stop at that feature and report the contradiction instead of choosing an interpretation. Report which features are complete and which remain.
+```
+
+## Prompt 3: Full domain completion review — Codex (post-build)
+
+Run this in **Codex** only after the entire domain README is marked `Completed` and Gemini's implementation is believed finished.
+
+```
+You are the post-build review agent. Your role is strictly limited to verification and reporting: confirm that the domain Gemini built followed everything that was required and introduced no conflicts. You must NOT create, modify, or delete any file or code. All corrections are executed by the build agent (Gemini) from the handoff report you produce at the end.
+
 Perform a strict, read-only completion review of the `[DOMAIN]` domain.
 
 Domain scope:
@@ -343,10 +474,11 @@ Verify the implementation follows `AGENTS.md` and repository configuration:
 
 - Google Python style.
 - Explicit typing on every signature.
-- Google-style module, class, and function docstrings.
+- Google-style docstrings on every module, class, and function—flag any missing or non-standard docstring.
 - Absolute and correctly grouped imports.
 - No bare `except`.
 - Logging instead of `print`.
+- Every function uses the system-wide logger (`from app.utils import logger`), every important step is logged, and every function contains at least one logger call stating what that function is doing—flag any function with no logging or using a non-standard logger.
 - No silent failures.
 - No unused compatibility code or speculative abstraction.
 - No duplicated domain logic.
@@ -435,7 +567,7 @@ Return exactly one result:
 12. **Commands and validation results**
 13. **Coverage result**
 14. **README status/checklist accuracy**
-15. **Ordered correction plan**
+15. **Gemini handoff report (ordered correction plan)**
 16. **Final review checklist**
 
 Every finding must include:
@@ -449,7 +581,14 @@ Every finding must include:
 - Why it matters
 - Verification needed after correction
 
-Do not implement corrections during this review. End with an ordered, bounded correction plan that can be approved and executed in a separate task.
+Do not implement corrections during this review. End with a section titled `GEMINI HANDOFF REPORT`: an ordered, bounded correction plan containing, for each finding:
+
+1. Finding ID and severity.
+2. The correct recommendation for resolving it.
+3. Exact step-by-step implementation instructions (files to edit, changes to make, tests to run, validation to perform).
+4. Verification required after the correction.
+
+Write the handoff report as a self-contained prompt that can be copy-pasted directly into the build agent (Gemini) without additional context. After Gemini executes it, this review must be re-run.
 ```
 
 The key principle is:

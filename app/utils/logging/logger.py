@@ -15,7 +15,8 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from queue import Queue
-from typing import TextIO
+from types import FrameType
+from typing import TYPE_CHECKING, TextIO
 
 from app.utils.errors.exceptions import ConfigurationError, HaruQuantError
 from app.utils.security.redaction import (
@@ -23,8 +24,11 @@ from app.utils.security.redaction import (
     redact_mapping_value,
     redact_text_value,
 )
-from app.utils.settings.models import LoggingSettings
+from app.utils.settings.loader import load_settings
 from app.utils.time.timestamps import format_utc_timestamp
+
+if TYPE_CHECKING:
+    from app.utils.settings.models import LoggingSettings
 
 _LOGGER_ROOT = "haruquant"
 _OWNED_HANDLER_ATTRIBUTE = "_haruquant_utils_handler"
@@ -47,7 +51,7 @@ _LEVEL_COLORS = {
     "CRITICAL": "\033[1;31m",
 }
 _COLOR_RESET = "\033[0m"
-_LISTENER_LOCK = threading.Lock()
+_LISTENER_LOCK = threading.RLock()
 
 
 class _LoggingRuntimeState:
@@ -280,7 +284,7 @@ def get_logger(name: str) -> logging.Logger:
 
 
 class BoundLogger:
-    """Import-safe logger facade with immutable structured context."""
+    """Import-safe logger facade with lazy default configuration."""
 
     def __init__(
         self,
@@ -304,6 +308,7 @@ class BoundLogger:
         *args: object,
         exc_info: bool = False,
     ) -> None:
+        _ensure_default_configuration()
         caller = sys._getframe(2)  # noqa: SLF001 - preserve facade caller location.
         context = dict(self._context)
         context.update(
@@ -351,6 +356,22 @@ class BoundLogger:
 
 
 logger = BoundLogger()
+
+
+def _ensure_default_configuration() -> None:
+    """Install the approved default once before the first runtime emission."""
+    frame: FrameType | None = sys._getframe(  # noqa: SLF001
+        1
+    )
+    while frame is not None:
+        module_name = str(frame.f_globals.get("__name__", ""))
+        if module_name.startswith(("_frozen_importlib", "importlib._bootstrap")):
+            return
+        frame = frame.f_back
+    with _LISTENER_LOCK:
+        if _RUNTIME_STATE.owned_sinks:
+            return
+        configure_logging()
 
 
 def _zip_rotated_name(default_name: str) -> str:
@@ -435,7 +456,9 @@ def _close_current_configuration(root_logger: logging.Logger) -> None:
             if handler not in _RUNTIME_STATE.owned_sinks:
                 handler.close()
     for sink in _RUNTIME_STATE.owned_sinks:
-        sink.flush()
+        stream = getattr(sink, "stream", None)
+        if stream is None or not getattr(stream, "closed", False):
+            sink.flush()
         sink.close()
     _RUNTIME_STATE.owned_sinks = ()
 
@@ -462,13 +485,13 @@ def configure_logging(
     """Explicitly configure deduplicated redacted structured handlers.
 
     Args:
-        settings: Immutable logging settings; approved defaults when omitted.
+        settings: Immutable override; centralized settings when omitted.
         redaction_policy: Optional immutable redaction policy.
 
     Raises:
         ConfigurationError: If the settings or sink is invalid.
     """
-    active_settings = settings or LoggingSettings()
+    active_settings = settings or load_settings().logging
     root_logger = logging.getLogger(_LOGGER_ROOT)
     console_formatter = StructuredFormatter(
         active_settings.render,

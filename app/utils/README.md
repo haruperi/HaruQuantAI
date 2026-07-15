@@ -2,7 +2,7 @@
 
 > **Package:** `app/utils`
 > **Status:** `Partial`
-> **Last updated:** `2026-07-14`
+> **Last updated:** `2026-07-15`
 
 > This README is the package's single source of truth for requirements, final
 > structure, implementation sequence, progress, usage examples, and tests.
@@ -28,9 +28,9 @@ It makes no trading or domain decision.
 - Deterministic canonical JSON serialization.
 - Denylist-first secret redaction, password hashing, Fernet encryption, and
   in-memory active-secret-version selection.
-- Immutable runtime settings and explicit settings loading.
-- Import-safe structured logging with immutable bound context and explicit
-  application, access, and debug file routing.
+- Immutable runtime settings and the sole repository `.env` loading boundary.
+- Import-safe structured logging with immutable bound context, a lazy approved
+  default profile, and explicit override support for specialized routing.
 - Resolution of broker/provider secret references at the composition root; the
   resulting `BrokerConnectionConfig v1` schema remains Brokers-owned.
 
@@ -180,19 +180,22 @@ ordinary programs with `if __name__ == "__main__"` entry points, not pytest test
 
 ### `WF-UTL-001` — Structured Logging and Redaction
 
-1. The caller obtains an import-safe named logger.
+1. The caller imports the global import-safe bound logger without side effects.
 2. The caller supplies a structured, JSON-safe context.
 3. Redaction runs before formatting or emission.
-4. Explicit configuration creates the configured directory and selects colored
-   stdout plus bounded application, access, debug, and error file output.
-5. Queued delivery is synchronized without closing sinks through
-   `flush_logging()`, then flushed and stopped through `shutdown_logging()`.
+4. The first runtime bound-logger emission atomically activates the approved default
+   profile; an explicit `configure_logging(...)` call replaces it only when a
+   specialized profile is required.
+5. Default queued delivery flushes and stops through the registered process-exit
+   lifecycle; special entry points may synchronize or stop it explicitly through
+   `flush_logging()` and `shutdown_logging()`.
 6. Configuration or sink failure is surfaced without exposing the source payload.
 
 ### `WF-UTL-002` — Shared Settings Bootstrap
 
-1. The composition root supplies explicit values and environment input.
-2. The loader validates the supported deployment and runtime settings.
+1. `AppSettings` loads the repository `.env` and process overrides at the shared
+   Utils boundary; callers may supply explicit values without parsing files.
+2. The loader validates supported deployment and runtime settings.
 3. The loader returns an immutable settings object without mutating caller input.
 4. Broker secret references are resolved at the composition root and injected into
    a Brokers-owned `BrokerConnectionConfig v1` instance.
@@ -362,7 +365,9 @@ encryption, and explicit in-memory active-secret selection without persistence.
 
 ### 4.7 `settings/` — Runtime Settings
 
-**Purpose:** Define immutable generic runtime/logging settings and load them, and resolve opaque secret references, only on explicit invocation.
+**Purpose:** Define immutable generic runtime/logging settings, provide the sole
+repository `.env` loading base for typed domain settings, and resolve opaque secret
+references only on explicit invocation.
 
 **Module flow:** `explicit values + environment → strict validation → immutable RuntimeSettings / resolved secret`
 
@@ -370,30 +375,31 @@ encryption, and explicit in-memory active-secret selection without persistence.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `models.py` | Define immutable generic runtime/logging settings and their strict validation, including human-readable logging by default. | `RuntimeSettings`, `LoggingSettings` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
-| Completed | `loader.py` | Load settings on explicit invocation and resolve opaque secret references through an injected source. | `load_settings`, `resolve_secret_reference` | **Standard library:** `collections.abc`, `os`, `re`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError`, `SecurityError` |
+| Completed | `models.py` | Define the immutable central `.env` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
+| Completed | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping and resolve opaque secret references through an injected source. | `load_settings`, `resolve_secret_reference` | **Standard library:** `collections.abc`, `re`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError`, `SecurityError` |
 | Completed | `__init__.py` | Expose the supported settings API. | Settings models and loader functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-UTL-022` | Define immutable generic runtime and logging settings, including the approved human-readable default logging profile. | `RuntimeSettings`, `LoggingSettings` | None | `ConfigurationError`: invalid setting value | **Usage:** `tests/utils/usage/07_settings.py::example_construct_configuration()`<br>**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()` |
-| Completed | `FR-UTL-023` | Load explicit values and environment in documented precedence order only when called. | `load_settings` | Environment read | `ConfigurationError`: unsupported or invalid value | **Usage:** `tests/utils/usage/07_settings.py::example_load_active_configuration()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
+| Completed | `FR-UTL-022` | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | `.env`/environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value | **Usage:** `tests/utils/usage/07_settings.py::example_construct_configuration()`<br>**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()` |
+| Completed | `FR-UTL-023` | Load explicit values and centralized `.env`/process settings in documented precedence order only when called. | `AppSettings`, `load_settings` | Settings read | `ConfigurationError`: unsupported or invalid runtime value | **Usage:** `tests/utils/usage/07_settings.py::example_load_active_configuration()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
 | Completed | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/07_settings.py::example_environment_constraints()`, `example_validate_settings()`<br>**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()` |
 | Completed | `FR-UTL-025` | Resolve secret references at the composition root without logging or persisting secret material. | `resolve_secret_reference` | Explicit secret-source read | `SecurityError`, `ConfigurationError`: unresolved or unsafe secret reference | **Usage:** `tests/utils/usage/07_settings.py::example_resolve_secret_reference()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_resolve_secret_reference_never_logs_secret()` |
 
 ### 4.8 `logging/` — Structured Logging
 
-**Purpose:** Provide import-safe logger access and explicit redacted structured-handler configuration for every domain.
+**Purpose:** Provide import-safe logger access, lazy approved defaults, and explicit
+redacted structured-handler overrides for specialized entry points.
 
-**Module flow:** `named logger + explicit LoggingSettings → redact → structured record → configured sink`
+**Module flow:** `runtime bound-logger call → lazy default or explicit override → redact → structured record → configured sink`
 
 #### Files
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `logger.py` | Provide side-effect-free bound logger access, explicit queued configuration and synchronization, source-aware human rendering, compressed rotation, color, lifecycle, and specialized routing. | `BoundLogger`, `logger`, `get_logger`, `configure_logging`, `flush_logging`, `shutdown_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** `atexit`, `copy`, `json`, `logging`, `logging.handlers`, `pathlib`, `queue`, `sys`, `threading`, `time`, `zipfile`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py`; `time/timestamps.py`; `security/redaction.py`; `settings/models.py` |
+| Completed | `logger.py` | Provide import-safe bound logger access, thread-safe lazy default activation, explicit override configuration and synchronization, source-aware human rendering, compressed rotation, color, lifecycle, and specialized routing. | `BoundLogger`, `logger`, `get_logger`, `configure_logging`, `flush_logging`, `shutdown_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** `atexit`, `copy`, `json`, `logging`, `logging.handlers`, `pathlib`, `queue`, `sys`, `threading`, `time`, `zipfile`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py`; `time/timestamps.py`; `security/redaction.py`; `settings/models.py` |
 | Completed | `__init__.py` | Expose the supported logging API without configuring logging. | All logging exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `logger.py` → approved exports |
 
 #### Functional requirements
@@ -401,16 +407,16 @@ encryption, and explicit in-memory active-secret selection without persistence.
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-UTL-026` | Return stable child loggers without configuring handlers. | `get_logger` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_logger_access()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_get_logger_configures_no_handlers()` |
-| Completed | `FR-UTL-027` | Configure deduplicated console and optional bounded rotating-file handlers only when called. | `configure_logging` | Logging configuration; directory creation; optional file write | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_default_configuration_creates_all_sinks()` |
+| Completed | `FR-UTL-027` | Atomically install deduplicated console and optional bounded rotating-file handlers from the approved default before the first runtime bound-log emission; explicit `configure_logging` replaces the active profile only for a specialized override. | `BoundLogger`, `configure_logging` | Logging configuration; directory creation; optional file write on first runtime emission or explicit override | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()` |
 | Completed | `FR-UTL-028` | Redact messages and structured context before formatting. | `RedactingFilter` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_logger_redaction()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_redacting_filter_runs_before_formatting()` |
 | Completed | `FR-UTL-029` | Emit JSON or source-aware human-readable records with UTC time, padded level, module, function, line, message, and trace IDs. Human records use `YYYY-MM-DD HH:MM:SS.mmm | LEVEL    | module:function:line - message`; default-console ANSI color is restricted to the level and message content. | `StructuredFormatter` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`, `example_bound_context()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_human_formatter_uses_source_aware_layout()`, `test_human_formatter_colors_only_level_and_message()` |
 | Completed | `FR-UTL-030` | Surface sink failure through a bounded secret-safe fallback. | Logging failure handling in `configure_logging` | Fallback emission | None | **Usage:** `tests/utils/usage/08_logging.py::example_sink_failure()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_sink_failure_uses_safe_fallback()` |
-| Completed | `FR-UTL-031` | Prevent duplicate handler or queue-listener installation across repeated configuration calls. | Configuration idempotency in `configure_logging` | Logging configuration | None | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_is_idempotent()` |
+| Completed | `FR-UTL-031` | Prevent duplicate handler or queue-listener installation across concurrent first use and repeated explicit configuration calls. | Lazy activation and configuration idempotency | Logging configuration | None | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_is_thread_safe()`, `test_configure_logging_is_idempotent()` |
 | Completed | `FR-UTL-032` | Keep import free of handler registration, environment reads, and filesystem writes. | Module import contract | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_import_safety()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_import_registers_no_handlers()` |
 | Completed | `FR-UTL-033` | Respect the shared `LOG_LEVEL` setting without redefining domain observability policy. | Logging level application in `configure_logging` | Logging configuration | None | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_applies_log_level()` |
-| Completed | `FR-UTL-039` | Expose an import-safe global bound logger with standard levels, exception traceback capture, and immutable context binding. | `BoundLogger`, `logger` | Log emission only when caller invokes a level method | None | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`, `example_exception_logging()`, `example_bound_context()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_bound_logger_preserves_context()` |
+| Completed | `FR-UTL-039` | Expose an import-safe global bound logger with standard levels, exception traceback capture, immutable context binding, and automatic approved-default activation on the first runtime emission. Import-time log attempts remain inert. | `BoundLogger`, `logger` | First runtime call may configure logging and create bounded sinks; every runtime call emits a log record | `ConfigurationError`: default sink cannot be configured | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`, `example_exception_logging()`, `example_bound_context()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()`, `test_import_time_bound_log_does_not_activate_defaults()`, `test_bound_logger_preserves_context()` |
 | Completed | `FR-UTL-040` | Route access-context records to `access.log`, exact DEBUG records to `debug.log`, and ERROR-or-higher records to `errors.log`. | `configure_logging` specialized handlers | Explicit bounded file writes | `ConfigurationError`: unavailable directory or file sink | **Usage:** `tests/utils/usage/08_logging.py::example_specialized_routing()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_specialized_log_routing()` |
-| Completed | `FR-UTL-041` | Provide the approved explicit default profile: human-readable DEBUG stdout with ANSI color limited to level and message content, `data/logs`, 10 MB ZIP rotation, ten-day retention, ten backups, queued delivery, non-destructive synchronization, and deterministic flush/stop. | `LoggingSettings`, `configure_logging`, `flush_logging`, `shutdown_logging` | Explicit directory creation, queue thread, and bounded file writes | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_default_configuration_creates_all_sinks()`, `test_human_formatter_colors_only_level_and_message()`, `test_flush_logging_synchronizes_delivery_without_shutdown()`, `test_zip_rollover_and_shutdown()` |
+| Completed | `FR-UTL-041` | Provide the approved lazy default profile: human-readable DEBUG stdout with ANSI color limited to level and message content, `data/logs`, 10 MB ZIP rotation, ten-day retention, ten backups, queued delivery, automatic process-exit cleanup, optional non-destructive synchronization, and deterministic explicit override/stop. | `LoggingSettings`, `BoundLogger`, `configure_logging`, `flush_logging`, `shutdown_logging` | First runtime bound-log emission or explicit override creates the directory, queue thread, and bounded files | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()`, `test_explicit_configuration_is_not_replaced_by_lazy_default()`, `test_human_formatter_colors_only_level_and_message()`, `test_flush_logging_synchronizes_delivery_without_shutdown()`, `test_zip_rollover_and_shutdown()` |
 
 ---
 
@@ -451,8 +457,8 @@ capabilities beyond the Section 4 exports.
     truncation flags only. Default replacement is `[REDACTED]`; maximum text is
     4,096 characters, mapping depth is 16, and aggregate items are 1,000.
   - `load_settings(explicit_values=None, environment=None) -> RuntimeSettings`.
-    Precedence is explicit values, then the supplied environment mapping (or
-    `os.environ` only when omitted), then documented defaults. Input keys are
+    Precedence is explicit values, then the supplied mapping (or centralized
+    `AppSettings` `.env`/process values when omitted), then documented defaults. Input keys are
     the exact uppercase setting names; unknown keys are rejected.
   - `resolve_secret_reference(reference, source) -> SecretStr`. References use
     `secret://` followed by 1-255 ASCII letters, digits, `.`, `_`, `/`, or `-`.
@@ -471,10 +477,12 @@ capabilities beyond the Section 4 exports.
   - `get_logger(name) -> logging.Logger`, `configure_logging(settings=None,
     redaction_policy=None) -> None`, `flush_logging() -> None`, and
     `shutdown_logging() -> None`.
-    `logger.bind(**context)` returns an immutable `BoundLogger`. Configuration
-    installs colored stdout plus bounded `app.log`, `access.log`, `debug.log`,
-    and `errors.log` handlers. `flush_logging()` synchronizes queued delivery
-    without closing sinks; shutdown performs the final flush and close.
+    `logger.bind(**context)` returns an immutable `BoundLogger`. The first runtime bound
+    log call installs the approved colored stdout plus bounded `app.log`,
+    `access.log`, `debug.log`, and `errors.log` handlers. Explicit
+    `configure_logging(...)` is reserved for specialized overrides.
+    `flush_logging()` synchronizes queued delivery without closing sinks;
+    process exit or explicit shutdown performs the final flush and close.
 - Shared exceptions accept a required uppercase symbolic `code` and optional
   uppercase symbolic `detail`. They never retain a wrapped provider exception.
 - `AuditEvent` payloads are limited to 64 KiB of canonical UTF-8 JSON, depth 16,
@@ -527,9 +535,9 @@ capabilities beyond the Section 4 exports.
 | Completed | UTC-first policy | policy | `Z`-suffixed ISO 8601 | Yes | All domains | Non-UTC cross-domain timestamps are rejected. |
 | Completed | Trace-ID policy | policy | Prefixed UUID4 | Yes | All domains | Request, workflow, correlation, causation, and event IDs are secret-free strings. |
 | Completed | Secret-redaction policy | policy | Denylist-first, case-insensitive | Yes | All domains | Applied before persistence or emission. |
-| Completed | `LOG_LEVEL` | `str` | `DEBUG` | No | All domains | Used only after explicit logging configuration. |
-| Completed | `LOG_RENDER` | `str` | `human` | No | All domains | Exactly `json` or `human`; human output includes UTC millisecond time, padded level, caller module/function/line, and message. Used only after explicit logging configuration. |
-| Completed | `LOG_DIRECTORY` | `Path` | `data/logs` | No | All domains | Created on explicit configuration for `app.log`, `access.log`, `debug.log`, and `errors.log`. |
+| Completed | `LOG_LEVEL` | `str` | `DEBUG` | No | All domains | Applied by lazy default activation or an explicit specialized override. |
+| Completed | `LOG_RENDER` | `str` | `human` | No | All domains | Exactly `json` or `human`; human output includes UTC millisecond time, padded level, caller module/function/line, and message. Applied by lazy default activation or an explicit override. |
+| Completed | `LOG_DIRECTORY` | `Path` | `data/logs` | No | All domains | Created on first runtime bound-log emission, or by an earlier explicit override, for `app.log`, `access.log`, `debug.log`, and `errors.log`. |
 | Completed | `LOG_MAX_BYTES` | `int` | `10000000` | No | All domains | Size threshold for rotating each configured file. |
 | Completed | `LOG_BACKUP_COUNT` | `int` | `10` | No | All domains | Maximum compressed rotations retained per file in addition to age cleanup. |
 | Completed | `LOG_RETENTION_DAYS` | `int` | `10` | No | All domains | Remove rotated files older than this during rollover. |
@@ -585,13 +593,14 @@ Feature-integration tests are assigned as follows:
 ### Definition of done
 
 - [X] The final package tree exists exactly as specified. `app/utils/__init__.py:1`
-- [X] Public exports contain only the retained shared surface. `tests/utils/unit/test_boundaries.py:66`
+- [X] Public exports contain only the retained shared surface; dotenv parsing and
+  named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:67`
 - [X] Shared capabilities have documented consumers and owner-approved security primitives remain bounded. `app/utils/README.md:70`
 - [X] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:69`
 - [X] UI/API owns authentication and permission enforcement. `app/utils/contracts/auth.py:17`
-- [X] Utils imports have no side effects. `tests/utils/unit/test_logger.py:136`
+- [X] Utils imports and import-time log attempts have no side effects. `tests/utils/unit/test_logger.py:229`, `tests/utils/unit/test_logger.py:243`
 - [X] No secret appears in logs, errors, audit records, or diagnostics. `tests/utils/integration/test_structured_logging.py:12`
-- [X] The default profile creates source-aware human stdout with color limited to level and message content, plus four bounded queued file routes with explicit synchronization and deterministic shutdown. `tests/utils/unit/test_logger.py:39`, `tests/utils/unit/test_logger.py:99`, `tests/utils/unit/test_logger.py:120`, `tests/utils/unit/test_logger.py:253`
+- [X] The first runtime log call activates the source-aware default profile exactly once, explicit overrides remain intact, and queued output has deterministic synchronization and shutdown. `tests/utils/unit/test_logger.py:71`, `tests/utils/unit/test_logger.py:90`, `tests/utils/unit/test_logger.py:112`
 - [X] Every requirement has a targeted unit test and directly executable usage example. `tests/utils/integration/test_usage_scripts.py:21`
 - [X] Coverage is at least 80%. `pyproject.toml:170`
 - [X] Ruff, formatting, mypy, and targeted tests pass. `pyproject.toml:29`
@@ -634,13 +643,15 @@ safe_payload = redact_mapping_value(
 serialized = canonical_json(safe_payload)
 ```
 
-### Default logging configuration
+### Default logging
 
 ```python
-from app.utils import configure_logging, flush_logging, logger, shutdown_logging
+from app.utils import logger
 
-configure_logging()
 logger.bind(request_id="req-example").info("dataset_ready")
-flush_logging()
-shutdown_logging()
 ```
+
+The first runtime log call activates the approved default profile. Import-time log
+attempts remain inert. Import
+`configure_logging`, `flush_logging`, or `shutdown_logging` only in specialized
+entry points that need a non-default profile or explicit lifecycle control.
