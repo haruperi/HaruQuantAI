@@ -1,1 +1,0 @@
-"""Data contract unit tests."""
