@@ -554,7 +554,7 @@ The package returns Analytics-owned typed contracts and surfaces
 ### Feature usage examples
 
 `tests/analytics/usage/test_usage_contracts.py` contains one `test_usage_*`
-function for every `FR-ANLT-001` through `FR-ANLT-026` mapping above.
+function for every `FR-ANLT-001` through `FR-ANLT-026` mapping above (excluding the reserved, unused IDs `FR-ANLT-015` and `FR-ANLT-019`).
 
 ---
 
@@ -993,3 +993,15 @@ These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`
 | `P-ANLT-006` | `app/services/analytics/dashboards/` | 1 | `dashboards` module + its `FR-ANLT-*` behavior (§4) |
 | `P-ANLT-003` | `app/services/analytics/metrics/` | 7 | `metrics` module + its `FR-ANLT-*` behavior (§4) |
 | `P-ANLT-005` | `app/services/analytics/scorecards/` | 7 | `scorecards` module + its `FR-ANLT-*` behavior (§4) |
+
+
+---
+
+## Appendix R — Reserved / Unused Requirement IDs
+
+The following `FR-` numbers are **reserved, unused numbering gaps** in the Analytics ledger. They define no behavior, require no implementation, and are excluded from any inclusive range that spans them. This is an authoritative exclusion per `docs/PROJECT.md` §12 (owner-resolved 2026-07-16; see `docs/CHANGELOG.md` → Decisions).
+
+| Reserved ID | Note |
+|---|---|
+| `FR-ANLT-015` | interior gap in the `FR-ANLT-001`–`FR-ANLT-026` coverage range; no metric/contract behavior |
+| `FR-ANLT-019` | interior gap in the `FR-ANLT-001`–`FR-ANLT-026` coverage range; no metric/contract behavior |

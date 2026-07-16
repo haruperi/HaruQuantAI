@@ -34,7 +34,10 @@
 - **Typing & Docs**: `mypy` type-checked (see `docs/ARCHITECTURE.md` for current strictness settings). Explicit type hints on all signatures. Google-style docstrings for all modules, classes, and functions.
 - **Imports**: Absolute imports, grouped (stdlib, 3rd-party, local).
 - **Versioning**: Always confirm library versions before coding. Default to `pyproject.toml` pinned version.
-- **Quality**: 80% `pytest` coverage minimum. No bare `except:`. Use `logger` (no `print`). No silent failures.
+- **Quality**: 80% `pytest` coverage minimum. No bare `except:`. Application and
+  library code uses `logger`, never `print`. Directly executable teaching and
+  usage-example scripts may use `print` to display bounded, secret-safe results.
+  No silent failures.
 - **Security**: Never commit secrets. Redact sensitive values in logs. `.env.example` only.
 
 ## 5. Safety & Governance

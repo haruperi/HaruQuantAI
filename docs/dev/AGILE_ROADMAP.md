@@ -112,7 +112,7 @@ The matrix assigns all **1230** IDs exactly once. No fake adapter participates i
 Exact rows are authoritative in the traceability matrix; ranges compact the same IDs.
 
 - **System:** `P-SYS-001-002`, `SYS-NFR-001-006`, `SYS-WF-001-002`, `SYS-WF-005`
-- **Utils:** `FR-UTL-001-015`, `FR-UTL-021-022`, `FR-UTL-025-035`, `FR-UTL-039-041`, `P-UTL-001-005`, `P-UTL-008`, `WF-UTL-001`
+- **Utils:** `FR-UTL-001-015`, `FR-UTL-021-022`, `FR-UTL-026-035`, `FR-UTL-039-041`, `P-UTL-001-005`, `P-UTL-008`, `WF-UTL-001`
 - **Brokers:** `CAP-BRK-001`, `CAP-BRK-003`, `CAP-BRK-012`, `FR-BRK-001-105`, `FR-BRK-110-114`, `FR-BRK-116-118`, `FR-BRK-133`, `P-BRK-001`, `P-BRK-003-004`, `WF-BRK-001-003`, `WF-BRK-008-009`
 - **Data:** `CAP-DATA-003-004`, `FR-DATA-001-008`, `FR-DATA-010-013`, `FR-DATA-016`, `FR-DATA-023`, `FR-DATA-026`, `FR-DATA-028`, `FR-DATA-030-036`, `FR-DATA-039`, `FR-DATA-041`, `FR-DATA-046`, `FR-DATA-075-076`, `FR-DATA-078-079`, `P-DATA-001`, `P-DATA-004`, `P-DATA-008`, `WF-DATA-001`, `WF-DATA-013-014`
 - **Indicators:** `FR-INDI-001-017`, `P-INDI-001-002`, `WF-INDI-001-002`

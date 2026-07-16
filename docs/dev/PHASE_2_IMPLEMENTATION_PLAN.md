@@ -385,7 +385,7 @@ Implement `Utils` in authoritative order: all component and functional work firs
 - **Source workflow:** Shared settings bootstrap
 - **Source input boundary:** Explicit mapping and environment
 - **Source final outcome:** Immutable validated `RuntimeSettings`
-- **Source requirement sequence:** `FR-UTL-022` through `FR-UTL-025`
+- **Source requirement sequence:** `FR-UTL-022` through `FR-UTL-024` (`FR-UTL-025` reserved/unused)
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `WF-UTL-002`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.

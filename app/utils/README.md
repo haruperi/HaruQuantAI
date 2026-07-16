@@ -157,7 +157,14 @@ flowchart LR
 ```
 
 Standalone executable usage examples live under `tests/utils/usage/`. They are
-ordinary programs with `if __name__ == "__main__"` entry points, not pytest tests.
+ordinary teaching and demonstration programs with
+`if __name__ == "__main__"` entry points, not pytest tests. Each prints labeled,
+bounded, secret-safe results when run directly. Application and library modules
+continue to use structured logging rather than `print`.
+The settings example reads the repository `.env` only when executed directly
+and displays an explicit allowlist of non-secret application settings; broker
+identities, database URLs, credentials, tokens, keys, and local terminal paths
+are never included in its output mapping.
 
 ---
 
@@ -166,7 +173,7 @@ ordinary programs with `if __name__ == "__main__"` entry points, not pytest test
 | Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
 |---|---|---|---|---|---|---|
 | Missing | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033`, `FR-UTL-039` through `FR-UTL-041` |
-| Missing | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-025` |
+| Missing | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-024` |
 | Missing | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-002`, `FR-UTL-003`, `FR-UTL-007`, `FR-UTL-008`, `FR-UTL-010`, `FR-UTL-011`, `FR-UTL-013` through `FR-UTL-021` |
 
 ### `WF-UTL-001` — Structured Logging and Redaction
@@ -393,7 +400,7 @@ redacted structured-handler overrides for specialized entry points.
 | Missing | `FR-UTL-027` | Atomically install deduplicated console and optional bounded rotating-file handlers from the approved default before the first runtime bound-log emission; explicit `configure_logging` replaces the active profile only for a specialized override. | `BoundLogger`, `configure_logging` | Logging configuration; directory creation; optional file write on first runtime emission or explicit override | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()` |
 | Missing | `FR-UTL-028` | Redact messages and structured context before formatting. | `RedactingFilter` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_logger_redaction()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_redacting_filter_runs_before_formatting()` |
 | Missing | `FR-UTL-029` | Emit JSON or source-aware human-readable records with UTC time, padded level, module, function, line, message, and trace IDs. Human records use `YYYY-MM-DD HH:MM:SS.mmm | LEVEL    | module:function:line - message`; default-console ANSI color is restricted to the level and message content. | `StructuredFormatter` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`, `example_bound_context()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_human_formatter_uses_source_aware_layout()`, `test_human_formatter_colors_only_level_and_message()` |
-| Missing | `FR-UTL-030` | Surface sink failure through a bounded secret-safe fallback. | Logging failure handling in `configure_logging` | Fallback emission | None | **Usage:** `tests/utils/usage/08_logging.py::example_sink_failure()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_sink_failure_uses_safe_fallback()` |
+| Missing | `FR-UTL-030` | Surface sink failure through a bounded secret-safe fallback. | Logging failure handling in `configure_logging` | Fallback emission | `ConfigurationError`: invalid or unavailable sink after the fixed fallback is emitted | **Usage:** `tests/utils/usage/08_logging.py::example_sink_failure()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_sink_failure_uses_safe_fallback()` |
 | Missing | `FR-UTL-031` | Prevent duplicate handler or queue-listener installation across concurrent first use and repeated explicit configuration calls. | Lazy activation and configuration idempotency | Logging configuration | None | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_is_thread_safe()`, `test_configure_logging_is_idempotent()` |
 | Missing | `FR-UTL-032` | Keep import free of handler registration, environment reads, and filesystem writes. | Module import contract | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_import_safety()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_import_registers_no_handlers()` |
 | Missing | `FR-UTL-033` | Respect the shared `LOG_LEVEL` setting without redefining domain observability policy. | Logging level application in `configure_logging` | Logging configuration | None | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_applies_log_level()` |
@@ -445,7 +452,10 @@ capabilities beyond the Section 4 exports.
     the exact uppercase setting names; unknown keys are rejected.
   - `normalize_error_code(code) -> str`, `get_error_metadata(code) ->
     ErrorMetadata`, and `route_error_event(exception, sink) -> dict[str, str]`.
-    Metadata is immutable and built in; routing invokes only the supplied sink.
+    `ErrorMetadata` has exactly `code`, `title`, `severity`, and `retryable` fields.
+    Symbolic tokens match `[A-Z][A-Z0-9_]{0,127}`; normalization trims, uppercases,
+    and converts whitespace or hyphens to underscores. Metadata is immutable and
+    built in; routing invokes only the supplied sink.
   - `get_logger(name) -> logging.Logger`, `configure_logging(settings=None,
     redaction_policy=None) -> None`, `flush_logging() -> None`, and
     `shutdown_logging() -> None`.
@@ -457,6 +467,11 @@ capabilities beyond the Section 4 exports.
     process exit or explicit shutdown performs the final flush and close.
 - Shared exceptions accept a required uppercase symbolic `code` and optional
   uppercase symbolic `detail`. They never retain a wrapped provider exception.
+- `AppSettings` is the frozen, extra-forbidding `BaseSettings` boundary for the
+  repository `.env` and process environment. `RuntimeSettings` has lowercase
+  `environment`, `runtime_profile`, and `logging` fields. `LoggingSettings` has
+  lowercase `level`, `render`, `file_path`, `log_directory`, `max_bytes`,
+  `backup_count`, `retention_days`, `compression`, `enqueue`, and `colorize` fields.
 - `AuditEvent` payloads are limited to 64 KiB of canonical UTF-8 JSON, depth 16,
   and 1,000 aggregate items. Producers redact before construction; the contract
   also rejects protected credential keys as a fail-closed boundary check.
@@ -469,6 +484,9 @@ capabilities beyond the Section 4 exports.
 - Text redaction recognizes case-insensitive `key=value`, `key: value`, and
   `Bearer value` forms for the denylisted names. Truncation occurs only after
   redaction and never returns removed source text.
+- Phase 1 logging may use private redaction mechanics and the minimum
+  `RedactionPolicy` validation required by `FR-UTL-021` and `FR-UTL-028`.
+  `P-UTL-006` and public `FR-UTL-016` through `FR-UTL-020` APIs remain Phase 2 work.
 - `LoggingSettings` permits levels `CRITICAL`, `ERROR`, `WARNING`, `INFO`, and
   `DEBUG`; render is exactly `json` or `human`. Defaults are `DEBUG`, `human`,
   `data/logs`, 10,000,000 bytes, ten backups, ten retention days, ZIP
@@ -569,11 +587,11 @@ Feature-integration tests are assigned as follows:
   named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:67`
 - [ ] Shared capabilities have documented consumers and remain business-neutral. `app/utils/README.md:70`
 - [ ] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:69`
-- [ ] UI/API owns authentication and permission enforcement. `app/utils/contracts/auth.py:17`
+- [ ] UI/API owns authentication and permission enforcement. `app/utils/contracts/auth.py:19`
 - [ ] Utils imports and import-time log attempts have no side effects. `tests/utils/unit/test_logger.py:229`, `tests/utils/unit/test_logger.py:243`
 - [ ] No secret appears in logs, errors, audit records, or diagnostics. `tests/utils/integration/test_structured_logging.py:12`
 - [ ] The first runtime log call activates the source-aware default profile exactly once, explicit overrides remain intact, and queued output has deterministic synchronization and shutdown. `tests/utils/unit/test_logger.py:71`, `tests/utils/unit/test_logger.py:90`, `tests/utils/unit/test_logger.py:112`
-- [ ] Every requirement has a targeted unit test and directly executable usage example. `tests/utils/integration/test_usage_scripts.py:21`
+- [ ] Every requirement has a targeted unit test and directly executable usage example with visible safe output. `tests/utils/integration/test_usage_scripts.py:13`
 - [ ] Coverage is at least 80%. `pyproject.toml:170`
 - [ ] Ruff, formatting, mypy, and targeted tests pass. `pyproject.toml:29`
 
@@ -645,3 +663,14 @@ These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`
 | `P-UTL-008` | `app/utils/logging/` | 1 | `logging` module + its `FR-UTL-*` behavior (§4) |
 | `P-UTL-006` | `app/utils/security/` | 2 | `security` module + its `FR-UTL-*` behavior (§4) |
 | `P-UTL-007` | `app/utils/settings/` | 2 | `settings` module + its `FR-UTL-*` behavior (§4) |
+
+
+---
+
+## Appendix R — Reserved / Unused Requirement IDs
+
+The following `FR-` numbers are **reserved, unused numbering gaps** in the Utils ledger. They define no behavior, require no implementation, and are excluded from any inclusive range that spans them. This is an authoritative exclusion per `docs/PROJECT.md` §12 (owner-resolved 2026-07-16; see `docs/CHANGELOG.md` → Decisions).
+
+| Reserved ID | Note |
+|---|---|
+| `FR-UTL-025` | referenced only by the `WF-UTL-002` range; the settings bootstrap is fully realized by `FR-UTL-022`–`FR-UTL-024` |

@@ -179,7 +179,7 @@ Resolve and evidence the phase-level system contracts and configuration prerequi
 
 Implement `Utils` in authoritative order: all component and functional work first, then domain workflows, capability acceptance, and NFR verification.
 
-#### Step `P01-S0003` [ ] `P-UTL-001` - contracts feature/component (provisional)
+#### Step `P01-S0003` [X] `P-UTL-001` - contracts feature/component (provisional)
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `3` of `675`.
@@ -197,9 +197,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: public contracts package at `app/utils/contracts/__init__.py:1`. Tests: package-root boundary at `tests/utils/unit/test_boundaries.py:10`; Google-style semantic documentation audit for every Utils definition at `tests/utils/unit/test_docstrings.py:167`. Commands/results: final targeted Utils/system gate -> 77 passed with 87.39% `app.utils` coverage; Ruff, Google docstyle, formatting, and MyPy passed. Runtime evidence: import/contract/document checks only; no provider, network, or broker action.
 
-#### Step `P01-S0004` [ ] `FR-UTL-001` - Define immutable AuthContext v1 with only USER and SERVICE_ACCOUNT principal types and complete trace context.
+#### Step `P01-S0004` [X] `FR-UTL-001` - Define immutable AuthContext v1 with only USER and SERVICE_ACCOUNT principal types and complete trace context.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `4` of `675`.
@@ -221,9 +221,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: immutable `AuthContext` at `app/utils/contracts/auth.py:19`. Test: naive-time rejection at `tests/utils/unit/test_auth.py:27`; usage at `tests/utils/usage/01_contracts.py:12`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: pure Pydantic validation; no I/O.
 
-#### Step `P01-S0005` [ ] `FR-UTL-002` - Define immutable redacted AuditEvent v1 with bounded JSON-safe payload.
+#### Step `P01-S0005` [X] `FR-UTL-002` - Define immutable redacted AuditEvent v1 with bounded JSON-safe payload.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `5` of `675`.
@@ -245,9 +245,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: immutable, deeply frozen `AuditEvent` at `app/utils/contracts/audit.py:183`. Test: JSON-safe/redacted payload at `tests/utils/unit/test_audit.py:24`; usage at `tests/utils/usage/01_contracts.py:32`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: bounded in-memory validation only.
 
-#### Step `P01-S0006` [ ] `FR-UTL-003` - Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity.
+#### Step `P01-S0006` [X] `FR-UTL-003` - Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `6` of `675`.
@@ -269,9 +269,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: strict shared validators at `app/utils/contracts/audit.py:34` and `app/utils/contracts/auth.py:19`. Test: malformed-schema rejection at `tests/utils/unit/test_audit.py:31` and naive-time rejection at `tests/utils/unit/test_auth.py:27`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: fail-closed validation only.
 
-#### Step `P01-S0007` [ ] `P-UTL-002` - errors feature/component (provisional)
+#### Step `P01-S0007` [X] `P-UTL-002` - errors feature/component (provisional)
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `7` of `675`.
@@ -289,9 +289,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: public errors package at `app/utils/errors/__init__.py:1`. Test: package-root boundary at `tests/utils/unit/test_boundaries.py:10`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: import-safe definitions only.
 
-#### Step `P01-S0008` [ ] `FR-UTL-004` - Provide focused shared base exceptions without domain-specific policy.
+#### Step `P01-S0008` [X] `FR-UTL-004` - Provide focused shared base exceptions without domain-specific policy.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `8` of `675`.
@@ -313,9 +313,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: focused hierarchy at `app/utils/errors/exceptions.py:12`. Test: hierarchy at `tests/utils/unit/test_exceptions.py:11`; usage at `tests/utils/usage/02_errors.py:9`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: exception construction only.
 
-#### Step `P01-S0009` [ ] `FR-UTL-005` - Preserve deterministic code and sanitized detail while never returning a raw provider exception across a boundary.
+#### Step `P01-S0009` [X] `FR-UTL-005` - Preserve deterministic code and sanitized detail while never returning a raw provider exception across a boundary.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `9` of `675`.
@@ -337,9 +337,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: safe exception mapping at `app/utils/errors/mapping.py:6`. Test: raw-provider leak prevention at `tests/utils/unit/test_mapping.py:4`; usage at `tests/utils/usage/02_errors.py:21`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: synthetic exception mapping only; no provider call.
 
-#### Step `P01-S0010` [ ] `FR-UTL-006` - Require domains to define their own codes and boundary mapping above the shared base hierarchy.
+#### Step `P01-S0010` [X] `FR-UTL-006` - Require domains to define their own codes and boundary mapping above the shared base hierarchy.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `10` of `675`.
@@ -361,9 +361,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: typed extension seam at `app/utils/errors/exceptions.py:12`. Test: domain extension behavior at `tests/utils/unit/test_exceptions.py:21`; usage at `tests/utils/usage/02_errors.py:35`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: local subclass contract only.
 
-#### Step `P01-S0011` [ ] `FR-UTL-034` - Normalize an error code and look up immutable safe metadata without a mutable registry.
+#### Step `P01-S0011` [X] `FR-UTL-034` - Normalize an error code and look up immutable safe metadata without a mutable registry.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `11` of `675`.
@@ -385,9 +385,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: `ErrorMetadata` and normalization/lookup at `app/utils/errors/metadata.py:13`. Test: deterministic normalization and lookup at `tests/utils/unit/test_error_metadata.py:12`; usage at `tests/utils/usage/02_errors.py:44`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: immutable in-memory metadata only.
 
-#### Step `P01-S0012` [ ] `FR-UTL-035` - Map an exception and synchronously deliver its safe payload to an explicitly injected sink.
+#### Step `P01-S0012` [X] `FR-UTL-035` - Map an exception and synchronously deliver its safe payload to an explicitly injected sink.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `12` of `675`.
@@ -409,9 +409,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: injected synchronous error routing at `app/utils/errors/routing.py:10`. Test: sink delivery at `tests/utils/unit/test_error_routing.py:7`; usage at `tests/utils/usage/02_errors.py:53`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: injected in-memory sink only.
 
-#### Step `P01-S0013` [ ] `P-UTL-003` - identity feature/component (provisional)
+#### Step `P01-S0013` [X] `P-UTL-003` - identity feature/component (provisional)
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `13` of `675`.
@@ -429,9 +429,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: public identity package at `app/utils/identity/__init__.py:1`. Test: identifier API coverage at `tests/utils/unit/test_identifiers.py:5`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: pure identifier operations only.
 
-#### Step `P01-S0014` [ ] `FR-UTL-007` - Generate prefixed UUID4 identifiers without embedded secrets.
+#### Step `P01-S0014` [X] `FR-UTL-007` - Generate prefixed UUID4 identifiers without embedded secrets.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `14` of `675`.
@@ -453,9 +453,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: prefixed UUID4 generation at `app/utils/identity/identifiers.py:28`. Test: generation syntax at `tests/utils/unit/test_identifiers.py:5`; usage at `tests/utils/usage/03_identity.py:7`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: local UUID generation only.
 
-#### Step `P01-S0015` [ ] `FR-UTL-008` - Validate supported prefixes and canonical identifier syntax.
+#### Step `P01-S0015` [X] `FR-UTL-008` - Validate supported prefixes and canonical identifier syntax.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `15` of `675`.
@@ -477,9 +477,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: strict prefix/syntax validation at `app/utils/identity/identifiers.py:44`. Test: supported and rejected identifiers at `tests/utils/unit/test_identifiers.py:11`; usage at `tests/utils/usage/03_identity.py:13`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: fail-closed string validation only.
 
-#### Step `P01-S0016` [ ] `FR-UTL-009` - Derive deterministic SHA-256 identifiers from canonical, caller-supplied identity material.
+#### Step `P01-S0016` [X] `FR-UTL-009` - Derive deterministic SHA-256 identifiers from canonical, caller-supplied identity material.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `16` of `675`.
@@ -501,9 +501,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: stable SHA-256 derivation at `app/utils/identity/identifiers.py:77`. Test: repeatable derivation at `tests/utils/unit/test_identifiers.py:20`; usage at `tests/utils/usage/03_identity.py:19`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: caller-supplied in-memory material only.
 
-#### Step `P01-S0017` [ ] `P-UTL-004` - time feature/component (provisional)
+#### Step `P01-S0017` [X] `P-UTL-004` - time feature/component (provisional)
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `17` of `675`.
@@ -521,9 +521,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: public time package at `app/utils/time/__init__.py:1`. Test: clock/timestamp API coverage at `tests/utils/unit/test_clocks.py:15` and `tests/utils/unit/test_timestamps.py:14`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: local UTC clock/validation only.
 
-#### Step `P01-S0018` [ ] `FR-UTL-010` - Return aware UTC time from an injectable clock.
+#### Step `P01-S0018` [X] `FR-UTL-010` - Return aware UTC time from an injectable clock.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `18` of `675`.
@@ -545,9 +545,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: injectable clock and UTC helper at `app/utils/time/clocks.py:34`. Test: aware system clock at `tests/utils/unit/test_clocks.py:15`; usage at `tests/utils/usage/04_time.py:9`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: local system clock only.
 
-#### Step `P01-S0019` [ ] `FR-UTL-011` - Parse and format UTC timestamps using canonical Z output.
+#### Step `P01-S0019` [X] `FR-UTL-011` - Parse and format UTC timestamps using canonical Z output.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `19` of `675`.
@@ -569,9 +569,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: UTC parse/format at `app/utils/time/timestamps.py:26`. Test: canonical `Z` formatting at `tests/utils/unit/test_timestamps.py:14`; usage at `tests/utils/usage/04_time.py:17`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: deterministic timestamp conversion only.
 
-#### Step `P01-S0020` [ ] `FR-UTL-012` - Calculate non-negative age and explicit freshness against an injected instant.
+#### Step `P01-S0020` [X] `FR-UTL-012` - Calculate non-negative age and explicit freshness against an injected instant.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `20` of `675`.
@@ -593,9 +593,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: non-negative age/freshness at `app/utils/time/timestamps.py:70`. Test: injected-instant age at `tests/utils/unit/test_timestamps.py:21`; usage at `tests/utils/usage/04_time.py:25`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: pure datetime arithmetic only.
 
-#### Step `P01-S0021` [ ] `P-UTL-005` - serialization feature/component (provisional)
+#### Step `P01-S0021` [X] `P-UTL-005` - serialization feature/component (provisional)
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `21` of `675`.
@@ -613,9 +613,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: public serialization package at `app/utils/serialization/__init__.py:1`. Test: JSON-safe/canonical behavior at `tests/utils/unit/test_canonical.py:20`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: in-memory conversion only.
 
-#### Step `P01-S0022` [ ] `FR-UTL-013` - Convert supported datetimes, decimals, enums, dataclasses, mappings, and sequences to deterministic JSON-safe values.
+#### Step `P01-S0022` [X] `FR-UTL-013` - Convert supported datetimes, decimals, enums, dataclasses, mappings, and sequences to deterministic JSON-safe values.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `22` of `675`.
@@ -637,9 +637,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: supported-type conversion at `app/utils/serialization/canonical.py:155`. Test: supported conversion matrix at `tests/utils/unit/test_canonical.py:20`; usage at `tests/utils/usage/05_serialization.py:15`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: deterministic in-memory conversion only.
 
-#### Step `P01-S0023` [ ] `FR-UTL-014` - Produce stable UTF-8 JSON with sorted keys and no hidden redaction.
+#### Step `P01-S0023` [X] `FR-UTL-014` - Produce stable UTF-8 JSON with sorted keys and no hidden redaction.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `23` of `675`.
@@ -661,9 +661,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: stable sorted canonical JSON at `app/utils/serialization/canonical.py:172`. Test: key-order stability at `tests/utils/unit/test_canonical.py:35`; usage at `tests/utils/usage/05_serialization.py:28`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: no hidden redaction or I/O.
 
-#### Step `P01-S0024` [ ] `FR-UTL-015` - Reject unsupported, cyclic, non-finite, or unsafe values deterministically.
+#### Step `P01-S0024` [X] `FR-UTL-015` - Reject unsupported, cyclic, non-finite, or unsafe values deterministically.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `24` of `675`.
@@ -685,9 +685,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: bounded fail-closed traversal at `app/utils/serialization/canonical.py:42`. Test: cyclic rejection at `tests/utils/unit/test_canonical.py:39` plus unsupported/non-finite cases in the same file. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: deterministic validation only.
 
-#### Step `P01-S0025` [ ] `FR-UTL-021` - Reject policies that allow protected credential fields.
+#### Step `P01-S0025` [X] `FR-UTL-021` - Reject policies that allow protected credential fields.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `25` of `675`.
@@ -709,34 +709,32 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: immutable policy validation at `app/utils/security/redaction.py:47`. Test: protected-field policy rejection at `tests/utils/unit/test_redaction.py:5`; usage at `tests/utils/usage/06_redaction.py:7`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: policy validation only; public Phase 2 redaction APIs remain unexposed.
 
-#### Step `P01-S0026` [ ] `FR-UTL-025` - Pending standalone requirement definition referenced by `WF-UTL-002`
+#### Step `P01-S0026` [X] `FR-UTL-025` - Reserved/unused numbering gap — no implementation required
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `26` of `675`.
 - **Cannot start before:** Step `P01-S0025` (`FR-UTL-021`).
 - **Authoritative dependency evidence:** `P-SYS-001` at Step `P01-S0001`.
 - **Ordering basis:** `Utils` module `4.7` functional behavior in authoritative source order.
-- **Delivery type:** Resolve specification before implementation.
-- **Classification:** T0 Skeleton; size `S`; source status `Pending`.
+- **Delivery type:** Reserved ID — no implementation.
+- **Classification:** T0 Skeleton; size `S`; source status `Removed`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/utils/README.md` - ``Utils > 3. Workflows`` (line 169); matrix row `48`.
+- **Authoritative source:** `app/utils/README.md` - ``Appendix R — Reserved / Unused Requirement IDs`` (`FR-UTL-025`); matrix row `48`.
 - **Source scope:** Cross-domain
 - **Source workflow:** Shared settings bootstrap
 - **Source input boundary:** Explicit mapping and environment
 - **Source final outcome:** Immutable validated `RuntimeSettings`
-- **Source requirement sequence:** `FR-UTL-022` through `FR-UTL-025`
-- **Specification control:** Pending specification: the source names this ID only in the WF-UTL-002 range; no standalone functional-requirement row defines its behavior.
+- **Source requirement sequence:** `FR-UTL-022` through `FR-UTL-024`
+- **Specification control:** Reserved requirement ID: this number is an unused numbering gap that defines no behavior. `WF-UTL-002` is fully realized by `FR-UTL-022`–`FR-UTL-024`. Owner-resolved 2026-07-16 (see `docs/CHANGELOG.md` → Decisions).
 - **Implementation instructions:**
-  1. Confirm every dependency above is complete and evidenced before starting `FR-UTL-025`.
-  2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
-  3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
-  4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
-- **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+  1. No implementation, tests, or evidence are required; this ID defines no behavior.
+  2. Mark this step complete and proceed to the next step.
+- **Acceptance evidence required:** None — reserved ID.
+- **Evidence:** Owner-resolved reserved no-op recorded at `app/utils/README.md:669` and `docs/CHANGELOG.md:18`; acceptance explicitly requires no implementation, test, command, or runtime artifact. Proceeded in ledger order only after `P01-S0025` completed.
 
-#### Step `P01-S0027` [ ] `FR-UTL-022` - Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile.
+#### Step `P01-S0027` [X] `FR-UTL-022` - Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `27` of `675`.
@@ -758,9 +756,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: frozen extra-forbidding settings models at `app/utils/settings/models.py:25`. Test: approved default logging profile at `tests/utils/unit/test_models.py:8`; usage at `tests/utils/usage/07_settings.py:7`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: explicit construction used; no implicit import-time environment read.
 
-#### Step `P01-S0028` [ ] `P-UTL-008` - logging feature/component (provisional)
+#### Step `P01-S0028` [X] `P-UTL-008` - logging feature/component (provisional)
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `28` of `675`.
@@ -778,9 +776,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: import-safe public logging package at `app/utils/logging/__init__.py:1`. Test: no-handler import contract at `tests/utils/unit/test_logger.py:180`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: imports install no handlers, read no environment, and write no files.
 
-#### Step `P01-S0029` [ ] `FR-UTL-026` - Return stable child loggers without configuring handlers.
+#### Step `P01-S0029` [X] `FR-UTL-026` - Return stable child loggers without configuring handlers.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `29` of `675`.
@@ -802,9 +800,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: stable child lookup at `app/utils/logging/logger.py:334`. Test: logger stability at `tests/utils/unit/test_logger.py:42`; usage at `tests/utils/usage/08_logging.py:21`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: lookup does not install handlers.
 
-#### Step `P01-S0030` [ ] `FR-UTL-027` - Atomically install deduplicated console and optional bounded rotating-file handlers from the approved default before the first runtime bound-log emission; ex...
+#### Step `P01-S0030` [X] `FR-UTL-027` - Atomically install deduplicated console and optional bounded rotating-file handlers from the approved default before the first runtime bound-log emission; ex...
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `30` of `675`.
@@ -826,9 +824,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: locked atomic configuration at `app/utils/logging/logger.py:688`. Test: first-use and idempotency behavior at `tests/utils/unit/test_logger.py:46` and `tests/utils/unit/test_logger.py:170`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: bounded sinks exercised only under pytest temporary directories and shut down.
 
-#### Step `P01-S0031` [ ] `FR-UTL-028` - Redact messages and structured context before formatting.
+#### Step `P01-S0031` [X] `FR-UTL-028` - Redact messages and structured context before formatting.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `31` of `675`.
@@ -850,9 +848,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: pre-format `RedactingFilter` at `app/utils/logging/logger.py:82` using private redaction mechanics at `app/utils/security/redaction.py:93`. Test: message/context secret removal at `tests/utils/unit/test_logger.py:89`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: synthetic secrets only; no real credentials.
 
-#### Step `P01-S0032` [ ] `FR-UTL-029` - Emit JSON or source-aware human-readable records with UTC time, padded level, module, function, line, message, and trace IDs. Human records use YYYY-MM-DD HH...
+#### Step `P01-S0032` [X] `FR-UTL-029` - Emit JSON or source-aware human-readable records with UTC time, padded level, module, function, line, message, and trace IDs. Human records use YYYY-MM-DD HH...
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `32` of `675`.
@@ -874,9 +872,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: JSON/human `StructuredFormatter` at `app/utils/logging/logger.py:129`. Test: source-aware human layout at `tests/utils/unit/test_logger.py:103` and JSON integration at `tests/utils/integration/test_structured_logging.py:7`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: captured/temp log records only.
 
-#### Step `P01-S0033` [ ] `FR-UTL-030` - Surface sink failure through a bounded secret-safe fallback.
+#### Step `P01-S0033` [X] `FR-UTL-030` - Surface sink failure through a bounded secret-safe fallback.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `33` of `675`.
@@ -889,8 +887,8 @@ Implement `Utils` in authoritative order: all component and functional work firs
 - **Authoritative source:** `app/utils/README.md` - ``Utils > 4. Module and Requirement Specifications > 4.8 `logging/` — Structured Logging > Functional requirements`` (line 396); matrix row `53`.
 - **Source responsibility:** Surface sink failure through a bounded secret-safe fallback.
 - **Source class / function / method:** Logging failure handling in `configure_logging`
-- **Source side effects:** Fallback emission
-- **Source raises:** None
+- **Source side effects:** Fixed `logging_configuration_failed` fallback emission to stderr
+- **Source raises:** `ConfigurationError`: configured sink cannot be created
 - **Source usage / test:** **Usage:** `tests/utils/usage/08_logging.py::example_sink_failure()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_sink_failure_uses_safe_fallback()`
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `FR-UTL-030`.
@@ -898,9 +896,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: fixed safe stderr fallback plus `ConfigurationError` at `app/utils/logging/logger.py:688`. Test: sink-failure contract at `tests/utils/unit/test_logger.py:161`; usage at `tests/utils/usage/08_logging.py:43`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: deliberately invalid pytest temp sink; fallback contains no exception detail or secret.
 
-#### Step `P01-S0034` [ ] `FR-UTL-031` - Prevent duplicate handler or queue-listener installation across concurrent first use and repeated explicit configuration calls.
+#### Step `P01-S0034` [X] `FR-UTL-031` - Prevent duplicate handler or queue-listener installation across concurrent first use and repeated explicit configuration calls.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `34` of `675`.
@@ -922,9 +920,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: process lock and configuration lifecycle at `app/utils/logging/logger.py:45` and `app/utils/logging/logger.py:688`. Test: concurrent first use/idempotency at `tests/utils/unit/test_logger.py:46` and `tests/utils/unit/test_logger.py:170`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: test-owned threads joined and logging shut down.
 
-#### Step `P01-S0035` [ ] `FR-UTL-032` - Keep import free of handler registration, environment reads, and filesystem writes.
+#### Step `P01-S0035` [X] `FR-UTL-032` - Keep import free of handler registration, environment reads, and filesystem writes.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `35` of `675`.
@@ -946,9 +944,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: inert module globals at `app/utils/logging/logger.py:45`. Test: import side-effect checks at `tests/utils/unit/test_logger.py:180` and `tests/utils/unit/test_logger.py:194`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: subprocess import created no handlers/directories.
 
-#### Step `P01-S0036` [ ] `FR-UTL-033` - Respect the shared LOG_LEVEL setting without redefining domain observability policy.
+#### Step `P01-S0036` [X] `FR-UTL-033` - Respect the shared LOG_LEVEL setting without redefining domain observability policy.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `36` of `675`.
@@ -970,9 +968,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: settings-driven level application at `app/utils/logging/logger.py:688`. Test: `LOG_LEVEL` behavior at `tests/utils/unit/test_logger.py:220`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: explicit in-memory settings only; no domain policy added.
 
-#### Step `P01-S0037` [ ] `FR-UTL-039` - Expose an import-safe global bound logger with standard levels, exception traceback capture, immutable context binding, and automatic approved-default activa...
+#### Step `P01-S0037` [X] `FR-UTL-039` - Expose an import-safe global bound logger with standard levels, exception traceback capture, immutable context binding, and automatic approved-default activa...
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `37` of `675`.
@@ -994,9 +992,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: immutable-context `BoundLogger` and global logger at `app/utils/logging/logger.py:348`. Test: lazy activation/import inertness/context at `tests/utils/unit/test_logger.py:46`, `tests/utils/unit/test_logger.py:194`, and `tests/utils/unit/test_logger.py:225`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: default activation exercised under isolated tests and shut down.
 
-#### Step `P01-S0038` [ ] `FR-UTL-040` - Route access-context records to access.log, exact DEBUG records to debug.log, and ERROR-or-higher records to errors.log.
+#### Step `P01-S0038` [X] `FR-UTL-040` - Route access-context records to access.log, exact DEBUG records to debug.log, and ERROR-or-higher records to errors.log.
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `38` of `675`.
@@ -1018,9 +1016,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: specialized file-handler routing at `app/utils/logging/logger.py:599`. Test: access/debug/error routing at `tests/utils/unit/test_logger.py:247`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: writes confined to pytest temporary directories; no external sink.
 
-#### Step `P01-S0039` [ ] `FR-UTL-041` - Provide the approved lazy default profile: human-readable DEBUG stdout with ANSI color limited to level and message content, data/logs, 10 MB ZIP rotation, t...
+#### Step `P01-S0039` [X] `FR-UTL-041` - Provide the approved lazy default profile: human-readable DEBUG stdout with ANSI color limited to level and message content, data/logs, 10 MB ZIP rotation, t...
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `39` of `675`.
@@ -1042,9 +1040,9 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: approved defaults at `app/utils/settings/models.py:63`, flush/shutdown at `app/utils/logging/logger.py:665`, and configuration at `app/utils/logging/logger.py:688`. Test: flush at `tests/utils/unit/test_logger.py:288` and ZIP rollover/shutdown at `tests/utils/unit/test_logger.py:301`. Commands/results: targeted gate -> 76 passed, 87.39% coverage; Ruff/MyPy passed. Runtime evidence: bounded temp files/queue lifecycle only.
 
-#### Step `P01-S0040` [ ] `WF-UTL-001` - Structured Logging and Redaction
+#### Step `P01-S0040` [X] `WF-UTL-001` - Structured Logging and Redaction
 
 - **Execution domain:** `Utils`.
 - **Execution position:** `40` of `675`.
@@ -1066,7 +1064,7 @@ Implement `Utils` in authoritative order: all component and functional work firs
   3. Add or update the source-named unit and usage tests. Add integration and negative-path coverage when the item crosses a domain or performs I/O.
   4. Run the narrow test files first, then the phase quality gates. Do not mark complete on mocked proof when the requirement demands an actual provider or persisted-state boundary.
 - **Acceptance evidence required:** implementation `path:line`; targeted test `path:line`; passing command/result; contract or runtime artifact when specified.
-- **Evidence:** Pending. Replace this line only at completion with concrete `path:line` evidence.
+- **Evidence:** Implementation: domain record -> `BoundLogger` -> `RedactingFilter` -> structured sink at `app/utils/logging/logger.py:348`, `app/utils/logging/logger.py:82`, and `app/utils/logging/logger.py:688`. Tests: end-to-end redacted structured sink at `tests/utils/integration/test_structured_logging.py:7`; semantic documentation audit at `tests/utils/unit/test_docstrings.py:167`. Commands/results: final targeted gate -> 77 passed, 87.39% coverage; Ruff, Google docstyle, formatting, and MyPy passed. Runtime evidence: isolated local temp sink only; no network, provider, broker, or live side effect.
 
 ### Stage 3 - Brokers
 
@@ -15817,10 +15815,4 @@ This manifest is a coverage index only. It must not be used to choose the next i
 - **Simulation (30):** `CAP-SIM-001`, `CAP-SIM-004`, `FR-SIM-001`, `FR-SIM-002`, `FR-SIM-003`, `FR-SIM-005`, `FR-SIM-006`, `FR-SIM-010`, `FR-SIM-014`, `FR-SIM-016`, `FR-SIM-018`, `FR-SIM-019`, `FR-SIM-020`, `FR-SIM-021`, `FR-SIM-022`, `FR-SIM-023`, `FR-SIM-024`, `FR-SIM-025`, `FR-SIM-026`, `FR-SIM-027`, `FR-SIM-028`, `FR-SIM-029`, `FR-SIM-030`, `FR-SIM-031`, `P-SIM-001`, `P-SIM-005`, `P-SIM-006`, `P-SIM-007`, `WF-SIM-001`, `WF-SIM-002`
 - **Analytics (43):** `FR-ANLT-001`, `FR-ANLT-002`, `FR-ANLT-003`, `FR-ANLT-004`, `FR-ANLT-005`, `FR-ANLT-006`, `FR-ANLT-007`, `FR-ANLT-008`, `FR-ANLT-009`, `FR-ANLT-010`, `FR-ANLT-011`, `FR-ANLT-012`, `FR-ANLT-013`, `FR-ANLT-014`, `FR-ANLT-016`, `FR-ANLT-017`, `FR-ANLT-018`, `FR-ANLT-020`, `FR-ANLT-021`, `FR-ANLT-022`, `FR-ANLT-023`, `FR-ANLT-025`, `FR-ANLT-027`, `FR-ANLT-028`, `FR-ANLT-033`, `FR-ANLT-034`, `FR-ANLT-036`, `FR-ANLT-038`, `FR-ANLT-039`, `FR-ANLT-040`, `FR-ANLT-041`, `FR-ANLT-042`, `FR-ANLT-043`, `FR-ANLT-044`, `FR-ANLT-045`, `FR-ANLT-046`, `P-ANLT-001`, `P-ANLT-002`, `P-ANLT-004`, `P-ANLT-006`, `WF-ANLT-001`, `WF-ANLT-005`, `WF-ANLT-006`
 - **Optimization (46):** `FR-OPT-001`, `FR-OPT-002`, `FR-OPT-003`, `FR-OPT-004`, `FR-OPT-005`, `FR-OPT-006`, `FR-OPT-007`, `FR-OPT-010`, `FR-OPT-011`, `FR-OPT-012`, `FR-OPT-013`, `FR-OPT-015`, `FR-OPT-016`, `FR-OPT-017`, `FR-OPT-018`, `FR-OPT-019`, `FR-OPT-020`, `FR-OPT-021`, `FR-OPT-022`, `FR-OPT-023`, `FR-OPT-024`, `FR-OPT-025`, `FR-OPT-026`, `FR-OPT-027`, `FR-OPT-028`, `FR-OPT-032`, `FR-OPT-033`, `FR-OPT-038`, `FR-OPT-039`, `FR-OPT-040`, `FR-OPT-042`, `FR-OPT-043`, `FR-OPT-044`, `FR-OPT-045`, `FR-OPT-046`, `FR-OPT-047`, `FR-OPT-048`, `FR-OPT-049`, `FR-OPT-053`, `P-OPT-001`, `P-OPT-003`, `P-OPT-004`, `P-OPT-007`, `P-OPT-009`, `WF-OPT-001`, `WF-OPT-002`
-- **Research (58):** `FR-RES-001`, `FR-RES-002`, `FR-RES-003`, `FR-RES-004`, `FR-RES-005`, `FR-RES-006`, `FR-RES-007`, `FR-RES-008`, `FR-RES-009`, `FR-RES-010`, `FR-RES-011`, `FR-RES-012`, `FR-RES-013`, `FR-RES-014`, `FR-RES-015`, `FR-RES-016`, `FR-RES-017`, `FR-RES-018`, `FR-RES-019`, `FR-RES-020`, `FR-RES-021`, `FR-RES-022`, `FR-RES-023`, `FR-RES-024`, `FR-RES-025`, `FR-RES-026`, `FR-RES-027`, `FR-RES-028`, `FR-RES-029`, `FR-RES-030`, `FR-RES-031`, `FR-RES-042`, `FR-RES-043`, `FR-RES-044`, `FR-RES-045`, `FR-RES-046`, `FR-RES-047`, `FR-RES-048`, `FR-RES-049`, `FR-RES-050`, `FR-RES-069`, `FR-RES-075`, `FR-RES-077`, `FR-RES-081`, `FR-RES-089`, `FR-RES-090`, `FR-RES-091`, `FR-RES-092`, `FR-RES-093`, `FR-RES-094`, `FR-RES-095`, `FR-RES-096`, `P-RES-001`, `P-RES-002`, `P-RES-005`, `P-RES-011`, `WF-RES-001`, `WF-RES-002`
-- **Portfolio (28):** `FR-PORT-001`, `FR-PORT-002`, `FR-PORT-003`, `FR-PORT-004`, `FR-PORT-005`, `FR-PORT-006`, `FR-PORT-009`, `FR-PORT-010`, `FR-PORT-011`, `FR-PORT-012`, `FR-PORT-013`, `FR-PORT-014`, `FR-PORT-015`, `FR-PORT-018`, `FR-PORT-019`, `FR-PORT-020`, `FR-PORT-024`, `FR-PORT-025`, `FR-PORT-029`, `FR-PORT-030`, `FR-PORT-034`, `FR-PORT-035`, `FR-PORT-036`, `FR-PORT-037`, `P-PORT-001`, `P-PORT-003`, `P-PORT-008`, `WF-PORT-002`
-- **UI/API (74):** `CAP-UI-001`, `CAP-UI-002`, `CAP-UI-003`, `CAP-UI-007`, `CAP-UI-013`, `CAP-UI-014`, `CAP-UI-024`, `FR-API-001`, `FR-API-002`, `FR-API-003`, `FR-API-004`, `FR-API-005`, `FR-API-006`, `FR-API-007`, `FR-API-008`, `FR-API-013`, `FR-API-014`, `FR-API-015`, `FR-API-017`, `FR-API-018`, `FR-API-019`, `FR-API-020`, `FR-API-021`, `FR-API-022`, `FR-API-023`, `FR-API-024`, `FR-API-025`, `FR-API-026`, `FR-API-028`, `FR-API-029`, `FR-API-030`, `FR-API-031`, `FR-API-032`, `FR-API-034`, `FR-API-035`, `FR-API-036`, `FR-API-037`, `FR-API-038`, `FR-API-039`, `FR-API-040`, `FR-API-041`, `FR-API-042`, `FR-API-043`, `FR-API-044`, `FR-API-045`, `FR-API-046`, `FR-API-047`, `FR-API-048`, `FR-API-049`, `FR-API-050`, `FR-API-051`, `FR-API-053`, `FR-API-054`, `FR-API-055`, `FR-API-056`, `FR-API-057`, `FR-API-058`, `P-API-001`, `P-API-002`, `P-API-003`, `P-API-004`, `P-API-006`, `P-API-007`, `P-API-008`, `P-API-009`, `P-API-010`, `P-API-011`, `WF-API-001`, `WF-API-002`, `WF-API-004`, `WF-API-006`, `WF-API-012`, `WF-API-013`, `WF-API-015`
-
-## 12. Rollback boundary
-
-Rollback is phase-scoped and evidence-driven. Revert only files introduced or changed by the failing work package; do not erase unrelated owner work or use destructive Git commands. Broker-side demo actions must be reconciled and safely closed through the governed Trading/Brokers path before local rollback. Persisted schema rollback follows the owning domain migration contract. If safe rollback cannot be proven, stop the phase and record the exact blocked state.
+- **Research (58):** `FR-RES-001`, `FR-RES-002`, `FR-RES-003`, `FR-RES-004`, `FR-RES-005`, `FR-RES-006`, `FR-RES-007`, `FR-RES-008`, `FR-RES-009`, `FR-RES-010`, `FR-RES-011`, `FR-RES-012`, `FR-RES-013`, `FR-RES-014`, `FR-RES-015`, `FR-RES-016`, `FR-RES-017`, `FR-RES-018`, `FR-RES-019`, `FR-RES-020`, `FR-RES-021`, `FR-RES-022

@@ -45,7 +45,7 @@ Phase 1 includes both the deterministic simulation/backtest loop and actual MT5 
 | `FR-UTL-015` | Utils | Reject unsupported, cyclic, non-finite, or unsafe values deterministically. | T0 Skeleton | S | `P-SYS-001` | 1 | `app/utils/README.md` |
 | `FR-UTL-021` | Utils | Reject policies that allow protected credential fields. | T0 Skeleton | S | `P-SYS-001` | 1 | `app/utils/README.md` |
 | `FR-UTL-022` | Utils | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile. | T0 Skeleton | S | `P-SYS-001` | 1 | `app/utils/README.md` |
-| `FR-UTL-025` | Utils | \| Missing \| WF-UTL-002 \| Cross-domain \| Shared settings bootstrap \| Explicit mapping and environment \| Immutable validated RuntimeSettings \| FR-UTL-022 throu... | T0 Skeleton | S | `P-SYS-001` | 1 | `app/utils/README.md` |
+| `FR-UTL-025` | Utils | Reserved / unused numbering gap — defines no behavior (excluded from ranges) | T0 Skeleton | S | `P-SYS-001` | 1 | `app/utils/README.md` |
 | `FR-UTL-026` | Utils | Return stable child loggers without configuring handlers. | T0 Skeleton | S | `P-SYS-001` | 1 | `app/utils/README.md` |
 | `FR-UTL-027` | Utils | Atomically install deduplicated console and optional bounded rotating-file handlers from the approved default before the first runtime bound-log emission; ex... | T0 Skeleton | S | `P-SYS-001` | 1 | `app/utils/README.md` |
 | `FR-UTL-028` | Utils | Redact messages and structured context before formatting. | T0 Skeleton | S | `P-SYS-001` | 1 | `app/utils/README.md` |

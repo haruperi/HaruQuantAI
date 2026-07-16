@@ -35,6 +35,9 @@ line-length = 88
 src = ["app", "tests"]
 
 [tool.ruff.lint]
+preview = true
+explicit-preview-rules = true
+
 # 1. ENABLING ALL REQUESTED RULE GROUPS
 select = [
     "F",     # Pyflakes – detects syntax errors and basic mistakes
@@ -93,6 +96,13 @@ select = [
     "FURB",  # Refurb – rules for code refurbishment
     "RUF",   # Ruff-specific rules – additional Ruff checks
     "ANN",   # Flake8-annotations - enforces type annotations
+    "D420",   # Pydocstyle - enforce Google Args/Returns/Raises section order
+    "DOC102", # Pydoclint - reject parameters absent from the signature
+    "DOC201", # Pydoclint - require Returns for returned values
+    "DOC202", # Pydoclint - reject Returns when no value is returned
+    "DOC402", # Pydoclint - require Yields for generators
+    "DOC403", # Pydoclint - reject Yields for non-generators
+    "DOC501", # Pydoclint - document explicitly raised exceptions
 ]
 
 # 2. CAREFULLY FILTERED IGNORE LIST (D1 and E501 removed from here so they run!)
@@ -124,10 +134,10 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 # Rules to ignore only within test environments
-"test_*.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "ARG001", "PLC0415", "EM102", "ANN"]
-"*_test.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "ARG001", "PLC0415", "EM102", "ANN"]
-"conftest.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "ARG001", "PLC0415", "EM102", "ANN"]
-"tests/*/usage/**/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "ARG001", "PLC0415", "EM102", "ANN", "INP001"]
+"test_*.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
+"*_test.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
+"conftest.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
+"tests/*/usage/**/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001"]
 "app/utils/logging/__init__.py" = ["A005"]
 "app/utils/time/__init__.py" = ["A005"]
 "scripts/*.py" = ["INP001", "D100", "D103", "ANN", "S603", "S607", "T201"]
@@ -139,6 +149,10 @@ max-complexity = 10
 [tool.ruff.lint.pydocstyle]
 # Standard docstring styling format
 convention = "google"
+
+[tool.ruff.lint.pydoclint]
+# Never exempt a docstring merely because it fits on one physical line.
+ignore-one-line-docstrings = false
 
 [tool.ruff.format]
 quote-style = "double"
