@@ -48,7 +48,7 @@
 ## 6. Documentation & Commands
 
 - **Update Rules**: Architecture/API/models → `docs/ARCHITECTURE.md`. Sprint state and completed changes → `docs/CHANGELOG.md`. Builder workflow → `AGENTS.md`.
-- **Decision Hygiene**: Decision sections contain unresolved choices only. When an owner resolves a choice, write the outcome as an ordinary requirement, contract, workflow, configuration rule, boundary, or explicit exclusion in the authoritative specification, then delete the decision row and any resolved issue entry. Do not retain resolved, superseded, retired, or deferred-from-initial-scope rows as decision history; use the changelog to record the documentation change.
+- **Decision Hygiene**: `Open Decisions` sections in `docs/PROJECT.md` and domain/module READMEs contain unresolved owner choices only. When an owner resolves a choice, write the outcome as an ordinary requirement, contract, workflow, configuration rule, boundary, or explicit exclusion in the authoritative specification, then delete the decision row and any resolved issue entry. Record the resolution under `Decisions` in `docs/CHANGELOG.md`. Do not retain resolved, superseded, retired, or deferred-from-initial-scope rows as decision history, and do not create ADR, or other standalone decision-record documents.
 - **Update Module/Service Documentation**: Add/update a `README.md` for each module/service as it's built.
 - **Checklist Evidence**: Every completed implementation-plan checklist item must end with the supporting code file path and line number.
 - **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `uv run pytest <test_file_path>`, `uv run ruff check .`, `uv run mypy .`

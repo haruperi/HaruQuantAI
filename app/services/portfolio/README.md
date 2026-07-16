@@ -56,7 +56,11 @@ Portfolio owns the deterministic construction, versioning, activation, drift ass
 | Submitted | `PortfolioBacktestRequestV1` | Simulation | Ask Simulation to validate a candidate |
 | Submitted | `PortfolioRebalanceExecutionRequest v1` | Trading | Ask Trading to execute an authorized plan |
 
-Receiver-owned requests are imported from their receiving domains. Portfolio never redefines them.
+Receiver-owned requests are imported from their receiving domains. Portfolio never
+redefines them. `AllocationReviewRequest v1` and `PortfolioBacktestRequestV1` are
+self-contained receiver projections built from Portfolio facts: scalar values,
+ordered components, identifiers, versions, references, and hashes only. Neither
+request embeds a Portfolio-owned contract or causes Risk/Simulation to import one.
 
 ### Persisted state
 
@@ -166,7 +170,7 @@ flowchart TD
 | Missing | `WF-PORT-003` | Cross-domain | `SYS-WF-007` | Coordinate simulation and Risk review | Complete construction result | Current Simulation result and Risk decision | `FR-PORT-025 → FR-PORT-029` |
 | Missing | `WF-PORT-004` | Cross-domain | `SYS-WF-007` | Activate allocation version | All gates current | `ActivePortfolioAllocation` | `FR-PORT-015 → FR-PORT-019` |
 | Missing | `WF-PORT-005` | Cross-domain | `SYS-WF-008` | Detect drift and plan rebalance | Schedule or threshold | `PortfolioRebalancePlan` | `FR-PORT-020 → FR-PORT-024` |
-| Missing | `WF-PORT-006` | Cross-domain | `SYS-WF-008` | Submit authorized rebalance | Current Risk approval | Trading-owned execution request | `FR-PORT-025 → FR-PORT-029` |
+| Missing | `WF-PORT-006` | Cross-domain | `SYS-WF-008` | Submit and measure authorized rebalance | Current Risk approval | Trading execution truth followed by Analytics evidence, or explicit executed-but-unmeasured state | `FR-PORT-025 → FR-PORT-030` |
 | Missing | `WF-PORT-007` | Internal | `SYS-WF-007` | Roll back allocation | Authorized rollback request | New governed allocation version | `FR-PORT-018 → FR-PORT-019` |
 
 ### Status values
@@ -174,8 +178,8 @@ flowchart TD
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified |
-| **Missing** | Partly implemented or tests are incomplete |
-| **Missing** | Implemented, tested, and verified |
+| **Partial** | Partly implemented or tests are incomplete |
+| **Completed** | Implemented, tested, and verified |
 
 ### Workflow scope values
 
@@ -213,6 +217,11 @@ Simulation activation is automatic within simulation policy. Paper/live activati
 4. Mark existing over-budget exposure reduce-only.
 5. Never open a position solely to make actual holdings match target weights.
 6. Submit the immutable plan to Risk; only an approved plan may be adapted into Trading's request.
+7. After Trading reconciliation, submit immutable `TradeRecord v1` /
+   `ExecutionReceipt v1` facts to Analytics for `PortfolioAllocationEvidence v1` or
+   `PerformanceReport v1` measurement.
+8. If measurement fails, preserve execution truth as `executed-but-unmeasured` and
+   retry deterministically from the same immutable execution/FX/version inputs.
 
 #### End-to-end workflow diagram
 
@@ -239,6 +248,9 @@ sequenceDiagram
     P-->>UI: ActivePortfolioAllocation
     P->>R: Rebalance review when drift requires
     P->>T: PortfolioRebalanceExecutionRequest after approval
+    T-->>P: TradeRecord / ExecutionReceipt
+    P->>D: Immutable execution facts for Analytics measurement
+    D-->>P: PortfolioAllocationEvidence / PerformanceReport or executed-but-unmeasured blocker
 ```
 
 ## 4. Module and Requirement Specifications
@@ -403,6 +415,7 @@ No defaults. Schema versions and IDs are constants; every numeric bound/toleranc
 | FR-PORT-027 | Propagate request/correlation/causation IDs end to end. | Trace tests |
 | FR-PORT-028 | Emit redacted audit events for requests, decisions, activation, rollback, and submission. | Audit tests |
 | FR-PORT-029 | Never retry a potentially accepted mutation without receiver-provided idempotency semantics. | Failure tests |
+| FR-PORT-030 | After reconciled execution, request Analytics measurement from immutable Trading facts; preserve executed-but-unmeasured truth on Analytics failure and support deterministic recomputation without rewriting execution. | `SYS-WF-008` integration tests |
 
 ### 4.8 `api.py` — Public Portfolio API
 

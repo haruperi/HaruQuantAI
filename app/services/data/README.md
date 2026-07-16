@@ -46,9 +46,9 @@ execution decision.
 - Strategy evaluation, indicators, risk policy, position sizing, order formulation,
   broker dispatch decisions, reconciliation authority, or simulated fills/state.
 - Broker/provider connections, adapters, sessions, or credentials: Brokers owns
-  connection/session lifecycle and adapters; secrets are resolved by the Utils
-  settings layer and injected via `BrokerConnectionConfig` at the composition root
-  boundary. Data never invokes `BrokerAdapter` mutation operations.
+  connection/session lifecycle and adapters; UI/API composition resolves credential
+  references and injects `BrokerConnectionConfig`. Data never resolves credentials
+  or invokes `BrokerAdapter` mutation operations.
 - Another domain's tables, artifact schemas, or migration definitions.
 - Public streaming subscriptions, automatic feed-gap backfill, historical calendar
   reconstruction, TSDB selection, or unapproved external-source promotion.
@@ -114,6 +114,10 @@ caller supplies `AuthContext` separately; unauthorized or unbounded queries fail
 | `BrokerAdapter` (read traits) | `v1` | Brokers | Read-only market data, account state, and calculation reads via `MarketDataProvider`, `AccountProvider`, and `CalculationProvider`; Data never invokes mutation operations. |
 | `BrokerResult` / `BrokerError` | `v1` | Brokers | Canonical result envelope and error taxonomy for every provider read consumed by Data. |
 | `BrokerConnectionEvent` / subscription event DTOs | `v1` | Brokers | Bounded connection lifecycle and provider-event channels feeding Data's internal feed handling. |
+
+Data is both the durable `AuditEvent` persistence owner and a required producer for
+its own governed source, storage, promotion, and audit-query actions. It never
+relabels another domain's payload meaning.
 
 ### Persisted state
 
@@ -342,8 +346,8 @@ an explicit exclusion.
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified |
-| **Missing** | Useful V1 behavior exists but final contracts, placement, or tests differ |
-| **Missing** | Implemented in the final structure, tested, and verified |
+| **Partial** | Useful V1 behavior exists but final contracts, placement, or tests differ |
+| **Completed** | Implemented in the final structure, tested, and verified |
 
 ### Workflow scope values
 
@@ -481,7 +485,7 @@ movement or an explicit no-change result.
 ### `WF-DATA-008` — Internal Real-Time Feed and Status
 
 **Scope:** `Cross-domain`
-**System workflow:** `SYS-WF-002`
+**System workflows:** `SYS-WF-002`, `SYS-WF-006` (registration/account evidence).
 **Input boundary:** A configured staging/production source emits provider events to
 the internal runtime; no public subscription API exists.
 **Output boundary:** Consumers receive normalized internal events and operators receive
@@ -545,7 +549,7 @@ through Brokers' `BrokerAdapter` mutation operations.
 ### `WF-DATA-014` — Risk Market-Context Evidence
 
 **Scope:** `Cross-domain`
-**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**System workflows:** `SYS-WF-001`, `SYS-WF-002`, `SYS-WF-006` (market-context evidence).
 **Input boundary:** Risk requests current session, calendar, spread, liquidity,
 volatility, correlation, and crisis evidence for a declared symbol/account scope.
 **Output boundary:** `MarketContextEvidence v1` or a structured missing/stale error.
@@ -1156,7 +1160,7 @@ feature-specific examples exercise the owning operations behind every facade cal
 | Missing | `NFR-DATA-002` | Determinism | Given identical inputs, versions, source revision, and seed, normalization, quality, transforms, synthetic generation, cache identity, and historical processing shall be reproducible. | Replay/golden tests |
 | Missing | `NFR-DATA-003` | Time safety | All official/cross-domain timestamps shall be UTC and every aligned value shall expose `available_at`; lookahead or ambiguous timezone evidence fails atomically. | Boundary and no-lookahead tests |
 | Missing | `NFR-DATA-004` | Reliability | Missing safety/context/source/license/precision/account evidence shall fail closed; no partial dataset, chunk, migration, or audit write is published as successful. | Fault-injection tests |
-| Missing | `NFR-DATA-005` | Security | Sensitive values handled by Data shall be redacted before logs, errors, events, metrics, manifests, or responses; broker credentials are resolved by the Utils settings layer, never by Data. | Secret/redaction tests |
+| Missing | `NFR-DATA-005` | Security | Sensitive values handled by Data shall be redacted before logs, errors, events, metrics, manifests, or responses; credential references are resolved by UI/API composition, never by Data. | Secret/redaction tests |
 | Missing | `NFR-DATA-006` | Broker safety | All Data broker/provider access shall be read-only through Brokers' `BrokerAdapter` read traits; Data shall never invoke a mutation operation or place a trade. | Capability/dependency audit |
 | Missing | `NFR-DATA-007` | Persistence | SQLite operations shall be transactional, bounded, idempotent where required, use one lock/migration framework, and never expose connections to another domain. | Concurrency/recovery tests |
 | Missing | `NFR-DATA-008` | Observability | Every governed operation shall propagate request/correlation IDs and emit bounded redacted source/cache/storage/job/feed evidence; failures are never swallowed. | Event/trace inspection |
@@ -1293,8 +1297,9 @@ run the complete Data set at the feature/slice completion gate.
 - [ ] Ruff, format check, strict mypy, targeted/full Data tests, and ≥80% coverage pass.
 - [ ] Source promotion and production evidence are approved for every enabled source.
 
-Current implementation status: `Missing`. The final package, contracts, workflows,
-and domain-scoped validation evidence satisfy this specification.
+Current authoritative implementation status remains `Missing` until the final
+package, contracts, workflows, and domain-scoped validation evidence satisfy this
+specification. Existing code is migration evidence only and does not promote status.
 
 ---
 
@@ -1312,7 +1317,7 @@ For every future change:
 7. Implement the smallest approved code change.
 8. Add or update the usage example and targeted tests.
 9. Run targeted validation, then the Data completion gate for the finished slice.
-10. Change Status to Missing only after implementation and verification exist.
+10. Change Status to `Completed` only after implementation and verification exist.
 ```
 
 Architecture/API/model changes also update `docs/ARCHITECTURE.md`; sprint state and

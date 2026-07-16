@@ -74,6 +74,8 @@ Contract definitions must match the name, version, and owner recorded in `docs/P
 ### Persisted state
 
 Indicators persists no tables, artifacts, cache entries, registry mutations, or incremental state. All public calculations have side effect `None`.
+Indicators is not an `AuditEvent` producer: its API is pure and deterministic, so
+the governed caller audits any surrounding action.
 
 ### Four-level structure
 
@@ -203,8 +205,8 @@ No experimental, optional, or future callable is exported in the initial package
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified against the final contract. |
-| **Missing** | Useful V1 behavior exists, but final contracts, relocation, or tests remain incomplete. |
-| **Missing** | Implemented, tested, and verified against this README. |
+| **Partial** | Useful V1 behavior exists, but final contracts, relocation, or tests remain incomplete. |
+| **Completed** | Implemented, tested, and verified against this README. |
 
 ### Workflow register
 
@@ -669,7 +671,7 @@ Shared settings are defined once in the Core Configuration and Limits Manifest. 
 
 ## 6. Open Decisions
 
-No open decisions. WMA, Bollinger Bands, MACD, volume and candlestick indicators, HMA, custom registration, incremental or streaming calculation, caching, chunking, out-of-core processing, acceleration, composition, audit telemetry, canary/SLO controls, proprietary indicators, and rich notebook rendering are explicitly outside the initial scope.
+No open decisions.
 
 ---
 

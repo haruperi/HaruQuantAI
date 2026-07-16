@@ -95,6 +95,8 @@ sections. Compatibility is evaluated only from `contract_version`.
 
 None. Analytics is read-only in the initial build and does not persist reports,
 catalogs, caches, or intermediate results, as required by `docs/PROJECT.md`.
+Analytics is not an `AuditEvent` producer: it is pure/read-only, so the governed
+caller audits the action and persists any durable audit evidence through Data.
 
 ### Four-level structure
 
@@ -243,8 +245,8 @@ reports, so the graph is acyclic.
 | Status | Meaning |
 |---|---|
 | **Missing** | Final behavior is absent, contradicted, or unverified. |
-| **Missing** | Useful behavior exists, but final contracts, relocation, validation, or tests remain. |
-| **Missing** | Final behavior, structure, runtime use, and tests are verified. |
+| **Partial** | Useful behavior exists, but final contracts, relocation, validation, or tests remain. |
+| **Completed** | Final behavior, structure, runtime use, and tests are verified. |
 
 ### Workflow registry
 
@@ -418,6 +420,8 @@ metrics, and caveats. Fixed zero differences are prohibited.
 #### `WF-ANLT-013` — Build Portfolio Allocation Evidence
 
 **System workflows:** `SYS-WF-007`, `SYS-WF-008`.
+For the final `SYS-WF-008` leg, Analytics receives immutable reconciled
+`TradeRecord v1` / `ExecutionReceipt v1` facts and never edits execution truth.
 Analytics validates exact component/source schemas, measurement window, base
 currency, fresh Data-owned `FXConversionEvidence`, and finite numeric results,
 then projects performance, dependence, concentration, and caveat evidence into
@@ -425,7 +429,9 @@ then projects performance, dependence, concentration, and caveat evidence into
 portfolio, set a risk budget, or infer missing values.
 
 **Failure behavior:** missing/incompatible sources or FX evidence returns a
-structured blocker and no partial cross-domain evidence.
+structured blocker and no partial cross-domain evidence. After execution this is
+recorded as `executed-but-unmeasured`; it never rolls back or rewrites execution.
+The same immutable execution/FX/version inputs support deterministic recomputation.
 
 **Integration test:**
 `tests/analytics/integration/test_portfolio_allocation_evidence.py::test_evidence_is_non_binding_and_fx_provenanced()`
@@ -886,7 +892,7 @@ new approved requirement before implementation.
 
 ## 6. Open Decisions
 
-No open decisions. Scorecard language and thresholds are outside the initial Analytics scope because promotion policy is not owned by Analytics.
+No open decisions.
 
 ---
 

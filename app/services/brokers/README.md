@@ -20,7 +20,7 @@
 | cTrader | Missing; connection verified | Full transport/mapping/adapter unit tests, a concurrent-correlation integration test, and a standalone usage script (`04_ctrader.py`) that validates real configured demo credentials at construction time and successfully connects (`connect()`) to the cTrader demo server | None outstanding at the file level. |
 | Binance | Missing; testnet verified | Full profile/transport/adapter/mapping unit tests, plus a standalone real usage script (`05_binance.py`) that connects to the real Binance testnet REST API (public market-data endpoints require no credentials) and reads real symbols/klines | No `BINANCE_*` credentials are configured in this environment, so authenticated/account/mutation capability remains unverified live. Futures remain registry-only by design. |
 | Dukascopy | Missing; network attempted but unreachable from this environment | Full instruments/transport/mapping/adapter unit tests, plus a standalone real usage script (`06_dukascopy.py`) that genuinely attempts a bounded HTTP fetch against `datafeed.dukascopy.com` | The real host times out from this environment's network (confirmed via a direct HTTPS probe, unlike Yahoo/Binance which are reachable); the script reports this real outcome rather than fabricating success. Live evidence remains outstanding pending a network path that can reach this host. |
-| Yahoo | Missing; connection verified | `DEC-BRK-001` resolved (explicit `probe_symbol` field); zero-duration bar defect fixed (closing timestamp derived from the parsed interval); full transport/mapping/adapter unit tests, plus a standalone real usage script (`07_yahoo.py`) that performs genuine `yfinance` calls (both connect paths, and real historical bars for `AAPL`) | None outstanding at the file level. |
+| Yahoo | Missing; connection verified | Explicit `probe_symbol` contract implemented; zero-duration bar defect fixed (closing timestamp derived from the parsed interval); full transport/mapping/adapter unit tests, plus a standalone real usage script (`07_yahoo.py`) that performs genuine `yfinance` calls (both connect paths, and real historical bars for `AAPL`) | None outstanding at the file level. |
 | Fake/testing utility | Missing | Complete protocol surface, error-injection tests, and a standalone usage script (`09_testing.py`) demonstrating `FakeBrokerAdapter` itself (the one legitimate use of a fake in this directory) | None outstanding at the file level. |
 | Package validation | Missing | 391 targeted `pytest` unit/integration/usage tests pass, plus 8 standalone real-behavior usage scripts run successfully outside pytest (real MT5 demo terminal, real cTrader demo connection, real Binance testnet, real Yahoo Finance calls, and an honest fail-closed Dukascopy network attempt); Ruff, `ruff format --check`, and strict `mypy app/services/brokers` all pass; branch coverage over `app/services/brokers` is 92.25% (≥ 80% gate) | Dukascopy live-response evidence remains outstanding until a network path can reach its host. `NFR-BRK-008` (structured observability logging) is implemented (central adapter sinks, runtime, registry, and every provider transport) and verified on Python 3.14 by the `tests/brokers/unit/test_observability.py` log-capture suite. |
 
@@ -28,7 +28,7 @@
 
 - **Registry release-gate defect (`registry/catalogue.py`):** the static capability catalogue marked every operation `UNAVAILABLE` unconditionally, including `connect`/`is_connected` — meaning no adapter created through `create_broker_adapter()` could ever connect or report its own connection state, regardless of implementation. Fixed by marking `connect`/`is_connected` `AVAILABLE` when implemented (the adapter's own verification act and a purely local state read); every other capability remains gated by credential-verified release evidence exactly as before.
 - **MT5 false-success defect (`mt5/adapter.py`):** `connect()` returned `status="success"` even when account/server verification failed via the boolean `verified` check (as opposed to a caught transport exception), because `self._last_error` was never set on that path and `_result()` derives `status` from `error` truthiness. Fixed by constructing a `BROKER_CONNECTION_FAILED` error before returning when verification fails without a caught exception.
-- **Yahoo zero-duration bar defect (`yahoo/mapping.py`):** every mapped bar set `closing_timestamp == opening_timestamp`, violating `BrokerBar`'s own `opening_timestamp < closing_timestamp` invariant and making every real Yahoo bar construction raise. Fixed by deriving the closing timestamp from the parsed provider interval (resolves `DEC-BRK-001`).
+- **Yahoo zero-duration bar defect (`yahoo/mapping.py`):** every mapped bar set `closing_timestamp == opening_timestamp`, violating `BrokerBar`'s own `opening_timestamp < closing_timestamp` invariant and making every real Yahoo bar construction raise. Fixed by deriving the closing timestamp from the parsed provider interval.
 
 MT5, Binance, Yahoo, and cTrader each have a verified real connection (MT5 against a real demo account; Binance against the real testnet; Yahoo against the real Yahoo Finance service; cTrader against Spotware's demo servers via the `ctrader/network.py` handshake). Dukascopy's real host is unreachable from this environment's network specifically (confirmed by direct probe — Yahoo and Binance are reachable from the same environment). The static catalogue keeps every operation other than `connect`/`is_connected` unavailable, and direct unavailable calls fail before importing or invoking the provider SDK.
 
@@ -93,6 +93,10 @@ concrete DTO/event schema ID). Consumers never parse `schema_id` for compatibili
 ### Persisted state
 
 None. Brokers owns no tables, artifacts, migration definitions, credential store, reusable data cache, order store, or durable connection state. Provider-required technical state is bounded, in-memory, adapter-instance scoped, and discarded at disconnect.
+
+Brokers emits bounded redacted technical structured logs only. It is not an
+`AuditEvent` producer; the Data or Trading caller produces business audit evidence
+for governed reads or mutations.
 
 ### Four-level structure
 
@@ -570,7 +574,7 @@ All DTOs are immutable. `datetime` values are timezone-aware UTC; monetary/price
 
 | Contract | Required fields |
 |---|---|
-| `BrokerConnectionConfig` | `broker_id: BrokerId`; `environment: BrokerEnvironment`; `provider_enabled: bool` derived by the composition root from the matching deployment flag; `account_reference: str | None`; `credentials: Mapping[str, pydantic.SecretStr] | None` (already resolved by Utils/composition root); `endpoint: str | None`; `connect_timeout_sec: float`; `request_timeout_sec: float`; `transport_reconnect_max_attempts: int`; `stream_buffer_size: int`; `circuit_failure_threshold: int`; `circuit_recovery_timeout_sec: float`; `circuit_half_open_max_calls: int`; `auto_connect: bool = False`; `probe_symbol: str | None = None` (`DEC-BRK-001`: explicit caller-supplied Yahoo connect-time probe symbol; never a hidden default) |
+| `BrokerConnectionConfig` | `broker_id: BrokerId`; `environment: BrokerEnvironment`; `provider_enabled: bool` derived by UI/API composition from the matching deployment flag; `account_reference: str | None`; `credentials: Mapping[str, pydantic.SecretStr] | None` (already resolved by UI/API composition); `endpoint: str | None`; `connect_timeout_sec: float`; `request_timeout_sec: float`; `transport_reconnect_max_attempts: int`; `stream_buffer_size: int`; `circuit_failure_threshold: int`; `circuit_recovery_timeout_sec: float`; `circuit_half_open_max_calls: int`; `auto_connect: bool = False`; `probe_symbol: str | None = None` (explicit caller-supplied Yahoo connect-time probe symbol; never a hidden default) |
 | `BrokerError` | `code: BrokerErrorCode`; `message: str`; `retryable: bool`; `provider_code: str | None`; `provider_message: str | None`; `capability: BrokerCapabilityId | None`; `details: Mapping[str, object]` (redacted) |
 | `BrokerResult[T]` | `status: Literal["success", "error"]`; `broker: BrokerId`; `operation: BrokerCapabilityId`; `request_id: str`; `timestamp: datetime`; `data: T | None`; `error: BrokerError | None`; `provider_metadata: Mapping[str, object]` (redacted/bounded); `latency_ms: float`; `provider_latency_ms: float | None`; `adapter_overhead_ms: float`; `environment: BrokerEnvironment`; `contract_version: str = "v1"`; `schema_id: str = "brokers.result.v1"`; `adapter_version: str`; `provider_api_version: str | None`. Success requires `status="success"` and `error is None`; `data` may be `None` for `BrokerResult[None]`. Error requires `status="error"`, `error is not None`, and `data is None`. |
 | `BrokerPage[T]` | `items: tuple[T, ...]`; `next_cursor: str | None`; `limit: int`; `returned_count: int`; `truncated: bool`; `provider_metadata: Mapping[str, object]` including page/timezone evidence when applicable |
@@ -1231,7 +1235,7 @@ explicit Yahoo symbol + bounded bar request
 |---|---|---|---|---|
 | Missing | `transport.py` | FR-BRK-130: perform bounded Yahoo historical-bar retrieval and verified provider probe without importing transitive pandas directly. | None | **Standard library:** `asyncio`<br>**Required third-party:** `yfinance>=1.4.1`<br>**Local:** `contracts → BrokerConnectionConfig, BrokerErrorCode`; `runtime → circuit breaker`; `app.utils → logging/redaction` |
 | Missing | `mapping.py` | FR-BRK-131: map the yfinance-returned table through its public row/index iteration surface to canonical DTOs without importing pandas or generating observations. | None | **Standard library:** `datetime, decimal, typing`<br>**Required third-party:** None<br>**Local:** `contracts → BrokerBar, BrokerPage` |
-| Missing | `adapter.py` | Implement approved historical bars, a genuine `connect()` verification (probe-symbol-gated per `DEC-BRK-001`), and deterministic unsupported defaults. | `YahooBrokerAdapter` | **Standard library:** `asyncio, collections.abc`<br>**Required third-party:** `yfinance>=1.4.1`<br>**Local:** `contracts → BrokerAdapter and DTOs`; private transport/mapping modules |
+| Missing | `adapter.py` | Implement approved historical bars, a genuine explicit-probe-symbol `connect()` verification, and deterministic unsupported defaults. | `YahooBrokerAdapter` | **Standard library:** `asyncio, collections.abc`<br>**Required third-party:** `yfinance>=1.4.1`<br>**Local:** `contracts → BrokerAdapter and DTOs`; private transport/mapping modules |
 | Missing | `__init__.py` | FR-BRK-132: expose the approved adapter type after implementation exists. | `YahooBrokerAdapter` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `adapter.py → YahooBrokerAdapter` |
 
 ### Configuration and Limits Manifest
@@ -1343,7 +1347,7 @@ These rows assign every remaining planned file an exact requirement. Private hel
 
 ### Shared Configuration and Limits Manifest
 
-These values apply across provider modules. Secrets are resolved by Utils at the composition root and injected; Brokers never reads environment variables, user tables, or a vault directly.
+These values apply across provider modules. UI/API composition resolves credential references and injects the final configuration; Brokers never reads environment variables, user tables, or a vault directly.
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
@@ -1357,7 +1361,7 @@ These values apply across provider modules. Secrets are resolved by Utils at the
 | Missing | `provider_enabled` | `bool` | None | Yes | `create_broker_adapter()` | Composition root derives it from the matching `*_ENABLED` deployment flag; false returns `BROKER_CONFIGURATION_INVALID` before provider import. |
 | Missing | `account_reference` | `str | None` | Provider-dependent | Authenticated adapters | Redacted/fingerprinted in logs; immutable for the adapter lifetime. |
 | Missing | `credentials` | `Mapping[str, SecretStr] | None` resolved before construction | None | Provider-dependent | `connect()` | In memory only; Brokers never accepts or resolves a secret reference. Missing required values return `BROKER_CONFIGURATION_INVALID` and never appear in logs/errors. Typed composition/test settings inherit `app.utils.AppSettings`; only that shared boundary loads `.env`, and callers assemble the final `BrokerConnectionConfig`. |
-| Missing | `probe_symbol` | `str | None` | `None` | No | `YahooBrokerAdapter.connect()` (`DEC-BRK-001`) | When set, an explicit caller-supplied symbol used for one genuine connect-time verification probe; when unset, `connect()` verifies transport/session only. Never a hidden default provider symbol. |
+| Missing | `probe_symbol` | `str | None` | `None` | No | `YahooBrokerAdapter.connect()` | When set, an explicit caller-supplied symbol used for one genuine connect-time verification probe; when unset, `connect()` verifies transport/session only. Never a hidden default provider symbol. |
 | Missing | `connect_timeout_sec` | positive `float` | No numeric default approved | Yes | `connect()`, `reconnect()` | Exceeded before session verification returns `BROKER_TIMEOUT`. |
 | Missing | `request_timeout_sec` | positive `float` | No numeric default approved | Yes | Provider operations | Read timeout returns `BROKER_TIMEOUT`; mutation possible-transmission timeout returns `BROKER_UNKNOWN_OUTCOME`. |
 | Missing | `transport_reconnect_max_attempts` | non-negative `int` | No numeric default approved | Yes | Transport recovery | Bounds connection recovery only; zero disables automatic reconnect; operations are never replayed. |
@@ -1393,8 +1397,6 @@ These values apply across provider modules. Secrets are resolved by Utils at the
 ## 6. Open Decisions
 
 No open decisions.
-
-`DEC-BRK-001` (Yahoo `connect()` probe symbol) is resolved: the owner selected an explicit, optional `probe_symbol: str | None = None` field on `BrokerConnectionConfig` (`contracts/models.py`). When set, `YahooBrokerAdapter.connect()` performs a genuine one-row history probe against that exact caller-supplied symbol; when unset, `connect()` verifies transport/session setup only and never assumes a hidden default provider symbol. See `yahoo/adapter.py::connect()` and `tests/brokers/unit/test_yahoo_adapter.py`.
 
 ---
 
@@ -1483,7 +1485,7 @@ During implementation, run only the targeted test file for the changed code befo
 - [x] Every FR maps to one exact usage example and at least one exact unit test.
 - [x] Removed, rejected, and excluded behavior is absent from the public surface.
 - [x] Every retained V1 behavior has a final destination or explicit removal condition.
-- [x] No open decision remains: `DEC-BRK-001` is resolved (explicit `probe_symbol` field); every remaining `Missing`/`Missing` requirement is an explicit implementation gap, not an unresolved choice, and affected availability remains fail-closed.
+- [x] No open decision remains; the explicit `probe_symbol` rule is an ordinary contract requirement and every remaining `Missing`/`Partial` item is an implementation gap, not an unresolved choice.
 - [x] No unnecessary service/manager/repository/factory layer beyond the approved technical registry was introduced.
 - [x] All targeted tests and quality checks pass. 391 tests pass (`uv run pytest tests/brokers`), plus 8 standalone real-behavior usage scripts run successfully outside pytest; `ruff check`, `ruff format --check`, and `mypy app/services/brokers` are clean.
 - [x] Package coverage is at least 80%. Branch coverage over `app/services/brokers` is 92.25% (measured from the `pytest` suite; the standalone usage scripts are not included in this measurement).

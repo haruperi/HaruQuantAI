@@ -15,7 +15,9 @@
 
 Simulation orchestrates deterministic historical backtests through the governed system path and owns the simulated execution environment for Trading's `sim` route. It replays approved FX order intents over historical market data, maintains simulated execution and account state, and produces immutable journals, reproducible `SimulationResult` records, artifact manifests, and execution reports. It must fail closed when required evidence, configuration, timing, persistence, or state cannot be verified.
 
-The current flat, bar-based implementation provides useful research behavior but does not match the approved final tick-based structure or contracts; the package is therefore `Partial`.
+The current flat, bar-based implementation provides useful migration evidence but
+does not match the approved final tick-based structure or contracts; authoritative
+package status therefore remains `Missing` until the target is implemented and verified.
 
 ### Owns
 
@@ -35,7 +37,7 @@ The current flat, bar-based implementation provides useful research behavior but
 - Indicator formulas or indicator availability rules; Indicators owns them.
 - Strategy code, strategy registration, signal logic, or arbitrary Python code execution; Strategy owns vetted strategy behavior.
 - Risk policy, final sizing approval, exposure limits, or kill-switch state; Risk owns them.
-- `OrderIntent`, route selection, live/paper execution, or reconciliation; Trading owns them. Broker connections/adapters; Brokers owns them. Broker secret resolution; the Utils settings layer owns it. All as defined in `docs/PROJECT.md`.
+- `OrderIntent`, route selection, live/paper execution, or reconciliation; Trading owns them. Broker connections/adapters; Brokers owns them. Credential-reference resolution and composition-root `BrokerConnectionConfig` construction; UI/API owns them. All as defined in `docs/PROJECT.md`.
 - Performance metric formulas, scorecards, or advisory conclusions; Analytics owns them.
 - Optimization search algorithms, ranking, walk-forward policy, Monte Carlo/bootstrap analysis, workers, or checkpoints; Optimization owns them.
 - Portfolio construction methods, allocation activation/versioning, drift detection, or rebalance planning; Portfolio owns them.
@@ -52,7 +54,7 @@ Contract definitions must match the name, version, and owner recorded in `docs/P
 |---|---|---|---|---|
 | Missing | `SimulationBacktestRequestV1` | `v1` | UI/API; Optimization submits via its internal backtest-adapter port | Receive the exact reference-based synchronous request defined in `docs/PROJECT.md` §5. Simulation supplies the production implementation of Optimization's internal `BacktestExecutionAdapter` port, which submits this contract and returns `SimulationResult v1`. |
 | Missing | `SimulationResult` | `v1` | Analytics, Optimization, UI/API | Publish a deterministic completed backtest outcome containing run/config/data/engine identities, simulated fills, journal and artifact references, accounting totals, diagnostics, and realism disclosures. Incomplete runs are never published. |
-| Missing | `PortfolioBacktestRequestV1` | `v1` | Portfolio submits; Simulation receives | Receive one reference-only deterministic backtest request for an immutable Portfolio construction result. |
+| Missing | `PortfolioBacktestRequestV1` | `v1` | Portfolio submits; Simulation receives | Receive one self-contained Simulation-owned projection of an immutable Portfolio candidate, with scalar values, ordered components, identifiers, versions, references, and hashes only. |
 | Missing | `PortfolioSimulationResult` | `v1` | Portfolio, Analytics, UI/API | Publish complete component and aggregate journals, risk-budget history, metrics/artifact references, and reproducibility identity. |
 
 **Consumed from other domains** — referenced only, never redefined:
@@ -61,7 +63,6 @@ Contract definitions must match the name, version, and owner recorded in `docs/P
 |---|---|---|---|
 | `MarketDataset` | `v1` | Data | Receive normalized historical bars or ticks, availability metadata, and provenance. |
 | `FXConversionEvidence` | `v1` | Data | Apply fresh direct/synthesized conversion evidence without choosing or synthesizing a rate path. |
-| `PortfolioConstructionResult` | `v1` | Portfolio | Bind a portfolio backtest to one immutable candidate and its complete lineage. |
 | `OrderIntent` | `v1` | Trading | Receive deterministic, idempotent, Risk-approved executable requests for the `sim` route. |
 | `AuthContext` | `v1` | Utils | Authenticate and trace governed `run_backtest` calls. |
 | `AuditEvent` common envelope | `v1` | Utils | Emit redacted governed-action evidence for durable storage through Data. |
@@ -234,8 +235,8 @@ flowchart LR
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified |
-| **Missing** | Partly implemented or tests are incomplete |
-| **Missing** | Implemented, tested, and verified |
+| **Partial** | Partly implemented or tests are incomplete |
+| **Completed** | Implemented, tested, and verified |
 
 ### Workflow scope values
 
@@ -420,9 +421,11 @@ distributed-lock capability exists in the Simulation architecture.
 
 **Scope:** Cross-domain
 **System workflow:** `SYS-WF-007`
-**Input boundary:** `PortfolioBacktestRequestV1` referencing one immutable
-`PortfolioConstructionResult`, exact Strategy/Data/FX/execution/Risk versions,
-bounded UTC range, explicit seed, and config hash.
+**Input boundary:** `PortfolioBacktestRequestV1` carries a self-contained
+Simulation-owned projection of one immutable candidate: scalar values, ordered
+components, identifiers, versions, references, hashes, exact Strategy/Data/FX/
+execution/Risk versions, bounded UTC range, explicit seed, and config hash. It
+never embeds or imports a Portfolio-owned contract type.
 **Output boundary:** `PortfolioSimulationResult v1`.
 
 Simulation executes every component through the ordinary deterministic simulation
@@ -855,7 +858,7 @@ Approved groups are: request/scope (`SIM_INVALID_CONFIG`, `SIM_INVALID_DATE_RANG
 
 No open decisions.
 
-### Explicit Exclusions
+## Explicit Exclusions
 
 The following are excluded from the initial implementation and must not appear as active files, exports, or completed requirements: asynchronous queues/workers/service scheduling; optimization algorithms and Monte Carlo/bootstrap analysis; Analytics formula catalogs; Data caches/vendor governance/full lineage; Risk policy/VaR/correlation/concentration; mandatory SQLite sidecars; tick batching; equities/ETFs/corporate actions/borrow fees; futures/perpetuals/options; regulatory engines; feature stores/alternative data; visual/debug/notebook artifacts; external report distribution; canaries/synthetic probes; and production-promotion automation.
 

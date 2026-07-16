@@ -16,7 +16,7 @@
 
 Utils provides business-neutral cross-domain primitives. It owns shared context
 and audit contracts, base errors, trace identifiers, UTC handling, canonical
-serialization, credential protection, runtime settings, and structured logging.
+serialization, shared payload redaction, runtime settings, and structured logging.
 It makes no trading or domain decision.
 
 ### Owns
@@ -26,24 +26,22 @@ It makes no trading or domain decision.
 - Request, workflow, correlation, causation, and event identifiers.
 - UTC clocks, timestamps, and freshness calculations.
 - Deterministic canonical JSON serialization.
-- Denylist-first secret redaction, password hashing, Fernet encryption, and
-  in-memory active-secret-version selection.
+- Denylist-first secret redaction for shared logs, errors, and contract payloads.
 - Immutable runtime settings and the sole repository `.env` loading boundary.
 - Import-safe structured logging with immutable bound context, a lazy approved
   default profile, and explicit override support for specialized routing.
-- Resolution of broker/provider secret references at the composition root; the
-  resulting `BrokerConnectionConfig v1` schema remains Brokers-owned.
 
 ### Does not own
 
 - Domain contracts, domain result types, business validation, or business limits.
 - Authentication, identity verification, permission enforcement, session state,
-  or credential persistence; UI/API owns these capabilities and produces
-  `AuthContext v1`. Utils only verifies hashes supplied to its pure helper.
+  password hashing, credential encryption/persistence, active-key selection, or
+  credential-reference resolution. UI/API owns these capabilities and produces
+  `AuthContext v1` plus composition-root `BrokerConnectionConfig v1` values.
 - DataFrame, OHLC, OHLCV, market-data quality, conversion, comparison, chunking,
   repair, resampling, persistence, or cache behavior; Data owns these capabilities.
-- Key generation, key storage, key rotation, secret persistence, or selecting a
-  secret by time or policy. Callers supply Fernet keys and explicit version state.
+- Encryption-key generation, storage, or rotation. UI/API consumes externally
+  provisioned keys but does not generate, store, or rotate them.
 - Safe-path abstractions; each filesystem-writing domain owns and validates its
   allowed roots and paths.
 - Metrics exporters, health providers, public registries,
@@ -56,7 +54,7 @@ It makes no trading or domain decision.
 | Status | Contract | Version | Producer | Consumers | Purpose |
 |---|---|---|---|---|---|
 | Missing | `AuthContext` | `v1` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio | Immutable authenticated principal and trace context. `principal_type` is exactly `USER` or `SERVICE_ACCOUNT`. |
-| Missing | `AuditEvent` | `v1` | Every emitting domain | Data (direct persistence consumer); Risk and UI/API query persisted events only through Data-owned query contracts | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning. |
+| Missing | `AuditEvent` | `v1` | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, UI/API | Data (direct persistence consumer); Risk and UI/API query persisted events only through Data-owned query contracts | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning. Brokers emits technical logs only; Indicators and Analytics remain pure/read-only and their governed callers audit actions. |
 
 `AuthContext v1` contains `contract_version`, `schema_id`, `principal_id`,
 `principal_type`, roles, permissions, scopes, tenant/environment, request ID,
@@ -70,8 +68,6 @@ ID, and a redacted JSON-safe payload. Emission or persistence failure is surface
 ### Capability-to-consumer evidence
 
 Shared business-neutral capabilities have at least two explicit domain consumers.
-Owner-approved credential-protection primitives are also retained for UI/API and
-composition-root use; Utils owns only their deterministic helper boundaries.
 
 | Retained capability | Named consuming domain READMEs |
 |---|---|
@@ -81,8 +77,6 @@ composition-root use; Utils owns only their deterministic helper boundaries.
 | UTC time | Brokers, Data, Strategy, Risk, Trading, Simulation, Research, Portfolio |
 | Canonical serialization | Strategy, Trading, Analytics, Optimization, Research |
 | Secret redaction | Brokers, Data, Strategy, Risk, Trading, Simulation, Analytics, Optimization, Research, Portfolio, UI/API |
-| Password hashing | UI/API |
-| Fernet encryption / active secret selection | UI/API, Brokers composition root |
 | Runtime settings | Data, Trading, Simulation, UI/API |
 | Error metadata and injected routing | Brokers, Risk, Trading, Simulation, Analytics, Research, Portfolio, UI/API |
 | Structured logging and specialized routing | Brokers, Risk, Trading, Data |
@@ -136,10 +130,7 @@ utils/
 |   `-- canonical.py
 |-- security/
 |   |-- __init__.py
-|   |-- redaction.py
-|   |-- hashing.py
-|   |-- encryption.py
-|   `-- secret_versions.py
+|   `-- redaction.py
 |-- settings/
 |   |-- __init__.py
 |   |-- models.py
@@ -332,10 +323,10 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Missing | `FR-UTL-014` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction. | `canonical_json` | None | `ValidationError`: non-serializable value | **Usage:** `tests/utils/usage/05_serialization.py::example_canonical_json()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_canonical_json_sorts_keys()` |
 | Missing | `FR-UTL-015` | Reject unsupported, cyclic, non-finite, or unsafe values deterministically. | Serialization validation used by `to_json_safe` and `canonical_json` | None | `ValidationError`: unsupported, cyclic, or non-finite value | **Usage:** `tests/utils/usage/05_serialization.py::example_reject_unsafe_value()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_serialization_rejects_cyclic_value()` |
 
-### 4.6 `security/` — Credential Protection
+### 4.6 `security/` — Shared Payload Redaction
 
-**Purpose:** Provide bounded redaction plus caller-keyed password hashing, Fernet
-encryption, and explicit in-memory active-secret selection without persistence.
+**Purpose:** Provide bounded, business-neutral redaction for shared logs, errors,
+and contract payloads without owning credential lifecycle behavior.
 
 **Module flow:** `redaction policy + text/mapping → denylist-first redaction → redacted value and diagnostics`
 
@@ -344,10 +335,7 @@ encryption, and explicit in-memory active-secret selection without persistence.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Missing | `redaction.py` | Define redaction policy/results and redact bounded text or JSON-safe mappings. | `RedactionPolicy`, `RedactionResult`, `is_sensitive_key`, `redact_text_value`, `redact_mapping_value` | **Standard library:** `collections.abc`, `dataclasses`, `math`, `re`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `SecurityError`, `ValidationError` |
-| Missing | `hashing.py` | Hash and verify passwords with versioned PBKDF2-HMAC-SHA256 encodings. | `hash_password`, `verify_password` | Entropy read when hashing | `SecurityError`: invalid password input | **Standard library:** `base64`, `hashlib`, `hmac`, `secrets`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` |
-| Missing | `encryption.py` | Generate Fernet keys and encrypt/decrypt caller-supplied text. | `generate_fernet_key`, `encrypt_text`, `decrypt_text` | Entropy read for key/encryption | `SecurityError`: invalid key, token, or text | **Required third-party:** `cryptography>=42.0.8`<br>**Local:** `errors/exceptions.py` |
-| Missing | `secret_versions.py` | Select exactly one explicitly active secret from immutable in-memory versions. | `SecretVersion`, `select_active_secret_version` | None | `SecurityError`: zero/multiple active versions or invalid version | **Required third-party:** `pydantic>=2.13.4`<br>**Local:** `errors/exceptions.py` |
-| Missing | `__init__.py` | Expose the supported credential-protection API. | All security exports above | **Local:** all security feature files → approved exports |
+| Missing | `__init__.py` | Expose only the supported shared-redaction API. | All redaction exports above | **Local:** `redaction.py` → approved exports |
 
 #### Functional requirements
 
@@ -359,24 +347,20 @@ encryption, and explicit in-memory active-secret selection without persistence.
 | Missing | `FR-UTL-019` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None | `ValidationError`: non-JSON-safe mapping | **Usage:** `tests/utils/usage/06_security.py::example_redaction()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_mapping_value_is_recursive()` |
 | Missing | `FR-UTL-020` | Return redacted paths and truncation diagnostics without secret values. | `RedactionResult` | None | None | **Usage:** `tests/utils/usage/06_security.py::example_redaction()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_result_omits_secret_values()` |
 | Missing | `FR-UTL-021` | Reject policies that allow protected credential fields. | `RedactionPolicy` validation | None | `SecurityError`: policy allows a protected credential field | **Usage:** `tests/utils/usage/06_security.py::example_policy_validation()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_policy_rejects_protected_credential_field()` |
-| Missing | `FR-UTL-036` | Hash passwords with a random salt and verify them using constant-time comparison. | `hash_password`, `verify_password` | Entropy read when hashing | `SecurityError`: empty, too-short, or oversized password | **Usage:** `tests/utils/usage/06_security.py::example_password_hashing()`<br>**Unit:** `tests/utils/unit/test_hashing.py::test_hash_and_verify_password()` |
-| Missing | `FR-UTL-037` | Generate Fernet keys and encrypt/decrypt UTF-8 text with authenticated symmetric encryption. | `generate_fernet_key`, `encrypt_text`, `decrypt_text` | Entropy read | `SecurityError`: invalid key, token, or input | **Usage:** `tests/utils/usage/06_security.py::example_fernet_encryption()`<br>**Unit:** `tests/utils/unit/test_encryption.py::test_encrypt_and_decrypt_text()` |
-| Missing | `FR-UTL-038` | Select exactly one explicitly active immutable secret version without persistence or rotation policy. | `SecretVersion`, `select_active_secret_version` | None | `SecurityError`: invalid version or active selection | **Usage:** `tests/utils/usage/06_security.py::example_active_secret_version()`<br>**Unit:** `tests/utils/unit/test_secret_versions.py::test_select_active_secret_version()` |
 
 ### 4.7 `settings/` — Runtime Settings
 
 **Purpose:** Define immutable generic runtime/logging settings, provide the sole
-repository `.env` loading base for typed domain settings, and resolve opaque secret
-references only on explicit invocation.
+repository `.env` loading base for typed domain settings.
 
-**Module flow:** `explicit values + environment → strict validation → immutable RuntimeSettings / resolved secret`
+**Module flow:** `explicit values + environment → strict validation → immutable RuntimeSettings`
 
 #### Files
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Missing | `models.py` | Define the immutable central `.env` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
-| Missing | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping and resolve opaque secret references through an injected source. | `load_settings`, `resolve_secret_reference` | **Standard library:** `collections.abc`, `re`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError`, `SecurityError` |
+| Missing | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping. | `load_settings` | **Standard library:** `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError` |
 | Missing | `__init__.py` | Expose the supported settings API. | Settings models and loader functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
 
 #### Functional requirements
@@ -386,7 +370,6 @@ references only on explicit invocation.
 | Missing | `FR-UTL-022` | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | `.env`/environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value | **Usage:** `tests/utils/usage/07_settings.py::example_construct_configuration()`<br>**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()` |
 | Missing | `FR-UTL-023` | Load explicit values and centralized `.env`/process settings in documented precedence order only when called. | `AppSettings`, `load_settings` | Settings read | `ConfigurationError`: unsupported or invalid runtime value | **Usage:** `tests/utils/usage/07_settings.py::example_load_active_configuration()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
 | Missing | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/07_settings.py::example_environment_constraints()`, `example_validate_settings()`<br>**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()` |
-| Missing | `FR-UTL-025` | Resolve secret references at the composition root without logging or persisting secret material. | `resolve_secret_reference` | Explicit secret-source read | `SecurityError`, `ConfigurationError`: unresolved or unsafe secret reference | **Usage:** `tests/utils/usage/07_settings.py::example_resolve_secret_reference()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_resolve_secret_reference_never_logs_secret()` |
 
 ### 4.8 `logging/` — Structured Logging
 
@@ -460,20 +443,9 @@ capabilities beyond the Section 4 exports.
     Precedence is explicit values, then the supplied mapping (or centralized
     `AppSettings` `.env`/process values when omitted), then documented defaults. Input keys are
     the exact uppercase setting names; unknown keys are rejected.
-  - `resolve_secret_reference(reference, source) -> SecretStr`. References use
-    `secret://` followed by 1-255 ASCII letters, digits, `.`, `_`, `/`, or `-`.
-    Resolution is explicit and returns a masked Pydantic secret value.
   - `normalize_error_code(code) -> str`, `get_error_metadata(code) ->
     ErrorMetadata`, and `route_error_event(exception, sink) -> dict[str, str]`.
     Metadata is immutable and built in; routing invokes only the supplied sink.
-  - `hash_password(password) -> str` and `verify_password(password, encoded) ->
-    bool`. The versioned format uses PBKDF2-HMAC-SHA256, 600,000 iterations, and
-    a fresh 16-byte salt. Passwords are 12-1,024 Unicode characters.
-  - `generate_fernet_key() -> bytes`, `encrypt_text(value, key) -> str`, and
-    `decrypt_text(token, key) -> str`. Keys are always caller-supplied except
-    when explicitly generated; Utils never stores them.
-  - `select_active_secret_version(versions) -> SecretVersion`. Exactly one
-    immutable supplied version must be marked active.
   - `get_logger(name) -> logging.Logger`, `configure_logging(settings=None,
     redaction_policy=None) -> None`, `flush_logging() -> None`, and
     `shutdown_logging() -> None`.
@@ -568,7 +540,7 @@ tests/utils/
 Feature-integration tests are assigned as follows:
 
 - `tests/utils/integration/test_settings_bootstrap.py` verifies the Utils-owned
-  portion of `WF-UTL-002` and the secret-reference handoff boundary.
+  portion of `WF-UTL-002` and centralized settings precedence.
 - `tests/utils/integration/test_structured_logging.py` verifies `WF-UTL-001`.
 - `tests/utils/integration/test_audit_event_construction.py` verifies the
   Utils-owned construction portion of `WF-UTL-003`. The workflow remains
@@ -595,7 +567,7 @@ Feature-integration tests are assigned as follows:
 - [ ] The final package tree exists exactly as specified. `app/utils/__init__.py:1`
 - [ ] Public exports contain only the retained shared surface; dotenv parsing and
   named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:67`
-- [ ] Shared capabilities have documented consumers and owner-approved security primitives remain bounded. `app/utils/README.md:70`
+- [ ] Shared capabilities have documented consumers and remain business-neutral. `app/utils/README.md:70`
 - [ ] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:69`
 - [ ] UI/API owns authentication and permission enforcement. `app/utils/contracts/auth.py:17`
 - [ ] Utils imports and import-time log attempts have no side effects. `tests/utils/unit/test_logger.py:229`, `tests/utils/unit/test_logger.py:243`

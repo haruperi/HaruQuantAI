@@ -54,6 +54,7 @@ Contract names, versions, and owners follow `docs/PROJECT.md`. The package path 
 | Missing | `AllocationReviewRequest` | `v1` | Portfolio submits; Risk receives | Request independent review of a Portfolio construction result or rebalance plan. |
 | Missing | `AllocationRiskDecision` | `v1` | Portfolio, Trading, UI/API | Publish approval/caps/conditions/rejection and the authoritative risk-budget projection. |
 | Missing | `AllocationBudgetActivationRequest` | `v1` | Portfolio submits; Risk receives | Activate the Risk-owned budget projection for one approved immutable allocation version. |
+| Missing | `ScenarioResult` | `v1` | UI/API, Research | Publish a bounded deterministic advisory comparison that cannot grant execution approval. |
 
 Each registered Risk contract carries `contract_version="v1"` and a separate
 stable `risk.<contract_name>.v1` `schema_id`, including the eligibility,
@@ -69,7 +70,6 @@ only from `contract_version`.
 | `MarketContextEvidence` | `v1` | Data | Normalized session, calendar, spread, liquidity, volatility, correlation, crisis, freshness, provenance, and missingness evidence. |
 | `FXConversionEvidence` | `v1` | Data | Fresh Data-owned conversion path/rate evidence; Risk never synthesizes rates. |
 | Strategy registry reference | `v1` | Strategy | Verify exact immutable technical registration before operational eligibility review. |
-| `PortfolioConstructionResult` / `PortfolioRebalancePlan` | `v1` | Portfolio | Review a complete immutable construction or rebalance proposal without mutating it. |
 | `PortfolioAllocationEvidence` | `v1` | Analytics | Consume non-binding performance/dependence/concentration evidence without delegating policy. |
 | `AuthContext` | `v1` | Utils | Authenticated principal, roles/scopes, workflow, request, and correlation context. |
 | `AuditEvent` | `v1` | Utils | Redacted common envelope through which Risk submits audit payloads to Data's durable audit storage. |
@@ -250,8 +250,8 @@ flowchart LR
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented, incompatible with the target, or not verified. |
-| **Missing** | Useful V1 behavior exists but contracts, relocation, validation, persistence, or tests remain. |
-| **Missing** | Target behavior, location, callers, tests, and boundaries are all verified. |
+| **Partial** | Useful V1 behavior exists but contracts, relocation, validation, persistence, or tests remain. |
+| **Completed** | Target behavior, location, callers, tests, and boundaries are all verified. |
 
 ### Workflow scope values
 
@@ -280,7 +280,7 @@ flowchart LR
 
 #### `WF-RISK-001` — Build portfolio risk snapshot
 
-**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**System workflow:** Internal contribution to `SYS-WF-001` and `SYS-WF-002`.
 **Input boundary:** `AccountStateSnapshot` v1 plus explicit position, pending-order, symbol, return-history, FX-conversion, and provenance evidence supplied by owning domains.
 **Output boundary:** immutable `PortfolioRiskSnapshot` retained inside Risk for sizing,
 limits, regime assessment, decision synthesis, scenarios, and reporting. Cross-domain
@@ -297,7 +297,7 @@ snapshot directly.
 
 #### `WF-RISK-002` — Calculate position size
 
-**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**System workflow:** Internal contribution to `SYS-WF-001` and `SYS-WF-002`.
 **Input boundary:** `PositionSizingRequest` (a Risk-internal type, not a registered cross-domain contract) plus portfolio, symbol, stop, broker-constraint, volatility/correlation, and performance evidence.
 **Output boundary:** `PositionSizingResult` only (Risk-internal; cross-domain consumers receive sizing outcomes only inside `RiskDecision v1`).
 
@@ -363,9 +363,11 @@ execution; missing or stale evidence fails closed.
 #### `WF-RISK-007` — Review allocation proposal
 
 **System workflows:** `SYS-WF-007`, `SYS-WF-008`
-**Input boundary:** `AllocationReviewRequest v1` referencing an immutable
-`PortfolioConstructionResult` or `PortfolioRebalancePlan` plus current
-eligibility, account, market, FX, Analytics, policy, and approval evidence.
+**Input boundary:** `AllocationReviewRequest v1` carries a self-contained
+Risk-owned projection of the immutable candidate or rebalance plan plus current
+eligibility, account, market, FX, Analytics, policy, and approval evidence. The
+projection contains only scalar values, ordered components, identifiers, versions,
+references, and hashes; it never embeds or imports a Portfolio-owned contract.
 **Output boundary:** `AllocationRiskDecision v1` and, after a valid
 `AllocationBudgetActivationRequest v1`, the active authoritative risk-budget
 projection.
@@ -391,11 +393,14 @@ live-success path; concurrent or conflicting reservation fails closed.
 #### `WF-RISK-009` — Apply or check kill-switch state
 
 **System workflow:** `SYS-WF-005`
-**Input boundary:** UI/API `KillSwitchCommand` plus `AuthContext`, or an existing `KillSwitchState` and requested scope.
+**Input boundary:** UI/API `KillSwitchCommand` with explicit scope level
+(`global`, `portfolio`, `strategy`, or `symbol`) and applicable identifiers, plus a
+separate `AuthContext`. Clearance also requires a matching current
+`ApprovalAttestation`; activation does not.
 **Output boundary:** canonical `KillSwitchState` and deterministic block/recovery decision consumed by Trading/UI/API.
 
 Active or unknown state blocks live risk increase. `global` state overrides
-`strategy`, which overrides `symbol`; an inactive child cannot override an active
+`portfolio`, which overrides `strategy`, which overrides `symbol`; an inactive child cannot override an active
 parent. Risk persists canonical state and revokes affected approvals; only Trading
 mutates execution controls. Clearance requires a valid Risk-owned, UI/API-produced
 `ApprovalAttestation`, and Trading resumes only after all applicable scopes are
@@ -405,9 +410,9 @@ inactive and reconciliation succeeds.
 
 #### `WF-RISK-010` — Run scenario or what-if analysis
 
-**System workflow:** None registered.
+**System workflow:** Cross-domain advisory result; no execution workflow is registered.
 **Input boundary:** immutable snapshot plus bounded `ScenarioDefinition` values.
-**Output boundary:** advisory baseline/projected comparison.
+**Output boundary:** registered `ScenarioResult v1` advisory baseline/projected comparison.
 
 No live state changes. Scenario output cannot claim approval and must pass through the canonical governor before any action.
 
@@ -498,7 +503,7 @@ Shortened test references are relative to the module's documented `tests/risk/us
 | Missing | `FR-RISK-013` | Return baseline/projected risk comparison and state that the output is advisory and not approved. | `ScenarioResult` | None | `ValidationError`: invalid projection | **Usage:** `test_usage_contracts.py::test_usage_results_scenario()`<br>**Unit:** `test_results.py::test_scenario_result_is_advisory()` |
 | Missing | `FR-RISK-014` | Implement `RiskDecision` v1 with verdict, approved size, ordered checks, primary/composite reasons, provenance, expiry, concurrency disclosure, and optional token. | `RiskDecisionPackage` | None | `ValidationError`: inconsistent verdict/token or missing provenance | **Usage:** `test_usage_contracts.py::test_usage_results_decision()`<br>**Unit:** `test_results.py::test_decision_package_invariants()` |
 | Missing | `FR-RISK-015` | Carry signed token scope, decision/config hashes, approver, expiry, nonce, schema version, and no secret key. | `RiskApprovalToken` | None | `ValidationError`: incomplete or non-UTC token | **Usage:** `test_usage_contracts.py::test_usage_results_token()`<br>**Unit:** `test_results.py::test_token_contract_has_required_bindings()` |
-| Missing | `FR-RISK-016` | Implement `KillSwitchCommand` v1 with action, principal/authorization context reference, reason, timestamp, and correlation ID. | `KillSwitchCommand` | None | `ValidationError`: invalid action/context | **Usage:** `test_usage_contracts.py::test_usage_requests_kill_switch()`<br>**Unit:** `test_requests.py::test_kill_switch_command_requires_reason()` |
+| Missing | `FR-RISK-016` | Implement `KillSwitchCommand v1` with action, explicit scope level, applicable portfolio/strategy/symbol identifiers, reason, UTC timestamp, request/workflow/correlation IDs, and schema identity. Principal authorization remains in the separate `AuthContext`; clearance requires a separate matching current `ApprovalAttestation`. | `KillSwitchCommand` | None | `ValidationError`: invalid action, scope, identifiers, time, or trace identity | **Usage:** `test_usage_contracts.py::test_usage_requests_kill_switch()`<br>**Unit:** `test_requests.py::test_kill_switch_command_requires_scope_and_reason()` |
 | Missing | `FR-RISK-017` | Implement `KillSwitchState` v1 with scope, active/unknown state, reason, version, and UTC update time. | `KillSwitchState` | None | `ValidationError`: invalid transition data | **Usage:** `test_usage_contracts.py::test_usage_results_kill_switch()`<br>**Unit:** `test_results.py::test_kill_switch_unknown_is_representable()` |
 | Missing | `FR-RISK-018` | Carry canonical redacted audit payload, evidence/config/decision provenance, sequence, previous hash, and record hash. | `RiskAuditRecord` | None | `ValidationError`: secret-like field, invalid hash, or incomplete provenance | **Usage:** `test_usage_contracts.py::test_usage_results_audit()`<br>**Unit:** `test_results.py::test_audit_record_redacts_secrets()` |
 | Missing | `FR-RISK-019` | Carry Markdown or exact JSON summary with separated evidence, assumptions, warnings, decision, and recommendations. | `RiskReport` | None | `ValidationError`: invalid format or false approval state | **Usage:** `test_usage_contracts.py::test_usage_results_report()`<br>**Unit:** `test_results.py::test_report_contract_separates_sections()` |
@@ -774,7 +779,7 @@ verdicts under the registered market-context, approval-attestation, reservation,
 | Missing | `FR-RISK-040` | Validate and review one proposed trade in fixed precedence, include regime/projected risks/final capped size/concurrency disclosure, attach token only when eligible, and audit the decision. | `RiskGovernor.review_trade_risk(proposal: ProposedTrade, snapshot: PortfolioRiskSnapshot, market: MarketContextEvidence, regime: RegimeAssessment, auth: AuthContext, *, now: datetime) -> RiskDecisionPackage` | Persistence write | `RiskDomainError(GOVERNOR_DECISION_FAILED, STORAGE_ERROR)` | **Usage:** `test_usage_decisions.py::test_usage_governor_trade_review()`<br>**Unit:** `test_governor.py::test_trade_review_truth_table_and_precedence()` |
 | Missing | `FR-RISK-041` | Evaluate current portfolio compliance and return a remediation recommendation without changing execution state. | `RiskGovernor.run_portfolio_risk_governor(snapshot: PortfolioRiskSnapshot, market: MarketContextEvidence, regime: RegimeAssessment, auth: AuthContext, *, now: datetime) -> RiskDecisionPackage` | Persistence write | `RiskDomainError(GOVERNOR_DECISION_FAILED, STORAGE_ERROR)` | **Usage:** `test_usage_decisions.py::test_usage_governor_portfolio()`<br>**Unit:** `test_governor.py::test_portfolio_governor_no_execution_mutation()` |
 | Missing | `FR-RISK-042` | Compare proposal/evidence/config/time with a prior decision and invalidate material changes, expiry, skew, stale state, config mismatch, or reconciliation expiry. | `revalidate_risk_decision(decision: RiskDecisionPackage, proposal: ProposedTrade, snapshot: PortfolioRiskSnapshot, config: RiskConfig, *, now: datetime) -> ApprovalValidationResult` | None | `RiskDomainError(STALE_EVIDENCE, CONFIG_VERSION_MISMATCH, IN_FLIGHT_RECONCILIATION_EXPIRED)` | **Usage:** `test_usage_decisions.py::test_usage_validity_revalidate()`<br>**Unit:** `tests/risk/unit/test_validity.py::test_material_change_invalidates()` |
-| Missing | `FR-RISK-043` | Validate `ApprovalAttestation v1`, apply authorized activation/clearance under `global > portfolio > strategy > symbol` precedence, revoke affected approvals on activation, and never mutate execution controls. | `apply_kill_switch_command(command: KillSwitchCommand, current: KillSwitchState, attestation: ApprovalAttestation, auth: AuthContext, approvals: ApprovalTokenService, audit: RiskAuditChain, *, now: datetime) -> KillSwitchState` | Persistence write | `RiskDomainError(PERMISSION_DENIED, POLICY_BLOCKED, STORAGE_ERROR)` | **Usage:** `test_usage_decisions.py::test_usage_kill_switch_apply()`<br>**Unit:** `tests/risk/unit/test_kill_switch.py::test_child_clear_cannot_override_active_parent()` |
+| Missing | `FR-RISK-043` | Apply authorized activation/clearance under `global > portfolio > strategy > symbol` precedence, revoke affected approvals on activation, and never mutate execution controls. Activation requires an authorized `AuthContext`; clearance additionally requires a matching current `ApprovalAttestation v1`. | `apply_kill_switch_command(command: KillSwitchCommand, current: KillSwitchState, auth: AuthContext, approvals: ApprovalTokenService, audit: RiskAuditChain, *, attestation: ApprovalAttestation | None = None, now: datetime) -> KillSwitchState` | Persistence write | `RiskDomainError(PERMISSION_DENIED, POLICY_BLOCKED, STORAGE_ERROR)` | **Usage:** `test_usage_decisions.py::test_usage_kill_switch_apply()`<br>**Unit:** `tests/risk/unit/test_kill_switch.py::test_child_clear_cannot_override_active_parent()` |
 | Missing | `FR-RISK-044` | Return deterministic block/recovery eligibility; active or unknown applicable state blocks live risk increase, and recovery requires all applicable scopes inactive plus Trading reconciliation. | `check_risk_kill_switch(states: Sequence[KillSwitchState], scope: Mapping[str, str], *, reconciled: bool, now: datetime) -> RiskDecisionPackage` | None | `RiskDomainError(KILL_SWITCH_ACTIVE, KILL_SWITCH_UNKNOWN, POLICY_BLOCKED)` | **Usage:** `test_usage_decisions.py::test_usage_kill_switch_check()`<br>**Unit:** `test_kill_switch.py::test_recovery_requires_clear_hierarchy_and_reconciliation()` |
 
 **Implementation notes:** Merge V1 `GovernanceEngine` and `RiskGovernor`, preserve execution-used validity and entry-block logic, and remove forced/manual decisions, broker reads, synthetic approvals, and execution-control mutation.
@@ -879,7 +884,7 @@ The V2 timing observations—100 ms pre-trade, 250 ms snapshot, 50 ms prepared g
 
 ## 6. Open Decisions
 
-No open decisions. Historical VaR/CVaR is the only initial VaR method; parametric, Student-t, filtered-historical-simulation, and Gaussian-waiver support are outside the initial scope.
+No open decisions.
 
 ---
 

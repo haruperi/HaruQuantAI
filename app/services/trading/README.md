@@ -28,7 +28,7 @@ Trading orchestrates live and paper evaluation, converts independently approved 
 
 ### Does not own
 
-- Market data or account truth; Data owns these. Broker/provider connections, adapters, and session lifecycle; Brokers owns these. Broker secret resolution; the Utils settings layer resolves secrets and injects them via `BrokerConnectionConfig` at the composition root.
+- Market data or account truth; Data owns these. Broker/provider connections, adapters, and session lifecycle; Brokers owns these. UI/API composition resolves credential references and constructs the Brokers-owned `BrokerConnectionConfig`; Trading never resolves credentials.
 - Indicator formulas, strategy signal generation, strategy promotion, or raw signal translation.
 - Risk policy, final approved position size, approval-token issuance, or canonical kill-switch policy/state.
 - Strategy operational eligibility, Portfolio construction/allocation versions, drift detection, rebalance planning, or authoritative Risk budgets.
@@ -50,11 +50,18 @@ Contract definitions match `docs/PROJECT.md`. Commands are owned by their receiv
 | Missing | `ExecutionReceipt` | `v1` | Analytics; Portfolio; UI/API | Immutable authority response containing intent reference, provider identifiers, finite status, requested/filled quantities, average price, authority timestamps, response classification, retry safety, reconciliation requirement, and trace IDs. Unknown or malformed success remains `unknown_outcome`. |
 | Missing | `TradeRecord` | `v1` | Analytics; Portfolio; UI/API | Official execution record containing the receipt, fills, factual commission/spread/slippage/cost inputs, authority and reconciliation state, warnings/incidents, and trace chain. Unreconciled records remain explicitly flagged. |
 | Missing | `PortfolioRebalanceExecutionRequest` | `v1` | Portfolio submits; Trading receives | Request idempotent execution of one Risk-authorized immutable rebalance plan; contains plan/allocation/decision references, ordered actions, reduce-only flags, route, approval token, validity, and canonical hash. |
+| Missing | `OperationalEvent` | `v1` | UI/API; composition-root audit adapter | Publish bounded redacted health, dependency, staleness, timeout, latency, cost, and incident evidence with severity, UTC time, trace IDs, and source references. |
 
 `ExecutionReceipt` and `TradeRecord` likewise carry `contract_version="v1"` plus
 `schema_id="trading.execution_receipt.v1"` and
 `schema_id="trading.trade_record.v1"` respectively. Compatibility is never inferred
 from a schema identifier.
+
+`OperationalEvent v1` carries `contract_version="v1"`,
+`schema_id="trading.operational_event.v1"`, event ID/type/severity, UTC occurrence
+time, request/workflow/correlation/causation IDs, bounded redacted facts, and source
+references. UI/API may present it; the composition root maps governed occurrences
+to Utils-owned `AuditEvent v1` for Data persistence without redefining either type.
 
 **Consumed from other domains** — referenced only, never redefined:
 
@@ -64,7 +71,7 @@ from a schema identifier.
 | `MarketDataset`, `AccountStateSnapshot`, `MarketContextEvidence` | `v1` | Data | Runtime market/account/context evidence; Trading never creates Risk policy from it. `MarketContextEvidence` is carried to Risk as orchestrator only — Risk is its sole interpreting consumer. |
 | `BrokerAdapter` (mutation + execution-read traits) | `v1` | Brokers | Sole paper/live mutation boundary (`TradeExecutionProvider`) plus execution-state and account reads needed for dispatch and reconciliation; mutation operations are Trading-only. |
 | `BrokerResult` / `BrokerError` | `v1` | Brokers | Canonical authority response envelope; `BROKER_UNKNOWN_OUTCOME` maps to `unknown_outcome` and freezes execution. |
-| `BrokerConnectionConfig` | `v1` | Brokers | Injected provider/account/environment configuration (secrets resolved by Utils); paper and live differ only by its environment/credentials. |
+| `BrokerConnectionConfig` | `v1` | Brokers | UI/API-composed provider/account/environment configuration with already-resolved in-memory credentials; paper and live differ only by its environment/credentials. |
 | `IndicatorSeries` | `v1` | Indicators | Current deterministic indicator evidence during live/paper orchestration. |
 | `TradeIntent` | `v1` | Strategy | Proposal lineage; Trading never executes it before Risk approval. |
 | `RiskDecision`, `ActionPolicyVerdict`, `KillSwitchState` | `v1` | Risk | Independent approved size/token or rejection, Risk-owned action permission, and canonical execution-blocking state/hierarchy. |
@@ -236,8 +243,8 @@ flowchart LR
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented, conflicting, or not verified |
-| **Missing** | Useful implementation exists but final behavior/tests are incomplete |
-| **Missing** | Final behavior is implemented, tested, and verified |
+| **Partial** | Useful implementation exists but final behavior/tests are incomplete |
+| **Completed** | Final behavior is implemented, tested, and verified |
 
 ### Workflow scope values
 
@@ -649,7 +656,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Missing | `FR-TRD-030` | The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence. | `classify_authority_response(raw: JsonValue, capability: Mapping[str, JsonValue]) -> ExecutionReceipt` | None | `TradingError`: response cannot be safely represented | **Usage:** `tests/trading/usage/test_usage_routing.py::test_usage_responses_classify()`<br>**Unit:** `tests/trading/unit/routing/test_responses.py::test_malformed_success_is_unknown_outcome()` |
 | Missing | `FR-TRD-031` | The system shall dispatch exactly one approved intent to Simulation for sim or Brokers' `BrokerAdapter` mutation operations for paper/live. | `dispatch_order_intent(intent: OrderIntent, broker_adapter: BrokerAdapter \| None, simulation_dispatch: Callable[[OrderIntent], ExecutionReceipt] \| None) -> ExecutionReceipt` | Broker mutation or external Simulation mutation; persistence write | `TradingError`: authority unavailable, gate absent, pre-write failure, timeout, or unsafe response | **Usage:** `tests/trading/usage/test_usage_routing.py::test_usage_dispatcher_dispatch()`<br>**Unit:** `tests/trading/unit/routing/test_dispatcher.py::test_dispatch_has_single_mutation_boundary()` |
 
-**Rules:** No provider SDK import; paper and live share this path and differ only by the environment/credentials carried in the injected `BrokerConnectionConfig` whose secrets are resolved by Utils.
+**Rules:** No provider SDK import; paper and live share this path and differ only by the environment/credentials carried in the injected `BrokerConnectionConfig` whose credential references were resolved by UI/API composition.
 **Implementation notes:** Preserve the single current broker mutation boundary and response classification; replace broker resolver access with the injected Brokers `BrokerAdapter` (mutation traits) and add Simulation dispatch.
 **Feature usage examples:** `tests/trading/usage/test_usage_routing.py`
 
@@ -901,7 +908,7 @@ No feature-specific setting. Report schema version follows `TRADING_CONTRACT_VER
 
 ## 6. Open Decisions
 
-No open decisions. Shadow execution and generalized compensation APIs are outside the initial scope; only the explicitly specified gated cancel/close behavior applies.
+No open decisions.
 
 ---
 

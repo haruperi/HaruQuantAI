@@ -47,6 +47,7 @@ Contract names, versions, and owners match `docs/PROJECT.md`. Commands and reque
 | ------- | ---------------------------------- | ------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | Missing | `StrategyRegistrationRequest`    | `v1`  | UI/API submits; Strategy receives                                        | Request registration of a reviewed strategy candidate as one immutable version.                              |
 | Missing | `StrategyParameterUpdateRequest` | `v1`  | UI/API submits; Strategy receives                                        | Request validation and registration of an approved parameter set for a compatible strategy version.          |
+| Missing | `StrategyMutationResult`         | `v1`  | UI/API, Risk, Portfolio                                                  | Publish the deterministic accepted/idempotent/rejected result of a registration or parameter-version mutation. |
 | Missing | `TradeIntent`                    | `v1`  | Risk consumes; Trading and Simulation receive only after Risk governance | Represent a non-executable strategy proposal with deterministic identity, timing, sizing hints, and lineage. |
 
 `StrategyRegistrationRequest v1` fields:
@@ -84,6 +85,12 @@ Contract names, versions, and owners match `docs/PROJECT.md`. Commands and reque
 | `reason`                  | `str`                                             |      Yes | Selection and approval rationale.            |
 | `request_id`              | `str`                                             |      Yes | Trace identifier.                            |
 | `correlation_id`          | `str`                                             |      Yes | Cross-domain correlation identifier.         |
+
+`StrategyMutationResult v1` contains `contract_version`, `schema_id`, mutation
+ID/type/status, exact strategy ID/version, immutable registry/config record
+references and hashes when accepted, idempotency outcome, bounded reason codes,
+request/workflow/correlation IDs, UTC completion time, and audit-event reference.
+It never embeds registry persistence objects or executable strategy content.
 
 `TradeIntent v1` fields:
 
@@ -281,8 +288,8 @@ No dependency points from Strategy into Risk, Trading, Simulation internals, Opt
 | Status              | Meaning                                                                                                       |
 | ------------------- | ------------------------------------------------------------------------------------------------------------- |
 | **Missing**   | Not implemented, incompatible with the final contract, or insufficiently tested. |
-| **Missing**   | Reusable behavior exists but needs contract, structure, validation, or test work.                             |
-| **Missing** | Final behavior, structure, runtime use, and tests are verified.                                               |
+| **Partial**   | Reusable behavior exists but needs contract, structure, validation, or test work.                             |
+| **Completed** | Final behavior, structure, runtime use, and tests are verified.                                               |
 
 | Status  | Workflow ID    | Scope        | Workflow                              | Trigger / Input boundary                                 | Final outcome / Output boundary                                | Requirement sequence                           |
 | ------- | -------------- | ------------ | ------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------- |
@@ -378,7 +385,7 @@ Trading owns the live/paper loop and supplies prepared public-contract inputs. S
 ### `WF-STR-008` — Register Immutable Strategy Version
 
 **Scope:** Cross-domain
-**System workflows:** `SYS-WF-003`, `SYS-WF-004`
+**System workflows:** `SYS-WF-003`, `SYS-WF-004`, and registration-truth evidence for `SYS-WF-006`.
 
 UI/API submits an authenticated Strategy-owned request after external review. For
 `SYS-WF-003`, the request references the selected `OptimizationResult` and carries
@@ -387,6 +394,10 @@ module allowlisting, immutable hashes, lifecycle/environment evidence references
 uniqueness, then writes its registry state through Data's persistence infrastructure.
 Parameter updates create a new hash-addressed configuration record and never mutate an
 approved record in place.
+
+**Output boundary:** `StrategyMutationResult v1` records accepted, idempotent, or
+rejected mutation truth for UI/API and supplies the immutable registration reference
+used by Risk and Portfolio; storage objects never cross the boundary.
 
 Successful registration proves technical validity and immutable identity only. It
 does not confer operational eligibility, capital allocation, or execution authority.
@@ -467,6 +478,7 @@ untrusted boundary payload
 | ------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Missing | `FR-STR-015` | The system shall represent a stable Strategy error code, safe message, redacted details, and trace identifiers without exposing raw exceptions. | `StrategyError`         | None         | None   | **Usage:** `tests/strategy/usage/test_usage_contracts.py::test_usage_outcomes_strategy_error()`**Unit:** `tests/strategy/unit/test_outcomes.py::test_strategy_error_rejects_unredacted_details()` |
 | Missing | `FR-STR-016` | The system shall return exactly one typed success value or one structured error for every public operation.                                     | `StrategyOutcome[T]`    | None         | None   | **Usage:** `tests/strategy/usage/test_usage_contracts.py::test_usage_outcomes_strategy_outcome()`**Unit:** `tests/strategy/unit/test_outcomes.py::test_outcome_exclusive_data_or_error()`         |
+| Missing | `FR-STR-017` | The system shall return a versioned immutable mutation result for every registration or parameter-version command, including exact record references/hashes, idempotency outcome, reason codes, trace IDs, completion time, and audit reference. | `StrategyMutationResult` | None | None | **Usage:** `tests/strategy/usage/test_usage_contracts.py::test_usage_outcomes_mutation_result()`**Unit:** `tests/strategy/unit/test_outcomes.py::test_mutation_result_has_immutable_registration_truth()` |
 
 **Rules:**
 
@@ -482,7 +494,7 @@ untrusted boundary payload
 
 ### Feature usage examples
 
-`tests/strategy/usage/test_usage_contracts.py` contains one `test_usage_*` function for each `FR-STR-001` through `FR-STR-016`.
+`tests/strategy/usage/test_usage_contracts.py` contains one `test_usage_*` function for each `FR-STR-001` through `FR-STR-017`.
 
 ---
 
@@ -816,7 +828,7 @@ These are re-exports of the requirement-bearing symbols above, not additional pu
 
 ## 6. Open Decisions
 
-No open decisions. Requirements remain `Missing` only until their specified implementation and verification are complete.
+No open decisions.
 
 ---
 

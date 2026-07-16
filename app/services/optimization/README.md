@@ -235,8 +235,8 @@ flowchart LR
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified |
-| **Missing** | Useful V1 behavior exists, but final contracts, structure, validation, or tests are incomplete |
-| **Missing** | Final behavior is implemented, tested, and verified |
+| **Partial** | Useful V1 behavior exists, but final contracts, structure, validation, or tests are incomplete |
+| **Completed** | Final behavior is implemented, tested, and verified |
 
 ### Workflow scope values
 
@@ -914,7 +914,7 @@ The explicit feature limits above are binding safety bounds. Other production pe
 
 ## 6. Open Decisions
 
-No open decisions. The explicit limits and initial algorithm/lifecycle exclusions in Sections 4 and 5 do not authorize fallback defaults or guessed trading policy.
+No open decisions.
 
 ---
 

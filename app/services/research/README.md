@@ -339,8 +339,8 @@ flowchart LR
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented, conflicting with the final contract, or not verified. |
-| **Missing** | Valuable V1 behavior exists, but relocation, contracts, validation, errors, or tests remain. |
-| **Missing** | Final behavior, structure, runtime use, and tests are verified. |
+| **Partial** | Valuable V1 behavior exists, but relocation, contracts, validation, errors, or tests remain. |
+| **Completed** | Final behavior, structure, runtime use, and tests are verified. |
 
 ### Workflow scope values
 
@@ -351,16 +351,16 @@ flowchart LR
 
 | Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
 |---|---|---|---|---|---|---|
-| Missing | `WF-RES-001` | Cross-domain | Prepare Research Dataset | `MarketDataset v1` from Data | `PreparedDataset` | `FR-RES-027 → 030` |
+| Missing | `WF-RES-001` | Cross-domain | Prepare Research Dataset | `MarketDataset v1` from Data | Research-internal `PreparedDataset`; never returned across the boundary | `FR-RES-027 → 030` |
 | Missing | `WF-RES-002` | Internal | Build Core Metric Profile | `PreparedDataset` | `CoreMetricProfile` | `FR-RES-042 → 049` |
 | Missing | `WF-RES-003` | Internal | Build Leakage-Safe Feature Frame and Time Splits | Prepared data + feature config | Feature frame + `LeakageReport` + `TimeSplitResult` | `FR-RES-031 → 041` |
 | Missing | `WF-RES-004` | Internal | Analyze Session and Seasonality Opportunity | Prepared OHLCVS + approved session policy | Advisory seasonality summaries | `FR-RES-069 → 074` |
 | Missing | `WF-RES-005` | Internal | Run Edge Study Against Null Evidence | Split data + study/statistical config | Advisory `EdgeResult` | `FR-RES-050 → 068` |
 | Missing | `WF-RES-006` | Internal | Build Market-Structure Profile | Prepared data + market-structure config | `MarketStructureProfile` + advisory fit | `FR-RES-075 → 076, 080` |
-| Missing | `WF-RES-007` | Cross-domain | Forward Validate and Calibrate Market Structure | Persisted prediction + later `MarketDataset v1` supplied by orchestrator | Validation/calibration evidence returned to orchestrator | `FR-RES-077 → 079` |
+| Missing | `WF-RES-007` | Internal | Forward Validate and Calibrate Market Structure | Persisted prediction + later approved dataset already supplied to the run | Research-internal validation/calibration evidence nested only in `ResearchReport v1` | `FR-RES-077 → 079` |
 | Missing | `WF-RES-008` | Internal | Run Unsupervised Market-Structure Research | Leakage-safe feature frame + seed | `UnsupervisedResearchResult` | `FR-RES-081 → 088` |
 | Missing | `WF-RES-009` | Internal | Build Research Scorecard and Profile Snapshot | Approved stage outputs | `ResearchScorecard` + `ResearchProfileSnapshot` | `FR-RES-089 → 092` |
-| Missing | `WF-RES-010` | Cross-domain | Render and Persist Research Artifact | Masked result + approved output location | `ArtifactReference` or typed failure | `FR-RES-093 → 095, 097` |
+| Missing | `WF-RES-010` | Internal | Render and Persist Research Artifact | Masked result + approved Research-owned output location | Research-internal `ArtifactReference` or typed failure; UI/API receives only `ResearchReport v1` | `FR-RES-093 → 095, 097` |
 | Missing | `WF-RES-011` | Cross-domain | Run Complete Edge Lab Profile | Run request and `MarketDataset v1` from external orchestrator | `ResearchReport v1` to UI/API; orchestration/persistence remain external | `FR-RES-096` plus selected stage requirements |
 
 ### `WF-RES-001` — Prepare Research Dataset
@@ -369,7 +369,8 @@ flowchart LR
 **System workflow:** `SYS-WF-004`
 
 **Input boundary:** Data supplies `MarketDataset v1` and provenance; Research performs no provider read.
-**Output boundary:** Research returns `PreparedDataset` to the caller.
+**Output boundary:** Research retains `PreparedDataset` as internal stage evidence;
+only the final `ResearchReport v1` may expose its bounded lineage/result projection.
 
 1. `validate_dataset()` produces fatal/warning quality evidence.
 2. `clean_dataset()` applies only explicit approved actions to a copy.
@@ -441,11 +442,13 @@ Quality layers are opt-in and bounded. The canonical profile scorer is also used
 
 ### `WF-RES-007` — Forward Validate and Calibrate Market Structure
 
-**Scope:** `Cross-domain`
-**System workflow:** None registered.
+**Scope:** `Internal`
+**System workflow:** Internal contribution to `SYS-WF-004`.
 
-**Input boundary:** An external orchestrator supplies a persisted prediction and later research-ready bars.
-**Output boundary:** Research returns labeling, validation, stability, and ranked calibration evidence; the orchestrator owns retrieval and database writes.
+**Input boundary:** The Research run receives an approved persisted prediction and a
+later research-ready dataset through its existing Data input boundary.
+**Output boundary:** Labeling, validation, stability, and calibration evidence remains
+Research-internal and may cross only as bounded fields in `ResearchReport v1`.
 
 The validation horizon is expressed in bars of the study timeframe; realized forward outcome at that horizon is calibration truth, ranked by calibration error and then sample size.
 
@@ -475,11 +478,12 @@ The scorecard and snapshot use one confirmation/fit policy and preserve uncertai
 
 ### `WF-RES-010` — Render and Persist Research Artifact
 
-**Scope:** `Cross-domain`
-**System workflow:** None registered.
+**Scope:** `Internal`
+**System workflow:** Internal governed persistence contribution to `SYS-WF-004`.
 
 **Input boundary:** A caller supplies a versioned result/snapshot, `AuthContext v1`, and approved destination.
-**Output boundary:** Research returns `ArtifactReference` and emits a redacted `AuditEvent v1`.
+**Output boundary:** `ArtifactReference` remains Research-internal. Research emits the
+registered redacted `AuditEvent v1`; UI/API receives only `ResearchReport v1`.
 
 Masking precedes serialization; traversal, disallowed root, overwrite conflict, permission failure, non-serializable input, and unsupported atomic replacement fail explicitly.
 
@@ -1126,7 +1130,7 @@ Shared settings are consumed from `docs/PROJECT.md` and not redefined: `ENVIRONM
 
 No open decisions.
 
-### Explicit exclusions
+## Explicit Exclusions
 
 - ForexFactory/news/calendar/sentiment acquisition, provider caching/retry/rate-limit/envelopes.
 - Cluster-based signal adaptation.

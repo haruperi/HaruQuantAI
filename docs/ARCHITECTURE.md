@@ -30,13 +30,13 @@
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
 * `app/services/api/README.md` defines the approved gateway/UI boundary, state ownership, and synchronous initial Simulation/Optimization surface; no API runtime code or `ui/` application package has landed yet.
 * `app/services/portfolio/README.md` now defines the approved Portfolio target architecture; the package code is not yet implemented. Portfolio is the thirteenth domain and its status remains `Missing`.
-* `app/services/data/` implements the completed Data domain: immutable contracts,
-  bounded SQLite/file/cache/audit persistence, explicit read-only sources and durable
-  policy, historical/reference/context/FX access, deterministic processing,
-  recoverable jobs, internal feed status, and exactly 23 typed package-root
-  operations. The lock ledger is the sole call-time bootstrap schema exception
-  because migrations consume the lock; every other Data schema is migration-owned.
-  Provider and broker sessions remain caller-owned and injected.
+* `app/services/data/` contains substantial implementation and migration evidence:
+  immutable contracts, bounded SQLite/file/cache/audit persistence, explicit read-only
+  sources and durable policy, historical/reference/context/FX access, deterministic
+  processing, recoverable jobs, internal feed status, and typed package-root operations.
+  Its authoritative status remains `Missing` until the target README contracts,
+  structure, and verification are fully satisfied. Provider and broker sessions remain
+  caller-owned and injected.
 
 ---
 
@@ -44,7 +44,7 @@
 
 ### Workspace Directory Layout (Target)
 
-* `app/services/api/`: FastAPI application, routes, middleware, authentication/session boundary, and API composition. UI/API owns user/session/settings/HTTP-idempotency schemas on Data infrastructure.
+* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, and API composition. UI/API owns user/session/settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
 * `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, and API). Live-route execution is owned by Trading.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
 * `ui/`: Next.js frontend application environment.
@@ -90,7 +90,7 @@ flowchart TD
 ### Shared Utility Framework (`app/utils/`)
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
-* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors and immutable metadata, injected error routing, identity/trace IDs, UTC time, canonical serialization, redaction, password hashing, caller-keyed Fernet encryption, in-memory active-secret selection, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. `app.utils.AppSettings` is the sole repository `.env` loading boundary; domains inherit it for typed owned settings and never parse dotenv files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, identity verification, credential persistence, and permission enforcement; callers own encryption-key storage and rotation; Data owns DataFrame/OHLC processing and quality; each domain owns its paths, limits, validation, result types, and business contracts.
+* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors and immutable metadata, injected error routing, identity/trace IDs, UTC time, canonical serialization, redaction, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. `app.utils.AppSettings` is the sole repository `.env` loading boundary; domains inherit it for typed owned settings and never parse dotenv files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, password hashing, credential encryption/persistence, active-key selection, credential-reference resolution, composition-root Brokers configuration, and permission enforcement; externally provisioned key infrastructure owns encryption-key generation/storage/rotation; Data owns DataFrame/OHLC processing and quality; each domain owns its paths, limits, validation, result types, and business contracts.
 * **Contract Ownership Rule**: Domain contract modules own their own base contract behavior locally. They must not inherit from or import a centralized utility contract base.
 
 ### Domain Audit Event Shape
@@ -110,6 +110,10 @@ flowchart TD
   "payload": "MAPPING (Redacted JSON-safe payload)"
 }
 ```
+
+Required `AuditEvent v1` producers are Data, Strategy, Risk, Trading, Simulation,
+Optimization, Research, Portfolio, and UI/API. Brokers emits technical logs only;
+Indicators and Analytics are pure/read-only, so their governed callers audit actions.
 
 ### Shared Authentication Context
 
@@ -153,6 +157,9 @@ Portfolio collaboration is contract-governed:
 - Risk owns `AllocationReviewRequest`, `AllocationRiskDecision`, `AllocationBudgetActivationRequest`, and the authoritative risk-budget projection.
 - Simulation owns `PortfolioBacktestRequestV1` / `PortfolioSimulationResult v1`; Analytics owns `PortfolioAllocationEvidence v1`; Data owns `FXConversionEvidence v1`.
 - Trading owns `PortfolioRebalanceExecutionRequest v1` and remains the only route to broker mutations.
+- Risk and Simulation requests carry self-contained receiver-owned projections using
+  scalar values, ordered components, identifiers, versions, references, and hashes;
+  they never embed or import Portfolio-owned contract types.
 
 ---
 
@@ -196,6 +203,8 @@ Portfolio collaboration is contract-governed:
 
 * Plaintext application passwords, live API keys, provider access configurations, and cryptographic seeds are classified as system secrets.
 * Redact sensitive patterns from execution dumps, trace events, log lines, and metrics payloads case-insensitively before persistence.
+* UI/API encrypts persisted credential material and selects from externally
+  provisioned keys. It never generates, persists, or rotates encryption keys.
 
 ---
 
@@ -208,7 +217,7 @@ Portfolio collaboration is contract-governed:
 | **Operational Protection** | `ALLOW_LIVE_MUTATIONS` (defaults to `false`), `RUNTIME_PROFILE`, `EXECUTION_ROUTE` |
 | **Structured Logging** | `LOG_LEVEL`, `LOG_RENDER` |
 | **Settings Loading** | Repository `.env` and process overrides are read only by typed classes inheriting `app.utils.AppSettings`; ordinary modules consume settings objects. |
-| **Broker Integration** | Provider-neutral adapter selection/readiness plus adapter-specific MT5, cTrader, or Binance settings; secrets are resolved at the composition root and injected as Brokers-owned `BrokerConnectionConfig` instances. |
+| **Broker Integration** | Provider-neutral adapter selection/readiness plus adapter-specific settings; UI/API composition resolves credential references and injects Brokers-owned `BrokerConnectionConfig` instances. |
 
 ---
 

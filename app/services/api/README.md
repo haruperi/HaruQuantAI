@@ -32,6 +32,10 @@ required dependency cannot be verified.
   shared `AuthContext` consumed by governed domains.
 - Password hashing and verification for UI/API-owned identities; Utils supplies
   redaction primitives but owns no credential-hashing API.
+- Credential encryption/persistence, active-key selection from externally provisioned
+  keys, credential-reference resolution, and composition-root construction of
+  Brokers-owned `BrokerConnectionConfig v1` values. UI/API does not generate, store,
+  or rotate encryption keys.
 - User, session, settings, and HTTP-idempotency logical schemas/tables/migrations on
   Data-owned shared persistence infrastructure.
 - Authenticated human `ApprovalAttestation v1` production; Risk remains the sole
@@ -42,8 +46,6 @@ required dependency cannot be verified.
   presentation, and non-authoritative governed-write preflight.
 - Requests to Risk for kill-switch activation or authorized clearance; UI/API never
   owns or mutates canonical kill-switch state.
-- Safe documentation browsing and, only when approved for the environment, audited
-  documentation writes within a configured root.
 
 ### Does not own
 
@@ -51,12 +53,15 @@ required dependency cannot be verified.
   execution, broker connectivity, reconciliation, simulation state, analytics,
   optimization algorithms, research algorithms, portfolio construction, allocation
   activation, drift detection, or rebalance planning.
-- Another domain's tables, artifacts, migrations, credentials, SDK objects, or internal
-  imports.
+- Another domain's tables, artifacts, migrations, SDK objects, or internal imports;
+  resolved credential material never crosses any boundary except inside the
+  in-memory Brokers-owned configuration built at composition.
 - Approval tokens, canonical kill-switch state, broker state, official fills, or live
   safety policy. Frontend checks are advisory; backend gates remain authoritative.
 - Currency strength, advanced Edge Lab calibration/automation/exports, broad
   performance pages, a public health event stream, or a second operator FastAPI app.
+- Raw strategy/SQX import, export, parsing, scoring, or artifact lifecycle; and
+  documentation browsing, management, mutation, or file persistence in the initial build.
 
 ### Shared contracts
 
@@ -81,10 +86,10 @@ Contract names, versions, and owners must match `docs/PROJECT.md`.
 | `AuthContext` | `v1` | Utils | Propagate the validated principal and trace context to governed domains. |
 | `MarketDataset`, `AccountStateSnapshot`, `MarketContextEvidence` | `v1` | Data | Market views, prepared-dataset requests, and Risk-ready market-context evidence; never raw DataFrames or provider objects. |
 | `FXConversionEvidence` | `v1` | Data | Read-only conversion provenance views where an owner contract exposes them. |
-| `TradeIntent`, `StrategyRegistrationRequest`, `StrategyParameterUpdateRequest` | `v1` | Strategy | Strategy views and explicitly approved registration/update commands. |
-| `RiskDecision`, `ActionPolicyVerdict`, `KillSwitchCommand`, `KillSwitchState`, `ApprovalAttestation` | `v1` | Risk | Risk views, Risk-owned action permission, governed operator commands, canonical safety state/hierarchy, and approval attestation. |
+| `TradeIntent`, `StrategyRegistrationRequest`, `StrategyParameterUpdateRequest`, `StrategyMutationResult` | `v1` | Strategy | Strategy views, explicitly approved registration/update commands, and immutable mutation truth. |
+| `RiskDecision`, `ActionPolicyVerdict`, `KillSwitchCommand`, `KillSwitchState`, `ApprovalAttestation`, `ScenarioResult` | `v1` | Risk | Risk views, Risk-owned action permission, governed scoped operator commands, canonical safety state/hierarchy, approval attestation, and advisory scenario results. |
 | `StrategyOperationalEligibilityRequest/Decision`, `AllocationReviewRequest`, `AllocationRiskDecision`, `AllocationBudgetActivationRequest` | `v1` | Risk | Operational-eligibility and portfolio review/authorization views and commands without gateway policy. |
-| `TradeRecord`, `ExecutionReceipt`, `OrderIntent` | `v1` | Trading | Live/paper status and governed execution outcomes. |
+| `TradeRecord`, `ExecutionReceipt`, `OrderIntent`, `OperationalEvent` | `v1` | Trading | Live/paper status, governed execution outcomes, and bounded operational evidence. |
 | `SimulationResult` | `v1` | Simulation | Completed synchronous backtest results; no interactive session lifecycle exists. |
 | `PortfolioBacktestRequestV1` / `PortfolioSimulationResult` | `v1` | Simulation | Synchronous portfolio validation request/result views delegated through Portfolio. |
 | `PerformanceReport` / `PortfolioAllocationEvidence` | `v1` | Analytics | Read-only performance, allocation-evidence, and dashboard views. |
@@ -101,9 +106,8 @@ connection, locking, and migration execution only.
 
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
-| Missing | User, session, and settings state | UI/API identity/settings contracts | `app/services/api/state/migrations.py` |
+| Missing | User, session, settings, and encrypted credential-reference state | UI/API identity/settings/credential contracts | `app/services/api/state/migrations.py` |
 | Missing | HTTP-idempotency records | UI/API replay/conflict checks only | `app/services/api/state/migrations.py` |
-| Missing | Frontend client state | Browser-local, non-authoritative UI state only | None |
 
 Browser sessions use opaque server-side identifiers in secure HttpOnly SameSite
 cookies outside local development and require CSRF validation for state changes.
@@ -162,6 +166,7 @@ app/services/api/
 ├── identity/
 │   ├── __init__.py
 │   ├── passwords.py              # UI/API-owned password hashing and verification
+│   ├── credentials.py            # Encrypted credential records and active-key selection
 │   ├── sessions.py               # Authentication and session lifecycle boundary
 │   └── authorization.py          # AuthContext, permission, and governed-write checks
 ├── middleware/
@@ -180,18 +185,18 @@ app/services/api/
 │   ├── auth.py                   # Registration, login, logout
 │   ├── settings.py               # User settings read/update
 │   ├── data.py                   # Symbols and prepared datasets
-│   ├── strategies.py             # Strategy catalogue, versions, imports, SQX
+│   ├── strategies.py             # Strategy catalogue and approved version commands
 │   ├── backtests.py              # One synchronous backtest request/result boundary
 │   ├── risk.py                   # Risk decision-support boundary
 │   ├── trading.py                # Live/paper Trading boundary and event stream
 │   ├── optimization.py           # Bounded synchronous runs and scenarios
 │   ├── research.py               # Initial core Edge Lab boundary
 │   ├── dashboards.py             # Read-only operational and analytics snapshots
-│   ├── documentation.py          # Safe documentation tree/read/write/delete
 │   └── operator.py               # Approvals, kill-switch commands, operator events
 └── composition/
     ├── __init__.py
     ├── lifecycle.py              # Required/optional dependency lifecycle
+    ├── broker_config.py          # Resolve references and build BrokerConnectionConfig
     └── application.py            # Canonical app and route registration
 
 ui/
@@ -211,8 +216,7 @@ ui/
 │       ├── risk-center/page.tsx
 │       ├── live/page.tsx
 │       ├── optimization/page.tsx
-│       ├── edge-lab/page.tsx
-│       └── documentation/page.tsx
+│       └── edge-lab/page.tsx
 ├── clients/
 │   ├── request.ts
 │   ├── index.ts
@@ -227,7 +231,6 @@ ui/
 │   ├── optimization.ts
 │   ├── research.ts
 │   ├── dashboards.ts
-│   ├── documentation.ts
 │   └── operator.ts
 ├── context/
 │   ├── auth.tsx
@@ -240,8 +243,7 @@ ui/
     ├── strategies.tsx
     ├── simulation.tsx
     ├── trading.tsx
-    ├── research.tsx
-    └── documentation.tsx
+    └── research.tsx
 ```
 
 ### Module dependency diagram
@@ -297,7 +299,7 @@ higher-authority exclusion.
 | `CAP-UI-007` operator approvals/events | `routes/operator.py`; `FR-API-034` |
 | `CAP-UI-008` settings | `routes/settings.py`; `FR-API-023` |
 | `CAP-UI-009` market data/prepared datasets | `routes/data.py`; `FR-API-024` |
-| `CAP-UI-010` strategy/SQX | `routes/strategies.py`; `FR-API-025` |
+| `CAP-UI-010` strategy catalogue/version commands | `routes/strategies.py`; `FR-API-025`; raw import/export/SQX excluded |
 | `CAP-UI-011` synchronous backtest result | `routes/backtests.py`; `FR-API-026`; no query/log/session lifecycle |
 | `CAP-UI-012` interactive simulator | Excluded from the initial synchronous lifecycle; no initial route or component |
 | `CAP-UI-013` risk decision support | `routes/risk.py`; `FR-API-028` |
@@ -305,7 +307,7 @@ higher-authority exclusion.
 | `CAP-UI-015` optimization/scenarios | `routes/optimization.py`; `FR-API-030` |
 | `CAP-UI-016` initial Edge Lab | `routes/research.py`; `FR-API-031`; advanced surface excluded |
 | `CAP-UI-018` dashboard reads | `routes/dashboards.py`; `FR-API-032`; currency strength excluded |
-| `CAP-UI-019` documentation | `routes/documentation.py`; `FR-API-033` |
+| `CAP-UI-019` documentation | Excluded from the initial build; no route, state, client, or component |
 | `CAP-UI-020` shared streaming | `streams/`; `FR-API-004`, `FR-API-020`, `FR-API-021` |
 | `CAP-UI-021` typed frontend clients | `ui/clients/`; `FR-API-038`–`FR-API-041` |
 | `CAP-UI-022` frontend auth/shell | `ui/context/`, `ui/app/`; `FR-API-042`, `FR-API-046`, `FR-API-053`, `FR-API-054` |
@@ -328,14 +330,14 @@ public symbols below. Unsupported ranges are absent from the target structure.
 | `UIAPI-FR-043`–`059` | `FR-API-009`–`017`; opaque server-side sessions, bearer service accounts, and server-side role/permission authority |
 | `UIAPI-FR-061`–`070` | `FR-API-019`, `FR-API-021`, `FR-API-034` |
 | `UIAPI-FR-071`–`076` | `FR-API-022`, `FR-API-023`; duplicate settings path rejected |
-| `UIAPI-FR-101`–`114` | `FR-API-025` |
+| `UIAPI-FR-101`–`114` | Registered strategy catalogue/version commands map to `FR-API-025`; raw import/export/SQX requirements are excluded |
 | `UIAPI-FR-115`–`123` | `FR-API-026` |
 | `UIAPI-FR-124`–`146` | `FR-API-027` |
 | `UIAPI-FR-147`–`150` | `FR-API-028` |
 | `UIAPI-FR-151`–`176` | `FR-API-029`; owner corrected from Live to Trading |
 | `UIAPI-FR-177`–`193` | `FR-API-030` |
 | `UIAPI-FR-194`–`199`, `201` | `FR-API-032` |
-| `UIAPI-FR-202`–`207` | `FR-API-024`, `FR-API-033` |
+| `UIAPI-FR-202`–`207` | Data reads map to `FR-API-024`; documentation-file capabilities are excluded |
 | `UIAPI-FR-208`–`226`, `238`–`241` | `FR-API-031` |
 | `UIAPI-FR-246`–`250`, `252`–`271`, `273`–`283`, `285` | `FR-API-038`–`055` with the reduced approved UI surface |
 | `UIAPI-NFR-001`–`018`, `023`–`024`, `027`–`030`, `032`–`033` | `NFR-API-001`–`018` and Section 7 |
@@ -349,11 +351,11 @@ public symbols below. Unsupported ranges are absent from the target structure.
 
 | Status | Workflow ID | Scope | Workflow | System workflow | Trigger / input boundary | Final outcome / output boundary | Requirements | Failure behavior | Integration test |
 |---|---|---|---|---|---|---|---|---|---|
-| Missing | `WF-API-001` | Internal | Gateway startup and readiness | None | Process configuration | Canonical app with truthful readiness | `FR-API-014`, `FR-API-015`, `FR-API-033`, `FR-API-034` | Required failure blocks startup/readiness; approved optional failure is reported degraded | `tests/api/integration/test_startup.py::test_required_failure_blocks_readiness()` |
+| Missing | `WF-API-001` | Internal | Gateway startup and readiness | None | Process configuration | Canonical app with truthful readiness | `FR-API-014`, `FR-API-015`, `FR-API-034` | Required failure blocks startup/readiness; approved optional failure is reported degraded | `tests/api/integration/test_startup.py::test_required_failure_blocks_readiness()` |
 | Missing | `WF-API-002` | Internal | Authenticated request boundary | All applicable | HTTP request | One typed response or stream event after one approved delegation | `FR-API-001`–`FR-API-020` | Validation/auth/dependency failures become redacted deterministic envelopes | `tests/api/integration/test_request_boundary.py::test_authenticated_request_delegates_once()` |
-| Missing | `WF-API-003` | Cross-domain | Authentication and settings | None | Credentials or session | Validated `AuthContext` and UI/API-owned settings response | `FR-API-008`–`FR-API-013`, `FR-API-021`, `FR-API-022` | No fallback identity; unavailable session/idempotency storage fails governed writes closed | `tests/api/integration/test_auth_settings.py::test_login_settings_logout()` |
+| Missing | `WF-API-003` | Cross-domain | Authentication, settings, and credential composition | None | Credentials, session, or broker credential reference | Validated `AuthContext`, UI/API-owned settings response, or Brokers-owned `BrokerConnectionConfig v1` | `FR-API-008`–`FR-API-013`, `FR-API-021`, `FR-API-022`, `FR-API-057`, `FR-API-058` | No fallback identity/key/credential; unavailable key source, state, or idempotency dependency fails closed | `tests/api/integration/test_auth_settings.py::test_login_settings_logout()` |
 | Missing | `WF-API-004` | Cross-domain | Market data and dataset preparation | `SYS-WF-001`, `SYS-WF-002` | Authenticated source/range request | Bounded Data result or provider error | `FR-API-023` | Requested provider failure is surfaced; no provider or user fallback | `tests/api/integration/test_data_boundary.py::test_prepare_dataset_delegates_to_data()` |
-| Missing | `WF-API-005` | Cross-domain | Strategy catalogue, approved optimization adoption, and SQX lifecycle (SQX = StrategyQuant X strategy-file import/list/score; every update reaches Strategy only as a `StrategyRegistrationRequest` / `StrategyParameterUpdateRequest` — UI/API never registers strategy state itself) | `SYS-WF-003`, `SYS-WF-004` | Authenticated strategy command/query or explicitly approved Optimization selection | Strategy-owned record, artifact, or compensating failure | `FR-API-025` | Missing approval blocks optimization adoption; partial artifact failure is reconciled; gateway never writes strategy state | `tests/api/integration/test_strategy_boundary.py::test_strategy_lifecycle()` |
+| Missing | `WF-API-005` | Cross-domain | Strategy catalogue, registered version commands, and approved optimization adoption | `SYS-WF-003`, `SYS-WF-004` | Authenticated strategy command/query or explicitly approved Optimization selection | `StrategyMutationResult v1` or structured failure | `FR-API-025` | Missing approval blocks adoption; gateway never writes strategy state or handles raw strategy artifacts | `tests/api/integration/test_strategy_boundary.py::test_strategy_lifecycle()` |
 | Missing | `WF-API-006` | Cross-domain | Synchronous backtest run and result review | `SYS-WF-001` | Exact `SimulationBacktestRequestV1` plus `AuthContext` | Completed `SimulationResult`, derived `PerformanceReport`, or structured error | `FR-API-026`, `FR-API-018`–`FR-API-020` | Incomplete runs are not published; no session/queue/log-stream state is implied | `tests/api/integration/test_backtest_boundary.py::test_synchronous_backtest_run_and_review()` |
 | Excluded | `WF-API-007` | Cross-domain | Interactive Simulation session lifecycle | Outside initial scope | — | — | `FR-API-027` | No initial session, frame, replay, or queued state | Excluded |
 | Excluded | `WF-API-008` | Cross-domain | Governed interactive Simulation mutation/what-if | Outside initial scope | — | — | `FR-API-027` | Excluded with the interactive session lifecycle | Excluded |
@@ -361,8 +363,7 @@ public symbols below. Unsupported ranges are absent from the target structure.
 | Missing | `WF-API-010` | Cross-domain | Risk decision support | `SYS-WF-002`, `SYS-WF-005` | Authorized risk request | Typed Risk-owned evaluation | `FR-API-028` | Missing evidence or stale state fails closed; gateway performs no calculation | `tests/api/integration/test_risk_boundary.py::test_risk_delegation()` |
 | Missing | `WF-API-011` | Cross-domain | Core Edge Lab research | `SYS-WF-004` | Dataset/research request | Registered `ResearchReport v1` or structured error | `FR-API-031` | Leakage/provider failures block publication; internal profiles, snapshots, and unsupported endpoints are absent | `tests/api/integration/test_research_boundary.py::test_core_edge_workflow()` |
 | Missing | `WF-API-012` | Cross-domain | Live/paper session and governed broker action | `SYS-WF-002`, `SYS-WF-005` | Authenticated Trading command | Trading-owned status, receipt, or rejection | `FR-API-029` | Closed live flags, Risk, approval, reconciliation, idempotency, audit, or kill-switch gate causes no broker mutation | `tests/api/integration/test_trading_boundary.py::test_live_mutation_cannot_bypass_gates()` |
-| Missing | `WF-API-013` | Cross-domain | Operator approval, kill switch, and event review | `SYS-WF-005` | Validated operator principal | `ApprovalAttestation`, audited Risk/Trading command result, or protected event | `FR-API-034` | Underprivileged caller is rejected; no public sample stream | `tests/api/integration/test_operator_boundary.py::test_operator_kill_switch()` |
-| Missing | `WF-API-014` | Internal | Documentation management | None | Authorized safe relative path | Tree/content or audited write/delete | `FR-API-031` | Traversal, symlink escape, bad content, or disallowed environment is rejected before I/O | `tests/api/integration/test_documentation.py::test_safe_document_lifecycle()` |
+| Missing | `WF-API-013` | Cross-domain | Operator approval, scoped kill switch, and event review | `SYS-WF-005` | Validated operator principal plus explicit global/portfolio/strategy/symbol scope | `ApprovalAttestation`, audited Risk/Trading command result, or protected event | `FR-API-034` | Underprivileged or malformed scope is rejected; clearance without matching current attestation is rejected; no public sample stream | `tests/api/integration/test_operator_boundary.py::test_operator_kill_switch()` |
 | Missing | `WF-API-015` | Cross-domain | Frontend governed request | All applicable | User action | Typed result, warning, or client preflight block | `FR-API-035`–`FR-API-041` | Preflight never substitutes for backend authorization; stale data blocks governed use | `tests/api/integration/test_frontend_governed.py::test_backend_remains_authoritative()` |
 | Missing | `WF-API-016` | Cross-domain | Frontend stream consumption | All applicable | Authenticated stream connection | Validated ordered events and authoritative refresh after gaps | `FR-API-004`, `FR-API-017`–`FR-API-020`, `FR-API-042` | Disconnect cleans resources; gap/backpressure/terminal error triggers documented recovery | `tests/api/integration/test_frontend_streams.py::test_gap_refresh_and_cleanup()` |
 | Missing | `WF-API-017` | Cross-domain | Portfolio construction, eligibility, activation, history, and rebalance | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008` | Authenticated Portfolio request/operator approval | Owner-contract result or structured fail-closed error | `FR-API-056` | Gateway delegates and presents; it never calculates weights, eligibility, Risk budget, or orders | `tests/api/integration/test_portfolio_boundary.py::test_portfolio_workflows_preserve_owner_gates()` |
@@ -455,9 +456,11 @@ envelope without redefining Utils-owned `AuthContext` or `AuditEvent`.
 
 ### 4.2 `identity/` — Authentication and authorization
 
-**Purpose:** Hash and verify UI/API identity credentials, authenticate users, enforce
-sessions and permissions, and construct the Utils-owned `AuthContext`. UI/API owns
-durable state ownership and browser/service authentication transport.
+**Purpose:** Hash and verify UI/API identity credentials, encrypt and persist broker
+credential material, select an externally provisioned active key, authenticate users,
+enforce sessions and permissions, and construct the Utils-owned `AuthContext`.
+UI/API owns durable credential state and browser/service authentication transport but
+does not generate, store, or rotate encryption keys.
 
 **Module flow:** credentials/session → validated principal → Utils `AuthContext` →
 permission and governed-request decision.
@@ -465,6 +468,7 @@ permission and governed-request decision.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Missing | `passwords.py` | Hash and verify UI/API-owned passwords without secret disclosure or silent algorithm fallback | `hash_password`, `verify_password` | **Standard library:** None<br>**Required third-party:** memory-hard password-hashing adapter satisfying `FR-API-009`; the exact compatible constraint belongs in `pyproject.toml`<br>**Local:** UI/API identity errors; Utils redaction primitives |
+| Missing | `credentials.py` | Encrypt/decrypt UI/API-owned credential records using an injected externally provisioned key set and explicit active key ID | `CredentialRecord`, `store_credential`, `resolve_credential_reference` | **Standard library:** `collections.abc`, `datetime`<br>**Required third-party:** authenticated-encryption adapter pinned in `pyproject.toml` before implementation<br>**Local:** UI/API state store; Utils redaction/error primitives |
 | Missing | `sessions.py` | Authenticate credentials and manage a single active UI/API-owned session | `authenticate_user`, `create_session`, `validate_session`, `revoke_session` | **Standard library:** `datetime`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** UI/API state store; Utils auth/context API |
 | Missing | `authorization.py` | Build shared auth context and enforce permissions/governed context | `build_auth_context`, `require_permission`, `validate_governed_request` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** Utils → `AuthContext`; `contracts.models` → `GovernedRequestContext` |
 
@@ -477,6 +481,8 @@ permission and governed-request decision.
 | Missing | `FR-API-013` | Produce Utils `AuthContext` from validated authority claims and trace context, never caller-controlled role headers. | `build_auth_context(principal: AuthenticatedPrincipal, trace: TraceContext) -> AuthContext` | None | `AuthenticationError`: authority claims cannot be verified | **Usage:** `tests/api/usage/test_usage_identity.py::test_usage_build_auth_context()`<br>**Unit:** `tests/api/unit/test_authorization.py::test_role_header_cannot_create_principal()` |
 | Missing | `FR-API-014` | Enforce the approved permission at the backend boundary and return the standard 403 envelope on failure. | `require_permission(context: AuthContext, permission: str) -> None` | Read-only | `AuthorizationError`: permission absent | **Usage:** `tests/api/usage/test_usage_identity.py::test_usage_require_permission()`<br>**Unit:** `tests/api/unit/test_authorization.py::test_missing_permission_rejected()` |
 | Missing | `FR-API-015` | Validate governed context, CSRF when applicable, approval scope, idempotency dependency, stale evidence, and audit intent before delegation. | `validate_governed_request(context: AuthContext, governed: GovernedRequestContext) -> None` | Read-only | `GovernanceError`: context missing/stale; `DependencyUnavailableError`: idempotency unavailable | **Usage:** `tests/api/usage/test_usage_identity.py::test_usage_validate_governed_request()`<br>**Unit:** `tests/api/unit/test_authorization.py::test_missing_governed_context_fails_closed()` |
+| Missing | `FR-API-057` | Encrypt credential material before persistence with authenticated encryption, store key ID/version and integrity metadata but never the key, select exactly the configured active key from an injected externally provisioned key set, and decrypt only for an authorized composition request. | `store_credential`, `resolve_credential_reference` | Persistence write/read | `CredentialSecurityError`: missing/multiple active keys, tamper, unknown key ID, unauthorized access, or storage failure | **Usage:** `tests/api/usage/test_usage_identity.py::test_usage_store_and_resolve_credential()`<br>**Unit:** `tests/api/unit/test_credentials.py::test_credential_store_never_persists_key_or_plaintext()` |
+| Missing | `FR-API-058` | Resolve an opaque `secret://` reference only at composition, build one immutable Brokers-owned `BrokerConnectionConfig v1` with `SecretStr` values, and discard plaintext after construction without logging, caching, or returning it through UI/API contracts. | `build_broker_connection_config` | Credential-store read | `CredentialSecurityError`, `DependencyUnavailableError`: unsafe/unresolved reference, unavailable key source, or invalid Brokers config | **Usage:** `tests/api/usage/test_usage_composition.py::test_usage_build_broker_config()`<br>**Unit:** `tests/api/unit/test_broker_config.py::test_plaintext_never_crosses_composition_boundary()` |
 
 **Configuration and Limits Manifest**
 
@@ -485,6 +491,8 @@ permission and governed-request decision.
 | Missing | `SESSION_TTL_SECONDS` | `int` | None | Yes | `create_session` | Owner-approved value; expiry is enforced by `validate_session`. |
 | Missing | `AUTH_TRANSPORT` | policy | Browser cookie / service bearer | Yes | all identity exports | Browsers use opaque server-side IDs in secure HttpOnly SameSite cookies outside local development; service accounts use authenticated bearer credentials. |
 | Missing | `CSRF_POLICY` | policy | Required for cookie-authenticated state changes | Conditional | `validate_governed_request` | Absence or invalidity fails the state-changing request closed. |
+| Missing | `CREDENTIAL_KEY_REFS` | `tuple[str, ...]` | None | Yes before credential persistence/resolution | `store_credential`, `resolve_credential_reference` | References externally provisioned keys; the keys are injected at runtime and never stored by UI/API. |
+| Missing | `ACTIVE_CREDENTIAL_KEY_ID` | `str` | None | Yes before credential persistence | `store_credential` | Must identify exactly one injected key; missing/ambiguous selection fails closed. |
 
 **Implementation notes:** reuse V1 password/session behavior only after moving it behind
 the approved state owner. Do not reuse raw-token acceptance, fallback users, development
@@ -571,7 +579,7 @@ stream subscription → standard envelope/event.
 | Missing | `auth.py` | Authentication HTTP boundary | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts` |
 | Missing | `settings.py` | Settings boundary | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; approved settings state-owner API |
 | Missing | `data.py` | Market symbols and prepared datasets | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Data public API |
-| Missing | `strategies.py` | Strategies, versions, imports, and SQX | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Strategy and approved Analytics public APIs |
+| Missing | `strategies.py` | Strategy catalogue, registered versions, and approved commands | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Strategy and Optimization public APIs |
 | Missing | `backtests.py` | One bounded synchronous backtest request returning its terminal result/report | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Simulation and Analytics public APIs |
 | Excluded | `simulation.py` | No route module; interactive lifecycle and mutation are outside the specified API surface | None | None |
 | Missing | `risk.py` | Risk decision support | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Risk public API |
@@ -579,7 +587,6 @@ stream subscription → standard envelope/event.
 | Missing | `optimization.py` | Synchronous Optimization runs and scenarios | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Optimization public API |
 | Missing | `research.py` | Initial core Edge Lab research | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Research, Data, and Analytics public APIs |
 | Missing | `dashboards.py` | Read-only operational/analytics snapshots | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Data, Trading, Analytics, and Utils public APIs |
-| Missing | `documentation.py` | Safe docs tree/read and controlled write/delete | `router` | **Standard library:** `pathlib`<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`, Utils audit/redaction |
 | Missing | `operator.py` | Approvals, kill-switch commands, protected owner events, and bounded audit views | `router` | Same; Risk, Trading, Data audit query, streams |
 | Missing | `portfolio.py` | Portfolio construction, eligibility/status, activation, rollback, drift/rebalance, history, and evidence views | `router` | **Local:** `identity`, `contracts`; Portfolio, Risk, Simulation, Analytics public APIs |
 | Missing | `__init__.py` | Expose approved routers to composition only | named routers | **Standard library:** None<br>**Required third-party:** None<br>**Local:** route files → `router` aliases |
@@ -591,16 +598,15 @@ stream subscription → standard envelope/event.
 | Missing | `FR-API-022` | Expose typed registration, login, and logout without fallback identities. | `auth.router: APIRouter` | Persistence write | Standard 400/401/403/422/429/500/503 envelopes | **Usage:** `tests/api/usage/test_usage_auth_routes.py::test_usage_auth_routes()`<br>**Unit:** `tests/api/unit/test_auth_routes.py::test_auth_contracts()` |
 | Missing | `FR-API-023` | Expose authenticated settings read/update through one canonical path. | `settings.router: APIRouter` | Read-only; persistence write | Standard 401/403/404/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_settings_routes.py::test_usage_settings_routes()`<br>**Unit:** `tests/api/unit/test_settings_routes.py::test_settings_contracts()` |
 | Missing | `FR-API-024` | Expose authenticated symbol discovery and bounded delegated dataset preparation. | `data.router: APIRouter` | Read-only; external API call | Standard 401/403/413/422/502/503 envelopes | **Usage:** `tests/api/usage/test_usage_data_routes.py::test_usage_data_routes()`<br>**Unit:** `tests/api/unit/test_data_routes.py::test_data_contracts()` |
-| Missing | `FR-API-025` | Expose strategy catalogue/version/import/export, explicitly approved Optimization-result adoption, and SQX import/list/score through Strategy-owned commands and state. | `strategies.router: APIRouter` | Read-only; owner-domain persistence write; artifact read/write | Standard 401/403/404/409/413/415/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_strategy_routes.py::test_usage_strategy_routes()`<br>**Unit:** `tests/api/unit/test_strategy_routes.py::test_strategy_contracts()` |
+| Missing | `FR-API-025` | Expose strategy catalogue/version reads and explicitly approved Optimization-result adoption through Strategy-owned registration/parameter commands, returning `StrategyMutationResult v1`. Raw import/export, SQX parsing/scoring, executable content, and artifact lifecycle are absent. | `strategies.router: APIRouter` | Read-only; owner-domain persistence write | Standard 401/403/404/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_strategy_routes.py::test_usage_strategy_routes()`<br>**Unit:** `tests/api/unit/test_strategy_routes.py::test_strategy_contracts()` |
 | Missing | `FR-API-026` | Expose one exact synchronous `SimulationBacktestRequestV1` run returning a terminal `SimulationResult`/report or structured error through Simulation/Analytics; no queued/query/session/log-stream lifecycle. | `backtests.router: APIRouter` | Read-only external-domain calls | Standard 401/403/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_backtest_routes.py::test_usage_synchronous_backtest_routes()`<br>**Unit:** `tests/api/unit/test_backtest_routes.py::test_backtest_contract_matches_adr_0014()` |
 | Excluded | `FR-API-027` | Interactive Simulation sessions, frames, replay, positions/orders, mutations, and what-if routes are outside the initial synchronous build. | None | None | None | Route-absence test `tests/api/unit/test_route_catalog.py::test_interactive_simulation_routes_absent()` |
-| Missing | `FR-API-028` | Expose position sizing, regime, allocation, and governance evaluation solely through Risk. | `risk.router: APIRouter` | Read-only | Standard 401/403/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_risk_routes.py::test_usage_risk_routes()`<br>**Unit:** `tests/api/unit/test_risk_routes.py::test_risk_contracts()` |
+| Missing | `FR-API-028` | Expose position sizing, regime, allocation, governance, and bounded advisory scenario evaluation solely through Risk; scenario responses use registered `ScenarioResult v1`. | `risk.router: APIRouter` | Read-only | Standard 401/403/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_risk_routes.py::test_usage_risk_routes()`<br>**Unit:** `tests/api/unit/test_risk_routes.py::test_risk_contracts()` |
 | Missing | `FR-API-029` | Expose live/paper session lifecycle, reads, strategy assignment, governed orders/positions, and events solely through Trading after Risk clearance. | `trading.router: APIRouter` | Read-only; broker mutation; persistence write; event publication | Standard 401/403/404/409/422/503 envelopes; unknown broker state freezes | **Usage:** `tests/api/usage/test_usage_trading_routes.py::test_usage_trading_routes()`<br>**Unit:** `tests/api/unit/test_trading_routes.py::test_live_gate_cannot_be_bypassed()` |
 | Missing | `FR-API-030` | Expose bounded synchronous optimization, walk-forward, unsupervised, and Monte Carlo/scenario operations returning one terminal `OptimizationResult` or structured error; no job persistence, cancellation, progress, or job WebSocket. | `optimization.router: APIRouter` | Read-only external-domain calls; in-memory calculation | Standard 401/403/409/413/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_optimization_routes.py::test_usage_synchronous_optimization_routes()`<br>**Unit:** `tests/api/unit/test_optimization_routes.py::test_async_job_routes_absent()` |
 | Missing | `FR-API-031` | Submit one bounded initial Research request and return only registered `ResearchReport v1` advisory evidence; Research-internal datasets, stage profiles, scorecards, snapshots, and artifact types never cross the API boundary directly. | `research.router: APIRouter` | Read-only external-domain call | Standard 401/403/409/413/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_research_routes.py::test_usage_research_routes()`<br>**Unit:** `tests/api/unit/test_research_routes.py::test_only_registered_report_crosses_boundary()` |
 | Missing | `FR-API-032` | Expose broker/equity/summary/resource/market-hours/calendar snapshots with timestamps and stale/unavailable states; merge system status into readiness. | `dashboards.router: APIRouter` | Read-only; external API call | Standard 401/403/404/422/502/503 envelopes | **Usage:** `tests/api/usage/test_usage_dashboard_routes.py::test_usage_dashboard_routes()`<br>**Unit:** `tests/api/unit/test_dashboard_routes.py::test_currency_strength_absent()` |
-| Missing | `FR-API-033` | Expose authenticated docs tree/read and environment-authorized audited/idempotent Markdown write/delete under a safe root. | `documentation.router: APIRouter` | Local file read/write/delete; event publication | Standard 401/403/404/409/413/415/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_documentation_routes.py::test_usage_documentation_routes()`<br>**Unit:** `tests/api/unit/test_documentation_routes.py::test_symlink_escape_rejected()` |
-| Missing | `FR-API-034` | Authenticate/authorize a human operator, produce `ApprovalAttestation v1`, submit Risk kill-switch commands, and expose protected readiness/events plus bounded Data-owned audit pages without issuing Risk tokens, policy verdicts, or direct store access. | `operator.router: APIRouter` | UI/API persistence write; event publication; Data read | Standard 401/403/404/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_operator_routes.py::test_usage_operator_routes()`<br>**Unit:** `tests/api/unit/test_operator_routes.py::test_approval_attestation_grants_no_execution_authority()` |
+| Missing | `FR-API-034` | Authenticate/authorize a human operator; construct `KillSwitchCommand v1` with explicit `global`/`portfolio`/`strategy`/`symbol` scope and applicable identifiers; submit activation with separate `AuthContext`; require and submit a matching current `ApprovalAttestation v1` for clearance; and expose protected readiness/`OperationalEvent v1` views plus bounded Data-owned audit pages without issuing Risk tokens, policy verdicts, or direct store access. | `operator.router: APIRouter` | UI/API persistence write; event publication; Data read | Standard 401/403/404/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_operator_routes.py::test_usage_operator_routes()`<br>**Unit:** `tests/api/unit/test_operator_routes.py::test_kill_switch_scope_and_clearance_attestation_are_required()` |
 | Missing | `FR-API-056` | Expose Portfolio construction/result/history/drift and governed activation/rollback/rebalance operations through Portfolio, with Risk eligibility/review and human approval where required; perform no gateway calculation or execution. | `portfolio.router: APIRouter` | Read-only; owner-domain persistence; governed command submission | Standard 401/403/404/409/422/503 envelopes; any stale/missing gate fails closed | **Usage:** `tests/api/usage/test_usage_portfolio_routes.py::test_usage_portfolio_routes()`<br>**Unit:** `tests/api/unit/test_portfolio_routes.py::test_gateway_cannot_bypass_risk_or_trading()` |
 
 #### Approved route contract inventory
@@ -616,7 +622,7 @@ when the final browser transport requires it.
 | `auth.py` | `POST /api/auth/register`; `POST /api/auth/login`; `POST /api/auth/logout` | Public credentials or UI/API-owned session | UI/API account/session write; opaque secure HttpOnly SameSite cookie for browsers, bearer for services; CSRF on cookie-authenticated state changes |
 | `settings.py` | `GET /api/settings`; `PUT /api/settings` | Authenticated owner; UI/API-owned state | Read/write; PUT HTTP idempotency required |
 | `data.py` | `GET /api/data/symbols`; `POST /api/data/dataset/prepare` | Authenticated; Data | Read/external provider; prepare command idempotency required |
-| `strategies.py` | `GET /api/strategies/templates/{name}`; CRUD `/api/strategies`; version list/code/rollback; export/import; explicit approved registration/parameter-update commands; `POST /api/sqx/import`; `POST /api/sqx/calculate-scores`; `GET /api/sqx/strategies` | Authenticated and command permission; Strategy, Analytics for approved scoring | Reads plus Strategy-owned writes/artifacts; every mutation/import idempotent with compensation |
+| `strategies.py` | Catalogue/version reads; explicit approved registration and parameter-update commands | Authenticated and command permission; Strategy, with Optimization evidence where approved | Reads plus Strategy-owned writes; every command idempotent and returns `StrategyMutationResult v1`; raw code/import/export/SQX routes are absent |
 | `backtests.py` | `POST /api/backtest/run` | Authenticated owner; Simulation/Analytics | One synchronous request returning its terminal result/report or error; no query, queue, session, progress, or log WebSocket; HTTP idempotency required |
 | `simulation.py` | No initial routes | — | Interactive session/mutation/what-if surface is outside the initial synchronous lifecycle |
 | `risk.py` | `POST /api/risk/position-sizing`; `/regime-detection`; `/allocation`; `/governance` | Authenticated plus approved risk permission; Risk | Read-only evaluation; no gateway calculations |
@@ -624,26 +630,21 @@ when the final browser transport requires it.
 | `optimization.py` | `POST /api/optimization/run`; synchronous walk-forward, unsupervised, Monte Carlo, and approved scenario variants | Authenticated owner; Optimization | In-memory synchronous calculation returning one terminal result/error; no create/detail/cancel/progress/job WebSocket |
 | `research.py` | `POST /api/research/run` | Authenticated researcher; Research | One bounded request returning `ResearchReport v1` or structured error; internal profile/snapshot/artifact CRUD is absent |
 | `dashboards.py` | `GET /api/dashboard/broker`; `/equity-curve`; `/summary`; `/system/resources`; `/market-hours`; `/forex-calendar` | Authenticated; Data/Trading/Analytics/Utils | Read-only with snapshot/freshness; provider failure never silently substituted |
-| `documentation.py` | `GET /api/docs/files`; `GET /api/docs/content`; `POST /api/docs/save`; `DELETE /api/docs/delete` | Authenticated developer/operator; UI/API boundary | Local read/write/delete; writes environment-gated, audited, idempotent, Markdown-only |
-| `operator.py` | Protected readiness; `POST /api/operator/approvals`; `POST /api/operator/kill-switch`; `GET /api/operator/audit-events`; `GET /api/operator/events/stream` | Validated human operator; UI/API owns attestation, Risk owns token/policy/state, Data owns audit query/page, Trading enforces | Attestation and governed command submission; bounded audit reads delegate to Data; UI/API never issues Risk token/verdict or reads audit tables; public stream forbidden |
+| `operator.py` | Protected readiness; `POST /api/operator/approvals`; `POST /api/operator/kill-switch`; `GET /api/operator/audit-events`; `GET /api/operator/events/stream` | Validated human operator; UI/API owns attestation, Risk owns command/state/policy, Data owns audit query/page, Trading enforces and produces operational events | Explicitly scoped activation uses `AuthContext`; clearance additionally requires matching current attestation; bounded audit reads delegate to Data; UI/API never issues Risk token/verdict or reads audit tables; public stream forbidden |
 | `portfolio.py` | `POST /api/portfolio/constructions`; result/history reads; `POST /api/portfolio/eligibility-reviews`; `POST /api/portfolio/activations`; `POST /api/portfolio/rollbacks`; drift/rebalance review and submission | Authenticated role/permission; Portfolio owns construction/state, Risk owns decisions/budgets, Simulation owns validation, Trading owns execution | Reads plus governed owner-domain writes; HTTP idempotency and current approval required; no gateway weight/risk/order calculation |
 
 **Configuration and Limits Manifest**
 
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `DOCS_ROOT` | `Path` | None | For docs routes | `documentation.router` | Missing/unsafe root blocks docs I/O. |
-| Missing | `DOCS_WRITE_ENABLED` | `bool` | `false` | Yes | `documentation.router` | False blocks all write/delete before filesystem mutation. |
-| Missing | `STRATEGY_IMPORT_MAX_BYTES` | `int` | None | Yes before strategy/SQX import activation | `strategies.router` | Must be explicitly configured from measured evidence; oversized input is rejected before parsing. |
-| Missing | `STRATEGY_IMPORT_CONTENT_TYPES` | `frozenset[str]` | None | For strategy/SQX imports | `strategies.router` | Unsupported types are rejected and partial artifacts cleaned. |
+No route-local import or documentation-file limits exist because both capabilities are
+outside the initial build.
 
 **Implementation notes:** refactor useful V1 DTO/result mappings only. Move route-local
 strategy, backtest, simulator, risk, live, optimization, and research logic to owners;
 remove all direct database, provider, scheduler, and broker access.
 
 **Route rules:** endpoint timeout is 30 seconds unless a documented async/stream contract
-applies; raw exceptions never cross the boundary; 204 never has a body; imports define
-type/size/cleanup; partial mutation failure rolls back, compensates, or returns an
+applies; raw exceptions never cross the boundary; 204 never has a body; partial mutation
+failure rolls back, compensates, or returns an
 explicit pending-reconciliation state.
 
 **Route contract defaults:** auth registration/login and liveness are public; all other
@@ -745,21 +746,19 @@ result, stale warning, or governed block.
 |---|---|---|---|---|
 | Missing | `shell.tsx` | Accessible protected application shell | `AppShell` | **Standard library:** None<br>**Required third-party:** React/Next versions pinned in the frontend manifest before implementation<br>**Local:** `context/auth.tsx` |
 | Missing | `dashboard.tsx` | Freshness-aware dashboard presentation | `DashboardView` | **Standard library:** None<br>**Required third-party:** React version pinned in the frontend manifest before implementation<br>**Local:** dashboard client/types |
-| Missing | `strategies.tsx` | Strategy/SQX workflow presentation | `StrategyWorkspace` | **Standard library:** None<br>**Required third-party:** React version pinned in the frontend manifest before implementation<br>**Local:** strategy client/types |
+| Missing | `strategies.tsx` | Registered strategy catalogue/version workflow presentation | `StrategyWorkspace` | **Standard library:** None<br>**Required third-party:** React version pinned in the frontend manifest before implementation<br>**Local:** strategy client/types |
 | Missing | `simulation.tsx` | Synchronous backtest configuration and completed-result presentation | `SimulationWorkspace` | **Standard library:** None<br>**Required third-party:** React version pinned in the frontend manifest before implementation<br>**Local:** backtest client and result types |
 | Missing | `trading.tsx` | Risk and live/paper Trading presentation | `TradingWorkspace` | **Standard library:** None<br>**Required third-party:** React version pinned in the frontend manifest before implementation<br>**Local:** risk/trading clients and governed context |
 | Missing | `research.tsx` | Optimization and core Edge Lab presentation | `ResearchWorkspace` | **Standard library:** None<br>**Required third-party:** React version pinned in the frontend manifest before implementation<br>**Local:** optimization/research clients |
-| Missing | `documentation.tsx` | Documentation navigation/render/edit presentation | `DocumentationWorkspace` | **Standard library:** None<br>**Required third-party:** React and Markdown renderer versions pinned in the frontend manifest before implementation<br>**Local:** documentation client |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Missing | `FR-API-046` | Provide accessible shell/navigation/error boundary and render stale/offline/unavailable states without hiding governed controls. | `AppShell(props: AppShellProps) => JSX.Element` | Local state mutation | None | **Usage:** `tests/api/usage/test_usage_frontend_components.tsx::testUsageAppShell()`<br>**Unit:** `ui/components/shell.test.tsx::controlsRemainAccessible()` |
 | Missing | `FR-API-047` | Render approved dashboard snapshots with time/freshness and without currency strength. | `DashboardView(props: DashboardProps) => JSX.Element` | None | None | **Usage:** `tests/api/usage/test_usage_frontend_components.tsx::testUsageDashboard()`<br>**Unit:** `ui/components/dashboard.test.tsx::staleSnapshotWarns()` |
-| Missing | `FR-API-048` | Render strategy list/create/edit/version and SQX workflows using typed clients only. | `StrategyWorkspace(props: StrategyWorkspaceProps) => JSX.Element` | External API call through client | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_components.tsx::testUsageStrategies()`<br>**Unit:** `ui/components/strategies.test.tsx::usesTypedClient()` |
+| Missing | `FR-API-048` | Render registered strategy catalogue/version commands using typed clients only; raw import/export/SQX controls are absent. | `StrategyWorkspace(props: StrategyWorkspaceProps) => JSX.Element` | External API call through client | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_components.tsx::testUsageStrategies()`<br>**Unit:** `ui/components/strategies.test.tsx::usesTypedClient()` |
 | Missing | `FR-API-049` | Render synchronous backtest configuration, local request activity, and completed `SimulationResult`/report evidence without presenting local activity as authoritative domain progress or exposing interactive controls. | `SimulationWorkspace(props: SimulationWorkspaceProps) => JSX.Element` | External API call through client | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_components.tsx::testUsageSimulation()`<br>**Unit:** `ui/components/simulation.test.tsx::interactive_controls_are_absent()` |
 | Missing | `FR-API-050` | Render Risk decision support and live/paper Trading monitoring/controls only when authoritative backend gates are available. | `TradingWorkspace(props: TradingWorkspaceProps) => JSX.Element` | External API call through client | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_components.tsx::testUsageTrading()`<br>**Unit:** `ui/components/trading.test.tsx::closedGateDisablesMutation()` |
 | Missing | `FR-API-051` | Render terminal synchronous `OptimizationResult` and registered `ResearchReport` evidence, excluding optimization job progress/cancellation and direct Research-internal profile/scorecard/snapshot views. | `ResearchWorkspace(props: ResearchWorkspaceProps) => JSX.Element` | External API call through client | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_components.tsx::testUsageResearch()`<br>**Unit:** `ui/components/research.test.tsx::unregistered_research_types_are_absent()` |
-| Missing | `FR-API-052` | Render documentation navigation, Markdown, table of contents, and environment-authorized editing. | `DocumentationWorkspace(props: DocumentationWorkspaceProps) => JSX.Element` | External API call through client | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_components.tsx::testUsageDocumentation()`<br>**Unit:** `ui/components/documentation.test.tsx::editHiddenWhenDisallowed()` |
 
 **Configuration and Limits Manifest:** None. Components consume typed client/context
 policy and do not duplicate backend limits.
@@ -783,7 +782,7 @@ client/context.
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Missing | `FR-API-053` | Render login/register routes and recover cleanly from invalid or expired sessions. | `AuthenticationPage(props: AuthenticationPageProps) => JSX.Element` | External API call; local state mutation | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_pages.tsx::testUsageAuthenticationPages()`<br>**Unit:** `ui/app/auth.e2e.test.ts::loginLogoutRecovery()` |
-| Missing | `FR-API-054` | Protect dashboard, settings, strategies, backtests, simulation, risk, live, optimization, Edge Lab, and documentation routes. | `ProtectedLayout(props: PropsWithChildren) => JSX.Element` | External API call; local state mutation | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_pages.tsx::testUsageProtectedLayout()`<br>**Unit:** `ui/app/protected.e2e.test.ts::unauthenticatedAccessRedirects()` |
+| Missing | `FR-API-054` | Protect dashboard, settings, strategies, backtests, simulation, risk, live, optimization, and Edge Lab routes. | `ProtectedLayout(props: PropsWithChildren) => JSX.Element` | External API call; local state mutation | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_pages.tsx::testUsageProtectedLayout()`<br>**Unit:** `ui/app/protected.e2e.test.ts::unauthenticatedAccessRedirects()` |
 | Missing | `FR-API-055` | Compose an approved workflow route exclusively from public clients, context, and workflow components. | `WorkflowPage(props: WorkflowPageProps) => JSX.Element` | External API call through clients | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_pages.tsx::testUsageApprovedPages()`<br>**Unit:** `ui/app/pages.contract.test.ts::everyPageHasClientContract()` |
 
 **Configuration and Limits Manifest:** None. Routing consumes the approved auth and
@@ -838,7 +837,7 @@ additional domain-level public exports; they delegate only to `AuthenticationPag
 
 ## 6. Open Decisions
 
-No open decisions. Requirements remain `Missing` only until their specified implementation and verification are complete.
+No open decisions.
 
 ---
 
@@ -890,7 +889,7 @@ created. During iterative work, run only tests associated with changed files.
   frontend DTO drift, pagination, idempotency, redaction, and requirement traceability.
 - **Usage:** one executable example per public functional requirement.
 - **E2E:** login/logout/session recovery, protected pages, stale blocking, governed-write
-  rejection/success with mocked owners, stream recovery, and documentation policy.
+  rejection/success with mocked owners and stream recovery.
 
 ### Specification completion checklist
 
