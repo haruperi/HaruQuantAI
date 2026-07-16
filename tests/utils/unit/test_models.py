@@ -1,7 +1,12 @@
 from pathlib import Path
 
 import pytest
-from app.utils import ConfigurationError, LoggingSettings, RuntimeSettings
+from app.utils import (
+    ConfigurationError,
+    LoggingSettings,
+    RuntimeSettings,
+    load_settings,
+)
 from pydantic import ValidationError
 
 
@@ -24,8 +29,10 @@ def test_runtime_settings_are_immutable() -> None:
         settings.environment = "production"
 
 
-def test_settings_reject_unknown_or_invalid_values() -> None:
+def test_settings_reject_unknown_value_without_mutation() -> None:
+    source = {"UNKNOWN": "value"}
+    with pytest.raises(ConfigurationError):
+        load_settings(source, {})
+    assert source == {"UNKNOWN": "value"}
     with pytest.raises(ConfigurationError):
         LoggingSettings.model_validate({"level": "TRACE"})
-    with pytest.raises(ConfigurationError):
-        LoggingSettings(unknown=True)

@@ -1,7 +1,12 @@
 import json
 from pathlib import Path
 
-from app.utils import LoggingSettings, configure_logging, get_logger, shutdown_logging
+from app.utils import (
+    LoggingSettings,
+    configure_logging,
+    get_logger,
+    shutdown_logging,
+)
 
 
 def test_structured_logging_redacts_before_file_emission(tmp_path: Path) -> None:
@@ -9,7 +14,8 @@ def test_structured_logging_redacts_before_file_emission(tmp_path: Path) -> None
     configure_logging(
         LoggingSettings(file_path=log_path, log_directory=None, render="json")
     )
-    get_logger("integration").info(
+    logger = get_logger("integration")
+    logger.info(
         "token=abc123",
         extra={"request_id": "req-example", "password": "hidden"},
     )

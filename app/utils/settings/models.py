@@ -1,8 +1,6 @@
-"""Define immutable generic runtime and structured-logging settings.
+"""Immutable validated runtime and logging settings models."""
 
-This module owns the repository's centralized ``BaseSettings`` boundary but
-does not select domain policy or validate execution-route compatibility.
-"""
+from __future__ import annotations
 
 from pathlib import Path
 from typing import Literal
@@ -13,46 +11,41 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.utils.errors.exceptions import ConfigurationError
 
-type LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
-type LogRender = Literal["json", "human"]
-type LogCompression = Literal["zip", "none"]
-type Environment = Literal["dev", "test", "staging", "production"]
-type RuntimeProfile = Literal["research", "simulation", "paper", "live"]
-
+LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
+LogRender = Literal["json", "human"]
+LogCompression = Literal["zip", "none"]
+Environment = Literal["dev", "test", "staging", "production"]
+RuntimeProfile = Literal["research", "simulation", "paper", "live"]
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
 class AppSettings(BaseSettings):
-    """Provide the frozen repository ``.env`` and process-settings boundary.
-
-    Subclasses inherit case-insensitive environment lookup, UTF-8 ``.env``
-    loading from the repository root, rejection of extra values, and immutable
-    model instances.
-    """
+    """Immutable base for typed settings loaded from the central environment."""
 
     model_config = SettingsConfigDict(
         env_file=_REPOSITORY_ROOT / ".env",
         env_file_encoding="utf-8",
+        env_ignore_empty=True,
         case_sensitive=False,
-        extra="forbid",
+        extra="ignore",
         frozen=True,
     )
 
 
 class _ConfigurationModel(BaseModel):
-    """Map Pydantic model failures to boundary-safe configuration errors."""
+    """Base model that maps Pydantic failures to shared configuration errors."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     def __init__(self, **data: object) -> None:
-        """Validate and freeze a generic configuration model.
+        """Initialize the configuration model, mapping Pydantic validation errors.
 
         Args:
-            **data: Explicit field values accepted by the concrete model.
+            data: Arbitrary keyword settings arguments.
 
         Raises:
-            ConfigurationError: Any supplied field is missing, extra, or
-                outside its declared type or bounds.
+            ConfigurationError: If any of the values violate field
+                validation constraints.
         """
         try:
             super().__init__(**data)
@@ -61,19 +54,19 @@ class _ConfigurationModel(BaseModel):
 
 
 class LoggingSettings(_ConfigurationModel):
-    """Represent immutable bounded structured-logging settings.
+    """Immutable bounded structured-logging settings.
 
     Attributes:
-        level: Minimum standard log level accepted by configured handlers.
-        render: Structured ``json`` or source-aware ``human`` rendering.
-        file_path: Optional standalone rotating application-log path.
-        log_directory: Optional directory for the four specialized log files.
-        max_bytes: Per-file size threshold that triggers rotation.
-        backup_count: Maximum numbered rotations retained per active file.
-        retention_days: Maximum rotation age removed during rollover.
-        compression: ``zip`` compression or uncompressed rotation.
-        enqueue: Whether records use one in-process queue listener.
-        colorize: Whether human console level and message text use ANSI color.
+        level: Log severity filter level.
+        render: Log output style format, human or json.
+        file_path: Optional path to write a single log file to.
+        log_directory: Optional directory path to write structured logs.
+        max_bytes: Size in bytes at which log files roll over.
+        backup_count: Maximum count of rotated log files to retain.
+        retention_days: Number of days to keep rotated logs before deletion.
+        compression: Mode of compression to apply to rotated logs.
+        enqueue: If True, writes logs asynchronously via a background queue.
+        colorize: If True, adds color escape sequences to terminal logs.
     """
 
     level: LogLevel = "DEBUG"
@@ -89,12 +82,12 @@ class LoggingSettings(_ConfigurationModel):
 
 
 class RuntimeSettings(_ConfigurationModel):
-    """Represent immutable business-neutral runtime settings.
+    """Immutable generic runtime settings.
 
     Attributes:
-        environment: Deployment environment label.
-        runtime_profile: Requested research or execution profile.
-        logging: Nested immutable structured-logging configuration.
+        environment: Standard environment classification name.
+        runtime_profile: Standard runtime profile categorization name.
+        logging: Configured sub-settings representing logging configuration.
     """
 
     environment: Environment = "dev"

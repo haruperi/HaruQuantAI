@@ -1,8 +1,6 @@
-"""Validate the Stage 2 redaction policy used by structured logging.
+"""Denylist-first secret redaction for text and JSON-safe mappings."""
 
-Only ``RedactionPolicy`` is public in Phase 1. Text and mapping redaction
-helpers remain private until the complete diagnostic API is delivered.
-"""
+from __future__ import annotations
 
 import math
 import re
@@ -27,34 +25,40 @@ _DEFAULT_SENSITIVE_KEYS = frozenset(
     }
 )
 _PROTECTED_KEYS = frozenset(
-    {"password", "passwd", "privatekey", "clientsecret", "apikey", "authorization"}
+    {
+        "password",
+        "passwd",
+        "privatekey",
+        "clientsecret",
+        "apikey",
+        "authorization",
+    }
 )
 
 
 def _normalize_key(value: str) -> str:
-    """Normalize a field name for case-insensitive policy matching.
+    """Normalize a key case-insensitively, removing hyphens and underscores.
 
     Args:
-        value: Source field name or configured sensitive key.
+        value: String key to normalize.
 
     Returns:
-        A case-folded key without hyphens or underscores.
+        The normalized canonical key.
     """
     return value.casefold().replace("-", "").replace("_", "")
 
 
 @dataclass(frozen=True, slots=True)
 class RedactionPolicy:
-    """Represent the immutable redaction policy required by logging.
+    """Immutable denylist-first redaction policy.
 
     Attributes:
-        sensitive_keys: Normalized denylist matched case-insensitively.
-        allowlisted_paths: Exact dot paths allowed to bypass ordinary
-            sensitive-key matching; protected credential fields remain barred.
-        replacement: Fixed text substituted for removed secret values.
-        max_text_length: Maximum safe text length after redaction.
-        max_depth: Maximum nested mapping or sequence depth.
-        max_items: Maximum aggregate mapping and sequence items.
+        sensitive_keys: A frozen set of lowercase key names to redact.
+        allowlisted_paths: A frozen set of JSON paths exempt from redaction.
+        replacement: String substitution value.
+        max_text_length: Bounded maximum size in characters for text nodes.
+        max_depth: Bounded maximum nesting depth for maps/sequences.
+        max_items: Bounded maximum total item count allowed.
     """
 
     sensitive_keys: frozenset[str] = field(
@@ -67,135 +71,253 @@ class RedactionPolicy:
     max_items: int = 1_000
 
     def __post_init__(self) -> None:
-        """Normalize the denylist and reject an unsafe policy.
+        """Validate and normalize the policy definition.
 
         Raises:
-            ValidationError: Required values or configured bounds are invalid.
-            SecurityError: An allowlisted path ends in a protected credential
-                field.
+            ValidationError: If key, path, replacement format, or numeric limit
+                bounds are violated.
+            SecurityError: If trying to allowlist protected credential keys.
         """
-        if not self.sensitive_keys or not self.replacement.strip():
+        if not self.sensitive_keys:
             raise ValidationError("REDACTION_POLICY_INVALID")
-        if min(self.max_text_length, self.max_depth, self.max_items) < 1:
+        normalized_keys: set[str] = set()
+        for key in self.sensitive_keys:
+            if not key or key != key.strip():
+                raise ValidationError("REDACTION_POLICY_INVALID")
+            normalized_keys.add(_normalize_key(key))
+        if not self.replacement or self.replacement != self.replacement.strip():
             raise ValidationError("REDACTION_POLICY_INVALID")
-        normalized_keys = frozenset(_normalize_key(key) for key in self.sensitive_keys)
-        if "" in normalized_keys:
+        if self.max_text_length < 1 or self.max_depth < 1 or self.max_items < 1:
             raise ValidationError("REDACTION_POLICY_INVALID")
+        normalized_paths: set[str] = set()
         for path in self.allowlisted_paths:
             parts = path.split(".")
             if not path or path != path.strip() or any(not part for part in parts):
                 raise ValidationError("REDACTION_POLICY_INVALID")
             if _normalize_key(parts[-1]) in _PROTECTED_KEYS:
                 raise SecurityError("REDACTION_PROTECTED_ALLOWLIST")
-        object.__setattr__(self, "sensitive_keys", normalized_keys)
+            normalized_paths.add(path)
+        object.__setattr__(self, "sensitive_keys", frozenset(normalized_keys))
+        object.__setattr__(self, "allowlisted_paths", frozenset(normalized_paths))
 
 
-def _redact_text(value: str, policy: RedactionPolicy) -> str:
-    """Redact recognized secret assignments before bounded truncation.
+@dataclass(frozen=True, slots=True)
+class RedactionResult:
+    """Redacted value plus secret-free diagnostics.
+
+    Attributes:
+        value: The newly constructed redacted and bounded JSON-safe object.
+        redacted_paths: Lexicographically sorted list of redacted paths.
+        truncated_paths: Lexicographically sorted list of truncated node paths.
+    """
+
+    value: object
+    redacted_paths: tuple[str, ...]
+    truncated_paths: tuple[str, ...]
+
+    @property
+    def truncated(self) -> bool:
+        """Return whether any value was truncated.
+
+        Returns:
+            True if any values or strings were truncated.
+        """
+        return bool(self.truncated_paths)
+
+
+def is_sensitive_key(key: str, policy: RedactionPolicy | None = None) -> bool:
+    """Return whether a key is sensitive under a policy.
 
     Args:
-        value: Source message or text value.
-        policy: Validated immutable redaction policy.
+        key: Candidate mapping key.
+        policy: Optional redaction policy.
 
     Returns:
-        Redacted text no longer than ``policy.max_text_length``.
+        Whether the key is sensitive, case-insensitively.
+    """
+    active_policy = policy or RedactionPolicy()
+    normalized = _normalize_key(key)
+    return any(
+        normalized == item or normalized.endswith(item)
+        for item in active_policy.sensitive_keys
+    )
+
+
+def _text_pattern(policy: RedactionPolicy) -> re.Pattern[str]:
+    """Compile a regex pattern to scan for sensitive key-value pairs.
+
+    Args:
+        policy: Active redaction policy.
+
+    Returns:
+        The compiled regex Pattern.
     """
     keys = sorted(policy.sensitive_keys, key=len, reverse=True)
     alternation = "|".join(re.escape(key) for key in keys)
-    pattern = re.compile(
+    return re.compile(
         rf"(?i)(\b(?:{alternation})\b\s*[:=]\s*)([^\s,;]+)|"
         r"(\bBearer\s+)([^\s,;]+)"
     )
 
-    def replace(match: re.Match[str]) -> str:
-        """Build a fixed replacement while preserving the matched label.
 
-        Args:
-            match: Regular-expression match containing a secret label/value.
-
-        Returns:
-            The original label followed by the policy replacement marker.
-        """
-        return f"{match.group(1) or match.group(3) or ''}{policy.replacement}"
-
-    return pattern.sub(replace, value)[: policy.max_text_length]
-
-
-def _redact_mapping(  # noqa: C901
-    value: Mapping[str, object],
-    policy: RedactionPolicy,
-) -> dict[str, object]:
-    """Return a bounded deep-redacted copy of structured context.
+def redact_text_value(
+    value: str,
+    policy: RedactionPolicy | None = None,
+) -> RedactionResult:
+    """Redact and bound text without mutating the source.
 
     Args:
-        value: Source structured context mapping.
-        policy: Validated immutable redaction policy.
+        value: Source text.
+        policy: Optional redaction policy.
 
     Returns:
-        A newly allocated mapping containing only safe supported values.
-
-    Raises:
-        ValidationError: A value is unsupported or non-finite, a key is
-            invalid, or a depth/item bound is exceeded.
+        Redacted text and secret-free diagnostics.
     """
-    item_count = [0]
+    active_policy = policy or RedactionPolicy()
+    pattern = _text_pattern(active_policy)
+    redacted = False
 
-    def redact(  # noqa: C901, PLR0912
-        nested: object,
-        *,
-        path: str,
-        depth: int,
-    ) -> object:
-        """Redact one value while tracking its path and traversal depth.
+    def replace(match: re.Match[str]) -> str:
+        """Substitute matched sensitive value with redaction replacement.
 
         Args:
-            nested: Current scalar or container value.
-            path: Exact dot path to the current value.
-            depth: Current traversal depth, starting at zero.
+            match: The regex match object.
 
         Returns:
-            A safe scalar or newly allocated container.
-
-        Raises:
-            ValidationError: The value is invalid or exceeds policy bounds.
+            The replacement string containing the key prefix and replacement value.
         """
-        if depth > policy.max_depth:
-            raise ValidationError("REDACTION_DEPTH_EXCEEDED")
-        if nested is None or isinstance(nested, bool | int):
-            return nested
-        if isinstance(nested, float):
-            if not math.isfinite(nested):
-                raise ValidationError("REDACTION_VALUE_INVALID")
-            return nested
-        if isinstance(nested, str):
-            return _redact_text(nested, policy)
-        if isinstance(nested, Mapping):
-            item_count[0] += len(nested)
-            if item_count[0] > policy.max_items:
-                raise ValidationError("REDACTION_ITEMS_EXCEEDED")
-            output: dict[str, object] = {}
-            for key, child in nested.items():
-                if not isinstance(key, str) or not key:
-                    raise ValidationError("REDACTION_MAPPING_INVALID")
-                child_path = f"{path}.{key}" if path else key
-                normalized = _normalize_key(key)
-                sensitive = any(
-                    normalized == candidate or normalized.endswith(candidate)
-                    for candidate in policy.sensitive_keys
-                )
-                if sensitive and child_path not in policy.allowlisted_paths:
-                    output[key] = policy.replacement
-                else:
-                    output[key] = redact(child, path=child_path, depth=depth + 1)
-            return output
-        if isinstance(nested, list | tuple):
-            item_count[0] += len(nested)
-            if item_count[0] > policy.max_items:
-                raise ValidationError("REDACTION_ITEMS_EXCEEDED")
-            return [
-                redact(child, path=f"{path}.{index}", depth=depth + 1)
-                for index, child in enumerate(nested)
-            ]
-        raise ValidationError("REDACTION_VALUE_INVALID")
+        nonlocal redacted
+        redacted = True
+        prefix = match.group(1) or match.group(3) or ""
+        return f"{prefix}{active_policy.replacement}"
 
-    return redact(value, path="", depth=0)  # type: ignore[return-value]
+    safe_value = pattern.sub(replace, value)
+    truncated_paths: tuple[str, ...] = ()
+    if len(safe_value) > active_policy.max_text_length:
+        safe_value = safe_value[: active_policy.max_text_length]
+        truncated_paths = ("$text",)
+    redacted_paths = ("$text",) if redacted else ()
+    return RedactionResult(safe_value, redacted_paths, truncated_paths)
+
+
+def _redact_value(  # noqa: C901, PLR0912 - bounded recursive type dispatch.
+    value: object,
+    *,
+    policy: RedactionPolicy,
+    path: str,
+    depth: int,
+    item_count: list[int],
+    redacted_paths: list[str],
+    truncated_paths: list[str],
+) -> object:
+    """Recursively redact and validate nodes.
+
+    Args:
+        value: Node value to process.
+        policy: Active redaction policy.
+        path: Dot-separated JSON path to the current node.
+        depth: Current recursion depth.
+        item_count: Aggregate item counter list.
+        redacted_paths: Output log of redacted paths.
+        truncated_paths: Output log of truncated paths.
+
+    Returns:
+        The redacted/validated node representation.
+
+    Raises:
+        ValidationError: If nesting depth, total item limits, or JSON-safe checks fail.
+    """
+    if depth > policy.max_depth:
+        raise ValidationError("REDACTION_DEPTH_EXCEEDED")
+    if value is None or isinstance(value, bool | int):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValidationError("REDACTION_VALUE_INVALID")
+        return value
+    if isinstance(value, str):
+        text_result = redact_text_value(value, policy)
+        if text_result.redacted_paths:
+            redacted_paths.append(path)
+        if text_result.truncated_paths:
+            truncated_paths.append(path)
+        return text_result.value
+    if isinstance(value, Mapping):
+        item_count[0] += len(value)
+        if item_count[0] > policy.max_items:
+            raise ValidationError("REDACTION_ITEMS_EXCEEDED")
+        safe_mapping: dict[str, object] = {}
+        for key, nested in value.items():
+            if not isinstance(key, str) or not key:
+                raise ValidationError("REDACTION_MAPPING_INVALID")
+            nested_path = f"{path}.{key}" if path else key
+            if is_sensitive_key(key, policy) and (
+                nested_path not in policy.allowlisted_paths
+            ):
+                safe_mapping[key] = policy.replacement
+                redacted_paths.append(nested_path)
+                continue
+            safe_mapping[key] = _redact_value(
+                nested,
+                policy=policy,
+                path=nested_path,
+                depth=depth + 1,
+                item_count=item_count,
+                redacted_paths=redacted_paths,
+                truncated_paths=truncated_paths,
+            )
+        return safe_mapping
+    if isinstance(value, list | tuple):
+        item_count[0] += len(value)
+        if item_count[0] > policy.max_items:
+            raise ValidationError("REDACTION_ITEMS_EXCEEDED")
+        return [
+            _redact_value(
+                item,
+                policy=policy,
+                path=f"{path}.{index}" if path else str(index),
+                depth=depth + 1,
+                item_count=item_count,
+                redacted_paths=redacted_paths,
+                truncated_paths=truncated_paths,
+            )
+            for index, item in enumerate(value)
+        ]
+    raise ValidationError("REDACTION_VALUE_INVALID")
+
+
+def redact_mapping_value(
+    value: Mapping[str, object],
+    policy: RedactionPolicy | None = None,
+) -> RedactionResult:
+    """Recursively redact a JSON-safe mapping without mutating it.
+
+    Args:
+        value: Source JSON-safe mapping.
+        policy: Optional redaction policy.
+
+    Returns:
+        Redacted mapping and secret-free diagnostics.
+
+    Raises:
+        ValidationError: If the mapping is not JSON-safe or exceeds bounds.
+    """
+    active_policy = policy or RedactionPolicy()
+    redacted_paths: list[str] = []
+    truncated_paths: list[str] = []
+    safe_value = _redact_value(
+        value,
+        policy=active_policy,
+        path="",
+        depth=0,
+        item_count=[0],
+        redacted_paths=redacted_paths,
+        truncated_paths=truncated_paths,
+    )
+    if not isinstance(safe_value, dict):
+        raise ValidationError("REDACTION_MAPPING_INVALID")
+    return RedactionResult(
+        safe_value,
+        tuple(sorted(set(redacted_paths))),
+        tuple(sorted(set(truncated_paths))),
+    )

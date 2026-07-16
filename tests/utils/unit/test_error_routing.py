@@ -11,6 +11,7 @@ def test_route_error_event_invokes_injected_sink() -> None:
         events.append,
     )
     assert events == [payload]
+    assert payload == {"code": "VALIDATION_FAILED", "detail": "FIELD_MISSING"}
 
 
 def test_route_error_event_propagates_sink_failure() -> None:

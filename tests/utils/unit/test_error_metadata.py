@@ -18,12 +18,14 @@ def test_normalize_and_lookup_error_metadata() -> None:
         severity="warning",
         retryable=False,
     )
+    field_name = "title"
     with pytest.raises(FrozenInstanceError):
-        metadata.title = "changed"
+        setattr(metadata, field_name, "changed")
 
 
 def test_error_metadata_rejects_malformed_code() -> None:
     with pytest.raises(ValidationError):
         normalize_error_code("***")
     generic = get_error_metadata("domain-owned-code")
-    assert (generic.code, generic.title) == ("DOMAIN_OWNED_CODE", "Application error")
+    assert generic.code == "DOMAIN_OWNED_CODE"
+    assert generic.title == "Application error"

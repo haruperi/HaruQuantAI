@@ -1,8 +1,6 @@
-"""Define the immutable authentication and trace-context contract.
+"""Shared immutable authentication-context contract."""
 
-The module validates caller-supplied identity, authorization labels, and trace
-identifiers without performing authentication or permission decisions.
-"""
+from __future__ import annotations
 
 from datetime import datetime
 from typing import Literal
@@ -17,25 +15,21 @@ from app.utils.contracts.audit import (
 
 
 class AuthContext(BaseModel):
-    """Represent an immutable authenticated principal and trace context.
-
-    The contract carries authentication evidence produced by the owning
-    boundary. It does not verify identities or authorize operations.
+    """Immutable authenticated principal and trace context version 1.
 
     Attributes:
-        contract_version: Fixed contract version, always ``"v1"``.
-        schema_id: Fixed schema identity, always
-            ``"utils.auth_context.v1"``.
-        principal_id: Non-empty identifier for the authenticated principal.
-        principal_type: Supported human or service-account principal type.
-        roles: Ordered, duplicate-free role labels.
-        permissions: Ordered, duplicate-free permission labels.
-        scopes: Ordered, duplicate-free authorization scopes.
-        tenant_or_environment: Tenant or environment bound to the evidence.
-        request_id: Canonical request trace identifier.
-        workflow_id: Canonical workflow trace identifier.
-        correlation_id: Canonical correlation trace identifier.
-        issued_at: Aware UTC instant when the evidence was issued.
+        contract_version: The version string, fixed at 'v1'.
+        schema_id: The schema identifier, fixed at 'utils.auth_context.v1'.
+        principal_id: Unique identity of the authenticated user or service.
+        principal_type: Categorization as USER or SERVICE_ACCOUNT.
+        roles: Bounded unique roles assigned to the principal.
+        permissions: Bounded unique fine-grained permissions.
+        scopes: Bounded unique scopes requested/granted.
+        tenant_or_environment: Namespace of the tenant or environment.
+        request_id: Trace identifier of the outer request.
+        workflow_id: Trace identifier tracking the orchestrating workflow.
+        correlation_id: Trace identifier tracking the entire flow.
+        issued_at: Aware UTC datetime representing token issuance.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -56,19 +50,17 @@ class AuthContext(BaseModel):
     @field_validator("principal_id", "tenant_or_environment")
     @classmethod
     def _validate_identity(cls, value: str, info: object) -> str:
-        """Validate a required identity field.
+        """Validate principal identity or environment string is non-empty.
 
         Args:
-            value: Candidate identity value.
-            info: Pydantic validation metadata containing the field name.
+            value: The string value to validate.
+            info: Validation context information.
 
         Returns:
-            The unchanged, validated value.
-
-        Raises:
-            ValueError: The value is empty or contains outer whitespace.
+            The validated non-empty string.
         """
-        return validate_non_empty(value, str(getattr(info, "field_name", "field")))
+        field_name = getattr(info, "field_name", "contract field")
+        return validate_non_empty(value, str(field_name))
 
     @field_validator("roles", "permissions", "scopes")
     @classmethod
@@ -77,17 +69,17 @@ class AuthContext(BaseModel):
         value: tuple[str, ...],
         info: object,
     ) -> tuple[str, ...]:
-        """Validate an ordered tuple of authorization labels.
+        """Validate that the string tuple is non-empty and has no duplicates.
 
         Args:
-            value: Candidate role, permission, or scope labels.
-            info: Pydantic validation metadata containing the field name.
+            value: The tuple of strings to validate.
+            info: Validation context information.
 
         Returns:
-            A tuple containing the validated labels in caller order.
+            The validated tuple of non-empty strings.
 
         Raises:
-            ValueError: A label is empty, untrimmed, or duplicated.
+            ValueError: If there are duplicate items in the tuple.
         """
         field_name = str(getattr(info, "field_name", "contract tuple"))
         if len(set(value)) != len(value):
@@ -98,63 +90,51 @@ class AuthContext(BaseModel):
     @field_validator("request_id")
     @classmethod
     def _validate_request_id(cls, value: str) -> str:
-        """Validate and return a canonical request identifier.
+        """Validate the canonical request trace identifier.
 
         Args:
-            value: Candidate request identifier.
+            value: Trace identifier to validate.
 
         Returns:
-            The validated identifier.
-
-        Raises:
-            ValueError: The identifier is not canonical.
+            The validated trace identifier string.
         """
         return validate_trace_id(value, "req", "request_id")
 
     @field_validator("workflow_id")
     @classmethod
     def _validate_workflow_id(cls, value: str) -> str:
-        """Validate and return a canonical workflow identifier.
+        """Validate the canonical workflow trace identifier.
 
         Args:
-            value: Candidate workflow identifier.
+            value: Trace identifier to validate.
 
         Returns:
-            The validated identifier.
-
-        Raises:
-            ValueError: The identifier is not canonical.
+            The validated trace identifier string.
         """
         return validate_trace_id(value, "wf", "workflow_id")
 
     @field_validator("correlation_id")
     @classmethod
     def _validate_correlation_id(cls, value: str) -> str:
-        """Validate and return a canonical correlation identifier.
+        """Validate the canonical correlation trace identifier.
 
         Args:
-            value: Candidate correlation identifier.
+            value: Trace identifier to validate.
 
         Returns:
-            The validated identifier.
-
-        Raises:
-            ValueError: The identifier is not canonical.
+            The validated trace identifier string.
         """
         return validate_trace_id(value, "cor", "correlation_id")
 
     @field_validator("issued_at")
     @classmethod
     def _validate_issued_at(cls, value: datetime) -> datetime:
-        """Validate and return the issuance instant.
+        """Validate that the issuance time is timezone-aware and set to UTC.
 
         Args:
-            value: Candidate issuance timestamp.
+            value: The datetime to validate.
 
         Returns:
-            The same aware UTC timestamp.
-
-        Raises:
-            ValueError: The timestamp is naive or not UTC.
+            The validated UTC datetime.
         """
         return validate_utc(value, "issued_at")

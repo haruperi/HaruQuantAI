@@ -1,8 +1,6 @@
-"""Define the immutable audit-event contract and its bounded validators.
+"""Shared immutable audit-event contract and contract-field validation."""
 
-Audit payload validation is deliberately fail-closed: only bounded JSON-safe
-values without protected credential keys can enter the shared contract.
-"""
+from __future__ import annotations
 
 import json
 import math
@@ -27,22 +25,29 @@ _MAX_PAYLOAD_BYTES = 65_536
 _MAX_PAYLOAD_DEPTH = 16
 _MAX_PAYLOAD_ITEMS = 1_000
 _PROTECTED_KEYS = frozenset(
-    {"password", "passwd", "privatekey", "clientsecret", "apikey", "authorization"}
+    {
+        "password",
+        "passwd",
+        "privatekey",
+        "clientsecret",
+        "apikey",
+        "authorization",
+    }
 )
 
 
 def validate_non_empty(value: str, field_name: str) -> str:
-    """Validate a required trimmed contract string.
+    """Validate a required contract string.
 
     Args:
-        value: Candidate string supplied by a contract producer.
-        field_name: Stable field label used in validation errors.
+        value: Candidate value.
+        field_name: Field name used in the validation message.
 
     Returns:
-        The unchanged validated string.
+        The unchanged validated value.
 
     Raises:
-        ValueError: The string is empty or contains outer whitespace.
+        ValueError: If the value is empty or has surrounding whitespace.
     """
     if not value or value != value.strip():
         message = f"{field_name} must be non-empty and trimmed"
@@ -54,14 +59,14 @@ def validate_utc(value: datetime, field_name: str) -> datetime:
     """Validate an aware UTC datetime.
 
     Args:
-        value: Candidate timestamp.
-        field_name: Stable field label used in validation errors.
+        value: Candidate datetime.
+        field_name: Field name used in the validation message.
 
     Returns:
-        The unchanged validated timestamp.
+        The unchanged validated datetime.
 
     Raises:
-        ValueError: The timestamp is naive or has a non-UTC offset.
+        ValueError: If the datetime is naive or not UTC.
     """
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         message = f"{field_name} must be an aware UTC datetime"
@@ -70,18 +75,18 @@ def validate_utc(value: datetime, field_name: str) -> datetime:
 
 
 def validate_trace_id(value: str, prefix: str, field_name: str) -> str:
-    """Validate a canonical UUID4 or stable-hash trace identifier.
+    """Validate a canonical trace identifier.
 
     Args:
-        value: Candidate prefixed trace identifier.
-        prefix: Required identifier prefix without its separator.
-        field_name: Stable field label used in validation errors.
+        value: Candidate identifier.
+        prefix: Required identifier prefix.
+        field_name: Field name used in the validation message.
 
     Returns:
         The unchanged validated identifier.
 
     Raises:
-        ValueError: The value is empty, untrimmed, or non-canonical.
+        ValueError: If the identifier is malformed.
     """
     validate_non_empty(value, field_name)
     if re.fullmatch(rf"{re.escape(prefix)}-{_TRACE_SUFFIX}", value) is None:
@@ -91,47 +96,36 @@ def validate_trace_id(value: str, prefix: str, field_name: str) -> str:
 
 
 def _normalize_key(value: str) -> str:
-    """Normalize a mapping key for credential-field comparison.
+    """Normalize a key case-insensitively, removing hyphens and underscores.
 
     Args:
-        value: Source mapping key.
+        value: The string key to normalize.
 
     Returns:
-        A case-folded key without hyphens or underscores.
+        The normalized canonical key.
     """
     return value.casefold().replace("-", "").replace("_", "")
 
 
-def _add_items(item_count: list[int], amount: int) -> None:
-    """Add container items to the mutable traversal counter.
+def _freeze_json(
+    value: object,
+    *,
+    depth: int,
+    item_count: list[int],
+) -> JsonValue:
+    """Recursively freeze a JSON-safe value into a read-only representation.
 
     Args:
-        item_count: Single-element aggregate counter owned by one traversal.
-        amount: Number of newly visited items.
-
-    Raises:
-        ValueError: The aggregate payload item limit is exceeded.
-    """
-    item_count[0] += amount
-    if item_count[0] > _MAX_PAYLOAD_ITEMS:
-        raise ValueError("payload exceeds maximum aggregate items")
-
-
-def _freeze_json(value: object, *, depth: int, item_count: list[int]) -> JsonValue:
-    """Validate and deeply freeze one JSON-safe value.
-
-    Args:
-        value: Candidate scalar or container value.
-        depth: Current traversal depth, starting at zero.
-        item_count: Shared single-element aggregate item counter.
+        value: The value to freeze.
+        depth: The current recursion nesting depth.
+        item_count: A single-element list containing the aggregate item count.
 
     Returns:
-        An immutable JSON-safe scalar, tuple, or mapping proxy.
+        The read-only frozen representation of the value.
 
     Raises:
-        TypeError: A mapping key is not a string.
-        ValueError: The value is unsafe, non-finite, protected, or over a
-            configured payload bound.
+        ValueError: If nesting depth or item count limits are exceeded, or
+            if the value is not JSON-safe.
     """
     if depth > _MAX_PAYLOAD_DEPTH:
         raise ValueError("payload exceeds maximum nesting depth")
@@ -142,36 +136,93 @@ def _freeze_json(value: object, *, depth: int, item_count: list[int]) -> JsonVal
             raise ValueError("payload contains a non-finite number")
         return value
     if isinstance(value, Mapping):
-        _add_items(item_count, len(value))
-        frozen: dict[str, JsonValue] = {}
-        for key, nested in value.items():
-            if not isinstance(key, str):
-                raise TypeError("payload mapping keys must be strings")
-            validate_non_empty(key, "payload key")
-            if _normalize_key(key) in _PROTECTED_KEYS:
-                raise ValueError("payload contains a protected credential key")
-            frozen[key] = _freeze_json(
-                nested,
-                depth=depth + 1,
-                item_count=item_count,
-            )
-        return MappingProxyType(frozen)
+        return _freeze_mapping(value, depth=depth, item_count=item_count)
     if isinstance(value, list | tuple):
-        _add_items(item_count, len(value))
-        return tuple(
-            _freeze_json(item, depth=depth + 1, item_count=item_count) for item in value
-        )
+        return _freeze_sequence(value, depth=depth, item_count=item_count)
     raise ValueError("payload contains a non-JSON-safe value")
 
 
-def _thaw_json(value: JsonValue) -> object:
-    """Convert a frozen payload to containers accepted by ``json.dumps``.
+def _add_items(item_count: list[int], amount: int) -> None:
+    """Add a count of items to the aggregate tracking list and validate limit.
 
     Args:
-        value: Frozen JSON-safe value.
+        item_count: A single-element list containing the aggregate item count.
+        amount: Number of items to add.
+
+    Raises:
+        ValueError: If the updated item count exceeds the maximum items limit.
+    """
+    item_count[0] += amount
+    if item_count[0] > _MAX_PAYLOAD_ITEMS:
+        raise ValueError("payload exceeds maximum aggregate items")
+
+
+def _freeze_mapping(
+    value: Mapping[object, object],
+    *,
+    depth: int,
+    item_count: list[int],
+) -> Mapping[str, JsonValue]:
+    """Recursively freeze a JSON mapping into an immutable mapping proxy.
+
+    Args:
+        value: The mapping to freeze.
+        depth: The current recursion nesting depth.
+        item_count: A single-element list containing the aggregate item count.
 
     Returns:
-        An equivalent scalar, list, or mutable mapping used only for encoding.
+        An immutable mapping proxy containing frozen values.
+
+    Raises:
+        TypeError: If any key in the mapping is not a string.
+        ValueError: If a key is empty, or normalized to a protected credential key.
+    """
+    _add_items(item_count, len(value))
+    frozen: dict[str, JsonValue] = {}
+    for key, nested in value.items():
+        if not isinstance(key, str):
+            raise TypeError("payload mapping keys must be strings")
+        validate_non_empty(key, "payload key")
+        if _normalize_key(key) in _PROTECTED_KEYS:
+            raise ValueError("payload contains a protected credential key")
+        frozen[key] = _freeze_json(
+            nested,
+            depth=depth + 1,
+            item_count=item_count,
+        )
+    return MappingProxyType(frozen)
+
+
+def _freeze_sequence(
+    value: list[object] | tuple[object, ...],
+    *,
+    depth: int,
+    item_count: list[int],
+) -> tuple[JsonValue, ...]:
+    """Recursively freeze a sequence into an immutable tuple.
+
+    Args:
+        value: The sequence of values to freeze.
+        depth: The current recursion nesting depth.
+        item_count: A single-element list containing the aggregate item count.
+
+    Returns:
+        An immutable tuple containing the frozen values.
+    """
+    _add_items(item_count, len(value))
+    return tuple(
+        _freeze_json(item, depth=depth + 1, item_count=item_count) for item in value
+    )
+
+
+def _thaw_json(value: JsonValue) -> object:
+    """Convert an immutable frozen JSON-safe structure back to mutable objects.
+
+    Args:
+        value: The frozen JSON-safe value to thaw.
+
+    Returns:
+        A mutable Python representation of the structure.
     """
     if isinstance(value, Mapping):
         return {key: _thaw_json(nested) for key, nested in value.items()}
@@ -181,28 +232,27 @@ def _thaw_json(value: JsonValue) -> object:
 
 
 class AuditEvent(BaseModel):
-    """Represent an immutable, bounded audit-event envelope.
-
-    Producers must redact payloads before construction. The contract performs
-    an additional fail-closed protected-key check but does not originate or
-    persist audit events.
+    """Immutable, bounded, redacted audit-event envelope version 1.
 
     Attributes:
-        contract_version: Fixed contract version, always ``"v1"``.
-        schema_id: Fixed schema identity, always
-            ``"utils.audit_event.v1"``.
-        event_id: Canonical event identifier.
-        timestamp: Aware UTC event timestamp.
-        domain: Non-empty producing domain name.
-        action: Non-empty audited action name.
-        principal_id: Optional authenticated principal identifier.
-        request_id: Canonical request trace identifier.
-        correlation_id: Canonical correlation trace identifier.
-        causation_id: Optional canonical causation trace identifier.
-        payload: Deeply immutable, bounded JSON-safe event evidence.
+        contract_version: The version string, fixed at 'v1'.
+        schema_id: The schema identifier, fixed at 'utils.audit_event.v1'.
+        event_id: Unique trace identifier for the event.
+        timestamp: Aware UTC datetime when the event occurred.
+        domain: Business domain name representing the source.
+        action: Specific action performed within the domain.
+        principal_id: Optional identity of the invoking user or service.
+        request_id: Trace identifier of the outer request.
+        correlation_id: Trace identifier tracking the entire flow.
+        causation_id: Optional trace identifier tracking the direct cause.
+        payload: Immutable, bounded, redacted event data.
     """
 
-    model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid", frozen=True)
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        frozen=True,
+    )
 
     contract_version: Literal["v1"]
     schema_id: Literal["utils.audit_event.v1"]
@@ -219,118 +269,101 @@ class AuditEvent(BaseModel):
     @field_validator("event_id")
     @classmethod
     def _validate_event_id(cls, value: str) -> str:
-        """Validate and return the event identifier.
+        """Validate the canonical event trace identifier prefix and format.
 
         Args:
-            value: Candidate event identifier.
+            value: Trace identifier to validate.
 
         Returns:
-            The validated identifier.
-
-        Raises:
-            ValueError: The identifier is not canonical.
+            The validated trace identifier string.
         """
         return validate_trace_id(value, "evt", "event_id")
 
     @field_validator("request_id")
     @classmethod
     def _validate_request_id(cls, value: str) -> str:
-        """Validate and return the request identifier.
+        """Validate the canonical request trace identifier prefix and format.
 
         Args:
-            value: Candidate request identifier.
+            value: Trace identifier to validate.
 
         Returns:
-            The validated identifier.
-
-        Raises:
-            ValueError: The identifier is not canonical.
+            The validated trace identifier string.
         """
         return validate_trace_id(value, "req", "request_id")
 
     @field_validator("correlation_id")
     @classmethod
     def _validate_correlation_id(cls, value: str) -> str:
-        """Validate and return the correlation identifier.
+        """Validate the canonical correlation trace identifier prefix and format.
 
         Args:
-            value: Candidate correlation identifier.
+            value: Trace identifier to validate.
 
         Returns:
-            The validated identifier.
-
-        Raises:
-            ValueError: The identifier is not canonical.
+            The validated trace identifier string.
         """
         return validate_trace_id(value, "cor", "correlation_id")
 
     @field_validator("causation_id")
     @classmethod
     def _validate_causation_id(cls, value: str | None) -> str | None:
-        """Validate an optional causation identifier.
+        """Validate the canonical causation trace identifier prefix and format.
 
         Args:
-            value: Candidate causation identifier or ``None``.
+            value: Optional trace identifier to validate.
 
         Returns:
-            ``None`` or the validated identifier.
-
-        Raises:
-            ValueError: A supplied identifier is not canonical.
+            The validated trace identifier or None.
         """
-        return (
-            None if value is None else validate_trace_id(value, "cau", "causation_id")
-        )
+        if value is None:
+            return None
+        return validate_trace_id(value, "cau", "causation_id")
 
     @field_validator("timestamp")
     @classmethod
     def _validate_timestamp(cls, value: datetime) -> datetime:
-        """Validate and return the event timestamp.
+        """Validate that the timestamp is timezone-aware and set to UTC.
 
         Args:
-            value: Candidate event timestamp.
+            value: The datetime to validate.
 
         Returns:
-            The same aware UTC timestamp.
-
-        Raises:
-            ValueError: The timestamp is naive or not UTC.
+            The validated UTC datetime.
         """
         return validate_utc(value, "timestamp")
 
     @field_validator("domain", "action", "principal_id")
     @classmethod
     def _validate_identity_fields(cls, value: str | None, info: object) -> str | None:
-        """Validate an optional identity-related string field.
+        """Validate that non-None identity strings are non-empty and stripped.
 
         Args:
-            value: Candidate value or ``None``.
-            info: Pydantic validation metadata containing the field name.
+            value: String value to validate.
+            info: Pydantic validation context metadata.
 
         Returns:
-            ``None`` or the unchanged validated value.
-
-        Raises:
-            ValueError: A supplied value is empty or untrimmed.
+            The validated string or None.
         """
         if value is None:
             return None
-        return validate_non_empty(value, str(getattr(info, "field_name", "field")))
+        field_name = getattr(info, "field_name", "contract field")
+        return validate_non_empty(value, str(field_name))
 
     @field_validator("payload", mode="before")
     @classmethod
     def _validate_payload(cls, value: object) -> Mapping[str, JsonValue]:
-        """Validate, bound, and freeze a producer payload before parsing.
+        """Validate and freeze the event payload using strict JSON boundaries.
 
         Args:
-            value: Candidate audit payload.
+            value: Payload object to validate.
 
         Returns:
-            A deeply immutable JSON-safe mapping.
+            The immutable frozen payload mapping.
 
         Raises:
-            TypeError: The payload is not a string-keyed mapping.
-            ValueError: The payload is unsafe, protected, or exceeds a bound.
+            TypeError: If the payload is not a mapping.
+            ValueError: If the payload size or complexity exceeds constraints.
         """
         if not isinstance(value, Mapping):
             raise TypeError("payload must be a mapping")
@@ -354,17 +387,16 @@ class AuditEvent(BaseModel):
         cls,
         value: Mapping[str, JsonValue],
     ) -> Mapping[str, JsonValue]:
-        """Restore deep immutability after Pydantic container validation.
+        """Verify the payload structure is completely frozen.
 
         Args:
-            value: Pydantic-validated payload mapping.
+            value: Validated payload mapping.
 
         Returns:
-            A deeply immutable mapping proxy.
+            The immutable frozen payload mapping.
 
         Raises:
-            TypeError: Validation unexpectedly produced a non-mapping value.
-            ValueError: Revalidation detects an unsafe or oversized value.
+            TypeError: If the value is not a mapping.
         """
         frozen = _freeze_json(value, depth=0, item_count=[0])
         if not isinstance(frozen, Mapping):

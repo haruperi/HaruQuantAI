@@ -1,1 +1,1 @@
-"""Utils integration tests."""
+"""Utils feature-integration test package."""

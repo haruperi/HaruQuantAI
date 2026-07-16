@@ -1,8 +1,4 @@
-"""Expose import-safe structured logging and its explicit lifecycle.
-
-Handler installation remains lazy or explicitly requested; importing this
-feature package does not configure logging or touch the filesystem.
-"""
+"""Public structured-logging exports."""
 
 from app.utils.logging.logger import (
     BoundLogger,
@@ -15,7 +11,7 @@ from app.utils.logging.logger import (
     shutdown_logging,
 )
 
-__all__ = (
+__all__ = [
     "BoundLogger",
     "RedactingFilter",
     "StructuredFormatter",
@@ -24,4 +20,4 @@ __all__ = (
     "get_logger",
     "logger",
     "shutdown_logging",
-)
+]

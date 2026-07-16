@@ -1,9 +1,4 @@
-"""Configure import-safe, redacted, bounded structured logging.
-
-Imports are inert. Explicit configuration or the first runtime ``BoundLogger``
-emission installs owned handlers, and explicit shutdown closes only those
-handlers and their optional queue listener.
-"""
+"""Import-safe redacted structured logging configuration."""
 
 from __future__ import annotations
 
@@ -21,15 +16,29 @@ from datetime import UTC, datetime
 from pathlib import Path
 from queue import Queue
 from types import FrameType
-from typing import TextIO
+from typing import TYPE_CHECKING, TextIO
 
 from app.utils.errors.exceptions import ConfigurationError, HaruQuantError
-from app.utils.security.redaction import RedactionPolicy, _redact_mapping, _redact_text
-from app.utils.settings.models import LoggingSettings
+from app.utils.security.redaction import (
+    RedactionPolicy,
+    redact_mapping_value,
+    redact_text_value,
+)
+from app.utils.settings.loader import load_settings
 from app.utils.time.timestamps import format_utc_timestamp
+
+if TYPE_CHECKING:
+    from app.utils.settings.models import LoggingSettings
 
 _LOGGER_ROOT = "haruquant"
 _OWNED_HANDLER_ATTRIBUTE = "_haruquant_utils_handler"
+_TRACE_FIELDS = (
+    "request_id",
+    "workflow_id",
+    "correlation_id",
+    "causation_id",
+    "event_id",
+)
 _STANDARD_RECORD_FIELDS = frozenset(
     {*logging.makeLogRecord({}).__dict__, "asctime", "message"}
 )
@@ -46,17 +55,10 @@ _LISTENER_LOCK = threading.RLock()
 
 
 class _LoggingRuntimeState:
-    """Hold process-local logging lifecycle state behind the listener lock.
-
-    Attributes:
-        queue_listener: Active owned queue listener, when queued delivery is on.
-        record_queue: Queue consumed by ``queue_listener``.
-        owned_sinks: Console and file handlers owned by Utils.
-        atexit_registered: Whether process-exit cleanup was registered.
-    """
+    """Mutable lifecycle state protected by the listener lock."""
 
     def __init__(self) -> None:
-        """Initialize an inactive logging runtime state."""
+        """Initialize default empty lifecycle state."""
         self.queue_listener: logging.handlers.QueueListener | None = None
         self.record_queue: Queue[logging.LogRecord] | None = None
         self.owned_sinks: tuple[logging.Handler, ...] = ()
@@ -67,12 +69,7 @@ _RUNTIME_STATE = _LoggingRuntimeState()
 
 
 def _safe_fallback() -> None:
-    """Emit the fixed bounded configuration-failure marker to stderr.
-
-    The fallback intentionally excludes exception text, paths, settings, and
-    source record values. An unavailable stderr stream is silently ignored so
-    error reporting cannot recursively fail.
-    """
+    """Write logging_configuration_failed to stderr as a last resort fallback."""
     try:
         sys.stderr.write("logging_configuration_failed\n")
     except OSError:
@@ -80,46 +77,40 @@ def _safe_fallback() -> None:
 
 
 class RedactingFilter(logging.Filter):
-    """Redact a log record before any configured formatter observes it."""
+    """Redact message and structured context before formatting."""
 
     def __init__(self, policy: RedactionPolicy | None = None) -> None:
         """Initialize the filter with an immutable policy.
 
         Args:
-            policy: Explicit redaction policy, or the approved default when
-                omitted.
+            policy: Optional redaction policy to apply.
         """
         super().__init__()
         self._policy = policy or RedactionPolicy()
 
     def filter(self, record: logging.LogRecord) -> bool:
-        """Sanitize a record before formatter access.
-
-        The method replaces the message, removes interpolation arguments,
-        stores a safe traceback copy, and writes redacted structured context to
-        private record attributes.
+        """Redact one record in place before formatter access.
 
         Args:
-            record: Mutable standard-library log record to sanitize in place.
+            record: Logging record to sanitize.
 
         Returns:
-            Always ``True`` so the sanitized record continues to the sink.
+            Always ``True`` so the sanitized record is emitted.
         """
-        record.msg = _redact_text(record.getMessage(), self._policy)
+        safe_message = redact_text_value(record.getMessage(), self._policy)
+        record.msg = safe_message.value
         record.args = ()
         if record.exc_info:
             exception_text = logging.Formatter().formatException(record.exc_info)
-            record._safe_exception = _redact_text(  # noqa: SLF001
-                exception_text,
-                self._policy,
-            )
+            safe_exception = redact_text_value(exception_text, self._policy)
+            record._safe_exception = safe_exception.value  # noqa: SLF001
         extras = {
             key: value
             for key, value in record.__dict__.items()
             if key not in _STANDARD_RECORD_FIELDS and not key.startswith("_")
         }
         try:
-            safe_context = _redact_mapping(extras, self._policy)
+            safe_context = redact_mapping_value(extras, self._policy).value
         except HaruQuantError:
             safe_context = {"redaction_error": True}
         record._structured_context = safe_context  # noqa: SLF001
@@ -127,17 +118,17 @@ class RedactingFilter(logging.Filter):
 
 
 class StructuredFormatter(logging.Formatter):
-    """Render sanitized records as JSON or source-aware human text."""
+    """Render sanitized logging records as JSON or human-readable text."""
 
     def __init__(self, render: str = "human", *, colorize: bool = False) -> None:
-        """Initialize a formatter for an approved render mode.
+        """Initialize a formatter.
 
         Args:
             render: Exactly ``json`` or ``human``.
-            colorize: Whether human level and message text receive ANSI color.
+            colorize: Whether to color human-rendered level and message content.
 
         Raises:
-            ConfigurationError: ``render`` is not an approved mode.
+            ConfigurationError: If the render mode is invalid.
         """
         if render not in {"json", "human"}:
             raise ConfigurationError("LOG_RENDER_INVALID")
@@ -146,32 +137,35 @@ class StructuredFormatter(logging.Formatter):
         self._colorize = colorize
 
     def _apply_color(self, rendered: str, level_name: str) -> str:
-        """Apply the configured ANSI color for a standard level.
+        """Apply level-specific ANSI colors if colorization is enabled.
 
         Args:
-            rendered: Already formatted text fragment.
-            level_name: Standard logging level name.
+            rendered: The already rendered log record text.
+            level_name: The name of the logging level.
 
         Returns:
-            The original fragment or a color-wrapped copy.
+            The colorized text if colorization is enabled; otherwise the original text.
         """
         if not self._colorize:
             return rendered
         color = _LEVEL_COLORS.get(level_name, "")
-        return rendered if not color else f"{color}{rendered}{_COLOR_RESET}"
+        if not color:
+            return rendered
+        return f"{color}{rendered}{_COLOR_RESET}"
 
     def format(self, record: logging.LogRecord) -> str:
         """Format a previously sanitized record.
 
         Args:
-            record: Log record already processed by ``RedactingFilter``.
+            record: Sanitized log record to format.
 
         Returns:
-            Compact sorted JSON or the approved source-aware human record.
+            Formatted log message text or JSON.
         """
         created_at = datetime.fromtimestamp(record.created, UTC)
+        timestamp = format_utc_timestamp(created_at)
         output: dict[str, object] = {
-            "timestamp": format_utc_timestamp(created_at),
+            "timestamp": timestamp,
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -190,55 +184,57 @@ class StructuredFormatter(logging.Formatter):
         if isinstance(safe_exception, str):
             output["exception"] = safe_exception
         if self._render == "json":
-            return json.dumps(
+            rendered = json.dumps(
                 output,
                 allow_nan=False,
                 ensure_ascii=False,
                 separators=(",", ":"),
                 sort_keys=True,
             )
+            return rendered
         context_text = " ".join(
             f"{key}={value}"
             for key, value in output.items()
             if key not in _OUTPUT_FIELDS and key != "exception"
         )
         suffix = f" | {context_text}" if context_text else ""
-        message = f"{record.getMessage()}{suffix}"
-        if isinstance(safe_exception, str):
-            message = f"{message}\n{safe_exception}"
-        level_text = self._apply_color(f"{record.levelname:<8}", record.levelname)
-        message_text = self._apply_color(message, record.levelname)
-        timestamp = created_at.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        human_timestamp = created_at.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
         source_module = getattr(record, "_source_module", record.module)
         source_function = getattr(record, "_source_function", record.funcName)
         source_line = getattr(record, "_source_line", record.lineno)
+        level_text = self._apply_color(f"{record.levelname:<8}", record.levelname)
+        message_text = f"{record.getMessage()}{suffix}"
+        if isinstance(safe_exception, str):
+            message_text = f"{message_text}\n{safe_exception}"
+        colored_message = self._apply_color(message_text, record.levelname)
         return (
-            f"{timestamp} | {level_text} | "
-            f"{source_module}:{source_function}:{source_line} - {message_text}"
+            f"{human_timestamp} | {level_text} | "
+            f"{source_module}:{source_function}:{source_line} - "
+            f"{colored_message}"
         )
 
 
 class _SafeErrorMixin:
-    """Replace standard handler diagnostics with the fixed safe fallback."""
+    """Emit only a fixed bounded fallback when a handler fails."""
 
     def handleError(self, _record: logging.LogRecord) -> None:  # noqa: N802
-        """Report a handler failure without exposing source values.
+        """Handle errors during emission by falling back to stderr.
 
         Args:
-            _record: Failed record, intentionally ignored to prevent leakage.
+            _record: Log record causing the handler failure.
         """
         _safe_fallback()
 
 
 class _SafeStreamHandler(_SafeErrorMixin, logging.StreamHandler[TextIO]):
-    """Write stream records with secret-safe handler failure reporting."""
+    """Stream handler with secret-safe failure handling."""
 
 
 class _SafeRotatingFileHandler(
     _SafeErrorMixin,
     logging.handlers.RotatingFileHandler,
 ):
-    """Rotate bounded files with optional ZIP compression and age cleanup."""
+    """Rotating file handler with ZIP compression and age retention."""
 
     def __init__(
         self,
@@ -249,17 +245,14 @@ class _SafeRotatingFileHandler(
         retention_days: int,
         compression: str,
     ) -> None:
-        """Initialize bounded rotation and retention settings.
+        """Initialize bounded size rotation and retention settings.
 
         Args:
-            filename: Existing-parent path of the active log file.
-            max_bytes: File-size threshold that triggers rollover.
-            backup_count: Maximum numbered rotations retained by the handler.
-            retention_days: Maximum rotation age removed during rollover.
-            compression: ``zip`` or ``none``.
-
-        Raises:
-            OSError: The file cannot be opened by the standard handler.
+            filename: Active file path for the log.
+            max_bytes: Bounded maximum size in bytes.
+            backup_count: Maximum number of backup files to keep.
+            retention_days: Days of historical logs to retain.
+            compression: Standard compression mode, e.g. zip.
         """
         super().__init__(
             filename,
@@ -273,59 +266,57 @@ class _SafeRotatingFileHandler(
             self.rotator = _zip_rotator
 
     def doRollover(self) -> None:  # noqa: N802
-        """Rotate the active file and remove expired rotations.
-
-        Raises:
-            OSError: Rotation, file inspection, or cleanup fails.
-        """
+        """Rotate the active file and remove expired rotated files."""
         super().doRollover()
-        cutoff = time.time() - self._retention_days * 86_400
+        cutoff = time.time() - (self._retention_days * 86_400)
         base_path = Path(self.baseFilename)
         for candidate in base_path.parent.glob(f"{base_path.name}.*"):
             if candidate.is_file() and candidate.stat().st_mtime < cutoff:
                 candidate.unlink()
 
 
-class _PreservingQueueHandler(_SafeErrorMixin, logging.handlers.QueueHandler):
-    """Enqueue a shallow record copy without stripping traceback evidence."""
+class _PreservingQueueHandler(
+    _SafeErrorMixin,
+    logging.handlers.QueueHandler,
+):
+    """In-process queue handler that preserves traceback information."""
 
     def prepare(self, record: logging.LogRecord) -> logging.LogRecord:
-        """Copy a record without stripping exception information.
+        """Copy a record without stripping exception or structured context.
 
         Args:
-            record: Source log record submitted by a producer thread.
+            record: Source log record to copy.
 
         Returns:
-            A shallow copy safe for queue handoff.
+            A copy of the record.
         """
         return copy.copy(record)
 
 
 class _RouteFilter(logging.Filter):
-    """Select records for one access, debug, or error file route."""
+    """Select records for one specialized logging route."""
 
     def __init__(self, route: str) -> None:
-        """Initialize a specialized route filter.
+        """Initialize an access or debug route filter.
 
         Args:
-            route: Internal route name: ``access``, ``debug``, or ``error``.
+            route: Route name representing the destination handler.
         """
         super().__init__()
         self._route = route
 
     def filter(self, record: logging.LogRecord) -> bool:
-        """Return whether a record belongs to this route.
+        """Return whether a record belongs to this specialized route.
 
         Args:
-            record: Candidate log record.
+            record: Candidate log record to filter.
 
         Returns:
-            ``True`` for access-context records on the access route, exact
-            DEBUG records on the debug route, or ERROR-and-higher records on
-            the error route.
+            True if the log record matches the route criteria.
         """
+        log_type = getattr(record, "log_type", None)
         if self._route == "access":
-            return getattr(record, "log_type", None) == "access"
+            return log_type == "access"
         if self._route == "debug":
             return record.levelno == logging.DEBUG
         return record.levelno >= logging.ERROR
@@ -335,10 +326,10 @@ def get_logger(name: str) -> logging.Logger:
     """Return a stable child logger without configuring handlers.
 
     Args:
-        name: Child name or an already qualified ``haruquant`` logger name.
+        name: Logger name or existing ``haruquant`` child name.
 
     Returns:
-        The standard-library logger for the normalized name.
+        Stable named logger.
     """
     if name == _LOGGER_ROOT or name.startswith(f"{_LOGGER_ROOT}."):
         return logging.getLogger(name)
@@ -346,26 +337,18 @@ def get_logger(name: str) -> logging.Logger:
 
 
 class BoundLogger:
-    """Emit through an import-safe logger with immutable bound context.
-
-    Bound instances copy caller context. The first runtime emission lazily
-    installs the approved default profile unless an explicit profile is active.
-
-    Attributes:
-        _name: Qualified or child logger name resolved at emission time.
-        _context: Private copy of structured caller context.
-    """
+    """Import-safe logger facade with lazy default configuration."""
 
     def __init__(
         self,
         name: str = _LOGGER_ROOT,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize a logger name and private context copy.
+        """Initialize a logger name and immutable copy of context.
 
         Args:
-            name: Logger name passed through ``get_logger`` at emission time.
-            context: Optional structured context copied into this instance.
+            name: Logger hierarchy name.
+            context: Mapping of structured context key-values.
         """
         self._name = name
         self._context = dict(context or {})
@@ -374,10 +357,10 @@ class BoundLogger:
         """Return a new logger carrying merged structured context.
 
         Args:
-            **context: Values to add or replace in the new bound context.
+            context: Keyword arguments representing structured context key-values.
 
         Returns:
-            A distinct ``BoundLogger``; the current instance is unchanged.
+            A new BoundLogger instance with the merged context.
         """
         merged = dict(self._context)
         merged.update(context)
@@ -390,24 +373,22 @@ class BoundLogger:
         *args: object,
         exc_info: bool = False,
     ) -> None:
-        """Emit one record with lazy setup and caller-source evidence.
+        """Internal emitter that bridges to standard logging child instances.
 
         Args:
-            level: Standard-library numeric log level.
-            message: Message or interpolation template.
-            *args: Positional values consumed by standard logging formatting.
-            exc_info: Whether to capture the active exception traceback.
-
-        Raises:
-            ConfigurationError: Lazy default logging cannot create its sinks.
+            level: Numeric logging level.
+            message: Raw log message string.
+            args: Optional positional arguments for formatting.
+            exc_info: If True, include the current exception traceback.
         """
         _ensure_default_configuration()
-        caller = sys._getframe(2)  # noqa: SLF001
+        caller = sys._getframe(2)  # noqa: SLF001 - preserve facade caller location.
         context = dict(self._context)
         context.update(
             {
                 "_source_module": caller.f_globals.get(
-                    "__name__", caller.f_code.co_name
+                    "__name__",
+                    caller.f_code.co_name,
                 ),
                 "_source_function": caller.f_code.co_name,
                 "_source_line": caller.f_lineno,
@@ -426,11 +407,8 @@ class BoundLogger:
         """Emit a DEBUG record.
 
         Args:
-            message: Message or interpolation template.
-            *args: Positional interpolation values.
-
-        Raises:
-            ConfigurationError: Lazy default configuration fails.
+            message: Log message string.
+            args: Optional arguments.
         """
         self._emit(logging.DEBUG, message, *args)
 
@@ -438,11 +416,8 @@ class BoundLogger:
         """Emit an INFO record.
 
         Args:
-            message: Message or interpolation template.
-            *args: Positional interpolation values.
-
-        Raises:
-            ConfigurationError: Lazy default configuration fails.
+            message: Log message string.
+            args: Optional arguments.
         """
         self._emit(logging.INFO, message, *args)
 
@@ -450,11 +425,8 @@ class BoundLogger:
         """Emit a WARNING record.
 
         Args:
-            message: Message or interpolation template.
-            *args: Positional interpolation values.
-
-        Raises:
-            ConfigurationError: Lazy default configuration fails.
+            message: Log message string.
+            args: Optional arguments.
         """
         self._emit(logging.WARNING, message, *args)
 
@@ -462,11 +434,8 @@ class BoundLogger:
         """Emit an ERROR record.
 
         Args:
-            message: Message or interpolation template.
-            *args: Positional interpolation values.
-
-        Raises:
-            ConfigurationError: Lazy default configuration fails.
+            message: Log message string.
+            args: Optional arguments.
         """
         self._emit(logging.ERROR, message, *args)
 
@@ -474,23 +443,17 @@ class BoundLogger:
         """Emit a CRITICAL record.
 
         Args:
-            message: Message or interpolation template.
-            *args: Positional interpolation values.
-
-        Raises:
-            ConfigurationError: Lazy default configuration fails.
+            message: Log message string.
+            args: Optional arguments.
         """
         self._emit(logging.CRITICAL, message, *args)
 
     def exception(self, message: str, *args: object) -> None:
-        """Emit an ERROR record with the current traceback.
+        """Emit an ERROR record with the current exception traceback.
 
         Args:
-            message: Message or interpolation template.
-            *args: Positional interpolation values.
-
-        Raises:
-            ConfigurationError: Lazy default configuration fails.
+            message: Log message string.
+            args: Optional arguments.
         """
         self._emit(logging.ERROR, message, *args, exc_info=True)
 
@@ -499,47 +462,39 @@ logger = BoundLogger()
 
 
 def _ensure_default_configuration() -> None:
-    """Install the approved default once before a runtime emission.
-
-    Import-stack emissions remain inert. Runtime calls serialize setup through
-    the listener lock and preserve any explicit active configuration.
-
-    Raises:
-        ConfigurationError: Default sinks cannot be configured.
-    """
-    frame: FrameType | None = sys._getframe(1)  # noqa: SLF001
+    """Install the approved default once before the first runtime emission."""
+    frame: FrameType | None = sys._getframe(  # noqa: SLF001
+        1
+    )
     while frame is not None:
         module_name = str(frame.f_globals.get("__name__", ""))
         if module_name.startswith(("_frozen_importlib", "importlib._bootstrap")):
             return
         frame = frame.f_back
     with _LISTENER_LOCK:
-        if not _RUNTIME_STATE.owned_sinks:
-            configure_logging()
+        if _RUNTIME_STATE.owned_sinks:
+            return
+        configure_logging()
 
 
 def _zip_rotated_name(default_name: str) -> str:
-    """Return the ZIP filename used for a numbered rotation.
+    """Format the rotated file name with a zip extension.
 
     Args:
-        default_name: Filename selected by ``RotatingFileHandler``.
+        default_name: Current default rotated log name.
 
     Returns:
-        The filename with a ``.zip`` suffix.
+        Formatted zipped log name.
     """
     return f"{default_name}.zip"
 
 
 def _zip_rotator(source: str, destination: str) -> None:
-    """Compress one rotation and remove its uncompressed source.
+    """Compress the source file to destination in ZIP format, then remove source.
 
     Args:
-        source: Existing uncompressed rotation path.
-        destination: ZIP archive path selected by the handler.
-
-    Raises:
-        OSError: Source/archive filesystem operations fail.
-        zipfile.BadZipFile: Archive creation fails structurally.
+        source: Uncompressed source path.
+        destination: Target ZIP archive destination path.
     """
     source_path = Path(source)
     with zipfile.ZipFile(
@@ -552,13 +507,13 @@ def _zip_rotator(source: str, destination: str) -> None:
 
 
 def _mark_owned(handler: logging.Handler) -> logging.Handler:
-    """Mark a handler as owned by the Utils logging lifecycle.
+    """Flag a handler as owned by the central configuration utility.
 
     Args:
-        handler: Handler created for the active configuration.
+        handler: Logging handler to mark.
 
     Returns:
-        The same handler after setting the private ownership marker.
+        The flagged handler.
     """
     setattr(handler, _OWNED_HANDLER_ATTRIBUTE, True)
     return handler
@@ -568,24 +523,25 @@ def _build_rotating_file_handler(
     path: Path,
     settings: LoggingSettings,
 ) -> logging.Handler:
-    """Create one bounded rotating file handler.
+    """Create a configured rotating file handler with safe fallbacks.
 
     Args:
-        path: Active file path whose parent must already exist.
-        settings: Validated logging bounds and compression mode.
+        path: Log file path destination.
+        settings: Active logging settings.
 
     Returns:
-        An unopened-to-callers owned-capable rotating handler.
+        A configured rotating file handler.
 
     Raises:
-        ConfigurationError: The parent is unavailable or the sink cannot open.
+        ConfigurationError: If the directory or handler construction fails.
     """
-    if not path.parent.is_dir():
+    resolved = Path(path)
+    if not resolved.parent.is_dir():
         _safe_fallback()
         raise ConfigurationError("LOGGING_SINK_INVALID")
     try:
         return _SafeRotatingFileHandler(
-            path,
+            resolved,
             max_bytes=settings.max_bytes,
             backup_count=settings.backup_count,
             retention_days=settings.retention_days,
@@ -597,24 +553,23 @@ def _build_rotating_file_handler(
 
 
 def _build_file_handlers(settings: LoggingSettings) -> list[logging.Handler]:
-    """Build the configured application and specialized file handlers.
+    """Build app, access, debug, and error handlers based on settings.
 
     Args:
-        settings: Validated logging configuration.
+        settings: Active logging settings.
 
     Returns:
-        File handlers in deterministic application/access/debug/error order,
-        preceded by the optional standalone application handler.
+        A list of configured logging handlers.
 
     Raises:
-        ConfigurationError: A directory or file sink cannot be created.
+        ConfigurationError: If any of the directories cannot be created.
     """
     handlers: list[logging.Handler] = []
     if settings.file_path is not None:
         handlers.append(_build_rotating_file_handler(settings.file_path, settings))
     if settings.log_directory is None:
         return handlers
-    directory = settings.log_directory
+    directory = Path(settings.log_directory)
     try:
         directory.mkdir(parents=True, exist_ok=True)
     except OSError:
@@ -639,13 +594,10 @@ def _build_file_handlers(settings: LoggingSettings) -> list[logging.Handler]:
 
 
 def _close_current_configuration(root_logger: logging.Logger) -> None:
-    """Stop and detach the currently owned logging configuration.
-
-    This stops the queue listener, flushes and closes owned sinks, removes
-    owned root handlers, and resets process-local runtime state.
+    """Close and cleanly remove all owned logging handlers.
 
     Args:
-        root_logger: HaruQuant root logger holding Utils-owned handlers.
+        root_logger: The root logger instance to clean up.
     """
     if _RUNTIME_STATE.queue_listener is not None:
         _RUNTIME_STATE.queue_listener.stop()
@@ -657,17 +609,15 @@ def _close_current_configuration(root_logger: logging.Logger) -> None:
             if handler not in _RUNTIME_STATE.owned_sinks:
                 handler.close()
     for sink in _RUNTIME_STATE.owned_sinks:
-        sink.flush()
+        stream = getattr(sink, "stream", None)
+        if stream is None or not getattr(stream, "closed", False):
+            sink.flush()
         sink.close()
     _RUNTIME_STATE.owned_sinks = ()
 
 
 def flush_logging() -> None:
-    """Synchronize queued delivery without closing sinks.
-
-    The function waits for the active record queue to drain, then flushes every
-    Utils-owned sink. Calling it before configuration is a safe no-op.
-    """
+    """Wait for queued records and flush Utils-owned sinks without closing them."""
     with _LISTENER_LOCK:
         if _RUNTIME_STATE.record_queue is not None:
             _RUNTIME_STATE.record_queue.join()
@@ -676,11 +626,7 @@ def flush_logging() -> None:
 
 
 def shutdown_logging() -> None:
-    """Flush queued records and close all Utils-owned sinks.
-
-    The operation is idempotent and does not remove handlers owned by other
-    libraries or application domains.
-    """
+    """Flush queued records and close every Utils-owned logging sink."""
     with _LISTENER_LOCK:
         _close_current_configuration(logging.getLogger(_LOGGER_ROOT))
 
@@ -689,22 +635,17 @@ def configure_logging(
     settings: LoggingSettings | None = None,
     redaction_policy: RedactionPolicy | None = None,
 ) -> None:
-    """Install a complete redacted structured-logging configuration.
-
-    The call replaces only Utils-owned handlers. It may create the configured
-    directory and files, start one queue-listener thread, and register
-    process-exit cleanup once when queued delivery is selected.
+    """Explicitly configure deduplicated redacted structured handlers.
 
     Args:
-        settings: Explicit validated logging profile, or approved defaults.
-        redaction_policy: Explicit immutable redaction policy, or defaults.
+        settings: Immutable override; centralized settings when omitted.
+        redaction_policy: Optional immutable redaction policy.
 
     Raises:
-        ConfigurationError: A render mode, directory, file, or handler cannot
-            be configured. Before raising, only the fixed safe fallback is
-            emitted to stderr.
+        ConfigurationError: If the settings or sink is invalid.
     """
-    active_settings = settings or LoggingSettings()
+    active_settings = settings or load_settings().logging
+    root_logger = logging.getLogger(_LOGGER_ROOT)
     console_formatter = StructuredFormatter(
         active_settings.render,
         colorize=active_settings.colorize,
@@ -725,7 +666,6 @@ def configure_logging(
         _safe_fallback()
         raise ConfigurationError("LOGGING_CONFIGURATION_FAILED") from None
 
-    root_logger = logging.getLogger(_LOGGER_ROOT)
     sinks = (console_handler, *file_handlers)
     with _LISTENER_LOCK:
         _close_current_configuration(root_logger)

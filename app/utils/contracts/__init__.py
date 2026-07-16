@@ -1,10 +1,9 @@
-"""Expose immutable authentication-context and audit-event contracts.
-
-The feature package validates shared evidence shapes without authenticating a
-principal, authorizing an operation, or persisting an audit event.
-"""
+"""Public shared-contract exports."""
 
 from app.utils.contracts.audit import AuditEvent
 from app.utils.contracts.auth import AuthContext
 
-__all__ = ("AuditEvent", "AuthContext")
+__all__ = [
+    "AuditEvent",
+    "AuthContext",
+]

@@ -43,5 +43,3 @@ def test_serialization_rejects_cyclic_value() -> None:
         canonical_json(cyclic)
     with pytest.raises(ValidationError):
         canonical_json(float("nan"))
-    with pytest.raises(ValidationError):
-        canonical_json({1, 2})

@@ -1,4 +1,6 @@
-"""Provide immutable display metadata for normalized shared error codes."""
+"""Immutable metadata for normalized shared error codes."""
+
+from __future__ import annotations
 
 import re
 from dataclasses import dataclass
@@ -11,13 +13,13 @@ _SYMBOLIC_CODE = re.compile(r"[A-Z][A-Z0-9_]{0,127}\Z")
 
 @dataclass(frozen=True, slots=True)
 class ErrorMetadata:
-    """Represent safe display metadata for one symbolic error code.
+    """Safe display and handling metadata for one symbolic error code.
 
     Attributes:
-        code: Normalized uppercase symbolic error code.
-        title: Secret-safe human-readable title.
-        severity: Stable display severity classification.
-        retryable: Whether a caller may safely retry the failed operation.
+        code: The uppercase symbolic error code.
+        title: User-facing descriptive summary of the error.
+        severity: Diagnostic classification: info, warning, error, critical.
+        retryable: True if the operation can be retried.
     """
 
     code: str
@@ -28,19 +30,34 @@ class ErrorMetadata:
 
 _ERROR_METADATA = {
     "CONFIGURATION_INVALID": ErrorMetadata(
-        "CONFIGURATION_INVALID", "Configuration is invalid", "error", False
+        code="CONFIGURATION_INVALID",
+        title="Configuration is invalid",
+        severity="error",
+        retryable=False,
     ),
     "EXTERNAL_SERVICE_UNAVAILABLE": ErrorMetadata(
-        "EXTERNAL_SERVICE_UNAVAILABLE", "External service is unavailable", "error", True
+        code="EXTERNAL_SERVICE_UNAVAILABLE",
+        title="External service is unavailable",
+        severity="error",
+        retryable=True,
     ),
     "INTERNAL_ERROR": ErrorMetadata(
-        "INTERNAL_ERROR", "Internal error", "critical", False
+        code="INTERNAL_ERROR",
+        title="Internal error",
+        severity="critical",
+        retryable=False,
     ),
     "SECURITY_POLICY_VIOLATION": ErrorMetadata(
-        "SECURITY_POLICY_VIOLATION", "Security policy violation", "critical", False
+        code="SECURITY_POLICY_VIOLATION",
+        title="Security policy violation",
+        severity="critical",
+        retryable=False,
     ),
     "VALIDATION_FAILED": ErrorMetadata(
-        "VALIDATION_FAILED", "Validation failed", "warning", False
+        code="VALIDATION_FAILED",
+        title="Validation failed",
+        severity="warning",
+        retryable=False,
     ),
 }
 
@@ -49,15 +66,13 @@ def normalize_error_code(code: str) -> str:
     """Normalize a human-entered code to uppercase symbolic syntax.
 
     Args:
-        code: Candidate code containing letters, digits, spaces, or hyphens.
+        code: Error code containing letters, digits, spaces, hyphens, or underscores.
 
     Returns:
-        A trimmed uppercase token with whitespace and hyphens converted to
-        underscores.
+        Canonical uppercase symbolic error code.
 
     Raises:
-        ValidationError: The input is not a string or cannot be normalized to
-            the approved symbolic-token grammar.
+        ValidationError: If the normalized code is empty or malformed.
     """
     if not isinstance(code, str):
         raise ValidationError("ERROR_CODE_INVALID")
@@ -68,20 +83,27 @@ def normalize_error_code(code: str) -> str:
 
 
 def get_error_metadata(code: str) -> ErrorMetadata:
-    """Return immutable metadata for a normalized error code.
+    """Look up safe immutable metadata for a normalized error code.
+
+    Unknown valid codes receive deterministic generic metadata without mutating a
+    process-wide registry.
 
     Args:
-        code: Candidate symbolic code accepted by ``normalize_error_code``.
+        code: Human-entered or canonical symbolic error code.
 
     Returns:
-        Built-in metadata when registered, otherwise deterministic generic
-        metadata carrying the normalized code.
+        Built-in or deterministic generic immutable metadata.
 
     Raises:
-        ValidationError: The code cannot be normalized safely.
+        ValidationError: If the code cannot be normalized.
     """
     normalized = normalize_error_code(code)
     return _ERROR_METADATA.get(
         normalized,
-        ErrorMetadata(normalized, "Application error", "error", False),
+        ErrorMetadata(
+            code=normalized,
+            title="Application error",
+            severity="error",
+            retryable=False,
+        ),
     )

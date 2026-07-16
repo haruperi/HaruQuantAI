@@ -1,10 +1,4 @@
-"""Expose the stable business-neutral Utils API.
-
-Consumers import shared contracts, errors, identifiers, UTC helpers,
-serialization, settings models, redaction policy, and logging only from this
-package root or their documented feature package. Importing this module has no
-configuration, environment, filesystem, network, or provider side effects.
-"""
+"""Business-neutral shared infrastructure for HaruQuantAI domains."""
 
 from app.utils.contracts import AuditEvent, AuthContext
 from app.utils.errors import (
@@ -31,9 +25,28 @@ from app.utils.logging import (
     logger,
     shutdown_logging,
 )
-from app.utils.security import RedactionPolicy
+from app.utils.security import (
+    RedactionPolicy,
+    RedactionResult,
+    SecretVersion,
+    decrypt_text,
+    encrypt_text,
+    generate_fernet_key,
+    hash_password,
+    is_sensitive_key,
+    redact_mapping_value,
+    redact_text_value,
+    select_active_secret_version,
+    verify_password,
+)
 from app.utils.serialization import canonical_json, to_json_safe
-from app.utils.settings import AppSettings, LoggingSettings, RuntimeSettings
+from app.utils.settings import (
+    AppSettings,
+    LoggingSettings,
+    RuntimeSettings,
+    load_settings,
+    resolve_secret_reference,
+)
 from app.utils.time import (
     Clock,
     SystemClock,
@@ -58,7 +71,9 @@ __all__ = (
     "LoggingSettings",
     "RedactingFilter",
     "RedactionPolicy",
+    "RedactionResult",
     "RuntimeSettings",
+    "SecretVersion",
     "SecurityError",
     "StructuredFormatter",
     "SystemClock",
@@ -66,20 +81,31 @@ __all__ = (
     "age_seconds",
     "canonical_json",
     "configure_logging",
+    "decrypt_text",
     "derive_stable_id",
+    "encrypt_text",
     "flush_logging",
     "format_utc_timestamp",
+    "generate_fernet_key",
     "generate_id",
     "get_error_metadata",
     "get_logger",
+    "hash_password",
     "is_fresh",
+    "is_sensitive_key",
+    "load_settings",
     "logger",
     "map_exception",
     "normalize_error_code",
     "parse_utc_timestamp",
+    "redact_mapping_value",
+    "redact_text_value",
+    "resolve_secret_reference",
     "route_error_event",
+    "select_active_secret_version",
     "shutdown_logging",
     "to_json_safe",
     "utc_now",
     "validate_id",
+    "verify_password",
 )

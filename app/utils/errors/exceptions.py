@@ -1,8 +1,6 @@
-"""Define boundary-safe shared exceptions for domain extension.
+"""Minimal shared exception hierarchy for domain extension."""
 
-Exceptions retain only validated symbolic tokens and never wrap raw provider
-objects or messages that could leak through an application boundary.
-"""
+from __future__ import annotations
 
 import re
 
@@ -10,22 +8,17 @@ _SYMBOLIC_TOKEN = re.compile(r"[A-Z][A-Z0-9_]{0,127}\Z")
 
 
 class HaruQuantError(Exception):
-    """Represent a failure using only boundary-safe symbolic evidence.
-
-    Attributes:
-        code: Stable uppercase category token supplied by the owning domain.
-        detail: Stable uppercase detail token safe for boundary mapping.
-    """
+    """Base exception carrying only boundary-safe symbolic evidence."""
 
     def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
-        """Initialize a shared exception with safe symbolic tokens.
+        """Initialize a shared exception.
 
         Args:
-            code: Uppercase symbolic failure category.
-            detail: Uppercase symbolic detail, defaulting to ``UNSPECIFIED``.
+            code: Uppercase symbolic error code.
+            detail: Uppercase symbolic safe detail.
 
         Raises:
-            ValueError: Either token violates the symbolic-token grammar.
+            ValueError: If either token is malformed.
         """
         if _SYMBOLIC_TOKEN.fullmatch(code) is None:
             raise ValueError("code must be an uppercase symbolic token")
@@ -37,16 +30,16 @@ class HaruQuantError(Exception):
 
 
 class ConfigurationError(HaruQuantError):
-    """Represent invalid or unavailable configuration evidence."""
+    """Invalid or unavailable configuration."""
 
 
 class ValidationError(HaruQuantError):
-    """Represent an invalid value at a shared boundary."""
+    """Invalid shared-boundary value."""
 
 
 class SecurityError(HaruQuantError):
-    """Represent a security-policy or secret-handling failure."""
+    """Security policy or secret-resolution failure."""
 
 
 class ExternalServiceError(HaruQuantError):
-    """Represent a sanitized external-service boundary failure."""
+    """External service boundary failure."""

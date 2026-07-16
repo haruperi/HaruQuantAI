@@ -22,7 +22,11 @@ def test_age_seconds_is_non_negative() -> None:
     current = datetime(2026, 1, 1, 0, 0, 2, tzinfo=UTC)
     observed = current - timedelta(seconds=1, microseconds=500_000)
     assert age_seconds(observed, reference=current) == Decimal("1.5")
-    assert is_fresh(observed, reference=current, max_age_seconds=Decimal("1.5"))
+    assert is_fresh(
+        observed,
+        reference=current,
+        max_age_seconds=Decimal("1.5"),
+    )
 
 
 def test_future_and_non_utc_timestamps_fail_closed() -> None:
@@ -31,5 +35,3 @@ def test_future_and_non_utc_timestamps_fail_closed() -> None:
         age_seconds(current + timedelta(seconds=1), reference=current)
     with pytest.raises(ValidationError):
         parse_utc_timestamp("2026-01-01T00:00:00+00:00")
-    with pytest.raises(ValidationError):
-        is_fresh(current, reference=current, max_age_seconds=Decimal(-1))

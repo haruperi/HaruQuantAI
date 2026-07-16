@@ -1,8 +1,6 @@
-"""Convert supported values to deterministic JSON-safe representations.
+"""Deterministic JSON-safe conversion and canonical JSON serialization."""
 
-Canonical serialization is pure and intentionally performs no redaction.
-Callers must redact sensitive evidence before invoking this module.
-"""
+from __future__ import annotations
 
 import json
 import math
@@ -23,43 +21,43 @@ _MAX_ITEMS = 10_000
 
 
 def _format_datetime(value: datetime) -> str:
-    """Format an aware UTC datetime for canonical JSON.
+    """Format datetime timezone-aware UTC datetime.
 
     Args:
-        value: Candidate datetime.
+        value: Datetime object to format.
 
     Returns:
-        ISO 8601 text with six fractional digits and a ``Z`` suffix.
+        ISO 8601 string representation of the datetime.
 
     Raises:
-        ValidationError: The datetime is naive or not UTC.
+        ValidationError: If the datetime is naive or not UTC.
     """
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValidationError("SERIALIZATION_DATETIME_INVALID")
     return value.isoformat(timespec="microseconds").replace("+00:00", "Z")
 
 
-def _convert(  # noqa: C901, PLR0911, PLR0912
+def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
     value: object,
     *,
     depth: int,
     active: set[int],
     item_count: list[int],
 ) -> JsonValue:
-    """Recursively convert one supported value under traversal bounds.
+    """Recursively convert supported python values to JSON-safe primitives.
 
     Args:
-        value: Candidate value at the current traversal node.
-        depth: Current nesting depth, starting at zero.
-        active: Identities of containers on the active recursion path.
-        item_count: Shared single-element aggregate container-item counter.
+        value: Python object to convert.
+        depth: Current recursion depth.
+        active: Set of current parent object IDs for cycle detection.
+        item_count: Aggregate item counter.
 
     Returns:
-        A deterministic JSON-safe scalar, list, or mapping.
+        JSON-safe primitive value.
 
     Raises:
-        ValidationError: The value is unsupported, non-finite, cyclic, has an
-            invalid key or datetime, or exceeds a traversal bound.
+        ValidationError: If nesting depth, item limit constraints, type
+            restrictions are violated, or a cycle is detected.
     """
     if depth > _MAX_DEPTH:
         raise ValidationError("SERIALIZATION_DEPTH_EXCEEDED")
@@ -86,11 +84,14 @@ def _convert(  # noqa: C901, PLR0911, PLR0912
     object_id = id(value)
     if object_id in active:
         raise ValidationError("SERIALIZATION_CYCLE_DETECTED")
+
     if is_dataclass(value) and not isinstance(value, type):
         active.add(object_id)
         try:
             dataclass_fields = fields(value)
-            _add_items(item_count, len(dataclass_fields))
+            item_count[0] += len(dataclass_fields)
+            if item_count[0] > _MAX_ITEMS:
+                raise ValidationError("SERIALIZATION_ITEMS_EXCEEDED")
             return {
                 field.name: _convert(
                     getattr(value, field.name),
@@ -102,10 +103,13 @@ def _convert(  # noqa: C901, PLR0911, PLR0912
             }
         finally:
             active.remove(object_id)
+
     if isinstance(value, Mapping):
         active.add(object_id)
         try:
-            _add_items(item_count, len(value))
+            item_count[0] += len(value)
+            if item_count[0] > _MAX_ITEMS:
+                raise ValidationError("SERIALIZATION_ITEMS_EXCEEDED")
             converted: dict[str, JsonValue] = {}
             for key, nested in value.items():
                 if not isinstance(key, str):
@@ -119,10 +123,13 @@ def _convert(  # noqa: C901, PLR0911, PLR0912
             return converted
         finally:
             active.remove(object_id)
+
     if isinstance(value, list | tuple):
         active.add(object_id)
         try:
-            _add_items(item_count, len(value))
+            item_count[0] += len(value)
+            if item_count[0] > _MAX_ITEMS:
+                raise ValidationError("SERIALIZATION_ITEMS_EXCEEDED")
             return [
                 _convert(
                     item,
@@ -134,37 +141,21 @@ def _convert(  # noqa: C901, PLR0911, PLR0912
             ]
         finally:
             active.remove(object_id)
+
     raise ValidationError("SERIALIZATION_TYPE_UNSUPPORTED")
-
-
-def _add_items(item_count: list[int], amount: int) -> None:
-    """Add visited container items to the traversal counter.
-
-    Args:
-        item_count: Single-element aggregate counter for one conversion.
-        amount: Number of newly visited items.
-
-    Raises:
-        ValidationError: The aggregate item limit is exceeded.
-    """
-    item_count[0] += amount
-    if item_count[0] > _MAX_ITEMS:
-        raise ValidationError("SERIALIZATION_ITEMS_EXCEEDED")
 
 
 def to_json_safe(value: object) -> JsonValue:
     """Convert a supported value to deterministic JSON-safe data.
 
     Args:
-        value: Supported scalar, enum, datetime, decimal, dataclass, mapping,
-            list, or tuple.
+        value: Supported value to convert.
 
     Returns:
-        A newly constructed JSON-safe value with deterministic conversions.
+        JSON-safe data.
 
     Raises:
-        ValidationError: The value is unsupported, unsafe, cyclic, non-finite,
-            or exceeds a conversion bound.
+        ValidationError: If the value is unsupported, cyclic, or unsafe.
     """
     return _convert(value, depth=0, active=set(), item_count=[0])
 
@@ -173,17 +164,18 @@ def canonical_json(value: object) -> str:
     """Produce stable sorted-key UTF-8 JSON without hidden redaction.
 
     Args:
-        value: Any value accepted by ``to_json_safe``.
+        value: Supported value to serialize.
 
     Returns:
-        Compact Unicode JSON with sorted keys and deterministic separators.
+        Canonical JSON text.
 
     Raises:
-        ValidationError: Conversion or UTF-8 JSON encoding fails.
+        ValidationError: If conversion or JSON encoding fails.
     """
+    safe_value = to_json_safe(value)
     try:
         encoded = json.dumps(
-            to_json_safe(value),
+            safe_value,
             allow_nan=False,
             ensure_ascii=False,
             separators=(",", ":"),

@@ -1,7 +1,4 @@
-"""Expose injectable clocks and canonical UTC timestamp operations.
-
-All accepted cross-domain datetimes are aware and use a zero UTC offset.
-"""
+"""Public UTC clock and timestamp exports."""
 
 from app.utils.time.clocks import Clock, SystemClock, utc_now
 from app.utils.time.timestamps import (
@@ -11,7 +8,7 @@ from app.utils.time.timestamps import (
     parse_utc_timestamp,
 )
 
-__all__ = (
+__all__ = [
     "Clock",
     "SystemClock",
     "age_seconds",
@@ -19,4 +16,4 @@ __all__ = (
     "is_fresh",
     "parse_utc_timestamp",
     "utc_now",
-)
+]

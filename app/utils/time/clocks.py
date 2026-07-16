@@ -1,32 +1,33 @@
-"""Provide an injectable boundary for obtaining aware UTC instants."""
+"""Injectable UTC clock boundary."""
 
-from datetime import UTC, datetime, timedelta
+from __future__ import annotations
+
+from datetime import UTC, datetime
 from typing import Protocol
 
 from app.utils.errors.exceptions import ValidationError
 
 
 class Clock(Protocol):
-    """Describe a clock capable of returning a current datetime."""
+    """Protocol for an injected clock."""
 
     def now(self) -> datetime:
         """Return the current aware UTC instant.
 
         Returns:
-            The clock's current datetime. Consumers validate that it is aware
-            and UTC before accepting it.
+            An aware UTC datetime instant.
         """
         ...
 
 
 class SystemClock:
-    """Read aware UTC instants from the local system clock."""
+    """System implementation of the UTC clock boundary."""
 
     def now(self) -> datetime:
-        """Return the current aware UTC system instant.
+        """Return the current aware UTC instant.
 
         Returns:
-            The current datetime with the standard-library UTC timezone.
+            An aware UTC datetime instant.
         """
         return datetime.now(UTC)
 
@@ -35,16 +36,18 @@ def utc_now(clock: Clock | None = None) -> datetime:
     """Return an aware UTC instant from an injected or system clock.
 
     Args:
-        clock: Optional caller-controlled clock. A ``SystemClock`` is used when
-            omitted.
+        clock: Optional injected clock.
 
     Returns:
-        The validated aware UTC instant returned by the selected clock.
+        An aware UTC datetime.
 
     Raises:
-        ValidationError: The clock returns a naive or non-UTC datetime.
+        ValidationError: If the clock returns a naive or non-UTC datetime.
     """
     current = (clock or SystemClock()).now()
-    if current.tzinfo is None or current.utcoffset() != timedelta(0):
+    offset = current.utcoffset()
+    if current.tzinfo is None or offset is None:
+        raise ValidationError("CLOCK_VALUE_INVALID")
+    if offset.total_seconds() != 0:
         raise ValidationError("CLOCK_VALUE_INVALID")
     return current

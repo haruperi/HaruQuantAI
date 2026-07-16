@@ -1,9 +1,12 @@
-"""Expose immutable generic runtime and logging settings models.
+"""Public runtime-settings exports."""
 
-The Phase 1 surface defines models only. Centralized precedence and the public
-settings loader remain Phase 2 work.
-"""
-
+from app.utils.settings.loader import load_settings, resolve_secret_reference
 from app.utils.settings.models import AppSettings, LoggingSettings, RuntimeSettings
 
-__all__ = ("AppSettings", "LoggingSettings", "RuntimeSettings")
+__all__ = [
+    "AppSettings",
+    "LoggingSettings",
+    "RuntimeSettings",
+    "load_settings",
+    "resolve_secret_reference",
+]

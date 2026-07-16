@@ -1,4 +1,6 @@
-"""Parse, format, and compare canonical aware UTC timestamps."""
+"""Canonical UTC timestamp parsing, formatting, and freshness."""
+
+from __future__ import annotations
 
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -7,16 +9,16 @@ from app.utils.errors.exceptions import ValidationError
 
 
 def _validate_utc(value: datetime) -> datetime:
-    """Validate an aware UTC datetime.
+    """Validate that the datetime instance is timezone-aware and set to UTC.
 
     Args:
-        value: Candidate datetime.
+        value: Datetime object to validate.
 
     Returns:
-        The unchanged validated datetime.
+        The validated aware UTC datetime.
 
     Raises:
-        ValidationError: The datetime is naive or not UTC.
+        ValidationError: If the datetime is naive or not in UTC.
     """
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValidationError("TIMESTAMP_NOT_UTC")
@@ -27,14 +29,13 @@ def parse_utc_timestamp(value: str) -> datetime:
     """Parse a canonical UTC timestamp with a ``Z`` suffix.
 
     Args:
-        value: Trimmed ISO 8601 text ending in ``Z``.
+        value: Timestamp text.
 
     Returns:
-        The represented aware UTC datetime.
+        An aware UTC datetime.
 
     Raises:
-        ValidationError: The input is empty, untrimmed, lacks ``Z``, or is not
-            a valid timestamp.
+        ValidationError: If the timestamp is malformed or non-UTC.
     """
     if not value or value != value.strip() or not value.endswith("Z"):
         raise ValidationError("TIMESTAMP_INVALID")
@@ -49,39 +50,34 @@ def format_utc_timestamp(value: datetime) -> str:
     """Format an aware UTC datetime with six fractional digits and ``Z``.
 
     Args:
-        value: Aware UTC datetime to serialize.
+        value: Aware UTC datetime.
 
     Returns:
-        Canonical ISO 8601 text with microseconds and a ``Z`` suffix.
+        Canonical UTC timestamp text.
 
     Raises:
-        ValidationError: The datetime is naive or not UTC.
+        ValidationError: If the datetime is naive or non-UTC.
     """
-    return (
-        _validate_utc(value)
-        .isoformat(timespec="microseconds")
-        .replace(
-            "+00:00",
-            "Z",
-        )
-    )
+    validated = _validate_utc(value)
+    return validated.isoformat(timespec="microseconds").replace("+00:00", "Z")
 
 
 def age_seconds(value: datetime, *, reference: datetime) -> Decimal:
     """Calculate exact non-negative age against an explicit instant.
 
     Args:
-        value: Observed aware UTC timestamp.
-        reference: Aware UTC instant against which age is measured.
+        value: Observed UTC instant.
+        reference: Explicit UTC reference instant.
 
     Returns:
-        Exact elapsed seconds as a finite ``Decimal``.
+        Exact non-negative age in seconds.
 
     Raises:
-        ValidationError: Either datetime is not UTC or ``value`` is later than
-            ``reference``.
+        ValidationError: If either instant is invalid or the value is future-dated.
     """
-    delta = _validate_utc(reference) - _validate_utc(value)
+    observed = _validate_utc(value)
+    current = _validate_utc(reference)
+    delta = current - observed
     if delta < timedelta(0):
         raise ValidationError("TIMESTAMP_IN_FUTURE")
     whole_seconds = delta.days * 86_400 + delta.seconds
@@ -97,16 +93,15 @@ def is_fresh(
     """Evaluate freshness inclusively against an explicit age limit.
 
     Args:
-        value: Observed aware UTC timestamp.
-        reference: Aware UTC instant against which age is measured.
-        max_age_seconds: Finite, non-negative inclusive freshness limit.
+        value: Observed UTC instant.
+        reference: Explicit UTC reference instant.
+        max_age_seconds: Inclusive maximum age.
 
     Returns:
-        ``True`` when age is less than or equal to the supplied limit.
+        Whether the value is within the age limit.
 
     Raises:
-        ValidationError: The limit is negative or non-finite, either datetime
-            is not UTC, or ``value`` is in the future.
+        ValidationError: If the limit or either instant is invalid.
     """
     if not max_age_seconds.is_finite() or max_age_seconds < 0:
         raise ValidationError("FRESHNESS_LIMIT_INVALID")

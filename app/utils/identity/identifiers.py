@@ -1,4 +1,6 @@
-"""Generate, validate, and derive secret-free trace identifiers."""
+"""Secret-free trace identifier generation and validation."""
+
+from __future__ import annotations
 
 import hashlib
 import re
@@ -6,22 +8,22 @@ import uuid
 
 from app.utils.errors.exceptions import ValidationError
 
-_SUPPORTED_PREFIXES = frozenset({"req", "wf", "cor", "cau", "evt"})
+SUPPORTED_PREFIXES = frozenset({"req", "wf", "cor", "cau", "evt"})
 _STABLE_HEX = re.compile(r"[0-9a-f]{64}\Z")
 _MAX_IDENTITY_MATERIAL_BYTES = 4_096
 _UUID4_VERSION = 4
 
 
 def _validate_prefix(prefix: str) -> None:
-    """Validate an identifier prefix against the closed supported set.
+    """Validate that the given prefix is supported.
 
     Args:
-        prefix: Candidate prefix without a separator.
+        prefix: Prefix string to validate.
 
     Raises:
-        ValidationError: The prefix is not supported.
+        ValidationError: If the prefix is not in the supported set.
     """
-    if prefix not in _SUPPORTED_PREFIXES:
+    if prefix not in SUPPORTED_PREFIXES:
         raise ValidationError("IDENTIFIER_PREFIX_INVALID")
 
 
@@ -29,13 +31,13 @@ def generate_id(prefix: str) -> str:
     """Generate a canonical prefixed UUID4 identifier.
 
     Args:
-        prefix: One of ``req``, ``wf``, ``cor``, ``cau``, or ``evt``.
+        prefix: One of the documented trace prefixes.
 
     Returns:
-        A lowercase identifier containing the prefix and a fresh UUID4.
+        A lowercase prefixed UUID4 identifier.
 
     Raises:
-        ValidationError: The prefix is unsupported.
+        ValidationError: If the prefix is unsupported.
     """
     _validate_prefix(prefix)
     return f"{prefix}-{uuid.uuid4()}"
@@ -45,15 +47,14 @@ def validate_id(value: str, *, expected_prefix: str | None = None) -> str:
     """Validate a canonical generated or stable identifier.
 
     Args:
-        value: Candidate prefixed UUID4 or SHA-256 identifier.
-        expected_prefix: Optional supported prefix required for this call.
+        value: Identifier to validate.
+        expected_prefix: Optional required prefix.
 
     Returns:
-        The unchanged canonical identifier.
+        The unchanged validated identifier.
 
     Raises:
-        ValidationError: The identifier, embedded prefix, or expected prefix
-            is invalid, or the prefixes do not match.
+        ValidationError: If the prefix or syntax is invalid.
     """
     if not value or value != value.strip() or "-" not in value:
         raise ValidationError("IDENTIFIER_INVALID")
@@ -78,15 +79,14 @@ def derive_stable_id(prefix: str, identity_material: str) -> str:
     """Derive a prefixed SHA-256 identifier from canonical material.
 
     Args:
-        prefix: Supported identifier prefix.
-        identity_material: Non-empty trimmed Unicode identity material no
-            larger than 4,096 UTF-8 bytes.
+        prefix: One of the documented trace prefixes.
+        identity_material: Non-empty trimmed canonical Unicode material.
 
     Returns:
-        A stable identifier containing the full lowercase SHA-256 digest.
+        A prefixed full lowercase SHA-256 digest.
 
     Raises:
-        ValidationError: The prefix or identity material is invalid.
+        ValidationError: If the prefix or material is invalid.
     """
     _validate_prefix(prefix)
     if not identity_material or identity_material != identity_material.strip():
@@ -94,4 +94,5 @@ def derive_stable_id(prefix: str, identity_material: str) -> str:
     encoded = identity_material.encode("utf-8")
     if len(encoded) > _MAX_IDENTITY_MATERIAL_BYTES:
         raise ValidationError("IDENTITY_MATERIAL_INVALID")
-    return f"{prefix}-{hashlib.sha256(encoded).hexdigest()}"
+    digest = hashlib.sha256(encoded).hexdigest()
+    return f"{prefix}-{digest}"

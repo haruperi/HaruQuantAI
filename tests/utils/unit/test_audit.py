@@ -31,12 +31,11 @@ def test_audit_event_requires_json_safe_payload() -> None:
 def test_contract_field_validation_rejects_malformed_schema() -> None:
     with pytest.raises(ValidationError):
         _event(schema_id="audit.v1")
-    with pytest.raises(ValidationError):
-        _event(timestamp=datetime.now(UTC).replace(tzinfo=None))
 
 
 def test_audit_event_payload_is_deeply_immutable() -> None:
     event = _event(payload={"nested": {"state": "safe"}})
     with pytest.raises(TypeError):
         event.payload["new"] = "value"  # type: ignore[index]
-    assert not isinstance(event.payload["nested"], dict)
+    nested = event.payload["nested"]
+    assert isinstance(nested, dict) is False

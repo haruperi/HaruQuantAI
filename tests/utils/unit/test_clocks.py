@@ -15,8 +15,9 @@ class _FixedClock:
 def test_system_clock_returns_aware_utc() -> None:
     current = SystemClock().now()
     assert current.tzinfo is not None
-    assert current.utcoffset() is not None
-    assert current.utcoffset().total_seconds() == 0
+    offset = current.utcoffset()
+    assert offset is not None
+    assert offset.total_seconds() == 0
 
 
 def test_utc_now_uses_injected_clock_and_rejects_naive() -> None:
