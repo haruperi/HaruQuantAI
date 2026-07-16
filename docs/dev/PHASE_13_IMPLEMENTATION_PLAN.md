@@ -1578,10 +1578,10 @@ Perform the final assurance, parity, or release-completion work after all implem
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** Final phase assurance after implementation and verification.
 - **Delivery type:** Resolve specification before implementation.
-- **Classification:** T3 Complete; size `M`; source status `Pending`.
+- **Classification:** T3 Complete; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `docs/PROJECT.md` - ``No exact source section located`` (anchor pending); matrix row `30`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `docs/PROJECT.md` - ``§7 System-Wide Requirements`` (`P-SYS-005`); matrix row `30`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-SYS-005`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.

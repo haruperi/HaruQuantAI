@@ -143,10 +143,10 @@ Implement `Brokers` in authoritative order: all component and functional work fi
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Brokers` module `4.6` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/brokers/README.md` - ``Standalone real-behavior usage scripts (run individually, not via pytest):`` (line 1453); matrix row `243`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/brokers/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-BRK-007`); matrix row `243`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-BRK-007`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -333,10 +333,10 @@ Implement `Data` in authoritative order: all component and functional work first
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Data` module `4.6` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/data/README.md` - ``Data > 7. Tests and Definition of Done > Test and usage locations`` (line 1229); matrix row `355`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/data/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-DATA-006`); matrix row `355`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-DATA-006`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -353,10 +353,10 @@ Implement `Data` in authoritative order: all component and functional work first
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Data` module `4.7` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/data/README.md` - ``Data > 7. Tests and Definition of Done > Test and usage locations`` (line 1230); matrix row `356`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/data/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-DATA-007`); matrix row `356`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-DATA-007`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -611,12 +611,12 @@ Implement `Trading` in authoritative order: all component and functional work fi
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Trading` module `4.6` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/trading/README.md` - ``Trading > 5. Package-Wide Requirements and Shared Configuration > Reconciliation decision coverage`` (line 899); matrix row `659`.
+- **Authoritative source:** `app/services/trading/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-TRD-006`); matrix row `659`
 - **Source capability:** `CAP-TRD-017`
 - **Source final destination:** `monitoring/events.py`
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-TRD-006`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -705,13 +705,13 @@ Implement `UI/API` in authoritative order: all component and functional work fir
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `UI/API` module `4.5` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/api/README.md` - ``UI/API > 5. Package-Wide Requirements and Shared Configuration > Non-functional requirements`` (line 820); matrix row `1207`.
+- **Authoritative source:** `app/services/api/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-API-005`); matrix row `1207`
 - **Source type:** Contracts
 - **Source responsibility:** Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI.
 - **Source verification:** OpenAPI/DTO snapshot tests
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-API-005`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -794,10 +794,10 @@ Compose the already implemented domains into the specified deployable runtime an
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** Deployment composition after all phase domain implementations.
 - **Delivery type:** Resolve specification before implementation.
-- **Classification:** T1 Core; size `M`; source status `Pending`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `docs/PROJECT.md` - ``No exact source section located`` (anchor pending); matrix row `28`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `docs/PROJECT.md` - ``§7 System-Wide Requirements`` (`P-SYS-004`); matrix row `28`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-SYS-004`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.

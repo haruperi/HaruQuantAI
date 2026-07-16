@@ -991,3 +991,22 @@ For every future change:
 ```
 
 This keeps requirements, domain ownership, dependency order, implementation, examples, and tests aligned.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-OPT-NNN` authorizes establishment of the named package seam under `app/services/optimization/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-OPT-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-OPT-001` | `app/services/optimization/parameters/` | 1 | `parameters` module + its `FR-OPT-*` behavior (§4) |
+| `P-OPT-003` | `app/services/optimization/execution/` | 1 | `execution` module + its `FR-OPT-*` behavior (§4) |
+| `P-OPT-004` | `app/services/optimization/search/` | 1 | `search` module + its `FR-OPT-*` behavior (§4) |
+| `P-OPT-007` | `app/services/optimization/evidence/` | 1 | `evidence` module + its `FR-OPT-*` behavior (§4) |
+| `P-OPT-009` | `app/services/optimization/public_api/` | 1 | `public_api` module + its `FR-OPT-*` behavior (§4) |
+| `P-OPT-002` | `app/services/optimization/scoring/` | 8 | `scoring` module + its `FR-OPT-*` behavior (§4) |
+| `P-OPT-005` | `app/services/optimization/validation/` | 8 | `validation` module + its `FR-OPT-*` behavior (§4) |
+| `P-OPT-006` | `app/services/optimization/robustness/` | 8 | `robustness` module + its `FR-OPT-*` behavior (§4) |
+| `P-OPT-008` | `app/services/optimization/state/` | 8 | `state` module + its `FR-OPT-*` behavior (§4) |

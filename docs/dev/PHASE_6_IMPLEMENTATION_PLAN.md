@@ -211,10 +211,10 @@ Implement `Strategy` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Strategy` module `4.5` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/strategy/README.md` - ``Strategy > 7. Tests and Definition of Done > Package completion checklist`` (line 890); matrix row `479`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/strategy/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-STR-005`); matrix row `479`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-STR-005`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -305,13 +305,13 @@ Implement `Simulation` in authoritative order: all component and functional work
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Simulation` module `4.2` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/simulator/README.md` - ``Simulation > 4. Module and Requirement Specifications > Files`` (line 661); matrix row `738`.
+- **Authoritative source:** `app/services/simulator/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-SIM-002`); matrix row `738`
 - **Source file:** `engine.py`
 - **Source responsibility:** Own the canonical tick lifecycle and authoritative simulated execution state.
 - **Source key exports:** `EventDrivenExecutionEngine` (`execute_tick`)
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-SIM-002`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -328,10 +328,10 @@ Implement `Simulation` in authoritative order: all component and functional work
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Simulation` module `4.3` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/simulator/README.md` - ``Simulation > 5. Package-Wide Requirements and Shared Configuration > Approved Phase 1 Error Surface`` (line 853); matrix row `739`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/simulator/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-SIM-003`); matrix row `739`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-SIM-003`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -348,10 +348,10 @@ Implement `Simulation` in authoritative order: all component and functional work
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Simulation` module `4.4` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/simulator/README.md` - ``Simulation > 7. Tests and Definition of Done > Package completion checklist`` (line 912); matrix row `740`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/simulator/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-SIM-004`); matrix row `740`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-SIM-004`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.

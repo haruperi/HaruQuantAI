@@ -977,3 +977,22 @@ uv run pytest tests/trading --cov=app/services/trading --cov-fail-under=80
 ```
 
 This keeps requirements, boundary ownership, implementation, usage, tests, and documentation aligned in one authoritative Trading specification.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-TRD-NNN` authorizes establishment of the named package seam under `app/services/trading/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-TRD-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-TRD-001` | `app/services/trading/contracts/` | 1 | `contracts` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-002` | `app/services/trading/state/` | 1 | `state` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-003` | `app/services/trading/validation/` | 1 | `validation` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-004` | `app/services/trading/routing/` | 1 | `routing` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-005` | `app/services/trading/reconciliation/` | 1 | `reconciliation` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-007` | `app/services/trading/live/` | 1 | `live` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-008` | `app/services/trading/actions/` | 1 | `actions` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-009` | `app/services/trading/reporting/` | 1 | `reporting` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-006` | `app/services/trading/monitoring/` | 11 | `monitoring` module + its `FR-TRD-*` behavior (§4) |

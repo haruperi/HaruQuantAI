@@ -291,10 +291,10 @@ Implement `Portfolio` in authoritative order: all component and functional work 
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Portfolio` module `4.2` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/portfolio/README.md` - ``Portfolio > 7. Tests and Definition of Done > Package completion checklist`` (line 523); matrix row `1096`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/portfolio/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-PORT-002`); matrix row `1096`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-PORT-002`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -353,10 +353,10 @@ Implement `Portfolio` in authoritative order: all component and functional work 
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Portfolio` module `4.4` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/portfolio/README.md` - ``Portfolio > 8. Change Process`` (line 529); matrix row `1097`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/portfolio/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-PORT-004`); matrix row `1097`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-PORT-004`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -436,10 +436,10 @@ Implement `Portfolio` in authoritative order: all component and functional work 
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Portfolio` module `4.5` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/portfolio/README.md` - ``Portfolio > 7. Tests and Definition of Done > Package completion checklist`` (line 516); matrix row `1098`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/portfolio/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-PORT-005`); matrix row `1098`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-PORT-005`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -498,10 +498,10 @@ Implement `Portfolio` in authoritative order: all component and functional work 
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Portfolio` module `4.6` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/portfolio/README.md` - ``Portfolio > 4. Module and Requirement Specifications > 4.6 `rebalancing/` — Drift and Rebalance Planning`` (line 376); matrix row `1099`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/portfolio/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-PORT-006`); matrix row `1099`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-PORT-006`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -581,13 +581,13 @@ Implement `Portfolio` in authoritative order: all component and functional work 
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Portfolio` module `4.7` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/portfolio/README.md` - ``Portfolio > 4. Module and Requirement Specifications > 4.8 `api.py` — Public Portfolio API`` (line 428); matrix row `1100`.
+- **Authoritative source:** `app/services/portfolio/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-PORT-007`); matrix row `1100`
 - **Source file:** `api.py`
 - **Source responsibility:** Expose the typed Portfolio application boundary.
 - **Source key exports:** `PortfolioService`
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-PORT-007`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.

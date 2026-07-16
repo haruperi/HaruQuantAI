@@ -169,10 +169,10 @@ Implement `Research` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Research` module `4.3` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/research/README.md` - ``Research > 4. Module and Requirement Specifications > Configuration and Limits Manifest > Functional requirements`` (line 1008); matrix row `1023`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/research/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RES-003`); matrix row `1023`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RES-003`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -189,13 +189,13 @@ Implement `Research` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Research` module `4.4` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/research/README.md` - ``Research > 5. Package-Wide Requirements and Shared Configuration`` (line 1114); matrix row `1024`.
+- **Authoritative source:** `app/services/research/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RES-004`); matrix row `1024`
 - **Source type:** Leakage
 - **Source responsibility:** Forward-looking fields shall be declared, detectable, excluded from feature inputs, and gated before publication.
 - **Source verification:** Generated-case leakage tests
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RES-004`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -212,10 +212,10 @@ Implement `Research` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Research` module `4.6` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/research/README.md` - ``Research > 4. Module and Requirement Specifications > Configuration and Limits Manifest > Functional requirements`` (line 873); matrix row `1025`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/research/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RES-006`); matrix row `1025`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RES-006`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -232,10 +232,10 @@ Implement `Research` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Research` module `4.7` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/research/README.md` - ``Research > 7. Tests and Definition of Done > Package completion checklist`` (line 1191); matrix row `1026`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/research/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RES-007`); matrix row `1026`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RES-007`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -252,10 +252,10 @@ Implement `Research` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Research` module `4.8` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/research/README.md` - ``Research > 7. Tests and Definition of Done > Package completion checklist`` (line 1191); matrix row `1027`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/research/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RES-008`); matrix row `1027`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RES-008`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -272,15 +272,15 @@ Implement `Research` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Research` module `4.9` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/research/README.md` - ``Research > 4. Module and Requirement Specifications > Configuration and Limits Manifest > Functional requirements`` (line 1044); matrix row `1028`.
+- **Authoritative source:** `app/services/research/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RES-009`); matrix row `1028`
 - **Source responsibility:** Build deterministic score rows, final score, uncertainty, readiness/reasons, versions, warnings, and advisory status from approved evidence.
 - **Source class / function / method:** `build_research_scorecard(*, metric_profile: CoreMetricProfile, seasonality: Mapping[str, JSONValue] | None, edges: Sequence[EdgeResult], market_structure: MarketStructureProfile | None, modeling: UnsupervisedResearchResult | None, performance: PerformanceReport | None = None) -> ResearchScorecard`
 - **Source side effects:** Read-only
 - **Source raises:** Pending taxonomy/dependency: absent prerequisite or incompatible versions
 - **Source usage / test:** **Usage:** `test_usage_profiles.py::test_usage_scorecard_build()`<br>**Unit:** `test_scorecard.py::test_scorecard_is_deterministic_and_advisory()`
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RES-009`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -297,10 +297,10 @@ Implement `Research` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Research` module `4.10` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/research/README.md` - ``Research > 7. Tests and Definition of Done > Package completion checklist`` (line 1191); matrix row `1029`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/research/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RES-010`); matrix row `1029`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RES-010`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -317,13 +317,13 @@ Implement `Research` in authoritative order: all component and functional work f
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Research` module `4.12` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/research/README.md` - ``Research > 5. Package-Wide Requirements and Shared Configuration`` (line 1118); matrix row `1030`.
+- **Authoritative source:** `app/services/research/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RES-012`); matrix row `1030`
 - **Source type:** Security
 - **Source responsibility:** Secrets, credentials, broker/account identifiers, private fields, and forbidden forward fields shall not appear in artifacts, warnings, logs, errors, or audit metadata.
 - **Source verification:** Nested masking/security tests
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RES-012`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.

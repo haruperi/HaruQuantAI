@@ -209,13 +209,13 @@ Implement `Optimization` in authoritative order: all component and functional wo
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Optimization` module `4.2` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/optimization/README.md` - ``Optimization > 4. Module and Requirement Specifications > 4.5 `validation/` — Time-Series Splits and Walk-Forward > Files`` (line 666); matrix row `900`.
+- **Authoritative source:** `app/services/optimization/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-OPT-002`); matrix row `900`
 - **Source file:** `walk_forward.py`
 - **Source responsibility:** Execute the single walk-forward workflow
 - **Source key exports:** `run_walk_forward_validation`
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-OPT-002`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -304,10 +304,10 @@ Implement `Optimization` in authoritative order: all component and functional wo
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Optimization` module `4.5` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/optimization/README.md` - ``Optimization > 8. Change Process`` (line 989); matrix row `901`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/optimization/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-OPT-005`); matrix row `901`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-OPT-005`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -420,11 +420,11 @@ Implement `Optimization` in authoritative order: all component and functional wo
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Optimization` module `4.6` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/optimization/README.md` - ``Optimization > 4. Module and Requirement Specifications > 4.9 `public_api/` — Typed Optimization Boundary`` (line 879); matrix row `902`.
+- **Authoritative source:** `app/services/optimization/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-OPT-006`); matrix row `902`
 - **Source public operation:** `calculate_robustness_score`
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-OPT-006`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -537,10 +537,10 @@ Implement `Optimization` in authoritative order: all component and functional wo
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Optimization` module `4.8` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/optimization/README.md` - ``Optimization > 7. Tests and Definition of Done > Package completion checklist`` (line 966); matrix row `903`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/optimization/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-OPT-008`); matrix row `903`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-OPT-008`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.

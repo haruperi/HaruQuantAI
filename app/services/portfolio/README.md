@@ -531,3 +531,21 @@ uv run mypy app/services/portfolio
 5. Record implementation progress and decisions in `docs/CHANGELOG.md`.
 6. Breaking contracts require a new version and explicit deprecation/migration plan.
 7. New construction methods, risk semantics, live behavior, or hidden/defaulted trading limits require a new approved architecture decision before implementation.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-PORT-NNN` authorizes establishment of the named package seam under `app/services/portfolio/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-PORT-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-PORT-001` | `app/services/portfolio/contracts/` | 1 | `contracts` module + its `FR-PORT-*` behavior (§4) |
+| `P-PORT-003` | `app/services/portfolio/construction/` | 1 | `construction` module + its `FR-PORT-*` behavior (§4) |
+| `P-PORT-008` | `app/services/portfolio/api/` | 1 | `api` module + its `FR-PORT-*` behavior (§4) |
+| `P-PORT-002` | `app/services/portfolio/evidence/` | 9 | `evidence` module + its `FR-PORT-*` behavior (§4) |
+| `P-PORT-004` | `app/services/portfolio/state/` | 9 | `state` module + its `FR-PORT-*` behavior (§4) |
+| `P-PORT-005` | `app/services/portfolio/allocation/` | 9 | `allocation` module + its `FR-PORT-*` behavior (§4) |
+| `P-PORT-006` | `app/services/portfolio/rebalancing/` | 9 | `rebalancing` module + its `FR-PORT-*` behavior (§4) |
+| `P-PORT-007` | `app/services/portfolio/orchestration/` | 9 | `orchestration` module + its `FR-PORT-*` behavior (§4) |

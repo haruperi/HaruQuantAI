@@ -13,6 +13,8 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Decisions
 
+- **2026-07-16 — Provisional roadmap IDs promoted to authoritative (full pass).** The agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`, canonical build plan) minted provisional `P-*` requirement IDs; all 115 are now authoritative — `P-SYS-001`–`006` added to `docs/PROJECT.md` §7, and every `P-<domain>-*` added to its owning README as an Appendix P component requirement. No scope was added or changed; each ID gives a citable anchor to already-specified structure so the coding agent can build against it.
+
 - `Open Decisions` sections are reserved exclusively for unresolved owner choices.
   Once resolved, the subject is removed from that section and the outcome becomes an
   ordinary requirement, contract, workflow, configuration rule, boundary, or explicit

@@ -1,3 +1,8 @@
-"""HaruQuantAI application package."""
+"""HaruQuantAI application boundary."""
 
-__all__: list[str] = []
+from app.runtime import RuntimeConfigurationError, validate_runtime_configuration
+
+__all__ = (
+    "RuntimeConfigurationError",
+    "validate_runtime_configuration",
+)

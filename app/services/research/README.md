@@ -1221,3 +1221,25 @@ For every future change:
 ```
 
 This keeps requirements, dependency order, implementation, examples, tests, and documentation aligned in one authoritative domain specification.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-RES-NNN` authorizes establishment of the named package seam under `app/services/research/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-RES-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-RES-001` | `app/services/research/contracts/` | 1 | `contracts` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-002` | `app/services/research/data/` | 1 | `data` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-005` | `app/services/research/metrics/` | 1 | `metrics` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-011` | `app/services/research/profiles/` | 1 | `profiles` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-003` | `app/services/research/features/` | 10 | `features` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-004` | `app/services/research/leakage/` | 10 | `leakage` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-006` | `app/services/research/statistics/` | 10 | `statistics` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-007` | `app/services/research/studies/` | 10 | `studies` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-008` | `app/services/research/seasonality/` | 10 | `seasonality` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-009` | `app/services/research/market_structure/` | 10 | `market_structure` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-010` | `app/services/research/modeling/` | 10 | `modeling` module + its `FR-RES-*` behavior (§4) |
+| `P-RES-012` | `app/services/research/artifacts/` | 10 | `artifacts` module + its `FR-RES-*` behavior (§4) |

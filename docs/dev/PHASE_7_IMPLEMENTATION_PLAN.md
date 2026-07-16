@@ -167,11 +167,11 @@ Implement `Analytics` in authoritative order: all component and functional work 
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Analytics` module `4.3` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/analytics/README.md` - ``Analytics > 5. Package-Wide Requirements and Shared Configuration > Shared configuration consumed by Analytics`` (line 882); matrix row `813`.
+- **Authoritative source:** `app/services/analytics/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-ANLT-003`); matrix row `813`
 - **Source setting / limit:** UTC-first time policy
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-ANLT-003`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -332,10 +332,10 @@ Implement `Analytics` in authoritative order: all component and functional work 
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Analytics` module `4.5` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T2 Advanced; size `M`; source status `Provisional`.
+- **Classification:** T2 Advanced; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/analytics/README.md` - ``Analytics > 4. Module and Requirement Specifications > Feature usage examples`` (line 807); matrix row `814`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/analytics/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-ANLT-005`); matrix row `814`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-ANLT-005`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.

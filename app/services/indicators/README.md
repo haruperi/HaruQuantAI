@@ -776,3 +776,17 @@ For every future change:
 ```
 
 Formula, public-contract, or schema changes also require a version update, golden-fixture review, consumer compatibility verification, and the applicable specification and changelog updates. This keeps requirements, dependency order, implementation, usage examples, tests, and documentation aligned.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-INDI-NNN` authorizes establishment of the named package seam under `app/services/indicators/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-INDI-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-INDI-001` | `app/services/indicators/core/` | 1 | `core` module + its `FR-INDI-*` behavior (§4) |
+| `P-INDI-002` | `app/services/indicators/trend/` | 1 | `trend` module + its `FR-INDI-*` behavior (§4) |
+| `P-INDI-003` | `app/services/indicators/volatility/` | 3 | `volatility` module + its `FR-INDI-*` behavior (§4) |
+| `P-INDI-004` | `app/services/indicators/momentum/` | 3 | `momentum` module + its `FR-INDI-*` behavior (§4) |

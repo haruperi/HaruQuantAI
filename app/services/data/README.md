@@ -1325,3 +1325,21 @@ decisions update `docs/CHANGELOG.md`.
 
 This keeps requirements, dependency order, implementation, usage examples, tests,
 and documentation aligned.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-DATA-NNN` authorizes establishment of the named package seam under `app/services/data/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-DATA-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-DATA-001` | `app/services/data/contracts/` | 1 | `contracts` module + its `FR-DATA-*` behavior (§4) |
+| `P-DATA-004` | `app/services/data/access/` | 1 | `access` module + its `FR-DATA-*` behavior (§4) |
+| `P-DATA-008` | `app/services/data/public_api/` | 1 | `public_api` module + its `FR-DATA-*` behavior (§4) |
+| `P-DATA-002` | `app/services/data/storage/` | 2 | `storage` module + its `FR-DATA-*` behavior (§4) |
+| `P-DATA-003` | `app/services/data/sources/` | 2 | `sources` module + its `FR-DATA-*` behavior (§4) |
+| `P-DATA-005` | `app/services/data/processing/` | 2 | `processing` module + its `FR-DATA-*` behavior (§4) |
+| `P-DATA-006` | `app/services/data/jobs/` | 11 | `jobs` module + its `FR-DATA-*` behavior (§4) |
+| `P-DATA-007` | `app/services/data/feeds/` | 11 | `feeds` module + its `FR-DATA-*` behavior (§4) |

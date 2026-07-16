@@ -909,3 +909,20 @@ For every future Strategy change:
 ```
 
 This keeps requirements, dependency order, implementation, usage examples, tests, and documentation aligned.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-STR-NNN` authorizes establishment of the named package seam under `app/services/strategy/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-STR-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-STR-001` | `app/services/strategy/contracts/` | 1 | `contracts` module + its `FR-STR-*` behavior (§4) |
+| `P-STR-004` | `app/services/strategy/intents/` | 1 | `intents` module + its `FR-STR-*` behavior (§4) |
+| `P-STR-006` | `app/services/strategy/vectorized/` | 1 | `vectorized` module + its `FR-STR-*` behavior (§4) |
+| `P-STR-002` | `app/services/strategy/diagnostics/` | 2 | `diagnostics` module + its `FR-STR-*` behavior (§4) |
+| `P-STR-003` | `app/services/strategy/registry/` | 3 | `registry` module + its `FR-STR-*` behavior (§4) |
+| `P-STR-007` | `app/services/strategy/event/` | 3 | `event` module + its `FR-STR-*` behavior (§4) |
+| `P-STR-005` | `app/services/strategy/replay/` | 6 | `replay` module + its `FR-STR-*` behavior (§4) |

@@ -627,3 +627,21 @@ The first runtime log call activates the approved default profile. Import-time l
 attempts remain inert. Import
 `configure_logging`, `flush_logging`, or `shutdown_logging` only in specialized
 entry points that need a non-default profile or explicit lifecycle control.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-UTL-NNN` authorizes establishment of the named package seam under `app/utils/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-UTL-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-UTL-001` | `app/utils/contracts/` | 1 | `contracts` module + its `FR-UTL-*` behavior (§4) |
+| `P-UTL-002` | `app/utils/errors/` | 1 | `errors` module + its `FR-UTL-*` behavior (§4) |
+| `P-UTL-003` | `app/utils/identity/` | 1 | `identity` module + its `FR-UTL-*` behavior (§4) |
+| `P-UTL-004` | `app/utils/time/` | 1 | `time` module + its `FR-UTL-*` behavior (§4) |
+| `P-UTL-005` | `app/utils/serialization/` | 1 | `serialization` module + its `FR-UTL-*` behavior (§4) |
+| `P-UTL-008` | `app/utils/logging/` | 1 | `logging` module + its `FR-UTL-*` behavior (§4) |
+| `P-UTL-006` | `app/utils/security/` | 2 | `security` module + its `FR-UTL-*` behavior (§4) |
+| `P-UTL-007` | `app/utils/settings/` | 2 | `settings` module + its `FR-UTL-*` behavior (§4) |

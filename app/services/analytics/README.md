@@ -977,3 +977,19 @@ For every future change:
 
 This keeps requirements, dependency order, implementation, usage examples,
 tests, and final documentation aligned.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-ANLT-NNN` authorizes establishment of the named package seam under `app/services/analytics/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-ANLT-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-ANLT-001` | `app/services/analytics/contracts/` | 1 | `contracts` module + its `FR-ANLT-*` behavior (§4) |
+| `P-ANLT-002` | `app/services/analytics/adapters/` | 1 | `adapters` module + its `FR-ANLT-*` behavior (§4) |
+| `P-ANLT-004` | `app/services/analytics/reports/` | 1 | `reports` module + its `FR-ANLT-*` behavior (§4) |
+| `P-ANLT-006` | `app/services/analytics/dashboards/` | 1 | `dashboards` module + its `FR-ANLT-*` behavior (§4) |
+| `P-ANLT-003` | `app/services/analytics/metrics/` | 7 | `metrics` module + its `FR-ANLT-*` behavior (§4) |
+| `P-ANLT-005` | `app/services/analytics/scorecards/` | 7 | `scorecards` module + its `FR-ANLT-*` behavior (§4) |

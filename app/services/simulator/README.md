@@ -940,3 +940,20 @@ For every future change:
 ```
 
 This keeps requirements, boundary ownership, implementation, tests, and evidence aligned without restoring removed V1 structure or unsupported V2 scope.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-SIM-NNN` authorizes establishment of the named package seam under `app/services/simulator/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-SIM-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-SIM-001` | `app/services/simulator/validation/` | 1 | `validation` module + its `FR-SIM-*` behavior (§4) |
+| `P-SIM-005` | `app/services/simulator/execution/` | 1 | `execution` module + its `FR-SIM-*` behavior (§4) |
+| `P-SIM-006` | `app/services/simulator/reporting/` | 1 | `reporting` module + its `FR-SIM-*` behavior (§4) |
+| `P-SIM-007` | `app/services/simulator/run/` | 1 | `run` module + its `FR-SIM-*` behavior (§4) |
+| `P-SIM-002` | `app/services/simulator/timeline/` | 6 | `timeline` module + its `FR-SIM-*` behavior (§4) |
+| `P-SIM-003` | `app/services/simulator/accounting/` | 6 | `accounting` module + its `FR-SIM-*` behavior (§4) |
+| `P-SIM-004` | `app/services/simulator/journal/` | 6 | `journal` module + its `FR-SIM-*` behavior (§4) |

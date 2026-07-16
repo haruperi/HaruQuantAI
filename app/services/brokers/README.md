@@ -1511,3 +1511,22 @@ For every future change:
 ```
 
 This keeps requirements, dependency order, implementation, provider truth, usage examples, tests, and completion status aligned in one file.
+
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-BRK-NNN` authorizes establishment of the named package seam under `app/services/brokers/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-BRK-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-BRK-001` | `app/services/brokers/contracts/` | 1 | `contracts` module + its `FR-BRK-*` behavior (§4) |
+| `P-BRK-003` | `app/services/brokers/registry/` | 1 | `registry` module + its `FR-BRK-*` behavior (§4) |
+| `P-BRK-004` | `app/services/brokers/mt5/` | 1 | `mt5` module + its `FR-BRK-*` behavior (§4) |
+| `P-BRK-008` | `app/services/brokers/yahoo/` | 2 | `yahoo` module + its `FR-BRK-*` behavior (§4) |
+| `P-BRK-002` | `app/services/brokers/runtime/` | 5 | `runtime` module + its `FR-BRK-*` behavior (§4) |
+| `P-BRK-005` | `app/services/brokers/ctrader/` | 5 | `ctrader` module + its `FR-BRK-*` behavior (§4) |
+| `P-BRK-006` | `app/services/brokers/binance/` | 5 | `binance` module + its `FR-BRK-*` behavior (§4) |
+| `P-BRK-007` | `app/services/brokers/dukascopy/` | 11 | `dukascopy` module + its `FR-BRK-*` behavior (§4) |
+| `P-BRK-009` | `app/services/brokers/testing/` | 12 | `testing` module + its `FR-BRK-*` behavior (§4) |

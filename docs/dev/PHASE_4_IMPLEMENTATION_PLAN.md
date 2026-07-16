@@ -191,10 +191,10 @@ Implement `Risk` in authoritative order: all component and functional work first
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Risk` module `4.3` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/risk/README.md` - ``Risk > 4. Module and Requirement Specifications > 4.11 `reporting/` — Focused Risk Decision Summaries`` (line 817); matrix row `555`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/risk/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RISK-003`); matrix row `555`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RISK-003`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -235,13 +235,13 @@ Implement `Risk` in authoritative order: all component and functional work first
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Risk` module `4.6` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/risk/README.md` - ``Risk > 4. Module and Requirement Specifications > 4.9 `decisions/` — Canonical Governor, Validity, and Kill Switch`` (line 761); matrix row `556`.
+- **Authoritative source:** `app/services/risk/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RISK-006`); matrix row `556`
 - **Source file:** `governor.py`
 - **Source responsibility:** Pre-trade and current-state decision orchestration
 - **Source key exports:** `RiskGovernor`, `RiskGovernor.review_trade_risk`, `RiskGovernor.run_portfolio_risk_governor`
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RISK-006`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -306,13 +306,13 @@ Implement `Risk` in authoritative order: all component and functional work first
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Risk` module `4.10` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/risk/README.md` - ``Risk > 5. Package-Wide Requirements and Shared Configuration > Non-functional requirements`` (line 875); matrix row `557`.
+- **Authoritative source:** `app/services/risk/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RISK-010`); matrix row `557`
 - **Source type:** Performance
 - **Source responsibility:** Support 500 positions, 100 strategies, 5,000 return points, and 100 scenarios; normal pre-trade work is no worse than O(n²). Exact p95 gates remain proposed until baselined.
 - **Source verification:** Representative benchmarks
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RISK-010`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
@@ -329,10 +329,10 @@ Implement `Risk` in authoritative order: all component and functional work first
 - **Authoritative dependency evidence:** `P-SYS-001` completed in Phase 1 before this phase opened.
 - **Ordering basis:** `Risk` module `4.11` component/package establishment before its functional behavior.
 - **Delivery type:** Confirm component contract, then implement.
-- **Classification:** T1 Core; size `M`; source status `Provisional`.
+- **Classification:** T1 Core; size `M`; source status `Specified`.
 - **Dependencies:** `P-SYS-001`.
-- **Authoritative source:** `app/services/risk/README.md` - ``Risk > 4. Module and Requirement Specifications > 4.11 `reporting/` — Focused Risk Decision Summaries > Configuration and Limits Manifest`` (line 839); matrix row `558`.
-- **Specification control:** Provisional planning item: implement only behavior explicitly specified by the referenced component and stop for owner resolution if a normative contract or acceptance condition is absent.
+- **Authoritative source:** `app/services/risk/README.md` - ``Appendix P — Provisional Component Requirements`` (`P-RISK-011`); matrix row `558`
+**Specification control:** Promoted roadmap requirement (authoritative): implement the named component seam and the behavior in the authoritative source, fixing the public seam from first implementation and adding depth behind it in later phases; if a normative contract or acceptance condition is still absent, stop for owner resolution.
 - **Implementation instructions:**
   1. Confirm every dependency above is complete and evidenced before starting `P-RISK-011`.
   2. Implement only the behavior, boundary, side effects, and failure semantics in the authoritative source; preserve final public seams from the first implementation.
