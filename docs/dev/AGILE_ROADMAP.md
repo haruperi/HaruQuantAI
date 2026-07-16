@@ -7,7 +7,18 @@
 
 ## 1. Summary
 
-The roadmap now uses 13 vertical-slice phases for 13 authoritative domains. Phase 1 is a dual production-grade walking skeleton: it runs the complete deterministic backtest path and performs actual actions on the configured MT5 demo account. Real MT5 bars and account evidence enter Data, one MA-crossover strategy emits an intent, Risk sizes and authorizes it, Trading places the actual demo order, reads and reconciles provider truth, closes the test-owned position, persists factual execution evidence, and Analytics displays actual outcomes. The same application also runs Simulation, Optimization, Research, Portfolio, and the minimal UI/API.
+The roadmap uses 13 vertical-slice phases for 13 authoritative domains. Utils,
+Brokers, and Data already exist as completed implementation baselines and are reused,
+not rebuilt. Indicators is completed as one full domain before Strategy, which is
+also completed as one full domain; their later phase allocations become regression
+and compatibility gates for already-landed behavior.
+
+Phase 1 remains a dual production-grade walking skeleton: it runs the complete
+deterministic backtest path and performs actual actions on the configured MT5 demo
+account. Real MT5 bars and account evidence enter Data, one MA-crossover strategy
+emits an intent, Risk sizes and authorizes it, Trading places the actual demo order,
+reads and reconciles provider truth, closes the test-owned position, persists factual
+execution evidence, and Analytics displays actual outcomes.
 
 Nothing in Phase 1 is disposable. All code must use the final package topology, stable v1 seams, typed contracts, deterministic validation, structured logs, production persistence boundaries, targeted tests, and the project quality gates. Phase 11 hardens the already-operational MT5 path; it does not introduce live broker execution for the first time. Phase 12 closes cross-cutting assurance, and Phase 13 reaches v2.0 parity.
 
@@ -26,6 +37,15 @@ The matrix assigns all **1230** IDs exactly once. No fake adapter participates i
 9. Provider outcomes are factual. The plan never predicts or invents fill price, latency, identifiers, or performance.
 10. Earlier demos stay green in later phases.
 11. Each inventory ID lands once; removed/excluded behavior remains a negative test, not resurrected scope.
+12. A requirement already satisfied by a retained full-domain baseline is not
+    reimplemented in its allocated phase; that phase verifies compatibility and
+    regression evidence against the same authoritative ID.
+
+The existing “Requirement IDs landing in this phase” lists retain the traceability
+matrix's first system-slice acceptance allocation. For retained Utils/Brokers/Data
+and the pre-Phase-1 full Indicator/Strategy builds, “landing” means the first phase
+that must demonstrate that requirement in the integrated system; it does not delay
+or split initial domain implementation and never authorizes duplicate code.
 
 ## 3. Owner-confirmed decisions
 
@@ -34,6 +54,9 @@ The matrix assigns all **1230** IDs exactly once. No fake adapter participates i
 - `.env` currently confirms `MT5_ENVIRONMENT=demo`.
 - Phase 1 uses the production MT5 adapter and the production Risk/Trading path, not a fake adapter.
 - Production-grade narrow scope and all binding planning principles apply from the first line of implementation.
+- Utils, Brokers, and Data are retained completed implementation baselines.
+- Indicators is built in full before the full Strategy build; neither is split into
+  duplicate later implementations.
 
 ## 4. Pass 1 - domain summaries
 
@@ -93,11 +116,11 @@ The matrix assigns all **1230** IDs exactly once. No fake adapter participates i
 
 | Domain | Work |
 |---|---|
-| Utils | Production shared contracts, structured logs, errors, IDs, UTC, canonical serialization, redaction, settings, and audit context. |
-| Brokers | Production MT5 adapter only for the proof: connect/authenticate, real bars/account reads, check/place order, read authority state, and close position. No fake adapter. |
-| Data | Normalize real MT5 bars/account/context evidence; minimum durable dataset/audit/execution-supporting persistence. |
-| Indicators | Availability-aware SMA/EMA with production validation and deterministic manifests. |
-| Strategy | One immutable MA-crossover strategy producing canonical TradeIntent lineage. |
+| Utils | Reuse the completed baseline; run Phase 1 contract/settings/logging regression. |
+| Brokers | Reuse the completed baseline and its production MT5 adapter for the proof. No fake adapter. |
+| Data | Reuse the completed baseline for MT5 bars/account/context evidence and durable dataset/audit support. |
+| Indicators | Reuse the complete Indicator domain; the Phase 1 proof exercises availability-aware SMA/EMA through its stable v1 surface. |
+| Strategy | Reuse the complete Strategy domain; the Phase 1 proof selects one immutable MA-crossover strategy. |
 | Risk | Configured sizing, proposal review, ActionPolicyVerdict, approval token, audit chain, and kill-switch block/clear needed by actual demo mutation. |
 | Trading | One production path for sim and MT5 demo: session start, gate, idempotent place/close, factual receipt/record, persistence, basic reconciliation, safe shutdown. |
 | Simulation | Simple official backtest loop with deterministic fills, results, and artifacts. |
@@ -153,11 +176,11 @@ Retires integration-late and broker-integration-late risk. Phase 1 is very large
 
 | Domain | Work |
 |---|---|
-| Utils | Complete settings, audit construction, redaction, error routing, and log sinks. |
-| Brokers | Add transport circuit behavior, Yahoo reads, readiness evidence, and technical observability. |
-| Data | Complete quality/provenance, SQLite/files/cache/audit, source policy, resampling, and alignment. |
-| Indicators | Propagate stronger evidence. |
-| Strategy | Add safe diagnostics and stricter point-in-time checks. |
+| Utils | Regression only; the completed baseline already contains the assigned behavior. |
+| Brokers | Regression only; the completed baseline already contains the assigned behavior. |
+| Data | Regression only; the completed baseline already contains the assigned behavior. |
+| Indicators | Regression of completed quality/provenance evidence propagation. |
+| Strategy | Regression of completed diagnostics and point-in-time checks. |
 | Risk | Consume stronger evidence through Phase 1 gates. |
 | Trading | Persist richer dependency failures. |
 | Simulation | Block severe data-quality errors. |
@@ -208,9 +231,9 @@ Retires weak evidence; adds bounded storage/source-policy complexity.
 |---|---|
 | Utils | Regression only. |
 | Brokers | Contract compatibility regression. |
-| Data | Serve point-in-time multi-timeframe data. |
-| Indicators | Complete official trend, volatility, and momentum indicators. |
-| Strategy | Complete immutable registry/config, arbitrary-code rejection, vectorized/event modes, and replay manifests. |
+| Data | Regression of completed point-in-time multi-timeframe data. |
+| Indicators | Regression of the already complete official indicator family. |
+| Strategy | Regression/deepening behind the already complete Strategy v1 seams. |
 | Risk | Review richer intents through stable ports. |
 | Trading | Orchestrate richer decisions without translating signals. |
 | Simulation | Exercise registered strategies and reject raw code. |
@@ -257,10 +280,10 @@ Retires strategy narrowness; adds state/no-lookahead complexity.
 | Domain | Work |
 |---|---|
 | Utils | Governance primitive regression. |
-| Brokers | Add account/execution read depth. |
-| Data | Deepen MarketContextEvidence. |
+| Brokers | Exercise completed account/execution read depth through the new Risk consumers. |
+| Data | Exercise completed `MarketContextEvidence` through the new Risk consumers. |
 | Indicators | Availability regression. |
-| Strategy | Complete intent evidence. |
+| Strategy | Exercise completed intent evidence. |
 | Risk | Complete portfolio snapshot, limits, regimes, scenarios, allocation/admission governance, and focused reporting. |
 | Trading | Consume deeper Risk evidence without self-approval. |
 | Simulation | Exercise full sim policy. |
@@ -307,7 +330,7 @@ Retires shallow governance; adds portfolio/regime/scenario complexity.
 | Domain | Work |
 |---|---|
 | Utils | Trace/redaction regression. |
-| Brokers | Complete cTrader/Binance execution profiles and transport mapping. |
+| Brokers | Exercise retained cTrader/Binance execution profiles and transport mapping through Trading; run compatibility regression. |
 | Data | Refresh authority facts. |
 | Indicators | No change. |
 | Strategy | Supply paper/demo decisions. |
@@ -358,9 +381,9 @@ Retires minimal reconciliation; unknown outcomes remain fail-closed.
 |---|---|
 | Utils | Serialization/time hash regression. |
 | Brokers | Prove simulation network isolation. |
-| Data | Add FX evidence and simulation modeling boundary. |
-| Indicators | Enforce decision-time availability. |
-| Strategy | Add replay checkpoints. |
+| Data | Exercise completed FX evidence and the simulation-modeling boundary. |
+| Indicators | Regression of completed decision-time availability. |
+| Strategy | Exercise completed replay checkpoints. |
 | Risk | Evaluate every sim intent. |
 | Trading | Keep identical sim formulation. |
 | Simulation | Complete tick timeline, pricing, Decimal ledger, costs, margin, journal, replay, artifacts, and official/research modes. |
@@ -607,9 +630,9 @@ Retires ad hoc research; leakage/multiple testing remain gated.
 
 | Domain | Work |
 |---|---|
-| Utils | Finalize logging lifecycle/rotation/shutdown. |
-| Brokers | Harden MT5 reconnect/stream/backpressure and add remaining provider depth. |
-| Data | Complete jobs/backfills, feeds, readiness/promotion, and recovery. |
+| Utils | Re-run completed logging lifecycle/rotation/shutdown assurance. |
+| Brokers | Exercise retained MT5 reconnect/stream/backpressure and provider-depth behavior. |
+| Data | Re-run completed jobs/backfills, feeds, readiness/promotion, and recovery assurance. |
 | Indicators | Live availability regression. |
 | Strategy | Supply live decisions/checkpoint recovery. |
 | Risk | Revalidate approvals and recovery eligibility. |
@@ -659,11 +682,11 @@ Retires operational weakness in the already-live demo path.
 
 | Domain | Work |
 |---|---|
-| Utils | NFR, export, usage, and shutdown assurance. |
-| Brokers | NFRs plus the ledger-mandated FakeBrokerAdapter as test-only contract utility; never a Phase 1/demo authority. |
-| Data | NFR, migration, precision, and recovery assurance. |
-| Indicators | Formula fixtures and performance gates. |
-| Strategy | NFR, migration, export, and replay assurance. |
+| Utils | Re-run NFR, export, usage, and shutdown assurance against the retained baseline. |
+| Brokers | Re-run NFRs and FakeBrokerAdapter contract assurance; never use the fake as Phase 1/demo authority. |
+| Data | Re-run NFR, migration, precision, and recovery assurance against the retained baseline. |
+| Indicators | Re-run formula fixtures and performance gates against the complete domain. |
+| Strategy | Re-run NFR, migration, export, and replay assurance against the complete domain. |
 | Risk | Security, concurrency, persistence, and tamper tests. |
 | Trading | Safety, reconciliation, timeout, and performance assurance. |
 | Simulation | Determinism/resource/error assurance. |
@@ -718,11 +741,11 @@ Retires cross-cutting quality gaps; fake utility is isolated to test assurance.
 
 | Domain | Work |
 |---|---|
-| Utils | Close remaining package checklist. |
-| Brokers | Close remaining provider capabilities and release evidence. |
-| Data | Close remaining capabilities and negative boundaries. |
-| Indicators | Close exports/usage checklist. |
-| Strategy | Close package checklist. |
+| Utils | Close residual repository-quality evidence without rebuilding the package. |
+| Brokers | Close residual provider/release evidence without rebuilding its contracts or adapters. |
+| Data | Close residual repository-quality and negative-boundary evidence without rebuilding the package. |
+| Indicators | Close residual exports/usage evidence against the already complete v1 package. |
+| Strategy | Close residual checklist evidence against the already complete v1 package. |
 | Risk | Close package checklist. |
 | Trading | Close capability catalogue and package checklist. |
 | Simulation | Close exclusions and usage checklist. |
@@ -767,11 +790,11 @@ Retires all remaining parity gaps; checklist claims require evidence.
 
 | Domain | Phase 1 minimum |
 |---|---|
-| Utils | `contracts/`, `errors/`, `identity/`, `time/`, `serialization/`, `security/`, narrow `settings/`, `logging/`, exports |
-| Brokers | `contracts/`, minimum real transport safety, `registry/`, production `mt5/{transport,mapping,adapter}.py`; no fake in the proof |
-| Data | v1 contracts, MT5-backed source/access, account/context evidence, minimum storage/audit, typed public operations |
-| Indicators | core contracts/validation/results/registry plus SMA/EMA |
-| Strategy | contracts, registry, intents, diagnostics, one immutable MA-crossover implementation |
+| Utils | Reuse the complete v1 package; Phase 1 exercises contracts, settings, security, logging, and exports |
+| Brokers | Reuse the complete v1 package and production MT5 adapter; no fake in the proof |
+| Data | Reuse the complete v1 package for MT5-backed access, account/context evidence, storage/audit, and public operations |
+| Indicators | Complete v1 package: Core, trend, volatility, momentum, tests, and public exports |
+| Strategy | Complete v1 package per its README; Phase 1 selects the immutable MA-crossover implementation |
 | Risk | contracts, config, sizing, minimum policy, audit chain, approvals, decisions, kill switch, public API |
 | Trading | contracts, state, validation, routing, reconciliation, live session, actions, evidence, migrations |
 | Simulation | validation, minimum accounting/execution/reporting, official orchestrator |
@@ -837,10 +860,10 @@ The MT5 usage command performs the actual demo-account place/reconcile/close pro
 | Domain | Stable Phase 1 surface | Stability |
 |---|---|---|
 | Utils | AuthContext/AuditEvent, errors, IDs, UTC, canonical JSON, redaction, AppSettings, logging | Stable v1 |
-| Brokers | BrokerAdapter traits, config, result/error/DTO/event family, registry, production MT5 adapter | Providers deepen behind traits |
-| Data | MarketDataset, AccountStateSnapshot, MarketContextEvidence, FXConversionEvidence, audit query/page, typed operations | Sources/storage deepen |
-| Indicators | IndicatorSeries, calculation/spec/result, registry | Formula set deepens |
-| Strategy | Registration/update/result, TradeIntent, evaluation, replay, diagnostics | Strategies deepen |
+| Brokers | BrokerAdapter traits, config, result/error/DTO/event family, registry, production adapters | Complete v1 baseline; later phases exercise consumers and evidence |
+| Data | MarketDataset, AccountStateSnapshot, MarketContextEvidence, FXConversionEvidence, audit query/page, typed operations | Complete v1 baseline; later phases exercise consumers and evidence |
+| Indicators | IndicatorSeries, calculation/spec/result, registry, complete official formula family | Complete v1 baseline before Phase 1 |
+| Strategy | Registration/update/result, TradeIntent, evaluation, replay, diagnostics, approved strategy family | Complete v1 baseline before Phase 1 |
 | Risk | RiskDecision, action verdict, approval, token, kill switch, eligibility, allocation, scenario, governor/sizing | Stable authority |
 | Trading | OrderIntent, receipt, record, operational event, action/readiness/reconciliation/session APIs | Reliability deepens |
 | Simulation | Backtest/portfolio requests/results and run/replay ports | Realism deepens |

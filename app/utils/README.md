@@ -1,8 +1,8 @@
 # Utils
 
 > **Package:** `app/utils`
-> **Status:** `Partial`
-> **Last updated:** `2026-07-15`
+> **Status:** `Completed implementation baseline`
+> **Last updated:** `2026-07-16`
 
 > This README is the package's single source of truth for requirements, final
 > structure, implementation sequence, progress, usage examples, and tests.
@@ -55,8 +55,8 @@ It makes no trading or domain decision.
 
 | Status | Contract | Version | Producer | Consumers | Purpose |
 |---|---|---|---|---|---|
-| Partial | `AuthContext` | `v1` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio | Immutable authenticated principal and trace context. `principal_type` is exactly `USER` or `SERVICE_ACCOUNT`. |
-| Partial | `AuditEvent` | `v1` | Every emitting domain | Data (direct persistence consumer); Risk and UI/API query persisted events only through Data-owned query contracts | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning. |
+| Completed | `AuthContext` | `v1` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio | Immutable authenticated principal and trace context. `principal_type` is exactly `USER` or `SERVICE_ACCOUNT`. |
+| Completed | `AuditEvent` | `v1` | Every emitting domain | Data (direct persistence consumer); Risk and UI/API query persisted events only through Data-owned query contracts | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning. |
 
 `AuthContext v1` contains `contract_version`, `schema_id`, `principal_id`,
 `principal_type`, roles, permissions, scopes, tenant/environment, request ID,
@@ -175,8 +175,8 @@ ordinary programs with `if __name__ == "__main__"` entry points, not pytest test
 | Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
 |---|---|---|---|---|---|---|
 | Completed | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033`, `FR-UTL-039` through `FR-UTL-041` |
-| Partial | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-025` |
-| Partial | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-002`, `FR-UTL-003`, `FR-UTL-007`, `FR-UTL-008`, `FR-UTL-010`, `FR-UTL-011`, `FR-UTL-013` through `FR-UTL-021` |
+| Completed | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-025` |
+| Completed | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-002`, `FR-UTL-003`, `FR-UTL-007`, `FR-UTL-008`, `FR-UTL-010`, `FR-UTL-011`, `FR-UTL-013` through `FR-UTL-021` |
 
 ### `WF-UTL-001` — Structured Logging and Redaction
 
@@ -567,12 +567,12 @@ tests/utils/
 
 Feature-integration tests are assigned as follows:
 
-- `tests/utils/integration/test_settings_bootstrap.py` verifies the Utils-owned
-  portion of `WF-UTL-002` and the secret-reference handoff boundary.
+- `tests/utils/integration/test_settings_bootstrap.py` verifies `WF-UTL-002`
+  and the secret-reference handoff boundary.
 - `tests/utils/integration/test_structured_logging.py` verifies `WF-UTL-001`.
 - `tests/utils/integration/test_audit_event_construction.py` verifies the
-  Utils-owned construction portion of `WF-UTL-003`. The workflow remains
-  incomplete until Data persistence integration is available.
+  Utils-owned construction portion of `WF-UTL-003`; Data's completed audit
+  persistence boundary verifies the downstream handoff.
 
 ### Required validation
 
@@ -603,7 +603,15 @@ Feature-integration tests are assigned as follows:
 - [X] The first runtime log call activates the source-aware default profile exactly once, explicit overrides remain intact, and queued output has deterministic synchronization and shutdown. `tests/utils/unit/test_logger.py:71`, `tests/utils/unit/test_logger.py:90`, `tests/utils/unit/test_logger.py:112`
 - [X] Every requirement has a targeted unit test and directly executable usage example. `tests/utils/integration/test_usage_scripts.py:21`
 - [X] Coverage is at least 80%. `pyproject.toml:170`
-- [X] Ruff, formatting, mypy, and targeted tests pass. `pyproject.toml:29`
+- [ ] The post-baseline repository formatting check is clean. Functional
+  verification currently passes (`79` tests and strict mypy); the formatter
+  reports only `tests/utils/integration/test_usage_scripts.py`.
+
+Current implementation status: `Completed implementation baseline`. All documented
+Utils capabilities and contracts are implemented and their deterministic domain
+tests pass. Repository-wide formatting/docstring rules introduced after the
+baseline remain a separate quality-cleanup gate and do not authorize rebuilding
+this domain.
 
 ---
 

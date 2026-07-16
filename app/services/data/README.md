@@ -1,8 +1,8 @@
 # Data
 
 > **Package:** `app/services/data`
-> **Status:** `Completed`
-> **Last updated:** `2026-07-15`
+> **Status:** `Completed implementation baseline`
+> **Last updated:** `2026-07-16`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -342,8 +342,8 @@ an explicit exclusion.
 | Status | Meaning |
 |---|---|
 | **Missing** | Not implemented or not verified |
-| **Missing** | Useful V1 behavior exists but final contracts, placement, or tests differ |
-| **Missing** | Implemented in the final structure, tested, and verified |
+| **Partial** | Useful V1 behavior exists but final contracts, placement, or tests differ |
+| **Completed** | Implemented in the final structure, tested, and verified |
 
 ### Workflow scope values
 
@@ -1290,11 +1290,17 @@ run the complete Data set at the feature/slice completion gate.
 - [x] Every collaborative workflow has a passing integration test.
 - [X] No unresolved Open Decision affects a completed requirement.
 - [x] No raw provider/database object, secret, live trade path, or silent failure exists.
-- [x] Ruff, format check, strict mypy, targeted/full Data tests, and ≥80% coverage pass.
+- [ ] The post-baseline semantic-docstring and formatting gates are clean. The
+  functional baseline remains verified by 196 passing tests and strict mypy;
+  current Ruff rules report documentation-only findings and four usage files
+  require formatting.
 - [x] Source promotion and production evidence are approved for every enabled source.
 
-Current implementation status: `Completed`. The final package, contracts, workflows,
-and domain-scoped validation evidence satisfy this specification.
+Current implementation status: `Completed implementation baseline`. The final
+package, contracts, workflows, and domain-scoped functional tests satisfy this
+specification and are reused by later agile phases. Repository-wide
+semantic-docstring/format cleanup remains a separate quality gate and does not
+authorize rebuilding Data.
 
 ---
 
@@ -1320,3 +1326,25 @@ decisions update `docs/CHANGELOG.md`.
 
 This keeps requirements, dependency order, implementation, usage examples, tests,
 and documentation aligned.
+
+---
+
+## Appendix P — Provisional Component Requirements (roadmap-promoted)
+
+These IDs were minted by the agile delivery roadmap
+(`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each
+`P-DATA-NNN` authorizes establishment of the named package seam under
+`app/services/data/`; its public port, package `__init__`, and error/DTO surface host
+the corresponding `FR-DATA-*` behavior in Section 4. Existing completed seams are
+reused rather than rebuilt.
+
+| Requirement ID | Component / package | First phase | Hosts |
+|---|---|---|---|
+| `P-DATA-001` | `app/services/data/contracts/` | 1 | `contracts` module + its `FR-DATA-*` behavior |
+| `P-DATA-004` | `app/services/data/access/` | 1 | `access` module + its `FR-DATA-*` behavior |
+| `P-DATA-008` | `app/services/data/public_api/` | 1 | `public_api` module + its `FR-DATA-*` behavior |
+| `P-DATA-002` | `app/services/data/storage/` | 2 | `storage` module + its `FR-DATA-*` behavior |
+| `P-DATA-003` | `app/services/data/sources/` | 2 | `sources` module + its `FR-DATA-*` behavior |
+| `P-DATA-005` | `app/services/data/processing/` | 2 | `processing` module + its `FR-DATA-*` behavior |
+| `P-DATA-006` | `app/services/data/jobs/` | 11 | `jobs` module + its `FR-DATA-*` behavior |
+| `P-DATA-007` | `app/services/data/feeds/` | 11 | `feeds` module + its `FR-DATA-*` behavior |

@@ -1,15 +1,18 @@
 # Brokers
 
 > **Package:** `app/services/brokers`
-> **Status:** `Partial`
-> **Last updated:** `2026-07-14`
+> **Status:** `Completed implementation baseline`
+> **Last updated:** `2026-07-16`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
 
 ### Current implementation evidence
 
-`Partial` means source exists but one or more mapped requirements, tests, usage examples, provider checks, or release gates remain incomplete. It does not mean the capability is available for production use.
+The Brokers implementation baseline is complete and is reused by later agile
+phases. Provider capability availability remains evidence-gated, and workflows
+whose caller domain has not landed remain pending integration rather than causing
+this domain to be rebuilt.
 
 | Area | Current state | Passing evidence | Remaining work |
 |---|---|---|---|
@@ -22,7 +25,7 @@
 | Dukascopy | Completed; network attempted but unreachable from this environment | Full instruments/transport/mapping/adapter unit tests, plus a standalone real usage script (`06_dukascopy.py`) that genuinely attempts a bounded HTTP fetch against `datafeed.dukascopy.com` | The real host times out from this environment's network (confirmed via a direct HTTPS probe, unlike Yahoo/Binance which are reachable); the script reports this real outcome rather than fabricating success. Live evidence remains outstanding pending a network path that can reach this host. |
 | Yahoo | Completed; connection verified | `DEC-BRK-001` resolved (explicit `probe_symbol` field); zero-duration bar defect fixed (closing timestamp derived from the parsed interval); full transport/mapping/adapter unit tests, plus a standalone real usage script (`07_yahoo.py`) that performs genuine `yfinance` calls (both connect paths, and real historical bars for `AAPL`) | None outstanding at the file level. |
 | Fake/testing utility | Completed | Complete protocol surface, error-injection tests, and a standalone usage script (`09_testing.py`) demonstrating `FakeBrokerAdapter` itself (the one legitimate use of a fake in this directory) | None outstanding at the file level. |
-| Package validation | Completed | 391 targeted `pytest` unit/integration/usage tests pass, plus 8 standalone real-behavior usage scripts run successfully outside pytest (real MT5 demo terminal, real cTrader demo connection, real Binance testnet, real Yahoo Finance calls, and an honest fail-closed Dukascopy network attempt); Ruff, `ruff format --check`, and strict `mypy app/services/brokers` all pass; branch coverage over `app/services/brokers` is 92.25% (≥ 80% gate) | Dukascopy live-response evidence remains outstanding until a network path can reach its host. `NFR-BRK-008` (structured observability logging) is implemented (central adapter sinks, runtime, registry, and every provider transport) and verified on Python 3.14 by the `tests/brokers/unit/test_observability.py` log-capture suite. |
+| Package validation | Completed implementation baseline | 391 targeted `pytest` unit/integration/usage tests pass; strict mypy and formatting pass; prior domain evidence records 92.25% branch coverage and eight standalone provider-behavior scripts | Current repository semantic-docstring rules report 76 documentation-only lint findings. Credential-gated scripts are not rerun during ordinary regression, and unavailable capabilities remain fail-closed. |
 
 ### Known defects fixed during this pass
 
@@ -1485,9 +1488,17 @@ During implementation, run only the targeted test file for the changed code befo
 - [x] Every retained V1 behavior has a final destination or explicit removal condition.
 - [x] No open decision remains: `DEC-BRK-001` is resolved (explicit `probe_symbol` field); every remaining `Missing`/`Partial` requirement is an explicit implementation gap, not an unresolved choice, and affected availability remains fail-closed.
 - [x] No unnecessary service/manager/repository/factory layer beyond the approved technical registry was introduced.
-- [x] All targeted tests and quality checks pass. 391 tests pass (`uv run pytest tests/brokers`), plus 8 standalone real-behavior usage scripts run successfully outside pytest; `ruff check`, `ruff format --check`, and `mypy app/services/brokers` are clean.
+- [ ] The post-baseline semantic-docstring lint gate is clean. The functional
+  baseline remains verified by 391 passing tests, strict mypy, and formatting;
+  current Ruff rules report 76 documentation-only findings.
 - [x] Package coverage is at least 80%. Branch coverage over `app/services/brokers` is 92.25% (measured from the `pytest` suite; the standalone usage scripts are not included in this measurement).
 - [x] Credential-gated provider evidence supports every capability advertised as available. MT5, Binance, Yahoo, and cTrader each have genuine real-connection evidence for `connect`/`is_connected` (the only capabilities the static catalogue ever marks `AVAILABLE`) via their standalone usage scripts. Dukascopy's real host is unreachable from this environment's network specifically (Yahoo and Binance are reachable from the same environment), so its `connect` evidence remains outstanding here.
+
+Current implementation status: `Completed implementation baseline`. The canonical
+contracts, registry, provider adapters, runtime safety behavior, and deterministic
+test utility are implemented. `WF-BRK-004` remains a downstream integration gate
+until Trading supplies its approved mutation request; it does not authorize a
+Brokers rebuild.
 
 ---
 
