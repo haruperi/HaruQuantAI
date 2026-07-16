@@ -2,6 +2,7 @@
 
 from collections.abc import Mapping
 from types import MappingProxyType
+from typing import Literal
 
 from app.services.brokers.contracts import (
     BrokerCapability,
@@ -130,7 +131,9 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
         and operation in _RELEASED.get(broker, frozenset())
         and operation not in _WRITE
     )
-    availability = "AVAILABLE" if (connect_ready or released) else "UNAVAILABLE"
+    availability: Literal["AVAILABLE", "UNAVAILABLE", "DEGRADED"] = (
+        "AVAILABLE" if (connect_ready or released) else "UNAVAILABLE"
+    )
     return BrokerCapability(
         capability=operation,
         implementation_status="IMPLEMENTED" if implemented else "NOT_IMPLEMENTED",

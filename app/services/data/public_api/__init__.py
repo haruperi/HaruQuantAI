@@ -1,6 +1,6 @@
-"""Approved DATA package-root public API."""
+"""Approved typed DATA domain facade."""
 
-from app.services.data.public_api import (
+from app.services.data.public_api.operations import (
     aggregate_ticks_to_bars,
     align_multitimeframe_data,
     clear_data_cache,
@@ -26,7 +26,7 @@ from app.services.data.public_api import (
     stop_data_update_job,
 )
 
-__all__ = (
+__all__ = [
     "aggregate_ticks_to_bars",
     "align_multitimeframe_data",
     "clear_data_cache",
@@ -50,4 +50,4 @@ __all__ = (
     "save_market_data",
     "start_data_update_job",
     "stop_data_update_job",
-)
+]

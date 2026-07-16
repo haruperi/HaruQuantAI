@@ -41,6 +41,8 @@ This document is only for adding high-level changes, decisions, or status update
   usage program now prints labeled, bounded, secret-safe demonstration output,
   and integration tests reject silent example scripts.
 
+- **2026-07-16 — Bounded prints and headers added to Data Domain usage examples.** Every Data Domain usage script in `tests/data/usage/` now prints clean, descriptive console headers and outputs demonstrating their operations directly.
+
 - **2026-07-16 — Settings usage output aligned to `.env`.** The executable
   settings example now displays only explicitly allowlisted non-secret
   application values from the repository `.env`; integration tests reject
