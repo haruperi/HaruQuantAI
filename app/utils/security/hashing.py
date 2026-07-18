@@ -75,8 +75,6 @@ def verify_password(password: str, encoded_hash: str) -> bool:
         SecurityError: If the password does not meet the input boundary.
     """
     password_bytes = _validate_password(password)
-    if not isinstance(encoded_hash, str):
-        return False
     try:
         algorithm, iterations_text, salt_text, digest_text = encoded_hash.split("$")
         if algorithm != _ALGORITHM or int(iterations_text) != _ITERATIONS:

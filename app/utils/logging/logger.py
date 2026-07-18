@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from queue import Queue
 from types import FrameType
-from typing import TYPE_CHECKING, TextIO
+from typing import TYPE_CHECKING, TextIO, override
 
 from app.utils.errors.exceptions import ConfigurationError, HaruQuantError
 from app.utils.security.redaction import (
@@ -88,6 +88,7 @@ class RedactingFilter(logging.Filter):
         super().__init__()
         self._policy = policy or RedactionPolicy()
 
+    @override
     def filter(self, record: logging.LogRecord) -> bool:
         """Redact one record in place before formatter access.
 
@@ -153,6 +154,7 @@ class StructuredFormatter(logging.Formatter):
             return rendered
         return f"{color}{rendered}{_COLOR_RESET}"
 
+    @override
     def format(self, record: logging.LogRecord) -> str:
         """Format a previously sanitized record.
 
@@ -265,7 +267,8 @@ class _SafeRotatingFileHandler(
             self.namer = _zip_rotated_name
             self.rotator = _zip_rotator
 
-    def doRollover(self) -> None:  # noqa: N802
+    @override
+    def doRollover(self) -> None:
         """Rotate the active file and remove expired rotated files."""
         super().doRollover()
         cutoff = time.time() - (self._retention_days * 86_400)
@@ -281,6 +284,7 @@ class _PreservingQueueHandler(
 ):
     """In-process queue handler that preserves traceback information."""
 
+    @override
     def prepare(self, record: logging.LogRecord) -> logging.LogRecord:
         """Copy a record without stripping exception or structured context.
 
@@ -305,6 +309,7 @@ class _RouteFilter(logging.Filter):
         super().__init__()
         self._route = route
 
+    @override
     def filter(self, record: logging.LogRecord) -> bool:
         """Return whether a record belongs to this specialized route.
 

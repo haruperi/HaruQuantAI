@@ -10,8 +10,32 @@ This document is only for adding high-level changes, decisions, or status update
 - Indicators is now a completed implementation baseline after independent
   deterministic domain verification (Core plus trend, volatility, momentum,
   volume, candles, the public package port, and all five `WF-INDI-*` workflows).
+- Strategy is implemented across contracts, diagnostics, registry, intents,
+  replay/checkpoints, vectorized evaluation, event hooks, concrete signal
+  evaluators, and all ten workflows. All prescribed Strategy validation gates pass.
 
 ### Added
+
+- **2026-07-19 — Strategy usage converted to real standalone examples.**
+  Replaced pytest-style usage cases with 14 numbered scripts using package-root
+  exports; market and concrete-strategy examples retrieve real MT5 evidence and
+  print evaluated prices, signal states, and entry markers. A subprocess integration
+  check distinguishes passing examples from explicit evidence-unavailable exits,
+  while stateful registry access remains opt-in.
+
+- **2026-07-19 — Concrete Strategy signal parity implemented.** Replaced the
+  removed bundled signal sources with seven immutable, hash-bound evaluators and
+  an atomic point-in-time evaluation boundary; all 47 requirements and ten
+  workflows pass in the current 79-case suite at 81.11% Strategy coverage, with
+  four real-evidence examples explicitly skipped when their prerequisites are
+  unavailable.
+
+- **2026-07-18 — Strategy domain implemented.** Built the initial 37
+  `FR-STR-*` requirements and nine `WF-STR-*` workflows with immutable
+  Data-backed registry, configuration, mutation, and checkpoint state; 92 tests
+  pass at over 80% domain coverage, with Ruff, formatting, security, imports,
+  and prescribed mypy clean. The 2026-07-19 signal-parity addition
+  (`FR-STR-038`–`FR-STR-047`) brought the current total to 47 requirements.
 
 - **2026-07-18 — Indicators post-build review corrections.** Usage examples are
   confirmed as standalone runnable scripts (`usage/NN_*.py`) exercising real data
@@ -29,8 +53,28 @@ This document is only for adding high-level changes, decisions, or status update
   All 34 `FR-INDI-*` requirements pass in 127 tests; the package is Ruff/mypy clean
   and reaches 91% statement-and-branch coverage against the 80% gate.
 
+### Verification
+
+- **2026-07-19 — Strategy canonical mypy gate.** `Success: no issues found in 87 source files`
+  from `uv run mypy app/services/strategy tests/strategy`.
 
 ### Decisions
+
+- **2026-07-19 — Strategy contract registry reconciled.** The delivered
+  `TradeIntent`, `StrategyMutationResult`, `StrategyRegistrationRequest`, and
+  `StrategyParameterUpdateRequest` contracts are now correctly marked `Completed`.
+
+- **2026-07-19 — Strategy signal-parity specification adopted
+  (owner-resolved).** The seven recovered strategies preserve testable signal
+  rules only; legacy loading plus basket, order, fill, broker, risk, and execution
+  behavior remain excluded.
+
+- **2026-07-18 — Strategy build specification corrections adopted
+  (owner-resolved).** Strategy now owns migration definitions, receives explicit
+  validation policy, invokes only injected hash-bound evaluators, returns mutation
+  truth directly, persists checkpoints through Data, and uses receiver-owned event
+  evidence; the obsolete flat modules and bundled `pybots` implementation were
+  removed.
 
 - **2026-07-18 — Strategy pre-build spec blockers resolved (owner-resolved).** The duplicate `FR-STR-017` was resolved by renumbering `StrategyDiagnostics` to `FR-STR-034` (leaving `StrategyMutationResult` = `FR-STR-017`), so every Strategy public symbol now maps to exactly one requirement. `StrategyMutationResult` is now exported (contracts `outcomes.py` and the package public API) and documented as the `WF-STR-008` output boundary published via register/update event-publication. Appendix P `First phase` is clarified as seam-establishment authorization only; Section 2 dependency order governs full `FR-STR-*` implementation sequencing.
 

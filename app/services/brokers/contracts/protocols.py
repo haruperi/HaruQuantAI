@@ -8,7 +8,7 @@ from collections.abc import AsyncIterator, Mapping
 from datetime import datetime
 from decimal import Decimal
 from types import TracebackType
-from typing import Any, Literal, Protocol, runtime_checkable
+from typing import Any, Literal, Protocol, override, runtime_checkable
 
 from app.services.brokers.contracts.enums import (
     BrokerCapabilityId,
@@ -358,8 +358,16 @@ class _UnsupportedAdapterBase:
         """Return the composite adapter schema identifier."""
         return "brokers.adapter.v1"
 
+    @override
     def __getattribute__(self, name: str) -> Any:
-        """Enforce declared availability before provider implementation access."""
+        """Enforce declared availability before provider implementation access.
+
+        Args:
+            name: Attribute name requested by the caller.
+
+        Returns:
+            The declared attribute or a fail-closed unsupported operation.
+        """
         if not name.startswith("_"):
             try:
                 operation = BrokerCapabilityId(name)
@@ -478,18 +486,30 @@ class _UnsupportedAdapterBase:
             ).warning("Connection event buffer overflow; adapter degraded")
 
     async def connect(self) -> BrokerResult[None]:
-        """Fail closed unless a provider verifies a real session."""
+        """Fail closed unless a provider verifies a real session.
+
+        Returns:
+            A canonical unsupported connection result.
+        """
         return self._unsupported(BrokerCapabilityId.CONNECT)
 
     async def disconnect(self) -> BrokerResult[None]:
-        """Idempotently close adapter-local state."""
+        """Idempotently close adapter-local state.
+
+        Returns:
+            A canonical successful disconnection result.
+        """
         if self._state != BrokerConnectionState.DISCONNECTED:
             await self._transition(BrokerConnectionState.CLOSING)
             await self._transition(BrokerConnectionState.DISCONNECTED)
         return self._result(BrokerCapabilityId.DISCONNECT)
 
     async def reconnect(self) -> BrokerResult[None]:
-        """Reconnect the same session without replaying an operation."""
+        """Reconnect the same session without replaying an operation.
+
+        Returns:
+            The canonical result of the new connection attempt.
+        """
         await self.disconnect()
         return await self.connect()
 
@@ -525,7 +545,11 @@ class _UnsupportedAdapterBase:
         return self._result(BrokerCapabilityId.GET_LAST_ERROR, data=self._last_error)
 
     def connection_events(self) -> AsyncIterator[BrokerConnectionEvent]:
-        """Yield bounded lifecycle events for this adapter instance."""
+        """Return bounded lifecycle events for this adapter instance.
+
+        Returns:
+            An asynchronous iterator over connection lifecycle events.
+        """
 
         async def _events() -> AsyncIterator[BrokerConnectionEvent]:
             while True:
@@ -548,7 +572,14 @@ class _UnsupportedAdapterBase:
         return self._result(BrokerCapabilityId.GET_FEATURE_FLAGS, data=flags)
 
     async def supports(self, capability: BrokerCapabilityId) -> BrokerResult[bool]:
-        """Answer from the static declaration without probing a provider."""
+        """Answer from the static declaration without probing a provider.
+
+        Args:
+            capability: Capability whose declared availability is requested.
+
+        Returns:
+            A canonical result containing declared support status.
+        """
         declared = self._capabilities[capability]
         return self._result(
             BrokerCapabilityId.SUPPORTS,
@@ -577,7 +608,17 @@ class _UnsupportedAdapterBase:
         return result
 
     def __getattr__(self, name: str) -> Any:
-        """Return defaults only for canonical unsupported operations."""
+        """Return defaults only for canonical unsupported operations.
+
+        Args:
+            name: Missing attribute name requested by the caller.
+
+        Returns:
+            A fail-closed asynchronous unsupported operation.
+
+        Raises:
+            AttributeError: If the name is not a canonical broker capability.
+        """
         try:
             operation = BrokerCapabilityId(name)
         except ValueError as error:
@@ -591,7 +632,14 @@ class _UnsupportedAdapterBase:
 
 
 def _make_unsupported_method(operation: BrokerCapabilityId) -> Any:
-    """Create one structurally visible unsupported protocol method."""
+    """Create one structurally visible unsupported protocol method.
+
+    Args:
+        operation: Capability represented by the generated method.
+
+    Returns:
+        An asynchronous fail-closed unsupported method.
+    """
 
     async def _method(
         self: _UnsupportedAdapterBase,

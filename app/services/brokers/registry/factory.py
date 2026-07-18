@@ -55,16 +55,41 @@ _FACTORIES = {
 
 
 def get_registered_brokers() -> tuple[BrokerId, ...]:
-    """List every profile without importing provider implementations or SDKs."""
+    """List every profile without importing provider implementations or SDKs.
+
+    Returns:
+        Every registered broker identifier in stable enumeration order.
+    """
     return tuple(BrokerId)
+
+
+def _is_registered_broker(value: object) -> bool:
+    """Return whether a runtime value is an exact registered broker identifier.
+
+    Args:
+        value: Potential broker identifier from a typed or untyped caller.
+
+    Returns:
+        Whether the value is a supported ``BrokerId`` member.
+    """
+    logger.debug("Validating explicit broker registry identifier")
+    return isinstance(value, BrokerId)
 
 
 def create_broker_adapter(
     broker_id: BrokerId, config: BrokerConnectionConfig
 ) -> BrokerResult[BrokerAdapter]:
-    """Create one exact disconnected adapter without selection or fallback."""
+    """Create one exact disconnected adapter without selection or fallback.
+
+    Args:
+        broker_id: Exact registered broker identifier.
+        config: Validated broker connection configuration.
+
+    Returns:
+        The disconnected adapter or a canonical structured factory error.
+    """
     request_id = f"create-{getattr(broker_id, 'value', str(broker_id))}"
-    if not isinstance(broker_id, BrokerId):
+    if not _is_registered_broker(broker_id):
         return _factory_error(
             broker=BrokerId.MT5,
             config=config,

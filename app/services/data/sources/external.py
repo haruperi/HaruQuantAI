@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from app.services.data.contracts.errors import DataError
 from app.services.data.contracts.sources import (
@@ -330,6 +330,7 @@ class ExternalMarketDataSource(MarketDataSource):
 
         return SymbolMetadata(**metadata_dict)
 
+    @override
     def fetch(self, request: SourceReadRequest) -> RawSourceBatch:
         """Fetch raw records through the injected adapter.
 
@@ -339,6 +340,7 @@ class ExternalMarketDataSource(MarketDataSource):
         logger.info("Executing external source fetch")
         return _run(self._fetch_async(request), request.request_id)
 
+    @override
     def list_symbols(self, request: SymbolListRequest) -> SymbolPage:
         """List provider-native symbols through the injected adapter.
 
@@ -348,6 +350,7 @@ class ExternalMarketDataSource(MarketDataSource):
         logger.info("Executing external source symbol listing")
         return _run(self._list_symbols_async(request), request.request_id)
 
+    @override
     def get_symbol_metadata(self, request: SymbolMetadataRequest) -> SymbolMetadata:
         """Read provider-native symbol metadata through the injected adapter.
 
