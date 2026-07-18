@@ -560,7 +560,7 @@ dependencies = [
     { name = "detect-secrets" },
     { name = "fastapi" },
     { name = "loguru" },
-    { name = "metatrader5" },
+    { name = "metatrader5", marker = "sys_platform == 'win32'" },
     { name = "mypy" },
     { name = "numba" },
     { name = "numpy" },
@@ -587,7 +587,7 @@ requires-dist = [
     { name = "detect-secrets", specifier = ">=1.5.0" },
     { name = "fastapi", specifier = ">=0.115.0" },
     { name = "loguru", specifier = ">=0.7.3" },
-    { name = "metatrader5", specifier = ">=5.0.5735" },
+    { name = "metatrader5", marker = "sys_platform == 'win32'", specifier = ">=5.0.5735" },
     { name = "mypy", specifier = ">=2.1.0" },
     { name = "numba", specifier = ">=0.65.1" },
     { name = "numpy", specifier = "==2.4.6" },
@@ -754,7 +754,7 @@ name = "metatrader5"
 version = "5.0.5735"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", marker = "sys_platform == 'win32'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/33/51/4a70004f8af537393861c31a3c211f818b8199fea8baf8c0b1f571d67c56/metatrader5-5.0.5735-cp314-cp314-win_amd64.whl", hash = "sha256:b69765be2eece9f884b60b6d008c7608ad77d7bfc5fbfbb8c23e3e3bb8dc88ba", size = 49590, upload-time = "2026-04-04T16:44:12.306Z" },

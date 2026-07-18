@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://haruquant.ai/schemas/strategy-config.schema.json",
+  "title": "HaruQuant Strategy Configuration",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "strategy_manifest",
+    "trading_profile",
+    "parameters",
+    "risk_management",
+    "trading_options",
+    "signal_rules",
+    "action_rules",
+    "protection_rules",
+    "state_contract",
+    "required"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "strategy_manifest": {
+      "type": "object",
+      "required": [
+        "identity",
+        "version",
+        "chart_requirements",
+        "supported_runtime_modes",
+        "strategy_capabilities",
+        "permissions"
+      ],
+      "properties": {
+        "identity": {
+          "type": "object",
+          "required": ["strategy_id", "strategy_type", "description", "author", "created_at"],
+          "properties": {
+            "strategy_id": {"type": "string", "minLength": 1},
+            "strategy_type": {"type": "string", "minLength": 1},
+            "description": {"type": "string"},
+            "author": {"type": "string"},
+            "created_at": {"type": "string", "format": "date"}
+          }
+        },
+        "version": {"type": "string", "minLength": 1},
+        "chart_requirements": {"type": "object"},
+        "supported_runtime_modes": {
+          "type": "array",
+          "items": {"enum": ["SIMULATOR", "PAPER", "LIVE"]},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "strategy_capabilities": {"type": "object"},
+        "permissions": {
+          "type": "object",
+          "required": ["lifecycle_status", "permitted_environments", "risk_profile"],
+          "properties": {
+            "lifecycle_status": {"enum": ["RESEARCH", "PAPER", "ACTIVE", "RETIRED"]},
+            "permitted_environments": {
+              "type": "array",
+              "items": {"enum": ["SIMULATOR", "PAPER", "LIVE"]},
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "risk_profile": {"type": "object"}
+          }
+        }
+      }
+    },
+    "trading_profile": {"type": "object"},
+    "parameters": {
+      "type": "object",
+      "required": ["definitions", "values", "generation_metadata"],
+      "properties": {
+        "definitions": {"type": "object", "additionalProperties": {"$ref": "#/$defs/parameterDefinition"}},
+        "values": {"type": "object"},
+        "generation_metadata": {"type": "object"}
+      }
+    },
+    "risk_management": {"type": "object"},
+    "trading_options": {"type": "object"},
+    "signal_rules": {"type": "object"},
+    "action_rules": {"type": "object"},
+    "protection_rules": {"type": "object"},
+    "state_contract": {"type": "object"},
+    "required": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "parameterDefinition": {
+      "type": "object",
+      "required": ["type", "default", "description"],
+      "properties": {
+        "type": {"enum": ["integer", "number", "string", "boolean", "list", "dict"]},
+        "default": {},
+        "minimum": {"type": "number"},
+        "maximum": {"type": "number"},
+        "step": {"type": "number", "exclusiveMinimum": 0},
+        "allowed_values": {"type": "array"},
+        "category": {"type": "string"},
+        "optimizable": {"type": "boolean"},
+        "description": {"type": "string"}
+      }
+    }
+  },
+  "additionalProperties": false
+}

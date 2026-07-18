@@ -32,6 +32,8 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Decisions
 
+- **2026-07-18 — Strategy pre-build spec blockers resolved (owner-resolved).** The duplicate `FR-STR-017` was resolved by renumbering `StrategyDiagnostics` to `FR-STR-034` (leaving `StrategyMutationResult` = `FR-STR-017`), so every Strategy public symbol now maps to exactly one requirement. `StrategyMutationResult` is now exported (contracts `outcomes.py` and the package public API) and documented as the `WF-STR-008` output boundary published via register/update event-publication. Appendix P `First phase` is clarified as seam-establishment authorization only; Section 2 dependency order governs full `FR-STR-*` implementation sequencing.
+
 - **2026-07-16 — Source policy made non-blocking with default fallback (owner-resolved).** Resolving missing source policies no longer raises `POLICY_BLOCKED` or fails closed. The system now automatically falls back to a default permissive `SourcePolicyConfig` (rate limit: 10,000 attempts per 60s, circuit breaker: 5 consecutive failures, recovery: 30s) to allow unassisted base-level execution.
 
 - **2026-07-16 — Phase 1 Utils seams clarified (owner-resolved).** Logging sink configuration failure emits only the fixed safe fallback and then raises `ConfigurationError`; the stable error-metadata and settings-model field shapes are fixed in the Utils specification. Phase 1 may use private redaction mechanics for logging while public redaction functions and diagnostics remain assigned to Phase 2.

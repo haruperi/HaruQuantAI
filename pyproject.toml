@@ -11,7 +11,7 @@ dependencies = [
     "detect-secrets>=1.5.0",
     "fastapi>=0.115.0",
     "loguru>=0.7.3",
-    "metatrader5>=5.0.5735",
+    "metatrader5>=5.0.5735 ; sys_platform == 'win32'",
     "mypy>=2.1.0",
     "numba>=0.65.1",
     "numpy==2.4.6",
