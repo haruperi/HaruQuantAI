@@ -2,9 +2,9 @@
 
 # ruff: noqa: ANN401, PLR2004 - SDK records and native retcodes are provider-defined.
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
+from typing import Any, cast
 
 from app.services.brokers.contracts import (
     BrokerAccountInfo,
@@ -20,13 +20,22 @@ from app.services.brokers.contracts import (
 def _field(value: object, name: str) -> Any:
     if isinstance(value, dict):
         return value[name]
-    return getattr(value, name)
+    try:
+        return getattr(value, name)
+    except AttributeError:
+        return cast("Any", value)[name]
 
 
 def _optional(value: object, name: str) -> Any:
     if isinstance(value, dict):
         return value.get(name)
-    return getattr(value, name, None)
+    try:
+        return getattr(value, name)
+    except AttributeError:
+        try:
+            return cast("Any", value)[name]
+        except (IndexError, KeyError, TypeError, ValueError):
+            return None
 
 
 def _time(value: object, name: str = "time") -> datetime:
@@ -35,9 +44,29 @@ def _time(value: object, name: str = "time") -> datetime:
 
 
 def _map_symbol(value: object) -> BrokerSymbolInfo:
-    """Map mandatory MT5 symbol evidence without aliases."""
+    """Map mandatory MT5 symbol evidence without aliases.
+
+    Returns:
+        Canonical symbol information.
+    """
     symbol = str(_field(value, "name"))
     digits = int(_field(value, "digits"))
+
+    # Extract provider_metadata dynamically from value
+    raw_dict = {}
+    asdict_fn = getattr(value, "_asdict", None)
+    if asdict_fn is not None:
+        raw_dict = asdict_fn()
+    elif isinstance(value, dict):
+        raw_dict = dict(value)
+    else:
+        for name in dir(value):
+            if not name.startswith("_"):
+                try:
+                    raw_dict[name] = getattr(value, name)
+                except Exception:
+                    pass
+
     return BrokerSymbolInfo(
         provider_symbol=symbol,
         product_profile="mt5",
@@ -47,11 +76,16 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
         quantity_step=Decimal(str(_field(value, "volume_step"))),
         min_quantity=Decimal(str(_field(value, "volume_min"))),
         max_quantity=Decimal(str(_field(value, "volume_max"))),
+        provider_metadata=raw_dict,
     )
 
 
 def _map_quote(value: object, symbol: str) -> BrokerQuote:
-    """Map only genuine MT5 quote fields."""
+    """Map only genuine MT5 quote fields.
+
+    Returns:
+        Canonical quote evidence.
+    """
     bid = Decimal(str(_field(value, "bid")))
     ask = Decimal(str(_field(value, "ask")))
     last = Decimal(str(_field(value, "last")))
@@ -86,10 +120,42 @@ def _map_tick(value: object, symbol: str) -> BrokerTick:
 
 def _map_bar(value: object, symbol: str, timeframe: str) -> BrokerBar:
     opening = _time(value)
+    durations = {
+        "M1": timedelta(minutes=1),
+        "M2": timedelta(minutes=2),
+        "M3": timedelta(minutes=3),
+        "M4": timedelta(minutes=4),
+        "M5": timedelta(minutes=5),
+        "M6": timedelta(minutes=6),
+        "M10": timedelta(minutes=10),
+        "M12": timedelta(minutes=12),
+        "M15": timedelta(minutes=15),
+        "M20": timedelta(minutes=20),
+        "M30": timedelta(minutes=30),
+        "H1": timedelta(hours=1),
+        "H2": timedelta(hours=2),
+        "H3": timedelta(hours=3),
+        "H4": timedelta(hours=4),
+        "H6": timedelta(hours=6),
+        "H8": timedelta(hours=8),
+        "H12": timedelta(hours=12),
+        "D1": timedelta(days=1),
+        "W1": timedelta(days=7),
+    }
+    if timeframe == "MN1":
+        closing = opening.replace(
+            year=opening.year + (1 if opening.month == 12 else 0),
+            month=1 if opening.month == 12 else opening.month + 1,
+        )
+    else:
+        closing = opening + durations[timeframe]
+    tick_volume = _optional(value, "tick_volume")
+    real_volume = _optional(value, "real_volume")
+    spread = _optional(value, "spread")
     return BrokerBar(
         symbol=symbol,
         opening_timestamp=opening,
-        closing_timestamp=opening,
+        closing_timestamp=closing,
         is_closed=True,
         open=Decimal(str(_field(value, "open"))),
         high=Decimal(str(_field(value, "high"))),
@@ -99,12 +165,21 @@ def _map_bar(value: object, symbol: str, timeframe: str) -> BrokerBar:
         requested_timeframe=timeframe,
         price_unit="quote_currency",
         quantity_unit="lots",
-        tick_volume=Decimal(str(_optional(value, "tick_volume"))),
+        trade_volume=(
+            Decimal(str(real_volume)) if real_volume not in (None, 0) else None
+        ),
+        tick_volume=(Decimal(str(tick_volume)) if tick_volume is not None else None),
+        spread=Decimal(str(spread)) if spread is not None else None,
+        spread_unit="points" if spread is not None else None,
     )
 
 
 def _map_account(value: object) -> BrokerAccountInfo:
-    """Map direct MT5 account state."""
+    """Map direct MT5 account state.
+
+    Returns:
+        Canonical account information.
+    """
     return BrokerAccountInfo(
         account_id=str(_field(value, "login")),
         retrieved_at=datetime.now(UTC),
@@ -118,7 +193,11 @@ def _map_account(value: object) -> BrokerAccountInfo:
 
 
 def _map_position(value: object) -> BrokerPosition:
-    """Map direct MT5 position state."""
+    """Map direct MT5 position state.
+
+    Returns:
+        Canonical open-position information.
+    """
     return BrokerPosition(
         position_id=str(_field(value, "ticket")),
         symbol=str(_field(value, "symbol")),
@@ -135,7 +214,11 @@ def _map_position(value: object) -> BrokerPosition:
 
 
 def _map_error_code(retcode: int) -> BrokerErrorCode:
-    """Map the normative MT5 order-retcode floor."""
+    """Map the normative MT5 order-retcode floor.
+
+    Returns:
+        Canonical broker error code.
+    """
     if retcode == 10019:
         return BrokerErrorCode.BROKER_INSUFFICIENT_MARGIN
     if retcode in {10018, 10021}:

@@ -9,9 +9,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
+    from pandas import DataFrame
+
     from app.services.data.access.sessions import MarketCalendar
     from app.services.data.contracts import (
         AvailabilityRequest,
@@ -39,128 +41,378 @@ if TYPE_CHECKING:
         VolumeRequest,
         VolumeResult,
     )
+    from app.services.data.contracts.market import PrecisionPolicy
+    from app.services.data.contracts.sources import WorkflowContext
 
 from app.services.data.contracts.errors import DataError
+from app.services.data.public_api._requests import (
+    availability_request,
+    market_request,
+    schedule_request,
+    symbol_list_request,
+    symbol_metadata_request,
+    volume_request,
+)
+from app.services.data.public_api._runtime import (
+    ensure_identity,
+    ensure_source,
+    ensure_source_access,
+    ensure_storage,
+    resolve_calendar,
+)
 from app.utils import logger
 
 
-def get_market_data(request: MarketDataRequest) -> MarketDataset:
-    """Retrieve OHLCV bars, ticks, or spreads from cache or source."""
+def get_market_data(
+    request: MarketDataRequest | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    timeframe: str | None = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    limit: int | None = None,
+    use_cache: bool | None = None,
+    cache_ttl_seconds: int | None = None,
+    quality_failure_behavior: Literal["fail", "warn"] | None = None,
+    workflow_context: WorkflowContext | None = None,
+    precision_policy: PrecisionPolicy | None = None,
+    fallback_sources: tuple[str, ...] | None = None,
+    source_timezone: str | None = None,
+    request_id: str | None = None,
+) -> MarketDataset:
+    """Retrieve bars using a typed request or direct keyword arguments.
+
+    Returns:
+        The normalized market dataset.
+    """
     logger.info("Executing public DATA market retrieval")
+    resolved = market_request(
+        request,
+        data_kind=None,
+        source_id=source_id,
+        symbol=symbol,
+        timeframe=timeframe,
+        start=start,
+        end=end,
+        limit=limit,
+        use_cache=use_cache,
+        cache_ttl_seconds=cache_ttl_seconds,
+        quality_failure_behavior=quality_failure_behavior,
+        workflow_context=workflow_context,
+        precision_policy=precision_policy,
+        fallback_sources=fallback_sources,
+        source_timezone=source_timezone,
+        request_id=request_id,
+    )
+    ensure_storage(resolved.request_id)
+    ensure_identity(
+        resolved.source_id,
+        resolved.symbol,
+        resolved.request_id,
+    )
     from app.services.data.access.historical import fetch_market_dataset
 
-    return fetch_market_dataset(request)
+    return fetch_market_dataset(resolved)
 
 
-def get_tick_data(request: MarketDataRequest) -> MarketDataset:
-    """Retrieve tick records specifically; raises if data_kind is not tick."""
+def get_tick_data(
+    request: MarketDataRequest | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    limit: int | None = None,
+    use_cache: bool | None = None,
+    cache_ttl_seconds: int | None = None,
+    quality_failure_behavior: Literal["fail", "warn"] | None = None,
+    workflow_context: WorkflowContext | None = None,
+    precision_policy: PrecisionPolicy | None = None,
+    fallback_sources: tuple[str, ...] | None = None,
+    source_timezone: str | None = None,
+    request_id: str | None = None,
+) -> MarketDataset:
+    """Retrieve ticks using a typed request or direct keyword arguments.
+
+    Returns:
+        The normalized tick dataset.
+    """
     logger.info("Executing public DATA tick retrieval")
-    if request.data_kind not in ("tick", "ticks"):
-        raise DataError(
-            "VALIDATION_FAILED",
-            safe_details={
-                "message": (
-                    f"get_tick_data requires tick data_kind, got '{request.data_kind}'"
-                )
-            },
-            request_id=request.request_id,
-        )
+    resolved = market_request(
+        request,
+        data_kind="ticks",
+        source_id=source_id,
+        symbol=symbol,
+        timeframe=None,
+        start=start,
+        end=end,
+        limit=limit,
+        use_cache=use_cache,
+        cache_ttl_seconds=cache_ttl_seconds,
+        quality_failure_behavior=quality_failure_behavior,
+        workflow_context=workflow_context,
+        precision_policy=precision_policy,
+        fallback_sources=fallback_sources,
+        source_timezone=source_timezone,
+        request_id=request_id,
+    )
+    ensure_storage(resolved.request_id)
+    ensure_identity(
+        resolved.source_id,
+        resolved.symbol,
+        resolved.request_id,
+    )
     from app.services.data.access.historical import fetch_market_dataset
 
-    return fetch_market_dataset(request)
+    return fetch_market_dataset(resolved)
 
 
-def get_spread_data(request: MarketDataRequest) -> MarketDataset:
-    """Retrieve spread records specifically; raises if data_kind is not spread."""
+def get_spread_data(
+    request: MarketDataRequest | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    limit: int | None = None,
+    use_cache: bool | None = None,
+    cache_ttl_seconds: int | None = None,
+    quality_failure_behavior: Literal["fail", "warn"] | None = None,
+    workflow_context: WorkflowContext | None = None,
+    precision_policy: PrecisionPolicy | None = None,
+    fallback_sources: tuple[str, ...] | None = None,
+    source_timezone: str | None = None,
+    request_id: str | None = None,
+) -> MarketDataset:
+    """Retrieve spreads using a typed request or direct keyword arguments.
+
+    Returns:
+        The normalized spread dataset.
+    """
     logger.info("Executing public DATA spread retrieval")
-    if request.data_kind not in ("spread", "spreads"):
-        raise DataError(
-            "VALIDATION_FAILED",
-            safe_details={
-                "message": (
-                    f"get_spread_data requires spread data_kind, "
-                    f"got '{request.data_kind}'"
-                )
-            },
-            request_id=request.request_id,
-        )
+    resolved = market_request(
+        request,
+        data_kind="spreads",
+        source_id=source_id,
+        symbol=symbol,
+        timeframe=None,
+        start=start,
+        end=end,
+        limit=limit,
+        use_cache=use_cache,
+        cache_ttl_seconds=cache_ttl_seconds,
+        quality_failure_behavior=quality_failure_behavior,
+        workflow_context=workflow_context,
+        precision_policy=precision_policy,
+        fallback_sources=fallback_sources,
+        source_timezone=source_timezone,
+        request_id=request_id,
+    )
+    ensure_storage(resolved.request_id)
+    ensure_identity(
+        resolved.source_id,
+        resolved.symbol,
+        resolved.request_id,
+    )
     from app.services.data.access.historical import fetch_market_dataset
 
-    return fetch_market_dataset(request)
+    return fetch_market_dataset(resolved)
 
 
-def get_symbol_metadata(request: SymbolMetadataRequest) -> SymbolMetadata:
-    """Retrieve static catalog details for a single symbol."""
+def get_symbol_metadata(
+    request: SymbolMetadataRequest | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    request_id: str | None = None,
+) -> SymbolMetadata:
+    """Retrieve symbol metadata using a request or direct keywords.
+
+    Returns:
+        Normalized provider symbol metadata.
+    """
     logger.info("Executing public DATA symbol metadata retrieval")
+    resolved = symbol_metadata_request(
+        request,
+        source_id=source_id,
+        symbol=symbol,
+        request_id=request_id,
+    )
+    ensure_source_access(resolved.source_id, resolved.request_id)
     from app.services.data.access.reference import fetch_symbol_metadata
 
-    return fetch_symbol_metadata(request)
+    return fetch_symbol_metadata(resolved)
 
 
-def list_symbols(request: SymbolListRequest) -> SymbolPage:
-    """List and page all discovered symbol descriptors."""
+def list_symbols(
+    request: SymbolListRequest | None = None,
+    *,
+    source_id: str | None = None,
+    query: str | None = None,
+    cursor: str | None = None,
+    limit: int | None = None,
+    request_id: str | None = None,
+) -> SymbolPage:
+    """List provider symbols using a request or direct keywords.
+
+    Returns:
+        A bounded provider symbol page.
+    """
     logger.info("Executing public DATA symbol listing")
+    resolved = symbol_list_request(
+        request,
+        source_id=source_id,
+        query=query,
+        cursor=cursor,
+        limit=limit,
+        request_id=request_id,
+    )
+    ensure_source_access(resolved.source_id, resolved.request_id)
     from app.services.data.access.reference import discover_symbols
 
-    return discover_symbols(request)
+    return discover_symbols(resolved)
 
 
-def get_data_availability(request: AvailabilityRequest) -> DataAvailability:
-    """Inspect local storage ranges, density, gaps, and overlaps."""
+def get_data_availability(
+    request: AvailabilityRequest | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    data_kind: Literal["ohlcv", "tick", "spread"] | None = None,
+    timeframe: str | None = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    max_probe_records: int | None = None,
+    request_id: str | None = None,
+) -> DataAvailability:
+    """Inspect local availability using a request or direct keywords.
+
+    Returns:
+        Stored-range and completeness evidence.
+    """
     logger.info("Executing public DATA availability query")
+    resolved = availability_request(
+        request,
+        source_id=source_id,
+        symbol=symbol,
+        data_kind=data_kind,
+        timeframe=timeframe,
+        start=start,
+        end=end,
+        max_probe_records=max_probe_records,
+        request_id=request_id,
+    )
+    ensure_source(resolved.source_id, resolved.request_id)
     from app.services.data.access.reference import inspect_availability
 
-    return inspect_availability(request)
+    return inspect_availability(resolved)
 
 
 def get_market_hours(
-    request: ScheduleRequest,
-    calendar: MarketCalendar,
+    request: ScheduleRequest | None = None,
+    calendar: MarketCalendar | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    timezone: str | None = None,
+    request_id: str | None = None,
 ) -> MarketSchedule:
-    """Retrieve weekly trading schedule windows; raises if view is not hours."""
+    """Retrieve market hours using a request or direct keywords.
+
+    Returns:
+        The current authoritative market schedule.
+    """
     logger.info("Executing public DATA market-hours query")
-    if request.view != "hours":
-        raise DataError(
-            "VALIDATION_FAILED",
-            safe_details={
-                "message": (
-                    f"get_market_hours requires hours view, got '{request.view}'"
-                )
-            },
-            request_id=request.request_id,
-        )
+    resolved = schedule_request(
+        request,
+        view="hours",
+        source_id=source_id,
+        symbol=symbol,
+        timezone=timezone,
+        request_id=request_id,
+    )
+    selected_calendar = calendar or resolve_calendar(
+        resolved.source_id,
+        resolved.request_id,
+    )
+    ensure_source(resolved.source_id, resolved.request_id)
     from app.services.data.access.sessions import get_current_schedule
 
-    return get_current_schedule(request, calendar)
+    return get_current_schedule(resolved, selected_calendar)
 
 
 def get_trading_sessions(
-    request: ScheduleRequest,
-    calendar: MarketCalendar,
+    request: ScheduleRequest | None = None,
+    calendar: MarketCalendar | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    timezone: str | None = None,
+    request_id: str | None = None,
 ) -> MarketSchedule:
-    """Retrieve specific session intervals; raises if view is not sessions."""
+    """Retrieve trading sessions using a request or direct keywords.
+
+    Returns:
+        The current authoritative trading-session schedule.
+    """
     logger.info("Executing public DATA trading-session query")
-    if request.view != "sessions":
-        raise DataError(
-            "VALIDATION_FAILED",
-            safe_details={
-                "message": (
-                    f"get_trading_sessions requires sessions view, got '{request.view}'"
-                )
-            },
-            request_id=request.request_id,
-        )
+    resolved = schedule_request(
+        request,
+        view="sessions",
+        source_id=source_id,
+        symbol=symbol,
+        timezone=timezone,
+        request_id=request_id,
+    )
+    selected_calendar = calendar or resolve_calendar(
+        resolved.source_id,
+        resolved.request_id,
+    )
+    ensure_source(resolved.source_id, resolved.request_id)
     from app.services.data.access.sessions import get_current_schedule
 
-    return get_current_schedule(request, calendar)
+    return get_current_schedule(resolved, selected_calendar)
 
 
-def get_historical_volume(request: VolumeRequest) -> VolumeResult:
-    """Retrieve aggregated or raw historical trading volume metrics."""
+def get_historical_volume(
+    request: VolumeRequest | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    mode: Literal["records", "buckets", "summary"] | None = None,
+    bucket_seconds: int | None = None,
+    limit: int | None = None,
+    request_id: str | None = None,
+) -> VolumeResult:
+    """Retrieve historical volume using a request or direct keywords.
+
+    Returns:
+        Historical volume records, buckets, or summary evidence.
+    """
     logger.info("Executing public DATA historical-volume query")
+    resolved = volume_request(
+        request,
+        source_id=source_id,
+        symbol=symbol,
+        start=start,
+        end=end,
+        mode=mode,
+        bucket_seconds=bucket_seconds,
+        limit=limit,
+        request_id=request_id,
+    )
+    ensure_storage(resolved.request_id)
+    ensure_identity(
+        resolved.source_id,
+        resolved.symbol,
+        resolved.request_id,
+    )
     from app.services.data.access.sessions import fetch_historical_volume
 
-    return fetch_historical_volume(request)
+    return fetch_historical_volume(resolved)
 
 
 def save_market_data(request: DatasetSaveRequest) -> StorageManifest:
@@ -193,6 +445,43 @@ def resample_ohlcv(dataset: MarketDataset, target_timeframe: str) -> MarketDatas
     from app.services.data.processing.transforms import resample_dataset
 
     return resample_dataset(dataset, target_timeframe)
+
+
+def to_ohlcv_dataframe(dataset: MarketDataset) -> DataFrame:
+    """Return a six-column float64 analytical copy of one OHLCV dataset.
+
+    Returns:
+        A DataFrame indexed by aware UTC timestamps.
+
+    Raises:
+        DataError: If the dataset is not canonical OHLCV bars or its numeric
+            values cannot be represented as finite float64 values.
+    """
+    logger.info("Executing public DATA OHLCV dataframe projection")
+    from app.services.data.processing.tabular import (
+        to_ohlcv_dataframe as project_to_ohlcv_dataframe,
+    )
+
+    return project_to_ohlcv_dataframe(dataset)
+
+
+def to_tick_dataframe(dataset: MarketDataset) -> DataFrame:
+    """Return a four-column float64 analytical copy of one tick dataset.
+
+    Returns:
+        A DataFrame indexed by aware UTC timestamps, with genuine missing optional
+        values represented as ``NaN``.
+
+    Raises:
+        DataError: If the dataset is not canonical ticks, units are inconsistent,
+            or numeric values cannot be represented safely as float64.
+    """
+    logger.info("Executing public DATA tick dataframe projection")
+    from app.services.data.processing.tabular import (
+        to_tick_dataframe as project_to_tick_dataframe,
+    )
+
+    return project_to_tick_dataframe(dataset)
 
 
 def align_multitimeframe_data(
@@ -347,4 +636,6 @@ __all__ = [
     "save_market_data",
     "start_data_update_job",
     "stop_data_update_job",
+    "to_ohlcv_dataframe",
+    "to_tick_dataframe",
 ]

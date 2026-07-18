@@ -8,13 +8,20 @@ from unittest.mock import MagicMock
 
 import pytest
 from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.sources import SourceDescriptor, SourceLicensePolicy
+from app.services.data.contracts.sources import (
+    SourceDescriptor,
+    SourceIdentity,
+    SourceIdentityRequest,
+    SourceLicensePolicy,
+)
 from app.services.data.sources.protocol import MarketDataSource
 from app.services.data.sources.registry import (
     _reset_registry,
     list_registered_sources,
     register_source,
+    register_source_identity,
     resolve_source,
+    resolve_source_identity,
 )
 
 
@@ -138,3 +145,33 @@ def test_list_registered_sources() -> None:
     all_desc = list_registered_sources()
     assert len(all_desc) == 2
     assert {d.source_id for d in all_desc} == {"test-1", "test-2"}
+
+
+def test_registry_adds_provider_confirmed_identity_after_source_registration() -> None:
+    """Lazy facade composition can add exact symbol evidence on first use."""
+    request_id = "req-9456bdfa12ea76959c94a3572f5d91c73d838622df0a8d9b4e815c276c6b7880"
+    register_source(
+        _make_descriptor("mt5"),
+        lambda: MagicMock(spec=MarketDataSource),
+    )
+    register_source_identity(
+        SourceIdentity(
+            source_id="mt5",
+            canonical_symbol="EURUSD",
+            friendly_name="EURUSD",
+            provider_symbol="EURUSD.a",
+            mapping_revision="v1",
+            provenance={"method": "provider_metadata"},
+            request_id=request_id,
+        )
+    )
+
+    resolved = resolve_source_identity(
+        SourceIdentityRequest(
+            source_id="mt5",
+            identity="EURUSD",
+            request_id=request_id,
+        )
+    )
+
+    assert resolved.provider_symbol == "EURUSD.a"

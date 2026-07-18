@@ -45,6 +45,7 @@ def _install_fake_sdk(monkeypatch: pytest.MonkeyPatch) -> types.SimpleNamespace:
         initialize=_record("initialize"),
         shutdown=_record("shutdown"),
         account_info=_record("account_info"),
+        TIMEFRAME_M1=1,
         calls=calls,
     )
     monkeypatch.setitem(sys.modules, "MetaTrader5", fake)
@@ -84,6 +85,20 @@ def test_transport_call_requires_initialized_session(
             await transport.call("account_info")
 
     asyncio.run(exercise())
+
+
+def test_transport_constant_requires_connected_session(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """SDK constants are available only after the terminal is initialized."""
+    _install_fake_sdk(monkeypatch)
+    transport = _MT5Transport(_config(login="1", password="p", server="s"))
+
+    with pytest.raises(ConnectionError, match="not initialized"):
+        asyncio.run(transport.constant("TIMEFRAME_M1"))
+
+    asyncio.run(transport.connect())
+    assert asyncio.run(transport.constant("TIMEFRAME_M1")) == 1
 
 
 def test_transport_close_releases_and_clears_session(

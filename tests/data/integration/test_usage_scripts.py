@@ -8,15 +8,11 @@ from pathlib import Path
 import pytest
 
 _USAGE_SCRIPTS = (
-    "01_contracts.py",
+    "01_retrieval_referance.py",
     "02_storage.py",
-    "03_sources.py",
-    "04_market_account_read.py",
-    "05_processing.py",
-    "06_update_jobs.py",
-    "07_realtime_feeds.py",
-    "08_public_api.py",
-    "usecases.py",
+    "03_processing.py",
+    "04_jobs.py",
+    "05_feeds.py",
 )
 
 
@@ -26,6 +22,7 @@ def test_documented_usage_script_executes_real_work(script_name: str) -> None:
     usage_directory = Path(__file__).parents[1] / "usage"
     environment = os.environ.copy()
     environment.pop("DATA_USAGE_LIVE_PROVIDERS", None)
+    environment["MT5_ENABLED"] = "false"
     completed = subprocess.run(  # noqa: S603 - fixed repository script invocation.
         [sys.executable, str(usage_directory / script_name)],
         check=False,

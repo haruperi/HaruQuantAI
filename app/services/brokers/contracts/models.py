@@ -731,7 +731,7 @@ class BrokerTick(_Schema):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BrokerBar(_Schema):
-    """One genuine provider OHLC bar."""
+    """One genuine provider OHLC bar with optional spread evidence."""
 
     SCHEMA_ID: ClassVar[str] = "brokers.bar.v1"
     symbol: str
@@ -748,6 +748,8 @@ class BrokerBar(_Schema):
     quantity_unit: str
     trade_volume: Decimal | None = None
     tick_volume: Decimal | None = None
+    spread: Decimal | None = None
+    spread_unit: str | None = None
 
     def __post_init__(self) -> None:
         for name in (
@@ -770,6 +772,10 @@ class BrokerBar(_Schema):
             raise ValueError("bar low is inconsistent")
         _non_negative(self.trade_volume, "trade_volume")
         _non_negative(self.tick_volume, "tick_volume")
+        _non_negative(self.spread, "spread")
+        _optional_text(self.spread_unit, "spread_unit")
+        if (self.spread is None) != (self.spread_unit is None):
+            raise ValueError("spread and spread_unit must be provided together")
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

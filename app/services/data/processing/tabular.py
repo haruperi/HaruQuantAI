@@ -8,15 +8,22 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from app.services.data.contracts import MarketDataset
 from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.records import OHLCVRecord
+from app.services.data.contracts.records import OHLCVRecord, TickRecord
 from app.utils import logger
 
 _MAX_MISMATCH_SAMPLES = 10
+_OHLCV_COLUMNS = ("open", "high", "low", "close", "volume", "spread")
+_TICK_COLUMNS = ("bid", "ask", "last", "volume")
 
 
 def _raise_naive_datetime(field: str) -> None:
-    """Reject ambiguous timestamps instead of guessing UTC."""
+    """Reject ambiguous timestamps instead of guessing UTC.
+
+    Raises:
+        DataError: Always, because the supplied timestamp evidence is ambiguous.
+    """
     logger.error("Rejecting ambiguous DATA timestamp evidence")
     raise DataError(
         "VALIDATION_FAILED",
@@ -107,8 +114,187 @@ def bars_to_records(records: Sequence[OHLCVRecord]) -> list[dict[str, Any]]:
         ) from error
 
 
+def to_ohlcv_dataframe(dataset: MarketDataset) -> pd.DataFrame:
+    """Project one canonical bar dataset to an analytical OHLCV/spread DataFrame.
+
+    The returned frame is a new mutable analytical copy. The source
+    ``MarketDataset`` remains the authoritative precision, quality, provenance,
+    and availability evidence.
+
+    Args:
+        dataset: Canonical Data-owned market dataset containing OHLCV bars.
+
+    Returns:
+        A DataFrame with a UTC ``timestamp`` index and float64 ``open``,
+        ``high``, ``low``, ``close``, ``volume``, and ``spread`` columns. The
+        provider-reported spread unit is stored in ``frame.attrs["spread_unit"]``.
+
+    Raises:
+        DataError: If the dataset is not bars, contains a non-OHLCV record, or
+            cannot be represented as finite float64 analytical values.
+    """
+    logger.info("Projecting canonical OHLCV dataset to analytical dataframe")
+    if dataset.data_kind != "bars":
+        raise DataError(
+            "VALIDATION_FAILED",
+            safe_details={"field": "data_kind"},
+            request_id=dataset.request_id,
+        )
+    if any(not isinstance(record, OHLCVRecord) for record in dataset.records):
+        raise DataError(
+            "VALIDATION_FAILED",
+            safe_details={"field": "records"},
+            request_id=dataset.request_id,
+        )
+
+    records = tuple(
+        record for record in dataset.records if isinstance(record, OHLCVRecord)
+    )
+    if any(record.spread is None or record.spread_unit is None for record in records):
+        raise DataError(
+            "DATA_QUALITY_FAILED",
+            safe_details={"field": "spread"},
+            request_id=dataset.request_id,
+        )
+    spread_units = {record.spread_unit for record in records}
+    if len(spread_units) > 1:
+        raise DataError(
+            "DATA_QUALITY_FAILED",
+            safe_details={"field": "spread_unit"},
+            request_id=dataset.request_id,
+        )
+    try:
+        values = {
+            column: np.asarray(
+                [float(getattr(record, column)) for record in records],
+                dtype="float64",
+            )
+            for column in _OHLCV_COLUMNS
+        }
+    except (OverflowError, TypeError, ValueError) as error:
+        raise DataError(
+            "PRECISION_MISMATCH",
+            safe_details={"operation": "ohlcv_dataframe_projection"},
+            request_id=dataset.request_id,
+        ) from error
+    if any(not np.isfinite(column_values).all() for column_values in values.values()):
+        raise DataError(
+            "PRECISION_MISMATCH",
+            safe_details={"operation": "ohlcv_dataframe_projection"},
+            request_id=dataset.request_id,
+        )
+
+    index = pd.DatetimeIndex(
+        [record.timestamp for record in records],
+        tz=UTC,
+        name="timestamp",
+    )
+    frame = pd.DataFrame(values, index=index, columns=_OHLCV_COLUMNS)
+    frame.attrs["spread_unit"] = next(iter(spread_units), None)
+    return frame
+
+
+def to_tick_dataframe(dataset: MarketDataset) -> pd.DataFrame:
+    """Project one canonical tick dataset to an analytical DataFrame.
+
+    Genuine missing optional tick values become ``NaN``. The returned frame is a
+    new mutable analytical copy; the canonical ``MarketDataset`` remains the
+    authoritative precision, quality, provenance, and availability evidence.
+
+    Args:
+        dataset: Canonical Data-owned market dataset containing ticks.
+
+    Returns:
+        A DataFrame with a UTC ``timestamp`` index and float64 ``bid``, ``ask``,
+        ``last``, and ``volume`` columns. Common units are stored in
+        ``frame.attrs["price_unit"]`` and ``frame.attrs["volume_unit"]``.
+
+    Raises:
+        DataError: If the dataset is not ticks, contains a non-tick record, has
+            inconsistent units, or cannot be represented safely as float64.
+    """
+    logger.info("Projecting canonical tick dataset to analytical dataframe")
+    if dataset.data_kind != "ticks":
+        raise DataError(
+            "VALIDATION_FAILED",
+            safe_details={"field": "data_kind"},
+            request_id=dataset.request_id,
+        )
+    if any(not isinstance(record, TickRecord) for record in dataset.records):
+        raise DataError(
+            "VALIDATION_FAILED",
+            safe_details={"field": "records"},
+            request_id=dataset.request_id,
+        )
+
+    records = tuple(
+        record for record in dataset.records if isinstance(record, TickRecord)
+    )
+    price_units = {record.price_unit for record in records}
+    volume_units = {
+        record.volume_unit for record in records if record.volume_unit is not None
+    }
+    if len(price_units) > 1:
+        raise DataError(
+            "DATA_QUALITY_FAILED",
+            safe_details={"field": "price_unit"},
+            request_id=dataset.request_id,
+        )
+    if len(volume_units) > 1:
+        raise DataError(
+            "DATA_QUALITY_FAILED",
+            safe_details={"field": "volume_unit"},
+            request_id=dataset.request_id,
+        )
+
+    try:
+        values = {
+            column: np.asarray(
+                [
+                    (
+                        np.nan
+                        if getattr(record, column) is None
+                        else float(getattr(record, column))
+                    )
+                    for record in records
+                ],
+                dtype="float64",
+            )
+            for column in _TICK_COLUMNS
+        }
+    except (OverflowError, TypeError, ValueError) as error:
+        raise DataError(
+            "PRECISION_MISMATCH",
+            safe_details={"operation": "tick_dataframe_projection"},
+            request_id=dataset.request_id,
+        ) from error
+    if any(np.isinf(column_values).any() for column_values in values.values()):
+        raise DataError(
+            "PRECISION_MISMATCH",
+            safe_details={"operation": "tick_dataframe_projection"},
+            request_id=dataset.request_id,
+        )
+
+    index = pd.DatetimeIndex(
+        [record.timestamp for record in records],
+        tz=UTC,
+        name="timestamp",
+    )
+    frame = pd.DataFrame(values, index=index, columns=_TICK_COLUMNS)
+    frame.attrs["price_unit"] = next(iter(price_units), None)
+    frame.attrs["volume_unit"] = next(iter(volume_units), None)
+    return frame
+
+
 def _serialize_value(val: object) -> object:
-    """Helper to serialize single cell values safely for JSON."""
+    """Serialize one private tabular cell safely for JSON.
+
+    Returns:
+        JSON-safe scalar value.
+
+    Raises:
+        DataError: If the value is non-finite, ambiguous, or unsupported.
+    """
     logger.debug("Running DATA function: _serialize_value")
     res: object
     if isinstance(val, datetime):

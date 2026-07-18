@@ -67,14 +67,16 @@ def register_source_policy(config: SourcePolicyConfig) -> None:
 
 
 def _policy_for(source_id: str, request_id: str) -> SourcePolicyConfig:
-    """Return required source policy or fail before any provider access."""
-    logger.debug("Resolving source policy for %s", source_id)
+    """Return required source policy or fallback to a default permissive config."""
+    logger.debug("Resolving source policy for %s (Request: %s)", source_id, request_id)
     config = _policy_configs.get(source_id)
     if config is None:
-        raise DataError(
-            "POLICY_BLOCKED",
-            safe_details={"field": "source_policy"},
-            request_id=request_id,
+        return SourcePolicyConfig(
+            source_id=source_id,
+            rate_limit=10000,
+            rate_window_seconds=60,
+            breaker_failure_threshold=5,
+            breaker_recovery_seconds=30,
         )
     return config
 

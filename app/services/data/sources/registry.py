@@ -179,6 +179,58 @@ def resolve_source_identity(request: SourceIdentityRequest) -> SourceIdentity:
     return identity.model_copy(update={"request_id": request.request_id})
 
 
+def register_source_identity(identity: SourceIdentity) -> None:
+    """Register one provider-confirmed identity for an existing source.
+
+    Args:
+        identity: Exact canonical-to-provider identity evidence.
+
+    Raises:
+        DataError: If the source is unavailable or the identity conflicts with
+            an existing mapping.
+    """
+    logger.info(
+        "Registering identity %s for source %s",
+        identity.canonical_symbol,
+        identity.source_id,
+    )
+    with _lock:
+        if identity.source_id not in _registry:
+            raise DataError(
+                "SOURCE_UNAVAILABLE",
+                safe_details={"field": "source_id"},
+                request_id=identity.request_id,
+            )
+        existing = _identities.get(identity.source_id, ())
+        matching = tuple(
+            item
+            for item in existing
+            if {
+                identity.canonical_symbol.casefold(),
+                identity.friendly_name.casefold(),
+                identity.provider_symbol.casefold(),
+            }
+            & {
+                item.canonical_symbol.casefold(),
+                item.friendly_name.casefold(),
+                item.provider_symbol.casefold(),
+            }
+        )
+        if matching:
+            if len(matching) == 1 and (
+                matching[0].canonical_symbol == identity.canonical_symbol
+                and matching[0].provider_symbol == identity.provider_symbol
+                and matching[0].mapping_revision == identity.mapping_revision
+            ):
+                return
+            raise DataError(
+                "VALIDATION_FAILED",
+                safe_details={"field": "source_identity"},
+                request_id=identity.request_id,
+            )
+        _identities[identity.source_id] = (*existing, identity)
+
+
 def _reset_registry() -> None:
     """Private reset helper to reset registry state between test suites."""
     logger.debug("Running DATA function: _reset_registry")
@@ -192,6 +244,7 @@ __all__ = [
     "get_source_descriptor",
     "list_registered_sources",
     "register_source",
+    "register_source_identity",
     "resolve_source",
     "resolve_source_identity",
     "update_source_descriptor_readiness",

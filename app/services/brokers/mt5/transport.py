@@ -60,6 +60,19 @@ class _MT5Transport:
         function: Callable[..., Any] = getattr(self._sdk, name)
         return await self._run(function, *args, **kwargs)
 
+    async def constant(self, name: str) -> object:
+        """Return one documented SDK constant from the connected transport.
+
+        Returns:
+            The exact SDK constant value.
+
+        Raises:
+            ConnectionError: If the terminal session is not initialized.
+        """
+        if self._sdk is None:
+            raise ConnectionError("MT5 session is not initialized")
+        return getattr(self._sdk, name)
+
     async def _run(
         self, function: Callable[..., Any], *args: object, **kwargs: object
     ) -> Any:

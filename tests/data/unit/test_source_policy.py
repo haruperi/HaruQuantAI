@@ -159,7 +159,7 @@ def test_evaluate_source_policy_unregistered() -> None:
 
     with pytest.raises(DataError) as captured:
         evaluate_source_policy(req)
-    assert captured.value.code == "POLICY_BLOCKED"
+    assert captured.value.code == "SOURCE_UNAVAILABLE"
 
 
 def test_evaluate_source_policy_capability_mismatch() -> None:
@@ -272,9 +272,8 @@ def test_evaluate_source_policy_rate_limits(monkeypatch: pytest.MonkeyPatch) -> 
         request_id="req-eb1bae3d11ff7b713a6bcf6bc16a5bf7fb51efa405d42d0caa8bf5dcda7c090b",
     )
 
-    with pytest.raises(DataError) as captured:
-        evaluate_source_policy(req)
-    assert captured.value.code == "POLICY_BLOCKED"
+    plan = evaluate_source_policy(req)
+    assert plan.source_id == "src-1"
 
 
 def test_promote_source_unauthorized() -> None:

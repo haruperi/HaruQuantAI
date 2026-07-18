@@ -351,8 +351,8 @@ def test_tick_preserves_optional_values() -> None:
     assert tick.last_price is None
 
 
-def test_bar_has_explicit_time_and_volume_semantics() -> None:
-    """FR-BRK-024: bars preserve exact intervals and optional volumes."""
+def test_bar_has_explicit_time_volume_and_spread_semantics() -> None:
+    """FR-BRK-024: bars preserve intervals, volumes, and spread evidence."""
     bar = BrokerBar(
         symbol="EURUSD",
         opening_timestamp=NOW,
@@ -366,9 +366,32 @@ def test_bar_has_explicit_time_and_volume_semantics() -> None:
         requested_timeframe="1m",
         price_unit="USD",
         quantity_unit="lot",
+        spread=D("2"),
+        spread_unit="points",
     )
     assert bar.trade_volume is None
     assert bar.is_closed
+    assert bar.spread == D("2")
+
+
+def test_bar_requires_spread_unit_with_spread() -> None:
+    """Provider spread evidence always carries its native unit."""
+    with pytest.raises(ValueError, match="provided together"):
+        BrokerBar(
+            symbol="EURUSD",
+            opening_timestamp=NOW,
+            closing_timestamp=LATER,
+            is_closed=True,
+            open=D("1"),
+            high=D("3"),
+            low=D("0.5"),
+            close=D("2"),
+            provider_timeframe="1m",
+            requested_timeframe="1m",
+            price_unit="USD",
+            quantity_unit="lot",
+            spread=D("2"),
+        )
 
 
 def test_order_book_exposes_resnapshot_state() -> None:

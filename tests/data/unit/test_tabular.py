@@ -5,8 +5,10 @@ from decimal import Decimal
 
 import pandas as pd
 import pytest
+from app.services.data import to_ohlcv_dataframe, to_tick_dataframe
+from app.services.data.contracts import DataQualityReport, MarketDataset
 from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.records import OHLCVRecord
+from app.services.data.contracts.records import OHLCVRecord, TickRecord
 from app.services.data.processing.tabular import (
     align_dataframe_datetime,
     bars_to_records,
@@ -15,6 +17,123 @@ from app.services.data.processing.tabular import (
     compare_ohlcv,
     serialize_dataframe_records,
 )
+from app.utils import generate_id
+
+
+def _bar_dataset(
+    *,
+    price: Decimal = Decimal(100),
+    include_spread: bool = True,
+) -> MarketDataset:
+    """Return a valid two-row canonical bar dataset."""
+    first = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
+    records = tuple(
+        OHLCVRecord(
+            timestamp=first.replace(minute=index),
+            source="test",
+            source_symbol="EURUSD",
+            source_revision="v1",
+            available_at=first.replace(minute=index + 1),
+            open=price + index,
+            high=price + index + Decimal(1),
+            low=price + index - Decimal(1),
+            close=price + index + Decimal("0.5"),
+            volume=Decimal(10 + index),
+            price_unit="quote_currency",
+            volume_unit="lots",
+            spread=Decimal(2 + index) if include_spread else None,
+            spread_unit="points" if include_spread else None,
+        )
+        for index in range(2)
+    )
+    return MarketDataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="EURUSD",
+        timeframe="M1",
+        records=records,
+        start=records[0].timestamp,
+        end=records[-1].timestamp,
+        available_at=records[-1].available_at,
+        record_count=len(records),
+        quality_report=DataQualityReport(
+            quality_status="passed",
+            quality_score=Decimal(1),
+            record_count=len(records),
+            checked_count=len(records),
+            truncated=False,
+            sample_limit=len(records),
+            schema_version="v1",
+            generated_at=records[-1].available_at,
+        ),
+        source_metadata={"source_id": "test"},
+        license_metadata={"status": "internal"},
+        cache_status="not_used",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id=generate_id("req"),
+    )
+
+
+def _tick_dataset(
+    *,
+    price: Decimal = Decimal("1.1"),
+    second_price_unit: str = "quote_currency",
+    first_volume_unit: str | None = None,
+) -> MarketDataset:
+    """Return a valid two-row canonical tick dataset."""
+    first = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
+    records = (
+        TickRecord(
+            timestamp=first,
+            source="test",
+            source_symbol="EURUSD",
+            source_revision="v1",
+            available_at=first,
+            bid=price,
+            ask=price + Decimal("0.0002"),
+            volume=Decimal(2) if first_volume_unit is not None else None,
+            price_unit="quote_currency",
+            volume_unit=first_volume_unit,
+        ),
+        TickRecord(
+            timestamp=first.replace(second=1),
+            source="test",
+            source_symbol="EURUSD",
+            source_revision="v1",
+            available_at=first.replace(second=1),
+            last=price + Decimal("0.0001"),
+            volume=Decimal(3),
+            price_unit=second_price_unit,
+            volume_unit="lots",
+        ),
+    )
+    return MarketDataset(
+        normalization_version="v1",
+        data_kind="ticks",
+        symbol="EURUSD",
+        records=records,
+        start=records[0].timestamp,
+        end=records[-1].timestamp,
+        available_at=records[-1].available_at,
+        record_count=len(records),
+        quality_report=DataQualityReport(
+            quality_status="passed",
+            quality_score=Decimal(1),
+            record_count=len(records),
+            checked_count=len(records),
+            truncated=False,
+            sample_limit=len(records),
+            schema_version="v1",
+            generated_at=records[-1].available_at,
+        ),
+        source_metadata={"source_id": "test"},
+        license_metadata={"status": "internal"},
+        cache_status="not_used",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id=generate_id("req"),
+    )
 
 
 def test_align_dataframe_datetime_success() -> None:
@@ -90,6 +209,143 @@ def test_bars_to_records() -> None:
     dicts = bars_to_records(records)
     assert len(dicts) == 1
     assert dicts[0]["open"] == "100.0"
+
+
+def test_to_ohlcv_dataframe_returns_float64_analytical_copy() -> None:
+    """Project canonical bars to the exact public analytical frame shape."""
+    dataset = _bar_dataset()
+
+    frame = to_ohlcv_dataframe(dataset)
+
+    assert list(frame.columns) == [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "spread",
+    ]
+    assert frame.index.name == "timestamp"
+    assert frame.index.tz == UTC
+    assert frame.attrs["spread_unit"] == "points"
+    assert all(str(dtype) == "float64" for dtype in frame.dtypes)
+    assert frame.iloc[0].to_dict() == {
+        "open": 100.0,
+        "high": 101.0,
+        "low": 99.0,
+        "close": 100.5,
+        "volume": 10.0,
+        "spread": 2.0,
+    }
+
+    frame.iloc[0, 0] = 999.0
+    assert dataset.records[0].open == Decimal(100)
+
+
+def test_to_ohlcv_dataframe_rejects_non_bar_dataset() -> None:
+    """Reject a dataset whose declared kind is not OHLCV bars."""
+    dataset = _bar_dataset().model_copy(
+        update={"data_kind": "ticks", "timeframe": None},
+    )
+
+    with pytest.raises(DataError) as captured:
+        to_ohlcv_dataframe(dataset)
+
+    assert captured.value.code == "VALIDATION_FAILED"
+
+
+def test_to_ohlcv_dataframe_rejects_float64_overflow() -> None:
+    """Reject canonical Decimal values that overflow analytical float64."""
+    dataset = _bar_dataset(price=Decimal("1e999"))
+
+    with pytest.raises(DataError) as captured:
+        to_ohlcv_dataframe(dataset)
+
+    assert captured.value.code == "PRECISION_MISMATCH"
+
+
+def test_to_ohlcv_dataframe_rejects_missing_spread_evidence() -> None:
+    """Never invent a zero or current quote when historical spread is absent."""
+    dataset = _bar_dataset(include_spread=False)
+
+    with pytest.raises(DataError) as captured:
+        to_ohlcv_dataframe(dataset)
+
+    assert captured.value.code == "DATA_QUALITY_FAILED"
+
+
+def test_ohlcv_record_requires_spread_unit_with_spread() -> None:
+    """Canonical per-bar spread evidence always carries its native unit."""
+    values = _bar_dataset().records[0].model_dump()
+    values["spread_unit"] = None
+
+    with pytest.raises(ValueError, match="provided together"):
+        OHLCVRecord(**values)
+
+
+def test_to_tick_dataframe_returns_float64_analytical_copy() -> None:
+    """Project canonical ticks while preserving genuine missing values."""
+    dataset = _tick_dataset()
+
+    frame = to_tick_dataframe(dataset)
+
+    assert list(frame.columns) == ["bid", "ask", "last", "volume"]
+    assert frame.index.name == "timestamp"
+    assert frame.index.tz == UTC
+    assert frame.attrs == {
+        "price_unit": "quote_currency",
+        "volume_unit": "lots",
+    }
+    assert all(str(dtype) == "float64" for dtype in frame.dtypes)
+    assert frame.iloc[0]["bid"] == 1.1
+    assert frame.iloc[0]["ask"] == 1.1002
+    assert pd.isna(frame.iloc[0]["last"])
+    assert pd.isna(frame.iloc[0]["volume"])
+    assert frame.iloc[1]["last"] == 1.1001
+    assert frame.iloc[1]["volume"] == 3.0
+
+    frame.iloc[0, 0] = 999.0
+    assert dataset.records[0].bid == Decimal("1.1")
+
+
+def test_to_tick_dataframe_rejects_non_tick_dataset() -> None:
+    """Reject a dataset whose declared kind is not ticks."""
+    dataset = _bar_dataset()
+
+    with pytest.raises(DataError) as captured:
+        to_tick_dataframe(dataset)
+
+    assert captured.value.code == "VALIDATION_FAILED"
+
+
+def test_to_tick_dataframe_rejects_inconsistent_price_units() -> None:
+    """Reject a frame that would mix incomparable provider price units."""
+    dataset = _tick_dataset(second_price_unit="USD")
+
+    with pytest.raises(DataError) as captured:
+        to_tick_dataframe(dataset)
+
+    assert captured.value.code == "DATA_QUALITY_FAILED"
+
+
+def test_to_tick_dataframe_rejects_inconsistent_volume_units() -> None:
+    """Reject a frame that would mix incomparable provider volume units."""
+    dataset = _tick_dataset(first_volume_unit="contracts")
+
+    with pytest.raises(DataError) as captured:
+        to_tick_dataframe(dataset)
+
+    assert captured.value.code == "DATA_QUALITY_FAILED"
+
+
+def test_to_tick_dataframe_rejects_float64_overflow() -> None:
+    """Reject canonical Decimal tick values that overflow analytical float64."""
+    dataset = _tick_dataset(price=Decimal("1e999"))
+
+    with pytest.raises(DataError) as captured:
+        to_tick_dataframe(dataset)
+
+    assert captured.value.code == "PRECISION_MISMATCH"
 
 
 def test_serialize_dataframe_records() -> None:

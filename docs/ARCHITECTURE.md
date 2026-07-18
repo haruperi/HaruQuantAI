@@ -41,13 +41,20 @@
   contracts, bounded SQLite/file/cache/audit persistence, explicit read-only sources
   and durable policy, historical/reference/context/FX access, deterministic
   processing/alignment, recoverable jobs, internal feed status, and typed
-  package-root operations. Provider and broker sessions remain caller-owned and
-  injected.
-* Later agile phases reuse these three domains and run compatibility/regression
+  package-root operations. Retrieval and reference exports accept either their
+  typed request or direct keyword arguments; standalone calls lazily compose
+  MT5 read-only source, identity, migration, and calendar dependencies through
+  the existing Brokers and Data boundaries. Explicit source/adapter injection
+  remains supported.
+* `app/services/indicators/` is a completed implementation baseline containing
+  the immutable Core calculation boundary and 20 approved one-indicator-per-file
+  implementations across trend, volatility, momentum, volume, and candles.
+  Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the
+  non-repainting contract.
+* Later agile phases reuse these four domains and run compatibility/regression
   checks; they do not rebuild them. Current semantic-docstring/format cleanup is a
   separate repository-quality gate.
-* Indicators is the next full-domain build and lands Core, trend, volatility, and
-  momentum together before the full Strategy domain build.
+* Strategy is the next full-domain build after Indicators.
 
 ---
 
@@ -101,7 +108,7 @@ flowchart TD
 ### Shared Utility Framework (`app/utils/`)
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
-* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors and immutable metadata, injected error routing, identity/trace IDs, UTC time, canonical serialization, redaction, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. `app.utils.AppSettings` is the sole repository `.env` loading boundary; domains inherit it for typed owned settings and never parse dotenv files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, password hashing, credential encryption/persistence, active-key selection, credential-reference resolution, composition-root Brokers configuration, and permission enforcement; externally provisioned key infrastructure owns encryption-key generation/storage/rotation; Data owns normalized OHLC contracts, cross-domain tabular processing, and quality policy, while Indicators may privately project one `MarketDataset v1` to pandas/NumPy for pure formula evaluation and owns its resulting tabular contract; each domain owns its paths, limits, validation, result types, and business contracts.
+* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors and immutable metadata, injected error routing, identity/trace IDs, UTC time, canonical serialization, redaction, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. `app.utils.AppSettings` is the sole repository `.env` loading boundary; domains inherit it for typed owned settings and never parse dotenv files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, password hashing, credential encryption/persistence, active-key selection, credential-reference resolution, composition-root Brokers configuration, and permission enforcement; externally provisioned key infrastructure owns encryption-key generation/storage/rotation; Data owns normalized market contracts, cross-domain tabular processing, quality policy, and the only public detached OHLCV/spread and tick DataFrame projections from canonical `MarketDataset v1`; Indicators may privately project the same contract to pandas/NumPy for pure formula evaluation and owns its resulting tabular contract; each domain owns its paths, limits, validation, result types, and business contracts.
 * **Contract Ownership Rule**: Domain contract modules own their own base contract behavior locally. They must not inherit from or import a centralized utility contract base.
 
 ### Domain Audit Event Shape

@@ -31,8 +31,10 @@ def test_data_contracts_exclude_provider_runtime_types() -> None:
     assert snapshot.account_id == "acct-1"
     assert "BrokerAdapter" not in field_types
     assert "Provider" not in field_types
-    assert len(data_public_api) == 23
+    assert len(data_public_api) == 25
     assert "get_market_data" in data_public_api
+    assert "to_ohlcv_dataframe" in data_public_api
+    assert "to_tick_dataframe" in data_public_api
 
 
 def test_audit_page_uses_utils_owned_event_contract() -> None:

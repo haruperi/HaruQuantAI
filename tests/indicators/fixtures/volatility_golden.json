@@ -1,0 +1,45 @@
+{
+  "fixture_version": "v1",
+  "formula_version": "1.0.0",
+  "derivation": "Hand-calculated ATR over a deterministic 6-bar M5 OHLC series with period=2, using true range TR[0]=high-low, TR[i]=max(high-low, |high-prior_close|, |low-prior_close|), first ATR = mean(TR[0:2]) at index 1, then Wilder smoothing ATR[i] = (ATR[i-1]*(period-1) + TR[i]) / period. ADR is hand-calculated over a deterministic 4-day D1 series with period=2 as the inclusive rolling mean of (high-low), which is a constant range of 1.0 for every day in this fixture.",
+  "symbol": "EURUSD",
+  "atr_bars": [
+    {"timestamp": "2026-01-01T00:00:00Z", "open": 9.5, "high": 10.0, "low": 9.0, "close": 9.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:05:00Z", "open": 10.5, "high": 11.0, "low": 10.0, "close": 10.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:10:00Z", "open": 10.0, "high": 10.5, "low": 9.5, "close": 10.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:15:00Z", "open": 11.5, "high": 12.0, "low": 11.0, "close": 11.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:20:00Z", "open": 11.0, "high": 11.5, "low": 10.5, "close": 11.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:25:00Z", "open": 12.5, "high": 13.0, "low": 12.0, "close": 12.5, "volume": 100}
+  ],
+  "atr": {
+    "period": 2,
+    "output_column": "atr_2",
+    "expected": [null, 1.25, 1.125, 1.5625, 1.28125, 1.640625]
+  },
+  "adr_bars": [
+    {"timestamp": "2026-01-01T00:00:00Z", "open": 9.5, "high": 10.0, "low": 9.0, "close": 9.5, "volume": 100},
+    {"timestamp": "2026-01-02T00:00:00Z", "open": 10.5, "high": 11.0, "low": 10.0, "close": 10.5, "volume": 100},
+    {"timestamp": "2026-01-03T00:00:00Z", "open": 11.5, "high": 12.0, "low": 11.0, "close": 11.5, "volume": 100},
+    {"timestamp": "2026-01-04T00:00:00Z", "open": 12.5, "high": 13.0, "low": 12.0, "close": 12.5, "volume": 100}
+  ],
+  "adr": {
+    "period": 2,
+    "output_column": "adr_2",
+    "expected": [null, 1.0, 1.0, 1.0]
+  },
+  "rolling_bars": [
+    {"timestamp": "2026-01-01T00:00:00Z", "open": 100.0, "high": 100.5, "low": 99.5, "close": 100.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:05:00Z", "open": 101.0, "high": 101.5, "low": 100.5, "close": 101.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:10:00Z", "open": 99.0, "high": 99.5, "low": 98.5, "close": 99.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:15:00Z", "open": 102.0, "high": 102.5, "low": 101.5, "close": 102.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:20:00Z", "open": 98.0, "high": 98.5, "low": 97.5, "close": 98.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:25:00Z", "open": 103.0, "high": 103.5, "low": 102.5, "close": 103.0, "volume": 100}
+  ],
+  "rolling_volatility": {
+    "period": 2,
+    "source": "close",
+    "output_column": "rolling_volatility_2",
+    "derivation": "Hand-calculated as the sample standard deviation (ddof=1) of each pair of consecutive log returns of the close-price series [100, 101, 99, 102, 98, 103], multiplied by sqrt(252), using the approved period+1-price rolling window.",
+    "expected": [null, null, 0.33619911378304584, 0.5596056072285265, 0.7841574475614046, 1.0076303267592]
+  }
+}

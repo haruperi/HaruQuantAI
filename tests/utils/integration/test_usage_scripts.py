@@ -20,6 +20,7 @@ _EXPECTED_OUTPUT = {
 @pytest.mark.parametrize(("filename", "expected"), _EXPECTED_OUTPUT.items())
 def test_usage_script_executes_real_work(filename: str, expected: str) -> None:
     import os
+
     env = os.environ.copy()
     env["PYTHONPATH"] = str(Path(__file__).resolve().parents[3])
     completed = subprocess.run(  # noqa: S603 - fixed local scripts and interpreter.

@@ -4,6 +4,7 @@ import asyncio
 from datetime import UTC, datetime
 from typing import Any
 
+import numpy as np
 import pytest
 from app.services.brokers import (
     BrokerCapability,
@@ -91,7 +92,29 @@ class _FakeTransport:
                 "ask": 1.1002,
                 "last": 1.1001,
             },
-            "copy_ticks_range": ({"time": now, "bid": 1.1, "ask": 1.1002},),
+            "copy_ticks_from": ({"time": now, "bid": 1.1, "ask": 1.1002},),
+            "copy_rates_from_pos": (
+                {
+                    "time": now,
+                    "open": 1.1,
+                    "high": 1.2,
+                    "low": 1.0,
+                    "close": 1.15,
+                    "tick_volume": 25,
+                    "real_volume": 0,
+                },
+            ),
+            "copy_rates_range": (
+                {
+                    "time": now,
+                    "open": 1.1,
+                    "high": 1.2,
+                    "low": 1.0,
+                    "close": 1.15,
+                    "tick_volume": 25,
+                    "real_volume": 0,
+                },
+            ),
             "positions_get": (
                 {
                     "ticket": 1,
@@ -109,6 +132,10 @@ class _FakeTransport:
     async def call(self, name: str, *args: object, **kwargs: object) -> object:
         del args, kwargs
         return self._responses().get(name)
+
+    async def constant(self, name: str) -> object:
+        del name
+        return 1
 
     async def close(self) -> None:
         self.closed = True
@@ -270,6 +297,76 @@ def test_adapter_get_quote_and_ticks() -> None:
         )
         assert ticks.data is not None
         assert len(ticks.data.items) == 1
+
+    asyncio.run(exercise())
+
+
+def test_adapter_bounds_numpy_tick_pages_without_ambiguous_truth_checks() -> None:
+    """NumPy tick arrays use their length for truncation evidence."""
+
+    class _NumpyTickTransport(_FakeTransport):
+        async def call(self, name: str, *args: object, **kwargs: object) -> object:
+            if name == "copy_ticks_from":
+                timestamp = int(datetime(2026, 1, 1, tzinfo=UTC).timestamp())
+                return np.array(
+                    [
+                        (timestamp, 1.1, 1.1002, 0.0),
+                        (timestamp + 1, 1.1001, 1.1003, 0.0),
+                    ],
+                    dtype=[
+                        ("time", "<i8"),
+                        ("bid", "<f8"),
+                        ("ask", "<f8"),
+                        ("last", "<f8"),
+                    ],
+                )
+            return await super().call(name, *args, **kwargs)
+
+    adapter = MT5BrokerAdapter(
+        _config(),
+        _capabilities(),
+        transport=_NumpyTickTransport(),
+    )
+
+    async def exercise() -> None:
+        await adapter.connect()
+        result = await adapter.get_ticks(
+            "EURUSD",
+            start=datetime(2026, 1, 1, tzinfo=UTC),
+            end=datetime(2026, 1, 2, tzinfo=UTC),
+            limit=1,
+        )
+        assert result.data is not None
+        assert len(result.data.items) == 1
+        assert result.data.truncated
+
+    asyncio.run(exercise())
+
+
+def test_adapter_get_latest_ticks_bars_and_spread() -> None:
+    """Omitted ranges retrieve bounded recent MT5 evidence."""
+    adapter = MT5BrokerAdapter(
+        _config(), _capabilities(), transport=_FakeTransport(verified=True)
+    )
+
+    async def exercise() -> None:
+        await adapter.connect()
+        ticks = await adapter.get_ticks("EURUSD", limit=10)
+        assert ticks.data is not None
+        assert len(ticks.data.items) == 1
+        bars = await adapter.get_historical_bars(
+            "EURUSD",
+            "M1",
+            limit=10,
+        )
+        assert bars.data is not None
+        assert len(bars.data.items) == 1
+        assert (
+            bars.data.items[0].closing_timestamp > bars.data.items[0].opening_timestamp
+        )
+        spread = await adapter.get_spread("EURUSD")
+        assert spread.data is not None
+        assert str(spread.data) == "0.0002"
 
     asyncio.run(exercise())
 
@@ -448,7 +545,7 @@ def test_adapter_get_ticks_invalid_parameters() -> None:
 
     async def exercise() -> None:
         await adapter.connect()
-        msg = "tick start, end, and positive limit are required"
+        msg = "positive tick limit is required"
         with pytest.raises(ValueError, match=msg):
             await adapter.get_ticks("EURUSD", start=None, end=None, limit=0)
 

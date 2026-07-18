@@ -102,6 +102,7 @@ def resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDat
                 item.source_revision,
                 item.price_unit,
                 item.volume_unit,
+                item.spread_unit,
             )
             for item in records
         }
@@ -126,6 +127,8 @@ def resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDat
                 volume=sum((item.volume for item in records), start=Decimal(0)),
                 price_unit=first.price_unit,
                 volume_unit=first.volume_unit,
+                spread=records[-1].spread,
+                spread_unit=records[-1].spread_unit,
             )
         )
 
@@ -249,6 +252,8 @@ def align_datasets(
                         volume=last_r.volume,
                         price_unit=last_r.price_unit,
                         volume_unit=last_r.volume_unit,
+                        spread=last_r.spread,
+                        spread_unit=last_r.spread_unit,
                     )
                 )
             elif isinstance(last_r, TickRecord):
@@ -459,6 +464,12 @@ def aggregate_ticks(
             )
         prices = tuple(price for _, price in values)
         first_tick = values[0][0]
+        closing_tick = values[-1][0]
+        closing_spread = (
+            closing_tick.ask - closing_tick.bid
+            if closing_tick.ask is not None and closing_tick.bid is not None
+            else None
+        )
         bars.append(
             OHLCVRecord(
                 timestamp=timestamp,
@@ -476,6 +487,8 @@ def aggregate_ticks(
                 ),
                 price_unit=price_unit,
                 volume_unit=volume_unit,
+                spread=closing_spread,
+                spread_unit=price_unit if closing_spread is not None else None,
             )
         )
 

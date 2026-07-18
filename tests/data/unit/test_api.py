@@ -13,6 +13,8 @@ from app.services.data import (
     get_spread_data,
     get_tick_data,
     get_trading_sessions,
+    to_ohlcv_dataframe,
+    to_tick_dataframe,
 )
 from app.services.data.contracts import (
     MarketDataRequest,
@@ -28,7 +30,7 @@ def test_public_api_exports_are_sorted_and_exact() -> None:
 
     assert tuple(sorted(data.__all__)) == data.__all__
 
-    # 23 expected operations
+    # 25 expected operations
     expected_exports = {
         "get_market_data",
         "get_tick_data",
@@ -53,8 +55,12 @@ def test_public_api_exports_are_sorted_and_exact() -> None:
         "run_data_update_job_once",
         "get_data_update_job_status",
         "get_feed_status",
+        "to_ohlcv_dataframe",
+        "to_tick_dataframe",
     }
     assert set(data.__all__) == expected_exports
+    assert data.to_ohlcv_dataframe is to_ohlcv_dataframe
+    assert data.to_tick_dataframe is to_tick_dataframe
 
 
 def test_get_tick_data_validates_data_kind() -> None:

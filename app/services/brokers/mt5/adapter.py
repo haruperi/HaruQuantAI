@@ -4,9 +4,11 @@
 
 from collections.abc import Mapping
 from datetime import UTC, datetime
+from decimal import Decimal
 
 from app.services.brokers.contracts import (
     BrokerAccountInfo,
+    BrokerBar,
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -26,6 +28,7 @@ from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.mt5.mapping import (
     _field,
     _map_account,
+    _map_bar,
     _map_position,
     _map_quote,
     _map_symbol,
@@ -57,7 +60,11 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         self._transport = transport or _MT5Transport(config)
 
     async def connect(self) -> BrokerResult[None]:
-        """Connect and verify terminal, login, server, and trade evidence."""
+        """Connect and verify terminal, login, server, and trade evidence.
+
+        Returns:
+            Canonical connection result.
+        """
         await self._transition(BrokerConnectionState.CONNECTING)
         try:
             initialized = await self._transport.connect()
@@ -101,12 +108,20 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         return self._result(BrokerCapabilityId.CONNECT)
 
     async def disconnect(self) -> BrokerResult[None]:
-        """Idempotently release the owned terminal handle."""
+        """Idempotently release the owned terminal handle.
+
+        Returns:
+            Canonical disconnection result.
+        """
         await self._transport.close()
         return await super().disconnect()
 
     async def ping(self) -> BrokerResult[None]:
-        """Probe the verified terminal session."""
+        """Probe the verified terminal session.
+
+        Returns:
+            Canonical provider-health result.
+        """
         terminal = await self._transport.call("terminal_info")
         if terminal is None:
             return self._unsupported(BrokerCapabilityId.PING)
@@ -118,7 +133,11 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         cursor: str | None = None,
         limit: int | None = None,
     ) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]:
-        """Return a caller-bounded page of exact MT5 symbols."""
+        """Return a caller-bounded page of exact MT5 symbols.
+
+        Raises:
+            ValueError: If the requested limit is not positive.
+        """
         del cursor
         if limit is None or limit <= 0:
             raise ValueError("positive symbol limit is required")
@@ -150,7 +169,11 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
     async def select_symbol(
         self, symbol: str, enabled: bool = True
     ) -> BrokerResult[None]:
-        """Set only MT5 Market Watch selection state."""
+        """Set only MT5 Market Watch selection state.
+
+        Returns:
+            Canonical symbol-selection result.
+        """
         if not await self._transport.call("symbol_select", symbol, enabled):
             return self._error(
                 BrokerCapabilityId.SELECT_SYMBOL,
@@ -177,19 +200,142 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         cursor: str | None = None,
         limit: int | None = None,
     ) -> BrokerResult[BrokerPage[BrokerTick]]:
-        """Return caller-bounded genuine MT5 ticks."""
+        """Return caller-bounded genuine MT5 ticks.
+
+        Raises:
+            ValueError: If the limit or optional range is invalid.
+        """
         del cursor
-        if start is None or end is None or limit is None or limit <= 0:
-            raise ValueError("tick start, end, and positive limit are required")
-        values = await self._transport.call("copy_ticks_range", symbol, start, end, 7)
-        items = tuple(_map_tick(value, symbol) for value in (values or ())[:limit])
+        if limit is None or limit <= 0:
+            raise ValueError("positive tick limit is required")
+        if (start is None) != (end is None):
+            raise ValueError("tick start and end must be supplied together")
+        if start is None or end is None:
+            latest = await self._transport.call("symbol_info_tick", symbol)
+            available = () if latest is None else (latest,)
+            items = tuple(_map_tick(value, symbol) for value in available)
+        else:
+            if start >= end:
+                raise ValueError("tick start must precede end")
+            values = await self._transport.call(
+                "copy_ticks_from",
+                symbol,
+                start,
+                limit,
+                7,
+            )
+            available = values if values is not None else ()
+            items = tuple(
+                tick
+                for tick in (_map_tick(value, symbol) for value in available[:limit])
+                if tick.event_timestamp <= end
+            )
         return self._result(
             BrokerCapabilityId.GET_TICKS,
             data=BrokerPage(
                 items=items,
                 limit=limit,
-                truncated=bool(values) and len(values) > limit,
+                truncated=len(available) > limit,
             ),
+        )
+
+    async def get_historical_bars(
+        self,
+        symbol: str,
+        timeframe: str,
+        start: datetime | None = None,
+        end: datetime | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+    ) -> BrokerResult[BrokerPage[BrokerBar]]:
+        """Return caller-bounded genuine MT5 historical bars.
+
+        Raises:
+            ValueError: If the limit, timeframe, or optional range is invalid.
+        """
+        del cursor
+        if limit is None or limit <= 0:
+            raise ValueError("positive bar limit is required")
+        if (start is None) != (end is None):
+            raise ValueError("bar start and end must be supplied together")
+        normalized_timeframe = timeframe.upper()
+        constant_names = {
+            "M1": "TIMEFRAME_M1",
+            "M2": "TIMEFRAME_M2",
+            "M3": "TIMEFRAME_M3",
+            "M4": "TIMEFRAME_M4",
+            "M5": "TIMEFRAME_M5",
+            "M6": "TIMEFRAME_M6",
+            "M10": "TIMEFRAME_M10",
+            "M12": "TIMEFRAME_M12",
+            "M15": "TIMEFRAME_M15",
+            "M20": "TIMEFRAME_M20",
+            "M30": "TIMEFRAME_M30",
+            "H1": "TIMEFRAME_H1",
+            "H2": "TIMEFRAME_H2",
+            "H3": "TIMEFRAME_H3",
+            "H4": "TIMEFRAME_H4",
+            "H6": "TIMEFRAME_H6",
+            "H8": "TIMEFRAME_H8",
+            "H12": "TIMEFRAME_H12",
+            "D1": "TIMEFRAME_D1",
+            "W1": "TIMEFRAME_W1",
+            "MN1": "TIMEFRAME_MN1",
+        }
+        try:
+            provider_timeframe = await self._transport.constant(
+                constant_names[normalized_timeframe]
+            )
+        except KeyError as error:
+            raise ValueError("unsupported MT5 timeframe") from error
+        if start is None or end is None:
+            values = await self._transport.call(
+                "copy_rates_from_pos",
+                symbol,
+                provider_timeframe,
+                1,
+                limit,
+            )
+        else:
+            if start >= end:
+                raise ValueError("bar start must precede end")
+            values = await self._transport.call(
+                "copy_rates_range",
+                symbol,
+                provider_timeframe,
+                start,
+                end,
+            )
+        available = values if values is not None else ()
+        items = tuple(
+            _map_bar(value, symbol, normalized_timeframe) for value in available[:limit]
+        )
+        return self._result(
+            BrokerCapabilityId.GET_HISTORICAL_BARS,
+            data=BrokerPage(
+                items=items,
+                limit=limit,
+                truncated=len(available) > limit,
+            ),
+        )
+
+    async def get_spread(self, symbol: str) -> BrokerResult[Decimal]:
+        """Return the current genuine MT5 bid/ask spread."""
+        value = await self._transport.call("symbol_info_tick", symbol)
+        if value is None:
+            return self._error(
+                BrokerCapabilityId.GET_SPREAD,
+                BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND,
+            )
+        quote = _map_quote(value, symbol)
+        if quote.bid is None or quote.ask is None:
+            return self._error(
+                BrokerCapabilityId.GET_SPREAD,
+                BrokerErrorCode.BROKER_RESPONSE_INVALID,
+            )
+        return self._result(
+            BrokerCapabilityId.GET_SPREAD,
+            data=quote.ask - quote.bid,
         )
 
     async def get_account_info(self) -> BrokerResult[BrokerAccountInfo]:
@@ -210,7 +356,11 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         cursor: str | None = None,
         limit: int | None = None,
     ) -> BrokerResult[BrokerPage[BrokerPosition]]:
-        """Return caller-bounded direct MT5 position state."""
+        """Return caller-bounded direct MT5 position state.
+
+        Raises:
+            ValueError: If the requested limit is not positive.
+        """
         del filter, cursor
         if limit is None or limit <= 0:
             raise ValueError("positive position limit is required")

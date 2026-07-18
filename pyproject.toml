@@ -157,6 +157,7 @@ convention = "google"
 ignore-one-line-docstrings = false
 
 [tool.ruff.format]
+docstring-code-format = true
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
@@ -166,14 +167,17 @@ line-ending = "auto"
 minversion = "7.0"
 testpaths = ["tests"]
 pythonpath = ["."]
-python_files = ["test_*.py", "*_test.py", "[0-9]*_*.py"]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+    "[0-9]*_*.py",
+]
 addopts = [
     "--import-mode=importlib",
     "-ra",
     "--strict-markers",
     "--strict-config",
-    "--cov=app.utils",
-    "--cov=app.services",
+    "--cov=app",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-fail-under=80"
@@ -181,25 +185,60 @@ addopts = [
 
 [tool.coverage.run]
 branch = true
-source = ["app/utils", "app/services"]
+source = ["app"]
 
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
 fail_under = 80
-exclude_lines = [
-    "pragma: no cover",
+exclude_also = [
     "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
-    "\\s*\\.\\.\\.\\s*$"
+    "\\s*\\.\\.\\.\\s*$",
 ]
 
 [tool.mypy]
+# Set this to the minimum Python version supported by the project.
 python_version = "3.14"
+
+# First-party code checked when running: python -m mypy
+files = [
+    "app",
+    "tests",
+]
+
+# Main strictness policy
 strict = true
 mypy_path = "."
-exclude = ["^scripts/"]
-packages = ["app.utils", "app.services"]
+
+# Useful checks not included by strict
+warn_unreachable = true
+strict_equality_for_none = true
+
+# Additional targeted checks
+enable_error_code = [
+    "deprecated",
+    "explicit-override",
+    "ignore-without-code",
+    "mutable-override",
+    "truthy-bool",
+    "truthy-iterable",
+    "unimported-reveal",
+]
+
+# Diagnostic output
+pretty = true
+show_error_context = true
+show_error_end = true
+show_error_code_links = true
+
+# Only paths that may appear inside the checked source trees
+exclude = [
+    "^scripts/",
+    '(^|/)(build|dist)(/|$)',
+    '(^|/)(generated|vendor|migrations)(/|$)',
+]
+
 warn_unused_configs = false
 warn_return_any = true
 warn_unused_ignores = true

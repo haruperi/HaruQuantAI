@@ -2,9 +2,11 @@
 
 from datetime import UTC, datetime
 
+import numpy as np
 from app.services.brokers import BrokerErrorCode
 from app.services.brokers.mt5.mapping import (
     _map_account,
+    _map_bar,
     _map_error_code,
     _map_position,
     _map_quote,
@@ -61,6 +63,66 @@ def test_map_tick_handles_missing_optional_prices() -> None:
     )
     assert tick.ask is None
     assert tick.last_price is None
+
+
+def test_map_bar_derives_a_nonzero_close_time() -> None:
+    """MT5 opening timestamps become valid closed canonical bar windows."""
+    opening = datetime(2026, 1, 1, tzinfo=UTC)
+    bar = _map_bar(
+        _record(
+            time=opening.timestamp(),
+            open=1.1,
+            high=1.2,
+            low=1.0,
+            close=1.15,
+            tick_volume=25,
+            real_volume=0,
+        ),
+        "EURUSD",
+        "M1",
+    )
+
+    assert bar.opening_timestamp == opening
+    assert bar.closing_timestamp > opening
+    assert str(bar.tick_volume) == "25"
+    assert bar.spread is None
+
+
+def test_map_bar_reads_mt5_numpy_structured_records() -> None:
+    """MT5 NumPy rows map through their named fields."""
+    opening = datetime(2026, 1, 1, tzinfo=UTC)
+    record = np.array(
+        [
+            (
+                int(opening.timestamp()),
+                1.1,
+                1.2,
+                1.0,
+                1.15,
+                25,
+                2,
+                0,
+            )
+        ],
+        dtype=[
+            ("time", "<i8"),
+            ("open", "<f8"),
+            ("high", "<f8"),
+            ("low", "<f8"),
+            ("close", "<f8"),
+            ("tick_volume", "<u8"),
+            ("spread", "<i4"),
+            ("real_volume", "<u8"),
+        ],
+    )[0]
+
+    bar = _map_bar(record, "EURUSD", "M1")
+
+    assert bar.opening_timestamp == opening
+    assert str(bar.close) == "1.15"
+    assert str(bar.tick_volume) == "25"
+    assert str(bar.spread) == "2"
+    assert bar.spread_unit == "points"
 
 
 def test_map_account_redacts_account_reference() -> None:

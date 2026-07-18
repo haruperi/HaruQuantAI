@@ -75,7 +75,7 @@ class _Record(BaseModel):
 
 
 class OHLCVRecord(_Record):
-    """Canonical UTC OHLCV record with exact finite numerics."""
+    """Canonical UTC OHLCV record with optional exact spread evidence."""
 
     open: Decimal
     high: Decimal
@@ -84,6 +84,8 @@ class OHLCVRecord(_Record):
     volume: Decimal
     price_unit: str
     volume_unit: str
+    spread: Decimal | None = None
+    spread_unit: str | None = None
 
     @field_validator("open", "high", "low", "close", "volume")
     @classmethod
@@ -95,12 +97,23 @@ class OHLCVRecord(_Record):
             raise ValueError("numeric value is required")
         return validated
 
-    @field_validator("price_unit", "volume_unit")
+    @field_validator("spread")
     @classmethod
-    def _validate_unit(cls, value: str) -> str:
+    def _validate_optional_numeric(cls, value: Decimal | None) -> Decimal | None:
+        """Validate optional spread evidence.
+
+        Returns:
+            The exact finite spread, or None when the provider supplied none.
+        """
+        logger.debug("Running DATA function: _validate_optional_numeric")
+        return _finite(value)
+
+    @field_validator("price_unit", "volume_unit", "spread_unit")
+    @classmethod
+    def _validate_unit(cls, value: str | None) -> str | None:
         """Validate one DATA value or contract invariant."""
         logger.debug("Running DATA function: _validate_unit")
-        return _text(value)
+        return None if value is None else _text(value)
 
     @model_validator(mode="after")
     def _validate_ohlcv(self) -> OHLCVRecord:
@@ -108,6 +121,10 @@ class OHLCVRecord(_Record):
         logger.debug("Running DATA function: _validate_ohlcv")
         if self.volume < 0:
             raise ValueError("volume must be non-negative")
+        if self.spread is not None and self.spread < 0:
+            raise ValueError("spread must be non-negative")
+        if (self.spread is None) != (self.spread_unit is None):
+            raise ValueError("spread and spread_unit must be provided together")
         if self.low > self.high:
             raise ValueError("low must not exceed high")
         if not self.low <= self.open <= self.high:
@@ -116,11 +133,19 @@ class OHLCVRecord(_Record):
             raise ValueError("close must be within the low/high range")
         return self
 
-    @field_serializer("open", "high", "low", "close", "volume", when_used="json")
-    def _serialize_decimal(self, value: Decimal) -> str:
+    @field_serializer(
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "spread",
+        when_used="json",
+    )
+    def _serialize_decimal(self, value: Decimal | None) -> str | None:
         """Serialize one DATA contract value deterministically."""
         logger.debug("Running DATA function: _serialize_decimal")
-        return str(value)
+        return None if value is None else str(value)
 
 
 class TickRecord(_Record):

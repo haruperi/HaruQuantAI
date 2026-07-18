@@ -24,6 +24,8 @@ from app.services.data.public_api import (
     save_market_data,
     start_data_update_job,
     stop_data_update_job,
+    to_ohlcv_dataframe,
+    to_tick_dataframe,
 )
 
 __all__ = (
@@ -50,4 +52,6 @@ __all__ = (
     "save_market_data",
     "start_data_update_job",
     "stop_data_update_job",
+    "to_ohlcv_dataframe",
+    "to_tick_dataframe",
 )

@@ -7,17 +7,40 @@ This document is only for adding high-level changes, decisions, or status update
 - Utils, Brokers, and Data are recorded as completed implementation baselines after
   independent deterministic domain verification. The complete system remains
   `Missing`, and repository-wide documentation-quality cleanup remains tracked.
+- Indicators is now a completed implementation baseline after independent
+  deterministic domain verification (Core plus trend, volatility, momentum,
+  volume, candles, the public package port, and all five `WF-INDI-*` workflows).
 
 ### Added
 
+- **2026-07-18 — Indicators post-build review corrections.** Usage examples are
+  confirmed as standalone runnable scripts (`usage/NN_*.py`) exercising real data
+  and connections — excluded from pytest collection via a usage `conftest.py`,
+  verified (executed or explicitly skipped when live data is unavailable) by
+  `test_usage_scripts.py`, and repointed in the README. Also: capability-matrix
+  dependencies corrected to `("numpy", "pandas")` for every indicator, the Doji
+  zero-range edge case aligned to `FR-INDI-031`, per-function logging completed,
+  and the input-mutation finalization check wired in.
+
+- **2026-07-16 — Indicators domain implemented with one indicator per file.**
+  Built the complete Indicators domain per its README: the Core calculation
+  boundary and 20 official built-ins across trend, volatility, momentum, volume,
+  and candles, with retired bundled modules removed and SMC explicitly excluded.
+  All 34 `FR-INDI-*` requirements pass in 127 tests; the package is Ruff/mypy clean
+  and reaches 91% statement-and-branch coverage against the 80% gate.
+
 
 ### Decisions
+
+- **2026-07-16 — Source policy made non-blocking with default fallback (owner-resolved).** Resolving missing source policies no longer raises `POLICY_BLOCKED` or fails closed. The system now automatically falls back to a default permissive `SourcePolicyConfig` (rate limit: 10,000 attempts per 60s, circuit breaker: 5 consecutive failures, recovery: 30s) to allow unassisted base-level execution.
 
 - **2026-07-16 — Phase 1 Utils seams clarified (owner-resolved).** Logging sink configuration failure emits only the fixed safe fallback and then raises `ConfigurationError`; the stable error-metadata and settings-model field shapes are fixed in the Utils specification. Phase 1 may use private redaction mechanics for logging while public redaction functions and diagnostics remain assigned to Phase 2.
 
 - **2026-07-16 — Existing foundation domains retained (owner-resolved).** Utils, Brokers, and Data are completed implementation baselines and shall not be rebuilt by later agile phases; their allocated steps become compatibility/regression gates unless a genuinely unsatisfied requirement is identified. Current semantic-docstring/format cleanup is tracked separately from functional completion.
 
-- **2026-07-16 — Indicators and Strategy sequencing expanded (owner-resolved).** Indicators is built as one complete domain covering Core, trend, volatility, and momentum, followed by the complete Strategy domain. Later roadmap phase allocations for already completed features become regression gates rather than duplicate implementation.
+- **2026-07-16 — Indicators and Strategy sequencing expanded (owner-resolved).** Indicators is built as one complete domain covering Core, trend, volatility, momentum, volume, and candles, followed by the complete Strategy domain. Later roadmap phase allocations for already completed features become regression gates rather than duplicate implementation.
+
+- **2026-07-16 — Retrospective SMC excluded from Indicators (owner-resolved).** SMC/FVG/swing/BOS/CHoCH labels are not part of the production registry because their retroactive confirmation can repaint already-published rows; the approved surface remains immutable and causal.
 
 - **2026-07-16 — Indicator v1 calculation boundary fixed (owner-resolved).** Official calculations consume one Data-owned `MarketDataset v1`, privately project it to pandas/NumPy, preserve non-empty short-history rows as unavailable warmup output, and return an Indicator-owned immutable-copy `IndicatorSeries v1`; multi-symbol and multi-timeframe orchestration remain caller/Data responsibilities. Synchronous Indicators owns no timeout/cancellation mechanism, and golden fixtures—not `pandas-ta`—are the formula authority.
 
@@ -33,6 +56,33 @@ This document is only for adding high-level changes, decisions, or status update
   decision-record documents are not created.
 
 ### Changed
+
+- **2026-07-16 — Canonical tick DataFrame projection added.** Data now exports
+  `to_tick_dataframe(dataset)`, returning a detached UTC-indexed float64 frame with
+  `bid`, `ask`, `last`, and `volume`; genuine optional missing values remain `NaN`,
+  and common price/volume units are retained in DataFrame metadata.
+
+- **2026-07-16 — Canonical OHLCV DataFrame projection added.** Data now exports
+  `to_ohlcv_dataframe(dataset)`, which returns a detached analytical copy with a
+  UTC timestamp index and exactly six finite float64 columns: OHLCV plus genuine
+  provider-reported per-bar spread. The common native spread unit is retained in
+  DataFrame metadata; incomplete spread evidence fails closed. Raw provider frames
+  remain prohibited, and the source `MarketDataset` remains the authoritative
+  precision, quality, provenance, and availability evidence.
+
+- **2026-07-16 — Data Retrieval and Reference facade made standalone-usable.**
+  All nine package-root retrieval/reference operations now accept direct keyword
+  arguments as well as their existing typed requests. MT5 source registration,
+  read-only Brokers composition, provider-confirmed identity mapping, Data
+  migrations, and calendar resolution occur lazily behind the facade; the usage
+  reference no longer assembles registries, adapters, identities, migrations, or
+  calendar objects. MT5 now also fulfills its released historical-bar and
+  provider-derived spread reads, with valid bar closing timestamps.
+
+- **2026-07-16 — Simplified Utils, Brokers, and Data public API usage scripts.**
+  Rewrote all usage examples under `tests/utils/usage/`, `tests/brokers/usage/`,
+  and `tests/data/usage/` to target only the package public exports unassisted,
+  directly at the base level, removing all unused complex classes and files.
 
 - **2026-07-16 — Phase 1 Utils documentation corrected.** Every Stage 2 Utils
   class and function now has caller-oriented Google-style documentation for its
@@ -55,6 +105,13 @@ This document is only for adding high-level changes, decisions, or status update
   sensitive setting names in its output.
 
 ### Fixed
+
+- **2026-07-16 — Live standalone Data retrieval example repaired.** Completed
+  required local SQLite configuration, added the expected database directory,
+  mapped native MT5 NumPy records correctly, and preserved valid availability
+  evidence when provider timestamps lead the local clock. The executable example
+  now distinguishes missing local manifests and unavailable MT5 schedule
+  capabilities from retrieval failures.
 
 - **2026-07-16 — Foundation and Indicator specifications reconciled.** Corrected
   Data's status legend, restored its authoritative Appendix P, aligned implemented

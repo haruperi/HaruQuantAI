@@ -1,0 +1,47 @@
+{
+  "fixture_version": "v1",
+  "formula_version": "1.0.0",
+  "derivation": "Hand-calculated SMA and EMA over a deterministic 8-bar M5 close-price series [10, 12, 11, 14, 13, 16, 15, 18] using the approved period=3 seed/window/recursive conventions in README Section 4.2. SMA is the arithmetic mean of the inclusive 3-bar window ending at each row. EMA seeds at the mean of the first 3 closes, then applies alpha=2/(period+1)=0.5 recursively: ema[i] = close[i]*0.5 + ema[i-1]*0.5.",
+  "symbol": "EURUSD",
+  "timeframe": "M5",
+  "bars": [
+    {"timestamp": "2026-01-01T00:00:00Z", "open": 10.0, "high": 10.5, "low": 9.5, "close": 10.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:05:00Z", "open": 12.0, "high": 12.5, "low": 11.5, "close": 12.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:10:00Z", "open": 11.0, "high": 11.5, "low": 10.5, "close": 11.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:15:00Z", "open": 14.0, "high": 14.5, "low": 13.5, "close": 14.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:20:00Z", "open": 13.0, "high": 13.5, "low": 12.5, "close": 13.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:25:00Z", "open": 16.0, "high": 16.5, "low": 15.5, "close": 16.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:30:00Z", "open": 15.0, "high": 15.5, "low": 14.5, "close": 15.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:35:00Z", "open": 18.0, "high": 18.5, "low": 17.5, "close": 18.0, "volume": 100}
+  ],
+  "sma": {
+    "period": 3,
+    "source": "close",
+    "output_column": "sma_3",
+    "expected": [null, null, 11.0, 12.333333333333334, 12.666666666666666, 14.333333333333334, 14.666666666666666, 16.333333333333332]
+  },
+  "ema": {
+    "period": 3,
+    "source": "close",
+    "output_column": "ema_3",
+    "expected": [null, null, 11.0, 12.5, 12.75, 14.375, 14.6875, 16.34375]
+  },
+  "adx_bars": [
+    {"timestamp": "2026-01-01T00:00:00Z", "open": 9.5, "high": 10.0, "low": 9.0, "close": 9.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:05:00Z", "open": 10.5, "high": 11.0, "low": 10.0, "close": 10.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:10:00Z", "open": 10.0, "high": 10.5, "low": 9.5, "close": 10.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:15:00Z", "open": 11.5, "high": 12.0, "low": 11.0, "close": 11.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:20:00Z", "open": 11.0, "high": 11.5, "low": 10.5, "close": 11.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:25:00Z", "open": 12.5, "high": 13.0, "low": 12.0, "close": 12.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:30:00Z", "open": 12.0, "high": 12.5, "low": 11.5, "close": 12.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:35:00Z", "open": 13.5, "high": 14.0, "low": 13.0, "close": 13.5, "volume": 100}
+  ],
+  "adx": {
+    "period": 2,
+    "output_columns": ["adx_2", "plus_di_2", "minus_di_2"],
+    "derivation": "Hand-calculated Wilder ADX/+DI/-DI over the adx_bars 8-bar M5 series with period=2, using true range TR[0]=high-low, TR[i]=max(high-low, |high-prior_close|, |low-prior_close|), Wilder-smoothed +DM/-DM starting at index 2 (sum of indices 1..2), DI=100*smoothed_dm/smoothed_tr, DX=100*|+DI-(-DI)|/(+DI+(-DI)), and ADX seeded as the mean of DX[2:4] at index 3, then Wilder-smoothed forward.",
+    "expected_adx": [null, null, null, 55.55555555555556, 39.31623931623932, 56.14460614460614, 38.44966156286911, 55.130871049890935],
+    "expected_plus_di": [null, null, null, 61.53846153846154, 38.095238095238095, 60.37735849056604, 37.64705882352941, 60.093896713615024],
+    "expected_minus_di": [null, null, null, 7.6923076923076925, 23.80952380952381, 9.433962264150944, 24.705882352941178, 9.859154929577464]
+  }
+}

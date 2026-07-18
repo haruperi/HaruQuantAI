@@ -51,6 +51,8 @@ def test_resample_dataset_is_deterministic() -> None:
                 volume=Decimal("10.0"),
                 price_unit="USD",
                 volume_unit="Units",
+                spread=Decimal(2 + i),
+                spread_unit="points",
             )
         )
 
@@ -81,6 +83,8 @@ def test_resample_dataset_is_deterministic() -> None:
     assert resampled.records[0].open == Decimal("100.0")
     assert resampled.records[0].close == Decimal("105.0")
     assert resampled.records[0].volume == Decimal("50.0")
+    assert resampled.records[0].spread == Decimal(6)
+    assert resampled.records[0].spread_unit == "points"
 
 
 def test_resample_dataset_empty() -> None:
@@ -349,6 +353,65 @@ def test_aggregate_ticks_rejects_disordered_input() -> None:
     with pytest.raises(DataError) as exc_info:
         aggregate_ticks(ds_empty, "M1", "last")
     assert exc_info.value.args[0] == "VALIDATION_FAILED"
+
+
+def test_aggregate_ticks_preserves_closing_quote_spread() -> None:
+    """Tick aggregation keeps the final genuine bid/ask spread in each bar."""
+    first = datetime(2026, 7, 1, 12, 0, 0, tzinfo=UTC)
+    second = first + timedelta(seconds=10)
+    records = (
+        TickRecord(
+            timestamp=first,
+            source="test",
+            source_symbol="EURUSD",
+            source_revision="v1",
+            available_at=first,
+            bid=Decimal("1.1000"),
+            ask=Decimal("1.1001"),
+            last=Decimal("1.10005"),
+            volume=Decimal(10),
+            price_unit="USD",
+            volume_unit="Units",
+        ),
+        TickRecord(
+            timestamp=second,
+            source="test",
+            source_symbol="EURUSD",
+            source_revision="v1",
+            available_at=second,
+            bid=Decimal("1.1001"),
+            ask=Decimal("1.1003"),
+            last=Decimal("1.1002"),
+            volume=Decimal(20),
+            price_unit="USD",
+            volume_unit="Units",
+        ),
+    )
+    dataset = MarketDataset(
+        normalization_version="v1",
+        data_kind="ticks",
+        symbol="EURUSD",
+        timeframe=None,
+        records=records,
+        start=first,
+        end=second,
+        available_at=second,
+        record_count=2,
+        quality_report=_create_mock_quality_report(2),
+        source_metadata={},
+        license_metadata={},
+        cache_status="not_used",
+        workflow_context="validation",
+        precision_policy="decimal_string",
+        request_id=(
+            "req-4e4af1e8fe818e12e32bac7236e1082513dd86fee61e894491067d5ee91ada74"
+        ),
+    )
+
+    aggregated = aggregate_ticks(dataset, "M1", "last")
+
+    assert aggregated.records[0].spread == Decimal("0.0002")
+    assert aggregated.records[0].spread_unit == "USD"
 
 
 def test_aggregate_ticks_invalid_policy() -> None:

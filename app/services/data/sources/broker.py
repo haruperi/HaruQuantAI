@@ -19,8 +19,8 @@ from app.utils import Clock, logger, utc_now
 
 if TYPE_CHECKING:
     from app.services.brokers import (
-        BrokerAdapter,
         BrokerAccountInfo,
+        BrokerAdapter,
         BrokerBalance,
         BrokerOrder,
         BrokerPermissions,

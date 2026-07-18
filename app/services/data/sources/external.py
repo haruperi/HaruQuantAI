@@ -25,7 +25,14 @@ if TYPE_CHECKING:
 
 
 def _run[T](operation: Coroutine[Any, Any, T], request_id: str) -> T:
-    """Run one bounded asynchronous broker read from the synchronous DATA API."""
+    """Run one bounded asynchronous broker read from the synchronous DATA API.
+
+    Returns:
+        Completed broker read result.
+
+    Raises:
+        DataError: If the asynchronous provider operation fails.
+    """
     logger.debug("Running one injected broker read operation")
     try:
         return asyncio.run(operation)
@@ -45,7 +52,14 @@ def _require_result[T](
     operation: str,
     request_id: str,
 ) -> T:
-    """Return a canonical Brokers result value or map it to a DATA failure."""
+    """Return a canonical Brokers result value or map it to a DATA failure.
+
+    Returns:
+        Successful result payload.
+
+    Raises:
+        DataError: If the broker result contains an error or no payload.
+    """
     logger.debug("Validating canonical broker result for %s", operation)
     if result.error is not None or result.data is None:
         raise DataError(
@@ -66,6 +80,9 @@ class ExternalMarketDataSource(MarketDataSource):
             source_id: DATA-owned source identifier.
             adapter: Caller-owned canonical Brokers adapter. DATA does not connect,
                 disconnect, select, configure, or otherwise own its lifecycle.
+
+        Raises:
+            ValueError: If the source identifier is blank or padded.
         """
         logger.info("Initializing injected external source %s", source_id)
         if not source_id or source_id != source_id.strip():
@@ -74,7 +91,14 @@ class ExternalMarketDataSource(MarketDataSource):
         self._adapter = adapter
 
     async def _fetch_async(self, request: SourceReadRequest) -> RawSourceBatch:
-        """Fetch bounded raw records without mutating adapter lifecycle."""
+        """Fetch bounded raw records without mutating adapter lifecycle.
+
+        Returns:
+            Provider-neutral raw source batch.
+
+        Raises:
+            DataError: If source identity, capability, or evidence is invalid.
+        """
         logger.info(
             "Fetching %s from injected source %s", request.data_kind, self._source_id
         )
@@ -98,6 +122,7 @@ class ExternalMarketDataSource(MarketDataSource):
                 bar_result, "historical_bars", request.request_id
             )
             normalized_bars: list[dict[str, object]] = []
+            available_times = []
             for bar in bar_page.items:
                 volume = bar.trade_volume
                 if volume is None:
@@ -108,13 +133,18 @@ class ExternalMarketDataSource(MarketDataSource):
                         safe_details={"field": "volume"},
                         request_id=request.request_id,
                     )
+                available_at = max(
+                    bar.closing_timestamp,
+                    bar_result.timestamp,
+                )
+                available_times.append(available_at)
                 normalized_bars.append(
                     {
                         "timestamp": bar.opening_timestamp,
                         "source": request.source_id,
                         "source_symbol": request.provider_symbol,
                         "source_revision": bar_result.adapter_version,
-                        "available_at": bar_result.timestamp,
+                        "available_at": available_at,
                         "open": bar.open,
                         "high": bar.high,
                         "low": bar.low,
@@ -122,10 +152,12 @@ class ExternalMarketDataSource(MarketDataSource):
                         "volume": volume,
                         "price_unit": bar.price_unit,
                         "volume_unit": bar.quantity_unit,
+                        "spread": bar.spread,
+                        "spread_unit": bar.spread_unit,
                     }
                 )
             records = tuple(normalized_bars)
-            retrieved_at = bar_result.timestamp
+            retrieved_at = max(available_times, default=bar_result.timestamp)
             revision = bar_result.adapter_version
         elif request.data_kind == "ticks":
             tick_result = await self._adapter.get_ticks(
@@ -135,13 +167,21 @@ class ExternalMarketDataSource(MarketDataSource):
                 limit=request.limit,
             )
             tick_page = _require_result(tick_result, "ticks", request.request_id)
+            available_times = [
+                max(
+                    tick.event_timestamp,
+                    tick.provider_receipt_timestamp,
+                    tick_result.timestamp,
+                )
+                for tick in tick_page.items
+            ]
             records = tuple(
                 {
                     "timestamp": tick.event_timestamp,
                     "source": request.source_id,
                     "source_symbol": request.provider_symbol,
                     "source_revision": tick_result.adapter_version,
-                    "available_at": tick_result.timestamp,
+                    "available_at": available_at,
                     "price_unit": tick.price_unit,
                     "bid": tick.bid,
                     "ask": tick.ask,
@@ -149,9 +189,13 @@ class ExternalMarketDataSource(MarketDataSource):
                     "volume": None,
                     "volume_unit": None,
                 }
-                for tick in tick_page.items
+                for tick, available_at in zip(
+                    tick_page.items,
+                    available_times,
+                    strict=True,
+                )
             )
-            retrieved_at = tick_result.timestamp
+            retrieved_at = max(available_times, default=tick_result.timestamp)
             revision = tick_result.adapter_version
         elif request.data_kind == "spreads":
             spread_result = await self._adapter.get_spread(
@@ -206,7 +250,14 @@ class ExternalMarketDataSource(MarketDataSource):
         )
 
     async def _list_symbols_async(self, request: SymbolListRequest) -> SymbolPage:
-        """Read an exact bounded provider-native symbol page."""
+        """Read an exact bounded provider-native symbol page.
+
+        Returns:
+            Bounded normalized symbol page.
+
+        Raises:
+            DataError: If source identity or provider evidence is invalid.
+        """
         logger.info("Listing symbols from injected source %s", self._source_id)
         if request.source_id != self._source_id:
             raise DataError(
@@ -234,7 +285,14 @@ class ExternalMarketDataSource(MarketDataSource):
         self,
         request: SymbolMetadataRequest,
     ) -> SymbolMetadata:
-        """Read exact provider metadata without assigning guessed values."""
+        """Read exact provider metadata without assigning guessed values.
+
+        Returns:
+            Normalized symbol metadata.
+
+        Raises:
+            DataError: If source identity or provider evidence is invalid.
+        """
         logger.info("Reading metadata from injected source %s", self._source_id)
         if request.source_id != self._source_id:
             raise DataError(
@@ -251,34 +309,51 @@ class ExternalMarketDataSource(MarketDataSource):
                 safe_details={"field": "timezone"},
                 request_id=request.request_id,
             )
-        return SymbolMetadata(
-            canonical_symbol=request.symbol,
-            provider_symbol=info.provider_symbol,
-            asset_class=info.product_profile,
-            base_currency=info.base_asset,
-            quote_currency=info.quote_asset,
-            digits=info.price_precision,
-            price_step=info.price_step,
-            quantity_step=info.quantity_step,
-            timezone=timezone,
-            source_id=request.source_id,
-            revision=result.adapter_version,
-            retrieved_at=result.timestamp,
-            request_id=request.request_id,
-        )
+        metadata_dict: dict[str, Any] = {
+            "canonical_symbol": request.symbol,
+            "provider_symbol": info.provider_symbol,
+            "asset_class": info.product_profile,
+            "base_currency": info.base_asset,
+            "quote_currency": info.quote_asset,
+            "digits": info.price_precision,
+            "price_step": info.price_step,
+            "quantity_step": info.quantity_step,
+            "timezone": timezone,
+            "source_id": request.source_id,
+            "revision": result.adapter_version,
+            "retrieved_at": result.timestamp,
+            "request_id": request.request_id,
+        }
+        metadata_dict.update(info.provider_metadata)
+        if "trade_contract_size" in info.provider_metadata:
+            metadata_dict["lot_size"] = info.provider_metadata["trade_contract_size"]
+
+        return SymbolMetadata(**metadata_dict)
 
     def fetch(self, request: SourceReadRequest) -> RawSourceBatch:
-        """Fetch raw records through the injected adapter."""
+        """Fetch raw records through the injected adapter.
+
+        Returns:
+            Provider-neutral raw source batch.
+        """
         logger.info("Executing external source fetch")
         return _run(self._fetch_async(request), request.request_id)
 
     def list_symbols(self, request: SymbolListRequest) -> SymbolPage:
-        """List provider-native symbols through the injected adapter."""
+        """List provider-native symbols through the injected adapter.
+
+        Returns:
+            Bounded normalized symbol page.
+        """
         logger.info("Executing external source symbol listing")
         return _run(self._list_symbols_async(request), request.request_id)
 
     def get_symbol_metadata(self, request: SymbolMetadataRequest) -> SymbolMetadata:
-        """Read provider-native symbol metadata through the injected adapter."""
+        """Read provider-native symbol metadata through the injected adapter.
+
+        Returns:
+            Normalized symbol metadata.
+        """
         logger.info("Executing external source metadata read")
         return _run(self._get_symbol_metadata_async(request), request.request_id)
 

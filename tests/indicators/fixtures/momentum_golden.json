@@ -1,0 +1,35 @@
+{
+  "fixture_version": "v1",
+  "formula_version": "1.0.0",
+  "derivation": "Hand-calculated RSI over a deterministic 7-bar M5 close-price series [44.0, 44.5, 43.5, 45.0, 44.0, 46.0, 45.5] with period=3, using Wilder-smoothed average gains/losses seeded from the first 3 deltas and RS=avg_gain/avg_loss, RSI=100-100/(1+RS). Williams %R is hand-calculated over a distinct 7-bar high/low series with period=3 as -100*(highest_high-close)/(highest_high-lowest_low) over the inclusive rolling window.",
+  "symbol": "EURUSD",
+  "rsi_bars": [
+    {"timestamp": "2026-01-01T00:00:00Z", "open": 44.0, "high": 44.5, "low": 43.5, "close": 44.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:05:00Z", "open": 44.5, "high": 45.0, "low": 44.0, "close": 44.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:10:00Z", "open": 43.5, "high": 44.0, "low": 43.0, "close": 43.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:15:00Z", "open": 45.0, "high": 45.5, "low": 44.5, "close": 45.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:20:00Z", "open": 44.0, "high": 44.5, "low": 43.5, "close": 44.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:25:00Z", "open": 46.0, "high": 46.5, "low": 45.5, "close": 46.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:30:00Z", "open": 45.5, "high": 46.0, "low": 45.0, "close": 45.5, "volume": 100}
+  ],
+  "rsi": {
+    "period": 3,
+    "source": "close",
+    "output_column": "rsi_3",
+    "expected": [null, null, null, 66.66666666666666, 44.44444444444444, 72.22222222222223, 60.8187134502924]
+  },
+  "williams_r_bars": [
+    {"timestamp": "2026-01-01T00:00:00Z", "open": 44.0, "high": 45.0, "low": 43.0, "close": 44.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:05:00Z", "open": 44.5, "high": 46.0, "low": 44.0, "close": 44.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:10:00Z", "open": 43.5, "high": 44.5, "low": 42.5, "close": 43.5, "volume": 100},
+    {"timestamp": "2026-01-01T00:15:00Z", "open": 45.0, "high": 46.5, "low": 44.5, "close": 45.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:20:00Z", "open": 44.0, "high": 45.0, "low": 43.0, "close": 44.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:25:00Z", "open": 46.0, "high": 47.0, "low": 45.0, "close": 46.0, "volume": 100},
+    {"timestamp": "2026-01-01T00:30:00Z", "open": 45.5, "high": 46.5, "low": 44.5, "close": 45.5, "volume": 100}
+  ],
+  "williams_r": {
+    "period": 3,
+    "output_column": "williams_r_3",
+    "expected": [null, null, -71.42857142857143, -37.5, -62.5, -25.0, -37.5]
+  }
+}

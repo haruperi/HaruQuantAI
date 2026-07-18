@@ -45,15 +45,20 @@ execution decision.
 
 - Strategy evaluation, indicators, risk policy, position sizing, order formulation,
   broker dispatch decisions, reconciliation authority, or simulated fills/state.
-- Broker/provider connections, adapters, sessions, or credentials: Brokers owns
-  connection/session lifecycle and adapters; secrets are resolved by the Utils
-  settings layer and injected via `BrokerConnectionConfig` at the composition root
-  boundary. Data never invokes `BrokerAdapter` mutation operations.
+- Broker/provider adapter implementations, connection/session mechanics, or
+  credentials: Brokers owns adapters and lifecycle behavior; secrets are resolved
+  through the Utils settings layer. The Data package-root retrieval facade may
+  privately and lazily compose a read-only adapter through the Brokers factory for
+  standalone calls. Data never exposes the adapter or invokes `BrokerAdapter`
+  mutation operations.
 - Another domain's tables, artifact schemas, or migration definitions.
 - Public streaming subscriptions, automatic feed-gap backfill, historical calendar
   reconstruction, TSDB selection, or unapproved external-source promotion.
-- Raw DataFrames, provider SDK objects, sockets, streams, credentials, or database
-  sessions crossing the public API or a cross-domain boundary.
+- Raw provider DataFrames, provider SDK objects, sockets, streams, credentials, or
+  database sessions crossing the public API or a cross-domain boundary. The
+  package-root `to_ohlcv_dataframe` and `to_tick_dataframe` helpers may return new
+  validated analytical projections containing only canonical market values and UTC
+  timestamps.
 - Silent source fallback, stale-cache use, gap repair, interpolation, schema migration,
   or precision coercion in governed workflows.
 
@@ -168,7 +173,7 @@ flowchart TD
     PROCESSING --> PFILES[timeframes.py; transforms.py; synthetic.py]
     JOBS --> JFILES[backfill.py; scheduler.py]
     FEEDS --> FFILES[runtime.py; status.py]
-    API --> APIFILES[operations.py]
+    API --> APIFILES[_requests.py; _runtime.py; operations.py]
 ```
 
 ---
@@ -179,7 +184,7 @@ Modules and files are ordered from lowest dependency to highest dependency.
 
 ```text
 app/services/data/
-├── __init__.py                         # Exactly 23 approved typed operations
+├── __init__.py                         # Exactly 25 approved public operations
 ├── README.md
 ├── config.py                           # Typed Data-owned settings via Utils
 ├── contracts/                          # Immutable Data-owned contracts
@@ -225,7 +230,7 @@ app/services/data/
 │   ├── __init__.py
 │   ├── timeframes.py                   # One timeframe source of truth
 │   ├── transforms.py                   # Resample, align, aggregate
-│   ├── tabular.py                      # Private DataFrame/OHLC conversion and comparison
+│   ├── tabular.py                      # Canonical analytical projections and comparison
 │   └── synthetic.py                    # Seeded bounded GBM bars/ticks
 ├── jobs/                               # Update/backfill lifecycle
 │   ├── __init__.py
@@ -237,13 +242,15 @@ app/services/data/
 │   └── status.py                       # Read-only status inspection
 └── public_api/
     ├── __init__.py
-    └── operations.py                   # Thin typed package facade
+    ├── _requests.py                    # Direct-call request construction
+    ├── _runtime.py                     # Private lazy read-only composition
+    └── operations.py                   # Typed/direct package facade
 ```
 
 Standalone usage examples live only under `tests/data/usage/`. Files `01` through
-`08` follow the feature order in Section 4, while `usecases.py` combines practical
-cross-feature recipes. External provider reads are opt-in through
-`DATA_USAGE_LIVE_PROVIDERS`; the default execution path is deterministic and offline.
+`05` cover retrieval/reference, storage, processing, jobs, and feeds. Provider-backed
+examples fail honestly with a typed `DataError` when their settings, credentials,
+dependency, connectivity, or capability evidence is unavailable.
 
 ### Module dependency diagram
 
@@ -635,7 +642,7 @@ untrusted source or request
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-001` | Validate UTC OHLCV with finite exact numerics, `low ≤ open/close ≤ high`, non-negative volume, provenance, and `available_at`. | `OHLCVRecord` | None | `DataError[VALIDATION_FAILED]`: field, UTC, order, or OHLC invariant fails | **Usage:** `tests/data/usage/01_contracts.py::example_fr_data_001_ohlcv_record()`<br>**Unit:** `tests/data/unit/test_records.py::test_ohlcv_record_rejects_invalid_range()` |
+| Completed | `FR-DATA-001` | Validate UTC OHLCV with finite exact numerics, `low ≤ open/close ≤ high`, non-negative volume, optional non-negative provider-reported spread with its native unit, provenance, and `available_at`. | `OHLCVRecord` | None | `DataError[VALIDATION_FAILED]`: field, UTC, order, OHLC, or spread/unit invariant fails | **Usage:** `tests/data/usage/01_contracts.py::example_fr_data_001_ohlcv_record()`<br>**Unit:** `tests/data/unit/test_records.py::test_ohlcv_record_rejects_invalid_range()` |
 | Completed | `FR-DATA-002` | Validate UTC ticks with finite bid/ask/last, `ask ≥ bid` when both exist, volume metadata, provenance, and `available_at`. | `TickRecord` | None | `DataError[VALIDATION_FAILED]`: invalid timestamp, numeric field, or bid/ask relation | **Usage:** `tests/data/usage/01_contracts.py::example_fr_data_002_tick_record()`<br>**Unit:** `tests/data/unit/test_records.py::test_tick_record_rejects_crossed_quote()` |
 | Completed | `FR-DATA-003` | Validate spread records with declared unit/scale, non-negative exact spread, UTC timestamp, provenance, and `available_at`. | `SpreadRecord` | None | `DataError[VALIDATION_FAILED]`: missing unit/scale or invalid spread | **Usage:** `tests/data/usage/01_contracts.py::example_fr_data_003_spread_record()`<br>**Unit:** `tests/data/unit/test_records.py::test_spread_record_requires_unit()` |
 
@@ -849,8 +856,8 @@ typed request
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
 | Completed | `SOURCE_READINESS` | `SourceDescriptor.readiness` | No shared default | Yes | policy/registry | Composition explicitly declares every source; synthetic generation is not an adapter. |
-| Completed | `SOURCE_RATE_LIMITS` | `SourcePolicyConfig` | No shared default | Yes | policy/adapters | Explicit positive per-source bounds; missing policy blocks before provider access. |
-| Completed | `CIRCUIT_BREAKER_POLICY` | `SourcePolicyConfig` | No shared default | Yes | policy/adapters | Explicit threshold/recovery values; persisted breaker state survives restart. |
+| Completed | `SOURCE_RATE_LIMITS` | `SourcePolicyConfig` | Default permissive config | Yes | policy/adapters | Fallback to a permissive policy (rate limit: 10,000 attempts/60s, breaker: 5 consecutive failures, recovery: 30s) if missing. |
+| Completed | `CIRCUIT_BREAKER_POLICY` | `SourcePolicyConfig` | Default permissive config | Yes | policy/adapters | Fallback to a permissive policy (rate limit: 10,000 attempts/60s, breaker: 5 consecutive failures, recovery: 30s) if missing. |
 
 #### Public source API
 
@@ -957,7 +964,7 @@ MarketDataset
 |---|---|---|---|---|
 | Completed | `timeframes.py` | Provide one private canonical timeframe manifest and conversion rules. | `TIMEFRAME_MANIFEST`, `get_timeframe_spec`, `validate_resample_target` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `contracts.errors` |
 | Completed | `transforms.py` | Resample bars, align datasets, and aggregate ticks. | `resample_dataset`, `align_datasets`, `aggregate_ticks` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `contracts`, `timeframes.py` |
-| Completed | `tabular.py` | Align and serialize private DataFrames and compare bounded OHLC/OHLCV evidence. | Private tabular helpers only | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `contracts` |
+| Completed | `tabular.py` | Project canonical OHLCV/spread or tick evidence to public analytical DataFrames; align and serialize private DataFrames; compare bounded OHLC/OHLCV evidence. | `to_ohlcv_dataframe`, `to_tick_dataframe`; private tabular helpers | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `contracts` |
 | Completed | `synthetic.py` | Generate bounded deterministic Decimal-only GBM bars/ticks. | `generate_synthetic_dataset` | **Standard library:** `datetime`, `decimal`, `random`<br>**Required third-party:** None<br>**Local:** `contracts`, `timeframes.py` |
 | Retired | `labeling.py` | Removed: Research owns historical labeling. | — | — |
 | Completed | `__init__.py` | Expose the supported typed processing API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
@@ -971,13 +978,17 @@ MarketDataset
 | Completed | `SYNTHETIC_TICK_MAX_RECORDS` | `int` | `250000` | Yes | synthetic/API | Direct-response bound; excess returns `LIMIT_EXCEEDED`. |
 | Completed | `SYNTHETIC_METHODS` | `tuple[str, ...]` | `gbm` | Yes | synthetic | No other stochastic process is part of the Data design. |
 
-#### Private tabular and OHLC implementation
+#### Tabular market-data implementation
 
-Data owns all tabular market-data behavior. The private `processing/tabular.py`
-module contains UTC alignment, bar/DataFrame record conversion, deterministic
-DataFrame comparison, and OHLC/OHLCV comparison. These functions are used only
-inside Data normalization, quality, storage, and test paths; raw DataFrames never
-cross the Data boundary.
+Data owns all tabular market-data behavior. The `processing/tabular.py` module
+contains public canonical bar and tick analytical projections plus private UTC
+alignment, record conversion, deterministic DataFrame comparison, and OHLC/OHLCV
+comparison. No raw provider DataFrame crosses the boundary. Both projections are
+new mutable copies with UTC `timestamp` indexes. The bar projection has exactly
+`open`, `high`, `low`, `close`, `volume`, and `spread`; the tick projection has
+exactly `bid`, `ask`, `last`, and `volume`, retaining optional missing fields as
+`NaN`. The source `MarketDataset` remains the authoritative precision, quality,
+provenance, and availability evidence.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
@@ -986,6 +997,8 @@ cross the Data boundary.
 | Completed | `FR-DATA-082` | Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics. | `compare_dataframes` | None | `DataError[VALIDATION_FAILED\|LIMIT_EXCEEDED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_082_compare_dataframes()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_dataframes_mismatch()` |
 | Completed | `FR-DATA-083` | Compare OHLC or OHLCV columns only after schema and alignment validation. | `compare_ohlc`, `compare_ohlcv` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_083_compare_ohlcv()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_ohlcv_success()` |
 | Completed | `FR-DATA-084` | Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper. | `execute_backfill_chunk` | Persistence write | Existing job errors | **Usage:** `tests/data/usage/06_update_jobs.py::example_fr_data_084_private_chunking_boundary()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_backfill_key_is_canonical()` |
+| Completed | `FR-DATA-085` | Project one canonical bar `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly six finite float64 columns: `open`, `high`, `low`, `close`, `volume`, and provider-reported `spread`; expose the common native spread unit in `DataFrame.attrs["spread_unit"]` and fail if spread evidence is missing or inconsistent. | `to_ohlcv_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/01_retrieval_referance.py`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_ohlcv_dataframe_returns_float64_analytical_copy()` |
+| Completed | `FR-DATA-086` | Project one canonical tick `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly four float64 columns: `bid`, `ask`, `last`, and `volume`; represent genuine missing optional values as `NaN`, expose common price/volume units in `DataFrame.attrs`, and fail on inconsistent units or unsafe float64 conversion. | `to_tick_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/01_retrieval_referance.py`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_tick_dataframe_returns_float64_analytical_copy()` |
 
 #### Public processing API
 
@@ -993,7 +1006,7 @@ cross the Data boundary.
 |---|---|---|---|---|---|---|
 | Completed | `FR-DATA-036` | Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`. | `resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDataset` | None | `DataError[UNSUPPORTED_TIMEFRAME|VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_036_resample_ohlcv()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_resample_dataset_is_deterministic()` |
 | Completed | `FR-DATA-037` | Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead. | `align_datasets(datasets: Mapping[str, MarketDataset], target: Sequence[datetime]) -> Mapping[str, MarketDataset]` | None | `DataError[VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_037_no_lookahead_alignment()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_align_datasets_prevents_lookahead()` |
-| Completed | `FR-DATA-038` | Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and spread policy, rejecting disorder or ambiguous spread units. | `aggregate_ticks(dataset: MarketDataset, timeframe: str, spread_policy: str) -> MarketDataset` | None | `DataError[VALIDATION_FAILED|UNSUPPORTED_TIMEFRAME]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_038_ticks_to_bars()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_aggregate_ticks_rejects_disordered_input()` |
+| Completed | `FR-DATA-038` | Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy, preserving the closing tick's genuine bid/ask spread when both sides exist and rejecting disorder or ambiguous units. | `aggregate_ticks(dataset: MarketDataset, timeframe: str, spread_policy: str) -> MarketDataset` | None | `DataError[VALIDATION_FAILED|UNSUPPORTED_TIMEFRAME]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_038_ticks_to_bars()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_aggregate_ticks_preserves_closing_quote_spread()` |
 | Completed | `FR-DATA-039` | Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter. | `generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset` | None | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_039_synthetic_bars()`<br>**Unit:** `tests/data/unit/test_synthetic.py::test_synthetic_dataset_replays_from_seed()` |
 | Retired | `FR-DATA-040` | Research owns historical labeling; no Data implementation. | — | — | — | — |
 
@@ -1114,28 +1127,44 @@ through `FR-DATA-048`.
 
 ### 4.8 `public_api/` — Typed Domain Boundary
 
-**Purpose:** Expose the approved Data operations through typed Data-owned requests,
-results, and errors. This layer performs no generic wrapping and defines no parallel
-business logic.
+**Purpose:** Expose the approved Data operations through Data-owned requests,
+results, and errors. Retrieval/reference functions accept either an existing typed
+request or direct keyword arguments and construct the same request internally. This
+layer defines no parallel business logic.
 
 **Boundary rules:**
 
-- Public operations accept typed Data request contracts rather than unstructured
-  caller-controlled payloads.
+- Retrieval/reference operations accept either one typed Data request or explicit
+  keyword arguments; mixing both styles fails validation.
+- Direct calls generate a request ID and apply documented safe defaults. For market
+  bars, `source_id`, `symbol`, and `timeframe` are required; `start`/`end` may both
+  be omitted to request the latest bounded records.
+- Source registration, provider adapter creation/connection, provider-confirmed
+  identity mapping, Data migrations, and calendar resolution are private lazy
+  composition details. They never become caller parameters.
+- The facade never invents trading hours. If a configured provider does not expose
+  authoritative session windows (including MT5's current Python integration),
+  `get_market_hours` and `get_trading_sessions` fail with a typed Data error.
 - Success returns the typed Data-owned result documented by the underlying feature.
 - Failure raises or returns the documented `DataError`; UI/API alone maps it to an
   external HTTP response.
-- Every governed operation requires a validated Utils-prefixed UUID4 request ID in
-  its typed request or explicit facade argument; only recovery may generate one when
-  invoked without an upstream request.
+- Every typed request carries a validated Utils-prefixed UUID4 request ID. Direct
+  retrieval/reference calls accept an explicit ID or generate one at the facade
+  boundary before any governed work begins.
 - Package-root exports are explicit and contain no registry, metadata catalog, or
   wrapper-only aliases.
+- `to_ohlcv_dataframe` and `to_tick_dataframe` are the only public DataFrame
+  convenience boundaries. Each accepts only its matching canonical `MarketDataset`
+  kind, returns a detached analytical copy, and never replaces the canonical dataset
+  contract. Bar spread requires complete unit-bearing evidence; tick fields preserve
+  genuine optional missingness as `NaN`. A genuine provider-reported zero remains
+  zero, and missing evidence is never replaced with zero or a repeated current quote.
 
 | Capability group | Public operations | Typed outcomes |
 |---|---|---|
 | Retrieval and reference | `get_market_data`, `get_tick_data`, `get_spread_data`, `get_symbol_metadata`, `list_symbols`, `get_data_availability`, `get_market_hours`, `get_trading_sessions`, `get_historical_volume` | `MarketDataset`, `DataAvailability`, source/reference result contracts |
 | Storage | `save_market_data`, `load_local_dataset`, `clear_data_cache` | `StorageManifest`, `MarketDataset`, `CacheClearResult` |
-| Processing | `resample_ohlcv`, `align_multitimeframe_data`, `generate_synthetic_ticks`, `generate_synthetic_bars`, `aggregate_ticks_to_bars` | `MarketDataset` |
+| Processing | `resample_ohlcv`, `align_multitimeframe_data`, `generate_synthetic_ticks`, `generate_synthetic_bars`, `aggregate_ticks_to_bars`, `to_ohlcv_dataframe`, `to_tick_dataframe` | `MarketDataset`; detached OHLCV/spread or tick `pandas.DataFrame` |
 | Jobs | `create_data_update_job`, `start_data_update_job`, `stop_data_update_job`, `run_data_update_job_once`, `get_data_update_job_status` | Data-owned job definition, run, and status contracts |
 | Feeds | `get_feed_status` | Data-owned feed status contract |
 
@@ -1143,9 +1172,10 @@ No labeling operation exists in Data; Research owns historical labeling.
 
 ### Feature usage examples
 
-`tests/data/usage/08_public_api.py::example_public_api_typed_success` verifies the
-package-root export boundary plus typed success and deterministic failure. The
-feature-specific examples exercise the owning operations behind every facade call.
+`tests/data/usage/01_retrieval_referance.py` demonstrates all nine package-root
+Retrieval and Reference functions without manual registry, adapter, identity,
+migration, or calendar assembly, then projects the retrieved bar and tick datasets
+with `to_ohlcv_dataframe` and `to_tick_dataframe`.
 ---
 
 ## 5. Package-Wide Requirements and Shared Configuration
