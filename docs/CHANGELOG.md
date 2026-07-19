@@ -34,9 +34,19 @@ This document is only for adding high-level changes, decisions, or status update
   post-build review of 2026-07-19 closed one blocking and three high findings in the
   evidence layer; its Section 7 gate must be re-run on the Windows toolchain before
   the domain is re-declared verified.
+- Optimization is a completed advisory-domain baseline across all 64 functional and
+  12 non-functional requirements, six domain workflows, and ten official public
+  operations. Its deterministic Optimization core passes 160 tests at 82.70% branch
+  coverage; `SYS-WF-003` remains `Partial` only because UI/API approval and Strategy
+  adoption are outside this domain build.
 
 ### Added
 
+- **2026-07-19 — Optimization domain completed.** Added bounded grid and seeded-random
+  search, Simulation/Analytics execution adaptation, scoring and overfit evidence,
+  walk-forward validation, robustness analysis, durable Optimization-owned state,
+  advisory handoff evidence, and the ten-operation public API. Added targeted unit,
+  usage, workflow-integration, non-functional, and `SYS-WF-003` core tests.
 - **2026-07-19 — Simulation domain gate unblocked.** Re-running the Section 7 gate
   after the post-build review corrections surfaced six failures, all traced to two
   defects in the shared `tests/simulator/unit/test_orchestrator.py` fixtures rather
@@ -262,6 +272,12 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Decisions
 
+- **2026-07-19 — Optimization V1 blockers resolved.** V1 search is limited to bounded
+  grid and seeded random methods; objectives project Analytics-owned metric evidence,
+  execution crosses a typed Simulation adapter, walk-forward splits use caller-supplied
+  equally spaced UTC observations, and persistence uses an injected Optimization-owned
+  store port over Data's public migration contract. Genetic/Bayesian search, live
+  authority, Strategy mutation, UI rendering, and automatic adoption remain excluded.
 - **2026-07-19 — Analytics quality-flag emission policy fixed.** `FR-ANLT-043` and
   the `WF-ANLT-001` failure behaviour now state exactly which cataloged flags a
   report carries and when. `quality_flags` is empty of blocker evidence only when

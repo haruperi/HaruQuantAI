@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from app.services.data.config import DataSettings, data_settings_context
 from app.services.data.contracts import DataError
 from app.services.data.contracts.storage import (
     MigrationRequest,
@@ -198,7 +199,10 @@ def test_run_domain_migrations_rejects_unsafe_configuration(
         request_id="req-2c5ba42aa86dfdc67bd844f3252b1cfd53b4726c7b9dea4d9c34e85b35f12910",
     )
 
-    with pytest.raises(DataError) as captured:
+    with (
+        data_settings_context(DataSettings(database_url=None, data_dir=None)),
+        pytest.raises(DataError) as captured,
+    ):
         run_domain_migrations(request)
 
     assert captured.value.code == "DB_CONNECTION_ERROR"

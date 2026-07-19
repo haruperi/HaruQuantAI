@@ -196,15 +196,17 @@ analytics/
 The final structure intentionally removes the mutable `registry/`, separate
 `boundaries/` and `statistics/` layers, duplicate distribution implementations,
 compatibility-export file, placeholder formatters, duplicate audit contracts,
-and explicit package-root exports. The initial public API contains only
-`build_performance_report`; comparison, dashboard, portfolio, and grouped-evidence
-functions remain focused feature APIs.
+and explicit package-root exports. The initial public API contains the immutable
+configuration contracts required to call `build_performance_report`, the owned
+cross-domain result contracts, and the approved performance-report builder;
+comparison, dashboard, portfolio, and grouped-evidence functions remain focused
+feature APIs.
 
 ### Package root files
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `__init__.py` | Expose owned cross-domain contracts plus the sole initial public operation, `build_performance_report`; no compatibility aliases or low-level kernels. | `PerformanceReport`, `DashboardPayload`, `PortfolioAllocationEvidence`, `build_performance_report` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts.models → owned contracts`; `reports.builder → build_performance_report` |
+| Completed | `__init__.py` | Expose caller-required immutable report configuration, owned cross-domain contracts, and `build_performance_report`; no compatibility aliases or low-level kernels. | `AnalyticsRunConfig`, `RiskFreeRateEvidence`, `StatisticalValidationConfig`, `PerformanceReport`, `DashboardPayload`, `PortfolioAllocationEvidence`, `build_performance_report` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts.models → owned contracts`; `reports.builder → build_performance_report` |
 | Completed | `README.md` | Define the final Analytics requirements, structure, implementation order, workflows, public symbols, tests, status, and exclusions. | None | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None |
 
 ### Module dependency diagram
@@ -1275,7 +1277,7 @@ edited feature. Run the full Analytics target only at the domain handoff gate.
 - [X] `net_pnl` equals `sum(profit + commission + swap)`, and classifications, aggregations, equity, and ratios use `net_trade_pnl`; only `gross_pnl_before_costs` and `trade_efficiency` consume raw `profit`. Evidence: `app/services/analytics/contracts/models.py:428`.
 - [X] Drawdown output is labelled `curve_basis="closed_trade"` and `max_intratrade_excursion` is reported alongside it. Evidence: `app/services/analytics/adapters/results.py:212`.
 - [X] Every package-wide requirement has status `Completed`, except `NFR-ANLT-009` observability and the `NFR-ANLT-002`/`-003`/`-006` verification test modules, which the 2026-07-19 review left open as deferred findings. Evidence: `app/services/analytics/__init__.py:8`.
-- [X] Package-root exports contain only owned contracts and `build_performance_report`. Evidence: `app/services/analytics/__init__.py:10`.
+- [X] Package-root exports contain only caller-required immutable configuration, owned contracts, and `build_performance_report`. Evidence: `app/services/analytics/__init__.py:3`.
 - [X] `PerformanceReport v1` matches `docs/PROJECT.md` and its consumer fixtures. Evidence: `app/services/analytics/contracts/models.py:570`.
 - [X] Analytics persists no state and mutates no live/external system. Evidence: `app/services/analytics/reports/builder.py:139`.
 - [X] Every dependency is documented and directly declared when imported. Evidence: `app/services/analytics/metrics/benchmarks.py:9` (`numpy`).

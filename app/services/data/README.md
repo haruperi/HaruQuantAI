@@ -184,7 +184,7 @@ Modules and files are ordered from lowest dependency to highest dependency.
 
 ```text
 app/services/data/
-├── __init__.py                         # Exactly 25 approved public operations
+├── __init__.py                         # Exactly 27 approved public operations
 ├── README.md
 ├── config.py                           # Typed Data-owned settings via Utils
 ├── contracts/                          # Immutable Data-owned contracts

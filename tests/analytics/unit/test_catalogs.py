@@ -27,9 +27,12 @@ def test_package_root_exports_only_approved_domain_symbols() -> None:
     """The package root exposes owned contracts and one high-level operation."""
     logger.debug("Testing Analytics package-root export boundary")
     assert analytics.__all__ == (
+        "AnalyticsRunConfig",
         "DashboardPayload",
         "PerformanceReport",
         "PortfolioAllocationEvidence",
+        "RiskFreeRateEvidence",
+        "StatisticalValidationConfig",
         "build_performance_report",
     )
 
