@@ -12,6 +12,7 @@ from app.services.risk.contracts import (
     DecisionState,
     KillSwitchState,
     LimitStatus,
+    PortfolioBudgetExecutionVerdict,
     PositionSizingResult,
     RegimeAssessment,
     RiskApprovalToken,
@@ -26,6 +27,27 @@ from app.services.risk.contracts import (
 from pydantic import ValidationError
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
+
+
+def test_budget_execution_verdict_requires_exact_plan_binding() -> None:
+    """Reject a malformed plan hash in execution-time budget authority."""
+    with pytest.raises(ValidationError):
+        PortfolioBudgetExecutionVerdict(
+            verdict_id="budget-verdict-1",
+            allocation_decision_id="allocation-decision-1",
+            portfolio_id="portfolio-1",
+            allocation_version="allocation-v1",
+            plan_id="plan-1",
+            plan_hash="not-a-hash",
+            budget_unit="USD",
+            allowed=True,
+            reasons=(),
+            issued_at=NOW,
+            expires_at=NOW + timedelta(minutes=1),
+            request_id="request-1",
+            workflow_id="workflow-1",
+            correlation_id="correlation-1",
+        )
 
 
 def _verdict() -> ActionPolicyVerdict:

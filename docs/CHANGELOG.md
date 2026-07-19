@@ -17,8 +17,30 @@ This document is only for adding high-level changes, decisions, or status update
 - Strategy is implemented across contracts, diagnostics, registry, intents,
   replay/checkpoints, vectorized evaluation, event hooks, concrete signal
   evaluators, and all ten workflows. All prescribed Strategy validation gates pass.
+- Trading is a completed implementation baseline across all 66 active functional and
+  eight non-functional requirements, nine capability modules, and all fourteen
+  documented workflows; production live mutation remains disabled by default.
+- Analytics is specification-complete and `Missing` (not yet implemented). A
+  pre-build readiness audit on 2026-07-19 opened seven owner decisions; five are
+  resolved and written into the specification. The two remaining are scoped and
+  non-blocking: `D-ANLT-004` (the `PortfolioSimulationResult` leg of `WF-ANLT-013`)
+  and `D-ANLT-007` (whether to lift the `scorecards/` exclusion).
 
 ### Added
+
+- **2026-07-19 — Trading kill-switch freshness and root-port conformance fixed.**
+  Added a required `kill_switch` bound to `MAX_STALENESS_SECONDS` so inactive but
+  stale governance evidence fails readiness with `KILL_SWITCH_STALE` and blocks the
+  live gate. Restored the repository-wide `__all__: tuple[str, ...]` package-root
+  convention that the Trading build had regressed to a list.
+
+- **2026-07-19 — Trading post-build review corrections completed.** Enforced truthful boundary redaction, required runtime safety bounds, deterministic timeout evidence, per-child paper/live emergency Risk authority, and exact report/state contracts. Added the missing rebalance, paper dispatch, bulk emergency, and standalone usage workflow evidence and reconciled the project contract registry.
+
+- **2026-07-19 — Trading domain completed.** Built the complete route-aware
+  execution domain across contracts, state, validation, routing, reconciliation,
+  monitoring, live lifecycle, actions, reporting, public exports, and all fourteen
+  workflow integrations, including authorized rebalance and live evaluation-cycle
+  orchestration.
 
 - **2026-07-19 — Risk domain completed.** Completed all Risk features and public
   exports, added dedicated policy-version and optional decision/snapshot migration
@@ -103,6 +125,11 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Verification
 
+- **2026-07-19 — Trading final Definition of Done.** The complete Trading gate
+  passes 188 tests at 84.54% statement-and-branch coverage; Trading formatting,
+  Ruff, 42-source-file mypy, public-import, standalone usage, docstring/logger,
+  and direct secret scans are clean, with Broker mutation compatibility passing.
+
 - **2026-07-19 — Risk final Definition of Done.** The complete Risk gate passes
   150 tests at 82.03% coverage; Risk formatting, Ruff, 34-source-file mypy,
   import/security/persistence/workload checks, and a direct secret scan are clean.
@@ -111,6 +138,116 @@ This document is only for adding high-level changes, decisions, or status update
   from `uv run mypy app/services/strategy tests/strategy`.
 
 ### Decisions
+
+- **2026-07-19 — Trading review decisions ratified.** Bulk paper/live emergency actions use Option A per-child `RiskDecisionPackage` injection; Broker dispatch receives an injected clock and validated operation timeout; Trading usage evidence is exposed through numbered standalone scripts. Runtime retention, concurrency, and per-evidence staleness bounds remain required and fail closed, while the Broker operation timeout keeps the ratified ten-second default.
+
+- **2026-07-19 — Analytics canonical input fixed as the closed-trade ledger.** The
+  owner resolved `D-ANLT-001`, `D-ANLT-002`, and `D-ANLT-003`. `FR-ANLT-049`
+  (`ClosedTrade`) defines the 17-field ledger row — ticket, symbol, type, volume,
+  entry/exit time and price, stop loss, take profit, comment, commission, swap,
+  profit, magic, MAE, MFE. `FR-ANLT-050` derives the equity curve from it as
+  `initial_balance + cumsum(net_trade_pnl)` ordered on `(exit_time, ticket)`, plus a
+  UTC calendar-daily resample for time-based metrics. `initial_balance` and
+  `account_currency` are required arguments and fail closed when absent. Drawdown is
+  closed-trade basis, labelled `curve_basis="closed_trade"`, with
+  `max_intratrade_excursion` reported separately from MAE because open-position
+  exposure is not observable in the curve.
+
+- **2026-07-19 — Analytics cost convention corrected to MT5 gross `profit`.**
+  Supersedes the cost clause of the ledger decision above, which was first recorded
+  with `profit` net of costs. `profit` is **gross** — price movement only — and
+  `commission` and `swap` are separate negative amounts. The canonical per-trade
+  figure is `net_trade_pnl = profit + commission + swap`, and it is the basis for the
+  equity curve and for every classification, aggregation, and ratio metric. Win/loss
+  classification is therefore net, so a gross winner with larger costs is correctly
+  counted as a loser. `gross_pnl_before_costs` (`sum(profit)`) and `trade_efficiency`
+  (`profit / mfe`) are the only two rows that consume raw `profit`; efficiency stays
+  gross on both sides because MFE is itself a price-movement figure and mixing bases
+  would conflate execution quality with cost structure.
+
+- **2026-07-19 — Analytics R-multiple given a realized-risk fallback.** `r_multiple`
+  now has two ordered bases: `declared_stop` (primary), and `realized_mae`
+  (`net_trade_pnl / abs(mae)`) when no usable stop price exists. Every trade carries
+  its applied basis; a fallback emits `r_multiple_mae_fallback` and a mixed ledger
+  emits `r_multiple_basis_mixed`, so declared and realized risk are never averaged
+  without disclosure. Added `r_multiple_basis` and `r_multiple_potential`
+  (`mfe / abs(mae)`), which separates available edge from exit timing.
+
+- **2026-07-19 — Analytics Metric Definition Catalog approved.** `D-ANLT-005` closed.
+  56 metric rows carry complete formula, unit, input, scale, annualization, sample,
+  minimum-sample, undefined-behavior, evidence-type, and golden-fixture definitions.
+  Industry-standard resolutions adopted: historical VaR returned as a signed return;
+  Van Tharp price-based R-multiple; simple returns; bias-corrected G1 skewness and
+  excess G2 kurtosis; linear percentile interpolation; Tukey-fence outliers; fixed
+  50-bin histogram for determinism; Benjamini-Hochberg FDR; percentile-method
+  bootstrap; add-one-corrected permutation p-values; Sortino downside deviation over
+  all observations with MAR = 0. `expected_shortfall` was removed as mathematically
+  identical to `conditional_var`. `gross_profit` / `gross_loss` were renamed
+  `sum_winning_pnl` / `sum_losing_pnl` to avoid collision with
+  `gross_pnl_before_costs`. The catalog is 58 rows after the cost-convention
+  correction and the R-multiple basis additions recorded below.
+
+- **2026-07-19 — Analytics Evidence Catalog approved.** `D-ANLT-006` closed. Warning
+  and quality-flag namespaces fixed with 18 and 11 codes respectively, each traced to
+  a written failure behavior. Uncataloged codes are rejected at construction.
+
+- **2026-07-19 — Analytics `PortfolioAllocationEvidence v1` given an owning
+  requirement.** The contract was registered in `docs/PROJECT.md` §5 and exported at
+  the Analytics package root but had no §4 definition or builder. Minted
+  `FR-ANLT-047` (contract in `contracts/models.py`) and `FR-ANLT-048` (projector in
+  the new `reports/allocation.py`), and corrected the `WF-ANLT-013` requirement
+  sequence, which previously terminated in the Analytics-internal
+  `PortfolioPerformanceReport`. Reserved IDs `FR-ANLT-015` and `FR-ANLT-019` were
+  not reused.
+
+- **2026-07-19 — Analytics seam phasing separated from dependency order.** Appendix P
+  placed `reports/` in phase 1 and `metrics/` in phase 7 while `reports/builder.py`
+  imports `metrics.groups`. A `P-ANLT-NNN` phase now explicitly fixes only when a
+  public seam appears; the §2 dependency order governs implementation. `FR-ANLT-038`
+  and `FR-ANLT-043` are seam-only in phase 1 and complete in phase 7.
+
+- **2026-07-19 — Analytics scorecards excluded from the initial build.**
+  `FR-ANLT-014`, `FR-ANLT-044`, `WF-ANLT-004`, and the `scorecards/` files are
+  `Excluded` because `STRATEGY_QUALITY_THRESHOLDS` and
+  `ALLOWED_RECOMMENDATION_LANGUAGE` have no owner-approved value and Analytics owns no
+  promotion-adjacent threshold. `P-ANLT-005` still authorizes the phase-7 seam.
+
+- **2026-07-19 — Analytics undefined limits are required fail-closed settings.** The
+  nine limits with a `None` default are supplied explicitly with no fallback; a public
+  operation invoked without its required limit raises `AnalyticsValidationError`. No
+  numeric value was invented. `RISK_FREE_RATE` is confirmed a caller-supplied argument
+  rather than a module constant.
+
+- **2026-07-19 — Analytics `to_json_safe` collision resolved.** `FR-ANLT-025` is
+  renamed `to_report_json_safe` and narrowed to normalizing pandas/NumPy values and
+  translating Utils `ValidationError` into `AnalyticsValidationError` before delegating
+  to the Utils-owned `to_json_safe`. This restores the boundary rule already stated by
+  the `Removed` `FR-ANLT-024` and `FR-ANLT-026`.
+
+- **2026-07-19 — Trading contract registry status reconciled.** `OrderIntent v1`,
+  `TradeRecord` / `ExecutionReceipt v1`, `OperationalEvent v1`, and the Trading
+  execution-state store were still recorded as `Missing` in `docs/PROJECT.md` §5 and
+  §5 Data ownership after the Trading domain completed. All four are now `Completed`.
+
+- **2026-07-19 — Analytics V1/V2 reuse instructions withdrawn.** Six "reuse V1" and
+  one "V2 historical inventory" reference in the Analytics README pointed at source
+  that does not exist in this repository. Each is restated as a direct requirement so
+  no implementer infers behavior from an unavailable tree.
+
+- **2026-07-19 — Remaining Trading execution contracts resolved.** Strategy
+  `TradeIntent v1` now carries explicit order type and applicable entry/TIF
+  material as immutable Risk lineage; Risk publishes a plan-bound
+  `PortfolioBudgetExecutionVerdict v1`; Trading consumes normalized symbol
+  capability evidence, binds live gates to an injected `LiveSession`, uses complete
+  rebalance action rows, canonical control-scope fields and cancellable states, and
+  queries official reporting evidence through its state-store port. The owner
+  explicitly authorized the necessary additive Strategy, Risk, and Trading-state
+  contract/document/test changes.
+
+- **2026-07-19 — Trading executable-intent mapping resolved.** `OrderIntent v1`
+  carries approved order type, validated quantity unit, optional order instructions,
+  and Trading-state target identities; `BrokerConnectionConfig` remains the sole
+  source of broker environment/account material during receiver-owned DTO adaptation.
 
 - **2026-07-19 — Risk registry status reconciled after post-build review.**
   `docs/PROJECT.md` marked all ten Risk-owned `v1` contracts (`RiskDecision`,

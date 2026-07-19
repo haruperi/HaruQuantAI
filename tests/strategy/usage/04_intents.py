@@ -36,6 +36,7 @@ decision = StrategyDecision(
     symbol="EURUSD",
     side="BUY",
     intent_type="OPEN",
+    order_type="MARKET",
     requested_sizing_mode="quantity",
     quantity_hint=Decimal("0.01"),
     valid_from=now,

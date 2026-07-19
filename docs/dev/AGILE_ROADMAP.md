@@ -143,7 +143,12 @@ Exact rows are authoritative in the traceability matrix; ranges compact the same
 - **Risk:** `FR-RISK-001-021`, `FR-RISK-023`, `FR-RISK-025-027`, `FR-RISK-029-031`, `FR-RISK-033-034`, `FR-RISK-036-046`, `FR-RISK-058-060`, `P-RISK-001-002`, `P-RISK-004-005`, `P-RISK-007-009`, `WF-RISK-002`, `WF-RISK-004`, `WF-RISK-008-009`, `WF-RISK-012`
 - **Trading:** `FR-TRD-001-010`, `FR-TRD-012-028`, `FR-TRD-030-039`, `FR-TRD-042-046`, `FR-TRD-048-058`, `FR-TRD-061-062`, `P-TRD-001-005`, `P-TRD-007-009`, `WF-TRD-001-004`, `WF-TRD-006`, `WF-TRD-008`, `WF-TRD-011-012`
 - **Simulation:** `CAP-SIM-001`, `CAP-SIM-004`, `FR-SIM-001-003`, `FR-SIM-005-006`, `FR-SIM-010`, `FR-SIM-014`, `FR-SIM-016`, `FR-SIM-018-031`, `P-SIM-001`, `P-SIM-005-007`, `WF-SIM-001-002`
-- **Analytics:** `FR-ANLT-001-014`, `FR-ANLT-016-018`, `FR-ANLT-020-023`, `FR-ANLT-025`, `FR-ANLT-027-028`, `FR-ANLT-033-034`, `FR-ANLT-036`, `FR-ANLT-038-046`, `P-ANLT-001-002`, `P-ANLT-004`, `P-ANLT-006`, `WF-ANLT-001`, `WF-ANLT-005-006`
+- **Analytics:** `FR-ANLT-001-013`, `FR-ANLT-016-018`, `FR-ANLT-020-023`, `FR-ANLT-025`, `FR-ANLT-027-028`, `FR-ANLT-033-034`, `FR-ANLT-036`, `FR-ANLT-038-043`, `FR-ANLT-045-047`, `FR-ANLT-049-050`, `P-ANLT-001-002`, `P-ANLT-004`, `P-ANLT-006`, `WF-ANLT-001`, `WF-ANLT-005-006`
+  - `FR-ANLT-014` and `FR-ANLT-044` are removed from this phase: `scorecards/` is `Excluded` from the initial build (Analytics README §4.5, `D-ANLT-007`). `P-ANLT-005` still authorizes the seam in phase 7.
+  - `FR-ANLT-038` and `FR-ANLT-043` are **seam only** in this phase — signature, error taxonomy, and package export. Their section-composition behavior completes in phase 7 with `FR-ANLT-029-032`, `FR-ANLT-035`, and `FR-ANLT-037`, because `reports/builder.py` imports `metrics.groups`. A phase allocation never overrides the §2 dependency order in the Analytics README.
+  - `FR-ANLT-015` and `FR-ANLT-019` are reserved, unused numbering gaps and are excluded from every inclusive range (Analytics README Appendix R).
+  - `FR-ANLT-049` (`ClosedTrade`) and `FR-ANLT-050` (`build_closed_trade_equity_curve`) establish the canonical ledger input and its derived equity curve. They are prerequisites for `FR-ANLT-027-032` and `FR-ANLT-037`.
+  - `FR-ANLT-048` and `WF-ANLT-013` remain `Blocked` on the `PortfolioSimulationResult` leg only, pending `D-ANLT-004`.
 - **Optimization:** `FR-OPT-001-007`, `FR-OPT-010-013`, `FR-OPT-015-028`, `FR-OPT-032-033`, `FR-OPT-038-040`, `FR-OPT-042-049`, `FR-OPT-053`, `P-OPT-001`, `P-OPT-003-004`, `P-OPT-007`, `P-OPT-009`, `WF-OPT-001-002`
 - **Research:** `FR-RES-001-031`, `FR-RES-042-050`, `FR-RES-069`, `FR-RES-075`, `FR-RES-077`, `FR-RES-081`, `FR-RES-089-096`, `P-RES-001-002`, `P-RES-005`, `P-RES-011`, `WF-RES-001-002`
 - **Portfolio:** `FR-PORT-001-006`, `FR-PORT-009-015`, `FR-PORT-018-020`, `FR-PORT-024-025`, `FR-PORT-029-030`, `FR-PORT-034-037`, `P-PORT-001`, `P-PORT-003`, `P-PORT-008`, `WF-PORT-002`
@@ -447,7 +452,10 @@ Retires bar-only realism; model risk stays explicit.
 Exact rows are authoritative in the traceability matrix; ranges compact the same IDs.
 
 - **Simulation:** `CAP-SIM-008`
-- **Analytics:** `FR-ANLT-029-032`, `FR-ANLT-035`, `FR-ANLT-037`, `P-ANLT-003`, `P-ANLT-005`, `WF-ANLT-002-004`, `WF-ANLT-007-008`, `WF-ANLT-010`
+- **Analytics:** `FR-ANLT-029-032`, `FR-ANLT-035`, `FR-ANLT-037`, `P-ANLT-003`, `P-ANLT-005`, `WF-ANLT-002-003`, `WF-ANLT-007-008`, `WF-ANLT-010`
+  - Completing these kernels also completes the phase-1 seams of `FR-ANLT-038` and `FR-ANLT-043`, which cannot pass their acceptance tests before this phase.
+  - `WF-ANLT-004` is removed from this phase: it is `Excluded` with `scorecards/` (`D-ANLT-007`). `P-ANLT-005` remains a seam-only allocation.
+  - `FR-ANLT-029` and `FR-ANLT-030` consume the closed-trade equity curve derived in phase 1 by `FR-ANLT-050`. Time-based metrics use the UTC calendar-daily resample; annualizing per-trade returns is prohibited.
 - **UI/API:** `CAP-UI-018`
 
 #### Public interfaces
@@ -764,7 +772,7 @@ Exact rows are authoritative in the traceability matrix; ranges compact the same
 - **Data:** `CAP-DATA-001-002`, `CAP-DATA-005-006`, `CAP-DATA-009`, `CAP-DATA-011-014`, `CAP-DATA-017-018`, `CAP-DATA-020-021`, `FR-DATA-009`, `FR-DATA-029`, `FR-DATA-040`, `WF-DATA-006`
 - **Trading:** `CAP-TRD-001-019`, `CAP-TRD-022-025`
 - **Simulation:** `CAP-SIM-002-003`, `CAP-SIM-011`
-- **Analytics:** `FR-ANLT-024`, `FR-ANLT-026`
+- **Analytics:** `FR-ANLT-024`, `FR-ANLT-026` — both are `Removed` requirements that produce no Analytics code. The allocation is satisfied by the boundary test `tests/analytics/unit/test_evidence.py::test_analytics_defines_no_utils_duplicate_primitive()`, which asserts Analytics defines no redaction primitive, no canonical JSON primitive, and no symbol named `to_json_safe`.
 - **UI/API:** `CAP-UI-004-006`, `CAP-UI-011-012`, `CAP-UI-016`, `CAP-UI-019`, `CAP-UI-021-023`, `FR-API-027`, `WF-API-007-008`
 
 #### Public interfaces

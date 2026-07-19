@@ -372,6 +372,7 @@ def make_decision(*, action: str = "PROPOSE") -> StrategyDecision:
         symbol="EURUSD" if proposal else None,
         side="BUY" if proposal else None,
         intent_type="OPEN" if proposal else None,
+        order_type="MARKET" if proposal else None,
         requested_sizing_mode="quantity" if proposal else None,
         quantity_hint=Decimal(1) if proposal else None,
         valid_from=NOW - timedelta(minutes=1),

@@ -35,10 +35,14 @@ def build_trade_intent(
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    if decision.side is None or decision.intent_type is None:
+    if (
+        decision.side is None
+        or decision.intent_type is None
+        or decision.order_type is None
+    ):
         return failure(
             StrategyErrorCode.SCHEMA_VALIDATION_FAILED,
-            "proposal decision is missing side or intent type",
+            "proposal decision is missing side, intent type, or order type",
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
@@ -73,6 +77,10 @@ def build_trade_intent(
             symbol=str(decision.symbol),
             side=decision.side,
             intent_type=decision.intent_type,
+            order_type=decision.order_type,
+            limit_price=decision.limit_price,
+            stop_price=decision.stop_price,
+            time_in_force=decision.time_in_force,
             requested_sizing_mode=decision.requested_sizing_mode,
             quantity_hint=decision.quantity_hint,
             notional_hint=decision.notional_hint,

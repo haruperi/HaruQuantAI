@@ -34,6 +34,10 @@ class TradeIntent(BaseModel):
     symbol: str
     side: Literal["BUY", "SELL"]
     intent_type: Literal["OPEN", "CLOSE", "REDUCE", "INCREASE", "MODIFY", "CANCEL"]
+    order_type: Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"]
+    limit_price: Decimal | None
+    stop_price: Decimal | None
+    time_in_force: Literal["GTC", "IOC", "FOK", "GTD", "DAY"] | None
     requested_sizing_mode: str | None
     quantity_hint: Decimal | None
     notional_hint: Decimal | None
@@ -129,6 +133,8 @@ class TradeIntent(BaseModel):
         if self.signal_timestamp > self.decision_timestamp:
             raise ValueError("signal_timestamp cannot follow decision_timestamp")
         for value in (
+            self.limit_price,
+            self.stop_price,
             self.quantity_hint,
             self.notional_hint,
             self.stop_loss,
@@ -139,6 +145,19 @@ class TradeIntent(BaseModel):
                 raise ValueError("TradeIntent decimals must be finite and positive")
         if self.min_fill_size is not None and not self.allow_partial_fills:
             raise ValueError("min_fill_size requires allow_partial_fills")
+        required_prices = {
+            "MARKET": (False, False),
+            "LIMIT": (True, False),
+            "STOP": (False, True),
+            "STOP_LIMIT": (True, True),
+        }
+        limit_required, stop_required = required_prices[self.order_type]
+        if (self.limit_price is not None) != limit_required:
+            raise ValueError("TradeIntent limit_price conflicts with order_type")
+        if (self.stop_price is not None) != stop_required:
+            raise ValueError("TradeIntent stop_price conflicts with order_type")
+        if self.time_in_force == "GTD" and self.expiration is None:
+            raise ValueError("TradeIntent GTD requires expiration")
         return self
 
 

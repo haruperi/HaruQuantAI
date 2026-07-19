@@ -999,6 +999,39 @@ class StrategyEvent(_Contract):
         return cast("dict[str, object]", _thaw_json(value))
 
 
+def _validate_strategy_order_shape(
+    order_type: Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"] | None,
+    limit_price: Decimal | None,
+    stop_price: Decimal | None,
+) -> None:
+    """Validate explicit Strategy execution-instruction shape.
+
+    Args:
+        order_type: Optional proposal order type.
+        limit_price: Optional limit entry price.
+        stop_price: Optional stop entry price.
+
+    Raises:
+        ValueError: If prices are invalid or conflict with the order type.
+    """
+    logger.debug("Validating Strategy decision order shape")
+    required_prices = {
+        "MARKET": (False, False),
+        "LIMIT": (True, False),
+        "STOP": (False, True),
+        "STOP_LIMIT": (True, True),
+    }
+    if order_type is not None:
+        limit_required, stop_required = required_prices[order_type]
+        if (limit_price is not None) != limit_required:
+            raise ValueError("limit_price conflicts with order_type")
+        if (stop_price is not None) != stop_required:
+            raise ValueError("stop_price conflicts with order_type")
+    for price in (limit_price, stop_price):
+        if price is not None and (not price.is_finite() or price <= 0):
+            raise ValueError("entry prices must be finite and positive")
+
+
 class StrategyDecision(_Contract):
     """Neutral or actionable evaluator decision."""
 
@@ -1012,6 +1045,10 @@ class StrategyDecision(_Contract):
     intent_type: (
         Literal["OPEN", "CLOSE", "REDUCE", "INCREASE", "MODIFY", "CANCEL"] | None
     ) = None
+    order_type: Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"] | None = None
+    limit_price: Decimal | None = None
+    stop_price: Decimal | None = None
+    time_in_force: Literal["GTC", "IOC", "FOK", "GTD", "DAY"] | None = None
     requested_sizing_mode: str | None = None
     quantity_hint: Decimal | None = None
     notional_hint: Decimal | None = None
@@ -1105,15 +1142,29 @@ class StrategyDecision(_Contract):
             self.symbol,
             self.side,
             self.intent_type,
+            self.order_type,
+            self.limit_price,
+            self.stop_price,
+            self.time_in_force,
             self.quantity_hint,
             self.notional_hint,
         )
         if self.action == "NEUTRAL" and any(item is not None for item in action_fields):
             raise ValueError("neutral decisions cannot contain proposal fields")
         if self.action == "PROPOSE" and (
-            self.symbol is None or self.side is None or self.intent_type is None
+            self.symbol is None
+            or self.side is None
+            or self.intent_type is None
+            or self.order_type is None
         ):
-            raise ValueError("proposal decisions require symbol, side, and intent type")
+            raise ValueError(
+                "proposal decisions require symbol, side, intent type, and order type"
+            )
+        _validate_strategy_order_shape(
+            self.order_type,
+            self.limit_price,
+            self.stop_price,
+        )
         if self.quantity_hint is not None and self.quantity_hint <= 0:
             raise ValueError("quantity_hint must be positive")
         if self.notional_hint is not None and self.notional_hint <= 0:

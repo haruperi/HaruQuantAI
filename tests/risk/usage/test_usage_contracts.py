@@ -21,6 +21,7 @@ from app.services.risk.contracts import (
     KillSwitchCommand,
     KillSwitchState,
     LimitStatus,
+    PortfolioBudgetExecutionVerdict,
     PortfolioRiskSnapshot,
     PortfolioState,
     PositionSizingRequest,
@@ -57,6 +58,10 @@ def _trade_intent() -> TradeIntent:
         symbol="EURUSD",
         side="BUY",
         intent_type="OPEN",
+        order_type="MARKET",
+        limit_price=None,
+        stop_price=None,
+        time_in_force=None,
         requested_sizing_mode="fixed_risk",
         quantity_hint=Decimal(1),
         notional_hint=None,
@@ -595,6 +600,27 @@ def test_usage_results_allocation_decision() -> None:
         audit_ref="audit-1",
     )
     assert decision.reviewed_version == "1"
+
+
+def test_usage_results_portfolio_budget_execution_verdict() -> None:
+    """Construct an exact plan-bound Risk budget execution verdict."""
+    verdict = PortfolioBudgetExecutionVerdict(
+        verdict_id="budget-verdict-1",
+        allocation_decision_id="decision-1",
+        portfolio_id="portfolio-1",
+        allocation_version="1",
+        plan_id="plan-1",
+        plan_hash="a" * 64,
+        budget_unit="USD",
+        allowed=True,
+        reasons=(),
+        issued_at=NOW,
+        expires_at=NOW + timedelta(minutes=1),
+        request_id="request-1",
+        workflow_id="workflow-1",
+        correlation_id="correlation-1",
+    )
+    assert verdict.allowed is True
 
 
 def test_usage_results_decision_reuse_validation() -> None:

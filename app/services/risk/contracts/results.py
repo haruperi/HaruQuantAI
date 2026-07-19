@@ -574,12 +574,105 @@ class AllocationRiskDecision(_ResultModel):
         return self
 
 
+class PortfolioBudgetExecutionVerdict(_ResultModel):
+    """Risk-owned execution-time budget authority for one rebalance plan."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["risk.portfolio_budget_execution_verdict.v1"] = (
+        "risk.portfolio_budget_execution_verdict.v1"
+    )
+    verdict_id: str
+    allocation_decision_id: str
+    portfolio_id: str
+    allocation_version: str
+    plan_id: str
+    plan_hash: str
+    budget_unit: str
+    allowed: bool
+    reasons: tuple[str, ...]
+    issued_at: datetime
+    expires_at: datetime
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+
+    @field_validator(
+        "verdict_id",
+        "allocation_decision_id",
+        "portfolio_id",
+        "allocation_version",
+        "plan_id",
+        "budget_unit",
+        "request_id",
+        "workflow_id",
+        "correlation_id",
+    )
+    @classmethod
+    def _validate_text(cls, value: str) -> str:
+        """Validate required budget-verdict text.
+
+        Args:
+            value: Candidate text.
+
+        Returns:
+            Validated text.
+
+        Raises:
+            ValueError: If the text is blank or untrimmed.
+        """
+        logger.debug("Validating portfolio budget verdict text")
+        if not value or value != value.strip():
+            raise ValueError("budget verdict text must be non-empty and trimmed")
+        return value
+
+    @field_validator("plan_hash")
+    @classmethod
+    def _validate_hash(cls, value: str) -> str:
+        """Validate the exact reviewed plan hash.
+
+        Args:
+            value: Candidate SHA-256 hexadecimal digest.
+
+        Returns:
+            Validated digest.
+
+        Raises:
+            ValueError: If the digest is not lowercase SHA-256 hexadecimal.
+        """
+        logger.debug("Validating portfolio budget verdict plan hash")
+        if len(value) != _SHA256_HEX_LENGTH or any(
+            character not in "0123456789abcdef" for character in value
+        ):
+            raise ValueError("plan_hash must be lowercase SHA-256 hex")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_verdict(self) -> PortfolioBudgetExecutionVerdict:
+        """Validate the budget verdict lifetime and outcome consistency.
+
+        Returns:
+            Validated verdict.
+
+        Raises:
+            ValueError: If time or allow/reason material conflicts.
+        """
+        logger.debug("Validating portfolio budget execution verdict")
+        _utc(self.issued_at)
+        _utc(self.expires_at)
+        if self.expires_at <= self.issued_at:
+            raise ValueError("budget verdict expiry must follow issuance")
+        if self.allowed == bool(self.reasons):
+            raise ValueError("budget verdict reasons conflict with allowed state")
+        return self
+
+
 __all__ = [
     "ActionPolicyVerdict",
     "AllocationRiskDecision",
     "ApprovalValidationResult",
     "DecisionReuseValidationResult",
     "KillSwitchState",
+    "PortfolioBudgetExecutionVerdict",
     "PositionSizingResult",
     "RegimeAssessment",
     "RiskApprovalToken",

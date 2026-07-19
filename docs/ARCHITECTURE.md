@@ -51,10 +51,27 @@
   implementations across trend, volatility, momentum, volume, and candles.
   Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the
   non-repainting contract.
-* Later agile phases reuse these four domains and run compatibility/regression
+* `app/services/strategy/` is implemented across contracts, diagnostics, registry,
+  intents, replay/checkpoints, vectorized evaluation, event hooks, concrete signal
+  evaluators, and all ten `WF-STRAT-*` workflows.
+* `app/services/risk/` is a completed implementation baseline across contracts,
+  configuration, snapshots, sizing, audit chaining, policy gates, regimes, approvals,
+  decisions, scenarios, and reporting — all 54 functional and 12 non-functional
+  requirements and all thirteen workflows.
+* `app/services/trading/` is a completed implementation baseline across all 64
+  functional and eight non-functional requirements, nine capability modules, and all
+  fourteen documented workflows. It owns `OrderIntent v1`, `ExecutionReceipt v1`,
+  `TradeRecord v1`, and `OperationalEvent v1`. Production live mutation remains
+  disabled by default.
+* Later agile phases reuse these completed domains and run compatibility/regression
   checks; they do not rebuild them. Current semantic-docstring/format cleanup is a
   separate repository-quality gate.
-* Strategy is the next full-domain build after Indicators.
+* `app/services/simulator/` and `app/services/analytics/` contain only their READMEs
+  and empty package roots. Simulation is the next full-domain build; Analytics follows
+  it, per the dependency order in `docs/PROJECT.md` §3. The Analytics specification is
+  complete: its canonical input is a closed-trade ledger from which the equity curve is
+  derived deterministically, its metric and evidence catalogs are approved, and two
+  scoped non-blocking decisions remain in its README §6.
 
 ---
 
