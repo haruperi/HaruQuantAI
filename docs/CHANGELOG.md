@@ -4,6 +4,10 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Status
 
+- Risk is a completed implementation baseline across contracts, configuration,
+  snapshots, sizing, audit, Policy, regimes, approvals, decisions, scenarios,
+  reporting, all 54 functional and 12 non-functional requirements, and all
+  thirteen workflows.
 - Utils, Brokers, and Data are recorded as completed implementation baselines after
   independent deterministic domain verification. The complete system remains
   `Missing`, and repository-wide documentation-quality cleanup remains tracked.
@@ -15,6 +19,50 @@ This document is only for adding high-level changes, decisions, or status update
   evaluators, and all ten workflows. All prescribed Strategy validation gates pass.
 
 ### Added
+
+- **2026-07-19 — Risk domain completed.** Completed all Risk features and public
+  exports, added dedicated policy-version and optional decision/snapshot migration
+  records, and added structured trace/verdict/reason/latency/evidence logging for
+  every material decision path.
+
+- **2026-07-19 — Risk public/final integration gates added.** Added exact root
+  exports, import-boundary enforcement, token/kill-switch security checks,
+  supported-bound workload evidence, and fail-closed audit/token persistence;
+  all thirteen documented Risk workflows now have passing integration evidence.
+
+- **2026-07-19 — Risk focused reporting implemented.** Added deterministic
+  Markdown/exact-JSON rendering with separated evidence, calculations,
+  assumptions, warnings, decisions, and recommendations; five tests pass at
+  89% focused coverage with token-bound approval-claim protection.
+
+- **2026-07-19 — Risk advisory scenarios implemented.** Added immutable bounded
+  aggregate shock analysis with explicit relative/ratio semantics, deterministic
+  seed provenance, no invented distribution, and four focused tests at 86% coverage.
+
+- **2026-07-19 — Risk canonical Decisions implemented.** Added fixed-precedence
+  trade/current-state governance, typed kill-switch hierarchy and authorized
+  CAS transitions, concurrent-capacity disclosure, durable approval issuance,
+  and non-authorizing decision reuse; 19 focused tests pass at 81% coverage.
+
+- **2026-07-19 — Risk durable approvals implemented.** Added HMAC-SHA-256
+  decision/attestation binding, injected secret and authorization dependencies,
+  atomic single-use consumption, scoped revocation, audit evidence, runnable
+  examples, and live-profile workflow evidence at 81% focused coverage.
+
+- **2026-07-19 — Risk regime assessment implemented.** Added deterministic
+  volatility, liquidity, correlation, drawdown, crisis, news, and session states,
+  explicit transitions, and tightening-only modifiers. Unit, usage, and workflow
+  integration evidence passes at 83% focused coverage.
+
+- **2026-07-19 — Risk Policy gates implemented.** Added ordered portfolio and
+  normalized market-context limits, immutable Strategy eligibility, allocation
+  cap review, and version-exact atomic Risk-budget activation. The 23-case targeted
+  gate and real audit-chain integrations pass at 84% focused Policy coverage.
+
+- **2026-07-19 — Risk tamper-evident audit boundary implemented.** Added
+  receiver-owned atomic persistence ports, SHA-256 continuity, canonical
+  redaction, deterministic verification, Risk-owned migrations, and targeted
+  usage/unit evidence at 81% feature coverage.
 
 - **2026-07-19 — Strategy usage converted to real standalone examples.**
   Replaced pytest-style usage cases with 14 numbered scripts using package-root
@@ -55,10 +103,105 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Verification
 
+- **2026-07-19 — Risk final Definition of Done.** The complete Risk gate passes
+  150 tests at 82.03% coverage; Risk formatting, Ruff, 34-source-file mypy,
+  import/security/persistence/workload checks, and a direct secret scan are clean.
+
 - **2026-07-19 — Strategy canonical mypy gate.** `Success: no issues found in 87 source files`
   from `uv run mypy app/services/strategy tests/strategy`.
 
 ### Decisions
+
+- **2026-07-19 — Risk registry status reconciled after post-build review.**
+  `docs/PROJECT.md` marked all ten Risk-owned `v1` contracts (`RiskDecision`,
+  `ScenarioResult`, `StrategyOperationalEligibilityRequest`/`Decision`,
+  `AllocationReviewRequest`, `AllocationRiskDecision`,
+  `AllocationBudgetActivationRequest`, `ApprovalAttestation`,
+  `ActionPolicyVerdict`, `KillSwitchCommand`, `KillSwitchState`) and the Risk
+  persisted-state row `Completed`, matching the registry legend (`Completed` =
+  implemented, tested, and verified) and the verified Risk build (150 tests,
+  82.03% coverage). The `app/services/risk/README.md` package status was
+  corrected from `Missing` to `Completed`, and the `admission.py` dependency
+  cell now declares all three imported public Strategy symbols
+  (`StrategyEnvironment`, `StrategyLifecycleStatus`, `ValidatedStrategyRef`).
+  Cross-domain `SYS-WF-*` rows and other unbuilt domains remain `Missing`.
+
+- **2026-07-19 — Evaluation-cycle driver relocated to `actions/` (cycle fix).**
+  `run_live_evaluation_cycle` (`FR-TRD-065`) moved from `live/runtime.py` to
+  `actions/runtime.py`: a driver that uses `TradingDependencies` and calls the
+  validate→gate→dispatch path must sit above the layers it invokes, so hosting it
+  in `live/` created a `live ↔ actions` cycle (`actions` already depends on
+  `live`). `actions/` is the top capability layer, so the cycle is removed and the
+  `LIV → ACT` order preserved. `TradingDependencies` (`FR-TRD-056`) now also carries
+  the Data/Indicators/Strategy/Risk read ports for the cycle and the current
+  Risk-state sources (`KillSwitchState`, `AllocationRiskDecision`,
+  `StrategyOperationalEligibilityDecision`) for rebalance execution. Corrected
+  `FR-TRD-065` so a neutral signal is a normal no-mutation `StandardTradingEnvelope`
+  outcome, not a `TradingError`.
+
+- **2026-07-19 — Live/paper runtime loop confirmed Trading-owned (Option A).**
+  `docs/PROJECT.md` `SYS-WF-002` step 1 assigns the Data→Indicators→Strategy→Risk
+  loop to Trading, but §4 had no requirement for it. Added `FR-TRD-065` and
+  `live/runtime.py` (`run_live_evaluation_cycle`) plus workflow `WF-TRD-014`
+  (`FR-TRD-065 → FR-TRD-012 → FR-TRD-036`); `WF-TRD-012`'s input boundary now
+  states the approved `RiskDecision` is produced within that cycle. Trading
+  orchestrates only through public domain APIs and never computes indicators,
+  generates signals, or sizes/approves. `docs/PROJECT.md` left unchanged.
+
+- **2026-07-19 — Trading execution path made async.** `dispatch_order_intent`,
+  every mutation-capable action verb (`FR-TRD-013`–`FR-TRD-023`, `FR-TRD-050`,
+  `FR-TRD-064`), `LiveSession.start`/`stop`, `evaluate_live_gate`, and the injected
+  simulation callback are `async` so they call the async Brokers `BrokerAdapter`
+  mutation operations directly. No synchronous broker bridge (e.g. `asyncio.run`
+  inside a live loop) is permitted; `LiveSession.status()` remains synchronous
+  (read-only local state). Resolves the sync-Trading-vs-async-Brokers conflict.
+
+- **2026-07-19 — `PortfolioRebalanceExecutionRequest v1` mapped into Section 4.**
+  The Trading-owned contract now has `FR-TRD-063` (model in `contracts/models.py`)
+  and `FR-TRD-064` (validation/idempotent adaptation in the new
+  `actions/rebalance.py`, `execute_portfolio_rebalance`), each with usage and unit
+  tests; `WF-TRD-013` sequence begins `FR-TRD-063 → FR-TRD-064`. Trading never
+  recalculates target weights and keeps over-budget correction reduce-only unless
+  Risk authorizes an increase. Closes the unmapped-required-contract gap.
+
+- **2026-07-19 — Trading monitoring seam scheduled to Phase 1.** The Trading
+  `monitoring` package (`P-TRD-006`) was moved from delivery Phase 11 to Phase 1
+  because the §2 module dependency diagram routes `monitoring → live` and
+  `monitoring → reporting`, and `live/session.py` and `reporting/evidence.py`
+  declare `monitoring` as a local dependency; the prior Phase 11 assignment made
+  those Phase 1 modules unbuildable. Only the minimal seam (`OperationalEvent`,
+  `emit_runtime_event`, `BudgetGate` — `FR-TRD-046/047/048`) is required in
+  Phase 1; extended monitoring breadth is deepened behind that seam later.
+  Also corrected in the Trading README: `state/migrations.py` /
+  `FR-TRD-042` now reference Data's real `MigrationStep` contract (not the
+  non-existent `MigrationDefinition`), and §4 implementation notes were reworded
+  to greenfield design constraints since no prior Trading implementation exists.
+
+- **2026-07-19 — Risk Decisions contract gaps resolved.** Governor paths now
+  receive typed applicable kill-switch state, kill checks receive config/auth
+  trace context, current-state compliance never invents a trade size, and reuse
+  returns `DecisionReuseValidationResult` rather than a consumed-token result.
+
+- **2026-07-19 — Risk approval state semantics approved.** The private
+  receiver-owned store uses exact synchronous issue, consume-if-active, and
+  revoke-intersecting operations; only one concurrent reservation succeeds,
+  expected scope is exact, and config compatibility remains explicit/default-deny.
+
+- **2026-07-19 — Risk Policy baseline semantics approved.** Functional defaults
+  now cover loss, drawdown, margin, leverage, historical tail risk, and concentration
+  while remaining profile-overridable; limit precedence and ratio bases are exact.
+  V1 market policy uses exact spread units and normalized session/calendar states,
+  treats liquidity as availability-only because its contract has no unit, and excludes
+  slippage because that evidence is absent and receiver-owned after execution.
+
+- **2026-07-19 — Five initial Risk pre-build blockers resolved (owner-approved).**
+  `ProposedTrade` now embeds the complete public `TradeIntent v1`; persistent
+  eligibility, allocation-budget, audit, and kill-switch work uses private injected
+  Risk ports over Data infrastructure; `RiskConfig v1` has an exact fail-closed
+  schema; PyYAML 6.0.3 is direct; and the supporting Risk test-file manifest is
+  explicitly in scope. Audit primitives precede persistent policy gates, no
+  production profile invents owner thresholds, and paper/live configuration remains
+  deployment-supplied and fail-closed when absent.
 
 - **2026-07-19 — Strategy contract registry reconciled.** The delivered
   `TradeIntent`, `StrategyMutationResult`, `StrategyRegistrationRequest`, and

@@ -81,6 +81,12 @@ to Utils-owned `AuditEvent v1` for Data persistence without redefining either ty
 `StandardTradingEnvelope` is an internal Trading result type. UI/API adapts it to
 the external `ApiResponse` family; no other domain consumes or redefines the envelope.
 
+**Consumed-symbol name reconciliation** (contract name → concrete public import, to avoid importing non-existent symbols):
+
+- `IndicatorSeries v1` → class `IndicatorResult` (`from app.services.indicators import IndicatorResult`).
+- `RiskDecision v1` → class `RiskDecisionPackage` (`from app.services.risk.contracts import RiskDecisionPackage`); `ActionPolicyVerdict`, `KillSwitchState`, `StrategyOperationalEligibilityDecision`, and `AllocationRiskDecision` use their own names.
+- The "Simulation" domain is the package `app.services.simulator`. Trading imports no Simulation internals; the `sim` route is dispatched through an injected async callback `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]`.
+
 ### Persisted state
 
 Trading owns logical schemas and migration definitions; Data owns connection, locking, and migration execution infrastructure. Concrete stores are injected. Trading does not implement a custom JSONL persistence architecture in the final design.
@@ -129,7 +135,7 @@ flowchart TD
     REC --> RECFILES[snapshots.py · compare.py · authority.py]
     MON --> MONFILES[events.py · budgets.py]
     LIV --> LIVFILES[config.py · session.py · gates.py]
-    ACT --> ACTFILES[dependencies.py · orders.py · positions.py · controls.py · emergency.py]
+    ACT --> ACTFILES[dependencies.py · orders.py · positions.py · controls.py · emergency.py · rebalance.py · runtime.py]
     REP --> REPFILES[evidence.py]
 ```
 
@@ -192,7 +198,9 @@ trading/
 │   ├── orders.py                       # Submit, modify, cancel
 │   ├── positions.py                    # Close, modify, reduce
 │   ├── controls.py                     # Pause, resume, synchronize, kill switch
-│   └── emergency.py                    # Gated mass cancel and close
+│   ├── emergency.py                    # Gated mass cancel and close
+│   ├── rebalance.py                    # Authorized rebalance execution adaptation
+│   └── runtime.py                      # Live/paper evaluation-cycle orchestration
 └── reporting/                          # Immutable evidence packaging
     ├── __init__.py
     └── evidence.py                     # Execution/reconciliation report evidence
@@ -267,7 +275,8 @@ flowchart LR
 | Missing | `WF-TRD-010` | Cross-domain | Emit monitoring, cost, and incident evidence | Runtime observation | Trading-owned `OperationalEvent`; durable audit evidence through Data and operator presentation through UI/API | `FR-TRD-046 → FR-TRD-048` |
 | Missing | `WF-TRD-011` | Cross-domain | Build execution/reconciliation evidence | Receipts, readiness, incidents | Immutable report to Analytics/Portfolio/UI/API | `FR-TRD-049` |
 | Missing | `WF-TRD-012` | Cross-domain | Accept governed upstream request | Approved `RiskDecision` and immutable lineage | Validated Trading request; no raw signal translation | `FR-TRD-003 → FR-TRD-024` |
-| Missing | `WF-TRD-013` | Cross-domain | Execute authorized portfolio rebalance | `PortfolioRebalanceExecutionRequest v1` plus current Risk decisions | Idempotent order outcomes and reconciliation evidence | `FR-TRD-024 → FR-TRD-036 → FR-TRD-039` |
+| Missing | `WF-TRD-013` | Cross-domain | Execute authorized portfolio rebalance | `PortfolioRebalanceExecutionRequest v1` plus current Risk decisions | Idempotent order outcomes and reconciliation evidence | `FR-TRD-063 → FR-TRD-064 → FR-TRD-024 → FR-TRD-036 → FR-TRD-039` |
+| Missing | `WF-TRD-014` | Cross-domain | Run a live/paper evaluation cycle | Live/paper market update or scheduled evaluation trigger | Neutral signal ends the cycle, or an approved `RiskDecision` enters the validate/gate/dispatch path | `FR-TRD-065 → FR-TRD-012 → FR-TRD-036` |
 
 ### `WF-TRD-001` — Validate and package a route-aware action
 
@@ -447,11 +456,23 @@ incident; event-delivery failure is surfaced and never hides execution state.
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-002`, `SYS-WF-006`
-**Input boundary:** Approved `RiskDecision` with immutable Strategy intent lineage.
+**Input boundary:** An approved `RiskDecision` with immutable Strategy intent lineage — produced within `WF-TRD-014` (`FR-TRD-065`) when Trading drives the loop, or supplied by an external governed caller.
 **Output boundary:** Canonical Trading request accepted for validation.
 
 **Failure behavior:** raw signal dictionaries, missing approval lineage, and size changes are rejected.
 **Integration test:** `tests/trading/integration/test_upstream_request.py::test_raw_signal_translation_is_rejected()`
+
+### `WF-TRD-014` — Run a live/paper evaluation cycle
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-002`
+**Input boundary:** A live/paper market update or scheduled strategy evaluation under an authenticated principal.
+**Output boundary:** Either a neutral-signal termination, or an approved `RiskDecision` handed into the validate/gate/dispatch path.
+
+`run_live_evaluation_cycle()` owns the runtime loop defined in `docs/PROJECT.md` `SYS-WF-002` step 1: it requests `MarketDataset`/`AccountStateSnapshot` from Data, `IndicatorSeries` from Indicators, invokes Strategy for a `TradeIntent`, ends the cycle on a neutral signal, submits the `TradeIntent` to Risk, and forwards any approved `RiskDecision` into `WF-TRD-012`. Trading never computes indicators, generates signals, or sizes/approves.
+
+**Failure behavior:** upstream unavailable/stale evidence fails closed; neutral signals end the cycle without mutation.
+**Integration test:** `tests/trading/integration/test_live_cycle.py::test_cycle_submits_intent_and_never_sizes()`
 
 ### `WF-TRD-013` — Execute an Authorized Portfolio Rebalance
 
@@ -487,7 +508,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `models.py` | Define routes, requests, intents, receipts, records, and envelopes | `TradingRoute`, `TradingRequest`, `StandardTradingEnvelope`, `OrderIntent`, `ExecutionReceipt`, `TradeRecord` | **Standard library:** `datetime`, `decimal`, `enum`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** Utils public time/serialization contracts |
+| Missing | `models.py` | Define routes, requests, intents, receipts, records, and envelopes | `TradingRoute`, `TradingRequest`, `StandardTradingEnvelope`, `OrderIntent`, `ExecutionReceipt`, `TradeRecord`, `PortfolioRebalanceExecutionRequest` | **Standard library:** `datetime`, `decimal`, `enum`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** Utils public time/serialization contracts |
 | Missing | `errors.py` | Define/map finite errors and redact boundary payloads | `TradingError`, `map_trading_error`, `redact_trading_payload` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `models.py → StandardTradingEnvelope`; Utils public error/redaction APIs |
 | Missing | `registry.py` | Expose the exact typed Python public API | `get_public_contracts` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `models.py`; `errors.py` |
 | Missing | `__init__.py` | Expose the approved contract API | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
@@ -516,6 +537,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Missing | `FR-TRD-004` | The system shall expose `OrderIntent v1` exactly as defined in Section 1 and preserve Risk-approved size. | `OrderIntent` | None | `TradingError`: size or lineage mismatch | **Usage:** `tests/trading/usage/test_usage_contracts.py::test_usage_models_order_intent()`<br>**Unit:** `tests/trading/unit/contracts/test_models.py::test_order_intent_cannot_exceed_risk_size()` |
 | Missing | `FR-TRD-005` | The system shall expose immutable `ExecutionReceipt v1` with authority, status, fill, retry, and reconciliation evidence. | `ExecutionReceipt` | None | `TradingError`: malformed receipt | **Usage:** `tests/trading/usage/test_usage_contracts.py::test_usage_models_execution_receipt()`<br>**Unit:** `tests/trading/unit/contracts/test_models.py::test_receipt_requires_authority_evidence()` |
 | Missing | `FR-TRD-006` | The system shall expose `TradeRecord v1` without deriving Analytics metrics or hiding unreconciled state. | `TradeRecord` | None | `TradingError`: inconsistent fill/authority state | **Usage:** `tests/trading/usage/test_usage_contracts.py::test_usage_models_trade_record()`<br>**Unit:** `tests/trading/unit/contracts/test_models.py::test_trade_record_flags_unreconciled_state()` |
+| Missing | `FR-TRD-063` | The system shall expose `PortfolioRebalanceExecutionRequest v1` exactly as defined in §1 (plan/allocation/decision references, ordered actions, reduce-only flags, route, approval token, validity, canonical hash) carrying `contract_version="v1"` and `schema_id="trading.portfolio_rebalance_execution_request.v1"`. | `PortfolioRebalanceExecutionRequest` | None | `TradingError`: invalid/duplicate hash, missing authorization, or non-canonical material | **Usage:** `tests/trading/usage/test_usage_contracts.py::test_usage_models_portfolio_rebalance_request()`<br>**Unit:** `tests/trading/unit/contracts/test_models.py::test_rebalance_request_requires_canonical_hash()` |
 
 #### `errors.py` — Error taxonomy and redaction
 
@@ -533,7 +555,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Missing | `FR-TRD-012` | The system shall create a non-executable action draft that cannot call a route authority. | `create_trading_action_draft(request: Mapping[str, JsonValue]) -> StandardTradingEnvelope` | None | `TradingError`: invalid draft | **Usage:** `tests/trading/usage/test_usage_contracts.py::test_usage_registry_create_draft()`<br>**Unit:** `tests/trading/unit/contracts/test_registry.py::test_create_draft_has_no_side_effect()` |
 
 **Rules:** Imports have no network, database, broker, worker, simulator, or clock side effects.
-**Implementation notes:** Merge duplicate current contract/error families; retain validated Decimal/serialization logic only.
+**Implementation notes:** Define one contract/error family with no duplicate types; implement validated Decimal/serialization logic only.
 **Feature usage examples:** `tests/trading/usage/test_usage_contracts.py`
 
 ---
@@ -552,7 +574,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Missing | `stores.py` | Define minimal injected state operations | `TradingStateStore` and its five public operations | **Standard library:** `datetime`, `typing`<br>**Required third-party:** None<br>**Local:** `events.py`; `contracts.models` |
 | Missing | `idempotency.py` | Reserve caller keys and detect material conflicts | `IdempotencyReservation`, `reserve_idempotency` | **Standard library:** `hashlib`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `stores.py`; Utils canonical JSON |
 | Missing | `projections.py` | Apply ordered events with optimistic versions | `TradingProjection`, `apply_execution_event` | **Standard library:** None<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `events.py`; `stores.py`; `contracts.models` |
-| Missing | `migrations.py` | Declare Trading-owned schema version and migrations | `TRADING_SCHEMA_VERSION`, `get_trading_migrations` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Data public migration-definition contract |
+| Missing | `migrations.py` | Declare Trading-owned schema version and migrations | `TRADING_SCHEMA_VERSION`, `get_trading_migrations` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Data public migration-definition contract (`MigrationStep` from `app.services.data.contracts`) |
 | Missing | `__init__.py` | Expose state API | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
 
 ### Configuration and Limits Manifest
@@ -571,7 +593,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Missing | `FR-TRD-039` | The system shall reserve a caller-supplied key against versioned canonical SHA-256 material before send and reject different-material reuse. | `reserve_idempotency(request: TradingRequest, store: TradingStateStore) -> IdempotencyReservation` | Persistence write | `TradingError`: missing key, conflict, or write failure | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_idempotency_reserve()`<br>**Unit:** `tests/trading/unit/state/test_idempotency.py::test_same_key_different_material_rejected()` |
 | Missing | `FR-TRD-040` | The system shall apply deduplicated authority events in logical order with optimistic version checks. | `apply_execution_event(event: TradingEvent, store: TradingStateStore) -> TradingProjection` | Persistence write | `TradingError`: duplicate conflict or stale version | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_projections_apply_event()`<br>**Unit:** `tests/trading/unit/state/test_projections.py::test_apply_event_rejects_stale_version()` |
 | Missing | `FR-TRD-041` | The system shall expose the current Trading schema version. | `TRADING_SCHEMA_VERSION: str` | None | None | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_migrations_schema_version()`<br>**Unit:** `tests/trading/unit/state/test_migrations.py::test_schema_version_matches_events()` |
-| Missing | `FR-TRD-042` | The system shall provide additive Trading migration definitions for execution-owned state without opening a database. | `get_trading_migrations() -> tuple[MigrationDefinition, ...]` | None | `TradingError`: invalid/non-additive definition | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_migrations_get_migrations()`<br>**Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()` |
+| Missing | `FR-TRD-042` | The system shall provide additive Trading migration definitions for execution-owned state without opening a database. | `get_trading_migrations() -> tuple[MigrationStep, ...]` | None | `TradingError`: invalid/non-additive definition | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_migrations_get_migrations()`<br>**Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()` |
 | Missing | `FR-TRD-051` | The store shall reserve one caller key against canonical material and return the existing/new/conflict decision atomically. | `TradingStateStore.reserve_idempotency(key: str, material_hash: str, material_version: str, expires_at: datetime) -> IdempotencyReservation` | Persistence write | `TradingError`: conflict or write failure | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_stores_reserve_idempotency()`<br>**Unit:** `tests/trading/unit/state/test_stores.py::test_reserve_idempotency_is_atomic()` |
 | Missing | `FR-TRD-052` | The store shall append one versioned event without rewriting prior events. | `TradingStateStore.append_event(event: TradingEvent) -> None` | Persistence write | `TradingError`: append/version failure | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_stores_append_event()`<br>**Unit:** `tests/trading/unit/state/test_stores.py::test_append_event_is_append_only()` |
 | Missing | `FR-TRD-053` | The store shall load the latest projection for an exact route/tenant/authority scope. | `TradingStateStore.load_projection(scope: tuple[TradingRoute, str, str]) -> TradingProjection \| None` | Read-only | `TradingError`: read or schema failure | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_stores_load_projection()`<br>**Unit:** `tests/trading/unit/state/test_stores.py::test_load_projection_is_scope_isolated()` |
@@ -581,7 +603,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Missing | `FR-TRD-058` | The system shall expose a route/tenant-scoped order, position, fill, receipt, and authority projection with optimistic version. | `TradingProjection` | None | `TradingError`: invalid projection/version | **Usage:** `tests/trading/usage/test_usage_state.py::test_usage_projections_trading_projection()`<br>**Unit:** `tests/trading/unit/state/test_projections.py::test_projection_requires_scope_and_version()` |
 
 **Rules:** A required persistence failure blocks broker mutation; import creates no store.
-**Implementation notes:** Replace concrete JSONL engines with ports and Data-executed Trading migrations; preserve proven hashing, deduplication, versioning, and projection math.
+**Implementation notes:** Depend on injected store ports and Data-executed Trading migrations; do not build a custom JSONL persistence engine. Implement deterministic hashing, deduplication, optimistic versioning, and projection math.
 **Feature usage examples:** `tests/trading/usage/test_usage_state.py`
 
 ---
@@ -621,7 +643,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Missing | `FR-TRD-060` | The system shall expose a bounded passed/failed readiness result with failed check codes and evidence references. | `ReadinessAssessment` | None | `TradingError`: invalid assessment | **Usage:** `tests/trading/usage/test_usage_validation.py::test_usage_readiness_assessment()`<br>**Unit:** `tests/trading/unit/validation/test_readiness.py::test_readiness_assessment_is_bounded()` |
 
 **Rules:** Private focused validators implement individual rules; only the aggregate validator/readiness surface is public.
-**Implementation notes:** Reuse proven Decimal/geometry checks; remove silent defaults, hard-coded market heuristics, and stubbed dealing-mode behavior.
+**Implementation notes:** Implement Decimal/geometry checks; use no silent defaults, hard-coded market heuristics, or stubbed dealing-mode behavior.
 **Feature usage examples:** `tests/trading/usage/test_usage_validation.py`
 
 ---
@@ -654,10 +676,10 @@ This section is the implementation plan. Modules, files, and requirements are in
 |---|---|---|---|---|---|---|
 | Missing | `FR-TRD-029` | The system shall reject adapters lacking approved provider, API/schema, action, security, timeout, malformed-response, rate-limit, retry, and redaction declarations. | `validate_adapter_capability(intent: OrderIntent, capability: Mapping[str, JsonValue]) -> None` | None | `TradingError`: incompatible/unsafe adapter | **Usage:** `tests/trading/usage/test_usage_routing.py::test_usage_capabilities_validate()`<br>**Unit:** `tests/trading/unit/routing/test_capabilities.py::test_missing_security_contract_blocks()` |
 | Missing | `FR-TRD-030` | The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence. | `classify_authority_response(raw: JsonValue, capability: Mapping[str, JsonValue]) -> ExecutionReceipt` | None | `TradingError`: response cannot be safely represented | **Usage:** `tests/trading/usage/test_usage_routing.py::test_usage_responses_classify()`<br>**Unit:** `tests/trading/unit/routing/test_responses.py::test_malformed_success_is_unknown_outcome()` |
-| Missing | `FR-TRD-031` | The system shall dispatch exactly one approved intent to Simulation for sim or Brokers' `BrokerAdapter` mutation operations for paper/live. | `dispatch_order_intent(intent: OrderIntent, broker_adapter: BrokerAdapter \| None, simulation_dispatch: Callable[[OrderIntent], ExecutionReceipt] \| None) -> ExecutionReceipt` | Broker mutation or external Simulation mutation; persistence write | `TradingError`: authority unavailable, gate absent, pre-write failure, timeout, or unsafe response | **Usage:** `tests/trading/usage/test_usage_routing.py::test_usage_dispatcher_dispatch()`<br>**Unit:** `tests/trading/unit/routing/test_dispatcher.py::test_dispatch_has_single_mutation_boundary()` |
+| Missing | `FR-TRD-031` | The system shall dispatch exactly one approved intent to Simulation for sim or Brokers' `BrokerAdapter` mutation operations for paper/live. | `async dispatch_order_intent(intent: OrderIntent, broker_adapter: BrokerAdapter \| None, simulation_dispatch: Callable[[OrderIntent], Awaitable[ExecutionReceipt]] \| None) -> ExecutionReceipt` | Broker mutation or external Simulation mutation; persistence write | `TradingError`: authority unavailable, gate absent, pre-write failure, timeout, or unsafe response | **Usage:** `tests/trading/usage/test_usage_routing.py::test_usage_dispatcher_dispatch()`<br>**Unit:** `tests/trading/unit/routing/test_dispatcher.py::test_dispatch_has_single_mutation_boundary()` |
 
-**Rules:** No provider SDK import; paper and live share this path and differ only by the environment/credentials carried in the injected `BrokerConnectionConfig` whose credential references were resolved by UI/API composition.
-**Implementation notes:** Preserve the single current broker mutation boundary and response classification; replace broker resolver access with the injected Brokers `BrokerAdapter` (mutation traits) and add Simulation dispatch.
+**Rules:** No provider SDK import; paper and live share this path and differ only by the environment/credentials carried in the injected `BrokerConnectionConfig` whose credential references were resolved by UI/API composition. The dispatch path is `async`: both the Brokers `BrokerAdapter` mutation operations and the injected simulation callback are awaited. No synchronous bridge (e.g., `asyncio.run`) is permitted inside a live event loop.
+**Implementation notes:** Implement a single broker mutation boundary and response classification; obtain the broker via the injected Brokers `BrokerAdapter` (mutation traits) — no broker resolver access — and provide Simulation dispatch through an injected callable.
 **Feature usage examples:** `tests/trading/usage/test_usage_routing.py`
 
 ---
@@ -694,7 +716,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Missing | `FR-TRD-062` | The system shall expose the approved authority transition, retry decision, incident reference, and remaining unresolved scope. | `AuthorityResolution` | None | `TradingError`: invalid/unapproved transition | **Usage:** `tests/trading/usage/test_usage_reconciliation.py::test_usage_authority_resolution()`<br>**Unit:** `tests/trading/unit/reconciliation/test_authority.py::test_resolution_requires_approved_transition()` |
 
 **Rules:** Live/paper prefer broker truth; sim prefers Simulation truth; comparison alone never mutates broker/simulator state.
-**Implementation notes:** Reuse comparison and retry-guard foundations; replace premature `is_reconciled` success with an approved transition model.
+**Implementation notes:** Implement comparison and retry-guard logic; represent resolution with an approved transition model rather than a premature `is_reconciled` success flag.
 **Feature usage examples:** `tests/trading/usage/test_usage_reconciliation.py`
 
 ---
@@ -729,7 +751,7 @@ or any locally invented budget policy.
 | Missing | `FR-TRD-048` | The system shall publish redacted runtime evidence through an injected composition sink without importing Data or UI/API and without hiding delivery failure. | `emit_runtime_event(event: OperationalEvent, sink: Callable[[OperationalEvent], None]) -> None` | Event publication | `TradingError`: sink failure | **Usage:** `tests/trading/usage/test_usage_monitoring.py::test_usage_events_emit_runtime_event()`<br>**Unit:** `tests/trading/unit/monitoring/test_events.py::test_event_delivery_failure_is_incident()` |
 
 **Rules:** Snapshot caches and policy-setting counters are excluded; monitoring never changes execution authority.
-**Implementation notes:** Connect the useful current components to runtime through focused events; remove generic managers and unused cache breadth.
+**Implementation notes:** Emit runtime evidence through focused events only; add no generic managers and no snapshot-cache breadth.
 **Feature usage examples:** `tests/trading/usage/test_usage_monitoring.py`
 
 ---
@@ -764,13 +786,12 @@ secret/session providers.
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Missing | `FR-TRD-032` | The system shall use one stateful lifecycle object for admission, startup evidence, recovery lock, in-flight work, and shutdown. | `LiveSession` | Local state mutation | `TradingError`: invalid construction/evidence | **Usage:** `tests/trading/usage/test_usage_live.py::test_usage_session_live_session()`<br>**Unit:** `tests/trading/unit/live/test_session.py::test_session_starts_package_only()` |
-| Missing | `FR-TRD-033` | The system shall validate config/security, bind opaque Data authority, and complete startup reconciliation before enabling mutation. | `LiveSession.start(config: Mapping[str, JsonValue], evidence: Mapping[str, JsonValue]) -> StandardTradingEnvelope` | Read-only; local state mutation; persistence write | `TradingError`: invalid config, unsafe adapter, reconciliation failure | **Usage:** `tests/trading/usage/test_usage_live.py::test_usage_session_start()`<br>**Unit:** `tests/trading/unit/live/test_session.py::test_start_never_enables_before_reconciliation()` |
+| Missing | `FR-TRD-033` | The system shall validate config/security, bind opaque Data authority, and complete startup reconciliation before enabling mutation. | `async LiveSession.start(config: Mapping[str, JsonValue], evidence: Mapping[str, JsonValue]) -> StandardTradingEnvelope` | Read-only; local state mutation; persistence write | `TradingError`: invalid config, unsafe adapter, reconciliation failure | **Usage:** `tests/trading/usage/test_usage_live.py::test_usage_session_start()`<br>**Unit:** `tests/trading/unit/live/test_session.py::test_start_never_enables_before_reconciliation()` |
 | Missing | `FR-TRD-034` | The system shall return the actual session mode, admission, authority, health, reconciliation, and unresolved-work state. | `LiveSession.status() -> StandardTradingEnvelope` | Read-only | None | **Usage:** `tests/trading/usage/test_usage_live.py::test_usage_session_status()`<br>**Unit:** `tests/trading/unit/live/test_session.py::test_status_never_overstates_readiness()` |
-| Missing | `FR-TRD-035` | The system shall stop admission, drain/mark work, flush evidence, reconcile, and report every incomplete shutdown step. | `LiveSession.stop() -> StandardTradingEnvelope` | Local state mutation; persistence write | `TradingError`: shutdown dependency failure | **Usage:** `tests/trading/usage/test_usage_live.py::test_usage_session_stop()`<br>**Unit:** `tests/trading/unit/live/test_session.py::test_stop_reports_flush_and_reconciliation_failure()` |
-| Missing | `FR-TRD-036` | The system shall enforce the canonical mandatory gate order and prohibit passthrough Risk or caller-declared emergency authority. | `evaluate_live_gate(request: TradingRequest, evidence: Mapping[str, JsonValue]) -> StandardTradingEnvelope` | Read-only; persistence write; event publication | `TradingError`: first failed mandatory gate or audit-write failure | **Usage:** `tests/trading/usage/test_usage_live.py::test_usage_gates_evaluate_live_gate()`<br>**Unit:** `tests/trading/unit/live/test_gates.py::test_real_risk_decision_is_mandatory()` |
-
+| Missing | `FR-TRD-035` | The system shall stop admission, drain/mark work, flush evidence, reconcile, and report every incomplete shutdown step. | `async LiveSession.stop() -> StandardTradingEnvelope` | Local state mutation; persistence write | `TradingError`: shutdown dependency failure | **Usage:** `tests/trading/usage/test_usage_live.py::test_usage_session_stop()`<br>**Unit:** `tests/trading/unit/live/test_session.py::test_stop_reports_flush_and_reconciliation_failure()` |
+| Missing | `FR-TRD-036` | The system shall enforce the canonical mandatory gate order and prohibit passthrough Risk or caller-declared emergency authority. | `async evaluate_live_gate(request: TradingRequest, evidence: Mapping[str, JsonValue]) -> StandardTradingEnvelope` | Read-only; persistence write; event publication | `TradingError`: first failed mandatory gate or audit-write failure | **Usage:** `tests/trading/usage/test_usage_live.py::test_usage_gates_evaluate_live_gate()`<br>**Unit:** `tests/trading/unit/live/test_gates.py::test_real_risk_decision_is_mandatory()` |
 **Rules:** Every governed verdict is rechecked immediately before send; kill switch and unknown authority fail closed.
-**Implementation notes:** Consolidate current config/gates/runtime into this module; remove risk passthrough, internal promotion ownership, and duplicate policy creation.
+**Implementation notes:** Implement config/gates/runtime lifecycle in this module; include no risk passthrough, no internal promotion ownership, and no duplicate policy creation.
 **Feature usage examples:** `tests/trading/usage/test_usage_live.py`
 
 ---
@@ -785,11 +806,13 @@ secret/session providers.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `dependencies.py` | Hold injected store, Brokers `BrokerAdapter` (mutation traits), Simulation dispatcher, clock, and event sinks | `TradingDependencies` | **Standard library:** `collections.abc`, `dataclasses`<br>**Required third-party:** None<br>**Local:** contracts, state, routing, live; Brokers/Data/Simulation public contracts |
+| Missing | `dependencies.py` | Hold injected store, Brokers `BrokerAdapter` (mutation traits), Simulation dispatcher, clock, event sinks, the Data/Indicators/Strategy/Risk read ports used by the evaluation cycle, and the current Risk-state sources (`KillSwitchState`, `AllocationRiskDecision`, `StrategyOperationalEligibilityDecision`) used by rebalance execution | `TradingDependencies` | **Standard library:** `collections.abc`, `dataclasses`<br>**Required third-party:** None<br>**Local:** contracts, state, routing, live; Brokers/Data/Indicators/Strategy/Risk/Simulation public contracts |
 | Missing | `orders.py` | Submit, modify, and cancel route-aware orders | `submit_order`, `modify_order`, `cancel_order` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contracts, validation, state, routing, live |
 | Missing | `positions.py` | Close/modify positions and reduce approved exposure | `close_position`, `modify_position`, `reduce_exposure` | **Standard library:** `decimal`<br>**Required third-party:** None<br>**Local:** contracts, validation, state, routing, live |
 | Missing | `controls.py` | Pause/resume, synchronize, and trigger/clear scoped switches | `pause_strategy`, `resume_strategy`, `sync_positions`, `trigger_kill_switch`, `clear_kill_switch` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contracts, state, reconciliation, live; Risk public contracts |
 | Missing | `emergency.py` | Execute explicit gated mass cancellation/closure | `cancel_all_orders`, `close_all_positions` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contracts, state, routing, live |
+| Missing | `rebalance.py` | Validate and idempotently adapt an authorized `PortfolioRebalanceExecutionRequest` into ordinary order intents | `execute_portfolio_rebalance` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contracts, validation, state, routing, reconciliation, live, monitoring |
+| Missing | `runtime.py` | Drive one live/paper evaluation cycle strictly through public Data/Indicators/Strategy/Risk APIs | `run_live_evaluation_cycle` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** contracts, validation, routing, live, actions (`orders`); Data/Indicators/Strategy/Risk public contracts |
 | Missing | `__init__.py` | Expose canonical action API | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
 
 ### Configuration and Limits Manifest
@@ -802,23 +825,25 @@ emergency eligibility, and side-effect ceilings come from Risk-owned
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-TRD-013` | The system shall submit one validated Risk-approved order through the selected route. | `submit_order(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: validation, gate, authority, or response failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_orders_submit_order()`<br>**Unit:** `tests/trading/unit/actions/test_orders.py::test_submit_order_route_parity()` |
-| Missing | `FR-TRD-014` | The system shall modify only the approved identity/scope with optimistic version and caller idempotency. | `modify_order(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: stale version/scope/gate failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_orders_modify_order()`<br>**Unit:** `tests/trading/unit/actions/test_orders.py::test_modify_order_rejects_stale_version()` |
-| Missing | `FR-TRD-015` | The system shall cancel one pending order after normal gates. | `cancel_order(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: order/gate/authority failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_orders_cancel_order()`<br>**Unit:** `tests/trading/unit/actions/test_orders.py::test_cancel_order_is_idempotent()` |
-| Missing | `FR-TRD-016` | The system shall close a position fully or partially with correct netting/hedging identity. | `close_position(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: identity/volume/gate failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_positions_close_position()`<br>**Unit:** `tests/trading/unit/actions/test_positions.py::test_partial_close_preserves_position_identity()` |
-| Missing | `FR-TRD-017` | The system shall modify only approved stop-loss/take-profit scope. | `modify_position(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: stop geometry/scope/gate failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_positions_modify_position()`<br>**Unit:** `tests/trading/unit/actions/test_positions.py::test_modify_position_rejects_unapproved_field()` |
-| Missing | `FR-TRD-018` | The system shall reduce, never increase, exposure and execute exactly the Risk-approved reduction. | `reduce_exposure(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: increase/scope/gate failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_positions_reduce_exposure()`<br>**Unit:** `tests/trading/unit/actions/test_positions.py::test_reduce_exposure_cannot_increase()` |
-| Missing | `FR-TRD-019` | The system shall pause runtime admission without changing strategy lifecycle governance. | `pause_strategy(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Local state mutation; persistence write | `TradingError`: policy/approval failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_pause_strategy()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_pause_does_not_promote_strategy()` |
-| Missing | `FR-TRD-020` | The system shall resume only after a valid Risk-owned `ActionPolicyVerdict`, all applicable `global > portfolio > strategy > symbol` kill-switch scopes are inactive, and reconciliation is ready. | `resume_strategy(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Local state mutation; persistence write | `TradingError`: blocking state, invalid verdict, or reconciliation failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_resume_strategy()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_resume_requires_cleared_hierarchy_and_reconciliation()` |
-| Missing | `FR-TRD-025` | The system shall synchronize projections from route truth without mutating route orders or positions. | `sync_positions(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Read-only; persistence write | `TradingError`: source/persistence failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_sync_positions()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_sync_is_route_read_only()` |
-| Missing | `FR-TRD-021` | The system shall request a scoped Risk-owned kill-switch transition only with a compatible `ActionPolicyVerdict`; request text cannot create emergency authority. | `trigger_kill_switch(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Persistence write; event publication | `TradingError`: policy/approval/state failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_trigger_kill_switch()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_request_text_cannot_self_classify_emergency()` |
-| Missing | `FR-TRD-022` | The system shall clear a switch only through Risk-authorized clearance; an inactive child cannot override an active parent, and resume requires reconciliation readiness. | `clear_kill_switch(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Persistence write; event publication | `TradingError`: clearance/approval/hierarchy/readiness failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_clear_kill_switch()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_clear_cannot_override_active_parent()` |
-| Missing | `FR-TRD-023` | The system shall mass-cancel pending or otherwise cancellable orders through normal gates, return every child result, and never claim cancellation for uncertain or already-filled work. | `cancel_all_orders(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: gate/authority failure; partial/uncertain results retained | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_emergency_cancel_all()`<br>**Unit:** `tests/trading/unit/actions/test_emergency.py::test_cancel_all_preserves_uncertain_results()` |
-| Missing | `FR-TRD-050` | The system shall mass-close positions through normal gates and return every child result. | `close_all_positions(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: gate/authority failure; partial results retained | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_emergency_close_all()`<br>**Unit:** `tests/trading/unit/actions/test_emergency.py::test_close_all_reports_partial_completion()` |
-| Missing | `FR-TRD-056` | The system shall expose one immutable injected dependency container without resolving secrets or creating route/store dependencies at import time. | `TradingDependencies` | None | `TradingError`: required dependency missing or route-incompatible | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_dependencies_trading_dependencies()`<br>**Unit:** `tests/trading/unit/actions/test_dependencies.py::test_dependencies_have_no_import_side_effect()` |
+| Missing | `FR-TRD-013` | The system shall submit one validated Risk-approved order through the selected route. | `async submit_order(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: validation, gate, authority, or response failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_orders_submit_order()`<br>**Unit:** `tests/trading/unit/actions/test_orders.py::test_submit_order_route_parity()` |
+| Missing | `FR-TRD-014` | The system shall modify only the approved identity/scope with optimistic version and caller idempotency. | `async modify_order(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: stale version/scope/gate failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_orders_modify_order()`<br>**Unit:** `tests/trading/unit/actions/test_orders.py::test_modify_order_rejects_stale_version()` |
+| Missing | `FR-TRD-015` | The system shall cancel one pending order after normal gates. | `async cancel_order(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: order/gate/authority failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_orders_cancel_order()`<br>**Unit:** `tests/trading/unit/actions/test_orders.py::test_cancel_order_is_idempotent()` |
+| Missing | `FR-TRD-016` | The system shall close a position fully or partially with correct netting/hedging identity. | `async close_position(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: identity/volume/gate failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_positions_close_position()`<br>**Unit:** `tests/trading/unit/actions/test_positions.py::test_partial_close_preserves_position_identity()` |
+| Missing | `FR-TRD-017` | The system shall modify only approved stop-loss/take-profit scope. | `async modify_position(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: stop geometry/scope/gate failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_positions_modify_position()`<br>**Unit:** `tests/trading/unit/actions/test_positions.py::test_modify_position_rejects_unapproved_field()` |
+| Missing | `FR-TRD-018` | The system shall reduce, never increase, exposure and execute exactly the Risk-approved reduction. | `async reduce_exposure(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: increase/scope/gate failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_positions_reduce_exposure()`<br>**Unit:** `tests/trading/unit/actions/test_positions.py::test_reduce_exposure_cannot_increase()` |
+| Missing | `FR-TRD-019` | The system shall pause runtime admission without changing strategy lifecycle governance. | `async pause_strategy(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Local state mutation; persistence write | `TradingError`: policy/approval failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_pause_strategy()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_pause_does_not_promote_strategy()` |
+| Missing | `FR-TRD-020` | The system shall resume only after a valid Risk-owned `ActionPolicyVerdict`, all applicable `global > portfolio > strategy > symbol` kill-switch scopes are inactive, and reconciliation is ready. | `async resume_strategy(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Local state mutation; persistence write | `TradingError`: blocking state, invalid verdict, or reconciliation failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_resume_strategy()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_resume_requires_cleared_hierarchy_and_reconciliation()` |
+| Missing | `FR-TRD-025` | The system shall synchronize projections from route truth without mutating route orders or positions. | `async sync_positions(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Read-only; persistence write | `TradingError`: source/persistence failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_sync_positions()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_sync_is_route_read_only()` |
+| Missing | `FR-TRD-021` | The system shall request a scoped Risk-owned kill-switch transition only with a compatible `ActionPolicyVerdict`; request text cannot create emergency authority. | `async trigger_kill_switch(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Persistence write; event publication | `TradingError`: policy/approval/state failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_trigger_kill_switch()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_request_text_cannot_self_classify_emergency()` |
+| Missing | `FR-TRD-022` | The system shall clear a switch only through Risk-authorized clearance; an inactive child cannot override an active parent, and resume requires reconciliation readiness. | `async clear_kill_switch(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | Persistence write; event publication | `TradingError`: clearance/approval/hierarchy/readiness failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_controls_clear_kill_switch()`<br>**Unit:** `tests/trading/unit/actions/test_controls.py::test_clear_cannot_override_active_parent()` |
+| Missing | `FR-TRD-023` | The system shall mass-cancel pending or otherwise cancellable orders through normal gates, return every child result, and never claim cancellation for uncertain or already-filled work. | `async cancel_all_orders(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: gate/authority failure; partial/uncertain results retained | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_emergency_cancel_all()`<br>**Unit:** `tests/trading/unit/actions/test_emergency.py::test_cancel_all_preserves_uncertain_results()` |
+| Missing | `FR-TRD-050` | The system shall mass-close positions through normal gates and return every child result. | `async close_all_positions(request: TradingRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: gate/authority failure; partial results retained | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_emergency_close_all()`<br>**Unit:** `tests/trading/unit/actions/test_emergency.py::test_close_all_reports_partial_completion()` |
+| Missing | `FR-TRD-056` | The system shall expose one immutable injected dependency container — carrying the store, Brokers `BrokerAdapter` (mutation traits), Simulation dispatcher, clock, event sinks, the Data/Indicators/Strategy/Risk read ports for the evaluation cycle, and the current Risk-state sources (`KillSwitchState`, `AllocationRiskDecision`, `StrategyOperationalEligibilityDecision`) for rebalance — without resolving secrets or creating route/store dependencies at import time. | `TradingDependencies` | None | `TradingError`: required dependency missing or route-incompatible | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_dependencies_trading_dependencies()`<br>**Unit:** `tests/trading/unit/actions/test_dependencies.py::test_dependencies_have_no_import_side_effect()` |
+| Missing | `FR-TRD-064` | The system shall validate the receiver-owned `PortfolioRebalanceExecutionRequest` (hash, approval token, route, target version), revalidate eligibility, `AllocationRiskDecision`, kill switch, and idempotency, and adapt each approved action into ordinary Risk-approved order intents through the existing order/reconciliation path; it never recalculates target weights and keeps over-budget correction reduce-only unless Risk authorizes an increase. | `async execute_portfolio_rebalance(request: PortfolioRebalanceExecutionRequest, deps: TradingDependencies) -> StandardTradingEnvelope` | External Simulation mutation or broker mutation; persistence write | `TradingError`: invalid authorization/version/hash, gate failure, or weight-recalculation attempt | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_rebalance_execute_portfolio_rebalance()`<br>**Unit:** `tests/trading/unit/actions/test_rebalance.py::test_rebalance_cannot_open_to_match_weight()` |
+| Missing | `FR-TRD-065` | The system shall drive one live/paper evaluation cycle strictly through public domain APIs: request `MarketDataset` + `AccountStateSnapshot` from Data, `IndicatorSeries` from Indicators, invoke Strategy for a `TradeIntent`, and — when a non-neutral `TradeIntent` is produced — submit it to Risk and pass any approved `RiskDecision` into the existing validate/gate/dispatch path. A neutral signal returns a normal no-mutation `StandardTradingEnvelope` (no-action) and ends the cycle. Trading never computes indicators, generates signals, or sizes/approves. | `async run_live_evaluation_cycle(deps: TradingDependencies, evidence: Mapping[str, JsonValue]) -> StandardTradingEnvelope` | Read-only cross-domain reads; persistence write; broker/simulation mutation via the dispatch path | `TradingError`: upstream unavailable/stale, or gate/authority failure | **Usage:** `tests/trading/usage/test_usage_actions.py::test_usage_runtime_run_live_evaluation_cycle()`<br>**Unit:** `tests/trading/unit/actions/test_runtime.py::test_cycle_never_generates_or_sizes_signals()` |
 
-**Rules:** Neutral signals never call actions; action functions do not size, approve, promote, or translate signals.
-**Implementation notes:** Refactor current fragmented verbs into the canonical family; retain validated position addressing and partial-completion behavior.
+**Rules:** Neutral signals never call actions; action functions do not size, approve, promote, or translate signals. Every mutation-capable verb (`FR-TRD-013`–`FR-TRD-018`, `FR-TRD-021`–`FR-TRD-023`, `FR-TRD-050`) is `async` and awaits the dispatch path; `pause_strategy`/`resume_strategy`/`sync_positions` are `async` where they touch route authority or persistence. No synchronous broker bridge is permitted.
+**Implementation notes:** Implement one canonical verb family; include validated position addressing and explicit partial-completion behavior.
 **Feature usage examples:** `tests/trading/usage/test_usage_actions.py`
 
 ---
@@ -847,7 +872,7 @@ No feature-specific setting. Report schema version follows `TRADING_CONTRACT_VER
 | Missing | `FR-TRD-049` | The system shall package receipts, factual costs, readiness, reconciliation, incidents, warnings, and unresolved actions without calculating performance/TCA. | `build_trading_report(request: TradingRequest, store: TradingStateStore) -> StandardTradingEnvelope` | Read-only | `TradingError`: missing/inconsistent evidence | **Usage:** `tests/trading/usage/test_usage_reporting.py::test_usage_evidence_build_trading_report()`<br>**Unit:** `tests/trading/unit/reporting/test_evidence.py::test_report_does_not_compute_analytics_metrics()` |
 
 **Rules:** Missing evidence is explicit; externally caused events retain attribution metadata.
-**Implementation notes:** Reuse current evidence packaging, remove metric aggregation, and connect it to official stored contracts.
+**Implementation notes:** Package evidence from official stored contracts only; compute no Analytics/TCA metric aggregation.
 **Feature usage examples:** `tests/trading/usage/test_usage_reporting.py`
 
 ---
@@ -897,7 +922,7 @@ No feature-specific setting. Report schema version follows `TRADING_CONTRACT_VER
 | `CAP-TRD-015` | Modify | `actions/controls.py`, `actions/emergency.py` |
 | `CAP-TRD-016` | Merge | `state/events.py`, `state/stores.py`, `state/migrations.py` |
 | `CAP-TRD-017` | Modify | `monitoring/events.py` |
-| `CAP-TRD-018` | Add | Enforce registered Risk-owned portfolio budget decisions during authorized Portfolio rebalance execution |
+| `CAP-TRD-018` | Add | `actions/rebalance.py` (`FR-TRD-063`, `FR-TRD-064`) with `monitoring/budgets.py` (`FR-TRD-047`) — enforce registered Risk-owned portfolio budget decisions during authorized Portfolio rebalance execution |
 | `CAP-TRD-019` | Modify | `reporting/evidence.py` |
 | `CAP-TRD-022` | Remove | No raw signal translator; upstream supplies the canonical request |
 | `CAP-TRD-023` | Merge | `routing/responses.py`; external rate verdicts, no local policy engine |
@@ -934,7 +959,12 @@ uv run pytest tests/trading/unit
 uv run pytest tests/trading/integration
 uv run pytest tests/trading/usage
 
-uv run pytest tests/trading --cov=app/services/trading --cov-fail-under=80
+# Domain-scoped coverage gate. `-o addopts=""` clears the global
+# `--cov=app --cov-fail-under=80` that pyproject.toml injects, so the
+# percentage reflects Trading only. (The unit/integration/usage sub-runs above
+# also need `-o addopts=""` whenever a Trading-only figure is required.)
+uv run pytest tests/trading -o addopts="" \
+  --cov=app/services/trading --cov-report=term-missing --cov-fail-under=80
 ```
 
 ### Required test levels
@@ -995,4 +1025,6 @@ These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`
 | `P-TRD-007` | `app/services/trading/live/` | 1 | `live` module + its `FR-TRD-*` behavior (§4) |
 | `P-TRD-008` | `app/services/trading/actions/` | 1 | `actions` module + its `FR-TRD-*` behavior (§4) |
 | `P-TRD-009` | `app/services/trading/reporting/` | 1 | `reporting` module + its `FR-TRD-*` behavior (§4) |
-| `P-TRD-006` | `app/services/trading/monitoring/` | 11 | `monitoring` module + its `FR-TRD-*` behavior (§4) |
+| `P-TRD-006` | `app/services/trading/monitoring/` | 1 | `monitoring` minimal seam (`OperationalEvent`, `emit_runtime_event`, `BudgetGate` — `FR-TRD-046`, `FR-TRD-047`, `FR-TRD-048`) + its `FR-TRD-*` behavior (§4) |
+
+> **Monitoring phase note:** `monitoring` is a Phase 1 seam because the module dependency diagram (§2) routes `monitoring → live` and `monitoring → reporting`, and `live/session.py` and `reporting/evidence.py` declare `monitoring` as a local dependency. Only the *extended* monitoring breadth (additional event categories and cost analytics beyond the minimal seam above) is deferred to a later delivery phase; it is deepened behind the Phase 1 seam and never blocks `live/` or `reporting/`.
