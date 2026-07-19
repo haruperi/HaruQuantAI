@@ -15,7 +15,10 @@
 
 Research provides a sandboxed, leakage-gated environment for exploring research-ready market data and evaluating hypotheses. It produces reproducible, versioned, advisory-only evidence—including prepared datasets, edge studies, market-structure profiles, unsupervised insights, scorecards, snapshots, and `ResearchReport v1` artifacts—without authorizing or mutating live trading, strategy, or risk state.
 
-Research consumes trusted `MarketDataset v1` inputs from Data and public `PerformanceReport v1` metric evidence from Analytics. Data/provider acquisition, cross-domain scheduling, database infrastructure, and strategy registration remain outside this package.
+Research consumes trusted `MarketDataset v1` inputs from Data, pure indicator
+evidence through the Indicators package root, and public `PerformanceReport v1`
+evidence from Analytics. Data/provider acquisition, cross-domain scheduling,
+database infrastructure, and strategy registration remain outside this package.
 
 ### Owns
 
@@ -36,7 +39,10 @@ Research consumes trusted `MarketDataset v1` inputs from Data and public `Perfor
 ### Does not own
 
 - Market-data or external-feed acquisition, provider connections, caching, or provider retries; Data owns production provider contracts.
-- Generic indicator formulas or Analytics ratios; Research consumes documented public contracts and does not re-export them.
+- Generic indicator formulas or Analytics ratios; Research imports SMA, EMA, ATR,
+  Bollinger Bands, RSI, and ADR only from the Indicators package root and consumes
+  Analytics only through `PerformanceReport v1`. Research does not re-export or
+  deep-import either owning domain.
 - Backtest or optimization orchestration.
 - Strategy registration, promotion, runtime state, or production signal execution.
 - Risk policy, position sizing, exposure limits, approval, or kill-switch state.
@@ -175,7 +181,8 @@ flowchart TD
     PRO --> PRO2[snapshot.py]
     PRO --> PRO3[rendering.py]
     PRO --> PRO4[workflow.py]
-    ART --> ART1[persistence.py]
+    ART --> ART1[migrations.py]
+    ART --> ART2[persistence.py]
 ```
 
 ---
@@ -531,6 +538,52 @@ sequenceDiagram
 
 This section is the implementation plan. Statuses reflect V1 audit evidence, not intention. `Partial` means reusable V1 behavior exists but the final structure/contracts/tests are not complete.
 
+### Owner-resolved implementation policy
+
+The following policy is authoritative for every Section 4 requirement. Public
+boundaries map third-party and Data failures to shared Utils errors with redacted
+symbolic details:
+
+| Error class | Approved Research codes |
+|---|---|
+| `ConfigurationError` | `RES_CONFIGURATION_INVALID`, `RES_STAGE_DEPENDENCY_INVALID` |
+| `ValidationError` | `RES_INPUT_INVALID`, `RES_INSUFFICIENT_DATA`, `RES_NONFINITE_DATA`, `RES_RESOURCE_LIMIT_EXCEEDED`, `RES_VERSION_INCOMPATIBLE`, `RES_MODEL_FIT_FAILED` |
+| `SecurityError` | `RES_PERMISSION_DENIED`, `RES_LEAKAGE_DETECTED`, `RES_ARTIFACT_PATH_REJECTED`, `RES_SENSITIVE_OUTPUT_REJECTED` |
+| `HaruQuantError` | `RES_ARTIFACT_CONFLICT`, `RES_ARTIFACT_TOO_LARGE`, `RES_ARTIFACT_ATOMICITY_UNAVAILABLE`, `RES_ARTIFACT_WRITE_FAILED`, `RES_AUDIT_PERSISTENCE_FAILED` |
+
+Exact hard bounds are 500,000 rows, 600 seconds per heavy operation, 50 MiB per
+serialized artifact, 1–10,000 resampling/null iterations, 1–128 calibration
+candidates, at most 32 distinct quality windows, and at most 100 reports in one
+multi-symbol rendering. ADR uses 14 bars. Hurst requires at least 20 finite
+observations. K-Means uses 2–64 clusters; PCA components may not exceed
+`min(feature_count, usable_rows - 1)`; modeling requires at least
+`max(20, 10 * clusters, 2 * pca_components)` usable rows. A supplied memory budget
+is enforced against measured frame memory before heavy work.
+
+Study mappings are closed schemas and reject unknown keys. Mean reversion uses a
+rolling close-price z-score with explicit lookback, entry threshold, side, and hold
+horizon. Trend persistence compares an explicit lookback log-return direction with
+an explicit forward horizon/minimum move. Session studies group forward returns
+under `SessionConfig`. Benjamini–Hochberg covers every successfully evaluated
+hypothesis. `confirmed` requires the minimum sample, a directionally correct 95%
+confidence interval excluding zero, adjusted p-value at or below `q`, and observed
+evidence beyond the matched directional null quantile. A directionally opposite
+interval excluding zero is `contradicted`; all other evidence is `inconclusive`.
+
+Market-structure validation horizons are positive integer bars. Confirmed pivots
+become available only after their confirmation window. The canonical score is
+`100 * (0.60 * Kaufman efficiency ratio + 0.40 * directional persistence)`;
+scores at least 65 are `trending`, scores at most 35 are `ranging`, and others are
+`mixed`. Calibration receives an explicit candidate grid and ranks ascending Brier
+error, descending validation sample, then canonical configuration hash.
+
+The scorecard measures evidence quality, never trading merit. Input quality,
+leakage safety, statistical confirmation, out-of-sample validation, and
+reproducibility each contribute 0, 10, or 20 points. Readiness is `BLOCKED` for a
+fatal data issue, high-severity leakage, or incompatible version; `REVIEW_READY`
+requires at least 80 points and nonzero evidence in every row; otherwise it is
+`INSUFFICIENT_EVIDENCE`. Trading-readiness language is prohibited.
+
 ### 4.1 `contracts/` — Versioned Contracts and Configuration
 
 **Purpose:** Define immutable configuration, result, warning, resource, and API-classification contracts shared by Research modules.
@@ -541,7 +594,7 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `configurations.py` | Define immutable, validated Research configuration contracts without hidden data-changing defaults. | `ResearchResourceLimits`, `CleaningConfig`, `EnrichmentConfig`, `FeatureConfig`, `StatisticalConfig`, `StudyConfig`, `SessionConfig`, `MarketStructureConfig`, `UnsupervisedResearchConfig`, `ArtifactWriteConfig`, `EdgeLabConfig` | **Standard library:** dataclasses, datetime, pathlib, typing<br>**Required third-party:** None<br>**Local:** app.utils.errors → pending canonical configuration error |
+| Missing | `configurations.py` | Define immutable, validated Research configuration contracts without hidden data-changing defaults. | `ResearchResourceLimits`, `CleaningConfig`, `EnrichmentConfig`, `FeatureConfig`, `StatisticalConfig`, `StudyConfig`, `SessionConfig`, `MarketStructureConfig`, `UnsupervisedResearchConfig`, `ArtifactWriteConfig`, `EdgeLabConfig` | **Standard library:** dataclasses, datetime, pathlib, typing<br>**Required third-party:** None<br>**Local:** approved shared Utils errors in the owner-resolved policy above |
 | Missing | `results.py` | Define versioned immutable Research results and the owned `ResearchReport v1` contract. | `PreparedDataset`, `DataQualityReport`, `LeakageReport`, `TimeSplitResult`, `CoreMetricProfile`, `EdgeResult`, `MarketStructureProfile`, `MarketStructureQualityReport`, `UnsupervisedResearchResult`, `ResearchScorecard`, `ResearchProfileSnapshot`, `ResearchWarning`, `ResearchReport`, `ArtifactReference` | **Standard library:** dataclasses, datetime, pathlib, typing<br>**Required third-party:** pandas<br>**Local:** configurations.py → configuration types; app.services.data public API → `MarketDataset` reference |
 | Missing | `api.py` | Define the explicit unique classification map used by the package lazy facade. | `PUBLIC_API_CLASSIFICATIONS` | **Standard library:** types, typing<br>**Required third-party:** None<br>**Local:** None |
 | Missing | `__init__.py` | Expose the approved public contract API. | All key exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** configurations.py, results.py, api.py → listed exports |
@@ -692,12 +745,15 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 | Missing | `FR-RES-035` | Compute one canonical horizon-aligned forward return in log or simple mode and mark it research-only. | `forward_returns(close: Series, *, horizon: int, mode: Literal["log", "simple"], output_label: str) -> Series` | Read-only | invalid horizon/mode/label | **Usage:** `test_usage_features.py::test_usage_calculations_forward_returns`<br>**Unit:** `test_calculations.py::test_forward_returns_never_used_as_feature` |
 | Missing | `FR-RES-036` | Compute forward maximum favorable excursion for declared side/horizon with trailing unavailability explicit. | `forward_max_favorable_excursion(data: DataFrame, *, horizon: int, side: Literal["buy", "sell"]) -> Series` | Read-only | invalid side/horizon/OHLC | **Usage:** `test_usage_features.py::test_usage_calculations_forward_mfe`<br>**Unit:** `test_calculations.py::test_forward_mfe_buy_sell_direction` |
 | Missing | `FR-RES-037` | Compute forward maximum adverse excursion for declared side/horizon with trailing unavailability explicit. | `forward_max_adverse_excursion(data: DataFrame, *, horizon: int, side: Literal["buy", "sell"]) -> Series` | Read-only | invalid side/horizon/OHLC | **Usage:** `test_usage_features.py::test_usage_calculations_forward_mae`<br>**Unit:** `test_calculations.py::test_forward_mae_buy_sell_direction` |
-| Missing | `FR-RES-038` | Build a new feature frame with declared lineage, warm-up/NaN behavior, shared indicator inputs, research-only forward columns, and no input mutation. | `build_research_feature_frame(prepared: PreparedDataset, *, config: FeatureConfig, limits: ResearchResourceLimits) -> tuple[DataFrame, Mapping[str, JSONValue]]` | Read-only | invalid feature/shared dependency/resource | **Usage:** `test_usage_features.py::test_usage_frame_build_research_feature_frame`<br>**Unit:** `test_frame.py::test_feature_frame_records_lineage_and_forward_columns` |
+| Missing | `FR-RES-038` | Build a new feature frame with declared lineage, warm-up/NaN behavior, caller-supplied public `IndicatorResult v1` inputs, research-only forward columns, and no input mutation. | `build_research_feature_frame(prepared: PreparedDataset, *, indicator_results: Mapping[str, IndicatorResult], config: FeatureConfig, limits: ResearchResourceLimits) -> tuple[DataFrame, Mapping[str, JSONValue]]` | Read-only | invalid feature/shared dependency/resource | **Usage:** `test_usage_features.py::test_usage_frame_build_research_feature_frame`<br>**Unit:** `test_feature_frame.py::test_feature_frame_records_lineage_and_forward_columns` |
 
 **Implementation notes:**
 
 - Reuse V1 return/Hurst/forward logic after validating parity.
-- Shared SMA, EMA, ATR, Bollinger, RSI, and equivalent generic formulas are dependencies, not Research exports.
+- Shared SMA, EMA, ATR, Bollinger, RSI, and equivalent generic formulas are
+  caller-supplied `IndicatorResult v1` values created through the Indicators package
+  root. This preserves the original `MarketDataset` checksum and prevents Research
+  from reconstructing or duplicating indicator formulas.
 - Incremental feature computation is excluded.
 
 ### Feature usage examples
@@ -733,9 +789,9 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-039` | Inspect feature metadata, names, targets, horizons, and declarations and return evidence/severity/recommendation without claiming proof of no leakage. | `validate_no_lookahead_features(data: DataFrame, *, feature_metadata: Mapping[str, JSONValue], target_column: str \| None, allowed_forward_columns: tuple[str,...] = ) -> LeakageReport` | Read-only | malformed metadata/missing field | **Usage:** `test_usage_leakage.py::test_usage_validation_validate_no_lookahead`<br>**Unit:** `test_validation.py::test_leakage_report_detects_forward_target` |
+| Missing | `FR-RES-039` | Inspect feature metadata, names, targets, horizons, and declarations and return evidence/severity/recommendation without claiming proof of no leakage. | `validate_no_lookahead_features(data: DataFrame, *, feature_metadata: Mapping[str, JSONValue], target_column: str \| None, allowed_forward_columns: tuple[str,...] = ()) -> LeakageReport` | Read-only | `ValidationError(RES_INPUT_INVALID)` | **Usage:** `test_usage_leakage.py::test_usage_validation_validate_no_lookahead`<br>**Unit:** `test_leakage_validation.py::test_leakage_report_detects_forward_target` |
 | Missing | `FR-RES-040` | Split chronologically into non-overlapping train/validation/test frames with deterministic boundaries and split hash. | `enforce_time_split(data: DataFrame, *, train_fraction: float, validation_fraction: float, gap_rows: int = 0) -> TimeSplitResult` | Read-only | invalid fractions/gap/insufficient rows | **Usage:** `test_usage_leakage.py::test_usage_splitting_enforce_time_split`<br>**Unit:** `test_splitting.py::test_time_split_is_chronological_and_gapped` |
-| Missing | `FR-RES-041` | Recursively mask sensitive, broker/account, and forbidden forward fields before sharing or serialization without mutating input. | `mask_research_artifact(artifact: JSONValue, *, extra_sensitive_keys: frozenset[str] = frozenset) -> JSONValue` | Read-only | unsupported/non-serializable structure | **Usage:** `test_usage_leakage.py::test_usage_masking_mask_research_artifact`<br>**Unit:** `test_masking.py::test_masking_covers_nested_sensitive_fields` |
+| Missing | `FR-RES-041` | Recursively mask sensitive, broker/account, and forbidden forward fields before sharing or serialization without mutating input. | `mask_research_artifact(artifact: JSONValue, *, extra_sensitive_keys: frozenset[str] = frozenset()) -> JSONValue` | Read-only | `SecurityError(RES_SENSITIVE_OUTPUT_REJECTED)` | **Usage:** `test_usage_leakage.py::test_usage_masking_mask_research_artifact`<br>**Unit:** `test_leakage_masking.py::test_masking_covers_nested_sensitive_fields` |
 
 ### Feature usage examples
 
@@ -774,7 +830,7 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 | Missing | `FR-RES-045` | Construct an isolated registry from a bounded calculator iterable. | `MetricRegistry.from_calculators(calculators: Iterable[MetricCalculator]) -> MetricRegistry` | Local state mutation | duplicate/empty/invalid calculators | **Usage:** `test_usage_metrics.py::test_usage_registry_from_calculators`<br>**Unit:** `test_registry.py::test_from_calculators_is_isolated` |
 | Missing | `FR-RES-046` | Resolve a calculator by exact family name. | `MetricRegistry.resolve(family: str) -> MetricCalculator` | Read-only | family not found | **Usage:** `test_usage_metrics.py::test_usage_registry_resolve`<br>**Unit:** `test_registry.py::test_resolve_missing_family` |
 | Missing | `FR-RES-047` | Return calculators in deterministic registration order without exposing mutable storage. | `MetricRegistry.all() -> tuple[MetricCalculator, ...]` | Read-only | None | **Usage:** `test_usage_metrics.py::test_usage_registry_all()`<br>**Unit:** `test_registry.py::test_all_is_immutable_and_ordered()` |
-| Missing | `FR-RES-048` | Build a new default registry containing the seven retained metric families. | `build_default_registry -> MetricRegistry` | Local state mutation | internal registration failure | **Usage:** `test_usage_metrics.py::test_usage_registry_build_default`<br>**Unit:** `test_registry.py::test_default_registry_has_seven_families` |
+| Missing | `FR-RES-048` | Build a new default registry containing the seven retained metric families. | `build_default_registry() -> MetricRegistry` | Local state mutation | `ValidationError(RES_INPUT_INVALID)` | **Usage:** `test_usage_metrics.py::test_usage_registry_build_default`<br>**Unit:** `test_metric_registry.py::test_default_registry_has_seven_families` |
 | Missing | `FR-RES-049` | Build a deterministic profile with units, samples, undefined reasons, hashes, warnings, and duration from a prepared dataset. | `build_core_metric_profile(prepared: PreparedDataset, *, registry: MetricRegistry \| None = None, limits: ResearchResourceLimits) -> CoreMetricProfile` | Read-only | invalid data/dependency/resource | **Usage:** `test_usage_metrics.py::test_usage_profile_build_core_metric_profile`<br>**Unit:** `test_profile.py::test_profile_contains_units_hashes_and_warnings` |
 
 **Implementation notes:**
@@ -898,7 +954,7 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
 | Missing | `session timezone/windows/precedence` | `SessionConfig` | UTC windows; `london > new_york > tokyo > sydney` | Yes | All module symbols | One authority across enrichment, session studies, heatmaps, and summaries. |
-| Missing | `adr_period` | `int` | V1 behavior retained pending contract validation | Yes | `run_seasonality()` | Positive window; too-short data produces documented insufficiency. |
+| Missing | `adr_period` | `int` | `14` | Yes | `run_seasonality()` | Positive window; too-short data produces documented insufficiency. |
 
 #### Functional requirements
 
@@ -938,8 +994,8 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `validation_horizon` | `int / timedelta` | bars by timeframe | Yes | Validation/calibration | Defines realized truth; no heuristic default is allowed. |
-| Missing | `max_calibration_candidates` | `int` | bounded; advisory per the applicable Research specification | Yes | `calibrate_market_structure` | Hard candidate bound; excess rejected before evaluation. |
+| Missing | `validation_horizon` | `int` | explicit positive bars | Yes | Validation/calibration | Defines realized truth; no heuristic default is allowed. |
+| Missing | `max_calibration_candidates` | `int` | `128` hard maximum | Yes | `calibrate_market_structure` | Candidate grids are caller-supplied; excess is rejected before evaluation. |
 | Missing | `enable_quality` | `bool` | `False` | No | `evaluate_market_structure_quality()` | Stability/robustness are explicitly opt-in due cost. |
 
 #### Functional requirements
@@ -1073,6 +1129,7 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Missing | `persistence.py` | Perform the single approved Research persistence side effect. | `write_research_artifact` | **Standard library:** hashlib, os, pathlib, tempfile, typing<br>**Required third-party:** None<br>**Local:** contracts; leakage.masking; profiles.rendering; Utils `AuthContext`/`AuditEvent`/security; Data migration/connection public API through Data's documented migration and connection API |
+| Missing | `migrations.py` | Define the immutable Research-owned artifact metadata migration for Data's shared executor. | `build_research_migration_request` | **Standard library:** hashlib<br>**Required third-party:** None<br>**Local:** Data `MigrationRequest`/`MigrationStep` contracts |
 | Missing | `__init__.py` | Expose the supported artifact API. | `write_research_artifact` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** persistence.py → `write_research_artifact` |
 
 ### Configuration and Limits Manifest
@@ -1089,6 +1146,7 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Missing | `FR-RES-097` | Mask and render an approved artifact, enforce allowed root/overwrite/encoding/size/atomic policy, write via temporary replacement, emit a redacted audit event, and return `ArtifactReference`. | `write_research_artifact(artifact: ResearchReport \| ResearchProfileSnapshot, destination: Path, *, config: ArtifactWriteConfig, auth: AuthContext, limits: ResearchResourceLimits) -> ArtifactReference` | Persistence write; event publication | invalid path, traversal, conflict, permission, serialization, size, atomicity, audit failure | **Usage:** `test_usage_artifacts.py::test_usage_persistence_write_research_artifact`<br>**Unit:** `test_persistence.py::test_write_artifact_masks_and_replaces_atomically` |
+| Missing | `FR-RES-098` | Return the deterministic Research-owned `001_research_artifacts_v1` metadata migration for execution through Data's migration framework. | `build_research_migration_request(request_id: str) -> MigrationRequest` | None | `ConfigurationError(RES_CONFIGURATION_INVALID)` | **Usage:** `test_usage_artifacts.py::test_usage_artifact_migration_request`<br>**Unit:** `test_artifact_migrations.py::test_research_migration_is_stable_and_owned` |
 
 **Rules:**
 
@@ -1128,7 +1186,9 @@ Shared settings are consumed from `docs/PROJECT.md` and not redefined: `ENVIRONM
 
 ## 6. Open Decisions
 
-No open decisions.
+No open decisions. The error taxonomy, dependency boundaries, statistical policy,
+market-structure score, scorecard readiness, resource ceilings, artifact migration,
+and persistence policy are resolved in the owner-resolved implementation policy.
 
 ## Explicit Exclusions
 
@@ -1161,7 +1221,7 @@ uv run pytest tests/research/unit
 uv run pytest tests/research/integration
 uv run pytest tests/research/usage
 
-uv run pytest tests/research --cov=app/services/research --cov-fail-under=80
+uv run pytest tests/research --cov=app.services.research --cov-branch --cov-fail-under=80
 ```
 
 Only targeted Research tests are run during iterative development. The full repository suite is reserved for final integration verification.

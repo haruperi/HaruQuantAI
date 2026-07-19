@@ -26,6 +26,7 @@ dependencies = [
     "pytest-mock>=3.15.1",
     "python-binance>=1.0.37",
     "ruff>=0.15.18",
+    "scikit-learn==1.9.0",
     "service-identity>=24.2.0",
     "uvicorn>=0.30.0",
     "yfinance>=1.4.1",
@@ -141,6 +142,7 @@ ignore = [
 "*_test.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
 "conftest.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
 "tests/*/usage/**/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001"]
+"tests/research/**/*.py" = ["INP001"]
 "app/services/data/**/*.py" = ["DOC201", "DOC501"]
 "app/utils/logging/__init__.py" = ["A005"]
 "app/utils/time/__init__.py" = ["A005"]
