@@ -1,0 +1,12 @@
+{
+  "metric_key": "sample_adequacy",
+  "fixture_case": "adequate_statistical_sample",
+  "expected_status": "calculated",
+  "expected_value": {
+    "observed_count": 30,
+    "required_count": 30,
+    "adequate": true,
+    "alpha": 0.05
+  },
+  "absolute_tolerance": 1e-9
+}

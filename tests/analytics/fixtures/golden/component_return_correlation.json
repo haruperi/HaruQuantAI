@@ -1,0 +1,7 @@
+{
+  "metric_key": "component_return_correlation",
+  "fixture_case": "portfolio_simulation_result",
+  "expected_status": "calculated",
+  "expected_value": -0.10669387452001605,
+  "absolute_tolerance": 1e-9
+}

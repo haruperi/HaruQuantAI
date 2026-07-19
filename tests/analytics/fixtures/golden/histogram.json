@@ -1,0 +1,7 @@
+{
+  "metric_key": "histogram",
+  "fixture_case": "canonical_ledger",
+  "expected_status": "skipped",
+  "expected_value": null,
+  "absolute_tolerance": 1e-9
+}

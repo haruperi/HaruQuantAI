@@ -1,0 +1,7 @@
+{
+  "metric_key": "capital_concentration_hhi",
+  "fixture_case": "portfolio_simulation_result",
+  "expected_status": "calculated",
+  "expected_value": 0.5,
+  "absolute_tolerance": 1e-9
+}

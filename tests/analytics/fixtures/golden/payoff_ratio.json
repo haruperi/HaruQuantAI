@@ -1,0 +1,7 @@
+{
+  "metric_key": "payoff_ratio",
+  "fixture_case": "canonical_ledger",
+  "expected_status": "undefined",
+  "expected_value": null,
+  "absolute_tolerance": 1e-9
+}

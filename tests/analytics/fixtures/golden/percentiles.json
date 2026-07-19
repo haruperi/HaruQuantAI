@@ -1,0 +1,17 @@
+{
+  "metric_key": "percentiles",
+  "fixture_case": "canonical_ledger",
+  "expected_status": "calculated",
+  "expected_value": {
+    "p01": 9,
+    "p05": 9,
+    "p10": 9,
+    "p25": 9,
+    "p50": 9,
+    "p75": 9,
+    "p90": 9,
+    "p95": 9,
+    "p99": 9
+  },
+  "absolute_tolerance": 1e-9
+}

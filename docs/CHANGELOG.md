@@ -20,13 +20,33 @@ This document is only for adding high-level changes, decisions, or status update
 - Trading is a completed implementation baseline across all 66 active functional and
   eight non-functional requirements, nine capability modules, and all fourteen
   documented workflows; production live mutation remains disabled by default.
-- Analytics is specification-complete and `Missing` (not yet implemented). A
-  pre-build readiness audit on 2026-07-19 opened seven owner decisions; five are
-  resolved and written into the specification. The two remaining are scoped and
-  non-blocking: `D-ANLT-004` (the `PortfolioSimulationResult` leg of `WF-ANLT-013`)
-  and `D-ANLT-007` (whether to lift the `scorecards/` exclusion).
+- Simulation is specification-complete and `Missing` (not yet implemented). A
+  pre-build readiness audit on 2026-07-19 found ten blockers, all now closed. Its
+  build depends on Data's additive tick-generation feature landing first.
+- Data remains a completed implementation baseline, now including real-evidence
+  tick-series generation (`FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016`). Its quality
+  gates must be run on the Windows toolchain; the feature has not yet been executed.
+- Analytics is a completed implementation baseline across contracts, ledger
+  adaptation, 60 cataloged metrics, reporting/allocation evidence, bounded dashboards,
+  package exports, all active requirements, and all non-excluded workflows.
 
 ### Added
+
+- **2026-07-19 — Analytics domain completed.** Implemented all active Analytics
+  features and workflows, exact Simulation fixture parity, value-bearing metric
+  goldens, and the Section 7 gate at 124 passing tests with 84.44% domain coverage.
+
+- **2026-07-19 — Simulator build blockers resolved (owner-approved).** Simulator
+  request, validation, accounting, matching, lifecycle, dependency, artifact,
+  fast-research, export, workflow-test, and observational-performance contracts
+  are exact; official execution has no implicit model, calendar, clock,
+  liquidity, cost, or global-engine default.
+
+- **2026-07-19 — Analytics implementation reached the allocation seam.** Built
+  contracts, producer-neutral ledger adaptation, all metric kernels and golden
+  fixture paths, hashing, serialization, comparison, portfolio aggregation, and a
+  partial report builder; stopped before allocation rather than inventing missing
+  dependence/concentration inputs or metric definitions.
 
 - **2026-07-19 — Trading kill-switch freshness and root-port conformance fixed.**
   Added a required `kill_switch` bound to `MAX_STALENESS_SECONDS` so inactive but
@@ -139,7 +159,84 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Decisions
 
+- **2026-07-19 — Portfolio simulation seam frozen.** Simulation `FR-SIM-033` now
+  owns exact aligned `component_return_series` evidence in
+  `PortfolioSimulationResult v1`, enabling Analytics correlation/concentration
+  projection and closing `D-ANLT-004`.
+
 - **2026-07-19 — Trading review decisions ratified.** Bulk paper/live emergency actions use Option A per-child `RiskDecisionPackage` injection; Broker dispatch receives an injected clock and validated operation timeout; Trading usage evidence is exposed through numbered standalone scripts. Runtime retention, concurrency, and per-evidence staleness bounds remain required and fail closed, while the Broker operation timeout keeps the ratified ten-second default.
+
+- **2026-07-19 — Data tick-series generation implemented.** Added
+  `processing/ticks.py` with `generate_tick_series` and
+  `generate_tick_series_to_parquet`, four models (`real`, `trading_bar`, `ohlc_m1`,
+  `generated`), three spread models, `Decimal` quantization at the contract boundary,
+  and output-aware Parquet chunking. Wired through `processing/__init__`,
+  `public_api/operations`, and the package root. `FR-DATA-087`–`FR-DATA-090` and
+  `WF-DATA-016` are `Completed`.
+
+- **2026-07-19 — `TickRecord` extended additively.** Added optional
+  `source_bar_time`, `tick_index_in_bar`, and `bar_phase`, all defaulting to `None`.
+  Per `docs/PROJECT.md` §5 this is an additive change requiring no version bump;
+  provider-sourced ticks and every existing consumer are unaffected. The fields carry
+  intra-bar position evidence that bar-derived ticks need and that the canonical
+  record previously could not express under `extra="forbid"`.
+
+- **2026-07-19 — Data usage-example paths corrected.** Thirteen `FR-DATA-*` rows cited
+  `tests/data/usage/05_processing.py`; the processing examples live in
+  `03_processing.py` and `05_feeds.py` is the feeds file. Pre-existing defect fixed in
+  the same pass.
+
+- **2026-07-19 — Tick-series generation assigned to Data, superseding a prior
+  exclusion.** `app/services/data/README.md` previously stated "Do not retain
+  `TicksGenerator` or any trading-bar/M1/real backtest model in Data." The owner
+  reversed that: deriving ticks from real evidence is a deterministic
+  `MarketDataset → MarketDataset` transform belonging beside resampling, alignment,
+  and aggregation. Added `FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016`, `CAP-DATA-022`,
+  and `processing/ticks.py` with four models (`real`, `trading_bar`, `ohlc_m1`,
+  `generated`) and three spread models (`native`, `fixed`, `variable`). Prices come
+  from real OHLC bounds or real quotes and tick counts from real `tick_volume`; only
+  the intra-bar path shape is constructed, deterministically. Simulation consumes the
+  result and derives no ticks of its own.
+
+- **2026-07-19 — Real-evidence tick generation separated from GBM synthesis.**
+  `generate_synthetic_dataset` (`FR-DATA-039`) fabricates prices from a random walk
+  and is now explicitly fixtures-and-tests only; it must never reach an official
+  Simulation run, and the boundary is enforced by test. The two capabilities shared
+  the word "synthetic" while differing on whether the data is real, which was a latent
+  path to a legitimate-looking backtest on invented prices.
+
+- **2026-07-19 — Strategy concepts removed from tick generation.** The V1
+  `TicksGenerator` merged `entry_signal`, `exit_signal`, `pending_signal`, `sl`, and
+  `tp` onto ticks. Data owns no trading decision logic, and the target Simulation is
+  event-driven — it calls Strategy per tick through its public boundary — so signal
+  pre-joining is obsolete rather than merely misplaced. No Data tick record carries a
+  signal, order, position, stop-loss, or take-profit field.
+
+- **2026-07-19 — Simulation specification completed.** Closed all ten blockers from
+  the pre-build audit. Added `errors.py` with `SimulationError` and the closed
+  `SIM_ERROR_CATALOG` (`FR-SIM-035`–`037`), replacing an unenumerated taxonomy that 24
+  requirements already raised. Added the `SimulationStateStore` port and Simulation-owned
+  migrations (`FR-SIM-041`), replacing a dependency on Data persistence internals that
+  Data does not export. Added `dispatch_sim_order` (`FR-SIM-038`) matching the async
+  `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]` port Trading already injects;
+  `SimTrader.submit_order` now returns `ExecutionReceipt` rather than an untyped
+  mapping. Added the portfolio backtest path (`FR-SIM-032`–`034`) for two registered
+  contracts that previously had no requirement, file, or function. Split `FR-SIM-010`
+  into `validate_fx_evidence` and `convert_fx_amount` (`FR-SIM-039`). Corrected the
+  `WF-SIM-003` diagram, which routed Optimization through the non-canonical research
+  path, and the `WF-SIM-001` diagram, which mislabelled two requirements. Removed
+  eleven references to a V1 implementation the owner had deliberately deleted,
+  including an instruction not to delete files that no longer existed.
+
+- **2026-07-19 — `SimulationResult v1` publishes the closed-trade ledger.**
+  `FR-SIM-040` defines `ClosedTradeRecord` with the seventeen fields of Analytics
+  `FR-ANLT-049`, and `FR-SIM-024` carries both `fills` (execution events) and
+  `closed_trades` (paired round-trips), plus `initial_balance` and `account_currency`.
+  `FR-SIM-020` now requires per-open-position excursion tracking so `mae` and `mfe`
+  are observed during execution rather than reconstructed afterwards. This freezes the
+  seam for the parallel Analytics build and closes `D-ANLT-003`.
+
+- **2026-07-19 — Simulation/Analytics seams and activation inputs fixed.** `FR-SIM-024` publishes the exact Analytics-owned 17-field closed-trade projection, `FR-SIM-033` owns the complete `PortfolioSimulationResult v1` schema, `FR-ANLT-051` supplies explicit bounded runtime/statistical/risk-free inputs, Simulation and Analytics may build concurrently with `reports/allocation.py` last, and the former `D-ANLT-007` is resolved by retaining the initial scorecard exclusion.
 
 - **2026-07-19 — Analytics canonical input fixed as the closed-trade ledger.** The
   owner resolved `D-ANLT-001`, `D-ANLT-002`, and `D-ANLT-003`. `FR-ANLT-049`

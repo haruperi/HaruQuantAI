@@ -1,0 +1,35 @@
+{
+  "contract_version": "v1",
+  "schema_id": "simulation.result.v1",
+  "source_id": "run-analytics-fixture-001",
+  "phase": "backtest",
+  "window_start": "2026-07-18T08:00:00Z",
+  "window_end": "2026-07-19T08:00:00Z",
+  "strategy_id": "strategy-fixture-001",
+  "strategy_version": "v1",
+  "symbols": ["EURUSD"],
+  "timeframe": "M1",
+  "closed_trades": [
+    {
+      "ticket": "ticket-001",
+      "symbol": "EURUSD",
+      "type": "BUY",
+      "volume": "1.00",
+      "entry_time": "2026-07-18T08:00:00Z",
+      "entry_price": "1.10000",
+      "stop_loss": "1.09500",
+      "take_profit": "1.11000",
+      "exit_time": "2026-07-18T12:00:00Z",
+      "exit_price": "1.10800",
+      "comment": "take-profit",
+      "commission": "-1.00",
+      "swap": "0.00",
+      "profit": "80.00",
+      "magic": "strategy-fixture-001",
+      "mae": "-15.00",
+      "mfe": "90.00"
+    }
+  ],
+  "quality_metadata": {"canonical": true},
+  "source_metadata": {"engine_version": "fixture-v1"}
+}

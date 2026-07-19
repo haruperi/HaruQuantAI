@@ -1,0 +1,7 @@
+{
+  "metric_key": "benchmark_correlation",
+  "fixture_case": "zero_variance",
+  "expected_status": "undefined",
+  "expected_value": null,
+  "absolute_tolerance": 1e-9
+}

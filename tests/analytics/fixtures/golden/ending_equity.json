@@ -1,0 +1,7 @@
+{
+  "metric_key": "ending_equity",
+  "fixture_case": "canonical_ledger",
+  "expected_status": "calculated",
+  "expected_value": "1009",
+  "absolute_tolerance": 1e-9
+}

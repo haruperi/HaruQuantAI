@@ -1,0 +1,7 @@
+{
+  "metric_key": "trade_efficiency",
+  "fixture_case": "canonical_ledger",
+  "expected_status": "calculated",
+  "expected_value": 0.8333333333333334,
+  "absolute_tolerance": 1e-9
+}

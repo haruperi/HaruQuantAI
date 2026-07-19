@@ -1,0 +1,10 @@
+{
+  "metric_key": "bootstrap_confidence_interval",
+  "fixture_case": "adequate_statistical_sample",
+  "expected_status": "calculated",
+  "expected_value": [
+    3.3225,
+    6.915833333333334
+  ],
+  "absolute_tolerance": 1e-9
+}

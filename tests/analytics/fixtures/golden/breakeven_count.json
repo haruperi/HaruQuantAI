@@ -1,0 +1,7 @@
+{
+  "metric_key": "breakeven_count",
+  "fixture_case": "canonical_ledger",
+  "expected_status": "calculated",
+  "expected_value": 0,
+  "absolute_tolerance": 1e-9
+}

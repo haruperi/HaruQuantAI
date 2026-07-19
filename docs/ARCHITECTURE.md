@@ -66,12 +66,13 @@
 * Later agile phases reuse these completed domains and run compatibility/regression
   checks; they do not rebuild them. Current semantic-docstring/format cleanup is a
   separate repository-quality gate.
-* `app/services/simulator/` and `app/services/analytics/` contain only their READMEs
-  and empty package roots. Simulation is the next full-domain build; Analytics follows
-  it, per the dependency order in `docs/PROJECT.md` §3. The Analytics specification is
-  complete: its canonical input is a closed-trade ledger from which the equity curve is
-  derived deterministically, its metric and evidence catalogs are approved, and two
-  scoped non-blocking decisions remain in its README §6.
+* `app/services/analytics/` is a completed implementation baseline across contracts,
+  producer-neutral ledger adaptation, 60 cataloged metrics, report/allocation evidence,
+  bounded dashboards, all active requirements, and all non-excluded workflows.
+  Simulation imports no Analytics code; until Simulation publishes executable
+  `PortfolioSimulationResult v1`, Analytics verifies `FR-SIM-033` through the exact
+  README-backed producer fixture. Analytics derives its equity curve deterministically
+  from the closed-trade ledger and has no open decisions.
 
 ---
 
@@ -191,6 +192,7 @@ Portfolio collaboration is contract-governed:
 - Portfolio owns `PortfolioConstructionRequest/Result v1`, `ActivePortfolioAllocation v1`, and `PortfolioRebalancePlan v1`.
 - Risk owns `AllocationReviewRequest`, `AllocationRiskDecision`, `AllocationBudgetActivationRequest`, and the authoritative risk-budget projection.
 - Simulation owns `PortfolioBacktestRequestV1` / `PortfolioSimulationResult v1`; Analytics owns `PortfolioAllocationEvidence v1`; Data owns `FXConversionEvidence v1`.
+- Simulation composes its historical loop through a typed receiver-owned dependency bundle. Its state store is constructed before its journal writer; one injected `SimTrader` instance supplies the asynchronous Trading sim-route callable. Canonical manifests hash `journal.jsonl`, `result.json`, and `report.md` and exclude the `manifest.json` envelope itself, preventing self-referential hashes.
 - Trading owns `PortfolioRebalanceExecutionRequest v1` and remains the only route to broker mutations.
 - Risk and Simulation requests carry self-contained receiver-owned projections using
   scalar values, ordered components, identifiers, versions, references, and hashes;

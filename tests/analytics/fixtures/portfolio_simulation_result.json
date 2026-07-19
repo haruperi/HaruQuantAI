@@ -1,0 +1,295 @@
+{
+  "contract_version": "v1",
+  "schema_id": "simulation.portfolio_result.v1",
+  "result_id": "portfolio-simulation-result-001",
+  "run_id": "portfolio-simulation-run-001",
+  "request_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "config_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "data_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "result_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "engine_version": "simulation-v1",
+  "status": "completed",
+  "portfolio_id": "portfolio-001",
+  "construction_result_id": "construction-result-001",
+  "construction_version": "v1",
+  "measurement_start": "2026-07-19T08:00:00Z",
+  "measurement_end": "2026-07-20T08:00:00Z",
+  "base_currency": "USD",
+  "component_results": [
+    {
+      "component_id": "component-1",
+      "simulation_result_id": "simulation-result-1",
+      "journal_ref": "journal-1",
+      "metrics_ref": "metrics-1",
+      "account_currency": "USD",
+      "reconciled": true
+    },
+    {
+      "component_id": "component-2",
+      "simulation_result_id": "simulation-result-2",
+      "journal_ref": "journal-2",
+      "metrics_ref": "metrics-2",
+      "account_currency": "USD",
+      "reconciled": true
+    }
+  ],
+  "component_return_series": [
+    {
+      "component_id": "component-1",
+      "simulation_result_id": "simulation-result-1",
+      "observations": [
+        {
+          "timestamp": "2026-07-19T08:00:00Z",
+          "return_value": -0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:01:00Z",
+          "return_value": -0.002
+        },
+        {
+          "timestamp": "2026-07-19T08:02:00Z",
+          "return_value": -0.001
+        },
+        {
+          "timestamp": "2026-07-19T08:03:00Z",
+          "return_value": 0
+        },
+        {
+          "timestamp": "2026-07-19T08:04:00Z",
+          "return_value": 0.001
+        },
+        {
+          "timestamp": "2026-07-19T08:05:00Z",
+          "return_value": 0.002
+        },
+        {
+          "timestamp": "2026-07-19T08:06:00Z",
+          "return_value": 0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:07:00Z",
+          "return_value": -0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:08:00Z",
+          "return_value": -0.002
+        },
+        {
+          "timestamp": "2026-07-19T08:09:00Z",
+          "return_value": -0.001
+        },
+        {
+          "timestamp": "2026-07-19T08:10:00Z",
+          "return_value": 0
+        },
+        {
+          "timestamp": "2026-07-19T08:11:00Z",
+          "return_value": 0.001
+        },
+        {
+          "timestamp": "2026-07-19T08:12:00Z",
+          "return_value": 0.002
+        },
+        {
+          "timestamp": "2026-07-19T08:13:00Z",
+          "return_value": 0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:14:00Z",
+          "return_value": -0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:15:00Z",
+          "return_value": -0.002
+        },
+        {
+          "timestamp": "2026-07-19T08:16:00Z",
+          "return_value": -0.001
+        },
+        {
+          "timestamp": "2026-07-19T08:17:00Z",
+          "return_value": 0
+        },
+        {
+          "timestamp": "2026-07-19T08:18:00Z",
+          "return_value": 0.001
+        },
+        {
+          "timestamp": "2026-07-19T08:19:00Z",
+          "return_value": 0.002
+        },
+        {
+          "timestamp": "2026-07-19T08:20:00Z",
+          "return_value": 0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:21:00Z",
+          "return_value": -0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:22:00Z",
+          "return_value": -0.002
+        },
+        {
+          "timestamp": "2026-07-19T08:23:00Z",
+          "return_value": -0.001
+        },
+        {
+          "timestamp": "2026-07-19T08:24:00Z",
+          "return_value": 0
+        },
+        {
+          "timestamp": "2026-07-19T08:25:00Z",
+          "return_value": 0.001
+        },
+        {
+          "timestamp": "2026-07-19T08:26:00Z",
+          "return_value": 0.002
+        },
+        {
+          "timestamp": "2026-07-19T08:27:00Z",
+          "return_value": 0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:28:00Z",
+          "return_value": -0.003
+        },
+        {
+          "timestamp": "2026-07-19T08:29:00Z",
+          "return_value": -0.002
+        }
+      ]
+    },
+    {
+      "component_id": "component-2",
+      "simulation_result_id": "simulation-result-2",
+      "observations": [
+        {
+          "timestamp": "2026-07-19T08:00:00Z",
+          "return_value": -0.004166666666666667
+        },
+        {
+          "timestamp": "2026-07-19T08:01:00Z",
+          "return_value": -0.0016666666666666668
+        },
+        {
+          "timestamp": "2026-07-19T08:02:00Z",
+          "return_value": 0.0008333333333333334
+        },
+        {
+          "timestamp": "2026-07-19T08:03:00Z",
+          "return_value": 0.0033333333333333335
+        },
+        {
+          "timestamp": "2026-07-19T08:04:00Z",
+          "return_value": -0.0033333333333333335
+        },
+        {
+          "timestamp": "2026-07-19T08:05:00Z",
+          "return_value": -0.0008333333333333334
+        },
+        {
+          "timestamp": "2026-07-19T08:06:00Z",
+          "return_value": 0.0016666666666666668
+        },
+        {
+          "timestamp": "2026-07-19T08:07:00Z",
+          "return_value": 0.004166666666666667
+        },
+        {
+          "timestamp": "2026-07-19T08:08:00Z",
+          "return_value": -0.0025
+        },
+        {
+          "timestamp": "2026-07-19T08:09:00Z",
+          "return_value": 0
+        },
+        {
+          "timestamp": "2026-07-19T08:10:00Z",
+          "return_value": 0.0025
+        },
+        {
+          "timestamp": "2026-07-19T08:11:00Z",
+          "return_value": -0.004166666666666667
+        },
+        {
+          "timestamp": "2026-07-19T08:12:00Z",
+          "return_value": -0.0016666666666666668
+        },
+        {
+          "timestamp": "2026-07-19T08:13:00Z",
+          "return_value": 0.0008333333333333334
+        },
+        {
+          "timestamp": "2026-07-19T08:14:00Z",
+          "return_value": 0.0033333333333333335
+        },
+        {
+          "timestamp": "2026-07-19T08:15:00Z",
+          "return_value": -0.0033333333333333335
+        },
+        {
+          "timestamp": "2026-07-19T08:16:00Z",
+          "return_value": -0.0008333333333333334
+        },
+        {
+          "timestamp": "2026-07-19T08:17:00Z",
+          "return_value": 0.0016666666666666668
+        },
+        {
+          "timestamp": "2026-07-19T08:18:00Z",
+          "return_value": 0.004166666666666667
+        },
+        {
+          "timestamp": "2026-07-19T08:19:00Z",
+          "return_value": -0.0025
+        },
+        {
+          "timestamp": "2026-07-19T08:20:00Z",
+          "return_value": 0
+        },
+        {
+          "timestamp": "2026-07-19T08:21:00Z",
+          "return_value": 0.0025
+        },
+        {
+          "timestamp": "2026-07-19T08:22:00Z",
+          "return_value": -0.004166666666666667
+        },
+        {
+          "timestamp": "2026-07-19T08:23:00Z",
+          "return_value": -0.0016666666666666668
+        },
+        {
+          "timestamp": "2026-07-19T08:24:00Z",
+          "return_value": 0.0008333333333333334
+        },
+        {
+          "timestamp": "2026-07-19T08:25:00Z",
+          "return_value": 0.0033333333333333335
+        },
+        {
+          "timestamp": "2026-07-19T08:26:00Z",
+          "return_value": -0.0033333333333333335
+        },
+        {
+          "timestamp": "2026-07-19T08:27:00Z",
+          "return_value": -0.0008333333333333334
+        },
+        {
+          "timestamp": "2026-07-19T08:28:00Z",
+          "return_value": 0.0016666666666666668
+        },
+        {
+          "timestamp": "2026-07-19T08:29:00Z",
+          "return_value": 0.004166666666666667
+        }
+      ]
+    }
+  ],
+  "aggregate_journal_ref": "aggregate-journal-001",
+  "aggregate_metrics_ref": "aggregate-metrics-001",
+  "risk_budget_history": [],
+  "fx_evidence_ids": [],
+  "artifact_manifest": {}
+}

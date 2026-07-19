@@ -1,0 +1,7 @@
+{
+  "metric_key": "multiple_comparison_adjustment",
+  "fixture_case": "adequate_statistical_sample",
+  "expected_status": "calculated",
+  "expected_value": 0.09090909090909091,
+  "absolute_tolerance": 1e-9
+}

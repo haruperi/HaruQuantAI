@@ -1,0 +1,7 @@
+{
+  "metric_key": "gross_pnl_before_costs",
+  "fixture_case": "canonical_ledger",
+  "expected_status": "calculated",
+  "expected_value": "10",
+  "absolute_tolerance": 1e-9
+}
