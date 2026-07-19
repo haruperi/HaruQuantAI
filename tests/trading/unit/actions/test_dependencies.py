@@ -22,6 +22,7 @@ from app.services.trading.actions import TradingDependencies
 from app.services.trading.contracts import (
     ExecutionReceipt,
     OrderIntent,
+    PortfolioRebalanceExecutionRequest,
     TradingError,
     TradingRequest,
     TradingRoute,
@@ -31,6 +32,7 @@ from app.services.trading.state import (
     TradingEvent,
     TradingProjection,
 )
+from app.utils import logger
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 DATA_REQUEST_ID = "req-" + "a" * 64
@@ -258,6 +260,40 @@ async def simulation_dispatch(intent: OrderIntent) -> ExecutionReceipt:
     )
 
 
+def rebalance_action_resolver(
+    parent: PortfolioRebalanceExecutionRequest,
+    action: dict[str, object],
+) -> TradingRequest:
+    """Resolve one Portfolio exposure reduction into a governed order request.
+
+    Args:
+        parent: Authorized immutable Portfolio plan request.
+        action: One validated high-level exposure reduction.
+
+    Returns:
+        Trading-owned fully specified reduce-exposure request.
+    """
+    logger.debug("Resolving a Portfolio exposure reduction in Trading")
+    action_id = str(action["action_id"])
+    return request(
+        request_id=action_id,
+        workflow_id=parent.workflow_id,
+        correlation_id=parent.correlation_id,
+        causation_id=parent.request_id,
+        route=parent.route,
+        action="reduce_exposure",
+        portfolio_id=parent.portfolio_id,
+        side="SELL",
+        quantity=Decimal("0.50"),
+        target_broker_position_id="position-001",
+        position_id="position-001",
+        expected_version=1,
+        allocation_decision_id=parent.allocation_decision_id,
+        eligibility_decision_id=str(action["eligibility_decision_id"]),
+        idempotency_key=f"{parent.plan_id}:{action_id}",
+    )
+
+
 def dependencies(
     *,
     store: MemoryStore | None = None,
@@ -297,6 +333,7 @@ def dependencies(
         allocation_decision_source=lambda item: None,
         budget_verdict_source=lambda item: None,
         eligibility_source=lambda item: (),
+        rebalance_action_resolver=rebalance_action_resolver,
         kill_switch_transition=transition,
         reconciliation_source=cast("object", lambda item: None),
         market_data_source=unavailable,

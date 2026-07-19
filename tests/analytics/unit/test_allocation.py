@@ -2,15 +2,18 @@
 
 # ruff: noqa: INP001
 
+from dataclasses import replace
 from decimal import Decimal
 
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.allocation import (
     build_portfolio_allocation_evidence,
+    build_portfolio_rebalance_measurement,
 )
 from app.utils import logger
 from tests.analytics.usage.test_usage_reports import (
+    _measurement_request,
     _portfolio_simulation_result,
     _report,
 )
@@ -78,3 +81,20 @@ def test_allocation_evidence_rejects_malformed_producer_hash() -> None:
             config=config,
             portfolio_simulation_result=portfolio_result,
         )
+
+
+def test_rebalance_measurement_is_deterministic_and_hash_bound() -> None:
+    """The same immutable Trading facts produce exactly the same evidence."""
+    logger.debug("Testing deterministic Analytics rebalance measurement")
+    request = _measurement_request()
+    first = build_portfolio_rebalance_measurement(request)
+    second = build_portfolio_rebalance_measurement(request)
+    assert first == second
+    assert first.trading_execution_hash == request.trading_execution_hash
+
+
+def test_rebalance_measurement_rejects_tampered_execution_hash() -> None:
+    """A digest that does not match Trading facts blocks measurement."""
+    logger.debug("Testing Analytics rebalance measurement tamper detection")
+    with pytest.raises(ValueError, match="hash does not match"):
+        replace(_measurement_request(), trading_execution_hash="b" * 64)

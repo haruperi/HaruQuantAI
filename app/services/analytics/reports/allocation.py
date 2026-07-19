@@ -15,6 +15,8 @@ from app.services.analytics.contracts.models import (
     MetricEvidence,
     PerformanceReport,
     PortfolioAllocationEvidence,
+    PortfolioRebalanceMeasurementEvidence,
+    PortfolioRebalanceMeasurementRequest,
     SectionEvidence,
 )
 from app.services.analytics.reports.portfolio import (
@@ -556,4 +558,92 @@ def build_portfolio_allocation_evidence(
     return evidence
 
 
-__all__ = ["build_portfolio_allocation_evidence"]
+def build_portfolio_rebalance_measurement(
+    request: PortfolioRebalanceMeasurementRequest,
+) -> PortfolioRebalanceMeasurementEvidence:
+    """Build deterministic post-trade evidence from immutable Trading facts.
+
+    Args:
+        request: Validated receiver-owned measurement request.
+
+    Returns:
+        Deterministic non-binding measurement evidence.
+
+    Raises:
+        AnalyticsValidationError: If validated facts cannot be projected.
+    """
+    logger.info("Building deterministic Portfolio rebalance measurement")
+    data = request.trading_facts.get("data")
+    if not isinstance(data, Mapping):
+        raise AnalyticsValidationError("Trading measurement data is unavailable")
+    outcomes = data.get("outcomes")
+    if not isinstance(outcomes, Sequence) or isinstance(outcomes, (str, bytes)):
+        raise AnalyticsValidationError("Trading action outcomes are unavailable")
+    measurements: list[Mapping[str, object]] = []
+    for outcome in outcomes:
+        if not isinstance(outcome, Mapping):
+            raise AnalyticsValidationError("Trading action outcome is unavailable")
+        measurements.append(
+            {
+                "action_id": str(outcome["action_id"]),
+                "status": str(outcome["status"]),
+            }
+        )
+    action_measurements = tuple(measurements)
+    summary: Mapping[str, object] = {
+        "execution_status": "success",
+        "action_count": len(action_measurements),
+        "successful_action_count": len(action_measurements),
+    }
+    material = {
+        "contract_version": "v1",
+        "schema_id": "analytics.portfolio_rebalance_measurement_evidence.v1",
+        "evidence_id": f"{request.request_id}:evidence",
+        "request_id": request.request_id,
+        "workflow_id": request.workflow_id,
+        "correlation_id": request.correlation_id,
+        "portfolio_id": request.portfolio_id,
+        "allocation_version": request.allocation_version,
+        "plan_id": request.plan_id,
+        "plan_version": request.plan_version,
+        "plan_hash": request.plan_hash,
+        "trading_request_id": request.trading_request_id,
+        "trading_execution_ref": request.trading_execution_ref,
+        "trading_execution_hash": request.trading_execution_hash,
+        "action_measurements": action_measurements,
+        "summary": summary,
+        "measured_at": request.requested_at,
+        "non_binding": True,
+    }
+    canonical_hash = hashlib.sha256(
+        canonical_json(material).encode("utf-8")
+    ).hexdigest()
+    evidence = PortfolioRebalanceMeasurementEvidence(
+        contract_version="v1",
+        schema_id="analytics.portfolio_rebalance_measurement_evidence.v1",
+        evidence_id=f"{request.request_id}:evidence",
+        request_id=request.request_id,
+        workflow_id=request.workflow_id,
+        correlation_id=request.correlation_id,
+        portfolio_id=request.portfolio_id,
+        allocation_version=request.allocation_version,
+        plan_id=request.plan_id,
+        plan_version=request.plan_version,
+        plan_hash=request.plan_hash,
+        trading_request_id=request.trading_request_id,
+        trading_execution_ref=request.trading_execution_ref,
+        trading_execution_hash=request.trading_execution_hash,
+        action_measurements=action_measurements,
+        summary=summary,
+        measured_at=request.requested_at,
+        canonical_hash=canonical_hash,
+        non_binding=True,
+    )
+    logger.info("Completed deterministic Portfolio rebalance measurement")
+    return evidence
+
+
+__all__ = [
+    "build_portfolio_allocation_evidence",
+    "build_portfolio_rebalance_measurement",
+]

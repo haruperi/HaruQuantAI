@@ -60,6 +60,10 @@ type RebalanceEligibilitySource = Callable[
     [PortfolioRebalanceExecutionRequest],
     Sequence[StrategyOperationalEligibilityDecision],
 ]
+type RebalanceActionResolver = Callable[
+    [PortfolioRebalanceExecutionRequest, Mapping[str, JsonValue]],
+    TradingRequest,
+]
 type KillSwitchTransition = Callable[
     [KillSwitchCommand, ActionPolicyVerdict], Awaitable[KillSwitchState]
 ]
@@ -105,6 +109,7 @@ class TradingDependencies:
         allocation_decision_source: Current Risk allocation reader.
         budget_verdict_source: Current plan-bound Risk budget reader.
         eligibility_source: Current Risk strategy-eligibility reader.
+        rebalance_action_resolver: Trading-owned exposure-to-order resolver.
         kill_switch_transition: Risk-owned switch transition port.
         reconciliation_source: Read-only route-authority snapshot port.
         market_data_source: Data market-dataset evaluation port.
@@ -133,6 +138,7 @@ class TradingDependencies:
     allocation_decision_source: RebalanceAllocationSource
     budget_verdict_source: RebalanceBudgetSource
     eligibility_source: RebalanceEligibilitySource
+    rebalance_action_resolver: RebalanceActionResolver
     kill_switch_transition: KillSwitchTransition
     reconciliation_source: ReconciliationSource
     market_data_source: MarketDataSource
@@ -160,6 +166,7 @@ class TradingDependencies:
             self.allocation_decision_source,
             self.budget_verdict_source,
             self.eligibility_source,
+            self.rebalance_action_resolver,
             self.kill_switch_transition,
             self.reconciliation_source,
             self.market_data_source,

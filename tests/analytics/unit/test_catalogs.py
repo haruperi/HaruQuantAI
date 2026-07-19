@@ -31,9 +31,13 @@ def test_package_root_exports_only_approved_domain_symbols() -> None:
         "DashboardPayload",
         "PerformanceReport",
         "PortfolioAllocationEvidence",
+        "PortfolioRebalanceMeasurementEvidence",
+        "PortfolioRebalanceMeasurementRequest",
         "RiskFreeRateEvidence",
         "StatisticalValidationConfig",
         "build_performance_report",
+        "build_portfolio_allocation_evidence",
+        "build_portfolio_rebalance_measurement",
     )
 
 

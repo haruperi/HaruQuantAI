@@ -5,22 +5,25 @@ from __future__ import annotations
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from hashlib import sha256
 
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.contracts import (
     AnalyticsRunConfig,
     PerformanceReport,
+    PortfolioRebalanceMeasurementRequest,
     RiskFreeRateEvidence,
 )
 from app.services.analytics.reports.allocation import (
     build_portfolio_allocation_evidence,
+    build_portfolio_rebalance_measurement,
 )
 from app.services.analytics.reports.builder import build_performance_report
 from app.services.analytics.reports.comparison import compare_performance_reports
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
 from app.services.analytics.reports.portfolio import build_portfolio_performance_report
 from app.services.analytics.reports.serialization import serialize_report
-from app.utils import derive_stable_id, logger
+from app.utils import canonical_json, derive_stable_id, logger
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 
@@ -248,3 +251,54 @@ def test_usage_allocation_build_evidence() -> None:
     )
     assert evidence.non_binding is True
     assert evidence.dependence_evidence.status == "completed"
+
+
+def _measurement_request() -> PortfolioRebalanceMeasurementRequest:
+    """Build one hash-bound request from redacted successful Trading facts.
+
+    Returns:
+        Valid deterministic measurement request.
+    """
+    logger.debug("Building Analytics rebalance measurement usage request")
+    facts: dict[str, object] = {
+        "status": "success",
+        "data": {
+            "plan_id": "plan-001",
+            "outcomes": ({"action_id": "action-001", "status": "success", "data": {}},),
+        },
+        "errors": (),
+        "warnings": (),
+        "audit_metadata": {
+            "operation": "execute_portfolio_rebalance",
+            "request_id": "trading-request-001",
+            "correlation_id": "correlation-001",
+            "redaction_applied": True,
+        },
+    }
+    return PortfolioRebalanceMeasurementRequest(
+        contract_version="v1",
+        schema_id="analytics.portfolio_rebalance_measurement_request.v1",
+        request_id="analytics-request-001",
+        workflow_id="workflow-001",
+        correlation_id="correlation-001",
+        portfolio_id="portfolio-001",
+        allocation_version="allocation-v1",
+        plan_id="plan-001",
+        plan_version="v1",
+        plan_hash="a" * 64,
+        trading_request_id="trading-request-001",
+        trading_execution_ref="trading-execution-001",
+        trading_execution_hash=sha256(
+            canonical_json(facts).encode("utf-8")
+        ).hexdigest(),
+        trading_facts=facts,
+        requested_at=datetime(2026, 7, 19, 9, 0, tzinfo=UTC),
+    )
+
+
+def test_usage_allocation_build_rebalance_measurement() -> None:
+    """Build deterministic read-only evidence from immutable Trading facts."""
+    logger.info("Running Analytics rebalance measurement usage")
+    evidence = build_portfolio_rebalance_measurement(_measurement_request())
+    assert evidence.summary["successful_action_count"] == 1
+    assert evidence.non_binding is True

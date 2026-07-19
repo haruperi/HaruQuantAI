@@ -4,6 +4,11 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Status
 
+- Portfolio is a completed implementation baseline across all 38 functional and
+  ten non-functional requirements, all seven domain workflows, and `SYS-WF-006`
+  through `SYS-WF-008`; its isolated Section 7 gate passes 51 tests at 80.73%
+  branch coverage.
+
 - Risk is a completed implementation baseline across contracts, configuration,
   snapshots, sizing, audit, Policy, regimes, approvals, decisions, scenarios,
   reporting, all 54 functional and 12 non-functional requirements, and all
@@ -41,6 +46,12 @@ This document is only for adding high-level changes, decisions, or status update
   adoption are outside this domain build.
 
 ### Added
+
+- **2026-07-19 — Portfolio domain completed.** Added strict Portfolio contracts,
+  evidence validation, fixed/equal/inverse-volatility construction, atomic state,
+  governed activation/rollback, reduce-only drift planning, owner-contract workflow
+  coordination, typed public API, usage evidence, and all three system workflows.
+  Trading and Analytics receiver amendments pass 32 and 15 targeted tests respectively.
 
 - **2026-07-19 — Optimization domain completed.** Added bounded grid and seeded-random
   search, Simulation/Analytics execution adaptation, scoring and overfit evidence,
@@ -271,6 +282,12 @@ This document is only for adding high-level changes, decisions, or status update
   from `uv run mypy app/services/strategy tests/strategy`.
 
 ### Decisions
+
+- **2026-07-19 — Portfolio receiver seams resolved.** Callers supply the fully
+  formed Simulation-owned `PortfolioBacktestRequestV1`; Trading owns conversion of
+  high-level component reductions into executable orders; Analytics owns the
+  hash-bound post-trade measurement request/evidence pair under `FR-ANLT-052`, and
+  recomputation never invokes Trading or rewrites execution truth.
 
 - **2026-07-19 — Optimization V1 blockers resolved.** V1 search is limited to bounded
   grid and seeded random methods; objectives project Analytics-owned metric evidence,

@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 from hashlib import sha256
 from types import MappingProxyType
-from typing import Annotated, ClassVar, Final, Literal, Self, cast
+from typing import Annotated, ClassVar, Final, Literal, Self
 
 from pydantic import (
     BaseModel,
@@ -1219,36 +1219,18 @@ class TradeRecord(_TradingModel):
 
 _REBALANCE_ACTION_FIELDS = {
     "action_id",
-    "account_id",
-    "strategy_id",
-    "strategy_version",
-    "source_intent_id",
-    "risk_decision_id",
-    "action_policy_verdict_id",
+    "component_id",
     "eligibility_decision_id",
-    "symbol",
     "action",
-    "side",
-    "order_type",
-    "approved_volume",
-    "price",
-    "stop_price",
-    "stop_loss",
-    "take_profit",
-    "time_in_force",
-    "expiration",
     "reduce_only",
+    "current_exposure",
+    "target_exposure",
+    "reduction_amount",
 }
 _REBALANCE_TEXT_FIELDS = (
     "action_id",
-    "account_id",
-    "strategy_id",
-    "strategy_version",
-    "source_intent_id",
-    "risk_decision_id",
-    "action_policy_verdict_id",
+    "component_id",
     "eligibility_decision_id",
-    "symbol",
 )
 
 
@@ -1308,20 +1290,19 @@ def _validate_rebalance_action(
         _validate_text(field_value, field)
     if safe["action"] != "reduce_exposure" or safe["reduce_only"] is not True:
         raise ValueError("rebalance action must be reduce-only reduce_exposure")
-    if safe["side"] not in {"BUY", "SELL"}:
-        raise ValueError("rebalance side is unsupported")
-    order_type = safe["order_type"]
-    if order_type not in {"MARKET", "LIMIT", "STOP", "STOP_LIMIT"}:
-        raise ValueError("rebalance order_type is unsupported")
-    volume = _rebalance_decimal(safe["approved_volume"], "approved_volume")
-    if volume is None or volume <= 0:
-        raise ValueError("rebalance approved_volume must be positive")
-    _validate_execution_price_shape(
-        cast("OrderType", order_type),
-        _rebalance_decimal(safe["price"], "price"),
-        _rebalance_decimal(safe["stop_price"], "stop_price"),
-        "rebalance actions",
-    )
+    current = _rebalance_decimal(safe["current_exposure"], "current_exposure")
+    target = _rebalance_decimal(safe["target_exposure"], "target_exposure")
+    reduction = _rebalance_decimal(safe["reduction_amount"], "reduction_amount")
+    if (
+        current is None
+        or target is None
+        or reduction is None
+        or current <= target
+        or target < 0
+        or reduction <= 0
+        or reduction != current - target
+    ):
+        raise ValueError("rebalance exposure reduction is invalid")
     return str(safe["action_id"]), safe
 
 

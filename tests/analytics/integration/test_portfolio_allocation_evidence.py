@@ -8,13 +8,34 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.services.analytics import (
+    build_portfolio_allocation_evidence as public_build_portfolio_allocation_evidence,
+)
+from app.services.analytics import (
+    build_portfolio_rebalance_measurement as public_build_rebalance_measurement,
+)
 from app.services.analytics.reports.allocation import (
     build_portfolio_allocation_evidence,
+    build_portfolio_rebalance_measurement,
 )
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import (
-    _report,
-)
+from tests.analytics.usage.test_usage_reports import _report
+
+
+def test_allocation_evidence_builder_is_package_root_public() -> None:
+    """Expose the registered allocation projector through Analytics' public port."""
+    logger.info("Testing Analytics package-root allocation projector export")
+    assert (
+        public_build_portfolio_allocation_evidence
+        is build_portfolio_allocation_evidence
+    )
+
+
+def test_rebalance_measurement_builder_is_package_root_public() -> None:
+    """Expose post-trade measurement through Analytics' public domain port."""
+    logger.info("Testing Analytics package-root rebalance measurement export")
+    assert public_build_rebalance_measurement is build_portfolio_rebalance_measurement
+
 
 _FIXTURE = Path("tests/analytics/fixtures/portfolio_simulation_result.json")
 _GOLDEN_DIRECTORY = Path("tests/analytics/fixtures/golden")
