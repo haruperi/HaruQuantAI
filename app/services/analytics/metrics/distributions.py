@@ -8,8 +8,9 @@ from collections.abc import Sequence
 import numpy as np
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
-    AnalyticsWarning,
+    AnalyticsRunConfig,
     MetricEvidence,
     SectionEvidence,
 )
@@ -40,22 +41,23 @@ def _metric(metric_key: str, value: object, unit: str = "ratio") -> MetricEviden
     )
 
 
-def _undefined(metric_key: str) -> MetricEvidence:
+def _undefined(metric_key: str, *, config: AnalyticsRunConfig) -> MetricEvidence:
     """Build explicit zero-variance distribution evidence.
 
     Args:
         metric_key: Catalog metric key.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Undefined metric evidence.
     """
     logger.debug("Building undefined Analytics distribution evidence")
-    warning = AnalyticsWarning(
-        code="undefined_zero_variance",
-        severity="warning",
-        affected_section="distribution",
+    warning = build_warning(
+        "undefined_zero_variance",
+        section="distribution",
         source_context="sample",
         detail={"metric_key": metric_key, "series_name": "values"},
+        max_detail_bytes=config.max_warning_detail_bytes,
     )
     return MetricEvidence(
         metric_key=metric_key,
@@ -66,23 +68,29 @@ def _undefined(metric_key: str) -> MetricEvidence:
     )
 
 
-def _skipped(metric_key: str, *, unit: str) -> MetricEvidence:
+def _skipped(
+    metric_key: str,
+    *,
+    unit: str,
+    config: AnalyticsRunConfig,
+) -> MetricEvidence:
     """Build explicit constant-sample skipped evidence.
 
     Args:
         metric_key: Catalog metric key.
         unit: Catalog unit.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Skipped metric evidence.
     """
     logger.debug("Building skipped Analytics distribution evidence")
-    warning = AnalyticsWarning(
-        code="undefined_zero_variance",
-        severity="warning",
-        affected_section="distribution",
+    warning = build_warning(
+        "undefined_zero_variance",
+        section="distribution",
         source_context="sample",
-        detail={"metric_key": metric_key, "reason": "constant sample"},
+        detail={"metric_key": metric_key, "series_name": "values"},
+        max_detail_bytes=config.max_warning_detail_bytes,
     )
     return MetricEvidence(
         metric_key=metric_key,
@@ -125,11 +133,16 @@ def _moments(values: np.ndarray) -> tuple[float | None, float | None]:
     return skew, kurtosis
 
 
-def calculate_distribution_evidence(values: Sequence[float]) -> SectionEvidence:
+def calculate_distribution_evidence(
+    values: Sequence[float],
+    *,
+    config: AnalyticsRunConfig,
+) -> SectionEvidence:
     """Calculate the single approved distribution evidence set.
 
     Args:
         values: Finite numeric observations.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Ordered distribution section evidence.
@@ -176,20 +189,22 @@ def calculate_distribution_evidence(values: Sequence[float]) -> SectionEvidence:
     outliers = int(np.count_nonzero((array < low_fence) | (array > high_fence)))
     metrics = (
         _metric("mean", mean),
-        _metric("stdev", stdev) if stdev is not None else _undefined("stdev"),
+        _metric("stdev", stdev)
+        if stdev is not None
+        else _undefined("stdev", config=config),
         _metric("skewness", skewness)
         if skewness is not None
-        else _undefined("skewness"),
+        else _undefined("skewness", config=config),
         _metric("kurtosis", kurtosis)
         if kurtosis is not None
-        else _undefined("kurtosis"),
+        else _undefined("kurtosis", config=config),
         _metric("percentiles", percentile_values),
         _metric("tail_ratio", tail_ratio)
         if tail_ratio is not None
-        else _undefined("tail_ratio"),
+        else _undefined("tail_ratio", config=config),
         _metric("histogram", histogram, "count")
         if histogram is not None
-        else _skipped("histogram", unit="count"),
+        else _skipped("histogram", unit="count", config=config),
         _metric("outliers", outliers, "count"),
     )
     warnings = tuple(warning for metric in metrics for warning in metric.warnings)

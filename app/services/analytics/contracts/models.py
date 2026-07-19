@@ -12,11 +12,43 @@ from typing import Literal
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
+from app.services.analytics.contracts.catalogs import EVIDENCE_CATALOG
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.utils import logger
 
 ANALYTICS_SCHEMA_VERSION = "v1"
 _SHA256_LENGTH = 64
+
+
+def _require_cataloged_code(
+    code: str,
+    severity: str,
+    *,
+    namespace: str,
+) -> Mapping[str, object]:
+    """Validate one evidence code and severity against the Evidence Catalog.
+
+    Args:
+        code: Candidate warning or quality-flag code.
+        severity: Candidate severity for that code.
+        namespace: Catalog namespace, ``warnings`` or ``quality_flags``.
+
+    Returns:
+        The authoritative catalog definition for the code.
+
+    Raises:
+        AnalyticsValidationError: If the code is uncataloged or the severity
+            conflicts with the cataloged severity.
+    """
+    logger.debug("Validating Analytics evidence code against the catalog")
+    definition = EVIDENCE_CATALOG[namespace].get(code)
+    if definition is None:
+        message = f"uncataloged {namespace} code: {code}"
+        raise AnalyticsValidationError(message)
+    if severity != definition["severity"]:
+        message = f"severity conflicts with the catalog for code: {code}"
+        raise AnalyticsValidationError(message)
+    return definition
 
 
 def _require_text(value: str, field_name: str) -> str:
@@ -161,10 +193,16 @@ class AnalyticsWarning:
     detail: Mapping[str, object]
 
     def __post_init__(self) -> None:
-        """Validate warning identity and detail."""
+        """Validate warning identity and detail.
+
+        Raises:
+            AnalyticsValidationError: If the code is uncataloged or the
+                severity conflicts with the cataloged severity.
+        """
         logger.debug("Validating Analytics warning contract")
         for name in ("code", "severity", "affected_section", "source_context"):
             _require_text(getattr(self, name), name)
+        _require_cataloged_code(self.code, self.severity, namespace="warnings")
         object.__setattr__(self, "detail", _freeze_mapping(self.detail))
 
 
@@ -183,7 +221,9 @@ class QualityFlag:
         """Validate quality-flag evidence.
 
         Raises:
-            AnalyticsValidationError: If required evidence is missing.
+            AnalyticsValidationError: If required evidence is missing, the code
+                is uncataloged, or the severity or blocker semantics conflict
+                with the Evidence Catalog.
         """
         logger.debug("Validating Analytics quality flag contract")
         _require_text(self.code, "code")
@@ -193,6 +233,12 @@ class QualityFlag:
             raise AnalyticsValidationError("affected_sections must not be empty")
         for section in self.affected_sections:
             _require_text(section, "affected_section")
+        definition = _require_cataloged_code(
+            self.code, self.severity, namespace="quality_flags"
+        )
+        if self.blocker != definition["blocker"]:
+            message = f"blocker conflicts with the catalog for code: {self.code}"
+            raise AnalyticsValidationError(message)
         object.__setattr__(self, "detail", _freeze_mapping(self.detail))
 
 

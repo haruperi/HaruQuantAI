@@ -149,3 +149,47 @@ def test_adapter_rejects_unknown_source_fields() -> None:
             account_currency="USD",
             config=_config(),
         )
+
+
+def test_adapter_redacts_sensitive_source_metadata() -> None:
+    """Producer source metadata is redacted before it reaches the contract."""
+    logger.debug("Testing Analytics adapter source-metadata redaction")
+    source = _source()
+    source["source_metadata"] = {
+        "api_key": "abcd1234abcd1234abcd1234",  # pragma: allowlist secret
+        "engine_version": "v1",
+    }
+    result = adapt_trading_result(
+        source,
+        source_contract="simulation.result",
+        initial_balance=Decimal(1000),
+        account_currency="USD",
+        config=_config(),
+    )
+    assert result.source_metadata["engine_version"] == "v1"
+    assert (
+        result.source_metadata["api_key"]
+        != "abcd1234abcd1234abcd1234"  # pragma: allowlist secret
+    )
+
+
+def test_adapter_redacts_sensitive_quality_metadata() -> None:
+    """Producer quality metadata is redacted before it reaches the contract."""
+    logger.debug("Testing Analytics adapter quality-metadata redaction")
+    source = _source()
+    source["quality_metadata"] = {
+        "password": "hunter2hunter2hunter2",  # pragma: allowlist secret
+        "canonical": True,
+    }
+    result = adapt_trading_result(
+        source,
+        source_contract="simulation.result",
+        initial_balance=Decimal(1000),
+        account_currency="USD",
+        config=_config(),
+    )
+    assert result.quality_metadata["canonical"] is True
+    assert (
+        result.quality_metadata["password"]
+        != "hunter2hunter2hunter2"  # pragma: allowlist secret
+    )

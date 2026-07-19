@@ -17,7 +17,7 @@ from app.services.analytics.contracts.models import (
     Lineage,
     TradingResult,
 )
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, logger, redact_mapping_value
 
 _SOURCE_FIELDS = frozenset(
     {
@@ -165,29 +165,44 @@ def _validate_benchmark(
         raise AnalyticsValidationError("benchmark exceeds configured point bound")
 
 
-def _validate_metadata_bound(
-    source_metadata: Mapping[str, object],
+def _redact_and_bound_metadata(
+    metadata: Mapping[str, object],
     *,
+    field_name: str,
     config: AnalyticsRunConfig,
-) -> None:
-    """Validate bounded source metadata without truncating fields.
+) -> Mapping[str, object]:
+    """Redact producer metadata, then validate its bound without truncating.
+
+    Producer metadata is the catch-all for fields Analytics does not model, so
+    it is redacted through the Utils-owned primitive before it is stored on
+    ``TradingResult`` and before its size is measured.
 
     Args:
-        source_metadata: Producer metadata mapping.
+        metadata: Producer metadata mapping.
+        field_name: Source field name used in failure messages.
         config: Required Analytics bounds.
+
+    Returns:
+        Redacted producer metadata.
 
     Raises:
         AnalyticsValidationError: If metadata is unsafe or oversized.
     """
-    logger.debug("Validating Analytics source metadata bound")
+    logger.debug("Redacting and bounding Analytics producer metadata")
+    redacted = redact_mapping_value(metadata)
+    if not isinstance(redacted.value, dict):
+        message = f"redacted {field_name} is invalid"
+        raise AnalyticsValidationError(message)
+    safe_metadata: Mapping[str, object] = dict(redacted.value)
     try:
-        byte_count = len(canonical_json(source_metadata).encode("utf-8"))
+        byte_count = len(canonical_json(safe_metadata).encode("utf-8"))
     except Exception as error:
-        raise AnalyticsValidationError(
-            "source metadata is not canonical JSON"
-        ) from error
+        message = f"{field_name} is not canonical JSON"
+        raise AnalyticsValidationError(message) from error
     if byte_count > config.max_warning_detail_bytes:
-        raise AnalyticsValidationError("source metadata exceeds configured bound")
+        message = f"{field_name} exceeds configured bound"
+        raise AnalyticsValidationError(message)
+    return safe_metadata
 
 
 def build_closed_trade_equity_curve(
@@ -294,9 +309,16 @@ def adapt_trading_result(
         trades, initial_balance=initial_balance, config=config
     )
     _validate_benchmark(benchmark, config=config)
-    quality = _require_mapping(source["quality_metadata"], "quality_metadata")
-    metadata = _require_mapping(source["source_metadata"], "source_metadata")
-    _validate_metadata_bound(metadata, config=config)
+    quality = _redact_and_bound_metadata(
+        _require_mapping(source["quality_metadata"], "quality_metadata"),
+        field_name="quality_metadata",
+        config=config,
+    )
+    metadata = _redact_and_bound_metadata(
+        _require_mapping(source["source_metadata"], "source_metadata"),
+        field_name="source_metadata",
+        config=config,
+    )
     symbols = tuple(
         str(item) for item in _require_sequence(source["symbols"], "symbols")
     )

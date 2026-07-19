@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
+    AnalyticsRunConfig,
     AnalyticsWarning,
     MetricEvidence,
     SectionEvidence,
@@ -62,11 +64,16 @@ def _optional_metric(
     )
 
 
-def calculate_cost_efficiency_evidence(result: TradingResult) -> SectionEvidence:
+def calculate_cost_efficiency_evidence(
+    result: TradingResult,
+    *,
+    config: AnalyticsRunConfig,
+) -> SectionEvidence:
     """Calculate cataloged cost, excursion, duration, and efficiency evidence.
 
     Args:
         result: Canonical Analytics input.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Ordered cost-efficiency section evidence.
@@ -82,12 +89,12 @@ def calculate_cost_efficiency_evidence(result: TradingResult) -> SectionEvidence
         for trade in result.trades
         if trade.mfe is not None and trade.mfe > 0
     ]
-    warning = AnalyticsWarning(
-        code="mae_mfe_absent",
-        severity="informational",
-        affected_section="cost_efficiency",
+    warning = build_warning(
+        "mae_mfe_absent",
+        section="cost_efficiency",
         source_context="cost",
         detail={"missing_fields": ("mae", "mfe")},
+        max_detail_bytes=config.max_warning_detail_bytes,
     )
     total_mae = sum(mae_values, Decimal(0)) if mae_values else None
     total_mfe = sum(mfe_values, Decimal(0)) if mfe_values else None

@@ -10,6 +10,7 @@ from decimal import Decimal
 import numpy as np
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
     AnalyticsRunConfig,
     AnalyticsWarning,
@@ -112,12 +113,18 @@ def _strategy_points(result: TradingResult) -> tuple[Mapping[str, object], ...]:
     return tuple(points)
 
 
-def _metric(metric_key: str, value: float | None) -> MetricEvidence:
+def _metric(
+    metric_key: str,
+    value: float | None,
+    *,
+    config: AnalyticsRunConfig,
+) -> MetricEvidence:
     """Build calculated or undefined benchmark evidence.
 
     Args:
         metric_key: Catalog metric key.
         value: Optional calculated ratio.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Benchmark metric evidence.
@@ -126,12 +133,12 @@ def _metric(metric_key: str, value: float | None) -> MetricEvidence:
     warnings: tuple[AnalyticsWarning, ...] = ()
     if value is None:
         warnings = (
-            AnalyticsWarning(
-                code="undefined_zero_variance",
-                severity="warning",
-                affected_section="benchmark",
+            build_warning(
+                "undefined_zero_variance",
+                section="benchmark",
                 source_context="aligned",
                 detail={"metric_key": metric_key, "series_name": "benchmark"},
+                max_detail_bytes=config.max_warning_detail_bytes,
             ),
         )
     return MetricEvidence(
@@ -221,7 +228,7 @@ def calculate_benchmark_evidence(
         else None
     )
     metrics = tuple(
-        _metric(key, value)
+        _metric(key, value, config=config)
         for key, value in (
             ("benchmark_alpha", alpha),
             ("benchmark_beta", beta),

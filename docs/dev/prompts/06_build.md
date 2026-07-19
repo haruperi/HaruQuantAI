@@ -111,7 +111,7 @@ Claude: domain-readiness audit (Prompt 1)
   → Next domain
 ```
 
-## Prompt 1: Domain implementation roadmap — Claude (pre-build)
+## Prompt 1: Domain implementation roadmap — Claude (prebuild)
 
 Run this in **Claude** once at the beginning of each domain. It is read-only.
 
@@ -602,8 +602,6 @@ Complete by package.
 ```
 
 That structure gives you the smallest safe implementation increments without losing the architectural context.
-
-
 
 ---
 

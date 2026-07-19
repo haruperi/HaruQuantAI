@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
     AnalyticsRunConfig,
-    AnalyticsWarning,
     SectionEvidence,
     TradingResult,
 )
@@ -82,19 +82,22 @@ def _split_returns(
     )
 
 
-def _skipped_benchmark() -> SectionEvidence:
+def _skipped_benchmark(*, config: AnalyticsRunConfig) -> SectionEvidence:
     """Build explicit optional benchmark-unavailable evidence.
+
+    Args:
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Skipped benchmark section.
     """
     logger.debug("Building skipped Analytics benchmark section")
-    warning = AnalyticsWarning(
-        code="optional_section_skipped",
-        severity="informational",
-        affected_section="benchmark",
+    warning = build_warning(
+        "optional_section_skipped",
+        section="benchmark",
         source_context="builder",
         detail={"section": "benchmark", "reason": "benchmark not supplied"},
+        max_detail_bytes=config.max_warning_detail_bytes,
     )
     return SectionEvidence(
         section_key="benchmark",
@@ -106,18 +109,23 @@ def _skipped_benchmark() -> SectionEvidence:
     )
 
 
-def _trade_contexts(result: TradingResult) -> SectionEvidence:
+def _trade_contexts(
+    result: TradingResult,
+    *,
+    config: AnalyticsRunConfig,
+) -> SectionEvidence:
     """Compose all, long, and short trade evidence in one report section.
 
     Args:
         result: Canonical Analytics input.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Trade evidence with explicit metric source contexts.
     """
     logger.debug("Composing Analytics all, long, and short trade contexts")
     contexts = tuple(
-        calculate_trade_evidence(result, source_context=context)
+        calculate_trade_evidence(result, config=config, source_context=context)
         for context in ("all", "long", "short")
     )
     warnings = tuple(warning for section in contexts for warning in section.warnings)
@@ -145,25 +153,25 @@ def calculate_grouped_evidence(
         Ordered required and optional section evidence.
     """
     logger.info("Calculating deterministic grouped Analytics evidence")
-    return_section = calculate_return_evidence(result)
+    return_section = calculate_return_evidence(result, config=config)
     pnl_section, equity_section = _split_returns(return_section)
     daily_returns = _daily_returns(return_section)
     net_values = tuple(float(trade.net_trade_pnl) for trade in result.trades)
     benchmark = (
         calculate_benchmark_evidence(result, config=config)
         if result.benchmark is not None
-        else _skipped_benchmark()
+        else _skipped_benchmark(config=config)
     )
     return (
-        _trade_contexts(result),
+        _trade_contexts(result, config=config),
         pnl_section,
         equity_section,
-        calculate_drawdown_evidence(result),
-        calculate_risk_evidence(daily_returns),
+        calculate_drawdown_evidence(result, config=config),
+        calculate_risk_evidence(daily_returns, config=config),
         calculate_ratio_evidence(result, daily_returns, config=config),
         benchmark,
-        calculate_distribution_evidence(net_values),
-        calculate_cost_efficiency_evidence(result),
+        calculate_distribution_evidence(net_values, config=config),
+        calculate_cost_efficiency_evidence(result, config=config),
         run_statistical_validation(net_values, config=config),
     )
 

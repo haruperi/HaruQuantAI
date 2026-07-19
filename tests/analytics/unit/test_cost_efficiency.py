@@ -26,7 +26,7 @@ def test_cost_evidence_preserves_rebates_and_signs() -> None:
         account_currency="USD",
         config=_config(),
     )
-    section = calculate_cost_efficiency_evidence(result)
+    section = calculate_cost_efficiency_evidence(result, config=_config())
     metrics = {item.metric_key: item.value for item in section.metrics}
     assert metrics["total_commission"] == Decimal(2)
     assert metrics["total_swap"] == Decimal(-1)

@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/data`
 > **Status:** `Completed implementation baseline`
-> **Last updated:** `2026-07-16`
+> **Last updated:** `2026-07-19`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -170,7 +170,7 @@ flowchart TD
     STORAGE --> STFILES[database.py; locking.py; datasets.py; cache.py; audit.py; migrations.py]
     SOURCES --> SOFILES[protocol.py; registry.py; policy.py; broker.py; local.py; external.py]
     ACCESS --> AFILES[historical.py; reference.py; sessions.py; context.py; fx.py]
-    PROCESSING --> PFILES[timeframes.py; transforms.py; synthetic.py]
+    PROCESSING --> PFILES[timeframes.py; transforms.py; synthetic.py; ticks.py]
     JOBS --> JFILES[backfill.py; scheduler.py]
     FEEDS --> FFILES[runtime.py; status.py]
     API --> APIFILES[_requests.py; _runtime.py; operations.py]
@@ -231,7 +231,8 @@ app/services/data/
 │   ├── timeframes.py                   # One timeframe source of truth
 │   ├── transforms.py                   # Resample, align, aggregate
 │   ├── tabular.py                      # Canonical analytical projections and comparison
-│   └── synthetic.py                    # Seeded bounded GBM bars/ticks
+│   ├── synthetic.py                    # Seeded bounded GBM bars/ticks (fixtures only)
+│   └── ticks.py                        # Real-evidence tick-series generation
 ├── jobs/                               # Update/backfill lifecycle
 │   ├── __init__.py
 │   ├── backfill.py                     # Bounded idempotent ingestion chunks
@@ -323,6 +324,7 @@ an explicit exclusion.
 | `CAP-DATA-010` Internal real-time feed lifecycle | Add/Replace | `feeds/`, `get_feed_status`, `WF-DATA-008`; initial deterministic fake harness and specified informational limits |
 | `CAP-DATA-011` Timeframes/resampling/alignment/aggregation | Merge/Modify | `processing/timeframes.py`, `transforms.py`, typed transform operations |
 | `CAP-DATA-012` Deterministic synthetic generation | Modify | `processing/synthetic.py`, typed synthetic operations, `WF-DATA-005` |
+| `CAP-DATA-022` Real-evidence tick-series generation | Add | `processing/ticks.py`, `FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016` |
 | `CAP-DATA-013` Historical labeling | Retired | Owned by Research; no Data implementation |
 | `CAP-DATA-014` Market hours/sessions/volume | Modify/Add | `access/sessions.py`, three typed retrieval operations, `WF-DATA-010` |
 | `CAP-DATA-015` License/fallback/rate/breaker/source safety | Modify | `sources/policy.py`, source manifests, `WF-DATA-011` |
@@ -365,7 +367,8 @@ an explicit exclusion.
 | Completed | `WF-DATA-002` | Cross-domain | Internal analytical data access | Approved Python consumer submits `MarketDataRequest` | Typed `MarketDataset`, never raw provider state | `FR-DATA-006 → 030 → 005` |
 | Completed | `WF-DATA-003` | Internal | Local dataset load/save | Approved CSV/Parquet path and normalized data | Validated dataset or atomic committed artifact/manifest | `FR-DATA-016 → 017/018` |
 | Completed | `WF-DATA-004` | Internal | Resample, align, and aggregate | Normalized datasets/ticks | Deterministic no-lookahead dataset | `FR-DATA-036 → 037/038` |
-| Completed | `WF-DATA-005` | Cross-domain | Synthetic generation | Bounded parameters and optional seed | Deterministic canonical bars/ticks | `FR-DATA-039` |
+| Completed | `WF-DATA-005` | Cross-domain | Synthetic generation | Bounded parameters and optional seed | Deterministic canonical bars/ticks for fixtures only | `FR-DATA-039` |
+| Completed | `WF-DATA-016` | Cross-domain | Tick-series generation from real evidence | Real bar or tick `MarketDataset`, approved model, spread model, and seed when variable | Canonical tick `MarketDataset` with intra-bar phase metadata, or a bounded Parquet artifact | `FR-DATA-087 → FR-DATA-088 → FR-DATA-089 → FR-DATA-090` |
 | Retired | `WF-DATA-006` | — | Historical labeling | Owned by Research; no Data workflow | — | — |
 | Completed | `WF-DATA-007` | Internal | Update job and historical backfill | Job definition or run-once command | Committed chunks and resumable checkpoint | `FR-DATA-041 → 042 → 043/044/045` |
 | Completed | `WF-DATA-008` | Cross-domain | Internal real-time feed and status | Staging feed source emits event | Normalized bounded state and `get_feed_status` output | `FR-DATA-046 → 047 → 048` |
@@ -965,7 +968,8 @@ MarketDataset
 | Completed | `timeframes.py` | Provide one private canonical timeframe manifest and conversion rules. | `TIMEFRAME_MANIFEST`, `get_timeframe_spec`, `validate_resample_target` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `contracts.errors` |
 | Completed | `transforms.py` | Resample bars, align datasets, and aggregate ticks. | `resample_dataset`, `align_datasets`, `aggregate_ticks` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `contracts`, `timeframes.py` |
 | Completed | `tabular.py` | Project canonical OHLCV/spread or tick evidence to public analytical DataFrames; align and serialize private DataFrames; compare bounded OHLC/OHLCV evidence. | `to_ohlcv_dataframe`, `to_tick_dataframe`; private tabular helpers | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `contracts` |
-| Completed | `synthetic.py` | Generate bounded deterministic Decimal-only GBM bars/ticks. | `generate_synthetic_dataset` | **Standard library:** `datetime`, `decimal`, `random`<br>**Required third-party:** None<br>**Local:** `contracts`, `timeframes.py` |
+| Completed | `synthetic.py` | Generate bounded deterministic Decimal-only GBM bars/ticks for fixtures and tests only; never an input to an official Simulation run. | `generate_synthetic_dataset` | **Standard library:** `datetime`, `decimal`, `random`<br>**Required third-party:** None<br>**Local:** `contracts`, `timeframes.py` |
+| Completed | `ticks.py` | Derive canonical tick series from real bar or tick evidence under four approved models and three spread models. Carries no strategy, signal, or order concept. | `generate_tick_series`, `generate_tick_series_to_parquet`, `TICK_GENERATION_MODELS`, `SPREAD_MODELS` | **Standard library:** `collections.abc`, `datetime`, `decimal`, `pathlib`, `random`<br>**Required third-party:** `numpy`, `pandas`, `pyarrow`<br>**Local:** `contracts`, `timeframes.py`, `tabular.py` |
 | Retired | `labeling.py` | Removed: Research owns historical labeling. | — | — |
 | Completed | `__init__.py` | Expose the supported typed processing API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
 
@@ -976,7 +980,12 @@ MarketDataset
 | Completed | `TIMEFRAME_MANIFEST` | `Mapping[str, TimeframeSpec]` | Approved M/H/D/W/MN values | Yes | transforms/synthetic | One accepted set, duration, frequency, and ordering source of truth. |
 | Completed | `SYNTHETIC_BAR_MAX_RECORDS` | `int` | `100000` | Yes | synthetic/API | Direct-response bound; excess returns `LIMIT_EXCEEDED`. |
 | Completed | `SYNTHETIC_TICK_MAX_RECORDS` | `int` | `250000` | Yes | synthetic/API | Direct-response bound; excess returns `LIMIT_EXCEEDED`. |
-| Completed | `SYNTHETIC_METHODS` | `tuple[str, ...]` | `gbm` | Yes | synthetic | No other stochastic process is part of the Data design. |
+| Completed | `SYNTHETIC_METHODS` | `tuple[str, ...]` | `gbm` | Yes | synthetic | No other stochastic process is part of the Data design. Fixtures and tests only. |
+| Completed | `TICK_GENERATION_MODELS` | `tuple[str, ...]` | `("real", "trading_bar", "ohlc_m1", "generated")` | Yes | `generate_tick_series()` | Closed set derived from real evidence; an unrecognized model fails rather than falling back. |
+| Completed | `SPREAD_MODELS` | `tuple[str, ...]` | `("native_spread", "fixed_spread", "variable_spread")` | Yes | `generate_tick_series()` | `variable_spread` is the only stochastic option and requires an explicit seed. |
+| Completed | `GENERATED_TICKS_MIN_PER_BAR` | `int` | `4` | Yes | `generate_tick_series()` | Guarantees the four canonical waypoints exist when real `tick_volume` is lower. |
+| Completed | `TICK_SERIES_MAX_RECORDS` | `int` | None | Yes before public activation | `generate_tick_series()` | Deployment must supply a measured positive bound; oversized direct responses return `LIMIT_EXCEEDED`. Streaming to Parquet is the bounded alternative. |
+| Completed | `TICK_PARQUET_MAX_OUTPUT_ROWS_PER_CHUNK` | `int` | `2000000` | Yes | `generate_tick_series_to_parquet()` | Output-aware chunking ceiling; input slices are sized from estimated output rows, not input rows. |
 
 #### Tabular market-data implementation
 
@@ -992,10 +1001,10 @@ provenance, and availability evidence.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-080` | Align a private tabular market-data copy to an aware UTC datetime field/index without mutating caller input. | `align_dataframe_datetime` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_080_align_private_tabular_copy()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_align_dataframe_datetime_success()` |
-| Completed | `FR-DATA-081` | Convert bar rows or private DataFrames to deterministic JSON-safe records with canonical UTC timestamps. | `bars_to_records`, `serialize_dataframe_records` | None | `DataError[VALIDATION_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_081_json_safe_records()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_serialize_dataframe_rejects_unsafe_values()` |
-| Completed | `FR-DATA-082` | Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics. | `compare_dataframes` | None | `DataError[VALIDATION_FAILED\|LIMIT_EXCEEDED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_082_compare_dataframes()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_dataframes_mismatch()` |
-| Completed | `FR-DATA-083` | Compare OHLC or OHLCV columns only after schema and alignment validation. | `compare_ohlc`, `compare_ohlcv` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_083_compare_ohlcv()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_ohlcv_success()` |
+| Completed | `FR-DATA-080` | Align a private tabular market-data copy to an aware UTC datetime field/index without mutating caller input. | `align_dataframe_datetime` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_080_align_private_tabular_copy()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_align_dataframe_datetime_success()` |
+| Completed | `FR-DATA-081` | Convert bar rows or private DataFrames to deterministic JSON-safe records with canonical UTC timestamps. | `bars_to_records`, `serialize_dataframe_records` | None | `DataError[VALIDATION_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_081_json_safe_records()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_serialize_dataframe_rejects_unsafe_values()` |
+| Completed | `FR-DATA-082` | Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics. | `compare_dataframes` | None | `DataError[VALIDATION_FAILED\|LIMIT_EXCEEDED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_082_compare_dataframes()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_dataframes_mismatch()` |
+| Completed | `FR-DATA-083` | Compare OHLC or OHLCV columns only after schema and alignment validation. | `compare_ohlc`, `compare_ohlcv` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_083_compare_ohlcv()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_ohlcv_success()` |
 | Completed | `FR-DATA-084` | Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper. | `execute_backfill_chunk` | Persistence write | Existing job errors | **Usage:** `tests/data/usage/06_update_jobs.py::example_fr_data_084_private_chunking_boundary()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_backfill_key_is_canonical()` |
 | Completed | `FR-DATA-085` | Project one canonical bar `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly six finite float64 columns: `open`, `high`, `low`, `close`, `volume`, and provider-reported `spread`; expose the common native spread unit in `DataFrame.attrs["spread_unit"]` and fail if spread evidence is missing or inconsistent. | `to_ohlcv_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/01_retrieval_referance.py`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_ohlcv_dataframe_returns_float64_analytical_copy()` |
 | Completed | `FR-DATA-086` | Project one canonical tick `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly four float64 columns: `bid`, `ask`, `last`, and `volume`; represent genuine missing optional values as `NaN`, expose common price/volume units in `DataFrame.attrs`, and fail on inconsistent units or unsafe float64 conversion. | `to_tick_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/01_retrieval_referance.py`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_tick_dataframe_returns_float64_analytical_copy()` |
@@ -1004,20 +1013,77 @@ provenance, and availability evidence.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-036` | Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`. | `resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDataset` | None | `DataError[UNSUPPORTED_TIMEFRAME|VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_036_resample_ohlcv()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_resample_dataset_is_deterministic()` |
-| Completed | `FR-DATA-037` | Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead. | `align_datasets(datasets: Mapping[str, MarketDataset], target: Sequence[datetime]) -> Mapping[str, MarketDataset]` | None | `DataError[VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_037_no_lookahead_alignment()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_align_datasets_prevents_lookahead()` |
-| Completed | `FR-DATA-038` | Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy, preserving the closing tick's genuine bid/ask spread when both sides exist and rejecting disorder or ambiguous units. | `aggregate_ticks(dataset: MarketDataset, timeframe: str, spread_policy: str) -> MarketDataset` | None | `DataError[VALIDATION_FAILED|UNSUPPORTED_TIMEFRAME]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_038_ticks_to_bars()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_aggregate_ticks_preserves_closing_quote_spread()` |
-| Completed | `FR-DATA-039` | Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter. | `generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset` | None | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/05_processing.py::example_fr_data_039_synthetic_bars()`<br>**Unit:** `tests/data/unit/test_synthetic.py::test_synthetic_dataset_replays_from_seed()` |
+| Completed | `FR-DATA-036` | Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`. | `resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDataset` | None | `DataError[UNSUPPORTED_TIMEFRAME|VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_036_resample_ohlcv()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_resample_dataset_is_deterministic()` |
+| Completed | `FR-DATA-037` | Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead. | `align_datasets(datasets: Mapping[str, MarketDataset], target: Sequence[datetime]) -> Mapping[str, MarketDataset]` | None | `DataError[VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_037_no_lookahead_alignment()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_align_datasets_prevents_lookahead()` |
+| Completed | `FR-DATA-038` | Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy, preserving the closing tick's genuine bid/ask spread when both sides exist and rejecting disorder or ambiguous units. | `aggregate_ticks(dataset: MarketDataset, timeframe: str, spread_policy: str) -> MarketDataset` | None | `DataError[VALIDATION_FAILED|UNSUPPORTED_TIMEFRAME]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_038_ticks_to_bars()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_aggregate_ticks_preserves_closing_quote_spread()` |
+| Completed | `FR-DATA-039` | Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter. | `generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset` | None | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_039_synthetic_bars()`<br>**Unit:** `tests/data/unit/test_synthetic.py::test_synthetic_dataset_replays_from_seed()` |
 | Retired | `FR-DATA-040` | Research owns historical labeling; no Data implementation. | — | — | — | — |
 
+#### Tick-series generation from real market evidence
+
+> **Owner decision, 2026-07-19.** This subsection supersedes the previous exclusion
+> "Do not retain `TicksGenerator` or any trading-bar/M1/real backtest model in Data."
+> Tick-series generation is a deterministic `MarketDataset → MarketDataset` transform
+> and belongs beside resampling, alignment, and aggregation. Simulation consumes it
+> through the public Data API exactly as it consumes any other Data output.
+
+**This is not synthetic generation and must never be confused with it.**
+`generate_synthetic_dataset` (`FR-DATA-039`) fabricates prices from a GBM random
+walk and exists only for fixtures and tests. Tick-series generation derives ticks
+from **real** bars or **real** ticks: every price comes from an actual OHLC bound or
+an actual quote, and every tick count comes from actual `tick_volume`. Only the
+intra-bar path shape is constructed, and it is fully deterministic. No output of
+`generate_synthetic_dataset` may reach an official Simulation run.
+
+**Data owns no trading concepts here.** The generated tick stream carries prices,
+spread, and intra-bar position only. Entry, exit, pending, cancel, stop-loss, and
+take-profit fields are Strategy-owned and must not appear in any Data tick record;
+the consuming domain joins its own decisions to the stream by timestamp.
+
+**Canonical record extension.** `TickRecord` gained three optional fields —
+`source_bar_time`, `tick_index_in_bar`, and `bar_phase` — all defaulting to `None`
+for provider-sourced ticks. This is an additive change under the `docs/PROJECT.md` §5
+versioning policy and requires no version bump: existing producers and consumers are
+unaffected. `bar_phase` is a 4-bit mask of open (1), high (2), low (4), and close (8)
+observations within the source bar and carries no trading meaning.
+
+| Model | Source evidence | Ticks per bar | Intra-bar path |
+|---|---|---|---|
+| `real` | real tick dataset | actual | actual quotes, unchanged |
+| `trading_bar` | real trading-timeframe OHLC | exactly 4 | open → first extreme → second extreme → close, ordered by bar direction |
+| `ohlc_m1` | real M1 OHLC | exactly 4 per M1 bar | same shape at M1 granularity |
+| `generated` | real bars plus real `tick_volume` | `tick_volume`, minimum 4 | piecewise-linear interpolation across the same four waypoints |
+
+For `trading_bar`, `ohlc_m1`, and `generated`, a bullish bar (`close >= open`) visits
+the low before the high and a bearish bar visits the high before the low. This
+ordering is deterministic, not stochastic, and it is the evidence a consumer needs to
+resolve same-bar protective-order precedence.
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Completed | `FR-DATA-087` | Derive a canonical tick `MarketDataset` from real bar or tick evidence using exactly one approved model, preserving real prices and real tick counts, ordering ticks strictly by UTC timestamp then intra-bar index, and quantizing every price to `Decimal` at the contract boundary. Vectorized float64 may be used internally; no float value crosses the boundary. | `generate_tick_series(dataset: MarketDataset, *, model: str, trading_timeframe: str, m1_dataset: MarketDataset \| None = None, real_tick_dataset: MarketDataset \| None = None, spread_model: str, point_value: Decimal, fixed_spread_points: Decimal \| None = None, min_spread_points: Decimal \| None = None, max_spread_points: Decimal \| None = None, seed: int \| None = None, request_id: str \| None = None) -> MarketDataset` | None | `DataError[INVALID_INPUT\|UNSUPPORTED_TIMEFRAME\|VALIDATION_FAILED\|LIMIT_EXCEEDED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_087_generate_tick_series()`<br>**Unit:** `tests/data/unit/test_ticks.py::test_generate_tick_series_preserves_real_prices_and_volume()` |
+| Completed | `FR-DATA-088` | Apply exactly one approved spread model to every generated tick: `native_spread` uses the provider-reported spread, `fixed_spread` applies one configured point value, and `variable_spread` draws bounded points from a seeded generator. A `variable_spread` request without a seed fails; identical seed and inputs reproduce identical spreads. | `apply_spread_model` (private helper surfaced through `generate_tick_series`) | None | `DataError[INVALID_INPUT\|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_088_spread_models()`<br>**Unit:** `tests/data/unit/test_ticks.py::test_variable_spread_requires_seed_and_replays()` |
+| Completed | `FR-DATA-089` | Attach deterministic intra-bar position evidence to every generated tick: `source_bar_time`, `tick_index_in_bar`, and a phase bitmask marking the bar open, high, low, and close observations. The bitmask carries no trading meaning and never encodes an order, signal, or decision. | Intra-bar metadata fields on the returned `MarketDataset` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_089_intrabar_phase_metadata()`<br>**Unit:** `tests/data/unit/test_ticks.py::test_phase_bitmask_marks_open_high_low_close()` |
+| Completed | `FR-DATA-090` | Stream a generated tick series to a bounded Parquet artifact under an approved root with output-aware chunking, returning path, row count, and column names without holding the full series in memory. | `generate_tick_series_to_parquet(dataset: MarketDataset, *, path: Path, max_output_rows_per_chunk: int, **generation_arguments: object) -> Mapping[str, object]` | Persistence write | `DataError[INVALID_INPUT\|LIMIT_EXCEEDED\|STORAGE_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_090_stream_ticks_to_parquet()`<br>**Unit:** `tests/data/unit/test_ticks.py::test_parquet_streaming_is_chunk_bounded()` |
+
+**Rules:**
+
+- Every price originates from real evidence. Interpolation constructs an intra-bar
+  path between real waypoints; it never invents a waypoint.
+- `generated` clamps `tick_volume` to a minimum of four so the four canonical
+  waypoints always exist.
+- The four models and three spread models are closed sets; an unrecognized value
+  fails rather than falling back.
+- Output ordering is total and reproducible: UTC timestamp, then intra-bar index.
+- No signal, order, position, stop-loss, or take-profit field appears in any output.
+
 **Implementation notes:** Merge V1 timeframe maps, resampling, aggregation, alignment,
-and seeded algorithms into one source of truth. Do not retain `TicksGenerator` or any
-trading-bar/M1/real backtest model in Data. Historical labeling is not implemented in Data because Research owns it.
+and seeded algorithms into one source of truth. Historical labeling is not implemented in Data because Research owns it. Tick-series generation replaces the V1 `TicksGenerator` class with module-level functions and drops its signal-column merging entirely, since the consuming domain owns those concepts.
 
 ### Feature usage examples
 
-`tests/data/usage/05_processing.py` contains one example for each
-`FR-DATA-036` through `FR-DATA-039`.
+`tests/data/usage/03_processing.py` contains one example for each
+`FR-DATA-036` through `FR-DATA-039` and each `FR-DATA-087` through `FR-DATA-090`.
 
 ---
 
@@ -1164,7 +1230,7 @@ layer defines no parallel business logic.
 |---|---|---|
 | Retrieval and reference | `get_market_data`, `get_tick_data`, `get_spread_data`, `get_symbol_metadata`, `list_symbols`, `get_data_availability`, `get_market_hours`, `get_trading_sessions`, `get_historical_volume` | `MarketDataset`, `DataAvailability`, source/reference result contracts |
 | Storage | `save_market_data`, `load_local_dataset`, `clear_data_cache` | `StorageManifest`, `MarketDataset`, `CacheClearResult` |
-| Processing | `resample_ohlcv`, `align_multitimeframe_data`, `generate_synthetic_ticks`, `generate_synthetic_bars`, `aggregate_ticks_to_bars`, `to_ohlcv_dataframe`, `to_tick_dataframe` | `MarketDataset`; detached OHLCV/spread or tick `pandas.DataFrame` |
+| Processing | `resample_ohlcv`, `align_multitimeframe_data`, `generate_synthetic_ticks`, `generate_synthetic_bars`, `aggregate_ticks_to_bars`, `generate_tick_series`, `generate_tick_series_to_parquet`, `to_ohlcv_dataframe`, `to_tick_dataframe` | `MarketDataset`; detached OHLCV/spread or tick `pandas.DataFrame`; bounded Parquet artifact reference |
 | Jobs | `create_data_update_job`, `start_data_update_job`, `stop_data_update_job`, `run_data_update_job_once`, `get_data_update_job_status` | Data-owned job definition, run, and status contracts |
 | Feeds | `get_feed_status` | Data-owned feed status contract |
 
@@ -1251,7 +1317,7 @@ tests/data/
     ├── 02_storage.py                  # Section 4.2 persistence
     ├── 03_sources.py                  # Section 4.3 source policy and reads
     ├── 04_market_account_read.py      # Section 4.4 access orchestration
-    ├── 05_processing.py               # Section 4.5 deterministic processing
+    ├── 03_processing.py               # Section 4.5 deterministic processing
     ├── 06_update_jobs.py              # Section 4.6 update jobs
     ├── 07_realtime_feeds.py           # Section 4.7 internal feed lifecycle
     ├── 08_public_api.py               # Section 4.8 typed package boundary

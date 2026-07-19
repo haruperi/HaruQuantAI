@@ -29,7 +29,7 @@ def test_drawdown_evidence_matches_golden_fixture() -> None:
         account_currency="USD",
         config=_config(),
     )
-    section = calculate_drawdown_evidence(result)
+    section = calculate_drawdown_evidence(result, config=_config())
     metric = next(item for item in section.metrics if item.metric_key == "max_drawdown")
     fixture = json.loads(GOLDEN.read_text(encoding="utf-8"))
     assert metric.metric_key == fixture["metric_key"]

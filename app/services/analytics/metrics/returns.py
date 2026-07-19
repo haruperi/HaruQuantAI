@@ -5,8 +5,9 @@ from __future__ import annotations
 from decimal import Decimal
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
-    AnalyticsWarning,
+    AnalyticsRunConfig,
     MetricEvidence,
     SectionEvidence,
     TradingResult,
@@ -14,6 +15,7 @@ from app.services.analytics.contracts.models import (
 from app.utils import logger
 
 _PERIOD_RETURN_MIN_SAMPLES = 2
+_CAGR_MIN_WINDOW_DAYS = 1
 
 
 def _metric(metric_key: str, value: object, unit: str) -> MetricEvidence:
@@ -41,7 +43,9 @@ def _optional_metric(
     value: object | None,
     unit: str,
     *,
-    reason: str,
+    observed_count: int,
+    required_count: int,
+    config: AnalyticsRunConfig,
 ) -> MetricEvidence:
     """Build calculated or explicitly undefined return evidence.
 
@@ -49,25 +53,37 @@ def _optional_metric(
         metric_key: Catalog metric key.
         value: Optional finite calculated value.
         unit: Catalog unit.
-        reason: Catalog-backed undefined reason.
+        observed_count: Observations actually available.
+        required_count: Cataloged minimum observations.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Calculated or undefined metric evidence.
     """
     logger.debug("Building optional Analytics return metric evidence")
-    warning = AnalyticsWarning(
-        code="insufficient_samples",
-        severity="warning",
-        affected_section="equity_returns",
+    if value is not None:
+        return MetricEvidence(
+            metric_key=metric_key,
+            status="calculated",
+            value=value,
+            unit=unit,
+        )
+    warning = build_warning(
+        "insufficient_samples",
+        section="equity_returns",
         source_context="daily",
-        detail={"metric_key": metric_key, "reason": reason},
+        detail={
+            "observed_count": observed_count,
+            "required_count": required_count,
+        },
+        max_detail_bytes=config.max_warning_detail_bytes,
     )
     return MetricEvidence(
         metric_key=metric_key,
-        status="calculated" if value is not None else "undefined",
-        value=value,
+        status="undefined",
+        value=None,
         unit=unit,
-        warnings=() if value is not None else (warning,),
+        warnings=(warning,),
     )
 
 
@@ -95,11 +111,16 @@ def _daily_returns(result: TradingResult) -> tuple[float, ...]:
     return tuple(returns)
 
 
-def calculate_return_evidence(result: TradingResult) -> SectionEvidence:
+def calculate_return_evidence(
+    result: TradingResult,
+    *,
+    config: AnalyticsRunConfig,
+) -> SectionEvidence:
     """Calculate cataloged PnL, equity, returns, and CAGR evidence.
 
     Args:
         result: Canonical Analytics input.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Ordered equity-return section evidence.
@@ -136,9 +157,18 @@ def calculate_return_evidence(result: TradingResult) -> SectionEvidence:
             "period_returns",
             period_returns,
             "ratio",
-            reason="fewer than two daily points",
+            observed_count=len(returns),
+            required_count=_PERIOD_RETURN_MIN_SAMPLES,
+            config=config,
         ),
-        _optional_metric("cagr", cagr, "ratio", reason="window shorter than one day"),
+        _optional_metric(
+            "cagr",
+            cagr,
+            "ratio",
+            observed_count=int(days),
+            required_count=_CAGR_MIN_WINDOW_DAYS,
+            config=config,
+        ),
     )
     warnings = tuple(warning for metric in metrics for warning in metric.warnings)
     return SectionEvidence(

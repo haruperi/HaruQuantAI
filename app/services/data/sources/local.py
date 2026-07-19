@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Literal
+from typing import Literal, override
 
 from app.services.data.contracts import DatasetLoadRequest
 from app.services.data.contracts.errors import DataError
@@ -69,6 +69,7 @@ class LocalMarketDataSource(MarketDataSource):
             return csv_path, "csv"
         raise DataError("DATA_NOT_FOUND", safe_details={"field": "symbol"})
 
+    @override
     def fetch(self, request: SourceReadRequest) -> RawSourceBatch:
         """Load an exact local artifact through the governed dataset boundary."""
         logger.info("Fetching local data for source %s", self._source_id)
@@ -112,6 +113,7 @@ class LocalMarketDataSource(MarketDataSource):
             request_id=request.request_id,
         )
 
+    @override
     def list_symbols(self, request: SymbolListRequest) -> SymbolPage:
         """Return a stable, cursor-bounded page of configured local symbols."""
         logger.info("Listing symbols for local source %s", self._source_id)
@@ -145,6 +147,7 @@ class LocalMarketDataSource(MarketDataSource):
             request_id=request.request_id,
         )
 
+    @override
     def get_symbol_metadata(self, request: SymbolMetadataRequest) -> SymbolMetadata:
         """Return caller-supplied authoritative metadata for one local symbol."""
         logger.info("Reading configured local metadata for source %s", self._source_id)

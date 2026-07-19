@@ -141,6 +141,7 @@ ignore = [
 "*_test.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
 "conftest.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
 "tests/*/usage/**/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001"]
+"app/services/data/**/*.py" = ["DOC201", "DOC501"]
 "app/utils/logging/__init__.py" = ["A005"]
 "app/utils/time/__init__.py" = ["A005"]
 "scripts/*.py" = ["INP001", "D100", "D103", "ANN", "S603", "S607", "T201"]

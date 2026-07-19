@@ -9,6 +9,7 @@ import pytest
 from app.services.analytics.contracts import (
     AnalyticsRunConfig,
     AnalyticsValidationError,
+    AnalyticsWarning,
     ClosedTrade,
     DashboardPayload,
     Lineage,
@@ -16,6 +17,7 @@ from app.services.analytics.contracts import (
     PerformanceReport,
     PortfolioAllocationEvidence,
     PortfolioPerformanceReport,
+    QualityFlag,
     ReproducibilityHashes,
     RiskFreeRateEvidence,
     SectionEvidence,
@@ -379,3 +381,65 @@ def test_runtime_config_bounds_iterations() -> None:
         (AnalyticsValidationError, PydanticValidationError), match="exceed"
     ):
         AnalyticsRunConfig(**data)
+
+
+def test_warning_rejects_uncataloged_code() -> None:
+    """An uncataloged warning code cannot reach a report contract."""
+    logger.debug("Testing Analytics uncataloged warning rejection")
+    with pytest.raises(
+        (AnalyticsValidationError, PydanticValidationError), match="uncataloged"
+    ):
+        AnalyticsWarning(
+            code="not_a_real_warning",
+            severity="warning",
+            affected_section="trades",
+            source_context="all",
+            detail={},
+        )
+
+
+def test_warning_rejects_severity_conflicting_with_catalog() -> None:
+    """Warning severity cannot diverge from the Evidence Catalog."""
+    logger.debug("Testing Analytics warning severity conflict")
+    with pytest.raises(
+        (AnalyticsValidationError, PydanticValidationError), match="severity"
+    ):
+        AnalyticsWarning(
+            code="stop_loss_absent",
+            severity="blocker",
+            affected_section="trades",
+            source_context="all",
+            detail={"ticket": "ticket-1"},
+        )
+
+
+def test_quality_flag_rejects_uncataloged_code() -> None:
+    """An uncataloged quality-flag code cannot reach a report contract."""
+    logger.debug("Testing Analytics uncataloged quality-flag rejection")
+    with pytest.raises(
+        (AnalyticsValidationError, PydanticValidationError), match="uncataloged"
+    ):
+        QualityFlag(
+            code="not_a_real_flag",
+            severity="warning",
+            blocker=False,
+            affected_sections=("trades",),
+            source_context="all",
+            detail={},
+        )
+
+
+def test_quality_flag_rejects_blocker_conflicting_with_catalog() -> None:
+    """Blocker semantics cannot diverge from the Evidence Catalog."""
+    logger.debug("Testing Analytics quality-flag blocker conflict")
+    with pytest.raises(
+        (AnalyticsValidationError, PydanticValidationError), match="blocker"
+    ):
+        QualityFlag(
+            code="sample_below_threshold",
+            severity="warning",
+            blocker=True,
+            affected_sections=("trades",),
+            source_context="all",
+            detail={"observed_count": 1, "required_count": 30},
+        )

@@ -2,6 +2,8 @@
 
 # ruff: noqa: INP001
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 from app.services.analytics import contracts
@@ -11,7 +13,11 @@ from app.services.analytics.contracts import (
     build_warning,
     to_report_json_safe,
 )
+from app.services.analytics.metrics.distributions import (
+    calculate_distribution_evidence,
+)
 from app.utils import logger
+from tests.analytics.unit.test_results_adapter import _config
 
 
 def test_build_warning_bounds_detail() -> None:
@@ -73,3 +79,25 @@ def test_analytics_defines_no_utils_duplicate_primitive() -> None:
     assert "to_json_safe" not in contracts.__all__
     assert "canonical_json" not in contracts.__all__
     assert "redact_mapping_value" not in contracts.__all__
+
+
+def test_metric_modules_construct_no_warning_directly() -> None:
+    """Every kernel warning is bounded and redacted through build_warning."""
+    logger.debug("Testing Analytics metric warning construction boundary")
+    metric_modules = sorted(Path("app/services/analytics/metrics").glob("*.py"))
+    assert metric_modules
+    offenders = [
+        path.name
+        for path in metric_modules
+        if "AnalyticsWarning(" in path.read_text(encoding="utf-8")
+    ]
+    assert not offenders
+
+
+def test_kernel_warning_detail_respects_configured_bound() -> None:
+    """A kernel warning cannot exceed the configured detail bound."""
+    logger.debug("Testing Analytics kernel warning detail bound")
+    with pytest.raises(AnalyticsValidationError, match="exceeds configured"):
+        calculate_distribution_evidence(
+            (1.0, 1.0, 1.0, 1.0), config=_config(max_warning_detail_bytes=1)
+        )

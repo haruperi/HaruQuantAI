@@ -149,7 +149,14 @@ class OHLCVRecord(_Record):
 
 
 class TickRecord(_Record):
-    """Canonical UTC tick record preserving genuine quote sides."""
+    """Canonical UTC tick record preserving genuine quote sides.
+
+    The optional ``source_bar_time``, ``tick_index_in_bar``, and ``bar_phase``
+    fields carry intra-bar position evidence for ticks derived from bars. They
+    default to ``None`` for provider-sourced ticks. ``bar_phase`` is a 4-bit mask
+    of open (1), high (2), low (4), and close (8) observations within the source
+    bar and carries no trading meaning.
+    """
 
     bid: Decimal | None = None
     ask: Decimal | None = None
@@ -157,6 +164,9 @@ class TickRecord(_Record):
     volume: Decimal | None = None
     price_unit: str
     volume_unit: str | None = None
+    source_bar_time: datetime | None = None
+    tick_index_in_bar: int | None = None
+    bar_phase: int | None = None
 
     @field_validator("bid", "ask", "last", "volume")
     @classmethod
@@ -164,6 +174,31 @@ class TickRecord(_Record):
         """Validate one DATA value or contract invariant."""
         logger.debug("Running DATA function: _validate_numeric")
         return _finite(value)
+
+    @field_validator("source_bar_time")
+    @classmethod
+    def _validate_source_bar_time(cls, value: datetime | None) -> datetime | None:
+        """Validate one DATA value or contract invariant."""
+        logger.debug("Running DATA function: _validate_source_bar_time")
+        return None if value is None else _utc(value)
+
+    @field_validator("tick_index_in_bar")
+    @classmethod
+    def _validate_tick_index(cls, value: int | None) -> int | None:
+        """Validate one DATA value or contract invariant."""
+        logger.debug("Running DATA function: _validate_tick_index")
+        if value is not None and value < 0:
+            raise ValueError("tick_index_in_bar must be non-negative")
+        return value
+
+    @field_validator("bar_phase")
+    @classmethod
+    def _validate_bar_phase(cls, value: int | None) -> int | None:
+        """Validate one DATA value or contract invariant."""
+        logger.debug("Running DATA function: _validate_bar_phase")
+        if value is not None and not 0 <= value <= 15:  # noqa: PLR2004
+            raise ValueError("bar_phase must be a 4-bit open/high/low/close mask")
+        return value
 
     @field_validator("price_unit", "volume_unit")
     @classmethod

@@ -8,7 +8,9 @@ from collections.abc import Sequence
 import numpy as np
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
+    AnalyticsRunConfig,
     AnalyticsWarning,
     MetricEvidence,
     SectionEvidence,
@@ -51,12 +53,14 @@ def _optional_metric(
 def calculate_risk_evidence(
     daily_returns: Sequence[float],
     *,
+    config: AnalyticsRunConfig,
     confidence: float = 0.95,
 ) -> SectionEvidence:
     """Calculate catalog-approved volatility, VaR, and conditional VaR.
 
     Args:
         daily_returns: Ordered daily simple returns.
+        config: Required Analytics bounds supplying the warning detail bound.
         confidence: Historical tail confidence.
 
     Returns:
@@ -72,21 +76,27 @@ def calculate_risk_evidence(
     if not np.all(np.isfinite(values)):
         raise AnalyticsValidationError("daily returns contain non-finite values")
     variance_warning = (
-        AnalyticsWarning(
-            code="insufficient_samples",
-            severity="warning",
-            affected_section="risk",
+        build_warning(
+            "insufficient_samples",
+            section="risk",
             source_context="daily",
-            detail={"observed_count": len(values), "required_count": 2},
+            detail={
+                "observed_count": len(values),
+                "required_count": _VARIANCE_MIN_SAMPLES,
+            },
+            max_detail_bytes=config.max_warning_detail_bytes,
         ),
     )
     tail_warning = (
-        AnalyticsWarning(
-            code="insufficient_samples",
-            severity="warning",
-            affected_section="risk",
+        build_warning(
+            "insufficient_samples",
+            section="risk",
             source_context="daily",
-            detail={"observed_count": len(values), "required_count": 30},
+            detail={
+                "observed_count": len(values),
+                "required_count": _TAIL_MIN_SAMPLES,
+            },
+            max_detail_bytes=config.max_warning_detail_bytes,
         ),
     )
     volatility = (

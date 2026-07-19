@@ -7,7 +7,9 @@ from decimal import Decimal
 from types import MappingProxyType
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
+    AnalyticsRunConfig,
     AnalyticsWarning,
     ClosedTrade,
     MetricEvidence,
@@ -144,12 +146,15 @@ def _market_presence(trades: tuple[ClosedTrade, ...]) -> float | None:
 def _r_multiples(
     trades: tuple[ClosedTrade, ...],
     source_context: str,
+    *,
+    config: AnalyticsRunConfig,
 ) -> tuple[tuple[float, ...], dict[str, int], tuple[AnalyticsWarning, ...]]:
     """Calculate ordered declared-stop or realized-MAE R multiples.
 
     Args:
         trades: Selected canonical closed trades.
         source_context: Applied source context.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         R values, basis counts, and catalog-backed warnings.
@@ -174,22 +179,22 @@ def _r_multiples(
             values.append(float(trade.net_trade_pnl / abs(trade.mae)))
             counts["realized_mae"] += 1
             warnings.append(
-                AnalyticsWarning(
-                    code="r_multiple_mae_fallback",
-                    severity="warning",
-                    affected_section="trades",
+                build_warning(
+                    "r_multiple_mae_fallback",
+                    section="trades",
                     source_context=source_context,
                     detail={"ticket": trade.ticket, "basis": "realized_mae"},
+                    max_detail_bytes=config.max_warning_detail_bytes,
                 )
             )
         else:
             warnings.append(
-                AnalyticsWarning(
-                    code="r_multiple_undefined",
-                    severity="warning",
-                    affected_section="trades",
+                build_warning(
+                    "r_multiple_undefined",
+                    section="trades",
                     source_context=source_context,
                     detail={"ticket": trade.ticket},
+                    max_detail_bytes=config.max_warning_detail_bytes,
                 )
             )
     return tuple(values), counts, tuple(warnings)
@@ -198,12 +203,14 @@ def _r_multiples(
 def calculate_trade_evidence(
     result: TradingResult,
     *,
+    config: AnalyticsRunConfig,
     source_context: str = "all",
 ) -> SectionEvidence:
     """Calculate all catalog-approved closed-trade evidence.
 
     Args:
         result: Canonical Analytics input.
+        config: Required Analytics bounds supplying the warning detail bound.
         source_context: Evidence grouping label.
 
     Returns:
@@ -213,18 +220,20 @@ def calculate_trade_evidence(
     trades = _selected_trades(result, source_context)
     wins, losses, breakeven, signs = _classifications(trades)
     trade_count = len(trades)
-    r_values, basis_counts, warnings = _r_multiples(trades, source_context)
+    r_values, basis_counts, warnings = _r_multiples(
+        trades, source_context, config=config
+    )
     if basis_counts["declared_stop"] and basis_counts["realized_mae"]:
         warnings += (
-            AnalyticsWarning(
-                code="r_multiple_basis_mixed",
-                severity="warning",
-                affected_section="trades",
+            build_warning(
+                "r_multiple_basis_mixed",
+                section="trades",
                 source_context=source_context,
                 detail={
                     "declared_stop_count": basis_counts["declared_stop"],
                     "realized_mae_count": basis_counts["realized_mae"],
                 },
+                max_detail_bytes=config.max_warning_detail_bytes,
             ),
         )
     potentials: list[float] = []
@@ -232,12 +241,12 @@ def calculate_trade_evidence(
         if trade.mae is not None and trade.mae != 0 and trade.mfe is not None:
             potentials.append(float(trade.mfe / abs(trade.mae)))
     market_presence = _market_presence(trades)
-    undefined_warning = AnalyticsWarning(
-        code="insufficient_samples",
-        severity="warning",
-        affected_section="trades",
+    undefined_warning = build_warning(
+        "insufficient_samples",
+        section="trades",
         source_context=source_context,
         detail={"observed_count": trade_count, "required_count": 1},
+        max_detail_bytes=config.max_warning_detail_bytes,
     )
 
     def optional(metric_key: str, value: object | None, unit: str) -> MetricEvidence:

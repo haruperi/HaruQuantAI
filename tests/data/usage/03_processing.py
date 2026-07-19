@@ -13,6 +13,8 @@ from app.services.data import (
     align_multitimeframe_data,
     generate_synthetic_bars,
     generate_synthetic_ticks,
+    generate_tick_series,
+    generate_tick_series_to_parquet,
     resample_ohlcv,
 )
 from app.services.data.contracts import (
@@ -183,3 +185,51 @@ print("Synthetic Bars Count:", synthetic_bars.record_count)
 _header("Example 5: Aggregate tick records into custom-timeframe OHLCV bars.")
 aggregated = aggregate_ticks_to_bars(dataset_ticks, "M1", "last")
 print("Aggregated Bar Count:", aggregated.record_count)
+
+
+_header("Example 6: FR-DATA-087 derive ticks from real bars (trading_bar model).")
+four_tick_series = generate_tick_series(
+    dataset_m1,
+    model="trading_bar",
+    trading_timeframe="M1",
+)
+print("Model:", four_tick_series.source_metadata["tick_generation_model"])
+print("Generated Tick Count:", four_tick_series.record_count)
+print("First Bid:", four_tick_series.records[0].bid)
+print("First Ask:", four_tick_series.records[0].ask)
+
+_header("Example 7: FR-DATA-088 apply a fixed spread model in points.")
+fixed_spread_series = generate_tick_series(
+    dataset_m1,
+    model="trading_bar",
+    trading_timeframe="M1",
+    spread_model="fixed_spread",
+    fixed_spread_points=Decimal(3),
+    point_value=Decimal("0.00001"),
+)
+_first = fixed_spread_series.records[0]
+print("Spread Model:", fixed_spread_series.source_metadata["tick_spread_model"])
+print("Applied Spread:", (_first.ask or Decimal(0)) - (_first.bid or Decimal(0)))
+
+_header("Example 8: FR-DATA-089 inspect intra-bar phase evidence.")
+for _record in four_tick_series.records[:4]:
+    print(
+        "index:",
+        _record.tick_index_in_bar,
+        "| phase mask:",
+        _record.bar_phase,
+        "| source bar:",
+        _record.source_bar_time,
+    )
+
+_header("Example 9: FR-DATA-090 stream a generated tick series to Parquet.")
+_artifact = Path(__file__).resolve().parents[2] / "data" / "usage_tick_series.parquet"
+_result = generate_tick_series_to_parquet(
+    dataset_m1,
+    path=_artifact,
+    max_output_rows_per_chunk=1000,
+    model="generated",
+    trading_timeframe="M1",
+)
+print("Rows Written:", _result["rows"])
+print("Columns:", _result["columns"])

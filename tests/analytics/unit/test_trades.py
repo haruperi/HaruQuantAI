@@ -20,7 +20,7 @@ def test_trade_evidence_filters_open_and_placeholder_trades() -> None:
         account_currency="USD",
         config=_config(),
     )
-    section = calculate_trade_evidence(result)
+    section = calculate_trade_evidence(result, config=_config())
     metrics = {item.metric_key: item.value for item in section.metrics}
     assert metrics["trade_count"] == 1
     assert metrics["win_count"] == 1
@@ -37,7 +37,7 @@ def test_trade_evidence_preserves_direction_context() -> None:
         account_currency="USD",
         config=_config(),
     )
-    section = calculate_trade_evidence(result, source_context="short")
+    section = calculate_trade_evidence(result, config=_config(), source_context="short")
     metrics = {item.metric_key: item for item in section.metrics}
     assert metrics["trade_count"].value == 0
     assert metrics["win_rate"].status == "undefined"

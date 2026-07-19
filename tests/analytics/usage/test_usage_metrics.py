@@ -74,27 +74,34 @@ def test_usage_trades_calculate_trade_evidence() -> None:
     """Calculate cataloged closed-trade evidence."""
     logger.info("Running Analytics trade-evidence usage")
     result, _ = _configured_result()
-    assert calculate_trade_evidence(result).section_key == "trades"
+    assert calculate_trade_evidence(result, config=_config()).section_key == "trades"
 
 
 def test_usage_returns_calculate_return_evidence() -> None:
     """Calculate exact PnL and daily return evidence."""
     logger.info("Running Analytics return-evidence usage")
     result, _ = _configured_result()
-    assert calculate_return_evidence(result).section_key == "equity_returns"
+    assert (
+        calculate_return_evidence(result, config=_config()).section_key
+        == "equity_returns"
+    )
 
 
 def test_usage_drawdowns_calculate_drawdown_evidence() -> None:
     """Calculate closed-trade drawdown evidence."""
     logger.info("Running Analytics drawdown-evidence usage")
     result, _ = _configured_result()
-    assert calculate_drawdown_evidence(result).section_key == "drawdown"
+    assert (
+        calculate_drawdown_evidence(result, config=_config()).section_key == "drawdown"
+    )
 
 
 def test_usage_risk_calculate_risk_evidence() -> None:
     """Calculate volatility and historical tail evidence."""
     logger.info("Running Analytics risk-evidence usage")
-    assert calculate_risk_evidence(tuple(index / 1000 for index in range(30))).metrics
+    assert calculate_risk_evidence(
+        tuple(index / 1000 for index in range(30)), config=_config()
+    ).metrics
 
 
 def test_usage_ratios_calculate_ratio_evidence() -> None:
@@ -121,7 +128,9 @@ def test_usage_benchmarks_calculate_evidence() -> None:
 def test_usage_distributions_calculate_evidence() -> None:
     """Calculate the canonical distribution evidence set."""
     logger.info("Running Analytics distribution-evidence usage")
-    assert calculate_distribution_evidence((1.0, 2.0, 3.0, 4.0)).metrics
+    assert calculate_distribution_evidence(
+        (1.0, 2.0, 3.0, 4.0), config=_config()
+    ).metrics
 
 
 def test_usage_statistics_run_validation() -> None:
@@ -136,7 +145,7 @@ def test_usage_cost_efficiency_calculate_evidence() -> None:
     """Calculate signed costs, excursions, duration, and efficiency."""
     logger.info("Running Analytics cost-efficiency usage")
     result, _ = _configured_result()
-    assert calculate_cost_efficiency_evidence(result).metrics
+    assert calculate_cost_efficiency_evidence(result, config=_config()).metrics
 
 
 def test_usage_groups_calculate_grouped_evidence() -> None:

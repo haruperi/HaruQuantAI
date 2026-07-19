@@ -7,9 +7,9 @@ from collections.abc import Sequence
 import numpy as np
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
     AnalyticsRunConfig,
-    AnalyticsWarning,
     MetricEvidence,
     SectionEvidence,
 )
@@ -69,12 +69,12 @@ def run_statistical_validation(
     if config.statistics.permutation_iterations > config.max_permutation_iterations:
         raise AnalyticsValidationError("permutation iterations exceed configured bound")
     if len(array) < _ADEQUATE_STATISTICAL_SAMPLES:
-        warning = AnalyticsWarning(
-            code="statistical_evidence_skipped",
-            severity="warning",
-            affected_section="statistical",
+        warning = build_warning(
+            "statistical_evidence_skipped",
+            section="statistical",
             source_context="sample",
             detail={"reason": "insufficient sample", "observed_count": len(array)},
+            max_detail_bytes=config.max_warning_detail_bytes,
         )
         return SectionEvidence(
             section_key="statistical",

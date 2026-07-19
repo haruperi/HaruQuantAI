@@ -9,6 +9,7 @@ from decimal import Decimal
 import numpy as np
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
     AnalyticsRunConfig,
     AnalyticsWarning,
@@ -29,6 +30,7 @@ def _metric(
     metric_key: str,
     value: float | None,
     *,
+    config: AnalyticsRunConfig,
     unit: str = "ratio",
 ) -> MetricEvidence:
     """Build calculated or undefined ratio evidence.
@@ -36,6 +38,7 @@ def _metric(
     Args:
         metric_key: Catalog metric key.
         value: Optional finite ratio.
+        config: Required Analytics bounds supplying the warning detail bound.
         unit: Catalog unit.
 
     Returns:
@@ -45,12 +48,12 @@ def _metric(
     warnings: tuple[AnalyticsWarning, ...] = ()
     if value is None:
         warnings = (
-            AnalyticsWarning(
-                code="undefined_zero_denominator",
-                severity="warning",
-                affected_section="ratios",
+            build_warning(
+                "undefined_zero_denominator",
+                section="ratios",
                 source_context="daily",
                 detail={"metric_key": metric_key},
+                max_detail_bytes=config.max_warning_detail_bytes,
             ),
         )
     return MetricEvidence(
@@ -162,7 +165,12 @@ def calculate_ratio_evidence(
         else None
     )
     metrics = tuple(
-        _metric(key, value, unit="currency" if key == "expectancy" else "ratio")
+        _metric(
+            key,
+            value,
+            config=config,
+            unit="currency" if key == "expectancy" else "ratio",
+        )
         for key, value in (
             ("sharpe_ratio", sharpe),
             ("sortino_ratio", sortino),

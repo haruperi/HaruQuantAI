@@ -7,7 +7,9 @@ from datetime import datetime
 from decimal import Decimal
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
+from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
+    AnalyticsRunConfig,
     AnalyticsWarning,
     MetricEvidence,
     SectionEvidence,
@@ -36,11 +38,16 @@ def _metric(metric_key: str, value: object, unit: str) -> MetricEvidence:
     )
 
 
-def calculate_drawdown_evidence(result: TradingResult) -> SectionEvidence:
+def calculate_drawdown_evidence(
+    result: TradingResult,
+    *,
+    config: AnalyticsRunConfig,
+) -> SectionEvidence:
     """Calculate core drawdown evidence from the closed-trade equity curve.
 
     Args:
         result: Canonical Analytics input.
+        config: Required Analytics bounds supplying the warning detail bound.
 
     Returns:
         Ordered drawdown section evidence.
@@ -79,12 +86,12 @@ def calculate_drawdown_evidence(result: TradingResult) -> SectionEvidence:
     warnings: tuple[AnalyticsWarning, ...] = ()
     if max_drawdown > 0 and recovery_at is None:
         warnings = (
-            AnalyticsWarning(
-                code="drawdown_unrecovered",
-                severity="informational",
-                affected_section="drawdown",
+            build_warning(
+                "drawdown_unrecovered",
+                section="drawdown",
                 source_context="all",
                 detail={"trough_at": trough_at, "window_end": result.window_end},
+                max_detail_bytes=config.max_warning_detail_bytes,
             ),
         )
     recovery = (

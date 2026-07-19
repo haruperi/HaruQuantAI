@@ -533,6 +533,64 @@ def generate_synthetic_bars(request: SyntheticRequest) -> MarketDataset:
     return generate_synthetic_dataset(request)
 
 
+def generate_tick_series(
+    dataset: MarketDataset,
+    **generation_arguments: object,
+) -> MarketDataset:
+    """Derive a canonical tick dataset from real bar or real tick evidence.
+
+    Unlike ``generate_synthetic_ticks``, every price comes from an actual OHLC bound
+    or an actual quote and every tick count from actual tick volume; only the
+    intra-bar path shape is constructed.
+
+    Args:
+        dataset: Source MarketDataset supplying bars, or signal-timeframe context.
+        **generation_arguments: Keyword arguments forwarded to the generator.
+
+    Returns:
+        A canonical tick MarketDataset ordered by timestamp.
+
+    Raises:
+        DataError: If the model, spread configuration, or timeframe is invalid.
+    """
+    logger.info("Executing public DATA tick-series generation")
+    from typing import Any
+
+    from app.services.data.processing.ticks import (
+        generate_tick_series as _generate_tick_series,
+    )
+
+    args: dict[str, Any] = generation_arguments
+    return _generate_tick_series(dataset, **args)
+
+
+def generate_tick_series_to_parquet(
+    dataset: MarketDataset,
+    **generation_arguments: object,
+) -> Mapping[str, object]:
+    """Stream a generated tick series to a bounded Parquet artifact.
+
+    Args:
+        dataset: Source MarketDataset supplying bar or context evidence.
+        **generation_arguments: Keyword arguments forwarded to the generator.
+
+    Returns:
+        Mapping with the written path, row count, and column names.
+
+    Raises:
+        DataError: If generation fails or the destination cannot be written.
+    """
+    logger.info("Executing public DATA tick-series Parquet streaming")
+    from typing import Any
+
+    from app.services.data.processing.ticks import (
+        generate_tick_series_to_parquet as _stream,
+    )
+
+    args: dict[str, Any] = generation_arguments
+    return _stream(dataset, **args)
+
+
 def aggregate_ticks_to_bars(
     dataset: MarketDataset,
     target_timeframe: str,

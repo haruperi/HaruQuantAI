@@ -20,17 +20,120 @@ This document is only for adding high-level changes, decisions, or status update
 - Trading is a completed implementation baseline across all 66 active functional and
   eight non-functional requirements, nine capability modules, and all fourteen
   documented workflows; production live mutation remains disabled by default.
-- Simulation is specification-complete and `Missing` (not yet implemented). A
-  pre-build readiness audit on 2026-07-19 found ten blockers, all now closed. Its
-  build depends on Data's additive tick-generation feature landing first.
+- Simulation is a completed implementation baseline across all 43 functional and
+  12 non-functional requirements, its nine registered workflows, and the clean
+  Section 7 domain gate. The post-build review of 2026-07-19 closed six blocking
+  correctness defects. The Section 7 gate is green on both Linux (`169 passed`,
+  `83.21%` coverage) and the Windows toolchain; the domain is verified.
 - Data remains a completed implementation baseline, now including real-evidence
   tick-series generation (`FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016`). Its quality
   gates must be run on the Windows toolchain; the feature has not yet been executed.
 - Analytics is a completed implementation baseline across contracts, ledger
   adaptation, 60 cataloged metrics, reporting/allocation evidence, bounded dashboards,
-  package exports, all active requirements, and all non-excluded workflows.
+  package exports, all active requirements, and all non-excluded workflows. The
+  post-build review of 2026-07-19 closed one blocking and three high findings in the
+  evidence layer; its Section 7 gate must be re-run on the Windows toolchain before
+  the domain is re-declared verified.
 
 ### Added
+
+- **2026-07-19 — Simulation domain gate unblocked.** Re-running the Section 7 gate
+  after the post-build review corrections surfaced six failures, all traced to two
+  defects in the shared `tests/simulator/unit/test_orchestrator.py` fixtures rather
+  than to Simulation production code. `FakeDependencies.resolve_fx_evidence` built a
+  `USD → USD` identity rate leg, which Data's `FXRateLeg` correctly rejects
+  (`app/services/data/contracts/fx.py:197`) because a leg converting a currency to
+  itself carries no conversion evidence and cannot satisfy the contract's
+  continuous-path and composite-rate invariants; the fixture now emits a genuine
+  `EUR → USD` leg at `1.10`, matching the `EURUSD` instrument and `USD` account
+  currency already used by the request fixture. This unblocked
+  `test_portfolio_run_fails_closed_on_incomplete_component`,
+  `test_portfolio_run_fails_closed_on_unreconciled_aggregate`,
+  `test_portfolio_return_series_is_measured_not_supplied`,
+  `test_portfolio_candidate_publishes_reconciled_aggregate`, and
+  `test_usage_run_portfolio_backtest`. Separately,
+  `test_repeat_request_with_different_hash_conflicts` arranged its conflict by
+  writing a mismatched record straight into the state store, so the store's own
+  `SIM_RUN_ID_CONFLICT` guard fired during setup and the production path was never
+  reached; the test now submits a second request carrying the same `request_id` with
+  different hashed material (`seed=11`) and asserts `run_backtest` raises
+  `SIM_RUN_ID_CONFLICT` through `resolve_idempotent_run` (`FR-SIM-017`), and further
+  asserts the stored run identity is unchanged. `_request` gained a `seed` parameter
+  for that purpose. No Simulation production file was modified. Gate: ruff and
+  `ruff format --check` clean, `mypy` clean over 32 source files, 110 unit + 16
+  integration + 43 usage tests passing, `169 passed` at `83.21%` coverage.
+
+- **2026-07-19 — Simulation domain verified and closed.** The Section 7 command
+  block was executed on the Windows toolchain and passes in full: `ruff check`,
+  `ruff format --check`, `mypy app/services/simulator`, the unit, integration, and
+  usage suites, and `--cov-fail-under=80`. This was the sole remaining checklist
+  item. `app/services/simulator/README.md` moves from `Partial` to `Completed`
+  with every checklist item satisfied, and no post-build review finding remains
+  open at any severity.
+
+- **2026-07-19 — Analytics post-build review corrections (blocking class).** A
+  read-only completion review returned `NOT READY`. The blocking finding and the
+  three high findings that shared the evidence/safety layer are now closed.
+  `build_performance_report()` no longer hardcodes `quality_flags=()`
+  (`FR-ANLT-043`): it emits `required_section_failed` per failed required section,
+  `diagnostic_partial_report` when a required section failed under
+  `diagnostic_partial_mode`, `sample_below_threshold` below
+  `MIN_METRIC_SAMPLES["statistical"]`, and `intratrade_exposure_unobserved` on every
+  closed-trade report. A diagnostic partial report is therefore no longer
+  byte-indistinguishable from a complete one, closing a false-success path into the
+  registered `PerformanceReport v1` consumed by Optimization, Portfolio, and UI/API.
+  `AnalyticsWarning` and `QualityFlag` now implement their documented `Raises`
+  (`FR-ANLT-007`, `FR-ANLT-008`): both validate `code` against `EVIDENCE_CATALOG`
+  and reject a severity — and, for flags, a blocker value — that conflicts with the
+  catalog. All fifteen direct `AnalyticsWarning(...)` constructions in
+  `metrics/` are routed through `build_warning()` (`FR-ANLT-022`), restoring the
+  `MAX_WARNING_DETAIL_BYTES` bound, Utils redaction, catalog-code validation, and
+  catalog-derived severity on the dominant emission path. Producer
+  `source_metadata` and `quality_metadata` are redacted through Utils
+  `redact_mapping_value` before they reach `TradingResult` and before their bound is
+  measured (`FR-ANLT-027`, `NFR-ANLT-006`). Two latent catalog defects surfaced by
+  the routing are fixed: `insufficient_samples` in `returns.py` and
+  `undefined_zero_variance` in `distributions.py` carried detail keys that did not
+  match their cataloged `required_detail_keys`, and `r_multiple_basis_mixed` carried
+  `severity="warning"` against a cataloged `major`. Eleven tests were added, each
+  revert-checked to confirm it fails when its fix is removed. Domain gate: 135
+  passed, 84.63% coverage.
+
+- **2026-07-19 — Simulation post-build review corrections.** A read-only completion
+  review returned `NOT READY` with six blocking findings; all six are now closed.
+  Protective exits execute: `evaluate_protective_exit()` (`FR-SIM-043`) resolves
+  stop-loss and take-profit against each tick and `EventDrivenExecutionEngine`
+  closes triggered positions before matching pending orders, with same-tick
+  conflicts resolved by `SAME_TICK_PRIORITY` so stop-loss always wins.
+  `SimulationResult.closed_trades` is populated from engine-observed terminal
+  closes carrying the `mae`/`mfe` observed during execution, replacing a
+  permanently empty tuple. `AccountingSummary` is derived from the completed
+  ledger, replacing hardcoded `commission=0`, `swap=0`, and
+  `gross_profit=net_profit`; `AccountLedger.apply_fill()` now returns itemized
+  costs so they can be attributed per position, and the orchestrator asserts
+  `net_profit == gross_profit + commission + swap`. `SimulationStateStore` is a
+  `Protocol` again: the SQLite implementation moved to
+  `tests/simulator/_fixtures/sqlite_store.py`, and Simulation imports no `sqlite3`
+  and executes no schema statement. The portfolio path measures instead of echoes:
+  `component_return_series` is derived from each component's own simulated equity
+  on a shared cadence (`FR-SIM-033`), reconciliation is an exact `Decimal`
+  comparison of aggregate against component totals, FX lineage is resolved through
+  the new `SimulationRunDependencies.resolve_fx_evidence()` seam and freshness
+  validated, and `aggregate_metrics_ref` now points at a written artifact.
+  `docs/PROJECT.md` rows for the four Simulation-owned contracts and the
+  Simulation persisted-state row move from `Missing` to `Completed`. Supporting
+  fixes: the engine no longer fabricates an acceptance tick when none exists
+  (`average_price=None`, no invented price in the journal), equity now includes
+  unrealized profit and loss via `AccountLedger.mark_to_market()` (`FR-SIM-042`)
+  so margin admission accounts for open exposure, and `SimTrader.submit_order()`
+  verifies route and Risk-approved volume before the engine is reached.
+  Ruff lint and format pass; `mypy`, `pytest`, and coverage must be executed on
+  the Windows toolchain.
+
+- **2026-07-19 — Simulation domain completed.** Implemented the deterministic
+  validation, timeline, accounting, state, journal, execution, reporting, and run
+  boundaries, including isolated fast research and all-or-nothing portfolio runs.
+  The final domain gate passes 112 tests at 82.37% coverage.
 
 - **2026-07-19 — Analytics domain completed.** Implemented all active Analytics
   features and workflows, exact Simulation fixture parity, value-bearing metric
@@ -159,6 +262,23 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Decisions
 
+- **2026-07-19 — Analytics quality-flag emission policy fixed.** `FR-ANLT-043` and
+  the `WF-ANLT-001` failure behaviour now state exactly which cataloged flags a
+  report carries and when. `quality_flags` is empty of blocker evidence only when
+  the report is a complete, clean measurement, so a diagnostic partial report can
+  never be mistaken for a complete one. `intratrade_exposure_unobserved` is emitted
+  on every report, because a closed-trade curve can never observe open-position
+  exposure — it is a permanent property of the basis, not a conditional caveat.
+
+- **2026-07-19 — Analytics metric kernels accept the run configuration.**
+  `FR-ANLT-028`, `-029`, `-030`, `-031`, `-035`, and `-037` gained a keyword-only
+  `config: AnalyticsRunConfig`, which is the bound `build_warning()` requires. These
+  are internal feature APIs (§2), not package-root exports, so no cross-domain
+  consumer is affected. `align_benchmark_series` (`FR-ANLT-033`) deliberately did
+  **not** gain `config`: it emits no warning today, and carrying a dead parameter
+  would be speculative. `benchmark_duplicate_resolved` needs a return-shape change
+  and is left to the deferred evidence-code work.
+
 - **2026-07-19 — Portfolio simulation seam frozen.** Simulation `FR-SIM-033` now
   owns exact aligned `component_return_series` evidence in
   `PortfolioSimulationResult v1`, enabling Analytics correlation/concentration
@@ -217,10 +337,11 @@ This document is only for adding high-level changes, decisions, or status update
   `SIM_ERROR_CATALOG` (`FR-SIM-035`–`037`), replacing an unenumerated taxonomy that 24
   requirements already raised. Added the `SimulationStateStore` port and Simulation-owned
   migrations (`FR-SIM-041`), replacing a dependency on Data persistence internals that
-  Data does not export. Added `dispatch_sim_order` (`FR-SIM-038`) matching the async
-  `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]` port Trading already injects;
-  `SimTrader.submit_order` now returns `ExecutionReceipt` rather than an untyped
-  mapping. Added the portfolio backtest path (`FR-SIM-032`–`034`) for two registered
+  Data does not export. Fixed `FR-SIM-038` as the bound asynchronous
+  `SimTrader.submit_order` method matching the
+  `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]` port Trading injects, with
+  no module-global engine or standalone dispatcher. Added the portfolio backtest
+  path (`FR-SIM-032`–`034`) for two registered
   contracts that previously had no requirement, file, or function. Split `FR-SIM-010`
   into `validate_fx_evidence` and `convert_fx_amount` (`FR-SIM-039`). Corrected the
   `WF-SIM-003` diagram, which routed Optimization through the non-canonical research

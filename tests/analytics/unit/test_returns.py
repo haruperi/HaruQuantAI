@@ -20,7 +20,7 @@ def test_return_evidence_sorts_utc_and_records_frequency() -> None:
         account_currency="USD",
         config=_config(),
     )
-    section = calculate_return_evidence(result)
+    section = calculate_return_evidence(result, config=_config())
     metrics = {item.metric_key: item for item in section.metrics}
     assert metrics["net_pnl"].value == Decimal(9)
     assert metrics["ending_equity"].value == Decimal(1009)

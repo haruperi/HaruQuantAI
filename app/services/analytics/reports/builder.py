@@ -7,14 +7,23 @@ from decimal import Decimal
 
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.contracts.errors import AnalyticsValidationError
-from app.services.analytics.contracts.evidence import build_warning, to_report_json_safe
+from app.services.analytics.contracts.evidence import (
+    build_quality_flag,
+    build_warning,
+    to_report_json_safe,
+)
 from app.services.analytics.contracts.models import (
     AnalyticsRunConfig,
     PerformanceReport,
+    QualityFlag,
     ReproducibilityHashes,
+    SectionEvidence,
 )
 from app.services.analytics.metrics.groups import calculate_grouped_evidence
-from app.services.analytics.metrics.trades import ANNUALIZATION_POLICY
+from app.services.analytics.metrics.trades import (
+    ANNUALIZATION_POLICY,
+    MIN_METRIC_SAMPLES,
+)
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
 from app.utils import ValidationError as UtilsValidationError
 from app.utils import canonical_json, derive_stable_id, logger, utc_now, validate_id
@@ -28,6 +37,84 @@ OPTIONAL_REPORT_SECTIONS = (
     "cost_efficiency",
     "statistical",
 )
+
+
+def _build_quality_flags(
+    sections: tuple[SectionEvidence, ...],
+    *,
+    required_failures: tuple[str, ...],
+    trade_count: int,
+    curve_basis: str,
+    diagnostic_partial_mode: bool,
+    config: AnalyticsRunConfig,
+) -> tuple[QualityFlag, ...]:
+    """Build the cataloged quality flags a report must carry.
+
+    ``quality_flags`` is empty of blocker evidence only when the report is a
+    complete, clean measurement, so a diagnostic partial report can never be
+    mistaken for a complete one.
+
+    Args:
+        sections: Ordered section evidence already calculated.
+        required_failures: Failed required section keys.
+        trade_count: Closed-trade count backing the report.
+        curve_basis: Applied equity-curve basis.
+        diagnostic_partial_mode: Explicit permission for non-binding diagnostics.
+        config: Required Analytics bounds supplying the flag detail bound.
+
+    Returns:
+        Ordered cataloged quality flags.
+    """
+    logger.debug("Building Analytics report quality flags")
+    reasons = {section.section_key: section.reason for section in sections}
+    flags: list[QualityFlag] = []
+    for section_key in required_failures:
+        flags.append(
+            build_quality_flag(
+                "required_section_failed",
+                section=section_key,
+                source_context="report",
+                detail={
+                    "section": section_key,
+                    "reason": reasons.get(section_key) or "required section failed",
+                },
+                max_detail_bytes=config.max_warning_detail_bytes,
+            )
+        )
+    if required_failures and diagnostic_partial_mode:
+        flags.append(
+            build_quality_flag(
+                "diagnostic_partial_report",
+                section="report",
+                source_context="report",
+                detail={"failed_sections": required_failures},
+                max_detail_bytes=config.max_warning_detail_bytes,
+            )
+        )
+    required_samples = MIN_METRIC_SAMPLES["statistical"]
+    if trade_count < required_samples:
+        flags.append(
+            build_quality_flag(
+                "sample_below_threshold",
+                section="trades",
+                source_context="all",
+                detail={
+                    "observed_count": trade_count,
+                    "required_count": required_samples,
+                },
+                max_detail_bytes=config.max_warning_detail_bytes,
+            )
+        )
+    flags.append(
+        build_quality_flag(
+            "intratrade_exposure_unobserved",
+            section="drawdown",
+            source_context="all",
+            detail={"curve_basis": curve_basis},
+            max_detail_bytes=config.max_warning_detail_bytes,
+        )
+    )
+    return tuple(flags)
 
 
 def _replace_hashes(
@@ -114,6 +201,14 @@ def build_performance_report(
     )
     if required_failures and not diagnostic_partial_mode:
         raise AnalyticsValidationError("required Analytics report section failed")
+    quality_flags = _build_quality_flags(
+        sections,
+        required_failures=required_failures,
+        trade_count=len(result.trades),
+        curve_basis=result.curve_basis,
+        diagnostic_partial_mode=diagnostic_partial_mode,
+        config=config,
+    )
     initial_hashes = compute_reproducibility_hashes(result)
     caveats = tuple(warning for section in sections for warning in section.warnings)
     curve_warning = build_warning(
@@ -136,7 +231,7 @@ def build_performance_report(
         account_currency=account_currency,
         sections=sections,
         caveats=caveats,
-        quality_flags=(),
+        quality_flags=quality_flags,
         lineage=result.lineage,
         hashes=initial_hashes,
         precision_metadata={
