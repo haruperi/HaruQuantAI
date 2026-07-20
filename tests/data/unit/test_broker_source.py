@@ -27,7 +27,7 @@ def test_account_snapshot_fails_closed_when_incomplete() -> None:
         source_id="mt5",
         account_id="acc-1",
         max_age_seconds=10,
-        request_id="req-9456bdfa12ea76959c94a3572f5d91c73d838622df0a8d9b4e815c276c6b7880",
+        request_id="req-9456bdfa-12ea-4695-9c94-a3572f5d91c7",
     )
 
     adapter = MagicMock()
@@ -81,7 +81,7 @@ def test_account_snapshot_success() -> None:
         symbol="MSFT",
         side="BUY",
         order_type="LIMIT",
-        state="NEW",
+        state="ACCEPTED",
         quantity=Decimal(5),
         filled=Decimal(0),
         remaining=Decimal(5),
@@ -126,7 +126,7 @@ def test_account_snapshot_success() -> None:
         source_id="yahoo",
         account_id="acc-1",
         max_age_seconds=30,
-        request_id="req-24cf6ea68781eab00f0f09fa954ed083c6b0ea3e49c75928e09b174febb88a9e",
+        request_id="req-24cf6ea6-8781-4ab0-8f0f-09fa954ed083",
     )
 
     clock = MagicMock()

@@ -4,6 +4,7 @@ import asyncio
 import inspect
 from collections.abc import AsyncGenerator, AsyncIterator
 from datetime import UTC, datetime
+from decimal import Decimal
 from typing import cast
 
 import pytest
@@ -17,6 +18,8 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
+    BrokerOrderRequest,
+    BrokerOrderResult,
     BrokerResult,
     BrokerSubscription,
     BrokerSubscriptionInfo,
@@ -26,6 +29,8 @@ from app.services.brokers import (
 )
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.runtime.subscription import _BrokerSubscription
+
+REQUEST_ID = "req-b4b8aa60-ba17-4561-884b-138c6074c5fb"
 
 
 def _capability(
@@ -445,6 +450,43 @@ def test_cancellation_propagates_without_translation() -> None:
     asyncio.run(_cancel())
 
 
+def test_public_boundary_translates_and_redacts_raw_provider_exception() -> None:
+    """Raw provider exceptions never cross the canonical adapter boundary."""
+
+    class _ExplodingAdapter(_ContextAdapter):
+        async def connect(self) -> BrokerResult[None]:
+            raise RuntimeError("password=provider-secret")
+
+    result = asyncio.run(_ExplodingAdapter().connect())
+    assert result.error is not None
+    assert result.error.code is BrokerErrorCode.BROKER_RESPONSE_INVALID
+    assert "provider-secret" not in repr(result)
+
+
+def test_mutation_timeout_is_non_retryable_unknown_outcome() -> None:
+    """Possible mutation transmission is never retried or reported as rejected."""
+
+    class _TimedOutAdapter(_ContextAdapter):
+        async def place_order(
+            self, request: BrokerOrderRequest
+        ) -> BrokerResult[BrokerOrderResult]:
+            del request
+            raise TimeoutError("provider acknowledgement timeout")
+
+    request = BrokerOrderRequest(
+        symbol="EURUSD",
+        side="BUY",
+        order_type="MARKET",
+        quantity=Decimal("0.01"),
+        quantity_unit="lots",
+        environment=BrokerEnvironment.DEMO,
+    )
+    result = asyncio.run(_TimedOutAdapter().place_order(request))
+    assert result.error is not None
+    assert result.error.code is BrokerErrorCode.BROKER_UNKNOWN_OUTCOME
+    assert result.error.retryable is False
+
+
 def test_adapter_context_connect_failure_raises_runtime_error() -> None:
     """A connection failure inside the async context manager raises RuntimeError."""
 
@@ -456,7 +498,7 @@ def test_adapter_context_connect_failure_raises_runtime_error() -> None:
                 status="error",
                 broker=BrokerId.YAHOO,
                 operation=BrokerCapabilityId.CONNECT,
-                request_id="test",
+                request_id=REQUEST_ID,
                 timestamp=datetime.now(UTC),
                 environment=BrokerEnvironment.SANDBOX,
                 adapter_version="1",

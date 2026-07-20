@@ -1,7 +1,5 @@
 """Immutable canonical broker inputs, outputs, results, and events."""
 
-# ruff: noqa: D105 - invariant hooks are documented by their model classes.
-
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -25,17 +23,36 @@ from app.utils import (
 from app.utils import (
     format_utc_timestamp,
     redact_mapping_value,
+    redact_text_value,
     validate_id,
 )
 
 
 def _text(value: str, name: str) -> None:
+    """Handle text.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     if not value.strip():
         message = f"{name} must not be empty"
         raise ValueError(message)
 
 
 def _utc(value: datetime | None, name: str) -> None:
+    """Handle utc.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     if value is None:
         return
     try:
@@ -46,12 +63,30 @@ def _utc(value: datetime | None, name: str) -> None:
 
 
 def _finite(value: Decimal | None, name: str) -> None:
+    """Handle finite.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     if value is not None and not value.is_finite():
         message = f"{name} must be finite"
         raise ValueError(message)
 
 
 def _positive(value: Decimal, name: str) -> None:
+    """Handle positive.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     _finite(value, name)
     if value <= 0:
         message = f"{name} must be positive"
@@ -59,6 +94,15 @@ def _positive(value: Decimal, name: str) -> None:
 
 
 def _non_negative(value: Decimal | None, name: str) -> None:
+    """Handle non negative.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     _finite(value, name)
     if value is not None and value < 0:
         message = f"{name} must not be negative"
@@ -66,28 +110,60 @@ def _non_negative(value: Decimal | None, name: str) -> None:
 
 
 def _optional_text(value: str | None, name: str) -> None:
+    """Handle optional text.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+    """
     if value is not None:
         _text(value, name)
 
 
 def _choice(value: str, allowed: set[str], name: str) -> None:
+    """Handle choice.
+
+    Args:
+        value: Value supplied to the operation.
+        allowed: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     if value not in allowed:
         message = f"unknown {name}"
         raise ValueError(message)
 
 
 def _non_negative_float(value: float | None, name: str) -> None:
+    """Handle non negative float.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     if value is not None and (not math.isfinite(value) or value < 0):
         message = f"{name} must be finite and non-negative"
         raise ValueError(message)
 
 
 def _request_id(value: str | None, name: str) -> None:
+    """Handle request id.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     if value is None:
         return
     _text(value, name)
-    if not value.startswith("req-"):
-        return
     try:
         validate_id(value, expected_prefix="req")
     except UtilsValidationError as error:
@@ -96,10 +172,26 @@ def _request_id(value: str | None, name: str) -> None:
 
 
 def _frozen[K, V](value: Mapping[K, V]) -> Mapping[K, V]:
+    """Handle frozen.
+
+    Args:
+        value: Value supplied to the operation.
+
+    Returns:
+        The operation result.
+    """
     return MappingProxyType(dict(value))
 
 
 def _freeze_value(value: object) -> object:
+    """Handle freeze value.
+
+    Args:
+        value: Value supplied to the operation.
+
+    Returns:
+        The operation result.
+    """
     if isinstance(value, Mapping):
         return MappingProxyType(
             {str(key): _freeze_value(item) for key, item in value.items()}
@@ -110,6 +202,18 @@ def _freeze_value(value: object) -> object:
 
 
 def _redacted(value: Mapping[str, object], name: str) -> Mapping[str, object]:
+    """Handle redacted.
+
+    Args:
+        value: Value supplied to the operation.
+        name: Value supplied to the operation.
+
+    Returns:
+        The operation result.
+
+    Raises:
+        ValueError: If the documented operation cannot complete.
+    """
     try:
         result = redact_mapping_value(value)
     except UtilsValidationError as error:
@@ -161,6 +265,11 @@ class BrokerConnectionConfig(_Schema):
     probe_symbol: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerConnectionConfig invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         positive = (
             self.connect_timeout_sec,
             self.request_timeout_sec,
@@ -201,9 +310,23 @@ class BrokerError(_Schema):
     details: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerError invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.message, "message")
         _optional_text(self.provider_code, "provider_code")
         _optional_text(self.provider_message, "provider_message")
+        for name in ("message", "provider_code", "provider_message"):
+            value = getattr(self, name)
+            if value is None:
+                continue
+            result = redact_text_value(value)
+            if result.truncated_paths:
+                message = f"{name} must not exceed redaction bounds"
+                raise ValueError(message)
+            object.__setattr__(self, name, cast("str", result.value))
         object.__setattr__(self, "details", _redacted(self.details, "details"))
 
 
@@ -228,6 +351,11 @@ class BrokerResult[T](_Schema):
     provider_api_version: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerResult invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.request_id, "request_id")
         _request_id(self.request_id, "request_id")
         _utc(self.timestamp, "timestamp")
@@ -265,6 +393,11 @@ class BrokerPage[T](_Schema):
     provider_metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerPage invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         count = len(self.items) if self.returned_count is None else self.returned_count
         if self.limit <= 0 or count != len(self.items) or count > self.limit:
             raise ValueError("page bounds are inconsistent")
@@ -295,6 +428,11 @@ class BrokerCapability(_Schema):
     reason: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerCapability invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _choice(
             self.implementation_status,
             {"IMPLEMENTED", "NOT_IMPLEMENTED"},
@@ -352,6 +490,11 @@ class BrokerFeatureFlags(_Schema):
     provider_api_version: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerFeatureFlags invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _utc(self.generated_at, "generated_at")
         _text(self.adapter_version, "adapter_version")
         _optional_text(self.account_reference_redacted, "account_reference_redacted")
@@ -381,13 +524,16 @@ class BrokerConnectionStatus(_Schema):
     account_reference_redacted: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerConnectionStatus invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _utc(self.observed_at, "observed_at")
         if self.session_generation < 0:
             raise ValueError("session generation must not be negative")
-        if self.state == BrokerConnectionState.READY and not (
-            self.transport_connected and self.application_authenticated is True
-        ):
-            raise ValueError("ready state requires verified transport and application")
+        if self.state == BrokerConnectionState.READY and not self.transport_connected:
+            raise ValueError("ready state requires verified transport")
         if not self.transport_connected and any(
             value is True
             for value in (
@@ -417,6 +563,11 @@ class BrokerConnectionEvent(_Schema):
     resynchronization_required: bool = False
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerConnectionEvent invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _utc(self.timestamp, "timestamp")
         if self.previous_state == self.new_state:
             raise ValueError("event must record a real transition")
@@ -440,6 +591,7 @@ class BrokerPlatformInfo(_Schema):
     endpoint_metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerPlatformInfo invariants."""
         _text(self.provider_name, "provider_name")
         _text(self.product_profile, "product_profile")
         _optional_text(self.api_or_terminal_version, "api_or_terminal_version")
@@ -464,6 +616,11 @@ class BrokerPermissions(_Schema):
     provider_permissions: Mapping[str, bool | None] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerPermissions invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _utc(self.observed_at, "observed_at")
         if any(not key.strip() for key in self.provider_permissions):
             raise ValueError("provider permission names must not be empty")
@@ -489,6 +646,7 @@ class BrokerAccountInfo(_Schema):
     provider_timestamp: datetime | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerAccountInfo invariants."""
         _text(self.account_id, "account_id")
         _optional_text(self.account_reference_redacted, "account_reference_redacted")
         _optional_text(self.currency, "currency")
@@ -513,6 +671,7 @@ class BrokerBalance(_Schema):
     provider_timestamp: datetime | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerBalance invariants."""
         _text(self.asset, "asset")
         _text(self.unit, "unit")
         _utc(self.provider_timestamp, "provider_timestamp")
@@ -533,6 +692,11 @@ class BrokerAssetInfo(_Schema):
     provider_metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerAssetInfo invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.asset_id, "asset_id")
         _optional_text(self.provider_name, "provider_name")
         _optional_text(self.unit, "unit")
@@ -568,6 +732,11 @@ class BrokerSymbolInfo(_Schema):
     provider_metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerSymbolInfo invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         for name in (
             "provider_symbol",
             "product_profile",
@@ -627,6 +796,11 @@ class BrokerMarketStatus(_Schema):
     reason: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerMarketStatus invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.symbol, "symbol")
         if self.status not in {"OPEN", "CLOSED", "HALTED", "UNKNOWN"}:
             raise ValueError("unknown market status")
@@ -647,6 +821,11 @@ class BrokerTradingSession(_Schema):
     provider_metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerTradingSession invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.symbol, "symbol")
         _utc(self.opens_at, "opens_at")
         _utc(self.closes_at, "closes_at")
@@ -678,6 +857,11 @@ class BrokerQuote(_Schema):
     provider_timestamp: datetime | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerQuote invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.symbol, "symbol")
         _text(self.price_unit, "price_unit")
         _text(self.quantity_unit, "quantity_unit")
@@ -712,6 +896,11 @@ class BrokerTick(_Schema):
     ask_quantity: Decimal | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerTick invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.symbol, "symbol")
         _text(self.price_unit, "price_unit")
         _text(self.quantity_unit, "quantity_unit")
@@ -752,6 +941,11 @@ class BrokerBar(_Schema):
     spread_unit: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerBar invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         for name in (
             "symbol",
             "provider_timeframe",
@@ -797,6 +991,11 @@ class BrokerOrderBook(_Schema):
     depth_truncation: int | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerOrderBook invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.symbol, "symbol")
         _text(self.price_unit, "price_unit")
         _text(self.quantity_unit, "quantity_unit")
@@ -831,6 +1030,11 @@ class BrokerSubscriptionInfo(_Schema):
     active: bool = True
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerSubscriptionInfo invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.subscription_id, "subscription_id")
         if not self.symbols or len(set(self.symbols)) != len(self.symbols):
             raise ValueError("subscription symbols must be non-empty and unique")
@@ -865,6 +1069,7 @@ class BrokerPosition(_Schema):
     provider_timestamp: datetime | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerPosition invariants."""
         _choice(self.side, {"LONG", "SHORT", "UNKNOWN"}, "position side")
         _choice(self.state, {"OPEN", "CLOSED", "UNKNOWN"}, "position state")
         _text(self.position_id, "position_id")
@@ -898,6 +1103,11 @@ class BrokerOrderFilter(_Schema):
     account_reference: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerOrderFilter invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         for name in ("symbol", "status", "side", "account_reference"):
             _optional_text(getattr(self, name), name)
         _utc(self.start, "start")
@@ -916,6 +1126,7 @@ class BrokerPositionFilter(_Schema):
     account_reference: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerPositionFilter invariants."""
         for name in ("symbol", "side", "account_reference"):
             _optional_text(getattr(self, name), name)
 
@@ -945,7 +1156,31 @@ class BrokerOrder(_Schema):
     provider_metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerOrder invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _choice(self.side, {"BUY", "SELL", "UNKNOWN"}, "order side")
+        _choice(
+            self.order_type,
+            {"MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP", "UNKNOWN"},
+            "order type",
+        )
+        _choice(
+            self.state,
+            {
+                "PENDING",
+                "ACCEPTED",
+                "PARTIALLY_FILLED",
+                "FILLED",
+                "CANCELLED",
+                "REJECTED",
+                "EXPIRED",
+                "UNKNOWN",
+            },
+            "order state",
+        )
         for name in (
             "order_id",
             "symbol",
@@ -996,6 +1231,7 @@ class BrokerDeal(_Schema):
     provider_timestamp: datetime | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerDeal invariants."""
         _choice(self.side, {"BUY", "SELL", "UNKNOWN"}, "deal side")
         _text(self.deal_id, "deal_id")
         _text(self.symbol, "symbol")
@@ -1025,6 +1261,22 @@ class BrokerAccountTransaction(_Schema):
     provider_metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerAccountTransaction invariants."""
+        _choice(
+            self.transaction_type,
+            {
+                "DEPOSIT",
+                "WITHDRAWAL",
+                "FEE",
+                "COMMISSION",
+                "SWAP",
+                "INTEREST",
+                "TRANSFER",
+                "ADJUSTMENT",
+                "UNKNOWN",
+            },
+            "transaction type",
+        )
         for name in ("transaction_id", "transaction_type", "asset", "currency"):
             _text(getattr(self, name), name)
         _finite(self.amount, "amount")
@@ -1063,6 +1315,11 @@ class BrokerOrderRequest(_Schema):
     comment: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerOrderRequest invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _choice(self.side, {"BUY", "SELL"}, "order side")
         _choice(
             self.order_type,
@@ -1111,6 +1368,11 @@ class BrokerOrderModificationRequest(_Schema):
     expiration: datetime | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerOrderModificationRequest invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.order_id, "order_id")
         _request_id(self.client_request_id, "client_request_id")
         modifications = (
@@ -1150,6 +1412,11 @@ class BrokerOrderCheck(_Schema):
     warnings: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerOrderCheck invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         if self.is_final_acceptance is not False:
             raise ValueError("order check cannot be final acceptance")
         _optional_text(self.provider_code, "provider_code")
@@ -1177,6 +1444,11 @@ class BrokerOrderResult(_Schema):
     provider_timestamp: datetime | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerOrderResult invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         if self.outcome not in {"ACCEPTED", "REJECTED", "UNKNOWN", "PARTIAL"}:
             raise ValueError("unknown order outcome")
         if self.acknowledged != (self.outcome != "UNKNOWN"):
@@ -1206,6 +1478,11 @@ class BrokerPositionModificationRequest(_Schema):
     take_profit: Decimal | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerPositionModificationRequest invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _text(self.position_id, "position_id")
         _request_id(self.client_request_id, "client_request_id")
         if self.stop_loss is None and self.take_profit is None:
@@ -1225,6 +1502,7 @@ class BrokerPositionCloseRequest(_Schema):
     client_request_id: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerPositionCloseRequest invariants."""
         _text(self.position_id, "position_id")
         _text(self.quantity_unit, "quantity_unit")
         _positive(self.quantity, "quantity")
@@ -1245,6 +1523,7 @@ class BrokerMarginRequest(_Schema):
     account_reference: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerMarginRequest invariants."""
         _choice(self.side, {"BUY", "SELL"}, "margin side")
         for name in ("symbol", "quantity_unit", "product_profile"):
             _text(getattr(self, name), name)
@@ -1268,6 +1547,7 @@ class BrokerProfitRequest(_Schema):
     account_reference: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerProfitRequest invariants."""
         _choice(self.side, {"BUY", "SELL"}, "profit side")
         for name in ("symbol", "quantity_unit", "product_profile"):
             _text(getattr(self, name), name)
@@ -1288,6 +1568,7 @@ class BrokerFeeEstimate(_Schema):
     provider_metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerFeeEstimate invariants."""
         _finite(self.amount, "amount")
         _text(self.currency_or_unit, "currency_or_unit")
         _optional_text(self.provider_code, "provider_code")
@@ -1310,6 +1591,11 @@ class BrokerServerTime(_Schema):
     round_trip_latency_ms: float
 
     def __post_init__(self) -> None:
+        """Validate the immutable BrokerServerTime invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _utc(self.provider_time, "provider_time")
         _utc(self.local_send_time, "local_send_time")
         _utc(self.local_receive_time, "local_receive_time")

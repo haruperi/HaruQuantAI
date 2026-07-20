@@ -52,6 +52,7 @@ from app.services.brokers import (
 from pydantic import SecretStr
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
+REQUEST_ID = "req-b4b8aa60-ba17-4561-884b-138c6074c5fb"
 LATER = NOW + timedelta(seconds=1)
 D = Decimal
 
@@ -132,7 +133,7 @@ def test_result_supports_successful_none_and_exclusive_error() -> None:
         status="success",
         broker=BrokerId.YAHOO,
         operation=BrokerCapabilityId.DISCONNECT,
-        request_id="request",
+        request_id=REQUEST_ID,
         timestamp=NOW,
         environment=BrokerEnvironment.SANDBOX,
         adapter_version="1",
@@ -147,7 +148,7 @@ def test_result_supports_successful_none_and_exclusive_error() -> None:
             status="error",
             broker=BrokerId.YAHOO,
             operation=BrokerCapabilityId.DISCONNECT,
-            request_id="request",
+            request_id=REQUEST_ID,
             timestamp=NOW,
             environment=BrokerEnvironment.SANDBOX,
             adapter_version="1",
@@ -157,7 +158,7 @@ def test_result_supports_successful_none_and_exclusive_error() -> None:
             status="success",
             broker=BrokerId.YAHOO,
             operation=BrokerCapabilityId.DISCONNECT,
-            request_id="request",
+            request_id=REQUEST_ID,
             timestamp=NOW.replace(tzinfo=None),
             environment=BrokerEnvironment.SANDBOX,
             adapter_version="1",
@@ -459,7 +460,7 @@ def test_order_preserves_partial_state_and_ids() -> None:
         symbol="EURUSD",
         side="BUY",
         order_type="LIMIT",
-        state="PARTIAL",
+        state="PARTIALLY_FILLED",
         quantity=D("2"),
         filled=D("1"),
         remaining=D("1"),

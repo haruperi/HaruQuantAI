@@ -13,7 +13,11 @@ _INTERVAL_PATTERN = re.compile(r"\A(\d+)(mo|wk|d|h|m)\Z")
 
 
 def _interval_duration(interval: str) -> timedelta:
-    """Return the exact closed-bar duration for one declared Yahoo interval."""
+    """Return the exact closed-bar duration for one declared Yahoo interval.
+
+    Raises:
+        ValueError: If the interval syntax or unit is unsupported.
+    """
     match = _INTERVAL_PATTERN.fullmatch(interval)
     if match is None:
         message = f"unsupported Yahoo interval: {interval}"
@@ -38,7 +42,14 @@ def _map_history(
     timeframe: str,
     limit: int,
 ) -> BrokerPage[BrokerBar]:
-    """Iterate public rows and reject empty or malformed OHLC evidence."""
+    """Iterate public rows and reject empty or malformed OHLC evidence.
+
+    Returns:
+        Canonical bounded historical-bar page.
+
+    Raises:
+        ValueError: If limit, table, interval, or OHLC evidence is invalid.
+    """
     if limit <= 0:
         raise ValueError("positive Yahoo history limit is required")
     rows = list(table.iterrows())

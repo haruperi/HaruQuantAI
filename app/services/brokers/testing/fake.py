@@ -2,8 +2,9 @@
 
 # ruff: noqa: ANN401 - generated fixed protocol methods preserve fixture types.
 
+import inspect
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, override
 
 from app.services.brokers.contracts import (
     BrokerCapability,
@@ -13,7 +14,10 @@ from app.services.brokers.contracts import (
     BrokerError,
     BrokerResult,
 )
-from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
+from app.services.brokers.contracts.protocols import (
+    BrokerAdapter,
+    _UnsupportedAdapterBase,
+)
 
 
 class FakeBrokerAdapter(_UnsupportedAdapterBase):
@@ -29,12 +33,25 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
         fixtures: Mapping[BrokerCapabilityId, object] | None = None,
         errors: Mapping[BrokerCapabilityId, BrokerError] | None = None,
     ) -> None:
+        """Initialize the FakeBrokerAdapter instance.
+
+        Args:
+            config: Value supplied to the operation.
+            capabilities: Value supplied to the operation.
+            fixtures: Value supplied to the operation.
+            errors: Value supplied to the operation.
+        """
         super().__init__(config, capabilities)
         self._fixtures = dict(fixtures or {})
         self._errors = dict(errors or {})
 
+    @override
     async def connect(self) -> BrokerResult[None]:
-        """Establish a deterministic local verified session."""
+        """Establish a deterministic local verified session.
+
+        Returns:
+            A successful canonical connection result.
+        """
         await self._transition(BrokerConnectionState.CONNECTING)
         self._session_generation += 1
         await self._transition(BrokerConnectionState.READY)
@@ -50,6 +67,14 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
             self._errors[operation] = error
 
     async def _invoke(self, operation: BrokerCapabilityId) -> BrokerResult[Any]:
+        """Handle invoke.
+
+        Args:
+            operation: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
         error = self._errors.get(operation)
         if error is not None:
             self._last_error = error
@@ -60,13 +85,35 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
 
 
 def _make_fake_method(operation: BrokerCapabilityId) -> Any:
+    """Handle make fake method.
+
+    Args:
+        operation: Value supplied to the operation.
+
+    Returns:
+        The operation result.
+    """
+
     async def _method(
         self: FakeBrokerAdapter, *args: object, **kwargs: object
     ) -> BrokerResult[Any]:
+        """Handle method.
+
+        Args:
+            self: Fake adapter receiving the generated operation.
+            args: Value supplied to the operation.
+            kwargs: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
         del args, kwargs
         return await self._invoke(operation)
 
     _method.__name__ = operation.value
+    protocol_method = getattr(BrokerAdapter, operation.value)
+    _method.__annotations__ = dict(protocol_method.__annotations__)
+    _method.__signature__ = inspect.signature(protocol_method)  # type: ignore[attr-defined]
     return _method
 
 

@@ -1,6 +1,7 @@
 """Binance adapter tests using an injected fake transport."""
 
 import asyncio
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 
 import pytest
@@ -9,6 +10,7 @@ from app.services.brokers import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerEnvironment,
+    BrokerErrorCode,
     BrokerId,
 )
 from app.services.brokers.binance.adapter import BinanceBrokerAdapter
@@ -259,8 +261,9 @@ def test_adapter_get_symbols_filtering_and_errors() -> None:
 
     async def exercise() -> None:
         await adapter.connect()
-        with pytest.raises(ValueError, match="positive symbol limit is required"):
-            await adapter.get_symbols(limit=0)
+        invalid = await adapter.get_symbols(limit=0)
+        assert invalid.error is not None
+        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
         res = await adapter.get_symbols(query="BTC", limit=5)
         assert len(res.data.items) == 1
         assert res.data.items[0].provider_symbol == "BTCUSDT"
@@ -342,8 +345,9 @@ def test_adapter_get_ticks() -> None:
 
     async def exercise() -> None:
         await adapter.connect()
-        with pytest.raises(ValueError, match="positive trade limit is required"):
-            await adapter.get_ticks("BTCUSDT", limit=0)
+        invalid = await adapter.get_ticks("BTCUSDT", limit=0)
+        assert invalid.error is not None
+        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
         res = await adapter.get_ticks("BTCUSDT", limit=1)
         assert res.is_success
         assert len(res.data.items) == 1
@@ -359,8 +363,9 @@ def test_adapter_get_historical_bars_parameters() -> None:
 
     async def exercise() -> None:
         await adapter.connect()
-        with pytest.raises(ValueError, match="positive kline limit is required"):
-            await adapter.get_historical_bars("BTCUSDT", "1m", limit=0)
+        invalid = await adapter.get_historical_bars("BTCUSDT", "1m", limit=0)
+        assert invalid.error is not None
+        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
         res = await adapter.get_historical_bars(
             "BTCUSDT",
             "1m",
@@ -369,5 +374,85 @@ def test_adapter_get_historical_bars_parameters() -> None:
             limit=5,
         )
         assert res.is_success
+
+    asyncio.run(exercise())
+
+
+def test_adapter_streams_quotes_bars_and_snapshot_first_depth() -> None:
+    """Binance websocket subscriptions map genuine bounded provider events."""
+
+    class _StreamTransport(_FakeTransport):
+        async def call(self, name: str, **kwargs: object) -> object:
+            if name == "get_order_book":
+                return {
+                    "lastUpdateId": 10,
+                    "bids": [["1.0", "2"]],
+                    "asks": [["1.1", "3"]],
+                }
+            return await super().call(name, **kwargs)
+
+        async def stream(
+            self, name: str, **kwargs: object
+        ) -> AsyncIterator[dict[str, object]]:
+            del kwargs
+            if name == "symbol_book_ticker_socket":
+                yield {
+                    "b": "1.0",
+                    "a": "1.1",
+                    "B": "2",
+                    "A": "3",
+                    "u": 11,
+                    "E": 1_700_000_000_000,
+                }
+            elif name == "kline_socket":
+                yield {
+                    "k": {
+                        "t": 1_700_000_000_000,
+                        "T": 1_700_000_060_000,
+                        "o": "1.0",
+                        "h": "1.2",
+                        "l": "0.9",
+                        "c": "1.1",
+                        "v": "5",
+                        "i": "1m",
+                        "x": True,
+                    }
+                }
+            else:
+                yield {
+                    "E": 1_700_000_000_000,
+                    "U": 11,
+                    "u": 12,
+                    "b": [["1.0", "1"]],
+                    "a": [["1.1", "1"]],
+                }
+
+    adapter = BinanceBrokerAdapter(
+        _config(), _capabilities(), transport=_StreamTransport()
+    )
+
+    async def exercise() -> None:
+        await adapter.connect()
+        quote_result = await adapter.subscribe_quotes(("BTCUSDT",))
+        assert quote_result.data is not None
+        quote = await anext(quote_result.data.events())
+        assert str(quote.bid) == "1.0"
+        await adapter.unsubscribe(quote_result.data.info.subscription_id)
+
+        bar_result = await adapter.subscribe_bars(("BTCUSDT",), "1m")
+        assert bar_result.data is not None
+        bar = await anext(bar_result.data.events())
+        assert bar.is_closed
+        await adapter.unsubscribe(bar_result.data.info.subscription_id)
+
+        depth_result = await adapter.subscribe_order_book(("BTCUSDT",), depth=5)
+        assert depth_result.data is not None
+        snapshot = await anext(depth_result.data.events())
+        assert snapshot.is_snapshot
+        assert snapshot.last_sequence_id == 10
+        listed = await adapter.list_subscriptions()
+        assert listed.data is not None
+        assert len(listed.data) == 1
+        await adapter.unsubscribe(depth_result.data.info.subscription_id)
 
     asyncio.run(exercise())

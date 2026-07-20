@@ -304,12 +304,12 @@ Run this in **Codex** only after the entire domain README is marked `Completed` 
 ```
 You are the post-build review agent. Your role is to verify the implementation, report findings, and then correct all identified issues yourself so that the domain becomes READY. Write out the exact implementation plan and steps to execute the corrections.
 
-Perform a strict, read-only completion review of the `UTILS` domain.
+Perform a strict, read-only completion review of the `Brokers` domain.
 
 Domain scope:
-- Domain README: `app/utils/README.md`
-- Implementation package: `app/utils/`
-- Tests: `tests/utils/`
+- Domain README: `app/services/brokers/README.md`
+- Implementation package: `app/services/brokers/`
+- Tests: `tests/brokers/`
 
 This is a verification task, not an implementation task. Do not modify files, update statuses, install dependencies, stage changes, or fix findings.
 
@@ -318,7 +318,7 @@ Authoritative sources, in order:
 1. Owner instructions
 2. `AGENTS.md`
 3. `docs/PROJECT.md`
-4. `app/utils/README.md`
+4. `app/services/brokers/README.md`
 5. `docs/dev/features_register.md`
 6. `docs/ARCHITECTURE.md`
 7. `docs/CHANGELOG.md`

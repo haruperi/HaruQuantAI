@@ -8,6 +8,8 @@ from app.services.brokers import (
 )
 from app.services.brokers.contracts.unsupported import _unsupported_result
 
+REQUEST_ID = "req-b4b8aa60-ba17-4561-884b-138c6074c5fb"
+
 
 def test_unsupported_result_is_deterministic_and_no_call() -> None:
     """Unsupported construction needs no provider module or probe."""
@@ -15,7 +17,7 @@ def test_unsupported_result_is_deterministic_and_no_call() -> None:
         broker=BrokerId.YAHOO,
         environment=BrokerEnvironment.SANDBOX,
         operation=BrokerCapabilityId.GET_QUOTE,
-        request_id="request",
+        request_id=REQUEST_ID,
         adapter_version="1",
     )
     assert not result.is_success

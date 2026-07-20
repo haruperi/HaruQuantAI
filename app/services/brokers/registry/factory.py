@@ -2,7 +2,6 @@
 
 import importlib
 import importlib.metadata
-from datetime import UTC, datetime
 from typing import cast
 
 from app.services.brokers.contracts import (
@@ -17,7 +16,7 @@ from app.services.brokers.contracts import (
 from app.services.brokers.registry.catalogue import (
     get_broker_capability_catalogue,
 )
-from app.utils import logger
+from app.utils import generate_id, logger, utc_now
 
 _FACTORIES = {
     BrokerId.MT5: ("app.services.brokers.mt5", "MT5BrokerAdapter", "MetaTrader5"),
@@ -88,14 +87,15 @@ def create_broker_adapter(
     Returns:
         The disconnected adapter or a canonical structured factory error.
     """
-    request_id = f"create-{getattr(broker_id, 'value', str(broker_id))}"
+    request_id = generate_id("req")
     if not _is_registered_broker(broker_id):
         return _factory_error(
-            broker=BrokerId.MT5,
+            broker=config.broker_id,
             config=config,
             request_id=request_id,
             code=BrokerErrorCode.BROKER_UNKNOWN,
             message="Broker profile is not registered",
+            provider_metadata={"requested_broker": str(broker_id)},
         )
     if config.broker_id != broker_id or not config.provider_enabled:
         return _factory_error(
@@ -147,7 +147,7 @@ def create_broker_adapter(
         broker=broker_id,
         operation=BrokerCapabilityId.CONNECT,
         request_id=request_id,
-        timestamp=datetime.now(UTC),
+        timestamp=utc_now(),
         environment=config.environment,
         adapter_version="1.0.0",
         data=cast("BrokerAdapter", adapter),
@@ -163,6 +163,19 @@ def _factory_error(
     message: str,
     provider_metadata: dict[str, object] | None = None,
 ) -> BrokerResult[BrokerAdapter]:
+    """Handle factory error.
+
+    Args:
+        broker: Value supplied to the operation.
+        config: Value supplied to the operation.
+        request_id: Value supplied to the operation.
+        code: Value supplied to the operation.
+        message: Value supplied to the operation.
+        provider_metadata: Value supplied to the operation.
+
+    Returns:
+        The operation result.
+    """
     logger.bind(
         broker=broker.value,
         environment=config.environment.value,
@@ -176,7 +189,7 @@ def _factory_error(
         broker=broker,
         operation=BrokerCapabilityId.CONNECT,
         request_id=request_id,
-        timestamp=datetime.now(UTC),
+        timestamp=utc_now(),
         environment=config.environment,
         adapter_version="1.0.0",
         error=BrokerError(code=code, message=message),
@@ -185,6 +198,14 @@ def _factory_error(
 
 
 def _required_version(package: str | None) -> str | None:
+    """Handle required version.
+
+    Args:
+        package: Value supplied to the operation.
+
+    Returns:
+        The operation result.
+    """
     if package is None:
         return None
     try:

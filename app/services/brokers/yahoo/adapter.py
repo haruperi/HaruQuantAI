@@ -2,6 +2,7 @@
 
 from collections.abc import Mapping
 from datetime import UTC, datetime
+from typing import override
 
 from app.services.brokers.contracts import (
     BrokerBar,
@@ -10,6 +11,8 @@ from app.services.brokers.contracts import (
     BrokerConnectionConfig,
     BrokerConnectionState,
     BrokerEnvironment,
+    BrokerError,
+    BrokerErrorCode,
     BrokerPage,
     BrokerPlatformInfo,
     BrokerResult,
@@ -29,6 +32,16 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         *,
         transport: _YahooTransport | None = None,
     ) -> None:
+        """Initialize the YahooBrokerAdapter instance.
+
+        Args:
+            config: Value supplied to the operation.
+            capabilities: Value supplied to the operation.
+            transport: Value supplied to the operation.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         if config.environment != BrokerEnvironment.SANDBOX:
             raise ValueError("Yahoo is sandbox-only")
         if config.credentials or config.account_reference or config.endpoint:
@@ -36,30 +49,64 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         super().__init__(config, capabilities)
         self._transport = transport or _YahooTransport(config)
 
+    @override
     async def connect(self) -> BrokerResult[None]:
         """Verify the provider using the caller's configured probe symbol.
 
         No probe symbol is ever assumed: a hidden default provider symbol is
-        prohibited by this domain's boundary. When ``probe_symbol`` is unset,
-        the session is verified at the transport/session level only.
+        prohibited by this domain's boundary.
+
+        Returns:
+            Canonical verified connection result.
         """
         await self._transition(BrokerConnectionState.CONNECTING)
-        if self._config.probe_symbol is not None:
-            try:
-                await self._transport.history(
-                    symbol=self._config.probe_symbol,
-                    timeframe="1d",
-                    start=None,
-                    end=None,
-                )
-            except (OSError, TimeoutError, ValueError, ConnectionError) as error:
-                await self._transition(
-                    BrokerConnectionState.FAILED, reason=type(error).__name__
-                )
-                return self._unsupported(BrokerCapabilityId.CONNECT)
+        if self._config.probe_symbol is None:
+            await self._transition(
+                BrokerConnectionState.FAILED, reason="probe_symbol_required"
+            )
+            return self._error(
+                BrokerCapabilityId.CONNECT,
+                BrokerErrorCode.BROKER_CONFIGURATION_INVALID,
+            )
+        try:
+            await self._probe()
+        except (OSError, TimeoutError, ValueError, ConnectionError) as error:
+            await self._transition(
+                BrokerConnectionState.FAILED, reason=type(error).__name__
+            )
+            return self._error(
+                BrokerCapabilityId.CONNECT,
+                BrokerErrorCode.BROKER_CONNECTION_FAILED,
+            )
         self._session_generation += 1
         await self._transition(BrokerConnectionState.READY)
         return self._result(BrokerCapabilityId.CONNECT)
+
+    @override
+    async def is_connected(self) -> BrokerResult[bool]:
+        """Re-run the explicit provider probe for current connectivity evidence.
+
+        Returns:
+            Canonical current connectivity evidence.
+        """
+        if self._config.probe_symbol is None:
+            return self._result(BrokerCapabilityId.IS_CONNECTED, data=False)
+        await self._probe()
+        return self._result(BrokerCapabilityId.IS_CONNECTED, data=True)
+
+    async def ping(self) -> BrokerResult[None]:
+        """Run the configured explicit provider probe.
+
+        Returns:
+            Canonical provider-health result.
+        """
+        if self._config.probe_symbol is None:
+            return self._error(
+                BrokerCapabilityId.PING,
+                BrokerErrorCode.BROKER_CONFIGURATION_INVALID,
+            )
+        await self._probe()
+        return self._result(BrokerCapabilityId.PING)
 
     async def get_historical_bars(
         self,
@@ -70,7 +117,11 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         cursor: str | None = None,
         limit: int | None = None,
     ) -> BrokerResult[BrokerPage[BrokerBar]]:
-        """Return one genuine bounded Yahoo history response."""
+        """Return one genuine bounded Yahoo history response.
+
+        Raises:
+            ValueError: If limit is not positive.
+        """
         del cursor
         if limit is None or limit <= 0:
             raise ValueError("positive Yahoo history limit is required")
@@ -101,3 +152,37 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
                 endpoint_metadata={"research_only": True},
             ),
         )
+
+    async def _probe(self) -> None:
+        """Perform one genuine Yahoo call using only the caller's probe symbol.
+
+        Raises:
+            ValueError: If probe configuration or provider evidence is absent.
+        """
+        probe_symbol = self._config.probe_symbol
+        if probe_symbol is None:
+            raise ValueError("Yahoo probe_symbol is required")
+        table = await self._transport.history(
+            symbol=probe_symbol,
+            timeframe="1d",
+            start=None,
+            end=None,
+        )
+        if getattr(table, "empty", False):
+            raise ValueError("Yahoo probe returned no provider evidence")
+
+    def _error[T](
+        self, operation: BrokerCapabilityId, code: BrokerErrorCode
+    ) -> BrokerResult[T]:
+        """Build one canonical Yahoo failure result.
+
+        Returns:
+            Canonical error result.
+        """
+        error = BrokerError(
+            code=code,
+            message=f"Yahoo {operation.value} failed",
+            capability=operation,
+        )
+        self._last_error = error
+        return self._result(operation, error=error)

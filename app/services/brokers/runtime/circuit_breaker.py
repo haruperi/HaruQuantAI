@@ -37,6 +37,16 @@ class _TransportCircuitBreaker:
         recovery_timeout_sec: float,
         half_open_max_calls: int,
     ) -> None:
+        """Initialize the _TransportCircuitBreaker instance.
+
+        Args:
+            failure_threshold: Value supplied to the operation.
+            recovery_timeout_sec: Value supplied to the operation.
+            half_open_max_calls: Value supplied to the operation.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         if min(failure_threshold, recovery_timeout_sec, half_open_max_calls) <= 0:
             raise ValueError("circuit bounds must be positive")
         self._failure_threshold = failure_threshold
@@ -55,7 +65,11 @@ class _TransportCircuitBreaker:
         return self._state.value
 
     async def before_call(self) -> BrokerErrorCode | None:
-        """Admit a call or return the fail-closed circuit error code."""
+        """Admit a call or return the fail-closed circuit error code.
+
+        Returns:
+            ``None`` when admitted, otherwise the open-circuit error code.
+        """
         async with self._lock:
             if self._state == _CircuitState.OPEN:
                 opened_at = self._opened_at
@@ -104,6 +118,7 @@ class _TransportCircuitBreaker:
                     self._open()
 
     def _open(self) -> None:
+        """Handle open."""
         self._state = _CircuitState.OPEN
         self._opened_at = time.monotonic()
         self._half_open_in_flight = 0
@@ -116,6 +131,7 @@ class _TransportCircuitBreaker:
         ).warning("Transport circuit opened; provider calls fail closed")
 
     def _close(self) -> None:
+        """Handle close."""
         self._state = _CircuitState.CLOSED
         self._opened_at = None
         self._consecutive_failures = 0

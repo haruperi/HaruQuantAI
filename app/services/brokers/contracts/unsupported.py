@@ -20,7 +20,11 @@ def _unsupported_result[T](
     request_id: str,
     adapter_version: str,
 ) -> BrokerResult[T]:
-    """Build a redacted unsupported result without accessing a provider."""
+    """Build a redacted unsupported result without accessing a provider.
+
+    Returns:
+        Canonical unsupported-operation result.
+    """
     return BrokerResult(
         status="error",
         broker=broker,

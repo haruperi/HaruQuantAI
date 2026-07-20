@@ -19,6 +19,11 @@ class _MT5Transport:
     """Own one serialized terminal/account session."""
 
     def __init__(self, config: BrokerConnectionConfig) -> None:
+        """Initialize the _MT5Transport instance.
+
+        Args:
+            config: Value supplied to the operation.
+        """
         self._config = config
         self._sdk: Any = None
         self._lock = asyncio.Lock()
@@ -29,7 +34,11 @@ class _MT5Transport:
         )
 
     async def connect(self) -> bool:
-        """Initialize and authenticate one configured terminal session."""
+        """Initialize and authenticate one configured terminal session.
+
+        Returns:
+            Whether MT5 initialized the configured terminal session.
+        """
         self._sdk = importlib.import_module("MetaTrader5")
         credentials = self._config.credentials or {}
         kwargs: dict[str, object] = {}
@@ -54,7 +63,14 @@ class _MT5Transport:
         return bool(result)
 
     async def call(self, name: str, *args: object, **kwargs: object) -> Any:
-        """Call one documented SDK operation through the serialized worker."""
+        """Call one documented SDK operation through the serialized worker.
+
+        Returns:
+            Exact provider SDK result.
+
+        Raises:
+            ConnectionError: If the MT5 SDK session is not initialized.
+        """
         if self._sdk is None:
             raise ConnectionError("MT5 session is not initialized")
         function: Callable[..., Any] = getattr(self._sdk, name)
@@ -76,6 +92,16 @@ class _MT5Transport:
     async def _run(
         self, function: Callable[..., Any], *args: object, **kwargs: object
     ) -> Any:
+        """Handle run.
+
+        Args:
+            function: Value supplied to the operation.
+            args: Value supplied to the operation.
+            kwargs: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
         async with self._lock:
             return await asyncio.wait_for(
                 asyncio.to_thread(function, *args, **kwargs),

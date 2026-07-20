@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 from app.utils import logger
 
 type _Sender = Callable[[object], Awaitable[object]]
+type _EventHandler = Callable[[object], None]
+type _EventRegistrar = Callable[[_EventHandler], None]
 
 
 class _CTraderTransport:
@@ -24,14 +26,35 @@ class _CTraderTransport:
         config: BrokerConnectionConfig,
         *,
         sender: _Sender | None = None,
+        register_event_handler: _EventRegistrar | None = None,
+        unregister_event_handler: _EventRegistrar | None = None,
     ) -> None:
+        """Initialize the _CTraderTransport instance.
+
+        Args:
+            config: Value supplied to the operation.
+            sender: Value supplied to the operation.
+            register_event_handler: Value supplied to the operation.
+            unregister_event_handler: Value supplied to the operation.
+        """
         self._config = config
         self._sender = sender
+        self._register_event_handler = register_event_handler
+        self._unregister_event_handler = unregister_event_handler
         self._locks: dict[type[object], asyncio.Lock] = {}
         self._connected = False
 
+    @property
+    def connected(self) -> bool:
+        """Return current authenticated transport state."""
+        return self._connected
+
     async def connect(self) -> bool:
-        """Load the pinned SDK and establish only a configured session."""
+        """Load the pinned SDK and establish only a configured session.
+
+        Returns:
+            Whether a configured sender is ready.
+        """
         importlib.import_module("ctrader_open_api")
         if self._sender is None:
             logger.bind(
@@ -55,7 +78,15 @@ class _CTraderTransport:
         *,
         request_id: str | None = None,
     ) -> object:
-        """Correlate by native ID or serialize the same response type."""
+        """Correlate by native ID or serialize the same response type.
+
+        Returns:
+            Exact typed provider response.
+
+        Raises:
+            ConnectionError: If no authenticated sender is available.
+            ValueError: If response type or native correlation is invalid.
+        """
         if not self._connected or self._sender is None:
             raise ConnectionError("cTrader session is not connected")
         lock = self._locks.setdefault(response_type, asyncio.Lock())
@@ -69,6 +100,28 @@ class _CTraderTransport:
             if request_id is not None and native_id not in {None, request_id}:
                 raise ValueError("cTrader native request ID mismatch")
             return response
+
+    def register_event_handler(self, handler: _EventHandler) -> None:
+        """Register one adapter-owned provider-event handler.
+
+        Args:
+            handler: Callback to receive extracted provider events.
+
+        Raises:
+            ConnectionError: If the concrete transport has no event source.
+        """
+        if self._register_event_handler is None:
+            raise ConnectionError("cTrader transport has no provider event source")
+        self._register_event_handler(handler)
+
+    def unregister_event_handler(self, handler: _EventHandler) -> None:
+        """Unregister one adapter-owned provider-event handler.
+
+        Args:
+            handler: Previously registered callback.
+        """
+        if self._unregister_event_handler is not None:
+            self._unregister_event_handler(handler)
 
     async def close(self) -> None:
         """Release the owned session state."""

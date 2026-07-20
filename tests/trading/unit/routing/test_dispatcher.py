@@ -32,9 +32,7 @@ from app.services.trading.routing.dispatcher import (
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
-BROKER_REQUEST_ID = (
-    "req-dd37fc1c2cd6d665f9a7a7f9a2482efe3347c7bb51ac073ef12ef9b7eb511055"
-)
+BROKER_REQUEST_ID = "req-dd37fc1c-2cd6-4d66-9f9a-7a7f9a2482ef"
 
 
 async def dispatch_order_intent(

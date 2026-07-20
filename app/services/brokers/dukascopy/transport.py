@@ -22,6 +22,11 @@ class _DukascopyTransport:
     _BASE_URL = "https://datafeed.dukascopy.com/datafeed"
 
     def __init__(self, config: BrokerConnectionConfig) -> None:
+        """Initialize the _DukascopyTransport instance.
+
+        Args:
+            config: Value supplied to the operation.
+        """
         self._config = config
         self._circuit = _TransportCircuitBreaker(
             failure_threshold=config.circuit_failure_threshold,
@@ -30,7 +35,17 @@ class _DukascopyTransport:
         )
 
     async def get_hour(self, symbol: str, hour: datetime) -> bytes:
-        """Retrieve and decompress exactly one provider BI5 hour file."""
+        """Retrieve and decompress exactly one provider BI5 hour file.
+
+        Returns:
+            Valid decompressed provider payload.
+
+        Raises:
+            ConnectionError: If the transport circuit is open.
+            lzma.LZMAError: If the provider payload is not valid LZMA.
+            OSError: If provider transport fails.
+            TimeoutError: If the configured request bound is exceeded.
+        """
         blocked = await self._circuit.before_call()
         if blocked is not None:
             raise ConnectionError(blocked.value)
@@ -40,6 +55,11 @@ class _DukascopyTransport:
         )
 
         def _read() -> bytes:
+            """Handle read.
+
+            Returns:
+                The operation result.
+            """
             request = urllib.request.Request(url, headers={"User-Agent": "HaruQuantAI"})
             with urllib.request.urlopen(
                 request, timeout=self._config.request_timeout_sec

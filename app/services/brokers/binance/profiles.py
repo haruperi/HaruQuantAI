@@ -7,6 +7,8 @@ from app.services.brokers.contracts import BrokerEnvironment, BrokerId
 
 @dataclass(frozen=True, slots=True)
 class _BinanceProfile:
+    """Represent the binance profile broker contract or runtime behavior."""
+
     broker_id: BrokerId
     environments: frozenset[BrokerEnvironment]
     endpoint_mode: str

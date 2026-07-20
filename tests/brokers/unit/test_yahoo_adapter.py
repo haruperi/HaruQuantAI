@@ -8,6 +8,7 @@ from app.services.brokers import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerEnvironment,
+    BrokerErrorCode,
     BrokerId,
 )
 from app.services.brokers.yahoo.adapter import YahooBrokerAdapter
@@ -73,7 +74,9 @@ def test_adapter_connect_without_probe_symbol_never_calls_transport() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert result.is_success
+        assert not result.is_success
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID
 
     asyncio.run(exercise())
     assert transport.requested_symbols == []
@@ -113,7 +116,8 @@ def test_adapter_get_historical_bars_requires_positive_limit() -> None:
     adapter = YahooBrokerAdapter(_config(), _capabilities(), transport=_FakeTransport())
 
     async def exercise() -> None:
-        with pytest.raises(ValueError, match="positive Yahoo history limit"):
-            await adapter.get_historical_bars("AAPL", "1d", limit=0)
+        result = await adapter.get_historical_bars("AAPL", "1d", limit=0)
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
 
     asyncio.run(exercise())

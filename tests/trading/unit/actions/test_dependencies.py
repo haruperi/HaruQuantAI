@@ -35,7 +35,7 @@ from app.services.trading.state import (
 from app.utils import logger
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
-DATA_REQUEST_ID = "req-" + "a" * 64
+DATA_REQUEST_ID = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
 
 
 class MemoryStore:

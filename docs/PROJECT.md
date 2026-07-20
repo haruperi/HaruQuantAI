@@ -29,9 +29,14 @@ satisfied.
 
 - `app/utils/` implements the shared v1 contracts, errors, identifiers, UTC,
   canonical serialization, redaction/security helpers, settings, and logging.
-- `app/services/brokers/` implements the canonical v1 broker contracts, registry,
-  runtime safety, provider adapters, and deterministic test adapter. Provider
-  capabilities remain fail-closed unless their evidence gate is satisfied.
+- `app/services/brokers/` is a completed implementation baseline. The canonical
+  contracts, registry, runtime safety, provider adapters, and deterministic test
+  adapter implement `FEAT-BRK-01`–`FEAT-BRK-13`. MT5/cTrader execution-state,
+  calculation, and mutation bodies are present; cTrader/Binance streams and
+  cTrader market data are present; Dukascopy aggregates midpoint bars locally.
+  Release remains fail-closed: `registry/catalogue.py` excludes every `_WRITE`
+  capability unconditionally, so implemented mutations remain `UNAVAILABLE` and
+  no live write was used as completion evidence.
 - `app/services/data/` implements its v1 contracts, normalized access, storage,
   cache, audit persistence, processing/alignment, jobs, feeds, source policy, and
   public operations. Data is `Partial`: series-level market-data quality inspection
@@ -139,6 +144,10 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Owns**: Per-platform adapter implementations, the broker registry/factory (`create_broker_adapter`; adapter instances are created via the registry and owned by the caller), connection/session lifecycle mechanics (state machine, keep-alives, transport reconnects), translation of provider-native symbol/request values into provider API calls, canonical DTO and error mapping (unenriched), capability discovery, and transport-level flow control (rate-limit throttling, bounded backpressure, and the adapter-local closed/open/half-open circuit breaker specified by the Brokers README).
 * **Boundaries**: Pure passthrough with zero business logic — no business validation (structural/transport validation only), no risk checks, no decision-making, no data enrichment, no business retry/replay (transport-level flow control and connection recovery are permitted; mutations are never retried), and no state management beyond the live session (no durable state). Owns no credential vault and performs no credential persistence, encryption, or database access; approved composition roots resolve settings before constructing `BrokerConnectionConfig`, and only resolved secret values live in memory for the adapter lifecycle. Data owns canonical market identity, friendly names, and every provider/cross-provider alias mapping; Brokers accepts and reports exact provider-native symbol strings only and owns no alias resolution. Brokers does not normalize into `MarketDataset` / `AccountStateSnapshot` and never leaks raw SDK objects across its boundary. Only Trading may invoke mutation operations; Data's use is strictly read-only; Risk and all other domains have no Brokers dependency. The read/write split is enforced by capability-trait scoping (`MarketDataProvider`, `TradeExecutionProvider`, `AccountProvider`, `CalculationProvider`).
 * **Key Limits**: Sole live-connectivity path to any broker/provider; connection, scope, or permission failure fails closed; mutations are never retried — uncertain outcomes return `BROKER_UNKNOWN_OUTCOME`; unsupported capabilities return `BROKER_CAPABILITY_UNSUPPORTED` deterministically; an open adapter-local transport circuit returns `BROKER_CIRCUIT_OPEN` without a provider call; no path returns a synthetic substitute.
+* **Status**: `Completed implementation baseline`. Accepted reads, histories,
+  calculations, streams, and provider mutation bodies are implemented. Every write
+  remains registry-unavailable by owner policy; external production release and
+  system composition are separate gates. See the Brokers README evidence table.
 * **Documentation**: `app/services/brokers/README.md`
 
 #### 2.1.3 Data

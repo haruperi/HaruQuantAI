@@ -8,10 +8,12 @@ from app.services.brokers.mt5.mapping import (
     _map_account,
     _map_bar,
     _map_error_code,
+    _map_order,
     _map_position,
     _map_quote,
     _map_symbol,
     _map_tick,
+    _map_transaction,
 )
 
 
@@ -169,6 +171,56 @@ def test_map_position_derives_side_from_type_code() -> None:
         )
     )
     assert short_position.side == "SHORT"
+
+    unknown_position = _map_position(
+        _record(
+            ticket=3,
+            symbol="EURUSD",
+            type=99,
+            volume=1,
+            price_open=1.1,
+            price_current=1.2,
+            profit=0,
+            time_update=datetime(2026, 1, 1, tzinfo=UTC).timestamp(),
+        )
+    )
+    assert unknown_position.side == "UNKNOWN"
+
+
+def test_map_order_uses_only_canonical_state_vocabulary() -> None:
+    """MT5 native state/type codes never leak into canonical enum fields."""
+    order = _map_order(
+        _record(
+            ticket=1,
+            symbol="EURUSD",
+            type=8,
+            state=3,
+            volume_initial=1,
+            volume_current=0.5,
+            time_setup=datetime(2026, 1, 1, tzinfo=UTC).timestamp(),
+        )
+    )
+    assert order.order_type == "UNKNOWN"
+    assert order.state == "PARTIALLY_FILLED"
+    assert order.provider_metadata["native_order_type"] == 8
+
+
+def test_map_transaction_uses_canonical_type_and_preserves_native_code() -> None:
+    """MT5 balance records map by sign without leaking provider vocabulary."""
+    transaction = _map_transaction(
+        _record(
+            ticket=1,
+            type=2,
+            profit=-25,
+            commission=0,
+            swap=0,
+            fee=0,
+            time=datetime(2026, 1, 1, tzinfo=UTC).timestamp(),
+        ),
+        "USD",
+    )
+    assert transaction.transaction_type == "WITHDRAWAL"
+    assert transaction.provider_metadata["native_transaction_type"] == 2
 
 
 def test_map_error_code_floor_is_exhaustive_for_documented_retcodes() -> None:

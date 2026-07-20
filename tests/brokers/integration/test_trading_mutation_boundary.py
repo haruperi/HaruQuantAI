@@ -13,8 +13,11 @@ from app.services.brokers import (
     BrokerErrorCode,
     BrokerId,
     BrokerOrder,
+    BrokerOrderRequest,
+    create_broker_adapter,
 )
 from app.services.brokers.testing import FakeBrokerAdapter
+from pydantic import SecretStr
 
 
 def _config() -> BrokerConnectionConfig:
@@ -29,6 +32,12 @@ def _config() -> BrokerConnectionConfig:
         circuit_failure_threshold=2,
         circuit_recovery_timeout_sec=1,
         circuit_half_open_max_calls=1,
+        account_reference="100001",
+        credentials={
+            "login": SecretStr("100001"),
+            "password": SecretStr("offline-placeholder"),
+            "server": SecretStr("Offline-Demo"),
+        },
     )
 
 
@@ -130,5 +139,26 @@ def test_unknown_mutation_outcome_is_never_treated_as_success() -> None:
         assert result.error is not None
         assert result.error.code == BrokerErrorCode.BROKER_UNKNOWN_OUTCOME
         assert result.error.retryable is False
+
+    asyncio.run(exercise())
+
+
+def test_registry_created_real_adapter_blocks_every_unreleased_write() -> None:
+    """The genuine registry/MT5 boundary blocks writes before provider access."""
+    created = create_broker_adapter(BrokerId.MT5, _config())
+    assert created.data is not None
+    request = BrokerOrderRequest(
+        symbol="EURUSD",
+        side="BUY",
+        order_type="MARKET",
+        quantity=Decimal("0.01"),
+        quantity_unit="lots",
+        environment=BrokerEnvironment.DEMO,
+    )
+
+    async def exercise() -> None:
+        result = await created.data.place_order(request)
+        assert result.error is not None
+        assert result.error.code is BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
 
     asyncio.run(exercise())

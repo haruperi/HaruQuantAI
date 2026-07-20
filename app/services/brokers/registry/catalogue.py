@@ -29,32 +29,66 @@ _WRITE = {
     BrokerCapabilityId.CLOSE_POSITION,
 }
 
-_MT5 = set(BrokerCapabilityId) - {
-    BrokerCapabilityId.REFRESH_SESSION,
-    BrokerCapabilityId.GET_SERVER_TIME,
-    BrokerCapabilityId.GET_TRADING_SESSIONS,
-    BrokerCapabilityId.SUBSCRIBE_QUOTES,
-    BrokerCapabilityId.SUBSCRIBE_BARS,
-    BrokerCapabilityId.SUBSCRIBE_ORDER_BOOK,
-    BrokerCapabilityId.LIST_ACCOUNTS,
-    BrokerCapabilityId.SELECT_ACCOUNT,
-    BrokerCapabilityId.LIST_ASSETS,
-    BrokerCapabilityId.GET_ASSET_INFO,
-    BrokerCapabilityId.REPLACE_ORDER,
-    BrokerCapabilityId.GET_COMMISSION_ESTIMATE,
-}
-_CTRADER = set(BrokerCapabilityId) - {
-    BrokerCapabilityId.SELECT_SYMBOL,
-    BrokerCapabilityId.LIST_ACCOUNTS,
-    BrokerCapabilityId.SELECT_ACCOUNT,
-    BrokerCapabilityId.REPLACE_ORDER,
-    BrokerCapabilityId.GET_COMMISSION_ESTIMATE,
-}
-_BINANCE_SPOT = _LOCAL | {
+_COMMON_TARGETS = _LOCAL | {
     BrokerCapabilityId.CONNECT,
     BrokerCapabilityId.IS_CONNECTED,
-    BrokerCapabilityId.GET_PLATFORM_INFO,
     BrokerCapabilityId.RECONNECT,
+}
+_MT5 = _COMMON_TARGETS | {
+    BrokerCapabilityId.PING,
+    BrokerCapabilityId.GET_SYMBOLS,
+    BrokerCapabilityId.GET_SYMBOL_INFO,
+    BrokerCapabilityId.SELECT_SYMBOL,
+    BrokerCapabilityId.GET_QUOTE,
+    BrokerCapabilityId.GET_TICKS,
+    BrokerCapabilityId.GET_HISTORICAL_BARS,
+    BrokerCapabilityId.GET_SPREAD,
+    BrokerCapabilityId.GET_PLATFORM_INFO,
+    BrokerCapabilityId.GET_PERMISSIONS,
+    BrokerCapabilityId.GET_ACCOUNT_INFO,
+    BrokerCapabilityId.GET_BALANCES,
+    BrokerCapabilityId.GET_POSITIONS,
+    BrokerCapabilityId.GET_POSITION,
+    BrokerCapabilityId.GET_ORDERS,
+    BrokerCapabilityId.GET_ORDER,
+    BrokerCapabilityId.LIST_ORDER_HISTORY,
+    BrokerCapabilityId.LIST_DEAL_HISTORY,
+    BrokerCapabilityId.GET_DEAL,
+    BrokerCapabilityId.LIST_ACCOUNT_TRANSACTIONS,
+    BrokerCapabilityId.CHECK_ORDER,
+    BrokerCapabilityId.PLACE_ORDER,
+    BrokerCapabilityId.MODIFY_ORDER,
+    BrokerCapabilityId.CANCEL_ORDER,
+    BrokerCapabilityId.MODIFY_POSITION,
+    BrokerCapabilityId.CLOSE_POSITION,
+    BrokerCapabilityId.CALCULATE_MARGIN,
+    BrokerCapabilityId.CALCULATE_PROFIT,
+}
+_CTRADER = _COMMON_TARGETS | {
+    BrokerCapabilityId.PING,
+    BrokerCapabilityId.GET_PLATFORM_INFO,
+    BrokerCapabilityId.GET_SYMBOLS,
+    BrokerCapabilityId.GET_SYMBOL_INFO,
+    BrokerCapabilityId.GET_QUOTE,
+    BrokerCapabilityId.GET_SPREAD,
+    BrokerCapabilityId.GET_TICKS,
+    BrokerCapabilityId.GET_HISTORICAL_BARS,
+    BrokerCapabilityId.GET_POSITIONS,
+    BrokerCapabilityId.GET_ORDERS,
+    BrokerCapabilityId.LIST_ORDER_HISTORY,
+    BrokerCapabilityId.LIST_DEAL_HISTORY,
+    BrokerCapabilityId.CHECK_ORDER,
+    BrokerCapabilityId.PLACE_ORDER,
+    BrokerCapabilityId.MODIFY_ORDER,
+    BrokerCapabilityId.CANCEL_ORDER,
+    BrokerCapabilityId.MODIFY_POSITION,
+    BrokerCapabilityId.CLOSE_POSITION,
+    BrokerCapabilityId.CALCULATE_MARGIN,
+    BrokerCapabilityId.CALCULATE_PROFIT,
+    BrokerCapabilityId.SUBSCRIBE_QUOTES,
+}
+_BINANCE_SPOT = _COMMON_TARGETS | {
+    BrokerCapabilityId.GET_PLATFORM_INFO,
     BrokerCapabilityId.PING,
     BrokerCapabilityId.GET_SERVER_TIME,
     BrokerCapabilityId.GET_SYMBOLS,
@@ -69,24 +103,31 @@ _BINANCE_SPOT = _LOCAL | {
     BrokerCapabilityId.SUBSCRIBE_BARS,
     BrokerCapabilityId.SUBSCRIBE_ORDER_BOOK,
 }
-_DUKASCOPY = _LOCAL | {
-    BrokerCapabilityId.CONNECT,
-    BrokerCapabilityId.IS_CONNECTED,
+_DUKASCOPY = _COMMON_TARGETS | {
     BrokerCapabilityId.GET_PLATFORM_INFO,
-    BrokerCapabilityId.RECONNECT,
     BrokerCapabilityId.PING,
     BrokerCapabilityId.GET_SYMBOLS,
     BrokerCapabilityId.GET_SYMBOL_INFO,
     BrokerCapabilityId.GET_TICKS,
+    BrokerCapabilityId.GET_HISTORICAL_BARS,
 }
-_YAHOO = _LOCAL | {
-    BrokerCapabilityId.CONNECT,
-    BrokerCapabilityId.IS_CONNECTED,
+_YAHOO = _COMMON_TARGETS | {
     BrokerCapabilityId.GET_PLATFORM_INFO,
-    BrokerCapabilityId.RECONNECT,
     BrokerCapabilityId.PING,
     BrokerCapabilityId.GET_HISTORICAL_BARS,
 }
+
+_IMPLEMENTED: Mapping[BrokerId, frozenset[BrokerCapabilityId]] = MappingProxyType(
+    {
+        BrokerId.MT5: frozenset(_MT5),
+        BrokerId.CTRADER: frozenset(_CTRADER),
+        BrokerId.BINANCE_SPOT: frozenset(_BINANCE_SPOT),
+        BrokerId.BINANCE_USD_M_FUTURES: frozenset(),
+        BrokerId.BINANCE_COIN_M_FUTURES: frozenset(),
+        BrokerId.DUKASCOPY: frozenset(_DUKASCOPY),
+        BrokerId.YAHOO: frozenset(_YAHOO),
+    }
+)
 
 _TARGETS: Mapping[BrokerId, set[BrokerCapabilityId]] = MappingProxyType(
     {
@@ -101,27 +142,32 @@ _TARGETS: Mapping[BrokerId, set[BrokerCapabilityId]] = MappingProxyType(
 )
 
 
-# Credential-gated release evidence. MT5 has a verified real demo-account
-# connection (see README "Current implementation evidence"), so its
-# implemented capabilities are released for the skeleton build. Live-order
-# safety remains enforced downstream by Trading's runtime gates
-# (ALLOW_LIVE_MUTATIONS) and Risk's kill switch; this table only stops
-# adapters whose provider connection has never been verified.
+# Read-release evidence. MT5's verified demo-account reads may be released here,
+# but `_capability` excludes `_WRITE` unconditionally. Downstream Trading/Risk
+# controls remain defense in depth and are never used to justify catalogue release.
 _RELEASED: Mapping[BrokerId, frozenset[BrokerCapabilityId]] = MappingProxyType(
     {
-        BrokerId.MT5: frozenset(_MT5),
+        BrokerId.MT5: frozenset(_IMPLEMENTED[BrokerId.MT5] - _WRITE),
     }
 )
 
 
 def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapability:
-    implemented = operation in _TARGETS[broker]
+    """Handle capability.
+
+    Args:
+        broker: Value supplied to the operation.
+        operation: Value supplied to the operation.
+
+    Returns:
+        The operation result.
+    """
+    target = operation in _TARGETS[broker]
+    implemented = operation in _IMPLEMENTED[broker]
     is_write = operation in _WRITE
-    # CONNECT is the adapter's own verification act, and IS_CONNECTED is a
-    # purely local read of tracked session state (no provider call): both
-    # must always be attemptable so a caller can establish and observe a
-    # session. Every other capability stays UNAVAILABLE until credential-gated
-    # release evidence is recorded, matching this domain's fail-closed policy.
+    # CONNECT is the adapter's verification act and IS_CONNECTED performs the
+    # adapter's provider-specific check. Both remain attemptable. Other reads
+    # require explicit release evidence; writes are excluded unconditionally.
     connect_ready = implemented and operation in {
         BrokerCapabilityId.CONNECT,
         BrokerCapabilityId.IS_CONNECTED,
@@ -153,7 +199,9 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
             if (connect_ready or released)
             else "Release evidence is not recorded"
             if implemented
-            else "Operation is not implemented for this profile"
+            else "Operation is not implemented"
+            if target
+            else "Operation is not supported for this profile"
         ),
     )
 

@@ -17,6 +17,8 @@ from app.services.brokers import (
 )
 from app.services.brokers.runtime.circuit_breaker import _TransportCircuitBreaker
 
+REQUEST_ID = "req-b4b8aa60-ba17-4561-884b-138c6074c5fb"
+
 
 def test_broker_result_separates_provider_and_adapter_latency() -> None:
     """Provider network latency and local adapter overhead are distinct fields."""
@@ -24,7 +26,7 @@ def test_broker_result_separates_provider_and_adapter_latency() -> None:
         status="success",
         broker=BrokerId.YAHOO,
         operation=BrokerCapabilityId.GET_HISTORICAL_BARS,
-        request_id="get_historical_bars-0",
+        request_id=REQUEST_ID,
         timestamp=datetime.now(UTC),
         environment=BrokerEnvironment.SANDBOX,
         adapter_version="1.0.0",

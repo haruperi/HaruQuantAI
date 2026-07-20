@@ -3,7 +3,6 @@
 import asyncio
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import replace
-from datetime import UTC, datetime
 
 from app.services.brokers.contracts import (
     BrokerCapabilityId,
@@ -14,7 +13,7 @@ from app.services.brokers.contracts import (
     BrokerResult,
     BrokerSubscriptionInfo,
 )
-from app.utils import logger
+from app.utils import generate_id, logger, utc_now
 
 type _Event[TEvent] = TEvent | BrokerError | None
 
@@ -31,6 +30,15 @@ class _BrokerSubscription[TEvent]:
         info: BrokerSubscriptionInfo,
         unsubscribe_callback: Callable[[], Awaitable[None]] | None = None,
     ) -> None:
+        """Initialize the _BrokerSubscription instance.
+
+        Args:
+            broker: Value supplied to the operation.
+            environment: Value supplied to the operation.
+            adapter_version: Value supplied to the operation.
+            info: Value supplied to the operation.
+            unsubscribe_callback: Value supplied to the operation.
+        """
         self._broker = broker
         self._environment = environment
         self._adapter_version = adapter_version
@@ -47,7 +55,11 @@ class _BrokerSubscription[TEvent]:
         return self._info
 
     async def publish(self, event: TEvent) -> bool:
-        """Publish one event, terminating explicitly on overflow."""
+        """Publish one event, terminating explicitly on overflow.
+
+        Returns:
+            Whether the event was accepted without terminal overflow.
+        """
         async with self._lock:
             if self._closed:
                 return False
@@ -102,6 +114,11 @@ class _BrokerSubscription[TEvent]:
             await self._enqueue_terminal(error)
 
     async def _enqueue_terminal(self, error: BrokerError) -> None:
+        """Handle enqueue terminal.
+
+        Args:
+            error: Value supplied to the operation.
+        """
         if self._terminal_enqueued:
             return
         if self._queue.full():
@@ -110,7 +127,11 @@ class _BrokerSubscription[TEvent]:
         self._terminal_enqueued = True
 
     async def events(self) -> AsyncIterator[TEvent | BrokerError]:
-        """Yield events in FIFO order until a terminal marker or error."""
+        """Yield events in FIFO order until a terminal marker or error.
+
+        Yields:
+            Canonical provider events or one terminal error.
+        """
         while True:
             event = await self._queue.get()
             if event is None:
@@ -120,7 +141,11 @@ class _BrokerSubscription[TEvent]:
                 return
 
     async def unsubscribe(self) -> BrokerResult[None]:
-        """Idempotently stop the exact subscription and provider stream."""
+        """Idempotently stop the exact subscription and provider stream.
+
+        Returns:
+            Canonical successful unsubscribe result.
+        """
         async with self._lock:
             if not self._closed and self._unsubscribe_callback is not None:
                 await self._unsubscribe_callback()
@@ -141,8 +166,8 @@ class _BrokerSubscription[TEvent]:
             status="success",
             broker=self._broker,
             operation=BrokerCapabilityId.UNSUBSCRIBE,
-            request_id=self._info.subscription_id,
-            timestamp=datetime.now(UTC),
+            request_id=generate_id("req"),
+            timestamp=utc_now(),
             environment=self._environment,
             adapter_version=self._adapter_version,
         )

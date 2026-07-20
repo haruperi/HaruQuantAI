@@ -15,6 +15,7 @@ this module performs no side effect and pulls in no optional dependency.
 
 import asyncio
 import threading
+from collections.abc import Callable
 from typing import Any
 
 from app.services.brokers.contracts import BrokerConnectionConfig, BrokerEnvironment
@@ -62,6 +63,7 @@ class _CTraderNetworkClient:
         self._client: Any = None
         self._loop: asyncio.AbstractEventLoop | None = None
         self._connected = False
+        self._event_handlers: list[Callable[[object], None]] = []
 
     async def connect(self) -> bool:  # pragma: no cover - requires Twisted + network
         """Establish transport and run the full authentication handshake.
@@ -87,6 +89,9 @@ class _CTraderNetworkClient:
             ProtoOAGetAccountListByAccessTokenReq,
             ProtoOATraderReq,
         )
+        from ctrader_open_api.protobuf import (  # type: ignore[import-untyped, unused-ignore]
+            Protobuf,
+        )
         from twisted.internet import (
             reactor,  # type: ignore[import-untyped, unused-ignore]
         )
@@ -106,15 +111,41 @@ class _CTraderNetworkClient:
         connected: asyncio.Future[bool] = self._loop.create_future()
 
         def _on_connected(_client: Any) -> None:
+            """Handle on connected.
+
+            Args:
+                _client: Value supplied to the operation.
+            """
             self._resolve(connected, value=True)
 
         def _on_disconnected(_client: Any, reason: Any) -> None:
+            """Handle on disconnected.
+
+            Args:
+                _client: Value supplied to the operation.
+                reason: Value supplied to the operation.
+            """
             self._connected = False
             self._reject(connected, ConnectionError(str(reason)))
+
+        def _on_message(_client: Any, message: Any) -> None:
+            """Handle on message.
+
+            Args:
+                _client: Value supplied to the operation.
+                message: Value supplied to the operation.
+            """
+            extracted = Protobuf.extract(message)
+            loop = self._loop
+            if loop is None:
+                return
+            for handler in tuple(self._event_handlers):
+                loop.call_soon_threadsafe(handler, extracted)
 
         client = Client(host, EndPoints.PROTOBUF_PORT, TcpProtocol)
         client.setConnectedCallback(_on_connected)
         client.setDisconnectedCallback(_on_disconnected)
+        client.setMessageReceivedCallback(_on_message)
         self._client = client
         reactor.callFromThread(client.startService)  # type: ignore[attr-defined]
         await asyncio.wait_for(connected, timeout=self._config.connect_timeout_sec)
@@ -153,6 +184,9 @@ class _CTraderNetworkClient:
 
         Returns:
             The extracted typed protobuf response for exactly this request.
+
+        Raises:
+            ConnectionError: If this client is not connected.
         """
         if not self._connected or self._client is None:
             raise ConnectionError("cTrader session is not connected")
@@ -162,6 +196,24 @@ class _CTraderNetworkClient:
 
         response = await self._request(request)
         return Protobuf.extract(response)
+
+    def add_event_handler(self, handler: Callable[[object], None]) -> None:
+        """Register one adapter-local provider-event callback.
+
+        Args:
+            handler: Callback invoked on the adapter asyncio loop.
+        """
+        if handler not in self._event_handlers:
+            self._event_handlers.append(handler)
+
+    def remove_event_handler(self, handler: Callable[[object], None]) -> None:
+        """Remove one adapter-local provider-event callback.
+
+        Args:
+            handler: Previously registered callback.
+        """
+        if handler in self._event_handlers:
+            self._event_handlers.remove(handler)
 
     async def close(self) -> None:  # pragma: no cover - requires Twisted + network
         """Release only this client's session; the shared reactor keeps running."""
@@ -180,7 +232,14 @@ class _CTraderNetworkClient:
             ).info("cTrader network client session released")
 
     async def _request(self, message: Any) -> Any:  # pragma: no cover - live only
-        """Bridge one reactor-thread send Deferred to an awaitable future."""
+        """Bridge one reactor-thread send Deferred to an awaitable future.
+
+        Returns:
+            Exact provider response message.
+
+        Raises:
+            ConnectionError: If the client event loop is unavailable.
+        """
         from twisted.internet import (
             reactor,  # type: ignore[import-untyped, unused-ignore]
         )
@@ -191,12 +250,23 @@ class _CTraderNetworkClient:
         future: asyncio.Future[Any] = loop.create_future()
 
         def _on_ok(response: Any) -> None:
+            """Handle on ok.
+
+            Args:
+                response: Value supplied to the operation.
+            """
             self._resolve(future, value=response)
 
         def _on_err(failure: Any) -> None:
+            """Handle on err.
+
+            Args:
+                failure: Value supplied to the operation.
+            """
             self._reject(future, ConnectionError(str(failure)))
 
         def _fire() -> None:
+            """Handle fire."""
             deferred = self._client.send(message)
             deferred.addCallbacks(_on_ok, _on_err)
 
@@ -212,6 +282,7 @@ class _CTraderNetworkClient:
             return
 
         def _set() -> None:
+            """Handle set."""
             if not future.done():
                 future.set_result(value)
 
@@ -226,6 +297,7 @@ class _CTraderNetworkClient:
             return
 
         def _set() -> None:
+            """Handle set."""
             if not future.done():
                 future.set_exception(error)
 

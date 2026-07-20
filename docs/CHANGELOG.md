@@ -16,7 +16,9 @@ This document is only for adding high-level changes, decisions, or status update
 - Utils is a completed verified implementation baseline: 100 targeted tests pass,
   aggregate branch coverage is 91.28%, all 23 source files individually exceed 80%
   coverage, and all eight feature-aligned standalone usage programs pass. Brokers
-  remains completed, Data is partial, and the complete system remains `Missing`.
+  is a completed verified baseline with 305 tests, 13 standalone usage programs,
+  and 86.24% branch coverage; Data remains `Partial`, and the complete system remains
+  `Missing`.
 - Indicators is now a completed implementation baseline after independent
   deterministic domain verification (Core plus trend, volatility, momentum,
   volume, candles, the public package port, and all five `WF-INDI-*` workflows).
@@ -306,6 +308,41 @@ This document is only for adding high-level changes, decisions, or status update
   from `uv run mypy app/services/strategy tests/strategy`.
 
 ### Decisions
+
+- **2026-07-20 — Brokers correction baseline completed.** `FEAT-BRK-02` and
+  `FEAT-BRK-07`–`FEAT-BRK-13` now have provider implementations, deterministic
+  provider-shaped tests, and one directly executable numbered usage program per
+  registered feature. Public exceptions are canonical/redacted, request IDs use
+  the Utils `req-<UUID4>` contract, Binance depth streams publish a genuine REST
+  snapshot before deltas, and Yahoo connectivity requires non-empty provider
+  probe evidence. No live mutation was executed.
+
+- **2026-07-20 — Dukascopy aggregation ownership resolved.** Tick-to-bar
+  aggregation is provider-local in `app/services/brokers/dukascopy/mapping.py`.
+  It uses genuine bid/ask midpoints, deterministic UTC buckets, bounded supported
+  timeframes, tick-volume counts, and explicit derivation provenance. The resolved
+  decision was removed from the Brokers README open-decision table.
+
+- **2026-07-20 — Broker write release policy resolved.** Catalogue release is
+  `implemented AND operation in _RELEASED AND operation not in _WRITE`.
+  Consequently, implemented MT5/cTrader mutations remain `UNAVAILABLE`
+  unconditionally through registry-created adapters. SDK presence, test success,
+  or implementation status alone cannot release a write capability.
+
+- **2026-07-20 — Brokers reclassified from completed baseline to `Partial`.** A
+  capability comparison of `ARCHIVE-V2/brokers` against `app/services/brokers`
+  examined 38 capabilities: 24 covered, 3 partially covered, 7 genuinely missing,
+  4 intentionally obsolete. The boundary (contracts, runtime, registry, fake) is
+  complete; seven provider operation groups are specified and accepted without an
+  implementation. This supersedes the 2026-07-16 entry below insofar as it named
+  Brokers a completed baseline.
+
+- **2026-07-20 — Brokers gaps registered as `FEAT-BRK-07`–`FEAT-BRK-13`.**
+  Mutations (MT5, cTrader), order/deal/transaction history, balances and
+  permissions, provider-native calculations, streaming subscriptions, cTrader
+  market data, and Dukascopy bar aggregation are recorded as `Missing`. Trading's
+  dispatcher and Data's account-snapshot source already call these operations, so
+  both fail closed against every real adapter until the work lands.
 
 - **2026-07-20 — Standalone usage evidence policy standardized.** Every registered
   feature owns one numbered non-pytest program that calls all of its public operations
@@ -692,7 +729,7 @@ This document is only for adding high-level changes, decisions, or status update
 
 - **2026-07-16 — Phase 1 Utils seams clarified (owner-resolved).** Logging sink configuration failure emits only the fixed safe fallback and then raises `ConfigurationError`; the stable error-metadata and settings-model field shapes are fixed in the Utils specification. Phase 1 may use private redaction mechanics for logging while public redaction functions and diagnostics remain assigned to Phase 2.
 
-- **2026-07-16 — Existing foundation domains retained (owner-resolved).** Utils, Brokers, and Data are completed implementation baselines and shall not be rebuilt by later agile phases; their allocated steps become compatibility/regression gates unless a genuinely unsatisfied requirement is identified. Current semantic-docstring/format cleanup is tracked separately from functional completion.
+- **2026-07-16 — Existing foundation domains retained (owner-resolved).** Utils, Brokers, and Data are completed implementation baselines and shall not be rebuilt by later agile phases; their allocated steps become compatibility/regression gates unless a genuinely unsatisfied requirement is identified. *(Superseded for Brokers on 2026-07-20: seven genuinely unsatisfied operation groups were identified, so Brokers is `Partial`. The no-rebuild rule still holds — the boundary is complete and the outstanding work is additive adapter implementation, not a rebuild.)* Current semantic-docstring/format cleanup is tracked separately from functional completion.
 
 - **2026-07-16 — Indicators and Strategy sequencing expanded (owner-resolved).** Indicators is built as one complete domain covering Core, trend, volatility, momentum, volume, and candles, followed by the complete Strategy domain. Later roadmap phase allocations for already completed features become regression gates rather than duplicate implementation.
 
@@ -761,6 +798,10 @@ This document is only for adding high-level changes, decisions, or status update
   sensitive setting names in its output.
 
 ### Fixed
+
+- **2026-07-20 — Brokers consumer compatibility restored.** Updated two stale
+  Trading test fixtures from legacy `req-<SHA256>` values to the canonical Utils
+  `req-<UUID4>` contract; all five focused dispatch compatibility tests pass.
 
 - **2026-07-20 — Utils review findings corrected.** Removed prohibited credential
   APIs and their direct dependency, closed separator/case redaction gaps, rejected

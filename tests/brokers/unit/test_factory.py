@@ -53,17 +53,19 @@ def test_create_adapter_is_explicit_and_independent() -> None:
     assert first.data is not second.data
 
 
-def test_registry_created_adapter_can_connect_and_report_state() -> None:
-    """CONNECT and IS_CONNECTED remain attemptable on a fresh registry adapter."""
+def test_registry_created_yahoo_adapter_requires_explicit_probe() -> None:
+    """Yahoo never reports connected without explicit provider evidence."""
 
     async def exercise() -> None:
         adapter = create_broker_adapter(BrokerId.YAHOO, _config()).data
         assert adapter is not None
         connected = await adapter.connect()
-        assert connected.is_success
+        assert not connected.is_success
+        assert connected.error is not None
+        assert connected.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID
         status = await adapter.is_connected()
         assert status.is_success
-        assert status.data is True
+        assert status.data is False
         await adapter.disconnect()
 
     asyncio.run(exercise())

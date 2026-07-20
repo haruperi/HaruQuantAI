@@ -92,9 +92,9 @@ This document registers all public and planned exported functions across the Har
 
 | Function | Purpose | Status |
 | :--- | :--- | :--- |
-| `create_broker_adapter(broker_id: str, config: BrokerConnectionConfig) -> BrokerAdapter` | Factory function to instantiate provider adapters. | Completed |
-| `get_broker_capability_catalogue(broker_id: str) -> BrokerCapability` | Retrieve capability matrix details for a provider. | Completed |
-| `get_registered_brokers() -> tuple[str, ...]` | Expose all registered/supported brokers. | Completed |
+| `create_broker_adapter(broker_id: BrokerId, config: BrokerConnectionConfig) -> BrokerResult[BrokerAdapter]` | Construct one exact disconnected provider adapter or canonical error. | Completed |
+| `get_broker_capability_catalogue() -> Mapping[BrokerId, tuple[BrokerCapability, ...]]` | Retrieve the complete capability matrix for every provider profile. | Completed |
+| `get_registered_brokers() -> tuple[BrokerId, ...]` | Expose all registered provider profiles without SDK import. | Completed |
 
 ## FEAT-BRK-02: MetaTrader 5 Broker Connection and Disconnection (services.brokers.mt5)
 
@@ -102,8 +102,22 @@ This document registers all public and planned exported functions across the Har
 
 | Function / Method | Purpose | Status |
 | :--- | :--- | :--- |
-| `MT5BrokerAdapter.connect() -> None` | Establish MT5 provider connection. | Completed |
-| `MT5BrokerAdapter.disconnect() -> None` | Disconnect MT5 provider connection. | Completed |
+| `MT5BrokerAdapter.connect() -> BrokerResult[None]` | Establish and verify the configured MT5 provider connection. | Completed |
+| `MT5BrokerAdapter.disconnect() -> BrokerResult[None]` | Disconnect the owned MT5 provider connection. | Completed |
+| `MT5BrokerAdapter.get_balances() -> BrokerResult[tuple[BrokerBalance, ...]]` | Report per-asset total and available balance. | Completed |
+| `MT5BrokerAdapter.get_permissions() -> BrokerResult[BrokerPermissions]` | Report whether the account may trade and read market data. | Completed |
+| `MT5BrokerAdapter.get_last_error() -> BrokerResult[BrokerError \| None]` | Report the provider's last error for diagnostics. | Completed |
+| `MT5BrokerAdapter.ping() -> BrokerResult[None]` | Run the provider-specific connection ping. | Completed |
+| `MT5BrokerAdapter.is_connected() -> BrokerResult[bool]` | Verify the live connection reachability status. | Completed |
+| `MT5BrokerAdapter.get_account_info() -> BrokerResult[BrokerAccountInfo]` | Retrieve account identifiers and financial balance details. | Completed |
+| `MT5BrokerAdapter.get_platform_info() -> BrokerResult[BrokerPlatformInfo]` | Retrieve technical environment and API/terminal details. | Completed |
+| `MT5BrokerAdapter.get_symbols(query: str \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]` | Retrieve provider symbol catalogue. | Completed |
+| `MT5BrokerAdapter.get_symbol_info(symbol: str) -> BrokerResult[BrokerSymbolInfo]` | Retrieve specifications and precision parameters for one symbol. | Completed |
+| `MT5BrokerAdapter.select_symbol(symbol: str, enabled: bool = True) -> BrokerResult[None]` | Mutate watch-list configuration for subscription/tick collection. | Completed |
+| `MT5BrokerAdapter.get_quote(symbol: str) -> BrokerResult[BrokerQuote]` | Read the latest bid and ask prices for one symbol. | Completed |
+| `MT5BrokerAdapter.get_ticks(symbol: str, start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerTick]]` | Read historical tick series with provider sequence identifiers. | Completed |
+| `MT5BrokerAdapter.get_historical_bars(symbol: str, timeframe: str, start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerBar]]` | Read historical trendbars using timeframe translation. | Completed |
+| `MT5BrokerAdapter.get_spread(symbol: str) -> BrokerResult[Decimal]` | Read current bid-ask spread in points. | Completed |
 
 ## FEAT-BRK-03: cTrader Broker Connection and Disconnection (services.brokers.ctrader)
 
@@ -111,8 +125,8 @@ This document registers all public and planned exported functions across the Har
 
 | Function / Method | Purpose | Status |
 | :--- | :--- | :--- |
-| `CTraderBrokerAdapter.connect() -> None` | Establish cTrader provider connection. | Completed |
-| `CTraderBrokerAdapter.disconnect() -> None` | Disconnect cTrader provider connection. | Completed |
+| `CTraderBrokerAdapter.connect() -> BrokerResult[None]` | Establish and verify the configured cTrader provider connection. | Completed |
+| `CTraderBrokerAdapter.disconnect() -> BrokerResult[None]` | Disconnect the owned cTrader provider connection. | Completed |
 
 ## FEAT-BRK-04: Binance Broker Connection and Disconnection (services.brokers.binance)
 
@@ -120,8 +134,16 @@ This document registers all public and planned exported functions across the Har
 
 | Function / Method | Purpose | Status |
 | :--- | :--- | :--- |
-| `BinanceBrokerAdapter.connect() -> None` | Establish Binance provider connection. | Completed |
-| `BinanceBrokerAdapter.disconnect() -> None` | Disconnect Binance provider connection. | Completed |
+| `BinanceBrokerAdapter.connect() -> BrokerResult[None]` | Establish and verify the configured Binance Spot provider connection. | Completed |
+| `BinanceBrokerAdapter.disconnect() -> BrokerResult[None]` | Disconnect the owned Binance provider connection. | Completed |
+| `BinanceBrokerAdapter.get_symbols(query: str \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]` | Retrieve the product catalogue filtered by native query. | Completed |
+| `BinanceBrokerAdapter.get_symbol_info(symbol: str) -> BrokerResult[BrokerSymbolInfo]` | Read contract specifications and precision limits for one symbol. | Completed |
+| `BinanceBrokerAdapter.get_quote(symbol: str) -> BrokerResult[BrokerQuote]` | Read the latest ticker bid and ask prices. | Completed |
+| `BinanceBrokerAdapter.get_spread(symbol: str) -> BrokerResult[Decimal]` | Calculate and return current bid-ask spread. | Completed |
+| `BinanceBrokerAdapter.get_market_status(symbol: str) -> BrokerResult[BrokerMarketStatus]` | Read provider trading status (open, halt, close). | Completed |
+| `BinanceBrokerAdapter.get_order_book(symbol: str, depth: int \| None = None) -> BrokerResult[BrokerOrderBook]` | Retrieve snapshot depth information. | Completed |
+| `BinanceBrokerAdapter.get_ticks(symbol: str, start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerTick]]` | Read historical trade/ticks. | Completed |
+| `BinanceBrokerAdapter.get_historical_bars(symbol: str, timeframe: str, start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerBar]]` | Retrieve historical trendbars from kline data. | Completed |
 
 ## FEAT-BRK-05: Dukascopy Broker Connection and Disconnection (services.brokers.dukascopy)
 
@@ -129,8 +151,8 @@ This document registers all public and planned exported functions across the Har
 
 | Function / Method | Purpose | Status |
 | :--- | :--- | :--- |
-| `DukascopyBrokerAdapter.connect() -> None` | Establish Dukascopy provider connection. | Completed |
-| `DukascopyBrokerAdapter.disconnect() -> None` | Disconnect Dukascopy provider connection. | Completed |
+| `DukascopyBrokerAdapter.connect() -> BrokerResult[None]` | Establish and verify Dukascopy provider reachability. | Completed |
+| `DukascopyBrokerAdapter.disconnect() -> BrokerResult[None]` | Disconnect the owned Dukascopy provider connection. | Completed |
 
 ## FEAT-BRK-06: Yahoo Finance Broker Connection and Disconnection (services.brokers.yahoo)
 
@@ -138,8 +160,101 @@ This document registers all public and planned exported functions across the Har
 
 | Function / Method | Purpose | Status |
 | :--- | :--- | :--- |
-| `YahooBrokerAdapter.connect() -> None` | Establish Yahoo provider connection. | Completed |
-| `YahooBrokerAdapter.disconnect() -> None` | Disconnect Yahoo provider connection. | Completed |
+| `YahooBrokerAdapter.connect() -> BrokerResult[None]` | Verify Yahoo with the explicitly configured non-empty probe symbol. | Completed |
+| `YahooBrokerAdapter.disconnect() -> BrokerResult[None]` | Disconnect the owned Yahoo provider connection. | Completed |
+| `YahooBrokerAdapter.get_historical_bars(symbol: str, timeframe: str, start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerBar]]` | Retrieve historical bars from Yahoo Finance. | Completed |
+
+## FEAT-BRK-07: MetaTrader 5 Order and Position Mutation Execution (services.brokers.mt5)
+
+***
+
+| Function | Purpose | Status |
+| :--- | :--- | :--- |
+| `MT5BrokerAdapter.check_order(request: BrokerOrderRequest) -> BrokerResult[BrokerOrderCheck]` | Pre-validate an order against provider margin and symbol constraints. | Completed |
+| `MT5BrokerAdapter.place_order(request: BrokerOrderRequest) -> BrokerResult[BrokerOrderResult]` | Submit a market or pending order to the MT5 terminal; registry release remains unavailable. | Completed |
+| `MT5BrokerAdapter.modify_order(request: BrokerOrderModificationRequest) -> BrokerResult[BrokerOrderResult]` | Amend price, volume, or expiry of a working order; registry release remains unavailable. | Completed |
+| `MT5BrokerAdapter.cancel_order(order_id: str, client_request_id: str \| None = None) -> BrokerResult[BrokerOrderResult]` | Remove a working pending order; registry release remains unavailable. | Completed |
+| `MT5BrokerAdapter.modify_position(request: BrokerPositionModificationRequest) -> BrokerResult[BrokerPosition]` | Amend stop-loss and take-profit on an open position; registry release remains unavailable. | Completed |
+| `MT5BrokerAdapter.close_position(request: BrokerPositionCloseRequest) -> BrokerResult[BrokerOrderResult]` | Close an open position in whole or in part; registry release remains unavailable. | Completed |
+
+## FEAT-BRK-08: cTrader Order and Position Mutation Execution (services.brokers.ctrader)
+
+***
+
+| Function | Purpose | Status |
+| :--- | :--- | :--- |
+| `CTraderBrokerAdapter.check_order(request: BrokerOrderRequest) -> BrokerResult[BrokerOrderCheck]` | Pre-validate an order against cTrader symbol and margin constraints. | Completed |
+| `CTraderBrokerAdapter.place_order(request: BrokerOrderRequest) -> BrokerResult[BrokerOrderResult]` | Submit via ProtoOANewOrderReq; registry release remains unavailable. | Completed |
+| `CTraderBrokerAdapter.modify_order(request: BrokerOrderModificationRequest) -> BrokerResult[BrokerOrderResult]` | Amend via ProtoOAAmendOrderReq; registry release remains unavailable. | Completed |
+| `CTraderBrokerAdapter.cancel_order(order_id: str, client_request_id: str \| None = None) -> BrokerResult[BrokerOrderResult]` | Cancel via ProtoOACancelOrderReq; registry release remains unavailable. | Completed |
+| `CTraderBrokerAdapter.modify_position(request: BrokerPositionModificationRequest) -> BrokerResult[BrokerPosition]` | Amend position stops; registry release remains unavailable. | Completed |
+| `CTraderBrokerAdapter.close_position(request: BrokerPositionCloseRequest) -> BrokerResult[BrokerOrderResult]` | Close via ProtoOAClosePositionReq; registry release remains unavailable. | Completed |
+
+## FEAT-BRK-09: Broker Order, Deal and Transaction History Reads (services.brokers.mt5, services.brokers.ctrader)
+
+***
+
+| Function | Purpose | Status |
+| :--- | :--- | :--- |
+| `MT5BrokerAdapter.get_orders(filter: BrokerOrderFilter \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerOrder]]` | List currently working orders for reconciliation. | Completed |
+| `MT5BrokerAdapter.get_order(order_id: str) -> BrokerResult[BrokerOrder]` | Read one working order by provider ticket. | Completed |
+| `MT5BrokerAdapter.list_order_history(start: datetime \| None = None, end: datetime \| None = None, symbol: str \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerOrder]]` | Read closed orders over a bounded window. | Completed |
+| `MT5BrokerAdapter.list_deal_history(start: datetime \| None = None, end: datetime \| None = None, symbol: str \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerDeal]]` | Read executed deals for realised P&L attribution. | Completed |
+| `MT5BrokerAdapter.get_deal(deal_id: str) -> BrokerResult[BrokerDeal]` | Read one executed deal by provider identifier. | Completed |
+| `MT5BrokerAdapter.list_account_transactions(start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerAccountTransaction]]` | Read deposits, withdrawals, swaps and commissions. | Completed |
+| `MT5BrokerAdapter.get_position(position_id: str) -> BrokerResult[BrokerPosition]` | Read one open position by provider identifier. | Completed |
+| `MT5BrokerAdapter.get_positions(filter: BrokerPositionFilter \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerPosition]]` | List open positions matching structural filters. | Completed |
+| `CTraderBrokerAdapter.get_orders(filter: BrokerOrderFilter \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerOrder]]` | List working orders via ProtoOAReconcileReq. | Completed |
+| `CTraderBrokerAdapter.get_positions(filter: BrokerPositionFilter \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerPosition]]` | List open positions via ProtoOAReconcileReq. | Completed |
+| `CTraderBrokerAdapter.list_order_history(start: datetime \| None = None, end: datetime \| None = None, symbol: str \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerOrder]]` | Read closed orders via ProtoOAOrderListReq. | Completed |
+| `CTraderBrokerAdapter.list_deal_history(start: datetime \| None = None, end: datetime \| None = None, symbol: str \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerDeal]]` | Read executed deals via ProtoOADealListReq. | Completed |
+
+## FEAT-BRK-10: Broker-Authoritative Margin and Profit Calculation (services.brokers.mt5, services.brokers.ctrader)
+
+***
+
+| Function | Purpose | Status |
+| :--- | :--- | :--- |
+| `MT5BrokerAdapter.calculate_margin(request: BrokerMarginRequest) -> BrokerResult[Decimal]` | Obtain the venue's required margin for a candidate order. | Completed |
+| `MT5BrokerAdapter.calculate_profit(request: BrokerProfitRequest) -> BrokerResult[Decimal]` | Obtain the venue's profit for a candidate price move. | Completed |
+| `CTraderBrokerAdapter.calculate_margin(request: BrokerMarginRequest) -> BrokerResult[Decimal]` | Compute required margin from cTrader provider evidence. | Completed |
+| `CTraderBrokerAdapter.calculate_profit(request: BrokerProfitRequest) -> BrokerResult[Decimal]` | Compute profit from cTrader symbol lot-size evidence. | Completed |
+
+## FEAT-BRK-11: Real-Time Broker Price Stream Subscription (services.brokers.ctrader, services.brokers.binance)
+
+***
+
+| Function | Purpose | Status |
+| :--- | :--- | :--- |
+| `CTraderBrokerAdapter.subscribe_quotes(symbols: tuple[str, ...]) -> BrokerResult[BrokerSubscription[BrokerQuote]]` | Open a live spot price stream via ProtoOASubscribeSpotsReq. | Completed |
+| `CTraderBrokerAdapter.unsubscribe(subscription_id: str) -> BrokerResult[None]` | Close one live stream via ProtoOAUnsubscribeSpotsReq. | Completed |
+| `CTraderBrokerAdapter.list_subscriptions() -> BrokerResult[tuple[BrokerSubscriptionInfo, ...]]` | Report currently open streams. | Completed |
+| `BinanceBrokerAdapter.subscribe_quotes(symbols: tuple[str, ...]) -> BrokerResult[BrokerSubscription[BrokerQuote]]` | Open a websocket best bid/ask stream. | Completed |
+| `BinanceBrokerAdapter.subscribe_bars(symbols: tuple[str, ...], timeframe: str) -> BrokerResult[BrokerSubscription[BrokerBar]]` | Open a websocket kline stream. | Completed |
+| `BinanceBrokerAdapter.subscribe_order_book(symbols: tuple[str, ...], depth: int \| None = None) -> BrokerResult[BrokerSubscription[BrokerOrderBook]]` | Open a snapshot-first websocket depth stream. | Completed |
+| `BinanceBrokerAdapter.unsubscribe(subscription_id: str) -> BrokerResult[None]` | Close one owned websocket stream. | Completed |
+| `BinanceBrokerAdapter.list_subscriptions() -> BrokerResult[tuple[BrokerSubscriptionInfo, ...]]` | Report currently open streams. | Completed |
+
+## FEAT-BRK-12: cTrader Market Data Retrieval (services.brokers.ctrader)
+
+***
+
+| Function | Purpose | Status |
+| :--- | :--- | :--- |
+| `CTraderBrokerAdapter.get_symbols(query: str \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]` | List tradable symbols for the authorized account. | Completed |
+| `CTraderBrokerAdapter.get_symbol_info(symbol: str) -> BrokerResult[BrokerSymbolInfo]` | Read contract specification and precision metadata. | Completed |
+| `CTraderBrokerAdapter.get_quote(symbol: str) -> BrokerResult[BrokerQuote]` | Read the latest bid/ask for a symbol. | Completed |
+| `CTraderBrokerAdapter.get_spread(symbol: str) -> BrokerResult[Decimal]` | Read the current spread for a symbol. | Completed |
+| `CTraderBrokerAdapter.get_ticks(symbol: str, start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerTick]]` | Retrieve historical tick data via ProtoOAGetTickDataReq. | Completed |
+| `CTraderBrokerAdapter.get_historical_bars(symbol: str, timeframe: str, start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerBar]]` | Retrieve historical trendbars via ProtoOAGetTrendbarsReq. | Completed |
+
+## FEAT-BRK-13: Dukascopy Historical Bar Aggregation (services.brokers.dukascopy)
+
+***
+
+| Function | Purpose | Status |
+| :--- | :--- | :--- |
+| `DukascopyBrokerAdapter.get_historical_bars(symbol: str, timeframe: str, start: datetime \| None = None, end: datetime \| None = None, cursor: str \| None = None, limit: int \| None = None) -> BrokerResult[BrokerPage[BrokerBar]]` | Return deterministic midpoint OHLC bars aggregated locally from genuine Dukascopy tick data at a validated timeframe. | Completed |
 
 # Data
 

@@ -2,6 +2,7 @@
 
 import asyncio
 from datetime import UTC, datetime
+from decimal import Decimal
 from typing import Any
 
 import numpy as np
@@ -13,6 +14,12 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
+    BrokerMarginRequest,
+    BrokerOrderModificationRequest,
+    BrokerOrderRequest,
+    BrokerPositionCloseRequest,
+    BrokerPositionModificationRequest,
+    BrokerProfitRequest,
 )
 from app.services.brokers.mt5.adapter import MT5BrokerAdapter
 from pydantic import SecretStr
@@ -73,8 +80,19 @@ class _FakeTransport:
     def _responses(self) -> dict[str, object]:
         now = datetime(2026, 1, 1, tzinfo=UTC).timestamp()
         return {
-            "account_info": {"login": 12345, "server": "Demo-Server"},
-            "terminal_info": {} if self._verified else None,
+            "account_info": {
+                "login": 12345,
+                "server": "Demo-Server",
+                "currency": "USD",
+                "balance": 1000,
+                "equity": 1100,
+                "margin": 100,
+                "margin_free": 1000,
+                "trade_allowed": True,
+            },
+            "terminal_info": (
+                {"connected": True, "trade_allowed": True} if self._verified else None
+            ),
             "version": "5.0.0",
             "symbols_get": (
                 {
@@ -127,6 +145,68 @@ class _FakeTransport:
                     "time_update": now,
                 },
             ),
+            "orders_get": (
+                {
+                    "ticket": 11,
+                    "symbol": "EURUSD",
+                    "type": 2,
+                    "state": 1,
+                    "volume_initial": 1,
+                    "volume_current": 0.5,
+                    "price_open": 1.1,
+                    "time_setup": now,
+                },
+            ),
+            "history_orders_get": (
+                {
+                    "ticket": 12,
+                    "symbol": "EURUSD",
+                    "type": 0,
+                    "state": 4,
+                    "volume_initial": 1,
+                    "volume_current": 0,
+                    "price_open": 1.1,
+                    "time_setup": now,
+                    "time_done": now,
+                },
+            ),
+            "history_deals_get": (
+                {
+                    "ticket": 21,
+                    "order": 12,
+                    "position_id": 1,
+                    "symbol": "EURUSD",
+                    "type": 0,
+                    "volume": 1,
+                    "price": 1.2,
+                    "entry": 0,
+                    "time": now,
+                    "commission": -1,
+                },
+                {
+                    "ticket": 22,
+                    "symbol": "",
+                    "type": 2,
+                    "profit": 100,
+                    "time": now,
+                },
+            ),
+            "last_error": (1, "Success"),
+            "order_check": {
+                "retcode": 0,
+                "comment": "Done",
+                "margin": 10,
+            },
+            "order_send": {
+                "retcode": 10009,
+                "comment": "Done",
+                "order": 77,
+                "deal": 88,
+                "volume": 1,
+                "price": 1.2,
+            },
+            "order_calc_margin": 10,
+            "order_calc_profit": 25,
         }
 
     async def call(self, name: str, *args: object, **kwargs: object) -> object:
@@ -402,6 +482,95 @@ def test_adapter_get_platform_info_reports_terminal_version() -> None:
     asyncio.run(exercise())
 
 
+def test_adapter_account_history_mutation_and_calculation_operations() -> None:
+    """Implemented MT5 operation groups preserve provider evidence."""
+    adapter = MT5BrokerAdapter(
+        _config(), _capabilities(), transport=_FakeTransport(verified=True)
+    )
+    start = datetime(2026, 1, 1, tzinfo=UTC)
+    end = datetime(2026, 1, 2, tzinfo=UTC)
+
+    async def exercise() -> None:
+        await adapter.connect()
+        permissions = await adapter.get_permissions()
+        assert permissions.data is not None
+        assert permissions.data.trade_write is True
+        balances = await adapter.get_balances()
+        assert balances.data is not None
+        assert balances.data[0].asset == "USD"
+        assert (await adapter.get_last_error()).data is None
+        assert (await adapter.get_position("1")).data is not None
+        assert (await adapter.get_orders(limit=10)).data is not None
+        assert (await adapter.get_order("11")).data is not None
+        assert (await adapter.list_order_history(start, end, limit=10)).data is not None
+        deals = await adapter.list_deal_history(start, end, limit=10)
+        assert deals.data is not None
+        assert len(deals.data.items) == 1
+        assert (await adapter.get_deal("21")).data is not None
+        transactions = await adapter.list_account_transactions(start, end, limit=10)
+        assert transactions.data is not None
+        assert len(transactions.data.items) == 1
+
+        order = BrokerOrderRequest(
+            symbol="EURUSD",
+            side="BUY",
+            order_type="MARKET",
+            quantity=Decimal(1),
+            quantity_unit="lots",
+            environment=BrokerEnvironment.DEMO,
+        )
+        assert (await adapter.check_order(order)).data is not None
+        assert (await adapter.place_order(order)).data is not None
+        assert (
+            await adapter.modify_order(
+                BrokerOrderModificationRequest(
+                    order_id="11", limit_price=Decimal("1.2")
+                )
+            )
+        ).data is not None
+        assert (await adapter.cancel_order("11")).data is not None
+        assert (
+            await adapter.modify_position(
+                BrokerPositionModificationRequest(
+                    position_id="1", stop_loss=Decimal("1.0")
+                )
+            )
+        ).data is not None
+        assert (
+            await adapter.close_position(
+                BrokerPositionCloseRequest(
+                    position_id="1",
+                    quantity=Decimal(1),
+                    quantity_unit="lots",
+                )
+            )
+        ).data is not None
+        margin = await adapter.calculate_margin(
+            BrokerMarginRequest(
+                symbol="EURUSD",
+                side="BUY",
+                quantity=Decimal(1),
+                quantity_unit="lots",
+                product_profile="mt5",
+            )
+        )
+        assert margin.data == Decimal(10)
+        profit = await adapter.calculate_profit(
+            BrokerProfitRequest(
+                symbol="EURUSD",
+                side="BUY",
+                quantity=Decimal(1),
+                quantity_unit="lots",
+                open_price=Decimal("1.1"),
+                close_price=Decimal("1.2"),
+                product_profile="mt5",
+            )
+        )
+        assert profit.data == Decimal(25)
+
+    asyncio.run(exercise())
+
+
 def test_adapter_rejects_non_live_or_demo_env() -> None:
     """MT5BrokerAdapter raises ValueError for invalid environment types."""
     bad = BrokerConnectionConfig(
@@ -533,8 +702,9 @@ def test_adapter_get_symbols_invalid_limit() -> None:
 
     async def exercise() -> None:
         await adapter.connect()
-        with pytest.raises(ValueError, match="positive symbol limit is required"):
-            await adapter.get_symbols(limit=0)
+        result = await adapter.get_symbols(limit=0)
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
 
     asyncio.run(exercise())
 
@@ -545,9 +715,9 @@ def test_adapter_get_ticks_invalid_parameters() -> None:
 
     async def exercise() -> None:
         await adapter.connect()
-        msg = "positive tick limit is required"
-        with pytest.raises(ValueError, match=msg):
-            await adapter.get_ticks("EURUSD", start=None, end=None, limit=0)
+        result = await adapter.get_ticks("EURUSD", start=None, end=None, limit=0)
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
 
     asyncio.run(exercise())
 
@@ -585,8 +755,9 @@ def test_adapter_get_positions_invalid_limit() -> None:
 
     async def exercise() -> None:
         await adapter.connect()
-        with pytest.raises(ValueError, match="positive position limit is required"):
-            await adapter.get_positions(limit=0)
+        result = await adapter.get_positions(limit=0)
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
 
     asyncio.run(exercise())
 

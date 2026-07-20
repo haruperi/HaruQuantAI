@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
-# ruff: noqa: A002, ANN401, D102, D105, PYI034 - normative/dynamic boundary.
+# ruff: noqa: A002, ANN401, BLE001, C901, PYI034 - normative boundary.
 import asyncio
+import functools
+import inspect
 from collections.abc import AsyncIterator, Mapping
 from datetime import datetime
 from decimal import Decimal
 from types import TracebackType
-from typing import Any, Literal, Protocol, override, runtime_checkable
+from typing import Any, Literal, Protocol, cast, override, runtime_checkable
 
 from app.services.brokers.contracts.enums import (
     BrokerCapabilityId,
     BrokerConnectionState,
+    BrokerErrorCode,
 )
 from app.services.brokers.contracts.models import (
     BrokerAccountInfo,
@@ -54,7 +57,7 @@ from app.services.brokers.contracts.models import (
     BrokerTradingSession,
 )
 from app.services.brokers.contracts.unsupported import _unsupported_result, _utc_now
-from app.utils import logger
+from app.utils import generate_id, logger
 
 
 @runtime_checkable
@@ -62,11 +65,29 @@ class BrokerSubscription[TEvent](Protocol):
     """Typed bounded provider-event subscription."""
 
     @property
-    def info(self) -> BrokerSubscriptionInfo: ...
+    def info(self) -> BrokerSubscriptionInfo:
+        """Handle info.
 
-    def events(self) -> AsyncIterator[TEvent | BrokerError]: ...
+        Returns:
+            The operation result.
+        """
+        ...
 
-    async def unsubscribe(self) -> BrokerResult[None]: ...
+    def events(self) -> AsyncIterator[TEvent | BrokerError]:
+        """Handle events.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def unsubscribe(self) -> BrokerResult[None]:
+        """Handle unsubscribe.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
 
 @runtime_checkable
@@ -78,26 +99,83 @@ class MarketDataProvider(Protocol):
         query: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]:
+        """Return get symbols.
 
-    async def get_symbol_info(self, symbol: str) -> BrokerResult[BrokerSymbolInfo]: ...
+        Args:
+            query: Value supplied to the operation.
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_symbol_info(self, symbol: str) -> BrokerResult[BrokerSymbolInfo]:
+        """Return get symbol info.
+
+        Args:
+            symbol: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def select_symbol(
         self, symbol: str, enabled: bool = True
-    ) -> BrokerResult[None]: ...
+    ) -> BrokerResult[None]:
+        """Handle select symbol.
 
-    async def get_market_status(
-        self, symbol: str
-    ) -> BrokerResult[BrokerMarketStatus]: ...
+        Args:
+            symbol: Value supplied to the operation.
+            enabled: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_market_status(self, symbol: str) -> BrokerResult[BrokerMarketStatus]:
+        """Return get market status.
+
+        Args:
+            symbol: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def get_trading_sessions(
         self,
         symbol: str,
         start: datetime | None = None,
         end: datetime | None = None,
-    ) -> BrokerResult[tuple[BrokerTradingSession, ...]]: ...
+    ) -> BrokerResult[tuple[BrokerTradingSession, ...]]:
+        """Return get trading sessions.
 
-    async def get_quote(self, symbol: str) -> BrokerResult[BrokerQuote]: ...
+        Args:
+            symbol: Value supplied to the operation.
+            start: Value supplied to the operation.
+            end: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_quote(self, symbol: str) -> BrokerResult[BrokerQuote]:
+        """Return get quote.
+
+        Args:
+            symbol: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def get_ticks(
         self,
@@ -106,7 +184,20 @@ class MarketDataProvider(Protocol):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerTick]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerTick]]:
+        """Return get ticks.
+
+        Args:
+            symbol: Value supplied to the operation.
+            start: Value supplied to the operation.
+            end: Value supplied to the operation.
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def get_historical_bars(
         self,
@@ -116,78 +207,272 @@ class MarketDataProvider(Protocol):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerBar]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerBar]]:
+        """Return get historical bars.
+
+        Args:
+            symbol: Value supplied to the operation.
+            timeframe: Value supplied to the operation.
+            start: Value supplied to the operation.
+            end: Value supplied to the operation.
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def get_order_book(
         self, symbol: str, depth: int | None = None
-    ) -> BrokerResult[BrokerOrderBook]: ...
+    ) -> BrokerResult[BrokerOrderBook]:
+        """Return get order book.
 
-    async def get_spread(self, symbol: str) -> BrokerResult[Decimal]: ...
+        Args:
+            symbol: Value supplied to the operation.
+            depth: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_spread(self, symbol: str) -> BrokerResult[Decimal]:
+        """Return get spread.
+
+        Args:
+            symbol: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def subscribe_quotes(
         self, symbols: tuple[str, ...]
-    ) -> BrokerResult[BrokerSubscription[BrokerQuote]]: ...
+    ) -> BrokerResult[BrokerSubscription[BrokerQuote]]:
+        """Handle subscribe quotes.
+
+        Args:
+            symbols: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def subscribe_bars(
         self, symbols: tuple[str, ...], timeframe: str
-    ) -> BrokerResult[BrokerSubscription[BrokerBar]]: ...
+    ) -> BrokerResult[BrokerSubscription[BrokerBar]]:
+        """Handle subscribe bars.
+
+        Args:
+            symbols: Value supplied to the operation.
+            timeframe: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def subscribe_order_book(
         self, symbols: tuple[str, ...], depth: int | None = None
-    ) -> BrokerResult[BrokerSubscription[BrokerOrderBook]]: ...
+    ) -> BrokerResult[BrokerSubscription[BrokerOrderBook]]:
+        """Handle subscribe order book.
 
-    async def unsubscribe(self, subscription_id: str) -> BrokerResult[None]: ...
+        Args:
+            symbols: Value supplied to the operation.
+            depth: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def unsubscribe(self, subscription_id: str) -> BrokerResult[None]:
+        """Handle unsubscribe.
+
+        Args:
+            subscription_id: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def list_subscriptions(
         self,
-    ) -> BrokerResult[tuple[BrokerSubscriptionInfo, ...]]: ...
+    ) -> BrokerResult[tuple[BrokerSubscriptionInfo, ...]]:
+        """Return list subscriptions.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
 
 @runtime_checkable
 class AccountProvider(Protocol):
     """Provider-native platform, account, and execution-state reads."""
 
-    async def get_feature_flags(self) -> BrokerResult[BrokerFeatureFlags]: ...
+    async def get_feature_flags(self) -> BrokerResult[BrokerFeatureFlags]:
+        """Return get feature flags.
 
-    async def supports(self, capability: BrokerCapabilityId) -> BrokerResult[bool]: ...
+        Returns:
+            The operation result.
+        """
+        ...
 
-    async def get_platform_info(self) -> BrokerResult[BrokerPlatformInfo]: ...
+    async def supports(self, capability: BrokerCapabilityId) -> BrokerResult[bool]:
+        """Return supports.
 
-    async def get_permissions(self) -> BrokerResult[BrokerPermissions]: ...
+        Args:
+            capability: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_platform_info(self) -> BrokerResult[BrokerPlatformInfo]:
+        """Return get platform info.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_permissions(self) -> BrokerResult[BrokerPermissions]:
+        """Return get permissions.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def list_accounts(
         self, cursor: str | None = None, limit: int | None = None
-    ) -> BrokerResult[BrokerPage[BrokerAccountInfo]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerAccountInfo]]:
+        """Return list accounts.
 
-    async def select_account(self, account_id: str) -> BrokerResult[None]: ...
+        Args:
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
 
-    async def get_account_info(self) -> BrokerResult[BrokerAccountInfo]: ...
+        Returns:
+            The operation result.
+        """
+        ...
 
-    async def get_balances(self) -> BrokerResult[tuple[BrokerBalance, ...]]: ...
+    async def select_account(self, account_id: str) -> BrokerResult[None]:
+        """Handle select account.
+
+        Args:
+            account_id: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_account_info(self) -> BrokerResult[BrokerAccountInfo]:
+        """Return get account info.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_balances(self) -> BrokerResult[tuple[BrokerBalance, ...]]:
+        """Return get balances.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def list_assets(
         self, cursor: str | None = None, limit: int | None = None
-    ) -> BrokerResult[BrokerPage[BrokerAssetInfo]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerAssetInfo]]:
+        """Return list assets.
 
-    async def get_asset_info(self, asset: str) -> BrokerResult[BrokerAssetInfo]: ...
+        Args:
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_asset_info(self, asset: str) -> BrokerResult[BrokerAssetInfo]:
+        """Return get asset info.
+
+        Args:
+            asset: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def get_positions(
         self,
         filter: BrokerPositionFilter | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerPosition]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerPosition]]:
+        """Return get positions.
 
-    async def get_position(self, position_id: str) -> BrokerResult[BrokerPosition]: ...
+        Args:
+            filter: Value supplied to the operation.
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_position(self, position_id: str) -> BrokerResult[BrokerPosition]:
+        """Return get position.
+
+        Args:
+            position_id: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def get_orders(
         self,
         filter: BrokerOrderFilter | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerOrder]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerOrder]]:
+        """Return get orders.
 
-    async def get_order(self, order_id: str) -> BrokerResult[BrokerOrder]: ...
+        Args:
+            filter: Value supplied to the operation.
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_order(self, order_id: str) -> BrokerResult[BrokerOrder]:
+        """Return get order.
+
+        Args:
+            order_id: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def list_order_history(
         self,
@@ -196,7 +481,20 @@ class AccountProvider(Protocol):
         symbol: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerOrder]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerOrder]]:
+        """Return list order history.
+
+        Args:
+            start: Value supplied to the operation.
+            end: Value supplied to the operation.
+            symbol: Value supplied to the operation.
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def list_deal_history(
         self,
@@ -205,9 +503,31 @@ class AccountProvider(Protocol):
         symbol: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerDeal]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerDeal]]:
+        """Return list deal history.
 
-    async def get_deal(self, deal_id: str) -> BrokerResult[BrokerDeal]: ...
+        Args:
+            start: Value supplied to the operation.
+            end: Value supplied to the operation.
+            symbol: Value supplied to the operation.
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_deal(self, deal_id: str) -> BrokerResult[BrokerDeal]:
+        """Return get deal.
+
+        Args:
+            deal_id: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def list_account_transactions(
         self,
@@ -215,7 +535,19 @@ class AccountProvider(Protocol):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerAccountTransaction]]: ...
+    ) -> BrokerResult[BrokerPage[BrokerAccountTransaction]]:
+        """Return list account transactions.
+
+        Args:
+            start: Value supplied to the operation.
+            end: Value supplied to the operation.
+            cursor: Value supplied to the operation.
+            limit: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
 
 @runtime_checkable
@@ -224,31 +556,95 @@ class TradeExecutionProvider(Protocol):
 
     async def check_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderCheck]: ...
+    ) -> BrokerResult[BrokerOrderCheck]:
+        """Handle check order.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def place_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderResult]: ...
+    ) -> BrokerResult[BrokerOrderResult]:
+        """Handle place order.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def modify_order(
         self, request: BrokerOrderModificationRequest
-    ) -> BrokerResult[BrokerOrderResult]: ...
+    ) -> BrokerResult[BrokerOrderResult]:
+        """Handle modify order.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def cancel_order(
         self, order_id: str, client_request_id: str | None = None
-    ) -> BrokerResult[BrokerOrderResult]: ...
+    ) -> BrokerResult[BrokerOrderResult]:
+        """Handle cancel order.
+
+        Args:
+            order_id: Value supplied to the operation.
+            client_request_id: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def modify_position(
         self, request: BrokerPositionModificationRequest
-    ) -> BrokerResult[BrokerPosition]: ...
+    ) -> BrokerResult[BrokerPosition]:
+        """Handle modify position.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def close_position(
         self, request: BrokerPositionCloseRequest
-    ) -> BrokerResult[BrokerOrderResult]: ...
+    ) -> BrokerResult[BrokerOrderResult]:
+        """Handle close position.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def replace_order(
         self, request: BrokerOrderModificationRequest
-    ) -> BrokerResult[BrokerOrderResult]: ...
+    ) -> BrokerResult[BrokerOrderResult]:
+        """Handle replace order.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
 
 @runtime_checkable
@@ -257,15 +653,42 @@ class CalculationProvider(Protocol):
 
     async def calculate_margin(
         self, request: BrokerMarginRequest
-    ) -> BrokerResult[Decimal]: ...
+    ) -> BrokerResult[Decimal]:
+        """Return calculate margin.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def calculate_profit(
         self, request: BrokerProfitRequest
-    ) -> BrokerResult[Decimal]: ...
+    ) -> BrokerResult[Decimal]:
+        """Return calculate profit.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def get_commission_estimate(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerFeeEstimate]: ...
+    ) -> BrokerResult[BrokerFeeEstimate]:
+        """Return get commission estimate.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
 
 @runtime_checkable
@@ -279,41 +702,127 @@ class BrokerAdapter(
     """Composite asynchronous broker adapter contract."""
 
     @property
-    def contract_version(self) -> Literal["v1"]: ...
+    def contract_version(self) -> Literal["v1"]:
+        """Handle contract version.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     @property
-    def schema_id(self) -> Literal["brokers.adapter.v1"]: ...
+    def schema_id(self) -> Literal["brokers.adapter.v1"]:
+        """Handle schema id.
 
-    async def __aenter__(self) -> BrokerAdapter: ...
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def __aenter__(self) -> BrokerAdapter:
+        """Handle aenter.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def __aexit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
         traceback: TracebackType | None,
-    ) -> None: ...
+    ) -> None:
+        """Handle aexit.
 
-    async def connect(self) -> BrokerResult[None]: ...
+        Args:
+            exc_type: Value supplied to the operation.
+            exc: Value supplied to the operation.
+            traceback: Value supplied to the operation.
+        """
+        ...
 
-    async def disconnect(self) -> BrokerResult[None]: ...
+    async def connect(self) -> BrokerResult[None]:
+        """Handle connect.
 
-    async def reconnect(self) -> BrokerResult[None]: ...
+        Returns:
+            The operation result.
+        """
+        ...
 
-    async def is_connected(self) -> BrokerResult[bool]: ...
+    async def disconnect(self) -> BrokerResult[None]:
+        """Handle disconnect.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def reconnect(self) -> BrokerResult[None]:
+        """Handle reconnect.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def is_connected(self) -> BrokerResult[bool]:
+        """Return is connected.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
     async def get_connection_status(
         self,
-    ) -> BrokerResult[BrokerConnectionStatus]: ...
+    ) -> BrokerResult[BrokerConnectionStatus]:
+        """Return get connection status.
 
-    async def ping(self) -> BrokerResult[None]: ...
+        Returns:
+            The operation result.
+        """
+        ...
 
-    async def refresh_session(self) -> BrokerResult[None]: ...
+    async def ping(self) -> BrokerResult[None]:
+        """Handle ping.
 
-    async def get_server_time(self) -> BrokerResult[BrokerServerTime]: ...
+        Returns:
+            The operation result.
+        """
+        ...
 
-    async def get_last_error(self) -> BrokerResult[BrokerError | None]: ...
+    async def refresh_session(self) -> BrokerResult[None]:
+        """Handle refresh session.
 
-    def connection_events(self) -> AsyncIterator[BrokerConnectionEvent]: ...
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_server_time(self) -> BrokerResult[BrokerServerTime]:
+        """Return get server time.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def get_last_error(self) -> BrokerResult[BrokerError | None]:
+        """Return get last error.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    def connection_events(self) -> AsyncIterator[BrokerConnectionEvent]:
+        """Handle connection events.
+
+        Returns:
+            The operation result.
+        """
+        ...
 
 
 class _UnsupportedAdapterBase:
@@ -333,12 +842,24 @@ class _UnsupportedAdapterBase:
             BrokerCapabilityId.LIST_SUBSCRIPTIONS,
         }
     )
+    _MUTATION_OPERATIONS = frozenset(
+        {
+            BrokerCapabilityId.CHECK_ORDER,
+            BrokerCapabilityId.PLACE_ORDER,
+            BrokerCapabilityId.MODIFY_ORDER,
+            BrokerCapabilityId.CANCEL_ORDER,
+            BrokerCapabilityId.MODIFY_POSITION,
+            BrokerCapabilityId.CLOSE_POSITION,
+            BrokerCapabilityId.REPLACE_ORDER,
+        }
+    )
 
     def __init__(
         self,
         config: BrokerConnectionConfig,
         capabilities: Mapping[BrokerCapabilityId, BrokerCapability],
     ) -> None:
+        """Handle init."""
         self._config = config
         self._capabilities = dict(capabilities)
         self._state = BrokerConnectionState.DISCONNECTED
@@ -368,6 +889,7 @@ class _UnsupportedAdapterBase:
         Returns:
             The declared attribute or a fail-closed unsupported operation.
         """
+        operation: BrokerCapabilityId | None = None
         if not name.startswith("_"):
             try:
                 operation = BrokerCapabilityId(name)
@@ -390,13 +912,50 @@ class _UnsupportedAdapterBase:
                     async def _blocked(
                         *args: object, **kwargs: object
                     ) -> BrokerResult[Any]:
+                        """Return the declared unavailable capability result.
+
+                        Returns:
+                            A deterministic unsupported result.
+                        """
                         del args, kwargs
                         return self._unsupported(operation)
 
                     return _blocked
-        return object.__getattribute__(self, name)
+        attribute = object.__getattribute__(self, name)
+        if operation is None or operation == BrokerCapabilityId.CONNECTION_EVENTS:
+            return attribute
+        if not callable(attribute):
+            return attribute
+
+        @functools.wraps(attribute)
+        async def _guarded(*args: object, **kwargs: object) -> BrokerResult[Any]:
+            """Normalize an adapter call into a canonical result.
+
+            Returns:
+                The canonical adapter result.
+
+            Raises:
+                asyncio.CancelledError: If the caller cancels the operation.
+            """
+            try:
+                result = await attribute(*args, **kwargs)
+                return cast("BrokerResult[Any]", result)
+            except asyncio.CancelledError:
+                raise
+            except Exception as error:
+                return self._exception_result(operation, error)
+
+        return _guarded
 
     async def __aenter__(self) -> _UnsupportedAdapterBase:
+        """Connect and enter the adapter context.
+
+        Returns:
+            The connected adapter instance.
+
+        Raises:
+            RuntimeError: If the adapter cannot connect.
+        """
         result = await self.connect()
         if not result.is_success:
             message = result.error.message if result.error else "connect failed"
@@ -409,6 +968,7 @@ class _UnsupportedAdapterBase:
         exc: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
+        """Handle aexit."""
         del exc_type, exc, traceback
         await self.disconnect()
 
@@ -421,11 +981,16 @@ class _UnsupportedAdapterBase:
         request_id: str | None = None,
         provider_metadata: Mapping[str, object] | None = None,
     ) -> BrokerResult[T]:
+        """Build and log one canonical adapter result.
+
+        Returns:
+            The canonical result envelope.
+        """
         result: BrokerResult[T] = BrokerResult(
             status="error" if error else "success",
             broker=self._config.broker_id,
             operation=operation,
-            request_id=request_id or f"{operation.value}-{self._session_generation}",
+            request_id=request_id or generate_id("req"),
             timestamp=_utc_now(),
             environment=self._config.environment,
             adapter_version=self.ADAPTER_VERSION,
@@ -455,6 +1020,7 @@ class _UnsupportedAdapterBase:
         reason: str | None = None,
         resynchronization_required: bool = False,
     ) -> None:
+        """Handle transition."""
         if state == self._state:
             return
         event = BrokerConnectionEvent(
@@ -514,7 +1080,14 @@ class _UnsupportedAdapterBase:
         return await self.connect()
 
     async def is_connected(self) -> BrokerResult[bool]:
-        """Return locally tracked verified-session state."""
+        """Return conservative locally retained session evidence.
+
+        Provider adapters override this method when current connectivity can be
+        verified. The shared default never upgrades non-provider evidence.
+
+        Returns:
+            A canonical result that is true only for a retained verified session.
+        """
         return self._result(
             BrokerCapabilityId.IS_CONNECTED,
             data=self._state == BrokerConnectionState.READY,
@@ -522,21 +1095,18 @@ class _UnsupportedAdapterBase:
 
     async def get_connection_status(self) -> BrokerResult[BrokerConnectionStatus]:
         """Return detailed fail-closed session state."""
-        ready = self._state == BrokerConnectionState.READY
         return self._result(
             BrokerCapabilityId.GET_CONNECTION_STATUS,
             data=BrokerConnectionStatus(
                 state=self._state,
-                transport_connected=ready,
+                transport_connected=self._state == BrokerConnectionState.READY,
                 environment=self._config.environment,
                 session_generation=self._session_generation,
                 observed_at=_utc_now(),
-                application_authenticated=ready,
-                account_authenticated=ready
-                if self._config.account_reference is not None
-                else None,
+                application_authenticated=None,
+                account_authenticated=None,
                 trading_permitted=None,
-                subscriptions_ready=ready,
+                subscriptions_ready=None,
             ),
         )
 
@@ -552,6 +1122,11 @@ class _UnsupportedAdapterBase:
         """
 
         async def _events() -> AsyncIterator[BrokerConnectionEvent]:
+            """Yield adapter lifecycle events in publication order.
+
+            Yields:
+                The next connection lifecycle event.
+            """
             while True:
                 yield await self._event_queue.get()
 
@@ -587,11 +1162,16 @@ class _UnsupportedAdapterBase:
         )
 
     def _unsupported[T](self, operation: BrokerCapabilityId) -> BrokerResult[T]:
+        """Return and record a deterministic unsupported result.
+
+        Returns:
+            The canonical unsupported result.
+        """
         result: BrokerResult[T] = _unsupported_result(
             broker=self._config.broker_id,
             environment=self._config.environment,
             operation=operation,
-            request_id=f"{operation.value}-{self._session_generation}",
+            request_id=generate_id("req"),
             adapter_version=self.ADAPTER_VERSION,
         )
         self._last_error = result.error
@@ -606,6 +1186,44 @@ class _UnsupportedAdapterBase:
             ),
         ).warning("Broker operation unavailable; failing closed without provider call")
         return result
+
+    def _exception_result[T](
+        self,
+        operation: BrokerCapabilityId,
+        error: BaseException,
+    ) -> BrokerResult[T]:
+        """Translate one public-boundary failure to a canonical result.
+
+        Args:
+            operation: Canonical operation that failed.
+            error: Bounded exception raised by validation or provider access.
+
+        Returns:
+            A redacted canonical failure result.
+        """
+        if operation in self._MUTATION_OPERATIONS and isinstance(
+            error, (OSError, TimeoutError, ConnectionError)
+        ):
+            code = BrokerErrorCode.BROKER_UNKNOWN_OUTCOME
+        elif isinstance(error, TimeoutError):
+            code = BrokerErrorCode.BROKER_TIMEOUT
+        elif isinstance(error, (OSError, ConnectionError)):
+            code = BrokerErrorCode.BROKER_CONNECTION_LOST
+        elif isinstance(error, ImportError):
+            code = BrokerErrorCode.BROKER_DEPENDENCY_MISSING
+        elif isinstance(error, ValueError):
+            code = BrokerErrorCode.BROKER_REQUEST_INVALID
+        else:
+            code = BrokerErrorCode.BROKER_RESPONSE_INVALID
+        canonical = BrokerError(
+            code=code,
+            message=f"Broker {operation.value} failed",
+            retryable=False,
+            provider_message=type(error).__name__,
+            capability=operation,
+        )
+        self._last_error = canonical
+        return self._result(operation, error=canonical)
 
     def __getattr__(self, name: str) -> Any:
         """Return defaults only for canonical unsupported operations.
@@ -625,6 +1243,11 @@ class _UnsupportedAdapterBase:
             raise AttributeError(name) from error
 
         async def _operation(*args: object, **kwargs: object) -> BrokerResult[Any]:
+            """Return the dynamically selected unsupported result.
+
+            Returns:
+                The canonical unsupported result.
+            """
             del args, kwargs
             return self._unsupported(operation)
 
@@ -646,10 +1269,18 @@ def _make_unsupported_method(operation: BrokerCapabilityId) -> Any:
         *args: object,
         **kwargs: object,
     ) -> BrokerResult[Any]:
+        """Return the generated unsupported operation result.
+
+        Returns:
+            The canonical unsupported result.
+        """
         del args, kwargs
         return self._unsupported(operation)
 
     _method.__name__ = operation.value
+    protocol_method = getattr(BrokerAdapter, operation.value)
+    _method.__annotations__ = dict(protocol_method.__annotations__)
+    _method.__signature__ = inspect.signature(protocol_method)  # type: ignore[attr-defined]
     return _method
 
 

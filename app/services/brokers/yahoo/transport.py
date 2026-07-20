@@ -18,6 +18,11 @@ class _YahooTransport:
     """Run one bounded yfinance history call off the event loop."""
 
     def __init__(self, config: BrokerConnectionConfig) -> None:
+        """Initialize the _YahooTransport instance.
+
+        Args:
+            config: Value supplied to the operation.
+        """
         self._config = config
         self._circuit = _TransportCircuitBreaker(
             failure_threshold=config.circuit_failure_threshold,
@@ -33,12 +38,26 @@ class _YahooTransport:
         start: object | None,
         end: object | None,
     ) -> Any:
-        """Return the public table object produced by one yfinance call."""
+        """Return the public table object produced by one yfinance call.
+
+        Returns:
+            Exact public table produced by yfinance.
+
+        Raises:
+            ConnectionError: If the transport circuit is open.
+            OSError: If provider transport fails.
+            TimeoutError: If the configured request bound is exceeded.
+        """
         blocked = await self._circuit.before_call()
         if blocked is not None:
             raise ConnectionError(blocked.value)
 
         def _history() -> Any:
+            """Handle history.
+
+            Returns:
+                The operation result.
+            """
             yfinance = importlib.import_module("yfinance")
             ticker = yfinance.Ticker(symbol)
             return ticker.history(interval=timeframe, start=start, end=end)
