@@ -1,0 +1,398 @@
+"""Base Strategy.
+
+Purpose:
+    Base Strategy.
+
+Classes:
+    SignalDict: Public class defined by this module.
+    StrategyEvent: Public class defined by this module.
+    SignalIntent: Public class defined by this module.
+    BaseStrategy: Public class defined by this module.
+
+Functions:
+    None.
+
+Notes:
+    External-facing exports are collected in package __init__.py files;
+    private underscore helpers remain implementation details.
+"""
+
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any, Literal, TypedDict
+
+import pandas as pd
+
+from app.services.utils.logger import logger
+
+# Avoid circular imports
+if TYPE_CHECKING:
+    from app.services.execution.core import (
+        AccountInfo,
+        OrderInfo,
+        PositionInfo,
+        SymbolInfo,
+    )
+    from app.services.execution.trading import Trade
+
+
+class SignalDict(TypedDict, total=False):
+    """
+    Signal dictionary structure.
+
+    Keys:
+        entry_signal: 1 (Buy), -1 (Sell), 0 (None)
+        exit_signal: 1 (Exit Buy), -1 (Exit Sell), 0 (None)
+        pending_signal: 1 (Buy Stop), -1 (Sell Stop), 2 (Buy Limit), -2 (Sell Limit), 0 (None)
+        cancel_pending_signal: 1 (Cancel Buy Stop), -1 (Cancel Sell Stop), ...
+        pending_signal_2: optional second pending leg
+        cancel_pending_signal_2: optional cancel for second pending leg
+        price: Price for entry/pending
+        price_2: Price for second pending leg
+        stop_loss: Preventative stop loss
+        take_profit: Profit target
+        reason: Text description of the signal
+        setup_id: Setup identifier for multi-leg strategies
+        group_id: Basket/group identifier for related orders/trades
+        time: Timestamp of the signal
+    """
+
+    entry_signal: int | None
+    exit_signal: int | None
+    pending_signal: int | None
+    cancel_pending_signal: int | None
+    pending_signal_2: int | None
+    cancel_pending_signal_2: int | None
+    price: float | None
+    price_2: float | None
+    stop_loss: float | None
+    take_profit: float | None
+    reason: str | None
+    setup_id: str | None
+    group_id: str | None
+    time: Any
+
+
+class StrategyEvent(TypedDict, total=False):
+    """Canonical strategy lifecycle/event payload."""
+
+    event_id: str
+    event_type: str
+    symbol: str
+    strategy_id: str
+    event_ts: Any
+    recv_ts: Any
+    payload: dict[str, Any]
+    run_id: str
+    trace_id: str
+    correlation_id: str
+
+
+class SignalIntent(TypedDict, total=False):
+    """Canonical strategy signal intent passed to routing/execution boundaries."""
+
+    action: Literal["BUY", "SELL", "EXIT", "REDUCE", "HOLD"]
+    qty: float | None
+    order_type: Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"]
+    price: float | None
+    time_in_force: Literal["GTC", "IOC", "FOK", "DAY"]
+    strategy_id: str
+    symbol: str
+    reason: str | None
+    features: dict[str, Any]
+    confidence: float | None
+    tags: list[str]
+    metadata: dict[str, Any]
+    timestamp: Any
+
+
+class BaseStrategy(ABC):
+    """
+    Abstract base class for all trading strategies.
+
+    Strategies are pure logic - they:
+    - Calculate indicators
+    - Generate signals via DataFrame columns
+    - Return signal details when requested
+
+    Simple lifecycle:
+    1. on_init() - Initialize strategy
+    2. on_bar() - Calculate indicators and add signal columns
+    3. get_signal() - Get signal details for specific bar
+
+    Required Columns in on_bar:
+    - entry_signal: 1 (Buy), -1 (Sell)
+    - exit_signal: 1 (Exit Buy), -1 (Exit Sell)
+    - pending_signal: 1 (Buy Stop), -1 (Sell Stop), 2 (Buy Limit), -2 (Sell Limit)
+    - cancel_pending_signal: matching pending enum
+    - pending_signal_2 / cancel_pending_signal_2: optional second pending leg
+    - price / price_2: Price for entries/pendings
+    """
+
+    def __init__(self, params: dict[str, Any] | None = None):
+        """
+        Initialize strategy.
+
+        Args:
+            params: Strategy parameters dict (e.g., {'symbol': 'EURUSD', 'ema_fast': 20})
+        """
+        self.params = params or {}
+        if "symbol" not in self.params:
+            self.params["symbol"] = "UNKNOWN"
+
+        # Extract symbol from params (required for backtest engines)
+        self.symbol = self.params["symbol"]
+        self.strategy_id = str(self.params.get("strategy_id", self.__class__.__name__))
+        self.state: dict[str, Any] = {}
+
+        # Optional trading objects (injected by engines for live/backtest)
+        self.trade: Trade | None = None
+        self.account: AccountInfo | None = None
+        self.position: PositionInfo | None = None
+        self.order: OrderInfo | None = None
+        self.symbol_info: SymbolInfo | None = None
+        logger.info(
+            "%s initialized | strategy_id=%s | symbol=%s",
+            self.__class__.__name__,
+            self.strategy_id,
+            self.symbol,
+        )
+
+    # =====================================================================
+    # LIFECYCLE METHODS
+    # =====================================================================
+
+    @abstractmethod
+    def on_init(self) -> None:
+        """
+        Initialize strategy (optional).
+
+        Called once before processing data.
+        Use this to:
+        - Validate parameters
+        - Set up internal state
+        - Log initialization
+
+        """
+
+    def on_tick(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Process tick data (optional).
+
+        For live trading tick-by-tick processing.
+        Most strategies can ignore this.
+
+        Args:
+            data: Tick data DataFrame
+
+        Returns:
+            Updated DataFrame
+
+        Note:
+            Not all engines support tick processing.
+        """
+        return data
+
+    def on_trade(self, event: StrategyEvent) -> None:
+        """Handle trade lifecycle events when an engine provides them."""
+
+    def on_order_update(self, event: StrategyEvent) -> None:
+        """Handle order lifecycle events when an engine provides them."""
+
+    def on_timer(self, event: StrategyEvent) -> None:
+        """Handle timer events when an engine provides them."""
+
+    def on_shutdown(self, event: StrategyEvent | None = None) -> None:
+        """Handle strategy shutdown when an engine provides a shutdown event."""
+
+    @abstractmethod
+    def on_bar(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calculate indicators and add signal columns.
+
+        This is the main strategy logic. Called with entire DataFrame.
+        Should:
+        1. Calculate all indicators (EMA, ATR, RSI, etc.)
+        2. Add signal columns:
+           - entry_signal: 1 (Buy), -1 (Sell)
+           - exit_signal: 1 (Exit Buy), -1 (Exit Sell)
+           - pending_signal: ...
+           - price: ...
+
+        Args:
+            data: OHLCV DataFrame
+
+        Returns:
+            DataFrame with indicators and signal columns added
+        """
+
+    def get_signal(self, data: pd.DataFrame, index: int) -> SignalDict | None:
+        """
+        Get signal details for a specific bar.
+
+        Args:
+            data: DataFrame with indicators and signal columns
+            index: Index of the bar to get signal for
+
+        Returns:
+            SignalDict with keys:
+                - entry_signal, exit_signal, pending_signal...
+                - time: Timestamp of the signal
+                - reason: Human-readable reason for signal
+                - stop_loss: Stop loss price (optional)
+                - take_profit: Take profit price (optional)
+            or None if no signal at that index
+        """
+        row = data.iloc[index]
+
+        entry = int(row.get("entry_signal", 0) or 0)
+        exit_sig = int(row.get("exit_signal", 0) or 0)
+        pending = int(row.get("pending_signal", 0) or 0)
+        cancel = int(row.get("cancel_pending_signal", 0) or 0)
+        pending_2 = int(row.get("pending_signal_2", 0) or 0)
+        cancel_2 = int(row.get("cancel_pending_signal_2", 0) or 0)
+
+        if (
+            entry == 0
+            and exit_sig == 0
+            and pending == 0
+            and cancel == 0
+            and pending_2 == 0
+            and cancel_2 == 0
+        ):
+            return None
+
+        price = row.get("price")
+        if pd.isna(price):
+            price = row.get("close")
+
+        price_2 = row.get("price_2")
+        if pd.isna(price_2):
+            price_2 = None
+
+        stop_loss = row.get("stop_loss", row.get("sl"))
+        if pd.isna(stop_loss) or stop_loss == 0:
+            stop_loss = None
+
+        take_profit = row.get("take_profit", row.get("tp"))
+        if pd.isna(take_profit) or take_profit == 0:
+            take_profit = None
+
+        reason = str(row.get("signal_reason", "") or "Signal detected")
+        setup_id = row.get("setup_id")
+        group_id = row.get("group_id")
+
+        return {
+            "entry_signal": entry,
+            "exit_signal": exit_sig,
+            "pending_signal": pending,
+            "cancel_pending_signal": cancel,
+            "pending_signal_2": pending_2,
+            "cancel_pending_signal_2": cancel_2,
+            "price": float(price) if price is not None and pd.notna(price) else None,
+            "price_2": float(price_2) if price_2 is not None else None,
+            "time": data.index[index],
+            "reason": reason,
+            "stop_loss": float(stop_loss) if stop_loss is not None else None,
+            "take_profit": float(take_profit) if take_profit is not None else None,
+            "setup_id": (
+                str(setup_id) if setup_id is not None and setup_id != "" else None
+            ),
+            "group_id": (
+                str(group_id) if group_id is not None and group_id != "" else None
+            ),
+        }
+
+    # =====================================================================
+    # HELPER METHODS
+    # =====================================================================
+
+    def get_indicator_value(
+        self, data: pd.DataFrame, column: str, offset: int = 0
+    ) -> float | None:
+        """
+        Get indicator value from data.
+
+        Args:
+            data: DataFrame with indicators
+            column: Indicator column name (e.g., 'ema_20', 'rsi_14')
+            offset: Bars back (0 = current, 1 = previous, etc.)
+
+        Returns:
+            Indicator value or None if not available or NaN
+
+        Example:
+            current_ema = self.get_indicator_value(data, 'ema_20', offset=0)
+            previous_rsi = self.get_indicator_value(data, 'rsi_14', offset=1)
+        """
+        if data is None or len(data) <= offset:
+            return None
+
+        try:
+            value = data.iloc[-(offset + 1)][column]
+            return None if pd.isna(value) else value
+        except (KeyError, IndexError):
+            return None
+
+    def crossover(self, series1: pd.Series, series2: pd.Series) -> bool:
+        """
+        Detect bullish crossover where series1 crosses above series2.
+
+        Checks if series1 was below/equal to series2 on previous bar
+        and is now above series2 on current bar.
+
+        Args:
+            series1: Fast series (e.g., EMA 20)
+            series2: Slow series (e.g., EMA 50)
+
+        Returns:
+            True if crossover occurred on latest bar, False otherwise
+
+        Example:
+            if self.crossover(data['ema_20'], data['ema_50']):
+                # EMA(20) just crossed above EMA(50) - bullish signal
+                pass
+        """
+        if len(series1) < 2 or len(series2) < 2:
+            return False
+
+        # Previous bar: series1 was below or equal
+        prev_below = series1.iloc[-2] <= series2.iloc[-2]
+
+        # Current bar: series1 is above
+        curr_above = series1.iloc[-1] > series2.iloc[-1]
+
+        return bool(prev_below and curr_above)
+
+    def crossunder(self, series1: pd.Series, series2: pd.Series) -> bool:
+        """
+        Detect bearish crossunder where series1 crosses below series2.
+
+        Checks if series1 was above/equal to series2 on previous bar
+        and is now below series2 on current bar.
+
+        Args:
+            series1: Fast series (e.g., EMA 20)
+            series2: Slow series (e.g., EMA 50)
+
+        Returns:
+            True if crossunder occurred on latest bar, False otherwise
+
+        Example:
+            if self.crossunder(data['ema_20'], data['ema_50']):
+                # EMA(20) just crossed below EMA(50) - bearish signal
+                pass
+        """
+        if len(series1) < 2 or len(series2) < 2:
+            return False
+
+        # Previous bar: series1 was above or equal
+        prev_above = series1.iloc[-2] >= series2.iloc[-2]
+
+        # Current bar: series1 is below
+        curr_below = series1.iloc[-1] < series2.iloc[-1]
+
+        return bool(prev_above and curr_below)
+
+    def __repr__(self) -> str:
+        """Human-readable representation."""
+        return f"{self.__class__.__name__}({self.params})"

@@ -11,27 +11,52 @@
 - **Correctness > Speed**: Verify via tools. Never guess. Say "I don't know" rather than hallucinating.
 - **Research Workflow**: 1. **WebSearch** (landscape) → 2. **Context7** (verify syntax/deprecations) → 3. **DeepWiki** (design intent). Handle disagreements by explicitly calling out tradeoffs.
 
-## 2. Workflow & Execution
+## 2. Builder Role & Execution Rules
 
-1. **Dry Run**: Before editing, report: files read/changed, commands/tests planned, scope boundaries, blockers, and rollback path.
-2. **Approval Gate**: Wait for exact phrase `APPROVED: EXECUTE` before modifying files.
-3. **Scope Control**: Work only in approved scope. Do not invent requirements or perform broad refactors.
-4. **Final Report**: After task, report files changed, decisions/risks updated, commands run, validation results, and rollback path. Use positive checklist wording (e.g., `[X] Scope followed`).
-
-## 3. Builder Role & Execution Rules
-
-- **Dry Run Required**: Before editing, report: files read, files to be created/changed, commands/tests planned, scope boundaries, blockers/risks, and rollback path.
-- **Approval Gate**: Wait for the exact phrase `APPROVED: EXECUTE` before modifying files.
-- **Scope Control**: Work only in approved scope. Do not invent requirements, risk limits, or trading rules. Do not perform broad refactors without approval.
+- **Dry Run Required**: Before editing, produce a dry-run report detailing:
+    - Selected feature to be built/edited and rationale
+    - Files read: authoritative documents, upstream dependency documentation, related source/test files.
+    - Files to create or edit; exact paths, purpose of each change, implementation order
+    - Requirements; exact `FR-*` requirements to be implemented, tests, usage evidence.
+    - Dependencies and contracts; upstream library/system/API/feature/contract, unresolved dependencies.
+    - Validation commands: formatting, tests, usage-example execution, feature-integration tests
+    - Scope boundaries: explicitly included work, explicitly excluded work,
+    - Blockers/risks; specification conflicts, missing info/dependencies, design trade-offs, implementation risks, compatibility risks
+    - Rollback path; files to revert, exports or registrations to remove, artifacts to clean up, verification commands after rollback
+- **Approval Gate**: Do not modify any files during the dry run. Wait for the exact phrase `APPROVED: EXECUTE` before modifying files.
+- **Scope Control**: After receiving `APPROVED: EXECUTE`:
+    - Implement only the selected feature and work only in approved scope.
+    - Do not invent requirements and do not perform broad refactors without explicit approval.
+    - Preserve domain ownership boundaries.
+    - Reuse existing conforming behavior where appropriate.
+    - Use only verified upstream contracts and public dependency interfaces.
 - **No Guessing**: If info is missing, check active docs. If still missing, stop and report as `Pending`, `Assumption`, or `Proposed Decision`.
-- **Final Report**: After any task, report files changed, decisions/risks updated, commands run, validation results, and rollback path. Use positive checklist wording (e.g., `[X] Scope followed`). Also if a checklist exists for the task, update it with a `[X]` or `[ ]` before the response.
+- **Final Report Checklist**: After any requirement task, report:
+    - [ ] Scope strictly followed.
+          - Files changed.
+          - Decisions made and implications documented
+          - Requirements implemented
+          - Dependencies and contracts used
+          - Rollback path identified
+    - [ ] Validation performed
+          - Code quality (Google style, types, docstrings, logging, 80% coverage, secrets) applied.
+          - Tests run and passed
+          - Usage example execution and passed
+          - All commands run
+    - [ ] Affected active docs updated.
+
 
 ## 4. Code Quality & Python Style
 
 **Strict adherence to [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).**
 
 - **Format**: 4 spaces, formatted via `ruff format` (double quotes, magic trailing comma respected). Pre-commit order: `trailing-whitespace` → `end-of-file-fixer` → `check-yaml/toml` → `check-added-large-files` → `ruff --fix` → `ruff-format` → `detect-secrets` → `mypy` → `pytest`.
-- **Typing & Docs**: `mypy` type-checked (see `docs/ARCHITECTURE.md` for current strictness settings). Explicit type hints on all signatures. Google-style docstrings for all modules, classes, and functions.
+- **Typing & Docs**: `mypy` type-checked (see `docs/ARCHITECTURE.md` for current strictness settings).
+    - Explicit type hints on all signatures.
+    - Every module, class, and function should be properly fitted with Google-style docstrings.
+    - Docstrings should always include, description, args, return values, exceptions raised, and type hints.
+    - Every function is properly logged using system-wide logger (from app.utils import logger).
+    - No function should be silent and must have at least one logger stating what is being done in that function.
 - **Imports**: Absolute imports, grouped (stdlib, 3rd-party, local).
 - **Versioning**: Always confirm library versions before coding. Default to `pyproject.toml` pinned version.
 - **Quality**: 80% `pytest` coverage minimum. No bare `except:`. Application and
@@ -57,13 +82,3 @@
 - **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `uv run pytest <test_file_path>`, `uv run ruff check .`, `uv run mypy .`
 - **Targeted Testing**: Do not run the full `pytest` suite during iterative development, as the total number of tests is very large and full runs are time-consuming. Only run the specific test files associated with the code just created or edited to verify changes.
 - **Restricted Commands (Require `APPROVED: EXECUTE`)**: `rm -rf`, `git reset`, `git clean`, `uv add`/`uv remove`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.
-
-## 7. Final Checklist (Must be satisfied before finishing)
-
-- **Scope strictly followed**.
-- **Required docs read; no rules invented**.
-- **Code quality (Google style, types, docstrings, logging, 80% coverage) applied**.
-- **No secrets or live side effects introduced**.
-- **Affected active docs updated**.
-- **Validation/tests run and passed**.
-- **Rollback path identified and reported**.

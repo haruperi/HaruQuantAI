@@ -1,0 +1,28 @@
+provider: forexfactory
+enabled: true
+base_url: "https://www.forexfactory.com"
+mode: html
+cache_ttl_seconds: 300
+request_timeout_seconds: 15
+min_seconds_between_requests: 10
+max_retries: 2
+save_raw_snapshots: true
+
+routes:
+  news: "/news"
+  calendar: "/calendar"
+  trades: "/trades"
+  market: "/market/{slug}"
+
+approved_aggregators:
+  - forexfactory
+
+approved_underlying_sources:
+  - forex.com
+  - cnbc.com
+  - boj.or.jp
+  - finance.yahoo.com
+  - morningstar.com
+  - fxnewsgroup.com
+  - marctomarket.com
+  - aljazeera.com

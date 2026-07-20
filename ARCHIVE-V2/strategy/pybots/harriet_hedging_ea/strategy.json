@@ -1,0 +1,221 @@
+{
+  "schema_version": "1.0.0",
+  "strategy_manifest": {
+    "identity": {
+      "strategy_id": "harriet_hedging_ea",
+      "strategy_type": "multi_timeframe_structure_hedging",
+      "description": "Faithful broker-neutral translation of Harriet Hedging EA: higher-timeframe and lower-timeframe higher-low/lower-high confirmation with hedged alternating entries and basket management.",
+      "author": "HaruQuantAI",
+      "created_at": "2026-06-23"
+    },
+    "version": "1.0.0",
+    "chart_requirements": {
+      "main": {
+        "symbol": "EURUSD",
+        "timeframe": "M5"
+      },
+      "other": {}
+    },
+    "supported_runtime_modes": [
+      "SIMULATOR",
+      "PAPER"
+    ],
+    "strategy_capabilities": [
+      "market_entry",
+      "hedging",
+      "modify_positions",
+      "multi_timeframe",
+      "multi_position"
+    ],
+    "permissions": {
+      "lifecycle_status": "RESEARCH",
+      "permitted_environments": [
+        "SIMULATOR",
+        "PAPER"
+      ],
+      "risk_profile": {
+        "execution_authority": "Risk Governor"
+      }
+    }
+  },
+  "trading_profile": {
+    "magic_number": 767876,
+    "order_comment": "harriet_hedging_ea",
+    "symbols": {
+      "main": {
+        "symbol": "EURUSD",
+        "timeframe": "M5"
+      },
+      "other": {}
+    },
+    "simulation_defaults": {
+      "starting_balance": 10000.0
+    }
+  },
+  "parameters": {
+    "definitions": {
+      "higher_timeframe": {
+        "type": "string",
+        "default": "H1",
+        "description": "higher_timeframe setting."
+      },
+      "lower_timeframe": {
+        "type": "string",
+        "default": "M5",
+        "description": "lower_timeframe setting."
+      },
+      "higher_min_distance_pips": {
+        "type": "number",
+        "default": 5.0,
+        "description": "higher_min_distance_pips setting."
+      },
+      "lower_min_distance_pips": {
+        "type": "number",
+        "default": 2.0,
+        "description": "lower_min_distance_pips setting."
+      },
+      "take_profit_pips": {
+        "type": "number",
+        "default": 30.0,
+        "description": "take_profit_pips setting."
+      },
+      "when_to_trail_pips": {
+        "type": "number",
+        "default": 10.0,
+        "description": "when_to_trail_pips setting."
+      },
+      "balance_increase": {
+        "type": "number",
+        "default": 3000.0,
+        "description": "balance_increase setting."
+      },
+      "volume_increase": {
+        "type": "number",
+        "default": 0.01,
+        "description": "volume_increase setting."
+      },
+      "pip_multiplier": {
+        "type": "number",
+        "default": 10.0,
+        "description": "pip_multiplier setting."
+      }
+    },
+    "values": {
+      "higher_timeframe": "H1",
+      "lower_timeframe": "M5",
+      "higher_min_distance_pips": 5.0,
+      "lower_min_distance_pips": 2.0,
+      "take_profit_pips": 30.0,
+      "when_to_trail_pips": 10.0,
+      "balance_increase": 3000.0,
+      "volume_increase": 0.01,
+      "pip_multiplier": 10.0
+    },
+    "generation_metadata": {
+      "optimization_enabled": true
+    }
+  },
+  "risk_management": {
+    "strategy_sizing_hint": {
+      "mode": "strategy_formula",
+      "value": null,
+      "authoritative": false,
+      "note": "The Risk Governor approves final size and portfolio exposure."
+    }
+  },
+  "trading_options": {
+    "timezone": "UTC",
+    "warmup_bars": 3,
+    "max_trades_per_day": 0,
+    "schedule": {
+      "weekend": {
+        "enabled": false,
+        "start": {
+          "weekday": "FRIDAY",
+          "time": "00:00"
+        },
+        "end": {
+          "weekday": "SUNDAY",
+          "time": "23:59"
+        }
+      }
+    },
+    "end_of_day_exit": {
+      "enabled": false,
+      "time": "23:59"
+    },
+    "friday_exit": {
+      "enabled": false,
+      "time": "20:00"
+    },
+    "signal_time_range": {
+      "enabled": false,
+      "start": "00:00",
+      "end": "23:59",
+      "exit_at_end": false,
+      "orders_to_close": "ALL"
+    },
+    "session_restrictions": [],
+    "pending_order_distance": {
+      "enabled": false,
+      "max_distance_from_market_pct": 6.0
+    },
+    "stop_loss_bounds": {
+      "minimum_ticks": 0,
+      "maximum_ticks": 0
+    },
+    "profit_target_bounds": {
+      "minimum_ticks": 0,
+      "maximum_ticks": 0
+    },
+    "trading_filters": {
+      "allowed_directions": [
+        "LONG",
+        "SHORT"
+      ],
+      "max_open_positions": 0,
+      "max_spread_ticks": null,
+      "max_slippage_ticks": null
+    }
+  },
+  "signal_rules": {
+    "long_entry_signal": {},
+    "short_entry_signal": {},
+    "long_exit_signal": {},
+    "short_exit_signal": {}
+  },
+  "action_rules": {
+    "long_entry_action": {
+      "enabled": true,
+      "action": "OPEN",
+      "entry_type": "MARKET"
+    },
+    "short_entry_action": {
+      "enabled": true,
+      "action": "OPEN",
+      "entry_type": "MARKET"
+    },
+    "long_exit_action": {
+      "enabled": true,
+      "action": "CLOSE"
+    },
+    "short_exit_action": {
+      "enabled": true,
+      "action": "CLOSE"
+    },
+    "direction_conflict_policy": "REJECT_BOTH",
+    "entry_exit_conflict_policy": "EXIT_PRIORITY",
+    "duplicate_trade_policy": "ALLOW"
+  },
+  "protection_rules": {},
+  "state_contract": {
+    "last_processed_bar": true,
+    "idempotency_keys": true,
+    "custom_state": true
+  },
+  "required": [
+    "strategy_manifest.identity.strategy_id",
+    "trading_profile.symbols.main.symbol",
+    "parameters.values"
+  ]
+}

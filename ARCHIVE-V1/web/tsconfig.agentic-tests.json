@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": ".agentic-test-dist",
+    "rootDir": ".",
+    "noEmit": false,
+    "incremental": false,
+    "types": ["node"],
+    "plugins": []
+  },
+  "include": [
+    "tests/agentic-firm-unit.test.ts",
+    "src/lib/agentic-firm/**/*.ts",
+    "src/types/agentic-core.ts",
+    "src/validators/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".next"]
+}

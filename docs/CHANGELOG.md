@@ -58,6 +58,12 @@ This document is only for adding high-level changes, decisions, or status update
   walk-forward validation, robustness analysis, durable Optimization-owned state,
   advisory handoff evidence, and the ten-operation public API. Added targeted unit,
   usage, workflow-integration, non-functional, and `SYS-WF-003` core tests.
+
+- **2026-07-19 — Research implementation policy resolved.** The owner approved the
+  closed Research error taxonomy, deterministic statistical/market-structure and
+  scorecard policies, explicit resource ceilings, Indicators/Analytics boundaries,
+  scikit-learn 1.9.0 baseline, and Research-owned artifact metadata migration.
+
 - **2026-07-19 — Simulation domain gate unblocked.** Re-running the Section 7 gate
   after the post-build review corrections surfaced six failures, all traced to two
   defects in the shared `tests/simulator/unit/test_orchestrator.py` fixtures rather
@@ -295,6 +301,7 @@ This document is only for adding high-level changes, decisions, or status update
   equally spaced UTC observations, and persistence uses an injected Optimization-owned
   store port over Data's public migration contract. Genetic/Bayesian search, live
   authority, Strategy mutation, UI rendering, and automatic adoption remain excluded.
+
 - **2026-07-19 — Analytics quality-flag emission policy fixed.** `FR-ANLT-043` and
   the `WF-ANLT-001` failure behaviour now state exactly which cataloged flags a
   report carries and when. `quality_flags` is empty of blocker evidence only when
