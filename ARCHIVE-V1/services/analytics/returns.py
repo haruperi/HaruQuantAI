@@ -393,7 +393,7 @@ def _balance_curve_from_closed_trades_impl(
     pnl_arr = sorted_trades["profit_loss"].values.astype(np.float64)
     equity_values = _equity_curve_kernel(pnl_arr, float(initial_balance))
 
-    first_time = start_time if start_time else sorted_trades.iloc[0]["open_time"]
+    first_time = start_time or sorted_trades.iloc[0]["open_time"]
     indices = np.concatenate(
         [np.array([first_time]), sorted_trades["close_time"].values]
     )
@@ -1833,7 +1833,6 @@ def _total_return_usd_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _total_return_usd_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1898,7 +1897,6 @@ def _total_return_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _total_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1963,7 +1961,6 @@ def _net_profit_impl(trades: pd.DataFrame, closed_only: bool = True) -> dict[str
     """AI Tool wrapper for _net_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2054,7 +2051,6 @@ def _gross_profit_impl(
     """AI Tool wrapper for _gross_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2145,7 +2141,6 @@ def _gross_loss_impl(trades: pd.DataFrame, closed_only: bool = True) -> dict[str
     """AI Tool wrapper for _gross_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2239,7 +2234,6 @@ def _balance_curve_from_closed_trades_impl(
     """AI Tool wrapper for _balance_curve_from_closed_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2388,7 +2382,6 @@ def _balance_curve_impl(
     """AI Tool wrapper for _balance_curve_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2536,7 +2529,6 @@ def _equity_curve_impl(
     """AI Tool wrapper for _equity_curve_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2679,7 +2671,6 @@ def _returns_series_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _returns_series_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2744,7 +2735,6 @@ def _log_returns_series_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _log_returns_series_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2809,7 +2799,6 @@ def _daily_returns_impl(equity: pd.Series, calendar: str = "D") -> dict[str, Any
     """AI Tool wrapper for _daily_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2900,7 +2889,6 @@ def _weekly_returns_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _weekly_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2965,7 +2953,6 @@ def _monthly_returns_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _monthly_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3030,7 +3017,6 @@ def _annual_returns_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _annual_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3095,7 +3081,6 @@ def _cagr_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _cagr_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3158,7 +3143,6 @@ def _compound_monthly_growth_rate_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _compound_monthly_growth_rate_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3224,7 +3208,6 @@ def _avg_monthly_return_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _avg_monthly_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3289,7 +3272,6 @@ def _monthly_return_stddev_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _monthly_return_stddev_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3357,7 +3339,6 @@ def _annualized_return_impl(
     """AI Tool wrapper for _annualized_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3446,7 +3427,6 @@ def _geometric_mean_return_impl(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _geometric_mean_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3509,7 +3489,6 @@ def _best_return_impl(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _best_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3570,7 +3549,6 @@ def _worst_return_impl(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _worst_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3633,7 +3611,6 @@ def _buy_and_hold_return_impl(price_data: pd.Series, **kwargs) -> dict[str, Any]
     """AI Tool wrapper for _buy_and_hold_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3724,7 +3701,6 @@ def _buy_and_hold_cagr_impl(price_data: pd.Series, **kwargs) -> dict[str, Any]:
     """AI Tool wrapper for _buy_and_hold_cagr_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3815,7 +3791,6 @@ def _return_volatility_impl(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _return_volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3880,7 +3855,6 @@ def _downside_return_volatility_impl(
     """AI Tool wrapper for _downside_return_volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3970,7 +3944,6 @@ def _return_skewness_impl(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _return_skewness_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4033,7 +4006,6 @@ def _return_kurtosis_impl(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _return_kurtosis_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4098,7 +4070,6 @@ def _adjusted_gross_profit_impl(
     """AI Tool wrapper for _adjusted_gross_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4191,7 +4162,6 @@ def _adjusted_gross_loss_impl(
     """AI Tool wrapper for _adjusted_gross_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4284,7 +4254,6 @@ def _adjusted_net_profit_impl(
     """AI Tool wrapper for _adjusted_net_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4377,7 +4346,6 @@ def _select_net_profit_impl(
     """AI Tool wrapper for _select_net_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4470,7 +4438,6 @@ def _select_gross_profit_impl(
     """AI Tool wrapper for _select_gross_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4563,7 +4530,6 @@ def _select_gross_loss_impl(
     """AI Tool wrapper for _select_gross_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4654,7 +4620,6 @@ def _return_on_max_strategy_drawdown_impl(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _return_on_max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4720,7 +4685,6 @@ def _return_on_max_close_to_close_drawdown_impl(trades: pd.DataFrame) -> dict[st
     """AI Tool wrapper for _return_on_max_close_to_close_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4786,7 +4750,6 @@ def _return_on_account_impl(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _return_on_account_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4853,7 +4816,6 @@ def _return_on_initial_capital_impl(
     """AI Tool wrapper for _return_on_initial_capital_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4945,7 +4907,6 @@ def _max_runup_impl(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _max_runup_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5008,7 +4969,6 @@ def _max_runup_date_impl(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _max_runup_date_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5080,7 +5040,6 @@ def _calculate_return_metrics_impl(
     """AI Tool wrapper for _calculate_return_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5257,7 +5216,6 @@ def _calculate_period_analysis_impl(
     """AI Tool wrapper for _calculate_period_analysis_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5460,7 +5418,6 @@ def _calculate_long_short_split_impl(
     """AI Tool wrapper for _calculate_long_short_split_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5638,7 +5595,6 @@ def _calculate_session_performance_impl(
     """AI Tool wrapper for _calculate_session_performance_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5834,7 +5790,6 @@ def total_return_usd(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _total_return_usd_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5899,7 +5854,6 @@ def total_return(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _total_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5964,7 +5918,6 @@ def net_profit(trades: pd.DataFrame, closed_only: bool = True) -> dict[str, Any]
     """AI Tool wrapper for _net_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6053,7 +6006,6 @@ def gross_profit(trades: pd.DataFrame, closed_only: bool = True) -> dict[str, An
     """AI Tool wrapper for _gross_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6144,7 +6096,6 @@ def gross_loss(trades: pd.DataFrame, closed_only: bool = True) -> dict[str, Any]
     """AI Tool wrapper for _gross_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6238,7 +6189,6 @@ def balance_curve_from_closed_trades(
     """AI Tool wrapper for _balance_curve_from_closed_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6387,7 +6337,6 @@ def balance_curve(
     """AI Tool wrapper for _balance_curve_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6535,7 +6484,6 @@ def equity_curve(
     """AI Tool wrapper for _equity_curve_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6678,7 +6626,6 @@ def returns_series(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _returns_series_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6743,7 +6690,6 @@ def log_returns_series(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _log_returns_series_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6808,7 +6754,6 @@ def daily_returns(equity: pd.Series, calendar: str = "D") -> dict[str, Any]:
     """AI Tool wrapper for _daily_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6899,7 +6844,6 @@ def weekly_returns(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _weekly_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6964,7 +6908,6 @@ def monthly_returns(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _monthly_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7029,7 +6972,6 @@ def annual_returns(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _annual_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7094,7 +7036,6 @@ def cagr(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _cagr_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7157,7 +7098,6 @@ def compound_monthly_growth_rate(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _compound_monthly_growth_rate_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7223,7 +7163,6 @@ def avg_monthly_return(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _avg_monthly_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7288,7 +7227,6 @@ def monthly_return_stddev(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _monthly_return_stddev_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7356,7 +7294,6 @@ def annualized_return(
     """AI Tool wrapper for _annualized_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7445,7 +7382,6 @@ def geometric_mean_return(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _geometric_mean_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7508,7 +7444,6 @@ def best_return(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _best_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7569,7 +7504,6 @@ def worst_return(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _worst_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7632,7 +7566,6 @@ def buy_and_hold_return(price_data: pd.Series, **kwargs) -> dict[str, Any]:
     """AI Tool wrapper for _buy_and_hold_return_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7723,7 +7656,6 @@ def buy_and_hold_cagr(price_data: pd.Series, **kwargs) -> dict[str, Any]:
     """AI Tool wrapper for _buy_and_hold_cagr_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7814,7 +7746,6 @@ def return_volatility(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _return_volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7877,7 +7808,6 @@ def downside_return_volatility(rets: pd.Series, target: float = 0.0) -> dict[str
     """AI Tool wrapper for _downside_return_volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7967,7 +7897,6 @@ def return_skewness(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _return_skewness_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8030,7 +7959,6 @@ def return_kurtosis(rets: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _return_kurtosis_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8095,7 +8023,6 @@ def adjusted_gross_profit(
     """AI Tool wrapper for _adjusted_gross_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8188,7 +8115,6 @@ def adjusted_gross_loss(
     """AI Tool wrapper for _adjusted_gross_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8281,7 +8207,6 @@ def adjusted_net_profit(
     """AI Tool wrapper for _adjusted_net_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8372,7 +8297,6 @@ def select_net_profit(trades: pd.DataFrame, closed_only: bool = True) -> dict[st
     """AI Tool wrapper for _select_net_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8465,7 +8389,6 @@ def select_gross_profit(
     """AI Tool wrapper for _select_gross_profit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8556,7 +8479,6 @@ def select_gross_loss(trades: pd.DataFrame, closed_only: bool = True) -> dict[st
     """AI Tool wrapper for _select_gross_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8647,7 +8569,6 @@ def return_on_max_strategy_drawdown(equity: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _return_on_max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8713,7 +8634,6 @@ def return_on_max_close_to_close_drawdown(trades: pd.DataFrame) -> dict[str, Any
     """AI Tool wrapper for _return_on_max_close_to_close_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8779,7 +8699,6 @@ def return_on_account(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _return_on_account_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8846,7 +8765,6 @@ def return_on_initial_capital(
     """AI Tool wrapper for _return_on_initial_capital_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -8938,7 +8856,6 @@ def max_runup(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _max_runup_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -9001,7 +8918,6 @@ def max_runup_date(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _max_runup_date_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -9073,7 +8989,6 @@ def calculate_return_metrics(
     """AI Tool wrapper for _calculate_return_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -9250,7 +9165,6 @@ def calculate_period_analysis(
     """AI Tool wrapper for _calculate_period_analysis_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -9453,7 +9367,6 @@ def calculate_long_short_split(
     """AI Tool wrapper for _calculate_long_short_split_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -9631,7 +9544,6 @@ def calculate_session_performance(
     """AI Tool wrapper for _calculate_session_performance_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

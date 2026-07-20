@@ -13,9 +13,8 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
-from data.database import ApprovalRecord, ApprovalVoteRecord, GovernanceRepository
-
 from app.services.utils import ErrorDescriptor, ValidationError, generate_id
+from data.database import ApprovalRecord, ApprovalVoteRecord, GovernanceRepository
 
 from .models import ApprovalState
 

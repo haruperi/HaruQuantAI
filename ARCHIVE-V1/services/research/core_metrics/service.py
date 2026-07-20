@@ -35,7 +35,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.research.data.models import DataQualityReportModel, PreparedDataset
 
 from .base import MetricCalculator, MetricContext, MetricValue

@@ -76,12 +76,11 @@ class SimulationRunner:
     ) -> None:
         """Persist simulation run to database."""
         import pandas as pd
-        from data.database.sqlite.database_operations import DatabaseManager
-
         from app.services.analytics.overview import (
             build_overview_payload,
             get_analytics_overview,
         )
+        from data.database.sqlite.database_operations import DatabaseManager
 
         db = DatabaseManager()
 

@@ -1,4 +1,4 @@
-# ruff: noqa: ANN401, C901, PLR0911, PLR0912, PLR2004, PLW0603, BLE001, EM102, E501, TC001
+# ruff: noqa: ANN401, C901, PLR0911, PLR0912, PLR2004, PLW0603, BLE001, EM102, E501
 """Emergency kill switch service and state manager.
 
 Handles global, portfolio, strategy, symbol, and currency-level halts.
@@ -30,8 +30,6 @@ from pathlib import Path
 from threading import RLock
 from typing import TYPE_CHECKING, Any, Protocol, overload
 
-from pydantic import Field
-
 from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
@@ -44,6 +42,7 @@ from app.services.risk.models import (
 )
 from app.utils.logger import logger
 from app.utils.security import redact_mapping
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.risk.storage.ports import RiskStateStore

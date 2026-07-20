@@ -10,9 +10,8 @@ import urllib.request
 from datetime import datetime
 from typing import Any
 
-from loguru import logger
-
 from app.services.trading.state.ports import Clock
+from loguru import logger
 
 
 class HeartbeatEmitter:

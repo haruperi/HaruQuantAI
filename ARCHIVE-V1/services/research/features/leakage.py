@@ -24,7 +24,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import pandas as pd
-
 from app.services.utils.security import redact_mapping, redact_text
 
 

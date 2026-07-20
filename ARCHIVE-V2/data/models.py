@@ -6,9 +6,8 @@ and validation rules.
 
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-
 from app.utils.normalization import normalize_timestamp
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 def validate_utc_timestamp_helper(v: str) -> str:

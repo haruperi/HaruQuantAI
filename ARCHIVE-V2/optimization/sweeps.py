@@ -12,7 +12,6 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-
 from app.services.optimization.algorithms.bayesian import bayesian_optimization
 from app.services.optimization.algorithms.genetic import genetic_algorithm
 from app.services.optimization.algorithms.grid import grid_search, parallel_grid_search

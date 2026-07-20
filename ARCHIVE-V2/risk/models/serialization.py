@@ -11,9 +11,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, TypeVar
 
-from pydantic import BaseModel
-
 from app.utils.logger import logger
+from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from app.services.risk.validations import ValidationResult

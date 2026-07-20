@@ -5,10 +5,9 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from pydantic import Field
-
 from app.services.risk.models.contracts import CurrencyLegExposure, RiskContract
 from app.utils.logger import logger
+from pydantic import Field
 
 FX_SYMBOL_LENGTH = 6
 

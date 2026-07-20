@@ -1,4 +1,4 @@
-# ruff: noqa: ANN401, PLR0915, PLR2004, BLE001, C901, PLR0912, PLR0911, S110, RET505, TC001
+# ruff: noqa: ANN401, PLR0915, PLR2004, BLE001, C901, PLR0912, PLR0911, S110, RET505
 """Decision-token signing, validation, scope, expiry, and revocation checks.
 
 Provides the cryptographic boundaries for authorization evidence before order
@@ -12,8 +12,6 @@ import hmac
 from datetime import datetime, timedelta
 from typing import Any, overload
 
-from pydantic import Field
-
 from app.services.risk.audit.hash_chain import _coerce_types
 from app.services.risk.models import (
     RiskContract,
@@ -23,6 +21,7 @@ from app.services.risk.models import (
 from app.services.risk.validations import ValidationResult
 from app.utils.logger import logger
 from app.utils.standard import canonical_json, stable_identifier
+from pydantic import Field
 
 
 class RequiredActionScope(RiskContract):

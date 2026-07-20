@@ -22,7 +22,6 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-
 from app.services.simulation.common import (
     phase_matches,
     signal_to_float_array,
@@ -812,7 +811,6 @@ def run_event_driven_simulation(
     """AI Tool wrapper for _run_event_driven_simulation_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         kwargs = {}

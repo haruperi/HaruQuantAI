@@ -9,7 +9,6 @@ from contextlib import suppress
 from typing import Any
 
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 

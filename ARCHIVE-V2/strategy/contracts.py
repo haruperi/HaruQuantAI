@@ -13,11 +13,10 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-
 from app.services.strategy.errors import StrategyConfigError as ValidationError
 from app.utils.normalization import normalize_timestamp
 from app.utils.standard import SENSITIVE_KEY_PATTERN, canonical_json
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 _SCHEMA_VERSION_MIN_PARTS = 2
 

@@ -4,16 +4,6 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import Any
 
-from data.database.sqlite.database_operations import DatabaseManager
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    HTTPException,
-    WebSocket,
-    WebSocketDisconnect,
-    status,
-)
-
 from app.api.websocket import optimization_progress_manager
 from app.services.brokers import load_dukascopy, mt5_data_get_bars_with_credentials
 from app.services.optimization.core import (
@@ -62,6 +52,15 @@ from app.services.research import (
 )
 from app.services.utils import logger
 from app.services.utils.validators import prepare_ohlcv_data
+from data.database.sqlite.database_operations import DatabaseManager
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
 
 router = APIRouter()
 db_manager = DatabaseManager()

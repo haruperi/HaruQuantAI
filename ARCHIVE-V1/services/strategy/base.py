@@ -21,7 +21,6 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 # Avoid circular imports

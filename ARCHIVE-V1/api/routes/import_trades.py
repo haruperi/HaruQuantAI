@@ -5,9 +5,6 @@ from datetime import datetime
 from typing import Annotated, Any
 
 import pandas as pd
-from data.database.sqlite.database_operations import DatabaseManager
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-
 from app.api.auth_utils import get_user_id_from_token
 from app.services.execution import (
     BacktestResult,
@@ -17,6 +14,8 @@ from app.services.execution import (
     TradeRecord,
 )
 from app.services.utils import logger
+from data.database.sqlite.database_operations import DatabaseManager
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 router = APIRouter()
 db_manager = DatabaseManager()

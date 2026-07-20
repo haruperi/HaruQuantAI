@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -30,7 +29,9 @@ class Doji(BaseIndicator):
     pd.DataFrame: Original DataFrame with 'candle_doji' column added (1 if Doji, 0 otherwise).
     """
 
-    def calculate(self, df: pd.DataFrame, threshold: float = 0.1, **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, threshold: float = 0.1, **kwargs: Any
+    ) -> pd.DataFrame:
         required_cols = ["open", "high", "low", "close"]
         for col in required_cols:
             if col not in df.columns:

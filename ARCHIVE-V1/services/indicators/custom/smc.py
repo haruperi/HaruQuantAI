@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -39,7 +38,7 @@ class SMC(BaseIndicator):
         swing_length: int = 50,
         join_consecutive_fvg: bool = False,
         close_break: bool = True,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> pd.DataFrame:
         # Validate input DataFrame
         ohlc = self._validate_and_lowercase(df, "ohlc")
@@ -67,7 +66,9 @@ class SMC(BaseIndicator):
 
         return result_df
 
-    def _validate_and_lowercase(self, df: pd.DataFrame, columns_required: str = "ohlc") -> pd.DataFrame:
+    def _validate_and_lowercase(
+        self, df: pd.DataFrame, columns_required: str = "ohlc"
+    ) -> pd.DataFrame:
         df_copy = df.copy()
         df_copy.columns = [c.lower() for c in df_copy.columns]
 
@@ -148,7 +149,9 @@ class SMC(BaseIndicator):
             axis=1,
         )
 
-    def _swing_highs_lows(self, ohlc: pd.DataFrame, swing_length: int = 50) -> pd.DataFrame:
+    def _swing_highs_lows(
+        self, ohlc: pd.DataFrame, swing_length: int = 50
+    ) -> pd.DataFrame:
         swing_length *= 2
         swing_highs_lows = np.where(
             ohlc["high"]
@@ -218,7 +221,12 @@ class SMC(BaseIndicator):
             axis=1,
         )
 
-    def _bos_choch(self, ohlc: pd.DataFrame, swing_highs_lows: pd.DataFrame, close_break: bool = True) -> pd.DataFrame:
+    def _bos_choch(
+        self,
+        ohlc: pd.DataFrame,
+        swing_highs_lows: pd.DataFrame,
+        close_break: bool = True,
+    ) -> pd.DataFrame:
         swing_highs_lows = swing_highs_lows.copy()
 
         level_order = []

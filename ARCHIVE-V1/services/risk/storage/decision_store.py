@@ -5,10 +5,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from data.database import RiskRepository
-
 from app.services.risk.governance.decisions import PackedRiskDecisionArtifacts
 from app.services.utils.logger import logger
+from data.database import RiskRepository
 
 
 class RiskDecisionPersistenceService:

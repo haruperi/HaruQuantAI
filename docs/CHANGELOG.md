@@ -13,9 +13,10 @@ This document is only for adding high-level changes, decisions, or status update
   snapshots, sizing, audit, Policy, regimes, approvals, decisions, scenarios,
   reporting, all 54 functional and 12 non-functional requirements, and all
   thirteen workflows.
-- Utils, Brokers, and Data are recorded as completed implementation baselines after
-  independent deterministic domain verification. The complete system remains
-  `Missing`, and repository-wide documentation-quality cleanup remains tracked.
+- Utils is a completed verified implementation baseline: 100 targeted tests pass,
+  aggregate branch coverage is 91.28%, all 23 source files individually exceed 80%
+  coverage, and all eight feature-aligned standalone usage programs pass. Brokers
+  remains completed, Data is partial, and the complete system remains `Missing`.
 - Indicators is now a completed implementation baseline after independent
   deterministic domain verification (Core plus trend, volatility, momentum,
   volume, candles, the public package port, and all five `WF-INDI-*` workflows).
@@ -30,9 +31,12 @@ This document is only for adding high-level changes, decisions, or status update
   Section 7 domain gate. The post-build review of 2026-07-19 closed six blocking
   correctness defects. The Section 7 gate is green on both Linux (`169 passed`,
   `83.21%` coverage) and the Windows toolchain; the domain is verified.
-- Data remains a completed implementation baseline, now including real-evidence
-  tick-series generation (`FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016`). Its quality
-  gates must be run on the Windows toolchain; the feature has not yet been executed.
+- Data is `Partial`. Its baseline is otherwise complete, including real-evidence
+  tick-series generation (`FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016`), but
+  series-level quality inspection (`CAP-DATA-023`, `FR-DATA-091`–`FR-DATA-094`) is
+  specified and accepted without an implementation, so every emitted
+  `DataQualityReport` currently carries a constant score. Its quality gates must be
+  run on the Windows toolchain; the tick feature has not yet been executed.
 - Analytics is a completed implementation baseline across contracts, ledger
   adaptation, 60 cataloged metrics, reporting/allocation evidence, bounded dashboards,
   package exports, all active requirements, and all non-excluded workflows. The
@@ -46,6 +50,15 @@ This document is only for adding high-level changes, decisions, or status update
   adoption are outside this domain build.
 
 ### Added
+
+- **2026-07-20 — Utils post-build corrections implemented.** Rebuilt the public
+  usage suite as eight safe executable programs, added downstream audit persistence
+  and structured-log routing evidence, and added public-register and import-safety
+  boundary checks. The final targeted domain gate is now green.
+
+- **2026-07-20 — Functions register documentation reformatted.** Rewrote the entire
+  `docs/dev/functions_register.md` to map each file to its descriptive feature name
+  and functionalities using clean markdown headers and tables.
 
 - **2026-07-19 — Portfolio domain completed.** Added strict Portfolio contracts,
   evidence validation, fixed/equal/inverse-volatility construction, atomic state,
@@ -275,6 +288,11 @@ This document is only for adding high-level changes, decisions, or status update
 
 ### Verification
 
+- **2026-07-20 — Utils final Definition of Done.** Ruff, formatting, and strict
+  mypy pass over 55 targeted files; all 100 Utils unit/integration tests and eight
+  directly executed usage programs pass. Aggregate branch coverage is 91.28%, and
+  every one of 23 source files individually exceeds 80% (minimum 82.30%).
+
 - **2026-07-19 — Trading final Definition of Done.** The complete Trading gate
   passes 188 tests at 84.54% statement-and-branch coverage; Trading formatting,
   Ruff, 42-source-file mypy, public-import, standalone usage, docstring/logger,
@@ -288,6 +306,60 @@ This document is only for adding high-level changes, decisions, or status update
   from `uv run mypy app/services/strategy tests/strategy`.
 
 ### Decisions
+
+- **2026-07-20 — Standalone usage evidence policy standardized.** Every registered
+  feature owns one numbered non-pytest program that calls all of its public operations
+  and constructors through the public API using realistic bounded data or genuine
+  runtime state. Usage programs use a main guard, remain outside pytest collection,
+  and are verified by direct Python execution.
+
+- **2026-07-20 — V1 `services/utils` reconciliation closed.** A capability-level
+  comparison of the legacy `ARCHIVE-V1/services/utils` package against `app/utils`
+  examined 70 capabilities: 51 are covered elsewhere, 13 are intentionally obsolete,
+  and 5 are accepted functional gaps. Two gaps (UI/API identity/credentials,
+  Research seasonality) were already specified and needed no new documentation.
+
+- **2026-07-20 — Series-level market-data quality inspection accepted (`CAP-DATA-023`).**
+  Data owns gap, spike, flat-line, zero-volume, duplicate-bar, and spread-breach
+  detection with deterministic scoring and remediation evidence
+  (`FR-DATA-091`–`FR-DATA-094`). Blocking issues are exactly `MISSING_BARS` and
+  `DUPLICATE_BARS`; all others are advisory. The score is
+  `1 − Σ(severity_weight × affected_count / checked_count)` clamped to `[0, 1]`;
+  V1's penalty-breakdown model is not carried over. Strictness is one
+  `QUALITY_PROFILE` value (`strict`/`standard`/`lenient`) selecting a frozen threshold
+  set rather than individually tunable knobs. A calendar is optional in the first
+  iteration; without one, gap issues are marked `calendar_unverified`. Only
+  `access/historical.py` computes a report; transforms propagate it. Data status moves
+  from `Completed implementation baseline` to `Partial` because emitted
+  `DataQualityReport` values are currently constant, which conflicts with
+  `AGENTS.md` §5.
+
+- **2026-07-20 — Clock-drift diagnostics assigned to UI/API (`FR-API-059`).** The probe
+  reports signed drift as a readiness detail and never corrects a clock, rewrites a
+  timestamp, or blocks a request. Utils owns no health provider, and clock
+  synchronisation remains an infrastructure responsibility.
+
+- **2026-07-20 — Operational telemetry accepted and assigned to UI/API
+  (`CAP-UI-024`, `FR-API-060`–`FR-API-063`, `P-API-012`).** Telemetry uses explicitly
+  injected sinks, never a process-global registry, and is advisory only: no governed
+  decision reads a metric and telemetry failure never alters execution. `METRICS_ENABLED`
+  defaults to `false`. The Prometheus renderer dependency is `Pending` and must be
+  pinned before implementation. V1's `MetricRegistry`, tool-call metrics, embedded
+  Grafana dashboard expectations, and `AlertDeduplicator` are explicitly excluded;
+  V1's `event_bus`, tool-response envelope standard, generic validation façade, and
+  self-minted encryption keys remain excluded.
+
+- **2026-07-20 — `FEAT-RES-07` register entry corrected.** The register listed six
+  function names (`tag_session_timezone`, `get_session_hours`, `analyze_intraday_returns`,
+  `analyze_day_of_week`, `analyze_month_of_year`, `run_seasonality_analysis`) that
+  contradicted the authoritative Research README §4.8. The register now matches
+  `FR-RES-069`–`FR-RES-074`. No Research README change was required.
+
+- **2026-07-20 — Utils ownership and identity boundaries corrected.** UI/API owns
+  password hashing, credential encryption, key lifecycle, active-secret selection,
+  and credential-reference resolution; Utils owns redaction only. Cross-domain trace
+  IDs use prefix plus UUID4, while deterministic non-trace IDs use `id` plus SHA-256;
+  this retires active Utils requirements `FR-UTL-025` and `FR-UTL-036`–`038`.
 
 - **2026-07-19 — Portfolio receiver seams resolved.** Callers supply the fully
   formed Simulation-owned `PortfolioBacktestRequestV1`; Trading owns conversion of
@@ -689,6 +761,12 @@ This document is only for adding high-level changes, decisions, or status update
   sensitive setting names in its output.
 
 ### Fixed
+
+- **2026-07-20 — Utils review findings corrected.** Removed prohibited credential
+  APIs and their direct dependency, closed separator/case redaction gaps, rejected
+  unknown supplied environment keys, aligned trace validation and affected consumers,
+  and reconciled the package README and public feature register. The final targeted
+  verification gate passes.
 
 - **2026-07-16 — Live standalone Data retrieval example repaired.** Completed
   required local SQLite configuration, added the expected database directory,

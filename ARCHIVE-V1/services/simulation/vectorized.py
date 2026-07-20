@@ -28,7 +28,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.execution import core
 from app.services.simulation.common import phase_mask, signal_to_float_array
 from app.services.utils.logger import logger
@@ -391,14 +390,14 @@ def _run_vectorized_simulation_impl(
         float(commission_per_lot),
         resolved_slippage_points,
         float(point_value),
-        int(len(prepared["id_to_symbol"])),
+        len(prepared["id_to_symbol"]),
         bool(snapshot_policy == "position_update"),
     )
     if len(kernel_result) == 3:
         trades_arr, equity_arr, final_balance = kernel_result
         open_pos_arr = np.empty((0, POS_COLS))
-        last_bids = np.zeros(int(len(prepared["id_to_symbol"])))
-        last_asks = np.zeros(int(len(prepared["id_to_symbol"])))
+        last_bids = np.zeros(len(prepared["id_to_symbol"]))
+        last_asks = np.zeros(len(prepared["id_to_symbol"]))
     else:
         (
             trades_arr,
@@ -495,7 +494,7 @@ def _run_vectorized_simulation_impl(
         engine.state.trading_account.equity = corrected_final_balance
 
     logger.info(f"Turbo run completed in {time.time() - start_time:.4f}s")
-    return int(len(data))
+    return len(data)
 
 
 def _prepare_vectorized_data_impl(
@@ -745,7 +744,6 @@ def run_vectorized_simulation(
     """AI Tool wrapper for _run_vectorized_simulation_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         kwargs = {}
@@ -808,7 +806,6 @@ def prepare_vectorized_data(
     """AI Tool wrapper for _prepare_vectorized_data_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         kwargs = {}
@@ -853,7 +850,6 @@ def reconstruct_trades(
     """AI Tool wrapper for _reconstruct_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         kwargs = {}
@@ -904,7 +900,6 @@ def reconstruct_equity_curve(
     """AI Tool wrapper for _reconstruct_equity_curve_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         kwargs = {}

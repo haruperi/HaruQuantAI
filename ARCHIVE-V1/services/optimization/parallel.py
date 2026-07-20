@@ -22,7 +22,6 @@ from multiprocessing import Lock
 from typing import Any
 
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 # =========================================================================
@@ -202,10 +201,9 @@ def parallel_grid_search(
             # helper internally executes through the migrated execution engine
             return result
 
+
         results = parallel_grid_search(
-            engine_factory,
-            param_grid={'fast': [10, 20], 'slow': [50, 100]},
-            n_jobs=4
+            engine_factory, param_grid={"fast": [10, 20], "slow": [50, 100]}, n_jobs=4
         )
         ```
 
@@ -315,11 +313,11 @@ def parallel_random_search(
         results = parallel_random_search(
             engine_factory,
             param_distributions={
-                'fast': lambda: random.randint(10, 30),
-                'slow': lambda: random.randint(50, 150)
+                "fast": lambda: random.randint(10, 30),
+                "slow": lambda: random.randint(50, 150),
             },
             n_iter=100,
-            n_jobs=4
+            n_jobs=4,
         )
         ```
 
@@ -424,16 +422,17 @@ def parallel_walk_forward(
             # Use the trading engine helper path (strategy -> signals -> TicksGenerator -> Engine.run)
             result = run_strategy_backtest(...)
             # helper internally executes through the migrated execution engine
-            result.metadata['is_train'] = is_train
+            result.metadata["is_train"] = is_train
             return result
+
 
         wf_results = parallel_walk_forward(
             engine_factory,
             data=full_data,
-            param_grid={'fast': [10, 20], 'slow': [50, 100]},
+            param_grid={"fast": [10, 20], "slow": [50, 100]},
             train_size=252,  # 1 year
-            test_size=63,     # 3 months
-            n_jobs=4
+            test_size=63,  # 3 months
+            n_jobs=4,
         )
         ```
 

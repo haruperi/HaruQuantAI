@@ -25,7 +25,6 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 from .csv import get_cached_data
@@ -47,10 +46,10 @@ from .responses import (
 def get_data_dir() -> Path:
     """Description.
         Return the project data directory for implementation code.
-    
+
     Args:
         None.
-    
+
     Returns:
         Path.
     """
@@ -61,10 +60,10 @@ def get_data_dir() -> Path:
 def load_parquet(file_path: str | Path) -> pd.DataFrame:
     """Description.
         Load a Parquet file as a DataFrame with cache support.
-    
+
     Args:
         file_path: str | Path.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -75,17 +74,19 @@ def load_parquet(file_path: str | Path) -> pd.DataFrame:
     def _loader() -> pd.DataFrame:
         """Description.
             Load the Parquet file from disk for the cache miss path.
-        
+
         Args:
             None.
-        
+
         Returns:
             pd.DataFrame.
         """
         logger.debug(f"Cache miss: Reading Parquet file directly from disk: {path}")
         return pd.read_parquet(path)
 
-    logger.debug(f"Attempting to load Parquet file from path={file_path} (checking cache first).")
+    logger.debug(
+        f"Attempting to load Parquet file from path={file_path} (checking cache first)."
+    )
     return get_cached_data(str(path.resolve()), _loader)
 
 
@@ -95,11 +96,11 @@ def parquet_data_load(
 ) -> dict[str, Any]:
     """Description.
         Load a Parquet file into a JSON-safe OHLCV payload.
-    
+
     Args:
         path: str | Path.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -123,7 +124,7 @@ def parquet_data_load(
             "source": tool_name,
             "path": str(source_path),
             "symbol": source_path.stem,
-            "rows": int(len(frame)),
+            "rows": len(frame),
             "columns": [str(column) for column in frame.columns],
             "data": _serialize_frame_records(frame),
         }
@@ -164,13 +165,13 @@ def parquet_data_saver_file_exists(
 ) -> dict[str, Any]:
     """Description.
         Check whether a saved Parquet market-data file exists.
-    
+
     Args:
         path: str | Path | None.
         symbol: str.
         timeframe: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -219,13 +220,13 @@ def parquet_data_saver_save(
 ) -> dict[str, Any]:
     """Description.
         Save market data to Parquet with sidecar metadata.
-    
+
     Args:
         data: Data | dict[str, Any].
         path: str | Path | None.
         is_initial: bool.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -278,13 +279,13 @@ def parquet_data_saver_load(
 ) -> dict[str, Any]:
     """Description.
         Load saved Parquet data and sidecar metadata.
-    
+
     Args:
         path: str | Path | None.
         symbol: str.
         timeframe: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -317,7 +318,7 @@ def parquet_data_saver_load(
             "source": tool_name,
             "path": str(target_path),
             "metadata": _data_to_metadata(data_obj),
-            "rows": int(len(data_obj.df)),
+            "rows": len(data_obj.df),
             "columns": [str(column) for column in data_obj.df.columns],
             "candles": _serialize_frame_records(data_obj.df),
         }

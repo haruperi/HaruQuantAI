@@ -10,11 +10,10 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from pydantic import Field, model_validator
-
 from app.services.trading.contracts import JsonObject, TradingContract
 from app.services.trading.security.error_mapping import TradingMappedError
 from app.utils.logger import logger
+from pydantic import Field, model_validator
 
 BPS_DENOMINATOR = Decimal(10_000)
 

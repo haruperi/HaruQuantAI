@@ -15,11 +15,10 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 from app.services.trading.contracts import JsonObject, JsonValue
 from app.utils.logger import logger
 from app.utils.security import redact_value
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 if TYPE_CHECKING:
     from app.services.trading.state import Clock

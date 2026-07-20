@@ -39,7 +39,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.analytics.common import EPSILON, analytics_tool_result
 from app.services.utils.logger import logger
 
@@ -821,7 +820,6 @@ def benchmark_returns(
     """AI Tool wrapper for _benchmark_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -910,7 +908,6 @@ def beta(strategy_returns: pd.Series, benchmark_returns: pd.Series) -> dict[str,
     """AI Tool wrapper for _beta_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1004,7 +1001,6 @@ def alpha(
     """AI Tool wrapper for _alpha_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1147,7 +1143,6 @@ def r_squared(
     """AI Tool wrapper for _r_squared_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1240,7 +1235,6 @@ def tracking_error(
     """AI Tool wrapper for _tracking_error_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1361,7 +1355,6 @@ def information_ratio(
     """AI Tool wrapper for _information_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1480,7 +1473,6 @@ def relative_drawdown_series(
     """AI Tool wrapper for _relative_drawdown_series_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1573,7 +1565,6 @@ def max_relative_drawdown_percent(
     """AI Tool wrapper for _max_relative_drawdown_percent_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1667,7 +1658,6 @@ def batting_average(
     """AI Tool wrapper for _batting_average_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1760,7 +1750,6 @@ def up_down_capture(
     """AI Tool wrapper for _up_down_capture_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1854,7 +1843,6 @@ def calculate_benchmark_metrics(
     """AI Tool wrapper for _calculate_benchmark_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

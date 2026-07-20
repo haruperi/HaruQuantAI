@@ -10,7 +10,6 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import httpx
-
 from app.agentic.agents._shared.base_contracts import AgentContext, AgentRequest
 from app.agentic.agents._shared.schemas import AgentPlan
 from app.agentic.agents.executive.ceo_agent.service import CEOAgent

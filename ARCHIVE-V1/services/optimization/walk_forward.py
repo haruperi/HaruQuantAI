@@ -11,7 +11,6 @@ from collections.abc import Callable
 from typing import Any
 
 import numpy as np
-
 from app.services.utils.logger import logger
 
 from .execution import run_strategy_backtest

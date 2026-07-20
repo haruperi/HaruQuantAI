@@ -52,7 +52,6 @@ from dataclasses import dataclass
 from typing import Any, cast
 
 import pandas as pd
-
 from app.services import resolve_service_attr, service_modules
 from app.services.indicator.standard import run_indicator_tool
 
@@ -113,7 +112,7 @@ def _service_function(name: str) -> Callable[..., pd.DataFrame]:
         raise TypeError(
             f"Indicator '{name}' resolved to a non-callable service object."
         )
-    return cast(Callable[..., pd.DataFrame], value)
+    return cast("Callable[..., pd.DataFrame]", value)
 
 
 @dataclass(frozen=True)

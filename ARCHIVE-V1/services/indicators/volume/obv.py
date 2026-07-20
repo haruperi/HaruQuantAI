@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -38,7 +37,9 @@ class OBV(BaseIndicator):
         result_df = df.copy()
 
         close_diff = df["close"].diff()
-        volume_direction = np.where(close_diff > 0, df["volume"], np.where(close_diff < 0, -df["volume"], 0))
+        volume_direction = np.where(
+            close_diff > 0, df["volume"], np.where(close_diff < 0, -df["volume"], 0)
+        )
         # Initialize first element to 0
         volume_direction[0] = 0
 

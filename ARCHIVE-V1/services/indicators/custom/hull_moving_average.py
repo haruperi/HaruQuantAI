@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -32,9 +31,13 @@ class HullMovingAverage(BaseIndicator):
     def _wma(self, series: pd.Series, period: int) -> pd.Series:
         weights = np.arange(1, period + 1)
         sum_weights = weights.sum()
-        return series.rolling(window=period).apply(lambda x: np.dot(x, weights) / sum_weights, raw=True)
+        return series.rolling(window=period).apply(
+            lambda x: np.dot(x, weights) / sum_weights, raw=True
+        )
 
-    def calculate(self, df: pd.DataFrame, period: int = 9, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 9, column: str = "close", **kwargs: Any
+    ) -> pd.DataFrame:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 2:

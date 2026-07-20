@@ -15,7 +15,6 @@ all resulting intents.
 """
 
 import pandas as pd
-
 from app.services.strategy import MarketContext
 from app.services.strategy.base import BaseStrategy
 

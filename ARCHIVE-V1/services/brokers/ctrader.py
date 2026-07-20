@@ -11,6 +11,9 @@ from datetime import UTC, datetime
 from typing import Any, cast
 
 import pandas as pd
+from app.services.utils.errors import ConfigurationError, ExternalServiceError
+from app.services.utils.logger import logger
+from app.services.utils.settings import settings
 from ctrader_open_api import (
     Client,
     EndPoints,
@@ -49,10 +52,6 @@ from ctrader_open_api.protobuf import (  # type: ignore[import-not-found]
 )
 from twisted.internet import reactor  # type: ignore[import-not-found]
 
-from app.services.utils.errors import ConfigurationError, ExternalServiceError
-from app.services.utils.logger import logger
-from app.services.utils.settings import settings
-
 
 class CTraderClient:
     """Client for interacting with the cTrader Open API endpoint.
@@ -89,18 +88,18 @@ class CTraderClient:
     ) -> None:
         """Description.
             Initialize the cTrader Open API client with configuration parameters.
-        
+
         Args:
             client_id: str | None.
             client_secret: str | None.
             access_token: str | None.
             account_id: int | None.
             environment: str | None.
-        
+
         Returns:
             None.
         """
-        settings_obj = cast(Any, settings)
+        settings_obj = cast("Any", settings)
         self.client_id = client_id or settings_obj.ctrader_client_id
         self.client_secret = client_secret or settings_obj.ctrader_client_secret
         self.access_token = access_token or settings_obj.ctrader_access_token
@@ -137,10 +136,10 @@ class CTraderClient:
     def connect(self) -> bool:
         """Description.
             Connect to the cTrader Open API endpoint and handshake.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -237,10 +236,10 @@ class CTraderClient:
     def _validate_credentials(self) -> None:
         """Description.
             Validate that required cTrader configuration details are provided.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -260,10 +259,10 @@ class CTraderClient:
     def disconnect(self) -> None:
         """Description.
             Close the cTrader connection and reset the status flags.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -281,26 +280,25 @@ class CTraderClient:
     def is_connected(self) -> bool:
         """Description.
             Check if TCP connection is active.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
         logger.debug(
-            f"Checking cTrader TCP connection state "
-            f"(connected={self._is_connected})."
+            f"Checking cTrader TCP connection state (connected={self._is_connected})."
         )
         return self._is_connected
 
     def is_app_authenticated(self) -> bool:
         """Description.
             Check if application is authenticated.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -313,10 +311,10 @@ class CTraderClient:
     def is_account_authorized(self) -> bool:
         """Description.
             Check if trading account is authorized.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -329,10 +327,10 @@ class CTraderClient:
     def _on_connected(self, _client: Any) -> None:
         """Description.
             Callback triggered on successful TCP connection.
-        
+
         Args:
             _client: Any.
-        
+
         Returns:
             None.
         """
@@ -355,11 +353,11 @@ class CTraderClient:
     def _on_disconnected(self, _client: Any, reason: Any) -> None:
         """Description.
             Callback triggered on socket disconnection.
-        
+
         Args:
             _client: Any.
             reason: Any.
-        
+
         Returns:
             None.
         """
@@ -374,11 +372,11 @@ class CTraderClient:
     def _on_message(self, _client: Any, message: Any) -> None:
         """Description.
             Callback triggered on receiving any protobuf message from cTrader.
-        
+
         Args:
             _client: Any.
             message: Any.
-        
+
         Returns:
             None.
         """
@@ -420,10 +418,10 @@ class CTraderClient:
     def _handle_app_auth_res(self) -> None:
         """Description.
             Handle application authentication success response.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -442,10 +440,10 @@ class CTraderClient:
     def _handle_account_list_res(self, extracted: Any) -> None:
         """Description.
             Handle account list response and send authorization request.
-        
+
         Args:
             extracted: Any.
-        
+
         Returns:
             None.
         """
@@ -494,10 +492,10 @@ class CTraderClient:
     def _handle_account_auth_res(self) -> None:
         """Description.
             Handle account authorization success response.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -516,10 +514,10 @@ class CTraderClient:
     def _handle_trader_res(self, extracted: Any) -> None:
         """Description.
             Handle trader details response.
-        
+
         Args:
             extracted: Any.
-        
+
         Returns:
             None.
         """
@@ -530,10 +528,10 @@ class CTraderClient:
     def _handle_error_res(self, extracted: Any) -> None:
         """Description.
             Handle cTrader error response.
-        
+
         Args:
             extracted: Any.
-        
+
         Returns:
             None.
         """
@@ -546,10 +544,10 @@ class CTraderClient:
     def _handle_spot_event(self, extracted: Any) -> None:
         """Description.
             Update local tick cache with spot event data.
-        
+
         Args:
             extracted: Any.
-        
+
         Returns:
             None.
         """
@@ -563,7 +561,11 @@ class CTraderClient:
         ask = getattr(extracted, "ask", None)  # pragma: no cover
 
         if name not in self._ticks:  # pragma: no cover
-            self._ticks[name] = {"bid": 0.0, "ask": 0.0, "last": 0.0}  # pragma: no cover
+            self._ticks[name] = {
+                "bid": 0.0,
+                "ask": 0.0,
+                "last": 0.0,
+            }  # pragma: no cover
 
         if bid is not None:  # pragma: no cover
             self._ticks[name]["bid"] = bid / 100000.0  # pragma: no cover
@@ -585,12 +587,12 @@ class CTraderClient:
     ) -> Any:
         """Description.
             Send a request to cTrader and wait synchronously for the response.
-        
+
         Args:
             req: Any.
             response_payload_type: int.
             timeout: float.
-        
+
         Returns:
             Any.
         """
@@ -611,11 +613,11 @@ class CTraderClient:
         def callback(extracted: Any, payload_type: int) -> None:
             """Description.
                 Capture the matching response or error for the pending request.
-            
+
             Args:
                 extracted: Any.
                 payload_type: int.
-            
+
             Returns:
                 None.
             """
@@ -663,10 +665,10 @@ class CTraderClient:
     def subscribe_spots(self, symbol_name: str) -> None:
         """Description.
             Subscribe to spot events for a symbol name.
-        
+
         Args:
             symbol_name: str.
-        
+
         Returns:
             None.
         """
@@ -691,16 +693,18 @@ class CTraderClient:
                 symbol_id,
             )
         except Exception as e:  # pragma: no cover
-            logger.error("Failed to subscribe to spots for {}: {}", symbol_name, e)  # pragma: no cover
+            logger.error(
+                "Failed to subscribe to spots for {}: {}", symbol_name, e
+            )  # pragma: no cover
             raise  # pragma: no cover
 
     def unsubscribe_spots(self, symbol_name: str) -> None:
         """Description.
             Unsubscribe from spot events for a symbol name.
-        
+
         Args:
             symbol_name: str.
-        
+
         Returns:
             None.
         """
@@ -722,15 +726,17 @@ class CTraderClient:
                 symbol_id,
             )
         except Exception as e:  # pragma: no cover
-            logger.error("Failed to unsubscribe from spots for {}: {}", symbol_name, e)  # pragma: no cover
+            logger.error(
+                "Failed to unsubscribe from spots for {}: {}", symbol_name, e
+            )  # pragma: no cover
 
     def last_error(self) -> str:
         """Description.
             Get the last error message or code.
-        
+
         Args:
             None.
-        
+
         Returns:
             str.
         """
@@ -740,10 +746,10 @@ class CTraderClient:
     def symbols_total(self) -> int:
         """Description.
             Get the total number of symbols.
-        
+
         Args:
             None.
-        
+
         Returns:
             int.
         """
@@ -756,10 +762,10 @@ class CTraderClient:
     def symbol_info_tick(self, symbol_name: str) -> Any:
         """Description.
             Get the current tick prices for a symbol.
-        
+
         Args:
             symbol_name: str.
-        
+
         Returns:
             Any.
         """
@@ -777,7 +783,9 @@ class CTraderClient:
             close_price = None
             if light_sym:
                 try:  # pragma: no cover
-                    to_ts = int(datetime.now(UTC).timestamp() * 1000)  # pragma: no cover
+                    to_ts = int(
+                        datetime.now(UTC).timestamp() * 1000
+                    )  # pragma: no cover
                     from_ts = to_ts - (7 * 24 * 60 * 60 * 1000)  # pragma: no cover
 
                     req = ProtoOAGetTrendbarsReq()  # pragma: no cover
@@ -789,11 +797,15 @@ class CTraderClient:
                     req.count = 1  # pragma: no cover
 
                     res = self.send_request(  # pragma: no cover
-                        req, ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES, timeout=5.0  # pragma: no cover
+                        req,
+                        ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES,
+                        timeout=5.0,  # pragma: no cover
                     )  # pragma: no cover
                     if res.trendbar:  # pragma: no cover
                         last_bar = res.trendbar[-1]  # pragma: no cover
-                        close_price = (last_bar.low + last_bar.deltaClose) / 100000.0  # pragma: no cover
+                        close_price = (
+                            last_bar.low + last_bar.deltaClose
+                        ) / 100000.0  # pragma: no cover
                 except Exception as e:  # pragma: no cover
                     logger.warning(  # pragma: no cover
                         "Failed to fetch fallback trendbar in symbol_info_tick for {}: {}",
@@ -826,10 +838,10 @@ class CTraderClient:
             def __init__(self, t: dict[str, float]) -> None:
                 """Description.
                     Initialize the tick from a bid/ask/last mapping.
-                
+
                 Args:
                     t: dict[str, float].
-                
+
                 Returns:
                     None.
                 """
@@ -845,13 +857,13 @@ class CTraderClient:
     ) -> float | None:
         """Description.
             Calculate the required margin for an order.
-        
+
         Args:
             action: int.
             symbol: str.
             volume: float.
             _price: float.
-        
+
         Returns:
             float | None.
         """
@@ -888,14 +900,14 @@ class CTraderClient:
     ) -> float | None:
         """Description.
             Calculate the expected profit for an order.
-        
+
         Args:
             action: int.
             symbol: str.
             volume: float.
             price_open: float.
             price_close: float.
-        
+
         Returns:
             float | None.
         """
@@ -933,7 +945,7 @@ class CTraderClient:
     ) -> pd.DataFrame:
         """Description.
             Get OHLCVS bars from cTrader.
-        
+
         Args:
             symbol: str.
             timeframe: str.
@@ -941,7 +953,7 @@ class CTraderClient:
             start_pos: int.
             date_from: datetime | None.
             date_to: datetime | None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -992,19 +1004,25 @@ class CTraderClient:
             req_sym.ctidTraderAccountId = self.account_id  # pragma: no cover
             req_sym.symbolId.append(light_sym.symbolId)  # pragma: no cover
             res_sym = self.send_request(  # pragma: no cover
-                req_sym, ProtoOAPayloadType.PROTO_OA_SYMBOL_BY_ID_RES, timeout=5.0  # pragma: no cover
+                req_sym,
+                ProtoOAPayloadType.PROTO_OA_SYMBOL_BY_ID_RES,
+                timeout=5.0,  # pragma: no cover
             )  # pragma: no cover
             if res_sym.symbol:  # pragma: no cover
                 digits = res_sym.symbol[0].digits  # pragma: no cover
         except Exception as e:  # pragma: no cover
-            logger.warning("Failed to fetch symbol digits for {}: {}", symbol, e)  # pragma: no cover
+            logger.warning(
+                "Failed to fetch symbol digits for {}: {}", symbol, e
+            )  # pragma: no cover
 
         divisor = 10.0**digits  # pragma: no cover
 
         # Handle date range  # pragma: no cover
         if date_from is not None:  # pragma: no cover
             from_ts = int(date_from.timestamp() * 1000)  # pragma: no cover
-            to_ts = int((date_to or datetime.now(UTC)).timestamp() * 1000)  # pragma: no cover
+            to_ts = int(
+                (date_to or datetime.now(UTC)).timestamp() * 1000
+            )  # pragma: no cover
         else:  # pragma: no cover
             # period in milliseconds  # pragma: no cover
             period_ms = {  # pragma: no cover
@@ -1023,9 +1041,13 @@ class CTraderClient:
                 "W1": 604800000,  # pragma: no cover
                 "MN1": 2592000000,  # pragma: no cover
             }  # pragma: no cover
-            to_ts = int((date_to or datetime.now(UTC)).timestamp() * 1000)  # pragma: no cover
+            to_ts = int(
+                (date_to or datetime.now(UTC)).timestamp() * 1000
+            )  # pragma: no cover
             # Add some buffer to start_pos  # pragma: no cover
-            from_ts = to_ts - ((count + start_pos) * period_ms.get(tf_upper, 60000))  # pragma: no cover
+            from_ts = to_ts - (
+                (count + start_pos) * period_ms.get(tf_upper, 60000)
+            )  # pragma: no cover
 
         req = ProtoOAGetTrendbarsReq()  # pragma: no cover
         req.ctidTraderAccountId = self.account_id  # pragma: no cover
@@ -1036,7 +1058,9 @@ class CTraderClient:
 
         try:  # pragma: no cover
             res = self.send_request(  # pragma: no cover
-                req, ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES, timeout=10.0  # pragma: no cover
+                req,
+                ProtoOAPayloadType.PROTO_OA_GET_TRENDBARS_RES,
+                timeout=10.0,  # pragma: no cover
             )  # pragma: no cover
         except Exception as e:  # pragma: no cover
             logger.error("Failed to fetch cTrader trendbars: {}", e)  # pragma: no cover
@@ -1063,7 +1087,9 @@ class CTraderClient:
 
                 bars.append(  # pragma: no cover
                     {  # pragma: no cover
-                        "Timestamp": pd.to_datetime(ts_ms, unit="ms", utc=True),  # pragma: no cover
+                        "Timestamp": pd.to_datetime(
+                            ts_ms, unit="ms", utc=True
+                        ),  # pragma: no cover
                         "Open": bar_open,  # pragma: no cover
                         "High": bar_high,  # pragma: no cover
                         "Low": bar_low,  # pragma: no cover
@@ -1090,7 +1116,9 @@ class CTraderClient:
         if date_from is None:  # pragma: no cover
             df = df.tail(count)  # pragma: no cover
 
-        return df[["Timestamp", "Open", "High", "Low", "Close", "Volume", "Spread"]]  # pragma: no cover
+        return df[
+            ["Timestamp", "Open", "High", "Low", "Close", "Volume", "Spread"]
+        ]  # pragma: no cover
 
     def get_ticks(
         self,
@@ -1102,14 +1130,14 @@ class CTraderClient:
     ) -> pd.DataFrame | list[dict[str, Any]] | None:
         """Description.
             Get ticks from cTrader.
-        
+
         Args:
             symbol: str.
             count: int.
             start: datetime | None.
             end: datetime | None.
             as_dataframe: bool.
-        
+
         Returns:
             pd.DataFrame | list[dict[str, Any]] | None.
         """
@@ -1128,20 +1156,28 @@ class CTraderClient:
             req_sym.ctidTraderAccountId = self.account_id  # pragma: no cover
             req_sym.symbolId.append(symbol_id)  # pragma: no cover
             res_sym = self.send_request(  # pragma: no cover
-                req_sym, ProtoOAPayloadType.PROTO_OA_SYMBOL_BY_ID_RES, timeout=5.0  # pragma: no cover
+                req_sym,
+                ProtoOAPayloadType.PROTO_OA_SYMBOL_BY_ID_RES,
+                timeout=5.0,  # pragma: no cover
             )  # pragma: no cover
             if res_sym.symbol:  # pragma: no cover
                 digits = res_sym.symbol[0].digits  # pragma: no cover
         except Exception as e:  # pragma: no cover
-            logger.warning("Failed to fetch symbol digits for {}: {}", symbol, e)  # pragma: no cover
+            logger.warning(
+                "Failed to fetch symbol digits for {}: {}", symbol, e
+            )  # pragma: no cover
 
         divisor = 10.0**digits  # pragma: no cover
 
         if start is not None:  # pragma: no cover
             from_ts = int(start.timestamp() * 1000)  # pragma: no cover
-            to_ts = int((end or datetime.now(UTC)).timestamp() * 1000)  # pragma: no cover
+            to_ts = int(
+                (end or datetime.now(UTC)).timestamp() * 1000
+            )  # pragma: no cover
         else:  # pragma: no cover
-            to_ts = int((end or datetime.now(UTC)).timestamp() * 1000)  # pragma: no cover
+            to_ts = int(
+                (end or datetime.now(UTC)).timestamp() * 1000
+            )  # pragma: no cover
             from_ts = to_ts - 24 * 60 * 60 * 1000  # pragma: no cover
 
         # Fetch BID ticks  # pragma: no cover
@@ -1154,7 +1190,9 @@ class CTraderClient:
             req_bid.fromTimestamp = from_ts  # pragma: no cover
             req_bid.toTimestamp = to_ts  # pragma: no cover
             res_bid = self.send_request(  # pragma: no cover
-                req_bid, ProtoOAPayloadType.PROTO_OA_GET_TICKDATA_RES, timeout=10.0  # pragma: no cover
+                req_bid,
+                ProtoOAPayloadType.PROTO_OA_GET_TICKDATA_RES,
+                timeout=10.0,  # pragma: no cover
             )  # pragma: no cover
             if res_bid and hasattr(res_bid, "tickData"):  # pragma: no cover
                 bid_ticks = list(res_bid.tickData)  # pragma: no cover
@@ -1171,7 +1209,9 @@ class CTraderClient:
             req_ask.fromTimestamp = from_ts  # pragma: no cover
             req_ask.toTimestamp = to_ts  # pragma: no cover
             res_ask = self.send_request(  # pragma: no cover
-                req_ask, ProtoOAPayloadType.PROTO_OA_GET_TICKDATA_RES, timeout=10.0  # pragma: no cover
+                req_ask,
+                ProtoOAPayloadType.PROTO_OA_GET_TICKDATA_RES,
+                timeout=10.0,  # pragma: no cover
             )  # pragma: no cover
             if res_ask and hasattr(res_ask, "tickData"):  # pragma: no cover
                 ask_ticks = list(res_ask.tickData)  # pragma: no cover
@@ -1189,7 +1229,9 @@ class CTraderClient:
             else:  # pragma: no cover
                 last_ts += t.timestamp  # pragma: no cover
                 last_price += t.tick  # pragma: no cover
-            bids.append({"timestamp": last_ts, "bid": last_price / divisor})  # pragma: no cover
+            bids.append(
+                {"timestamp": last_ts, "bid": last_price / divisor}
+            )  # pragma: no cover
 
         # Decode ASK ticks (delta compression)  # pragma: no cover
         asks = []  # pragma: no cover
@@ -1202,7 +1244,9 @@ class CTraderClient:
             else:  # pragma: no cover
                 last_ts += t.timestamp  # pragma: no cover
                 last_price += t.tick  # pragma: no cover
-            asks.append({"timestamp": last_ts, "ask": last_price / divisor})  # pragma: no cover
+            asks.append(
+                {"timestamp": last_ts, "ask": last_price / divisor}
+            )  # pragma: no cover
 
         df_bid = pd.DataFrame(bids)  # pragma: no cover
         df_ask = pd.DataFrame(asks)  # pragma: no cover
@@ -1219,10 +1263,14 @@ class CTraderClient:
         else:  # pragma: no cover
             df_bid = df_bid.sort_values("timestamp")  # pragma: no cover
             df_ask = df_ask.sort_values("timestamp")  # pragma: no cover
-            df = pd.merge_asof(df_bid, df_ask, on="timestamp", direction="backward")  # pragma: no cover
+            df = pd.merge_asof(
+                df_bid, df_ask, on="timestamp", direction="backward"
+            )  # pragma: no cover
             df["ask"] = df["ask"].fillna(df["bid"] + 0.0002)  # pragma: no cover
 
-        df["Timestamp"] = pd.to_datetime(df["timestamp"], unit="ms", utc=True)  # pragma: no cover
+        df["Timestamp"] = pd.to_datetime(
+            df["timestamp"], unit="ms", utc=True
+        )  # pragma: no cover
         df["Spread"] = df["ask"] - df["bid"]  # pragma: no cover
         df["Last"] = (df["bid"] + df["ask"]) / 2.0  # pragma: no cover
         df["Volume"] = 1.0  # pragma: no cover
@@ -1237,7 +1285,9 @@ class CTraderClient:
                 "Spread": "spread",  # pragma: no cover
             }  # pragma: no cover
         )  # pragma: no cover
-        res_df = res_df[["Timestamp", "bid", "ask", "last", "volume", "spread"]]  # pragma: no cover
+        res_df = res_df[
+            ["Timestamp", "bid", "ask", "last", "volume", "spread"]
+        ]  # pragma: no cover
 
         if start is None:  # pragma: no cover
             res_df = res_df.tail(count)  # pragma: no cover
@@ -1250,10 +1300,10 @@ class CTraderClient:
     def get_instance(cls) -> "CTraderClient":
         """Description.
             Get the shared singleton instance of CTraderClient.
-        
+
         Args:
             None.
-        
+
         Returns:
             'CTraderClient'.
         """
@@ -1270,13 +1320,13 @@ class CTraderTerminalInfo:
     def __init__(self, connected: bool, host: str, port: int, environment: str) -> None:
         """Description.
             Initialize terminal info.
-        
+
         Args:
             connected: bool.
             host: str.
             port: int.
             environment: str.
-        
+
         Returns:
             None.
         """
@@ -1300,11 +1350,11 @@ class CTraderAccountInfo:
     def __init__(self, trader: Any, client: CTraderClient | None = None) -> None:
         """Description.
             Initialize account info.
-        
+
         Args:
             trader: Any.
             client: CTraderClient | None.
-        
+
         Returns:
             None.
         """
@@ -1370,12 +1420,12 @@ class CTraderSymbolInfo:
     def __init__(self, symbol: Any, light_symbol: Any, client: CTraderClient) -> None:
         """Description.
             Initialize symbol info.
-        
+
         Args:
             symbol: Any.
             light_symbol: Any.
             client: CTraderClient.
-        
+
         Returns:
             None.
         """
@@ -1463,11 +1513,11 @@ class CTraderPositionInfo:
     def __init__(self, pos: Any, client: CTraderClient) -> None:
         """Description.
             Initialize position info.
-        
+
         Args:
             pos: Any.
             client: CTraderClient.
-        
+
         Returns:
             None.
         """
@@ -1507,11 +1557,11 @@ class CTraderOrderInfo:
     def __init__(self, ord_data: Any, client: CTraderClient) -> None:
         """Description.
             Initialize pending order info.
-        
+
         Args:
             ord_data: Any.
             client: CTraderClient.
-        
+
         Returns:
             None.
         """
@@ -1562,11 +1612,11 @@ class CTraderDealInfo:
     def __init__(self, deal: Any, client: CTraderClient) -> None:
         """Description.
             Initialize deal info.
-        
+
         Args:
             deal: Any.
             client: CTraderClient.
-        
+
         Returns:
             None.
         """
@@ -1604,11 +1654,11 @@ class CTraderTradeResult:
     def __init__(self, order_id: int, deal_id: int | None = None) -> None:
         """Description.
             Initialize trade result.
-        
+
         Args:
             order_id: int.
             deal_id: int | None.
-        
+
         Returns:
             None.
         """
@@ -1623,10 +1673,10 @@ class CTraderTradeResult:
 def get_ctrader_client() -> CTraderClient:
     """Description.
         Get the shared singleton instance of CTraderClient.
-    
+
     Args:
         None.
-    
+
     Returns:
         CTraderClient.
     """
@@ -1643,14 +1693,14 @@ def _load_ctrader_impl(
 ) -> pd.DataFrame:
     """Description.
         Load OHLCV bars from cTrader as a DataFrame.
-    
+
     Args:
         symbol: str.
         timeframe: str.
         start_date: str | datetime | None.
         end_date: str | datetime | None.
         count: int | None.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -1660,9 +1710,7 @@ def _load_ctrader_impl(
         else start_date
     )
     parsed_end = (
-        datetime.fromisoformat(end_date)
-        if isinstance(end_date, str)
-        else end_date
+        datetime.fromisoformat(end_date) if isinstance(end_date, str) else end_date
     )
     client = get_ctrader_client()
     frame = client.get_bars(
@@ -1679,10 +1727,10 @@ def _load_ctrader_impl(
 def _ensure_connected() -> None:
     """Description.
         Ensure the shared CTraderClient is initialized and connected.
-    
+
     Args:
         None.
-    
+
     Returns:
         None.
     """
@@ -1697,10 +1745,10 @@ def _ensure_connected() -> None:
 def get_terminal_info() -> CTraderTerminalInfo | None:
     """Description.
         Get the terminal settings and status.
-    
+
     Args:
         None.
-    
+
     Returns:
         CTraderTerminalInfo | None.
     """
@@ -1719,10 +1767,10 @@ def get_terminal_info() -> CTraderTerminalInfo | None:
 def get_account_info() -> CTraderAccountInfo | None:
     """Description.
         Get information on the current trading account.
-    
+
     Args:
         None.
-    
+
     Returns:
         CTraderAccountInfo | None.
     """
@@ -1738,10 +1786,10 @@ def get_account_info() -> CTraderAccountInfo | None:
 def get_symbol_info(symbol: str) -> CTraderSymbolInfo | None:
     """Description.
         Get information about a specific symbol.
-    
+
     Args:
         symbol: str.
-    
+
     Returns:
         CTraderSymbolInfo | None.
     """
@@ -1769,11 +1817,11 @@ def get_position_info(
 ) -> list[CTraderPositionInfo]:
     """Description.
         Get open positions filtered by symbol or ticket.
-    
+
     Args:
         symbol: str | None.
         ticket: int | None.
-    
+
     Returns:
         list[CTraderPositionInfo].
     """
@@ -1800,11 +1848,11 @@ def get_order_info(
 ) -> list[CTraderOrderInfo]:
     """Description.
         Get active pending orders filtered by symbol or ticket.
-    
+
     Args:
         symbol: str | None.
         ticket: int | None.
-    
+
     Returns:
         list[CTraderOrderInfo].
     """
@@ -1834,13 +1882,13 @@ def get_history_order_info(
 ) -> list[CTraderOrderInfo]:
     """Description.
         Get historical orders from the specified time frame or ticket.
-    
+
     Args:
         date_from: Any.
         date_to: Any.
         group: str | None.
         ticket: int | None.
-    
+
     Returns:
         list[CTraderOrderInfo].
     """
@@ -1889,13 +1937,13 @@ def get_history_deal_info(
 ) -> list[CTraderDealInfo]:
     """Description.
         Get historical deals from the specified time frame or ticket.
-    
+
     Args:
         date_from: Any.
         date_to: Any.
         group: str | None.
         ticket: int | None.
-    
+
     Returns:
         list[CTraderDealInfo].
     """
@@ -1939,10 +1987,10 @@ def get_history_deal_info(
 def trade(request: dict[str, Any]) -> CTraderTradeResult:
     """Description.
         Send a trading request to the cTrader server.
-    
+
     Args:
         request: dict[str, Any].
-    
+
     Returns:
         CTraderTradeResult.
     """

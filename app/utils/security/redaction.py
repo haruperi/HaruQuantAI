@@ -153,9 +153,16 @@ def _text_pattern(policy: RedactionPolicy) -> re.Pattern[str]:
         The compiled regex Pattern.
     """
     keys = sorted(policy.sensitive_keys, key=len, reverse=True)
-    alternation = "|".join(re.escape(key) for key in keys)
+    tolerant_keys = (
+        "[_-]*".join(re.escape(character) for character in key) for key in keys
+    )
+    alternation = "|".join(
+        rf"(?<![A-Za-z0-9]){key_pattern}(?![A-Za-z0-9])"
+        for key_pattern in tolerant_keys
+    )
     return re.compile(
-        rf"(?i)(\b(?:{alternation})\b\s*[:=]\s*)([^\s,;]+)|"
+        rf"(?i)((?:{alternation})\s*[:=]\s*)"
+        r"((?:(?:Bearer|Basic)\s+)?[^\s,;]+)|"
         r"(\bBearer\s+)([^\s,;]+)"
     )
 

@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-
 from app.services.risk.metrics.math import build_returns_df
 from app.services.risk.models import PortfolioState
 

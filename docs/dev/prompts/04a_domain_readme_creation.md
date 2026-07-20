@@ -664,26 +664,38 @@ Do not prescribe unnecessary architecture.
 
 ## Step 17 — Define usage examples
 
-Every public requirement must map to one example under:
+Every registered feature must map to exactly one standalone program under:
 
 ```text
 tests/[domain]/usage/
 ```
 
-Use one usage file per feature module:
+Use one numbered usage file per `FEAT-[DOM]-NN`, in feature order:
 
 ```text
-tests/[domain]/usage/test_usage_[module_name].py
+tests/[domain]/usage/NN_[feature_name].py
 ```
 
-Use one example function per public requirement:
+Use one example function per public operation or constructor and call them from a
+single entry point:
 
 ```python
-def test_usage_[file]_[function]() -> None:
+def example_[function]() -> None:
     """Demonstrate FR-[DOM]-NNN."""
+
+
+def main() -> None:
+    """Run every example for this feature."""
 ```
 
-Name example functions `test_usage_*` so pytest collects them when `tests/[domain]/usage` is run as part of verification.
+Usage examples are not pytest tests. Do not use `test_*` names. Every program must
+define `main()`, use an `if __name__ == "__main__"` guard, and be excluded from
+pytest collection. Verify it by direct Python execution.
+
+The program must call every documented public operation and constructor in its
+feature through the public package API using realistic, bounded, secret-safe data
+or genuine runtime state. Do not substitute mocks or invented provider evidence
+when the genuine supported public boundary is available.
 
 The README should identify the example location and function name.
 

@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-
 from app.services.research.session_config import session_hours_payload
 from app.services.utils.logger import logger
 from app.services.utils.validators import (

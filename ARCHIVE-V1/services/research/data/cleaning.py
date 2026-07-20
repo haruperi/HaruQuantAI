@@ -22,7 +22,6 @@ from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
-
 from app.services.data.transforms import TimeframeManager
 from app.services.utils.normalization import normalize_timezone_for_series
 

@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.services.utils import logger, redact_mapping
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-
-from app.services.utils import logger, redact_mapping
 
 
 class SecretRedactionMiddleware(BaseHTTPMiddleware):

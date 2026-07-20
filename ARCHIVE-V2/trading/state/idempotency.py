@@ -5,7 +5,6 @@ a local JSONL-backed store for in-progress and completed command records. Live
 route records are durable across process restarts when callers reuse the same
 store path.
 """
-# ruff: noqa: TC001
 
 from __future__ import annotations
 
@@ -17,8 +16,6 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, model_validator
-
 from app.services.trading.contracts import (
     JsonObject,
     TradingAction,
@@ -27,6 +24,7 @@ from app.services.trading.contracts import (
 from app.services.trading.state.ports import Clock
 from app.utils.logger import logger
 from app.utils.standard import canonical_json
+from pydantic import BaseModel, ConfigDict, model_validator
 
 IDEMPOTENCY_MATERIAL_FIELDS = (
     "account_id",

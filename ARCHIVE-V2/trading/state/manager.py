@@ -1,9 +1,6 @@
 """Local trading state update coordinators."""
-# ruff: noqa: TC001
 
 from __future__ import annotations
-
-from pydantic import BaseModel, ConfigDict, model_validator
 
 from app.services.trading.contracts import JsonObject, TradingRoute
 from app.services.trading.state.event_journal import (
@@ -12,6 +9,7 @@ from app.services.trading.state.event_journal import (
 )
 from app.services.trading.state.ports import Clock, TradingStateStore
 from app.utils.logger import logger
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class StateUpdateResult(BaseModel):

@@ -19,9 +19,11 @@
 HaruQuantAI is an algorithmic trading platform that turns market data into governed trading outcomes. It acquires and normalizes market data, derives indicators, generates strategy signals, and forces every trading proposal through independent risk governance before execution. Approved actions are executed deterministically across paper and live routes (against a broker) and the sim route (against a simulated execution environment). Execution and simulation results are persisted by their owning domains and may be evaluated through read-only performance analytics. The system fails closed: if safety, context, or state cannot be proven, execution is blocked.
 
 This document defines the target system and the contract-governed continuation of
-the existing implementation. Utils, Brokers, and Data are completed implementation
-baselines and are reused; later agile phases run compatibility/regression gates and
-add only requirements that are not already satisfied.
+the existing implementation. Utils and Brokers are completed implementation baselines
+and Data is a near-complete baseline with one accepted open requirement group
+(`CAP-DATA-023`); all three are reused. Later agile phases run
+compatibility/regression gates and add only requirements that are not already
+satisfied.
 
 ### Current delivered baseline
 
@@ -32,7 +34,9 @@ add only requirements that are not already satisfied.
   capabilities remain fail-closed unless their evidence gate is satisfied.
 - `app/services/data/` implements its v1 contracts, normalized access, storage,
   cache, audit persistence, processing/alignment, jobs, feeds, source policy, and
-  public operations.
+  public operations. Data is `Partial`: series-level market-data quality inspection
+  (`CAP-DATA-023`, `FR-DATA-091`–`FR-DATA-094`) is specified and accepted but not
+  implemented, so `DataQualityReport` currently carries a constant score.
 - These domains are not rebuilt phase-by-phase. Current repository-wide
   semantic-docstring/format cleanup is tracked separately from functional domain
   completion.
@@ -130,7 +134,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 
 * **Package**: `app/services/brokers`
 * **Responsibility**: Provide a pure, thin passthrough layer over external broker/trading and market-data provider platform APIs — trading-capable platforms (MT5, cTrader, Binance Spot/Futures profiles) and read-only providers (Dukascopy, Yahoo Finance) — behind one canonical `BrokerAdapter` interface, with zero business logic. Every function in the system that requires a live connection to a broker or provider routes exclusively through this domain.
-* **Inputs**: Canonical broker requests (market data reads, account state reads, order mutations, execution-state reads, subscriptions), `BrokerConnectionConfig` constructed by an approved composition root with caller-selected environment and Utils-resolved in-memory credentials. UI/API remains the interactive application composition root; Data's package-root retrieval facade may privately construct a read-only configuration for standalone calls. Trading may receive an injected capability-scoped adapter but does not resolve secrets or mutate its configuration.
+* **Inputs**: Canonical broker requests (market data reads, account state reads, order mutations, execution-state reads, subscriptions), `BrokerConnectionConfig` constructed by an approved composition root with caller-selected environment and UI/API-resolved in-memory credentials. UI/API remains the interactive application composition root; Data's package-root retrieval facade may privately construct a read-only configuration for standalone calls. Trading may receive an injected capability-scoped adapter but does not resolve secrets or mutate its configuration.
 * **Outputs**: Canonical DTOs preserving provider truth in `BrokerResult` / `BrokerError` envelopes, streaming subscription events and connection lifecycle events (canonical event DTOs), capability/feature-flag reports, connection/session status.
 * **Owns**: Per-platform adapter implementations, the broker registry/factory (`create_broker_adapter`; adapter instances are created via the registry and owned by the caller), connection/session lifecycle mechanics (state machine, keep-alives, transport reconnects), translation of provider-native symbol/request values into provider API calls, canonical DTO and error mapping (unenriched), capability discovery, and transport-level flow control (rate-limit throttling, bounded backpressure, and the adapter-local closed/open/half-open circuit breaker specified by the Brokers README).
 * **Boundaries**: Pure passthrough with zero business logic — no business validation (structural/transport validation only), no risk checks, no decision-making, no data enrichment, no business retry/replay (transport-level flow control and connection recovery are permitted; mutations are never retried), and no state management beyond the live session (no durable state). Owns no credential vault and performs no credential persistence, encryption, or database access; approved composition roots resolve settings before constructing `BrokerConnectionConfig`, and only resolved secret values live in memory for the adapter lifecycle. Data owns canonical market identity, friendly names, and every provider/cross-provider alias mapping; Brokers accepts and reports exact provider-native symbol strings only and owns no alias resolution. Brokers does not normalize into `MarketDataset` / `AccountStateSnapshot` and never leaks raw SDK objects across its boundary. Only Trading may invoke mutation operations; Data's use is strictly read-only; Risk and all other domains have no Brokers dependency. The read/write split is enforced by capability-trait scoping (`MarketDataProvider`, `TradeExecutionProvider`, `AccountProvider`, `CalculationProvider`).
@@ -143,9 +147,9 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Responsibility**: Acquire, normalize, store, and serve trusted market data and read-only broker/account state. All of Data's broker/provider access is read-only and flows through the Brokers domain's canonical `BrokerAdapter` (read capability traits).
 * **Inputs**: Package-root retrieval arguments or typed Data requests, Broker/provider reads via Brokers' `BrokerAdapter`, historical files, backfill commands.
 * **Outputs**: Normalized bars/ticks (`MarketDataset`), account/broker state snapshots (`AccountStateSnapshot`), storage state, and explicitly requested detached analytical OHLCV/spread or tick DataFrame projections.
-* **Owns**: Historical market and account data storage/persistence, durable audit storage, shared database infrastructure, connections, locking, SQLite migration execution framework, real-time feed handling, data-source selection and cross-provider fallback policy, every provider/cross-provider alias mapping plus canonical and friendly market identity, conversion of those identities to exact provider-native symbols before a Brokers call, normalization of raw broker/provider reads into `MarketDataset` / `AccountStateSnapshot`, multi-timeframe alignment, and deterministic tick-series derivation from real bar or tick evidence under approved tick and spread models (distinct from GBM synthetic generation, which is fixtures-only and never reaches an official simulation run).
+* **Owns**: Historical market and account data storage/persistence, durable audit storage, shared database infrastructure, connections, locking, SQLite migration execution framework, real-time feed handling, data-source selection and cross-provider fallback policy, every provider/cross-provider alias mapping plus canonical and friendly market identity, conversion of those identities to exact provider-native symbols before a Brokers call, normalization of raw broker/provider reads into `MarketDataset` / `AccountStateSnapshot`, multi-timeframe alignment, deterministic series-level market-data quality inspection producing scored issue, severity, and remediation evidence, and deterministic tick-series derivation from real bar or tick evidence under approved tick and spread models (distinct from GBM synthetic generation, which is fixtures-only and never reaches an official simulation run).
 * **Boundaries**: Foundation layer with no trading decision logic. Brokers continues to own provider adapter implementations and connection/session mechanics. Data's package-root retrieval facade may privately and lazily compose a read-only adapter through the Brokers factory from Utils-loaded settings; manual adapter/source injection remains supported. Data does not expose that composition, invoke broker mutations, own strategy logic, backtest engines, sizing formulas, order dispatch, or other domains' tables, artifact schemas, and migration definitions (each domain owns its tables, artifact schemas, and migration definitions, utilizing the shared execution framework). Raw provider DataFrames, sockets, DB sessions, credentials, adapters, and provider SDK objects never cross its boundary. Data may explicitly project canonical bar or tick `MarketDataset` evidence into detached analytical DataFrames whose exact columns, missingness, units, and precision-loss boundaries are fixed in the Data README; the canonical dataset remains authoritative evidence.
-* **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers.
+* **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers. Quality evidence attached to a `MarketDataset` must be computed from the actual records; a constant or unexamined quality score is never emitted.
 * **Documentation**: `app/services/data/README.md`
 
 #### 2.1.4 Indicators
@@ -253,8 +257,8 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Responsibility**: Expose the system to users and clients through authenticated HTTP/WebSocket interfaces and frontend views, delegating logic to selected public domain APIs including Portfolio.
 * **Inputs**: HTTP requests, WebSocket connections, client payloads, authenticated principals.
 * **Outputs**: HTTP responses, WebSocket broadcasts, views/DTOs, `AuthContext` propagated to downstream domains.
-* **Owns**: Routes, HTTP/WS wrappers, frontend views and client stores, auth/authz enforcement, password hashing, credential encryption/persistence, active-key selection, composition-root credential-reference resolution, DTO translation, preflight write safeguards, requests for kill-switch activation or clearance, and construction of Brokers-owned `BrokerConnectionConfig` values from caller-selected environment plus resolved in-memory credentials.
-* **Boundaries**: Pure presentation/delegation layer with zero inline trading, risk, strategy, analytics, or research calculation logic. It accepts only approved Strategy commands and owns no raw strategy/SQX import, export, parsing, scoring, or artifact lifecycle. Documentation browsing or mutation is outside the initial system scope. Cannot bypass Risk or Trading gates. Encryption keys are supplied by deployment configuration; UI/API does not generate, persist, or rotate them.
+* **Owns**: Routes, HTTP/WS wrappers, frontend views and client stores, auth/authz enforcement, password hashing, credential encryption/persistence, active-key selection, composition-root credential-reference resolution, DTO translation, preflight write safeguards, requests for kill-switch activation or clearance, construction of Brokers-owned `BrokerConnectionConfig` values from caller-selected environment plus resolved in-memory credentials, operational telemetry recording through explicitly injected sinks, metric-label hygiene, the Prometheus exposition surface, and clock-drift readiness diagnostics.
+* **Boundaries**: Pure presentation/delegation layer with zero inline trading, risk, strategy, analytics, or research calculation logic. Operational telemetry is transport and exposition only: UI/API records and renders counters, gauges, and timings supplied by emitting domains and computes no business, performance, or risk metric. Telemetry is never an input to a governed decision, and telemetry unavailability never blocks or alters execution. It accepts only approved Strategy commands and owns no raw strategy/SQX import, export, parsing, scoring, or artifact lifecycle. Documentation browsing or mutation is outside the initial system scope. Cannot bypass Risk or Trading gates. Encryption keys are supplied by deployment configuration; UI/API does not generate, persist, or rotate them.
 * **Key Limits**: List endpoints paginated; endpoint timeouts; preflight warnings expire.
 * **Documentation**: `app/services/api/README.md`
 
@@ -872,6 +876,8 @@ Only settings or limits shared across multiple domains belong here. Feature-spec
 | Completed | `EXECUTION_ROUTE`                                                          | `str`            | `none`                                      | Conditional | `Trading` | Risk, Trading, Simulation, Portfolio, UI/API                                         | Active route:`none`, `sim`, `paper`, or `live`; must be compatible with `RUNTIME_PROFILE`                                                                                                |
 | Completed | `ALLOW_LIVE_MUTATIONS`                                                     | `bool`           | `false`                                     | Yes         | `Trading` | Trading, Portfolio, UI/API                                                           | Master live-trading enablement;`false` blocks all broker mutation regardless of approval. Risk does not consume or redefine this Trading-owned execution gate.                                   |
 | Completed | `DATABASE_URL` / `DATA_DIR`                                              | `str` / `Path` | —                                            | Yes         | `Data`    | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, UI/API | Shared connection and artifact-root configuration; each persistent domain owns its own tables/files                                                                                                |
+| Missing   | `QUALITY_PROFILE`                                                          | `str`            | `standard`                                  | Yes         | `Data`    | Data, Indicators, Strategy, Trading, Simulation, Optimization, Research, Portfolio, Analytics, UI/API | Series-level market-data quality strictness: exactly`strict`, `standard`, or `lenient`. Selects one frozen threshold set; individual thresholds are not separately tunable. Determines which detected issues are blocking, so it changes fail-closed behaviour for every `MarketDataset` consumer. |
+| Missing   | `METRICS_ENABLED`                                                          | `bool`           | `false`                                     | No          | `UI/API`  | All emitting domains                                                                 | Master enablement for operational telemetry recording and the Prometheus exposition surface. Disabled by default; telemetry is never an input to a governed decision and its unavailability never blocks execution.                                                                              |
 | Partial   | `MT5_ENABLED` (per-platform: `CTRADER_ENABLED`, `BINANCE_ENABLED`, …) | `bool`           | `false`                                     | Yes         | `Brokers` | Brokers connections; Data reads, Trading dispatch                                    | `BrokerConnectionConfig.provider_enabled` and Data's private standalone MT5 retrieval composition are implemented; UI/API composition-root loading and remaining provider facades remain pending |
 | Completed | UTC-first time policy                                                        | policy             | `Z`-suffixed ISO 8601                       | Yes         | `Utils`   | All domains                                                                          | Cross-domain timestamps must be UTC; violations are validation errors                                                                                                                              |
 | Completed | Correlation/trace ID format                                                  | policy             | prefixed UUID4                                | Yes         | `Utils`   | All domains                                                                          | Cross-domain calls and audit events carry request, correlation, and causation identifiers                                                                                                          |
@@ -1004,6 +1010,7 @@ uv run pytest tests/[domain]/unit
 uv run pytest tests/[domain]/integration
 uv run pytest tests/system/integration
 uv run pytest tests
+uv run python tests/[domain]/usage/NN_[feature].py
 
 uv run ruff check app
 uv run ruff format --check app
@@ -1013,6 +1020,12 @@ uv run mypy app
 ### Verification rules
 
 - Unit tests remain inside the owning domain.
+- Usage evidence is not pytest. Every registered feature has exactly one numbered
+  standalone program under `tests/[domain]/usage/`; it calls every public operation
+  and constructor in that feature through the documented public API with realistic,
+  bounded, secret-safe data or genuine runtime state. Usage programs define
+  `main()`, use a main guard, remain excluded from pytest collection, and are run
+  directly with Python.
 - System integration tests verify collaboration across domains; every `SYS-WF-*` workflow must have at least one.
 - Shared contracts must have producer–consumer compatibility tests when needed.
 
@@ -1057,10 +1070,10 @@ The system is complete only when:
 - [ ] All tests and quality checks pass.
 
 Current status: `Missing` — the complete target system and system workflows are not
-implemented. Utils, Brokers, and Data are completed implementation baselines;
-Indicators and the remaining domains are tracked independently, and current
-repository-wide documentation-quality cleanup does not erase completed functional
-domain evidence.
+implemented. Utils and Brokers are completed implementation baselines; Data is
+`Partial` pending `CAP-DATA-023` series-level quality inspection; Indicators and the
+remaining domains are tracked independently, and current repository-wide
+documentation-quality cleanup does not erase completed functional domain evidence.
 
 ---
 

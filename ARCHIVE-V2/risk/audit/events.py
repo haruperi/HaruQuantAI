@@ -11,8 +11,6 @@ import hashlib
 from collections.abc import Mapping
 from typing import Any
 
-from pydantic import Field, JsonValue
-
 from app.services.risk.audit.hash_chain import (
     _coerce_types,
     append_audit_hash,
@@ -28,6 +26,7 @@ from app.services.risk.models import (
 from app.services.risk.models.enums import RiskDecisionStatus
 from app.utils.logger import logger
 from app.utils.standard import canonical_json, stable_identifier
+from pydantic import Field, JsonValue
 
 
 class AuditRedactionPolicy(RiskContract):

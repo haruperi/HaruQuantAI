@@ -21,8 +21,6 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, overload
 
-from pydantic import Field
-
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
     PortfolioState,
@@ -34,6 +32,7 @@ from app.services.risk.models import (
     RiskSeverity,
 )
 from app.utils.logger import logger
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.risk.models import (

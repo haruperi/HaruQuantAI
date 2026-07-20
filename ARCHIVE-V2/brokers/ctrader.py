@@ -11,6 +11,12 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pandas as pd
+from app.services.brokers.errors import BrokerConfigurationError as ConfigurationError
+from app.services.brokers.errors import (
+    BrokerExternalServiceError as ExternalServiceError,
+)
+from app.utils.logger import logger
+from app.utils.settings import settings
 from ctrader_open_api import (  # type: ignore[import-untyped, unused-ignore]
     Client,
     EndPoints,
@@ -48,13 +54,6 @@ from ctrader_open_api.protobuf import (  # type: ignore[import-untyped, unused-i
     Protobuf,
 )
 from twisted.internet import reactor
-
-from app.services.brokers.errors import BrokerConfigurationError as ConfigurationError
-from app.services.brokers.errors import (
-    BrokerExternalServiceError as ExternalServiceError,
-)
-from app.utils.logger import logger
-from app.utils.settings import settings
 
 
 class CTraderClient:

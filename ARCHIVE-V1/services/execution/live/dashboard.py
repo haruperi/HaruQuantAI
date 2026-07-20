@@ -347,7 +347,7 @@ class Dashboard:
         # Try to read from a status file if it exists
         status_file = Path("multi_strategy_status.json")
         if status_file.exists():
-            with contextlib.suppress(Exception), open(status_file) as f:
+            with contextlib.suppress(Exception), Path(status_file).open() as f:
                 data = json.load(f)
                 self._portfolio_data = data.get("portfolio", {})
                 self._strategy_data = data.get("strategies", [])
@@ -393,7 +393,7 @@ class Dashboard:
 
         with (
             contextlib.suppress(Exception),
-            open(self.log_file, encoding="utf-8") as f,
+            Path(self.log_file).open(encoding="utf-8") as f,
         ):
             # Read last 20 lines
             lines = f.readlines()

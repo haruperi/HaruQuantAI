@@ -1,4 +1,4 @@
-# ruff: noqa: E501, TC001
+# ruff: noqa: E501
 """Reporting and serialization service for Research Edge Lab.
 
 This module converts edge discovery results and profile snapshots to markdown,

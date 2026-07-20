@@ -1256,11 +1256,7 @@ def _max_net_size_held_impl(
     close_sizes = -open_sizes
 
     o_times = trades["open_time"].values
-    c_times = (
-        trades["close_time"]
-        .fillna(end_time if end_time else trades["open_time"].max())
-        .values
-    )
+    c_times = trades["close_time"].fillna(end_time or trades["open_time"].max()).values
 
     event_times = np.concatenate([o_times, c_times])
     event_sizes = np.concatenate([open_sizes, close_sizes])
@@ -2755,7 +2751,7 @@ def _calculate_trade_metrics_impl(
     wins = pnl[pnl > 0]
     losses = pnl[pnl < 0]
     data = {
-        "trade_count": int(len(pnl)),
+        "trade_count": len(pnl),
         "win_rate": float(len(wins) / len(pnl)) if len(pnl) else 0.0,
         "expectancy": float(pnl.mean()) if len(pnl) else 0.0,
         "profit_factor": float(wins.sum() / abs(losses.sum()))
@@ -2778,7 +2774,6 @@ def get_ordered_closed_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _get_ordered_closed_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2844,7 +2839,6 @@ def win_rate_fraction(values, epsilon: float = EPSILON) -> dict[str, Any]:
     """AI Tool wrapper for _win_rate_fraction_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2935,7 +2929,6 @@ def avg_win_loss(values, epsilon: float = EPSILON) -> dict[str, Any]:
     """AI Tool wrapper for _avg_win_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3026,7 +3019,6 @@ def consecutive_wins_losses(values, epsilon: float = EPSILON) -> dict[str, Any]:
     """AI Tool wrapper for _consecutive_wins_losses_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3117,7 +3109,6 @@ def median_mae_mfe(mae: np.ndarray, mfe: np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _median_mae_mfe_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3204,7 +3195,6 @@ def get_mae_mfe_r(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _get_mae_mfe_r_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3269,7 +3259,6 @@ def t_statistic(values) -> dict[str, Any]:
     """AI Tool wrapper for _t_statistic_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3332,7 +3321,6 @@ def open_position_pnl(open_trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _open_position_pnl_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3397,7 +3385,6 @@ def total_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _total_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3462,7 +3449,6 @@ def winning_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _winning_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3527,7 +3513,6 @@ def losing_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _losing_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3592,7 +3577,6 @@ def breakeven_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _breakeven_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3657,7 +3641,6 @@ def long_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _long_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3720,7 +3703,6 @@ def short_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _short_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3785,7 +3767,6 @@ def count_open_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _count_open_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3850,7 +3831,6 @@ def slippage_paid(trades: pd.DataFrame, closed_only: bool = False) -> dict[str, 
     """AI Tool wrapper for _slippage_paid_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3941,7 +3921,6 @@ def commission_paid(trades: pd.DataFrame, closed_only: bool = False) -> dict[str
     """AI Tool wrapper for _commission_paid_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4032,7 +4011,6 @@ def swap_paid(trades: pd.DataFrame, closed_only: bool = False) -> dict[str, Any]
     """AI Tool wrapper for _swap_paid_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4121,7 +4099,6 @@ def win_rate(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _win_rate_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4184,7 +4161,6 @@ def loss_rate(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _loss_rate_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4247,7 +4223,6 @@ def avg_win(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _avg_win_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4310,7 +4285,6 @@ def largest_win(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _largest_win_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4373,7 +4347,6 @@ def largest_loss(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _largest_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4438,7 +4411,6 @@ def median_win(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _median_win_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4501,7 +4473,6 @@ def median_loss(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _median_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4564,7 +4535,6 @@ def expectancy(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _expectancy_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4627,7 +4597,6 @@ def expectancy_r(r_values: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _expectancy_r_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4692,7 +4661,6 @@ def max_size_held(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _max_size_held_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4759,7 +4727,6 @@ def max_net_size_held(
     """AI Tool wrapper for _max_net_size_held_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4850,7 +4817,6 @@ def max_long_size_held(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _max_long_size_held_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4915,7 +4881,6 @@ def max_short_size_held(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _max_short_size_held_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4980,7 +4945,6 @@ def avg_r_multiple(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _avg_r_multiple_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5045,7 +5009,6 @@ def median_r_multiple(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _median_r_multiple_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5110,7 +5073,6 @@ def r_multiple_distribution(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _r_multiple_distribution_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5175,7 +5137,6 @@ def r_expectancy(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _r_expectancy_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5240,7 +5201,6 @@ def max_r_multiple(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _max_r_multiple_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5305,7 +5265,6 @@ def min_r_multiple(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _min_r_multiple_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5370,7 +5329,6 @@ def median_mae_r(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _median_mae_r_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5435,7 +5393,6 @@ def median_mfe_r(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _median_mfe_r_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5500,7 +5457,6 @@ def max_consecutive_wins(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _max_consecutive_wins_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5565,7 +5521,6 @@ def max_consecutive_losses(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _max_consecutive_losses_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5630,7 +5585,6 @@ def avg_consecutive_wins(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _avg_consecutive_wins_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5695,7 +5649,6 @@ def avg_consecutive_losses(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _avg_consecutive_losses_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5760,7 +5713,6 @@ def win_loss_streaks(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _win_loss_streaks_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5825,7 +5777,6 @@ def avg_time_in_trade(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _avg_time_in_trade_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5890,7 +5841,6 @@ def median_time_in_trade(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _median_time_in_trade_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5955,7 +5905,6 @@ def max_time_in_trade(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _max_time_in_trade_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6020,7 +5969,6 @@ def min_time_in_trade(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _min_time_in_trade_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6085,7 +6033,6 @@ def sqn(trades: pd.DataFrame | pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _sqn_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6148,7 +6095,6 @@ def kelly_criterion(trades: pd.DataFrame | pd.Series | np.ndarray) -> dict[str, 
     """AI Tool wrapper for _kelly_criterion_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6217,7 +6163,6 @@ def compute_r_trade_metrics(
     """AI Tool wrapper for _compute_r_trade_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6334,7 +6279,6 @@ def compute_trade_metrics(
     """AI Tool wrapper for _compute_trade_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6449,7 +6393,6 @@ def compute_equity_metrics(
     """AI Tool wrapper for _compute_equity_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6540,7 +6483,6 @@ def trade_efficiency(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _trade_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6605,7 +6547,6 @@ def r_signal_to_noise(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _r_signal_to_noise_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6672,7 +6613,6 @@ def rolling_expectancy_stability(
     """AI Tool wrapper for _rolling_expectancy_stability_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6764,7 +6704,6 @@ def win_after_win_probability(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _win_after_win_probability_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6830,7 +6769,6 @@ def runs_test_zscore(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _runs_test_zscore_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6899,7 +6837,6 @@ def trading_period_duration(
     """AI Tool wrapper for _trading_period_duration_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7016,7 +6953,6 @@ def trade_outcome_entropy(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _trade_outcome_entropy_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7085,7 +7021,6 @@ def longest_flat_period_duration(
     """AI Tool wrapper for _longest_flat_period_duration_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7210,7 +7145,6 @@ def calculate_trade_metrics(
     """AI Tool wrapper for _calculate_trade_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

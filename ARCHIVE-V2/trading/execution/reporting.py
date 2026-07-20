@@ -8,13 +8,10 @@ shortfall, fill latency, partial-fill counts, and transaction cost facts —
 under the versioned contract schema (TRD-XM-004). Trading performs no metric
 aggregation of its own; analytics consumes these contracts.
 """
-# ruff: noqa: TC001 -- pydantic model field types must stay real runtime imports.
 
 from __future__ import annotations
 
 from decimal import Decimal
-
-from pydantic import Field, model_validator
 
 from app.services.trading.contracts import (
     OrderState,
@@ -29,6 +26,7 @@ from app.services.trading.execution.coordinator import (
 from app.services.trading.execution.state_machine import LifecycleKind
 from app.services.trading.security.error_mapping import TradingMappedError
 from app.utils.logger import logger
+from pydantic import Field, model_validator
 
 _VALID_SIDES = frozenset({"buy", "sell"})
 _BPS_DENOMINATOR = Decimal(10_000)

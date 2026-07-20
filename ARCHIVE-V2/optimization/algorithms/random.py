@@ -11,8 +11,6 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
-
 from app.services.optimization.algorithms.grid import check_constraints
 from app.services.optimization.errors import (
     OptimizationValidationError as ValidationError,
@@ -30,6 +28,7 @@ from app.services.optimization.models import (
 )
 from app.services.optimization.scoring import evaluate_candidate_score
 from app.utils.logger import logger
+from pydantic import BaseModel, Field
 
 
 class ManualPairInput(BaseModel):

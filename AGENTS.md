@@ -55,14 +55,26 @@
     - Explicit type hints on all signatures.
     - Every module, class, and function should be properly fitted with Google-style docstrings.
     - Docstrings should always include, description, args, return values, exceptions raised, and type hints.
-    - Every function is properly logged using system-wide logger (from app.utils import logger).
-    - No function should be silent and must have at least one logger stating what is being done in that function.
+    - Functions that own material I/O, persistence, external calls, or lifecycle/state
+      transitions use the system-wide logger (`from app.utils import logger`) for
+      bounded start/outcome/failure evidence. Pure deterministic transforms,
+      validators, immutable contract construction, accessors, and the logging
+      implementation itself do not emit logs solely to satisfy a mechanical rule;
+      their governed caller logs the material action. Imports remain silent.
 - **Imports**: Absolute imports, grouped (stdlib, 3rd-party, local).
 - **Versioning**: Always confirm library versions before coding. Default to `pyproject.toml` pinned version.
 - **Quality**: 80% `pytest` coverage minimum. No bare `except:`. Application and
   library code uses `logger`, never `print`. Directly executable teaching and
   usage-example scripts may use `print` to display bounded, secret-safe results.
   No silent failures.
+- **Usage Evidence**: Usage examples are standalone numbered programs, not pytest
+  tests. Each registered `FEAT-[DOM]-NN` has exactly one corresponding program in
+  `tests/[domain]/usage/`; that program calls every public operation and constructor
+  in the feature through the documented public API using realistic, bounded,
+  secret-safe data or genuine runtime state. Programs define `main()`, use an
+  `if __name__ == "__main__"` guard, are excluded from pytest collection, and are
+  verified by direct Python execution. Unit and integration behavior remains in
+  pytest files outside `usage/`.
 - **Security**: Never commit secrets. Redact sensitive values in logs. `.env.example` only.
 
 ## 5. Safety & Governance

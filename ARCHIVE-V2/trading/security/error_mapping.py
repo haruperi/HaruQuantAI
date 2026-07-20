@@ -9,12 +9,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from pydantic import ValidationError as PydanticValidationError
-
 from app.services.trading.contracts import JsonObject, JsonValue, TradingError
 from app.services.trading.errors import TradingError as UtilityTradingError
 from app.utils.logger import logger
 from app.utils.security import redact_text, redact_value
+from pydantic import ValidationError as PydanticValidationError
 
 
 class TradingMappedError(UtilityTradingError):

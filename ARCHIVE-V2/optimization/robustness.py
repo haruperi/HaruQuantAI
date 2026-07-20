@@ -11,7 +11,6 @@ import uuid
 from typing import Any, Literal
 
 import numpy as np
-
 from app.services.optimization.models import (
     MonteCarloResponse,
     MonteCarloResult,

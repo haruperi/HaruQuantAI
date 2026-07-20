@@ -8,7 +8,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicator.standard import run_indicator_tool
 from app.services.indicator.validation import (
     require_columns,

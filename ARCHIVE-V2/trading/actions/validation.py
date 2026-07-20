@@ -19,8 +19,6 @@ from __future__ import annotations
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 from enum import StrEnum
 
-from pydantic import Field, model_validator
-
 from app.services.trading.contracts import (
     JsonObject,
     TimeInForce,
@@ -32,6 +30,7 @@ from app.services.trading.security.error_mapping import (
     TradingValidationError,
 )
 from app.utils.logger import logger
+from pydantic import Field, model_validator
 
 BPS_DENOMINATOR = Decimal(10_000)
 LIVE_SENSITIVE_ROUTES = frozenset({TradingRoute.LIVE})

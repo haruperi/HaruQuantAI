@@ -7,8 +7,6 @@ Classes and functions:
     LiveTradingNotifier: Class. Provides LiveTradingNotifier behavior for execution workflows.
 """
 
-from data.database.sqlite import SQLiteDatabase
-
 from app.services.notification import (
     NotificationLevel,
     NotificationManager,
@@ -16,6 +14,7 @@ from app.services.notification import (
 )
 from app.services.notification.config import NotificationConfig
 from app.services.utils.logger import logger
+from data.database.sqlite import SQLiteDatabase
 
 
 class LiveTradingNotifier:

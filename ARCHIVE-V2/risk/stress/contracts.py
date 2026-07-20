@@ -9,8 +9,6 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
-from pydantic import Field
-
 from app.services.risk.models import (
     PortfolioState,
     ProposedTrade,
@@ -18,6 +16,7 @@ from app.services.risk.models import (
     StressScenarioResult,
 )
 from app.utils.logger import logger
+from pydantic import Field
 
 # Re-export StressScenarioResult for usage convenience
 __all__ = [

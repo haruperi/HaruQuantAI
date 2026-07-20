@@ -28,8 +28,6 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import TYPE_CHECKING, Protocol
 
-from pydantic import Field, model_validator
-
 from app.services.trading.contracts import (
     AllocationVector,
     JsonObject,
@@ -40,6 +38,7 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.security.error_mapping import TradingMappedError
 from app.utils.logger import logger
+from pydantic import Field, model_validator
 
 if TYPE_CHECKING:
     from collections.abc import Callable

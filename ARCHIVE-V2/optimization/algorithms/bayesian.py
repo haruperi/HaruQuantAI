@@ -10,11 +10,10 @@ import importlib
 import time
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, Field
-
 from app.services.optimization.algorithms.random import random_search
 from app.services.optimization.helpers import OptimizationExecutionError
 from app.utils.logger import logger
+from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
     from app.services.optimization.models import (

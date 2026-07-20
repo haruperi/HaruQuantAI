@@ -3,7 +3,6 @@
 from typing import Any
 
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -29,7 +28,9 @@ class EMA(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'ema_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 10, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 10, column: str = "close", **kwargs: Any
+    ) -> pd.DataFrame:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:

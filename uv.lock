@@ -551,11 +551,10 @@ wheels = [
 
 [[package]]
 name = "haruquantai"
-version = "0.1.0"
+version = "2.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "coverage" },
-    { name = "cryptography" },
     { name = "ctrader-open-api" },
     { name = "detect-secrets" },
     { name = "fastapi" },
@@ -584,7 +583,6 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "coverage", specifier = ">=7.14.2" },
-    { name = "cryptography", specifier = ">=42.0.8" },
     { name = "ctrader-open-api", specifier = ">=0.9.2" },
     { name = "detect-secrets", specifier = ">=1.5.0" },
     { name = "fastapi", specifier = ">=0.115.0" },

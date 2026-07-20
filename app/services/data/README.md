@@ -1,8 +1,8 @@
 # Data
 
 > **Package:** `app/services/data`
-> **Status:** `Completed implementation baseline`
-> **Last updated:** `2026-07-19`
+> **Status:** `Partial` — baseline complete except `CAP-DATA-023` series-level quality inspection
+> **Last updated:** `2026-07-20`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -27,6 +27,10 @@ execution decision.
 
 - Historical and real-time market-data acquisition, normalization, provenance,
   quality validation, availability inspection, and multi-timeframe alignment.
+- Series-level market-data quality inspection: gap, spike, flat-line, zero-volume,
+  duplicate-bar, and spread-breach detection, deterministic quality scoring, and
+  recommended remediation evidence. Quality evidence is always computed from the
+  records examined.
 - Historical market/account data tables, local CSV/Parquet datasets, cache state,
   source policy, job/checkpoint state, feed status, and durable audit storage.
 - Shared SQLite connections, path-scoped write locking, and migration execution;
@@ -170,7 +174,7 @@ flowchart TD
     STORAGE --> STFILES[database.py; locking.py; datasets.py; cache.py; audit.py; migrations.py]
     SOURCES --> SOFILES[protocol.py; registry.py; policy.py; broker.py; local.py; external.py]
     ACCESS --> AFILES[historical.py; reference.py; sessions.py; context.py; fx.py]
-    PROCESSING --> PFILES[timeframes.py; transforms.py; synthetic.py; ticks.py]
+    PROCESSING --> PFILES[timeframes.py; transforms.py; tabular.py; quality.py; synthetic.py; ticks.py]
     JOBS --> JFILES[backfill.py; scheduler.py]
     FEEDS --> FFILES[runtime.py; status.py]
     API --> APIFILES[_requests.py; _runtime.py; operations.py]
@@ -231,6 +235,7 @@ app/services/data/
 │   ├── timeframes.py                   # One timeframe source of truth
 │   ├── transforms.py                   # Resample, align, aggregate
 │   ├── tabular.py                      # Canonical analytical projections and comparison
+│   ├── quality.py                      # Series-level anomaly detection, scoring, remediation
 │   ├── synthetic.py                    # Seeded bounded GBM bars/ticks (fixtures only)
 │   └── ticks.py                        # Real-evidence tick-series generation
 ├── jobs/                               # Update/backfill lifecycle
@@ -316,7 +321,7 @@ an explicit exclusion.
 | `CAP-DATA-002` Historical OHLCV/tick/spread retrieval | Modify | `access/historical.py`, typed retrieval operations, `WF-DATA-001/002` |
 | `CAP-DATA-003` Source protocol/registry/readiness/adapters | Modify | `sources/`, `FR-DATA-022–029` |
 | `CAP-DATA-004` Canonical records/UTC/versioning | Modify | `contracts/records.py`, `contracts/market.py` |
-| `CAP-DATA-005` Quality/gaps/availability/revision | Modify/Replace | `DataQualityReport`, `DataAvailability`, `inspect_availability`, `get_data_availability` |
+| `CAP-DATA-005` Quality/gaps/availability/revision | Modify/Replace | `DataQualityReport`, `DataAvailability`, `inspect_availability`, `get_data_availability`; series-level detection and scoring in `processing/quality.py` (`CAP-DATA-023`) |
 | `CAP-DATA-006` Versioned cache and safe clear | Modify | `storage/cache.py`, `clear_data_cache` |
 | `CAP-DATA-007` Local CSV/Parquet and atomic storage | Modify | `storage/datasets.py`, `save_market_data`, `load_local_dataset` |
 | `CAP-DATA-008` SQLite state and transactional infrastructure | Modify | `storage/database.py`, `locking.py`, `migrations.py`, `audit.py` |
@@ -325,6 +330,7 @@ an explicit exclusion.
 | `CAP-DATA-011` Timeframes/resampling/alignment/aggregation | Merge/Modify | `processing/timeframes.py`, `transforms.py`, typed transform operations |
 | `CAP-DATA-012` Deterministic synthetic generation | Modify | `processing/synthetic.py`, typed synthetic operations, `WF-DATA-005` |
 | `CAP-DATA-022` Real-evidence tick-series generation | Add | `processing/ticks.py`, `FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016` |
+| `CAP-DATA-023` Series-level quality detection, scoring, and remediation evidence | Add | `processing/quality.py`, `FR-DATA-091`–`FR-DATA-094`, `WF-DATA-001` step 4 |
 | `CAP-DATA-013` Historical labeling | Retired | Owned by Research; no Data implementation |
 | `CAP-DATA-014` Market hours/sessions/volume | Modify/Add | `access/sessions.py`, three typed retrieval operations, `WF-DATA-010` |
 | `CAP-DATA-015` License/fallback/rate/breaker/source safety | Modify | `sources/policy.py`, source manifests, `WF-DATA-011` |
@@ -394,9 +400,12 @@ an explicit exclusion.
 3. Resolve cache identity from source revision, schema/normalization versions, raw
    hash when known, request dimensions, and policy.
 4. Fetch from one lazy read adapter on cache miss, normalize UTC records, and create a
-   bounded quality report.
+   bounded quality report by running `inspect_dataset_quality` over the normalized
+   records under the active `QUALITY_PROFILE`. The report always reflects the actual
+   records examined; a constant or unexamined score is never emitted.
 5. Fail closed for blocking quality/precision violations; otherwise return the typed
-   dataset or JSON-safe envelope with attempted-source metadata.
+   dataset or JSON-safe envelope with attempted-source metadata. Advisory issues
+   reduce `quality_score` and populate `issues`/`warnings` without blocking.
 
 **Failure behaviour:** invalid input → `VALIDATION_FAILED`; undeclared fallback → no
 fallback; unavailable/staging-disallowed source → `SOURCE_UNAVAILABLE`; missing
@@ -968,6 +977,7 @@ MarketDataset
 | Completed | `timeframes.py` | Provide one private canonical timeframe manifest and conversion rules. | `TIMEFRAME_MANIFEST`, `get_timeframe_spec`, `validate_resample_target` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `contracts.errors` |
 | Completed | `transforms.py` | Resample bars, align datasets, and aggregate ticks. | `resample_dataset`, `align_datasets`, `aggregate_ticks` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `contracts`, `timeframes.py` |
 | Completed | `tabular.py` | Project canonical OHLCV/spread or tick evidence to public analytical DataFrames; align and serialize private DataFrames; compare bounded OHLC/OHLCV evidence. | `to_ohlcv_dataframe`, `to_tick_dataframe`; private tabular helpers | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `contracts` |
+| Missing | `quality.py` | Detect series-level temporal and statistical anomalies in normalized records and produce bounded scored quality evidence with severity and remediation. Computes no business metric and mutates no dataset. | `QualityPolicy`, `inspect_dataset_quality`, `summarize_quality_remediation` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `contracts` → `DataQualityReport`, `QualityIssue`, records; `timeframes.py` → expected frequency; `access/sessions.py` → optional `MarketCalendar` |
 | Completed | `synthetic.py` | Generate bounded deterministic Decimal-only GBM bars/ticks for fixtures and tests only; never an input to an official Simulation run. | `generate_synthetic_dataset` | **Standard library:** `datetime`, `decimal`, `random`<br>**Required third-party:** None<br>**Local:** `contracts`, `timeframes.py` |
 | Completed | `ticks.py` | Derive canonical tick series from real bar or tick evidence under four approved models and three spread models. Carries no strategy, signal, or order concept. | `generate_tick_series`, `generate_tick_series_to_parquet`, `TICK_GENERATION_MODELS`, `SPREAD_MODELS` | **Standard library:** `collections.abc`, `datetime`, `decimal`, `pathlib`, `random`<br>**Required third-party:** `numpy`, `pandas`, `pyarrow`<br>**Local:** `contracts`, `timeframes.py`, `tabular.py` |
 | Retired | `labeling.py` | Removed: Research owns historical labeling. | — | — |
@@ -986,6 +996,11 @@ MarketDataset
 | Completed | `GENERATED_TICKS_MIN_PER_BAR` | `int` | `4` | Yes | `generate_tick_series()` | Guarantees the four canonical waypoints exist when real `tick_volume` is lower. |
 | Completed | `TICK_SERIES_MAX_RECORDS` | `int` | None | Yes before public activation | `generate_tick_series()` | Deployment must supply a measured positive bound; oversized direct responses return `LIMIT_EXCEEDED`. Streaming to Parquet is the bounded alternative. |
 | Completed | `TICK_PARQUET_MAX_OUTPUT_ROWS_PER_CHUNK` | `int` | `2000000` | Yes | `generate_tick_series_to_parquet()` | Output-aware chunking ceiling; input slices are sized from estimated output rows, not input rows. |
+| Missing | `QUALITY_PROFILE` | `str` | `standard` | Yes | `inspect_dataset_quality()` | Exactly `strict`, `standard`, or `lenient`. Selects one frozen `QualityPolicy` threshold set; individual thresholds are not separately tunable configuration. An unrecognized value fails rather than falling back. |
+| Missing | `QUALITY_PROFILE_THRESHOLDS` | `Mapping[str, QualityPolicy]` | Frozen built-in set | Yes | `inspect_dataset_quality()` | Immutable module-level mapping defining spike sigma, flat-line run length, zero-volume run length, spread ceiling, and gap tolerance per profile. Not environment-configurable. |
+| Missing | `QUALITY_BLOCKING_ISSUES` | `frozenset[str]` | `{"MISSING_BARS", "DUPLICATE_BARS"}` | Yes | `inspect_dataset_quality()` | Closed set of issue codes that set `quality_status="failed"`. Every other detected issue is advisory: it reduces `quality_score` and appears in `issues` without blocking. |
+| Missing | `QUALITY_MIN_SCORE` | `Decimal` | `0.90` | Yes | `WF-DATA-001` | Score below this value sets `quality_status="failed"` under the `strict` profile only; `standard` and `lenient` treat it as advisory. |
+| Missing | `QUALITY_SEVERITY_WEIGHTS` | `Mapping[str, Decimal]` | `info=0`, `warning=0.25`, `error=0.5`, `critical=1.0` | Yes | `inspect_dataset_quality()` | Deterministic weights used by the score formula in `FR-DATA-093`. |
 
 #### Tabular market-data implementation
 
@@ -1008,6 +1023,48 @@ provenance, and availability evidence.
 | Completed | `FR-DATA-084` | Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper. | `execute_backfill_chunk` | Persistence write | Existing job errors | **Usage:** `tests/data/usage/06_update_jobs.py::example_fr_data_084_private_chunking_boundary()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_backfill_key_is_canonical()` |
 | Completed | `FR-DATA-085` | Project one canonical bar `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly six finite float64 columns: `open`, `high`, `low`, `close`, `volume`, and provider-reported `spread`; expose the common native spread unit in `DataFrame.attrs["spread_unit"]` and fail if spread evidence is missing or inconsistent. | `to_ohlcv_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/01_retrieval_referance.py`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_ohlcv_dataframe_returns_float64_analytical_copy()` |
 | Completed | `FR-DATA-086` | Project one canonical tick `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly four float64 columns: `bid`, `ask`, `last`, and `volume`; represent genuine missing optional values as `NaN`, expose common price/volume units in `DataFrame.attrs`, and fail on inconsistent units or unsafe float64 conversion. | `to_tick_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/01_retrieval_referance.py`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_tick_dataframe_returns_float64_analytical_copy()` |
+
+#### Series-level quality inspection
+
+Record-level invariants (finite prices, non-negative volume and spread, `low <= high`,
+open/close inside the bar range, aware UTC timestamps) are enforced fail-closed at
+contract construction in `contracts/records.py` and are not repeated here. Ordering and
+uniqueness are enforced during normalization in `access/historical.py`.
+
+`processing/quality.py` owns the remaining question: whether a *series* is trustworthy.
+It examines already-normalized records for temporal and statistical anomalies that no
+single record can reveal, and returns evidence only. It never mutates, repairs, drops,
+or interpolates records, and it never decides the workflow outcome — the calling
+workflow owns the fail-closed decision.
+
+Two rules are normative:
+
+- **No invented evidence.** Every field of a returned `DataQualityReport` is derived
+  from the records actually examined. A constant score, an unexamined report, or a
+  score produced without running detection is prohibited (`docs/PROJECT.md` §2.1.3
+  Key Limits; `AGENTS.md` §5).
+- **Deterministic and clock-free.** Detection is a pure function. `generated_at` is
+  supplied by the caller from existing retrieval evidence; the module reads no clock,
+  performs no I/O, and satisfies `NFR-DATA-002`.
+
+Calendar awareness is optional in the first iteration. When a `MarketCalendar` is
+injected, scheduled closures are discounted from gap detection. When it is absent, the
+detector falls back to `SessionWindow` evidence from `access/sessions.py` and marks
+every gap issue `calendar_unverified=true` rather than silently over- or under-reporting.
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-091` | Detect missing bars against the expected timeframe frequency, discounting scheduled closures from an injected `MarketCalendar` when available and marking issues `calendar_unverified` when it is not. Emit `MISSING_BARS` with affected count and bounded samples. | `inspect_dataset_quality(dataset: MarketDataset, *, policy: QualityPolicy \| None = None, calendar: MarketCalendar \| None = None, generated_at: datetime) -> DataQualityReport` | None | `DataError[VALIDATION_FAILED\|UNSUPPORTED_TIMEFRAME]`: malformed policy or unsupported timeframe | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_091_gap_detection()`<br>**Unit:** `tests/data/unit/test_quality.py::test_gap_detection_discounts_scheduled_closure()`, `test_gap_marks_calendar_unverified_without_calendar()` |
+| Missing | `FR-DATA-092` | Detect price spikes beyond the profile sigma bound, flat-line runs, zero-volume runs, duplicate bars at distinct timestamps, and spread-threshold breaches. Each issue carries a code, severity, affected count, and bounded samples honouring `sample_limit` and `truncated`. | `inspect_dataset_quality` | None | `DataError[VALIDATION_FAILED]`: malformed policy | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_092_anomaly_detection()`<br>**Unit:** `tests/data/unit/test_quality.py::test_flatline_run_is_reported()`, `test_issue_samples_respect_limit()` |
+| Missing | `FR-DATA-093` | Compute `quality_score` as `1 − Σ(severity_weight × affected_count / checked_count)` clamped to `[0, 1]` in `Decimal`, and derive `quality_status`: `failed` when any `QUALITY_BLOCKING_ISSUES` code is present (or, under `strict`, when the score is below `QUALITY_MIN_SCORE`), otherwise `passed_with_warnings` when any issue or warning exists, otherwise `passed`. A constant or unexamined score is never emitted. | `inspect_dataset_quality` | None | `DataError[VALIDATION_FAILED]`: non-finite or out-of-range computed score | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_093_quality_score()`<br>**Unit:** `tests/data/unit/test_quality.py::test_score_reflects_issue_severity()`, `test_clean_series_scores_one()`, `test_score_is_never_constant_across_differing_inputs()` |
+| Missing | `FR-DATA-094` | Map each detected issue code to one deterministic recommended remediation action without mutating the dataset or performing the remediation. | `summarize_quality_remediation(report: DataQualityReport) -> Mapping[str, str]` | None | `DataError[VALIDATION_FAILED]`: unknown issue code | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_094_remediation()`<br>**Unit:** `tests/data/unit/test_quality.py::test_remediation_is_deterministic()`, `test_remediation_does_not_mutate_report()` |
+
+**Quality evidence propagation.** Only `access/historical.py` computes a fresh report,
+at `WF-DATA-001` step 4. `processing/transforms.py`, `processing/ticks.py`, and
+`processing/synthetic.py` propagate the source dataset's report with updated
+provenance rather than manufacturing new evidence — a transform changes the shape of a
+series, not the trustworthiness of the observations it was derived from. A caller that
+needs post-transform evidence calls `inspect_dataset_quality` explicitly.
 
 #### Public processing API
 
@@ -1231,6 +1288,7 @@ layer defines no parallel business logic.
 | Retrieval and reference | `get_market_data`, `get_tick_data`, `get_spread_data`, `get_symbol_metadata`, `list_symbols`, `get_data_availability`, `get_market_hours`, `get_trading_sessions`, `get_historical_volume` | `MarketDataset`, `DataAvailability`, source/reference result contracts |
 | Storage | `save_market_data`, `load_local_dataset`, `clear_data_cache` | `StorageManifest`, `MarketDataset`, `CacheClearResult` |
 | Processing | `resample_ohlcv`, `align_multitimeframe_data`, `generate_synthetic_ticks`, `generate_synthetic_bars`, `aggregate_ticks_to_bars`, `generate_tick_series`, `generate_tick_series_to_parquet`, `to_ohlcv_dataframe`, `to_tick_dataframe` | `MarketDataset`; detached OHLCV/spread or tick `pandas.DataFrame`; bounded Parquet artifact reference |
+| Quality | `inspect_data_quality`, `get_quality_policy`, `summarize_quality_remediation` | `DataQualityReport`, `QualityPolicy`, deterministic remediation mapping |
 | Jobs | `create_data_update_job`, `start_data_update_job`, `stop_data_update_job`, `run_data_update_job_once`, `get_data_update_job_status` | Data-owned job definition, run, and status contracts |
 | Feeds | `get_feed_status` | Data-owned feed status contract |
 
@@ -1391,12 +1449,17 @@ run the complete Data set at the feature/slice completion gate.
   current Ruff rules report documentation-only findings and four usage files
   require formatting.
 - [x] Source promotion and production evidence are approved for every enabled source.
+- [ ] Every emitted `DataQualityReport` is computed from the records examined;
+  `CAP-DATA-023` / `FR-DATA-091`–`FR-DATA-094` are implemented and no construction
+  site returns a constant score.
 
-Current implementation status: `Completed implementation baseline`. The final
-package, contracts, workflows, and domain-scoped functional tests satisfy this
-specification and are reused by later agile phases. Repository-wide
-semantic-docstring/format cleanup remains a separate quality gate and does not
-authorize rebuilding Data.
+Current implementation status: `Partial`. The final package, contracts, workflows, and
+domain-scoped functional tests satisfy this specification and are reused by later
+agile phases, with one accepted functional gap: series-level quality inspection
+(`CAP-DATA-023`, `FR-DATA-091`–`FR-DATA-094`) is specified but not implemented, so
+`DataQualityReport` currently carries a constant score and an empty issue list.
+Repository-wide semantic-docstring/format cleanup remains a separate quality gate and
+does not authorize rebuilding Data.
 
 ---
 

@@ -9,10 +9,9 @@ import hashlib
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-
 from app.services.risk.errors import RiskValidationError as ValidationError
 from app.utils.standard import SENSITIVE_KEY_PATTERN, canonical_json
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 if TYPE_CHECKING:
     from app.services.trading.contracts import OrderIntent

@@ -97,7 +97,7 @@ def risk_observed(
     def decorator(func: RiskCallableT) -> RiskCallableT:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            active_logger.info(f"Starting risk boundary operation: {operation}")
+            active_logger.info("Starting risk boundary operation: %s", operation)
             t_start = time.perf_counter()
             try:
                 res = func(*args, **kwargs)
@@ -105,7 +105,9 @@ def risk_observed(
                     str(round((time.perf_counter() - t_start) * 1000, 3))
                 )
                 active_logger.info(
-                    f"Risk boundary operation '{operation}' completed in {t_duration}ms"
+                    "Risk boundary operation '%s' completed in %sms",
+                    operation,
+                    t_duration,
                 )
                 # Emit latency metric
                 latency_event = build_latency_metric(operation, t_duration)
@@ -116,7 +118,10 @@ def risk_observed(
                     str(round((time.perf_counter() - t_start) * 1000, 3))
                 )
                 active_logger.error(
-                    f"Risk boundary operation '{operation}' failed in {t_duration}ms: {e}"
+                    "Risk boundary operation '%s' failed in %sms: %s",
+                    operation,
+                    t_duration,
+                    e,
                 )
                 latency_event = build_latency_metric(operation, t_duration)
                 emit_risk_metrics(latency_event, metrics)

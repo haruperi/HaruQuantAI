@@ -5,8 +5,6 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
-
 from app.services.utils.normalization import (
     Clock,
     FreshnessClass,
@@ -14,6 +12,7 @@ from app.services.utils.normalization import (
     SystemClock,
     evaluate_freshness,
 )
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 MarketSnapshotType = Literal[
     "best_bid_ask_tick", "spread_snapshot", "symbol_tradability_status"

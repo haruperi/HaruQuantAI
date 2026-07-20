@@ -6,10 +6,9 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 from app.services.risk.limits import RiskLimits
 from app.services.risk.models import PortfolioState
+from scipy import stats
 
 _FX_BRIDGE_CURRENCIES = ("USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD")
 

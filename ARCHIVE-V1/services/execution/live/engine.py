@@ -14,12 +14,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
-from data.database.sqlite.database_operations import DatabaseManager
-from data.strategies import storage
-from data.strategies.baselines.close_breakout import CloseBreakoutStrategy
-from data.strategies.baselines.mean_reversion import MeanReversionStrategy
-from data.strategies.baselines.trend_following import TrendFollowingStrategy
-
 from app.services.execution.live.bar_monitor import BarMonitor
 from app.services.execution.live.config import load_config_mapping
 from app.services.execution.live.mt5_compat import (
@@ -37,6 +31,11 @@ from app.services.risk.live.portfolio_manager import PortfolioManager
 from app.services.risk.live.safety_checks import SafetyChecker
 from app.services.trading.permissions import assert_strategy_allowed
 from app.services.utils.logger import logger
+from data.database.sqlite.database_operations import DatabaseManager
+from data.strategies import storage
+from data.strategies.baselines.close_breakout import CloseBreakoutStrategy
+from data.strategies.baselines.mean_reversion import MeanReversionStrategy
+from data.strategies.baselines.trend_following import TrendFollowingStrategy
 
 if TYPE_CHECKING:
     from app.services.brokers.mt5 import MT5Client
@@ -930,7 +929,7 @@ class MultiStrategyEngine:
 
             # Write to status file
             status_file = Path("multi_strategy_status.json")
-            with open(status_file, "w") as f:
+            with Path(status_file).open("w") as f:
                 json.dump(status, f, indent=2)
 
             logger.debug("Status exported for dashboard")

@@ -845,7 +845,7 @@ def _time_weighted_avg_exposure_impl(
         return 0.0
 
     open_times = trades["open_time"].values
-    fallback = end_time if end_time else trades["open_time"].max()
+    fallback = end_time or trades["open_time"].max()
     close_times = trades["close_time"].fillna(fallback).values
     sizes = trades[size_col].abs().values
 
@@ -895,7 +895,7 @@ def _portfolio_margin_utilization_curve_impl(
         return pd.Series(dtype=float)
 
     open_times = trades["open_time"].values
-    fallback = end_time if end_time else trades["open_time"].max()
+    fallback = end_time or trades["open_time"].max()
     close_times = trades["close_time"].fillna(fallback).values
     margins = trades["margin_used"].abs().values
 
@@ -1208,7 +1208,6 @@ def _volatility_impl(rets: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1271,7 +1270,6 @@ def _annualized_volatility_impl(
     """AI Tool wrapper for _annualized_volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1362,7 +1360,6 @@ def _downside_volatility_impl(
     """AI Tool wrapper for _downside_volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1455,7 +1452,6 @@ def _value_at_risk_impl(
     """AI Tool wrapper for _value_at_risk_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1572,7 +1568,6 @@ def _conditional_var_impl(
     """AI Tool wrapper for _conditional_var_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1663,7 +1658,6 @@ def _expected_shortfall_impl(
     """AI Tool wrapper for _expected_shortfall_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1754,7 +1748,6 @@ def _max_loss_probability_impl(
     """AI Tool wrapper for _max_loss_probability_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1847,7 +1840,6 @@ def _drawdown_probability_impl(
     """AI Tool wrapper for _drawdown_probability_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1944,7 +1936,6 @@ def _risk_of_ruin_impl(
     """AI Tool wrapper for _risk_of_ruin_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2115,7 +2106,6 @@ def _max_nominal_exposure_simple_impl(
     """AI Tool wrapper for _max_nominal_exposure_simple_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2209,7 +2199,6 @@ def _max_gross_exposure_impl(
     """AI Tool wrapper for _max_gross_exposure_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2302,7 +2291,6 @@ def _avg_trade_nominal_exposure_impl(
     """AI Tool wrapper for _avg_trade_nominal_exposure_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2398,7 +2386,6 @@ def _exposure_time_ratio_impl(
     """AI Tool wrapper for _exposure_time_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2517,7 +2504,6 @@ def _max_single_trade_margin_utilization_impl(
     """AI Tool wrapper for _max_single_trade_margin_utilization_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2611,7 +2597,6 @@ def _avg_single_trade_margin_utilization_impl(
     """AI Tool wrapper for _avg_single_trade_margin_utilization_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2707,7 +2692,6 @@ def _time_weighted_avg_exposure_impl(
     """AI Tool wrapper for _time_weighted_avg_exposure_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2827,7 +2811,6 @@ def _portfolio_margin_utilization_curve_impl(
     """AI Tool wrapper for _portfolio_margin_utilization_curve_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2950,7 +2933,6 @@ def _compounding_risk_of_ruin_impl(
     """AI Tool wrapper for _compounding_risk_of_ruin_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3099,7 +3081,6 @@ def _risk_of_ruin_with_custom_horizon_impl(
     """AI Tool wrapper for _risk_of_ruin_with_custom_horizon_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3271,7 +3252,6 @@ def _historical_var_by_symbol_impl(
     """AI Tool wrapper for _historical_var_by_symbol_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3366,7 +3346,6 @@ def _portfolio_var_from_covariance_impl(
     """AI Tool wrapper for _portfolio_var_from_covariance_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3492,7 +3471,6 @@ def _calculate_risk_metrics_impl(
     """AI Tool wrapper for _calculate_risk_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3685,7 +3663,6 @@ def volatility(rets: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3748,7 +3725,6 @@ def annualized_volatility(
     """AI Tool wrapper for _annualized_volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3839,7 +3815,6 @@ def downside_volatility(
     """AI Tool wrapper for _downside_volatility_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3932,7 +3907,6 @@ def value_at_risk(
     """AI Tool wrapper for _value_at_risk_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4049,7 +4023,6 @@ def conditional_var(
     """AI Tool wrapper for _conditional_var_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4140,7 +4113,6 @@ def expected_shortfall(
     """AI Tool wrapper for _expected_shortfall_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4231,7 +4203,6 @@ def max_loss_probability(
     """AI Tool wrapper for _max_loss_probability_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4324,7 +4295,6 @@ def drawdown_probability(
     """AI Tool wrapper for _drawdown_probability_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4421,7 +4391,6 @@ def risk_of_ruin(
     """AI Tool wrapper for _risk_of_ruin_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4592,7 +4561,6 @@ def max_nominal_exposure_simple(
     """AI Tool wrapper for _max_nominal_exposure_simple_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4686,7 +4654,6 @@ def max_gross_exposure(
     """AI Tool wrapper for _max_gross_exposure_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4779,7 +4746,6 @@ def avg_trade_nominal_exposure(
     """AI Tool wrapper for _avg_trade_nominal_exposure_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4875,7 +4841,6 @@ def exposure_time_ratio(
     """AI Tool wrapper for _exposure_time_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4994,7 +4959,6 @@ def max_single_trade_margin_utilization(
     """AI Tool wrapper for _max_single_trade_margin_utilization_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5088,7 +5052,6 @@ def avg_single_trade_margin_utilization(
     """AI Tool wrapper for _avg_single_trade_margin_utilization_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5184,7 +5147,6 @@ def time_weighted_avg_exposure(
     """AI Tool wrapper for _time_weighted_avg_exposure_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5304,7 +5266,6 @@ def portfolio_margin_utilization_curve(
     """AI Tool wrapper for _portfolio_margin_utilization_curve_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5427,7 +5388,6 @@ def compounding_risk_of_ruin(
     """AI Tool wrapper for _compounding_risk_of_ruin_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5576,7 +5536,6 @@ def risk_of_ruin_with_custom_horizon(
     """AI Tool wrapper for _risk_of_ruin_with_custom_horizon_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5748,7 +5707,6 @@ def historical_var_by_symbol(
     """AI Tool wrapper for _historical_var_by_symbol_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5843,7 +5801,6 @@ def portfolio_var_from_covariance(
     """AI Tool wrapper for _portfolio_var_from_covariance_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5969,7 +5926,6 @@ def calculate_risk_metrics(
     """AI Tool wrapper for _calculate_risk_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

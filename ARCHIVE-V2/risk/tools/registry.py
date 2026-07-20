@@ -7,10 +7,9 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import Field
-
 from app.services.risk.models import RiskContract
 from app.services.risk.validations import ValidationResult, _fail, _ok
+from pydantic import Field
 
 
 class RiskToolDefinition(RiskContract):

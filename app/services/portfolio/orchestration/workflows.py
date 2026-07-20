@@ -45,7 +45,7 @@ from app.services.trading import (
     StandardTradingEnvelope,
     TradingRoute,
 )
-from app.utils import AuditEvent, canonical_json, derive_stable_id, logger
+from app.utils import AuditEvent, canonical_json, generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.data.contracts import (
@@ -283,17 +283,7 @@ class PortfolioWorkflowService:
             PortfolioError: If audit persistence fails.
         """
         logger.info("Persisting redacted Portfolio workflow audit event")
-        event_id = derive_stable_id(
-            "evt",
-            canonical_json(
-                {
-                    "action": action,
-                    "correlation_id": correlation_id,
-                    "payload": payload,
-                    "request_id": request_id,
-                }
-            ),
-        )
+        event_id = generate_id("evt")
         event = AuditEvent(
             contract_version="v1",
             schema_id="utils.audit_event.v1",

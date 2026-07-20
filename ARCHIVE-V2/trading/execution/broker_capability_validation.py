@@ -14,11 +14,10 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from pydantic import Field, model_validator
-
 from app.services.trading.contracts import TradingContract
 from app.services.trading.security.error_mapping import TradingValidationError
 from app.utils.logger import logger
+from pydantic import Field, model_validator
 
 
 class BrokerCapabilityProfile(TradingContract):

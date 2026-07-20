@@ -11,10 +11,9 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from pydantic import Field, model_validator
-
 from app.services.risk.models.contracts import RiskContract
 from app.utils.logger import logger
+from pydantic import Field, model_validator
 
 if TYPE_CHECKING:
     from app.services.risk.validations import ValidationResult

@@ -5,11 +5,10 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-from pydantic import Field
-
 from app.services.trading.config.models import SecretReference, TradingConfigModel
 from app.services.trading.contracts import MutationCapability
 from app.utils.logger import logger
+from pydantic import Field
 
 
 class SecretResolutionResult(TradingConfigModel):

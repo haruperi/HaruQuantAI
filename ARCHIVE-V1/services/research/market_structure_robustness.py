@@ -18,7 +18,6 @@ from dataclasses import replace
 from typing import Any
 
 import numpy as np
-
 from app.services.research.config import MarketStructureConfig
 from app.services.research.data.models import PreparedDataset
 from app.services.research.market_structure import build_market_structure_profile

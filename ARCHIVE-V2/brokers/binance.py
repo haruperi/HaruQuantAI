@@ -8,9 +8,8 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pandas as pd
-from binance.client import Client as BinanceAPIClient
-
 from app.utils.logger import logger
+from binance.client import Client as BinanceAPIClient
 
 
 class BinanceClient:

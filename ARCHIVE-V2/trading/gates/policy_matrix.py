@@ -9,8 +9,6 @@ permissive default.
 
 from __future__ import annotations
 
-from pydantic import Field
-
 from app.services.trading.contracts import (
     SideEffectMode,
     TradingAction,
@@ -18,6 +16,7 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.security.error_mapping import TradingMappedError
 from app.utils.logger import logger
+from pydantic import Field
 
 
 class PolicyMatrixEntry(TradingContract):

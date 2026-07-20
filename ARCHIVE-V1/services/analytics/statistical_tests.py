@@ -75,8 +75,8 @@ TRADES = False
 
 def _clean_returns(data: np.ndarray | pd.Series) -> np.ndarray:
     """Normalize input to a finite 1D NumPy float array."""
-    arr = cast(np.ndarray, np.asarray(data, dtype=float))
-    return cast(np.ndarray, arr[np.isfinite(arr)])
+    arr = cast("np.ndarray", np.asarray(data, dtype=float))
+    return cast("np.ndarray", arr[np.isfinite(arr)])
 
 
 def _sharpe_ratio(rets: np.ndarray, periods_per_year: int = 252) -> float:
@@ -1033,7 +1033,7 @@ def _returns_from_backtest_result(result: "BacktestResult") -> np.ndarray:
         if eq is None or len(eq) < 2:
             return np.array([], dtype=float)
         returns = eq["equity"].pct_change().dropna()
-        return cast(np.ndarray, _clean_returns(returns))
+        return cast("np.ndarray", _clean_returns(returns))
     except (AttributeError, KeyError, TypeError, ValueError):
         return np.array([], dtype=float)
 
@@ -1280,7 +1280,6 @@ def _whites_reality_check_impl(
     """AI Tool wrapper for _whites_reality_check_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1506,7 +1505,6 @@ def _permutation_test_impl(
     """AI Tool wrapper for _permutation_test_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1707,7 +1705,6 @@ def _bootstrap_confidence_intervals_impl(
     """AI Tool wrapper for _bootstrap_confidence_intervals_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1934,7 +1931,6 @@ def _deflated_sharpe_ratio_impl(
     """AI Tool wrapper for _deflated_sharpe_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2128,7 +2124,6 @@ def _probability_of_backtest_overfitting_impl(
     """AI Tool wrapper for _probability_of_backtest_overfitting_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2223,7 +2218,6 @@ def _walk_forward_degradation_score_impl(
     """AI Tool wrapper for _walk_forward_degradation_score_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2322,7 +2316,6 @@ def _bootstrap_probability_above_threshold_impl(
     """AI Tool wrapper for _bootstrap_probability_above_threshold_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2519,7 +2512,6 @@ def _bonferroni_correction_impl(
     """AI Tool wrapper for _bonferroni_correction_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2611,7 +2603,6 @@ def _benjamini_hochberg_correction_impl(
     """AI Tool wrapper for _benjamini_hochberg_correction_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2703,7 +2694,6 @@ def _sample_size_warning_impl(
     """AI Tool wrapper for _sample_size_warning_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2796,7 +2786,6 @@ def _stability_score_impl(
     """AI Tool wrapper for _stability_score_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2892,7 +2881,6 @@ def _whites_reality_check_backtests_impl(
     """AI Tool wrapper for _whites_reality_check_backtests_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3038,7 +3026,6 @@ def _permutation_test_backtest_impl(
     """AI Tool wrapper for _permutation_test_backtest_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3132,7 +3119,6 @@ def _bootstrap_confidence_intervals_backtest_impl(
     """AI Tool wrapper for _bootstrap_confidence_intervals_backtest_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3232,7 +3218,6 @@ def _print_statistical_validation_report_impl(
     """AI Tool wrapper for _print_statistical_validation_report_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3410,7 +3395,6 @@ def whites_reality_check(
     """AI Tool wrapper for _whites_reality_check_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3636,7 +3620,6 @@ def permutation_test(
     """AI Tool wrapper for _permutation_test_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3837,7 +3820,6 @@ def bootstrap_confidence_intervals(
     """AI Tool wrapper for _bootstrap_confidence_intervals_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4064,7 +4046,6 @@ def deflated_sharpe_ratio(
     """AI Tool wrapper for _deflated_sharpe_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4258,7 +4239,6 @@ def probability_of_backtest_overfitting(
     """AI Tool wrapper for _probability_of_backtest_overfitting_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4353,7 +4333,6 @@ def walk_forward_degradation_score(
     """AI Tool wrapper for _walk_forward_degradation_score_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4452,7 +4431,6 @@ def bootstrap_probability_above_threshold(
     """AI Tool wrapper for _bootstrap_probability_above_threshold_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4649,7 +4627,6 @@ def bonferroni_correction(
     """AI Tool wrapper for _bonferroni_correction_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4741,7 +4718,6 @@ def benjamini_hochberg_correction(
     """AI Tool wrapper for _benjamini_hochberg_correction_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4833,7 +4809,6 @@ def sample_size_warning(
     """AI Tool wrapper for _sample_size_warning_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4926,7 +4901,6 @@ def stability_score(
     """AI Tool wrapper for _stability_score_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5022,7 +4996,6 @@ def whites_reality_check_backtests(
     """AI Tool wrapper for _whites_reality_check_backtests_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5168,7 +5141,6 @@ def permutation_test_backtest(
     """AI Tool wrapper for _permutation_test_backtest_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5262,7 +5234,6 @@ def bootstrap_confidence_intervals_backtest(
     """AI Tool wrapper for _bootstrap_confidence_intervals_backtest_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5362,7 +5333,6 @@ def print_statistical_validation_report(
     """AI Tool wrapper for _print_statistical_validation_report_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

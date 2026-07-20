@@ -21,7 +21,6 @@ import numpy.typing as npt
 import pandas as pd
 import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
-
 from app.services.utils.errors import ValidationError
 from app.services.utils.logger import logger
 
@@ -96,13 +95,14 @@ _TIMEFRAME_SECONDS: dict[str, int] = {
     "MN1": 2592000,
 }
 
+
 def _ensure_datetime_index(data: pd.DataFrame) -> pd.DataFrame:
     """Description.
         Return data indexed by a DatetimeIndex named ``Datetime``.
-    
+
     Args:
         data: pd.DataFrame.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -141,7 +141,7 @@ class TicksGenerator:
     ) -> None:
         """Description.
             Initialize the generator and validate the configuration.
-        
+
         Args:
             model: str.
             trading_timeframe: str.
@@ -153,7 +153,7 @@ class TicksGenerator:
             min_spread_points: float | None.
             max_spread_points: float | None.
             random_seed: int | None.
-        
+
         Returns:
             None.
         """
@@ -173,14 +173,16 @@ class TicksGenerator:
     def _validate_config(self) -> None:
         """Description.
             Validate model, point value, and spread configuration.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
-        logger.debug(f"Validating TicksGenerator config for model={self.model}, spread_model={self.spread_model}.")
+        logger.debug(
+            f"Validating TicksGenerator config for model={self.model}, spread_model={self.spread_model}."
+        )
         if self.model not in SUPPORTED_MODELS:
             raise ValidationError(
                 f"Unsupported ticks model: {self.model}. "
@@ -198,14 +200,16 @@ class TicksGenerator:
     def _validate_spread_config(self) -> None:
         """Description.
             Validate spread-model-specific point bounds.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
-        logger.debug(f"Validating spread parameters for spread_model={self.spread_model}.")
+        logger.debug(
+            f"Validating spread parameters for spread_model={self.spread_model}."
+        )
         if self.spread_model == SPREAD_FIXED:
             if self.fixed_spread_points is None:
                 raise ValidationError(
@@ -234,10 +238,10 @@ class TicksGenerator:
     def generate(self, bars: pd.DataFrame) -> pd.DataFrame:
         """Description.
             Generate a standardized tick frame for the configured model.
-        
+
         Args:
             bars: pd.DataFrame.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -257,11 +261,11 @@ class TicksGenerator:
     def _find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
         """Description.
             Return the actual column name matching any candidate.
-        
+
         Args:
             df: pd.DataFrame.
             candidates: list[str].
-        
+
         Returns:
             str | None.
         """
@@ -276,16 +280,18 @@ class TicksGenerator:
     def _require_col(cls, df: pd.DataFrame, candidates: list[str], context: str) -> str:
         """Description.
             Return a required column name or raise.
-        
+
         Args:
             df: pd.DataFrame.
             candidates: list[str].
             context: str.
-        
+
         Returns:
             str.
         """
-        logger.debug(f"Validating that one of the candidate columns {candidates} is present.")
+        logger.debug(
+            f"Validating that one of the candidate columns {candidates} is present."
+        )
         column = cls._find_col(df, candidates)
         if column is None:
             raise ValidationError(f"{context} requires one of columns: {candidates}")
@@ -295,14 +301,16 @@ class TicksGenerator:
     def _ensure_signal_columns(df: pd.DataFrame) -> pd.DataFrame:
         """Description.
             Return a copy of df with all signal columns present.
-        
+
         Args:
             df: pd.DataFrame.
-        
+
         Returns:
             pd.DataFrame.
         """
-        logger.debug("Ensuring the generated DataFrame contains standard signal fields.")
+        logger.debug(
+            "Ensuring the generated DataFrame contains standard signal fields."
+        )
         out = df.copy()
         for column in _SIGNAL_COLUMNS:
             if column not in out.columns:
@@ -313,14 +321,16 @@ class TicksGenerator:
     def _infer_bar_seconds(index: pd.DatetimeIndex) -> int:
         """Description.
             Infer bar duration in seconds from median index spacing.
-        
+
         Args:
             index: pd.DatetimeIndex.
-        
+
         Returns:
             int.
         """
-        logger.debug("Inferring bar duration in seconds from the DatetimeIndex median spacing.")
+        logger.debug(
+            "Inferring bar duration in seconds from the DatetimeIndex median spacing."
+        )
         if len(index) > 1:
             deltas = index.to_series().diff().dropna()
             if not deltas.empty:
@@ -330,28 +340,32 @@ class TicksGenerator:
     def _configured_bar_seconds(self) -> int:
         """Description.
             Return the configured trading-timeframe duration in seconds.
-        
+
         Args:
             None.
-        
+
         Returns:
             int.
         """
-        logger.debug(f"Resolving duration in seconds for configured timeframe: {self.trading_timeframe}")
+        logger.debug(
+            f"Resolving duration in seconds for configured timeframe: {self.trading_timeframe}"
+        )
         return _TIMEFRAME_SECONDS.get(self.trading_timeframe, _DEFAULT_BAR_SECONDS)
 
     @staticmethod
     def _four_tick_offsets_ms(bar_seconds: int) -> npt.NDArray[np.int64]:
         """Description.
             Return four within-bar millisecond offsets.
-        
+
         Args:
             bar_seconds: int.
-        
+
         Returns:
             npt.NDArray[np.int64].
         """
-        logger.debug(f"Calculating four intra-bar millisecond offsets for bar_seconds={bar_seconds}")
+        logger.debug(
+            f"Calculating four intra-bar millisecond offsets for bar_seconds={bar_seconds}"
+        )
         bar_ms = max(1, int(bar_seconds) * 1000)
         close_offset = max(0, bar_ms - 1)
         first_inner = max(1, bar_ms // 3)
@@ -366,15 +380,17 @@ class TicksGenerator:
     ) -> npt.NDArray[np.float64]:
         """Description.
             Return per-tick spread points for the configured model.
-        
+
         Args:
             native_per_tick: npt.NDArray[np.float64].
             total: int.
-        
+
         Returns:
             npt.NDArray[np.float64].
         """
-        logger.debug(f"Calculating tick spread points (spread_model={self.spread_model}, count={total}).")
+        logger.debug(
+            f"Calculating tick spread points (spread_model={self.spread_model}, count={total})."
+        )
         if self.spread_model == SPREAD_NATIVE:
             return np.maximum(native_per_tick, 0.0)
         if self.spread_model == SPREAD_FIXED:
@@ -388,10 +404,10 @@ class TicksGenerator:
     def _four_tick_frame(self, bars: pd.DataFrame) -> pd.DataFrame:
         """Description.
             Build a four-tick-per-bar frame from OHLC bars.
-        
+
         Args:
             bars: pd.DataFrame.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -413,14 +429,16 @@ class TicksGenerator:
         def col_or_zeros(name: str | None) -> npt.NDArray[np.float64]:
             """Description.
                 Return the named column as a NaN-free float array, or zeros.
-            
+
             Args:
                 name: str | None.
-            
+
             Returns:
                 npt.NDArray[np.float64].
             """
-            logger.debug(f"Coercing column '{name}' to NaN-free float array or returning zeros.")
+            logger.debug(
+                f"Coercing column '{name}' to NaN-free float array or returning zeros."
+            )
             if name is None:
                 return np.zeros(n_bars, dtype=np.float64)
             values = pd.to_numeric(bars[name], errors="coerce").to_numpy(
@@ -493,14 +511,16 @@ class TicksGenerator:
     def _ohlc_m1_frame(self, trading_bars: pd.DataFrame) -> pd.DataFrame:
         """Description.
             Build a four-tick frame from M1 bars with merged signals.
-        
+
         Args:
             trading_bars: pd.DataFrame.
-        
+
         Returns:
             pd.DataFrame.
         """
-        logger.debug(f"Building OHLC M1 tick frame for {len(trading_bars)} trading bars.")
+        logger.debug(
+            f"Building OHLC M1 tick frame for {len(trading_bars)} trading bars."
+        )
         if self.m1_bars is None or self.m1_bars.empty:
             raise ValidationError("TICK_MODEL_OHLC_M1 requires non-empty m1_bars.")
         m1_with_signals = self._merge_signals_onto(self.m1_bars, trading_bars)
@@ -513,11 +533,11 @@ class TicksGenerator:
     ) -> pd.DataFrame:
         """Description.
             Broadcast trading-timeframe signals onto finer-grained bars.
-        
+
         Args:
             target: pd.DataFrame.
             signal_bars: pd.DataFrame.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -540,14 +560,16 @@ class TicksGenerator:
     def _generated_frame(self, bars: pd.DataFrame) -> pd.DataFrame:
         """Description.
             Interpolate each trading-timeframe bar into tick-volume ticks.
-        
+
         Args:
             bars: pd.DataFrame.
-        
+
         Returns:
             pd.DataFrame.
         """
-        logger.debug(f"Interpolating {len(bars)} bars into tick-volume generated ticks.")
+        logger.debug(
+            f"Interpolating {len(bars)} bars into tick-volume generated ticks."
+        )
         if bars is None or bars.empty:
             return self._empty_frame(_BASIC_SIGNAL_COLUMNS)
 
@@ -572,10 +594,10 @@ class TicksGenerator:
         def bar_floats(name: str) -> npt.NDArray[np.float64]:
             """Description.
                 Return the named bar column as a NaN-free float array.
-            
+
             Args:
                 name: str.
-            
+
             Returns:
                 npt.NDArray[np.float64].
             """
@@ -664,7 +686,7 @@ class TicksGenerator:
     ]:
         """Description.
             Vectorize piecewise-linear OHLC interpolation across bars.
-        
+
         Args:
             open_b: npt.NDArray[np.float64].
             high_b: npt.NDArray[np.float64].
@@ -672,11 +694,13 @@ class TicksGenerator:
             close_b: npt.NDArray[np.float64].
             vol_b: npt.NDArray[np.int64].
             total: int.
-        
+
         Returns:
             tuple[npt.NDArray[np.float64], npt.NDArray[np.int64], npt.NDArray[np.int64]].
         """
-        logger.debug(f"Interpolating OHLC values vectorially (total output ticks: {total}).")
+        logger.debug(
+            f"Interpolating OHLC values vectorially (total output ticks: {total})."
+        )
         bar_start: npt.NDArray[np.int64] = np.repeat(
             np.cumsum(vol_b) - vol_b,
             vol_b,
@@ -739,18 +763,20 @@ class TicksGenerator:
     ) -> npt.NDArray[np.uint8]:
         """Description.
             Return generated tick phase bitmasks without scanning output prices.
-        
+
         Args:
             open_b: npt.NDArray[np.float64].
             close_b: npt.NDArray[np.float64].
             vol_b: npt.NDArray[np.int64].
             local_i: npt.NDArray[np.int64].
             vol_rep: npt.NDArray[np.int64].
-        
+
         Returns:
             npt.NDArray[np.uint8].
         """
-        logger.debug(f"Calculating generated tick phase bitmasks (total ticks: {local_i.shape[0]}).")
+        logger.debug(
+            f"Calculating generated tick phase bitmasks (total ticks: {local_i.shape[0]})."
+        )
         steps = vol_b - 1
         base = steps // 3
         rem = steps % 3
@@ -772,10 +798,10 @@ class TicksGenerator:
     def _real_frame(self, trading_bars: pd.DataFrame) -> pd.DataFrame:
         """Description.
             Standardize real ticks and attach merged trading signals.
-        
+
         Args:
             trading_bars: pd.DataFrame.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -832,11 +858,11 @@ class TicksGenerator:
     ) -> npt.NDArray[np.uint8]:
         """Description.
             Return open/high/low/close phase bitmasks within each bucket.
-        
+
         Args:
             bucket: pd.DatetimeIndex.
             bids: pd.Series.
-        
+
         Returns:
             npt.NDArray[np.uint8].
         """
@@ -872,14 +898,16 @@ class TicksGenerator:
     def _empty_frame(signal_columns: tuple[str, ...]) -> pd.DataFrame:
         """Description.
             Return an empty tick frame with the standard column layout.
-        
+
         Args:
             signal_columns: tuple[str, ...].
-        
+
         Returns:
             pd.DataFrame.
         """
-        logger.debug(f"Constructing empty tick DataFrame structure with signals: {signal_columns}")
+        logger.debug(
+            f"Constructing empty tick DataFrame structure with signals: {signal_columns}"
+        )
         columns = [
             "bid",
             "ask",
@@ -898,10 +926,10 @@ def _to_dataframe(
 ) -> pd.DataFrame | None:
     """Description.
         Coerce list-of-records input into a DataFrame.
-    
+
     Args:
         data: pd.DataFrame | list[dict[str, Any]] | None.
-    
+
     Returns:
         pd.DataFrame | None.
     """
@@ -930,7 +958,7 @@ def generate_ticks(
 ) -> pd.DataFrame:
     """Description.
         Generate standardized ticks as a columnar DataFrame.
-    
+
     Args:
         model: str.
         trading_timeframe: str.
@@ -944,7 +972,7 @@ def generate_ticks(
         max_spread_points: float | None.
         random_seed: int | None.
         request_id: str | None.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -980,15 +1008,17 @@ def generate_ticks(
 def _chunk_bounds(n_rows: int, size: int) -> list[tuple[int, int]]:
     """Description.
         Return row ranges covering n_rows in size chunks.
-    
+
     Args:
         n_rows: int.
         size: int.
-    
+
     Returns:
         list[tuple[int, int]].
     """
-    logger.debug(f"Calculating basic chunk bounds for {n_rows} rows (chunk size: {size}).")
+    logger.debug(
+        f"Calculating basic chunk bounds for {n_rows} rows (chunk size: {size})."
+    )
     step = max(1, size)
     return [(index, min(index + step, n_rows)) for index in range(0, n_rows, step)]
 
@@ -996,11 +1026,11 @@ def _chunk_bounds(n_rows: int, size: int) -> list[tuple[int, int]]:
 def _find_column(df: pd.DataFrame, candidates: tuple[str, ...]) -> str | None:
     """Description.
         Return the first matching column name case-insensitively.
-    
+
     Args:
         df: pd.DataFrame.
         candidates: tuple[str, ...].
-    
+
     Returns:
         str | None.
     """
@@ -1015,14 +1045,16 @@ def _find_column(df: pd.DataFrame, candidates: tuple[str, ...]) -> str | None:
 def _estimated_generated_counts(source: pd.DataFrame) -> npt.NDArray[np.int64]:
     """Description.
         Return estimated generated output rows per input bar.
-    
+
     Args:
         source: pd.DataFrame.
-    
+
     Returns:
         npt.NDArray[np.int64].
     """
-    logger.debug(f"Estimating generated output rows per input bar for DataFrame with {len(source)} rows.")
+    logger.debug(
+        f"Estimating generated output rows per input bar for DataFrame with {len(source)} rows."
+    )
     volume_col = _find_column(source, ("tick_volume", "Volume", "volume"))
     if volume_col is None:
         raise ValidationError(
@@ -1041,15 +1073,17 @@ def _output_aware_chunk_bounds(
 ) -> list[tuple[int, int]]:
     """Description.
         Return input row ranges targeting a maximum generated output size.
-    
+
     Args:
         counts: npt.NDArray[np.int64].
         max_output_rows: int.
-    
+
     Returns:
         list[tuple[int, int]].
     """
-    logger.debug(f"Calculating output-aware chunk bounds targeting max output rows: {max_output_rows}")
+    logger.debug(
+        f"Calculating output-aware chunk bounds targeting max output rows: {max_output_rows}"
+    )
     if len(counts) == 0:
         return []
 
@@ -1081,7 +1115,7 @@ def _parquet_input_chunks(
 ) -> Iterator[_InputChunk]:
     """Description.
         Yield input slices per chunk by model.
-    
+
     Args:
         model: str.
         bars_df: pd.DataFrame | None.
@@ -1089,11 +1123,13 @@ def _parquet_input_chunks(
         real_df: pd.DataFrame | None.
         chunk_size: int.
         max_output_rows_per_chunk: int.
-    
+
     Returns:
         Iterator[_InputChunk].
     """
-    logger.debug(f"Segmenting parquet input datasets into chunks for ticks model={model}.")
+    logger.debug(
+        f"Segmenting parquet input datasets into chunks for ticks model={model}."
+    )
     if model == TICK_MODEL_REAL:
         yield bars_df, m1_df, real_df
         return
@@ -1142,7 +1178,7 @@ def generate_ticks_to_parquet(
 ) -> dict[str, Any]:
     """Description.
         Stream generated ticks to a Parquet file with bounded memory.
-    
+
     Args:
         model: str.
         trading_timeframe: str.
@@ -1159,7 +1195,7 @@ def generate_ticks_to_parquet(
         chunk_size: int.
         max_output_rows_per_chunk: int.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """

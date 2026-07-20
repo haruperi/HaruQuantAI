@@ -16,12 +16,11 @@ import hashlib
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from pydantic import model_validator
-
 from app.services.trading.contracts import JsonObject, TradingContract
 from app.services.trading.security.error_mapping import TradingMappedError
 from app.utils.logger import logger
 from app.utils.standard import canonical_json
+from pydantic import model_validator
 
 if TYPE_CHECKING:
     from app.services.trading.gates.policy_matrix import PolicyMatrixEntry

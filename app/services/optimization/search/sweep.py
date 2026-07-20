@@ -24,7 +24,7 @@ from app.services.optimization.search.contracts import (
 )
 from app.services.optimization.search.grid import iter_grid_candidates
 from app.services.optimization.search.random import sample_random_candidates
-from app.utils import canonical_json, derive_stable_id, logger
+from app.utils import canonical_json, generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.optimization.parameters import ParameterValue
@@ -117,7 +117,7 @@ def run_bounded_search(
         logger.bind(
             event="optimization.validation_failure",
             result="validation_failed",
-            request_id=request.request_id,
+            request_id=generate_id("req"),
             workflow_id=request.workflow_id,
             correlation_id=request.correlation_id,
             error_type=type(error).__name__,
@@ -154,9 +154,7 @@ def run_bounded_search(
             candidate_hash=identity,
             executable_parameters=parameters,
             seed=(request.seed or 0) + index,
-            request_id=derive_stable_id(
-                "req", f"{request.request_id}:{search_id}:{identity}"
-            ),
+            request_id=request.request_id,
             workflow_id=request.workflow_id,
             correlation_id=request.correlation_id,
             context=context,

@@ -1,8 +1,8 @@
 # Utils
 
 > **Package:** `app/utils`
-> **Status:** `Completed implementation baseline`
-> **Last updated:** `2026-07-16`
+> **Status:** `Completed — verified implementation baseline`
+> **Last updated:** `2026-07-20`
 
 > This README is the package's single source of truth for requirements, final
 > structure, implementation sequence, progress, usage examples, and tests.
@@ -16,7 +16,7 @@
 
 Utils provides business-neutral cross-domain primitives. It owns shared context
 and audit contracts, base errors, trace identifiers, UTC handling, canonical
-serialization, credential protection, runtime settings, and structured logging.
+serialization, secret redaction, runtime settings, and structured logging.
 It makes no trading or domain decision.
 
 ### Owns
@@ -26,24 +26,23 @@ It makes no trading or domain decision.
 - Request, workflow, correlation, causation, and event identifiers.
 - UTC clocks, timestamps, and freshness calculations.
 - Deterministic canonical JSON serialization.
-- Denylist-first secret redaction, password hashing, Fernet encryption, and
-  in-memory active-secret-version selection.
+- Denylist-first secret redaction.
 - Immutable runtime settings and the sole repository `.env` loading boundary.
 - Import-safe structured logging with immutable bound context, a lazy approved
   default profile, and explicit override support for specialized routing.
-- Resolution of broker/provider secret references at the composition root; the
-  resulting `BrokerConnectionConfig v1` schema remains Brokers-owned.
 
 ### Does not own
 
 - Domain contracts, domain result types, business validation, or business limits.
 - Authentication, identity verification, permission enforcement, session state,
   or credential persistence; UI/API owns these capabilities and produces
-  `AuthContext v1`. Utils only verifies hashes supplied to its pure helper.
+  `AuthContext v1`.
 - DataFrame, OHLC, OHLCV, market-data quality, conversion, comparison, chunking,
   repair, resampling, persistence, or cache behavior; Data owns these capabilities.
-- Key generation, key storage, key rotation, secret persistence, or selecting a
-  secret by time or policy. Callers supply Fernet keys and explicit version state.
+- Password hashing, credential encryption, key generation/storage/rotation,
+  secret persistence, active-key selection, or credential-reference resolution.
+  UI/API owns those application capabilities and externally provisioned key
+  infrastructure owns encryption-key lifecycle.
 - Safe-path abstractions; each filesystem-writing domain owns and validates its
   allowed roots and paths.
 - Metrics exporters, health providers, public registries,
@@ -70,8 +69,6 @@ ID, and a redacted JSON-safe payload. Emission or persistence failure is surface
 ### Capability-to-consumer evidence
 
 Shared business-neutral capabilities have at least two explicit domain consumers.
-Owner-approved credential-protection primitives are also retained for UI/API and
-composition-root use; Utils owns only their deterministic helper boundaries.
 
 | Retained capability | Named consuming domain READMEs |
 |---|---|
@@ -81,8 +78,6 @@ composition-root use; Utils owns only their deterministic helper boundaries.
 | UTC time | Brokers, Data, Strategy, Risk, Trading, Simulation, Research, Portfolio |
 | Canonical serialization | Strategy, Trading, Analytics, Optimization, Research |
 | Secret redaction | Brokers, Data, Strategy, Risk, Trading, Simulation, Analytics, Optimization, Research, Portfolio, UI/API |
-| Password hashing | UI/API |
-| Fernet encryption / active secret selection | UI/API, Brokers composition root |
 | Runtime settings | Data, Trading, Simulation, UI/API |
 | Error metadata and injected routing | Brokers, Risk, Trading, Simulation, Analytics, Research, Portfolio, UI/API |
 | Structured logging and specialized routing | Brokers, Risk, Trading, Data |
@@ -136,10 +131,7 @@ utils/
 |   `-- canonical.py
 |-- security/
 |   |-- __init__.py
-|   |-- redaction.py
-|   |-- hashing.py
-|   |-- encryption.py
-|   `-- secret_versions.py
+|   `-- redaction.py
 |-- settings/
 |   |-- __init__.py
 |   |-- models.py
@@ -166,7 +158,12 @@ flowchart LR
 ```
 
 Standalone executable usage examples live under `tests/utils/usage/`. They are
-ordinary programs with `if __name__ == "__main__"` entry points, not pytest tests.
+ordinary programs with `main()` and `if __name__ == "__main__"` entry points, not
+pytest tests. The eight numbered programs map one-to-one to `FEAT-UTIL-00` through
+`FEAT-UTIL-07`; each calls every public operation or constructor in its feature
+through `app.utils` using realistic, bounded, secret-safe inputs or genuine runtime
+state. Pytest explicitly ignores these programs, and verification executes each
+one directly with Python.
 
 ---
 
@@ -175,7 +172,7 @@ ordinary programs with `if __name__ == "__main__"` entry points, not pytest test
 | Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
 |---|---|---|---|---|---|---|
 | Completed | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033`, `FR-UTL-039` through `FR-UTL-041` |
-| Completed | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-025` |
+| Completed | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-024` |
 | Completed | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-002`, `FR-UTL-003`, `FR-UTL-007`, `FR-UTL-008`, `FR-UTL-010`, `FR-UTL-011`, `FR-UTL-013` through `FR-UTL-021` |
 
 ### `WF-UTL-001` — Structured Logging and Redaction
@@ -197,9 +194,6 @@ ordinary programs with `if __name__ == "__main__"` entry points, not pytest test
    Utils boundary; callers may supply explicit values without parsing files.
 2. The loader validates supported deployment and runtime settings.
 3. The loader returns an immutable settings object without mutating caller input.
-4. Broker secret references are resolved at the composition root and injected into
-   a Brokers-owned `BrokerConnectionConfig v1` instance.
-
 Imports never read the environment, a file, or a secret store.
 
 ### `WF-UTL-003` — Audit-Event Construction
@@ -229,7 +223,7 @@ functional behavior.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
+| Completed | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent` | **Standard library:** `collections.abc`, `datetime`, `json`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
 | Completed | `auth.py` | Define immutable authenticated principal and trace context. | `AuthContext` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `audit.py` → strict contract-field validation |
 | Completed | `__init__.py` | Expose the supported shared-contract API. | `AuthContext`, `AuditEvent` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
 
@@ -252,8 +246,8 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `exceptions.py` | Define the minimal shared exception hierarchy and domain-extension boundary. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None |
-| Completed | `mapping.py` | Convert caught exceptions to deterministic secret-safe shared error evidence. | `map_exception` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `exceptions.py` → shared base exceptions |
+| Completed | `exceptions.py` | Define the minimal shared exception hierarchy and domain-extension boundary. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | **Standard library:** `re`<br>**Required third-party:** None<br>**Local:** None |
+| Completed | `mapping.py` | Convert caught exceptions to deterministic secret-safe shared error evidence. | `map_exception` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `exceptions.py` → shared base exceptions |
 | Completed | `metadata.py` | Normalize symbolic error codes and provide immutable built-in metadata. | `ErrorMetadata`, `normalize_error_code`, `get_error_metadata` | **Standard library:** `dataclasses`, `re`<br>**Required third-party:** None<br>**Local:** `exceptions.py` → `ValidationError` |
 | Completed | `routing.py` | Route a mapped error payload to an explicitly injected sink. | `ErrorSink`, `route_error_event` | **Standard library:** `collections.abc`, `typing`<br>**Required third-party:** None<br>**Local:** `mapping.py` → `map_exception` |
 | Completed | `__init__.py` | Expose the supported shared-error API. | Shared exceptions, mapping, metadata, and routing exports | **Standard library:** None<br>**Required third-party:** None<br>**Local:** all error feature files → approved exports |
@@ -287,7 +281,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 |---|---|---|---|---|---|---|
 | Completed | `FR-UTL-007` | Generate prefixed UUID4 identifiers without embedded secrets. | `generate_id` | Entropy read | `ValidationError`: unsupported prefix | **Usage:** `tests/utils/usage/03_identity.py::example_generate_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_generate_id_is_prefixed_and_secret_free()` |
 | Completed | `FR-UTL-008` | Validate supported prefixes and canonical identifier syntax. | `validate_id` | None | `ValidationError`: unsupported prefix or malformed identifier | **Usage:** `tests/utils/usage/03_identity.py::example_validate_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_validate_id_rejects_malformed()` |
-| Completed | `FR-UTL-009` | Derive deterministic SHA-256 identifiers from canonical, caller-supplied identity material. | `derive_stable_id` | None | `ValidationError`: empty or non-canonical identity material | **Usage:** `tests/utils/usage/03_identity.py::example_derive_stable_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_derive_stable_id_is_deterministic()` |
+| Completed | `FR-UTL-009` | Derive deterministic `id`-prefixed SHA-256 identifiers from canonical caller-supplied identity material; stable IDs are never shared trace identifiers. | `derive_stable_id` | None | `ValidationError`: unsupported prefix or empty/non-canonical identity material | **Usage:** `tests/utils/usage/03_identity.py::example_derive_stable_id()`<br>**Unit:** `tests/utils/unit/test_identifiers.py::test_derive_stable_id_is_deterministic()` |
 
 ### 4.4 `time/` — UTC Clocks and Timestamps
 
@@ -299,8 +293,8 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `clocks.py` | Define the injectable clock boundary and UTC system clock. | `Clock`, `SystemClock`, `utc_now` | **Standard library:** `collections.abc`, `datetime`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
-| Completed | `timestamps.py` | Parse, format, age, and evaluate canonical UTC timestamps. | `parse_utc_timestamp`, `format_utc_timestamp`, `age_seconds`, `is_fresh` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `clocks.py` → `Clock`; `errors/exceptions.py` → `ValidationError` |
+| Completed | `clocks.py` | Define the injectable clock boundary and UTC system clock. | `Clock`, `SystemClock`, `utc_now` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
+| Completed | `timestamps.py` | Parse, format, age, and evaluate canonical UTC timestamps. | `parse_utc_timestamp`, `format_utc_timestamp`, `age_seconds`, `is_fresh` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
 | Completed | `__init__.py` | Expose the supported time API. | All clock and timestamp exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `clocks.py`, `timestamps.py` → approved exports |
 
 #### Functional requirements
@@ -321,7 +315,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `canonical.py` | Convert supported values to JSON-safe data and produce canonical UTF-8 JSON. | `to_json_safe`, `canonical_json` | **Standard library:** `dataclasses`, `datetime`, `decimal`, `enum`, `json`, `math`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
+| Completed | `canonical.py` | Convert supported values to JSON-safe data and produce canonical UTF-8 JSON. | `to_json_safe`, `canonical_json` | **Standard library:** `collections.abc`, `dataclasses`, `datetime`, `decimal`, `enum`, `json`, `math`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
 | Completed | `__init__.py` | Expose the supported serialization API. | `to_json_safe`, `canonical_json` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `canonical.py` → approved exports |
 
 #### Functional requirements
@@ -332,10 +326,9 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `FR-UTL-014` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction. | `canonical_json` | None | `ValidationError`: non-serializable value | **Usage:** `tests/utils/usage/05_serialization.py::example_canonical_json()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_canonical_json_sorts_keys()` |
 | Completed | `FR-UTL-015` | Reject unsupported, cyclic, non-finite, or unsafe values deterministically. | Serialization validation used by `to_json_safe` and `canonical_json` | None | `ValidationError`: unsupported, cyclic, or non-finite value | **Usage:** `tests/utils/usage/05_serialization.py::example_reject_unsafe_value()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_serialization_rejects_cyclic_value()` |
 
-### 4.6 `security/` — Credential Protection
+### 4.6 `security/` — Secret Redaction
 
-**Purpose:** Provide bounded redaction plus caller-keyed password hashing, Fernet
-encryption, and explicit in-memory active-secret selection without persistence.
+**Purpose:** Provide bounded denylist-first redaction for text and JSON-safe mappings.
 
 **Module flow:** `redaction policy + text/mapping → denylist-first redaction → redacted value and diagnostics`
 
@@ -344,10 +337,7 @@ encryption, and explicit in-memory active-secret selection without persistence.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `redaction.py` | Define redaction policy/results and redact bounded text or JSON-safe mappings. | `RedactionPolicy`, `RedactionResult`, `is_sensitive_key`, `redact_text_value`, `redact_mapping_value` | **Standard library:** `collections.abc`, `dataclasses`, `math`, `re`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `SecurityError`, `ValidationError` |
-| Completed | `hashing.py` | Hash and verify passwords with versioned PBKDF2-HMAC-SHA256 encodings. | `hash_password`, `verify_password` | Entropy read when hashing | `SecurityError`: invalid password input | **Standard library:** `base64`, `hashlib`, `hmac`, `secrets`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` |
-| Completed | `encryption.py` | Generate Fernet keys and encrypt/decrypt caller-supplied text. | `generate_fernet_key`, `encrypt_text`, `decrypt_text` | Entropy read for key/encryption | `SecurityError`: invalid key, token, or text | **Required third-party:** `cryptography>=42.0.8`<br>**Local:** `errors/exceptions.py` |
-| Completed | `secret_versions.py` | Select exactly one explicitly active secret from immutable in-memory versions. | `SecretVersion`, `select_active_secret_version` | None | `SecurityError`: zero/multiple active versions or invalid version | **Required third-party:** `pydantic>=2.13.4`<br>**Local:** `errors/exceptions.py` |
-| Completed | `__init__.py` | Expose the supported credential-protection API. | All security exports above | **Local:** all security feature files → approved exports |
+| Completed | `__init__.py` | Expose the supported secret-redaction API. | All security exports above | **Local:** `redaction.py` → approved exports |
 
 #### Functional requirements
 
@@ -359,24 +349,20 @@ encryption, and explicit in-memory active-secret selection without persistence.
 | Completed | `FR-UTL-019` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None | `ValidationError`: non-JSON-safe mapping | **Usage:** `tests/utils/usage/06_security.py::example_redaction()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_mapping_value_is_recursive()` |
 | Completed | `FR-UTL-020` | Return redacted paths and truncation diagnostics without secret values. | `RedactionResult` | None | None | **Usage:** `tests/utils/usage/06_security.py::example_redaction()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_result_omits_secret_values()` |
 | Completed | `FR-UTL-021` | Reject policies that allow protected credential fields. | `RedactionPolicy` validation | None | `SecurityError`: policy allows a protected credential field | **Usage:** `tests/utils/usage/06_security.py::example_policy_validation()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_policy_rejects_protected_credential_field()` |
-| Completed | `FR-UTL-036` | Hash passwords with a random salt and verify them using constant-time comparison. | `hash_password`, `verify_password` | Entropy read when hashing | `SecurityError`: empty, too-short, or oversized password | **Usage:** `tests/utils/usage/06_security.py::example_password_hashing()`<br>**Unit:** `tests/utils/unit/test_hashing.py::test_hash_and_verify_password()` |
-| Completed | `FR-UTL-037` | Generate Fernet keys and encrypt/decrypt UTF-8 text with authenticated symmetric encryption. | `generate_fernet_key`, `encrypt_text`, `decrypt_text` | Entropy read | `SecurityError`: invalid key, token, or input | **Usage:** `tests/utils/usage/06_security.py::example_fernet_encryption()`<br>**Unit:** `tests/utils/unit/test_encryption.py::test_encrypt_and_decrypt_text()` |
-| Completed | `FR-UTL-038` | Select exactly one explicitly active immutable secret version without persistence or rotation policy. | `SecretVersion`, `select_active_secret_version` | None | `SecurityError`: invalid version or active selection | **Usage:** `tests/utils/usage/06_security.py::example_active_secret_version()`<br>**Unit:** `tests/utils/unit/test_secret_versions.py::test_select_active_secret_version()` |
 
 ### 4.7 `settings/` — Runtime Settings
 
-**Purpose:** Define immutable generic runtime/logging settings, provide the sole
-repository `.env` loading base for typed domain settings, and resolve opaque secret
-references only on explicit invocation.
+**Purpose:** Define immutable generic runtime/logging settings and provide the sole
+repository `.env` loading base for typed domain settings.
 
-**Module flow:** `explicit values + environment → strict validation → immutable RuntimeSettings / resolved secret`
+**Module flow:** `explicit values + environment → strict validation → immutable RuntimeSettings`
 
 #### Files
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `models.py` | Define the immutable central `.env` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
-| Completed | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping and resolve opaque secret references through an injected source. | `load_settings`, `resolve_secret_reference` | **Standard library:** `collections.abc`, `re`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError`, `SecurityError` |
+| Completed | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping. | `load_settings` | **Standard library:** `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError` |
 | Completed | `__init__.py` | Expose the supported settings API. | Settings models and loader functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
 
 #### Functional requirements
@@ -386,7 +372,6 @@ references only on explicit invocation.
 | Completed | `FR-UTL-022` | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | `.env`/environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value | **Usage:** `tests/utils/usage/07_settings.py::example_construct_configuration()`<br>**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()` |
 | Completed | `FR-UTL-023` | Load explicit values and centralized `.env`/process settings in documented precedence order only when called. | `AppSettings`, `load_settings` | Settings read | `ConfigurationError`: unsupported or invalid runtime value | **Usage:** `tests/utils/usage/07_settings.py::example_load_active_configuration()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
 | Completed | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/07_settings.py::example_environment_constraints()`, `example_validate_settings()`<br>**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()` |
-| Completed | `FR-UTL-025` | Resolve secret references at the composition root without logging or persisting secret material. | `resolve_secret_reference` | Explicit secret-source read | `SecurityError`, `ConfigurationError`: unresolved or unsafe secret reference | **Usage:** `tests/utils/usage/07_settings.py::example_resolve_secret_reference()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_resolve_secret_reference_never_logs_secret()` |
 
 ### 4.8 `logging/` — Structured Logging
 
@@ -399,7 +384,7 @@ redacted structured-handler overrides for specialized entry points.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `logger.py` | Provide import-safe bound logger access, thread-safe lazy default activation, explicit override configuration and synchronization, source-aware human rendering, compressed rotation, color, lifecycle, and specialized routing. | `BoundLogger`, `logger`, `get_logger`, `configure_logging`, `flush_logging`, `shutdown_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** `atexit`, `copy`, `json`, `logging`, `logging.handlers`, `pathlib`, `queue`, `sys`, `threading`, `time`, `zipfile`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py`; `time/timestamps.py`; `security/redaction.py`; `settings/models.py` |
+| Completed | `logger.py` | Provide import-safe bound logger access, thread-safe lazy default activation, explicit override configuration and synchronization, source-aware human rendering, compressed rotation, color, lifecycle, and specialized routing. | `BoundLogger`, `logger`, `get_logger`, `configure_logging`, `flush_logging`, `shutdown_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** `atexit`, `collections.abc`, `copy`, `datetime`, `json`, `logging`, `logging.handlers`, `pathlib`, `queue`, `sys`, `threading`, `time`, `types`, `typing`, `zipfile`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py`; `time/timestamps.py`; `security/redaction.py`; `settings/loader.py` |
 | Completed | `__init__.py` | Expose the supported logging API without configuring logging. | All logging exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `logger.py` → approved exports |
 
 #### Functional requirements
@@ -434,9 +419,9 @@ capabilities beyond the Section 4 exports.
     raw exception text crosses the boundary.
   - `generate_id(prefix) -> str`, `validate_id(value, *, expected_prefix=None)
     -> str`, and `derive_stable_id(prefix, identity_material) -> str`.
-    Supported prefixes are exactly `req`, `wf`, `cor`, `cau`, and `evt`.
-    Generated identifiers use lowercase canonical UUID4 syntax. Stable
-    identifiers use the full lowercase SHA-256 hex digest. Canonical identity
+    Generated trace prefixes are exactly `req`, `wf`, `cor`, `cau`, and `evt`;
+    they use lowercase canonical UUID4 syntax. Stable non-trace identifiers use
+    prefix `id` plus the full lowercase SHA-256 hex digest. Canonical identity
     material is a non-empty, trimmed Unicode string of at most 4,096 UTF-8
     bytes.
   - `utc_now(clock=None) -> datetime`, `parse_utc_timestamp(value) -> datetime`,
@@ -460,20 +445,9 @@ capabilities beyond the Section 4 exports.
     Precedence is explicit values, then the supplied mapping (or centralized
     `AppSettings` `.env`/process values when omitted), then documented defaults. Input keys are
     the exact uppercase setting names; unknown keys are rejected.
-  - `resolve_secret_reference(reference, source) -> SecretStr`. References use
-    `secret://` followed by 1-255 ASCII letters, digits, `.`, `_`, `/`, or `-`.
-    Resolution is explicit and returns a masked Pydantic secret value.
   - `normalize_error_code(code) -> str`, `get_error_metadata(code) ->
     ErrorMetadata`, and `route_error_event(exception, sink) -> dict[str, str]`.
     Metadata is immutable and built in; routing invokes only the supplied sink.
-  - `hash_password(password) -> str` and `verify_password(password, encoded) ->
-    bool`. The versioned format uses PBKDF2-HMAC-SHA256, 600,000 iterations, and
-    a fresh 16-byte salt. Passwords are 12-1,024 Unicode characters.
-  - `generate_fernet_key() -> bytes`, `encrypt_text(value, key) -> str`, and
-    `decrypt_text(token, key) -> str`. Keys are always caller-supplied except
-    when explicitly generated; Utils never stores them.
-  - `select_active_secret_version(versions) -> SecretVersion`. Exactly one
-    immutable supplied version must be marked active.
   - `get_logger(name) -> logging.Logger`, `configure_logging(settings=None,
     redaction_policy=None) -> None`, `flush_logging() -> None`, and
     `shutdown_logging() -> None`.
@@ -567,8 +541,7 @@ tests/utils/
 
 Feature-integration tests are assigned as follows:
 
-- `tests/utils/integration/test_settings_bootstrap.py` verifies `WF-UTL-002`
-  and the secret-reference handoff boundary.
+- `tests/utils/integration/test_settings_bootstrap.py` verifies `WF-UTL-002`.
 - `tests/utils/integration/test_structured_logging.py` verifies `WF-UTL-001`.
 - `tests/utils/integration/test_audit_event_construction.py` verifies the
   Utils-owned construction portion of `WF-UTL-003`; Data's completed audit
@@ -589,29 +562,39 @@ Feature-integration tests are assigned as follows:
 - `uv run mypy app/utils tests/utils`
 - Targeted `pytest` commands for the affected Utils test files.
 - Direct execution of every `tests/utils/usage/[0-9][0-9]_*.py` program.
+- Branch-aware coverage greater than 80% for every individual `app/utils/**/*.py`
+  source file; aggregate coverage alone is insufficient.
+
+When running examples from a source checkout that is not installed as a package,
+set `PYTHONPATH` to the repository root before invoking each program directly.
 
 ### Definition of done
 
 - [X] The final package tree exists exactly as specified. `app/utils/__init__.py:1`
 - [X] Public exports contain only the retained shared surface; dotenv parsing and
-  named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:67`
-- [X] Shared capabilities have documented consumers and owner-approved security primitives remain bounded. `app/utils/README.md:70`
-- [X] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:69`
-- [X] UI/API owns authentication and permission enforcement. `app/utils/contracts/auth.py:17`
-- [X] Utils imports and import-time log attempts have no side effects. `tests/utils/unit/test_logger.py:229`, `tests/utils/unit/test_logger.py:243`
-- [X] No secret appears in logs, errors, audit records, or diagnostics. `tests/utils/integration/test_structured_logging.py:12`
-- [X] The first runtime log call activates the source-aware default profile exactly once, explicit overrides remain intact, and queued output has deterministic synchronization and shutdown. `tests/utils/unit/test_logger.py:71`, `tests/utils/unit/test_logger.py:90`, `tests/utils/unit/test_logger.py:112`
+  named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:90`
+- [X] Shared capabilities have documented consumers and secret redaction remains bounded to Utils. `app/utils/README.md:80`
+- [X] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:94`
+- [X] UI/API owns authentication and permission enforcement. `docs/PROJECT.md:125`
+- [X] Utils imports and import-time log attempts have no side effects.
+  `tests/utils/unit/test_logger.py:229`, `tests/utils/unit/test_logger.py:243`
+- [X] No secret appears in logs, errors, audit records, or diagnostics.
+  `tests/utils/integration/test_structured_logging.py:12`
+- [X] The first runtime log call activates the source-aware default profile exactly
+  once, explicit overrides remain intact, and queued output has deterministic
+  synchronization and shutdown. `tests/utils/unit/test_logger.py:71`,
+  `tests/utils/unit/test_logger.py:90`, `tests/utils/unit/test_logger.py:112`
 - [X] Every requirement has a targeted unit test and directly executable usage example. `tests/utils/integration/test_usage_scripts.py:21`
-- [X] Coverage is at least 80%. `pyproject.toml:170`
-- [ ] The post-baseline repository formatting check is clean. Functional
-  verification currently passes (`79` tests and strict mypy); the formatter
-  reports only `tests/utils/integration/test_usage_scripts.py`.
+- [X] Every individual Utils source file exceeds 80% branch-aware coverage. The
+  verified minimum is 82.30% and aggregate coverage is 91.28% across 23 files.
+- [X] Ruff, formatting, strict mypy, 100 targeted unit/integration tests, and all
+  eight directly executed standalone usage programs pass.
 
-Current implementation status: `Completed implementation baseline`. All documented
-Utils capabilities and contracts are implemented and their deterministic domain
-tests pass. Repository-wide formatting/docstring rules introduced after the
-baseline remain a separate quality-cleanup gate and do not authorize rebuilding
-this domain.
+Current implementation status: `Completed — verified implementation baseline`.
+The 2026-07-20 gate is green: Ruff and formatting pass over 55 targeted files,
+strict mypy passes over 55 files, 100 targeted tests pass, aggregate branch coverage
+is 91.28%, every one of the 23 Utils source files exceeds 80% coverage (minimum
+82.30%), and all eight feature-aligned usage programs execute successfully.
 
 ---
 

@@ -4,7 +4,7 @@ The trading domain depends on these protocol interfaces only. Concrete
 database, broker, encryption, clock, RNG, and distributed-store implementations
 must live outside ``app/services/trading`` and be injected by callers.
 """
-# ruff: noqa: ARG002, TC001
+# ruff: noqa: ARG002
 
 from __future__ import annotations
 

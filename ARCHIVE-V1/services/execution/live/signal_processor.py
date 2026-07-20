@@ -8,7 +8,6 @@ Classes and functions:
 """
 
 import pandas as pd
-
 from app.services.strategy.base import BaseStrategy, SignalDict
 from app.services.utils.logger import logger
 

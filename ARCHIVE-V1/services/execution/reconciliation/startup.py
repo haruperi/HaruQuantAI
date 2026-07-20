@@ -8,9 +8,8 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from data.database import ExecutionIntentRecord, ExecutionRepository
-
 from app.services.governance.workflow import ProposalState
+from data.database import ExecutionIntentRecord, ExecutionRepository
 
 DEFAULT_IN_FLIGHT_EXECUTION_STATUSES: tuple[str, ...] = (
     ProposalState.EXECUTION_PENDING.value,

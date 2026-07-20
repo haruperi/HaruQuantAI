@@ -7,7 +7,7 @@ from decimal import Decimal
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError, SectionEvidence
 from app.services.analytics.reports import builder
-from app.utils import derive_stable_id, logger
+from app.utils import generate_id, logger
 from tests.analytics.usage.test_usage_reports import _configured, _source_with_profit
 
 
@@ -41,7 +41,7 @@ def test_builder_fails_closed_on_required_section(
         builder.build_performance_report(
             _source_with_profit(Decimal(10)),
             source_contract="simulation.result",
-            request_id=derive_stable_id("req", "analytics-builder-failure"),
+            request_id=generate_id("req"),
             initial_balance=Decimal(1000),
             account_currency="USD",
             config=_configured(),
@@ -79,7 +79,7 @@ def test_builder_emits_blocker_flags_in_diagnostic_partial_mode(
     report = builder.build_performance_report(
         _source_with_profit(Decimal(10)),
         source_contract="simulation.result",
-        request_id=derive_stable_id("req", "analytics-builder-partial"),
+        request_id=generate_id("req"),
         initial_balance=Decimal(1000),
         account_currency="USD",
         config=_configured(),
@@ -109,7 +109,7 @@ def test_builder_clean_report_carries_no_blocker_flag() -> None:
     report = builder.build_performance_report(
         _source_with_profit(Decimal(10)),
         source_contract="simulation.result",
-        request_id=derive_stable_id("req", "analytics-builder-clean"),
+        request_id=generate_id("req"),
         initial_balance=Decimal(1000),
         account_currency="USD",
         config=_configured(),
@@ -127,7 +127,7 @@ def test_builder_emits_sample_below_threshold_under_thirty_trades() -> None:
     report = builder.build_performance_report(
         _source_with_profit(Decimal(10)),
         source_contract="simulation.result",
-        request_id=derive_stable_id("req", "analytics-builder-samples"),
+        request_id=generate_id("req"),
         initial_balance=Decimal(1000),
         account_currency="USD",
         config=_configured(),

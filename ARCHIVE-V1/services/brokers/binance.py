@@ -8,9 +8,8 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pandas as pd
-from binance.client import Client as BinanceAPIClient
-
 from app.services.utils.logger import logger
+from binance.client import Client as BinanceAPIClient
 
 
 class BinanceClient:
@@ -28,11 +27,11 @@ class BinanceClient:
     ) -> None:
         """Description.
             Initialize the Binance client with API credentials.
-        
+
         Args:
             api_key: str | None.
             api_secret: str | None.
-        
+
         Returns:
             None.
         """
@@ -50,10 +49,10 @@ class BinanceClient:
     def connect(self) -> bool:
         """Description.
             Initialize connection to Binance API.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -64,10 +63,10 @@ class BinanceClient:
     def disconnect(self) -> None:
         """Description.
             Shutdown the connection and clean up resources.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -77,16 +76,15 @@ class BinanceClient:
     def is_connected(self) -> bool:
         """Description.
             Check if client is currently connected.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
         logger.debug(
-            f"Checking Binance client connection state "
-            f"(connected={self._connected})."
+            f"Checking Binance client connection state (connected={self._connected})."
         )
         return self._connected
 
@@ -101,7 +99,7 @@ class BinanceClient:
     ) -> pd.DataFrame:
         """Description.
             Get OHLCVS bars from Binance.
-        
+
         Args:
             symbol: str.
             timeframe: str.
@@ -109,7 +107,7 @@ class BinanceClient:
             start_pos: int.
             date_from: datetime | None.
             date_to: datetime | None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -199,23 +197,21 @@ class BinanceClient:
     ) -> pd.DataFrame | list[dict[str, Any]] | None:
         """Description.
             Get ticks from Binance (using aggregate trades).
-        
+
         Args:
             symbol: str.
             count: int.
             start: datetime | None.
             end: datetime | None.
             as_dataframe: bool.
-        
+
         Returns:
             pd.DataFrame | list[dict[str, Any]] | None.
         """
         if not self.is_connected():
             self.connect()
 
-        logger.debug(
-            "Fetching Binance ticks for {} (count={}).", symbol, count
-        )
+        logger.debug("Fetching Binance ticks for {} (count={}).", symbol, count)
 
         client = BinanceAPIClient(self.api_key or "", self.api_secret or "")
 
@@ -269,10 +265,10 @@ class BinanceClient:
     def get_instance(cls) -> "BinanceClient":
         """Description.
             Get the shared singleton instance of BinanceClient.
-        
+
         Args:
             None.
-        
+
         Returns:
             'BinanceClient'.
         """
@@ -285,10 +281,10 @@ class BinanceClient:
 def get_binance_client() -> BinanceClient:
     """Description.
         Get the shared singleton instance of BinanceClient.
-    
+
     Args:
         None.
-    
+
     Returns:
         BinanceClient.
     """

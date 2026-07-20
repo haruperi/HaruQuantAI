@@ -39,7 +39,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.research.session_config import (
     EDGE_SESSION_ORDER,
     session_label_for_hour,
@@ -288,8 +287,8 @@ def _calculate_session_high_low_rates(filtered: pd.DataFrame) -> dict[str, Any]:
     if filtered.empty:
         return {"total_days": 0, "rows": []}
 
-    high_counts = {session: 0 for session in SESSION_ORDER}
-    low_counts = {session: 0 for session in SESSION_ORDER}
+    high_counts = dict.fromkeys(SESSION_ORDER, 0)
+    low_counts = dict.fromkeys(SESSION_ORDER, 0)
     evaluable_days = 0
 
     for _, frame in filtered.groupby(filtered.index.normalize()):
@@ -360,7 +359,7 @@ def _calculate_session_summary(
         rows.append(
             {
                 "session": session,
-                "bars": int(len(frame)),
+                "bars": len(frame),
                 "avg_range_pips": avg_range_pips,
                 "avg_spread_pips": avg_spread_pips,
                 "avg_abs_co_pips": avg_abs_co_pips,
@@ -411,7 +410,7 @@ def _calculate_hourly_window_summary(
         rows.append(
             {
                 "hour": hour,
-                "bars": int(len(frame)),
+                "bars": len(frame),
                 "avg_range_pips": avg_range_pips,
                 "avg_spread_pips": avg_spread_pips,
                 "avg_abs_co_pips": avg_abs_co_pips,

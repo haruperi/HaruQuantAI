@@ -96,8 +96,8 @@ def build_market_regime_feature_frame(
 
     metadata = {
         "price_column": price_column,
-        "source_rows": int(len(data)),
-        "rows_after_dropna": int(len(feature_frame)),
+        "source_rows": len(data),
+        "rows_after_dropna": len(feature_frame),
         "fast_period": fast_period,
         "slow_period": slow_period,
         "volatility_window": volatility_window,

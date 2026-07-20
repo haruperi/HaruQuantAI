@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-
 from app.services.data.transforms import TimeframeManager
 from app.services.utils.validators import (
     validate_duplicates,

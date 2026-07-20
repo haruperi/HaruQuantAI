@@ -11,7 +11,6 @@ from typing import Any, cast
 
 import numpy as np
 import pandas as pd
-
 from app.services.execution.live.engine import MultiStrategyEngine, StrategyInstance
 from app.services.risk.calculations.position_sizing import PositionSizer
 from app.services.risk.core import (
@@ -390,7 +389,7 @@ class RiskIntegratedEngine(MultiStrategyEngine):
 
             # 5. Gate and execute
             for signal in all_signals:
-                instance = cast(StrategyInstance, signal["_instance"])
+                instance = cast("StrategyInstance", signal["_instance"])
                 self._gate_and_execute(instance, signal)
 
         except Exception as e:

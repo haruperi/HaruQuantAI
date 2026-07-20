@@ -20,7 +20,7 @@ _UUID4_SUFFIX = (
     r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-"
     r"[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 )
-_TRACE_SUFFIX = rf"(?:{_UUID4_SUFFIX}|[0-9a-f]{{64}})"
+_TRACE_SUFFIX = _UUID4_SUFFIX
 _MAX_PAYLOAD_BYTES = 65_536
 _MAX_PAYLOAD_DEPTH = 16
 _MAX_PAYLOAD_ITEMS = 1_000

@@ -6,9 +6,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from data.database import GovernanceRepository, KillSwitchEventRecord
-
 from app.services.governance.workflow import KillSwitchState
+from data.database import GovernanceRepository, KillSwitchEventRecord
 
 
 class KillSwitchAuditService:

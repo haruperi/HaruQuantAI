@@ -12,12 +12,11 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from pydantic import Field
-
 from app.services.risk.config.schema import validate_risk_config
 from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import RiskConfig, RiskContract
 from app.utils.logger import logger
+from pydantic import Field
 
 # PyYAML is used for YAML config parsing
 try:

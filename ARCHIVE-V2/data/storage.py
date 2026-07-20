@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
 from app.services.data.errors import DataIntegrityError as DataError
 from app.services.data.errors import DataValidationError as ValidationError
 from app.services.strategy.contracts import Bar

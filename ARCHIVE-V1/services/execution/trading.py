@@ -1696,14 +1696,14 @@ def trading_place_order(
         from app.services.execution.bridges.mt5_bridge import MT5Bridge
 
         return cast(
-            dict[str, Any],
+            "dict[str, Any]",
             _json_safe(MT5Bridge(live_enabled=live_enabled).place_order(order)),
         )
     if _is_ctrader_provider(normalized_provider):
         from app.services.execution.bridges.ctrader_bridge import CTraderBridge
 
         return cast(
-            dict[str, Any],
+            "dict[str, Any]",
             _json_safe(CTraderBridge(live_enabled=live_enabled).place_order(order)),
         )
     raise ValueError("provider must be 'mt5' or 'ctrader'")
@@ -1748,7 +1748,7 @@ def place_market_order(
         "comment": comment,
     }
     bridge = _execution_bridge(normalized_provider, live_enabled=live_enabled)
-    return cast(dict[str, Any], _json_safe(bridge.place_order(order)))
+    return cast("dict[str, Any]", _json_safe(bridge.place_order(order)))
 
 
 def _broker_place_pending_order(
@@ -1795,7 +1795,7 @@ def _broker_place_pending_order(
         "comment": comment,
     }
     bridge = _execution_bridge(normalized_provider, live_enabled=live_enabled)
-    return cast(dict[str, Any], _json_safe(bridge.place_order(order)))
+    return cast("dict[str, Any]", _json_safe(bridge.place_order(order)))
 
 
 def _broker_modify_position(
@@ -1913,7 +1913,7 @@ def _broker_close_position(
 
     bridge = _execution_bridge(normalized_provider, live_enabled=live_enabled)
     target = position_id or symbol
-    return cast(dict[str, Any], _json_safe(bridge.close_position(str(target))))
+    return cast("dict[str, Any]", _json_safe(bridge.close_position(str(target))))
 
 
 def _is_simulator_session_candidate(value: Any) -> bool:
@@ -2001,7 +2001,7 @@ def cancel_pending_order(
     """
     normalized_provider = _resolve_provider(provider)
     bridge = _execution_bridge(normalized_provider, live_enabled=live_enabled)
-    return cast(dict[str, Any], _json_safe(bridge.cancel_order(str(order_id))))
+    return cast("dict[str, Any]", _json_safe(bridge.cancel_order(str(order_id))))
 
 
 def _mt5_trading_deal_history(

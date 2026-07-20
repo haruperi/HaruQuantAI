@@ -16,7 +16,6 @@ from dataclasses import asdict
 
 import numpy as np
 import pandas as pd
-
 from app.services.analytics.metrics import median_mae_mfe, win_rate_fraction
 from app.services.analytics.ratios import expectancy, profit_factor
 from app.services.utils.logger import logger
@@ -206,7 +205,7 @@ def run_eds_mean_reversion(  # noqa: C901
 
     total_r = float(np.nansum(r)) if len(r) else float("nan")
     stats = EdgeStats(
-        n_trades=int(len(trades)),
+        n_trades=len(trades),
         expectancy_r=float(exp_r) if np.isfinite(exp_r) else float("nan"),
         win_rate=float(wr) if np.isfinite(wr) else float("nan"),
         profit_factor=float(pf),

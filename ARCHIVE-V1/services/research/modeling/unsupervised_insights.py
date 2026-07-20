@@ -29,7 +29,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import pandas as pd
-
 from app.services.research.modeling.unsupervised import (
     ClusterModelResult,
     PcaModelResult,
@@ -221,8 +220,8 @@ def summarize_investment_data(
             }
 
     return InvestmentDataSummary(
-        row_count=int(len(data)),
-        column_count=int(len(data.columns)),
+        row_count=len(data),
+        column_count=len(data.columns),
         start=data.index[0],
         end=data.index[-1],
         numeric_columns=tuple(str(column) for column in numeric.columns),
@@ -356,7 +355,7 @@ def analyze_cluster_outperformance(
         results.append(
             ClusterOutperformance(
                 cluster_label=int(label),
-                observations=int(len(group)),
+                observations=len(group),
                 mean_forward_return=cluster_return,
                 hit_rate=float((group["forward_return"] > 0).mean()),
                 outperformance_vs_overall=cluster_return - overall_mean,

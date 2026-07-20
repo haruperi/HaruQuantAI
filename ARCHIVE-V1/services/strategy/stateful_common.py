@@ -29,7 +29,6 @@ from collections.abc import Iterable
 from typing import Any
 
 import pandas as pd
-
 from app.services.trading.stateful import PositionSnapshot, StrategyContext
 from app.services.utils.logger import logger
 
@@ -171,9 +170,7 @@ def is_bar_close(context: StrategyContext) -> bool:
         if not math.isfinite(value):
             return False
         return bool(int(value) & 8)
-    return "close" in {
-        part.strip().lower() for part in str(phase).split("|")
-    }
+    return "close" in {part.strip().lower() for part in str(phase).split("|")}
 
 
 def current_mid_price(context: StrategyContext) -> float:

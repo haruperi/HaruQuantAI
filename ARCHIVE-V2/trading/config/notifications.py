@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from pydantic import Field, model_validator
-
 from app.services.trading.config.models import TradingConfigModel
 from app.utils.logger import logger
 from app.utils.security import redact_value
+from pydantic import Field, model_validator
 
 if TYPE_CHECKING:
     from app.services.trading.contracts import JsonObject

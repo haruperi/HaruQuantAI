@@ -21,6 +21,7 @@ class BarProtocol(Protocol):
 
     open_time: datetime
 
+
 # --- 1. Limits Rules ---
 DEFAULT_OHLCV_LIMIT: int = 5000
 MAX_OHLCV_LIMIT: int = 50000
@@ -55,12 +56,12 @@ MIN_SCHEDULER_FREQUENCY_SECONDS: int = 60
 def validate_limit(limit: int | None, max_allowed: int, default_value: int) -> int:
     """Description.
         Validate and return a query limit.
-    
+
     Args:
         limit: int | None.
         max_allowed: int.
         default_value: int.
-    
+
     Returns:
         int.
     """
@@ -77,9 +78,7 @@ def validate_limit(limit: int | None, max_allowed: int, default_value: int) -> i
         )
         logger.error(err_msg)
         raise ValidationError(err_msg)
-    logger.debug(
-        f"Validated limit: {limit}."
-    )
+    logger.debug(f"Validated limit: {limit}.")
     return limit
 
 
@@ -92,12 +91,12 @@ def normalize_numeric(
 ) -> str | float:
     """Description.
         Normalize numeric values according to workflow rules.
-    
+
     Args:
         value: NumericType.
         digits: int.
         workflow_context: str.
-    
+
     Returns:
         str | float.
     """
@@ -125,7 +124,7 @@ def normalize_numeric(
             f"Normalized value: {value} -> {quantized:.{digits}f} for workflow context {workflow_context}."
         )
         return f"{quantized:.{digits}f}"
-    
+
     return float(quantized)
 
 
@@ -134,12 +133,12 @@ def validate_step_alignment(
 ) -> None:
     """Description.
         Validate that a value aligns perfectly with the allowed step size.
-    
+
     Args:
         value: NumericType.
         step_size: NumericType.
         workflow_context: str.
-    
+
     Returns:
         None.
     """
@@ -204,14 +203,13 @@ VALID_TIMEFRAMES: set[str] = {
 }
 
 
-
 def validate_timeframe(timeframe: str) -> str:
     """Description.
         Validate that a timeframe name is supported.
-    
+
     Args:
         timeframe: str.
-    
+
     Returns:
         str.
     """
@@ -223,19 +221,17 @@ def validate_timeframe(timeframe: str) -> str:
         err_msg = f"Unsupported timeframe: {timeframe}"
         logger.error(err_msg)
         raise ValidationError(err_msg)
-    logger.debug(
-        f"Validated timeframe: {timeframe} -> {upper_tf}."
-    )
+    logger.debug(f"Validated timeframe: {timeframe} -> {upper_tf}.")
     return upper_tf
 
 
 def validate_timezone(tz_name: str) -> str:
     """Description.
         Validate that a timezone string is a valid IANA timezone.
-    
+
     Args:
         tz_name: str.
-    
+
     Returns:
         str.
     """
@@ -245,9 +241,7 @@ def validate_timezone(tz_name: str) -> str:
         err_msg = f"Invalid timezone: {tz_name}"
         logger.error(f"Invalid IANA timezone name {tz_name}: {e}")
         raise ValidationError(err_msg) from e
-    logger.debug(
-        f"Validated timezone: {tz_name}."
-    )
+    logger.debug(f"Validated timezone: {tz_name}.")
     return tz_name
 
 
@@ -256,10 +250,10 @@ def validate_bars(
 ) -> tuple[BarProtocol, ...]:
     """Description.
         Return bars as an increasing, non-empty tuple after validation.
-    
+
     Args:
         bars: Iterable[BarProtocol].
-    
+
     Returns:
         tuple[BarProtocol, ...].
     """

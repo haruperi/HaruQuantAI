@@ -12,8 +12,6 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from pydantic import Field
-
 from app.services.risk.models import (
     DrawdownState,
     PortfolioRiskSnapshot,
@@ -25,6 +23,7 @@ from app.utils.logger import logger
 from app.utils.normalization import utc_now
 from app.utils.security import redact_mapping, redact_text
 from app.utils.standard import canonical_json, stable_identifier
+from pydantic import Field
 
 
 class PortfolioRiskReport(RiskContract):

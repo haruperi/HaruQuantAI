@@ -4,16 +4,6 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
-from data.database.sqlite.database_operations import DatabaseManager
-from fastapi import (
-    APIRouter,
-    Depends,
-    Header,
-    HTTPException,
-    Request,
-    status,
-)
-
 from app.api.auth_utils import get_user_id_from_token
 from app.api.session.models import (
     AdvanceRequest,
@@ -72,6 +62,15 @@ from app.services.execution.trading import (
     preview_trade as preview_trade_runtime,
 )
 from app.services.utils import logger
+from data.database.sqlite.database_operations import DatabaseManager
+from fastapi import (
+    APIRouter,
+    Depends,
+    Header,
+    HTTPException,
+    Request,
+    status,
+)
 
 router = APIRouter()
 db_manager = DatabaseManager()
@@ -160,10 +159,8 @@ async def start_simulation(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="strategy_id is required for strategy mode",
                 )
-            version_id = (
-                payload.strategy_version_id
-                if payload.strategy_version_id
-                else resolve_strategy_version_id(db_manager, payload.strategy_id)
+            version_id = payload.strategy_version_id or resolve_strategy_version_id(
+                db_manager, payload.strategy_id
             )
             strategy_class = load_strategy_class(
                 db_manager,

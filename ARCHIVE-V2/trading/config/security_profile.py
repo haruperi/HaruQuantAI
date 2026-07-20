@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import model_validator
-
 from app.services.trading.config.models import TradingConfigModel
 from app.utils.logger import logger
+from pydantic import model_validator
 
 
 class BrokerSecurityProfile(TradingConfigModel):

@@ -21,6 +21,9 @@ def route_error_event(
 
     Returns:
         The same safe payload delivered to the sink.
+
+    Raises:
+        Exception: Any exception raised by the caller-provided sink.
     """
     payload = map_exception(exception)
     sink(payload)

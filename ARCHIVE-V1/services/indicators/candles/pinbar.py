@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -44,8 +43,12 @@ class Pinbar(BaseIndicator):
         lower_shadow = df[["open", "close"]].min(axis=1) - df["low"]
         upper_shadow = df["high"] - df[["open", "close"]].max(axis=1)
 
-        bullish = (lower_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
-        bearish = (upper_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
+        bullish = (
+            (lower_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
+        )
+        bearish = (
+            (upper_shadow > 0.6 * h_range) & (body < 0.3 * h_range) & (h_range > 0)
+        )
 
         pattern = np.where(bullish, 1, np.where(bearish, -1, 0))
 

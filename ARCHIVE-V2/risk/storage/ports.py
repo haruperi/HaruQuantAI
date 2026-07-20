@@ -11,13 +11,12 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Protocol, TypedDict
 
-from pydantic import Field
-
 from app.services.risk.errors import RiskDataError as DataError
 from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models.contracts import RiskContract
 from app.utils.logger import logger
 from app.utils.standard import canonical_json
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.risk.models import (

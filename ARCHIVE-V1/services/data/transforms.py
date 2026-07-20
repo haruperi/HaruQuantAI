@@ -10,7 +10,6 @@ from typing import Any, cast
 
 import numpy as np
 import pandas as pd
-
 from app.services.data.validation import validate_timeframe
 from app.services.utils.errors import ValidationError
 from app.services.utils.logger import logger
@@ -47,10 +46,10 @@ class TimeframeManager:
     def timeframe_to_frequency(cls, timeframe: str) -> str:
         """Description.
             Convert a timeframe string to a pandas frequency string.
-        
+
         Args:
             timeframe: str.
-        
+
         Returns:
             str.
         """
@@ -70,10 +69,10 @@ class TimeframeManager:
     def validate_timeframe(cls, timeframe: str) -> bool:
         """Description.
             Return whether a timeframe string is supported.
-        
+
         Args:
             timeframe: str.
-        
+
         Returns:
             bool.
         """
@@ -84,11 +83,11 @@ class TimeframeManager:
     def can_resample(cls, from_timeframe: str, to_timeframe: str) -> bool:
         """Description.
             Return whether resampling from source to target is possible.
-        
+
         Args:
             from_timeframe: str.
             to_timeframe: str.
-        
+
         Returns:
             bool.
         """
@@ -106,16 +105,15 @@ class TimeframeManager:
     def _find_ohlcv_columns(self, df: pd.DataFrame) -> dict[str, str]:
         """Description.
             Find OHLCV columns in a DataFrame case-insensitively.
-        
+
         Args:
             df: pd.DataFrame.
-        
+
         Returns:
             dict[str, str].
         """
         logger.debug(
-            "Scanning DataFrame columns to identify OHLCV fields "
-            "case-insensitively."
+            "Scanning DataFrame columns to identify OHLCV fields case-insensitively."
         )
         mapping = {}
         columns_lower = {str(column).lower(): str(column) for column in df.columns}
@@ -134,10 +132,10 @@ class TimeframeManager:
     def _ensure_datetime_index(self, data: pd.DataFrame) -> pd.DataFrame:
         """Description.
             Return a DataFrame with a DatetimeIndex.
-        
+
         Args:
             data: pd.DataFrame.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -171,12 +169,12 @@ class TimeframeManager:
     ) -> pd.DataFrame:
         """Description.
             Resample OHLCV data to a higher timeframe.
-        
+
         Args:
             data: pd.DataFrame.
             target_timeframe: str.
             source_timeframe: str | None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -231,12 +229,12 @@ class TimeframeManager:
     ) -> dict[str, pd.DataFrame]:
         """Description.
             Resample data to multiple target timeframes.
-        
+
         Args:
             data: pd.DataFrame.
             source_timeframe: str.
             target_timeframes: list[str].
-        
+
         Returns:
             dict[str, pd.DataFrame].
         """
@@ -248,8 +246,7 @@ class TimeframeManager:
                 source_timeframe,
             )
         logger.debug(
-            f"Completed multi-timeframe resampling for targets: "
-            f"{target_timeframes}"
+            f"Completed multi-timeframe resampling for targets: {target_timeframes}"
         )
         return results
 
@@ -260,10 +257,10 @@ class BarAggregator:
     def __init__(self, target_timeframe: str) -> None:
         """Description.
             Initialize the aggregator.
-        
+
         Args:
             target_timeframe: str.
-        
+
         Returns:
             None.
         """
@@ -286,14 +283,14 @@ class BarAggregator:
     ) -> dict[str, Any] | None:
         """Description.
             Add a tick and return a completed bar when a period rolls over.
-        
+
         Args:
             timestamp: datetime.
             price: float.
             volume: float.
             bid: float | None.
             ask: float | None.
-        
+
         Returns:
             dict[str, Any] | None.
         """
@@ -316,7 +313,7 @@ class BarAggregator:
     ) -> dict[str, Any] | None:
         """Description.
             Add a lower-timeframe bar to the aggregate state.
-        
+
         Args:
             timestamp: datetime.
             open_price: float.
@@ -324,7 +321,7 @@ class BarAggregator:
             low_price: float.
             close_price: float.
             volume: float.
-        
+
         Returns:
             dict[str, Any] | None.
         """
@@ -358,10 +355,10 @@ class BarAggregator:
     def _get_bar_start_time(self, timestamp: datetime) -> datetime:
         """Description.
             Return the target-period start time for a timestamp.
-        
+
         Args:
             timestamp: datetime.
-        
+
         Returns:
             datetime.
         """
@@ -370,21 +367,19 @@ class BarAggregator:
             f"using frequency={self.target_frequency}"
         )
         period = pd.Period(pd.Timestamp(timestamp), freq=self.target_frequency)
-        return cast(datetime, period.start_time.to_pydatetime())
+        return cast("datetime", period.start_time.to_pydatetime())
 
     def _finalize_current_bar(self) -> dict[str, Any]:
         """Description.
             Finalize and return the current bar.
-        
+
         Args:
             None.
-        
+
         Returns:
             dict[str, Any].
         """
-        logger.debug(
-            f"Finalizing current bar started at {self.current_bar_start}."
-        )
+        logger.debug(f"Finalizing current bar started at {self.current_bar_start}.")
         if not self.current_bar or self.current_bar_start is None:
             raise ValidationError("No current bar to finalize.")
         bar: dict[str, Any] = dict(self.current_bar)
@@ -394,16 +389,15 @@ class BarAggregator:
     def get_current_bar(self) -> dict[str, Any] | None:
         """Description.
             Return the current incomplete bar.
-        
+
         Args:
             None.
-        
+
         Returns:
             dict[str, Any] | None.
         """
         logger.debug(
-            f"Retrieving current incomplete bar started at "
-            f"{self.current_bar_start}."
+            f"Retrieving current incomplete bar started at {self.current_bar_start}."
         )
         if not self.current_bar or self.current_bar_start is None:
             return None
@@ -414,26 +408,25 @@ class BarAggregator:
     def get_completed_bars(self) -> list[dict[str, Any]]:
         """Description.
             Return completed bars.
-        
+
         Args:
             None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
         logger.debug(
-            f"Retrieving list of completed bars (count: "
-            f"{len(self.completed_bars)})."
+            f"Retrieving list of completed bars (count: {len(self.completed_bars)})."
         )
         return self.completed_bars.copy()
 
     def flush(self) -> dict[str, Any] | None:
         """Description.
             Flush current incomplete bar into completed bars.
-        
+
         Args:
             None.
-        
+
         Returns:
             dict[str, Any] | None.
         """
@@ -450,10 +443,10 @@ class BarAggregator:
 def _clean_numpy_types(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Description.
         Convert numpy integers and floats in records to native Python types.
-    
+
     Args:
         records: list[dict[str, Any]].
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -473,10 +466,10 @@ def _clean_numpy_types(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def timeframe_to_pandas_freq(tf: str) -> str:
     """Description.
         Convert a timeframe string into a pandas frequency string.
-    
+
     Args:
         tf: str.
-    
+
     Returns:
         str.
     """
@@ -508,10 +501,10 @@ def timeframe_to_pandas_freq(tf: str) -> str:
 def timeframe_to_minutes(tf: str) -> int:
     """Description.
         Convert a timeframe string into minutes.
-    
+
     Args:
         tf: str.
-    
+
     Returns:
         int.
     """
@@ -549,13 +542,13 @@ def resample_ohlcv(  # noqa: C901
 ) -> list[dict[str, Any]]:
     """Description.
         Resample normalized OHLCV records into higher timeframes.
-    
+
     Args:
         records: list[dict[str, Any]].
         target_timeframe: str.
         spread_policy: str.
         request_id: str | None.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -573,7 +566,9 @@ def resample_ohlcv(  # noqa: C901
     # Validate source timeframe from records
     source_tf = records[0].get("timeframe")
     if not source_tf:
-        raise ValidationError("Source records missing timeframe field.")  # pragma: no cover
+        raise ValidationError(
+            "Source records missing timeframe field."
+        )  # pragma: no cover
 
     validate_timeframe(source_tf)
 
@@ -590,7 +585,9 @@ def resample_ohlcv(  # noqa: C901
     # Convert to DataFrame
     df = pd.DataFrame(records)
     if "symbol" in df.columns and (df["symbol"] != df["symbol"].iloc[0]).any():
-        raise ValidationError("Cannot resample records containing multiple symbols.")  # pragma: no cover
+        raise ValidationError(
+            "Cannot resample records containing multiple symbols."
+        )  # pragma: no cover
 
     df["timestamp_dt"] = pd.to_datetime(df["timestamp"])
     df = df.set_index("timestamp_dt")
@@ -662,14 +659,14 @@ def align_multitimeframe_data(
 ) -> dict[str, list[dict[str, Any]]]:
     """Description.
         Align multiple timeframe datasets to target timestamps without lookahead.
-    
+
     Args:
         datasets: dict[str, list[dict[str, Any]]].
         target_timestamps: list[str].
         allow_lookahead: bool.
         alignment_method: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, list[dict[str, Any]]].
     """
@@ -755,13 +752,13 @@ def aggregate_ticks_to_bars(  # noqa: C901, PLR0912
 ) -> list[dict[str, Any]]:
     """Description.
         Aggregate tick records into OHLCV bars.
-    
+
     Args:
         ticks: list[dict[str, Any]].
         timeframe: str.
         repair: bool.
         request_id: str | None.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -877,7 +874,7 @@ def generate_synthetic_ticks(
 ) -> list[dict[str, Any]]:
     """Description.
         Generate deterministic synthetic tick data using random walks.
-    
+
     Args:
         symbol: str.
         start_time: str.
@@ -888,7 +885,7 @@ def generate_synthetic_ticks(
         volume_behavior: str.
         seed: int | None.
         request_id: str | None.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -966,7 +963,7 @@ def generate_synthetic_bars(
 ) -> list[dict[str, Any]]:
     """Description.
         Generate deterministic synthetic bar data (OHLCV) using GBM.
-    
+
     Args:
         symbol: str.
         timeframe: str.
@@ -980,7 +977,7 @@ def generate_synthetic_bars(
         method: str.
         seed: int | None.
         request_id: str | None.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -1001,7 +998,9 @@ def generate_synthetic_bars(
     validate_timeframe(timeframe)
 
     if method.lower() != "gbm":
-        msg = f"Unsupported synthetic bar generation method: {method}"  # pragma: no cover
+        msg = (
+            f"Unsupported synthetic bar generation method: {method}"  # pragma: no cover
+        )
         raise ValidationError(msg)  # pragma: no cover
 
     rng = np.random.default_rng(seed)
@@ -1078,13 +1077,13 @@ def label_market_data(
 ) -> list[dict[str, Any]]:
     """Description.
         Generate deterministic historical labels without claiming predictive value.
-    
+
     Args:
         records: list[dict[str, Any]].
         horizon: int.
         threshold: float.
         request_id: str | None.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -1106,7 +1105,9 @@ def label_market_data(
 
     # Validate that close price is present in records
     if "close" not in records[0]:
-        raise ValidationError("Records missing mandatory close price column.")  # pragma: no cover
+        raise ValidationError(
+            "Records missing mandatory close price column."
+        )  # pragma: no cover
 
     prices = [float(r["close"]) for r in records]
     n = len(prices)

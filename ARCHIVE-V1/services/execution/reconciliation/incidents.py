@@ -9,9 +9,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from data.database import IncidentRecord, WorkflowRepository
-
 from app.services.utils import generate_id
+from data.database import IncidentRecord, WorkflowRepository
 
 from .comparison import ReconciliationComparison, ReconciliationResultState
 

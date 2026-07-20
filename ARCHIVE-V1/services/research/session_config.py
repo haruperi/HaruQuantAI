@@ -17,7 +17,6 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 EDGE_SESSION_WINDOWS: dict[str, tuple[int, ...]] = {

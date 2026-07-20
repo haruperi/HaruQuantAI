@@ -6,7 +6,6 @@ from collections.abc import Iterable
 from typing import Any
 
 import pandas as pd
-
 from app.services.risk.core import (
     PortfolioStateEngine,
     RecommendationEngine,

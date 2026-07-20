@@ -8,11 +8,11 @@ _USAGE_DIRECTORY = Path(__file__).parents[1] / "usage"
 _EXPECTED_OUTPUT = {
     "01_contracts.py": "AuditEvent:",
     "02_errors.py": "Routed error event:",
-    "03_identity.py": "Stable correlation ID:",
+    "03_identity.py": "Stable artifact ID:",
     "04_time.py": "is_fresh': True",
     "05_serialization.py": "Canonical JSON:",
     "06_security.py": "Redaction policy: protected credential allowlist rejected",
-    "07_settings.py": "Safe .env application settings:",
+    "07_settings.py": "Active settings:",
     "08_logging.py": "Logging verification:",
 }
 

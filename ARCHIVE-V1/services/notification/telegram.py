@@ -8,6 +8,7 @@ Classes and functions:
     TelegramNotifier: Class. Provides TelegramNotifier behavior for notification workflows.
 """
 
+import pathlib
 from dataclasses import dataclass, field
 from typing import Any, cast
 
@@ -219,7 +220,7 @@ class TelegramNotifier(BaseNotifier):
         }
 
         response = requests.post(url, data=data, timeout=30)
-        return cast(dict[str, Any], response.json())
+        return cast("dict[str, Any]", response.json())
 
     def _test_bot_token(self) -> bool:
         """Test if bot token is valid."""
@@ -256,7 +257,7 @@ class TelegramNotifier(BaseNotifier):
             result = response.json()
 
             if result.get("ok"):
-                return cast(dict[str, Any], result["result"])
+                return cast("dict[str, Any]", result["result"])
             self.logger.error(
                 f"Failed to get chat info: {result.get('description', 'Unknown error')}"
             )
@@ -284,7 +285,7 @@ class TelegramNotifier(BaseNotifier):
         try:
             url = f"{self.api_base_url}/sendPhoto"
 
-            with open(photo_path, "rb") as photo:
+            with pathlib.Path(photo_path).open("rb") as photo:
                 files = {"photo": photo}
                 data = {
                     "chat_id": chat_id,
@@ -296,7 +297,7 @@ class TelegramNotifier(BaseNotifier):
                 result = response.json()
 
                 if result.get("ok"):
-                    self.logger.info(f"Photo sent successfully to {chat_id}")
+                    self.logger.info("Photo sent successfully to %s", chat_id)
                     return NotificationResult(
                         success=True,
                         message_id=f"photo_{result['result']['message_id']}",
@@ -317,7 +318,7 @@ class TelegramNotifier(BaseNotifier):
         try:
             url = f"{self.api_base_url}/sendDocument"
 
-            with open(document_path, "rb") as document:
+            with pathlib.Path(document_path).open("rb") as document:
                 files = {"document": document}
                 data = {
                     "chat_id": chat_id,
@@ -329,7 +330,7 @@ class TelegramNotifier(BaseNotifier):
                 result = response.json()
 
                 if result.get("ok"):
-                    self.logger.info(f"Document sent successfully to {chat_id}")
+                    self.logger.info("Document sent successfully to %s", chat_id)
                     return NotificationResult(
                         success=True, message_id=f"doc_{result['result']['message_id']}"
                     )
@@ -356,7 +357,7 @@ class TelegramNotifier(BaseNotifier):
             result = response.json()
 
             if result.get("ok"):
-                return cast(list[dict[str, Any]], result["result"])
+                return cast("list[dict[str, Any]]", result["result"])
             self.logger.error(
                 f"Failed to get updates: {result.get('description', 'Unknown error')}"
             )

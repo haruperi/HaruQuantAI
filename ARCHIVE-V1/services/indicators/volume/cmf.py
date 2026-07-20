@@ -3,7 +3,6 @@
 from typing import Any
 
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -29,7 +28,9 @@ class CMF(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'cmf_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 20, **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 20, **kwargs: Any
+    ) -> pd.DataFrame:
         required_cols = ["high", "low", "close", "volume"]
         for col in required_cols:
             if col not in df.columns:
@@ -40,7 +41,9 @@ class CMF(BaseIndicator):
         result_df = df.copy()
 
         high_low_range = df["high"] - df["low"]
-        mf_multiplier = ((df["close"] - df["low"]) - (df["high"] - df["close"])) / high_low_range.replace(0, 1e-10)
+        mf_multiplier = (
+            (df["close"] - df["low"]) - (df["high"] - df["close"])
+        ) / high_low_range.replace(0, 1e-10)
 
         mf_multiplier = mf_multiplier.fillna(0)
 

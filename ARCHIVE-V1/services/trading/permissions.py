@@ -19,10 +19,9 @@ from __future__ import annotations
 
 from typing import Literal
 
+from app.services.utils.logger import logger
 from data.database import GovernanceRepository
 from data.database.sqlite.database_operations import DatabaseManager
-
-from app.services.utils.logger import logger
 
 StrategyRuntimeContext = Literal[
     "backtest", "optimization", "paper", "live", "live_production"
@@ -104,9 +103,7 @@ class StrategyRuntimePermissionService:
                 registration or its lifecycle state does not permit the
                 requested context.
         """
-        logger.debug(
-            "Authorizing strategy %s for context '%s'.", strategy_id, context
-        )
+        logger.debug("Authorizing strategy %s for context '%s'.", strategy_id, context)
         strategy = self.db.get_strategy(strategy_id)
         if strategy is None:
             logger.error("Strategy %s not found during authorization.", strategy_id)

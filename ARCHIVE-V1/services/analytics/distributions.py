@@ -1075,7 +1075,6 @@ def return_distribution(rets: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _return_distribution_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1138,7 +1137,6 @@ def trade_pnl_distribution(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _trade_pnl_distribution_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1203,7 +1201,6 @@ def r_multiple_distribution(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _r_multiple_distribution_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1271,7 +1268,6 @@ def percentile_summary(
     """AI Tool wrapper for _percentile_summary_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1360,7 +1356,6 @@ def upside_downside_summary(data: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _upside_downside_summary_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1423,7 +1418,6 @@ def skewness(data: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _skewness_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1484,7 +1478,6 @@ def kurtosis(data: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _kurtosis_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1545,7 +1538,6 @@ def higher_moments(data: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _higher_moments_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1608,7 +1600,6 @@ def fat_tail_score(data: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _fat_tail_score_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1673,7 +1664,6 @@ def tail_ratio(
     """AI Tool wrapper for _tail_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1786,7 +1776,6 @@ def jarque_bera_test(data: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _jarque_bera_test_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1849,7 +1838,6 @@ def shapiro_wilk_test(data: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _shapiro_wilk_test_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1912,7 +1900,6 @@ def qq_plot_data(data: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _qq_plot_data_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1978,7 +1965,6 @@ def fit_distribution(
     """AI Tool wrapper for _fit_distribution_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2070,7 +2056,6 @@ def distribution_fit_quality(
     """AI Tool wrapper for _distribution_fit_quality_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2162,7 +2147,6 @@ def histogram_data(
     """AI Tool wrapper for _histogram_data_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2253,7 +2237,6 @@ def detect_outliers(
     """AI Tool wrapper for _detect_outliers_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2372,7 +2355,6 @@ def outlier_ratio(
     """AI Tool wrapper for _outlier_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2494,7 +2476,6 @@ def calculate_distribution_metrics(
     """AI Tool wrapper for _calculate_distribution_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

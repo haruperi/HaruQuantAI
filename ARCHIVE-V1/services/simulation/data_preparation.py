@@ -30,7 +30,6 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
 from app.services.brokers.dukascopy import load_dukascopy
 from app.services.data.generators import (
     TICK_MODEL_GENERATED,
@@ -314,7 +313,6 @@ def resolve_position_size(
     """AI Tool wrapper for _resolve_position_size_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         kwargs = {}
@@ -393,7 +391,7 @@ class SimulationDataPreparer:
             "start": config.data.start,
             "end": config.data.end,
             "warmup_start": config.data.warmup_start,
-            "tick_count": int(len(ticks)),
+            "tick_count": len(ticks),
             "tick_counts_by_symbol": dict(tick_counts_by_symbol),
         }
         return PreparedSimulationData(

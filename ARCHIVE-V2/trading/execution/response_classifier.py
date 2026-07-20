@@ -19,8 +19,6 @@ from __future__ import annotations
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import model_validator
-
 from app.services.trading.contracts import (
     JsonObject,
     NormalizedTradeResult,
@@ -30,6 +28,7 @@ from app.services.trading.contracts import (
 from app.services.trading.errors import classify_broker_error
 from app.services.trading.security.error_mapping import TradingMappedError
 from app.utils.logger import logger
+from pydantic import model_validator
 
 UNKNOWN_OUTCOME_RETCODE = "10005"
 _SUCCESS_RETCODES = frozenset({"10008", "10009"})

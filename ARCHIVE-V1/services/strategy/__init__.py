@@ -113,6 +113,13 @@ __all__ = [
     "register_builtin_strategies",
     "register_strategy",
     "registered_strategies",
+    "BaseStrategy",
+    "SignalDict",
+    "SignalIntent",
+    "StrategyEvent",
+    "StrategyClass",
+    "StrategyRegistryError",
+    "TemplateStrategy",
 ]
 
 

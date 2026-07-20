@@ -76,7 +76,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 from .common import _has_col, analytics_tool_result, get_closed_trades
@@ -2476,7 +2475,6 @@ def drawdown_series(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _drawdown_series_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2541,7 +2539,6 @@ def drawdown_duration_series(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _drawdown_duration_series_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2606,7 +2603,6 @@ def max_strategy_drawdown(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2671,7 +2667,6 @@ def max_strategy_drawdown_percent(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _max_strategy_drawdown_percent_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2737,7 +2732,6 @@ def max_drawdown(returns: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _max_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2802,7 +2796,6 @@ def avg_drawdown(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _avg_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2867,7 +2860,6 @@ def drawdown_distribution(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _drawdown_distribution_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2932,7 +2924,6 @@ def max_drawdown_duration_from_equity(equity_curve: pd.Series) -> dict[str, Any]
     """AI Tool wrapper for _max_drawdown_duration_from_equity_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3000,7 +2991,6 @@ def max_drawdown_duration_from_returns(
     """AI Tool wrapper for _max_drawdown_duration_from_returns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3066,7 +3056,6 @@ def max_drawdown_duration(values, input_type: str = "equity") -> dict[str, Any]:
     """AI Tool wrapper for _max_drawdown_duration_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3157,7 +3146,6 @@ def avg_drawdown_duration(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _avg_drawdown_duration_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3222,7 +3210,6 @@ def time_to_recovery(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _time_to_recovery_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3287,7 +3274,6 @@ def recovery_factor(equity_curve: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _recovery_factor_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3354,7 +3340,6 @@ def trade_level_drawdowns(
     """AI Tool wrapper for _trade_level_drawdowns_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3447,7 +3432,6 @@ def max_close_to_close_drawdown(
     """AI Tool wrapper for _max_close_to_close_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3541,7 +3525,6 @@ def max_close_to_close_drawdown_percent(
     """AI Tool wrapper for _max_close_to_close_drawdown_percent_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3659,7 +3642,6 @@ def avg_trade_drawdown(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _avg_trade_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3724,7 +3706,6 @@ def account_size_required(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _account_size_required_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3791,7 +3772,6 @@ def max_consecutive_drawdown_trades(
     """AI Tool wrapper for _max_consecutive_drawdown_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3883,7 +3863,6 @@ def avg_yearly_max_drawdown(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _avg_yearly_max_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3948,7 +3927,6 @@ def max_strategy_drawdown_date(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _max_strategy_drawdown_date_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4016,7 +3994,6 @@ def max_close_to_close_drawdown_date(
     """AI Tool wrapper for _max_close_to_close_drawdown_date_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4108,7 +4085,6 @@ def ulcer_index(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _ulcer_index_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4171,7 +4147,6 @@ def pain_index(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _pain_index_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4234,7 +4209,6 @@ def avg_underwater_drawdown_percent(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _avg_underwater_drawdown_percent_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4300,7 +4274,6 @@ def pain_ratio(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _pain_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4363,7 +4336,6 @@ def calculate_drawdown_metrics(equity_curve: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _calculate_drawdown_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

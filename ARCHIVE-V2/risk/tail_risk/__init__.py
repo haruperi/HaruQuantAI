@@ -1,4 +1,4 @@
-# ruff: noqa: ANN401, TC001
+# ruff: noqa: ANN401
 """Tail-risk engine package initialization."""
 
 from __future__ import annotations

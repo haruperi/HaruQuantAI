@@ -11,7 +11,6 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 if TYPE_CHECKING:

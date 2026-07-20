@@ -1571,7 +1571,6 @@ def _calculate_analytics_for_subset_impl(
     """AI Tool wrapper for _calculate_analytics_for_subset_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -1773,7 +1772,6 @@ def _get_analytics_overview_impl(
     """AI Tool wrapper for _get_analytics_overview_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -1942,7 +1940,6 @@ def _format_summary_as_rows_impl(summary_data: dict[str, Any]) -> dict[str, Any]
     """AI Tool wrapper for _format_summary_as_rows_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -2014,7 +2011,6 @@ def _build_overview_payload_impl(
     """AI Tool wrapper for _build_overview_payload_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -2217,7 +2213,6 @@ def _calculate_spread_cost_impact_impl(
     """AI Tool wrapper for _calculate_spread_cost_impact_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -2421,7 +2416,6 @@ def _calculate_slippage_impact_impl(
     """AI Tool wrapper for _calculate_slippage_impact_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -2625,7 +2619,6 @@ def _calculate_commission_impact_impl(
     """AI Tool wrapper for _calculate_commission_impact_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -2828,7 +2821,6 @@ def _build_backtest_report_impl(
     """AI Tool wrapper for _build_backtest_report_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -3004,7 +2996,6 @@ def calculate_analytics_for_subset(
     """AI Tool wrapper for _calculate_analytics_for_subset_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -3206,7 +3197,6 @@ def get_analytics_overview(
     """AI Tool wrapper for _get_analytics_overview_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -3375,7 +3365,6 @@ def format_summary_as_rows(summary_data: dict[str, Any]) -> dict[str, Any]:
     """AI Tool wrapper for _format_summary_as_rows_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -3447,7 +3436,6 @@ def build_overview_payload(
     """AI Tool wrapper for _build_overview_payload_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -3650,7 +3638,6 @@ def calculate_spread_cost_impact(
     """AI Tool wrapper for _calculate_spread_cost_impact_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -3854,7 +3841,6 @@ def calculate_slippage_impact(
     """AI Tool wrapper for _calculate_slippage_impact_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -4058,7 +4044,6 @@ def calculate_commission_impact(
     """AI Tool wrapper for _calculate_commission_impact_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result
@@ -4261,7 +4246,6 @@ def build_backtest_report(
     """AI Tool wrapper for _build_backtest_report_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result

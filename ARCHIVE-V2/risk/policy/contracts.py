@@ -9,8 +9,6 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from pydantic import Field
-
 from app.services.risk.models import (
     PolicyEnforcementResult,
     PolicyRule,
@@ -20,6 +18,7 @@ from app.services.risk.models import (
     RiskContract,
 )
 from app.utils.logger import logger
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.risk.validations import ValidationResult

@@ -30,8 +30,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from pydantic import Field
-
 from app.services.trading.contracts import TradingContract, TradingStatus
 from app.services.trading.execution.broker_capability_validation import (
     validate_broker_capabilities,
@@ -46,6 +44,7 @@ from app.services.trading.gates._common import (
 )
 from app.services.trading.security.error_mapping import TradingValidationError
 from app.utils.logger import logger
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.trading.contracts import QuoteSnapshot, TradingRequestEnvelope

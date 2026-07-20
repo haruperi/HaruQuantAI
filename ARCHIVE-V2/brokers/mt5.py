@@ -10,7 +10,6 @@ from typing import Any
 
 import MetaTrader5 as mt5  # type: ignore[import-untyped, unused-ignore]  # noqa: N813
 import pandas as pd
-
 from app.services.brokers.errors import BrokerConfigurationError as ConfigurationError
 from app.services.brokers.errors import (
     BrokerExternalServiceError as ExternalServiceError,

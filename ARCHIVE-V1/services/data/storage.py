@@ -18,10 +18,10 @@ from pathlib import Path
 from typing import Any, cast
 
 import pandas as pd
-
 from app.services.utils.errors import DataError, ValidationError
 from app.services.utils.logger import logger
 from app.services.utils.paths import ensure_parent_dir, normalize_path
+
 
 @dataclass(frozen=True)
 class Bar:
@@ -33,6 +33,7 @@ class Bar:
     low: float
     close: float
     volume: float
+
 
 APPROVED_STORAGE_ROOTS: list[str] = [
     "data/raw",
@@ -51,10 +52,10 @@ DEFAULT_NORMALIZATION_VERSION: str = "v1"
 def validate_storage_path(path_str: str) -> Path:
     """Description.
         Validate that the path is secure and falls within approved storage roots.
-    
+
     Args:
         path_str: str.
-    
+
     Returns:
         Path.
     """
@@ -107,10 +108,10 @@ class DatabaseHelper:
     def __init__(self, db_path: str = DB_FILE_PATH) -> None:
         """Description.
             Initialize and ensure database file exists.
-        
+
         Args:
             db_path: str.
-        
+
         Returns:
             None.
         """
@@ -124,10 +125,10 @@ class DatabaseHelper:
     def get_connection(self) -> Generator[sqlite3.Connection]:
         """Description.
             Context manager providing a configured SQLite connection.
-        
+
         Args:
             None.
-        
+
         Returns:
             Generator[sqlite3.Connection].
         """
@@ -150,10 +151,10 @@ class DatabaseHelper:
     def init_database(self) -> None:
         """Description.
             Ensure core tables and migrations are initialized.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -180,11 +181,11 @@ class DatabaseHelper:
     def _apply_migrations(self, conn: sqlite3.Connection, current: int) -> None:
         """Description.
             Apply incremental schema upgrades to the database.
-        
+
         Args:
             conn: sqlite3.Connection.
             current: int.
-        
+
         Returns:
             None.
         """
@@ -294,7 +295,7 @@ def generate_cache_key(
 ) -> str:
     """Description.
         Generate a unique deterministic SHA256 cache key.
-    
+
     Args:
         source: str.
         symbol: str.
@@ -304,7 +305,7 @@ def generate_cache_key(
         schema_version: str.
         normalization_version: str.
         raw_hash: str | None.
-    
+
     Returns:
         str.
     """
@@ -312,7 +313,9 @@ def generate_cache_key(
         f"{source}:{symbol}:{timeframe}:{start_time}:{end_time}:"
         f"{schema_version}:{normalization_version}:{raw_hash or ''}"
     )
-    logger.debug(f"Generating cache key for source={source}, symbol={symbol}, timeframe={timeframe}")
+    logger.debug(
+        f"Generating cache key for source={source}, symbol={symbol}, timeframe={timeframe}"
+    )
     return hashlib.sha256(key_str.encode("utf-8")).hexdigest()
 
 
@@ -321,12 +324,12 @@ def get_cached_data(
 ) -> dict[str, Any] | None:
     """Description.
         Retrieve data records from cache, evaluating TTL.
-    
+
     Args:
         key: str.
         stale_data_behavior: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any] | None.
     """
@@ -396,7 +399,7 @@ def set_cached_data(
 ) -> None:
     """Description.
         Store data records into cache.
-    
+
     Args:
         key: str.
         source: str.
@@ -410,7 +413,7 @@ def set_cached_data(
         normalization_version: str.
         raw_hash: str | None.
         request_id: str | None.
-    
+
     Returns:
         None.
     """
@@ -465,14 +468,14 @@ def clear_data_cache(
 ) -> dict[str, Any]:
     """Description.
         Inspect or delete cache records.
-    
+
     Args:
         namespace: str.
         source_filter: str | None.
         symbol_filter: str | None.
         dry_run: bool.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -534,7 +537,7 @@ def save_market_data(
 ) -> dict[str, Any]:
     """Description.
         Atomically writes normalized market data to file.
-    
+
     Args:
         records: list[dict[str, Any]].
         path_str: str.
@@ -542,7 +545,7 @@ def save_market_data(
         overwrite: bool.
         include_metadata: bool.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -616,11 +619,11 @@ def load_local_dataset(
 ) -> list[dict[str, Any]]:
     """Description.
         Loads CSV or Parquet file dataset from local roots.
-    
+
     Args:
         path_str: str.
         request_id: str | None.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -664,10 +667,10 @@ _TIME_COLUMNS = ("open_time", "time", "timestamp", "datetime", "date")
 def _parse_timezone_aware_datetime(val: str) -> datetime:
     """Description.
         Parse an ISO-8601 string into a timezone-aware datetime.
-    
+
     Args:
         val: str.
-    
+
     Returns:
         datetime.
     """
@@ -681,10 +684,10 @@ def _parse_timezone_aware_datetime(val: str) -> datetime:
 def load_ohlcv_csv(path: str | Path) -> tuple[Bar, ...]:
     """Description.
         Load canonical OHLCV bars from a UTF-8 CSV file.
-    
+
     Args:
         path: str | Path.
-    
+
     Returns:
         tuple[Bar, ...].
     """
@@ -719,7 +722,7 @@ def load_ohlcv_csv(path: str | Path) -> tuple[Bar, ...]:
             msg = f"Invalid OHLCV row: {row!r}"
             raise ValueError(msg) from error
 
-    return cast(tuple[Bar, ...], validate_bars(cast(Any, bars)))
+    return cast("tuple[Bar, ...]", validate_bars(cast("Any", bars)))
 
 
 __all__ = [

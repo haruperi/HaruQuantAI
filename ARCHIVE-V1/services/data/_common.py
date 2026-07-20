@@ -59,7 +59,6 @@ from pathlib import Path
 from typing import Any, Literal
 
 import pandas as pd
-
 from app.services import service_modules
 from app.services.utils.common import serialize_dataframe_records
 from app.services.utils.logger import logger
@@ -341,9 +340,8 @@ def data_cache_get(
     """
     key = data_cache_make_key(source_name, payload)
     try:
-        with _data_cache_open_env() as env:
-            with env.begin(write=False) as txn:
-                raw = txn.get(key)
+        with _data_cache_open_env() as env, env.begin(write=False) as txn:
+            raw = txn.get(key)
     except ImportError:
         path = _data_cache_file_path(key)
         if not path.exists():
@@ -372,9 +370,8 @@ def data_cache_set(
     key = data_cache_make_key(source_name, payload)
     raw = pickle.dumps(frame, protocol=pickle.HIGHEST_PROTOCOL)
     try:
-        with _data_cache_open_env() as env:
-            with env.begin(write=True) as txn:
-                txn.put(key, raw)
+        with _data_cache_open_env() as env, env.begin(write=True) as txn:
+            txn.put(key, raw)
     except ImportError:
         path = _data_cache_file_path(key)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -551,7 +548,7 @@ def _market_data_payload(
         "source": source,
         "request": request,
         "downloaded_at": datetime.now(UTC).isoformat(),
-        "rows": int(len(frame)),
+        "rows": len(frame),
         "columns": [str(column) for column in frame.columns],
         "candles": _serialize_frame_records(frame),
     }
@@ -1073,7 +1070,7 @@ def get_spread_data(
             "symbol": symbol,
             "source": source,
             "timeframe": timeframe,
-            "rows": int(len(spread_frame)),
+            "rows": len(spread_frame),
             "spread": _serialize_frame_records(spread_frame),
         }
 
@@ -1338,7 +1335,7 @@ def get_historical_volume(
             "symbol": symbol.upper(),
             "source": source,
             "timeframe": timeframe,
-            "rows": int(len(volume)),
+            "rows": len(volume),
             "statistics": {
                 "mean": float(volume.mean()) if len(volume) else 0.0,
                 "median": float(volume.median()) if len(volume) else 0.0,
@@ -1401,8 +1398,8 @@ def resample_ohlcv(
         simulated_result = {
             "source_timeframe": source_timeframe,
             "target_timeframe": target_timeframe,
-            "input_rows": int(len(frame)),
-            "output_rows": int(len(resampled)),
+            "input_rows": len(frame),
+            "output_rows": len(resampled),
             "columns": [str(column) for column in resampled.columns],
             "candles": _serialize_frame_records(resampled),
         }
@@ -1450,7 +1447,7 @@ def align_multitimeframe_data(
         row_counts: dict[str, int] = {}
         for timeframe, timeframe_records in datasets.items():
             frame = _frame_from_records(records=timeframe_records)
-            row_counts[timeframe] = int(len(frame))
+            row_counts[timeframe] = len(frame)
             renamed = frame.add_prefix(f"{timeframe.lower()}_")
             aligned_frames.append(renamed)
         aligned = pd.concat(aligned_frames, axis=1, join=join).sort_index()
@@ -1460,7 +1457,7 @@ def align_multitimeframe_data(
             "base_timeframe": base_timeframe,
             "join": join,
             "input_rows": row_counts,
-            "output_rows": int(len(aligned)),
+            "output_rows": len(aligned),
             "columns": [str(column) for column in aligned.columns],
             "records": _serialize_frame_records(aligned),
         }
@@ -1538,7 +1535,7 @@ def get_tick_data(
         simulated_result = {
             "source": source,
             "symbol": symbol.upper(),
-            "rows": int(len(frame)),
+            "rows": len(frame),
             "columns": [str(column) for column in frame.columns],
             "ticks": _serialize_frame_records(frame),
         }

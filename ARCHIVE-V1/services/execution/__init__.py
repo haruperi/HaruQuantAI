@@ -96,6 +96,8 @@ from .readiness_tools import (
 from .trading import Trade, TradeResult
 
 __all__ = [
+    "Trade",
+    "TradeResult",
     "build_execution_plan",
     "build_live_execution_report",
     "build_paper_trading_report",

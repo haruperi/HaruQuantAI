@@ -179,7 +179,6 @@ def build_symbol_summary(
     """AI Tool wrapper for _build_symbol_summary_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         kwargs = {}

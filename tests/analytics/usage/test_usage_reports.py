@@ -23,7 +23,7 @@ from app.services.analytics.reports.comparison import compare_performance_report
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
 from app.services.analytics.reports.portfolio import build_portfolio_performance_report
 from app.services.analytics.reports.serialization import serialize_report
-from app.utils import canonical_json, derive_stable_id, logger
+from app.utils import canonical_json, generate_id, logger
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 
@@ -85,9 +85,7 @@ def _report(
     report = build_performance_report(
         source,
         source_contract="simulation.result",
-        request_id=derive_stable_id(
-            "req", f"analytics-report:{account_currency}:{profit}:{source_id}"
-        ),
+        request_id=generate_id("req"),
         initial_balance=Decimal(1000),
         account_currency=account_currency,
         config=config,

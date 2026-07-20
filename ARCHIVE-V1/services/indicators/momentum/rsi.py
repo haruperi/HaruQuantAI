@@ -3,7 +3,6 @@
 from typing import Any
 
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -29,7 +28,9 @@ class RSI(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'rsi_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 14, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 14, column: str = "close", **kwargs: Any
+    ) -> pd.DataFrame:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:
@@ -42,8 +43,8 @@ class RSI(BaseIndicator):
         loss = -delta.clip(upper=0)
 
         # Wilder's smoothing technique
-        avg_gain = gain.ewm(alpha=1/period, adjust=False).mean()
-        avg_loss = loss.ewm(alpha=1/period, adjust=False).mean()
+        avg_gain = gain.ewm(alpha=1 / period, adjust=False).mean()
+        avg_loss = loss.ewm(alpha=1 / period, adjust=False).mean()
 
         rs = avg_gain / avg_loss.replace(0, 1e-10)
         rsi = 100 - (100 / (1 + rs))

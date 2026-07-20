@@ -10,8 +10,6 @@ import random
 import time
 from typing import Any
 
-from pydantic import BaseModel, Field
-
 from app.services.optimization.algorithms.grid import check_constraints
 from app.services.optimization.algorithms.random import sample_parameter
 from app.services.optimization.errors import (
@@ -30,6 +28,7 @@ from app.services.optimization.models import (
 )
 from app.services.optimization.scoring import evaluate_candidate_score
 from app.utils.logger import logger
+from pydantic import BaseModel, Field
 
 
 class GeneticAlgorithmResult(BaseModel):

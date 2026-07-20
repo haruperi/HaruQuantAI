@@ -1,5 +1,4 @@
 """Read-only account information facade."""
-# ruff: noqa: TC001
 
 from __future__ import annotations
 

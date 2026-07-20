@@ -20,7 +20,7 @@ class MarketState:
 
     @property
     def row_count(self) -> int:
-        return int(len(self.bars))
+        return len(self.bars)
 
     @property
     def last_close(self) -> float | None:

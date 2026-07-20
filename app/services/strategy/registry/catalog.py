@@ -28,7 +28,7 @@ from app.services.strategy.registry.validation import (
     validate_strategy_config,
     validate_strategy_ref,
 )
-from app.utils import AuditEvent, AuthContext, canonical_json, derive_stable_id, logger
+from app.utils import AuditEvent, AuthContext, canonical_json, generate_id, logger
 
 _REGISTER_PERMISSION = "strategy:register"
 _UPDATE_PERMISSION = "strategy:update"
@@ -242,8 +242,8 @@ def list_strategy_versions(
         Ordered validated references or a missing-id error.
     """
     logger.info("Listing immutable Strategy versions")
-    request_id = derive_stable_id("req", f"strategy-list:{strategy_id or '*'}")
-    correlation_id = derive_stable_id("cor", f"strategy-list:{strategy_id or '*'}")
+    request_id = generate_id("req")
+    correlation_id = generate_id("cor")
     try:
         ensure_strategy_storage(request_id)
         if strategy_id is None:
@@ -485,7 +485,7 @@ def _publish_mutation(
         Mutation result with publication evidence or pending state.
     """
     logger.info("Publishing Strategy mutation audit evidence")
-    event_id = derive_stable_id("evt", mutation.mutation_id)
+    event_id = generate_id("evt")
     try:
         persist_audit_event(
             AuditEvent(

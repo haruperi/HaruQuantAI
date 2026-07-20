@@ -1,14 +1,12 @@
-"""Explicit runtime-settings loading and opaque secret resolution."""
+"""Explicit immutable runtime-settings loading."""
 
 from __future__ import annotations
 
-import re
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 
-from pydantic import SecretStr
 from pydantic import ValidationError as PydanticValidationError
 
-from app.utils.errors.exceptions import ConfigurationError, SecurityError
+from app.utils.errors.exceptions import ConfigurationError
 from app.utils.settings.models import AppSettings, LoggingSettings, RuntimeSettings
 
 _SUPPORTED_KEYS = frozenset(
@@ -27,7 +25,6 @@ _SUPPORTED_KEYS = frozenset(
         "LOG_COLORIZE",
     }
 )
-_SECRET_REFERENCE = re.compile(r"secret://[A-Za-z0-9._/-]{1,255}\Z")
 
 
 class _EnvironmentSettings(AppSettings):
@@ -219,6 +216,10 @@ def load_settings(
     unknown = set(explicit) - _SUPPORTED_KEYS
     if unknown:
         raise ConfigurationError("CONFIGURATION_UNKNOWN_KEY")
+    if environment is not None:
+        unknown_environment = set(environment) - _SUPPORTED_KEYS
+        if unknown_environment:
+            raise ConfigurationError("CONFIGURATION_UNKNOWN_KEY")
     source_environment = (
         _load_environment_settings() if environment is None else environment
     )
@@ -238,31 +239,3 @@ def load_settings(
         return RuntimeSettings.model_validate(runtime_values)
     except PydanticValidationError:
         raise ConfigurationError("CONFIGURATION_INVALID") from None
-
-
-def resolve_secret_reference(
-    reference: str,
-    source: Callable[[str], str],
-) -> SecretStr:
-    """Resolve an opaque secret reference through an injected source.
-
-    Args:
-        reference: Valid opaque ``secret://`` reference.
-        source: Injected secret-source callable.
-
-    Returns:
-        A masked Pydantic secret value.
-
-    Raises:
-        ConfigurationError: If the reference is malformed.
-        SecurityError: If resolution fails or returns no secret.
-    """
-    if _SECRET_REFERENCE.fullmatch(reference) is None:
-        raise ConfigurationError("SECRET_REFERENCE_INVALID")
-    try:
-        resolved = source(reference)
-    except Exception:  # noqa: BLE001 - injected sources may use arbitrary clients.
-        raise SecurityError("SECRET_RESOLUTION_FAILED") from None
-    if not isinstance(resolved, str) or not resolved:
-        raise SecurityError("SECRET_RESOLUTION_FAILED")
-    return SecretStr(resolved)

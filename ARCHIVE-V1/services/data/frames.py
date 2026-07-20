@@ -30,7 +30,6 @@ from pathlib import Path
 from typing import Any, cast
 
 import pandas as pd
-
 from app.services.utils.common import serialize_dataframe_records
 from app.services.utils.logger import logger
 
@@ -48,12 +47,12 @@ class Data:
     ) -> None:
         """Description.
             Initialize the data container.
-        
+
         Args:
             df: pd.DataFrame.
             symbol: str | list[str].
             timeframe: str | None.
-        
+
         Returns:
             None.
         """
@@ -68,10 +67,10 @@ class Data:
     def df(self) -> pd.DataFrame:
         """Description.
             Return the underlying market-data frame.
-        
+
         Args:
             None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -82,10 +81,10 @@ class Data:
     def symbol(self) -> str | list[str]:
         """Description.
             Return the symbol(s) the data represents.
-        
+
         Args:
             None.
-        
+
         Returns:
             str | list[str].
         """
@@ -96,10 +95,10 @@ class Data:
     def timeframe(self) -> str | None:
         """Description.
             Return the timeframe identifier.
-        
+
         Args:
             None.
-        
+
         Returns:
             str | None.
         """
@@ -110,10 +109,10 @@ class Data:
     def close(self) -> pd.Series | pd.DataFrame:
         """Description.
             Return the close price(s).
-        
+
         Args:
             None.
-        
+
         Returns:
             pd.Series | pd.DataFrame.
         """
@@ -136,10 +135,10 @@ class Data:
     def __getattr__(self, name: str) -> Any:
         """Description.
             Return a DataFrame column matching ``name`` (case-insensitive).
-        
+
         Args:
             name: str.
-        
+
         Returns:
             Any.
         """
@@ -156,11 +155,11 @@ def _frame_from_records(
 ) -> pd.DataFrame:
     """Description.
         Build a DataFrame from either direct data or JSON-style records.
-    
+
     Args:
         records: list[dict[str, Any]] | None.
         data: pd.DataFrame | None.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -184,27 +183,27 @@ def _frame_from_records(
 def _serialize_frame_records(frame: pd.DataFrame) -> list[dict[str, Any]]:
     """Description.
         Convert a pandas DataFrame to JSON-safe records.
-    
+
     Args:
         frame: pd.DataFrame.
-    
+
     Returns:
         list[dict[str, Any]].
     """
     logger.debug("Implemented serialize frame records.")
     records = serialize_dataframe_records(frame)
     if isinstance(records, dict) and records.get("status") == "success":
-        return cast(list[dict[str, Any]], records.get("data", []))
-    return cast(list[dict[str, Any]], records)
+        return cast("list[dict[str, Any]]", records.get("data", []))
+    return cast("list[dict[str, Any]]", records)
 
 
 def _json_safe(value: Any) -> Any:
     """Description.
         Convert pandas/numpy/datetime objects into JSON-safe values.
-    
+
     Args:
         value: Any.
-    
+
     Returns:
         Any.
     """
@@ -234,10 +233,10 @@ def _json_safe(value: Any) -> Any:
 def _data_from_payload(payload: dict[str, Any]) -> Data:
     """Description.
         Build a Data object from a data tool payload.
-    
+
     Args:
         payload: dict[str, Any].
-    
+
     Returns:
         Data.
     """
@@ -270,7 +269,7 @@ def _data_from_payload(payload: dict[str, Any]) -> Data:
     )
     return Data(
         df,
-        symbol=cast(str | list[str], symbol),
+        symbol=cast("str | list[str]", symbol),
         timeframe=request.get("timeframe")
         or metadata.get("timeframe")
         or actual_payload.get("timeframe"),
@@ -280,10 +279,10 @@ def _data_from_payload(payload: dict[str, Any]) -> Data:
 def _coerce_data(data: Data | dict[str, Any]) -> Data:
     """Description.
         Coerce a Data object or payload dict into a Data object.
-    
+
     Args:
         data: Data | dict[str, Any].
-    
+
     Returns:
         Data.
     """
@@ -296,10 +295,10 @@ def _coerce_data(data: Data | dict[str, Any]) -> Data:
 def _data_to_metadata(data: Data) -> dict[str, Any]:
     """Description.
         Build JSON-safe metadata describing a Data object.
-    
+
     Args:
         data: Data.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -325,13 +324,13 @@ def _saved_data_path(
 ) -> Path:
     """Description.
         Resolve the on-disk path for saved market data.
-    
+
     Args:
         extension: str.
         path: str | Path | None.
         symbol: str.
         timeframe: str.
-    
+
     Returns:
         Path.
     """
@@ -352,13 +351,13 @@ def _save_data(
 ) -> dict[str, Any]:
     """Description.
         Persist a Data object to CSV or Parquet with metadata.
-    
+
     Args:
         data: Data | dict[str, Any].
         extension: str.
         path: str | Path | None.
         is_initial: bool.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -402,13 +401,13 @@ def _load_saved_data(
 ) -> Data:
     """Description.
         Load a previously saved Data object from disk.
-    
+
     Args:
         extension: str.
         path: str | Path | None.
         symbol: str.
         timeframe: str.
-    
+
     Returns:
         Data.
     """
@@ -448,10 +447,10 @@ def _load_saved_data(
 def data_df(payload: dict[str, Any]) -> pd.DataFrame:
     """Description.
         Convert a data tool payload into a pandas DataFrame. Use this tool when a structured data tool response should be inspected or passed into dataframe-based utilities.
-    
+
     Args:
         payload: dict[str, Any].
-    
+
     Returns:
         pd.DataFrame.
     """

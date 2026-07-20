@@ -8,11 +8,10 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from pydantic import Field
-
 from app.services.trading.config.models import TradingConfigModel, TradingRuntimeConfig
 from app.utils.logger import logger
 from app.utils.standard import canonical_json
+from pydantic import Field
 
 type TradingConfigSource = Mapping[str, object] | str | Path
 

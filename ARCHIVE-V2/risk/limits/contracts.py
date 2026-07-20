@@ -11,8 +11,6 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import Any, Protocol
 
-from pydantic import Field
-
 from app.services.risk.models import (
     RiskAssessmentRequest,
     RiskConfig,
@@ -22,6 +20,7 @@ from app.services.risk.models import (
     RiskSeverity,
 )
 from app.utils.logger import logger
+from pydantic import Field
 
 
 class LimitResult(RiskContract):

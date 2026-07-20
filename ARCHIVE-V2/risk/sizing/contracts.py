@@ -3,13 +3,12 @@
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import Field
-
 from app.services.risk.models.contracts import (
     PositionSizingRequest,
     PositionSizingResult,
     RiskContract,
 )
+from pydantic import Field
 
 
 class SizingMethod(StrEnum):

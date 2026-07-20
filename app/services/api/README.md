@@ -46,6 +46,12 @@ required dependency cannot be verified.
   presentation, and non-authoritative governed-write preflight.
 - Requests to Risk for kill-switch activation or authorized clearance; UI/API never
   owns or mutates canonical kill-switch state.
+- Clock-drift readiness diagnostics; the probe reports drift and never corrects a
+  clock, rewrites a timestamp, or blocks a request.
+- Operational telemetry transport: recording through explicitly injected sinks,
+  metric-label hygiene, bounded snapshots, and the protected Prometheus exposition
+  surface. UI/API computes no business, performance, or risk metric, and telemetry is
+  never an input to a governed decision.
 
 ### Does not own
 
@@ -173,9 +179,15 @@ app/services/api/
 │   ├── __init__.py
 │   ├── context.py                # Request, trace, actor, session, and route intent
 │   └── redaction.py              # Secret-safe allowlisted request telemetry
+├── observability/
+│   ├── __init__.py
+│   ├── sinks.py                  # Injected telemetry sink boundary
+│   ├── metrics.py                # Recording and metric-label hygiene
+│   └── exposition.py             # Bounded snapshot and Prometheus rendering
 ├── health/
 │   ├── __init__.py
-│   └── probes.py                 # Public liveness and protected readiness
+│   ├── probes.py                 # Public liveness and protected readiness
+│   └── clock.py                  # Signed clock-drift readiness diagnostic
 ├── streams/
 │   ├── __init__.py
 │   ├── events.py                 # Stream envelope validation
@@ -295,7 +307,8 @@ higher-authority exclusion.
 | `CAP-UI-003` canonical identity/sessions | `identity/`; `FR-API-009`–`FR-API-013`; UI/API-owned state and opaque-cookie/bearer transport |
 | `CAP-UI-004` authorization/governed writes/idempotency | `identity/`; `FR-API-014`, `FR-API-015`; UI/API-owned storage policy |
 | `CAP-UI-005` request security/context/observability | `middleware/`; `FR-API-016`, `FR-API-017` |
-| `CAP-UI-006` health/readiness | `health/`; `FR-API-018`, `FR-API-019` |
+| `CAP-UI-006` health/readiness | `health/`; `FR-API-018`, `FR-API-019`, `FR-API-059` |
+| `CAP-UI-024` operational telemetry and exposition | `observability/`; `FR-API-060`–`FR-API-063` |
 | `CAP-UI-007` operator approvals/events | `routes/operator.py`; `FR-API-034` |
 | `CAP-UI-008` settings | `routes/settings.py`; `FR-API-023` |
 | `CAP-UI-009` market data/prepared datasets | `routes/data.py`; `FR-API-024` |
@@ -527,19 +540,91 @@ readiness → typed response.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Missing | `probes.py` | Report minimal public liveness and protected dependency readiness | `get_liveness`, `get_readiness` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** approved dependency health APIs; `contracts` |
+| Missing | `clock.py` | Report signed local-clock drift against an authoritative external instant as a readiness diagnostic | `check_clock_drift` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `app.utils` → `utc_now`; approved Brokers server-time read; `contracts` |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Missing | `FR-API-018` | Return HTTP 200 with coarse service status only when the process accepts requests; expose no private dependency data. | `get_liveness() -> ApiResponse[Liveness]` | None | None | **Usage:** `tests/api/usage/test_usage_health.py::test_usage_liveness()`<br>**Unit:** `tests/api/unit/test_health.py::test_liveness_contains_no_private_data()` |
 | Missing | `FR-API-019` | Return protected required/optional component readiness with degraded reasons and timestamps. | `get_readiness(context: AuthContext) -> ApiResponse[Readiness]` | Read-only | `AuthorizationError`: detail not permitted; `DependencyUnavailableError`: required dependency failed | **Usage:** `tests/api/usage/test_usage_health.py::test_usage_readiness()`<br>**Unit:** `tests/api/unit/test_health.py::test_required_failure_is_not_healthy()` |
+| Missing | `FR-API-059` | Report signed local-clock drift against an authoritative external instant, expose it as a `readiness` detail, and mark readiness degraded when the absolute drift exceeds the configured tolerance. Drift is diagnostic only and never rewrites a timestamp or blocks execution. | `check_clock_drift(reference: datetime, *, tolerance_seconds: Decimal) -> Decimal` | Read-only | `ValidationError`: naive/non-UTC reference or non-positive tolerance | **Usage:** `tests/api/usage/test_usage_health.py::test_usage_clock_drift()`<br>**Unit:** `tests/api/unit/test_clock.py::test_drift_is_signed_and_utc_only()`, `test_drift_beyond_tolerance_degrades_readiness()` |
 
-**Configuration and Limits Manifest:** None. Required/optional classification is owned
-by composition and the configured dependency set.
+**Configuration and Limits Manifest**
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `CLOCK_DRIFT_TOLERANCE_SECONDS` | `Decimal` | `2` | No | `check_clock_drift` | Absolute drift beyond this value marks readiness degraded. Diagnostic only; it never blocks a request or alters a recorded timestamp. |
+
+Required/optional dependency classification remains owned by composition and the
+configured dependency set.
 
 **Implementation notes:** replace V1 constant health and placeholder Redis reporting;
 probe only configured dependencies through public health APIs.
 
-### 4.5 `streams/` — Ordered event delivery
+**Why clock drift lives here.** Utils rejects future timestamps at every freshness
+boundary (`app/utils/README.md` `FR-UTL-012`), which correctly prevents skewed
+timestamps from entering evidence but gives an operator no way to see *why* freshness
+checks are failing. `check_clock_drift` closes that diagnostic gap without granting
+telemetry or time-correction authority. Utils owns no health provider
+(`app/utils/README.md` "Does not own"), so the probe belongs in UI/API. Clock
+synchronisation itself remains an infrastructure responsibility (NTP/chrony); this
+requirement only surfaces the condition.
+
+### 4.5 `observability/` — Operational telemetry and exposition
+
+**Module flow:** emitting-domain observation → injected sink → label hygiene → bounded
+snapshot → Prometheus text exposition → protected scrape route.
+
+UI/API owns the telemetry transport and exposition surface only. It records counters,
+gauges, and timings supplied by emitting domains and computes no business, performance,
+or risk metric — those belong to Analytics and Research. Three rules are normative:
+
+- **Injection, never a global registry.** Emitting domains pass an explicit
+  `MetricSink`, mirroring the injected-sink pattern already used by
+  `route_error_event(exception, sink)` in Utils. No module-global mutable registry
+  exists, so telemetry stays compatible with multi-process deployment and with
+  `NFR-UTL-003` import safety.
+- **Telemetry is never authoritative.** No governed decision reads a metric. Telemetry
+  failure, sink unavailability, or a disabled `METRICS_ENABLED` never blocks, delays,
+  or alters execution, and never changes a recorded business outcome.
+- **Label hygiene before emission.** Labels are validated against the shared sensitive-key
+  denylist and a cardinality bound before any value reaches a sink, reusing
+  `app.utils.security.is_sensitive_key` rather than defining a second secret pattern.
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `sinks.py` | Define the injected telemetry sink boundary and a bounded in-process sink | `MetricSink`, `InProcessMetricSink` | **Standard library:** `collections.abc`, `decimal`, `threading`<br>**Required third-party:** None<br>**Local:** `contracts` |
+| Missing | `metrics.py` | Validate label hygiene and record one observation through an injected sink | `record_metric`, `validate_metric_labels` | **Standard library:** `collections.abc`, `decimal`<br>**Required third-party:** None<br>**Local:** `app.utils.security` → `is_sensitive_key`; `sinks.py` |
+| Missing | `exposition.py` | Collect a bounded snapshot and render Prometheus text exposition | `MetricSnapshot`, `build_metric_snapshot`, `export_prometheus_metrics` | **Standard library:** `collections.abc`, `decimal`<br>**Required third-party:** Prometheus text-format renderer; the exact compatible constraint is `Pending` and belongs in `pyproject.toml` before implementation<br>**Local:** `sinks.py` |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-API-060` | Record one counter, gauge, or timing observation through an explicitly injected sink; never through a module-global registry. Recording is a no-op when `METRICS_ENABLED` is false. | `record_metric(name: str, value: Decimal, *, labels: Mapping[str, str], sink: MetricSink) -> None` | Caller-provided sink mutation | `ValidationError`: malformed metric name or non-finite value | **Usage:** `tests/api/usage/test_usage_observability.py::test_usage_record_metric()`<br>**Unit:** `tests/api/unit/test_metrics.py::test_record_uses_injected_sink_only()`, `test_disabled_metrics_is_noop()` |
+| Missing | `FR-API-061` | Reject label values that match the shared sensitive-key denylist or exceed the configured cardinality bound, before any value reaches a sink. | `validate_metric_labels(labels: Mapping[str, str]) -> None` | None | `SecurityError`: sensitive label key; `ValidationError`: cardinality bound exceeded or malformed label | **Usage:** `tests/api/usage/test_usage_observability.py::test_usage_label_hygiene()`<br>**Unit:** `tests/api/unit/test_metrics.py::test_secret_bearing_label_rejected()`, `test_high_cardinality_label_rejected()` |
+| Missing | `FR-API-062` | Collect a bounded point-in-time snapshot from a sink and render it as Prometheus text exposition without mutating recorded state. | `build_metric_snapshot(sink: MetricSink) -> MetricSnapshot`, `export_prometheus_metrics(snapshot: MetricSnapshot) -> str` | None | `ValidationError`: snapshot exceeds `METRICS_MAX_SERIES` | **Usage:** `tests/api/usage/test_usage_observability.py::test_usage_exposition()`<br>**Unit:** `tests/api/unit/test_exposition.py::test_exposition_is_deterministic()`, `test_snapshot_does_not_mutate_sink()` |
+| Missing | `FR-API-063` | Serve the protected scrape endpoint, returning `404` when `METRICS_ENABLED` is false so that a disabled deployment discloses no telemetry surface. | `get_metrics(context: AuthContext) -> ApiResponse[str]` | Read-only | `AuthorizationError`: scrape permission absent | **Usage:** `tests/api/usage/test_usage_observability.py::test_usage_scrape_route()`<br>**Unit:** `tests/api/unit/test_observability_routes.py::test_disabled_metrics_returns_not_found()`, `test_scrape_requires_permission()` |
+
+**Configuration and Limits Manifest**
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `METRICS_ENABLED` | `bool` | `false` | No | all observability exports | Master enablement. Disabled by default; a disabled deployment exposes no scrape route and records nothing. |
+| Missing | `METRICS_MAX_SERIES` | `int` | `5000` | Yes when enabled | `build_metric_snapshot` | Bound on distinct name+label series retained by a sink; exceeding it fails the snapshot rather than growing unbounded. |
+| Missing | `METRICS_MAX_LABEL_CARDINALITY` | `int` | `50` | Yes when enabled | `validate_metric_labels` | Per-label distinct-value bound. Exceeding it rejects the observation rather than degrading the sink. |
+| Missing | `METRICS_SCRAPE_PERMISSION` | `str` | `ops:metrics:read` | Yes when enabled | `get_metrics` | Permission required for the scrape endpoint; the surface is never anonymous. |
+
+**Explicit exclusions.** The following legacy observability behaviour is deliberately
+not reproduced: a process-global mutable `MetricRegistry`; tool-call metric recording
+(the agentic-tool architecture is superseded); embedded Grafana dashboard expectations
+(dashboards are an operations artifact, not application code); and alert deduplication
+(no alerting surface exists, and building one before an alerting requirement exists
+would be speculative). Circuit-breaker behaviour is owned by Brokers
+(`app/services/brokers/runtime/circuit_breaker.py`) and is not duplicated here.
+
+**Implementation notes:** the Prometheus renderer dependency is `Pending` and must be
+pinned in `pyproject.toml` under a separate approved change before this module is
+implemented.
+
+### 4.6 `streams/` — Ordered event delivery
 
 **Module flow:** owner event → validated `StreamEvent` → bounded connection delivery →
 resume, terminal recovery, or cleanup.
@@ -566,7 +651,7 @@ resume, terminal recovery, or cleanup.
 with one envelope and focused lifecycle state. Authoritative events/state remain with the
 producing domain.
 
-### 4.6 `routes/` — Thin HTTP and streaming boundaries
+### 4.7 `routes/` — Thin HTTP and streaming boundaries
 
 **Purpose:** Group external routes by approved resource family. Every file exports only
 `router: APIRouter`; endpoint functions remain private and contain no domain logic.
@@ -657,7 +742,7 @@ Every route declares the request/response types in `RouteContract` before its ro
 register. Rate-limit class values require explicit configuration before release; absence of an approved
 class blocks release, not startup-time authorization.
 
-### 4.7 `composition/` — Canonical application lifecycle
+### 4.8 `composition/` — Canonical application lifecycle
 
 **Module flow:** configuration → required/optional dependency lifecycle → middleware and
 router registration → canonical ASGI app.
@@ -683,7 +768,7 @@ router registration → canonical ASGI app.
 **Implementation notes:** merge V1 `main.py` and `app.py`; preserve only an explicitly
 compatibility import shim. Required imports never fail open.
 
-### 4.8 `ui/clients/` — Typed frontend transport
+### 4.9 `ui/clients/` — Typed frontend transport
 
 **Module flow:** typed operation → shared request primitive → validated `ApiResponse` or
 `StreamEvent` → typed data/error state.
@@ -709,7 +794,7 @@ compatibility import shim. Required imports never fail open.
 **Implementation notes:** one transport stack only; no parallel generic helpers.
 Authentication attaches only through the opaque-cookie or bearer-service-account transport specified in Section 1.
 
-### 4.9 `ui/context/` — Session, governed, page, and stream context
+### 4.10 `ui/context/` — Session, governed, page, and stream context
 
 **Module flow:** authenticated UI state + page/action state → bounded request/stream
 options → client call and authoritative recovery.
@@ -737,7 +822,7 @@ options → client call and authoritative recovery.
 **Implementation notes:** browser context never confers authority and never stores
 domain truth.
 
-### 4.10 `ui/components/` — Approved workflow presentation
+### 4.11 `ui/components/` — Approved workflow presentation
 
 **Module flow:** typed client/context state → accessible workflow component → user-visible
 result, stale warning, or governed block.
@@ -767,7 +852,7 @@ policy and do not duplicate backend limits.
 currency-strength, automation/calibration, and broad performance UI are outside the
 specified component surface.
 
-### 4.11 `ui/app/` — Protected workflow pages
+### 4.12 `ui/app/` — Protected workflow pages
 
 **Module flow:** Next.js route → protected layout → approved workflow component → typed
 client/context.
@@ -809,6 +894,10 @@ additional domain-level public exports; they delegate only to `AuthenticationPag
 | Missing | `RATE_LIMITS_BY_CLASS` | `Mapping[str, RateLimit]` | None | Yes before release | middleware/routes | Values require explicit measured configuration; 429 always uses `RATE_LIMITED`, and routes without required limits remain disabled. |
 | Missing | `RUNTIME_PROFILE`, `EXECUTION_ROUTE`, `ALLOW_LIVE_MUTATIONS` | shared policy | From system manifest | Yes for live/paper controls | Trading routes/UI | UI/API consumes but never overrides Trading-owned route/live enablement. |
 | Missing | `DATABASE_URL` / `DATA_DIR` | shared persistence configuration | From system manifest | Yes | identity, settings, HTTP idempotency | Data owns connection, locking, and migration execution infrastructure; UI/API owns its schemas and records and never exposes raw connections. |
+| Missing | `CLOCK_DRIFT_TOLERANCE_SECONDS` | `Decimal` | `2` | No | `health/clock.py` | Absolute drift beyond this value marks readiness degraded; diagnostic only. |
+| Missing | `METRICS_ENABLED` | `bool` | `false` | No | `observability/` | Shared enablement declared in the system manifest; disabled deployments expose no scrape route and record nothing. |
+| Missing | `METRICS_MAX_SERIES` / `METRICS_MAX_LABEL_CARDINALITY` | `int` | `5000` / `50` | Yes when enabled | `observability/` | Bounds on retained series and per-label distinct values; exceeding either rejects rather than growing unbounded. |
+| Missing | `METRICS_SCRAPE_PERMISSION` | `str` | `ops:metrics:read` | Yes when enabled | `observability/exposition.py` | The scrape surface is never anonymous. |
 
 ### Non-functional requirements
 
@@ -823,7 +912,7 @@ additional domain-level public exports; they delegate only to `AuthenticationPag
 | Missing | `NFR-API-007` | Streaming | Disconnect stops delivery, releases resources, preserves authoritative owner state, and emits no later client events. | Stream lifecycle tests |
 | Missing | `NFR-API-008` | Freshness | UI shows stale/unavailable state and blocks governed decisions until authoritative refresh. | Frontend integration tests |
 | Missing | `NFR-API-009` | Accessibility | Core workflows meet approved accessibility target (prefer WCAG 2.1 AA) and remain usable without horizontal-scroll-only critical controls. | Automated and manual accessibility tests |
-| Missing | `NFR-API-010` | Observability | Boundary actions carry request/correlation IDs and emit redacted audit/telemetry with route, intent, actor when available, status, duration, and error code. | Trace inspection tests |
+| Missing | `NFR-API-010` | Observability | Boundary actions carry request/correlation IDs and emit redacted audit/telemetry with route, intent, actor when available, status, duration, and error code. Telemetry is advisory: no governed decision reads a metric, and sink failure or disabled telemetry never blocks or alters execution. | Trace inspection tests; telemetry-failure isolation test |
 | Missing | `NFR-API-011` | Pagination | Every list route uses opaque cursors, stable ordering, default 50, maximum 200, and empty list plus null next cursor. | Pagination contract tests |
 | Missing | `NFR-API-012` | Timeouts | Non-stream endpoints complete or return a structured timeout within 30 seconds; no initial Simulation/Optimization async contract exists. | Deadline tests |
 | Missing | `NFR-API-013` | Resilience | Only opt-in idempotent reads retry once for classified transient failures; governed writes and unknown broker outcomes never retry blindly. | Retry tests |
@@ -963,6 +1052,7 @@ These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`
 | `P-API-010` | `app/services/api/ui_components/` | 1 | `ui_components` module + its `FR-API-*` behavior (§4) |
 | `P-API-011` | `app/services/api/ui_app/` | 1 | `ui_app` module + its `FR-API-*` behavior (§4) |
 | `P-API-005` | `app/services/api/streams/` | 11 | `streams` module + its `FR-API-*` behavior (§4) |
+| `P-API-012` | `app/services/api/observability/` | 11 | `observability` module + its `FR-API-*` behavior (§4); blocked on the `Pending` Prometheus renderer dependency |
 
 
 ---

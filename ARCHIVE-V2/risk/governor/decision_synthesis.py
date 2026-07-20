@@ -10,8 +10,6 @@ from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any
 
-from pydantic import Field
-
 from app.services.risk.models import (
     PortfolioRiskSnapshot,
     ProposedAllocation,
@@ -25,9 +23,10 @@ from app.services.risk.models.enums import (
     RiskDecisionStatus,
     RiskReasonCode,
 )
-from app.services.risk.policy.contracts import EffectiveRiskPolicy  # noqa: TC001
+from app.services.risk.policy.contracts import EffectiveRiskPolicy
 from app.utils.logger import logger
 from app.utils.normalization import utc_now
+from pydantic import Field
 
 
 class GateResult(RiskContract):

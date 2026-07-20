@@ -19,7 +19,6 @@ import time
 from typing import Any
 
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 from .frames import Data, _data_from_payload
@@ -38,13 +37,13 @@ def labeler_lexlb(  # noqa: C901
 ) -> dict[str, Any]:
     """Description.
         Label local extrema with the LEXLB method.
-    
+
     Args:
         data: pd.Series | Data | dict[str, Any].
         up_threshold: float.
         down_threshold: float.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """

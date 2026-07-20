@@ -13,10 +13,9 @@ from typing import TYPE_CHECKING, Any
 from app.services.utils.logger import logger
 
 if TYPE_CHECKING:
-    from data.database.sqlite.database_operations import DatabaseManager
-
     from app.services.brokers.mt5 import MT5Client
     from app.services.execution.live.engine import MultiStrategyEngine
+    from data.database.sqlite.database_operations import DatabaseManager
 
 
 class ExecutionEngineWrapper:

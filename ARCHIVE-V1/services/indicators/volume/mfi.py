@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -31,7 +30,9 @@ class MFI(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'mfi_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 14, **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 14, **kwargs: Any
+    ) -> pd.DataFrame:
         required_cols = ["high", "low", "close", "volume"]
         for col in required_cols:
             if col not in df.columns:

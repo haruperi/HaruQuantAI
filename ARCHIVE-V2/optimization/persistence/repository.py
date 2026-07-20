@@ -12,9 +12,8 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any, TypeVar
 
-from pydantic import BaseModel, Field
-
 from app.services.optimization.helpers import OptimizationExecutionError
+from pydantic import BaseModel, Field
 
 R = TypeVar("R")
 

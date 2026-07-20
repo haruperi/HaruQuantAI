@@ -5,9 +5,6 @@ from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
-from fastapi import APIRouter, Header, HTTPException, status
-from pydantic import BaseModel, Field
-
 from app.api.auth_utils import get_user_id_from_token
 from app.services.risk.calculations.position_sizing import PositionSizer
 from app.services.risk.core import (
@@ -27,6 +24,8 @@ from app.services.risk.optimization import AllocationPlanner
 from app.services.risk.regimes import CrisisRegimeDetector, RegimeEngine, RegimeState
 from app.services.simulation import Engine
 from app.services.utils import logger
+from fastapi import APIRouter, Header, HTTPException, status
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 AUTH_HEADER = Header(None)

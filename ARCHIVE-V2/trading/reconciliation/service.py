@@ -10,7 +10,7 @@ from app.services.trading.contracts import (
     TradingRoute,
 )
 from app.services.trading.execution.reporting import (
-    ReconciliationDiscrepancyEntry,  # noqa: TC001
+    ReconciliationDiscrepancyEntry,
 )
 from app.services.trading.execution.state_machine import LifecycleKind
 from app.services.trading.info._common import broker_call, iter_or_empty, safe_attr

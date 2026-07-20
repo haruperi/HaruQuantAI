@@ -12,12 +12,11 @@ import hashlib
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-
 from app.services.optimization.errors import (
     OptimizationValidationError as ValidationError,
 )
 from app.utils.standard import SENSITIVE_KEY_PATTERN, canonical_json
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 # ---------------------------------------------------------------------------
 # Canonical workflow status values used across all optimization outputs.

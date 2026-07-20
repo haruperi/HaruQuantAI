@@ -12,10 +12,9 @@ from __future__ import annotations
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import Field, model_validator
-
 from app.services.trading.contracts import TradingContract
 from app.utils.logger import logger
+from pydantic import Field, model_validator
 
 
 class GateName(StrEnum):

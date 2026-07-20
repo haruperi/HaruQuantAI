@@ -15,7 +15,6 @@ from dataclasses import dataclass
 from typing import Any, cast
 
 import pandas as pd
-
 from app.api.routes.backtest import portfolio_run
 from app.services.analytics import drawdowns, metrics, ratios, returns
 from app.services.strategy import BaseStrategy
@@ -44,7 +43,7 @@ def load_strategy_from_path(path: str, class_name: str) -> type[BaseStrategy]:
         raise ImportError(f"Could not load module spec for {path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return cast(type[BaseStrategy], getattr(module, class_name))
+    return cast("type[BaseStrategy]", getattr(module, class_name))
 
 
 def normalize_engine_type(engine_type: str) -> str:

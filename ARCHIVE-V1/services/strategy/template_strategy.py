@@ -19,7 +19,6 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-
 from app.services.strategy.base import BaseStrategy, SignalDict
 from app.services.utils.logger import logger
 

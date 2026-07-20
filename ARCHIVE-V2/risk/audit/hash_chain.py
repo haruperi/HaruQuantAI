@@ -13,12 +13,11 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from pydantic import Field, JsonValue
-
 from app.services.risk.models import RiskAuditEvent, RiskContract
 from app.services.risk.models.enums import RiskMode
 from app.utils.logger import logger
 from app.utils.standard import canonical_json
+from pydantic import Field, JsonValue
 
 if TYPE_CHECKING:
     from app.services.risk.validations import ValidationResult

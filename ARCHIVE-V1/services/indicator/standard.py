@@ -24,7 +24,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.data.frames import _serialize_frame_records
 from app.services.utils.logger import logger
 from app.services.utils.standard import ToolStandardSpec, standard_tool_response

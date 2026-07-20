@@ -1,4 +1,4 @@
-# ruff: noqa: E501, TC001
+# ruff: noqa: E501
 """Edge Discovery Studies (EDS) service for Research Edge Lab.
 
 Evaluates mean-reversion and trend-persistence rules against historical data and
@@ -11,7 +11,6 @@ import datetime
 from typing import Any
 
 import numpy as np
-
 from app.services.research.data import PreparedDataset
 from app.utils.settings import (
     EdgeLabConfig,

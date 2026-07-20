@@ -8,14 +8,13 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+from app.services.utils import logger
 from data.database import GovernanceRepository
 from data.database.sqlite.database_operations import DatabaseManager
 from data.strategies import storage
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-
-from app.services.utils import logger
 
 router = APIRouter()
 db_manager = DatabaseManager()
@@ -722,13 +721,13 @@ async def get_strategy_template(template_name: str) -> dict[str, str]:
         )
 
         # Read template content
-        if not os.path.exists(template_file):
+        if not Path(template_file).exists():
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Template file not found: {template_file}",
             )
 
-        with open(template_file, encoding="utf-8") as f:
+        with Path(template_file).open(encoding="utf-8") as f:
             code = f.read()
 
         logger.info(f"Serving template: {template_name}")
@@ -1058,7 +1057,7 @@ async def import_strategy(
         temp_dir = tempfile.gettempdir()
         import_path = os.path.join(temp_dir, file.filename or "unknown.zip")
 
-        with open(import_path, "wb") as f:
+        with Path(import_path).open("wb") as f:
             content = await file.read()
             f.write(content)
 
@@ -1071,7 +1070,7 @@ async def import_strategy(
         logger.info(f"Strategy version created from import: {file.filename}")
 
         # Clean up temp file
-        os.remove(import_path)
+        Path(import_path).unlink()
 
         logger.info(f"Strategy imported: version {new_version}")
 

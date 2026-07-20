@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pandas as pd
-
 from app.services.strategy import MarketContext
 from app.services.strategy.base import BaseStrategy
 from app.services.strategy.pybots._template import rules

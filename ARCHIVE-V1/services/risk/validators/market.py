@@ -47,7 +47,7 @@ def validate_market_states(
             )
             continue
 
-        row_counts[symbol] = int(len(prepared))
+        row_counts[symbol] = len(prepared)
         if row_counts[symbol] == 0:
             summary = summary.add(
                 "error",

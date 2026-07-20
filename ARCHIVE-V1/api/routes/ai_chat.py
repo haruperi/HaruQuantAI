@@ -7,12 +7,6 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from data.database.migrations.runner import apply_pending_migrations
-from data.database.repositories.ai_chat_repository import AiChatRepository
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
-
 from app.services.conversation.context.builders import build_page_context
 from app.services.conversation.service import ConversationService
 from app.services.schemas.chat import (
@@ -22,6 +16,11 @@ from app.services.schemas.chat import (
     ChatThreadDetail,
     ChatTurnRequest,
 )
+from data.database.migrations.runner import apply_pending_migrations
+from data.database.repositories.ai_chat_repository import AiChatRepository
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 
 try:
     from agentic.capabilities.tools.read_only import list_read_only_tool_definitions

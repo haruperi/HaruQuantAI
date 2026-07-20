@@ -3,13 +3,12 @@
 import importlib
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
-
 from app.api.middleware.security import SecretRedactionMiddleware
 from app.api.router import intent_classifier
 from app.services.utils.logger import logger
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 
 def _optional_import(module_path: str, label: str):
@@ -59,10 +58,9 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting HaruQuant API server")
 
+    from app.api.scheduler import start_scheduler
     from data.database import apply_pending_migrations, default_migrations_dir
     from data.database.sqlite.database_operations import DatabaseManager
-
-    from app.api.scheduler import start_scheduler
 
     try:
         db = DatabaseManager()

@@ -30,10 +30,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from fastapi import HTTPException, status
-
 from app.services.risk.simulation import HypotheticalOrderAction
 from app.services.utils.logger import logger
+from fastapi import HTTPException, status
 
 from .route_support import (
     build_session_state_response,

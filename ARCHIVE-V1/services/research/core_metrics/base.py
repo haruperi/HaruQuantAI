@@ -18,7 +18,6 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 import pandas as pd
-
 from app.services.research.data.models import (
     CanonicalOHLCVSSchema,
     DataQualityReportModel,

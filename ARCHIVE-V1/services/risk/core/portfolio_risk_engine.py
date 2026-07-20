@@ -6,8 +6,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 from app.services.risk.limits import RiskLimits
 from app.services.risk.metrics.math import (
     compute_portfolio_var_es,
@@ -15,6 +13,7 @@ from app.services.risk.metrics.math import (
 )
 from app.services.risk.models import PortfolioState
 from app.services.utils.logger import logger
+from scipy import stats
 
 
 class PortfolioRiskEngine:

@@ -17,7 +17,6 @@ from typing import Any
 
 import pandas as pd
 import requests
-
 from app.services.brokers.dukascopy_instruments import INSTRUMENT_MAP
 from app.services.utils.common import bars_to_records
 from app.services.utils.logger import logger
@@ -73,12 +72,12 @@ def _resample_to_nearest(
 ) -> datetime:
     """Description.
         Resample timestamp to nearest time unit.
-    
+
     Args:
         timestamp: datetime.
         time_unit: str.
         interval_value: int.
-    
+
     Returns:
         datetime.
     """
@@ -117,7 +116,9 @@ def _resample_to_nearest(
             microseconds=timestamp.microsecond,  # pragma: no cover
         )  # pragma: no cover
     if time_unit == TIME_UNIT_WEEK:  # pragma: no cover
-        subtraction = (timestamp.weekday() + 1) % (interval_value * 7)  # pragma: no cover
+        subtraction = (timestamp.weekday() + 1) % (
+            interval_value * 7
+        )  # pragma: no cover
         return timestamp - timedelta(  # pragma: no cover
             days=subtraction,  # pragma: no cover
             hours=timestamp.hour,  # pragma: no cover
@@ -127,27 +128,28 @@ def _resample_to_nearest(
         )  # pragma: no cover
     if time_unit == TIME_UNIT_MONTH:  # pragma: no cover
         month = (timestamp.month // interval_value) + 1  # pragma: no cover
-        return datetime(timestamp.year, month, 1, 0, 0, 0, 0, timestamp.tzinfo)  # pragma: no cover
+        return datetime(
+            timestamp.year, month, 1, 0, 0, 0, 0, timestamp.tzinfo
+        )  # pragma: no cover
     if time_unit == TIME_UNIT_TICK:  # pragma: no cover
         return timestamp  # pragma: no cover
 
-    raise NotImplementedError(f"resampling not implemented for {time_unit}")  # pragma: no cover
+    raise NotImplementedError(
+        f"resampling not implemented for {time_unit}"
+    )  # pragma: no cover
 
 
 def _get_dataframe_columns_for_timeunit(time_unit: str) -> list[str]:
     """Description.
         Get dataframe columns for time unit.
-    
+
     Args:
         time_unit: str.
-    
+
     Returns:
         list[str].
     """
-    logger.debug(
-        f"Retrieving DataFrame columns for Dukascopy time_unit: "
-        f"'{time_unit}'"
-    )
+    logger.debug(f"Retrieving DataFrame columns for Dukascopy time_unit: '{time_unit}'")
     ohlc_df = ["timestamp", "open", "high", "low", "close", "volume"]
     tick_df = ["timestamp", "bidPrice", "askPrice", "bidVolume", "askVolume"]
 
@@ -171,14 +173,14 @@ def _fetch(
 ) -> Any:
     """Description.
         Fetch data from Dukascopy freeserv.
-    
+
     Args:
         instrument: str.
         interval: str.
         offer_side: str.
         last_update: int.
         limit: int | None.
-    
+
     Returns:
         Any.
     """
@@ -230,7 +232,7 @@ def _stream(
 ) -> Generator[list[Any]]:
     """Description.
         Stream data from Dukascopy freeserv.
-    
+
     Args:
         instrument: str.
         interval: str.
@@ -239,7 +241,7 @@ def _stream(
         end: datetime | None.
         max_retries: int.
         limit: int | None.
-    
+
     Returns:
         Generator[list[Any]].
     """
@@ -309,7 +311,7 @@ def fetch(
 ) -> pd.DataFrame:
     """Description.
         Fetch data from Dukascopy freeserv.
-    
+
     Args:
         instrument: str.
         interval: str.
@@ -318,7 +320,7 @@ def fetch(
         end: datetime.
         max_retries: int.
         limit: int.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -370,11 +372,11 @@ class DukascopyClient:
     ) -> None:
         """Description.
             Initialize the Dukascopy client with account credentials.
-        
+
         Args:
             username: str | None.
             password: str | None.
-        
+
         Returns:
             None.
         """
@@ -392,10 +394,10 @@ class DukascopyClient:
     def connect(self) -> bool:
         """Description.
             Initialize connection to Dukascopy feed.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -406,10 +408,10 @@ class DukascopyClient:
     def disconnect(self) -> None:
         """Description.
             Shutdown the connection and clean up resources.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -419,16 +421,15 @@ class DukascopyClient:
     def is_connected(self) -> bool:
         """Description.
             Check if client is currently connected.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
         logger.debug(
-            f"Checking Dukascopy client connection state "
-            f"(connected={self._connected})."
+            f"Checking Dukascopy client connection state (connected={self._connected})."
         )
         return self._connected
 
@@ -443,7 +444,7 @@ class DukascopyClient:
     ) -> pd.DataFrame:
         """Description.
             Get OHLCVS bars from Dukascopy.
-        
+
         Args:
             symbol: str.
             timeframe: str.
@@ -451,7 +452,7 @@ class DukascopyClient:
             start_pos: int.
             date_from: datetime | None.
             date_to: datetime | None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -510,7 +511,9 @@ class DukascopyClient:
             dt_from = dt_to - timedelta(hours=hours_needed * buffer_multiplier)
         else:
             dt_from = date_from  # pragma: no cover
-            dt_to = date_to if date_to is not None else datetime.now(UTC)  # pragma: no cover
+            dt_to = (
+                date_to if date_to is not None else datetime.now(UTC)
+            )  # pragma: no cover
 
         try:
             df = fetch(
@@ -579,23 +582,21 @@ class DukascopyClient:
     ) -> pd.DataFrame | list[dict[str, Any]] | None:
         """Description.
             Get ticks from Dukascopy.
-        
+
         Args:
             symbol: str.
             count: int.
             start: datetime | None.
             end: datetime | None.
             as_dataframe: bool.
-        
+
         Returns:
             pd.DataFrame | list[dict[str, Any]] | None.
         """
         if not self.is_connected():
             self.connect()
 
-        logger.debug(
-            "Fetching Dukascopy ticks for %s (count=%d).", symbol, count
-        )
+        logger.debug("Fetching Dukascopy ticks for %s (count=%d).", symbol, count)
 
         if len(symbol) == 6 and "/" not in symbol:
             instrument = f"{symbol[:3].upper()}/{symbol[3:].upper()}"
@@ -653,10 +654,10 @@ class DukascopyClient:
     def get_instance(cls) -> "DukascopyClient":
         """Description.
             Get the shared singleton instance of DukascopyClient.
-        
+
         Args:
             None.
-        
+
         Returns:
             'DukascopyClient'.
         """
@@ -669,10 +670,10 @@ class DukascopyClient:
 def get_dukascopy_client() -> DukascopyClient:
     """Description.
         Get the shared singleton instance of DukascopyClient.
-    
+
     Args:
         None.
-    
+
     Returns:
         DukascopyClient.
     """
@@ -690,7 +691,7 @@ def _load_dukascopy_impl(
 ) -> pd.DataFrame:
     """Description.
         Load OHLCV bars from Dukascopy as a DataFrame.
-    
+
     Args:
         symbol: str.
         timeframe: str.
@@ -698,7 +699,7 @@ def _load_dukascopy_impl(
         end_date: str | datetime | None.
         count: int | None.
         cache: bool.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -720,10 +721,10 @@ def _load_dukascopy_impl(
 def _parse_date_value(value: str | datetime | None) -> datetime | None:
     """Description.
         Parse a date-like value for Dukascopy wrappers.
-    
+
     Args:
         value: str | datetime | None.
-    
+
     Returns:
         datetime | None.
     """
@@ -744,7 +745,7 @@ def load_dukascopy(
 ) -> dict[str, Any]:
     """Description.
         Load OHLCV bars from Dukascopy through the broker-owned client.
-    
+
     Args:
         symbol: str.
         timeframe: str | None.
@@ -753,7 +754,7 @@ def load_dukascopy(
         count: int | None.
         cache: bool.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -795,7 +796,7 @@ def load_dukascopy(
                 "source": "load_dukascopy",
                 "symbol": symbol,
                 "timeframe": timeframe,
-                "rows": int(len(frame)),
+                "rows": len(frame),
                 "columns": [str(column) for column in frame.columns],
                 "data": records,
             },
@@ -811,11 +812,11 @@ def dukascopy_data_list_symbols(
 ) -> dict[str, Any]:
     """Description.
         List known Dukascopy instrument symbols from broker metadata.
-    
+
     Args:
         pattern: str | None.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -829,9 +830,7 @@ def dukascopy_data_list_symbols(
             if fnmatch.fnmatch(symbol.lower(), pattern_lower)
             or pattern_lower in symbol.lower()
         ]
-    logger.debug(
-        f"Listing known Dukascopy symbols filtered by pattern={pattern}."
-    )
+    logger.debug(f"Listing known Dukascopy symbols filtered by pattern={pattern}.")
     return {"status": "success", "data": {"symbols": symbols}}
 
 

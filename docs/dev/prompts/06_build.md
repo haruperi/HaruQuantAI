@@ -78,7 +78,7 @@ A feature-level task should include:
 - One Section 4.x feature
 - Every file in its Files table
 - Every mapped `FR-*`
-- Targeted unit and usage tests
+- Targeted unit tests and directly executed standalone usage programs
 - Feature exports
 - README status updates
 
@@ -302,14 +302,14 @@ If any feature's specification is incomplete or conflicts with `docs/PROJECT.md`
 Run this in **Codex** only after the entire domain README is marked `Completed` and Gemini's implementation is believed finished.
 
 ```
-You are the post-build review agent. Your role is strictly limited to verification and reporting: confirm that the domain Gemini built followed everything that was required and introduced no conflicts. You must NOT create, modify, or delete any file or code. All corrections are executed by the build agent (Gemini) from the handoff report you produce at the end.
+You are the post-build review agent. Your role is to verify the implementation, report findings, and then correct all identified issues yourself so that the domain becomes READY. Write out the exact implementation plan and steps to execute the corrections.
 
-Perform a strict, read-only completion review of the `[DOMAIN]` domain.
+Perform a strict, read-only completion review of the `UTILS` domain.
 
 Domain scope:
-- Domain README: `[DOMAIN README PATH]`
-- Implementation package: `[PACKAGE PATH]`
-- Tests: `[TEST PATH]`
+- Domain README: `app/utils/README.md`
+- Implementation package: `app/utils/`
+- Tests: `tests/utils/`
 
 This is a verification task, not an implementation task. Do not modify files, update statuses, install dependencies, stage changes, or fix findings.
 
@@ -318,14 +318,15 @@ Authoritative sources, in order:
 1. Owner instructions
 2. `AGENTS.md`
 3. `docs/PROJECT.md`
-4. `[DOMAIN README PATH]`
-5. `docs/ARCHITECTURE.md`
-6. `docs/CHANGELOG.md`
-7. Implemented code and tests as evidence of current reality
+4. `app/utils/README.md`
+5. `docs/dev/features_register.md`
+6. `docs/ARCHITECTURE.md`
+7. `docs/CHANGELOG.md`
+8. Implemented code and tests as evidence of current reality
 
 Review objective:
 
-Determine whether the completed implementation strictly and fully satisfies the domain README, system architecture, cross-domain contracts, safety rules, quality standards, and Definition of Done.
+Determine whether the completed implementation strictly and fully satisfies the domain README, system architecture, cross-domain contracts, safety rules, quality standards, Definition of Done, and is accurately registered in `docs/dev/features_register.md`.
 
 Do not infer compliance from a `Completed` status. Every completion claim must be proven by code and passing evidence.
 
@@ -382,7 +383,19 @@ For each workflow, verify:
 
 A workflow is compliant only when its complete integration test passes.
 
-### 4. File and functional-requirement traceability
+### 4. features_register.md verification
+
+Verify that all the implemented features and public exported functions of the domain are registered and up-to-date in `docs/dev/features_register.md`.
+
+Confirm:
+- Every public exported function is registered with its correct signature and purpose.
+- Every feature heading has its corresponding Feature ID (e.g. `FEAT-[DOM]-01`).
+- The `Status` column correctly reflects the audited implementation status (`Completed/Partial/Missing`).
+- There are no undocumented public exported functions that are missing from `docs/dev/features_register.md`.
+
+Report every violation with exact file and line evidence.
+
+### 5. File and functional-requirement traceability
 
 Review every Section 4 feature, file, and `FR-[DOM]-*` requirement.
 
@@ -415,7 +428,7 @@ Produce a complete traceability matrix with these columns:
 
 Every declared `FR-*` must appear exactly once in this matrix.
 
-### 5. Package-wide requirements and configuration
+### 6. Package-wide requirements and configuration
 
 Review every Section 5 `NFR-[DOM]-*`, shared setting, feature limit, and policy.
 
@@ -437,7 +450,7 @@ Verify:
 
 Produce a separate `NFR-*` compliance matrix with implementation and test evidence.
 
-### 6. Contract and persistence reconciliation
+### 7. Contract and persistence reconciliation
 
 Reconcile every owned and consumed contract with `docs/PROJECT.md` and relevant producer/consumer READMEs.
 
@@ -451,7 +464,7 @@ Verify:
 - Persisted-state ownership, read access, write authority, tables, artifacts, and migration definitions match the top-level registry.
 - No implementation bypasses the owning domain through direct storage access.
 
-### 7. Safety and security review
+### 8. Safety and security review
 
 Verify all applicable safety requirements, including:
 
@@ -468,7 +481,7 @@ Verify all applicable safety requirements, including:
 
 Treat any safety bypass or false success claim as a blocking finding.
 
-### 8. Code-quality review
+### 9. Code-quality review
 
 Verify the implementation follows `AGENTS.md` and repository configuration:
 
@@ -488,7 +501,7 @@ Verify the implementation follows `AGENTS.md` and repository configuration:
 
 Inspect the implementation directly; do not rely only on lint output.
 
-### 9. Test and validation execution
+### 10. Test and validation execution
 
 Run the domain-scoped validation required by its README and `AGENTS.md`.
 
@@ -498,23 +511,20 @@ At minimum, where applicable:
 - `ruff check` for the domain package and its tests.
 - `ruff format --check` for the domain package and its tests.
 - `mypy` for the domain package and its tests.
-- Domain unit tests.
-- Domain usage tests.
-- Domain integration/workflow tests.
-- Contract-compatibility tests.
-- Security/import-side-effect tests.
-- Property or golden tests required by the README.
-- Domain coverage measurement.
+- Domain unit tests (skip running, verify existence only).
+- Domain standalone usage programs (do not collect with pytest; verify structure
+  and run each directly with Python when execution is in scope).
+- Domain integration/workflow tests (skip running, verify existence only).
+- Contract-compatibility tests (skip running, verify existence only).
+- Security/import-side-effect tests (skip running, verify existence only).
+- Property or golden tests required by the README (skip running, verify existence only).
+- Domain coverage measurement (skip).
 
-Do not run live broker operations, real external sends, destructive persistence actions, or other live side effects.
+Do not run the tests. Skip execution of the test suite and coverage measurements; only verify that the test files and test cases exist in the codebase.
 
-Do not run the entire repository test suite unless the domain README explicitly requires it. Run the complete domain-scoped suite.
+Record check commands, exit results, lint checks, and status.
 
-Coverage must meet or exceed 80%, and every public requirement must have meaningful direct test evidence. Coverage alone does not prove requirement compliance.
-
-Record every command, exit result, and relevant test count.
-
-### 10. Status and checklist truthfulness
+### 11. Status and checklist truthfulness
 
 Review every README status and checklist entry.
 
@@ -567,8 +577,9 @@ Return exactly one result:
 12. **Commands and validation results**
 13. **Coverage result**
 14. **README status/checklist accuracy**
-15. **Gemini handoff report (ordered correction plan)**
-16. **Final review checklist**
+15. **features_register.md accuracy**
+16. **Correction plan and implementation steps**
+17. **Final review checklist**
 
 Every finding must include:
 
@@ -581,14 +592,12 @@ Every finding must include:
 - Why it matters
 - Verification needed after correction
 
-Do not implement corrections during this review. End with a section titled `GEMINI HANDOFF REPORT`: an ordered, bounded correction plan containing, for each finding:
+Write the correction plan and implementation steps. End with a section titled `CORRECTION PLAN AND IMPLEMENTATION STEPS`: an ordered, bounded correction plan containing, for each finding:
 
 1. Finding ID and severity.
-2. The correct recommendation for resolving it.
-3. Exact step-by-step implementation instructions (files to edit, changes to make, tests to run, validation to perform).
+2. Recommended resolution.
+3. Exact step-by-step implementation instructions (files to edit, changes to make, tests to run, validation to perform) to execute yourself to make the domain READY.
 4. Verification required after the correction.
-
-Write the handoff report as a self-contained prompt that can be copy-pasted directly into the build agent (Gemini) without additional context. After Gemini executes it, this review must be re-run.
 ```
 
 The key principle is:
@@ -605,302 +614,185 @@ That structure gives you the smallest safe implementation increments without los
 
 ---
 
-## 1. Stage implementation prompt
+# Prompt 4: Domain Migration Validation
 
 ```
-You are the HaruQuantAI implementation lead.
+You are a **senior software architect and product systems analyst specializing in quantitative-finance and algorithmic-trading platforms, legacy-system modernization, domain-driven design, and requirements traceability**.
 
-Implement exactly one stage from the sequential phase implementation ledger.
+You are experienced in reconstructing actual business capabilities from source code, tracing how those capabilities are used across an application, and determining whether a newer system preserves them through behaviorally equivalent workflows.
 
-PHASE: {PHASE_NUMBER}
-STAGE: {STAGE_NUMBER}
-STAGE NAME: {STAGE_NAME}
-IMPLEMENTATION PLAN:
-docs/dev/PHASE_{PHASE_NUMBER}_IMPLEMENTATION_PLAN.md
+Your task is to compare:
+- The legacy application (referenced as legacy version).
+- The current application (referenced as current version).
+one domain at a time and identify only **genuinely missing functionality in current version that existed in legacy version** . Evaluate equivalence based on supported use cases and observable outcomes—not terminology, code structure, architecture, or implementation approach.
 
-Follow the repository authority order:
+## Domain under review - `UTILS`
 
-1. Owner instructions
-2. AGENTS.md
-3. docs/PROJECT.md
-4. docs/ARCHITECTURE.md
-5. Relevant domain README files
-6. docs/dev/AGILE_ROADMAP.md
-7. docs/dev/TRACEABILITY_MATRIX.md
-8. The selected phase implementation plan
+Legacy Path: `ARCHIVE-V1/services/utils`
+Current Path: `app/utils`
 
-The phase implementation plan is a non-authoritative execution ledger. It controls sequence, status, and evidence, but it does not define product behavior. Product behavior comes from the authoritative project, architecture, and domain specifications.
+## Core comparison rule
 
-Before changing files:
+Compare behavior and capabilities—not names, wording, class structure, file layout, architecture, APIs, or implementation details.
 
-1. Read AGENTS.md and all required active documents.
-2. Locate the selected stage in Section 8 of the implementation plan.
-3. Enumerate every step and requirement ID assigned to the stage.
-4. Confirm every earlier ledger step is complete and has valid path:line evidence.
-5. Confirm every explicit and derived dependency is complete.
-6. Stop if the stage contains a Pending specification, unresolved owner decision, missing contract, or invalid predecessor evidence.
-7. Confirm relevant dependency versions from pyproject.toml and uv.lock.
-8. Produce the required dry run containing:
-   - Requirements and ledger steps in scope
-   - Files to read
-   - Files to create or change
-   - Public contracts affected
-   - Tests and commands planned
-   - Runtime or external side effects
-   - Safety conditions
-   - Risks and blockers
-   - Rollback procedure
-9. Wait for the exact phrase:
-   APPROVED: EXECUTE
+For example, if legacy version calls a capability “download data” and current version calls it “get data,” but both provide the same functional outcome, the capability is already covered and must not be reported as missing.
 
-Implementation constraints:
+Treat functionality as present when current version provides the same user-visible or system-level outcome, even if current version:
 
-- Implement only the selected stage.
-- Execute its ledger steps from top to bottom.
-- Do not begin a later step before its “Cannot start before” predecessor is complete.
-- Do not implement requirements belonging to later stages or phases.
-- Preserve stable Phase 1 public seams.
-- Phase 1 must define the full final v1 public port for every domain.
-- Later phases must add behavior behind existing seams without rewriting consumers.
-- Flag any apparently unavoidable interface change before making it.
-- Do not introduce a breaking public signature without an explicit owner decision.
-- No throwaway code.
-- No concrete function or method containing pass.
-- Protocol or abstract declarations may use an abstract body, but concrete implementations must provide factual behavior or a deterministic specified unsupported result.
-- No fake success responses, invented data, invented broker fills, placeholder performance, silent None, or swallowed failures.
-- Unsupported behavior must fail deterministically through the domain’s specified typed error/result contract.
-- Use production-grade code for the narrow current scope.
-- Follow Google Python Style, explicit types, Google docstrings, absolute imports, and repository Ruff/MyPy settings.
-- Use the project logger; never use print.
-- Redact secrets before logs, errors, traces, metrics, audits, or diagnostics.
-- Maintain at least 80% coverage for changed behavior.
-- Use targeted tests during implementation.
-- Add or update the unit, usage, integration, security, determinism, recovery, and negative-path tests required by the source specification.
-- Never weaken the kill switch, Risk authority, authorization, idempotency, reconciliation, or audit requirements.
-- Never modify another domain’s private state.
-- Use only documented public domain exports.
+- Uses different terminology.
+- Has a different interface or architecture.
+- Combines several legacy version operations into one.
+- Splits one legacy version operation into several components.
+- Implements the behavior in another domain or shared service.
+- Automates something that required an explicit action in legacy version.
+- Replaces the old implementation with an equivalent or better mechanism.
 
-MT5 rules:
+Do not treat the following as missing functionality by themselves:
 
-- Never use real capital.
-- All actual broker actions must use an MT5 demo account.
-- Confirm MT5_ENVIRONMENT=demo without displaying credentials or secret values.
-- Actual MT5 requirements must perform factual actions through the production Brokers, Risk, and Trading paths.
-- A fake adapter cannot satisfy an actual MT5 usage or integration requirement.
-- Do not make a broker mutation until separately and explicitly approved in the dry run.
-- Capture factual provider-returned identifiers and use them for reconciliation and closure.
-- Fail closed if demo environment, authorization, Risk approval, kill-switch state, route compatibility, or broker state cannot be proven.
+- Renamed methods, classes, commands, or UI labels.
+- Refactoring or folder-structure differences.
+- Different parameters that still support the same use cases.
+- Removed duplicate, obsolete, unreachable, or internal-only code.
+- Different technical implementations with equivalent outcomes.
+- legacy version implementation quirks or bugs.
+- Compatibility layers that are unnecessary in current version.
+- Minor presentation differences without a capability impact.
 
-Documentation during the stage:
+## Required investigation
 
-- Update only the selected implementation-plan steps and evidence.
-- Do not change domain README requirement statuses during stage implementation.
-- Do not perform phase-close PROJECT, ARCHITECTURE, or CHANGELOG reconciliation.
-- If an authoritative specification is defective or contradictory, stop and report it; do not silently repair or reinterpret it.
-- Mark a requirement [X] only after its implementation and tests pass.
-- Every [X] requirement must end with:
-  - Implementation path:line
-  - Test path:line
-  - Commands run and results
-  - Required runtime, contract, migration, or provider evidence
-- Leave partially completed or unverified requirements unchecked.
+For every legacy capability in this domain:
 
-Verification:
+1. Determine what the capability actually did.
+2. Trace how it was invoked and used in legacy.
+3. Identify its callers, inputs, outputs, side effects, configuration, persistence, integrations, and user-facing behavior where relevant.
+4. Search all relevant current version domains and shared infrastructure for an equivalent capability; do not assume it must be in a similarly named file.
+5. Compare supported use cases, edge cases, and externally observable outcomes.
+6. Classify the capability as:
+   - **Covered:** current version provides the same functional outcome.
+   - **Partially covered:** current version supports some, but not all, meaningful legacy version use cases.
+   - **Missing:** No equivalent capability exists in current version.
+   - **Intentionally obsolete:** The capability is no longer necessary because of an architectural or product change.
+   - **Unclear:** The available evidence is insufficient to make a reliable determination.
 
-1. Run the exact source-named targeted tests.
-2. Run affected integration and usage tests.
-3. Run Ruff on changed code and tests.
-4. Run Ruff format checking.
-5. Run MyPy over the affected application scope.
-6. Run git diff --check.
-7. Inspect the final diff for scope leakage, secrets, placeholders, pass statements, fake successes, and interface churn.
-8. Confirm every completed checklist item has valid path:line evidence.
+Do not count a capability as missing merely because you cannot immediately find it. Trace execution paths and search for semantic equivalents before reaching that conclusion.
 
-Final stage report:
+Approach the review from three perspectives:
 
-- Requirements completed
-- Requirements still unchecked
-- Files created or changed
-- Public interfaces implemented or preserved
-- Decisions or specification gaps discovered
-- Tests and commands run
-- Coverage result
-- Runtime/provider actions performed
-- Safety evidence
-- Rollback procedure
-- Positive checklist confirming scope, quality, documentation discipline, validation, and no unauthorized side effects
+- **Financial-domain perspective:** Determine the real trading, investment, market-data, portfolio, risk, research, or operational purpose of each capability.
+- **Product-analysis perspective:** Determine who or what used the capability, why it mattered, and whether the use case remains relevant.
+- **Software-architecture perspective:** Determine whether current version already provides an equivalent outcome elsewhere and, for genuine gaps, how the capability could fit naturally into current version’s current architecture.
 
-Do not declare the stage complete while any assigned requirement is unchecked or lacks evidence.
-```
+Do not assume every legacy feature should be preserved. Distinguish valuable missing functionality from obsolete behavior, duplication, implementation details, compatibility code, and functionality superseded by current version.
 
-## 2. Final phase review and documentation prompt
 
-```
-You are the HaruQuantAI lead architect, release reviewer, and phase-close owner.
+## Evidence requirements
 
-Perform a full evidence-based review and close exactly one completed phase.
+Every conclusion must cite concrete repository evidence, including:
 
-PHASE: {PHASE_NUMBER}
-VERSION: {PHASE_VERSION}
-IMPLEMENTATION PLAN:
-docs/dev/PHASE_{PHASE_NUMBER}_IMPLEMENTATION_PLAN.md
+- Relevant legacy version file paths and symbols.
+- Relevant current version file paths and symbols, when an equivalent or partial implementation exists.
+- legacy version call sites or workflows demonstrating that the capability was actually used.
+- Tests, documentation, configuration, routes, commands, UI actions, or integrations that support the conclusion.
 
-This is not a superficial checklist review. Independently verify the implementation, tests, integrations, safety controls, requirement coverage, and phase demonstration before updating any authoritative document from Missing to Completed.
+Clearly distinguish verified facts from assumptions. Do not claim a capability is missing when the evidence only establishes uncertainty.
 
-Follow the repository authority order:
+## Report requirements
 
-1. Owner instructions
-2. AGENTS.md
-3. docs/PROJECT.md
-4. docs/ARCHITECTURE.md
-5. Relevant domain README files
-6. docs/CHANGELOG.md
-7. docs/dev/AGILE_ROADMAP.md
-8. docs/dev/TRACEABILITY_MATRIX.md
-9. The selected phase implementation plan
+Focus the main report on genuinely missing or partially covered functionality. For every reported item, include:
 
-Before modifying files:
+1. **Functionality**
+   - Describe the capability in implementation-neutral terms.
 
-1. Read all authoritative documents.
-2. Read the complete selected phase plan.
-3. Extract every requirement assigned to the phase from the traceability matrix.
-4. Compare the matrix inventory against the implementation-plan primary entries.
-5. Verify that every stage and sequential step is checked.
-6. Verify every checked item’s implementation and test path:line evidence against the actual files.
-7. Identify all affected domains and system workflows.
-8. Produce a dry run containing:
-   - Complete phase requirement inventory
-   - Files and evidence to inspect
-   - Tests and quality commands planned
-   - Phase exit demonstration procedure
-   - MT5 demo actions, if applicable
-   - Documentation files to update after validation
-   - Risks and blockers
-   - Rollback procedure
-9. Wait for the exact phrase:
-   APPROVED: EXECUTE
+2. **Classification**
+   - Missing or partially covered.
 
-Review rules:
+3. **How legacy version used it**
+   - Explain the workflow, caller, inputs, outputs, side effects, and practical purpose.
+   - State whether it was user-facing, externally consumed, or internal.
+   - Cite the relevant legacy version evidence.
 
-- Do not trust checklist marks without inspecting their evidence.
-- Do not mark a requirement Completed merely because code exists.
-- Confirm the implementation matches the authoritative requirement, public contract, side effects, failure behavior, and tests.
-- Confirm every explicit dependency and earlier phase dependency remains satisfied.
-- Confirm no later-phase requirement was accidentally pulled forward or partially implemented without traceability.
-- Confirm no completed Phase 1 public seam was broken.
-- Compare current public signatures and exports against the stable Phase 1 interface commitment.
-- Confirm later-phase behavior was added behind existing seams.
-- Flag all interface churn and determine whether it is compatible, additive, or an unauthorized breaking change.
-- Reject silent caller rewrites.
-- Confirm there is no throwaway code, concrete pass body, fake success, invented data, invented fill, silent None, swallowed exception, or unapproved fallback.
-- Confirm unsupported operations fail through their specified deterministic typed contract.
-- Confirm domain dependency direction and state ownership.
-- Confirm security, redaction, audit, determinism, idempotency, reconciliation, recovery, and kill-switch behavior.
-- Confirm changed code maintains at least 80% coverage.
-- Confirm all usage examples are runnable and factual.
+4. **Current current version coverage**
+   - Explain what current version currently provides and precisely where the behavioral gap remains.
+   - Cite the relevant current version evidence.
 
-MT5 review rules:
+5. **Why this is a functional gap**
+   - Describe the concrete use case or outcome that current version cannot currently provide.
+   - Do not rely on naming or structural differences.
 
-- Never use real capital.
-- Confirm MT5_ENVIRONMENT=demo without revealing credentials.
-- Require separate explicit approval before any broker mutation.
-- Use the production Brokers, Risk, and Trading paths.
-- Do not use FakeBrokerAdapter, monkeypatched success, or invented provider responses for the actual MT5 proof.
-- Confirm the factual place, provider acknowledgment, reconciliation, and close sequence.
-- Confirm the proof-owned position is closed or its exact safely reconciled state is documented.
-- Confirm Risk approval, authorization, route compatibility, kill-switch state, idempotency, audit, and broker authority immediately before mutation.
-- Fail the phase if demo environment or safe final broker state cannot be proven.
+6. **Value and relevance**
+   - Explain whether the capability is still useful in the current current version product and architecture.
+   - Identify any evidence that it may instead be obsolete.
 
-Required validation:
+7. **Recommended current version design**
+   - Explain how the capability could fit naturally into V3’s existing architecture.
+   - Reuse current current version patterns and abstractions.
+   - Do not propose restoring legacy version architecture merely to reproduce its implementation.
 
-1. Verify every phase requirement against implementation and test evidence.
-2. Run all targeted unit tests associated with the phase.
-3. Run all phase integration, usage, security, recovery, and system tests.
-4. Run the phase exit demonstration from the roadmap.
-5. Run:
-   uv run ruff check .
-   uv run ruff format --check .
-   uv run mypy .
-   git diff --check
-6. Run the appropriate phase-level coverage command and confirm at least 80%.
-7. Verify imports use only documented public exports.
-8. Verify all persisted migrations, restart behavior, locks, idempotency, and reconciliation required by the phase.
-9. Recalculate traceability coverage:
-   - Every matrix ID appears in exactly one phase plan
-   - No duplicates
-   - No unassigned IDs
-   - Phase counts remain correct
-   - Dependencies remain valid
-10. Confirm every checked implementation-plan item has valid path:line evidence.
+8. **Proposed usage in current version**
+   - Show a concise example of how users, services, commands, or other components would use it.
 
-Failure behavior:
+9. **Documentation changes**
+   - Identify the exact project documentation and domain README sections that should be updated before implementation.
+   - Provide proposed documentation text or a precise outline.
 
-- If any requirement fails review, leave it unchecked or return it to unchecked.
-- Do not update its source README status to Completed.
-- Do not declare the phase complete.
-- Report the exact blocker, failed evidence, affected requirements, and corrective stage.
-- Do not partially close a phase.
-- Do not conceal provider, test, coverage, or documentation failures.
+10. **Implementation scope**
+    - List the likely components, tests, configuration, migrations, or interfaces that would need changes.
+    - This is an estimate only; do not implement anything during the comparison.
 
-Documentation reconciliation after all validation passes:
+11. **Priority and confidence**
+    - Priority: critical, high, medium, or low.
+    - Confidence: high, medium, or low.
+    - Explain both ratings briefly.
 
-1. Update every affected domain README.
-2. Change Missing or Partial to Completed only for requirements, workflows, files, capabilities, and NFRs assigned to this phase and proven by evidence.
-3. Do not alter future-phase Missing entries.
-4. Do not change Removed or explicit negative requirements to Completed; preserve their status and record verified absence evidence.
-5. Add factual implementation references:
-   - Code path:line
-   - Public export
-   - Test path:line
-   - Usage example
-   - Migration or artifact
-   - Operational command where applicable
-6. Reconcile package structures and public APIs with the implemented files.
-7. Update docs/PROJECT.md for completed system workflows and system requirements.
-8. Update docs/ARCHITECTURE.md with the factual current implementation state, contracts, models, dependencies, persistence, runtime behavior, and deployment changes.
-9. Update docs/CHANGELOG.md with:
-   - Completed phase and version
-   - Requirements delivered
-   - Decisions resolved
-   - Tests and commands run
-   - Coverage
-   - Runtime/provider proof
-   - Known residual risks
-10. Apply decision hygiene:
-   - Remove resolved Open Decision rows
-   - Express resolutions as ordinary authoritative requirements or boundaries
-   - Record the resolution under Decisions in the changelog
-   - Do not create a separate ADR
-11. Complete the phase-close checklist and add documentation path:line evidence.
-12. Re-run traceability and documentation consistency checks after all updates.
+12. **Proposed Features Register Entry**
+    - Provide a proposed entry matching the exact format used in the features register (`docs/dev/features_register.md`).
+    - The format must be:
+      ```markdown
+      ## [FEAT-ID]: [Feature Name] ([Module Name])
 
-Final phase report:
+      ***
 
-- Phase/version reviewed
-- Exit demonstration result
-- Requirement totals: completed, failed, pending
-- Stages reviewed
-- Files changed during documentation reconciliation
-- Domain READMEs updated
-- PROJECT and ARCHITECTURE updates
-- CHANGELOG entry
-- Public-seam compatibility result
-- Test commands and results
-- Coverage
-- MT5 demo proof and final broker state, if applicable
-- Decisions resolved
-- Remaining risks
-- Rollback procedure
-- Positive final checklist:
-  - Scope followed
-  - All phase requirements evidenced
-  - Stable seams preserved
-  - No unauthorized interface churn
-  - No secrets or real-capital actions
-  - Quality gates passed
-  - Documentation reconciled
-  - Traceability remains exact
-  - Phase exit demonstration passed
+      | Function | Purpose | Status |
+      | :--- | :--- | :--- |
+      | `[Signature]` | [Purpose] | Missing/Partial |
+      ```
+    - For each missing or partially covered feature, write a table mapping the missing functions to their purpose and status. If the feature does not exist in current version, include all its planned public/exported functions in the table. If the feature already exists in current version but only specific functions are missing, include the existing feature header and module details but list only the missing functions (with their signatures and purposes) in the table.
 
-Declare the phase Completed only when every assigned requirement, stage, integration gate, exit criterion, and phase-close documentation item has passed.
+## Covered-capability appendix
+
+Include a concise appendix mapping important legacy version capabilities to their current version equivalents. This appendix exists to demonstrate that semantic equivalents were checked and to prevent renamed or reorganized functionality from being reported as missing.
+
+Use this format:
+
+| legacy version capability | legacy version evidence | current version equivalent | current version evidence | Status | Notes |
+|---|---|---|---|---|---|
+
+Keep this appendix concise, but include every significant capability examined.
+
+## Final summary
+
+Conclude with:
+
+- Number of capabilities examined.
+- Number fully covered.
+- Number partially covered.
+- Number genuinely missing.
+- Number intentionally obsolete.
+- Number still unclear.
+- A prioritized list of documentation changes recommended for genuine gaps.
+- Any questions that must be resolved before documentation or implementation.
+
+## Workflow constraint
+
+This task is analysis and documentation planning only.
+
+Do not modify production code or implement missing functionality. For any capability we decide to retain, the required sequence is:
+
+1. Confirm that it is a genuine and desirable functional gap.
+2. Update the appropriate project-level documentation.
+3. Update the relevant domain README.
+4. Review and approve the documented design.
+5. Only then implement and test it in current version.
+
+Do not edit documentation automatically unless explicitly instructed to do so after presenting the comparison report.
 ```

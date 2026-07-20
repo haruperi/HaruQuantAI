@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import pandas as pd
-
 from app.services.research.modeling.contracts import (
     UnsupervisedResearchConfig,
     UnsupervisedResearchRequest,

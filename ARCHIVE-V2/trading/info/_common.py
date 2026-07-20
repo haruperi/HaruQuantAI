@@ -1,5 +1,4 @@
 """Shared helpers for trading read-only info facades."""
-# ruff: noqa: TC001
 
 from __future__ import annotations
 

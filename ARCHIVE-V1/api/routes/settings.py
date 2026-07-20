@@ -1,11 +1,10 @@
 """Settings routes."""
 
-from data.database.sqlite.database_operations import DatabaseManager
-from fastapi import APIRouter, Header, HTTPException, status
-
 from app.api.auth_utils import verify_token
 from app.api.models import UpdateUserSettingsRequest, UserSettingsResponse
 from app.services.utils import logger
+from data.database.sqlite.database_operations import DatabaseManager
+from fastapi import APIRouter, Header, HTTPException, status
 
 router = APIRouter()
 

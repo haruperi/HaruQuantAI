@@ -1,10 +1,9 @@
 """Background scheduler jobs."""
 
+from app.services.utils import logger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from data.database.sqlite.database_operations import DatabaseManager
-
-from app.services.utils import logger
 
 _scheduler = AsyncIOScheduler()
 

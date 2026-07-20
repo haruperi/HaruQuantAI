@@ -14,15 +14,6 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    field_serializer,
-    field_validator,
-    model_validator,
-)
-
 from app.services.trading.errors import TradingValidationError as ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import normalize_timestamp
@@ -30,6 +21,14 @@ from app.utils.standard import (
     SENSITIVE_KEY_PATTERN,
     SENSITIVE_VALUE_PATTERN,
     canonical_json,
+)
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_serializer,
+    field_validator,
+    model_validator,
 )
 
 SUPPORTED_SCHEMA_MAJOR = 1

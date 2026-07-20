@@ -1,4 +1,5 @@
 import ast
+import inspect
 import re
 from decimal import getcontext
 from pathlib import Path
@@ -22,7 +23,6 @@ _EXPECTED_EXPORTS = {
     "RedactionResult",
     "RuntimeSettings",
     "SecurityError",
-    "SecretVersion",
     "StructuredFormatter",
     "SystemClock",
     "ValidationError",
@@ -30,15 +30,11 @@ _EXPECTED_EXPORTS = {
     "canonical_json",
     "configure_logging",
     "derive_stable_id",
-    "decrypt_text",
-    "encrypt_text",
     "flush_logging",
     "format_utc_timestamp",
     "generate_id",
-    "generate_fernet_key",
     "get_error_metadata",
     "get_logger",
-    "hash_password",
     "is_fresh",
     "is_sensitive_key",
     "load_settings",
@@ -48,19 +44,46 @@ _EXPECTED_EXPORTS = {
     "parse_utc_timestamp",
     "redact_mapping_value",
     "redact_text_value",
-    "resolve_secret_reference",
     "route_error_event",
-    "select_active_secret_version",
     "shutdown_logging",
     "to_json_safe",
     "utc_now",
     "validate_id",
-    "verify_password",
 }
 _FORBIDDEN_IMPORT_ROOTS = {
     "app.services",
     "pandas",
     "sqlite3",
+}
+_EXPECTED_USAGE_CALLS = {
+    "01_contracts.py": {"AuditEvent", "AuthContext"},
+    "02_errors.py": {
+        "get_error_metadata",
+        "map_exception",
+        "normalize_error_code",
+        "route_error_event",
+    },
+    "03_identity.py": {"derive_stable_id", "generate_id", "validate_id"},
+    "04_time.py": {
+        "age_seconds",
+        "format_utc_timestamp",
+        "is_fresh",
+        "parse_utc_timestamp",
+        "utc_now",
+    },
+    "05_serialization.py": {"canonical_json", "to_json_safe"},
+    "06_security.py": {
+        "is_sensitive_key",
+        "redact_mapping_value",
+        "redact_text_value",
+    },
+    "07_settings.py": {"load_settings"},
+    "08_logging.py": {
+        "configure_logging",
+        "flush_logging",
+        "get_logger",
+        "shutdown_logging",
+    },
 }
 
 
@@ -89,6 +112,27 @@ def test_utils_does_not_mutate_decimal_context() -> None:
     assert getcontext().prec >= 28
 
 
+def test_utils_has_no_print_calls_or_import_time_log_emission() -> None:
+    """Keep library output explicit and package imports silent."""
+    source_root = Path(app.utils.__file__).parent
+    for source_file in source_root.rglob("*.py"):
+        tree = ast.parse(source_file.read_text(encoding="utf-8"))
+        assert not any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "print"
+            for node in ast.walk(tree)
+        )
+        assert not any(
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Attribute)
+            and isinstance(node.value.func.value, ast.Name)
+            and node.value.func.value.id == "logger"
+            for node in tree.body
+        )
+
+
 def test_every_functional_requirement_has_test_and_usage_traceability() -> None:
     source_root = Path(app.utils.__file__).parent
     repository_root = source_root.parents[1]
@@ -103,9 +147,53 @@ def test_every_functional_requirement_has_test_and_usage_traceability() -> None:
         for line in requirement_lines
         if (match := re.search(r"FR-UTL-(\d{3})", line)) is not None
     }
-    assert completed == {f"{number:03d}" for number in range(1, 42)}
+    assert completed == {
+        *(f"{number:03d}" for number in range(1, 25)),
+        *(f"{number:03d}" for number in range(26, 36)),
+        *(f"{number:03d}" for number in range(39, 42)),
+    }
     for line in requirement_lines:
         assert "**Usage:**" in line
         assert "**Unit:**" in line
         for relative_path in re.findall(r"`(tests/utils/[^`:]+\.py)::", line):
             assert (repository_root / relative_path).is_file()
+
+
+def test_features_register_contains_every_public_function() -> None:
+    """Require the Utils register to name every public exported function."""
+    source_root = Path(app.utils.__file__).parent
+    register_path = source_root.parents[1] / "docs" / "dev" / "features_register.md"
+    utils_section = register_path.read_text(encoding="utf-8").split("# Brokers", 1)[0]
+    registered = set(re.findall(r"\| `([a-z][a-z0-9_]*)\(", utils_section))
+    public_functions = {
+        name
+        for name in app.utils.__all__
+        if inspect.isfunction(getattr(app.utils, name))
+    }
+    assert registered == public_functions
+
+
+def test_each_feature_has_one_standalone_usage_program_covering_public_calls() -> None:
+    """Require one non-pytest program that calls every operation in each feature."""
+    source_root = Path(app.utils.__file__).parent
+    usage_root = source_root.parents[1] / "tests" / "utils" / "usage"
+    usage_files = {
+        path.name: path for path in usage_root.glob("[0-9][0-9]_*.py") if path.is_file()
+    }
+    assert set(usage_files) == set(_EXPECTED_USAGE_CALLS)
+    for filename, expected_calls in _EXPECTED_USAGE_CALLS.items():
+        tree = ast.parse(usage_files[filename].read_text(encoding="utf-8"))
+        called_names = {
+            node.func.id
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+        }
+        assert expected_calls <= called_names
+        assert not any(
+            isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
+            for node in tree.body
+        )
+        assert any(
+            isinstance(node, ast.FunctionDef) and node.name == "main"
+            for node in tree.body
+        )

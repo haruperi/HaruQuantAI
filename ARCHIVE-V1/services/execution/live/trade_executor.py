@@ -214,7 +214,7 @@ class TradeExecutor:
             except (TypeError, ValueError):
                 return False
         try:
-            return int(cast(int, retcode)) in transient_codes
+            return int(cast("int", retcode)) in transient_codes
         except (TypeError, ValueError):
             return False
 

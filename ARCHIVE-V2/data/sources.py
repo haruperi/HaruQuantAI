@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
 import pandas as pd
-
 from app.services.data.contracts import (
     BrokerMarketDataFactory,
     BrokerMarketDataPort,

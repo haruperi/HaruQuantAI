@@ -7,18 +7,17 @@ and validation rules.
 from datetime import UTC
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-
 from app.services.utils.normalization import _parse_datetime
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 def validate_utc_timestamp_helper(v: str) -> str:
     """Description.
         Validate and normalize timestamp to UTC string format.
-    
+
     Args:
         v: str.
-    
+
     Returns:
         str.
     """
@@ -51,10 +50,10 @@ class OHLCVRecord(BaseModel):
     def validate_utc_timestamp(cls, v: str) -> str:
         """Description.
             Validate and normalize timestamp using the shared helper.
-        
+
         Args:
             v: str.
-        
+
         Returns:
             str.
         """
@@ -64,10 +63,10 @@ class OHLCVRecord(BaseModel):
     def validate_ohlc_order(self) -> "OHLCVRecord":
         """Description.
             Verify that high is the maximum value and low is the minimum value.
-        
+
         Args:
             None.
-        
+
         Returns:
             'OHLCVRecord'.
         """
@@ -103,10 +102,10 @@ class TickRecord(BaseModel):
     def validate_utc_timestamp(cls, v: str) -> str:
         """Description.
             Validate and normalize timestamp using the shared helper.
-        
+
         Args:
             v: str.
-        
+
         Returns:
             str.
         """
@@ -116,10 +115,10 @@ class TickRecord(BaseModel):
     def validate_tick_constraints(self) -> "TickRecord":
         """Description.
             Validate tick constraints.
-        
+
         Args:
             None.
-        
+
         Returns:
             'TickRecord'.
         """
@@ -155,10 +154,10 @@ class SpreadRecord(BaseModel):
     def validate_utc_timestamp(cls, v: str) -> str:
         """Description.
             Validate and normalize timestamp using the shared helper.
-        
+
         Args:
             v: str.
-        
+
         Returns:
             str.
         """
@@ -168,10 +167,10 @@ class SpreadRecord(BaseModel):
     def validate_spread_values(self) -> "SpreadRecord":
         """Description.
             Verify bid-ask spread rules.
-        
+
         Args:
             None.
-        
+
         Returns:
             'SpreadRecord'.
         """

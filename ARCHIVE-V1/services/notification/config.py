@@ -289,7 +289,7 @@ class NotificationConfig:
     def from_file(cls, file_path: str) -> "NotificationConfig":
         """Create configuration from JSON file."""
         try:
-            with open(file_path) as f:
+            with Path(file_path).open() as f:
                 data = json.load(f)
 
             config = cls()
@@ -339,9 +339,7 @@ class NotificationConfig:
             config.email_default_recipients = [settings.smtp_username]
 
         config.email_enabled = bool(
-            config.email_smtp_server
-            and config.email_username
-            and config.email_password
+            config.email_smtp_server and config.email_username and config.email_password
         )
 
         # Telegram mapping
@@ -368,7 +366,7 @@ class NotificationConfig:
             # Create directory if it doesn't exist
             Path(file_path).parent.mkdir(parents=True, exist_ok=True)
 
-            with open(file_path, "w") as f:
+            with Path(file_path).open("w") as f:
                 json.dump(asdict(self), f, indent=2)
 
             logger.info(f"Configuration saved to {file_path}")
@@ -489,10 +487,8 @@ class NotificationConfig:
             auth_token=self.sms_auth_token,
             from_number=self.sms_from_number,
             default_recipients=self.sms_default_recipients,
-            webhook_url=self.sms_webhook_url if self.sms_webhook_url else None,
-            status_callback=(
-                self.sms_status_callback if self.sms_status_callback else None
-            ),
+            webhook_url=self.sms_webhook_url or None,
+            status_callback=(self.sms_status_callback or None),
         )
 
     def get_desktop_config(self) -> DesktopConfig | None:

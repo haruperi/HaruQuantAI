@@ -106,7 +106,7 @@ class StrategyStorage:
 
             # Save strategy code
             strategy_file = version_dir / "strategy.py"
-            with open(strategy_file, "w", encoding="utf-8") as f:
+            with Path(strategy_file).open("w", encoding="utf-8") as f:
                 f.write(code)
 
             # Save metadata
@@ -120,7 +120,7 @@ class StrategyStorage:
                 **(metadata or {}),
             }
 
-            with open(metadata_file, "w", encoding="utf-8") as f:
+            with Path(metadata_file).open("w", encoding="utf-8") as f:
                 json.dump(full_metadata, f, indent=2)
 
             logger.info(
@@ -162,7 +162,7 @@ class StrategyStorage:
             if not strategy_file.exists():
                 raise FileNotFoundError(f"Strategy file not found: {strategy_file}")
 
-            with open(strategy_file, encoding="utf-8") as f:
+            with Path(strategy_file).open(encoding="utf-8") as f:
                 code = f.read()
 
             return code
@@ -200,7 +200,7 @@ class StrategyStorage:
             if not metadata_file.exists():
                 return {}
 
-            with open(metadata_file, encoding="utf-8") as f:
+            with Path(metadata_file).open(encoding="utf-8") as f:
                 metadata: dict[str, Any] = json.load(f)
 
             return metadata

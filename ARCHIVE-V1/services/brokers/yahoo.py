@@ -10,7 +10,6 @@ from typing import Any
 
 import pandas as pd
 import yfinance as yf
-
 from app.services.utils.logger import logger
 
 
@@ -25,10 +24,10 @@ class YahooClient:
     def __init__(self, api_key: str | None = None) -> None:
         """Description.
             Initialize the Yahoo Finance client.
-        
+
         Args:
             api_key: str | None.
-        
+
         Returns:
             None.
         """
@@ -45,10 +44,10 @@ class YahooClient:
     def connect(self) -> bool:
         """Description.
             Initialize connection to Yahoo Finance feed.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -59,10 +58,10 @@ class YahooClient:
     def disconnect(self) -> None:
         """Description.
             Shutdown the connection and clean up resources.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -72,10 +71,10 @@ class YahooClient:
     def is_connected(self) -> bool:
         """Description.
             Check if client is currently connected.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -96,7 +95,7 @@ class YahooClient:
     ) -> pd.DataFrame:
         """Description.
             Get OHLCVS bars from Yahoo Finance.
-        
+
         Args:
             symbol: str.
             timeframe: str.
@@ -104,7 +103,7 @@ class YahooClient:
             start_pos: int.
             date_from: datetime | None.
             date_to: datetime | None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -196,14 +195,14 @@ class YahooClient:
     ) -> pd.DataFrame | list[dict[str, Any]] | None:
         """Description.
             Get ticks from Yahoo Finance (mocked/generated from daily bounds).
-        
+
         Args:
             symbol: str.
             count: int.
             start: datetime | None.
             end: datetime | None.
             as_dataframe: bool.
-        
+
         Returns:
             pd.DataFrame | list[dict[str, Any]] | None.
         """
@@ -256,10 +255,10 @@ class YahooClient:
     def get_instance(cls) -> "YahooClient":
         """Description.
             Get the shared singleton instance of YahooClient.
-        
+
         Args:
             None.
-        
+
         Returns:
             'YahooClient'.
         """
@@ -272,10 +271,10 @@ class YahooClient:
 def get_yahoo_client() -> YahooClient:
     """Description.
         Get the shared singleton instance of YahooClient.
-    
+
     Args:
         None.
-    
+
     Returns:
         YahooClient.
     """

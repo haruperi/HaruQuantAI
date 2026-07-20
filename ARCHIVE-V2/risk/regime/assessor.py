@@ -13,8 +13,6 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
-from pydantic import Field
-
 from app.services.risk.models import (
     MarketRiskSnapshot,
     RiskConfig,
@@ -25,6 +23,7 @@ from app.services.risk.models import (
 from app.services.risk.policy.contracts import EffectiveRiskPolicy
 from app.utils.logger import logger
 from app.utils.normalization import parse_datetime, to_utc_datetime, utc_now
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.risk.validations import ValidationResult

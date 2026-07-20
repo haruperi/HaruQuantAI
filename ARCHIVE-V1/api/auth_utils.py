@@ -2,10 +2,9 @@
 
 from datetime import datetime
 
+from app.services.utils import verify_password
 from data.database.sqlite.database_operations import DatabaseManager
 from fastapi import Header, HTTPException, status
-
-from app.services.utils import verify_password
 
 
 def generate_token(user_id: int, db_manager: DatabaseManager) -> str:

@@ -6,14 +6,6 @@ import json
 from dataclasses import dataclass
 from uuid import uuid4
 
-from data.database.repositories.ai_chat_repository import (
-    AiChatActionDraftRow,
-    AiChatLifecycleAuditEventRow,
-    AiChatMessageRow,
-    AiChatRepository,
-    AiChatThreadRow,
-)
-
 from app.services.conversation.memory import ConversationMemoryService
 from app.services.conversation.retention import (
     ConversationRetentionService,
@@ -28,6 +20,13 @@ from app.services.schemas.chat import (
     ChatRetentionPolicyDetail,
     ChatThread,
     ChatThreadDetail,
+)
+from data.database.repositories.ai_chat_repository import (
+    AiChatActionDraftRow,
+    AiChatLifecycleAuditEventRow,
+    AiChatMessageRow,
+    AiChatRepository,
+    AiChatThreadRow,
 )
 
 

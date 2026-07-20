@@ -3,7 +3,6 @@
 from typing import Any
 
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -31,7 +30,14 @@ class BollingerBands(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new columns 'bb_middle_{period}', 'bb_upper_{period}_{std_dev}', and 'bb_lower_{period}_{std_dev}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 20, std_dev: float = 2.0, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self,
+        df: pd.DataFrame,
+        period: int = 20,
+        std_dev: float = 2.0,
+        column: str = "close",
+        **kwargs: Any,
+    ) -> pd.DataFrame:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if period < 1:

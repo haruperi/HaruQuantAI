@@ -12,15 +12,6 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from data.database import (
-    AiChatRepository,
-    ExecutionRepository,
-    GovernanceRepository,
-    ProposalRepository,
-    RiskRepository,
-    WorkflowRepository,
-)
-
 from app.agentic.contracts.common import Originator
 from app.agentic.contracts.risk_assessment_decision.model import (
     RiskAssessmentDecision,
@@ -47,6 +38,14 @@ from app.services.execution.pre_send import PreSendValidationRequest
 from app.services.governance.workflow import KillSwitchState
 from app.services.risk.safety.kill_switch import evaluate_new_entry_block
 from app.services.utils.identity import generate_id, generate_prefixed_id
+from data.database import (
+    AiChatRepository,
+    ExecutionRepository,
+    GovernanceRepository,
+    ProposalRepository,
+    RiskRepository,
+    WorkflowRepository,
+)
 
 UTC = UTC
 

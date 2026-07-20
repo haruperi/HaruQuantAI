@@ -83,7 +83,7 @@ async def get_files():
     """Get the tree structure of the documentation directory."""
     try:
         if not DOCS_ROOT.exists():
-            os.makedirs(DOCS_ROOT, exist_ok=True)
+            Path(DOCS_ROOT).mkdir(exist_ok=True, parents=True)
         return get_directory_structure(DOCS_ROOT)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -140,7 +140,7 @@ async def delete_file(path: str = CONTENT_PATH_QUERY):
                 status_code=400, detail="Cannot delete directory directly"
             )
 
-        os.remove(full_path)
+        Path(full_path).unlink()
         return {"status": "success"}
     except HTTPException:
         raise

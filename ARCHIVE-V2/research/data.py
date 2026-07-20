@@ -11,11 +11,10 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel, Field
-
 from app.services.research.errors import ResearchValidationError as ValidationError
 from app.utils.logger import logger
 from app.utils.settings import EdgeLabConfig
+from pydantic import BaseModel, Field
 
 CanonicalOHLCVSSchema = {"open", "high", "low", "close", "volume", "spread"}
 

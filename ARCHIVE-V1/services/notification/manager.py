@@ -413,17 +413,17 @@ class NotificationManager:
         """Enable a specific notification service."""
         if service_name in self.notifiers:
             self.notifiers[service_name].enable()
-            self.logger.info(f"Service {service_name} enabled")
+            self.logger.info("Service %s enabled", service_name)
         else:
-            self.logger.warning(f"Service {service_name} not found")
+            self.logger.warning("Service %s not found", service_name)
 
     def disable_service(self, service_name: str):
         """Disable a specific notification service."""
         if service_name in self.notifiers:
             self.notifiers[service_name].disable()
-            self.logger.info(f"Service {service_name} disabled")
+            self.logger.info("Service %s disabled", service_name)
         else:
-            self.logger.warning(f"Service {service_name} not found")
+            self.logger.warning("Service %s not found", service_name)
 
     def get_service_status(self) -> dict[str, dict[str, Any]]:
         """Get status of all notification tools."""

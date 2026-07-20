@@ -7,7 +7,6 @@ from dataclasses import asdict, is_dataclass
 from typing import Any
 
 import pandas as pd
-
 from app.services.risk.limits import RiskLimits
 from app.services.risk.metrics.math import symbol_notional_value
 from app.services.risk.models import (
@@ -529,7 +528,7 @@ class PortfolioStateEngine:
         if value is None:
             return None
         text = str(value)
-        return text if text else None
+        return text or None
 
     def _strip_known_keys(
         self,

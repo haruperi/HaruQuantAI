@@ -11,10 +11,6 @@ from typing import Any, cast
 
 import numpy as np
 import pandas as pd
-from data.database.sqlite.database_operations import DatabaseManager
-from fastapi import APIRouter, Header, HTTPException, status
-from pydantic import BaseModel, Field
-
 from app.api.auth_utils import get_user_id_from_token
 from app.services.brokers import load_dukascopy, mt5_data_get_bars_with_credentials
 from app.services.research import (
@@ -59,6 +55,9 @@ from app.services.research import (
 )
 from app.services.utils import logger
 from app.services.utils.validators import DataSource, prepare_ohlcv_data
+from data.database.sqlite.database_operations import DatabaseManager
+from fastapi import APIRouter, Header, HTTPException, status
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 db_manager = DatabaseManager()
@@ -623,7 +622,7 @@ def _run_single_eds(
     """Execute a single EDS function safely."""
     try:
         return cast(
-            EdgeResult | None,
+            "EdgeResult | None",
             eds_func(df, symbol, timeframe, config, bootstrap, perm, **kwargs),
         )
     except Exception as exc:

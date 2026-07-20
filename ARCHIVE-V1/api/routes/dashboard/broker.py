@@ -49,7 +49,7 @@ def _parse_credentials(credentials: str | dict[str, Any] | None) -> dict[str, An
 
     if isinstance(credentials, str):
         try:
-            return cast(dict[str, Any], json.loads(credentials))
+            return cast("dict[str, Any]", json.loads(credentials))
         except json.JSONDecodeError:
             logger.error("Failed to parse broker credentials JSON")
             return {}
@@ -225,8 +225,10 @@ async def get_equity_curve(authorization: Annotated[str | None, Header()] = None
 
         sorted_deals = sorted(
             list(deals),
-            key=lambda row: int(_coerce_deal_value(row, "time_msc", 0) or 0)
-            or int(_coerce_deal_value(row, "time", 0) or 0),
+            key=lambda row: (
+                int(_coerce_deal_value(row, "time_msc", 0) or 0)
+                or int(_coerce_deal_value(row, "time", 0) or 0)
+            ),
         )
 
         account = client.account_info()

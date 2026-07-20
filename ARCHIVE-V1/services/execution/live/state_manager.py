@@ -30,7 +30,7 @@ class StateManager:
         """Load existing state or create default state."""
         if self.state_file.exists():
             try:
-                with open(self.state_file) as f:
+                with Path(self.state_file).open() as f:
                     state = json.load(f)
 
                 # Ensure all required fields exist
@@ -60,7 +60,7 @@ class StateManager:
             # Create directory if it doesn't exist
             self.state_file.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(self.state_file, "w") as f:
+            with Path(self.state_file).open("w") as f:
                 json.dump(self._state, f, indent=2)
 
         except Exception as e:

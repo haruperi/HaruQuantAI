@@ -19,7 +19,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.research.config import MarketStructureConfig
 from app.services.research.data.models import PreparedDataset
 from app.services.research.market_structure import build_market_structure_profile

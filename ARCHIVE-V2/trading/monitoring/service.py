@@ -10,8 +10,6 @@ from collections import deque
 from datetime import datetime
 from typing import Any, Literal
 
-from loguru import logger
-
 from app.services.trading.config.models import TradingRuntimeConfig
 from app.services.trading.contracts import TradingRoute
 from app.services.trading.monitoring.heartbeat_watchdog import HeartbeatEmitter
@@ -25,6 +23,7 @@ from app.services.trading.monitoring.timeouts_and_staleness import (
 )
 from app.services.trading.monitoring.tool_health import ToolHealthMonitor
 from app.services.trading.state.ports import Clock
+from loguru import logger
 
 
 class MonitoringService:

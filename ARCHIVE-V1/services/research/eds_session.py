@@ -19,7 +19,6 @@ from dataclasses import asdict
 
 import numpy as np
 import pandas as pd
-
 from app.services.analytics.metrics import median_mae_mfe, win_rate_fraction
 from app.services.analytics.ratios import expectancy, profit_factor
 from app.services.research.session_config import tag_sessions

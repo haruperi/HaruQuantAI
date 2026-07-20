@@ -8,9 +8,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from data.database import IncidentRecord, WorkflowRepository
-
 from app.services.utils.identity import generate_id
+from data.database import IncidentRecord, WorkflowRepository
 
 INCIDENT_STATE_TRANSITIONS: dict[str, frozenset[str]] = {
     "OPEN": frozenset({"ACKNOWLEDGED", "RESOLVED", "CLOSED"}),

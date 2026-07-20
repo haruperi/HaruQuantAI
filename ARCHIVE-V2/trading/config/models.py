@@ -9,14 +9,13 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 from app.services.trading.contracts import (
     MutationCapability,
     SideEffectMode,
     TradingRoute,
 )
 from app.utils.logger import logger
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 CURRENCY_CODE_LENGTH = 3
 

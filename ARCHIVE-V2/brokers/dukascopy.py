@@ -16,7 +16,6 @@ from typing import Any
 
 import pandas as pd
 import requests
-
 from app.utils.logger import logger
 
 TIME_UNIT_MONTH = "MONTH"

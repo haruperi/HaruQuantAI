@@ -10,13 +10,12 @@ from typing import Any, cast
 
 import MetaTrader5 as mt5  # type: ignore[import-untyped, unused-ignore]  # noqa: N813
 import pandas as pd
-from data.database.sqlite.users import UserManager
-
-from app.services.utils.errors import ConfigurationError, ExternalServiceError
 from app.services.utils.common import bars_to_records
+from app.services.utils.errors import ConfigurationError, ExternalServiceError
 from app.services.utils.logger import logger
 from app.services.utils.settings import settings
 from app.services.utils.validators import prepare_ohlcv_data
+from data.database.sqlite.users import UserManager
 
 
 class MT5Api:
@@ -25,10 +24,10 @@ class MT5Api:
     def __init__(self, mt5_module: Any = mt5) -> None:  # noqa: ANN401
         """Description.
             Initialize the MT5 API wrapper.
-        
+
         Args:
             mt5_module: Any.
-        
+
         Returns:
             None.
         """
@@ -39,11 +38,11 @@ class MT5Api:
     def initialize(self, *args: Any, **kwargs: Any) -> bool:  # noqa: ANN401
         """Description.
             Initialize MetaTrader5 and remember the connection state.
-        
+
         Args:
             args: Any.
             kwargs: Any.
-        
+
         Returns:
             bool.
         """
@@ -54,26 +53,24 @@ class MT5Api:
     def shutdown(self) -> None:
         """Description.
             Shutdown MetaTrader5 and clear the connection state.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
         self._mt5.shutdown()
         self._initialized = False
-        logger.debug(
-            "Shutting down MetaTrader5 connection and clearing wrapper state."
-        )
+        logger.debug("Shutting down MetaTrader5 connection and clearing wrapper state.")
 
     def last_error(self) -> Any:  # noqa: ANN401
         """Description.
             Return the last MetaTrader5 error.
-        
+
         Args:
             None.
-        
+
         Returns:
             Any.
         """
@@ -83,10 +80,10 @@ class MT5Api:
     def is_initialized(self) -> bool:
         """Description.
             Return whether this wrapper initialized MetaTrader5.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -99,10 +96,10 @@ class MT5Api:
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401
         """Description.
             Delegate unknown attributes to the MetaTrader5 package.
-        
+
         Args:
             name: str.
-        
+
         Returns:
             Any.
         """
@@ -135,7 +132,7 @@ class MT5Client:
     ) -> None:
         """Description.
             Initialize the MetaTrader 5 client with credentials and configuration.
-        
+
         Args:
             path: str | None.
             login: int | None.
@@ -144,12 +141,12 @@ class MT5Client:
             default_symbols: list[str] | None.
             timeout: int.
             portable: bool.
-        
+
         Returns:
             None.
         """
         # Resolve config from parameters or settings fallback
-        settings_obj = cast(Any, settings)
+        settings_obj = cast("Any", settings)
         self.path = path or settings_obj.mt5_terminal_path
 
         # Parse login ID
@@ -200,13 +197,13 @@ class MT5Client:
     ) -> bool:
         """Description.
             Start and initialize MT5 terminal, and login to the trading account.
-        
+
         Args:
             path: str | None.
             login: int | None.
             password: str | None.
             server: str | None.
-        
+
         Returns:
             bool.
         """
@@ -240,10 +237,10 @@ class MT5Client:
     def _validate_credentials(self) -> None:
         """Description.
             Validate that required MT5 credentials are provided.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -263,10 +260,10 @@ class MT5Client:
     def _initialize_terminal(self) -> None:
         """Description.
             Initialize the MT5 terminal connection.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -293,10 +290,10 @@ class MT5Client:
     def _login_account(self) -> None:
         """Description.
             Log in to the trading account on the initialized terminal.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -330,10 +327,10 @@ class MT5Client:
     def _select_default_symbols(self) -> None:
         """Description.
             Add all default symbols to the terminal Market Watch.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -369,10 +366,10 @@ class MT5Client:
     def is_connected(self) -> bool:
         """Description.
             Check if client is currently connected to the MT5 terminal and server.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -388,10 +385,10 @@ class MT5Client:
     def shutdown(self) -> None:
         """Description.
             Shutdown the MT5 terminal connection and clean up resources.
-        
+
         Args:
             None.
-        
+
         Returns:
             None.
         """
@@ -418,7 +415,7 @@ class MT5Client:
     ) -> pd.DataFrame:
         """Description.
             Get OHLCVS bars from MT5.
-        
+
         Args:
             symbol: str.
             timeframe: str.
@@ -426,7 +423,7 @@ class MT5Client:
             start_pos: int.
             date_from: datetime | None.
             date_to: datetime | None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -511,7 +508,7 @@ class MT5Client:
     ) -> pd.DataFrame | list[dict[str, Any]] | None:
         """Description.
             Get ticks from MT5.
-        
+
         Args:
             symbol: str.
             count: int.
@@ -519,7 +516,7 @@ class MT5Client:
             end: datetime | None.
             flags: int.
             as_dataframe: bool.
-        
+
         Returns:
             pd.DataFrame | list[dict[str, Any]] | None.
         """
@@ -557,10 +554,10 @@ class MT5Client:
     def get_instance(cls) -> "MT5Client":
         """Description.
             Get the shared singleton instance of MT5Client.
-        
+
         Args:
             None.
-        
+
         Returns:
             'MT5Client'.
         """
@@ -572,10 +569,10 @@ class MT5Client:
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401
         """Description.
             Delegate attribute/method calls to the underlying MetaTrader5 library.
-        
+
         Args:
             name: str.
-        
+
         Returns:
             Any.
         """
@@ -617,10 +614,10 @@ __all__ = [
 def get_mt5_client() -> MT5Client:
     """Description.
         Get the shared singleton instance of MT5Client.
-    
+
     Args:
         None.
-    
+
     Returns:
         MT5Client.
     """
@@ -631,10 +628,10 @@ def get_mt5_client() -> MT5Client:
 def _ensure_connected() -> None:
     """Description.
         Ensure the shared MT5Client is initialized and connected.
-    
+
     Args:
         None.
-    
+
     Returns:
         None.
     """
@@ -647,10 +644,10 @@ def _ensure_connected() -> None:
 def get_terminal_info() -> Any:  # noqa: ANN401
     """Description.
         Get the MT5 terminal settings and status.
-    
+
     Args:
         None.
-    
+
     Returns:
         Any.
     """
@@ -662,10 +659,10 @@ def get_terminal_info() -> Any:  # noqa: ANN401
 def get_account_info() -> Any:  # noqa: ANN401
     """Description.
         Get information on the current trading account.
-    
+
     Args:
         None.
-    
+
     Returns:
         Any.
     """
@@ -677,10 +674,10 @@ def get_account_info() -> Any:  # noqa: ANN401
 def get_symbol_info(symbol: str) -> Any:  # noqa: ANN401
     """Description.
         Get information about a specific symbol.
-    
+
     Args:
         symbol: str.
-    
+
     Returns:
         Any.
     """
@@ -693,18 +690,16 @@ def get_symbol_info(symbol: str) -> Any:  # noqa: ANN401
 def get_position_info(symbol: str | None = None, ticket: int | None = None) -> Any:  # noqa: ANN401
     """Description.
         Get open positions filtered by symbol or ticket.
-    
+
     Args:
         symbol: str | None.
         ticket: int | None.
-    
+
     Returns:
         Any.
     """
     _ensure_connected()
-    logger.debug(
-        "Fetching MT5 positions (symbol={}, ticket={}).", symbol, ticket
-    )
+    logger.debug("Fetching MT5 positions (symbol={}, ticket={}).", symbol, ticket)
     if ticket is not None:
         return mt5.positions_get(ticket=ticket)
     if symbol is not None:
@@ -715,11 +710,11 @@ def get_position_info(symbol: str | None = None, ticket: int | None = None) -> A
 def get_order_info(symbol: str | None = None, ticket: int | None = None) -> Any:  # noqa: ANN401
     """Description.
         Get active pending orders filtered by symbol or ticket.
-    
+
     Args:
         symbol: str | None.
         ticket: int | None.
-    
+
     Returns:
         Any.
     """
@@ -740,13 +735,13 @@ def get_history_order_info(
 ) -> Any:  # noqa: ANN401
     """Description.
         Get historical orders from the specified time frame or ticket.
-    
+
     Args:
         date_from: Any.
         date_to: Any.
         group: str | None.
         ticket: int | None.
-    
+
     Returns:
         Any.
     """
@@ -771,13 +766,13 @@ def get_history_deal_info(
 ) -> Any:  # noqa: ANN401
     """Description.
         Get historical deals from the specified time frame or ticket.
-    
+
     Args:
         date_from: Any.
         date_to: Any.
         group: str | None.
         ticket: int | None.
-    
+
     Returns:
         Any.
     """
@@ -797,10 +792,10 @@ def get_history_deal_info(
 def trade(request: dict[str, Any]) -> Any:  # noqa: ANN401
     """Description.
         Send a trading request to the MT5 terminal.
-    
+
     Args:
         request: dict[str, Any].
-    
+
     Returns:
         Any.
     """
@@ -832,10 +827,10 @@ def trade(request: dict[str, Any]) -> Any:  # noqa: ANN401
 def get_mt5_api() -> MT5Api:
     """Description.
         Return the shared MT5 API wrapper.
-    
+
     Args:
         None.
-    
+
     Returns:
         MT5Api.
     """
@@ -849,25 +844,24 @@ def get_mt5_credentials(
 ) -> dict[str, Any] | None:
     """Description.
         Load stored MT5 credentials from the application database.
-    
+
     Args:
         user_id: int.
         mt5_login: int | None.
-    
+
     Returns:
         dict[str, Any] | None.
     """
     logger.debug(
-        f"Loading stored MT5 credentials for user_id={user_id}, "
-        f"login={mt5_login}."
+        f"Loading stored MT5 credentials for user_id={user_id}, login={mt5_login}."
     )
     user_manager = UserManager()
     if mt5_login is not None:
         return cast(
-            dict[str, Any] | None,
+            "dict[str, Any] | None",
             user_manager.get_mt5_credentials_by_login(user_id, mt5_login),
         )
-    return cast(dict[str, Any] | None, user_manager.get_mt5_credentials(user_id))
+    return cast("dict[str, Any] | None", user_manager.get_mt5_credentials(user_id))
 
 
 def get_connected_mt5_client(
@@ -876,11 +870,11 @@ def get_connected_mt5_client(
 ) -> MT5Client | None:
     """Description.
         Create and connect an MT5 client using stored credentials.
-    
+
     Args:
         user_id: int.
         mt5_login: int | None.
-    
+
     Returns:
         MT5Client | None.
     """
@@ -915,7 +909,7 @@ def _load_mt5_impl(
 ) -> pd.DataFrame | None:
     """Description.
         Load OHLCV data from MT5 using stored credentials.
-    
+
     Args:
         symbol: str.
         timeframe: str.
@@ -924,13 +918,12 @@ def _load_mt5_impl(
         count: int | None.
         user_id: int.
         mt5_login: int | None.
-    
+
     Returns:
         pd.DataFrame | None.
     """
     logger.debug(
-        f"Executing raw MT5 load operations for symbol={symbol}, "
-        f"timeframe={timeframe}."
+        f"Executing raw MT5 load operations for symbol={symbol}, timeframe={timeframe}."
     )
     if isinstance(start_date, str):
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
@@ -968,7 +961,7 @@ def load_mt5(
 ) -> dict[str, Any]:
     """Description.
         Load OHLCV bars from MetaTrader 5 using stored credentials.
-    
+
     Args:
         symbol: str.
         timeframe: str.
@@ -979,7 +972,7 @@ def load_mt5(
         mt5_login: int | None.
         request_id: str | None.
         _kwargs: Any.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -1008,7 +1001,7 @@ def load_mt5(
                 "source": "load_mt5",
                 "symbol": symbol,
                 "timeframe": timeframe,
-                "rows": int(len(frame)),
+                "rows": len(frame),
                 "columns": [str(column) for column in frame.columns],
                 "data": bars_to_records(frame),
             },
@@ -1033,7 +1026,7 @@ def _mt5_data_get_bars_with_credentials_impl(
 ) -> pd.DataFrame:
     """Description.
         Connect to MT5 with credentials, fetch bars, and close the client.
-    
+
     Args:
         symbol: str.
         timeframe: str.
@@ -1045,7 +1038,7 @@ def _mt5_data_get_bars_with_credentials_impl(
         start_pos: int.
         date_from: datetime | None.
         date_to: datetime | None.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -1085,7 +1078,7 @@ def mt5_data_get_bars_with_credentials(
 ) -> dict[str, Any]:
     """Description.
         Load MT5 bars with explicit credentials.
-    
+
     Args:
         symbol: str.
         timeframe: str.
@@ -1098,7 +1091,7 @@ def mt5_data_get_bars_with_credentials(
         date_from: datetime | None.
         date_to: datetime | None.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -1123,7 +1116,7 @@ def mt5_data_get_bars_with_credentials(
             "status": "success",
             "message": "MT5 credential data loaded successfully.",
             "data": {
-                "rows": int(len(frame)),
+                "rows": len(frame),
                 "columns": [str(column) for column in frame.columns],
                 "data": bars_to_records(prepare_ohlcv_data(frame))
                 if not frame.empty
@@ -1144,13 +1137,13 @@ def _mt5_data_list_symbol_details_with_credentials_impl(
 ) -> list[dict[str, Any]]:
     """Description.
         Connect to MT5 with credentials and return JSON-safe symbol metadata.
-    
+
     Args:
         login: int.
         password: str.
         server: str.
         path: str.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -1194,14 +1187,14 @@ def mt5_data_list_symbol_details_with_credentials(
 ) -> dict[str, Any]:
     """Description.
         List MT5 symbol metadata with explicit credentials.
-    
+
     Args:
         login: int.
         password: str.
         server: str.
         path: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -1232,11 +1225,11 @@ def mt5_data_list_symbols(
 ) -> dict[str, Any]:
     """Description.
         List available MT5 symbols from the local terminal.
-    
+
     Args:
         pattern: str | None.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """

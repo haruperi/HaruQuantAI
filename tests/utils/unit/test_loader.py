@@ -1,11 +1,7 @@
-import logging
-
 import pytest
 from app.utils import (
     ConfigurationError,
-    SecurityError,
     load_settings,
-    resolve_secret_reference,
 )
 
 
@@ -42,14 +38,11 @@ def test_load_settings_rejects_invalid_boolean() -> None:
         load_settings({"LOG_ENQUEUE": "yes"}, {})
 
 
-def test_resolve_secret_reference_never_logs_secret(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    caplog.set_level(logging.DEBUG)
-    secret = resolve_secret_reference("secret://broker/demo", lambda _: "abc123")
-    assert secret.get_secret_value() == "abc123"
-    assert "abc123" not in caplog.text
+def test_load_settings_rejects_unknown_environment_key() -> None:
+    """Reject exact unknown or mis-cased keys in supplied environments."""
+    source = {"UNKNOWN": "value"}
     with pytest.raises(ConfigurationError):
-        resolve_secret_reference("plain-text", lambda _: "abc123")
-    with pytest.raises(SecurityError):
-        resolve_secret_reference("secret://missing", lambda _: "")
+        load_settings({}, source)
+    assert source == {"UNKNOWN": "value"}
+    with pytest.raises(ConfigurationError):
+        load_settings({}, {"environment": "test"})

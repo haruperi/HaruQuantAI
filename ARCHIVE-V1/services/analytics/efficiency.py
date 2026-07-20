@@ -25,7 +25,6 @@ Functions:
 from typing import Any
 
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 from .common import (
@@ -293,8 +292,8 @@ def _trades_per_day_impl(
     open_times = pd.to_datetime(data["open_time"])
     close_times = pd.to_datetime(data["close_time"])
 
-    t_start = start_time if start_time else open_times.min()
-    t_end = end_time if end_time else close_times.max()
+    t_start = start_time or open_times.min()
+    t_end = end_time or close_times.max()
 
     if pd.isna(t_start) or pd.isna(t_end) or t_end <= t_start:
         return 0.0
@@ -335,8 +334,8 @@ def _return_per_calendar_day_impl(
     open_times = pd.to_datetime(data["open_time"])
     close_times = pd.to_datetime(data["close_time"])
 
-    t_start = start_time if start_time else open_times.min()
-    t_end = end_time if end_time else close_times.max()
+    t_start = start_time or open_times.min()
+    t_end = end_time or close_times.max()
 
     if pd.isna(t_start) or pd.isna(t_end) or t_end <= t_start:
         return 0.0
@@ -1122,7 +1121,6 @@ def capital_efficiency(
     """AI Tool wrapper for _capital_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1216,7 +1214,6 @@ def avg_trade_notional_efficiency(
     """AI Tool wrapper for _avg_trade_notional_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1308,7 +1305,6 @@ def return_per_unit_mae(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _return_per_unit_mae_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1373,7 +1369,6 @@ def risk_adjusted_efficiency(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _risk_adjusted_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1438,7 +1433,6 @@ def avg_return_per_risk_unit(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _avg_return_per_risk_unit_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1503,7 +1497,6 @@ def return_per_trade_hour(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _return_per_trade_hour_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1570,7 +1563,6 @@ def return_per_market_hour(
     """AI Tool wrapper for _return_per_market_hour_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1665,7 +1657,6 @@ def trades_per_day(
     """AI Tool wrapper for _trades_per_day_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1786,7 +1777,6 @@ def return_per_calendar_day(
     """AI Tool wrapper for _return_per_calendar_day_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1907,7 +1897,6 @@ def profit_per_trade_per_day(
     """AI Tool wrapper for _profit_per_trade_per_day_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2024,7 +2013,6 @@ def mfe_efficiency(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _mfe_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2089,7 +2077,6 @@ def aggregate_mfe_capture_ratio(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _aggregate_mfe_capture_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2155,7 +2142,6 @@ def profit_per_pip_risk(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _profit_per_pip_risk_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2220,7 +2206,6 @@ def mae_efficiency(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _mae_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2285,7 +2270,6 @@ def exit_efficiency(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _exit_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2350,7 +2334,6 @@ def loss_containment_efficiency(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _loss_containment_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2416,7 +2399,6 @@ def aggregate_loss_containment_efficiency(trades: pd.DataFrame) -> dict[str, Any
     """AI Tool wrapper for _aggregate_loss_containment_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2482,7 +2464,6 @@ def position_size_efficiency(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _position_size_efficiency_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2549,7 +2530,6 @@ def calculate_efficiency_metrics(
     """AI Tool wrapper for _calculate_efficiency_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

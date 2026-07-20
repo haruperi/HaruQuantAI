@@ -30,7 +30,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import pandas as pd
-
 from app.services.indicators import arithmetic_average, balance_scaled_volume
 from app.services.strategy import (
     Direction,

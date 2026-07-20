@@ -5,10 +5,9 @@ import json
 from typing import Annotated, Any, cast
 
 import pandas as pd
+from app.services.utils import logger
 from data.database.sqlite.database_operations import DatabaseManager
 from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
-
-from app.services.utils import logger
 
 router = APIRouter()
 
@@ -43,7 +42,7 @@ def _parse_mapping(mapping_json: str | None) -> dict[str, Any]:
     if not mapping_json:
         return DEFAULT_SQX_MAPPING
     try:
-        return cast(dict[str, Any], json.loads(mapping_json))
+        return cast("dict[str, Any]", json.loads(mapping_json))
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON in mapping field.")
 
@@ -266,7 +265,7 @@ async def list_strategies(
 
         df = _apply_strategy_sorting(df, sort_by, sort_dir)
 
-        total = int(len(df))
+        total = len(df)
         if limit and limit < total:
             df = df.iloc[offset : offset + limit]
         elif offset:

@@ -17,7 +17,6 @@ from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
-
 from app.services.research.session_config import active_sessions_for_hour
 
 from .models import CanonicalOHLCVSSchema

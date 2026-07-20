@@ -13,7 +13,6 @@ import numpy as np
 
 if TYPE_CHECKING:
     import pandas as pd
-
     from app.utils.settings import EdgeLabConfig
 
 

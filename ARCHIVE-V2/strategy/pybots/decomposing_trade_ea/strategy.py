@@ -28,7 +28,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import pandas as pd
-
 from app.services.indicators import balance_scaled_volume, weighted_average
 from app.services.strategy import (
     Direction,

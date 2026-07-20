@@ -2,15 +2,14 @@
 
 from typing import Annotated
 
+from app.api.auth_utils import authenticate_user, generate_token
+from app.api.models import AuthResponse, LoginRequest, RegisterRequest, UserResponse
+from app.services.utils import logger
 from data.database.sqlite.database_operations import (
     DatabaseManager,
     UserAlreadyExistsError,
 )
 from fastapi import APIRouter, Header, HTTPException, status
-
-from app.api.auth_utils import authenticate_user, generate_token
-from app.api.models import AuthResponse, LoginRequest, RegisterRequest, UserResponse
-from app.services.utils import logger
 
 router = APIRouter()
 

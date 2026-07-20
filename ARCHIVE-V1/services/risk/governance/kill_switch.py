@@ -81,11 +81,10 @@ class KillSwitchStateMachine:
         if target_state in {
             KillSwitchState.RECOVERY_PENDING,
             KillSwitchState.RECOVERY_APPROVED,
-        }:
-            if authorization not in {"operator", "risk_manager", "compliance"}:
-                raise KillSwitchTransitionError(
-                    "recovery transition requires authorized actor"
-                )
+        } and authorization not in {"operator", "risk_manager", "compliance"}:
+            raise KillSwitchTransitionError(
+                "recovery transition requires authorized actor"
+            )
 
         if (
             target_state == KillSwitchState.ARMED

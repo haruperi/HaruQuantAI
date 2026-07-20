@@ -14,7 +14,6 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Any
 
 import numpy as np
-
 from app.services.strategy import BaseStrategy
 from app.services.utils.logger import logger
 

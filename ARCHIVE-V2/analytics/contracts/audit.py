@@ -9,10 +9,9 @@ import hashlib
 from datetime import UTC, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-
 from app.services.analytics.errors import AnalyticsValidationError as ValidationError
 from app.utils.standard import SENSITIVE_KEY_PATTERN, canonical_json
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 _SCHEMA_VERSION_MIN_PARTS = 2
 

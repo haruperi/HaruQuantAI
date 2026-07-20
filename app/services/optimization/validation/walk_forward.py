@@ -21,7 +21,7 @@ from app.services.optimization.validation.contracts import (
     WalkForwardResult,
 )
 from app.services.optimization.validation.splits import build_time_series_splits
-from app.utils import derive_stable_id, logger
+from app.utils import generate_id, logger
 
 
 def _utility(value: float, direction: ObjectiveDirection) -> float:
@@ -68,9 +68,7 @@ def run_walk_forward_validation(
         train_search = request.search.model_copy(
             update={
                 "execution_context": train_context,
-                "request_id": derive_stable_id(
-                    "req", f"{request.search.request_id}:{split.fold_id}:train"
-                ),
+                "request_id": generate_id("req"),
             }
         )
         summary = run_bounded_search(
@@ -99,9 +97,7 @@ def run_walk_forward_validation(
             candidate_hash=selected.candidate_hash,
             executable_parameters=selected.executable_parameters,
             seed=request.search.seed or 0,
-            request_id=derive_stable_id(
-                "req", f"{request.search.request_id}:{split.fold_id}:test"
-            ),
+            request_id=generate_id("req"),
             workflow_id=request.search.workflow_id,
             correlation_id=request.search.correlation_id,
             context=test_context,

@@ -28,7 +28,6 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-
 from app.services.utils.logger import logger
 
 # =============================================================================
@@ -574,7 +573,7 @@ def exceeds_null_threshold(
         return False
 
     threshold = np.percentile(null_samples, percentile)
-    exceeds = cast(bool, observed > threshold)
+    exceeds = cast("bool", observed > threshold)
 
     logger.debug(
         f"Null check: observed={observed:.4f}, threshold (p{percentile:.0f})={threshold:.4f}, exceeds={exceeds}"

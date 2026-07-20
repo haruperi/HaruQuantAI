@@ -9,10 +9,9 @@ from collections import deque
 from datetime import datetime
 from typing import Any, Protocol
 
-from loguru import logger
-
 from app.services.trading.contracts import TradingRoute
 from app.services.trading.state.ports import Clock
+from loguru import logger
 
 
 class ReconciliationService(Protocol):  # pragma: no cover

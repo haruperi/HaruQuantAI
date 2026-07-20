@@ -8,8 +8,6 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
-from pydantic import Field
-
 from app.services.risk.config import load_risk_config, validate_risk_config
 from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import (
@@ -43,6 +41,7 @@ from app.services.risk.policy.resolver import (
 )
 from app.utils.logger import logger
 from app.utils.normalization import utc_now
+from pydantic import Field
 
 
 class PolicyVersion(RiskContract):

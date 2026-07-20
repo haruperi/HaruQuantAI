@@ -69,7 +69,7 @@ def _normalized_absolute_rc_map(
     }
     total_absolute = float(sum(absolute_map.values()))
     if total_absolute <= 0.0:
-        return {symbol: 0.0 for symbol in absolute_map}
+        return dict.fromkeys(absolute_map, 0.0)
     return {
         symbol: float(value) / total_absolute for symbol, value in absolute_map.items()
     }

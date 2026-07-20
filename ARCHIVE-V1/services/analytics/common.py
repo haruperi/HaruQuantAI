@@ -40,7 +40,6 @@ from uuid import uuid4
 
 import numpy as np
 import pandas as pd
-
 from app.services.utils.logger import logger
 from app.services.utils.standard import ToolStandardSpec, standard_tool_response
 
@@ -410,9 +409,7 @@ def _max_gross_size_held_impl(
     # For gross exposure, use absolute size
     open_times = trades["open_time"].values
     close_times = (
-        trades["close_time"]
-        .fillna(end_time if end_time else trades["open_time"].max())
-        .values
+        trades["close_time"].fillna(end_time or trades["open_time"].max()).values
     )
     sizes = trades[size_col].abs().values
 
@@ -552,15 +549,11 @@ def _percent_time_in_market_impl(
     if len(trades) == 0:
         return 0.0
 
-    t_start = start_time if start_time else trades["open_time"].min()
-    t_end = (
-        end_time
-        if end_time
-        else (
-            trades["close_time"].max()
-            if "close_time" in trades.columns
-            else trades["open_time"].max()
-        )
+    t_start = start_time or trades["open_time"].min()
+    t_end = end_time or (
+        trades["close_time"].max()
+        if "close_time" in trades.columns
+        else trades["open_time"].max()
     )
 
     if pd.isna(t_start) or pd.isna(t_end) or t_end <= t_start:
@@ -838,7 +831,6 @@ def get_closed_trades(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _get_closed_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -905,7 +897,6 @@ def classify_trades(
     """AI Tool wrapper for _classify_trades_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -996,7 +987,6 @@ def avg_loss(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _avg_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1059,7 +1049,6 @@ def get_r_multiples(trades: pd.DataFrame, closed_only: bool = True) -> dict[str,
     """AI Tool wrapper for _get_r_multiples_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1152,7 +1141,6 @@ def max_gross_size_held(
     """AI Tool wrapper for _max_gross_size_held_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1245,7 +1233,6 @@ def time_in_market_duration(
     """AI Tool wrapper for _time_in_market_duration_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1340,7 +1327,6 @@ def percent_time_in_market(
     """AI Tool wrapper for _percent_time_in_market_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

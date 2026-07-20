@@ -57,7 +57,6 @@ from typing import Any
 from uuid import uuid4
 
 import pandas as pd
-
 from app.services.utils.standard import ToolStandardSpec, standard_tool_response
 
 

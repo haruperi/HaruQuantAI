@@ -13,10 +13,8 @@ import asyncio
 from datetime import datetime
 from typing import Any
 
-from data.database.sqlite.database_operations import DatabaseManager
-
-from app.services.data import get_ohlcv_data
 from app.services.brokers.dukascopy import load_dukascopy
+from app.services.data import get_ohlcv_data
 from app.services.research.modeling import (
     UnsupervisedResearchConfig,
     UnsupervisedResearchService,
@@ -24,6 +22,7 @@ from app.services.research.modeling import (
 from app.services.strategy.storage import StrategyStorage
 from app.services.trading.permissions import assert_strategy_allowed
 from app.services.utils.logger import logger
+from data.database.sqlite.database_operations import DatabaseManager
 
 from .methods import (
     bayesian_optimization,

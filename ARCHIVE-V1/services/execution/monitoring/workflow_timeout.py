@@ -11,9 +11,8 @@ import json
 from dataclasses import dataclass
 from datetime import datetime
 
-from data.database import WorkflowRecord, WorkflowRepository
-
 from app.services.utils import Clock, SystemClock
+from data.database import WorkflowRecord, WorkflowRepository
 
 TERMINAL_WORKFLOW_STATES = {"COMPLETED", "FAILED", "CANCELLED", "TIMED_OUT"}
 

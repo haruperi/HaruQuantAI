@@ -10,11 +10,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from data.database import ExecutionReceiptRecord, ExecutionRepository
-
 from app.services.execution.normalization import normalize_broker_response
 from app.services.utils.identity import generate_id
 from app.services.utils.logger import logger
+from data.database import ExecutionReceiptRecord, ExecutionRepository
 
 
 @dataclass(frozen=True)

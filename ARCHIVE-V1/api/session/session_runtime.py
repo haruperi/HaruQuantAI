@@ -29,8 +29,6 @@ from datetime import datetime
 from typing import Any
 
 import pandas as pd
-from data.database.sqlite.database_operations import DatabaseManager
-
 from app.services.brokers.mt5 import get_mt5_api
 from app.services.execution import core
 from app.services.risk.core import PortfolioStateEngine
@@ -59,6 +57,7 @@ from app.services.simulation.data_preparation import (
 from app.services.simulation.engine import Engine
 from app.services.utils.logger import logger
 from app.services.utils.validators import prepare_ohlcv_data
+from data.database.sqlite.database_operations import DatabaseManager
 
 from .serializers import (
     _apply_leverage_override_to_state,

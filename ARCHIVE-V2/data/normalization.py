@@ -5,7 +5,6 @@ from datetime import UTC
 from typing import Any
 
 import pandas as pd
-
 from app.utils.logger import logger
 
 VOLUME_KIND_TICK: str = "tick_volume"

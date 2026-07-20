@@ -3,7 +3,6 @@
 from typing import Any
 
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 

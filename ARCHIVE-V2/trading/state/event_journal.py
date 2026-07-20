@@ -4,7 +4,6 @@ The journal stores encrypted JSONL records with hash-chain links, logical
 sequence IDs, detached signatures, snapshots, reconciliation scans, and replay
 helpers for forensic reconstruction.
 """
-# ruff: noqa: TC001
 
 from __future__ import annotations
 
@@ -15,12 +14,11 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 from app.services.trading.contracts import JsonObject, JsonValue, TradingRoute
 from app.services.trading.state.ports import Clock, EncryptionProvider
 from app.utils.logger import logger
 from app.utils.standard import canonical_json
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 TERMINAL_EVENT_TYPES = {
     "ExecutionReportEvent",

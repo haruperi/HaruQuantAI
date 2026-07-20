@@ -55,7 +55,6 @@ from uuid import uuid4
 
 import numpy as np
 import pandas as pd
-
 from app.services.utils.standard import ToolStandardSpec, standard_tool_response
 
 EnvironmentName = Literal["local", "development", "test", "paper", "live"]

@@ -1,5 +1,4 @@
 """Shared ticket-based read-only info facade base."""
-# ruff: noqa: TC001
 
 from __future__ import annotations
 

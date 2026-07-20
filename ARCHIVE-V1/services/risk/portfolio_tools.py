@@ -26,7 +26,6 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-
 from app.services.risk._common import risk_business_payload, risk_tool_result
 
 

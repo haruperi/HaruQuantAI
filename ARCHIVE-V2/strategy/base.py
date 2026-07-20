@@ -9,7 +9,6 @@ from hashlib import sha256
 from typing import Any
 
 import pandas as pd
-
 from app.services.strategy.config import StrategyConfig
 from app.services.strategy.contracts import (
     Direction,

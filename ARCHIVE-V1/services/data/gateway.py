@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any, Protocol, cast, runtime_checkable
 
 import pandas as pd
-
 from app.services.data.licensing import validate_license
 from app.services.data.models import (
     DataAvailability,
@@ -57,10 +56,10 @@ class SourceAdapterProtocol(Protocol):
     def is_ready(self) -> bool:
         """Description.
             Check if source adapter is ready/configured.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -77,14 +76,14 @@ class SourceAdapterProtocol(Protocol):
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch normalized historical OHLCV data.
-        
+
         Args:
             symbol: str.
             timeframe: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -100,13 +99,13 @@ class SourceAdapterProtocol(Protocol):
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch normalized historical tick data.
-        
+
         Args:
             symbol: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -115,10 +114,10 @@ class SourceAdapterProtocol(Protocol):
     def list_symbols(self, *, request_id: str | None = None) -> list[str]:
         """Description.
             List symbols discovered from the source.
-        
+
         Args:
             request_id: str | None.
-        
+
         Returns:
             list[str].
         """
@@ -129,11 +128,11 @@ class SourceAdapterProtocol(Protocol):
     ) -> dict[str, Any]:
         """Description.
             Retrieve symbol metadata.
-        
+
         Args:
             symbol: str.
             request_id: str | None.
-        
+
         Returns:
             dict[str, Any].
         """
@@ -147,11 +146,11 @@ class TokenBucketLimiter:
     def __init__(self, rate: float, capacity: float) -> None:
         """Description.
             Initialize with a token replenishment rate (tokens/sec) and capacity.
-        
+
         Args:
             rate: float.
             capacity: float.
-        
+
         Returns:
             None.
         """
@@ -166,10 +165,10 @@ class TokenBucketLimiter:
     def consume(self) -> bool:
         """Description.
             Consume 1 token from the bucket. Returns True if successful.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -199,10 +198,10 @@ RATE_LIMITERS: dict[str, TokenBucketLimiter] = {
 def check_rate_limit(source: str) -> None:
     """Description.
         Consume rate limit token or raise a BACKPRESSURE_EXCEEDED error.
-    
+
     Args:
         source: str.
-    
+
     Returns:
         None.
     """
@@ -218,10 +217,10 @@ def check_rate_limit(source: str) -> None:
 def get_circuit_breaker(source: str) -> dict[str, Any]:
     """Description.
         Retrieve persisted circuit breaker state for a source.
-    
+
     Args:
         source: str.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -259,13 +258,13 @@ def update_circuit_breaker(
 ) -> None:
     """Description.
         Update and persist circuit breaker state.
-    
+
     Args:
         source: str.
         state: str.
         failures_count: int.
         cooldown_expires: str | None.
-    
+
     Returns:
         None.
     """
@@ -296,10 +295,10 @@ def update_circuit_breaker(
 def check_circuit_breaker_barrier(source: str) -> None:
     """Description.
         Check if the source's circuit breaker blocks execution.
-    
+
     Args:
         source: str.
-    
+
     Returns:
         None.
     """
@@ -322,13 +321,13 @@ def _normalize_mt5_record(
 ) -> dict[str, Any]:
     """Description.
         Normalize a single MT5-style raw record.
-    
+
     Args:
         r: dict[str, Any].
         symbol: str.
         timeframe: str.
         source: str.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -350,10 +349,10 @@ def _normalize_mt5_record(
     def get_float(key: str) -> float:
         """Description.
             Return ``r[key]`` coerced to float, or ``0.0`` when missing/invalid.
-        
+
         Args:
             key: str.
-        
+
         Returns:
             float.
         """
@@ -395,13 +394,13 @@ def _normalize_std_record(
 ) -> dict[str, Any]:
     """Description.
         Normalize a single standard-style record.
-    
+
     Args:
         r: dict[str, Any].
         symbol: str.
         timeframe: str.
         source: str.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -432,13 +431,13 @@ def normalize_file_records(
 ) -> list[dict[str, Any]]:
     """Description.
         Normalize raw or MT5 file records to standard OHLCV schema.
-    
+
     Args:
         records: list[dict[str, Any]].
         symbol: str.
         timeframe: str.
         source: str.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -468,10 +467,10 @@ class CSVAdapter:
     def is_ready(self) -> bool:
         """Description.
             Check if ready.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -489,14 +488,14 @@ class CSVAdapter:
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch market data.
-        
+
         Args:
             symbol: str.
             timeframe: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -546,13 +545,13 @@ class CSVAdapter:
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch tick data.
-        
+
         Args:
             symbol: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -593,10 +592,10 @@ class CSVAdapter:
     def list_symbols(self, *, request_id: str | None = None) -> list[str]:
         """Description.
             List symbols.
-        
+
         Args:
             request_id: str | None.
-        
+
         Returns:
             list[str].
         """
@@ -625,17 +624,15 @@ class CSVAdapter:
     ) -> dict[str, Any]:
         """Description.
             Get symbol metadata.
-        
+
         Args:
             symbol: str.
             request_id: str | None.
-        
+
         Returns:
             dict[str, Any].
         """
-        logger.debug(
-            f"CSVAdapter: Retrieving symbol metadata for symbol={symbol}."
-        )
+        logger.debug(f"CSVAdapter: Retrieving symbol metadata for symbol={symbol}.")
         return {
             "symbol": symbol,
             "source": "csv",
@@ -651,10 +648,10 @@ class ParquetAdapter:
     def is_ready(self) -> bool:
         """Description.
             Check if ready.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -672,14 +669,14 @@ class ParquetAdapter:
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch market data.
-        
+
         Args:
             symbol: str.
             timeframe: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -732,13 +729,13 @@ class ParquetAdapter:
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch tick data.
-        
+
         Args:
             symbol: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -779,10 +776,10 @@ class ParquetAdapter:
     def list_symbols(self, *, request_id: str | None = None) -> list[str]:
         """Description.
             List symbols.
-        
+
         Args:
             request_id: str | None.
-        
+
         Returns:
             list[str].
         """
@@ -811,17 +808,15 @@ class ParquetAdapter:
     ) -> dict[str, Any]:
         """Description.
             Get symbol metadata.
-        
+
         Args:
             symbol: str.
             request_id: str | None.
-        
+
         Returns:
             dict[str, Any].
         """
-        logger.debug(
-            f"ParquetAdapter: Retrieving symbol metadata for symbol={symbol}."
-        )
+        logger.debug(f"ParquetAdapter: Retrieving symbol metadata for symbol={symbol}.")
         return {
             "symbol": symbol,
             "source": "parquet",
@@ -837,10 +832,10 @@ class SyntheticAdapter:
     def is_ready(self) -> bool:
         """Description.
             Check if ready.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -858,14 +853,14 @@ class SyntheticAdapter:
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch market data.
-        
+
         Args:
             symbol: str.
             timeframe: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -896,13 +891,13 @@ class SyntheticAdapter:
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch tick data.
-        
+
         Args:
             symbol: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -924,14 +919,16 @@ class SyntheticAdapter:
     def list_symbols(self, *, request_id: str | None = None) -> list[str]:
         """Description.
             List symbols.
-        
+
         Args:
             request_id: str | None.
-        
+
         Returns:
             list[str].
         """
-        logger.debug("SyntheticAdapter: Listing static EURUSD, GBPUSD, USDJPY, SPX500, XAUUSD symbols.")
+        logger.debug(
+            "SyntheticAdapter: Listing static EURUSD, GBPUSD, USDJPY, SPX500, XAUUSD symbols."
+        )
         _ = request_id
         return ["EURUSD", "GBPUSD", "USDJPY", "SPX500", "XAUUSD"]
 
@@ -943,11 +940,11 @@ class SyntheticAdapter:
     ) -> dict[str, Any]:
         """Description.
             Get symbol metadata.
-        
+
         Args:
             symbol: str.
             request_id: str | None.
-        
+
         Returns:
             dict[str, Any].
         """
@@ -1214,7 +1211,7 @@ class CCXTAdapter:
         upper = symbol.upper()
         for quote in self._QUOTE_SUFFIXES:
             if upper.endswith(quote) and len(upper) > len(quote):
-                return f"{upper[:-len(quote)]}/{quote}"
+                return f"{upper[: -len(quote)]}/{quote}"
         return upper
 
 
@@ -1222,10 +1219,10 @@ class CCXTAdapter:
 def _mt5_client() -> Any:  # noqa: ANN401
     """Description.
         Lazily resolve the MT5 broker client.
-    
+
     Args:
         None.
-    
+
     Returns:
         Any.
     """
@@ -1238,10 +1235,10 @@ def _mt5_client() -> Any:  # noqa: ANN401
 def _ctrader_client() -> Any:  # noqa: ANN401
     """Description.
         Lazily resolve the cTrader broker client.
-    
+
     Args:
         None.
-    
+
     Returns:
         Any.
     """
@@ -1254,10 +1251,10 @@ def _ctrader_client() -> Any:  # noqa: ANN401
 def _dukascopy_client() -> Any:  # noqa: ANN401
     """Description.
         Lazily resolve the Dukascopy broker client.
-    
+
     Args:
         None.
-    
+
     Returns:
         Any.
     """
@@ -1270,10 +1267,10 @@ def _dukascopy_client() -> Any:  # noqa: ANN401
 def _binance_client() -> Any:  # noqa: ANN401
     """Description.
         Lazily resolve the Binance broker client.
-    
+
     Args:
         None.
-    
+
     Returns:
         Any.
     """
@@ -1286,10 +1283,10 @@ def _binance_client() -> Any:  # noqa: ANN401
 def _yahoo_client() -> Any:  # noqa: ANN401
     """Description.
         Lazily resolve the Yahoo Finance broker client.
-    
+
     Args:
         None.
-    
+
     Returns:
         Any.
     """
@@ -1302,10 +1299,10 @@ def _yahoo_client() -> Any:  # noqa: ANN401
 def _mt5_asset_class(symbol: str) -> str:
     """Description.
         Resolve the asset class for an MT5 symbol.
-    
+
     Args:
         symbol: str.
-    
+
     Returns:
         str.
     """
@@ -1346,10 +1343,10 @@ class BrokerAdapter:
     def __init__(self, spec: _BrokerSpec) -> None:
         """Description.
             Initialize the adapter with its source specification.
-        
+
         Args:
             spec: _BrokerSpec.
-        
+
         Returns:
             None.
         """
@@ -1359,10 +1356,10 @@ class BrokerAdapter:
     def is_ready(self) -> bool:
         """Description.
             Check if source adapter is ready/configured.
-        
+
         Args:
             None.
-        
+
         Returns:
             bool.
         """
@@ -1375,10 +1372,10 @@ class BrokerAdapter:
     def _connect(self, *, with_breaker: bool) -> Any:  # noqa: ANN401
         """Description.
             Resolve and connect the broker client, applying failure policy.
-        
+
         Args:
             with_breaker: bool.
-        
+
         Returns:
             Any.
         """
@@ -1408,18 +1405,18 @@ class BrokerAdapter:
         start_time: datetime,
         end_time: datetime,
         *,
-        request_id: str | None = None,  # noqa: ARG002
+        request_id: str | None = None,
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch normalized historical OHLCV data.
-        
+
         Args:
             symbol: str.
             timeframe: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -1494,17 +1491,17 @@ class BrokerAdapter:
         start_time: datetime,
         end_time: datetime,
         *,
-        request_id: str | None = None,  # noqa: ARG002
+        request_id: str | None = None,
     ) -> list[dict[str, Any]]:
         """Description.
             Fetch normalized historical tick data.
-        
+
         Args:
             symbol: str.
             start_time: datetime.
             end_time: datetime.
             request_id: str | None.
-        
+
         Returns:
             list[dict[str, Any]].
         """
@@ -1570,10 +1567,10 @@ class BrokerAdapter:
     def list_symbols(self, *, request_id: str | None = None) -> list[str]:
         """Description.
             List symbols discovered from the source.
-        
+
         Args:
             request_id: str | None.
-        
+
         Returns:
             list[str].
         """
@@ -1592,11 +1589,11 @@ class BrokerAdapter:
     ) -> dict[str, Any]:
         """Description.
             Retrieve symbol metadata.
-        
+
         Args:
             symbol: str.
             request_id: str | None.
-        
+
         Returns:
             dict[str, Any].
         """
@@ -1624,12 +1621,12 @@ class BrokerAdapter:
     ) -> dict[str, Any]:
         """Description.
             Normalize a single broker OHLCV row to the standard schema.
-        
+
         Args:
             row: Any.
             symbol: str.
             timeframe: str.
-        
+
         Returns:
             dict[str, Any].
         """
@@ -1661,11 +1658,11 @@ class BrokerAdapter:
     ) -> dict[str, Any]:
         """Description.
             Normalize a single standard broker tick row.
-        
+
         Args:
             row: Any.
             symbol: str.
-        
+
         Returns:
             dict[str, Any].
         """
@@ -1693,11 +1690,11 @@ class BrokerAdapter:
     ) -> dict[str, Any]:
         """Description.
             Normalize a single MT5-native tick row.
-        
+
         Args:
             row: Any.
             symbol: str.
-        
+
         Returns:
             dict[str, Any].
         """
@@ -1801,10 +1798,10 @@ ADAPTER_REGISTRY: dict[str, SourceAdapterProtocol] = {
 def get_source_adapter(source: str) -> SourceAdapterProtocol:
     """Description.
         Retrieve the registered adapter for a source.
-    
+
     Args:
         source: str.
-    
+
     Returns:
         SourceAdapterProtocol.
     """
@@ -1824,14 +1821,14 @@ def _normalize_and_validate_records(
 ) -> list[dict[str, Any]]:
     """Description.
         Validate, normalize, and dump records based on data_kind.
-    
+
     Args:
         records: list[dict[str, Any]].
         data_kind: str.
         symbol: str.
         source: str.
         workflow_context: str.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -1891,7 +1888,7 @@ def _check_gateway_cache(
 ) -> tuple[str, str, list[dict[str, Any]] | None]:
     """Description.
         Generate cache keys and check cache availability.
-    
+
     Args:
         source: str.
         symbol: str.
@@ -1900,7 +1897,7 @@ def _check_gateway_cache(
         end_time: datetime.
         stale_data_behavior: str.
         request_id: str | None.
-    
+
     Returns:
         tuple[str, str, list[dict[str, Any]] | None].
     """
@@ -1927,7 +1924,7 @@ def _download_from_adapter(
 ) -> list[dict[str, Any]]:
     """Description.
         Retrieve raw records from the registered source adapter.
-    
+
     Args:
         source: str.
         symbol: str.
@@ -1936,7 +1933,7 @@ def _download_from_adapter(
         end_time: datetime.
         data_kind: str.
         request_id: str | None.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -1971,7 +1968,7 @@ def execute_gateway_request(  # noqa: C901
 ) -> list[dict[str, Any]]:
     """Description.
         Internal gateway request execution, routing through adapters with cache.
-    
+
     Args:
         source: str.
         symbol: str.
@@ -1983,7 +1980,7 @@ def execute_gateway_request(  # noqa: C901
         workflow_context: str.
         fallback_sources: list[str] | None.
         request_id: str | None.
-    
+
     Returns:
         list[dict[str, Any]].
     """
@@ -2390,10 +2387,14 @@ def _canonicalize_ohlcv_dataframe(
             column,
             required=True,
         )
-        out[column] = pd.to_numeric(
-            source_frame[source_column],
-            errors="coerce",
-        ).round(5).to_numpy()
+        out[column] = (
+            pd.to_numeric(
+                source_frame[source_column],
+                errors="coerce",
+            )
+            .round(5)
+            .to_numpy()
+        )
 
     for column in OHLCV_OPTIONAL_COLUMNS:
         source_column = _resolve_ohlcv_column(
@@ -2462,9 +2463,7 @@ def _ohlcv_dataframe_to_cache_records(
                 "tick_volume": None if pd.isna(volume) else float(volume),
                 "real_volume": 0.0,
                 "spread": (
-                    None
-                    if pd.isna(row.get("spread"))
-                    else float(row.get("spread"))
+                    None if pd.isna(row.get("spread")) else float(row.get("spread"))
                 ),
                 "source": source,
                 "symbol": symbol,
@@ -2526,7 +2525,9 @@ def _canonicalize_tick_dataframe(
         timestamp_key = timestamp_column.lower()
         if timestamp_key == "time_msc":
             timestamp_unit = "ms"
-        elif timestamp_key == "time" and pd.api.types.is_numeric_dtype(timestamp_values):
+        elif timestamp_key == "time" and pd.api.types.is_numeric_dtype(
+            timestamp_values
+        ):
             timestamp_unit = "s"
         else:
             timestamp_unit = None
@@ -2578,8 +2579,8 @@ def _canonicalize_tick_dataframe(
 
     missing_last = out["last"].isna()
     if bool(missing_last.any()):
-        out.loc[missing_last, "last"] = (
-            out.loc[missing_last, ["bid", "ask"]].mean(axis=1)
+        out.loc[missing_last, "last"] = out.loc[missing_last, ["bid", "ask"]].mean(
+            axis=1
         )
 
     missing_spread = out["spread"].isna()
@@ -2616,18 +2617,12 @@ def _tick_dataframe_to_cache_records(frame: pd.DataFrame) -> list[dict[str, Any]
                 "timestamp": timestamp.isoformat(),
                 "bid": None if pd.isna(row.get("bid")) else float(row.get("bid")),
                 "ask": None if pd.isna(row.get("ask")) else float(row.get("ask")),
-                "last": (
-                    None if pd.isna(row.get("last")) else float(row.get("last"))
-                ),
+                "last": (None if pd.isna(row.get("last")) else float(row.get("last"))),
                 "volume": (
-                    None
-                    if pd.isna(row.get("volume"))
-                    else float(row.get("volume"))
+                    None if pd.isna(row.get("volume")) else float(row.get("volume"))
                 ),
                 "spread": (
-                    None
-                    if pd.isna(row.get("spread"))
-                    else float(row.get("spread"))
+                    None if pd.isna(row.get("spread")) else float(row.get("spread"))
                 ),
                 "source": str(row.get("source", "")),
                 "symbol": str(row.get("symbol", "")),
@@ -2748,8 +2743,7 @@ def execute_gateway_dataframe_request(  # noqa: C901
                 workflow_context,
             )
             logger.debug(
-                "get_data flow: cache canonical data | "
-                f"rows={len(canonical)}",
+                f"get_data flow: cache canonical data | rows={len(canonical)}",
                 extra={"request_id": request_id},
             )
             cache_records = _ohlcv_dataframe_to_cache_records(
@@ -3125,12 +3119,12 @@ def get_symbol_metadata(
 ) -> dict[str, Any]:
     """Description.
         Retrieve normalized symbol and asset metadata.
-    
+
     Args:
         symbol: str.
         source: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -3160,7 +3154,7 @@ def get_symbol_metadata(
         source_metadata=raw_meta,
     )
 
-    return cast(dict[str, Any], meta_obj.model_dump())
+    return cast("dict[str, Any]", meta_obj.model_dump())
 
 
 def list_symbols(
@@ -3170,11 +3164,11 @@ def list_symbols(
 ) -> list[str]:
     """Description.
         List symbols discovered from the source.
-    
+
     Args:
         source: str.
         request_id: str | None.
-    
+
     Returns:
         list[str].
     """
@@ -3192,13 +3186,13 @@ def get_data_availability(
 ) -> dict[str, Any]:
     """Description.
         Inspect committed ranges, gaps, and record counts.
-    
+
     Args:
         symbol: str.
         timeframe: str.
         source: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -3241,7 +3235,7 @@ def get_data_availability(
         metadata={"cache_queried": True},
     )
 
-    return cast(dict[str, Any], availability.model_dump())
+    return cast("dict[str, Any]", availability.model_dump())
 
 
 __all__ = [

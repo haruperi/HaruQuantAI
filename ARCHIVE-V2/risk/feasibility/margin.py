@@ -14,8 +14,6 @@ from collections.abc import Sequence
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from pydantic import Field
-
 from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.exposure import (
     _resolve_base_quote as _orig_resolve_base_quote,
@@ -38,6 +36,7 @@ from app.services.risk.models import (
     RiskSeverity,
 )
 from app.utils.logger import logger
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.risk.policy.contracts import EffectiveRiskPolicy

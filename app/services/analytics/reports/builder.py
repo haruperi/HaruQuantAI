@@ -220,7 +220,7 @@ def build_performance_report(
     )
     caveats += (curve_warning,)
     report_id = derive_stable_id(
-        "cor", f"analytics-report:{request_id}:{initial_hashes.input_hash}"
+        "id", f"analytics-report:{request_id}:{initial_hashes.input_hash}"
     )
     report = PerformanceReport(
         contract_version="v1",

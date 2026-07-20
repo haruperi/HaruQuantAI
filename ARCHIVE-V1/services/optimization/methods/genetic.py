@@ -12,7 +12,6 @@ from collections.abc import Callable
 from typing import Any
 
 import numpy as np
-
 from app.services.strategy import BaseStrategy
 from app.services.utils.logger import logger
 

@@ -22,7 +22,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicator.standard import run_indicator_tool
 from app.services.utils.logger import logger
 
@@ -221,7 +220,9 @@ def _calculate_pair_strength_impl(
     Example:
         >>> data = get_multi_timeframe_data("EURUSD", ["M5", "H1", "H4"])
         >>> result = calculate_pair_strength(data)
-        >>> print(result[["M5_change", "H1_change", "H4_change", "pair_strength"]].tail())
+        >>> print(
+        ...     result[["M5_change", "H1_change", "H4_change", "pair_strength"]].tail()
+        ... )
 
     Purpose:
         Provide deterministic indicator computation or validation as a focused HaruQuant tool.
@@ -512,7 +513,9 @@ def _get_top_pairs_impl(
         >>>
         >>> print("Top LONG opportunities:")
         >>> for pair in strong:
-        ...     print(f"{pair['pair']}: {pair['recommendation']} (strength: {pair['strength']:.2f})")
+        ...     print(
+        ...         f"{pair['pair']}: {pair['recommendation']} (strength: {pair['strength']:.2f})"
+        ...     )
 
     Purpose:
         Provide deterministic indicator computation or validation as a focused HaruQuant tool.

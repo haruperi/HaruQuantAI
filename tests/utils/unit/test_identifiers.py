@@ -17,7 +17,9 @@ def test_validate_id_rejects_malformed() -> None:
 
 
 def test_derive_stable_id_is_deterministic() -> None:
-    first = derive_stable_id("cor", "strategy:v1")
-    second = derive_stable_id("cor", "strategy:v1")
+    first = derive_stable_id("id", "strategy:v1")
+    second = derive_stable_id("id", "strategy:v1")
     assert first == second
-    assert validate_id(first, expected_prefix="cor") == first
+    assert validate_id(first, expected_prefix="id") == first
+    with pytest.raises(ValidationError):
+        derive_stable_id("cor", "strategy:v1")

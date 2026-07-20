@@ -202,7 +202,6 @@ def evaluate_strategy_quality(report: dict[str, Any]) -> dict[str, Any]:
     """AI Tool wrapper for _evaluate_strategy_quality_impl."""
     try:
         import pandas as pd
-
         from app.services.utils.logger import logger
 
         from .common import analytics_tool_result

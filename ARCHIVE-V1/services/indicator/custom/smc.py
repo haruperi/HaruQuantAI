@@ -19,8 +19,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from pandas import DataFrame
-
 from app.services.indicator.standard import run_indicator_tool
 from app.services.indicator.validation import (
     require_columns,
@@ -28,6 +26,7 @@ from app.services.indicator.validation import (
     require_positive_int,
 )
 from app.services.utils.logger import logger
+from pandas import DataFrame
 
 
 def _inputvalidator(input_="ohlc"):

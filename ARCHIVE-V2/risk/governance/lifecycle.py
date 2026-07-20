@@ -18,8 +18,6 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, overload
 
-from pydantic import Field
-
 from app.services.risk.limits import LimitResult
 from app.services.risk.models import (
     LiveReadinessRequest,
@@ -32,6 +30,7 @@ from app.services.risk.models import (
 )
 from app.utils.logger import logger
 from app.utils.normalization import utc_now
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.risk.policy.contracts import EffectiveRiskPolicy

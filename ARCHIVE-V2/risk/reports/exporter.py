@@ -11,13 +11,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from pydantic import Field
-
 from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.models import RiskContract
 from app.services.risk.validations import ValidationResult, _fail, _ok
 from app.utils.logger import logger
 from app.utils.normalization import utc_now
+from pydantic import Field
 
 if TYPE_CHECKING:
     from app.services.risk.reports.builder import RiskReport

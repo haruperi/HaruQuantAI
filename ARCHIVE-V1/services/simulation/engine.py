@@ -21,7 +21,6 @@ from collections.abc import Mapping
 from typing import Any
 
 import pandas as pd
-
 from app.services.brokers.mt5 import get_connected_mt5_client, get_mt5_api
 from app.services.execution import core
 from app.services.execution.core import RunResult
@@ -2494,17 +2493,15 @@ class Engine:
         # Manual/Legacy mode: Trigger based on tick intervals
         positions_every = schedule.get("positions")
         positions_due = self._due_by_interval(tick_number, positions_every)
-        if positions_due:
-            if self._has_open_positions():
-                self.monitor_positions(verbose=verbose)
-                state_changed = True
+        if positions_due and self._has_open_positions():
+            self.monitor_positions(verbose=verbose)
+            state_changed = True
 
         pending_orders_every = schedule.get("pending_orders")
         pending_due = self._due_by_interval(tick_number, pending_orders_every)
-        if pending_due:
-            if self._has_pending_orders():
-                self.monitor_pending_orders(verbose=verbose)
-                state_changed = True
+        if pending_due and self._has_pending_orders():
+            self.monitor_pending_orders(verbose=verbose)
+            state_changed = True
 
         if state_changed:
             self._schedule_state_dirty = True

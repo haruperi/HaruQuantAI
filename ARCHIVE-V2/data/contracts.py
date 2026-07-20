@@ -13,12 +13,11 @@ from datetime import UTC, datetime
 from typing import Any, Protocol, runtime_checkable
 
 import pandas as pd
-from pydantic import BaseModel, Field, field_validator, model_validator
-
 from app.services.data.errors import DataValidationError as ValidationError
 from app.utils.logger import logger
 from app.utils.normalization import normalize_timestamp
 from app.utils.standard import SENSITIVE_KEY_PATTERN, canonical_json
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 type JsonScalar = str | int | float | bool | None
 type JsonValue = JsonScalar | list[JsonValue] | dict[str, JsonValue]

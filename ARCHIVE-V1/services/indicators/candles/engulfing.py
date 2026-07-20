@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -43,10 +42,20 @@ class Engulfing(BaseIndicator):
         close_prev = df["close"].shift(1)
 
         # Bullish Engulfing
-        bullish = (close_prev < open_prev) & (close_val > open_val) & (close_val >= open_prev) & (open_val <= close_prev)
+        bullish = (
+            (close_prev < open_prev)
+            & (close_val > open_val)
+            & (close_val >= open_prev)
+            & (open_val <= close_prev)
+        )
 
         # Bearish Engulfing
-        bearish = (close_prev > open_prev) & (close_val < open_val) & (close_val <= open_prev) & (open_val >= close_prev)
+        bearish = (
+            (close_prev > open_prev)
+            & (close_val < open_val)
+            & (close_val <= open_prev)
+            & (open_val >= close_prev)
+        )
 
         pattern = np.where(bullish, 1, np.where(bearish, -1, 0))
         pattern[0] = 0

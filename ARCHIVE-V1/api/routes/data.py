@@ -9,10 +9,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from data.database.sqlite.database_operations import DatabaseManager
-from fastapi import APIRouter, Header, HTTPException, status
-from pydantic import BaseModel
-
 from app.api.auth_utils import get_user_id_from_token
 from app.services.brokers import (
     load_dukascopy,
@@ -31,6 +27,9 @@ from app.services.research import (
 )
 from app.services.utils import logger
 from app.services.utils.validators import DataSource, prepare_ohlcv_data
+from data.database.sqlite.database_operations import DatabaseManager
+from fastapi import APIRouter, Header, HTTPException, status
+from pydantic import BaseModel
 
 router = APIRouter()
 db_manager = DatabaseManager()
@@ -307,7 +306,6 @@ def resolve_symbol_price_metadata(source: DataSource, symbol: str) -> dict[str, 
                 "trade_tick_size": json_safe_value(item.get("trade_tick_size")),
             }
     return {}
-
 
 
 def parse_date(value: str | None) -> datetime | None:

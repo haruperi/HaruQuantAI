@@ -14,8 +14,6 @@ from __future__ import annotations
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import Field, model_validator
-
 from app.services.trading.contracts import (
     FixExecutionState,
     RetrySafety,
@@ -26,6 +24,7 @@ from app.services.trading.security.error_mapping import (
     TradingValidationError,
 )
 from app.utils.logger import logger
+from pydantic import Field, model_validator
 
 _TERMINAL_STATES = frozenset(
     {

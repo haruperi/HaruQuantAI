@@ -23,6 +23,16 @@ from datetime import datetime
 from typing import Any, cast
 
 import pandas as pd
+from app.api.auth_utils import get_user_id_from_token
+from app.api.routes.dashboard.broker import client as global_mt5_client
+from app.api.websocket import live_trading_manager
+from app.services.brokers.mt5 import MT5Client, get_mt5_api
+from app.services.execution.live import LiveTradingSession
+from app.services.trading.permissions import (
+    StrategyPermissionError,
+    assert_strategy_allowed,
+)
+from app.services.utils import logger
 from data.database.sqlite.database_operations import DatabaseManager
 from fastapi import (
     APIRouter,
@@ -34,17 +44,6 @@ from fastapi import (
     status,
 )
 from pydantic import BaseModel, Field
-
-from app.api.auth_utils import get_user_id_from_token
-from app.api.routes.dashboard.broker import client as global_mt5_client
-from app.api.websocket import live_trading_manager
-from app.services.brokers.mt5 import MT5Client, get_mt5_api
-from app.services.execution.live import LiveTradingSession
-from app.services.trading.permissions import (
-    StrategyPermissionError,
-    assert_strategy_allowed,
-)
-from app.services.utils import logger
 
 mt5 = get_mt5_api()
 
@@ -1051,7 +1050,7 @@ async def create_session(
 
         logger.info(f"Live trading session created successfully: {session_id}")
 
-        return SessionResponse(**cast(dict, session))
+        return SessionResponse(**cast("dict", session))
 
     except HTTPException:
         raise
@@ -1222,7 +1221,7 @@ async def update_session(
 
         logger.info(f"Session {session_id} updated successfully")
 
-        return SessionResponse(**cast(dict, updated_session))
+        return SessionResponse(**cast("dict", updated_session))
 
     except HTTPException:
         raise
@@ -1280,8 +1279,7 @@ async def delete_session(session_id: int, authorization: str = AUTH_HEADER):
 
         # Remove from active sessions if present
 
-        if session_id in active_sessions:
-            del active_sessions[session_id]
+        active_sessions.pop(session_id, None)
 
         # Delete from database (cascades to all related tables)
 

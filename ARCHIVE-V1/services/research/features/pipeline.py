@@ -21,7 +21,6 @@ from datetime import datetime
 from typing import Any
 
 import pandas as pd
-
 from app.services.indicator.momentum.rsi import rsi as compute_rsi
 from app.services.indicator.trend.ema import ema as compute_ema
 from app.services.indicator.trend.sma import sma as compute_sma
@@ -204,7 +203,7 @@ class FeaturePipeline:
             "pipeline_version": self.pipeline_version,
             "pipeline_fingerprint": self.fingerprint(),
             "features": [asdict(spec) for spec in self._features],
-            "source_rows": int(len(source)),
+            "source_rows": len(source),
             "source_columns": [str(col) for col in source.columns],
             "source_start": index.min().isoformat()
             if index is not None and len(index)

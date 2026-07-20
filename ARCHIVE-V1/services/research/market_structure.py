@@ -52,7 +52,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.services.research.config import (
     BootstrapConfig,
     MarketStructureConfig,

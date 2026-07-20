@@ -160,7 +160,7 @@ class BaseNotifier(ABC):
         """Check if rate limit allows sending."""
         if not self.rate_limit.can_send():
             wait_time = self.rate_limit.get_wait_time()
-            self.logger.warning(f"Rate limit exceeded. Wait {wait_time} seconds")
+            self.logger.warning("Rate limit exceeded. Wait %s seconds", wait_time)
             return False
         return True
 
@@ -200,7 +200,7 @@ class BaseNotifier(ABC):
             # Wait before retry (exponential backoff)
             if attempt < self.retry_attempts - 1:
                 wait_time = self.retry_delay * (2**attempt)
-                self.logger.info(f"Retrying in {wait_time} seconds...")
+                self.logger.info("Retrying in %s seconds...", wait_time)
                 time.sleep(wait_time)
 
         # All attempts failed

@@ -186,7 +186,7 @@ class SMSNotifier(BaseNotifier):
         )
 
         if response.status_code == 201:
-            return cast(dict[str, Any], response.json())
+            return cast("dict[str, Any]", response.json())
         error_data = response.json()
         return {
             "status": "failed",
@@ -229,7 +229,7 @@ class SMSNotifier(BaseNotifier):
             )
 
             if response.status_code == 200:
-                return cast(dict[str, Any], response.json())
+                return cast("dict[str, Any]", response.json())
             self.logger.error(
                 f"Failed to get account info: HTTP {response.status_code}"
             )
@@ -259,7 +259,7 @@ class SMSNotifier(BaseNotifier):
             )
 
             if response.status_code == 200:
-                return cast(dict[str, Any], response.json())
+                return cast("dict[str, Any]", response.json())
             self.logger.error(
                 f"Failed to get message status: HTTP {response.status_code}"
             )
@@ -284,7 +284,7 @@ class SMSNotifier(BaseNotifier):
 
             if response.status_code == 200:
                 data = response.json()
-                return cast(list[dict[str, Any]], data.get("messages", []))
+                return cast("list[dict[str, Any]]", data.get("messages", []))
             self.logger.error(
                 f"Failed to get message history: HTTP {response.status_code}"
             )
@@ -308,7 +308,7 @@ class SMSNotifier(BaseNotifier):
             )
 
             if response.status_code == 200:
-                return cast(dict[str, Any], response.json())
+                return cast("dict[str, Any]", response.json())
             self.logger.error(
                 f"Failed to validate phone number: HTTP {response.status_code}"
             )

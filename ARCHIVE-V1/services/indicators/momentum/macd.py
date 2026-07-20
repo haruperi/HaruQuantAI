@@ -3,7 +3,6 @@
 from typing import Any
 
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -32,7 +31,15 @@ class MACD(BaseIndicator):
     pd.DataFrame: Original DataFrame with 'macd_{fast}_{slow}', 'macd_signal_{fast}_{slow}_{signal}', and 'macd_hist_{fast}_{slow}_{signal}' columns added.
     """
 
-    def calculate(self, df: pd.DataFrame, fast_period: int = 12, slow_period: int = 26, signal_period: int = 9, column: str = "close", **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self,
+        df: pd.DataFrame,
+        fast_period: int = 12,
+        slow_period: int = 26,
+        signal_period: int = 9,
+        column: str = "close",
+        **kwargs: Any,
+    ) -> pd.DataFrame:
         if column not in df.columns:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
         if fast_period < 1 or slow_period < 1 or signal_period < 1:

@@ -10,8 +10,6 @@ import time
 from decimal import Decimal
 from typing import Any, Literal, TypeVar
 
-from pydantic import Field
-
 from app.services.risk.config import load_risk_config
 from app.services.risk.errors import RiskValidationError as ValidationError
 from app.services.risk.governor import RiskGovernor
@@ -32,6 +30,7 @@ from app.services.risk.sizing import calculate_position_size
 from app.services.risk.storage import InMemoryRiskStateStore
 from app.services.risk.stress import build_default_scenario_registry
 from app.services.risk.tail_risk import calculate_var_es_snapshots
+from pydantic import Field
 
 
 def _exception_to_error_payload(

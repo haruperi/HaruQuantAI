@@ -28,7 +28,6 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
 from app.services.utils.common import clear_dataframe_cache, get_cached_dataframe
 from app.services.utils.logger import logger
 
@@ -55,12 +54,12 @@ def load_csv(
 ) -> pd.DataFrame:
     """Description.
         Load a CSV file into a DataFrame with lowercase column names.
-    
+
     Args:
         file_path: str | Path.
         index_col: int | str | None.
         parse_dates: bool.
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -73,10 +72,10 @@ def load_csv(
     def _loader() -> pd.DataFrame:
         """Description.
             Load the CSV from disk for the cache miss path.
-        
+
         Args:
             None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -85,7 +84,9 @@ def load_csv(
         frame.columns = [str(column).lower() for column in frame.columns]
         return frame
 
-    logger.debug(f"Attempting to load CSV file from path={file_path} (checking cache first).")
+    logger.debug(
+        f"Attempting to load CSV file from path={file_path} (checking cache first)."
+    )
     return get_cached_data(key, _loader)
 
 
@@ -120,13 +121,13 @@ class CSVDataSource:
     ) -> None:
         """Description.
             Initialize the CSV data source.
-        
+
         Args:
             filepath: str | Path.
             date_column: str | None.
             cache: bool.
             read_csv_kwargs: Any.
-        
+
         Returns:
             None.
         """
@@ -140,10 +141,10 @@ class CSVDataSource:
     def _detect_date_column(self, columns: list[str]) -> str | None:
         """Description.
             Return the first column name that looks like a datetime field.
-        
+
         Args:
             columns: list[str].
-        
+
         Returns:
             str | None.
         """
@@ -157,10 +158,10 @@ class CSVDataSource:
     def _load(self) -> pd.DataFrame:
         """Description.
             Load and normalize the CSV into a DataFrame with DatetimeIndex.
-        
+
         Args:
             None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -212,10 +213,10 @@ class CSVDataSource:
     def _get_cached_or_load(self) -> pd.DataFrame:
         """Description.
             Load from cache or disk.
-        
+
         Args:
             None.
-        
+
         Returns:
             pd.DataFrame.
         """
@@ -243,13 +244,13 @@ class CSVDataSource:
     ) -> pd.DataFrame | None:
         """Description.
             Fetch OHLCV data sliced to the requested bar-position range.
-        
+
         Args:
             symbol: str.
             timeframe: str.
             start_pos: int.
             end_pos: int.
-        
+
         Returns:
             pd.DataFrame | None.
         """
@@ -276,10 +277,10 @@ class CSVDataSource:
 def clear_data_cache() -> None:
     """Description.
         Clear the internal DataFrame cache used by CSV helpers.
-    
+
     Args:
         None.
-    
+
     Returns:
         None.
     """
@@ -290,11 +291,11 @@ def clear_data_cache() -> None:
 def get_cached_data(key: str, loader_func: Callable[[], pd.DataFrame]) -> pd.DataFrame:
     """Description.
         Get data from cache or load it using the provided loader function.
-    
+
     Args:
         key: str.
         loader_func: Callable[[], pd.DataFrame].
-    
+
     Returns:
         pd.DataFrame.
     """
@@ -319,7 +320,7 @@ def csv_data_fetch_range(
 ) -> dict[str, Any]:
     """Description.
         Fetch an OHLCV range from a CSV file.
-    
+
     Args:
         path: str | Path.
         symbol: str.
@@ -330,7 +331,7 @@ def csv_data_fetch_range(
         cache: bool.
         request_id: str | None.
         read_csv_kwargs: Any.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -379,7 +380,7 @@ def csv_data_fetch_range(
             "source": tool_name,
             "symbol": symbol,
             "timeframe": timeframe,
-            "rows": int(len(frame)),
+            "rows": len(frame),
             "columns": [str(column) for column in frame.columns],
             "data": _serialize_frame_records(frame),
         }
@@ -409,13 +410,13 @@ def csv_data_load(
 ) -> dict[str, Any]:
     """Description.
         Load a CSV file into a JSON-safe OHLCV payload.
-    
+
     Args:
         path: str | Path.
         index_col: int | str | None.
         parse_dates: bool.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -438,7 +439,7 @@ def csv_data_load(
             "source": tool_name,
             "path": str(source_path),
             "symbol": source_path.stem,
-            "rows": int(len(frame)),
+            "rows": len(frame),
             "columns": [str(column) for column in frame.columns],
             "data": _serialize_frame_records(frame),
         }
@@ -468,13 +469,13 @@ def csv_data_saver_file_exists(
 ) -> dict[str, Any]:
     """Description.
         Check whether a saved CSV market-data file exists.
-    
+
     Args:
         path: str | Path | None.
         symbol: str.
         timeframe: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -523,13 +524,13 @@ def csv_data_saver_save(
 ) -> dict[str, Any]:
     """Description.
         Save market data to CSV with sidecar metadata.
-    
+
     Args:
         data: Data | dict[str, Any].
         path: str | Path | None.
         is_initial: bool.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -580,13 +581,13 @@ def csv_data_saver_load(
 ) -> dict[str, Any]:
     """Description.
         Load saved CSV data and sidecar metadata.
-    
+
     Args:
         path: str | Path | None.
         symbol: str.
         timeframe: str.
         request_id: str | None.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -619,7 +620,7 @@ def csv_data_saver_load(
             "source": tool_name,
             "path": str(target_path),
             "metadata": _data_to_metadata(data_obj),
-            "rows": int(len(data_obj.df)),
+            "rows": len(data_obj.df),
             "columns": [str(column) for column in data_obj.df.columns],
             "candles": _serialize_frame_records(data_obj.df),
         }

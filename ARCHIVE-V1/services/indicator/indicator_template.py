@@ -7,7 +7,6 @@ Classes and functions:
 """
 
 import pandas as pd
-
 from app.services.indicator.validation import (
     require_columns,
     require_dataframe,

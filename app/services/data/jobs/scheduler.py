@@ -25,7 +25,7 @@ from app.services.data.jobs.backfill import (
 )
 from app.services.data.sources.policy import evaluate_source_policy
 from app.services.data.storage.database import execute_transaction
-from app.utils import Clock, derive_stable_id, logger, utc_now
+from app.utils import Clock, generate_id, logger, utc_now
 
 # Configuration Limits
 JOB_MAX_SYMBOLS: Final[int] = 500
@@ -679,7 +679,7 @@ def _start_background_loop(job_id: str, interval_seconds: int) -> None:
                             parameter_sets=((job_id,),),
                             max_rows=1,
                         ),
-                        request_id=derive_stable_id("req", f"scheduler-loop:{job_id}"),
+                        request_id=generate_id("req"),
                     )
                 )
                 if not chk.rows or not bool(chk.rows[0]["enabled"]):
@@ -689,7 +689,7 @@ def _start_background_loop(job_id: str, interval_seconds: int) -> None:
                 try:
                     run_data_update_job_once(
                         job_id,
-                        derive_stable_id("req", f"scheduler-run:{job_id}"),
+                        generate_id("req"),
                     )
                 except Exception:  # noqa: BLE001
                     logger.error("Background job execution failed for %s", job_id)

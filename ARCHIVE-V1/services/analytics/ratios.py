@@ -1580,7 +1580,6 @@ def _win_rate_fraction_impl(values) -> dict[str, Any]:
     """AI Tool wrapper for _win_rate_fraction_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1650,7 +1649,6 @@ def _sharpe_ratio_impl(
     """AI Tool wrapper for _sharpe_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1795,7 +1793,6 @@ def _annualized_sharpe_ratio_impl(
     """AI Tool wrapper for _annualized_sharpe_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -1891,7 +1888,6 @@ def _sortino_ratio_impl(
     """AI Tool wrapper for _sortino_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2038,7 +2034,6 @@ def _calmar_ratio_impl(
     """AI Tool wrapper for _calmar_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2160,7 +2155,6 @@ def _information_ratio_impl(
     """AI Tool wrapper for _information_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2307,7 +2301,6 @@ def _fouse_ratio_impl(
     """AI Tool wrapper for _fouse_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2424,7 +2417,6 @@ def _upside_potential_ratio_impl(
     """AI Tool wrapper for _upside_potential_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2515,7 +2507,6 @@ def _omega_ratio_impl(returns_in: pd.Series, threshold: float = 0.0) -> dict[str
     """AI Tool wrapper for _omega_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2604,7 +2595,6 @@ def _gain_to_pain_ratio_impl(returns_in: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _gain_to_pain_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2671,7 +2661,6 @@ def _kappa_ratio_impl(
     """AI Tool wrapper for _kappa_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2784,7 +2773,6 @@ def _sterling_ratio_impl(cagr_value: float, avg_yearly_max_dd: float) -> dict[st
     """AI Tool wrapper for _sterling_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2877,7 +2865,6 @@ def _rina_index_impl(
     """AI Tool wrapper for _rina_index_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -2994,7 +2981,6 @@ def _profit_factor_impl(
     """AI Tool wrapper for _profit_factor_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3059,7 +3045,6 @@ def _payoff_ratio_impl(trades: pd.DataFrame | pd.Series | np.ndarray) -> dict[st
     """AI Tool wrapper for _payoff_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3124,7 +3109,6 @@ def _edge_ratio_impl(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _edge_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3187,7 +3171,6 @@ def _profit_to_mae_ratio_impl(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _profit_to_mae_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3252,7 +3235,6 @@ def _mfe_to_mae_ratio_impl(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _mfe_to_mae_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3317,7 +3299,6 @@ def _return_over_drawdown_impl(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _return_over_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3382,7 +3363,6 @@ def _expectancy_over_std_impl(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _expectancy_over_std_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3447,7 +3427,6 @@ def _net_profit_as_percent_of_largest_loss_impl(trades: pd.DataFrame) -> dict[st
     """AI Tool wrapper for _net_profit_as_percent_of_largest_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3515,7 +3494,6 @@ def _net_profit_as_percent_of_max_trade_drawdown_impl(
     """AI Tool wrapper for _net_profit_as_percent_of_max_trade_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3585,7 +3563,6 @@ def _net_profit_as_percent_of_max_strategy_drawdown_impl(
     """AI Tool wrapper for _net_profit_as_percent_of_max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3681,7 +3658,6 @@ def _select_net_profit_as_percent_of_largest_loss_impl(
     """AI Tool wrapper for _select_net_profit_as_percent_of_largest_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3751,7 +3727,6 @@ def _select_net_profit_as_percent_of_max_trade_drawdown_impl(
     """AI Tool wrapper for _select_net_profit_as_percent_of_max_trade_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3821,7 +3796,6 @@ def _select_net_profit_as_percent_of_max_strategy_drawdown_impl(
     """AI Tool wrapper for _select_net_profit_as_percent_of_max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3919,7 +3893,6 @@ def _adjusted_net_profit_as_percent_of_largest_loss_impl(
     """AI Tool wrapper for _adjusted_net_profit_as_percent_of_largest_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -3989,7 +3962,6 @@ def _adjusted_net_profit_as_percent_of_max_trade_drawdown_impl(
     """AI Tool wrapper for _adjusted_net_profit_as_percent_of_max_trade_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4059,7 +4031,6 @@ def _adjusted_net_profit_as_percent_of_max_strategy_drawdown_impl(
     """AI Tool wrapper for _adjusted_net_profit_as_percent_of_max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4155,7 +4126,6 @@ def _adjusted_profit_factor_impl(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _adjusted_profit_factor_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4220,7 +4190,6 @@ def _select_profit_factor_impl(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _select_profit_factor_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4285,7 +4254,6 @@ def _expectancy_impl(trades: pd.DataFrame | pd.Series | np.ndarray) -> dict[str,
     """AI Tool wrapper for _expectancy_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4348,7 +4316,6 @@ def _expectancy_r_impl(r_multiples: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _expectancy_r_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4420,7 +4387,6 @@ def _calculate_ratio_metrics_impl(
     """AI Tool wrapper for _calculate_ratio_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4589,7 +4555,6 @@ def win_rate_fraction(values) -> dict[str, Any]:
     """AI Tool wrapper for _win_rate_fraction_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4659,7 +4624,6 @@ def sharpe_ratio(
     """AI Tool wrapper for _sharpe_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4804,7 +4768,6 @@ def annualized_sharpe_ratio(
     """AI Tool wrapper for _annualized_sharpe_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -4900,7 +4863,6 @@ def sortino_ratio(
     """AI Tool wrapper for _sortino_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5047,7 +5009,6 @@ def calmar_ratio(
     """AI Tool wrapper for _calmar_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5169,7 +5130,6 @@ def information_ratio(
     """AI Tool wrapper for _information_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5316,7 +5276,6 @@ def fouse_ratio(
     """AI Tool wrapper for _fouse_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5433,7 +5392,6 @@ def upside_potential_ratio(
     """AI Tool wrapper for _upside_potential_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5524,7 +5482,6 @@ def omega_ratio(returns_in: pd.Series, threshold: float = 0.0) -> dict[str, Any]
     """AI Tool wrapper for _omega_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5613,7 +5570,6 @@ def gain_to_pain_ratio(returns_in: pd.Series) -> dict[str, Any]:
     """AI Tool wrapper for _gain_to_pain_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5680,7 +5636,6 @@ def kappa_ratio(
     """AI Tool wrapper for _kappa_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5793,7 +5748,6 @@ def sterling_ratio(cagr_value: float, avg_yearly_max_dd: float) -> dict[str, Any
     """AI Tool wrapper for _sterling_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -5886,7 +5840,6 @@ def rina_index(
     """AI Tool wrapper for _rina_index_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6001,7 +5954,6 @@ def profit_factor(trades: pd.DataFrame | pd.Series | np.ndarray) -> dict[str, An
     """AI Tool wrapper for _profit_factor_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6066,7 +6018,6 @@ def payoff_ratio(trades: pd.DataFrame | pd.Series | np.ndarray) -> dict[str, Any
     """AI Tool wrapper for _payoff_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6131,7 +6082,6 @@ def edge_ratio(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _edge_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6194,7 +6144,6 @@ def profit_to_mae_ratio(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _profit_to_mae_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6259,7 +6208,6 @@ def mfe_to_mae_ratio(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _mfe_to_mae_ratio_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6324,7 +6272,6 @@ def return_over_drawdown(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _return_over_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6389,7 +6336,6 @@ def expectancy_over_std(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _expectancy_over_std_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6454,7 +6400,6 @@ def net_profit_as_percent_of_largest_loss(trades: pd.DataFrame) -> dict[str, Any
     """AI Tool wrapper for _net_profit_as_percent_of_largest_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6520,7 +6465,6 @@ def net_profit_as_percent_of_max_trade_drawdown(trades: pd.DataFrame) -> dict[st
     """AI Tool wrapper for _net_profit_as_percent_of_max_trade_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6590,7 +6534,6 @@ def net_profit_as_percent_of_max_strategy_drawdown(
     """AI Tool wrapper for _net_profit_as_percent_of_max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6686,7 +6629,6 @@ def select_net_profit_as_percent_of_largest_loss(
     """AI Tool wrapper for _select_net_profit_as_percent_of_largest_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6756,7 +6698,6 @@ def select_net_profit_as_percent_of_max_trade_drawdown(
     """AI Tool wrapper for _select_net_profit_as_percent_of_max_trade_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6826,7 +6767,6 @@ def select_net_profit_as_percent_of_max_strategy_drawdown(
     """AI Tool wrapper for _select_net_profit_as_percent_of_max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6924,7 +6864,6 @@ def adjusted_net_profit_as_percent_of_largest_loss(
     """AI Tool wrapper for _adjusted_net_profit_as_percent_of_largest_loss_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -6994,7 +6933,6 @@ def adjusted_net_profit_as_percent_of_max_trade_drawdown(
     """AI Tool wrapper for _adjusted_net_profit_as_percent_of_max_trade_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7064,7 +7002,6 @@ def adjusted_net_profit_as_percent_of_max_strategy_drawdown(
     """AI Tool wrapper for _adjusted_net_profit_as_percent_of_max_strategy_drawdown_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7160,7 +7097,6 @@ def adjusted_profit_factor(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _adjusted_profit_factor_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7225,7 +7161,6 @@ def select_profit_factor(trades: pd.DataFrame) -> dict[str, Any]:
     """AI Tool wrapper for _select_profit_factor_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7290,7 +7225,6 @@ def expectancy(trades: pd.DataFrame | pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _expectancy_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7353,7 +7287,6 @@ def expectancy_r(r_multiples: pd.Series | np.ndarray) -> dict[str, Any]:
     """AI Tool wrapper for _expectancy_r_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result
@@ -7425,7 +7358,6 @@ def calculate_ratio_metrics(
     """AI Tool wrapper for _calculate_ratio_metrics_impl."""
     try:
         import pandas as pd
-
         from app.services.utils import logger
 
         from .common import analytics_tool_result

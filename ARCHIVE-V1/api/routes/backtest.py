@@ -10,20 +10,6 @@ from datetime import datetime
 from typing import Annotated, Any
 
 import pandas as pd
-from data.database.sqlite.backtests import normalize_backtest_overview_payload
-from data.database.sqlite.database_operations import DatabaseManager
-from data.strategies import storage
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Header,
-    HTTPException,
-    WebSocket,
-    WebSocketDisconnect,
-    status,
-)
-from pydantic import BaseModel
-
 from app.api.auth_utils import get_user_id_from_token
 from app.api.websocket import backtest_log_manager
 from app.services.analytics.overview import build_overview_payload
@@ -37,6 +23,19 @@ from app.services.simulation import (
 from app.services.simulation.results import SimulationRunResult
 from app.services.trading.permissions import assert_strategy_allowed
 from app.services.utils import logger
+from data.database.sqlite.backtests import normalize_backtest_overview_payload
+from data.database.sqlite.database_operations import DatabaseManager
+from data.strategies import storage
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Header,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
+from pydantic import BaseModel
 
 router = APIRouter()
 db_manager = DatabaseManager()

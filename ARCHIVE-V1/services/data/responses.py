@@ -36,10 +36,10 @@ REQUIRES_NETWORK = False
 def _execution_ms(started_at: float) -> float:
     """Description.
         Return elapsed tool execution time in milliseconds.
-    
+
     Args:
         started_at: float.
-    
+
     Returns:
         float.
     """
@@ -57,14 +57,14 @@ def _data_tool_spec(
 ) -> ToolStandardSpec:
     """Description.
         Build a standard metadata specification for a data-domain AI tool.
-    
+
     Args:
         tool_name: str.
         tool_risk_level: str.
         read_only: bool.
         writes_file: bool.
         requires_network: bool.
-    
+
     Returns:
         ToolStandardSpec.
     """
@@ -100,7 +100,7 @@ def _data_tool_response(
 ) -> dict[str, Any]:
     """Description.
         Build a standard HaruQuant data tool response envelope.
-    
+
     Args:
         tool_name: str.
         started_at: float.
@@ -114,7 +114,7 @@ def _data_tool_response(
         read_only: bool.
         writes_file: bool.
         requires_network: bool.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -131,7 +131,7 @@ def _data_tool_response(
         data = None
 
     return cast(
-        dict[str, Any],
+        "dict[str, Any]",
         standard_tool_response(
             spec=_data_tool_spec(
                 tool_name,
@@ -163,7 +163,7 @@ def _data_tool_validation_error(
 ) -> dict[str, Any]:
     """Description.
         Return a standardized invalid-input response for a data tool.
-    
+
     Args:
         tool_name: str.
         started_at: float.
@@ -173,7 +173,7 @@ def _data_tool_validation_error(
         read_only: bool.
         writes_file: bool.
         requires_network: bool.
-    
+
     Returns:
         dict[str, Any].
     """
@@ -209,7 +209,7 @@ def _data_tool_execution_error(
 ) -> dict[str, Any]:
     """Description.
         Return a standardized execution-failure response for a data tool.
-    
+
     Args:
         tool_name: str.
         started_at: float.
@@ -218,7 +218,7 @@ def _data_tool_execution_error(
         read_only: bool.
         writes_file: bool.
         requires_network: bool.
-    
+
     Returns:
         dict[str, Any].
     """

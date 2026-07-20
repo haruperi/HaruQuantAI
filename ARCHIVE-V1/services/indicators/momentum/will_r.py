@@ -3,7 +3,6 @@
 from typing import Any
 
 import pandas as pd
-
 from app.services.indicators.base import BaseIndicator
 
 
@@ -27,7 +26,9 @@ class WilliamsR(BaseIndicator):
     pd.DataFrame: Original DataFrame with the new column 'will_r_{period}' added.
     """
 
-    def calculate(self, df: pd.DataFrame, period: int = 14, **kwargs: Any) -> pd.DataFrame:
+    def calculate(
+        self, df: pd.DataFrame, period: int = 14, **kwargs: Any
+    ) -> pd.DataFrame:
         required_cols = ["high", "low", "close"]
         for col in required_cols:
             if col not in df.columns:

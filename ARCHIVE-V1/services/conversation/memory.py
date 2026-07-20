@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from data.database.repositories.ai_chat_repository import AiChatRepository
-
 from app.services.conversation.summaries import build_rolling_summary
 from app.services.schemas.chat import ChatMemorySummary, ChatMessage, ChatPinnedFact
+from data.database.repositories.ai_chat_repository import AiChatRepository
 
 
 class ConversationMemoryService:
