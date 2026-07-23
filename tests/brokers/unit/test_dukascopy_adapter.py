@@ -14,8 +14,8 @@ from app.services.brokers import (
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.dukascopy.adapter import DukascopyBrokerAdapter
-from app.services.brokers.dukascopy.candle_transport import _CandleBatch
+from app.services.brokers.dukascopy_ticks.adapter import DukascopyBrokerAdapter
+from app.services.brokers.dukascopy_ticks.candle_transport import _CandleBatch
 
 _RECORD = struct.Struct(">3I2f")
 
@@ -103,14 +103,12 @@ def test_adapter_rejects_non_sandbox_environment() -> None:
         circuit_half_open_max_calls=1,
     )
     with pytest.raises(ValueError, match="sandbox-only"):
-        DukascopyBrokerAdapter(bad, _capabilities())
+        DukascopyBrokerAdapter(bad)
 
 
 def test_adapter_connect_verifies_via_bounded_probe() -> None:
     """A successful bounded EURUSD probe verifies the session."""
-    adapter = DukascopyBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport()
-    )
+    adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -121,9 +119,7 @@ def test_adapter_connect_verifies_via_bounded_probe() -> None:
 
 def test_adapter_connect_fails_closed_on_transport_error() -> None:
     """A transport failure never reports a successful connection."""
-    adapter = DukascopyBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(fails=True)
-    )
+    adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport(fails=True))
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -134,11 +130,10 @@ def test_adapter_connect_fails_closed_on_transport_error() -> None:
 
 def test_adapter_get_symbols_filters_by_query() -> None:
     """Only fixture-declared symbols matching the query are returned."""
-    adapter = DukascopyBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport()
-    )
+    adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_symbols(query="EUR")
         assert result.data is not None
         assert [item.provider_symbol for item in result.data.items] == ["EURUSD"]
@@ -151,11 +146,10 @@ def test_adapter_get_symbols_filters_by_query() -> None:
 
 def test_adapter_get_symbol_info_rejects_undeclared_symbol() -> None:
     """An undeclared symbol raises rather than returning fabricated metadata."""
-    adapter = DukascopyBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport()
-    )
+    adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_symbol_info("GBPUSD")
         assert result.error is not None
         assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
@@ -165,11 +159,10 @@ def test_adapter_get_symbol_info_rejects_undeclared_symbol() -> None:
 
 def test_adapter_get_ticks_requires_start_and_positive_limit() -> None:
     """Missing start or non-positive limit is rejected before any transport call."""
-    adapter = DukascopyBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport()
-    )
+    adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_ticks("EURUSD", limit=1)
         assert result.error is not None
         assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
@@ -179,11 +172,10 @@ def test_adapter_get_ticks_requires_start_and_positive_limit() -> None:
 
 def test_adapter_get_ticks_maps_bounded_genuine_ticks() -> None:
     """A bounded genuine tick page is mapped from the provider hour file."""
-    adapter = DukascopyBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport()
-    )
+    adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_ticks(
             "EURUSD", start=datetime(2026, 1, 1, tzinfo=UTC), limit=1
         )
@@ -199,12 +191,12 @@ def test_adapter_maps_bounded_provider_bid_bars() -> None:
     candle_transport = _FakeCandleTransport()
     adapter = DukascopyBrokerAdapter(
         _config(),
-        _capabilities(),
         transport=_FakeTransport(),
         candle_transport=candle_transport,
     )
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_historical_bars(
             "EURUSD",
             "H1",
@@ -227,12 +219,12 @@ def test_adapter_passes_output_limit_to_candle_pagination() -> None:
     candle_transport = _FakeCandleTransport(truncated=True)
     adapter = DukascopyBrokerAdapter(
         _config(),
-        _capabilities(),
         transport=_FakeTransport(),
         candle_transport=candle_transport,
     )
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_historical_bars(
             "EURUSD",
             "H1",

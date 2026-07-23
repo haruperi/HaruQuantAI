@@ -11,7 +11,7 @@ from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from app.services.brokers.contracts.models import (
+from app.services.brokers import (
     BrokerAccountInfo,
     BrokerBalance,
     BrokerOrder,

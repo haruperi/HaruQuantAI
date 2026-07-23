@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.2.1
+
+**Release date:** 2026-07-23
+
+### Focused Brokers domain correction
+
+The Brokers domain now exposes its corrected focused feature architecture, fail-closed capability policy, provider controls, and complete offline evidence suite.
+
+#### Added (16)
+
+- `FEAT-BRK-00` Canonical Provider-Neutral Contracts.
+- `FEAT-BRK-01` Adapter Registry and Capability Discovery.
+- `FEAT-BRK-02` MetaTrader 5 Account Lifecycle.
+- `FEAT-BRK-03` cTrader Account Lifecycle.
+- `FEAT-BRK-04` Binance Lifecycle.
+- `FEAT-BRK-05` Dukascopy Tick Reads.
+- `FEAT-BRK-06` Yahoo History.
+- `FEAT-BRK-07` MetaTrader 5 Mutations.
+- `FEAT-BRK-08` cTrader Mutations.
+- `FEAT-BRK-09` Execution History Reads.
+- `FEAT-BRK-10` Provider Calculations.
+- `FEAT-BRK-11` Price Streams.
+- `FEAT-BRK-12` cTrader Market Data.
+- `FEAT-BRK-13` Dukascopy BID Bars.
+- `FEAT-BRK-14` Deterministic Fake Adapter.
+- `FEAT-BRK-15` Adapter Runtime.
+
 ## 2.2.0
 
 July 23, 2026

@@ -4,7 +4,9 @@ import asyncio
 
 import pytest
 from app.services.brokers import BrokerErrorCode
-from app.services.brokers.runtime.circuit_breaker import _TransportCircuitBreaker
+from app.services.brokers.adapter_runtime.circuit_breaker import (
+    _TransportCircuitBreaker,
+)
 
 
 def test_circuit_state_machine_and_failure_classification() -> None:

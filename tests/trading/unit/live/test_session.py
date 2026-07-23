@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers import (
     BrokerAdapter,
     BrokerConnectionConfig,
     BrokerEnvironment,

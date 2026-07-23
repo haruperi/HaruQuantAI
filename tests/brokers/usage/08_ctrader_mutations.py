@@ -1,141 +1,117 @@
-"""FEAT-BRK-08: exercise the cTrader single-target mutation surface.
-
-Runs the genuine `CTraderBrokerAdapter` over an offline sender. Real lot-size
-aware volume conversion, protobuf request construction, acknowledgement mapping,
-and fail-closed validation execute without Spotware traffic or a live order.
-"""
+"""FEAT-BRK-08: cTrader mutation capabilities."""
 
 import asyncio
 from decimal import Decimal
 
-from _support import (
-    OfflineCTraderTransport,
-    available_capabilities,
-    config,
-    show,
-    show_value,
-    unavailable_capabilities,
-)
+import _support  # noqa: F401
+from _support import config
 from app.services.brokers import (
-    BrokerEnvironment,
+    BrokerErrorCode,
     BrokerId,
-    BrokerOrderModificationRequest,
-    BrokerOrderRequest,
-    BrokerPositionCloseRequest,
-    BrokerPositionModificationRequest,
-    CTraderBrokerAdapter,
+    BrokerMarginRequest,
+    BrokerProfitRequest,
+    create_broker_adapter,
 )
 
-_REQUEST_ID = "req-2f1d5a6c-8b3e-4c17-9f52-70a1c8d94e33"
 
-
-def _order() -> BrokerOrderRequest:
-    """Build one complete, structurally valid V1 order request."""
-    return BrokerOrderRequest(
+def fr_brokers_098() -> None:
+    """FR-BRK-098: Request provider-native margin calculation."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+    req = BrokerMarginRequest(
         symbol="EURUSD",
         side="BUY",
-        order_type="MARKET",
-        quantity=Decimal(1),
+        quantity=Decimal("1.0"),
         quantity_unit="lots",
-        environment=BrokerEnvironment.DEMO,
-        client_request_id=_REQUEST_ID,
+        product_profile="ctrader",
     )
 
+    async def run() -> None:
+        res = await adapter.calculate_margin(req)
+        print("FR-BRK-098:", res.status)
 
-async def example_acknowledged_mutations() -> None:
-    """Each mutation maps an explicit provider acknowledgement, once."""
-    transport = OfflineCTraderTransport()
-    adapter = CTraderBrokerAdapter(
-        config(BrokerId.CTRADER), available_capabilities(), transport=transport
-    )
-    await adapter.connect()
-
-    checked = await adapter.check_order(_order())
-    show_value(
-        "check",
-        checked,
-        f"final={checked.data.is_final_acceptance}" if checked.data else None,
-    )
-
-    placed = await adapter.place_order(_order())
-    show_value(
-        "place",
-        placed,
-        f"outcome={placed.data.outcome} order_id={placed.data.order_id}"
-        if placed.data
-        else None,
-    )
-    show(
-        "modify-order",
-        await adapter.modify_order(
-            BrokerOrderModificationRequest(
-                order_id="11",
-                client_request_id=_REQUEST_ID,
-                limit_price=Decimal("1.09000"),
-            )
-        ),
-    )
-    show("cancel-order", await adapter.cancel_order("11", _REQUEST_ID))
-    show(
-        "modify-position",
-        await adapter.modify_position(
-            BrokerPositionModificationRequest(
-                position_id="21",
-                client_request_id=_REQUEST_ID,
-                stop_loss=Decimal("1.09000"),
-            )
-        ),
-    )
-    show(
-        "close-position",
-        await adapter.close_position(
-            BrokerPositionCloseRequest(
-                position_id="21",
-                quantity=Decimal(1),
-                quantity_unit="lots",
-                client_request_id=_REQUEST_ID,
-            )
-        ),
-    )
-    print("provider requests", len(transport.requests))
+    asyncio.run(run())
 
 
-async def example_unrepresentable_quantity_is_rejected() -> None:
-    """A quantity outside the provider volume grid never reaches the venue."""
-    transport = OfflineCTraderTransport()
-    adapter = CTraderBrokerAdapter(
-        config(BrokerId.CTRADER), available_capabilities(), transport=transport
-    )
-    await adapter.connect()
-    request = BrokerOrderRequest(
+def fr_brokers_099() -> None:
+    """FR-BRK-099: Request provider-native profit calculation."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+    req = BrokerProfitRequest(
         symbol="EURUSD",
         side="BUY",
-        order_type="MARKET",
-        quantity=Decimal("0.000000001"),
+        quantity=Decimal("1.0"),
         quantity_unit="lots",
-        environment=BrokerEnvironment.DEMO,
-        client_request_id=_REQUEST_ID,
+        open_price=Decimal("1.10"),
+        close_price=Decimal("1.11"),
+        product_profile="ctrader",
     )
-    show("place-unrepresentable", await adapter.place_order(request))
-    print("new-order requests", transport.requests.count("ProtoOANewOrderReq"))
+
+    async def run() -> None:
+        res = await adapter.calculate_profit(req)
+        print("FR-BRK-099:", res.status)
+
+    asyncio.run(run())
 
 
-async def example_writes_remain_unreleased() -> None:
-    """Mutations stay fail-closed while the release gate is unsatisfied."""
-    transport = OfflineCTraderTransport()
-    adapter = CTraderBrokerAdapter(
-        config(BrokerId.CTRADER), unavailable_capabilities(), transport=transport
-    )
-    show("gated-place", await adapter.place_order(_order()))
-    print("provider requests while gated", len(transport.requests))
+def fr_brokers_100() -> None:
+    """FR-BRK-100: Request provider-native commission estimate."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_commission_estimate("EURUSD", Decimal("1.0"))
+        print("FR-BRK-100:", res.status)
+
+    asyncio.run(run())
 
 
-async def main() -> None:
-    """Exercise every FEAT-BRK-08 operation offline."""
-    await example_acknowledged_mutations()
-    await example_unrepresentable_quantity_is_rejected()
-    await example_writes_remain_unreleased()
+def fr_brokers_101() -> None:
+    """FR-BRK-101: Resolve explicit broker adapter profile."""
+    created = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER))
+    print("FR-BRK-101:", created.status)
+
+
+def fr_brokers_102() -> None:
+    """FR-BRK-102: List registered brokers without SDK import."""
+    from app.services.brokers import get_registered_brokers
+
+    brokers = get_registered_brokers()
+    print("FR-BRK-102:", len(brokers))
+
+
+def fr_brokers_103() -> None:
+    """FR-BRK-103: Expose complete static capability catalogue."""
+    from app.services.brokers import get_broker_capability_catalogue
+
+    cat = get_broker_capability_catalogue()
+    print("FR-BRK-103:", len(cat))
+
+
+def fr_brokers_104() -> None:
+    """FR-BRK-104: Block unreleased cTrader write operations."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.cancel_order("o1")
+        assert res.error is not None
+        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        print("FR-BRK-104: write blocked")
+
+    asyncio.run(run())
+
+
+def main() -> None:
+    """Execute every FR-BRK-098..104 usage function."""
+    fr_brokers_098()
+    fr_brokers_099()
+    fr_brokers_100()
+    fr_brokers_101()
+    fr_brokers_102()
+    fr_brokers_103()
+    fr_brokers_104()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

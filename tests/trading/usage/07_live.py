@@ -14,7 +14,7 @@ from typing import cast
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.brokers.contracts import (
+from app.services.brokers import (
     BrokerAdapter,
     BrokerConnectionConfig,
     BrokerEnvironment,

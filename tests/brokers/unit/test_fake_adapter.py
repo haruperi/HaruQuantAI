@@ -1,6 +1,8 @@
 """Deterministic fake adapter tests (FR-BRK-109)."""
 
 import asyncio
+from datetime import UTC, datetime
+from decimal import Decimal
 
 from app.services.brokers import (
     BrokerAdapter,
@@ -11,11 +13,21 @@ from app.services.brokers import (
     BrokerError,
     BrokerErrorCode,
     BrokerId,
+    BrokerQuote,
 )
 from app.services.brokers.registry import get_broker_capability_catalogue
 from app.services.brokers.testing import FakeBrokerAdapter
 
 _BUFFER_SIZE = 2
+_MUTATIONS = {
+    BrokerCapabilityId.CHECK_ORDER,
+    BrokerCapabilityId.PLACE_ORDER,
+    BrokerCapabilityId.MODIFY_ORDER,
+    BrokerCapabilityId.CANCEL_ORDER,
+    BrokerCapabilityId.MODIFY_POSITION,
+    BrokerCapabilityId.CLOSE_POSITION,
+    BrokerCapabilityId.REPLACE_ORDER,
+}
 
 
 def _config() -> BrokerConnectionConfig:
@@ -40,8 +52,8 @@ def _capabilities(
         operation: BrokerCapability(
             capability=operation,
             implementation_status="IMPLEMENTED",
-            availability=availability,
-            access_mode="READ",
+            availability=("UNAVAILABLE" if operation in _MUTATIONS else availability),
+            access_mode="WRITE" if operation in _MUTATIONS else "READ",
             requirement="NONE",
             verification_status="NOT_TESTED",
             execution_model="TEST_DOUBLE",
@@ -51,7 +63,23 @@ def _capabilities(
 
 
 def _fake(**kwargs: object) -> FakeBrokerAdapter:
-    return FakeBrokerAdapter(_config(), _capabilities(), **kwargs)  # type: ignore[arg-type]
+    return FakeBrokerAdapter(
+        _config(),
+        _capabilities(),
+        **kwargs,  # type: ignore[arg-type]
+    )
+
+
+def _quote() -> BrokerQuote:
+    """Return a valid deterministic quote fixture."""
+    return BrokerQuote(
+        symbol="A",
+        price_unit="USD",
+        quantity_unit="units",
+        retrieved_at=datetime.now(UTC),
+        bid=Decimal(1),
+        ask=Decimal(2),
+    )
 
 
 def test_fake_adapter_implements_complete_protocol() -> None:
@@ -65,7 +93,8 @@ def test_fake_adapter_error_injection() -> None:
     """One injected failure affects only the selected operation."""
 
     async def exercise() -> None:
-        fake = _fake(fixtures={BrokerCapabilityId.GET_QUOTE: "quote"})
+        fake = _fake(fixtures={BrokerCapabilityId.GET_QUOTE: _quote()})
+        await fake.connect()
         fake.inject_error(
             BrokerCapabilityId.GET_QUOTE,
             BrokerError(code=BrokerErrorCode.BROKER_TIMEOUT, message="timeout"),
@@ -83,17 +112,18 @@ def test_fake_adapter_error_injection_is_reversible_and_isolated() -> None:
     async def exercise() -> None:
         fake = _fake(
             fixtures={
-                BrokerCapabilityId.GET_QUOTE: "quote",
-                BrokerCapabilityId.GET_SPREAD: "spread",
+                BrokerCapabilityId.GET_QUOTE: _quote(),
+                BrokerCapabilityId.GET_SPREAD: Decimal(1),
             }
         )
+        await fake.connect()
         fake.inject_error(
             BrokerCapabilityId.GET_QUOTE,
             BrokerError(code=BrokerErrorCode.BROKER_TIMEOUT, message="timeout"),
         )
-        assert (await fake.get_spread("A")).data == "spread"
+        assert (await fake.get_spread("A")).data == Decimal(1)
         fake.inject_error(BrokerCapabilityId.GET_QUOTE, None)
-        assert (await fake.get_quote("A")).data == "quote"
+        assert isinstance((await fake.get_quote("A")).data, BrokerQuote)
 
     asyncio.run(exercise())
 
@@ -104,8 +134,7 @@ def test_fixture_cannot_bypass_declared_unavailable_capability() -> None:
     async def exercise() -> None:
         fake = FakeBrokerAdapter(
             _config(),
-            _capabilities("UNAVAILABLE"),
-            fixtures={BrokerCapabilityId.GET_QUOTE: "quote"},
+            fixtures={BrokerCapabilityId.GET_QUOTE: _quote()},
         )
         result = await fake.get_quote("A")
         assert not result.is_success
@@ -119,7 +148,7 @@ def test_injected_error_cannot_bypass_declared_unavailable_capability() -> None:
     """Error injection never re-enables a capability declared UNAVAILABLE."""
 
     async def exercise() -> None:
-        fake = FakeBrokerAdapter(_config(), _capabilities("UNAVAILABLE"))
+        fake = FakeBrokerAdapter(_config())
         fake.inject_error(
             BrokerCapabilityId.GET_QUOTE,
             BrokerError(code=BrokerErrorCode.BROKER_TIMEOUT, message="timeout"),
@@ -142,7 +171,7 @@ def test_fake_adapter_honours_the_genuine_provider_catalogue() -> None:
         fake = FakeBrokerAdapter(
             _config(),
             capabilities,
-            fixtures={BrokerCapabilityId.GET_QUOTE: "quote"},
+            fixtures={BrokerCapabilityId.GET_QUOTE: _quote()},
         )
         result = await fake.get_quote("A")
         assert result.error is not None

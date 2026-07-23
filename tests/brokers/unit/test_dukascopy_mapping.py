@@ -3,7 +3,7 @@
 import struct
 from datetime import UTC, datetime
 
-from app.services.brokers.dukascopy.mapping import _map_ticks
+from app.services.brokers.dukascopy_ticks.mapping import _map_ticks
 
 
 def test_dukascopy_mapping_is_tick_only() -> None:

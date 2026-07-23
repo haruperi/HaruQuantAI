@@ -1,93 +1,136 @@
-"""FEAT-BRK-05: exercise the Dukascopy lifecycle and tick-read surface.
-
-Runs the genuine `DukascopyBrokerAdapter` over an offline transport serving
-recorded BI5 hour files, so real instrument validation, BI5 decoding, and
-canonical tick mapping execute without provider network traffic.
-"""
+"""FEAT-BRK-05: Dukascopy research lifecycle."""
 
 import asyncio
-from datetime import UTC, datetime
 
-from _support import (
-    OfflineDukascopyTransport,
-    available_capabilities,
-    config,
-    show,
-    show_value,
-    unavailable_capabilities,
+import _support  # noqa: F401
+from _support import config
+from app.services.brokers import (
+    BrokerId,
+    BrokerPositionFilter,
+    create_broker_adapter,
 )
-from app.services.brokers import BrokerId, DukascopyBrokerAdapter
 
 
-async def example_verified_lifecycle_and_tick_reads() -> None:
-    """Connect, list provider-native symbols, and read genuine mapped ticks."""
-    transport = OfflineDukascopyTransport()
-    adapter = DukascopyBrokerAdapter(
-        config(BrokerId.DUKASCOPY), available_capabilities(), transport=transport
-    )
-    show("connect", await adapter.connect())
+def fr_brokers_075() -> None:
+    """FR-BRK-075: Return direct provider platform metadata without secrets."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
 
-    symbols = await adapter.get_symbols(limit=5)
-    show_value(
-        "symbols",
-        symbols,
-        tuple(item.provider_symbol for item in symbols.data.items)
-        if symbols.data
-        else None,
-    )
+    async def run() -> None:
+        res = await adapter.get_platform_info()
+        print("FR-BRK-075:", res.status)
 
-    ticks = await adapter.get_ticks(
-        "EURUSD",
-        datetime(2026, 1, 1, tzinfo=UTC),
-        datetime(2026, 1, 1, 1, tzinfo=UTC),
-        limit=3,
-    )
-    show_value(
-        "ticks",
-        ticks,
-        f"count={ticks.data.returned_count} first_bid={ticks.data.items[0].bid}"
-        if ticks.data
-        else None,
-    )
-
-    show("disconnect", await adapter.disconnect())
-    print("hour files requested", len(transport.requested))
+    asyncio.run(run())
 
 
-async def example_undeclared_symbol_is_rejected() -> None:
-    """Only exact declared provider-native instruments are accepted."""
-    adapter = DukascopyBrokerAdapter(
-        config(BrokerId.DUKASCOPY),
-        available_capabilities(),
-        transport=OfflineDukascopyTransport(),
-    )
-    show(
-        "undeclared-symbol",
-        await adapter.get_ticks(
-            "NOT_A_SYMBOL",
-            datetime(2026, 1, 1, tzinfo=UTC),
-            datetime(2026, 1, 1, 1, tzinfo=UTC),
-            limit=1,
-        ),
-    )
+def fr_brokers_076() -> None:
+    """FR-BRK-076: Return provider-reported permissions without inferring from SDK."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_permissions()
+        print("FR-BRK-076:", res.status)
+
+    asyncio.run(run())
 
 
-async def example_unreleased_capability_fails_closed() -> None:
-    """A gated capability returns unsupported without a provider call."""
-    transport = OfflineDukascopyTransport()
-    adapter = DukascopyBrokerAdapter(
-        config(BrokerId.DUKASCOPY), unavailable_capabilities(), transport=transport
-    )
-    show("gated-symbols", await adapter.get_symbols(limit=1))
-    print("hour files while gated", len(transport.requested))
+def fr_brokers_077() -> None:
+    """FR-BRK-077: Return bounded page of provider-visible accounts."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.list_accounts()
+        print("FR-BRK-077:", res.status)
+
+    asyncio.run(run())
 
 
-async def main() -> None:
-    """Exercise every FEAT-BRK-05 operation offline."""
-    await example_verified_lifecycle_and_tick_reads()
-    await example_undeclared_symbol_is_rejected()
-    await example_unreleased_capability_fails_closed()
+def fr_brokers_078() -> None:
+    """FR-BRK-078: Reject in-place account switching as unsupported."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.select_account("acc-1")
+        print("FR-BRK-078:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_079() -> None:
+    """FR-BRK-079: Return provider account info and state."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_account_info()
+        print("FR-BRK-079:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_080() -> None:
+    """FR-BRK-080: Return provider balances without currency conversion."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_balances()
+        print("FR-BRK-080:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_081() -> None:
+    """FR-BRK-081: Return provider-known assets without constructing universe."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.list_assets()
+        print("FR-BRK-081:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_082() -> None:
+    """FR-BRK-082: Return direct provider metadata for one asset or not-found."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_asset_info("EUR")
+        print("FR-BRK-082:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_083() -> None:
+    """FR-BRK-083: Return bounded canonical page of current positions."""
+    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_positions(BrokerPositionFilter())
+        print("FR-BRK-083:", res.status)
+
+    asyncio.run(run())
+
+
+def main() -> None:
+    """Execute every FR-BRK-075..083 usage function."""
+    fr_brokers_075()
+    fr_brokers_076()
+    fr_brokers_077()
+    fr_brokers_078()
+    fr_brokers_079()
+    fr_brokers_080()
+    fr_brokers_081()
+    fr_brokers_082()
+    fr_brokers_083()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

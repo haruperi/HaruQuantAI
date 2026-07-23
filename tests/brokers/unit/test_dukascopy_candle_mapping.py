@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import pytest
 from app.services.brokers.contracts.protocols import _ProviderResponseError
-from app.services.brokers.dukascopy.candle_mapping import (
+from app.services.brokers.dukascopy_ticks.candle_mapping import (
     _map_candles,
     _provider_interval,
 )

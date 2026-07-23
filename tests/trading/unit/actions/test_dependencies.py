@@ -10,7 +10,7 @@ from decimal import Decimal
 from typing import cast
 
 import pytest
-from app.services.brokers.contracts import BrokerSymbolInfo
+from app.services.brokers import BrokerSymbolInfo
 from app.services.data.evidence.account_contracts import (
     AccountBalance,
     AccountOrder,

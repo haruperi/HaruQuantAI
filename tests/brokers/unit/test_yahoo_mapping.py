@@ -3,7 +3,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from app.services.brokers.yahoo.mapping import _map_history, _provider_interval
+from app.services.brokers.yahoo_history.mapping import _map_history, _provider_interval
 
 
 class _Table:
@@ -78,7 +78,7 @@ def test_yahoo_unsupported_interval_is_rejected() -> None:
 
 def test_yahoo_intervals() -> None:
     """All standard Yahoo interval types map correctly to duration offsets."""
-    from app.services.brokers.yahoo.mapping import _interval_duration
+    from app.services.brokers.yahoo_history.mapping import _interval_duration
 
     assert _interval_duration("1mo") == timedelta(days=30)
     assert _interval_duration("2wk") == timedelta(weeks=2)

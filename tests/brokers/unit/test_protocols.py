@@ -15,6 +15,7 @@ from app.services.brokers import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerConnectionEvent,
+    BrokerConnectionState,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
@@ -27,8 +28,8 @@ from app.services.brokers import (
     MarketDataProvider,
     TradeExecutionProvider,
 )
+from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
-from app.services.brokers.runtime.subscription import _BrokerSubscription
 
 REQUEST_ID = "req-b4b8aa60-ba17-4561-884b-138c6074c5fb"
 
@@ -49,13 +50,7 @@ def _capability(
 
 
 def _adapter(*, connect_available: bool = False) -> _UnsupportedAdapterBase:
-    capabilities = {
-        capability: _capability(
-            capability,
-            available=connect_available and capability is BrokerCapabilityId.CONNECT,
-        )
-        for capability in BrokerCapabilityId
-    }
+    del connect_available
     config = BrokerConnectionConfig(
         broker_id=BrokerId.YAHOO,
         environment=BrokerEnvironment.SANDBOX,
@@ -68,11 +63,12 @@ def _adapter(*, connect_available: bool = False) -> _UnsupportedAdapterBase:
         circuit_recovery_timeout_sec=1,
         circuit_half_open_max_calls=1,
     )
-    return _UnsupportedAdapterBase(config, capabilities)
+    return _UnsupportedAdapterBase(config)
 
 
 def _unsupported(operation: BrokerCapabilityId) -> BrokerResult[object]:
     adapter = _adapter()
+    adapter._state = BrokerConnectionState.READY
 
     async def _call() -> BrokerResult[object]:
         method = getattr(adapter, operation.value)
@@ -98,7 +94,7 @@ class _ContextAdapter(_UnsupportedAdapterBase):
 
     def __init__(self) -> None:
         base = _adapter(connect_available=True)
-        super().__init__(base._config, base._capabilities)
+        super().__init__(base._config)
         self.disconnect_count = 0
 
     async def connect(self) -> BrokerResult[None]:
@@ -170,18 +166,14 @@ def test_subscription_is_bounded_fifo_and_explicitly_closed() -> None:
     assert not subscription.info.active
 
 
-def test_adapter_context_always_disconnects() -> None:
+def test_adapter_explicit_connect_and_disconnect() -> None:
     adapter = _ContextAdapter()
 
     async def _use() -> None:
-        async def _caller_failure() -> None:
-            async with adapter as entered:
-                assert entered.contract_version == "v1"
-                assert entered.schema_id == "brokers.adapter.v1"
-                raise RuntimeError("caller failure")
-
-        with pytest.raises(RuntimeError, match="caller failure"):
-            await _caller_failure()
+        await adapter.connect()
+        assert adapter.contract_version == "v1"
+        assert adapter.schema_id == "brokers.adapter.v1"
+        await adapter.disconnect()
 
     asyncio.run(_use())
     assert adapter.disconnect_count == 1
@@ -206,7 +198,11 @@ def test_reconnect_never_replays_operation() -> None:
 
 
 def test_is_connected_is_provider_verified() -> None:
-    _unsupported(BrokerCapabilityId.IS_CONNECTED)
+    adapter = _adapter()
+    adapter._state = BrokerConnectionState.READY
+    result = asyncio.run(adapter.is_connected())
+    assert result.is_success
+    assert result.data is True
 
 
 def test_connection_status_is_detailed() -> None:
@@ -444,8 +440,7 @@ def test_cancellation_propagates_without_translation() -> None:
 
     async def _cancel() -> None:
         with pytest.raises(asyncio.CancelledError):
-            async with _CancelledAdapter():
-                pass
+            await _CancelledAdapter().connect()
 
     asyncio.run(_cancel())
 
@@ -473,6 +468,9 @@ def test_mutation_timeout_is_non_retryable_unknown_outcome() -> None:
             del request
             raise TimeoutError("provider acknowledgement timeout")
 
+    adapter = _TimedOutAdapter()
+    adapter._state = BrokerConnectionState.READY
+
     request = BrokerOrderRequest(
         symbol="EURUSD",
         side="BUY",
@@ -481,16 +479,16 @@ def test_mutation_timeout_is_non_retryable_unknown_outcome() -> None:
         quantity_unit="lots",
         environment=BrokerEnvironment.DEMO,
     )
-    result = asyncio.run(_TimedOutAdapter().place_order(request))
+    result = asyncio.run(adapter.place_order(request))
     assert result.error is not None
     assert result.error.code is BrokerErrorCode.BROKER_UNKNOWN_OUTCOME
     assert result.error.retryable is False
 
 
-def test_adapter_context_connect_failure_raises_runtime_error() -> None:
-    """A connection failure inside the async context manager raises RuntimeError."""
+def test_adapter_connect_failure_returns_canonical_error() -> None:
+    """A connection failure returns a canonical error result."""
 
-    class _FailingContextAdapter(_ContextAdapter):
+    class _FailingAdapter(_ContextAdapter):
         async def connect(self) -> BrokerResult[None]:
             from app.services.brokers import BrokerError
 
@@ -508,12 +506,9 @@ def test_adapter_context_connect_failure_raises_runtime_error() -> None:
                 ),
             )
 
-    async def _use() -> None:
-        with pytest.raises(RuntimeError, match="failed to connect"):
-            async with _FailingContextAdapter():
-                pass
-
-    asyncio.run(_use())
+    result = asyncio.run(_FailingAdapter().connect())
+    assert result.error is not None
+    assert result.error.code is BrokerErrorCode.BROKER_CONNECTION_FAILED
 
 
 def test_transition_noop() -> None:
@@ -551,6 +546,7 @@ def test_reconnect_executes_disconnect_and_connect() -> None:
 def test_getattr_fallback_for_undefined_capability() -> None:
     """Attribute lookup for undefined capability routes to fallback handler."""
     adapter = _ContextAdapter()
+    adapter._state = BrokerConnectionState.READY
 
     async def exercise() -> None:
         method = getattr(adapter, "calculate_profit")  # noqa: B009

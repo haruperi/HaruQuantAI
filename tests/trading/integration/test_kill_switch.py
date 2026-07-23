@@ -8,7 +8,10 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from app.services.brokers.contracts import BrokerAdapter, BrokerFeatureFlags
+from app.services.brokers import (
+    BrokerAdapter,
+    BrokerFeatureFlags,
+)
 from app.services.data.evidence.account_contracts import (
     AccountOrder,
     AccountStateSnapshot,

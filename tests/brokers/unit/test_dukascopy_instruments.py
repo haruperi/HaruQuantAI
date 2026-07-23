@@ -1,7 +1,7 @@
 """Dukascopy exact-instrument declaration tests."""
 
 import pytest
-from app.services.brokers.dukascopy.instruments import (
+from app.services.brokers.dukascopy_ticks.instruments import (
     _INSTRUMENT_PRICE_DIVISORS,
     _price_divisor,
 )

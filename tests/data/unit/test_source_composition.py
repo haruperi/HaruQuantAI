@@ -11,12 +11,12 @@ from typing import Any
 
 import pytest
 from app.services.brokers import (
+    BrokerCapabilityId,
     BrokerEnvironment,
     BrokerId,
     BrokerResult,
     BrokerTradingSession,
 )
-from app.services.brokers.contracts import BrokerCapabilityId
 from app.services.data.contracts import DataError
 from app.services.data.market_data.symbol_metadata import SymbolMetadata
 from app.services.data.sources import composition as _runtime

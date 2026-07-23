@@ -1,7 +1,7 @@
 """Binance mapping tests."""
 
 from app.services.brokers import BrokerErrorCode
-from app.services.brokers.binance.mapping import (
+from app.services.brokers.binance_session.mapping import (
     _map_error_code,
     _map_kline,
     _provider_interval,
@@ -44,7 +44,7 @@ def test_binance_kline_retains_requested_timeframe() -> None:
 
 def test_binance_map_symbol() -> None:
     """_map_symbol maps standard Binance symbol payload to BrokerSymbolInfo."""
-    from app.services.brokers.binance.mapping import _map_symbol
+    from app.services.brokers.binance_session.mapping import _map_symbol
 
     info = _map_symbol(
         {
@@ -70,7 +70,7 @@ def test_binance_native_error_floor() -> None:
 
 def test_binance_map_quote() -> None:
     """_map_quote produces a valid BrokerQuote."""
-    from app.services.brokers.binance.mapping import _map_quote
+    from app.services.brokers.binance_session.mapping import _map_quote
 
     quote = _map_quote(
         {"bidPrice": "1.0", "askPrice": "1.1", "bidQty": "10.0", "askQty": "20.0"},
@@ -85,7 +85,7 @@ def test_binance_map_quote() -> None:
 
 def test_binance_map_trade() -> None:
     """_map_trade produces a valid BrokerTick."""
-    from app.services.brokers.binance.mapping import _map_trade
+    from app.services.brokers.binance_session.mapping import _map_trade
 
     tick = _map_trade(
         {"T": 1700000000000, "p": "1.2", "q": "5.0", "a": 12345},

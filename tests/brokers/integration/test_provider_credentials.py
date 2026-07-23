@@ -5,10 +5,12 @@ import sys
 from collections.abc import Iterator
 
 import pytest
-from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
-from app.services.brokers.ctrader.adapter import CTraderBrokerAdapter
-from app.services.brokers.mt5.adapter import MT5BrokerAdapter
-from app.services.brokers.registry.catalogue import get_broker_capability_catalogue
+from app.services.brokers import (
+    BrokerConnectionConfig,
+    BrokerEnvironment,
+    BrokerId,
+    create_broker_adapter,
+)
 
 from tests.brokers.provider_settings import ProviderTestSettings
 
@@ -53,11 +55,10 @@ def test_mt5_demo_credential_gated_connection() -> None:
         account_reference=settings.mt5_login.get_secret_value(),
         credentials=credentials,
     )
-    capabilities = {
-        entry.capability: entry
-        for entry in get_broker_capability_catalogue()[BrokerId.MT5]
-    }
-    adapter = MT5BrokerAdapter(config, capabilities)
+    created = create_broker_adapter(BrokerId.MT5, config)
+    assert created.is_success
+    adapter = created.data
+    assert adapter is not None
 
     async def exercise() -> None:
         """Connect and disconnect one genuine MT5 session."""
@@ -99,9 +100,7 @@ def test_ctrader_demo_credentials_validate_without_a_network_transport() -> None
         account_reference=settings.ctrader_account_id.get_secret_value(),
         credentials=credentials,
     )
-    capabilities = {
-        entry.capability: entry
-        for entry in get_broker_capability_catalogue()[BrokerId.CTRADER]
-    }
-    adapter = CTraderBrokerAdapter(config, capabilities)
+    created = create_broker_adapter(BrokerId.CTRADER, config)
+    assert created.is_success
+    adapter = created.data
     assert adapter is not None

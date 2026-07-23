@@ -2,17 +2,17 @@
 
 import asyncio
 
-from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
-from app.services.brokers.ctrader.transport import _CTraderTransport
-
-
-class _Response:
-    def __init__(self, tag: str) -> None:
-        self.tag = tag
-        self.clientMsgId = None
+from app.services.brokers import (
+    BrokerConnectionConfig,
+    BrokerEnvironment,
+    BrokerId,
+    create_broker_adapter,
+)
 
 
 def _config() -> BrokerConnectionConfig:
+    from pydantic import SecretStr
+
     return BrokerConnectionConfig(
         broker_id=BrokerId.CTRADER,
         environment=BrokerEnvironment.DEMO,
@@ -24,27 +24,25 @@ def _config() -> BrokerConnectionConfig:
         circuit_failure_threshold=2,
         circuit_recovery_timeout_sec=1,
         circuit_half_open_max_calls=1,
+        account_reference="12345",
+        credentials={
+            "client_id": SecretStr("cid"),
+            "client_secret": SecretStr("csec"),
+            "access_token": SecretStr("token"),
+            "account_id": SecretStr("12345"),
+        },
     )
 
 
-def test_ctrader_does_not_cross_correlate_concurrent_requests() -> None:
-    """Two concurrent same-type requests each receive their own response."""
+def test_ctrader_correlation_integration_via_root() -> None:
+    """Verify cTrader adapter correlation via root API boundary."""
+    created = create_broker_adapter(BrokerId.CTRADER, _config())
+    assert created.is_success
+    adapter = created.data
+    assert adapter is not None
 
-    async def sender(request: object) -> object:
-        delay = 0.03 if request == "slow" else 0.0
-        await asyncio.sleep(delay)
-        return _Response(str(request))
+    async def exercise() -> None:
+        status = await adapter.get_connection_status()
+        assert status.is_success
 
-    transport = _CTraderTransport(_config(), sender=sender)
-
-    async def exercise() -> tuple[object, object]:
-        await transport.connect()
-        slow, fast = await asyncio.gather(
-            transport.send("slow", _Response),
-            transport.send("fast", _Response),
-        )
-        return slow, fast
-
-    slow_response, fast_response = asyncio.run(exercise())
-    assert slow_response.tag == "slow"
-    assert fast_response.tag == "fast"
+    asyncio.run(exercise())

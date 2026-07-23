@@ -8,11 +8,12 @@ from app.services.brokers import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
+    BrokerConnectionState,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.yahoo.adapter import YahooBrokerAdapter
+from app.services.brokers.yahoo_history.adapter import YahooBrokerAdapter
 
 
 def _config(**overrides: object) -> BrokerConnectionConfig:
@@ -89,13 +90,13 @@ class _Table:
 def test_adapter_rejects_non_sandbox_environment() -> None:
     """Yahoo accepts only the SANDBOX environment."""
     with pytest.raises(ValueError, match="sandbox-only"):
-        YahooBrokerAdapter(_config(environment=BrokerEnvironment.DEMO), _capabilities())
+        YahooBrokerAdapter(_config(environment=BrokerEnvironment.DEMO))
 
 
 def test_adapter_connect_without_probe_symbol_never_calls_transport() -> None:
     """No hidden default probe symbol is ever assumed."""
     transport = _FakeTransport()
-    adapter = YahooBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = YahooBrokerAdapter(_config(), transport=transport)
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -110,9 +111,7 @@ def test_adapter_connect_without_probe_symbol_never_calls_transport() -> None:
 def test_adapter_connect_with_probe_symbol_verifies_via_transport() -> None:
     """A configured probe symbol is used for a genuine verification call."""
     transport = _FakeTransport()
-    adapter = YahooBrokerAdapter(
-        _config(probe_symbol="AAPL"), _capabilities(), transport=transport
-    )
+    adapter = YahooBrokerAdapter(_config(probe_symbol="AAPL"), transport=transport)
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -126,9 +125,7 @@ def test_adapter_connect_with_probe_symbol_verifies_via_transport() -> None:
 def test_adapter_connect_fails_closed_when_probe_fails() -> None:
     """A failed probe never reports a successful connection."""
     transport = _FakeTransport(fails=True)
-    adapter = YahooBrokerAdapter(
-        _config(probe_symbol="AAPL"), _capabilities(), transport=transport
-    )
+    adapter = YahooBrokerAdapter(_config(probe_symbol="AAPL"), transport=transport)
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -139,7 +136,8 @@ def test_adapter_connect_fails_closed_when_probe_fails() -> None:
 
 def test_adapter_get_historical_bars_requires_positive_limit() -> None:
     """A missing or non-positive limit is rejected before any transport call."""
-    adapter = YahooBrokerAdapter(_config(), _capabilities(), transport=_FakeTransport())
+    adapter = YahooBrokerAdapter(_config(), transport=_FakeTransport())
+    adapter._state = BrokerConnectionState.READY
 
     async def exercise() -> None:
         result = await adapter.get_historical_bars("AAPL", "1d", limit=0)
@@ -152,7 +150,8 @@ def test_adapter_get_historical_bars_requires_positive_limit() -> None:
 def test_adapter_maps_canonical_h1_to_yfinance_interval() -> None:
     """Canonical H1 requests use provider 1h while preserving request provenance."""
     transport = _FakeTransport(table=_Table())
-    adapter = YahooBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = YahooBrokerAdapter(_config(), transport=transport)
+    adapter._state = BrokerConnectionState.READY
 
     async def exercise() -> None:
         result = await adapter.get_historical_bars("AAPL", "H1", limit=1)

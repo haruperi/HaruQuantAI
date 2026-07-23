@@ -444,6 +444,19 @@ class BrokerCapability(_Schema):
             "availability",
         )
         _choice(self.access_mode, {"READ", "WRITE", "READ_WRITE"}, "access_mode")
+        mutation_capabilities = {
+            BrokerCapabilityId.CHECK_ORDER,
+            BrokerCapabilityId.PLACE_ORDER,
+            BrokerCapabilityId.MODIFY_ORDER,
+            BrokerCapabilityId.CANCEL_ORDER,
+            BrokerCapabilityId.MODIFY_POSITION,
+            BrokerCapabilityId.CLOSE_POSITION,
+            BrokerCapabilityId.REPLACE_ORDER,
+        }
+        if self.capability in mutation_capabilities and self.access_mode != "WRITE":
+            raise ValueError("mutation capability must use WRITE access mode")
+        if self.capability not in mutation_capabilities and self.access_mode == "WRITE":
+            raise ValueError("non-mutation capability cannot use WRITE access mode")
         _choice(
             self.requirement,
             {"NONE", "AUTHENTICATION", "CONFIGURATION", "PERMISSION"},
@@ -1317,7 +1330,7 @@ class BrokerOrderRequest(_Schema):
     magic: int | None = None
     comment: str | None = None
 
-    def __post_init__(self) -> None:
+    def __post_init__(self) -> None:  # noqa: C901, PLR0912
         """Validate the immutable BrokerOrderRequest invariants.
 
         Raises:
@@ -1341,6 +1354,39 @@ class BrokerOrderRequest(_Schema):
         for name in ("limit_price", "stop_price", "stop_loss", "take_profit"):
             _finite(getattr(self, name), name)
         _utc(self.expiration, "expiration")
+        # Cross-field order type & price validation (REV-BRK-005)
+        if self.order_type == "MARKET":
+            if self.limit_price is not None or self.stop_price is not None:
+                raise ValueError(
+                    "MARKET order must not specify limit_price or stop_price"
+                )
+        elif self.order_type == "LIMIT":
+            if self.limit_price is None:
+                raise ValueError("LIMIT order requires limit_price")
+            if self.stop_price is not None:
+                raise ValueError("LIMIT order must not specify stop_price")
+            _positive(self.limit_price, "limit_price")
+        elif self.order_type == "STOP":
+            if self.stop_price is None:
+                raise ValueError("STOP order requires stop_price")
+            if self.limit_price is not None:
+                raise ValueError("STOP order must not specify limit_price")
+            _positive(self.stop_price, "stop_price")
+        elif self.order_type == "STOP_LIMIT":
+            if self.limit_price is None or self.stop_price is None:
+                raise ValueError(
+                    "STOP_LIMIT order requires both limit_price and stop_price"
+                )
+            _positive(self.limit_price, "limit_price")
+            _positive(self.stop_price, "stop_price")
+
+        # Time-in-force vs expiration matrix (REV-BRK-005)
+        if self.time_in_force == "GTD":
+            if self.expiration is None:
+                raise ValueError("GTD order requires expiration datetime")
+        elif self.expiration is not None:
+            raise ValueError("Only GTD orders may specify expiration datetime")
+
         if self.deviation_points is not None and self.deviation_points < 0:
             raise ValueError("deviation_points must not be negative")
         if self.magic is not None and self.magic < 0:

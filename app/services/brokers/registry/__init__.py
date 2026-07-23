@@ -8,7 +8,7 @@ from app.services.brokers.registry.factory import (
     get_registered_brokers,
 )
 
-__all__ = [
+__all__: list[str] = [
     "create_broker_adapter",
     "get_broker_capability_catalogue",
     "get_registered_brokers",

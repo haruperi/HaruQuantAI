@@ -8,8 +8,8 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
+    create_broker_adapter,
 )
-from app.services.brokers.testing import FakeBrokerAdapter
 
 
 def _config() -> BrokerConnectionConfig:
@@ -28,25 +28,31 @@ def _config() -> BrokerConnectionConfig:
 
 
 def test_unsupported_operation_never_calls_provider() -> None:
-    """An operation with no registered fixture returns a deterministic error."""
-    adapter = FakeBrokerAdapter(_config(), {})
+    """An unreleased mutation returns a deterministic error from root API."""
+    created = create_broker_adapter(BrokerId.DUKASCOPY, _config())
+    assert created.is_success
+    adapter = created.data
+    assert adapter is not None
 
     async def exercise() -> None:
-        result = await adapter.place_order(object())
+        result = await adapter.cancel_order("not-a-ticket")
         assert not result.is_success
         assert result.error is not None
         assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        assert result.error.capability == BrokerCapabilityId.PLACE_ORDER
+        assert result.error.capability == BrokerCapabilityId.CANCEL_ORDER
 
     asyncio.run(exercise())
 
 
 def test_unsupported_result_identifies_broker_and_environment() -> None:
-    """The unsupported result still carries broker/environment identity."""
-    adapter = FakeBrokerAdapter(_config(), {})
+    """The unsupported result carries broker/environment identity."""
+    created = create_broker_adapter(BrokerId.DUKASCOPY, _config())
+    assert created.is_success
+    adapter = created.data
+    assert adapter is not None
 
     async def exercise() -> None:
-        result = await adapter.get_order_book("EURUSD")
+        result = await adapter.cancel_order("not-a-ticket")
         assert result.broker == BrokerId.DUKASCOPY
         assert result.environment == BrokerEnvironment.SANDBOX
 

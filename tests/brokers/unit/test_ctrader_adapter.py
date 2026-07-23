@@ -4,6 +4,7 @@ import asyncio
 from collections.abc import Callable
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from app.services.brokers import (
@@ -11,6 +12,7 @@ from app.services.brokers import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerEnvironment,
+    BrokerErrorCode,
     BrokerId,
     BrokerMarginRequest,
     BrokerOrderModificationRequest,
@@ -19,7 +21,7 @@ from app.services.brokers import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
 )
-from app.services.brokers.ctrader.adapter import CTraderBrokerAdapter
+from app.services.brokers.ctrader_session.adapter import CTraderBrokerAdapter
 from pydantic import SecretStr
 
 
@@ -48,15 +50,25 @@ def _config(**overrides: object) -> BrokerConnectionConfig:
 
 
 def _capabilities() -> dict[BrokerCapabilityId, BrokerCapability]:
+    mutations = {
+        BrokerCapabilityId.CHECK_ORDER,
+        BrokerCapabilityId.PLACE_ORDER,
+        BrokerCapabilityId.MODIFY_ORDER,
+        BrokerCapabilityId.CANCEL_ORDER,
+        BrokerCapabilityId.MODIFY_POSITION,
+        BrokerCapabilityId.CLOSE_POSITION,
+        BrokerCapabilityId.REPLACE_ORDER,
+    }
     return {
         operation: BrokerCapability(
             capability=operation,
             implementation_status="IMPLEMENTED",
-            availability="AVAILABLE",
-            access_mode="READ",
+            availability="UNAVAILABLE" if operation in mutations else "AVAILABLE",
+            access_mode="WRITE" if operation in mutations else "READ",
             requirement="NONE",
             verification_status="NOT_TESTED",
             execution_model="TEST_DOUBLE",
+            reason="test release gate" if operation in mutations else None,
         )
         for operation in BrokerCapabilityId
     }
@@ -72,6 +84,13 @@ class _FakeTransport:
 
     async def close(self) -> None:
         self.closed = True
+
+
+def _implementation_adapter(transport: Any) -> CTraderBrokerAdapter:
+    """Build a private provider-mapping harness without changing production policy."""
+    adapter = CTraderBrokerAdapter(_config(), transport=transport)
+    adapter._capabilities = _capabilities()
+    return adapter
 
 
 class _OperationTransport(_FakeTransport):
@@ -206,7 +225,7 @@ class _OperationTransport(_FakeTransport):
 def test_adapter_requires_matching_account_reference() -> None:
     """The declared account reference must match the resolved account_id."""
     with pytest.raises(ValueError, match="account_reference must match account_id"):
-        CTraderBrokerAdapter(_config(account_reference="000000"), _capabilities())
+        CTraderBrokerAdapter(_config(account_reference="000000"))
 
 
 def test_adapter_rejects_incomplete_credentials() -> None:
@@ -217,15 +236,12 @@ def test_adapter_rejects_incomplete_credentials() -> None:
                 credentials={"client_id": SecretStr("client-id")},
                 account_reference=None,
             ),
-            _capabilities(),
         )
 
 
 def test_adapter_connect_succeeds_on_verified_transport() -> None:
     """A verified transport session transitions the adapter to ready."""
-    adapter = CTraderBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = _implementation_adapter(_FakeTransport(verified=True))
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -236,9 +252,7 @@ def test_adapter_connect_succeeds_on_verified_transport() -> None:
 
 def test_adapter_connect_fails_closed_without_authentication() -> None:
     """An unauthenticated transport never reports a successful connection."""
-    adapter = CTraderBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=False)
-    )
+    adapter = CTraderBrokerAdapter(_config(), transport=_FakeTransport(verified=False))
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -251,7 +265,7 @@ def test_adapter_connect_fails_closed_without_authentication() -> None:
 def test_adapter_disconnect_releases_transport() -> None:
     """Disconnecting releases the owned cTrader session transport."""
     transport = _FakeTransport(verified=True)
-    adapter = CTraderBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -263,11 +277,10 @@ def test_adapter_disconnect_releases_transport() -> None:
 
 def test_adapter_platform_info_reports_environment_endpoint() -> None:
     """Platform info reports the exact demo/live endpoint without secrets."""
-    adapter = CTraderBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = _implementation_adapter(_FakeTransport(verified=True))
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_platform_info()
         assert result.data is not None
         assert result.data.endpoint_metadata["endpoint"] == "demo.ctraderapi.com:5035"
@@ -278,7 +291,7 @@ def test_adapter_platform_info_reports_environment_endpoint() -> None:
 def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # noqa: PLR0915
     """cTrader operation groups map native units through the public adapter."""
     transport = _OperationTransport()
-    adapter = CTraderBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
     start = datetime(2026, 1, 1, tzinfo=UTC)
     end = datetime(2026, 1, 2, tzinfo=UTC)
 
@@ -312,21 +325,27 @@ def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # n
             quantity_unit="lots",
             environment=BrokerEnvironment.DEMO,
         )
-        assert (await adapter.check_order(order)).data is not None
-        assert (await adapter.place_order(order)).data is not None
+        assert (
+            await adapter.check_order(order)
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert (
+            await adapter.place_order(order)
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         assert (
             await adapter.modify_order(
                 BrokerOrderModificationRequest(order_id="11", quantity=Decimal(1))
             )
-        ).data is not None
-        assert (await adapter.cancel_order("11")).data is not None
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert (
+            await adapter.cancel_order("11")
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         assert (
             await adapter.modify_position(
                 BrokerPositionModificationRequest(
-                    position_id="21", stop_loss=Decimal("1.05")
+                    position_id="21", stop_loss=Decimal("1.09")
                 )
             )
-        ).data is not None
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         assert (
             await adapter.close_position(
                 BrokerPositionCloseRequest(
@@ -335,7 +354,7 @@ def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # n
                     quantity_unit="lots",
                 )
             )
-        ).data is not None
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         margin = await adapter.calculate_margin(
             BrokerMarginRequest(
                 symbol="EURUSD",
@@ -381,6 +400,6 @@ def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # n
             if type(request).__name__
             in {"ProtoOANewOrderReq", "ProtoOAClosePositionReq"}
         ]
-        assert native_volumes == [10_000_000, 10_000_000]
+        assert native_volumes == []
 
     asyncio.run(exercise())

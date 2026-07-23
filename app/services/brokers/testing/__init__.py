@@ -2,4 +2,4 @@
 
 from app.services.brokers.testing.fake import FakeBrokerAdapter
 
-__all__ = ["FakeBrokerAdapter"]
+__all__: list[str] = ["FakeBrokerAdapter"]

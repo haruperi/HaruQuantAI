@@ -27,6 +27,7 @@ _WRITE = {
     BrokerCapabilityId.CANCEL_ORDER,
     BrokerCapabilityId.MODIFY_POSITION,
     BrokerCapabilityId.CLOSE_POSITION,
+    BrokerCapabilityId.REPLACE_ORDER,
 }
 # Operations that mutate provider watch-list or session subscription state
 # without placing an order. They are neither pure reads nor order writes, so

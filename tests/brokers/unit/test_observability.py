@@ -4,6 +4,7 @@ import asyncio
 import logging
 
 from app.services.brokers import (
+    BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerEnvironment,
@@ -58,11 +59,34 @@ def _capture() -> tuple[_RecordCollector, logging.Logger, int]:
     return collector, domain_logger, previous_level
 
 
+def _caps() -> dict[BrokerCapabilityId, BrokerCapability]:
+    return {
+        BrokerCapabilityId.CONNECT: BrokerCapability(
+            capability=BrokerCapabilityId.CONNECT,
+            implementation_status="IMPLEMENTED",
+            availability="AVAILABLE",
+            access_mode="READ",
+            requirement="NONE",
+            verification_status="NOT_TESTED",
+            execution_model="TEST_DOUBLE",
+        ),
+        BrokerCapabilityId.GET_QUOTE: BrokerCapability(
+            capability=BrokerCapabilityId.GET_QUOTE,
+            implementation_status="IMPLEMENTED",
+            availability="AVAILABLE",
+            access_mode="READ",
+            requirement="NONE",
+            verification_status="NOT_TESTED",
+            execution_model="TEST_DOUBLE",
+        ),
+    }
+
+
 def test_operations_emit_structured_logs() -> None:
     """A completed operation emits a record with the NFR-BRK-008 fields."""
     collector, domain_logger, previous_level = _capture()
     try:
-        adapter = FakeBrokerAdapter(_config(), {})
+        adapter = FakeBrokerAdapter(_config(), _caps())
         asyncio.run(adapter.connect())
     finally:
         domain_logger.removeHandler(collector)
@@ -89,7 +113,7 @@ def test_state_transitions_are_logged() -> None:
     """Every verified state transition emits a lifecycle record."""
     collector, domain_logger, previous_level = _capture()
     try:
-        adapter = FakeBrokerAdapter(_config(), {})
+        adapter = FakeBrokerAdapter(_config(), _caps())
         asyncio.run(adapter.connect())
     finally:
         domain_logger.removeHandler(collector)
@@ -104,7 +128,8 @@ def test_error_results_log_provider_code_without_secret_leak() -> None:
     """An error result logs its provider code and never leaks a secret."""
     collector, domain_logger, previous_level = _capture()
     try:
-        adapter = FakeBrokerAdapter(_config(), {})
+        adapter = FakeBrokerAdapter(_config(), _caps())
+        asyncio.run(adapter.connect())
         adapter.inject_error(
             BrokerCapabilityId.GET_QUOTE,
             BrokerError(

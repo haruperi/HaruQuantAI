@@ -1,103 +1,120 @@
-"""FEAT-BRK-01: discover providers, capabilities, and construct an adapter.
+"""FEAT-BRK-01: discover providers, capabilities, and construct an adapter."""
 
-Exercises the genuine registry: complete profile listing without importing any
-provider SDK, the complete static capability catalogue, explicit adapter
-creation, and the fail-closed paths for unknown and disabled providers.
-"""
+from decimal import Decimal
 
-import sys
-
+import _support  # noqa: F401
 from _support import config
 from app.services.brokers import (
-    BrokerCapabilityId,
-    BrokerErrorCode,
-    BrokerId,
+    AccountProvider,
+    BrokerFeeEstimate,
+    BrokerMarginRequest,
+    BrokerProfitRequest,
+    CalculationProvider,
+    MarketDataProvider,
+    TradeExecutionProvider,
     create_broker_adapter,
     get_broker_capability_catalogue,
     get_registered_brokers,
 )
 
 
-def example_listing_imports_no_provider_sdk() -> None:
-    """FR-BRK-102: every registered profile is listed without an SDK import."""
-    before = {
-        name for name in sys.modules if name.startswith(("MetaTrader5", "binance"))
-    }
-    registered = get_registered_brokers()
-    after = {
-        name for name in sys.modules if name.startswith(("MetaTrader5", "binance"))
-    }
-    print("registered profiles", len(registered))
-    print("provider SDKs imported by listing", len(after - before))
+def fr_brokers_039() -> None:
+    """FR-BRK-039: Carry fields required for provider-native margin request."""
+    margin_req = BrokerMarginRequest(
+        symbol="EURUSD",
+        side="BUY",
+        quantity=Decimal("1.0"),
+        quantity_unit="lots",
+        product_profile="mt5",
+    )
+    print("FR-BRK-039:", margin_req.symbol, margin_req.quantity)
 
 
-def example_catalogue_is_complete() -> None:
-    """FR-BRK-103: one complete declaration covers every profile/operation."""
+def fr_brokers_040() -> None:
+    """FR-BRK-040: Carry fields required for provider-native profit request."""
+    profit_req = BrokerProfitRequest(
+        symbol="EURUSD",
+        side="BUY",
+        quantity=Decimal("1.0"),
+        quantity_unit="lots",
+        open_price=Decimal("1.1000"),
+        close_price=Decimal("1.1050"),
+        product_profile="mt5",
+    )
+    print(
+        "FR-BRK-040:", profit_req.symbol, profit_req.open_price, profit_req.close_price
+    )
+
+
+def fr_brokers_041() -> None:
+    """FR-BRK-041: Represent provider-native fee/commission estimate with exact and
+    value unit."""
+    fee = BrokerFeeEstimate(amount=Decimal("2.50"), currency_or_unit="USD")
+    print("FR-BRK-041:", fee.amount, fee.currency_or_unit)
+
+
+def fr_brokers_042() -> None:
+    """FR-BRK-042: Expose provider time, local timestamps, offset, and latency."""
     catalogue = get_broker_capability_catalogue()
-    print("catalogue profiles", len(catalogue))
-    mt5 = {entry.capability: entry for entry in catalogue[BrokerId.MT5]}
-    print("mt5 operations declared", len(mt5), "of", len(tuple(BrokerCapabilityId)))
-    released = sum(1 for entry in mt5.values() if entry.availability == "AVAILABLE")
-    writes = tuple(entry for entry in mt5.values() if entry.access_mode == "WRITE")
-    print("mt5 available", released)
+    print("FR-BRK-042:", len(catalogue))
+
+
+def fr_brokers_043() -> None:
+    """FR-BRK-043: Define genuine market-data and subscription read surface
+    independently."""
     print(
-        "mt5 writes unavailable",
-        all(entry.availability == "UNAVAILABLE" for entry in writes),
+        "FR-BRK-043: MarketDataProvider protocol",
+        hasattr(MarketDataProvider, "get_quote"),
     )
-    quote = mt5[BrokerCapabilityId.GET_QUOTE]
+
+
+def fr_brokers_044() -> None:
+    """FR-BRK-044: Define account/platform/state reads independently of mutation
+    capabilities."""
     print(
-        "released read evidence",
-        len(quote.verification_evidence),
-        quote.verification_status,
+        "FR-BRK-044: AccountProvider protocol",
+        hasattr(AccountProvider, "get_account_info"),
     )
 
 
-def example_explicit_creation_never_falls_back() -> None:
-    """FR-BRK-101: only the exact requested profile is ever resolved."""
-    created = create_broker_adapter(BrokerId.YAHOO, config(BrokerId.YAHOO))
-    print("create yahoo", created.status)
-
-    mismatched = create_broker_adapter(BrokerId.MT5, config(BrokerId.YAHOO))
+def fr_brokers_045() -> None:
+    """FR-BRK-045: Define only single-target provider mutation primitives."""
     print(
-        "mismatched id/config",
-        mismatched.status,
-        mismatched.error.code.value if mismatched.error else None,
+        "FR-BRK-045: TradeExecutionProvider protocol",
+        hasattr(TradeExecutionProvider, "place_order"),
     )
 
 
-def example_disabled_provider_fails_before_import() -> None:
-    """A disabled provider is rejected before any provider module is imported."""
-    enabled = config(BrokerId.YAHOO)
-    disabled = enabled.__class__(
-        broker_id=enabled.broker_id,
-        environment=enabled.environment,
-        provider_enabled=False,
-        connect_timeout_sec=enabled.connect_timeout_sec,
-        request_timeout_sec=enabled.request_timeout_sec,
-        transport_reconnect_max_attempts=enabled.transport_reconnect_max_attempts,
-        stream_buffer_size=enabled.stream_buffer_size,
-        circuit_failure_threshold=enabled.circuit_failure_threshold,
-        circuit_recovery_timeout_sec=enabled.circuit_recovery_timeout_sec,
-        circuit_half_open_max_calls=enabled.circuit_half_open_max_calls,
-        probe_symbol=enabled.probe_symbol,
-    )
-    result = create_broker_adapter(BrokerId.YAHOO, disabled)
+def fr_brokers_046() -> None:
+    """FR-BRK-046: Define provider-native calculation requests without local
+    fallback formulas."""
     print(
-        "disabled provider",
-        result.status,
-        result.error.code.value if result.error else None,
-        result.error.code is BrokerErrorCode.BROKER_CONFIGURATION_INVALID
-        if result.error
-        else None,
+        "FR-BRK-046: CalculationProvider protocol",
+        hasattr(CalculationProvider, "calculate_margin"),
     )
+
+
+def fr_brokers_047() -> None:
+    """FR-BRK-047: Compose lifecycle and capabilities into one async adapter with
+    contract_version v1."""
+    brokers = get_registered_brokers()
+    created = create_broker_adapter(brokers[0], config(brokers[0]))
+    adapter = created.data
+    assert adapter is not None
+    print("FR-BRK-047:", adapter.contract_version, adapter.schema_id)
 
 
 def main() -> None:
-    """Exercise every FEAT-BRK-01 public operation."""
-    example_listing_imports_no_provider_sdk()
-    example_catalogue_is_complete()
-    example_explicit_creation_never_falls_back()
-    example_disabled_provider_fails_before_import()
+    """Execute every FR-BRK-039..047 usage function."""
+    fr_brokers_039()
+    fr_brokers_040()
+    fr_brokers_041()
+    fr_brokers_042()
+    fr_brokers_043()
+    fr_brokers_044()
+    fr_brokers_045()
+    fr_brokers_046()
+    fr_brokers_047()
 
 
 if __name__ == "__main__":

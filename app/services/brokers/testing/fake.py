@@ -3,10 +3,12 @@
 # ruff: noqa: ANN401 - generated fixed protocol methods preserve fixture types.
 
 import inspect
+import types
 from collections.abc import Mapping
 from datetime import UTC, datetime
-from typing import Any, override
+from typing import Any, cast, get_args, get_origin, get_type_hints, override
 
+from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
 from app.services.brokers.contracts import (
     BrokerCapability,
     BrokerCapabilityId,
@@ -21,7 +23,6 @@ from app.services.brokers.contracts.protocols import (
     BrokerAdapter,
     _UnsupportedAdapterBase,
 )
-from app.services.brokers.runtime.subscription import _BrokerSubscription
 from app.utils import generate_id
 
 _SUBSCRIPTION_OPERATIONS = {
@@ -45,7 +46,7 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
     def __init__(
         self,
         config: BrokerConnectionConfig,
-        capabilities: Mapping[BrokerCapabilityId, BrokerCapability],
+        capabilities: Mapping[BrokerCapabilityId, BrokerCapability] | None = None,
         *,
         fixtures: Mapping[BrokerCapabilityId, object] | None = None,
         errors: Mapping[BrokerCapabilityId, BrokerError] | None = None,
@@ -54,12 +55,18 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
 
         Args:
             config: Immutable connection configuration for this instance.
-            capabilities: Complete declared capability map honoured by the gate.
+            capabilities: Optional non-production capability declaration used
+                by contract tests. Production adapters never accept this input.
             fixtures: Optional per-operation deterministic success payloads.
             errors: Optional per-operation deterministic canonical failures.
         """
-        super().__init__(config, capabilities)
-        self._fixtures = dict(fixtures or {})
+        super().__init__(config)
+        if capabilities is not None:
+            self._capabilities = dict(capabilities)
+        self._fixtures: dict[BrokerCapabilityId, object] = {}
+        for operation, fixture in (fixtures or {}).items():
+            self._validate_fixture(operation, fixture)
+            self._fixtures[operation] = fixture
         self._errors = dict(errors or {})
         self._subscriptions: dict[str, _BrokerSubscription[Any]] = {}
 
@@ -122,7 +129,37 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
             return self._open_subscription(operation)
         if operation not in self._fixtures:
             return self._unsupported(operation)
-        return self._result(operation, data=self._fixtures[operation])
+        fixture = self._fixtures[operation]
+        self._validate_fixture(operation, fixture)
+        return self._result(operation, data=fixture)
+
+    @staticmethod
+    def _validate_fixture(
+        operation: BrokerCapabilityId,
+        fixture: object,
+    ) -> None:
+        """Validate a fixture against the protocol's success payload.
+
+        Args:
+            operation: Capability receiving the fixture.
+            fixture: Proposed deterministic success payload.
+
+        Raises:
+            TypeError: If the payload cannot satisfy the public result contract.
+        """
+        if operation in _SUBSCRIPTION_OPERATIONS:
+            if not (
+                isinstance(fixture, tuple)
+                and all(isinstance(symbol, str) and symbol for symbol in fixture)
+            ):
+                raise TypeError("subscription fixture must be a tuple of symbols")
+            return
+        method = getattr(BrokerAdapter, operation.value)
+        return_type = get_type_hints(method)["return"]
+        payload_type = get_args(return_type)[0]
+        if not _matches_payload(fixture, payload_type):
+            message = f"{operation.value} fixture does not match {payload_type!r}"
+            raise TypeError(message)
 
     def _open_subscription(
         self, operation: BrokerCapabilityId
@@ -248,3 +285,42 @@ for _operation_id in BrokerCapabilityId:
         setattr(
             FakeBrokerAdapter, _operation_id.value, _make_fake_method(_operation_id)
         )
+
+
+def _matches_payload(  # noqa: PLR0911
+    value: object,
+    expected: object,
+) -> bool:
+    """Return whether a value satisfies a resolved payload annotation.
+
+    Args:
+        value: Fixture value under validation.
+        expected: Resolved payload annotation inside ``BrokerResult``.
+
+    Returns:
+        Whether the value satisfies the annotation recursively.
+    """
+    if expected is Any:
+        return True
+    if expected is None or expected is type(None):
+        return value is None
+    origin = get_origin(expected)
+    args = get_args(expected)
+    if origin in {types.UnionType, getattr(types, "UnionType", object)}:
+        return any(_matches_payload(value, item) for item in args)
+    if origin is tuple:
+        if not isinstance(value, tuple):
+            return False
+        if len(args) == len((None, None)) and args[1] is Ellipsis:
+            return all(_matches_payload(item, args[0]) for item in value)
+        return len(value) == len(args) and all(
+            _matches_payload(item, item_type)
+            for item, item_type in zip(value, args, strict=True)
+        )
+    if origin is not None:
+        if not isinstance(value, origin):
+            return False
+        if origin.__name__ == "BrokerPage" and args:
+            return all(_matches_payload(item, args[0]) for item in value.items)
+        return True
+    return isinstance(value, cast("type[object]", expected))

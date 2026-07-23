@@ -1,136 +1,157 @@
-"""FEAT-BRK-07: exercise the MT5 single-target mutation surface.
-
-Runs the genuine `MT5BrokerAdapter` over an offline transport. Real request
-construction, provider acknowledgement mapping, pre-transmission validation and
-fail-closed unknown-outcome behaviour execute without a terminal or live order.
-"""
+"""FEAT-BRK-07: MetaTrader 5 mutation capabilities."""
 
 import asyncio
 from decimal import Decimal
 
-from _support import (
-    OfflineMT5Transport,
-    available_capabilities,
-    config,
-    show,
-    show_value,
-    unavailable_capabilities,
-)
+import _support  # noqa: F401
+from _support import config
 from app.services.brokers import (
     BrokerEnvironment,
+    BrokerErrorCode,
     BrokerId,
     BrokerOrderModificationRequest,
     BrokerOrderRequest,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-    MT5BrokerAdapter,
+    create_broker_adapter,
 )
 
-_REQUEST_ID = "req-2f1d5a6c-8b3e-4c17-9f52-70a1c8d94e33"
 
-
-def _order() -> BrokerOrderRequest:
-    """Build one complete, structurally valid V1 order request."""
-    return BrokerOrderRequest(
+def fr_brokers_091() -> None:
+    """FR-BRK-091: Validate order request before transmission."""
+    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
+    assert adapter is not None
+    req = BrokerOrderRequest(
         symbol="EURUSD",
         side="BUY",
         order_type="MARKET",
         quantity=Decimal("0.01"),
         quantity_unit="lots",
         environment=BrokerEnvironment.DEMO,
-        client_request_id=_REQUEST_ID,
     )
 
+    async def run() -> None:
+        res = await adapter.check_order(req)
+        print("FR-BRK-091:", res.error.code if res.error else None)
 
-async def example_acknowledged_mutations() -> None:
-    """Every single-target mutation maps an explicit provider acknowledgement."""
-    transport = OfflineMT5Transport()
-    adapter = MT5BrokerAdapter(
-        config(BrokerId.MT5), available_capabilities(), transport=transport
-    )
-    await adapter.connect()
+    asyncio.run(run())
 
-    checked = await adapter.check_order(_order())
-    show_value(
-        "check",
-        checked,
-        f"accepted={checked.data.accepted_for_submission} "
-        f"final={checked.data.is_final_acceptance}"
-        if checked.data
-        else None,
-    )
 
-    placed = await adapter.place_order(_order())
-    show_value(
-        "place",
-        placed,
-        f"outcome={placed.data.outcome} order_id={placed.data.order_id}"
-        if placed.data
-        else None,
+def fr_brokers_092() -> None:
+    """FR-BRK-092: Submit single order mutation once without retry."""
+    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
+    assert adapter is not None
+    req = BrokerOrderRequest(
+        symbol="EURUSD",
+        side="BUY",
+        order_type="MARKET",
+        quantity=Decimal("0.01"),
+        quantity_unit="lots",
+        environment=BrokerEnvironment.DEMO,
     )
 
-    show(
-        "modify-order",
-        await adapter.modify_order(
-            BrokerOrderModificationRequest(
-                order_id="555002",
-                client_request_id=_REQUEST_ID,
-                limit_price=Decimal("1.09000"),
-            )
-        ),
+    async def run() -> None:
+        res = await adapter.place_order(req)
+        assert res.error is not None
+        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        print("FR-BRK-092: unreleased write blocked closed")
+
+    asyncio.run(run())
+
+
+def fr_brokers_093() -> None:
+    """FR-BRK-093: Modify single existing pending order."""
+    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
+    assert adapter is not None
+    mod = BrokerOrderModificationRequest(order_id="o1", limit_price=Decimal("1.11"))
+
+    async def run() -> None:
+        res = await adapter.modify_order(mod)
+        assert res.error is not None
+        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        print("FR-BRK-093: unreleased write blocked closed")
+
+    asyncio.run(run())
+
+
+def fr_brokers_094() -> None:
+    """FR-BRK-094: Cancel single pending order."""
+    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.cancel_order("o1")
+        assert res.error is not None
+        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        print("FR-BRK-094: unreleased write blocked closed")
+
+    asyncio.run(run())
+
+
+def fr_brokers_095() -> None:
+    """FR-BRK-095: Modify single position stop-loss/take-profit."""
+    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
+    assert adapter is not None
+    mod = BrokerPositionModificationRequest(position_id="p1", stop_loss=Decimal("1.09"))
+
+    async def run() -> None:
+        res = await adapter.modify_position(mod)
+        assert res.error is not None
+        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        print("FR-BRK-095: unreleased write blocked closed")
+
+    asyncio.run(run())
+
+
+def fr_brokers_096() -> None:
+    """FR-BRK-096: Close or reduce single position."""
+    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
+    assert adapter is not None
+    close = BrokerPositionCloseRequest(
+        position_id="p1", quantity=Decimal("0.5"), quantity_unit="lots"
     )
-    show("cancel-order", await adapter.cancel_order("555002", _REQUEST_ID))
-    show(
-        "modify-position",
-        await adapter.modify_position(
-            BrokerPositionModificationRequest(
-                position_id="555001",
-                client_request_id=_REQUEST_ID,
-                stop_loss=Decimal("1.09000"),
-            )
-        ),
+
+    async def run() -> None:
+        res = await adapter.close_position(close)
+        assert res.error is not None
+        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        print("FR-BRK-096: unreleased write blocked closed")
+
+    asyncio.run(run())
+
+
+def fr_brokers_097() -> None:
+    """FR-BRK-097: Replace single order in single atomic operation."""
+    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
+    assert adapter is not None
+    req = BrokerOrderRequest(
+        symbol="EURUSD",
+        side="BUY",
+        order_type="MARKET",
+        quantity=Decimal("0.01"),
+        quantity_unit="lots",
+        environment=BrokerEnvironment.DEMO,
     )
-    show(
-        "close-position",
-        await adapter.close_position(
-            BrokerPositionCloseRequest(
-                position_id="555001",
-                quantity=Decimal("0.25"),
-                quantity_unit="lots",
-                client_request_id=_REQUEST_ID,
-            )
-        ),
-    )
-    print("provider calls", len(transport.calls))
+
+    async def run() -> None:
+        res = await adapter.replace_order("o1", req)
+        assert res.error is not None
+        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        print("FR-BRK-097: unreleased write blocked closed")
+
+    asyncio.run(run())
 
 
-async def example_invalid_target_is_rejected_before_transmission() -> None:
-    """A malformed caller identifier never becomes an uncertain outcome."""
-    transport = OfflineMT5Transport()
-    adapter = MT5BrokerAdapter(
-        config(BrokerId.MT5), available_capabilities(), transport=transport
-    )
-    await adapter.connect()
-    show("cancel-invalid-target", await adapter.cancel_order("not-a-ticket"))
-    print("order_send calls", transport.calls.count("order_send"))
-
-
-async def example_writes_remain_unreleased() -> None:
-    """Mutations stay fail-closed while the release gate is unsatisfied."""
-    transport = OfflineMT5Transport()
-    adapter = MT5BrokerAdapter(
-        config(BrokerId.MT5), unavailable_capabilities(), transport=transport
-    )
-    show("gated-place", await adapter.place_order(_order()))
-    print("provider calls while gated", len(transport.calls))
-
-
-async def main() -> None:
-    """Exercise every FEAT-BRK-07 operation offline."""
-    await example_acknowledged_mutations()
-    await example_invalid_target_is_rejected_before_transmission()
-    await example_writes_remain_unreleased()
+def main() -> None:
+    """Execute every FR-BRK-091..097 usage function."""
+    fr_brokers_091()
+    fr_brokers_092()
+    fr_brokers_093()
+    fr_brokers_094()
+    fr_brokers_095()
+    fr_brokers_096()
+    fr_brokers_097()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

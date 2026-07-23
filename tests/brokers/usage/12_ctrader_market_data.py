@@ -1,109 +1,83 @@
-"""FEAT-BRK-12: exercise the cTrader market-data read surface.
-
-Runs the genuine `CTraderBrokerAdapter` over an offline sender so real protobuf
-decoding, symbol specification mapping, tick/trendbar translation, and provider
-spread derivation execute without Spotware network traffic.
-"""
+"""FEAT-BRK-12: cTrader market data."""
 
 import asyncio
-from datetime import UTC, datetime
 
-from _support import (
-    OfflineCTraderTransport,
-    available_capabilities,
-    config,
-    show,
-    show_value,
-    unavailable_capabilities,
+import _support  # noqa: F401
+from _support import config
+from app.services.brokers import (
+    BrokerId,
+    create_broker_adapter,
 )
-from app.services.brokers import BrokerId, CTraderBrokerAdapter
-
-_START = datetime(2023, 11, 14, tzinfo=UTC)
-_END = datetime(2023, 11, 15, tzinfo=UTC)
 
 
-async def example_market_data_reads() -> None:
-    """Every accepted cTrader read maps genuine decoded provider truth."""
-    transport = OfflineCTraderTransport()
-    adapter = CTraderBrokerAdapter(
-        config(BrokerId.CTRADER), available_capabilities(), transport=transport
-    )
-    await adapter.connect()
+def fr_brokers_124() -> None:
+    """FR-BRK-124: Fetch cTrader symbols."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
 
-    symbols = await adapter.get_symbols(limit=5)
-    show_value(
-        "symbols",
-        symbols,
-        tuple(item.provider_symbol for item in symbols.data.items)
-        if symbols.data
-        else None,
-    )
+    async def run() -> None:
+        res = await adapter.get_symbols(limit=5)
+        print("FR-BRK-124:", res.status)
 
-    info = await adapter.get_symbol_info("EURUSD")
-    show_value(
-        "symbol-info",
-        info,
-        f"digits={info.data.price_precision}" if info.data else None,
-    )
-
-    quote = await adapter.get_quote("EURUSD")
-    show_value(
-        "quote",
-        quote,
-        f"bid={quote.data.bid} ask={quote.data.ask}" if quote.data else None,
-    )
-
-    spread = await adapter.get_spread("EURUSD")
-    show_value("spread", spread, spread.data)
-
-    ticks = await adapter.get_ticks("EURUSD", _START, _END, limit=5)
-    show_value(
-        "ticks",
-        ticks,
-        f"count={ticks.data.returned_count}" if ticks.data else None,
-    )
-
-    bars = await adapter.get_historical_bars("EURUSD", "M1", _START, _END, limit=5)
-    show_value(
-        "bars",
-        bars,
-        f"close={bars.data.items[0].close} count={bars.data.returned_count}"
-        if bars.data
-        else None,
-    )
-    print("provider requests", len(transport.requests))
+    asyncio.run(run())
 
 
-async def example_unsupported_timeframe_never_falls_back() -> None:
-    """An unsupported timeframe fails explicitly and never becomes H1."""
-    adapter = CTraderBrokerAdapter(
-        config(BrokerId.CTRADER),
-        available_capabilities(),
-        transport=OfflineCTraderTransport(),
-    )
-    await adapter.connect()
-    show(
-        "unsupported-timeframe",
-        await adapter.get_historical_bars("EURUSD", "M7", _START, _END, limit=1),
-    )
+def fr_brokers_125() -> None:
+    """FR-BRK-125: Fetch cTrader symbol info."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_symbol_info("EURUSD")
+        print("FR-BRK-125:", res.status)
+
+    asyncio.run(run())
 
 
-async def example_reads_remain_gated() -> None:
-    """A gated read returns unsupported without a provider request."""
-    transport = OfflineCTraderTransport()
-    adapter = CTraderBrokerAdapter(
-        config(BrokerId.CTRADER), unavailable_capabilities(), transport=transport
-    )
-    show("gated-quote", await adapter.get_quote("EURUSD"))
-    print("provider requests while gated", len(transport.requests))
+def fr_brokers_126() -> None:
+    """FR-BRK-126: Fetch cTrader quote."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_quote("EURUSD")
+        print("FR-BRK-126:", res.status)
+
+    asyncio.run(run())
 
 
-async def main() -> None:
-    """Exercise every FEAT-BRK-12 operation offline."""
-    await example_market_data_reads()
-    await example_unsupported_timeframe_never_falls_back()
-    await example_reads_remain_gated()
+def fr_brokers_127() -> None:
+    """FR-BRK-127: Fetch cTrader ticks."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_ticks("EURUSD", limit=5)
+        print("FR-BRK-127:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_128() -> None:
+    """FR-BRK-128: Fetch cTrader historical bars."""
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_historical_bars("EURUSD", "1m", limit=5)
+        print("FR-BRK-128:", res.status)
+
+    asyncio.run(run())
+
+
+def main() -> None:
+    """Execute every FR-BRK-124..128 usage function."""
+    fr_brokers_124()
+    fr_brokers_125()
+    fr_brokers_126()
+    fr_brokers_127()
+    fr_brokers_128()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

@@ -21,7 +21,7 @@ from app.services.brokers import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
 )
-from app.services.brokers.mt5.adapter import MT5BrokerAdapter
+from app.services.brokers.mt5_account.adapter import MT5BrokerAdapter
 from pydantic import SecretStr
 
 
@@ -242,14 +242,12 @@ def test_adapter_rejects_mismatched_account_reference() -> None:
         },
     )
     with pytest.raises(ValueError, match="account_reference must match login"):
-        MT5BrokerAdapter(bad, _capabilities())
+        MT5BrokerAdapter(bad)
 
 
 def test_adapter_connect_verifies_account_and_server() -> None:
     """A successful transport verification transitions to a ready session."""
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -272,9 +270,7 @@ def test_adapter_connect_fails_closed_on_account_mismatch() -> None:
                 return {}
             return None
 
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_MismatchedTransport()
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_MismatchedTransport())
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -294,7 +290,7 @@ def test_adapter_get_symbol_info_not_found_is_structured() -> None:
                 return None
             return await super().call(name, *args, **kwargs)
 
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=_EmptyTransport())
+    adapter = MT5BrokerAdapter(_config(), transport=_EmptyTransport())
 
     async def exercise() -> None:
         await adapter.connect()
@@ -308,7 +304,7 @@ def test_adapter_get_symbol_info_not_found_is_structured() -> None:
 def test_adapter_disconnect_releases_transport() -> None:
     """Disconnecting the adapter releases the owned transport handle."""
     transport = _FakeTransport(verified=True)
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = MT5BrokerAdapter(_config(), transport=transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -320,9 +316,7 @@ def test_adapter_disconnect_releases_transport() -> None:
 
 def test_adapter_get_symbols_and_ping() -> None:
     """Symbols map genuine values and ping succeeds on a verified terminal."""
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
 
     async def exercise() -> None:
         await adapter.connect()
@@ -344,9 +338,7 @@ def test_adapter_select_symbol_reports_not_found() -> None:
                 return False
             return await super().call(name, *args, **kwargs)
 
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_RejectingTransport()
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_RejectingTransport())
 
     async def exercise() -> None:
         await adapter.connect()
@@ -360,9 +352,7 @@ def test_adapter_select_symbol_reports_not_found() -> None:
 
 def test_adapter_get_quote_and_ticks() -> None:
     """Quotes and ticks map genuine terminal values."""
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
 
     async def exercise() -> None:
         await adapter.connect()
@@ -404,7 +394,6 @@ def test_adapter_bounds_numpy_tick_pages_without_ambiguous_truth_checks() -> Non
 
     adapter = MT5BrokerAdapter(
         _config(),
-        _capabilities(),
         transport=_NumpyTickTransport(),
     )
 
@@ -425,9 +414,7 @@ def test_adapter_bounds_numpy_tick_pages_without_ambiguous_truth_checks() -> Non
 
 def test_adapter_get_latest_ticks_bars_and_spread() -> None:
     """Omitted ranges retrieve bounded recent MT5 evidence."""
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
 
     async def exercise() -> None:
         await adapter.connect()
@@ -453,9 +440,7 @@ def test_adapter_get_latest_ticks_bars_and_spread() -> None:
 
 def test_adapter_get_positions_maps_open_state() -> None:
     """Positions map genuine terminal position state."""
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
 
     async def exercise() -> None:
         await adapter.connect()
@@ -468,9 +453,7 @@ def test_adapter_get_positions_maps_open_state() -> None:
 
 def test_adapter_get_platform_info_reports_terminal_version() -> None:
     """Platform info exposes the redacted terminal version and environment."""
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
 
     async def exercise() -> None:
         await adapter.connect()
@@ -484,9 +467,7 @@ def test_adapter_get_platform_info_reports_terminal_version() -> None:
 
 def test_adapter_account_history_mutation_and_calculation_operations() -> None:
     """Implemented MT5 operation groups preserve provider evidence."""
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=True)
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
     start = datetime(2026, 1, 1, tzinfo=UTC)
     end = datetime(2026, 1, 2, tzinfo=UTC)
 
@@ -519,23 +500,29 @@ def test_adapter_account_history_mutation_and_calculation_operations() -> None:
             quantity_unit="lots",
             environment=BrokerEnvironment.DEMO,
         )
-        assert (await adapter.check_order(order)).data is not None
-        assert (await adapter.place_order(order)).data is not None
+        assert (
+            await adapter.check_order(order)
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert (
+            await adapter.place_order(order)
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         assert (
             await adapter.modify_order(
                 BrokerOrderModificationRequest(
                     order_id="11", limit_price=Decimal("1.2")
                 )
             )
-        ).data is not None
-        assert (await adapter.cancel_order("11")).data is not None
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert (
+            await adapter.cancel_order("11")
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         assert (
             await adapter.modify_position(
                 BrokerPositionModificationRequest(
                     position_id="1", stop_loss=Decimal("1.0")
                 )
             )
-        ).data is not None
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         assert (
             await adapter.close_position(
                 BrokerPositionCloseRequest(
@@ -544,7 +531,7 @@ def test_adapter_account_history_mutation_and_calculation_operations() -> None:
                     quantity_unit="lots",
                 )
             )
-        ).data is not None
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         margin = await adapter.calculate_margin(
             BrokerMarginRequest(
                 symbol="EURUSD",
@@ -592,7 +579,7 @@ def test_adapter_rejects_non_live_or_demo_env() -> None:
         },
     )
     with pytest.raises(ValueError, match="MT5 requires LIVE or DEMO"):
-        MT5BrokerAdapter(bad, _capabilities())
+        MT5BrokerAdapter(bad)
 
 
 def test_adapter_rejects_endpoint_override() -> None:
@@ -617,7 +604,7 @@ def test_adapter_rejects_endpoint_override() -> None:
         },
     )
     with pytest.raises(ValueError, match="MT5 does not accept endpoint override"):
-        MT5BrokerAdapter(bad, _capabilities())
+        MT5BrokerAdapter(bad)
 
 
 def test_adapter_rejects_missing_credentials() -> None:
@@ -638,7 +625,7 @@ def test_adapter_rejects_missing_credentials() -> None:
     )
     msg = "MT5 resolved login, password, and server are required"
     with pytest.raises(ValueError, match=msg):
-        MT5BrokerAdapter(bad, _capabilities())
+        MT5BrokerAdapter(bad)
 
 
 def test_adapter_connect_handles_transport_exception() -> None:
@@ -648,9 +635,7 @@ def test_adapter_connect_handles_transport_exception() -> None:
         async def connect(self) -> bool:
             raise ConnectionError("failed to connect")
 
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FailingTransport()
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FailingTransport())
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -663,9 +648,7 @@ def test_adapter_connect_handles_transport_exception() -> None:
 
 def test_adapter_connect_fails_if_initialized_is_false() -> None:
     """A transport reporting initialized is False transitions to failed connection."""
-    adapter = MT5BrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport(verified=False)
-    )
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=False))
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -684,10 +667,12 @@ def test_adapter_ping_unsupported_if_terminal_none() -> None:
             return await super().call(name, *args, **kwargs)
 
     transport = _NoTerminalTransport()
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = MT5BrokerAdapter(_config(), transport=transport)
+    from app.services.brokers import BrokerConnectionState
 
     async def exercise() -> None:
         await adapter.connect()
+        adapter._state = BrokerConnectionState.READY
         result = await adapter.ping()
         assert not result.is_success
         assert result.error is not None
@@ -698,7 +683,7 @@ def test_adapter_ping_unsupported_if_terminal_none() -> None:
 
 def test_adapter_get_symbols_invalid_limit() -> None:
     """Retrieving symbols with an invalid limit raises ValueError."""
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=_FakeTransport())
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
         await adapter.connect()
@@ -711,7 +696,7 @@ def test_adapter_get_symbols_invalid_limit() -> None:
 
 def test_adapter_get_ticks_invalid_parameters() -> None:
     """Retrieving ticks with missing or invalid parameters raises ValueError."""
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=_FakeTransport())
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
         await adapter.connect()
@@ -736,7 +721,7 @@ def test_adapter_get_account_info_not_found() -> None:
             return await super().call(name, *args, **kwargs)
 
     transport = _NoAccountTransport()
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = MT5BrokerAdapter(_config(), transport=transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -751,7 +736,7 @@ def test_adapter_get_account_info_not_found() -> None:
 
 def test_adapter_get_positions_invalid_limit() -> None:
     """Retrieving positions with an invalid limit raises ValueError."""
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=_FakeTransport())
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
         await adapter.connect()
@@ -777,7 +762,7 @@ def test_adapter_get_symbol_info_success() -> None:
                 }
             return await super().call(name, *args, **kwargs)
 
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=_SymbolTransport())
+    adapter = MT5BrokerAdapter(_config(), transport=_SymbolTransport())
 
     async def exercise() -> None:
         await adapter.connect()
@@ -799,7 +784,7 @@ def test_adapter_get_quote_not_found() -> None:
             return await super().call(name, *args, **kwargs)
 
     transport = _NoQuoteTransport()
-    adapter = MT5BrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = MT5BrokerAdapter(_config(), transport=transport)
 
     async def exercise() -> None:
         await adapter.connect()

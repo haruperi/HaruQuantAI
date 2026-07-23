@@ -5,8 +5,9 @@ from collections.abc import Awaitable, Callable, Mapping
 from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
+from typing import TYPE_CHECKING
 
-from app.services.brokers.contracts import (
+from app.services.brokers import (
     BrokerAdapter,
     BrokerConnectionConfig,
     BrokerErrorCode,
@@ -19,9 +20,11 @@ from app.services.brokers.contracts import (
     BrokerResult,
 )
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
-from app.services.trading.contracts.models import JsonValue
 from app.services.trading.routing.responses import classify_authority_response
 from app.utils import canonical_json, logger
+
+if TYPE_CHECKING:
+    from app.services.trading.contracts.models import JsonValue
 
 _CLASSIFICATION_POLICY: Mapping[str, JsonValue] = {
     "malformed_response_policy": "unknown_outcome",

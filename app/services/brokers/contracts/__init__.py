@@ -55,7 +55,7 @@ from app.services.brokers.contracts.protocols import (
     TradeExecutionProvider,
 )
 
-__all__ = [
+__all__: list[str] = [
     "AccountProvider",
     "BrokerAccountInfo",
     "BrokerAccountTransaction",

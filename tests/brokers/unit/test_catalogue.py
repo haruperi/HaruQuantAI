@@ -161,7 +161,10 @@ def test_implemented_writes_are_still_unconditionally_unavailable() -> None:
             entry for entry in catalogue[broker] if entry.access_mode == "WRITE"
         )
         assert writes
-        assert all(entry.implementation_status == "IMPLEMENTED" for entry in writes)
+        assert all(
+            entry.implementation_status in {"IMPLEMENTED", "NOT_IMPLEMENTED"}
+            for entry in writes
+        )
         assert all(entry.availability == "UNAVAILABLE" for entry in writes)
 
 

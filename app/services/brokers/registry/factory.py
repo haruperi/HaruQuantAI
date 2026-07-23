@@ -2,6 +2,8 @@
 
 import importlib
 import importlib.metadata
+import importlib.util
+from dataclasses import dataclass
 from typing import cast
 
 from app.services.brokers.contracts import (
@@ -13,42 +15,77 @@ from app.services.brokers.contracts import (
     BrokerId,
     BrokerResult,
 )
-from app.services.brokers.registry.catalogue import (
-    get_broker_capability_catalogue,
-)
 from app.utils import generate_id, logger, utc_now
 
+
+@dataclass(frozen=True, slots=True)
+class _ProviderRegistration:
+    """Immutable adapter and dependency declaration."""
+
+    module: str
+    adapter_class: str
+    import_package: str | None
+    distribution: str | None
+    constraint: str | None
+    installation_extra: str
+
+
 _FACTORIES = {
-    BrokerId.MT5: ("app.services.brokers.mt5", "MT5BrokerAdapter", "MetaTrader5"),
-    BrokerId.CTRADER: (
-        "app.services.brokers.ctrader",
+    BrokerId.MT5: _ProviderRegistration(
+        "app.services.brokers.mt5_account",
+        "MT5BrokerAdapter",
+        "MetaTrader5",
+        "MetaTrader5",
+        None,
+        "brokers",
+    ),
+    BrokerId.CTRADER: _ProviderRegistration(
+        "app.services.brokers.ctrader_session",
         "CTraderBrokerAdapter",
+        "ctrader_open_api",
         "ctrader-open-api",
+        ">=0.9.2",
+        "brokers",
     ),
-    BrokerId.BINANCE_SPOT: (
-        "app.services.brokers.binance",
+    BrokerId.BINANCE_SPOT: _ProviderRegistration(
+        "app.services.brokers.binance_session",
         "BinanceBrokerAdapter",
+        "binance",
         "python-binance",
+        ">=1.0.37",
+        "brokers",
     ),
-    BrokerId.BINANCE_USD_M_FUTURES: (
-        "app.services.brokers.binance",
+    BrokerId.BINANCE_USD_M_FUTURES: _ProviderRegistration(
+        "app.services.brokers.binance_session",
         "BinanceBrokerAdapter",
+        "binance",
         "python-binance",
+        ">=1.0.37",
+        "brokers",
     ),
-    BrokerId.BINANCE_COIN_M_FUTURES: (
-        "app.services.brokers.binance",
+    BrokerId.BINANCE_COIN_M_FUTURES: _ProviderRegistration(
+        "app.services.brokers.binance_session",
         "BinanceBrokerAdapter",
+        "binance",
         "python-binance",
+        ">=1.0.37",
+        "brokers",
     ),
-    BrokerId.DUKASCOPY: (
-        "app.services.brokers.dukascopy",
+    BrokerId.DUKASCOPY: _ProviderRegistration(
+        "app.services.brokers.dukascopy_ticks",
         "DukascopyBrokerAdapter",
         None,
+        None,
+        None,
+        "brokers",
     ),
-    BrokerId.YAHOO: (
-        "app.services.brokers.yahoo",
+    BrokerId.YAHOO: _ProviderRegistration(
+        "app.services.brokers.yahoo_history",
         "YahooBrokerAdapter",
         "yfinance",
+        "yfinance",
+        ">=1.4.1",
+        "brokers",
     ),
 }
 
@@ -73,6 +110,25 @@ def _is_registered_broker(value: object) -> bool:
     """
     logger.debug("Validating explicit broker registry identifier")
     return isinstance(value, BrokerId)
+
+
+def _require_dependency(registration: _ProviderRegistration) -> None:
+    """Verify an optional provider dependency without importing its SDK.
+
+    Args:
+        registration: Provider declaration to inspect.
+
+    Raises:
+        ModuleNotFoundError: If the declared import package is unavailable.
+    """
+    if (
+        registration.import_package is not None
+        and importlib.util.find_spec(registration.import_package) is None
+    ):
+        raise ModuleNotFoundError(
+            name=registration.import_package,
+            path=registration.import_package,
+        )
 
 
 def create_broker_adapter(
@@ -105,19 +161,19 @@ def create_broker_adapter(
             code=BrokerErrorCode.BROKER_CONFIGURATION_INVALID,
             message="Broker config does not match or provider is disabled",
         )
-    module_name, class_name, package = _FACTORIES[broker_id]
+    registration = _FACTORIES[broker_id]
     try:
-        module = importlib.import_module(module_name)
-        adapter_type = getattr(module, class_name)
-        catalogue = get_broker_capability_catalogue()[broker_id]
-        capabilities = {item.capability: item for item in catalogue}
-        adapter = adapter_type(config, capabilities)
+        _require_dependency(registration)
+        module = importlib.import_module(registration.module)
+        adapter_type = getattr(module, registration.adapter_class)
+        adapter = adapter_type(config)
     except ModuleNotFoundError as error:
         metadata: dict[str, object] = {
-            "package": package or error.name or "unknown",
-            "required_version": _required_version(package),
-            "installed_version": None,
-            "installation_extra": "brokers",
+            "package": registration.distribution or error.name or registration.module,
+            "missing_import": error.name,
+            "required_version": registration.constraint,
+            "installed_version": _installed_version(registration.distribution),
+            "installation_extra": registration.installation_extra,
         }
         return _factory_error(
             broker=broker_id,
@@ -197,18 +253,18 @@ def _factory_error(
     )
 
 
-def _required_version(package: str | None) -> str | None:
-    """Handle required version.
+def _installed_version(distribution: str | None) -> str | None:
+    """Return the installed distribution version when present.
 
     Args:
-        package: Value supplied to the operation.
+        distribution: Declared project distribution name.
 
     Returns:
-        The operation result.
+        Installed version, or ``None`` when absent/not applicable.
     """
-    if package is None:
+    if distribution is None:
         return None
     try:
-        return importlib.metadata.version(package)
+        return importlib.metadata.version(distribution)
     except importlib.metadata.PackageNotFoundError:
         return None

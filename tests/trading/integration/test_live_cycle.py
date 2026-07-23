@@ -8,7 +8,10 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from app.services.brokers.contracts import BrokerAdapter, BrokerFeatureFlags
+from app.services.brokers import (
+    BrokerAdapter,
+    BrokerFeatureFlags,
+)
 from app.services.trading.actions import run_live_evaluation_cycle
 from app.services.trading.live import LiveSession
 from app.services.trading.validation import ReadinessAssessment

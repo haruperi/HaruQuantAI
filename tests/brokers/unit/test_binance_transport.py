@@ -8,7 +8,7 @@ from typing import ClassVar
 
 import pytest
 from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
-from app.services.brokers.binance.transport import _BinanceTransport
+from app.services.brokers.binance_session.transport import _BinanceTransport
 from pydantic import SecretStr
 
 

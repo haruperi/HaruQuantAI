@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 import numpy as np
 from app.services.brokers import BrokerErrorCode
-from app.services.brokers.mt5.mapping import (
+from app.services.brokers.mt5_account.mapping import (
     _map_account,
     _map_bar,
     _map_error_code,

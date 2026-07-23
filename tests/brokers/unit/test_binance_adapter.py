@@ -3,6 +3,7 @@
 import asyncio
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from typing import Any
 
 import pytest
 from app.services.brokers import (
@@ -13,7 +14,7 @@ from app.services.brokers import (
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.binance.adapter import BinanceBrokerAdapter
+from app.services.brokers.binance_session.adapter import BinanceBrokerAdapter
 from pydantic import SecretStr
 
 
@@ -37,15 +38,25 @@ def _config(broker_id: BrokerId = BrokerId.BINANCE_SPOT) -> BrokerConnectionConf
 
 
 def _capabilities() -> dict[BrokerCapabilityId, BrokerCapability]:
+    mutations = {
+        BrokerCapabilityId.CHECK_ORDER,
+        BrokerCapabilityId.PLACE_ORDER,
+        BrokerCapabilityId.MODIFY_ORDER,
+        BrokerCapabilityId.CANCEL_ORDER,
+        BrokerCapabilityId.MODIFY_POSITION,
+        BrokerCapabilityId.CLOSE_POSITION,
+        BrokerCapabilityId.REPLACE_ORDER,
+    }
     return {
         operation: BrokerCapability(
             capability=operation,
             implementation_status="IMPLEMENTED",
-            availability="AVAILABLE",
-            access_mode="READ",
+            availability="UNAVAILABLE" if operation in mutations else "AVAILABLE",
+            access_mode="WRITE" if operation in mutations else "READ",
             requirement="NONE",
             verification_status="NOT_TESTED",
             execution_model="TEST_DOUBLE",
+            reason="test release gate" if operation in mutations else None,
         )
         for operation in BrokerCapabilityId
     }
@@ -100,6 +111,13 @@ class _FakeTransport:
         self.closed = True
 
 
+def _implementation_adapter(transport: Any) -> BinanceBrokerAdapter:
+    """Build a private provider-mapping harness without changing production policy."""
+    adapter = BinanceBrokerAdapter(_config(), transport=transport)
+    adapter._capabilities = _capabilities()
+    return adapter
+
+
 def test_adapter_rejects_environment_profile_mismatch() -> None:
     """Spot/Futures profiles reject any non-LIVE/TESTNET environment."""
     bad = BrokerConnectionConfig(
@@ -115,7 +133,7 @@ def test_adapter_rejects_environment_profile_mismatch() -> None:
         circuit_half_open_max_calls=1,
     )
     with pytest.raises(ValueError, match="profile/environment mismatch"):
-        BinanceBrokerAdapter(bad, _capabilities())
+        BinanceBrokerAdapter(bad)
 
 
 def test_adapter_rejects_unknown_credential_keys() -> None:
@@ -134,14 +152,13 @@ def test_adapter_rejects_unknown_credential_keys() -> None:
         credentials={"unexpected": SecretStr("x")},
     )
     with pytest.raises(ValueError, match="unknown Binance credential key"):
-        BinanceBrokerAdapter(bad, _capabilities())
+        BinanceBrokerAdapter(bad)
 
 
 def test_futures_profiles_remain_registry_only_for_connect() -> None:
     """Futures profiles never verify a connection; Spot is the only live path."""
     adapter = BinanceBrokerAdapter(
         _config(BrokerId.BINANCE_USD_M_FUTURES),
-        _capabilities(),
         transport=_FakeTransport(),
     )
 
@@ -155,7 +172,7 @@ def test_futures_profiles_remain_registry_only_for_connect() -> None:
 def test_spot_adapter_connects_and_maps_symbols_and_klines() -> None:
     """A verified Spot session maps genuine symbols and klines."""
     transport = _FakeTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         connected = await adapter.connect()
@@ -177,11 +194,10 @@ def test_spot_adapter_connects_and_maps_symbols_and_klines() -> None:
 
 def test_spot_adapter_platform_info_reports_profile() -> None:
     """Platform info reports the immutable selected product profile."""
-    adapter = BinanceBrokerAdapter(
-        _config(), _capabilities(), transport=_FakeTransport()
-    )
+    adapter = _implementation_adapter(_FakeTransport())
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_platform_info()
         assert result.data is not None
         assert result.data.product_profile == "spot"
@@ -205,7 +221,7 @@ def test_adapter_rejects_custom_endpoints() -> None:
         circuit_half_open_max_calls=1,
     )
     with pytest.raises(ValueError, match="Binance custom endpoints are unavailable"):
-        BinanceBrokerAdapter(bad, _capabilities())
+        BinanceBrokerAdapter(bad)
 
 
 def test_adapter_connect_handles_probe_failure() -> None:
@@ -215,9 +231,7 @@ def test_adapter_connect_handles_probe_failure() -> None:
         async def connect(self) -> bool:
             raise ConnectionError("failed to connect")
 
-    adapter = BinanceBrokerAdapter(
-        _config(), _capabilities(), transport=_FailingTransport()
-    )
+    adapter = _implementation_adapter(_FailingTransport())
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -229,7 +243,7 @@ def test_adapter_connect_handles_probe_failure() -> None:
 def test_adapter_ping() -> None:
     """Spot ping request succeeds on a verified transport."""
     transport = _FakeTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -242,7 +256,7 @@ def test_adapter_ping() -> None:
 def test_adapter_get_server_time() -> None:
     """Spot server time returns estimated clock offset and latency."""
     transport = _FakeTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -257,7 +271,7 @@ def test_adapter_get_server_time() -> None:
 def test_adapter_get_symbols_filtering_and_errors() -> None:
     """Retrieving symbols handles limit checks and query filtering."""
     transport = _FakeTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -292,7 +306,7 @@ def test_adapter_get_symbol_info() -> None:
             return await super().call(name, **kwargs)
 
     transport = _SymbolTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -320,7 +334,7 @@ def test_adapter_get_quote() -> None:
             return await super().call(name, **kwargs)
 
     transport = _QuoteTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -341,7 +355,7 @@ def test_adapter_get_ticks() -> None:
             return await super().call(name, **kwargs)
 
     transport = _TicksTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -359,7 +373,7 @@ def test_adapter_get_ticks() -> None:
 def test_adapter_get_historical_bars_parameters() -> None:
     """Spot historical bars map klines and handle bounding datetime inputs."""
     transport = _FakeTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -392,9 +406,10 @@ def test_adapter_maps_canonical_h1_to_binance_interval() -> None:
             return await super().call(name, **kwargs)
 
     transport = _RecordingTransport()
-    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+    adapter = _implementation_adapter(transport)
 
     async def exercise() -> None:
+        await adapter.connect()
         result = await adapter.get_historical_bars("BTCUSDT", "H1", limit=5)
         assert result.is_success
         assert result.data is not None
@@ -458,9 +473,7 @@ def test_adapter_streams_quotes_bars_and_snapshot_first_depth() -> None:
                     "a": [["1.1", "1"]],
                 }
 
-    adapter = BinanceBrokerAdapter(
-        _config(), _capabilities(), transport=_StreamTransport()
-    )
+    adapter = _implementation_adapter(_StreamTransport())
 
     async def exercise() -> None:
         await adapter.connect()

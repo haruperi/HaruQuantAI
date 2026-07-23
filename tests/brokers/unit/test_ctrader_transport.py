@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
-from app.services.brokers.ctrader.transport import _CTraderTransport
+from app.services.brokers.ctrader_session.transport import _CTraderTransport
 
 
 class _Response:

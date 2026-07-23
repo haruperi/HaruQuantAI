@@ -8,7 +8,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from app.services.brokers.contracts import (
+from app.services.brokers import (
     BrokerAdapter,
     BrokerConnectionConfig,
     BrokerSymbolInfo,

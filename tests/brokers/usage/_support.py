@@ -16,7 +16,7 @@ from app.services.brokers import (
     BrokerId,
     BrokerResult,
 )
-from app.services.brokers.dukascopy.candle_transport import _CandleBatch
+from app.services.brokers.dukascopy_ticks.candle_transport import _CandleBatch
 from pydantic import SecretStr
 
 
@@ -71,12 +71,29 @@ def config(broker_id: BrokerId) -> BrokerConnectionConfig:
     account_reference: str | None = None
     probe_symbol: str | None = None
     if broker_id == BrokerId.MT5:
-        account_reference = "100001"
-        credentials = {
-            "login": SecretStr(account_reference),
-            "password": SecretStr("offline-placeholder"),
-            "server": SecretStr("Offline-Demo"),
-        }
+        from tests.brokers.provider_settings import ProviderTestSettings
+
+        settings = ProviderTestSettings()
+        if (
+            settings.mt5_login is not None
+            and settings.mt5_password is not None
+            and settings.mt5_server is not None
+        ):
+            account_reference = settings.mt5_login.get_secret_value()
+            credentials = {
+                "login": settings.mt5_login,
+                "password": settings.mt5_password,
+                "server": settings.mt5_server,
+            }
+            if settings.mt5_terminal_path is not None:
+                credentials["terminal_path"] = settings.mt5_terminal_path
+        else:
+            account_reference = "100001"
+            credentials = {
+                "login": SecretStr(account_reference),
+                "password": SecretStr("offline-placeholder"),
+                "server": SecretStr("Offline-Demo"),
+            }
     elif broker_id == BrokerId.CTRADER:
         account_reference = "100001"
         credentials = {

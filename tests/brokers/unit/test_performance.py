@@ -13,13 +13,16 @@ from app.services.brokers import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
+    BrokerConnectionState,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
     BrokerResult,
 )
-from app.services.brokers.runtime.circuit_breaker import _TransportCircuitBreaker
-from app.services.brokers.yahoo.adapter import YahooBrokerAdapter
+from app.services.brokers.adapter_runtime.circuit_breaker import (
+    _TransportCircuitBreaker,
+)
+from app.services.brokers.yahoo_history.adapter import YahooBrokerAdapter
 
 
 def _config() -> BrokerConnectionConfig:
@@ -39,15 +42,25 @@ def _config() -> BrokerConnectionConfig:
 
 
 def _capabilities() -> dict[BrokerCapabilityId, BrokerCapability]:
+    mutations = {
+        BrokerCapabilityId.CHECK_ORDER,
+        BrokerCapabilityId.PLACE_ORDER,
+        BrokerCapabilityId.MODIFY_ORDER,
+        BrokerCapabilityId.CANCEL_ORDER,
+        BrokerCapabilityId.MODIFY_POSITION,
+        BrokerCapabilityId.CLOSE_POSITION,
+        BrokerCapabilityId.REPLACE_ORDER,
+    }
     return {
         operation: BrokerCapability(
             capability=operation,
             implementation_status="IMPLEMENTED",
-            availability="AVAILABLE",
-            access_mode="READ",
+            availability="UNAVAILABLE" if operation in mutations else "AVAILABLE",
+            access_mode="WRITE" if operation in mutations else "READ",
             requirement="NONE",
             verification_status="NOT_TESTED",
             execution_model="TEST_DOUBLE",
+            reason="test release gate" if operation in mutations else None,
         )
         for operation in BrokerCapabilityId
     }
@@ -94,9 +107,8 @@ def test_adapter_populates_measured_latency() -> None:
     """The adapter measures real elapsed time instead of reporting zero."""
 
     async def exercise() -> BrokerResult[object]:
-        adapter = YahooBrokerAdapter(
-            _config(), _capabilities(), transport=_SlowTransport()
-        )
+        adapter = YahooBrokerAdapter(_config(), transport=_SlowTransport())
+        adapter._state = BrokerConnectionState.READY
         return await adapter.get_historical_bars("AAPL", "1d", limit=1)
 
     result = asyncio.run(exercise())
@@ -109,8 +121,9 @@ def test_adapter_separates_provider_latency_from_local_overhead() -> None:
     """Provider network time is reported separately from adapter overhead."""
 
     async def exercise() -> BrokerResult[object]:
-        adapter = YahooBrokerAdapter(_config(), _capabilities())
+        adapter = YahooBrokerAdapter(_config())
         adapter._transport = _SlowTransport(adapter._record_provider_latency)  # type: ignore[assignment]
+        adapter._state = BrokerConnectionState.READY
         return await adapter.get_historical_bars("AAPL", "1d", limit=1)
 
     result = asyncio.run(exercise())
@@ -138,9 +151,9 @@ def test_unsupported_operation_does_not_inherit_a_previous_measurement() -> None
     )
 
     async def exercise() -> BrokerResult[object]:
-        adapter = YahooBrokerAdapter(
-            _config(), capabilities, transport=_SlowTransport()
-        )
+        adapter = YahooBrokerAdapter(_config(), transport=_SlowTransport())
+        adapter._capabilities = capabilities
+        adapter._state = BrokerConnectionState.READY
         await adapter.get_historical_bars("AAPL", "1d", limit=1)
         return await adapter.get_order_book("AAPL")
 

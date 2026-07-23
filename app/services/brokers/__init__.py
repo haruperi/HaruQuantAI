@@ -1,46 +1,156 @@
-"""Canonical Brokers domain API with lazy provider type resolution."""
-
-# ruff: noqa: ANN401, PLE0604 - PEP 562 resolves a fixed heterogeneous type table.
+"""Canonical Brokers domain API."""
 
 import importlib
-from typing import Any
+from typing import TYPE_CHECKING
 
-from app.services.brokers.contracts import *  # noqa: F403
-from app.services.brokers.contracts import __all__ as _contract_exports
-from app.services.brokers.registry import (
-    create_broker_adapter,
+if TYPE_CHECKING:
+    from app.services.brokers.binance_session import BinanceBrokerAdapter
+    from app.services.brokers.ctrader_session import CTraderBrokerAdapter
+    from app.services.brokers.dukascopy_ticks import DukascopyBrokerAdapter
+    from app.services.brokers.mt5_account import MT5BrokerAdapter
+    from app.services.brokers.yahoo_history import YahooBrokerAdapter
+
+from app.services.brokers.contracts.enums import (
+    BrokerCapabilityId,
+    BrokerConnectionState,
+    BrokerEnvironment,
+    BrokerErrorCode,
+    BrokerId,
+)
+from app.services.brokers.contracts.models import (
+    BrokerAccountInfo,
+    BrokerAccountTransaction,
+    BrokerAssetInfo,
+    BrokerBalance,
+    BrokerBar,
+    BrokerCapability,
+    BrokerConnectionConfig,
+    BrokerConnectionEvent,
+    BrokerConnectionStatus,
+    BrokerDeal,
+    BrokerError,
+    BrokerFeatureFlags,
+    BrokerFeeEstimate,
+    BrokerMarginRequest,
+    BrokerMarketStatus,
+    BrokerOrder,
+    BrokerOrderBook,
+    BrokerOrderCheck,
+    BrokerOrderFilter,
+    BrokerOrderModificationRequest,
+    BrokerOrderRequest,
+    BrokerOrderResult,
+    BrokerPage,
+    BrokerPermissions,
+    BrokerPlatformInfo,
+    BrokerPosition,
+    BrokerPositionCloseRequest,
+    BrokerPositionFilter,
+    BrokerPositionModificationRequest,
+    BrokerProfitRequest,
+    BrokerQuote,
+    BrokerResult,
+    BrokerServerTime,
+    BrokerSubscriptionInfo,
+    BrokerSymbolInfo,
+    BrokerTick,
+    BrokerTradingSession,
+)
+from app.services.brokers.contracts.protocols import (
+    AccountProvider,
+    BrokerAdapter,
+    BrokerSubscription,
+    CalculationProvider,
+    MarketDataProvider,
+    TradeExecutionProvider,
+)
+from app.services.brokers.registry.catalogue import (
     get_broker_capability_catalogue,
+)
+from app.services.brokers.registry.factory import (
+    create_broker_adapter,
     get_registered_brokers,
 )
 
 _LAZY_ADAPTERS = {
-    "MT5BrokerAdapter": "app.services.brokers.mt5",
-    "CTraderBrokerAdapter": "app.services.brokers.ctrader",
-    "BinanceBrokerAdapter": "app.services.brokers.binance",
-    "DukascopyBrokerAdapter": "app.services.brokers.dukascopy",
-    "YahooBrokerAdapter": "app.services.brokers.yahoo",
+    "MT5BrokerAdapter": "app.services.brokers.mt5_account",
+    "CTraderBrokerAdapter": "app.services.brokers.ctrader_session",
+    "BinanceBrokerAdapter": "app.services.brokers.binance_session",
+    "DukascopyBrokerAdapter": "app.services.brokers.dukascopy_ticks",
+    "YahooBrokerAdapter": "app.services.brokers.yahoo_history",
 }
 
 __all__ = (
-    *_contract_exports,
+    "AccountProvider",
+    "BinanceBrokerAdapter",
+    "BrokerAccountInfo",
+    "BrokerAccountTransaction",
+    "BrokerAdapter",
+    "BrokerAssetInfo",
+    "BrokerBalance",
+    "BrokerBar",
+    "BrokerCapability",
+    "BrokerCapabilityId",
+    "BrokerConnectionConfig",
+    "BrokerConnectionEvent",
+    "BrokerConnectionState",
+    "BrokerConnectionStatus",
+    "BrokerDeal",
+    "BrokerEnvironment",
+    "BrokerError",
+    "BrokerErrorCode",
+    "BrokerFeatureFlags",
+    "BrokerFeeEstimate",
+    "BrokerId",
+    "BrokerMarginRequest",
+    "BrokerMarketStatus",
+    "BrokerOrder",
+    "BrokerOrderBook",
+    "BrokerOrderCheck",
+    "BrokerOrderFilter",
+    "BrokerOrderModificationRequest",
+    "BrokerOrderRequest",
+    "BrokerOrderResult",
+    "BrokerPage",
+    "BrokerPermissions",
+    "BrokerPlatformInfo",
+    "BrokerPosition",
+    "BrokerPositionCloseRequest",
+    "BrokerPositionFilter",
+    "BrokerPositionModificationRequest",
+    "BrokerProfitRequest",
+    "BrokerQuote",
+    "BrokerResult",
+    "BrokerServerTime",
+    "BrokerSubscription",
+    "BrokerSubscriptionInfo",
+    "BrokerSymbolInfo",
+    "BrokerTick",
+    "BrokerTradingSession",
+    "CTraderBrokerAdapter",
+    "CalculationProvider",
+    "DukascopyBrokerAdapter",
+    "MT5BrokerAdapter",
+    "MarketDataProvider",
+    "TradeExecutionProvider",
+    "YahooBrokerAdapter",
     "create_broker_adapter",
     "get_broker_capability_catalogue",
     "get_registered_brokers",
-    *_LAZY_ADAPTERS,
 )
 
 
-def __getattr__(name: str) -> Any:
-    """Resolve only an approved adapter class and cache the class object.
+def __getattr__(name: str) -> object:
+    """Resolve one approved adapter type without importing SDKs eagerly.
 
     Args:
-        name: Name of the attribute/adapter class to resolve.
+        name: Requested package attribute.
 
     Returns:
-        The resolved adapter class object.
+        Approved concrete adapter class.
 
     Raises:
-        AttributeError: If the class name is not recognized or found.
+        AttributeError: If ``name`` is not an approved lazy export.
     """
     module_name = _LAZY_ADAPTERS.get(name)
     if module_name is None:

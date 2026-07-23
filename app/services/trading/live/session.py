@@ -8,7 +8,7 @@ from decimal import Decimal
 from hashlib import sha256
 from typing import TYPE_CHECKING
 
-from app.services.brokers.contracts import (
+from app.services.brokers import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerFeatureFlags,
@@ -34,7 +34,7 @@ from app.services.trading.validation import ReadinessAssessment
 from app.utils import canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.brokers.contracts import BrokerAdapter
+    from app.services.brokers import BrokerAdapter
     from app.services.trading.state import TradingStateStore
 
 type _LifecycleStep = Callable[[], Awaitable[bool]]
@@ -462,7 +462,7 @@ class LiveSession:
         logger.info("Running LiveSession shutdown step %s", name)
         try:
             return await step()
-        except (OSError, RuntimeError, TypeError, ValueError, TradingError):
+        except OSError, RuntimeError, TypeError, ValueError, TradingError:
             logger.exception("LiveSession shutdown step failed: %s", name)
             return False
 

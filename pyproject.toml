@@ -1,6 +1,6 @@
 [project]
 name = "haruquantai"
-version = "2.2.0"
+version = "2.2.1"
 description = "Quantitative Financial Trading System"
 readme = "README.md"
 requires-python = ">=3.14"

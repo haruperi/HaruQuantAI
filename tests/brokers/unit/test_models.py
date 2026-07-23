@@ -74,11 +74,20 @@ def _config() -> BrokerConnectionConfig:
 
 
 def _capability(capability: BrokerCapabilityId) -> BrokerCapability:
+    mutations = {
+        BrokerCapabilityId.CHECK_ORDER,
+        BrokerCapabilityId.PLACE_ORDER,
+        BrokerCapabilityId.MODIFY_ORDER,
+        BrokerCapabilityId.CANCEL_ORDER,
+        BrokerCapabilityId.MODIFY_POSITION,
+        BrokerCapabilityId.CLOSE_POSITION,
+        BrokerCapabilityId.REPLACE_ORDER,
+    }
     return BrokerCapability(
         capability=capability,
         implementation_status="NOT_IMPLEMENTED",
         availability="UNAVAILABLE",
-        access_mode="READ",
+        access_mode="WRITE" if capability in mutations else "READ",
         requirement="NONE",
         verification_status="NOT_TESTED",
         execution_model="NO_PROVIDER_CALL",

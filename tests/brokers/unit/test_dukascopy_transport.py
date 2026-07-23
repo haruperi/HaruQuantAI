@@ -7,7 +7,7 @@ from typing import Self
 
 import pytest
 from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
-from app.services.brokers.dukascopy.transport import _DukascopyTransport
+from app.services.brokers.dukascopy_ticks.transport import _DukascopyTransport
 
 
 def _config() -> BrokerConnectionConfig:

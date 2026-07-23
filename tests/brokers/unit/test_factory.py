@@ -2,6 +2,7 @@
 
 import asyncio
 import sys
+from unittest.mock import patch
 
 from app.services.brokers import (
     BrokerConnectionConfig,
@@ -13,6 +14,7 @@ from app.services.brokers.registry import (
     create_broker_adapter,
     get_registered_brokers,
 )
+from app.services.brokers.registry.factory import _ProviderRegistration
 
 
 def _config(enabled: bool = True) -> BrokerConnectionConfig:
@@ -96,13 +98,14 @@ def test_create_adapter_invalid_broker_type() -> None:
 
 def test_create_adapter_missing_dependency() -> None:
     """create_broker_adapter returns BROKER_DEPENDENCY_MISSING when import fails."""
-    from unittest.mock import patch
-
     fake_factories = {
-        BrokerId.YAHOO: (
+        BrokerId.YAHOO: _ProviderRegistration(
             "app.services.brokers.nonexistent",
             "YahooBrokerAdapter",
+            "nonexistent",
             "nonexistent-pkg",
+            None,
+            "brokers",
         )
     }
     with patch("app.services.brokers.registry.factory._FACTORIES", fake_factories):
@@ -115,13 +118,14 @@ def test_create_adapter_missing_dependency() -> None:
 
 def test_create_adapter_dukascopy_missing_dependency() -> None:
     """create_broker_adapter handles package version checks when package is None."""
-    from unittest.mock import patch
-
     fake_factories = {
-        BrokerId.DUKASCOPY: (
+        BrokerId.DUKASCOPY: _ProviderRegistration(
             "app.services.brokers.nonexistent_dukascopy",
             "DukascopyBrokerAdapter",
             None,
+            None,
+            None,
+            "brokers",
         )
     }
     with patch("app.services.brokers.registry.factory._FACTORIES", fake_factories):
@@ -149,10 +153,16 @@ def test_create_adapter_dukascopy_missing_dependency() -> None:
 def test_create_adapter_value_error() -> None:
     """create_broker_adapter handles ValueError during adapter instantiation."""
     from typing import Any
-    from unittest.mock import patch
 
     fake_factories = {
-        BrokerId.YAHOO: ("app.services.brokers.yahoo", "InvalidClass", "yfinance")
+        BrokerId.YAHOO: _ProviderRegistration(
+            "app.services.brokers.yahoo_history",
+            "InvalidClass",
+            None,
+            "yfinance",
+            None,
+            "brokers",
+        )
     }
 
     class MockAdapter:
@@ -162,7 +172,9 @@ def test_create_adapter_value_error() -> None:
 
     with (
         patch("app.services.brokers.registry.factory._FACTORIES", fake_factories),
-        patch("app.services.brokers.yahoo.InvalidClass", MockAdapter, create=True),
+        patch(
+            "app.services.brokers.yahoo_history.InvalidClass", MockAdapter, create=True
+        ),
     ):
         result = create_broker_adapter(BrokerId.YAHOO, _config())
         assert result.error is not None

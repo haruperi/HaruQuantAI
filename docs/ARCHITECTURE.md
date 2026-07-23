@@ -30,10 +30,10 @@
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
 * `app/services/api/README.md` defines the approved gateway/UI boundary, state ownership, and synchronous initial Simulation/Optimization surface; no API runtime code or `ui/` application package has landed yet.
 * `app/services/portfolio/README.md` now defines the approved Portfolio target architecture; the package code is not yet implemented. Portfolio is the thirteenth domain and its status remains `Missing`.
-* `app/utils/` is a completed implementation baseline for shared v1 contracts,
+* `app/utils/` is a partial implementation baseline for shared v1 contracts,
   errors, identifiers, UTC, canonical serialization, redaction/security helpers,
   settings, and structured logging.
-* `app/services/brokers/` is a completed implementation baseline for canonical
+* `app/services/brokers/` is a partial implementation baseline for canonical
   broker contracts, registry/factory, runtime safety, provider adapters, and its
   deterministic test adapter. Capability availability remains evidence-gated and
   fail-closed.
@@ -57,7 +57,7 @@
   and file focus only; active requirements, public
   behaviour, contract versions, schema identifiers, error codes, and the frozen
   package-root API remain compatible.
-* `app/services/indicators/` is a completed implementation baseline containing
+* `app/services/indicators/` is a partial implementation baseline containing
   the immutable Core calculation boundary and 20 approved one-indicator-per-file
   implementations across trend, volatility, momentum, volume, and candles.
   Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the
@@ -70,7 +70,7 @@
   reporting. Its status is `Partial`: kill-switch clearance must require a distinct
   authorized attestation principal, while the current implementation still requires
   the same principal.
-* `app/services/trading/` is a completed implementation baseline across all 64
+* `app/services/trading/` is a partial implementation baseline across all 64
   functional and eight non-functional requirements, nine capability modules, and all
   fourteen documented workflows. It owns `OrderIntent v1`, `ExecutionReceipt v1`,
   `TradeRecord v1`, and `OperationalEvent v1`. Production live mutation remains
@@ -78,7 +78,7 @@
 * Later agile phases reuse these completed domains and run compatibility/regression
   checks; they do not rebuild them. Current semantic-docstring/format cleanup is a
   separate repository-quality gate.
-* `app/services/analytics/` is a completed implementation baseline across contracts,
+* `app/services/analytics/` is a partial implementation baseline across contracts,
   producer-neutral ledger adaptation, 60 cataloged metrics, report/allocation evidence,
   bounded dashboards, all active requirements, and all non-excluded workflows.
   Simulation imports no Analytics code; until Simulation publishes executable

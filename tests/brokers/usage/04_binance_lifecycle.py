@@ -1,76 +1,157 @@
-"""FEAT-BRK-04: exercise the Binance Spot lifecycle and market-data surface.
-
-Runs the genuine `BinanceBrokerAdapter` over an offline REST transport, so the
-real ping/server-time verification and Spot payload mapping execute without
-network traffic or credentials.
-"""
+"""FEAT-BRK-04: Binance provider lifecycle."""
 
 import asyncio
 
-from _support import (
-    OfflineBinanceTransport,
-    available_capabilities,
-    config,
-    show,
-    show_value,
-    unavailable_capabilities,
+import _support  # noqa: F401
+from _support import config
+from app.services.brokers import (
+    BrokerCapabilityId,
+    BrokerId,
+    create_broker_adapter,
 )
-from app.services.brokers import BinanceBrokerAdapter, BrokerId
 
 
-async def example_verified_lifecycle_and_market_data() -> None:
-    """Connect, read genuine mapped Spot observations, and disconnect."""
-    transport = OfflineBinanceTransport()
-    adapter = BinanceBrokerAdapter(
-        config(BrokerId.BINANCE_SPOT), available_capabilities(), transport=transport
-    )
-    show("connect", await adapter.connect())
+def fr_brokers_066() -> None:
+    """FR-BRK-066: Return provider order-book truth with depth/sequence evidence."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
 
-    server_time = await adapter.get_server_time()
-    show_value(
-        "server-time",
-        server_time,
-        server_time.data.provider_time.isoformat() if server_time.data else None,
-    )
+    async def run() -> None:
+        res = await adapter.get_order_book("BTCUSDT")
+        print("FR-BRK-066:", res.status)
 
-    quote = await adapter.get_quote("BTCUSDT")
-    show_value(
-        "quote",
-        quote,
-        f"bid={quote.data.bid} ask={quote.data.ask}" if quote.data else None,
-    )
-
-    spread = await adapter.get_spread("BTCUSDT")
-    show_value("spread", spread, spread.data)
-
-    bars = await adapter.get_historical_bars("BTCUSDT", "1m", limit=1)
-    show_value(
-        "bars",
-        bars,
-        f"close={bars.data.items[0].close} count={bars.data.returned_count}"
-        if bars.data
-        else None,
-    )
-
-    show("disconnect", await adapter.disconnect())
-    print("provider calls", len(transport.calls))
+    asyncio.run(run())
 
 
-async def example_unreleased_capability_fails_closed() -> None:
-    """A gated capability returns unsupported without a provider call."""
-    transport = OfflineBinanceTransport()
-    adapter = BinanceBrokerAdapter(
-        config(BrokerId.BINANCE_SPOT), unavailable_capabilities(), transport=transport
-    )
-    show("gated-quote", await adapter.get_quote("BTCUSDT"))
-    print("provider calls while gated", len(transport.calls))
+def fr_brokers_067() -> None:
+    """FR-BRK-067: Return provider-reported spread only without fixed placeholder."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_spread("BTCUSDT")
+        print("FR-BRK-067:", res.status)
+
+    asyncio.run(run())
 
 
-async def main() -> None:
-    """Exercise every FEAT-BRK-04 operation offline."""
-    await example_verified_lifecycle_and_market_data()
-    await example_unreleased_capability_fails_closed()
+def fr_brokers_068() -> None:
+    """FR-BRK-068: Create adapter-scoped bounded quote stream handle."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.subscribe_quotes(("BTCUSDT",))
+        print("FR-BRK-068:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_069() -> None:
+    """FR-BRK-069: Create provider bar stream where genuine events are supported."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.subscribe_bars(("BTCUSDT",), "1m")
+        print("FR-BRK-069:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_070() -> None:
+    """FR-BRK-070: Create order-book stream where sequence safety is supported."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.subscribe_order_book(("BTCUSDT",))
+        print("FR-BRK-070:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_071() -> None:
+    """FR-BRK-071: Terminate exactly one owned subscription."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.unsubscribe("invalid-id")
+        print("FR-BRK-071:", res.status)
+
+    asyncio.run(run())
+
+
+def fr_brokers_072() -> None:
+    """FR-BRK-072: List immutable metadata for subscriptions owned by current
+    adapter."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.list_subscriptions()
+        print("FR-BRK-072:", len(res.data) if res.data else 0)
+
+    asyncio.run(run())
+
+
+def fr_brokers_073() -> None:
+    """FR-BRK-073: Return refreshed capability report with unapproved mutations
+    unavailable."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_feature_flags()
+        print("FR-BRK-073:", res.data.broker_id if res.data else None)
+
+    asyncio.run(run())
+
+
+def fr_brokers_074() -> None:
+    """FR-BRK-074: Answer capability support from report without probing missing
+    attribute."""
+    adapter = create_broker_adapter(
+        BrokerId.BINANCE_SPOT, config(BrokerId.BINANCE_SPOT)
+    ).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.supports(BrokerCapabilityId.GET_QUOTE)
+        print("FR-BRK-074:", res.data)
+
+    asyncio.run(run())
+
+
+def main() -> None:
+    """Execute every FR-BRK-066..074 usage function."""
+    fr_brokers_066()
+    fr_brokers_067()
+    fr_brokers_068()
+    fr_brokers_069()
+    fr_brokers_070()
+    fr_brokers_071()
+    fr_brokers_072()
+    fr_brokers_073()
+    fr_brokers_074()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

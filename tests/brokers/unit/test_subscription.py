@@ -1,6 +1,7 @@
 """Bounded subscription runtime tests."""
 
 import asyncio
+import contextlib
 from datetime import UTC, datetime
 
 from app.services.brokers import (
@@ -11,7 +12,7 @@ from app.services.brokers import (
     BrokerId,
     BrokerSubscriptionInfo,
 )
-from app.services.brokers.runtime.subscription import _BrokerSubscription
+from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
 
 
 def test_subscription_overflow_is_terminal_and_requires_resync() -> None:
@@ -33,9 +34,9 @@ def test_subscription_overflow_is_terminal_and_requires_resync() -> None:
         assert await subscription.publish(1)
         assert not await subscription.publish(2)
         events = [event async for event in subscription.events()]
-        assert len(events) == 1
-        assert isinstance(events[0], BrokerError)
-        assert events[0].code == BrokerErrorCode.BROKER_BACKPRESSURE
+        assert events[0] == 1
+        assert isinstance(events[1], BrokerError)
+        assert events[1].code == BrokerErrorCode.BROKER_BACKPRESSURE
         assert subscription.info.resynchronization_required
 
     asyncio.run(exercise())
@@ -124,3 +125,35 @@ def test_subscription_fail_yields_one_terminal_error() -> None:
         assert not await subscription.publish(2)
 
     asyncio.run(exercise())
+
+
+def test_cancelling_a_consumer_never_corrupts_subscription_state() -> None:
+    """Cancelling an in-progress ``events()`` consumer leaves state usable."""
+
+    async def exercise() -> bool:
+        subscription = _BrokerSubscription[int](
+            broker=BrokerId.YAHOO,
+            environment=BrokerEnvironment.SANDBOX,
+            adapter_version="1.0.0",
+            info=BrokerSubscriptionInfo(
+                subscription_id="sub-cancel",
+                capability=BrokerCapabilityId.SUBSCRIBE_QUOTES,
+                symbols=("EURUSD",),
+                created_at=datetime.now(UTC),
+                buffer_size=4,
+            ),
+        )
+
+        async def _consume_forever() -> None:
+            async for _event in subscription.events():
+                pass
+
+        task = asyncio.create_task(_consume_forever())
+        await asyncio.sleep(0)
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
+        result = await subscription.unsubscribe()
+        return result.is_success
+
+    assert asyncio.run(exercise())
