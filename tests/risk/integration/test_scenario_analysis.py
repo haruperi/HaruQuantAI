@@ -5,7 +5,7 @@ from decimal import Decimal
 from app.services.risk.contracts import ScenarioDefinition
 from app.services.risk.scenarios import run_risk_scenario_analysis
 
-from tests.risk.usage import test_usage_policy as examples
+from tests.risk import _support as examples
 
 
 def test_scenario_analysis_is_deterministic_and_advisory() -> None:

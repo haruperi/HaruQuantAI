@@ -9,7 +9,7 @@ from app.services.optimization.scoring import (
     calculate_deflated_sharpe,
     count_nominal_trials,
 )
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_calculate_candidate_score_rejects_unknown_objective() -> None:

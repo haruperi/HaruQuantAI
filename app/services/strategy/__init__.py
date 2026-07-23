@@ -1,5 +1,10 @@
 """Canonical public port for the complete Strategy domain."""
 
+from app.services.strategy.checkpoints import (
+    StrategyCheckpoint,
+    create_strategy_checkpoint,
+    validate_strategy_checkpoint,
+)
 from app.services.strategy.contracts import (
     StrategyConfig,
     StrategyDecision,
@@ -35,7 +40,6 @@ from app.services.strategy.evaluators import (
     RandomWalkEvaluator,
     SQXBreakoutAtrTrailingEvaluator,
     WhiteFairyEvaluator,
-    evaluate_strategy_signals,
 )
 from app.services.strategy.event import EventStrategyEvaluator, run_event_strategy_hook
 from app.services.strategy.intents import TradeIntent, build_trade_intent
@@ -47,18 +51,16 @@ from app.services.strategy.registry import (
     validate_strategy_ref,
 )
 from app.services.strategy.replay import (
-    StrategyCheckpoint,
     StrategyReplayManifest,
-    create_strategy_checkpoint,
     create_strategy_replay_manifest,
-    validate_strategy_checkpoint,
 )
+from app.services.strategy.signals import SignalEvaluator, evaluate_strategy_signals
 from app.services.strategy.vectorized import (
     VectorizedStrategyEvaluator,
     run_vectorized_strategy_signals,
 )
 
-__all__ = [
+__all__ = (
     "DecomposingTradeEvaluator",
     "EventStrategyEvaluator",
     "HarrietHedgingEvaluator",
@@ -66,6 +68,7 @@ __all__ = [
     "NaiveMATrendEvaluator",
     "RandomWalkEvaluator",
     "SQXBreakoutAtrTrailingEvaluator",
+    "SignalEvaluator",
     "StrategyCheckpoint",
     "StrategyConfig",
     "StrategyDecision",
@@ -106,4 +109,4 @@ __all__ = [
     "validate_strategy_checkpoint",
     "validate_strategy_config",
     "validate_strategy_ref",
-]
+)

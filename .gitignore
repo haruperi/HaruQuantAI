@@ -780,3 +780,6 @@ artifacts/
 /data/saved/
 /data/simulations/
 /data/states/
+
+# Strategy signal-audit frames written by tests/strategy/usage/10_strategy_library.py
+tests/strategy/usage/signal_audit/

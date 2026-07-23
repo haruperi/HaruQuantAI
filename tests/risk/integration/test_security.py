@@ -2,10 +2,10 @@
 
 import pytest
 from app.services.risk.contracts import DecisionState, RiskDomainError, RiskErrorCode
-from app.services.risk.decisions import check_risk_kill_switch
+from app.services.risk.kill_switch import check_risk_kill_switch
 
-from tests.risk.usage import test_usage_approvals as approval_examples
-from tests.risk.usage import test_usage_decisions as decision_examples
+from tests.risk import _support as approval_examples
+from tests.risk import _support as decision_examples
 
 
 def test_token_tamper_scope_and_replay_fail_closed() -> None:

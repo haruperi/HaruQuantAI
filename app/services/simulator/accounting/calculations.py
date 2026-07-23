@@ -4,14 +4,15 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from decimal import Decimal, DecimalException, InvalidOperation
-from hashlib import sha256
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from app.services.data.contracts import FXConversionEvidence  # noqa: TC001
+from app.services.data.evidence.fx_contracts import (
+    FXConversionEvidence,  # noqa: TC001
+)
 from app.services.simulator.errors import SimulationError
-from app.utils import canonical_json, logger
+from app.utils import canonical_digest, logger
 
 
 class SymbolSpecification(BaseModel):
@@ -288,7 +289,7 @@ def validate_fx_evidence(
     if not evidence.as_of <= as_of < evidence.expires_at:
         raise SimulationError("SIM_FX_EVIDENCE_UNAVAILABLE", "FX evidence is not fresh")
     material = evidence.model_dump(mode="python", warnings=False)
-    digest = sha256(canonical_json(material).encode("utf-8")).hexdigest()
+    digest = canonical_digest(material)
     return ValidatedFXConversionEvidence(
         evidence=evidence,
         evidence_hash=digest,

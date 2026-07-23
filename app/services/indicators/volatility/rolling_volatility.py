@@ -18,13 +18,20 @@ import pandas as pd
 from numpy.lib.stride_tricks import sliding_window_view
 
 from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
+from app.services.indicators.core.errors import (
+    IndicatorError,
+    IndicatorErrorCode,
+    guard_public_boundary,
+)
 from app.services.indicators.core.results import build_indicator_result
 from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset, OHLCVRecord
+    from app.services.data.contracts import (
+        MarketDataset,
+        OHLCVRecord,
+    )
     from app.services.indicators.core.results import IndicatorResult
 
 _FORMULA_VERSION = "1.0.0"
@@ -204,6 +211,7 @@ def _rolling_log_return_volatility(
     return values, is_valid
 
 
+@guard_public_boundary
 def rolling_volatility(
     data: MarketDataset,
     *,

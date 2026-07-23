@@ -4,9 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pandas as pd
-from app.services.data.contracts import (
-    DataQualityReport as SourceQualityReport,
-)
+from app.services.data.contracts import DataQualityReport as SourceQualityReport
 from app.services.data.contracts import (
     MarketDataset,
     OHLCVRecord,

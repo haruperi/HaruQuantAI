@@ -25,7 +25,9 @@ def build_json_report(result: SimulationResult) -> str:
     """
     logger.info("Building canonical JSON Simulation report")
     try:
-        return canonical_json(result.model_dump(mode="python", warnings=False))
+        return canonical_json(
+            result.model_dump(mode="python", warnings=False), max_items=None
+        )
     except ValidationError as error:
         raise SimulationError(
             "SIM_INTERNAL_ERROR", "Result serialization failed"

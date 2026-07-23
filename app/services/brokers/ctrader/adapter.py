@@ -41,7 +41,10 @@ from app.services.brokers.contracts import (
     BrokerSymbolInfo,
     BrokerTick,
 )
-from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
+from app.services.brokers.contracts.protocols import (
+    _RequestValidationError,
+    _UnsupportedAdapterBase,
+)
 from app.services.brokers.ctrader.mapping import (
     _field,
     _map_bar,
@@ -105,6 +108,7 @@ class CTraderBrokerAdapter(_UnsupportedAdapterBase):
                 sender=network.send,
                 register_event_handler=network.add_event_handler,
                 unregister_event_handler=network.remove_event_handler,
+                latency_sink=self._record_provider_latency,
             )
         self._messages: ModuleType | None = None
         self._light_symbols: dict[str, object] = {}
@@ -896,14 +900,17 @@ class CTraderBrokerAdapter(_UnsupportedAdapterBase):
             Exact integral provider volume.
 
         Raises:
-            ValueError: If the requested lots are not exactly representable.
+            _RequestValidationError: If the requested lots are not exactly
+                representable before any provider transmission.
         """
         spec = await self._symbol_spec(symbol)
         lot_size = Decimal(str(_field(spec, "lotSize")))
         volume = quantity * lot_size * Decimal(100)
         integral = volume.to_integral_value()
         if volume != integral:
-            raise ValueError("quantity is not representable in cTrader volume cents")
+            raise _RequestValidationError(
+                "quantity is not representable in cTrader volume cents"
+            )
         return int(integral)
 
     async def _symbol_for_order(self, order_id: str) -> str:
@@ -913,7 +920,8 @@ class CTraderBrokerAdapter(_UnsupportedAdapterBase):
             Exact provider symbol name.
 
         Raises:
-            KeyError: If the active order is absent.
+            _RequestValidationError: If the active order is absent before any
+                provider transmission.
         """
         await self._ensure_symbols()
         response = await self._request("ProtoOAReconcileReq", "ProtoOAReconcileRes")
@@ -921,7 +929,7 @@ class CTraderBrokerAdapter(_UnsupportedAdapterBase):
             if str(_field(order, "orderId")) == order_id:
                 trade = _field(order, "tradeData")
                 return self._symbol_names[int(_field(trade, "symbolId"))]
-        raise KeyError(order_id)
+        raise _RequestValidationError("cTrader active order is absent")
 
     async def _symbol_for_position(self, position_id: str) -> str:
         """Resolve an active position's provider symbol without mutation.
@@ -930,7 +938,8 @@ class CTraderBrokerAdapter(_UnsupportedAdapterBase):
             Exact provider symbol name.
 
         Raises:
-            KeyError: If the active position is absent.
+            _RequestValidationError: If the active position is absent before any
+                provider transmission.
         """
         await self._ensure_symbols()
         response = await self._request("ProtoOAReconcileReq", "ProtoOAReconcileRes")
@@ -938,7 +947,7 @@ class CTraderBrokerAdapter(_UnsupportedAdapterBase):
             if str(_field(position, "positionId")) == position_id:
                 trade = _field(position, "tradeData")
                 return self._symbol_names[int(_field(trade, "symbolId"))]
-        raise KeyError(position_id)
+        raise _RequestValidationError("cTrader active position is absent")
 
     async def _get_symbol_value(self, symbol: str) -> BrokerSymbolInfo:
         """Return one mapped exact provider symbol."""

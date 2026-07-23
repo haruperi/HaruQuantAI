@@ -5,7 +5,7 @@ from app.services.optimization.public_api import run_parameter_sweep
 from app.services.strategy import StrategyConfig, validate_strategy_config
 from app.utils import logger
 
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 from tests.data.helpers import make_dataset
 from tests.optimization.unit.test_adapter import _auth
 from tests.optimization.unit.test_search_contracts import search_request

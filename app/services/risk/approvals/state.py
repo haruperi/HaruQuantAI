@@ -9,7 +9,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal, Protocol
 
-from app.services.risk.contracts import RiskApprovalToken
+from app.services.risk.contracts import RiskApprovalToken  # noqa: TC001
 from app.utils import logger
 
 

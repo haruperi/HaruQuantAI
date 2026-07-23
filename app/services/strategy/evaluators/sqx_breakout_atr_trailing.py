@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from app.services.strategy.evaluators._shared import (
+from app.services.strategy.signals._mechanics import (
     _bar_records,
     _current_value,
     _decimal_parameter,
@@ -21,12 +21,12 @@ from app.utils import logger
 if TYPE_CHECKING:
     from app.services.indicators import IndicatorResult
     from app.services.strategy.contracts import (
-        JsonValue,
         StrategyExecutionContext,
         StrategySignal,
         StrategySignalEvidence,
         ValidatedStrategyConfig,
     )
+    from app.services.strategy.contracts._base import JsonValue
 
 _MIN_ATR_PERIOD = 2
 

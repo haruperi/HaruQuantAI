@@ -71,15 +71,15 @@ def test_registry_created_yahoo_adapter_requires_explicit_probe() -> None:
     asyncio.run(exercise())
 
 
-def test_unavailable_provider_call_never_imports_sdk() -> None:
+def test_unsupported_provider_call_never_imports_sdk() -> None:
     """The catalogue release gate is enforced before provider transport."""
 
     async def exercise() -> None:
         result = create_broker_adapter(BrokerId.YAHOO, _config())
         assert result.data is not None
-        bars = await result.data.get_historical_bars("AAPL", "1d", limit=1)
-        assert bars.error is not None
-        assert bars.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        quote = await result.data.get_quote("AAPL")
+        assert quote.error is not None
+        assert quote.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
         assert "yfinance" not in sys.modules
 
     asyncio.run(exercise())

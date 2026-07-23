@@ -57,7 +57,7 @@ class OptimizationCheckpoint(BaseModel):
         if any(not value.strip() for value in self.evidence_references):
             raise ValueError("checkpoint evidence references cannot be blank")
         try:
-            canonical_json(self.model_dump(mode="json"))
+            canonical_json(self.model_dump(mode="json"), max_items=None)
         except (TypeError, ValueError) as exc:
             raise ValueError("checkpoint must be JSON-safe") from exc
         return self

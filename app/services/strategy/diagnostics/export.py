@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Literal, cast
 
-from app.services.strategy.contracts.models import (  # noqa: TC001
-    JsonValue,
-    StrategyExecutionContext,
+from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
+from app.services.strategy.contracts.execution import (
+    StrategyExecutionContext,  # noqa: TC001
 )
 from app.services.strategy.contracts.outcomes import StrategyOutcome, failure, success
 from app.services.strategy.diagnostics.errors import StrategyErrorCode

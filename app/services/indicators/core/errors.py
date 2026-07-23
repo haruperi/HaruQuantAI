@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
+import functools
 import math
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Final
+from typing import Final, ParamSpec, TypeVar
 
 from app.utils import logger, redact_text_value
+
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
 
 _MESSAGE_MAX_LENGTH: Final[int] = 256
 _DETAILS_MAX_KEYS: Final[int] = 16
@@ -179,6 +183,71 @@ class IndicatorError(Exception):
         self.message = _validate_message(message)
         self.details = _validate_details(details)
         super().__init__(self.code.value)
+
+
+def guard_public_boundary(
+    function: Callable[_P, _R],
+) -> Callable[_P, _R]:
+    """Convert any unexpected exception into a redacted ``IND_INTERNAL_ERROR``.
+
+    Applied to every official indicator convenience function so that no raw
+    pandas, NumPy, Utils, or Python exception can cross the Indicators public
+    port. A deliberate ``IndicatorError`` propagates unchanged so documented
+    deterministic failures keep their exact code.
+
+    The original exception is suppressed with ``raise ... from None`` and only
+    its class name is reported, because an upstream exception message may embed
+    caller payload data that must not cross the boundary.
+
+    This is an internal Core helper, not public API: it appears in no
+    ``__all__`` and is not a documented import for callers outside this package.
+
+    Args:
+        function: One official public indicator callable to protect.
+
+    Returns:
+        The wrapped callable with identical signature and behavior on success.
+    """
+
+    @functools.wraps(function)
+    def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+        """Execute the wrapped callable under the deterministic error boundary.
+
+        Args:
+            *args: Positional arguments forwarded unchanged.
+            **kwargs: Keyword arguments forwarded unchanged.
+
+        Returns:
+            Whatever the wrapped callable returns.
+
+        Raises:
+            IndicatorError: The original deterministic failure, or a redacted
+                ``IND_INTERNAL_ERROR`` replacing an unexpected exception.
+        """
+        try:
+            return function(*args, **kwargs)
+        except IndicatorError:
+            raise
+        # BLE001 is intentional here and only here: this decorator is the
+        # domain's outermost exception boundary, and its entire purpose is to
+        # stop *any* unexpected exception from crossing the public port. A
+        # narrower clause would let an unanticipated type escape as a raw
+        # traceback. BaseException is deliberately not caught, so KeyboardInterrupt
+        # and SystemExit still propagate.
+        except Exception as error:  # noqa: BLE001
+            failure_type = type(error).__name__
+            logger.error(
+                "Unexpected %s escaped %s; raising IND_INTERNAL_ERROR",
+                failure_type,
+                function.__name__,
+            )
+            raise IndicatorError(
+                IndicatorErrorCode.IND_INTERNAL_ERROR,
+                "indicator calculation failed with an unexpected internal error",
+                {"operation": function.__name__, "failure_type": failure_type},
+            ) from None
+
+    return wrapper
 
 
 __all__ = ["IndicatorError", "IndicatorErrorCode"]

@@ -14,7 +14,7 @@ from tests.simulator.unit.test_orchestrator import (
 
 def test_fast_research_cannot_claim_canonical(tmp_path: Path) -> None:
     """Return the distinct non-canonical result without official evidence."""
-    dataset = _dataset(f"req-{'8' * 64}")
+    dataset = _dataset("req-88888888-8888-4888-8888-888888888888")
     request = _request(
         dataset,
         runtime_profile="fast_research",

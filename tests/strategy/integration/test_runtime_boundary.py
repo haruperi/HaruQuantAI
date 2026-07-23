@@ -1,16 +1,60 @@
 """WF-STR-007 runtime safety-boundary integration."""
 
-from app.services.strategy import build_trade_intent
+# ruff: noqa: PT018
+
+from app.services.strategy import (
+    StrategyTimingPolicy,
+    run_vectorized_strategy_signals,
+)
 from app.utils import logger
 
-from tests.strategy.unit.test_models import make_context, make_decision
+from tests.strategy.integration.test_vectorized_workflow import _ProposingEvaluator
+from tests.strategy.unit.test_models import make_config, make_context, make_ref
+from tests.strategy.unit.test_vectorized_runner import Evaluator, _dataset
+
+_TIMING = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
 
 
 def test_runtime_boundary_emits_proposals_only() -> None:
-    """Verify Strategy output cannot represent official execution state."""
-    logger.debug("Testing WF-STR-007 runtime boundary")
-    intent = build_trade_intent(make_decision(), make_context(), 0).data
-    assert intent is not None
-    assert not (
-        {"order_id", "fill_id", "risk_approved"} & set(type(intent).model_fields)
+    """Verify a prepared runtime evaluation returns proposals and nothing else."""
+    logger.debug("Testing WF-STR-007 runtime boundary output")
+    outcome = run_vectorized_strategy_signals(
+        make_ref(timing=_TIMING),
+        make_config(),
+        _dataset(),
+        (),
+        make_context(timing=_TIMING),
+        _ProposingEvaluator(),
     )
+    assert outcome.status == "success"
+    assert outcome.data is not None
+    intents = outcome.data.intents
+    assert intents
+    forbidden = {
+        "approval_token",
+        "approved_size",
+        "broker_order_id",
+        "fill_id",
+        "fill_price",
+        "order_id",
+        "risk_approved",
+        "risk_decision_id",
+    }
+    for intent in intents:
+        assert not forbidden & set(intent.model_dump(mode="json"))
+        assert intent.schema_id == "strategy.trade_intent.v1"
+
+
+def test_runtime_boundary_neutral_evaluation_ends_workflow() -> None:
+    """Verify a neutral runtime evaluation hands Trading no action."""
+    logger.debug("Testing WF-STR-007 neutral runtime boundary")
+    outcome = run_vectorized_strategy_signals(
+        make_ref(timing=_TIMING),
+        make_config(),
+        _dataset(),
+        (),
+        make_context(timing=_TIMING),
+        Evaluator(),
+    )
+    assert outcome.status == "success"
+    assert outcome.data is not None and outcome.data.intents == ()

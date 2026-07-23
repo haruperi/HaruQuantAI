@@ -1,7 +1,9 @@
 # Simulation
 
 > **Package:** `app/services/simulator`
-> **Status:** `Completed` — implementation, post-build review corrections, and the Section 7 domain gate all completed 2026-07-19. The gate is green on both Linux (`169 passed`, `83.21%` coverage) and the Windows toolchain.
+> **Status:** `Partial` — implemented behavioral evidence remains recorded, but
+> the requirement-bearing root `errors.py` feature does not satisfy the current
+> one-feature/one-module-folder rule.
 > **Last updated:** `2026-07-19`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -142,6 +144,24 @@ flowchart TD
 ## 2. Final Package Structure
 
 Module folders and files are ordered from lowest dependency to highest dependency.
+
+### Feature Registry
+
+| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
+|---|---|---|---|---|---|
+| Completed | `FEAT-SIM-01` Boundary and Quality Validation | `validation/` | Exact declarations and validation contracts: Section 4.1 | Section 4.1 functional requirements | `tests/simulator/usage/01_validation.py` |
+| Completed | `FEAT-SIM-02` Simulation-Owned State | `state/` | Exact declarations and state contracts: Section 4.4a | Section 4.4a functional requirements | `tests/simulator/usage/02_state.py` |
+| Completed | `FEAT-SIM-03` Canonical Tick Timeline | `timeline/` | Exact declarations and tick contracts: Section 4.2 | Section 4.2 functional requirements | `tests/simulator/usage/03_timeline.py` |
+| Completed | `FEAT-SIM-04` Fixed-Precision Account Math | `accounting/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/simulator/usage/04_accounting.py` |
+| Completed | `FEAT-SIM-05` Matching and Simulated State | `execution/` | Exact declarations and execution contracts: Section 4.5 | Section 4.5 functional requirements | `tests/simulator/usage/05_execution.py` |
+| Completed | `FEAT-SIM-06` Immutable Journal and Replay | `journal/` | Exact declarations and journal contracts: Section 4.4 | Section 4.4 functional requirements | `tests/simulator/usage/06_journal.py` |
+| Completed | `FEAT-SIM-07` Official and Research Orchestration | `run/` | Exact declarations and run contracts: Section 4.7 | Section 4.7 functional requirements | `tests/simulator/usage/07_run.py` |
+| Partial | `FEAT-SIM-08` Domain Error Taxonomy | Root file `errors.py` | Exact declarations: Section 4.0 | Section 4.0 functional requirements | `tests/simulator/usage/08_errors.py`; root-file ownership remains structurally noncompliant |
+| Completed | `FEAT-SIM-09` Results and Canonical Artifacts | `reporting/` | Exact declarations and result contracts: Section 4.6 | Section 4.6 functional requirements | `tests/simulator/usage/09_reporting.py` |
+
+The Simulation feature IDs now follow the numbered usage programs. This exposes
+the root-file structural finding without changing implementation or erasing the
+previously recorded behavioral test results.
 
 ```text
 simulator/

@@ -1,5 +1,10 @@
 """Public typed Risk domain contracts and operations."""
 
+from app.services.risk.admission import review_strategy_admission
+from app.services.risk.allocation import (
+    activate_allocation_budget,
+    review_allocation_proposal,
+)
 from app.services.risk.approvals import ApprovalTokenService
 from app.services.risk.audit import RiskAuditChain
 from app.services.risk.config import RiskConfig, compute_config_hash, load_risk_config
@@ -35,26 +40,23 @@ from app.services.risk.contracts import (
     StrategyOperationalEligibilityRequest,
     validate_market_context_evidence,
 )
-from app.services.risk.decisions import (
-    RiskGovernor,
+from app.services.risk.governor import RiskGovernor
+from app.services.risk.kill_switch import (
     apply_kill_switch_command,
     check_risk_kill_switch,
-    revalidate_risk_decision,
 )
-from app.services.risk.policy import (
-    activate_allocation_budget,
+from app.services.risk.limits import (
     evaluate_market_context,
     evaluate_portfolio_limits,
-    review_allocation_proposal,
-    review_strategy_admission,
 )
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
 from app.services.risk.regimes import assess_risk_regime
 from app.services.risk.reporting import generate_risk_report
 from app.services.risk.scenarios import run_risk_scenario_analysis
 from app.services.risk.sizing import calculate_position_size
+from app.services.risk.validity import revalidate_risk_decision
 
-__all__ = [
+__all__ = (
     "ActionPolicyVerdict",
     "AllocationBudgetActivationRequest",
     "AllocationReviewRequest",
@@ -104,4 +106,4 @@ __all__ = [
     "review_strategy_admission",
     "run_risk_scenario_analysis",
     "validate_market_context_evidence",
-]
+)

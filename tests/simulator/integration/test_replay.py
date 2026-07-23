@@ -24,7 +24,7 @@ def _count_events(state: object, event: JournalEvent) -> dict[str, object]:
 def test_completed_run_replays_to_terminal_state(tmp_path: Path) -> None:
     """Validate the hash chain and reconstruct the terminal run event."""
     logger.info("Testing WF-SIM-005 deterministic replay")
-    dataset = _dataset(f"req-{'f' * 64}")
+    dataset = _dataset("req-ffffffff-ffff-4fff-8fff-ffffffffffff")
     request = _request(dataset, suffix="f")
     dependencies = FakeDependencies(tmp_path, dataset)
     result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]

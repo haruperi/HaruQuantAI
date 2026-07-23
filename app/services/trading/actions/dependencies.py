@@ -13,7 +13,10 @@ from app.services.brokers.contracts import (
     BrokerConnectionConfig,
     BrokerSymbolInfo,
 )
-from app.services.data.contracts import AccountStateSnapshot, MarketDataset
+from app.services.data.contracts import MarketDataset
+from app.services.data.evidence.account_contracts import (
+    AccountStateSnapshot,
+)
 from app.services.indicators import IndicatorResult
 from app.services.risk.contracts import (
     ActionPolicyVerdict,

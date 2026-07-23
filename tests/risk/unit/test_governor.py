@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 from app.services.risk.contracts import DecisionState, RiskDomainError, RiskErrorCode
-from app.services.risk.decisions import RiskGovernor
+from app.services.risk.governor import RiskGovernor
 
-from tests.risk.usage import test_usage_decisions as examples
-from tests.risk.usage import test_usage_policy as policy_examples
+from tests.risk import _support as examples
+from tests.risk import _support as policy_examples
 
 
 def test_governor_requires_live_dependencies() -> None:
@@ -78,7 +78,7 @@ def test_governor_logs_structured_material_decision_evidence() -> None:
     """Log trace, verdict, reason, latency, evidence, and config context."""
     config = examples._config()
     governor, _, _ = examples._services(config)
-    with patch("app.services.risk.decisions.governor.logger") as mocked_logger:
+    with patch("app.services.risk.governor.orchestration.logger") as mocked_logger:
         decision = governor.review_trade_risk(
             examples._proposal(config),
             examples._snapshot(config),

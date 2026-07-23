@@ -12,8 +12,8 @@ from app.services.brokers import (
     BrokerResult,
     BrokerTick,
 )
-from app.services.data.contracts import SourceReadRequest
-from app.services.data.sources.external import ExternalMarketDataSource
+from app.services.data.sources.broker_adapter import ExternalMarketDataSource
+from app.services.data.sources.contracts import SourceReadRequest
 from app.utils import generate_id
 
 
@@ -54,7 +54,7 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
                 status="success",
                 broker=BrokerId.MT5,
                 operation=BrokerCapabilityId.GET_HISTORICAL_BARS,
-                request_id="get-bars-1",
+                request_id=generate_id("req"),
                 timestamp=closing,
                 environment=BrokerEnvironment.DEMO,
                 adapter_version="1.0.0",
@@ -104,7 +104,7 @@ def test_tick_availability_tolerates_provider_clock_skew() -> None:
                 status="success",
                 broker=BrokerId.MT5,
                 operation=BrokerCapabilityId.GET_TICKS,
-                request_id="get_ticks-1",
+                request_id=generate_id("req"),
                 timestamp=received_at,
                 environment=BrokerEnvironment.DEMO,
                 adapter_version="1.0.0",

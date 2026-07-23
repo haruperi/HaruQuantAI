@@ -48,11 +48,9 @@ from app.services.trading import (
 from app.utils import AuditEvent, canonical_json, generate_id, logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
-        AccountStateSnapshot,
-        FXConversionEvidence,
-        MarketDataset,
-    )
+    from app.services.data.contracts import MarketDataset
+    from app.services.data.evidence.account_contracts import AccountStateSnapshot
+    from app.services.data.evidence.fx_contracts import FXConversionEvidence
     from app.services.portfolio.config import PortfolioSettings
     from app.services.portfolio.state import AuditOutboxRecord, PortfolioRepository
 

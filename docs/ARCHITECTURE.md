@@ -37,15 +37,26 @@
   broker contracts, registry/factory, runtime safety, provider adapters, and its
   deterministic test adapter. Capability availability remains evidence-gated and
   fail-closed.
-* `app/services/data/` is a completed implementation baseline containing immutable
+* `app/services/data/` has an implemented functional baseline containing immutable
   contracts, bounded SQLite/file/cache/audit persistence, explicit read-only sources
   and durable policy, historical/reference/context/FX access, deterministic
-  processing/alignment, recoverable jobs, internal feed status, and typed
-  package-root operations. Retrieval and reference exports accept either their
-  typed request or direct keyword arguments; standalone calls lazily compose
-  MT5 read-only source, identity, migration, and calendar dependencies through
-  the existing Brokers and Data boundaries. Explicit source/adapter injection
-  remains supported.
+  transforms/alignment, synthetic generators, quality validation, recoverable
+  scheduler jobs, internal feed status, immutable backup/restore manifests,
+  licence-aware retention enforcement, and exactly 35 typed package-root operations.
+  Retrieval and reference exports accept either their typed request or direct keyword
+  arguments; standalone calls lazily compose MT5 read-only source, identity,
+  migration, and calendar dependencies through the existing Brokers and Data
+  boundaries. Explicit source/adapter injection remains supported.
+  Its architecture status is `Completed`. `CAP-DATA-028` locates the behavior in
+  fifteen approved capabilities: `contracts/`, `market_data/`,
+  `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`,
+  `quality/`, `transformation/`, `time_sessions/`, `sources/`,
+  `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, and `audit/`.
+  Exactly fifteen numbered standalone usage programs cover those owners, and removed
+  horizontal packages have no compatibility shims. The correction changes ownership
+  and file focus only; active requirements, public
+  behaviour, contract versions, schema identifiers, error codes, and the frozen
+  package-root API remain compatible.
 * `app/services/indicators/` is a completed implementation baseline containing
   the immutable Core calculation boundary and 20 approved one-indicator-per-file
   implementations across trend, volatility, momentum, volume, and candles.
@@ -177,14 +188,88 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
 - Data's canonical cross-domain schema identifiers are
   `data.market_dataset.v1`, `data.account_state_snapshot.v1`,
   `data.market_context_evidence.v1`, and `data.fx_conversion_evidence.v1`.
+- Canonical Data contracts are exposed by `app.services.data.contracts`; pending
+  feature-specific contracts remain in `app.services.data.models` only until their
+  approved owning slices migrate.
 - Data contract modules contain immutable schemas and deterministic validation only.
   They perform no source, broker, network, storage, cache, scheduling, or feed-runtime
   acquisition.
-- Data evidence acquisition belongs in `app.services.data.access`; canonical/friendly
-  identity and provider-symbol mapping belongs in `app.services.data.sources`.
+- Data market-data acquisition belongs in `app.services.data.retrieval`; normalized
+  cross-domain evidence (market context, FX, account state) belongs in
+  `app.services.data.evidence`; canonical/friendly identity, provider-symbol mapping,
+  and source readiness/licence/promotion policy belong in
+  `app.services.data.sources`.
+- `MarketDataRequest.limit` is required to be positive, but OHLCV retrieval has no
+  app-wide record-count ceiling. Tick and spread retrieval retain their governed
+  limits; multi-million-record OHLCV ingestion remains the responsibility of the
+  bounded, resumable Data Jobs backfill workflow.
+- Detached OHLCV DataFrame projection preserves genuinely unavailable optional spread
+  as float64 `NaN` and records `spread_unit=None`; supplied spread remains unit-bearing
+  and finite. Missing spread is never replaced with zero or an assumed current quote.
+- FEAT-DATA-05 owns tick derivation in two internal stages: eligible bar evidence is
+  transformed by private Numba kernels into exact signed-64-bit fixed-point columns,
+  then the public in-memory operation constructs canonical immutable `TickRecord`
+  values at the Decimal boundary. Direct Parquet persistence consumes bounded columns
+  without constructing a complete tick `MarketDataset`. A safe common internal scale
+  preserves provider precision before output rounding; real ticks, seeded variable
+  spreads, unsafe precision/ranges, and small batches use the exact legacy path.
+  Simulation may later consume bounded columns through its own integration, but
+  it does not own or duplicate tick generation.
 - External broker/provider reads use injected Brokers `BrokerAdapter` read traits.
   Data owns no SDK session, credential resolution, connection lifecycle, or mutation
   capability; only Trading may invoke broker mutations.
+- The research-only Dukascopy adapter uses BI5 hour files for raw ticks and the
+  keyless `chart/json3` web-chart interface for BID candles. Brokers owns exact
+  interface-specific symbol mapping (for example, canonical `EURUSD` to web-chart
+  `EUR/USD`), bounded cursor pagination/retries, and provider-value mapping; it does
+  not invent spread or locally synthesize OHLC from those ticks.
+- Source composition is centralized in `app.services.data.sources.composition` and is the single
+  gate on source availability. It dispatches on source kind: local artifact sources
+  declared by `DATA_LOCAL_SOURCES` compose at `production` readiness with no
+  credential, network, or promotion requirement; broker provider facades declared by
+  `DATA_PROVIDER_SOURCES` compose at `staging` only when their Brokers-owned
+  `*_ENABLED` flag is set, and reach `production` solely through evidence-based
+  promotion. An identifier that is neither fails closed as `UNSUPPORTED_SOURCE`
+  before any policy evaluation. Local artifacts live under `DATA_RAW_ROOT` and are
+  named `{symbol}[_{timeframe}].{csv|parquet}`.
+- Standalone Yahoo composition is credential-free but explicit: Data selects the
+  Brokers-required `SANDBOX` profile, configures `AAPL` as the connectivity probe, and
+  registers exact identity `AAPL` to `AAPL`. Brokers maps canonical bar timeframes such
+  as `H1` to documented yfinance intervals such as `1h` without fallback guessing.
+- Standalone Binance Spot public-read composition is also credential-free. Data uses
+  the Brokers-required `LIVE` profile without account secrets, while Registry releases
+  only symbol discovery, symbol metadata, and historical bars. Brokers maps canonical
+  timeframes such as `H1` to Binance's exact case-sensitive `1h` interval and preserves
+  both requested and provider timeframe provenance; unsupported intervals fail closed.
+  Data keeps each asynchronous connect/read/disconnect sequence on one event loop, so
+  no loop-bound HTTP client crosses calls through the synchronous facade.
+- Availability inspection uses persisted manifests/indexes for local artifacts and one
+  bounded canonical retrieval for network providers. Provider availability reports
+  only the observed probe range and records whether its record limit was reached, so
+  an unobserved remote history is never represented as complete.
+- Foreign artifact admission is explicit. `load_dataset` requires a Data-written
+  manifest and performs no hidden on-read conversion or migration. Externally
+  produced CSV/Parquet enters canonical form only through `import_external_dataset`,
+  which requires a caller-declared `ColumnMapping` and a named dialect fixing header
+  style and delimiter. No governed field — `symbol`, `data_kind`, `timeframe`,
+  `workflow_context`, `precision_policy` — is ever inferred from file contents; the
+  import fails rather than guessing. The operation terminates in `save_dataset` and
+  persists one `AuditEvent` recording external origin, so imported artifacts are
+  thereafter indistinguishable from Data-authored output while their provenance
+  remains auditable.
+- Cache staleness is caller-declared and never silent. `MarketDataRequest.stale_cache_policy`
+  admits `refresh` (expired entry is a miss), `fail_closed` (return `EMPTY_RESULT`
+  without contacting any source, enabling deterministic offline replay), and
+  `serve_stale` (return the expired entry with `cache_status="stale_warning"`).
+  `serve_stale` is restricted to the `research` workflow context at contract
+  validation; governed contexts never serve expired entries.
+- Retrieval quality-failure behavior is a closed `reject | warn` contract, applied
+  identically to fresh and cached datasets. `reject` is the default and raises
+  `DATA_QUALITY_FAILED`; `warn` logs bounded evidence and returns the unchanged
+  dataset with `quality_status="failed"` and its issues intact.
+- High-level bar quality inspection discounts exact weekend closures and injected
+  `SessionWindow` non-trading intervals. Unexplained weekday gaps remain critical;
+  absent session evidence is explicitly disclosed as `calendar_unverified`.
 
 Portfolio collaboration is contract-governed:
 

@@ -5,7 +5,11 @@ from decimal import Decimal
 
 import pandas as pd
 import pytest
-from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.data.contracts import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+)
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import IndicatorError
 from app.services.indicators.core.results import (
@@ -195,3 +199,162 @@ def test_join_to_rejects_unsupported_mode() -> None:
     result = _build_result(data)
     with pytest.raises(IndicatorError):
         result.join_to(data, mode="overwrite")  # type: ignore[arg-type]
+
+
+def test_build_result_row_count_mismatch() -> None:
+    """build_indicator_result fails if row count does not match dataset."""
+    data = _dataset()
+    res = _build_result(data)
+    res_values = res.values  # noqa: PD011
+    # output_values is shorter than dataset
+    with pytest.raises(IndicatorError, match="IND_PARTIAL_RESULT"):
+        build_indicator_result(
+            data=data,
+            config=_config(),
+            indicator_version="1.0.0",
+            output_columns=("sma_2",),
+            output_values=res_values[["sma_2"]].iloc[:1],
+            available_at=pd.Series([datetime.now(UTC)]),
+            computed_from_start=pd.Series([pd.NaT]),
+            computed_from_end=pd.Series([pd.NaT]),
+            unavailable_reason=pd.Series(["warmup"]),
+        )
+
+
+def test_build_result_missing_columns() -> None:
+    """build_indicator_result fails if expected columns are missing."""
+    data = _dataset()
+    res = _build_result(data)
+    res_values = res.values  # noqa: PD011
+    # columns in output_values do not match output_columns
+    with pytest.raises(IndicatorError, match="IND_PARTIAL_RESULT"):
+        build_indicator_result(
+            data=data,
+            config=_config(),
+            indicator_version="1.0.0",
+            output_columns=("sma_2", "other_col"),
+            output_values=res_values[["sma_2"]],
+            available_at=res_values["available_at"],
+            computed_from_start=res_values["computed_from_start"],
+            computed_from_end=res_values["computed_from_end"],
+            unavailable_reason=res_values["unavailable_reason"],
+        )
+
+
+def test_build_result_inconsistent_warmup() -> None:
+    """build_indicator_result fails if warmup values are not atomically consistent."""
+    data = _dataset()
+    res = _build_result(data)
+    res_values = res.values  # noqa: PD011
+    # Make a non-warmup value NaN or vice versa to cause inconsistency
+    output_values = res_values[["sma_2"]].copy()
+    output_values.loc[output_values.index[1], "sma_2"] = float("nan")
+    with pytest.raises(IndicatorError, match="IND_PARTIAL_RESULT"):
+        build_indicator_result(
+            data=data,
+            config=_config(),
+            indicator_version="1.0.0",
+            output_columns=("sma_2",),
+            output_values=output_values,
+            available_at=res_values["available_at"],
+            computed_from_start=res_values["computed_from_start"],
+            computed_from_end=res_values["computed_from_end"],
+            unavailable_reason=res_values["unavailable_reason"],
+        )
+
+
+def test_build_result_lookahead_risk() -> None:
+    """build_indicator_result fails if causality bounds are not logical."""
+    data = _dataset()
+    res = _build_result(data)
+    res_values = res.values  # noqa: PD011
+    # start > end
+    bad_start = pd.Series(
+        [pd.NaT, data.records[2].timestamp, data.records[2].timestamp],
+        index=res_values.index,
+    )
+    bad_end = pd.Series(
+        [pd.NaT, data.records[1].timestamp, data.records[2].timestamp],
+        index=res_values.index,
+    )
+    with pytest.raises(IndicatorError, match="IND_LOOKAHEAD_RISK"):
+        build_indicator_result(
+            data=data,
+            config=_config(),
+            indicator_version="1.0.0",
+            output_columns=("sma_2",),
+            output_values=res_values[["sma_2"]],
+            available_at=res_values["available_at"],
+            computed_from_start=bad_start,
+            computed_from_end=bad_end,
+            unavailable_reason=res_values["unavailable_reason"],
+        )
+
+
+def test_build_result_non_finite_values() -> None:
+    """build_indicator_result fails if non-warmup values are infinite."""
+    data = _dataset()
+    res = _build_result(data)
+    res_values = res.values  # noqa: PD011
+    output_values = res_values[["sma_2"]].copy()
+    output_values.loc[output_values.index[1], "sma_2"] = float("inf")
+    with pytest.raises(IndicatorError, match="IND_INTERNAL_ERROR"):
+        build_indicator_result(
+            data=data,
+            config=_config(),
+            indicator_version="1.0.0",
+            output_columns=("sma_2",),
+            output_values=output_values,
+            available_at=res_values["available_at"],
+            computed_from_start=res_values["computed_from_start"],
+            computed_from_end=res_values["computed_from_end"],
+            unavailable_reason=res_values["unavailable_reason"],
+        )
+
+
+def test_build_result_input_mutation() -> None:
+    """build_indicator_result fails if input dataset is mutated during finalization."""
+    from unittest.mock import patch
+
+    data = _dataset()
+    res = _build_result(data)
+    res_values = res.values  # noqa: PD011
+
+    # We patch _input_checksum to return a different hash on the second call
+    with (
+        patch(
+            "app.services.indicators.core.results._input_checksum",
+            side_effect=["first_checksum", "second_checksum"],
+        ),
+        pytest.raises(IndicatorError, match="IND_INPUT_MUTATION_DETECTED"),
+    ):
+        build_indicator_result(
+            data=data,
+            config=_config(),
+            indicator_version="1.0.0",
+            output_columns=("sma_2",),
+            output_values=res_values[["sma_2"]],
+            available_at=res_values["available_at"],
+            computed_from_start=res_values["computed_from_start"],
+            computed_from_end=res_values["computed_from_end"],
+            unavailable_reason=res_values["unavailable_reason"],
+        )
+
+
+def test_serialize_output_cell_edge_cases() -> None:
+    """Test _serialize_output_cell internal serialization logic."""
+    from app.services.indicators.core.results import _serialize_output_cell
+
+    # None and float NaN
+    assert _serialize_output_cell(None) is None
+    assert _serialize_output_cell(float("nan")) is None
+    assert _serialize_output_cell(pd.NA) is None
+
+    # pd.Timestamp conversion
+    ts = pd.Timestamp("2026-07-21 16:30:00+00:00")
+    assert _serialize_output_cell(ts) == "2026-07-21T16:30:00Z"
+
+    # floats normalization
+    assert _serialize_output_cell(-0.0) == "0x0.0p+0"
+    assert _serialize_output_cell(0.0) == "0x0.0p+0"
+    assert _serialize_output_cell(1.5) == float.hex(1.5)

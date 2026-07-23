@@ -11,14 +11,30 @@ from app.services.strategy import (
 )
 from app.utils import logger
 
-from tests.indicators.unit.test_results import _dataset
 from tests.strategy.unit.test_models import (
     HASH,
     make_config,
     make_context,
     make_decision,
+    make_market,
     make_ref,
 )
+
+_BARS = (
+    ("1.1000", "1.1010", "1.0990", "1.1005"),
+    ("1.1005", "1.1015", "1.0995", "1.1010"),
+    ("1.1010", "1.1020", "1.1000", "1.1015"),
+)
+
+
+def _dataset():
+    """Build local Strategy-owned bar evidence for runner tests.
+
+    Returns:
+        A complete immutable Data-owned market dataset.
+    """
+    logger.debug("Building local vectorized runner market evidence")
+    return make_market(_BARS)
 
 
 class Evaluator:

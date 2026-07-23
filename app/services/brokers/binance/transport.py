@@ -4,7 +4,8 @@
 
 import asyncio
 import importlib
-from collections.abc import AsyncIterator
+import time
+from collections.abc import AsyncIterator, Callable
 from typing import Any
 
 from app.services.brokers.contracts import BrokerConnectionConfig, BrokerEnvironment
@@ -15,13 +16,21 @@ from app.utils import logger
 class _BinanceTransport:
     """Own one python-binance client and close it deterministically."""
 
-    def __init__(self, config: BrokerConnectionConfig) -> None:
+    def __init__(
+        self,
+        config: BrokerConnectionConfig,
+        latency_sink: Callable[[float], None] | None = None,
+    ) -> None:
         """Initialize the _BinanceTransport instance.
 
         Args:
-            config: Value supplied to the operation.
+            config: Immutable connection configuration for this session.
+            latency_sink: Optional receiver for the measured milliseconds spent
+                inside each provider REST call, used to separate provider
+                latency from local adapter overhead.
         """
         self._config = config
+        self._latency_sink = latency_sink
         self._client: Any = None
         self._socket_manager: Any = None
         self._circuit = _TransportCircuitBreaker(
@@ -71,6 +80,7 @@ class _BinanceTransport:
         if blocked is not None:
             raise ConnectionError(blocked.value)
         method = getattr(self._client, name)
+        started = time.perf_counter()
         try:
             result = await asyncio.wait_for(
                 method(**kwargs), timeout=self._config.request_timeout_sec
@@ -87,6 +97,9 @@ class _BinanceTransport:
                 provider_code=BrokerErrorCode.BROKER_PROVIDER_ERROR.value,
             ).warning("Binance transport call failed")
             raise
+        finally:
+            if self._latency_sink is not None:
+                self._latency_sink((time.perf_counter() - started) * 1000.0)
         await self._circuit.record_success()
         return result
 

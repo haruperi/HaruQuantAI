@@ -5,7 +5,7 @@
 from contextlib import AbstractContextManager
 from pathlib import Path
 
-from app.services.data.config import DataSettings, data_settings_context
+from app.services.data._settings import DataSettings, data_settings_context
 from app.services.strategy import (
     StrategyConfig,
     StrategyEnvironment,
@@ -95,6 +95,29 @@ def test_registration_is_immutable(tmp_path: Path) -> None:
     assert first.data is not None and first.data.status == "ACCEPTED"
     assert retry.data is not None and retry.data.status == "IDEMPOTENT"
     assert rejected.data is not None and rejected.data.status == "REJECTED"
+
+
+def test_multi_environment_manifest_requires_explicit_environment(
+    tmp_path: Path,
+) -> None:
+    """Verify ambiguous environment declarations reject instead of defaulting."""
+    logger.debug("Testing explicit Strategy registration environment")
+    request = make_registration()
+    ambiguous_manifest = request.manifest.model_copy(
+        update={
+            "permitted_environments": (
+                StrategyEnvironment.RESEARCH,
+                StrategyEnvironment.PAPER,
+            )
+        }
+    )
+    ambiguous = request.model_copy(update={"manifest": ambiguous_manifest})
+    with storage_context(tmp_path):
+        outcome = register_strategy_version(ambiguous, make_auth(), make_policy())
+    assert outcome.data is not None
+    assert outcome.data.status == "REJECTED"
+    assert outcome.data.reason_codes == ("AMBIGUOUS_ENVIRONMENT",)
+    assert outcome.data.validated_ref is None
 
 
 def test_list_versions_is_deterministically_ordered(tmp_path: Path) -> None:

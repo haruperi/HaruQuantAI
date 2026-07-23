@@ -28,6 +28,18 @@ _WRITE = {
     BrokerCapabilityId.MODIFY_POSITION,
     BrokerCapabilityId.CLOSE_POSITION,
 }
+# Operations that mutate provider watch-list or session subscription state
+# without placing an order. They are neither pure reads nor order writes, so
+# they are declared `READ_WRITE` and a read-scoped consumer cannot invoke them
+# by mistaking them for observations.
+_SESSION_MUTATING = {
+    BrokerCapabilityId.SELECT_SYMBOL,
+    BrokerCapabilityId.SELECT_ACCOUNT,
+    BrokerCapabilityId.SUBSCRIBE_QUOTES,
+    BrokerCapabilityId.SUBSCRIBE_BARS,
+    BrokerCapabilityId.SUBSCRIBE_ORDER_BOOK,
+    BrokerCapabilityId.UNSUBSCRIBE,
+}
 
 _COMMON_TARGETS = _LOCAL | {
     BrokerCapabilityId.CONNECT,
@@ -148,55 +160,119 @@ _TARGETS: Mapping[BrokerId, set[BrokerCapabilityId]] = MappingProxyType(
 _RELEASED: Mapping[BrokerId, frozenset[BrokerCapabilityId]] = MappingProxyType(
     {
         BrokerId.MT5: frozenset(_IMPLEMENTED[BrokerId.MT5] - _WRITE),
+        BrokerId.BINANCE_SPOT: frozenset(
+            {
+                BrokerCapabilityId.GET_SYMBOLS,
+                BrokerCapabilityId.GET_SYMBOL_INFO,
+                BrokerCapabilityId.GET_HISTORICAL_BARS,
+            }
+        ),
+        BrokerId.DUKASCOPY: frozenset(_IMPLEMENTED[BrokerId.DUKASCOPY] - _WRITE),
+        BrokerId.YAHOO: frozenset({BrokerCapabilityId.GET_HISTORICAL_BARS}),
     }
 )
 
+# Recorded evidence for every released read, satisfying FR-BRK-010. A released
+# capability must name the deterministic provider-response suites that prove it;
+# an entry may never be added without the corresponding passing tests.
+_READ_EVIDENCE: Mapping[BrokerId, tuple[str, ...]] = MappingProxyType(
+    {
+        BrokerId.MT5: (
+            "tests/brokers/unit/test_mt5_transport.py",
+            "tests/brokers/unit/test_mt5_mapping.py",
+            "tests/brokers/unit/test_mt5_adapter.py",
+            "tests/brokers/integration/test_provider_contracts.py",
+        ),
+        BrokerId.BINANCE_SPOT: (
+            "tests/brokers/unit/test_binance_transport.py",
+            "tests/brokers/unit/test_binance_mapping.py",
+            "tests/brokers/unit/test_binance_adapter.py",
+        ),
+        BrokerId.DUKASCOPY: (
+            "tests/brokers/unit/test_dukascopy_transport.py",
+            "tests/brokers/unit/test_dukascopy_mapping.py",
+            "tests/brokers/unit/test_dukascopy_adapter.py",
+        ),
+        BrokerId.YAHOO: (
+            "tests/brokers/unit/test_yahoo_transport.py",
+            "tests/brokers/unit/test_yahoo_mapping.py",
+            "tests/brokers/unit/test_yahoo_adapter.py",
+        ),
+    }
+)
 
-def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapability:
-    """Handle capability.
+# The adapter's own verification act. `connect` establishes and verifies the
+# session and `is_connected` reads local/provider session state, so both remain
+# attemptable without prior release evidence; every other provider call does not.
+_SELF_VERIFYING = {
+    BrokerCapabilityId.CONNECT,
+    BrokerCapabilityId.IS_CONNECTED,
+}
+
+
+def _access_mode(
+    operation: BrokerCapabilityId,
+) -> Literal["READ", "WRITE", "READ_WRITE"]:
+    """Classify one operation's effect on provider and session state.
 
     Args:
-        broker: Value supplied to the operation.
-        operation: Value supplied to the operation.
+        operation: Capability being declared.
 
     Returns:
-        The operation result.
+        `WRITE` for order mutations, `READ_WRITE` for session-mutating
+        operations, and `READ` for pure observations.
+    """
+    if operation in _WRITE:
+        return "WRITE"
+    if operation in _SESSION_MUTATING:
+        return "READ_WRITE"
+    return "READ"
+
+
+def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapability:
+    """Declare one profile/operation entry from the single static source.
+
+    Args:
+        broker: Exact registered provider profile.
+        operation: Canonical capability being declared.
+
+    Returns:
+        The complete immutable capability declaration for the pair.
     """
     target = operation in _TARGETS[broker]
     implemented = operation in _IMPLEMENTED[broker]
-    is_write = operation in _WRITE
     # CONNECT is the adapter's verification act and IS_CONNECTED performs the
     # adapter's provider-specific check. Both remain attemptable. Other reads
     # require explicit release evidence; writes are excluded unconditionally.
-    connect_ready = implemented and operation in {
-        BrokerCapabilityId.CONNECT,
-        BrokerCapabilityId.IS_CONNECTED,
-    }
+    connect_ready = implemented and operation in _SELF_VERIFYING
     released = (
         implemented
         and operation in _RELEASED.get(broker, frozenset())
         and operation not in _WRITE
     )
+    available = connect_ready or released
     availability: Literal["AVAILABLE", "UNAVAILABLE", "DEGRADED"] = (
-        "AVAILABLE" if (connect_ready or released) else "UNAVAILABLE"
+        "AVAILABLE" if available else "UNAVAILABLE"
     )
+    evidence = _READ_EVIDENCE.get(broker, ()) if released else ()
     return BrokerCapability(
         capability=operation,
         implementation_status="IMPLEMENTED" if implemented else "NOT_IMPLEMENTED",
         availability=availability,
-        access_mode="WRITE" if is_write else "READ",
+        access_mode=_access_mode(operation),
         requirement=(
             "PERMISSION"
-            if is_write
+            if operation in _WRITE
             else "AUTHENTICATION"
             if broker in {BrokerId.MT5, BrokerId.CTRADER}
             else "NONE"
         ),
-        verification_status="NOT_TESTED",
+        verification_status="TESTED_SANDBOX" if released else "NOT_TESTED",
+        verification_evidence=evidence,
         execution_model="LOCAL" if operation in _LOCAL else "PROVIDER_CALL",
         reason=(
             None
-            if (connect_ready or released)
+            if available
             else "Release evidence is not recorded"
             if implemented
             else "Operation is not implemented"

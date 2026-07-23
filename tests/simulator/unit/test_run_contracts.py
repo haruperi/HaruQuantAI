@@ -16,7 +16,7 @@ from tests.simulator.unit.test_orchestrator import _dataset, _request
 
 def test_request_matches_project_section_5_exactly() -> None:
     """Forbid unknown request material and preserve exact identity fields."""
-    dataset = _dataset(f"req-{'5' * 64}")
+    dataset = _dataset("req-55555555-5555-4555-8555-555555555555")
     request = _request(dataset)
     payload = request.model_dump(mode="python", warnings=False) | {"raw_code": "unsafe"}
     with pytest.raises(ValidationError, match="extra"):
@@ -25,7 +25,7 @@ def test_request_matches_project_section_5_exactly() -> None:
 
 def test_portfolio_request_is_self_contained() -> None:
     """Accept only Simulation-owned immutable component projections."""
-    dataset = _dataset(f"req-{'6' * 64}")
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     child = _request(dataset, suffix="6")
     observations = tuple(
         ReturnObservation(
@@ -43,9 +43,9 @@ def test_portfolio_request_is_self_contained() -> None:
         backtest_request=child,
     )
     payload: dict[str, object] = {
-        "request_id": f"req-{'7' * 64}",
-        "workflow_id": f"wf-{'7' * 64}",
-        "correlation_id": f"cor-{'7' * 64}",
+        "request_id": "req-77777777-7777-4777-8777-777777777777",
+        "workflow_id": "wf-77777777-7777-4777-8777-777777777777",
+        "correlation_id": "cor-77777777-7777-4777-8777-777777777777",
         "portfolio_id": "portfolio",
         "construction_result_id": "construction",
         "construction_version": "v1",

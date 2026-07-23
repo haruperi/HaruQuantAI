@@ -81,6 +81,8 @@ def test_operations_emit_structured_logs() -> None:
     assert isinstance(record.request_id, str)
     assert record.request_id
     assert isinstance(record.latency_ms, float)
+    # NFR-BRK-008 requires a measured latency, never a constant placeholder.
+    assert record.latency_ms > 0.0
 
 
 def test_state_transitions_are_logged() -> None:

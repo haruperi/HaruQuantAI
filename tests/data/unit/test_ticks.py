@@ -2,18 +2,20 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from pathlib import Path
 
+import app.services.data.tick_derivation.generator as tick_generator
 import pytest
-from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.market import DataQualityReport, MarketDataset
+from app.services.data.contracts import DataError, DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
-from app.services.data.processing.ticks import (
+from app.services.data.tick_derivation.generator import (
     GENERATED_TICKS_MIN_PER_BAR,
     PHASE_CLOSE,
     PHASE_HIGH,
     PHASE_LOW,
     PHASE_OPEN,
     generate_tick_series,
+    generate_tick_series_to_parquet,
 )
 
 _START = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
@@ -390,3 +392,156 @@ def test_real_model_marks_bucket_extremes() -> None:
     assert phases[-1] & PHASE_CLOSE
     assert any(phase is not None and phase & PHASE_HIGH for phase in phases)
     assert any(phase is not None and phase & PHASE_LOW for phase in phases)
+
+
+@pytest.mark.parametrize("spread_model", ["native_spread", "fixed_spread"])
+def test_compiled_generated_path_matches_decimal_fallback_exactly(
+    monkeypatch: pytest.MonkeyPatch,
+    spread_model: str,
+) -> None:
+    """The fixed-point kernel preserves every canonical record field exactly."""
+    dataset = _bar_dataset(
+        (
+            _bar(
+                0,
+                "1.10000",
+                "1.1020000000000001",
+                "1.09900",
+                "1.1009999999999999",
+                volume="13",
+            ),
+            _bar(1, "1.10100", "1.10300", "1.10000", "1.10050", volume="14"),
+        )
+    )
+    arguments: dict[str, object] = {
+        "model": "generated",
+        "trading_timeframe": "M1",
+        "spread_model": spread_model,
+    }
+    if spread_model == "fixed_spread":
+        arguments["fixed_spread_points"] = Decimal(3)
+
+    monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1)
+    compiled = generate_tick_series(dataset, **arguments)  # type: ignore[arg-type]
+    monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1_000_000)
+    fallback = generate_tick_series(dataset, **arguments)  # type: ignore[arg-type]
+
+    assert [record.model_dump() for record in compiled.records] == [
+        record.model_dump() for record in fallback.records
+    ]
+
+
+def test_compiled_four_tick_path_matches_decimal_fallback_exactly(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Compiled canonical waypoints preserve bullish and bearish traversal."""
+    dataset = _bar_dataset(
+        (
+            _bar(0, "1.10000", "1.10200", "1.09900", "1.10100"),
+            _bar(1, "1.10100", "1.10300", "1.10000", "1.10050"),
+        )
+    )
+    monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1)
+    compiled = generate_tick_series(
+        dataset, model="trading_bar", trading_timeframe="M1"
+    )
+    monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1_000_000)
+    fallback = generate_tick_series(
+        dataset, model="trading_bar", trading_timeframe="M1"
+    )
+
+    assert [record.model_dump() for record in compiled.records] == [
+        record.model_dump() for record in fallback.records
+    ]
+
+
+def test_unsafe_precision_uses_exact_decimal_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Precision outside signed-64-bit safety retains the Decimal path."""
+    dataset = _bar_dataset(
+        (
+            _bar(
+                0,
+                "1.100000000000000000000000000001",
+                "1.102000000000000000000000000001",
+                "1.099000000000000000000000000001",
+                "1.101000000000000000000000000001",
+                volume="12",
+            ),
+        )
+    )
+    monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1)
+
+    result = generate_tick_series(
+        dataset,
+        model="generated",
+        trading_timeframe="M1",
+        price_precision=5,
+    )
+
+    assert result.record_count == 12
+    assert result.records[0].bid == Decimal("1.10000")
+
+
+def test_generated_limit_is_rejected_before_kernel_allocation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The total output ceiling is enforced before compiled allocation."""
+    dataset = _bar_dataset(
+        (_bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="10000"),)
+    )
+
+    def fail_if_called(*args: object, **kwargs: object) -> None:
+        raise AssertionError("kernel must not run after a failed preflight")
+
+    monkeypatch.setattr(tick_generator, "generate_volume_tick_arrays", fail_if_called)
+    with pytest.raises(DataError):
+        generate_tick_series(
+            dataset,
+            model="generated",
+            trading_timeframe="M1",
+            max_records=100,
+        )
+
+
+def test_parquet_uses_bounded_compiled_columns_without_materializing_dataset(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Eligible Parquet chunks bypass canonical in-memory tick construction."""
+    import pyarrow.parquet as pq
+
+    dataset = _bar_dataset(
+        (
+            _bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="13"),
+            _bar(1, "1.10100", "1.10300", "1.10000", "1.10050", volume="14"),
+        )
+    )
+    destination = tmp_path / "ticks.parquet"
+    monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1)
+
+    def fail_if_called(*args: object, **kwargs: object) -> None:
+        raise AssertionError("public materializing path must not run")
+
+    monkeypatch.setattr(tick_generator, "generate_tick_series", fail_if_called)
+    result = generate_tick_series_to_parquet(
+        dataset,
+        path=destination,
+        max_output_rows_per_chunk=20,
+        model="generated",
+        trading_timeframe="M1",
+    )
+    table = pq.read_table(destination)
+
+    assert result["rows"] == 27
+    assert table.num_rows == 27
+    assert table.column_names == [
+        "timestamp",
+        "bid",
+        "ask",
+        "last",
+        "source_bar_time",
+        "tick_index_in_bar",
+        "bar_phase",
+    ]

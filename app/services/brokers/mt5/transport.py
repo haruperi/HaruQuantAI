@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib
+import time
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
@@ -18,13 +19,21 @@ from app.utils import logger
 class _MT5Transport:
     """Own one serialized terminal/account session."""
 
-    def __init__(self, config: BrokerConnectionConfig) -> None:
+    def __init__(
+        self,
+        config: BrokerConnectionConfig,
+        latency_sink: Callable[[float], None] | None = None,
+    ) -> None:
         """Initialize the _MT5Transport instance.
 
         Args:
-            config: Value supplied to the operation.
+            config: Immutable connection configuration for this session.
+            latency_sink: Optional receiver for the measured milliseconds spent
+                inside each provider SDK call, used to separate provider
+                latency from local adapter overhead.
         """
         self._config = config
+        self._latency_sink = latency_sink
         self._sdk: Any = None
         self._lock = asyncio.Lock()
         self._circuit = _TransportCircuitBreaker(
@@ -103,10 +112,15 @@ class _MT5Transport:
             The operation result.
         """
         async with self._lock:
-            return await asyncio.wait_for(
-                asyncio.to_thread(function, *args, **kwargs),
-                timeout=self._config.request_timeout_sec,
-            )
+            started = time.perf_counter()
+            try:
+                return await asyncio.wait_for(
+                    asyncio.to_thread(function, *args, **kwargs),
+                    timeout=self._config.request_timeout_sec,
+                )
+            finally:
+                if self._latency_sink is not None:
+                    self._latency_sink((time.perf_counter() - started) * 1000.0)
 
     async def close(self) -> None:
         """Release the exact owned terminal handle deterministically."""

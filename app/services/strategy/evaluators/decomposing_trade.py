@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from app.services.strategy.evaluators._shared import (
+from app.services.strategy.signals._mechanics import (
     _current_previous,
     _decimal_parameter,
     _indicator_values,

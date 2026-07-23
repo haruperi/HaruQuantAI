@@ -6,7 +6,9 @@ from __future__ import annotations
 
 import asyncio
 import lzma
+import time
 import urllib.request
+from collections.abc import Callable
 from datetime import datetime
 from typing import TYPE_CHECKING, cast
 
@@ -21,13 +23,21 @@ class _DukascopyTransport:
 
     _BASE_URL = "https://datafeed.dukascopy.com/datafeed"
 
-    def __init__(self, config: BrokerConnectionConfig) -> None:
+    def __init__(
+        self,
+        config: BrokerConnectionConfig,
+        latency_sink: Callable[[float], None] | None = None,
+    ) -> None:
         """Initialize the _DukascopyTransport instance.
 
         Args:
-            config: Value supplied to the operation.
+            config: Immutable connection configuration for this session.
+            latency_sink: Optional receiver for the measured milliseconds spent
+                retrieving each provider hour file, used to separate provider
+                latency from local adapter overhead.
         """
         self._config = config
+        self._latency_sink = latency_sink
         self._circuit = _TransportCircuitBreaker(
             failure_threshold=config.circuit_failure_threshold,
             recovery_timeout_sec=config.circuit_recovery_timeout_sec,
@@ -66,6 +76,7 @@ class _DukascopyTransport:
             ) as response:
                 return cast("bytes", response.read())
 
+        started = time.perf_counter()
         try:
             compressed = await asyncio.wait_for(
                 asyncio.to_thread(_read), timeout=self._config.request_timeout_sec
@@ -83,6 +94,9 @@ class _DukascopyTransport:
                 provider_code=BrokerErrorCode.BROKER_PROVIDER_ERROR.value,
             ).warning("Dukascopy hour-file transport call failed")
             raise
+        finally:
+            if self._latency_sink is not None:
+                self._latency_sink((time.perf_counter() - started) * 1000.0)
         await self._circuit.record_success()
         logger.bind(
             broker=self._config.broker_id.value,

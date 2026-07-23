@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
-from hashlib import sha256
 from typing import TYPE_CHECKING
 
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.journal.contracts import JournalEvent
-from app.utils import canonical_json, logger
+from app.utils import canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.simulator.state import SimulationStateStore
@@ -31,7 +30,7 @@ def _event_hash(material: Mapping[str, object]) -> str:
         Lowercase SHA-256 digest.
     """
     logger.debug("Hashing canonical Simulation journal material")
-    return sha256(canonical_json(material).encode("utf-8")).hexdigest()
+    return canonical_digest(material)
 
 
 class JournalWriter:

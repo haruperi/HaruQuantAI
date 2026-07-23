@@ -5,9 +5,7 @@ from decimal import Decimal
 
 import pandas as pd
 import pytest
-from app.services.data.contracts import (
-    DataQualityReport as SourceQualityReport,
-)
+from app.services.data.contracts import DataQualityReport as SourceQualityReport
 from app.services.data.contracts import (
     MarketDataset,
     OHLCVRecord,

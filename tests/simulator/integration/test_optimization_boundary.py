@@ -16,7 +16,7 @@ from tests.simulator.unit.test_orchestrator import (
 def test_external_adapter_can_call_stable_simulation_port(tmp_path: Path) -> None:
     """Return an idempotent immutable result without importing Optimization."""
     logger.info("Testing WF-SIM-003 external Optimization adapter boundary")
-    dataset = _dataset(f"req-{'d' * 64}")
+    dataset = _dataset("req-dddddddd-dddd-4ddd-8ddd-dddddddddddd")
     request = _request(dataset, suffix="d")
     dependencies = FakeDependencies(tmp_path, dataset)
     first = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]

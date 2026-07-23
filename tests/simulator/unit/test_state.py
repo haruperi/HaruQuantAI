@@ -34,7 +34,7 @@ def _imported_modules() -> set[str]:
 def test_simulation_imports_no_data_storage_module() -> None:
     """Keep Simulation independent of Data storage internals."""
     assert not any(
-        name.startswith("app.services.data.storage") for name in _imported_modules()
+        name.startswith("app.services.data.persistence") for name in _imported_modules()
     )
     assert SIMULATION_MIGRATIONS[0].domain == "simulation"
 

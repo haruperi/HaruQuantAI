@@ -4,7 +4,7 @@
 
 from app.services.analytics.reports.serialization import serialize_report
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_serialization_and_hashes_are_deterministic() -> None:

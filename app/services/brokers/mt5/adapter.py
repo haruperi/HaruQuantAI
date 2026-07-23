@@ -40,7 +40,10 @@ from app.services.brokers.contracts import (
     BrokerSymbolInfo,
     BrokerTick,
 )
-from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
+from app.services.brokers.contracts.protocols import (
+    _RequestValidationError,
+    _UnsupportedAdapterBase,
+)
 from app.services.brokers.mt5.mapping import (
     _field,
     _map_account,
@@ -60,6 +63,26 @@ from app.services.brokers.mt5.mapping import (
     _optional,
 )
 from app.services.brokers.mt5.transport import _MT5Transport
+
+
+def _provider_ticket(value: str) -> int:
+    """Parse one caller-supplied MT5 ticket before any provider transmission.
+
+    Args:
+        value: Caller-supplied provider order or position identifier.
+
+    Returns:
+        The exact integral MT5 ticket.
+
+    Raises:
+        _RequestValidationError: If the identifier is not a valid MT5 ticket.
+            Raised before transmission so a malformed caller identifier is never
+            reported as an uncertain mutation outcome.
+    """
+    try:
+        return int(value)
+    except (TypeError, ValueError) as error:
+        raise _RequestValidationError("MT5 ticket must be an integer") from error
 
 
 class MT5BrokerAdapter(_UnsupportedAdapterBase):
@@ -92,7 +115,9 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         if config.account_reference != config.credentials["login"].get_secret_value():
             raise ValueError("MT5 account_reference must match login")
         super().__init__(config, capabilities)
-        self._transport = transport or _MT5Transport(config)
+        self._transport = transport or _MT5Transport(
+            config, self._record_provider_latency
+        )
 
     @override
     async def connect(self) -> BrokerResult[None]:
@@ -517,7 +542,9 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         Returns:
             Canonical open position or a not-found error.
         """
-        values = await self._transport.call("positions_get", ticket=int(position_id))
+        values = await self._transport.call(
+            "positions_get", ticket=_provider_ticket(position_id)
+        )
         if not values:
             return self._error(
                 BrokerCapabilityId.GET_POSITION,
@@ -761,7 +788,7 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         del client_request_id
         native = {
             "action": await self._transport.constant("TRADE_ACTION_REMOVE"),
-            "order": int(order_id),
+            "order": _provider_ticket(order_id),
         }
         return await self._send_mutation(BrokerCapabilityId.CANCEL_ORDER, native)
 
@@ -775,7 +802,7 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         """
         native: dict[str, object] = {
             "action": await self._transport.constant("TRADE_ACTION_SLTP"),
-            "position": int(request.position_id),
+            "position": _provider_ticket(request.position_id),
         }
         self._copy_prices(native, request)
         response = await self._transport.call("order_send", native)
@@ -788,7 +815,7 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         if result.outcome not in {"ACCEPTED", "PARTIAL"}:
             return self._native_rejection(BrokerCapabilityId.MODIFY_POSITION, response)
         values = await self._transport.call(
-            "positions_get", ticket=int(request.position_id)
+            "positions_get", ticket=_provider_ticket(request.position_id)
         )
         if not values:
             return self._error(
@@ -808,7 +835,7 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
             Canonical acknowledged close outcome.
         """
         positions = await self._transport.call(
-            "positions_get", ticket=int(request.position_id)
+            "positions_get", ticket=_provider_ticket(request.position_id)
         )
         if not positions:
             return self._error(
@@ -819,7 +846,7 @@ class MT5BrokerAdapter(_UnsupportedAdapterBase):
         side = "SELL" if int(_field(position, "type")) == 0 else "BUY"
         native = {
             "action": await self._transport.constant("TRADE_ACTION_DEAL"),
-            "position": int(request.position_id),
+            "position": _provider_ticket(request.position_id),
             "symbol": str(_field(position, "symbol")),
             "volume": float(request.quantity),
             "type": await self._transport.constant(f"ORDER_TYPE_{side}"),

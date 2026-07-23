@@ -5,7 +5,10 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import FXConversionEvidence, FXRateLeg
+from app.services.data.evidence.fx_contracts import (
+    FXConversionEvidence,
+    FXRateLeg,
+)
 from app.services.simulator.accounting import (
     ExecutionCostInput,
     ExecutionCostModel,
@@ -52,7 +55,7 @@ def _fx_evidence() -> FXConversionEvidence:
         path_policy_id="direct",
         path_policy_version="v1",
         provenance={"provider": "fixture"},
-        request_id=f"req-{'3' * 64}",
+        request_id="req-33333333-3333-4333-8333-333333333333",
     )
 
 

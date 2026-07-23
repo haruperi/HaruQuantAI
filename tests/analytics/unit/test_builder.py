@@ -8,7 +8,7 @@ import pytest
 from app.services.analytics.contracts import AnalyticsValidationError, SectionEvidence
 from app.services.analytics.reports import builder
 from app.utils import generate_id, logger
-from tests.analytics.usage.test_usage_reports import _configured, _source_with_profit
+from tests.analytics._support import _configured, _source_with_profit
 
 
 def test_builder_fails_closed_on_required_section(

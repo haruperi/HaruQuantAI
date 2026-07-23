@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import asyncio
 import importlib
+import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -17,13 +19,21 @@ from app.utils import logger
 class _YahooTransport:
     """Run one bounded yfinance history call off the event loop."""
 
-    def __init__(self, config: BrokerConnectionConfig) -> None:
+    def __init__(
+        self,
+        config: BrokerConnectionConfig,
+        latency_sink: Callable[[float], None] | None = None,
+    ) -> None:
         """Initialize the _YahooTransport instance.
 
         Args:
-            config: Value supplied to the operation.
+            config: Immutable connection configuration for this session.
+            latency_sink: Optional receiver for the measured milliseconds spent
+                inside each provider history call, used to separate provider
+                latency from local adapter overhead.
         """
         self._config = config
+        self._latency_sink = latency_sink
         self._circuit = _TransportCircuitBreaker(
             failure_threshold=config.circuit_failure_threshold,
             recovery_timeout_sec=config.circuit_recovery_timeout_sec,
@@ -62,6 +72,7 @@ class _YahooTransport:
             ticker = yfinance.Ticker(symbol)
             return ticker.history(interval=timeframe, start=start, end=end)
 
+        started = time.perf_counter()
         try:
             value = await asyncio.wait_for(
                 asyncio.to_thread(_history), timeout=self._config.request_timeout_sec
@@ -79,6 +90,9 @@ class _YahooTransport:
                 provider_code=BrokerErrorCode.BROKER_PROVIDER_ERROR.value,
             ).warning("Yahoo history transport call failed")
             raise
+        finally:
+            if self._latency_sink is not None:
+                self._latency_sink((time.perf_counter() - started) * 1000.0)
         await self._circuit.record_success()
         logger.bind(
             broker=self._config.broker_id.value,

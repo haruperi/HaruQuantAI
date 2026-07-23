@@ -22,6 +22,14 @@ def test_is_sensitive_key_is_case_insensitive() -> None:
     assert is_sensitive_key("Client-Secret")
 
 
+def test_is_sensitive_key_matches_composite_suffixes() -> None:
+    """Pin the documented normalized-suffix rule in both directions."""
+    assert is_sensitive_key("user_token")
+    assert is_sensitive_key("broker-api-key")
+    assert not is_sensitive_key("accountid")
+    assert not is_sensitive_key("tokenizer")
+
+
 @pytest.mark.parametrize(
     "source",
     [

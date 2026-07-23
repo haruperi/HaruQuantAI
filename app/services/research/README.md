@@ -191,6 +191,27 @@ flowchart TD
 
 Folders and files are ordered from lowest dependency to highest dependency; this is the implementation sequence.
 
+### Feature Registry
+
+The Research domain remains `Missing`. Existing numbered teaching programs are
+not completion evidence until the corresponding Section 4 feature, unit tests,
+integration workflow, and package boundary satisfy Section 7.
+
+| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
+|---|---|---|---|---|---|
+| Missing | `FEAT-RES-01` Versioned Contracts and Configuration | `contracts/` | Planned declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/research/usage/01_contracts.py` exists; completion unverified |
+| Missing | `FEAT-RES-02` Deterministic Dataset Preparation | `data/` | Planned declarations: Section 4.2 | Section 4.2 functional requirements | `tests/research/usage/02_data.py` exists; completion unverified |
+| Missing | `FEAT-RES-03` Research-Specific Features | `features/` | Planned declarations: Section 4.3 | Section 4.3 functional requirements | `tests/research/usage/03_features.py` exists; completion unverified |
+| Missing | `FEAT-RES-04` Leakage Evidence, Splits, and Masking | `leakage/` | Planned declarations: Section 4.4 | Section 4.4 functional requirements | `tests/research/usage/04_leakage.py` exists; completion unverified |
+| Missing | `FEAT-RES-05` Core Metric Profile | `metrics/` | Planned declarations: Section 4.5 | Section 4.5 functional requirements | `tests/research/usage/05_metrics.py` exists; completion unverified |
+| Missing | `FEAT-RES-06` Seeded Statistical Validation | `statistics/` | Planned declarations: Section 4.6 | Section 4.6 functional requirements | `tests/research/usage/06_statistics.py` exists; completion unverified |
+| Missing | `FEAT-RES-07` Edge Discovery and Confirmation | `studies/` | Planned declarations: Section 4.7 | Section 4.7 functional requirements | Missing |
+| Missing | `FEAT-RES-08` Sessions and Seasonality | `seasonality/` | Planned declarations: Section 4.8 | Section 4.8 functional requirements | Missing |
+| Missing | `FEAT-RES-09` Market Structure Analysis | `market_structure/` | Planned declarations: Section 4.9 | Section 4.9 functional requirements | Missing |
+| Missing | `FEAT-RES-10` Deterministic Unsupervised Insights | `modeling/` | Planned declarations: Section 4.10 | Section 4.10 functional requirements | Missing |
+| Missing | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Planned declarations: Section 4.11 | Section 4.11 functional requirements | Missing |
+| Missing | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Planned declarations and artifact contracts: Section 4.12 | Section 4.12 functional requirements | Missing |
+
 ```text
 research/
 ├── __init__.py                         # Explicit classified lazy domain API only

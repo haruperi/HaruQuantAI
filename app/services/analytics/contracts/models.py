@@ -652,6 +652,7 @@ class PerformanceReport:
 class PortfolioPerformanceReport:
     """Analytics-internal currency-safe portfolio performance report."""
 
+    contract_version: Literal["v1"]
     schema_id: Literal["analytics.portfolio_performance_report.v1"]
     report_id: str
     component_report_ids: tuple[str, ...]

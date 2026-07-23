@@ -26,9 +26,9 @@ def search_request(**overrides) -> SearchRequest:
         "max_parameter_space_expansion": 20,
         "max_constraint_count": 5,
         "max_runtime_seconds": 10.0,
-        "request_id": "req-" + "a" * 64,
-        "workflow_id": "wf-" + "b" * 64,
-        "correlation_id": "cor-" + "c" * 64,
+        "request_id": "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "workflow_id": "wf-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "correlation_id": "cor-cccccccc-cccc-4ccc-8ccc-cccccccccccc",
     }
     payload.update(overrides)
     return SearchRequest.model_validate(payload)

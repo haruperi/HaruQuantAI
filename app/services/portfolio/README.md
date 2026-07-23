@@ -4,7 +4,7 @@
 | --- | --- |
 | **Package path** | `app/services/portfolio` |
 | **Domain ID** | `PORT` |
-| **Status** | Completed |
+| **Status** | Partial — runtime behavior is implemented, but four documented feature owners lack dedicated one-to-one usage programs and `api.py` remains a requirement-bearing root file |
 | **Last updated** | 2026-07-19 |
 | **System workflows** | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008` |
 
@@ -105,6 +105,23 @@ flowchart TD
 ```
 
 ## 2. Final Package Structure
+
+### Feature Registry
+
+| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
+|---|---|---|---|---|---|
+| Completed | `FEAT-PORT-01` Portfolio Boundary Contracts | `contracts/` | Exact declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/portfolio/usage/01_contracts.py` |
+| Partial | `FEAT-PORT-02` Evidence and Eligibility Validation | `evidence/` | Exact declarations: Section 4.2 | Section 4.2 functional requirements | No dedicated numbered usage program |
+| Completed | `FEAT-PORT-03` Deterministic Construction | `construction/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/portfolio/usage/02_construction.py` |
+| Partial | `FEAT-PORT-04` Portfolio Persistence | `state/` | Exact declarations and state contracts: Section 4.4 | Section 4.4 functional requirements | No dedicated numbered usage program |
+| Partial | `FEAT-PORT-05` Version and Activation Governance | `allocation/` | Exact declarations: Section 4.5 | Section 4.5 functional requirements | No dedicated numbered usage program |
+| Completed | `FEAT-PORT-06` Drift and Rebalance Planning | `rebalancing/` | Exact declarations and rebalance contracts: Section 4.6 | Section 4.6 functional requirements | `tests/portfolio/usage/03_rebalancing.py` |
+| Partial | `FEAT-PORT-07` Cross-Domain Workflow Coordination | `orchestration/` | Exact declarations: Section 4.7 | Section 4.7 functional requirements | No dedicated numbered usage program |
+| Partial | `FEAT-PORT-08` Public Portfolio API | Root file `api.py` | Exact declarations and package API: Section 4.8 | Section 4.8 functional requirements | `tests/portfolio/usage/04_lifecycle.py`; root-file ownership remains structurally noncompliant |
+
+The `Partial` rows are current documentation-integrity findings, not newly added
+features. This documentation-only cleanup neither creates the missing usage
+programs nor relocates the root API behavior.
 
 ```text
 app/services/portfolio/

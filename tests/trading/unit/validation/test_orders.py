@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import (
+from app.services.data.evidence.account_contracts import (
     AccountOrder,
     AccountPosition,
     AccountStateSnapshot,

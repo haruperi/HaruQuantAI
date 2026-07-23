@@ -4,7 +4,11 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.data.contracts import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+)
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.services.indicators.core.validation import validate_indicator

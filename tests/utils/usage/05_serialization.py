@@ -6,7 +6,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.utils import ValidationError, canonical_json, to_json_safe
+from app.utils import (
+    ValidationError,
+    canonical_digest,
+    canonical_json,
+    to_json_safe,
+)
 
 
 def _header(title: str) -> None:
@@ -35,11 +40,23 @@ def example_reject_unsafe_value() -> None:
         print("Serialization validation: unsafe value rejected")
 
 
+def example_canonical_digest() -> None:
+    """Digest a trusted structure larger than the untrusted-payload ceiling."""
+    _header("Example 4: Canonical Digest")
+    oversized = {"records": [{"i": index} for index in range(20_000)]}
+    try:
+        canonical_json(oversized)
+    except ValidationError:
+        print("canonical_json rejects >10,000 items for untrusted payloads")
+    print("canonical_digest of 20,000 records:", canonical_digest(oversized))
+
+
 def main() -> None:
     """Run all serialization examples."""
     example_to_json_safe()
     example_canonical_json()
     example_reject_unsafe_value()
+    example_canonical_digest()
 
 
 if __name__ == "__main__":

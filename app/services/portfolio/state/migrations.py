@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from hashlib import sha256
 
-from app.services.data.contracts import MigrationStep
+from app.services.data.persistence.contracts import (
+    MigrationStep,
+)
 from app.utils import logger
 
 _PORTFOLIO_SCHEMA_STATEMENTS = (

@@ -4,7 +4,10 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import MarketContextEvidence
+from app.services.data.evidence.market_context_contracts import (
+    MarketContextEvidence,
+)
+from app.services.risk.admission import review_strategy_admission
 from app.services.risk.config import RiskConfig
 from app.services.risk.contracts import (
     DecisionState,
@@ -13,7 +16,6 @@ from app.services.risk.contracts import (
     StrategyOperationalEligibilityDecision,
     StrategyOperationalEligibilityRequest,
 )
-from app.services.risk.policy import review_strategy_admission
 from app.services.strategy import (
     StrategyEnvironment,
     StrategyLifecycleStatus,
@@ -26,7 +28,7 @@ from app.services.strategy import (
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 HASH_A = "a" * 64
 HASH_B = "b" * 64
-MARKET_REQUEST_ID = "req-" + "c" * 64
+MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 
 
 class _EligibilityStore:

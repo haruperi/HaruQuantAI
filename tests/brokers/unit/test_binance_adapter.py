@@ -378,6 +378,37 @@ def test_adapter_get_historical_bars_parameters() -> None:
     asyncio.run(exercise())
 
 
+def test_adapter_maps_canonical_h1_to_binance_interval() -> None:
+    """Canonical H1 is sent as 1h while retaining request provenance."""
+
+    class _RecordingTransport(_FakeTransport):
+        def __init__(self) -> None:
+            super().__init__()
+            self.kline_kwargs: dict[str, object] = {}
+
+        async def call(self, name: str, **kwargs: object) -> object:
+            if name == "get_klines":
+                self.kline_kwargs = dict(kwargs)
+            return await super().call(name, **kwargs)
+
+    transport = _RecordingTransport()
+    adapter = BinanceBrokerAdapter(_config(), _capabilities(), transport=transport)
+
+    async def exercise() -> None:
+        result = await adapter.get_historical_bars("BTCUSDT", "H1", limit=5)
+        assert result.is_success
+        assert result.data is not None
+        assert transport.kline_kwargs["interval"] == "1h"
+        assert result.data.items[0].provider_timeframe == "1h"
+        assert result.data.items[0].requested_timeframe == "H1"
+
+        unsupported = await adapter.get_historical_bars("BTCUSDT", "H3", limit=5)
+        assert unsupported.error is not None
+        assert unsupported.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+
+    asyncio.run(exercise())
+
+
 def test_adapter_streams_quotes_bars_and_snapshot_first_depth() -> None:
     """Binance websocket subscriptions map genuine bounded provider events."""
 

@@ -3,9 +3,9 @@
 from datetime import UTC, datetime
 
 import pytest
-from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.market import SyntheticRequest
-from app.services.data.processing.synthetic import (
+from app.services.data.contracts import DataError
+from app.services.data.synthetic_data.contracts import SyntheticRequest
+from app.services.data.synthetic_data.gbm import (
     SYNTHETIC_BAR_MAX_RECORDS,
     SYNTHETIC_TICK_MAX_RECORDS,
     generate_synthetic_dataset,

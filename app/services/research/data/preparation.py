@@ -19,7 +19,7 @@ from app.services.research.contracts import (
     ResearchWarning,
 )
 from app.services.research.data.validation import validate_dataset
-from app.utils import canonical_json, logger
+from app.utils import canonical_digest, canonical_json, logger
 from app.utils.errors import ValidationError
 
 if TYPE_CHECKING:
@@ -290,9 +290,7 @@ def prepare_research_dataset(
     enriched, final_report = enrich_dataset(
         cleaned, config=enrichment, report=cleaned_report
     )
-    dataset_hash = hashlib.sha256(
-        canonical_json(dataset.model_dump(mode="json")).encode()
-    ).hexdigest()
+    dataset_hash = canonical_digest(dataset.model_dump(mode="json"))
     config_payload = {
         "cleaning": {
             "timezone": cleaning.timezone,

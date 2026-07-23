@@ -3,6 +3,7 @@
 from types import MappingProxyType
 
 _INSTRUMENT_PRICE_DIVISORS = MappingProxyType({"EURUSD": 100_000})
+_WEB_SYMBOLS = MappingProxyType({"EURUSD": "EUR/USD"})
 
 
 def _price_divisor(symbol: str) -> int:
@@ -21,3 +22,21 @@ def _price_divisor(symbol: str) -> int:
         return _INSTRUMENT_PRICE_DIVISORS[symbol]
     except KeyError as error:
         raise ValueError("unsupported exact Dukascopy provider symbol") from error
+
+
+def _web_symbol(symbol: str) -> str:
+    """Return the exact Dukascopy web-chart symbol.
+
+    Args:
+        symbol: Canonical exact Dukascopy symbol.
+
+    Returns:
+        Exact web-chart instrument string.
+
+    Raises:
+        ValueError: If the symbol has no verified web mapping.
+    """
+    try:
+        return _WEB_SYMBOLS[symbol]
+    except KeyError as error:
+        raise ValueError("unsupported Dukascopy web symbol") from error

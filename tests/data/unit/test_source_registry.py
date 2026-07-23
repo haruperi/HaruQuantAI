@@ -7,8 +7,8 @@ import time
 from unittest.mock import MagicMock
 
 import pytest
-from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.sources import (
+from app.services.data.contracts import DataError
+from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourceIdentity,
     SourceIdentityRequest,

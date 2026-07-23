@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from app.services.brokers.contracts import BrokerBar, BrokerTick
+from app.services.brokers.contracts.protocols import _ProviderResponseError
 
 _RECORD = struct.Struct(">3I2f")
 
@@ -23,10 +24,11 @@ def _map_ticks(
         Bounded chronological canonical ticks.
 
     Raises:
-        ValueError: If payload shape or hour timestamp is invalid.
+        ValueError: If the requested hour timestamp is timezone-naive.
+        _ProviderResponseError: If the provider payload shape is malformed.
     """
     if len(payload) % _RECORD.size:
-        raise ValueError("malformed Dukascopy BI5 record length")
+        raise _ProviderResponseError("malformed Dukascopy BI5 record length")
     if hour.tzinfo is None or hour.utcoffset() is None:
         raise ValueError("Dukascopy hour must be timezone-aware")
     base = hour.astimezone(UTC).replace(minute=0, second=0, microsecond=0)
@@ -133,6 +135,8 @@ def _aggregate_bars(
             price_unit="quote_currency",
             quantity_unit="provider_volume",
             tick_volume=Decimal(len(prices)),
+            spread=Decimal(0),
+            spread_unit="price_unit",
         )
         for opening, prices in sorted(buckets.items())
     )

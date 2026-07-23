@@ -10,13 +10,20 @@ import pandas as pd
 from numpy.lib.stride_tricks import sliding_window_view
 
 from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
+from app.services.indicators.core.errors import (
+    IndicatorError,
+    IndicatorErrorCode,
+    guard_public_boundary,
+)
 from app.services.indicators.core.results import build_indicator_result
 from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset, OHLCVRecord
+    from app.services.data.contracts import (
+        MarketDataset,
+        OHLCVRecord,
+    )
     from app.services.indicators.core.results import IndicatorResult
 
 _FORMULA_VERSION = "1.0.0"
@@ -113,6 +120,7 @@ def _rolling_available_at(
     return pd.Series(pd.to_datetime(result, unit="us", utc=True), index=index)
 
 
+@guard_public_boundary
 def hull_ma(
     data: MarketDataset,
     *,

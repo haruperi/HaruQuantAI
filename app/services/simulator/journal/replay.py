@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable, Mapping
-from hashlib import sha256
 from pathlib import Path
 from types import MappingProxyType
 
@@ -12,7 +11,7 @@ from pydantic import ValidationError
 
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.journal.contracts import JournalEvent
-from app.utils import canonical_json, logger
+from app.utils import canonical_digest, canonical_json, logger
 
 type JournalReducer = Callable[
     [Mapping[str, object], JournalEvent], Mapping[str, object]
@@ -50,7 +49,7 @@ def _computed_hash(event: JournalEvent) -> str:
     """
     logger.debug("Recomputing Simulation journal event hash")
     material = event.model_dump(mode="python", exclude={"event_hash"}, warnings=False)
-    return sha256(canonical_json(material).encode("utf-8")).hexdigest()
+    return canonical_digest(material)
 
 
 def replay_journal(path: Path, reducer: JournalReducer) -> Mapping[str, object]:

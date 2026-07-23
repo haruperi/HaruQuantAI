@@ -2,7 +2,7 @@
 
 from decimal import ROUND_FLOOR, Decimal
 
-from app.services.risk.config import RiskConfig
+from app.services.risk.config import RiskConfig  # noqa: TC001
 from app.services.risk.contracts import (
     PortfolioRiskSnapshot,
     PositionSizingRequest,

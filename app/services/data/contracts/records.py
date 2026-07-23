@@ -1,4 +1,4 @@
-"""Immutable canonical market-record contracts."""
+"""Immutable canonical market-record contracts owned by FEAT-DATA-01."""
 
 from __future__ import annotations
 
@@ -270,4 +270,8 @@ class SpreadRecord(_Record):
         return str(value)
 
 
-__all__ = ["OHLCVRecord", "SpreadRecord", "TickRecord"]
+__all__ = [
+    "OHLCVRecord",
+    "SpreadRecord",
+    "TickRecord",
+]

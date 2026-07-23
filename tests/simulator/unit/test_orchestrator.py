@@ -10,10 +10,12 @@ from pathlib import Path
 import pytest
 from app.services.data.contracts import (
     DataQualityReport,
-    FXConversionEvidence,
-    FXRateLeg,
     MarketDataset,
     TickRecord,
+)
+from app.services.data.evidence.fx_contracts import (
+    FXConversionEvidence,
+    FXRateLeg,
 )
 from app.services.simulator.accounting import ExecutionCostModel, SymbolSpecification
 from app.services.simulator.errors import SimulationError
@@ -95,9 +97,9 @@ def _request(
     unchanged, which is what an identity-conflict test requires.
     """
     payload: dict[str, object] = {
-        "request_id": f"req-{suffix * 64}",
-        "workflow_id": f"wf-{suffix * 64}",
-        "correlation_id": f"cor-{suffix * 64}",
+        "request_id": f"req-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}",
+        "workflow_id": f"wf-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}",
+        "correlation_id": f"cor-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}",
         "strategy_id": f"strategy-{suffix}",
         "strategy_version": "v1",
         "strategy_config_ref": "strategy-config",
@@ -335,7 +337,7 @@ class CostBearingDependencies(FakeDependencies):
 
 def test_run_backtest_maps_internal_failure(tmp_path: Path) -> None:
     """Map an unexpected dependency failure to SIM_INTERNAL_ERROR."""
-    dataset = _dataset(f"req-{'5' * 64}")
+    dataset = _dataset("req-55555555-5555-4555-8555-555555555555")
     request = _request(dataset)
     dependencies = FakeDependencies(tmp_path, dataset)
 
@@ -352,7 +354,7 @@ def test_run_backtest_maps_internal_failure(tmp_path: Path) -> None:
 
 def test_run_backtest_publishes_completed_result(tmp_path: Path) -> None:
     """Execute the complete official dependency path and publish artifacts."""
-    dataset = _dataset(f"req-{'5' * 64}")
+    dataset = _dataset("req-55555555-5555-4555-8555-555555555555")
     request = _request(dataset)
     dependencies = FakeDependencies(tmp_path, dataset)
     result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
@@ -362,7 +364,7 @@ def test_run_backtest_publishes_completed_result(tmp_path: Path) -> None:
 
 def test_result_accounting_matches_ledger_totals(tmp_path: Path) -> None:
     """Publish commission and swap measured by the ledger, never constants."""
-    dataset = _dataset(f"req-{'8' * 64}")
+    dataset = _dataset("req-88888888-8888-4888-8888-888888888888")
     request = _request(dataset, suffix="8")
     dependencies = CostBearingDependencies(tmp_path, dataset)
     result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
@@ -378,7 +380,7 @@ def test_result_accounting_matches_ledger_totals(tmp_path: Path) -> None:
 
 def test_repeat_request_returns_the_stored_completed_result(tmp_path: Path) -> None:
     """Resolve idempotency through `resolve_idempotent_run`, not inline logic."""
-    dataset = _dataset(f"req-{'a' * 64}")
+    dataset = _dataset("req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
     request = _request(dataset, suffix="a")
     dependencies = FakeDependencies(tmp_path, dataset)
     first = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
@@ -389,7 +391,7 @@ def test_repeat_request_returns_the_stored_completed_result(tmp_path: Path) -> N
 
 def test_repeat_request_with_different_hash_conflicts(tmp_path: Path) -> None:
     """Reject one request identifier bound to different material."""
-    dataset = _dataset(f"req-{'b' * 64}")
+    dataset = _dataset("req-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
     request = _request(dataset, suffix="b")
     dependencies = FakeDependencies(tmp_path, dataset)
     first = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
@@ -408,7 +410,7 @@ def test_repeat_request_with_different_hash_conflicts(tmp_path: Path) -> None:
 
 def test_markdown_report_states_measured_costs(tmp_path: Path) -> None:
     """Prove the canonical report renders the measured, non-zero cost totals."""
-    dataset = _dataset(f"req-{'9' * 64}")
+    dataset = _dataset("req-99999999-9999-4999-8999-999999999999")
     request = _request(dataset, suffix="9")
     dependencies = CostBearingDependencies(tmp_path, dataset)
     result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -37,7 +38,7 @@ class ExecutionStressAnalysisRequest(BaseModel):
         if not self.outcomes:
             raise ValueError("stress analysis outcomes cannot be empty")
         try:
-            canonical_json(self.model_dump(mode="json"))
+            canonical_json(self.model_dump(mode="json"), max_items=None)
         except (TypeError, ValueError) as exc:
             raise ValueError("stress analysis request must be JSON-safe") from exc
         return self
@@ -48,7 +49,8 @@ class RobustnessAnalysisResult(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    schema_id: str = "optimization.robustness.v1"
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["optimization.robustness.v1"] = "optimization.robustness.v1"
     monte_carlo: MonteCarloResult | None = None
     stressed_outcomes: tuple[Mapping[str, object], ...] = ()
     warnings: tuple[str, ...] = ()
@@ -74,7 +76,8 @@ class OptimizationComparison(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    schema_id: str = "optimization.comparison.v1"
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["optimization.comparison.v1"] = "optimization.comparison.v1"
     search_ids: tuple[str, ...]
     decisions: tuple[str, ...]
     best_candidate_hashes: tuple[str | None, ...]

@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/indicators`
 > **Status:** `Completed`
-> **Last updated:** `2026-07-16`
+> **Last updated:** `2026-07-22`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -42,7 +42,7 @@ Contract definitions must match the name, version, and owner recorded in `docs/P
 
 | Status | Contract | Version | Counterparty | Purpose |
 |---|---|---|---|---|
-| Completed | `IndicatorSeries` (`IndicatorResult`) | `v1` | Strategy; Trading and Simulation as orchestrators | Return deterministic indicator values and their earliest safe consumption time without exposing raw provider objects or mutable internal state. |
+| Completed | `IndicatorSeries` (`IndicatorResult`) | `v1` | Strategy; Trading, Simulation, Research (as runtime/backtest/research orchestrators) | Return deterministic indicator values and their earliest safe consumption time without exposing raw provider objects or mutable internal state. |
 
 #### `IndicatorSeries v1` field contract
 
@@ -218,6 +218,28 @@ indicators/
 
 Excluded from the structure: `base.py`, `batch/`, `incremental/`, `adapters/`, `custom/`, caching, composition, audit/telemetry, acceleration, and proprietary-access modules. MACD, crossover helpers, pip conversion, balance-scaled volume, and generic averaging/base-class abstractions have no final destination in this package. Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded from the production indicator surface (see Section 1) because swing/BOS/CHoCH structure-break tracking is inherently retroactive (a later bar can rewrite an earlier bar's already-published signal), which is fundamentally incompatible with this package's immutable, non-repainting batch output guarantee; this exclusion is revisited only as a separately scoped decision, not silently reduced to a partial port.
 
+### Feature Registry
+
+Each registered feature is exactly one module folder with exactly one runnable
+usage program, satisfying the Focused Domain Architecture rule
+(one feature = one module folder = one usage example file). This section owns the
+feature IDs, and each ordinal matches its usage-program number.
+
+| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
+|---|---|---|---|---|---|
+| Completed | `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation | `core/` | `IndicatorErrorCode`, `IndicatorError`, config/spec/warmup/protocol, result/manifest/projection, discovery, capability, and validation declarations | `FR-INDI-001`–`FR-INDI-014`; exact declarations in Section 4.1 | `tests/indicators/usage/01_core.py` |
+| Completed | `FEAT-INDI-02` Candlestick Pattern Labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar` | `FR-INDI-031`–`FR-INDI-034`; exact declarations in Section 4.6 | `tests/indicators/usage/02_candles.py` |
+| Completed | `FEAT-INDI-03` Trend and Moving-Average Calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`; exact declarations in Section 4.2 | `tests/indicators/usage/03_trend.py` |
+| Completed | `FEAT-INDI-04` Momentum Oscillator Calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`, `FR-INDI-022`; exact declarations in Section 4.4 | `tests/indicators/usage/04_momentum.py` |
+| Completed | `FEAT-INDI-05` Volatility and Range Calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026`; exact declarations in Section 4.3 | `tests/indicators/usage/05_volatility.py` |
+| Completed | `FEAT-INDI-06` Volume-Flow and Price-Volume Calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution` | `FR-INDI-027`–`FR-INDI-030`; exact declarations in Section 4.5 | `tests/indicators/usage/06_volume.py` |
+
+Module folders are named for the analytical family they calculate. Within each
+folder every file implements exactly one official indicator, and every public
+function implements exactly one `FR-INDI-*` behaviour, so the file and
+class/function levels of the rule are enforced per indicator rather than per
+folder.
+
 ### Module dependency diagram
 
 ```mermaid
@@ -246,6 +268,17 @@ flowchart LR
 - Public callers import only from `app.services.indicators` or an approved feature `__init__.py`; leaf-file imports are not stable API.
 - Every public symbol appears exactly once in Section 4.
 - Private vectorization, hashing, naming, and formula helpers remain in the focused owning file and receive no separate requirement IDs.
+- **Common leaf set.** Every one of the 20 indicator leaf files imports exactly
+  the same local surface, referenced as *(common leaf set)* in the feature
+  Files tables: `core.contracts → IndicatorConfig`;
+  `core.errors → IndicatorError, IndicatorErrorCode`;
+  `core.errors → guard_public_boundary`;
+  `core.results → build_indicator_result`;
+  `core.validation → validate_indicator`; `app.utils → logger`; and, under
+  `TYPE_CHECKING` only, `app.services.data.contracts → MarketDataset,
+  OHLCVRecord` plus `core.results → IndicatorResult`. `build_indicator_result`
+  is an internal Core helper, not public API: it appears in no `__all__` and is
+  not a documented import for callers outside this package.
 - The immutable registry stores no runtime registrations and performs no plugin discovery.
 - Usage examples live under `tests/indicators/usage/`, never in the production package.
 
@@ -529,11 +562,11 @@ indicator id + normalized data + config
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `errors.py` | Define the compact Core MVP error catalogue and one structured domain exception. | `IndicatorErrorCode`, `IndicatorError` | **Standard library:** `enum`, `typing`<br>**Required third-party:** None<br>**Local:** None |
-| Completed | `contracts.py` | Define immutable calculation config, spec, warmup, and structural callable contracts. | `IndicatorConfig`, `IndicatorSpec`, `WarmupRequirement`, `IndicatorProtocol` | **Standard library:** `collections.abc`, `dataclasses`, `typing`<br>**Required third-party:** None<br>**Local:** `app.services.data → MarketDataset`; `errors.py → IndicatorError` |
-| Completed | `results.py` | Define deterministic manifest/result fields and safe result projection/join behavior. | `IndicatorManifest`, `IndicatorResult` | **Standard library:** `dataclasses`, `typing`<br>**Required third-party:** `pandas`<br>**Local:** `contracts.py → IndicatorConfig`; `errors.py → IndicatorError` |
-| Completed | `registry.py` | Expose immutable official specs and capability metadata without importing feature implementations. | `get_indicator`, `list_indicators`, `get_capability_matrix` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `contracts.py → IndicatorSpec`; `errors.py → IndicatorError, IndicatorErrorCode` |
-| Completed | `validation.py` | Resolve and fully validate one batch request before any formula work. | `validate_indicator` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.services.data → MarketDataset, OHLCVRecord`; `contracts.py → IndicatorConfig, IndicatorSpec`; `errors.py → IndicatorError, IndicatorErrorCode`; `registry.py → get_indicator` |
+| Completed | `errors.py` | Define the compact Core MVP error catalogue, one structured domain exception, and the public-boundary exception guard. | `IndicatorErrorCode`, `IndicatorError`<br>Internal (non-public) cross-file helper: `guard_public_boundary`, applied to all twenty official convenience functions and deliberately absent from `core/__init__.py.__all__` and the package port. | **Standard library:** `collections.abc`, `enum`, `functools`, `math`, `re`, `types`, `typing`<br>**Required third-party:** None<br>**Local:** `app.utils → logger, redact_text_value` |
+| Completed | `contracts.py` | Define immutable calculation config, spec, warmup, and structural callable contracts. | `IndicatorConfig`, `IndicatorSpec`, `WarmupRequirement`, `IndicatorProtocol` | **Standard library:** `collections.abc`, `dataclasses`, `typing`<br>**Required third-party:** None<br>**Local (type-checking only):** `app.services.data.contracts → MarketDataset`; `results.py → IndicatorResult` |
+| Completed | `results.py` | Define deterministic manifest/result fields and safe result projection/join behavior. | `IndicatorManifest`, `IndicatorResult`<br>Internal (non-public) cross-file helper: `build_indicator_result`, used by every feature leaf file and deliberately absent from `core/__init__.py.__all__` and the package port. | **Standard library:** `collections.abc`, `dataclasses`, `hashlib`, `json`, `math`, `typing`<br>**Required third-party:** `pandas`<br>**Local:** `errors.py → IndicatorError, IndicatorErrorCode`; `app.utils → canonical_json, logger`<br>**Local (type-checking only):** `app.services.data.contracts → MarketDataset, OHLCVRecord`; `contracts.py → IndicatorConfig` |
+| Completed | `registry.py` | Expose immutable official specs and capability metadata without importing feature implementations. | `get_indicator`, `list_indicators`, `get_capability_matrix` | **Standard library:** `collections.abc`, `types`<br>**Required third-party:** None<br>**Local:** `contracts.py → IndicatorSpec`; `errors.py → IndicatorError, IndicatorErrorCode`; `app.utils → logger` |
+| Completed | `validation.py` | Resolve and fully validate one batch request before any formula work. | `validate_indicator` | **Standard library:** `collections.abc`, `datetime`, `math`, `re`, `typing`<br>**Required third-party:** `pandas`<br>**Local:** `app.services.data.contracts → MarketDataset, OHLCVRecord`; `errors.py → IndicatorError, IndicatorErrorCode`; `registry.py → get_indicator`; `app.utils → logger`<br>**Local (type-checking only):** `contracts.py → IndicatorConfig, IndicatorSpec` |
 | Completed | `__init__.py` | Expose only the approved public Core API. | All Core exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from the five files above |
 
 ### Configuration and Limits Manifest
@@ -550,7 +583,7 @@ indicator id + normalized data + config
 | Completed | `IndicatorConfig.availability_policy` | `Literal["source_available_at"]` | `"source_available_at"` | Yes | Official wrappers | Valid output is available at the maximum contributing record `available_at`; short non-empty history remains warmup output. |
 | Completed | `IndicatorConfig.quality_policy` | `Literal["propagate_dataset"]` | `"propagate_dataset"` | Yes | `validate_indicator`, official wrappers | Requires Data-owned dataset quality evidence and propagates status/score without reclassification. |
 | Completed | `IndicatorConfig.error_mode` | `Literal["raise"]` | `"raise"` | Yes | All public callables | Every public failure raises one deterministic exception; result-error and partial-success modes are unsupported in v1. |
-| Completed | `MAX_INPUT_ROWS` | Positive `int` | `1000000` | Yes | `validate_indicator` | Rejects oversized input with `IND_RESOURCE_LIMIT_EXCEEDED`. |
+| Completed | `MAX_INPUT_ROWS` | Positive `int` | `1000000` | Yes | `validate_indicator` | Rejects oversized input with `IND_RESOURCE_LIMIT_EXCEEDED`. This is the only input-size ceiling; no lower serialization bound exists. Regression evidence: `tests/indicators/unit/test_large_input.py`. |
 | Completed | `IndicatorManifest.manifest_version` | `str` | `"v1"` | Yes | `IndicatorManifest` | Versions the deterministic manifest contract. |
 | Completed | `IndicatorManifest.output_schema_version` | `str` | `"v1"` | Yes | `IndicatorManifest` | Versions the `IndicatorSeries` values schema. |
 
@@ -682,7 +715,16 @@ deep copy.
    `app.utils.canonical_json(...)` UTF-8 bytes.
 2. Input-checksum material is `MarketDataset.model_dump(mode="json")` with record
    tuple order preserved and mapping keys canonicalized by
-   `app.utils.canonical_json`.
+   `app.utils.canonical_json`. The digest is **folded**, not computed in one
+   call: one `canonical_json` call covers the dataset-level fields, then one
+   call per ordered chunk of at most `_CHECKSUM_CHUNK_RECORDS` (250) records,
+   each chunk separated by an ASCII record separator (`0x1e`) that cannot
+   appear unescaped in JSON text. `app.utils.canonical_json` enforces a
+   cumulative 10,000-item traversal bound owned by Utils; a single-call
+   implementation therefore failed for any dataset beyond 664 records, far
+   below `MAX_INPUT_ROWS`. Folding keeps every call far under the Utils bound
+   at any history length while preserving determinism and record-order
+   sensitivity. Indicators must not weaken the Utils bound to work around it.
 3. Output-checksum material is records-oriented JSON in exact result row and column
    order. UTC timestamps use canonical `Z` strings; `NaT`, `NaN`, and pandas `NA`
    serialize as JSON null; negative zero normalizes to `0.0`; finite float64 values
@@ -843,7 +885,13 @@ After formula execution, finalization checks occur in this exact order:
 
 Unexpected pandas/NumPy/Python exceptions are caught at the public boundary and
 raised as redacted `IND_INTERNAL_ERROR`; the original exception never crosses the
-domain port.
+domain port. This is enforced by the `guard_public_boundary` decorator in
+`core/errors.py`, applied to all twenty official convenience functions. A
+deliberate `IndicatorError` propagates unchanged so documented deterministic
+codes are never masked. The original exception is suppressed with
+`raise ... from None` and only its class name is reported, because an upstream
+exception message may embed caller payload data. Evidence:
+`tests/indicators/unit/test_large_input.py`.
 
 ### Feature usage examples
 
@@ -874,12 +922,12 @@ normalized values + config → Core validation → approved trend formula → In
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `ema.py` | Compute EMA under the approved formula contract. | `ema` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `sma.py` | Compute SMA under the approved formula contract. | `sma` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `wma.py` | Compute WMA under the approved linear-weight formula contract. | `wma` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `hull_ma.py` | Compute Hull MA from nested private WMA passes. | `hull_ma` | **Standard library:** `math`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `bollinger_bands.py` | Compute the SMA-basis upper/middle/lower Bollinger Bands. | `bollinger_bands` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `directional.py` | Compute ADX and its directional components. | `adx` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
+| Completed | `ema.py` | Compute EMA under the approved formula contract. | `ema` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set — see below)* |
+| Completed | `sma.py` | Compute SMA under the approved formula contract. | `sma` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `wma.py` | Compute WMA under the approved linear-weight formula contract. | `wma` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `hull_ma.py` | Compute Hull MA from nested private WMA passes. | `hull_ma` | **Standard library:** `math`, `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `bollinger_bands.py` | Compute the SMA-basis upper/middle/lower Bollinger Bands. | `bollinger_bands` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `directional.py` | Compute ADX and its directional components. | `adx` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
 | Completed | `__init__.py` | Expose the approved trend API. | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from files above |
 
 ### Configuration and Limits Manifest
@@ -1016,10 +1064,10 @@ normalized OHLC/source values → Core validation → approved volatility formul
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `atr.py` | Compute ATR with explicit true-range/Wilder conventions. | `atr` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `adr.py` | Compute ADR over a fixed `D1` rolling window. | `adr` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `rolling_volatility.py` | Compute explicitly specified return-based rolling volatility. | `rolling_volatility` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `standard_deviation.py` | Compute rolling sample standard deviation of one selected price. | `standard_deviation` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
+| Completed | `atr.py` | Compute ATR with explicit true-range/Wilder conventions. | `atr` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
+| Completed | `adr.py` | Compute ADR over a fixed `D1` rolling window. | `adr` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `rolling_volatility.py` | Compute explicitly specified return-based rolling volatility. | `rolling_volatility` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `standard_deviation.py` | Compute rolling sample standard deviation of one selected price. | `standard_deviation` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
 | Completed | `__init__.py` | Expose the approved volatility API. | `atr`, `adr`, `rolling_volatility`, `standard_deviation` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from files above |
 
 ### Configuration and Limits Manifest
@@ -1120,8 +1168,8 @@ normalized OHLC/source values → Core validation → approved oscillator formul
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `rsi.py` | Compute RSI under the approved Wilder convention. | `rsi` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
-| Completed | `williams_r.py` | Compute Williams %R under the approved rolling-range convention. | `williams_r` | **Standard library:** None<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `core → IndicatorConfig, IndicatorResult, validate_indicator` |
+| Completed | `rsi.py` | Compute RSI under the approved Wilder convention. | `rsi` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
+| Completed | `williams_r.py` | Compute Williams %R under the approved rolling-range convention. | `williams_r` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
 | Completed | `__init__.py` | Expose the approved momentum API. | `rsi`, `williams_r` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `rsi.py → rsi`; `williams_r.py → williams_r` |
 
 ### Configuration and Limits Manifest
@@ -1179,22 +1227,30 @@ features from normalized OHLCV bars.
 
 ### Files
 
-| Status | File | Responsibility | Key export |
-|---|---|---|---|
-| Completed | `cmf.py` | Rolling Chaikin Money Flow with explicit zero-range and zero-volume behavior. | `cmf` |
-| Completed | `obv.py` | Cumulative On-Balance Volume, seeded at zero on the first row. | `obv` |
-| Completed | `mfi.py` | Rolling Money Flow Index from typical-price direction and volume. | `mfi` |
-| Completed | `price_volume_distribution.py` | Rolling equal-width close-price bins and dominant-volume point-of-control center. | `price_volume_distribution` |
-| Completed | `__init__.py` | Expose the approved volume API. | `cmf`, `obv`, `mfi`, `price_volume_distribution` |
+| Status | File | Responsibility | Key export | Dependencies |
+|---|---|---|---|---|
+| Completed | `cmf.py` | Rolling Chaikin Money Flow with explicit zero-range and zero-volume behavior. | `cmf` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `obv.py` | Cumulative On-Balance Volume, seeded at zero on the first row. | `obv` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
+| Completed | `mfi.py` | Rolling Money Flow Index from typical-price direction and volume. | `mfi` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `price_volume_distribution.py` | Rolling equal-width close-price bins and dominant-volume point-of-control center. | `price_volume_distribution` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
+| Completed | `__init__.py` | Expose the approved volume API. | `cmf`, `obv`, `mfi`, `price_volume_distribution` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from files above |
 
 ### Formula and requirement gate
 
-| Status | Requirement | Contract | Usage / Unit evidence |
-|---|---|---|---|
-| Completed | `FR-INDI-027` | `cmf()` sums money-flow volume over an inclusive `period` window; zero-range bars contribute zero and a complete zero-volume window returns zero. | `tests/indicators/usage/06_volume.py`; `tests/indicators/unit/test_cmf.py::test_cmf_matches_money_flow_volume_fixture()` |
-| Completed | `FR-INDI-028` | `obv()` starts at zero, adds volume after a higher close, subtracts it after a lower close, and carries forward after an unchanged close. | `tests/indicators/usage/06_volume.py`; `tests/indicators/unit/test_obv.py::test_obv_matches_directional_cumulative_fixture()` |
-| Completed | `FR-INDI-029` | `mfi()` uses typical price × volume and an inclusive `period` flow window; both flows zero returns 50, negative flow zero returns 100, and positive flow zero returns 0. | `tests/indicators/usage/06_volume.py`; `tests/indicators/unit/test_mfi.py::test_mfi_rising_typical_price_reaches_upper_bound()` |
-| Completed | `FR-INDI-030` | `price_volume_distribution()` assigns each close to one of `bins` equal-width rolling price bins and returns the center of the highest-volume bin; ties resolve to the lowest bin. | `tests/indicators/usage/06_volume.py`; `tests/indicators/unit/test_price_volume_distribution.py::test_price_volume_distribution_returns_dominant_bin_center()` |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Completed | `FR-INDI-027` | The system shall sum money-flow volume over an inclusive `period` window for one validated `MarketDataset v1`; zero-range bars contribute zero and a complete zero-volume window returns zero. | `cmf(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_cmf.py::test_cmf_matches_money_flow_volume_fixture()` |
+| Completed | `FR-INDI-028` | The system shall start at zero, add volume after a higher close, subtract it after a lower close, and carry forward after an unchanged close. | `obv(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_obv.py::test_obv_matches_directional_cumulative_fixture()` |
+| Completed | `FR-INDI-029` | The system shall use typical price × volume over an inclusive `period` flow window; both flows zero returns 50, negative flow zero returns 100, and positive flow zero returns 0. | `mfi(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_mfi.py::test_mfi_rising_typical_price_reaches_upper_bound()` |
+| Completed | `FR-INDI-030` | The system shall assign each close to one of `bins` equal-width rolling price bins and return the center of the highest-volume bin; ties resolve to the lowest bin. | `price_volume_distribution(data: MarketDataset, *, period: int, bins: int, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_price_volume_distribution.py::test_price_volume_distribution_returns_dominant_bin_center()` |
+
+**Implementation notes (`FR-INDI-030`):** the rolling point-of-control window
+loop in `_point_of_control` is an approved `NFR-INDI-005` exception. Each
+window's bin edges depend on that window's own `min(low)` and `max(high)`, so
+bin assignment has no closed-form expression across windows; the per-window body
+remains fully vectorized (`linspace`, `searchsorted`, `bincount`). This is the
+only window-local exception in the package; the remaining loops
+(`ema.py`, `atr.py`, `rsi.py`, `directional.py`) are stateful recurrences.
 
 ---
 
@@ -1205,22 +1261,22 @@ retrospective confirmation or repainting.
 
 ### Files
 
-| Status | File | Responsibility | Key export |
-|---|---|---|---|
-| Completed | `doji.py` | Binary Doji label from an explicit body-to-range threshold. | `doji` |
-| Completed | `engulfing.py` | Bullish/bearish body-engulfing label using the current and previous candle. | `engulfing` |
-| Completed | `pinbar.py` | Bullish/bearish Pinbar label using fixed 60% shadow and 30% body limits. | `pinbar` |
-| Completed | `inside_bar.py` | Binary full-range containment label using the current and previous candle. | `inside_bar` |
-| Completed | `__init__.py` | Expose the approved candle-pattern API. | `doji`, `engulfing`, `pinbar`, `inside_bar` |
+| Status | File | Responsibility | Key export | Dependencies |
+|---|---|---|---|---|
+| Completed | `doji.py` | Binary Doji label from an explicit body-to-range threshold. | `doji` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
+| Completed | `engulfing.py` | Bullish/bearish body-engulfing label using the current and previous candle. | `engulfing` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
+| Completed | `pinbar.py` | Bullish/bearish Pinbar label using fixed 60% shadow and 30% body limits. | `pinbar` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
+| Completed | `inside_bar.py` | Binary full-range containment label using the current and previous candle. | `inside_bar` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
+| Completed | `__init__.py` | Expose the approved candle-pattern API. | `doji`, `engulfing`, `pinbar`, `inside_bar` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from files above |
 
 ### Formula and requirement gate
 
-| Status | Requirement | Contract | Usage / Unit evidence |
-|---|---|---|---|
-| Completed | `FR-INDI-031` | `doji()` emits `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close. | `tests/indicators/usage/02_candles.py`; `tests/indicators/unit/test_doji.py::test_doji_matches_body_to_range_fixture()` |
-| Completed | `FR-INDI-032` | `engulfing()` emits `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies. | `tests/indicators/usage/02_candles.py`; `tests/indicators/unit/test_engulfing.py::test_engulfing_matches_bullish_fixture_with_warmup()` |
-| Completed | `FR-INDI-033` | `pinbar()` emits `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match. | `tests/indicators/usage/02_candles.py`; `tests/indicators/unit/test_pinbar.py::test_pinbar_matches_bullish_and_bearish_fixtures()` |
-| Completed | `FR-INDI-034` | `inside_bar()` emits `1` only when the current high/low is contained within the prior high/low; the first row is warmup. | `tests/indicators/usage/02_candles.py`; `tests/indicators/unit/test_inside_bar.py::test_inside_bar_matches_containment_fixture_with_warmup()` |
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Completed | `FR-INDI-031` | The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close. | `doji(data: MarketDataset, *, threshold: float, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_doji.py::test_doji_matches_body_to_range_fixture()` |
+| Completed | `FR-INDI-032` | The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies. | `engulfing(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_engulfing.py::test_engulfing_matches_bullish_fixture_with_warmup()` |
+| Completed | `FR-INDI-033` | The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match. | `pinbar(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_pinbar.py::test_pinbar_matches_bullish_and_bearish_fixtures()` |
+| Completed | `FR-INDI-034` | The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup. | `inside_bar(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_inside_bar.py::test_inside_bar_matches_containment_fixture_with_warmup()` |
 
 Retrospective SMC/FVG/swing/BOS/CHoCH labeling remains explicitly excluded from
 this immutable, non-repainting production surface.
@@ -1231,19 +1287,19 @@ this immutable, non-repainting production surface.
 
 | Status | Requirement ID | Type | Responsibility | Verification |
 |---|---|---|---|---|
-| Completed | `NFR-INDI-001` | Architecture | The package shall remain a pure, persistence-free calculation domain with no broker, network, filesystem, cache, audit-sink, telemetry-export, or mutable registry I/O. | Side-effect/dependency audit |
+| Completed | `NFR-INDI-001` | Architecture | The package shall remain a pure, persistence-free calculation domain with no broker, network, filesystem, cache, audit-sink, telemetry-export, or mutable registry I/O. | `tests/indicators/unit/test_import_boundaries.py` (dependency surface, forbidden-I/O, cross-domain, registry-import, and import-side-effect guards) |
 | Completed | `NFR-INDI-002` | Determinism | Equivalent canonical inputs, parameters, versions, and policy shall produce byte-equivalent canonical values/checksums/manifests independent of call order. | Replay and checksum tests |
 | Completed | `NFR-INDI-003` | API boundary | Consumers shall use only documented root/feature exports; leaf modules, private helpers, DataFrames internal to other domains, and provider SDK objects are not cross-domain contracts. | Import contract tests |
 | Completed | `NFR-INDI-004` | Maintainability | Python shall follow Google style, explicit signature typing, Google docstrings, absolute imports, logging rules, and one focused responsibility per file. | Ruff, mypy, structure review |
-| Completed | `NFR-INDI-005` | Vectorization | Official batch formulas shall use vectorized pandas/NumPy operations except a documented mathematically stateful dependency that cannot be vectorized safely. | Implementation review and benchmark |
+| Completed | `NFR-INDI-005` | Vectorization | Official batch formulas shall use vectorized pandas/NumPy operations except a documented mathematically stateful recurrence or window-local dependency that cannot be vectorized safely. The complete set of approved exceptions is: the Wilder/EMA recurrences in `ema.py`, `atr.py`, `rsi.py`, and `directional.py`, and the window-local bin assignment in `price_volume_distribution.py` (see `FR-INDI-030` implementation notes). No other loop is permitted. | Implementation review and benchmark |
 | Completed | `NFR-INDI-006` | Numeric policy | Indicator values shall use float64 and approved absolute/relative tolerances; NaN, infinity, overflow, underflow, negative zero, null, and degenerate windows shall follow each approved formula table. | Golden/property/edge tests |
 | Completed | `NFR-INDI-007` | No-lookahead | Every row shall expose earliest-safe UTC `available_at` and source-window bounds; current/future data cannot be represented as already available. | Causality tests |
 | Completed | `NFR-INDI-008` | Data boundary | The package shall consume and propagate Data-owned provenance/quality/alignment evidence without implementing provider normalization, calendar, symbol-mapping, or quote-quality policy. | Producer-consumer contract tests |
-| Completed | `NFR-INDI-009` | Reliability | Validation, resource-limit, and calculation failures shall be atomic, deterministic, and fail closed; no partial official result is published. External deadlines and cancellation remain orchestrator-owned. | Failure-injection tests |
-| Completed | `NFR-INDI-010` | Concurrency | Public calculations and registry reads shall be thread-safe through immutability and absence of shared mutable state. | Concurrency tests |
+| Completed | `NFR-INDI-009` | Reliability | Validation, resource-limit, and calculation failures shall be atomic, deterministic, and fail closed; no partial official result is published. No raw upstream exception crosses the public port. External deadlines and cancellation remain orchestrator-owned. | Failure-injection tests; `tests/indicators/unit/test_large_input.py` (boundary guard, guard coverage of all twenty calculators) |
+| Completed | `NFR-INDI-010` | Concurrency | Public calculations and registry reads shall be thread-safe through immutability and absence of shared mutable state. | `tests/indicators/unit/test_concurrency.py` (parallel checksum equality, shared-input immutability, parallel registry reads, immutable registry storage) |
 | Completed | `NFR-INDI-011` | Testing | Every `FR-INDI-*` shall have usage and unit coverage; formulas require approved hand-calculated golden fixtures and invariants/property tests. No absent historical implementation or third-party indicator library is normative. | Traceability and coverage audit |
-| Completed | `NFR-INDI-012` | Coverage | The package shall maintain at least 80% statement and branch coverage, with all documented error paths exercised. | `pytest --cov` |
-| Completed | `NFR-INDI-013` | Dependencies | Runtime dependencies shall be direct project dependencies and locked at the approved baseline: Python 3.14.3, pandas 3.0.3, and NumPy 2.4.6. | `pyproject.toml`, `uv.lock`, and dependency-version audit |
+| Completed | `NFR-INDI-012` | Coverage | The package shall maintain at least 80% statement and branch coverage, with all documented error paths exercised. | `pytest --cov`; 2026-07-22 measured branch coverage 91.84% over 1711 statements / 310 branches (111 passed, 6 usage skips) |
+| Completed | `NFR-INDI-013` | Dependencies | Runtime dependencies shall be direct project dependencies and locked at the approved baseline declared in `pyproject.toml`: Python `>=3.14`, pandas `==3.0.3`, and NumPy `==2.4.6`. No patch-level Python pin is declared, so any 3.14.x interpreter satisfies the baseline. | `pyproject.toml`, `uv.lock`, and dependency-version audit |
 | Completed | `NFR-INDI-014` | Security | Errors, manifests, and quality/provenance metadata shall exclude secrets and raw full input payloads; safe details are redacted before crossing the boundary. | Security/redaction tests |
 
 Shared settings are defined once in the Core Configuration and Limits Manifest. Feature modules own only their formula-specific parameters.
@@ -1262,12 +1318,18 @@ No open decisions.
 
 ```text
 tests/indicators/
+├── __init__.py
+├── helpers.py                          # Shared deterministic dataset builders
 ├── fixtures/
 │   ├── trend_golden.json
 │   ├── volatility_golden.json
 │   └── momentum_golden.json
 ├── unit/
+│   ├── __init__.py
 │   ├── test_public_api.py
+│   ├── test_import_boundaries.py
+│   ├── test_concurrency.py
+│   ├── test_large_input.py
 │   ├── test_errors.py
 │   ├── test_contracts.py
 │   ├── test_results.py
@@ -1291,11 +1353,13 @@ tests/indicators/
 │   ├── test_pinbar.py
 │   └── test_inside_bar.py
 ├── integration/
+│   ├── __init__.py
 │   ├── test_batch_calculation.py
 │   ├── test_decision_time_consumption.py
 │   ├── test_warmup_coordination.py
 │   ├── test_multi_timeframe.py
-│   └── test_registry_workflow.py
+│   ├── test_registry_workflow.py
+│   └── test_usage_scripts.py           # Executes each usage/NN_*.py program
 └── usage/                              # Runnable real-data example scripts (not pytest)
     ├── conftest.py                      # Excludes NN_*.py scripts from pytest collection
     ├── 01_core.py
@@ -1341,6 +1405,9 @@ During iterative implementation, run only the changed file's unit/usage/integrat
 - **Integration:** Every `WF-INDI-*`, including producer-consumer compatibility for `MarketDataset v1` and `IndicatorSeries v1`.
 - **Usage:** One independently runnable example per public requirement, provided as standalone `usage/NN_*.py` scripts (not pytest tests) that exercise the public API end-to-end against real market data and real connections, using documented public imports only. They are excluded from pytest collection by `usage/conftest.py` and executed/verified — or explicitly skipped when live data is unavailable — by `tests/indicators/integration/test_usage_scripts.py`.
 - **Import contract:** `tests/indicators/unit/test_public_api.py::test_root_and_feature_exports_are_exact()` verifies the root/feature `__all__` values, rejects leaf modules as documented stable imports, and detects undocumented public symbols.
+- **Dependency boundary and purity:** `tests/indicators/unit/test_import_boundaries.py` enforces `NFR-INDI-001`/`NFR-INDI-003` by asserting the package imports only stdlib, `numpy`/`pandas`, `app.utils`, and `app.services.data.contracts`; declares no I/O, network, subprocess, environment, or randomness module; imports no peer service domain; keeps `core/registry.py` free of feature-implementation imports; and creates nothing on import.
+- **Concurrency:** `tests/indicators/unit/test_concurrency.py` enforces `NFR-INDI-010` by proving parallel calculations reproduce serial checksums exactly, the shared input dataset is never mutated, and registry reads return stable immutable values.
+- **Scale and boundary:** `tests/indicators/unit/test_large_input.py` enforces `NFR-INDI-009` and guards the 2026-07-22 regression in which every indicator failed above 664 records. It asserts calculation succeeds across and far beyond that ceiling for every indicator family, that the folded input checksum stays deterministic and order-sensitive, that a raw upstream exception surfaces as a redacted `IND_INTERNAL_ERROR` carrying no upstream payload, that a deliberate `IndicatorError` is never masked, and that all twenty official calculators carry the boundary guard.
 
 Each golden JSON file contains `fixture_version="v1"`, `formula_version`,
 `derivation`, canonical OHLCV input rows, parameters, and exact expected values.
@@ -1356,4 +1423,11 @@ embedded in the fixture.
 - [X] Candle-pattern indicators are implemented and publicly exported. Evidence: `app/services/indicators/candles/__init__.py:1`.
 - [X] Retrospective SMC remains excluded from the production surface. Evidence: `app/services/indicators/README.md:35`.
 - [X] The root registry and public package port expose exactly 20 approved indicators. Evidence: `app/services/indicators/core/registry.py:437`.
-- [X] Unit, integration, lint, format, type, and coverage gates pass, and the runnable usage-example scripts execute (or skip on unavailable live data) via `tests/indicators/integration/test_usage_scripts.py`. Evidence: `tests/indicators/integration/test_usage_scripts.py:20`.
+- [X] Each feature is one module folder with one runnable usage program, registered with a matching `FEAT-INDI-NN` in this README's Section 2 Feature Registry.
+- [X] `NFR-INDI-001` purity and dependency boundaries are proven by test, not by inspection. Evidence: `tests/indicators/unit/test_import_boundaries.py:90`.
+- [X] `NFR-INDI-010` thread safety is proven by test, not by inspection. Evidence: `tests/indicators/unit/test_concurrency.py:40`.
+- [X] Every public export documented in Sections 2 and 4 matches the implemented signature, verified against `inspect.signature` for all 26 public callables.
+- [X] Usage programs define `main()` and an `if __name__ == "__main__"` guard per `AGENTS.md` §4. Evidence: `tests/indicators/usage/01_core.py:205`.
+- [X] Datasets far beyond the former 664-record serialization ceiling calculate correctly; `MAX_INPUT_ROWS` is the only input-size limit. Evidence: `app/services/indicators/core/results.py:219`, `tests/indicators/unit/test_large_input.py:53`.
+- [X] No raw upstream exception crosses the public port; all twenty calculators are boundary-guarded. Evidence: `app/services/indicators/core/errors.py:188`, `tests/indicators/unit/test_large_input.py:105`.
+- [X] Unit, integration, lint, format, type, and coverage gates pass, and the runnable usage-example scripts execute (or skip on unavailable live data) via `tests/indicators/integration/test_usage_scripts.py`. Evidence: `tests/indicators/integration/test_usage_scripts.py:20`; 2026-07-22 run — `ruff check` clean, `ruff format --check` 75 files clean, `mypy` clean over 32 source files, 111 passed / 6 skipped, branch coverage 91.84%.

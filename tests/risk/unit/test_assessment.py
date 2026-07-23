@@ -5,7 +5,7 @@ from decimal import Decimal
 from app.services.risk.config import RiskConfig
 from app.services.risk.regimes import assess_risk_regime
 
-from tests.risk.usage import test_usage_policy as examples
+from tests.risk import _support as examples
 
 
 def _enabled_config() -> RiskConfig:

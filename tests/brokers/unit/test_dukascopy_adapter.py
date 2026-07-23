@@ -15,6 +15,7 @@ from app.services.brokers import (
     BrokerId,
 )
 from app.services.brokers.dukascopy.adapter import DukascopyBrokerAdapter
+from app.services.brokers.dukascopy.candle_transport import _CandleBatch
 
 _RECORD = struct.Struct(">3I2f")
 
@@ -58,6 +59,33 @@ class _FakeTransport:
         if self._fails:
             raise OSError("network unreachable")
         return _RECORD.pack(0, 110_000, 109_990, 1.0, 1.0)
+
+
+class _FakeCandleTransport:
+    """Return bounded recorded Dukascopy web-chart rows."""
+
+    def __init__(self, *, truncated: bool = False) -> None:
+        self.truncated = truncated
+        self.requests: list[tuple[str, str, datetime, datetime, int]] = []
+
+    async def get_candles(
+        self,
+        symbol: str,
+        timeframe: str,
+        start: datetime,
+        end: datetime,
+        limit: int,
+    ) -> _CandleBatch:
+        """Return one recorded candle batch."""
+        self.requests.append((symbol, timeframe, start, end, limit))
+        rows = ((int(start.timestamp() * 1000), 1.1, 1.2, 1.0, 1.15, 10.0),)
+        return _CandleBatch(
+            rows=rows[:limit],
+            provider_symbol="EUR/USD",
+            provider_interval="1HOUR" if timeframe == "H1" else "1MIN",
+            page_count=1,
+            truncated=self.truncated,
+        )
 
 
 def test_adapter_rejects_non_sandbox_environment() -> None:
@@ -166,38 +194,55 @@ def test_adapter_get_ticks_maps_bounded_genuine_ticks() -> None:
     asyncio.run(exercise())
 
 
-def test_adapter_aggregates_bounded_midpoint_bars_locally() -> None:
-    """DEC-BRK-002(a): Dukascopy mapping owns deterministic tick aggregation."""
-
-    class _BarTransport(_FakeTransport):
-        async def get_hour(self, symbol: str, hour: object) -> bytes:
-            del symbol, hour
-            return b"".join(
-                (
-                    _RECORD.pack(0, 110_010, 109_990, 1.0, 1.0),
-                    _RECORD.pack(30_000, 110_030, 110_010, 1.0, 1.0),
-                    _RECORD.pack(60_000, 110_020, 110_000, 1.0, 1.0),
-                )
-            )
-
+def test_adapter_maps_bounded_provider_bid_bars() -> None:
+    """Dukascopy web-chart BID rows map without invented spread evidence."""
+    candle_transport = _FakeCandleTransport()
     adapter = DukascopyBrokerAdapter(
-        _config(), _capabilities(), transport=_BarTransport()
+        _config(),
+        _capabilities(),
+        transport=_FakeTransport(),
+        candle_transport=candle_transport,
     )
 
     async def exercise() -> None:
         result = await adapter.get_historical_bars(
             "EURUSD",
-            "M1",
+            "H1",
             start=datetime(2026, 1, 1, tzinfo=UTC),
-            end=datetime(2026, 1, 1, 0, 2, tzinfo=UTC),
-            limit=2,
+            end=datetime(2026, 1, 1, 2, tzinfo=UTC),
+            limit=1,
         )
         assert result.data is not None
-        assert len(result.data.items) == 2
-        assert result.data.items[0].open == Decimal("1.1000")
-        assert result.data.items[0].close == Decimal("1.1002")
-        assert result.data.provider_metadata["derivation"] == (
-            "quote_midpoint_tick_aggregation"
+        assert len(result.data.items) == 1
+        assert result.data.items[0].open == Decimal("1.1")
+        assert result.data.items[0].spread is None
+        assert result.data.provider_metadata["offer_side"] == "BID"
+        assert result.data.provider_metadata["provider_symbol"] == "EUR/USD"
+
+    asyncio.run(exercise())
+
+
+def test_adapter_passes_output_limit_to_candle_pagination() -> None:
+    """The bar limit bounds web-chart pagination rather than BI5 hour fan-out."""
+    candle_transport = _FakeCandleTransport(truncated=True)
+    adapter = DukascopyBrokerAdapter(
+        _config(),
+        _capabilities(),
+        transport=_FakeTransport(),
+        candle_transport=candle_transport,
+    )
+
+    async def exercise() -> None:
+        result = await adapter.get_historical_bars(
+            "EURUSD",
+            "H1",
+            start=datetime(2026, 1, 1, tzinfo=UTC),
+            end=datetime(2026, 1, 1, 3, tzinfo=UTC),
+            limit=1,
         )
+        assert result.data is not None
+        assert len(result.data.items) == 1
+        assert result.data.truncated
+        assert candle_transport.requests[0][-1] == 1
 
     asyncio.run(exercise())

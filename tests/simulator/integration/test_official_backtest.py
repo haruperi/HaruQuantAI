@@ -7,7 +7,11 @@ from decimal import Decimal
 from pathlib import Path
 from time import perf_counter
 
-from app.services.data.contracts import DataQualityReport, MarketDataset, TickRecord
+from app.services.data.contracts import (
+    DataQualityReport,
+    MarketDataset,
+    TickRecord,
+)
 from app.services.simulator import run_backtest
 from app.utils import logger
 from tests.simulator.unit.test_orchestrator import (
@@ -163,7 +167,7 @@ class ProtectiveDependencies(FakeDependencies):
 def test_official_backtest_completes_end_to_end(tmp_path: Path) -> None:
     """Complete Data through reporting with the required domain call order."""
     logger.info("Testing WF-SIM-001 official backtest end to end")
-    dataset = _dataset(f"req-{'a' * 64}")
+    dataset = _dataset("req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
     request = _request(dataset, suffix="a")
     dependencies = TrackingDependencies(tmp_path, dataset)
     result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
@@ -188,7 +192,7 @@ def test_official_backtest_completes_end_to_end(tmp_path: Path) -> None:
 def test_completed_run_publishes_closed_trade_ledger(tmp_path: Path) -> None:
     """Publish a real closed-trade ledger with observed excursions."""
     logger.info("Testing WF-SIM-001 closed-trade ledger publication")
-    dataset = _protective_dataset(f"req-{'d' * 64}")
+    dataset = _protective_dataset("req-dddddddd-dddd-4ddd-8ddd-dddddddddddd")
     request = _request(dataset, suffix="d")
     dependencies = ProtectiveDependencies(tmp_path, dataset)
     result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
@@ -205,7 +209,7 @@ def test_completed_run_publishes_closed_trade_ledger(tmp_path: Path) -> None:
 def test_official_backtest_uses_data_tick_series_only(tmp_path: Path) -> None:
     """Prove the official clock invokes Data-owned real-evidence generation."""
     logger.info("Testing WF-SIM-010 synthetic-market-data exclusion")
-    dataset = _dataset(f"req-{'b' * 64}")
+    dataset = _dataset("req-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
     request = _request(dataset, suffix="b")
     dependencies = TrackingDependencies(tmp_path, dataset)
     run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
@@ -216,7 +220,7 @@ def test_official_backtest_uses_data_tick_series_only(tmp_path: Path) -> None:
 def test_official_backtest_performance_baseline(tmp_path: Path) -> None:
     """Measure and bound a two-tick official run's time and peak memory."""
     logger.info("Measuring the Section 7 official-run performance baseline")
-    dataset = _dataset(f"req-{'c' * 64}")
+    dataset = _dataset("req-cccccccc-cccc-4ccc-8ccc-cccccccccccc")
     request = _request(dataset, suffix="c")
     dependencies = FakeDependencies(tmp_path, dataset)
     tracemalloc.start()

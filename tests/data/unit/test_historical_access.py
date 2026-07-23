@@ -6,19 +6,13 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from app.services.data.access.historical import (
-    OHLCV_MAX_LIMIT,
-    fetch_market_dataset,
-)
-from app.services.data.contracts import (
-    DatasetSaveRequest,
-    MarketDataRequest,
-    MarketDataset,
-)
-from app.services.data.contracts.errors import DataError
+from app.services.data.contracts import MarketDataset
+from app.services.data.market_data.pipeline import fetch_market_dataset
+from app.services.data.market_data.requests import MarketDataRequest
+from app.services.data.persistence.contracts import DatasetSaveRequest
+from app.services.data.persistence.dataset_writer import save_dataset
 from app.services.data.sources.policy import _reset_policy_registry
 from app.services.data.sources.registry import _reset_registry
-from app.services.data.storage.datasets import save_dataset
 
 from tests.data.helpers import make_dataset, register_local_test_source
 
@@ -31,7 +25,7 @@ def _configure_database(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1.0")
     monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "30")
-    from app.services.data.storage.migrations import run_data_migrations
+    from app.services.data.persistence.migrations import run_data_migrations
 
     run_data_migrations(
         "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
@@ -48,7 +42,7 @@ def _setup(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
 def test_fetch_market_dataset_reports_actual_source(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Verify fetch_market_dataset reports actual source and validates limits."""
+    """Verify source reporting and multi-million-bar request acceptance."""
     raw_root = tmp_path / "data" / "raw"
     raw_root.mkdir(parents=True, exist_ok=True)
     register_local_test_source(raw_root, ("AAPL",))
@@ -105,8 +99,8 @@ def test_fetch_market_dataset_reports_actual_source(
     assert res.symbol == "AAPL"
     assert res.records[0].source == "local_csv"
 
-    # 2. Limit exceeded check
-    req_invalid_limit = req.model_copy(update={"limit": OHLCV_MAX_LIMIT + 1})
-    with pytest.raises(DataError) as exc_info:
-        fetch_market_dataset(req_invalid_limit)
-    assert exc_info.value.code == "LIMIT_EXCEEDED"
+    # 2. OHLCV requests are not capped by an app-wide record-count limit.
+    large_req = req.model_copy(update={"limit": 8_000_000})
+    large_result = fetch_market_dataset(large_req)
+    assert isinstance(large_result, MarketDataset)
+    assert large_result.records

@@ -2,8 +2,8 @@
 
 from app.services.risk.contracts import DecisionState
 
-from tests.risk.usage import test_usage_decisions as examples
-from tests.risk.usage import test_usage_policy as policy_examples
+from tests.risk import _support as examples
+from tests.risk import _support as policy_examples
 
 
 def test_trade_review_uses_fixed_precedence_and_fails_closed() -> None:

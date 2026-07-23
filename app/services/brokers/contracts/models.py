@@ -464,8 +464,11 @@ class BrokerCapability(_Schema):
             and self.availability != "UNAVAILABLE"
         ):
             raise ValueError("unimplemented capability must be unavailable")
+        # `WRITE` denotes an order mutation and carries the FR-BRK-010 release
+        # gate. `READ_WRITE` denotes provider watch-list or subscription session
+        # mutation, which places no order and is not subject to that gate.
         if (
-            self.access_mode in {"WRITE", "READ_WRITE"}
+            self.access_mode == "WRITE"
             and self.availability == "AVAILABLE"
             and (
                 not self.verification_evidence

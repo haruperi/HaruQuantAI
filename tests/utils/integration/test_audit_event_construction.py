@@ -1,29 +1,26 @@
+"""Utils-owned construction portion of `WF-UTL-003`.
+
+Steps 1-4 of the workflow are owned by Utils: domain-supplied action facts and
+trace context, ID and UTC validation, redaction plus canonicalization, and bounded
+`AuditEvent v1` construction. Step 5, persistence, is owned by Data and is proven by
+`tests/data/integration/test_audit_event_handoff.py`, which keeps this module free of
+any `app.services` dependency.
+"""
+
 from datetime import UTC, datetime
-from pathlib import Path
 
 import pytest
-from app.services.data.storage import persist_audit_event
-from app.services.data.storage.migrations import run_data_migrations
 from app.utils import (
     AuditEvent,
     canonical_json,
     generate_id,
     redact_mapping_value,
 )
+from pydantic import ValidationError
 
 
-def test_redacted_canonical_audit_event_reaches_data_persistence(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
-) -> None:
-    """Persist one genuinely redacted Utils audit envelope through Data."""
-    monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("DATABASE_URL", "sqlite:///utils-audit.sqlite3")
-    monkeypatch.setenv("DATA_DIR", str(tmp_path))
-    monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1.0")
-    monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "10")
-    migration_request_id = generate_id("req")
-    run_data_migrations(migration_request_id)
+def test_redacted_canonical_audit_event_is_constructed() -> None:
+    """Build one genuinely redacted, canonicalized Utils audit envelope."""
     safe_payload = redact_mapping_value({"account": "demo", "token": "abc123"}).value
     assert isinstance(safe_payload, dict)
     event = AuditEvent(
@@ -40,6 +37,20 @@ def test_redacted_canonical_audit_event_reaches_data_persistence(
     serialized = canonical_json(event.payload)
     assert "abc123" not in serialized
     assert "[REDACTED]" in serialized
-    result = persist_audit_event(event)
-    assert result.persisted
-    assert result.event_id == event.event_id
+    assert event.payload["account"] == "demo"
+
+
+def test_audit_event_construction_fails_closed_on_protected_key() -> None:
+    """Reject a payload carrying a protected credential key before persistence."""
+    with pytest.raises(ValidationError):
+        AuditEvent(
+            contract_version="v1",
+            schema_id="utils.audit_event.v1",
+            event_id=generate_id("evt"),
+            timestamp=datetime.now(UTC),
+            domain="trading",
+            action="request_received",
+            request_id=generate_id("req"),
+            correlation_id=generate_id("cor"),
+            payload={"api_key": "abc123"},
+        )

@@ -6,10 +6,9 @@ from decimal import Decimal
 import pandas as pd
 import pytest
 from app.services.data import to_ohlcv_dataframe, to_tick_dataframe
-from app.services.data.contracts import DataQualityReport, MarketDataset
-from app.services.data.contracts.errors import DataError
+from app.services.data.contracts import DataError, DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
-from app.services.data.processing.tabular import (
+from app.services.data.transformation.tabular import (
     align_dataframe_datetime,
     bars_to_records,
     compare_dataframes,
@@ -264,12 +263,44 @@ def test_to_ohlcv_dataframe_rejects_float64_overflow() -> None:
     assert captured.value.code == "PRECISION_MISMATCH"
 
 
-def test_to_ohlcv_dataframe_rejects_missing_spread_evidence() -> None:
-    """Never invent a zero or current quote when historical spread is absent."""
+def test_to_ohlcv_dataframe_preserves_missing_spread_as_nan() -> None:
+    """Preserve missing historical spread without inventing a value or unit."""
     dataset = _bar_dataset(include_spread=False)
 
+    frame = to_ohlcv_dataframe(dataset)
+
+    assert frame["spread"].isna().all()
+    assert str(frame["spread"].dtype) == "float64"
+    assert frame.attrs["spread_unit"] is None
+
+
+def test_to_ohlcv_dataframe_preserves_partial_spread_evidence() -> None:
+    """Keep supplied spreads and represent only unavailable rows as NaN."""
+    dataset = _bar_dataset()
+    records = (
+        dataset.records[0],
+        dataset.records[1].model_copy(
+            update={"spread": None, "spread_unit": None},
+        ),
+    )
+
+    frame = to_ohlcv_dataframe(dataset.model_copy(update={"records": records}))
+
+    assert frame.iloc[0]["spread"] == 2.0
+    assert pd.isna(frame.iloc[1]["spread"])
+    assert frame.attrs["spread_unit"] == "points"
+
+
+def test_to_ohlcv_dataframe_rejects_conflicting_spread_units() -> None:
+    """Supplied spread evidence must use one common native unit."""
+    dataset = _bar_dataset()
+    records = (
+        dataset.records[0],
+        dataset.records[1].model_copy(update={"spread_unit": "pips"}),
+    )
+
     with pytest.raises(DataError) as captured:
-        to_ohlcv_dataframe(dataset)
+        to_ohlcv_dataframe(dataset.model_copy(update={"records": records}))
 
     assert captured.value.code == "DATA_QUALITY_FAILED"
 

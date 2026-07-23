@@ -27,13 +27,17 @@ dependencies = [
     "ruff>=0.15.18",
     "scikit-learn==1.9.0",
     "service-identity>=24.2.0",
+    # Pinned to the exact version `ctrader-open-api==0.9.2` requires. Brokers
+    # imports `twisted.internet` directly in `ctrader/network.py`, so NFR-BRK-013
+    # requires this transitive package to be declared rather than inherited.
+    "twisted==24.3.0",
     "uvicorn>=0.30.0",
     "yfinance>=1.4.1",
 ]
 
 [tool.ruff]
 # Target Python version rules
-target-version = "py313"
+target-version = "py314"
 line-length = 88
 src = ["app", "tests"]
 
@@ -173,7 +177,6 @@ pythonpath = ["."]
 python_files = [
     "test_*.py",
     "*_test.py",
-    "[0-9]*_*.py",
 ]
 addopts = [
     "--import-mode=importlib",

@@ -5,7 +5,11 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import DataQualityReport, MarketDataset, TickRecord
+from app.services.data.contracts import (
+    DataQualityReport,
+    MarketDataset,
+    TickRecord,
+)
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.timeline import build_tick_timeline, validate_intent_timing
 
@@ -54,7 +58,7 @@ def _dataset() -> MarketDataset:
         cache_status="not_used",
         workflow_context="backtest",
         precision_policy="decimal_string",
-        request_id=f"req-{'2' * 64}",
+        request_id="req-22222222-2222-4222-8222-222222222222",
     )
 
 

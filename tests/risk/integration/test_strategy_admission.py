@@ -3,12 +3,16 @@
 from decimal import Decimal
 from typing import Literal
 
+from app.services.risk.admission import review_strategy_admission
 from app.services.risk.audit import RiskAuditChain
-from app.services.risk.contracts import DecisionState, RiskAuditRecord
-from app.services.risk.policy import review_strategy_admission
+from app.services.risk.contracts import (
+    DecisionState,
+    RiskAuditRecord,
+    StrategyOperationalEligibilityRequest,
+)
 from app.utils import canonical_json
 
-from tests.risk.usage import test_usage_policy as examples
+from tests.risk import _support as examples
 
 
 class _AuditStore:
@@ -75,7 +79,7 @@ def test_strategy_operational_eligibility_end_to_end() -> None:
     audit = RiskAuditChain(config, audit_store, lambda: examples.NOW, canonical_json)
     eligibility_store = examples._EligibilityStore()
     decision = review_strategy_admission(
-        examples.StrategyOperationalEligibilityRequest(
+        StrategyOperationalEligibilityRequest(
             strategy_id="mean-reversion",
             strategy_version="1.0.0",
             runtime_profile="simulation",

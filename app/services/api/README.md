@@ -36,6 +36,12 @@ required dependency cannot be verified.
   keys, credential-reference resolution, and composition-root construction of
   Brokers-owned `BrokerConnectionConfig v1` values. UI/API does not generate, store,
   or rotate encryption keys.
+- Composition-root loading of the per-platform provider enablement flags
+  (`MT5_ENABLED`, `CTRADER_ENABLED`, `BINANCE_ENABLED`, …) declared in
+  `docs/PROJECT.md` §6. These flags determine which broker-backed provider facades
+  Data may compose as read-only market-data sources; UI/API loads and supplies them
+  and never decides source selection, ordering, fallback, or readiness, which remain
+  Data's under `CAP-DATA-025` and `WF-DATA-011`.
 - User, session, settings, and HTTP-idempotency logical schemas/tables/migrations on
   Data-owned shared persistence infrastructure.
 - Authenticated human `ApprovalAttestation v1` production; Risk remains the sole
@@ -160,6 +166,27 @@ flowchart TD
 The canonical Python runtime tree remains under `app/services/api/`; there is no
 top-level `api/` package and no temporary compatibility import. The frontend remains a separate
 `ui/` deployable as required by `docs/PROJECT.md`.
+
+### Feature Registry
+
+The UI/API domain remains `Missing`. These are the approved current feature
+targets; none may be marked `Completed` until its owning module, exact public
+contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
+
+| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
+|---|---|---|---|---|---|
+| Missing | `FEAT-API-01` Boundary Contracts | `contracts/` | Planned exact declarations: Section 4.1 | Section 4.1 functional requirements | Missing |
+| Missing | `FEAT-API-02` Authentication and Authorization | `identity/` | Planned exact declarations: Section 4.2 | Section 4.2 functional requirements | Missing |
+| Missing | `FEAT-API-03` Request Security and Context | `middleware/` | Planned exact declarations: Section 4.3 | Section 4.3 functional requirements | Missing |
+| Missing | `FEAT-API-04` Liveness and Readiness | `health/` | Planned exact declarations: Section 4.4 | Section 4.4 functional requirements | Missing |
+| Missing | `FEAT-API-05` Operational Telemetry and Exposition | `observability/` | Planned exact declarations: Section 4.5 | Section 4.5 functional requirements | Missing |
+| Missing | `FEAT-API-06` Ordered Event Delivery | `streams/` | Planned exact declarations: Section 4.6 | Section 4.6 functional requirements | Missing |
+| Missing | `FEAT-API-07` Thin HTTP and Streaming Boundaries | `routes/` | Planned exact declarations and route contracts: Section 4.7 | Section 4.7 functional requirements | Missing |
+| Missing | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | Planned exact declarations: Section 4.8 | Section 4.8 functional requirements | Missing |
+| Missing | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | Planned exact declarations: Section 4.9 | Section 4.9 functional requirements | Missing |
+| Missing | `FEAT-API-10` Frontend Session and Page Context | `ui/context/` | Planned exact declarations: Section 4.10 | Section 4.10 functional requirements | Missing |
+| Missing | `FEAT-API-11` Workflow Presentation Components | `ui/components/` | Planned exact declarations: Section 4.11 | Section 4.11 functional requirements | Missing |
+| Missing | `FEAT-API-12` Protected Workflow Pages | `ui/app/` | Planned exact declarations: Section 4.12 | Section 4.12 functional requirements | Missing |
 
 ```text
 app/services/api/

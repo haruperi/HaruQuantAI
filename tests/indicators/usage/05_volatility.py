@@ -8,10 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import get_market_data
-from app.services.data.contracts import (
-    DataError,
-    MarketDataset,
-)
+from app.services.data.contracts import DataError, MarketDataset
 from app.services.indicators.volatility import (
     adr,
     atr,
@@ -74,32 +71,48 @@ def _get_daily_dataset() -> MarketDataset:
     return dataset
 
 
-try:
-    intraday_data = _get_intraday_dataset()
-    daily_data = _get_daily_dataset()
-except DataError as error:
-    print(f"Skipping volatility examples: MT5 data unavailable ({error.code})")
-    sys.exit(3)
+def main() -> None:
+    """Run the volatility-indicator feature usage examples.
 
-_header("Example 1: Calculate ATR over a normalized intraday dataset")
-result_atr = atr(intraday_data, period=2)
-print(f"ATR columns: {list(result_atr.values.columns)}")
-print(f"ATR values: {result_atr.values['atr_2'].tolist()}")
+    Demonstrates ``FR-INDI-018`` through ``FR-INDI-020`` and ``FR-INDI-026``
+    end-to-end against real market data using only documented public exports.
+    Exits with status ``3`` when the live market-data source is unavailable,
+    which the integration runner treats as a skip rather than a failure.
+    """
+    try:
+        intraday_data = _get_intraday_dataset()
+        daily_data = _get_daily_dataset()
+    except DataError as unavailable:
+        print(
+            f"Skipping volatility examples: MT5 data unavailable ({unavailable.code})"
+        )
+        sys.exit(3)
 
-_header("Example 2: Calculate ADR over a normalized D1 dataset")
-result_adr = adr(daily_data, period=2)
-print(f"ADR columns: {list(result_adr.values.columns)}")
-print(f"ADR values: {result_adr.values['adr_2'].tolist()}")
+    _header("Example 1: Calculate ATR over a normalized intraday dataset")
+    result_atr = atr(intraday_data, period=2)
+    print(f"ATR columns: {list(result_atr.values.columns)}")
+    print(f"ATR values: {result_atr.values['atr_2'].tolist()}")
 
-_header("Example 3: Calculate rolling volatility over a normalized dataset")
-result_vol = rolling_volatility(intraday_data, period=2)
-print(f"Rolling volatility columns: {list(result_vol.values.columns)}")
-print(
-    f"Rolling volatility values: {result_vol.values['rolling_volatility_2'].tolist()}"
-)
+    _header("Example 2: Calculate ADR over a normalized D1 dataset")
+    result_adr = adr(daily_data, period=2)
+    print(f"ADR columns: {list(result_adr.values.columns)}")
+    print(f"ADR values: {result_adr.values['adr_2'].tolist()}")
 
-_header("Example 4: Calculate rolling price standard deviation")
-result_std = standard_deviation(intraday_data, period=2)
-print(
-    f"Standard deviation values: {result_std.values['standard_deviation_2'].tolist()}"
-)
+    _header("Example 3: Calculate rolling volatility over a normalized dataset")
+    result_vol = rolling_volatility(intraday_data, period=2)
+    print(f"Rolling volatility columns: {list(result_vol.values.columns)}")
+    print(
+        f"Rolling volatility values: "
+        f"{result_vol.values['rolling_volatility_2'].tolist()}"
+    )
+
+    _header("Example 4: Calculate rolling price standard deviation")
+    result_std = standard_deviation(intraday_data, period=2)
+    print(
+        f"Standard deviation values: "
+        f"{result_std.values['standard_deviation_2'].tolist()}"
+    )
+
+
+if __name__ == "__main__":
+    main()

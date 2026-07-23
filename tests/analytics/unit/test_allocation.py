@@ -12,7 +12,7 @@ from app.services.analytics.reports.allocation import (
     build_portfolio_rebalance_measurement,
 )
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import (
+from tests.analytics._support import (
     _measurement_request,
     _portfolio_simulation_result,
     _report,

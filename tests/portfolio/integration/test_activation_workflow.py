@@ -52,9 +52,9 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
     request_data = _request_data_with_fx(construction_request_data)
     request_data.update(
         {
-            "request_id": "req-" + "1" * 64,
-            "workflow_id": "wf-" + "2" * 64,
-            "correlation_id": "cor-" + "3" * 64,
+            "request_id": "req-11111111-1111-4111-8111-111111111111",
+            "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+            "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         }
     )
     request = PortfolioConstructionRequest(**request_data)

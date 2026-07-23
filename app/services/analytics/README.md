@@ -152,6 +152,21 @@ flowchart TD
 Modules and files are ordered from lowest dependency to highest dependency.
 The order is the implementation sequence.
 
+### Feature Registry
+
+| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
+|---|---|---|---|---|---|
+| Completed | `FEAT-ANLT-01` Schemas, Catalogs, and Evidence Safety | `contracts/` | Exact declarations and contract manifests: Section 4.1 | Section 4.1 functional requirements | `tests/analytics/usage/01_contracts.py` |
+| Completed | `FEAT-ANLT-02` Approved Upstream Result Mapping | `adapters/` | Exact declarations: Section 4.2 | Section 4.2 functional requirements | `tests/analytics/usage/02_adapters.py` |
+| Completed | `FEAT-ANLT-03` Internal Pure Analytical Evidence | `metrics/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/analytics/usage/03_metrics.py` |
+| Completed | `FEAT-ANLT-04` Canonical Reporting | `reports/` | Exact declarations and report contracts: Section 4.4 | Section 4.4 functional requirements | `tests/analytics/usage/04_reports.py` |
+| Excluded | Unregistered strategy-quality scorecards | `scorecards/` | Excluded declarations: Section 4.5 | `FR-ANLT-014`, `FR-ANLT-044` remain excluded | No usage program required while excluded |
+| Completed | `FEAT-ANLT-05` Bounded Report Projection | `dashboards/` | Exact declarations and `DashboardPayload` contract: Section 4.6 | Section 4.6 functional requirements | `tests/analytics/usage/05_dashboards.py` |
+
+Excluded work has no `FEAT-*` registration and does not consume a feature ordinal.
+The registry therefore maps the five active feature IDs one-to-one to the five
+numbered usage programs.
+
 ```text
 analytics/
 ├── __init__.py                         # Approved domain-level exports only

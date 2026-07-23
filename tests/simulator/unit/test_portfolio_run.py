@@ -24,7 +24,7 @@ from tests.simulator.unit.test_orchestrator import (
 
 def _portfolio_request() -> PortfolioBacktestRequestV1:
     """Build a one-component reconciled portfolio request."""
-    dataset = _dataset(f"req-{'6' * 64}")
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     child = _request(dataset, suffix="6")
     component = PortfolioComponentRequest(
         component_id="component-1",
@@ -35,9 +35,9 @@ def _portfolio_request() -> PortfolioBacktestRequestV1:
         backtest_request=child,
     )
     payload: dict[str, object] = {
-        "request_id": f"req-{'7' * 64}",
-        "workflow_id": f"wf-{'7' * 64}",
-        "correlation_id": f"cor-{'7' * 64}",
+        "request_id": "req-77777777-7777-4777-8777-777777777777",
+        "workflow_id": "wf-77777777-7777-4777-8777-777777777777",
+        "correlation_id": "cor-77777777-7777-4777-8777-777777777777",
         "portfolio_id": "portfolio",
         "construction_result_id": "construction",
         "construction_version": "v1",
@@ -72,7 +72,7 @@ def _portfolio_auth(request: PortfolioBacktestRequestV1) -> AuthContext:
 def test_portfolio_run_fails_closed_on_incomplete_component(tmp_path: Path) -> None:
     """Map any component failure to an incomplete aggregate failure."""
     request = _portfolio_request()
-    dataset = _dataset(f"req-{'6' * 64}")
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     dependencies = FakeDependencies(tmp_path, dataset)
 
     def fail_load(request_value: object) -> object:
@@ -98,7 +98,7 @@ def test_portfolio_run_fails_closed_on_unreconciled_aggregate(
     import app.services.simulator.run.portfolio as portfolio_module
 
     request = _portfolio_request()
-    dataset = _dataset(f"req-{'6' * 64}")
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     dependencies = FakeDependencies(tmp_path, dataset)
     original = portfolio_module._reconcile
 
@@ -127,7 +127,7 @@ def test_portfolio_run_fails_closed_on_unreconciled_aggregate(
 def test_portfolio_run_fails_closed_on_unresolvable_fx(tmp_path: Path) -> None:
     """Fail the whole run closed when referenced FX evidence is missing."""
     request = _portfolio_request()
-    dataset = _dataset(f"req-{'6' * 64}")
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     dependencies = FakeDependencies(tmp_path, dataset)
 
     def empty_fx(evidence_ids: tuple[str, ...]) -> Mapping[str, object]:
@@ -148,7 +148,7 @@ def test_portfolio_run_fails_closed_on_unresolvable_fx(tmp_path: Path) -> None:
 def test_portfolio_return_series_is_measured_not_supplied(tmp_path: Path) -> None:
     """Derive return evidence from the component's own simulated equity."""
     request = _portfolio_request()
-    dataset = _dataset(f"req-{'6' * 64}")
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     dependencies = FakeDependencies(tmp_path, dataset)
     result = run_portfolio_backtest(
         request,

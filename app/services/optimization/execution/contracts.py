@@ -6,7 +6,7 @@ import math
 from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
-from typing import Protocol
+from typing import Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -123,7 +123,10 @@ class BacktestExecutionRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    contract_version: str = "v1"
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["optimization.backtest_execution_request.v1"] = (
+        "optimization.backtest_execution_request.v1"
+    )
     candidate_hash: str
     executable_parameters: Mapping[str, ParameterValue]
     seed: int
@@ -198,6 +201,7 @@ class BacktestExecutionAdapter(Protocol):
     """Receiver-owned synchronous candidate execution port."""
 
     contract_version: str
+    schema_id: str
     engine_type: str
     engine_version: str
     deterministic: bool

@@ -8,11 +8,21 @@ from pathlib import Path
 import pytest
 
 _USAGE_SCRIPTS = (
-    "01_retrieval_referance.py",
-    "02_storage.py",
-    "03_processing.py",
-    "04_jobs.py",
-    "05_feeds.py",
+    "01_contracts.py",
+    "02_market_data.py",
+    "03_local_datasets.py",
+    "04_synthetic_data.py",
+    "05_tick_derivation.py",
+    "06_persistence.py",
+    "07_quality.py",
+    "08_transformation.py",
+    "09_time_sessions.py",
+    "10_sources.py",
+    "11_economic_calendar.py",
+    "12_realtime_feeds.py",
+    "13_data_jobs.py",
+    "14_evidence.py",
+    "15_audit.py",
 )
 
 

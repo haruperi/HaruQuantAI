@@ -6,13 +6,19 @@ import abc
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.services.data.contracts.sources import (
-        RawSourceBatch,
-        SourceReadRequest,
+    # Unpinned in Phase 4, once `sources/local.py` and `sources/external.py` — the two
+    # implementors of this Protocol — were migrated to the same package. An interface
+    # and its implementations must name one contract package, or every override is a
+    # Liskov violation that `mypy` reports and runtime duck typing hides.
+    from app.services.data.market_data.symbol_metadata import (
         SymbolListRequest,
         SymbolMetadata,
         SymbolMetadataRequest,
         SymbolPage,
+    )
+    from app.services.data.sources.contracts import (
+        RawSourceBatch,
+        SourceReadRequest,
     )
 
 

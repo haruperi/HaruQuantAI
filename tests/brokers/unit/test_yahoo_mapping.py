@@ -3,7 +3,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from app.services.brokers.yahoo.mapping import _map_history
+from app.services.brokers.yahoo.mapping import _map_history, _provider_interval
 
 
 class _Table:
@@ -84,6 +84,15 @@ def test_yahoo_intervals() -> None:
     assert _interval_duration("2wk") == timedelta(weeks=2)
     assert _interval_duration("3h") == timedelta(hours=3)
     assert _interval_duration("4m") == timedelta(minutes=4)
+
+
+def test_yahoo_canonical_intervals_map_without_fallback() -> None:
+    """Canonical application timeframes map only to verified yfinance intervals."""
+    assert _provider_interval("H1") == "1h"
+    assert _provider_interval("D1") == "1d"
+    assert _provider_interval("1wk") == "1wk"
+    with pytest.raises(ValueError, match="unsupported Yahoo timeframe"):
+        _provider_interval("H4")
 
 
 def test_yahoo_invalid_limit() -> None:

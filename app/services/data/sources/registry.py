@@ -6,12 +6,12 @@ import threading
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from app.services.data.contracts.errors import DataError
+from app.services.data.contracts import DataError
 from app.services.data.sources.protocol import MarketDataSource
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts.sources import (
+    from app.services.data.sources.contracts import (
         SourceDescriptor,
         SourceIdentity,
         SourceIdentityRequest,

@@ -4,10 +4,10 @@ from decimal import Decimal
 
 import pytest
 from app.services.risk.contracts import RiskDomainError, RiskErrorCode
-from app.services.risk.decisions import revalidate_risk_decision
+from app.services.risk.validity import revalidate_risk_decision
 
-from tests.risk.usage import test_usage_decisions as examples
-from tests.risk.usage import test_usage_policy as policy_examples
+from tests.risk import _support as examples
+from tests.risk import _support as policy_examples
 
 
 def test_material_change_requires_new_decision() -> None:

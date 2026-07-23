@@ -1,7 +1,11 @@
 """Binance mapping tests."""
 
 from app.services.brokers import BrokerErrorCode
-from app.services.brokers.binance.mapping import _map_error_code, _map_kline
+from app.services.brokers.binance.mapping import (
+    _map_error_code,
+    _map_kline,
+    _provider_interval,
+)
 
 
 def test_binance_mapping_preserves_product_units() -> None:
@@ -13,6 +17,29 @@ def test_binance_mapping_preserves_product_units() -> None:
     )
     assert str(bar.open) == "1"
     assert str(bar.trade_volume) == "10"
+
+
+def test_binance_canonical_intervals_map_without_fallback() -> None:
+    """Canonical intervals map exactly and unsupported values fail closed."""
+    import pytest
+
+    assert _provider_interval("H1") == "1h"
+    assert _provider_interval("MN1") == "1M"
+    assert _provider_interval("1h") == "1h"
+    with pytest.raises(ValueError, match="unsupported Binance timeframe"):
+        _provider_interval("H3")
+
+
+def test_binance_kline_retains_requested_timeframe() -> None:
+    """Mapped bars distinguish canonical request and provider interval values."""
+    bar = _map_kline(
+        [0, "1", "2", "0.5", "1.5", "10", 60_000, "", 0, "", ""],
+        "BTCUSDT",
+        "1h",
+        requested_timeframe="H1",
+    )
+    assert bar.provider_timeframe == "1h"
+    assert bar.requested_timeframe == "H1"
 
 
 def test_binance_map_symbol() -> None:

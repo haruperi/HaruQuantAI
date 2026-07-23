@@ -138,7 +138,11 @@ def _map_tick(value: object, symbol: str) -> BrokerTick:
     Returns:
         The operation result.
     """
-    timestamp = _time(value)
+    raw_msc = _optional(value, "time_msc")
+    if raw_msc is not None and float(raw_msc) > 0:
+        timestamp = datetime.fromtimestamp(float(raw_msc) / 1000.0, UTC)
+    else:
+        timestamp = _time(value)
     return BrokerTick(
         symbol=symbol,
         event_timestamp=timestamp,

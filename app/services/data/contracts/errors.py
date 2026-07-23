@@ -9,8 +9,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import ValidationError as UtilsValidationError
-from app.utils import logger, redact_text_value, validate_id
+from app.utils import logger, redact_text_value
 
 type JsonScalar = None | bool | int | float | str
 type ErrorSeverity = Literal["info", "warning", "error", "critical"]
@@ -364,8 +363,15 @@ class DataError(Exception):
         logger.debug("Initializing manifest-backed Data error")
         if request_id is not None:
             try:
-                validate_id(request_id, expected_prefix="req")
-            except UtilsValidationError as error:
+                # Deferred by design. `models` imports `errors`, so a module-level
+                # import here would be a cycle. The helper is a leaf that depends
+                # only on `app.utils`; importing it lazily keeps `errors` free of
+                # module-level domain dependencies. Enforced by
+                # `tests/data/unit/test_import_graph.py`.
+                from app.services.data.contracts.validation import validate_request_id
+
+                validate_request_id(request_id)
+            except ValueError as error:
                 raise ValueError(
                     "request_id must be a prefixed UUID4 identifier"
                 ) from error

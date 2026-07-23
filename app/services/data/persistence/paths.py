@@ -1,0 +1,5 @@
+"""Persistence path ownership constants."""
+
+APPROVED_STORAGE_ROOTS_SETTING = "APPROVED_STORAGE_ROOTS"
+
+__all__ = ["APPROVED_STORAGE_ROOTS_SETTING"]

@@ -7,21 +7,26 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data.access.reference import (
+from app.services.data.contracts import DataError, MarketDataset
+from app.services.data.market_data.requests import (
+    AvailabilityRequest,
+    MarketDataRequest,
+)
+from app.services.data.market_data.symbol_discovery import (
     discover_symbols,
     fetch_symbol_metadata,
     inspect_availability,
 )
-from app.services.data.contracts import (
-    AvailabilityRequest,
-    DatasetSaveRequest,
+from app.services.data.market_data.symbol_metadata import (
     SymbolListRequest,
     SymbolMetadataRequest,
 )
-from app.services.data.contracts.errors import DataError
+from app.services.data.persistence.contracts import DatasetSaveRequest
+from app.services.data.persistence.dataset_writer import save_dataset
+from app.services.data.sources.contracts import SourceDescriptor, SourceLicensePolicy
 from app.services.data.sources.policy import _reset_policy_registry
 from app.services.data.sources.registry import _reset_registry
-from app.services.data.storage.datasets import save_dataset
+from app.utils import generate_id
 
 from tests.data.helpers import make_dataset, make_quality, register_local_test_source
 
@@ -34,7 +39,7 @@ def _configure_database(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1.0")
     monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "30")
-    from app.services.data.storage.migrations import run_data_migrations
+    from app.services.data.persistence.migrations import run_data_migrations
 
     run_data_migrations(
         "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
@@ -169,6 +174,100 @@ def test_availability_never_hardcodes_ready(
     assert avail.gaps[0].end == START
     assert avail.gaps[1].start == END
     assert avail.gaps[1].end == query_end
+
+
+def test_provider_availability_uses_bounded_observed_probe(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Provider availability derives its range from one bounded canonical read."""
+    request_id = generate_id("req")
+    descriptor = SourceDescriptor(
+        source_id="binance_spot",
+        readiness="staging",
+        capabilities=("bars",),
+        requires_credentials=False,
+        requires_network=True,
+        supports_writes=False,
+        schema_version="v1",
+        timezone="UTC",
+        revision="descriptor-v1",
+        license_policy=SourceLicensePolicy(
+            source_id="binance_spot",
+            status="restricted",
+            permitted_workflows=("research",),
+            export_allowed=False,
+            attribution_required=False,
+        ),
+        identity_mapping_revision="provider-confirmed-v1",
+    )
+    first = make_dataset().records[0]
+    second = first.model_copy(
+        update={"timestamp": END, "available_at": END + timedelta(seconds=1)}
+    )
+    dataset = make_dataset().model_copy(
+        update={
+            "symbol": "BTCUSDT",
+            "timeframe": "H1",
+            "records": (first, second),
+            "start": START,
+            "end": END,
+            "record_count": 2,
+            "available_at": END + timedelta(seconds=1),
+            "quality_report": make_quality(count=2).model_copy(
+                update={"generated_at": END + timedelta(seconds=1)}
+            ),
+            "source_metadata": {
+                "source_id": "binance_spot",
+                "source_revision": "binance-adapter-v1",
+            },
+            "request_id": request_id,
+        }
+    )
+    captured: list[MarketDataRequest] = []
+    monkeypatch.setattr(
+        "app.services.data.market_data.symbol_discovery.get_source_descriptor",
+        lambda _source_id: descriptor,
+    )
+    monkeypatch.setattr(
+        "app.services.data.market_data.symbol_discovery.ensure_storage",
+        lambda _request_id: None,
+    )
+    monkeypatch.setattr(
+        "app.services.data.market_data.symbol_discovery.ensure_identity",
+        lambda _source_id, _symbol, _request_id: None,
+    )
+
+    def fetch(probe: MarketDataRequest) -> MarketDataset:
+        captured.append(probe)
+        return dataset
+
+    monkeypatch.setattr(
+        "app.services.data.market_data.pipeline.fetch_market_dataset",
+        fetch,
+    )
+    request = AvailabilityRequest(
+        source_id="binance_spot",
+        symbol="BTCUSDT",
+        data_kind="ohlcv",
+        timeframe="H1",
+        start=START - timedelta(hours=1),
+        end=END + timedelta(hours=1),
+        max_probe_records=2,
+        request_id=request_id,
+    )
+
+    availability = inspect_availability(request)
+
+    assert len(captured) == 1
+    assert captured[0].limit == 2
+    assert captured[0].use_cache is False
+    assert availability.record_count == 2
+    assert availability.source_revision == "binance-adapter-v1"
+    assert availability.source_readiness == "staging"
+    assert availability.completeness == Decimal(1) / Decimal(3)
+    assert availability.provenance["inspection_method"] == "bounded_provider_probe"
+    assert availability.provenance["probe_limit_reached"] == "true"
+    assert len(availability.gaps) == 2
 
 
 def test_reference_limits_are_validated_at_call_time(

@@ -2,7 +2,9 @@
 
 import hashlib
 
-from app.services.data.contracts import MigrationStep
+from app.services.data.persistence.contracts import (
+    MigrationStep,
+)
 from app.utils import logger
 
 _STATEMENTS = (

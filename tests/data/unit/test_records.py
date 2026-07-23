@@ -1,4 +1,4 @@
-"""Unit tests for canonical market records."""
+"""Unit tests for FEAT-DATA-01 canonical market records."""
 
 from decimal import Decimal
 

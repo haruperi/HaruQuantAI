@@ -1,6 +1,7 @@
 """Yahoo adapter tests using an injected fake transport."""
 
 import asyncio
+from datetime import UTC, datetime
 
 import pytest
 from app.services.brokers import (
@@ -47,18 +48,42 @@ def _capabilities() -> dict[BrokerCapabilityId, BrokerCapability]:
 
 
 class _FakeTransport:
-    def __init__(self, *, fails: bool = False) -> None:
+    def __init__(self, *, fails: bool = False, table: object | None = None) -> None:
         self._fails = fails
+        self._table = table
         self.requested_symbols: list[str] = []
+        self.requested_timeframes: list[str] = []
 
     async def history(
         self, *, symbol: str, timeframe: str, start: object, end: object
     ) -> object:
-        del timeframe, start, end
+        del start, end
         self.requested_symbols.append(symbol)
+        self.requested_timeframes.append(timeframe)
         if self._fails:
             raise ConnectionError("unreachable")
-        return object()
+        return self._table if self._table is not None else object()
+
+
+class _Table:
+    """Minimal yfinance-shaped history table."""
+
+    def iterrows(self) -> object:
+        """Return one genuine-shaped provider row."""
+        return iter(
+            (
+                (
+                    datetime(2026, 6, 1, 12, tzinfo=UTC),
+                    {
+                        "Open": 100,
+                        "High": 101,
+                        "Low": 99,
+                        "Close": 100.5,
+                        "Volume": 1000,
+                    },
+                ),
+            )
+        )
 
 
 def test_adapter_rejects_non_sandbox_environment() -> None:
@@ -95,6 +120,7 @@ def test_adapter_connect_with_probe_symbol_verifies_via_transport() -> None:
 
     asyncio.run(exercise())
     assert transport.requested_symbols == ["AAPL"]
+    assert transport.requested_timeframes == ["1d"]
 
 
 def test_adapter_connect_fails_closed_when_probe_fails() -> None:
@@ -121,3 +147,19 @@ def test_adapter_get_historical_bars_requires_positive_limit() -> None:
         assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
 
     asyncio.run(exercise())
+
+
+def test_adapter_maps_canonical_h1_to_yfinance_interval() -> None:
+    """Canonical H1 requests use provider 1h while preserving request provenance."""
+    transport = _FakeTransport(table=_Table())
+    adapter = YahooBrokerAdapter(_config(), _capabilities(), transport=transport)
+
+    async def exercise() -> None:
+        result = await adapter.get_historical_bars("AAPL", "H1", limit=1)
+        assert result.data is not None
+        bar = result.data.items[0]
+        assert bar.provider_timeframe == "1h"
+        assert bar.requested_timeframe == "H1"
+
+    asyncio.run(exercise())
+    assert transport.requested_timeframes == ["1h"]

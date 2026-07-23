@@ -52,7 +52,7 @@ class EvidenceAssemblyRequest(BaseModel):
         """
         logger.debug("Validating Optimization evidence assembly request")
         try:
-            canonical_json(self.model_dump(mode="json"))
+            canonical_json(self.model_dump(mode="json"), max_items=None)
         except (TypeError, ValueError) as exc:
             raise ValueError("Optimization evidence must be JSON-safe") from exc
         if any(not value.strip() for value in self.audit_references):

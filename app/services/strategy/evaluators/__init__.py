@@ -1,9 +1,13 @@
-"""Public concrete Strategy signal evaluator feature exports."""
+"""Public Strategy signal-library exports.
+
+Each name below is one strategy in the library — catalogue content, not a
+Strategy feature. The execution mechanism lives in
+``app.services.strategy.signals``.
+"""
 
 from app.services.strategy.evaluators.decomposing_trade import (
     DecomposingTradeEvaluator,
 )
-from app.services.strategy.evaluators.evaluate import evaluate_strategy_signals
 from app.services.strategy.evaluators.harriet_hedging import HarrietHedgingEvaluator
 from app.services.strategy.evaluators.market_structure import MarketStructureEvaluator
 from app.services.strategy.evaluators.naive_ma_trend import NaiveMATrendEvaluator
@@ -21,5 +25,4 @@ __all__ = [
     "RandomWalkEvaluator",
     "SQXBreakoutAtrTrailingEvaluator",
     "WhiteFairyEvaluator",
-    "evaluate_strategy_signals",
 ]

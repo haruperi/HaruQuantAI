@@ -9,7 +9,11 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
-from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.data.contracts import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+)
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.results import IndicatorResult, build_indicator_result
 from app.services.strategy import (
@@ -35,14 +39,14 @@ from pydantic import ValidationError
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
-    from app.services.strategy.contracts import JsonValue
+    from app.services.strategy.contracts._base import JsonValue
 
 HASH = "a" * 64
 HASH_B = "b" * 64
 NOW = datetime(2026, 1, 2, 12, tzinfo=UTC)
-REQ = f"req-{'1' * 64}"
-WF = f"wf-{'2' * 64}"
-COR = f"cor-{'3' * 64}"
+REQ = "req-11111111-1111-4111-8111-111111111111"
+WF = "wf-22222222-2222-4222-8222-222222222222"
+COR = "cor-33333333-3333-4333-8333-333333333333"
 
 
 def make_market(
@@ -276,7 +280,7 @@ def make_manifest(
         provenance_refs=("build-1",),
         supported_hooks=("on_bar",),
         requires_account_snapshot=False,
-        max_batch_records=100,
+        max_batch_records=10_000,
         max_diagnostic_bytes=8_192,
         max_checkpoint_bytes=8_192,
         max_local_state_bytes=4_096,

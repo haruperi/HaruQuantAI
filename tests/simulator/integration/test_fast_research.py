@@ -16,7 +16,7 @@ from tests.simulator.unit.test_orchestrator import (
 def test_fast_research_cannot_produce_canonical_evidence(tmp_path: Path) -> None:
     """Return disclosed observations without fills, journal, or artifacts."""
     logger.info("Testing WF-SIM-007 isolated fast research")
-    dataset = _dataset(f"req-{'1' * 64}")
+    dataset = _dataset("req-11111111-1111-4111-8111-111111111111")
     request = _request(
         dataset,
         runtime_profile="fast_research",

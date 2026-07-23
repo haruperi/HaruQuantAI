@@ -2,21 +2,18 @@
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import asdict
 from typing import Protocol, runtime_checkable
 
-from app.services.data.contracts import (  # noqa: TC001
+from app.services.data.contracts import MarketDataset  # noqa: TC001
+from app.services.data.evidence.account_contracts import (  # noqa: TC001
     AccountStateSnapshot,
-    MarketDataset,
 )
 from app.services.indicators import IndicatorResult  # noqa: TC001
-from app.services.strategy.contracts.models import (
+from app.services.strategy.contracts.execution import (
     StrategyDecision,
     StrategyExecutionContext,
     StrategyExecutionResult,
-    ValidatedStrategyConfig,
-    ValidatedStrategyRef,
 )
 from app.services.strategy.contracts.outcomes import (
     StrategyOutcome,
@@ -24,13 +21,17 @@ from app.services.strategy.contracts.outcomes import (
     propagate_failure,
     success,
 )
+from app.services.strategy.contracts.references import (  # noqa: TC001
+    ValidatedStrategyConfig,
+    ValidatedStrategyRef,
+)
 from app.services.strategy.diagnostics import (
     StrategyErrorCode,
     export_strategy_diagnostics,
 )
 from app.services.strategy.intents import TradeIntent, build_trade_intent
 from app.services.strategy.replay import create_strategy_replay_manifest
-from app.utils import canonical_json, logger
+from app.utils import canonical_digest, logger
 
 
 @runtime_checkable
@@ -69,7 +70,7 @@ class VectorizedStrategyEvaluator(Protocol):
         raise NotImplementedError
 
 
-def run_vectorized_strategy_signals(  # noqa: PLR0911
+def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
     market: MarketDataset,
@@ -139,14 +140,19 @@ def run_vectorized_strategy_signals(  # noqa: PLR0911
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    data_checksum = hashlib.sha256(
-        canonical_json(market.model_dump(mode="json")).encode("utf-8")
-    ).hexdigest()
-    indicator_hash = hashlib.sha256(
-        canonical_json(tuple(asdict(item.manifest) for item in indicators)).encode(
-            "utf-8"
+    try:
+        data_checksum = canonical_digest(market.model_dump(mode="json"))
+        indicator_hash = canonical_digest(
+            tuple(asdict(item.manifest) for item in indicators)
         )
-    ).hexdigest()
+    except (TypeError, ValueError):
+        logger.error("Vectorized Strategy input digest failed")
+        return failure(
+            StrategyErrorCode.INTERNAL_ERROR,
+            "strategy input digest failed",
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
     replay = create_strategy_replay_manifest(
         ref, config, context, data_checksum, indicator_hash
     )
@@ -184,9 +190,16 @@ def run_vectorized_strategy_signals(  # noqa: PLR0911
         "replay_manifest": replay.data.model_dump(mode="json"),
         "local_state_update": local_updates[0] if local_updates else None,
     }
-    result_hash = hashlib.sha256(
-        canonical_json(result_material).encode("utf-8")
-    ).hexdigest()
+    try:
+        result_hash = canonical_digest(result_material)
+    except (TypeError, ValueError):
+        logger.error("Vectorized Strategy result digest failed")
+        return failure(
+            StrategyErrorCode.INTERNAL_ERROR,
+            "strategy result digest failed",
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
     return success(
         StrategyExecutionResult(
             decisions=decisions,

@@ -13,7 +13,7 @@ from app.services.optimization.execution import (
     EngineOptimizationResult,
 )
 from pydantic import ValidationError
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def execution_context() -> BacktestExecutionContext:
@@ -58,9 +58,9 @@ def execution_request() -> BacktestExecutionRequest:
         candidate_hash="9" * 64,
         executable_parameters={"period": 14},
         seed=7,
-        request_id="req-" + "a" * 64,
-        workflow_id="wf-" + "b" * 64,
-        correlation_id="cor-" + "c" * 64,
+        request_id="req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        workflow_id="wf-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        correlation_id="cor-cccccccc-cccc-4ccc-8ccc-cccccccccccc",
         context=execution_context(),
     )
 

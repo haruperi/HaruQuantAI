@@ -4,17 +4,13 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from app.services.data.contracts import AccountStateSnapshot  # noqa: TC001
-from app.services.strategy.contracts.models import (
-    JsonValue,
+from app.services.strategy.contracts.execution import (
     StrategyDecision,
     StrategyEvent,
     StrategyExecutionContext,
     StrategyExecutionResult,
-    ValidatedStrategyConfig,
-    ValidatedStrategyRef,
 )
 from app.services.strategy.contracts.outcomes import (
     StrategyOutcome,
@@ -22,13 +18,21 @@ from app.services.strategy.contracts.outcomes import (
     propagate_failure,
     success,
 )
+from app.services.strategy.contracts.references import (  # noqa: TC001
+    ValidatedStrategyConfig,
+    ValidatedStrategyRef,
+)
 from app.services.strategy.diagnostics import (
     StrategyErrorCode,
     export_strategy_diagnostics,
 )
 from app.services.strategy.intents import TradeIntent, build_trade_intent
 from app.services.strategy.replay import create_strategy_replay_manifest
-from app.utils import canonical_json, logger
+from app.utils import canonical_digest, canonical_json, logger
+
+if TYPE_CHECKING:
+    from app.services.data.evidence.account_contracts import AccountStateSnapshot
+    from app.services.strategy.contracts._base import JsonValue
 
 
 @runtime_checkable
@@ -68,7 +72,7 @@ class EventStrategyEvaluator(Protocol):
         raise NotImplementedError
 
 
-def run_event_strategy_hook(  # noqa: PLR0911
+def run_event_strategy_hook(  # noqa: C901, PLR0911
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
     event: StrategyEvent,
@@ -190,7 +194,16 @@ def run_event_strategy_hook(  # noqa: PLR0911
         "replay_manifest": replay.data.model_dump(mode="json"),
         "local_state_update": candidate,
     }
-    result_hash = hashlib.sha256(canonical_json(material).encode("utf-8")).hexdigest()
+    try:
+        result_hash = canonical_digest(material)
+    except (TypeError, ValueError):
+        logger.error("Event Strategy result digest failed")
+        return failure(
+            StrategyErrorCode.INTERNAL_ERROR,
+            "strategy result digest failed",
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
     return success(
         StrategyExecutionResult(
             decisions=decisions,

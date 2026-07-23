@@ -35,7 +35,7 @@ def test_auth_context_rejects_stable_trace_identifier() -> None:
             permissions=("read",),
             scopes=("demo",),
             tenant_or_environment="test",
-            request_id=f"req-{'a' * 64}",
+            request_id="req-" + "a" * 64,
             workflow_id=generate_id("wf"),
             correlation_id=generate_id("cor"),
             issued_at=datetime.now(UTC),

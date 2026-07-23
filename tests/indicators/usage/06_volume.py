@@ -49,29 +49,41 @@ def _get_dataset() -> MarketDataset:
     return dataset
 
 
-try:
-    data = _get_dataset()
-except DataError as error:
-    print(f"Skipping volume examples: MT5 data unavailable ({error.code})")
-    sys.exit(3)
+def main() -> None:
+    """Run the volume-indicator feature usage examples.
 
-_header("Example 1: Calculate Chaikin Money Flow")
-result_cmf = cmf(data, period=2)
-print(f"CMF values: {result_cmf.values['cmf_2'].tolist()}")
-print(f"Output columns: {result_cmf.output_columns}")
+    Demonstrates ``FR-INDI-027`` through ``FR-INDI-030`` end-to-end against
+    real market data using only documented public exports. Exits with status
+    ``3`` when the live market-data source is unavailable, which the
+    integration runner treats as a skip rather than a failure.
+    """
+    try:
+        data = _get_dataset()
+    except DataError as unavailable:
+        print(f"Skipping volume examples: MT5 data unavailable ({unavailable.code})")
+        sys.exit(3)
 
-_header("Example 2: Calculate On-Balance Volume")
-result_obv = obv(data)
-print(f"OBV values: {result_obv.values['obv'].tolist()}")
-print(f"Output columns: {result_obv.output_columns}")
+    _header("Example 1: Calculate Chaikin Money Flow")
+    result_cmf = cmf(data, period=2)
+    print(f"CMF values: {result_cmf.values['cmf_2'].tolist()}")
+    print(f"Output columns: {result_cmf.output_columns}")
 
-_header("Example 3: Calculate Money Flow Index")
-result_mfi = mfi(data, period=2)
-print(f"MFI values: {result_mfi.values['mfi_2'].tolist()}")
-print(f"Output columns: {result_mfi.output_columns}")
+    _header("Example 2: Calculate On-Balance Volume")
+    result_obv = obv(data)
+    print(f"OBV values: {result_obv.values['obv'].tolist()}")
+    print(f"Output columns: {result_obv.output_columns}")
 
-_header("Example 4: Calculate rolling volume-by-price POC")
-result_dist = price_volume_distribution(data, period=2, bins=2)
-dist_values = result_dist.values["price_volume_distribution_2_2"].tolist()
-print(f"Price-volume distribution values: {dist_values}")
-print(f"Output columns: {result_dist.output_columns}")
+    _header("Example 3: Calculate Money Flow Index")
+    result_mfi = mfi(data, period=2)
+    print(f"MFI values: {result_mfi.values['mfi_2'].tolist()}")
+    print(f"Output columns: {result_mfi.output_columns}")
+
+    _header("Example 4: Calculate rolling volume-by-price POC")
+    result_dist = price_volume_distribution(data, period=2, bins=2)
+    dist_values = result_dist.values["price_volume_distribution_2_2"].tolist()
+    print(f"Price-volume distribution values: {dist_values}")
+    print(f"Output columns: {result_dist.output_columns}")
+
+
+if __name__ == "__main__":
+    main()

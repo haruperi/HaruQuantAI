@@ -9,7 +9,7 @@ import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.serialization import serialize_report
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_serialize_report_json_is_canonical() -> None:

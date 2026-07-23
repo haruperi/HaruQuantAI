@@ -2,7 +2,9 @@
 
 from hashlib import sha256
 
-from app.services.data.contracts import MigrationStep
+from app.services.data.persistence.contracts import (
+    MigrationStep,
+)
 from app.utils import logger
 
 TRADING_SCHEMA_VERSION = "v1"

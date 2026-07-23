@@ -4,7 +4,7 @@
 
 from app.services.analytics.dashboards.payloads import build_dashboard_payload
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_dashboard_payload_does_not_recompute_metrics() -> None:

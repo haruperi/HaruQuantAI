@@ -8,12 +8,16 @@ from app.services.data.contracts import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
+)
+from app.services.data.market_data.symbol_metadata import (
+    SymbolMetadata,
+)
+from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourceIdentity,
     SourceLicensePolicy,
-    SymbolMetadata,
 )
-from app.services.data.sources.local import LocalMarketDataSource
+from app.services.data.sources.local_adapter import LocalMarketDataSource
 from app.services.data.sources.policy import SourcePolicyConfig, register_source_policy
 from app.services.data.sources.registry import register_source
 from app.utils import AuditEvent, generate_id

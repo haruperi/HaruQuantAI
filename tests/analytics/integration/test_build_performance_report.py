@@ -3,7 +3,7 @@
 # ruff: noqa: INP001
 
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_build_performance_report_from_simulation_result() -> None:

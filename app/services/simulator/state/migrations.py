@@ -7,7 +7,9 @@ journal sidecar is an explicit Phase 1 exclusion.
 
 from hashlib import sha256
 
-from app.services.data.contracts import MigrationStep
+from app.services.data.persistence.contracts import (
+    MigrationStep,
+)
 
 _STATEMENTS = (
     "CREATE TABLE IF NOT EXISTS simulation_runs ("

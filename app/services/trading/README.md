@@ -153,6 +153,20 @@ flowchart TD
 
 Modules and files are ordered from lowest dependency to highest dependency.
 
+### Feature Registry
+
+| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
+|---|---|---|---|---|---|
+| Completed | `FEAT-TRD-01` Canonical Contracts and Registries | `contracts/` | Exact declarations, signatures, and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/trading/usage/01_contracts.py` |
+| Completed | `FEAT-TRD-02` State and Deterministic Projections | `state/` | Exact declarations and state contracts: Section 4.2 | Section 4.2 functional requirements | `tests/trading/usage/02_state.py` |
+| Completed | `FEAT-TRD-03` Validation, Readiness, and Plans | `validation/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/trading/usage/03_validation.py` |
+| Completed | `FEAT-TRD-04` Authority Selection and Dispatch | `routing/` | Exact declarations: Section 4.4 | Section 4.4 functional requirements | `tests/trading/usage/04_routing.py` |
+| Completed | `FEAT-TRD-05` Reconciliation and Retry Guard | `reconciliation/` | Exact declarations and reconciliation contracts: Section 4.5 | Section 4.5 functional requirements | `tests/trading/usage/05_reconciliation.py` |
+| Completed | `FEAT-TRD-06` Operational and Budget Evidence | `monitoring/` | Exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/trading/usage/06_monitoring.py` |
+| Completed | `FEAT-TRD-07` Live and Paper Session Lifecycle | `live/` | Exact declarations and configuration contracts: Section 4.7 | Section 4.7 functional requirements | `tests/trading/usage/07_live.py` |
+| Completed | `FEAT-TRD-08` Route-Aware Public Actions | `actions/` | Exact async declarations and dependency contracts: Section 4.8 | Section 4.8 functional requirements | `tests/trading/usage/08_actions.py` |
+| Completed | `FEAT-TRD-09` Immutable Execution Evidence | `reporting/` | Exact declarations and report contracts: Section 4.9 | Section 4.9 functional requirements | `tests/trading/usage/09_reporting.py` |
+
 ```text
 trading/
 ├── __init__.py                         # Approved domain-level Python API only

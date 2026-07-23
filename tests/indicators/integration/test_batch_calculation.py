@@ -4,7 +4,11 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pandas as pd
-from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.data.contracts import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+)
 from app.services.indicators import IndicatorConfig, sma, validate_indicator
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)

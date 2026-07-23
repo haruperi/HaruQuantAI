@@ -8,10 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import get_market_data
-from app.services.data.contracts import (
-    DataError,
-    MarketDataset,
-)
+from app.services.data.contracts import DataError, MarketDataset
 from app.services.indicators.momentum import rsi, williams_r
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
@@ -50,18 +47,30 @@ def _get_dataset() -> MarketDataset:
     return dataset
 
 
-try:
-    data = _get_dataset()
-except DataError as error:
-    print(f"Skipping momentum examples: MT5 data unavailable ({error.code})")
-    sys.exit(3)
+def main() -> None:
+    """Run the momentum-oscillator feature usage examples.
 
-_header("Example 1: Calculate RSI over a normalized dataset")
-result_rsi = rsi(data, period=2)
-print(f"RSI columns: {list(result_rsi.values.columns)}")
-print(f"RSI values: {result_rsi.values['rsi_2'].tolist()}")
+    Demonstrates ``FR-INDI-021`` and ``FR-INDI-022`` end-to-end against real
+    market data using only documented public exports. Exits with status ``3``
+    when the live market-data source is unavailable, which the integration
+    runner treats as a skip rather than a failure.
+    """
+    try:
+        data = _get_dataset()
+    except DataError as unavailable:
+        print(f"Skipping momentum examples: MT5 data unavailable ({unavailable.code})")
+        sys.exit(3)
 
-_header("Example 2: Calculate Williams %R over a normalized dataset")
-result_williams = williams_r(data, period=2)
-print(f"Williams %R columns: {list(result_williams.values.columns)}")
-print(f"Williams %R values: {result_williams.values['williams_r_2'].tolist()}")
+    _header("Example 1: Calculate RSI over a normalized dataset")
+    result_rsi = rsi(data, period=2)
+    print(f"RSI columns: {list(result_rsi.values.columns)}")
+    print(f"RSI values: {result_rsi.values['rsi_2'].tolist()}")
+
+    _header("Example 2: Calculate Williams %R over a normalized dataset")
+    result_williams = williams_r(data, period=2)
+    print(f"Williams %R columns: {list(result_williams.values.columns)}")
+    print(f"Williams %R values: {result_williams.values['williams_r_2'].tolist()}")
+
+
+if __name__ == "__main__":
+    main()

@@ -14,6 +14,7 @@ from app.services.brokers.binance.mapping import (
     _map_stream_quote,
     _map_symbol,
     _map_trade,
+    _provider_interval,
 )
 from app.services.brokers.binance.profiles import _BINANCE_PROFILES
 from app.services.brokers.binance.transport import _BinanceTransport
@@ -74,7 +75,9 @@ class BinanceBrokerAdapter(_UnsupportedAdapterBase):
             raise ValueError("unknown Binance credential key")
         super().__init__(config, capabilities)
         self._profile = profile
-        self._transport = transport or _BinanceTransport(config)
+        self._transport = transport or _BinanceTransport(
+            config, self._record_provider_latency
+        )
         self._subscriptions: dict[
             str, tuple[_BrokerSubscription[Any], asyncio.Task[None]]
         ] = {}
@@ -91,7 +94,7 @@ class BinanceBrokerAdapter(_UnsupportedAdapterBase):
         await self._transition(BrokerConnectionState.CONNECTING)
         try:
             await self._transport.connect()
-        except (ImportError, OSError, TimeoutError, ValueError, ConnectionError):
+        except ImportError, OSError, TimeoutError, ValueError, ConnectionError:
             await self._transition(BrokerConnectionState.FAILED, reason="probe_failed")
             return self._unsupported(BrokerCapabilityId.CONNECT)
         self._session_generation += 1
@@ -287,9 +290,10 @@ class BinanceBrokerAdapter(_UnsupportedAdapterBase):
         del cursor
         if limit is None or limit <= 0:
             raise ValueError("positive kline limit is required")
+        provider_timeframe = _provider_interval(timeframe)
         kwargs: dict[str, object] = {
             "symbol": symbol,
-            "interval": timeframe,
+            "interval": provider_timeframe,
             "limit": limit,
         }
         if start is not None:
@@ -297,7 +301,15 @@ class BinanceBrokerAdapter(_UnsupportedAdapterBase):
         if end is not None:
             kwargs["endTime"] = int(end.timestamp() * 1000)
         values = await self._transport.call("get_klines", **kwargs)
-        items = tuple(_map_kline(value, symbol, timeframe) for value in values)
+        items = tuple(
+            _map_kline(
+                value,
+                symbol,
+                provider_timeframe,
+                requested_timeframe=timeframe,
+            )
+            for value in values
+        )
         return self._result(
             BrokerCapabilityId.GET_HISTORICAL_BARS,
             data=BrokerPage(items=items, limit=limit),
@@ -390,11 +402,18 @@ class BinanceBrokerAdapter(_UnsupportedAdapterBase):
         """Close one exact Binance websocket subscription.
 
         Returns:
-            Canonical unsubscribe result or not-found error.
+            Canonical unsubscribe result, or `BROKER_SUBSCRIPTION_NOT_FOUND`
+            when this adapter instance does not own the supplied identifier.
         """
         record = self._subscriptions.get(subscription_id)
         if record is None:
-            return self._unsupported(BrokerCapabilityId.UNSUBSCRIBE)
+            error = BrokerError(
+                code=BrokerErrorCode.BROKER_SUBSCRIPTION_NOT_FOUND,
+                message="Subscription is not owned by this adapter",
+                capability=BrokerCapabilityId.UNSUBSCRIBE,
+            )
+            self._last_error = error
+            return self._result(BrokerCapabilityId.UNSUBSCRIBE, error=error)
         await record[0].unsubscribe()
         return self._result(BrokerCapabilityId.UNSUBSCRIBE)
 

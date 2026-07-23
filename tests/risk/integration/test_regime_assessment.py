@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from app.services.risk.regimes import assess_risk_regime
 
-from tests.risk.usage import test_usage_policy as examples
+from tests.risk import _support as examples
 
 
 def test_regime_assessment_workflow_end_to_end() -> None:

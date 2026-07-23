@@ -6,7 +6,7 @@ import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.portfolio import build_portfolio_performance_report
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_portfolio_report_fails_closed_without_fx() -> None:

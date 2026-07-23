@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib
+import time
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING
 
@@ -28,17 +29,23 @@ class _CTraderTransport:
         sender: _Sender | None = None,
         register_event_handler: _EventRegistrar | None = None,
         unregister_event_handler: _EventRegistrar | None = None,
+        latency_sink: Callable[[float], None] | None = None,
     ) -> None:
         """Initialize the _CTraderTransport instance.
 
         Args:
-            config: Value supplied to the operation.
-            sender: Value supplied to the operation.
-            register_event_handler: Value supplied to the operation.
-            unregister_event_handler: Value supplied to the operation.
+            config: Immutable connection configuration for this session.
+            sender: Async provider sender; the default Spotware sender is
+                supplied by `ctrader/network.py`.
+            register_event_handler: Registrar for adapter-owned provider events.
+            unregister_event_handler: Deregistrar for the same handler.
+            latency_sink: Optional receiver for the measured milliseconds spent
+                awaiting each provider response, used to separate provider
+                latency from local adapter overhead.
         """
         self._config = config
         self._sender = sender
+        self._latency_sink = latency_sink
         self._register_event_handler = register_event_handler
         self._unregister_event_handler = unregister_event_handler
         self._locks: dict[type[object], asyncio.Lock] = {}
@@ -91,9 +98,14 @@ class _CTraderTransport:
             raise ConnectionError("cTrader session is not connected")
         lock = self._locks.setdefault(response_type, asyncio.Lock())
         async with lock:
-            response = await asyncio.wait_for(
-                self._sender(request), timeout=self._config.request_timeout_sec
-            )
+            started = time.perf_counter()
+            try:
+                response = await asyncio.wait_for(
+                    self._sender(request), timeout=self._config.request_timeout_sec
+                )
+            finally:
+                if self._latency_sink is not None:
+                    self._latency_sink((time.perf_counter() - started) * 1000.0)
             if not isinstance(response, response_type):
                 raise ValueError("unexpected cTrader response type")
             native_id = getattr(response, "clientMsgId", None)

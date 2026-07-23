@@ -2,7 +2,7 @@
 
 import hashlib
 
-from app.services.strategy.contracts.models import (
+from app.services.strategy.contracts.execution import (  # noqa: TC001
     StrategyDecision,
     StrategyExecutionContext,
 )

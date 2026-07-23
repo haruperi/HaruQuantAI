@@ -3,7 +3,11 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.data.contracts import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+)
 from app.services.indicators import sma
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)

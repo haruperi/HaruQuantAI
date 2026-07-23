@@ -3,7 +3,9 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data.contracts import MarketContextEvidence
+from app.services.data.evidence.market_context_contracts import (
+    MarketContextEvidence,
+)
 from app.services.risk.contracts import ProposedTrade, validate_market_context_evidence
 from app.services.strategy import TradeIntent
 

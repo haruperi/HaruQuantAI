@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "FXRateLeg": {
+      "additionalProperties": false,
+      "description": "One exact provenance-bound rate leg.",
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "provenance": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Provenance",
+          "type": "object"
+        },
+        "provider_symbol": {
+          "title": "Provider Symbol",
+          "type": "string"
+        },
+        "rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Rate"
+        },
+        "source_currency": {
+          "title": "Source Currency",
+          "type": "string"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_currency": {
+          "title": "Target Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_currency",
+        "target_currency",
+        "rate",
+        "source_id",
+        "provider_symbol",
+        "as_of",
+        "provenance"
+      ],
+      "title": "FXRateLeg",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable ordered FX conversion evidence version 1.",
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "composite_rate": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Composite Rate"
+    },
+    "contract_version": {
+      "const": "v1",
+      "default": "v1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "legs": {
+      "items": {
+        "$ref": "#/$defs/FXRateLeg"
+      },
+      "title": "Legs",
+      "type": "array"
+    },
+    "path_policy_id": {
+      "title": "Path Policy Id",
+      "type": "string"
+    },
+    "path_policy_version": {
+      "title": "Path Policy Version",
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Provenance",
+      "type": "object"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "schema_id": {
+      "const": "data.fx_conversion_evidence.v1",
+      "default": "data.fx_conversion_evidence.v1",
+      "title": "Schema Id",
+      "type": "string"
+    },
+    "source_currency": {
+      "title": "Source Currency",
+      "type": "string"
+    },
+    "target_currency": {
+      "title": "Target Currency",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_currency",
+    "target_currency",
+    "legs",
+    "composite_rate",
+    "as_of",
+    "expires_at",
+    "path_policy_id",
+    "path_policy_version",
+    "provenance",
+    "request_id"
+  ],
+  "title": "FXConversionEvidence",
+  "type": "object"
+}

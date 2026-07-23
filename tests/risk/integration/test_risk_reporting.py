@@ -2,8 +2,8 @@
 
 from app.services.risk.reporting import generate_risk_report
 
-from tests.risk.usage import test_usage_decisions as decision_examples
-from tests.risk.usage import test_usage_policy as policy_examples
+from tests.risk import _support as decision_examples
+from tests.risk import _support as policy_examples
 
 
 def test_report_separates_evidence_and_decision() -> None:

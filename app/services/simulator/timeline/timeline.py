@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from app.services.data.contracts import MarketDataset, TickRecord
+from app.services.data.contracts import (
+    MarketDataset,
+    TickRecord,
+)
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.timeline.contracts import Tick
 from app.utils import logger

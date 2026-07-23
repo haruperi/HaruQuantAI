@@ -66,7 +66,7 @@ def _dataset() -> MarketDataset:
         cache_status="not_used",
         workflow_context="backtest",
         precision_policy="decimal_string",
-        request_id=f"req-{'1' * 64}",
+        request_id="req-11111111-1111-4111-8111-111111111111",
     )
 
 

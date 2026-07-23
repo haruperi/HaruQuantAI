@@ -4,7 +4,7 @@
 
 from app.services.analytics.metrics.benchmarks import calculate_benchmark_evidence
 from app.utils import logger
-from tests.analytics.usage.test_usage_metrics import _configured_result
+from tests.analytics._support import _configured_result
 
 
 def test_benchmark_alignment_is_utc_and_window_bounded() -> None:

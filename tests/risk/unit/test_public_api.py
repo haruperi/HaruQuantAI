@@ -18,6 +18,7 @@ def test_root_public_api_is_exact_and_resolvable() -> None:
         "KillSwitchCommand",
         "KillSwitchState",
         "LimitStatus",
+        "PortfolioBudgetExecutionVerdict",
         "PortfolioRiskSnapshot",
         "PortfolioState",
         "PositionSizingRequest",

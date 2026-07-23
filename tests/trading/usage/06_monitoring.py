@@ -1,26 +1,68 @@
-"""Standalone Trading monitoring usage evidence."""
+"""Executable Trading monitoring usage example.
 
-import asyncio
-import inspect
+Demonstrates operational events, runtime event emission, and budget gates.
+"""
+
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
+# Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from tests.trading.usage import test_usage_monitoring as examples
+from app.services.trading.monitoring import (
+    BudgetGate,
+    OperationalEvent,
+    emit_runtime_event,
+)
+
+NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
-def _run_examples() -> int:
-    """Run every bounded monitoring example and return the executed count."""
-    executed = 0
-    for name, example in vars(examples).items():
-        if not name.startswith("test_usage_") or not callable(example):
-            continue
-        result = example()
-        if inspect.isawaitable(result):
-            asyncio.run(result)
-        executed += 1
-    return executed
+def example_monitoring() -> None:
+    """Demonstrate Trading monitoring models and emission."""
+    print("=" * 80)
+    print("Trading Example 6: Operational Events and Monitoring")
+    print("=" * 80)
+
+    # 1. Operational event construction
+    event = OperationalEvent(
+        event_id="usage-event-001",
+        event_type="LATENCY_OBSERVED",
+        severity="info",
+        occurred_at=NOW,
+        request_id="usage-request-001",
+        workflow_id="usage-workflow-001",
+        correlation_id="usage-correlation-001",
+        facts={"elapsed_seconds": "0.125"},
+        source_refs={"operation": "submit_order"},
+    )
+    print(f"Operational event schema_id: {event.schema_id}, type: {event.event_type}")
+
+    # 2. Emit runtime event
+    published: list[OperationalEvent] = []
+    event2 = OperationalEvent(
+        event_id="usage-event-002",
+        event_type="HEALTH_CHANGED",
+        severity="info",
+        occurred_at=NOW,
+        request_id="usage-request-002",
+        workflow_id="usage-workflow-002",
+        correlation_id="usage-correlation-002",
+        facts={"health": "ready"},
+        source_refs={"session": "session-001"},
+    )
+    emit_runtime_event(event2, published.append)
+    print(f"Published runtime events count: {len(published)}")
+
+    # 3. Budget gate
+    print(f"BudgetGate validate is callable: {callable(BudgetGate.validate)}")
 
 
-print("Trading monitoring examples executed:", _run_examples())
+def main() -> None:
+    """Run Trading monitoring usage example."""
+    example_monitoring()
+
+
+if __name__ == "__main__":
+    main()

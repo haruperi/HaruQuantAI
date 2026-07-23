@@ -4,7 +4,7 @@
 
 from app.services.analytics.metrics.groups import calculate_grouped_evidence
 from app.utils import logger
-from tests.analytics.usage.test_usage_metrics import _configured_result
+from tests.analytics._support import _configured_result
 
 
 def test_grouped_evidence_preserves_source_context() -> None:

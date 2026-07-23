@@ -15,7 +15,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.services.strategy.contracts.models import (  # noqa: TC001
+from app.services.strategy.contracts.references import (  # noqa: TC001
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
 )

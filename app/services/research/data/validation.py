@@ -8,8 +8,7 @@ import numpy as np
 import pandas as pd
 
 from app.services.data import to_ohlcv_dataframe
-from app.services.data.contracts import MarketDataset
-from app.services.data.contracts.errors import DataError
+from app.services.data.contracts import DataError, MarketDataset
 from app.services.research.contracts import (
     DataQualityReport,
     ResearchResourceLimits,

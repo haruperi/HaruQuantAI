@@ -19,7 +19,7 @@ from app.services.analytics.reports.allocation import (
     build_portfolio_rebalance_measurement,
 )
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_allocation_evidence_builder_is_package_root_public() -> None:

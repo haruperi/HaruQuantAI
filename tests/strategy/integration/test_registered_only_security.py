@@ -3,9 +3,8 @@
 from app.services.strategy import StrategyTimingPolicy, run_vectorized_strategy_signals
 from app.utils import logger
 
-from tests.indicators.unit.test_results import _dataset
 from tests.strategy.unit.test_models import make_config, make_context, make_ref
-from tests.strategy.unit.test_vectorized_runner import Evaluator
+from tests.strategy.unit.test_vectorized_runner import Evaluator, _dataset
 
 
 def test_unregistered_evaluator_hash_fails_closed() -> None:

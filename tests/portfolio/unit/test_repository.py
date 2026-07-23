@@ -356,4 +356,4 @@ def test_state_declares_data_executed_migrations_without_storage_access() -> Non
     ):
         assert table in statements
     assert "sqlite" not in source.lower()
-    assert "app.services.data.storage" not in source
+    assert "app.services.data.persistence" not in source

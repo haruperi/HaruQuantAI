@@ -13,23 +13,13 @@ _USAGE_SCRIPTS = (
     "03_registry.py",
     "04_intents.py",
     "05_replay.py",
-    "06_vectorized.py",
-    "07_event.py",
-    "08_naive_ma_trend.py",
-    "09_decomposing_trade.py",
-    "10_harriet_hedging.py",
-    "11_market_structure.py",
-    "12_random_walk.py",
-    "13_sqx_breakout_atr_trailing.py",
-    "14_white_fairy.py",
+    "06_checkpoints.py",
+    "07_vectorized.py",
+    "08_event.py",
+    "09_signals.py",
+    "10_strategy_library.py",
 )
-_SIGNAL_SCRIPTS = {
-    "08_naive_ma_trend.py",
-    "09_decomposing_trade.py",
-    "10_harriet_hedging.py",
-    "13_sqx_breakout_atr_trailing.py",
-    "14_white_fairy.py",
-}
+_SIGNAL_SCRIPTS = {"10_strategy_library.py"}
 _UNAVAILABLE_EXIT = 3
 
 

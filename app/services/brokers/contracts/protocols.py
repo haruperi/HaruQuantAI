@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import functools
 import inspect
+import time
 from collections.abc import AsyncIterator, Mapping
 from datetime import datetime
 from decimal import Decimal
@@ -58,6 +59,27 @@ from app.services.brokers.contracts.models import (
 )
 from app.services.brokers.contracts.unsupported import _unsupported_result, _utc_now
 from app.utils import generate_id, logger
+
+
+class _RequestValidationError(ValueError):
+    """Signal that a canonical request failed structural validation.
+
+    Adapters raise this only from pre-transmission request construction, before
+    any provider call is made. It is the sole exception type that permits a
+    mutation to be reported as `BROKER_REQUEST_INVALID`; every other failure on
+    a mutation path is treated as a possible transmission and fails closed with
+    `BROKER_UNKNOWN_OUTCOME`.
+    """
+
+
+class _ProviderResponseError(ValueError):
+    """Signal that a provider response is malformed, empty, or unmappable.
+
+    Mapping modules raise this when the caller's request was structurally valid
+    but the provider payload cannot be represented as canonical truth. It maps
+    to `BROKER_RESPONSE_INVALID` per the normative native-error mapping floor,
+    keeping provider-side failures distinct from caller-side ones.
+    """
 
 
 @runtime_checkable
@@ -868,6 +890,12 @@ class _UnsupportedAdapterBase:
         self._event_queue: asyncio.Queue[BrokerConnectionEvent] = asyncio.Queue(
             config.stream_buffer_size
         )
+        # Wall time of the operation currently resolving at the public
+        # boundary, measured by `__getattribute__` and consumed once by
+        # `_result`. Provider-network time is reported separately by the
+        # transports through `_record_provider_latency`.
+        self._call_started_at: float | None = None
+        self._provider_latency_ms: float | None = None
 
     @property
     def contract_version(self) -> Literal["v1"]:
@@ -937,6 +965,8 @@ class _UnsupportedAdapterBase:
             Raises:
                 asyncio.CancelledError: If the caller cancels the operation.
             """
+            object.__setattr__(self, "_call_started_at", time.perf_counter())
+            object.__setattr__(self, "_provider_latency_ms", None)
             try:
                 result = await attribute(*args, **kwargs)
                 return cast("BrokerResult[Any]", result)
@@ -946,6 +976,30 @@ class _UnsupportedAdapterBase:
                 return self._exception_result(operation, error)
 
         return _guarded
+
+    def _record_provider_latency(self, elapsed_ms: float) -> None:
+        """Record the measured provider-network time for the current call.
+
+        Args:
+            elapsed_ms: Non-negative wall time spent inside the provider call.
+        """
+        if elapsed_ms < 0:
+            return
+        previous = self._provider_latency_ms or 0.0
+        self._provider_latency_ms = previous + elapsed_ms
+
+    def _elapsed_ms(self) -> float:
+        """Return and clear the measured wall time of the current call.
+
+        Returns:
+            Milliseconds elapsed since the public boundary was entered, or
+            `0.0` when the result is built outside a guarded call.
+        """
+        started = self._call_started_at
+        if started is None:
+            return 0.0
+        self._call_started_at = None
+        return max((time.perf_counter() - started) * 1000.0, 0.0)
 
     async def __aenter__(self) -> _UnsupportedAdapterBase:
         """Connect and enter the adapter context.
@@ -983,9 +1037,21 @@ class _UnsupportedAdapterBase:
     ) -> BrokerResult[T]:
         """Build and log one canonical adapter result.
 
+        Total latency is the measured wall time of the public call. Provider
+        latency is whatever the transports reported for this call, and adapter
+        overhead is the remainder, so the two are always separable.
+
         Returns:
             The canonical result envelope.
         """
+        latency_ms = self._elapsed_ms()
+        provider_latency_ms = self._provider_latency_ms
+        self._provider_latency_ms = None
+        if provider_latency_ms is None:
+            adapter_overhead_ms = latency_ms
+        else:
+            provider_latency_ms = min(provider_latency_ms, latency_ms)
+            adapter_overhead_ms = max(latency_ms - provider_latency_ms, 0.0)
         result: BrokerResult[T] = BrokerResult(
             status="error" if error else "success",
             broker=self._config.broker_id,
@@ -997,6 +1063,9 @@ class _UnsupportedAdapterBase:
             data=data,
             error=error,
             provider_metadata=provider_metadata or {},
+            latency_ms=latency_ms,
+            provider_latency_ms=provider_latency_ms,
+            adapter_overhead_ms=adapter_overhead_ms,
         )
         bound = logger.bind(
             broker=self._config.broker_id.value,
@@ -1164,9 +1233,15 @@ class _UnsupportedAdapterBase:
     def _unsupported[T](self, operation: BrokerCapabilityId) -> BrokerResult[T]:
         """Return and record a deterministic unsupported result.
 
+        No provider call is made, so the gate consumes and discards any timing
+        started at the public boundary rather than attributing it to a later
+        operation.
+
         Returns:
             The canonical unsupported result.
         """
+        self._elapsed_ms()
+        self._provider_latency_ms = None
         result: BrokerResult[T] = _unsupported_result(
             broker=self._config.broker_id,
             environment=self._config.environment,
@@ -1201,16 +1276,25 @@ class _UnsupportedAdapterBase:
         Returns:
             A redacted canonical failure result.
         """
-        if operation in self._MUTATION_OPERATIONS and isinstance(
-            error, (OSError, TimeoutError, ConnectionError)
-        ):
-            code = BrokerErrorCode.BROKER_UNKNOWN_OUTCOME
+        if operation in self._MUTATION_OPERATIONS:
+            # A mutation fails closed. Only pre-transmission structural
+            # validation may claim the request never reached the provider;
+            # every other failure is a possible transmission and must be
+            # reported as an unknown outcome so the caller reconciles instead
+            # of assuming the mutation did not happen.
+            code = (
+                BrokerErrorCode.BROKER_REQUEST_INVALID
+                if isinstance(error, _RequestValidationError)
+                else BrokerErrorCode.BROKER_UNKNOWN_OUTCOME
+            )
         elif isinstance(error, TimeoutError):
             code = BrokerErrorCode.BROKER_TIMEOUT
         elif isinstance(error, (OSError, ConnectionError)):
             code = BrokerErrorCode.BROKER_CONNECTION_LOST
         elif isinstance(error, ImportError):
             code = BrokerErrorCode.BROKER_DEPENDENCY_MISSING
+        elif isinstance(error, _ProviderResponseError):
+            code = BrokerErrorCode.BROKER_RESPONSE_INVALID
         elif isinstance(error, ValueError):
             code = BrokerErrorCode.BROKER_REQUEST_INVALID
         else:
@@ -1224,34 +1308,6 @@ class _UnsupportedAdapterBase:
         )
         self._last_error = canonical
         return self._result(operation, error=canonical)
-
-    def __getattr__(self, name: str) -> Any:
-        """Return defaults only for canonical unsupported operations.
-
-        Args:
-            name: Missing attribute name requested by the caller.
-
-        Returns:
-            A fail-closed asynchronous unsupported operation.
-
-        Raises:
-            AttributeError: If the name is not a canonical broker capability.
-        """
-        try:
-            operation = BrokerCapabilityId(name)
-        except ValueError as error:
-            raise AttributeError(name) from error
-
-        async def _operation(*args: object, **kwargs: object) -> BrokerResult[Any]:
-            """Return the dynamically selected unsupported result.
-
-            Returns:
-                The canonical unsupported result.
-            """
-            del args, kwargs
-            return self._unsupported(operation)
-
-        return _operation
 
 
 def _make_unsupported_method(operation: BrokerCapabilityId) -> Any:

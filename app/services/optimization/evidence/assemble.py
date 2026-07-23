@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-import hashlib
-
 from app.services.optimization.evidence.contracts import (
     EvidenceAssemblyRequest,
     FinalDecision,
     OptimizationResult,
 )
 from app.services.optimization.search import CandidateState
-from app.utils import canonical_json, logger
+from app.utils import canonical_digest, logger
 
 
 def _select_decision(request: EvidenceAssemblyRequest) -> FinalDecision:
@@ -92,10 +90,9 @@ def build_optimization_evidence(
         "audit_references": request.audit_references,
     }
     try:
-        serialized = canonical_json(hash_payload)
+        reproducibility_hash = canonical_digest(hash_payload)
     except (TypeError, ValueError) as exc:
         raise ValueError("Optimization evidence is not canonicalizable") from exc
-    reproducibility_hash = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
     warnings = list(request.search.warnings)
     if request.walk_forward is None:
         warnings.append("walk_forward_evidence_missing")

@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 from datetime import datetime, timedelta
 from decimal import Decimal
-from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -32,7 +31,7 @@ from app.services.simulator.validation import (
 )
 from app.services.simulator.validation.contracts import MarketDataValidationContext
 from app.services.trading import ExecutionReceipt
-from app.utils import AuthContext, canonical_json, logger
+from app.utils import AuthContext, canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import (
@@ -54,7 +53,7 @@ def _canonical_hash(value: object) -> str:
         Lowercase SHA-256 digest.
     """
     logger.debug("Hashing canonical Simulation orchestration material")
-    return sha256(canonical_json(value).encode("utf-8")).hexdigest()
+    return canonical_digest(value)
 
 
 def _validate_auth(request: SimulationBacktestRequestV1, auth: AuthContext) -> None:
@@ -224,7 +223,9 @@ def _publish_result(
     )
     _write_completed_text(
         run_root / "manifest.json",
-        canonical_json(manifest.model_dump(mode="python", warnings=False)),
+        canonical_json(
+            manifest.model_dump(mode="python", warnings=False), max_items=None
+        ),
     )
 
 

@@ -1,6 +1,4 @@
-"""Integration evidence for standalone bounded Trading usage scripts."""
-
-# ruff: noqa: INP001
+"""Integration evidence that every documented Trading usage script is runnable."""
 
 import subprocess
 import sys
@@ -23,13 +21,9 @@ _USAGE_SCRIPTS = (
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_trading_usage_script_executes(script_name: str) -> None:
-    """Run one fixed standalone Trading usage script successfully.
-
-    Args:
-        script_name: Fixed repository script selected by parametrization.
-    """
+    """Run one standalone Trading usage script in an isolated Python process."""
     usage_directory = Path(__file__).parents[1] / "usage"
-    completed = subprocess.run(  # noqa: S603 - fixed repository script list.
+    completed = subprocess.run(
         [sys.executable, str(usage_directory / script_name)],
         check=False,
         capture_output=True,

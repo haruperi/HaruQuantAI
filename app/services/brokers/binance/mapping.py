@@ -14,6 +14,48 @@ from app.services.brokers.contracts import (
     BrokerSymbolInfo,
     BrokerTick,
 )
+from app.services.brokers.contracts.protocols import _ProviderResponseError
+
+_CANONICAL_INTERVALS = {
+    "S1": "1s",
+    "M1": "1m",
+    "M3": "3m",
+    "M5": "5m",
+    "M15": "15m",
+    "M30": "30m",
+    "H1": "1h",
+    "H2": "2h",
+    "H4": "4h",
+    "H6": "6h",
+    "H8": "8h",
+    "H12": "12h",
+    "D1": "1d",
+    "D3": "3d",
+    "W1": "1w",
+    "MN1": "1M",
+}
+_PROVIDER_INTERVALS = frozenset(_CANONICAL_INTERVALS.values())
+
+
+def _provider_interval(timeframe: str) -> str:
+    """Translate one canonical timeframe to an exact Binance interval.
+
+    Args:
+        timeframe: Canonical or exact provider timeframe.
+
+    Returns:
+        Binance's case-sensitive interval value.
+
+    Raises:
+        ValueError: If the timeframe has no declared Binance mapping.
+    """
+    if timeframe in _PROVIDER_INTERVALS:
+        return timeframe
+    try:
+        return _CANONICAL_INTERVALS[timeframe.upper()]
+    except KeyError as error:
+        message = f"unsupported Binance timeframe: {timeframe}"
+        raise ValueError(message) from error
 
 
 def _map_symbol(value: dict[str, Any]) -> BrokerSymbolInfo:
@@ -74,17 +116,22 @@ def _map_trade(value: dict[str, Any], symbol: str) -> BrokerTick:
     )
 
 
-def _map_kline(value: list[Any], symbol: str, timeframe: str) -> BrokerBar:
+def _map_kline(
+    value: list[Any],
+    symbol: str,
+    timeframe: str,
+    requested_timeframe: str | None = None,
+) -> BrokerBar:
     """Map one documented Spot kline array.
 
     Returns:
         Canonical provider bar.
 
     Raises:
-        ValueError: If the provider array is incomplete.
+        _ProviderResponseError: If the provider kline array is incomplete.
     """
     if len(value) < 11:
-        raise ValueError("malformed Binance kline")
+        raise _ProviderResponseError("malformed Binance kline")
     return BrokerBar(
         symbol=symbol,
         opening_timestamp=datetime.fromtimestamp(int(value[0]) / 1000, UTC),
@@ -95,7 +142,7 @@ def _map_kline(value: list[Any], symbol: str, timeframe: str) -> BrokerBar:
         low=Decimal(str(value[3])),
         close=Decimal(str(value[4])),
         provider_timeframe=timeframe,
-        requested_timeframe=timeframe,
+        requested_timeframe=requested_timeframe or timeframe,
         price_unit="quote_asset",
         quantity_unit="base_asset",
         trade_volume=Decimal(str(value[5])),

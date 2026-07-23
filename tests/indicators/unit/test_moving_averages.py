@@ -6,7 +6,11 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.data.contracts import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+)
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.services.indicators.trend import ema, sma

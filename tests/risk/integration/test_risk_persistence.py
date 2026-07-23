@@ -16,9 +16,9 @@ from app.services.risk.contracts import (
 )
 from app.utils import canonical_json
 
-from tests.risk.usage import test_usage_approvals as approval_examples
-from tests.risk.usage import test_usage_decisions as decision_examples
-from tests.risk.usage import test_usage_policy as policy_examples
+from tests.risk import _support as approval_examples
+from tests.risk import _support as decision_examples
+from tests.risk import _support as policy_examples
 
 
 class _UnavailableAuditStore:

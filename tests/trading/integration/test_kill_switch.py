@@ -9,7 +9,10 @@ from typing import cast
 
 import pytest
 from app.services.brokers.contracts import BrokerAdapter, BrokerFeatureFlags
-from app.services.data.contracts import AccountOrder, AccountStateSnapshot
+from app.services.data.evidence.account_contracts import (
+    AccountOrder,
+    AccountStateSnapshot,
+)
 from app.services.risk.contracts import ActionPolicyVerdict, RiskDecisionPackage
 from app.services.trading.actions import cancel_all_orders, resume_strategy
 from app.services.trading.contracts import TradingError

@@ -6,8 +6,11 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import StatementPlan, TransactionRequest
-from app.services.data.storage.database import execute_transaction
+from app.services.data.persistence.contracts import (
+    StatementPlan,
+    TransactionRequest,
+)
+from app.services.data.persistence.transactions import execute_transaction
 
 
 def test_database_connection_is_closed_after_committed_result(
@@ -53,19 +56,29 @@ def test_storage_package_import_has_no_configuration_or_filesystem_side_effect(
     monkeypatch.delenv("DATA_DIR", raising=False)
     monkeypatch.delenv("SQLITE_BUSY_TIMEOUT_SECONDS", raising=False)
 
-    storage = importlib.import_module("app.services.data.storage")
-    reloaded = importlib.reload(storage)
+    persistence = importlib.import_module("app.services.data.persistence")
+    reloaded = importlib.reload(persistence)
 
     expected = [
+        "DATA_MIGRATION_STEPS",
+        "WriteLock",
         "acquire_write_lock",
+        "clear_cache_entry",
+        "clear_data_cache",
+        "create_backup",
+        "describe_import_dialects",
+        "enforce_retention_policy",
         "execute_transaction",
         "get_cache_entry",
+        "import_external_dataset",
         "load_dataset",
-        "persist_audit_event",
+        "load_local_dataset",
         "put_cache_entry",
-        "query_audit_events",
+        "restore_from_backup",
+        "run_data_migrations",
         "run_domain_migrations",
         "save_dataset",
+        "save_market_data",
     ]
     assert sorted(reloaded.__all__) == expected
     assert tuple(tmp_path.iterdir()) == ()

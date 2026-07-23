@@ -16,10 +16,14 @@ from pydantic import (
     model_validator,
 )
 
-from app.services.data.contracts import (  # noqa: TC001
-    AccountStateSnapshot,
-    FXConversionEvidence,
-    MarketContextEvidence,
+from app.services.data.evidence.account_contracts import (
+    AccountStateSnapshot,  # noqa: TC001
+)
+from app.services.data.evidence.fx_contracts import (
+    FXConversionEvidence,  # noqa: TC001
+)
+from app.services.data.evidence.market_context_contracts import (
+    MarketContextEvidence,  # noqa: TC001
 )
 from app.services.risk.contracts.enums import LimitStatus, RiskErrorCode
 from app.services.risk.contracts.errors import RiskDomainError

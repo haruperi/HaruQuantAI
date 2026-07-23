@@ -2,9 +2,11 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import (
+from app.services.data.evidence.account_contracts import (
     AccountBalance,
     AccountStateSnapshot,
+)
+from app.services.data.evidence.market_context_contracts import (
     MarketContextEvidence,
 )
 from app.services.risk.contracts import (

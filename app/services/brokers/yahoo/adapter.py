@@ -18,7 +18,7 @@ from app.services.brokers.contracts import (
     BrokerResult,
 )
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
-from app.services.brokers.yahoo.mapping import _map_history
+from app.services.brokers.yahoo.mapping import _map_history, _provider_interval
 from app.services.brokers.yahoo.transport import _YahooTransport
 
 
@@ -47,7 +47,9 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         if config.credentials or config.account_reference or config.endpoint:
             raise ValueError("Yahoo accepts no credentials, account, or endpoint")
         super().__init__(config, capabilities)
-        self._transport = transport or _YahooTransport(config)
+        self._transport = transport or _YahooTransport(
+            config, self._record_provider_latency
+        )
 
     @override
     async def connect(self) -> BrokerResult[None]:
@@ -125,17 +127,19 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         del cursor
         if limit is None or limit <= 0:
             raise ValueError("positive Yahoo history limit is required")
+        provider_timeframe = _provider_interval(timeframe)
         table = await self._transport.history(
             symbol=symbol,
-            timeframe=timeframe,
+            timeframe=provider_timeframe,
             start=start,
             end=end,
         )
         page = _map_history(
             table,
             symbol=symbol,
-            timeframe=timeframe,
+            timeframe=provider_timeframe,
             limit=limit,
+            requested_timeframe=timeframe,
         )
         return self._result(BrokerCapabilityId.GET_HISTORICAL_BARS, data=page)
 

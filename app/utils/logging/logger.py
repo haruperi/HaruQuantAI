@@ -687,11 +687,11 @@ def configure_logging(
             listener.start()
             _RUNTIME_STATE.queue_listener = listener
             _RUNTIME_STATE.record_queue = record_queue
-            if not _RUNTIME_STATE.atexit_registered:
-                atexit.register(shutdown_logging)
-                _RUNTIME_STATE.atexit_registered = True
         else:
             for sink in sinks:
                 root_logger.addHandler(sink)
+        if not _RUNTIME_STATE.atexit_registered:
+            atexit.register(shutdown_logging)
+            _RUNTIME_STATE.atexit_registered = True
         root_logger.setLevel(active_settings.level)
         root_logger.propagate = False

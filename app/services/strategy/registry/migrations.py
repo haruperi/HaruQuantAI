@@ -2,8 +2,11 @@
 
 import hashlib
 
-from app.services.data.contracts import MigrationRequest, MigrationStep
-from app.services.data.storage import run_domain_migrations
+from app.services.data.persistence import run_domain_migrations
+from app.services.data.persistence.contracts import (
+    MigrationRequest,
+    MigrationStep,
+)
 from app.utils import logger
 
 _STATEMENTS = (
@@ -42,7 +45,7 @@ _STATEMENTS = (
 )
 
 
-def strategy_migration_steps() -> tuple[MigrationStep, ...]:
+def _strategy_migration_steps() -> tuple[MigrationStep, ...]:
     """Return ordered immutable Strategy migration definitions.
 
     Returns:
@@ -60,7 +63,7 @@ def strategy_migration_steps() -> tuple[MigrationStep, ...]:
     )
 
 
-def ensure_strategy_storage(request_id: str) -> None:
+def _ensure_strategy_storage(request_id: str) -> None:
     """Apply Strategy migrations idempotently through Data.
 
     Args:
@@ -70,7 +73,7 @@ def ensure_strategy_storage(request_id: str) -> None:
     run_domain_migrations(
         MigrationRequest(
             domain="strategy",
-            steps=strategy_migration_steps(),
+            steps=_strategy_migration_steps(),
             request_id=request_id,
         )
     )

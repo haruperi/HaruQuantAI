@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from collections.abc import Mapping
@@ -43,6 +44,7 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
     depth: int,
     active: set[int],
     item_count: list[int],
+    max_items: int | None,
 ) -> JsonValue:
     """Recursively convert supported python values to JSON-safe primitives.
 
@@ -51,6 +53,8 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
         depth: Current recursion depth.
         active: Set of current parent object IDs for cycle detection.
         item_count: Aggregate item counter.
+        max_items: Cumulative item ceiling, or ``None`` to disable it for a
+            trusted-data digest while retaining every other safety check.
 
     Returns:
         JSON-safe primitive value.
@@ -67,6 +71,7 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
             depth=depth + 1,
             active=active,
             item_count=item_count,
+            max_items=max_items,
         )
     if value is None or isinstance(value, bool | str | int):
         return value
@@ -90,7 +95,7 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
         try:
             dataclass_fields = fields(value)
             item_count[0] += len(dataclass_fields)
-            if item_count[0] > _MAX_ITEMS:
+            if max_items is not None and item_count[0] > max_items:
                 raise ValidationError("SERIALIZATION_ITEMS_EXCEEDED")
             return {
                 field.name: _convert(
@@ -98,6 +103,7 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
                     depth=depth + 1,
                     active=active,
                     item_count=item_count,
+                    max_items=max_items,
                 )
                 for field in dataclass_fields
             }
@@ -108,7 +114,7 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
         active.add(object_id)
         try:
             item_count[0] += len(value)
-            if item_count[0] > _MAX_ITEMS:
+            if max_items is not None and item_count[0] > max_items:
                 raise ValidationError("SERIALIZATION_ITEMS_EXCEEDED")
             converted: dict[str, JsonValue] = {}
             for key, nested in value.items():
@@ -119,6 +125,7 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
                     depth=depth + 1,
                     active=active,
                     item_count=item_count,
+                    max_items=max_items,
                 )
             return converted
         finally:
@@ -128,7 +135,7 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
         active.add(object_id)
         try:
             item_count[0] += len(value)
-            if item_count[0] > _MAX_ITEMS:
+            if max_items is not None and item_count[0] > max_items:
                 raise ValidationError("SERIALIZATION_ITEMS_EXCEEDED")
             return [
                 _convert(
@@ -136,6 +143,7 @@ def _convert(  # noqa: C901, PLR0911, PLR0912 - bounded recursive type dispatch.
                     depth=depth + 1,
                     active=active,
                     item_count=item_count,
+                    max_items=max_items,
                 )
                 for item in value
             ]
@@ -157,22 +165,21 @@ def to_json_safe(value: object) -> JsonValue:
     Raises:
         ValidationError: If the value is unsupported, cyclic, or unsafe.
     """
-    return _convert(value, depth=0, active=set(), item_count=[0])
+    return _convert(value, depth=0, active=set(), item_count=[0], max_items=_MAX_ITEMS)
 
 
-def canonical_json(value: object) -> str:
-    """Produce stable sorted-key UTF-8 JSON without hidden redaction.
+def _encode_canonical(safe_value: JsonValue) -> str:
+    """Encode JSON-safe data as canonical sorted-key UTF-8 JSON text.
 
     Args:
-        value: Supported value to serialize.
+        safe_value: Already JSON-safe data produced by ``_convert``.
 
     Returns:
         Canonical JSON text.
 
     Raises:
-        ValidationError: If conversion or JSON encoding fails.
+        ValidationError: If JSON encoding fails.
     """
-    safe_value = to_json_safe(value)
     try:
         encoded = json.dumps(
             safe_value,
@@ -185,3 +192,55 @@ def canonical_json(value: object) -> str:
     except (TypeError, ValueError, UnicodeError) as error:
         raise ValidationError("SERIALIZATION_ENCODING_FAILED") from error
     return encoded
+
+
+def canonical_json(value: object, *, max_items: int | None = _MAX_ITEMS) -> str:
+    """Produce stable sorted-key UTF-8 JSON without hidden redaction.
+
+    The default cumulative item ceiling suits untrusted payloads. Pass
+    ``max_items=None`` to serialize an arbitrarily large trusted structure — for
+    example a full simulation result written to a run artifact — while retaining
+    every other safety check. For a trusted-data hash rather than a string, use
+    ``canonical_digest``.
+
+    Args:
+        value: Supported value to serialize.
+        max_items: Cumulative item ceiling, or ``None`` to disable it for a
+            trusted structure. Defaults to the untrusted-payload ceiling.
+
+    Returns:
+        Canonical JSON text.
+
+    Raises:
+        ValidationError: If conversion or JSON encoding fails.
+    """
+    safe_value = _convert(
+        value, depth=0, active=set(), item_count=[0], max_items=max_items
+    )
+    return _encode_canonical(safe_value)
+
+
+def canonical_digest(value: object) -> str:
+    """Compute the SHA-256 digest of a value's canonical JSON, unbounded in size.
+
+    The digest is byte-for-byte equivalent to
+    ``hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()`` for
+    every value ``canonical_json`` accepts, and additionally succeeds for
+    trusted structures whose item count exceeds the ``canonical_json`` ceiling
+    (for example a full market dataset, simulation result, or ranked candidate
+    set). Every other safety check — finite numbers, aware-UTC datetimes,
+    depth, cycles, and supported types — is retained; only the untrusted-payload
+    item ceiling is lifted.
+
+    Args:
+        value: Supported value to digest.
+
+    Returns:
+        Lowercase 64-character SHA-256 hexadecimal digest.
+
+    Raises:
+        ValidationError: If conversion or JSON encoding fails.
+    """
+    safe_value = _convert(value, depth=0, active=set(), item_count=[0], max_items=None)
+    encoded = _encode_canonical(safe_value)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()

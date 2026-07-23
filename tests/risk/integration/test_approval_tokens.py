@@ -3,7 +3,7 @@
 import pytest
 from app.services.risk.contracts import RiskDomainError, RiskErrorCode
 
-from tests.risk.usage import test_usage_approvals as examples
+from tests.risk import _support as examples
 
 
 def test_live_token_is_consumed_once_durably() -> None:

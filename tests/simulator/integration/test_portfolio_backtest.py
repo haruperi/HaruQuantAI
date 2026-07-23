@@ -25,7 +25,7 @@ def test_portfolio_candidate_publishes_reconciled_aggregate(tmp_path: Path) -> N
     """Complete every component before publishing the aggregate manifest."""
     logger.info("Testing WF-SIM-009 portfolio backtest")
     request = _portfolio_request()
-    dataset = _dataset(f"req-{'6' * 64}")
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     dependencies = FakeDependencies(tmp_path, dataset)
     result = run_portfolio_backtest(
         request,

@@ -9,13 +9,20 @@ import pandas as pd
 from numpy.lib.stride_tricks import sliding_window_view
 
 from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
+from app.services.indicators.core.errors import (
+    IndicatorError,
+    IndicatorErrorCode,
+    guard_public_boundary,
+)
 from app.services.indicators.core.results import build_indicator_result
 from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset, OHLCVRecord
+    from app.services.data.contracts import (
+        MarketDataset,
+        OHLCVRecord,
+    )
     from app.services.indicators.core.results import IndicatorResult
 
 _FORMULA_VERSION = "1.0.0"
@@ -112,6 +119,9 @@ def _point_of_control(
     """
     logger.debug("Computing point of control for price_volume_distribution")
     values = np.full(len(close), np.nan, dtype="float64")
+    # NFR-INDI-005 approved window-local exception: each window's bin edges
+    # depend on that window's own min(low)/max(high), so bin assignment has no
+    # closed form across windows. The per-window body stays fully vectorized.
     for end in range(period - 1, len(close)):
         start = end - period + 1
         minimum = float(low[start : end + 1].min())
@@ -130,6 +140,7 @@ def _point_of_control(
     return values
 
 
+@guard_public_boundary
 def price_volume_distribution(
     data: MarketDataset,
     *,

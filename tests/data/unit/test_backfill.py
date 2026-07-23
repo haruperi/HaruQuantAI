@@ -1,342 +1,345 @@
-"""Unit tests for backfill key derivation, chunk execution, and recovery."""
+"""Behavioral coverage for recoverably atomic DATA backfill operations."""
 
-import hashlib
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
-from app.services.data.contracts import (
+from app.services.data.contracts import DataError
+from app.services.data.data_jobs import backfill, recovery
+from app.services.data.data_jobs.contracts import (
     BackfillChunkRequest,
-    DataQualityReport,
-    MarketDataset,
+    BackfillChunkResult,
 )
-from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.records import OHLCVRecord
-from app.services.data.jobs.backfill import (
-    derive_backfill_key,
-    execute_backfill_chunk,
-    recover_update_jobs,
-)
-from app.services.data.storage.database import execute_transaction
-from app.services.data.storage.migrations import run_data_migrations
+from app.utils import generate_id
+
+from tests.data.helpers_models import make_dataset
+
+_NOW = datetime(2026, 1, 1, 12, tzinfo=UTC)
 
 
-@pytest.fixture
-def test_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
-    """Setup test environment variables and database tables."""
-    db_path = tmp_path / "data_jobs.sqlite3"
-    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{db_path.name}")
-    monkeypatch.setenv("DATA_DIR", str(tmp_path))
-    monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1")
-    monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "30")
-    run_data_migrations(
-        "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
-    )
-    return tmp_path
+def _request(**updates: object) -> BackfillChunkRequest:
+    """Return one bounded backfill chunk request."""
+    values: dict[str, object] = {
+        "job_id": "job-fixture",
+        "source_id": "source-fixture",
+        "symbol": "EURUSD",
+        "data_kind": "ohlcv",
+        "timeframe": "M1",
+        "start": _NOW,
+        "end": _NOW + timedelta(hours=1),
+        "schema_version": "v1",
+        "normalization_version": "v1",
+        "max_records": 100,
+        "request_id": generate_id("req"),
+    }
+    values.update(updates)
+    return BackfillChunkRequest(**values)  # type: ignore[arg-type]
 
 
-def test_backfill_key_is_canonical() -> None:
-    """Test idempotency key derivation is deterministic and canonical."""
-    t = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
-    req1 = BackfillChunkRequest(
-        job_id="job-1",
-        source_id="binance",
-        symbol="BTC/USD",
-        data_kind="ohlcv",
-        timeframe="M1",
-        start=t,
-        end=t + timedelta(hours=1),
-        schema_version="v1",
-        normalization_version="v1",
-        max_records=100,
-        request_id="req-9456bdfa12ea76959c94a3572f5d91c73d838622df0a8d9b4e815c276c6b7880",
-    )
-    req2 = BackfillChunkRequest(
-        job_id="job-2",  # Different job ID
-        source_id="binance",
-        symbol="BTC/USD",
-        data_kind="ohlcv",
-        timeframe="M1",
-        start=t,
-        end=t + timedelta(hours=1),
-        schema_version="v1",
-        normalization_version="v1",
-        max_records=100,
-        request_id="req-a697f8b99a46c8465b9a70e7af44e49a7665cf1ce8e62c3b42678f1c26b21814",
-    )
-    # Checksum is identical because job_id is not in the key components list
-    assert derive_backfill_key(req1) == derive_backfill_key(req2)
-
-
-def test_chunk_execution_deduplication(
-    test_env: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Test duplicate backfill chunks return cached result without source fetch."""
-    t = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
-    req = BackfillChunkRequest(
-        job_id="job-1",
-        source_id="test",
-        symbol="BTC/USD",
-        data_kind="ohlcv",
-        timeframe="M5",
-        start=t,
-        end=t + timedelta(hours=1),
-        schema_version="v1",
-        normalization_version="v1",
-        max_records=100,
-        request_id="req-9def222923677c46c532f127a566e618927942a9122451cf38f44a98a45cd6ee",
+def _result(request: BackfillChunkRequest) -> BackfillChunkResult:
+    """Return committed result evidence for a request."""
+    return BackfillChunkResult(
+        job_id=request.job_id,
+        chunk_id="chunk-fixture",
+        idempotency_key=backfill.derive_backfill_key(request),
+        committed_start=request.start,
+        committed_end=request.end,
+        record_count=2,
+        content_hash="hash-fixture",
+        checkpoint="data/raw/backfill/checkpoint.parquet",
+        committed=True,
+        request_id=request.request_id,
     )
 
-    # Insert dummy job definition first
-    insert_job_sql = (
-        "INSERT INTO data_update_jobs ("
-        "    job_id, source_id, symbols_json, timeframes_json, data_kinds_json, "
-        "    start, enabled, created_at, request_id, state, recovery_state"
-        ") VALUES ("
-        "    ?, ?, '[\"BTC/USD\"]', '[\"M5\"]', '[\"ohlcv\"]', ?, 1, ?, ?, "
-        "    'created', 'clean'"
-        ")"
-    )
-    from app.services.data.contracts import StatementPlan, TransactionRequest
 
-    execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(insert_job_sql,),
-                parameter_sets=(
-                    (
-                        "job-1",
-                        "test",
-                        t.isoformat(),
-                        datetime.now(UTC).isoformat(),
-                        "req-e1c98f93323acd1110614245c80be18779dae0d25a466e78f45c5502ad3617f4",
-                    ),
-                ),
-                max_rows=1,
-            ),
-            request_id="req-e1c98f93323acd1110614245c80be18779dae0d25a466e78f45c5502ad3617f4",
+def test_key_limits_and_result_mapping() -> None:
+    """Derive stable keys, enforce bounds, and reconstruct committed evidence."""
+    request = _request()
+    key = backfill.derive_backfill_key(request)
+    assert key == backfill.derive_backfill_key(request)
+    backfill._check_limits(request)
+    with pytest.raises(DataError):
+        backfill._check_limits(
+            _request(max_records=backfill.BACKFILL_MAX_RECORDS_PER_CHUNK + 1)
         )
-    )
+    with pytest.raises(DataError):
+        backfill._check_limits(_request(end=_NOW + timedelta(days=2)))
 
-    # Mock fetch_market_dataset and save_dataset
-    mock_records = (
-        OHLCVRecord(
-            timestamp=t,
-            source="test",
-            source_symbol="BTC/USD",
-            source_revision="v1",
-            available_at=t,
-            open=Decimal("100.0"),
-            high=Decimal("101.0"),
-            low=Decimal("99.0"),
-            close=Decimal("100.5"),
-            volume=Decimal("10.0"),
-            price_unit="USD",
-            volume_unit="Units",
-        ),
+    row = {
+        "job_id": request.job_id,
+        "chunk_id": "chunk-fixture",
+        "idempotency_key": "key-fixture",
+        "committed_start": request.start.isoformat(),
+        "committed_end": request.end.isoformat(),
+        "record_count": 2,
+        "content_hash": "hash-fixture",
+        "artifact_final": "checkpoint.parquet",
+    }
+    assert backfill._result_from_row(request, row).record_count == 2
+
+
+def test_committed_lookup_and_lease_outcomes(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Return idempotent commits and distinguish lease contention from absence."""
+    request = _request()
+    result = _result(request)
+    row = {
+        "job_id": result.job_id,
+        "chunk_id": result.chunk_id,
+        "idempotency_key": result.idempotency_key,
+        "committed_start": result.committed_start.isoformat(),
+        "committed_end": result.committed_end.isoformat(),
+        "record_count": result.record_count,
+        "content_hash": result.content_hash,
+        "artifact_final": result.checkpoint,
+    }
+    monkeypatch.setattr(
+        backfill,
+        "execute_transaction",
+        lambda _transaction: SimpleNamespace(rows=(row,)),
     )
-    mock_dataset = MarketDataset(
-        normalization_version="v1",
-        data_kind="bars",
-        symbol="BTC/USD",
-        timeframe="M5",
-        records=mock_records,
-        start=t,
-        end=t,
-        available_at=t,
-        record_count=1,
-        quality_report=DataQualityReport(
-            quality_status="passed",
-            quality_score=Decimal("1.0"),
-            issues=(),
-            warnings=(),
-            record_count=1,
-            checked_count=1,
-            truncated=False,
-            sample_limit=1000,
-            schema_version="v1",
-            generated_at=t,
-        ),
-        source_metadata={},
-        license_metadata={},
-        cache_status="miss",
-        workflow_context="validation",
-        precision_policy="decimal_string",
-        request_id="req-9def222923677c46c532f127a566e618927942a9122451cf38f44a98a45cd6ee",
-    )
+    assert backfill._committed_result(request, result.idempotency_key)
 
     monkeypatch.setattr(
-        "app.services.data.jobs.backfill.fetch_market_dataset",
-        lambda _: mock_dataset,
+        backfill,
+        "execute_transaction",
+        lambda _transaction: SimpleNamespace(rows=(), affected_rows=1),
     )
-    res1 = execute_backfill_chunk(req)
-    assert res1.committed is True
-    assert res1.record_count == 1
+    backfill._acquire_lease(request, _NOW)
 
-    # Second execution: should be deduplicated
-    res2 = execute_backfill_chunk(req)
-    assert res2.idempotency_key == res1.idempotency_key
-    assert res2.chunk_id == res1.chunk_id
-
-
-def test_chunk_execution_lease_locked(test_env: Path) -> None:
-    """Test execute_backfill_chunk fails when job lease is locked by another request."""
-    t = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
-    req = BackfillChunkRequest(
-        job_id="job-1",
-        source_id="test",
-        symbol="BTC/USD",
-        data_kind="ohlcv",
-        timeframe="M5",
-        start=t,
-        end=t + timedelta(hours=1),
-        schema_version="v1",
-        normalization_version="v1",
-        max_records=100,
-        request_id="req-f9268538b6e1c2ba98715a5eaa23c31bd74d6f6a1c924c1aedcf2eebe6f321b1",
-    )
-
-    # Insert job definition already locked by another request
-    expires = (
-        (datetime.now(UTC) + timedelta(minutes=5)).isoformat().replace("+00:00", "Z")
-    )
-    insert_job_sql = (
-        "INSERT INTO data_update_jobs ("
-        "    job_id, source_id, symbols_json, timeframes_json, data_kinds_json, "
-        "    start, enabled, created_at, request_id, state, lease_owner, "
-        "    lease_expires_at, recovery_state"
-        ") VALUES ("
-        "    ?, ?, '[\"BTC/USD\"]', '[\"M5\"]', '[\"ohlcv\"]', ?, 1, ?, ?, "
-        "    'running', 'other-request', ?, 'clean'"
-        ")"
-    )
-    from app.services.data.contracts import StatementPlan, TransactionRequest
-
-    execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(insert_job_sql,),
-                parameter_sets=(
-                    (
-                        "job-1",
-                        "test",
-                        t.isoformat(),
-                        datetime.now(UTC).isoformat(),
-                        "req-e1c98f93323acd1110614245c80be18779dae0d25a466e78f45c5502ad3617f4",
-                        expires,
-                    ),
-                ),
-                max_rows=1,
-            ),
-            request_id="req-e1c98f93323acd1110614245c80be18779dae0d25a466e78f45c5502ad3617f4",
+    responses = iter(
+        (
+            SimpleNamespace(rows=(), affected_rows=0),
+            SimpleNamespace(rows=({"job_id": request.job_id},), affected_rows=0),
         )
     )
-
+    monkeypatch.setattr(
+        backfill,
+        "execute_transaction",
+        lambda _transaction: next(responses),
+    )
     with pytest.raises(DataError) as exc_info:
-        execute_backfill_chunk(req)
-    assert exc_info.value.args[0] == "CONCURRENT_WRITE_LOCKED"
+        backfill._acquire_lease(request, _NOW)
+    assert exc_info.value.code == "CONCURRENT_WRITE_LOCKED"
 
 
-def test_recovery_resumes_after_committed_chunk(test_env: Path) -> None:
-    """Test recovery successfully processes active jobs and identifies corruption."""
-    t = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
+def test_fetch_and_configured_storage_fail_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Map source kinds and require an explicit existing DATA storage root."""
+    request = _request()
+    dataset = make_dataset().model_copy(update={"request_id": request.request_id})
+    monkeypatch.setattr(backfill, "fetch_market_dataset", lambda _request: dataset)
+    assert backfill._fetch_backfill_data(request) is dataset
 
-    # Job 1 has a complete prepared data/manifest pair that can be published.
-    pending_file = test_env / "job1.pending.parquet"
-    pending_file.write_bytes(b"prepared-data")
-    pending_file.with_suffix(".parquet.manifest.json").write_text("{}")
-    clean_hash = hashlib.sha256(b"prepared-data").hexdigest()
-
-    # Job 2: Running, last checkpoint points to file that doesn't exist (corrupted)
-    # Insert both jobs
-    insert_job_sql = (
-        "INSERT INTO data_update_jobs ("
-        "    job_id, source_id, symbols_json, timeframes_json, data_kinds_json, "
-        "    start, enabled, created_at, request_id, state, last_checkpoint, "
-        "    recovery_state"
-        ") VALUES ("
-        "    ?, ?, '[\"BTC/USD\"]', '[\"M5\"]', '[\"ohlcv\"]', ?, 1, ?, ?, "
-        "    'running', ?, 'clean'"
-        ")"
+    persisted: list[object] = []
+    monkeypatch.setattr(
+        backfill,
+        "execute_transaction",
+        persisted.append,
     )
-    from app.services.data.contracts import StatementPlan, TransactionRequest
 
-    execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(insert_job_sql, insert_job_sql),
-                parameter_sets=(
-                    (
-                        "job-clean",
-                        "test",
-                        t.isoformat(),
-                        datetime.now(UTC).isoformat(),
-                        "req-7dbf5afd61b2617f550fb1f9ad53d59b32b0006cca5c6062e61b5ecdc4fb5208",
-                        "job1_chk.parquet",
-                    ),
-                    (
-                        "job-corrupt",
-                        "test",
-                        t.isoformat(),
-                        datetime.now(UTC).isoformat(),
-                        "req-904920868f0ada429110c9717cd9246f74ed91b8f81acd08be2fb4042e17f208",
-                        "missing.parquet",
-                    ),
-                ),
-                max_rows=1,
-            ),
-            request_id="req-d5f4394607b72fcdb7c37a392c28de4c7cfa7ccd97ee49416eb7b22c4e5cc1fa",
+    def _fail(_request: object) -> object:
+        raise DataError("SOURCE_UNAVAILABLE")
+
+    monkeypatch.setattr(backfill, "fetch_market_dataset", _fail)
+    with pytest.raises(DataError):
+        backfill._fetch_backfill_data(request)
+    assert persisted
+
+    monkeypatch.setattr(
+        backfill,
+        "get_data_settings",
+        lambda: SimpleNamespace(data_dir=tmp_path),
+    )
+    assert backfill._configured_data_dir(request.request_id) == tmp_path.resolve()
+    missing = tmp_path / "missing"
+    monkeypatch.setattr(
+        backfill,
+        "get_data_settings",
+        lambda: SimpleNamespace(data_dir=missing),
+    )
+    with pytest.raises(DataError):
+        backfill._configured_data_dir(request.request_id)
+
+
+def test_publication_and_finalize_reject_incomplete_evidence(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Reject missing publication files and uncommitted checkpoint writes."""
+    request = _request()
+    monkeypatch.setattr(backfill, "_configured_data_dir", lambda _request_id: tmp_path)
+    with pytest.raises(DataError) as exc_info:
+        backfill._publish_artifact(
+            request.request_id,
+            "data/raw/pending.parquet",
+            "data/raw/final.parquet",
+            "hash-fixture",
         )
-    )
+    assert exc_info.value.code == "CHECKPOINT_CORRUPTED"
 
-    insert_checkpoint_sql = (
-        "INSERT INTO data_backfill_checkpoints ("
-        "idempotency_key, job_id, chunk_id, committed_start, committed_end, "
-        "record_count, content_hash, checkpoint, artifact_temp, artifact_final, "
-        "publication_state, request_id, created_at"
-        ") VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, 'prepared', ?, ?)"
+    monkeypatch.setattr(
+        backfill,
+        "execute_transaction",
+        lambda _transaction: SimpleNamespace(committed=False),
     )
-    execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(insert_checkpoint_sql, insert_checkpoint_sql),
-                parameter_sets=(
-                    (
-                        "clean-key",
-                        "job-clean",
-                        "clean-chunk",
-                        t.isoformat(),
-                        (t + timedelta(hours=1)).isoformat(),
-                        clean_hash,
-                        "job1.pending.parquet",
-                        "job1.pending.parquet",
-                        "job1.parquet",
-                        "req-7dbf5afd61b2617f550fb1f9ad53d59b32b0006cca5c6062e61b5ecdc4fb5208",
-                        t.isoformat(),
-                    ),
-                    (
-                        "corrupt-key",
-                        "job-corrupt",
-                        "corrupt-chunk",
-                        t.isoformat(),
-                        (t + timedelta(hours=1)).isoformat(),
-                        clean_hash,
-                        "missing.pending.parquet",
-                        "missing.pending.parquet",
-                        "missing.parquet",
-                        "req-904920868f0ada429110c9717cd9246f74ed91b8f81acd08be2fb4042e17f208",
-                        t.isoformat(),
-                    ),
-                ),
-                max_rows=2,
-            ),
-            request_id="req-d5f4394607b72fcdb7c37a392c28de4c7cfa7ccd97ee49416eb7b22c4e5cc1fa",
+    with pytest.raises(DataError):
+        backfill._finalize_checkpoint(
+            request.request_id,
+            request.job_id,
+            "key-fixture",
+            "final.parquet",
         )
+
+
+def test_execute_returns_existing_commit(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Return durable idempotency evidence without repeating side effects."""
+    request = _request()
+    existing = _result(request)
+    monkeypatch.setattr(backfill, "_committed_result", lambda *_args: existing)
+    assert backfill.execute_backfill_chunk(request) is existing
+
+
+def test_artifact_paths_hash_and_publication(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Resolve approved paths, hash payloads, and publish data/manifest atomically."""
+    request = _request()
+    monkeypatch.setattr(backfill, "_configured_data_dir", lambda _request_id: tmp_path)
+    pending_relative, final_relative, pending, final = backfill._artifact_paths(
+        request,
+        "key-fixture",
+    )
+    pending.write_bytes(b"payload")
+    pending_manifest = pending.with_suffix(pending.suffix + ".manifest.json")
+    pending_manifest.write_text("{}", encoding="utf-8")
+    content_hash = backfill._file_hash(pending)
+    backfill._publish_artifact(
+        request.request_id,
+        str(pending_relative),
+        str(final_relative),
+        content_hash,
+    )
+    assert final.read_bytes() == b"payload"
+    assert final.with_suffix(final.suffix + ".manifest.json").is_file()
+
+    backfill._publish_artifact(
+        request.request_id,
+        str(pending_relative),
+        str(final_relative),
+        content_hash,
+    )
+    final.write_bytes(b"corrupt")
+    with pytest.raises(DataError):
+        backfill._publish_artifact(
+            request.request_id,
+            str(pending_relative),
+            str(final_relative),
+            content_hash,
+        )
+
+
+def test_prepare_finalize_and_execute_protocol(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Prepare, finalize, and compose one complete backfill protocol."""
+    request = _request()
+    dataset = make_dataset().model_copy(update={"request_id": request.request_id})
+    monkeypatch.setattr(
+        backfill,
+        "_artifact_paths",
+        lambda _request, _key: (
+            Path("pending.parquet"),
+            Path("final.parquet"),
+            Path("pending.parquet"),
+            Path("final.parquet"),
+        ),
+    )
+    monkeypatch.setattr(
+        backfill,
+        "save_dataset",
+        lambda _request: SimpleNamespace(content_hash="hash-fixture"),
+    )
+    monkeypatch.setattr(
+        backfill,
+        "execute_transaction",
+        lambda _transaction: SimpleNamespace(committed=True),
+    )
+    prepared = backfill._prepare_artifact(
+        request,
+        dataset,
+        "key-fixture",
+        _NOW,
+    )
+    assert prepared[0] == "chunk-key-fixture"
+    backfill._finalize_checkpoint(
+        request.request_id,
+        request.job_id,
+        "key-fixture",
+        "final.parquet",
     )
 
-    report = recover_update_jobs(
-        "req-18ddccd09e275818a0371d15ba1dbd1487e11b4401e7d9e3b130cecc3448ba77"
+    monkeypatch.setattr(backfill, "_committed_result", lambda *_args: None)
+    monkeypatch.setattr(backfill, "_acquire_lease", lambda *_args: None)
+    monkeypatch.setattr(backfill, "_fetch_backfill_data", lambda _request: dataset)
+    monkeypatch.setattr(
+        backfill,
+        "_prepare_artifact",
+        lambda *_args: (
+            "chunk-key-fixture",
+            "hash-fixture",
+            "pending.parquet",
+            "final.parquet",
+        ),
     )
-    assert "job-clean" in report.recovered_job_ids
-    assert "job-corrupt" in report.blocked_job_ids
+    monkeypatch.setattr(backfill, "_publish_artifact", lambda *_args: None)
+    monkeypatch.setattr(backfill, "_finalize_checkpoint", lambda *_args: None)
+    result = backfill.execute_backfill_chunk(request)
+    assert result.committed
+
+
+def test_recovery_classifies_recovered_and_blocked(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Classify each prepared publication from explicit recovery evidence."""
+    rows = (
+        {
+            "idempotency_key": "good",
+            "job_id": "job-good",
+            "content_hash": "hash",
+            "artifact_temp": "pending-good",
+            "artifact_final": "final-good",
+        },
+        {
+            "idempotency_key": "bad",
+            "job_id": "job-bad",
+            "content_hash": "hash",
+            "artifact_temp": "pending-bad",
+            "artifact_final": "final-bad",
+        },
+    )
+    monkeypatch.setattr(
+        recovery,
+        "execute_transaction",
+        lambda _transaction: SimpleNamespace(rows=rows),
+    )
+
+    def _publish(
+        request_id: str,
+        pending: str,
+        final: str,
+        content_hash: str,
+    ) -> None:
+        del request_id, final, content_hash
+        if pending == "pending-bad":
+            raise DataError("CHECKPOINT_CORRUPTED")
+
+    monkeypatch.setattr(recovery, "_publish_artifact", _publish)
+    monkeypatch.setattr(recovery, "_finalize_checkpoint", lambda *_args: None)
+    report = recovery.recover_update_jobs(
+        request_id=generate_id("req"),
+        clock=SimpleNamespace(now=lambda: _NOW),
+    )
+    assert report.recovered_job_ids == ("job-good",)
+    assert report.blocked_job_ids == ("job-bad",)

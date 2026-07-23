@@ -12,10 +12,12 @@ from typing import Any
 
 import pytest
 from app.services.analytics import PortfolioAllocationEvidence
-from app.services.data.contracts import (
+from app.services.data.contracts import MarketDataset
+from app.services.data.evidence.account_contracts import (
     AccountStateSnapshot,
+)
+from app.services.data.evidence.fx_contracts import (
     FXConversionEvidence,
-    MarketDataset,
 )
 from app.services.portfolio.config import PortfolioSettings
 from app.services.portfolio.contracts import PortfolioConstructionRequest

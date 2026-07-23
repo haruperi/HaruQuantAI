@@ -62,13 +62,20 @@ def test_contract_exports_are_exact() -> None:
 
 def test_root_exports_and_lazy_imports_are_exact() -> None:
     """Ordinary root import leaves every provider SDK unloaded."""
-    brokers = importlib.import_module("app.services.brokers")
-    assert "FakeBrokerAdapter" not in brokers.__all__
-    assert "MetaTrader5" not in sys.modules
-    assert "binance" not in sys.modules
-    assert "yfinance" not in sys.modules
-    assert brokers.YahooBrokerAdapter.__name__ == "YahooBrokerAdapter"
-    assert "yfinance" not in sys.modules
+    modules_to_check = ["MetaTrader5", "binance", "yfinance"]
+    stored = {
+        name: sys.modules.pop(name) for name in modules_to_check if name in sys.modules
+    }
+    try:
+        brokers = importlib.import_module("app.services.brokers")
+        assert "FakeBrokerAdapter" not in brokers.__all__
+        assert "MetaTrader5" not in sys.modules
+        assert "binance" not in sys.modules
+        assert "yfinance" not in sys.modules
+        assert brokers.YahooBrokerAdapter.__name__ == "YahooBrokerAdapter"
+        assert "yfinance" not in sys.modules
+    finally:
+        sys.modules.update(stored)
 
 
 def test_runtime_package_is_private() -> None:

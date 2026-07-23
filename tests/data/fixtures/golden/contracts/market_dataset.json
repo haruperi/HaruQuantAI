@@ -1,0 +1,691 @@
+{
+  "$defs": {
+    "CanonicalRecord": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OHLCVRecord"
+        },
+        {
+          "$ref": "#/$defs/TickRecord"
+        },
+        {
+          "$ref": "#/$defs/SpreadRecord"
+        }
+      ]
+    },
+    "DataQualityReport": {
+      "additionalProperties": false,
+      "description": "Bounded quality evidence for one normalized dataset.",
+      "properties": {
+        "checked_count": {
+          "title": "Checked Count",
+          "type": "integer"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "issues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/QualityIssue"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "quality_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Quality Score"
+        },
+        "quality_status": {
+          "enum": [
+            "passed",
+            "passed_with_warnings",
+            "failed",
+            "not_checked"
+          ],
+          "title": "Quality Status",
+          "type": "string"
+        },
+        "record_count": {
+          "title": "Record Count",
+          "type": "integer"
+        },
+        "sample_limit": {
+          "title": "Sample Limit",
+          "type": "integer"
+        },
+        "schema_version": {
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "truncated": {
+          "title": "Truncated",
+          "type": "boolean"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "quality_status",
+        "quality_score",
+        "record_count",
+        "checked_count",
+        "truncated",
+        "sample_limit",
+        "schema_version",
+        "generated_at"
+      ],
+      "title": "DataQualityReport",
+      "type": "object"
+    },
+    "OHLCVRecord": {
+      "additionalProperties": false,
+      "description": "Canonical UTC OHLCV record with optional exact spread evidence.",
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "close": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Close"
+        },
+        "high": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "High"
+        },
+        "low": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Low"
+        },
+        "open": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Open"
+        },
+        "price_unit": {
+          "title": "Price Unit",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "source_symbol": {
+          "title": "Source Symbol",
+          "type": "string"
+        },
+        "spread": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spread"
+        },
+        "spread_unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spread Unit"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Volume"
+        },
+        "volume_unit": {
+          "title": "Volume Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "timestamp",
+        "source",
+        "source_symbol",
+        "available_at",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "price_unit",
+        "volume_unit"
+      ],
+      "title": "OHLCVRecord",
+      "type": "object"
+    },
+    "PrecisionPolicy": {
+      "enum": [
+        "decimal_string",
+        "float_research_only",
+        "source_native_decimal",
+        "reject_on_missing_metadata"
+      ],
+      "type": "string"
+    },
+    "QualityIssue": {
+      "additionalProperties": false,
+      "description": "One bounded redacted quality diagnostic.",
+      "properties": {
+        "affected_count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Count"
+        },
+        "blocking_workflows": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/WorkflowContext"
+          },
+          "title": "Blocking Workflows",
+          "type": "array"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "samples": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Samples",
+          "type": "array"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "error",
+            "critical"
+          ],
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "QualityIssue",
+      "type": "object"
+    },
+    "SpreadRecord": {
+      "additionalProperties": false,
+      "description": "Canonical UTC spread record with explicit unit and scale.",
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "scale": {
+          "title": "Scale",
+          "type": "integer"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "source_symbol": {
+          "title": "Source Symbol",
+          "type": "string"
+        },
+        "spread": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Spread"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "timestamp",
+        "source",
+        "source_symbol",
+        "available_at",
+        "spread",
+        "unit",
+        "scale"
+      ],
+      "title": "SpreadRecord",
+      "type": "object"
+    },
+    "TickRecord": {
+      "additionalProperties": false,
+      "description": "Canonical UTC tick record preserving genuine quote sides.\n\nThe optional ``source_bar_time``, ``tick_index_in_bar``, and ``bar_phase``\nfields carry intra-bar position evidence for ticks derived from bars. They\ndefault to ``None`` for provider-sourced ticks. ``bar_phase`` is a 4-bit mask\nof open (1), high (2), low (4), and close (8) observations within the source\nbar and carries no trading meaning.",
+      "properties": {
+        "ask": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ask"
+        },
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "bar_phase": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bar Phase"
+        },
+        "bid": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bid"
+        },
+        "last": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last"
+        },
+        "price_unit": {
+          "title": "Price Unit",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "source_bar_time": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Bar Time"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "source_symbol": {
+          "title": "Source Symbol",
+          "type": "string"
+        },
+        "tick_index_in_bar": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tick Index In Bar"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volume"
+        },
+        "volume_unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volume Unit"
+        }
+      },
+      "required": [
+        "timestamp",
+        "source",
+        "source_symbol",
+        "available_at",
+        "price_unit"
+      ],
+      "title": "TickRecord",
+      "type": "object"
+    },
+    "WorkflowContext": {
+      "enum": [
+        "research",
+        "backtest",
+        "validation",
+        "risk",
+        "execution_bound"
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable normalized provider-neutral market dataset version 1.",
+  "properties": {
+    "available_at": {
+      "format": "date-time",
+      "title": "Available At",
+      "type": "string"
+    },
+    "cache_status": {
+      "enum": [
+        "miss",
+        "hit",
+        "stale_warning",
+        "not_used"
+      ],
+      "title": "Cache Status",
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "v1",
+      "default": "v1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "data_kind": {
+      "enum": [
+        "bars",
+        "ticks",
+        "spreads"
+      ],
+      "title": "Data Kind",
+      "type": "string"
+    },
+    "end": {
+      "format": "date-time",
+      "title": "End",
+      "type": "string"
+    },
+    "license_metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "License Metadata",
+      "type": "object"
+    },
+    "normalization_version": {
+      "title": "Normalization Version",
+      "type": "string"
+    },
+    "precision_policy": {
+      "$ref": "#/$defs/PrecisionPolicy"
+    },
+    "quality_report": {
+      "$ref": "#/$defs/DataQualityReport"
+    },
+    "record_count": {
+      "title": "Record Count",
+      "type": "integer"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/CanonicalRecord"
+      },
+      "title": "Records",
+      "type": "array"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "schema_id": {
+      "const": "data.market_dataset.v1",
+      "default": "data.market_dataset.v1",
+      "title": "Schema Id",
+      "type": "string"
+    },
+    "source_metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Source Metadata",
+      "type": "object"
+    },
+    "start": {
+      "format": "date-time",
+      "title": "Start",
+      "type": "string"
+    },
+    "symbol": {
+      "title": "Symbol",
+      "type": "string"
+    },
+    "timeframe": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timeframe"
+    },
+    "workflow_context": {
+      "$ref": "#/$defs/WorkflowContext"
+    }
+  },
+  "required": [
+    "normalization_version",
+    "data_kind",
+    "symbol",
+    "records",
+    "start",
+    "end",
+    "available_at",
+    "record_count",
+    "quality_report",
+    "source_metadata",
+    "license_metadata",
+    "cache_status",
+    "workflow_context",
+    "precision_policy",
+    "request_id"
+  ],
+  "title": "MarketDataset",
+  "type": "object"
+}

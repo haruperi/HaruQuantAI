@@ -91,12 +91,12 @@ class ValidatedMarketDataEvidence(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     data_hash: str
-    schema_id: str
+    dataset_schema_id: str
     tick_model: str
     record_count: int
     validated_at: datetime
 
-    @field_validator("data_hash", "schema_id", "tick_model")
+    @field_validator("data_hash", "dataset_schema_id", "tick_model")
     @classmethod
     def _validate_text(cls, value: str) -> str:
         """Validate required evidence text.

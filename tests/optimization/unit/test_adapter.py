@@ -12,7 +12,7 @@ from app.services.optimization.execution import (
     execute_candidate,
 )
 from app.utils import AuthContext
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 from tests.optimization.unit.test_execution_contracts import execution_request
 from tests.simulator.unit.test_reporting_contracts import _result
 
@@ -27,7 +27,7 @@ class FakeAdapter:
 
     def execute(self, request):
         """Return matching measured evidence."""
-        report, _ = _report()
+        report, _ = _report(request_id=request.request_id)
         return EngineOptimizationResult(
             candidate_hash=request.candidate_hash,
             simulation_run_id="run-1",

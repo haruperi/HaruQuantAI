@@ -27,6 +27,7 @@ _EXPECTED_EXPORTS = {
     "SystemClock",
     "ValidationError",
     "age_seconds",
+    "canonical_digest",
     "canonical_json",
     "configure_logging",
     "derive_stable_id",
@@ -71,7 +72,7 @@ _EXPECTED_USAGE_CALLS = {
         "parse_utc_timestamp",
         "utc_now",
     },
-    "05_serialization.py": {"canonical_json", "to_json_safe"},
+    "05_serialization.py": {"canonical_digest", "canonical_json", "to_json_safe"},
     "06_security.py": {
         "is_sensitive_key",
         "redact_mapping_value",
@@ -106,6 +107,45 @@ def test_utils_has_no_domain_or_persistence_dependencies() -> None:
         for module in imported_modules
         for forbidden in _FORBIDDEN_IMPORT_ROOTS
     )
+
+
+def test_no_consumer_imports_or_mutates_utils_internals() -> None:
+    """Keep every consumer on the documented package and feature exports."""
+    source_root = Path(app.utils.__file__).parent
+    repository_root = source_root.parents[1]
+    offenders: list[str] = []
+    for scope in ("app", "tests"):
+        for source_file in (repository_root / scope).rglob("*.py"):
+            if source_root in source_file.parents or source_file == source_root:
+                continue
+            tree = ast.parse(source_file.read_text(encoding="utf-8"))
+            relative = source_file.relative_to(repository_root).as_posix()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    offenders.extend(
+                        f"{relative}:{node.lineno} imports {alias.name}"
+                        for alias in node.names
+                        if alias.name.count(".") > 2
+                        and alias.name.startswith("app.utils.")
+                    )
+                elif (
+                    isinstance(node, ast.ImportFrom)
+                    and node.module is not None
+                    and node.module.count(".") > 2
+                    and node.module.startswith("app.utils.")
+                ):
+                    offenders.append(
+                        f"{relative}:{node.lineno} imports from {node.module}"
+                    )
+                elif isinstance(node, ast.Assign):
+                    offenders.extend(
+                        f"{relative}:{node.lineno} assigns {target.attr}"
+                        for target in node.targets
+                        if isinstance(target, ast.Attribute)
+                        and target.attr.startswith("_")
+                        and "app.utils" in ast.unparse(target.value)
+                    )
+    assert not offenders, "\n" + "\n".join(offenders)
 
 
 def test_utils_does_not_mutate_decimal_context() -> None:
@@ -162,8 +202,10 @@ def test_every_functional_requirement_has_test_and_usage_traceability() -> None:
 def test_features_register_contains_every_public_function() -> None:
     """Require the Utils register to name every public exported function."""
     source_root = Path(app.utils.__file__).parent
-    register_path = source_root.parents[1] / "docs" / "dev" / "features_register.md"
-    utils_section = register_path.read_text(encoding="utf-8").split("# Brokers", 1)[0]
+    register_path = source_root.parents[1] / "docs" / "CHANGELOG.md"
+    content = register_path.read_text(encoding="utf-8")
+    utils_part = content.split("# Utils", 1)[1] if "# Utils" in content else ""
+    utils_section = utils_part.split("\n# ", 1)[0]
     registered = set(re.findall(r"\| `([a-z][a-z0-9_]*)\(", utils_section))
     public_functions = {
         name

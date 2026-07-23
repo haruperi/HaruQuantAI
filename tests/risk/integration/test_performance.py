@@ -3,7 +3,7 @@
 from datetime import timedelta
 from decimal import Decimal
 
-from app.services.data.contracts import (
+from app.services.data.evidence.account_contracts import (
     AccountBalance,
     AccountPosition,
     AccountStateSnapshot,
@@ -12,7 +12,7 @@ from app.services.risk.contracts import PortfolioState, ScenarioDefinition
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
 from app.services.risk.scenarios import run_risk_scenario_analysis
 
-from tests.risk.usage import test_usage_policy as examples
+from tests.risk import _support as examples
 
 
 def test_supported_scenario_and_position_workload_completes() -> None:

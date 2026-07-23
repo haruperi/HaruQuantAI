@@ -83,6 +83,30 @@ def _candidates(request: SearchRequest) -> Sequence[dict[str, ParameterValue]]:
     )
 
 
+def _deterministic_execution_id(prefix: str, parent_id: str, index: int) -> str:
+    """Generate a deterministic UUIDv4-style trace ID.
+
+    Args:
+        prefix: Target prefix (e.g. 'req').
+        parent_id: Parent trace ID.
+        index: Candidate index.
+
+    Returns:
+        Deterministic, valid trace ID.
+    """
+    seed_str = f"{parent_id}-{index}"
+    h = hashlib.sha256(seed_str.encode("utf-8")).hexdigest()
+    part1 = h[:8]
+    part2 = h[8:12]
+    part3 = "4" + h[13:16]
+    variant_char = h[16]
+    if variant_char not in "89ab":
+        variant_char = "89ab"[int(variant_char, 16) % 4]
+    part4 = variant_char + h[17:20]
+    part5 = h[20:32]
+    return f"{prefix}-{part1}-{part2}-{part3}-{part4}-{part5}"
+
+
 def run_bounded_search(
     request: SearchRequest,
     adapter: BacktestExecutionAdapter,
@@ -154,7 +178,7 @@ def run_bounded_search(
             candidate_hash=identity,
             executable_parameters=parameters,
             seed=(request.seed or 0) + index,
-            request_id=request.request_id,
+            request_id=_deterministic_execution_id("req", request.request_id, index),
             workflow_id=request.workflow_id,
             correlation_id=request.correlation_id,
             context=context,

@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
-from hashlib import sha256
 from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Literal, Protocol
@@ -18,10 +17,11 @@ from pydantic import (
     model_validator,
 )
 
-from app.utils import canonical_json, logger
+from app.utils import canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import FXConversionEvidence, MarketDataset
+    from app.services.data.contracts import MarketDataset
+    from app.services.data.evidence.fx_contracts import FXConversionEvidence
     from app.services.indicators import IndicatorResult
     from app.services.risk import RiskDecisionPackage
     from app.services.simulator.accounting import (
@@ -56,7 +56,7 @@ def _hash_material(payload: Mapping[str, object]) -> str:
     logger.debug("Hashing Simulation request configuration material")
     excluded = {"request_id", "workflow_id", "correlation_id", "config_hash"}
     material = {key: value for key, value in payload.items() if key not in excluded}
-    return sha256(canonical_json(material).encode("utf-8")).hexdigest()
+    return canonical_digest(material)
 
 
 class SimulationBacktestRequestV1(BaseModel):

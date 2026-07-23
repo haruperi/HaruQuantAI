@@ -8,10 +8,10 @@ from decimal import Decimal
 from typing import Literal, Protocol
 
 from app.services.risk.contracts import (
-    AllocationRiskDecision,
-    KillSwitchState,
-    RiskAuditRecord,
-    StrategyOperationalEligibilityDecision,
+    AllocationRiskDecision,  # noqa: TC001
+    KillSwitchState,  # noqa: TC001
+    RiskAuditRecord,  # noqa: TC001
+    StrategyOperationalEligibilityDecision,  # noqa: TC001
 )
 from app.utils import logger
 

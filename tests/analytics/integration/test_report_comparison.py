@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from app.services.analytics.reports.comparison import compare_performance_reports
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_report_comparison_uses_actual_common_metrics() -> None:

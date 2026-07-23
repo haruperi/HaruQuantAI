@@ -2,7 +2,7 @@
 
 > **Package:** `app/utils`
 > **Status:** `Completed — verified implementation baseline`
-> **Last updated:** `2026-07-20`
+> **Last updated:** `2026-07-21`
 
 > This README is the package's single source of truth for requirements, final
 > structure, implementation sequence, progress, usage examples, and tests.
@@ -104,6 +104,23 @@ Utils owns no durable business state, tables, artifacts, or migrations.
 ## 2. Final Package Structure
 
 Folders are ordered from lowest to highest dependency.
+
+### Feature Registry
+
+| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
+|---|---|---|---|---|---|
+| Completed | `FEAT-UTIL-00` Shared Authentication and Audit Contracts | `contracts/` | Exact declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/utils/usage/01_contracts.py` |
+| Completed | `FEAT-UTIL-01` Error Mapping and Exception Normalization | `errors/` | Exact declarations: Section 4.2 | Section 4.2 functional requirements | `tests/utils/usage/02_errors.py` |
+| Completed | `FEAT-UTIL-02` Prefixed and Deterministic Identity Generation | `identity/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/utils/usage/03_identity.py` |
+| Completed | `FEAT-UTIL-03` Aware UTC Time and Timestamp Utilities | `time/` | Exact declarations: Section 4.4 | Section 4.4 functional requirements | `tests/utils/usage/04_time.py` |
+| Completed | `FEAT-UTIL-04` Canonical JSON Serialization and Safe Conversion | `serialization/` | Exact declarations: Section 4.5 | Section 4.5 functional requirements | `tests/utils/usage/05_serialization.py` |
+| Completed | `FEAT-UTIL-05` Sensitive Data Redaction | `security/` | Exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/utils/usage/06_security.py` |
+| Completed | `FEAT-UTIL-06` Precedence-Ordered Settings Loading | `settings/` | Exact declarations and settings contracts: Section 4.7 | Section 4.7 functional requirements | `tests/utils/usage/07_settings.py` |
+| Completed | `FEAT-UTIL-07` Non-Blocking Logging Configuration | `logging/` | Exact declarations and logging contracts: Section 4.8 | Section 4.8 functional requirements | `tests/utils/usage/08_logging.py` |
+
+This table is the sole current registry for Utils. Detailed signatures, contract
+fields, failure behavior, and evidence remain authoritative in the referenced
+Section 4 feature specifications and are not duplicated in the changelog.
 
 ```text
 utils/
@@ -223,7 +240,7 @@ functional behavior.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent` | **Standard library:** `collections.abc`, `datetime`, `json`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
+| Completed | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent`; module-level, not re-exported through `__init__.py`: `JsonValue`, `validate_non_empty`, `validate_utc`, `validate_trace_id` | **Standard library:** `collections.abc`, `datetime`, `json`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
 | Completed | `auth.py` | Define immutable authenticated principal and trace context. | `AuthContext` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `audit.py` → strict contract-field validation |
 | Completed | `__init__.py` | Expose the supported shared-contract API. | `AuthContext`, `AuditEvent` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
 
@@ -272,7 +289,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `identifiers.py` | Generate, validate, and deterministically derive secret-free identifiers. | `generate_id`, `validate_id`, `derive_stable_id` | **Standard library:** `hashlib`, `re`, `uuid`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
+| Completed | `identifiers.py` | Generate, validate, and deterministically derive secret-free identifiers. | `generate_id`, `validate_id`, `derive_stable_id`; module-level, not re-exported through `__init__.py`: `SUPPORTED_TRACE_PREFIXES`, `SUPPORTED_STABLE_PREFIXES` | **Standard library:** `hashlib`, `re`, `uuid`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
 | Completed | `__init__.py` | Expose the supported identity API. | `generate_id`, `validate_id`, `derive_stable_id` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `identifiers.py` → approved exports |
 
 #### Functional requirements
@@ -315,15 +332,16 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `canonical.py` | Convert supported values to JSON-safe data and produce canonical UTF-8 JSON. | `to_json_safe`, `canonical_json` | **Standard library:** `collections.abc`, `dataclasses`, `datetime`, `decimal`, `enum`, `json`, `math`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
-| Completed | `__init__.py` | Expose the supported serialization API. | `to_json_safe`, `canonical_json` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `canonical.py` → approved exports |
+| Completed | `canonical.py` | Convert supported values to JSON-safe data, produce canonical UTF-8 JSON, and digest trusted structures of any size. | `to_json_safe`, `canonical_json`, `canonical_digest`; module-level, not re-exported through `__init__.py`: `JsonValue` | **Standard library:** `collections.abc`, `dataclasses`, `datetime`, `decimal`, `enum`, `hashlib`, `json`, `math`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
+| Completed | `__init__.py` | Expose the supported serialization API. | `to_json_safe`, `canonical_json`, `canonical_digest` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `canonical.py` → approved exports |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-UTL-013` | Convert supported datetimes, decimals, enums, dataclasses, mappings, and sequences to deterministic JSON-safe values. | `to_json_safe` | None | `ValidationError`: unsupported value type | **Usage:** `tests/utils/usage/05_serialization.py::example_to_json_safe()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_to_json_safe_converts_supported_types()` |
-| Completed | `FR-UTL-014` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction. | `canonical_json` | None | `ValidationError`: non-serializable value | **Usage:** `tests/utils/usage/05_serialization.py::example_canonical_json()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_canonical_json_sorts_keys()` |
+| Completed | `FR-UTL-014` | Produce stable UTF-8 JSON with sorted keys and no hidden redaction; an optional `max_items=None` lifts the untrusted-payload ceiling for trusted structures. | `canonical_json` | None | `ValidationError`: non-serializable value | **Usage:** `tests/utils/usage/05_serialization.py::example_canonical_json()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_canonical_json_sorts_keys()` |
+| Completed | `FR-UTL-016` | Digest a trusted structure of any size, byte-identical to hashing its canonical JSON, without the untrusted-payload item ceiling. | `canonical_digest` | None | `ValidationError`: non-serializable value | **Usage:** `tests/utils/usage/05_serialization.py::example_canonical_digest()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_canonical_digest_matches_sha256_of_canonical_json()` |
 | Completed | `FR-UTL-015` | Reject unsupported, cyclic, non-finite, or unsafe values deterministically. | Serialization validation used by `to_json_safe` and `canonical_json` | None | `ValidationError`: unsupported, cyclic, or non-finite value | **Usage:** `tests/utils/usage/05_serialization.py::example_reject_unsafe_value()`<br>**Unit:** `tests/utils/unit/test_canonical.py::test_serialization_rejects_cyclic_value()` |
 
 ### 4.6 `security/` — Secret Redaction
@@ -337,14 +355,14 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `redaction.py` | Define redaction policy/results and redact bounded text or JSON-safe mappings. | `RedactionPolicy`, `RedactionResult`, `is_sensitive_key`, `redact_text_value`, `redact_mapping_value` | **Standard library:** `collections.abc`, `dataclasses`, `math`, `re`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `SecurityError`, `ValidationError` |
-| Completed | `__init__.py` | Expose the supported secret-redaction API. | All security exports above | **Local:** `redaction.py` → approved exports |
+| Completed | `__init__.py` | Expose the supported secret-redaction API. | All security exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `redaction.py` → approved exports |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-UTL-016` | Define immutable denylist-first redaction policy with narrow reviewed field-path allowlists. | `RedactionPolicy` | None | `ValidationError`: malformed policy definition | **Usage:** `tests/utils/usage/06_security.py::example_redaction()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_policy_is_immutable()` |
-| Completed | `FR-UTL-017` | Detect sensitive keys case-insensitively. | `is_sensitive_key` | None | None | **Usage:** `tests/utils/usage/06_security.py::example_key_classification()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_is_sensitive_key_is_case_insensitive()` |
+| Completed | `FR-UTL-017` | Detect sensitive keys case-insensitively, including normalized composite suffixes. | `is_sensitive_key` | None | None | **Usage:** `tests/utils/usage/06_security.py::example_key_classification()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_is_sensitive_key_is_case_insensitive()`, `test_is_sensitive_key_matches_composite_suffixes()` |
 | Completed | `FR-UTL-018` | Redact bounded text without mutating input. | `redact_text_value` | None | None | **Usage:** `tests/utils/usage/06_security.py::example_redaction()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_text_value_does_not_mutate_input()` |
 | Completed | `FR-UTL-019` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None | `ValidationError`: non-JSON-safe mapping | **Usage:** `tests/utils/usage/06_security.py::example_redaction()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_mapping_value_is_recursive()` |
 | Completed | `FR-UTL-020` | Return redacted paths and truncation diagnostics without secret values. | `RedactionResult` | None | None | **Usage:** `tests/utils/usage/06_security.py::example_redaction()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_result_omits_secret_values()` |
@@ -361,7 +379,7 @@ repository `.env` loading base for typed domain settings.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `models.py` | Define the immutable central `.env` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
+| Completed | `models.py` | Define the immutable central `.env` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings`; module-level, not re-exported through `__init__.py`: `LogLevel`, `LogRender`, `LogCompression`, `Environment`, `RuntimeProfile` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
 | Completed | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping. | `load_settings` | **Standard library:** `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError` |
 | Completed | `__init__.py` | Expose the supported settings API. | Settings models and loader functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
 
@@ -384,7 +402,7 @@ redacted structured-handler overrides for specialized entry points.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `logger.py` | Provide import-safe bound logger access, thread-safe lazy default activation, explicit override configuration and synchronization, source-aware human rendering, compressed rotation, color, lifecycle, and specialized routing. | `BoundLogger`, `logger`, `get_logger`, `configure_logging`, `flush_logging`, `shutdown_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** `atexit`, `collections.abc`, `copy`, `datetime`, `json`, `logging`, `logging.handlers`, `pathlib`, `queue`, `sys`, `threading`, `time`, `types`, `typing`, `zipfile`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py`; `time/timestamps.py`; `security/redaction.py`; `settings/loader.py` |
+| Completed | `logger.py` | Provide import-safe bound logger access, thread-safe lazy default activation, explicit override configuration and synchronization, source-aware human rendering, compressed rotation, color, lifecycle, and specialized routing. | `BoundLogger`, `logger`, `get_logger`, `configure_logging`, `flush_logging`, `shutdown_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** `atexit`, `collections.abc`, `copy`, `datetime`, `json`, `logging`, `logging.handlers`, `pathlib`, `queue`, `sys`, `threading`, `time`, `types`, `typing`, `zipfile`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py`; `time/timestamps.py`; `security/redaction.py`; `settings/loader.py`; `settings/models.py` → `LoggingSettings` (type-only) |
 | Completed | `__init__.py` | Expose the supported logging API without configuring logging. | All logging exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `logger.py` → approved exports |
 
 #### Functional requirements
@@ -394,7 +412,7 @@ redacted structured-handler overrides for specialized entry points.
 | Completed | `FR-UTL-026` | Return stable child loggers without configuring handlers. | `get_logger` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_logger_access()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_get_logger_configures_no_handlers()` |
 | Completed | `FR-UTL-027` | Atomically install deduplicated console and optional bounded rotating-file handlers from the approved default before the first runtime bound-log emission; explicit `configure_logging` replaces the active profile only for a specialized override. | `BoundLogger`, `configure_logging` | Logging configuration; directory creation; optional file write on first runtime emission or explicit override | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()` |
 | Completed | `FR-UTL-028` | Redact messages and structured context before formatting. | `RedactingFilter` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_logger_redaction()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_redacting_filter_runs_before_formatting()` |
-| Completed | `FR-UTL-029` | Emit JSON or source-aware human-readable records with UTC time, padded level, module, function, line, message, and trace IDs. Human records use `YYYY-MM-DD HH:MM:SS.mmm | LEVEL    | module:function:line - message`; default-console ANSI color is restricted to the level and message content. | `StructuredFormatter` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`, `example_bound_context()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_human_formatter_uses_source_aware_layout()`, `test_human_formatter_colors_only_level_and_message()` |
+| Completed | `FR-UTL-029` | Emit either JSON records carrying UTC time, level, logger, message, and redacted trace context, or source-aware human-readable records that additionally carry padded level and caller module/function/line. Human records use `YYYY-MM-DD HH:MM:SS.mmm | LEVEL    | module:function:line - message`; default-console ANSI color is restricted to the level and message content. | `StructuredFormatter` | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_standard_levels()`, `example_bound_context()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_human_formatter_uses_source_aware_layout()`, `test_human_formatter_colors_only_level_and_message()` |
 | Completed | `FR-UTL-030` | Surface sink failure through a bounded secret-safe fallback. | Logging failure handling in `configure_logging` | Fallback emission | None | **Usage:** `tests/utils/usage/08_logging.py::example_sink_failure()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_sink_failure_uses_safe_fallback()` |
 | Completed | `FR-UTL-031` | Prevent duplicate handler or queue-listener installation across concurrent first use and repeated explicit configuration calls. | Lazy activation and configuration idempotency | Logging configuration | None | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_is_thread_safe()`, `test_configure_logging_is_idempotent()` |
 | Completed | `FR-UTL-032` | Keep import free of handler registration, environment reads, and filesystem writes. | Module import contract | None | None | **Usage:** `tests/utils/usage/08_logging.py::example_import_safety()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_import_registers_no_handlers()` |
@@ -430,7 +448,11 @@ capabilities beyond the Section 4 exports.
     Canonical output always has six fractional digits and a `Z` suffix. Future
     observed timestamps and negative freshness limits are rejected. Freshness
     is inclusive at the configured limit.
-  - `to_json_safe(value) -> JsonValue` and `canonical_json(value) -> str`.
+  - `to_json_safe(value) -> JsonValue`, `canonical_json(value, *, max_items=10_000) -> str`,
+    and `canonical_digest(value) -> str`. `canonical_digest` is byte-identical to
+    `sha256(canonical_json(value))` where the latter succeeds, and additionally
+    digests trusted structures beyond the item ceiling; `canonical_json(...,
+    max_items=None)` serializes such structures to a string.
     Mapping keys must be strings; tuples become arrays; finite floats remain
     numbers; decimals become exact fixed-point strings; enums serialize through
     their values; aware UTC datetimes use canonical timestamp output; sets,
@@ -465,7 +487,10 @@ capabilities beyond the Section 4 exports.
 - The default sensitive-key denylist is case-insensitive and contains
   `password`, `passwd`, `secret`, `token`, `api_key`, `apikey`, `authorization`,
   `credential`, `private_key`, `access_key`, and `client_secret`. Matching ignores
-  case plus hyphen/underscore differences. Protected credential fields are
+  case plus hyphen/underscore differences, and additionally matches any key whose
+  normalized form ends with a denylisted name, so composite keys such as
+  `user_token` and `broker-api-key` are redacted while unrelated keys such as
+  `accountid` and `tokenizer` are not. Protected credential fields are
   `password`, `passwd`, `private_key`, `client_secret`, `api_key`, `apikey`, and
   `authorization`; they can never be allowlisted. Allowlists are exact dot-paths.
 - Text redaction recognizes case-insensitive `key=value`, `key: value`, and
@@ -543,16 +568,32 @@ Feature-integration tests are assigned as follows:
 
 - `tests/utils/integration/test_settings_bootstrap.py` verifies `WF-UTL-002`.
 - `tests/utils/integration/test_structured_logging.py` verifies `WF-UTL-001`.
-- `tests/utils/integration/test_audit_event_construction.py` verifies the
-  Utils-owned construction portion of `WF-UTL-003`; Data's completed audit
-  persistence boundary verifies the downstream handoff.
+- `tests/utils/integration/test_audit_event_construction.py` verifies steps 1-4 of
+  `WF-UTL-003`, the Utils-owned construction, validation, redaction, and
+  canonicalization portion. Step 5, Data persistence, is verified by the
+  Data-owned `tests/data/integration/test_audit_event_handoff.py`.
+- `tests/utils/integration/test_auth_context_compatibility.py` provides the
+  producer-side compatibility evidence for `AuthContext v1`: fixed compatibility
+  keys, the exact consumed field set, immutability, lossless round-trip
+  reconstruction, and fail-closed rejection of version, schema, principal-type, or
+  unknown-field drift. Consumer-side acceptance is proven inside each consuming
+  domain's own suite.
+- `tests/utils/integration/test_usage_scripts.py` executes all eight standalone
+  usage programs directly and asserts their bounded expected output.
+
+No test under `tests/utils/` imports `app.services`; the Utils suite is runnable in
+isolation, matching the foundation-layer dependency direction in `docs/PROJECT.md`.
 
 ### Required validation
 
 - Targeted tests for every changed capability.
 - Import-side-effect checks for every package and feature module.
-- Contract compatibility tests for `AuthContext v1` and `AuditEvent v1` producers
-  and consumers.
+- Contract compatibility tests for `AuthContext v1` and `AuditEvent v1`.
+  `tests/utils/integration/test_auth_context_compatibility.py` and
+  `tests/utils/integration/test_audit_event_construction.py` own the producer side;
+  consuming domains own consumer-side acceptance, and
+  `tests/data/integration/test_audit_event_handoff.py` owns the Data persistence
+  handoff.
 - Secret-leak tests covering logging, errors, audit payloads, and diagnostics.
 - Determinism tests for canonical JSON, stable IDs, and UTC calculations.
 - Dependency checks proving DataFrame/OHLC, path, limit, business validation,
@@ -575,7 +616,7 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
   named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:90`
 - [X] Shared capabilities have documented consumers and secret redaction remains bounded to Utils. `app/utils/README.md:80`
 - [X] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:94`
-- [X] UI/API owns authentication and permission enforcement. `docs/PROJECT.md:125`
+- [X] UI/API owns authentication and permission enforcement. `docs/PROJECT.md:143`
 - [X] Utils imports and import-time log attempts have no side effects.
   `tests/utils/unit/test_logger.py:229`, `tests/utils/unit/test_logger.py:243`
 - [X] No secret appears in logs, errors, audit records, or diagnostics.
@@ -586,15 +627,21 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
   `tests/utils/unit/test_logger.py:90`, `tests/utils/unit/test_logger.py:112`
 - [X] Every requirement has a targeted unit test and directly executable usage example. `tests/utils/integration/test_usage_scripts.py:21`
 - [X] Every individual Utils source file exceeds 80% branch-aware coverage. The
-  verified minimum is 82.30% and aggregate coverage is 91.28% across 23 files.
-- [X] Ruff, formatting, strict mypy, 100 targeted unit/integration tests, and all
+  verified minimum is 82.30% (`serialization/canonical.py`) and aggregate coverage
+  is 91.12% across 23 files.
+- [X] `AuthContext v1` and `AuditEvent v1` each have producer-side contract
+  compatibility evidence, and no Utils test depends on another domain.
+  `tests/utils/integration/test_auth_context_compatibility.py:1`,
+  `tests/utils/integration/test_audit_event_construction.py:1`
+- [X] Ruff, formatting, strict mypy, 111 targeted unit/integration tests, and all
   eight directly executed standalone usage programs pass.
 
 Current implementation status: `Completed — verified implementation baseline`.
-The 2026-07-20 gate is green: Ruff and formatting pass over 55 targeted files,
-strict mypy passes over 55 files, 100 targeted tests pass, aggregate branch coverage
-is 91.28%, every one of the 23 Utils source files exceeds 80% coverage (minimum
-82.30%), and all eight feature-aligned usage programs execute successfully.
+The 2026-07-21 gate is green: Ruff and formatting pass over 56 targeted files,
+strict mypy passes over the 23 Utils source files, 111 targeted tests pass,
+aggregate branch coverage is 91.12%, every one of the 23 Utils source files exceeds
+80% coverage (minimum 82.30%), and all eight feature-aligned usage programs execute
+successfully.
 
 ---
 

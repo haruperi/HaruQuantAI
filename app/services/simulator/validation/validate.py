@@ -4,15 +4,18 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
-from hashlib import sha256
 
-from app.services.data.contracts import MarketDataset, OHLCVRecord, TickRecord
+from app.services.data.contracts import (
+    MarketDataset,
+    OHLCVRecord,
+    TickRecord,
+)
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.validation.contracts import (
     MarketDataValidationContext,
     ValidatedMarketDataEvidence,
 )
-from app.utils import ValidationError, canonical_json, logger
+from app.utils import ValidationError, canonical_digest, canonical_json, logger
 
 SUPPORTED_ASSET_CLASSES = ("FX",)
 _REQUIRED_INPUT_FIELDS = (
@@ -71,7 +74,7 @@ def _dataset_hash(dataset: MarketDataset) -> str:
     """
     logger.debug("Hashing one Data MarketDataset for Simulation")
     material = dataset.model_dump(mode="python", warnings=False)
-    return sha256(canonical_json(material).encode("utf-8")).hexdigest()
+    return canonical_digest(material)
 
 
 def validate_run_inputs(payload: Mapping[str, object]) -> None:
@@ -203,7 +206,7 @@ def validate_market_data(
         _raise("SIM_UNSUPPORTED_TICK_MODEL", "Dataset is not an approved tick series")
     return ValidatedMarketDataEvidence(
         data_hash=actual_hash,
-        schema_id=dataset.schema_id,
+        dataset_schema_id=dataset.schema_id,
         tick_model=tick_model,
         record_count=dataset.record_count,
         validated_at=context.evaluated_at,

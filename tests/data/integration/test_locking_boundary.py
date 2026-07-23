@@ -6,7 +6,7 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-from app.services.data.storage.locking import acquire_write_lock
+from app.services.data.persistence.locking import acquire_write_lock
 
 
 def _configure_locking(monkeypatch: pytest.MonkeyPatch, data_directory: Path) -> Path:
@@ -59,7 +59,7 @@ def test_locking_import_has_no_configuration_or_schema_side_effect(
     monkeypatch.delenv("SQLITE_BUSY_TIMEOUT_SECONDS", raising=False)
     monkeypatch.delenv("WRITE_LOCK_LEASE_SECONDS", raising=False)
 
-    module = importlib.import_module("app.services.data.storage.locking")
+    module = importlib.import_module("app.services.data.persistence.locking")
     reloaded = importlib.reload(module)
 
     assert reloaded.__all__ == ["WriteLock", "acquire_write_lock"]

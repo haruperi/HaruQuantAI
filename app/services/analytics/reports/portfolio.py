@@ -220,6 +220,7 @@ def build_portfolio_performance_report(
         else "identity-currency"
     )
     return PortfolioPerformanceReport(
+        contract_version="v1",
         schema_id="analytics.portfolio_performance_report.v1",
         report_id=_compute_portfolio_hashes(payload).input_hash,
         component_report_ids=component_ids,

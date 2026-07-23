@@ -3,7 +3,9 @@
 from collections.abc import Mapping
 from decimal import Decimal
 
-from app.services.data.contracts import AccountStateSnapshot
+from app.services.data.evidence.account_contracts import (
+    AccountStateSnapshot,
+)
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.contracts.models import JsonValue
 from app.utils import logger

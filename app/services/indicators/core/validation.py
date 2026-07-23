@@ -15,7 +15,10 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 
-from app.services.data.contracts import MarketDataset, OHLCVRecord
+from app.services.data.contracts import (
+    MarketDataset,
+    OHLCVRecord,
+)
 from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.services.indicators.core.registry import get_indicator
 from app.utils import logger

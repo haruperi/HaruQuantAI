@@ -2,7 +2,7 @@
 
 import re
 
-from app.services.risk.contracts.enums import RiskErrorCode
+from app.services.risk.contracts.enums import RiskErrorCode  # noqa: TC001
 from app.utils import HaruQuantError, is_sensitive_key, logger, redact_text_value
 
 _SAFE_DETAIL = re.compile(r"[^A-Z0-9_]+")

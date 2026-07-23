@@ -4,7 +4,7 @@
 
 from app.services.analytics.metrics.statistics import run_statistical_validation
 from app.utils import logger
-from tests.analytics.usage.test_usage_metrics import _configured_result
+from tests.analytics._support import _configured_result
 
 
 def test_seeded_validation_is_reproducible() -> None:

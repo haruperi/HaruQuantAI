@@ -14,15 +14,24 @@ import json
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Final, Literal, cast
 
 import pandas as pd
 
 from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.utils import canonical_json, logger
 
+# ``app.utils.canonical_json`` rejects any traversal exceeding 10,000 cumulative
+# items. One OHLCV record contributes roughly fifteen, so this chunk size keeps
+# each call near 3,750 items — a wide margin that survives future record fields
+# while still amortizing call overhead across long histories.
+_CHECKSUM_CHUNK_RECORDS: Final[int] = 250
+
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset, OHLCVRecord
+    from app.services.data.contracts import (
+        MarketDataset,
+        OHLCVRecord,
+    )
     from app.services.indicators.core.contracts import IndicatorConfig
 
 
@@ -78,6 +87,9 @@ class IndicatorManifest:
     quality_schema_version: str
     manifest_version: Literal["v1"] = "v1"
     contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["indicators.indicator_manifest.v1"] = (
+        "indicators.indicator_manifest.v1"
+    )
     output_schema_version: Literal["v1"] = "v1"
     precision_dtype: Literal["float64"] = "float64"
     availability_policy: Literal["source_available_at"] = "source_available_at"
@@ -207,6 +219,15 @@ def _parameter_hash(config: IndicatorConfig) -> str:
 def _input_checksum(data: MarketDataset) -> str:
     """Compute the canonical SHA-256 input-dataset digest.
 
+    The digest folds one ``canonical_json`` call for the dataset-level fields
+    and one per fixed-size record chunk, in exact record order, rather than
+    canonicalizing the whole dataset in a single call.
+    ``app.utils.canonical_json`` enforces a cumulative 10,000-item traversal
+    bound, so a single-call implementation failed for any dataset beyond 664
+    records. Chunking keeps every call bounded well under that limit
+    regardless of history length, while keeping the digest deterministic and
+    order-sensitive.
+
     Args:
         data: One normalized ``MarketDataset v1``.
 
@@ -215,8 +236,16 @@ def _input_checksum(data: MarketDataset) -> str:
     """
     logger.debug("Computing canonical input checksum for %s", data.symbol)
     payload = data.model_dump(mode="json")
-    encoded = canonical_json(payload).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+    records = payload.pop("records")
+    digest = hashlib.sha256()
+    digest.update(canonical_json(payload).encode("utf-8"))
+    for start in range(0, len(records), _CHECKSUM_CHUNK_RECORDS):
+        # ASCII record separator cannot appear unescaped inside JSON text, so
+        # concatenated chunk payloads stay unambiguous.
+        digest.update(b"\x1e")
+        chunk = records[start : start + _CHECKSUM_CHUNK_RECORDS]
+        digest.update(canonical_json(chunk).encode("utf-8"))
+    return digest.hexdigest()
 
 
 def _serialize_output_cell(value: object) -> object:
@@ -422,10 +451,15 @@ def build_indicator_result(
 ) -> IndicatorResult:
     """Assemble the deterministic ``IndicatorResult`` for one calculation.
 
-    This internal helper is shared by every official trend, volatility,
-    and momentum calculator so identity, checksum, and finalization logic
-    is implemented exactly once, per ``FR-INDI-007`` through
-    ``FR-INDI-010``. It is not part of the package's public API.
+    This internal helper is shared by all twenty official trend, volatility,
+    momentum, volume, and candle calculators so identity, checksum, and
+    finalization logic is implemented exactly once, per ``FR-INDI-007``
+    through ``FR-INDI-010``.
+
+    It is deliberately not part of the package's public API: it appears in no
+    ``__all__`` and is not a documented import for callers outside this
+    package. Public consumers construct results only by calling an official
+    indicator convenience function.
 
     Args:
         data: One normalized, validated ``MarketDataset v1``.

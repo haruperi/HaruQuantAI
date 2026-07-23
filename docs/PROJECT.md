@@ -2,13 +2,17 @@
 
 > **System path:** `HaruQuantAI/`
 > **Status:** `Missing`
-> **Last updated:** `2026-07-16`
+> **Last updated:** `2026-07-22`
 
 > This document is the system-level source of truth.
 > It defines how domains fit together, how cross-domain workflows operate, which rules apply system-wide, and how the complete system is verified.
 >
 > Domain internals belong in each domain's own `README.md`.
 > Do not duplicate domain-level requirements, files, functions, or implementation details here.
+> Each owning package README's `### Feature Registry` is the sole canonical
+> current-state registry for that package's feature IDs, statuses, module
+> ownership, public API, contracts, requirements, and usage evidence.
+> `docs/CHANGELOG.md` records dated history and is not a current feature registry.
 
 ---
 
@@ -19,9 +23,9 @@
 HaruQuantAI is an algorithmic trading platform that turns market data into governed trading outcomes. It acquires and normalizes market data, derives indicators, generates strategy signals, and forces every trading proposal through independent risk governance before execution. Approved actions are executed deterministically across paper and live routes (against a broker) and the sim route (against a simulated execution environment). Execution and simulation results are persisted by their owning domains and may be evaluated through read-only performance analytics. The system fails closed: if safety, context, or state cannot be proven, execution is blocked.
 
 This document defines the target system and the contract-governed continuation of
-the existing implementation. Utils and Brokers are completed implementation baselines
-and Data is a near-complete baseline with one accepted open requirement group
-(`CAP-DATA-023`); all three are reused. Later agile phases run
+the existing implementation. Utils and Brokers are completed implementation
+baselines. Data's functional baseline and owner-approved fifteen-capability focused
+architecture are implemented by `CAP-DATA-028`. Later agile phases run
 compatibility/regression gates and add only requirements that are not already
 satisfied.
 
@@ -37,11 +41,26 @@ satisfied.
   Release remains fail-closed: `registry/catalogue.py` excludes every `_WRITE`
   capability unconditionally, so implemented mutations remain `UNAVAILABLE` and
   no live write was used as completion evidence.
-- `app/services/data/` implements its v1 contracts, normalized access, storage,
-  cache, audit persistence, processing/alignment, jobs, feeds, source policy, and
-  public operations. Data is `Partial`: series-level market-data quality inspection
-  (`CAP-DATA-023`, `FR-DATA-091`–`FR-DATA-094`) is specified and accepted but not
-  implemented, so `DataQualityReport` currently carries a constant score.
+- `app/services/data/` implements its v1 contracts, normalized retrieval, storage,
+  cache, audit persistence, transforms/alignment, synthetic generators,
+  quality validation, scheduler jobs, feeds, source policy/composition, and
+  public operations. The functional migration (`CAP-DATA-026`) and
+  backup/restore/retention capability (`CAP-DATA-027`) are implemented, preserving
+  active `FR-DATA-*` behaviour, contract versions, schema identifiers, error codes,
+  and the frozen 35-operation package API. Architectural acceptance of
+  `CAP-DATA-026` was withdrawn because fourteen horizontal module folders and ten
+  usage programs do not satisfy one feature = one module folder = one usage program.
+  `CAP-DATA-028` implements the approved fifteen-capability corrective target.
+  Feature-owned contracts and behavior live in their focused owners, removed
+  horizontal paths have no compatibility shims, and exactly fifteen numbered usage
+  programs supply deterministic evidence. Data is `Completed`. The
+  functional baseline includes series-level
+  quality inspection (`CAP-DATA-023`), economic calendar scraping (`CAP-DATA-024`),
+  and source composition, external artifact import, and stale-cache policy
+  (`CAP-DATA-025`) and backup/restore/retention. Two residual constraints are not Data
+  defects: non-MT5 provider reads stay `UNAVAILABLE` until the Brokers catalogue
+  records read-release evidence, and the calendar scraper's live network path has not
+  been executed against the four external sites.
 - These domains are not rebuilt phase-by-phase. Current repository-wide
   semantic-docstring/format cleanup is tracked separately from functional domain
   completion.
@@ -154,12 +173,13 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 
 * **Package**: `app/services/data`
 * **Responsibility**: Acquire, normalize, store, and serve trusted market data and read-only broker/account state. All of Data's broker/provider access is read-only and flows through the Brokers domain's canonical `BrokerAdapter` (read capability traits).
-* **Inputs**: Package-root retrieval arguments or typed Data requests, Broker/provider reads via Brokers' `BrokerAdapter`, historical files, backfill commands.
+* **Inputs**: Package-root retrieval arguments or typed Data requests, Broker/provider reads via Brokers' `BrokerAdapter`, historical files, externally produced CSV/Parquet artifacts admitted by explicit audited import, backfill commands.
 * **Outputs**: Normalized bars/ticks (`MarketDataset`), account/broker state snapshots (`AccountStateSnapshot`), storage state, and explicitly requested detached analytical OHLCV/spread or tick DataFrame projections.
 * **Owns**: Historical market and account data storage/persistence, durable audit storage, shared database infrastructure, connections, locking, SQLite migration execution framework, real-time feed handling, data-source selection and cross-provider fallback policy, every provider/cross-provider alias mapping plus canonical and friendly market identity, conversion of those identities to exact provider-native symbols before a Brokers call, normalization of raw broker/provider reads into `MarketDataset` / `AccountStateSnapshot`, multi-timeframe alignment, deterministic series-level market-data quality inspection producing scored issue, severity, and remediation evidence, and deterministic tick-series derivation from real bar or tick evidence under approved tick and spread models (distinct from GBM synthetic generation, which is fixtures-only and never reaches an official simulation run).
 * **Boundaries**: Foundation layer with no trading decision logic. Brokers continues to own provider adapter implementations and connection/session mechanics. Data's package-root retrieval facade may privately and lazily compose a read-only adapter through the Brokers factory from Utils-loaded settings; manual adapter/source injection remains supported. Data does not expose that composition, invoke broker mutations, own strategy logic, backtest engines, sizing formulas, order dispatch, or other domains' tables, artifact schemas, and migration definitions (each domain owns its tables, artifact schemas, and migration definitions, utilizing the shared execution framework). Raw provider DataFrames, sockets, DB sessions, credentials, adapters, and provider SDK objects never cross its boundary. Data may explicitly project canonical bar or tick `MarketDataset` evidence into detached analytical DataFrames whose exact columns, missingness, units, and precision-loss boundaries are fixed in the Data README; the canonical dataset remains authoritative evidence.
 * **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers. Quality evidence attached to a `MarketDataset` must be computed from the actual records; a constant or unexamined quality score is never emitted.
-* **Documentation**: `app/services/data/README.md`
+* **Module structure**: `CAP-DATA-028` is complete with fifteen focused capability folders: `contracts/`, `market_data/`, `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`, `quality/`, `transformation/`, `time_sessions/`, `sources/`, `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, and `audit/`. Each registered capability owns exactly one folder and one standalone usage program. Historical labeling remains owned by Research and has no Data implementation.
+* **Documentation**: `app/services/data/README.md`; continuation handoff `docs/dev/DATA_FOCUSED_RESTRUCTURE_HANDOFF.md`
 
 #### 2.1.4 Indicators
 
@@ -852,10 +872,11 @@ Each persisted or long-lived state has exactly one owning domain. Data owns the 
 | Status    | State / Store                                                                                                                                                                                                                       | Owning domain      | Read access (via contract)                                                                                                             | Write access                                                         | Notes                                                                                                                                                           |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | Market/account data tables and historical storage                                                                                                                                                                                   | `Data`           | All consuming domains via`MarketDataset` / `AccountStateSnapshot`                                                                  | `Data` only                                                        | Includes provider alias mappings and alignment metadata                                                                                                         |
+| Missing   | Externally produced market-data artifacts admitted by explicit import                                                                                                                                                               | `Data`           | All consuming domains via`MarketDataset`                                                                                          | `Data` only                                                        | Third-party CSV/Parquet enters canonical manifest-backed form only through an explicit audited import that records external origin in provenance; never on read |
 | Completed | Data operational state: versioned cache entries/manifests, source readiness/capability/license/rate-limit/breaker state, update jobs/leases/idempotency/checkpoints, internal feed status, shared migration ledger and lock records | `Data`           | Data policy/job/feed/migration APIs only (e.g.,`get_feed_status`, migration results); never direct table access                      | `Data` only                                                        | Data-internal operational stores enumerated in the Data README's Persisted state table                                                                          |
 | Completed | Durable audit storage                                                                                                                                                                                                               | `Data` (storage) | `UI/API` (audit views), `Risk` (decision chain verification)                                                                       | Emitting domains via`AuditEvent` envelope; persistence by `Data` | Each emitting domain owns its payload fields                                                                                                                    |
 | Completed   | Orders, fills, execution state, idempotency reservations,`TradeRecord` tables                                                                                                                                                     | `Trading`        | `Analytics`, `Portfolio`, `UI/API` via `TradeRecord` / `ExecutionReceipt`                                                    | `Trading` only                                                     | Reconciliation state, incident records, and idempotency reservations included; unreconciled records flagged                                                     |
-| Missing   | Strategy registry, parameter schemas, state checkpoints                                                                                                                                                                             | `Strategy`       | `Trading`, `Simulation`, `Optimization`, `Portfolio` via registry references                                                   | `Strategy` only                                                    | Registration only via approved`Strategy*Request` commands; registration is distinct from Risk-owned operational eligibility                                   |
+| Completed | Strategy registry, parameter schemas, state checkpoints                                                                                                                                                                             | `Strategy`       | `Trading`, `Simulation`, `Optimization`, `Portfolio` via registry references                                                   | `Strategy` only                                                    | Registration only via approved`Strategy*Request` commands; registration is distinct from Risk-owned operational eligibility; tables and migrations in `app/services/strategy/registry/migrations.py`                                   |
 | Completed | Risk policies, kill-switch state, operational-eligibility and allocation decisions, active risk-budget projection, approval-token issuance/reservation state, decision audit chain                                                  | `Risk`           | `Portfolio`, `Trading`, `UI/API` via registered Risk decisions and state contracts; token state via Risk validation results only | `Risk` only                                                        | Cryptographically chained; eligibility, budget projection, kill-switch state, and atomic approval-token reservation are canonical here                          |
 | Completed | Portfolio definitions, construction results, active allocation versions, drift assessments, and rebalance plans                                                                                                                     | `Portfolio`      | `Risk`, `Simulation`, `Trading`, `Analytics`, `UI/API` via registered Portfolio contracts or receiver-owned requests         | `Portfolio` only                                                   | Immutable version history; rollback creates a new governed version and never rewrites history                                                                   |
 | Completed   | Simulation results and artifacts                                                                                                                                                                                                    | `Simulation`     | `Analytics`, `Optimization`, `Portfolio`, `UI/API` via `SimulationResult` / `PortfolioSimulationResult`                    | `Simulation` only                                                  | Incomplete runs never published                                                                                                                                 |
@@ -887,7 +908,10 @@ Only settings or limits shared across multiple domains belong here. Feature-spec
 | Completed | `DATABASE_URL` / `DATA_DIR`                                              | `str` / `Path` | —                                            | Yes         | `Data`    | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, UI/API | Shared connection and artifact-root configuration; each persistent domain owns its own tables/files                                                                                                |
 | Missing   | `QUALITY_PROFILE`                                                          | `str`            | `standard`                                  | Yes         | `Data`    | Data, Indicators, Strategy, Trading, Simulation, Optimization, Research, Portfolio, Analytics, UI/API | Series-level market-data quality strictness: exactly`strict`, `standard`, or `lenient`. Selects one frozen threshold set; individual thresholds are not separately tunable. Determines which detected issues are blocking, so it changes fail-closed behaviour for every `MarketDataset` consumer. |
 | Missing   | `METRICS_ENABLED`                                                          | `bool`           | `false`                                     | No          | `UI/API`  | All emitting domains                                                                 | Master enablement for operational telemetry recording and the Prometheus exposition surface. Disabled by default; telemetry is never an input to a governed decision and its unavailability never blocks execution.                                                                              |
-| Partial   | `MT5_ENABLED` (per-platform: `CTRADER_ENABLED`, `BINANCE_ENABLED`, …) | `bool`           | `false`                                     | Yes         | `Brokers` | Brokers connections; Data reads, Trading dispatch                                    | `BrokerConnectionConfig.provider_enabled` and Data's private standalone MT5 retrieval composition are implemented; UI/API composition-root loading and remaining provider facades remain pending |
+| Partial   | `MT5_ENABLED` (per-platform: `CTRADER_ENABLED`, `BINANCE_ENABLED`, …) | `bool`           | `false`                                     | Yes         | `Brokers` | Brokers connections; Data reads, Trading dispatch                                    | `BrokerConnectionConfig.provider_enabled` is implemented. UI/API composition-root loading remains pending. Data composes a provider source only when its flag is enabled and Data holds a descriptor for it; see `DATA_PROVIDER_SOURCES`                                |
+| Missing   | `DATA_PROVIDER_SOURCES`                                                    | `tuple[str, ...]` | `()`                                        | No          | `Data`    | Data source composition                                                              | Additional broker-backed provider source identifiers Data may compose as read-only sources, each gated by its `*_ENABLED` platform flag. Credential-free Binance Spot, Dukascopy, and Yahoo compose automatically when enabled; every provider registers at `staging` readiness and reaches `production` only through `WF-DATA-011` promotion. |
+| Missing   | `DATA_LOCAL_SOURCES`                                                       | `tuple[str, ...]` | `("csv", "parquet")`                        | No          | `Data`    | Data source composition                                                              | Local artifact source identifiers Data composes from `DATA_RAW_ROOT`. Local sources require no credentials, no network, and no promotion evidence, so they register at `production` readiness directly                                                                     |
+| Missing   | `DATA_RAW_ROOT`                                                            | `Path`           | `data/raw`                                  | No          | `Data`    | Data local sources, dataset import                                                   | Root for local market-data artifacts, resolved under `APPROVED_STORAGE_ROOTS`. Artifacts are named `{symbol}[_{timeframe}].{csv\|parquet}`                                                                                                                                 |
 | Completed | UTC-first time policy                                                        | policy             | `Z`-suffixed ISO 8601                       | Yes         | `Utils`   | All domains                                                                          | Cross-domain timestamps must be UTC; violations are validation errors                                                                                                                              |
 | Completed | Correlation/trace ID format                                                  | policy             | prefixed UUID4                                | Yes         | `Utils`   | All domains                                                                          | Cross-domain calls and audit events carry request, correlation, and causation identifiers                                                                                                          |
 | Completed | Decimal precision standard                                                   | policy             | precision ≥ 28; domain-specific quantization | Yes         | `Utils`   | Data, Risk, Trading, Simulation, Analytics                                           | Broker-critical price, size, and balance math uses`decimal.Decimal`                                                                                                                              |
@@ -945,7 +969,7 @@ Rules:
 
 ---
 
-> **Provisional roadmap requirements (`P-*`).** The `P-SYS-*` rows above and the `P-<domain>-*` rows in each domain README were introduced by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) as provisional IDs and are hereby promoted to authoritative requirements. `P-SYS-*` are system-level; each `P-<domain>-*` authorizes establishment of the same-named package seam in its owning domain. See `docs/CHANGELOG.md` → Decisions (2026-07-16).
+> **Provisional roadmap requirements (`P-*`).** The `P-SYS-*` rows above and the `P-<domain>-*` rows in each domain README were introduced by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) as provisional IDs and are hereby promoted to authoritative requirements. `P-SYS-*` are system-level; each `P-<domain>-*` authorizes establishment of the same-named package seam in its owning domain. Its release-visible effect may be summarized under `Changed` in the corresponding historical release block in `docs/CHANGELOG.md`.
 
 ## 8. External Systems
 
@@ -1047,9 +1071,10 @@ Detailed verification content: `Missing` (implementation has not begun).
 `Open Decisions` sections in this specification and domain/module READMEs are reserved
 exclusively for unresolved owner choices. After a decision is made, remove the subject
 from the section, express the outcome as an ordinary authoritative requirement,
-contract, workflow, configuration rule, boundary, or explicit exclusion, and record
-the resolution under `Decisions` in `docs/CHANGELOG.md`. Do not create ADR, NDR, or
-other standalone decision-record documents.
+contract, workflow, configuration rule, boundary, or explicit exclusion. The
+changelog is not a decision ledger; only a release-visible effect may be summarized
+under `Changed` during release aggregation. Do not create ADR, NDR, or other
+standalone decision-record documents.
 
 No open decisions.
 
@@ -1079,8 +1104,7 @@ The system is complete only when:
 - [ ] All tests and quality checks pass.
 
 Current status: `Missing` — the complete target system and system workflows are not
-implemented. Utils and Brokers are completed implementation baselines; Data is
-`Partial` pending `CAP-DATA-023` series-level quality inspection; Indicators and the
+implemented. Utils, Brokers, and Data are completed implementation baselines; Indicators and the
 remaining domains are tracked independently, and current repository-wide
 documentation-quality cleanup does not erase completed functional domain evidence.
 

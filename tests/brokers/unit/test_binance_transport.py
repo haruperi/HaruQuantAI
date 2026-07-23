@@ -3,6 +3,7 @@
 import asyncio
 import sys
 import types
+from dataclasses import replace
 from typing import ClassVar
 
 import pytest
@@ -80,6 +81,27 @@ def test_transport_connect_creates_client_with_resolved_credentials(
     assert _FakeClient.created_kwargs["api_key"] == "test-key"
     assert _FakeClient.created_kwargs["api_secret"] == "test-secret"
     assert _FakeClient.created_kwargs["testnet"] is True
+
+
+def test_transport_connects_anonymous_live_public_client(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Public Spot reads create a live client without credential material."""
+    _install_fake_sdk(monkeypatch)
+    config = replace(
+        _config(),
+        environment=BrokerEnvironment.LIVE,
+        credentials=None,
+    )
+
+    result = asyncio.run(_BinanceTransport(config).connect())
+
+    assert result is True
+    assert _FakeClient.created_kwargs == {
+        "api_key": None,
+        "api_secret": None,
+        "testnet": False,
+    }
 
 
 def test_transport_call_requires_connected_client(

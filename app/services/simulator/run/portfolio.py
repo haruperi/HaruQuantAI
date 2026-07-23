@@ -360,7 +360,9 @@ def run_portfolio_backtest(
     writer.finalize()
     _write_completed_text(
         result_path,
-        canonical_json(result.model_dump(mode="python", warnings=False)),
+        canonical_json(
+            result.model_dump(mode="python", warnings=False), max_items=None
+        ),
     )
     _write_completed_text(
         report_path,
@@ -388,7 +390,9 @@ def run_portfolio_backtest(
     )
     _write_completed_text(
         run_root / "manifest.json",
-        canonical_json(manifest.model_dump(mode="python", warnings=False)),
+        canonical_json(
+            manifest.model_dump(mode="python", warnings=False), max_items=None
+        ),
     )
     return result
 

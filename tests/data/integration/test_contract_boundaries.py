@@ -3,7 +3,12 @@
 from decimal import Decimal
 
 from app.services.data import __all__ as data_public_api
-from app.services.data.contracts import AccountStateSnapshot, AuditEventPage
+from app.services.data.audit.contracts import (
+    AuditEventPage,
+)
+from app.services.data.evidence.account_contracts import (
+    AccountStateSnapshot,
+)
 from app.utils import AuditEvent
 
 from tests.data.helpers import END, START, make_audit_event
@@ -31,7 +36,7 @@ def test_data_contracts_exclude_provider_runtime_types() -> None:
     assert snapshot.account_id == "acct-1"
     assert "BrokerAdapter" not in field_types
     assert "Provider" not in field_types
-    assert len(data_public_api) == 27
+    assert len(data_public_api) == 35
     assert "get_market_data" in data_public_api
     assert "to_ohlcv_dataframe" in data_public_api
     assert "to_tick_dataframe" in data_public_api

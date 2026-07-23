@@ -44,28 +44,40 @@ def _get_dataset() -> MarketDataset:
     return dataset
 
 
-try:
-    data = _get_dataset()
-except DataError as error:
-    print(f"Skipping candle examples: MT5 data unavailable ({error.code})")
-    sys.exit(3)
+def main() -> None:
+    """Run the candlestick-pattern feature usage examples.
 
-_header("Example 1: Identify Doji candlesticks")
-result_doji = doji(data, threshold=0.1)
-print(f"Doji values: {result_doji.values['doji'].tolist()}")
-print(f"Output columns: {result_doji.output_columns}")
+    Demonstrates ``FR-INDI-031`` through ``FR-INDI-034`` end-to-end against
+    real market data using only documented public exports. Exits with status
+    ``3`` when the live market-data source is unavailable, which the
+    integration runner treats as a skip rather than a failure.
+    """
+    try:
+        data = _get_dataset()
+    except DataError as unavailable:
+        print(f"Skipping candle examples: MT5 data unavailable ({unavailable.code})")
+        sys.exit(3)
 
-_header("Example 2: Identify Engulfing candlesticks")
-result_engulfing = engulfing(data)
-print(f"Engulfing values: {result_engulfing.values['engulfing'].tolist()}")
-print(f"Output columns: {result_engulfing.output_columns}")
+    _header("Example 1: Identify Doji candlesticks")
+    result_doji = doji(data, threshold=0.1)
+    print(f"Doji values: {result_doji.values['doji'].tolist()}")
+    print(f"Output columns: {result_doji.output_columns}")
 
-_header("Example 3: Identify Pinbar candlesticks")
-result_pinbar = pinbar(data)
-print(f"Pinbar values: {result_pinbar.values['pinbar'].tolist()}")
-print(f"Output columns: {result_pinbar.output_columns}")
+    _header("Example 2: Identify Engulfing candlesticks")
+    result_engulfing = engulfing(data)
+    print(f"Engulfing values: {result_engulfing.values['engulfing'].tolist()}")
+    print(f"Output columns: {result_engulfing.output_columns}")
 
-_header("Example 4: Identify Inside Bar candlesticks")
-result_inside = inside_bar(data)
-print(f"Inside Bar values: {result_inside.values['inside_bar'].tolist()}")
-print(f"Output columns: {result_inside.output_columns}")
+    _header("Example 3: Identify Pinbar candlesticks")
+    result_pinbar = pinbar(data)
+    print(f"Pinbar values: {result_pinbar.values['pinbar'].tolist()}")
+    print(f"Output columns: {result_pinbar.output_columns}")
+
+    _header("Example 4: Identify Inside Bar candlesticks")
+    result_inside = inside_bar(data)
+    print(f"Inside Bar values: {result_inside.values['inside_bar'].tolist()}")
+    print(f"Output columns: {result_inside.output_columns}")
+
+
+if __name__ == "__main__":
+    main()

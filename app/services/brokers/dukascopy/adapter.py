@@ -2,7 +2,7 @@
 
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
-from typing import override
+from typing import Protocol, override
 
 from app.services.brokers.contracts import (
     BrokerBar,
@@ -18,23 +18,52 @@ from app.services.brokers.contracts import (
     BrokerTick,
 )
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
+from app.services.brokers.dukascopy.candle_mapping import _map_candles
+from app.services.brokers.dukascopy.candle_transport import (
+    _CandleBatch,
+    _DukascopyCandleTransport,
+)
 from app.services.brokers.dukascopy.instruments import (
     _INSTRUMENT_PRICE_DIVISORS,
     _price_divisor,
 )
-from app.services.brokers.dukascopy.mapping import _aggregate_bars, _map_ticks
+from app.services.brokers.dukascopy.mapping import _map_ticks
 from app.services.brokers.dukascopy.transport import _DukascopyTransport
 
 
+class _TickTransport(Protocol):
+    """Structural transport required for Dukascopy tick reads."""
+
+    async def get_hour(self, symbol: str, hour: datetime) -> bytes:
+        """Return one decompressed BI5 hour payload."""
+        ...
+
+
+class _CandleTransport(Protocol):
+    """Structural transport required for Dukascopy candle reads."""
+
+    async def get_candles(
+        self,
+        symbol: str,
+        timeframe: str,
+        start: datetime,
+        end: datetime,
+        limit: int,
+    ) -> _CandleBatch:
+        """Return one bounded raw candle batch."""
+        ...
+
+
 class DukascopyBrokerAdapter(_UnsupportedAdapterBase):
-    """Bounded genuine Dukascopy tick adapter for sandbox research."""
+    """Bounded genuine Dukascopy market-data adapter for sandbox research."""
 
     def __init__(
         self,
         config: BrokerConnectionConfig,
         capabilities: Mapping[BrokerCapabilityId, BrokerCapability],
         *,
-        transport: _DukascopyTransport | None = None,
+        transport: _TickTransport | None = None,
+        candle_transport: _CandleTransport | None = None,
     ) -> None:
         """Initialize the DukascopyBrokerAdapter instance.
 
@@ -42,6 +71,7 @@ class DukascopyBrokerAdapter(_UnsupportedAdapterBase):
             config: Value supplied to the operation.
             capabilities: Value supplied to the operation.
             transport: Value supplied to the operation.
+            candle_transport: Optional web-chart candle transport.
 
         Raises:
             ValueError: If the documented operation cannot complete.
@@ -51,7 +81,12 @@ class DukascopyBrokerAdapter(_UnsupportedAdapterBase):
         if config.credentials or config.account_reference or config.endpoint:
             raise ValueError("Dukascopy accepts no credentials, account, or endpoint")
         super().__init__(config, capabilities)
-        self._transport = transport or _DukascopyTransport(config)
+        self._transport = transport or _DukascopyTransport(
+            config, self._record_provider_latency
+        )
+        self._candle_transport = candle_transport or _DukascopyCandleTransport(
+            config, self._record_provider_latency
+        )
 
     @override
     async def connect(self) -> BrokerResult[None]:
@@ -62,7 +97,8 @@ class DukascopyBrokerAdapter(_UnsupportedAdapterBase):
         """
         await self._transition(BrokerConnectionState.CONNECTING)
         try:
-            await self._transport.get_hour("EURUSD", datetime.now(UTC))
+            probe_hour = datetime.now(UTC) - timedelta(hours=4)
+            await self._transport.get_hour("EURUSD", probe_hour)
         except (OSError, TimeoutError, ValueError, ConnectionError) as error:
             await self._transition(
                 BrokerConnectionState.FAILED, reason=type(error).__name__
@@ -79,7 +115,8 @@ class DukascopyBrokerAdapter(_UnsupportedAdapterBase):
         Returns:
             Canonical current connectivity evidence.
         """
-        await self._transport.get_hour("EURUSD", datetime.now(UTC))
+        probe_hour = datetime.now(UTC) - timedelta(hours=4)
+        await self._transport.get_hour("EURUSD", probe_hour)
         return self._result(BrokerCapabilityId.IS_CONNECTED, data=True)
 
     async def ping(self) -> BrokerResult[None]:
@@ -89,8 +126,9 @@ class DukascopyBrokerAdapter(_UnsupportedAdapterBase):
             Canonical provider-health result.
         """
         try:
-            await self._transport.get_hour("EURUSD", datetime.now(UTC))
-        except (OSError, TimeoutError, ValueError, ConnectionError):
+            probe_hour = datetime.now(UTC) - timedelta(hours=4)
+            await self._transport.get_hour("EURUSD", probe_hour)
+        except OSError, TimeoutError, ValueError, ConnectionError:
             return self._unsupported(BrokerCapabilityId.PING)
         return self._result(BrokerCapabilityId.PING)
 
@@ -183,10 +221,10 @@ class DukascopyBrokerAdapter(_UnsupportedAdapterBase):
         cursor: str | None = None,
         limit: int | None = None,
     ) -> BrokerResult[BrokerPage[BrokerBar]]:
-        """Return bounded local bars aggregated from genuine quote ticks.
+        """Return bounded provider BID candles from Dukascopy's web chart.
 
         Returns:
-            Canonical midpoint-bar page with explicit tick provenance.
+            Canonical BID candle page with explicit provider provenance.
 
         Raises:
             ValueError: If range, cursor, timeframe, or limit is invalid.
@@ -207,43 +245,33 @@ class DukascopyBrokerAdapter(_UnsupportedAdapterBase):
             raise ValueError("positive Dukascopy bar limit is required")
         normalized_start = start.astimezone(UTC)
         normalized_end = end.astimezone(UTC)
-        hour = normalized_start.replace(minute=0, second=0, microsecond=0)
-        terminal_hour = (normalized_end - timedelta(microseconds=1)).replace(
-            minute=0, second=0, microsecond=0
+        batch = await self._candle_transport.get_candles(
+            symbol,
+            timeframe,
+            normalized_start,
+            normalized_end,
+            limit,
         )
-        hour_count = int((terminal_hour - hour).total_seconds() // 3600) + 1
-        if hour_count > limit:
-            raise ValueError("Dukascopy hour-file fan-out exceeds caller limit")
-        ticks: list[BrokerTick] = []
-        for offset in range(hour_count):
-            current = hour + timedelta(hours=offset)
-            payload = await self._transport.get_hour(symbol, current)
-            ticks.extend(
-                _map_ticks(
-                    payload,
-                    symbol=symbol,
-                    hour=current,
-                    price_divisor=_price_divisor(symbol),
-                    limit=max(1, len(payload) // 20),
-                )
-            )
-        bars = _aggregate_bars(
-            tuple(ticks),
+        bars = _map_candles(
+            batch.rows,
             symbol=symbol,
             timeframe=timeframe,
             start=normalized_start,
             end=normalized_end,
         )
-        bounded_limit = limit
         return self._result(
             BrokerCapabilityId.GET_HISTORICAL_BARS,
             data=BrokerPage(
-                items=bars[:bounded_limit],
-                limit=bounded_limit,
-                truncated=len(bars) > bounded_limit,
+                items=bars,
+                limit=limit,
+                truncated=batch.truncated,
                 provider_metadata={
                     "provider": "dukascopy",
-                    "derivation": "quote_midpoint_tick_aggregation",
+                    "endpoint": "web_chart_json3",
+                    "provider_symbol": batch.provider_symbol,
+                    "provider_interval": batch.provider_interval,
+                    "offer_side": "BID",
+                    "page_count": batch.page_count,
                     "research_only": True,
                 },
             ),

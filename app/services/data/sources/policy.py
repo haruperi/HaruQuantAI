@@ -7,22 +7,26 @@ import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, cast
 
-from app.services.data.contracts import StatementPlan, TransactionRequest
-from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.sources import (
+from app.services.data.contracts import DataError
+from app.services.data.persistence.contracts import (
+    StatementPlan,
+    TransactionRequest,
+)
+from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourcePlan,
     SourcePromotionRequest,
 )
+from app.services.data.sources.licensing import enforce_license
 from app.services.data.sources.registry import (
     get_source_descriptor,
     update_source_descriptor_readiness,
 )
-from app.services.data.storage.database import execute_transaction
 from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts.market import MarketDataRequest
+    from app.services.data.market_data.requests import MarketDataRequest
     from app.utils import AuthContext
 
 type AttemptStatus = Literal["SUCCESS", "FAILURE", "BLOCKED"]
@@ -243,12 +247,9 @@ def _validate_descriptor(
             safe_details={"source_id": descriptor.source_id},
             request_id=request.request_id,
         )
-    if request.workflow_context not in descriptor.license_policy.permitted_workflows:
-        raise DataError(
-            "LICENSE_RESTRICTION",
-            safe_details={"source_id": descriptor.source_id},
-            request_id=request.request_id,
-        )
+    # Licence enforcement moved to `security/licensing.py` in Phase 9 so the rule has
+    # one owner. The condition and the raised code are unchanged.
+    enforce_license(descriptor, request.workflow_context, request.request_id)
 
 
 def _persisted_descriptor(

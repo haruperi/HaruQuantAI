@@ -1,19 +1,19 @@
 """Integration test for allocation review and Risk-budget activation."""
 
+from app.services.risk.allocation import (
+    activate_allocation_budget,
+    review_allocation_proposal,
+)
 from app.services.risk.audit import RiskAuditChain
 from app.services.risk.contracts import (
     AllocationBudgetActivationRequest,
     DecisionState,
     KillSwitchState,
 )
-from app.services.risk.policy import (
-    activate_allocation_budget,
-    review_allocation_proposal,
-)
 from app.utils import canonical_json
 
+from tests.risk import _support as examples
 from tests.risk.integration.test_strategy_admission import _AuditStore
-from tests.risk.usage import test_usage_policy as examples
 
 
 def test_allocation_review_and_activation_end_to_end() -> None:

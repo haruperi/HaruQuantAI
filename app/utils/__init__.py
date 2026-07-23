@@ -32,7 +32,7 @@ from app.utils.security import (
     redact_mapping_value,
     redact_text_value,
 )
-from app.utils.serialization import canonical_json, to_json_safe
+from app.utils.serialization import canonical_digest, canonical_json, to_json_safe
 from app.utils.settings import (
     AppSettings,
     LoggingSettings,
@@ -70,6 +70,7 @@ __all__ = (
     "SystemClock",
     "ValidationError",
     "age_seconds",
+    "canonical_digest",
     "canonical_json",
     "configure_logging",
     "derive_stable_id",

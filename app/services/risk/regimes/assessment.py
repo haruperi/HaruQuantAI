@@ -18,7 +18,9 @@ from app.services.risk.contracts import (
 from app.utils import canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketContextEvidence
+    from app.services.data.evidence.market_context_contracts import (
+        MarketContextEvidence,
+    )
 
 _State = Literal["normal", "elevated", "high", "unknown"]
 _DIMENSIONS = (

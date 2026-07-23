@@ -4,7 +4,13 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import MarketContextEvidence
+from app.services.data.evidence.market_context_contracts import (
+    MarketContextEvidence,
+)
+from app.services.risk.allocation import (
+    activate_allocation_budget,
+    review_allocation_proposal,
+)
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
     AllocationBudgetActivationRequest,
@@ -16,13 +22,9 @@ from app.services.risk.contracts import (
     RiskAuditRecord,
     RiskDomainError,
 )
-from app.services.risk.policy import (
-    activate_allocation_budget,
-    review_allocation_proposal,
-)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
-MARKET_REQUEST_ID = "req-" + "c" * 64
+MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 
 
 class _AllocationStore:

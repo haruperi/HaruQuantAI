@@ -17,7 +17,7 @@ from tests.simulator.unit.test_orchestrator import (
 def test_failed_data_quality_prevents_result_publication(tmp_path: Path) -> None:
     """Stop before engine output when Data quality status is failed."""
     logger.info("Testing WF-SIM-004 market-data quality gate")
-    original = _dataset(f"req-{'e' * 64}")
+    original = _dataset("req-eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")
     failed_quality = original.quality_report.model_copy(
         update={"quality_status": "failed"}
     )

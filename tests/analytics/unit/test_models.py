@@ -293,6 +293,7 @@ def test_portfolio_report_requires_fx_lineage() -> None:
     logger.debug("Testing Analytics portfolio FX lineage requirement")
     with pytest.raises((TypeError, PydanticValidationError)):
         PortfolioPerformanceReport(
+            contract_version="v1",
             schema_id="analytics.portfolio_performance_report.v1",
             report_id="portfolio-report-1",
             component_report_ids=("report-1",),

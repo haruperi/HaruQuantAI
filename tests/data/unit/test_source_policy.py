@@ -7,9 +7,9 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-from app.services.data.contracts import MarketDataRequest
-from app.services.data.contracts.errors import DataError
-from app.services.data.contracts.sources import (
+from app.services.data.contracts import DataError
+from app.services.data.market_data.requests import MarketDataRequest
+from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourceLicensePolicy,
     SourcePromotionRequest,
@@ -41,7 +41,7 @@ def _configure_database(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1.0")
     monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "30")
-    from app.services.data.storage.migrations import run_data_migrations
+    from app.services.data.persistence.migrations import run_data_migrations
 
     run_data_migrations(generate_id("req"))
 
@@ -129,7 +129,7 @@ def test_evaluate_source_policy_success() -> None:
         end=END,
         limit=100,
         use_cache=False,
-        quality_failure_behavior="fail",
+        quality_failure_behavior="reject",
         workflow_context="research",
         precision_policy="float_research_only",
         request_id="req-9456bdfa12ea76959c94a3572f5d91c73d838622df0a8d9b4e815c276c6b7880",
@@ -151,7 +151,7 @@ def test_evaluate_source_policy_unregistered() -> None:
         end=END,
         limit=100,
         use_cache=False,
-        quality_failure_behavior="fail",
+        quality_failure_behavior="reject",
         workflow_context="research",
         precision_policy="float_research_only",
         request_id="req-a697f8b99a46c8465b9a70e7af44e49a7665cf1ce8e62c3b42678f1c26b21814",
@@ -176,7 +176,7 @@ def test_evaluate_source_policy_capability_mismatch() -> None:
         end=END,
         limit=100,
         use_cache=False,
-        quality_failure_behavior="fail",
+        quality_failure_behavior="reject",
         workflow_context="research",
         precision_policy="float_research_only",
         request_id="req-bc0e142195cb27a6127a29283e0ccdfb3a51449da848f04abee1c1526184084e",
@@ -201,7 +201,7 @@ def test_evaluate_source_policy_license_restriction() -> None:
         end=END,
         limit=100,
         use_cache=False,
-        quality_failure_behavior="fail",
+        quality_failure_behavior="reject",
         workflow_context="backtest",  # Not permitted
         precision_policy="decimal_string",  # Valid for backtest context
         request_id="req-d9c2b1bc8ab6d4617766f0c4dbee6bbbc164c63262325a31ed7b8c8bb2d90bca",
@@ -237,7 +237,7 @@ def test_evaluate_source_policy_circuit_breaking() -> None:
         end=END,
         limit=100,
         use_cache=False,
-        quality_failure_behavior="fail",
+        quality_failure_behavior="reject",
         workflow_context="research",
         precision_policy="float_research_only",
         request_id="req-749e7e1c63a152e701f9ae4d52d9dc8fe7b50df12c9f54b06e7a9f8ff3550414",
@@ -266,14 +266,15 @@ def test_evaluate_source_policy_rate_limits(monkeypatch: pytest.MonkeyPatch) -> 
         end=END,
         limit=100,
         use_cache=False,
-        quality_failure_behavior="fail",
+        quality_failure_behavior="reject",
         workflow_context="research",
         precision_policy="float_research_only",
         request_id="req-eb1bae3d11ff7b713a6bcf6bc16a5bf7fb51efa405d42d0caa8bf5dcda7c090b",
     )
 
-    plan = evaluate_source_policy(req)
-    assert plan.source_id == "src-1"
+    with pytest.raises(DataError) as captured:
+        evaluate_source_policy(req)
+    assert captured.value.code == "POLICY_BLOCKED"
 
 
 def test_promote_source_unauthorized() -> None:
@@ -383,7 +384,7 @@ def test_promoted_readiness_survives_registry_restart() -> None:
             end=END,
             limit=10,
             use_cache=False,
-            quality_failure_behavior="fail",
+            quality_failure_behavior="reject",
             workflow_context="research",
             precision_policy="decimal_string",
             request_id=generate_id("req"),

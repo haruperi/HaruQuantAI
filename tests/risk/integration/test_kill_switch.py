@@ -3,12 +3,12 @@
 from typing import TYPE_CHECKING, cast
 
 from app.services.risk.contracts import DecisionState, KillSwitchCommand
-from app.services.risk.decisions import (
+from app.services.risk.kill_switch import (
     apply_kill_switch_command,
     check_risk_kill_switch,
 )
 
-from tests.risk.usage import test_usage_decisions as examples
+from tests.risk import _support as examples
 
 if TYPE_CHECKING:
     from app.services.risk.audit import RiskAuditChain

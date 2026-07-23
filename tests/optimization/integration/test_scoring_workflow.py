@@ -11,7 +11,7 @@ from app.services.optimization.scoring import (
     rank_candidates,
 )
 from app.utils import logger
-from tests.analytics.usage.test_usage_reports import _report
+from tests.analytics._support import _report
 
 
 def test_scoring_workflow_preserves_metric_and_trial_evidence() -> None:

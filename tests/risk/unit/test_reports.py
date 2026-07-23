@@ -6,8 +6,8 @@ from app.services.risk.contracts import DecisionState, ScenarioDefinition
 from app.services.risk.reporting import generate_risk_report
 from app.services.risk.scenarios import run_risk_scenario_analysis
 
-from tests.risk.usage import test_usage_decisions as decision_examples
-from tests.risk.usage import test_usage_policy as policy_examples
+from tests.risk import _support as decision_examples
+from tests.risk import _support as policy_examples
 
 
 def test_report_has_no_false_approval_claim() -> None:
