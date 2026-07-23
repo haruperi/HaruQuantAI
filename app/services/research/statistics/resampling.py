@@ -8,8 +8,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from numpy.typing import NDArray
 
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 if TYPE_CHECKING:
     from app.services.research.contracts import StatisticalConfig

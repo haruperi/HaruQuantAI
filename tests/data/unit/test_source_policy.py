@@ -28,8 +28,7 @@ from app.services.data.sources.registry import (
     _reset_registry,
     register_source,
 )
-from app.utils import generate_id
-from app.utils.contracts.auth import AuthContext
+from app.utils import AuthContext, generate_id
 
 # Base timestamps
 START = datetime.now(UTC)

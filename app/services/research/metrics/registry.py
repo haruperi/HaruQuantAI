@@ -9,8 +9,7 @@ from typing import Protocol, runtime_checkable
 import numpy as np
 import pandas as pd
 
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 _FAMILIES = (
     "returns",

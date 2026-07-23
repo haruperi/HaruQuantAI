@@ -5,8 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 if TYPE_CHECKING:
     from app.services.research.contracts import EdgeResult

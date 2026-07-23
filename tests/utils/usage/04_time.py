@@ -21,21 +21,21 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def example_utc_now() -> None:
-    """Read and display the real current instant through the shared UTC clock."""
+def fr_utils_010_utc_now() -> None:
+    """FR-UTL-010: read and display the real current instant through UTC clock."""
     _header("Example 1: UTC Now")
     print("UTC instant:", utc_now())
 
 
-def example_parse_format_timestamp() -> None:
-    """Round-trip a canonical UTC timestamp."""
+def fr_utils_011_parse_format_timestamp() -> None:
+    """FR-UTL-011: Round-trip a canonical UTC timestamp."""
     _header("Example 2: Parse Format Timestamp")
     value = datetime(2026, 1, 1, tzinfo=UTC)
     print("Timestamp:", parse_utc_timestamp(format_utc_timestamp(value)))
 
 
-def example_age_and_freshness() -> None:
-    """Calculate exact age and inclusive freshness."""
+def fr_utils_012_age_and_freshness() -> None:
+    """FR-UTL-012: Calculate exact age and inclusive freshness."""
     _header("Example 3: Age and Freshness")
     reference = datetime(2026, 1, 1, 0, 0, 2, tzinfo=UTC)
     observed = reference - timedelta(seconds=1)
@@ -54,9 +54,9 @@ def example_age_and_freshness() -> None:
 
 def main() -> None:
     """Run all UTC-time examples."""
-    example_utc_now()
-    example_parse_format_timestamp()
-    example_age_and_freshness()
+    fr_utils_010_utc_now()
+    fr_utils_011_parse_format_timestamp()
+    fr_utils_012_age_and_freshness()
 
 
 if __name__ == "__main__":

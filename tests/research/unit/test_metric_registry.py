@@ -10,8 +10,7 @@ from app.services.research.metrics import (
     build_default_registry,
 )
 from app.services.research.metrics.registry import MetricContext, MetricValue
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 
 @dataclass(frozen=True)

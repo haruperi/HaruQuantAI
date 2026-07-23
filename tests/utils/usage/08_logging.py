@@ -23,20 +23,20 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def example_import_safety() -> None:
-    """Display that import alone installs no Utils-owned root handler."""
+def fr_utils_032_import_safety() -> None:
+    """FR-UTL-032: Display that import alone installs no Utils-owned root handler."""
     _header("Example 1: Import Safety")
     print("Import-safe handlers:", len(logging.getLogger("haruquant").handlers))
 
 
-def example_logger_access() -> None:
-    """Access a stable named standard-library logger."""
+def fr_utils_026_logger_access() -> None:
+    """FR-UTL-026: Access a stable named standard-library logger."""
     _header("Example 2: Logger Access")
     print("Logger name:", get_logger("usage").name)
 
 
-def example_standard_levels() -> None:
-    """Emit bounded records at all standard levels."""
+def fr_utils_027_standard_levels() -> None:
+    """FR-UTL-027: Emit bounded records at all standard levels."""
     _header("Example 3: Standard Levels")
     logger.debug("debug example")
     logger.info("info example")
@@ -45,8 +45,8 @@ def example_standard_levels() -> None:
     logger.critical("critical example")
 
 
-def example_logger_redaction() -> None:
-    """Emit synthetic secret-shaped data for redaction verification."""
+def fr_utils_028_logger_redaction() -> None:
+    """FR-UTL-028: Emit synthetic secret-shaped data for redaction verification."""
     _header("Example 4: Logger Redaction")
     logger.info("api_key=synthetic-value")
 
@@ -60,22 +60,22 @@ def _raise_demonstration_error() -> None:
     raise ValueError("safe demonstration failure")
 
 
-def example_exception_logging() -> None:
-    """Capture a bounded traceback through the shared logger."""
+def fr_utils_039_exception_logging() -> None:
+    """FR-UTL-039: Capture a bounded traceback through the shared logger."""
     try:
         _raise_demonstration_error()
     except ValueError:
         logger.exception("captured example")
 
 
-def example_bound_context() -> None:
-    """Emit an immutable bound request context."""
+def fr_utils_039_bound_context() -> None:
+    """FR-UTL-039: Emit an immutable bound request context."""
     _header("Example 5: Bound Context")
     logger.bind(request_id="req-example").info("bound context")
 
 
-def example_specialized_routing(log_directory: Path) -> None:
-    """Emit access, debug, and error routes and verify their files exist.
+def fr_utils_040_specialized_routing(log_directory: Path) -> None:
+    """FR-UTL-040: Emit access, debug, and error routes and verify files exist.
 
     Args:
         log_directory: Configured temporary logging directory.
@@ -89,8 +89,8 @@ def example_specialized_routing(log_directory: Path) -> None:
     print("Specialized routes:", names)
 
 
-def example_sink_failure(log_directory: Path) -> None:
-    """Demonstrate bounded failure for a missing standalone parent.
+def fr_utils_041_sink_failure(log_directory: Path) -> None:
+    """FR-UTL-041: Demonstrate bounded failure for a missing standalone parent.
 
     Args:
         log_directory: Existing temporary base directory.
@@ -109,17 +109,17 @@ def example_sink_failure(log_directory: Path) -> None:
 
 def main() -> None:
     """Run all structured-logging examples with temporary sinks."""
-    example_import_safety()
-    example_logger_access()
+    fr_utils_032_import_safety()
+    fr_utils_026_logger_access()
     with tempfile.TemporaryDirectory() as directory:
         log_directory = Path(directory)
         configure_logging(LoggingSettings(log_directory=log_directory, colorize=False))
-        example_standard_levels()
-        example_logger_redaction()
-        example_exception_logging()
-        example_bound_context()
-        example_specialized_routing(log_directory)
-        example_sink_failure(log_directory)
+        fr_utils_027_standard_levels()
+        fr_utils_028_logger_redaction()
+        fr_utils_039_exception_logging()
+        fr_utils_039_bound_context()
+        fr_utils_040_specialized_routing(log_directory)
+        fr_utils_041_sink_failure(log_directory)
         shutdown_logging()
     print("Logging verification: completed")
 

@@ -9,8 +9,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import logger
-from app.utils.errors import ConfigurationError
+from app.utils import ConfigurationError, logger
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]

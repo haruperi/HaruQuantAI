@@ -8,8 +8,7 @@ from app.services.research.statistics import (
     block_bootstrap_distribution,
     permutation_test,
 )
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 
 def _config() -> StatisticalConfig:

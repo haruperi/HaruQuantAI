@@ -14,8 +14,7 @@ from app.services.research.contracts import (
     ResearchResourceLimits,
     ResearchWarning,
 )
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 _MIN_CONTINUITY_ROWS = 3
 

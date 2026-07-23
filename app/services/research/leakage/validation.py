@@ -8,8 +8,7 @@ from typing import cast
 import pandas as pd
 
 from app.services.research.contracts import LeakageReport
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]

@@ -2,8 +2,7 @@
 
 import pytest
 from app.services.research.statistics import benjamini_hochberg, holm_bonferroni
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 
 def test_bh_preserves_original_order() -> None:

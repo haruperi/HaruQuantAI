@@ -18,15 +18,15 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def example_construct_configuration() -> None:
-    """Construct immutable generic settings directly."""
+def fr_utils_022_construct_configuration() -> None:
+    """FR-UTL-022: Construct immutable generic settings directly."""
     _header("Example 1: Construct Configuration")
     settings = RuntimeSettings(logging=LoggingSettings(log_directory=None))
     print("Constructed settings:", settings.environment, settings.runtime_profile)
 
 
-def example_load_active_configuration() -> None:
-    """Load explicit values over a supplied environment mapping."""
+def fr_utils_023_load_active_configuration() -> None:
+    """FR-UTL-023: Load explicit values over a supplied environment mapping."""
     _header("Example 2: Load Active Configuration")
     settings = load_settings(
         {"ENVIRONMENT": "test"},
@@ -35,8 +35,8 @@ def example_load_active_configuration() -> None:
     print("Active settings:", settings.environment, settings.runtime_profile)
 
 
-def example_environment_constraints() -> None:
-    """Demonstrate exact environment-value validation."""
+def fr_utils_024_environment_constraints() -> None:
+    """FR-UTL-024: Demonstrate exact environment-value validation."""
     _header("Example 3: Environment Constraints")
     try:
         load_settings({"ENVIRONMENT": "invalid"}, {})
@@ -44,8 +44,8 @@ def example_environment_constraints() -> None:
         print("Environment constraint: invalid value rejected")
 
 
-def example_validate_settings() -> None:
-    """Demonstrate unknown-key rejection without mutation."""
+def fr_utils_024_validate_settings() -> None:
+    """FR-UTL-024: Demonstrate unknown-key rejection without mutation."""
     _header("Example 4: Validate Settings")
     source = {"UNKNOWN": "value"}
     try:
@@ -56,10 +56,10 @@ def example_validate_settings() -> None:
 
 def main() -> None:
     """Run all runtime-settings examples."""
-    example_construct_configuration()
-    example_load_active_configuration()
-    example_environment_constraints()
-    example_validate_settings()
+    fr_utils_022_construct_configuration()
+    fr_utils_023_load_active_configuration()
+    fr_utils_024_environment_constraints()
+    fr_utils_024_validate_settings()
 
 
 if __name__ == "__main__":

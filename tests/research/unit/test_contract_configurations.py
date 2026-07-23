@@ -17,8 +17,7 @@ from app.services.research.contracts import (
     StudyConfig,
     UnsupervisedResearchConfig,
 )
-from app.utils import logger
-from app.utils.errors import ConfigurationError
+from app.utils import ConfigurationError, logger
 
 
 def _limits() -> ResearchResourceLimits:

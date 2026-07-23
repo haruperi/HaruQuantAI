@@ -13,8 +13,7 @@ from app.services.research.features.calculations import (
     rolling_hurst,
     simple_returns,
 )
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 if TYPE_CHECKING:
     from app.services.indicators import IndicatorResult

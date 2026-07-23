@@ -13,8 +13,7 @@ from app.services.research.statistics import (
     session_randomized_null,
     shuffle_returns_null,
 )
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 
 def _config(block: int = 2) -> StatisticalConfig:

@@ -15,8 +15,8 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def example_auth_context() -> None:
-    """Construct and display bounded AuthContext identity evidence."""
+def fr_utils_001_auth_context() -> None:
+    """FR-UTL-001: Construct and display bounded AuthContext identity evidence."""
     _header("Example 1: AuthContext Construction")
     context = AuthContext(
         contract_version="v1",
@@ -35,8 +35,8 @@ def example_auth_context() -> None:
     print("AuthContext:", context.principal_type, context.tenant_or_environment)
 
 
-def example_audit_event() -> None:
-    """Construct and display redacted AuditEvent metadata."""
+def fr_utils_002_audit_event() -> None:
+    """FR-UTL-002: Construct and display redacted AuditEvent metadata."""
     _header("Example 2: AuditEvent Construction")
     payload = redact_mapping_value({"status": "accepted", "token": "demo"}).value
     assert isinstance(payload, dict)
@@ -54,8 +54,8 @@ def example_audit_event() -> None:
     print("AuditEvent:", event.domain, event.action, event.payload["token"])
 
 
-def example_contract_validation() -> None:
-    """Demonstrate fail-closed contract timestamp validation."""
+def fr_utils_003_contract_validation() -> None:
+    """FR-UTL-003: Demonstrate fail-closed contract timestamp validation."""
     _header("Example 3: Contract Validation")
     try:
         AuthContext(
@@ -78,9 +78,9 @@ def example_contract_validation() -> None:
 
 def main() -> None:
     """Run all shared-contract examples."""
-    example_auth_context()
-    example_audit_event()
-    example_contract_validation()
+    fr_utils_001_auth_context()
+    fr_utils_002_audit_event()
+    fr_utils_003_contract_validation()
 
 
 if __name__ == "__main__":

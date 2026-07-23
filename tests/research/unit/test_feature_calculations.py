@@ -12,8 +12,7 @@ from app.services.research.features import (
     rolling_hurst,
     simple_returns,
 )
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 
 def _prices(count: int = 40) -> pd.Series:

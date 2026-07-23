@@ -14,8 +14,7 @@ from app.services.research.statistics import (
     null_distribution_stats,
     random_entry_null,
 )
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 if TYPE_CHECKING:
     from app.services.research.contracts import (

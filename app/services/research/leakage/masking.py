@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
-from app.utils import is_sensitive_key, logger
-from app.utils.errors import SecurityError
+from app.utils import SecurityError, is_sensitive_key, logger
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]

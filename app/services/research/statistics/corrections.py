@@ -7,8 +7,7 @@ from collections.abc import Sequence
 import numpy as np
 from numpy.typing import NDArray
 
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 
 def _p_values(values: Sequence[float], level: float) -> NDArray[np.float64]:

@@ -7,8 +7,7 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 _MIN_HURST_SAMPLES = 20
 _MAX_HURST_LAG = 20

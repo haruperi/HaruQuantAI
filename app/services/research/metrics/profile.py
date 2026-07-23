@@ -6,8 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from app.services.research.contracts import CoreMetricProfile, ResearchWarning
 from app.services.research.metrics.registry import MetricContext
-from app.utils import logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, logger
 
 if TYPE_CHECKING:
     from app.services.research.contracts import PreparedDataset, ResearchResourceLimits

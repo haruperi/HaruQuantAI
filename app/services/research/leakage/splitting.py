@@ -8,8 +8,7 @@ from datetime import UTC
 import pandas as pd
 
 from app.services.research.contracts import TimeSplitResult
-from app.utils import canonical_json, logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, canonical_json, logger
 
 _MIN_PARTITION_ROWS = 1
 

@@ -21,8 +21,7 @@ from app.services.research.contracts import (
     TimeSplitResult,
     UnsupervisedResearchResult,
 )
-from app.utils import logger
-from app.utils.errors import SecurityError, ValidationError
+from app.utils import SecurityError, ValidationError, logger
 
 _HASH = "a" * 64
 

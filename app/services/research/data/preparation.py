@@ -19,8 +19,7 @@ from app.services.research.contracts import (
     ResearchWarning,
 )
 from app.services.research.data.validation import validate_dataset
-from app.utils import canonical_digest, canonical_json, logger
-from app.utils.errors import ValidationError
+from app.utils import ValidationError, canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.data.contracts import MarketDataset
