@@ -3,7 +3,7 @@
 > **Specification location:** `app/services/api/README.md`
 > **Logical runtime packages:** FastAPI gateway at `app/services/api` plus Next.js frontend at `ui/` (per the `docs/PROJECT.md` registry), with canonical ASGI target `app.services.api.main:app`; Next.js frontend at `ui/`
 > **Status:** `Missing`
-> **Last updated:** `2026-07-13`
+> **Last updated:** `2026-07-23`
 
 > This README is the UI/API domain's **single source of truth** for final requirements,
 > structure, implementation sequence, workflows, public symbols, boundary contracts,
@@ -58,6 +58,9 @@ required dependency cannot be verified.
   metric-label hygiene, bounded snapshots, and the protected Prometheus exposition
   surface. UI/API computes no business, performance, or risk metric, and telemetry is
   never an input to a governed decision.
+- Channel-neutral critical operational alert construction and one-attempt delivery for
+  exactly Risk kill-switch activation and Trading retry-locked unknown broker state,
+  after their authoritative state/evidence exists.
 
 ### Does not own
 
@@ -74,6 +77,9 @@ required dependency cannot be verified.
   performance pages, a public health event stream, or a second operator FastAPI app.
 - Raw strategy/SQX import, export, parsing, scoring, or artifact lifecycle; and
   documentation browsing, management, mutation, or file persistence in the initial build.
+- A Notification domain, provider-specific desktop/email/SMS/chat delivery adapters,
+  generic notifications, automatic alert retries, acknowledgements, escalation policy,
+  or alert authority over Risk/Trading state.
 
 ### Shared contracts
 
@@ -90,6 +96,8 @@ Contract names, versions, and owners must match `docs/PROJECT.md`.
 | Missing | `RouteContract` | `v1` | Backend and frontend | Method/path/auth/schema/side-effect/owner/stability contract used for drift tests. |
 | Missing | `GovernedRequestContext` | `v1` | Browser and gateway | Request, workflow, permission, approval, audit, and idempotency context for governed writes. |
 | Missing | `PageContext` | `v1` | Frontend workflows | Bounded, redacted route and action context. |
+| Missing | `CriticalOperationalAlert` | `v1` | Injected channel-neutral delivery sink | Deterministic bounded critical alert for one of the two approved authoritative triggers. |
+| Missing | `CriticalAlertDeliveryResult` | `v1` | Composition/operations | Structured one-attempt delivery evidence whose failure never changes source truth. |
 
 **Consumed from other domains** — referenced, never redefined:
 
@@ -151,6 +159,7 @@ flowchart TD
     API --> MW[middleware]
     API --> HEALTH[health]
     API --> STREAMS[streams]
+    API --> ALERTS[alerts]
     API --> ROUTES[routes]
     API --> COMPOSITION[composition]
     UI --> CLIENTS[clients]
@@ -187,6 +196,7 @@ contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
 | Missing | `FEAT-API-10` Frontend Session and Page Context | `ui/context/` | Planned exact declarations: Section 4.10 | Section 4.10 functional requirements | Missing |
 | Missing | `FEAT-API-11` Workflow Presentation Components | `ui/components/` | Planned exact declarations: Section 4.11 | Section 4.11 functional requirements | Missing |
 | Missing | `FEAT-API-12` Protected Workflow Pages | `ui/app/` | Planned exact declarations: Section 4.12 | Section 4.12 functional requirements | Missing |
+| Missing | `FEAT-API-13` Critical Operational Alert Delivery | `alerts/` | Planned exact declarations: Section 4.13 | Section 4.13 functional requirements | Missing |
 
 ```text
 app/services/api/
@@ -211,6 +221,11 @@ app/services/api/
 │   ├── sinks.py                  # Injected telemetry sink boundary
 │   ├── metrics.py                # Recording and metric-label hygiene
 │   └── exposition.py             # Bounded snapshot and Prometheus rendering
+├── alerts/
+│   ├── __init__.py
+│   ├── models.py                 # Critical alert and delivery-result contracts
+│   ├── builders.py               # Authoritative two-trigger alert construction
+│   └── delivery.py               # Injected channel-neutral delivery boundary
 ├── health/
 │   ├── __init__.py
 │   ├── probes.py                 # Public liveness and protected readiness
@@ -298,6 +313,7 @@ flowchart LR
     I --> R
     H --> R
     S --> R
+    AL --> A[[composition]]
     M --> A[[composition]]
     R --> A
     C --> FC[[ui clients]]
@@ -352,7 +368,8 @@ higher-authority exclusion.
 | `CAP-UI-021` typed frontend clients | `ui/clients/`; `FR-API-038`–`FR-API-041` |
 | `CAP-UI-022` frontend auth/shell | `ui/context/`, `ui/app/`; `FR-API-042`, `FR-API-046`, `FR-API-053`, `FR-API-054` |
 | `CAP-UI-023` workflow pages/components | `ui/components/`, `ui/app/`; `FR-API-047`–`FR-API-055` (excluding reserved `FR-API-052`) |
-| `CAP-UI-024` contract/security/workflow tests | Section 7 and `NFR-API-001`–`NFR-API-018` |
+| `CAP-UI-025` channel-neutral critical operational alerts | `alerts/`; `FR-API-064`–`FR-API-067`; exactly Risk kill-switch activation and Trading unknown broker state |
+| `CAP-UI-026` contract/security/workflow tests | Section 7 and `NFR-API-001`–`NFR-API-018` |
 
 ### Source requirement traceability
 
@@ -403,7 +420,8 @@ public symbols below. Unsupported ranges are absent from the target structure.
 | Missing | `WF-API-010` | Cross-domain | Risk decision support | `SYS-WF-002`, `SYS-WF-005` | Authorized risk request | Typed Risk-owned evaluation | `FR-API-028` | Missing evidence or stale state fails closed; gateway performs no calculation | `tests/api/integration/test_risk_boundary.py::test_risk_delegation()` |
 | Missing | `WF-API-011` | Cross-domain | Core Edge Lab research | `SYS-WF-004` | Dataset/research request | Registered `ResearchReport v1` or structured error | `FR-API-031` | Leakage/provider failures block publication; internal profiles, snapshots, and unsupported endpoints are absent | `tests/api/integration/test_research_boundary.py::test_core_edge_workflow()` |
 | Missing | `WF-API-012` | Cross-domain | Live/paper session and governed broker action | `SYS-WF-002`, `SYS-WF-005` | Authenticated Trading command | Trading-owned status, receipt, or rejection | `FR-API-029` | Closed live flags, Risk, approval, reconciliation, idempotency, audit, or kill-switch gate causes no broker mutation | `tests/api/integration/test_trading_boundary.py::test_live_mutation_cannot_bypass_gates()` |
-| Missing | `WF-API-013` | Cross-domain | Operator approval, scoped kill switch, and event review | `SYS-WF-005` | Validated operator principal plus explicit global/portfolio/strategy/symbol scope | `ApprovalAttestation`, audited Risk/Trading command result, or protected event | `FR-API-034` | Underprivileged or malformed scope is rejected; clearance without matching current attestation is rejected; no public sample stream | `tests/api/integration/test_operator_boundary.py::test_operator_kill_switch()` |
+| Missing | `WF-API-013` | Cross-domain | Operator approval, scoped kill switch, and event review | `SYS-WF-005` | Validated command principal plus explicit global/portfolio/strategy/symbol scope; clearance attestation from a distinct authorized principal | `ApprovalAttestation`, audited Risk/Trading command result, or protected event | `FR-API-034` | Underprivileged or malformed scope is rejected; clearance without a matching current distinct-principal attestation is rejected; no public sample stream | `tests/api/integration/test_operator_boundary.py::test_operator_kill_switch()` |
+| Missing | `WF-API-014` | Cross-domain | Critical operational alert delivery | `SYS-WF-002`, `SYS-WF-005` | Active Risk `KillSwitchState` plus authenticated trace context, or critical Trading `BROKER_STATE_UNKNOWN` `OperationalEvent` | Deterministic `CriticalOperationalAlert` plus one `CriticalAlertDeliveryResult` | `FR-API-064`–`FR-API-067` | Invalid source is rejected; sink failure is structured and logged but never alters source truth, safety state, or retry locks | `tests/api/integration/test_critical_alerts.py::test_delivery_failure_cannot_change_authoritative_state()` |
 | Missing | `WF-API-015` | Cross-domain | Frontend governed request | All applicable | User action | Typed result, warning, or client preflight block | `FR-API-035`–`FR-API-041` | Preflight never substitutes for backend authorization; stale data blocks governed use | `tests/api/integration/test_frontend_governed.py::test_backend_remains_authoritative()` |
 | Missing | `WF-API-016` | Cross-domain | Frontend stream consumption | All applicable | Authenticated stream connection | Validated ordered events and authoritative refresh after gaps | `FR-API-004`, `FR-API-017`–`FR-API-020`, `FR-API-042` | Disconnect cleans resources; gap/backpressure/terminal error triggers documented recovery | `tests/api/integration/test_frontend_streams.py::test_gap_refresh_and_cleanup()` |
 | Missing | `WF-API-017` | Cross-domain | Portfolio construction, eligibility, activation, history, and rebalance | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008` | Authenticated Portfolio request/operator approval | Owner-contract result or structured fail-closed error | `FR-API-056` | Gateway delegates and presents; it never calculates weights, eligibility, Risk budget, or orders | `tests/api/integration/test_portfolio_boundary.py::test_portfolio_workflows_preserve_owner_gates()` |
@@ -642,9 +660,9 @@ or risk metric — those belong to Analytics and Research. Three rules are norma
 **Explicit exclusions.** The following legacy observability behaviour is deliberately
 not reproduced: a process-global mutable `MetricRegistry`; tool-call metric recording
 (the agentic-tool architecture is superseded); embedded Grafana dashboard expectations
-(dashboards are an operations artifact, not application code); and alert deduplication
-(no alerting surface exists, and building one before an alerting requirement exists
-would be speculative). Circuit-breaker behaviour is owned by Brokers
+(dashboards are an operations artifact, not application code); and a UI/API-local
+mutable alert-deduplication manager. Critical alerts use deterministic source-derived
+identity and require sink idempotency under Section 4.13. Circuit-breaker behaviour is owned by Brokers
 (`app/services/brokers/runtime/circuit_breaker.py`) and is not duplicated here.
 
 **Implementation notes:** the Prometheus renderer dependency is `Pending` and must be
@@ -718,7 +736,7 @@ stream subscription → standard envelope/event.
 | Missing | `FR-API-030` | Expose bounded synchronous optimization, walk-forward, unsupervised, and Monte Carlo/scenario operations returning one terminal `OptimizationResult` or structured error; no job persistence, cancellation, progress, or job WebSocket. | `optimization.router: APIRouter` | Read-only external-domain calls; in-memory calculation | Standard 401/403/409/413/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_optimization_routes.py::test_usage_synchronous_optimization_routes()`<br>**Unit:** `tests/api/unit/test_optimization_routes.py::test_async_job_routes_absent()` |
 | Missing | `FR-API-031` | Submit one bounded initial Research request and return only registered `ResearchReport v1` advisory evidence; Research-internal datasets, stage profiles, scorecards, snapshots, and artifact types never cross the API boundary directly. | `research.router: APIRouter` | Read-only external-domain call | Standard 401/403/409/413/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_research_routes.py::test_usage_research_routes()`<br>**Unit:** `tests/api/unit/test_research_routes.py::test_only_registered_report_crosses_boundary()` |
 | Missing | `FR-API-032` | Expose broker/equity/summary/resource/market-hours/calendar snapshots with timestamps and stale/unavailable states; merge system status into readiness. | `dashboards.router: APIRouter` | Read-only; external API call | Standard 401/403/404/422/502/503 envelopes | **Usage:** `tests/api/usage/test_usage_dashboard_routes.py::test_usage_dashboard_routes()`<br>**Unit:** `tests/api/unit/test_dashboard_routes.py::test_currency_strength_absent()` |
-| Missing | `FR-API-034` | Authenticate/authorize a human operator; construct `KillSwitchCommand v1` with explicit `global`/`portfolio`/`strategy`/`symbol` scope and applicable identifiers; submit activation with separate `AuthContext`; require and submit a matching current `ApprovalAttestation v1` for clearance; and expose protected readiness/`OperationalEvent v1` views plus bounded Data-owned audit pages without issuing Risk tokens, policy verdicts, or direct store access. | `operator.router: APIRouter` | UI/API persistence write; event publication; Data read | Standard 401/403/404/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_operator_routes.py::test_usage_operator_routes()`<br>**Unit:** `tests/api/unit/test_operator_routes.py::test_kill_switch_scope_and_clearance_attestation_are_required()` |
+| Missing | `FR-API-034` | Authenticate/authorize a human operator; construct `KillSwitchCommand v1` with explicit `global`/`portfolio`/`strategy`/`symbol` scope and applicable identifiers; submit activation immediately with the commanding principal's separate `AuthContext`; for clearance require and submit a matching current `ApprovalAttestation v1` issued by a different authorized principal; reject same-principal clearance before delegation while Risk remains authoritative; and expose protected readiness/`OperationalEvent v1` views plus bounded Data-owned audit pages without issuing Risk tokens, policy verdicts, or direct store access. | `operator.router: APIRouter` | UI/API persistence write; event publication; Data read | Standard 401/403/404/409/422/503 envelopes | **Usage:** `tests/api/usage/test_usage_operator_routes.py::test_usage_operator_routes()`<br>**Unit:** `tests/api/unit/test_operator_routes.py::test_kill_switch_scope_and_clearance_attestation_are_required()` and planned `test_kill_switch_clearance_requires_distinct_principals()` |
 | Missing | `FR-API-056` | Expose Portfolio construction/result/history/drift and governed activation/rollback/rebalance operations through Portfolio, with Risk eligibility/review and human approval where required; perform no gateway calculation or execution. | `portfolio.router: APIRouter` | Read-only; owner-domain persistence; governed command submission | Standard 401/403/404/409/422/503 envelopes; any stale/missing gate fails closed | **Usage:** `tests/api/usage/test_usage_portfolio_routes.py::test_usage_portfolio_routes()`<br>**Unit:** `tests/api/unit/test_portfolio_routes.py::test_gateway_cannot_bypass_risk_or_trading()` |
 
 #### Approved route contract inventory
@@ -742,7 +760,7 @@ when the final browser transport requires it.
 | `optimization.py` | `POST /api/optimization/run`; synchronous walk-forward, unsupervised, Monte Carlo, and approved scenario variants | Authenticated owner; Optimization | In-memory synchronous calculation returning one terminal result/error; no create/detail/cancel/progress/job WebSocket |
 | `research.py` | `POST /api/research/run` | Authenticated researcher; Research | One bounded request returning `ResearchReport v1` or structured error; internal profile/snapshot/artifact CRUD is absent |
 | `dashboards.py` | `GET /api/dashboard/broker`; `/equity-curve`; `/summary`; `/system/resources`; `/market-hours`; `/forex-calendar` | Authenticated; Data/Trading/Analytics/Utils | Read-only with snapshot/freshness; provider failure never silently substituted |
-| `operator.py` | Protected readiness; `POST /api/operator/approvals`; `POST /api/operator/kill-switch`; `GET /api/operator/audit-events`; `GET /api/operator/events/stream` | Validated human operator; UI/API owns attestation, Risk owns command/state/policy, Data owns audit query/page, Trading enforces and produces operational events | Explicitly scoped activation uses `AuthContext`; clearance additionally requires matching current attestation; bounded audit reads delegate to Data; UI/API never issues Risk token/verdict or reads audit tables; public stream forbidden |
+| `operator.py` | Protected readiness; `POST /api/operator/approvals`; `POST /api/operator/kill-switch`; `GET /api/operator/audit-events`; `GET /api/operator/events/stream` | Validated human operator; UI/API owns attestation, Risk owns command/state/policy, Data owns audit query/page, Trading enforces and produces operational events | Explicitly scoped activation uses one `AuthContext` immediately; clearance additionally requires a matching current attestation from a distinct authorized principal; bounded audit reads delegate to Data; UI/API never issues Risk token/verdict or reads audit tables; public stream forbidden |
 | `portfolio.py` | `POST /api/portfolio/constructions`; result/history reads; `POST /api/portfolio/eligibility-reviews`; `POST /api/portfolio/activations`; `POST /api/portfolio/rollbacks`; drift/rebalance review and submission | Authenticated role/permission; Portfolio owns construction/state, Risk owns decisions/budgets, Simulation owns validation, Trading owns execution | Reads plus governed owner-domain writes; HTTP idempotency and current approval required; no gateway weight/risk/order calculation |
 
 **Configuration and Limits Manifest**
@@ -903,6 +921,60 @@ client configuration.
 **Implementation notes:** Next.js page default exports are framework entry points, not
 additional domain-level public exports; they delegate only to `AuthenticationPage`,
 `ProtectedLayout`, or `WorkflowPage`.
+
+### 4.13 `alerts/` — Critical operational alert delivery
+
+**Purpose:** Translate exactly two authoritative safety/incident sources into one
+bounded channel-neutral alert contract and attempt delivery without becoming execution
+authority.
+
+**Module flow:** active Risk `KillSwitchState` or critical Trading
+`BROKER_STATE_UNKNOWN` `OperationalEvent` → strict source validation → deterministic
+alert construction → injected idempotent sink → structured delivery result.
+
+The initial trigger set is closed:
+
+- `risk.kill_switch_activated` accepts only `KillSwitchState.state == "active"` and
+  requires the authenticated `AuthContext` from the command workflow.
+- `trading.broker_state_unknown` accepts only
+  `OperationalEvent.event_type == "BROKER_STATE_UNKNOWN"`,
+  `severity == "critical"`, `facts.retry_locked == true`, and immutable
+  receipt/incident source references.
+
+Alert IDs are the SHA-256 digest of canonical trigger, source schema, immutable source
+identity, and source version when the owner contract provides one. They are the
+delivery sink's idempotency key. Titles are fixed trigger literals; summaries are fixed
+templates capped at 512 characters; scope/facts contain at most eight allowlisted
+entries with textual values capped at 256 characters after shared redaction. No source
+payload is forwarded wholesale.
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Missing | `models.py` | Define the closed trigger set, bounded alert, delivery result, error, and channel-neutral sink port | `CriticalAlertTrigger`, `CriticalOperationalAlert`, `CriticalAlertDeliveryResult`, `CriticalAlertError`, `CriticalAlertSink` | **Standard library:** `collections.abc`, `datetime`, `enum`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
+| Missing | `builders.py` | Validate authoritative Risk/Trading sources and derive deterministic redacted alerts | `build_kill_switch_activation_alert`, `build_unknown_broker_state_alert` | **Standard library:** `hashlib`<br>**Required third-party:** None<br>**Local:** `models.py`; Risk `KillSwitchState`; Trading `OperationalEvent`; Utils `AuthContext`, canonical serialization, redaction |
+| Missing | `delivery.py` | Perform exactly one sink attempt and return structured visible delivery evidence | `deliver_critical_alert` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `models.py`; Utils logger/time |
+| Missing | `__init__.py` | Expose the complete focused alert API | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-API-064` | Represent one of the two approved critical triggers, its deterministic authoritative-source binding, fixed-template bounded redacted content, and one delivery attempt/result without carrying secrets or provider objects. | `CriticalAlertTrigger(StrEnum)`, `CriticalOperationalAlert(BaseModel)`, `CriticalAlertDeliveryResult(BaseModel)`, `CriticalAlertSink(Protocol)`, `CriticalAlertError` | None | `ValidationError`: unknown trigger, non-critical severity, malformed source binding, unbounded/unredacted content, or inconsistent delivery result | **Usage:** `python tests/api/usage/13_alerts.py` exercises every constructor and sink operation<br>**Unit:** `tests/api/unit/test_alert_models.py::test_alert_contract_is_closed_bounded_and_redacted()` |
+| Missing | `FR-API-065` | Accept only an active Risk `KillSwitchState v1` plus authenticated trace context and derive `risk.kill_switch_activated` with identity bound to state ID/version; inactive or unknown state never creates an alert. | `build_kill_switch_activation_alert(state: KillSwitchState, context: AuthContext) -> CriticalOperationalAlert` | None | `CriticalAlertError`: state is not active, identity/version/trace context is invalid, or bounded redaction fails | **Usage:** `python tests/api/usage/13_alerts.py`<br>**Unit:** `tests/api/unit/test_alert_builders.py::test_only_active_kill_switch_builds_alert()` |
+| Missing | `FR-API-066` | Accept only a critical Trading `BROKER_STATE_UNKNOWN` `OperationalEvent v1` with `retry_locked=true` and receipt/incident references, and derive `trading.broker_state_unknown` with identity bound to the event ID. | `build_unknown_broker_state_alert(event: OperationalEvent) -> CriticalOperationalAlert` | None | `CriticalAlertError`: event type/severity/lock/source references are incompatible or bounded redaction fails | **Usage:** `python tests/api/usage/13_alerts.py`<br>**Unit:** `tests/api/unit/test_alert_builders.py::test_only_retry_locked_unknown_broker_event_builds_alert()` |
+| Missing | `FR-API-067` | Submit the alert exactly once to an injected sink using `alert_id` as the idempotency key and return a delivered/failed `CriticalAlertDeliveryResult`. Catch and redact sink exceptions into `ALERT_DELIVERY_FAILED`, log the failure, and never retry automatically or change/clear/delay the authoritative Risk state, Trading lock, reconciliation result, or execution truth. | `deliver_critical_alert(alert: CriticalOperationalAlert, sink: CriticalAlertSink) -> CriticalAlertDeliveryResult` | One external channel-neutral delivery attempt; redacted outcome logging | `CriticalAlertError`: pre-attempt sink/alert contract is invalid; sink/provider failure is returned, not raised | **Usage:** `python tests/api/usage/13_alerts.py`<br>**Unit:** `tests/api/unit/test_alert_delivery.py::test_sink_failure_is_structured_and_non_authoritative()`<br>**Integration:** `tests/api/integration/test_critical_alerts.py::test_delivery_failure_cannot_change_authoritative_state()` |
+
+**Configuration and Limits Manifest:** None. The sink is an explicitly injected
+composition dependency. Missing or invalid injection returns failed delivery evidence;
+it does not create a fallback channel or weaken application safety/readiness truth.
+
+**Explicit exclusions:** provider-specific desktop, SMTP/email, SMS/Twilio, Telegram,
+or other chat adapters; generic/custom notifications; UI/API-local mutable
+deduplication state; automatic retry or persistent queues; acknowledgement and
+escalation workflows; inbound messaging; attachments/media; alert-triggered Risk or
+Trading mutation.
+
+**Implementation notes:** `FR-API-066` is blocked until Trading implements
+`FR-TRD-068`. Risk already supplies the complete authoritative
+`KillSwitchState v1`; no Risk requirement or implementation change is needed.
 
 ---
 
@@ -1080,6 +1152,7 @@ These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`
 | `P-API-011` | `app/services/api/ui_app/` | 1 | `ui_app` module + its `FR-API-*` behavior (§4) |
 | `P-API-005` | `app/services/api/streams/` | 11 | `streams` module + its `FR-API-*` behavior (§4) |
 | `P-API-012` | `app/services/api/observability/` | 11 | `observability` module + its `FR-API-*` behavior (§4); blocked on the `Pending` Prometheus renderer dependency |
+| `P-API-013` | `app/services/api/alerts/` | 11 | `alerts` module + `FR-API-064`–`FR-API-067`; `FR-API-066` is blocked on Trading `FR-TRD-068` |
 
 
 ---

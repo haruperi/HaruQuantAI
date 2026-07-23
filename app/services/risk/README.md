@@ -1,7 +1,7 @@
 # Risk
 
 > **Package:** `app/services/risk`
-> **Status:** `Completed`
+> **Status:** `Partial`
 > **Last updated:** `2026-07-23`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -34,8 +34,14 @@ Risk is HaruQuantAI's independent, deterministic master gate for risk-increasing
 - Market, broker, account, position, pending-order, calendar, session, liquidity, or execution-state acquisition.
 - Strategy signal generation or registry mutation; Portfolio-owned construction, allocation versioning, drift detection, or rebalance planning; portfolio execution, broker submission, fills, reconciliation, or emergency execution mutation.
 - MT5 connections, provider SDK objects, broker credentials, database connection/locking infrastructure, broad performance reporting, cost reporting, incident management, or enterprise audit services.
-- Full replay/timeline/cockpit infrastructure, ranked recommendation engines, parametric VaR, exit-liquidity stress, or graduated step-down controls in the initial build.
+- Full replay/timeline/cockpit infrastructure, ranked recommendation engines,
+  parametric VaR, exit-liquidity stress, or a separate persisted graduated
+  step-down subsystem in the initial build.
 - Live approval from unverified text or any override of deterministic policy or kill-switch state.
+
+Drawdown-aware tightening is already owned by `FEAT-RISK-07`: its equal-or-stricter
+regime modifiers cap the final requested size in `FEAT-RISK-12`. The excluded legacy
+step-down subsystem is not required to obtain that safety outcome.
 
 ### Shared contracts
 
@@ -167,7 +173,7 @@ Modules and files are ordered from lowest dependency to highest dependency. Priv
 | Completed | `FEAT-RISK-10` Durable Approval-Token Lifecycle | `approvals/` | Exact declarations and token contracts: Section 4.10 | Section 4.10 functional requirements | `tests/risk/usage/10_approvals.py` |
 | Completed | `FEAT-RISK-11` Decision Reuse Revalidation | `validity/` | Exact declarations: Section 4.11 | Section 4.11 functional requirements | `tests/risk/usage/11_validity.py` |
 | Completed | `FEAT-RISK-12` Canonical Risk Governor | `governor/` | Exact declarations and decision contracts: Section 4.12 | Section 4.12 functional requirements | `tests/risk/usage/12_governor.py` |
-| Completed | `FEAT-RISK-13` Kill-Switch Authority and Block State | `kill_switch/` | Exact declarations and state contracts: Section 4.13 | Section 4.13 functional requirements | `tests/risk/usage/13_kill_switch.py` |
+| Partial | `FEAT-RISK-13` Kill-Switch Authority and Block State | `kill_switch/` | Exact declarations and state contracts: Section 4.13 | Section 4.13 functional requirements | Existing `tests/risk/usage/13_kill_switch.py`; distinct-principal clearance evidence missing |
 | Completed | `FEAT-RISK-14` Advisory Scenario Analysis | `scenarios/` | Exact declarations: Section 4.14 | Section 4.14 functional requirements | `tests/risk/usage/14_scenarios.py` |
 | Completed | `FEAT-RISK-15` Risk Decision Summaries | `reporting/` | Exact declarations and report contracts: Section 4.15 | Section 4.15 functional requirements | `tests/risk/usage/15_reporting.py` |
 
@@ -322,7 +328,7 @@ flowchart LR
 | Completed | `WF-RISK-006` | Cross-domain | Review strategy operational eligibility | Exact registered strategy/version, evidence, policy, route/profile, approval context | `StrategyOperationalEligibilityDecision v1` | `FR-RISK-010 → FR-RISK-029` |
 | Completed | `WF-RISK-007` | Cross-domain | Review/activate allocation risk | Portfolio construction/rebalance reference plus fresh evidence and approval context | `AllocationRiskDecision v1` and budget activation result | `FR-RISK-009 → FR-RISK-030 → FR-RISK-051` |
 | Completed | `WF-RISK-008` | Cross-domain | Validate approval token | Token, expected scope/action/config, injected time | Durable validation/consumption result | `FR-RISK-015 → FR-RISK-020 → FR-RISK-037` |
-| Completed | `WF-RISK-009` | Cross-domain | Apply/check kill-switch state | Authorized command or current state and scope | Canonical state or block/recovery decision | `FR-RISK-016 → FR-RISK-043 → FR-RISK-017 → FR-RISK-044` |
+| Partial | `WF-RISK-009` | Cross-domain | Apply/check kill-switch state | Authorized command or current state and scope | Canonical state or block/recovery decision | `FR-RISK-016 → FR-RISK-043 → FR-RISK-017 → FR-RISK-044` |
 | Completed | `WF-RISK-010` | Cross-domain | Run scenario or what-if analysis | Immutable snapshot and scenario definitions | Advisory `ScenarioResult` | `FR-RISK-012 → FR-RISK-013 → FR-RISK-045` |
 | Completed | `WF-RISK-011` | Internal/Cross-domain | Generate risk decision summary | Snapshot, decision, or scenario result | Markdown/JSON `RiskReport` | `FR-RISK-019 → FR-RISK-046` |
 | Completed | `WF-RISK-012` | Cross-domain | Persist risk audit and token state | Material decision/token event | Durable hash-chain/token state or fail-closed result | `FR-RISK-018 → FR-RISK-033 → FR-RISK-037` |
@@ -462,15 +468,16 @@ live-success path; concurrent or conflicting reservation fails closed.
 **Input boundary:** UI/API `KillSwitchCommand` with explicit scope level
 (`global`, `portfolio`, `strategy`, or `symbol`) and applicable identifiers, plus a
 separate `AuthContext`. Clearance also requires a matching current
-`ApprovalAttestation`; activation does not.
+`ApprovalAttestation` from a different authorized principal; activation does not.
 **Output boundary:** canonical `KillSwitchState` and deterministic block/recovery decision consumed by Trading/UI/API.
 
 Active or unknown state blocks live risk increase. `global` state overrides
 `portfolio`, which overrides `strategy`, which overrides `symbol`; an inactive child cannot override an active
 parent. Risk persists canonical state and revokes affected approvals; only Trading
 mutates execution controls. Clearance requires a valid Risk-owned, UI/API-produced
-`ApprovalAttestation`, and Trading resumes only after all applicable scopes are
-inactive and reconciliation succeeds.
+`ApprovalAttestation` whose principal differs from the commanding `AuthContext`.
+Same-principal clearance fails deterministically with no state change. Trading
+resumes only after all applicable scopes are inactive and reconciliation succeeds.
 
 **Integration test:** `tests/risk/integration/test_kill_switch.py::test_kill_switch_command_blocks_trading_without_execution_mutation()`
 
@@ -1225,7 +1232,7 @@ token invalidates reuse.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `authority.py` | Apply authorized commands and evaluate block/recovery state | `apply_kill_switch_command`, `check_risk_kill_switch` | **Standard library:** collections.abc, datetime, time<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `audit`, `approvals`, `audit.storage → _KillSwitchStateStore`; `app.utils → AuthContext, canonical_json, logger` |
+| Partial | `authority.py` | Apply authorized commands and evaluate block/recovery state; distinct-principal clearance is specified but not implemented | `apply_kill_switch_command`, `check_risk_kill_switch` | **Standard library:** collections.abc, datetime, time<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `audit`, `approvals`, `audit.storage → _KillSwitchStateStore`; `app.utils → AuthContext, canonical_json, logger` |
 | Completed | `__init__.py` | Expose kill-switch API | symbols above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `authority.py` |
 
 #### Configuration and Limits Manifest
@@ -1237,10 +1244,17 @@ token invalidates reuse.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-RISK-043` | Apply an authorized, version-checked activation/clearance under `global > portfolio > strategy > symbol` precedence, compare-and-swap canonical state in the injected store, revoke affected approvals on activation, append the Risk audit record, and never mutate execution controls. Activation requires an authorized `AuthContext`; clearance additionally requires a matching current `ApprovalAttestation v1`. Active config is explicit so permission, timeout, policy reference, and audit hashing never use implicit state. | `apply_kill_switch_command(command: KillSwitchCommand, current: KillSwitchState, auth: AuthContext, approvals: ApprovalTokenService, audit: RiskAuditChain, store: _KillSwitchStateStore, config: RiskConfig, *, attestation: ApprovalAttestation | None = None, now: datetime) -> KillSwitchState` | Persistence write | `RiskDomainError(PERMISSION_DENIED, POLICY_BLOCKED, STORAGE_ERROR)` | **Usage:** `tests/risk/usage/13_kill_switch.py::example_kill_switch()`<br>**Unit:** `tests/risk/unit/test_kill_switch.py::test_child_clear_cannot_override_active_parent()` |
+| Partial | `FR-RISK-043` | Apply an authorized, version-checked activation/clearance under `global > portfolio > strategy > symbol` precedence, compare-and-swap canonical state in the injected store, revoke affected approvals on activation, append the Risk audit record, and never mutate execution controls. Activation requires one authorized `AuthContext` and remains immediate and unilateral. Clearance additionally requires a matching current `ApprovalAttestation v1` from a different authorized principal; same-principal clearance leaves the active state unchanged and fails deterministically. Active config is explicit so permission, timeout, policy reference, and audit hashing never use implicit state. | `apply_kill_switch_command(command: KillSwitchCommand, current: KillSwitchState, auth: AuthContext, approvals: ApprovalTokenService, audit: RiskAuditChain, store: _KillSwitchStateStore, config: RiskConfig, *, attestation: ApprovalAttestation | None = None, now: datetime) -> KillSwitchState` | Persistence write | `RiskDomainError(PERMISSION_DENIED, POLICY_BLOCKED, STORAGE_ERROR)` | **Usage:** existing `tests/risk/usage/13_kill_switch.py::example_kill_switch()`; distinct-principal case missing<br>**Unit:** existing `tests/risk/unit/test_kill_switch.py::test_child_clear_cannot_override_active_parent()`; planned `test_clearance_requires_distinct_principal()` |
 | Completed | `FR-RISK-044` | Return deterministic block/recovery eligibility; active or unknown applicable state blocks live risk increase, and recovery requires all applicable scopes inactive plus Trading reconciliation. Config and authenticated trace context are required so the returned canonical decision contains no invented policy or trace identity. | `check_risk_kill_switch(states: Sequence[KillSwitchState], scope: Mapping[str, str], config: RiskConfig, auth: AuthContext, *, reconciled: bool, now: datetime) -> RiskDecisionPackage` | None | `RiskDomainError(KILL_SWITCH_ACTIVE, KILL_SWITCH_UNKNOWN, POLICY_BLOCKED)` | **Usage:** `tests/risk/usage/13_kill_switch.py::example_kill_switch()`<br>**Unit:** `test_kill_switch.py::test_recovery_requires_clear_hierarchy_and_reconciliation()` |
 
-**Implementation notes:** Implement kill-switch authority from this specification; allow no caller override or bypass. `global` state overrides `portfolio`, which overrides `strategy`, which overrides `symbol`; an inactive child cannot override an active parent. Active or unknown state blocks live risk increase. Only Trading mutates execution controls; Risk persists canonical state and revokes affected approvals on activation.
+**Implementation notes:** Implement kill-switch authority from this specification;
+allow no caller override or bypass. `global` state overrides `portfolio`, which
+overrides `strategy`, which overrides `symbol`; an inactive child cannot override an
+active parent. Active or unknown state blocks live risk increase. Activation must
+never wait for a second principal. Clearance must verify that the authenticated
+command principal and attestation principal are distinct before persistence. Only
+Trading mutates execution controls; Risk persists canonical state and revokes
+affected approvals on activation.
 
 **Usage file:** `tests/risk/usage/13_kill_switch.py`
 

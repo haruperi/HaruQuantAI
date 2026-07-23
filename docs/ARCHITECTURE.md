@@ -65,10 +65,11 @@
 * `app/services/strategy/` is implemented across contracts, diagnostics, registry,
   intents, replay/checkpoints, vectorized evaluation, event hooks, concrete signal
   evaluators, and all ten `WF-STRAT-*` workflows.
-* `app/services/risk/` is a completed implementation baseline across contracts,
-  configuration, snapshots, sizing, audit chaining, policy gates, regimes, approvals,
-  decisions, scenarios, and reporting — all 54 functional and 12 non-functional
-  requirements and all thirteen workflows.
+* `app/services/risk/` is implemented across contracts, configuration, snapshots,
+  sizing, audit chaining, policy gates, regimes, approvals, decisions, scenarios, and
+  reporting. Its status is `Partial`: kill-switch clearance must require a distinct
+  authorized attestation principal, while the current implementation still requires
+  the same principal.
 * `app/services/trading/` is a completed implementation baseline across all 64
   functional and eight non-functional requirements, nine capability modules, and all
   fourteen documented workflows. It owns `OrderIntent v1`, `ExecutionReceipt v1`,
@@ -91,7 +92,7 @@
 
 ### Workspace Directory Layout (Target)
 
-* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, and API composition. UI/API owns user/session/settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
+* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. UI/API owns user/session/settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
 * `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, and API). Live-route execution is owned by Trading.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
 * `ui/`: Next.js frontend application environment.
@@ -307,6 +308,11 @@ Portfolio collaboration is contract-governed:
 * Every error object crossing module borders must remain structured, fully trace-tagged, and redacted.
 * **Blind Retry Ban**: Automated retries apply only to verified transient transport anomalies. Unknown broker state responses block automated processing; execution loops freeze until state validation completes.
 * **Fail-Closed Baseline**: System stops operations instantly if it encounters active kill switches, validation failures, token expiration, or structural mismatch flags.
+* **Kill-Switch Dual-Control Baseline**: Activation is immediate and unilateral for
+  one authorized principal. Clearance requires a current scope/policy-bound
+  `ApprovalAttestation` from a different authorized principal; same-principal
+  clearance fails without changing canonical state. Trading resumes only after all
+  applicable scopes are inactive and reconciliation succeeds.
 * **Portfolio Activation Baseline**: Simulation-profile activation is automatic only within explicit simulation policy. Paper/live activation requires human approval plus current Risk authorization. Active kill switches block activation and rebalance.
 * **Allocation Safety Baseline**: Capital weights are Portfolio metadata; Risk budgets are authoritative. Existing over-budget exposure creates a Risk-reviewed reduce-only plan, and the system never opens a position solely to match a target weight.
 
@@ -320,6 +326,34 @@ Portfolio collaboration is contract-governed:
   telemetry, network, or persistence side effect.
 * Logging dependencies are explicit and never carry raw provider/database exceptions
   or sensitive values across a public boundary.
+
+### Critical Operational Alert Boundary
+
+Critical operational alerts are a focused UI/API delivery boundary, not a Notification
+domain and not an execution-control authority:
+
+* The only approved triggers are a Risk-owned `KillSwitchState v1` transition to
+  `active` and a Trading-owned critical `OperationalEvent v1` with
+  `event_type="BROKER_STATE_UNKNOWN"` after the affected conflict scope is retry
+  locked.
+* UI/API validates the authoritative source, derives one deterministic
+  `CriticalOperationalAlert v1`, and performs one delivery attempt through an injected
+  channel-neutral idempotent sink. The alert identifier is derived from the trigger,
+  source schema, and immutable source identity/version, and is the sink's idempotency
+  key.
+* Alert content uses fixed trigger-specific templates and bounded, allowlisted,
+  redacted facts. Arbitrary source payload forwarding, secrets, provider objects, and
+  private broker state are forbidden.
+* The composition root passes Risk results and Trading events to UI/API-owned alert
+  functions. Risk and Trading never import UI/API, so the code dependency remains
+  one-way and acyclic.
+* Construction or delivery failure produces a structured
+  `CriticalAlertDeliveryResult` and a redacted error log. It never rolls back or clears
+  Risk state, releases a Trading retry lock, changes execution truth, or permits a
+  mutation.
+* Provider-specific channels, generic notifications, automatic retry queues,
+  acknowledgements, escalation policy, and UI/API-local mutable deduplication state are
+  outside the initial target.
 
 ### Core Security Mandates
 
