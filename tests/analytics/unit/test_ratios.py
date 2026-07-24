@@ -1,7 +1,6 @@
 """Unit tests for core Analytics ratios."""
 
 # ruff: noqa: INP001
-
 from dataclasses import replace
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -36,4 +35,4 @@ def test_ratio_evidence_never_returns_infinity() -> None:
     metrics = {item.metric_key: item for item in section.metrics}
     assert metrics["sharpe_ratio"].status == "undefined"
     assert metrics["profit_factor"].status == "undefined"
-    assert metrics["expectancy"].value == 9.0
+    assert metrics["expectancy"].value == Decimal(9)

@@ -1,117 +1,85 @@
-"""Executable indicators volatility feature examples."""
+"""Executable usage evidence for volatility indicators."""
 
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 
-# Add project root to path before importing local modules
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import get_market_data
-from app.services.data.contracts import DataError, MarketDataset
-from app.services.indicators.volatility import (
+from app.services.data import DataError, MarketDataset, get_market_data
+from app.services.indicators import (
     adr,
     atr,
     rolling_volatility,
     standard_deviation,
 )
 
-_START = datetime(2026, 1, 1, tzinfo=UTC)
-
-
-def _header(title: str) -> None:
-    """Print the header for an example section.
-
-    Args:
-        title: The title of the section to display.
-    """
-    print(f"\n\n\n{'=' * 100}")
-    print(f"\t\t{title}\t")
-    print(f"{'=' * 100}\n")
-
-
 _CACHE: dict[str, MarketDataset] = {}
 
 
-def _get_intraday_dataset() -> MarketDataset:
-    """Retrieve real market intraday dataset.
+def _dataset(timeframe: str) -> MarketDataset:
+    """Return one cached real read-only market dataset.
+
+    Args:
+        timeframe: Exact requested timeframe.
 
     Returns:
-        A MarketDataset instance.
+        A normalized real market dataset.
+
+    Raises:
+        DataError: If the configured source is unavailable.
     """
-    if "intraday" in _CACHE:
-        return _CACHE["intraday"]
-    dataset = get_market_data(
-        source_id="mt5",
-        symbol="EURUSD",
-        timeframe="M5",
-        limit=20,
-    )
-    print("Using real MT5 EURUSD M5 market data.")
-    _CACHE["intraday"] = dataset
-    return dataset
+    if timeframe not in _CACHE:
+        _CACHE[timeframe] = get_market_data(
+            source_id="mt5",
+            symbol="EURUSD",
+            timeframe=timeframe,
+            limit=20,
+        )
+    return _CACHE[timeframe]
 
 
-def _get_daily_dataset() -> MarketDataset:
-    """Retrieve real market daily dataset.
+def fr_indi_018() -> None:
+    """FR-INDI-018: The system shall calculate non-negative ATR for one validated `MarketDataset v1` using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation."""  # noqa: E501 - exact specification text
+    result = atr(_dataset("M5"), period=2)
+    print("FR-INDI-018", result.values["atr_2"].tolist())
 
-    Returns:
-        A MarketDataset instance.
-    """
-    if "daily" in _CACHE:
-        return _CACHE["daily"]
-    dataset = get_market_data(
-        source_id="mt5",
-        symbol="EURUSD",
-        timeframe="D1",
-        limit=10,
-    )
-    print("Using real MT5 EURUSD D1 market data.")
-    _CACHE["daily"] = dataset
-    return dataset
+
+def fr_indi_019() -> None:
+    """FR-INDI-019: The system shall calculate ADR for one validated D1 `MarketDataset v1` as the inclusive rolling mean of `high-low`, perform no timeframe aggregation, preserve warmup rows, and return deterministic availability and manifest metadata."""  # noqa: E501 - exact specification text
+    result = adr(_dataset("D1"), period=2)
+    print("FR-INDI-019", result.values["adr_2"].tolist())
+
+
+def fr_indi_020() -> None:
+    """FR-INDI-020: The system shall calculate rolling volatility for one validated `MarketDataset v1` from `period` log returns using `ddof=1` and annualization 252, return the exact source-qualified output, treat constant prices as zero volatility, and return causal metadata."""  # noqa: E501 - exact specification text
+    result = rolling_volatility(_dataset("M5"), period=2)
+    print("FR-INDI-020", result.values["rolling_volatility_2"].tolist())
+
+
+def fr_indi_026() -> None:
+    """FR-INDI-026: The system shall calculate rolling sample standard deviation (`ddof=1`) for one validated `MarketDataset v1` over the selected price, return the exact source-qualified output, treat constant prices as zero, and expose causal metadata."""  # noqa: E501 - exact specification text
+    result = standard_deviation(_dataset("M5"), period=2)
+    print("FR-INDI-026", result.values["standard_deviation_2"].tolist())
 
 
 def main() -> None:
-    """Run the volatility-indicator feature usage examples.
+    """Run every volatility requirement demonstration.
 
-    Demonstrates ``FR-INDI-018`` through ``FR-INDI-020`` and ``FR-INDI-026``
-    end-to-end against real market data using only documented public exports.
-    Exits with status ``3`` when the live market-data source is unavailable,
-    which the integration runner treats as a skip rather than a failure.
+    Returns:
+        None.
     """
     try:
-        intraday_data = _get_intraday_dataset()
-        daily_data = _get_daily_dataset()
+        _dataset("M5")
+        _dataset("D1")
     except DataError as unavailable:
         print(
             f"Skipping volatility examples: MT5 data unavailable ({unavailable.code})"
         )
-        sys.exit(3)
-
-    _header("Example 1: Calculate ATR over a normalized intraday dataset")
-    result_atr = atr(intraday_data, period=2)
-    print(f"ATR columns: {list(result_atr.values.columns)}")
-    print(f"ATR values: {result_atr.values['atr_2'].tolist()}")
-
-    _header("Example 2: Calculate ADR over a normalized D1 dataset")
-    result_adr = adr(daily_data, period=2)
-    print(f"ADR columns: {list(result_adr.values.columns)}")
-    print(f"ADR values: {result_adr.values['adr_2'].tolist()}")
-
-    _header("Example 3: Calculate rolling volatility over a normalized dataset")
-    result_vol = rolling_volatility(intraday_data, period=2)
-    print(f"Rolling volatility columns: {list(result_vol.values.columns)}")
-    print(
-        f"Rolling volatility values: "
-        f"{result_vol.values['rolling_volatility_2'].tolist()}"
-    )
-
-    _header("Example 4: Calculate rolling price standard deviation")
-    result_std = standard_deviation(intraday_data, period=2)
-    print(
-        f"Standard deviation values: "
-        f"{result_std.values['standard_deviation_2'].tolist()}"
-    )
+        raise SystemExit(3) from None
+    fr_indi_018()
+    fr_indi_019()
+    fr_indi_020()
+    fr_indi_026()
 
 
 if __name__ == "__main__":

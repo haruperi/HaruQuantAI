@@ -18,7 +18,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -42,7 +42,6 @@ def _build_config(period: int, config: IndicatorConfig | None) -> IndicatorConfi
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building atr config")
     expected = IndicatorConfig(
         indicator_id="atr",
         parameters=(("period", period),),
@@ -80,7 +79,6 @@ def _true_range(records: tuple[OHLCVRecord, ...]) -> np.ndarray:
     Returns:
         A float64 true-range array.
     """
-    logger.debug("Computing true range for atr")
     high = np.asarray([float(record.high) for record in records], dtype="float64")
     low = np.asarray([float(record.low) for record in records], dtype="float64")
     close = np.asarray([float(record.close) for record in records], dtype="float64")

@@ -25,7 +25,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -56,7 +56,6 @@ def _build_config(period: int, config: IndicatorConfig | None) -> IndicatorConfi
             disagrees with ``indicator_id``, ``period``, or the approved
             formula version.
     """
-    logger.debug("Building config for adx (period=%s)", period)
     expected = IndicatorConfig(
         indicator_id="adx",
         parameters=(("period", period),),
@@ -98,7 +97,6 @@ def _timestamps_and_available(
         A UTC ``DatetimeIndex`` plus parallel lists of row timestamps and
         row ``available_at`` timestamps, all in dataset row order.
     """
-    logger.debug("Projecting timestamps and availability for %s", data.symbol)
     timestamps = [record.timestamp for record in data.records]
     available_ats = [record.available_at for record in data.records]
     index = pd.DatetimeIndex(timestamps, name="timestamp", tz="UTC")
@@ -117,9 +115,6 @@ def _epoch_micros(available_ats: list[datetime]) -> np.ndarray:
     Returns:
         An ``int64`` array of exact epoch-microsecond values.
     """
-    logger.debug(
-        "Converting %d available_at timestamps to epoch micros", len(available_ats)
-    )
     return np.array(
         [(moment - _EPOCH) // timedelta(microseconds=1) for moment in available_ats],
         dtype="int64",
@@ -138,9 +133,6 @@ def _cumulative_max_available_at(
     Returns:
         A UTC datetime64 Series of the running maximum ``available_at``.
     """
-    logger.debug(
-        "Computing cumulative max available_at over %d rows", len(available_ats)
-    )
     micros = _epoch_micros(available_ats)
     cumulative = np.maximum.accumulate(micros)
     return pd.Series(pd.to_datetime(cumulative, unit="us", utc=True), index=index)
@@ -162,7 +154,6 @@ def _true_range_and_directional_moves(
     Returns:
         Parallel ``(true_range, plus_dm, minus_dm)`` arrays.
     """
-    logger.debug("Computing true range and directional moves over %d rows", len(high))
     row_count = len(high)
     previous_close = np.full(row_count, np.nan, dtype="float64")
     previous_close[1:] = close[:-1]
@@ -203,9 +194,6 @@ def _wilder_adx(
         where ``is_valid`` marks rows at or after observation
         ``2 * period``.
     """
-    logger.debug(
-        "Computing Wilder ADX chain over %d rows (period=%d)", len(true_range), period
-    )
     row_count = len(true_range)
     plus_di = np.full(row_count, np.nan, dtype="float64")
     minus_di = np.full(row_count, np.nan, dtype="float64")

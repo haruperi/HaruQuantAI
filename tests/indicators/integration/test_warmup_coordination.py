@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import (
+from app.services.data import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
@@ -13,8 +13,8 @@ from app.services.indicators import (
     IndicatorConfig,
     IndicatorError,
     IndicatorErrorCode,
-    WarmupRequirement,
     get_indicator,
+    get_warmup_requirement,
     sma,
     validate_indicator,
 )
@@ -102,14 +102,19 @@ def test_warmup_requirement_preserves_unavailable_rows() -> None:
     """
     spec = get_indicator("sma")
     period = 3
-    requirement = WarmupRequirement(
-        indicator_id=spec.indicator_id,
+    config = IndicatorConfig(
+        indicator_id="sma",
+        parameters=(("period", period),),
+        source="close",
         formula_version=spec.formula_version,
-        minimum_observations=period,
-        source_timeframe=None,
-        required_columns=spec.required_columns,
-        availability_basis="source_available_at",
+        output_mode="values",
+        column_conflict_policy="error",
+        precision_dtype="float64",
+        availability_policy="source_available_at",
+        quality_policy="propagate_dataset",
+        error_mode="raise",
     )
+    requirement = get_warmup_requirement("sma", config)
     assert requirement.minimum_observations == period
 
     sufficient_data = _dataset(bar_count=4)
@@ -123,18 +128,6 @@ def test_warmup_requirement_preserves_unavailable_rows() -> None:
     assert short_result.values["unavailable_reason"].eq("warmup").all()
 
     empty_data = _dataset(bar_count=0)
-    config = IndicatorConfig(
-        indicator_id="sma",
-        parameters=(("period", period),),
-        source="close",
-        formula_version=spec.formula_version,
-        output_mode="values",
-        column_conflict_policy="error",
-        precision_dtype="float64",
-        availability_policy="source_available_at",
-        quality_policy="propagate_dataset",
-        error_mode="raise",
-    )
     with pytest.raises(IndicatorError) as excinfo:
         validate_indicator("sma", empty_data, config)
     assert excinfo.value.code == IndicatorErrorCode.IND_INSUFFICIENT_DATA

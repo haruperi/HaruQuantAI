@@ -3,6 +3,11 @@
 import dataclasses
 
 import pytest
+from app.services.indicators import (
+    IndicatorError,
+    IndicatorErrorCode,
+    get_warmup_requirement,
+)
 from app.services.indicators.core.contracts import (
     IndicatorConfig,
     IndicatorProtocol,
@@ -112,6 +117,89 @@ def test_warmup_requirement_is_deterministic() -> None:
     assert requirement == same_requirement
     with pytest.raises(dataclasses.FrozenInstanceError):
         requirement.minimum_observations = 20  # type: ignore[misc]
+
+
+@pytest.mark.parametrize(
+    ("indicator_id", "parameters", "source", "minimum", "timeframe", "columns"),
+    [
+        ("adx", (("period", 14),), None, 28, None, ("high", "low", "close")),
+        ("adr", (("period", 14),), None, 14, "D1", ("high", "low")),
+        ("atr", (("period", 14),), None, 14, None, ("high", "low", "close")),
+        (
+            "bollinger_bands",
+            (("period", 5), ("std_dev", 2.0)),
+            None,
+            5,
+            None,
+            ("close",),
+        ),
+        ("cmf", (("period", 5),), None, 5, None, ("high", "low", "close", "volume")),
+        (
+            "doji",
+            (("threshold", 0.1),),
+            None,
+            1,
+            None,
+            ("open", "high", "low", "close"),
+        ),
+        ("ema", (("period", 5),), "close", 5, None, ("close",)),
+        ("engulfing", (), None, 2, None, ("open", "close")),
+        ("hull_ma", (("period", 16),), "close", 19, None, ("close",)),
+        ("inside_bar", (), None, 2, None, ("high", "low")),
+        ("mfi", (("period", 5),), None, 5, None, ("high", "low", "close", "volume")),
+        ("obv", (), None, 1, None, ("close", "volume")),
+        ("pinbar", (), None, 1, None, ("open", "high", "low", "close")),
+        (
+            "price_volume_distribution",
+            (("bins", 3), ("period", 5)),
+            None,
+            5,
+            None,
+            ("high", "low", "close", "volume"),
+        ),
+        ("rolling_volatility", (("period", 5),), "open", 6, None, ("open",)),
+        ("rsi", (("period", 14),), "close", 15, None, ("close",)),
+        ("sma", (("period", 5),), "close", 5, None, ("close",)),
+        ("standard_deviation", (("period", 5),), "close", 5, None, ("close",)),
+        ("williams_r", (("period", 14),), None, 14, None, ("high", "low", "close")),
+        ("wma", (("period", 5),), "close", 5, None, ("close",)),
+    ],
+)
+def test_get_warmup_requirement_resolves_every_official_policy(
+    indicator_id: str,
+    parameters: tuple[tuple[str, int | float], ...],
+    source: str | None,
+    minimum: int,
+    timeframe: str | None,
+    columns: tuple[str, ...],
+) -> None:
+    """FR-INDI-005: resolve exact formula-specific normalized history."""
+    config = IndicatorConfig(
+        indicator_id=indicator_id,
+        parameters=parameters,
+        source=source,
+        formula_version="1.0.0",
+        output_mode="values",
+        column_conflict_policy="error",
+        precision_dtype="float64",
+        availability_policy="source_available_at",
+        quality_policy="propagate_dataset",
+        error_mode="raise",
+    )
+
+    requirement = get_warmup_requirement(indicator_id, config)
+
+    assert requirement.minimum_observations == minimum
+    assert requirement.source_timeframe == timeframe
+    assert requirement.required_columns == columns
+
+
+def test_get_warmup_requirement_rejects_config_identity_mismatch() -> None:
+    """FR-INDI-005: invalid candidate configuration fails closed."""
+    with pytest.raises(IndicatorError) as excinfo:
+        get_warmup_requirement("ema", _config())
+
+    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
 
 
 class _StubCalculator:

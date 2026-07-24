@@ -1,6 +1,6 @@
 """Public Indicators domain port.
 
-Re-exports the approved Core contracts/registry API plus the twenty official
+Re-exports the approved Core contracts/registry API plus the twenty-one official
 built-in indicator convenience functions. This package root is the only
 documented stable import surface; leaf modules are internal implementation
 detail and are not part of the public contract.
@@ -18,6 +18,7 @@ from app.services.indicators.core import (
     WarmupRequirement,
     get_capability_matrix,
     get_indicator,
+    get_warmup_requirement,
     list_indicators,
     validate_indicator,
 )
@@ -29,6 +30,7 @@ from app.services.indicators.trend import (
     hull_ma,
     sma,
     wma,
+    zigzag,
 )
 from app.services.indicators.volatility import (
     adr,
@@ -57,6 +59,7 @@ __all__ = (
     "engulfing",
     "get_capability_matrix",
     "get_indicator",
+    "get_warmup_requirement",
     "hull_ma",
     "inside_bar",
     "list_indicators",
@@ -71,4 +74,5 @@ __all__ = (
     "validate_indicator",
     "williams_r",
     "wma",
+    "zigzag",
 )

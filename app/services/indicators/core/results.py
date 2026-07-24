@@ -28,7 +28,7 @@ from app.utils import canonical_json, logger
 _CHECKSUM_CHUNK_RECORDS: Final[int] = 250
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -134,7 +134,6 @@ class IndicatorResult:
             IndicatorError: Never raised; present for interface symmetry
                 with other public Core operations.
         """
-        logger.debug("Deep-copying IndicatorResult values on construction")
         object.__setattr__(self, "values", self.values.copy(deep=True))
 
     @property
@@ -146,7 +145,6 @@ class IndicatorResult:
             quality columns. The stored ``values`` frame never carries
             original OHLCV columns, so this is a defensive full copy.
         """
-        logger.debug("Building values_only projection for %s", self.indicator_id)
         return self.values.copy(deep=True)
 
     def join_to(
@@ -205,7 +203,6 @@ def _parameter_hash(config: IndicatorConfig) -> str:
     Returns:
         Lowercase 64-character SHA-256 hexadecimal digest.
     """
-    logger.debug("Computing canonical parameter hash for %s", config.indicator_id)
     material = {
         "indicator_id": config.indicator_id,
         "formula_version": config.formula_version,
@@ -234,7 +231,6 @@ def _input_checksum(data: MarketDataset) -> str:
     Returns:
         Lowercase 64-character SHA-256 hexadecimal digest.
     """
-    logger.debug("Computing canonical input checksum for %s", data.symbol)
     payload = data.model_dump(mode="json")
     records = payload.pop("records")
     digest = hashlib.sha256()
@@ -259,7 +255,6 @@ def _serialize_output_cell(value: object) -> object:
         UTC ISO string for timestamps, a ``float.hex()`` string for finite
         floats (normalizing negative zero), or the original value.
     """
-    logger.debug("Serializing one output cell to canonical checksum form")
     if value is None or (isinstance(value, float) and math.isnan(value)):
         return None
     if pd.isna(value):
@@ -282,7 +277,6 @@ def _output_checksum(frame: pd.DataFrame) -> str:
     Returns:
         Lowercase 64-character SHA-256 hexadecimal digest.
     """
-    logger.debug("Computing canonical output checksum over %d rows", len(frame))
     rows = [
         [_serialize_output_cell(cell) for cell in row]
         for row in frame.itertuples(index=False, name=None)
@@ -303,7 +297,6 @@ def _project_source_frame(data: MarketDataset) -> pd.DataFrame:
         A UTC-indexed DataFrame with the dataset's symbol and OHLCV
         columns, in dataset row order.
     """
-    logger.debug("Projecting source MarketDataset for join_to (%s)", data.symbol)
     records = cast("tuple[OHLCVRecord, ...]", data.records)
     index = pd.DatetimeIndex(
         [record.timestamp for record in records], name="timestamp", tz="UTC"
@@ -340,7 +333,6 @@ def _validate_finalization_shape(
             or the dataset timeframe is unexpectedly missing
             (``IND_INTERNAL_ERROR``).
     """
-    logger.debug("Validating finalization shape for %s", data.symbol)
     if len(output_values) != data.record_count:
         raise IndicatorError(
             IndicatorErrorCode.IND_PARTIAL_RESULT,
@@ -392,7 +384,6 @@ def _validate_finalization_causality(
         IndicatorError: If a valid row's causal bounds are inconsistent
             (``IND_LOOKAHEAD_RISK``).
     """
-    logger.debug("Validating finalization causality for %d rows", len(timestamps))
     is_valid = unavailable_reason.isna()
     if not is_valid.any():
         return
@@ -425,7 +416,6 @@ def _validate_finalization_values(
         IndicatorError: If a non-warmup output value is not finite
             (``IND_INTERNAL_ERROR``).
     """
-    logger.debug("Validating finalization output value finiteness")
     is_valid = unavailable_reason.isna()
     for column in output_values.columns:
         values = output_values.loc[is_valid, column].to_numpy(dtype="float64")
@@ -451,7 +441,7 @@ def build_indicator_result(
 ) -> IndicatorResult:
     """Assemble the deterministic ``IndicatorResult`` for one calculation.
 
-    This internal helper is shared by all twenty official trend, volatility,
+    This internal helper is shared by all twenty-one official trend, volatility,
     momentum, volume, and candle calculators so identity, checksum, and
     finalization logic is implemented exactly once, per ``FR-INDI-007``
     through ``FR-INDI-010``.

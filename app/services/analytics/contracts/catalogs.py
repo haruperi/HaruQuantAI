@@ -76,6 +76,7 @@ _MONETARY_METRICS = frozenset(
         "sum_winning_pnl",
         "sum_losing_pnl",
         "net_pnl",
+        "expectancy",
         "starting_equity",
         "ending_equity",
         "total_commission",

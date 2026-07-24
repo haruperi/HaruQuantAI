@@ -28,7 +28,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -64,7 +64,6 @@ def _build_config(
             disagrees with ``indicator_id``, ``period``, ``source``, or
             the approved formula version.
     """
-    logger.debug("Building config for rolling_volatility (period=%s)", period)
     expected = IndicatorConfig(
         indicator_id="rolling_volatility",
         parameters=(("period", period),),
@@ -105,9 +104,6 @@ def _resolve_output_column(source: str, period: int) -> str:
         ``rolling_volatility_{period}`` when ``source`` is ``close``, else
         ``rolling_volatility_{source}_{period}``.
     """
-    logger.debug(
-        "Resolving output column for rolling_volatility over period=%d", period
-    )
     if source == "close":
         return f"rolling_volatility_{period}"
     return f"rolling_volatility_{source}_{period}"
@@ -125,7 +121,6 @@ def _timestamps_and_available(
         A UTC ``DatetimeIndex`` plus parallel lists of row timestamps and
         row ``available_at`` timestamps, all in dataset row order.
     """
-    logger.debug("Projecting timestamps and availability for %s", data.symbol)
     timestamps = [record.timestamp for record in data.records]
     available_ats = [record.available_at for record in data.records]
     index = pd.DatetimeIndex(timestamps, name="timestamp", tz="UTC")
@@ -144,9 +139,6 @@ def _epoch_micros(available_ats: list[datetime]) -> np.ndarray:
     Returns:
         An ``int64`` array of exact epoch-microsecond values.
     """
-    logger.debug(
-        "Converting %d available_at timestamps to epoch micros", len(available_ats)
-    )
     return np.array(
         [(moment - _EPOCH) // timedelta(microseconds=1) for moment in available_ats],
         dtype="int64",
@@ -170,7 +162,6 @@ def _rolling_max_available_at(
     Returns:
         A UTC datetime64 Series of the rolling maximum ``available_at``.
     """
-    logger.debug("Computing rolling max available_at over window=%d", window)
     micros = _epoch_micros(available_ats)
     result = micros.copy()
     if len(micros) >= window:
@@ -192,11 +183,6 @@ def _rolling_log_return_volatility(
         A ``(values, is_valid)`` pair where ``is_valid`` marks rows at or
         after observation ``period + 1``.
     """
-    logger.debug(
-        "Computing rolling log-return volatility over %d prices (period=%d)",
-        len(prices),
-        period,
-    )
     row_count = len(prices)
     values = np.full(row_count, np.nan, dtype="float64")
     is_valid = np.zeros(row_count, dtype=bool)

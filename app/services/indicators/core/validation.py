@@ -11,20 +11,22 @@ import math
 import re
 from collections.abc import Mapping
 from datetime import timedelta
-from typing import TYPE_CHECKING
+from typing import cast
 
 import pandas as pd
 
-from app.services.data.contracts import (
+from app.services.data import (
     MarketDataset,
     OHLCVRecord,
+)
+from app.services.indicators.core.contracts import (
+    IndicatorConfig,
+    IndicatorSpec,
+    WarmupRequirement,
 )
 from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.services.indicators.core.registry import get_indicator
 from app.utils import logger
-
-if TYPE_CHECKING:
-    from app.services.indicators.core.contracts import IndicatorConfig, IndicatorSpec
 
 MAX_INPUT_ROWS = 1_000_000
 
@@ -54,7 +56,6 @@ def _validate_config_identity(indicator_id: str, config: IndicatorConfig) -> Non
         IndicatorError: ``IND_INVALID_CONFIG`` if the config disagrees with
             the requested indicator or a fixed policy field is non-approved.
     """
-    logger.debug("Validating config identity for %s", indicator_id)
     if config.indicator_id != indicator_id:
         raise IndicatorError(
             IndicatorErrorCode.IND_INVALID_CONFIG,
@@ -83,7 +84,6 @@ def _validate_output_mode(config: IndicatorConfig) -> None:
     Raises:
         IndicatorError: ``IND_INVALID_OUTPUT_MODE`` otherwise.
     """
-    logger.debug("Validating output mode")
     if config.output_mode != "values":
         raise IndicatorError(
             IndicatorErrorCode.IND_INVALID_OUTPUT_MODE,
@@ -100,7 +100,6 @@ def _validate_precision_dtype(config: IndicatorConfig) -> None:
     Raises:
         IndicatorError: ``IND_UNSUPPORTED_DTYPE`` otherwise.
     """
-    logger.debug("Validating precision dtype")
     if config.precision_dtype != "float64":
         raise IndicatorError(
             IndicatorErrorCode.IND_UNSUPPORTED_DTYPE,
@@ -118,7 +117,6 @@ def _validate_formula_version(spec: IndicatorSpec, config: IndicatorConfig) -> N
     Raises:
         IndicatorError: ``IND_FORMULA_VERSION_MISMATCH`` otherwise.
     """
-    logger.debug("Validating formula version for %s", spec.indicator_id)
     if config.formula_version != spec.formula_version:
         raise IndicatorError(
             IndicatorErrorCode.IND_FORMULA_VERSION_MISMATCH,
@@ -148,7 +146,6 @@ def _validate_one_declared_parameter(
             missing, its type disagrees with the schema, or it falls outside
             the declared minimum/maximum.
     """
-    logger.debug("Validating declared parameter %s", name)
     if value is None:
         if schema.get("required", False):
             raise IndicatorError(
@@ -202,7 +199,6 @@ def _validate_parameters(spec: IndicatorSpec, config: IndicatorConfig) -> None:
             declared parameter is missing/invalid, an undeclared parameter
             is supplied, or the source is invalid for this indicator.
     """
-    logger.debug("Validating parameters for %s", spec.indicator_id)
     keys = [key for key, _ in config.parameters]
     if keys != sorted(keys) or len(set(keys)) != len(keys):
         raise IndicatorError(
@@ -250,7 +246,6 @@ def _validate_row_limit(data: MarketDataset) -> None:
     Raises:
         IndicatorError: ``IND_RESOURCE_LIMIT_EXCEEDED`` otherwise.
     """
-    logger.debug("Validating row limit for %s", data.symbol)
     if len(data.records) > MAX_INPUT_ROWS:
         raise IndicatorError(
             IndicatorErrorCode.IND_RESOURCE_LIMIT_EXCEEDED,
@@ -270,7 +265,6 @@ def _validate_input_schema(data: MarketDataset) -> None:
             version, schema ID, data kind, record types, or quality status
             are not approved for Indicators.
     """
-    logger.debug("Validating input schema for %s", data.symbol)
     if data.contract_version != "v1" or data.schema_id != "data.market_dataset.v1":
         raise IndicatorError(
             IndicatorErrorCode.IND_INVALID_INPUT_SCHEMA,
@@ -301,7 +295,6 @@ def _validate_adr_timeframe(indicator_id: str, data: MarketDataset) -> None:
         IndicatorError: ``IND_UNSUPPORTED_TIMEFRAME`` if ADR is requested
             against a non-``D1`` dataset.
     """
-    logger.debug("Validating ADR timeframe requirement")
     if indicator_id == "adr" and data.timeframe != "D1":
         raise IndicatorError(
             IndicatorErrorCode.IND_UNSUPPORTED_TIMEFRAME,
@@ -319,7 +312,6 @@ def _validate_sufficient_data(data: MarketDataset) -> None:
     Raises:
         IndicatorError: ``IND_INSUFFICIENT_DATA`` if the dataset is empty.
     """
-    logger.debug("Validating dataset is non-empty for %s", data.symbol)
     if len(data.records) == 0:
         raise IndicatorError(
             IndicatorErrorCode.IND_INSUFFICIENT_DATA,
@@ -339,7 +331,6 @@ def _resolve_price_fields(
     Returns:
         The concrete OHLC record field names this indicator reads.
     """
-    logger.debug("Resolving price fields for %s", spec.indicator_id)
     return tuple(
         config.source if column == "source" and config.source else column
         for column in spec.required_columns
@@ -357,7 +348,6 @@ def _validate_required_columns(spec: IndicatorSpec, config: IndicatorConfig) -> 
         IndicatorError: ``IND_MISSING_REQUIRED_COLUMN`` if a resolved field
             is not one of the dataset's always-present OHLCV columns.
     """
-    logger.debug("Validating required columns for %s", spec.indicator_id)
     fields = _resolve_price_fields(spec, config)
     missing = tuple(field for field in fields if field not in _SOURCE_OHLCV_COLUMNS)
     if missing:
@@ -377,7 +367,6 @@ def _validate_timezone(data: MarketDataset) -> None:
     Raises:
         IndicatorError: ``IND_INVALID_TIMEZONE`` otherwise.
     """
-    logger.debug("Validating record timezone for %s", data.symbol)
     for record in data.records:
         if record.timestamp.tzinfo is None or record.timestamp.utcoffset() != timedelta(
             0
@@ -398,7 +387,6 @@ def _validate_no_ambiguous_timestamps(data: MarketDataset) -> None:
         IndicatorError: ``IND_AMBIGUOUS_TIMESTAMP`` if conversion fails or
             round-trips to a different value or row count.
     """
-    logger.debug("Validating non-ambiguous timestamps for %s", data.symbol)
     timestamps = [record.timestamp for record in data.records]
     try:
         index = pd.DatetimeIndex(timestamps)
@@ -426,7 +414,6 @@ def _validate_unique_timestamps(data: MarketDataset) -> None:
     Raises:
         IndicatorError: ``IND_DUPLICATE_TIMESTAMP`` otherwise.
     """
-    logger.debug("Validating unique timestamps for %s", data.symbol)
     timestamps = [record.timestamp for record in data.records]
     if len(set(timestamps)) != len(timestamps):
         raise IndicatorError(
@@ -444,7 +431,6 @@ def _validate_monotonic_timestamps(data: MarketDataset) -> None:
     Raises:
         IndicatorError: ``IND_NON_MONOTONIC_TIME`` otherwise.
     """
-    logger.debug("Validating monotonic timestamps for %s", data.symbol)
     timestamps = [record.timestamp for record in data.records]
     if timestamps != sorted(timestamps):
         raise IndicatorError(
@@ -467,7 +453,6 @@ def _validate_finite_numeric(
         IndicatorError: ``IND_UNSUPPORTED_DTYPE`` if a selected value does
             not convert to a finite float.
     """
-    logger.debug("Validating finite numeric values for %s", spec.indicator_id)
     fields = _resolve_price_fields(spec, config)
     for record in data.records:
         for field in fields:
@@ -502,7 +487,6 @@ def _validate_formula_specific_invariants(
         IndicatorError: ``IND_INVALID_OHLC`` if rolling_volatility receives
             a non-positive selected price.
     """
-    logger.debug("Validating formula-specific invariants for %s", indicator_id)
     if indicator_id != "rolling_volatility":
         return
     source = config.source or "close"
@@ -526,7 +510,6 @@ def _resolve_output_columns(
     Returns:
         The resolved, deterministic output column names in canonical order.
     """
-    logger.debug("Resolving output columns for %s", spec.indicator_id)
     format_kwargs = dict(config.parameters)
     templates = spec.output_templates
     if len(templates) > 1 and config.source is not None:
@@ -546,7 +529,6 @@ def _validate_output_column_names(output_columns: tuple[str, ...]) -> None:
     Raises:
         IndicatorError: ``IND_INVALID_OUTPUT_COLUMN`` otherwise.
     """
-    logger.debug("Validating output column names")
     for column in output_columns:
         if not _SNAKE_CASE_KEY.fullmatch(column):
             raise IndicatorError(
@@ -565,7 +547,6 @@ def _validate_no_output_collision(output_columns: tuple[str, ...]) -> None:
     Raises:
         IndicatorError: ``IND_OUTPUT_COLUMN_CONFLICT`` otherwise.
     """
-    logger.debug("Validating no output column collision")
     reserved = set(_FIXED_RESULT_COLUMNS) | set(_SOURCE_OHLCV_COLUMNS)
     colliding = tuple(column for column in output_columns if column in reserved)
     if colliding:
@@ -574,6 +555,81 @@ def _validate_no_output_collision(output_columns: tuple[str, ...]) -> None:
             "resolved output columns collide with reserved columns",
             {"columns": colliding},
         )
+
+
+def get_warmup_requirement(
+    indicator_id: str,
+    config: IndicatorConfig,
+) -> WarmupRequirement:
+    """Resolve the exact normalized history requirement for one config.
+
+    Args:
+        indicator_id: Requested official indicator identifier.
+        config: Complete calculation configuration for the indicator.
+
+    Returns:
+        The immutable formula-specific warmup requirement.
+
+    Raises:
+        IndicatorError: If the indicator or configuration is invalid.
+    """
+    logger.info("Resolving warmup requirement for %s", indicator_id)
+    spec = get_indicator(indicator_id)
+    _validate_config_identity(indicator_id, config)
+    _validate_output_mode(config)
+    _validate_precision_dtype(config)
+    _validate_formula_version(spec, config)
+    _validate_parameters(spec, config)
+
+    parameters = dict(config.parameters)
+    period_value = parameters.get("period")
+    if period_value is None:
+        period_schema = spec.parameter_schema.get("period")
+        if isinstance(period_schema, Mapping):
+            period_value = period_schema.get("default")
+    period = period_value if isinstance(period_value, int) else None
+    requires_period = (
+        spec.warmup_policy
+        in {
+            "period",
+            "period_plus_one",
+            "two_period",
+        }
+        or indicator_id == "hull_ma"
+    )
+    if requires_period and period is None:
+        raise IndicatorError(
+            IndicatorErrorCode.IND_INTERNAL_ERROR,
+            "official warmup policy is missing period metadata",
+            {"indicator_id": indicator_id},
+        )
+    resolved_period = cast("int", period)
+
+    if spec.warmup_policy == "none":
+        minimum_observations = 1
+    elif spec.warmup_policy == "period":
+        minimum_observations = resolved_period
+    elif spec.warmup_policy == "period_plus_one":
+        minimum_observations = resolved_period + 1
+    elif spec.warmup_policy == "two_period":
+        minimum_observations = 2 * resolved_period
+    elif indicator_id == "hull_ma":
+        minimum_observations = resolved_period + math.isqrt(resolved_period) - 1
+    else:
+        minimum_observations = 2
+
+    required_columns = tuple(
+        cast("str", config.source) if column == "source" else column
+        for column in spec.required_columns
+    )
+    return WarmupRequirement(
+        indicator_id=spec.indicator_id,
+        formula_version=spec.formula_version,
+        minimum_observations=minimum_observations,
+        source_timeframe="D1" if indicator_id == "adr" else None,
+        required_columns=required_columns,
+        availability_basis="source_available_at",
+    )
 
 
 def validate_indicator(

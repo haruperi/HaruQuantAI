@@ -18,7 +18,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -46,7 +46,6 @@ def _build_config(
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building rsi config")
     expected = IndicatorConfig(
         indicator_id="rsi",
         parameters=(("period", period),),
@@ -85,7 +84,6 @@ def _wilder_rsi(prices: np.ndarray, period: int) -> tuple[np.ndarray, np.ndarray
     Returns:
         A values array and Boolean valid-row mask.
     """
-    logger.debug("Computing Wilder RSI")
     values = np.full(len(prices), np.nan, dtype="float64")
     is_valid = np.zeros(len(prices), dtype=bool)
     if len(prices) < period + 1:

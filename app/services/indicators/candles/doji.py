@@ -18,7 +18,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -42,7 +42,6 @@ def _build_config(threshold: float, config: IndicatorConfig | None) -> Indicator
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building doji config (threshold=%s)", threshold)
     expected = IndicatorConfig(
         indicator_id="doji",
         parameters=(("threshold", threshold),),

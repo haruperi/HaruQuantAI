@@ -53,8 +53,8 @@ def fr_brokers_092() -> None:
     async def run() -> None:
         res = await adapter.place_order(req)
         assert res.error is not None
-        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        print("FR-BRK-092: unreleased write blocked closed")
+        assert res.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED
+        print("FR-BRK-092: disconnected write blocked closed")
 
     asyncio.run(run())
 
@@ -82,8 +82,8 @@ def fr_brokers_094() -> None:
     async def run() -> None:
         res = await adapter.cancel_order("o1")
         assert res.error is not None
-        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        print("FR-BRK-094: unreleased write blocked closed")
+        assert res.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED
+        print("FR-BRK-094: disconnected write blocked closed")
 
     asyncio.run(run())
 
@@ -114,8 +114,8 @@ def fr_brokers_096() -> None:
     async def run() -> None:
         res = await adapter.close_position(close)
         assert res.error is not None
-        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        print("FR-BRK-096: unreleased write blocked closed")
+        assert res.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED
+        print("FR-BRK-096: disconnected write blocked closed")
 
     asyncio.run(run())
 

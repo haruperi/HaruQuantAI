@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.2.3
+
+**Release date:** 2026-07-24
+
+### Complete Indicators calculation domain
+
+The Indicators domain now exposes six focused feature modules with deterministic contracts, workflows, calculations, and standalone usage evidence.
+
+#### Added (6)
+
+- `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation.
+- `FEAT-INDI-02` Candlestick Pattern Labelling.
+- `FEAT-INDI-03` Trend and Moving-Average Calculation.
+- `FEAT-INDI-04` Momentum Oscillator Calculation.
+- `FEAT-INDI-05` Volatility and Range Calculation.
+- `FEAT-INDI-06` Volume-Flow and Price-Volume Calculation.
+
 ## 2.2.2
 
 **Release date:** 2026-07-24

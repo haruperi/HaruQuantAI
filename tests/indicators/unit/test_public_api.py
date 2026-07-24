@@ -29,6 +29,7 @@ _EXPECTED_ROOT_ALL = (
     "engulfing",
     "get_capability_matrix",
     "get_indicator",
+    "get_warmup_requirement",
     "hull_ma",
     "inside_bar",
     "list_indicators",
@@ -43,6 +44,7 @@ _EXPECTED_ROOT_ALL = (
     "validate_indicator",
     "williams_r",
     "wma",
+    "zigzag",
 )
 _EXPECTED_CORE_ALL = (
     "IndicatorConfig",
@@ -55,10 +57,19 @@ _EXPECTED_CORE_ALL = (
     "WarmupRequirement",
     "get_capability_matrix",
     "get_indicator",
+    "get_warmup_requirement",
     "list_indicators",
     "validate_indicator",
 )
-_EXPECTED_TREND_ALL = ("adx", "bollinger_bands", "ema", "hull_ma", "sma", "wma")
+_EXPECTED_TREND_ALL = (
+    "adx",
+    "bollinger_bands",
+    "ema",
+    "hull_ma",
+    "sma",
+    "wma",
+    "zigzag",
+)
 _EXPECTED_VOLATILITY_ALL = (
     "adr",
     "atr",

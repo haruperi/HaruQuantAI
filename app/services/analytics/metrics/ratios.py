@@ -28,7 +28,7 @@ _VARIANCE_MIN_SAMPLES = MIN_METRIC_SAMPLES["variance"]
 
 def _metric(
     metric_key: str,
-    value: float | None,
+    value: Decimal | float | None,
     *,
     config: AnalyticsRunConfig,
     unit: str = "ratio",
@@ -37,12 +37,12 @@ def _metric(
 
     Args:
         metric_key: Catalog metric key.
-        value: Optional finite ratio.
+        value: Optional finite ratio or monetary expectancy.
         config: Required Analytics bounds supplying the warning detail bound.
         unit: Catalog unit.
 
     Returns:
-        Ratio metric evidence.
+        Ratio or monetary expectancy metric evidence.
     """
     logger.debug("Building Analytics ratio metric evidence")
     warnings: tuple[AnalyticsWarning, ...] = ()
@@ -154,13 +154,11 @@ def calculate_ratio_evidence(
     if mean_win is not None and mean_loss is not None and mean_loss != 0:
         payoff = float(mean_win / abs(mean_loss))
     expectancy = (
-        float(
-            sum(
-                (trade.net_trade_pnl for trade in result.trades),
-                Decimal(0),
-            )
-            / len(result.trades)
+        sum(
+            (trade.net_trade_pnl for trade in result.trades),
+            Decimal(0),
         )
+        / Decimal(len(result.trades))
         if result.trades
         else None
     )

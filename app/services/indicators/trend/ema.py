@@ -18,7 +18,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -45,7 +45,6 @@ def _build_config(
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building ema config (period=%d, source=%s)", period, source)
     expected = IndicatorConfig(
         indicator_id="ema",
         parameters=(("period", period),),
@@ -84,7 +83,6 @@ def _output_column(source: str, period: int) -> str:
     Returns:
         The deterministic output column name.
     """
-    logger.debug("Resolving ema output column (source=%s, period=%d)", source, period)
     return f"ema_{period}" if source == "close" else f"ema_{source}_{period}"
 
 

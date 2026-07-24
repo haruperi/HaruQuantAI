@@ -19,7 +19,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -46,7 +46,6 @@ def _build_config(
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building wma config")
     expected = IndicatorConfig(
         indicator_id="wma",
         parameters=(("period", period),),
@@ -88,7 +87,6 @@ def _rolling_available_at(
     Returns:
         Row-aligned UTC availability timestamps.
     """
-    logger.debug("Computing rolling availability for wma")
     nanos = pd.DatetimeIndex([record.available_at for record in records]).asi8
     result = nanos.copy()
     if len(records) >= period:
@@ -106,7 +104,6 @@ def _weighted_average(prices: np.ndarray, period: int) -> np.ndarray:
     Returns:
         A float64 array with ``NaN`` warmup values.
     """
-    logger.debug("Computing weighted average for wma")
     values = np.full(len(prices), np.nan, dtype="float64")
     if len(prices) >= period:
         weights = np.arange(1, period + 1, dtype="float64")

@@ -3,12 +3,19 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data.contracts import (
+from app.services.data import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
 )
 from app.services.indicators import ema
+from app.services.strategy import (
+    StrategyTimingPolicy,
+    run_vectorized_strategy_signals,
+)
+
+from tests.strategy.unit.test_models import make_config, make_context, make_ref
+from tests.strategy.unit.test_vectorized_runner import Evaluator
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -75,23 +82,30 @@ def _dataset(closes: list[float]) -> MarketDataset:
 def test_strategy_receives_only_availability_qualified_series() -> None:
     """WF-INDI-002: Strategy consumes only rows qualified by decision time.
 
-    Simulates Trading/Simulation supplying a normalized dataset, calling
-    the official ``ema`` calculation, and returning the resulting
-    ``IndicatorSeries v1`` to Strategy. Strategy (not Indicators) enforces
-    the decision-time filter: it consumes only rows whose ``available_at``
-    is at or before its current decision time, so no row exposes
-    current/future data as already available.
+    Supplies a normalized Data contract to Indicators and passes the real
+    ``IndicatorSeries v1`` through Strategy's package-root vectorized
+    consumption boundary.
     """
     data = _dataset([1.0, 2.0, 3.0, 4.0, 5.0])
     result = ema(data, period=2)
-    values = result.values
+    timing = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
+    ref = make_ref(timing=timing)
+    ref = ref.model_copy(
+        update={
+            "manifest": ref.manifest.model_copy(
+                update={"required_indicators": ("ema",)}
+            )
+        }
+    )
 
-    decision_time = values["available_at"].iloc[2]
+    outcome = run_vectorized_strategy_signals(
+        ref,
+        make_config(),
+        data,
+        (result,),
+        make_context(timing=timing),
+        Evaluator(),
+    )
 
-    qualified = values.loc[values["available_at"] <= decision_time]
-    disqualified = values.loc[values["available_at"] > decision_time]
-
-    assert len(qualified) + len(disqualified) == len(values)
-    assert len(disqualified) > 0
-    assert (qualified["available_at"] <= decision_time).all()
-    assert (qualified["computed_from_end"].dropna() <= decision_time).all()
+    assert outcome.status == "success"
+    assert outcome.data is not None

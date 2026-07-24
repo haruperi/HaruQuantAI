@@ -19,7 +19,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -46,7 +46,6 @@ def _build_config(
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building price_volume_distribution config")
     expected = IndicatorConfig(
         indicator_id="price_volume_distribution",
         parameters=(("bins", bins), ("period", period)),
@@ -88,7 +87,6 @@ def _rolling_available_at(
     Returns:
         Row-aligned UTC availability timestamps.
     """
-    logger.debug("Computing rolling availability for price_volume_distribution")
     nanos = pd.DatetimeIndex([record.available_at for record in records]).asi8
     result = nanos.copy()
     if len(records) >= period:
@@ -117,7 +115,6 @@ def _point_of_control(
     Returns:
         A float64 array with ``NaN`` warmup values.
     """
-    logger.debug("Computing point of control for price_volume_distribution")
     values = np.full(len(close), np.nan, dtype="float64")
     # NFR-INDI-005 approved window-local exception: each window's bin edges
     # depend on that window's own min(low)/max(high), so bin assignment has no

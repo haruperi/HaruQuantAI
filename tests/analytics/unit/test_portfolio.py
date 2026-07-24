@@ -1,15 +1,27 @@
 """Unit tests for currency-safe Analytics portfolio composition."""
 
 # ruff: noqa: INP001
-
+from copy import copy
+from dataclasses import replace
 from datetime import datetime, timedelta
 from decimal import Decimal
+from typing import TypeVar
 
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.portfolio import build_portfolio_performance_report
 from app.utils import logger
 from tests.analytics._support import _report
+
+_T = TypeVar("_T")
+
+
+def _unsafe_test_copy(value: _T, **changes: object) -> _T:
+    """Build intentionally malformed downstream-boundary test evidence."""
+    copied = copy(value)
+    for field_name, field_value in changes.items():
+        object.__setattr__(copied, field_name, field_value)
+    return copied
 
 
 def test_portfolio_builder_never_sums_mixed_currency_raw_pnl() -> None:
@@ -49,7 +61,7 @@ def test_portfolio_builder_invalid_components_count() -> None:
         )
 
     # Exceeds max components
-    config.max_portfolio_components = 1
+    config = replace(config, max_portfolio_components=1)
     with pytest.raises(AnalyticsValidationError, match="component count is invalid"):
         build_portfolio_performance_report(
             (usd, usd), base_currency="USD", fx_evidence=None, config=config
@@ -72,13 +84,13 @@ def test_portfolio_builder_invalid_base_currency() -> None:
 def test_portfolio_builder_incompatible_schema() -> None:
     """Incompatible contract version or schema ID fails validation."""
     usd, config = _report(account_currency="USD")
-    bad_report = usd.model_copy(update={"contract_version": "v2"})
+    bad_report = _unsafe_test_copy(usd, contract_version="v2")
     with pytest.raises(AnalyticsValidationError, match="schema is incompatible"):
         build_portfolio_performance_report(
             (bad_report,), base_currency="USD", fx_evidence=None, config=config
         )
 
-    bad_schema = usd.model_copy(update={"schema_id": "other.schema"})
+    bad_schema = _unsafe_test_copy(usd, schema_id="other.schema")
     with pytest.raises(AnalyticsValidationError, match="schema is incompatible"):
         build_portfolio_performance_report(
             (bad_schema,), base_currency="USD", fx_evidence=None, config=config
@@ -90,14 +102,13 @@ def test_portfolio_builder_mismatched_windows() -> None:
     usd, config = _report(account_currency="USD")
     eur, _ = _report(account_currency="EUR")
     # Alter measurement window in eur
-    bad_eur = eur.model_copy(
-        update={
-            "precision_metadata": {
-                **eur.precision_metadata,
-                "measurement_start": eur.precision_metadata["measurement_start"]
-                + timedelta(days=1),
-            }
-        }
+    bad_eur = replace(
+        eur,
+        precision_metadata={
+            **eur.precision_metadata,
+            "measurement_start": eur.precision_metadata["measurement_start"]
+            + timedelta(days=1),
+        },
     )
     with pytest.raises(AnalyticsValidationError, match="windows do not match"):
         build_portfolio_performance_report(
@@ -110,21 +121,20 @@ def test_portfolio_builder_invalid_measurement_windows() -> None:
     usd, config = _report(account_currency="USD")
 
     # Missing
-    bad_usd = usd.model_copy(update={"precision_metadata": {}})
+    bad_usd = replace(usd, precision_metadata={})
     with pytest.raises(AnalyticsValidationError, match="window is missing"):
         build_portfolio_performance_report(
             (bad_usd,), base_currency="USD", fx_evidence=None, config=config
         )
 
     # Naive timestamp
-    naive_dt = datetime(2026, 7, 19)
-    bad_usd2 = usd.model_copy(
-        update={
-            "precision_metadata": {
-                "measurement_start": naive_dt,
-                "measurement_end": usd.precision_metadata["measurement_end"],
-            }
-        }
+    naive_dt = datetime(2026, 7, 19)  # noqa: DTZ001 - intentional naive timestamp validation
+    bad_usd2 = replace(
+        usd,
+        precision_metadata={
+            "measurement_start": naive_dt,
+            "measurement_end": usd.precision_metadata["measurement_end"],
+        },
     )
     with pytest.raises(AnalyticsValidationError, match="window is invalid"):
         build_portfolio_performance_report(
@@ -132,13 +142,12 @@ def test_portfolio_builder_invalid_measurement_windows() -> None:
         )
 
     # End < Start
-    bad_usd3 = usd.model_copy(
-        update={
-            "precision_metadata": {
-                "measurement_start": usd.precision_metadata["measurement_end"],
-                "measurement_end": usd.precision_metadata["measurement_start"],
-            }
-        }
+    bad_usd3 = replace(
+        usd,
+        precision_metadata={
+            "measurement_start": usd.precision_metadata["measurement_end"],
+            "measurement_end": usd.precision_metadata["measurement_start"],
+        },
     )
     with pytest.raises(AnalyticsValidationError, match="window is invalid"):
         build_portfolio_performance_report(
@@ -252,7 +261,7 @@ def test_portfolio_builder_invalid_fx_evidence_values() -> None:
         )
 
     # Naive as_of
-    naive_dt = datetime(2026, 7, 19)
+    naive_dt = datetime(2026, 7, 19)  # noqa: DTZ001 - intentional naive timestamp validation
     naive_as_of = _good_evidence(as_of=naive_dt)
     with pytest.raises(AnalyticsValidationError, match="stale or invalid"):
         build_portfolio_performance_report(
@@ -264,7 +273,7 @@ def test_portfolio_builder_no_aggregable_currency_evidence() -> None:
     """Component reports with no currency metrics fail validation."""
     usd, config = _report(account_currency="USD")
     # Empty out the metrics
-    empty_usd = usd.model_copy(update={"sections": ()})
+    empty_usd = _unsafe_test_copy(usd, sections=())
     with pytest.raises(
         AnalyticsValidationError, match="no aggregable currency evidence"
     ):
@@ -276,7 +285,7 @@ def test_portfolio_builder_no_aggregable_currency_evidence() -> None:
 def test_portfolio_builder_metric_value_not_decimal() -> None:
     """A currency metric value that is not Decimal fails validation."""
     usd, config = _report(account_currency="USD")
-    from app.services.analytics.contracts.models import MetricEvidence, SectionEvidence
+    from app.services.analytics.contracts.models import MetricEvidence
 
     # Replace metrics with a float value metric
     bad_metric = MetricEvidence(
@@ -286,14 +295,13 @@ def test_portfolio_builder_metric_value_not_decimal() -> None:
         unit="currency",
         source_context="source-1",
     )
-    bad_usd = usd.model_copy(
-        update={
-            "sections": (
-                SectionEvidence(
-                    section_key="overall", status="completed", metrics=(bad_metric,)
-                ),
-            )
-        }
+    bad_section = _unsafe_test_copy(
+        usd.sections[0],
+        metrics=(bad_metric,),
+    )
+    bad_usd = _unsafe_test_copy(
+        usd,
+        sections=(bad_section,),
     )
     with pytest.raises(
         AnalyticsValidationError, match="currency metric must be Decimal"

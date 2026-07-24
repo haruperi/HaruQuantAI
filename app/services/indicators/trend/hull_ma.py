@@ -20,7 +20,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -47,7 +47,6 @@ def _build_config(
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building hull_ma config")
     expected = IndicatorConfig(
         indicator_id="hull_ma",
         parameters=(("period", period),),
@@ -86,7 +85,6 @@ def _weighted_average(values: np.ndarray, period: int) -> np.ndarray:
     Returns:
         A float64 array with ``NaN`` for incomplete windows.
     """
-    logger.debug("Computing weighted average for hull_ma")
     result = np.full(len(values), np.nan, dtype="float64")
     if len(values) < period:
         return result
@@ -112,7 +110,6 @@ def _rolling_available_at(
     Returns:
         Row-aligned UTC availability timestamps.
     """
-    logger.debug("Computing rolling availability for hull_ma")
     nanos = pd.DatetimeIndex([record.available_at for record in records]).asi8
     result = nanos.copy()
     if len(records) >= window:

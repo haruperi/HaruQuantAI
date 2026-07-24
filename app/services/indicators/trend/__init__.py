@@ -6,5 +6,6 @@ from app.services.indicators.trend.ema import ema
 from app.services.indicators.trend.hull_ma import hull_ma
 from app.services.indicators.trend.sma import sma
 from app.services.indicators.trend.wma import wma
+from app.services.indicators.trend.zigzag import zigzag
 
-__all__ = ["adx", "bollinger_bands", "ema", "hull_ma", "sma", "wma"]
+__all__ = ["adx", "bollinger_bands", "ema", "hull_ma", "sma", "wma", "zigzag"]

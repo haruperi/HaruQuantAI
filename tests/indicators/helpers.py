@@ -2,12 +2,19 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
-from app.services.data.contracts import (
+import pandas as pd
+from app.services.data import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
 )
+from app.services.indicators.core.contracts import IndicatorConfig
+from app.services.indicators.core.results import IndicatorResult, build_indicator_result
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _REQUEST_ID = "req-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
@@ -89,4 +96,62 @@ def close_dataset(prices: list[float]) -> MarketDataset:
     )
 
 
-__all__ = ["build_dataset", "close_dataset"]
+def build_indicator_evidence(
+    market: MarketDataset,
+    *,
+    indicator_id: str,
+    output_column: str,
+    values: Sequence[float],
+) -> IndicatorResult:
+    """Build checksum-bound indicator evidence for cross-domain test fixtures.
+
+    Args:
+        market: Exact source market dataset.
+        indicator_id: Official indicator identity.
+        output_column: Exact output column name.
+        values: Ordered ready indicator values.
+
+    Returns:
+        A deterministic ``IndicatorResult`` for consumer-domain unit tests.
+    """
+    index = pd.DatetimeIndex(
+        [record.timestamp for record in market.records],
+        name="timestamp",
+        tz="UTC",
+    )
+    output_values = pd.DataFrame({output_column: values}, index=index)
+    available_at = pd.Series(
+        [record.available_at for record in market.records],
+        index=index,
+    )
+    computed_from = pd.Series(
+        [record.timestamp for record in market.records],
+        index=index,
+    )
+    unavailable_reason = pd.Series([pd.NA] * len(index), index=index)
+    config = IndicatorConfig(
+        indicator_id=indicator_id,
+        parameters=(),
+        source="close",
+        formula_version="1.0.0",
+        output_mode="values",
+        column_conflict_policy="error",
+        precision_dtype="float64",
+        availability_policy="source_available_at",
+        quality_policy="propagate_dataset",
+        error_mode="raise",
+    )
+    return build_indicator_result(
+        data=market,
+        config=config,
+        indicator_version="1.0.0",
+        output_columns=(output_column,),
+        output_values=output_values,
+        available_at=available_at,
+        computed_from_start=computed_from,
+        computed_from_end=computed_from,
+        unavailable_reason=unavailable_reason,
+    )
+
+
+__all__ = ["build_dataset", "build_indicator_evidence", "close_dataset"]

@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pandas as pd
-from app.services.data.contracts import (
+from app.services.data import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,

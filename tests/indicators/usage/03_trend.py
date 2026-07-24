@@ -1,102 +1,95 @@
-"""Executable indicators trend feature examples."""
+"""Executable usage evidence for trend indicators."""
 
 import sys
 from pathlib import Path
 
-# Add project root to path before importing local modules
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import get_market_data
-from app.services.data.contracts import DataError, MarketDataset
-from app.services.indicators.trend import (
-    adx,
-    bollinger_bands,
-    ema,
-    hull_ma,
-    sma,
-    wma,
-)
+from app.services.data import DataError, MarketDataset, get_market_data
+from app.services.indicators import adx, bollinger_bands, ema, hull_ma, sma, wma, zigzag
 
 _CACHE: dict[str, MarketDataset] = {}
 
 
-def _header(title: str) -> None:
-    """Print the header for an example section.
-
-    Args:
-        title: The title of the section to display.
-    """
-    print(f"\n\n\n{'=' * 100}")
-    print(f"\t\t{title}\t")
-    print(f"{'=' * 100}\n")
-
-
-def _get_dataset() -> MarketDataset:
-    """Retrieve real market dataset.
+def _dataset() -> MarketDataset:
+    """Return one cached real read-only market dataset.
 
     Returns:
-        A MarketDataset instance.
+        A normalized real market dataset.
+
+    Raises:
+        DataError: If the configured source is unavailable.
     """
-    if "dataset" in _CACHE:
-        return _CACHE["dataset"]
-    dataset = get_market_data(
-        source_id="mt5",
-        symbol="EURUSD",
-        timeframe="M5",
-        limit=20,
-    )
-    print("Using real MT5 EURUSD market data.")
-    _CACHE["dataset"] = dataset
-    return dataset
+    if "dataset" not in _CACHE:
+        _CACHE["dataset"] = get_market_data(
+            source_id="mt5",
+            symbol="EURUSD",
+            timeframe="M5",
+            limit=30,
+        )
+    return _CACHE["dataset"]
+
+
+def fr_indi_015() -> None:
+    """FR-INDI-015: The system shall calculate EMA for one validated `MarketDataset v1` using the approved seed/smoothing contract, return `ema_{period}` or the exact source-qualified name, preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input."""  # noqa: E501 - exact specification text
+    result = ema(_dataset(), period=3)
+    print("FR-INDI-015", result.values["ema_3"].tolist())
+
+
+def fr_indi_016() -> None:
+    """FR-INDI-016: The system shall calculate SMA for one validated `MarketDataset v1` over the approved inclusive window, return the exact deterministic source-qualified output, preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input."""  # noqa: E501 - exact specification text
+    result = sma(_dataset(), period=3)
+    print("FR-INDI-016", result.values["sma_3"].tolist())
+
+
+def fr_indi_017() -> None:
+    """FR-INDI-017: The system shall calculate approved ADX, +DI, and -DI values for one validated `MarketDataset v1`, return the three canonical columns with warmup/availability metadata, and handle zero range deterministically."""  # noqa: E501 - exact specification text
+    result = adx(_dataset(), period=2)
+    print("FR-INDI-017", list(result.output_columns))
+
+
+def fr_indi_023() -> None:
+    """FR-INDI-023: The system shall calculate WMA for one validated `MarketDataset v1` using linear weights `1..period` over the inclusive window, return the exact source-qualified output, preserve warmup rows, and expose causal metadata."""  # noqa: E501 - exact specification text
+    result = wma(_dataset(), period=3)
+    print("FR-INDI-023", result.values["wma_3"].tolist())
+
+
+def fr_indi_024() -> None:
+    """FR-INDI-024: The system shall calculate Hull MA for one validated `MarketDataset v1` from two nested half/full-period WMA passes and one `⌊√period⌋`-length WMA pass, return the exact source-qualified output, preserve warmup rows, and expose causal metadata."""  # noqa: E501 - exact specification text
+    result = hull_ma(_dataset(), period=4)
+    print("FR-INDI-024", result.values["hull_ma_4"].tolist())
+
+
+def fr_indi_025() -> None:
+    """FR-INDI-025: The system shall calculate Bollinger Bands for one validated `MarketDataset v1` as an SMA basis with symmetric standard-deviation bands, return the three canonical columns sharing one warmup mask, and expose causal metadata."""  # noqa: E501 - exact specification text
+    result = bollinger_bands(_dataset(), period=3, std_dev=2.0)
+    print("FR-INDI-025", list(result.output_columns))
+
+
+def fr_indi_035() -> None:
+    """FR-INDI-035: The system shall identify unique alternating high/low extrema over an explicit symmetric `depth` window and publish each value and type only on its causal confirmation row; tied extrema and consecutive candidates of the same type are not pivots, and a published pivot is never revised."""  # noqa: E501
+    result = zigzag(_dataset(), depth=2)
+    print("FR-INDI-035", result.values["zigzag_value_2"].dropna().tolist())
 
 
 def main() -> None:
-    """Run the trend-indicator feature usage examples.
+    """Run every trend requirement demonstration.
 
-    Demonstrates ``FR-INDI-015``, ``FR-INDI-016``, ``FR-INDI-017``, and
-    ``FR-INDI-023`` through ``FR-INDI-025`` end-to-end against real market
-    data using only documented public exports. Exits with status ``3`` when
-    the live market-data source is unavailable, which the integration runner
-    treats as a skip rather than a failure.
+    Returns:
+        None.
     """
     try:
-        data = _get_dataset()
+        _dataset()
     except DataError as unavailable:
         print(f"Skipping trend examples: MT5 data unavailable ({unavailable.code})")
-        sys.exit(3)
-
-    _header("Example 1: Calculate EMA over a normalized dataset")
-    result_ema = ema(data, period=3)
-    print(f"EMA columns: {list(result_ema.values.columns)}")
-    print("EMA Full Table Values: ")
-    print(f"{result_ema.values}")
-
-    _header("Example 2: Calculate SMA over a normalized dataset")
-    result_sma = sma(data, period=3)
-    print(f"SMA columns: {list(result_sma.values.columns)}")
-    print("View the specific indicator column 'sma_3': ")
-    print(f"{result_sma.values['sma_3']}")
-
-    _header("Example 3: Calculate WMA over a normalized dataset")
-    result_wma = wma(data, period=3)
-    print("View the indicator columns joined with the original market data (OHLCV): ")
-    print(f"{result_wma.join_to(data)}")
-
-    _header("Example 4: Calculate Hull MA over a normalized dataset")
-    result_hma = hull_ma(data, period=3)
-    print("View the copy-safe values-only projection: ")
-    print(f"{result_hma.values_only}")
-
-    _header("Example 5: Calculate Bollinger Bands over a normalized dataset")
-    result_bb = bollinger_bands(data, period=3, std_dev=2.0)
-    print(f"Bollinger Bands columns: {list(result_bb.output_columns)}")
-
-    _header("Example 6: Calculate ADX, +DI, and -DI over a normalized dataset")
-    result_adx = adx(data, period=2)
-    print(f"ADX columns: {list(result_adx.values.columns)}")
-    print(f"ADX values: {result_adx.values['adx_2'].tolist()}")
-    print(f"Plus DI values: {result_adx.values['plus_di_2'].tolist()}")
-    print(f"Minus DI values: {result_adx.values['minus_di_2'].tolist()}")
+        raise SystemExit(3) from None
+    fr_indi_015()
+    fr_indi_016()
+    fr_indi_017()
+    fr_indi_023()
+    fr_indi_024()
+    fr_indi_025()
+    fr_indi_035()
 
 
 if __name__ == "__main__":

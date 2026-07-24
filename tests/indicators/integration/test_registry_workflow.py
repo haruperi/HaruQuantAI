@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.contracts import (
+from app.services.data import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
@@ -42,6 +42,7 @@ _OFFICIAL_INDICATOR_IDS = frozenset(
         "standard_deviation",
         "williams_r",
         "wma",
+        "zigzag",
     }
 )
 
@@ -103,7 +104,7 @@ def _dataset() -> MarketDataset:
 
 
 def test_registry_discovers_and_validates_only_official_batch_indicators() -> None:
-    """WF-INDI-005: the registry exposes exactly the eight official built-ins.
+    """WF-INDI-005: the registry exposes exactly the official built-ins.
 
     ``get_indicator`` resolves a candidate ID to its immutable spec or
     raises a deterministic refusal for anything outside the eight reviewed

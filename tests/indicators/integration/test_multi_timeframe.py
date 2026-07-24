@@ -3,10 +3,11 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data.contracts import (
+from app.services.data import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
+    align_multitimeframe_data,
 )
 from app.services.indicators import sma
 
@@ -88,14 +89,19 @@ def test_separate_timeframe_results_preserve_source_availability() -> None:
     """
     primary = _dataset([1.0, 2.0, 3.0, 4.0, 5.0], timeframe="M5", minutes_per_bar=5)
     higher = _dataset([10.0, 12.0, 14.0], timeframe="H1", minutes_per_bar=60)
+    target = tuple(record.timestamp for record in primary.records[1:])
+    aligned = align_multitimeframe_data(
+        {"primary": primary, "higher": higher},
+        target,
+    )
 
-    primary_result = sma(primary, period=2, source="close")
-    higher_result = sma(higher, period=2, source="close")
+    primary_result = sma(aligned["primary"], period=2, source="close")
+    higher_result = sma(aligned["higher"], period=2, source="close")
 
     assert primary_result.manifest.source_timeframe == "M5"
     assert higher_result.manifest.source_timeframe == "H1"
-    assert primary_result.manifest.row_count == len(primary.records)
-    assert higher_result.manifest.row_count == len(higher.records)
+    assert primary_result.manifest.row_count == len(target)
+    assert higher_result.manifest.row_count == len(target)
     assert (
         primary_result.manifest.input_checksum != higher_result.manifest.input_checksum
     )

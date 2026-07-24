@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset
+    from app.services.data import MarketDataset
     from app.services.indicators.core.results import IndicatorResult
 
 

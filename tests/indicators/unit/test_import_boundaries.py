@@ -10,10 +10,11 @@ from pathlib import Path
 
 INDICATORS_ROOT = Path("app/services/indicators").resolve()
 DOMAIN_PREFIX = "app.services.indicators"
+DATA_PUBLIC_ROOT = "app.services.data"
 
 # The complete approved runtime dependency surface for this pure domain.
 ALLOWED_THIRD_PARTY = {"numpy", "pandas"}
-ALLOWED_LOCAL_PREFIXES = ("app.utils", "app.services.data.contracts", DOMAIN_PREFIX)
+ALLOWED_LOCAL_PREFIXES = ("app.utils", DOMAIN_PREFIX)
 
 # Modules that would give this domain I/O, persistence, network, subprocess,
 # environment, wall-clock, or nondeterminism capability it must never hold.
@@ -80,7 +81,7 @@ def _is_allowed(module: str) -> bool:
     Returns:
         ``True`` when the module is stdlib, approved third-party, or approved local.
     """
-    if module.startswith(ALLOWED_LOCAL_PREFIXES):
+    if module == DATA_PUBLIC_ROOT or module.startswith(ALLOWED_LOCAL_PREFIXES):
         return True
     root = module.split(".", maxsplit=1)[0]
     if root in ALLOWED_THIRD_PARTY:
@@ -113,8 +114,8 @@ def test_indicators_never_imports_a_peer_service_domain() -> None:
     violations: list[str] = []
     for path in _python_files():
         for module in _imported_roots(path):
-            if module.startswith("app.services.") and not module.startswith(
-                (DOMAIN_PREFIX, "app.services.data.contracts")
+            if module.startswith("app.services.") and not (
+                module.startswith(DOMAIN_PREFIX) or module == DATA_PUBLIC_ROOT
             ):
                 violations.append(f"{path.name}: {module}")
     assert violations == [], f"cross-domain imports: {violations}"
@@ -146,7 +147,7 @@ def test_importing_indicators_has_no_persistent_side_effects() -> None:
         "import app.services.indicators as ind;"
         "after={p.name for p in pathlib.Path.cwd().iterdir()};"
         "assert before==after,'import created filesystem entries';"
-        "assert len(ind.__all__)==32,'unexpected public surface';"
+        "assert len(ind.__all__)==34,'unexpected public surface';"
         "print('OK')"
     )
     completed = subprocess.run(  # noqa: S603 - fixed inline probe, no shell.

@@ -13,7 +13,10 @@ from app.services.indicators.core.registry import (
     list_indicators,
 )
 from app.services.indicators.core.results import IndicatorManifest, IndicatorResult
-from app.services.indicators.core.validation import validate_indicator
+from app.services.indicators.core.validation import (
+    get_warmup_requirement,
+    validate_indicator,
+)
 
 __all__ = (
     "IndicatorConfig",
@@ -26,6 +29,7 @@ __all__ = (
     "WarmupRequirement",
     "get_capability_matrix",
     "get_indicator",
+    "get_warmup_requirement",
     "list_indicators",
     "validate_indicator",
 )

@@ -1,82 +1,74 @@
-"""Executable indicators candlestick patterns examples."""
+"""Executable usage evidence for candlestick-pattern indicators."""
 
 import sys
 from pathlib import Path
 
-# Add project root to path before importing local modules
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import get_market_data
-from app.services.data.contracts import DataError, MarketDataset
-from app.services.indicators.candles import doji, engulfing, inside_bar, pinbar
-
-
-def _header(title: str) -> None:
-    """Print the header for an example section.
-
-    Args:
-        title: The title of the section to display.
-    """
-    print(f"\n\n\n{'=' * 100}")
-    print(f"\t\t{title}\t")
-    print(f"{'=' * 100}\n")
-
+from app.services.data import DataError, MarketDataset, get_market_data
+from app.services.indicators import doji, engulfing, inside_bar, pinbar
 
 _CACHE: dict[str, MarketDataset] = {}
 
 
-def _get_dataset() -> MarketDataset:
-    """Retrieve real market dataset.
+def _dataset() -> MarketDataset:
+    """Return one cached real read-only market dataset.
 
     Returns:
-        A MarketDataset instance.
+        A normalized real market dataset.
+
+    Raises:
+        DataError: If the configured source is unavailable.
     """
-    if "dataset" in _CACHE:
-        return _CACHE["dataset"]
-    dataset = get_market_data(
-        source_id="mt5",
-        symbol="EURUSD",
-        timeframe="M5",
-        limit=20,
-    )
-    print("Using real MT5 EURUSD market data.")
-    _CACHE["dataset"] = dataset
-    return dataset
+    if "dataset" not in _CACHE:
+        _CACHE["dataset"] = get_market_data(
+            source_id="mt5",
+            symbol="EURUSD",
+            timeframe="M5",
+            limit=20,
+        )
+    return _CACHE["dataset"]
+
+
+def fr_indi_031() -> None:
+    """FR-INDI-031: The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close."""  # noqa: E501 - exact specification text
+    result = doji(_dataset(), threshold=0.1)
+    print("FR-INDI-031", result.values["doji"].tolist())
+
+
+def fr_indi_032() -> None:
+    """FR-INDI-032: The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies."""  # noqa: E501 - exact specification text
+    result = engulfing(_dataset())
+    print("FR-INDI-032", result.values["engulfing"].tolist())
+
+
+def fr_indi_033() -> None:
+    """FR-INDI-033: The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match."""  # noqa: E501 - exact specification text
+    result = pinbar(_dataset())
+    print("FR-INDI-033", result.values["pinbar"].tolist())
+
+
+def fr_indi_034() -> None:
+    """FR-INDI-034: The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup."""  # noqa: E501 - exact specification text
+    result = inside_bar(_dataset())
+    print("FR-INDI-034", result.values["inside_bar"].tolist())
 
 
 def main() -> None:
-    """Run the candlestick-pattern feature usage examples.
+    """Run every candlestick-pattern requirement demonstration.
 
-    Demonstrates ``FR-INDI-031`` through ``FR-INDI-034`` end-to-end against
-    real market data using only documented public exports. Exits with status
-    ``3`` when the live market-data source is unavailable, which the
-    integration runner treats as a skip rather than a failure.
+    Returns:
+        None.
     """
     try:
-        data = _get_dataset()
+        _dataset()
     except DataError as unavailable:
         print(f"Skipping candle examples: MT5 data unavailable ({unavailable.code})")
-        sys.exit(3)
-
-    _header("Example 1: Identify Doji candlesticks")
-    result_doji = doji(data, threshold=0.1)
-    print(f"Doji values: {result_doji.values['doji'].tolist()}")
-    print(f"Output columns: {result_doji.output_columns}")
-
-    _header("Example 2: Identify Engulfing candlesticks")
-    result_engulfing = engulfing(data)
-    print(f"Engulfing values: {result_engulfing.values['engulfing'].tolist()}")
-    print(f"Output columns: {result_engulfing.output_columns}")
-
-    _header("Example 3: Identify Pinbar candlesticks")
-    result_pinbar = pinbar(data)
-    print(f"Pinbar values: {result_pinbar.values['pinbar'].tolist()}")
-    print(f"Output columns: {result_pinbar.output_columns}")
-
-    _header("Example 4: Identify Inside Bar candlesticks")
-    result_inside = inside_bar(data)
-    print(f"Inside Bar values: {result_inside.values['inside_bar'].tolist()}")
-    print(f"Output columns: {result_inside.output_columns}")
+        raise SystemExit(3) from None
+    fr_indi_031()
+    fr_indi_032()
+    fr_indi_033()
+    fr_indi_034()
 
 
 if __name__ == "__main__":

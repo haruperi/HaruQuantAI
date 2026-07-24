@@ -19,7 +19,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -43,7 +43,6 @@ def _build_config(period: int, config: IndicatorConfig | None) -> IndicatorConfi
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building williams_r config (period=%d)", period)
     expected = IndicatorConfig(
         indicator_id="williams_r",
         parameters=(("period", period),),
@@ -85,7 +84,6 @@ def _rolling_available_at(
     Returns:
         Row-aligned UTC availability timestamps.
     """
-    logger.debug("Computing rolling availability for williams_r (period=%d)", period)
     nanos = pd.DatetimeIndex([record.available_at for record in records]).asi8
     result = nanos.copy()
     if len(records) >= period:

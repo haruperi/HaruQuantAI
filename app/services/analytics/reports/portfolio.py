@@ -130,9 +130,7 @@ def _currency_metrics(report: PerformanceReport) -> tuple[MetricEvidence, ...]:
         metric
         for section in report.sections
         for metric in section.metrics
-        if metric.status == "calculated"
-        and metric.unit == "currency"
-        and isinstance(metric.value, Decimal)
+        if metric.status == "calculated" and metric.unit == "currency"
     )
 
 

@@ -1,6 +1,6 @@
 """Immutable official Indicators registry and capability matrix.
 
-Describes the twenty official built-in indicators and the Core-supported
+Describes the twenty-one official built-in indicators and the Core-supported
 execution modes. The registry stores no runtime registrations, performs no
 plugin discovery, and never imports a feature implementation module.
 """
@@ -46,7 +46,6 @@ def _period_schema(*, required: bool, default: int | None) -> Mapping[str, objec
     Returns:
         A frozen JSON-compatible period schema mapping.
     """
-    logger.debug("Building period parameter schema (required=%s)", required)
     return MappingProxyType(
         {
             "type": "integer",
@@ -77,7 +76,6 @@ def _number_schema(
     Returns:
         A frozen JSON-compatible numeric schema mapping.
     """
-    logger.debug("Building numeric parameter schema (required=%s)", required)
     return MappingProxyType(
         {
             "type": "number",
@@ -107,7 +105,6 @@ def _integer_schema(
     Returns:
         A frozen JSON-compatible integer schema mapping.
     """
-    logger.debug("Building integer parameter schema (required=%s)", required)
     return MappingProxyType(
         {
             "type": "integer",
@@ -152,7 +149,6 @@ def _spec(
     Returns:
         The immutable official ``IndicatorSpec``.
     """
-    logger.debug("Building official IndicatorSpec for %s", indicator_id)
     resolved_schema = (
         parameter_schema
         if parameter_schema is not None
@@ -430,6 +426,27 @@ _REGISTRY: Mapping[str, IndicatorSpec] = MappingProxyType(
                 period_required=True,
                 period_default=None,
             ),
+            _spec(
+                indicator_id="zigzag",
+                name="Causal Confirmed ZigZag",
+                required_columns=("high", "low"),
+                output_templates=(
+                    "zigzag_value_{depth}",
+                    "zigzag_type_{depth}",
+                ),
+                warmup_policy="custom",
+                import_path="app.services.indicators.trend.zigzag:zigzag",
+                parameter_schema=MappingProxyType(
+                    {
+                        "depth": _integer_schema(
+                            required=True,
+                            default=None,
+                            minimum=2,
+                            maximum=10_000,
+                        )
+                    }
+                ),
+            ),
         )
     }
 )
@@ -455,6 +472,7 @@ _REGISTRY_ORDER: tuple[str, ...] = (
     "standard_deviation",
     "williams_r",
     "wma",
+    "zigzag",
 )
 
 
@@ -469,7 +487,7 @@ def get_indicator(indicator_id: str) -> IndicatorSpec:
 
     Raises:
         IndicatorError: ``IND_UNSUPPORTED_INDICATOR`` if the ID is not one
-            of the twenty official built-ins.
+            of the twenty-one official built-ins.
     """
     logger.info("Resolving official indicator spec for %s", indicator_id)
     spec = _REGISTRY.get(indicator_id)

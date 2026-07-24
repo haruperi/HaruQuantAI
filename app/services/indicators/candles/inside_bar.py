@@ -18,7 +18,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -41,7 +41,6 @@ def _build_config(config: IndicatorConfig | None) -> IndicatorConfig:
         IndicatorError: If an explicit configuration disagrees with the
             parameterless Inside Bar contract.
     """
-    logger.debug("Building inside_bar config")
     expected = IndicatorConfig(
         indicator_id="inside_bar",
         parameters=(),

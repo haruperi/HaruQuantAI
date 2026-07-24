@@ -19,7 +19,7 @@ from app.services.indicators.core.validation import validate_indicator
 from app.utils import logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import (
+    from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
@@ -46,7 +46,6 @@ def _build_config(
         IndicatorError: If an explicit configuration disagrees with the
             wrapper arguments.
     """
-    logger.debug("Building standard_deviation config")
     expected = IndicatorConfig(
         indicator_id="standard_deviation",
         parameters=(("period", period),),
@@ -88,7 +87,6 @@ def _rolling_available_at(
     Returns:
         Row-aligned UTC availability timestamps.
     """
-    logger.debug("Computing rolling availability for standard_deviation")
     nanos = pd.DatetimeIndex([record.available_at for record in records]).asi8
     result = nanos.copy()
     if len(records) >= period:

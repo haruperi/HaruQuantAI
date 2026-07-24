@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/indicators`
 > **Status:** `Completed`
-> **Last updated:** `2026-07-22`
+> **Last updated:** `2026-07-24`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -179,6 +179,7 @@ indicators/
 ├── README.md
 ├── core/                               # Feature: contracts and deterministic execution boundary
 │   ├── __init__.py
+│   ├── README.md
 │   ├── errors.py                       # Deterministic Core MVP error contract
 │   ├── contracts.py                    # Immutable config/spec/warmup/protocol contracts
 │   ├── results.py                      # IndicatorSeries manifest, values-only, and copied join
@@ -186,30 +187,36 @@ indicators/
 │   └── validation.py                   # Full fail-fast request validation
 ├── trend/                              # Feature: trend indicators
 │   ├── __init__.py
+│   ├── README.md
 │   ├── ema.py                          # Exponential Moving Average
 │   ├── sma.py                          # Simple Moving Average
 │   ├── wma.py                          # Weighted Moving Average
 │   ├── hull_ma.py                      # Hull Moving Average
 │   ├── bollinger_bands.py              # Bollinger Bands
-│   └── directional.py                  # ADX
+│   ├── directional.py                  # ADX
+│   └── zigzag.py                       # Causal confirmed-pivot ZigZag
 ├── volatility/                         # Feature: volatility indicators
 │   ├── __init__.py
+│   ├── README.md
 │   ├── atr.py                          # Average True Range
 │   ├── adr.py                          # Average Daily Range
 │   ├── rolling_volatility.py           # Return-based rolling volatility
 │   └── standard_deviation.py           # Rolling price standard deviation
 ├── momentum/                           # Feature: momentum indicators
 │   ├── __init__.py
+│   ├── README.md
 │   ├── rsi.py                          # Relative Strength Index
 │   └── williams_r.py                   # Williams %R
 ├── volume/                             # Feature: volume indicators
 │   ├── __init__.py
+│   ├── README.md
 │   ├── cmf.py                          # Chaikin Money Flow
 │   ├── obv.py                          # On-Balance Volume
 │   ├── mfi.py                          # Money Flow Index
 │   └── price_volume_distribution.py    # Rolling volume-by-price point of control
 └── candles/                            # Feature: single/two-bar candlestick patterns
     ├── __init__.py
+    ├── README.md
     ├── doji.py                         # Doji pattern
     ├── engulfing.py                    # Engulfing pattern
     ├── pinbar.py                       # Pinbar pattern
@@ -227,9 +234,9 @@ feature IDs, and each ordinal matches its usage-program number.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
-| Completed | `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation | `core/` | `IndicatorErrorCode`, `IndicatorError`, config/spec/warmup/protocol, result/manifest/projection, discovery, capability, and validation declarations | `FR-INDI-001`–`FR-INDI-014`; exact declarations in Section 4.1 | `tests/indicators/usage/01_core.py` |
+| Completed | `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation | `core/` | `IndicatorErrorCode`, `IndicatorError`, config/spec/warmup/protocol, result/manifest/projection, discovery, capability, `get_warmup_requirement`, and validation declarations | `FR-INDI-001`–`FR-INDI-014`; exact declarations in Section 4.1 | `tests/indicators/usage/01_core.py` |
 | Completed | `FEAT-INDI-02` Candlestick Pattern Labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar` | `FR-INDI-031`–`FR-INDI-034`; exact declarations in Section 4.6 | `tests/indicators/usage/02_candles.py` |
-| Completed | `FEAT-INDI-03` Trend and Moving-Average Calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`; exact declarations in Section 4.2 | `tests/indicators/usage/03_trend.py` |
+| Completed | `FEAT-INDI-03` Trend and Moving-Average Calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`, `FR-INDI-035`; exact declarations in Section 4.2 | `tests/indicators/usage/03_trend.py` |
 | Completed | `FEAT-INDI-04` Momentum Oscillator Calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`, `FR-INDI-022`; exact declarations in Section 4.4 | `tests/indicators/usage/04_momentum.py` |
 | Completed | `FEAT-INDI-05` Volatility and Range Calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026`; exact declarations in Section 4.3 | `tests/indicators/usage/05_volatility.py` |
 | Completed | `FEAT-INDI-06` Volume-Flow and Price-Volume Calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution` | `FR-INDI-027`–`FR-INDI-030`; exact declarations in Section 4.5 | `tests/indicators/usage/06_volume.py` |
@@ -265,17 +272,17 @@ flowchart LR
 - The root contains only `README.md`, `__init__.py`, and the six approved module folders.
 - Built-ins are stateless functions. Classes are limited to immutable data contracts, the structural protocol, and the domain exception.
 - Each trend/volatility/momentum/volume/candles file implements exactly one official indicator; a file is never shared by two indicators. Private vectorization helpers may be duplicated per file rather than factored into a shared base class.
-- Public callers import only from `app.services.indicators` or an approved feature `__init__.py`; leaf-file imports are not stable API.
+- Public callers import only from `app.services.indicators`; feature and leaf modules are not stable API.
 - Every public symbol appears exactly once in Section 4.
 - Private vectorization, hashing, naming, and formula helpers remain in the focused owning file and receive no separate requirement IDs.
-- **Common leaf set.** Every one of the 20 indicator leaf files imports exactly
+- **Common leaf set.** Every one of the 21 indicator leaf files imports exactly
   the same local surface, referenced as *(common leaf set)* in the feature
   Files tables: `core.contracts → IndicatorConfig`;
   `core.errors → IndicatorError, IndicatorErrorCode`;
   `core.errors → guard_public_boundary`;
   `core.results → build_indicator_result`;
   `core.validation → validate_indicator`; `app.utils → logger`; and, under
-  `TYPE_CHECKING` only, `app.services.data.contracts → MarketDataset,
+  `TYPE_CHECKING` only, `app.services.data → MarketDataset,
   OHLCVRecord` plus `core.results → IndicatorResult`. `build_indicator_result`
   is an internal Core helper, not public API: it appears in no `__all__` and is
   not a documented import for callers outside this package.
@@ -294,7 +301,8 @@ retired bundled files (`moving_averages.py`, `oscillators.py`, `ranges.py`, and
 1. `core/errors.py` → `core/contracts.py` → `core/results.py` →
    `core/registry.py` → `core/validation.py` → `core/__init__.py`.
 2. `trend/ema.py` → `trend/sma.py` → `trend/wma.py` → `trend/hull_ma.py` →
-   `trend/bollinger_bands.py` → `trend/directional.py` → `trend/__init__.py`.
+   `trend/bollinger_bands.py` → `trend/directional.py` → `trend/zigzag.py` →
+   `trend/__init__.py`.
 3. `volatility/atr.py` → `volatility/adr.py` → `volatility/rolling_volatility.py` →
    `volatility/standard_deviation.py` → `volatility/__init__.py`.
 4. `momentum/rsi.py` → `momentum/williams_r.py` → `momentum/__init__.py`.
@@ -340,8 +348,9 @@ correct.
 | `candles/engulfing.py` | `FR-INDI-032` |
 | `candles/pinbar.py` | `FR-INDI-033` |
 | `candles/inside_bar.py` | `FR-INDI-034` |
+| `trend/zigzag.py` | `FR-INDI-035` |
 | Feature `__init__.py` files | No independent `FR-*`; re-export only their feature's assigned symbols. |
-| Root `__init__.py` | No independent `FR-*`; re-export only the approved `FR-INDI-001` through `FR-INDI-034` public symbols. |
+| Root `__init__.py` | No independent `FR-*`; re-export only the approved `FR-INDI-001` through `FR-INDI-035` public symbols. |
 | `README.md` | No implementation requirement; authoritative specification and evidence ledger. |
 
 ### Public import and API contract
@@ -352,8 +361,9 @@ The package root `app.services.indicators` is the canonical public import surfac
 IndicatorErrorCode, IndicatorError,
 IndicatorConfig, IndicatorSpec, WarmupRequirement, IndicatorProtocol,
 IndicatorManifest, IndicatorResult,
-get_indicator, list_indicators, get_capability_matrix, validate_indicator,
-ema, sma, wma, hull_ma, bollinger_bands, adx,
+get_indicator, list_indicators, get_capability_matrix, get_warmup_requirement,
+validate_indicator,
+ema, sma, wma, hull_ma, bollinger_bands, adx, zigzag,
 atr, adr, rolling_volatility, standard_deviation,
 rsi, williams_r,
 cmf, obv, mfi, price_volume_distribution,
@@ -366,8 +376,9 @@ doji, engulfing, pinbar, inside_bar
 | `IndicatorConfig`, `IndicatorSpec`, `WarmupRequirement`, `IndicatorProtocol` | Stable | `WF-INDI-001..005` | Carries no cache configuration | None |
 | `IndicatorManifest`, `IndicatorResult`, `IndicatorResult.values_only`, `IndicatorResult.join_to` | Stable | `WF-INDI-001..004` | Exposes identity/checksum material only; no reads or writes | None |
 | `get_indicator`, `list_indicators`, `get_capability_matrix` | Stable | `WF-INDI-005` | None; immutable in-memory metadata | None |
+| `get_warmup_requirement` | Stable | `WF-INDI-003` | None; resolves immutable registry metadata without fetching data | None |
 | `validate_indicator` | Stable | `WF-INDI-001..005` | No cache access | None |
-| `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `atr`, `adr`, `rolling_volatility`, `standard_deviation`, `rsi`, `williams_r`, `cmf`, `obv`, `mfi`, `price_volume_distribution`, `doji`, `engulfing`, `pinbar`, `inside_bar` | Stable | `WF-INDI-001..004`; official in `SYS-WF-001` and `SYS-WF-002` | No cache access; returns canonical checksum material | None |
+| `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag`, `atr`, `adr`, `rolling_volatility`, `standard_deviation`, `rsi`, `williams_r`, `cmf`, `obv`, `mfi`, `price_volume_distribution`, `doji`, `engulfing`, `pinbar`, `inside_bar` | Stable | `WF-INDI-001..004`; official in `SYS-WF-001` and `SYS-WF-002` | No cache access; returns canonical checksum material | None |
 
 No experimental, optional, or future callable is exported in the initial package. Excluded capabilities appear only in the capability matrix as unsupported modes, not as callable stubs.
 
@@ -387,10 +398,10 @@ No experimental, optional, or future callable is exported in the initial package
 
 | Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
 |---|---|---|---|---|---|---|
-| Completed | `WF-INDI-001` | Internal | Core batch indicator calculation | One normalized `MarketDataset v1` plus approved config | Atomic `IndicatorResult` with values, availability, quality, and manifest | `FR-INDI-014 → FR-INDI-015..034 → FR-INDI-007..010` |
-| Completed | `WF-INDI-002` | Cross-domain | Decision-time consumption | Trading or Simulation supplies Data-owned normalized input | `IndicatorSeries v1` returned for Strategy consumption | `FR-INDI-014 → FR-INDI-015..034 → FR-INDI-008` |
-| Completed | `WF-INDI-003` | Cross-domain | Warmup coordination | Caller queries an official `WarmupRequirement` and supplies sufficient history | Warmup rows retained and explicitly unavailable until safe | `FR-INDI-005 → FR-INDI-014 → FR-INDI-015..034` |
-| Completed | `WF-INDI-004` | Cross-domain | Availability-aware multi-timeframe orchestration compatibility | Data supplies separately keyed aligned primary and higher-timeframe datasets; caller calculates each independently | Separately returned series preserve source availability and can be combined by the orchestrator without lookahead | `FR-INDI-014 → FR-INDI-015..034 → FR-INDI-007` |
+| Completed | `WF-INDI-001` | Internal | Core batch indicator calculation | One normalized `MarketDataset v1` plus approved config | Atomic `IndicatorResult` with values, availability, quality, and manifest | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-007..010` |
+| Completed | `WF-INDI-002` | Cross-domain | Decision-time consumption | Trading or Simulation supplies Data-owned normalized input | `IndicatorSeries v1` returned for Strategy consumption | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-008` |
+| Completed | `WF-INDI-003` | Cross-domain | Warmup coordination | Caller queries an official `WarmupRequirement` and supplies sufficient history | Warmup rows retained and explicitly unavailable until safe | `FR-INDI-005 → FR-INDI-014 → FR-INDI-015..035` |
+| Completed | `WF-INDI-004` | Cross-domain | Availability-aware multi-timeframe orchestration compatibility | Data supplies separately keyed aligned primary and higher-timeframe datasets; caller calculates each independently | Separately returned series preserve source availability and can be combined by the orchestrator without lookahead | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-007` |
 | Completed | `WF-INDI-005` | Internal | Static registry discovery and validation | Caller supplies official indicator ID/config | Validated spec/capability record or deterministic refusal | `FR-INDI-011..014` |
 
 `WF-INDI-001` through `WF-INDI-004` are multi-feature completion gates covering
@@ -422,7 +433,7 @@ unchanged.
 flowchart LR
     A[MarketDataset v1 + config]
     B["FR-INDI-014: validate_indicator"]
-    C["FR-INDI-015..034: official function"]
+    C["FR-INDI-015..035: official function"]
     D["FR-INDI-007..010: manifest and result"]
     E[IndicatorResult]
     A --> B --> C --> D --> E
@@ -522,7 +533,7 @@ flowchart LR
 **Input boundary:** Official indicator ID and candidate config.
 **Output boundary:** Immutable `IndicatorSpec`/capability metadata or deterministic `IND_UNSUPPORTED_INDICATOR` / validation error.
 
-The registry exposes exactly 20 reviewed built-ins and cannot register or
+The registry exposes exactly 21 reviewed built-ins and cannot register or
 unregister at runtime.
 
 **Integration test:**
@@ -562,11 +573,11 @@ indicator id + normalized data + config
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `errors.py` | Define the compact Core MVP error catalogue, one structured domain exception, and the public-boundary exception guard. | `IndicatorErrorCode`, `IndicatorError`<br>Internal (non-public) cross-file helper: `guard_public_boundary`, applied to all twenty official convenience functions and deliberately absent from `core/__init__.py.__all__` and the package port. | **Standard library:** `collections.abc`, `enum`, `functools`, `math`, `re`, `types`, `typing`<br>**Required third-party:** None<br>**Local:** `app.utils → logger, redact_text_value` |
-| Completed | `contracts.py` | Define immutable calculation config, spec, warmup, and structural callable contracts. | `IndicatorConfig`, `IndicatorSpec`, `WarmupRequirement`, `IndicatorProtocol` | **Standard library:** `collections.abc`, `dataclasses`, `typing`<br>**Required third-party:** None<br>**Local (type-checking only):** `app.services.data.contracts → MarketDataset`; `results.py → IndicatorResult` |
-| Completed | `results.py` | Define deterministic manifest/result fields and safe result projection/join behavior. | `IndicatorManifest`, `IndicatorResult`<br>Internal (non-public) cross-file helper: `build_indicator_result`, used by every feature leaf file and deliberately absent from `core/__init__.py.__all__` and the package port. | **Standard library:** `collections.abc`, `dataclasses`, `hashlib`, `json`, `math`, `typing`<br>**Required third-party:** `pandas`<br>**Local:** `errors.py → IndicatorError, IndicatorErrorCode`; `app.utils → canonical_json, logger`<br>**Local (type-checking only):** `app.services.data.contracts → MarketDataset, OHLCVRecord`; `contracts.py → IndicatorConfig` |
+| Completed | `errors.py` | Define the compact Core MVP error catalogue, one structured domain exception, and the public-boundary exception guard. | `IndicatorErrorCode`, `IndicatorError`<br>Internal (non-public) cross-file helper: `guard_public_boundary`, applied to all twenty-one official convenience functions and deliberately absent from `core/__init__.py.__all__` and the package port. | **Standard library:** `collections.abc`, `enum`, `functools`, `math`, `re`, `types`, `typing`<br>**Required third-party:** None<br>**Local:** `app.utils → logger, redact_text_value` |
+| Completed | `contracts.py` | Define immutable calculation config, spec, warmup, and structural callable contracts. | `IndicatorConfig`, `IndicatorSpec`, `WarmupRequirement`, `IndicatorProtocol` | **Standard library:** `collections.abc`, `dataclasses`, `typing`<br>**Required third-party:** None<br>**Local (type-checking only):** `app.services.data → MarketDataset`; `results.py → IndicatorResult` |
+| Completed | `results.py` | Define deterministic manifest/result fields and safe result projection/join behavior. | `IndicatorManifest`, `IndicatorResult`<br>Internal (non-public) cross-file helper: `build_indicator_result`, used by every feature leaf file and deliberately absent from `core/__init__.py.__all__` and the package port. | **Standard library:** `collections.abc`, `dataclasses`, `hashlib`, `json`, `math`, `typing`<br>**Required third-party:** `pandas`<br>**Local:** `errors.py → IndicatorError, IndicatorErrorCode`; `app.utils → canonical_json, logger`<br>**Local (type-checking only):** `app.services.data → MarketDataset, OHLCVRecord`; `contracts.py → IndicatorConfig` |
 | Completed | `registry.py` | Expose immutable official specs and capability metadata without importing feature implementations. | `get_indicator`, `list_indicators`, `get_capability_matrix` | **Standard library:** `collections.abc`, `types`<br>**Required third-party:** None<br>**Local:** `contracts.py → IndicatorSpec`; `errors.py → IndicatorError, IndicatorErrorCode`; `app.utils → logger` |
-| Completed | `validation.py` | Resolve and fully validate one batch request before any formula work. | `validate_indicator` | **Standard library:** `collections.abc`, `datetime`, `math`, `re`, `typing`<br>**Required third-party:** `pandas`<br>**Local:** `app.services.data.contracts → MarketDataset, OHLCVRecord`; `errors.py → IndicatorError, IndicatorErrorCode`; `registry.py → get_indicator`; `app.utils → logger`<br>**Local (type-checking only):** `contracts.py → IndicatorConfig, IndicatorSpec` |
+| Completed | `validation.py` | Resolve exact warmup requirements and fully validate one batch request before any formula work. | `get_warmup_requirement`, `validate_indicator` | **Standard library:** `collections.abc`, `datetime`, `math`, `re`<br>**Required third-party:** `pandas`<br>**Local:** `app.services.data → MarketDataset, OHLCVRecord`; `contracts.py → IndicatorConfig, IndicatorSpec, WarmupRequirement`; `errors.py → IndicatorError, IndicatorErrorCode`; `registry.py → get_indicator`; `app.utils → logger` |
 | Completed | `__init__.py` | Expose only the approved public Core API. | All Core exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from the five files above |
 
 ### Configuration and Limits Manifest
@@ -628,7 +639,7 @@ reconstruct historical public classes that are absent from the specification.
 |---|---|---|---|---|---|---|
 | Completed | `FR-INDI-003` | The system shall represent indicator ID, canonical parameters, source, formula version, output/precision/availability/quality policy, and error mode in one immutable batch config, excluding cache, calendar, backend, actor, tracing, SLO, entitlement, timeout, cancellation, and orchestration context. | `IndicatorConfig` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_indicator_config_is_immutable_and_core_only()` |
 | Completed | `FR-INDI-004` | The system shall describe each official indicator's ID, name, versions, tier, required columns, parameter/output schemas, warmup policy, supported batch capabilities, import path, stability, and workflow eligibility. | `IndicatorSpec` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_indicator_spec_contains_required_public_metadata()` |
-| Completed | `FR-INDI-005` | The system shall expose the exact normalized history requirement for an indicator/config without fetching data, including minimum observations, source timeframe, required columns, and availability basis. | `WarmupRequirement` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_warmup_requirement_is_deterministic()` |
+| Completed | `FR-INDI-005` | The system shall expose the exact normalized history requirement for an indicator/config without fetching data, including minimum observations, source timeframe, required columns, and availability basis. | `get_warmup_requirement(indicator_id: str, config: IndicatorConfig) -> WarmupRequirement` | None | `IndicatorError`: unsupported indicator or invalid configuration | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_get_warmup_requirement_resolves_every_official_policy()` |
 | Completed | `FR-INDI-006` | The system shall expose a minimal structural registered-calculator protocol whose approved calculation accepts one normalized `MarketDataset v1` plus a complete `IndicatorConfig` and returns `IndicatorResult`; public convenience wrappers construct the config and are not required to share this internal signature. | `IndicatorProtocol.calculate(data: MarketDataset, config: IndicatorConfig) -> IndicatorResult` | None | `IndicatorError`: deterministic request/calculation failure under the approved error mode | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_official_calculator_satisfies_indicator_protocol()` |
 
 **Rules:** Contracts are frozen, typed, JSON-compatible where serialized, and contain only calculation-relevant metadata. Serialized field types are exactly those declared by the contract requirements.
@@ -740,7 +751,7 @@ modes without runtime mutation or implementation imports.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-011` | The system shall resolve one of the 20 official indicator IDs in the registry identity below to its immutable spec and reject every unknown ID before calculation. | `get_indicator(indicator_id: str) -> IndicatorSpec` | None | `IndicatorError`: `IND_UNSUPPORTED_INDICATOR` | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_get_indicator_rejects_unknown_id()` |
+| Completed | `FR-INDI-011` | The system shall resolve one of the 21 official indicator IDs in the registry identity below to its immutable spec and reject every unknown ID before calculation. | `get_indicator(indicator_id: str) -> IndicatorSpec` | None | `IndicatorError`: `IND_UNSUPPORTED_INDICATOR` | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_get_indicator_rejects_unknown_id()` |
 | Completed | `FR-INDI-012` | The system shall list official specs in stable indicator-ID order with no mutable registry handle. | `list_indicators() -> tuple[IndicatorSpec, ...]` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_list_indicators_is_stable_and_immutable()` |
 | Completed | `FR-INDI-013` | The system shall expose a JSON/YAML-compatible matrix containing ID, versions, tier, batch/vectorized/multi-symbol/multi-timeframe support, unsupported optional modes, dependencies, deterministic unsupported codes, and official-workflow eligibility. | `get_capability_matrix() -> tuple[Mapping[str, object], ...]` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_capability_matrix_matches_registry()` |
 
@@ -751,7 +762,7 @@ modes without runtime mutation or implementation imports.
 Registry order is exactly `adx`, `adr`, `atr`, `bollinger_bands`, `cmf`, `doji`,
 `ema`, `engulfing`, `hull_ma`, `inside_bar`, `mfi`, `obv`, `pinbar`,
 `price_volume_distribution`, `rolling_volatility`, `rsi`, `sma`,
-`standard_deviation`, `williams_r`, `wma`. Every entry uses `indicator_version="1.0.0"`,
+`standard_deviation`, `williams_r`, `wma`, `zigzag`. Every entry uses `indicator_version="1.0.0"`,
 `formula_version="1.0.0"`, `tier="core_mvp"`, `vectorized=true`,
 `multi_symbol=false`, `multi_timeframe=false`, and `stability="stable"`.
 
@@ -777,6 +788,7 @@ Registry order is exactly `adx`, `adr`, `atr`, `bollinger_bands`, `cmf`, `doji`,
 | `standard_deviation` | `app.services.indicators.volatility.standard_deviation:standard_deviation` |
 | `williams_r` | `app.services.indicators.momentum.williams_r:williams_r` |
 | `wma` | `app.services.indicators.trend.wma:wma` |
+| `zigzag` | `app.services.indicators.trend.zigzag:zigzag` |
 
 `parameter_schema` is a recursively frozen JSON-compatible mapping. Indicators
 with a period use the exact period schema
@@ -805,6 +817,7 @@ with a period use the exact period schema
 | `standard_deviation` | `("source",)` | Yes / `null` | source-selectable standard-deviation templates | `period` |
 | `williams_r` | `("high", "low", "close")` | No / `14` | `("williams_r_{period}",)` | `period` |
 | `wma` | `("source",)` | Yes / `null` | source-selectable WMA templates | `period` |
+| `zigzag` | `("high", "low")` | No period; `depth` required | `("zigzag_value_{depth}", "zigzag_type_{depth}")` | `custom` |
 
 For source-selectable entries, `"source"` is a registry placeholder resolved to
 the exact validated `IndicatorConfig.source` before calculation. Only one of the
@@ -886,7 +899,7 @@ After formula execution, finalization checks occur in this exact order:
 Unexpected pandas/NumPy/Python exceptions are caught at the public boundary and
 raised as redacted `IND_INTERNAL_ERROR`; the original exception never crosses the
 domain port. This is enforced by the `guard_public_boundary` decorator in
-`core/errors.py`, applied to all twenty official convenience functions. A
+`core/errors.py`, applied to all twenty-one official convenience functions. A
 deliberate `IndicatorError` propagates unchanged so documented deterministic
 codes are never masked. The original exception is suppressed with
 `raise ... from None` and only its class name is reported, because an upstream
@@ -908,7 +921,7 @@ by `tests/indicators/integration/test_usage_scripts.py`.
 
 ---
 
-### 4.2 `trend/` — EMA, SMA, WMA, Hull MA, Bollinger Bands, and ADX
+### 4.2 `trend/` — EMA, SMA, WMA, Hull MA, Bollinger Bands, ADX, and ZigZag
 
 **Purpose:** Compute the approved trend indicators through stateless vectorized batch functions.
 
@@ -928,7 +941,8 @@ normalized values + config → Core validation → approved trend formula → In
 | Completed | `hull_ma.py` | Compute Hull MA from nested private WMA passes. | `hull_ma` | **Standard library:** `math`, `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
 | Completed | `bollinger_bands.py` | Compute the SMA-basis upper/middle/lower Bollinger Bands. | `bollinger_bands` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`, `numpy.lib.stride_tricks.sliding_window_view`<br>**Local:** *(common leaf set)* |
 | Completed | `directional.py` | Compute ADX and its directional components. | `adx` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
-| Completed | `__init__.py` | Expose the approved trend API. | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from files above |
+| Completed | `zigzag.py` | Confirm unique alternating high/low pivots causally and publish them only on their confirmation rows. | `zigzag` | **Standard library:** `typing`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** *(common leaf set)* |
+| Completed | `__init__.py` | Expose the approved trend API. | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Approved exports from files above |
 
 ### Configuration and Limits Manifest
 
@@ -942,6 +956,7 @@ The following formula conventions are authoritative for implementation.
 | Completed | Hull MA period/range/nested-WMA/warmup/tolerance | Formula-spec fields | Explicit period ≥2; nested WMA passes; warmup=custom; `1e-9` | Yes | `hull_ma()` | `HMA = WMA(2×WMA(price, ⌊period/2⌋) − WMA(price, period), ⌊√period⌋)`. |
 | Completed | Bollinger Bands period/std_dev/warmup/tolerance | Formula-spec fields | Explicit period ≥2; explicit `std_dev` multiplier > 0; warmup=period; `1e-9` | Yes | `bollinger_bands()` | Upper/lower bands are the SMA basis ± `std_dev` × sample standard deviation (`ddof=1`). |
 | Completed | ADX period/range/Wilder seed/warmup/tolerance | Formula-spec fields | Period `14`; Wilder smoothing; warmup=`2×period`; `1e-9` | Yes | `adx()` | Uses standard TR, +DM, -DM, +DI, -DI, DX, and ADX calculations; zero TR produces zero directional values. |
+| Completed | ZigZag depth/confirmation/alternation | Formula-spec fields | Explicit integer depth ≥2; warmup=`2×depth`; exact comparison | Yes | `zigzag()` | A unique center-window high or low is emitted only at `center + depth`; tied extrema and consecutive candidates of the same type are ignored so published pivots are never revised. |
 
 #### Formula specification gate
 
@@ -1042,6 +1057,12 @@ parameter-schema engine as `period`.
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-INDI-017` | The system shall calculate approved ADX, +DI, and -DI values for one validated `MarketDataset v1`, return the three canonical columns with warmup/availability metadata, and handle zero range deterministically. | `adx(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_directional.py::test_adx_matches_approved_golden_fixture()` |
+
+#### `zigzag.py` — Causal confirmed-pivot ZigZag
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Completed | `FR-INDI-035` | The system shall identify unique alternating high/low extrema over an explicit symmetric `depth` window and publish each value and type only on its causal confirmation row; tied extrema and consecutive candidates of the same type are not pivots, and a published pivot is never revised. | `zigzag(data: MarketDataset, *, depth: int, config: IndicatorConfig \| None = None) -> IndicatorResult` | None | `IndicatorError`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py::fr_indi_035()`<br>**Unit:** `tests/indicators/unit/test_zigzag.py` |
 
 ### Feature usage examples
 
@@ -1289,16 +1310,16 @@ this immutable, non-repainting production surface.
 |---|---|---|---|---|
 | Completed | `NFR-INDI-001` | Architecture | The package shall remain a pure, persistence-free calculation domain with no broker, network, filesystem, cache, audit-sink, telemetry-export, or mutable registry I/O. | `tests/indicators/unit/test_import_boundaries.py` (dependency surface, forbidden-I/O, cross-domain, registry-import, and import-side-effect guards) |
 | Completed | `NFR-INDI-002` | Determinism | Equivalent canonical inputs, parameters, versions, and policy shall produce byte-equivalent canonical values/checksums/manifests independent of call order. | Replay and checksum tests |
-| Completed | `NFR-INDI-003` | API boundary | Consumers shall use only documented root/feature exports; leaf modules, private helpers, DataFrames internal to other domains, and provider SDK objects are not cross-domain contracts. | Import contract tests |
+| Completed | `NFR-INDI-003` | API boundary | Consumers shall use only documented package-root exports; feature modules, leaf modules, private helpers, DataFrames internal to other domains, and provider SDK objects are not cross-domain contracts. | Import contract tests |
 | Completed | `NFR-INDI-004` | Maintainability | Python shall follow Google style, explicit signature typing, Google docstrings, absolute imports, logging rules, and one focused responsibility per file. | Ruff, mypy, structure review |
-| Completed | `NFR-INDI-005` | Vectorization | Official batch formulas shall use vectorized pandas/NumPy operations except a documented mathematically stateful recurrence or window-local dependency that cannot be vectorized safely. The complete set of approved exceptions is: the Wilder/EMA recurrences in `ema.py`, `atr.py`, `rsi.py`, and `directional.py`, and the window-local bin assignment in `price_volume_distribution.py` (see `FR-INDI-030` implementation notes). No other loop is permitted. | Implementation review and benchmark |
+| Completed | `NFR-INDI-005` | Vectorization | Official batch formulas shall use vectorized pandas/NumPy operations except a documented mathematically stateful recurrence or window-local dependency that cannot be vectorized safely. The complete set of approved exceptions is: the Wilder/EMA recurrences in `ema.py`, `atr.py`, `rsi.py`, and `directional.py`; the window-local bin assignment in `price_volume_distribution.py` (see `FR-INDI-030` implementation notes); and the causal alternating-pivot state machine in `zigzag.py` (see `FR-INDI-035`). No other loop is permitted. | Implementation review and benchmark |
 | Completed | `NFR-INDI-006` | Numeric policy | Indicator values shall use float64 and approved absolute/relative tolerances; NaN, infinity, overflow, underflow, negative zero, null, and degenerate windows shall follow each approved formula table. | Golden/property/edge tests |
 | Completed | `NFR-INDI-007` | No-lookahead | Every row shall expose earliest-safe UTC `available_at` and source-window bounds; current/future data cannot be represented as already available. | Causality tests |
 | Completed | `NFR-INDI-008` | Data boundary | The package shall consume and propagate Data-owned provenance/quality/alignment evidence without implementing provider normalization, calendar, symbol-mapping, or quote-quality policy. | Producer-consumer contract tests |
-| Completed | `NFR-INDI-009` | Reliability | Validation, resource-limit, and calculation failures shall be atomic, deterministic, and fail closed; no partial official result is published. No raw upstream exception crosses the public port. External deadlines and cancellation remain orchestrator-owned. | Failure-injection tests; `tests/indicators/unit/test_large_input.py` (boundary guard, guard coverage of all twenty calculators) |
+| Completed | `NFR-INDI-009` | Reliability | Validation, resource-limit, and calculation failures shall be atomic, deterministic, and fail closed; no partial official result is published. No raw upstream exception crosses the public port. External deadlines and cancellation remain orchestrator-owned. | Failure-injection tests; `tests/indicators/unit/test_large_input.py` (boundary guard coverage) and `tests/indicators/unit/test_zigzag.py` |
 | Completed | `NFR-INDI-010` | Concurrency | Public calculations and registry reads shall be thread-safe through immutability and absence of shared mutable state. | `tests/indicators/unit/test_concurrency.py` (parallel checksum equality, shared-input immutability, parallel registry reads, immutable registry storage) |
 | Completed | `NFR-INDI-011` | Testing | Every `FR-INDI-*` shall have usage and unit coverage; formulas require approved hand-calculated golden fixtures and invariants/property tests. No absent historical implementation or third-party indicator library is normative. | Traceability and coverage audit |
-| Completed | `NFR-INDI-012` | Coverage | The package shall maintain at least 80% statement and branch coverage, with all documented error paths exercised. | `pytest --cov`; 2026-07-22 measured branch coverage 91.84% over 1711 statements / 310 branches (111 passed, 6 usage skips) |
+| Completed | `NFR-INDI-012` | Coverage | The package shall maintain at least 80% statement and branch coverage, with all documented error paths exercised. | `pytest --cov`; 2026-07-24 measured branch-enabled coverage 91.71% over 1770 statements / 342 branches (151 passed) |
 | Completed | `NFR-INDI-013` | Dependencies | Runtime dependencies shall be direct project dependencies and locked at the approved baseline declared in `pyproject.toml`: Python `>=3.14`, pandas `==3.0.3`, and NumPy `==2.4.6`. No patch-level Python pin is declared, so any 3.14.x interpreter satisfies the baseline. | `pyproject.toml`, `uv.lock`, and dependency-version audit |
 | Completed | `NFR-INDI-014` | Security | Errors, manifests, and quality/provenance metadata shall exclude secrets and raw full input payloads; safe details are redacted before crossing the boundary. | Security/redaction tests |
 
@@ -1403,11 +1424,11 @@ During iterative implementation, run only the changed file's unit/usage/integrat
 - **Golden/reference:** Every approved formula, seed, warmup, null, and tolerance convention, using committed hand-calculated fixtures whose derivation is documented in the fixture or test; third-party indicator libraries are not normative dependencies.
 - **Property/edge:** Constant/flat/short/duplicate/non-monotonic datasets, malformed or unexpectedly null private projections, impossible OHLC, gaps, zero range, non-default source, output collision, independent multi-dataset orchestration, and input immutability.
 - **Integration:** Every `WF-INDI-*`, including producer-consumer compatibility for `MarketDataset v1` and `IndicatorSeries v1`.
-- **Usage:** One independently runnable example per public requirement, provided as standalone `usage/NN_*.py` scripts (not pytest tests) that exercise the public API end-to-end against real market data and real connections, using documented public imports only. They are excluded from pytest collection by `usage/conftest.py` and executed/verified — or explicitly skipped when live data is unavailable — by `tests/indicators/integration/test_usage_scripts.py`.
+- **Usage:** One independently runnable example per public requirement, provided as standalone `usage/NN_*.py` scripts (not pytest tests) that exercise the public API end-to-end against real market data and real connections, using documented public imports only. Data's public retrieval facade performs Data-owned migration checks, durable source-attempt recording, and runtime logging, so validation must redirect `DATA_DIR`, `DATABASE_URL`, `LOG_DIRECTORY`, and `LOG_FILE_PATH` to disposable development paths. The scripts are excluded from pytest collection by `usage/conftest.py` and executed/verified — or explicitly skipped when live data is unavailable — by `tests/indicators/integration/test_usage_scripts.py`, which creates and removes that isolated state for every program.
 - **Import contract:** `tests/indicators/unit/test_public_api.py::test_root_and_feature_exports_are_exact()` verifies the root/feature `__all__` values, rejects leaf modules as documented stable imports, and detects undocumented public symbols.
-- **Dependency boundary and purity:** `tests/indicators/unit/test_import_boundaries.py` enforces `NFR-INDI-001`/`NFR-INDI-003` by asserting the package imports only stdlib, `numpy`/`pandas`, `app.utils`, and `app.services.data.contracts`; declares no I/O, network, subprocess, environment, or randomness module; imports no peer service domain; keeps `core/registry.py` free of feature-implementation imports; and creates nothing on import.
+- **Dependency boundary and purity:** `tests/indicators/unit/test_import_boundaries.py` enforces `NFR-INDI-001`/`NFR-INDI-003` by asserting the package imports only stdlib, `numpy`/`pandas`, `app.utils`, and the `app.services.data` package root; declares no I/O, network, subprocess, environment, or randomness module; imports no peer service domain; keeps `core/registry.py` free of feature-implementation imports; and creates nothing on import.
 - **Concurrency:** `tests/indicators/unit/test_concurrency.py` enforces `NFR-INDI-010` by proving parallel calculations reproduce serial checksums exactly, the shared input dataset is never mutated, and registry reads return stable immutable values.
-- **Scale and boundary:** `tests/indicators/unit/test_large_input.py` enforces `NFR-INDI-009` and guards the 2026-07-22 regression in which every indicator failed above 664 records. It asserts calculation succeeds across and far beyond that ceiling for every indicator family, that the folded input checksum stays deterministic and order-sensitive, that a raw upstream exception surfaces as a redacted `IND_INTERNAL_ERROR` carrying no upstream payload, that a deliberate `IndicatorError` is never masked, and that all twenty official calculators carry the boundary guard.
+- **Scale and boundary:** `tests/indicators/unit/test_large_input.py` enforces `NFR-INDI-009` and guards the 2026-07-22 regression in which every indicator failed above 664 records. It asserts calculation succeeds across and far beyond that ceiling for every indicator family, that the folded input checksum stays deterministic and order-sensitive, that a raw upstream exception surfaces as a redacted `IND_INTERNAL_ERROR` carrying no upstream payload, and that a deliberate `IndicatorError` is never masked. ZigZag boundary, determinism, and causality evidence is in `tests/indicators/unit/test_zigzag.py`.
 
 Each golden JSON file contains `fixture_version="v1"`, `formula_version`,
 `derivation`, canonical OHLCV input rows, parameters, and exact expected values.
@@ -1422,12 +1443,13 @@ embedded in the fixture.
 - [X] Volume indicators are implemented and publicly exported. Evidence: `app/services/indicators/volume/__init__.py:1`.
 - [X] Candle-pattern indicators are implemented and publicly exported. Evidence: `app/services/indicators/candles/__init__.py:1`.
 - [X] Retrospective SMC remains excluded from the production surface. Evidence: `app/services/indicators/README.md:35`.
-- [X] The root registry and public package port expose exactly 20 approved indicators. Evidence: `app/services/indicators/core/registry.py:437`.
+- [X] The root registry and public package port expose exactly 21 approved indicators. Evidence: `app/services/indicators/core/registry.py`.
 - [X] Each feature is one module folder with one runnable usage program, registered with a matching `FEAT-INDI-NN` in this README's Section 2 Feature Registry.
 - [X] `NFR-INDI-001` purity and dependency boundaries are proven by test, not by inspection. Evidence: `tests/indicators/unit/test_import_boundaries.py:90`.
 - [X] `NFR-INDI-010` thread safety is proven by test, not by inspection. Evidence: `tests/indicators/unit/test_concurrency.py:40`.
-- [X] Every public export documented in Sections 2 and 4 matches the implemented signature, verified against `inspect.signature` for all 26 public callables.
+- [X] Every public export documented in Sections 2 and 4 matches the implemented signature, verified against `inspect.signature` for all 27 public callables.
 - [X] Usage programs define `main()` and an `if __name__ == "__main__"` guard per `AGENTS.md` §4. Evidence: `tests/indicators/usage/01_core.py:205`.
 - [X] Datasets far beyond the former 664-record serialization ceiling calculate correctly; `MAX_INPUT_ROWS` is the only input-size limit. Evidence: `app/services/indicators/core/results.py:219`, `tests/indicators/unit/test_large_input.py:53`.
-- [X] No raw upstream exception crosses the public port; all twenty calculators are boundary-guarded. Evidence: `app/services/indicators/core/errors.py:188`, `tests/indicators/unit/test_large_input.py:105`.
-- [X] Unit, integration, lint, format, type, and coverage gates pass, and the runnable usage-example scripts execute (or skip on unavailable live data) via `tests/indicators/integration/test_usage_scripts.py`. Evidence: `tests/indicators/integration/test_usage_scripts.py:20`; 2026-07-22 run — `ruff check` clean, `ruff format --check` 75 files clean, `mypy` clean over 32 source files, 111 passed / 6 skipped, branch coverage 91.84%.
+- [X] No raw upstream exception crosses the public port; all twenty-one calculators are boundary-guarded. Evidence: `app/services/indicators/core/errors.py`, `tests/indicators/unit/test_zigzag.py`.
+- [X] Unit, integration, lint, format, type, and coverage gates pass, and all six runnable usage-example scripts execute against MT5 demo market data. Evidence: `tests/indicators/integration/test_usage_scripts.py:20`; 2026-07-24 run — repository-wide `ruff check` and `ruff format --check` clean over 1091 files, `mypy` clean over 1116 source files, 151 passed, branch-enabled coverage 91.71%.
+- [X] Indicators participates through its package-root API in the completed historical and genuine MT5 demo system workflows. Evidence: `tests/system/integration/test_backtest.py:1`, `tests/system/integration/test_signal_to_live.py:1`.

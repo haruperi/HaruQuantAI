@@ -29,6 +29,7 @@ _EXPECTED_ORDER = (
     "standard_deviation",
     "williams_r",
     "wma",
+    "zigzag",
 )
 
 
