@@ -1,3 +1,4 @@
+# ruff: noqa: INP001 - standalone test namespace by repository policy.
 """Integration evidence that every documented Analytics usage script is runnable."""
 
 import subprocess
@@ -19,7 +20,7 @@ _USAGE_SCRIPTS = (
 def test_analytics_usage_script_executes(script_name: str) -> None:
     """Run one standalone Analytics usage script in an isolated Python process."""
     usage_directory = Path(__file__).parents[1] / "usage"
-    completed = subprocess.run(
+    completed = subprocess.run(  # noqa: S603 - fixed repository-controlled command
         [sys.executable, str(usage_directory / script_name)],
         check=False,
         capture_output=True,

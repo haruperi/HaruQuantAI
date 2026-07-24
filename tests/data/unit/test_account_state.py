@@ -19,6 +19,7 @@ from app.services.brokers import (
     BrokerPermissions,
     BrokerPosition,
 )
+from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
 from app.services.data.evidence.account_contracts import (
     AccountSnapshotRequest,
@@ -50,7 +51,7 @@ def test_account_snapshot_fails_closed_when_incomplete() -> None:
     assert captured.value.code == "SOURCE_UNAVAILABLE"
 
 
-def test_account_snapshot_success() -> None:  # noqa: PLR0915 - explicit end-to-end evidence flow
+def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence mapping
     """Verify standard account state snapshot mapping from mock adapter."""
     # Mock Broker DTOs
     now = datetime.now(UTC)
@@ -69,7 +70,7 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - explicit end-to-
         unit="CURRENCY",
         retrieved_at=now,
         total=Decimal(10000),
-        available=Decimal(9000),
+        available=None,
         locked=Decimal(1000),
     )
     mock_pos = BrokerPosition(
@@ -141,6 +142,9 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - explicit end-to-
     snapshot = get_account_state_snapshot(req, mock_adapter, clock=clock)
 
     # Assertions
+    account_limit = get_limit("ACCOUNT_SNAPSHOT_MAX_RECORDS", "execution_bound")
+    mock_adapter.get_positions.assert_awaited_once_with(limit=account_limit)
+    mock_adapter.get_orders.assert_awaited_once_with(limit=account_limit)
     assert snapshot.account_id == "acc-1"
     assert snapshot.currency == "USD"
     assert snapshot.equity == Decimal(10500)
@@ -149,7 +153,7 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - explicit end-to-
     assert len(snapshot.balances) == 1
     assert snapshot.balances[0].asset == "USD"
     assert snapshot.balances[0].total == Decimal(10000)
-    assert snapshot.balances[0].available == Decimal(9000)
+    assert snapshot.balances[0].available == Decimal(9500)
     assert len(snapshot.positions) == 1
     assert snapshot.positions[0].position_id == "pos-1"
     assert snapshot.positions[0].ownership_ref == "mt5-magic:12345"
@@ -164,3 +168,37 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - explicit end-to-
     assert snapshot.connected is True
     assert snapshot.trading_allowed is True
     assert all(call[0] != "connect" for call in mock_adapter.method_calls)
+
+
+def test_account_snapshot_rejects_truncated_exposure_evidence() -> None:
+    """A bounded snapshot fails closed instead of omitting open exposure."""
+    adapter = MagicMock()
+
+    def result(data: object) -> object:
+        wrapped = MagicMock()
+        wrapped.data = data
+        wrapped.error = None
+        return wrapped
+
+    adapter.get_account_info = AsyncMock(return_value=result(object()))
+    adapter.get_balances = AsyncMock(return_value=result(()))
+    adapter.get_positions = AsyncMock(
+        return_value=result(BrokerPage(items=(), limit=1, truncated=True))
+    )
+    adapter.get_orders = AsyncMock(
+        return_value=result(BrokerPage(items=(), limit=1, truncated=False))
+    )
+    adapter.get_permissions = AsyncMock(return_value=result(object()))
+    adapter.is_connected = AsyncMock(return_value=result(True))
+    request = AccountSnapshotRequest(
+        source_id="mt5",
+        account_id="account-1",
+        max_age_seconds=30,
+        request_id="req-9c425996-f4f8-4197-a7b1-b63e36cccd4c",
+    )
+
+    with pytest.raises(DataError) as captured:
+        get_account_state_snapshot(request, adapter)
+
+    assert captured.value.code == "LIMIT_EXCEEDED"
+    assert captured.value.safe_details["operation"] == "positions"

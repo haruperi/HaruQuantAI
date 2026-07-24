@@ -35,13 +35,15 @@ def example_state() -> None:
     # 1. Memory state store initialization
     store = MemoryOptimizationStore()
     print(
-        f"Memory store satisfies OptimizationStateStore: {isinstance(store, OptimizationStateStore)}"
+        "Memory store satisfies OptimizationStateStore: "
+        f"{isinstance(store, OptimizationStateStore)}"
     )
 
     # 2. Checkpoint save and load
     ckpt = checkpoint()
     print(
-        f"Original checkpoint completed candidate position: {ckpt.completed_candidate_position}"
+        "Original checkpoint completed candidate position: "
+        f"{ckpt.completed_candidate_position}"
     )
     save_search_checkpoint(ckpt, store)
     loaded_ckpt = load_search_checkpoint(

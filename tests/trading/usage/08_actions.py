@@ -4,7 +4,6 @@ Demonstrates order, position, and control actions.
 """
 
 # ruff: noqa: PLR0915
-
 import asyncio
 import sys
 from dataclasses import replace

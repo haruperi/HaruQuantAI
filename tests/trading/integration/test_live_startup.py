@@ -1,7 +1,6 @@
 """Workflow integration for fail-closed live startup."""
 
 # ruff: noqa: INP001
-
 import pytest
 from tests.trading.conftest import live_config, live_evidence, live_session
 

@@ -500,29 +500,21 @@ def test_adapter_account_history_mutation_and_calculation_operations() -> None:
             quantity_unit="lots",
             environment=BrokerEnvironment.DEMO,
         )
+        assert (await adapter.check_order(order)).is_success
+        assert (await adapter.place_order(order)).is_success
+        modify_order = await adapter.modify_order(
+            BrokerOrderModificationRequest(order_id="11", limit_price=Decimal("1.2"))
+        )
+        assert modify_order.error is not None
+        assert modify_order.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert (await adapter.cancel_order("11")).is_success
+        modify_position = await adapter.modify_position(
+            BrokerPositionModificationRequest(position_id="1", stop_loss=Decimal("1.0"))
+        )
+        assert modify_position.error is not None
         assert (
-            await adapter.check_order(order)
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        assert (
-            await adapter.place_order(order)
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        assert (
-            await adapter.modify_order(
-                BrokerOrderModificationRequest(
-                    order_id="11", limit_price=Decimal("1.2")
-                )
-            )
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        assert (
-            await adapter.cancel_order("11")
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        assert (
-            await adapter.modify_position(
-                BrokerPositionModificationRequest(
-                    position_id="1", stop_loss=Decimal("1.0")
-                )
-            )
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+            modify_position.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        )
         assert (
             await adapter.close_position(
                 BrokerPositionCloseRequest(
@@ -531,7 +523,7 @@ def test_adapter_account_history_mutation_and_calculation_operations() -> None:
                     quantity_unit="lots",
                 )
             )
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        ).is_success
         margin = await adapter.calculate_margin(
             BrokerMarginRequest(
                 symbol="EURUSD",

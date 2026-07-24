@@ -1,6 +1,7 @@
 """Executable Simulation reporting usage example.
 
-Demonstrates simulation result construction, trade records, artifact manifests, and report generation.
+Demonstrates simulation result construction, trade records, artifact manifests,
+and report generation.
 """
 
 import sys

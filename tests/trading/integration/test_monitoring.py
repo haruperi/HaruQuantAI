@@ -1,7 +1,6 @@
 """Workflow integration for budget and monitoring delivery failures."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.trading.contracts import TradingError
 from app.services.trading.monitoring import (

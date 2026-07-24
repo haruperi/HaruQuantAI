@@ -1,7 +1,6 @@
 """Tests for leakage-safe time-series splitting."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.validation import build_time_series_splits
 from tests.optimization.unit.test_validation_contracts import walk_forward_request
 

@@ -1,7 +1,6 @@
 """Unit tests for normalized Trading authority snapshots."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 

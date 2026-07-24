@@ -1,7 +1,6 @@
 """Integration test for complete Optimization evidence assembly."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.evidence import (
     EvidenceAssemblyRequest,
     FinalDecision,

@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, cast
 
+from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
 from app.services.data.evidence.account_contracts import (
     AccountBalance,
@@ -64,10 +65,11 @@ async def _fetch_from_adapter(
 ]:
     """Read account evidence without owning adapter connection lifecycle."""
     logger.info("Reading account evidence from an injected broker adapter")
+    account_limit = get_limit("ACCOUNT_SNAPSHOT_MAX_RECORDS", "execution_bound")
     info_result = await adapter.get_account_info()
     balance_result = await adapter.get_balances()
-    position_result = await adapter.get_positions()
-    order_result = await adapter.get_orders()
+    position_result = await adapter.get_positions(limit=account_limit)
+    order_result = await adapter.get_orders(limit=account_limit)
     permission_result = await adapter.get_permissions()
     connection_result = await adapter.is_connected()
 
@@ -79,6 +81,10 @@ async def _fetch_from_adapter(
         raise _failure(request_id, "positions", "SOURCE_UNAVAILABLE")
     if order_result.error is not None or order_result.data is None:
         raise _failure(request_id, "orders", "SOURCE_UNAVAILABLE")
+    if position_result.data.truncated:
+        raise _failure(request_id, "positions", "LIMIT_EXCEEDED")
+    if order_result.data.truncated:
+        raise _failure(request_id, "orders", "LIMIT_EXCEEDED")
     if permission_result.error is not None or permission_result.data is None:
         raise _failure(request_id, "permissions", "SOURCE_UNAVAILABLE")
     if connection_result.error is not None or connection_result.data is None:
@@ -109,9 +115,10 @@ def _required_decimal(
 
 def _map_balances(
     balances: tuple[BrokerBalance, ...],
+    account_info: BrokerAccountInfo,
     request_id: str,
 ) -> tuple[AccountBalance, ...]:
-    """Map exact broker balances without manufacturing missing amounts."""
+    """Map exact broker balances with account-currency margin availability."""
     logger.debug("Normalizing %d broker balances", len(balances))
     return tuple(
         AccountBalance(
@@ -122,7 +129,15 @@ def _map_balances(
                 request_id=request_id,
             ),
             available=_required_decimal(
-                balance.available,
+                (
+                    balance.available
+                    if balance.available is not None
+                    else (
+                        account_info.free_margin
+                        if balance.asset == account_info.currency
+                        else None
+                    )
+                ),
                 field="balance.available",
                 request_id=request_id,
             ),
@@ -254,7 +269,7 @@ def get_account_state_snapshot(
     return AccountStateSnapshot(
         account_id=request.account_id,
         currency=info.currency,
-        balances=_map_balances(balances, request.request_id),
+        balances=_map_balances(balances, info, request.request_id),
         equity=equity,
         margin_used=info.margin,
         margin_available=info.free_margin,

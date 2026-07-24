@@ -1,7 +1,6 @@
 """Unit tests for aggregate Trading order validation."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 

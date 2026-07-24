@@ -1,12 +1,33 @@
 """Structural guarantees for the standalone Strategy usage programs."""
 
 import ast
+from importlib import import_module
 from pathlib import Path
 
 from app.services import strategy
 from app.utils import logger
 
 _USAGE_DIR = Path(__file__).parents[1] / "usage"
+_FEATURE_REQUIREMENTS = {
+    "contracts": (
+        "01_contracts.py",
+        {
+            *range(1, 18),
+            35,
+            38,
+            39,
+        },
+    ),
+    "diagnostics": ("02_diagnostics.py", {18, 19, 34}),
+    "registry": ("03_registry.py", set(range(20, 25))),
+    "intents": ("04_intents.py", {25, 26}),
+    "replay": ("05_replay.py", {27, 29}),
+    "checkpoints": ("06_checkpoints.py", {28, 30, 31}),
+    "vectorized": ("07_vectorized.py", {32, 36}),
+    "event": ("08_event.py", {33, 37}),
+    "signals": ("09_signals.py", {47, 48}),
+    "evaluators": ("10_strategy_library.py", set(range(40, 47))),
+}
 
 
 def _programs() -> tuple[Path, ...]:
@@ -34,6 +55,53 @@ def test_every_public_symbol_has_usage_evidence() -> None:
     assert not missing, f"public symbols without usage evidence: {missing}"
 
 
+def test_each_feature_program_uses_its_own_public_exports() -> None:
+    """Verify each feature's program covers that feature's public API."""
+    logger.debug("Testing Strategy feature-local public usage coverage")
+    for feature, (program_name, _) in _FEATURE_REQUIREMENTS.items():
+        path = _USAGE_DIR / program_name
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        referenced = {
+            node.id for node in ast.walk(tree) if isinstance(node, ast.Name)
+        } | {node.attr for node in ast.walk(tree) if isinstance(node, ast.Attribute)}
+        module = import_module(f"app.services.strategy.{feature}")
+        missing = sorted(set(module.__all__) - referenced)
+        assert not missing, f"{feature} exports missing from {program_name}: {missing}"
+
+
+def test_every_requirement_has_one_feature_local_demonstration() -> None:
+    """Verify exact feature ownership for every FR demonstration function."""
+    logger.debug("Testing Strategy requirement-to-usage mapping")
+    observed: set[int] = set()
+    for feature, (program_name, expected) in _FEATURE_REQUIREMENTS.items():
+        tree = ast.parse((_USAGE_DIR / program_name).read_text(encoding="utf-8"))
+        actual = {
+            int(node.name.removeprefix("fr_str_"))
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name.startswith("fr_str_")
+        }
+        assert actual == expected, feature
+        duplicates = observed & actual
+        assert not duplicates, f"duplicate FR demonstrations: {duplicates}"
+        observed.update(actual)
+    assert observed == set(range(1, 49))
+
+
+def test_usage_programs_import_domain_dependencies_from_package_roots() -> None:
+    """Verify usage programs contain no external deep service imports."""
+    logger.debug("Testing Strategy usage import boundaries")
+    for path in _programs():
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ImportFrom) or node.module is None:
+                continue
+            if node.module.startswith("app.services.strategy."):
+                raise AssertionError(f"{path.name}: Strategy deep import {node.module}")
+            service_parts = node.module.split(".")
+            if service_parts[:2] == ["app", "services"] and len(service_parts) > 3:
+                raise AssertionError(f"{path.name}: service deep import {node.module}")
+
+
 def test_every_program_is_a_standalone_main_program() -> None:
     """Verify each program defines main() behind a __main__ guard."""
     logger.debug("Testing Strategy usage program structure")
@@ -57,11 +125,14 @@ def test_every_program_is_a_standalone_main_program() -> None:
 def test_program_count_matches_feature_count() -> None:
     """Verify the domain keeps one usage program per registered feature."""
     logger.debug("Testing Strategy usage program cardinality")
-    features = tuple(
+    feature_directories = {
         path.name
-        for path in sorted(
-            (Path(__file__).parents[3] / "app/services/strategy").iterdir()
-        )
-        if path.is_dir() and (path / "__init__.py").exists()
-    )
-    assert len(_programs()) == len(features), sorted(features)
+        for path in (Path(__file__).parents[3] / "app/services/strategy").iterdir()
+        if path.is_dir()
+        and (path / "__init__.py").exists()
+        and path.name != "migrations"
+    }
+    assert feature_directories == set(_FEATURE_REQUIREMENTS)
+    assert {path.name for path in _programs()} == {
+        program_name for program_name, _ in _FEATURE_REQUIREMENTS.values()
+    }

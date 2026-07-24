@@ -144,7 +144,6 @@ class ExternalMarketDataSource(MarketDataSource):
                 bar_result, "historical_bars", request.request_id
             )
             normalized_bars: list[dict[str, object]] = []
-            available_times = []
             for bar in bar_page.items:
                 volume = bar.trade_volume
                 if volume is None:
@@ -155,18 +154,13 @@ class ExternalMarketDataSource(MarketDataSource):
                         safe_details={"field": "volume"},
                         request_id=request.request_id,
                     )
-                available_at = max(
-                    bar.closing_timestamp,
-                    bar_result.timestamp,
-                )
-                available_times.append(available_at)
                 normalized_bars.append(
                     {
                         "timestamp": bar.opening_timestamp,
                         "source": request.source_id,
                         "source_symbol": request.provider_symbol,
                         "source_revision": bar_result.adapter_version,
-                        "available_at": available_at,
+                        "available_at": bar.closing_timestamp,
                         "open": bar.open,
                         "high": bar.high,
                         "low": bar.low,
@@ -179,7 +173,12 @@ class ExternalMarketDataSource(MarketDataSource):
                     }
                 )
             records = tuple(normalized_bars)
-            retrieved_at = max(available_times, default=bar_result.timestamp)
+            retrieved_at = max(
+                (
+                    *(bar.closing_timestamp for bar in bar_page.items),
+                    bar_result.timestamp,
+                )
+            )
             revision = bar_result.adapter_version
         elif request.data_kind == "ticks":
             tick_result = await self._adapter.get_ticks(

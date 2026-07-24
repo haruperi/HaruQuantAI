@@ -1,7 +1,6 @@
 """Unit tests for Analytics dashboard payload projection."""
 
 # ruff: noqa: INP001
-
 from app.services.analytics.dashboards.payloads import build_dashboard_payload
 from app.utils import logger
 from tests.analytics._support import _report

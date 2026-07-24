@@ -1,7 +1,6 @@
 """Unit tests for the canonical Trading live gate sequence."""
 
 # ruff: noqa: ARG005, INP001
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from types import SimpleNamespace

@@ -1,7 +1,6 @@
 """Unit tests for Analytics benchmark evidence."""
 
 # ruff: noqa: INP001
-
 import json
 from dataclasses import replace
 from datetime import UTC, datetime

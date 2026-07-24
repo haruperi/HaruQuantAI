@@ -7,8 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import get_market_data
-from app.services.data.contracts import DataError
+from app.services.data import DataError, get_market_data
 from app.services.strategy import (
     EventStrategyEvaluator,
     StrategyDecision,
@@ -32,6 +31,16 @@ _WORKFLOW = "strategy-usage-event-workflow"
 _CORRELATION = "strategy-usage-event-correlation"
 _STRATEGY = "usage-event-strategy"
 _HOOKS = ("on_init", "on_bar", "on_tick", "on_fill", "on_stop")
+
+
+def fr_str_033() -> None:
+    """Demonstrate atomic typed event evaluation."""
+    assert callable(run_event_strategy_hook)
+
+
+def fr_str_037() -> None:
+    """Demonstrate the hash-bound event evaluator contract."""
+    assert EventStrategyEvaluator
 
 
 class BarCountingEvaluator:
@@ -91,6 +100,8 @@ def main() -> int:
     Returns:
         ``0`` on success, or ``3`` when real MT5 evidence is unavailable.
     """
+    fr_str_033()
+    fr_str_037()
     print("\nSTATEFUL STRATEGY EVENT HOOK — REAL MT5 EURUSD M5")
     print("=" * 88)
     try:

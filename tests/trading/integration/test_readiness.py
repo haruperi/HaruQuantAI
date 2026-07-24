@@ -1,7 +1,6 @@
 """Workflow integration for route facts and readiness aggregation."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 from app.services.trading.validation import assess_execution_readiness

@@ -105,7 +105,8 @@ def example_data() -> None:
         limits=limits,
     )
     print(
-        f"Cleaned DataFrame rows: {len(df_clean)}, clean report fatal issues: {len(clean_report.fatal_issues)}"
+        f"Cleaned DataFrame rows: {len(df_clean)}, "
+        f"clean report fatal issues: {len(clean_report.fatal_issues)}"
     )
 
     # 3. Enrich dataset

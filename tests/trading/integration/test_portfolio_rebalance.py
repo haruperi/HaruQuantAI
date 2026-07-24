@@ -1,7 +1,6 @@
 """Negative workflow integration for governed portfolio rebalance execution."""
 
 # ruff: noqa: INP001
-
 from dataclasses import replace
 from datetime import timedelta
 

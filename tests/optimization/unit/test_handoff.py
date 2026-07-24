@@ -1,7 +1,6 @@
 """Tests for Optimization report handoff packages."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.evidence import (
     build_optimization_evidence,
     build_report_package,

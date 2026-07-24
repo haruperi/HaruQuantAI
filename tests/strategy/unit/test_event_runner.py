@@ -1,7 +1,6 @@
 """Atomic event-driven Strategy runner tests."""
 
 # ruff: noqa: PT018
-
 from app.services.strategy import EventStrategyEvaluator, run_event_strategy_hook
 from app.utils import logger
 

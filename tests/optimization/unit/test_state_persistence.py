@@ -1,7 +1,6 @@
 """Tests for atomic Optimization result persistence."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.evidence import build_optimization_evidence
 from app.services.optimization.state import persist_optimization_result
 from tests.optimization.unit.test_evidence_contracts import evidence_request

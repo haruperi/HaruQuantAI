@@ -1,7 +1,6 @@
 """Workflow integration for bounded live shutdown reporting."""
 
 # ruff: noqa: INP001
-
 import pytest
 from tests.trading.conftest import live_config, live_evidence, live_session
 

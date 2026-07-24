@@ -120,17 +120,20 @@ def example_metrics() -> None:
 
     trade_evidence = calculate_trade_evidence(result, config=config)
     print(
-        f"Trade section key: {trade_evidence.section_key}, status: {trade_evidence.status}"
+        f"Trade section key: {trade_evidence.section_key}, "
+        f"status: {trade_evidence.status}"
     )
 
     return_evidence = calculate_return_evidence(result, config=config)
     print(
-        f"Return section key: {return_evidence.section_key}, status: {return_evidence.status}"
+        f"Return section key: {return_evidence.section_key}, "
+        f"status: {return_evidence.status}"
     )
 
     drawdown_evidence = calculate_drawdown_evidence(result, config=config)
     print(
-        f"Drawdown section key: {drawdown_evidence.section_key}, status: {drawdown_evidence.status}"
+        f"Drawdown section key: {drawdown_evidence.section_key}, "
+        f"status: {drawdown_evidence.status}"
     )
 
     risk_evidence = calculate_risk_evidence(daily_returns, config=config)
@@ -140,17 +143,20 @@ def example_metrics() -> None:
 
     ratio_evidence = calculate_ratio_evidence(result, daily_returns, config=config)
     print(
-        f"Ratio section key: {ratio_evidence.section_key}, status: {ratio_evidence.status}"
+        f"Ratio section key: {ratio_evidence.section_key}, "
+        f"status: {ratio_evidence.status}"
     )
 
     cost_evidence = calculate_cost_efficiency_evidence(result, config=config)
     print(
-        f"Cost/Efficiency section key: {cost_evidence.section_key}, status: {cost_evidence.status}"
+        f"Cost/Efficiency section key: {cost_evidence.section_key}, "
+        f"status: {cost_evidence.status}"
     )
 
     dist_evidence = calculate_distribution_evidence(daily_returns, config=config)
     print(
-        f"Distribution section key: {dist_evidence.section_key}, status: {dist_evidence.status}"
+        f"Distribution section key: {dist_evidence.section_key}, "
+        f"status: {dist_evidence.status}"
     )
 
 

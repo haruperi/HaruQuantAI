@@ -1,6 +1,7 @@
 """Executable Simulation timeline usage example.
 
-Demonstrates tick contract construction, tick timeline building, and intent timing validation.
+Demonstrates tick contract construction, tick timeline building, and intent
+timing validation.
 """
 
 import sys

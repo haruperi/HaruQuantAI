@@ -1,7 +1,6 @@
 """Workflow integration for the governed upstream request boundary."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.trading.contracts import TradingRequest
 from pydantic import ValidationError

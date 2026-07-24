@@ -1,7 +1,6 @@
 """Workflow integration for the public-domain live evaluation cycle."""
 
 # ruff: noqa: ARG005, INP001
-
 from dataclasses import replace
 from decimal import Decimal
 from types import SimpleNamespace

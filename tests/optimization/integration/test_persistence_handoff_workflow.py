@@ -1,7 +1,6 @@
 """WF-OPT-006 evidence and persistence handoff integration."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.public_api import build_optimization_handoff
 from app.services.optimization.state import persist_optimization_result
 from app.utils import logger

@@ -1,8 +1,8 @@
 # Research
 
 > **Package:** `app/services/research`
-> **Status:** `Missing`
-> **Last updated:** `2026-07-13`
+> **Status:** `Partial`
+> **Last updated:** `2026-07-24`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -69,7 +69,7 @@ Contract definitions match `docs/PROJECT.md`. Commands and requests are owned by
 
 | Status | Contract | Version | Counterparty | Purpose |
 |---|---|---|---|---|
-| Missing | `ResearchReport` | `v1` | `UI/API` | Return advisory research evidence and hypothesis results; leakage-gate failure blocks publication. |
+| Completed | `ResearchReport` | `v1` | `UI/API` | Return advisory research evidence and hypothesis results; leakage-gate failure blocks publication. |
 
 `ResearchReport` is the only registered cross-domain Research result in the initial
 build. Prepared datasets, stage profiles/results, scorecards, snapshots, warnings, and
@@ -199,7 +199,7 @@ integration workflow, and package boundary satisfy Section 7.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
-| Missing | `FEAT-RES-01` Versioned Contracts and Configuration | `contracts/` | Planned declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/research/usage/01_contracts.py` exists; completion unverified |
+| Partial | `FEAT-RES-01` Versioned Contracts and Configuration | `contracts/` | Implemented package-root contracts include `ResearchReport v1` and `EdgeLabConfig`; exact declarations: Section 4.1 | Section 4.1 functional requirements | `tests/research/usage/01_contracts.py`; `tests/research/unit/test_workflow.py` |
 | Missing | `FEAT-RES-02` Deterministic Dataset Preparation | `data/` | Planned declarations: Section 4.2 | Section 4.2 functional requirements | `tests/research/usage/02_data.py` exists; completion unverified |
 | Missing | `FEAT-RES-03` Research-Specific Features | `features/` | Planned declarations: Section 4.3 | Section 4.3 functional requirements | `tests/research/usage/03_features.py` exists; completion unverified |
 | Missing | `FEAT-RES-04` Leakage Evidence, Splits, and Masking | `leakage/` | Planned declarations: Section 4.4 | Section 4.4 functional requirements | `tests/research/usage/04_leakage.py` exists; completion unverified |
@@ -209,7 +209,7 @@ integration workflow, and package boundary satisfy Section 7.
 | Missing | `FEAT-RES-08` Sessions and Seasonality | `seasonality/` | Planned declarations: Section 4.8 | Section 4.8 functional requirements | Missing |
 | Missing | `FEAT-RES-09` Market Structure Analysis | `market_structure/` | Planned declarations: Section 4.9 | Section 4.9 functional requirements | Missing |
 | Missing | `FEAT-RES-10` Deterministic Unsupervised Insights | `modeling/` | Planned declarations: Section 4.10 | Section 4.10 functional requirements | Missing |
-| Missing | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Planned declarations: Section 4.11 | Section 4.11 functional requirements | Missing |
+| Partial | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | `run_edge_lab_profile`; remaining declarations: Section 4.11 | `FR-RES-096` implemented for `data`/`metrics`; `FR-RES-089`–`095` missing | `tests/research/unit/test_workflow.py` |
 | Missing | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Planned declarations and artifact contracts: Section 4.12 | Section 4.12 functional requirements | Missing |
 
 ```text
@@ -389,7 +389,7 @@ flowchart LR
 | Missing | `WF-RES-008` | Internal | Run Unsupervised Market-Structure Research | Leakage-safe feature frame + seed | `UnsupervisedResearchResult` | `FR-RES-081 → 088` |
 | Missing | `WF-RES-009` | Internal | Build Research Scorecard and Profile Snapshot | Approved stage outputs | `ResearchScorecard` + `ResearchProfileSnapshot` | `FR-RES-089 → 092` |
 | Missing | `WF-RES-010` | Internal | Render and Persist Research Artifact | Masked result + approved Research-owned output location | Research-internal `ArtifactReference` or typed failure; UI/API receives only `ResearchReport v1` | `FR-RES-093 → 095, 097` |
-| Missing | `WF-RES-011` | Cross-domain | Run Complete Edge Lab Profile | Run request and `MarketDataset v1` from external orchestrator | `ResearchReport v1` to UI/API; orchestration/persistence remain external | `FR-RES-096` plus selected stage requirements |
+| Partial | `WF-RES-011` | Cross-domain | Run Complete Edge Lab Profile | Explicit hypothesis, `EdgeLabConfig`, and `MarketDataset v1` from external orchestrator | Advisory `ResearchReport v1` to UI/API; unavailable selected stages fail closed | `FR-RES-096` plus implemented data/metrics stage requirements |
 
 ### `WF-RES-001` — Prepare Research Dataset
 
@@ -522,12 +522,14 @@ Masking precedes serialization; traversal, disallowed root, overwrite conflict, 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-004`
 
-**Input boundary:** External UI/API orchestration supplies a run request, `MarketDataset v1`, and optional `PerformanceReport v1`.
+**Input boundary:** External UI/API orchestration supplies an explicit hypothesis,
+`EdgeLabConfig`, `MarketDataset v1`, and optional `PerformanceReport v1`.
 **Output boundary:** Research returns `ResearchReport v1`. UI/API owns human approval and any `StrategyRegistrationRequest` submission.
 
 Research executes only selected deterministic stages. External code owns triggering, scheduling, provider reads, caching, and database orchestration.
 
-**Integration test:** `tests/research/integration/test_edge_lab_profile.py::test_edge_lab_returns_advisory_research_report()`
+**Integration tests:** `tests/research/unit/test_workflow.py`;
+`tests/system/integration/test_research_to_strategy.py`.
 
 #### End-to-end workflow diagram
 
@@ -1104,8 +1106,8 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 | Missing | `scorecard.py` | Build one deterministic advisory scorecard. | `build_research_scorecard` | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** contracts; metrics; studies; seasonality; market_structure; Analytics `PerformanceReport` |
 | Missing | `snapshot.py` | Normalize approved versioned stage outputs. | `build_research_profile_snapshot`, `build_profile_summary`, `build_dashboard_summary` | **Standard library:** datetime, typing<br>**Required third-party:** None<br>**Local:** contracts; scorecard.py |
 | Missing | `rendering.py` | Render JSON-compatible, Markdown, comparison, and multi-symbol reports without writing. | `render_research_report`, `render_profile_comparison`, `generate_multi_symbol_report` | **Standard library:** json, typing<br>**Required third-party:** None<br>**Local:** contracts; snapshot.py |
-| Missing | `workflow.py` | Execute selected deterministic Research stages and construct `ResearchReport v1` for an external orchestrator. | `run_edge_lab_profile` | **Standard library:** time, typing<br>**Required third-party:** None<br>**Local:** all lower Research feature APIs; Data `MarketDataset`; Analytics `PerformanceReport` |
-| Missing | `__init__.py` | Expose the supported profiles API. | Eight functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** four files above |
+| Partial | `workflow.py` | Execute implemented selected deterministic Research stages and construct `ResearchReport v1`; unavailable selected stages fail closed. | `run_edge_lab_profile` | **Standard library:** collections, typing<br>**Required third-party:** None<br>**Local:** Research contracts/data/metrics; Data `MarketDataset`; Analytics `PerformanceReport`; Utils validation/hash/logging |
+| Partial | `__init__.py` | Expose the implemented profiles API. | `run_edge_lab_profile` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** workflow.py |
 
 ### Configuration and Limits Manifest
 
@@ -1125,7 +1127,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 | Missing | `FR-RES-093` | Render a canonical report as JSON-compatible data or Markdown with UTC metadata and no persistence side effect. | `render_research_report(report: ResearchReport, *, format: Literal["json", "markdown"]) -> JSONValue \| str` | Read-only | Pending taxonomy: unsupported format/non-serializable report | **Usage:** `test_usage_profiles.py::test_usage_rendering_report()`<br>**Unit:** `test_rendering.py::test_render_report_uses_utc_and_no_io()` |
 | Missing | `FR-RES-094` | Render a Markdown comparison of two compatible snapshots while exposing schema/config/dataset differences. | `render_profile_comparison(left: ResearchProfileSnapshot, right: ResearchProfileSnapshot) -> str` | Read-only | Pending taxonomy: incompatible schema/snapshot | **Usage:** `test_usage_profiles.py::test_usage_rendering_comparison()`<br>**Unit:** `test_rendering.py::test_comparison_rejects_incompatible_schema()` |
 | Missing | `FR-RES-095` | Render per-symbol and combined advisory summaries in memory while preserving individual failures/warnings; it shall not write files. | `generate_multi_symbol_report(reports: Mapping[str, ResearchReport], *, format: Literal["json", "markdown"]) -> JSONValue \| str` | Read-only | Pending taxonomy/resource: empty/invalid/oversized report set | **Usage:** `test_usage_profiles.py::test_usage_rendering_multi_symbol()`<br>**Unit:** `test_rendering.py::test_multi_symbol_preserves_partial_warnings()` |
-| Missing | `FR-RES-096` | Execute selected deterministic stage APIs over supplied contracts and return `ResearchReport v1` while leaving provider reads, cache, scheduling, database writes, and strategy submission external. | `run_edge_lab_profile(dataset: MarketDataset, *, config: EdgeLabConfig, performance: PerformanceReport \| None = None) -> ResearchReport` | Read-only | stage config/data/dependency/resource failure | **Usage:** `test_usage_profiles.py::test_usage_workflow_run_edge_lab`<br>**Unit:** `test_workflow.py::test_edge_lab_has_no_external_or_live_side_effects` |
+| Partial | `FR-RES-096` | Execute implemented selected deterministic stage APIs over supplied contracts and return advisory `ResearchReport v1` while leaving provider reads, cache, scheduling, database writes, and strategy submission external. `data` is mandatory; `metrics` is optional; selecting another currently unavailable stage fails closed. | `run_edge_lab_profile(dataset: MarketDataset, *, hypothesis: str, config: EdgeLabConfig, performance: PerformanceReport \| None = None) -> ResearchReport` | Read-only | `ValidationError[RES_INPUT_INVALID|RES_STAGE_DEPENDENCY_INVALID|RES_STAGE_UNAVAILABLE]` or typed stage failure | **Unit:** `tests/research/unit/test_workflow.py`<br>**System:** `tests/system/integration/test_research_to_strategy.py` |
 
 **Implementation notes:**
 

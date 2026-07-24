@@ -82,8 +82,8 @@ def test_structurally_invalid_request_is_rejected_before_transmission() -> None:
         )
 
 
-def test_registry_created_real_adapter_blocks_every_unreleased_write() -> None:
-    """The genuine registry/MT5 boundary blocks writes before provider access."""
+def test_registry_created_real_adapter_requires_connection_for_released_write() -> None:
+    """The genuine registry/MT5 boundary requires a ready connection."""
     created = create_broker_adapter(BrokerId.MT5, _config())
     assert created.data is not None
     adapter = created.data
@@ -92,7 +92,7 @@ def test_registry_created_real_adapter_blocks_every_unreleased_write() -> None:
     async def exercise() -> None:
         result = await adapter.place_order(request)
         assert result.error is not None
-        assert result.error.code is BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert result.error.code is BrokerErrorCode.BROKER_NOT_CONNECTED
         assert result.error.capability is BrokerCapabilityId.PLACE_ORDER
 
     asyncio.run(exercise())
@@ -137,22 +137,28 @@ def _broker_config(broker_id: BrokerId) -> BrokerConnectionConfig:
 
 
 def test_all_mutation_operations_fail_closed_at_public_root_boundary() -> None:
-    """Every mutation method returns BROKER_CAPABILITY_UNSUPPORTED for root adapters."""
+    """Every disconnected mutation fails closed under its capability policy."""
     for broker_id in (BrokerId.MT5, BrokerId.CTRADER, BrokerId.BINANCE_SPOT):
         config = _broker_config(broker_id)
         created = create_broker_adapter(broker_id, config)
         assert created.data is not None
         adapter = created.data
+        expected_code = (
+            BrokerErrorCode.BROKER_NOT_CONNECTED
+            if broker_id is BrokerId.MT5
+            else BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        )
 
-        async def exercise(target_adapter: object = adapter) -> None:
+        async def exercise(
+            target_adapter: object = adapter,
+            target_code: BrokerErrorCode = expected_code,
+        ) -> None:
             res_place = await target_adapter.place_order(_order_request())  # type: ignore[attr-defined]
             assert res_place.error is not None
-            assert res_place.error.code is BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+            assert res_place.error.code is target_code
 
             res_cancel = await target_adapter.cancel_order("ticket-1")  # type: ignore[attr-defined]
             assert res_cancel.error is not None
-            assert (
-                res_cancel.error.code is BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-            )
+            assert res_cancel.error.code is target_code
 
         asyncio.run(exercise())

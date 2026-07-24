@@ -1,6 +1,7 @@
 """Executable Research leakage usage example.
 
-Demonstrates lookahead feature validation, chronological time splitting, and research artifact masking.
+Demonstrates lookahead feature validation, chronological time splitting, and
+research artifact masking.
 """
 
 import sys
@@ -46,7 +47,9 @@ def example_leakage() -> None:
         ts_frame, train_fraction=0.5, validation_fraction=0.2
     )
     print(
-        f"Train rows: {len(split_result.train)}, Val rows: {len(split_result.validation)}, Test rows: {len(split_result.test)}"
+        f"Train rows: {len(split_result.train)}, "
+        f"Val rows: {len(split_result.validation)}, "
+        f"Test rows: {len(split_result.test)}"
     )
 
     # 3. Artifact masking

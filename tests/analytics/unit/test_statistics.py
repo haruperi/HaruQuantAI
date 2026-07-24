@@ -1,7 +1,6 @@
 """Unit tests for bounded Analytics statistical validation."""
 
 # ruff: noqa: INP001
-
 import json
 from dataclasses import replace
 from pathlib import Path

@@ -1,7 +1,6 @@
 """Tests for controlled Optimization errors."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.optimization.errors import OptimizationError
 

@@ -1,0 +1,29 @@
+{
+  "artifact_id": "artifact-8583d3fa81bd9aa332ee75056574ae6bc8bfd70ca381d7c9f97fa7dfa04e762f",
+  "relative_path": "data\\raw\\EURUSD_H1.csv",
+  "format": "csv",
+  "content_hash": "8583d3fa81bd9aa332ee75056574ae6bc8bfd70ca381d7c9f97fa7dfa04e762f",
+  "schema_version": "data.market_dataset.v1",
+  "normalization_version": "v1",
+  "source_revision": "v1",
+  "row_count": 24,
+  "start": "2026-06-01T00:00:00Z",
+  "end": "2026-06-01T23:00:00Z",
+  "license_metadata": {
+    "license": "synthetic-public"
+  },
+  "provenance": {
+    "generator": "decimal_gbm",
+    "seed": "42",
+    "rounding": "ROUND_HALF_EVEN",
+    "data.symbol": "EURUSD",
+    "data.data_kind": "bars",
+    "data.available_at": "2026-06-01T23:00:00+00:00",
+    "data.workflow_context": "validation",
+    "data.precision_policy": "decimal_string",
+    "data.quality_report": "{\"quality_status\":\"passed\",\"quality_score\":\"1\",\"issues\":[],\"warnings\":[],\"record_count\":24,\"checked_count\":24,\"truncated\":false,\"sample_limit\":24,\"schema_version\":\"v1\",\"generated_at\":\"2026-06-01T23:00:00Z\"}",
+    "data.timeframe": "H1"
+  },
+  "created_at": "2026-07-23T20:44:36.878462Z",
+  "request_id": "req-6eb0d55e-ddc0-44e6-b3be-3b8b38d4f9db"
+}

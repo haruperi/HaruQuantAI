@@ -1,7 +1,6 @@
 """WF-OPT-003 scoring, ranking, and overfit integration."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.scoring import (
     ObjectiveName,
     assess_overfit_evidence,

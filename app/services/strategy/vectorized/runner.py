@@ -5,9 +5,9 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import Protocol, runtime_checkable
 
-from app.services.data.contracts import MarketDataset  # noqa: TC001
-from app.services.data.evidence.account_contracts import (  # noqa: TC001
-    AccountStateSnapshot,
+from app.services.data import (
+    AccountStateSnapshot,  # noqa: TC001 - runtime annotation and model resolution
+    MarketDataset,  # noqa: TC001 - runtime annotation and model resolution
 )
 from app.services.indicators import IndicatorResult  # noqa: TC001
 from app.services.strategy.contracts.execution import (
@@ -145,7 +145,7 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
         indicator_hash = canonical_digest(
             tuple(asdict(item.manifest) for item in indicators)
         )
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         logger.error("Vectorized Strategy input digest failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
@@ -192,7 +192,7 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
     }
     try:
         result_hash = canonical_digest(result_material)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         logger.error("Vectorized Strategy result digest failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,

@@ -1,7 +1,6 @@
 """WF-STR-003 event evaluation integration."""
 
 # ruff: noqa: PT018
-
 from app.services.strategy import run_event_strategy_hook
 from app.utils import logger
 

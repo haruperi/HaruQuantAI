@@ -1,7 +1,6 @@
 """Workflow integration for real Risk enforcement before live dispatch."""
 
 # ruff: noqa: INP001
-
 from dataclasses import replace
 from types import SimpleNamespace
 from typing import cast

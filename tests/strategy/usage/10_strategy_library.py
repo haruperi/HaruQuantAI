@@ -6,21 +6,34 @@ the usage evidence for the whole ``services.strategy.evaluators`` library: each
 evidence through the public ``evaluate_strategy_signals`` boundary.
 """
 
+import asyncio
 import hashlib
 import inspect
-import os
 import sys
 from collections.abc import Callable, Sequence
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import pandas as pd
-from app.services.data import get_market_data, get_symbol_metadata
-from app.services.data.contracts import DataError
-from app.services.indicators import IndicatorError, atr, rsi, sma
+from app.services.brokers import (
+    BrokerConnectionConfig,
+    BrokerEnvironment,
+    BrokerId,
+    create_broker_adapter,
+)
+from app.services.data import (
+    AccountSnapshotRequest,
+    AccountStateSnapshot,
+    DataError,
+    MarketDataset,
+    get_account_state_snapshot,
+    get_market_data,
+    get_symbol_metadata,
+)
+from app.services.indicators import IndicatorError, atr, rsi, sma, zigzag
 from app.services.strategy import (
     DecomposingTradeEvaluator,
     HarrietHedgingEvaluator,
@@ -41,7 +54,22 @@ from app.services.strategy import (
     WhiteFairyEvaluator,
     evaluate_strategy_signals,
 )
-from app.utils import canonical_json
+from app.utils import AppSettings, canonical_json
+from pydantic import Field, SecretStr
+
+
+class _StrategyUsageSettings(AppSettings):
+    """Typed standalone composition settings for real Strategy evidence."""
+
+    environment: str = "dev"
+    strategy_audit_bars: int = Field(default=120, gt=0, le=240)
+    mt5_login: SecretStr | None = None
+    mt5_password: SecretStr | None = None
+    mt5_server: SecretStr | None = None
+    mt5_terminal_path: SecretStr | None = None
+
+
+_USAGE_SETTINGS = _StrategyUsageSettings()
 
 _UNAVAILABLE = 3
 # Signal-audit tuning. Each audited bar re-evaluates the real boundary against
@@ -54,7 +82,7 @@ _UNAVAILABLE = 3
 # so indicators must be recomputed per window rather than sliced from a
 # full-history result. 260 bars is ample warmup for period-14 Wilder smoothing
 # to converge, keeping audited values equal to full-history values.
-_AUDIT_BARS = int(os.getenv("STRATEGY_AUDIT_BARS", "120"))
+_AUDIT_BARS = _USAGE_SETTINGS.strategy_audit_bars
 _AUDIT_WINDOW = 260
 _AUDIT_DIR = Path(__file__).resolve().parent / "signal_audit"
 _MODULE_ROOT = "app.services.strategy.evaluators"
@@ -305,7 +333,7 @@ def _audit(  # noqa: C901
         }
         for result in indicators:
             for column in result.output_columns:
-                series = result.values[column]  # noqa: PD011
+                series = result.values_only[column]
                 row[column] = series.iloc[-1]
                 # The evaluators compare the current value against the previous
                 # one, so both are needed to verify a crossing from one row.
@@ -452,7 +480,7 @@ def example_04_sqx_breakout_atr_trailing(market: object, point: Decimal) -> int:
 
 
 def example_05_harriet_hedging(  # noqa: C901
-    market: object, point: Decimal
+    market: MarketDataset, point: Decimal
 ) -> int:
     """Audit Harriet Hedging multi-timeframe structure confirmations.
 
@@ -470,6 +498,8 @@ def example_05_harriet_hedging(  # noqa: C901
             source_id="mt5",
             symbol="EURUSD",
             timeframe="H4",
+            start=market.start,
+            end=market.end,
             limit=500,
             use_cache=False,
             quality_failure_behavior="warn",
@@ -478,8 +508,8 @@ def example_05_harriet_hedging(  # noqa: C901
         print("Higher-timeframe evidence unavailable:", error.code)
         return _UNAVAILABLE
     parameters: dict[str, object] = {
-        "lower_timeframe": "lower",
-        "higher_timeframe": "higher",
+        "lower_timeframe": "H1",
+        "higher_timeframe": "H4",
         "lower_min_distance_pips": "1.0",
         "higher_min_distance_pips": "2.0",
         "pip_multiplier": "10",
@@ -496,7 +526,7 @@ def example_05_harriet_hedging(  # noqa: C901
         closed = [
             position
             for position, record in enumerate(higher.records)
-            if record.available_at <= signal_time
+            if record.timestamp + timedelta(hours=4) <= signal_time
         ]
         if len(closed) < 3:
             failures["HIGHER_TIMEFRAME_NOT_READY"] = (
@@ -513,9 +543,7 @@ def example_05_harriet_hedging(  # noqa: C901
             window.request_id,
             (),
         )
-        evidence = _evidence(
-            window, point, related={"lower": window, "higher": higher_window}
-        )
+        evidence = _evidence(window, point, related={"H4": higher_window})
         outcome = evaluate_strategy_signals(
             ref, config, evidence, (), context, evaluator
         )
@@ -558,47 +586,194 @@ def example_05_harriet_hedging(  # noqa: C901
 
 
 def example_06_market_structure(market: object, point: Decimal) -> int:
-    """Report why Market Structure fails closed without real ZigZag evidence.
+    """Evaluate Market Structure with official causal ZigZag evidence.
 
     Args:
         market: Real MT5 market evidence.
         point: Instrument point size.
 
     Returns:
-        Always ``3``: no exported provenance-bound ZigZag provider exists yet.
+        ``0`` on success or ``3`` when eight confirmed pivots are unavailable.
     """
-    del market, point
     print("\n06 MARKET STRUCTURE")
     print("-" * 88)
-    print(
-        f"{MarketStructureEvaluator.__name__} requires exactly eight externally "
-        "supplied, provenance-bound ZigZag extremes. No exported real ZigZag "
-        "evidence provider exists, so this strategy fails closed rather than "
-        "substituting synthetic extremes. No signal frame can be produced."
+    result = zigzag(market, depth=2)
+    if result.values_only["zigzag_value_2"].count() < 8:
+        print("Fewer than eight causal confirmed ZigZag pivots are available.")
+        return _UNAVAILABLE
+    context = _context("market-structure")
+    ref, config, evaluator = _binding(
+        MarketStructureEvaluator,
+        "market-structure",
+        {},
+        context,
+        market.request_id,
+        ("zigzag",),
     )
-    return _UNAVAILABLE
+    evidence = _evidence(market, point)
+    outcome = evaluate_strategy_signals(
+        ref,
+        config,
+        evidence,
+        (result,),
+        context,
+        evaluator,
+    )
+    if outcome.data is None:
+        print("Market Structure evaluation failed:", outcome.error)
+        return _UNAVAILABLE
+    print("ZigZag manifest:", result.manifest.output_checksum)
+    for signal in outcome.data:
+        print(signal.signal_name, "active=", signal.active)
+    return 0
+
+
+def _real_mt5_account_snapshot() -> AccountStateSnapshot | None:
+    """Read a verified demo MT5 account snapshot through public contracts."""
+    login_secret = _USAGE_SETTINGS.mt5_login
+    password = _USAGE_SETTINGS.mt5_password
+    server_secret = _USAGE_SETTINGS.mt5_server
+    if (
+        _USAGE_SETTINGS.environment.casefold() not in {"dev", "test"}
+        or login_secret is None
+        or password is None
+        or server_secret is None
+    ):
+        return None
+    login = login_secret.get_secret_value()
+    server = server_secret.get_secret_value()
+    if "demo" not in server.casefold():
+        return None
+    credentials = {
+        "login": login_secret,
+        "password": password,
+        "server": server_secret,
+    }
+    terminal_path = _USAGE_SETTINGS.mt5_terminal_path
+    if terminal_path:
+        credentials["terminal_path"] = terminal_path
+    created = create_broker_adapter(
+        BrokerId.MT5,
+        BrokerConnectionConfig(
+            broker_id=BrokerId.MT5,
+            environment=BrokerEnvironment.DEMO,
+            provider_enabled=True,
+            connect_timeout_sec=10,
+            request_timeout_sec=15,
+            transport_reconnect_max_attempts=0,
+            stream_buffer_size=16,
+            circuit_failure_threshold=2,
+            circuit_recovery_timeout_sec=30,
+            circuit_half_open_max_calls=1,
+            account_reference=login,
+            credentials=credentials,
+            auto_connect=False,
+        ),
+    )
+    adapter = created.data
+    if adapter is None:
+        return None
+    try:
+        connected = asyncio.run(adapter.connect())
+        if not connected.is_success:
+            return None
+        return get_account_state_snapshot(
+            AccountSnapshotRequest(
+                source_id="mt5",
+                account_id=login,
+                max_age_seconds=30,
+                request_id="req-77777777-7777-4777-8777-777777777777",
+            ),
+            adapter,
+        )
+    except DataError as error:
+        print("MT5 demo account snapshot failed:", error.code)
+        return None
+    finally:
+        asyncio.run(adapter.disconnect())
 
 
 def example_07_random_walk(market: object, point: Decimal) -> int:
-    """Report why RandomWalk fails closed without real owned-position tags.
+    """Evaluate RandomWalk with a fresh Data-owned demo account snapshot.
 
     Args:
         market: Real MT5 market evidence.
         point: Instrument point size.
 
     Returns:
-        Always ``3``: no exported Data-owned position-tag source exists yet.
+        ``0`` on success or ``3`` when verified demo evidence is unavailable.
     """
-    del market, point
     print("\n07 RANDOM WALK")
     print("-" * 88)
-    print(
-        f"{RandomWalkEvaluator.__name__} requires real owned-position tags "
-        "derived from a fresh account snapshot. No exported Data-owned "
-        "position-tag source exists, so this strategy fails closed. The "
-        "recovered source contains no random market-direction signal."
+    snapshot = _real_mt5_account_snapshot()
+    if snapshot is None:
+        print("Fresh verified MT5 demo account evidence is unavailable.")
+        return _UNAVAILABLE
+    tags = tuple(
+        f"{position.ownership_ref}:{'BUY' if position.side == 'LONG' else 'SELL'}"
+        for position in snapshot.positions
+        if position.ownership_ref is not None
     )
-    return _UNAVAILABLE
+    context = _context("random-walk")
+    parameters = {"buy_magic_number": 17001, "sell_magic_number": 17002}
+    ref, config, evaluator = _binding(
+        RandomWalkEvaluator,
+        "random-walk",
+        parameters,
+        context,
+        snapshot.request_id,
+        (),
+    )
+    outcome = evaluate_strategy_signals(
+        ref,
+        config,
+        _evidence(market, point, tags=tags),
+        (),
+        context,
+        evaluator,
+    )
+    if outcome.data is None:
+        print("RandomWalk evaluation failed:", outcome.error)
+        return _UNAVAILABLE
+    print("Account snapshot:", snapshot.request_id, "positions:", len(tags))
+    for signal in outcome.data:
+        print(signal.signal_name, "active=", signal.active)
+    return 0
+
+
+def fr_str_040(market: object, point: Decimal) -> int:
+    """Demonstrate Naive MA Trend signal parity."""
+    return example_01_naive_ma_trend(market, point)
+
+
+def fr_str_041(market: object, point: Decimal) -> int:
+    """Demonstrate Decomposing Trade signal parity."""
+    return example_02_decomposing_trade(market, point)
+
+
+def fr_str_042(market: object, point: Decimal) -> int:
+    """Demonstrate Harriet Hedging signal parity."""
+    return example_05_harriet_hedging(market, point)
+
+
+def fr_str_043(market: object, point: Decimal) -> int:
+    """Demonstrate fail-closed Market Structure evidence handling."""
+    return example_06_market_structure(market, point)
+
+
+def fr_str_044(market: object, point: Decimal) -> int:
+    """Demonstrate fail-closed RandomWalk ownership evidence handling."""
+    return example_07_random_walk(market, point)
+
+
+def fr_str_045(market: object, point: Decimal) -> int:
+    """Demonstrate SQX breakout and ATR signal parity."""
+    return example_04_sqx_breakout_atr_trailing(market, point)
+
+
+def fr_str_046(market: object, point: Decimal) -> int:
+    """Demonstrate White Fairy signal parity."""
+    return example_03_white_fairy(market, point)
 
 
 def main() -> int:
@@ -636,22 +811,22 @@ def main() -> int:
         return _UNAVAILABLE
     point = Decimal(str(metadata.point))
     examples = (
-        example_01_naive_ma_trend,
-        # example_02_decomposing_trade,
-        # example_03_white_fairy,
-        # example_04_sqx_breakout_atr_trailing,
-        # example_05_harriet_hedging,
-        # example_06_market_structure,
-        # example_07_random_walk,
+        fr_str_040,
+        fr_str_041,
+        fr_str_042,
+        fr_str_043,
+        fr_str_044,
+        fr_str_045,
+        fr_str_046,
     )
     evaluated = 0
     for example in examples:
         if example(market, point) == 0:
             evaluated += 1
     print("\n" + "=" * 88)
-    print(f"Strategies evaluated with real evidence: {evaluated}/{len(examples)}")
+    print(f"Evaluated strategies with real evidence: {evaluated}/{len(examples)}")
     print("Signals are proposals only; Risk has approved nothing.")
-    return 0 if evaluated else _UNAVAILABLE
+    return 0 if evaluated == len(examples) else _UNAVAILABLE
 
 
 if __name__ == "__main__":

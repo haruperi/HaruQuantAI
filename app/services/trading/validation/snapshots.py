@@ -8,7 +8,9 @@ from typing import Self
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from app.services.trading.contracts import TradingError, TradingRequest, TradingRoute
-from app.services.trading.contracts.models import JsonValue
+from app.services.trading.contracts.models import (
+    JsonValue,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.utils import logger, to_json_safe
 
 

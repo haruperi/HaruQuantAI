@@ -133,7 +133,7 @@ def test_feature_exports_are_exact() -> None:
 def test_migration_helpers_are_private() -> None:
     """Verify Strategy migration definitions expose no public surface."""
     logger.debug("Testing private Strategy migration surface")
-    module = import_module("app.services.strategy.registry.migrations")
+    module = import_module("app.services.strategy.migrations.definitions")
     assert module.__all__ == []
     public = {name for name in vars(module) if not name.startswith("_")}
     assert not public & {"strategy_migration_steps", "ensure_strategy_storage"}

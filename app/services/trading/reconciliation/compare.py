@@ -7,9 +7,15 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.services.trading.contracts.models import JsonValue
-from app.services.trading.reconciliation.snapshots import AuthoritySnapshot
-from app.services.trading.state import TradingProjection
+from app.services.trading.contracts.models import (
+    JsonValue,  # noqa: TC001 - runtime annotation and model resolution
+)
+from app.services.trading.reconciliation.snapshots import (
+    AuthoritySnapshot,  # noqa: TC001 - runtime annotation and model resolution
+)
+from app.services.trading.state import (
+    TradingProjection,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.utils import canonical_json, logger, to_json_safe
 
 type DiscrepancyClass = Literal[

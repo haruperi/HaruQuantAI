@@ -14,7 +14,6 @@ from app.services.strategy.signals._mechanics import (
     _SignalDataError,
     _SignalIndicatorError,
 )
-from app.services.strategy.signals.protocol import SignalEvaluator  # noqa: TC001
 from app.utils import logger
 
 if TYPE_CHECKING:
@@ -26,8 +25,7 @@ if TYPE_CHECKING:
         ValidatedStrategyConfig,
         ValidatedStrategyRef,
     )
-
-
+    from app.services.strategy.signals.protocol import SignalEvaluator
 
 
 def _validate_identity(
@@ -90,7 +88,7 @@ def _validate_identity(
     return None
 
 
-def _validate_evidence(
+def _validate_evidence(  # noqa: PLR0911 - each evidence failure returns atomically.
     evidence: StrategySignalEvidence,
     indicators: tuple[IndicatorResult, ...],
     context: StrategyExecutionContext,
@@ -115,9 +113,10 @@ def _validate_evidence(
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    signal_time = primary_bars[-1].timestamp
+    signal_time = primary_bars[-1].available_at
     if (
-        signal_time > context.decision_timestamp
+        primary_bars[-1].timestamp > context.decision_timestamp
+        or signal_time > context.decision_timestamp
         or evidence.primary_market.available_at > context.decision_timestamp
     ):
         return failure(
@@ -126,10 +125,18 @@ def _validate_evidence(
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    related_future = any(
-        market.available_at > signal_time
-        for market in evidence.related_markets.values()
-    )
+    try:
+        related_future = any(
+            any(record.available_at > signal_time for record in _bar_records(market))
+            for market in evidence.related_markets.values()
+        )
+    except _SignalDataError:
+        return failure(
+            StrategyErrorCode.DATA_NOT_READY,
+            "concrete signal related market is not ready",
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
     feature_future = any(
         available_at > signal_time
         for available_at in evidence.feature_available_at.values()
@@ -144,6 +151,16 @@ def _validate_evidence(
     try:
         for indicator in indicators:
             indicator.join_to(evidence.primary_market)
+            available = indicator.values_only["available_at"]
+            if any(
+                item.to_pydatetime() > context.decision_timestamp for item in available
+            ):
+                return failure(
+                    StrategyErrorCode.LOOKAHEAD_DETECTED,
+                    "concrete signal indicator contains future evidence",
+                    request_id=context.request_id,
+                    correlation_id=context.correlation_id,
+                )
     except IndicatorError:
         return failure(
             StrategyErrorCode.INDICATOR_MODULE_ERROR,
@@ -256,7 +273,7 @@ def evaluate_strategy_signals(  # noqa: PLR0911
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    except Exception as error:  # noqa: BLE001 - evaluator trust boundary.
+    except Exception as error:  # noqa: BLE001 - injected evaluator is untrusted.
         logger.error("Concrete Strategy evaluator failed: %s", type(error).__name__)
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,

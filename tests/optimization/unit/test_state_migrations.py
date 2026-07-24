@@ -1,7 +1,6 @@
 """Tests for Optimization-owned additive migration definitions."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.state import get_optimization_migrations
 
 

@@ -1,7 +1,6 @@
 """Integration evidence for Analytics portfolio composition."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.portfolio import build_portfolio_performance_report

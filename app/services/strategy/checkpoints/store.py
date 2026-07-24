@@ -5,11 +5,11 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Mapping
 
-from app.services.data.contracts import DataError
-from app.services.data.persistence import execute_transaction
-from app.services.data.persistence.contracts import (
+from app.services.data import (
+    DataError,
     StatementPlan,
     TransactionRequest,
+    execute_transaction,
 )
 from app.services.strategy.checkpoints.models import StrategyCheckpoint
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
@@ -19,7 +19,7 @@ from app.services.strategy.contracts.references import (  # noqa: TC001
     ValidatedStrategyRef,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.services.strategy.registry.migrations import _ensure_strategy_storage
+from app.services.strategy.migrations.definitions import _ensure_strategy_storage
 from app.utils import (
     AuthContext,
     RedactionPolicy,
@@ -195,7 +195,6 @@ def validate_strategy_checkpoint(
             correlation_id=auth.correlation_id,
         )
     try:
-        _ensure_strategy_storage(auth.request_id)
         result = execute_transaction(
             TransactionRequest(
                 plan=StatementPlan(

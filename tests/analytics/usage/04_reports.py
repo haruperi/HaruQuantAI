@@ -142,7 +142,8 @@ def example_reports() -> None:
     # 2. Compare reports
     comparison = compare_performance_reports(report1, report2)
     print(
-        f"Report comparison section: {comparison.section_key}, status: {comparison.status}"
+        f"Report comparison section: {comparison.section_key}, "
+        f"status: {comparison.status}"
     )
 
     # 3. Serialize report

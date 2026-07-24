@@ -1,6 +1,7 @@
 """Executable Research features usage example.
 
-Demonstrates log returns, simple returns, Hurst exponent estimation, forward returns, and excursion features.
+Demonstrates log returns, simple returns, Hurst exponent estimation, forward
+returns, and excursion features.
 """
 
 import sys
@@ -72,7 +73,8 @@ def example_features() -> None:
     # 3. Forward returns
     f_ret = forward_returns(prices, horizon=2, mode="log", output_label="f2")
     print(
-        f"Forward returns output label: {f_ret.name}, research_only attr: {f_ret.attrs['research_only']}"
+        f"Forward returns output label: {f_ret.name}, "
+        f"research_only attr: {f_ret.attrs['research_only']}"
     )
 
     # 4. Excursions

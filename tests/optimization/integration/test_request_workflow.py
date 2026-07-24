@@ -1,7 +1,6 @@
 """WF-OPT-001 request packaging integration."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.public_api import (
     run_parameter_sweep,
     run_robustness_analysis,

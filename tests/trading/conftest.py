@@ -1,7 +1,6 @@
 """Shared public builders for Trading unit and workflow-integration tests."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.risk.contracts import KillSwitchState
 from tests.trading.unit.actions.test_controls import switch as kill_switch

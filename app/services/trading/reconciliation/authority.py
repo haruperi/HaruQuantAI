@@ -15,7 +15,9 @@ from app.services.trading.reconciliation.compare import (
     ReconciliationReport,
     compare_authority_state,
 )
-from app.services.trading.reconciliation.snapshots import AuthoritySnapshot
+from app.services.trading.reconciliation.snapshots import (
+    AuthoritySnapshot,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.services.trading.state import (
     TradingEvent,
     TradingProjection,

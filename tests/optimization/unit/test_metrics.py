@@ -1,7 +1,6 @@
 """Tests for Optimization metric evidence."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.optimization.scoring import (
     ObjectiveName,

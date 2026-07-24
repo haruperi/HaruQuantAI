@@ -9,13 +9,8 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
-from app.services.data.contracts import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
-)
-from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.results import IndicatorResult, build_indicator_result
+from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.indicators import IndicatorManifest, IndicatorResult
 from app.services.strategy import (
     StrategyConfig,
     StrategyDecision,
@@ -119,51 +114,62 @@ def make_indicator(
     output_column: str,
     values: Sequence[float],
 ) -> IndicatorResult:
-    """Build one official indicator result over exact market evidence.
+    """Build public Indicators evidence without importing another test suite.
 
     Args:
         market: Exact source market dataset.
-        indicator_id: Official indicator identity.
-        output_column: Exact output column name.
-        values: Ordered ready indicator values.
+        indicator_id: Stable public indicator identifier.
+        output_column: Generated value column.
+        values: Ordered finite indicator values.
 
     Returns:
-        A checksum-bound official indicator result.
+        Immutable public indicator evidence.
     """
-    logger.debug("Building concrete Strategy indicator test evidence")
     index = pd.DatetimeIndex(
-        [record.timestamp for record in market.records], name="timestamp", tz="UTC"
+        [record.timestamp for record in market.records],
+        name="timestamp",
+        tz="UTC",
     )
-    output_values = pd.DataFrame({output_column: values}, index=index)
-    available_at = pd.Series(
-        [record.available_at for record in market.records], index=index
+    frame = pd.DataFrame(
+        {
+            "symbol": market.symbol,
+            output_column: values,
+            "available_at": [record.available_at for record in market.records],
+            "computed_from_start": [record.timestamp for record in market.records],
+            "computed_from_end": [record.timestamp for record in market.records],
+            "source_timeframe": market.timeframe,
+            "data_quality_status": market.quality_report.quality_status,
+            "data_quality_score": float(market.quality_report.quality_score),
+            "unavailable_reason": [pd.NA] * market.record_count,
+        },
+        index=index,
     )
-    computed_from = pd.Series(
-        [record.timestamp for record in market.records], index=index
-    )
-    unavailable_reason = pd.Series([pd.NA] * len(index), index=index)
-    config = IndicatorConfig(
+    manifest = IndicatorManifest(
         indicator_id=indicator_id,
-        parameters=(),
-        source="close",
-        formula_version="1.0.0",
-        output_mode="values",
-        column_conflict_policy="error",
-        precision_dtype="float64",
-        availability_policy="source_available_at",
-        quality_policy="propagate_dataset",
-        error_mode="raise",
-    )
-    return build_indicator_result(
-        data=market,
-        config=config,
         indicator_version="1.0.0",
+        formula_version="1.0.0",
+        parameter_hash=HASH,
+        input_checksum=HASH,
+        output_checksum=HASH,
         output_columns=(output_column,),
-        output_values=output_values,
-        available_at=available_at,
-        computed_from_start=computed_from,
-        computed_from_end=computed_from,
-        unavailable_reason=unavailable_reason,
+        row_count=market.record_count,
+        symbol=market.symbol,
+        source_timeframe=market.timeframe or "",
+        normalization_version=market.normalization_version,
+        source_metadata=market.source_metadata,
+        license_metadata=market.license_metadata,
+        quality_status=market.quality_report.quality_status,
+        quality_score=str(market.quality_report.quality_score),
+        quality_schema_version=market.quality_report.schema_version,
+    )
+    return IndicatorResult(
+        indicator_id=indicator_id,
+        indicator_version="1.0.0",
+        formula_version="1.0.0",
+        parameter_hash=HASH,
+        values=frame,
+        output_columns=(output_column,),
+        manifest=manifest,
     )
 
 

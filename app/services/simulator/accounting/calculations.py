@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from app.services.data.evidence.fx_contracts import (
+from app.services.data import (
     FXConversionEvidence,  # noqa: TC001
 )
 from app.services.simulator.errors import SimulationError

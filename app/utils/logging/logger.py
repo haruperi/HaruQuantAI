@@ -667,7 +667,7 @@ def configure_logging(
             _mark_owned(file_handler)
             file_handler.setFormatter(file_formatter)
             file_handler.addFilter(redacting_filter)
-    except (OSError, ValueError, TypeError):
+    except OSError, ValueError, TypeError:
         _safe_fallback()
         raise ConfigurationError("LOGGING_CONFIGURATION_FAILED") from None
 

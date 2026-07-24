@@ -34,7 +34,8 @@ def example_rebalancing() -> None:
     print(f"Component: {action.component_id}")
     print(f"Action: {action.action}, Reduce only: {action.reduce_only}")
     print(
-        f"Current exposure: {action.current_exposure} -> Target: {action.target_exposure}"
+        f"Current exposure: {action.current_exposure} -> "
+        f"Target: {action.target_exposure}"
     )
 
 

@@ -1,7 +1,6 @@
 """Unit tests for the Analytics error taxonomy."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.analytics.contracts import (
     AnalyticsError,

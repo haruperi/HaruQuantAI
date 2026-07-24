@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime
 
-from app.services.data.contracts import (
+from app.services.data import (
     MarketDataset,
     OHLCVRecord,
     TickRecord,

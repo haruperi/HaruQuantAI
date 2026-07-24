@@ -1,7 +1,6 @@
 """Tests for bounded search orchestration."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.optimization.errors import OptimizationError
 from app.services.optimization.search import run_bounded_search, select_top_candidates

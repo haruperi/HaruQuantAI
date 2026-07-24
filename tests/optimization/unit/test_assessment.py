@@ -1,7 +1,6 @@
 """Tests for Optimization robustness assessment."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.optimization.robustness import assess_strategy_robustness
 

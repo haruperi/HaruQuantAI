@@ -1,7 +1,6 @@
 """Tests for Optimization parameter contracts."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 import pytest

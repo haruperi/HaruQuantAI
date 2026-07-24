@@ -1,7 +1,6 @@
 """Unit tests for explicit gated Trading bulk actions."""
 
 # ruff: noqa: INP001
-
 from dataclasses import replace
 from decimal import Decimal
 

@@ -52,5 +52,5 @@ def test_audit_event_construction_fails_closed_on_protected_key() -> None:
             action="request_received",
             request_id=generate_id("req"),
             correlation_id=generate_id("cor"),
-            payload={"api_key": "abc123"},
+            payload={"api_key": "abc123"},  # pragma: allowlist secret
         )

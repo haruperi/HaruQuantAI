@@ -1,7 +1,6 @@
 """Unit tests for deterministic reduce-only Portfolio planning."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 from datetime import datetime, timedelta

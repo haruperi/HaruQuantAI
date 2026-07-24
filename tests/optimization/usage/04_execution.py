@@ -40,7 +40,8 @@ def example_execution() -> None:
     # Execute candidate
     res = adapter.execute(req)
     print(
-        f"Adapter execution returned EngineOptimizationResult: {isinstance(res, EngineOptimizationResult)}"
+        "Adapter execution returned EngineOptimizationResult: "
+        f"{isinstance(res, EngineOptimizationResult)}"
     )
 
     exec_res = execute_candidate(req, adapter, deterministic_only=True)

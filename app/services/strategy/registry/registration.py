@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import hashlib
 
-from app.services.data.contracts import DataError
-from app.services.data.persistence import execute_transaction
-from app.services.data.persistence.contracts import (
+from app.services.data import (
+    DataError,
     StatementPlan,
     TransactionRequest,
+    execute_transaction,
 )
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.outcomes import (
@@ -27,13 +27,13 @@ from app.services.strategy.contracts.requests import (  # noqa: TC001
     StrategyRegistrationRequest,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
+from app.services.strategy.migrations.definitions import _ensure_strategy_storage
 from app.services.strategy.registry._mutations import (
     _REGISTER_PERMISSION,
     _load_mutation,
     _mutation_id,
     _publish_mutation,
 )
-from app.services.strategy.registry.migrations import _ensure_strategy_storage
 from app.utils import AuthContext, canonical_json, logger
 
 

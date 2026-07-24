@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import hashlib
 
-from app.services.data.audit import persist_audit_event
-from app.services.data.contracts import DataError
-from app.services.data.persistence import execute_transaction
-from app.services.data.persistence.contracts import (
+from app.services.data import (
+    DataError,
     StatementPlan,
     TransactionRequest,
+    execute_transaction,
+    persist_audit_event,
 )
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
@@ -18,7 +18,7 @@ from app.services.strategy.contracts.policy import StrategyValidationPolicy
 from app.services.strategy.contracts.references import (  # noqa: TC001
     StrategyRef,
 )
-from app.services.strategy.registry.migrations import _ensure_strategy_storage
+from app.services.strategy.migrations.definitions import _ensure_strategy_storage
 from app.utils import AuditEvent, AuthContext, generate_id, logger
 
 _REGISTER_PERMISSION = "strategy:register"

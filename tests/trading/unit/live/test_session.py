@@ -1,7 +1,6 @@
 """Unit tests for Trading live/paper session lifecycle."""
 
 # ruff: noqa: ARG005, INP001
-
 from datetime import UTC, datetime
 from types import SimpleNamespace
 from typing import cast

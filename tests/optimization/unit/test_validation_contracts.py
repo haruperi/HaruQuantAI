@@ -1,7 +1,6 @@
 """Tests for walk-forward validation contracts."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 
 import pytest

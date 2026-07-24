@@ -1,7 +1,6 @@
 """Bounded yfinance history transport without direct pandas imports."""
 
 # ruff: noqa: ANN401 - yfinance returns a transitive table without a stable type.
-
 from __future__ import annotations
 
 import asyncio

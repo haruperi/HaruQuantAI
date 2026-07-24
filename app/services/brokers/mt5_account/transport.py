@@ -1,7 +1,6 @@
 """Serialized non-blocking MetaTrader 5 terminal transport."""
 
 # ruff: noqa: ANN401 - the optional SDK has heterogeneous documented return types.
-
 from __future__ import annotations
 
 import asyncio

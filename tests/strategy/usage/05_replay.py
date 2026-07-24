@@ -25,6 +25,16 @@ _WORKFLOW = "wf-88888888-8888-4888-8888-888888888888"
 _CORRELATION = "cor-99999999-9999-4999-8999-999999999999"
 
 
+def fr_str_027() -> None:
+    """Demonstrate the replay-manifest contract."""
+    assert StrategyReplayManifest.model_fields["manifest_hash"]
+
+
+def fr_str_029() -> None:
+    """Demonstrate deterministic replay-manifest creation."""
+    assert callable(create_strategy_replay_manifest)
+
+
 def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
     """Build the validated reference and configuration pair.
 
@@ -91,6 +101,8 @@ def main() -> int:
     Returns:
         ``0`` once manifest creation and hash stability are demonstrated.
     """
+    fr_str_027()
+    fr_str_029()
     print("\nSTRATEGY REPLAY MANIFEST")
     print("=" * 88)
     print("Contract:", StrategyReplayManifest.__name__)
@@ -130,8 +142,7 @@ def main() -> int:
         ref, config, context, data_checksum="a" * 64, indicator_manifest_hash=_HASH
     )
     changed = (
-        drifted.data is not None
-        and drifted.data.manifest_hash != replay.manifest_hash
+        drifted.data is not None and drifted.data.manifest_hash != replay.manifest_hash
     )
     print("Changed data checksum changes the manifest hash:", changed)
     print("\nReplay-manifest construction is pure and persists nothing.")

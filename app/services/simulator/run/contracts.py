@@ -20,8 +20,7 @@ from pydantic import (
 from app.utils import canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset
-    from app.services.data.evidence.fx_contracts import FXConversionEvidence
+    from app.services.data import FXConversionEvidence, MarketDataset
     from app.services.indicators import IndicatorResult
     from app.services.risk import RiskDecisionPackage
     from app.services.simulator.accounting import (

@@ -72,17 +72,13 @@ def _parse(expression: str, names: set[str]) -> ast.Expression:
     )
     for node in ast.walk(tree):
         if not isinstance(node, allowed):
-            raise ValueError(  # noqa: TRY004
-                "parameter expression contains unsafe syntax"
-            )
+            raise ValueError("parameter expression contains unsafe syntax")  # noqa: TRY004 - public validation error contract
         if isinstance(node, ast.Name) and node.id not in names:
             raise ValueError("parameter expression references an unknown name")
         if isinstance(node, ast.Constant) and not isinstance(
             node.value, (bool, int, str, type(None))
         ):
-            raise ValueError(  # noqa: TRY004
-                "parameter expression constant is unsupported"
-            )
+            raise ValueError("parameter expression constant is unsupported")  # noqa: TRY004 - public validation error contract
     return tree
 
 

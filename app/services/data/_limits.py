@@ -47,6 +47,7 @@ DEFAULT_LIMITS: Final[Mapping[str, int]] = MappingProxyType(
         "SYMBOL_LIST_DEFAULT_LIMIT": 1_000,
         "SYMBOL_LIST_MAX_LIMIT": 10_000,
         "AVAILABILITY_SCAN_MAX_RECORDS": 1_000_000,
+        "ACCOUNT_SNAPSHOT_MAX_RECORDS": 10_000,
         # Cache identity and expiry bounds.
         "CACHE_TTL_DEFAULT": 3_600,
         "CACHE_TTL_MAX_SECONDS": 604_800,

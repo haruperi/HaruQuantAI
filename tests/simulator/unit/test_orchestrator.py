@@ -97,9 +97,15 @@ def _request(
     unchanged, which is what an identity-conflict test requires.
     """
     payload: dict[str, object] = {
-        "request_id": f"req-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}",
-        "workflow_id": f"wf-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}",
-        "correlation_id": f"cor-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}",
+        "request_id": (
+            f"req-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}"
+        ),
+        "workflow_id": (
+            f"wf-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}"
+        ),
+        "correlation_id": (
+            f"cor-{suffix * 8}-{suffix * 4}-4{suffix * 3}-8{suffix * 3}-{suffix * 12}"
+        ),
         "strategy_id": f"strategy-{suffix}",
         "strategy_version": "v1",
         "strategy_config_ref": "strategy-config",

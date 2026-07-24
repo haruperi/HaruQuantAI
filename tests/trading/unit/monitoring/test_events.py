@@ -1,7 +1,6 @@
 """Unit tests for Trading operational-event evidence and publication."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime
 
 import pytest

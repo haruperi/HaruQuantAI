@@ -14,7 +14,9 @@ from pydantic import (
     model_validator,
 )
 
-from app.services.data.contracts import MarketDataset  # noqa: TC001
+from app.services.data import (
+    MarketDataset,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.services.strategy.contracts._base import (
     JsonValue,
     _Contract,

@@ -1,6 +1,7 @@
 """Executable Optimization validation usage example.
 
-Demonstrates walk-forward validation modes, time series fold generation, and walk-forward validation execution.
+Demonstrates walk-forward validation modes, time series fold generation, and
+walk-forward validation execution.
 """
 
 import sys
@@ -40,7 +41,8 @@ def example_validation() -> None:
     adapter = FakeAdapter()
     wf_res = run_walk_forward_validation(req, adapter)
     print(
-        f"Walk-forward validation status: {wf_res.status}, pass rate: {wf_res.fold_pass_rate * 100:.1f}%"
+        f"Walk-forward validation status: {wf_res.status}, "
+        f"pass rate: {wf_res.fold_pass_rate * 100:.1f}%"
     )
 
 

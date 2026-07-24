@@ -1,7 +1,6 @@
 """Bounded Binance Spot REST transport."""
 
 # ruff: noqa: ANN401 - the optional SDK has a heterogeneous runtime payload surface.
-
 import asyncio
 import importlib
 import time

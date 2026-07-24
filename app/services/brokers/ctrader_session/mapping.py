@@ -1,7 +1,6 @@
 """cTrader protobuf fixture to canonical value mapping."""
 
 # ruff: noqa: ANN401, FURB171 - protobuf fixtures expose heterogeneous fields.
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, cast
@@ -252,6 +251,7 @@ def _map_position(
     open_status = 1
     closed_status = 2
     trade_side = _side(_field(trade, "tradeSide"))
+    label = _optional(trade, "label")
     return BrokerPosition(
         position_id=str(_field(value, "positionId")),
         symbol=symbols[symbol_id],
@@ -270,6 +270,7 @@ def _map_position(
             if status == open_status
             else ("CLOSED" if status == closed_status else "UNKNOWN")
         ),
+        ownership_ref=f"ctrader-label:{label}" if label else None,
         open_price=(
             Decimal(str(_optional(value, "price")))
             if _optional(value, "price") is not None

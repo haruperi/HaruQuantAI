@@ -1,7 +1,6 @@
 """Tests for traversal-safe Optimization artifact paths."""
 
 # ruff: noqa: INP001
-
 from pathlib import Path
 
 import pytest

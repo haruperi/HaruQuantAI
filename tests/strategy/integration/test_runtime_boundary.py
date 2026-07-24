@@ -1,7 +1,6 @@
 """WF-STR-007 runtime safety-boundary integration."""
 
 # ruff: noqa: PT018
-
 from app.services.strategy import (
     StrategyTimingPolicy,
     run_vectorized_strategy_signals,

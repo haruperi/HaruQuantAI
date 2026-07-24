@@ -434,6 +434,84 @@ class StrategyExecutionResult(_Contract):
     local_state_update: Mapping[str, JsonValue] | None = None
     result_hash: str
 
+    @field_validator("intents", mode="before")
+    @classmethod
+    def _validate_result_intents(cls, value: object) -> tuple[object, ...]:
+        """Validate and reconstruct exact TradeIntent values.
+
+        Args:
+            value: Candidate intent collection.
+
+        Returns:
+            Exact immutable TradeIntent tuple.
+
+        Raises:
+            TypeError: If the value is not an intent tuple.
+        """
+        from app.services.strategy.intents.intent import TradeIntent
+
+        logger.debug("Validating Strategy execution-result intents")
+        if not isinstance(value, list | tuple):
+            raise TypeError("intents must be an immutable intent collection")
+        return tuple(
+            item if type(item) is TradeIntent else TradeIntent.model_validate(item)
+            for item in value
+        )
+
+    @field_validator("diagnostics", mode="before")
+    @classmethod
+    def _validate_result_diagnostics(cls, value: object) -> object:
+        """Validate and reconstruct exact StrategyDiagnostics.
+
+        Args:
+            value: Candidate diagnostics value.
+
+        Returns:
+            Exact StrategyDiagnostics contract.
+        """
+        from app.services.strategy.diagnostics.models import StrategyDiagnostics
+
+        logger.debug("Validating Strategy execution-result diagnostics")
+        if type(value) is StrategyDiagnostics:
+            return value
+        return StrategyDiagnostics.model_validate(value)
+
+    @field_validator("replay_manifest", mode="before")
+    @classmethod
+    def _validate_result_replay_manifest(cls, value: object) -> object:
+        """Validate and reconstruct exact StrategyReplayManifest.
+
+        Args:
+            value: Candidate replay value.
+
+        Returns:
+            Exact StrategyReplayManifest contract.
+        """
+        from app.services.strategy.replay.models import StrategyReplayManifest
+
+        logger.debug("Validating Strategy execution-result replay manifest")
+        if type(value) is StrategyReplayManifest:
+            return value
+        return StrategyReplayManifest.model_validate(value)
+
+    @field_validator("local_state_update", mode="after")
+    @classmethod
+    def _freeze_result_local_state(
+        cls, value: Mapping[str, JsonValue] | None
+    ) -> Mapping[str, JsonValue] | None:
+        """Freeze optional validated local state.
+
+        Args:
+            value: Optional local-state update.
+
+        Returns:
+            Optional recursively immutable local state.
+        """
+        logger.debug("Freezing Strategy execution-result local state")
+        if value is None:
+            return None
+        return cast("Mapping[str, JsonValue]", _freeze_json(value))
+
     @field_validator("result_hash")
     @classmethod
     def _validate_result_hash(cls, value: str) -> str:
@@ -459,6 +537,16 @@ class StrategyExecutionResult(_Contract):
             ValueError: If decision ordering or batch correspondence is invalid.
         """
         logger.debug("Validating atomic Strategy execution result")
+        from app.services.strategy.diagnostics.models import StrategyDiagnostics
+        from app.services.strategy.intents.intent import TradeIntent
+        from app.services.strategy.replay.models import StrategyReplayManifest
+
+        if any(type(intent) is not TradeIntent for intent in self.intents):
+            raise ValueError("intents must contain only TradeIntent contracts")
+        if type(self.diagnostics) is not StrategyDiagnostics:
+            raise ValueError("diagnostics must be StrategyDiagnostics")
+        if type(self.replay_manifest) is not StrategyReplayManifest:
+            raise ValueError("replay_manifest must be StrategyReplayManifest")
         sequences = tuple(decision.sequence for decision in self.decisions)
         if sequences != tuple(sorted(sequences)) or len(set(sequences)) != len(
             sequences

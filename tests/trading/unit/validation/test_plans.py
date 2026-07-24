@@ -1,7 +1,6 @@
 """Unit tests for deterministic Trading execution plans."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 

@@ -31,7 +31,7 @@ from app.services.strategy.replay import create_strategy_replay_manifest
 from app.utils import canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.data.evidence.account_contracts import AccountStateSnapshot
+    from app.services.data import AccountStateSnapshot
     from app.services.strategy.contracts._base import JsonValue
 
 
@@ -196,7 +196,7 @@ def run_event_strategy_hook(  # noqa: C901, PLR0911
     }
     try:
         result_hash = canonical_digest(material)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         logger.error("Event Strategy result digest failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,

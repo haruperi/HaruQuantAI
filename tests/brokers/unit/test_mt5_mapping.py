@@ -9,6 +9,7 @@ from app.services.brokers.mt5_account.mapping import (
     _map_bar,
     _map_error_code,
     _map_order,
+    _map_order_result,
     _map_position,
     _map_quote,
     _map_symbol,
@@ -154,10 +155,12 @@ def test_map_position_derives_side_from_type_code() -> None:
             price_open=1.1,
             price_current=1.2,
             profit=100,
+            magic=12345,
             time_update=datetime(2026, 1, 1, tzinfo=UTC).timestamp(),
         )
     )
     assert long_position.side == "LONG"
+    assert long_position.ownership_ref == "mt5-magic:12345"
     short_position = _map_position(
         _record(
             ticket=2,
@@ -203,6 +206,64 @@ def test_map_order_uses_only_canonical_state_vocabulary() -> None:
     assert order.order_type == "UNKNOWN"
     assert order.state == "PARTIALLY_FILLED"
     assert order.provider_metadata["native_order_type"] == 8
+
+
+def test_map_pending_order_does_not_invent_a_fill() -> None:
+    """An MT5 placed acknowledgement preserves volume as remaining."""
+    result = _map_order_result(
+        _record(
+            retcode=10008,
+            order=123,
+            deal=0,
+            volume=0.01,
+            price=0,
+            comment="Request accepted",
+        )
+    )
+
+    assert result.outcome == "ACCEPTED"
+    assert result.order_id == "123"
+    assert result.deal_ids == ()
+    assert result.filled_quantity == 0
+    assert str(result.remaining_quantity) == "0.01"
+
+
+def test_map_done_pending_order_without_deal_does_not_invent_a_fill() -> None:
+    """A completed request without a deal remains an unfilled order."""
+    result = _map_order_result(
+        _record(
+            retcode=10009,
+            order=123,
+            deal=0,
+            volume=0.01,
+            price=0,
+            comment="Request completed",
+        )
+    )
+
+    assert result.outcome == "ACCEPTED"
+    assert result.deal_ids == ()
+    assert result.filled_quantity == 0
+    assert str(result.remaining_quantity) == "0.01"
+
+
+def test_map_completed_order_preserves_provider_fill() -> None:
+    """An MT5 completed acknowledgement preserves deal-backed fill volume."""
+    result = _map_order_result(
+        _record(
+            retcode=10009,
+            order=123,
+            deal=456,
+            volume=0.01,
+            price=1.1,
+            comment="Request completed",
+        )
+    )
+
+    assert result.outcome == "ACCEPTED"
+    assert result.deal_ids == ("456",)
+    assert str(result.filled_quantity) == "0.01"
+    assert result.remaining_quantity == 0
 
 
 def test_map_transaction_uses_canonical_type_and_preserves_native_code() -> None:

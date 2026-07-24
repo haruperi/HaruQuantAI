@@ -41,7 +41,8 @@ def example_journal() -> None:
             NOW,
         )
         print(
-            f"Appended JournalEvent type: {event.event_type}, sequence: {event.sequence}"
+            f"Appended JournalEvent type: {event.event_type}, "
+            f"sequence: {event.sequence}"
         )
 
         # 2. Finalize journal

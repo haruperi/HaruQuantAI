@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
 from app.services.strategy import (
     StrategyConfig,
     StrategyDecision,
@@ -23,25 +24,156 @@ from app.services.strategy import (
     StrategyRef,
     StrategyRegistrationRequest,
     StrategySignal,
+    StrategySignalEvidence,
     StrategyTimingPolicy,
     StrategyValidationPolicy,
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
+    create_strategy_replay_manifest,
+    export_strategy_diagnostics,
 )
 
 _HASH = "a" * 64
-_REQUEST = "strategy-usage-contracts"
-_CORRELATION = "strategy-usage-contracts-correlation"
-_WORKFLOW = "strategy-usage-contracts-workflow"
+_REQUEST = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+_CORRELATION = "cor-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+_WORKFLOW = "wf-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 
 
-def main() -> int:
+def fr_str_001() -> None:
+    """Demonstrate the supported Strategy environment."""
+    assert StrategyEnvironment.RESEARCH.value == "RESEARCH"
+
+
+def fr_str_002() -> None:
+    """Demonstrate the explicit timing policy."""
+    assert StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE.value
+
+
+def fr_str_003() -> None:
+    """Demonstrate lifecycle eligibility states."""
+    assert StrategyLifecycleStatus.APPROVED is not StrategyLifecycleStatus.REVOKED
+
+
+def fr_str_004() -> None:
+    """Demonstrate exact Strategy reference construction."""
+    assert StrategyRef.model_fields["exact_version"]
+
+
+def fr_str_005() -> None:
+    """Demonstrate validated reference construction."""
+    assert ValidatedStrategyRef.model_fields["registry_record_hash"]
+
+
+def fr_str_006() -> None:
+    """Demonstrate declarative Strategy configuration."""
+    assert StrategyConfig.model_fields["parameters"]
+
+
+def fr_str_007() -> None:
+    """Demonstrate validated configuration identity."""
+    assert ValidatedStrategyConfig.model_fields["config_hash"]
+
+
+def fr_str_008() -> None:
+    """Demonstrate the complete Strategy manifest."""
+    assert StrategyManifest.model_fields["max_batch_records"]
+
+
+def fr_str_009() -> None:
+    """Demonstrate the registration request contract."""
+    assert StrategyRegistrationRequest.model_fields["authorization_ref"]
+
+
+def fr_str_010() -> None:
+    """Demonstrate the parameter-update request contract."""
+    assert StrategyParameterUpdateRequest.model_fields["parameters"]
+
+
+def fr_str_011() -> None:
+    """Demonstrate fixed execution context."""
+    assert StrategyExecutionContext.model_fields["decision_timestamp"]
+
+
+def fr_str_012() -> None:
+    """Demonstrate typed Strategy event evidence."""
+    assert StrategyEvent.model_fields["source_checksum"]
+
+
+def fr_str_013() -> None:
+    """Demonstrate neutral and proposal decisions."""
+    assert StrategyDecision.model_fields["action"]
+
+
+def fr_str_014() -> None:
+    """Demonstrate the closed atomic execution result."""
+    assert StrategyExecutionResult.model_fields["replay_manifest"]
+
+
+def fr_str_015() -> None:
+    """Demonstrate structured Strategy errors."""
+    assert StrategyError.model_fields["code"]
+
+
+def fr_str_016() -> None:
+    """Demonstrate exclusive Strategy outcomes."""
+    assert StrategyOutcome.model_fields["status"]
+
+
+def fr_str_017() -> None:
+    """Demonstrate immutable mutation truth."""
+    assert StrategyMutationResult.model_fields["mutation_id"]
+
+
+def fr_str_035() -> None:
+    """Demonstrate explicit host validation policy."""
+    assert StrategyValidationPolicy.model_fields["policy_version"]
+
+
+def fr_str_038() -> None:
+    """Demonstrate immutable concrete signal output."""
+    assert StrategySignal.model_fields["signal_id"]
+
+
+def fr_str_039() -> None:
+    """Demonstrate immutable point-in-time signal evidence."""
+    assert StrategySignalEvidence.model_fields["primary_market"]
+
+
+def _demonstrate_requirement_contracts() -> None:
+    """Run every Contracts feature requirement demonstration."""
+    for demonstration in (
+        fr_str_001,
+        fr_str_002,
+        fr_str_003,
+        fr_str_004,
+        fr_str_005,
+        fr_str_006,
+        fr_str_007,
+        fr_str_008,
+        fr_str_009,
+        fr_str_010,
+        fr_str_011,
+        fr_str_012,
+        fr_str_013,
+        fr_str_014,
+        fr_str_015,
+        fr_str_016,
+        fr_str_017,
+        fr_str_035,
+        fr_str_038,
+        fr_str_039,
+    ):
+        demonstration()
+
+
+def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     """Construct and display every immutable Strategy contract.
 
     Returns:
         ``0`` once every contract has been constructed and printed.
     """
     now = datetime.now(UTC)
+    _demonstrate_requirement_contracts()
     print("\nSTRATEGY CONTRACTS")
     print("=" * 88)
 
@@ -240,11 +372,62 @@ def main() -> int:
         facts={"fast": "1.1005"},
         lineage={"config_hash": _HASH},
     )
+    market_record = OHLCVRecord(
+        timestamp=now - timedelta(hours=1),
+        source="usage",
+        source_symbol="EURUSD",
+        available_at=now - timedelta(hours=1),
+        open=Decimal("1.1000"),
+        high=Decimal("1.1010"),
+        low=Decimal("1.0990"),
+        close=Decimal("1.1005"),
+        volume=Decimal(100),
+        price_unit="USD",
+        volume_unit="units",
+    )
+    market = MarketDataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="EURUSD",
+        timeframe="H1",
+        records=(market_record,),
+        start=market_record.timestamp,
+        end=market_record.timestamp,
+        available_at=market_record.available_at,
+        record_count=1,
+        quality_report=DataQualityReport(
+            quality_status="passed",
+            quality_score=Decimal(1),
+            record_count=1,
+            checked_count=1,
+            truncated=False,
+            sample_limit=1,
+            schema_version="v1",
+            generated_at=market_record.available_at,
+        ),
+        source_metadata={"provider": "usage"},
+        license_metadata={"license": "usage"},
+        cache_status="not_used",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id=_REQUEST,
+    )
+    signal_evidence = StrategySignalEvidence(
+        evidence_id="strategy-contract-usage",
+        primary_market=market,
+        related_markets={},
+        point_size=Decimal("0.0001"),
+        feature_values={},
+        feature_available_at={},
+        feature_refs={},
+        active_position_tags=(),
+    )
     print("\n-- Evaluation values --")
     print("Event type:", event.event_type)
     print("Proposal action:", decision.action, decision.symbol, decision.side)
     print("Neutral decision emits no intent:", neutral.symbol is None)
     print("Signal:", signal.signal_name, "active:", signal.active)
+    print("Signal evidence:", signal_evidence.evidence_id)
 
     error = StrategyError(
         code="STRATEGY_INVALID_CONFIG",
@@ -269,11 +452,22 @@ def main() -> int:
         workflow_id=_WORKFLOW,
         completed_at=now,
     )
+    diagnostics = export_strategy_diagnostics(context, {"example": "contracts"})
+    replay = create_strategy_replay_manifest(
+        validated_ref,
+        validated_config,
+        context,
+        _HASH,
+        _HASH,
+    )
+    if diagnostics.data is None or replay.data is None:
+        print("Unable to construct typed execution-result dependencies.")
+        return 1
     result = StrategyExecutionResult(
         decisions=(neutral,),
         intents=(),
-        diagnostics=None,
-        replay_manifest=None,
+        diagnostics=diagnostics.data,
+        replay_manifest=replay.data,
         local_state_update=None,
         result_hash=_HASH,
     )

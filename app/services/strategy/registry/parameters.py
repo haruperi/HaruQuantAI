@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from app.services.data.contracts import DataError
-from app.services.data.persistence import execute_transaction
-from app.services.data.persistence.contracts import (
+from app.services.data import (
+    DataError,
     StatementPlan,
     TransactionRequest,
+    execute_transaction,
 )
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
@@ -18,6 +18,7 @@ from app.services.strategy.contracts.requests import (  # noqa: TC001
     StrategyParameterUpdateRequest,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
+from app.services.strategy.migrations.definitions import _ensure_strategy_storage
 from app.services.strategy.registry._mutations import (
     _UPDATE_PERMISSION,
     _load_mutation,
@@ -26,7 +27,6 @@ from app.services.strategy.registry._mutations import (
     _publish_mutation,
 )
 from app.services.strategy.registry.configuration import validate_strategy_config
-from app.services.strategy.registry.migrations import _ensure_strategy_storage
 from app.services.strategy.registry.resolution import validate_strategy_ref
 from app.utils import AuthContext, logger
 

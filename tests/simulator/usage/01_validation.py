@@ -1,6 +1,7 @@
 """Executable Simulation validation usage example.
 
-Demonstrates run input validation, phase-one scope validation, and market data validation.
+Demonstrates run input validation, phase-one scope validation, and market data
+validation.
 """
 
 import sys

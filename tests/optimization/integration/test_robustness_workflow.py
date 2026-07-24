@@ -1,7 +1,6 @@
 """Integration test for the complete robustness workflow."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 from app.services.optimization.robustness import (

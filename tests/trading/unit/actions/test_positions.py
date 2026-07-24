@@ -1,7 +1,6 @@
 """Unit tests for route-aware Trading position actions."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 import pytest

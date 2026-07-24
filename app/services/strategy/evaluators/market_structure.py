@@ -7,8 +7,9 @@ from typing import TYPE_CHECKING
 
 from app.services.strategy.signals._mechanics import (
     _bar_records,
-    _feature_values,
+    _indicator_reference,
     _make_signal,
+    _ready_indicator_values,
     _SignalDataError,
     _SignalEvaluatorBase,
 )
@@ -23,7 +24,8 @@ if TYPE_CHECKING:
         ValidatedStrategyConfig,
     )
 
-_FEATURE_NAME = "zigzag_extremes"
+_INDICATOR_ID = "zigzag"
+_OUTPUT_COLUMN = "zigzag_value_2"
 _MIN_BARS = 2
 _REQUIRED_EXTREMES = 8
 
@@ -55,13 +57,20 @@ class MarketStructureEvaluator(_SignalEvaluatorBase):
             _SignalDataError: If bar or ZigZag evidence is incomplete.
         """
         logger.info("Evaluating recovered Market Structure signals")
-        del indicators
         bars = _bar_records(evidence.primary_market)
         if len(bars) < _MIN_BARS:
             raise _SignalDataError("Market Structure requires two completed bars")
-        values = _feature_values(evidence, _FEATURE_NAME, _REQUIRED_EXTREMES)[
-            :_REQUIRED_EXTREMES
-        ]
+        values = _ready_indicator_values(
+            indicators,
+            indicator_id=_INDICATOR_ID,
+            output_column=_OUTPUT_COLUMN,
+            minimum=_REQUIRED_EXTREMES,
+        )[-_REQUIRED_EXTREMES:]
+        zigzag_ref = _indicator_reference(
+            indicators,
+            indicator_id=_INDICATOR_ID,
+            output_column=_OUTPUT_COLUMN,
+        )
         if values[0] > values[1]:
             high0, low0, high1, low1, high2, low2, high3, low3 = values
         else:
@@ -85,13 +94,13 @@ class MarketStructureEvaluator(_SignalEvaluatorBase):
             and high1 > high2
         )
         facts = {
-            "feature_ref": evidence.feature_refs[_FEATURE_NAME],
+            "indicator_ref": zigzag_ref,
             "high0": str(high0),
             "low0": str(low0),
             "high1": str(high1),
             "low1": str(low1),
         }
-        lineage = {"zigzag_ref": evidence.feature_refs[_FEATURE_NAME]}
+        lineage = {"zigzag_ref": zigzag_ref}
         return (
             _make_signal(
                 self,

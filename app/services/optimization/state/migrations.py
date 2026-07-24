@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 
-from app.services.data.persistence.contracts import (
+from app.services.data import (
     MigrationStep,
 )
 from app.services.optimization.state.contracts import OPTIMIZATION_SCHEMA_VERSION

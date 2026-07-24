@@ -1075,6 +1075,7 @@ class BrokerPosition(_Schema):
     quantity_unit: str
     retrieved_at: datetime
     state: Literal["OPEN", "CLOSED", "UNKNOWN"] = "UNKNOWN"
+    ownership_ref: str | None = None
     open_price: Decimal | None = None
     current_price: Decimal | None = None
     profit: Decimal | None = None
@@ -1102,6 +1103,7 @@ class BrokerPosition(_Schema):
         ):
             _finite(getattr(self, name), name)
         _optional_text(self.currency, "currency")
+        _optional_text(self.ownership_ref, "ownership_ref")
         _utc(self.provider_timestamp, "provider_timestamp")
         _utc(self.retrieved_at, "retrieved_at")
 

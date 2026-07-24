@@ -1,7 +1,6 @@
 """Tests for typed Optimization public-operation results."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 import pytest

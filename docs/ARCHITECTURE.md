@@ -42,24 +42,30 @@
   and durable policy, historical/reference/context/FX access, deterministic
   transforms/alignment, synthetic generators, quality validation, recoverable
   scheduler jobs, internal feed status, immutable backup/restore manifests,
-  licence-aware retention enforcement, and exactly 35 typed package-root operations.
+  licence-aware retention enforcement, and 207 explicitly declared package-root
+  public names across fifteen focused features.
   Retrieval and reference exports accept either their typed request or direct keyword
   arguments; standalone calls lazily compose MT5 read-only source, identity,
   migration, and calendar dependencies through the existing Brokers and Data
   boundaries. Explicit source/adapter injection remains supported.
-  Its architecture status is `Completed`. `CAP-DATA-028` locates the behavior in
+  Its package-local architecture and repository-wide package-root consumer boundary
+  are implemented and verified. Data status is `Completed`; specification parity,
+  standalone usage evidence, and the approved MT5 demo-provider validation pass.
+  `CAP-DATA-028` locates the behavior in
   fifteen approved capabilities: `contracts/`, `market_data/`,
   `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`,
   `quality/`, `transformation/`, `time_sessions/`, `sources/`,
   `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, and `audit/`.
   Exactly fifteen numbered standalone usage programs cover those owners, and removed
   horizontal packages have no compatibility shims. The correction changes ownership
-  and file focus only; active requirements, public
-  behaviour, contract versions, schema identifiers, error codes, and the frozen
-  package-root API remain compatible.
-* `app/services/indicators/` is a partial implementation baseline containing
-  the immutable Core calculation boundary and 20 approved one-indicator-per-file
+  and file focus only; active requirements, public behaviour, contract versions,
+  schema identifiers, error codes, and the explicit package-root API remain
+  compatible.
+* `app/services/indicators/` is a completed implementation containing the
+  immutable Core calculation boundary and 20 approved one-indicator-per-file
   implementations across trend, volatility, momentum, volume, and candles.
+  Its package-root API, standalone usage programs, domain workflows, and its
+  participation in `SYS-WF-001` and the verified MT5 demo `SYS-WF-002` path pass.
   Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the
   non-repainting contract.
 * `app/services/strategy/` is implemented across contracts, diagnostics, registry,
@@ -189,13 +195,13 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
 - Data's canonical cross-domain schema identifiers are
   `data.market_dataset.v1`, `data.account_state_snapshot.v1`,
   `data.market_context_evidence.v1`, and `data.fx_conversion_evidence.v1`.
-- Canonical Data contracts are exposed by `app.services.data.contracts`; pending
-  feature-specific contracts remain in `app.services.data.models` only until their
-  approved owning slices migrate.
+- Canonical shared Data contracts live in `app.services.data.contracts`;
+  feature-specific contracts live in their registered feature folders. Public
+  consumers import both only through `app.services.data`.
 - Data contract modules contain immutable schemas and deterministic validation only.
   They perform no source, broker, network, storage, cache, scheduling, or feed-runtime
   acquisition.
-- Data market-data acquisition belongs in `app.services.data.retrieval`; normalized
+- Data market-data acquisition belongs in `app.services.data.market_data`; normalized
   cross-domain evidence (market context, FX, account state) belongs in
   `app.services.data.evidence`; canonical/friendly identity, provider-symbol mapping,
   and source readiness/licence/promotion policy belong in
@@ -233,6 +239,12 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
   promotion. An identifier that is neither fails closed as `UNSUPPORTED_SOURCE`
   before any policy evaluation. Local artifacts live under `DATA_RAW_ROOT` and are
   named `{symbol}[_{timeframe}].{csv|parquet}`.
+- Symbol tradability and analytical session labels are separate contracts. Data
+  evaluates `MarketHours` only from ordered UTC windows supplied by a broker,
+  an explicit `exchange-calendars==4.12` venue identifier, or an explicit
+  revisioned weekly definition. cTrader remains the owner of parsing its full-symbol
+  weekly schedule and broker holidays. Regional named sessions use `zoneinfo` for
+  DST-aware analytics and carry no order-validation authority.
 - Standalone Yahoo composition is credential-free but explicit: Data selects the
   Brokers-required `SANDBOX` profile, configures `AAPL` as the connectivity probe, and
   registers exact identity `AAPL` to `AAPL`. Brokers maps canonical bar timeframes such

@@ -29,7 +29,7 @@ from app.services.risk.limits import evaluate_market_context, evaluate_portfolio
 from app.utils import AuthContext, canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.data.evidence.market_context_contracts import (
+    from app.services.data import (
         MarketContextEvidence,
     )
     from app.services.risk.approvals import ApprovalTokenService

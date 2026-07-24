@@ -1,7 +1,6 @@
 """Unit tests for Trading-owned additive migration definitions."""
 
 # ruff: noqa: INP001
-
 from app.services.trading.state import (
     TRADING_SCHEMA_VERSION,
     TradingEvent,

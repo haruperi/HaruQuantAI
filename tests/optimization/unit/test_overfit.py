@@ -1,7 +1,6 @@
 """Tests for overfit evidence assembly."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.scoring import CandidateScore, assess_overfit_evidence
 
 

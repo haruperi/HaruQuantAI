@@ -10,6 +10,7 @@ from pydantic import ValidationError
 from tests.strategy.unit.test_models import (
     HASH,
     make_context,
+    make_indicator,
     make_market,
     make_signal_config,
     make_signal_evidence,
@@ -34,17 +35,26 @@ def test_feature_evidence_must_be_provenance_complete() -> None:
 
 
 def test_market_structure_uses_exact_eight_zigzag_extremes() -> None:
-    """Verify a recovered bullish break uses supplied immutable ZigZag evidence."""
+    """Verify a bullish break uses official immutable ZigZag evidence."""
     logger.debug("Testing recovered Market Structure bullish break")
-    market = make_market((("100", "105", "95", "104"), ("104", "107", "103", "106")))
-    values = tuple(
-        Decimal(value) for value in ("110", "90", "105", "80", "100", "85", "110", "70")
+    market = make_market(
+        (
+            ("100", "111", "90", "100"),
+            ("100", "110", "90", "100"),
+            ("100", "106", "80", "100"),
+            ("100", "105", "80", "100"),
+            ("100", "101", "85", "100"),
+            ("100", "111", "70", "100"),
+            ("100", "105", "95", "104"),
+            ("104", "107", "103", "106"),
+        )
     )
-    evidence = make_signal_evidence(
+    evidence = make_signal_evidence(market)
+    zigzag = make_indicator(
         market,
-        feature_values={"zigzag_extremes": values},
-        feature_available_at={"zigzag_extremes": market.records[-1].timestamp},
-        feature_refs={"zigzag_extremes": HASH},
+        indicator_id="zigzag",
+        output_column="zigzag_value_2",
+        values=(110, 90, 105, 80, 100, 85, 110, 70),
     )
     evaluator = MarketStructureEvaluator(
         strategy_id="mean-reversion",
@@ -55,7 +65,7 @@ def test_market_structure_uses_exact_eight_zigzag_extremes() -> None:
         dependency_hash=HASH,
     )
     signals = evaluator.evaluate_signals(
-        evidence, (), make_signal_config({}), make_context()
+        evidence, (zigzag,), make_signal_config({}), make_context()
     )
     assert tuple(signal.active for signal in signals) == (True, False)
     assert signals[0].lineage["zigzag_ref"] == HASH

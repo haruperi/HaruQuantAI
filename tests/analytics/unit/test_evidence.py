@@ -1,7 +1,6 @@
 """Unit tests for Analytics evidence construction and output safety."""
 
 # ruff: noqa: INP001
-
 from pathlib import Path
 
 import numpy as np

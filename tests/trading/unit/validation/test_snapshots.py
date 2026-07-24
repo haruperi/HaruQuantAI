@@ -1,7 +1,6 @@
 """Unit tests for explicit Trading route snapshots."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 
 import pytest

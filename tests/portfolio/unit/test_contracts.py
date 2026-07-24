@@ -1,7 +1,6 @@
 """Unit tests for strict Portfolio boundary contracts."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 from copy import deepcopy

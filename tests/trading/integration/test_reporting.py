@@ -1,7 +1,6 @@
 """Workflow integration for immutable execution evidence reporting."""
 
 # ruff: noqa: INP001
-
 from app.services.trading.reporting import build_trading_report
 from tests.trading.conftest import ReportStore, trading_request
 

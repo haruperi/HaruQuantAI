@@ -61,7 +61,8 @@ def example_contracts() -> None:
         True,
     )
     print(
-        f"ResearchScorecard readiness: {scorecard.readiness}, score: {scorecard.final_score}"
+        f"ResearchScorecard readiness: {scorecard.readiness}, "
+        f"score: {scorecard.final_score}"
     )
 
 

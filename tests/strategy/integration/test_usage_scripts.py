@@ -26,15 +26,25 @@ _UNAVAILABLE_EXIT = 3
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_strategy_usage_script_executes_or_reports_unavailable(
     script_name: str,
+    tmp_path: Path,
 ) -> None:
     """Execute one fixed standalone Strategy usage script.
 
     Args:
         script_name: Fixed repository script selected by parametrization.
+        tmp_path: Isolated development storage root.
     """
     usage_directory = Path(__file__).parents[1] / "usage"
     environment = os.environ.copy()
-    environment.pop("RUN_STRATEGY_STATEFUL_USAGE", None)
+    state_root = tmp_path / script_name.removesuffix(".py")
+    state_root.mkdir()
+    (state_root / "logs").mkdir()
+    environment["RUN_STRATEGY_STATEFUL_USAGE"] = "1"
+    environment["ENVIRONMENT"] = "test"
+    environment["DATA_DIR"] = str(state_root)
+    environment["DATABASE_URL"] = "sqlite:///strategy_usage.sqlite3"
+    environment["LOG_DIRECTORY"] = str(state_root / "logs")
+    environment["LOG_FILE_PATH"] = str(state_root / "logs" / "strategy.log")
     completed = subprocess.run(  # noqa: S603 - fixed repository script list.
         [sys.executable, str(usage_directory / script_name)],
         check=False,

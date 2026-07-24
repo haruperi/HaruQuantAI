@@ -16,7 +16,9 @@ from pydantic import (
 )
 
 from app.services.trading.contracts import TradingError
-from app.services.trading.contracts.models import JsonValue
+from app.services.trading.contracts.models import (
+    JsonValue,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.services.trading.routing.capabilities import BROKER_OPERATION_TIMEOUT_SECONDS
 from app.utils import is_sensitive_key, logger
 

@@ -1,7 +1,6 @@
 """Bounded standard-library Dukascopy tick-file transport."""
 
 # ruff: noqa: S310 - URL is constructed from a fixed HTTPS provider base.
-
 from __future__ import annotations
 
 import asyncio

@@ -1,7 +1,6 @@
 """Deterministic complete broker adapter test double."""
 
 # ruff: noqa: ANN401 - generated fixed protocol methods preserve fixture types.
-
 import inspect
 import types
 from collections.abc import Mapping

@@ -1,7 +1,6 @@
 """yfinance public table to canonical historical-bar mapping."""
 
 # ruff: noqa: ANN401 - table rows are a transitive public interface.
-
 import re
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal

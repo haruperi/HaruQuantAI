@@ -1,7 +1,6 @@
 """Workflow integration for event persistence and state recovery."""
 
 # ruff: noqa: INP001
-
 from app.services.trading.state import TradingEvent, apply_execution_event
 from tests.trading.conftest import NOW, MemoryStore
 

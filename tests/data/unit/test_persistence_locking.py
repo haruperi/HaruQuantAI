@@ -221,8 +221,9 @@ def test_lock_rejects_inconsistent_persisted_result(
             rows=(
                 {
                     "owner_request_id": (
-                        "req-13d6b58ac3340a2bb680ae96f455bbae5e06e3dc63a7df18"
-                        "afb26f0d0953d3d6"
+                        "req-13d6b58ac3340a2bb680"  # pragma: allowlist secret
+                        "ae96f455bbae5e06e3dc63a7df18"  # pragma: allowlist secret
+                        "afb26f0d0953d3d6"  # pragma: allowlist secret
                     ),
                     "lease_expires_at_ns": "0000000000000000001",
                     "recovery_count": 0,

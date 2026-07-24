@@ -1,6 +1,7 @@
 """Executable Optimization robustness usage example.
 
-Demonstrates Monte Carlo simulations, execution stress testing, confidence interval calculation,
+Demonstrates Monte Carlo simulations, execution stress testing, confidence
+interval calculation,
 probability of ruin, and strategy robustness assessment.
 """
 
@@ -38,7 +39,8 @@ def example_robustness() -> None:
     req = monte_carlo_request()
     mc_res = run_monte_carlo(req, max_simulations=5)
     print(
-        f"Monte Carlo simulation count: {mc_res.simulations}, is MonteCarloResult: {isinstance(mc_res, MonteCarloResult)}"
+        f"Monte Carlo simulation count: {mc_res.simulations}, "
+        f"is MonteCarloResult: {isinstance(mc_res, MonteCarloResult)}"
     )
 
     # 3. Probability of ruin & confidence intervals
@@ -64,7 +66,8 @@ def example_robustness() -> None:
         max_simulations=2,
     )
     print(
-        f"Parametric simulation final equity points count: {len(param_res.final_equity)}"
+        "Parametric simulation final equity points count: "
+        f"{len(param_res.final_equity)}"
     )
 
     # 5. Execution stress request & stress application

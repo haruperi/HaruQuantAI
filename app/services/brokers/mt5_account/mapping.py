@@ -1,7 +1,6 @@
 """MetaTrader 5 provider payload to canonical DTO mapping."""
 
 # ruff: noqa: ANN401, PLR2004 - SDK records and native retcodes are provider-defined.
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, cast
@@ -252,6 +251,7 @@ def _map_position(value: object) -> BrokerPosition:
     side = (
         "LONG" if position_type == 0 else "SHORT" if position_type == 1 else "UNKNOWN"
     )
+    magic = _optional(value, "magic")
     return BrokerPosition(
         position_id=str(_field(value, "ticket")),
         symbol=str(_field(value, "symbol")),
@@ -260,6 +260,7 @@ def _map_position(value: object) -> BrokerPosition:
         quantity_unit="lots",
         retrieved_at=datetime.now(UTC),
         state="OPEN",
+        ownership_ref=f"mt5-magic:{int(magic)}" if magic is not None else None,
         open_price=Decimal(str(_field(value, "price_open"))),
         current_price=Decimal(str(_field(value, "price_current"))),
         profit=Decimal(str(_field(value, "profit"))),
@@ -516,6 +517,9 @@ def _map_order_result(value: object) -> BrokerOrderResult:
     partial = retcode == 10010
     order = _optional(value, "order")
     deal = _optional(value, "deal")
+    pending_acknowledgement = accepted and not deal
+    reported_volume = _optional(value, "volume")
+    volume = Decimal(str(reported_volume)) if reported_volume is not None else None
     order_id = str(order or deal) if accepted or partial else None
     return BrokerOrderResult(
         acknowledged=True,
@@ -523,11 +527,12 @@ def _map_order_result(value: object) -> BrokerOrderResult:
         retrieved_at=datetime.now(UTC),
         order_id=order_id,
         deal_ids=(str(deal),) if deal else (),
-        filled_quantity=(
-            Decimal(str(_optional(value, "volume")))
-            if _optional(value, "volume") is not None
-            else None
-        ),
+        filled_quantity=Decimal(0) if pending_acknowledgement else volume,
+        remaining_quantity=volume
+        if pending_acknowledgement
+        else Decimal(0)
+        if retcode == 10009 and volume is not None
+        else None,
         average_price=(
             Decimal(str(_optional(value, "price")))
             if _optional(value, "price") is not None

@@ -8,7 +8,9 @@ from typing import Literal, Self
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from app.services.trading.contracts import TradingError, TradingRequest
-from app.services.trading.state.stores import TradingStateStore
+from app.services.trading.state.stores import (
+    TradingStateStore,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.utils import canonical_json, logger
 
 type ReservationStatus = Literal[

@@ -1,7 +1,6 @@
 """Binance Spot provider payload to canonical DTO mapping."""
 
 # ruff: noqa: PLR2004 - native wire constants are normative provider evidence.
-
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any

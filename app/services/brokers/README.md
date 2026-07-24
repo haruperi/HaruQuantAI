@@ -4,7 +4,7 @@
 > **Status:** `Partial` — runtime behavior and usage evidence are implemented,
 > but several registered provider capabilities still share module folders and
 > therefore do not satisfy the repository's one-feature/one-folder rule.
-> **Last updated:** `2026-07-22`
+> **Last updated:** `2026-07-24`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -21,10 +21,12 @@ retrieves BID candles from its keyless web-chart feed while retaining BI5 for
 genuine tick reads.
 
 Implementation does not imply release. `registry/catalogue.py` requires
-membership in `_RELEASED` and excludes `_WRITE` unconditionally. All mutation
-operations remain `UNAVAILABLE` through the public registry even though their
-adapter bodies and deterministic tests exist. No live mutation was executed while
-establishing this baseline.
+membership in `_RELEASED`. MT5 demo `check_order`, `place_order`, `cancel_order`,
+and `close_position` are released with deterministic, provider-demo,
+authenticated-permission, cleanup, reconciliation, and Owner-approval evidence.
+Adapter instances downgrade those writes to `UNAVAILABLE` outside `demo`.
+All other mutation operations remain unavailable, and no live-money mutation is
+completion evidence.
 
 Implementation also does not imply consumption. Data composes enabled MT5 plus the
 credential-free Binance Spot, Dukascopy, and Yahoo research sources; cTrader still
@@ -40,7 +42,7 @@ The completed operation groups and requirement anchors are:
 | Balances and permissions reads (`get_balances`, `get_permissions`, `get_last_error`) | `CAP-BRK-008`; `FR-BRK-012`, `FR-BRK-014`–`018`, `FR-BRK-073`–`082` | MT5 only; peers return deterministic unsupported | `FEAT-BRK-02` |
 | Provider-native calculations (`calculate_margin`, `calculate_profit`) | `CAP-BRK-011`; `FR-BRK-039`–`041`, `FR-BRK-098`–`100` | MT5, cTrader | `FEAT-BRK-10` |
 | Streaming subscriptions (`subscribe_quotes`, `subscribe_bars`, `subscribe_order_book`) | `CAP-BRK-007`; `FR-BRK-026`, `FR-BRK-057`, `FR-BRK-068`–`072` | cTrader, Binance | `FEAT-BRK-11` |
-| cTrader market data (`get_symbols`, `get_symbol_info`, `get_quote`, `get_spread`, `get_ticks`, `get_historical_bars`) | `CAP-BRK-005`, `CAP-BRK-006`; `FR-BRK-058`–`067` | cTrader | `FEAT-BRK-12` |
+| cTrader market data (`get_symbols`, `get_symbol_info`, `get_trading_sessions`, `get_quote`, `get_spread`, `get_ticks`, `get_historical_bars`) | `CAP-BRK-005`, `CAP-BRK-006`; `FR-BRK-058`–`067` | cTrader | `FEAT-BRK-12` |
 | Dukascopy historical bars (`get_historical_bars`) | `CAP-BRK-006`; `FR-BRK-063`–`067` | Dukascopy | `FEAT-BRK-13` |
 
 The subscription runtime is exercised by Binance/cTrader adapter producers through
@@ -53,13 +55,13 @@ must never be inferred from SDK method presence.
 | Contracts | Partial | Contract, invariant, public-exception, request-ID, export, and consumer-boundary tests pass; every linked test file resolves. Result envelopes carry measured latency separated into provider and adapter components. | Provider fulfillment remains tracked by provider/runtime requirements and does not reopen the V1 boundary. |
 | Runtime | Partial | Full circuit state-machine and subscription overflow/resync, idempotent unsubscribe, and terminal-failure tests pass. | None outstanding at the file level. |
 | Registry/public API | Partial | Explicit adapter creation/listing, disabled-provider rejection, SDK-free listing, lazy imports, write-release gating, and `01_registry.py` pass. | None outstanding at the file level. |
-| MT5 | Completed; writes unreleased | Provider-shaped tests cover lifecycle, market/account state, histories, calculations, and accepted mutation outcomes. | Live writes are excluded by release policy; credential-gated evidence remains outside ordinary regression. |
+| MT5 | Completed; selected demo writes released | Provider-shaped tests cover lifecycle, market/account state, histories, calculations, accepted mutation outcomes, provider-reported demo classification, minimum-size placement, cancellation, and exact reconciliation. | Live writes and unreleased mutation operations remain excluded by release policy. |
 | cTrader | Completed; writes unreleased | Protobuf-shaped tests cover lifecycle, market data, histories, lot-size-aware calculations/mutations, bounded quotes, and correlation. | Live writes are excluded by release policy. |
 | Binance | Completed Spot baseline; public reads selectively released | REST/websocket tests cover market status, spread, snapshot-first order books, streams, ownership, cancellation, anonymous symbol reads, and canonical-to-provider kline intervals. Registry-created callers may use symbols, symbol metadata, and historical bars. | Other reads, authenticated mutations, and Futures adapters remain explicitly excluded. |
 | Dukascopy | Completed research baseline | Tests cover genuine BI5 ticks and bounded web-chart BID candles with provenance. | The undocumented web-chart interface may change; provider reachability remains environment-dependent. |
 | Yahoo | Completed research baseline | Explicit probe-symbol configuration, non-empty probe verification, canonical interval mapping, and released historical bars with provider-shaped transport/mapping/adapter evidence pass. | None outstanding at the file level. |
 | Fake/testing utility | Partial | Complete protocol surface, deterministic fixture/error injection, bounded FIFO subscriptions with backpressure and resync, instance isolation, and the capability gate that injection cannot bypass. | None outstanding at the file level. |
-| Package validation | Partial | Contract, provider, integration, static-analysis, and 16 directly executed feature usage programs cover the accepted baseline. Each `WF-BRK-*` integration test drives a real provider adapter rather than a test double. | Credential-gated live evidence is not ordinary regression evidence; writes remain fail-closed. |
+| Package validation | Partial | Contract, provider, integration, static-analysis, and 16 directly executed feature usage programs cover the accepted baseline. Each `WF-BRK-*` integration test drives a real provider adapter rather than a test double; the MT5 demo mutation suite and `SYS-WF-002` perform exact cleanup/reconciliation. | Credential-gated demo evidence remains separate from ordinary regression; non-demo writes remain fail-closed. |
 
 ### Known defects fixed during the 2026-07-21 completion review
 
@@ -99,7 +101,7 @@ must never be inferred from SDK method presence.
 - **MT5 released-read implementation gap (`mt5/adapter.py`, `mt5/mapping.py`):** the catalogue declared historical bars and spread available while MT5 inherited deterministic unsupported defaults, and mapped bars had a zero-duration window. Implemented genuine bounded latest/ranged bar reads, provider-derived bid/ask spread, optional latest-tick lookup, SDK timeframe resolution, and valid closing timestamps.
 - **Yahoo zero-duration bar defect (`yahoo/mapping.py`):** every mapped bar set `closing_timestamp == opening_timestamp`, violating `BrokerBar`'s own `opening_timestamp < closing_timestamp` invariant and making every real Yahoo bar construction raise. Fixed by deriving the closing timestamp from the parsed provider interval (resolves `DEC-BRK-001`).
 
-Session lifecycle is the verified layer. MT5, Binance, Yahoo, and cTrader each have a verified real connection (MT5 against a real demo account; Binance against the real testnet; Yahoo against the real Yahoo Finance service; cTrader against Spotware's demo servers via the `ctrader/network.py` handshake). Dukascopy's real host is unreachable from this environment's network specifically (confirmed by direct probe — Yahoo and Binance are reachable from the same environment). The static catalogue keeps every operation other than `connect`/`is_connected` unavailable, and direct unavailable calls fail before importing or invoking the provider SDK.
+Session lifecycle is the verified layer. MT5, Binance, Yahoo, and cTrader have verified real connections (MT5 and cTrader against provider-confirmed demo accounts; Binance against the real testnet; Yahoo against the real Yahoo Finance service). The 2026-07-24 cTrader validation also returned six genuine bounded ordered UTC `EURUSD` sessions and disconnected without creating provider state. Dukascopy's real host is unreachable from this environment's network specifically (confirmed by direct probe — Yahoo, Binance, and cTrader are reachable from the same environment). The static catalogue keeps operations without complete provider evidence unavailable, and direct unavailable calls fail before invoking the provider SDK.
 
 ---
 
@@ -696,7 +698,7 @@ All DTOs are immutable. `datetime` values are timezone-aware UTC; monetary/price
 | `BrokerBar` | `symbol`; `opening_timestamp`; `closing_timestamp`; `is_closed`; `open/high/low/close: Decimal`; `trade_volume/tick_volume: Decimal | None`; provider-reported `spread: Decimal | None` with `spread_unit`; `provider_timeframe`; `requested_timeframe`; explicit units |
 | `BrokerOrderBook` | `symbol`; `bids/asks: tuple[(Decimal price, Decimal quantity), ...]`; `is_snapshot`; `first/last_sequence_id: int | None`; `checksum: str | None`; `depth_truncation: int | None`; `resnapshot_required`; `event_timestamp`; explicit units |
 | `BrokerSubscriptionInfo` | `subscription_id`; `capability`; exact provider-native `symbols`; `created_at`; `buffer_size`; `delivery_sequence`; `resynchronization_required`; `active` |
-| `BrokerPosition` | `position_id`; `symbol`; `side`; `quantity`; `quantity_unit`; `open/current_price: Decimal | None`; `profit/swap: Decimal | None`; `currency: str | None`; `stop_loss/take_profit: Decimal | None`; `state`; provider/retrieval timestamps |
+| `BrokerPosition` | `position_id`; `symbol`; `side`; `quantity`; `quantity_unit`; `open/current_price: Decimal | None`; `profit/swap: Decimal | None`; `currency: str | None`; `stop_loss/take_profit: Decimal | None`; `state`; optional provider-derived `ownership_ref`; provider/retrieval timestamps |
 | `BrokerOrderFilter` | Optional `symbol`, `status`, `side`, `start`, `end`, `account_reference` structural fields only |
 | `BrokerPositionFilter` | Optional `symbol`, `side`, `account_reference` structural fields only |
 | `BrokerOrder` | `order_id`; `client_request_id/client_order_id: str | None`; `symbol`; `side`; `order_type`; `state`; `quantity/filled/remaining: Decimal` and unit; applicable price/stop/TIF/product fields; provider/retrieval timestamps; `provider_metadata` |
@@ -812,7 +814,7 @@ All model constructors have side effect `None`. Each raises `ValueError` only wh
 | Partial | `FR-BRK-024` | The system shall preserve UTC open/close time, closed state, trade/tick volume distinctions, optional provider-reported spread with its native unit, and native/requested timeframe while storing conversion evidence once in page metadata. | `class BrokerBar` | None | `ValueError`: OHLC/time ordering, mandatory decimals, or spread/unit pairing is invalid. | **Usage:** `tests/brokers/usage/01_registry.py`<br>**Unit:** `tests/brokers/unit/test_models.py::test_bar_has_explicit_time_volume_and_spread_semantics()` |
 | Partial | `FR-BRK-025` | The system shall represent order-book snapshot/delta state, levels, provider sequence/checksum, depth truncation, and resnapshot requirement without invented sequence IDs. | `class BrokerOrderBook` | None | `ValueError`: levels or supplied sequence range is invalid. | **Usage:** `tests/brokers/usage/01_registry.py`<br>**Unit:** `tests/brokers/unit/test_models.py::test_order_book_exposes_resnapshot_state()` |
 | Partial | `FR-BRK-026` | The system shall represent immutable metadata for one adapter-scoped bounded subscription, including capability, exact provider-native symbols, creation time, delivery sequence, active state, and resync state. | `class BrokerSubscriptionInfo` | None | `ValueError`: subscription ID or bounded-buffer evidence is invalid. | **Usage:** `tests/brokers/usage/01_registry.py`<br>**Unit:** `tests/brokers/unit/test_models.py::test_subscription_info_is_adapter_scoped()` |
-| Partial | `FR-BRK-027` | The system shall preserve provider position ID, symbol, side, exact quantities/prices/P&L fields, partial state, and timestamps. | `class BrokerPosition` | None | `ValueError`: mandatory provider identity/quantity/time is invalid. | **Usage:** `tests/brokers/usage/01_registry.py`<br>**Unit:** `tests/brokers/unit/test_models.py::test_position_preserves_provider_profit()` |
+| Partial | `FR-BRK-027` | The system shall preserve provider position ID, symbol, side, exact quantities/prices/P&L fields, partial state, timestamps, and an optional genuine provider ownership reference when the provider exposes one; MT5 maps `magic` as `mt5-magic:<integer>` and cTrader maps a non-empty label as `ctrader-label:<label>`, without inventing missing ownership. | `class BrokerPosition` | None | `ValueError`: mandatory provider identity/quantity/time or supplied ownership reference is invalid. | **Usage:** `tests/brokers/usage/01_registry.py`<br>**Unit:** `tests/brokers/unit/test_models.py::test_position_preserves_provider_profit()`; `tests/brokers/unit/test_mt5_mapping.py`; `tests/brokers/unit/test_ctrader_mapping.py` |
 | Partial | `FR-BRK-028` | The system shall express structural order filters only, without selection policy or unbounded history. | `class BrokerOrderFilter` | None | `ValueError`: date interval is invalid. | **Usage:** `tests/brokers/usage/01_registry.py`<br>**Unit:** `tests/brokers/unit/test_models.py::test_order_filter_is_structural()` |
 | Partial | `FR-BRK-029` | The system shall express structural position filters only. | `class BrokerPositionFilter` | None | `ValueError`: supplied filter value is structurally invalid. | **Usage:** `tests/brokers/usage/01_registry.py`<br>**Unit:** `tests/brokers/unit/test_models.py::test_position_filter_is_structural()` |
 | Partial | `FR-BRK-030` | The system shall preserve provider order IDs, caller IDs, product-applicable fields, exact quantity/unit, partial state, prices, and timestamps without fabricating acceptance. | `class BrokerOrder` | None | `ValueError`: mandatory identity/state/quantity evidence is invalid. | **Usage:** `tests/brokers/usage/01_registry.py`<br>**Unit:** `tests/brokers/unit/test_models.py::test_order_preserves_partial_state_and_ids()` |
@@ -997,7 +999,7 @@ No registry-specific setting exists. The composition root derives `BrokerConnect
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Partial | `FR-BRK-101` | The system shall require an exact provider/profile ID and matching immutable config, reject `provider_enabled=False` before provider import, lazily import only that provider, and return a new disconnected adapter or canonical error without fallback. The static catalogue marks implemented `connect`/`is_connected` operations available; other reads require explicit membership in `_RELEASED` (currently verified MT5 and Dukascopy reads, Yahoo historical bars, and Binance Spot symbols, symbol metadata, and historical bars), and writes remain unavailable unconditionally. | `create_broker_adapter(broker_id: BrokerId, config: BrokerConnectionConfig) -> BrokerResult[BrokerAdapter]` | Local state mutation; lazy import | None; `BROKER_UNKNOWN`, `BROKER_CONFIGURATION_INVALID`, or `BROKER_DEPENDENCY_MISSING` returned. | **Usage:** `tests/brokers/usage/01_registry.py` (standalone script, run via `python`)<br>**Unit:** `tests/brokers/unit/test_factory.py::test_create_adapter_never_falls_back()`, `test_registry_created_adapter_can_connect_and_report_state()` |
+| Partial | `FR-BRK-101` | The system shall require an exact provider/profile ID and matching immutable config, reject `provider_enabled=False` before provider import, lazily import only that provider, and return a new disconnected adapter or canonical error without fallback. The static catalogue marks implemented `connect`/`is_connected` operations available; other provider operations require explicit membership in `_RELEASED`. Released operations currently include verified reads plus MT5 demo `check_order`, `place_order`, `cancel_order`, and `close_position`; adapter instances downgrade released writes outside `demo`. | `create_broker_adapter(broker_id: BrokerId, config: BrokerConnectionConfig) -> BrokerResult[BrokerAdapter]` | Local state mutation; lazy import | None; `BROKER_UNKNOWN`, `BROKER_CONFIGURATION_INVALID`, or `BROKER_DEPENDENCY_MISSING` returned. | **Usage:** `tests/brokers/usage/01_registry.py` (standalone script, run via `python`)<br>**Unit:** `tests/brokers/unit/test_factory.py::test_create_adapter_never_falls_back()`, `test_registry_created_adapter_can_connect_and_report_state()` |
 | Partial | `FR-BRK-102` | The system shall list every canonical registered provider/profile, including profiles whose optional SDK is absent, without importing provider SDKs. | `get_registered_brokers() -> tuple[BrokerId, ...]` | Read-only | None | **Usage:** `tests/brokers/usage/01_registry.py` (standalone script, run via `python`)<br>**Unit:** `tests/brokers/unit/test_factory.py::test_listing_does_not_import_optional_sdks()` |
 | Partial | `FR-BRK-103` | The system shall generate one complete capability catalogue covering every protocol operation and registered profile from the static declaration table in `registry/catalogue.py`. Provider modules consume the resulting declaration and shall not duplicate capability lists. | `get_broker_capability_catalogue() -> Mapping[BrokerId, tuple[BrokerCapability, ...]]` | Read-only | None | **Usage:** `tests/brokers/usage/01_registry.py` (standalone script, run via `python`)<br>**Unit:** `tests/brokers/unit/test_catalogue.py::test_catalogue_is_the_single_complete_declaration_source()` |
 
@@ -1021,7 +1023,7 @@ No registry-specific setting exists. The composition root derives `BrokerConnect
 
 ### Normative provider/profile capability matrix
 
-`A` means an implementation target that may become `AVAILABLE` only after its deterministic contract and required provider-response evidence passes. `W` means implemented but always `UNAVAILABLE` until the FR-BRK-010 write release gate is satisfied. `U` means `NOT_IMPLEMENTED`/`UNAVAILABLE` and must return deterministic unsupported without an SDK call. Binance Futures profiles are registry-only in the initial package, so every provider operation is `U`; only local catalogue/factory introspection applies.
+`A` means implemented and eligible for catalogue availability after its required evidence passes. `D` means released only for an authenticated demo profile and downgraded to `UNAVAILABLE` in every other environment. `W` means implemented but `UNAVAILABLE` until the FR-BRK-010 write release gate is satisfied. `U` means `NOT_IMPLEMENTED`/`UNAVAILABLE` and must return deterministic unsupported without an SDK call. Binance Futures profiles are registry-only in the initial package, so every provider operation is `U`; only local catalogue/factory introspection applies.
 
 | Exact operations | MT5 | cTrader | Binance Spot | Binance USD-M / Coin-M | Dukascopy | Yahoo |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -1120,7 +1122,7 @@ canonical request
 |---|---|---|---|---|
 | Partial | `transport.py` | FR-BRK-116: own one MT5 terminal/account session, circuit, and serialized blocking-call boundary. | None | **Standard library:** `asyncio, threading`<br>**Required third-party:** `MetaTrader5>=5.0.5735`<br>**Local:** `contracts → BrokerConnectionConfig, BrokerErrorCode`; `runtime → circuit breaker`; `app.utils → logging/redaction` |
 | Partial | `mapping.py` | FR-BRK-117: structurally map MT5 values, including the native historical bar spread in points, and documented native errors to canonical DTOs/errors without raw object leakage. | None | **Standard library:** `datetime, decimal`<br>**Required third-party:** `MetaTrader5>=5.0.5735`<br>**Local:** `contracts → canonical enums/models` |
-| Partial | `adapter.py` | Implement every accepted canonical operation using one explicit MT5 session; catalogue-gated writes remain unreleased. | `MT5BrokerAdapter` | **Standard library:** `asyncio, collections.abc`<br>**Required third-party:** `MetaTrader5>=5.0.5735`<br>**Local:** `contracts → BrokerAdapter and DTOs`; `transport.py → private transport`; `mapping.py → private mappers` |
+| Partial | `adapter.py` | Implement every accepted canonical operation using one explicit MT5 session; selected single-target writes are released only for verified demo instances and all other writes remain unavailable. | `MT5BrokerAdapter` | **Standard library:** `asyncio, collections.abc`<br>**Required third-party:** `MetaTrader5>=5.0.5735`<br>**Local:** `contracts → BrokerAdapter and DTOs`; `transport.py → private transport`; `mapping.py → private mappers` |
 | Partial | `__init__.py` | FR-BRK-118: expose the approved adapter type after implementation exists. | `MT5BrokerAdapter` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `adapter.py → MT5BrokerAdapter` |
 
 ### Configuration and Limits Manifest
@@ -1526,9 +1528,10 @@ Resolved requirements:
 - Dukascopy owns interface-specific market-data retrieval and mapping. BI5 files
   provide ticks; the keyless web-chart feed provides BID candles mapped directly
   to canonical bars. Brokers does not fabricate a spread or derive OHLC from ticks.
-- `registry/catalogue.py` gates release through `_RELEASED` and excludes every
-  `_WRITE` operation unconditionally. Implemented MT5/cTrader mutations remain
-  `UNAVAILABLE`; SDK presence or implementation status cannot release them.
+- `registry/catalogue.py` gates release through `_RELEASED`. MT5 demo
+  `check_order`, `place_order`, `cancel_order`, and `close_position` have recorded
+  provider-demo evidence and explicit approval; adapter instances downgrade them
+  outside `demo`. Other MT5/cTrader mutations remain `UNAVAILABLE`.
   Yahoo releases only `get_historical_bars`, backed by its deterministic
   transport, mapping, and adapter evidence suites.
 - Yahoo requires an explicit non-empty `probe_symbol` for verified `connect()`.
@@ -1600,6 +1603,10 @@ During implementation, run only the targeted test file for the changed code befo
 - **Boundary:** No business-domain import, database/persistence, synthetic data, policy, fallback, raw SDK object, or concrete-provider dependency in callers.
 - **Integration:** Every `WF-BRK-*` plus Data/Trading consumer compatibility for `SYS-WF-001`, `SYS-WF-002`, and the Trading-owned mutation leg of `SYS-WF-008`.
 - **Provider:** Credential-gated sandbox/testnet evidence for every capability marked available.
+- **MT5 demo mutation:** `tests/brokers/integration/test_mt5_demo_mutations.py`
+  and `tests/system/integration/test_signal_to_live.py` verify provider-reported
+  demo classification, authenticated write permission, provider-minimum order
+  size, unique identities, exact cleanup, and reconciliation.
 - **Usage:** Every registered `FEAT-BRK-*` owns exactly one `NN_<feature>.py`
   standalone program. Programs exercise genuine adapter behavior over offline
   transports and separately demonstrate fail-closed release behavior; live
@@ -1627,7 +1634,7 @@ During implementation, run only the targeted test file for the changed code befo
 - [ ] Removed, rejected, and excluded behavior is absent from the public surface. `app/services/brokers/contracts/unsupported.py:1`
 - [ ] Every retained V1 behavior has a final destination or explicit removal condition. `app/services/brokers/registry/catalogue.py:148`
 - [ ] No Brokers open decisions remain. Dukascopy candle mapping is adapter-local;
-  write operations are implemented but unconditionally unreleased; Yahoo connect
+  selected MT5 demo writes are released and every other write remains unavailable; Yahoo connect
   requires an explicit probe symbol. `app/services/brokers/dukascopy/candle_mapping.py:29`
 - [ ] No unnecessary service/manager/repository/factory layer beyond the approved technical registry was introduced. `app/services/brokers/registry/factory.py:78`
 - [ ] Ruff, format, and strict `mypy` gates are clean over production and tests,
@@ -1637,9 +1644,10 @@ During implementation, run only the targeted test file for the changed code befo
   standalone usage programs remain excluded from measurement. `tests/brokers/usage/conftest.py:3`
 - [ ] The dependency manifest resolves. `twisted` is pinned to the exact version
   `ctrader-open-api==0.9.2` requires, and `uv lock` succeeds. `pyproject.toml:30`
-- [ ] Deterministic provider-shaped evidence supports advertised reads, and every
-  released read records its verification evidence. All writes remain
-  unconditionally unavailable, so no live mutation evidence is claimed. `app/services/brokers/registry/catalogue.py:166`
+- [ ] Deterministic provider-shaped evidence supports every advertised operation.
+  Released MT5 demo writes record sandbox evidence and approval; non-demo and
+  unreleased writes remain unavailable. No live-money mutation evidence is claimed.
+  `app/services/brokers/registry/catalogue.py:166`
 - [ ] The normative capability matrix and the static catalogue are locked together
   by an executable check. `tests/brokers/unit/test_catalogue.py:169`
 - [ ] Every public export is documented in this README's Section 2 Feature
@@ -1650,8 +1658,8 @@ During implementation, run only the targeted test file for the changed code befo
 Current implementation status: `Partial`. The canonical contracts, registry,
 provider adapters, runtime safety behavior, and deterministic test utility are
 implemented, but the Section 2 registry records the provider-folder structural
-finding. Live write release is explicitly excluded and would require a new owner
-decision; it is not an implementation gap.
+finding. Selected MT5 demo writes are released; live-money write release remains
+excluded and would require a new owner decision.
 
 Every checklist item above is verified. The strict `mypy` gate, the coverage
 threshold, and the dependency resolution were confirmed on the pinned Windows

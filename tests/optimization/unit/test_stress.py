@@ -1,7 +1,6 @@
 """Tests for explicit Optimization execution stress."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 from app.services.optimization.robustness import (

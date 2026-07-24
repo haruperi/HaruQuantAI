@@ -1,7 +1,6 @@
 """Deterministic TradeIntent builder tests."""
 
 # ruff: noqa: PT018
-
 from app.services.strategy import build_trade_intent
 from app.utils import logger
 

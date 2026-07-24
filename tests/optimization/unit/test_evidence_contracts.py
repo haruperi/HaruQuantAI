@@ -1,7 +1,6 @@
 """Tests for versioned Optimization evidence contracts."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.optimization.evidence import (
     EvidenceAssemblyRequest,

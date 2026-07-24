@@ -1,7 +1,6 @@
 """Unit tests for the typed public Portfolio service and quality boundary."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 import inspect

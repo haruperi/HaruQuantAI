@@ -1,6 +1,7 @@
 """Executable Research statistics usage example.
 
-Demonstrates block bootstrap resampling, permutation tests, null model generation, and multiple testing corrections.
+Demonstrates block bootstrap resampling, permutation tests, null model
+generation, and multiple testing corrections.
 """
 
 import sys

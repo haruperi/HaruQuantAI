@@ -1,3 +1,5 @@
-"""Public UI/API domain port."""
+"""Approved package-root boundary contracts for the UI/API domain."""
 
-__all__: tuple[str, ...] = ()
+from app.services.api.contracts import ResearchRunRequest
+
+__all__ = ("ResearchRunRequest",)

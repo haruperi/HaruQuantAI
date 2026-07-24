@@ -8,15 +8,34 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from types import MappingProxyType
-from typing import Literal
+from typing import Annotated, Literal
 
 import pandas as pd
+from pydantic import PlainSerializer
 
 from app.utils import SecurityError, ValidationError, logger
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]
 )
+
+
+def _serialize_mapping(value: Mapping[str, JSONValue]) -> dict[str, JSONValue]:
+    """Project an immutable mapping for JSON transport.
+
+    Args:
+        value: Immutable contract mapping.
+
+    Returns:
+        Detached JSON-serializable mapping.
+    """
+    return dict(value)
+
+
+type SerializableJSONMapping = Annotated[
+    Mapping[str, JSONValue],
+    PlainSerializer(_serialize_mapping, return_type=dict),
+]
 
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 _WARNING_SEVERITIES = frozenset({"info", "warning", "error"})
@@ -118,7 +137,7 @@ class ResearchWarning:
     message: str
     severity: str
     field_path: str | None = None
-    details: Mapping[str, JSONValue] | None = None
+    details: SerializableJSONMapping | None = None
 
     def __post_init__(self) -> None:
         """Validate and freeze warning evidence.
@@ -497,14 +516,20 @@ class ResearchReport:
     schema_id: Literal["research.report.v1"]
     report_id: str
     hypothesis: str
-    evidence: Mapping[str, JSONValue]
-    seeds: Mapping[str, int]
+    evidence: SerializableJSONMapping
+    seeds: Annotated[
+        Mapping[str, int],
+        PlainSerializer(dict, return_type=dict),
+    ]
     configuration_hash: str
     dataset_hash: str
     source_references: tuple[str, ...]
     warnings: tuple[ResearchWarning, ...]
     generated_at: datetime
-    dependency_versions: Mapping[str, str]
+    dependency_versions: Annotated[
+        Mapping[str, str],
+        PlainSerializer(dict, return_type=dict),
+    ]
     duration_ms: float
     advisory_only: Literal[True]
 

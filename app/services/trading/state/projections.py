@@ -8,9 +8,15 @@ from typing import Self
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.services.trading.contracts import TradingError, TradingRoute
-from app.services.trading.contracts.models import JsonValue
-from app.services.trading.state.events import TradingEvent
-from app.services.trading.state.stores import TradingStateStore
+from app.services.trading.contracts.models import (
+    JsonValue,  # noqa: TC001 - runtime annotation and model resolution
+)
+from app.services.trading.state.events import (
+    TradingEvent,  # noqa: TC001 - runtime annotation and model resolution
+)
+from app.services.trading.state.stores import (
+    TradingStateStore,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.utils import logger, to_json_safe
 
 

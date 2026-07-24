@@ -144,7 +144,8 @@ def example_contracts() -> None:
 
     json_report = to_report_json_safe(report)
     print(
-        f"PerformanceReport serialized to JSON-safe dict, keys: {list(json_report.keys())}"
+        "PerformanceReport serialized to JSON-safe dict, keys: "
+        f"{list(json_report.keys())}"
     )
 
     # 6. Error conversion

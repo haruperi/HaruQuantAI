@@ -2,7 +2,6 @@
 """cTrader execution-history read operations."""
 
 # ruff: noqa: A002 - public protocol signatures are normative.
-
 from datetime import datetime
 from typing import cast
 

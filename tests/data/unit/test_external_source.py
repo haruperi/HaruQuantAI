@@ -21,6 +21,7 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
     """Provider-reported per-bar spread remains exact and unit-bearing."""
     opening = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
     closing = opening + timedelta(minutes=1)
+    retrieved = closing + timedelta(days=1)
 
     class _Adapter:
         async def get_historical_bars(
@@ -55,7 +56,7 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
                 broker=BrokerId.MT5,
                 operation=BrokerCapabilityId.GET_HISTORICAL_BARS,
                 request_id=generate_id("req"),
-                timestamp=closing,
+                timestamp=retrieved,
                 environment=BrokerEnvironment.DEMO,
                 adapter_version="1.0.0",
                 data=BrokerPage(items=(bar,), limit=limit, truncated=False),
@@ -74,6 +75,8 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
 
     assert batch.records[0]["spread"] == Decimal(2)
     assert batch.records[0]["spread_unit"] == "points"
+    assert batch.records[0]["available_at"] == closing
+    assert batch.retrieved_at == retrieved
 
 
 def test_tick_availability_tolerates_provider_clock_skew() -> None:

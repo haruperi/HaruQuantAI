@@ -1,6 +1,7 @@
 """Executable Research metrics usage example.
 
-Demonstrates metric registry creation, resolution, calculator computation, and metric profile building.
+Demonstrates metric registry creation, resolution, calculator computation, and
+metric profile building.
 """
 
 import sys

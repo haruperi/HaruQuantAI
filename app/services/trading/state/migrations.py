@@ -2,7 +2,7 @@
 
 from hashlib import sha256
 
-from app.services.data.persistence.contracts import (
+from app.services.data import (
     MigrationStep,
 )
 from app.utils import logger

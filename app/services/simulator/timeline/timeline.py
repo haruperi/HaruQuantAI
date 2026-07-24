@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from app.services.data.contracts import (
+from app.services.data import (
     MarketDataset,
     TickRecord,
 )

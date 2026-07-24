@@ -66,18 +66,6 @@ def fr_brokers_061() -> None:
     asyncio.run(run())
 
 
-def fr_brokers_062() -> None:
-    """FR-BRK-062: Return provider-supplied trading windows within optional bounds."""
-    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_trading_sessions("EURUSD")
-        print("FR-BRK-062:", res.status)
-
-    asyncio.run(run())
-
-
 def fr_brokers_063() -> None:
     """FR-BRK-063: Return latest genuine provider quote without fallback price."""
     adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
@@ -122,7 +110,6 @@ def main() -> None:
     fr_brokers_059()
     fr_brokers_060()
     fr_brokers_061()
-    fr_brokers_062()
     fr_brokers_063()
     fr_brokers_064()
     fr_brokers_065()

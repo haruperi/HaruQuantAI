@@ -52,7 +52,8 @@ def example_public_api() -> None:
     # 2. Walk-forward optimization
     wf_res = run_walk_forward_optimization(walk_forward_request(), adapter)
     print(
-        f"Walk-forward optimization diagnostic key present: {'walk_forward' in wf_res.diagnostics}"
+        "Walk-forward optimization diagnostic key present: "
+        f"{'walk_forward' in wf_res.diagnostics}"
     )
 
     # 3. Walk-forward matrix

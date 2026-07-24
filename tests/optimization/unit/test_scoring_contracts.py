@@ -1,7 +1,6 @@
 """Tests for Optimization scoring contracts."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.optimization.scoring import CandidateScore, ObjectiveName
 from pydantic import ValidationError

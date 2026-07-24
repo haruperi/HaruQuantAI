@@ -1,7 +1,6 @@
 """Tests for all official Optimization public operations."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 from app.services.optimization.evidence import build_optimization_evidence

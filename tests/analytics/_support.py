@@ -1,3 +1,4 @@
+# ruff: noqa: INP001 - standalone test namespace by repository policy.
 """Shared test support helpers for Analytics tests."""
 
 from dataclasses import replace
@@ -21,7 +22,11 @@ NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
 
 def _config() -> AnalyticsRunConfig:
-    """Build default analytics run config."""
+    """Build default analytics run config.
+
+    Returns:
+        Default bounded Analytics configuration.
+    """
     return AnalyticsRunConfig(
         max_warning_detail_bytes=1024,
         max_trades=100,
@@ -49,7 +54,11 @@ def _config() -> AnalyticsRunConfig:
 
 
 def _configured() -> AnalyticsRunConfig:
-    """Build fully source-backed reporting configuration."""
+    """Build fully source-backed reporting configuration.
+
+    Returns:
+        Source-backed Analytics configuration.
+    """
     return replace(
         _config(),
         risk_free_rate=RiskFreeRateEvidence(
@@ -62,7 +71,14 @@ def _configured() -> AnalyticsRunConfig:
 
 
 def _source_with_profit(profit: Decimal = Decimal(10)) -> dict[str, object]:
-    """Build producer-neutral source evidence."""
+    """Build producer-neutral source evidence.
+
+    Args:
+        profit: Closed-trade profit to include.
+
+    Returns:
+        Producer-neutral source evidence.
+    """
     return {
         "contract_version": "v1",
         "schema_id": "simulation.result.v1",
@@ -101,7 +117,11 @@ def _source_with_profit(profit: Decimal = Decimal(10)) -> dict[str, object]:
 
 
 def _source() -> dict[str, object]:
-    """Build default producer-neutral source dict."""
+    """Build default producer-neutral source dict.
+
+    Returns:
+        Default producer-neutral source evidence.
+    """
     return _source_with_profit(Decimal(10))
 
 
@@ -112,7 +132,17 @@ def _report(
     source_id: str = "simulation-result-1",
     request_id: str | None = None,
 ) -> tuple[PerformanceReport, AnalyticsRunConfig]:
-    """Build one complete usage/unit report."""
+    """Build one complete usage/unit report.
+
+    Args:
+        profit: Closed-trade profit to include.
+        account_currency: Report account currency.
+        source_id: Producer source identifier.
+        request_id: Optional request identifier.
+
+    Returns:
+        Complete performance report and its configuration.
+    """
     config = _configured()
     source = _source_with_profit(profit)
     source["source_id"] = source_id

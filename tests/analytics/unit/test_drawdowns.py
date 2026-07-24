@@ -1,7 +1,6 @@
 """Unit tests for closed-trade drawdown evidence."""
 
 # ruff: noqa: INP001
-
 import json
 from decimal import Decimal
 from pathlib import Path

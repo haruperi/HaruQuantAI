@@ -1,7 +1,6 @@
 """Unit tests for producer-neutral Analytics result adaptation."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 

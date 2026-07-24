@@ -1,7 +1,6 @@
 """Integration test for the official Optimization boundary."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.public_api import (
     OFFICIAL_OPTIMIZATION_TOOLS,
     compare_optimization_runs,

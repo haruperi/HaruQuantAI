@@ -1,7 +1,6 @@
 """Workflow integration for uncertain authority outcomes."""
 
 # ruff: noqa: ARG005, INP001
-
 from app.services.trading.reconciliation import resolve_unknown_outcome
 from tests.trading.conftest import (
     AuthorityStore,

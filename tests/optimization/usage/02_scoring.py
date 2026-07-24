@@ -134,7 +134,8 @@ def example_scoring() -> None:
         enabled_objectives=frozenset({ObjectiveName.NET_PNL}),
     )
     print(
-        f"Calculated candidate score: objective={score_res.objective}, value={score_res.value}"
+        f"Calculated candidate score: objective={score_res.objective}, "
+        f"value={score_res.value}"
     )
 
     # 3. Deflated Sharpe ratio calculation

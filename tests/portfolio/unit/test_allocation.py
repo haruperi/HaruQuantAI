@@ -1,7 +1,6 @@
 """Unit tests for governed Portfolio activation and rollback semantics."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 from datetime import datetime, timedelta

@@ -8,11 +8,18 @@ from typing import Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.services.risk import KillSwitchState, RiskDecisionPackage
+from app.services.risk import (  # noqa: TC001 - runtime annotation and model resolution
+    KillSwitchState,
+    RiskDecisionPackage,
+)
 from app.services.risk.contracts import DecisionState
 from app.services.trading.contracts import TradingError, TradingRequest
-from app.services.trading.contracts.models import JsonValue
-from app.services.trading.validation.snapshots import RouteSnapshot
+from app.services.trading.contracts.models import (
+    JsonValue,  # noqa: TC001 - runtime annotation and model resolution
+)
+from app.services.trading.validation.snapshots import (
+    RouteSnapshot,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.utils import logger, to_json_safe
 
 _MAX_FAILED_CHECKS = 32

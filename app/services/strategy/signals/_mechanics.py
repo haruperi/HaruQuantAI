@@ -9,12 +9,12 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Literal, cast
 
-from app.services.data.contracts import OHLCVRecord
+from app.services.data import OHLCVRecord
 from app.services.strategy.contracts import StrategySignal
 from app.utils import canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset
+    from app.services.data import MarketDataset
     from app.services.indicators import IndicatorResult
     from app.services.strategy.contracts import (
         StrategyExecutionContext,
@@ -245,6 +245,62 @@ def _indicator_values(
     return raw
 
 
+def _ready_indicator_values(
+    indicators: tuple[IndicatorResult, ...],
+    *,
+    indicator_id: str,
+    output_column: str,
+    minimum: int,
+) -> tuple[Decimal, ...]:
+    """Return finite official indicator values and enforce a minimum count.
+
+    Args:
+        indicators: Official indicator results.
+        indicator_id: Required official indicator identity.
+        output_column: Required canonical output column.
+        minimum: Minimum number of finite values.
+
+    Returns:
+        Ordered finite decimal values.
+
+    Raises:
+        _SignalIndicatorError: If evidence is absent, ambiguous, or incomplete.
+    """
+    values = _indicator_values(
+        indicators,
+        indicator_id=indicator_id,
+        output_column=output_column,
+    )
+    ready = tuple(Decimal(str(value)) for value in values if math.isfinite(value))
+    if len(ready) < minimum:
+        message = f"indicator requires at least {minimum} ready values: {output_column}"
+        raise _SignalIndicatorError(message)
+    return ready
+
+
+def _indicator_reference(
+    indicators: tuple[IndicatorResult, ...],
+    *,
+    indicator_id: str,
+    output_column: str,
+) -> str:
+    """Return the exact manifest checksum for one official result.
+
+    Raises:
+        _SignalIndicatorError: If the result is absent or ambiguous.
+    """
+    matches = tuple(
+        result
+        for result in indicators
+        if result.indicator_id == indicator_id
+        and output_column in result.output_columns
+    )
+    if len(matches) != 1:
+        message = f"indicator result must resolve exactly once: {output_column}"
+        raise _SignalIndicatorError(message)
+    return matches[0].manifest.output_checksum
+
+
 def _current_previous(values: tuple[float, ...], name: str) -> tuple[Decimal, Decimal]:
     """Return the current and previous values from an ordered series.
 
@@ -299,7 +355,7 @@ def _position_tag(magic_number: int, side: str) -> str:
         Stable ownership tag expected from runtime evidence.
     """
     logger.debug("Building concrete Strategy owned-position tag")
-    return f"magic:{magic_number}:{side}"
+    return f"mt5-magic:{magic_number}:{side}"
 
 
 def _make_signal(

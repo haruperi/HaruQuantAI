@@ -16,8 +16,12 @@ from app.services.trading.contracts import (
     TradingRequest,
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
-from app.services.trading.contracts.models import JsonValue
-from app.services.trading.live.session import LiveSession
+from app.services.trading.contracts.models import (
+    JsonValue,  # noqa: TC001 - runtime annotation and model resolution
+)
+from app.services.trading.live.session import (
+    LiveSession,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.services.trading.routing import validate_adapter_capability
 from app.services.trading.state import reserve_idempotency
 from app.services.trading.validation import build_execution_plan

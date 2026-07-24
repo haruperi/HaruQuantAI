@@ -1,7 +1,6 @@
 """Unit tests for Trading caller-key idempotency."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 

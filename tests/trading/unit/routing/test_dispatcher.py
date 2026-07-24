@@ -1,7 +1,6 @@
 """Unit tests for the sole asynchronous Trading dispatch boundary."""
 
 # ruff: noqa: INP001
-
 import asyncio
 from collections.abc import Awaitable, Callable
 from dataclasses import replace

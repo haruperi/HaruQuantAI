@@ -2,10 +2,10 @@
 
 import hashlib
 
-from app.services.data.persistence import run_domain_migrations
-from app.services.data.persistence.contracts import (
+from app.services.data import (
     MigrationRequest,
     MigrationStep,
+    run_domain_migrations,
 )
 from app.utils import logger
 

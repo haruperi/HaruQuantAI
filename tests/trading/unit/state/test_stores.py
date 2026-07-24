@@ -1,7 +1,6 @@
 """Contract tests for the injected TradingStateStore port."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime
 
 import pytest

@@ -1,7 +1,6 @@
 """WF-STR-008 mutation-result publication integration."""
 
 # ruff: noqa: PT018
-
 from pathlib import Path
 
 from app.services.strategy import StrategyLifecycleStatus, register_strategy_version

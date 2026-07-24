@@ -3,7 +3,9 @@
 from hashlib import sha256
 
 from app.services.trading.contracts import OrderIntent, TradingError, TradingRequest
-from app.services.trading.validation.readiness import ReadinessAssessment
+from app.services.trading.validation.readiness import (
+    ReadinessAssessment,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.utils import canonical_json, logger
 
 

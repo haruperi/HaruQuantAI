@@ -26,7 +26,7 @@ from app.services.strategy import (
 from app.utils import canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.data.evidence.market_context_contracts import (
+    from app.services.data import (
         MarketContextEvidence,
     )
     from app.services.risk.audit import RiskAuditChain

@@ -5,7 +5,9 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
 from app.services.trading.contracts import ExecutionReceipt, TradingError
-from app.services.trading.contracts.models import JsonValue
+from app.services.trading.contracts.models import (
+    JsonValue,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.utils import logger
 
 _RECEIPT_TEXT_FIELDS = (

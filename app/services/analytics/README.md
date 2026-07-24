@@ -397,7 +397,8 @@ non-finite values or inability to satisfy the point limit fails validation.
 
 #### `WF-ANLT-006` — Adapt Upstream Result
 
-**System workflows:** `SYS-WF-001`, `SYS-WF-002`, `SYS-WF-003`
+**System workflows:** `SYS-WF-001`, `SYS-WF-003`, and the later measurement
+stage of `SYS-WF-002` only after a complete versioned closed-trade ledger exists.
 **Input boundary:** versioned producer-owned result.
 **Output boundary:** internal canonical `TradingResult`.
 
@@ -405,6 +406,11 @@ non-finite values or inability to satisfy the point limit fails validation.
 currency/timestamps, or conflicting PnL fields fail closed with bounded details.
 Unsupported fields are never silently dropped; bounded source metadata is
 preserved in lineage.
+
+For `SYS-WF-002`, Analytics is not in the immediate order path. It does not
+consume an open/pending order, `ExecutionReceipt`, raw fill, or incomplete
+`TradeRecord`; the receiver-owned closed-ledger boundary in Section 1 remains
+mandatory.
 
 **Integration test:**
 `tests/analytics/integration/test_result_adapters.py::test_approved_sources_map_without_field_loss()`

@@ -1,6 +1,7 @@
 """Executable Optimization evidence usage example.
 
-Demonstrates assembling optimization evidence, final decisions, and report package generation.
+Demonstrates assembling optimization evidence, final decisions, and report
+package generation.
 """
 
 import sys
@@ -30,7 +31,8 @@ def example_evidence() -> None:
     # 2. Evidence assembly request
     req = evidence_request()
     print(
-        f"Is EvidenceAssemblyRequest instance: {isinstance(req, EvidenceAssemblyRequest)}"
+        "Is EvidenceAssemblyRequest instance: "
+        f"{isinstance(req, EvidenceAssemblyRequest)}"
     )
 
     # 3. Build optimization evidence

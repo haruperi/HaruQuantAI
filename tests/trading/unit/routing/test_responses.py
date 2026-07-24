@@ -1,7 +1,6 @@
 """Unit tests for conservative Trading authority response classification."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime
 
 from app.services.trading.routing.responses import classify_authority_response

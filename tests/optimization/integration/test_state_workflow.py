@@ -1,7 +1,6 @@
 """Integration test for Optimization checkpoint and result persistence."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.evidence import build_optimization_evidence
 from app.services.optimization.state import (
     load_search_checkpoint,

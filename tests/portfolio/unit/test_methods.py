@@ -1,7 +1,6 @@
 """Unit tests for approved Portfolio construction methods."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 from decimal import Decimal

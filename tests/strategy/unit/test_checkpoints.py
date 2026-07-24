@@ -1,7 +1,6 @@
 """Persisted Strategy checkpoint tests."""
 
 # ruff: noqa: PT018
-
 from pathlib import Path
 
 from app.services.strategy import (

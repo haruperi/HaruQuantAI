@@ -1,7 +1,6 @@
 """Producer README fixture-parity checks for Analytics inputs."""
 
 # ruff: noqa: INP001
-
 import json
 from pathlib import Path
 

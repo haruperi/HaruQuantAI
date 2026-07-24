@@ -1,6 +1,7 @@
 """Executable Optimization search usage example.
 
-Demonstrates candidate generation, grid search, random sampling, and bounded search execution.
+Demonstrates candidate generation, grid search, random sampling, and bounded
+search execution.
 """
 
 import sys
@@ -31,7 +32,8 @@ def example_search() -> None:
     # 1. Search method enum & request
     req = search_request()
     print(
-        f"Search Method: {SearchMethod.GRID.value}, max candidates: {req.max_candidates}"
+        f"Search Method: {SearchMethod.GRID.value}, "
+        f"max candidates: {req.max_candidates}"
     )
 
     # 2. Grid candidate iteration
@@ -61,7 +63,8 @@ def example_search() -> None:
     # 5. Run bounded search with adapter
     summary = run_bounded_search(req, FakeAdapter())
     print(
-        f"Bounded search ID: {summary.search_id}, best candidate: {summary.best_candidate_hash[:8]}..."
+        f"Bounded search ID: {summary.search_id}, "
+        f"best candidate: {summary.best_candidate_hash[:8]}..."
     )
 
     top_candidates = select_top_candidates(summary, 1)

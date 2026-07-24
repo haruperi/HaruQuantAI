@@ -1,7 +1,6 @@
 """Invocation-local lifecycle and fail-closed adapter runtime."""
 
 # ruff: noqa: BLE001, C901 - canonical public-boundary normalization.
-
 from __future__ import annotations
 
 import asyncio
@@ -9,6 +8,7 @@ import contextvars
 import functools
 import time
 from collections.abc import AsyncIterator, Mapping
+from dataclasses import replace
 from typing import Any, Literal, cast, override
 
 from app.services.brokers.adapter_runtime.errors import (
@@ -20,6 +20,7 @@ from app.services.brokers.adapter_runtime.errors import (
 from app.services.brokers.contracts.enums import (
     BrokerCapabilityId,
     BrokerConnectionState,
+    BrokerEnvironment,
     BrokerErrorCode,
 )
 from app.services.brokers.contracts.models import (
@@ -92,7 +93,20 @@ class _UnsupportedAdapterBase:
 
         self._config = config
         catalogue = get_broker_capability_catalogue()[config.broker_id]
-        self._capabilities = {item.capability: item for item in catalogue}
+        self._capabilities = {
+            item.capability: (
+                replace(
+                    item,
+                    availability="UNAVAILABLE",
+                    reason="Mutation capability is released only for demo environments",
+                )
+                if item.capability in self._MUTATION_OPERATIONS
+                and item.availability == "AVAILABLE"
+                and config.environment is not BrokerEnvironment.DEMO
+                else item
+            )
+            for item in catalogue
+        }
         self._state = BrokerConnectionState.DISCONNECTED
         self._session_generation = 0
         self._last_error: BrokerError | None = None
@@ -142,17 +156,12 @@ class _UnsupportedAdapterBase:
                     self, "_ENFORCE_DECLARED_AVAILABILITY"
                 )
                 local = object.__getattribute__(self, "_LOCAL_FAIL_SAFE_OPERATIONS")
-                mutations = object.__getattribute__(self, "_MUTATION_OPERATIONS")
                 capabilities = object.__getattribute__(self, "_capabilities")
                 declared = capabilities.get(operation)
                 if (
                     enforce
                     and operation not in local
-                    and (
-                        operation in mutations
-                        or declared is None
-                        or declared.availability == "UNAVAILABLE"
-                    )
+                    and (declared is None or declared.availability == "UNAVAILABLE")
                 ):
 
                     async def _blocked(

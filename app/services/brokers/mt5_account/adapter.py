@@ -1,7 +1,6 @@
 """Canonical MetaTrader 5 broker adapter."""
 
 # ruff: noqa: A002 - public protocol signatures are normative.
-
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import override

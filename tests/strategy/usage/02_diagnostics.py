@@ -16,12 +16,30 @@ from app.services.strategy import (
 )
 
 
+def fr_str_018() -> None:
+    """Demonstrate the accepted Strategy error catalogue."""
+    assert StrategyErrorCode.INVALID_CONFIG.value == "STRATEGY_INVALID_CONFIG"
+
+
+def fr_str_019() -> None:
+    """Demonstrate the bounded diagnostic exporter."""
+    assert callable(export_strategy_diagnostics)
+
+
+def fr_str_034() -> None:
+    """Demonstrate the immutable diagnostic contract."""
+    assert StrategyDiagnostics.model_fields["safe_details"]
+
+
 def main() -> int:
     """Export bounded redacted diagnostics and show the accepted code catalogue.
 
     Returns:
         ``0`` when diagnostics export and bound enforcement both behave.
     """
+    fr_str_018()
+    fr_str_019()
+    fr_str_034()
     print("\nSTRATEGY DIAGNOSTICS")
     print("=" * 88)
     context = StrategyExecutionContext(

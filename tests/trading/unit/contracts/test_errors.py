@@ -1,7 +1,6 @@
 """Unit tests for Trading errors and redaction."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.trading.contracts import (
     TradingError,

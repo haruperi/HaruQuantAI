@@ -1,7 +1,6 @@
 """Strategy reference and configuration validation tests."""
 
 # ruff: noqa: PT018
-
 from pathlib import Path
 
 import pytest

@@ -1,7 +1,6 @@
 """Unit tests for fail-closed Trading authority capability validation."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 

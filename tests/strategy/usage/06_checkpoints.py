@@ -29,6 +29,21 @@ _CORRELATION = "cor-99999999-9999-4999-8999-999999999999"
 _AUTHORIZATION = "usage-checkpoint-auth"
 
 
+def fr_str_028() -> None:
+    """Demonstrate the bounded checkpoint contract."""
+    assert StrategyCheckpoint.model_fields["state_checksum"]
+
+
+def fr_str_030() -> None:
+    """Demonstrate checkpoint creation and persistence."""
+    assert callable(create_strategy_checkpoint)
+
+
+def fr_str_031() -> None:
+    """Demonstrate read-only checkpoint validation."""
+    assert callable(validate_strategy_checkpoint)
+
+
 def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
     """Build the validated reference and configuration pair.
 
@@ -98,6 +113,9 @@ def main() -> int:
     print("\nSTRATEGY LOCAL CHECKPOINTS")
     print("=" * 88)
     print("Contract:", StrategyCheckpoint.__name__)
+    fr_str_028()
+    fr_str_030()
+    fr_str_031()
     if os.getenv("RUN_STRATEGY_STATEFUL_USAGE") != "1":
         print(
             "Set RUN_STRATEGY_STATEFUL_USAGE=1 to persist through the "

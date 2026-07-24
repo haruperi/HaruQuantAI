@@ -7,7 +7,6 @@ exercised.
 """
 
 # ruff: noqa: PT018
-
 from datetime import timedelta
 
 from app.services.strategy import (

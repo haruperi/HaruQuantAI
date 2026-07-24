@@ -1,7 +1,6 @@
 """Package-wide non-functional verification for Optimization."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 import ast

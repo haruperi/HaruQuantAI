@@ -1,7 +1,6 @@
 """Integration evidence for canonical Analytics report construction."""
 
 # ruff: noqa: INP001
-
 from app.utils import logger
 from tests.analytics._support import _report
 

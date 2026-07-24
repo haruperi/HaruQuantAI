@@ -17,11 +17,13 @@ from app.services.brokers.mt5_account import MT5BrokerAdapter
 from pydantic import SecretStr
 
 
-def _config() -> BrokerConnectionConfig:
-    """Return a bounded MT5 demo configuration."""
+def _config(
+    environment: BrokerEnvironment = BrokerEnvironment.DEMO,
+) -> BrokerConnectionConfig:
+    """Return a bounded MT5 configuration for one exact environment."""
     return BrokerConnectionConfig(
         broker_id=BrokerId.MT5,
-        environment=BrokerEnvironment.DEMO,
+        environment=environment,
         provider_enabled=True,
         connect_timeout_sec=1,
         request_timeout_sec=1,
@@ -63,17 +65,25 @@ def test_access_mode_cannot_reclassify_reads_or_mutations() -> None:
         _capability(BrokerCapabilityId.GET_QUOTE, "WRITE")
 
 
-def test_direct_mt5_construction_has_no_capability_injection_and_blocks_write() -> None:
-    """Direct construction derives policy and makes zero mutation calls."""
+def test_direct_mt5_demo_construction_uses_released_write_policy() -> None:
+    """Direct demo construction derives the evidence-backed write policy."""
     assert "capabilities" not in inspect.signature(MT5BrokerAdapter).parameters
     adapter = MT5BrokerAdapter(_config())
+    assert adapter._capabilities[BrokerCapabilityId.PLACE_ORDER].availability == (
+        "AVAILABLE"
+    )
+
+
+def test_direct_mt5_live_construction_blocks_write() -> None:
+    """A live adapter downgrades sandbox-only writes before provider access."""
+    adapter = MT5BrokerAdapter(_config(BrokerEnvironment.LIVE))
     request = BrokerOrderRequest(
         symbol="EURUSD",
         side="BUY",
         order_type="MARKET",
         quantity=Decimal("0.01"),
         quantity_unit="lots",
-        environment=BrokerEnvironment.DEMO,
+        environment=BrokerEnvironment.LIVE,
     )
     result = asyncio.run(adapter.place_order(request))
     assert not result.is_success

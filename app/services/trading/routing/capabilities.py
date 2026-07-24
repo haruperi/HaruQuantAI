@@ -4,7 +4,9 @@ from collections.abc import Mapping
 from decimal import Decimal, InvalidOperation
 
 from app.services.trading.contracts import OrderIntent, TradingError
-from app.services.trading.contracts.models import JsonValue
+from app.services.trading.contracts.models import (
+    JsonValue,  # noqa: TC001 - runtime annotation and model resolution
+)
 from app.utils import logger
 
 BROKER_OPERATION_TIMEOUT_SECONDS = Decimal(10)

@@ -1,8 +1,8 @@
 ﻿# Strategy
 
 > **Package:** `app/services/strategy`
-> **Status:** `Implemented`
-> **Last updated:** `2026-07-18`
+> **Status:** `Completed`
+> **Last updated:** `2026-07-24`
 
 > This README is the package's **single source of truth** for final requirements, structure, implementation sequence, workflows, public contracts, configuration, limits, progress, usage examples, and tests.
 > Update this file before changing Strategy code.
@@ -155,9 +155,9 @@ Data provides shared connection, locking, and migration execution infrastructure
 
 | Status  | State / Store                                                           | Read access (via contract)                                              | Migration definitions                 |
 | ------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------- |
-| Completed | Immutable strategy registry entries and lifecycle/provenance references | Trading, Simulation, Optimization, Portfolio, UI/API via exact registry resolution | `app/services/strategy/registry/migrations.py` |
-| Completed | Versioned parameter schemas and approved configuration hashes           | Trading, Simulation, Optimization, Portfolio via validated references              | `app/services/strategy/registry/migrations.py` |
-| Completed | Bounded strategy-local checkpoints and replay links                     | Simulation and Trading through checkpoint/replay contracts              | `app/services/strategy/registry/migrations.py` |
+| Completed | Immutable strategy registry entries and lifecycle/provenance references | Trading, Simulation, Optimization, Portfolio, UI/API via exact registry resolution | `app/services/strategy/migrations/definitions.py` |
+| Completed | Versioned parameter schemas and approved configuration hashes           | Trading, Simulation, Optimization, Portfolio via validated references              | `app/services/strategy/migrations/definitions.py` |
+| Completed | Bounded strategy-local checkpoints and replay links                     | Simulation and Trading through checkpoint/replay contracts              | `app/services/strategy/migrations/definitions.py` |
 
 No strategy source code, broker state, official positions, orders, fills, analytics reports, or secrets may be stored in these records.
 
@@ -192,6 +192,7 @@ flowchart TD
     STR --> EVT[[event: Stateful event decisions]]
     STR --> SIG[[signals: Concrete signal execution boundary]]
     STR --> EVAL[[evaluators: The strategy signal library]]
+    STR --> MIG[[migrations: Non-feature persistence support]]
 
     CON --> CONF[enums / policy / manifest / references / requests / execution / signals]
     CON --> OUT[outcomes.py: Structured outcomes]
@@ -211,6 +212,7 @@ flowchart TD
     SIG --> SP[protocol.py: SignalEvaluator contract]
     SIG --> SB[boundary.py: Hash-bound atomic execution]
     EVAL --> CE[Strategy modules: One file per strategy]
+    MIG --> MD[definitions.py: Strategy-owned schema definitions]
 ```
 
 ---
@@ -240,6 +242,7 @@ app/services/strategy/
 ├── README.md
 ├── contracts/                          # Feature: versioned strategy contracts
 │   ├── __init__.py
+│   ├── README.md
 │   ├── _base.py                        # Private validation, coercion, base model
 │   ├── enums.py                        # Environment, timing, lifecycle enums
 │   ├── policy.py                       # Explicit host validation policy
@@ -251,12 +254,13 @@ app/services/strategy/
 │   └── outcomes.py                     # Structured success/error outcomes
 ├── diagnostics/                        # Feature: deterministic safe diagnostics
 │   ├── __init__.py
+│   ├── README.md
 │   ├── models.py                       # Structured diagnostics contract
 │   ├── errors.py                       # Reduced accepted error catalogue
 │   └── export.py                       # Bounded redaction and diagnostics export
 ├── registry/                           # Feature: immutable registry and configuration
 │   ├── __init__.py
-│   ├── migrations.py                   # Strategy-owned migration definitions
+│   ├── README.md
 │   ├── _mutations.py                   # Private mutation load/publish mechanics
 │   ├── resolution.py                   # Resolve exactly one approved reference
 │   ├── configuration.py                # Validate declarative config and hash it
@@ -265,29 +269,36 @@ app/services/strategy/
 │   └── parameters.py                   # Record one immutable parameter version
 ├── intents/                            # Feature: canonical strategy proposals
 │   ├── __init__.py
+│   ├── README.md
 │   ├── intent.py                       # TradeIntent v1 contract
 │   └── builder.py                      # Deterministic identity, sequence, lineage
 ├── replay/                             # Feature: deterministic replay identity (pure)
 │   ├── __init__.py
+│   ├── README.md
 │   ├── models.py                       # Replay manifest contract
 │   └── manifests.py                    # Replay manifest creation
 ├── checkpoints/                        # Feature: bounded persisted local state
 │   ├── __init__.py
+│   ├── README.md
 │   ├── models.py                       # Checkpoint contract
 │   └── store.py                        # Bounded checkpoint create/validate
 ├── vectorized/                         # Feature: atomic vectorized evaluation
 │   ├── __init__.py
+│   ├── README.md
 │   └── runner.py                       # Readiness, no-lookahead, decision, intents
 ├── event/                              # Feature: stateful event evaluation
 │   ├── __init__.py
+│   ├── README.md
 │   └── runner.py                       # Deterministic typed hook invocation
 ├── signals/                            # Feature: concrete signal execution boundary
 │   ├── __init__.py
+│   ├── README.md
 │   ├── protocol.py                     # SignalEvaluator structural contract
 │   ├── _mechanics.py                   # Private deterministic signal mechanics
 │   └── boundary.py                     # Hash-bound atomic evaluation boundary
-└── evaluators/                         # Feature: the strategy signal library
+├── evaluators/                         # Feature: the strategy signal library
     ├── __init__.py
+    ├── README.md
     ├── naive_ma_trend.py               # MA crossover and trend-filter signals
     ├── decomposing_trade.py            # Recovered RSI crossing signals
     ├── harriet_hedging.py              # Point-in-time MTF structure signals
@@ -295,6 +306,10 @@ app/services/strategy/
     ├── random_walk.py                  # Flat-state basket trigger signals
     ├── sqx_breakout_atr_trailing.py    # Channel breakout and ATR facts
     └── white_fairy.py                  # Recovered RSI crossing signals
+└── migrations/                         # Documented non-feature persistence support
+    ├── __init__.py
+    ├── README.md
+    └── definitions.py                  # Strategy-owned schema definitions
 ```
 
 Usage and test artifacts live outside the production package:
@@ -570,10 +585,10 @@ untrusted boundary payload
 | Completed | `FR-STR-011` | The system shall fix environment, decision timestamp, timing policy, seed, trace identifiers, dependency status, and immutable snapshot references for one evaluation.                   | `StrategyExecutionContext`       | None         | None   | **Usage:** `tests/strategy/usage/01_contracts.py`**Unit:** `tests/strategy/unit/test_models.py::test_execution_context_rejects_naive_time()`             |
 | Completed | `FR-STR-012` | The system shall represent one typed event without granting mutable access to official external state.                                                                                   | `StrategyEvent`                  | None         | None   | **Usage:** `tests/strategy/usage/01_contracts.py`**Unit:** `tests/strategy/unit/test_models.py::test_strategy_event_payload_is_immutable()`                 |
 | Completed | `FR-STR-013` | The system shall represent a neutral decision or proposed actions, rationale references, diagnostics facts, and candidate local-state update.                                            | `StrategyDecision`               | None         | None   | **Usage:** `tests/strategy/usage/01_contracts.py`**Unit:** `tests/strategy/unit/test_models.py::test_neutral_decision_contains_no_intent()`              |
-| Completed | `FR-STR-014` | The system shall return ordered intents, diagnostics, replay metadata, and an optional validated local-state update as one atomic result.                                                | `StrategyExecutionResult`        | None         | None   | **Usage:** `tests/strategy/usage/01_contracts.py`**Unit:** `tests/strategy/unit/test_models.py::test_execution_result_rejects_partial_failed_batch()`     |
+| Completed | `FR-STR-014` | The system shall return exact `TradeIntent`, `StrategyDiagnostics`, and `StrategyReplayManifest` contracts plus an optional recursively immutable validated local-state update as one atomic ordered result; serialization shall reconstruct those exact types. | `StrategyExecutionResult` | None | Validation error | **Usage:** `tests/strategy/usage/01_contracts.py::fr_str_014()` **Unit:** `tests/strategy/unit/test_execution_contracts.py` |
 | Completed | `FR-STR-035` | The system shall represent an immutable explicit policy version, approved module roots, and positive configuration payload, nesting, string, and collection limits with no hidden defaults. | `StrategyValidationPolicy` | None | None | **Usage:** `tests/strategy/usage/01_contracts.py`**Unit:** `tests/strategy/unit/test_models.py::test_validation_policy_requires_explicit_positive_bounds()` |
-| Completed | `FR-STR-038` | The system shall represent each recovered concrete signal as an immutable deterministic identity, strategy/version, symbol, UTC timestamp, named signal, optional side, active state, lineage, and bounded facts. | `StrategySignal` | None | None | **Usage:** `tests/strategy/usage/10_strategy_library.py`**Unit:** `tests/strategy/unit/test_naive_ma_trend_evaluator.py::test_naive_ma_signals_are_deterministic()` |
-| Completed | `FR-STR-039` | The system shall provide immutable point-in-time signal evidence containing one primary market dataset, named related datasets, provenance-bound feature values, explicit point size, and active owned-position tags without mutable provider objects. | `StrategySignalEvidence` | None | None | **Usage:** `tests/strategy/usage/10_strategy_library.py`**Unit:** `tests/strategy/unit/test_market_structure_evaluator.py::test_feature_evidence_must_be_provenance_complete()` |
+| Completed | `FR-STR-038` | The system shall represent each recovered concrete signal as an immutable deterministic identity, strategy/version, symbol, UTC timestamp, named signal, optional side, active state, lineage, and bounded facts. | `StrategySignal` | None | None | **Usage:** `tests/strategy/usage/01_contracts.py::fr_str_038()` **Unit:** `tests/strategy/unit/test_naive_ma_trend_evaluator.py::test_naive_ma_signals_are_deterministic()` |
+| Completed | `FR-STR-039` | The system shall provide immutable point-in-time signal evidence containing one primary market dataset, named related datasets, provenance-bound feature values, explicit point size, and active owned-position tags without mutable provider objects. | `StrategySignalEvidence` | None | None | **Usage:** `tests/strategy/usage/01_contracts.py::fr_str_039()` **Unit:** `tests/strategy/unit/test_market_structure_evaluator.py::test_feature_evidence_must_be_provenance_complete()` |
 
 `StrategyManifest` required core fields are: `contract_version`, `schema_id`, `strategy_id`, `strategy_version`, `module_path`, `owner_ref`, `interface_version`, `config_schema_version`, `required_data`, `required_indicators`, `timing_policy`, `permitted_environments`, `concurrency_model="SYNC_BLOCKING"`, `source_hash`, `artifact_hash`, `dependency_hash`, and `provenance_refs`. Optional applicability sections cover local state, recovery depth, maximum intent frequency, spread/data-gap suppression, corporate-action price mode, halt/closure behavior, execution assumptions, and resource-budget declarations. Optional declarations remain advisory to their owning downstream domains.
 
@@ -682,14 +697,13 @@ The three conditional codes apply only when the selected manifest/lifecycle requ
 
 | Status  | File              | Responsibility                                                                   | Key exports                                                                               | Dependencies                                                                                                                                                                                    |
 | ------- | ----------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `migrations.py` | Define ordered Strategy-owned registry, configuration, checkpoint, mutation-result, and publication-state migrations for Data's shared runner. | None; `_strategy_migration_steps` and `_ensure_strategy_storage` are private domain-internal helpers | **Standard library:** None**Required third-party:** None**Local:** Data public migration contracts |
 | Completed | `_mutations.py` | Provide private mutation load, policy load, publication, and identity mechanics. | None | **Standard library:** `hashlib` **Required third-party:** None **Local:** contracts; Data audit/persistence |
-| Completed | `registration.py` | Register one unique immutable strategy version. | `register_strategy_version` | **Standard library:** `hashlib` **Required third-party:** None **Local:** contracts/outcomes; diagnostics; `_mutations.py`; `migrations.py` |
+| Completed | `registration.py` | Register one unique immutable strategy version. | `register_strategy_version` | **Standard library:** `hashlib` **Required third-party:** None **Local:** contracts/outcomes; diagnostics; `_mutations.py`; migrations support |
 | Completed | `parameters.py` | Record one immutable parameter version as a new configuration hash. | `update_strategy_parameters` | **Standard library:** None **Required third-party:** None **Local:** contracts/outcomes; diagnostics; `_mutations.py`; `resolution.py`; `configuration.py` |
-| Completed | `listing.py` | Return immutable registry entries in deterministic order. | `list_strategy_versions` | **Standard library:** None **Required third-party:** None **Local:** contracts/outcomes; diagnostics; `migrations.py` |
-| Completed | `resolution.py` | Resolve exactly one approved immutable version. | `validate_strategy_ref` | **Standard library:** None **Required third-party:** None **Local:** contracts/outcomes; diagnostics; `migrations.py` |
+| Completed | `listing.py` | Return immutable registry entries in deterministic order without hidden migration. | `list_strategy_versions` | **Standard library:** None **Required third-party:** None **Local:** contracts/outcomes; diagnostics; Data public persistence contracts |
+| Completed | `resolution.py` | Resolve exactly one approved immutable version without hidden migration. | `validate_strategy_ref` | **Standard library:** None **Required third-party:** None **Local:** contracts/outcomes; diagnostics; Data public persistence contracts |
 | Completed | `configuration.py` | Validate declarative configuration and derive its canonical hash. | `validate_strategy_config` | **Standard library:** `hashlib` **Required third-party:** None **Local:** contracts/outcomes; diagnostics |
-| Completed | `__init__.py`   | Expose the registry API.                                                         | Five functions above                                                                      | **Standard library:** None**Required third-party:** None**Local:** Approved exports from `catalog.py`, `validation.py`                                                    |
+| Completed | `__init__.py`   | Expose the registry API.                                                         | Five functions above                                                                      | **Standard library:** None**Required third-party:** None**Local:** Approved exports from `configuration.py`, `listing.py`, `parameters.py`, `registration.py`, and `resolution.py` |
 
 ### Configuration and Limits Manifest
 
@@ -712,6 +726,19 @@ The three conditional codes apply only when the selected manifest/lifecycle requ
 | Completed | `FR-STR-024` | The system shall validate declarative configuration, explicit defaults, unknown fields, types, enums, bounds, and resource limits, producing a canonical hash before execution. | `validate_strategy_config(ref: ValidatedStrategyRef, config: StrategyConfig) -> StrategyOutcome[ValidatedStrategyConfig]`            | None                                                               | None; returns`STRATEGY_INVALID_CONFIG`, `STRATEGY_SCHEMA_VALIDATION_FAILED`, or resource error | **Usage:** `tests/strategy/usage/03_registry.py`**Unit:** `tests/strategy/unit/test_validation.py::test_config_rejects_executable_injection()`  |
 
 **Implementation notes:** Reuse current JSON configuration validation and bundled-strategy discovery only as migration input. Replace mutable/bundled class lookup with versioned immutable entries; remove physical deletion, archive import, arbitrary path loading, and in-place approval mutation.
+
+The documented non-feature support directory
+`app/services/strategy/migrations/` owns Strategy's private migration
+definitions. Mutating registry and checkpoint entry points initialize the
+schema through Data's public migration runner; registry and checkpoint reads
+never invoke migration execution.
+
+#### `migrations/` — Non-feature persistence support
+
+| Status | File | Responsibility | Key exports | Dependencies |
+| --- | --- | --- | --- | --- |
+| Completed | `definitions.py` | Define the ordered Strategy-owned registry, configuration, checkpoint, mutation-result, and publication-state schema for Data's shared runner. | None; `_strategy_migration_steps` and `_ensure_strategy_storage` are private domain-internal helpers | **Standard library:** None **Required third-party:** None **Local:** Data public migration contracts |
+| Completed | `__init__.py` | Mark the directory as private package support without adding a public domain export. | None | None |
 
 ---
 
@@ -895,6 +922,8 @@ No feature-specific numeric default is approved. Precision and UTC policies come
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 | --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-STR-047` | Execute one concrete signal evaluator only when registry identity/hashes and point-in-time evidence match, returning an atomic ordered signal tuple or a structured failure. | `evaluate_strategy_signals(ref: ValidatedStrategyRef, config: ValidatedStrategyConfig, evidence: StrategySignalEvidence, indicators: tuple[IndicatorResult, ...], context: StrategyExecutionContext, evaluator: SignalEvaluator) -> StrategyOutcome[tuple[StrategySignal, ...]]` | None | None; returns hash/lookahead/data/indicator/config/internal error | **Usage:** `tests/strategy/usage/09_signals.py::fr_str_047()` **Integration:** `tests/strategy/integration/test_concrete_signal_workflow.py` |
+| Completed | `FR-STR-048` | The system shall expose the structural contract every concrete signal evaluator satisfies, comprising immutable identity/hash attributes and one deterministic `evaluate_signals` method. | `SignalEvaluator` | None | None | **Usage:** `tests/strategy/usage/09_signals.py::fr_str_048()` **Unit:** `tests/strategy/unit/test_public_api.py::test_feature_exports_are_exact()` |
 
 ---
 
@@ -934,12 +963,10 @@ No feature-specific numeric default is approved. Precision and UTC policies come
 | Completed | `FR-STR-040` | Preserve Naive MA Trend long/short crossover entries and exits with the configured slow/trend filter using supplied SMA results only. | `NaiveMATrendEvaluator` | None | None; boundary returns config/indicator error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_naive_ma_trend_evaluator.py` |
 | Completed | `FR-STR-041` | Preserve Decomposing Trade long-entry, short-entry, oppose-buy, and oppose-sell RSI threshold crossings using supplied RSI results only. | `DecomposingTradeEvaluator` | None | None; boundary returns config/indicator error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_decomposing_trade_evaluator.py` |
 | Completed | `FR-STR-042` | Preserve Harriet Hedging higher-low/lower-high confirmation across explicit lower and higher timeframe datasets with point-in-time higher-bar availability. | `HarrietHedgingEvaluator` | None | None; boundary returns data/config error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_harriet_hedging_evaluator.py` |
-| Partial | `FR-STR-043` | Preserve Market Structure bullish/bearish break rules using exactly eight externally supplied ZigZag extremes whose reference, hash, and availability are explicit. | `MarketStructureEvaluator` | None | None; boundary returns feature/data error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_market_structure_evaluator.py` |
-| Partial | `FR-STR-044` | Preserve RandomWalk's non-random flat-state long/short basket triggers using configured magic-number ownership tags. | `RandomWalkEvaluator` | None | None; boundary returns config error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_random_walk_evaluator.py` |
+| Completed | `FR-STR-043` | Preserve Market Structure bullish/bearish break rules using exactly eight finite values from one official causal ZigZag `IndicatorResult` whose manifest checksum and row availability are explicit. | `MarketStructureEvaluator` | None | None; boundary returns indicator/data error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_market_structure_evaluator.py` |
+| Completed | `FR-STR-044` | Preserve RandomWalk's non-random flat-state long/short basket triggers using configured magic-number ownership tags derived only from fresh Data-owned account-position evidence. | `RandomWalkEvaluator` | Read-only demo account snapshot in usage evidence only | None; boundary returns config error and usage fails closed without verified demo evidence | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_random_walk_evaluator.py` |
 | Completed | `FR-STR-045` | Preserve SQX prior-channel opening breakout signals and attach supplied ATR stop, trailing, and activation distances as non-executable facts. | `SQXBreakoutAtrTrailingEvaluator` | None | None; boundary returns config/indicator error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_sqx_breakout_atr_trailing_evaluator.py` |
 | Completed | `FR-STR-046` | Preserve White Fairy long/short RSI entry crossings using supplied RSI results only. | `WhiteFairyEvaluator` | None | None; boundary returns config/indicator error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_white_fairy_evaluator.py` |
-| Completed | `FR-STR-048` | The system shall expose the structural contract every concrete signal evaluator satisfies, comprising immutable identity/hash attributes and one deterministic `evaluate_signals` method. | `SignalEvaluator` | None | None | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Unit:** `tests/strategy/unit/test_public_api.py::test_feature_exports_are_exact()` |
-| Completed | `FR-STR-047` | Execute one concrete signal evaluator only when registry identity/hashes and point-in-time evidence match, returning an atomic ordered signal tuple or a structured failure. | `evaluate_strategy_signals(ref: ValidatedStrategyRef, config: ValidatedStrategyConfig, evidence: StrategySignalEvidence, indicators: tuple[IndicatorResult, ...], context: StrategyExecutionContext, evaluator: SignalEvaluator) -> StrategyOutcome[tuple[StrategySignal, ...]]` | None | None; returns hash/lookahead/data/indicator/config/internal error | **Usage:** `tests/strategy/usage/10_strategy_library.py` **Integration:** `tests/strategy/integration/test_concrete_signal_workflow.py` |
 
 **Rules:**
 
@@ -978,7 +1005,7 @@ No feature-specific numeric default is approved. Precision and UTC policies come
 | Completed | `NFR-STR-009` | Compatibility   | Public contracts shall remain backward compatible within a major version; breaking changes require version bumps, migration guidance, and compatibility tests.   | `tests/strategy/integration/test_contract_compatibility.py` |
 | Completed | `NFR-STR-010` | Maintainability | Public Python signatures shall be typed; modules/classes/functions shall have Google-style docstrings; private helpers shall begin with`_`.                    | Ruff/mypy/API review             |
 | Completed | `NFR-STR-011` | Testing         | Every public requirement shall have a unit test and usage example; collaborative workflows shall have integration tests; package coverage shall be at least 80%. Resource bounds are proven near their limit, not merely declared. | Traceability and coverage audit; `tests/strategy/unit/test_large_input.py` |
-| Completed | `NFR-STR-012` | Performance     | Reference hardware, OS, Python/dependency versions, dataset, strategy type, method, and workload shall be recorded before numerical budgets become CI gates.     | Approved benchmark report        |
+| Completed | `NFR-STR-012` | Performance     | Reference hardware, OS, Python/dependency versions, dataset, strategy type, method, and workload shall be recorded before numerical budgets become CI gates.     | `docs/benchmarks/strategy_baseline.md`; no numerical performance budget is a CI gate |
 
 ### Package public API
 
@@ -1093,60 +1120,63 @@ During iterative implementation, run only the test file associated with the chan
 - **Property/golden:** No-lookahead, deterministic identity, event ordering, canonical hashing, replay, checkpoint integrity, and decimal tolerance.
 - **Security:** Import side effects, raw-code rejection, config injection, secret redaction, oversized structures, and prohibited access.
 
-There are exactly eight numbered usage programs — one per feature. Each defines
+There are exactly ten numbered usage programs — one per feature. Each defines
 `main()`, ends with an `if __name__ == "__main__"` guard, is excluded from pytest
 collection, and is verified by direct Python execution. Exit code `3` means the
 real connection or receiver-owned evidence is unavailable, never that synthetic
 evidence was substituted.
 
-`08_strategy_library.py` is the single usage program for the whole strategy
+`10_strategy_library.py` is the single usage program for the whole strategy
 library; each strategy is one `example_NN_*` function inside it, not a separate
-program. Programs `06`, `07`, and `08` request real MT5 data through the Data
-package. `03_registry.py` and the checkpoint half of `05_replay.py` additionally
+program. Programs `07`, `08`, `09`, and `10` request real MT5 data through the Data
+package. `03_registry.py` and `06_checkpoints.py` additionally
 require `RUN_STRATEGY_STATEFUL_USAGE=1` because they open the configured
-Data-owned store; the replay-manifest half is pure and always runs.
+Data-owned store; `05_replay.py` is pure and always runs.
 
-Within `08_strategy_library.py`, the Market Structure and RandomWalk examples
-fail closed until an exported real ZigZag-evidence provider and an exported
-Data-owned account-position-tag source, respectively, are available. Harriet
-Hedging likewise fails closed when the provider cannot supply higher-timeframe
-bars whose availability predates the lower-timeframe decision bar. The number of
-skipped checks therefore depends on the environment and on live MT5 availability.
+Within `10_strategy_library.py`, Market Structure calculates the public causal
+`zigzag` indicator from real Data-owned market evidence and fails closed until
+eight confirmed pivots exist. RandomWalk reads a fresh MT5 demo account snapshot
+through Data and derives ownership tags only from the provider-backed
+`AccountPosition.ownership_ref`; it fails closed unless the environment is
+`dev`/`test`, the configured server identifies a demo target, and credentials
+are available. Harriet Hedging likewise fails closed when the provider cannot
+supply higher-timeframe bars whose closing-time availability does not follow the
+lower-timeframe evidence availability. Provider retrieval time remains separate
+dataset provenance and does not rewrite historical record availability.
 
 ### Package completion checklist
 
-- [X] The actual package tree matches Section 2. `app/services/strategy/__init__.py:62`
-- [X] Module sections and files remain in dependency/implementation order. `app/services/strategy/contracts/models.py:239`
-- [X] Every module folder represents one coherent approved capability. `app/services/strategy/README.md:812`
-- [X] Every file has one focused responsibility. `app/services/strategy/registry/catalog.py:42`
-- [X] Every functional and non-functional requirement is `Completed` with evidence, except `FR-STR-043` and `FR-STR-044`, which are `Partial` pending exported real ZigZag and position-tag providers. `tests/strategy/unit/test_usage_coverage.py:22`
-- [X] Every workflow is `Completed` with its integration test passing. `tests/strategy/integration/test_vectorized_workflow.py:84`
+- [X] The actual package tree matches Section 2. `tests/strategy/unit/test_usage_coverage.py:125`
+- [X] Module sections and files remain in dependency/implementation order. `app/services/strategy/contracts/execution.py:424`
+- [X] Every module folder represents one coherent approved capability. `tests/strategy/unit/test_usage_coverage.py:125`
+- [X] Every file has one focused responsibility. `tests/strategy/unit/test_usage_coverage.py:58`
+- [X] Every functional and non-functional requirement is `Completed` with evidence. `tests/strategy/usage/10_strategy_library.py:774`
+- [X] Every workflow is `Completed` with its integration test passing. `tests/system/integration/test_research_to_strategy.py:1`
 - [X] Every package and feature export matches the documented API exactly. `tests/strategy/unit/test_public_api.py:64`
 - [X] Owned and consumed contracts match `docs/PROJECT.md` names, versions, and owners. `tests/strategy/integration/test_contract_compatibility.py:75`
-- [X] Strategy-owned registry, configuration, checkpoint, and migration state follows the system data-ownership rule. `app/services/strategy/registry/migrations.py:48`
-- [X] Every dependency is documented in standard-library, third-party, local order. `app/services/strategy/registry/catalog.py:3`
-- [X] Every public symbol has exactly one functional requirement, usage example, and unit test. `tests/strategy/unit/test_usage_coverage.py:22`
-- [X] Every usage program is a standalone `main()` program behind a `__main__` guard, one per feature. `tests/strategy/unit/test_usage_coverage.py:37`
+- [X] Strategy-owned registry, configuration, checkpoint, and migration state follows the system data-ownership rule. `app/services/strategy/migrations/definitions.py:48`
+- [X] Every dependency is documented in standard-library, third-party, local order. `tests/strategy/unit/test_import_security.py:9`
+- [X] Every public symbol has exactly one functional requirement, usage example, and unit test. `tests/strategy/unit/test_usage_coverage.py:43`
+- [X] Every usage program is a standalone `main()` program behind a `__main__` guard, one per feature. `tests/strategy/unit/test_usage_coverage.py:105`
 - [X] No raw provider object, DataFrame, DB session, socket, or exception crosses the public boundary. `tests/strategy/integration/test_registration_workflow.py:70`
 - [X] No arbitrary code, secret, network/filesystem/process access, broker mutation, or official state mutation is possible. `tests/strategy/unit/test_import_security.py:9`
-- [X] No removed, rejected, or excluded capability appears in the public API. `tests/strategy/unit/test_public_api.py:7`
+- [X] No removed, rejected, or excluded capability appears in the public API. `tests/strategy/unit/test_public_api.py:9`
 - [X] No hidden fallback or guessed default remains at a governed boundary. `tests/strategy/unit/test_catalog.py:100`
 - [X] Every retained V1 behavior has a tested final destination or an explicit migration decision. `tests/strategy/integration/test_registration_workflow.py:17`
 - [X] No open decision remains in this specification.
-- [X] Ruff, format, prescribed mypy, targeted tests, usage tests, integration tests, and 80% coverage pass. `app/services/strategy/contracts/models.py:1`
+- [X] Ruff, format, prescribed mypy, targeted tests, usage tests, integration tests, and 80% coverage pass. `tests/strategy/integration/test_usage_scripts.py:27`
 
-Current evidence is `Implemented`. The domain is ten features, ten module
-folders, and ten usage programs. The suite collects 107 cases: 101 pass and 6
-standalone-program checks skip when approved real external evidence is
-unavailable (`03_registry.py` and `06_checkpoints.py` require
-`RUN_STRATEGY_STATEFUL_USAGE=1`; `07`, `08`, `09`, and `10` require a live MT5
-connection). The skip count is environment-dependent. Domain coverage measured
-with `--cov-reset --cov=app/services/strategy` is 82.46%. `ruff check` and
-`mypy` report zero findings for `app/services/strategy` and `tests/strategy`.
-Forty-six of the 48 requirements are `Completed`; `FR-STR-043` and `FR-STR-044`
-remain `Partial` because no exported real ZigZag-evidence provider or Data-owned
-position-tag source exists yet, and both fail closed rather than substituting
-synthetic evidence.
+Current evidence is `Completed`. The domain has ten registered features, ten
+feature module folders, and ten usage programs. The complete Strategy suite
+passes 113 cases with 82.04% branch-aware coverage; three isolated subprocess
+checks skip when their real provider prerequisites are unavailable, while direct
+development execution and the Strategy Signal Library's verified MT5 demo run
+pass all seven evaluators. Ruff lint, Ruff format verification, and prescribed
+mypy pass for the complete domain. The public causal ZigZag provider and the
+provider-derived Data-owned position ownership path pass deterministic and real
+non-production validation.
+`NFR-STR-012` is completed by the non-gating baseline in
+`docs/benchmarks/strategy_baseline.md`.
 
 ---
 
@@ -1174,7 +1204,11 @@ This keeps requirements, dependency order, implementation, usage examples, tests
 
 ## Appendix P — Provisional Component Requirements (roadmap-promoted)
 
-These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-STR-NNN` authorizes establishment of the named package seam under `app/services/strategy/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-STR-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
+These historical component identifiers are defined canonically by the table
+below; they do not depend on an external roadmap file. Each `P-STR-NNN`
+authorizes establishment of the named package seam under
+`app/services/strategy/` and hosts the same-named module and its `FR-STR-*`
+behavior defined in Section 4.
 
 > **Implementation-order precedence:** The `First phase` column authorizes *seam establishment* (package directory, typed public port, `__init__`, and error/DTO surface) only; it does not define the code-completion sequence and does not override dependency order. The authoritative implementation order for full `FR-STR-*` behavior is the dependency order in Section 2 and the module dependency diagram: `contracts → diagnostics → registry → intents → replay → checkpoints → vectorized → event → signals → evaluators`. A seam may be established in its listed phase, but its dependent `FR-STR-*` behavior is completed only after all upstream features it consumes are complete.
 

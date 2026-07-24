@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.2.4
+
+**Release date:** 2026-07-24
+
+### Complete Strategy domain
+
+The Strategy domain now exposes ten focused feature modules with deterministic contracts, governed workflows, immutable proposal boundaries, and standalone usage evidence.
+
+#### Added (10)
+
+- `FEAT-STR-01` Versioned Strategy Contracts.
+- `FEAT-STR-02` Deterministic Safe Diagnostics.
+- `FEAT-STR-03` Immutable Registry and Configuration.
+- `FEAT-STR-04` Canonical TradeIntent Proposals.
+- `FEAT-STR-05` Deterministic Replay Manifests.
+- `FEAT-STR-06` Bounded Persisted Local State.
+- `FEAT-STR-07` Atomic Vectorized Evaluation.
+- `FEAT-STR-08` Stateful Event Evaluation.
+- `FEAT-STR-09` Concrete Signal Execution Boundary.
+- `FEAT-STR-10` Strategy Signal Library.
+
 ## 2.2.3
 
 **Release date:** 2026-07-24

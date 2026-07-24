@@ -12,7 +12,7 @@
 > migration are complete; production consumers outside this domain use only the
 > documented `app.services.data` package-root boundary. Specification parity,
 > standalone usage evidence, and the approved MT5 demo-provider validation pass.
-> **Last updated:** `2026-07-23`
+> **Last updated:** `2026-07-24`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -113,6 +113,11 @@ Contract definitions must match the name, version, and owner recorded in
 `start`/`end`, per-record or dataset `available_at`, `record_count`,
 `DataQualityReport`, source/provenance/license metadata, cache status, workflow
 context, and precision policy. Records never contain raw provider objects.
+
+For broker historical bars, each record's `available_at` is its provider-reported
+closing timestamp. `RawSourceBatch.retrieved_at` and dataset-level `available_at`
+retain the later retrieval/assembly instant, so point-in-time consumers can test
+record causality without erasing when the dataset was fetched.
 
 `AccountStateSnapshot v1` contains: `contract_version="v1"`,
 `schema_id="data.account_state_snapshot.v1"`, account identifier,
@@ -1360,7 +1365,7 @@ See the authoritative current production-file inventory at the start of Section 
 | Completed | `FR-DATA-025` | Register a source descriptor and lazy factory atomically, reject duplicate/conflicting declarations, and perform no I/O during registration/import. | `register_source(descriptor: SourceDescriptor, factory: SourceFactory) -> None` | Local state mutation | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_025()`<br>**Unit:** `tests/data/unit/test_source_registry.py::test_registry_lazy_resolution()` |
 | Completed | `FR-DATA-026` | Validate requested and explicit fallback sources in order against capability, readiness, license, context, timeout/rate, and breaker state and record every attempt. | `evaluate_source_policy(request: MarketDataRequest) -> SourcePlan` | Read-only | `DataError[LICENSE_RESTRICTION|SOURCE_UNAVAILABLE|CIRCUIT_BREAKER_OPEN]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_026()`<br>**Unit:** `tests/data/unit/test_source_policy.py::test_evaluate_source_policy_unregistered()` |
 | Completed | `FR-DATA-027` | Change readiness only from a complete authenticated evidence package, record an audit event, and permit immediate reversible demotion. | `promote_source(request: SourcePromotionRequest, auth: AuthContext) -> SourceDescriptor` | Persistence write; Event publication | `DataError[PERMISSION_DENIED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_027()`<br>**Unit:** `tests/data/unit/test_source_policy.py::test_promote_source_production_missing_evidence()` |
-| Completed | `FR-DATA-028` | Return a fresh normalized `AccountStateSnapshot v1` from read-only Brokers `BrokerAdapter` account reads without exposing credentials/provider objects, preserving each supplied position `ownership_ref` exactly. | `get_account_state_snapshot(request: AccountSnapshotRequest, adapter: BrokerAdapter) -> AccountStateSnapshot` | External API call (read-only, via Brokers) | `DataError[SOURCE_UNAVAILABLE|STALE_EVIDENCE|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/14_evidence.py::fr_data_028()`<br>**Unit:** `tests/data/unit/test_account_state.py` |
+| Completed | `FR-DATA-028` | Return a fresh normalized `AccountStateSnapshot v1` from bounded complete read-only Brokers account reads without exposing provider objects, preserving each supplied position `ownership_ref`. Exact account-currency `free_margin` supplies required available-balance evidence when the provider balance tuple omits it; truncated exposure pages fail closed. | `get_account_state_snapshot(request: AccountSnapshotRequest, adapter: BrokerAdapter) -> AccountStateSnapshot` | External API call (read-only, via Brokers) | `DataError[SOURCE_UNAVAILABLE|STALE_EVIDENCE|VALIDATION_FAILED|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/14_evidence.py::fr_data_028()`<br>**Unit:** `tests/data/unit/test_account_state.py` |
 | Removed | `FR-DATA-029` | *(Channel issuance is outside Data; Trading obtains mutation capability directly from Brokers' `BrokerAdapter`.)* | — | None | — | — |
 | Completed | `FR-DATA-101` | Compose and register the descriptor and lazy factory for every configured source — local artifact sources at `production` readiness and enabled provider facades at `staging` — dispatching on source kind rather than accepting a single hardcoded provider. Credential-free Binance Spot, Dukascopy, and Yahoo public reads compose without account secrets; an unconfigured identifier fails closed. | `ensure_source(source_id: str, request_id: str) -> None` | Local state mutation | `DataError[UNSUPPORTED_SOURCE|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_101()`<br>**Unit:** `tests/data/unit/test_source_composition.py::test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile()`<br>**Evidence:** `app/services/data/sources/composition.py` |
 | Completed | `FR-DATA-102` | Report which source identifiers the current configuration can compose so callers and operators discover valid `source_id` values without trial and error. | `list_composable_sources() -> tuple[str, ...]` | Read-only | None | **Usage:** `tests/data/usage/10_sources.py::fr_data_102()`<br>**Unit:** `tests/data/unit/test_historical_access.py`<br>**Evidence:** `app/services/data/sources/composition.py:447` |
@@ -1426,6 +1431,7 @@ See the authoritative current production-file inventory at the start of Section 
 | Completed | `SPREAD_MAX_LIMIT` | `int` | `250000` | Yes | historical/API | Caller supplies a positive limit; excess returns `LIMIT_EXCEEDED`. |
 | Completed | `SYMBOL_LIST_DEFAULT_LIMIT` / `SYMBOL_LIST_MAX_LIMIT` | `int` | `1000` / `10000` | Yes | `discover_symbols` | Enforces deterministic bounded pagination. |
 | Completed | `AVAILABILITY_SCAN_MAX_RECORDS` | `int` | `1000000` | Yes | `inspect_availability` | Uses indexes/manifests first; excess audit materialization returns `LIMIT_EXCEEDED`. |
+| Completed | `ACCOUNT_SNAPSHOT_MAX_RECORDS` | `int` | `10000` | Yes | `get_account_state_snapshot` | Bounds position and order reads; truncated exposure evidence fails closed with `LIMIT_EXCEEDED`. |
 | Completed | `VOLUME_RESPONSE_MODES` | `tuple[str, ...]` | `records, buckets, summary` | Yes | volume access | Unsupported values return `INVALID_INPUT`. |
 
 #### Public access API

@@ -1,7 +1,6 @@
 """Unit tests for complete Analytics allocation projection."""
 
 # ruff: noqa: INP001
-
 from dataclasses import replace
 from decimal import Decimal
 

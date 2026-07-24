@@ -1,7 +1,6 @@
 """Workflow integration for kill switches and partial emergency results."""
 
 # ruff: noqa: ARG005, INP001
-
 from dataclasses import replace
 from datetime import timedelta
 from types import SimpleNamespace

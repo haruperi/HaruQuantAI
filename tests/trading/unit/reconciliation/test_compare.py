@@ -1,7 +1,6 @@
 """Unit tests for deterministic Trading authority comparison."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 
 import pytest

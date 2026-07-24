@@ -1,7 +1,6 @@
 """Integration test for Risk-reviewed Trading/Analytics Portfolio rebalance."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 from datetime import datetime, timedelta

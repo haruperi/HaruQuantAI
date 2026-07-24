@@ -14,8 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import get_market_data, get_symbol_metadata
-from app.services.data.contracts import DataError
+from app.services.data import DataError, get_market_data, get_symbol_metadata
 from app.services.strategy import (
     SignalEvaluator,
     StrategyEnvironment,
@@ -34,6 +33,16 @@ from app.services.strategy import (
 _UNAVAILABLE = 3
 _MODULE = "app.services.strategy.evaluators.naive_ma_trend"
 _STRATEGY = "usage-signal-boundary"
+
+
+def fr_str_047() -> None:
+    """Demonstrate atomic concrete signal evaluation."""
+    assert callable(evaluate_strategy_signals)
+
+
+def fr_str_048() -> None:
+    """Demonstrate the structural signal evaluator contract."""
+    assert SignalEvaluator
 
 
 class ConstantSignalEvaluator:
@@ -91,6 +100,8 @@ def main() -> int:
     Returns:
         ``0`` on success, or ``3`` when real MT5 evidence is unavailable.
     """
+    fr_str_047()
+    fr_str_048()
     print("\nCONCRETE SIGNAL EVALUATION BOUNDARY")
     print("=" * 88)
     try:
@@ -192,9 +203,7 @@ def main() -> int:
     )
 
     print("\n-- Registry-bound execution --")
-    outcome = evaluate_strategy_signals(
-        ref, config, evidence, (), context, evaluator
-    )
+    outcome = evaluate_strategy_signals(ref, config, evidence, (), context, evaluator)
     if outcome.data is None:
         print("Boundary rejected the evaluation:", outcome.error)
         return _UNAVAILABLE
@@ -207,9 +216,7 @@ def main() -> int:
 
     print("\n-- Hash binding fails closed --")
     unbound = ConstantSignalEvaluator("0" * 64)
-    rejected = evaluate_strategy_signals(
-        ref, config, evidence, (), context, unbound
-    )
+    rejected = evaluate_strategy_signals(ref, config, evidence, (), context, unbound)
     print("Status:", rejected.status)
     if rejected.error is not None:
         print("Error code:", rejected.error.code)

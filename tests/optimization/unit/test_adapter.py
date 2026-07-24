@@ -1,7 +1,6 @@
 """Tests for the Optimization execution adapter."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime
 
 import pytest

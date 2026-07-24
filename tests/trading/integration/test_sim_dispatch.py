@@ -1,7 +1,6 @@
 """Workflow integration for Simulation authority dispatch."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.trading.actions import submit_order
 from tests.trading.conftest import trading_dependencies, trading_request

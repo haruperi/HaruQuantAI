@@ -1,7 +1,6 @@
 """Tests for deterministic Optimization ranking."""
 
 # ruff: noqa: INP001
-
 from app.services.optimization.scoring import (
     CandidateScore,
     rank_candidates,

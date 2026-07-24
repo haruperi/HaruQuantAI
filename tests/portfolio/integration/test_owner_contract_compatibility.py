@@ -1,7 +1,6 @@
 """Producer-consumer compatibility tests for Portfolio owner requests."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 from datetime import datetime, timedelta

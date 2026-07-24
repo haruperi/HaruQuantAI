@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from app.services.data.contracts import DataError
-from app.services.data.persistence import execute_transaction
-from app.services.data.persistence.contracts import (
+from app.services.data import (
+    DataError,
     StatementPlan,
     TransactionRequest,
+    execute_transaction,
 )
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
@@ -22,7 +22,6 @@ from app.services.strategy.contracts.references import (
     ValidatedStrategyRef,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.services.strategy.registry.migrations import _ensure_strategy_storage
 from app.utils import generate_id, logger
 
 
@@ -41,7 +40,6 @@ def list_strategy_versions(
     request_id = generate_id("req")
     correlation_id = generate_id("cor")
     try:
-        _ensure_strategy_storage(request_id)
         if strategy_id is None:
             statement = (
                 "SELECT manifest_json, lifecycle_status, policy_json, record_hash "

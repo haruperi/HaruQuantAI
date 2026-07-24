@@ -1,7 +1,6 @@
 """Workflow integration for authorized portfolio rebalance execution."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.trading.actions import execute_portfolio_rebalance
 from tests.trading.conftest import (

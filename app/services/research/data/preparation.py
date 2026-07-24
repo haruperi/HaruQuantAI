@@ -22,7 +22,7 @@ from app.services.research.data.validation import validate_dataset
 from app.utils import ValidationError, canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset
+    from app.services.data import MarketDataset
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]

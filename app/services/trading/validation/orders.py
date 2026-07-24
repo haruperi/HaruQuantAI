@@ -1,14 +1,17 @@
 """Aggregate deterministic validation for governed Trading requests."""
 
+from __future__ import annotations
+
 from collections.abc import Mapping
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
-from app.services.data.evidence.account_contracts import (
-    AccountStateSnapshot,
-)
 from app.services.trading.contracts import TradingError, TradingRequest
-from app.services.trading.contracts.models import JsonValue
 from app.utils import logger
+
+if TYPE_CHECKING:
+    from app.services.data import AccountStateSnapshot
+    from app.services.trading.contracts.models import JsonValue
 
 _ORDER_ACTIONS = frozenset({"submit_order", "modify_order", "cancel_order"})
 _POSITION_ACTIONS = frozenset({"close_position", "modify_position", "reduce_exposure"})

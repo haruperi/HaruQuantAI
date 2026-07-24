@@ -1,6 +1,7 @@
 """Executable Simulation errors usage example.
 
-Demonstrates simulation error construction, error catalog inspection, and error payload formatting.
+Demonstrates simulation error construction, error catalog inspection, and error
+payload formatting.
 """
 
 import sys
@@ -29,7 +30,8 @@ def example_errors() -> None:
     # 2. Inspect Error Catalog
     catalog_entry = SIM_ERROR_CATALOG.get("SIM_MARKET_CLOSED")
     print(
-        f"Catalog entry for SIM_MARKET_CLOSED group: {catalog_entry['group'] if catalog_entry else None}"
+        "Catalog entry for SIM_MARKET_CLOSED group: "
+        f"{catalog_entry['group'] if catalog_entry else None}"
     )
 
     # 3. Payload conversion

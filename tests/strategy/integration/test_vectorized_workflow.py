@@ -1,7 +1,6 @@
 """WF-STR-002 vectorized evaluation integration."""
 
 # ruff: noqa: PT018
-
 from datetime import timedelta
 
 from app.services.strategy import (

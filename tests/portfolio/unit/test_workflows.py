@@ -1,7 +1,6 @@
 """Unit tests for traced owner-contract Portfolio workflow coordination."""
 
 # ruff: noqa: INP001
-
 from __future__ import annotations
 
 from datetime import datetime, timedelta

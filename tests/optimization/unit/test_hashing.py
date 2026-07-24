@@ -1,7 +1,6 @@
 """Tests for parameter provenance hashing."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 from app.services.optimization.parameters import (

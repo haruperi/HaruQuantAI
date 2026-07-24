@@ -95,7 +95,7 @@ def build_trade_intent(
             rationale_ref=decision.rationale_ref,
             lineage=decision.lineage,
         )
-    except (KeyError, ValueError):
+    except KeyError, ValueError:
         logger.warning("TradeIntent construction rejected invalid proposal fields")
         return failure(
             StrategyErrorCode.SCHEMA_VALIDATION_FAILED,

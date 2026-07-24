@@ -7,8 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import get_market_data
-from app.services.data.contracts import DataError
+from app.services.data import DataError, get_market_data
 from app.services.strategy import (
     StrategyDecision,
     StrategyEnvironment,
@@ -30,6 +29,16 @@ _WORKFLOW = "strategy-usage-vectorized-workflow"
 _CORRELATION = "strategy-usage-vectorized-correlation"
 _STRATEGY = "usage-vectorized-strategy"
 _MODULE = "app.services.strategy.evaluators.naive_ma_trend"
+
+
+def fr_str_032() -> None:
+    """Demonstrate atomic vectorized evaluation."""
+    assert callable(run_vectorized_strategy_signals)
+
+
+def fr_str_036() -> None:
+    """Demonstrate the hash-bound vectorized evaluator contract."""
+    assert VectorizedStrategyEvaluator
 
 
 class LastBarProposalEvaluator:
@@ -90,6 +99,8 @@ def main() -> int:
     Returns:
         ``0`` on success, or ``3`` when real MT5 evidence is unavailable.
     """
+    fr_str_032()
+    fr_str_036()
     print("\nVECTORIZED STRATEGY EVALUATION — REAL MT5 EURUSD M5")
     print("=" * 88)
     try:

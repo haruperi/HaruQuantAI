@@ -1,7 +1,6 @@
 """Unit tests for bounded Analytics report serialization."""
 
 # ruff: noqa: INP001
-
 import json
 from dataclasses import replace
 

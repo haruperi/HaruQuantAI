@@ -1,7 +1,6 @@
 """Tests for bounded-search contracts."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.optimization.search import (
     CandidateResult,

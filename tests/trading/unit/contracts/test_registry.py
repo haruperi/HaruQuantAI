@@ -1,7 +1,6 @@
 """Unit tests for the exact Trading public API registry."""
 
 # ruff: noqa: INP001
-
 import json
 from datetime import UTC, datetime, timedelta
 

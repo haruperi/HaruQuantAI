@@ -91,7 +91,8 @@ def example_dashboards() -> None:
     )
     selected, metadata = truncate_series(points, max_points=6)
     print(
-        f"Original points: {len(points)}, Truncated points: {len(selected)}, Truncated flag: {metadata['truncated']}"
+        f"Original points: {len(points)}, Truncated points: {len(selected)}, "
+        f"Truncated flag: {metadata['truncated']}"
     )
 
     # 2. Build dashboard payload from performance report

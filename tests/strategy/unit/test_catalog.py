@@ -1,11 +1,10 @@
 """Immutable Strategy registry persistence tests."""
 
 # ruff: noqa: PT018
-
 from contextlib import AbstractContextManager
 from pathlib import Path
 
-from app.services.data._settings import DataSettings, data_settings_context
+from app.services.data import DataSettings, data_settings_context
 from app.services.strategy import (
     StrategyConfig,
     StrategyEnvironment,

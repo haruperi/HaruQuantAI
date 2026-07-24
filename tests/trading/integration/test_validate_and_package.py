@@ -1,7 +1,6 @@
 """Workflow integration for validation and deterministic packaging."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.trading.contracts import TradingError
 from app.services.trading.validation import (

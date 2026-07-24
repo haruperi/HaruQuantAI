@@ -1,6 +1,7 @@
 """Executable Simulation execution usage example.
 
-Demonstrates pricing orders, matching orders, SimTrader operations, and protective exit evaluations.
+Demonstrates pricing orders, matching orders, SimTrader operations, and
+protective exit evaluations.
 """
 
 import asyncio

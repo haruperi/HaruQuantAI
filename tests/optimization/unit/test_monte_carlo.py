@@ -1,7 +1,6 @@
 """Tests for Optimization Monte Carlo behavior."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 from app.services.optimization.robustness import (

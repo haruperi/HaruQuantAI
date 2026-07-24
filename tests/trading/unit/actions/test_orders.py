@@ -1,7 +1,6 @@
 """Unit tests for route-aware Trading order actions."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.trading.actions import cancel_order, modify_order, submit_order
 from app.services.trading.contracts import TradingError, TradingRoute

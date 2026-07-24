@@ -1,7 +1,6 @@
 """Unit tests for immutable Trading report evidence packaging."""
 
 # ruff: noqa: INP001
-
 import json
 
 import pytest

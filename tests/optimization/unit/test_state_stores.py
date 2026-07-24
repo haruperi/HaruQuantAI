@@ -1,7 +1,6 @@
 """Tests for Optimization checkpoint store coordination."""
 
 # ruff: noqa: INP001
-
 import pytest
 from app.services.optimization.errors import OptimizationError
 from app.services.optimization.state import (

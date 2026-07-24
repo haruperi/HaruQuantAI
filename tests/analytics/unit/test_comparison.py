@@ -1,7 +1,6 @@
 """Unit tests for actual Analytics report comparison."""
 
 # ruff: noqa: INP001
-
 from decimal import Decimal
 
 from app.services.analytics.reports.comparison import compare_performance_reports

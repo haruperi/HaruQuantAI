@@ -1,7 +1,6 @@
 """Unit tests for immutable Trading contract models."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256

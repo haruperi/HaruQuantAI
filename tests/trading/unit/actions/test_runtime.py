@@ -1,7 +1,6 @@
 """Unit tests for the thin Trading live evaluation-cycle orchestrator."""
 
 # ruff: noqa: INP001
-
 from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal

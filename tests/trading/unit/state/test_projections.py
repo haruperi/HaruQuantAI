@@ -1,7 +1,6 @@
 """Unit tests for deterministic Trading projections."""
 
 # ruff: noqa: INP001
-
 from datetime import UTC, datetime
 
 import pytest

@@ -1,7 +1,6 @@
 """Bounded Dukascopy web-chart candle transport with cursor pagination."""
 
 # ruff: noqa: S310 - URL is constructed from a fixed HTTPS provider base.
-
 from __future__ import annotations
 
 import asyncio

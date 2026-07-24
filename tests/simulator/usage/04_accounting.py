@@ -1,6 +1,7 @@
 """Executable Simulation accounting usage example.
 
-Demonstrates volume normalization, execution cost calculation, margin computation, and FX conversion.
+Demonstrates volume normalization, execution cost calculation, margin
+computation, and FX conversion.
 """
 
 import sys
