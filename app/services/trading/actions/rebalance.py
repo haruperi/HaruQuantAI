@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
-from app.services.risk.contracts import DecisionState
+from app.services.risk import DecisionState
 from app.services.trading.actions.positions import reduce_exposure
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,

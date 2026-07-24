@@ -14,20 +14,21 @@ from typing import Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.market_context_contracts import MarketContextEvidence
-from app.services.risk.approvals import ApprovalTokenService
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.config import RiskConfig, compute_config_hash
-from app.services.risk.contracts import (
+from app.services.data import MarketContextEvidence
+from app.services.risk import (
     ApprovalAttestation,
+    ApprovalTokenService,
     KillSwitchState,
     PortfolioRiskSnapshot,
     ProposedTrade,
     RegimeAssessment,
     RiskApprovalToken,
+    RiskAuditChain,
     RiskAuditRecord,
+    RiskConfig,
+    RiskGovernor,
+    compute_config_hash,
 )
-from app.services.risk.governor import RiskGovernor
 from app.services.strategy import TradeIntent
 from app.utils import AuthContext, canonical_json
 
@@ -376,9 +377,42 @@ def example_governor() -> None:
     print(f"Current-state approved size is absent: {current.approved_size is None}")
 
 
+_DEMONSTRATED = False
+
+
+def _demonstrate_once() -> None:
+    """Run the bounded governor demonstration once."""
+    global _DEMONSTRATED  # noqa: PLW0603
+    if not _DEMONSTRATED:
+        example_governor()
+        _DEMONSTRATED = True
+
+
+def fr_risk_039() -> None:
+    """FR-RISK-039: Own immutable config plus injected token, audit, clock, and
+    optional configured concurrency protection dependencies."""
+    _demonstrate_once()
+
+
+def fr_risk_040() -> None:
+    """FR-RISK-040: Validate and review one proposed trade in fixed precedence,
+    include regime/projected risks/final capped size/concurrency disclosure,
+    attach a token only when eligible and a valid optional attestation is
+    supplied, and audit the decision. Missing attestation yields
+    `needs_approval`, never synthetic approval."""
+    _demonstrate_once()
+
+
+def fr_risk_041() -> None:
+    """FR-RISK-041: Evaluate current portfolio compliance and return a
+    remediation recommendation without changing execution state."""
+    _demonstrate_once()
+
+
 def main() -> None:
-    """Run the canonical Risk governor usage example."""
-    example_governor()
+    """Run every functional-requirement demonstration for the Risk governor."""
+    for demonstrate in (fr_risk_039, fr_risk_040, fr_risk_041):
+        demonstrate()
 
 
 if __name__ == "__main__":

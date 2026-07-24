@@ -5,16 +5,12 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Literal, cast
 
-from app.services.data.evidence.market_context_contracts import (
-    MarketContextEvidence,
-)
-from app.services.risk.approvals import ApprovalTokenService
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.config import RiskConfig, compute_config_hash
-from app.services.risk.contracts import (
+from app.services.data import MarketContextEvidence
+from app.services.risk import (
     AllocationReviewRequest,
     AllocationRiskDecision,
     ApprovalAttestation,
+    ApprovalTokenService,
     DecisionState,
     KillSwitchState,
     PortfolioRiskSnapshot,
@@ -22,12 +18,15 @@ from app.services.risk.contracts import (
     ProposedTrade,
     RegimeAssessment,
     RiskApprovalToken,
+    RiskAuditChain,
     RiskAuditRecord,
+    RiskConfig,
     RiskDecisionPackage,
+    RiskGovernor,
     StrategyOperationalEligibilityDecision,
+    calculate_position_size,
+    compute_config_hash,
 )
-from app.services.risk.governor import RiskGovernor
-from app.services.risk.sizing import calculate_position_size
 from app.services.strategy import (
     StrategyEnvironment,
     StrategyLifecycleStatus,
@@ -301,32 +300,45 @@ class _TokenStore:
         return len(new)
 
 
-class _KillStore:
-    """Minimal version-exact canonical state adapter for examples."""
+class _KillStore(_AuditStore):
+    """Minimal atomic canonical state and audit adapter for examples."""
 
     def __init__(self) -> None:
-        """Initialize without a persisted resulting state."""
+        """Initialize without persisted state or audit records."""
+        super().__init__()
         self.state: KillSwitchState | None = None
 
-    def compare_and_swap(
+    def compare_and_swap_with_audit(
         self,
         state: KillSwitchState,
+        record: RiskAuditRecord,
         *,
         expected_version: int,
+        expected_sequence: int,
+        expected_previous_hash: str,
         timeout_seconds: Decimal | None,
-    ) -> bool:
-        """Persist when the supplied predecessor version is current.
+    ) -> Literal["committed", "already_committed", "conflict"]:
+        """Atomically persist state and its exact sealed audit record.
 
         Returns:
-            True when the supplied predecessor version was current and the state was
-            replaced, False otherwise.
+            Exact transactional outcome.
         """
         del timeout_seconds
         current = expected_version if self.state is None else self.state.version
-        if current != expected_version:
-            return False
+        head = self.records[-1] if self.records else None
+        sequence = 0 if head is None else int(head.sequence or 0) + 1
+        previous = "0" * 64 if head is None else str(head.record_hash)
+        if self.state == state and head == record:
+            return "already_committed"
+        if (
+            current != expected_version
+            or sequence != expected_sequence
+            or previous != expected_previous_hash
+        ):
+            return "conflict"
         self.state = state
-        return True
+        self.records.append(record)
+        return "committed"
 
 
 def _config() -> RiskConfig:
@@ -462,8 +474,8 @@ def _registration() -> ValidatedStrategyRef:
         policy_version=validation.policy_version,
         validation_policy=validation,
         registry_record_hash=HASH_B,
-        request_id="strategy-request-1",
-        correlation_id="correlation-1",
+        request_id=REQUEST_ID,
+        correlation_id=CORRELATION_ID,
     )
 
 
@@ -495,9 +507,9 @@ def _allocation_request(config: RiskConfig) -> AllocationReviewRequest:
         execution_route="sim",
         approval_refs=(),
         requested_at=NOW,
-        request_id="allocation-request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id=REQUEST_ID,
+        workflow_id=WORKFLOW_ID,
+        correlation_id=CORRELATION_ID,
     )
 
 
@@ -767,9 +779,9 @@ def _values(
         issued_at=NOW,
         expires_at=NOW + timedelta(seconds=120),
         token=None,
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id=REQUEST_ID,
+        workflow_id=WORKFLOW_ID,
+        correlation_id=CORRELATION_ID,
     )
     attestation = ApprovalAttestation(
         attestation_id="attestation-1",
@@ -780,9 +792,9 @@ def _values(
         policy_version=config.policy_version,
         issued_at=NOW - timedelta(seconds=1),
         expires_at=NOW + timedelta(seconds=120),
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id=REQUEST_ID,
+        workflow_id=WORKFLOW_ID,
+        correlation_id=CORRELATION_ID,
     )
     return service, token_store, decision, attestation
 
@@ -830,7 +842,7 @@ def run_position_size_test() -> None:
         broker_max_size=Decimal(100),
         broker_size_step=Decimal("0.01"),
         evidence_refs={"snapshot": snapshot.snapshot_id},
-        request_id="request-1",
+        request_id=REQUEST_ID,
     )
     result = calculate_position_size(request, snapshot, _config())
     if result.normalized_size != Decimal(1):

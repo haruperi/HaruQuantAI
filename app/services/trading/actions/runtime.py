@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import ValidationError as PydanticValidationError
 
-from app.services.risk.contracts import DecisionState
+from app.services.risk import DecisionState
 from app.services.trading.actions.orders import _execute_request
 from app.services.trading.contracts import (
     StandardTradingEnvelope,
@@ -22,7 +22,7 @@ from app.services.trading.monitoring import OperationalEvent, emit_runtime_event
 from app.utils import canonical_json, logger
 
 if TYPE_CHECKING:
-    from app.services.risk.contracts import RiskDecisionPackage
+    from app.services.risk import RiskDecisionPackage
     from app.services.strategy import TradeIntent
     from app.services.trading.actions.dependencies import TradingDependencies
     from app.services.trading.contracts.models import JsonValue

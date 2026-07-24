@@ -13,14 +13,14 @@ from typing import Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.market_context_contracts import MarketContextEvidence
-from app.services.risk.admission import review_strategy_admission
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.config import RiskConfig
-from app.services.risk.contracts import (
+from app.services.data import MarketContextEvidence
+from app.services.risk import (
+    RiskAuditChain,
     RiskAuditRecord,
+    RiskConfig,
     StrategyOperationalEligibilityDecision,
     StrategyOperationalEligibilityRequest,
+    review_strategy_admission,
 )
 from app.services.strategy import (
     StrategyEnvironment,
@@ -170,8 +170,8 @@ def _registration() -> ValidatedStrategyRef:
         policy_version=validation.policy_version,
         validation_policy=validation,
         registry_record_hash=HASH_B,
-        request_id="strategy-request-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -188,14 +188,18 @@ def _request() -> StrategyOperationalEligibilityRequest:
         approval_refs=(),
         requested_scope={"symbol": "EURUSD"},
         requested_at=NOW,
-        request_id="admission-request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
-def example_admission() -> None:
-    """Demonstrate reviewing strategy operational eligibility."""
+def fr_risk_029() -> None:
+    """FR-RISK-029: Validate a public Strategy `ValidatedStrategyRef` against the
+    exact request, produce and atomically persist
+    `StrategyOperationalEligibilityDecision v1` with scope, conditions,
+    evidence/policy lineage, issue/expiry, and suspension semantics, then append
+    its Risk audit record; never mutate Strategy state."""
     print("=" * 80)
     print("Risk Example 8: Strategy Operational Eligibility")
     print("=" * 80)
@@ -222,8 +226,8 @@ def example_admission() -> None:
 
 
 def main() -> None:
-    """Run the Risk strategy operational-eligibility usage example."""
-    example_admission()
+    """Run the FR-RISK-029 admission demonstration."""
+    fr_risk_029()
 
 
 if __name__ == "__main__":

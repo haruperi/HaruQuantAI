@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.evidence.market_context_contracts import (
+from app.services.data import (
     MarketContextEvidence,
 )
 from app.services.risk.allocation import (
@@ -170,8 +170,8 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
         as_of=NOW,
         config_hash=compute_config_hash(config),
         evidence_refs={"account": "account-evidence-1"},
-        request_id="snapshot-request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
 
 
@@ -220,9 +220,9 @@ def _review_request(config: RiskConfig) -> AllocationReviewRequest:
         execution_route="sim",
         approval_refs=(),
         requested_at=NOW,
-        request_id="allocation-request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -289,9 +289,9 @@ def test_budget_activation_is_version_exact_and_atomic() -> None:
         "scope": {"portfolio_id": "portfolio-1"},
         "effective_at": NOW,
         "predecessor_version": None,
-        "request_id": "activation-request-1",
-        "workflow_id": "workflow-1",
-        "correlation_id": "correlation-1",
+        "request_id": "req-44444444-4444-4444-8444-444444444444",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
     }
     inactive = KillSwitchState(
         state_id="kill-global",

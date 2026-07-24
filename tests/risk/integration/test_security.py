@@ -1,8 +1,12 @@
 """Security integration tests for Risk token and kill-switch non-bypass."""
 
 import pytest
-from app.services.risk.contracts import DecisionState, RiskDomainError, RiskErrorCode
-from app.services.risk.kill_switch import check_risk_kill_switch
+from app.services.risk import (
+    DecisionState,
+    RiskDomainError,
+    RiskErrorCode,
+    check_risk_kill_switch,
+)
 
 from tests.risk import _support as approval_examples
 from tests.risk import _support as decision_examples

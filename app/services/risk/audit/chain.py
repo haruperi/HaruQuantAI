@@ -12,8 +12,9 @@ from app.services.risk.contracts import RiskAuditRecord, RiskDomainError, RiskEr
 from app.utils import logger, redact_mapping_value
 
 if TYPE_CHECKING:
-    from app.services.risk.audit.storage import _RiskAuditStore
+    from app.services.risk.audit.storage import _KillSwitchStateStore, _RiskAuditStore
     from app.services.risk.config import RiskConfig
+    from app.services.risk.contracts import KillSwitchState
 
 _SHA256_HEX_LENGTH = 64
 
@@ -187,6 +188,90 @@ class RiskAuditChain:
             raise RiskDomainError(RiskErrorCode.STORAGE_ERROR, "sealed append input")
         with self._lock:
             return self._append_locked(record)
+
+    def append_kill_switch_transition(
+        self,
+        record: RiskAuditRecord,
+        state: KillSwitchState,
+        store: _KillSwitchStateStore,
+        *,
+        expected_version: int,
+    ) -> RiskAuditRecord:
+        """Atomically persist one kill-switch state transition and audit record.
+
+        The state and audit ports must be the same receiver-owned transactional
+        adapter. This identity requirement prevents an apparent transaction from
+        spanning unrelated persistence resources.
+
+        Args:
+            record: Unsealed audit input for the exact transition.
+            state: Canonical resulting kill-switch state.
+            store: Combined kill-switch state and audit adapter.
+            expected_version: Required predecessor state version.
+
+        Returns:
+            Durably committed sealed audit record.
+
+        Raises:
+            RiskDomainError: If ports differ, persistence fails, or concurrency
+                conflicts exhaust the configured retry budget.
+        """
+        logger.info("Atomically appending one Risk kill-switch transition")
+        if record.sealed or store is not self._store:
+            raise RiskDomainError(
+                RiskErrorCode.STORAGE_ERROR,
+                "kill-switch state and audit require one transactional store",
+            )
+        with self._lock:
+            try:
+                attempts = self._config.audit_retry_attempts + 1
+                for _ in range(attempts):
+                    head = self._store.read_head(
+                        timeout_seconds=self._config.audit_timeout_seconds
+                    )
+                    sequence = 0 if head is None else (head.sequence or 0) + 1
+                    previous_hash = (
+                        self._config.audit_genesis_hash
+                        if head is None
+                        else str(head.record_hash)
+                    )
+                    sealed = self._seal(record, sequence, previous_hash)
+                    outcome = store.compare_and_swap_with_audit(
+                        state,
+                        sealed,
+                        expected_version=expected_version,
+                        expected_sequence=sequence,
+                        expected_previous_hash=previous_hash,
+                        timeout_seconds=self._config.dependency_timeouts_seconds.get(
+                            "kill_switch"
+                        ),
+                    )
+                    if outcome == "committed":
+                        return sealed
+                    if outcome == "already_committed":
+                        current = self._store.read_head(
+                            timeout_seconds=self._config.audit_timeout_seconds
+                        )
+                        if (
+                            current is not None
+                            and current.record_id == sealed.record_id
+                            and current.record_hash == sealed.record_hash
+                        ):
+                            return current
+                        break
+            except RiskDomainError:
+                logger.error("Risk kill-switch atomic transition failed closed")
+                raise
+            except Exception as error:
+                logger.error("Risk kill-switch transactional store access failed")
+                raise RiskDomainError(
+                    RiskErrorCode.STORAGE_ERROR,
+                    "kill-switch atomic persistence unavailable",
+                ) from error
+            raise RiskDomainError(
+                RiskErrorCode.STORAGE_ERROR,
+                "kill-switch atomic transition conflict exhausted",
+            )
 
     def _append_locked(self, record: RiskAuditRecord) -> RiskAuditRecord:
         """Append under local synchronization and atomic store concurrency.

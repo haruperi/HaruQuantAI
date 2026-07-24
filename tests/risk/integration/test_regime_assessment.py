@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from app.services.risk.regimes import assess_risk_regime
+from app.services.risk import assess_risk_regime
 
 from tests.risk import _support as examples
 

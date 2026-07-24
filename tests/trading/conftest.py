@@ -2,7 +2,7 @@
 
 # ruff: noqa: INP001
 import pytest
-from app.services.risk.contracts import KillSwitchState
+from app.services.risk import KillSwitchState
 from tests.trading.unit.actions.test_controls import switch as kill_switch
 from tests.trading.unit.actions.test_dependencies import (
     NOW,

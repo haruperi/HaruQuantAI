@@ -13,7 +13,7 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerFeatureFlags,
 )
-from app.services.risk.contracts import (
+from app.services.risk import (
     ActionPolicyVerdict,
     DecisionState,
     KillSwitchState,
@@ -92,9 +92,9 @@ def _request() -> TradingRequest:
     """
     logger.debug("Building live-gate request fixture")
     return TradingRequest(
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route=TradingRoute.LIVE,
         action="submit_order",
         provider_id="test-broker",
@@ -139,9 +139,9 @@ def _policy() -> ActionPolicyVerdict:
         reasons=(),
         issued_at=NOW - timedelta(minutes=1),
         expires_at=NOW + timedelta(minutes=5),
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -163,9 +163,9 @@ def _risk_decision() -> RiskDecisionPackage:
         expires_at=NOW + timedelta(minutes=5),
         nonce="nonce-001",
         signature="signature-001",
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     return RiskDecisionPackage(
         decision_id="risk-decision-001",
@@ -183,9 +183,9 @@ def _risk_decision() -> RiskDecisionPackage:
         issued_at=NOW - timedelta(minutes=1),
         expires_at=NOW + timedelta(minutes=5),
         token=token,
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 

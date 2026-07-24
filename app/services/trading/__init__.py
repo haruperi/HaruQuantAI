@@ -37,6 +37,7 @@ from app.services.trading.live import LiveSession, evaluate_live_gate
 from app.services.trading.monitoring import (
     BudgetGate,
     OperationalEvent,
+    build_broker_state_unknown_event,
     emit_runtime_event,
 )
 from app.services.trading.reconciliation import (
@@ -97,6 +98,7 @@ __all__: tuple[str, ...] = (
     "TradingStateStore",
     "apply_execution_event",
     "assess_execution_readiness",
+    "build_broker_state_unknown_event",
     "build_execution_plan",
     "build_trading_report",
     "cancel_all_orders",

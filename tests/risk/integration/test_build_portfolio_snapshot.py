@@ -1,6 +1,6 @@
 """Workflow integration test for external evidence to Risk snapshot."""
 
-from app.services.risk.portfolio import build_portfolio_risk_snapshot
+from app.services.risk import build_portfolio_risk_snapshot
 
 from tests.risk.unit.test_snapshot import NOW, _config, _state
 

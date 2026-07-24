@@ -48,7 +48,7 @@ def _request(method: str) -> PositionSizingRequest:
         "broker_max_size": Decimal(100),
         "broker_size_step": Decimal("0.01"),
         "evidence_refs": {"snapshot": "snapshot-1"},
-        "request_id": "request-1",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
     }
     if method == "fixed_lot":
         values["fixed_lot"] = Decimal(1)

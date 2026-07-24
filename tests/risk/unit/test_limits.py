@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.evidence.market_context_contracts import (
+from app.services.data import (
     MarketContextEvidence,
 )
 from app.services.risk.config import RiskConfig, compute_config_hash
@@ -92,8 +92,8 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
         as_of=NOW,
         config_hash=compute_config_hash(config),
         evidence_refs={"account": "account-evidence-1"},
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
 
 

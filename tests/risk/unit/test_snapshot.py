@@ -3,13 +3,11 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data.evidence.account_contracts import (
+from app.services.data import (
     AccountBalance,
     AccountOrder,
     AccountPosition,
     AccountStateSnapshot,
-)
-from app.services.data.evidence.fx_contracts import (
     FXConversionEvidence,
     FXRateLeg,
 )
@@ -136,8 +134,8 @@ def _state() -> PortfolioState:
         expires_at=NOW + timedelta(minutes=1),
         provenance={"source": "data"},
         missing_fields=(),
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
 
 

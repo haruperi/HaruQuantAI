@@ -9,7 +9,7 @@ from typing import cast
 
 import app.services.trading.actions.runtime as runtime_module
 import pytest
-from app.services.risk.contracts import (
+from app.services.risk import (
     DecisionState,
     RiskApprovalToken,
     RiskDecisionPackage,
@@ -38,9 +38,9 @@ def anyio_backend() -> str:
 def evidence() -> dict[str, object]:
     """Return complete JSON-safe workflow and lineage references."""
     return {
-        "request_id": "request-001",
-        "workflow_id": "workflow-001",
-        "correlation_id": "correlation-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "account_id": "account-001",
         "action_policy_verdict_id": "policy-001",
         "canonical_material_version": "v1",
@@ -92,9 +92,9 @@ def risk_decision() -> RiskDecisionPackage:
         expires_at=NOW + timedelta(minutes=5),
         nonce="nonce-001",
         signature="signature-001",
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     return RiskDecisionPackage(
         decision_id="risk-001",
@@ -112,9 +112,9 @@ def risk_decision() -> RiskDecisionPackage:
         issued_at=NOW - timedelta(minutes=1),
         expires_at=NOW + timedelta(minutes=5),
         token=token,
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -251,9 +251,9 @@ def test_runtime_reads_modify_targets_only_from_trading_state() -> None:
 def dependencies_request_data() -> dict[str, object]:
     """Return complete request data for runtime state-target tests."""
     return {
-        "request_id": "request-001",
-        "workflow_id": "workflow-001",
-        "correlation_id": "correlation-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "route": "sim",
         "action": "submit_order",
         "provider_id": None,

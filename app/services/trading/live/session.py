@@ -13,7 +13,7 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerFeatureFlags,
 )
-from app.services.risk.contracts import (
+from app.services.risk import (
     ActionPolicyVerdict,
     KillSwitchState,
     RiskDecisionPackage,

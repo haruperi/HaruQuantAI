@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.2.5
+
+**Release date:** 2026-07-24
+
+### Complete Risk governance domain
+
+The Risk domain now exposes fifteen focused feature modules with deterministic policy enforcement, fail-closed governance, durable evidence, and standalone usage coverage.
+
+#### Added (15)
+
+- `FEAT-RISK-01` Versioned Contracts and Deterministic Errors.
+- `FEAT-RISK-02` Risk Profiles and Stable Configuration.
+- `FEAT-RISK-03` Portfolio Risk Snapshot.
+- `FEAT-RISK-04` Position Sizing Recommendations.
+- `FEAT-RISK-05` Tamper-Evident Risk Audit.
+- `FEAT-RISK-06` Portfolio and Market-Context Limits.
+- `FEAT-RISK-07` Regime Assessment and Limit Tightening.
+- `FEAT-RISK-08` Strategy Operational Eligibility.
+- `FEAT-RISK-09` Allocation Review and Budget Activation.
+- `FEAT-RISK-10` Durable Approval-Token Lifecycle.
+- `FEAT-RISK-11` Decision Reuse Revalidation.
+- `FEAT-RISK-12` Canonical Risk Governor.
+- `FEAT-RISK-13` Kill-Switch Authority and Block State.
+- `FEAT-RISK-14` Advisory Scenario Analysis.
+- `FEAT-RISK-15` Risk Decision Summaries.
+
 ## 2.2.4
 
 **Release date:** 2026-07-24

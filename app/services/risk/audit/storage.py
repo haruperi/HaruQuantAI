@@ -154,28 +154,34 @@ class _AllocationDecisionStore(Protocol):  # pragma: no cover
         raise NotImplementedError
 
 
-class _KillSwitchStateStore(Protocol):  # pragma: no cover
-    """Atomic store for canonical scoped kill-switch state."""
+class _KillSwitchStateStore(_RiskAuditStore, Protocol):  # pragma: no cover
+    """Atomic store for canonical scoped kill-switch state and its audit."""
 
     @abstractmethod
-    def compare_and_swap(
+    def compare_and_swap_with_audit(
         self,
         state: KillSwitchState,
+        record: RiskAuditRecord,
         *,
         expected_version: int,
+        expected_sequence: int,
+        expected_previous_hash: str,
         timeout_seconds: Decimal | None,
-    ) -> bool:
-        """Persist a canonical state under exact version concurrency.
+    ) -> Literal["committed", "already_committed", "conflict"]:
+        """Atomically persist a canonical state and its sealed audit record.
 
         Args:
             state: New canonical state.
+            record: Sealed audit record for the exact state transition.
             expected_version: Required current version.
+            expected_sequence: Required next audit sequence.
+            expected_previous_hash: Required current audit head hash.
             timeout_seconds: Bounded store timeout.
 
         Returns:
-            Whether compare-and-swap succeeded.
+            Exact atomic transition outcome.
         """
-        logger.debug("Persisting kill-switch state by compare-and-swap")
+        logger.debug("Persisting atomic kill-switch state and audit transition")
         raise NotImplementedError
 
 

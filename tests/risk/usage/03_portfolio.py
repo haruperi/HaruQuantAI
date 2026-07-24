@@ -11,19 +11,21 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.account_contracts import (
+from app.services.data import (
     AccountBalance,
     AccountStateSnapshot,
 )
-from app.services.risk.config import RiskConfig
-from app.services.risk.contracts import PortfolioState
-from app.services.risk.portfolio import build_portfolio_risk_snapshot
+from app.services.risk import PortfolioState, RiskConfig, build_portfolio_risk_snapshot
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
-def example_portfolio() -> None:
-    """Demonstrate building portfolio risk snapshot."""
+def fr_risk_025() -> None:
+    """FR-RISK-025: Build an immutable snapshot containing pending-order-aware
+    gross/net exposure by dimension, account-currency conversions,
+    drawdown/loss state, margin/leverage, volatility, historical VaR/CVaR,
+    pair/portfolio correlation, incremental contribution, assumptions,
+    coverage, and explicit gaps."""
     print("=" * 80)
     print("Risk Example 7: Portfolio Risk Snapshot Construction")
     print("=" * 80)
@@ -63,8 +65,8 @@ def example_portfolio() -> None:
         expires_at=NOW + timedelta(minutes=1),
         provenance={"source": "data"},
         missing_fields=("returns",),
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
     config = RiskConfig(
         profile="research",
@@ -93,8 +95,8 @@ def example_portfolio() -> None:
 
 
 def main() -> None:
-    """Run Risk portfolio usage example."""
-    example_portfolio()
+    """Run the FR-RISK-025 portfolio demonstration."""
+    fr_risk_025()
 
 
 if __name__ == "__main__":

@@ -143,7 +143,7 @@ def _authorized(
         return False
     scope = _revocation_scope(_command_scope(command))
     return (
-        attestation.principal_id == auth.principal_id
+        attestation.principal_id != auth.principal_id
         and attestation.action == "risk.kill.clear"
         and dict(attestation.scope) == scope
         and attestation.policy_ref == compute_config_hash(config)
@@ -242,22 +242,6 @@ def _validate_apply_request(
         )
 
 
-def _require_persisted(persisted: bool) -> None:
-    """Require atomic canonical state persistence success.
-
-    Args:
-        persisted: Receiver-owned compare-and-swap outcome.
-
-    Raises:
-        RiskDomainError: If version-exact persistence conflicts.
-    """
-    logger.debug("Requiring canonical kill-switch compare-and-swap success")
-    if not persisted:
-        raise RiskDomainError(
-            RiskErrorCode.STORAGE_ERROR, "kill-switch version conflict"
-        )
-
-
 def _validate_check_request(
     scope: Mapping[str, str], config: RiskConfig, auth: AuthContext
 ) -> None:
@@ -339,20 +323,17 @@ def apply_kill_switch_command(
             version=current.version + 1,
             updated_at=checked_now,
         )
-        persisted = store.compare_and_swap(
-            new_state,
-            expected_version=current.version,
-            timeout_seconds=config.dependency_timeouts_seconds.get("kill_switch"),
-        )
-        _require_persisted(persisted)
         revoked_count = 0
         if command.action == "activate":
             revoked_count = approvals.revoke_scope(
                 _revocation_scope(scope), command.reason, now=checked_now
             )
         config_hash = compute_config_hash(config)
-        audit.append(
-            _audit_input(command, new_state, config_hash, revoked_count, checked_now)
+        audit.append_kill_switch_transition(
+            _audit_input(command, new_state, config_hash, revoked_count, checked_now),
+            new_state,
+            store,
+            expected_version=current.version,
         )
         logger.bind(
             request_id=command.request_id,

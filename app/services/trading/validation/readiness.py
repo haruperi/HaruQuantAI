@@ -8,11 +8,11 @@ from typing import Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.services.risk import (  # noqa: TC001 - runtime annotation and model resolution
+from app.services.risk import (
+    DecisionState,
     KillSwitchState,
     RiskDecisionPackage,
 )
-from app.services.risk.contracts import DecisionState
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution

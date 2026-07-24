@@ -2,11 +2,9 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.evidence.account_contracts import (
+from app.services.data import (
     AccountBalance,
     AccountStateSnapshot,
-)
-from app.services.data.evidence.market_context_contracts import (
     MarketContextEvidence,
 )
 from app.services.risk.contracts import (
@@ -58,8 +56,8 @@ def _state() -> PortfolioState:
         expires_at=NOW + timedelta(minutes=1),
         provenance={"source": "data"},
         missing_fields=("calendar",),
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
 
 
@@ -99,8 +97,8 @@ def test_snapshot_serializes_decimal_exactly() -> None:
         as_of=NOW,
         config_hash="a" * 64,
         evidence_refs={"state": "state-1"},
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
     assert snapshot.model_dump(mode="json")["equity"] == "9500.10"
 

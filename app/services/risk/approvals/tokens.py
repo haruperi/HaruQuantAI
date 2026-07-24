@@ -22,7 +22,7 @@ from app.services.risk.contracts import (
     RiskDomainError,
     RiskErrorCode,
 )
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.risk.approvals.state import _TokenStateStore
@@ -763,7 +763,9 @@ class ApprovalTokenService:
                 RiskErrorCode.STORAGE_ERROR, "approval revocation result invalid"
             )
         config_hash = compute_config_hash(self._config)
-        request_id = _hash_identity("approval.revoke.request", checked_now.isoformat())
+        request_id = generate_id("req")
+        workflow_id = generate_id("wf")
+        correlation_id = generate_id("cor")
         self._audit.append(
             _audit_record(
                 record_id=_hash_identity(
@@ -782,13 +784,13 @@ class ApprovalTokenService:
                 decision_id=None,
                 occurred_at=checked_now,
                 request_id=request_id,
-                correlation_id=request_id,
+                correlation_id=correlation_id,
             )
         )
         logger.bind(
             request_id=request_id,
-            workflow_id="risk.approval.revoke",
-            correlation_id=request_id,
+            workflow_id=workflow_id,
+            correlation_id=correlation_id,
             verdict="revoked",
             reason_codes=(reason.strip(),),
             latency_ms=round((monotonic() - started_at) * 1000, 3),

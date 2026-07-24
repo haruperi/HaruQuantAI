@@ -1,6 +1,6 @@
 """Workflow integration test for focused Risk decision reporting."""
 
-from app.services.risk.reporting import generate_risk_report
+from app.services.risk import generate_risk_report
 
 from tests.risk import _support as decision_examples
 from tests.risk import _support as policy_examples

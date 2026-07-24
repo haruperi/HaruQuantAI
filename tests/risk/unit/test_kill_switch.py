@@ -1,9 +1,9 @@
 """Unit tests for hierarchical canonical Risk kill-switch policy."""
 
 from datetime import timedelta
-from typing import TYPE_CHECKING, cast
 
 import pytest
+from app.services.risk import RiskAuditChain
 from app.services.risk.config import compute_config_hash
 from app.services.risk.contracts import (
     ApprovalAttestation,
@@ -16,11 +16,9 @@ from app.services.risk.kill_switch import (
     apply_kill_switch_command,
     check_risk_kill_switch,
 )
+from app.utils import canonical_json
 
 from tests.risk import _support as examples
-
-if TYPE_CHECKING:
-    from app.services.risk.audit import RiskAuditChain
 
 
 def test_child_clear_cannot_override_active_parent() -> None:
@@ -69,7 +67,9 @@ def test_recovery_requires_clear_hierarchy_and_reconciliation() -> None:
 def test_clearance_requires_matching_current_attestation() -> None:
     """Deny unapproved clearance and apply exact authorized evidence."""
     config = examples._config()
-    _, approvals, audit = examples._services(config)
+    _, approvals, _ = examples._services(config)
+    store = examples._KillStore()
+    audit = RiskAuditChain(config, store, lambda: examples.NOW, canonical_json)
     current = examples._inactive_state().model_copy(
         update={"state": "active", "reason": "operator safety stop"}
     )
@@ -91,15 +91,15 @@ def test_clearance_requires_matching_current_attestation() -> None:
             current,
             examples._auth(config, clearance=True),
             approvals,
-            cast("RiskAuditChain", audit),
-            examples._KillStore(),
+            audit,
+            store,
             config,
             now=examples.NOW,
         )
     assert captured.value.risk_code is RiskErrorCode.PERMISSION_DENIED
     attestation = ApprovalAttestation(
         attestation_id="clearance-1",
-        principal_id="operator-1",
+        principal_id="operator-2",
         action="risk.kill.clear",
         scope={"global": "*"},
         policy_ref=compute_config_hash(config),
@@ -115,13 +115,68 @@ def test_clearance_requires_matching_current_attestation() -> None:
         current,
         examples._auth(config, clearance=True),
         approvals,
-        cast("RiskAuditChain", audit),
-        examples._KillStore(),
+        audit,
+        store,
         config,
         attestation=attestation,
         now=examples.NOW,
     )
     assert cleared.state == "inactive"
+    assert store.state == cleared
+    assert len(store.records) == 1
+
+
+def test_clearance_requires_distinct_principal() -> None:
+    """Reject same-principal clearance without changing state or audit."""
+    config = examples._config()
+    _, approvals, _ = examples._services(config)
+    store = examples._KillStore()
+    audit = RiskAuditChain(config, store, lambda: examples.NOW, canonical_json)
+    current = examples._inactive_state().model_copy(
+        update={"state": "active", "reason": "operator safety stop"}
+    )
+    command = KillSwitchCommand(
+        action="clear",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="reconciled and approved",
+        requested_at=examples.NOW,
+        request_id=examples.REQUEST_ID,
+        workflow_id=examples.WORKFLOW_ID,
+        correlation_id=examples.CORRELATION_ID,
+    )
+    attestation = ApprovalAttestation(
+        attestation_id="clearance-same-principal",
+        principal_id="operator-1",
+        action="risk.kill.clear",
+        scope={"global": "*"},
+        policy_ref=compute_config_hash(config),
+        policy_version=config.policy_version,
+        issued_at=examples.NOW,
+        expires_at=examples.NOW + timedelta(minutes=1),
+        request_id=examples.REQUEST_ID,
+        workflow_id=examples.WORKFLOW_ID,
+        correlation_id=examples.CORRELATION_ID,
+    )
+
+    with pytest.raises(RiskDomainError) as captured:
+        apply_kill_switch_command(
+            command,
+            current,
+            examples._auth(config, clearance=True),
+            approvals,
+            audit,
+            store,
+            config,
+            attestation=attestation,
+            now=examples.NOW,
+        )
+
+    assert captured.value.risk_code is RiskErrorCode.PERMISSION_DENIED
+    assert store.state is None
+    assert store.records == []
 
 
 def test_missing_or_unknown_state_blocks() -> None:

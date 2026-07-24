@@ -14,8 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.services.data.evidence.account_contracts import (
     AccountStateSnapshot,
 )
-from app.services.risk import KillSwitchState, RiskDecisionPackage
-from app.services.risk.contracts import DecisionState
+from app.services.risk import DecisionState, KillSwitchState, RiskDecisionPackage
 from app.services.trading.contracts import TradingRequest
 from app.services.trading.validation import (
     ReadinessAssessment,
@@ -32,9 +31,9 @@ NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 def _request() -> TradingRequest:
     """Build complete validated order material."""
     return TradingRequest(
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route="sim",
         action="submit_order",
         account_id="usage-account-001",
@@ -122,9 +121,9 @@ def _risk() -> RiskDecisionPackage:
         issued_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
         token=None,
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 

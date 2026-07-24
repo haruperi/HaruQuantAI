@@ -5,7 +5,7 @@ from __future__ import annotations
 from hashlib import sha256
 from typing import TYPE_CHECKING
 
-from app.services.risk.contracts import ActionPolicyVerdict, KillSwitchCommand
+from app.services.risk import ActionPolicyVerdict, KillSwitchCommand
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.contracts import (
     StandardTradingEnvelope,

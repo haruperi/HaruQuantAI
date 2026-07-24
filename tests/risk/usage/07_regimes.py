@@ -11,12 +11,10 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.market_context_contracts import (
+from app.services.data import (
     MarketContextEvidence,
 )
-from app.services.risk.config import RiskConfig
-from app.services.risk.contracts import PortfolioRiskSnapshot
-from app.services.risk.regimes import assess_risk_regime
+from app.services.risk import PortfolioRiskSnapshot, RiskConfig, assess_risk_regime
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -49,8 +47,8 @@ def _snapshot() -> PortfolioRiskSnapshot:
         as_of=NOW,
         config_hash="a" * 64,
         evidence_refs={"account": "account-evidence-1"},
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
 
 
@@ -75,8 +73,11 @@ def _market() -> MarketContextEvidence:
     )
 
 
-def example_regimes() -> None:
-    """Demonstrate risk regime assessment."""
+def fr_risk_031() -> None:
+    """FR-RISK-031: Classify volatility, liquidity, correlation, drawdown,
+    crisis, news, and session regimes; record deterministic
+    transitions/evidence; return only equal-or-stricter modifiers; fail closed
+    on required missing/unknown live evidence."""
     print("=" * 80)
     print("Risk Example 9: Regime Assessment")
     print("=" * 80)
@@ -105,8 +106,8 @@ def example_regimes() -> None:
 
 
 def main() -> None:
-    """Run Risk regimes usage example."""
-    example_regimes()
+    """Run the FR-RISK-031 regime demonstration."""
+    fr_risk_031()
 
 
 if __name__ == "__main__":

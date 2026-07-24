@@ -1,14 +1,12 @@
 """Integration test for allocation review and Risk-budget activation."""
 
-from app.services.risk.allocation import (
-    activate_allocation_budget,
-    review_allocation_proposal,
-)
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.contracts import (
+from app.services.risk import (
     AllocationBudgetActivationRequest,
     DecisionState,
     KillSwitchState,
+    RiskAuditChain,
+    activate_allocation_budget,
+    review_allocation_proposal,
 )
 from app.utils import canonical_json
 
@@ -40,9 +38,9 @@ def test_allocation_review_and_activation_end_to_end() -> None:
             scope={"portfolio_id": "portfolio-1"},
             effective_at=examples.NOW,
             predecessor_version=None,
-            request_id="activation-integration-1",
-            workflow_id="workflow-allocation-1",
-            correlation_id="correlation-1",
+            request_id=examples.REQUEST_ID,
+            workflow_id=examples.WORKFLOW_ID,
+            correlation_id=examples.CORRELATION_ID,
         ),
         decision,
         (

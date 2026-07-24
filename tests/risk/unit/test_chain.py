@@ -121,8 +121,8 @@ def _record(record_id: str = "audit-1") -> RiskAuditRecord:
         previous_hash=None,
         record_hash=None,
         sealed=False,
-        request_id="request-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 

@@ -11,9 +11,12 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.risk.config import RiskConfig
-from app.services.risk.contracts import PortfolioRiskSnapshot, ScenarioDefinition
-from app.services.risk.scenarios import run_risk_scenario_analysis
+from app.services.risk import (
+    PortfolioRiskSnapshot,
+    RiskConfig,
+    ScenarioDefinition,
+    run_risk_scenario_analysis,
+)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -46,13 +49,15 @@ def _snapshot() -> PortfolioRiskSnapshot:
         as_of=NOW,
         config_hash="a" * 64,
         evidence_refs={"account": "account-evidence-1"},
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
 
 
-def example_scenarios() -> None:
-    """Demonstrate risk scenario stress testing."""
+def fr_risk_045() -> None:
+    """FR-RISK-045: Deterministically apply bounded scenarios to immutable
+    snapshot evidence, return baseline/projected risk differences, preserve
+    explicit seed, and mark every result advisory."""
     print("=" * 80)
     print("Risk Example 10: Scenario Stress Testing")
     print("=" * 80)
@@ -91,8 +96,8 @@ def example_scenarios() -> None:
 
 
 def main() -> None:
-    """Run Risk scenarios usage example."""
-    example_scenarios()
+    """Run the FR-RISK-045 scenario demonstration."""
+    fr_risk_045()
 
 
 if __name__ == "__main__":

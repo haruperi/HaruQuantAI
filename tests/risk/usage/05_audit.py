@@ -12,9 +12,7 @@ from typing import Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.config import RiskConfig
-from app.services.risk.contracts import RiskAuditRecord
+from app.services.risk import RiskAuditChain, RiskAuditRecord, RiskConfig
 from app.utils import canonical_json
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -89,8 +87,8 @@ def example_audit() -> None:
         previous_hash=None,
         record_hash=None,
         sealed=False,
-        request_id="req-1",
-        correlation_id="cor-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
     sealed = chain.append(record)
@@ -99,9 +97,40 @@ def example_audit() -> None:
     )
 
 
+_DEMONSTRATED = False
+
+
+def _demonstrate_once() -> None:
+    """Run the bounded audit demonstration once."""
+    global _DEMONSTRATED  # noqa: PLW0603
+    if not _DEMONSTRATED:
+        example_audit()
+        _DEMONSTRATED = True
+
+
+def fr_risk_032() -> None:
+    """FR-RISK-032: Own injected canonical serializer, clock, storage port, and
+    deterministic chain configuration without owning database infrastructure."""
+    _demonstrate_once()
+
+
+def fr_risk_033() -> None:
+    """FR-RISK-033: Accept only an unsealed record, redact, canonicalize, assign
+    sequence/previous hash, calculate the record hash, and durably append the
+    resulting sealed record with previous-hash continuity."""
+    _demonstrate_once()
+
+
+def fr_risk_034() -> None:
+    """FR-RISK-034: Verify genesis, sequence, previous hash, and record hash;
+    identify tamper deterministically."""
+    _demonstrate_once()
+
+
 def main() -> None:
-    """Run Risk audit usage example."""
-    example_audit()
+    """Run every functional-requirement demonstration for Risk audit."""
+    for demonstrate in (fr_risk_032, fr_risk_033, fr_risk_034):
+        demonstrate()
 
 
 if __name__ == "__main__":

@@ -5,10 +5,15 @@ from dataclasses import replace
 from decimal import Decimal
 
 import pytest
-from app.services.trading.actions import cancel_all_orders, close_all_positions
+from app.services.trading.actions import (
+    cancel_all_orders,
+    close_all_positions,
+    emergency,
+)
 from app.services.trading.actions.emergency import _validated_child
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
 from app.services.trading.state import TradingProjection
+from app.utils import validate_id
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
     MemoryStore,
@@ -106,6 +111,38 @@ async def test_close_all_reports_partial_completion() -> None:
     outcome = await close_all_positions(request(action="close_all_positions"), deps)
     assert outcome.status == "success"
     assert len(outcome.data["results"]) == 1
+
+
+@pytest.mark.anyio
+async def test_bulk_children_receive_distinct_canonical_request_ids(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Every cancel/close child receives its own canonical UUID4 trace."""
+    generated = [
+        "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "req-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    ]
+    issued: list[str] = []
+
+    def issue_request_id(prefix: str) -> str:
+        """Return the next deterministic canonical test request ID."""
+        assert prefix == "req"
+        value = generated[len(issued)]
+        issued.append(value)
+        return value
+
+    monkeypatch.setattr(emergency, "generate_id", issue_request_id)
+    await cancel_all_orders(
+        request(action="cancel_all_orders"),
+        emergency_dependencies("cancel_all_orders"),
+    )
+    await close_all_positions(
+        request(action="close_all_positions"),
+        emergency_dependencies("close_all_positions"),
+    )
+
+    checked = tuple(validate_id(value, expected_prefix="req") for value in issued)
+    assert checked == tuple(generated)
 
 
 @pytest.mark.anyio

@@ -5,7 +5,7 @@ from dataclasses import replace
 from datetime import timedelta
 
 import pytest
-from app.services.risk.contracts import DecisionState
+from app.services.risk import DecisionState
 from app.services.trading.actions import execute_portfolio_rebalance
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,

@@ -2,13 +2,21 @@
 
 # ruff: noqa: INP001
 from datetime import UTC, datetime
+from decimal import Decimal
 
 import pytest
-from app.services.trading.contracts import TradingError
-from app.services.trading.monitoring import OperationalEvent, emit_runtime_event
+from app.services.trading.contracts import ExecutionReceipt, TradingError
+from app.services.trading.monitoring import (
+    OperationalEvent,
+    build_broker_state_unknown_event,
+    emit_runtime_event,
+)
 from app.utils import logger
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
+REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
+WORKFLOW_ID = "wf-22222222-2222-4222-8222-222222222222"
+CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
 
 
 def _event() -> OperationalEvent:
@@ -83,3 +91,78 @@ def test_event_delivery_failure_is_incident() -> None:
     with pytest.raises(TradingError, match="SERVICE_UNAVAILABLE"):
         emit_runtime_event(_event(), flaky_sink)
     assert delivered[-1].event_type == "EVENT_DELIVERY_FAILED"
+
+
+def _unknown_receipt() -> ExecutionReceipt:
+    """Build one canonical retry-locked unknown-outcome receipt.
+
+    Returns:
+        Valid Trading execution receipt.
+    """
+    return ExecutionReceipt(
+        receipt_id="receipt-unknown-001",
+        intent_id="intent-001",
+        client_order_id="client-order-001",
+        route="sim",
+        authority="simulator",
+        status="unknown_outcome",
+        requested_quantity=Decimal("1.00"),
+        filled_quantity=Decimal(0),
+        authority_timestamp=NOW,
+        received_at=NOW,
+        response_classification="timeout",
+        retry_safe=False,
+        reconciliation_required=True,
+        request_id=REQUEST_ID,
+        correlation_id=CORRELATION_ID,
+    )
+
+
+def test_unknown_broker_state_event_is_critical_and_traceable() -> None:
+    """Build deterministic critical evidence from exact retry-lock sources."""
+    first = build_broker_state_unknown_event(
+        _unknown_receipt(),
+        incident_id="incident-001",
+        unresolved_scope=("order:order-001",),
+        occurred_at=NOW,
+        workflow_id=WORKFLOW_ID,
+    )
+    second = build_broker_state_unknown_event(
+        _unknown_receipt(),
+        incident_id="incident-001",
+        unresolved_scope=("order:order-001",),
+        occurred_at=NOW,
+        workflow_id=WORKFLOW_ID,
+    )
+
+    assert first == second
+    assert first.event_type == "BROKER_STATE_UNKNOWN"
+    assert first.severity == "critical"
+    assert first.facts == {
+        "retry_locked": True,
+        "unresolved_scope": "order:order-001",
+    }
+    assert first.source_refs == {
+        "receipt_id": "receipt-unknown-001",
+        "incident_id": "incident-001",
+    }
+
+
+def test_unknown_broker_state_event_rejects_non_unknown_receipt() -> None:
+    """Reject source evidence that does not prove a retry lock."""
+    receipt = _unknown_receipt().model_copy(
+        update={
+            "status": "rejected",
+            "retry_safe": True,
+            "reconciliation_required": False,
+        }
+    )
+
+    with pytest.raises(TradingError, match="VALIDATION_FAILED"):
+        build_broker_state_unknown_event(
+            receipt,
+            incident_id="incident-001",
+            unresolved_scope=("order:order-001",),
+            occurred_at=NOW,
+            workflow_id=WORKFLOW_ID,
+        )

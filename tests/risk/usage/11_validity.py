@@ -13,22 +13,23 @@ from typing import Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.market_context_contracts import MarketContextEvidence
-from app.services.risk.approvals import ApprovalTokenService
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.config import RiskConfig, compute_config_hash
-from app.services.risk.contracts import (
+from app.services.data import MarketContextEvidence
+from app.services.risk import (
     ApprovalAttestation,
+    ApprovalTokenService,
     KillSwitchState,
     PortfolioRiskSnapshot,
     ProposedTrade,
     RegimeAssessment,
     RiskApprovalToken,
+    RiskAuditChain,
     RiskAuditRecord,
+    RiskConfig,
     RiskDomainError,
+    RiskGovernor,
+    compute_config_hash,
+    revalidate_risk_decision,
 )
-from app.services.risk.governor import RiskGovernor
-from app.services.risk.validity import revalidate_risk_decision
 from app.services.strategy import TradeIntent
 from app.utils import AuthContext, canonical_json
 
@@ -309,8 +310,10 @@ def _attestation(config: RiskConfig) -> ApprovalAttestation:
     )
 
 
-def example_validity() -> None:
-    """Demonstrate reuse validation and deterministic invalidation."""
+def fr_risk_042() -> None:
+    """FR-RISK-042: Compare proposal/evidence/config/time with a prior decision
+    and invalidate material changes, expiry, skew, stale state, config mismatch,
+    or reconciliation expiry without granting action authority."""
     print("=" * 80)
     print("Risk Example 11: Decision Reuse Revalidation")
     print("=" * 80)
@@ -356,8 +359,8 @@ def example_validity() -> None:
 
 
 def main() -> None:
-    """Run the Risk decision-reuse revalidation usage example."""
-    example_validity()
+    """Run the FR-RISK-042 decision-reuse demonstration."""
+    fr_risk_042()
 
 
 if __name__ == "__main__":

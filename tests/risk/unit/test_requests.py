@@ -65,9 +65,9 @@ def test_proposed_trade_requires_fixed_risk_stop() -> None:
             risk_profile="live",
             evidence_refs={"market": "market-1"},
             provenance={"source": "strategy"},
-            request_id="request-1",
-            workflow_id="workflow-1",
-            correlation_id="correlation-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 
@@ -92,7 +92,7 @@ def test_sizing_request_is_method_strict() -> None:
             broker_max_size=Decimal(100),
             broker_size_step=Decimal("0.01"),
             evidence_refs={"history": "history-1"},
-            request_id="request-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
         )
 
 
@@ -115,9 +115,9 @@ def test_allocation_review_request_is_self_contained() -> None:
             execution_route="live",
             approval_refs=("approval-1",),
             requested_at=NOW,
-            request_id="request-1",
-            workflow_id="workflow-1",
-            correlation_id="correlation-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 
@@ -134,9 +134,9 @@ def test_strategy_eligibility_request_binds_exact_version() -> None:
         approval_refs=("approval-1",),
         requested_scope={"strategy": "strategy-1"},
         requested_at=NOW,
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     assert request.strategy_version == "1.0.0"
 
@@ -164,9 +164,9 @@ def test_kill_switch_command_requires_scope_and_reason() -> None:
             symbol=None,
             reason="operator stop",
             requested_at=NOW,
-            request_id="request-1",
-            workflow_id="workflow-1",
-            correlation_id="correlation-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 
@@ -182,9 +182,9 @@ def test_approval_attestation_requires_scope_and_expiry() -> None:
             policy_version="policy-1",
             issued_at=NOW,
             expires_at=NOW,
-            request_id="request-1",
-            workflow_id="workflow-1",
-            correlation_id="correlation-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 
@@ -197,11 +197,40 @@ def test_budget_activation_request_binds_decision_and_version() -> None:
         scope={"portfolio": "portfolio-1"},
         effective_at=NOW,
         predecessor_version="1",
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     assert request.predecessor_version == "1"
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid"),
+    [
+        ("request_id", "req-not-a-uuid4"),
+        ("workflow_id", "req-11111111-1111-4111-8111-111111111111"),
+        ("correlation_id", "cor-11111111-1111-1111-8111-111111111111"),
+    ],
+)
+def test_trace_ids_require_exact_prefixed_uuid4(field: str, invalid: str) -> None:
+    """Reject malformed, wrong-prefix, and non-v4 Risk trace identifiers."""
+    command = KillSwitchCommand(
+        action="activate",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="operator stop",
+        requested_at=NOW,
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
+    )
+    values = command.model_dump(mode="python")
+    values[field] = invalid
+
+    with pytest.raises(ValidationError):
+        KillSwitchCommand.model_validate(values)
 
 
 """Unit tests for strict Risk request contracts."""

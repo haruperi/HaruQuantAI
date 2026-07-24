@@ -13,20 +13,19 @@ from typing import Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.market_context_contracts import MarketContextEvidence
-from app.services.risk.allocation import (
-    activate_allocation_budget,
-    review_allocation_proposal,
-)
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.config import RiskConfig, compute_config_hash
-from app.services.risk.contracts import (
+from app.services.data import MarketContextEvidence
+from app.services.risk import (
     AllocationBudgetActivationRequest,
     AllocationReviewRequest,
     AllocationRiskDecision,
     KillSwitchState,
     PortfolioRiskSnapshot,
+    RiskAuditChain,
     RiskAuditRecord,
+    RiskConfig,
+    activate_allocation_budget,
+    compute_config_hash,
+    review_allocation_proposal,
 )
 from app.utils import canonical_json
 
@@ -205,9 +204,9 @@ def _review_request(config: RiskConfig) -> AllocationReviewRequest:
         execution_route="sim",
         approval_refs=(),
         requested_at=NOW,
-        request_id="allocation-request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -256,9 +255,9 @@ def example_allocation() -> None:
         scope={"portfolio_id": "portfolio-1"},
         effective_at=NOW,
         predecessor_version=None,
-        request_id="activation-request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-44444444-4444-4444-8444-444444444444",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     active = activate_allocation_budget(
         activation,
@@ -273,9 +272,36 @@ def example_allocation() -> None:
     print(f"Durably active: {store.active is not None}")
 
 
+_DEMONSTRATED = False
+
+
+def _demonstrate_once() -> None:
+    """Run the bounded allocation demonstration once."""
+    global _DEMONSTRATED  # noqa: PLW0603
+    if not _DEMONSTRATED:
+        example_allocation()
+        _DEMONSTRATED = True
+
+
+def fr_risk_030() -> None:
+    """FR-RISK-030: Produce and atomically persist `AllocationRiskDecision v1`,
+    enforce caps for the exact reviewed Portfolio version, and append its Risk
+    audit record without constructing or applying a Portfolio allocation."""
+    _demonstrate_once()
+
+
+def fr_risk_051() -> None:
+    """FR-RISK-051: Atomically compare-and-swap the authoritative risk-budget
+    projection only for the exact approved allocation version and predecessor;
+    version, expiry, active/unknown kill-switch, or concurrency conflict blocks
+    activation, and success is audit-chained."""
+    _demonstrate_once()
+
+
 def main() -> None:
-    """Run the Risk allocation review and activation usage example."""
-    example_allocation()
+    """Run every functional-requirement demonstration for Risk allocation."""
+    for demonstrate in (fr_risk_030, fr_risk_051):
+        demonstrate()
 
 
 if __name__ == "__main__":

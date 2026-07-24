@@ -1,8 +1,8 @@
 # Trading
 
 > **Package:** `app/services/trading`
-> **Status:** `Partial`
-> **Last updated:** `2026-07-23`
+> **Status:** `Completed`
+> **Last updated:** `2026-07-24`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -51,7 +51,7 @@ Contract definitions match `docs/PROJECT.md`. Commands are owned by their receiv
 | Completed | `ExecutionReceipt` | `v1` | Analytics; Portfolio; UI/API | Immutable authority response containing intent reference, provider identifiers, finite status, requested/filled quantities, average price, authority timestamps, response classification, retry safety, reconciliation requirement, and trace IDs. Unknown or malformed success remains `unknown_outcome`. |
 | Completed | `TradeRecord` | `v1` | Analytics; Portfolio; UI/API | Official execution record containing the receipt, fills, factual commission/spread/slippage/cost inputs, authority and reconciliation state, warnings/incidents, and trace chain. Unreconciled records remain explicitly flagged. |
 | Completed | `PortfolioRebalanceExecutionRequest` | `v1` | Portfolio submits; Trading receives | Request idempotent execution of one Risk-authorized immutable rebalance plan; contains plan/allocation/decision references, ordered actions, reduce-only flags, route, approval token, validity, and canonical hash. |
-| Partial | `OperationalEvent` | `v1` | UI/API; composition-root audit adapter | Publish bounded redacted health, dependency, staleness, timeout, latency, cost, and incident evidence with severity, UTC time, trace IDs, and source references. Existing behavior is implemented; the required critical `BROKER_STATE_UNKNOWN` event is missing. |
+| Completed | `OperationalEvent` | `v1` | UI/API; composition-root audit adapter | Publish bounded redacted health, dependency, staleness, timeout, latency, cost, and incident evidence with severity, UTC time, trace IDs, and source references, including critical retry-locked `BROKER_STATE_UNKNOWN` evidence. |
 | Completed | `ExecutionEvidenceReport` | `v1` | Analytics; Portfolio; UI/API | Immutable stored execution, readiness, reconciliation, incident, warning, and unresolved-action evidence carrying `contract_version="v1"` and `schema_id="trading.execution_evidence_report.v1"`; missing or inconsistent stored evidence fails closed. |
 
 `ExecutionReceipt` and `TradeRecord` likewise carry `contract_version="v1"` plus
@@ -91,7 +91,7 @@ the external `ApiResponse` family; no other domain consumes or redefines the env
 **Consumed-symbol name reconciliation** (contract name → concrete public import, to avoid importing non-existent symbols):
 
 - `IndicatorSeries v1` → class `IndicatorResult` (`from app.services.indicators import IndicatorResult`).
-- `RiskDecision v1` → class `RiskDecisionPackage` (`from app.services.risk.contracts import RiskDecisionPackage`); `ActionPolicyVerdict`, `KillSwitchState`, `StrategyOperationalEligibilityDecision`, and `AllocationRiskDecision` use their own names.
+- `RiskDecision v1` → class `RiskDecisionPackage` (`from app.services.risk import RiskDecisionPackage`); `ActionPolicyVerdict`, `KillSwitchState`, `StrategyOperationalEligibilityDecision`, and `AllocationRiskDecision` use their own names.
 - The "Simulation" domain is the package `app.services.simulator`. Trading imports no Simulation internals; the `sim` route is dispatched through an injected async callback `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]`.
 
 ### Persisted state
@@ -167,7 +167,7 @@ Modules and files are ordered from lowest dependency to highest dependency.
 | Completed | `FEAT-TRD-03` Validation, Readiness, and Plans | `validation/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/trading/usage/03_validation.py` |
 | Completed | `FEAT-TRD-04` Authority Selection and Dispatch | `routing/` | Exact declarations: Section 4.4 | Section 4.4 functional requirements | `tests/trading/usage/04_routing.py` |
 | Completed | `FEAT-TRD-05` Reconciliation and Retry Guard | `reconciliation/` | Exact declarations and reconciliation contracts: Section 4.5 | Section 4.5 functional requirements | `tests/trading/usage/05_reconciliation.py` |
-| Partial | `FEAT-TRD-06` Operational and Budget Evidence | `monitoring/` | Exact declarations: Section 4.6 | Section 4.6 functional requirements | Existing `tests/trading/usage/06_monitoring.py`; `FR-TRD-068` evidence missing |
+| Completed | `FEAT-TRD-06` Operational and Budget Evidence | `monitoring/` | Exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/trading/usage/06_monitoring.py` |
 | Completed | `FEAT-TRD-07` Live and Paper Session Lifecycle | `live/` | Exact declarations and configuration contracts: Section 4.7 | Section 4.7 functional requirements | `tests/trading/usage/07_live.py` |
 | Completed | `FEAT-TRD-08` Route-Aware Public Actions | `actions/` | Exact async declarations and dependency contracts: Section 4.8 | Section 4.8 functional requirements | `tests/trading/usage/08_actions.py` |
 | Completed | `FEAT-TRD-09` Immutable Execution Evidence | `reporting/` | Exact declarations and report contracts: Section 4.9 | Section 4.9 functional requirements | `tests/trading/usage/09_reporting.py` |
@@ -289,12 +289,12 @@ flowchart LR
 | Completed | `WF-TRD-002` | Cross-domain | Execute a simulation-route action | Approved sim request | `OrderIntent` to Simulation; canonical receipt returned | `FR-TRD-013 → FR-TRD-031` |
 | Completed | `WF-TRD-003` | Cross-domain | Start and enable a live session | Approved config and Data session/channel | Package-only or mutation-enabled session | `FR-TRD-033 → FR-TRD-034` |
 | Completed | `WF-TRD-004` | Cross-domain | Gate and dispatch a live action | Canonical request plus external verdicts | One broker dispatch or fail-closed outcome | `FR-TRD-036 → FR-TRD-013 → FR-TRD-031` |
-| Partial | `WF-TRD-005` | Cross-domain | Resolve an unknown route outcome | Timeout/malformed authority response | Retry locked until authority resolution; critical operational event emitted | `FR-TRD-030 → FR-TRD-044 → FR-TRD-045 → FR-TRD-068` |
+| Completed | `WF-TRD-005` | Cross-domain | Resolve an unknown route outcome | Timeout/malformed authority response | Retry locked until authority resolution; critical operational event emitted | `FR-TRD-030 → FR-TRD-044 → FR-TRD-045 → FR-TRD-068` |
 | Completed | `WF-TRD-006` | Cross-domain | Read route facts and aggregate readiness | Data/Simulation read evidence | Fresh structured readiness assessment | `FR-TRD-026 → FR-TRD-027` |
 | Completed | `WF-TRD-007` | Cross-domain | Enforce kill switch and emergency controls | Risk state and approved control request | New actions blocked; gated cancel/close result | `FR-TRD-021 → FR-TRD-023`, `FR-TRD-050` |
 | Completed | `WF-TRD-008` | Cross-domain | Persist evidence and recover state | Trading events and injected stores | Reconstructed projections and unresolved attempts | `FR-TRD-037 → FR-TRD-042`, `FR-TRD-051 → FR-TRD-055` |
 | Completed | `WF-TRD-009` | Cross-domain | Perform safe live shutdown | Operator/runtime stop request | Admission stopped and unresolved-work report | `FR-TRD-035` |
-| Partial | `WF-TRD-010` | Cross-domain | Emit monitoring, cost, and incident evidence | Runtime observation | Trading-owned `OperationalEvent`; durable audit evidence through Data and operator presentation/critical-alert intake through UI/API | `FR-TRD-046 → FR-TRD-048 → FR-TRD-068` |
+| Completed | `WF-TRD-010` | Cross-domain | Emit monitoring, cost, and incident evidence | Runtime observation | Trading-owned `OperationalEvent`; durable audit evidence through Data and operator presentation/critical-alert intake through UI/API | `FR-TRD-046 → FR-TRD-048 → FR-TRD-068` |
 | Completed | `WF-TRD-011` | Cross-domain | Build execution/reconciliation evidence | Receipts, readiness, incidents | Immutable report to Analytics/Portfolio/UI/API | `FR-TRD-049` |
 | Completed | `WF-TRD-012` | Cross-domain | Accept governed upstream request | Approved `RiskDecision` and immutable lineage | Validated Trading request; no raw signal translation | `FR-TRD-003 → FR-TRD-024` |
 | Completed | `WF-TRD-013` | Cross-domain | Execute authorized portfolio rebalance | `PortfolioRebalanceExecutionRequest v1` plus current Risk decisions | Idempotent order outcomes and reconciliation evidence | `FR-TRD-063 → FR-TRD-064 → FR-TRD-024 → FR-TRD-036 → FR-TRD-039` |
@@ -405,7 +405,7 @@ transition.
 status implies safe retry. Event construction or sink failure is surfaced but never
 releases the retry lock or changes authority truth.
 **Integration tests:** `tests/trading/integration/test_unknown_outcome.py::test_unknown_outcome_blocks_retry()`;
-planned `test_unknown_outcome_emits_critical_operational_event()`.
+`tests/trading/integration/test_unknown_outcome.py::test_unknown_outcome_emits_critical_operational_event()`.
 
 ### `WF-TRD-006` — Read route facts and aggregate readiness
 
@@ -768,7 +768,7 @@ or any locally invented budget policy.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Partial | `events.py` | Define and emit health/staleness/timeout/latency/cost/incident evidence, including the missing critical unknown-broker-state event builder | `OperationalEvent`, `build_broker_state_unknown_event`, `emit_runtime_event` | **Standard library:** `collections.abc`, `datetime`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** contracts; Utils redaction/serialization/logger APIs |
+| Completed | `events.py` | Define and emit health/staleness/timeout/latency/cost/incident evidence, including the critical unknown-broker-state event builder | `OperationalEvent`, `build_broker_state_unknown_event`, `emit_runtime_event` | **Standard library:** `collections.abc`, `datetime`, `hashlib`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** contracts; Utils canonical serialization, identifier validation, redaction, and logger APIs |
 | Completed | `budgets.py` | Validate current Risk-owned `AllocationRiskDecision` and authoritative budget projection without recalculation. | `BudgetGate` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** Trading contracts; Risk public contracts; Utils logger |
 | Completed | `__init__.py` | Expose monitoring API | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
 
@@ -785,7 +785,7 @@ or any locally invented budget policy.
 | Completed | `FR-TRD-046` | The system shall represent focused health, dependency, staleness, timeout, latency, cost, and incident evidence in a Trading-owned contract. | `OperationalEvent` | None | `TradingError`: invalid/unredacted event | **Usage:** `tests/trading/usage/test_usage_monitoring.py::test_usage_events_operational_event()`<br>**Unit:** `tests/trading/unit/monitoring/test_events.py::test_event_has_trace_and_severity()` |
 | Completed | `FR-TRD-047` | Enforce the current Risk-owned `AllocationRiskDecision v1` together with a current `PortfolioBudgetExecutionVerdict v1` for the exact portfolio, allocation version, plan ID/hash, and budget unit; never calculate or modify the budget. | `BudgetGate.validate(request: PortfolioRebalanceExecutionRequest, allocation: AllocationRiskDecision, verdict: PortfolioBudgetExecutionVerdict, *, now: datetime) -> None` | None | Missing, stale, expired, inactive, mismatched, or Risk-blocked budget authority blocks dispatch | **Usage:** `tests/trading/usage/test_usage_monitoring.py::test_usage_budgets_budget_gate()`<br>**Unit:** `tests/trading/unit/monitoring/test_budgets.py::test_budget_gate_requires_exact_plan_binding()` |
 | Completed | `FR-TRD-048` | The system shall publish redacted runtime evidence through an injected composition sink without importing Data or UI/API and without hiding delivery failure. | `emit_runtime_event(event: OperationalEvent, sink: Callable[[OperationalEvent], None]) -> None` | Event publication | `TradingError`: sink failure | **Usage:** `tests/trading/usage/test_usage_monitoring.py::test_usage_events_emit_runtime_event()`<br>**Unit:** `tests/trading/unit/monitoring/test_events.py::test_event_delivery_failure_is_incident()` |
-| Missing | `FR-TRD-068` | After the first persisted transition of a conflict scope into retry-locked `unknown_outcome`, build one `BROKER_STATE_UNKNOWN` `OperationalEvent` with `severity="critical"`, deterministic identity, receipt/incident references, `retry_locked=true`, and bounded redacted unresolved-scope facts. Emit it through the existing injected composition sink after persistence; construction or delivery failure is surfaced and never changes the lock, reconciliation result, or execution truth. | `build_broker_state_unknown_event(receipt: ExecutionReceipt, *, incident_id: str, unresolved_scope: Sequence[str], occurred_at: datetime, workflow_id: str) -> OperationalEvent` | None; publication occurs through `emit_runtime_event` | `TradingError`: source is not a retry-locked unknown outcome, source identity/time is invalid, or facts cannot be safely bounded/redacted | **Usage:** planned `tests/trading/usage/06_monitoring.py::example_broker_state_unknown_event()`<br>**Unit:** planned `tests/trading/unit/monitoring/test_events.py::test_unknown_broker_state_event_is_critical_and_traceable()`<br>**Integration:** planned `tests/trading/integration/test_unknown_outcome.py::test_unknown_outcome_emits_critical_operational_event()` |
+| Completed | `FR-TRD-068` | After the first persisted transition of a conflict scope into retry-locked `unknown_outcome`, build one `BROKER_STATE_UNKNOWN` `OperationalEvent` with `severity="critical"`, deterministic identity, receipt/incident references, `retry_locked=true`, and bounded redacted unresolved-scope facts. Emit it through the existing injected composition sink after persistence; construction or delivery failure is surfaced and never changes the lock, reconciliation result, or execution truth. | `build_broker_state_unknown_event(receipt: ExecutionReceipt, *, incident_id: str, unresolved_scope: Sequence[str], occurred_at: datetime, workflow_id: str) -> OperationalEvent` | None; publication occurs through `emit_runtime_event` | `TradingError`: source is not a retry-locked unknown outcome, source identity/time is invalid, or facts cannot be safely bounded/redacted | **Usage:** `tests/trading/usage/06_monitoring.py::fr_trd_068()`<br>**Unit:** `tests/trading/unit/monitoring/test_events.py::test_unknown_broker_state_event_is_critical_and_traceable()`<br>**Integration:** `tests/trading/integration/test_unknown_outcome.py::test_unknown_outcome_emits_critical_operational_event()` |
 
 **Rules:** Snapshot caches and policy-setting counters are excluded; monitoring never changes execution authority.
 **Implementation notes:** Emit runtime evidence through focused events only; add no generic managers and no snapshot-cache breadth.
@@ -929,7 +929,7 @@ No feature-specific setting. Report schema version follows `TRADING_CONTRACT_VER
 | Completed | `NFR-TRD-003` | Security | No secret/provider object shall cross or leak from the boundary; production broker transport must satisfy an approved security profile. | Redaction/adapter security tests |
 | Completed | `NFR-TRD-004` | Reliability | Unknown outcomes shall freeze the conflict scope until reconciliation; blind retries are forbidden. | Timeout/reconciliation tests |
 | Completed | `NFR-TRD-005` | API boundary | Consumers shall use documented public exports; package import shall have no runtime side effect. | Import/catalog tests |
-| Partial | `NFR-TRD-006` | Observability | Every governed action shall carry trace IDs and emit redacted pre/post evidence; pre-audit failure blocks send. A retry-locked unknown broker outcome additionally emits the critical event required by `FR-TRD-068`. | Audit/trace tests; missing unknown-state critical-event coverage |
+| Completed | `NFR-TRD-006` | Observability | Every governed action shall carry trace IDs and emit redacted pre/post evidence; pre-audit failure blocks send. A retry-locked unknown broker outcome additionally emits the critical event required by `FR-TRD-068`. | Audit/trace tests and unknown-state critical-event integration coverage |
 | Completed | `NFR-TRD-007` | Testing | Every `FR-TRD-*` shall have a usage example and unit test; collaborative workflows shall have integration tests; coverage shall be at least 80%. | Traceability/coverage audit |
 | Completed | `NFR-TRD-008` | Performance | Only owner-approved provider/workload limits shall become enforced SLOs; unapproved targets shall not be represented as approved. | Configuration review/benchmark |
 

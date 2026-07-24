@@ -6,7 +6,7 @@ from decimal import Decimal
 from hashlib import sha256
 
 import pytest
-from app.services.risk.contracts import (
+from app.services.risk import (
     AllocationRiskDecision,
     DecisionState,
     PortfolioBudgetExecutionVerdict,
@@ -32,9 +32,9 @@ def _request() -> PortfolioRebalanceExecutionRequest:
     data: dict[str, object] = {
         "contract_version": "v1",
         "schema_id": "trading.portfolio_rebalance_execution_request.v1",
-        "request_id": "request-001",
-        "workflow_id": "workflow-001",
-        "correlation_id": "correlation-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "plan_id": "plan-001",
         "plan_version": "v1",
         "portfolio_id": "portfolio-001",

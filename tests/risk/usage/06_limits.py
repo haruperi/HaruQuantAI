@@ -11,10 +11,10 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.market_context_contracts import MarketContextEvidence
-from app.services.risk.config import RiskConfig
-from app.services.risk.contracts import PortfolioRiskSnapshot
-from app.services.risk.limits import (
+from app.services.data import MarketContextEvidence
+from app.services.risk import (
+    PortfolioRiskSnapshot,
+    RiskConfig,
     evaluate_market_context,
     evaluate_portfolio_limits,
 )
@@ -51,8 +51,8 @@ def _snapshot() -> PortfolioRiskSnapshot:
         as_of=NOW,
         config_hash="a" * 64,
         evidence_refs={"account": "account-evidence-1"},
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
 
 
@@ -114,9 +114,38 @@ def example_limits() -> None:
     print(f"Ordered market statuses: {[r.status for r in market_results]}")
 
 
+_DEMONSTRATED = False
+
+
+def _demonstrate_once() -> None:
+    """Run the bounded limits demonstration once."""
+    global _DEMONSTRATED  # noqa: PLW0603
+    if not _DEMONSTRATED:
+        example_limits()
+        _DEMONSTRATED = True
+
+
+def fr_risk_027() -> None:
+    """FR-RISK-027: Evaluate daily/total loss, drawdown state, consistency,
+    exposure/concentration, margin/leverage, historical tail risk, correlation,
+    and freshness in deterministic precedence, returning primary and composite
+    failures."""
+    _demonstrate_once()
+
+
+def fr_risk_028() -> None:
+    """FR-RISK-028: Evaluate supplied spread, liquidity availability, session,
+    and normalized calendar state without external fetches, hidden unit
+    conversion, or naive/aware datetime comparison. Slippage is excluded because
+    `MarketContextEvidence v1` does not carry it and execution slippage is
+    receiver-owned post-trade evidence."""
+    _demonstrate_once()
+
+
 def main() -> None:
-    """Run the Risk limit-evaluation usage example."""
-    example_limits()
+    """Run every functional-requirement demonstration for Risk limits."""
+    for demonstrate in (fr_risk_027, fr_risk_028):
+        demonstrate()
 
 
 if __name__ == "__main__":

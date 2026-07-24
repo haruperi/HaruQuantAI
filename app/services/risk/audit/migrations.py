@@ -44,7 +44,7 @@ _STATEMENTS = (
         decision_id TEXT PRIMARY KEY,
         portfolio_id TEXT NOT NULL,
         reviewed_version TEXT NOT NULL,
-        active INTEGER NOT NULL,
+        active INTEGER NOT NULL CHECK (active IN (0, 1)),
         predecessor_version TEXT,
         payload_json TEXT NOT NULL,
         UNIQUE(portfolio_id, reviewed_version)

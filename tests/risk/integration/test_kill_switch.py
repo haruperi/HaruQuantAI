@@ -1,23 +1,23 @@
 """Workflow integration test for canonical Risk kill-switch control."""
 
-from typing import TYPE_CHECKING, cast
-
-from app.services.risk.contracts import DecisionState, KillSwitchCommand
-from app.services.risk.kill_switch import (
+from app.services.risk import (
+    DecisionState,
+    KillSwitchCommand,
+    RiskAuditChain,
     apply_kill_switch_command,
     check_risk_kill_switch,
 )
+from app.utils import canonical_json
 
 from tests.risk import _support as examples
-
-if TYPE_CHECKING:
-    from app.services.risk.audit import RiskAuditChain
 
 
 def test_kill_switch_command_blocks_trading_without_execution_mutation() -> None:
     """Persist activation, revoke approvals, and leave Trading state untouched."""
     config = examples._config()
-    _, approvals, audit = examples._services(config)
+    _, approvals, _ = examples._services(config)
+    store = examples._KillStore()
+    audit = RiskAuditChain(config, store, lambda: examples.NOW, canonical_json)
     execution_state = {"enabled": True}
     command = KillSwitchCommand(
         action="activate",
@@ -36,8 +36,8 @@ def test_kill_switch_command_blocks_trading_without_execution_mutation() -> None
         examples._inactive_state(),
         examples._auth(config),
         approvals,
-        cast("RiskAuditChain", audit),
-        examples._KillStore(),
+        audit,
+        store,
         config,
         now=examples.NOW,
     )

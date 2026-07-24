@@ -27,6 +27,7 @@ def test_migration_definition_is_stable_and_complete() -> None:
         "risk_decision_snapshots",
     ):
         assert table in sql
+    assert "active INTEGER NOT NULL CHECK (active IN (0, 1))" in sql
 
 
 def test_private_storage_ports_have_no_public_exports() -> None:

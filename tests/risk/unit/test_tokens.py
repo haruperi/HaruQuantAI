@@ -193,9 +193,9 @@ def _decision(config: RiskConfig) -> RiskDecisionPackage:
         issued_at=NOW,
         expires_at=NOW + timedelta(seconds=120),
         token=None,
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -210,9 +210,9 @@ def _attestation(config: RiskConfig) -> ApprovalAttestation:
         policy_version=config.policy_version,
         issued_at=NOW - timedelta(seconds=1),
         expires_at=NOW + timedelta(seconds=120),
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -342,7 +342,7 @@ def test_private_state_contract_is_abstract() -> None:
             "token-1",
             expected_signature="signature",
             reservation_id="reservation-1",
-            workflow_id="workflow-1",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
             action="submit_order",
             scope={"account_id": "account-1"},
             now=NOW,

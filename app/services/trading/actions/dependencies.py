@@ -18,7 +18,7 @@ from app.services.data import (
     MarketDataset,
 )
 from app.services.indicators import IndicatorResult
-from app.services.risk.contracts import (
+from app.services.risk import (
     ActionPolicyVerdict,
     AllocationRiskDecision,
     KillSwitchCommand,

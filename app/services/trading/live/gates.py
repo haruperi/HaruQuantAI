@@ -4,7 +4,7 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime
 from decimal import Decimal
 
-from app.services.risk.contracts import (
+from app.services.risk import (
     ActionPolicyVerdict,
     DecisionState,
     KillSwitchState,

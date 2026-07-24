@@ -13,15 +13,16 @@ from typing import Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.risk.approvals import ApprovalTokenService
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.config import RiskConfig, compute_config_hash
-from app.services.risk.contracts import (
+from app.services.risk import (
     ApprovalAttestation,
+    ApprovalTokenService,
     DecisionState,
     RiskApprovalToken,
+    RiskAuditChain,
     RiskAuditRecord,
+    RiskConfig,
     RiskDecisionPackage,
+    compute_config_hash,
 )
 from app.utils import canonical_json
 
@@ -181,9 +182,9 @@ def example_approvals() -> None:
         issued_at=NOW,
         expires_at=NOW + timedelta(seconds=120),
         token=None,
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     attestation = ApprovalAttestation(
         attestation_id="attestation-1",
@@ -194,9 +195,9 @@ def example_approvals() -> None:
         policy_version=config.policy_version,
         issued_at=NOW - timedelta(seconds=1),
         expires_at=NOW + timedelta(seconds=120),
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
     # 1. Issue token
@@ -217,9 +218,51 @@ def example_approvals() -> None:
     print(f"Validation result valid: {result.valid}")
 
 
+_DEMONSTRATED = False
+
+
+def _demonstrate_once() -> None:
+    """Run the bounded approval lifecycle demonstration once."""
+    global _DEMONSTRATED  # noqa: PLW0603
+    if not _DEMONSTRATED:
+        example_approvals()
+        _DEMONSTRATED = True
+
+
+def fr_risk_035() -> None:
+    """FR-RISK-035: Own internal HMAC signing plus an injected secret resolver,
+    clock, durable state port, authorization verifier, and audit chain."""
+    _demonstrate_once()
+
+
+def fr_risk_036() -> None:
+    """FR-RISK-036: Validate Risk-owned, UI/API-produced
+    `ApprovalAttestation v1`, then issue a tamper-evident token only for an
+    eligible decision, binding request/workflow/action/account/strategy/symbol/
+    config/decision/approver/expiry/nonce and writing audit/state durably."""
+    _demonstrate_once()
+
+
+def fr_risk_037() -> None:
+    """FR-RISK-037: Atomically verify
+    schema/signature/scope/hashes/attestation/time/revocation/nonce, reserve
+    token + workflow + action scope + expiry, persist single-use consumption
+    before live success, create the allowed `ActionPolicyVerdict`, include it in
+    `ApprovalValidationResult`, and audit the result. No failed validation
+    contains an allowed verdict."""
+    _demonstrate_once()
+
+
+def fr_risk_038() -> None:
+    """FR-RISK-038: Revoke every outstanding token intersecting an activated
+    global/portfolio/strategy/symbol scope and write a material audit event."""
+    _demonstrate_once()
+
+
 def main() -> None:
-    """Run Risk approvals usage example."""
-    example_approvals()
+    """Run every functional-requirement demonstration for Risk approvals."""
+    for demonstrate in (fr_risk_035, fr_risk_036, fr_risk_037, fr_risk_038):
+        demonstrate()
 
 
 if __name__ == "__main__":

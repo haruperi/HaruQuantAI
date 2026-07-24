@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from app.services.risk.contracts import (
+from app.services.risk import (
     AllocationRiskDecision,
     DecisionState,
     PortfolioBudgetExecutionVerdict,

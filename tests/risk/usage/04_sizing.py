@@ -11,9 +11,12 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.risk.config import RiskConfig
-from app.services.risk.contracts import PortfolioRiskSnapshot, PositionSizingRequest
-from app.services.risk.sizing import calculate_position_size
+from app.services.risk import (
+    PortfolioRiskSnapshot,
+    PositionSizingRequest,
+    RiskConfig,
+    calculate_position_size,
+)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -46,8 +49,8 @@ def _snapshot() -> PortfolioRiskSnapshot:
         as_of=NOW,
         config_hash="a" * 64,
         evidence_refs={"account": "account-evidence-1"},
-        request_id="request-1",
-        workflow_id="workflow-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
 
 
@@ -70,8 +73,12 @@ def _config() -> RiskConfig:
     )
 
 
-def example_sizing() -> None:
-    """Demonstrate calculating position size."""
+def fr_risk_026() -> None:
+    """FR-RISK-026: Calculate fixed-lot, fixed-risk, milestone,
+    fractional-Kelly, volatility, or fixed-fractional size using the retained
+    migration-evidenced formulas; enforce stop/equity/evidence rules; disclose
+    fallback/correlation adjustment; normalize against explicit broker and risk
+    constraints; return no non-zero failure fallback and no approval."""
     print("=" * 80)
     print("Risk Example 8: Position Sizing Calculation")
     print("=" * 80)
@@ -95,7 +102,7 @@ def example_sizing() -> None:
         broker_max_size=Decimal(100),
         broker_size_step=Decimal("0.01"),
         evidence_refs={"snapshot": snapshot.snapshot_id},
-        request_id="request-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
     )
     result = calculate_position_size(request, snapshot, _config())
     print(
@@ -105,8 +112,8 @@ def example_sizing() -> None:
 
 
 def main() -> None:
-    """Run Risk sizing usage example."""
-    example_sizing()
+    """Run the FR-RISK-026 sizing demonstration."""
+    fr_risk_026()
 
 
 if __name__ == "__main__":

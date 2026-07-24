@@ -1,18 +1,24 @@
 """Workflow integration test for fail-closed Risk audit and token state."""
 
+from datetime import timedelta
 from decimal import Decimal
 from typing import Literal
 
 import pytest
-from app.services.risk.approvals import ApprovalTokenService
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.contracts import (
+from app.services.risk import (
+    ApprovalAttestation,
+    ApprovalTokenService,
     DecisionState,
+    KillSwitchCommand,
+    KillSwitchState,
     RiskApprovalToken,
+    RiskAuditChain,
     RiskAuditRecord,
     RiskDecisionPackage,
     RiskDomainError,
     RiskErrorCode,
+    apply_kill_switch_command,
+    compute_config_hash,
 )
 from app.utils import canonical_json
 
@@ -44,33 +50,41 @@ class _UnavailableAuditStore:
         expected_previous_hash: str,
         timeout_seconds: Decimal | None,
     ) -> Literal["appended", "already_appended", "conflict"]:
-        """Reject unreachable append operation.
-
-        Args:
-            record: Sealed record.
-            expected_sequence: Required sequence.
-            expected_previous_hash: Required predecessor hash.
-            timeout_seconds: Configured bounded timeout.
-
-        Raises:
-            OSError: Always, to model backend unavailability.
-        """
+        """Reject unreachable append operation."""
         del record, expected_sequence, expected_previous_hash, timeout_seconds
         raise OSError("audit unavailable")
 
     def read_all(
         self, *, timeout_seconds: Decimal | None
     ) -> tuple[RiskAuditRecord, ...]:
-        """Reject unreachable full-chain read.
-
-        Args:
-            timeout_seconds: Configured bounded timeout.
-
-        Raises:
-            OSError: Always, to model backend unavailability.
-        """
+        """Reject unreachable full-chain read."""
         del timeout_seconds
         raise OSError("audit unavailable")
+
+
+class _UnavailableKillSwitchStore(approval_examples._KillStore):
+    """Combined adapter that fails before an atomic transition can commit."""
+
+    def compare_and_swap_with_audit(
+        self,
+        state: KillSwitchState,
+        record: RiskAuditRecord,
+        *,
+        expected_version: int,
+        expected_sequence: int,
+        expected_previous_hash: str,
+        timeout_seconds: Decimal | None,
+    ) -> Literal["committed", "already_committed", "conflict"]:
+        """Fail the combined state-and-audit transaction before mutation."""
+        del (
+            state,
+            record,
+            expected_version,
+            expected_sequence,
+            expected_previous_hash,
+            timeout_seconds,
+        )
+        raise OSError("transaction unavailable")
 
 
 def _eligible_decision(config_hash: str) -> RiskDecisionPackage:
@@ -132,3 +146,56 @@ def test_audit_and_token_state_fail_closed_atomically() -> None:
     assert all(
         isinstance(token, RiskApprovalToken) for token in token_store.tokens.values()
     )
+
+
+def test_kill_switch_clearance_audit_failure_leaves_state_unchanged() -> None:
+    """Expose no cleared state when the atomic state/audit transaction fails."""
+    config = decision_examples._config()
+    _, approvals, _ = decision_examples._services(config)
+    store = _UnavailableKillSwitchStore()
+    audit = RiskAuditChain(config, store, lambda: decision_examples.NOW, canonical_json)
+    current = decision_examples._inactive_state().model_copy(
+        update={"state": "active", "reason": "operator safety stop"}
+    )
+    command = KillSwitchCommand(
+        action="clear",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="reconciled and independently approved",
+        requested_at=decision_examples.NOW,
+        request_id=decision_examples.REQUEST_ID,
+        workflow_id=decision_examples.WORKFLOW_ID,
+        correlation_id=decision_examples.CORRELATION_ID,
+    )
+    attestation = ApprovalAttestation(
+        attestation_id="clearance-independent-1",
+        principal_id="operator-2",
+        action="risk.kill.clear",
+        scope={"global": "*"},
+        policy_ref=compute_config_hash(config),
+        policy_version=config.policy_version,
+        issued_at=decision_examples.NOW,
+        expires_at=decision_examples.NOW + timedelta(minutes=1),
+        request_id=decision_examples.REQUEST_ID,
+        workflow_id=decision_examples.WORKFLOW_ID,
+        correlation_id=decision_examples.CORRELATION_ID,
+    )
+
+    with pytest.raises(RiskDomainError) as captured:
+        apply_kill_switch_command(
+            command,
+            current,
+            decision_examples._auth(config, clearance=True),
+            approvals,
+            audit,
+            store,
+            config,
+            attestation=attestation,
+            now=decision_examples.NOW,
+        )
+
+    assert captured.value.risk_code is RiskErrorCode.STORAGE_ERROR
+    assert store.state is None
+    assert store.records == []

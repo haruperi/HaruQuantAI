@@ -3,10 +3,10 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data.evidence.market_context_contracts import (
+from app.services.data import (
     MarketContextEvidence,
 )
-from app.services.risk.contracts import ProposedTrade, validate_market_context_evidence
+from app.services.risk import ProposedTrade, validate_market_context_evidence
 from app.services.strategy import TradeIntent
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -54,9 +54,9 @@ def test_risk_embeds_the_exact_strategy_intent() -> None:
         risk_profile="paper",
         evidence_refs={"market": "market-1"},
         provenance={"source": "strategy"},
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     assert proposal.intent is intent
 

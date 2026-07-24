@@ -15,7 +15,7 @@ from app.services.data.evidence.account_contracts import (
     AccountOrder,
     AccountStateSnapshot,
 )
-from app.services.risk.contracts import ActionPolicyVerdict, RiskDecisionPackage
+from app.services.risk import ActionPolicyVerdict, RiskDecisionPackage
 from app.services.trading.actions import cancel_all_orders, resume_strategy
 from app.services.trading.contracts import TradingError
 from app.services.trading.live import LiveSession

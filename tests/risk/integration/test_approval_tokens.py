@@ -1,7 +1,7 @@
 """Workflow integration test for durable live approval-token consumption."""
 
 import pytest
-from app.services.risk.contracts import RiskDomainError, RiskErrorCode
+from app.services.risk import RiskDomainError, RiskErrorCode
 
 from tests.risk import _support as examples
 

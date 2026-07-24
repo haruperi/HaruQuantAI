@@ -1,15 +1,29 @@
 """Focused redacted operational evidence for Trading runtime behavior."""
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timedelta
+from hashlib import sha256
 from types import MappingProxyType
 from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.services.trading.contracts import TradingError, redact_trading_payload
+from app.services.trading.contracts import (
+    ExecutionReceipt,
+    TradingError,
+    redact_trading_payload,
+)
 from app.services.trading.contracts.models import TRADING_CONTRACT_VERSION, JsonValue
-from app.utils import is_sensitive_key, logger, to_json_safe
+from app.utils import (
+    ValidationError as UtilsValidationError,
+)
+from app.utils import (
+    canonical_json,
+    is_sensitive_key,
+    logger,
+    to_json_safe,
+    validate_id,
+)
 
 type OperationalEventType = Literal[
     "HEALTH_CHANGED",
@@ -20,8 +34,12 @@ type OperationalEventType = Literal[
     "COST_OBSERVED",
     "INCIDENT_RECORDED",
     "EVENT_DELIVERY_FAILED",
+    "BROKER_STATE_UNKNOWN",
 ]
 type OperationalSeverity = Literal["info", "warning", "error", "critical"]
+
+_MAX_UNRESOLVED_SCOPE_ITEMS = 8
+_MAX_UNRESOLVED_SCOPE_TEXT = 256
 
 
 class OperationalEvent(BaseModel):
@@ -161,7 +179,140 @@ class OperationalEvent(BaseModel):
         incident_types = {"INCIDENT_RECORDED", "EVENT_DELIVERY_FAILED"}
         if self.event_type in incident_types and self.severity == "info":
             raise ValueError("incident events cannot have info severity")
+        if self.event_type == "BROKER_STATE_UNKNOWN" and self.severity != "critical":
+            raise ValueError("unknown broker state must be critical")
         return self
+
+
+def _validate_unknown_event_source(
+    receipt: ExecutionReceipt,
+    *,
+    incident_id: str,
+    unresolved_scope: Sequence[str],
+    occurred_at: datetime,
+    workflow_id: str,
+) -> tuple[str, str, str, tuple[str, ...], str]:
+    """Validate one retry-locked event source and its bounded facts.
+
+    Args:
+        receipt: Authoritative unknown-outcome execution receipt.
+        incident_id: Persisted Trading incident identity.
+        unresolved_scope: Ordered unresolved reconciliation identities.
+        occurred_at: Persisted transition occurrence time.
+        workflow_id: Originating canonical workflow trace.
+
+    Returns:
+        Canonical traces, ordered scope, and bounded textual scope.
+
+    Raises:
+        ValueError: If source, time, or bounded facts are incompatible.
+        UtilsValidationError: If trace identities are incompatible.
+    """
+    if receipt.status != "unknown_outcome" or not receipt.reconciliation_required:
+        raise ValueError("receipt is not a retry-locked unknown outcome")
+    if (
+        not incident_id
+        or incident_id != incident_id.strip()
+        or occurred_at.tzinfo is None
+        or occurred_at.utcoffset() != timedelta(0)
+    ):
+        raise ValueError("incident identity or occurrence time is invalid")
+    request_id = validate_id(receipt.request_id, expected_prefix="req")
+    checked_workflow_id = validate_id(workflow_id, expected_prefix="wf")
+    correlation_id = validate_id(
+        receipt.correlation_id,
+        expected_prefix="cor",
+    )
+    checked_scope = tuple(unresolved_scope)
+    if (
+        not checked_scope
+        or len(checked_scope) > _MAX_UNRESOLVED_SCOPE_ITEMS
+        or checked_scope != tuple(sorted(set(checked_scope)))
+        or any(not item or item != item.strip() for item in checked_scope)
+    ):
+        raise ValueError("unresolved scope is invalid or unbounded")
+    scope_text = ",".join(checked_scope)
+    if len(scope_text) > _MAX_UNRESOLVED_SCOPE_TEXT:
+        raise ValueError("unresolved scope text is unbounded")
+    return (
+        request_id,
+        checked_workflow_id,
+        correlation_id,
+        checked_scope,
+        scope_text,
+    )
+
+
+def build_broker_state_unknown_event(
+    receipt: ExecutionReceipt,
+    *,
+    incident_id: str,
+    unresolved_scope: Sequence[str],
+    occurred_at: datetime,
+    workflow_id: str,
+) -> OperationalEvent:
+    """Build one critical event from a persisted retry-locked outcome.
+
+    Args:
+        receipt: Authoritative unknown-outcome execution receipt.
+        incident_id: Persisted Trading incident identity.
+        unresolved_scope: Ordered unresolved reconciliation identities.
+        occurred_at: Persisted transition occurrence time.
+        workflow_id: Originating canonical workflow trace.
+
+    Returns:
+        Deterministic bounded critical operational event.
+
+    Raises:
+        TradingError: If source, trace, time, or bounded facts are incompatible.
+    """
+    logger.warning("Building critical unknown-broker-state event")
+    try:
+        (
+            request_id,
+            checked_workflow_id,
+            correlation_id,
+            checked_scope,
+            scope_text,
+        ) = _validate_unknown_event_source(
+            receipt,
+            incident_id=incident_id,
+            unresolved_scope=unresolved_scope,
+            occurred_at=occurred_at,
+            workflow_id=workflow_id,
+        )
+        digest = sha256(
+            canonical_json(
+                {
+                    "receipt_id": receipt.receipt_id,
+                    "incident_id": incident_id,
+                    "unresolved_scope": checked_scope,
+                }
+            ).encode("utf-8")
+        ).hexdigest()
+        return OperationalEvent(
+            event_id=f"trd-broker-unknown-{digest}",
+            event_type="BROKER_STATE_UNKNOWN",
+            severity="critical",
+            occurred_at=occurred_at,
+            request_id=request_id,
+            workflow_id=checked_workflow_id,
+            correlation_id=correlation_id,
+            causation_id=receipt.receipt_id,
+            facts={
+                "retry_locked": True,
+                "unresolved_scope": scope_text,
+            },
+            source_refs={
+                "receipt_id": receipt.receipt_id,
+                "incident_id": incident_id,
+            },
+        )
+    except (TypeError, ValueError, UtilsValidationError) as error:
+        raise TradingError(
+            "VALIDATION_FAILED",
+            "Unknown broker-state event source is invalid",
+        ) from error
 
 
 def _delivery_failure_event(event: OperationalEvent) -> OperationalEvent:
@@ -229,4 +380,8 @@ def emit_runtime_event(
         ) from error
 
 
-__all__ = ["OperationalEvent", "emit_runtime_event"]
+__all__ = [
+    "OperationalEvent",
+    "build_broker_state_unknown_event",
+    "emit_runtime_event",
+]

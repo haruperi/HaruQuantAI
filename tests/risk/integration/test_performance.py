@@ -3,14 +3,17 @@
 from datetime import timedelta
 from decimal import Decimal
 
-from app.services.data.evidence.account_contracts import (
+from app.services.data import (
     AccountBalance,
     AccountPosition,
     AccountStateSnapshot,
 )
-from app.services.risk.contracts import PortfolioState, ScenarioDefinition
-from app.services.risk.portfolio import build_portfolio_risk_snapshot
-from app.services.risk.scenarios import run_risk_scenario_analysis
+from app.services.risk import (
+    PortfolioState,
+    ScenarioDefinition,
+    build_portfolio_risk_snapshot,
+    run_risk_scenario_analysis,
+)
 
 from tests.risk import _support as examples
 
@@ -73,8 +76,8 @@ def test_supported_scenario_and_position_workload_completes() -> None:
         expires_at=examples.NOW + timedelta(minutes=1),
         provenance={"source": "performance-fixture"},
         missing_fields=(),
-        request_id="request-performance",
-        workflow_id="workflow-performance",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
     snapshot = build_portfolio_risk_snapshot(state, config, now=examples.NOW)
     scenarios = tuple(

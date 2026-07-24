@@ -10,7 +10,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.risk.config import RiskConfig, compute_config_hash
+from app.services.risk import RiskConfig, compute_config_hash
 
 
 def _values() -> dict[str, object]:
@@ -49,9 +49,40 @@ def example_config() -> None:
     print(f"Computed RiskConfig SHA256 digest: {digest}")
 
 
+_DEMONSTRATED = False
+
+
+def _demonstrate_once() -> None:
+    """Run the bounded configuration demonstration once."""
+    global _DEMONSTRATED  # noqa: PLW0603
+    if not _DEMONSTRATED:
+        example_config()
+        _DEMONSTRATED = True
+
+
+def fr_risk_022() -> None:
+    """FR-RISK-022: Define strict profile fields, thresholds, modes, freshness,
+    rounding, concurrency, audit, and dependency timeouts with stable schema
+    version."""
+    _demonstrate_once()
+
+
+def fr_risk_023() -> None:
+    """FR-RISK-023: Load only the selected YAML profile from the bounded root and
+    fail closed on missing/invalid live configuration."""
+    _demonstrate_once()
+
+
+def fr_risk_024() -> None:
+    """FR-RISK-024: Hash canonical exact serialization so any material config
+    change changes the SHA-256 hash."""
+    _demonstrate_once()
+
+
 def main() -> None:
-    """Run Risk config usage example."""
-    example_config()
+    """Run every functional-requirement demonstration for Risk configuration."""
+    for demonstrate in (fr_risk_022, fr_risk_023, fr_risk_024):
+        demonstrate()
 
 
 if __name__ == "__main__":

@@ -3,8 +3,11 @@
 from decimal import Decimal
 
 import pytest
-from app.services.risk.contracts import RiskDomainError, RiskErrorCode
-from app.services.risk.validity import revalidate_risk_decision
+from app.services.risk import (
+    RiskDomainError,
+    RiskErrorCode,
+    revalidate_risk_decision,
+)
 
 from tests.risk import _support as examples
 from tests.risk import _support as policy_examples

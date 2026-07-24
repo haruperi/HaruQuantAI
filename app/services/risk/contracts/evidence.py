@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import (
     BaseModel,
     ConfigDict,
+    ValidationInfo,
     field_serializer,
     field_validator,
     model_validator,
@@ -23,7 +24,8 @@ from app.services.data import (
 )
 from app.services.risk.contracts.enums import LimitStatus, RiskErrorCode
 from app.services.risk.contracts.errors import RiskDomainError
-from app.utils import logger
+from app.utils import ValidationError as UtilsValidationError
+from app.utils import logger, validate_id
 
 _CURRENCY_CODE_LENGTH = 3
 _CORRELATION_PAIR_SIZE = 2
@@ -109,6 +111,40 @@ class _EvidenceModel(BaseModel):
         allow_inf_nan=False,
         arbitrary_types_allowed=True,
     )
+
+    @field_validator(
+        "request_id",
+        "workflow_id",
+        "correlation_id",
+        check_fields=False,
+    )
+    @classmethod
+    def _validate_trace_id(cls, value: str, info: ValidationInfo) -> str:
+        """Validate a canonical prefixed UUID4 trace identifier.
+
+        Args:
+            value: Trace identifier to validate.
+            info: Pydantic field metadata.
+
+        Returns:
+            Unchanged validated trace identifier.
+
+        Raises:
+            ValueError: If the identifier prefix or UUID4 syntax is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        prefix = prefixes.get(info.field_name or "")
+        if prefix is None:
+            raise ValueError("unsupported Risk trace identifier field")
+        try:
+            return validate_id(value, expected_prefix=prefix)
+        except UtilsValidationError as error:
+            message = f"{info.field_name} must be a canonical prefixed UUID4"
+            raise ValueError(message) from error
 
 
 class PortfolioState(_EvidenceModel):

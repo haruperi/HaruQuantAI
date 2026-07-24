@@ -1,6 +1,6 @@
 """Workflow integration test for current-state portfolio Risk governor."""
 
-from app.services.risk.contracts import DecisionState
+from app.services.risk import DecisionState
 
 from tests.risk import _support as examples
 from tests.risk import _support as policy_examples

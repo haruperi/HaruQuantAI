@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
-from app.services.risk.contracts import DecisionState
+from app.services.risk import DecisionState
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.actions.orders import cancel_order
 from app.services.trading.actions.positions import close_position
@@ -17,7 +17,7 @@ from app.services.trading.contracts import (
     TradingRequest,
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
-from app.utils import logger
+from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -235,7 +235,7 @@ async def cancel_all_orders(
             request,
             {
                 "action": "cancel_order",
-                "request_id": f"{request.request_id}:{order.order_id}",
+                "request_id": generate_id("req"),
                 "causation_id": request.request_id,
                 "symbol": order.symbol,
                 "side": order.side,
@@ -321,7 +321,7 @@ async def close_all_positions(
             request,
             {
                 "action": "close_position",
-                "request_id": f"{request.request_id}:{position.position_id}",
+                "request_id": generate_id("req"),
                 "causation_id": request.request_id,
                 "symbol": position.symbol,
                 "side": side,

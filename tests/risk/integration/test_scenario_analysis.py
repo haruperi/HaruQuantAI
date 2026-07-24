@@ -2,8 +2,7 @@
 
 from decimal import Decimal
 
-from app.services.risk.contracts import ScenarioDefinition
-from app.services.risk.scenarios import run_risk_scenario_analysis
+from app.services.risk import ScenarioDefinition, run_risk_scenario_analysis
 
 from tests.risk import _support as examples
 

@@ -5,7 +5,7 @@ from dataclasses import replace
 from datetime import timedelta
 
 import pytest
-from app.services.risk.contracts import KillSwitchState
+from app.services.risk import KillSwitchState
 from app.services.trading.actions import (
     clear_kill_switch,
     pause_strategy,

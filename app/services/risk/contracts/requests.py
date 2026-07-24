@@ -7,10 +7,17 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 from app.services.strategy import TradeIntent  # noqa: TC001
-from app.utils import logger
+from app.utils import ValidationError as UtilsValidationError
+from app.utils import logger, validate_id
 
 
 def _utc(value: datetime) -> datetime:
@@ -58,6 +65,40 @@ class _RequestModel(BaseModel):
         frozen=True,
         allow_inf_nan=False,
     )
+
+    @field_validator(
+        "request_id",
+        "workflow_id",
+        "correlation_id",
+        check_fields=False,
+    )
+    @classmethod
+    def _validate_trace_id(cls, value: str, info: ValidationInfo) -> str:
+        """Validate a canonical prefixed UUID4 trace identifier.
+
+        Args:
+            value: Trace identifier to validate.
+            info: Pydantic field metadata.
+
+        Returns:
+            Unchanged validated trace identifier.
+
+        Raises:
+            ValueError: If the identifier prefix or UUID4 syntax is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        prefix = prefixes.get(info.field_name or "")
+        if prefix is None:
+            raise ValueError("unsupported Risk trace identifier field")
+        try:
+            return validate_id(value, expected_prefix=prefix)
+        except UtilsValidationError as error:
+            message = f"{info.field_name} must be a canonical prefixed UUID4"
+            raise ValueError(message) from error
 
 
 class ProposedTrade(_RequestModel):

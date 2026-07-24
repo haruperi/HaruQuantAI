@@ -5,8 +5,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.risk import KillSwitchState, RiskDecisionPackage
-from app.services.risk.contracts import DecisionState
+from app.services.risk import DecisionState, KillSwitchState, RiskDecisionPackage
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.validation import (
     ReadinessAssessment,
@@ -26,9 +25,9 @@ BOUNDS = {
 def _request() -> TradingRequest:
     """Build canonical readiness request material."""
     return TradingRequest(
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route="sim",
         action="submit_order",
         account_id="account-001",
@@ -86,9 +85,9 @@ def _risk() -> RiskDecisionPackage:
         issued_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
         token=None,
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 

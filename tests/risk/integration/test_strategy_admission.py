@@ -3,12 +3,12 @@
 from decimal import Decimal
 from typing import Literal
 
-from app.services.risk.admission import review_strategy_admission
-from app.services.risk.audit import RiskAuditChain
-from app.services.risk.contracts import (
+from app.services.risk import (
     DecisionState,
+    RiskAuditChain,
     RiskAuditRecord,
     StrategyOperationalEligibilityRequest,
+    review_strategy_admission,
 )
 from app.utils import canonical_json
 
@@ -90,9 +90,9 @@ def test_strategy_operational_eligibility_end_to_end() -> None:
             approval_refs=(),
             requested_scope={"symbol": "EURUSD"},
             requested_at=examples.NOW,
-            request_id="admission-integration-1",
-            workflow_id="workflow-eligibility-1",
-            correlation_id="correlation-1",
+            request_id=examples.REQUEST_ID,
+            workflow_id=examples.WORKFLOW_ID,
+            correlation_id=examples.CORRELATION_ID,
         ),
         examples._registration(),
         examples._market(),

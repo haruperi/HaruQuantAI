@@ -44,9 +44,9 @@ def test_budget_execution_verdict_requires_exact_plan_binding() -> None:
             reasons=(),
             issued_at=NOW,
             expires_at=NOW + timedelta(minutes=1),
-            request_id="request-1",
-            workflow_id="workflow-1",
-            correlation_id="correlation-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 
@@ -64,9 +64,9 @@ def _verdict() -> ActionPolicyVerdict:
         reasons=(),
         issued_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -96,9 +96,9 @@ def _token() -> RiskApprovalToken:
         expires_at=NOW + timedelta(minutes=1),
         nonce="nonce-1",
         signature="signature-1",
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -117,9 +117,9 @@ def test_action_policy_verdict_requires_reservation() -> None:
             reasons=(),
             issued_at=NOW,
             expires_at=NOW + timedelta(minutes=1),
-            request_id="request-1",
-            workflow_id="workflow-1",
-            correlation_id="correlation-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 
@@ -206,9 +206,9 @@ def test_decision_package_invariants() -> None:
             issued_at=NOW,
             expires_at=NOW + timedelta(minutes=1),
             token=None,
-            request_id="request-1",
-            workflow_id="workflow-1",
-            correlation_id="correlation-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 
@@ -251,8 +251,8 @@ def test_audit_record_redacts_secrets() -> None:
             previous_hash=None,
             record_hash=None,
             sealed=False,
-            request_id="request-1",
-            correlation_id="correlation-1",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 
@@ -313,9 +313,9 @@ def test_current_state_compliance_approves_without_trade_size() -> None:
         issued_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
         token=None,
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     assert current.state is DecisionState.APPROVE
     assert current.approved_size is None
@@ -331,9 +331,9 @@ def test_decision_reuse_result_never_grants_action_authority() -> None:
         config_hash="a" * 64,
         evidence_refs={"portfolio": "snapshot-1"},
         validated_at=NOW,
-        request_id="request-1",
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     assert result.reusable is True
     assert not hasattr(result, "action_policy_verdict")
