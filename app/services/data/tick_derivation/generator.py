@@ -9,12 +9,10 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_HALF_EVEN, Decimal
+from importlib import import_module
 from pathlib import Path
 from random import Random
-from typing import NamedTuple, cast
-
-import numpy as np
-from numpy.typing import NDArray
+from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
 from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
@@ -26,12 +24,27 @@ from app.services.data.contracts.dataset import (
 )
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
 from app.services.data.persistence.paths import resolve_approved_storage_path
-from app.services.data.tick_derivation._kernel import (
-    generate_four_tick_arrays,
-    generate_volume_tick_arrays,
-)
 from app.services.data.time_sessions.timeframes import get_timeframe_spec
 from app.utils import logger
+
+if TYPE_CHECKING:
+    import numpy as np
+    from numpy.typing import NDArray
+
+    type Int64Array = NDArray[np.int64]
+    type Int8Array = NDArray[np.int8]
+else:
+
+    class _LazyNumpy:
+        """Load NumPy only when tick generation requires array operations."""
+
+        def __getattr__(self, name: str) -> object:
+            """Resolve one NumPy attribute at the runtime operation boundary."""
+            return getattr(import_module("numpy"), name)
+
+    np = _LazyNumpy()
+    type Int64Array = Any
+    type Int8Array = Any
 
 TICK_MODEL_REAL = "real"
 TICK_MODEL_TRADING_BAR = "trading_bar"
@@ -60,12 +73,9 @@ PHASE_CLOSE = 8
 
 _WAYPOINTS_PER_BAR = 4
 _EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
-_INT64_MAX = np.iinfo(np.int64).max
+_INT64_MAX = (2**63) - 1
 _KERNEL_MIN_RECORDS = 10_000
 _MAX_INTERNAL_PRECISION_DIFFERENCE = 18
-
-Int64Array = NDArray[np.int64]
-Int8Array = NDArray[np.int8]
 
 
 class _KernelColumns(NamedTuple):
@@ -77,6 +87,50 @@ class _KernelColumns(NamedTuple):
     local_indices: Int64Array
     phases: Int8Array
     bar_indices: Int64Array
+
+
+def generate_volume_tick_arrays(
+    waypoints: Int64Array,
+    phases: Int64Array,
+    bar_start_us: Int64Array,
+    tick_counts: Int64Array,
+    output_offsets: Int64Array,
+    spread_ticks: Int64Array,
+    bar_milliseconds: int,
+    output_divisor: int,
+) -> tuple[Int64Array, Int64Array, Int64Array, Int64Array, Int8Array, Int64Array]:
+    """Load and invoke the compiled volume-tick kernel on demand.
+
+    Args:
+        waypoints: Four fixed-point prices for every source bar.
+        phases: Four phase flags matching each bar's waypoint order.
+        bar_start_us: UTC epoch microseconds for every source bar.
+        tick_counts: Output tick count for every source bar.
+        output_offsets: Exclusive-prefix output offsets.
+        spread_ticks: Fixed-point spread increment for every source bar.
+        bar_milliseconds: Inferred bar duration in milliseconds.
+        output_divisor: Internal units per public output quantum.
+
+    Returns:
+        The six generated fixed-point output columns.
+    """
+    from app.services.data.tick_derivation._kernel import (
+        generate_volume_tick_arrays as _generate_volume_tick_arrays,
+    )
+
+    return cast(
+        "tuple[Int64Array, Int64Array, Int64Array, Int64Array, Int8Array, Int64Array]",
+        _generate_volume_tick_arrays(
+            waypoints,
+            phases,
+            bar_start_us,
+            tick_counts,
+            output_offsets,
+            spread_ticks,
+            bar_milliseconds,
+            output_divisor,
+        ),
+    )
 
 
 def _resolve_direct_output_limit(
@@ -559,6 +613,10 @@ def _try_kernel_columns(
         phases[bar_index] = phase_values
         starts[bar_index] = start_us
         spreads[bar_index] = spread_ticks
+
+    from app.services.data.tick_derivation._kernel import (
+        generate_four_tick_arrays,
+    )
 
     if model == TICK_MODEL_GENERATED:
         count_array = np.asarray(counts, dtype=np.int64)

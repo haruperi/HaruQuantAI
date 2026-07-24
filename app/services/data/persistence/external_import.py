@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
+from importlib import import_module
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import pandas as pd
 from pydantic import ValidationError
 
 from app.services.data._settings import get_data_settings
@@ -38,8 +38,20 @@ from app.utils import AuditEvent, generate_id, logger
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
+    import pandas as pd
+
     from app.services.data.contracts.dataset import CanonicalRecord
     from app.services.data.persistence.contracts import ColumnMapping, StorageManifest
+else:
+
+    class _LazyPandas:
+        """Load pandas only when an external import operation requires it."""
+
+        def __getattr__(self, name: str) -> object:
+            """Resolve one pandas attribute at the runtime operation boundary."""
+            return getattr(import_module("pandas"), name)
+
+    pd = _LazyPandas()
 
 IMPORT_NORMALIZATION_VERSION = "v1"
 _MT5_TIME_COLUMNS = ("<DATE>", "<TIME>")

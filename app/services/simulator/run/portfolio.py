@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from decimal import Decimal
 from hashlib import sha256
 from typing import TYPE_CHECKING
@@ -17,12 +18,14 @@ from app.services.simulator.reporting import (
     RiskBudgetHistoryRow,
     build_artifact_manifest,
 )
+from app.services.simulator.run.aggregate import PortfolioAggregateLedger
+from app.services.simulator.run.audit import emit_simulation_audit
 from app.services.simulator.run.orchestrator import (
     _canonical_hash,
+    _run_backtest_with_evidence,
     _write_completed_text,
-    run_backtest,
 )
-from app.utils import AuthContext, canonical_json, logger
+from app.utils import AuthContext, canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -76,18 +79,19 @@ def _component_return_series(
     result: SimulationResult,
     grid: tuple[datetime, ...],
     initial_balance: Decimal,
+    equity_observations: tuple[tuple[datetime, Decimal], ...],
 ) -> ComponentReturnSeries:
     """Measure one component's periodic mark-to-market equity returns.
 
-    The equity curve is reconstructed from the component's own closed-trade
-    ledger, which is the only completed evidence the component published. Each
-    observation is the period return of that curve on the shared cadence.
+    Each observation is sampled from the component engine's own end-of-tick
+    mark-to-market account equity on the shared cadence.
 
     Args:
         component_id: Ordered component identity.
         result: Completed component result.
         grid: Shared UTC measurement cadence.
         initial_balance: Component opening balance.
+        equity_observations: Ordered end-of-tick mark-to-market evidence.
 
     Returns:
         Aligned immutable component return evidence.
@@ -100,29 +104,44 @@ def _component_return_series(
         raise SimulationError(
             "SIM_COMPONENT_INCOMPLETE", "Component initial balance is invalid"
         )
+    if not equity_observations:
+        raise SimulationError(
+            "SIM_COMPONENT_INCOMPLETE",
+            "Component mark-to-market equity evidence is missing",
+        )
+    if any(
+        timestamp.tzinfo is None
+        or timestamp.utcoffset() is None
+        or timestamp.utcoffset() != timedelta(0)
+        or not equity.is_finite()
+        for timestamp, equity in equity_observations
+    ):
+        raise SimulationError(
+            "SIM_COMPONENT_INCOMPLETE",
+            "Component mark-to-market equity evidence is invalid",
+        )
     observations: list[ReturnObservation] = []
     previous_equity = initial_balance
+    observation_index = 0
+    current_equity = initial_balance
     for timestamp in grid:
-        realized = sum(
-            (
-                trade.profit + trade.commission + trade.swap
-                for trade in result.closed_trades
-                if trade.exit_time <= timestamp
-            ),
-            Decimal(0),
-        )
-        equity = initial_balance + realized
-        if not equity.is_finite() or previous_equity <= 0:
+        while (
+            observation_index < len(equity_observations)
+            and equity_observations[observation_index][0] <= timestamp
+        ):
+            current_equity = equity_observations[observation_index][1]
+            observation_index += 1
+        if not current_equity.is_finite() or previous_equity <= 0:
             raise SimulationError(
                 "SIM_COMPONENT_INCOMPLETE", "Component equity evidence is invalid"
             )
         observations.append(
             ReturnObservation(
                 timestamp=timestamp,
-                return_value=(equity - previous_equity) / previous_equity,
+                return_value=(current_equity - previous_equity) / previous_equity,
             )
         )
-        previous_equity = equity
+        previous_equity = current_equity
     return ComponentReturnSeries(
         component_id=component_id,
         simulation_result_id=result.run_id,
@@ -154,11 +173,25 @@ def _validate_fx_lineage(
         raise SimulationError(
             "SIM_FX_EVIDENCE_UNAVAILABLE", "FX evidence could not be resolved"
         ) from error
-    for evidence_id in request.fx_evidence_ids:
+    for evidence_id, expected_version, expected_hash in zip(
+        request.fx_evidence_ids,
+        request.fx_evidence_versions,
+        request.fx_evidence_hashes,
+        strict=True,
+    ):
         evidence = resolved.get(evidence_id)
         if evidence is None:
             raise SimulationError(
                 "SIM_FX_EVIDENCE_UNAVAILABLE", "FX evidence is missing"
+            )
+        if (
+            evidence.contract_version != expected_version
+            or canonical_digest(evidence.model_dump(mode="python", warnings=False))
+            != expected_hash
+        ):
+            raise SimulationError(
+                "SIM_FX_EVIDENCE_UNAVAILABLE",
+                "FX evidence identity binding does not match",
             )
         validate_fx_evidence(evidence, as_of=request.measurement_end)
 
@@ -219,7 +252,7 @@ def _reconcile(
     return tuple(rows)
 
 
-def run_portfolio_backtest(
+def _run_portfolio_backtest(
     request: PortfolioBacktestRequestV1,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
@@ -246,6 +279,8 @@ def run_portfolio_backtest(
         raise SimulationError("SIM_INVALID_CONFIG", "Portfolio auth trace differs")
     _validate_fx_lineage(request, dependencies)
     results: list[SimulationResult] = []
+    equity_evidence: list[tuple[tuple[datetime, Decimal], ...]] = []
+    aggregate_ledger = PortfolioAggregateLedger(request.initial_balance)
     for component in request.components:
         child = component.backtest_request
         child_auth = auth_context.model_copy(
@@ -256,7 +291,18 @@ def run_portfolio_backtest(
             }
         )
         try:
-            results.append(run_backtest(child, child_auth, dependencies))
+            component_result, component_equity = _run_backtest_with_evidence(
+                child,
+                child_auth,
+                dependencies,
+            )
+            aggregate_ledger.record_component(
+                component.component_id,
+                request.initial_balance * component.capital_weight,
+                component_result,
+            )
+            results.append(component_result)
+            equity_evidence.append(component_equity)
         except SimulationError as error:
             raise SimulationError(
                 "SIM_COMPONENT_INCOMPLETE",
@@ -264,9 +310,8 @@ def run_portfolio_backtest(
                 request_id=request.request_id,
             ) from error
     completed = tuple(results)
-    aggregate_net_profit = sum(
-        (result.accounting.net_profit for result in completed), Decimal(0)
-    )
+    aggregate = aggregate_ledger.snapshot(len(request.components))
+    aggregate_net_profit = Decimal(str(aggregate["net_profit"]))
     component_results = _reconcile(request, completed, aggregate_net_profit)
     grid = _measurement_grid(
         request.measurement_start,
@@ -279,8 +324,14 @@ def run_portfolio_backtest(
             result,
             grid,
             component.backtest_request.initial_balance,
+            observations,
         )
-        for component, result in zip(request.components, completed, strict=True)
+        for component, result, observations in zip(
+            request.components,
+            completed,
+            equity_evidence,
+            strict=True,
+        )
     )
     budgets = tuple(
         RiskBudgetHistoryRow(
@@ -393,6 +444,52 @@ def run_portfolio_backtest(
         canonical_json(
             manifest.model_dump(mode="python", warnings=False), max_items=None
         ),
+    )
+    return result
+
+
+def run_portfolio_backtest(
+    request: PortfolioBacktestRequestV1,
+    auth_context: AuthContext,
+    dependencies: SimulationRunDependencies,
+) -> PortfolioSimulationResult:
+    """Execute and audit one all-or-nothing portfolio simulation.
+
+    Args:
+        request: Self-contained receiver-owned portfolio projection.
+        auth_context: Authenticated portfolio trace context.
+        dependencies: Explicit run, audit, and persistence composition.
+
+    Returns:
+        Completed reconciled portfolio result.
+
+    Raises:
+        SimulationError: If validation, execution, audit, or persistence fails.
+    """
+    emit_simulation_audit(
+        dependencies,
+        auth_context,
+        "simulation.portfolio_started",
+        request.measurement_start,
+        {"portfolio_id": request.portfolio_id},
+    )
+    try:
+        result = _run_portfolio_backtest(request, auth_context, dependencies)
+    except Exception:
+        emit_simulation_audit(
+            dependencies,
+            auth_context,
+            "simulation.portfolio_failed",
+            request.measurement_end,
+            {"portfolio_id": request.portfolio_id},
+        )
+        raise
+    emit_simulation_audit(
+        dependencies,
+        auth_context,
+        "simulation.portfolio_completed",
+        request.measurement_end,
+        {"portfolio_id": request.portfolio_id, "result_id": result.result_id},
     )
     return result
 

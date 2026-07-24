@@ -145,9 +145,17 @@ def test_importing_indicators_has_no_persistent_side_effects() -> None:
         "import pathlib,sys;"
         "before={p.name for p in pathlib.Path.cwd().iterdir()};"
         "import app.services.indicators as ind;"
+        "assert 'numpy' not in sys.modules,'root import loaded NumPy';"
+        "assert 'pandas' not in sys.modules,'root import loaded pandas';"
+        "assert ind.IndicatorError is not None;"
+        "assert ind.IndicatorResult is not None;"
+        "assert 'numpy' not in sys.modules,'contract import loaded NumPy';"
+        "assert 'pandas' not in sys.modules,'contract import loaded pandas';"
         "after={p.name for p in pathlib.Path.cwd().iterdir()};"
         "assert before==after,'import created filesystem entries';"
         "assert len(ind.__all__)==34,'unexpected public surface';"
+        "assert callable(ind.doji),'lazy numerical export did not resolve';"
+        "assert 'numpy' in sys.modules,'numerical export did not load NumPy';"
         "print('OK')"
     )
     completed = subprocess.run(  # noqa: S603 - fixed inline probe, no shell.

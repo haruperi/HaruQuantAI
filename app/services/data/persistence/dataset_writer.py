@@ -7,10 +7,10 @@ import json
 import math
 from datetime import UTC, datetime, timezone
 from decimal import Decimal
+from importlib import import_module
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-import pandas as pd
 from pydantic import ValidationError
 
 from app.services.data._settings import get_data_settings
@@ -30,8 +30,20 @@ from app.services.data.persistence.locking import acquire_write_lock
 from app.utils import Clock, logger, utc_now
 
 if TYPE_CHECKING:
+    import pandas as pd
+
     from app.services.data.contracts.dataset import CanonicalRecord
     from app.services.data.local_datasets.contracts import DatasetLoadRequest
+else:
+
+    class _LazyPandas:
+        """Load pandas only when a dataset operation requires it."""
+
+        def __getattr__(self, name: str) -> object:
+            """Resolve one pandas attribute at the runtime operation boundary."""
+            return getattr(import_module("pandas"), name)
+
+    pd = _LazyPandas()
 
 _APPROVED_ROOTS = "APPROVED_STORAGE_ROOTS"
 

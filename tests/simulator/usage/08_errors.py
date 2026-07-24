@@ -10,31 +10,48 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.simulator.errors import (
+from app.services.simulator import (
     SIM_ERROR_CATALOG,
     SimulationError,
     to_simulation_error_payload,
 )
 
 
-def example_errors() -> None:
-    """Demonstrate Simulation error handling and catalog."""
-    print("=" * 80)
-    print("Simulator Example 8: Error Catalog and Payload Serialization")
-    print("=" * 80)
+def fr_sim_035() -> None:
+    """Demonstrate FR-SIM-035.
 
-    # 1. Construct SimulationError
+    Responsibility:
+        The system shall expose one base exception carrying a cataloged `code`, bounded
+        redacted message/details, and optional request/correlation identifiers. Every
+        controlled Simulation boundary failure surfaces through it; no uncontrolled
+        exception crosses the run boundary.
+    """
     error = SimulationError("SIM_MARKET_CLOSED", "Configured market is closed")
     print(f"SimulationError code: {error.code}, message: {error.message}")
 
-    # 2. Inspect Error Catalog
+
+def fr_sim_036() -> None:
+    """Demonstrate FR-SIM-036.
+
+    Responsibility:
+        The system shall expose the authoritative closed catalog of Simulation error
+        codes with group, meaning, and fail-closed effect. Every code raised by any
+        `FR-SIM-*` appears here, and no code appears that no requirement raises.
+    """
     catalog_entry = SIM_ERROR_CATALOG.get("SIM_MARKET_CLOSED")
     print(
         "Catalog entry for SIM_MARKET_CLOSED group: "
         f"{catalog_entry['group'] if catalog_entry else None}"
     )
 
-    # 3. Payload conversion
+
+def fr_sim_037() -> None:
+    """Demonstrate FR-SIM-037.
+
+    Responsibility:
+        The system shall convert a controlled exception into a bounded, redacted payload
+        exposing no provider exception, path, credential, or raw payload.
+    """
     payload = to_simulation_error_payload(
         SimulationError("SIM_INVALID_CONFIG", "Invalid configuration")
     )
@@ -43,7 +60,9 @@ def example_errors() -> None:
 
 def main() -> None:
     """Run Simulator errors usage example."""
-    example_errors()
+    fr_sim_035()
+    fr_sim_036()
+    fr_sim_037()
 
 
 if __name__ == "__main__":

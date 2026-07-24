@@ -14,17 +14,33 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import UTC, datetime
 from decimal import Decimal
+from importlib import import_module
 from typing import TYPE_CHECKING, Any
-
-import numpy as np
-import pandas as pd
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
 from app.utils import logger
 
 if TYPE_CHECKING:
+    import numpy as np
+    import pandas as pd
+
     from app.services.data.contracts.dataset import MarketDataset
+else:
+
+    class _LazyScientificModule:
+        """Load one scientific module only at an analytical operation boundary."""
+
+        def __init__(self, module_name: str) -> None:
+            """Retain the module name without importing it."""
+            self._module_name = module_name
+
+        def __getattr__(self, name: str) -> object:
+            """Resolve one attribute from the lazily imported module."""
+            return getattr(import_module(self._module_name), name)
+
+    np = _LazyScientificModule("numpy")
+    pd = _LazyScientificModule("pandas")
 
 _MAX_MISMATCH_SAMPLES = 10
 _OHLCV_COLUMNS = ("open", "high", "low", "close", "volume", "spread")

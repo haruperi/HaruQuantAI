@@ -14,22 +14,20 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.simulator.accounting import (
+from app.services.simulator import (
     AccountLedger,
-    ExecutionCostModel,
-    SymbolSpecification,
-)
-from app.services.simulator.execution import (
     EventDrivenExecutionEngine,
+    ExecutionCostModel,
     ExecutionProfile,
+    JournalWriter,
     SessionInterval,
     SimTrader,
+    SymbolSpecification,
+    Tick,
     evaluate_protective_exit,
     match_order,
     price_order,
 )
-from app.services.simulator.journal import JournalWriter
-from app.services.simulator.timeline import Tick
 from app.services.trading import OrderIntent, TradingRoute
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
@@ -40,9 +38,9 @@ def _intent() -> OrderIntent:
     """Build one approved sim market intent."""
     return OrderIntent(
         client_order_id="order-engine",
-        request_id="req-test",
-        workflow_id="wf-test",
-        correlation_id="cor-test",
+        request_id="req-123e4567-e89b-42d3-a456-426614174000",
+        workflow_id="wf-123e4567-e89b-42d3-a456-426614174001",
+        correlation_id="cor-123e4567-e89b-42d3-a456-426614174002",
         route=TradingRoute.SIM,
         provider_id=None,
         account_id="account",
@@ -161,9 +159,134 @@ def example_execution() -> None:
     print(f"Evaluated protective exit type: {exit_type}")
 
 
+def fr_sim_018() -> None:
+    """Demonstrate FR-SIM-018.
+
+    Responsibility:
+        The system shall derive an executable bid/ask price from the current tick and
+        approved spread/slippage model without using future ticks.
+    """
+    print(f"Priced order: {price_order(_intent(), _tick(), _profile())}")
+
+
+def fr_sim_019() -> None:
+    """Demonstrate FR-SIM-019.
+
+    Responsibility:
+        The system shall deterministically match supported FX market and pending intents
+        using configured trigger, gap, liquidity, FOK/IOC, and same-tick priority rules,
+        explicitly recording partial or cancelled remainder outcomes.
+    """
+    print(f"Match status: {match_order(_intent(), _tick(), _profile()).status}")
+
+
+def fr_sim_043() -> None:
+    """Demonstrate FR-SIM-043.
+
+    Responsibility:
+        The system shall resolve the protective exit of one open position against the
+        current tick, triggering stop-loss when the position's exit side crosses its
+        stop and take-profit when it crosses its target, and shall resolve a same-tick
+        stop-loss/take-profit conflict by `SAME_TICK_PRIORITY` order so stop-loss always
+        wins. A condition absent from `SAME_TICK_PRIORITY` is ambiguous and fails
+        closed.
+    """
+    position = {
+        "side": "BUY",
+        "stop_loss": Decimal("1.20000"),
+        "take_profit": Decimal("1.05000"),
+    }
+    print(f"Protective exit: {evaluate_protective_exit(position, _tick())}")
+
+
+def fr_sim_020() -> None:
+    """Demonstrate FR-SIM-020.
+
+    Responsibility:
+        The system shall process one canonical tick at a time, enforce timing and state
+        transitions, apply fills through the ledger, append journal events, maintain
+        per-open-position maximum adverse and favourable excursion so that `mae` and
+        `mfe` are observed rather than reconstructed, and retain immutable end-of-tick
+        mark-to-market equity observations for portfolio measurement. Each tick
+        evaluates every open position for a protective exit before pending orders are
+        matched, closes triggered positions through the ledger, and records one
+        `ClosedTradeRecord` per terminal close carrying the excursions observed during
+        execution.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        engine = _engine(Path(tmp_dir), "usage-engine")
+        engine.submit_order(_intent())
+        print(f"Execution receipts: {len(engine.execute_tick(_tick()))}")
+
+
+def fr_sim_021() -> None:
+    """Demonstrate FR-SIM-021.
+
+    Responsibility:
+        The system shall accept only a Trading-owned `OrderIntent` for route `sim`,
+        preserve its final approved volume, submit it to the active simulation engine
+        without any broker call, and return a Trading-owned `ExecutionReceipt`
+        constructed from the simulated outcome.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        trader = SimTrader(_engine(Path(tmp_dir), "usage-submit"))
+        receipt = asyncio.run(trader.submit_order(_intent()))
+        print(f"Submission status: {receipt.status}")
+
+
+def fr_sim_038() -> None:
+    """Demonstrate FR-SIM-038.
+
+    Responsibility:
+        The system shall expose the bound asynchronous `SimTrader.submit_order` method
+        whose signature is exactly the port Trading injects for the `sim` route,
+        `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]`, delegating to its active
+        engine and importing no Trading internals beyond public contracts.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        trader = SimTrader(_engine(Path(tmp_dir), "usage-port"))
+        receipt = asyncio.run(trader.submit_order(_intent()))
+        print(f"Async port status: {receipt.status}")
+
+
+def fr_sim_022() -> None:
+    """Demonstrate FR-SIM-022.
+
+    Responsibility:
+        The system shall close an existing simulated position by approved quantity using
+        the current canonical tick and journal the resulting fill.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        engine = _engine(Path(tmp_dir), "usage-close-fr")
+        trader = SimTrader(engine)
+        asyncio.run(trader.submit_order(_intent()))
+        engine.execute_tick(_tick())
+        print(trader.close_position("sim-position-order-engine", Decimal(1)))
+
+
+def fr_sim_023() -> None:
+    """Demonstrate FR-SIM-023.
+
+    Responsibility:
+        The system shall expose immutable read-only orders, positions, pending orders,
+        deals, and account state for the current run without leaking mutable engine
+        objects.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        trader = SimTrader(_engine(Path(tmp_dir), "usage-snapshot"))
+        print(f"Snapshot engine: {trader.snapshot()['engine_version']}")
+
+
 def main() -> None:
     """Run Simulator execution usage example."""
-    example_execution()
+    fr_sim_018()
+    fr_sim_019()
+    fr_sim_043()
+    fr_sim_020()
+    fr_sim_021()
+    fr_sim_038()
+    fr_sim_022()
+    fr_sim_023()
 
 
 if __name__ == "__main__":

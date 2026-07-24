@@ -22,7 +22,7 @@ from app.services.simulator.errors import SimulationError
 from app.services.simulator.execution import ExecutionProfile, SessionInterval
 from app.services.simulator.run import SimulationBacktestRequestV1, run_backtest
 from app.services.trading import OrderIntent, TradingRoute
-from app.utils import AuthContext, canonical_json
+from app.utils import AuditEvent, AuthContext, canonical_json
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 
@@ -71,6 +71,39 @@ def _dataset(request_id: str) -> MarketDataset:
         workflow_context="backtest",
         precision_policy="decimal_string",
         request_id=request_id,
+    )
+
+
+def _fx_evidence(dataset: MarketDataset) -> FXConversionEvidence:
+    """Build one fresh Data-owned FX evidence fixture.
+
+    Args:
+        dataset: Dataset supplying trace and time identity.
+
+    Returns:
+        Fresh direct EUR/USD conversion evidence.
+    """
+    instant = dataset.start
+    leg = FXRateLeg(
+        source_currency="EUR",
+        target_currency="USD",
+        rate=Decimal("1.10"),
+        source_id="fixture",
+        provider_symbol="EURUSD",
+        as_of=instant,
+        provenance={"provider": "fixture"},
+    )
+    return FXConversionEvidence(
+        source_currency="EUR",
+        target_currency="USD",
+        legs=(leg,),
+        composite_rate=Decimal("1.10"),
+        as_of=instant,
+        expires_at=instant + timedelta(days=365),
+        path_policy_id="direct",
+        path_policy_version="v1",
+        provenance={"provider": "fixture"},
+        request_id=dataset.request_id,
     )
 
 
@@ -174,6 +207,15 @@ class FakeDependencies:
             tmp_path / "state.db", self.artifact_root
         )
         self.dataset = dataset
+        self.audit_events: list[AuditEvent] = []
+
+    def persist_audit_event(self, event: AuditEvent) -> None:
+        """Persist one audit event in the bounded fixture list.
+
+        Args:
+            event: Validated Utils-owned audit envelope.
+        """
+        self.audit_events.append(event)
 
     def load_market_data(self, request: SimulationBacktestRequestV1) -> MarketDataset:
         """Return referenced market evidence."""
@@ -292,31 +334,7 @@ class FakeDependencies:
         self, evidence_ids: tuple[str, ...]
     ) -> Mapping[str, FXConversionEvidence]:
         """Return one fresh Data-owned FX evidence record per identifier."""
-        instant = self.dataset.start
-        leg = FXRateLeg(
-            source_currency="EUR",
-            target_currency="USD",
-            rate=Decimal("1.10"),
-            source_id="fixture",
-            provider_symbol="EURUSD",
-            as_of=instant,
-            provenance={"provider": "fixture"},
-        )
-        return {
-            evidence_id: FXConversionEvidence(
-                source_currency="EUR",
-                target_currency="USD",
-                legs=(leg,),
-                composite_rate=Decimal("1.10"),
-                as_of=instant,
-                expires_at=instant + timedelta(days=365),
-                path_policy_id="direct",
-                path_policy_version="v1",
-                provenance={"provider": "fixture"},
-                request_id=self.dataset.request_id,
-            )
-            for evidence_id in evidence_ids
-        }
+        return {evidence_id: _fx_evidence(self.dataset) for evidence_id in evidence_ids}
 
 
 class CostBearingDependencies(FakeDependencies):
@@ -425,3 +443,63 @@ def test_markdown_report_states_measured_costs(tmp_path: Path) -> None:
     )
     assert f"- Commission: {result.accounting.commission}" in report
     assert "- Commission: 0\n" not in report
+
+
+def test_run_backtest_persists_started_and_completed_audit_events(
+    tmp_path: Path,
+) -> None:
+    """Persist bounded governed audit evidence at the official run boundary."""
+    dataset = _dataset("req-77777777-7777-4777-8777-777777777777")
+    request = _request(dataset, suffix="7")
+    dependencies = FakeDependencies(tmp_path, dataset)
+
+    run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+
+    assert [event.action for event in dependencies.audit_events] == [
+        "simulation.run_started",
+        "simulation.run_completed",
+    ]
+    assert all(event.domain == "simulation" for event in dependencies.audit_events)
+    assert all(
+        event.request_id == request.request_id for event in dependencies.audit_events
+    )
+
+
+def test_run_backtest_persists_failed_audit_event(tmp_path: Path) -> None:
+    """Persist a deterministic failure event without leaking provider details."""
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
+    request = _request(dataset, suffix="6")
+    dependencies = FakeDependencies(tmp_path, dataset)
+
+    def fail_load(request_value: SimulationBacktestRequestV1) -> MarketDataset:
+        del request_value
+        raise RuntimeError("provider-secret")
+
+    dependencies.load_market_data = fail_load  # type: ignore[method-assign]
+    with pytest.raises(SimulationError):
+        run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+
+    assert [event.action for event in dependencies.audit_events] == [
+        "simulation.run_started",
+        "simulation.run_failed",
+    ]
+    assert "provider-secret" not in repr(dependencies.audit_events)
+
+
+def test_run_backtest_fails_closed_when_audit_persistence_fails(
+    tmp_path: Path,
+) -> None:
+    """Map unavailable governed audit persistence to the public error catalog."""
+    dataset = _dataset("req-33333333-3333-4333-8333-333333333333")
+    request = _request(dataset, suffix="3")
+    dependencies = FakeDependencies(tmp_path, dataset)
+
+    def fail_audit(event: AuditEvent) -> None:
+        del event
+        raise OSError("audit store unavailable")
+
+    dependencies.persist_audit_event = fail_audit  # type: ignore[method-assign]
+    with pytest.raises(SimulationError) as captured:
+        run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+
+    assert captured.value.code == "SIM_PERSISTENCE_FAILED"

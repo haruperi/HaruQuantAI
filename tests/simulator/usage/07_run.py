@@ -12,7 +12,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.simulator.run import (
+from app.services.simulator import (
     PortfolioBacktestRequestV1,
     PortfolioComponentRequest,
     SimulationBacktestRequestV1,
@@ -20,12 +20,13 @@ from app.services.simulator.run import (
     run_fast_research,
     run_portfolio_backtest,
 )
-from app.utils import AuthContext, generate_id
+from app.utils import AuthContext, canonical_digest, generate_id
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,
     _data_hash,
     _dataset,
+    _fx_evidence,
 )
 
 
@@ -95,6 +96,7 @@ def _build_portfolio_request(
     wf_id = generate_id("wf")
     cor_id = generate_id("cor")
     start = dataset.start
+    fx_evidence = _fx_evidence(dataset)  # type: ignore[arg-type]
 
     payload: dict[str, object] = {
         "request_id": req_id,
@@ -108,6 +110,10 @@ def _build_portfolio_request(
         "measurement_end": start + timedelta(days=30),
         "base_currency": "USD",
         "fx_evidence_ids": ("fx-1",),
+        "fx_evidence_versions": (fx_evidence.contract_version,),
+        "fx_evidence_hashes": (
+            canonical_digest(fx_evidence.model_dump(mode="python", warnings=False)),
+        ),
         "execution_profile_version": "v1",
         "risk_policy_version": "v1",
         "seed": 7,
@@ -176,9 +182,133 @@ def example_run() -> None:
         print(f"Portfolio backtest status: {port_result.status}")
 
 
+def fr_sim_029() -> None:
+    """Demonstrate FR-SIM-029.
+
+    Responsibility:
+        The system shall expose the exact `docs/PROJECT.md` §5 request for one
+        synchronous bounded FX run, with separate contract version/schema ID, immutable
+        Strategy/Data/Simulation/Risk references, JSON-safe parameters,
+        symbol/timeframe/UTC range, positive initial balance, trace IDs, simulation
+        profile/route, config hash, and no raw code/provider objects/inline data.
+    """
+    request_id = generate_id("req")
+    request = _build_request(_dataset(request_id))
+    print(f"Backtest request: {request.schema_id}")
+
+
+def fr_sim_032() -> None:
+    """Demonstrate FR-SIM-032.
+
+    Responsibility:
+        The system shall expose `PortfolioBacktestRequestV1` with
+        `contract_version="v1"`, `schema_id="simulation.portfolio_backtest_request.v1"`,
+        portfolio and construction-result identifiers and versions, ordered component
+        allocations, exact Strategy/Data/FX/execution/Risk references and versions,
+        bounded UTC range, explicit seed, positive initial balance,
+        `runtime_profile="simulation"`, `execution_route="sim"`, and a SHA-256 config
+        hash. Every FX evidence ID is positionally bound to an explicit `v1`
+        compatibility version and lowercase canonical SHA-256 evidence hash. Each child
+        request's initial balance equals the portfolio balance multiplied by its exact
+        capital weight and its account currency equals the portfolio base currency. It
+        carries scalar values, identifiers, references, and hashes only, never embeds a
+        Portfolio-owned contract type, and carries no caller-supplied measurement
+        series.
+    """
+    request_id = generate_id("req")
+    request, _ = _build_portfolio_request(_dataset(request_id))
+    print(f"Portfolio request: {request.schema_id}")
+
+
+def fr_sim_030() -> None:
+    """Demonstrate FR-SIM-030.
+
+    Responsibility:
+        The system shall authenticate, deduplicate, validate, execute, journal, report,
+        persist, and return one deterministic canonical FX run, never publishing a
+        partial completed result. It persists bounded `simulation.run_started`,
+        `simulation.run_completed`, `simulation.run_replayed`, or
+        `simulation.run_failed` `AuditEvent v1` evidence through
+        `SimulationRunDependencies.persist_audit_event`; unavailable audit persistence
+        fails closed.
+    """
+    request_id = generate_id("req")
+    dataset = _dataset(request_id)
+    request = _build_request(dataset)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        dependencies = FakeDependencies(Path(tmp_dir), dataset)
+        result = run_backtest(
+            request,
+            _auth(request),
+            dependencies,  # type: ignore[arg-type]
+        )
+        print(f"Canonical status: {result.status}")
+
+
+def fr_sim_034() -> None:
+    """Demonstrate FR-SIM-034.
+
+    Responsibility:
+        The system shall execute every component of an approved portfolio candidate
+        through the ordinary deterministic simulation path, maintain one aggregate
+        account ledger and the Risk-owned budget history, and publish
+        `PortfolioSimulationResult v1` only when every component and the aggregate
+        journal reconcile. Reconciliation is arithmetic and falsifiable: exact allocated
+        opening capital equals portfolio opening capital, aggregate net profit equals
+        the exact sum of component net profit, and aggregate component count equals the
+        request. Component returns are sampled from each engine's actual end-of-tick
+        mark-to-market equity observations on one shared 30-point UTC cadence;
+        open-position price movement is included and closed-trade reconstruction is
+        forbidden. Every resolved FX evidence object must match its request-bound
+        version and canonical hash before freshness validation. The run persists bounded
+        portfolio start/completion/failure audit evidence.
+    """
+    request_id = generate_id("req")
+    dataset = _dataset(request_id)
+    request, auth = _build_portfolio_request(dataset)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        dependencies = FakeDependencies(Path(tmp_dir), dataset)
+        result = run_portfolio_backtest(
+            request,
+            auth,
+            dependencies,  # type: ignore[arg-type]
+        )
+        print(f"Portfolio status: {result.status}")
+
+
+def fr_sim_031() -> None:
+    """Demonstrate FR-SIM-031.
+
+    Responsibility:
+        The system shall run an explicitly requested approximation only when enabled,
+        mark every output `canonical=false`, disclose assumptions, prohibit canonical
+        fills, promotion evidence, and reports, and persist bounded research
+        start/completion/failure audit evidence.
+    """
+    request_id = generate_id("req")
+    dataset = _dataset(request_id)
+    request = _build_request(
+        dataset,
+        runtime_profile="fast_research",
+        canonical=False,
+    )
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        dependencies = FakeDependencies(Path(tmp_dir), dataset)
+        result = run_fast_research(
+            request,
+            _auth(request),
+            dependencies,  # type: ignore[arg-type]
+        )
+        print(f"Fast research canonical: {result.canonical}")
+
+
 def main() -> None:
     """Run Simulator run usage example."""
-    example_run()
+    fr_sim_029()
+    fr_sim_032()
+    fr_sim_030()
+    fr_sim_034()
+    fr_sim_031()
 
 
 if __name__ == "__main__":

@@ -10,16 +10,21 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.simulator.state import SIMULATION_MIGRATIONS, SimulationStateStore
+from app.services.simulator import SIMULATION_MIGRATIONS, SimulationStateStore
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 
-def example_state() -> None:
-    """Demonstrate state store operations and migrations."""
-    print("=" * 80)
-    print("Simulator Example 2: State Store Port and Migrations")
-    print("=" * 80)
+def fr_sim_041() -> None:
+    """Demonstrate FR-SIM-041.
 
+    Responsibility:
+        The system shall depend on persistence only through an injected
+        runtime-checkable `Protocol` exposing `append_journal`, `flush_journal`,
+        `finalize_journal`, `load_run`, and `record_idempotency`, and shall declare its
+        own migrations using the Data-owned `MigrationStep` contract. Simulation imports
+        no Data storage, connection, or locking module, no `sqlite3`, and executes no
+        schema statement of its own.
+    """
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
         store: SimulationStateStore = SqliteSimulationStateStore(
@@ -33,7 +38,7 @@ def example_state() -> None:
 
 def main() -> None:
     """Run Simulator state usage example."""
-    example_state()
+    fr_sim_041()
 
 
 if __name__ == "__main__":

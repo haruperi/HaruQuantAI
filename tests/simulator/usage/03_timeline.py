@@ -17,7 +17,7 @@ from app.services.data.contracts import (
     MarketDataset,
     TickRecord,
 )
-from app.services.simulator.timeline import (
+from app.services.simulator import (
     Tick,
     build_tick_timeline,
     validate_intent_timing,
@@ -88,15 +88,15 @@ def _dataset() -> MarketDataset:
     )
 
 
-def example_timeline() -> None:
-    """Demonstrate timeline and tick operations."""
-    print("=" * 80)
-    print("Simulator Example 3: Tick Contract and Timeline")
-    print("=" * 80)
+def fr_sim_004() -> None:
+    """Demonstrate FR-SIM-004.
 
+    Responsibility:
+        The system shall expose an immutable UTC tick containing symbol, timestamp, bid,
+        ask, source identity, sequence, and availability metadata with finite positive
+        prices and `ask >= bid`.
+    """
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-
-    # 1. Tick contract
     tick = Tick(
         symbol="EURUSD",
         timestamp=instant,
@@ -108,19 +108,39 @@ def example_timeline() -> None:
     )
     print(f"Tick spread: {tick.ask - tick.bid}")
 
-    # 2. Build tick timeline
+
+def fr_sim_005() -> None:
+    """Demonstrate FR-SIM-005.
+
+    Responsibility:
+        The system shall convert one Data-owned tick `MarketDataset` into a strictly
+        ordered immutable `Tick` tuple, validating UTC monotonicity, positive finite
+        prices, `ask >= bid`, and the presence of intra-bar phase evidence. Tick
+        derivation itself belongs to Data (`FR-DATA-087`-`FR-DATA-090`); Simulation
+        constructs no ticks, applies no spread model, and consumes no seed.
+    """
     timeline = build_tick_timeline(_dataset())
     sequences = tuple(t.sequence for t in timeline)
     print(f"Timeline tick sequences: {sequences}")
 
-    # 3. Validate intent timing
+
+def fr_sim_006() -> None:
+    """Demonstrate FR-SIM-006.
+
+    Responsibility:
+        The system shall reject a strategy intent whose evidence became available after
+        its execution time and enforce previous-closed-bar visibility by default.
+    """
+    instant = datetime(2025, 1, 1, tzinfo=UTC)
     validate_intent_timing(instant, instant)
     print("Intent timing validated successfully")
 
 
 def main() -> None:
     """Run Simulator timeline usage example."""
-    example_timeline()
+    fr_sim_004()
+    fr_sim_005()
+    fr_sim_006()
 
 
 if __name__ == "__main__":

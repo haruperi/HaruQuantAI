@@ -3,8 +3,7 @@
 
 from pathlib import Path
 
-from app.services.simulator import run_backtest
-from app.services.simulator.journal import JournalEvent, replay_journal
+from app.services.simulator import JournalEvent, replay_journal, run_backtest
 from app.utils import logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,

@@ -14,9 +14,8 @@ import json
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass
+from importlib import import_module
 from typing import TYPE_CHECKING, Final, Literal, cast
-
-import pandas as pd
 
 from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.utils import canonical_json, logger
@@ -28,11 +27,30 @@ from app.utils import canonical_json, logger
 _CHECKSUM_CHUNK_RECORDS: Final[int] = 250
 
 if TYPE_CHECKING:
+    import pandas as pd
+
     from app.services.data import (
         MarketDataset,
         OHLCVRecord,
     )
     from app.services.indicators.core.contracts import IndicatorConfig
+else:
+
+    class _LazyPandas:
+        """Load pandas only when IndicatorResult performs tabular work."""
+
+        def __getattr__(self, name: str) -> object:
+            """Resolve one pandas attribute at the runtime operation boundary.
+
+            Args:
+                name: Requested pandas attribute name.
+
+            Returns:
+                The resolved pandas attribute.
+            """
+            return getattr(import_module("pandas"), name)
+
+    pd = _LazyPandas()
 
 
 @dataclass(frozen=True, slots=True)

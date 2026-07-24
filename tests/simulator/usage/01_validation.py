@@ -18,8 +18,8 @@ from app.services.data.contracts import (
     MarketDataset,
     TickRecord,
 )
-from app.services.simulator.validation.contracts import MarketDataValidationContext
-from app.services.simulator.validation.validate import (
+from app.services.simulator import (
+    MarketDataValidationContext,
     validate_market_data,
     validate_phase_one_scope,
     validate_run_inputs,
@@ -92,13 +92,14 @@ def _context(dataset: MarketDataset) -> MarketDataValidationContext:
     )
 
 
-def example_validation() -> None:
-    """Demonstrate simulation validation operations."""
-    print("=" * 80)
-    print("Simulator Example 1: Boundary Validation")
-    print("=" * 80)
+def fr_sim_001() -> None:
+    """Demonstrate FR-SIM-001.
 
-    # 1. Run inputs validation
+    Responsibility:
+        The system shall validate authentication-relevant request structure, registered
+        strategy references, Data references, broker-profile references, trace
+        identifiers, and deterministic serialization before any import or execution.
+    """
     payload = {
         "request_id": "req-simulator-usage",
         "workflow_id": "wf-simulator-usage",
@@ -122,7 +123,15 @@ def example_validation() -> None:
     validate_run_inputs(payload)
     print("Run inputs successfully validated")
 
-    # 2. Phase one scope validation
+
+def fr_sim_003() -> None:
+    """Demonstrate FR-SIM-003.
+
+    Responsibility:
+        The system shall permit only approved FX scope or explicit `FAST_RESEARCH`,
+        rejecting unsupported assets, features, service mode, and canonical claims from
+        approximation.
+    """
     validate_phase_one_scope(
         {
             "asset_class": "FX",
@@ -132,7 +141,16 @@ def example_validation() -> None:
     )
     print("Phase one scope successfully validated")
 
-    # 3. Market data validation
+
+def fr_sim_002() -> None:
+    """Demonstrate FR-SIM-002.
+
+    Responsibility:
+        The system shall verify manifest checksum, required schema, UTC monotonic
+        timestamps, uniqueness, OHLC consistency, bid/ask spread, staleness,
+        availability metadata, and requested coverage, blocking severe failures before
+        execution, and shall return immutable validated evidence.
+    """
     dataset = _dataset()
     evidence = validate_market_data(dataset, _context(dataset))
     print(f"Validated market data records: {evidence.record_count}")
@@ -140,7 +158,9 @@ def example_validation() -> None:
 
 def main() -> None:
     """Run Simulator validation usage example."""
-    example_validation()
+    fr_sim_001()
+    fr_sim_002()
+    fr_sim_003()
 
 
 if __name__ == "__main__":

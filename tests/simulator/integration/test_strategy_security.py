@@ -2,8 +2,7 @@
 # ruff: noqa: INP001
 
 import pytest
-from app.services.simulator import SimulationError
-from app.services.simulator.validation import validate_run_inputs
+from app.services.simulator import SimulationError, validate_run_inputs
 from app.utils import logger
 from tests.simulator.unit.test_validate import _valid_payload
 

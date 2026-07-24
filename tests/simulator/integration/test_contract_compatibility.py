@@ -11,14 +11,12 @@ import dataclasses
 from decimal import Decimal
 
 from app.services.analytics import ClosedTrade
-from app.services.simulator.reporting import (
+from app.services.simulator import (
     ClosedTradeRecord,
-    PortfolioSimulationResult,
-    SimulationResult,
-)
-from app.services.simulator.run import (
     PortfolioBacktestRequestV1,
+    PortfolioSimulationResult,
     SimulationBacktestRequestV1,
+    SimulationResult,
 )
 from app.utils import logger
 from tests.simulator.unit.test_reporting_contracts import _result

@@ -117,9 +117,9 @@ def test_root_and_feature_exports_are_exact() -> None:
     """Root/feature ``__all__`` values are exact with no undocumented symbols."""
     for module, expected in _NAMESPACES:
         assert list(module.__all__) == list(expected)
-        assert _public_non_module_attrs(module) == set(expected)
         for name in expected:
             assert hasattr(module, name)
+        assert _public_non_module_attrs(module) == set(expected)
 
 
 def test_retired_bundled_modules_are_not_public_symbols() -> None:

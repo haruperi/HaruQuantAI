@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.reporting import FastResearchResult
+from app.services.simulator.run.audit import emit_simulation_audit
 from app.services.simulator.run.orchestrator import _canonical_hash, _validate_auth
 from app.services.simulator.timeline import build_tick_timeline
 from app.services.simulator.validation import (
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
     )
 
 
-def run_fast_research(
+def _run_fast_research(
     request: SimulationBacktestRequestV1,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
@@ -77,6 +78,52 @@ def run_fast_research(
         ),
         generated_at=timeline[-1].timestamp,
     )
+
+
+def run_fast_research(
+    request: SimulationBacktestRequestV1,
+    auth_context: AuthContext,
+    dependencies: SimulationRunDependencies,
+) -> FastResearchResult:
+    """Run and audit one explicitly non-canonical approximation.
+
+    Args:
+        request: Explicit ``fast_research`` non-canonical request.
+        auth_context: Authenticated matching trace context.
+        dependencies: Read-only composition and audit persistence.
+
+    Returns:
+        Disclosed non-canonical approximation.
+
+    Raises:
+        SimulationError: If validation, audit, or execution fails.
+    """
+    emit_simulation_audit(
+        dependencies,
+        auth_context,
+        "simulation.research_started",
+        request.start,
+        {"config_hash": request.config_hash},
+    )
+    try:
+        result = _run_fast_research(request, auth_context, dependencies)
+    except Exception:
+        emit_simulation_audit(
+            dependencies,
+            auth_context,
+            "simulation.research_failed",
+            request.end,
+            {"config_hash": request.config_hash},
+        )
+        raise
+    emit_simulation_audit(
+        dependencies,
+        auth_context,
+        "simulation.research_completed",
+        result.generated_at,
+        {"request_hash": result.request_hash},
+    )
+    return result
 
 
 __all__ = ["run_fast_research"]

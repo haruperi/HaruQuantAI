@@ -67,9 +67,9 @@ def _intent() -> OrderIntent:
     instant = datetime(2025, 1, 1, tzinfo=UTC)
     return OrderIntent(
         client_order_id="order-engine",
-        request_id="req-test",
-        workflow_id="wf-test",
-        correlation_id="cor-test",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-11111111-1111-4111-8111-111111111111",
         route=TradingRoute.SIM,
         provider_id=None,
         account_id="account",

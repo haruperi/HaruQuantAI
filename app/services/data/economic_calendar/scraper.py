@@ -16,9 +16,8 @@ import pickle
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
+from importlib import import_module
 from typing import TYPE_CHECKING, Final, Literal, Protocol
-
-import pandas as pd
 
 from app.services.data.contracts import DataError
 from app.services.data.persistence.paths import resolve_approved_storage_path
@@ -27,6 +26,18 @@ from app.utils import logger
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
     from pathlib import Path
+
+    import pandas as pd
+else:
+
+    class _LazyPandas:
+        """Load pandas only when calendar parsing or projection requires it."""
+
+        def __getattr__(self, name: str) -> object:
+            """Resolve one pandas attribute at the runtime operation boundary."""
+            return getattr(import_module("pandas"), name)
+
+    pd = _LazyPandas()
 
 CALENDAR_SITES: Final[tuple[str, ...]] = (
     "forexfactory",

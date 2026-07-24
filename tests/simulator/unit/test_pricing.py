@@ -18,9 +18,9 @@ def _intent(side: str = "BUY") -> OrderIntent:
     instant = datetime(2025, 1, 1, tzinfo=UTC)
     return OrderIntent(
         client_order_id=f"order-{side.lower()}",
-        request_id="req-test",
-        workflow_id="wf-test",
-        correlation_id="cor-test",
+        request_id="req-123e4567-e89b-42d3-a456-426614174000",
+        workflow_id="wf-123e4567-e89b-42d3-a456-426614174001",
+        correlation_id="cor-123e4567-e89b-42d3-a456-426614174002",
         route=TradingRoute.SIM,
         provider_id=None,
         account_id="account",

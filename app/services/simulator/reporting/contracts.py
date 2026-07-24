@@ -14,7 +14,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.services.trading import ExecutionReceipt  # noqa: TC001
+from app.services.trading.contracts import ExecutionReceipt  # noqa: TC001
 from app.utils import logger
 
 CANONICAL_ARTIFACT_TYPES = ("journal.jsonl", "result.json", "report.md")

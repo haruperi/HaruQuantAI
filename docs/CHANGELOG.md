@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.2.8
+
+**Release date:** 2026-07-24
+
+### Complete Simulator domain
+
+The Simulation domain now exposes nine focused feature modules with deterministic execution, replay journals, fixed-precision account math, canonical artifacts, and standalone usage coverage.
+
+#### Added (9)
+
+- `FEAT-SIM-01` Boundary and Quality Validation.
+- `FEAT-SIM-02` Simulation-Owned State.
+- `FEAT-SIM-03` Canonical Tick Timeline.
+- `FEAT-SIM-04` Fixed-Precision Account Math.
+- `FEAT-SIM-05` Matching and Simulated State.
+- `FEAT-SIM-06` Immutable Journal and Replay.
+- `FEAT-SIM-07` Official and Research Orchestration.
+- `FEAT-SIM-08` Domain Error Taxonomy.
+- `FEAT-SIM-09` Results and Canonical Artifacts.
+
 ## 2.2.7
 
 **Release date:** 2026-07-24

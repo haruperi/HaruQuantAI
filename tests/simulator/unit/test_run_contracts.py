@@ -10,8 +10,9 @@ from app.services.simulator.run import (
     PortfolioBacktestRequestV1,
     PortfolioComponentRequest,
 )
+from app.utils import canonical_digest
 from pydantic import ValidationError
-from tests.simulator.unit.test_orchestrator import _dataset, _request
+from tests.simulator.unit.test_orchestrator import _dataset, _fx_evidence, _request
 
 
 def test_request_matches_project_section_5_exactly() -> None:
@@ -42,6 +43,7 @@ def test_portfolio_request_is_self_contained() -> None:
         metrics_ref="metrics-1",
         backtest_request=child,
     )
+    fx_evidence = _fx_evidence(dataset)
     payload: dict[str, object] = {
         "request_id": "req-77777777-7777-4777-8777-777777777777",
         "workflow_id": "wf-77777777-7777-4777-8777-777777777777",
@@ -54,6 +56,10 @@ def test_portfolio_request_is_self_contained() -> None:
         "measurement_end": observations[-1].timestamp,
         "base_currency": "USD",
         "fx_evidence_ids": ("fx-1",),
+        "fx_evidence_versions": (fx_evidence.contract_version,),
+        "fx_evidence_hashes": (
+            canonical_digest(fx_evidence.model_dump(mode="python", warnings=False)),
+        ),
         "execution_profile_version": "v1",
         "risk_policy_version": "v1",
         "seed": 7,

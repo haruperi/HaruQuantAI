@@ -1,0 +1,88 @@
+"""Authoritative closed Simulation error catalog."""
+
+from collections.abc import Mapping
+from types import MappingProxyType
+
+from app.utils import logger
+
+_GROUPS: dict[str, tuple[str, ...]] = {
+    "request_scope": (
+        "SIM_INVALID_CONFIG",
+        "SIM_INVALID_DATE_RANGE",
+        "SIM_MISSING_SYMBOL",
+        "SIM_ARBITRARY_CODE_REJECTED",
+        "SIM_UNSUPPORTED_OPERATION",
+        "SIM_UNSUPPORTED_ASSET_CLASS",
+        "SIM_UNSUPPORTED_FEATURE",
+    ),
+    "data_timing": (
+        "SIM_DATA_CHECKSUM_MISMATCH",
+        "SIM_DATA_SCHEMA_INVALID",
+        "SIM_DATA_NON_MONOTONIC",
+        "SIM_DATA_DUPLICATE_TIMESTAMP",
+        "SIM_DATA_OHLC_INVALID",
+        "SIM_DATA_SPREAD_NEGATIVE",
+        "SIM_DATA_STALE",
+        "SIM_DATA_COVERAGE_INSUFFICIENT",
+        "SIM_LOOKAHEAD_DETECTED",
+        "SIM_FEATURE_LOOKAHEAD_DETECTED",
+        "SIM_UNSUPPORTED_TICK_MODEL",
+        "SIM_SPREAD_MISSING",
+    ),
+    "execution_accounting": (
+        "SIM_INVALID_PRICE",
+        "SIM_INVALID_VOLUME",
+        "SIM_VOLUME_BELOW_MIN",
+        "SIM_VOLUME_ABOVE_MAX",
+        "SIM_VOLUME_STEP_MISMATCH",
+        "SIM_SLIPPAGE_EXCEEDED",
+        "SIM_LIQUIDITY_UNAVAILABLE",
+        "SIM_GAP_UNCROSSABLE",
+        "SIM_MARKET_CLOSED",
+        "SIM_UNSUPPORTED_FILL_POLICY",
+        "SIM_INSUFFICIENT_MARGIN",
+        "SIM_COMMISSION_CALCULATION_FAILED",
+        "SIM_SWAP_CALCULATION_FAILED",
+        "SIM_FX_EVIDENCE_UNAVAILABLE",
+        "SIM_POSITION_NOT_FOUND",
+        "SIM_ORDER_NOT_FOUND",
+        "SIM_EVENT_PRIORITY_AMBIGUOUS",
+        "SIM_ACCOUNT_INVARIANT_BROKEN",
+    ),
+    "persistence_replay": (
+        "SIM_PERSISTENCE_FAILED",
+        "SIM_CHECKPOINT_INCOMPATIBLE",
+        "SIM_RUN_ID_CONFLICT",
+    ),
+    "portfolio": (
+        "SIM_COMPONENT_INCOMPLETE",
+        "SIM_AGGREGATE_UNRECONCILED",
+    ),
+    "safe_fallback": ("SIM_INTERNAL_ERROR",),
+}
+
+
+def _build_catalog() -> Mapping[str, Mapping[str, object]]:
+    """Build the immutable authoritative error catalog.
+
+    Returns:
+        Immutable mapping from error code to public metadata.
+    """
+    logger.debug("Building the Simulation error catalog")
+    catalog = {
+        code: MappingProxyType(
+            {
+                "group": group,
+                "meaning": code.removeprefix("SIM_").lower(),
+                "effect": "fail_closed",
+            }
+        )
+        for group, codes in _GROUPS.items()
+        for code in codes
+    }
+    return MappingProxyType(catalog)
+
+
+SIM_ERROR_CATALOG = _build_catalog()
+
+__all__ = ["SIM_ERROR_CATALOG"]

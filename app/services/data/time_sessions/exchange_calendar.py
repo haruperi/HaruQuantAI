@@ -1,8 +1,7 @@
 """Exchange-calendar session retrieval using explicit venue identifiers."""
 
 from datetime import UTC, datetime, timedelta
-
-import exchange_calendars as xcals  # type: ignore[import-untyped]
+from importlib import import_module
 
 from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
@@ -40,6 +39,7 @@ def get_exchange_sessions(
         request.calendar_code,
     )
     try:
+        xcals = import_module("exchange_calendars")
         registered = xcals.get_calendar(request.calendar_code)
         calendar = type(registered)(
             start=request.start - timedelta(days=1),

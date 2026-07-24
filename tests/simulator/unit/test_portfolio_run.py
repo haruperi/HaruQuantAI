@@ -13,11 +13,12 @@ from app.services.simulator.run import (
     PortfolioComponentRequest,
     run_portfolio_backtest,
 )
-from app.utils import AuthContext
+from app.utils import AuthContext, canonical_digest
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,
     _dataset,
+    _fx_evidence,
     _request,
 )
 
@@ -34,6 +35,7 @@ def _portfolio_request() -> PortfolioBacktestRequestV1:
         metrics_ref="metrics-1",
         backtest_request=child,
     )
+    fx_evidence = _fx_evidence(dataset)
     payload: dict[str, object] = {
         "request_id": "req-77777777-7777-4777-8777-777777777777",
         "workflow_id": "wf-77777777-7777-4777-8777-777777777777",
@@ -46,6 +48,10 @@ def _portfolio_request() -> PortfolioBacktestRequestV1:
         "measurement_end": dataset.start + timedelta(days=30),
         "base_currency": "USD",
         "fx_evidence_ids": ("fx-1",),
+        "fx_evidence_versions": (fx_evidence.contract_version,),
+        "fx_evidence_hashes": (
+            canonical_digest(fx_evidence.model_dump(mode="python", warnings=False)),
+        ),
         "execution_profile_version": "v1",
         "risk_policy_version": "v1",
         "seed": 7,
@@ -167,3 +173,51 @@ def test_portfolio_return_series_is_measured_not_supplied(tmp_path: Path) -> Non
     )
     assert all(row.reconciled for row in result.component_results)
     assert (dependencies.artifact_root / result.aggregate_metrics_ref).is_file()
+    assert result.component_results[0].account_currency == request.base_currency
+    assert any(
+        observation.return_value != Decimal(0) for observation in series.observations
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement"),
+    [
+        ("fx_evidence_versions", ("v2",)),
+        ("fx_evidence_hashes", ("F" * 64,)),
+    ],
+)
+def test_portfolio_request_rejects_invalid_fx_identity_bindings(
+    field: str,
+    replacement: tuple[str, ...],
+) -> None:
+    """Reject malformed FX version or hash bindings before provider access."""
+    request = _portfolio_request()
+    payload = request.model_dump(mode="python", warnings=False)
+    payload[field] = replacement
+    payload["config_hash"] = PortfolioBacktestRequestV1.calculate_config_hash(payload)
+
+    with pytest.raises(ValueError, match="FX evidence"):
+        PortfolioBacktestRequestV1.model_validate(payload)
+
+
+def test_portfolio_run_rejects_resolved_fx_hash_mismatch(tmp_path: Path) -> None:
+    """Bind resolved Data evidence to the exact request-declared digest."""
+    request = _portfolio_request()
+    dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
+    dependencies = FakeDependencies(tmp_path, dataset)
+    replacement = _fx_evidence(dataset).model_copy(
+        update={"path_policy_id": "different-policy"}
+    )
+
+    def mismatched_fx(evidence_ids: tuple[str, ...]) -> Mapping[str, object]:
+        return dict.fromkeys(evidence_ids, replacement)
+
+    dependencies.resolve_fx_evidence = mismatched_fx  # type: ignore[method-assign]
+    with pytest.raises(SimulationError) as captured:
+        run_portfolio_backtest(
+            request,
+            _portfolio_auth(request),
+            dependencies,  # type: ignore[arg-type]
+        )
+
+    assert captured.value.code == "SIM_FX_EVIDENCE_UNAVAILABLE"

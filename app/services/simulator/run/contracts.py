@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from app.services.simulator.state import SimulationStateStore
     from app.services.strategy import TradeIntent
     from app.services.trading import OrderIntent
+    from app.utils import AuditEvent
 
 type JsonParameter = (
     None
@@ -242,6 +243,8 @@ class PortfolioBacktestRequestV1(BaseModel):
     measurement_end: datetime
     base_currency: str
     fx_evidence_ids: tuple[str, ...]
+    fx_evidence_versions: tuple[str, ...]
+    fx_evidence_hashes: tuple[str, ...]
     execution_profile_version: str
     risk_policy_version: str
     seed: int
@@ -266,9 +269,51 @@ class PortfolioBacktestRequestV1(BaseModel):
         material.setdefault("schema_id", "simulation.portfolio_backtest_request.v1")
         return _hash_material(material)
 
+    def _validate_fx_bindings(self) -> None:
+        """Validate ordered immutable FX evidence identities.
+
+        Raises:
+            ValueError: If FX bindings are incomplete or malformed.
+        """
+        sha256_hex_length = 64
+        if not (
+            len(self.fx_evidence_ids)
+            == len(self.fx_evidence_versions)
+            == len(self.fx_evidence_hashes)
+        ):
+            raise ValueError("Portfolio FX evidence bindings must align")
+        if len(set(self.fx_evidence_ids)) != len(self.fx_evidence_ids):
+            raise ValueError("Portfolio FX evidence IDs must be unique")
+        if any(version != "v1" for version in self.fx_evidence_versions):
+            raise ValueError("Portfolio FX evidence versions must be v1")
+        if any(
+            len(digest) != sha256_hex_length
+            or digest != digest.lower()
+            or any(character not in "0123456789abcdef" for character in digest)
+            for digest in self.fx_evidence_hashes
+        ):
+            raise ValueError("Portfolio FX evidence hashes must be lowercase SHA-256")
+
+    def _validate_component_allocations(self) -> None:
+        """Validate component capital and currency allocations.
+
+        Raises:
+            ValueError: If a child request disagrees with its allocation.
+        """
+        for component in self.components:
+            expected_balance = self.initial_balance * component.capital_weight
+            child = component.backtest_request
+            if (
+                child.initial_balance != expected_balance
+                or child.account_currency != self.base_currency
+            ):
+                raise ValueError(
+                    "Portfolio component capital and currency must match allocation"
+                )
+
     @model_validator(mode="after")
     def _validate_portfolio(self) -> PortfolioBacktestRequestV1:
-        """Validate component completeness and portfolio config hash.
+        """Validate portfolio relationships and configuration identity.
 
         Returns:
             Validated portfolio request.
@@ -286,6 +331,8 @@ class PortfolioBacktestRequestV1(BaseModel):
             raise ValueError("Portfolio component IDs must be unique")
         if not self.initial_balance.is_finite() or self.initial_balance <= 0:
             raise ValueError("Portfolio initial balance must be positive")
+        self._validate_fx_bindings()
+        self._validate_component_allocations()
         payload = self.model_dump(mode="python", warnings=False)
         if self.config_hash != type(self).calculate_config_hash(payload):
             raise ValueError("config_hash does not match portfolio material")
@@ -298,6 +345,19 @@ class SimulationRunDependencies(Protocol):
     state_store: SimulationStateStore
     artifact_root: Path
     fast_research_enabled: bool
+
+    def persist_audit_event(self, event: AuditEvent) -> None:
+        """Persist one governed Simulation audit event through Data.
+
+        Args:
+            event: Bounded Utils-owned audit envelope.
+
+        Raises:
+            SimulationError: If durable persistence fails.
+        """
+        logger.debug("Declaring Simulation audit persistence dependency")
+        del event
+        raise NotImplementedError
 
     def load_market_data(self, request: SimulationBacktestRequestV1) -> MarketDataset:
         """Load the immutable referenced Data dataset."""

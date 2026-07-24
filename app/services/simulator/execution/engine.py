@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
 from types import MappingProxyType
@@ -16,7 +17,7 @@ from app.services.simulator.execution.matching import (
 )
 from app.services.simulator.reporting.contracts import ClosedTradeRecord
 from app.services.simulator.timeline import Tick, validate_intent_timing
-from app.services.trading import ExecutionReceipt, OrderIntent
+from app.services.trading.contracts import ExecutionReceipt, OrderIntent
 from app.utils import canonical_json, logger
 
 if TYPE_CHECKING:
@@ -103,6 +104,7 @@ class EventDrivenExecutionEngine:
         self._deals: list[ExecutionReceipt] = []
         self._positions: dict[str, dict[str, object]] = {}
         self._closed_trades: list[ClosedTradeRecord] = []
+        self._equity_observations: list[tuple[datetime, Decimal]] = []
         self._current_tick: Tick | None = None
         self._last_seen: Tick | None = None
 
@@ -115,6 +117,16 @@ class EventDrivenExecutionEngine:
         """
         logger.debug("Reading the Simulation closed-trade ledger")
         return tuple(self._closed_trades)
+
+    @property
+    def equity_observations(self) -> tuple[tuple[datetime, Decimal], ...]:
+        """Return end-of-tick mark-to-market equity observations.
+
+        Returns:
+            Immutable ordered UTC timestamp and equity pairs.
+        """
+        logger.debug("Reading Simulation mark-to-market equity observations")
+        return tuple(self._equity_observations)
 
     def _receipt(
         self,
@@ -500,6 +512,11 @@ class EventDrivenExecutionEngine:
                 continue
             outcomes.append(self._apply_match(intent, match, tick))
             del self._pending[order_id]
+        self._observe_excursions(tick)
+        account = self._ledger.snapshot()
+        self._equity_observations.append(
+            (tick.timestamp, Decimal(str(account["equity"])))
+        )
         return tuple(outcomes)
 
     def close_position(

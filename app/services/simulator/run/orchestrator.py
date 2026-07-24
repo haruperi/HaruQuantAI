@@ -23,6 +23,7 @@ from app.services.simulator.reporting import (
     build_json_report,
     build_markdown_report,
 )
+from app.services.simulator.run.audit import emit_simulation_audit
 from app.services.simulator.timeline import APPROVED_TICK_MODELS, build_tick_timeline
 from app.services.simulator.validation import (
     validate_market_data,
@@ -30,7 +31,7 @@ from app.services.simulator.validation import (
     validate_run_inputs,
 )
 from app.services.simulator.validation.contracts import MarketDataValidationContext
-from app.services.trading import ExecutionReceipt
+from app.services.trading.contracts import ExecutionReceipt
 from app.utils import AuthContext, canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
@@ -245,12 +246,12 @@ def _require_nonempty_timeline(timeline: tuple[Tick, ...]) -> None:
         )
 
 
-def run_backtest(  # noqa: PLR0915 - explicit governed lifecycle.
+def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
     request: SimulationBacktestRequestV1,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
-) -> SimulationResult:
-    """Execute and publish one governed deterministic canonical FX run.
+) -> tuple[SimulationResult, tuple[tuple[datetime, Decimal], ...]]:
+    """Execute one governed run and retain internal equity evidence.
 
     Args:
         request: Exact receiver-owned backtest request.
@@ -258,7 +259,7 @@ def run_backtest(  # noqa: PLR0915 - explicit governed lifecycle.
         dependencies: Explicit cross-domain and persistence composition.
 
     Returns:
-        Completed canonical result; partial results are never returned.
+        Completed canonical result and ordered mark-to-market equity evidence.
 
     Raises:
         SimulationError: For any controlled or safely mapped run failure.
@@ -270,6 +271,13 @@ def run_backtest(  # noqa: PLR0915 - explicit governed lifecycle.
     validate_phase_one_scope(payload)
     request_hash = _canonical_hash(payload)
     run_id = f"sim-{request_hash[:32]}"
+    emit_simulation_audit(
+        dependencies,
+        auth_context,
+        "simulation.run_started",
+        request.start,
+        {"request_hash": request_hash, "run_id": run_id},
+    )
     completed_run = resolve_idempotent_run(
         request.request_id,
         request_hash,
@@ -283,11 +291,19 @@ def run_backtest(  # noqa: PLR0915 - explicit governed lifecycle.
                 "SIM_CHECKPOINT_INCOMPATIBLE", "Stored result is unavailable"
             )
         try:
-            return SimulationResult.model_validate(stored)
+            result = SimulationResult.model_validate(stored)
         except ValidationError as error:
             raise SimulationError(
                 "SIM_CHECKPOINT_INCOMPATIBLE", "Stored result is invalid"
             ) from error
+        emit_simulation_audit(
+            dependencies,
+            auth_context,
+            "simulation.run_replayed",
+            request.end,
+            {"request_hash": request_hash, "run_id": result.run_id},
+        )
+        return result, ()
     dependencies.state_store.record_idempotency(
         request.request_id,
         request_hash,
@@ -379,7 +395,14 @@ def run_backtest(  # noqa: PLR0915 - explicit governed lifecycle.
             "completed",
             result.model_dump(mode="python", warnings=False),
         )
-        return result
+        emit_simulation_audit(
+            dependencies,
+            auth_context,
+            "simulation.run_completed",
+            timeline[-1].timestamp,
+            {"request_hash": request_hash, "run_id": run_id},
+        )
+        return result, engine.equity_observations
     except SimulationError:
         dependencies.state_store.record_idempotency(
             request.request_id,
@@ -401,6 +424,38 @@ def run_backtest(  # noqa: PLR0915 - explicit governed lifecycle.
             "Simulation failed safely",
             request_id=request.request_id,
         ) from error
+
+
+def run_backtest(
+    request: SimulationBacktestRequestV1,
+    auth_context: AuthContext,
+    dependencies: SimulationRunDependencies,
+) -> SimulationResult:
+    """Execute and publish one governed deterministic canonical FX run.
+
+    Args:
+        request: Exact receiver-owned backtest request.
+        auth_context: Authenticated matching trace context.
+        dependencies: Explicit cross-domain and persistence composition.
+
+    Returns:
+        Completed canonical result; partial results are never returned.
+
+    Raises:
+        SimulationError: For any controlled or safely mapped run failure.
+    """
+    try:
+        result, _ = _run_backtest_with_evidence(request, auth_context, dependencies)
+    except SimulationError:
+        emit_simulation_audit(
+            dependencies,
+            auth_context,
+            "simulation.run_failed",
+            request.end,
+            {"config_hash": request.config_hash},
+        )
+        raise
+    return result
 
 
 __all__ = ["run_backtest"]

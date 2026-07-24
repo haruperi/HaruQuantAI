@@ -1,10 +1,9 @@
 # Simulation
 
 > **Package:** `app/services/simulator`
-> **Status:** `Partial` — implemented behavioral evidence remains recorded, but
-> the requirement-bearing root `errors.py` feature does not satisfy the current
-> one-feature/one-module-folder rule.
-> **Last updated:** `2026-07-19`
+> **Status:** `Completed` — implementation, documentation, behavioral
+> validation, standalone usage, and coverage gates are current and green.
+> **Last updated:** `2026-07-24`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -129,6 +128,8 @@ flowchart TD
     SIM --> EXE[[execution: Matching and simulated state]]
     SIM --> REP[[reporting: Results and artifacts]]
     SIM --> RUN[[run: Official and research orchestration]]
+    SIM --> ERR[[errors: Domain error taxonomy]]
+    SIM --> STA[[state: Owned persistence contracts]]
 
     VAL --> VALF[contracts.py; validate.py]
     TIME --> TIMEF[contracts.py; timeline.py]
@@ -136,7 +137,9 @@ flowchart TD
     JRN --> JRNF[contracts.py; writer.py; replay.py]
     EXE --> EXEF[pricing.py; matching.py; engine.py; trader.py]
     REP --> REPF[contracts.py; artifacts.py; reports.py]
-    RUN --> RUNF[contracts.py; orchestrator.py; research.py]
+    RUN --> RUNF[contracts.py; aggregate.py; audit.py; orchestrator.py; portfolio.py; research.py]
+    ERR --> ERRF[catalog.py; exception.py; payload.py]
+    STA --> STAF[store.py; migrations.py]
 ```
 
 ---
@@ -156,18 +159,20 @@ Module folders and files are ordered from lowest dependency to highest dependenc
 | Completed | `FEAT-SIM-05` Matching and Simulated State | `execution/` | Exact declarations and execution contracts: Section 4.5 | Section 4.5 functional requirements | `tests/simulator/usage/05_execution.py` |
 | Completed | `FEAT-SIM-06` Immutable Journal and Replay | `journal/` | Exact declarations and journal contracts: Section 4.4 | Section 4.4 functional requirements | `tests/simulator/usage/06_journal.py` |
 | Completed | `FEAT-SIM-07` Official and Research Orchestration | `run/` | Exact declarations and run contracts: Section 4.7 | Section 4.7 functional requirements | `tests/simulator/usage/07_run.py` |
-| Partial | `FEAT-SIM-08` Domain Error Taxonomy | Root file `errors.py` | Exact declarations: Section 4.0 | Section 4.0 functional requirements | `tests/simulator/usage/08_errors.py`; root-file ownership remains structurally noncompliant |
+| Completed | `FEAT-SIM-08` Domain Error Taxonomy | `errors/` | Exact declarations: Section 4.0 | Section 4.0 functional requirements | `tests/simulator/usage/08_errors.py` |
 | Completed | `FEAT-SIM-09` Results and Canonical Artifacts | `reporting/` | Exact declarations and result contracts: Section 4.6 | Section 4.6 functional requirements | `tests/simulator/usage/09_reporting.py` |
 
-The Simulation feature IDs now follow the numbered usage programs. This exposes
-the root-file structural finding without changing implementation or erasing the
-previously recorded behavioral test results.
+The Simulation feature IDs follow the numbered standalone usage programs.
 
 ```text
 simulator/
 ├── __init__.py                         # Domain API: requests, results, governed run operations, and SimTrader
 ├── README.md
-├── errors.py                           # Domain error taxonomy and code catalog
+├── errors/                            # Domain error taxonomy
+│   ├── __init__.py
+│   ├── catalog.py                     # Closed Simulation error catalog
+│   ├── exception.py                   # Controlled SimulationError
+│   └── payload.py                     # Bounded public error payload
 ├── validation/                         # Inbound contracts, scope, and data-quality gates
 │   ├── __init__.py
 │   ├── contracts.py                    # Validation result contracts
@@ -203,6 +208,8 @@ simulator/
 └── run/                                # Typed public contracts and orchestration
     ├── __init__.py
     ├── contracts.py                    # Versioned request contracts
+    ├── aggregate.py                    # Portfolio aggregate account ledger
+    ├── audit.py                        # Governed AuditEvent persistence
     ├── orchestrator.py                 # Official synchronous run_backtest path
     ├── portfolio.py                    # Portfolio candidate backtest orchestration
     └── research.py                     # Explicit non-canonical fast-research path
@@ -246,13 +253,55 @@ flowchart LR
 
 ### Structure rules
 
-- The package root contains only `README.md`, `__init__.py`, `errors.py`, and the approved feature folders.
+- The package root contains only `README.md`, `__init__.py`, and the approved feature folders.
 - Every official run uses one deterministic tick clock; vectorization is limited to indicator and signal generation outside the execution loop.
 - Public cross-domain imports use only package or feature `__init__.py` exports.
 - Private helpers receive no requirement IDs unless independently required.
 - The engine, ledger, writer, and simulation-scoped Trader may be classes because they own state or lifecycle; other behavior is a function by default.
 - No manager, repository, adapter, factory, scheduler, worker, queue, or provider layer is added without a separately approved requirement.
 - Usage examples live under `tests/simulator/usage/`.
+
+### Package-root public API
+
+`app/services/simulator/__init__.py` is the only public import boundary. Its
+explicit `__all__` re-exports the documented feature APIs below:
+
+- Validation and time: `SUPPORTED_ASSET_CLASSES`, `MarketDataValidationContext`,
+  `ValidatedMarketDataEvidence`, `validate_run_inputs`,
+  `validate_phase_one_scope`, `validate_market_data`,
+  `APPROVED_TICK_MODELS`, `Tick`, `build_tick_timeline`, and
+  `validate_intent_timing`.
+- Accounting and state: `AccountLedger`, `ExecutionCostInput`,
+  `ExecutionCostModel`, `LedgerFill`, `SymbolSpecification`,
+  `ValidatedFXConversionEvidence`, `calculate_execution_costs`,
+  `calculate_margin`, `convert_fx_amount`, `normalize_volume`,
+  `validate_fx_evidence`, `SIMULATION_MIGRATIONS`, `RunStatus`, and
+  `SimulationStateStore`.
+- Journal and execution: `JOURNAL_FORMAT`, `JOURNAL_FSYNC_INTERVAL`,
+  `JOURNAL_SIDECAR_MODE`, `JournalEvent`, `JournalWriter`, `replay_journal`,
+  `resolve_idempotent_run`, `SAME_TICK_PRIORITY`,
+  `SUPPORTED_FILL_POLICIES`, `EventDrivenExecutionEngine`,
+  `ExecutionProfile`, `MatchResult`, `SessionInterval`, `SimTrader`,
+  `evaluate_protective_exit`, `match_order`, and `price_order`.
+- Results and artifacts: `CANONICAL_ARTIFACT_TYPES`, `REPORT_SCHEMA_VERSION`,
+  `AccountingSummary`, `ArtifactEntry`, `ArtifactManifest`,
+  `ClosedTradeRecord`, `ComponentReturnSeries`, `FastResearchResult`,
+  `PortfolioComponentResult`, `PortfolioSimulationResult`,
+  `RealismDisclosure`, `ReturnObservation`, `RiskBudgetHistoryRow`,
+  `SimulationResult`, `build_artifact_manifest`, `build_json_report`, and
+  `build_markdown_report`.
+- Run and errors: `PortfolioBacktestRequestV1`,
+  `PortfolioComponentRequest`, `SimulationBacktestRequestV1`,
+  `SimulationRunDependencies`, `run_backtest`, `run_fast_research`,
+  `run_portfolio_backtest`, `SIM_ERROR_CATALOG`, `SimulationError`, and
+  `to_simulation_error_payload`.
+
+Every external consumer and standalone usage program imports these names through
+`from app.services.simulator import ...`. Feature subpackages remain internal
+implementation organization and do not create additional cross-domain import
+paths. Simulation consumes Trading-owned `OrderIntent` and `ExecutionReceipt`
+through Trading's approved `app.services.trading.contracts` package so importing
+Simulation does not activate Trading operational features.
 
 ---
 
@@ -512,7 +561,7 @@ remove all implementation discretion from the Phase 1 build:
   execution_profile, engine_version)`, and `SimTrader(engine)`.
 - `SimulationRunDependencies` is the typed receiver-owned composition contract
   for Data, Indicators, Strategy, Risk, Trading packing, resolved profiles/FX
-  evidence, and the state store. The canonical operation is
+  evidence, audit persistence, and the state store. The canonical operation is
   `run_backtest(request, auth_context, dependencies)`. Request identity is not
   duplicated by an optional function argument. FX evidence reaches Simulation
   only through `resolve_fx_evidence(evidence_ids) -> Mapping[str,
@@ -520,7 +569,9 @@ remove all implementation discretion from the Phase 1 build:
   per requested identifier; Simulation validates freshness through
   `validate_fx_evidence()` and never selects, refreshes, or synthesizes a rate.
   An identifier the caller cannot resolve fails the run closed with
-  `SIM_FX_EVIDENCE_UNAVAILABLE`.
+  `SIM_FX_EVIDENCE_UNAVAILABLE`. Governed run transitions are persisted only
+  through `persist_audit_event(event: AuditEvent) -> None`; unavailable audit
+  persistence fails the governed operation closed.
 - `SimulationStateStore` is a `Protocol` only. Simulation declares the port and
   its own migration definitions; the caller supplies the implementation.
   Simulation opens no database connection, executes no migration, and imports
@@ -560,18 +611,27 @@ Modules, files, and requirements below are in implementation order. Every symbol
 | `CAP-SIM-012` — Explicit fast-research mode | `run/`: `FR-SIM-031` |
 | `CAP-SIM-013` — Optimization/robustness execution boundary | `run/`, `reporting/`: `FR-SIM-024`, `FR-SIM-026`, `FR-SIM-030`; search/ranking remain outside Simulation |
 | `CAP-SIM-014` — Portfolio candidate execution | `run/`, `reporting/`: `FR-SIM-032`–`FR-SIM-034` |
-| `CAP-SIM-015` — Error taxonomy and persistence port | `errors.py`, `state/`: `FR-SIM-035`–`FR-SIM-037`, `FR-SIM-041` |
+| `CAP-SIM-015` — Error taxonomy and persistence port | `errors/`, `state/`: `FR-SIM-035`–`FR-SIM-037`, `FR-SIM-041` |
 
-### 4.0 `errors.py` — Domain Error Taxonomy
+### 4.0 `errors/` — Domain Error Taxonomy
 
 **Purpose:** Define the single Simulation exception and the closed catalog of codes
 that every other requirement raises. Implemented first; every feature depends on it.
 
+### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Completed | `catalog.py` | Define the immutable closed Simulation error catalog. | `SIM_ERROR_CATALOG` | **Standard library:** `types`<br>**Required third-party:** None<br>**Local:** None |
+| Completed | `exception.py` | Validate, redact, and carry controlled Simulation failures. | `SimulationError` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `catalog.py`; Utils public redaction API |
+| Completed | `payload.py` | Convert controlled or unexpected exceptions into bounded public payloads. | `to_simulation_error_payload` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `exception.py` |
+| Completed | `__init__.py` | Re-export the complete documented error feature API. | `SIM_ERROR_CATALOG`, `SimulationError`, `to_simulation_error_payload` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** feature files |
+
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-035` | The system shall expose one base exception carrying a cataloged `code`, bounded redacted message/details, and optional request/correlation identifiers. Every controlled Simulation boundary failure surfaces through it; no uncontrolled exception crosses the run boundary. | `SimulationError(code: str, message: str, *, details: Mapping[str, object] \| None = None, request_id: str \| None = None, correlation_id: str \| None = None)` | None | `ValueError`: code is absent from `SIM_ERROR_CATALOG` or supplied metadata is invalid | **Usage:** `tests/simulator/usage/test_usage_errors.py::test_usage_simulation_error()`<br>**Unit:** `tests/simulator/unit/test_errors.py::test_error_rejects_uncataloged_code()` |
-| Completed | `FR-SIM-036` | The system shall expose the authoritative closed catalog of Simulation error codes with group, meaning, and fail-closed effect. Every code raised by any `FR-SIM-*` appears here, and no code appears that no requirement raises. | `SIM_ERROR_CATALOG: Mapping[str, Mapping[str, object]]` | None | None | **Usage:** `tests/simulator/usage/test_usage_errors.py::test_usage_error_catalog()`<br>**Unit:** `tests/simulator/unit/test_errors.py::test_catalog_matches_documented_requirements()` |
-| Completed | `FR-SIM-037` | The system shall convert a controlled exception into a bounded, redacted payload exposing no provider exception, path, credential, or raw payload. | `to_simulation_error_payload(error: Exception) -> dict[str, object]` | None | None | **Usage:** `tests/simulator/usage/test_usage_errors.py::test_usage_error_payload()`<br>**Unit:** `tests/simulator/unit/test_errors.py::test_error_payload_is_bounded_and_redacted()` |
+| Completed | `FR-SIM-035` | The system shall expose one base exception carrying a cataloged `code`, bounded redacted message/details, and optional request/correlation identifiers. Every controlled Simulation boundary failure surfaces through it; no uncontrolled exception crosses the run boundary. | `SimulationError(code: str, message: str, *, details: Mapping[str, object] \| None = None, request_id: str \| None = None, correlation_id: str \| None = None)` | None | `ValueError`: code is absent from `SIM_ERROR_CATALOG` or supplied metadata is invalid | **Usage:** `tests/simulator/usage/08_errors.py::fr_sim_035()`<br>**Unit:** `tests/simulator/unit/test_errors.py::test_error_rejects_uncataloged_code()` |
+| Completed | `FR-SIM-036` | The system shall expose the authoritative closed catalog of Simulation error codes with group, meaning, and fail-closed effect. Every code raised by any `FR-SIM-*` appears here, and no code appears that no requirement raises. | `SIM_ERROR_CATALOG: Mapping[str, Mapping[str, object]]` | None | None | **Usage:** `tests/simulator/usage/08_errors.py::fr_sim_036()`<br>**Unit:** `tests/simulator/unit/test_errors.py::test_catalog_matches_documented_requirements()` |
+| Completed | `FR-SIM-037` | The system shall convert a controlled exception into a bounded, redacted payload exposing no provider exception, path, credential, or raw payload. | `to_simulation_error_payload(error: Exception) -> dict[str, object]` | None | None | **Usage:** `tests/simulator/usage/08_errors.py::fr_sim_037()`<br>**Unit:** `tests/simulator/unit/test_errors.py::test_error_payload_is_bounded_and_redacted()` |
 
 **Approved code groups** — the catalog contains exactly these, and every code carries
 the `SIM_` prefix:
@@ -591,7 +651,7 @@ masks a cataloged condition.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_errors.py`
+`tests/simulator/usage/08_errors.py`
 
 ---
 
@@ -622,9 +682,9 @@ masks a cataloged condition.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-001` | The system shall validate authentication-relevant request structure, registered strategy references, Data references, broker-profile references, trace identifiers, and deterministic serialization before any import or execution. | `validate_run_inputs(payload: Mapping[str, object]) -> None` | Read-only | `SimulationError`: `SIM_INVALID_CONFIG` for malformed evidence; `SIM_ARBITRARY_CODE_REJECTED` for raw code/path input | **Usage:** `tests/simulator/usage/test_usage_validation.py::test_usage_validate_run_inputs()`<br>**Unit:** `tests/simulator/unit/test_validate.py::test_validate_run_inputs_rejects_raw_code()` |
-| Completed | `FR-SIM-002` | The system shall verify manifest checksum, required schema, UTC monotonic timestamps, uniqueness, OHLC consistency, bid/ask spread, staleness, availability metadata, and requested coverage, blocking severe failures before execution, and shall return immutable validated evidence. | `validate_market_data(dataset: MarketDataset, context: MarketDataValidationContext) -> ValidatedMarketDataEvidence` | Read-only | `SimulationError`: exact `SIM_DATA_*` code for the detected severe condition | **Usage:** `tests/simulator/usage/test_usage_validation.py::test_usage_validate_market_data()`<br>**Unit:** `tests/simulator/unit/test_validate.py::test_validate_market_data_blocks_invalid_ohlc()` |
-| Completed | `FR-SIM-003` | The system shall permit only approved FX scope or explicit `FAST_RESEARCH`, rejecting unsupported assets, features, service mode, and canonical claims from approximation. | `validate_phase_one_scope(payload: Mapping[str, object]) -> None` | Read-only | `SimulationError`: `SIM_UNSUPPORTED_OPERATION` or the specific approved `SIM_UNSUPPORTED_*` code | **Usage:** `tests/simulator/usage/test_usage_validation.py::test_usage_validate_phase_one_scope()`<br>**Unit:** `tests/simulator/unit/test_validate.py::test_validate_phase_one_scope_rejects_unsupported_asset()` |
+| Completed | `FR-SIM-001` | The system shall validate authentication-relevant request structure, registered strategy references, Data references, broker-profile references, trace identifiers, and deterministic serialization before any import or execution. | `validate_run_inputs(payload: Mapping[str, object]) -> None` | Read-only | `SimulationError`: `SIM_INVALID_CONFIG` for malformed evidence; `SIM_ARBITRARY_CODE_REJECTED` for raw code/path input | **Usage:** `tests/simulator/usage/01_validation.py::fr_sim_001()`<br>**Unit:** `tests/simulator/unit/test_validate.py::test_validate_run_inputs_rejects_raw_code()` |
+| Completed | `FR-SIM-002` | The system shall verify manifest checksum, required schema, UTC monotonic timestamps, uniqueness, OHLC consistency, bid/ask spread, staleness, availability metadata, and requested coverage, blocking severe failures before execution, and shall return immutable validated evidence. | `validate_market_data(dataset: MarketDataset, context: MarketDataValidationContext) -> ValidatedMarketDataEvidence` | Read-only | `SimulationError`: exact `SIM_DATA_*` code for the detected severe condition | **Usage:** `tests/simulator/usage/01_validation.py::fr_sim_002()`<br>**Unit:** `tests/simulator/unit/test_validate.py::test_validate_market_data_blocks_invalid_ohlc()` |
+| Completed | `FR-SIM-003` | The system shall permit only approved FX scope or explicit `FAST_RESEARCH`, rejecting unsupported assets, features, service mode, and canonical claims from approximation. | `validate_phase_one_scope(payload: Mapping[str, object]) -> None` | Read-only | `SimulationError`: `SIM_UNSUPPORTED_OPERATION` or the specific approved `SIM_UNSUPPORTED_*` code | **Usage:** `tests/simulator/usage/01_validation.py::fr_sim_003()`<br>**Unit:** `tests/simulator/unit/test_validate.py::test_validate_phase_one_scope_rejects_unsupported_asset()` |
 
 **Rules:** Validation occurs before engine, ledger, journal writer, strategy import, or artifact creation. Raw provider objects and DataFrames never cross the boundary.
 
@@ -632,7 +692,7 @@ masks a cataloged condition.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_validation.py` contains one independently runnable `test_usage_*` example for each requirement above.
+`tests/simulator/usage/01_validation.py` contains one directly runnable `fr_sim_*` demonstration for each requirement above.
 
 ---
 
@@ -662,14 +722,14 @@ masks a cataloged condition.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-004` | The system shall expose an immutable UTC tick containing symbol, timestamp, bid, ask, source identity, sequence, and availability metadata with finite positive prices and `ask >= bid`. | `Tick(symbol: str, timestamp: datetime, bid: Decimal, ask: Decimal, source_id: str, sequence: int, available_at: datetime)` | None | `ValueError`: invalid timestamp, price, spread, sequence, or metadata | **Usage:** `tests/simulator/usage/test_usage_timeline.py::test_usage_tick_contract()`<br>**Unit:** `tests/simulator/unit/test_timeline_contracts.py::test_tick_rejects_negative_spread()` |
+| Completed | `FR-SIM-004` | The system shall expose an immutable UTC tick containing symbol, timestamp, bid, ask, source identity, sequence, and availability metadata with finite positive prices and `ask >= bid`. | `Tick(symbol: str, timestamp: datetime, bid: Decimal, ask: Decimal, source_id: str, sequence: int, available_at: datetime)` | None | `ValueError`: invalid timestamp, price, spread, sequence, or metadata | **Usage:** `tests/simulator/usage/03_timeline.py::fr_sim_004()`<br>**Unit:** `tests/simulator/unit/test_timeline_contracts.py::test_tick_rejects_negative_spread()` |
 
 #### `timeline.py` — Tick Construction and Timing
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-005` | The system shall convert one Data-owned tick `MarketDataset` into a strictly ordered immutable `Tick` tuple, validating UTC monotonicity, positive finite prices, `ask >= bid`, and the presence of intra-bar phase evidence. Tick derivation itself belongs to Data (`FR-DATA-087`–`FR-DATA-090`); Simulation constructs no ticks, applies no spread model, and consumes no seed. | `build_tick_timeline(tick_dataset: MarketDataset) -> tuple[Tick, ...]` | Read-only | `SimulationError`: `SIM_SPREAD_MISSING`, `SIM_DATA_NON_MONOTONIC`, `SIM_INVALID_PRICE`, or `SIM_UNSUPPORTED_TICK_MODEL` when the dataset was not produced by an approved Data model | **Usage:** `tests/simulator/usage/test_usage_timeline.py::test_usage_build_tick_timeline()`<br>**Unit:** `tests/simulator/unit/test_timeline.py::test_build_tick_timeline_is_deterministic()` |
-| Completed | `FR-SIM-006` | The system shall reject a strategy intent whose evidence became available after its execution time and enforce previous-closed-bar visibility by default. | `validate_intent_timing(intent_available_at: datetime, execution_time: datetime) -> None` | None | `SimulationError`: `SIM_LOOKAHEAD_DETECTED` or `SIM_FEATURE_LOOKAHEAD_DETECTED` | **Usage:** `tests/simulator/usage/test_usage_timeline.py::test_usage_validate_intent_timing()`<br>**Unit:** `tests/simulator/unit/test_timeline.py::test_validate_intent_timing_blocks_lookahead()` |
+| Completed | `FR-SIM-005` | The system shall convert one Data-owned tick `MarketDataset` into a strictly ordered immutable `Tick` tuple, validating UTC monotonicity, positive finite prices, `ask >= bid`, and the presence of intra-bar phase evidence. Tick derivation itself belongs to Data (`FR-DATA-087`-`FR-DATA-090`); Simulation constructs no ticks, applies no spread model, and consumes no seed. | `build_tick_timeline(tick_dataset: MarketDataset) -> tuple[Tick, ...]` | Read-only | `SimulationError`: `SIM_SPREAD_MISSING`, `SIM_DATA_NON_MONOTONIC`, `SIM_INVALID_PRICE`, or `SIM_UNSUPPORTED_TICK_MODEL` when the dataset was not produced by an approved Data model | **Usage:** `tests/simulator/usage/03_timeline.py::fr_sim_005()`<br>**Unit:** `tests/simulator/unit/test_timeline.py::test_build_tick_timeline_is_deterministic()` |
+| Completed | `FR-SIM-006` | The system shall reject a strategy intent whose evidence became available after its execution time and enforce previous-closed-bar visibility by default. | `validate_intent_timing(intent_available_at: datetime, execution_time: datetime) -> None` | None | `SimulationError`: `SIM_LOOKAHEAD_DETECTED` or `SIM_FEATURE_LOOKAHEAD_DETECTED` | **Usage:** `tests/simulator/usage/03_timeline.py::fr_sim_006()`<br>**Unit:** `tests/simulator/unit/test_timeline.py::test_validate_intent_timing_blocks_lookahead()` |
 
 **Rules:** A tick falling outside every configured UTC session is journalled as `tick_outside_session` and skipped, not treated as a run failure; Data may legitimately supply closed-market ticks inside a requested range, and aborting would discard an otherwise valid backtest. Official execution advances one tick at a time. Tick batching is excluded until a later correctness proof demonstrates that no execution, accounting, risk, session, or journal boundary can be skipped. Data's `generate_synthetic_dataset` (`FR-DATA-039`, GBM) is a fixture generator and must never reach an official run; only `generate_tick_series` (`FR-DATA-087`) output is accepted, and the boundary is enforced by test rather than convention.
 
@@ -677,7 +737,7 @@ masks a cataloged condition.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_timeline.py`
+`tests/simulator/usage/03_timeline.py`
 
 ---
 
@@ -707,19 +767,19 @@ masks a cataloged condition.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-007` | The system shall verify that the final approved volume is finite, positive, and within symbol min/max/step constraints without increasing, decreasing, or otherwise re-sizing it. | `normalize_volume(volume: Decimal, specification: Mapping[str, Decimal]) -> Decimal` | None | `SimulationError`: `SIM_INVALID_VOLUME`, `SIM_VOLUME_BELOW_MIN`, `SIM_VOLUME_ABOVE_MAX`, or `SIM_VOLUME_STEP_MISMATCH` | **Usage:** `tests/simulator/usage/test_usage_accounting.py::test_usage_normalize_volume()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_normalize_volume_preserves_approved_size()` |
-| Completed | `FR-SIM-008` | The system shall calculate configured Phase 1 commission and swap deterministically and return an itemized fixed-precision cost mapping. | `calculate_execution_costs(fill: Mapping[str, object], model: Mapping[str, object]) -> Mapping[str, Decimal]` | None | `SimulationError`: `SIM_COMMISSION_CALCULATION_FAILED`, `SIM_SWAP_CALCULATION_FAILED`, or unsupported model code | **Usage:** `tests/simulator/usage/test_usage_accounting.py::test_usage_calculate_execution_costs()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_calculate_execution_costs_is_exact()` |
-| Completed | `FR-SIM-009` | The system shall calculate required FX margin from approved symbol evidence, price, volume, and leverage, rejecting insufficient free margin before a fill. | `calculate_margin(volume: Decimal, price: Decimal, contract_size: Decimal, leverage: Decimal) -> Decimal` | None | `SimulationError`: `SIM_INVALID_CONFIG` or `SIM_INSUFFICIENT_MARGIN` | **Usage:** `tests/simulator/usage/test_usage_accounting.py::test_usage_calculate_margin()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_calculate_margin_rejects_zero_leverage()` |
-| Completed | `FR-SIM-010` | The system shall accept only fresh, schema-compatible Data-owned `FXConversionEvidence v1` for conversion-dependent accounting, and shall never choose, synthesize, refresh, or fetch a rate path. | `validate_fx_evidence(evidence: Mapping[str, object], *, as_of: datetime) -> None` | None | `SimulationError`: `SIM_FX_EVIDENCE_UNAVAILABLE` when evidence is missing, stale, or incompatible | **Usage:** `tests/simulator/usage/test_usage_accounting.py::test_usage_validate_fx_evidence()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_fx_evidence_must_be_fresh()` |
-| Completed | `FR-SIM-039` | The system shall convert one monetary amount using only the composite rate carried by validated `FXConversionEvidence v1`, preserving fixed precision and rejecting any conversion whose evidence was not first validated. | `convert_fx_amount(amount: Decimal, evidence: Mapping[str, object]) -> Decimal` | None | `SimulationError`: `SIM_FX_EVIDENCE_UNAVAILABLE` or `SIM_INVALID_CONFIG` for unvalidated or non-finite input | **Usage:** `tests/simulator/usage/test_usage_accounting.py::test_usage_convert_fx_amount()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_convert_fx_amount_uses_supplied_rate_only()` |
+| Completed | `FR-SIM-007` | The system shall verify that the final approved volume is finite, positive, and within symbol min/max/step constraints without increasing, decreasing, or otherwise re-sizing it. | `normalize_volume(volume: Decimal, specification: Mapping[str, Decimal]) -> Decimal` | None | `SimulationError`: `SIM_INVALID_VOLUME`, `SIM_VOLUME_BELOW_MIN`, `SIM_VOLUME_ABOVE_MAX`, or `SIM_VOLUME_STEP_MISMATCH` | **Usage:** `tests/simulator/usage/04_accounting.py::fr_sim_007()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_normalize_volume_preserves_approved_size()` |
+| Completed | `FR-SIM-008` | The system shall calculate configured Phase 1 commission and swap deterministically and return an itemized fixed-precision cost mapping. | `calculate_execution_costs(fill: Mapping[str, object], model: Mapping[str, object]) -> Mapping[str, Decimal]` | None | `SimulationError`: `SIM_COMMISSION_CALCULATION_FAILED`, `SIM_SWAP_CALCULATION_FAILED`, or unsupported model code | **Usage:** `tests/simulator/usage/04_accounting.py::fr_sim_008()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_calculate_execution_costs_is_exact()` |
+| Completed | `FR-SIM-009` | The system shall calculate required FX margin from approved symbol evidence, price, volume, and leverage, rejecting insufficient free margin before a fill. | `calculate_margin(volume: Decimal, price: Decimal, contract_size: Decimal, leverage: Decimal) -> Decimal` | None | `SimulationError`: `SIM_INVALID_CONFIG` or `SIM_INSUFFICIENT_MARGIN` | **Usage:** `tests/simulator/usage/04_accounting.py::fr_sim_009()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_calculate_margin_rejects_zero_leverage()` |
+| Completed | `FR-SIM-010` | The system shall accept only fresh, schema-compatible Data-owned `FXConversionEvidence v1` for conversion-dependent accounting, and shall never choose, synthesize, refresh, or fetch a rate path. | `validate_fx_evidence(evidence: Mapping[str, object], *, as_of: datetime) -> None` | None | `SimulationError`: `SIM_FX_EVIDENCE_UNAVAILABLE` when evidence is missing, stale, or incompatible | **Usage:** `tests/simulator/usage/04_accounting.py::fr_sim_010()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_fx_evidence_must_be_fresh()` |
+| Completed | `FR-SIM-039` | The system shall convert one monetary amount using only the composite rate carried by validated `FXConversionEvidence v1`, preserving fixed precision and rejecting any conversion whose evidence was not first validated. | `convert_fx_amount(amount: Decimal, evidence: Mapping[str, object]) -> Decimal` | None | `SimulationError`: `SIM_FX_EVIDENCE_UNAVAILABLE` or `SIM_INVALID_CONFIG` for unvalidated or non-finite input | **Usage:** `tests/simulator/usage/04_accounting.py::fr_sim_039()`<br>**Unit:** `tests/simulator/unit/test_accounting.py::test_convert_fx_amount_uses_supplied_rate_only()` |
 
 #### `ledger.py` — Authoritative Account Ledger
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-011` | The system shall atomically apply a simulated fill, realized PnL, commission, swap, and margin effect while preserving balance/equity/free-margin invariants, accumulating commission, swap, and gross-profit totals, and returning the itemized costs charged by that fill so the caller can attribute them to the exact position. The engine journals the resulting evidence; the ledger itself publishes no event. | `AccountLedger.apply_fill(fill: LedgerFill) -> Mapping[str, Decimal]` | Local state mutation | `SimulationError`: `SIM_ACCOUNT_INVARIANT_BROKEN` or `SIM_INSUFFICIENT_MARGIN` | **Usage:** `tests/simulator/usage/test_usage_accounting.py::test_usage_ledger_apply_fill()`<br>**Unit:** `tests/simulator/unit/test_ledger.py::test_apply_fill_preserves_account_invariants()` |
-| Completed | `FR-SIM-012` | The system shall return an immutable read-only fixed-precision account snapshot without exposing mutable engine state. The snapshot exposes `balance`, `equity`, `used_margin`, `free_margin`, `unrealized`, `commission`, `swap`, `gross_profit`, and `account_currency`. `equity` is `balance + unrealized` and `free_margin` is `equity - used_margin`, so open-position risk is reflected before the next fill is admitted. | `AccountLedger.snapshot() -> Mapping[str, Decimal \| str]` | Read-only | `SimulationError`: `SIM_ACCOUNT_INVARIANT_BROKEN` when current state is inconsistent |
-| Completed | `FR-SIM-042` | The system shall accept the current aggregate unrealized profit and loss of all open positions, so that equity, free margin, and margin admission reflect open exposure at the current tick. The engine supplies it once per tick from observed excursions; Simulation computes no price of its own. | `AccountLedger.mark_to_market(unrealized: Decimal) -> None` | Local state mutation | `SimulationError`: `SIM_ACCOUNT_INVARIANT_BROKEN` when the supplied value is not finite | **Usage:** `tests/simulator/usage/test_usage_accounting.py::test_usage_ledger_snapshot()`<br>**Unit:** `tests/simulator/unit/test_ledger.py::test_snapshot_is_immutable()` |
+| Completed | `FR-SIM-011` | The system shall atomically apply a simulated fill, realized PnL, commission, swap, and margin effect while preserving balance/equity/free-margin invariants, accumulating commission, swap, and gross-profit totals, and returning the itemized costs charged by that fill so the caller can attribute them to the exact position. The engine journals the resulting evidence; the ledger itself publishes no event. | `AccountLedger.apply_fill(fill: LedgerFill) -> Mapping[str, Decimal]` | Local state mutation | `SimulationError`: `SIM_ACCOUNT_INVARIANT_BROKEN` or `SIM_INSUFFICIENT_MARGIN` | **Usage:** `tests/simulator/usage/04_accounting.py::fr_sim_011()`<br>**Unit:** `tests/simulator/unit/test_ledger.py::test_apply_fill_preserves_account_invariants()` |
+| Completed | `FR-SIM-012` | The system shall return an immutable read-only fixed-precision account snapshot without exposing mutable engine state. The snapshot exposes `balance`, `equity`, `used_margin`, `free_margin`, `unrealized`, `commission`, `swap`, `gross_profit`, and `account_currency`. `equity` is `balance + unrealized` and `free_margin` is `equity - used_margin`, so open-position risk is reflected before the next fill is admitted. | `AccountLedger.snapshot() -> Mapping[str, Decimal \| str]` | Read-only | `SimulationError`: `SIM_ACCOUNT_INVARIANT_BROKEN` when current state is inconsistent | **Usage:** `tests/simulator/usage/04_accounting.py::fr_sim_012()`<br>**Unit:** `tests/simulator/unit/test_ledger.py::test_snapshot_is_immutable()` |
+| Completed | `FR-SIM-042` | The system shall accept the current aggregate unrealized profit and loss of all open positions, so that equity, free margin, and margin admission reflect open exposure at the current tick. The engine supplies it once per tick from observed excursions; Simulation computes no price of its own. | `AccountLedger.mark_to_market(unrealized: Decimal) -> None` | Local state mutation | `SimulationError`: `SIM_ACCOUNT_INVARIANT_BROKEN` when the supplied value is not finite | **Usage:** `tests/simulator/usage/04_accounting.py::fr_sim_042()`<br>**Unit:** `tests/simulator/unit/test_ledger.py::test_snapshot_is_immutable()` |
 
 **Rules:** Balance changes only from documented realized execution/accounting events. Float-based V1 models are not used for official monetary math.
 
@@ -727,7 +787,7 @@ masks a cataloged condition.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_accounting.py`
+`tests/simulator/usage/04_accounting.py`
 
 ---
 
@@ -758,21 +818,21 @@ masks a cataloged condition.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-013` | The system shall expose an immutable versioned journal event containing run, sequence, UTC time, event type, redacted payload, previous hash, event hash, correlation, and causation identities. | `JournalEvent(run_id: str, sequence: int, occurred_at: datetime, event_type: str, payload: Mapping[str, object], previous_hash: str, event_hash: str, correlation_id: str, causation_id: str | None, schema_version: str = "v1")` | None | `ValueError`: missing identity, invalid sequence/hash, non-UTC time, unsafe payload, or unsupported version | **Usage:** `tests/simulator/usage/test_usage_journal.py::test_usage_journal_event()`<br>**Unit:** `tests/simulator/unit/test_journal_contracts.py::test_journal_event_rejects_secret_payload()` |
+| Completed | `FR-SIM-013` | The system shall expose an immutable versioned journal event containing run, sequence, UTC time, event type, redacted payload, previous hash, event hash, correlation, and causation identities. | `JournalEvent(run_id: str, sequence: int, occurred_at: datetime, event_type: str, payload: Mapping[str, object], previous_hash: str, event_hash: str, correlation_id: str, causation_id: str | None, schema_version: str = "v1")` | None | `ValueError`: missing identity, invalid sequence/hash, non-UTC time, unsafe payload, or unsupported version | **Usage:** `tests/simulator/usage/06_journal.py::fr_sim_013()`<br>**Unit:** `tests/simulator/unit/test_journal_contracts.py::test_journal_event_rejects_secret_payload()` |
 
 #### `writer.py` — Streaming Journal Persistence
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-014` | The system shall append one event with the next monotonic sequence and hash-chain link before the corresponding governed state transition is considered durable. | `JournalWriter.append(event: JournalEvent) -> None` | Persistence write | `SimulationError`: `SIM_PERSISTENCE_FAILED` on write, flush, lock, or continuity failure | **Usage:** `tests/simulator/usage/test_usage_journal.py::test_usage_journal_append()`<br>**Unit:** `tests/simulator/unit/test_journal_writer.py::test_append_fails_closed_on_write_error()` |
-| Completed | `FR-SIM-015` | The system shall finalize a completed journal atomically and return its checksum without publishing incomplete temporary artifacts. | `JournalWriter.finalize() -> str` | Persistence write | `SimulationError`: `SIM_PERSISTENCE_FAILED` on flush, checksum, or atomic-finalization failure | **Usage:** `tests/simulator/usage/test_usage_journal.py::test_usage_journal_finalize()`<br>**Unit:** `tests/simulator/unit/test_journal_writer.py::test_finalize_is_atomic()` |
+| Completed | `FR-SIM-014` | The system shall append one event with the next monotonic sequence and hash-chain link before the corresponding governed state transition is considered durable. | `JournalWriter.append(event: JournalEvent) -> None` | Persistence write | `SimulationError`: `SIM_PERSISTENCE_FAILED` on write, flush, lock, or continuity failure | **Usage:** `tests/simulator/usage/06_journal.py::fr_sim_014()`<br>**Unit:** `tests/simulator/unit/test_journal_writer.py::test_append_fails_closed_on_write_error()` |
+| Completed | `FR-SIM-015` | The system shall finalize a completed journal atomically and return its checksum without publishing incomplete temporary artifacts. | `JournalWriter.finalize() -> str` | Persistence write | `SimulationError`: `SIM_PERSISTENCE_FAILED` on flush, checksum, or atomic-finalization failure | **Usage:** `tests/simulator/usage/06_journal.py::fr_sim_015()`<br>**Unit:** `tests/simulator/unit/test_journal_writer.py::test_finalize_is_atomic()` |
 
 #### `replay.py` — Replay and Idempotency
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-016` | The system shall validate schema, sequence, hash chain, config/data/engine identities, and invariants while reconstructing state through an injected deterministic reducer. | `replay_journal(path: Path, reducer: Callable[[Mapping[str, object], JournalEvent], Mapping[str, object]]) -> Mapping[str, object]` | Read-only | `SimulationError`: `SIM_CHECKPOINT_INCOMPATIBLE`, `SIM_PERSISTENCE_FAILED`, or `SIM_ACCOUNT_INVARIANT_BROKEN` | **Usage:** `tests/simulator/usage/test_usage_journal.py::test_usage_replay_journal()`<br>**Unit:** `tests/simulator/unit/test_replay.py::test_replay_rejects_hash_break()` |
-| Completed | `FR-SIM-017` | The system shall return the existing completed run for the same request ID and hash, and reject the same request ID with a different hash. | `resolve_idempotent_run(request_id: str, request_hash: str, lookup: Callable[[str], Mapping[str, str] | None]) -> str | None` | Read-only | `SimulationError`: `SIM_RUN_ID_CONFLICT` when an existing request hash differs | **Usage:** `tests/simulator/usage/test_usage_journal.py::test_usage_resolve_idempotent_run()`<br>**Unit:** `tests/simulator/unit/test_replay.py::test_request_id_conflict_fails_closed()` |
+| Completed | `FR-SIM-016` | The system shall validate schema, sequence, hash chain, config/data/engine identities, and invariants while reconstructing state through an injected deterministic reducer. | `replay_journal(path: Path, reducer: Callable[[Mapping[str, object], JournalEvent], Mapping[str, object]]) -> Mapping[str, object]` | Read-only | `SimulationError`: `SIM_CHECKPOINT_INCOMPATIBLE`, `SIM_PERSISTENCE_FAILED`, or `SIM_ACCOUNT_INVARIANT_BROKEN` | **Usage:** `tests/simulator/usage/06_journal.py::fr_sim_016()`<br>**Unit:** `tests/simulator/unit/test_replay.py::test_replay_rejects_hash_break()` |
+| Completed | `FR-SIM-017` | The system shall return the existing completed run for the same request ID and hash, and reject the same request ID with a different hash. | `resolve_idempotent_run(request_id: str, request_hash: str, lookup: Callable[[str], Mapping[str, str] | None]) -> str | None` | Read-only | `SimulationError`: `SIM_RUN_ID_CONFLICT` when an existing request hash differs | **Usage:** `tests/simulator/usage/06_journal.py::fr_sim_017()`<br>**Unit:** `tests/simulator/unit/test_replay.py::test_request_id_conflict_fails_closed()` |
 
 **Rules:** Risk rejections, IOC remainder cancellation, lifecycle transitions, validation failures, and all state mutations are typed journal events. No separate compliance-record subsystem is created.
 
@@ -780,7 +840,7 @@ masks a cataloged condition.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_journal.py`
+`tests/simulator/usage/06_journal.py`
 
 ---
 
@@ -797,7 +857,7 @@ definitions, so no Simulation module imports Data storage internals.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-041` | The system shall depend on persistence only through an injected runtime-checkable `Protocol` exposing `append_journal`, `flush_journal`, `finalize_journal`, `load_run`, and `record_idempotency`, and shall declare its own migrations using the Data-owned `MigrationStep` contract. Simulation imports no Data storage, connection, or locking module, no `sqlite3`, and executes no schema statement of its own. | `SimulationStateStore` (Protocol), `SIMULATION_MIGRATIONS` | None | `SimulationError`: `SIM_PERSISTENCE_FAILED` raised by the caller's implementation | **Usage:** `tests/simulator/usage/test_usage_state.py::test_usage_state_store_port()`<br>**Unit:** `tests/simulator/unit/test_state.py::test_simulation_imports_no_data_storage_module()`, `::test_simulation_imports_no_sqlite_module()` |
+| Completed | `FR-SIM-041` | The system shall depend on persistence only through an injected runtime-checkable `Protocol` exposing `append_journal`, `flush_journal`, `finalize_journal`, `load_run`, and `record_idempotency`, and shall declare its own migrations using the Data-owned `MigrationStep` contract. Simulation imports no Data storage, connection, or locking module, no `sqlite3`, and executes no schema statement of its own. | `SimulationStateStore` (Protocol), `SIMULATION_MIGRATIONS` | None | `SimulationError`: `SIM_PERSISTENCE_FAILED` raised by the caller's implementation | **Usage:** `tests/simulator/usage/02_state.py::fr_sim_041()`<br>**Unit:** `tests/simulator/unit/test_state.py::test_simulation_imports_no_data_storage_module()`, `::test_simulation_imports_no_sqlite_module()` |
 
 **Rules:** Data owns the shared connection, locking, and migration execution
 framework; Simulation owns only its records, artifacts, and migration definitions.
@@ -806,7 +866,7 @@ package-root operations. `app.services.data.storage.*` is never imported.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_state.py`
+`tests/simulator/usage/02_state.py`
 
 ---
 
@@ -838,29 +898,29 @@ package-root operations. `app.services.data.storage.*` is never imported.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-018` | The system shall derive an executable bid/ask price from the current tick and approved spread/slippage model without using future ticks. | `price_order(intent: OrderIntent, tick: Tick, model: Mapping[str, object]) -> Decimal` | None | `SimulationError`: `SIM_INVALID_PRICE`, `SIM_SPREAD_MISSING`, `SIM_SLIPPAGE_EXCEEDED`, or unsupported model code | **Usage:** `tests/simulator/usage/test_usage_execution.py::test_usage_price_order()`<br>**Unit:** `tests/simulator/unit/test_pricing.py::test_price_order_uses_side_correct_bid_ask()` |
+| Completed | `FR-SIM-018` | The system shall derive an executable bid/ask price from the current tick and approved spread/slippage model without using future ticks. | `price_order(intent: OrderIntent, tick: Tick, model: Mapping[str, object]) -> Decimal` | None | `SimulationError`: `SIM_INVALID_PRICE`, `SIM_SPREAD_MISSING`, `SIM_SLIPPAGE_EXCEEDED`, or unsupported model code | **Usage:** `tests/simulator/usage/05_execution.py::fr_sim_018()`<br>**Unit:** `tests/simulator/unit/test_pricing.py::test_price_order_uses_side_correct_bid_ask()` |
 
 #### `matching.py` — Order Matching
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-019` | The system shall deterministically match supported FX market and pending intents using configured trigger, gap, liquidity, FOK/IOC, and same-tick priority rules, explicitly recording partial or cancelled remainder outcomes. | `match_order(intent: OrderIntent, tick: Tick, profile: ExecutionProfile, *, stop_limit_armed: bool = False) -> MatchResult` | None | `SimulationError`: specific matching, liquidity, gap, market-hours, or fill-policy `SIM_*` code | **Usage:** `tests/simulator/usage/test_usage_execution.py::test_usage_match_order()`<br>**Unit:** `tests/simulator/unit/test_matching.py::test_match_order_journals_ioc_remainder()` |
-| Completed | `FR-SIM-043` | The system shall resolve the protective exit of one open position against the current tick, triggering stop-loss when the position's exit side crosses its stop and take-profit when it crosses its target, and shall resolve a same-tick stop-loss/take-profit conflict by `SAME_TICK_PRIORITY` order so stop-loss always wins. A condition absent from `SAME_TICK_PRIORITY` is ambiguous and fails closed. | `evaluate_protective_exit(position: Mapping[str, object], tick: Tick) -> str \| None` | None | `SimulationError`: `SIM_EVENT_PRIORITY_AMBIGUOUS` when a detected condition has no declared precedence | **Usage:** `tests/simulator/usage/test_usage_execution.py::test_usage_evaluate_protective_exit()`<br>**Unit:** `tests/simulator/unit/test_matching.py::test_stop_loss_wins_same_tick_conflict_with_take_profit()` |
+| Completed | `FR-SIM-019` | The system shall deterministically match supported FX market and pending intents using configured trigger, gap, liquidity, FOK/IOC, and same-tick priority rules, explicitly recording partial or cancelled remainder outcomes. | `match_order(intent: OrderIntent, tick: Tick, profile: ExecutionProfile, *, stop_limit_armed: bool = False) -> MatchResult` | None | `SimulationError`: specific matching, liquidity, gap, market-hours, or fill-policy `SIM_*` code | **Usage:** `tests/simulator/usage/05_execution.py::fr_sim_019()`<br>**Unit:** `tests/simulator/unit/test_matching.py::test_match_order_journals_ioc_remainder()` |
+| Completed | `FR-SIM-043` | The system shall resolve the protective exit of one open position against the current tick, triggering stop-loss when the position's exit side crosses its stop and take-profit when it crosses its target, and shall resolve a same-tick stop-loss/take-profit conflict by `SAME_TICK_PRIORITY` order so stop-loss always wins. A condition absent from `SAME_TICK_PRIORITY` is ambiguous and fails closed. | `evaluate_protective_exit(position: Mapping[str, object], tick: Tick) -> str \| None` | None | `SimulationError`: `SIM_EVENT_PRIORITY_AMBIGUOUS` when a detected condition has no declared precedence | **Usage:** `tests/simulator/usage/05_execution.py::fr_sim_043()`<br>**Unit:** `tests/simulator/unit/test_matching.py::test_stop_loss_wins_same_tick_conflict_with_take_profit()` |
 
 #### `engine.py` — Canonical Tick Engine
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-020` | The system shall process one canonical tick at a time, enforce timing and state transitions, apply fills through the ledger, append journal events, maintain per-open-position maximum adverse and favourable excursion so that `mae` and `mfe` are observed rather than reconstructed, and return immutable execution outcomes. Each tick evaluates every open position for a protective exit before pending orders are matched, closes triggered positions through the ledger, and records one `ClosedTradeRecord` per terminal close carrying the excursions observed during execution. | `EventDrivenExecutionEngine.execute_tick(tick: Tick) -> tuple[ExecutionReceipt, ...]`; `EventDrivenExecutionEngine.closed_trades` | Local state mutation; event publication; persistence write | `SimulationError`: exact validation, execution, accounting, invariant, or persistence code | **Usage:** `tests/simulator/usage/test_usage_execution.py::test_usage_engine_execute_tick()`<br>**Unit:** `tests/simulator/unit/test_engine.py::test_execute_tick_is_deterministic()` |
+| Completed | `FR-SIM-020` | The system shall process one canonical tick at a time, enforce timing and state transitions, apply fills through the ledger, append journal events, maintain per-open-position maximum adverse and favourable excursion so that `mae` and `mfe` are observed rather than reconstructed, and retain immutable end-of-tick mark-to-market equity observations for portfolio measurement. Each tick evaluates every open position for a protective exit before pending orders are matched, closes triggered positions through the ledger, and records one `ClosedTradeRecord` per terminal close carrying the excursions observed during execution. | `EventDrivenExecutionEngine.execute_tick(tick: Tick) -> tuple[ExecutionReceipt, ...]`; `EventDrivenExecutionEngine.closed_trades`; `EventDrivenExecutionEngine.equity_observations` | Local state mutation; event publication; persistence write | `SimulationError`: exact validation, execution, accounting, invariant, or persistence code | **Usage:** `tests/simulator/usage/05_execution.py::fr_sim_020()`<br>**Unit:** `tests/simulator/unit/test_engine.py::test_execute_tick_is_deterministic()` |
 
 #### `trader.py` — Simulation-Scoped Trader Facade
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-021` | The system shall accept only a Trading-owned `OrderIntent` for route `sim`, preserve its final approved volume, submit it to the active simulation engine without any broker call, and return a Trading-owned `ExecutionReceipt` constructed from the simulated outcome. | `SimTrader.submit_order(intent: OrderIntent) -> ExecutionReceipt` | Local state mutation; event publication; persistence write | `SimulationError`: `SIM_INVALID_CONFIG`, `SIM_INVALID_VOLUME`, or matching/accounting code | **Usage:** `tests/simulator/usage/test_usage_execution.py::test_usage_sim_trader_submit_order()`<br>**Unit:** `tests/simulator/unit/test_trader.py::test_submit_order_never_calls_live_adapter()` |
-| Completed | `FR-SIM-038` | The system shall expose the bound asynchronous `SimTrader.submit_order` method whose signature is exactly the port Trading injects for the `sim` route, `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]`, delegating to its active engine and importing no Trading internals beyond public contracts. | `async SimTrader.submit_order(intent: OrderIntent) -> ExecutionReceipt` | Local state mutation; event publication; persistence write | `SimulationError`: non-`sim` route, altered volume, absent engine, or matching/accounting code | **Usage:** `tests/simulator/usage/test_usage_execution.py::test_usage_dispatch_sim_order()`<br>**Unit:** `tests/simulator/unit/test_trader.py::test_dispatch_signature_matches_trading_port()` |
-| Completed | `FR-SIM-022` | The system shall close an existing simulated position by approved quantity using the current canonical tick and journal the resulting fill. | `SimTrader.close_position(position_id: str, quantity: Decimal) -> Mapping[str, object]` | Local state mutation; event publication; persistence write | `SimulationError`: `SIM_POSITION_NOT_FOUND` or `SIM_INVALID_VOLUME` | **Usage:** `tests/simulator/usage/test_usage_execution.py::test_usage_sim_trader_close_position()`<br>**Unit:** `tests/simulator/unit/test_trader.py::test_close_position_rejects_unknown_position()` |
-| Completed | `FR-SIM-023` | The system shall expose immutable read-only orders, positions, pending orders, deals, and account state for the current run without leaking mutable engine objects. | `SimTrader.snapshot() -> Mapping[str, object]` | Read-only | `SimulationError`: `SIM_ACCOUNT_INVARIANT_BROKEN` when state cannot be verified | **Usage:** `tests/simulator/usage/test_usage_execution.py::test_usage_sim_trader_snapshot()`<br>**Unit:** `tests/simulator/unit/test_trader.py::test_snapshot_cannot_mutate_engine_state()` |
+| Completed | `FR-SIM-021` | The system shall accept only a Trading-owned `OrderIntent` for route `sim`, preserve its final approved volume, submit it to the active simulation engine without any broker call, and return a Trading-owned `ExecutionReceipt` constructed from the simulated outcome. | `SimTrader.submit_order(intent: OrderIntent) -> ExecutionReceipt` | Local state mutation; event publication; persistence write | `SimulationError`: `SIM_INVALID_CONFIG`, `SIM_INVALID_VOLUME`, or matching/accounting code | **Usage:** `tests/simulator/usage/05_execution.py::fr_sim_021()`<br>**Unit:** `tests/simulator/unit/test_trader.py::test_submit_order_never_calls_live_adapter()` |
+| Completed | `FR-SIM-038` | The system shall expose the bound asynchronous `SimTrader.submit_order` method whose signature is exactly the port Trading injects for the `sim` route, `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]`, delegating to its active engine and importing no Trading internals beyond public contracts. | `async SimTrader.submit_order(intent: OrderIntent) -> ExecutionReceipt` | Local state mutation; event publication; persistence write | `SimulationError`: non-`sim` route, altered volume, absent engine, or matching/accounting code | **Usage:** `tests/simulator/usage/05_execution.py::fr_sim_038()`<br>**Unit:** `tests/simulator/unit/test_trader.py::test_dispatch_signature_matches_trading_port()` |
+| Completed | `FR-SIM-022` | The system shall close an existing simulated position by approved quantity using the current canonical tick and journal the resulting fill. | `SimTrader.close_position(position_id: str, quantity: Decimal) -> Mapping[str, object]` | Local state mutation; event publication; persistence write | `SimulationError`: `SIM_POSITION_NOT_FOUND` or `SIM_INVALID_VOLUME` | **Usage:** `tests/simulator/usage/05_execution.py::fr_sim_022()`<br>**Unit:** `tests/simulator/unit/test_trader.py::test_close_position_rejects_unknown_position()` |
+| Completed | `FR-SIM-023` | The system shall expose immutable read-only orders, positions, pending orders, deals, and account state for the current run without leaking mutable engine objects. | `SimTrader.snapshot() -> Mapping[str, object]` | Read-only | `SimulationError`: `SIM_ACCOUNT_INVARIANT_BROKEN` when state cannot be verified | **Usage:** `tests/simulator/usage/05_execution.py::fr_sim_023()`<br>**Unit:** `tests/simulator/unit/test_trader.py::test_snapshot_cannot_mutate_engine_state()` |
 
 **Rules:** Simulation is the broker analogue only for the `sim` route. It must not import live adapters, broker SDKs, credentials, or any Brokers `BrokerAdapter` capability.
 
@@ -868,7 +928,7 @@ package-root operations. `app.services.data.storage.*` is never imported.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_execution.py`
+`tests/simulator/usage/05_execution.py`
 
 ---
 
@@ -898,23 +958,23 @@ package-root operations. `app.services.data.storage.*` is never imported.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-024` | The system shall expose `SimulationResult` v1 with separate compatibility/schema identity, reproducibility identities, completed status, raw fills, the paired closed-trade ledger, journal/artifact references, fixed-precision accounting totals, diagnostics, and realism disclosures, and shall reject incomplete publication. `fills` are execution events; `closed_trades` are the paired round-trips consumers measure, populated from the engine-observed terminal closes of `FR-SIM-020` and never reconstructed after the run. `accounting` is derived from the completed `AccountLedger` totals; no monetary field in the published envelope is a constant. | `SimulationResult(contract_version: Literal["v1"], schema_id: Literal["simulation.result.v1"], run_id: str, request_hash: str, config_hash: str, data_hash: str, engine_version: str, status: Literal["completed"], journal_ref: str, artifact_manifest_ref: str, fills: tuple[ExecutionReceipt, ...], closed_trades: tuple[ClosedTradeRecord, ...], initial_balance: Decimal, account_currency: str, accounting: AccountingSummary, diagnostics: tuple[str, ...], realism: RealismDisclosure)` | None | `ValueError`: missing identity/artifact reference, non-final status, unsafe metadata, or invalid monetary value | **Usage:** `tests/simulator/usage/test_usage_reporting.py::test_usage_simulation_result()`<br>**Unit:** `tests/simulator/unit/test_reporting_contracts.py::test_result_rejects_incomplete_status()` |
-| Completed | `FR-SIM-040` | The system shall expose one closed-trade ledger record carrying exactly `ticket`, `symbol`, `type`, `volume`, `entry_time`, `entry_price`, `stop_loss`, `take_profit`, `exit_time`, `exit_price`, `comment`, `commission`, `swap`, `profit`, `magic`, `mae`, and `mfe`. Timestamps are UTC; monetary and price fields are `Decimal`. `profit` is **gross** — price movement only — and excludes `commission` and `swap`, which carry a negative sign. The field set matches Analytics `FR-ANLT-049` exactly. | `ClosedTradeRecord` | None | `ValueError`: missing identity, non-UTC timestamp, `exit_time` before `entry_time`, or non-finite monetary value | **Usage:** `tests/simulator/usage/test_usage_reporting.py::test_usage_closed_trade_record()`<br>**Unit:** `tests/simulator/unit/test_reporting_contracts.py::test_closed_trade_profit_is_gross()` |
-| Completed | `FR-SIM-033` | The system shall expose `PortfolioSimulationResult` v1 with separate compatibility/schema identity, run/result/reproducibility identities, construction identity, a bounded UTC measurement window, base currency, ordered reconciled component results, aligned component return evidence, aggregate journal and metric references, ordered Risk-owned budget-history evidence, FX lineage, an artifact manifest, and completed status. Each component row contains exactly `component_id`, `simulation_result_id`, `journal_ref`, `metrics_ref`, `account_currency`, and `reconciled=true`. Each component-return row contains exactly `component_id`, `simulation_result_id`, and `observations`; each observation contains exactly `timestamp` and `return_value`. Return observations are **periodic mark-to-market equity returns** measured by Simulation on one fixed UTC cadence shared by every component, derived from the component's own simulated equity curve; they are never supplied by the caller and never derived on a closed-trade basis, because a closed-trade basis cannot guarantee timestamps common to every component. Analytics derives its own closed-trade returns independently and the two bases are not expected to agree. Return timestamps are unique ordered UTC values inside the measurement window, return values are finite, every component/result pair appears exactly once, and at least 30 timestamps are common to every component. Each risk-budget row contains exactly `risk_decision_id`, `component_id`, `effective_at`, `expires_at`, `approved_budget`, and `currency`. Incomplete or unreconciled runs are never published. | `PortfolioSimulationResult(contract_version: Literal["v1"], schema_id: Literal["simulation.portfolio_result.v1"], result_id: str, run_id: str, request_hash: str, config_hash: str, data_hash: str, result_hash: str, engine_version: str, status: Literal["completed"], portfolio_id: str, construction_result_id: str, construction_version: str, measurement_start: datetime, measurement_end: datetime, base_currency: str, component_results: tuple[Mapping[str, object], ...], component_return_series: tuple[Mapping[str, object], ...], aggregate_journal_ref: str, aggregate_metrics_ref: str, risk_budget_history: tuple[Mapping[str, object], ...], fx_evidence_ids: tuple[str, ...], artifact_manifest_ref: str)` | None | `ValueError`: missing/unknown field, unsafe reference, malformed hash, unordered or non-UTC window, missing component, missing/unaligned/short/non-finite return evidence, unreconciled aggregate, incomplete FX/Risk lineage, non-final status, or invalid monetary value | **Usage:** `tests/simulator/usage/test_usage_reporting.py::test_usage_portfolio_simulation_result()`<br>**Unit:** `tests/simulator/unit/test_reporting_contracts.py::test_portfolio_result_requires_all_components()` |
-| Completed | `FR-SIM-025` | The system shall expose a versioned manifest entry for every canonical artifact with relative path, media type, size, SHA-256 checksum, schema version, and creation time. | `ArtifactManifest(artifacts: tuple[Mapping[str, object], ...], created_at: datetime, schema_version: str = "v1")` | None | `ValueError`: absolute/unsafe path, invalid checksum, missing canonical artifact, or unsupported version | **Usage:** `tests/simulator/usage/test_usage_reporting.py::test_usage_artifact_manifest()`<br>**Unit:** `tests/simulator/unit/test_reporting_contracts.py::test_manifest_rejects_unsafe_path()` |
+| Completed | `FR-SIM-024` | The system shall expose `SimulationResult` v1 with separate compatibility/schema identity, reproducibility identities, completed status, raw fills, the paired closed-trade ledger, journal/artifact references, fixed-precision accounting totals, diagnostics, and realism disclosures, and shall reject incomplete publication. `fills` are execution events; `closed_trades` are the paired round-trips consumers measure, populated from the engine-observed terminal closes of `FR-SIM-020` and never reconstructed after the run. `accounting` is derived from the completed `AccountLedger` totals; no monetary field in the published envelope is a constant. | `SimulationResult(contract_version: Literal["v1"], schema_id: Literal["simulation.result.v1"], run_id: str, request_hash: str, config_hash: str, data_hash: str, engine_version: str, status: Literal["completed"], journal_ref: str, artifact_manifest_ref: str, fills: tuple[ExecutionReceipt, ...], closed_trades: tuple[ClosedTradeRecord, ...], initial_balance: Decimal, account_currency: str, accounting: AccountingSummary, diagnostics: tuple[str, ...], realism: RealismDisclosure)` | None | `ValueError`: missing identity/artifact reference, non-final status, unsafe metadata, or invalid monetary value | **Usage:** `tests/simulator/usage/09_reporting.py::fr_sim_024()`<br>**Unit:** `tests/simulator/unit/test_reporting_contracts.py::test_result_rejects_incomplete_status()` |
+| Completed | `FR-SIM-040` | The system shall expose one closed-trade ledger record carrying exactly `ticket`, `symbol`, `type`, `volume`, `entry_time`, `entry_price`, `stop_loss`, `take_profit`, `exit_time`, `exit_price`, `comment`, `commission`, `swap`, `profit`, `magic`, `mae`, and `mfe`. Timestamps are UTC; monetary and price fields are `Decimal`. `profit` is **gross** — price movement only — and excludes `commission` and `swap`, which carry a negative sign. The field set matches Analytics `FR-ANLT-049` exactly. | `ClosedTradeRecord` | None | `ValueError`: missing identity, non-UTC timestamp, `exit_time` before `entry_time`, or non-finite monetary value | **Usage:** `tests/simulator/usage/09_reporting.py::fr_sim_040()`<br>**Unit:** `tests/simulator/unit/test_reporting_contracts.py::test_closed_trade_profit_is_gross()` |
+| Completed | `FR-SIM-033` | The system shall expose `PortfolioSimulationResult` v1 with separate compatibility/schema identity, run/result/reproducibility identities, construction identity, a bounded UTC measurement window, base currency, ordered reconciled component results, aligned component return evidence, aggregate journal and metric references, ordered Risk-owned budget-history evidence, FX lineage, an artifact manifest, and completed status. Each component row contains exactly `component_id`, `simulation_result_id`, `journal_ref`, `metrics_ref`, `account_currency`, and `reconciled=true`. Each component-return row contains exactly `component_id`, `simulation_result_id`, and `observations`; each observation contains exactly `timestamp` and `return_value`. Return observations are **periodic mark-to-market equity returns** measured by Simulation on one fixed UTC cadence shared by every component, derived from the component's own simulated equity curve; they are never supplied by the caller and never derived on a closed-trade basis. Return timestamps are unique ordered UTC values inside the measurement window, return values are finite, every component/result pair appears exactly once, and at least 30 timestamps are common to every component. Each risk-budget row contains exactly `risk_decision_id`, `component_id`, `effective_at`, `expires_at`, `approved_budget`, and `currency`. Incomplete or unreconciled runs are never published. | `PortfolioSimulationResult(contract_version: Literal["v1"], schema_id: Literal["simulation.portfolio_result.v1"], result_id: str, run_id: str, request_hash: str, config_hash: str, data_hash: str, result_hash: str, engine_version: str, status: Literal["completed"], portfolio_id: str, construction_result_id: str, construction_version: str, measurement_start: datetime, measurement_end: datetime, base_currency: str, component_results: tuple[PortfolioComponentResult, ...], component_return_series: tuple[ComponentReturnSeries, ...], aggregate_journal_ref: str, aggregate_metrics_ref: str, risk_budget_history: tuple[RiskBudgetHistoryRow, ...], fx_evidence_ids: tuple[str, ...], artifact_manifest_ref: str)` | None | `ValueError`: missing/unknown field, unsafe reference, malformed hash, unordered or non-UTC window, missing component, missing/unaligned/short/non-finite return evidence, unreconciled aggregate, incomplete FX/Risk lineage, non-final status, or invalid monetary value | **Usage:** `tests/simulator/usage/09_reporting.py::fr_sim_033()`<br>**Unit:** `tests/simulator/unit/test_reporting_contracts.py::test_portfolio_result_requires_all_components()` |
+| Completed | `FR-SIM-025` | The system shall expose a versioned manifest entry for every canonical artifact with relative path, media type, size, SHA-256 checksum, schema version, and creation time. | `ArtifactManifest(artifacts: tuple[Mapping[str, object], ...], created_at: datetime, schema_version: str = "v1")` | None | `ValueError`: absolute/unsafe path, invalid checksum, missing canonical artifact, or unsupported version | **Usage:** `tests/simulator/usage/09_reporting.py::fr_sim_025()`<br>**Unit:** `tests/simulator/unit/test_reporting_contracts.py::test_manifest_rejects_unsafe_path()` |
 
 #### `artifacts.py` — Artifact Manifest Assembly
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-026` | The system shall read completed canonical artifacts, verify containment and size, calculate checksums, and return a stable manifest without publishing temporary files. | `build_artifact_manifest(artifact_root: Path, paths: Sequence[Path]) -> ArtifactManifest` | Read-only | `SimulationError`: `SIM_PERSISTENCE_FAILED` for missing, unsafe, unreadable, or changed artifacts | **Usage:** `tests/simulator/usage/test_usage_reporting.py::test_usage_build_artifact_manifest()`<br>**Unit:** `tests/simulator/unit/test_artifacts.py::test_manifest_rejects_path_escape()` |
+| Completed | `FR-SIM-026` | The system shall read completed canonical artifacts, verify containment and size, calculate checksums, and return a stable manifest without publishing temporary files. | `build_artifact_manifest(artifact_root: Path, paths: Sequence[Path]) -> ArtifactManifest` | Read-only | `SimulationError`: `SIM_PERSISTENCE_FAILED` for missing, unsafe, unreadable, or changed artifacts | **Usage:** `tests/simulator/usage/09_reporting.py::fr_sim_026()`<br>**Unit:** `tests/simulator/unit/test_artifacts.py::test_manifest_rejects_path_escape()` |
 
 #### `reports.py` — Canonical Reports
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-027` | The system shall serialize a `SimulationResult` to deterministic canonical JSON with execution/accounting diagnostics and realism/data-quality disclosures, excluding Analytics-owned metric formulas. | `build_json_report(result: SimulationResult) -> str` | None | `SimulationError`: `SIM_INTERNAL_ERROR` if canonical serialization fails | **Usage:** `tests/simulator/usage/test_usage_reporting.py::test_usage_build_json_report()`<br>**Unit:** `tests/simulator/unit/test_reports.py::test_json_report_is_deterministic()` |
-| Completed | `FR-SIM-028` | The system shall render a deterministic Markdown execution report with assumptions, limitations, costs, fills, rejections, data quality, and artifact identities, excluding external distribution claims. | `build_markdown_report(result: SimulationResult) -> str` | None | `SimulationError`: `SIM_INTERNAL_ERROR` when required evidence is absent | **Usage:** `tests/simulator/usage/test_usage_reporting.py::test_usage_build_markdown_report()`<br>**Unit:** `tests/simulator/unit/test_reports.py::test_markdown_report_discloses_shortcuts()` |
+| Completed | `FR-SIM-027` | The system shall serialize a `SimulationResult` to deterministic canonical JSON with execution/accounting diagnostics and realism/data-quality disclosures, excluding Analytics-owned metric formulas. | `build_json_report(result: SimulationResult) -> str` | None | `SimulationError`: `SIM_INTERNAL_ERROR` if canonical serialization fails | **Usage:** `tests/simulator/usage/09_reporting.py::fr_sim_027()`<br>**Unit:** `tests/simulator/unit/test_reports.py::test_json_report_is_deterministic()` |
+| Completed | `FR-SIM-028` | The system shall render a deterministic Markdown execution report with assumptions, limitations, costs, fills, rejections, data quality, and artifact identities, excluding external distribution claims. | `build_markdown_report(result: SimulationResult) -> str` | None | `SimulationError`: `SIM_INTERNAL_ERROR` when required evidence is absent | **Usage:** `tests/simulator/usage/09_reporting.py::fr_sim_028()`<br>**Unit:** `tests/simulator/unit/test_reports.py::test_markdown_report_discloses_shortcuts()` |
 
 **Rules:** Simulation reports execution evidence and accounting totals. Analytics consumes `SimulationResult` and owns performance metrics, scorecards, benchmark analysis, and caveats. `ClosedTradeRecord` rejects unknown fields, permits only final closed trades, uses `type` values `BUY` or `SELL`, requires positive finite volume and entry/exit prices, requires positive finite stop/take-profit prices when supplied, treats `magic` as the immutable string strategy ID, and permits nullable `mae <= 0` and `mfe >= 0`. `PortfolioSimulationResult` validates the exact component, component-return, and risk-budget row schemas stated by `FR-SIM-033`; Simulation preserves component returns and Risk references without interpreting or changing them.
 
@@ -922,7 +982,7 @@ package-root operations. `app.services.data.storage.*` is never imported.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_reporting.py`
+`tests/simulator/usage/09_reporting.py`
 
 ---
 
@@ -937,8 +997,10 @@ package-root operations. `app.services.data.storage.*` is never imported.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `contracts.py` | Define the versioned requests received by Simulation and the receiver-owned composition contract. | `SimulationBacktestRequestV1`, `PortfolioBacktestRequestV1`, `PortfolioComponentRequest`, `SimulationRunDependencies` | **Standard library:** `datetime`, `decimal`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** Utils public API → canonical serialization and trace IDs |
-| Completed | `orchestrator.py` | Validate and execute one synchronous canonical run. | `run_backtest` | **Standard library:** `os`, `datetime`, `decimal`, `hashlib`, `pathlib`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** all lower feature APIs; Trading public API → `ExecutionReceipt`; Utils → `AuthContext`, canonical JSON |
-| Completed | `portfolio.py` | Execute every component of an approved portfolio candidate and publish the reconciled aggregate. | `run_portfolio_backtest` | **Standard library:** `collections.abc`, `decimal`<br>**Required third-party:** None<br>**Local:** `orchestrator.py` → component execution; accounting, journal, reporting public APIs |
+| Completed | `aggregate.py` | Maintain exact portfolio opening-capital allocation and component net-profit attribution. | Internal `PortfolioAggregateLedger` | **Standard library:** `decimal`, `types`, `typing`<br>**Required third-party:** None<br>**Local:** errors; reporting result contract |
+| Completed | `audit.py` | Construct bounded Utils-owned `AuditEvent v1` records and persist them through the injected Data-owned composition seam. | Internal `emit_simulation_audit` | **Standard library:** `collections.abc`, `datetime`, `typing`<br>**Required third-party:** None<br>**Local:** errors; Utils public `AuditEvent`, `AuthContext`, identity and logger APIs |
+| Completed | `orchestrator.py` | Validate and execute one synchronous canonical run, retaining internal end-of-tick equity observations for portfolio measurement. | `run_backtest` | **Standard library:** `os`, `datetime`, `decimal`, `hashlib`, `pathlib`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** all lower feature APIs; Trading approved contracts API → `ExecutionReceipt`; Utils → `AuthContext`, canonical JSON |
+| Completed | `portfolio.py` | Validate immutable FX identity bindings, execute every approved component, sample mark-to-market equity on one shared cadence, and publish the reconciled aggregate. | `run_portfolio_backtest` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `orchestrator.py` → component execution; `aggregate.py`; accounting, journal, reporting public APIs |
 | Completed | `research.py` | Execute an explicit non-canonical approximation with prohibited-claim controls. | `run_fast_research` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** validation, reporting |
 | Completed | `__init__.py` | Expose the supported run API. | `SimulationBacktestRequestV1`, `PortfolioBacktestRequestV1`, `run_backtest`, `run_portfolio_backtest`, `run_fast_research` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** feature files → exports |
 
@@ -957,21 +1019,21 @@ package-root operations. `app.services.data.storage.*` is never imported.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-029` | The system shall expose the exact `docs/PROJECT.md` §5 request for one synchronous bounded FX run, with separate contract version/schema ID, immutable Strategy/Data/Simulation/Risk references, JSON-safe parameters, symbol/timeframe/UTC range, positive initial balance, trace IDs, simulation profile/route, config hash, and no raw code/provider objects/inline data. | `SimulationBacktestRequestV1` | None | `ValueError`: missing/unknown field, invalid range/balance/mode/reference/version, non-deterministic value, or unsafe metadata | **Usage:** `tests/simulator/usage/test_usage_run.py::test_usage_backtest_request()`<br>**Unit:** `tests/simulator/unit/test_run_contracts.py::test_request_matches_project_section_5_exactly()` |
+| Completed | `FR-SIM-029` | The system shall expose the exact `docs/PROJECT.md` §5 request for one synchronous bounded FX run, with separate contract version/schema ID, immutable Strategy/Data/Simulation/Risk references, JSON-safe parameters, symbol/timeframe/UTC range, positive initial balance, trace IDs, simulation profile/route, config hash, and no raw code/provider objects/inline data. | `SimulationBacktestRequestV1` | None | `ValueError`: missing/unknown field, invalid range/balance/mode/reference/version, non-deterministic value, or unsafe metadata | **Usage:** `tests/simulator/usage/07_run.py::fr_sim_029()`<br>**Unit:** `tests/simulator/unit/test_run_contracts.py::test_request_matches_project_section_5_exactly()` |
 
-| Completed | `FR-SIM-032` | The system shall expose `PortfolioBacktestRequestV1` with `contract_version="v1"`, `schema_id="simulation.portfolio_backtest_request.v1"`, portfolio and construction-result identifiers and versions, ordered component allocations, exact Strategy/Data/FX/execution/Risk references and versions, bounded UTC range, explicit seed, positive initial balance, `runtime_profile="simulation"`, `execution_route="sim"`, and a SHA-256 config hash. It carries scalar values, identifiers, references, and hashes only, and never embeds or imports a Portfolio-owned contract type. It carries no measurement series: return evidence is produced by Simulation under `FR-SIM-033`, never supplied by the caller. | `PortfolioBacktestRequestV1` | None | `ValueError`: unknown field, embedded Portfolio contract instance, stale or incompatible reference, invalid range or balance, or non-deterministic configuration | **Usage:** `tests/simulator/usage/test_usage_run.py::test_usage_portfolio_backtest_request()`<br>**Unit:** `tests/simulator/unit/test_run_contracts.py::test_portfolio_request_is_self_contained()` |
+| Completed | `FR-SIM-032` | The system shall expose `PortfolioBacktestRequestV1` with `contract_version="v1"`, `schema_id="simulation.portfolio_backtest_request.v1"`, portfolio and construction-result identifiers and versions, ordered component allocations, exact Strategy/Data/FX/execution/Risk references and versions, bounded UTC range, explicit seed, positive initial balance, `runtime_profile="simulation"`, `execution_route="sim"`, and a SHA-256 config hash. Every FX evidence ID is positionally bound to an explicit `v1` compatibility version and lowercase canonical SHA-256 evidence hash. Each child request's initial balance equals the portfolio balance multiplied by its exact capital weight and its account currency equals the portfolio base currency. It carries scalar values, identifiers, references, and hashes only, never embeds a Portfolio-owned contract type, and carries no caller-supplied measurement series. | `PortfolioBacktestRequestV1(..., fx_evidence_ids: tuple[str, ...], fx_evidence_versions: tuple[str, ...], fx_evidence_hashes: tuple[str, ...], ...)` | None | `ValueError`: unknown field, embedded Portfolio contract instance, missing/misaligned/malformed FX binding, incompatible child capital/currency, invalid range or balance, or non-deterministic configuration | **Usage:** `tests/simulator/usage/07_run.py::fr_sim_032()`<br>**Unit:** `tests/simulator/unit/test_run_contracts.py::test_portfolio_request_is_self_contained()` |
 
 #### `orchestrator.py` — Official Backtest
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-030` | The system shall authenticate, deduplicate, validate, execute, journal, report, persist, and return one deterministic canonical FX run, never publishing a partial completed result. | `run_backtest(request: SimulationBacktestRequestV1, auth_context: AuthContext, dependencies: SimulationRunDependencies) -> SimulationResult` | Read-only external-domain calls; local state mutation; persistence write; event publication | `SimulationError`: controlled validation, execution, journal, reporting, or persistence failure | **Usage:** `tests/simulator/usage/test_usage_run.py::test_usage_run_backtest()`<br>**Unit:** `tests/simulator/unit/test_orchestrator.py::test_run_backtest_maps_internal_failure()` |
+| Completed | `FR-SIM-030` | The system shall authenticate, deduplicate, validate, execute, journal, report, persist, and return one deterministic canonical FX run, never publishing a partial completed result. It persists bounded `simulation.run_started`, `simulation.run_completed`, `simulation.run_replayed`, or `simulation.run_failed` `AuditEvent v1` evidence through `SimulationRunDependencies.persist_audit_event`; unavailable audit persistence fails closed. | `run_backtest(request: SimulationBacktestRequestV1, auth_context: AuthContext, dependencies: SimulationRunDependencies) -> SimulationResult` | Read-only external-domain calls; local state mutation; persistence write; audit and journal event publication | `SimulationError`: controlled validation, execution, audit, journal, reporting, or persistence failure | **Usage:** `tests/simulator/usage/07_run.py::fr_sim_030()`<br>**Unit:** `tests/simulator/unit/test_orchestrator.py::test_run_backtest_maps_internal_failure()` |
 
 #### `portfolio.py` — Portfolio Candidate Backtest
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-034` | The system shall execute every component of an approved portfolio candidate through the ordinary deterministic simulation path, maintain one aggregate account ledger and the Risk-owned budget history, and publish `PortfolioSimulationResult v1` only when every component and the aggregate journal reconcile. Reconciliation is arithmetic and falsifiable: the aggregate net profit shall equal the sum of component `accounting.net_profit` and the aggregate component count shall equal the requested component count, both to exact `Decimal` equality; `reconciled` is computed per component and is never a literal. Component return evidence shall be measured from each component's own simulated equity curve. FX evidence shall be resolved through `resolve_fx_evidence()` and validated before publication. It shall not approve, activate, rank, weight, or modify the allocation. Missing or stale FX evidence and any incomplete component fail the whole run closed. | `run_portfolio_backtest(request: PortfolioBacktestRequestV1, auth_context: AuthContext, dependencies: SimulationRunDependencies) -> PortfolioSimulationResult` | Local state mutation; persistence write; event publication | `SimulationError`: `SIM_COMPONENT_INCOMPLETE`, `SIM_AGGREGATE_UNRECONCILED`, `SIM_FX_EVIDENCE_UNAVAILABLE`, or any controlled validation, execution, journal, or persistence code | **Usage:** `tests/simulator/usage/test_usage_run.py::test_usage_run_portfolio_backtest()`<br>**Unit:** `tests/simulator/unit/test_portfolio_run.py::test_portfolio_run_fails_closed_on_incomplete_component()` |
+| Completed | `FR-SIM-034` | The system shall execute every component of an approved portfolio candidate through the ordinary deterministic simulation path, maintain one aggregate account ledger and the Risk-owned budget history, and publish `PortfolioSimulationResult v1` only when every component and the aggregate journal reconcile. Reconciliation is arithmetic and falsifiable: exact allocated opening capital equals portfolio opening capital, aggregate net profit equals the exact sum of component net profit, and aggregate component count equals the request. Component returns are sampled from each engine's actual end-of-tick mark-to-market equity observations on one shared 30-point UTC cadence; open-position price movement is included and closed-trade reconstruction is forbidden. Every resolved FX evidence object must match its request-bound version and canonical hash before freshness validation. The run persists bounded portfolio start/completion/failure audit evidence. | `run_portfolio_backtest(request: PortfolioBacktestRequestV1, auth_context: AuthContext, dependencies: SimulationRunDependencies) -> PortfolioSimulationResult` | Local state mutation; persistence write; audit and journal event publication | `SimulationError`: `SIM_COMPONENT_INCOMPLETE`, `SIM_AGGREGATE_UNRECONCILED`, `SIM_FX_EVIDENCE_UNAVAILABLE`, or any controlled validation, execution, audit, journal, or persistence code | **Usage:** `tests/simulator/usage/07_run.py::fr_sim_034()`<br>**Unit:** `tests/simulator/unit/test_portfolio_run.py::test_portfolio_run_fails_closed_on_incomplete_component()` |
 
 **Rules:** Components share one deterministic clock and one aggregate ledger. A
 component failure is never partially published. Portfolio owns construction and
@@ -981,15 +1043,17 @@ activation; Simulation only measures the candidate it was given.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-SIM-031` | The system shall run an explicitly requested approximation only when enabled, mark every output `canonical=false`, disclose assumptions, and prohibit canonical fills, promotion evidence, and reports. | `run_fast_research(request: SimulationBacktestRequestV1, auth_context: AuthContext, dependencies: SimulationRunDependencies) -> FastResearchResult` | Read-only | `SimulationError`: controlled failure | **Usage:** `tests/simulator/usage/test_usage_run.py::test_usage_run_fast_research()`<br>**Unit:** `tests/simulator/unit/test_research.py::test_fast_research_cannot_claim_canonical()` |
+| Completed | `FR-SIM-031` | The system shall run an explicitly requested approximation only when enabled, mark every output `canonical=false`, disclose assumptions, prohibit canonical fills, promotion evidence, and reports, and persist bounded research start/completion/failure audit evidence. | `run_fast_research(request: SimulationBacktestRequestV1, auth_context: AuthContext, dependencies: SimulationRunDependencies) -> FastResearchResult` | Audit event publication | `SimulationError`: controlled validation, audit, or research failure | **Usage:** `tests/simulator/usage/07_run.py::fr_sim_031()`<br>**Unit:** `tests/simulator/unit/test_research.py::test_fast_research_cannot_claim_canonical()` |
 
-**Rules:** `run_backtest`, `run_portfolio_backtest`, and `run_fast_research` are the only package-root public operations; internal helpers are not exported.
+**Rules:** `run_backtest`, `run_portfolio_backtest`, and `run_fast_research` are
+the only public operations owned by the run feature; internal run helpers are not
+exported.
 
 **Implementation notes:** `docs/PROJECT.md` §5 fixes the exact request schema and synchronous terminal behavior. `contract_version` and `schema_id` remain separate fields and compatibility is never inferred by parsing the schema identifier.
 
 ### Feature usage examples
 
-`tests/simulator/usage/test_usage_run.py`
+`tests/simulator/usage/07_run.py`
 
 ---
 
@@ -1004,7 +1068,7 @@ activation; Simulation only measures the candidate it was given.
 | Completed | `NFR-SIM-005` | API boundary | Package and feature `__init__.py` files shall expose only documented public symbols. No Data helper, provider object, or internal type is re-exported. | Import-surface test |
 | Completed | `NFR-SIM-006` | Security | Official requests shall reject arbitrary code and paths, redact secrets, bound payloads/diagnostics, and use vetted references only. | Security tests |
 | Completed | `NFR-SIM-007` | Reliability | Missing evidence, persistence failure, invariant failure, unknown state, or unsupported scope shall fail closed with a deterministic code and no published completed result. | Fault-injection tests |
-| Completed | `NFR-SIM-008` | Auditability | Every governed transition and rejection shall be traceable through correlation/causation IDs and the canonical hash-chained journal. | Journal audit test |
+| Completed | `NFR-SIM-008` | Auditability | Every governed transition and rejection shall be traceable through correlation/causation IDs. Execution evidence remains in the canonical hash-chained journal, while bounded run lifecycle evidence is persisted as Utils-owned `AuditEvent v1` records through `SimulationRunDependencies.persist_audit_event`. | Journal and run-audit tests |
 | Completed | `NFR-SIM-009` | Maintainability | Modules/files shall match Sections 2 and 4, remain acyclic, and contain Google-style typed public APIs without speculative layers. | Structure, Ruff, mypy review |
 | Completed | `NFR-SIM-010` | Testing | Every public functional requirement shall have one usage example, at least one unit test, and collaborative workflow coverage, with package coverage at least 80%. | Traceability and coverage gate |
 | Completed | `NFR-SIM-011` | Performance | Phase 1 shall record non-blocking deterministic runtime and memory baselines; no blocking numeric gate applies until measured evidence supports a separately approved domain limit. | Benchmark report |
@@ -1048,7 +1112,7 @@ The following are excluded from the initial implementation and must not appear a
 tests/simulator/
 ├── unit/                         # Each public symbol and failure path
 ├── integration/                  # WF-SIM-* module/domain collaboration
-└── usage/                        # One runnable test_usage_* example per FR-SIM-*
+└── usage/                        # Nine numbered standalone feature programs
 ```
 
 ### Commands
@@ -1060,7 +1124,7 @@ uv run mypy app/services/simulator
 
 uv run pytest tests/simulator/unit
 uv run pytest tests/simulator/integration
-uv run pytest tests/simulator/usage
+python tests/simulator/usage/NN_feature.py
 
 uv run pytest tests/simulator --import-mode=importlib --cov=app.services.simulator --cov-fail-under=80
 ```
@@ -1073,7 +1137,9 @@ During iterative implementation, run only the specific files associated with the
 - **Contract:** Producer/consumer compatibility for the registered `v1` contracts `SimulationBacktestRequestV1`, `SimulationResult`, `MarketDataset`, and `OrderIntent`; the request must match `docs/PROJECT.md` §5 exactly.
 - **Golden/replay:** Controlled FX fixture, byte-stable artifacts, hash-chain integrity, identity mismatch, and deterministic reconstruction.
 - **Integration:** Every registered `WF-SIM-*`, including no-live-side-effect spies and persistence-failure injection.
-- **Usage:** Every mapped `test_usage_*` function imports only documented public feature APIs and is collected by pytest.
+- **Usage:** Every mapped `fr_sim_NNN()` function imports the domain-root public
+  API, is called by its feature program's `main()`, and is verified by direct
+  Python execution rather than pytest collection.
 - **Coverage:** At least 80% statement coverage for the final package, with important safety branches explicitly tested.
 
 ### Package completion checklist
@@ -1090,8 +1156,8 @@ During iterative implementation, run only the specific files associated with the
 - [X] No raw code, live adapter, broker SDK, credential resolution, network call, or live mutation is reachable. Evidence: `tests/simulator/integration/test_strategy_security.py:10`.
 - [X] Every `FR-SIM-*` has one usage example and at least one unit test; every workflow has an integration test. Evidence: `tests/simulator/integration/test_official_backtest.py:78`.
 - [X] Golden, replay, persistence-failure, security, boundary, and import-safety tests pass. Evidence: `tests/simulator/integration/test_replay.py:23`.
-- [X] Ruff, formatting, mypy, targeted pytest, and 80% coverage gates pass. All five gates were executed on 2026-07-19 after the review corrections and are green: `ruff check` and `ruff format --check` clean over 32 files, `mypy` clean over 32 source files, `110` unit + `16` integration + `43` usage tests passing, and `169 passed` with `83.21%` coverage against the 80% floor. The same command block was then confirmed green on the Windows toolchain, which is the authoritative platform for this domain because it exercises journal `fsync` grouping, a SQLite-backed state-store fixture, and filesystem artifact paths whose behaviour is platform-sensitive. Evidence: `tests/simulator/unit/test_orchestrator.py::test_repeat_request_with_different_hash_conflicts`; `tests/simulator/unit/test_portfolio_run.py::test_portfolio_return_series_is_measured_not_supplied`.
-- [X] Every raised code exists in `SIM_ERROR_CATALOG`, and every catalog code has a fail-closed raise path. Evidence: `app/services/simulator/errors.py:88`.
+- [X] Ruff, formatting, mypy, targeted pytest, standalone usage execution, and the 80% coverage gate pass on the 2026-07-24 correction tree: Ruff checked 1,140 files, mypy checked 1,165 source files, all 166 Simulator unit/integration/contract/security/import/property/golden/compatibility checks passed, all nine standalone usage programs passed, the 89 targeted Data/Indicators boundary regressions passed, and Simulator coverage reached 83.73%. Evidence: `tests/simulator/unit/test_import_safety.py`; `tests/simulator/unit/test_properties.py`; `tests/simulator/integration/test_usage_scripts.py`.
+- [X] Every raised code exists in `SIM_ERROR_CATALOG`, and every catalog code has a fail-closed raise path. Evidence: `app/services/simulator/errors/catalog.py`.
 - [X] Bound `SimTrader.submit_order` is assignable to Trading's injected `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]` port. Evidence: `app/services/simulator/execution/trader.py:28`.
 - [X] No module imports `app.services.data.storage.*` or `app.services.optimization.*`. Evidence: `tests/simulator/unit/test_state.py:12`.
 - [X] Official runs consume only `generate_tick_series` output; `generate_synthetic_dataset` is unreachable from `run_backtest`. Evidence: `tests/simulator/integration/test_official_backtest.py:103`.
@@ -1104,9 +1170,11 @@ During iterative implementation, run only the specific files associated with the
 - [X] Idempotency on the governed path is resolved through `resolve_idempotent_run`, with no second implementation. Evidence: `app/services/simulator/run/orchestrator.py`; `tests/simulator/unit/test_orchestrator.py::test_repeat_request_with_different_hash_conflicts`.
 - [X] Every feature `__init__.py` exposes exactly its documented public symbols. Evidence: `tests/simulator/unit/test_public_api.py::test_feature_exports_match_documentation`.
 - [X] Rejected behavior is absent from the architecture and active package surface. Evidence: `app/services/simulator/validation/validate.py:77`.
-- [X] The package contains only `README.md`, `__init__.py`, `errors.py`, and the approved feature folders; no migration or compatibility shim exists. Evidence: `app/services/simulator/__init__.py:1`.
+- [X] The package contains only `README.md`, `__init__.py`, and the approved feature folders; no migration or compatibility shim exists. Evidence: `app/services/simulator/__init__.py:1`.
 
-Current checklist status: `Completed`. Every functional, contract, boundary, and documentation item is satisfied; all findings from the 2026-07-19 post-build review are closed; and the Section 7 domain gate is green on both Linux and the Windows toolchain. No item remains open.
+Current checklist status: `Completed`. All implementation, contract, boundary,
+documentation, behavioral, standalone usage, typing, formatting, and coverage
+gates pass on the current correction tree.
 
 ---
 
