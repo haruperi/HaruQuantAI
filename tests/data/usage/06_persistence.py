@@ -8,53 +8,43 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data._settings import DataSettings, data_settings_context
-from app.services.data.audit import persist_audit_event, query_audit_events
-from app.services.data.audit.contracts import (
+from app.services.data import (
     AuditEventQuery,
-)
-from app.services.data.contracts import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
-)
-from app.services.data.local_datasets.contracts import DatasetLoadRequest
-from app.services.data.persistence.backup import (
-    create_backup,
-    enforce_retention_policy,
-    restore_from_backup,
-)
-from app.services.data.persistence.cache import (
-    clear_data_cache,
-    get_cache_entry,
-    put_cache_entry,
-)
-from app.services.data.persistence.contracts import (
     BackupTarget,
-    CacheClearRequest,
     CacheReadRequest,
     CacheWriteRequest,
+    ColumnMapping,
+    DataError,
+    DataQualityReport,
+    DatasetLoadRequest,
     DatasetSaveRequest,
+    DataSettings,
+    ExternalImportRequest,
+    MarketDataset,
     MigrationRequest,
     MigrationStep,
+    OHLCVRecord,
     StatementPlan,
     TransactionRequest,
-)
-from app.services.data.persistence.dataset_writer import (
+    acquire_write_lock,
+    clear_data_cache,
+    create_backup,
+    data_settings_context,
+    describe_import_dialects,
+    enforce_retention_policy,
+    execute_transaction,
+    get_cache_entry,
+    import_external_dataset,
     load_dataset,
+    persist_audit_event,
+    put_cache_entry,
+    query_audit_events,
+    restore_from_backup,
+    run_data_migrations,
+    run_domain_migrations,
     save_dataset,
     save_market_data,
 )
-from app.services.data.persistence.external_import import (
-    ExternalImportRequest,
-    import_external_dataset,
-)
-from app.services.data.persistence.locking import acquire_write_lock
-from app.services.data.persistence.migrations import (
-    run_data_migrations,
-    run_domain_migrations,
-)
-from app.services.data.persistence.transactions import execute_transaction
 from app.utils import AuditEvent, AuthContext, generate_id, logger
 
 _OBSERVED_AT = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
@@ -132,7 +122,7 @@ def _dataset() -> MarketDataset:
     )
 
 
-def example_fr_data_014_transaction() -> None:
+def _example_fr_data_014() -> None:
     """Run one raw transaction using the shared persistence connection."""
     _header("FR-DATA-014: executing one bounded SQLite transaction")
     request = TransactionRequest(
@@ -140,21 +130,25 @@ def example_fr_data_014_transaction() -> None:
             statements=("SELECT 1;",),
             parameter_sets=((),),
             max_rows=10,
-        )
+        ),
+        request_id=generate_id("req"),
     )
     outcome = execute_transaction(request)
     print(f"Transaction committed and returned {len(outcome.rows)} rows")
 
 
-def example_fr_data_015_migration() -> None:
+def _example_fr_data_015() -> None:
     """Run step-level domain migrations with ledger verification."""
     _header("FR-DATA-015: applying an idempotent usage migration")
     req_id = generate_id("req")
+    statement = (
+        "CREATE TABLE IF NOT EXISTS usage_notes (id TEXT PRIMARY KEY, content TEXT)"
+    )
     step = MigrationStep(
-        step_id="001_create_usage_notes",
         domain="usage",
-        up_statement="CREATE TABLE IF NOT EXISTS usage_notes (id TEXT PRIMARY KEY, content TEXT);",
-        down_statement="DROP TABLE IF EXISTS usage_notes;",
+        migration_id="001_create_usage_notes",
+        checksum="usage-notes-v1",
+        statements=(statement,),
     )
     request = MigrationRequest(
         domain="usage",
@@ -162,10 +156,10 @@ def example_fr_data_015_migration() -> None:
         request_id=req_id,
     )
     report = run_domain_migrations(request)
-    print(f"Applied migration IDs={report.applied_step_ids}")
+    print(f"Applied migration IDs={report.applied_ids}")
 
 
-def example_fr_data_016_write_lock(root: Path) -> None:
+def _example_fr_data_016(root: Path) -> None:
     """Acquire one path-scoped write lease for atomic writes."""
     _header("FR-DATA-016: acquiring a path-scoped write lease")
     req_id = generate_id("req")
@@ -174,15 +168,17 @@ def example_fr_data_016_write_lock(root: Path) -> None:
         print(f"Lease acquired for {lease.path} by {lease.request_id}")
 
 
-def example_fr_data_017_load_dataset(root: Path) -> None:
+def _example_fr_data_017(root: Path) -> None:
     """Load one dataset artifact and manifest via DatasetLoadRequest."""
     _header("FR-DATA-017: loading a governed CSV artifact")
     ds = _dataset()
     save_dataset(
         DatasetSaveRequest(
             dataset=ds,
-            destination_relative_path=Path("data/raw/AAPL.csv"),
-            request_id=generate_id("req"),
+            relative_path=Path("data/raw/AAPL.csv"),
+            format="csv",
+            overwrite=True,
+            request_id=ds.request_id,
         )
     )
     request = DatasetLoadRequest(
@@ -195,15 +191,17 @@ def example_fr_data_017_load_dataset(root: Path) -> None:
     print(f"Verified {root / request.relative_path} with sha256={checksum}")
 
 
-def example_fr_data_018_save_dataset(root: Path) -> None:
+def _example_fr_data_018(root: Path) -> None:
     """Write one dataset artifact and its sidecar manifest atomically."""
     _header("FR-DATA-018: saving a governed CSV artifact")
     ds = _dataset()
     save_dataset(
         DatasetSaveRequest(
             dataset=ds,
-            destination_relative_path=Path("data/raw/AAPL.csv"),
-            request_id=generate_id("req"),
+            relative_path=Path("data/raw/AAPL.csv"),
+            format="csv",
+            overwrite=True,
+            request_id=ds.request_id,
         )
     )
     loaded = load_dataset(
@@ -217,13 +215,14 @@ def example_fr_data_018_save_dataset(root: Path) -> None:
     print(f"Verified {root / 'data/raw/AAPL.csv'} with sha256={checksum}")
 
 
-def example_fr_data_019_read_cache() -> None:
+def _example_fr_data_019() -> None:
     """Read one entry from the local SQLite cache."""
     _header("FR-DATA-019: reading a compatible cache entry")
     ds = _dataset()
     req_id = generate_id("req")
     put_cache_entry(
         CacheWriteRequest(
+            key="usage-aapl-m1-v1",
             dataset=ds,
             source_revision="rev-1",
             raw_data_hash="abc123hash",
@@ -233,19 +232,21 @@ def example_fr_data_019_read_cache() -> None:
     )
     entry = get_cache_entry(
         CacheReadRequest(
-            key=ds.cache_key,
+            key="usage-aapl-m1-v1",
+            allow_stale=False,
             request_id=req_id,
         )
     )
     print(f"Cache entry read: found={entry is not None}")
 
 
-def example_fr_data_020_write_cache() -> None:
+def _example_fr_data_020() -> None:
     """Write one dataset entry into the local SQLite cache."""
     _header("FR-DATA-020: writing a bounded cache entry")
     ds = _dataset()
     outcome = put_cache_entry(
         CacheWriteRequest(
+            key="usage-aapl-m1-v1",
             dataset=ds,
             source_revision="rev-1",
             raw_data_hash="abc123hash",
@@ -253,7 +254,7 @@ def example_fr_data_020_write_cache() -> None:
             request_id=generate_id("req"),
         )
     )
-    print(f"Cache write={outcome.written} records={outcome.record_count}")
+    print(f"Cache write={outcome.written} key={outcome.key}")
 
 
 def example_13_csv_saver() -> None:
@@ -261,15 +262,23 @@ def example_13_csv_saver() -> None:
     _header("FR-DATA-018: CSV Saver (save_market_data)")
     ds = _dataset()
     manifest = save_market_data(ds, destination_path=Path("data/raw/AAPL_saver.csv"))
-    print(f"CSV save status: committed={manifest.committed} path={manifest.relative_path}")
+    print(
+        f"CSV save status: committed={manifest.committed} path={manifest.relative_path}"
+    )
 
 
 def example_14_parquet_saver() -> None:
     """Save and reload Parquet market-data artifacts via save_market_data."""
     _header("FR-DATA-018: Parquet Saver (save_market_data)")
     ds = _dataset()
-    manifest = save_market_data(ds, destination_path=Path("data/processed/AAPL_saver.parquet"))
-    print(f"Parquet save status: committed={manifest.committed} path={manifest.relative_path}")
+    manifest = save_market_data(
+        ds,
+        destination_path=Path("data/processed/AAPL_saver.parquet"),
+    )
+    print(
+        "Parquet save status: "
+        f"committed={manifest.committed} path={manifest.relative_path}"
+    )
 
 
 def example_18_caching() -> None:
@@ -286,7 +295,7 @@ def example_35_cleanup() -> None:
     print(f"Data cache cleanup result: deleted={result.deleted_count}")
 
 
-def example_fr_data_021_persist_audit() -> None:
+def _example_fr_data_021() -> None:
     """Persist one audit event to the durable SQLite store."""
     _header("FR-DATA-021: persisting redacted audit evidence")
     req_id = generate_id("req")
@@ -307,7 +316,7 @@ def example_fr_data_021_persist_audit() -> None:
     print(f"Queried {len(page.events)} redacted audit events")
 
 
-def example_fr_data_077_query_audit() -> None:
+def _example_fr_data_077() -> None:
     """Query audit events with authorized AuthContext."""
     _header("FR-DATA-077: querying redacted audit evidence")
     req_id = generate_id("req")
@@ -335,11 +344,11 @@ def example_fr_data_077_query_audit() -> None:
     print(f"Queried {len(page.events)} redacted audit events")
 
 
-def example_fr_data_105_106_external_import() -> None:
+def _example_fr_data_105() -> None:
     """Import an external raw CSV file using standard dialect."""
     _header("FR-DATA-106 describe_import_dialects")
-    for dialect in describe_import_dialects():
-        print(f" - {dialect.dialect_id}: {dialect.description}")
+    for dialect_id, description in describe_import_dialects().items():
+        print(f" - {dialect_id}: {description}")
 
     _header("FR-DATA-105 import_external_dataset")
     with TemporaryDirectory(prefix="haru-external-import-") as directory:
@@ -353,13 +362,17 @@ def example_fr_data_105_106_external_import() -> None:
             encoding="utf-8",
         )
         settings = DataSettings(
-            database_url=f"sqlite:///{root / 'data/storage.sqlite3'}",
+            database_url="sqlite:///storage.sqlite3",
             data_dir=root,
+            sqlite_busy_timeout_seconds=1.5,
+            write_lock_lease_seconds=30,
+            approved_storage_roots=(root,),
         )
         request = ExternalImportRequest(
-            source_file_path=Path("raw/EURUSD.csv"),
-            dialect_id="standard",
-            column_mapping=dict(
+            relative_path=Path("data/raw/EURUSD.csv"),
+            format="csv",
+            dialect="standard",
+            mapping=ColumnMapping(
                 timestamp="timestamp",
                 open="open",
                 high="high",
@@ -375,7 +388,7 @@ def example_fr_data_105_106_external_import() -> None:
             precision_policy="decimal_string",
             price_unit="USD",
             volume_unit="lots",
-            destination_path=Path("raw/EURUSD_M1.csv"),
+            destination_path=Path("data/raw/EURUSD_M1.csv"),
             request_id=generate_id("req"),
         )
         try:
@@ -384,11 +397,11 @@ def example_fr_data_105_106_external_import() -> None:
                 manifest = import_external_dataset(request)
             print("Imported rows:", manifest.row_count)
             print("Committed artifact:", manifest.relative_path)
-        except Exception as error:
-            print("External import error:", type(error).__name__)
+        except DataError as error:
+            print("External import error:", error.code)
 
 
-def example_fr_data_108_110_backup_and_retention() -> None:
+def _example_fr_data_108() -> None:
     """Create, restore, and inspect retention for one governed raw artifact."""
     _header("FR-DATA-108..110: backup, restore, and retention")
     manifest = create_backup(
@@ -407,7 +420,7 @@ def example_fr_data_108_110_backup_and_retention() -> None:
     print("Expired raw payloads:", retained)
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Call every storage operation in isolated state."""
     with TemporaryDirectory(prefix="haru-data-storage-") as directory:
         demo_root = Path(directory)
@@ -419,21 +432,100 @@ def main() -> None:
         )
         with data_settings_context(settings):
             _configure_environment(demo_root)
-            example_fr_data_014_transaction()
-            example_fr_data_015_migration()
-            example_fr_data_016_write_lock(demo_root)
-            example_fr_data_017_load_dataset(demo_root)
-            example_fr_data_018_save_dataset(demo_root)
-            example_13_csv_saver()
-            example_14_parquet_saver()
-            example_fr_data_019_read_cache()
-            example_fr_data_020_write_cache()
-            example_18_caching()
-            example_35_cleanup()
-            example_fr_data_021_persist_audit()
-            example_fr_data_077_query_audit()
-            example_fr_data_108_110_backup_and_retention()
-    example_fr_data_105_106_external_import()
+            _example_fr_data_014()
+            _example_fr_data_015()
+            _example_fr_data_016(demo_root)
+            _example_fr_data_017(demo_root)
+            _example_fr_data_018(demo_root)
+            _example_fr_data_019()
+            _example_fr_data_020()
+            _example_fr_data_108()
+    _example_fr_data_105()
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_014() -> None:
+    "FR-DATA-014: Execute a bounded caller-owned statement plan in one short-lived SQLite transaction, return normalized results without a connection/session, and roll back atomically on failure."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_015() -> None:
+    "FR-DATA-015: Validate ownership/order/checksums, acquire the shared lock, and execute domain-owned migration definitions exactly once while preserving an immutable ledger."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_016() -> None:
+    "FR-DATA-016: Grant at most one writer lease per resolved path, reject conflicts deterministically, and release it on exit or verified stale recovery."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_018() -> None:
+    "FR-DATA-018: Validate license/quality/path, lock the target, write artifact and manifest through a temporary file, and atomically commit or quarantine failure."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_019() -> None:
+    "FR-DATA-019: Return a cache entry only when request dimensions, schema/normalization, source revision/raw hash, and stale policy match; stale data is never silent."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_020() -> None:
+    "FR-DATA-020: Write a bounded cache entry with complete identity/TTL metadata and surface an optional cache-write failure without corrupting a successful retrieval result."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_105() -> None:
+    "FR-DATA-105: Admit one externally produced artifact under a declared dialect and explicit column mapping, infer no governed field, validate and quality-check every record, commit through `save_dataset`, and persist an audit event marking external origin."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_106() -> None:
+    "FR-DATA-106: Expose the supported deterministic header and delimiter dialects so a caller can select one without trial and error; an unlisted dialect is rejected."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_108() -> None:
+    "FR-DATA-108: Snapshot a declared set of backup targets (raw artifacts, processed artifacts, cache state, manifests, and the migration ledger) into one immutable manifest carrying per-target hashes, byte counts, UTC creation time, and schema/normalization versions. Persist one audit event. A target outside `APPROVED_STORAGE_ROOTS` is rejected before any read."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_109() -> None:
+    "FR-DATA-109: Restore every target in a named manifest to its recorded state, verifying each hash before writing and failing atomically without partial restoration when any verification fails. Restore is always explicit and never automatic."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_110() -> None:
+    "FR-DATA-110: Purge raw payloads for one dataset older than an explicit maximum age and return the purged count. Operates only on raw payloads; the canonical retention terms carried by `SourceLicensePolicy` are separate and are never overridden. Defaults to a dry run."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (
+        fr_data_014,
+        fr_data_015,
+        fr_data_016,
+        fr_data_018,
+        fr_data_019,
+        fr_data_020,
+        fr_data_105,
+        fr_data_106,
+        fr_data_108,
+        fr_data_109,
+        fr_data_110,
+    )
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

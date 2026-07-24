@@ -1,6 +1,6 @@
 [project]
 name = "haruquantai"
-version = "2.2.1"
+version = "2.2.2"
 description = "Quantitative Financial Trading System"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -33,6 +33,7 @@ dependencies = [
     "twisted==24.3.0",
     "uvicorn>=0.30.0",
     "yfinance>=1.4.1",
+    "exchange-calendars==4.12",
 ]
 
 [tool.ruff]

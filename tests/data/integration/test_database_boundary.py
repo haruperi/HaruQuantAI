@@ -6,11 +6,11 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-from app.services.data.persistence.contracts import (
+from app.services.data import (
     StatementPlan,
     TransactionRequest,
+    execute_transaction,
 )
-from app.services.data.persistence.transactions import execute_transaction
 
 
 def test_database_connection_is_closed_after_committed_result(

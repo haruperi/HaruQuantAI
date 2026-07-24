@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import pytest
-from app.services.data.contracts import DataError
-from app.services.data.evidence.account_contracts import (
+from app.services.data import (
     AccountSnapshotRequest,
+    DataError,
+    ReadOnlyBrokerProxy,
+    get_account_state_snapshot,
 )
-from app.services.data.sources.read_only import ReadOnlyBrokerProxy
 from app.utils import generate_id
 
 
@@ -25,8 +26,6 @@ def test_account_evidence_wraps_every_injected_broker(
         "app.services.data.evidence.account_state._fetch_from_adapter",
         inspect_proxy,
     )
-    from app.services.data.evidence.account_state import get_account_state_snapshot
-
     request = AccountSnapshotRequest(
         source_id="fixture",
         account_id="account-1",

@@ -212,7 +212,8 @@ def to_ohlcv_dataframe(dataset: MarketDataset) -> pd.DataFrame:
         name="timestamp",
     )
     frame = pd.DataFrame(values, index=index, columns=_OHLCV_COLUMNS)
-    frame.attrs["spread_unit"] = next(iter(spread_units), None)
+    unit = next(iter(spread_units), None)
+    frame.attrs["spread_unit"] = unit
     return frame
 
 

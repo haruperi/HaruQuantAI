@@ -6,7 +6,9 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-from app.services.data.persistence.locking import acquire_write_lock
+from app.services.data import (
+    acquire_write_lock,
+)
 
 
 def _configure_locking(monkeypatch: pytest.MonkeyPatch, data_directory: Path) -> Path:

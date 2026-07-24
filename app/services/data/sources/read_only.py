@@ -44,13 +44,14 @@ __all__ = [
 # from a specification that disagrees with the code is worse than none: it fails closed
 # on legitimate reads, which reads as an outage rather than as a policy.
 #
-# Every name here was verified against an actual call site. `connect` and `is_connected`
-# are included because establishing and observing a session is not a market mutation.
-# Everything that changes broker-side state is absent by construction.
+# Every name here was verified against an actual call site. Session lifecycle methods
+# establish or release a Data-owned read session; they do not mutate market or account
+# state. Everything that changes broker-side trading state is absent by construction.
 READ_ONLY_BROKER_METHODS: Final[frozenset[str]] = frozenset(
     {
         # Session lifecycle.
         "connect",
+        "disconnect",
         "is_connected",
         # Market data reads.
         "get_historical_bars",

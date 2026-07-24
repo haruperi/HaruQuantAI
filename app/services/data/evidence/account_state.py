@@ -148,6 +148,7 @@ def _map_positions(
                 side=position.side,
                 quantity=position.quantity,
                 entry_price=position.open_price,
+                ownership_ref=position.ownership_ref,
             )
         )
     return tuple(normalized)

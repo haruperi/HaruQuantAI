@@ -32,7 +32,14 @@ def test_documented_usage_script_executes_real_work(script_name: str) -> None:
     usage_directory = Path(__file__).parents[1] / "usage"
     environment = os.environ.copy()
     environment.pop("DATA_USAGE_LIVE_PROVIDERS", None)
-    environment["MT5_ENABLED"] = "false"
+    for setting_name in (
+        "MT5_ENABLED",
+        "CTRADER_ENABLED",
+        "BINANCE_ENABLED",
+        "DUKASCOPY_ENABLED",
+        "YAHOO_ENABLED",
+    ):
+        environment[setting_name] = "false"
     completed = subprocess.run(  # noqa: S603 - fixed repository script invocation.
         [sys.executable, str(usage_directory / script_name)],
         check=False,

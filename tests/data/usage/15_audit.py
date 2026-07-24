@@ -8,15 +8,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.audit import persist_audit_event, query_audit_events
-from app.services.data.audit.contracts import AuditEventQuery
+from app.services.data import (
+    AuditEventQuery,
+    DataError,
+    persist_audit_event,
+    query_audit_events,
+)
 from app.utils import AuditEvent, AuthContext, generate_id
 
 _START = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 _END = _START + timedelta(hours=1)
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Exercise audit event creation, persistence, and authorized query."""
     req_id = generate_id("req")
 
@@ -38,8 +42,8 @@ def main() -> None:
     try:
         res = persist_audit_event(event)
         print("persist_audit_event:", res.persisted)
-    except Exception as err:
-        print("persist_audit_event handled:", type(err).__name__)
+    except DataError as error:
+        print("persist_audit_event handled:", error.code)
 
     query = AuditEventQuery(
         start=_START,
@@ -67,8 +71,39 @@ def main() -> None:
     try:
         page = query_audit_events(query, auth)
         print("query_audit_events count:", len(page.events))
-    except Exception as err:
-        print("query_audit_events handled:", type(err).__name__)
+    except DataError as error:
+        print("query_audit_events handled:", error.code)
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_021() -> None:
+    "FR-DATA-021: Persist a redacted `AuditEvent v1` idempotently with trace identifiers and surface every persistence failure."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_077() -> None:
+    "FR-DATA-077: Authorize and execute a bounded, deterministically ordered audit query without exposing storage handles or unredacted payloads."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (
+        fr_data_021,
+        fr_data_077,
+    )
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

@@ -50,7 +50,7 @@ def test_account_snapshot_fails_closed_when_incomplete() -> None:
     assert captured.value.code == "SOURCE_UNAVAILABLE"
 
 
-def test_account_snapshot_success() -> None:
+def test_account_snapshot_success() -> None:  # noqa: PLR0915 - explicit end-to-end evidence flow
     """Verify standard account state snapshot mapping from mock adapter."""
     # Mock Broker DTOs
     now = datetime.now(UTC)
@@ -81,6 +81,7 @@ def test_account_snapshot_success() -> None:
         retrieved_at=now,
         state="OPEN",
         open_price=Decimal(150),
+        ownership_ref="mt5-magic:12345",
     )
     mock_order = BrokerOrder(
         order_id="ord-1",
@@ -151,6 +152,7 @@ def test_account_snapshot_success() -> None:
     assert snapshot.balances[0].available == Decimal(9000)
     assert len(snapshot.positions) == 1
     assert snapshot.positions[0].position_id == "pos-1"
+    assert snapshot.positions[0].ownership_ref == "mt5-magic:12345"
     assert snapshot.positions[0].side == "LONG"
     assert snapshot.positions[0].quantity == Decimal(10)
     assert snapshot.positions[0].entry_price == Decimal(150)

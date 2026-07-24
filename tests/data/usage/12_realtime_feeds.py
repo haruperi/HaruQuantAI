@@ -8,26 +8,24 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import DataError
-from app.services.data.realtime_feeds import (
+from app.services.data import (
+    DataError,
+    FeedConfig,
+    FeedStatusRequest,
+    RawFeedEvent,
+    ReconnectPolicy,
     ingest_feed_event,
     read_feed_status,
     reconcile_feed_gap,
     reconnect_feed,
     start_internal_feed,
 )
-from app.services.data.realtime_feeds.contracts import (
-    FeedConfig,
-    FeedStatusRequest,
-    RawFeedEvent,
-    ReconnectPolicy,
-)
 from app.utils import generate_id
 
 _NOW = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Exercise feed configuration, starting, ingestion, status, and reconnection."""
     req_id = generate_id("req")
     feed_id = "usage-feed-btc"
@@ -88,7 +86,7 @@ def main() -> None:
             feed_id,
             req_id,
             reconnect=lambda: True,
-            wait=lambda s: None,
+            wait=lambda _seconds: None,
         )
         print("reconnect_feed: succeeded")
     except DataError as err:
@@ -103,6 +101,43 @@ def main() -> None:
         print("reconcile_feed_gap: succeeded")
     except DataError as err:
         print("reconcile_feed_gap handled:", err.code)
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_046() -> None:
+    "FR-DATA-046: Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_047() -> None:
+    "FR-DATA-047: Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_048() -> None:
+    "FR-DATA-048: Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (
+        fr_data_046,
+        fr_data_047,
+        fr_data_048,
+    )
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

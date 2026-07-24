@@ -1,14 +1,14 @@
 # Changelog
 
-## 2.2.1
+## 2.2.2
 
-**Release date:** 2026-07-23
+**Release date:** 2026-07-24
 
-### Focused Brokers domain correction
+### Focused Brokers and Data domain correction
 
-The Brokers domain now exposes its corrected focused feature architecture, fail-closed capability policy, provider controls, and complete offline evidence suite.
+The Brokers and Data domains now expose their corrected focused feature architectures, governed provider and data controls, and complete standalone evidence suites.
 
-#### Added (16)
+#### Added (31)
 
 - `FEAT-BRK-00` Canonical Provider-Neutral Contracts.
 - `FEAT-BRK-01` Adapter Registry and Capability Discovery.
@@ -26,6 +26,21 @@ The Brokers domain now exposes its corrected focused feature architecture, fail-
 - `FEAT-BRK-13` Dukascopy BID Bars.
 - `FEAT-BRK-14` Deterministic Fake Adapter.
 - `FEAT-BRK-15` Adapter Runtime.
+- `FEAT-DATA-01` Canonical Data Contracts.
+- `FEAT-DATA-02` Market Data Retrieval.
+- `FEAT-DATA-03` Local Dataset Loading.
+- `FEAT-DATA-04` Synthetic Data Generation.
+- `FEAT-DATA-05` Tick-Series Derivation.
+- `FEAT-DATA-06` Data Persistence and Storage.
+- `FEAT-DATA-07` Data Quality and Validation.
+- `FEAT-DATA-08` Data Transformation and Resampling.
+- `FEAT-DATA-09` Time and Session Handling.
+- `FEAT-DATA-10` Data Source Governance.
+- `FEAT-DATA-11` Economic Calendar.
+- `FEAT-DATA-12` Real-Time Feed Lifecycle and Observability.
+- `FEAT-DATA-13` Scheduler and Job Management.
+- `FEAT-DATA-14` Cross-Domain Evidence.
+- `FEAT-DATA-15` Audit Evidence.
 
 ## 2.2.0
 

@@ -16,6 +16,7 @@ from typing import NamedTuple, cast
 import numpy as np
 from numpy.typing import NDArray
 
+from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import (
     DataQualityReport,
@@ -24,6 +25,7 @@ from app.services.data.contracts.dataset import (
     WorkflowContext,
 )
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
+from app.services.data.persistence.paths import resolve_approved_storage_path
 from app.services.data.tick_derivation._kernel import (
     generate_four_tick_arrays,
     generate_volume_tick_arrays,
@@ -75,6 +77,40 @@ class _KernelColumns(NamedTuple):
     local_indices: Int64Array
     phases: Int8Array
     bar_indices: Int64Array
+
+
+def _resolve_direct_output_limit(
+    max_records: int | None,
+    request_id: str,
+) -> int:
+    """Resolve a caller-tightenable direct tick-series output limit.
+
+    Args:
+        max_records: Optional caller ceiling.
+        request_id: Request identifier for deterministic errors.
+
+    Returns:
+        The positive effective record ceiling.
+
+    Raises:
+        DataError: If the caller attempts to disable or loosen the domain ceiling.
+    """
+    domain_max_records = get_limit("TICK_SERIES_MAX_RECORDS")
+    if max_records is None:
+        return domain_max_records
+    if (
+        not isinstance(max_records, int)
+        or isinstance(max_records, bool)
+        or max_records <= 0
+        or max_records > domain_max_records
+    ):
+        raise _error(
+            "LIMIT_EXCEEDED",
+            "max_records",
+            request_id,
+            "outside domain ceiling",
+        )
+    return max_records
 
 
 def _error(
@@ -964,7 +1000,8 @@ def generate_tick_series(
         min_spread_points: Required when spread_model is variable_spread.
         max_spread_points: Required when spread_model is variable_spread.
         seed: Required when spread_model is variable_spread.
-        max_records: Optional output ceiling; exceeding it raises LIMIT_EXCEEDED.
+        max_records: Optional caller ceiling. The domain ceiling is always enforced,
+            and a lower caller ceiling may tighten it.
         request_id: Optional caller trace identifier.
 
     Returns:
@@ -980,6 +1017,7 @@ def generate_tick_series(
         model,
     )
     resolved_request_id = request_id or dataset.request_id
+    max_records = _resolve_direct_output_limit(max_records, resolved_request_id)
     _validate_model(model, resolved_request_id)
     _validate_spread_model(
         spread_model,
@@ -1060,7 +1098,7 @@ def generate_tick_series(
 
     if not records:
         raise _error("VALIDATION_FAILED", "records", resolved_request_id, "empty")
-    if max_records is not None and len(records) > max_records:
+    if len(records) > max_records:
         raise _error(
             "LIMIT_EXCEEDED", "record_count", resolved_request_id, "series too long"
         )
@@ -1264,7 +1302,7 @@ def generate_tick_series_to_parquet(
     dataset: MarketDataset,
     *,
     path: Path,
-    max_output_rows_per_chunk: int = 2_000_000,
+    max_output_rows_per_chunk: int | None = None,
     **generation_arguments: object,
 ) -> Mapping[str, object]:
     """Stream a generated tick series to a bounded Parquet artifact.
@@ -1272,7 +1310,8 @@ def generate_tick_series_to_parquet(
     Args:
         dataset: Source MarketDataset supplying bar or context evidence.
         path: Destination Parquet path beneath an approved artifact root.
-        max_output_rows_per_chunk: Output-aware chunk ceiling.
+        max_output_rows_per_chunk: Optional caller chunk ceiling. The domain ceiling
+            is used by default and cannot be loosened.
         **generation_arguments: Keyword arguments forwarded to generate_tick_series.
 
     Returns:
@@ -1281,9 +1320,22 @@ def generate_tick_series_to_parquet(
     Raises:
         DataError: If generation fails or the destination cannot be written.
     """
-    logger.info("Streaming generated tick series to %s", path)
-    if max_output_rows_per_chunk <= 0:
-        raise _error("INVALID_INPUT", "max_output_rows_per_chunk", dataset.request_id)
+    domain_chunk_limit = get_limit("TICK_PARQUET_MAX_OUTPUT_ROWS_PER_CHUNK")
+    if max_output_rows_per_chunk is None:
+        max_output_rows_per_chunk = domain_chunk_limit
+    elif (
+        not isinstance(max_output_rows_per_chunk, int)
+        or isinstance(max_output_rows_per_chunk, bool)
+        or max_output_rows_per_chunk <= 0
+        or max_output_rows_per_chunk > domain_chunk_limit
+    ):
+        raise _error(
+            "LIMIT_EXCEEDED",
+            "max_output_rows_per_chunk",
+            dataset.request_id,
+        )
+    approved_path = resolve_approved_storage_path(path, dataset.request_id)
+    logger.info("Streaming generated tick series to an approved storage path")
 
     import pandas as pd
     import pyarrow as pa
@@ -1307,7 +1359,7 @@ def generate_tick_series_to_parquet(
     rows_written = 0
     columns: list[str] = []
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
+        approved_path.parent.mkdir(parents=True, exist_ok=True)
         for chunk in chunks:
             direct_columns = _kernel_parquet_columns(chunk, generation_arguments)
             if direct_columns is None:
@@ -1326,18 +1378,21 @@ def generate_tick_series_to_parquet(
                 frame_columns = [str(column) for column in direct_columns]
                 row_count = table.num_rows
             if writer is None:
-                writer = pq.ParquetWriter(path, table.schema)  # type: ignore[no-untyped-call]
+                writer = pq.ParquetWriter(  # type: ignore[no-untyped-call]
+                    approved_path,
+                    table.schema,
+                )
                 columns = frame_columns
             writer.write_table(table)  # type: ignore[no-untyped-call]
             rows_written += row_count
     except OSError as error:
         raise _error(
-            "STORAGE_FAILED", "path", dataset.request_id, "write failed"
+            "DB_WRITE_FAILED", "path", dataset.request_id, "write failed"
         ) from error
     finally:
         if writer is not None:
             writer.close()  # type: ignore[no-untyped-call]
-    return {"path": str(path), "rows": rows_written, "columns": columns}
+    return {"path": str(approved_path), "rows": rows_written, "columns": columns}
 
 
 __all__ = [

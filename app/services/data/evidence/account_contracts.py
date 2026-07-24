@@ -89,6 +89,7 @@ class AccountPosition(_Contract):
     side: Literal["LONG", "SHORT"]
     quantity: Decimal
     entry_price: Decimal | None = None
+    ownership_ref: str | None = None
 
     @field_validator("position_id", "symbol")
     @classmethod
@@ -96,6 +97,12 @@ class AccountPosition(_Contract):
         """Validate one DATA value or contract invariant."""
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
+
+    @field_validator("ownership_ref")
+    @classmethod
+    def _validate_optional_text(cls, value: str | None) -> str | None:
+        """Validate optional normalized provider ownership evidence."""
+        return None if value is None else _text(value)
 
     @field_validator("quantity", "entry_price")
     @classmethod

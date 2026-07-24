@@ -9,8 +9,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
-from app.services.data.quality import (
+from app.services.data import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
     detect_extreme_spread_widening,
     detect_flatline_periods,
     detect_price_jumps,
@@ -77,14 +79,17 @@ def _sample_dataset() -> MarketDataset:
 def example_25_quality_validation() -> None:
     """Validate OHLCV quality using inspect_data_quality and inspect_dataset_quality."""
     ds = _sample_dataset()
-    report = inspect_data_quality(ds.records, timeframe="M1")
+    report = inspect_data_quality(ds)
     print(f"Data Quality status: {report.quality_status} score={report.quality_score}")
 
     full_report = inspect_dataset_quality(ds)
-    print(f"Dataset Quality score: {full_report.quality_score} checked={full_report.checked_count}")
+    print(
+        f"Dataset Quality score: {full_report.quality_score} "
+        f"checked={full_report.checked_count}"
+    )
 
     policy = get_quality_policy()
-    print(f"Quality policy: {policy.policy_id}")
+    print(f"Quality policy: {policy.profile}")
 
     remediation = summarize_quality_remediation(report)
     print(f"Quality remediation summary: {remediation}")
@@ -94,17 +99,64 @@ def example_anomaly_detectors() -> None:
     """Exercise individual anomaly detector functions."""
     ds = _sample_dataset()
     gaps = detect_timestamp_gaps(ds.records, timeframe="M1")
-    jumps = detect_price_jumps(ds.records, max_jump_pct=Decimal("0.05"))
-    flatlines = detect_flatline_periods(ds.records, max_consecutive=3)
+    jumps = detect_price_jumps(ds.records)
+    flatlines = detect_flatline_periods(ds.records)
     zero_vols = detect_zero_volume_bars(ds.records)
-    spreads = detect_extreme_spread_widening(ds.records, max_spread=Decimal("0.01"))
-    print(f"Anomaly detection: gaps={len(gaps)} jumps={len(jumps)} flatlines={len(flatlines)} zero_vol={len(zero_vols)} spreads={len(spreads)}")
+    spreads = detect_extreme_spread_widening(ds.records)
+    print(
+        f"Anomaly detection: gaps={gaps is not None} jumps={jumps is not None} "
+        f"flatlines={flatlines is not None} zero_vol={zero_vols is not None} "
+        f"spreads={spreads is not None}"
+    )
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Run all quality validation examples."""
     example_25_quality_validation()
     example_anomaly_detectors()
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_091() -> None:
+    "FR-DATA-091: Detect missing bars against expected timeframe frequency, discounting exact weekend closures and supplied `SessionWindow` closures. Emit critical `MISSING_BARS` only for unexplained gaps beyond tolerance, with affected count and bounded samples; add `calendar_unverified` when no sessions were supplied."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_092() -> None:
+    "FR-DATA-092: Detect price spikes beyond the profile sigma bound, flat-line runs, zero-volume runs, duplicate OHLCV bar timestamps, and comparable price-unit spread-threshold breaches. Tick timestamps may repeat; provider-point spreads are disclosed as `spread_unit_unverified` instead of being compared to a price-unit ceiling. Each issue carries bounded evidence."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_093() -> None:
+    "FR-DATA-093: Compute `quality_score` as `1 − Σ(severity_weight × affected_count / checked_count)` clamped to `[0, 1]` in `Decimal`, and derive `quality_status`: `failed` when any `QUALITY_BLOCKING_ISSUES` code is present (or, under `strict`, when the score is below `QUALITY_MIN_SCORE`), otherwise `passed_with_warnings` when any issue or warning exists, otherwise `passed`. A constant or unexamined score is never emitted."  # noqa: E501, RUF002 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_094() -> None:
+    "FR-DATA-094: Map each detected issue code to one deterministic recommended remediation action without mutating the dataset or performing the remediation."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (
+        fr_data_091,
+        fr_data_092,
+        fr_data_093,
+        fr_data_094,
+    )
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

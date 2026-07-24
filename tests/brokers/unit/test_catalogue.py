@@ -91,7 +91,6 @@ _NORMATIVE_MATRIX: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
     (
         (
             "refresh_session",
-            "get_trading_sessions",
             "list_accounts",
             "select_account",
             "list_assets",
@@ -101,6 +100,7 @@ _NORMATIVE_MATRIX: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
         ),
         ("U", "U", "U", "U", "U", "U", "U"),
     ),
+    (("get_trading_sessions",), ("U", "A", "U", "U", "U", "U", "U")),
 )
 
 
@@ -149,23 +149,39 @@ def test_catalogue_is_the_single_complete_declaration_source() -> None:
             BrokerCapabilityId.CLOSE_POSITION,
         }
         for entry in entries:
-            if entry.capability in writes:
-                assert entry.availability == "UNAVAILABLE"
+            if entry.capability in writes and entry.availability == "AVAILABLE":
+                assert entry.verification_status == "TESTED_SANDBOX"
+                assert entry.verification_evidence
+                assert entry.release_approval_reference
 
 
-def test_implemented_writes_are_still_unconditionally_unavailable() -> None:
-    """DEC-BRK-003 release policy cannot be bypassed by implementation state."""
+def test_only_mt5_sandbox_verified_writes_are_released() -> None:
+    """FR-BRK-010 releases only evidence-backed MT5 demo-write operations."""
     catalogue = get_broker_capability_catalogue()
-    for broker in (BrokerId.MT5, BrokerId.CTRADER):
-        writes = tuple(
-            entry for entry in catalogue[broker] if entry.access_mode == "WRITE"
-        )
-        assert writes
-        assert all(
-            entry.implementation_status in {"IMPLEMENTED", "NOT_IMPLEMENTED"}
-            for entry in writes
-        )
-        assert all(entry.availability == "UNAVAILABLE" for entry in writes)
+    released = {
+        BrokerCapabilityId.CHECK_ORDER,
+        BrokerCapabilityId.PLACE_ORDER,
+        BrokerCapabilityId.CANCEL_ORDER,
+        BrokerCapabilityId.CLOSE_POSITION,
+    }
+    mt5_writes = tuple(
+        entry for entry in catalogue[BrokerId.MT5] if entry.access_mode == "WRITE"
+    )
+    assert mt5_writes
+    assert all(
+        entry.availability
+        == ("AVAILABLE" if entry.capability in released else "UNAVAILABLE")
+        for entry in mt5_writes
+    )
+    for entry in mt5_writes:
+        if entry.capability in released:
+            assert entry.verification_status == "TESTED_SANDBOX"
+            assert entry.release_approval_reference == "FR-BRK-010:MT5_DEMO_ONLY"
+    ctrader_writes = tuple(
+        entry for entry in catalogue[BrokerId.CTRADER] if entry.access_mode == "WRITE"
+    )
+    assert ctrader_writes
+    assert all(entry.availability == "UNAVAILABLE" for entry in ctrader_writes)
 
 
 def test_catalogue_matches_the_normative_matrix() -> None:
@@ -240,6 +256,24 @@ def test_binance_data_reads_are_released_with_provider_evidence() -> None:
     assert entries[BrokerCapabilityId.GET_QUOTE].availability == "UNAVAILABLE"
 
 
+def test_ctrader_sessions_are_released_with_demo_evidence() -> None:
+    """Release only the provider-validated cTrader session operation."""
+    entries = {
+        item.capability: item
+        for item in get_broker_capability_catalogue()[BrokerId.CTRADER]
+    }
+    session_entry = entries[BrokerCapabilityId.GET_TRADING_SESSIONS]
+    assert session_entry.availability == "AVAILABLE"
+    assert session_entry.verification_status == "TESTED_SANDBOX"
+    assert session_entry.verification_evidence == (
+        "tests/brokers/unit/test_ctrader_network.py",
+        "tests/brokers/unit/test_ctrader_transport.py",
+        "tests/brokers/unit/test_ctrader_sessions.py",
+        "tests/brokers/unit/test_ctrader_adapter.py",
+    )
+    assert entries[BrokerCapabilityId.GET_SYMBOLS].availability == "UNAVAILABLE"
+
+
 def test_session_mutating_operations_are_not_declared_pure_reads() -> None:
     """Watch-list and subscription mutations are declared `READ_WRITE`."""
     catalogue = get_broker_capability_catalogue()
@@ -271,9 +305,20 @@ def test_session_mutating_operations_are_not_declared_pure_reads() -> None:
 def test_every_order_mutation_is_declared_write_everywhere(
     operation: BrokerCapabilityId,
 ) -> None:
-    """The order-write release gate covers all six mutations on every profile."""
+    """The write gate permits only evidence-backed MT5 sandbox operations."""
     catalogue = get_broker_capability_catalogue()
-    for entries in catalogue.values():
+    released = {
+        BrokerCapabilityId.CHECK_ORDER,
+        BrokerCapabilityId.PLACE_ORDER,
+        BrokerCapabilityId.CANCEL_ORDER,
+        BrokerCapabilityId.CLOSE_POSITION,
+    }
+    for broker, entries in catalogue.items():
         entry = next(item for item in entries if item.capability == operation)
         assert entry.access_mode == "WRITE"
-        assert entry.availability == "UNAVAILABLE"
+        if broker is BrokerId.MT5 and operation in released:
+            assert entry.availability == "AVAILABLE"
+            assert entry.verification_status == "TESTED_SANDBOX"
+            assert entry.release_approval_reference == "FR-BRK-010:MT5_DEMO_ONLY"
+        else:
+            assert entry.availability == "UNAVAILABLE"

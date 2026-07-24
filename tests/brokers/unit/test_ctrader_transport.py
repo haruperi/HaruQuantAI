@@ -12,6 +12,18 @@ class _Response:
         self.clientMsgId = client_msg_id
 
 
+class ProtoOAErrorRes:
+    """Minimal provider-error response for transport-boundary testing."""
+
+    def __init__(self, error_code: str) -> None:
+        """Store one bounded provider error code.
+
+        Args:
+            error_code: Provider-authored error classification.
+        """
+        self.errorCode = error_code
+
+
 def _config() -> BrokerConnectionConfig:
     return BrokerConnectionConfig(
         broker_id=BrokerId.CTRADER,
@@ -49,6 +61,22 @@ def test_transport_rejects_unexpected_response_type() -> None:
     async def exercise() -> None:
         await transport.connect()
         with pytest.raises(ValueError, match="unexpected cTrader response type"):
+            await transport.send(object(), _Response)
+
+    asyncio.run(exercise())
+
+
+def test_transport_rejects_provider_error_response() -> None:
+    """Provider error payloads are failures, never successful correlations."""
+
+    async def sender(_request: object) -> object:
+        return ProtoOAErrorRes("INVALID_REQUEST")
+
+    transport = _CTraderTransport(_config(), sender=sender)
+
+    async def exercise() -> None:
+        await transport.connect()
+        with pytest.raises(ConnectionError, match="INVALID_REQUEST"):
             await transport.send(object(), _Response)
 
     asyncio.run(exercise())

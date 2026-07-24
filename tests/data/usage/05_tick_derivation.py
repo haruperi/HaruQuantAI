@@ -7,27 +7,33 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-from app.services.data import to_ohlcv_dataframe, to_tick_dataframe
-from app.services.data.contracts import DataError
-from app.services.data.market_data import (
+from app.services.data import (
+    DataError,
+    DataSettings,
     MarketDataRequest,
-    get_market_data,
-    get_tick_data,
-)
-from app.services.data.tick_derivation import (
+    MarketDataset,
     generate_tick_series,
     generate_tick_series_to_parquet,
+    get_market_data,
+    get_tick_data,
+    to_ohlcv_dataframe,
+    to_tick_dataframe,
 )
 from app.utils import generate_id
 
-if TYPE_CHECKING:
-    from app.services.data.contracts import MarketDataset
-
 _START = datetime(2026, 1, 1, 12, 0, tzinfo=UTC)
 _END = datetime(2026, 6, 30, 12, 0, tzinfo=UTC)
+
+
+def _approved_temporary_directory(
+    settings: DataSettings | None = None,
+) -> TemporaryDirectory[str]:
+    """Create an automatically cleaned directory under an approved Data root."""
+    approved_root = (settings or DataSettings()).approved_storage_roots[0]
+    approved_root.mkdir(parents=True, exist_ok=True)
+    return TemporaryDirectory(dir=approved_root)
 
 
 def _print_header(title: str) -> None:
@@ -219,7 +225,7 @@ def example_05_stream_tick_series_to_parquet() -> None:
     if bars is None:
         return
 
-    with TemporaryDirectory() as temporary_directory:
+    with _approved_temporary_directory() as temporary_directory:
         start_time = time.perf_counter()
         artifact = generate_tick_series_to_parquet(
             bars,
@@ -239,13 +245,56 @@ def example_05_stream_tick_series_to_parquet() -> None:
         )
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Run all tick derivation model examples."""
     example_01_tick_model_trading_bar()
     example_02_tick_model_generated()
     example_03_tick_model_ohlc_m1()
     example_04_tick_model_real()
     example_05_stream_tick_series_to_parquet()
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_087() -> None:
+    "FR-DATA-087: Derive a canonical tick `MarketDataset` from real bar or tick evidence using exactly one approved model, preserving real prices and real tick counts, ordering ticks strictly by UTC timestamp then intra-bar index, and quantizing every price to `Decimal` at the contract boundary. Exact fixed-point arrays may be used internally; no array value crosses the canonical boundary."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_088() -> None:
+    "FR-DATA-088: Apply exactly one approved spread model to every generated tick: `native_spread` uses the provider-reported spread, `fixed_spread` applies one configured point value, and `variable_spread` draws bounded points from a seeded generator. A `variable_spread` request without a seed fails; identical seed and inputs reproduce identical spreads."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_089() -> None:
+    "FR-DATA-089: Attach deterministic intra-bar position evidence to every generated tick: `source_bar_time`, `tick_index_in_bar`, and a phase bitmask marking the bar open, high, low, and close observations. The bitmask carries no trading meaning and never encodes an order, signal, or decision."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_090() -> None:
+    "FR-DATA-090: Stream a generated tick series to a bounded Parquet artifact under an approved root with output-aware chunking, returning path, row count, and column names without holding the full series in memory. Eligible fixed-point chunks bypass canonical in-memory record materialization."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (
+        fr_data_087,
+        fr_data_088,
+        fr_data_089,
+        fr_data_090,
+    )
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

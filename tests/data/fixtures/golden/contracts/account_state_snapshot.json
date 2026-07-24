@@ -124,6 +124,18 @@
           "default": null,
           "title": "Entry Price"
         },
+        "ownership_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ownership Ref"
+        },
         "position_id": {
           "title": "Position Id",
           "type": "string"

@@ -3,12 +3,16 @@
 > **Package:** `app/services/data`
 > **Status:** `Completed` — `CAP-DATA-028` implements the owner-approved focused
 > architecture: one registered capability equals one module folder and one standalone
-> usage program. Behaviour, the 35 public operations, active requirement IDs,
+> usage program. Behaviour, the 207 explicitly declared package-root public names,
+> active requirement IDs,
 > contract versions, schema identifiers, and error codes remain compatible.
 > Provider facades compose on the Data side; their reads remain gated by Brokers
 > read-release evidence (`_RELEASED`).
-> **Last updated:** `2026-07-22`
-> **Continuation handoff:** `docs/dev/DATA_FOCUSED_RESTRUCTURE_HANDOFF.md`
+> The package-local implementation, validation, and repository-wide public-boundary
+> migration are complete; production consumers outside this domain use only the
+> documented `app.services.data` package-root boundary. Specification parity,
+> standalone usage evidence, and the approved MT5 demo-provider validation pass.
+> **Last updated:** `2026-07-23`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -113,7 +117,8 @@ context, and precision policy. Records never contain raw provider objects.
 `AccountStateSnapshot v1` contains: `contract_version="v1"`,
 `schema_id="data.account_state_snapshot.v1"`, account identifier,
 currency, balances/equity/margin values as exact decimal strings, normalized open
-positions and orders, broker connectivity/trading-allowance evidence, source,
+positions (including an optional provider-derived `ownership_ref`) and orders,
+broker connectivity/trading-allowance evidence, source,
 `snapshot_at` UTC, expiry/staleness metadata, and trace identifiers. Missing, stale,
 or unverifiable governed evidence fails closed.
 
@@ -201,7 +206,7 @@ capabilities: fourteen business features and one foundational contract capabilit
 | Completed | `FEAT-DATA-06` Data Persistence and Storage | `persistence/` | Transaction, migration, locking, dataset, cache, import, backup, restore, retention, and path contracts/operations | Section 4 persistence requirements, allocated to this owner | `tests/data/usage/06_persistence.py` |
 | Completed | `FEAT-DATA-07` Data Quality and Validation | `quality/` | Quality contracts, series/anomaly inspection, symbol metadata validation, policy, scoring, and remediation | Section 4 quality requirements, allocated to this owner | `tests/data/usage/07_quality.py` |
 | Completed | `FEAT-DATA-08` Data Transformation and Resampling | `transformation/` | Resampling, tick aggregation, multi-timeframe alignment, and detached tabular projections | Section 4 transformation requirements, allocated to this owner | `tests/data/usage/08_transformation.py` |
-| Completed | `FEAT-DATA-09` Time and Session Handling | `time_sessions/` | Timeframe/schedule contracts, UTC policy, market hours, sessions, current schedule, and gap classification | Section 4 time/session requirements, allocated to this owner | `tests/data/usage/09_time_sessions.py` |
+| Completed | `FEAT-DATA-09` Time and Session Handling | `time_sessions/` | Timeframe/schedule contracts, UTC policy, venue market hours, exchange/configured schedules, analytical named sessions, and gap classification | `FR-DATA-034`, `FR-DATA-117`–`FR-DATA-122` | `tests/data/usage/09_time_sessions.py` |
 | Completed | `FEAT-DATA-10` Data Source Governance | `sources/` | Source contracts/protocol, registry/composition, policy/promotion, adapters, licensing, and read-only proxy | Section 4 source-governance requirements, allocated to this owner | `tests/data/usage/10_sources.py` |
 | Completed | `FEAT-DATA-11` Economic Calendar | `economic_calendar/` | Calendar transport/options/event/result contracts and `scrape_economic_calendar` | Section 4 calendar requirements, allocated to this owner | `tests/data/usage/11_economic_calendar.py` |
 | Completed | `FEAT-DATA-12` Real-Time Feed Lifecycle and Observability | `realtime_feeds/` | Feed contracts/state, buffer, heartbeat, reconnection, reconciliation, and status operations | Section 4 feed requirements, allocated to this owner | `tests/data/usage/12_realtime_feeds.py` |
@@ -235,10 +240,10 @@ feature usages that consume them.
 | Completed | `FEAT-DATA-01` Canonical Data Contracts | Canonical contract bases, request-boundary validation, records, dataset envelope, and stable errors now live in `contracts/`; all direct consumers were migrated without compatibility re-exports; `01_contracts.py` directly exercises the complete public feature surface. Evidence: `app/services/data/contracts/__init__.py:24`, `app/services/data/contracts/records.py:77`, `app/services/data/contracts/dataset.py:135`, `app/services/data/contracts/errors.py:341`, `tests/data/unit/test_import_graph.py:71`, `tests/data/usage/01_contracts.py:30`. |
 | Completed | `FEAT-DATA-02`–`FEAT-DATA-15` | Focused owners, consumers, tests, and all fourteen remaining usage programs are migrated; forbidden horizontal folders are absent and the complete Data gate passes. |
 
-The completed migration preserves the exact 35-operation package-root API, contract
-versions, schema identifiers, error codes, validation behavior, and golden JSON
-schemas. Feature contracts live with their owners; no compatibility package recreates
-a removed path.
+The completed migration preserves contract versions, schema identifiers, error codes,
+validation behavior, and golden JSON schemas. The package root explicitly exports the
+207 approved names assigned across the fifteen registered features. Feature contracts
+live with their owners; no compatibility package recreates a removed path.
 
 ### Pre-migration capability map (historical evidence)
 
@@ -284,9 +289,8 @@ flowchart TD
 
 ## 2. Current Package Structure and Approved Target
 
-The existing tree below is functionally implemented but does not satisfy the approved
-one-feature/one-folder/one-usage invariant. It remains authoritative only as an
-inventory of code that must be relocated. The approved target is:
+The current tree below satisfies the approved
+one-feature/one-folder/one-usage invariant and is the authoritative package inventory:
 
 ```text
 app/services/data/
@@ -478,11 +482,11 @@ flowchart LR
 
 - **Focused Domain Architecture**: In `app/services/data`, every module folder inside the domain is dedicated to one Feature / capability only, every file inside a module folder is for one use case or focused responsibility only, and every class/function/method inside a file addresses one functional requirement behaviour at a time.
 - **Module folder names state the capability, not the mechanism.** A folder answers
-  "what can Data do", not "what technology does it use". `retrieval/`, `quality/`,
-  and `transformation/` are capabilities; a folder named for a library, a layer, or a
-  generic orchestration role is not.
-- `models/` and `errors/` are the shared core. They import nothing else inside the
-  domain, so no capability folder can create an import cycle through them.
+  "what can Data do", not "what technology does it use". The fifteen names in the
+  Feature Registry are the only production feature folders.
+- `contracts/` is the canonical shared contract core. Feature-owned contracts remain
+  in their owning feature folders; removed horizontal `models/`, `errors/`, `limits/`,
+  `retrieval/`, and `security/` packages must not return.
 - `app/services/data/__init__.py` contains imports and `__all__` only.
 - Package-root `__all__` contains exactly the approved typed public operations.
 - Efficient internal APIs remain in focused submodules and do not appear in the
@@ -494,7 +498,7 @@ flowchart LR
 - No class named `DataGateway`, generic manager/service/repository layer, SQLite
   connection pool, or TSDB abstraction is part of the design. The retrieval pipeline
   (policy → cache → source → normalize → quality) is an internal function sequence
-  shared by `retrieval/`, not a class hierarchy or a folder.
+  owned by `market_data/`, not a class hierarchy or a generic layer folder.
 - Simulation-specific trading-bar/M1/real tick reconstruction is absent; Simulation
   owns it and consumes canonical Data output.
 - Historical labeling is absent; Research owns it.
@@ -506,29 +510,29 @@ an explicit exclusion.
 
 | Capability | Decision | Final destination / treatment |
 |---|---|---|
-| `CAP-DATA-001` Typed public and internal API boundary | Modify | `models/`, focused typed submodules, and the package-root `__init__.py` export gate over the owning `FR-DATA-*` operations |
-| `CAP-DATA-002` Historical OHLCV/tick/spread retrieval | Modify | `retrieval/sources.py`, typed retrieval operations, `WF-DATA-001/002` |
+| `CAP-DATA-001` Typed public and internal API boundary | Modify | `contracts/`, feature-owned contracts, and the package-root `__init__.py` export gate over the owning `FR-DATA-*` operations |
+| `CAP-DATA-002` Historical OHLCV/tick/spread retrieval | Modify | `market_data/`, typed retrieval operations, `WF-DATA-001/002` |
 | `CAP-DATA-003` Source protocol/registry/readiness/adapters | Modify | `sources/`, `FR-DATA-022–029` |
-| `CAP-DATA-004` Canonical records/UTC/versioning | Modify | `models/records.py`, `models/datasets.py` |
-| `CAP-DATA-005` Quality/gaps/availability/revision | Modify/Replace | `DataQualityReport`, `DataAvailability`, `retrieval/discovery.py`; series-level detection and scoring in `quality/` (`CAP-DATA-023`) |
+| `CAP-DATA-004` Canonical records/UTC/versioning | Modify | `contracts/records.py`, `contracts/dataset.py` |
+| `CAP-DATA-005` Quality/gaps/availability/revision | Modify/Replace | `DataQualityReport`, `DataAvailability`, `market_data/symbol_discovery.py`; series-level detection and scoring in `quality/` (`CAP-DATA-023`) |
 | `CAP-DATA-006` Versioned cache and safe clear | Modify | `persistence/cache.py`, `clear_data_cache` |
-| `CAP-DATA-007` Local CSV/Parquet and atomic storage | Modify | `persistence/file_io.py` (save), `retrieval/local_loader.py` (load) |
+| `CAP-DATA-007` Local CSV/Parquet and atomic storage | Modify | `persistence/dataset_writer.py` (save), `local_datasets/` (load) |
 | `CAP-DATA-008` SQLite state and transactional infrastructure | Modify | `persistence/sqlite.py`, `locking.py`, `migrations.py`; `audit/` |
-| `CAP-DATA-009` Jobs and resumable backfills | Modify/Replace | `scheduler/`, typed job operations, `WF-DATA-007` |
-| `CAP-DATA-010` Internal real-time feed lifecycle | Add/Replace | `feeds/`, `get_feed_status`, `WF-DATA-008`; initial deterministic fake harness and specified informational limits |
-| `CAP-DATA-011` Timeframes/resampling/alignment/aggregation | Merge/Modify | `time/timezone.py`, `transformation/`, typed transform operations |
-| `CAP-DATA-012` Deterministic synthetic generation | Modify | `retrieval/synthetic.py`, typed synthetic operations, `WF-DATA-005` |
-| `CAP-DATA-022` Real-evidence tick-series generation | Add | `retrieval/synthetic.py`, `FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016` |
+| `CAP-DATA-009` Jobs and resumable backfills | Modify/Replace | `data_jobs/`, typed job operations, `WF-DATA-007` |
+| `CAP-DATA-010` Internal real-time feed lifecycle | Add/Replace | `realtime_feeds/`, `get_feed_status`, `WF-DATA-008`; deterministic fake harness and specified informational limits |
+| `CAP-DATA-011` Timeframes/resampling/alignment/aggregation | Merge/Modify | `time_sessions/`, `transformation/`, typed transform operations |
+| `CAP-DATA-012` Deterministic synthetic generation | Modify | `synthetic_data/`, typed synthetic operations, `WF-DATA-005` |
+| `CAP-DATA-022` Real-evidence tick-series generation | Add | `tick_derivation/`, `FR-DATA-087`–`FR-DATA-090`, `WF-DATA-016` |
 | `CAP-DATA-023` Series-level quality detection, scoring, and remediation evidence | Add | `quality/`, `FR-DATA-091`–`FR-DATA-094`, `WF-DATA-001` step 4 |
-| `CAP-DATA-024` Multi-site economic calendar scraping | Add | `retrieval/calendar.py`, `FR-DATA-095`–`FR-DATA-100` |
-| `CAP-DATA-025` Source composition and external artifact import | Add | `sources/composition.py` local/provider descriptor composition, `retrieval/local_loader.py` addressing and filtering, `persistence/import_artifacts.py`, `FR-DATA-101`–`FR-DATA-107`, `WF-DATA-017` |
-| `CAP-DATA-026` Feature-oriented module restructure | Add | Section 2 target structure and the phased sequence below; `docs/dev/DATA_RESTRUCTURE_PLAN.md` |
+| `CAP-DATA-024` Multi-site economic calendar scraping | Add | `economic_calendar/`, `FR-DATA-095`–`FR-DATA-100` |
+| `CAP-DATA-025` Source composition and external artifact import | Add | `sources/composition.py` local/provider descriptor composition, `local_datasets/` addressing and filtering, `persistence/external_import.py`, `FR-DATA-101`–`FR-DATA-107`, `WF-DATA-017` |
+| `CAP-DATA-026` Feature-oriented module restructure | Superseded | Historical migration summarized below; current ownership is defined exclusively by `CAP-DATA-028`, Section 2, and the Feature Registry |
 | `CAP-DATA-027` Backup, restore, and retention enforcement | Add | `persistence/backup.py`, `FR-DATA-108`–`FR-DATA-110` |
 | `CAP-DATA-013` Historical labeling | Retired | Owned by Research; no Data implementation |
-| `CAP-DATA-014` Market hours/sessions/volume | Modify/Add | `time/market_hours.py` (hours/sessions), `retrieval/discovery.py` (volume), `WF-DATA-010` |
-| `CAP-DATA-015` License/fallback/rate/breaker/source safety | Modify | `sources/policy.py`, `security/licensing.py`, source manifests, `WF-DATA-011` |
-| `CAP-DATA-016` Symbol discovery and metadata | Modify | `retrieval/discovery.py`, typed metadata/discovery operations, `WF-DATA-009` |
-| `CAP-DATA-017` Errors/request correlation/audit/side effects | Add | `errors/catalog.py`, `audit/`, typed API rules, NFRs |
+| `CAP-DATA-014` Market hours/sessions/volume | Modify/Add | `time_sessions/schedule.py` (hours/sessions), `market_data/symbol_discovery.py` (volume), `WF-DATA-010` |
+| `CAP-DATA-015` License/fallback/rate/breaker/source safety | Modify | `sources/policy.py`, `sources/licensing.py`, source manifests, `WF-DATA-011` |
+| `CAP-DATA-016` Symbol discovery and metadata | Modify | `market_data/symbol_discovery.py`, typed metadata/discovery operations, `WF-DATA-009` |
+| `CAP-DATA-017` Errors/request correlation/audit/side effects | Add | `contracts/errors.py`, `audit/`, typed API rules, NFRs |
 | `CAP-DATA-018` Workflow-aware precision/serialization | Modify | Contract/API precision policy and `NFR-DATA-002–004` |
 | `CAP-DATA-019` Simulation tick-model boundary | Split | Data retains canonical/generic generation; Simulation owns model reconstruction; `WF-DATA-012` |
 | `CAP-DATA-020` Legacy implementation/facade cleanup | Remove | No legacy facade, aliases, duplicate cache, `_common.py`, or simulation tick model exists in the final tree. |
@@ -549,6 +553,10 @@ This sequence records the implemented migration that preserved the functional
 baseline. Its claim to satisfy focused feature architecture was withdrawn by the
 owner on 2026-07-22. It is not the implementation plan for `CAP-DATA-028`.
 
+All paths named in this historical sequence that are absent from the Section 2
+inventory are intentionally removed historical paths, not required production
+artifacts or alternative ownership locations.
+
 Ordered lowest dependency first. Each phase is independently verifiable, carries its
 own dry-run and `APPROVED: EXECUTE` gate, and leaves the package importable and the
 targeted test suite green. A legacy folder is deleted only at the end of the phase
@@ -567,12 +575,9 @@ data — JSON-schema equality is a complete check. Phase 2 onward duplicates *fu
 where no equivalent automated check exists, so divergence is prevented procedurally
 instead. Phase 11 deletes the frozen packages.
 
-**Cross-package contract instances do not interchange.** While `contracts/` and
-`models/` both exist, they define distinct Python classes with identical schemas.
-Pydantic validates by type identity, so a legacy-built `MarketDataset` is rejected by a
-new-package request. Tests targeting new packages build fixtures from
-`tests/data/helpers_models.py`; legacy tests keep using `tests/data/helpers.py`. The
-two merge in Phase 11.
+**Historical contract migration.** During `CAP-DATA-026`, temporary legacy and target
+contract instances did not interchange. `CAP-DATA-028` completed the merge: only the
+Section 2 owners remain, and no removed contract path is public or required.
 
 | Status | Phase | Work | Requirements | Verification | Depends on |
 |---|---|---|---|---|---|
@@ -587,12 +592,12 @@ two merge in Phase 11.
 | Completed | 8 | Split `feeds/` and `scheduler/` **in place**, splitting `runtime.py` into buffer, reconnection, and heartbeat, and `backfill.py` into backfill and recovery. | `FR-DATA-041`–`048` | `test_feed_runtime.py`, `test_feed_status.py`, `test_backfill.py`, `test_scheduler.py` | 1, 2 |
 | Completed | 9 | Build `security/`: licensing enforcement, runtime read-only broker contract. Credentials pass-through withdrawn (`NFR-DATA-005`). | `FR-DATA-113`–`116`, `NFR-DATA-006` | `test_broker_contract.py`, `test_licensing.py`, `test_import_graph.py` | 1, 3 |
 | Completed | 10 | Build `persistence/backup.py` — snapshot, restore, and retention enforcement. Genuinely new capability. | `CAP-DATA-027`, `FR-DATA-108`–`110` | `test_backup.py`, `test_backfill.py`; restore round trip; atomic hash-mismatch rejection; dry-run/purge/licence retention cases | 2 |
-| Completed | 11 | Freeze the package-root `__init__.py` export list and migrate every cross-domain consumer import. | `NFR-DATA-001`, `NFR-DATA-011` | `test_api.py` asserts the exact 35-operation root surface; import-graph and boundary tests reject bypass paths | 1–10 |
-| Completed | 12 | Verification sweep: full suite, coverage ≥ 80%, `ruff`, `mypy`, and every usage program executed directly. | `NFR-DATA-012` | Section 7 commands pass; branch coverage meets the configured 80% gate | 11 |
+| Completed | 11 | Freeze the package-root `__init__.py` export list and migrate every cross-domain consumer import. | `NFR-DATA-001`, `NFR-DATA-011` | `test_api.py` asserts the explicit 207-name root surface. Data-owned usage and integration imports use the root boundary, and the repository production scan contains no prohibited `app.services.data.*` deep import outside Data. | 1–10 |
+| Completed | 12 | Verification sweep: full suite, coverage ≥ 80%, `ruff`, `mypy`, and every usage program executed directly. | `NFR-DATA-012` | 436 Data tests pass with 81.65% branch-aware coverage; all fifteen usage programs exit zero; changed-file Ruff and full-repository Mypy pass. | 1–11 |
 
-**Consumer boundary.** Cross-domain consumers use the frozen package-root operations
-or explicitly approved owned contracts. The import-graph, package API, and full Data
-suite verify that deleted compatibility paths do not remain in the Data boundary.
+**Consumer boundary.** Cross-domain consumers are required to use package-root
+exports. Data-owned usage and integration evidence complies, and repository-wide
+production consumers contain no prohibited `app.services.data.*` deep imports.
 
 **Out of scope for `CAP-DATA-026`:** any behaviour change to an existing
 `FR-DATA-*`, symbol-level licensing, incremental aggregation, and historical
@@ -630,6 +635,8 @@ labeling (see `Explicit exclusions`).
 | Completed | `WF-DATA-008` | Cross-domain | Internal real-time feed and status | Staging feed source emits event | Normalized bounded state and `get_feed_status` output | `FR-DATA-046 → 047 → 048` |
 | Completed | `WF-DATA-009` | Cross-domain | Symbol discovery, metadata, availability | Bounded source/symbol query | Provenanced metadata/page/availability result | `FR-DATA-023/024 → 031/032/033` |
 | Completed | `WF-DATA-010` | Cross-domain | Current hours, sessions, and volume | Current configured market request | UTC windows or bounded volume result | `FR-DATA-034/035` |
+| Completed | `WF-DATA-018` | Cross-domain | Venue-authoritative market hours | Explicit broker source or exchange calendar code and exact symbol | UTC sessions plus deterministic open/current/next state | `FR-DATA-117 → FR-DATA-118 → FR-DATA-119/120` |
+| Completed | `WF-DATA-019` | Cross-domain | Analytical named-session classification | Exact symbol, aware UTC instant, and configured regional definitions | DST-aware liquidity labels that confer no trading authority | `FR-DATA-121 → FR-DATA-122` |
 | Completed | `WF-DATA-011` | Internal | Source readiness and promotion | Operator evidence package and `AuthContext` | Reversible readiness state | `FR-DATA-026 → 027` |
 | Completed | `WF-DATA-012` | Cross-domain | Simulation data-modelling boundary | Simulation requests canonical history | Data supplies canonical bars/ticks; Simulation reconstructs model-specific ticks | `FR-DATA-030 → 005` |
 | Completed | `WF-DATA-013` | Cross-domain | Account snapshot service | Strategy/Risk/Trading read-only account evidence request | `AccountStateSnapshot v1` (read-only; no mutation capability) | `FR-DATA-028 → 008` |
@@ -677,7 +684,7 @@ Cache-write failure is disclosed as a warning for read workflows and never chang
 returned records.
 
 **Integration test:**
-`tests/data/integration/test_historical_retrieval.py::test_historical_retrieval_explicit_fallback()`
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_009_discovers_metadata_and_measures_local_availability()`
 
 ```mermaid
 sequenceDiagram
@@ -718,7 +725,7 @@ overwrite/manifest options.
 `DATA_QUALITY_FAILED`; write failure → `DB_WRITE_FAILED` or mapped filesystem error.
 
 **Integration test:**
-`tests/data/integration/test_local_dataset.py::test_local_dataset_atomic_round_trip()`
+`tests/data/integration/test_local_source_retrieval.py`
 
 ### `WF-DATA-017` — External Artifact Import
 
@@ -755,7 +762,7 @@ incomplete mapping → `VALIDATION_FAILED`; unreadable or malformed artifact →
 `CONCURRENT_WRITE_LOCKED`; commit failure → `DB_WRITE_FAILED`.
 
 **Integration test:**
-`tests/data/integration/test_external_import.py::test_import_admits_foreign_csv_with_declared_mapping()`
+`tests/data/integration/test_external_import.py::test_external_import_measures_commits_and_reloads()`
 
 ### `WF-DATA-004` — Resample, Align, and Aggregate
 
@@ -772,7 +779,7 @@ policy. Any lookahead, disorder, overlap-policy, or unsupported-timeframe violat
 fails the operation atomically.
 
 **Integration test:**
-`tests/data/integration/test_processing.py::test_multitimeframe_alignment_has_no_lookahead()`
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_004_005_and_016_transform_generate_and_derive()`
 
 ### `WF-DATA-007` — Update Job and Historical Backfill
 
@@ -795,7 +802,7 @@ recovery failure → `STATE_RECOVERY_FAILED`. A job never reports success withou
 movement or an explicit no-change result.
 
 **Integration test:**
-`tests/data/integration/test_backfill.py::test_backfill_resumes_after_last_committed_chunk()`
+`tests/data/integration/test_historical_retrieval.py::test_wf_data_007_commits_data_and_resumable_checkpoint()`
 
 ### `WF-DATA-008` — Internal Real-Time Feed and Status
 
@@ -813,7 +820,7 @@ no automatic historical reconciliation capability exists, so Phase 1 records and
 gap only. The initial source is the deterministic fake contract harness. Promotion to one MT5 demo feed for the Trading live/paper runtime occurs only after Trading exists and the promotion evidence passes.
 
 **Integration test:**
-`tests/data/integration/test_feed_runtime.py::test_feed_overflow_records_gap_without_hidden_backfill()`
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_008_persists_ingests_and_reads_feed_status()`
 
 ### `WF-DATA-011` — Source Readiness and Promotion
 
@@ -829,7 +836,7 @@ MT5, cTrader, Dukascopy, Binance discovery, and the real-time feed gateway begin
 demotion is always allowed when evidence degrades.
 
 **Integration test:**
-`tests/data/integration/test_source_promotion.py::test_source_promotion_requires_complete_evidence()`
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_011_persists_audited_reversible_promotion()`
 
 ### `WF-DATA-012` — Simulation Data-Modelling Boundary
 
@@ -843,7 +850,7 @@ generated/real tick reconstruction, fill models, and simulated state.
 boundary; Data never returns a partially modeled simulation stream.
 
 **Integration test:**
-`tests/data/integration/test_simulation_boundary.py::test_data_excludes_simulation_tick_models()`
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_009_discovers_metadata_and_measures_local_availability()`
 
 ### `WF-DATA-013` — Account Snapshot Service
 
@@ -859,7 +866,7 @@ capability and issues none: broker mutations are dispatched by Trading directly
 through Brokers' `BrokerAdapter` mutation operations.
 
 **Integration test:**
-`tests/data/integration/test_broker_boundary.py::test_data_broker_access_is_read_only()`
+`tests/data/integration/test_broker_boundary.py::test_account_evidence_wraps_every_injected_broker()`
 
 ### `WF-DATA-014` — Risk Market-Context Evidence
 
@@ -875,7 +882,7 @@ and publishes no policy verdict. Risk alone decides whether the evidence permits
 action. Missing mandatory evidence is never replaced with a fabricated default.
 
 **Integration test:**
-`tests/data/integration/test_market_context_boundary.py::test_risk_receives_owned_market_context_evidence()`
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_014_and_015_return_fresh_provider_evidence()`
 
 ---
 
@@ -894,28 +901,180 @@ published rate but may not reconstruct a different path. No synthetic/default ra
 is emitted.
 
 **Integration test:**
-`tests/data/integration/test_fx_conversion_evidence.py::test_portfolio_receives_fresh_owned_fx_evidence()`
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_014_and_015_return_fresh_provider_evidence()`
+
+---
+
+### `WF-DATA-018` — Venue-Authoritative Market Hours
+
+**Scope:** `Cross-domain`
+**Input boundary:** an exact provider symbol plus either a configured broker source,
+an explicit exchange calendar code, or an explicit revisioned weekly definition.
+**Output boundary:** ordered UTC sessions and deterministic `MarketHours`.
+
+Data reads broker sessions through the Brokers public contract, reads exchange
+sessions only from an explicit calendar identifier, or expands an operator-owned
+revisioned definition when a provider API is unavailable. It applies authoritative
+holiday closures before selecting current and next sessions. Missing or conflicting
+evidence fails closed; ticker text and recent ticks are never schedule evidence.
+
+**Integration tests:** `tests/data/integration/test_workflow_runtime.py`,
+`tests/data/unit/test_exchange_calendar.py`, and
+`tests/brokers/unit/test_ctrader_adapter.py`.
+
+---
+
+### `WF-DATA-019` — Analytical Named-Session Classification
+
+**Scope:** `Cross-domain`
+**Input boundary:** exact symbol, aware UTC instant, and configurable regional
+session definitions.
+**Output boundary:** ordered analytical liquidity labels only.
+
+Regional `zoneinfo` timezones provide DST-aware classification and definitions may
+cross midnight. The result has no `is_open` field and cannot authorize order
+validation; venue tradability remains exclusively in `MarketHours`.
+
+**Integration tests:** `tests/data/unit/test_named_sessions.py` and
+`tests/data/unit/test_market_hours.py`.
 
 ---
 
 ## 4. Module and Requirement Specifications
 
-The following file tables and requirement evidence describe the current implemented
-locations. They remain authoritative for existing behaviour until each focused
-feature slice migrates. The approved ownership target in Section 1 overrides their
-pre-`CAP-DATA-028` module grouping; no row may be marked structurally complete merely
-because its current implementation passes functional tests.
+The authoritative inventory below describes the current implemented locations. The
+feature subsections retain the canonical requirement ledgers and configuration
+manifests. Public and internal operations return typed Data contracts or raise
+`DataError` with a code from `DATA_ERROR_MANIFEST`. UI/API owns external transport
+mapping.
 
-Modules, files, and requirements below are the implementation order. Public and
-internal operations return typed Data contracts or raise `DataError` with a code
-from `DATA_ERROR_MANIFEST`. UI/API owns external transport mapping.
+### Authoritative current production-file inventory
 
-### 4.1 `contracts/`, `models/`, `limits/` — Canonical and Pending Vocabulary
+This table is generated from the current source AST and is the single current file
+inventory for Section 4. A name is cross-domain public only when it also appears in
+the package-root `__all__`; subpackage `__all__` declarations organize internal
+feature imports and do not create a second public boundary.
+
+For `FEAT-DATA-09`, the package-root row is supplemented by the registered exports
+`FOREX_NAMED_SESSIONS`, `ActiveMarketSessions`, `ActiveMarketSessionsRequest`,
+`ExchangeSessionRequest`, `MarketHours`, `MarketHoursRequest`,
+`NamedSessionDefinition`, `TradingSession`, `WeeklyHoliday`,
+`WeeklyScheduleDefinition`, `WeeklyScheduleProvider`,
+`get_active_market_sessions`, and `get_exchange_sessions`.
+
+| File | Focused responsibility | Explicit module exports | Dependencies |
+|---|---|---|---|
+| `__init__.py` | Approved Data-domain package-root public API. | `ACCOUNT_SNAPSHOT_SCHEMA`, `AUDIT_QUERY_HARD_MAX_LIMIT`, `CALENDAR_SITES`, `DATA_ERROR_MANIFEST`, `DATA_MIGRATION_STEPS`, `FX_CONVERSION_EVIDENCE_SCHEMA`, `MARKET_CONTEXT_SCHEMA`, `MARKET_DATASET_SCHEMA`, `NORMALIZATION_VERSION`, `PRECISION_POLICIES`, `QUALITY_SAMPLE_LIMIT`, `READ_ONLY_BROKER_METHODS`, `TIMEFRAME_MANIFEST`, `WORKFLOW_CONTEXTS`, `AccountBalance`, `AccountOrder`, `AccountPosition`, `AccountSnapshotRequest`, `AccountStateSnapshot`, `AuditEventPage`, `AuditEventQuery`, `AuditPersistenceResult`, `AvailabilityRequest`, `BackfillChunkRequest`, `BackfillChunkResult`, `BackupManifest`, `BackupTarget`, `CacheClearRequest`, `CacheClearResult`, `CacheEntry`, `CacheReadRequest`, `CacheWriteRequest`, `CacheWriteResult`, `CalendarEvent`, `CalendarTransport`, `ColumnMapping`, `DataAvailability`, `DataError`, `DataGap`, `DataQualityReport`, `DataRange`, `DataSettings`, `DatasetLoadRequest`, `DatasetSaveRequest`, `ErrorDefinition`, `ExternalImportRequest`, `FXConversionEvidence`, `FXConversionRequest`, `FXRateLeg`, `FXRateProvider`, `FeedConfig`, `FeedEventResult`, `FeedStatus`, `FeedStatusRequest`, `GapType`, `JobDefinition`, `JobRunResult`, `JobStatus`, `JobStatusRequest`, `LocalMarketDataSource`, `MarketCalendar`, `MarketContextEvidence`, `MarketContextProvider`, `MarketContextRequest`, `MarketDataRequest`, `MarketDataSource`, `MarketDataset`, `MarketSchedule`, `MigrationRequest`, `MigrationResult`, `MigrationStep`, `OHLCVRecord`, `QualityFlag`, `QualityIssue`, `QualityPolicy`, `RawFeedEvent`, `RawSourceBatch`, `ReadOnlyBrokerProxy`, `ReconnectPolicy`, `RecoveryReport`, `RestoreReport`, `ScheduleJobRequest`, `ScheduleRequest`, `ScrapeOptions`, `ScrapeResult`, `SessionWindow`, `SourceDescriptor`, `SourceIdentity`, `SourceIdentityRequest`, `SourceLicensePolicy`, `SourcePlan`, `SourcePromotionRequest`, `SourceReadRequest`, `SpreadRecord`, `StatementPlan`, `StorageManifest`, `SymbolListRequest`, `SymbolMetadata`, `SymbolMetadataRequest`, `SymbolPage`, `SyntheticRequest`, `TickRecord`, `TimeframeSpec`, `TransactionRequest`, `TransactionResult`, `VolumeRecord`, `VolumeRequest`, `VolumeResult`, `VolumeSummary`, `WriteLock`, `acquire_write_lock`, `aggregate_flags`, `aggregate_ticks`, `aggregate_ticks_to_bars`, `align_datasets`, `align_multitimeframe_data`, `classify_gap`, `clear_cache_entry`, `clear_data_cache`, `create_backup`, `create_data_update_job`, `data_settings_context`, `derive_backfill_key`, `describe_import_dialects`, `detect_extreme_spread_widening`, `detect_flatline_periods`, `detect_price_jumps`, `detect_timestamp_gaps`, `detect_zero_volume_bars`, `discover_symbols`, `enforce_retention_policy`, `ensure_source`, `ensure_source_access`, `evaluate_source_policy`, `execute_backfill_chunk`, `execute_transaction`, `fetch_historical_volume`, `fetch_market_dataset`, `fetch_symbol_metadata`, `generate_synthetic_bars`, `generate_synthetic_dataset`, `generate_synthetic_ticks`, `generate_tick_series`, `generate_tick_series_to_parquet`, `get_account_state_snapshot`, `get_cache_entry`, `get_current_schedule`, `get_data_availability`, `get_data_update_job_status`, `get_feed_status`, `get_fx_conversion_evidence`, `get_historical_volume`, `get_market_context_evidence`, `get_market_data`, `get_market_hours`, `get_quality_policy`, `get_source_descriptor`, `get_spread_data`, `get_symbol_metadata`, `get_tick_data`, `get_timeframe_spec`, `get_trading_sessions`, `import_external_dataset`, `ingest_feed_event`, `inspect_availability`, `inspect_data_quality`, `inspect_dataset_quality`, `inspect_records_quality`, `list_composable_sources`, `list_registered_sources`, `list_symbols`, `load_csv`, `load_dataset`, `load_local_dataset`, `load_parquet`, `persist_audit_event`, `promote_source`, `put_cache_entry`, `query_audit_events`, `read_feed_status`, `read_update_job_status`, `reconcile_feed_gap`, `reconnect_feed`, `recover_update_jobs`, `register_source`, `require_utc`, `resample_dataset`, `resample_ohlcv`, `resolve_source`, `restore_from_backup`, `run_data_migrations`, `run_data_update_job_once`, `run_domain_migrations`, `save_dataset`, `save_market_data`, `schedule_update_job`, `scrape_economic_calendar`, `start_data_update_job`, `start_internal_feed`, `stop_data_update_job`, `summarize_quality_remediation`, `to_ohlcv_dataframe`, `to_tick_dataframe`, `validate_resample_target`, `validate_symbol_metadata`, `verify_read_only_call`, `wrap_broker_client` | local: `app.services.data._settings`, `app.services.data.audit`, `app.services.data.audit.contracts`, `app.services.data.contracts`, `app.services.data.data_jobs`, `app.services.data.data_jobs.contracts`, `app.services.data.data_jobs.job`, `app.services.data.economic_calendar`, `app.services.data.economic_calendar.scraper`, `app.services.data.evidence`, `app.services.data.evidence.account_contracts`, `app.services.data.evidence.fx_contracts`, `app.services.data.evidence.market_context_contracts`, `app.services.data.local_datasets`, `app.services.data.market_data`, `app.services.data.persistence`, `app.services.data.persistence.contracts`, `app.services.data.quality`, `app.services.data.realtime_feeds`, `app.services.data.realtime_feeds.contracts`, `app.services.data.realtime_feeds.status`, `app.services.data.sources`, `app.services.data.sources.contracts`, `app.services.data.sources.local_adapter`, `app.services.data.sources.read_only`, `app.services.data.synthetic_data`, `app.services.data.tick_derivation`, `app.services.data.time_sessions`, `app.services.data.transformation` |
+| `_limits.py` | Private central resolution point for every bounded DATA limit. | `DEFAULT_LIMITS`, `WORKFLOW_CONTEXTS`, `apply_workflow_override`, `get_limit` | stdlib: __future__, collections, types, typing<br>local: `app.services.data.contracts`, `app.utils` |
+| `_settings.py` | Private DATA-domain configuration loaded through the shared settings boundary. | `LOCAL_SYMBOL_MANIFEST_NAME`, `DataSettings`, `data_settings_context`, `get_data_settings` | stdlib: __future__, collections, contextlib, contextvars, pathlib, typing<br>third-party: pydantic, pydantic_settings<br>local: `app.utils` |
+| `audit/__init__.py` | Durable governed audit evidence: persistence and authorized query. | `persist_audit_event`, `query_audit_events` | local: `app.services.data.audit.query`, `app.services.data.audit.store` |
+| `audit/authorization.py` | Audit-query authorization boundary. | `may_query_audit` | stdlib: typing<br>local: `app.utils` |
+| `audit/contracts.py` | DATA-owned bounded audit query and page contracts. | `AUDIT_QUERY_HARD_MAX_LIMIT`, `AuditEventPage`, `AuditEventQuery`, `AuditPersistenceResult` | stdlib: __future__, datetime, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.contracts.validation`, `app.utils` |
+| `audit/query.py` | Authorized, bounded, deterministically ordered audit event queries. | `query_audit_events` | stdlib: __future__, collections, datetime, json, typing<br>local: `app.services.data.audit.contracts`, `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `audit/store.py` | Durable, idempotent persistence of Utils-owned redacted audit events. | `persist_audit_event` | stdlib: __future__, json, typing<br>local: `app.services.data.audit.contracts`, `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `contracts/__init__.py` | Canonical, provider-neutral DATA contract vocabulary. | `DATA_ERROR_MANIFEST`, `ERROR_SAFE_DETAILS_MAX_BYTES`, `ERROR_SAFE_DETAILS_MAX_ITEMS`, `MARKET_DATASET_SCHEMA`, `NORMALIZATION_VERSION`, `PRECISION_POLICIES`, `QUALITY_SAMPLE_LIMIT`, `WORKFLOW_CONTEXTS`, `DataError`, `DataGap`, `DataQualityReport`, `DataRange`, `ErrorDefinition`, `MarketDataset`, `OHLCVRecord`, `QualityIssue`, `SpreadRecord`, `TickRecord` | local: `app.services.data.contracts.dataset`, `app.services.data.contracts.errors`, `app.services.data.contracts.records` |
+| `contracts/_base.py` | Private immutable bases for canonical DATA contracts. | Internal only | stdlib: __future__<br>third-party: pydantic<br>local: `app.services.data.contracts.errors`, `app.services.data.contracts.validation`, `app.utils` |
+| `contracts/dataset.py` | Canonical dataset envelope and schema-identifier contracts. | Internal only | stdlib: __future__, collections, datetime, decimal, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.contracts.records`, `app.utils` |
+| `contracts/errors.py` | Deterministic Data-domain errors and immutable error metadata. | `DATA_ERROR_MANIFEST`, `ERROR_SAFE_DETAILS_MAX_BYTES`, `ERROR_SAFE_DETAILS_MAX_ITEMS`, `DataError`, `ErrorDefinition` | stdlib: __future__, collections, dataclasses, json, math, types, typing<br>local: `app.services.data.contracts.validation`, `app.utils` |
+| `contracts/records.py` | Immutable canonical market-record contracts owned by FEAT-DATA-01. | `OHLCVRecord`, `SpreadRecord`, `TickRecord` | stdlib: __future__, datetime, decimal<br>third-party: pydantic<br>local: `app.utils` |
+| `contracts/validation.py` | Private validation helpers shared by canonical DATA request boundaries. | Internal only | local: `app.services.data.contracts.errors`, `app.utils` |
+| `data_jobs/__init__.py` | Bounded update jobs, resumable backfills, and explicit crash recovery. | `derive_backfill_key`, `execute_backfill_chunk`, `read_update_job_status`, `recover_update_jobs`, `run_data_update_job_once`, `schedule_update_job` | local: `app.services.data.data_jobs.backfill`, `app.services.data.data_jobs.job`, `app.services.data.data_jobs.recovery` |
+| `data_jobs/backfill.py` | Recoverably atomic historical backfill orchestration. | Internal only | stdlib: __future__, collections, datetime, hashlib, pathlib, typing<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.data_jobs.contracts`, `app.services.data.market_data.pipeline`, `app.services.data.market_data.requests`, `app.services.data.persistence.contracts`, `app.services.data.persistence.dataset_writer`, `app.services.data.persistence.transactions`, `app.utils` |
+| `data_jobs/contracts.py` | Public bounded backfill and scheduler contracts. | `BackfillChunkRequest`, `BackfillChunkResult`, `JobDefinition`, `JobRunResult`, `JobStatus`, `JobStatusRequest`, `RecoveryReport`, `ScheduleJobRequest` | stdlib: __future__, datetime, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `data_jobs/job.py` | Persisted update-job lifecycle: create, start, stop, run once, and report. | `create_data_update_job`, `get_data_update_job_status`, `read_update_job_status`, `run_data_update_job_once`, `schedule_update_job`, `start_data_update_job`, `stop_data_update_job` | stdlib: __future__, asyncio, datetime, hashlib, json, typing<br>local: `app.services.data.contracts`, `app.services.data.data_jobs.backfill`, `app.services.data.data_jobs.contracts`, `app.services.data.market_data.requests`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.services.data.sources.policy`, `app.utils` |
+| `data_jobs/recovery.py` | Explicit crash recovery for interrupted update jobs. | `recover_update_jobs` | stdlib: __future__, datetime, typing<br>local: `app.services.data.contracts`, `app.services.data.data_jobs.backfill`, `app.services.data.data_jobs.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `economic_calendar/__init__.py` | Focused economic-calendar acquisition and normalization. | `CalendarEvent`, `CalendarTransport`, `ScrapeOptions`, `ScrapeResult`, `scrape_economic_calendar` | local: `app.services.data.economic_calendar.scraper` |
+| `economic_calendar/normalization.py` | Economic-calendar numeric normalization boundary. | `normalize_calendar_number` | stdlib: decimal<br>local: `app.services.data.economic_calendar.scraper` |
+| `economic_calendar/parsing.py` | Economic-calendar parsing boundary. | `parse_calendar_row` | stdlib: collections<br>local: `app.services.data.economic_calendar.scraper` |
+| `economic_calendar/scraper.py` | Concurrent multi-site economic calendar scraping, cleaning, and persistence. | `CALENDAR_SITES`, `CalendarEvent`, `CalendarTransport`, `ScrapeOptions`, `ScrapeResult`, `scrape_economic_calendar` | stdlib: __future__, asyncio, collections, dataclasses, datetime, decimal, pathlib, pickle, typing<br>third-party: pandas<br>local: `app.services.data.contracts`, `app.services.data.persistence.paths`, `app.utils` |
+| `evidence/__init__.py` | Normalized cross-domain evidence. | `FXRateProvider`, `MarketContextProvider`, `get_account_state_snapshot`, `get_fx_conversion_evidence`, `get_market_context_evidence` | local: `app.services.data.evidence.account_state`, `app.services.data.evidence.fx_conversion`, `app.services.data.evidence.market_context` |
+| `evidence/account_contracts.py` | Read-only normalized broker-account evidence contracts. | `ACCOUNT_SNAPSHOT_SCHEMA`, `AccountBalance`, `AccountOrder`, `AccountPosition`, `AccountSnapshotRequest`, `AccountStateSnapshot` | stdlib: __future__, datetime, decimal, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `evidence/account_state.py` | Read-only account state normalized from a caller-owned broker adapter. | `get_account_state_snapshot` | stdlib: __future__, asyncio, datetime, decimal, typing<br>local: `app.services.brokers`, `app.services.data.contracts`, `app.services.data.evidence.account_contracts`, `app.services.data.sources.read_only`, `app.utils` |
+| `evidence/freshness.py` | Cross-domain evidence freshness validation. | `is_fresh` | stdlib: datetime |
+| `evidence/fx_contracts.py` | Exact FX conversion request, leg, and evidence contracts. | `CURRENCY_CODE_LENGTH`, `FX_CONVERSION_EVIDENCE_SCHEMA`, `FXConversionEvidence`, `FXConversionRequest`, `FXRateLeg` | stdlib: __future__, collections, datetime, decimal, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `evidence/fx_conversion.py` | FX conversion evidence over an injected rate provider. | `FXRateProvider`, `get_fx_conversion_evidence` | stdlib: __future__, datetime, decimal, typing<br>local: `app.services.data.contracts`, `app.services.data.evidence.fx_contracts`, `app.utils` |
+| `evidence/market_context.py` | Normalized market-context evidence for Risk. | `MarketContextProvider`, `get_market_context_evidence` | stdlib: __future__, typing<br>local: `app.services.data.contracts`, `app.services.data.evidence.market_context_contracts`, `app.utils` |
+| `evidence/market_context_contracts.py` | Risk-ready market-context request and evidence contracts. | `MARKET_CONTEXT_SCHEMA`, `MarketContextEvidence`, `MarketContextRequest` | stdlib: __future__, collections, datetime, decimal, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `local_datasets/__init__.py` | Focused loading of approved local DATA artifacts. | `DatasetLoadRequest`, `load_csv`, `load_dataset`, `load_local_dataset`, `load_parquet` | local: `app.services.data.local_datasets.contracts`, `app.services.data.local_datasets.csv_loader`, `app.services.data.local_datasets.parquet_loader`, `app.services.data.persistence.dataset_writer` |
+| `local_datasets/contracts.py` | Contracts for loading an approved local CSV or Parquet dataset. | `DatasetLoadRequest` | stdlib: pathlib, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base` |
+| `local_datasets/csv_loader.py` | Focused CSV dataset loading through the governed local loader. | `load_csv` | stdlib: pathlib, typing<br>local: `app.services.data.contracts`, `app.services.data.local_datasets.contracts`, `app.services.data.persistence.dataset_writer`, `app.utils` |
+| `local_datasets/manifest.py` | Dataset-manifest verification boundary. | `verify_dataset_manifest` | stdlib: typing<br>local: `app.services.data.contracts`, `app.services.data.local_datasets.contracts`, `app.services.data.persistence.dataset_writer` |
+| `local_datasets/parquet_loader.py` | Focused Parquet dataset loading through the governed local loader. | `load_parquet` | stdlib: pathlib, typing<br>local: `app.services.data.contracts`, `app.services.data.local_datasets.contracts`, `app.services.data.persistence.dataset_writer`, `app.utils` |
+| `market_data/__init__.py` | Focused governed market-data retrieval and reference operations. | `AvailabilityRequest`, `DataAvailability`, `MarketDataRequest`, `SymbolListRequest`, `SymbolMetadata`, `SymbolMetadataRequest`, `SymbolPage`, `VolumeRecord`, `VolumeRequest`, `VolumeResult`, `VolumeSummary`, `discover_symbols`, `fetch_historical_volume`, `fetch_market_dataset`, `fetch_symbol_metadata`, `get_data_availability`, `get_historical_volume`, `get_market_data`, `get_spread_data`, `get_symbol_metadata`, `get_tick_data`, `inspect_availability`, `list_symbols` | local: `app.services.data.market_data.pipeline`, `app.services.data.market_data.requests`, `app.services.data.market_data.results`, `app.services.data.market_data.symbol_discovery`, `app.services.data.market_data.symbol_metadata` |
+| `market_data/pipeline.py` | Fail-closed historical market-data retrieval orchestration. | Internal only | stdlib: __future__, datetime, hashlib, typing<br>third-party: pydantic<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.services.data.market_data.requests`, `app.services.data.persistence.cache`, `app.services.data.persistence.contracts`, `app.services.data.quality`, `app.services.data.sources.composition`, `app.services.data.sources.contracts`, `app.services.data.sources.policy`, `app.services.data.sources.registry`, `app.utils` |
+| `market_data/requests.py` | Bounded market, synthetic, availability, schedule, and volume requests. | `AvailabilityRequest`, `MarketDataRequest`, `VolumeRequest` | stdlib: __future__, datetime, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.contracts.records`, `app.utils` |
+| `market_data/results.py` | Temporary market-data result contracts pending FEAT-DATA-02 migration. | `DataAvailability` | stdlib: __future__, collections, decimal, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.contracts.dataset`, `app.utils` |
+| `market_data/symbol_discovery.py` | Reference data and availability orchestration. | `VOLUME_RESPONSE_MODES`, `discover_symbols`, `fetch_historical_volume`, `fetch_symbol_metadata`, `get_data_availability`, `get_historical_volume`, `get_symbol_metadata`, `inspect_availability`, `list_symbols`, `symbol_list_request`, `symbol_metadata_request` | stdlib: __future__, datetime, decimal, json, typing<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.contracts.records`, `app.services.data.market_data.pipeline`, `app.services.data.market_data.requests`, `app.services.data.market_data.results`, `app.services.data.market_data.symbol_metadata`, `app.services.data.persistence.contracts`, `app.services.data.sources.composition`, `app.services.data.sources.contracts`, `app.services.data.sources.registry`, `app.utils` |
+| `market_data/symbol_metadata.py` | Symbol, schedule, session, and volume descriptor contracts. | `SymbolListRequest`, `SymbolMetadata`, `SymbolMetadataRequest`, `SymbolPage`, `VolumeRecord`, `VolumeResult`, `VolumeSummary` | stdlib: __future__, collections, datetime, decimal, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `persistence/__init__.py` | Shared DATA persistence infrastructure: SQLite, locks, migrations, files, cache. | `DATA_MIGRATION_STEPS`, `WriteLock`, `acquire_write_lock`, `clear_cache_entry`, `clear_data_cache`, `create_backup`, `describe_import_dialects`, `enforce_retention_policy`, `execute_transaction`, `get_cache_entry`, `import_external_dataset`, `load_dataset`, `load_local_dataset`, `put_cache_entry`, `restore_from_backup`, `run_data_migrations`, `run_domain_migrations`, `save_dataset`, `save_market_data` | local: `app.services.data.persistence.backup`, `app.services.data.persistence.cache`, `app.services.data.persistence.dataset_writer`, `app.services.data.persistence.external_import`, `app.services.data.persistence.locking`, `app.services.data.persistence.migrations`, `app.services.data.persistence.transactions` |
+| `persistence/backup.py` | Immutable approved-root backups, atomic restore, and raw-data retention. | `create_backup`, `enforce_retention_policy`, `restore_from_backup` | stdlib: __future__, collections, contextlib, datetime, hashlib, json, pathlib, shutil, time, typing<br>third-party: pydantic<br>local: `app.services.data.audit.store`, `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.dataset_writer`, `app.services.data.persistence.locking`, `app.utils` |
+| `persistence/cache.py` | Versioned, TTL-aware local SQLite caching. | `clear_cache_entry`, `clear_data_cache`, `get_cache_entry`, `put_cache_entry` | stdlib: __future__, collections, datetime, json, typing<br>third-party: pydantic<br>local: `app.services.data.contracts`, `app.services.data.contracts.validation`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `persistence/contracts.py` | Typed storage, transaction, migration, cache, and manifest contracts. | `CACHE_CLEAR_MAX_ENTRIES`, `CACHE_TTL_MAX_SECONDS`, `IMPORT_DIALECTS`, `_OHLC_COLUMN_COUNT`, `BackupManifest`, `BackupTarget`, `CacheClearRequest`, `CacheClearResult`, `CacheEntry`, `CacheReadRequest`, `CacheWriteRequest`, `CacheWriteResult`, `ColumnMapping`, `DatasetSaveRequest`, `ExternalImportRequest`, `MigrationRequest`, `MigrationResult`, `MigrationStep`, `RestoreReport`, `StatementPlan`, `StorageManifest`, `TransactionRequest`, `TransactionResult` | stdlib: __future__, collections, datetime, pathlib, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.contracts.dataset`, `app.utils` |
+| `persistence/dataset_writer.py` | Local dataset loading and atomic persistent storage. | `compute_file_hash`, `load_dataset`, `load_local_dataset`, `resolve_approved_storage_path`, `resolve_data_root`, `save_dataset`, `save_market_data` | stdlib: __future__, datetime, decimal, hashlib, json, math, pathlib, typing<br>third-party: pandas, pydantic<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.local_datasets.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.locking`, `app.utils` |
+| `persistence/external_import.py` | Explicit audited admission of externally produced market-data artifacts. | `describe_import_dialects`, `import_external_dataset` | stdlib: __future__, collections, datetime, decimal, pathlib, typing<br>third-party: pandas, pydantic<br>local: `app.services.data._settings`, `app.services.data.audit.store`, `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.persistence.contracts`, `app.services.data.persistence.dataset_writer`, `app.services.data.quality`, `app.utils` |
+| `persistence/locking.py` | Persistent exclusive write leases for resolved filesystem paths. | `WriteLock`, `acquire_write_lock` | stdlib: __future__, dataclasses, math, pathlib, time, types, typing<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `persistence/migrations.py` | Module for executing domain migrations and maintaining migration ledger. | `DATA_MIGRATION_STEPS`, `run_data_migrations`, `run_domain_migrations` | stdlib: __future__, hashlib, pathlib, time<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.locking`, `app.services.data.persistence.transactions`, `app.utils` |
+| `persistence/paths.py` | Validate Data-owned persistence paths before filesystem access. | `APPROVED_STORAGE_ROOTS_SETTING`, `resolve_approved_storage_path` | stdlib: __future__, pathlib<br>local: `app.services.data._settings`, `app.services.data.contracts` |
+| `persistence/transactions.py` | Bounded short-lived SQLite transaction execution. | `execute_transaction` | stdlib: __future__, collections, dataclasses, math, pathlib, sqlite3, typing<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.utils` |
+| `quality/__init__.py` | Is this series trustworthy? | `QualityFlag`, `QualityPolicy`, `aggregate_flags`, `detect_extreme_spread_widening`, `detect_flatline_periods`, `detect_price_jumps`, `detect_timestamp_gaps`, `detect_zero_volume_bars`, `get_quality_policy`, `inspect_data_quality`, `inspect_dataset_quality`, `inspect_records_quality`, `summarize_quality_remediation`, `validate_symbol_metadata` | stdlib: __future__, typing<br>local: `app.services.data.contracts`, `app.services.data.quality.anomalies`, `app.services.data.quality.asset_metadata`, `app.services.data.quality.contracts`, `app.services.data.quality.policy`, `app.services.data.quality.series` |
+| `quality/anomalies.py` | Statistical anomaly detection over an already-normalized series. | `detect_extreme_spread_widening`, `detect_flatline_periods`, `detect_price_jumps`, `detect_unexpected_gaps`, `detect_zero_volume_bars` | stdlib: __future__, collections, decimal, itertools, typing<br>local: `app.services.data.contracts.dataset`, `app.services.data.quality.policy`, `app.services.data.quality.scoring`, `app.services.data.time_sessions.contracts`, `app.services.data.time_sessions.gaps`, `app.services.data.time_sessions.timeframes`, `app.utils` |
+| `quality/asset_metadata.py` | Precision and instrument-metadata validation for a supplied symbol. | `validate_symbol_metadata` | stdlib: __future__, decimal, typing<br>local: `app.services.data.contracts`, `app.services.data.market_data.symbol_metadata`, `app.utils` |
+| `quality/contracts.py` | Typed vocabulary for the quality issues the detectors actually emit. | `QualityFlag`, `aggregate_flags` | stdlib: __future__, enum, typing<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.utils` |
+| `quality/policy.py` | Quality profiles, thresholds, and deterministic remediation mapping. | `QUALITY_BLOCKING_ISSUES`, `QUALITY_MIN_SCORE`, `QUALITY_PROFILE_THRESHOLDS`, `QUALITY_REMEDIATION`, `QUALITY_SEVERITY_WEIGHTS`, `QualityPolicy`, `get_quality_policy`, `summarize_quality_remediation` | stdlib: __future__, collections, decimal, typing<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.utils` |
+| `quality/scoring.py` | Private helpers shared by the quality detectors. | Internal only | stdlib: __future__, collections, typing<br>local: `app.services.data.contracts.dataset` |
+| `quality/series.py` | Series-level quality inspection, scoring, and status derivation. | `detect_timestamp_gaps`, `inspect_dataset_quality`, `inspect_records_quality`, `validate_tick_order` | stdlib: __future__, collections, datetime, decimal, itertools, typing<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.services.data.quality.anomalies`, `app.services.data.quality.policy`, `app.services.data.quality.scoring`, `app.services.data.time_sessions.contracts`, `app.services.data.time_sessions.timeframes`, `app.utils` |
+| `realtime_feeds/__init__.py` | Internal feed runtime lifecycle and status API. | `ingest_feed_event`, `read_feed_status`, `reconcile_feed_gap`, `reconnect_feed`, `start_internal_feed` | stdlib: __future__<br>local: `app.services.data.realtime_feeds.buffer`, `app.services.data.realtime_feeds.reconnection`, `app.services.data.realtime_feeds.status` |
+| `realtime_feeds/buffer.py` | Bounded event buffering and gap reconciliation for internal feeds. | `ingest_feed_event`, `reconcile_feed_gap`, `start_internal_feed` | stdlib: __future__, collections, datetime, json, typing<br>local: `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.services.data.realtime_feeds.contracts`, `app.services.data.realtime_feeds.state`, `app.services.data.sources.registry`, `app.utils` |
+| `realtime_feeds/contracts.py` | Public bounded live-feed configuration, event, and status contracts. | `FeedConfig`, `FeedEventResult`, `FeedStatus`, `FeedStatusRequest`, `RawFeedEvent`, `ReconnectPolicy` | stdlib: __future__, collections, datetime, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `realtime_feeds/heartbeat.py` | Heartbeat observation for internal feeds. | Internal only | stdlib: __future__, datetime, typing<br>local: `app.services.data.realtime_feeds.state`, `app.utils` |
+| `realtime_feeds/reconnection.py` | Bounded reconnection with exponential backoff for internal feeds. | `reconnect_feed` | stdlib: __future__, collections, datetime, hashlib<br>local: `app.services.data.contracts`, `app.services.data.realtime_feeds.state`, `app.utils` |
+| `realtime_feeds/state.py` | The single registry of live internal feed state. | `ActiveFeed` | stdlib: __future__, collections, datetime, typing<br>local: `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.services.data.realtime_feeds.contracts`, `app.utils` |
+| `realtime_feeds/status.py` | Read persisted/in-memory feed status information. | `get_feed_status`, `read_feed_status` | stdlib: __future__, datetime<br>local: `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.services.data.realtime_feeds.contracts`, `app.services.data.realtime_feeds.state`, `app.utils` |
+| `sources/__init__.py` | Canonical Data domain sources surface exports. | `MarketDataSource`, `ensure_source`, `ensure_source_access`, `evaluate_source_policy`, `get_source_descriptor`, `list_composable_sources`, `list_registered_sources`, `promote_source`, `register_source`, `resolve_source` | stdlib: __future__<br>local: `app.services.data.sources.composition`, `app.services.data.sources.policy`, `app.services.data.sources.protocol`, `app.services.data.sources.registry` |
+| `sources/broker_adapter.py` | Adapter for caller-owned canonical Brokers read capabilities. | `ExternalMarketDataSource` | stdlib: __future__, asyncio, collections, typing<br>local: `app.services.brokers`, `app.services.data.contracts`, `app.services.data.market_data.symbol_metadata`, `app.services.data.sources.contracts`, `app.services.data.sources.protocol`, `app.utils` |
+| `sources/composition.py` | Lazy composition and migrations execution trigger for standalone Data operations. | `ensure_identity`, `ensure_source`, `ensure_source_access`, `ensure_storage`, `list_composable_sources`, `resolve_calendar` | stdlib: __future__, asyncio, collections, datetime, json, pathlib, threading, typing<br>third-party: pydantic<br>local: `app.services.brokers`, `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.market_data.symbol_metadata`, `app.services.data.persistence.migrations`, `app.services.data.sources.broker_adapter`, `app.services.data.sources.contracts`, `app.services.data.sources.local_adapter`, `app.services.data.sources.registry`, `app.services.data.time_sessions.contracts`, `app.services.data.time_sessions.schedule`, `app.utils` |
+| `sources/contracts.py` | Source readiness, capability, provenance, licence, and plan contracts. | `RawSourceBatch`, `SourceDescriptor`, `SourceIdentity`, `SourceIdentityRequest`, `SourceLicensePolicy`, `SourcePlan`, `SourcePromotionRequest`, `SourceReadRequest` | stdlib: __future__, collections, datetime, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `sources/licensing.py` | Licence enforcement and attribution for governed source use. | `enforce_license`, `get_attribution_text` | stdlib: __future__, typing<br>local: `app.services.data.contracts`, `app.services.data.sources.contracts`, `app.utils` |
+| `sources/local_adapter.py` | Explicitly configured local CSV/Parquet market-data source. | `LocalMarketDataSource` | stdlib: __future__, collections, pathlib, typing<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.local_datasets.contracts`, `app.services.data.market_data.symbol_metadata`, `app.services.data.persistence.dataset_writer`, `app.services.data.sources.contracts`, `app.services.data.sources.protocol`, `app.utils` |
+| `sources/policy.py` | Durable fail-closed source policy and promotion enforcement. | `SourcePolicyConfig`, `evaluate_source_policy`, `promote_source`, `record_source_attempt`, `register_source_policy` | stdlib: __future__, dataclasses, json, time, typing<br>local: `app.services.data.contracts`, `app.services.data.market_data.requests`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.services.data.sources.contracts`, `app.services.data.sources.licensing`, `app.services.data.sources.registry`, `app.utils` |
+| `sources/protocol.py` | Base market data source protocol definitions. | Internal only | stdlib: __future__, abc, typing<br>local: `app.services.data.market_data.symbol_metadata`, `app.services.data.sources.contracts` |
+| `sources/read_only.py` | Runtime enforcement of Data's read-only broker contract. | `READ_ONLY_BROKER_METHODS`, `ReadOnlyBrokerProxy`, `verify_read_only_call`, `wrap_broker_client` | stdlib: __future__, typing<br>local: `app.services.data.contracts`, `app.utils` |
+| `sources/registry.py` | Thread-safe registry for registering and lazy resolving data sources. | `get_source_descriptor`, `list_registered_sources`, `register_source`, `register_source_identity`, `resolve_source`, `resolve_source_identity`, `update_source_descriptor_readiness` | stdlib: __future__, collections, threading, typing<br>local: `app.services.data.contracts`, `app.services.data.sources.contracts`, `app.services.data.sources.protocol`, `app.utils` |
+| `synthetic_data/__init__.py` | Focused deterministic synthetic market-data generation. | `SyntheticRequest`, `generate_synthetic_bars`, `generate_synthetic_dataset`, `generate_synthetic_ticks` | local: `app.services.data.synthetic_data.contracts`, `app.services.data.synthetic_data.gbm` |
+| `synthetic_data/contracts.py` | Contracts for deterministic bounded synthetic market-data generation. | `SyntheticRequest` | stdlib: __future__, collections, datetime, decimal, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.time_sessions.utc` |
+| `synthetic_data/gbm.py` | Generate deterministic seeded geometric-Brownian market-data fixtures. | `generate_synthetic_bars`, `generate_synthetic_dataset`, `generate_synthetic_ticks` | stdlib: __future__, datetime, decimal, random, typing<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.services.data.synthetic_data.contracts`, `app.services.data.time_sessions.timeframes`, `app.utils` |
+| `synthetic_data/provenance.py` | Stable provenance identifier for explicitly synthetic datasets. | `SYNTHETIC_SOURCE` | None |
+| `synthetic_data/randomness.py` | Seed requirement for deterministic synthetic generation. | `require_seed` | stdlib: typing<br>local: `app.services.data.synthetic_data.contracts` |
+| `tick_derivation/__init__.py` | Focused tick-series derivation from real market evidence. | `generate_tick_series`, `generate_tick_series_to_parquet` | local: `app.services.data.tick_derivation.generator` |
+| `tick_derivation/_kernel.py` | Compiled fixed-point kernels for deterministic tick derivation. | `generate_four_tick_arrays`, `generate_volume_tick_arrays` | stdlib: __future__<br>third-party: numba, numpy |
+| `tick_derivation/contracts.py` | Tick-derivation closed-set contract vocabulary. | `SpreadModel`, `TickDerivationModel` | stdlib: typing |
+| `tick_derivation/generator.py` | Derive deterministic tick series from real market evidence. | `GENERATED_TICKS_MIN_PER_BAR`, `PHASE_CLOSE`, `PHASE_HIGH`, `PHASE_LOW`, `PHASE_OPEN`, `SPREAD_MODELS`, `TICK_GENERATION_MODELS`, `generate_tick_series`, `generate_tick_series_to_parquet` | stdlib: __future__, collections, datetime, decimal, pathlib, random, typing<br>third-party: numpy, pandas, pyarrow<br>local: `app.services.data._limits`, `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.services.data.persistence.paths`, `app.services.data.tick_derivation._kernel`, `app.services.data.time_sessions.timeframes`, `app.utils` |
+| `tick_derivation/provenance.py` | Stable provenance identifier for real-evidence tick derivation. | `DERIVED_TICK_SOURCE` | None |
+| `time_sessions/__init__.py` | Focused timeframes, venue schedules, named sessions, UTC validation, and gap classification. | `FOREX_NAMED_SESSIONS`, `TIMEFRAME_MANIFEST`, time/session request-result contracts, `WeeklyScheduleProvider`, `classify_gap`, `get_active_market_sessions`, `get_current_schedule`, `get_exchange_sessions`, `get_market_hours`, `get_timeframe_spec`, `get_trading_sessions`, `require_utc`, `validate_resample_target` | local: all focused `app.services.data.time_sessions` implementation modules |
+| `time_sessions/contracts.py` | Immutable contracts for venue schedules, market-hour evaluation, named sessions, and configured weekly schedules. | `ActiveMarketSessions`, `ActiveMarketSessionsRequest`, `ExchangeSessionRequest`, `MarketHours`, `MarketHoursRequest`, `MarketSchedule`, `NamedSessionDefinition`, `ScheduleRequest`, `SessionWindow`, `TradingSession`, `WeeklyHoliday`, `WeeklyScheduleDefinition` | stdlib: __future__, collections, datetime, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.time_sessions.utc` |
+| `time_sessions/exchange_calendar.py` | Bounded exchange sessions from an explicit venue calendar code. | `get_exchange_sessions` | stdlib: datetime<br>third-party: exchange-calendars<br>local: `app.services.data._limits`, `app.services.data.contracts`, `app.services.data.time_sessions.contracts`, `app.utils` |
+| `time_sessions/gaps.py` | Classification of a temporal gap as expected or anomalous. | `GapType`, `classify_gap` | stdlib: __future__, collections, datetime, enum, typing<br>local: `app.services.data.time_sessions.contracts`, `app.utils` |
+| `time_sessions/market_hours.py` | Deterministic open/current/next evaluation over authoritative sessions. | Internal `evaluate_market_hours` | stdlib: datetime<br>local: `app.services.data.time_sessions.contracts`, `app.services.data.time_sessions.utc` |
+| `time_sessions/named_sessions.py` | DST-aware analytical named-session classification. | `FOREX_NAMED_SESSIONS`, `get_active_market_sessions` | stdlib: datetime, zoneinfo<br>local: `app.services.data.contracts`, `app.services.data.time_sessions.contracts`, `app.utils` |
+| `time_sessions/schedule.py` | Current configured market hours and normalized session windows. | `MarketCalendar`, `get_current_schedule`, `get_market_hours`, `get_trading_sessions`, `schedule_request` | stdlib: __future__, datetime, typing<br>local: `app.services.data.contracts`, `app.services.data.contracts.validation`, `app.services.data.sources.composition`, `app.services.data.sources.registry`, `app.services.data.time_sessions.contracts`, `app.utils` |
+| `time_sessions/timeframes.py` | Temporal truth for the DATA domain: timeframes and UTC normalization. | Internal only | stdlib: collections, datetime, typing<br>local: `app.services.data.contracts`, `app.utils` |
+| `time_sessions/utc.py` | Focused UTC validation for DATA time and session contracts. | `require_utc` | stdlib: datetime |
+| `time_sessions/weekly_schedule.py` | Revisioned explicit weekly schedule and holiday expansion. | `WeeklyScheduleProvider` | stdlib: datetime, zoneinfo<br>local: `app.services.data.contracts`, `app.services.data.time_sessions.contracts` |
+| `transformation/__init__.py` | Deterministic reshaping of canonical datasets. | `aggregate_ticks`, `aggregate_ticks_to_bars`, `align_datasets`, `align_multitimeframe_data`, `resample_dataset`, `resample_ohlcv`, `to_ohlcv_dataframe`, `to_tick_dataframe` | local: `app.services.data.transformation.alignment`, `app.services.data.transformation.resampling`, `app.services.data.transformation.tabular`, `app.services.data.transformation.tick_aggregation` |
+| `transformation/alignment.py` | Backward-only multi-timeframe alignment. | `align_datasets`, `align_multitimeframe_data` | stdlib: __future__, collections, datetime, decimal<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.utils` |
+| `transformation/resampling.py` | Deterministic higher-timeframe aggregation of canonical bars. | `resample_dataset`, `resample_ohlcv` | stdlib: __future__, datetime, decimal<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.services.data.time_sessions.timeframes`, `app.utils` |
+| `transformation/tabular.py` | Canonical market evidence projected into detached analytical DataFrames. | Internal only | stdlib: __future__, collections, datetime, decimal, typing<br>third-party: numpy, pandas<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.utils` |
+| `transformation/tick_aggregation.py` | Aggregation of canonical ticks into OHLCV bars. | `aggregate_ticks`, `aggregate_ticks_to_bars` | stdlib: __future__, collections, datetime, decimal<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.services.data.time_sessions.timeframes`, `app.utils` |
+
+Every registered feature folder also contains a `README.md` documenting its ownership,
+requirements, usage program, side effects, and failure boundary.
+
+### 4.1 `contracts/`, `_settings.py`, `_limits.py` — Canonical Vocabulary and Domain Infrastructure
 
 **Purpose:** `contracts/` owns the canonical typed, versioned, provider-neutral Data
-vocabulary and deterministic error catalog. `models/` temporarily owns only contracts
-whose approved feature folders have not migrated; `limits/` remains pending its
-approved root-private or feature-owned disposition.
+vocabulary and deterministic error catalog. Feature-specific contracts live inside
+their registered owners. `_settings.py` and `_limits.py` are the only root-private
+domain-wide configuration infrastructure.
 
 **Module flow:**
 
@@ -926,29 +1085,9 @@ untrusted source or request
   → internal or cross-domain consumer
 ```
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `contracts/errors.py` | Define the only Data exception and deterministic code catalog. Holds no module-level Data dependency. | `DataError`, `DATA_ERROR_MANIFEST`, `ErrorDefinition` | **Standard library:** `dataclasses`, `collections.abc`<br>**Required third-party:** None<br>**Local:** `validation.py`, imported lazily inside `DataError.__init__` only |
-| Completed | `contracts/_base.py` | Publish the three immutable contract bases that reproduce the pre-restructure validation behaviour exactly and map Pydantic failures to `DataError`. | `DataContractModel`, `FrozenContract`, `TracedContract`, `TracedOpenContract` (all private to the domain) | **Standard library:** None<br>**Required third-party:** `pydantic`<br>**Local:** `errors.py`, `validation.py` |
-| Completed | `contracts/validation.py` | Validate request and trace identifiers through Utils policy and own shared direct-call facade validation. | Private validation helpers | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.utils` |
-| Completed | `contracts/records.py` | Validate immutable canonical market records. | `OHLCVRecord`, `TickRecord`, `SpreadRecord` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** `_base.py` |
-| Completed | `contracts/dataset.py` | Define the canonical `MarketDataset` envelope, quality evidence, ranges, and schema identifiers. | `MarketDataset`, `DataQualityReport`, `QualityIssue`, `DataGap`, `DataRange`, `MARKET_DATASET_SCHEMA`, `NORMALIZATION_VERSION`, `PRECISION_POLICIES`, `WORKFLOW_CONTEXTS`, `QUALITY_SAMPLE_LIMIT` | **Standard library:** `datetime`, `decimal`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `_base.py`, `records.py` |
-| Pending migration | `models/datasets.py` | Temporarily define `DataAvailability` until the Market Data Retrieval slice moves it to its approved owner. | `DataAvailability` | **Standard library:** None<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/requests.py` | Define the bounded market, synthetic, availability, schedule, and volume requests. | `MarketDataRequest`, `SyntheticRequest`, `AvailabilityRequest`, `ScheduleRequest`, `VolumeRequest` | **Standard library:** `datetime`, `decimal`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/`, `datasets.py` |
-| Completed | `models/metadata.py` | Define symbol, schedule, session, and volume descriptors. Hosts two bases because its contracts came from two modules with different validation behaviour. | `SymbolMetadata`, `SymbolPage`, `SymbolListRequest`, `SymbolMetadataRequest`, `MarketSchedule`, `SessionWindow`, `VolumeRecord`, `VolumeSummary`, `VolumeResult` | **Standard library:** `datetime`, `decimal`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/sources.py` | Define source readiness, capability, provenance, licence policy, and plan contracts. | `SourceDescriptor`, `SourceLicensePolicy`, `SourceReadRequest`, `RawSourceBatch`, `SourceIdentity`, `SourceIdentityRequest`, `SourcePlan`, `SourcePromotionRequest` | **Standard library:** `datetime`, `decimal`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/storage.py` | Define handle-free transaction, migration, dataset, cache, import, and audit-persistence contracts. | `TransactionRequest`, `StorageManifest`, `CacheEntry`, `MigrationRequest`, `ExternalImportRequest`, `ColumnMapping`, `IMPORT_DIALECTS`, `CACHE_TTL_MAX_SECONDS`, `CACHE_CLEAR_MAX_ENTRIES` | **Standard library:** `datetime`, `pathlib`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/jobs.py` | Define job, backfill, recovery, and scheduler contracts. | `BackfillChunkRequest`, `BackfillChunkResult`, `JobDefinition`, `JobStatus`, `JobRunResult`, `RecoveryReport`, `ScheduleJobRequest` | **Standard library:** `datetime`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/feeds.py` | Define feed configuration, events, results, and status. | `FeedConfig`, `RawFeedEvent`, `FeedEventResult`, `FeedStatus`, `FeedStatusRequest`, `ReconnectPolicy` | **Standard library:** `datetime`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/account.py` | Define read-only normalized account evidence. | `AccountStateSnapshot`, `AccountBalance`, `AccountPosition`, `AccountOrder`, `AccountSnapshotRequest`, `ACCOUNT_SNAPSHOT_SCHEMA` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/market_context.py` | Define Risk-ready normalized market-context evidence without policy interpretation. | `MarketContextEvidence`, `MarketContextRequest`, `MARKET_CONTEXT_SCHEMA` | **Standard library:** `datetime`, `decimal`, `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/fx.py` | Define bounded FX conversion requests and immutable conversion-path evidence. | `FXConversionEvidence`, `FXConversionRequest`, `FXRateLeg`, `FX_CONVERSION_EVIDENCE_SCHEMA` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/` |
-| Completed | `models/audit.py` | Define receiver-owned bounded audit query/page contracts. | `AuditEventQuery`, `AuditEventPage`, `AUDIT_QUERY_HARD_MAX_LIMIT` | **Standard library:** `datetime`<br>**Required third-party:** `pydantic`<br>**Local:** `contracts/`; `app.utils.AuditEvent` |
-| Completed | `limits/config.py` | Own immutable `DataSettings`, loaded only through `app.utils.AppSettings`, with a context-local explicit profile for isolated tests. | `DataSettings`, `get_data_settings`, `data_settings_context` | **Standard library:** `pathlib`, `contextvars`, `contextlib`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `app.utils` |
-| Completed | `limits/manifest.py` | Resolve one centralised bounded limit and apply workflow-context overrides, replacing per-module constant duplication. Declares values rather than importing them, to preserve layering. | `get_limit`, `apply_workflow_override`, `DEFAULT_LIMITS`, `WORKFLOW_CONTEXTS` | **Standard library:** `collections.abc`, `types`<br>**Required third-party:** None<br>**Local:** `contracts` |
-| Completed | `__init__.py` (each folder) | Expose the supported typed API for that folder. | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+See the authoritative current production-file inventory at the start of Section 4.
 
 #### The three contract bases
 
@@ -962,9 +1101,8 @@ them into one base would have loosened validation for three contract groups:
 | `TracedContract` | yes | no | yes | `contracts/jobs.py`, `contracts/broker.py` |
 | `TracedOpenContract` | yes | yes | yes | `contracts/market.py`, `storage.py`, `feeds.py`, `reference.py`, `market_context.py`, `fx.py` |
 
-`models/metadata.py` is the one module that hosts contracts from two of these groups,
-so it imports two bases under explicit names. `tests/data/unit/test_base.py` pins both
-axes for every base.
+Feature-owned contract modules select the narrowest applicable base explicitly.
+`tests/data/unit/test_base.py` pins both axes for every base.
 
 ### Configuration and Limits Manifest
 
@@ -983,9 +1121,9 @@ axes for every base.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-001` | Validate UTC OHLCV with finite exact numerics, `low ≤ open/close ≤ high`, non-negative volume, optional non-negative provider-reported spread with its native unit, provenance, and `available_at`. | `OHLCVRecord` | None | `DataError[VALIDATION_FAILED]`: field, UTC, order, OHLC, or spread/unit invariant fails | **Usage:** `tests/data/usage/01_contracts.py`<br>**Unit:** `tests/data/unit/test_records.py::test_ohlcv_record_rejects_invalid_range()` |
-| Completed | `FR-DATA-002` | Validate UTC ticks with finite bid/ask/last, `ask ≥ bid` when both exist, volume metadata, provenance, and `available_at`. | `TickRecord` | None | `DataError[VALIDATION_FAILED]`: invalid timestamp, numeric field, or bid/ask relation | **Usage:** `tests/data/usage/01_contracts.py`<br>**Unit:** `tests/data/unit/test_records.py::test_tick_record_rejects_crossed_quote()` |
-| Completed | `FR-DATA-003` | Validate spread records with declared unit/scale, non-negative exact spread, UTC timestamp, provenance, and `available_at`. | `SpreadRecord` | None | `DataError[VALIDATION_FAILED]`: missing unit/scale or invalid spread | **Usage:** `tests/data/usage/01_contracts.py`<br>**Unit:** `tests/data/unit/test_records.py::test_spread_record_requires_unit()` |
+| Completed | `FR-DATA-001` | Validate UTC OHLCV with finite exact numerics, `low ≤ open/close ≤ high`, non-negative volume, optional non-negative provider-reported spread with its native unit, provenance, and `available_at`. | `OHLCVRecord` | None | `DataError[VALIDATION_FAILED]`: field, UTC, order, OHLC, or spread/unit invariant fails | **Usage:** `tests/data/usage/01_contracts.py::fr_data_001()`<br>**Unit:** `tests/data/unit/test_records.py::test_ohlcv_record_rejects_invalid_range()` |
+| Completed | `FR-DATA-002` | Validate UTC ticks with finite bid/ask/last, `ask ≥ bid` when both exist, volume metadata, provenance, and `available_at`. | `TickRecord` | None | `DataError[VALIDATION_FAILED]`: invalid timestamp, numeric field, or bid/ask relation | **Usage:** `tests/data/usage/01_contracts.py::fr_data_002()`<br>**Unit:** `tests/data/unit/test_records.py::test_tick_record_rejects_crossed_quote()` |
+| Completed | `FR-DATA-003` | Validate spread records with declared unit/scale, non-negative exact spread, UTC timestamp, provenance, and `available_at`. | `SpreadRecord` | None | `DataError[VALIDATION_FAILED]`: missing unit/scale or invalid spread | **Usage:** `tests/data/usage/01_contracts.py::fr_data_003()`<br>**Unit:** `tests/data/unit/test_records.py::test_spread_record_requires_unit()` |
 
 **Rules:** Canonical timestamps are timezone-aware UTC. Broker-critical numerics use
 `Decimal` internally or lossless source-native values and serialize as decimal strings
@@ -994,49 +1132,49 @@ at official/persisted governed boundaries.
 **Implementation notes:** Canonical contracts do not copy provider defaults or expose
 mutable DataFrames.
 
-#### `contracts/dataset.py` and pending feature contracts — Datasets, Quality, and Requests
+#### `contracts/dataset.py` and feature-owned contracts — Datasets, Quality, and Requests
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-004` | Represent bounded quality evidence with status, score, issues, warnings, counts, truncation, schema version, UTC generation time, and governed blocking behavior. | `DataQualityReport` | None | `DataError[VALIDATION_FAILED]`: malformed or unbounded diagnostics | **Usage:** `tests/data/usage/01_contracts.py`<br>**Unit:** `tests/data/unit/test_dataset.py::test_quality_report_bounds_samples()` |
-| Completed | `FR-DATA-005` | Expose immutable normalized records with availability, quality, provenance, license, cache, workflow, schema, normalization, and precision metadata, including failed quality evidence when the caller selected `warn`. | `MarketDataset` | None | `DataError[VALIDATION_FAILED]`: malformed dataset contract | **Usage:** `tests/data/usage/01_contracts.py`<br>**Unit:** `tests/data/unit/test_dataset.py::test_market_dataset_rejects_provider_objects()` |
-| Completed | `FR-DATA-006` | Validate one typed internal request containing source, symbol, kind, optional timeframe/range/limit, cache policy, the closed quality-failure enum `reject` or `warn`, UTC/IANA inputs, workflow, precision, explicit fallbacks, and request ID. The default is `reject`; the removed `fail` literal is invalid. | `MarketDataRequest` | None | `DataError[INVALID_INPUT]`: invalid enum/range/limit/timezone/fallback | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_market_data_facade.py::test_market_data_request_rejects_removed_fail_behavior()` |
-| Completed | `FR-DATA-007` | Represent indexed ranges, gaps, overlap/completeness evidence, record count, source revision/readiness, and provenance without materializing the full dataset. | `DataAvailability` | None | `DataError[VALIDATION_FAILED]`: inconsistent range or count evidence | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_market_contracts.py::test_availability_requires_measured_gaps()` |
+| Completed | `FR-DATA-004` | Represent bounded quality evidence with status, score, issues, warnings, counts, truncation, schema version, UTC generation time, and governed blocking behavior. | `DataQualityReport` | None | `DataError[VALIDATION_FAILED]`: malformed or unbounded diagnostics | **Usage:** `tests/data/usage/01_contracts.py::fr_data_004()`<br>**Unit:** `tests/data/unit/test_dataset.py::test_quality_report_bounds_samples()` |
+| Completed | `FR-DATA-005` | Expose immutable normalized records with availability, quality, provenance, license, cache, workflow, schema, normalization, and precision metadata, including failed quality evidence when the caller selected `warn`. | `MarketDataset` | None | `DataError[VALIDATION_FAILED]`: malformed dataset contract | **Usage:** `tests/data/usage/01_contracts.py::fr_data_005()`<br>**Unit:** `tests/data/unit/test_dataset.py::test_market_dataset_rejects_provider_objects()` |
+| Completed | `FR-DATA-006` | Validate one typed internal request containing source, symbol, kind, optional timeframe/range/limit, cache policy, the closed quality-failure enum `reject` or `warn`, UTC/IANA inputs, workflow, precision, explicit fallbacks, and request ID. The default is `reject`; the removed `fail` literal is invalid. | `MarketDataRequest` | None | `DataError[INVALID_INPUT]`: invalid enum/range/limit/timezone/fallback | **Usage:** `tests/data/usage/02_market_data.py::fr_data_006()`<br>**Unit:** `tests/data/unit/test_market_data_facade.py::test_market_data_request_rejects_removed_fail_behavior()` |
+| Completed | `FR-DATA-007` | Represent indexed ranges, gaps, overlap/completeness evidence, record count, source revision/readiness, and provenance without materializing the full dataset. | `DataAvailability` | None | `DataError[VALIDATION_FAILED]`: inconsistent range or count evidence | **Usage:** `tests/data/usage/02_market_data.py::fr_data_007()`<br>**Unit:** `tests/data/unit/test_reference_access.py` |
 
-#### `models/contracts.py` — Broker Boundary Contracts
+#### `evidence/account_contracts.py` — Broker Boundary Contracts
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-008` | Expose immutable normalized account, balance, margin, position, order, connectivity, and staleness evidence with exact decimals and UTC snapshot time. | `AccountStateSnapshot` | None | `DataError[STALE_EVIDENCE]`: snapshot expired; `DataError[VALIDATION_FAILED]`: evidence incomplete | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_broker_contracts.py::test_account_snapshot_rejects_stale_evidence()` |
+| Completed | `FR-DATA-008` | Expose immutable normalized account, balance, margin, position, order, connectivity, and staleness evidence with exact decimals and UTC snapshot time; each position preserves an optional genuine Brokers-owned `ownership_ref` without synthesizing one. | `AccountStateSnapshot` | None | `DataError[STALE_EVIDENCE]`: snapshot expired; `DataError[VALIDATION_FAILED]`: evidence incomplete | **Usage:** `tests/data/usage/14_evidence.py::fr_data_008()`<br>**Unit:** `tests/data/unit/test_broker_contract.py`; `tests/data/unit/test_account_state.py` |
 | Removed | `FR-DATA-009` | *(The restricted broker-execution channel is outside the architecture. Trading dispatches mutations directly through Brokers' `BrokerAdapter`; Data holds and issues no mutation capability.)* | — | None | — | — |
 
-#### `models/contracts.py` and `evidence/market_context.py` — Market-Context Evidence
+#### `evidence/market_context_contracts.py` and `evidence/market_context.py` — Market-Context Evidence
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-075` | Validate a bounded request for session, calendar, spread, liquidity, volatility, correlation, and crisis evidence for one declared scope. | `MarketContextRequest` | None | `DataError[INVALID_INPUT]`: invalid scope, timezone, or evidence request | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_market_context.py::test_request_rejects_unknown_scope()` |
-| Completed | `FR-DATA-076` | Produce immutable `MarketContextEvidence v1` with separate contract version/schema ID, UTC freshness, provenance, and explicit missingness; never produce a Risk verdict. | `get_market_context_evidence(request: MarketContextRequest, provider: MarketContextProvider) -> MarketContextEvidence` | Read-only provider/source calls | `DataError[STALE_EVIDENCE|SOURCE_UNAVAILABLE|VALIDATION_FAILED]`: mandatory evidence unavailable, stale, or malformed | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_market_context.py::test_missing_evidence_is_explicit()` |
+| Completed | `FR-DATA-075` | Validate a bounded request for session, calendar, spread, liquidity, volatility, correlation, and crisis evidence for one declared scope. | `MarketContextRequest` | None | `DataError[INVALID_INPUT]`: invalid scope, timezone, or evidence request | **Usage:** `tests/data/usage/14_evidence.py::fr_data_075()`<br>**Unit:** `tests/data/unit/test_evidence_market_context.py` |
+| Completed | `FR-DATA-076` | Produce immutable `MarketContextEvidence v1` with separate contract version/schema ID, UTC freshness, provenance, and explicit missingness; never produce a Risk verdict. | `get_market_context_evidence(request: MarketContextRequest, provider: MarketContextProvider) -> MarketContextEvidence` | Read-only provider/source calls | `DataError[STALE_EVIDENCE|SOURCE_UNAVAILABLE|VALIDATION_FAILED]`: mandatory evidence unavailable, stale, or malformed | **Usage:** `tests/data/usage/14_evidence.py::fr_data_076()`<br>**Unit:** `tests/data/unit/test_evidence_market_context.py` |
 
-#### `models/contracts.py` and `evidence/fx.py` — FX Conversion Evidence
-
-| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
-|---|---|---|---|---|---|---|
-| Completed | `FR-DATA-078` | Validate source/target currencies, UTC `as_of`, explicit maximum age, and explicit allowed-path policy; reject same-leg cycles and unbounded discovery. | `FXConversionRequest` | None | `DataError[INVALID_INPUT, LIMIT_EXCEEDED]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_fx_contracts.py::test_request_requires_explicit_policy_and_freshness()` |
-| Completed | `FR-DATA-079` | Deterministically select an allowed acyclic direct/synthesized path and publish exact rates, UTC freshness, policy version, and source provenance as `FXConversionEvidence v1`; never fabricate a rate. | `get_fx_conversion_evidence(request: FXConversionRequest, provider: FXRateProvider) -> FXConversionEvidence` | Read-only provider/source calls | `DataError[DATA_NOT_FOUND, STALE_EVIDENCE, SOURCE_UNAVAILABLE, VALIDATION_FAILED]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_fx_contracts.py::test_path_is_acyclic_exact_and_provenanced()` |
-
-#### `models/contracts.py` — Source Contracts
+#### `evidence/fx_contracts.py` and `evidence/fx_conversion.py` — FX Conversion Evidence
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-010` | Declare source readiness, capabilities, credential/network/write requirements, schema/timezone/version metadata, promotion criteria, and sign-off evidence. | `SourceDescriptor` | None | `DataError[VALIDATION_FAILED]`: declaration incomplete or contradictory | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_source_contracts.py::test_source_descriptor_requires_capabilities()` |
-| Completed | `FR-DATA-011` | Declare permitted workflow contexts, export/retention/attribution restrictions, enforcement behavior, and license status for each source. | `SourceLicensePolicy` | None | `DataError[LICENSE_RESTRICTION]`: metadata missing or use forbidden | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_source_contracts.py::test_license_policy_fails_closed_for_validation()` |
+| Completed | `FR-DATA-078` | Validate source/target currencies, UTC `as_of`, explicit maximum age, and explicit allowed-path policy; reject same-leg cycles and unbounded discovery. | `FXConversionRequest` | None | `DataError[INVALID_INPUT, LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/14_evidence.py::fr_data_078()`<br>**Unit:** `tests/data/unit/test_evidence_fx.py` |
+| Completed | `FR-DATA-079` | Deterministically select an allowed acyclic direct/synthesized path and publish exact rates, UTC freshness, policy version, and source provenance as `FXConversionEvidence v1`; never fabricate a rate. | `get_fx_conversion_evidence(request: FXConversionRequest, provider: FXRateProvider) -> FXConversionEvidence` | Read-only provider/source calls | `DataError[DATA_NOT_FOUND, STALE_EVIDENCE, SOURCE_UNAVAILABLE, VALIDATION_FAILED]` | **Usage:** `tests/data/usage/14_evidence.py::fr_data_079()`<br>**Unit:** `tests/data/unit/test_evidence_fx.py` |
+
+#### `sources/contracts.py` — Source Contracts
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Completed | `FR-DATA-010` | Declare source readiness, capabilities, credential/network/write requirements, schema/timezone/version metadata, promotion criteria, and sign-off evidence. | `SourceDescriptor` | None | `DataError[VALIDATION_FAILED]`: declaration incomplete or contradictory | **Usage:** `tests/data/usage/10_sources.py::fr_data_010()`<br>**Unit:** `tests/data/unit/test_source_contract_identity.py` |
+| Completed | `FR-DATA-011` | Declare permitted workflow contexts, export/retention/attribution restrictions, enforcement behavior, and license status for each source. | `SourceLicensePolicy` | None | `DataError[LICENSE_RESTRICTION]`: metadata missing or use forbidden | **Usage:** `tests/data/usage/10_sources.py::fr_data_011()`<br>**Unit:** `tests/data/unit/test_source_contract_identity.py` |
 
 #### `contracts/errors.py` — Deterministic Errors
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-012` | Expose one redacted domain exception carrying a manifest code, safe details, retryability, severity, request ID, and operator action without raw exceptions. | `DataError` | None | None | **Usage:** `tests/data/usage/01_contracts.py`<br>**Unit:** `tests/data/unit/test_errors.py::test_data_error_redacts_sensitive_details()` |
-| Completed | `FR-DATA-013` | Expose one immutable manifest for active deterministic codes and reserve `UNKNOWN_ERROR` for failures not otherwise mapped. | `DATA_ERROR_MANIFEST: Mapping[str, ErrorDefinition]` | None | None | **Usage:** `tests/data/usage/01_contracts.py`<br>**Unit:** `tests/data/unit/test_errors.py::test_error_manifest_is_complete_and_unique()` |
+| Completed | `FR-DATA-012` | Expose one redacted domain exception carrying a manifest code, safe details, retryability, severity, request ID, and operator action without raw exceptions. | `DataError` | None | None | **Usage:** `tests/data/usage/01_contracts.py::fr_data_012()`<br>**Unit:** `tests/data/unit/test_errors.py::test_data_error_redacts_sensitive_details()` |
+| Completed | `FR-DATA-013` | Expose one immutable manifest for active deterministic codes and reserve `UNKNOWN_ERROR` for failures not otherwise mapped. | `DATA_ERROR_MANIFEST: Mapping[str, ErrorDefinition]` | None | None | **Usage:** `tests/data/usage/01_contracts.py::fr_data_013()`<br>**Unit:** `tests/data/unit/test_errors.py::test_error_manifest_is_complete_and_unique()` |
 
 ```text
 INVALID_INPUT, VALIDATION_FAILED, DATA_QUALITY_FAILED, DATA_NOT_FOUND,
@@ -1118,20 +1256,9 @@ validated command or dataset
   → committed result or complete rollback
 ```
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `persistence/sqlite.py` | Execute bounded SQLite transactions without leaking connections; persist job, feed, and circuit-breaker state. | `execute_transaction`, `ingest_records` | **Standard library:** `sqlite3`, `pathlib`, `collections.abc`<br>**Required third-party:** None<br>**Local:** `errors`, `models`, `limits` |
-| Completed | `persistence/locking.py` | Enforce exclusive path-scoped write ownership. | `acquire_write_lock` | **Standard library:** `contextlib`, `pathlib`, `threading`, `time`<br>**Required third-party:** None<br>**Local:** `errors` |
-| Completed | `persistence/migrations.py` | Execute ordered domain-owned migrations and maintain the shared ledger. | `run_domain_migrations`, `execute_migration` | **Standard library:** `dataclasses`, `collections.abc`<br>**Required third-party:** None<br>**Local:** `sqlite.py`, `locking.py`, `errors` |
-| Completed | `persistence/file_io.py` | Atomically save normalized CSV/Parquet artifacts and manifests through a temporary file and rename, under an explicit overwrite guard. | `save_dataset`, `save_to_parquet`, `save_to_csv` | **Standard library:** `hashlib`, `pathlib`<br>**Required third-party:** `pandas`, `pyarrow`<br>**Local:** `models`, `locking.py`, `limits` |
-| Completed | `persistence/cache.py` | Read/write one versioned TTL/revision-aware cache and resolve stale policy. | `get_cache_entry`, `put_cache_entry`, `create_cache_key`, `is_stale`, `clear_cache` | **Standard library:** `datetime`, `hashlib`<br>**Required third-party:** None<br>**Local:** `sqlite.py`, `models`, `limits` |
-| Completed | `persistence/import_artifacts.py` | Admit externally produced CSV/Parquet into canonical manifest-backed form under an explicit declared mapping and dialect. | `import_external_dataset`, `describe_import_dialects` | **Standard library:** `pathlib`<br>**Required third-party:** `pandas`, `pyarrow`<br>**Local:** `file_io.py`, `locking.py`, `models`, `audit/store.py` |
-| Completed | `persistence/backup.py` | Snapshot approved roots to an immutable manifest, restore a prior state, and enforce dataset retention. | `create_backup`, `restore_from_backup`, `enforce_retention_policy` | **Standard library:** `hashlib`, `pathlib`, `shutil`, `datetime`<br>**Required third-party:** None<br>**Local:** `file_io.py`, `locking.py`, `models`, `audit/store.py`, `limits` |
-| Completed | `audit/store.py` | Persist Utils-owned redacted `AuditEvent` envelopes durably and idempotently. | `persist_audit_event` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `persistence/sqlite.py`; `app.utils` → `AuditEvent` |
-| Completed | `audit/query.py` | Authorize and execute a bounded, deterministically ordered audit query without exposing storage handles. | `query_audit_events` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `persistence/sqlite.py`, `models`; `app.utils` → `AuthContext` |
-| Completed | `__init__.py` (each folder) | Expose the supported persistence and audit API. | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+See the authoritative current production-file inventory at the start of Section 4.
 
 ### Configuration and Limits Manifest
 
@@ -1148,25 +1275,25 @@ validated command or dataset
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-014` | Execute a bounded caller-owned statement plan in one short-lived SQLite transaction, return normalized results without a connection/session, and roll back atomically on failure. | `execute_transaction(request: TransactionRequest) -> TransactionResult` | Persistence write | `DataError[DB_CONNECTION_ERROR|DATABASE_ERROR|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_014_transaction()`<br>**Unit:** `tests/data/unit/test_database.py::test_execute_transaction_rolls_back_atomically()` |
-| Completed | `FR-DATA-015` | Validate ownership/order/checksums, acquire the shared lock, and execute domain-owned migration definitions exactly once while preserving an immutable ledger. | `run_domain_migrations(request: MigrationRequest) -> MigrationResult` | Persistence write | `DataError[SCHEMA_MIGRATION_FAILED|CONCURRENT_WRITE_LOCKED]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_015_migration()`<br>**Unit:** `tests/data/unit/test_migrations.py::test_run_domain_migrations_rejects_modified_applied_step()`<br>**Evidence:** `app/services/data/storage/migrations.py:246` |
-| Completed | `FR-DATA-016` | Grant at most one writer lease per resolved path, reject conflicts deterministically, and release it on exit or verified stale recovery. | `acquire_write_lock(path: Path, request_id: str) -> WriteLock` | Local state mutation; persistence write | `DataError[CONCURRENT_WRITE_LOCKED]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_016_write_lock()`<br>**Unit:** `tests/data/unit/test_locking.py::test_write_lock_is_path_scoped_and_exclusive()` |
+| Completed | `FR-DATA-014` | Execute a bounded caller-owned statement plan in one short-lived SQLite transaction, return normalized results without a connection/session, and roll back atomically on failure. | `execute_transaction(request: TransactionRequest) -> TransactionResult` | Persistence write | `DataError[DB_CONNECTION_ERROR|DATABASE_ERROR|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_014()`<br>**Unit:** `tests/data/unit/test_sqlite.py` |
+| Completed | `FR-DATA-015` | Validate ownership/order/checksums, acquire the shared lock, and execute domain-owned migration definitions exactly once while preserving an immutable ledger. | `run_domain_migrations(request: MigrationRequest) -> MigrationResult` | Persistence write | `DataError[SCHEMA_MIGRATION_FAILED|CONCURRENT_WRITE_LOCKED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_015()`<br>**Unit:** `tests/data/unit/test_persistence_migrations.py`<br>**Evidence:** `app/services/data/persistence/migrations.py:246` |
+| Completed | `FR-DATA-016` | Grant at most one writer lease per resolved path, reject conflicts deterministically, and release it on exit or verified stale recovery. | `acquire_write_lock(path: Path, request_id: str) -> WriteLock` | Local state mutation; persistence write | `DataError[CONCURRENT_WRITE_LOCKED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_016()`<br>**Unit:** `tests/data/unit/test_persistence_locking.py` |
 
 #### `persistence/file_io.py`, `cache.py`, `import_artifacts.py`, and `audit/`
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-017` | Load CSV/Parquet plus manifest only from an approved root, verify hash/schema/normalization metadata, normalize records, and reject corruption without hidden migration. | `load_dataset(request: DatasetLoadRequest) -> MarketDataset` | Read-only | `DataError[PERMISSION_DENIED|FILE_CORRUPTED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_017_load_dataset()`<br>**Unit:** `tests/data/unit/test_datasets.py::test_load_dataset_rejects_hash_mismatch()` |
-| Completed | `FR-DATA-018` | Validate license/quality/path, lock the target, write artifact and manifest through a temporary file, and atomically commit or quarantine failure. | `save_dataset(request: DatasetSaveRequest) -> StorageManifest` | Persistence write | `DataError[PERMISSION_DENIED|CONCURRENT_WRITE_LOCKED|DATA_QUALITY_FAILED|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_018_save_dataset()`<br>**Unit:** `tests/data/unit/test_datasets.py::test_save_dataset_commits_artifact_and_manifest_atomically()` |
-| Completed | `FR-DATA-019` | Return a cache entry only when request dimensions, schema/normalization, source revision/raw hash, and stale policy match; stale data is never silent. | `get_cache_entry(request: CacheReadRequest) -> CacheEntry | None` | Read-only | `DataError[DATABASE_ERROR]`; stale policy may yield warning metadata or miss | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_019_read_cache()`<br>**Unit:** `tests/data/unit/test_cache.py::test_cache_invalidates_on_source_revision()` |
-| Completed | `FR-DATA-020` | Write a bounded cache entry with complete identity/TTL metadata and surface an optional cache-write failure without corrupting a successful retrieval result. | `put_cache_entry(request: CacheWriteRequest) -> CacheWriteResult` | Persistence write | `DataError[DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_020_write_cache()`<br>**Unit:** `tests/data/unit/test_cache.py::test_cache_write_failure_is_not_silent()` |
-| Completed | `FR-DATA-021` | Persist a redacted `AuditEvent v1` idempotently with trace identifiers and surface every persistence failure. | `persist_audit_event(event: AuditEvent) -> AuditPersistenceResult` | Persistence write | `DataError[DATABASE_ERROR|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_021_persist_audit()`<br>**Unit:** `tests/data/unit/test_audit_storage.py::test_persist_audit_event_is_idempotent()` |
-| Completed | `FR-DATA-077` | Authorize and execute a bounded, deterministically ordered audit query without exposing storage handles or unredacted payloads. | `query_audit_events(request: AuditEventQuery, auth_context: AuthContext) -> AuditEventPage` | Read-only | `DataError[PERMISSION_DENIED|INVALID_INPUT|LIMIT_EXCEEDED|DATABASE_ERROR]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_077_query_audit()`<br>**Unit:** `tests/data/unit/test_audit_storage.py::test_query_is_authorized_bounded_and_cursor_ordered()` |
-| Completed | `FR-DATA-105` | Admit one externally produced artifact under a declared dialect and explicit column mapping, infer no governed field, validate and quality-check every record, commit through `save_dataset`, and persist an audit event marking external origin. | `import_external_dataset(request: ExternalImportRequest) -> StorageManifest` | Persistence write; Event publication | `DataError[PERMISSION_DENIED|VALIDATION_FAILED|FILE_CORRUPTED|DATA_QUALITY_FAILED|CONCURRENT_WRITE_LOCKED|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_105_import_external_dataset()`<br>**Unit:** `tests/data/unit/test_import_artifacts.py::test_import_never_infers_a_governed_field()` |
-| Completed | `FR-DATA-106` | Expose the supported deterministic header and delimiter dialects so a caller can select one without trial and error; an unlisted dialect is rejected. | `describe_import_dialects() -> Mapping[str, str]` | Read-only | None | **Usage:** `tests/data/usage/02_storage.py::example_fr_data_106_import_dialects()`<br>**Unit:** `tests/data/unit/test_import_artifacts.py::test_unknown_dialect_is_rejected()` |
-| Completed | `FR-DATA-108` | Snapshot a declared set of backup targets (raw artifacts, processed artifacts, cache state, manifests, and the migration ledger) into one immutable manifest carrying per-target hashes, byte counts, UTC creation time, and schema/normalization versions. Persist one audit event. A target outside `APPROVED_STORAGE_ROOTS` is rejected before any read. | `create_backup(targets: Sequence[BackupTarget]) -> BackupManifest` | Persistence write; Event publication | `DataError[PERMISSION_DENIED\|CONCURRENT_WRITE_LOCKED\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/02_storage.py`<br>**Unit:** `tests/data/unit/test_backup.py` |
-| Completed | `FR-DATA-109` | Restore every target in a named manifest to its recorded state, verifying each hash before writing and failing atomically without partial restoration when any verification fails. Restore is always explicit and never automatic. | `restore_from_backup(manifest_id: str) -> RestoreReport` | Persistence write; Event publication | `DataError[DATA_NOT_FOUND\|FILE_CORRUPTED\|CONCURRENT_WRITE_LOCKED\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/02_storage.py`<br>**Unit:** `tests/data/unit/test_backup.py` |
-| Completed | `FR-DATA-110` | Purge raw payloads for one dataset older than an explicit maximum age and return the purged count. Operates only on raw payloads; the canonical retention terms carried by `SourceLicensePolicy` are separate and are never overridden. Defaults to a dry run. | `enforce_retention_policy(dataset: str, max_age_days: int, *, dry_run: bool = True) -> int` | Persistence write; Event publication | `DataError[PERMISSION_DENIED\|LICENSE_RESTRICTION\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/02_storage.py`<br>**Unit:** `tests/data/unit/test_backup.py` |
+| Completed | `FR-DATA-017` | Load CSV/Parquet plus manifest only from an approved root, verify hash/schema/normalization metadata, normalize records, and reject corruption without hidden migration. | `load_dataset(request: DatasetLoadRequest) -> MarketDataset` | Read-only | `DataError[PERMISSION_DENIED|FILE_CORRUPTED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/03_local_datasets.py::fr_data_017()`<br>**Unit:** `tests/data/unit/test_file_io.py` |
+| Completed | `FR-DATA-018` | Validate license/quality/path, lock the target, write artifact and manifest through a temporary file, and atomically commit or quarantine failure. | `save_dataset(request: DatasetSaveRequest) -> StorageManifest` | Persistence write | `DataError[PERMISSION_DENIED|CONCURRENT_WRITE_LOCKED|DATA_QUALITY_FAILED|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_018()`<br>**Unit:** `tests/data/unit/test_file_io.py` |
+| Completed | `FR-DATA-019` | Return a cache entry only when request dimensions, schema/normalization, source revision/raw hash, and stale policy match; stale data is never silent. | `get_cache_entry(request: CacheReadRequest) -> CacheEntry | None` | Read-only | `DataError[DATABASE_ERROR]`; stale policy may yield warning metadata or miss | **Usage:** `tests/data/usage/06_persistence.py::fr_data_019()`<br>**Unit:** `tests/data/unit/test_persistence_cache.py` |
+| Completed | `FR-DATA-020` | Write a bounded cache entry with complete identity/TTL metadata and surface an optional cache-write failure without corrupting a successful retrieval result. | `put_cache_entry(request: CacheWriteRequest) -> CacheWriteResult` | Persistence write | `DataError[DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_020()`<br>**Unit:** `tests/data/unit/test_persistence_cache.py` |
+| Completed | `FR-DATA-021` | Persist a redacted `AuditEvent v1` idempotently with trace identifiers and surface every persistence failure. | `persist_audit_event(event: AuditEvent) -> AuditPersistenceResult` | Persistence write | `DataError[DATABASE_ERROR|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/15_audit.py::fr_data_021()`<br>**Unit:** `tests/data/unit/test_audit.py` |
+| Completed | `FR-DATA-077` | Authorize and execute a bounded, deterministically ordered audit query without exposing storage handles or unredacted payloads. | `query_audit_events(request: AuditEventQuery, auth_context: AuthContext) -> AuditEventPage` | Read-only | `DataError[PERMISSION_DENIED|INVALID_INPUT|LIMIT_EXCEEDED|DATABASE_ERROR]` | **Usage:** `tests/data/usage/15_audit.py::fr_data_077()`<br>**Unit:** `tests/data/unit/test_audit.py` |
+| Completed | `FR-DATA-105` | Admit one externally produced artifact under a declared dialect and explicit column mapping, infer no governed field, validate and quality-check every record, commit through `save_dataset`, and persist an audit event marking external origin. | `import_external_dataset(request: ExternalImportRequest) -> StorageManifest` | Persistence write; Event publication | `DataError[PERMISSION_DENIED|VALIDATION_FAILED|FILE_CORRUPTED|DATA_QUALITY_FAILED|CONCURRENT_WRITE_LOCKED|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_105()`<br>**Unit:** `tests/data/unit/test_persistence_import_artifacts.py` |
+| Completed | `FR-DATA-106` | Expose the supported deterministic header and delimiter dialects so a caller can select one without trial and error; an unlisted dialect is rejected. | `describe_import_dialects() -> Mapping[str, str]` | Read-only | None | **Usage:** `tests/data/usage/06_persistence.py::fr_data_106()`<br>**Unit:** `tests/data/unit/test_persistence_import_artifacts.py` |
+| Completed | `FR-DATA-108` | Snapshot a declared set of backup targets (raw artifacts, processed artifacts, cache state, manifests, and the migration ledger) into one immutable manifest carrying per-target hashes, byte counts, UTC creation time, and schema/normalization versions. Persist one audit event. A target outside `APPROVED_STORAGE_ROOTS` is rejected before any read. | `create_backup(targets: Sequence[BackupTarget]) -> BackupManifest` | Persistence write; Event publication | `DataError[PERMISSION_DENIED\|CONCURRENT_WRITE_LOCKED\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_108()`<br>**Unit:** `tests/data/unit/test_backup.py` |
+| Completed | `FR-DATA-109` | Restore every target in a named manifest to its recorded state, verifying each hash before writing and failing atomically without partial restoration when any verification fails. Restore is always explicit and never automatic. | `restore_from_backup(manifest_id: str) -> RestoreReport` | Persistence write; Event publication | `DataError[DATA_NOT_FOUND\|FILE_CORRUPTED\|CONCURRENT_WRITE_LOCKED\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_109()`<br>**Unit:** `tests/data/unit/test_backup.py` |
+| Completed | `FR-DATA-110` | Purge raw payloads for one dataset older than an explicit maximum age and return the purged count. Operates only on raw payloads; the canonical retention terms carried by `SourceLicensePolicy` are separate and are never overridden. Defaults to a dry run. | `enforce_retention_policy(dataset: str, max_age_days: int, *, dry_run: bool = True) -> int` | Persistence write; Event publication | `DataError[PERMISSION_DENIED\|LICENSE_RESTRICTION\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/06_persistence.py::fr_data_110()`<br>**Unit:** `tests/data/unit/test_backup.py` |
 
 `FR-DATA-017` (`load_dataset`) moves to `retrieval/local_loader.py` in Phase 4: it is
 a read, and reads belong to `retrieval/`. Its contract, errors, and tests are
@@ -1180,7 +1307,7 @@ path as `save_dataset`; it introduces no second write mechanism.
 
 ### Feature usage examples
 
-`tests/data/usage/02_storage.py` contains one example for each
+`tests/data/usage/06_persistence.py` contains one demonstration for each
 `FR-DATA-014` through `FR-DATA-021`, `FR-DATA-077`, `FR-DATA-105`, `FR-DATA-106`, and
 `FR-DATA-108` through `FR-DATA-110`.
 
@@ -1207,15 +1334,9 @@ typed request
   → provider-neutral result
 ```
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `protocol.py` | Define the minimum read-only source behavior. | `MarketDataSource.fetch`, `.list_symbols`, `.get_symbol_metadata` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `models` |
-| Completed | `registry.py` | Register and lazily resolve declared sources without side effects. | `register_source`, `resolve_source`, `get_source_descriptor`, `list_registered_sources` | **Standard library:** `collections.abc`, `threading`<br>**Required third-party:** None<br>**Local:** `models`, `protocol.py`, `app.utils` |
-| Completed | `policy.py` | Enforce durable readiness/license/fallback/rate/breaker policy and evidence-based promotion. | `SourcePolicyConfig`, `evaluate_source_policy`, `promote_source`, `is_source_ready` | **Standard library:** `dataclasses`, `json`, `time`<br>**Required third-party:** None<br>**Local:** `models`, `registry.py`, `persistence`, `security/licensing.py`, `app.utils` |
-| Completed | `composition.py` | Compose and register descriptors and lazy factories for every configured local and provider source; trigger Data migrations once. | `ensure_source`, `ensure_source_access`, `list_composable_sources` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `models`, `registry.py`, `policy.py`, `limits`, `persistence`, `app.utils`; Brokers types are type-check-only |
-| Missing | `__init__.py` | Expose only the typed source governance API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+See the authoritative current production-file inventory at the start of Section 4.
 
 ### Configuration and Limits Manifest
 
@@ -1233,18 +1354,18 @@ typed request
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-022` | Require every adapter to perform one bounded read and return provider-neutral raw records plus source metadata without broker mutation. | `MarketDataSource.fetch(request: SourceReadRequest) -> RawSourceBatch` | External API call or Read-only | `DataError[SOURCE_UNAVAILABLE|NETWORK_ERROR|TIMEOUT]` | **Usage:** `tests/data/usage/04_sources.py::example_fr_data_022_bounded_fetch()`<br>**Unit:** `tests/data/unit/test_source_protocol.py::test_source_fetch_contract_is_read_only()` |
-| Completed | `FR-DATA-023` | Require bounded, deterministically ordered symbol discovery with cursor pagination and declared discovery capability. | `MarketDataSource.list_symbols(request: SymbolListRequest) -> SymbolPage` | External API call or Read-only | `DataError[UNSUPPORTED_OPERATION|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/04_sources.py::example_fr_data_023_symbol_discovery()`<br>**Unit:** `tests/data/unit/test_source_protocol.py::test_list_symbols_is_bounded_and_ordered()` |
-| Completed | `FR-DATA-024` | Require normalized symbol metadata with provenance and explicit missing fields rather than optimistic defaults. | `MarketDataSource.get_symbol_metadata(request: SymbolMetadataRequest) -> SymbolMetadata` | External API call or Read-only | `DataError[DATA_NOT_FOUND|MISSING_ASSET_METADATA]` | **Usage:** `tests/data/usage/04_sources.py::example_fr_data_024_symbol_metadata()`<br>**Unit:** `tests/data/unit/test_source_protocol.py::test_symbol_metadata_does_not_invent_fields()` |
-| Completed | `FR-DATA-025` | Register a source descriptor and lazy factory atomically, reject duplicate/conflicting declarations, and perform no I/O during registration/import. | `register_source(descriptor: SourceDescriptor, factory: SourceFactory) -> None` | Local state mutation | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/04_sources.py::example_fr_data_025_lazy_registration()`<br>**Unit:** `tests/data/unit/test_source_registry.py::test_registry_is_lazy_and_duplicate_safe()` |
-| Completed | `FR-DATA-026` | Validate requested and explicit fallback sources in order against capability, readiness, license, context, timeout/rate, and breaker state and record every attempt. | `evaluate_source_policy(request: MarketDataRequest) -> SourcePlan` | Read-only | `DataError[LICENSE_RESTRICTION|SOURCE_UNAVAILABLE|CIRCUIT_BREAKER_OPEN]` | **Usage:** `tests/data/usage/04_sources.py::example_fr_data_026_source_policy()`<br>**Unit:** `tests/data/unit/test_source_policy.py::test_policy_never_invents_fallback()` |
-| Completed | `FR-DATA-027` | Change readiness only from a complete authenticated evidence package, record an audit event, and permit immediate reversible demotion. | `promote_source(request: SourcePromotionRequest, auth: AuthContext) -> SourceDescriptor` | Persistence write; Event publication | `DataError[PERMISSION_DENIED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/04_sources.py::example_fr_data_027_source_promotion()`<br>**Unit:** `tests/data/unit/test_source_policy.py::test_promotion_requires_all_evidence()` |
-| Completed | `FR-DATA-028` | Return a fresh normalized `AccountStateSnapshot v1` from read-only Brokers `BrokerAdapter` account reads without exposing credentials/provider objects. | `get_account_state_snapshot(request: AccountSnapshotRequest, adapter: BrokerAdapter) -> AccountStateSnapshot` | External API call (read-only, via Brokers) | `DataError[SOURCE_UNAVAILABLE|STALE_EVIDENCE|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/04_sources.py::example_fr_data_028_read_only_account_snapshot()`<br>**Unit:** `tests/data/unit/test_broker_source.py::test_account_snapshot_fails_closed_when_incomplete()` |
+| Completed | `FR-DATA-022` | Require every adapter to perform one bounded read and return provider-neutral raw records plus source metadata without broker mutation. | `MarketDataSource.fetch(request: SourceReadRequest) -> RawSourceBatch` | External API call or Read-only | `DataError[SOURCE_UNAVAILABLE|NETWORK_ERROR|TIMEOUT]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_022()`<br>**Unit:** `tests/data/unit/test_source_contract_identity.py` |
+| Completed | `FR-DATA-023` | Require bounded, deterministically ordered symbol discovery with cursor pagination and declared discovery capability. | `MarketDataSource.list_symbols(request: SymbolListRequest) -> SymbolPage` | External API call or Read-only | `DataError[UNSUPPORTED_OPERATION|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_023()`<br>**Unit:** `tests/data/unit/test_source_contract_identity.py` |
+| Completed | `FR-DATA-024` | Require normalized symbol metadata with provenance and explicit missing fields rather than optimistic defaults. | `MarketDataSource.get_symbol_metadata(request: SymbolMetadataRequest) -> SymbolMetadata` | External API call or Read-only | `DataError[DATA_NOT_FOUND|MISSING_ASSET_METADATA]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_024()`<br>**Unit:** `tests/data/unit/test_source_contract_identity.py` |
+| Completed | `FR-DATA-025` | Register a source descriptor and lazy factory atomically, reject duplicate/conflicting declarations, and perform no I/O during registration/import. | `register_source(descriptor: SourceDescriptor, factory: SourceFactory) -> None` | Local state mutation | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_025()`<br>**Unit:** `tests/data/unit/test_source_registry.py::test_registry_lazy_resolution()` |
+| Completed | `FR-DATA-026` | Validate requested and explicit fallback sources in order against capability, readiness, license, context, timeout/rate, and breaker state and record every attempt. | `evaluate_source_policy(request: MarketDataRequest) -> SourcePlan` | Read-only | `DataError[LICENSE_RESTRICTION|SOURCE_UNAVAILABLE|CIRCUIT_BREAKER_OPEN]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_026()`<br>**Unit:** `tests/data/unit/test_source_policy.py::test_evaluate_source_policy_unregistered()` |
+| Completed | `FR-DATA-027` | Change readiness only from a complete authenticated evidence package, record an audit event, and permit immediate reversible demotion. | `promote_source(request: SourcePromotionRequest, auth: AuthContext) -> SourceDescriptor` | Persistence write; Event publication | `DataError[PERMISSION_DENIED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_027()`<br>**Unit:** `tests/data/unit/test_source_policy.py::test_promote_source_production_missing_evidence()` |
+| Completed | `FR-DATA-028` | Return a fresh normalized `AccountStateSnapshot v1` from read-only Brokers `BrokerAdapter` account reads without exposing credentials/provider objects, preserving each supplied position `ownership_ref` exactly. | `get_account_state_snapshot(request: AccountSnapshotRequest, adapter: BrokerAdapter) -> AccountStateSnapshot` | External API call (read-only, via Brokers) | `DataError[SOURCE_UNAVAILABLE|STALE_EVIDENCE|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/14_evidence.py::fr_data_028()`<br>**Unit:** `tests/data/unit/test_account_state.py` |
 | Removed | `FR-DATA-029` | *(Channel issuance is outside Data; Trading obtains mutation capability directly from Brokers' `BrokerAdapter`.)* | — | None | — | — |
-| Completed | `FR-DATA-101` | Compose and register the descriptor and lazy factory for every configured source — local artifact sources at `production` readiness and enabled provider facades at `staging` — dispatching on source kind rather than accepting a single hardcoded provider. Credential-free Binance Spot, Dukascopy, and Yahoo public reads compose without account secrets; an unconfigured identifier fails closed. | `ensure_source(source_id: str, request_id: str) -> None` | Local state mutation | `DataError[UNSUPPORTED_SOURCE|VALIDATION_FAILED]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_source_composition.py::test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile()`<br>**Evidence:** `app/services/data/sources/composition.py` |
-| Completed | `FR-DATA-102` | Report which source identifiers the current configuration can compose so callers and operators discover valid `source_id` values without trial and error. | `list_composable_sources() -> tuple[str, ...]` | Read-only | None | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_public_retrieval_runtime.py::test_composable_sources_reflects_configuration()`<br>**Evidence:** `app/services/data/sources/composition.py:447` |
-| Completed | `FR-DATA-103` | Resolve local artifacts as `{symbol}_{timeframe}` first and fall back to `{symbol}` only for kinds without a timeframe, so multiple timeframes per symbol are individually addressable. | `LocalMarketDataSource._artifact(symbol: str, timeframe: str \| None) -> tuple[Path, Literal["csv", "parquet"]]` | Read-only | `DataError[DATA_NOT_FOUND]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_local_source.py::test_timeframes_are_individually_addressable()`<br>**Evidence:** `app/services/data/retrieval/local_loader.py:62`; `app/services/data/retrieval/discovery.py:158` |
-| Completed | `FR-DATA-104` | Apply the requested UTC range and record limit at the local source boundary rather than returning the whole artifact, and fail closed when the window selects nothing. | `LocalMarketDataSource.fetch(request: SourceReadRequest) -> RawSourceBatch` | Read-only | `DataError[EMPTY_RESULT|FILE_CORRUPTED]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_local_source.py::test_fetch_honours_range_and_limit()`<br>**Evidence:** `app/services/data/retrieval/local_loader.py:147` |
+| Completed | `FR-DATA-101` | Compose and register the descriptor and lazy factory for every configured source — local artifact sources at `production` readiness and enabled provider facades at `staging` — dispatching on source kind rather than accepting a single hardcoded provider. Credential-free Binance Spot, Dukascopy, and Yahoo public reads compose without account secrets; an unconfigured identifier fails closed. | `ensure_source(source_id: str, request_id: str) -> None` | Local state mutation | `DataError[UNSUPPORTED_SOURCE|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_101()`<br>**Unit:** `tests/data/unit/test_source_composition.py::test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile()`<br>**Evidence:** `app/services/data/sources/composition.py` |
+| Completed | `FR-DATA-102` | Report which source identifiers the current configuration can compose so callers and operators discover valid `source_id` values without trial and error. | `list_composable_sources() -> tuple[str, ...]` | Read-only | None | **Usage:** `tests/data/usage/10_sources.py::fr_data_102()`<br>**Unit:** `tests/data/unit/test_historical_access.py`<br>**Evidence:** `app/services/data/sources/composition.py:447` |
+| Completed | `FR-DATA-103` | Resolve local artifacts as `{symbol}_{timeframe}` first and fall back to `{symbol}` only for kinds without a timeframe, so multiple timeframes per symbol are individually addressable. | `LocalMarketDataSource._artifact(symbol: str, timeframe: str \| None) -> tuple[Path, Literal["csv", "parquet"]]` | Read-only | `DataError[DATA_NOT_FOUND]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_103()`<br>**Unit:** `tests/data/unit/test_local_source.py::test_timeframes_are_individually_addressable()`<br>**Evidence:** `app/services/data/local_datasets/csv_loader.py:62`; `app/services/data/market_data/symbol_discovery.py:158` |
+| Completed | `FR-DATA-104` | Apply the requested UTC range and record limit at the local source boundary rather than returning the whole artifact, and fail closed when the window selects nothing. | `LocalMarketDataSource.fetch(request: SourceReadRequest) -> RawSourceBatch` | Read-only | `DataError[EMPTY_RESULT|FILE_CORRUPTED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_104()`<br>**Unit:** `tests/data/unit/test_local_source.py::test_fetch_honours_range_and_limit()`<br>**Evidence:** `app/services/data/local_datasets/csv_loader.py:147` |
 
 **Implementation notes:** Refactor V1 adapter routing, license gates, rate-limit intent,
 and persisted breakers. External adapters stay staging and lazy. Brokers owns broker
@@ -1267,20 +1388,20 @@ operations.
 
 ### Feature usage examples
 
-`tests/data/usage/04_sources.py` contains one example for each
+`tests/data/usage/10_sources.py` contains one demonstration for each
 `FR-DATA-022` through `FR-DATA-028`.
 
 ---
 
-### 4.4 `retrieval/`, `evidence/`, and `time/` — Acquisition and Normalized Evidence
+### 4.4 Acquisition and Normalized Evidence Features
 
 **Purpose:** Produce typed canonical datasets, reference evidence, temporal truth, and
 normalized cross-domain evidence from policy, cache, source, normalization, and
 quality collaboration.
 
 The former `gateway/` folder is dissolved. Its orchestration role — policy → cache →
-source read → normalize → quality — becomes an internal function sequence shared by
-the `retrieval/` modules, not a folder, a class, or a layer.
+source read → normalize → quality — is an internal function sequence owned by
+`market_data/` and its collaborating focused features, not a generic layer.
 
 **Module flow:**
 
@@ -1292,23 +1413,9 @@ MarketDataRequest
   → typed result
 ```
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `time/timezone.py` | Normalize any input timestamp to UTC preserving the source zone in metadata, and own the one canonical timeframe manifest and conversion rules. | `normalize_to_utc`, `parse_timeframe`, `TIMEFRAME_MANIFEST`, `get_timeframe_spec`, `validate_resample_target` | **Standard library:** `datetime`, `zoneinfo`<br>**Required third-party:** None<br>**Local:** `errors` |
-| Completed | `time/market_hours.py` | Return current configured hours and normalized UTC session segments; reject historical reconstruction. | `MarketCalendar`, `get_market_hours`, `get_trading_sessions`, `get_current_schedule` | **Standard library:** `datetime`, `typing`, `zoneinfo`<br>**Required third-party:** None<br>**Local:** `models`, `timezone.py`, `app.utils` |
-| Completed | `time/gaps.py` | Classify a gap as expected or unexpected against session rules, and reconcile real-time feed gaps without silently filling research data. | `classify_gap`, `reconcile_real_time_gaps` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `models`, `market_hours.py`, `errors` |
-| Completed | `retrieval/sources.py` | Retrieve canonical bars, ticks, and spreads through policy, cache, source read, normalization, and quality. Adapts a caller-owned Brokers read adapter to provider-neutral batches. | `fetch_market_dataset`, `get_bars`, `get_ticks`, `get_source_license` | **Standard library:** `asyncio`, `datetime`, `decimal`, `hashlib`, `json`, `typing`<br>**Required third-party:** `pydantic`<br>**Local:** `models`, `sources`, `persistence`, `quality`, `security`, `app.utils`; Brokers types are type-check-only |
-| Completed | `retrieval/local_loader.py` | Load local CSV/Parquet datasets and artifacts from an approved root with timeframe-scoped addressing and source-boundary range/limit filtering. | `load_dataset`, `load_local_dataset`, `load_csv`, `load_parquet`, `LocalMarketDataSource` | **Standard library:** `hashlib`, `json`, `pathlib`, `typing`<br>**Required third-party:** `pandas`, `pyarrow`, `pydantic`<br>**Local:** `models`, `sources/protocol.py`, `limits`, `app.utils` |
-| Completed | `retrieval/discovery.py` | Discover symbols, normalize metadata, inspect real availability, and return bounded historical volume. | `discover_symbols`, `list_symbols`, `fetch_symbol_metadata`, `inspect_availability`, `fetch_historical_volume` | **Standard library:** `datetime`, `decimal`, `json`, `pathlib`, `typing`<br>**Required third-party:** `pydantic`<br>**Local:** `models`, `sources`, `app.utils` |
-| Completed | `retrieval/synthetic.py` | Generate seeded bounded GBM fixture bars/ticks, and derive canonical tick series from real bar or tick evidence under the approved generation and spread models. | `generate_synthetic_dataset`, `generate_synthetic_bars`, `generate_synthetic_ticks`, `generate_tick_series`, `generate_tick_series_to_parquet`, `TICK_GENERATION_MODELS`, `SPREAD_MODELS` | **Standard library:** `collections.abc`, `datetime`, `decimal`, `pathlib`, `random`<br>**Required third-party:** `numpy`, `pandas`, `pyarrow`<br>**Local:** `models`, `time/timezone.py`, `transformation/tabular.py`, `limits` |
-| Completed | `retrieval/calendar.py` | Scrape economic calendar events from multiple financial portals concurrently, clean and validate results, and persist them with metadata. | `scrape_economic_calendar`, `ScrapeOptions`, `ScrapeResult` | **Standard library:** `asyncio`, `datetime`, `pickle`<br>**Required third-party:** `pandas`, `pydantic`<br>**Local:** `models`, `limits`, `app.utils` |
-| Completed | `evidence/market_context.py` | Acquire and validate injected market-context evidence without Risk interpretation. | `MarketContextProvider`, `get_market_context_evidence` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `models`, `app.utils` |
-| Completed | `evidence/fx.py` | Select an exact bounded acyclic path from injected FX-rate evidence. | `FXRateProvider`, `get_fx_conversion_evidence` | **Standard library:** `decimal`<br>**Required third-party:** None<br>**Local:** `models` |
-| Completed | `evidence/account_state.py` | Normalize account snapshots from a caller-owned `BrokerAdapter`; Data owns no connection, credential, or mutation behavior. | `get_account_state_snapshot` | **Standard library:** `asyncio`, `datetime`, `decimal`, `typing`<br>**Required third-party:** None<br>**Local:** `models`, `security/broker_contract.py`, `app.utils`; Brokers types are type-check-only |
-| Missing | `__init__.py` (each folder) | Expose the typed read and evidence API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
-| Completed | `__init__.py` | Expose the typed read API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+See the authoritative current production-file inventory at the start of Section 4.
 
 ### Configuration and Limits Manifest
 
@@ -1325,13 +1432,19 @@ MarketDataRequest
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-030` | Execute bounded bars/ticks/spreads retrieval through explicit source policy, versioned cache, normalization, quality, and precision, returning `MarketDataset`. A failed quality report raises `DATA_QUALITY_FAILED` under `reject`; under `warn`, fresh and cached paths log and return the unchanged data and failed report. | `fetch_market_dataset(request: MarketDataRequest) -> MarketDataset` | Read-only; optional External API call and cache write | `DataError`: mapped retrieval/quality/policy code | **Usage:** `tests/data/usage/02_market_data.py`<br>**Unit:** `tests/data/unit/test_retrieval_sources.py::test_fetch_market_dataset_warns_and_returns_blocking_quality()` |
-| Completed | `FR-DATA-107` | Honour a caller-declared stale-cache policy on `MarketDataRequest`: `refresh` treats an expired entry as a miss, `fail_closed` returns `EMPTY_RESULT` without contacting any source, and `serve_stale` returns the expired entry with `cache_status="stale_warning"`. `serve_stale` is valid only in the `research` workflow context and is rejected elsewhere at contract validation. | `MarketDataRequest.stale_cache_policy: Literal["refresh", "fail_closed", "serve_stale"]` | Read-only | `DataError[VALIDATION_FAILED|EMPTY_RESULT]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_historical_access.py::test_serve_stale_is_rejected_outside_research()` |
-| Completed | `FR-DATA-031` | Return a bounded deterministic symbol page with cursor, source readiness, and provenance. | `discover_symbols(request: SymbolListRequest) -> SymbolPage` | Read-only or External API call | `DataError[LIMIT_EXCEEDED|UNSUPPORTED_OPERATION|SOURCE_UNAVAILABLE]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_reference_access.py::test_discover_symbols_cursor_is_stable()` <br>**Evidence:** [reference.py:L28](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/data/retrieval/discovery.py#L28) |
-| Completed | `FR-DATA-032` | Return normalized asset-aware metadata and explicitly mark unknown optional fields without provider-derived optimistic defaults. | `fetch_symbol_metadata(request: SymbolMetadataRequest) -> SymbolMetadata` | Read-only or External API call | `DataError[DATA_NOT_FOUND|MISSING_ASSET_METADATA]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_reference_access.py::test_fetch_metadata_preserves_unknown_fields()` <br>**Evidence:** [reference.py:L67](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/data/retrieval/discovery.py#L67) |
-| Completed | `FR-DATA-033` | Compute ranges, gaps, overlaps, completeness, count, revision, and readiness from local manifests/indexes or one bounded provider retrieval, never hard-code certainty. Provider results describe only the observed probe window and record whether the probe limit was reached. | `inspect_availability(request: AvailabilityRequest) -> DataAvailability` | Read-only; optional External API call | `DataError[LIMIT_EXCEEDED|SOURCE_UNAVAILABLE|DATABASE_ERROR]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_reference_access.py::test_provider_availability_uses_bounded_observed_probe()`, `test_availability_never_hardcodes_ready()`<br>**Evidence:** `app/services/data/market_data/symbol_discovery.py` |
-| Completed | `FR-DATA-034` | Return current configured hours and normalized UTC sessions, advance cross-midnight windows correctly, and reject historical reconstruction. | `get_current_schedule(request: ScheduleRequest, calendar: MarketCalendar) -> MarketSchedule` | Read-only provider call | `DataError[UNSUPPORTED_OPERATION|VALIDATION_FAILED]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_sessions.py::test_current_schedule_advances_midnight_end()` |
-| Completed | `FR-DATA-035` | Return bounded source-native or derived volume as records, buckets, or summary with explicit volume kind/unit and provenance. | `fetch_historical_volume(request: VolumeRequest) -> VolumeResult` | Read-only; optional External API call/cache write | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|DATA_QUALITY_FAILED]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_sessions.py::test_volume_modes_have_stable_contracts()` <br>**Evidence:** [sessions.py:L191](file:///c:/Users/rharu/AppDev/HaruquantAI/app/services/data/time/market_hours.py#L191) |
+| Completed | `FR-DATA-030` | Execute bounded bars/ticks/spreads retrieval through explicit source policy, versioned cache, normalization, quality, and precision, returning `MarketDataset`. A failed quality report raises `DATA_QUALITY_FAILED` under `reject`; under `warn`, fresh and cached paths log and return the unchanged data and failed report. | `fetch_market_dataset(request: MarketDataRequest) -> MarketDataset` | Read-only; optional External API call and cache write | `DataError`: mapped retrieval/quality/policy code | **Usage:** `tests/data/usage/02_market_data.py::fr_data_030()`<br>**Unit:** `tests/data/unit/test_retrieval_sources.py::test_fetch_market_dataset_warns_and_returns_blocking_quality()` |
+| Completed | `FR-DATA-107` | Honour a caller-declared stale-cache policy on `MarketDataRequest`: `refresh` treats an expired entry as a miss, `fail_closed` returns `EMPTY_RESULT` without contacting any source, and `serve_stale` returns the expired entry with `cache_status="stale_warning"`. `serve_stale` is valid only in the `research` workflow context and is rejected elsewhere at contract validation. | `MarketDataRequest.stale_cache_policy: Literal["refresh", "fail_closed", "serve_stale"]` | Read-only | `DataError[VALIDATION_FAILED|EMPTY_RESULT]` | **Usage:** `tests/data/usage/02_market_data.py::fr_data_107()`<br>**Unit:** `tests/data/unit/test_historical_access.py::test_serve_stale_is_rejected_outside_research()` |
+| Completed | `FR-DATA-031` | Return a bounded deterministic symbol page with cursor, source readiness, and provenance. | `discover_symbols(request: SymbolListRequest) -> SymbolPage` | Read-only or External API call | `DataError[LIMIT_EXCEEDED|UNSUPPORTED_OPERATION|SOURCE_UNAVAILABLE]` | **Usage:** `tests/data/usage/02_market_data.py::fr_data_031()`<br>**Unit:** `tests/data/unit/test_reference_access.py::test_discover_symbols_cursor_is_stable()`<br>**Evidence:** `app/services/data/market_data/symbol_discovery.py` |
+| Completed | `FR-DATA-032` | Return normalized asset-aware metadata and explicitly mark unknown optional fields without provider-derived optimistic defaults. | `fetch_symbol_metadata(request: SymbolMetadataRequest) -> SymbolMetadata` | Read-only or External API call | `DataError[DATA_NOT_FOUND|MISSING_ASSET_METADATA]` | **Usage:** `tests/data/usage/02_market_data.py::fr_data_032()`<br>**Unit:** `tests/data/unit/test_reference_access.py::test_fetch_metadata_preserves_unknown_fields()`<br>**Evidence:** `app/services/data/market_data/symbol_discovery.py` |
+| Completed | `FR-DATA-033` | Compute ranges, gaps, overlaps, completeness, count, revision, and readiness from local manifests/indexes or one bounded provider retrieval, never hard-code certainty. Provider results describe only the observed probe window and record whether the probe limit was reached. | `inspect_availability(request: AvailabilityRequest) -> DataAvailability` | Read-only; optional External API call | `DataError[LIMIT_EXCEEDED|SOURCE_UNAVAILABLE|DATABASE_ERROR]` | **Usage:** `tests/data/usage/02_market_data.py::fr_data_033()`<br>**Unit:** `tests/data/unit/test_reference_access.py::test_provider_availability_uses_bounded_observed_probe()`, `test_availability_never_hardcodes_ready()`<br>**Evidence:** `app/services/data/market_data/symbol_discovery.py` |
+| Completed | `FR-DATA-034` | Return current configured hours and normalized UTC sessions, advance cross-midnight windows correctly, and reject historical reconstruction. | `get_current_schedule(request: ScheduleRequest, calendar: MarketCalendar) -> MarketSchedule` | Read-only provider call | `DataError[UNSUPPORTED_OPERATION|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/09_time_sessions.py::fr_data_034()`<br>**Unit:** `tests/data/unit/test_focused_boundaries.py` |
+| Completed | `FR-DATA-117` | Return provider- or venue-authoritative symbol trading windows as ordered timezone-aware UTC intervals without inferring a venue from ticker text. | `get_exchange_sessions(request: ExchangeSessionRequest) -> tuple[TradingSession, ...]`; broker-backed `get_trading_sessions(...)` | Read-only provider/calendar call | `DataError[LIMIT_EXCEEDED|SOURCE_UNAVAILABLE|INVALID_INPUT]` | **Usage:** `tests/data/usage/09_time_sessions.py::fr_data_117()`<br>**Unit:** `tests/data/unit/test_exchange_calendar.py`, `tests/brokers/unit/test_ctrader_sessions.py`<br>**Provider:** 2026-07-24 Spotware demo `EURUSD` session validation. |
+| Completed | `FR-DATA-118` | Derive `is_open`, `current_session`, and `next_session` deterministically from authoritative ordered windows at the checked UTC instant. | `get_market_hours(...) -> MarketHours` | Read-only provider call | `DataError[SOURCE_UNAVAILABLE|STALE_EVIDENCE|INVALID_INPUT]` | **Usage:** `tests/data/usage/09_time_sessions.py::fr_data_118()`<br>**Unit:** `tests/data/unit/test_market_hours.py` |
+| Completed | `FR-DATA-119` | Require an explicit registered exchange-calendar code for exchange-traded symbols and return bounded holiday-, break-, and shortened-session-aware UTC windows. | `get_exchange_sessions(request: ExchangeSessionRequest) -> tuple[TradingSession, ...]` | Read-only calendar call | `DataError[LIMIT_EXCEEDED|SOURCE_UNAVAILABLE]` | **Usage:** `tests/data/usage/09_time_sessions.py::fr_data_119()`<br>**Unit:** `tests/data/unit/test_exchange_calendar.py` |
+| Completed | `FR-DATA-120` | Expand an explicit timezone, effective range, revision, weekly interval map, and date holiday overrides for providers that expose no session API; never label configured evidence as provider evidence. | `WeeklyScheduleProvider`; `WeeklyScheduleDefinition`; `WeeklyHoliday` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/09_time_sessions.py::fr_data_120()`<br>**Unit:** `tests/data/unit/test_weekly_schedule.py` |
+| Completed | `FR-DATA-121` | Classify configurable named sessions in regional timezones with DST handling, including cross-midnight definitions. | `get_active_market_sessions(request: ActiveMarketSessionsRequest, *, definitions=...) -> ActiveMarketSessions` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/09_time_sessions.py::fr_data_121()`<br>**Unit:** `tests/data/unit/test_named_sessions.py` |
+| Completed | `FR-DATA-122` | Keep analytical named-session labels structurally separate from symbol tradability so labels never authorize or validate an order. | `ActiveMarketSessions`; `MarketHours` | None | Contract validation failure | **Usage:** `tests/data/usage/09_time_sessions.py::fr_data_122()`<br>**Unit:** `tests/data/unit/test_named_sessions.py`, `tests/data/unit/test_market_hours.py` |
+| Completed | `FR-DATA-035` | Return bounded source-native or derived volume as records, buckets, or summary with explicit volume kind/unit and provenance. | `fetch_historical_volume(request: VolumeRequest) -> VolumeResult` | Read-only; optional External API call/cache write | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/02_market_data.py::fr_data_035()`<br>**Unit:** `tests/data/unit/test_focused_boundaries.py`<br>**Evidence:** `app/services/data/market_data/symbol_discovery.py` |
 
 **Implementation notes:** Split and refactor V1 `gateway.get_data`; retain vectorized
 internal frame processing but return only typed contracts. Replace the misleading V1
@@ -1342,9 +1455,9 @@ complete.
 
 ### Feature usage examples
 
-The former broad retrieval/reference program was removed when `01_contracts.py`
-became the focused FEAT-DATA-01 evidence. Retrieval examples are pending the
-independently approved `market_data/` and related owning-feature slices.
+Current focused evidence is split across `02_market_data.py`,
+`03_local_datasets.py`, `04_synthetic_data.py`, `05_tick_derivation.py`,
+`09_time_sessions.py`, and `14_evidence.py`.
 
 ---
 
@@ -1367,21 +1480,9 @@ MarketDataset
   → MarketDataset with updated provenance/quality
 ```
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `transformation/resample.py` | Aggregate ordered canonical OHLCV to a supported higher timeframe and disclose the volume kind carried by the result. | `resample_dataset`, `resample_ohlcv`, `disclose_volume_kind` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `models`, `time/timezone.py` |
-| Completed | `transformation/tick_aggregation.py` | Aggregate sorted canonical ticks into OHLCV bars under an explicit spread policy, and enforce strict tick ordering. | `aggregate_ticks`, `aggregate_ticks_to_bars`, `enforce_tick_order` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `models`, `time/timezone.py`, `errors` |
-| Completed | `transformation/alignment.py` | Backward-align multiple datasets using only values available by each target timestamp. | `align_datasets`, `align_multitimeframe_data` | **Standard library:** `collections.abc`, `datetime`<br>**Required third-party:** None<br>**Local:** `models`, `time/timezone.py` |
-| Completed | `transformation/tabular.py` | Project canonical OHLCV/spread or tick evidence to public analytical DataFrames; align and serialize private DataFrames; compare bounded OHLC/OHLCV evidence. | `to_ohlcv_dataframe`, `to_tick_dataframe`; private tabular helpers | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** `numpy`, `pandas`<br>**Local:** `models` |
-| Completed | `quality/ohlcv_validator.py` | Inspect an already-normalized series for temporal anomalies and produce bounded scored quality evidence. Mutates nothing and decides no workflow outcome. Record-level invariants are **not** repeated here; `contracts/records.py` enforces them at construction. | `inspect_dataset_quality`, `inspect_records_quality`, `detect_timestamp_gaps`, `validate_tick_order` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `contracts`, `time/timezone.py` → expected frequency, `time/market_hours.py` → optional `MarketCalendar` |
-| Completed | `quality/adversarial.py` | Detect statistical anomalies no single record can reveal: price spikes, flat-line runs, zero-volume runs, extreme spread widening, and unexpected gaps. | `detect_price_jumps`, `detect_flatline_periods`, `detect_zero_volume_bars`, `detect_extreme_spread_widening`, `detect_unexpected_gaps` | **Standard library:** `collections.abc`, `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `models`, `time/gaps.py` |
-| Completed | `quality/flags.py` | Compile detected issues into the closed quality-flag enumeration over the six codes the detectors actually emit. | `QualityFlag`, `aggregate_flags` | **Standard library:** `enum`<br>**Required third-party:** None<br>**Local:** `models` |
-| Completed | `quality/asset_validator.py` | Verify symbol precision and lot/tick step consistency on a supplied `SymbolMetadata`. Symbol mapping stays in `sources/registry`, its existing owner. | `validate_symbol_metadata` | **Standard library:** `decimal`<br>**Required third-party:** None<br>**Local:** `models`, `errors` |
-| Completed | `quality/policy.py` | Own the frozen quality profiles and map each issue code to one deterministic remediation action. | `QualityPolicy`, `get_quality_policy`, `summarize_quality_remediation` | **Standard library:** `collections.abc`, `decimal`<br>**Required third-party:** None<br>**Local:** `models`, `limits` |
-| Retired | `labeling.py` | Not implemented: Research owns historical labeling. | — | — |
-| Missing | `__init__.py` (each folder) | Expose the supported typed processing and quality API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+See the authoritative current production-file inventory at the start of Section 4.
 
 ### Configuration and Limits Manifest
 
@@ -1394,7 +1495,7 @@ MarketDataset
 | Completed | `TICK_GENERATION_MODELS` | `tuple[str, ...]` | `("real", "trading_bar", "ohlc_m1", "generated")` | Yes | `generate_tick_series()` | Closed set derived from real evidence; an unrecognized model fails rather than falling back. |
 | Completed | `SPREAD_MODELS` | `tuple[str, ...]` | `("native_spread", "fixed_spread", "variable_spread")` | Yes | `generate_tick_series()` | `variable_spread` is the only stochastic option and requires an explicit seed. |
 | Completed | `GENERATED_TICKS_MIN_PER_BAR` | `int` | `4` | Yes | `generate_tick_series()` | Guarantees the four canonical waypoints exist when real `tick_volume` is lower. |
-| Completed | `TICK_SERIES_MAX_RECORDS` | `int` | None | Yes before public activation | `generate_tick_series()` | Deployment must supply a measured positive bound; oversized direct responses return `LIMIT_EXCEEDED`. Streaming to Parquet is the bounded alternative. |
+| Completed | `TICK_SERIES_MAX_RECORDS` | `int` | `250000` | Yes | `generate_tick_series()` | Domain ceiling enforced before returning a direct series. Callers may tighten but cannot loosen it; oversized responses return `LIMIT_EXCEEDED`. Streaming to Parquet is the bounded alternative. |
 | Completed | `TICK_PARQUET_MAX_OUTPUT_ROWS_PER_CHUNK` | `int` | `2000000` | Yes | `generate_tick_series_to_parquet()` | Output-aware chunking ceiling; input slices are sized from estimated output rows, not input rows. |
 | Completed | `QUALITY_PROFILE` | `str` | `standard` | Yes | `inspect_dataset_quality()` | Exactly `strict`, `standard`, or `lenient`. Selects one frozen `QualityPolicy` threshold set; individual thresholds are not separately tunable configuration. An unrecognized value fails rather than falling back. |
 | Completed | `QUALITY_PROFILE_THRESHOLDS` | `Mapping[str, QualityPolicy]` | Frozen built-in set | Yes | `inspect_dataset_quality()` | Immutable module-level mapping defining spike sigma, flat-line run length, zero-volume run length, spread ceiling, and gap tolerance per profile. Not environment-configurable. |
@@ -1418,13 +1519,13 @@ and availability evidence.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-080` | Align a private tabular market-data copy to an aware UTC datetime field/index without mutating caller input. | `align_dataframe_datetime` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_080_align_private_tabular_copy()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_align_dataframe_datetime_success()` |
-| Completed | `FR-DATA-081` | Convert bar rows or private DataFrames to deterministic JSON-safe records with canonical UTC timestamps. | `bars_to_records`, `serialize_dataframe_records` | None | `DataError[VALIDATION_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_081_json_safe_records()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_serialize_dataframe_rejects_unsafe_values()` |
-| Completed | `FR-DATA-082` | Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics. | `compare_dataframes` | None | `DataError[VALIDATION_FAILED\|LIMIT_EXCEEDED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_082_compare_dataframes()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_dataframes_mismatch()` |
-| Completed | `FR-DATA-083` | Compare OHLC or OHLCV columns only after schema and alignment validation. | `compare_ohlc`, `compare_ohlcv` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_083_compare_ohlcv()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_ohlcv_success()` |
-| Completed | `FR-DATA-084` | Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper. | `execute_backfill_chunk` | Persistence write | Existing job errors | **Usage:** `tests/data/usage/05_update_jobs.py::example_fr_data_084_private_chunking_boundary()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_backfill_key_is_canonical()` |
-| Completed | `FR-DATA-085` | Project one canonical bar `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly six float64 columns: finite `open`, `high`, `low`, `close`, and `volume`, plus provider-reported `spread`; preserve genuinely missing spread as `NaN`, expose the common supplied spread unit in `DataFrame.attrs["spread_unit"]` or `None` when absent, and fail on inconsistent supplied units or unsafe conversion. | `to_ohlcv_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/08_transformation.py`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_ohlcv_dataframe_returns_float64_analytical_copy()`, `::test_to_ohlcv_dataframe_preserves_missing_spread_as_nan()` |
-| Completed | `FR-DATA-086` | Project one canonical tick `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly four float64 columns: `bid`, `ask`, `last`, and `volume`; represent genuine missing optional values as `NaN`, expose common price/volume units in `DataFrame.attrs`, and fail on inconsistent units or unsafe float64 conversion. | `to_tick_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** See the owning numbered program in `tests/data/usage/`.<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_tick_dataframe_returns_float64_analytical_copy()` |
+| Completed | `FR-DATA-080` | Align a private tabular market-data copy to an aware UTC datetime field/index without mutating caller input. | `align_dataframe_datetime` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_080()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_align_dataframe_datetime_success()` |
+| Completed | `FR-DATA-081` | Convert bar rows or private DataFrames to deterministic JSON-safe records with canonical UTC timestamps. | `bars_to_records`, `serialize_dataframe_records` | None | `DataError[VALIDATION_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_081()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_serialize_dataframe_rejects_unsafe_values()` |
+| Completed | `FR-DATA-082` | Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics. | `compare_dataframes` | None | `DataError[VALIDATION_FAILED\|LIMIT_EXCEEDED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_082()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_dataframes_mismatch()` |
+| Completed | `FR-DATA-083` | Compare OHLC or OHLCV columns only after schema and alignment validation. | `compare_ohlc`, `compare_ohlcv` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_083()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_compare_ohlcv_success()` |
+| Completed | `FR-DATA-084` | Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper. | `execute_backfill_chunk` | Persistence write | Existing job errors | **Usage:** `tests/data/usage/13_data_jobs.py::fr_data_084()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_key_limits_and_result_mapping()` |
+| Completed | `FR-DATA-085` | Project one canonical bar `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly six float64 columns: finite `open`, `high`, `low`, `close`, and `volume`, plus provider-reported `spread`; preserve genuinely missing spread as `NaN`, expose the common supplied spread unit in `DataFrame.attrs["spread_unit"]` or `None` when absent, and fail on inconsistent supplied units or unsafe conversion. | `to_ohlcv_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_085()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_ohlcv_dataframe_returns_float64_analytical_copy()`, `::test_to_ohlcv_dataframe_preserves_missing_spread_as_nan()` |
+| Completed | `FR-DATA-086` | Project one canonical tick `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly four float64 columns: `bid`, `ask`, `last`, and `volume`; represent genuine missing optional values as `NaN`, expose common price/volume units in `DataFrame.attrs`, and fail on inconsistent units or unsafe float64 conversion. | `to_tick_dataframe(dataset: MarketDataset) -> pandas.DataFrame` | None | `DataError[VALIDATION_FAILED\|DATA_QUALITY_FAILED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_086()`<br>**Unit:** `tests/data/unit/test_tabular.py::test_to_tick_dataframe_returns_float64_analytical_copy()` |
 
 #### Series-level quality inspection
 
@@ -1457,10 +1558,10 @@ session-agnostic and reports gaps solely against timeframe frequency.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-091` | Detect missing bars against expected timeframe frequency, discounting exact weekend closures and supplied `SessionWindow` closures. Emit critical `MISSING_BARS` only for unexplained gaps beyond tolerance, with affected count and bounded samples; add `calendar_unverified` when no sessions were supplied. | `inspect_dataset_quality(dataset: MarketDataset, *, policy: QualityPolicy \| None = None, sessions: Sequence[SessionWindow] \| None = None, generated_at: datetime) -> DataQualityReport` | None | `DataError[VALIDATION_FAILED\|UNSUPPORTED_TIMEFRAME]`: malformed policy or unsupported timeframe | **Usage:** `tests/data/usage/07_quality.py`<br>**Unit:** `tests/data/unit/test_quality.py::test_weekend_closure_is_not_reported_as_missing()`, `test_declared_session_break_is_not_reported_as_missing()` |
-| Completed | `FR-DATA-092` | Detect price spikes beyond the profile sigma bound, flat-line runs, zero-volume runs, duplicate OHLCV bar timestamps, and comparable price-unit spread-threshold breaches. Tick timestamps may repeat; provider-point spreads are disclosed as `spread_unit_unverified` instead of being compared to a price-unit ceiling. Each issue carries bounded evidence. | `inspect_dataset_quality` | None | `DataError[VALIDATION_FAILED]`: malformed policy | **Usage:** `tests/data/usage/07_quality.py`<br>**Unit:** `tests/data/unit/test_quality.py::test_duplicate_tick_timestamps_are_not_duplicate_bars()`, `test_incomparable_spread_units_are_not_threshold_breaches()` |
-| Completed | `FR-DATA-093` | Compute `quality_score` as `1 − Σ(severity_weight × affected_count / checked_count)` clamped to `[0, 1]` in `Decimal`, and derive `quality_status`: `failed` when any `QUALITY_BLOCKING_ISSUES` code is present (or, under `strict`, when the score is below `QUALITY_MIN_SCORE`), otherwise `passed_with_warnings` when any issue or warning exists, otherwise `passed`. A constant or unexamined score is never emitted. | `inspect_dataset_quality` | None | `DataError[VALIDATION_FAILED]`: non-finite or out-of-range computed score | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_093_quality_score()`<br>**Unit:** `tests/data/unit/test_quality.py::test_score_reflects_issue_severity()`, `test_clean_series_scores_one()`, `test_score_is_never_constant_across_differing_inputs()` |
-| Completed | `FR-DATA-094` | Map each detected issue code to one deterministic recommended remediation action without mutating the dataset or performing the remediation. | `summarize_quality_remediation(report: DataQualityReport) -> Mapping[str, str]` | None | `DataError[VALIDATION_FAILED]`: unknown issue code | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_094_remediation()`<br>**Unit:** `tests/data/unit/test_quality.py::test_remediation_is_deterministic()`, `test_remediation_does_not_mutate_report()` |
+| Completed | `FR-DATA-091` | Detect missing bars against expected timeframe frequency, discounting exact weekend closures and supplied `SessionWindow` closures. Emit critical `MISSING_BARS` only for unexplained gaps beyond tolerance, with affected count and bounded samples; add `calendar_unverified` when no sessions were supplied. | `inspect_dataset_quality(dataset: MarketDataset, *, policy: QualityPolicy \| None = None, sessions: Sequence[SessionWindow] \| None = None, generated_at: datetime) -> DataQualityReport` | None | `DataError[VALIDATION_FAILED\|UNSUPPORTED_TIMEFRAME]`: malformed policy or unsupported timeframe | **Usage:** `tests/data/usage/07_quality.py::fr_data_091()`<br>**Unit:** `tests/data/unit/test_quality.py::test_gap_detection_discounts_weekend_closure()`, `test_declared_session_break_is_not_reported_as_missing()` |
+| Completed | `FR-DATA-092` | Detect price spikes beyond the profile sigma bound, flat-line runs, zero-volume runs, duplicate OHLCV bar timestamps, and comparable price-unit spread-threshold breaches. Tick timestamps may repeat; provider-point spreads are disclosed as `spread_unit_unverified` instead of being compared to a price-unit ceiling. Each issue carries bounded evidence. | `inspect_dataset_quality` | None | `DataError[VALIDATION_FAILED]`: malformed policy | **Usage:** `tests/data/usage/07_quality.py::fr_data_092()`<br>**Unit:** `tests/data/unit/test_quality.py::test_duplicate_tick_timestamps_are_not_duplicate_bars()`, `test_incomparable_spread_units_are_not_threshold_breaches()` |
+| Completed | `FR-DATA-093` | Compute `quality_score` as `1 − Σ(severity_weight × affected_count / checked_count)` clamped to `[0, 1]` in `Decimal`, and derive `quality_status`: `failed` when any `QUALITY_BLOCKING_ISSUES` code is present (or, under `strict`, when the score is below `QUALITY_MIN_SCORE`), otherwise `passed_with_warnings` when any issue or warning exists, otherwise `passed`. A constant or unexamined score is never emitted. | `inspect_dataset_quality` | None | `DataError[VALIDATION_FAILED]`: non-finite or out-of-range computed score | **Usage:** `tests/data/usage/07_quality.py::fr_data_093()`<br>**Unit:** `tests/data/unit/test_quality.py::test_score_reflects_issue_severity()`, `test_clean_series_scores_one()`, `test_score_is_never_constant_across_differing_inputs()` |
+| Completed | `FR-DATA-094` | Map each detected issue code to one deterministic recommended remediation action without mutating the dataset or performing the remediation. | `summarize_quality_remediation(report: DataQualityReport) -> Mapping[str, str]` | None | `DataError[VALIDATION_FAILED]`: unknown issue code | **Usage:** `tests/data/usage/07_quality.py::fr_data_094()`<br>**Unit:** `tests/data/unit/test_quality.py::test_remediation_is_deterministic()`, `test_remediation_does_not_mutate_report()` |
 
 **Quality evidence propagation.** Only `retrieval/sources.py` computes a fresh report,
 at `WF-DATA-001` step 4. The `transformation/` modules and `retrieval/synthetic.py`
@@ -1473,10 +1574,10 @@ needs post-transform evidence calls `inspect_dataset_quality` explicitly.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-036` | Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`. | `resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDataset` | None | `DataError[UNSUPPORTED_TIMEFRAME|VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_036_resample_ohlcv()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_resample_dataset_is_deterministic()` |
-| Completed | `FR-DATA-037` | Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead. | `align_datasets(datasets: Mapping[str, MarketDataset], target: Sequence[datetime]) -> Mapping[str, MarketDataset]` | None | `DataError[VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_037_no_lookahead_alignment()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_align_datasets_prevents_lookahead()` |
-| Completed | `FR-DATA-038` | Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy, preserving the closing tick's genuine bid/ask spread when both sides exist and rejecting disorder or ambiguous units. | `aggregate_ticks(dataset: MarketDataset, timeframe: str, spread_policy: str) -> MarketDataset` | None | `DataError[VALIDATION_FAILED|UNSUPPORTED_TIMEFRAME]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_038_ticks_to_bars()`<br>**Unit:** `tests/data/unit/test_transforms.py::test_aggregate_ticks_preserves_closing_quote_spread()` |
-| Completed | `FR-DATA-039` | Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter. | `generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset` | None | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/03_processing.py::example_fr_data_039_synthetic_bars()`<br>**Unit:** `tests/data/unit/test_synthetic.py::test_synthetic_dataset_replays_from_seed()` |
+| Completed | `FR-DATA-036` | Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`. | `resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDataset` | None | `DataError[UNSUPPORTED_TIMEFRAME|VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_036()`<br>**Unit:** `tests/data/unit/test_transformation.py` |
+| Completed | `FR-DATA-037` | Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead. | `align_datasets(datasets: Mapping[str, MarketDataset], target: Sequence[datetime]) -> Mapping[str, MarketDataset]` | None | `DataError[VALIDATION_FAILED|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_037()`<br>**Unit:** `tests/data/unit/test_transformation.py` |
+| Completed | `FR-DATA-038` | Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy, preserving the closing tick's genuine bid/ask spread when both sides exist and rejecting disorder or ambiguous units. | `aggregate_ticks(dataset: MarketDataset, timeframe: str, spread_policy: str) -> MarketDataset` | None | `DataError[VALIDATION_FAILED|UNSUPPORTED_TIMEFRAME]` | **Usage:** `tests/data/usage/08_transformation.py::fr_data_038()`<br>**Unit:** `tests/data/unit/test_transformation.py` |
+| Completed | `FR-DATA-039` | Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter. | `generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset` | None | `DataError[INVALID_INPUT|LIMIT_EXCEEDED|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/04_synthetic_data.py::fr_data_039()`<br>**Unit:** `tests/data/unit/test_synthetic.py::test_synthetic_dataset_replays_from_seed()` |
 | Retired | `FR-DATA-040` | Research owns historical labeling; no Data implementation. | — | — | — | — |
 
 #### Tick-series generation from real market evidence
@@ -1533,10 +1634,10 @@ Simulation-owned follow-up, not a second generation implementation.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-087` | Derive a canonical tick `MarketDataset` from real bar or tick evidence using exactly one approved model, preserving real prices and real tick counts, ordering ticks strictly by UTC timestamp then intra-bar index, and quantizing every price to `Decimal` at the contract boundary. Exact fixed-point arrays may be used internally; no array value crosses the canonical boundary. | `generate_tick_series(dataset: MarketDataset, *, model: str, trading_timeframe: str, m1_dataset: MarketDataset \| None = None, real_tick_dataset: MarketDataset \| None = None, spread_model: str, point_value: Decimal, fixed_spread_points: Decimal \| None = None, min_spread_points: Decimal \| None = None, max_spread_points: Decimal \| None = None, seed: int \| None = None, request_id: str \| None = None) -> MarketDataset` | None | `DataError[INVALID_INPUT\|UNSUPPORTED_TIMEFRAME\|VALIDATION_FAILED\|LIMIT_EXCEEDED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/05_tick_derivation.py`<br>**Unit:** `tests/data/unit/test_ticks.py::test_compiled_generated_path_matches_decimal_fallback_exactly()` |
-| Completed | `FR-DATA-088` | Apply exactly one approved spread model to every generated tick: `native_spread` uses the provider-reported spread, `fixed_spread` applies one configured point value, and `variable_spread` draws bounded points from a seeded generator. A `variable_spread` request without a seed fails; identical seed and inputs reproduce identical spreads. | `apply_spread_model` (private helper surfaced through `generate_tick_series`) | None | `DataError[INVALID_INPUT\|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/05_tick_derivation.py`<br>**Unit:** `tests/data/unit/test_ticks.py::test_variable_spread_requires_seed_and_replays()` |
-| Completed | `FR-DATA-089` | Attach deterministic intra-bar position evidence to every generated tick: `source_bar_time`, `tick_index_in_bar`, and a phase bitmask marking the bar open, high, low, and close observations. The bitmask carries no trading meaning and never encodes an order, signal, or decision. | Intra-bar metadata fields on the returned `MarketDataset` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/05_tick_derivation.py`<br>**Unit:** `tests/data/unit/test_ticks.py::test_phase_bitmask_marks_open_high_low_close()` |
-| Completed | `FR-DATA-090` | Stream a generated tick series to a bounded Parquet artifact under an approved root with output-aware chunking, returning path, row count, and column names without holding the full series in memory. Eligible fixed-point chunks bypass canonical in-memory record materialization. | `generate_tick_series_to_parquet(dataset: MarketDataset, *, path: Path, max_output_rows_per_chunk: int, **generation_arguments: object) -> Mapping[str, object]` | Persistence write | `DataError[INVALID_INPUT\|LIMIT_EXCEEDED\|STORAGE_FAILED]` | **Usage:** `tests/data/usage/05_tick_derivation.py`<br>**Unit:** `tests/data/unit/test_ticks.py::test_parquet_uses_bounded_compiled_columns_without_materializing_dataset()` |
+| Completed | `FR-DATA-087` | Derive a canonical tick `MarketDataset` from real bar or tick evidence using exactly one approved model, preserving real prices and real tick counts, ordering ticks strictly by UTC timestamp then intra-bar index, and quantizing every price to `Decimal` at the contract boundary. Exact fixed-point arrays may be used internally; no array value crosses the canonical boundary. | `generate_tick_series(dataset: MarketDataset, *, model: str, trading_timeframe: str, m1_dataset: MarketDataset \| None = None, real_tick_dataset: MarketDataset \| None = None, spread_model: str, point_value: Decimal, fixed_spread_points: Decimal \| None = None, min_spread_points: Decimal \| None = None, max_spread_points: Decimal \| None = None, seed: int \| None = None, request_id: str \| None = None) -> MarketDataset` | None | `DataError[INVALID_INPUT\|UNSUPPORTED_TIMEFRAME\|VALIDATION_FAILED\|LIMIT_EXCEEDED\|PRECISION_MISMATCH]` | **Usage:** `tests/data/usage/05_tick_derivation.py::fr_data_087()`<br>**Unit:** `tests/data/unit/test_ticks.py::test_compiled_generated_path_matches_decimal_fallback_exactly()` |
+| Completed | `FR-DATA-088` | Apply exactly one approved spread model to every generated tick: `native_spread` uses the provider-reported spread, `fixed_spread` applies one configured point value, and `variable_spread` draws bounded points from a seeded generator. A `variable_spread` request without a seed fails; identical seed and inputs reproduce identical spreads. | `apply_spread_model` (private helper surfaced through `generate_tick_series`) | None | `DataError[INVALID_INPUT\|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/05_tick_derivation.py::fr_data_088()`<br>**Unit:** `tests/data/unit/test_ticks.py::test_variable_spread_requires_seed_and_replays()` |
+| Completed | `FR-DATA-089` | Attach deterministic intra-bar position evidence to every generated tick: `source_bar_time`, `tick_index_in_bar`, and a phase bitmask marking the bar open, high, low, and close observations. The bitmask carries no trading meaning and never encodes an order, signal, or decision. | Intra-bar metadata fields on the returned `MarketDataset` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/05_tick_derivation.py::fr_data_089()`<br>**Unit:** `tests/data/unit/test_ticks.py::test_phase_bitmask_marks_open_high_low_close()` |
+| Completed | `FR-DATA-090` | Stream a generated tick series to a bounded Parquet artifact under an approved root with output-aware chunking, returning path, row count, and column names without holding the full series in memory. Eligible fixed-point chunks bypass canonical in-memory record materialization. | `generate_tick_series_to_parquet(dataset: MarketDataset, *, path: Path, max_output_rows_per_chunk: int, **generation_arguments: object) -> Mapping[str, object]` | Persistence write | `DataError[INVALID_INPUT\|LIMIT_EXCEEDED\|PERMISSION_DENIED\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/05_tick_derivation.py::fr_data_090()`<br>**Unit:** `tests/data/unit/test_ticks.py::test_parquet_uses_bounded_compiled_columns_without_materializing_dataset()` |
 
 **Rules:**
 
@@ -1560,7 +1661,7 @@ streaming with elapsed time and ticks-per-second evidence.
 
 ---
 
-### 4.6 `scheduler/` — Update Jobs and Historical Backfills
+### 4.6 `data_jobs/` — Update Jobs and Historical Backfills
 
 **Purpose:** Execute real bounded ingestion work with deterministic identity, one
 active lease, atomic checkpoints, and crash recovery.
@@ -1574,14 +1675,9 @@ job definition
   → checkpoint and status
 ```
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `job.py` | Coordinate persisted create/start/stop/run-once/status lifecycle. | `schedule_update_job`, `read_update_job_status`, `run_data_update_job_once` | **Standard library:** `asyncio`, `datetime`, `hashlib`, `json`<br>**Required third-party:** None<br>**Local:** `backfill.py`, `models`, `persistence`, `sources`, `limits`, `app.utils` |
-| Completed | `backfill.py` | Derive chunk identity, execute one bounded chunk, and publish it atomically with its checkpoint. | `derive_backfill_key`, `execute_backfill_chunk`, `get_last_checkpoint` | **Standard library:** `collections.abc`, `datetime`, `hashlib`, `os`, `pathlib`<br>**Required third-party:** None<br>**Local:** `retrieval`, `models`, `persistence`, `quality`, `limits`, `app.utils` |
-| Completed | `recovery.py` | Validate interrupted leases and checkpoints at an explicit startup call and resume only after the last committed chunk. Never runs at import time. | `recover_update_jobs`, `recover_data_jobs_on_startup` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `backfill.py`, `models`, `persistence`, `app.utils` |
-| Missing | `__init__.py` | Expose only the typed job runtime API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+See the authoritative current production-file inventory at the start of Section 4.
 
 ### Configuration and Limits Manifest
 
@@ -1598,11 +1694,11 @@ job definition
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-041` | Derive the stable SHA-256 idempotency key from source, symbol, kind, timeframe, start/end, schema version, and normalization version. | `derive_backfill_key(request: BackfillChunkRequest) -> str` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/05_update_jobs.py::example_fr_data_041_backfill_key()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_backfill_key_is_canonical()` |
-| Completed | `FR-DATA-042` | Execute retrieval, normalization, quality, persistence, and checkpoint for one bounded chunk as one recoverable unit, deduplicating a committed key. | `execute_backfill_chunk(request: BackfillChunkRequest) -> BackfillChunkResult` | External API call; persistence write | `DataError[CONCURRENT_WRITE_LOCKED|DATA_QUALITY_FAILED|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/05_update_jobs.py::example_fr_data_042_execute_chunk()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_chunk_commit_and_checkpoint_are_atomic()` |
-| Completed | `FR-DATA-043` | Validate interrupted job leases/checkpoints at startup and resume only after the last committed chunk without publishing partial work. | `recover_update_jobs(request_id: str | None = None) -> RecoveryReport` | Persistence write | `DataError[CHECKPOINT_CORRUPTED|STATE_RECOVERY_FAILED]` | **Usage:** `tests/data/usage/05_update_jobs.py::example_fr_data_043_recovery()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_recovery_resumes_after_committed_chunk()` |
-| Completed | `FR-DATA-044` | Start or stop a persisted job only after state-transition, lease, source-policy, and schedule validation; recurring execution uses the single-node in-process asyncio loop, while `run_data_update_job_once` remains independently invokable by an OS scheduler. | `schedule_update_job(request: ScheduleJobRequest) -> JobStatus` | Local state mutation; persistence write | `DataError[JOB_NOT_FOUND|SCHEDULER_ERROR|POLICY_BLOCKED]` | **Usage:** `tests/data/usage/05_update_jobs.py::example_fr_data_044_start_stop_worker()`<br>**Unit:** `tests/data/unit/test_scheduler.py::test_scheduler_cannot_report_false_success()` |
-| Completed | `FR-DATA-045` | Return persisted job definition/state, enabled flag, run/checkpoint/error/next-run evidence, lease and recovery state, and request ID without mutation. | `read_update_job_status(request: JobStatusRequest) -> JobStatus` | Read-only | `DataError[JOB_NOT_FOUND|DATABASE_ERROR]` | **Usage:** `tests/data/usage/05_update_jobs.py::example_fr_data_045_status_query()`<br>**Unit:** `tests/data/unit/test_scheduler.py::test_job_status_reflects_committed_work()` |
+| Completed | `FR-DATA-041` | Derive the stable SHA-256 idempotency key from source, symbol, kind, timeframe, start/end, schema version, and normalization version. | `derive_backfill_key(request: BackfillChunkRequest) -> str` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/13_data_jobs.py::fr_data_041()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_key_limits_and_result_mapping()` |
+| Completed | `FR-DATA-042` | Execute retrieval, normalization, quality, persistence, and checkpoint for one bounded chunk as one recoverable unit, deduplicating a committed key. | `execute_backfill_chunk(request: BackfillChunkRequest) -> BackfillChunkResult` | External API call; persistence write | `DataError[CONCURRENT_WRITE_LOCKED|DATA_QUALITY_FAILED|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/13_data_jobs.py::fr_data_042()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_prepare_finalize_and_execute_protocol()` |
+| Completed | `FR-DATA-043` | Validate interrupted job leases/checkpoints at startup and resume only after the last committed chunk without publishing partial work. | `recover_update_jobs(request_id: str | None = None) -> RecoveryReport` | Persistence write | `DataError[CHECKPOINT_CORRUPTED|STATE_RECOVERY_FAILED]` | **Usage:** `tests/data/usage/13_data_jobs.py::fr_data_043()`<br>**Unit:** `tests/data/unit/test_backfill.py::test_recovery_classifies_recovered_and_blocked()` |
+| Completed | `FR-DATA-044` | Start or stop a persisted job only after state-transition, lease, source-policy, and schedule validation; recurring execution uses the single-node in-process asyncio loop, while `run_data_update_job_once` remains independently invokable by an OS scheduler. | `schedule_update_job(request: ScheduleJobRequest) -> JobStatus` | Local state mutation; persistence write | `DataError[JOB_NOT_FOUND|SCHEDULER_ERROR|POLICY_BLOCKED]` | **Usage:** `tests/data/usage/13_data_jobs.py::fr_data_044()`<br>**Unit:** `tests/data/unit/test_scheduler.py::test_run_once_success_and_failure()` |
+| Completed | `FR-DATA-045` | Return persisted job definition/state, enabled flag, run/checkpoint/error/next-run evidence, lease and recovery state, and request ID without mutation. | `read_update_job_status(request: JobStatusRequest) -> JobStatus` | Read-only | `DataError[JOB_NOT_FOUND|DATABASE_ERROR]` | **Usage:** `tests/data/usage/13_data_jobs.py::fr_data_045()`<br>**Unit:** `tests/data/unit/test_scheduler.py::test_read_status_maps_persisted_evidence()` |
 
 **Implementation notes:** Retain V1 job-definition/status persistence concepts but
 replace the status-only execution loop. Never mark a run successful merely because a
@@ -1610,12 +1706,12 @@ timer completed. `run_data_update_job_once` remains independently invokable by a
 
 ### Feature usage examples
 
-`tests/data/usage/05_update_jobs.py` contains one example for each `FR-DATA-041`
+`tests/data/usage/13_data_jobs.py` contains one demonstration for each `FR-DATA-041`
 through `FR-DATA-045`.
 
 ---
 
-### 4.7 `feeds/` — Internal Real-Time Feed Lifecycle
+### 4.7 `realtime_feeds/` — Internal Real-Time Feed Lifecycle
 
 **Purpose:** Normalize internal live events through bounded buffers and expose honest
 heartbeat, overflow, gap, reconnect, and breaker status without public streaming.
@@ -1629,15 +1725,9 @@ staging/production source event
   → internal consumer and read-only status
 ```
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `status.py` | Register a feed on startup and derive persisted/in-memory feed evidence without mutation. | `register_feed`, `start_internal_feed`, `read_feed_status`, `get_feed_status` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `models`, `persistence`, `limits`, `app.utils` |
-| Completed | `buffer.py` | Normalize and buffer each event under a bounded capacity and an explicit overflow policy; expose depth and drop counters. | `push_event`, `ingest_feed_event`, `get_buffer_depth`, `get_dropped_event_count` | **Standard library:** `collections`, `datetime`, `hashlib`<br>**Required third-party:** None<br>**Local:** `models`, `persistence`, `heartbeat.py`, `time/gaps.py`, `limits`, `app.utils` |
-| Completed | `reconnection.py` | Compute bounded exponential backoff with jitter and own the restart-survivable circuit breaker state. | `apply_backoff`, `reconnect_feed`, `circuit_breaker_state`, `reset_circuit_breaker` | **Standard library:** `datetime`, `random`<br>**Required third-party:** None<br>**Local:** `models`, `persistence`, `errors`, `app.utils` |
-| Completed | `heartbeat.py` | Touch the heartbeat timestamp on each received message and evaluate timeout against the configured deadline. | `update_heartbeat`, `check_timeout` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `models`, `persistence`, `errors` |
-| Missing | `__init__.py` | Expose only the internal lifecycle/status API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+See the authoritative current production-file inventory at the start of Section 4.
 
 ### Configuration and Limits Manifest
 
@@ -1652,9 +1742,9 @@ staging/production source event
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-046` | Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle. | `start_internal_feed(config: FeedConfig) -> FeedStatus` | Local state mutation; persistence write; External API call | `DataError[SOURCE_UNAVAILABLE|POLICY_BLOCKED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/06_realtime_feeds.py::example_fr_data_046_start_internal_feed()`<br>**Unit:** `tests/data/unit/test_feed_runtime.py::test_start_feed_requires_declared_capability()` |
-| Completed | `FR-DATA-047` | Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair. | `ingest_feed_event(feed_id: str, event: RawFeedEvent) -> FeedEventResult` | Local state mutation; persistence write | `DataError[BUFFER_OVERFLOW|DATA_DROPPED|FEED_HEARTBEAT_TIMEOUT]` | **Usage:** `tests/data/usage/06_realtime_feeds.py::example_fr_data_047_ingest_event()`<br>**Unit:** `tests/data/unit/test_feed_runtime.py::test_overflow_records_gap_without_backfill()` |
-| Completed | `FR-DATA-048` | Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state. | `read_feed_status(request: FeedStatusRequest) -> FeedStatus` | Read-only | `DataError[DATA_NOT_FOUND|DATABASE_ERROR]` | **Usage:** `tests/data/usage/06_realtime_feeds.py::example_fr_data_048_read_status()`<br>**Unit:** `tests/data/unit/test_feed_status.py::test_status_is_backed_by_real_runtime_state()` |
+| Completed | `FR-DATA-046` | Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle. | `start_internal_feed(config: FeedConfig) -> FeedStatus` | Local state mutation; persistence write; External API call | `DataError[SOURCE_UNAVAILABLE|POLICY_BLOCKED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/12_realtime_feeds.py::fr_data_046()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
+| Completed | `FR-DATA-047` | Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair. | `ingest_feed_event(feed_id: str, event: RawFeedEvent) -> FeedEventResult` | Local state mutation; persistence write | `DataError[BUFFER_OVERFLOW|DATA_DROPPED|FEED_HEARTBEAT_TIMEOUT]` | **Usage:** `tests/data/usage/12_realtime_feeds.py::fr_data_047()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
+| Completed | `FR-DATA-048` | Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state. | `read_feed_status(request: FeedStatusRequest) -> FeedStatus` | Read-only | `DataError[DATA_NOT_FOUND|DATABASE_ERROR]` | **Usage:** `tests/data/usage/12_realtime_feeds.py::fr_data_048()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
 
 **Implementation notes:** Replace V1 mock registration/counters. Do not add a
 composite health score or public subscription surface. Minimum source/consumer and numeric
@@ -1662,12 +1752,12 @@ buffer, heartbeat, and reconnect values are informational baselines until measur
 
 ### Feature usage examples
 
-`tests/data/usage/06_realtime_feeds.py` contains one example for each `FR-DATA-046`
+`tests/data/usage/12_realtime_feeds.py` contains one demonstration for each `FR-DATA-046`
 through `FR-DATA-048`.
 
 ---
 
-### 4.8 `retrieval/calendar.py` — Multi-Site Economic Calendar Scraping
+### 4.8 `economic_calendar/` — Multi-Site Economic Calendar Scraping
 
 **Purpose:** Scrape economic calendar events from multiple financial portals concurrently, clean and validate the results, and persist them with metadata.
 
@@ -1675,25 +1765,23 @@ Calendar scraping is a retrieval capability: it acquires a different data kind f
 different transport, but it is still acquisition. It is not a source adapter and is
 not registered in `sources/`.
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `retrieval/calendar.py` | Coordinate multi-site concurrent scrapers using asyncio. | `scrape_economic_calendar`, `ScrapeOptions`, `ScrapeResult` | **Standard library:** `asyncio`, `datetime`, `pickle`<br>**Required third-party:** `pandas`, `pydantic`<br>**Local:** `models`, `limits`, `app.utils` |
+See the authoritative current production-file inventory at the start of Section 4.
 
 #### Public calendar scraper API
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-095` | Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`. | `scrape_economic_calendar(options: ScrapeOptions) -> ScrapeResult` | External network calls | `DataError[NETWORK_ERROR\|TIMEOUT]` | **Usage:** `tests/data/usage/07_calendar.py::example_fr_data_095_scrape_calendar()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_concurrency_limit_is_respected()` |
-| Completed | `FR-DATA-096` | Clean and validate raw calendar data into structured records (representing title, country, impact, actual, forecast, previous, and timestamp), filtering duplicates and bad values. | `scrape_economic_calendar` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/07_calendar.py::example_fr_data_096_data_cleaning()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_invalid_records_are_filtered()` |
-| Completed | `FR-DATA-097` | Return scraped datasets as a pandas DataFrame via a clean encapsulation `ScrapeResult`. | `ScrapeResult.to_dataframe() -> DataFrame` | None | None | **Usage:** `tests/data/usage/07_calendar.py::example_fr_data_097_dataframe_output()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_to_dataframe_returns_valid_structure()` |
-| Completed | `FR-DATA-098` | Automatically save non-empty calendar dataframes using descriptive file names that include the site name, date range, and scrape timestamp; empty dataframes are skipped. | `ScrapeResult.save(directory: Path, format: str) -> None` | Local file write | `DataError[STORAGE_FAILED]` | **Usage:** `tests/data/usage/07_calendar.py::example_fr_data_098_saving_with_metadata()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_save_skips_empty_dataframes()` |
-| Completed | `FR-DATA-099` | Support serialization and deserialization of `ScrapeResult` using python's `pickle` module for easy persistence and transport. | `ScrapeResult.serialize() -> bytes` | None | None | **Usage:** `tests/data/usage/07_calendar.py::example_fr_data_099_serialization()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_pickle_roundtrip()` |
+| Completed | `FR-DATA-095` | Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`. | `scrape_economic_calendar(options: ScrapeOptions) -> ScrapeResult` | External network calls | `DataError[NETWORK_ERROR\|TIMEOUT]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_095()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_concurrency_limit_is_respected()` |
+| Completed | `FR-DATA-096` | Clean and validate raw calendar data into structured records (representing title, country, impact, actual, forecast, previous, and timestamp), filtering duplicates and bad values. | `scrape_economic_calendar` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_096()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_invalid_records_are_filtered()` |
+| Completed | `FR-DATA-097` | Return scraped datasets as a pandas DataFrame via a clean encapsulation `ScrapeResult`. | `ScrapeResult.to_dataframe() -> DataFrame` | None | None | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_097()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_to_dataframe_returns_valid_structure()` |
+| Completed | `FR-DATA-098` | Automatically save non-empty calendar dataframes using descriptive file names that include the site name, date range, and scrape timestamp; empty dataframes are skipped. | `ScrapeResult.save(directory: Path, format: str) -> None` | Local file write | `DataError[INVALID_INPUT\|PERMISSION_DENIED\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_098()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_save_skips_empty_dataframes()` |
+| Completed | `FR-DATA-099` | Support serialization and deserialization of `ScrapeResult` using python's `pickle` module for easy persistence and transport. | `ScrapeResult.serialize() -> bytes` | None | None | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_099()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_pickle_roundtrip()` |
 
 ---
 
-### 4.9 `security/` — Fail-Closed Access Governance
+### 4.9 `sources/` — Fail-Closed Read-Only Access Governance
 
 **Purpose:** Enforce, at runtime, the access rules the rest of the domain
 depends on: a licence-restricted source is never read or exported, and a broker client
@@ -1704,25 +1792,20 @@ Phase 9 because `app.utils.security` and `app.utils.settings` already own redact
 credential resolution. This preserves `NFR-DATA-005` without creating a duplicate
 implementation in Data. `FR-DATA-111` and `FR-DATA-112` were withdrawn accordingly.
 
-### Files
+### Current inventory reference
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Withdrawn | `credentials.py` | Withdrawn — `app.utils` owns credential loading and redaction. | — | — |
-| Completed | `licensing.py` | Block retrieval, storage, or export when the source licence disallows it for the declared workflow, and return the attribution text a publication requires. | `enforce_license`, `get_attribution_text` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models`, `errors`, `app.utils` |
-| Completed | `broker_contract.py` | Permit only permitted read methods; reject mutations. Wrap a caller-owned client in a proxy that enforces the contract at call time, not by convention. | `verify_read_only_call`, `wrap_broker_client`, `ReadOnlyBrokerProxy` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `errors`; Brokers types are type-check-only |
-| Completed | `__init__.py` | Expose only the typed security API. | Public exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
+See the authoritative current production-file inventory at the start of Section 4.
 
-#### Public security API
+#### Public source-safety API
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Withdrawn | `FR-DATA-111` | Withdrawn — credential resolution is owned by Utils settings layer (`NFR-DATA-005`). | — | — | — | — |
 | Withdrawn | `FR-DATA-112` | Withdrawn — redaction is owned by `app.utils.security`. | — | — | — | — |
-| Completed | `FR-DATA-113` | Block a retrieval, storage, or export workflow when the source `SourceLicensePolicy` does not permit it, failing closed when licence metadata is absent. | `enforce_license(descriptor: SourceDescriptor, workflow_context: str, request_id: str \| None = None)` | Read-only | `DataError[LICENSE_RESTRICTION]` | **Usage:** `tests/data/usage/10_security.py`<br>**Unit:** `tests/data/unit/test_licensing.py` |
-| Completed | `FR-DATA-114` | Return the attribution text a source requires for publication, and fail rather than return an empty string when attribution is required but undeclared. | `get_attribution_text(descriptor: SourceDescriptor, request_id: str \| None = None) -> str` | Read-only | `DataError[LICENSE_RESTRICTION]` | **Usage:** `tests/data/usage/10_security.py`<br>**Unit:** `tests/data/unit/test_licensing.py` |
-| Completed | `FR-DATA-115` | Allow only the declared read method names and reject every mutation name deterministically, independent of the adapter's actual surface. | `verify_read_only_call(method_name: str) -> bool` | None | `DataError[PERMISSION_DENIED]` | **Usage:** `tests/data/usage/10_security.py`<br>**Unit:** `tests/data/unit/test_broker_contract.py` |
-| Completed | `FR-DATA-116` | Wrap a caller-owned broker client in a proxy that enforces the read-only contract on every attribute access at runtime, so a mutation call fails even when the underlying client exposes it. | `wrap_broker_client(client: object) -> ReadOnlyBrokerProxy` | None | `DataError[PERMISSION_DENIED]` | **Usage:** `tests/data/usage/10_security.py`<br>**Unit:** `tests/data/unit/test_broker_contract.py` |
+| Completed | `FR-DATA-113` | Block a retrieval, storage, or export workflow when the source `SourceLicensePolicy` does not permit it, failing closed when licence metadata is absent. | `enforce_license(descriptor: SourceDescriptor, workflow_context: str, request_id: str \| None = None)` | Read-only | `DataError[LICENSE_RESTRICTION]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_113()`<br>**Unit:** `tests/data/unit/test_licensing.py` |
+| Completed | `FR-DATA-114` | Return the attribution text a source requires for publication, and fail rather than return an empty string when attribution is required but undeclared. | `get_attribution_text(descriptor: SourceDescriptor, request_id: str \| None = None) -> str` | Read-only | `DataError[LICENSE_RESTRICTION]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_114()`<br>**Unit:** `tests/data/unit/test_licensing.py` |
+| Completed | `FR-DATA-115` | Allow only the declared read method names and reject every mutation name deterministically, independent of the adapter's actual surface. | `verify_read_only_call(method_name: str) -> bool` | None | `DataError[PERMISSION_DENIED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_115()`<br>**Unit:** `tests/data/unit/test_broker_contract.py` |
+| Completed | `FR-DATA-116` | Wrap a caller-owned broker client in a proxy that enforces the read-only contract on every attribute access at runtime, so a mutation call fails even when the underlying client exposes it. | `wrap_broker_client(client: object) -> ReadOnlyBrokerProxy` | None | `DataError[PERMISSION_DENIED]` | **Usage:** `tests/data/usage/10_sources.py::fr_data_116()`<br>**Unit:** `tests/data/unit/test_broker_contract.py` |
 
 **Implementation notes:** These requirements formalise enforcement that today is
 distributed across source policy and the Utils logging layer. The final structure gives
@@ -1731,7 +1814,7 @@ new authority over secrets, adapters, or licence terms.
 
 ### Feature usage examples
 
-`tests/data/usage/10_security.py` demonstrates active `FR-DATA-113` through
+`tests/data/usage/10_sources.py` demonstrates active `FR-DATA-113` through
 `FR-DATA-116`; the withdrawn Utils-owned `FR-DATA-111` and `FR-DATA-112` have no
 duplicate Data operation.
 
@@ -1807,13 +1890,13 @@ the focused unit and integration suites.
 
 ### Shared Configuration and Limits Manifest
 
-`app/services/data/limits/config.py` owns immutable `DataSettings`, loads it only
+`app/services/data/_settings.py` owns immutable `DataSettings`, loads it only
 through `app.utils.AppSettings`, and provides a context-local explicit profile for
 isolated tests and usage scripts. DATA production modules never parse `.env` files or
 read `os.environ` directly. Missing or invalid required settings are translated to the
 documented fail-closed `DataError` at the feature boundary.
 
-`app/services/data/limits/manifest.py` is the single resolution point for every
+`app/services/data/_limits.py` is the single resolution point for every
 bounded numeric limit. A module reads a limit through `get_limit` rather than
 declaring its own constant, and `apply_workflow_override` adjusts defaults per
 workflow context (`research`, `backtest`, `validation`, `risk`, `execution_bound`).
@@ -1853,10 +1936,8 @@ their owning manifests.
 
 No unresolved owner decision blocks `CAP-DATA-028`. The owner approved the fifteen
 capabilities, their target module names, the current-to-target disposition, and the
-one-feature/one-folder/one-usage invariant on 2026-07-22. Implementation inventory
-must still determine whether subpackage comparison helpers are retained as supported
-feature operations or made private; that is an evidence check, not permission to add
-new behaviour.
+one-feature/one-folder/one-usage invariant on 2026-07-22. The package-root `__all__`
+is the sole public-boundary decision; submodule-only helpers remain internal.
 
 ---
 
@@ -1864,112 +1945,17 @@ new behaviour.
 
 ### Test and usage locations
 
-The tree below records the pre-`CAP-DATA-028` test inventory. It is not the approved
-final layout. During the restructure, unit tests must move with their owning feature,
-and a test named for a removed module is a migration defect rather than a naming
-preference.
+The current inventory contains 44 focused unit files, 11 integration/workflow files,
+and exactly 15 directly executable usage programs. Unit tests may import internals;
+integration and usage evidence imports the Data domain through `app.services.data` only.
 
-```text
-tests/data/
-├── unit/                              # One file per module file; every public symbol and failure path
-│   ├── test_records.py                # contracts/records.py
-│   ├── test_dataset.py                # contracts/dataset.py focused invariants
-│   ├── test_metadata.py               # models/metadata.py
-│   ├── test_datasets.py               # models/datasets.py
-│   ├── test_contracts.py              # models/contracts.py
-│   ├── test_errors.py                 # contracts/errors.py
-│   ├── test_config.py                 # limits/config.py
-│   ├── test_limits.py                 # limits/manifest.py
-│   ├── test_sqlite.py                 # persistence/sqlite.py
-│   ├── test_locking.py                # persistence/locking.py
-│   ├── test_migrations.py             # persistence/migrations.py
-│   ├── test_file_io.py                # persistence/file_io.py
-│   ├── test_cache.py                  # persistence/cache.py
-│   ├── test_import_artifacts.py       # persistence/import_artifacts.py
-│   ├── test_backup.py                 # persistence/backup.py
-│   ├── test_audit.py                  # audit/store.py, audit/query.py
-│   ├── test_source_protocol.py        # sources/protocol.py
-│   ├── test_source_registry.py        # sources/registry.py
-│   ├── test_source_policy.py          # sources/policy.py
-│   ├── test_source_composition.py     # sources/composition.py
-│   ├── test_retrieval_sources.py      # retrieval/sources.py
-│   ├── test_local_loader.py           # retrieval/local_loader.py
-│   ├── test_synthetic.py              # retrieval/synthetic.py
-│   ├── test_discovery.py              # retrieval/discovery.py
-│   ├── test_calendar.py               # retrieval/calendar.py
-│   ├── test_market_context.py         # evidence/market_context.py
-│   ├── test_fx.py                     # evidence/fx.py
-│   ├── test_account_state.py          # evidence/account_state.py
-│   ├── test_ohlcv_validator.py        # quality/ohlcv_validator.py
-│   ├── test_adversarial.py            # quality/adversarial.py
-│   ├── test_flags.py                  # quality/flags.py
-│   ├── test_asset_validator.py        # quality/asset_validator.py
-│   ├── test_quality_policy.py         # quality/policy.py
-│   ├── test_resample.py               # transformation/resample.py
-│   ├── test_tick_aggregation.py       # transformation/tick_aggregation.py
-│   ├── test_alignment.py              # transformation/alignment.py
-│   ├── test_tabular.py                # transformation/tabular.py
-│   ├── test_timezone.py               # time/timezone.py
-│   ├── test_market_hours.py           # time/market_hours.py
-│   ├── test_gaps.py                   # time/gaps.py
-│   ├── test_feed_status.py            # feeds/status.py
-│   ├── test_feed_buffer.py            # feeds/buffer.py
-│   ├── test_reconnection.py           # feeds/reconnection.py
-│   ├── test_heartbeat.py              # feeds/heartbeat.py
-│   ├── test_job.py                    # scheduler/job.py
-│   ├── test_backfill.py               # scheduler/backfill.py
-│   ├── test_recovery.py               # scheduler/recovery.py
-│   ├── test_security.py               # security/
-│   └── test_api.py                    # package-root export gate
-├── integration/                       # WF-DATA-* collaboration and boundaries
-└── usage/
-    ├── 01_contracts.py                # FEAT-DATA-01 canonical contracts
-    ├── 02_storage.py                  # FEAT-DATA-03 persistence, import, backup
-    ├── 03_processing.py               # FEAT-DATA-04 transformation and quality
-    ├── 04_sources.py                  # FEAT-DATA-08 source governance and composition
-    ├── 05_update_jobs.py              # FEAT-DATA-05 update jobs and recovery
-    ├── 06_realtime_feeds.py           # FEAT-DATA-06 internal feed lifecycle
-    ├── 07_calendar.py                 # FEAT-DATA-02 economic calendar
-    ├── 08_tabular.py                  # FEAT-DATA-07 analytical projections
-    ├── 09_evidence.py                 # FEAT-DATA-09 market context, FX, account state
-    ├── 10_security.py                 # FEAT-DATA-10 credentials, licensing, broker contract
-    └── __init__.py
-```
+- **Unit:** `test_account_state.py`, `test_api.py`, `test_audit.py`, `test_backfill.py`, `test_backup.py`, `test_base.py`, `test_broker_contract.py`, `test_calendar_scraper.py`, `test_contract_snapshot.py`, `test_dataset.py`, `test_errors.py`, `test_evidence_fx.py`, `test_evidence_market_context.py`, `test_external_source.py`, `test_feed_state_single_owner.py`, `test_feeds.py`, `test_file_io.py`, `test_focused_boundaries.py`, `test_gaps.py`, `test_historical_access.py`, `test_import_graph.py`, `test_licensing.py`, `test_limits.py`, `test_local_source.py`, `test_market_data_facade.py`, `test_persistence_cache.py`, `test_persistence_import_artifacts.py`, `test_persistence_isolation.py`, `test_persistence_locking.py`, `test_persistence_migrations.py`, `test_quality.py`, `test_records.py`, `test_reference_access.py`, `test_retrieval_sources.py`, `test_scheduler.py`, `test_source_composition.py`, `test_source_contract_identity.py`, `test_source_policy.py`, `test_source_registry.py`, `test_sqlite.py`, `test_synthetic.py`, `test_tabular.py`, `test_ticks.py`, `test_transformation.py`
+- **Integration/workflow:** `test_audit_event_handoff.py`, `test_broker_boundary.py`, `test_calendar.py`, `test_contract_boundaries.py`, `test_database_boundary.py`, `test_external_import.py`, `test_historical_retrieval.py`, `test_local_source_retrieval.py`, `test_locking_boundary.py`, `test_usage_scripts.py`, `test_workflow_runtime.py`
+- **Usage:** `01_contracts.py`, `02_market_data.py`, `03_local_datasets.py`, `04_synthetic_data.py`, `05_tick_derivation.py`, `06_persistence.py`, `07_quality.py`, `08_transformation.py`, `09_time_sessions.py`, `10_sources.py`, `11_economic_calendar.py`, `12_realtime_feeds.py`, `13_data_jobs.py`, `14_evidence.py`, `15_audit.py`
 
-**Current usage evidence.** Ten standalone programs exist. `01_contracts.py` is the
-completed focused evidence for FEAT-DATA-01; the other nine are pre-target broad
-programs. The package does not yet satisfy the approved feature invariant because
-the target has fifteen registered capabilities.
-
-**Required target usage evidence.** `CAP-DATA-028` is complete only when the following
-programs exist, execute directly, and collectively exercise every public constructor
-and operation owned by their corresponding feature:
-
-```text
-tests/data/usage/
-├── 01_contracts.py
-├── 02_market_data.py
-├── 03_local_datasets.py
-├── 04_synthetic_data.py
-├── 05_tick_derivation.py
-├── 06_persistence.py
-├── 07_quality.py
-├── 08_transformation.py
-├── 09_time_sessions.py
-├── 10_sources.py
-├── 11_economic_calendar.py
-├── 12_realtime_feeds.py
-├── 13_data_jobs.py
-├── 14_evidence.py
-└── 15_audit.py
-```
-
-**Unit-test and evidence citations.** Consolidated behavioral coverage is located in
-the current files listed above, including `test_transformation.py`, `test_feeds.py`,
-`test_scheduler.py`, `test_backfill.py`, and the module-specific persistence,
-retrieval, quality, security, calendar, and integration tests. The executable usage
-program is the durable requirement-level citation; helper function names inside a
-program are not part of the public evidence contract.
+Every one of the 84 canonical `FR-DATA-*` rows maps to exactly one `fr_data_NNN()`
+demonstration in its owning feature program. Every program defines `main()` and an
+`if __name__ == "__main__"` guard; all fifteen exited zero on 2026-07-23.
 
 ### Commands
 
@@ -2031,10 +2017,12 @@ run the complete Data set at the feature/slice completion gate.
 - [x] The actual package tree matches the approved target in Section 2.
 - [x] Every registered feature owns exactly one module folder and no horizontal
   `models/`, `errors/`, `limits/`, `retrieval/`, or `security/` package remains.
-- [ ] Module sections and files remain in dependency order without cycles after
-  feature-specific contracts move to their owners.
+- [x] Module sections and files remain in dependency order after feature-specific
+  contracts moved to their owners; current architecture guards inspect the actual
+  feature folders.
 - [x] Every active requirement, workflow, and package-wide requirement is `Completed`.
-- [x] Package root exports exactly the approved 35 typed public operations and nothing else.
+- [x] Package root explicitly imports and declares exactly the approved 207 public
+  names in `__all__`; the API golden/union test rejects missing or extra exposure.
 - [x] Contracts match `docs/PROJECT.md` name, version, owner, and consumers, and each
   owned contract is byte-identical to its pre-restructure golden snapshot.
 - [x] Data writes only Data-owned state; other domain migrations preserve ownership.
@@ -2043,19 +2031,22 @@ run the complete Data set at the feature/slice completion gate.
 - [x] Every collaborative workflow has a passing integration test.
 - [x] No unresolved Open Decision affects a completed requirement (`O-DATA-01`).
 - [x] No raw provider/database object, secret, live trade path, or silent failure exists.
-- [x] No consumer outside `app/services/data/` imports a removed Data path after migration.
+- [x] No consumer outside `app/services/data/` deep-imports a Data submodule.
 - [x] FEAT-DATA-01 consumers import canonical contracts directly; no removed
   `errors/` or canonical `models/` path is re-exported.
 - [x] Every unit test file corresponds to an approved feature or boundary.
 - [x] The semantic-docstring and formatting gates are clean.
-- [x] Source promotion and production evidence are approved for every enabled source.
+- [x] Enabled sources remain fail-closed at staging without promotion evidence; the
+  approved MT5 demo-provider read and cleanup validation pass.
 - [x] Every emitted `DataQualityReport` is computed from the records examined.
 
 Current implementation status: `Completed`. The package implements the approved
 fifteen focused feature folders and exactly fifteen numbered standalone usage
-programs. Removed horizontal packages have no compatibility shims, the frozen
-35-operation package-root API remains intact, and the complete focused validation
-gate passes with 80% whole-domain branch coverage.
+programs. Removed horizontal packages have no compatibility shims, the explicit
+207-name package-root API is validated, and the complete focused validation gate
+passes with 81.65% branch-aware whole-domain coverage. All fifteen standalone usage
+programs pass, and the approved MT5 demo-provider read confirms genuine bounded
+provider evidence without a broker mutation.
 
 ---
 
@@ -2081,30 +2072,3 @@ decisions update `docs/CHANGELOG.md`.
 
 This keeps requirements, dependency order, implementation, usage examples, tests,
 and documentation aligned.
-
----
-
-## Appendix P — Provisional Component Requirements (roadmap-promoted)
-
-These IDs were minted by the agile delivery roadmap
-(`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each
-`P-DATA-NNN` authorizes establishment of the named package seam under
-`app/services/data/`; its public port, package `__init__`, and error/DTO surface host
-the corresponding `FR-DATA-*` behavior in Section 4. Existing completed seams are
-reused rather than rebuilt.
-
-Seam paths are restated below against the `CAP-DATA-026` target structure. The
-requirement IDs, their first roadmap phase, and the `FR-DATA-*` behavior each hosts
-are unchanged; only the package path moves.
-
-| Requirement ID | Component / package | First phase | Hosts |
-|---|---|---|---|
-| `P-DATA-001` | `app/services/data/models/`, `app/services/data/errors/` | 1 | Shared core contracts and errors + their `FR-DATA-*` behavior |
-| `P-DATA-004` | `app/services/data/retrieval/`, `app/services/data/evidence/`, `app/services/data/time/` | 1 | Retrieval, evidence, and temporal modules + their `FR-DATA-*` behavior |
-| `P-DATA-008` | `app/services/data/__init__.py` | 1 | Package-root export gate + its `FR-DATA-*` behavior |
-| `P-DATA-002` | `app/services/data/persistence/`, `app/services/data/audit/` | 2 | Persistence and audit modules + their `FR-DATA-*` behavior |
-| `P-DATA-003` | `app/services/data/sources/`, `app/services/data/security/` | 2 | Source governance and access enforcement + their `FR-DATA-*` behavior |
-| `P-DATA-005` | `app/services/data/transformation/`, `app/services/data/quality/` | 2 | Transformation and quality modules + their `FR-DATA-*` behavior |
-| `P-DATA-006` | `app/services/data/scheduler/` | 11 | `scheduler` module + its `FR-DATA-*` behavior |
-| `P-DATA-007` | `app/services/data/feeds/` | 11 | `feeds` module + its `FR-DATA-*` behavior |
-| `P-DATA-009` | `app/services/data/limits/` | 1 | Configuration and limits manifest + their `FR-DATA-*` behavior |

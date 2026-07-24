@@ -14,17 +14,18 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data._settings import (
-    LOCAL_SYMBOL_MANIFEST_NAME,
+from app.services.data import (
+    DataError,
+    DatasetLoadRequest,
     DataSettings,
-    data_settings_context,
-)
-from app.services.data.contracts import DataError, OHLCVRecord
-from app.services.data.sources import composition as _runtime
-from app.services.data.sources.contracts import (
+    MarketDataset,
+    OHLCVRecord,
     SourceReadRequest,
+    data_settings_context,
+    ensure_source,
+    list_composable_sources,
+    resolve_source,
 )
-from app.services.data.sources.registry import _reset_registry, resolve_source
 from app.utils import generate_id
 
 _SYMBOL = "EURUSD"
@@ -32,17 +33,18 @@ _START = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 @pytest.fixture(autouse=True)
-def isolated_runtime() -> None:
+def isolated_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
     """Reset process-local composition state around every test."""
-    _reset_registry()
-    _runtime._calendars.clear()
-    _runtime._sessions.clear()
-    _runtime._migrated_targets.clear()
-    yield
-    _reset_registry()
-    _runtime._calendars.clear()
-    _runtime._sessions.clear()
-    _runtime._migrated_targets.clear()
+    for target in (
+        "app.services.data.sources.registry._registry",
+        "app.services.data.sources.registry._instances",
+        "app.services.data.sources.registry._identities",
+        "app.services.data.sources.composition._calendars",
+        "app.services.data.sources.composition._sessions",
+        "app.services.data.sources.composition._migrated_targets",
+    ):
+        replacement: object = set() if target.endswith("_migrated_targets") else {}
+        monkeypatch.setattr(target, replacement)
 
 
 def _bar(index: int) -> OHLCVRecord:
@@ -76,7 +78,7 @@ def _settings(tmp_path: Path) -> DataSettings:
 
 def _write_manifest(raw_root: Path) -> None:
     """Declare one operator-supplied local symbol."""
-    (raw_root / LOCAL_SYMBOL_MANIFEST_NAME).write_text(
+    (raw_root / "symbols.json").write_text(
         json.dumps(
             {
                 _SYMBOL: {
@@ -108,11 +110,11 @@ def test_local_source_composes_without_credentials_or_network(
 ) -> None:
     """A configured local source is reachable with no provider dependency."""
     with data_settings_context(_settings(tmp_path)):
-        _runtime.ensure_source("csv", generate_id("req"))
+        ensure_source("csv", generate_id("req"))
         source = resolve_source("csv")
 
     assert source is not None
-    assert "csv" in _runtime.list_composable_sources()
+    assert "csv" in list_composable_sources()
 
 
 def test_local_source_reads_only_the_requested_window(
@@ -136,7 +138,7 @@ def test_local_source_reads_only_the_requested_window(
 
     with data_settings_context(_settings(tmp_path)):
         request_id = generate_id("req")
-        _runtime.ensure_source("csv", request_id)
+        ensure_source("csv", request_id)
         batch = resolve_source("csv").fetch(
             SourceReadRequest(
                 source_id="csv",
@@ -159,25 +161,50 @@ def test_local_source_reads_only_the_requested_window(
 def test_two_timeframes_for_one_symbol_are_independently_addressable(
     tmp_path: Path,
     composed_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Distinct timeframe artifacts for one symbol resolve to distinct files."""
     (composed_root / f"{_SYMBOL}_1m.csv").touch()
     (composed_root / f"{_SYMBOL}_1h.csv").touch()
+    observed_paths: list[Path] = []
+
+    from tests.data.helpers import make_dataset
+
+    stored = make_dataset().model_copy(update={"symbol": _SYMBOL, "timeframe": "1m"})
+
+    def load_requested_artifact(request: DatasetLoadRequest) -> MarketDataset:
+        observed_paths.append(request.relative_path)
+        return stored
+
+    monkeypatch.setattr(
+        "app.services.data.sources.local_adapter.load_dataset",
+        load_requested_artifact,
+    )
 
     with data_settings_context(_settings(tmp_path)):
-        _runtime.ensure_source("csv", generate_id("req"))
+        ensure_source("csv", generate_id("req"))
         source = resolve_source("csv")
-        minute_artifact, _ = source._artifact(_SYMBOL, "1m")
-        hour_artifact, _ = source._artifact(_SYMBOL, "1h")
+        for timeframe in ("1m", "1h"):
+            source.fetch(
+                SourceReadRequest(
+                    source_id="csv",
+                    provider_symbol=_SYMBOL,
+                    data_kind="bars",
+                    timeframe=timeframe,
+                    limit=100,
+                    request_id=generate_id("req"),
+                )
+            )
 
-    assert minute_artifact.name == f"{_SYMBOL}_1m.csv"
-    assert hour_artifact.name == f"{_SYMBOL}_1h.csv"
-    assert minute_artifact != hour_artifact
+    assert [path.name for path in observed_paths] == [
+        f"{_SYMBOL}_1m.csv",
+        f"{_SYMBOL}_1h.csv",
+    ]
 
 
 def test_unsupported_source_identifier_fails_before_policy(tmp_path: Path) -> None:
     """An identifier outside the configured set never reaches source policy."""
     with data_settings_context(_settings(tmp_path)), pytest.raises(DataError) as error:
-        _runtime.ensure_source("dukascopy", generate_id("req"))
+        ensure_source("not-configured-source", generate_id("req"))
 
     assert error.value.code == "UNSUPPORTED_SOURCE"

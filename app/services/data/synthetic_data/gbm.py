@@ -103,8 +103,18 @@ def _generate_bars(
     logger.info("Building synthetic bars")
     records: list[OHLCVRecord] = []
     timestamp = request.start
+    s_min_val = request.parameters.get("spread_min")
+    s_max_val = request.parameters.get("spread_max")
+    spread_min = int(s_min_val) if s_min_val is not None else 10
+    spread_max = int(s_max_val) if s_max_val is not None else 50
+    if spread_min > spread_max:
+        spread_min, spread_max = spread_max, spread_min
+
     for index in range(request.record_count):
         segment = path[4 * index : 4 * index + 5]
+        high_val = _quantize_synthetic(max(segment), _PRICE_QUANTUM)
+        low_val = _quantize_synthetic(min(segment), _PRICE_QUANTUM)
+        spread_val = Decimal(rng.randint(spread_min, spread_max))
         records.append(
             OHLCVRecord(
                 timestamp=timestamp,
@@ -113,8 +123,8 @@ def _generate_bars(
                 source_revision="v1",
                 available_at=timestamp,
                 open=_quantize_synthetic(segment[0], _PRICE_QUANTUM),
-                high=_quantize_synthetic(max(segment), _PRICE_QUANTUM),
-                low=_quantize_synthetic(min(segment), _PRICE_QUANTUM),
+                high=high_val,
+                low=low_val,
                 close=_quantize_synthetic(segment[-1], _PRICE_QUANTUM),
                 volume=_quantize_synthetic(
                     _exponential(rng, Decimal(100)),
@@ -122,6 +132,8 @@ def _generate_bars(
                 ),
                 price_unit="USD",
                 volume_unit="units",
+                spread=spread_val,
+                spread_unit="points",
             )
         )
         timestamp += spec.duration
@@ -161,20 +173,11 @@ def _generate_ticks(
     return tuple(records)
 
 
-def generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset:
-    """Generate a byte-reproducible bounded Decimal GBM dataset."""
-    logger.info("Generating synthetic dataset for request %s", request.request_id)
-    maximum = (
-        SYNTHETIC_BAR_MAX_RECORDS
-        if request.data_kind == "bars"
-        else SYNTHETIC_TICK_MAX_RECORDS
-    )
-    if request.record_count > maximum:
-        raise DataError(
-            "LIMIT_EXCEEDED",
-            safe_details={"record_count": request.record_count, "maximum": maximum},
-            request_id=request.request_id,
-        )
+def _validate_synthetic_request(
+    request: SyntheticRequest,
+) -> tuple[Decimal, Decimal, Decimal]:
+    """Validate input parameters for synthetic generation."""
+    logger.debug("Validating synthetic generation request parameters")
     if request.seed is None:
         raise DataError(
             "INVALID_INPUT",
@@ -193,6 +196,23 @@ def generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset:
     mu = request.parameters["mu"]
     sigma = request.parameters["sigma"]
     start = request.parameters["start_val"]
+    s_min = request.parameters.get("spread_min")
+    s_max = request.parameters.get("spread_max")
+    for s_val in (s_min, s_max):
+        if s_val is not None and not s_val.is_finite():
+            raise DataError("PRECISION_MISMATCH", request_id=request.request_id)
+        if s_val is not None and s_val < 0:
+            raise DataError(
+                "INVALID_INPUT",
+                safe_details={"field": "spread"},
+                request_id=request.request_id,
+            )
+    if s_min is not None and s_max is not None and s_min > s_max:
+        raise DataError(
+            "INVALID_INPUT",
+            safe_details={"field": "spread_min"},
+            request_id=request.request_id,
+        )
     if not all(value.is_finite() for value in (mu, sigma, start)):
         raise DataError("PRECISION_MISMATCH", request_id=request.request_id)
     if sigma <= 0 or start <= 0:
@@ -201,6 +221,24 @@ def generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset:
             safe_details={"field": "parameters"},
             request_id=request.request_id,
         )
+    return mu, sigma, start
+
+
+def generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset:
+    """Generate a byte-reproducible bounded Decimal GBM dataset."""
+    logger.info("Generating synthetic dataset for request %s", request.request_id)
+    maximum = (
+        SYNTHETIC_BAR_MAX_RECORDS
+        if request.data_kind == "bars"
+        else SYNTHETIC_TICK_MAX_RECORDS
+    )
+    if request.record_count > maximum:
+        raise DataError(
+            "LIMIT_EXCEEDED",
+            safe_details={"record_count": request.record_count, "maximum": maximum},
+            request_id=request.request_id,
+        )
+    mu, sigma, start = _validate_synthetic_request(request)
 
     rng = random.Random(request.seed)
     if request.data_kind == "bars":

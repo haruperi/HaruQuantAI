@@ -146,6 +146,15 @@ class _OperationTransport(_FakeTransport):
                         "stepVolume": 100_000,
                         "lotSize": 100_000,
                         "enableShortSelling": True,
+                        "tradingMode": 0,
+                        "scheduleTimeZone": "UTC",
+                        "schedule": [
+                            {
+                                "startSecond": 4 * 86_400,
+                                "endSecond": 5 * 86_400,
+                            }
+                        ],
+                        "holiday": [],
                     }
                 ]
             }
@@ -401,5 +410,20 @@ def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # n
             in {"ProtoOANewOrderReq", "ProtoOAClosePositionReq"}
         ]
         assert native_volumes == []
+
+    asyncio.run(exercise())
+
+
+def test_adapter_returns_ctrader_symbol_sessions() -> None:
+    """cTrader full-symbol schedules cross the canonical adapter boundary."""
+    adapter = _implementation_adapter(_OperationTransport())
+    start = datetime(2026, 1, 1, tzinfo=UTC)
+    end = datetime(2026, 1, 2, tzinfo=UTC)
+
+    async def exercise() -> None:
+        await adapter.connect()
+        sessions = await adapter.get_trading_sessions("EURUSD", start, end)
+        assert sessions.data is not None
+        assert sessions.data[0].provider_timezone == "UTC"
 
     asyncio.run(exercise())

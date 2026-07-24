@@ -11,8 +11,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from app.services.data.audit import persist_audit_event
-from app.services.data.persistence import run_data_migrations
+from app.services.data import (
+    persist_audit_event,
+    run_data_migrations,
+)
 from app.utils import AuditEvent, canonical_json, generate_id, redact_mapping_value
 
 

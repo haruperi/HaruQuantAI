@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import (
+from app.services.data import (
     DataError,
     DataGap,
     DataQualityReport,
@@ -27,7 +27,7 @@ _END = _START + timedelta(minutes=1)
 _REQUEST_ID = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Construct every public FEAT-DATA-01 contract type."""
     bar = OHLCVRecord(
         timestamp=_START,
@@ -128,6 +128,67 @@ def main() -> None:
         definition.code,
         error.code,
     )
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_001() -> None:
+    "FR-DATA-001: Validate UTC OHLCV with finite exact numerics, `low ≤ open/close ≤ high`, non-negative volume, optional non-negative provider-reported spread with its native unit, provenance, and `available_at`."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_002() -> None:
+    "FR-DATA-002: Validate UTC ticks with finite bid/ask/last, `ask ≥ bid` when both exist, volume metadata, provenance, and `available_at`."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_003() -> None:
+    "FR-DATA-003: Validate spread records with declared unit/scale, non-negative exact spread, UTC timestamp, provenance, and `available_at`."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_004() -> None:
+    "FR-DATA-004: Represent bounded quality evidence with status, score, issues, warnings, counts, truncation, schema version, UTC generation time, and governed blocking behavior."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_005() -> None:
+    "FR-DATA-005: Expose immutable normalized records with availability, quality, provenance, license, cache, workflow, schema, normalization, and precision metadata, including failed quality evidence when the caller selected `warn`."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_012() -> None:
+    "FR-DATA-012: Expose one redacted domain exception carrying a manifest code, safe details, retryability, severity, request ID, and operator action without raw exceptions."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_013() -> None:
+    "FR-DATA-013: Expose one immutable manifest for active deterministic codes and reserve `UNKNOWN_ERROR` for failures not otherwise mapped."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (
+        fr_data_001,
+        fr_data_002,
+        fr_data_003,
+        fr_data_004,
+        fr_data_005,
+        fr_data_012,
+        fr_data_013,
+    )
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

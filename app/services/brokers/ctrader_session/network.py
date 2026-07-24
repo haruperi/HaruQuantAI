@@ -12,7 +12,6 @@ this module performs no side effect and pulls in no optional dependency.
 """
 
 # ruff: noqa: ANN401 - dynamic cTrader SDK types; long SDK import / type-ignore lines.
-
 import asyncio
 import threading
 from collections.abc import Callable
@@ -23,6 +22,87 @@ from app.utils import logger
 
 _reactor_lock = threading.Lock()
 _reactor_running = False
+
+
+def _expect_response(
+    response: object,
+    expected_type: type[object],
+    *,
+    step: str,
+) -> Any:
+    """Validate one cTrader lifecycle response without exposing provider payloads.
+
+    Args:
+        response: Extracted provider response.
+        expected_type: Exact protobuf response class required by the step.
+        step: Bounded lifecycle-step label for safe error reporting.
+
+    Returns:
+        The validated provider response.
+
+    Raises:
+        ConnectionError: If the provider rejects the request or returns an
+            unexpected response type.
+    """
+    if type(response).__name__ == "ProtoOAErrorRes":
+        provider_code = str(getattr(response, "errorCode", "UNKNOWN"))
+        message = f"cTrader {step} rejected: {provider_code}"
+        raise ConnectionError(message)
+    if not isinstance(response, expected_type):
+        message = f"cTrader {step} returned an unexpected response"
+        raise ConnectionError(message)
+    return response
+
+
+def _validate_account_environment(
+    response: object,
+    *,
+    account_id: int,
+    environment: BrokerEnvironment,
+) -> None:
+    """Require the configured account and its provider-reported environment.
+
+    Args:
+        response: Validated ``ProtoOAGetAccountListByAccessTokenRes``.
+        account_id: Configured cTrader account identifier.
+        environment: Configured broker environment.
+
+    Raises:
+        ConnectionError: If the account is unavailable or its provider-reported
+            live/demo classification conflicts with configuration.
+    """
+    accounts = tuple(getattr(response, "ctidTraderAccount", ()))
+    account = next(
+        (
+            item
+            for item in accounts
+            if int(getattr(item, "ctidTraderAccountId", -1)) == account_id
+        ),
+        None,
+    )
+    if account is None:
+        raise ConnectionError("configured cTrader account is unavailable")
+    is_live = bool(getattr(account, "isLive", False))
+    expected_live = environment == BrokerEnvironment.LIVE
+    if is_live != expected_live:
+        raise ConnectionError("cTrader account environment mismatch")
+
+
+def _validate_account_response(response: object, *, account_id: int, step: str) -> None:
+    """Require a lifecycle response to refer to the configured account.
+
+    Args:
+        response: Validated provider response.
+        account_id: Configured cTrader account identifier.
+        step: Bounded lifecycle-step label for safe error reporting.
+
+    Raises:
+        ConnectionError: If the response refers to another account.
+    """
+    response_account_id = int(getattr(response, "ctidTraderAccountId", -1))
+    if response_account_id != account_id:
+        message = f"cTrader {step} account mismatch"
+        raise ConnectionError(message)
 
 
 def _ensure_reactor_thread() -> None:  # pragma: no cover - requires Twisted + network
@@ -82,12 +162,6 @@ class _CTraderNetworkClient:
             Client,
             EndPoints,
             TcpProtocol,
-        )
-        from ctrader_open_api.messages.OpenApiMessages_pb2 import (  # type: ignore[import-untyped, unused-ignore]
-            ProtoOAAccountAuthReq,
-            ProtoOAApplicationAuthReq,
-            ProtoOAGetAccountListByAccessTokenReq,
-            ProtoOATraderReq,
         )
         from ctrader_open_api.protobuf import (  # type: ignore[import-untyped, unused-ignore]
             Protobuf,
@@ -150,23 +224,11 @@ class _CTraderNetworkClient:
         reactor.callFromThread(client.startService)  # type: ignore[attr-defined]
         await asyncio.wait_for(connected, timeout=self._config.connect_timeout_sec)
 
-        app_request = ProtoOAApplicationAuthReq()
-        app_request.clientId = self._client_id
-        app_request.clientSecret = self._client_secret
-        await self._request(app_request)
-
-        list_request = ProtoOAGetAccountListByAccessTokenReq()
-        list_request.accessToken = self._access_token
-        await self._request(list_request)
-
-        account_request = ProtoOAAccountAuthReq()
-        account_request.ctidTraderAccountId = self._account_id
-        account_request.accessToken = self._access_token
-        await self._request(account_request)
-
-        trader_request = ProtoOATraderReq()
-        trader_request.ctidTraderAccountId = self._account_id
-        await self._request(trader_request)
+        try:
+            await self._authenticate(Protobuf)
+        except Exception:
+            await self.close()
+            raise
 
         self._connected = True
         logger.bind(
@@ -175,6 +237,78 @@ class _CTraderNetworkClient:
             result="success",
         ).info("cTrader session authenticated")
         return True
+
+    async def _authenticate(self, protobuf: Any) -> None:
+        """Run and validate the provider's complete authentication handshake.
+
+        Args:
+            protobuf: Lazily imported cTrader protobuf helper.
+
+        Raises:
+            ConnectionError: If any provider response or account classification
+                fails validation.
+            TimeoutError: If a provider response exceeds its configured bound.
+        """
+        from ctrader_open_api.messages.OpenApiMessages_pb2 import (  # type: ignore[import-untyped, unused-ignore]
+            ProtoOAAccountAuthReq,
+            ProtoOAAccountAuthRes,
+            ProtoOAApplicationAuthReq,
+            ProtoOAApplicationAuthRes,
+            ProtoOAGetAccountListByAccessTokenReq,
+            ProtoOAGetAccountListByAccessTokenRes,
+            ProtoOATraderReq,
+            ProtoOATraderRes,
+        )
+
+        app_request = ProtoOAApplicationAuthReq()
+        app_request.clientId = self._client_id
+        app_request.clientSecret = self._client_secret
+        app_response = protobuf.extract(await self._request(app_request))
+        _expect_response(
+            app_response,
+            ProtoOAApplicationAuthRes,
+            step="application authentication",
+        )
+
+        list_request = ProtoOAGetAccountListByAccessTokenReq()
+        list_request.accessToken = self._access_token
+        list_response = _expect_response(
+            protobuf.extract(await self._request(list_request)),
+            ProtoOAGetAccountListByAccessTokenRes,
+            step="account discovery",
+        )
+        _validate_account_environment(
+            list_response,
+            account_id=self._account_id,
+            environment=self._config.environment,
+        )
+
+        account_request = ProtoOAAccountAuthReq()
+        account_request.ctidTraderAccountId = self._account_id
+        account_request.accessToken = self._access_token
+        account_response = _expect_response(
+            protobuf.extract(await self._request(account_request)),
+            ProtoOAAccountAuthRes,
+            step="account authentication",
+        )
+        _validate_account_response(
+            account_response,
+            account_id=self._account_id,
+            step="account authentication",
+        )
+
+        trader_request = ProtoOATraderReq()
+        trader_request.ctidTraderAccountId = self._account_id
+        trader_response = _expect_response(
+            protobuf.extract(await self._request(trader_request)),
+            ProtoOATraderRes,
+            step="trader lookup",
+        )
+        _validate_account_response(
+            trader_response,
+            account_id=self._account_id,
+            step="trader lookup",
+        )
 
     async def send(self, request: object) -> object:  # pragma: no cover - live only
         """Send one correlated request and return the extracted response.

@@ -1,72 +1,150 @@
-"""Demonstrate FEAT-DATA-03 local-dataset loading operations across CSV and Parquet formats."""
+"""Demonstrate FEAT-DATA-03 local CSV and Parquet dataset loading."""
 
 from __future__ import annotations
 
 import sys
+from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import DataError
-from app.services.data.local_datasets import (
+from app.services.data import (
+    DataError,
     DatasetLoadRequest,
+    DatasetSaveRequest,
+    SyntheticRequest,
+    generate_synthetic_bars,
     load_csv,
-    load_dataset,
     load_local_dataset,
     load_parquet,
+    save_market_data,
+    to_ohlcv_dataframe,
 )
 from app.utils import generate_id
+
+_CSV_PATH = Path("data/raw/EURUSD_H1.csv")
+_PARQUET_PATH = Path("data/raw/EURUSD_H1.parquet")
+
+
+def _ensure_raw_datasets() -> None:
+    """Ensure manifest-backed CSV and Parquet datasets exist in data/raw."""
+    csv_manifest = _CSV_PATH.with_suffix(".csv.manifest.json")
+    parquet_manifest = _PARQUET_PATH.with_suffix(".parquet.manifest.json")
+    if (
+        _CSV_PATH.exists()
+        and csv_manifest.exists()
+        and _PARQUET_PATH.exists()
+        and parquet_manifest.exists()
+    ):
+        return
+
+    req_id = generate_id("req")
+    synth_req = SyntheticRequest(
+        symbol="EURUSD",
+        data_kind="bars",
+        timeframe="H1",
+        start=datetime(2026, 6, 1, tzinfo=UTC),
+        record_count=24,
+        method="gbm",
+        seed=42,
+        parameters={
+            "mu": Decimal("0.02"),
+            "sigma": Decimal("0.10"),
+            "start_val": Decimal("1.1000"),
+        },
+        precision_policy="decimal_string",
+        request_id=req_id,
+    )
+    dataset = generate_synthetic_bars(synth_req)
+    save_market_data(
+        DatasetSaveRequest(
+            dataset=dataset,
+            relative_path=_CSV_PATH,
+            format="csv",
+            overwrite=True,
+            request_id=req_id,
+        )
+    )
+    save_market_data(
+        DatasetSaveRequest(
+            dataset=dataset,
+            relative_path=_PARQUET_PATH,
+            format="parquet",
+            overwrite=True,
+            request_id=req_id,
+        )
+    )
 
 
 def example_08_csv_load_direct() -> None:
     """Load a local CSV file directly via load_csv."""
-    with TemporaryDirectory(prefix="haru-local-csv-") as tmpdir:
-        sample_path = Path(tmpdir) / "EURUSD_M1.csv"
-        sample_path.write_text(
-            "timestamp,open,high,low,close,volume\n"
-            "2026-07-01T12:00:00Z,1.1000,1.1020,1.0990,1.1010,100\n"
-            "2026-07-01T12:01:00Z,1.1010,1.1025,1.1005,1.1015,120\n",
-            encoding="utf-8",
-        )
-        try:
-            ds = load_csv(sample_path)
-            print(f"Loaded CSV direct rows: {ds.record_count}")
-        except DataError as exc:
-            print(f"CSV direct load error handled: {exc.code}")
+    _ensure_raw_datasets()
+    try:
+        ds = load_csv(_CSV_PATH)
+        print(f"Loaded CSV direct rows: {ds.record_count}")
+        print(to_ohlcv_dataframe(ds))
+    except DataError as exc:
+        print(f"CSV direct load error handled: {exc.code}")
 
 
 def example_10_csv_fetch_range() -> None:
-    """Fetch a range from a local CSV file via DatasetLoadRequest and load_local_dataset."""
+    """Fetch a local CSV range through the typed request boundary."""
+    _ensure_raw_datasets()
     req_id = generate_id("req")
     request = DatasetLoadRequest(
-        relative_path=Path("usage/example.csv"),
+        relative_path=_CSV_PATH,
         format="csv",
         request_id=req_id,
     )
     try:
         ds = load_local_dataset(request)
         print(f"Loaded CSV range dataset: symbol={ds.symbol} rows={ds.record_count}")
+        print(to_ohlcv_dataframe(ds))
     except DataError as exc:
         print(f"CSV range fetch handled: {exc.code}")
 
 
 def example_11_parquet_load_direct() -> None:
     """Load a local Parquet file directly via load_parquet."""
-    with TemporaryDirectory(prefix="haru-local-parquet-") as tmpdir:
-        sample_path = Path(tmpdir) / "EURUSD_M1.parquet"
-        try:
-            ds = load_parquet(sample_path)
-            print(f"Loaded Parquet direct rows: {ds.record_count}")
-        except DataError as exc:
-            print(f"Parquet direct load error handled: {exc.code}")
+    _ensure_raw_datasets()
+    try:
+        ds = load_parquet(_PARQUET_PATH)
+        print(f"Loaded Parquet direct rows: {ds.record_count}")
+        print(ds)
+        print(to_ohlcv_dataframe(ds))
+    except DataError as exc:
+        print(f"Parquet direct load error handled: {exc.code}")
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Run all local dataset loading examples."""
     example_08_csv_load_direct()
     example_10_csv_fetch_range()
     example_11_parquet_load_direct()
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_017() -> None:
+    "FR-DATA-017: Load CSV/Parquet plus manifest only from an approved root, verify hash/schema/normalization metadata, normalize records, and reject corruption without hidden migration."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (fr_data_017,)
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

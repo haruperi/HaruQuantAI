@@ -31,7 +31,13 @@ from app.services.data.contracts.validation import (
 )
 from app.services.data.sources.composition import ensure_source, resolve_calendar
 from app.services.data.sources.registry import get_source_descriptor
-from app.services.data.time_sessions.contracts import MarketSchedule, ScheduleRequest
+from app.services.data.time_sessions.contracts import (
+    MarketHours,
+    MarketHoursRequest,
+    MarketSchedule,
+    ScheduleRequest,
+)
+from app.services.data.time_sessions.market_hours import evaluate_market_hours
 from app.utils import Clock, logger, utc_now
 
 
@@ -56,6 +62,7 @@ def get_current_schedule(
     calendar: MarketCalendar,
     *,
     clock: Clock | None = None,
+    validate_source: bool = True,
 ) -> MarketSchedule:
     """Return current configured hours and normalized UTC sessions.
 
@@ -65,6 +72,7 @@ def get_current_schedule(
         request: Schedule details request.
         calendar: Caller-injected authoritative schedule provider.
         clock: Optional injected UTC clock.
+        validate_source: Whether to require a registered source descriptor.
 
     Returns:
         The MarketSchedule details.
@@ -79,13 +87,14 @@ def get_current_schedule(
         request.request_id,
     )
 
-    desc = get_source_descriptor(request.source_id)
-    if desc.readiness == "disabled":
-        raise DataError(
-            "SOURCE_UNAVAILABLE",
-            safe_details={"source_id": request.source_id},
-            request_id=request.request_id,
-        )
+    if validate_source:
+        desc = get_source_descriptor(request.source_id)
+        if desc.readiness == "disabled":
+            raise DataError(
+                "SOURCE_UNAVAILABLE",
+                safe_details={"source_id": request.source_id},
+                request_id=request.request_id,
+            )
     observed_at = utc_now(clock)
     try:
         schedule = calendar.get_schedule(
@@ -167,22 +176,33 @@ def schedule_request(
 
 
 def get_market_hours(
-    request: ScheduleRequest | None = None,
+    request: MarketHoursRequest | ScheduleRequest | None = None,
     calendar: MarketCalendar | None = None,
     *,
     source_id: str | None = None,
     symbol: str | None = None,
     timezone: str | None = None,
     request_id: str | None = None,
-) -> MarketSchedule:
+) -> MarketHours:
     """Retrieve market hours using a request or direct keywords.
 
     Returns:
-        The current authoritative market schedule.
+        Evaluated current authoritative market hours.
     """
     logger.info("Executing public DATA market-hours query")
+    schedule_input = (
+        ScheduleRequest(
+            source_id=request.source_id,
+            symbol=request.symbol,
+            view="hours",
+            timezone=request.timezone,
+            request_id=request.request_id,
+        )
+        if isinstance(request, MarketHoursRequest)
+        else request
+    )
     resolved = schedule_request(
-        request,
+        schedule_input,
         view="hours",
         source_id=source_id,
         symbol=symbol,
@@ -193,8 +213,18 @@ def get_market_hours(
         resolved.source_id,
         resolved.request_id,
     )
-    ensure_source(resolved.source_id, resolved.request_id)
-    return get_current_schedule(resolved, selected_calendar)
+    if calendar is None:
+        ensure_source(resolved.source_id, resolved.request_id)
+    schedule = (
+        get_current_schedule(resolved, selected_calendar)
+        if calendar is None
+        else get_current_schedule(
+            resolved,
+            selected_calendar,
+            validate_source=False,
+        )
+    )
+    return evaluate_market_hours(schedule, checked_at=schedule.observed_at)
 
 
 def get_trading_sessions(
@@ -224,8 +254,15 @@ def get_trading_sessions(
         resolved.source_id,
         resolved.request_id,
     )
-    ensure_source(resolved.source_id, resolved.request_id)
-    return get_current_schedule(resolved, selected_calendar)
+    if calendar is None:
+        ensure_source(resolved.source_id, resolved.request_id)
+    if calendar is None:
+        return get_current_schedule(resolved, selected_calendar)
+    return get_current_schedule(
+        resolved,
+        selected_calendar,
+        validate_source=False,
+    )
 
 
 __all__ = [

@@ -6,6 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from app.services.data import (
+    MarketSchedule,
     get_data_availability,
     get_historical_volume,
     get_market_data,
@@ -42,7 +43,15 @@ def isolated_facade(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         schedule,
         "get_current_schedule",
-        lambda request, _calendar: request,
+        lambda request, _calendar: MarketSchedule(
+            source_id=request.source_id,
+            symbol=request.symbol,
+            timezone=request.timezone,
+            hours=(),
+            sessions=(),
+            observed_at=datetime(2026, 7, 1, tzinfo=UTC),
+            request_id=request.request_id,
+        ),
     )
     monkeypatch.setattr(
         symbol_discovery,
@@ -168,9 +177,9 @@ def test_all_retrieval_reference_exports_accept_direct_keywords(
     assert symbols.limit == 100
     assert availability.data_kind == "ohlcv"
     assert availability.max_probe_records == 1_000
-    assert hours.view == "hours"
+    assert hours.is_open is False
     assert hours.timezone == "UTC"
-    assert sessions.view == "sessions"
+    assert sessions.symbol == "EURUSD"
     assert volume.mode == "summary"
     assert volume.limit == 10
 

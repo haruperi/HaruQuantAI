@@ -1,7 +1,6 @@
 """cTrader request correlation and session transport boundary."""
 
 # ruff: noqa: TRY004 - an unexpected provider response is invalid provider evidence.
-
 from __future__ import annotations
 
 import asyncio
@@ -131,16 +130,28 @@ class _CTraderTransport:
                     BrokerErrorCode.BROKER_PROVIDER_ERROR
                 )
                 raise
-            else:
-                await self._circuit.record_success()
             finally:
                 if self._latency_sink is not None:
                     self._latency_sink((time.perf_counter() - started) * 1000.0)
+            if type(response).__name__ == "ProtoOAErrorRes":
+                await self._circuit.record_failure(
+                    BrokerErrorCode.BROKER_PROVIDER_ERROR
+                )
+                provider_code = str(getattr(response, "errorCode", "UNKNOWN"))
+                message = f"cTrader provider rejected request: {provider_code}"
+                raise ConnectionError(message)
             if not isinstance(response, response_type):
+                await self._circuit.record_failure(
+                    BrokerErrorCode.BROKER_PROVIDER_ERROR
+                )
                 raise ValueError("unexpected cTrader response type")
             native_id = getattr(response, "clientMsgId", None)
             if request_id is not None and native_id not in {None, request_id}:
+                await self._circuit.record_failure(
+                    BrokerErrorCode.BROKER_PROVIDER_ERROR
+                )
                 raise ValueError("cTrader native request ID mismatch")
+            await self._circuit.record_success()
             return response
 
     async def _admit_rate(self, request_name: str) -> None:

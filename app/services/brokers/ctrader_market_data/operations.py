@@ -2,7 +2,7 @@
 """cTrader market-data operations."""
 
 import asyncio
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import cast
 
@@ -16,10 +16,12 @@ from app.services.brokers.contracts import (
     BrokerResult,
     BrokerSymbolInfo,
     BrokerTick,
+    BrokerTradingSession,
 )
 from app.services.brokers.contracts.protocols import (
     _RequestValidationError,
 )
+from app.services.brokers.ctrader_market_data.sessions import _map_trading_sessions
 from app.services.brokers.ctrader_session.mapping import (
     _field,
     _map_bar,
@@ -331,3 +333,37 @@ class _CTraderMarketDataMixin:
         """Return provider symbol ID and verified price digits."""
         spec = await self._symbol_spec(symbol)
         return int(_field(spec, "symbolId")), int(_field(spec, "digits"))
+
+    async def get_trading_sessions(
+        self,
+        symbol: str,
+        start: datetime | None = None,
+        end: datetime | None = None,
+    ) -> BrokerResult[tuple[BrokerTradingSession, ...]]:
+        """Return broker-authored cTrader sessions with holiday closures applied.
+
+        Args:
+            symbol: Exact provider symbol.
+            start: Optional inclusive aware range start.
+            end: Optional exclusive aware range end.
+
+        Returns:
+            Canonical ordered UTC sessions.
+
+        Raises:
+            ValueError: If only one bound is supplied or bounds are invalid.
+        """
+        if (start is None) != (end is None):
+            raise ValueError("cTrader session bounds must be supplied together")
+        if start is None:
+            start = datetime.now(UTC)
+            end = start + timedelta(days=7)
+        bounded_end = cast("datetime", end)
+        spec = await self._symbol_spec(symbol)
+        sessions = _map_trading_sessions(
+            spec,
+            symbol=symbol,
+            start=start,
+            end=bounded_end,
+        )
+        return self._result(BrokerCapabilityId.GET_TRADING_SESSIONS, data=sessions)

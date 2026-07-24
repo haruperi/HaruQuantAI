@@ -2,48 +2,71 @@
 
 from __future__ import annotations
 
+from importlib import import_module
+
 from app.services import data
 
-_EXPECTED_API = {
-    "aggregate_ticks_to_bars",
-    "align_multitimeframe_data",
-    "clear_data_cache",
-    "create_backup",
+_PUBLIC_MODULES = (
+    "app.services.data.audit",
+    "app.services.data.audit.contracts",
+    "app.services.data.contracts",
+    "app.services.data.data_jobs",
+    "app.services.data.data_jobs.contracts",
+    "app.services.data.economic_calendar",
+    "app.services.data.evidence",
+    "app.services.data.evidence.account_contracts",
+    "app.services.data.evidence.fx_contracts",
+    "app.services.data.evidence.market_context_contracts",
+    "app.services.data.local_datasets",
+    "app.services.data.market_data",
+    "app.services.data.persistence",
+    "app.services.data.persistence.contracts",
+    "app.services.data.quality",
+    "app.services.data.realtime_feeds",
+    "app.services.data.realtime_feeds.contracts",
+    "app.services.data.sources",
+    "app.services.data.sources.contracts",
+    "app.services.data.sources.local_adapter",
+    "app.services.data.sources.read_only",
+    "app.services.data.synthetic_data",
+    "app.services.data.tick_derivation",
+    "app.services.data.time_sessions",
+    "app.services.data.transformation",
+)
+_APPROVED_INFRASTRUCTURE_EXPORTS = {"DataSettings", "data_settings_context"}
+_APPROVED_FACADE_EXPORTS = {
+    "CALENDAR_SITES",
     "create_data_update_job",
-    "describe_import_dialects",
-    "enforce_retention_policy",
-    "generate_synthetic_bars",
-    "generate_synthetic_ticks",
-    "generate_tick_series",
-    "generate_tick_series_to_parquet",
-    "get_data_availability",
     "get_data_update_job_status",
     "get_feed_status",
-    "get_historical_volume",
-    "get_market_data",
-    "get_market_hours",
-    "get_quality_policy",
-    "get_spread_data",
-    "get_symbol_metadata",
-    "get_tick_data",
-    "get_trading_sessions",
-    "import_external_dataset",
-    "inspect_data_quality",
-    "list_symbols",
-    "load_local_dataset",
-    "resample_ohlcv",
-    "restore_from_backup",
-    "run_data_update_job_once",
-    "save_market_data",
     "start_data_update_job",
     "stop_data_update_job",
-    "summarize_quality_remediation",
-    "to_ohlcv_dataframe",
-    "to_tick_dataframe",
+}
+_OMITTED_PRIVATE_NAMES = {
+    "CACHE_CLEAR_MAX_ENTRIES",
+    "CACHE_TTL_MAX_SECONDS",
+    "CURRENCY_CODE_LENGTH",
+    "ERROR_SAFE_DETAILS_MAX_BYTES",
+    "ERROR_SAFE_DETAILS_MAX_ITEMS",
+    "IMPORT_DIALECTS",
+    "_OHLC_COLUMN_COUNT",
 }
 
 
+def _expected_api() -> set[str]:
+    """Build the approved root surface from registered feature-module exports."""
+    names = _APPROVED_INFRASTRUCTURE_EXPORTS | _APPROVED_FACADE_EXPORTS
+    for module_name in _PUBLIC_MODULES:
+        module = import_module(module_name)
+        names.update(getattr(module, "__all__", ()))
+    return names - _OMITTED_PRIVATE_NAMES
+
+
 def test_package_root_exports_exact_approved_surface() -> None:
-    """No undeclared alias or missing operation crosses the package root."""
-    assert set(data.__all__) == _EXPECTED_API
-    assert {name for name in _EXPECTED_API if hasattr(data, name)} == _EXPECTED_API
+    """Every registered feature export crosses only the package root."""
+    expected = _expected_api()
+
+    assert set(data.__all__) == expected
+    assert len(data.__all__) == len(expected)
+    assert {name for name in expected if hasattr(data, name)} == expected
+    assert all(not name.startswith("_") for name in data.__all__)

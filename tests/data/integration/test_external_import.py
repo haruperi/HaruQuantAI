@@ -4,15 +4,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from app.services.data._settings import DataSettings, data_settings_context
-from app.services.data.local_datasets.contracts import DatasetLoadRequest
-from app.services.data.persistence.contracts import (
+from app.services.data import (
     ColumnMapping,
+    DatasetLoadRequest,
+    DataSettings,
     ExternalImportRequest,
+    data_settings_context,
+    import_external_dataset,
+    load_dataset,
+    run_data_migrations,
 )
-from app.services.data.persistence.dataset_writer import load_dataset
-from app.services.data.persistence.external_import import import_external_dataset
-from app.services.data.persistence.migrations import run_data_migrations
 from app.utils import generate_id
 
 

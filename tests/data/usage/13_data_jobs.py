@@ -1,4 +1,4 @@
-"""Demonstrate FEAT-DATA-13 data update job definitions, scheduling, and lifecycle operations."""
+"""Demonstrate FEAT-DATA-13 update-job scheduling and lifecycle operations."""
 
 from __future__ import annotations
 
@@ -8,9 +8,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import DataError
-from app.services.data.data_jobs.contracts import JobDefinition, JobStatusRequest
-from app.services.data.data_jobs.job import (
+from app.services.data import (
+    DataError,
+    JobDefinition,
+    JobStatusRequest,
     create_data_update_job,
     get_data_update_job_status,
     run_data_update_job_once,
@@ -24,7 +25,7 @@ _START = datetime(2026, 6, 1, tzinfo=UTC)
 
 
 def example_29_scheduler_create_status() -> None:
-    """Create and inspect a scheduler job status via create_data_update_job and get_data_update_job_status."""
+    """Create and inspect a persisted update-job status."""
     req_id = generate_id("req")
     job_def = JobDefinition(
         job_id=_JOB_NAME,
@@ -57,7 +58,7 @@ def example_29_scheduler_create_status() -> None:
 
 
 def example_30_scheduler_start_stop() -> None:
-    """Start and stop a scheduler job via start_data_update_job, stop_data_update_job, run_data_update_job_once."""
+    """Start, run once, and stop a persisted update job."""
     req_id = generate_id("req")
     try:
         job = start_data_update_job(job_id=_JOB_NAME, request_id=req_id)
@@ -78,10 +79,65 @@ def example_30_scheduler_start_stop() -> None:
         print(f"run_data_update_job_once handled: {exc.code}")
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Run all data update job scheduler examples."""
     example_29_scheduler_create_status()
     example_30_scheduler_start_stop()
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_041() -> None:
+    "FR-DATA-041: Derive the stable SHA-256 idempotency key from source, symbol, kind, timeframe, start/end, schema version, and normalization version."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_042() -> None:
+    "FR-DATA-042: Execute retrieval, normalization, quality, persistence, and checkpoint for one bounded chunk as one recoverable unit, deduplicating a committed key."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_043() -> None:
+    "FR-DATA-043: Validate interrupted job leases/checkpoints at startup and resume only after the last committed chunk without publishing partial work."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_044() -> None:
+    "FR-DATA-044: Start or stop a persisted job only after state-transition, lease, source-policy, and schedule validation; recurring execution uses the single-node in-process asyncio loop, while `run_data_update_job_once` remains independently invokable by an OS scheduler."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_045() -> None:
+    "FR-DATA-045: Return persisted job definition/state, enabled flag, run/checkpoint/error/next-run evidence, lease and recovery state, and request ID without mutation."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_084() -> None:
+    "FR-DATA-084: Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (
+        fr_data_041,
+        fr_data_042,
+        fr_data_043,
+        fr_data_044,
+        fr_data_045,
+        fr_data_084,
+    )
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

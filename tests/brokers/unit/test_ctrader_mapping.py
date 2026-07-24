@@ -7,6 +7,7 @@ from app.services.brokers import BrokerErrorCode
 from app.services.brokers.ctrader_session.mapping import (
     _map_error_code,
     _map_order,
+    _map_position,
     _map_quote,
     _optional,
 )
@@ -73,6 +74,26 @@ def test_map_order_uses_canonical_unknown_and_preserves_native_code() -> None:
     )
     assert order.order_type == "UNKNOWN"
     assert order.provider_metadata["native_order_type"] == 99
+
+
+def test_map_position_preserves_provider_ownership_label() -> None:
+    """A genuine cTrader label becomes the canonical ownership reference."""
+    position = _map_position(
+        {
+            "positionId": 21,
+            "positionStatus": 1,
+            "tradeData": {
+                "symbolId": 1,
+                "volume": 10_000_000,
+                "tradeSide": 1,
+                "label": "strategy-alpha",
+            },
+            "swap": 0,
+        },
+        {1: "EURUSD"},
+        {1: Decimal(100_000)},
+    )
+    assert position.ownership_ref == "ctrader-label:strategy-alpha"
 
 
 def test_map_error_code_scopes_not_found_by_operation() -> None:

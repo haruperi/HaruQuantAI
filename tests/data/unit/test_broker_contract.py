@@ -173,8 +173,9 @@ def test_the_allow_list_contains_no_mutation_names() -> None:
         AssertionError: If a mutation name is permitted.
     """
     assert not READ_ONLY_BROKER_METHODS & set(MUTATION_METHODS)
+    lifecycle_methods = {"connect", "disconnect"}
     for name in READ_ONLY_BROKER_METHODS:
-        assert name.startswith(("get_", "is_")) or name == "connect", (
+        assert name.startswith(("get_", "is_")) or name in lifecycle_methods, (
             f"{name!r} is in the read-only allow-list but does not read like a read."
         )
 

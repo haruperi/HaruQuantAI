@@ -90,6 +90,22 @@ def test_ensure_source_registers_mt5_without_connecting(
     assert _runtime.resolve_calendar("mt5", generate_id("req")) is not None
 
 
+def test_ensure_source_registers_ctrader_session_capability_without_connecting(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """cTrader advertises the Brokers-owned read-only session capability."""
+    monkeypatch.setattr(
+        _runtime._LazyBrokerSession,
+        "adapter",
+        lambda *_args: pytest.fail("adapter connected during registration"),
+    )
+
+    _runtime.ensure_source("ctrader", generate_id("req"))
+
+    descriptor = get_source_descriptor("ctrader")
+    assert descriptor.capabilities == ("bars", "ticks", "spreads", "sessions")
+
+
 def test_ensure_source_rejects_unknown_profile() -> None:
     """An undeclared direct-call source fails before provider access."""
     with pytest.raises(DataError) as error:
@@ -261,6 +277,39 @@ def test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile(
     assert len({id(loop) for _event, loop in adapter.events}) == 1
 
 
+def test_lazy_ctrader_session_uses_one_loop() -> None:
+    """Standalone cTrader connects, reads, and closes on one owned event loop."""
+    request_id = generate_id("req")
+
+    class _Adapter:
+        def __init__(self) -> None:
+            self.events: list[tuple[str, asyncio.AbstractEventLoop]] = []
+
+        async def connect(self) -> SimpleNamespace:
+            self.events.append(("connect", asyncio.get_running_loop()))
+            return SimpleNamespace(error=None)
+
+        async def read(self) -> str:
+            self.events.append(("read", asyncio.get_running_loop()))
+            return "payload"
+
+        async def disconnect(self) -> SimpleNamespace:
+            self.events.append(("disconnect", asyncio.get_running_loop()))
+            return SimpleNamespace(error=None)
+
+    adapter = _Adapter()
+    session = _runtime._LazyBrokerSession("ctrader")
+    session._adapter = adapter
+
+    assert session.run(adapter.read(), request_id) == "payload"
+    assert [event for event, _loop in adapter.events] == [
+        "connect",
+        "read",
+        "disconnect",
+    ]
+    assert len({id(loop) for _event, loop in adapter.events}) == 1
+
+
 def test_yahoo_source_registers_exact_standalone_identity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -381,7 +430,10 @@ def test_broker_calendar_maps_authoritative_sessions() -> None:
                 data=(provider_session,),
             )
 
-    session = SimpleNamespace(adapter=lambda _request_id: _Adapter())
+    session = SimpleNamespace(
+        adapter=lambda _request_id: _Adapter(),
+        run=_runtime._run,
+    )
     calendar = _runtime._BrokerMarketCalendar(session)
 
     schedule = calendar.get_schedule(

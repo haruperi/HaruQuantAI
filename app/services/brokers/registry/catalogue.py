@@ -29,6 +29,12 @@ _WRITE = {
     BrokerCapabilityId.CLOSE_POSITION,
     BrokerCapabilityId.REPLACE_ORDER,
 }
+_MT5_DEMO_RELEASED_WRITES = {
+    BrokerCapabilityId.CHECK_ORDER,
+    BrokerCapabilityId.PLACE_ORDER,
+    BrokerCapabilityId.CANCEL_ORDER,
+    BrokerCapabilityId.CLOSE_POSITION,
+}
 # Operations that mutate provider watch-list or session subscription state
 # without placing an order. They are neither pure reads nor order writes, so
 # they are declared `READ_WRITE` and a read-scoped consumer cannot invoke them
@@ -86,6 +92,7 @@ _CTRADER = _COMMON_TARGETS | {
     BrokerCapabilityId.GET_SPREAD,
     BrokerCapabilityId.GET_TICKS,
     BrokerCapabilityId.GET_HISTORICAL_BARS,
+    BrokerCapabilityId.GET_TRADING_SESSIONS,
     BrokerCapabilityId.GET_POSITIONS,
     BrokerCapabilityId.GET_ORDERS,
     BrokerCapabilityId.LIST_ORDER_HISTORY,
@@ -155,12 +162,17 @@ _TARGETS: Mapping[BrokerId, set[BrokerCapabilityId]] = MappingProxyType(
 )
 
 
-# Read-release evidence. MT5's verified demo-account reads may be released here,
-# but `_capability` excludes `_WRITE` unconditionally. Downstream Trading/Risk
-# controls remain defense in depth and are never used to justify catalogue release.
+# Provider-operation release evidence. MT5's verified demo-account reads and
+# single-target writes plus cTrader's verified demo session read may be released
+# here. Adapter instances independently downgrade released writes outside the
+# demo environment; downstream Trading/Risk controls remain defense in depth
+# and never justify release.
 _RELEASED: Mapping[BrokerId, frozenset[BrokerCapabilityId]] = MappingProxyType(
     {
-        BrokerId.MT5: frozenset(_IMPLEMENTED[BrokerId.MT5] - _WRITE),
+        BrokerId.MT5: frozenset(
+            (_IMPLEMENTED[BrokerId.MT5] - _WRITE) | _MT5_DEMO_RELEASED_WRITES
+        ),
+        BrokerId.CTRADER: frozenset({BrokerCapabilityId.GET_TRADING_SESSIONS}),
         BrokerId.BINANCE_SPOT: frozenset(
             {
                 BrokerCapabilityId.GET_SYMBOLS,
@@ -173,9 +185,7 @@ _RELEASED: Mapping[BrokerId, frozenset[BrokerCapabilityId]] = MappingProxyType(
     }
 )
 
-# Recorded evidence for every released read, satisfying FR-BRK-010. A released
-# capability must name the deterministic provider-response suites that prove it;
-# an entry may never be added without the corresponding passing tests.
+# Recorded evidence for every released read, satisfying FR-BRK-010.
 _READ_EVIDENCE: Mapping[BrokerId, tuple[str, ...]] = MappingProxyType(
     {
         BrokerId.MT5: (
@@ -183,6 +193,12 @@ _READ_EVIDENCE: Mapping[BrokerId, tuple[str, ...]] = MappingProxyType(
             "tests/brokers/unit/test_mt5_mapping.py",
             "tests/brokers/unit/test_mt5_adapter.py",
             "tests/brokers/integration/test_provider_contracts.py",
+        ),
+        BrokerId.CTRADER: (
+            "tests/brokers/unit/test_ctrader_network.py",
+            "tests/brokers/unit/test_ctrader_transport.py",
+            "tests/brokers/unit/test_ctrader_sessions.py",
+            "tests/brokers/unit/test_ctrader_adapter.py",
         ),
         BrokerId.BINANCE_SPOT: (
             "tests/brokers/unit/test_binance_transport.py",
@@ -201,6 +217,14 @@ _READ_EVIDENCE: Mapping[BrokerId, tuple[str, ...]] = MappingProxyType(
         ),
     }
 )
+
+_MT5_DEMO_WRITE_EVIDENCE = (
+    "tests/brokers/unit/test_mt5_transport.py",
+    "tests/brokers/unit/test_mt5_mapping.py",
+    "tests/brokers/unit/test_mt5_adapter.py",
+    "tests/brokers/integration/test_mt5_demo_mutations.py",
+)
+_MT5_DEMO_WRITE_APPROVAL = "FR-BRK-010:MT5_DEMO_ONLY"
 
 # The adapter's own verification act. `connect` establishes and verifies the
 # session and `is_connected` reads local/provider session state, so both remain
@@ -243,19 +267,22 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
     target = operation in _TARGETS[broker]
     implemented = operation in _IMPLEMENTED[broker]
     # CONNECT is the adapter's verification act and IS_CONNECTED performs the
-    # adapter's provider-specific check. Both remain attemptable. Other reads
-    # require explicit release evidence; writes are excluded unconditionally.
+    # adapter's provider-specific check. Both remain attemptable. Other
+    # provider calls require explicit release evidence.
     connect_ready = implemented and operation in _SELF_VERIFYING
-    released = (
-        implemented
-        and operation in _RELEASED.get(broker, frozenset())
-        and operation not in _WRITE
-    )
+    released = implemented and operation in _RELEASED.get(broker, frozenset())
     available = connect_ready or released
     availability: Literal["AVAILABLE", "UNAVAILABLE", "DEGRADED"] = (
         "AVAILABLE" if available else "UNAVAILABLE"
     )
-    evidence = _READ_EVIDENCE.get(broker, ()) if released else ()
+    is_demo_write = broker is BrokerId.MT5 and operation in _WRITE and released
+    evidence = (
+        _MT5_DEMO_WRITE_EVIDENCE
+        if is_demo_write
+        else _READ_EVIDENCE.get(broker, ())
+        if released
+        else ()
+    )
     return BrokerCapability(
         capability=operation,
         implementation_status="IMPLEMENTED" if implemented else "NOT_IMPLEMENTED",
@@ -270,6 +297,9 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
         ),
         verification_status="TESTED_SANDBOX" if released else "NOT_TESTED",
         verification_evidence=evidence,
+        release_approval_reference=(
+            _MT5_DEMO_WRITE_APPROVAL if is_demo_write else None
+        ),
         execution_model="LOCAL" if operation in _LOCAL else "PROVIDER_CALL",
         reason=(
             None

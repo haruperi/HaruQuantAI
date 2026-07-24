@@ -70,8 +70,21 @@ def fr_brokers_128() -> None:
     asyncio.run(run())
 
 
+def fr_brokers_062() -> None:
+    """FR-BRK-062: The system shall return provider-supplied trading windows within optional bounds without generating sessions. cTrader shall read the full symbol's `schedule`, `scheduleTimeZone`, `holiday`, and `tradingMode`, normalize intervals to UTC, and subtract broker-authored holiday closures."""  # noqa: E501
+    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
+    assert adapter is not None
+
+    async def run() -> None:
+        res = await adapter.get_trading_sessions("EURUSD")
+        print("FR-BRK-062:", res.status)
+
+    asyncio.run(run())
+
+
 def main() -> None:
-    """Execute every FR-BRK-124..128 usage function."""
+    """Execute every cTrader market-data usage function."""
+    fr_brokers_062()
     fr_brokers_124()
     fr_brokers_125()
     fr_brokers_126()

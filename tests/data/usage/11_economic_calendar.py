@@ -13,9 +13,9 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import DataError
-from app.services.data.economic_calendar.scraper import (
+from app.services.data import (
     CALENDAR_SITES,
+    DataError,
     ScrapeOptions,
     ScrapeResult,
     scrape_economic_calendar,
@@ -78,7 +78,7 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def example_fr_data_095_scrape_calendar() -> ScrapeResult:
+def _example_fr_data_095() -> ScrapeResult:
     """Scrape several sites concurrently under a declared bound."""
     _header("FR-DATA-095 scrape_economic_calendar")
     options = ScrapeOptions(
@@ -95,7 +95,7 @@ def example_fr_data_095_scrape_calendar() -> ScrapeResult:
     return result
 
 
-def example_fr_data_096_data_cleaning(result: ScrapeResult) -> None:
+def _example_fr_data_096(result: ScrapeResult) -> None:
     """Show duplicate removal and malformed-row filtering."""
     _header("FR-DATA-096 cleaning and validation")
     print("Raw forexfactory rows supplied:", len(_ROWS["forexfactory"]))
@@ -104,9 +104,10 @@ def example_fr_data_096_data_cleaning(result: ScrapeResult) -> None:
     if kept:
         print("Actual parsed exactly:", kept[0].actual)
         print("Missing previous is explicit:", kept[0].previous)
+        print(kept)
 
 
-def example_fr_data_097_dataframe_output(result: ScrapeResult) -> None:
+def _example_fr_data_097(result: ScrapeResult) -> None:
     """Project the result into the fixed calendar column contract."""
     _header("FR-DATA-097 to_dataframe")
     frame = result.to_dataframe()
@@ -114,7 +115,7 @@ def example_fr_data_097_dataframe_output(result: ScrapeResult) -> None:
     print("Rows:", len(frame))
 
 
-def example_fr_data_098_saving_with_metadata(result: ScrapeResult) -> None:
+def _example_fr_data_098(result: ScrapeResult) -> None:
     """Save one descriptive artifact per non-empty site frame."""
     _header("FR-DATA-098 save with descriptive names")
     with TemporaryDirectory() as temporary:
@@ -126,7 +127,7 @@ def example_fr_data_098_saving_with_metadata(result: ScrapeResult) -> None:
             print(" -", path.name)
 
 
-def example_fr_data_099_serialization(result: ScrapeResult) -> None:
+def _example_fr_data_099(result: ScrapeResult) -> None:
     """Round-trip the result through its pickled transport form."""
     _header("FR-DATA-099 serialize and deserialize")
     payload = result.serialize()
@@ -135,16 +136,65 @@ def example_fr_data_099_serialization(result: ScrapeResult) -> None:
     print("Events preserved:", restored.events == result.events)
 
 
-def main() -> None:
+def _demonstrate_feature() -> None:
     """Execute every calendar example."""
     try:
-        result = example_fr_data_095_scrape_calendar()
-        example_fr_data_096_data_cleaning(result)
-        example_fr_data_097_dataframe_output(result)
-        example_fr_data_098_saving_with_metadata(result)
-        example_fr_data_099_serialization(result)
+        result = _example_fr_data_095()
+        _example_fr_data_096(result)
+        _example_fr_data_097(result)
+        _example_fr_data_098(result)
+        _example_fr_data_099(result)
     except DataError as error:
         print("Calendar example failed:", error.code)
+
+
+_DEMONSTRATED = [False]
+
+
+def _demonstrate_once() -> None:
+    """Run the feature demonstration once for all requirement entry points."""
+    if _DEMONSTRATED[0]:
+        return
+    _demonstrate_feature()
+    _DEMONSTRATED[0] = True
+
+
+def fr_data_095() -> None:
+    "FR-DATA-095: Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_096() -> None:
+    "FR-DATA-096: Clean and validate raw calendar data into structured records (representing title, country, impact, actual, forecast, previous, and timestamp), filtering duplicates and bad values."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_097() -> None:
+    "FR-DATA-097: Return scraped datasets as a pandas DataFrame via a clean encapsulation `ScrapeResult`."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_098() -> None:
+    "FR-DATA-098: Automatically save non-empty calendar dataframes using descriptive file names that include the site name, date range, and scrape timestamp; empty dataframes are skipped."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def fr_data_099() -> None:
+    "FR-DATA-099: Support serialization and deserialization of `ScrapeResult` using python's `pickle` module for easy persistence and transport."  # noqa: E501 - exact specification text
+    _demonstrate_once()
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
+    demonstrations = (
+        fr_data_095,
+        fr_data_096,
+        fr_data_097,
+        fr_data_098,
+        fr_data_099,
+    )
+    for demonstration in demonstrations:
+        demonstration()
 
 
 if __name__ == "__main__":

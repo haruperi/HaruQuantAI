@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Final, Literal, Protocol
 import pandas as pd
 
 from app.services.data.contracts import DataError
+from app.services.data.persistence.paths import resolve_approved_storage_path
 from app.utils import logger
 
 if TYPE_CHECKING:
@@ -162,7 +163,8 @@ class ScrapeResult:
         Raises:
             DataError: If the format is unsupported or a write fails.
         """
-        logger.info("Saving calendar artifacts to %s", directory)
+        approved_directory = resolve_approved_storage_path(directory)
+        logger.info("Saving calendar artifacts to an approved storage path")
         if format not in {"csv", "parquet"}:
             raise DataError("VALIDATION_FAILED", safe_details={"field": "format"})
         frame = self.to_dataframe()
@@ -174,7 +176,7 @@ class ScrapeResult:
                 if site_frame.empty:
                     logger.info("Skipping empty calendar frame for %s", site)
                     continue
-                path = directory / f"{site}_{window}_{stamp}.{format}"
+                path = approved_directory / f"{site}_{window}_{stamp}.{format}"
                 if format == "csv":
                     site_frame.to_csv(path, index=False)
                 else:

@@ -5,8 +5,10 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from app.services.data.economic_calendar.scraper import (
+from app.services.data import (
+    DataSettings,
     ScrapeOptions,
+    data_settings_context,
     scrape_economic_calendar,
 )
 
@@ -44,7 +46,8 @@ def test_calendar_scrape_cleans_projects_and_saves(tmp_path: Path) -> None:
         )
     )
 
-    result.save(tmp_path, "csv")
+    with data_settings_context(DataSettings(approved_storage_roots=(tmp_path,))):
+        result.save(tmp_path, "csv")
 
     assert len(result.events) == 1
     assert len(result.to_dataframe()) == 1

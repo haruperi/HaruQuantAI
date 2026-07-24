@@ -1,11 +1,13 @@
 """Unit tests for real-evidence tick-series generation."""
 
+import importlib
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
 import app.services.data.tick_derivation.generator as tick_generator
 import pytest
+from app.services.data._settings import DataSettings, data_settings_context
 from app.services.data.contracts import DataError, DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
 from app.services.data.tick_derivation.generator import (
@@ -19,6 +21,16 @@ from app.services.data.tick_derivation.generator import (
 )
 
 _START = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
+
+
+def test_usage_parquet_directory_is_beneath_approved_root(tmp_path: Path) -> None:
+    """The standalone Parquet demonstration writes only under an approved root."""
+    usage = importlib.import_module("tests.data.usage.05_tick_derivation")
+
+    settings = DataSettings(approved_storage_roots=(tmp_path,))
+    with usage._approved_temporary_directory(settings) as temporary_directory:
+        resolved = Path(temporary_directory).resolve()
+        assert resolved.is_relative_to(tmp_path.resolve())
 
 
 def _quality(count: int) -> DataQualityReport:
@@ -525,13 +537,14 @@ def test_parquet_uses_bounded_compiled_columns_without_materializing_dataset(
         raise AssertionError("public materializing path must not run")
 
     monkeypatch.setattr(tick_generator, "generate_tick_series", fail_if_called)
-    result = generate_tick_series_to_parquet(
-        dataset,
-        path=destination,
-        max_output_rows_per_chunk=20,
-        model="generated",
-        trading_timeframe="M1",
-    )
+    with data_settings_context(DataSettings(approved_storage_roots=(tmp_path,))):
+        result = generate_tick_series_to_parquet(
+            dataset,
+            path=destination,
+            max_output_rows_per_chunk=20,
+            model="generated",
+            trading_timeframe="M1",
+        )
     table = pq.read_table(destination)
 
     assert result["rows"] == 27
@@ -545,3 +558,43 @@ def test_parquet_uses_bounded_compiled_columns_without_materializing_dataset(
         "tick_index_in_bar",
         "bar_phase",
     ]
+
+
+def test_parquet_rejects_destination_outside_approved_roots(tmp_path: Path) -> None:
+    """A caller cannot write a tick artifact outside the configured roots."""
+    dataset = _bar_dataset(
+        (_bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="4"),)
+    )
+    approved = tmp_path / "approved"
+    approved.mkdir()
+
+    with (
+        data_settings_context(DataSettings(approved_storage_roots=(approved,))),
+        pytest.raises(DataError) as excinfo,
+    ):
+        generate_tick_series_to_parquet(
+            dataset,
+            path=tmp_path / "outside.parquet",
+            model="generated",
+            trading_timeframe="M1",
+        )
+
+    assert excinfo.value.code == "PERMISSION_DENIED"
+    assert not (tmp_path / "outside.parquet").exists()
+
+
+def test_tick_series_domain_ceiling_cannot_be_loosened() -> None:
+    """A caller cannot disable or raise the domain-wide direct-output ceiling."""
+    dataset = _bar_dataset(
+        (_bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="4"),)
+    )
+
+    with pytest.raises(DataError) as excinfo:
+        generate_tick_series(
+            dataset,
+            model="generated",
+            trading_timeframe="M1",
+            max_records=250_001,
+        )
+
+    assert excinfo.value.code == "LIMIT_EXCEEDED"

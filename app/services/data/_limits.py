@@ -59,6 +59,8 @@ DEFAULT_LIMITS: Final[Mapping[str, int]] = MappingProxyType(
         "SYNTHETIC_TICK_MAX_RECORDS": 250_000,
         "MAX_SYNTHETIC_RECORDS": 250_000,
         "GENERATED_TICKS_MIN_PER_BAR": 4,
+        "TICK_SERIES_MAX_RECORDS": 250_000,
+        "TICK_PARQUET_MAX_OUTPUT_ROWS_PER_CHUNK": 2_000_000,
         # Scheduler and backfill bounds.
         "BACKFILL_CHUNK_SIZE": 10_000,
         "BACKFILL_MAX_RECORDS_PER_CHUNK": 10_000,
@@ -72,6 +74,8 @@ DEFAULT_LIMITS: Final[Mapping[str, int]] = MappingProxyType(
         "AUDIT_QUERY_HARD_MAX_LIMIT": 1_000,
         "ERROR_SAFE_DETAILS_MAX_ITEMS": 64,
         "ERROR_SAFE_DETAILS_MAX_BYTES": 8_192,
+        # Venue schedule expansion bound.
+        "MARKET_SESSION_MAX_DAYS": 366,
     }
 )
 

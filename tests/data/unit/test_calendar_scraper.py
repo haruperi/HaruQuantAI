@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+from app.services.data._settings import DataSettings, data_settings_context
 from app.services.data.contracts import DataError
 from app.services.data.economic_calendar.scraper import (
     CALENDAR_SITES,
@@ -207,7 +208,8 @@ def test_save_skips_empty_dataframes(tmp_path: Path) -> None:
         _options(sites=("forexfactory", "metalsmine")), transport
     )
 
-    result.save(tmp_path)
+    with data_settings_context(DataSettings(approved_storage_roots=(tmp_path,))):
+        result.save(tmp_path)
     written = tuple(tmp_path.glob("*.csv"))
 
     assert len(written) == 1
@@ -215,12 +217,32 @@ def test_save_skips_empty_dataframes(tmp_path: Path) -> None:
     assert written[0].exists()
 
 
+def test_save_rejects_directory_outside_approved_roots(tmp_path: Path) -> None:
+    """Calendar persistence fails before writing outside approved roots."""
+    transport = _FakeTransport({"forexfactory": [_row()]})
+    result = scrape_economic_calendar(_options(sites=("forexfactory",)), transport)
+    approved = tmp_path / "approved"
+    approved.mkdir()
+
+    with (
+        data_settings_context(DataSettings(approved_storage_roots=(approved,))),
+        pytest.raises(DataError) as excinfo,
+    ):
+        result.save(tmp_path)
+
+    assert excinfo.value.code == "PERMISSION_DENIED"
+    assert not tuple(tmp_path.glob("*.csv"))
+
+
 def test_save_rejects_unsupported_format(tmp_path: Path) -> None:
     """An unsupported artifact format fails before any write."""
     transport = _FakeTransport({"forexfactory": [_row()]})
     result = scrape_economic_calendar(_options(sites=("forexfactory",)), transport)
 
-    with pytest.raises(DataError):
+    with (
+        data_settings_context(DataSettings(approved_storage_roots=(tmp_path,))),
+        pytest.raises(DataError),
+    ):
         result.save(tmp_path, "xlsx")
 
 

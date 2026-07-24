@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import MarketDataset
+from app.services.data.contracts import DataError, MarketDataset
 from app.services.data.market_data.pipeline import fetch_market_dataset
 from app.services.data.market_data.requests import MarketDataRequest
 from app.services.data.persistence.contracts import DatasetSaveRequest
@@ -18,6 +18,27 @@ from tests.data.helpers import make_dataset, register_local_test_source
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(hours=1)
+
+
+def test_serve_stale_is_rejected_outside_research() -> None:
+    """FR-DATA-107 limits stale serving to the research workflow."""
+    with pytest.raises(DataError) as captured:
+        MarketDataRequest(
+            source_id="fixture",
+            symbol="EURUSD",
+            data_kind="bars",
+            timeframe="M1",
+            limit=1,
+            use_cache=True,
+            stale_cache_policy="serve_stale",
+            quality_failure_behavior="reject",
+            workflow_context="validation",
+            precision_policy="decimal_string",
+            request_id=(
+                "req-9456bdfa12ea76959c94a3572f5d91c73d838622df0a8d9b4e815c276c6b7880"
+            ),
+        )
+    assert captured.value.code == "INVALID_INPUT"
 
 
 def _configure_database(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
