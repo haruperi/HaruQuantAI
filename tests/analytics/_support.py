@@ -6,16 +6,17 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
 
-from app.services.analytics.adapters.results import adapt_trading_result
-from app.services.analytics.contracts import (
+from app.services.analytics import (
     AnalyticsRunConfig,
     PerformanceReport,
     PortfolioRebalanceMeasurementRequest,
     RiskFreeRateEvidence,
     StatisticalValidationConfig,
     TradingResult,
+    adapt_trading_result,
+    build_performance_report,
 )
-from app.services.analytics.reports.builder import build_performance_report
+from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
 from app.utils import canonical_json, generate_id, logger
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
@@ -150,6 +151,8 @@ def _report(
         source,
         source_contract="simulation.result",
         request_id=request_id or generate_id("req"),
+        correlation_id=generate_id("cor"),
+        created_at=NOW,
         initial_balance=Decimal(1000),
         account_currency=account_currency,
         config=config,
@@ -178,16 +181,65 @@ def _configured_result(
             as_of=NOW,
         ),
     )
+    benchmark_start = NOW.replace(day=18, hour=0, minute=0, second=0, microsecond=0)
+    benchmark_end = NOW.replace(hour=0, minute=0, second=0, microsecond=0)
+    benchmark_available = NOW
+    benchmark_records = (
+        OHLCVRecord(
+            timestamp=benchmark_start,
+            source="analytics-test",
+            source_symbol="BENCH",
+            available_at=benchmark_available,
+            open=Decimal(100),
+            high=Decimal(101),
+            low=Decimal(99),
+            close=Decimal(100),
+            volume=Decimal(1),
+            price_unit="index_points",
+            volume_unit="contracts",
+        ),
+        OHLCVRecord(
+            timestamp=benchmark_end,
+            source="analytics-test",
+            source_symbol="BENCH",
+            available_at=benchmark_available,
+            open=Decimal(100),
+            high=Decimal(102),
+            low=Decimal(99),
+            close=Decimal(101),
+            volume=Decimal(1),
+            price_unit="index_points",
+            volume_unit="contracts",
+        ),
+    )
     benchmark_evidence = (
-        {
-            "currency": "USD",
-            "points": (
-                {
-                    "timestamp": NOW.replace(hour=0, minute=0, second=0, microsecond=0),
-                    "value": 0.01,
-                },
+        MarketDataset(
+            normalization_version="v1",
+            data_kind="bars",
+            symbol="BENCH",
+            timeframe="1d",
+            records=benchmark_records,
+            start=benchmark_start,
+            end=benchmark_end,
+            available_at=benchmark_available,
+            record_count=2,
+            quality_report=DataQualityReport(
+                quality_status="passed",
+                quality_score=Decimal(1),
+                record_count=2,
+                checked_count=2,
+                truncated=False,
+                sample_limit=10,
+                schema_version="v1",
+                generated_at=benchmark_available,
             ),
-        }
+            source_metadata={"source": "analytics-test"},
+            license_metadata={"status": "approved"},
+            cache_status="miss",
+            workflow_context="backtest",
+            precision_policy="decimal_string",
+            request_id=generate_id("req"),
+        )
         if benchmark
         else None
     )
@@ -285,11 +337,7 @@ def _portfolio_simulation_result() -> dict[str, object]:
             },
         ),
         "fx_evidence_ids": ("identity-USD",),
-        "artifact_manifest": {
-            "artifacts": (),
-            "created_at": end,
-            "schema_version": "v1",
-        },
+        "artifact_manifest_ref": "artifact-manifest-1",
     }
 
 

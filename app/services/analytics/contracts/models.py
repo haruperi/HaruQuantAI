@@ -41,7 +41,6 @@ def _require_cataloged_code(
         AnalyticsValidationError: If the code is uncataloged or the severity
             conflicts with the cataloged severity.
     """
-    logger.debug("Validating Analytics evidence code against the catalog")
     definition = EVIDENCE_CATALOG[namespace].get(code)
     if definition is None:
         message = f"uncataloged {namespace} code: {code}"
@@ -65,7 +64,6 @@ def _require_text(value: str, field_name: str) -> str:
     Raises:
         AnalyticsValidationError: If the value is blank or untrimmed.
     """
-    logger.debug("Validating Analytics text field")
     if not value or value != value.strip():
         message = f"{field_name} must be non-empty trimmed text"
         raise AnalyticsValidationError(message)
@@ -85,7 +83,6 @@ def _require_utc(value: datetime, field_name: str) -> datetime:
     Raises:
         AnalyticsValidationError: If the timestamp is not aware UTC.
     """
-    logger.debug("Validating Analytics UTC timestamp")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         message = f"{field_name} must be aware UTC"
         raise AnalyticsValidationError(message)
@@ -105,7 +102,6 @@ def _require_decimal(value: object, field_name: str) -> Decimal:
     Raises:
         AnalyticsValidationError: If the value is not an exact finite Decimal.
     """
-    logger.debug("Validating Analytics Decimal field")
     if not isinstance(value, Decimal) or not value.is_finite():
         message = f"{field_name} must be a finite Decimal"
         raise AnalyticsValidationError(message)
@@ -125,7 +121,6 @@ def _validate_finite_scalar(value: object, path: str) -> bool:
     Raises:
         AnalyticsValidationError: If a recognized number is non-finite.
     """
-    logger.debug("Validating finite Analytics scalar evidence")
     if value is None or isinstance(value, (str, bool, int, datetime)):
         return True
     if isinstance(value, Decimal):
@@ -151,7 +146,6 @@ def _validate_finite(value: object, path: str = "value") -> None:
     Raises:
         AnalyticsValidationError: If an unsupported or non-finite value is found.
     """
-    logger.debug("Validating finite Analytics evidence")
     if _validate_finite_scalar(value, path):
         return
     if isinstance(value, Mapping):
@@ -178,7 +172,6 @@ def _freeze_mapping(value: Mapping[str, object]) -> Mapping[str, object]:
     Returns:
         Immutable mapping copy.
     """
-    logger.debug("Freezing Analytics mapping evidence")
     _validate_finite(value)
     return MappingProxyType(dict(value))
 
@@ -200,7 +193,6 @@ class AnalyticsWarning:
             AnalyticsValidationError: If the code is uncataloged or the
                 severity conflicts with the cataloged severity.
         """
-        logger.debug("Validating Analytics warning contract")
         for name in ("code", "severity", "affected_section", "source_context"):
             _require_text(getattr(self, name), name)
         _require_cataloged_code(self.code, self.severity, namespace="warnings")
@@ -226,7 +218,6 @@ class QualityFlag:
                 is uncataloged, or the severity or blocker semantics conflict
                 with the Evidence Catalog.
         """
-        logger.debug("Validating Analytics quality flag contract")
         _require_text(self.code, "code")
         _require_text(self.severity, "severity")
         _require_text(self.source_context, "source_context")
@@ -261,7 +252,6 @@ class Lineage:
         Raises:
             AnalyticsValidationError: If required lineage is missing.
         """
-        logger.debug("Validating Analytics lineage contract")
         for name in (
             "source_contract",
             "source_version",
@@ -296,7 +286,6 @@ class ReproducibilityHashes:
         Raises:
             AnalyticsValidationError: If a digest is malformed.
         """
-        logger.debug("Validating Analytics reproducibility hashes")
         for value in (
             self.input_hash,
             self.configuration_hash,
@@ -324,7 +313,6 @@ class RiskFreeRateEvidence:
 
     def __post_init__(self) -> None:
         """Validate risk-free-rate source, unit, and value."""
-        logger.debug("Validating Analytics risk-free-rate evidence")
         _require_decimal(self.rate, "rate")
         _require_text(self.source, "source")
         _require_utc(self.as_of, "as_of")
@@ -346,7 +334,6 @@ class StatisticalValidationConfig:
         Raises:
             AnalyticsValidationError: If an iteration or probability is invalid.
         """
-        logger.debug("Validating Analytics statistical configuration")
         if self.bootstrap_iterations <= 0 or self.permutation_iterations <= 0:
             raise AnalyticsValidationError("statistical iterations must be positive")
         if not 0.0 < self.confidence < 1.0 or not 0.0 < self.alpha < 1.0:
@@ -377,7 +364,6 @@ class AnalyticsRunConfig:
         Raises:
             AnalyticsValidationError: If a bound is invalid or exceeded.
         """
-        logger.debug("Validating Analytics runtime configuration")
         bounds = (
             self.max_warning_detail_bytes,
             self.max_trades,
@@ -429,7 +415,6 @@ class ClosedTrade:
         Raises:
             AnalyticsValidationError: If identity, numeric, or time evidence fails.
         """
-        logger.debug("Validating Analytics closed trade")
         for name in ("ticket", "symbol", "comment", "magic"):
             _require_text(getattr(self, name), name)
         for name in (
@@ -457,7 +442,6 @@ class ClosedTrade:
         Raises:
             AnalyticsValidationError: If numeric trade semantics are invalid.
         """
-        logger.debug("Validating Analytics closed-trade numeric semantics")
         if self.volume <= 0 or self.entry_price <= 0 or self.exit_price <= 0:
             raise AnalyticsValidationError(
                 "volume and entry/exit prices must be positive"
@@ -478,7 +462,6 @@ class ClosedTrade:
         Returns:
             Exact net trade profit or loss.
         """
-        logger.debug("Calculating Analytics net trade PnL")
         return self.profit + self.commission + self.swap
 
 
@@ -517,7 +500,6 @@ class TradingResult:
         Raises:
             AnalyticsValidationError: If required canonical evidence is invalid.
         """
-        logger.debug("Validating Analytics trading result")
         for name in (
             "source_contract",
             "source_contract_version",
@@ -569,7 +551,6 @@ class MetricEvidence:
         Raises:
             AnalyticsValidationError: If status and evidence conflict.
         """
-        logger.debug("Validating Analytics metric evidence")
         _require_text(self.metric_key, "metric_key")
         _require_text(self.unit, "unit")
         _require_text(self.source_context, "source_context")
@@ -601,7 +582,6 @@ class SectionEvidence:
         Raises:
             AnalyticsValidationError: If status and section evidence conflict.
         """
-        logger.debug("Validating Analytics section evidence")
         _require_text(self.section_key, "section_key")
         if self.status in {"skipped", "failed"} and not self.reason:
             raise AnalyticsValidationError(
@@ -637,7 +617,6 @@ class PerformanceReport:
         Raises:
             AnalyticsValidationError: If the report is incomplete or unsafe.
         """
-        logger.debug("Validating Analytics performance report")
         for name in ("report_id", "request_id", "account_currency"):
             _require_text(getattr(self, name), name)
         _require_utc(self.created_at, "created_at")
@@ -672,7 +651,6 @@ class PortfolioPerformanceReport:
         Raises:
             AnalyticsValidationError: If portfolio evidence is incomplete.
         """
-        logger.debug("Validating Analytics portfolio report")
         _require_text(self.report_id, "report_id")
         _require_text(self.base_currency, "base_currency")
         _require_utc(self.measurement_start, "measurement_start")
@@ -701,7 +679,6 @@ class DashboardPayload:
 
     def __post_init__(self) -> None:
         """Validate dashboard identity and finite payload values."""
-        logger.debug("Validating Analytics dashboard payload")
         _require_text(self.payload_id, "payload_id")
         _require_text(self.report_id, "report_id")
         _require_utc(self.generated_at, "generated_at")
@@ -736,7 +713,6 @@ class PortfolioAllocationEvidence:
         Raises:
             AnalyticsValidationError: If allocation evidence is incomplete.
         """
-        logger.debug("Validating Analytics portfolio allocation evidence")
         _require_text(self.evidence_id, "evidence_id")
         _require_text(self.allocation_reference, "allocation_reference")
         _require_text(self.base_currency, "base_currency")
@@ -762,7 +738,6 @@ def _require_hash(value: str, field_name: str) -> str:
     Raises:
         AnalyticsValidationError: If the digest is malformed.
     """
-    logger.debug("Validating Analytics SHA-256 digest")
     if len(value) != _SHA256_LENGTH or any(
         character not in "0123456789abcdef" for character in value
     ):
@@ -793,7 +768,6 @@ def _validated_trading_facts(
         AnalyticsValidationError: If facts are incomplete, unreconciled, or
             not explicitly redacted.
     """
-    logger.debug("Validating redacted Trading facts for Analytics measurement")
     expected_fields = {"status", "data", "errors", "warnings", "audit_metadata"}
     if set(value) != expected_fields or value.get("status") != "success":
         raise AnalyticsValidationError(
@@ -839,7 +813,6 @@ def _validated_action_outcomes(value: object) -> list[str]:
         AnalyticsValidationError: If any action outcome is malformed or not
             reconciled successful.
     """
-    logger.debug("Validating Trading action outcomes for Analytics measurement")
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
         raise AnalyticsValidationError("Trading action outcomes are missing")
     action_ids: list[str] = []

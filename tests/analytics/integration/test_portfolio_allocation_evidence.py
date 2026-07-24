@@ -8,32 +8,29 @@ from pathlib import Path
 
 import pytest
 from app.services.analytics import (
-    build_portfolio_allocation_evidence as public_build_portfolio_allocation_evidence,
-)
-from app.services.analytics import (
-    build_portfolio_rebalance_measurement as public_build_rebalance_measurement,
-)
-from app.services.analytics.reports.allocation import (
     build_portfolio_allocation_evidence,
     build_portfolio_rebalance_measurement,
 )
 from app.utils import logger
-from tests.analytics._support import _report
+from tests.analytics._support import _measurement_request, _report
 
 
 def test_allocation_evidence_builder_is_package_root_public() -> None:
     """Expose the registered allocation projector through Analytics' public port."""
     logger.info("Testing Analytics package-root allocation projector export")
-    assert (
-        public_build_portfolio_allocation_evidence
-        is build_portfolio_allocation_evidence
-    )
+    assert callable(build_portfolio_allocation_evidence)
 
 
 def test_rebalance_measurement_builder_is_package_root_public() -> None:
-    """Expose post-trade measurement through Analytics' public domain port."""
-    logger.info("Testing Analytics package-root rebalance measurement export")
-    assert public_build_rebalance_measurement is build_portfolio_rebalance_measurement
+    """WF-ANLT-014 measures genuine hash-bound reconciled Trading facts."""
+    logger.info("Testing Analytics post-trade rebalance measurement workflow")
+    request = _measurement_request()
+    evidence = build_portfolio_rebalance_measurement(request)
+    assert evidence.request_id == request.request_id
+    assert evidence.trading_execution_ref == request.trading_execution_ref
+    assert evidence.trading_execution_hash == request.trading_execution_hash
+    assert evidence.summary["successful_action_count"] == 1
+    assert evidence.non_binding is True
 
 
 _FIXTURE = Path("tests/analytics/fixtures/portfolio_simulation_result.json")

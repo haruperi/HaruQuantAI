@@ -4,14 +4,12 @@
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from app.services.analytics.adapters.results import (
-    adapt_trading_result,
-    build_closed_trade_equity_curve,
-)
-from app.services.analytics.contracts import (
+from app.services.analytics import (
     AnalyticsRunConfig,
     ClosedTrade,
     StatisticalValidationConfig,
+    adapt_trading_result,
+    build_closed_trade_equity_curve,
 )
 from app.utils import logger
 

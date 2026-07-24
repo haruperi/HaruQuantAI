@@ -169,6 +169,8 @@ class SimulationAnalyticsBacktestAdapter:
                 _simulation_source(simulation_result, request),
                 source_contract="simulation.result",
                 request_id=request.request_id,
+                correlation_id=request.correlation_id,
+                created_at=context.end,
                 initial_balance=simulation_result.initial_balance,
                 account_currency=simulation_result.account_currency,
                 config=self._analytics_config,

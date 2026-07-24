@@ -13,7 +13,8 @@ from app.services.analytics.metrics.benchmarks import (
     align_benchmark_series,
     calculate_benchmark_evidence,
 )
-from app.utils import logger
+from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
+from app.utils import generate_id, logger
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -43,10 +44,62 @@ def test_benchmark_zero_variance_is_undefined() -> None:
             as_of=NOW,
         ),
     )
-    benchmark = {
-        "currency": "USD",
-        "points": ({"timestamp": NOW, "value": 0.01},),
-    }
+    start = NOW.replace(day=18)
+    bars = (
+        OHLCVRecord(
+            timestamp=start,
+            source="unit-test",
+            source_symbol="BENCH",
+            available_at=NOW,
+            open=Decimal(100),
+            high=Decimal(100),
+            low=Decimal(100),
+            close=Decimal(100),
+            volume=Decimal(1),
+            price_unit="index_points",
+            volume_unit="contracts",
+        ),
+        OHLCVRecord(
+            timestamp=NOW,
+            source="unit-test",
+            source_symbol="BENCH",
+            available_at=NOW,
+            open=Decimal(100),
+            high=Decimal(101),
+            low=Decimal(100),
+            close=Decimal(101),
+            volume=Decimal(1),
+            price_unit="index_points",
+            volume_unit="contracts",
+        ),
+    )
+    benchmark = MarketDataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="BENCH",
+        timeframe="1d",
+        records=bars,
+        start=start,
+        end=NOW,
+        available_at=NOW,
+        record_count=2,
+        quality_report=DataQualityReport(
+            quality_status="passed",
+            quality_score=Decimal(1),
+            record_count=2,
+            checked_count=2,
+            truncated=False,
+            sample_limit=10,
+            schema_version="v1",
+            generated_at=NOW,
+        ),
+        source_metadata={"source": "unit-test"},
+        license_metadata={"status": "approved"},
+        cache_status="miss",
+        workflow_context="backtest",
+        precision_policy="decimal_string",
+        request_id=generate_id("req"),
+    )
     result = adapt_trading_result(
         _source(),
         source_contract="simulation.result",

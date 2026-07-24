@@ -3,7 +3,7 @@
 # ruff: noqa: INP001
 from decimal import Decimal
 
-from app.services.analytics.reports.comparison import compare_performance_reports
+from app.services.analytics import compare_performance_reports
 from app.utils import logger
 from tests.analytics._support import _report
 

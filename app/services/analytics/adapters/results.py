@@ -17,6 +17,7 @@ from app.services.analytics.contracts.models import (
     Lineage,
     TradingResult,
 )
+from app.services.data import MarketDataset, OHLCVRecord
 from app.utils import canonical_json, logger, redact_mapping_value
 
 _SOURCE_FIELDS = frozenset(
@@ -61,6 +62,36 @@ _SCHEMA_BY_CONTRACT = {
     "trading.closed_trade_ledger": "trading.closed_trade_ledger.v1",
     "simulation.result": "simulation.result.v1",
 }
+_MIN_BENCHMARK_BARS = 2
+
+
+def _benchmark_return_points(
+    records: tuple[OHLCVRecord, ...],
+) -> tuple[Mapping[str, object], ...]:
+    """Derive currency-neutral periodic close returns from canonical bars.
+
+    Args:
+        records: Ordered canonical benchmark bars.
+
+    Returns:
+        Timestamped simple-return points.
+
+    Raises:
+        AnalyticsValidationError: If a return denominator is zero.
+    """
+    previous = records[0].close
+    points: list[Mapping[str, object]] = []
+    for record in records[1:]:
+        if previous == 0:
+            raise AnalyticsValidationError("benchmark close must be non-zero")
+        points.append(
+            {
+                "timestamp": record.timestamp,
+                "value": float((record.close - previous) / previous),
+            }
+        )
+        previous = record.close
+    return tuple(points)
 
 
 def _validate_source_shape(source: Mapping[str, object]) -> None:
@@ -143,26 +174,58 @@ def _adapt_trade(row: object) -> ClosedTrade:
         raise AnalyticsValidationError("closed-trade row is invalid") from error
 
 
-def _validate_benchmark(
-    benchmark: Mapping[str, object] | None,
+def _adapt_benchmark(
+    benchmark: MarketDataset | None,
     *,
     config: AnalyticsRunConfig,
-) -> None:
-    """Validate caller-supplied benchmark point bounds.
+) -> Mapping[str, object] | None:
+    """Validate and adapt one Data-owned benchmark dataset.
 
     Args:
-        benchmark: Optional benchmark evidence.
+        benchmark: Optional Data-owned benchmark dataset.
         config: Required Analytics bounds.
 
+    Returns:
+        Internal currency-neutral periodic-return evidence, or ``None``.
+
     Raises:
-        AnalyticsValidationError: If benchmark points are absent or oversized.
+        AnalyticsValidationError: If the dataset is incompatible or unsafe.
     """
-    logger.debug("Validating Analytics benchmark bound")
     if benchmark is None:
-        return
-    points = _require_sequence(benchmark.get("points"), "benchmark.points")
-    if len(points) > config.max_benchmark_points:
+        return None
+    if benchmark.contract_version != "v1" or benchmark.schema_id != (
+        "data.market_dataset.v1"
+    ):
+        raise AnalyticsValidationError(
+            "benchmark MarketDataset version is incompatible"
+        )
+    if benchmark.data_kind != "bars":
+        raise AnalyticsValidationError("benchmark MarketDataset must contain bars")
+    if benchmark.quality_report.quality_status in {"failed", "not_checked"}:
+        raise AnalyticsValidationError(
+            "benchmark MarketDataset quality is insufficient"
+        )
+    if len(benchmark.records) < _MIN_BENCHMARK_BARS:
+        raise AnalyticsValidationError(
+            "benchmark MarketDataset requires at least two bars"
+        )
+    if len(benchmark.records) - 1 > config.max_benchmark_points:
         raise AnalyticsValidationError("benchmark exceeds configured point bound")
+    if any(not isinstance(record, OHLCVRecord) for record in benchmark.records):
+        raise AnalyticsValidationError(
+            "benchmark MarketDataset contains non-bar records"
+        )
+    records = cast("tuple[OHLCVRecord, ...]", benchmark.records)
+    return {
+        "contract_version": benchmark.contract_version,
+        "schema_id": benchmark.schema_id,
+        "dataset_request_id": benchmark.request_id,
+        "symbol": benchmark.symbol,
+        "timeframe": benchmark.timeframe,
+        "quality_status": benchmark.quality_report.quality_status,
+        "available_at": benchmark.available_at,
+        "points": _benchmark_return_points(records),
+    }
 
 
 def _redact_and_bound_metadata(
@@ -269,7 +332,7 @@ def adapt_trading_result(
     initial_balance: Decimal,
     account_currency: str,
     config: AnalyticsRunConfig,
-    benchmark: Mapping[str, object] | None = None,
+    benchmark: MarketDataset | None = None,
     fx_evidence: Mapping[str, object] | None = None,
 ) -> TradingResult:
     """Adapt an approved versioned ledger projection to canonical Analytics input.
@@ -280,7 +343,7 @@ def adapt_trading_result(
         initial_balance: Positive caller-supplied starting balance.
         account_currency: Required caller-supplied account currency.
         config: Required Analytics bounds and calculation settings.
-        benchmark: Optional caller-supplied benchmark evidence.
+        benchmark: Optional caller-supplied Data-owned benchmark dataset.
         fx_evidence: Optional caller-supplied FX conversion evidence.
 
     Returns:
@@ -308,7 +371,7 @@ def adapt_trading_result(
     curve, daily = build_closed_trade_equity_curve(
         trades, initial_balance=initial_balance, config=config
     )
-    _validate_benchmark(benchmark, config=config)
+    benchmark_evidence = _adapt_benchmark(benchmark, config=config)
     quality = _redact_and_bound_metadata(
         _require_mapping(source["quality_metadata"], "quality_metadata"),
         field_name="quality_metadata",
@@ -352,7 +415,7 @@ def adapt_trading_result(
             equity_curve=curve,
             daily_equity_curve=daily,
             curve_basis="closed_trade",
-            benchmark=benchmark,
+            benchmark=benchmark_evidence,
             fx_evidence=fx_evidence,
             quality_metadata=quality,
             source_metadata=metadata,

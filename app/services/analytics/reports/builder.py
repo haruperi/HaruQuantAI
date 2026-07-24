@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.contracts.errors import AnalyticsValidationError
@@ -26,7 +28,10 @@ from app.services.analytics.metrics.trades import (
 )
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
 from app.utils import ValidationError as UtilsValidationError
-from app.utils import canonical_json, derive_stable_id, logger, utc_now, validate_id
+from app.utils import canonical_json, derive_stable_id, logger, validate_id
+
+if TYPE_CHECKING:
+    from app.services.data import MarketDataset
 
 REQUIRED_REPORT_SECTIONS = ("trades", "pnl", "equity_returns", "drawdown")
 OPTIONAL_REPORT_SECTIONS = (
@@ -147,15 +152,17 @@ def _replace_hashes(
     )
 
 
-def build_performance_report(
+def _build_performance_report(
     source: Mapping[str, object],
     *,
     source_contract: str,
     request_id: str,
+    correlation_id: str,
+    created_at: datetime,
     initial_balance: Decimal,
     account_currency: str,
     config: AnalyticsRunConfig,
-    benchmark: Mapping[str, object] | None = None,
+    benchmark: MarketDataset | None = None,
     fx_evidence: Mapping[str, object] | None = None,
     diagnostic_partial_mode: bool = False,
 ) -> PerformanceReport:
@@ -165,10 +172,12 @@ def build_performance_report(
         source: Approved producer-neutral closed-trade ledger mapping.
         source_contract: Compatibility-matrix producer identity.
         request_id: Required caller request identity.
+        correlation_id: Required caller correlation identity.
+        created_at: Required caller-supplied UTC report creation time.
         initial_balance: Exact positive starting balance.
         account_currency: Ledger account currency.
         config: Required limits and calculation configuration.
-        benchmark: Optional caller-supplied benchmark evidence.
+        benchmark: Optional caller-supplied Data-owned benchmark dataset.
         fx_evidence: Optional caller-supplied Data-owned FX evidence.
         diagnostic_partial_mode: Explicit permission for non-binding diagnostics.
 
@@ -178,9 +187,9 @@ def build_performance_report(
     Raises:
         AnalyticsValidationError: If input, a required section, or output fails.
     """
-    logger.info("Building canonical Analytics performance report")
     try:
         validate_id(request_id, expected_prefix="req")
+        validate_id(correlation_id, expected_prefix="cor")
     except UtilsValidationError as error:
         raise AnalyticsValidationError("request_id is invalid") from error
     result = adapt_trading_result(
@@ -227,7 +236,7 @@ def build_performance_report(
         schema_id="analytics.performance_report.v1",
         report_id=report_id,
         request_id=request_id,
-        created_at=utc_now(),
+        created_at=created_at,
         account_currency=account_currency,
         sections=sections,
         caveats=caveats,
@@ -250,7 +259,72 @@ def build_performance_report(
     safe = to_report_json_safe(report)
     if len(canonical_json(safe).encode("utf-8")) > config.max_response_bytes:
         raise AnalyticsValidationError("performance report exceeds configured bound")
-    logger.info("Completed canonical Analytics performance report")
+    return report
+
+
+def build_performance_report(
+    source: Mapping[str, object],
+    *,
+    source_contract: str,
+    request_id: str,
+    correlation_id: str,
+    created_at: datetime,
+    initial_balance: Decimal,
+    account_currency: str,
+    config: AnalyticsRunConfig,
+    benchmark: MarketDataset | None = None,
+    fx_evidence: Mapping[str, object] | None = None,
+    diagnostic_partial_mode: bool = False,
+) -> PerformanceReport:
+    """Build one canonical report with bounded structured boundary logging.
+
+    Args:
+        source: Approved producer-neutral closed-trade ledger mapping.
+        source_contract: Compatibility-matrix producer identity.
+        request_id: Required caller request identity.
+        correlation_id: Required caller correlation identity.
+        created_at: Required caller-supplied UTC report creation time.
+        initial_balance: Exact positive starting balance.
+        account_currency: Ledger account currency.
+        config: Required limits and calculation configuration.
+        benchmark: Optional caller-supplied Data-owned benchmark dataset.
+        fx_evidence: Optional caller-supplied Data-owned FX evidence.
+        diagnostic_partial_mode: Explicit permission for non-binding diagnostics.
+
+    Returns:
+        Canonical PerformanceReport v1.
+
+    Raises:
+        AnalyticsValidationError: If input, a required section, or output fails.
+    """
+    operation_logger = logger.bind(
+        domain="analytics",
+        operation="build_performance_report",
+        request_id=request_id,
+        correlation_id=correlation_id,
+    )
+    operation_logger.info("Analytics public operation started")
+    try:
+        report = _build_performance_report(
+            source,
+            source_contract=source_contract,
+            request_id=request_id,
+            correlation_id=correlation_id,
+            created_at=created_at,
+            initial_balance=initial_balance,
+            account_currency=account_currency,
+            config=config,
+            benchmark=benchmark,
+            fx_evidence=fx_evidence,
+            diagnostic_partial_mode=diagnostic_partial_mode,
+        )
+    except AnalyticsValidationError:
+        operation_logger.warning("Analytics public operation validation failed")
+        raise
+    except Exception:
+        operation_logger.exception("Analytics public operation failed")
+        raise
+    operation_logger.info("Analytics public operation succeeded")
     return report
 
 

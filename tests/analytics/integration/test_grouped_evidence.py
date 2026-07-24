@@ -1,7 +1,7 @@
 """Integration evidence for deterministic grouped Analytics metrics."""
 
 # ruff: noqa: INP001
-from app.services.analytics.metrics.groups import calculate_grouped_evidence
+from app.services.analytics import calculate_grouped_evidence
 from app.utils import logger
 from tests.analytics._support import _configured_result
 

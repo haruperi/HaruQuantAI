@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.2.7
+
+**Release date:** 2026-07-24
+
+### Complete Analytics domain
+
+The Analytics domain now exposes five focused feature modules with deterministic evidence, performance reports, bounded projections, and standalone usage coverage.
+
+#### Added (5)
+
+- `FEAT-ANLT-01` Schemas, Catalogs, and Evidence Safety.
+- `FEAT-ANLT-02` Approved Upstream Result Mapping.
+- `FEAT-ANLT-03` Internal Pure Analytical Evidence.
+- `FEAT-ANLT-04` Canonical Reporting.
+- `FEAT-ANLT-05` Bounded Report Projection.
+
 ## 2.2.6
 
 **Release date:** 2026-07-24

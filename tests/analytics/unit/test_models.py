@@ -247,10 +247,10 @@ def test_warning_uses_cataloged_severity() -> None:
     """Warning construction derives severity from the evidence catalog."""
     logger.debug("Testing Analytics warning catalog severity")
     warning = build_warning(
-        "stop_loss_absent",
+        "r_multiple_mae_fallback",
         section="trades",
         source_context="all",
-        detail={"ticket": "ticket-1"},
+        detail={"ticket": "ticket-1", "basis": "realized_mae"},
         max_detail_bytes=256,
     )
     assert warning.severity == "warning"
@@ -405,11 +405,11 @@ def test_warning_rejects_severity_conflicting_with_catalog() -> None:
         (AnalyticsValidationError, PydanticValidationError), match="severity"
     ):
         AnalyticsWarning(
-            code="stop_loss_absent",
+            code="r_multiple_mae_fallback",
             severity="blocker",
             affected_section="trades",
             source_context="all",
-            detail={"ticket": "ticket-1"},
+            detail={"ticket": "ticket-1", "basis": "realized_mae"},
         )
 
 

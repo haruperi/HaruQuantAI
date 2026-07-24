@@ -11,17 +11,16 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.analytics.contracts import (
+from app.services.analytics import (
     AnalyticsRunConfig,
     ClosedTrade,
+    DashboardPayload,
     RiskFreeRateEvidence,
     StatisticalValidationConfig,
-)
-from app.services.analytics.dashboards import (
     build_dashboard_payload,
+    build_performance_report,
     truncate_series,
 )
-from app.services.analytics.reports.builder import build_performance_report
 from app.utils import generate_id
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -117,18 +116,42 @@ def example_dashboards() -> None:
         source,
         source_contract="simulation.result",
         request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        created_at=NOW,
         initial_balance=Decimal(1000),
         account_currency="USD",
         config=config,
     )
 
     payload = build_dashboard_payload(report)
+    payload = DashboardPayload(**dict(payload.__dict__))
     print(f"Dashboard Payload schema: {payload.schema_id}")
     print(f"Non-binding: {payload.non_binding}")
 
 
+def fr_anlt_045() -> None:
+    """FR-ANLT-045.
+
+    The system shall deterministically bound a series without exceeding the
+    approved limit, preserving endpoints and approved extrema/trough/high/warning
+    points by defined priority and returning original/returned counts, method,
+    reason, and truncation status.
+    """
+    example_dashboards()
+
+
+def fr_anlt_046() -> None:
+    """FR-ANLT-046.
+
+    The system shall project only approved `PerformanceReport` sections into
+    finite versioned summary, equity, drawdown, warning, and quality-flag payloads
+    with units/status metadata and no metric recomputation.
+    """
+    example_dashboards()
+
+
 def main() -> None:
-    """Run Analytics dashboards usage example."""
+    """Run the bounded demonstration shared by every dashboard requirement."""
     example_dashboards()
 
 

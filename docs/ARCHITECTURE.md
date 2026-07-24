@@ -84,13 +84,14 @@
 * Later agile phases reuse these completed domains and run compatibility/regression
   checks; they do not rebuild them. Current semantic-docstring/format cleanup is a
   separate repository-quality gate.
-* `app/services/analytics/` is a partial implementation baseline across contracts,
-  producer-neutral ledger adaptation, 60 cataloged metrics, report/allocation evidence,
-  bounded dashboards, all active requirements, and all non-excluded workflows.
-  Simulation imports no Analytics code; until Simulation publishes executable
-  `PortfolioSimulationResult v1`, Analytics verifies `FR-SIM-033` through the exact
-  README-backed producer fixture. Analytics derives its equity curve deterministically
-  from the closed-trade ledger and has no open decisions.
+* `app/services/analytics/` is a completed read-only implementation across
+  contracts, producer-neutral ledger and Data-owned benchmark adaptation, 60
+  cataloged metrics, report/allocation evidence, bounded dashboards, all active
+  requirements, and all non-excluded workflows. Simulation publishes executable
+  `PortfolioSimulationResult v1`; producer-consumer compatibility and exact
+  `FR-SIM-033` fixture parity are verified without reverse imports. Analytics
+  derives its equity curve deterministically from the closed-trade ledger and has
+  no open decisions.
 
 ---
 

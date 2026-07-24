@@ -1,16 +1,19 @@
 """Integration evidence for Analytics serialization and hashing."""
 
 # ruff: noqa: INP001
-from app.services.analytics.reports.serialization import serialize_report
-from app.utils import logger
+from app.services.analytics import serialize_report
+from app.utils import generate_id, logger
 from tests.analytics._support import _report
 
 
 def test_serialization_and_hashes_are_deterministic() -> None:
-    """Creation time changes neither report hash nor canonical repeat serialization."""
+    """Independent identical builds produce identical reports and serialization."""
     logger.debug("Testing Analytics serialization and hash workflow")
-    report, config = _report()
-    assert report.hashes.report_hash is not None
+    request_id = generate_id("req")
+    first, config = _report(request_id=request_id)
+    second, _ = _report(request_id=request_id)
+    assert first == second
+    assert first.hashes.report_hash is not None
     assert serialize_report(
-        report, format_name="json", config=config
-    ) == serialize_report(report, format_name="json", config=config)
+        first, format_name="json", config=config
+    ) == serialize_report(second, format_name="json", config=config)

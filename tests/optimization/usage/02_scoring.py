@@ -12,13 +12,13 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.analytics.contracts import (
+from app.services.analytics import (
     AnalyticsRunConfig,
     ClosedTrade,
     RiskFreeRateEvidence,
     StatisticalValidationConfig,
+    build_performance_report,
 )
-from app.services.analytics.reports.builder import build_performance_report
 from app.services.optimization.scoring import (
     CandidateScore,
     ObjectiveName,
@@ -123,6 +123,8 @@ def example_scoring() -> None:
         source,
         source_contract="simulation.result",
         request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        created_at=NOW,
         initial_balance=Decimal(1000),
         account_currency="USD",
         config=_config(),

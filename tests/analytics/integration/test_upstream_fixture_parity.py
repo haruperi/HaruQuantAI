@@ -49,7 +49,7 @@ _PORTFOLIO_FIELDS = {
     "aggregate_metrics_ref",
     "risk_budget_history",
     "fx_evidence_ids",
-    "artifact_manifest",
+    "artifact_manifest_ref",
 }
 _COMPONENT_FIELDS = {
     "component_id",

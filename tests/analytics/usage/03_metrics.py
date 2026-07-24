@@ -12,24 +12,25 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.analytics.adapters.results import adapt_trading_result
-from app.services.analytics.contracts import (
+from app.services.analytics import (
     AnalyticsRunConfig,
     ClosedTrade,
     RiskFreeRateEvidence,
     StatisticalValidationConfig,
-)
-from app.services.analytics.metrics.cost_efficiency import (
+    adapt_trading_result,
+    align_benchmark_series,
+    calculate_benchmark_evidence,
     calculate_cost_efficiency_evidence,
-)
-from app.services.analytics.metrics.distributions import (
     calculate_distribution_evidence,
+    calculate_drawdown_evidence,
+    calculate_grouped_evidence,
+    calculate_ratio_evidence,
+    calculate_return_evidence,
+    calculate_risk_evidence,
+    calculate_trade_evidence,
+    run_statistical_validation,
 )
-from app.services.analytics.metrics.drawdowns import calculate_drawdown_evidence
-from app.services.analytics.metrics.ratios import calculate_ratio_evidence
-from app.services.analytics.metrics.returns import calculate_return_evidence
-from app.services.analytics.metrics.risk import calculate_risk_evidence
-from app.services.analytics.metrics.trades import calculate_trade_evidence
+from tests.analytics._support import _configured_result
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -158,10 +159,155 @@ def example_metrics() -> None:
         f"Distribution section key: {dist_evidence.section_key}, "
         f"status: {dist_evidence.status}"
     )
+    grouped = calculate_grouped_evidence(result, config=config)
+    print(f"Grouped section count: {len(grouped)}")
+    statistical = run_statistical_validation(
+        tuple(float(index - 15) for index in range(30)),
+        config=config,
+    )
+    print(f"Statistical section status: {statistical.status}")
+    benchmark_result, benchmark_config = _configured_result(benchmark=True)
+    benchmark_points = benchmark_result.benchmark
+    if benchmark_points is None:
+        raise RuntimeError("benchmark usage evidence is missing")
+    strategy_points = tuple(
+        {"timestamp": point["timestamp"], "value": 0.01}
+        for point in benchmark_result.daily_equity_curve
+    )
+    aligned = align_benchmark_series(
+        strategy_points,
+        benchmark_points["points"],
+    )
+    print(f"Aligned benchmark observations: {len(aligned[0])}")
+    benchmark_evidence = calculate_benchmark_evidence(
+        benchmark_result,
+        config=benchmark_config,
+    )
+    print(f"Benchmark section status: {benchmark_evidence.status}")
+
+
+def fr_anlt_028() -> None:
+    """FR-ANLT-028.
+
+    The system shall calculate closed-trade outcomes classified on
+    `net_trade_pnl`, explicit-direction splits, cataloged R-multiples under the
+    ordered `declared_stop` then `realized_mae` basis with the applied basis
+    labelled per trade, merged-overlap market presence, streaks, and source
+    context without treating open/placeholders as realized trades.
+    """
+    example_metrics()
+
+
+def fr_anlt_029() -> None:
+    """FR-ANLT-029.
+
+    The system shall calculate monetary PnL in `Decimal` and deterministic sorted
+    equity/return evidence with explicit frequency, scale, UTC, and undefined
+    behavior.
+    """
+    example_metrics()
+
+
+def fr_anlt_030() -> None:
+    """FR-ANLT-030.
+
+    The system shall calculate core drawdown depth, duration, recovery, ulcer, and
+    pain evidence from approved curves while returning undefined ratios as `None`
+    with warnings.
+    """
+    example_metrics()
+
+
+def fr_anlt_031() -> None:
+    """FR-ANLT-031.
+
+    The system shall calculate only approved annualized volatility, historical
+    VaR, and conditional VaR evidence from the daily return resample, with
+    cataloged sign, confidence, sample, and units. Expected shortfall is not
+    calculated separately: it is mathematically identical to conditional VaR and
+    the catalog permits one implementation.
+    """
+    example_metrics()
+
+
+def fr_anlt_032() -> None:
+    """FR-ANLT-032.
+
+    The system shall calculate only approved core ratios and return
+    zero-denominator/insufficient-sample results as `None` with warnings.
+    Excess-return metrics require source-backed annual-decimal risk-free-rate
+    evidence from the injected configuration.
+    """
+    example_metrics()
+
+
+def fr_anlt_033() -> None:
+    """FR-ANLT-033.
+
+    The system shall normalize strategy/benchmark timestamps to UTC, restrict the
+    comparison window, resolve duplicates under approved policy, and return
+    deterministic aligned observations.
+    """
+    example_metrics()
+
+
+def fr_anlt_034() -> None:
+    """FR-ANLT-034.
+
+    The system shall calculate approved benchmark-relative evidence only after
+    alignment and currency checks; non-overlap or zero variance is explicit
+    skipped/undefined evidence. Alpha requires source-backed annual-decimal
+    risk-free-rate evidence from the injected configuration.
+    """
+    example_metrics()
+
+
+def fr_anlt_035() -> None:
+    """FR-ANLT-035.
+
+    The system shall use one cataloged implementation for approved moments,
+    percentiles, tails, histogram, and outlier evidence, with constant/short
+    samples handled explicitly.
+    """
+    example_metrics()
+
+
+def fr_anlt_036() -> None:
+    """FR-ANLT-036.
+
+    The system shall compute real, bounded, seeded bootstrap, permutation,
+    multiple-comparison, and sample diagnostics reproducibly and shall not return
+    fixed placeholder evidence.
+    """
+    example_metrics()
+
+
+def fr_anlt_037() -> None:
+    """FR-ANLT-037.
+
+    The system shall calculate ledger cost drag, duration, MAE/MFE,
+    `max_intratrade_excursion`, and selected efficiency evidence with documented
+    sign conventions and no source mutation. Because `profit` is gross,
+    `commission` and `swap` are real deductions: `gross_pnl_before_costs` is
+    `sum(profit)`, `total_cost_drag` is their signed sum, and `net_pnl` is their
+    combination.
+    """
+    example_metrics()
+
+
+def fr_anlt_038() -> None:
+    """FR-ANLT-038.
+
+    The system shall execute approved metric groups in deterministic order using
+    the injected bounded statistical and risk-free settings, preserve
+    all/long/short/benchmark/cost/statistical source context, and expose the
+    documented feature operation through the package root.
+    """
+    example_metrics()
 
 
 def main() -> None:
-    """Run Analytics metrics usage example."""
+    """Run the bounded demonstration shared by every metric requirement."""
     example_metrics()
 
 

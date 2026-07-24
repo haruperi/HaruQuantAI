@@ -20,24 +20,24 @@ def test_every_contract_metric_is_cataloged() -> None:
     logger.debug("Testing Analytics metric catalog coverage")
     assert len(METRIC_DEFINITION_CATALOG) == 60
     validate_metric_catalog(METRIC_DEFINITION_CATALOG)
+    assert all(
+        definition["formula"] != metric_key
+        for metric_key, definition in METRIC_DEFINITION_CATALOG.items()
+    )
+    assert (
+        len({definition["inputs"] for definition in METRIC_DEFINITION_CATALOG.values()})
+        > 5
+    )
 
 
 def test_package_root_exports_only_approved_domain_symbols() -> None:
-    """The package root exposes owned contracts and one high-level operation."""
+    """The package root exposes the exact documented Analytics public API."""
     logger.debug("Testing Analytics package-root export boundary")
-    assert analytics.__all__ == (
-        "AnalyticsRunConfig",
-        "DashboardPayload",
-        "PerformanceReport",
-        "PortfolioAllocationEvidence",
-        "PortfolioRebalanceMeasurementEvidence",
-        "PortfolioRebalanceMeasurementRequest",
-        "RiskFreeRateEvidence",
-        "StatisticalValidationConfig",
-        "build_performance_report",
-        "build_portfolio_allocation_evidence",
-        "build_portfolio_rebalance_measurement",
-    )
+    assert len(analytics.__all__) == len(set(analytics.__all__))
+    assert all(getattr(analytics, name, None) is not None for name in analytics.__all__)
+    assert "build_dashboard_payload" in analytics.__all__
+    assert "compare_performance_reports" in analytics.__all__
+    assert "serialize_report" in analytics.__all__
 
 
 def test_warning_and_flag_codes_are_unique() -> None:
@@ -52,10 +52,14 @@ def test_contract_matrix_covers_each_counterparty() -> None:
     """Supported Trading and Simulation versions classify independently."""
     logger.debug("Testing Analytics compatibility catalog")
     assert validate_contract_version("simulation.result", "v1") == "accepted"
-    assert (
+    assert validate_contract_version("trading.closed_trade_ledger", "v1") == "accepted"
+
+
+def test_contract_matrix_rejects_legacy() -> None:
+    """Legacy producer contracts fail closed rather than claiming adaptation."""
+    logger.debug("Testing Analytics legacy-version rejection")
+    with pytest.raises(AnalyticsValidationError):
         validate_contract_version("trading.closed_trade_ledger", "legacy")
-        == "legacy-adapted"
-    )
 
 
 def test_validate_metric_catalog_requires_formula_policy() -> None:

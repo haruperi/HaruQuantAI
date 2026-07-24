@@ -173,11 +173,6 @@ def calculate_benchmark_evidence(
         raise AnalyticsValidationError("benchmark evidence is required")
     if config.risk_free_rate is None:
         raise AnalyticsValidationError("risk-free-rate evidence is required")
-    benchmark_currency = result.benchmark.get("currency")
-    if benchmark_currency != result.account_currency and result.fx_evidence is None:
-        raise AnalyticsValidationError(
-            "benchmark currency conversion evidence is missing"
-        )
     raw_points = result.benchmark.get("points")
     if not isinstance(raw_points, Sequence) or isinstance(raw_points, (str, bytes)):
         raise AnalyticsValidationError("benchmark points are invalid")

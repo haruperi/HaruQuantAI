@@ -7,7 +7,7 @@ import pytest
 from app.services.analytics.contracts import AnalyticsValidationError, SectionEvidence
 from app.services.analytics.reports import builder
 from app.utils import generate_id, logger
-from tests.analytics._support import _configured, _source_with_profit
+from tests.analytics._support import NOW, _configured, _source_with_profit
 
 
 def test_builder_fails_closed_on_required_section(
@@ -41,6 +41,8 @@ def test_builder_fails_closed_on_required_section(
             _source_with_profit(Decimal(10)),
             source_contract="simulation.result",
             request_id=generate_id("req"),
+            correlation_id=generate_id("cor"),
+            created_at=NOW,
             initial_balance=Decimal(1000),
             account_currency="USD",
             config=_configured(),
@@ -79,6 +81,8 @@ def test_builder_emits_blocker_flags_in_diagnostic_partial_mode(
         _source_with_profit(Decimal(10)),
         source_contract="simulation.result",
         request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        created_at=NOW,
         initial_balance=Decimal(1000),
         account_currency="USD",
         config=_configured(),
@@ -109,6 +113,8 @@ def test_builder_clean_report_carries_no_blocker_flag() -> None:
         _source_with_profit(Decimal(10)),
         source_contract="simulation.result",
         request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        created_at=NOW,
         initial_balance=Decimal(1000),
         account_currency="USD",
         config=_configured(),
@@ -127,6 +133,8 @@ def test_builder_emits_sample_below_threshold_under_thirty_trades() -> None:
         _source_with_profit(Decimal(10)),
         source_contract="simulation.result",
         request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        created_at=NOW,
         initial_balance=Decimal(1000),
         account_currency="USD",
         config=_configured(),

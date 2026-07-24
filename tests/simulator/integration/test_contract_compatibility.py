@@ -10,7 +10,7 @@ rather than asserting parity in a comment.
 import dataclasses
 from decimal import Decimal
 
-from app.services.analytics.contracts.models import ClosedTrade
+from app.services.analytics import ClosedTrade
 from app.services.simulator.reporting import (
     ClosedTradeRecord,
     PortfolioSimulationResult,

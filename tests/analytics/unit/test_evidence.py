@@ -24,10 +24,10 @@ def test_build_warning_bounds_detail() -> None:
     logger.debug("Testing Analytics warning bounds")
     with pytest.raises(AnalyticsValidationError):
         build_warning(
-            "stop_loss_absent",
+            "r_multiple_mae_fallback",
             section="trades",
             source_context="all",
-            detail={"ticket": "x" * 100},
+            detail={"ticket": "x" * 100, "basis": "realized_mae"},
             max_detail_bytes=10,
         )
 
@@ -37,10 +37,10 @@ def test_build_warning_requires_configured_detail_bound() -> None:
     logger.debug("Testing Analytics warning configured bound")
     with pytest.raises(AnalyticsValidationError):
         build_warning(
-            "stop_loss_absent",
+            "r_multiple_mae_fallback",
             section="trades",
             source_context="all",
-            detail={"ticket": "1"},
+            detail={"ticket": "1", "basis": "realized_mae"},
             max_detail_bytes=0,
         )
 
@@ -49,10 +49,10 @@ def test_quality_flag_does_not_embed_decision() -> None:
     """Quality flags contain evidence and blocker truth, not approvals."""
     logger.debug("Testing Analytics quality flag boundary")
     flag = build_quality_flag(
-        "initial_balance_required",
+        "required_section_failed",
         section="report",
-        source_context="adapter",
-        detail={"source_contract": "simulation.result"},
+        source_context="report_builder",
+        detail={"section": "trades", "reason": "missing evidence"},
         max_detail_bytes=256,
     )
     assert flag.blocker is True
