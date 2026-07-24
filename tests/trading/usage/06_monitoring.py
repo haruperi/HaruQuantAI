@@ -3,6 +3,7 @@
 Demonstrates operational events, runtime event emission, and budget gates.
 """
 
+# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -26,11 +27,7 @@ CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
 
 
 def fr_trd_068() -> OperationalEvent:
-    """FR-TRD-068: After the first persisted transition of a conflict scope
-    into retry-locked unknown_outcome, build one BROKER_STATE_UNKNOWN
-    OperationalEvent with severity="critical", deterministic identity,
-    receipt/incident references, retry_locked=true, and bounded redacted
-    unresolved-scope facts.
+    """FR-TRD-068: After the first persisted transition of a conflict scope into retry-locked `unknown_outcome`, build one `BROKER_STATE_UNKNOWN` `OperationalEvent` with `severity="critical"`, deterministic identity, receipt/incident references, `retry_locked=true`, and bounded redacted unresolved-scope facts. Emit it through the existing injected composition sink after persistence; construction or delivery failure is surfaced and never changes the lock, reconciliation result, or execution truth.
 
     Returns:
         Critical unknown-broker-state operational evidence.
@@ -77,9 +74,9 @@ def example_monitoring() -> None:
         event_type="LATENCY_OBSERVED",
         severity="info",
         occurred_at=NOW,
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id=REQUEST_ID,
+        workflow_id=WORKFLOW_ID,
+        correlation_id=CORRELATION_ID,
         facts={"elapsed_seconds": "0.125"},
         source_refs={"operation": "submit_order"},
     )
@@ -92,9 +89,9 @@ def example_monitoring() -> None:
         event_type="HEALTH_CHANGED",
         severity="info",
         occurred_at=NOW,
-        request_id="usage-request-002",
-        workflow_id="usage-workflow-002",
-        correlation_id="usage-correlation-002",
+        request_id="req-44444444-4444-4444-8444-444444444444",
+        workflow_id="wf-55555555-5555-4555-8555-555555555555",
+        correlation_id="cor-66666666-6666-4666-8666-666666666666",
         facts={"health": "ready"},
         source_refs={"session": "session-001"},
     )
@@ -107,6 +104,21 @@ def example_monitoring() -> None:
     # 4. Critical unknown-broker-state evidence
     critical = fr_trd_068()
     print(f"Critical event type: {critical.event_type}")
+
+
+def fr_trd_046() -> None:
+    """FR-TRD-046: The system shall represent focused health, dependency, staleness, timeout, latency, cost, and incident evidence in a Trading-owned contract."""
+    example_monitoring()
+
+
+def fr_trd_047() -> None:
+    """FR-TRD-047: Enforce the current Risk-owned `AllocationRiskDecision v1` together with a current `PortfolioBudgetExecutionVerdict v1` for the exact portfolio, allocation version, plan ID/hash, and budget unit; never calculate or modify the budget."""
+    example_monitoring()
+
+
+def fr_trd_048() -> None:
+    """FR-TRD-048: The system shall publish redacted runtime evidence through an injected composition sink without importing Data or UI/API and without hiding delivery failure."""
+    example_monitoring()
 
 
 def main() -> None:

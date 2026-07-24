@@ -134,6 +134,11 @@ def _build_public_contracts() -> tuple[Mapping[str, JsonValue], ...]:
             approval_required=True,
             idempotency="canonical_hash",
         ),
+        _contract_entry(
+            "ExecutionEvidenceReport",
+            "model",
+            "trading.execution_evidence_report.v1",
+        ),
         _contract_entry("TradingError", "error", None),
         _contract_entry("map_trading_error", "function", None),
         _contract_entry("redact_trading_payload", "function", None),

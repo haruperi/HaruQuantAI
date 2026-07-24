@@ -241,7 +241,11 @@ def _project_event(
         if isinstance(trade_record, dict):
             trade_records[event.event_id] = trade_record
         attempt_id = facts.get("attempt_event_id")
-        if isinstance(attempt_id, str) and attempt_id in unresolved:
+        receipt = facts.get("receipt")
+        outcome_known = not (
+            isinstance(receipt, dict) and receipt.get("status") == "unknown_outcome"
+        )
+        if outcome_known and isinstance(attempt_id, str) and attempt_id in unresolved:
             unresolved.remove(attempt_id)
     elif event.event_type == "fill_recorded":
         fills[event.event_id] = facts

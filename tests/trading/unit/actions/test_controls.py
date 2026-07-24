@@ -20,6 +20,7 @@ from tests.trading.unit.actions.test_dependencies import (
     NOW,
     MemoryStore,
     dependencies,
+    kill_switch_states,
     policy,
     request,
 )
@@ -92,10 +93,24 @@ async def test_resume_requires_cleared_hierarchy_and_reconciliation() -> None:
     """Resume blocks on any active applicable Risk scope."""
     item = request(action="resume_strategy")
     deps = dependencies(action_policy=policy("resume_strategy"))
-    deps = replace(
-        deps, kill_switch_state_source=lambda value: (switch("global", "active"),)
-    )
+    states = list(kill_switch_states(item))
+    states[0] = states[0].model_copy(update={"state": "active"})
+    deps = replace(deps, kill_switch_state_source=lambda value: tuple(states))
     with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
+        await resume_strategy(item, deps)
+
+
+@pytest.mark.anyio
+async def test_resume_rejects_incomplete_kill_switch_hierarchy() -> None:
+    """Missing applicable Risk scope evidence blocks resume deterministically."""
+    item = request(action="resume_strategy")
+    incomplete = kill_switch_states(item)[:-1]
+    deps = replace(
+        dependencies(action_policy=policy("resume_strategy")),
+        kill_switch_state_source=lambda value: incomplete,
+        reconciliation_source=lambda value: authority(),
+    )
+    with pytest.raises(TradingError, match="KILL_SWITCH_UNKNOWN"):
         await resume_strategy(item, deps)
 
 
@@ -107,7 +122,7 @@ async def test_resume_succeeds_with_clear_hierarchy_and_route_truth() -> None:
     deps = dependencies(store=store, action_policy=policy("resume_strategy"))
     deps = replace(
         deps,
-        kill_switch_state_source=lambda value: (switch("global"),),
+        kill_switch_state_source=kill_switch_states,
         reconciliation_source=lambda value: authority(),
     )
     assert (
@@ -146,8 +161,8 @@ async def test_clear_cannot_override_active_parent() -> None:
         control_reason="operator reviewed",
     )
     deps = dependencies(action_policy=policy("clear_kill_switch"))
-    deps = replace(
-        deps, kill_switch_state_source=lambda value: (switch("global", "active"),)
-    )
+    states = list(kill_switch_states(item))
+    states[0] = states[0].model_copy(update={"state": "active"})
+    deps = replace(deps, kill_switch_state_source=lambda value: tuple(states))
     with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
         await clear_kill_switch(item, deps)

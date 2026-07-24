@@ -3,6 +3,7 @@
 Demonstrates public Trading contracts, route selection, and validation.
 """
 
+# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -12,7 +13,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.trading.contracts import (
+from app.services.trading import (
     TRADING_CONTRACT_VERSION,
     ExecutionReceipt,
     OrderIntent,
@@ -35,9 +36,9 @@ NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 def _request_data() -> dict[str, object]:
     """Build complete canonical request material for usage examples."""
     return {
-        "request_id": "usage-request-001",
-        "workflow_id": "usage-workflow-001",
-        "correlation_id": "usage-correlation-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "route": "sim",
         "action": "submit_order",
         "provider_id": None,
@@ -78,8 +79,8 @@ def _receipt() -> ExecutionReceipt:
         response_classification="confirmed",
         retry_safe=False,
         reconciliation_required=False,
-        request_id="usage-request-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -88,9 +89,9 @@ def _rebalance_data() -> dict[str, object]:
     data: dict[str, object] = {
         "contract_version": "v1",
         "schema_id": "trading.portfolio_rebalance_execution_request.v1",
-        "request_id": "usage-rebalance-001",
-        "workflow_id": "usage-workflow-001",
-        "correlation_id": "usage-correlation-001",
+        "request_id": "req-77777777-7777-4777-8777-777777777777",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "plan_id": "usage-plan-001",
         "plan_version": "v1",
         "portfolio_id": "usage-portfolio-001",
@@ -143,9 +144,9 @@ def example_contracts() -> None:
 
     intent = OrderIntent(
         client_order_id="usage-order-001",
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route=TradingRoute.SIM,
         provider_id=None,
         account_id="usage-account-001",
@@ -179,9 +180,9 @@ def example_contracts() -> None:
         authority_state="confirmed",
         reconciliation_state="reconciled",
         created_at=NOW,
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
     print(f"TradeRecord reconciliation_state: {record.reconciliation_state}")
 
@@ -193,7 +194,10 @@ def example_contracts() -> None:
 
     mapped = map_trading_error(
         TimeoutError("provider detail"),
-        {"operation": "submit_order", "request_id": "usage-request-001"},
+        {
+            "operation": "submit_order",
+            "request_id": "req-11111111-1111-4111-8111-111111111111",
+        },
     )
     print(f"Mapped trading error envelope status: {mapped.status}")
 
@@ -205,6 +209,71 @@ def example_contracts() -> None:
 
     draft = create_trading_action_draft(_request_data())
     print(f"Created action draft status: {draft.status}")
+
+
+def fr_trd_001() -> None:
+    """FR-TRD-001: The system shall expose only `sim`, `paper`, and `live` action routes; package-only is a side-effect mode, not a route."""
+    example_contracts()
+
+
+def fr_trd_002() -> None:
+    """FR-TRD-002: The system shall validate one immutable canonical request with route, action, trace, authority, approval, Risk, idempotency, UTC evidence, approved `order_type`, validated instrument `quantity_unit`, optional stop/TIF/expiration material, and nullable Trading-state broker target identities."""
+    example_contracts()
+
+
+def fr_trd_003() -> None:
+    """FR-TRD-003: The system shall return one finite JSON-safe envelope distinguishing packaging, rejection, block, send, fill, cancellation, unknown outcome, and error."""
+    example_contracts()
+
+
+def fr_trd_004() -> None:
+    """FR-TRD-004: The system shall expose complete deterministic `OrderIntent v1` exactly as defined in Section 1, preserving Risk-approved size, approved order type, validated quantity unit, optional order instructions, and Trading-state broker target identities without connection material."""
+    example_contracts()
+
+
+def fr_trd_005() -> None:
+    """FR-TRD-005: The system shall expose immutable `ExecutionReceipt v1` with authority, status, fill, retry, and reconciliation evidence."""
+    example_contracts()
+
+
+def fr_trd_006() -> None:
+    """FR-TRD-006: The system shall expose `TradeRecord v1` without deriving Analytics metrics or hiding unreconciled state."""
+    example_contracts()
+
+
+def fr_trd_007() -> None:
+    """FR-TRD-007: The system shall expose one finite Trading exception carrying a registered code and redacted trace context."""
+    example_contracts()
+
+
+def fr_trd_008() -> None:
+    """FR-TRD-008: The system shall map validation, permission, persistence, timeout, provider, and unknown failures into the canonical envelope without raw exceptions."""
+    example_contracts()
+
+
+def fr_trd_009() -> None:
+    """FR-TRD-009: The system shall recursively redact secrets before any log, error, event, metric, or returned payload."""
+    example_contracts()
+
+
+def fr_trd_010() -> None:
+    """FR-TRD-010: The system shall return the exact stable Python API with routes, schemas, side effects, approvals, idempotency, statuses, errors, and stability metadata."""
+    example_contracts()
+
+
+def fr_trd_012() -> None:
+    """FR-TRD-012: The system shall create a non-executable action draft that cannot call a route authority."""
+    example_contracts()
+
+
+def fr_trd_063() -> None:
+    """FR-TRD-063: The system shall expose `PortfolioRebalanceExecutionRequest v1` exactly as defined in §1 (plan/allocation/decision references, ordered actions, reduce-only flags, route, approval token, validity, canonical hash) carrying `contract_version="v1"` and `schema_id="trading.portfolio_rebalance_execution_request.v1"`."""
+    example_contracts()
+
+
+def fr_trd_066() -> None:
+    """FR-TRD-066: The system shall expose one canonical `TRADING_CONTRACT_VERSION="v1"` constant used by every Trading-owned versioned contract and report schema. `FR-TRD-011` remains retired with `CAP-TRD-022` and is not reused."""
+    example_contracts()
 
 
 def main() -> None:

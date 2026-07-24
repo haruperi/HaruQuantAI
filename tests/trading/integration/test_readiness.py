@@ -3,7 +3,7 @@
 # ruff: noqa: INP001
 from decimal import Decimal
 
-from app.services.trading.validation import assess_execution_readiness
+from app.services.trading import assess_execution_readiness
 from tests.trading.conftest import (
     readiness_request,
     readiness_risk,

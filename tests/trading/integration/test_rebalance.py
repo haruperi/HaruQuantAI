@@ -2,7 +2,7 @@
 
 # ruff: noqa: INP001
 import pytest
-from app.services.trading.actions import execute_portfolio_rebalance
+from app.services.trading import execute_portfolio_rebalance
 from tests.trading.conftest import (
     rebalance_dependencies,
     rebalance_request,

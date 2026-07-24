@@ -11,11 +11,17 @@ from app.services.trading.contracts import (
     ExecutionReceipt,
     OrderIntent,
     StandardTradingEnvelope,
+    TradeRecord,
     TradingError,
     TradingRequest,
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.live import evaluate_live_gate
+from app.services.trading.monitoring import (
+    build_broker_state_unknown_event,
+    emit_runtime_event,
+)
+from app.services.trading.reconciliation import resolve_unknown_outcome
 from app.services.trading.routing import dispatch_order_intent
 from app.services.trading.state import (
     TradingEvent,
@@ -26,6 +32,11 @@ from app.services.trading.validation import (
     ReadinessAssessment,
     build_execution_plan,
     validate_order_request,
+)
+from app.services.trading.validation.authority import (
+    validate_action_policy,
+    validate_kill_switch_hierarchy,
+    validate_risk_authority,
 )
 from app.utils import canonical_json, logger
 
@@ -77,9 +88,78 @@ def _envelope(
     )
 
 
+def _event_id(event_type: str, material: Mapping[str, JsonValue]) -> str:
+    """Build one deterministic Trading state-event identity.
+
+    Args:
+        event_type: Stable event category.
+        material: Canonical identity material.
+
+    Returns:
+        Full SHA-256 event identity.
+    """
+    digest = sha256(
+        canonical_json({"event_type": event_type, **material}).encode("utf-8")
+    ).hexdigest()
+    return f"trd-event-{digest}"
+
+
+def _record_send_attempt(
+    request: TradingRequest,
+    intent: OrderIntent,
+    deps: TradingDependencies,
+) -> str:
+    """Persist the mutation attempt before crossing the authority boundary.
+
+    Args:
+        request: Source governed request.
+        intent: Exact executable intent.
+        deps: Injected action dependencies.
+
+    Returns:
+        Persisted attempt event identifier.
+    """
+    logger.info("Recording Trading send attempt for %s", request.request_id)
+    scope = (request.route, request.account_id, authority_id(request))
+    current = deps.store.load_projection(scope)
+    version = 0 if current is None else current.version
+    event_id = _event_id(
+        "send_attempted",
+        {
+            "request_id": request.request_id,
+            "client_order_id": intent.client_order_id,
+        },
+    )
+    event = TradingEvent(
+        event_id=event_id,
+        event_type="send_attempted",
+        aggregate_version=version,
+        route=request.route,
+        tenant_id=request.account_id,
+        authority_id=authority_id(request),
+        occurred_at=deps.clock(),
+        request_id=request.request_id,
+        workflow_id=request.workflow_id,
+        correlation_id=request.correlation_id,
+        causation_id=request.causation_id,
+        payload=_redacted_envelope_data(
+            {
+                "request_id": request.request_id,
+                "intent": intent.model_dump(mode="json"),
+                "idempotency_key_hash": sha256(
+                    request.idempotency_key.encode("utf-8")
+                ).hexdigest(),
+            }
+        ),
+    )
+    apply_execution_event(event, deps.store)
+    return event_id
+
+
 def _record_receipt(
     request: TradingRequest,
     receipt: ExecutionReceipt,
+    attempt_event_id: str,
     deps: TradingDependencies,
 ) -> None:
     """Persist one receipt as ordered Trading evidence.
@@ -87,19 +167,42 @@ def _record_receipt(
     Args:
         request: Source governed request.
         receipt: Authority result to persist.
+        attempt_event_id: Persisted pre-dispatch attempt identity.
         deps: Injected action dependencies.
     """
     logger.info("Recording Trading receipt %s", receipt.receipt_id)
     scope = (request.route, request.account_id, authority_id(request))
     current = deps.store.load_projection(scope)
     version = 0 if current is None else current.version
-    event_material = {
-        "receipt_id": receipt.receipt_id,
-        "request_id": request.request_id,
-        "version": version,
-    }
-    event_id = sha256(canonical_json(event_material).encode("utf-8")).hexdigest()
-    payload = _redacted_envelope_data({"receipt": receipt.model_dump(mode="json")})
+    event_id = _event_id(
+        "receipt_recorded",
+        {"receipt_id": receipt.receipt_id, "request_id": request.request_id},
+    )
+    record = TradeRecord(
+        record_id=_event_id(
+            "trade_record",
+            {"receipt_id": receipt.receipt_id, "request_id": request.request_id},
+        ),
+        receipt=receipt,
+        fill_ids=receipt.provider_deal_ids,
+        authority_state=receipt.status,
+        reconciliation_state=(
+            "unreconciled" if receipt.reconciliation_required else "reconciled"
+        ),
+        warnings=(),
+        incidents=(),
+        created_at=receipt.received_at,
+        request_id=request.request_id,
+        workflow_id=request.workflow_id,
+        correlation_id=request.correlation_id,
+    )
+    payload = _redacted_envelope_data(
+        {
+            "receipt": receipt.model_dump(mode="json"),
+            "attempt_event_id": attempt_event_id,
+            "trade_record": record.model_dump(mode="json"),
+        }
+    )
     event = TradingEvent(
         event_id=event_id,
         event_type="receipt_recorded",
@@ -115,6 +218,123 @@ def _record_receipt(
         payload=payload,
     )
     apply_execution_event(event, deps.store)
+    for deal_id in receipt.provider_deal_ids:
+        projection = deps.store.load_projection(scope)
+        fill_version = 0 if projection is None else projection.version
+        fill = TradingEvent(
+            event_id=_event_id(
+                "fill_recorded",
+                {"receipt_id": receipt.receipt_id, "deal_id": deal_id},
+            ),
+            event_type="fill_recorded",
+            aggregate_version=fill_version,
+            route=request.route,
+            tenant_id=request.account_id,
+            authority_id=authority_id(request),
+            occurred_at=receipt.received_at,
+            request_id=request.request_id,
+            workflow_id=request.workflow_id,
+            correlation_id=request.correlation_id,
+            causation_id=request.causation_id,
+            payload={
+                "provider_deal_id": deal_id,
+                "receipt_id": receipt.receipt_id,
+                "filled_quantity": str(receipt.filled_quantity),
+                "average_price": (
+                    None
+                    if receipt.average_price is None
+                    else str(receipt.average_price)
+                ),
+            },
+        )
+        apply_execution_event(fill, deps.store)
+
+
+def _require_clear_authority_scope(
+    request: TradingRequest, deps: TradingDependencies
+) -> None:
+    """Block mutation while any prior attempt remains unresolved in scope.
+
+    Args:
+        request: Governed request defining the conflict scope.
+        deps: Injected action dependencies.
+
+    Raises:
+        TradingError: If persisted authority scope contains unresolved mutation.
+    """
+    projection = deps.store.load_projection(
+        (request.route, request.account_id, authority_id(request))
+    )
+    if projection is not None and projection.unresolved_attempt_ids:
+        raise TradingError(
+            "RECONCILIATION_REQUIRED",
+            "Trading authority scope contains an unresolved mutation",
+        )
+
+
+def _complete_reservation(
+    request: TradingRequest,
+    receipt: ExecutionReceipt,
+    deps: TradingDependencies,
+) -> None:
+    """Persist an idempotency outcome after its receipt is durable.
+
+    Args:
+        request: Source governed request.
+        receipt: Persisted authority receipt.
+        deps: Injected action dependencies.
+
+    Raises:
+        TradingError: If reservation completion cannot be persisted.
+    """
+    digest = sha256(
+        canonical_json(request.model_dump(mode="python")).encode("utf-8")
+    ).hexdigest()
+    try:
+        deps.store.complete_idempotency(
+            request.idempotency_key,
+            digest,
+            receipt.receipt_id,
+            deps.clock(),
+            status=(
+                "reconciliation_required"
+                if receipt.reconciliation_required
+                else "completed"
+            ),
+        )
+    except Exception as error:
+        raise TradingError(
+            "PERSISTENCE_FAILED", "Idempotency completion persistence failed"
+        ) from error
+
+
+def _resolve_unknown(
+    request: TradingRequest,
+    receipt: ExecutionReceipt,
+    deps: TradingDependencies,
+) -> None:
+    """Reconcile and publish one critical retry-lock transition when required.
+
+    Args:
+        request: Source governed request.
+        receipt: Persisted unknown-outcome receipt.
+        deps: Injected action dependencies.
+    """
+    resolution = resolve_unknown_outcome(
+        receipt,
+        deps.store,
+        lambda _route: deps.reconciliation_source(request),
+    )
+    if resolution.transition != "retry_locked":
+        return
+    event = build_broker_state_unknown_event(
+        receipt,
+        incident_id=resolution.incident_reference,
+        unresolved_scope=resolution.remaining_unresolved_scope,
+        occurred_at=deps.clock(),
+        workflow_id=request.workflow_id,
+    )
+    emit_runtime_event(event, deps.event_sink)
 
 
 def _passed_readiness(request: TradingRequest) -> ReadinessAssessment:
@@ -190,6 +410,7 @@ async def _execute_request(
         request.route, request.provider_id, request.symbol
     )
     validate_order_request(request, account_state, capability)
+    _require_clear_authority_scope(request, deps)
     intent: OrderIntent | None
     if request.route.value in {"paper", "live"}:
         if deps.live_session is None:
@@ -199,6 +420,17 @@ async def _execute_request(
         if intent is None:
             return gate
     else:
+        now = deps.clock()
+        validate_action_policy(request, deps.action_policy_source(request), now)
+        validate_risk_authority(
+            request, deps.execution_risk_decision_source(request), now
+        )
+        validate_kill_switch_hierarchy(
+            request,
+            deps.kill_switch_state_source(request),
+            deps.max_staleness_seconds["kill_switch"],
+            now,
+        )
         reservation = reserve_idempotency(
             request,
             deps.store,
@@ -225,6 +457,7 @@ async def _execute_request(
                 "TRADING_CONCURRENCY_CONFLICT", "Request is already unresolved"
             )
         intent = build_execution_plan(request, _passed_readiness(request))
+    attempt_event_id = _record_send_attempt(request, intent, deps)
     receipt = await dispatch_order_intent(
         intent,
         deps.connection,
@@ -233,7 +466,10 @@ async def _execute_request(
         operation_timeout_seconds=deps.broker_operation_timeout_seconds,
         clock=deps.clock,
     )
-    _record_receipt(request, receipt, deps)
+    _record_receipt(request, receipt, attempt_event_id, deps)
+    _complete_reservation(request, receipt, deps)
+    if receipt.reconciliation_required:
+        _resolve_unknown(request, receipt, deps)
     return _envelope(request, receipt)
 
 

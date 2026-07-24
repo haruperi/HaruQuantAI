@@ -3,6 +3,7 @@
 Demonstrates LiveSession lifecycle and evaluate_live_gate.
 """
 
+# ruff: noqa: E501
 import asyncio
 import sys
 from datetime import UTC, datetime, timedelta
@@ -20,9 +21,13 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerFeatureFlags,
 )
-from app.services.trading.contracts import TradingRequest, TradingRoute
-from app.services.trading.live import LiveSession, evaluate_live_gate
-from app.services.trading.state import TradingStateStore
+from app.services.trading import (
+    LiveSession,
+    TradingRequest,
+    TradingRoute,
+    TradingStateStore,
+    evaluate_live_gate,
+)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -63,6 +68,7 @@ def _session() -> LiveSession:
         kill_switch_source=lambda _request: (),
         readiness_source=lambda _req, _ev: cast("object", None),
         adapter_capability_source=lambda _request: {},
+        auth_context_source=lambda _request: cast("object", None),
         pre_audit_sink=lambda _ev: None,
         event_sink=lambda _evt: None,
         startup_reconcile=_passed,
@@ -116,9 +122,9 @@ async def _async_example() -> None:
 
     # Evaluate live gate
     request = TradingRequest(
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route=TradingRoute.LIVE,
         action="submit_order",
         provider_id="test-broker",
@@ -153,6 +159,31 @@ def example_live() -> None:
     print("Trading Example 7: Live Session Lifecycle and Safety Gates")
     print("=" * 80)
     asyncio.run(_async_example())
+
+
+def fr_trd_032() -> None:
+    """FR-TRD-032: The system shall use one stateful lifecycle object for admission, startup evidence, recovery lock, in-flight work, and shutdown."""
+    example_live()
+
+
+def fr_trd_033() -> None:
+    """FR-TRD-033: The system shall validate config/security, bind opaque Data authority, and complete startup reconciliation before enabling mutation."""
+    example_live()
+
+
+def fr_trd_034() -> None:
+    """FR-TRD-034: The system shall return the actual session mode, admission, authority, health, reconciliation, and unresolved-work state."""
+    example_live()
+
+
+def fr_trd_035() -> None:
+    """FR-TRD-035: The system shall stop admission, drain/mark work, flush evidence, reconcile, and report every incomplete shutdown step."""
+    example_live()
+
+
+def fr_trd_036() -> None:
+    """FR-TRD-036: The system shall enforce the canonical mandatory gate order using typed authority sources owned by the injected session and prohibit passthrough Risk or caller-declared emergency authority. JSON evidence carries facts/references only."""
+    example_live()
 
 
 def main() -> None:

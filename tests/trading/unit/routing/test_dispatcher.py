@@ -55,9 +55,9 @@ def _intent(*, route: str = "paper", action: str = "submit_order") -> OrderInten
     """Build one complete executable intent."""
     return OrderIntent(
         client_order_id="client-order-001",
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route=route,  # type: ignore[arg-type]
         provider_id=None if route == "sim" else "mt5",
         account_id="account-001",
@@ -241,6 +241,19 @@ class _TimeoutAdapter(_Adapter):
         """Remain pending until the dispatch boundary cancels the call."""
         await asyncio.sleep(1)
         return await super().place_order(request)
+
+
+class _RaisingAdapter(_Adapter):
+    """Test adapter raising an unexpected provider exception."""
+
+    async def place_order(
+        self,
+        request: BrokerOrderRequest,
+    ) -> BrokerResult[BrokerOrderResult]:
+        """Raise secret-bearing provider text at the external boundary."""
+        self.calls += 1
+        self.mutations.append(request)
+        raise RuntimeError("password=hunter2")
 
 
 def test_dispatch_has_single_mutation_boundary() -> None:
@@ -428,3 +441,19 @@ def test_timeout_replay_has_deterministic_receipt_identity() -> None:
     assert first.status == "unknown_outcome"
     assert first.receipt_id == second.receipt_id
     assert first.received_at == second.received_at == NOW
+
+
+def test_provider_exception_becomes_redacted_unknown_receipt() -> None:
+    """Unexpected provider exceptions never cross the Trading public boundary."""
+    receipt = asyncio.run(
+        dispatch_order_intent(
+            _intent(),
+            _connection(),
+            cast("BrokerAdapter", _RaisingAdapter()),
+            None,
+        )
+    )
+    assert receipt.status == "unknown_outcome"
+    assert receipt.response_classification == "malformed_response"
+    assert receipt.reconciliation_required
+    assert "hunter2" not in receipt.model_dump_json()

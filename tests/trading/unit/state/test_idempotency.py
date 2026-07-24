@@ -44,13 +44,17 @@ class _ReservationStore:
         )
         return self.reservation.model_copy(update={"status": status})
 
+    def complete_idempotency(self, *args: object, **kwargs: object) -> None:
+        """Accept completion calls outside this reservation-focused test."""
+        del args, kwargs
+
 
 def _request(*, symbol: str = "EURUSD") -> TradingRequest:
     """Build a canonical request with one fixed caller key."""
     return TradingRequest(
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route="sim",
         action="submit_order",
         account_id="account-001",

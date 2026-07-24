@@ -1,6 +1,7 @@
 """Unit tests for the canonical Trading live gate sequence."""
 
 # ruff: noqa: ARG005, INP001
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from types import SimpleNamespace
@@ -24,7 +25,7 @@ from app.services.trading.contracts import TradingError, TradingRequest, Trading
 from app.services.trading.live import LiveSession, evaluate_live_gate
 from app.services.trading.state import IdempotencyReservation, TradingStateStore
 from app.services.trading.validation import ReadinessAssessment
-from app.utils import logger
+from app.utils import AuditEvent, AuthContext, logger
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -82,6 +83,10 @@ class _Store:
             reserved_at=reserved_at,
             expires_at=expires_at,
         )
+
+    def complete_idempotency(self, *args: object, **kwargs: object) -> None:
+        """Accept completion outside this gate-focused test."""
+        del args, kwargs
 
 
 def _request() -> TradingRequest:
@@ -207,6 +212,51 @@ def _inactive_switch() -> KillSwitchState:
     )
 
 
+def _inactive_hierarchy(
+    global_state: KillSwitchState | None = None,
+) -> tuple[KillSwitchState, ...]:
+    """Build all exact applicable inactive switch scopes."""
+    return (
+        global_state or _inactive_switch(),
+        KillSwitchState(
+            state_id="switch-strategy",
+            scope_level="strategy",
+            scope={"strategy_id": "strategy-001"},
+            state="inactive",
+            reason="normal operation",
+            version=1,
+            updated_at=NOW,
+        ),
+        KillSwitchState(
+            state_id="switch-symbol",
+            scope_level="symbol",
+            scope={"symbol": "EURUSD"},
+            state="inactive",
+            reason="normal operation",
+            version=1,
+            updated_at=NOW,
+        ),
+    )
+
+
+def _auth_context() -> AuthContext:
+    """Build exact authenticated context for pre-mutation audit."""
+    return AuthContext(
+        contract_version="v1",
+        schema_id="utils.auth_context.v1",
+        principal_id="trading-test",
+        principal_type="SERVICE_ACCOUNT",
+        roles=("trading",),
+        permissions=("trading.execute",),
+        scopes=("account-001",),
+        tenant_or_environment="test",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
+        issued_at=NOW,
+    )
+
+
 def _capability() -> dict[str, object]:
     """Build normalized approved adapter capability evidence.
 
@@ -234,12 +284,14 @@ def _session(
     *,
     risk_decision: RiskDecisionPackage | None = None,
     kill_switches: tuple[KillSwitchState, ...] = (),
+    pre_audit_sink: Callable[[AuditEvent], None] | None = None,
 ) -> LiveSession:
     """Build a mutation-enabled session with injected Risk evidence.
 
     Args:
         risk_decision: Optional typed Risk approval.
         kill_switches: Applicable Risk switch hierarchy.
+        pre_audit_sink: Optional observable canonical audit sink.
 
     Returns:
         Started-capable LiveSession fixture.
@@ -279,7 +331,8 @@ def _session(
             assessed_at=NOW,
         ),
         adapter_capability_source=lambda request: _capability(),
-        pre_audit_sink=lambda evidence: None,
+        auth_context_source=lambda request: _auth_context(),
+        pre_audit_sink=pre_audit_sink or (lambda evidence: None),
         event_sink=lambda event: None,
         startup_reconcile=_passed,
         drain_in_flight=_passed,
@@ -330,7 +383,7 @@ async def test_gate_passes_every_typed_authority_in_order() -> None:
     logger.debug("Testing complete live-gate success path")
     session = _session(
         risk_decision=_risk_decision(),
-        kill_switches=(_inactive_switch(),),
+        kill_switches=_inactive_hierarchy(),
     )
     await session.start(
         {
@@ -360,6 +413,46 @@ async def test_gate_passes_every_typed_authority_in_order() -> None:
 
 
 @pytest.mark.anyio
+async def test_gate_emits_exact_utils_audit_event() -> None:
+    """The live pre-mutation boundary emits the shared typed AuditEvent."""
+    audits: list[AuditEvent] = []
+    session = _session(
+        risk_decision=_risk_decision(),
+        kill_switches=_inactive_hierarchy(),
+        pre_audit_sink=audits.append,
+    )
+    await session.start(
+        {
+            "RUNTIME_PROFILE": "live",
+            "EXECUTION_ROUTE": "live",
+            "ALLOW_LIVE_MUTATIONS": True,
+            "LIVE_WORKFLOW_TIMEOUT_SECONDS": "30",
+            "SHUTDOWN_BUDGET_SECONDS": "5",
+            "IDEMPOTENCY_RETENTION_SECONDS": 600,
+            "CONCURRENCY_LOCK_TIMEOUT_SECONDS": "30",
+            "MAX_STALENESS_SECONDS": {
+                "route_snapshot": "30",
+                "risk_decision": "30",
+                "kill_switch": "30",
+            },
+            "DATA_AUTHORITY_ID": "data-authority-001",
+        },
+        {
+            "data_authority_id": "data-authority-001",
+            "adapter_security_profile": "approved",
+            "startup_evidence_fresh": True,
+        },
+    )
+
+    await evaluate_live_gate(_request(), {"route": "fresh"}, session)
+
+    assert len(audits) == 1
+    assert isinstance(audits[0], AuditEvent)
+    assert audits[0].principal_id == _auth_context().principal_id
+    assert audits[0].request_id == _auth_context().request_id
+
+
+@pytest.mark.anyio
 async def test_stale_kill_switch_evidence_blocks_dispatch() -> None:
     """Inactive but stale kill-switch evidence cannot authorize mutation."""
     logger.debug("Testing live-gate kill-switch freshness")
@@ -368,7 +461,7 @@ async def test_stale_kill_switch_evidence_blocks_dispatch() -> None:
     )
     session = _session(
         risk_decision=_risk_decision(),
-        kill_switches=(stale_switch,),
+        kill_switches=_inactive_hierarchy(stale_switch),
     )
     await session.start(
         {

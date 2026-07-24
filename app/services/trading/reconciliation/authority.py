@@ -212,7 +212,7 @@ def _load_context(
     receipt: ExecutionReceipt,
     authority: AuthoritySnapshot,
     store: TradingStateStore,
-) -> tuple[TradingProjection, str]:
+) -> tuple[TradingProjection, TradingEvent]:
     """Load exact projection and workflow context for persistence.
 
     Args:
@@ -221,7 +221,7 @@ def _load_context(
         store: Injected Trading persistence port.
 
     Returns:
-        Current projection and originating workflow identifier.
+        Current projection and originating send-attempt event.
 
     Raises:
         TradingError: If persistence or originating attempt evidence is absent.
@@ -244,7 +244,7 @@ def _load_context(
     )
     if attempt is None:
         raise TradingError("PERSISTENCE_FAILED", "Originating send attempt is absent")
-    return projection, attempt.workflow_id
+    return projection, attempt
 
 
 def resolve_unknown_outcome(
@@ -278,7 +278,8 @@ def resolve_unknown_outcome(
         ) from error
     if authority.route != receipt.route:
         raise TradingError("SCOPE_MISMATCH", "Authority route does not match receipt")
-    projection, workflow_id = _load_context(receipt, authority, store)
+    projection, attempt = _load_context(receipt, authority, store)
+    workflow_id = attempt.workflow_id
     report = compare_authority_state(authority, projection)
     unresolved_scope = _unresolved_scope(report)
     approval_reference = _approved_retry_reference(receipt, projection)
@@ -304,7 +305,7 @@ def resolve_unknown_outcome(
         request_id=receipt.request_id,
         workflow_id=workflow_id,
         correlation_id=receipt.correlation_id,
-        causation_id=receipt.receipt_id,
+        causation_id=None,
         payload={
             "receipt_id": receipt.receipt_id,
             "report_id": report.report_id,
@@ -324,7 +325,7 @@ def resolve_unknown_outcome(
         request_id=receipt.request_id,
         workflow_id=workflow_id,
         correlation_id=receipt.correlation_id,
-        causation_id=incident_id,
+        causation_id=None,
         payload={
             "receipt_id": receipt.receipt_id,
             "report_id": report.report_id,
@@ -332,6 +333,9 @@ def resolve_unknown_outcome(
             "retry_allowed": retry_allowed,
             "approved_transition_reference": approval_reference,
             "remaining_unresolved_scope": list(unresolved_scope),
+            "resolved_attempt_event_id": (
+                None if transition == "retry_locked" else attempt.event_id
+            ),
         },
     )
     apply_execution_event(transition_event, store)

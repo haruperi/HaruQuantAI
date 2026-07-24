@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Literal, Protocol
 
 from app.services.trading.contracts.models import JsonValue, TradingRoute
 from app.utils import logger
@@ -40,6 +40,28 @@ class TradingStateStore(Protocol):  # pragma: no cover - structural port declara
         """
         del key, material_hash, material_version, reserved_at, expires_at
         logger.debug("Calling Trading store idempotency reservation port")
+        raise NotImplementedError
+
+    def complete_idempotency(
+        self,
+        key: str,
+        material_hash: str,
+        receipt_id: str,
+        completed_at: datetime,
+        *,
+        status: Literal["completed", "reconciliation_required"],
+    ) -> None:
+        """Persist the terminal or reconciliation-locked reservation outcome.
+
+        Args:
+            key: Caller-supplied idempotency key.
+            material_hash: Reserved canonical request material digest.
+            receipt_id: Persisted authority receipt identifier.
+            completed_at: Injected UTC outcome time.
+            status: Proven completion or reconciliation-required state.
+        """
+        del key, material_hash, receipt_id, completed_at, status
+        logger.debug("Calling Trading store idempotency completion port")
         raise NotImplementedError
 
     def append_event(self, event: TradingEvent) -> None:

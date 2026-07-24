@@ -102,6 +102,7 @@ def _session(
         kill_switch_source=lambda request: (),
         readiness_source=lambda request, evidence: cast("object", None),
         adapter_capability_source=lambda request: {},
+        auth_context_source=lambda request: cast("object", None),
         pre_audit_sink=lambda evidence: None,
         event_sink=events.append,
         startup_reconcile=startup_reconcile,

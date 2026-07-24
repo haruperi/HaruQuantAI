@@ -2,9 +2,9 @@
 
 # ruff: noqa: INP001
 import pytest
-from app.services.trading.contracts import TradingError
-from app.services.trading.validation import (
+from app.services.trading import (
     ReadinessAssessment,
+    TradingError,
     build_execution_plan,
     validate_order_request,
 )

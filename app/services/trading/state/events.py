@@ -5,13 +5,22 @@ from datetime import datetime, timedelta
 from types import MappingProxyType
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 from app.services.trading.contracts.models import (
     TRADING_CONTRACT_VERSION,
     JsonValue,
     TradingRoute,
     _contains_sensitive_key,
+    _redact_json_value,
+    _validate_trace_id,
+    _validation_field_name,
 )
 from app.utils import logger, to_json_safe
 
@@ -57,9 +66,6 @@ class TradingEvent(BaseModel):
         "event_id",
         "tenant_id",
         "authority_id",
-        "request_id",
-        "workflow_id",
-        "correlation_id",
     )
     @classmethod
     def _validate_text(cls, value: str) -> str:
@@ -79,6 +85,29 @@ class TradingEvent(BaseModel):
             raise ValueError("TradingEvent text must be non-empty and trimmed")
         return value
 
+    @field_validator("request_id", "workflow_id", "correlation_id")
+    @classmethod
+    def _validate_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate canonical event trace identifiers.
+
+        Args:
+            value: Candidate trace identifier.
+            info: Pydantic field metadata.
+
+        Returns:
+            Validated prefixed UUID4 identifier.
+
+        Raises:
+            ValueError: If the identifier is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        field_name = _validation_field_name(info)
+        return _validate_trace_id(value, prefixes[field_name], field_name)
+
     @field_validator("causation_id")
     @classmethod
     def _validate_causation(cls, value: str | None) -> str | None:
@@ -94,9 +123,9 @@ class TradingEvent(BaseModel):
             ValueError: If supplied text is blank or untrimmed.
         """
         logger.debug("Validating TradingEvent causation identity")
-        if value is not None and (not value or value != value.strip()):
-            raise ValueError("causation_id must be non-empty and trimmed")
-        return value
+        if value is None:
+            return None
+        return _validate_trace_id(value, "cau", "causation_id")
 
     @field_validator("occurred_at")
     @classmethod
@@ -132,7 +161,7 @@ class TradingEvent(BaseModel):
             TypeError: If facts do not serialize to a mapping.
         """
         logger.debug("Validating TradingEvent payload")
-        safe = to_json_safe(value)
+        safe = _redact_json_value(value)
         if not isinstance(safe, dict):
             raise TypeError("TradingEvent payload must be a mapping")
         return MappingProxyType(safe)

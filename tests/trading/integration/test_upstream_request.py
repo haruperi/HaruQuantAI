@@ -2,7 +2,7 @@
 
 # ruff: noqa: INP001
 import pytest
-from app.services.trading.contracts import TradingRequest
+from app.services.trading import TradingRequest
 from pydantic import ValidationError
 from tests.trading.conftest import trading_request
 

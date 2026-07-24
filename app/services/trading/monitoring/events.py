@@ -6,14 +6,25 @@ from hashlib import sha256
 from types import MappingProxyType
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 from app.services.trading.contracts import (
     ExecutionReceipt,
     TradingError,
     redact_trading_payload,
 )
-from app.services.trading.contracts.models import TRADING_CONTRACT_VERSION, JsonValue
+from app.services.trading.contracts.models import (
+    TRADING_CONTRACT_VERSION,
+    JsonValue,
+    _validate_trace_id,
+    _validation_field_name,
+)
 from app.utils import (
     ValidationError as UtilsValidationError,
 )
@@ -21,6 +32,7 @@ from app.utils import (
     canonical_json,
     is_sensitive_key,
     logger,
+    redact_text_value,
     to_json_safe,
     validate_id,
 )
@@ -61,7 +73,7 @@ class OperationalEvent(BaseModel):
     source_refs: Mapping[str, str]
     redaction_applied: Literal[True] = True
 
-    @field_validator("event_id", "request_id", "workflow_id", "correlation_id")
+    @field_validator("event_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
         """Validate required operational-event identifiers.
@@ -80,6 +92,29 @@ class OperationalEvent(BaseModel):
             raise ValueError("operational event identifiers must be non-empty")
         return value
 
+    @field_validator("request_id", "workflow_id", "correlation_id")
+    @classmethod
+    def _validate_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate canonical operational-event trace identifiers.
+
+        Args:
+            value: Candidate trace identifier.
+            info: Pydantic field metadata.
+
+        Returns:
+            Validated prefixed UUID4 identifier.
+
+        Raises:
+            ValueError: If the identifier is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        field_name = _validation_field_name(info)
+        return _validate_trace_id(value, prefixes[field_name], field_name)
+
     @field_validator("causation_id")
     @classmethod
     def _validate_causation(cls, value: str | None) -> str | None:
@@ -95,9 +130,9 @@ class OperationalEvent(BaseModel):
             ValueError: If supplied text is blank or untrimmed.
         """
         logger.debug("Validating OperationalEvent causation identity")
-        if value is not None and (not value or value != value.strip()):
-            raise ValueError("causation_id must be non-empty when supplied")
-        return value
+        if value is None:
+            return None
+        return _validate_trace_id(value, "cau", "causation_id")
 
     @field_validator("occurred_at")
     @classmethod
@@ -163,6 +198,14 @@ class OperationalEvent(BaseModel):
             raise ValueError("operational event source references must be non-empty")
         if any(is_sensitive_key(key) for key in value):
             raise ValueError("operational event source references contain secrets")
+        if any(
+            redact_text_value(item).redacted_paths
+            or redact_text_value(item).truncated_paths
+            for item in value.values()
+        ):
+            raise ValueError(
+                "operational event source references contain unsafe material"
+            )
         return MappingProxyType(dict(value))
 
     @model_validator(mode="after")
@@ -298,7 +341,7 @@ def build_broker_state_unknown_event(
             request_id=request_id,
             workflow_id=checked_workflow_id,
             correlation_id=correlation_id,
-            causation_id=receipt.receipt_id,
+            causation_id=None,
             facts={
                 "retry_locked": True,
                 "unresolved_scope": scope_text,
@@ -333,7 +376,7 @@ def _delivery_failure_event(event: OperationalEvent) -> OperationalEvent:
         request_id=event.request_id,
         workflow_id=event.workflow_id,
         correlation_id=event.correlation_id,
-        causation_id=event.event_id,
+        causation_id=None,
         facts={"failed_event_type": event.event_type},
         source_refs={"failed_event_id": event.event_id},
     )

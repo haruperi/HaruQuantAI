@@ -14,7 +14,10 @@ from app.services.risk import (
     StrategyOperationalEligibilityDecision,
 )
 from app.services.trading.actions import execute_portfolio_rebalance
-from app.services.trading.contracts import PortfolioRebalanceExecutionRequest
+from app.services.trading.contracts import (
+    PortfolioRebalanceExecutionRequest,
+    TradingError,
+)
 from app.services.trading.state import TradingProjection
 from app.utils import canonical_json
 from pydantic import ValidationError
@@ -47,7 +50,7 @@ def rebalance_data() -> dict[str, object]:
         "eligibility_decision_ids": ("eligibility-001",),
         "actions": (
             {
-                "action_id": "action-001",
+                "action_id": "req-44444444-4444-4444-8444-444444444444",
                 "component_id": "strategy-001",
                 "eligibility_decision_id": "eligibility-001",
                 "action": "reduce_exposure",
@@ -176,4 +179,46 @@ async def test_rebalance_executes_complete_approved_reduction() -> None:
     item = rebalance_request()
     outcome = await execute_portfolio_rebalance(item, rebalance_dependencies(item))
     assert outcome.status == "success"
-    assert outcome.data["outcomes"][0]["action_id"] == "action-001"
+    assert (
+        outcome.data["outcomes"][0]["action_id"]
+        == "req-44444444-4444-4444-8444-444444444444"
+    )
+
+
+@pytest.mark.anyio
+async def test_rebalance_preserves_prior_outcomes_and_marks_remaining_skipped() -> None:
+    """A later child failure retains earlier truth and identifies unattempted work."""
+    data = rebalance_data()
+    first = dict(data["actions"][0])
+    second = {
+        **first,
+        "action_id": "req-55555555-5555-4555-8555-555555555555",
+    }
+    third = {
+        **first,
+        "action_id": "req-66666666-6666-4666-8666-666666666666",
+    }
+    data["actions"] = (first, second, third)
+    del data["canonical_hash"]
+    data["canonical_hash"] = sha256(canonical_json(data).encode()).hexdigest()
+    item = PortfolioRebalanceExecutionRequest.model_validate(data)
+    deps = rebalance_dependencies(item)
+    resolver = deps.rebalance_action_resolver
+
+    def fail_second(parent, action):
+        """Fail the second child before dispatch while leaving later work untouched."""
+        if action["action_id"] == second["action_id"]:
+            raise TradingError("SCOPE_MISMATCH", "Injected child resolution failure")
+        return resolver(parent, action)
+
+    outcome = await execute_portfolio_rebalance(
+        item,
+        replace(deps, rebalance_action_resolver=fail_second),
+    )
+
+    assert outcome.status == "partial"
+    assert [entry["status"] for entry in outcome.data["outcomes"]] == [
+        "sent",
+        "error",
+        "skipped",
+    ]

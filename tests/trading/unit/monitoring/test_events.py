@@ -31,9 +31,9 @@ def _event() -> OperationalEvent:
         event_type="HEALTH_CHANGED",
         severity="warning",
         occurred_at=NOW,
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id=REQUEST_ID,
+        workflow_id=WORKFLOW_ID,
+        correlation_id=CORRELATION_ID,
         facts={"state": "degraded", "api_key": "secret-value"},
         source_refs={"session": "session-001"},
     )
@@ -44,7 +44,7 @@ def test_event_has_trace_and_severity() -> None:
     logger.debug("Testing OperationalEvent trace and redaction")
     event = _event()
     assert event.severity == "warning"
-    assert event.workflow_id == "workflow-001"
+    assert event.workflow_id == WORKFLOW_ID
     assert event.facts["api_key"] != "secret-value"
 
 

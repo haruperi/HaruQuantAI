@@ -19,6 +19,10 @@ from app.services.trading.state import (
     TradingProjection,
     apply_execution_event,
 )
+from app.services.trading.validation.authority import (
+    validate_action_policy,
+    validate_kill_switch_hierarchy,
+)
 from app.utils import canonical_json, logger
 
 if TYPE_CHECKING:
@@ -40,16 +44,14 @@ def _policy(request: TradingRequest, deps: TradingDependencies) -> ActionPolicyV
         TradingError: If policy authority is absent, stale, denied, or mismatched.
     """
     logger.debug("Validating Risk action policy for Trading control")
-    verdict = deps.action_policy_source(request)
-    if (
-        verdict is None
-        or not verdict.allowed
-        or verdict.verdict_id != request.action_policy_verdict_id
-        or verdict.action != request.action
-        or verdict.expires_at <= deps.clock()
-    ):
-        raise TradingError("PERMISSION_DENIED", "Compatible action policy is absent")
-    return verdict
+    try:
+        return validate_action_policy(
+            request, deps.action_policy_source(request), deps.clock()
+        )
+    except TradingError as error:
+        raise TradingError(
+            "PERMISSION_DENIED", "Compatible action policy is absent"
+        ) from error
 
 
 def _record_control(
@@ -168,10 +170,12 @@ async def resume_strategy(
     logger.info("Resuming Trading strategy admission")
     require_action(request, "resume_strategy")
     _policy(request, deps)
-    if any(
-        state.state != "inactive" for state in deps.kill_switch_state_source(request)
-    ):
-        raise TradingError("KILL_SWITCH_ACTIVE", "Kill-switch hierarchy blocks resume")
+    validate_kill_switch_hierarchy(
+        request,
+        deps.kill_switch_state_source(request),
+        deps.max_staleness_seconds["kill_switch"],
+        deps.clock(),
+    )
     snapshot = deps.reconciliation_source(request)
     current = deps.store.load_projection(
         (request.route, request.account_id, authority_id(request))
@@ -296,11 +300,15 @@ async def clear_kill_switch(
         raise TradingError("INVALID_REQUEST", "Switch scope is required")
     target_level = levels[request.scope_level]
     states = deps.kill_switch_state_source(request)
-    if any(
-        levels[state.scope_level] < target_level and state.state != "inactive"
-        for state in states
-    ):
-        raise TradingError("KILL_SWITCH_ACTIVE", "Active parent blocks clearance")
+    validate_kill_switch_hierarchy(
+        request,
+        states,
+        deps.max_staleness_seconds["kill_switch"],
+        deps.clock(),
+        allowed_active_levels=frozenset(
+            level for level, rank in levels.items() if rank >= target_level
+        ),
+    )
     state = await deps.kill_switch_transition(
         _kill_switch_command(request, "clear"), _policy(request, deps)
     )

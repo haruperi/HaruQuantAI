@@ -6,12 +6,12 @@ from datetime import timedelta
 
 import pytest
 from app.services.risk import DecisionState
-from app.services.trading.actions import execute_portfolio_rebalance
-from app.services.trading.contracts import (
+from app.services.trading import (
+    BudgetGate,
     PortfolioRebalanceExecutionRequest,
     TradingError,
+    execute_portfolio_rebalance,
 )
-from app.services.trading.monitoring import BudgetGate
 from app.utils import canonical_json
 from pydantic import ValidationError
 from tests.trading.conftest import (

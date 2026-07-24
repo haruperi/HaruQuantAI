@@ -3,6 +3,7 @@
 Demonstrates adapter capabilities and order dispatch.
 """
 
+# ruff: noqa: E501
 import asyncio
 import sys
 from datetime import UTC, datetime, timedelta
@@ -12,8 +13,9 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.trading.contracts import ExecutionReceipt, OrderIntent
-from app.services.trading.routing import (
+from app.services.trading import (
+    ExecutionReceipt,
+    OrderIntent,
     classify_authority_response,
     dispatch_order_intent,
     validate_adapter_capability,
@@ -26,9 +28,9 @@ def _intent() -> OrderIntent:
     """Build one complete simulation executable intent."""
     return OrderIntent(
         client_order_id="usage-client-order-001",
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route="sim",
         provider_id=None,
         account_id="usage-account-001",
@@ -100,8 +102,8 @@ def example_routing() -> None:
         "status": "accepted",
         "requested_quantity": "1.00",
         "filled_quantity": "0",
-        "request_id": "usage-request-001",
-        "correlation_id": "usage-correlation-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "authority_timestamp": NOW.isoformat(),
         "received_at": NOW.isoformat(),
     }
@@ -143,6 +145,21 @@ def example_routing() -> None:
         )
     )
     print(f"Dispatched order intent receipt status: {dispatched_receipt.status}")
+
+
+def fr_trd_029() -> None:
+    """FR-TRD-029: The system shall reject adapters lacking approved provider, API/schema, action, intent order-type, security, timeout, malformed-response, rate-limit, retry, and redaction declarations."""
+    example_routing()
+
+
+def fr_trd_030() -> None:
+    """FR-TRD-030: The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence."""
+    example_routing()
+
+
+def fr_trd_031() -> None:
+    """FR-TRD-031: The system shall dispatch exactly one approved intent to Simulation for sim or adapt it into the matching receiver-owned Brokers mutation DTO for paper/live. Broker environment/account reference come only from injected `BrokerConnectionConfig`; order type/unit/instructions come only from `OrderIntent`; target order/position identities come only from Trading state carried by the intent; timeout and receipt time come from validated injected policy/clock dependencies."""
+    example_routing()
 
 
 def main() -> None:

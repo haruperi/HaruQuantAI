@@ -3,6 +3,7 @@
 Demonstrates authority snapshots and reconciliation.
 """
 
+# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -11,15 +12,16 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.trading.contracts import ExecutionReceipt
-from app.services.trading.reconciliation import (
+from app.services.trading import (
     AuthorityResolution,
     AuthoritySnapshot,
+    ExecutionReceipt,
     ReconciliationReport,
+    TradingEvent,
+    TradingProjection,
     compare_authority_state,
     resolve_unknown_outcome,
 )
-from app.services.trading.state import TradingEvent, TradingProjection
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
@@ -67,9 +69,9 @@ def _attempt() -> TradingEvent:
         tenant_id="usage-account-001",
         authority_id="simulator",
         occurred_at=NOW,
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         payload={"client_order_id": "usage-client-order-001"},
     )
 
@@ -90,8 +92,8 @@ def _receipt() -> ExecutionReceipt:
         response_classification="timeout",
         retry_safe=False,
         reconciliation_required=True,
-        request_id="usage-request-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -156,6 +158,31 @@ def example_reconciliation() -> None:
     )
     print(f"Unknown outcome resolution transition: {resolution.transition}")
     print(f"Retry allowed: {resolution.retry_allowed}")
+
+
+def fr_trd_043() -> None:
+    """FR-TRD-043: The system shall expose normalized account/order/position/time authority evidence without provider objects."""
+    example_reconciliation()
+
+
+def fr_trd_044() -> None:
+    """FR-TRD-044: The system shall deterministically report missing, extra, mismatched, and stale records without claiming resolution."""
+    example_reconciliation()
+
+
+def fr_trd_045() -> None:
+    """FR-TRD-045: The system shall lock retry, persist evidence, prefer route authority truth, and release only after an approved transition resolves."""
+    example_reconciliation()
+
+
+def fr_trd_061() -> None:
+    """FR-TRD-061: The system shall expose a deterministic comparison result with discrepancy classes, severity, evidence references, and unresolved status."""
+    example_reconciliation()
+
+
+def fr_trd_062() -> None:
+    """FR-TRD-062: The system shall expose the approved authority transition, retry decision, incident reference, and remaining unresolved scope."""
+    example_reconciliation()
 
 
 def main() -> None:

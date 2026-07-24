@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import ast
+import os
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 DATA_ROOT = Path("app/services/data").resolve()
@@ -202,3 +205,52 @@ def test_package_root_has_no_runtime_side_effect_statements() -> None:
         if not isinstance(node, permitted)
     ]
     assert not unexpected, f"Unexpected package-root statements: {unexpected}"
+
+
+def test_domain_import_has_no_external_or_persistent_side_effect() -> None:
+    """Assert a fresh Data import cannot write, connect, spawn, or mutate env."""
+    script = """
+import asyncio
+import builtins
+import os
+import socket
+import sqlite3
+import subprocess
+import threading
+
+environment = dict(os.environ)
+real_open = builtins.open
+
+def guarded_open(file, mode="r", *args, **kwargs):
+    if any(flag in mode for flag in ("w", "a", "x", "+")):
+        raise AssertionError(f"import attempted filesystem mutation: {file}")
+    return real_open(file, mode, *args, **kwargs)
+
+def blocked(*args, **kwargs):
+    raise AssertionError("import attempted an external side effect")
+
+builtins.open = guarded_open
+socket.socket.connect = blocked
+sqlite3.connect = blocked
+subprocess.Popen = blocked
+threading.Thread.start = blocked
+os.mkdir = blocked
+os.makedirs = blocked
+
+import app.services.data
+
+assert dict(os.environ) == environment
+assert app.services.data.__all__
+"""
+    environment = dict(os.environ)
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    completed = subprocess.run(  # noqa: S603 - fixed interpreter and source.
+        [sys.executable, "-c", script],
+        cwd=Path(__file__).parents[3],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=30,
+    )
+    assert completed.returncode == 0, completed.stderr

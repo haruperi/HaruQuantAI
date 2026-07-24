@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.2.6
+
+**Release date:** 2026-07-24
+
+### Complete Trading domain
+
+The Trading domain now exposes nine focused feature modules with deterministic authority, fail-closed execution, reconciliation, operational evidence, and standalone usage coverage.
+
+#### Added (9)
+
+- `FEAT-TRD-01` Canonical Contracts and Registries.
+- `FEAT-TRD-02` State and Deterministic Projections.
+- `FEAT-TRD-03` Validation, Readiness, and Plans.
+- `FEAT-TRD-04` Authority Selection and Dispatch.
+- `FEAT-TRD-05` Reconciliation and Retry Guard.
+- `FEAT-TRD-06` Operational and Budget Evidence.
+- `FEAT-TRD-07` Live and Paper Session Lifecycle.
+- `FEAT-TRD-08` Route-Aware Public Actions.
+- `FEAT-TRD-09` Immutable Execution Evidence.
+
 ## 2.2.5
 
 **Release date:** 2026-07-24

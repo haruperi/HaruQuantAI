@@ -11,18 +11,21 @@ from app.services.brokers import (
     BrokerAdapter,
     BrokerFeatureFlags,
 )
-from app.services.trading.actions import run_live_evaluation_cycle
-from app.services.trading.live import LiveSession
-from app.services.trading.validation import ReadinessAssessment
+from app.services.trading import (
+    LiveSession,
+    ReadinessAssessment,
+    run_live_evaluation_cycle,
+)
 from tests.trading.conftest import (
     NOW,
     CountingAdapter,
     action_policy,
+    auth_context,
     broker_connection,
     evaluation_dependencies,
     evaluation_evidence,
     evaluation_risk_decision,
-    inactive_kill_switch,
+    inactive_kill_switch_hierarchy,
     symbol_capability,
     trade_intent,
 )
@@ -53,7 +56,7 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
         ),
         risk_decision_source=lambda request: evaluation_risk_decision(),
         action_policy_source=lambda request: action_policy(request.action),
-        kill_switch_source=lambda request: (inactive_kill_switch(),),
+        kill_switch_source=inactive_kill_switch_hierarchy,
         readiness_source=lambda request, supplied_evidence: ReadinessAssessment(
             passed=True,
             failed_check_codes=(),
@@ -65,6 +68,7 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
             request.provider_id,
             request.symbol,
         )[0],
+        auth_context_source=auth_context,
         pre_audit_sink=audits.append,
         event_sink=lambda event: None,
         startup_reconcile=passed,
@@ -106,7 +110,14 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
     outcome = await run_live_evaluation_cycle(deps, evaluation_evidence())
 
     assert outcome.status == "sent"
-    assert calls == ["data.market", "data.account", "indicators", "strategy", "risk"]
+    assert calls == [
+        "data.market",
+        "data.account",
+        "data.market_context",
+        "indicators",
+        "strategy",
+        "risk",
+    ]
     assert adapter.calls == 1
     assert adapter.request is not None
     assert adapter.request.quantity == Decimal("0.50")

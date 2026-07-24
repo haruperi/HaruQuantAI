@@ -1,7 +1,7 @@
 """Workflow integration for immutable execution evidence reporting."""
 
 # ruff: noqa: INP001
-from app.services.trading.reporting import build_trading_report
+from app.services.trading import build_trading_report
 from tests.trading.conftest import ReportStore, trading_request
 
 
@@ -10,7 +10,8 @@ def test_report_contains_only_execution_evidence() -> None:
     outcome = build_trading_report(
         trading_request(action="sync_positions"), ReportStore()
     )
-    assert set(outcome.data["evidence"]) == {
+    assert outcome.data["report"]["schema_id"] == "trading.execution_evidence_report.v1"
+    assert set(outcome.data["report"]["evidence"]) == {
         "incidents",
         "readiness",
         "receipts",

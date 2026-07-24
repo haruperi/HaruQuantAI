@@ -3,6 +3,8 @@
 # ruff: noqa: INP001
 import pytest
 from app.services.risk import KillSwitchState
+from app.services.trading import TradingRequest
+from app.utils import AuthContext
 from tests.trading.unit.actions.test_controls import switch as kill_switch
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
@@ -93,6 +95,67 @@ def inactive_kill_switch() -> KillSwitchState:
     return _gate_inactive_switch().model_copy(update={"updated_at": NOW})
 
 
+def inactive_kill_switch_hierarchy(
+    request: TradingRequest,
+) -> tuple[KillSwitchState, ...]:
+    """Build every exact applicable inactive Risk switch scope."""
+    states = [
+        inactive_kill_switch().model_copy(update={"updated_at": request.system_time}),
+        KillSwitchState(
+            state_id="switch-strategy",
+            scope_level="strategy",
+            scope={"strategy_id": request.strategy_id},
+            state="inactive",
+            reason="normal operation",
+            version=1,
+            updated_at=request.system_time,
+        ),
+    ]
+    if request.portfolio_id is not None:
+        states.append(
+            KillSwitchState(
+                state_id="switch-portfolio",
+                scope_level="portfolio",
+                scope={"portfolio_id": request.portfolio_id},
+                state="inactive",
+                reason="normal operation",
+                version=1,
+                updated_at=request.system_time,
+            )
+        )
+    if request.symbol is not None:
+        states.append(
+            KillSwitchState(
+                state_id="switch-symbol",
+                scope_level="symbol",
+                scope={"symbol": request.symbol},
+                state="inactive",
+                reason="normal operation",
+                version=1,
+                updated_at=request.system_time,
+            )
+        )
+    return tuple(states)
+
+
+def auth_context(request: TradingRequest) -> AuthContext:
+    """Build exact authenticated trace context for a governed request."""
+    return AuthContext(
+        contract_version="v1",
+        schema_id="utils.auth_context.v1",
+        principal_id="trading-test",
+        principal_type="SERVICE_ACCOUNT",
+        roles=("trading",),
+        permissions=("trading.execute",),
+        scopes=(request.account_id,),
+        tenant_or_environment="test",
+        request_id=request.request_id,
+        workflow_id=request.workflow_id,
+        correlation_id=request.correlation_id,
+        issued_at=NOW,
+    )
+
+
 @pytest.fixture
 def anyio_backend() -> str:
     """Select the installed asyncio AnyIO backend."""
@@ -108,6 +171,7 @@ __all__ = [
     "account_snapshot",
     "action_policy",
     "anyio_backend",
+    "auth_context",
     "authority_projection",
     "authority_receipt",
     "authority_snapshot",
@@ -117,6 +181,7 @@ __all__ = [
     "evaluation_evidence",
     "evaluation_risk_decision",
     "inactive_kill_switch",
+    "inactive_kill_switch_hierarchy",
     "kill_switch",
     "live_action_policy",
     "live_adapter_capability",

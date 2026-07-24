@@ -18,9 +18,9 @@ def _event_data() -> dict[str, object]:
         "tenant_id": "tenant-001",
         "authority_id": "simulator",
         "occurred_at": datetime(2026, 7, 19, 8, 0, tzinfo=UTC),
-        "request_id": "request-001",
-        "workflow_id": "workflow-001",
-        "correlation_id": "correlation-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "payload": {"order_id": "order-001"},
     }
 
@@ -40,8 +40,8 @@ def test_event_requires_trace_and_utc_time() -> None:
 
 
 def test_event_rejects_sensitive_payload_key() -> None:
-    """Event redaction evidence rejects an unredacted protected key."""
+    """Event boundary redacts a sensitive payload before persistence."""
     data = _event_data()
     data["payload"] = {"api_secret": "x"}
-    with pytest.raises(ValidationError, match="unredacted sensitive keys"):
-        TradingEvent.model_validate(data)
+    event = TradingEvent.model_validate(data)
+    assert event.payload["api_secret"] != "x"

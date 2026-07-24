@@ -25,9 +25,9 @@ NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 def _request_data() -> dict[str, object]:
     """Return complete governed Trading request material."""
     return {
-        "request_id": "req-001",
-        "workflow_id": "wf-001",
-        "correlation_id": "corr-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "route": TradingRoute.SIM,
         "action": "submit_order",
         "provider_id": None,
@@ -68,8 +68,8 @@ def _receipt(*, reconciliation_required: bool = False) -> ExecutionReceipt:
         response_classification="confirmed",
         retry_safe=False,
         reconciliation_required=reconciliation_required,
-        request_id="req-001",
-        correlation_id="corr-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 
@@ -90,9 +90,9 @@ def _rebalance_data() -> dict[str, object]:
     data: dict[str, object] = {
         "contract_version": "v1",
         "schema_id": "trading.portfolio_rebalance_execution_request.v1",
-        "request_id": "rebalance-req-001",
-        "workflow_id": "wf-rebalance-001",
-        "correlation_id": "corr-rebalance-001",
+        "request_id": "req-44444444-4444-4444-8444-444444444444",
+        "workflow_id": "wf-55555555-5555-4555-8555-555555555555",
+        "correlation_id": "cor-66666666-6666-4666-8666-666666666666",
         "plan_id": "plan-001",
         "plan_version": "v3",
         "portfolio_id": "portfolio-001",
@@ -142,16 +142,17 @@ def test_standard_envelope_status_contract() -> None:
 
 
 def test_envelope_rejects_unredacted_sensitive_keys() -> None:
-    """A true redaction marker cannot accompany protected payload keys."""
-    with pytest.raises(ValidationError, match="unredacted sensitive keys"):
-        StandardTradingEnvelope(
-            status="success",
-            message="Unsafe evidence",
-            data={"nested": {"access_token": "secret"}},
-            errors=(),
-            warnings=(),
-            audit_metadata={"operation": "unit", "redaction_applied": True},
-        )
+    """Sensitive nested values are redacted at the public envelope boundary."""
+    envelope = StandardTradingEnvelope(
+        status="success",
+        message="Unsafe evidence",
+        data={"nested": {"access_token": "secret"}},
+        errors=(),
+        warnings=(),
+        audit_metadata={"operation": "unit", "redaction_applied": True},
+    )
+    assert "secret" not in str(envelope.data)
+    assert "[REDACTED]" in str(envelope.data)
 
 
 def test_contract_version_is_canonical() -> None:
@@ -167,9 +168,9 @@ def test_order_intent_cannot_exceed_risk_size() -> None:
     with pytest.raises(ValidationError):
         OrderIntent(
             client_order_id="client-order-001",
-            request_id="req-001",
-            workflow_id="wf-001",
-            correlation_id="corr-001",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
             route=TradingRoute.SIM,
             provider_id=None,
             account_id="account-001",
@@ -197,9 +198,9 @@ def test_order_intent_preserves_stop_limit_execution_material() -> None:
     """Executable stop-limit fields remain explicit and unmodified."""
     intent = OrderIntent(
         client_order_id="client-order-002",
-        request_id="req-002",
-        workflow_id="wf-002",
-        correlation_id="corr-002",
+        request_id="req-44444444-4444-4444-8444-444444444444",
+        workflow_id="wf-55555555-5555-4555-8555-555555555555",
+        correlation_id="cor-66666666-6666-4666-8666-666666666666",
         route=TradingRoute.SIM,
         provider_id=None,
         account_id="account-001",
@@ -256,9 +257,9 @@ def test_trade_record_flags_unreconciled_state() -> None:
             authority_state="confirmed",
             reconciliation_state="reconciled",
             created_at=NOW,
-            request_id="req-001",
-            workflow_id="wf-001",
-            correlation_id="corr-001",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
         )
 
 

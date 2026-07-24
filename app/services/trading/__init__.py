@@ -20,6 +20,7 @@ from app.services.trading.actions import (
 )
 from app.services.trading.contracts import (
     TRADING_CONTRACT_VERSION,
+    ExecutionEvidenceReport,
     ExecutionReceipt,
     OrderIntent,
     PortfolioRebalanceExecutionRequest,
@@ -78,6 +79,7 @@ __all__: tuple[str, ...] = (
     "AuthorityResolution",
     "AuthoritySnapshot",
     "BudgetGate",
+    "ExecutionEvidenceReport",
     "ExecutionReceipt",
     "IdempotencyReservation",
     "LiveSession",

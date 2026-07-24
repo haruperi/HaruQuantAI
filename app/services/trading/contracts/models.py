@@ -2,7 +2,7 @@
 
 from collections.abc import Mapping
 from datetime import datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_EVEN, Decimal, InvalidOperation, localcontext
 from enum import StrEnum
 from hashlib import sha256
 from types import MappingProxyType
@@ -12,11 +12,19 @@ from pydantic import (
     BaseModel,
     BeforeValidator,
     ConfigDict,
+    ValidationInfo,
     field_validator,
     model_validator,
 )
 
-from app.utils import canonical_json, is_sensitive_key, logger, to_json_safe
+from app.utils import (
+    canonical_json,
+    is_sensitive_key,
+    logger,
+    redact_mapping_value,
+    to_json_safe,
+    validate_id,
+)
 
 TRADING_CONTRACT_VERSION: Final = "v1"
 
@@ -56,6 +64,7 @@ type OrderType = Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"]
 type TimeInForce = Literal["GTC", "IOC", "FOK", "GTD", "DAY"]
 
 _SHA256_HEX_LENGTH = 64
+_DECIMAL_PRECISION = 28
 
 
 def _reject_float(value: object) -> object:
@@ -116,6 +125,45 @@ def _validate_optional_text(value: str | None, field_name: str) -> str | None:
     if value is None:
         return None
     return _validate_text(value, field_name)
+
+
+def _validate_trace_id(value: str, prefix: str, field_name: str) -> str:
+    """Validate one Utils-defined prefixed UUID4 trace identifier.
+
+    Args:
+        value: Candidate trace identifier.
+        prefix: Required stable identifier prefix.
+        field_name: Human-readable field name for diagnostics.
+
+    Returns:
+        Validated canonical trace identifier.
+
+    Raises:
+        ValueError: If the identifier is not a prefixed UUID4.
+    """
+    logger.debug("Validating Trading trace field: %s", field_name)
+    try:
+        return validate_id(value, expected_prefix=prefix)
+    except Exception as error:
+        message = f"{field_name} must be a {prefix}-prefixed UUID4"
+        raise ValueError(message) from error
+
+
+def _validation_field_name(info: ValidationInfo) -> str:
+    """Return a present Pydantic field name for validator dispatch.
+
+    Args:
+        info: Pydantic validation metadata.
+
+    Returns:
+        Present field name.
+
+    Raises:
+        ValueError: If validator metadata omits the field name.
+    """
+    if info.field_name is None:
+        raise ValueError("validator field name is absent")
+    return info.field_name
 
 
 def _validate_utc(value: datetime, field_name: str) -> datetime:
@@ -257,12 +305,15 @@ def _validate_decimal(
     if not isinstance(value, Decimal) or not value.is_finite():
         message = f"{field_name} must be a finite Decimal"
         raise ValueError(message)
-    if positive and value <= 0:
-        message = f"{field_name} must be positive"
-        raise ValueError(message)
-    if non_negative and value < 0:
-        message = f"{field_name} must be non-negative"
-        raise ValueError(message)
+    with localcontext() as context:
+        context.prec = _DECIMAL_PRECISION
+        context.rounding = ROUND_HALF_EVEN
+        if positive and value <= 0:
+            message = f"{field_name} must be positive"
+            raise ValueError(message)
+        if non_negative and value < 0:
+            message = f"{field_name} must be non-negative"
+            raise ValueError(message)
     return value
 
 
@@ -306,6 +357,27 @@ def _contains_sensitive_key(value: JsonValue) -> bool:
     if isinstance(value, list):
         return any(_contains_sensitive_key(item) for item in value)
     return False
+
+
+def _redact_json_value(value: object) -> JsonValue:
+    """Convert arbitrary JSON-safe material through the shared redaction policy.
+
+    Args:
+        value: Candidate public or persisted boundary material.
+
+    Returns:
+        Redacted, bounded, JSON-safe material.
+
+    Raises:
+        TypeError: If the shared redactor returns an incompatible shape.
+        ValueError: If material is not safely representable.
+    """
+    logger.debug("Redacting Trading JSON boundary material")
+    safe = to_json_safe(value)
+    result = redact_mapping_value({"value": safe}).value
+    if not isinstance(result, dict) or "value" not in result:
+        raise TypeError("shared redaction returned invalid Trading material")
+    return to_json_safe(result["value"])
 
 
 class _TradingModel(BaseModel):
@@ -389,9 +461,6 @@ class TradingRequest(_TradingModel):
     redaction_applied: Literal[True] = True
 
     @field_validator(
-        "request_id",
-        "workflow_id",
-        "correlation_id",
         "account_id",
         "strategy_id",
         "strategy_version",
@@ -419,8 +488,30 @@ class TradingRequest(_TradingModel):
         logger.debug("Validating required TradingRequest text")
         return _validate_text(value, "request text")
 
+    @field_validator("request_id", "workflow_id", "correlation_id")
+    @classmethod
+    def _validate_request_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate canonical request trace identifiers.
+
+        Args:
+            value: Candidate trace identifier.
+            info: Pydantic field metadata.
+
+        Returns:
+            Validated prefixed UUID4 identifier.
+
+        Raises:
+            ValueError: If the identifier prefix or UUID4 shape is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        field_name = _validation_field_name(info)
+        return _validate_trace_id(value, prefixes[field_name], field_name)
+
     @field_validator(
-        "causation_id",
         "provider_id",
         "portfolio_id",
         "symbol",
@@ -447,6 +538,24 @@ class TradingRequest(_TradingModel):
         """
         logger.debug("Validating optional TradingRequest text")
         return _validate_optional_text(value, "optional request text")
+
+    @field_validator("causation_id")
+    @classmethod
+    def _validate_request_causation(cls, value: str | None) -> str | None:
+        """Validate an optional canonical causation identifier.
+
+        Args:
+            value: Candidate causation identifier.
+
+        Returns:
+            Validated identifier or ``None``.
+
+        Raises:
+            ValueError: If the supplied identifier is not a prefixed UUID4.
+        """
+        if value is None:
+            return None
+        return _validate_trace_id(value, "cau", "causation_id")
 
     @field_validator(
         "quantity",
@@ -600,7 +709,7 @@ class StandardTradingEnvelope(_TradingModel):
             JSON-safe result data.
         """
         logger.debug("Validating StandardTradingEnvelope data")
-        return to_json_safe(value)
+        return _redact_json_value(value)
 
     @field_validator("errors", "warnings", mode="before")
     @classmethod
@@ -614,9 +723,22 @@ class StandardTradingEnvelope(_TradingModel):
 
         Returns:
             Immutable JSON-safe evidence rows.
+
+        Raises:
+            TypeError: If redacted evidence is not a sequence of mappings.
         """
         logger.debug("Validating StandardTradingEnvelope evidence rows")
-        return tuple(_freeze_json_mapping(row) for row in value)
+        redacted = _redact_json_value(list(value))
+        if not isinstance(redacted, list) or any(
+            not isinstance(row, dict) for row in redacted
+        ):
+            raise TypeError("envelope evidence rows must be mappings")
+        rows: list[Mapping[str, JsonValue]] = []
+        for row in redacted:
+            if not isinstance(row, dict):
+                raise TypeError("envelope evidence rows must be mappings")
+            rows.append(_freeze_json_mapping(row))
+        return tuple(rows)
 
     @field_validator("audit_metadata", mode="before")
     @classmethod
@@ -632,12 +754,16 @@ class StandardTradingEnvelope(_TradingModel):
             Immutable JSON-safe audit metadata.
 
         Raises:
+            TypeError: If metadata does not remain a mapping after redaction.
             ValueError: If metadata is absent or not JSON-safe.
         """
         logger.debug("Validating StandardTradingEnvelope audit metadata")
         if not value:
             raise ValueError("audit_metadata must not be empty")
-        return _freeze_json_mapping(value)
+        redacted = _redact_json_value(value)
+        if not isinstance(redacted, dict):
+            raise TypeError("audit_metadata must be a mapping")
+        return _freeze_json_mapping(redacted)
 
     @model_validator(mode="after")
     def _validate_status_evidence(self) -> Self:
@@ -724,9 +850,6 @@ class OrderIntent(_TradingModel):
 
     @field_validator(
         "client_order_id",
-        "request_id",
-        "workflow_id",
-        "correlation_id",
         "account_id",
         "strategy_id",
         "strategy_version",
@@ -753,6 +876,29 @@ class OrderIntent(_TradingModel):
         """
         logger.debug("Validating OrderIntent text")
         return _validate_text(value, "order intent text")
+
+    @field_validator("request_id", "workflow_id", "correlation_id")
+    @classmethod
+    def _validate_intent_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate canonical order-intent trace identifiers.
+
+        Args:
+            value: Candidate trace identifier.
+            info: Pydantic field metadata.
+
+        Returns:
+            Validated prefixed UUID4 identifier.
+
+        Raises:
+            ValueError: If the identifier is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        field_name = _validation_field_name(info)
+        return _validate_trace_id(value, prefixes[field_name], field_name)
 
     @field_validator(
         "provider_id",
@@ -935,8 +1081,6 @@ class ExecutionReceipt(_TradingModel):
         "client_order_id",
         "authority",
         "response_classification",
-        "request_id",
-        "correlation_id",
     )
     @classmethod
     def _validate_receipt_text(cls, value: str) -> str:
@@ -953,6 +1097,25 @@ class ExecutionReceipt(_TradingModel):
         """
         logger.debug("Validating ExecutionReceipt text")
         return _validate_text(value, "receipt text")
+
+    @field_validator("request_id", "correlation_id")
+    @classmethod
+    def _validate_receipt_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate canonical execution-receipt trace identifiers.
+
+        Args:
+            value: Candidate trace identifier.
+            info: Pydantic field metadata.
+
+        Returns:
+            Validated prefixed UUID4 identifier.
+
+        Raises:
+            ValueError: If the identifier is invalid.
+        """
+        field_name = _validation_field_name(info)
+        prefix = "req" if field_name == "request_id" else "cor"
+        return _validate_trace_id(value, prefix, field_name)
 
     @field_validator("provider_order_id")
     @classmethod
@@ -1104,9 +1267,6 @@ class TradeRecord(_TradingModel):
     @field_validator(
         "record_id",
         "authority_state",
-        "request_id",
-        "workflow_id",
-        "correlation_id",
     )
     @classmethod
     def _validate_record_text(cls, value: str) -> str:
@@ -1123,6 +1283,29 @@ class TradeRecord(_TradingModel):
         """
         logger.debug("Validating TradeRecord text")
         return _validate_text(value, "trade record text")
+
+    @field_validator("request_id", "workflow_id", "correlation_id")
+    @classmethod
+    def _validate_record_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate canonical trade-record trace identifiers.
+
+        Args:
+            value: Candidate trace identifier.
+            info: Pydantic field metadata.
+
+        Returns:
+            Validated prefixed UUID4 identifier.
+
+        Raises:
+            ValueError: If the identifier is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        field_name = _validation_field_name(info)
+        return _validate_trace_id(value, prefixes[field_name], field_name)
 
     @field_validator("cost_currency_or_unit")
     @classmethod
@@ -1217,6 +1400,99 @@ class TradeRecord(_TradingModel):
         return self
 
 
+class ExecutionEvidenceReport(_TradingModel):
+    """Immutable package of officially stored Trading execution evidence.
+
+    Attributes:
+        contract_version: Stable Trading contract version.
+        schema_id: Stable execution-evidence schema identifier.
+        scope: Exact route, account, and authority query scope.
+        evidence: Stored receipts, records, readiness, reconciliation, incidents,
+            warnings, and unresolved actions without derived metrics.
+        request_id: Canonical request trace identifier.
+        workflow_id: Canonical workflow trace identifier.
+        correlation_id: Canonical cross-domain correlation identifier.
+    """
+
+    contract_version: Literal["v1"] = TRADING_CONTRACT_VERSION
+    schema_id: Literal["trading.execution_evidence_report.v1"] = (
+        "trading.execution_evidence_report.v1"
+    )
+    scope: Mapping[str, str]
+    evidence: Mapping[str, JsonValue]
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+
+    @field_validator("scope", mode="before")
+    @classmethod
+    def _validate_report_scope(cls, value: Mapping[str, object]) -> Mapping[str, str]:
+        """Validate and freeze the exact report query scope.
+
+        Args:
+            value: Candidate route/account/authority mapping.
+
+        Returns:
+            Immutable validated scope mapping.
+
+        Raises:
+            ValueError: If fields are missing, additional, or invalid.
+        """
+        logger.debug("Validating ExecutionEvidenceReport scope")
+        if set(value) != {"route", "account_id", "authority_id"}:
+            raise ValueError("execution report scope fields are incomplete")
+        checked = {
+            key: _validate_text(str(item), f"report scope {key}")
+            for key, item in value.items()
+        }
+        return MappingProxyType(checked)
+
+    @field_validator("evidence", mode="before")
+    @classmethod
+    def _validate_report_evidence(
+        cls, value: Mapping[str, object]
+    ) -> Mapping[str, JsonValue]:
+        """Redact and freeze official stored report evidence.
+
+        Args:
+            value: Candidate stored evidence mapping.
+
+        Returns:
+            Immutable redacted JSON-safe evidence.
+
+        Raises:
+            TypeError: If the value cannot be represented as a mapping.
+        """
+        logger.debug("Validating ExecutionEvidenceReport evidence")
+        redacted = _redact_json_value(value)
+        if not isinstance(redacted, dict):
+            raise TypeError("execution report evidence must be a mapping")
+        return _freeze_json_mapping(redacted)
+
+    @field_validator("request_id", "workflow_id", "correlation_id")
+    @classmethod
+    def _validate_report_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate canonical report trace identifiers.
+
+        Args:
+            value: Candidate trace identifier.
+            info: Pydantic field metadata.
+
+        Returns:
+            Validated prefixed UUID4 identifier.
+
+        Raises:
+            ValueError: If the identifier is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        field_name = _validation_field_name(info)
+        return _validate_trace_id(value, prefixes[field_name], field_name)
+
+
 _REBALANCE_ACTION_FIELDS = {
     "action_id",
     "component_id",
@@ -1293,15 +1569,19 @@ def _validate_rebalance_action(
     current = _rebalance_decimal(safe["current_exposure"], "current_exposure")
     target = _rebalance_decimal(safe["target_exposure"], "target_exposure")
     reduction = _rebalance_decimal(safe["reduction_amount"], "reduction_amount")
-    if (
-        current is None
-        or target is None
-        or reduction is None
-        or current <= target
-        or target < 0
-        or reduction <= 0
-        or reduction != current - target
-    ):
+    with localcontext() as context:
+        context.prec = _DECIMAL_PRECISION
+        context.rounding = ROUND_HALF_EVEN
+        invalid_reduction = (
+            current is None
+            or target is None
+            or reduction is None
+            or current <= target
+            or target < 0
+            or reduction <= 0
+            or reduction != current - target
+        )
+    if invalid_reduction:
         raise ValueError("rebalance exposure reduction is invalid")
     return str(safe["action_id"]), safe
 
@@ -1358,9 +1638,6 @@ class PortfolioRebalanceExecutionRequest(_TradingModel):
     )
 
     @field_validator(
-        "request_id",
-        "workflow_id",
-        "correlation_id",
         "plan_id",
         "plan_version",
         "portfolio_id",
@@ -1384,6 +1661,29 @@ class PortfolioRebalanceExecutionRequest(_TradingModel):
         """
         logger.debug("Validating rebalance request text")
         return _validate_text(value, "rebalance request text")
+
+    @field_validator("request_id", "workflow_id", "correlation_id")
+    @classmethod
+    def _validate_rebalance_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate canonical rebalance trace identifiers.
+
+        Args:
+            value: Candidate trace identifier.
+            info: Pydantic field metadata.
+
+        Returns:
+            Validated prefixed UUID4 identifier.
+
+        Raises:
+            ValueError: If the identifier is invalid.
+        """
+        prefixes = {
+            "request_id": "req",
+            "workflow_id": "wf",
+            "correlation_id": "cor",
+        }
+        field_name = _validation_field_name(info)
+        return _validate_trace_id(value, prefixes[field_name], field_name)
 
     @field_validator("eligibility_decision_ids")
     @classmethod
@@ -1503,6 +1803,7 @@ class PortfolioRebalanceExecutionRequest(_TradingModel):
 
 __all__ = [
     "TRADING_CONTRACT_VERSION",
+    "ExecutionEvidenceReport",
     "ExecutionReceipt",
     "JsonValue",
     "OrderIntent",

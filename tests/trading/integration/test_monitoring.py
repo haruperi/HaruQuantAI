@@ -2,10 +2,10 @@
 
 # ruff: noqa: INP001
 import pytest
-from app.services.trading.contracts import TradingError
-from app.services.trading.monitoring import (
+from app.services.trading import (
     BudgetGate,
     OperationalEvent,
+    TradingError,
     emit_runtime_event,
 )
 from tests.trading.conftest import (
@@ -38,9 +38,9 @@ def test_budget_and_event_delivery_failures_emit_incidents() -> None:
         event_type="COST_OBSERVED",
         severity="warning",
         occurred_at=NOW,
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         facts={"cost": "1.25"},
         source_refs={"receipt": "receipt-001"},
     )

@@ -27,9 +27,9 @@ def _symbol_capability() -> dict[str, object]:
 def _request() -> TradingRequest:
     """Build an invalid order lacking required instrument metadata."""
     return TradingRequest(
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route="sim",
         action="submit_order",
         account_id="account-001",
@@ -66,9 +66,7 @@ def _account() -> AccountStateSnapshot:
         source_id="simulator",
         snapshot_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
-        request_id=(
-            "req-dd37fc1c2cd6d665f9a7a7f9a2482efe3347c7bb51ac073ef12ef9b7eb511055"
-        ),
+        request_id=("req-dd37fc1c-2cd6-4d66-9f9a-7a7f9a2482ef"),
     )
 
 

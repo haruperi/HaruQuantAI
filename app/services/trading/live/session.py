@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from datetime import datetime
-from decimal import Decimal
 from hashlib import sha256
 from typing import TYPE_CHECKING
 
@@ -31,7 +31,13 @@ from app.services.trading.monitoring import (
     emit_runtime_event,
 )
 from app.services.trading.validation import ReadinessAssessment
-from app.utils import canonical_json, logger
+from app.utils import (
+    AuditEvent,
+    AuthContext,
+    canonical_json,
+    generate_id,
+    logger,
+)
 
 if TYPE_CHECKING:
     from app.services.brokers import BrokerAdapter
@@ -45,7 +51,8 @@ type _ReadinessSource = Callable[
     [TradingRequest, Mapping[str, JsonValue]], ReadinessAssessment
 ]
 type _AdapterCapabilitySource = Callable[[TradingRequest], Mapping[str, JsonValue]]
-type _AuditSink = Callable[[Mapping[str, JsonValue]], None]
+type _AuthContextSource = Callable[[TradingRequest], AuthContext]
+type _AuditSink = Callable[[AuditEvent], None]
 type _EventSink = Callable[[OperationalEvent], None]
 
 
@@ -64,6 +71,7 @@ class LiveSession:
         kill_switch_source: _KillSwitchSource,
         readiness_source: _ReadinessSource,
         adapter_capability_source: _AdapterCapabilitySource,
+        auth_context_source: _AuthContextSource,
         pre_audit_sink: _AuditSink,
         event_sink: _EventSink,
         startup_reconcile: _LifecycleStep,
@@ -84,6 +92,7 @@ class LiveSession:
             kill_switch_source: Applicable Risk kill-switch hierarchy reader.
             readiness_source: Current Data/route readiness assessor.
             adapter_capability_source: Normalized adapter capability reader.
+            auth_context_source: Exact authenticated principal context reader.
             pre_audit_sink: Fail-closed pre-mutation audit boundary.
             event_sink: Operational-event publication boundary.
             startup_reconcile: Startup authority reconciliation operation.
@@ -102,6 +111,7 @@ class LiveSession:
         self._kill_switch_source = kill_switch_source
         self._readiness_source = readiness_source
         self._adapter_capability_source = adapter_capability_source
+        self._auth_context_source = auth_context_source
         self._pre_audit_sink = pre_audit_sink
         self._event_sink = event_sink
         self._startup_reconcile = startup_reconcile
@@ -115,6 +125,9 @@ class LiveSession:
         self._reconciliation_ready = False
         self._health = "not_started"
         self._unresolved_steps: tuple[str, ...] = ()
+        self._lifecycle_request_id = generate_id("req")
+        self._lifecycle_workflow_id = generate_id("wf")
+        self._lifecycle_correlation_id = generate_id("cor")
 
     @property
     def config(self) -> _LiveRuntimeConfig:
@@ -239,14 +252,45 @@ class LiveSession:
         logger.debug("Reading LiveSession adapter capability")
         return self._adapter_capability_source(request)
 
-    def write_pre_audit(self, evidence: Mapping[str, JsonValue]) -> None:
+    def write_pre_audit(
+        self,
+        request: TradingRequest,
+        evidence: Mapping[str, JsonValue],
+    ) -> None:
         """Write fail-closed pre-mutation audit evidence.
 
         Args:
+            request: Exact governed request being audited.
             evidence: Redacted governed-action evidence.
+
+        Raises:
+            TradingError: If authenticated context is absent or trace-mismatched.
         """
         logger.info("Writing LiveSession pre-mutation audit evidence")
-        self._pre_audit_sink(evidence)
+        auth = self._auth_context_source(request)
+        if (
+            auth.request_id != request.request_id
+            or auth.workflow_id != request.workflow_id
+            or auth.correlation_id != request.correlation_id
+        ):
+            raise TradingError("AUDIT_FAILED", "Audit context trace is mismatched")
+        event = AuditEvent(
+            contract_version="v1",
+            schema_id="utils.audit_event.v1",
+            event_id=generate_id("evt"),
+            timestamp=self._clock(),
+            domain="trading",
+            action=request.action,
+            principal_id=auth.principal_id,
+            request_id=request.request_id,
+            correlation_id=request.correlation_id,
+            causation_id=request.causation_id,
+            payload={
+                "workflow_id": request.workflow_id,
+                "evidence": canonical_json(_redacted_envelope_data(evidence)),
+            },
+        )
+        self._pre_audit_sink(event)
 
     def now(self) -> datetime:
         """Read the injected current UTC time.
@@ -308,9 +352,9 @@ class LiveSession:
                 event_type="HEALTH_CHANGED",
                 severity="info" if state in {"ready", "stopped"} else "warning",
                 occurred_at=now,
-                request_id="live-session",
-                workflow_id="live-session-lifecycle",
-                correlation_id="live-session-lifecycle",
+                request_id=self._lifecycle_request_id,
+                workflow_id=self._lifecycle_workflow_id,
+                correlation_id=self._lifecycle_correlation_id,
                 facts={"state": state},
                 source_refs={"data_authority_id": self.config.data_authority_id},
             ),
@@ -449,20 +493,32 @@ class LiveSession:
         self,
         name: str,
         step: _LifecycleStep,
+        timeout_seconds: float,
     ) -> bool:
         """Run one shutdown step without hiding dependency failure.
 
         Args:
             name: Stable shutdown step name.
             step: Injected async lifecycle operation.
+            timeout_seconds: Positive remaining monotonic shutdown budget.
 
         Returns:
             Whether the step completed successfully.
         """
         logger.info("Running LiveSession shutdown step %s", name)
+        if timeout_seconds <= 0:
+            return False
         try:
-            return await step()
-        except OSError, RuntimeError, TypeError, ValueError, TradingError:
+            async with asyncio.timeout(timeout_seconds):
+                return await step()
+        except (
+            TimeoutError,
+            OSError,
+            RuntimeError,
+            TypeError,
+            ValueError,
+            TradingError,
+        ):
             logger.exception("LiveSession shutdown step failed: %s", name)
             return False
 
@@ -478,27 +534,22 @@ class LiveSession:
         logger.info("Stopping Trading LiveSession")
         config = self.config
         self._admission_enabled = False
-        started_at = self._clock()
-        results = (
-            (
-                "drain_in_flight",
-                await self._run_shutdown_step("drain_in_flight", self._drain_in_flight),
-            ),
-            (
-                "flush_evidence",
-                await self._run_shutdown_step("flush_evidence", self._flush_evidence),
-            ),
-            (
-                "shutdown_reconciliation",
-                await self._run_shutdown_step(
-                    "shutdown_reconciliation",
-                    self._shutdown_reconcile,
-                ),
-            ),
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + float(config.shutdown_budget_seconds)
+        steps = (
+            ("drain_in_flight", self._drain_in_flight),
+            ("flush_evidence", self._flush_evidence),
+            ("shutdown_reconciliation", self._shutdown_reconcile),
         )
-        elapsed = Decimal(str((self._clock() - started_at).total_seconds()))
+        results_list: list[tuple[str, bool]] = []
+        for name, step in steps:
+            remaining = deadline - loop.time()
+            results_list.append(
+                (name, await self._run_shutdown_step(name, step, remaining))
+            )
+        results = tuple(results_list)
         unresolved = [name for name, passed in results if not passed]
-        if elapsed > config.shutdown_budget_seconds:
+        if loop.time() > deadline:
             unresolved.append("shutdown_budget_exceeded")
         self._unresolved_steps = tuple(unresolved)
         self._reconciliation_ready = results[-1][1] and not unresolved

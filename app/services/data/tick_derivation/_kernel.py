@@ -16,7 +16,7 @@ Int64Array = NDArray[np.int64]
 Int8Array = NDArray[np.int8]
 
 
-@njit(cache=True)  # type: ignore[untyped-decorator]
+@njit(cache=False)  # type: ignore[untyped-decorator]
 def _add_ratio_half_even(base_value: int, numerator: int, denominator: int) -> int:
     """Add an integer ratio to a base and round the result ties-to-even.
 
@@ -39,7 +39,7 @@ def _add_ratio_half_even(base_value: int, numerator: int, denominator: int) -> i
     return result
 
 
-@njit(cache=True)  # type: ignore[untyped-decorator]
+@njit(cache=False)  # type: ignore[untyped-decorator]
 def _phase_mask(
     local_index: int,
     tick_count: int,
@@ -60,7 +60,7 @@ def _phase_mask(
     return phase
 
 
-@njit(cache=True)  # type: ignore[untyped-decorator]
+@njit(cache=False)  # type: ignore[untyped-decorator]
 def _write_volume_bar(
     bar_index: int,
     waypoints: Int64Array,
@@ -145,7 +145,7 @@ def _write_volume_bar(
         bar_indices[output_index] = bar_index
 
 
-@njit(cache=True, parallel=True)  # type: ignore[untyped-decorator]
+@njit(cache=False, parallel=True)  # type: ignore[untyped-decorator]
 def generate_volume_tick_arrays(
     waypoints: Int64Array,
     phases: Int64Array,
@@ -208,7 +208,7 @@ def generate_volume_tick_arrays(
     )
 
 
-@njit(cache=True, parallel=True)  # type: ignore[untyped-decorator]
+@njit(cache=False, parallel=True)  # type: ignore[untyped-decorator]
 def generate_four_tick_arrays(
     waypoints: Int64Array,
     phases: Int64Array,

@@ -16,21 +16,24 @@ from app.services.data.evidence.account_contracts import (
     AccountStateSnapshot,
 )
 from app.services.risk import ActionPolicyVerdict, RiskDecisionPackage
-from app.services.trading.actions import cancel_all_orders, resume_strategy
-from app.services.trading.contracts import TradingError
-from app.services.trading.live import LiveSession
-from app.services.trading.state import TradingProjection
-from app.services.trading.validation import ReadinessAssessment
+from app.services.trading import (
+    LiveSession,
+    ReadinessAssessment,
+    TradingError,
+    TradingProjection,
+    cancel_all_orders,
+    resume_strategy,
+)
 from tests.trading.conftest import (
     NOW,
     CountingAdapter,
     MemoryStore,
     account_snapshot,
     action_policy,
+    auth_context,
     broker_connection,
     emergency_dependencies,
-    inactive_kill_switch,
-    kill_switch,
+    inactive_kill_switch_hierarchy,
     live_config,
     live_evidence,
     live_risk_decision,
@@ -153,7 +156,7 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
         ),
         risk_decision_source=_child_risk,
         action_policy_source=_emergency_policy,
-        kill_switch_source=lambda _request: (inactive_kill_switch(),),
+        kill_switch_source=inactive_kill_switch_hierarchy,
         readiness_source=lambda request, _evidence: ReadinessAssessment(
             passed=True,
             failed_check_codes=(),
@@ -163,6 +166,7 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
         adapter_capability_source=lambda request: symbol_capability(
             request.route, request.provider_id, request.symbol
         )[0],
+        auth_context_source=auth_context,
         pre_audit_sink=lambda _evidence: None,
         event_sink=lambda _event: None,
         startup_reconcile=_passed,
@@ -179,7 +183,7 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
         live_session=session,
         account_state_source=lambda _request: _paper_account(),
         action_policy_source=_emergency_policy,
-        kill_switch_state_source=lambda _request: (inactive_kill_switch(),),
+        kill_switch_state_source=inactive_kill_switch_hierarchy,
         child_risk_decision_source=_child_risk,
     )
     return deps, session
@@ -189,12 +193,15 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
 async def test_kill_switch_blocks_and_reports_partial_emergency_results() -> None:
     """New admission blocks while emergency uncertainty remains explicit."""
     blocked = trading_dependencies(action_policy=action_policy("resume_strategy"))
+    blocked_request = trading_request(action="resume_strategy")
+    active_states = list(inactive_kill_switch_hierarchy(blocked_request))
+    active_states[0] = active_states[0].model_copy(update={"state": "active"})
     blocked = replace(
         blocked,
-        kill_switch_state_source=lambda item: (kill_switch("global", "active"),),
+        kill_switch_state_source=lambda item: tuple(active_states),
     )
     with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
-        await resume_strategy(trading_request(action="resume_strategy"), blocked)
+        await resume_strategy(blocked_request, blocked)
     emergency = replace(
         emergency_dependencies("cancel_all_orders"),
         simulation_dispatch=unknown_dispatch,

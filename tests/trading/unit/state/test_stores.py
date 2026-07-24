@@ -55,6 +55,30 @@ class _MemoryStore:
             raise RuntimeError("duplicate event")
         self.events.append(event)
 
+    def complete_idempotency(
+        self,
+        key: str,
+        material_hash: str,
+        receipt_id: str,
+        completed_at: datetime,
+        *,
+        status: str,
+    ) -> None:
+        """Persist one completed reservation for contract-test purposes."""
+        existing = self.reservations[key]
+        assert existing.material_hash == material_hash
+        self.reservations[key] = existing.model_copy(
+            update={
+                "status": (
+                    "duplicate_completed"
+                    if status == "completed"
+                    else "reconciliation_required"
+                ),
+                "receipt_id": receipt_id,
+                "reserved_at": completed_at,
+            }
+        )
+
     def load_projection(
         self, scope: tuple[object, str, str]
     ) -> TradingProjection | None:
@@ -103,9 +127,9 @@ def _event(event_id: str = "event-001", tenant_id: str = "tenant-001") -> Tradin
         tenant_id=tenant_id,
         authority_id="simulator",
         occurred_at=datetime(2026, 7, 19, 8, 0, tzinfo=UTC),
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         payload={"order_id": "order-001"},
     )
 

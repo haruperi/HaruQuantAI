@@ -40,13 +40,14 @@ def test_report_does_not_compute_analytics_metrics() -> None:
     """Report returns exact factual costs without deriving PnL or TCA."""
     store = ReportStore()
     outcome = build_trading_report(request(action="sync_positions"), store)
-    evidence = outcome.data["evidence"]
+    report = outcome.data["report"]
+    evidence = report["evidence"]
     assert evidence["trade_records"] == [{"commission": "1.25", "cost_unit": "USD"}]
     assert "pnl" not in str(outcome.data).lower()
     assert "tca" not in str(outcome.data).lower()
     assert store.report_scope == ("sim", "account-001", "simulation")
-    assert outcome.data["contract_version"] == "v1"
-    assert outcome.data["schema_id"] == "trading.execution_evidence_report.v1"
+    assert report["contract_version"] == "v1"
+    assert report["schema_id"] == "trading.execution_evidence_report.v1"
 
 
 def test_report_fails_closed_on_missing_evidence() -> None:

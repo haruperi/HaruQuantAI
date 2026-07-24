@@ -2,6 +2,7 @@
 
 # ruff: noqa: INP001
 from dataclasses import replace
+from datetime import timedelta
 from decimal import Decimal
 
 import pytest
@@ -12,6 +13,7 @@ from app.services.trading.actions import (
 )
 from app.services.trading.actions.emergency import _validated_child
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
+from app.services.trading.reconciliation import AuthoritySnapshot
 from app.services.trading.state import TradingProjection
 from app.utils import validate_id
 from tests.trading.unit.actions.test_dependencies import (
@@ -76,7 +78,37 @@ def emergency_dependencies(action: str):
         authority_state={},
         updated_at=NOW,
     )
-    return dependencies(store=store, action_policy=policy(action, max_children="5"))
+    deps = dependencies(store=store)
+
+    def policy_for(item):
+        """Build exact parent or child action-policy evidence."""
+        selected = policy(
+            item.action,
+            **({"max_children": "5"} if item.action == action else {}),
+        )
+        return selected.model_copy(
+            update={
+                "request_id": item.request_id,
+                "workflow_id": item.workflow_id,
+                "correlation_id": item.correlation_id,
+            }
+        )
+
+    return replace(
+        deps,
+        action_policy_source=policy_for,
+        reconciliation_source=lambda item: AuthoritySnapshot(
+            route=item.route,
+            authority_id="simulation",
+            account_id=item.account_id,
+            source_id="simulation-read-port",
+            account={},
+            orders={},
+            positions={},
+            observed_at=NOW,
+            expires_at=NOW + timedelta(minutes=1),
+        ),
+    )
 
 
 def test_derived_child_is_revalidated_before_dispatch() -> None:
@@ -118,17 +150,23 @@ async def test_bulk_children_receive_distinct_canonical_request_ids(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Every cancel/close child receives its own canonical UUID4 trace."""
-    generated = [
+    generated_requests = [
         "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
         "req-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    ]
+    generated_causes = [
+        "cau-cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+        "cau-dddddddd-dddd-4ddd-8ddd-dddddddddddd",
     ]
     issued: list[str] = []
 
     def issue_request_id(prefix: str) -> str:
         """Return the next deterministic canonical test request ID."""
-        assert prefix == "req"
-        value = generated[len(issued)]
-        issued.append(value)
+        if prefix == "req":
+            value = generated_requests[len(issued)]
+            issued.append(value)
+            return value
+        value = generated_causes[len(issued) - 1]
         return value
 
     monkeypatch.setattr(emergency, "generate_id", issue_request_id)
@@ -142,7 +180,7 @@ async def test_bulk_children_receive_distinct_canonical_request_ids(
     )
 
     checked = tuple(validate_id(value, expected_prefix="req") for value in issued)
-    assert checked == tuple(generated)
+    assert checked == tuple(generated_requests)
 
 
 @pytest.mark.anyio

@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import FrozenInstanceError
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import cast
+from typing import Literal, cast
 
 import pytest
 from app.services.brokers import BrokerSymbolInfo
@@ -16,7 +16,13 @@ from app.services.data.evidence.account_contracts import (
     AccountPosition,
     AccountStateSnapshot,
 )
-from app.services.risk import ActionPolicyVerdict
+from app.services.risk import (
+    ActionPolicyVerdict,
+    DecisionState,
+    KillSwitchState,
+    RiskApprovalToken,
+    RiskDecisionPackage,
+)
 from app.services.trading.actions import TradingDependencies
 from app.services.trading.contracts import (
     ExecutionReceipt,
@@ -57,6 +63,11 @@ class MemoryStore:
         """Reserve or return one exact-material request key."""
         existing = self.reservations.get(key)
         if existing is not None:
+            if existing.status in {
+                "duplicate_completed",
+                "reconciliation_required",
+            }:
+                return existing
             return existing.model_copy(update={"status": "duplicate_active"})
         reservation = IdempotencyReservation(
             key=key,
@@ -72,6 +83,31 @@ class MemoryStore:
     def append_event(self, event: TradingEvent) -> None:
         """Append one event."""
         self.events.append(event)
+
+    def complete_idempotency(
+        self,
+        key: str,
+        material_hash: str,
+        receipt_id: str,
+        completed_at: datetime,
+        *,
+        status: Literal["completed", "reconciliation_required"],
+    ) -> None:
+        """Persist a terminal or reconciliation-required reservation outcome."""
+        existing = self.reservations[key]
+        assert existing.material_hash == material_hash
+        reservation_status = (
+            "duplicate_completed"
+            if status == "completed"
+            else "reconciliation_required"
+        )
+        self.reservations[key] = existing.model_copy(
+            update={
+                "status": reservation_status,
+                "receipt_id": receipt_id,
+                "reserved_at": completed_at,
+            }
+        )
 
     def load_projection(self, scope) -> TradingProjection | None:
         """Load the current projection when its scope matches."""
@@ -94,8 +130,13 @@ class MemoryStore:
         self.projection = projection
 
     def load_unresolved_attempts(self, _scope) -> tuple[TradingEvent, ...]:
-        """Return no unresolved attempts in the fixture."""
-        return ()
+        """Return persisted attempts still unresolved in the projection."""
+        unresolved = (
+            set()
+            if self.projection is None
+            else set(self.projection.unresolved_attempt_ids)
+        )
+        return tuple(event for event in self.events if event.event_id in unresolved)
 
     def load_report_evidence(self, _scope):
         """Return bounded empty report evidence in the fixture."""
@@ -185,7 +226,7 @@ def policy(action: str = "submit_order", **scope: str) -> ActionPolicyVerdict:
     return ActionPolicyVerdict(
         verdict_id="policy-001",
         action=action,
-        scope=scope or {"account_id": "account-001"},
+        scope={"account_id": "account-001", **scope},
         policy_version="policy-v1",
         attestation_id="attestation-001",
         decision_id="risk-001",
@@ -197,6 +238,69 @@ def policy(action: str = "submit_order", **scope: str) -> ActionPolicyVerdict:
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
+    )
+
+
+def risk_decision(item: TradingRequest) -> RiskDecisionPackage:
+    """Build an exact current Risk approval for one governed request."""
+    token = RiskApprovalToken(
+        token_id=item.approval_token_ref,
+        decision_id=item.risk_decision_id,
+        config_hash="config-hash",
+        action=item.action,
+        scope={"account_id": item.account_id},
+        approver_id="risk-service",
+        issued_at=NOW - timedelta(minutes=1),
+        expires_at=NOW + timedelta(minutes=10),
+        nonce="nonce-001",
+        signature="signature-001",
+        request_id=item.request_id,
+        workflow_id=item.workflow_id,
+        correlation_id=item.correlation_id,
+    )
+    return RiskDecisionPackage(
+        decision_id=item.risk_decision_id,
+        intent_id=item.intent_id,
+        state=DecisionState.APPROVE,
+        requested_size=item.quantity,
+        approved_size=item.quantity,
+        ordered_checks=(),
+        primary_failure_limit=None,
+        composite_breach_flags=(),
+        evidence_refs={"request": item.request_id},
+        config_hash="config-hash",
+        concurrency_disclosure="serialized",
+        recommendations=(),
+        issued_at=NOW - timedelta(minutes=1),
+        expires_at=NOW + timedelta(minutes=10),
+        token=token,
+        request_id=item.request_id,
+        workflow_id=item.workflow_id,
+        correlation_id=item.correlation_id,
+    )
+
+
+def kill_switch_states(item: TradingRequest) -> tuple[KillSwitchState, ...]:
+    """Build the exact inactive Risk kill-switch hierarchy for a request."""
+    scopes = [
+        ("global", {}),
+        ("strategy", {"strategy_id": item.strategy_id}),
+    ]
+    if item.portfolio_id is not None:
+        scopes.append(("portfolio", {"portfolio_id": item.portfolio_id}))
+    if item.symbol is not None:
+        scopes.append(("symbol", {"symbol": item.symbol}))
+    return tuple(
+        KillSwitchState(
+            state_id=f"switch-{level}",
+            scope_level=level,
+            scope=scope,
+            state="inactive",
+            reason="clear",
+            version=1,
+            updated_at=NOW,
+        )
+        for level, scope in scopes
     )
 
 
@@ -278,7 +382,7 @@ def rebalance_action_resolver(
         request_id=action_id,
         workflow_id=parent.workflow_id,
         correlation_id=parent.correlation_id,
-        causation_id=parent.request_id,
+        causation_id=None,
         route=parent.route,
         action="reduce_exposure",
         portfolio_id=parent.portfolio_id,
@@ -309,6 +413,17 @@ def dependencies(
         """Fail if an unrelated transition port is unexpectedly used."""
         raise AssertionError("unexpected transition port")
 
+    def policy_for(item: TradingRequest) -> ActionPolicyVerdict:
+        """Bind the selected test policy to the exact child trace."""
+        selected = action_policy or policy(item.action)
+        return selected.model_copy(
+            update={
+                "request_id": item.request_id,
+                "workflow_id": item.workflow_id,
+                "correlation_id": item.correlation_id,
+            }
+        )
+
     return TradingDependencies(
         store=memory,
         connection=None,
@@ -327,8 +442,8 @@ def dependencies(
         event_sink=lambda event: None,
         account_state_source=lambda item: account_snapshot(),
         symbol_capability_source=symbol_capability,
-        action_policy_source=lambda item: action_policy or policy(item.action),
-        kill_switch_state_source=lambda item: (),
+        action_policy_source=policy_for,
+        kill_switch_state_source=kill_switch_states,
         allocation_decision_source=lambda item: None,
         budget_verdict_source=lambda item: None,
         eligibility_source=lambda item: (),
@@ -337,10 +452,12 @@ def dependencies(
         reconciliation_source=cast("object", lambda item: None),
         market_data_source=unavailable,
         evaluation_account_source=unavailable,
+        market_context_source=unavailable,
         indicator_source=unavailable,
         strategy_source=unavailable,
         risk_source=unavailable,
         child_risk_decision_source=lambda item: None,
+        execution_risk_decision_source=risk_decision,
     )
 
 

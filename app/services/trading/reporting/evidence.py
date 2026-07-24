@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from app.services.trading.contracts import (
-    TRADING_CONTRACT_VERSION,
+    ExecutionEvidenceReport,
     StandardTradingEnvelope,
     TradingError,
     TradingRequest,
@@ -66,18 +66,18 @@ def build_trading_report(
     evidence: dict[str, JsonValue] = {
         key: safe[key] for key in sorted(_REQUIRED_EVIDENCE)
     }
-    data = _redacted_envelope_data(
-        {
-            "contract_version": TRADING_CONTRACT_VERSION,
-            "schema_id": "trading.execution_evidence_report.v1",
-            "scope": {
-                "route": request.route,
-                "account_id": request.account_id,
-                "authority_id": authority,
-            },
-            "evidence": evidence,
-        }
+    report = ExecutionEvidenceReport(
+        scope={
+            "route": request.route.value,
+            "account_id": request.account_id,
+            "authority_id": authority,
+        },
+        evidence=evidence,
+        request_id=request.request_id,
+        workflow_id=request.workflow_id,
+        correlation_id=request.correlation_id,
     )
+    data = _redacted_envelope_data({"report": report.model_dump(mode="json")})
     return StandardTradingEnvelope(
         status="success",
         message="Immutable Trading execution evidence packaged",

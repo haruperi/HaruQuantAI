@@ -335,6 +335,30 @@ def _timeout_receipt(intent: OrderIntent, observed_at: datetime) -> ExecutionRec
     return classify_authority_response(raw, _CLASSIFICATION_POLICY)
 
 
+def _uncertain_failure_receipt(
+    intent: OrderIntent, observed_at: datetime
+) -> ExecutionReceipt:
+    """Classify an unexpected authority failure without exposing provider details.
+
+    Args:
+        intent: Intent whose mutation result could not be proven.
+        observed_at: Injected failure observation timestamp.
+
+    Returns:
+        Conservative receipt requiring reconciliation.
+    """
+    logger.error("Classifying unexpected authority failure as unknown outcome")
+    raw = _base_raw_response(
+        intent,
+        intent.provider_id or "simulation",
+        f"uncertain-{intent.client_order_id}-{intent.idempotency_hash}",
+        observed_at,
+        observed_at,
+    )
+    raw.update({"authority_failure": True, "filled_quantity": "0"})
+    return classify_authority_response(raw, _CLASSIFICATION_POLICY)
+
+
 def _validate_dispatch_policy(operation_timeout_seconds: Decimal) -> None:
     """Validate exact injected Broker dispatch policy.
 
@@ -353,7 +377,7 @@ def _validate_dispatch_policy(operation_timeout_seconds: Decimal) -> None:
         raise TradingError("CONFIGURATION_INVALID", "Dispatch timeout is invalid")
 
 
-async def dispatch_order_intent(
+async def dispatch_order_intent(  # noqa: C901, PLR0912
     intent: OrderIntent,
     connection: BrokerConnectionConfig | None,
     broker_adapter: BrokerAdapter | None,
@@ -390,11 +414,21 @@ async def dispatch_order_intent(
             raise TradingError(
                 "SCOPE_MISMATCH", "Sim dispatch received Broker authority"
             )
-        receipt = await simulation_dispatch(intent)
+        try:
+            async with asyncio.timeout(float(operation_timeout_seconds)):
+                receipt = await simulation_dispatch(intent)
+        except TimeoutError:
+            return _timeout_receipt(intent, clock())
+        except TradingError:
+            raise
+        except Exception:  # noqa: BLE001 - normalize authority-boundary failures.
+            return _uncertain_failure_receipt(intent, clock())
         if (
             receipt.client_order_id != intent.client_order_id
             or receipt.intent_id != intent.source_intent_id
             or receipt.route != intent.route
+            or receipt.request_id != intent.request_id
+            or receipt.correlation_id != intent.correlation_id
         ):
             raise TradingError(
                 "MALFORMED_RECEIPT", "Simulation receipt scope mismatches"
@@ -425,6 +459,8 @@ async def dispatch_order_intent(
             "INVALID_REQUEST",
             "Broker mutation request is invalid",
         ) from error
+    except Exception:  # noqa: BLE001 - normalize authority-boundary failures.
+        return _uncertain_failure_receipt(intent, clock())
     if (
         result.broker != selected_connection.broker_id
         or result.environment != selected_connection.environment

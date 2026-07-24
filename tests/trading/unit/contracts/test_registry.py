@@ -2,7 +2,11 @@
 
 # ruff: noqa: INP001
 import json
+import os
+import subprocess
+import sys
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import pytest
 from app.services import trading
@@ -18,9 +22,9 @@ def _draft_data() -> dict[str, object]:
     """Return JSON-safe request material for a non-executable draft."""
     now = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
     return {
-        "request_id": "req-draft-001",
-        "workflow_id": "wf-draft-001",
-        "correlation_id": "corr-draft-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "route": "sim",
         "action": "submit_order",
         "provider_id": None,
@@ -55,6 +59,55 @@ def test_domain_root_exports_are_explicit_and_import_safe() -> None:
     assert "build_trading_report" in trading.__all__
     assert "LiveSession" in trading.__all__
     assert not hasattr(trading, "__getattr__")
+
+
+def test_domain_import_has_no_external_or_persistent_side_effect() -> None:
+    """A fresh Trading import cannot write, connect, spawn, or mutate env state."""
+    script = """
+import asyncio
+import builtins
+import os
+import socket
+import sqlite3
+import subprocess
+import threading
+
+environment = dict(os.environ)
+real_open = builtins.open
+
+def guarded_open(file, mode="r", *args, **kwargs):
+    if any(flag in mode for flag in ("w", "a", "x", "+")):
+        raise AssertionError(f"import attempted filesystem mutation: {file}")
+    return real_open(file, mode, *args, **kwargs)
+
+def blocked(*args, **kwargs):
+    raise AssertionError("import attempted an external side effect")
+
+builtins.open = guarded_open
+socket.socket.connect = blocked
+sqlite3.connect = blocked
+subprocess.Popen = blocked
+threading.Thread.start = blocked
+os.mkdir = blocked
+os.makedirs = blocked
+
+import app.services.trading
+
+assert dict(os.environ) == environment
+assert app.services.trading.__all__
+"""
+    environment = dict(os.environ)
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    completed = subprocess.run(  # noqa: S603 - fixed interpreter and source.
+        [sys.executable, "-c", script],
+        cwd=Path(__file__).parents[4],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=30,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def test_create_draft_has_no_side_effect() -> None:

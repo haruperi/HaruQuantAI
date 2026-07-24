@@ -18,9 +18,12 @@ from app.services.risk import (
     check_risk_kill_switch,
     compute_config_hash,
 )
-from app.services.trading.actions import resume_strategy
-from app.services.trading.contracts import TradingError, TradingRequest
-from app.services.trading.reconciliation import AuthoritySnapshot
+from app.services.trading import (
+    AuthoritySnapshot,
+    TradingError,
+    TradingRequest,
+    resume_strategy,
+)
 from app.utils import AuthContext, canonical_json
 from fastapi import FastAPI
 
@@ -35,8 +38,64 @@ from tests.trading.unit.actions.test_dependencies import (
 )
 
 
+def _kill_switch_hierarchy(
+    request_value: TradingRequest,
+    global_state: KillSwitchState,
+) -> tuple[KillSwitchState, ...]:
+    """Build the exact applicable hierarchy around the real global state."""
+    states = [
+        global_state,
+        KillSwitchState(
+            state_id="strategy-state-1",
+            scope_level="strategy",
+            scope={"strategy_id": request_value.strategy_id},
+            state="inactive",
+            reason="normal operation",
+            version=1,
+            updated_at=request_value.system_time,
+        ),
+    ]
+    if request_value.portfolio_id is not None:
+        states.append(
+            KillSwitchState(
+                state_id="portfolio-state-1",
+                scope_level="portfolio",
+                scope={"portfolio_id": request_value.portfolio_id},
+                state="inactive",
+                reason="normal operation",
+                version=1,
+                updated_at=request_value.system_time,
+            )
+        )
+    if request_value.symbol is not None:
+        states.append(
+            KillSwitchState(
+                state_id="symbol-state-1",
+                scope_level="symbol",
+                scope={"symbol": request_value.symbol},
+                state="inactive",
+                reason="normal operation",
+                version=1,
+                updated_at=request_value.system_time,
+            )
+        )
+    return tuple(states)
+
+
 def test_operator_activation_halts_and_clearance_requires_reconciliation() -> None:
     """Execute UI/API → Risk → Trading → UI/API activation and recovery."""
+    workflow_now = risk_support.NOW
+    trading_request = request(
+        action="resume_strategy",
+        system_time=workflow_now,
+        valid_until=workflow_now + timedelta(minutes=10),
+    )
+    resume_policy = policy("resume_strategy").model_copy(
+        update={
+            "issued_at": workflow_now - timedelta(minutes=1),
+            "expires_at": workflow_now + timedelta(minutes=10),
+        }
+    )
     config = risk_support._config()
     _, approvals, _ = risk_support._services(config)
     risk_store = risk_support._KillStore()
@@ -64,7 +123,7 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
             risk_store,
             config,
             attestation=attestation,
-            now=risk_support.NOW,
+            now=workflow_now,
         )
         return current[0]
 
@@ -88,7 +147,7 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         "strategy_id": None,
         "symbol": None,
         "reason": "operator safety stop",
-        "requested_at": risk_support.NOW.isoformat(),
+        "requested_at": workflow_now.isoformat(),
         "attestation": None,
     }
 
@@ -97,16 +156,15 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         "/api/operator/kill-switch",
         payload,
     )
-    trading_request = request(action="resume_strategy")
 
     def current_states(value: TradingRequest) -> tuple[KillSwitchState, ...]:
         """Return the current canonical Risk state hierarchy."""
-        del value
-        return (current[0],)
+        return _kill_switch_hierarchy(value, current[0])
 
     active_dependencies = replace(
-        dependencies(action_policy=policy("resume_strategy")),
+        dependencies(action_policy=resume_policy),
         kill_switch_state_source=current_states,
+        clock=lambda: workflow_now,
     )
 
     with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
@@ -119,8 +177,8 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         scope={"global": "*"},
         policy_ref=compute_config_hash(config),
         policy_version=config.policy_version,
-        issued_at=risk_support.NOW,
-        expires_at=risk_support.NOW + timedelta(minutes=1),
+        issued_at=workflow_now,
+        expires_at=workflow_now + timedelta(minutes=1),
         request_id=risk_support.REQUEST_ID,
         workflow_id=risk_support.WORKFLOW_ID,
         correlation_id=risk_support.CORRELATION_ID,
@@ -137,20 +195,28 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         clearance,
     )
     trading_store = MemoryStore()
-    trading_store.projection = projection()
+    trading_store.projection = projection().model_copy(
+        update={"updated_at": workflow_now}
+    )
 
     def reconciled_authority(value: TradingRequest) -> AuthoritySnapshot:
         """Return matching current route authority evidence."""
         del value
-        return authority()
+        return authority().model_copy(
+            update={
+                "observed_at": workflow_now,
+                "expires_at": workflow_now + timedelta(minutes=5),
+            }
+        )
 
     recovered_dependencies = replace(
         dependencies(
             store=trading_store,
-            action_policy=policy("resume_strategy"),
+            action_policy=resume_policy,
         ),
         kill_switch_state_source=current_states,
         reconciliation_source=reconciled_authority,
+        clock=lambda: workflow_now,
     )
     resumed = asyncio.run(resume_strategy(trading_request, recovered_dependencies))
     risk_recovery = check_risk_kill_switch(

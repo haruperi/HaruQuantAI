@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from decimal import Decimal
+from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from typing import TYPE_CHECKING
 
 from app.services.trading.contracts import TradingError, TradingRequest
@@ -109,7 +109,11 @@ def _validate_quantity(request: TradingRequest) -> None:
             "Order quantity is outside instrument bounds",
             trace_context={"request_id": request.request_id},
         )
-    if (request.quantity - minimum) % step != Decimal(0):
+    with localcontext() as context:
+        context.prec = 28
+        context.rounding = ROUND_HALF_EVEN
+        misaligned = (request.quantity - minimum) % step != Decimal(0)
+    if misaligned:
         raise TradingError(
             "VALIDATION_FAILED",
             "Order quantity is not aligned to instrument step",
@@ -138,7 +142,14 @@ def _validate_price_geometry(request: TradingRequest) -> None:
         if value is not None
     )
     tick = request.instrument_price_tick
-    if tick is not None and any(value % tick != Decimal(0) for value in prices):
+    if tick is not None:
+        with localcontext() as context:
+            context.prec = 28
+            context.rounding = ROUND_HALF_EVEN
+            misaligned = any(value % tick != Decimal(0) for value in prices)
+    else:
+        misaligned = False
+    if misaligned:
         raise TradingError(
             "VALIDATION_FAILED",
             "Order price is not aligned to instrument tick",

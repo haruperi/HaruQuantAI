@@ -236,7 +236,7 @@ async def cancel_all_orders(
             {
                 "action": "cancel_order",
                 "request_id": generate_id("req"),
-                "causation_id": request.request_id,
+                "causation_id": generate_id("cau"),
                 "symbol": order.symbol,
                 "side": order.side,
                 "quantity": order.quantity,
@@ -322,7 +322,7 @@ async def close_all_positions(
             {
                 "action": "close_position",
                 "request_id": generate_id("req"),
-                "causation_id": request.request_id,
+                "causation_id": generate_id("cau"),
                 "symbol": position.symbol,
                 "side": side,
                 "quantity": position.quantity,

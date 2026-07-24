@@ -7,6 +7,7 @@ from app.services.trading.contracts.errors import (
 )
 from app.services.trading.contracts.models import (
     TRADING_CONTRACT_VERSION,
+    ExecutionEvidenceReport,
     ExecutionReceipt,
     OrderIntent,
     PortfolioRebalanceExecutionRequest,
@@ -22,6 +23,7 @@ from app.services.trading.contracts.registry import (
 
 __all__ = [
     "TRADING_CONTRACT_VERSION",
+    "ExecutionEvidenceReport",
     "ExecutionReceipt",
     "OrderIntent",
     "PortfolioRebalanceExecutionRequest",

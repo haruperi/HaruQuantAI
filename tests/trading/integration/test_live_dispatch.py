@@ -13,15 +13,19 @@ from app.services.brokers import (
     BrokerOrderResult,
     BrokerResult,
 )
-from app.services.trading.actions import submit_order
-from app.services.trading.contracts import TradingError
-from app.services.trading.live import LiveSession, evaluate_live_gate
-from app.services.trading.validation import ReadinessAssessment
+from app.services.trading import (
+    LiveSession,
+    ReadinessAssessment,
+    TradingError,
+    evaluate_live_gate,
+    submit_order,
+)
 from tests.trading.conftest import (
     CountingAdapter,
     MemoryStore,
+    auth_context,
     broker_connection,
-    inactive_kill_switch,
+    inactive_kill_switch_hierarchy,
     live_action_policy,
     live_config,
     live_evidence,
@@ -80,7 +84,7 @@ def _paper_session(
             else (lambda _request: None)
         ),
         action_policy_source=lambda _request: live_action_policy(),
-        kill_switch_source=lambda _request: (inactive_kill_switch(),),
+        kill_switch_source=inactive_kill_switch_hierarchy,
         readiness_source=lambda request, _evidence: ReadinessAssessment(
             passed=True,
             failed_check_codes=(),
@@ -90,6 +94,7 @@ def _paper_session(
         adapter_capability_source=lambda request: symbol_capability(
             request.route, request.provider_id, request.symbol
         )[0],
+        auth_context_source=auth_context,
         pre_audit_sink=lambda _evidence: order.append("pre_audit"),
         event_sink=lambda _event: None,
         startup_reconcile=_passed,
@@ -139,7 +144,10 @@ async def test_live_dispatch_completes_single_broker_mutation() -> None:
 
     assert adapter.calls == 1
     assert outcome.status == "sent"
-    assert len(store.events) == 1
+    assert [event.event_type for event in store.events] == [
+        "send_attempted",
+        "receipt_recorded",
+    ]
     assert ordering == ["pre_audit", "adapter"]
 
     blocked_adapter = _AuditedAdapter([])

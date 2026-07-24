@@ -14,6 +14,7 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.monitoring import BudgetGate
+from app.services.trading.validation.authority import validate_kill_switch_hierarchy
 from app.utils import logger
 
 if TYPE_CHECKING:
@@ -72,7 +73,7 @@ def _validate_resolved_action(
         child.request_id != action["action_id"]
         or child.workflow_id != parent.workflow_id
         or child.correlation_id != parent.correlation_id
-        or child.causation_id != parent.request_id
+        or child.causation_id is not None
         or child.route is not parent.route
         or child.portfolio_id != parent.portfolio_id
         or child.action != "reduce_exposure"
@@ -119,22 +120,47 @@ async def execute_portfolio_rebalance(
     outcomes: list[dict[str, JsonValue]] = []
     for raw_action in request.actions:
         action = dict(raw_action)
-        child = deps.rebalance_action_resolver(request, action)
-        _validate_resolved_action(request, action, child)
-        if any(
-            state.state != "inactive" for state in deps.kill_switch_state_source(child)
-        ):
-            raise TradingError("KILL_SWITCH_ACTIVE", "Kill switch blocks rebalance")
-        outcome = await reduce_exposure(child, deps)
-        outcomes.append(
-            {
-                "action_id": child.request_id,
-                "status": outcome.status,
-                "data": outcome.data,
-            }
-        )
+        action_id = str(action["action_id"])
+        try:
+            child = deps.rebalance_action_resolver(request, action)
+            _validate_resolved_action(request, action, child)
+            validate_kill_switch_hierarchy(
+                child,
+                deps.kill_switch_state_source(child),
+                deps.max_staleness_seconds["kill_switch"],
+                deps.clock(),
+            )
+            outcome = await reduce_exposure(child, deps)
+            outcomes.append(
+                {
+                    "action_id": child.request_id,
+                    "status": outcome.status,
+                    "data": outcome.data,
+                }
+            )
+            if outcome.status == "unknown_outcome":
+                break
+        except TradingError as error:
+            outcomes.append(
+                {
+                    "action_id": action_id,
+                    "status": "error",
+                    "error_code": error.trading_code,
+                }
+            )
+            break
+    completed_ids = {item["action_id"] for item in outcomes}
+    outcomes.extend(
+        {
+            "action_id": str(action["action_id"]),
+            "status": "skipped",
+            "reason": "prior_action_not_completed",
+        }
+        for action in request.actions
+        if action["action_id"] not in completed_ids
+    )
     partial = any(
-        item["status"] in {"partial", "unknown_outcome", "rejected"}
+        item["status"] in {"partial", "unknown_outcome", "rejected", "error", "skipped"}
         for item in outcomes
     )
     data = _redacted_envelope_data(

@@ -132,6 +132,11 @@ def evaluation_dependencies(intent):
         calls.append("data.account")
         return account_snapshot()
 
+    async def market_context(dataset, value):
+        """Record the Data market-context evidence read."""
+        calls.append("data.market_context")
+        return cast("object", object())
+
     async def indicators(dataset, value):
         """Record the Indicators invocation."""
         calls.append("indicators")
@@ -142,7 +147,7 @@ def evaluation_dependencies(intent):
         calls.append("strategy")
         return intent
 
-    async def risk(proposal, snapshot, value):
+    async def risk(proposal, snapshot, market_evidence, value):
         """Record the Risk invocation."""
         calls.append("risk")
         return risk_decision()
@@ -163,6 +168,7 @@ def evaluation_dependencies(intent):
         ),
         market_data_source=market,
         evaluation_account_source=account,
+        market_context_source=market_context,
         indicator_source=indicators,
         strategy_source=strategy,
         risk_source=risk,
@@ -191,7 +197,14 @@ async def test_cycle_never_generates_or_sizes_signals(monkeypatch) -> None:
     monkeypatch.setattr(runtime_module, "_execute_request", execute)
     outcome = await run_live_evaluation_cycle(deps, evidence())
     assert outcome.status == "sent"
-    assert calls == ["data.market", "data.account", "indicators", "strategy", "risk"]
+    assert calls == [
+        "data.market",
+        "data.account",
+        "data.market_context",
+        "indicators",
+        "strategy",
+        "risk",
+    ]
     assert captured["quantity"] == Decimal("0.50")
 
 
@@ -202,7 +215,13 @@ async def test_neutral_cycle_is_normal_no_mutation() -> None:
     outcome = await run_live_evaluation_cycle(deps, evidence())
     assert outcome.status == "success"
     assert outcome.data == {"mutation_performed": False}
-    assert calls == ["data.market", "data.account", "indicators", "strategy"]
+    assert calls == [
+        "data.market",
+        "data.account",
+        "data.market_context",
+        "indicators",
+        "strategy",
+    ]
 
 
 def test_runtime_reads_modify_targets_only_from_trading_state() -> None:

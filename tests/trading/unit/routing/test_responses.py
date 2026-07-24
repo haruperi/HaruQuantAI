@@ -23,8 +23,8 @@ def _raw() -> dict[str, object]:
         "status": "success",
         "requested_quantity": "1.00",
         "filled_quantity": "0",
-        "request_id": "request-001",
-        "correlation_id": "correlation-001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "authority_timestamp": NOW.isoformat(),
         "received_at": NOW.isoformat(),
     }

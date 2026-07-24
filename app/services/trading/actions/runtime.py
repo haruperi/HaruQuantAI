@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Mapping
 from datetime import datetime
 from hashlib import sha256
@@ -192,7 +193,7 @@ def _approved_request(
         request_id=decision.request_id,
         workflow_id=decision.workflow_id,
         correlation_id=decision.correlation_id,
-        causation_id=intent.decision_id,
+        causation_id=None,
         route=route,
         action=action,  # type: ignore[arg-type]
         provider_id=provider_id,
@@ -256,6 +257,8 @@ def _check_timeout(
     deps: TradingDependencies,
     started_at: datetime,
     evidence: Mapping[str, JsonValue],
+    *,
+    force: bool = False,
 ) -> None:
     """Emit timeout evidence and block before mutation when the cycle exceeds budget.
 
@@ -263,6 +266,7 @@ def _check_timeout(
         deps: Explicit action dependencies.
         started_at: Injected cycle start timestamp.
         evidence: Workflow trace references.
+        force: Whether an elapsed monotonic deadline already proved timeout.
 
     Raises:
         TradingError: If elapsed time exceeds the configured exact bound.
@@ -272,7 +276,9 @@ def _check_timeout(
         raise TradingError("SERVICE_UNAVAILABLE", "Live session is absent")
     now = deps.clock()
     elapsed = (now - started_at).total_seconds()
-    if elapsed <= float(deps.live_session.config.live_workflow_timeout_seconds):
+    if not force and elapsed <= float(
+        deps.live_session.config.live_workflow_timeout_seconds
+    ):
         return
     material = {"started_at": started_at, "observed_at": now}
     digest = sha256(canonical_json(material).encode("utf-8")).hexdigest()
@@ -311,29 +317,40 @@ async def run_live_evaluation_cycle(
     """
     logger.info("Running one governed Trading live evaluation cycle")
     started_at = deps.clock()
-    dataset = await deps.market_data_source(evidence)
-    account = await deps.evaluation_account_source(evidence)
-    indicators = await deps.indicator_source(dataset, evidence)
-    intent = await deps.strategy_source(dataset, account, indicators, evidence)
-    if intent is None:
-        data = _redacted_envelope_data({"mutation_performed": False})
-        return StandardTradingEnvelope(
-            status="success",
-            message="Strategy produced a neutral no-action outcome",
-            data=data,
-            errors=(),
-            warnings=(),
-            audit_metadata={
-                "operation": "run_live_evaluation_cycle",
-                "request_id": _required_text(evidence, "request_id"),
-                "correlation_id": _required_text(evidence, "correlation_id"),
-                "redaction_applied": True,
-            },
-        )
-    decision = await deps.risk_source(intent, account, evidence)
-    request = _approved_request(intent, decision, deps, evidence)
-    _check_timeout(deps, started_at, evidence)
-    return await _execute_request(request, deps, evidence)
+    if deps.live_session is None:
+        raise TradingError("SERVICE_UNAVAILABLE", "Live session is absent")
+    timeout_seconds = float(deps.live_session.config.live_workflow_timeout_seconds)
+    try:
+        async with asyncio.timeout(timeout_seconds):
+            dataset = await deps.market_data_source(evidence)
+            account = await deps.evaluation_account_source(evidence)
+            market_context = await deps.market_context_source(dataset, evidence)
+            indicators = await deps.indicator_source(dataset, evidence)
+            intent = await deps.strategy_source(dataset, account, indicators, evidence)
+            if intent is None:
+                data = _redacted_envelope_data({"mutation_performed": False})
+                return StandardTradingEnvelope(
+                    status="success",
+                    message="Strategy produced a neutral no-action outcome",
+                    data=data,
+                    errors=(),
+                    warnings=(),
+                    audit_metadata={
+                        "operation": "run_live_evaluation_cycle",
+                        "request_id": _required_text(evidence, "request_id"),
+                        "correlation_id": _required_text(evidence, "correlation_id"),
+                        "redaction_applied": True,
+                    },
+                )
+            decision = await deps.risk_source(intent, account, market_context, evidence)
+            request = _approved_request(intent, decision, deps, evidence)
+            _check_timeout(deps, started_at, evidence)
+            return await _execute_request(request, deps, evidence)
+    except TimeoutError as error:
+        _check_timeout(deps, started_at, evidence, force=True)
+        raise TradingError(
+            "WORKFLOW_TIMEOUT", "Evaluation cycle exceeded its bound"
+        ) from error
 
 
 __all__ = ["run_live_evaluation_cycle"]

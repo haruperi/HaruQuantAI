@@ -62,3 +62,17 @@ def test_redaction_is_recursive_and_case_insensitive() -> None:
     assert "secret-one" not in rendered
     assert "secret-two" not in rendered
     assert rendered.count("[REDACTED]") == 2
+
+
+def test_redaction_removes_embedded_secret_text() -> None:
+    """Secret assignments embedded in free text are removed recursively."""
+    redacted = redact_trading_payload(
+        {
+            "message": "provider failed: password=hunter2 api_key=abcd",
+            "nested": ["token=very-secret"],
+        }
+    )
+    rendered = str(redacted)
+    assert "hunter2" not in rendered
+    assert "abcd" not in rendered
+    assert "very-secret" not in rendered

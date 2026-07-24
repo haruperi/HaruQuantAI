@@ -15,6 +15,9 @@ from app.services.trading.state import TradingEvent, TradingProjection
 from pydantic import ValidationError
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
+WORKFLOW_ID = "wf-22222222-2222-4222-8222-222222222222"
+CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
 
 
 def _receipt() -> ExecutionReceipt:
@@ -33,8 +36,8 @@ def _receipt() -> ExecutionReceipt:
         response_classification="timeout",
         retry_safe=False,
         reconciliation_required=True,
-        request_id="request-001",
-        correlation_id="correlation-001",
+        request_id=REQUEST_ID,
+        correlation_id=CORRELATION_ID,
     )
 
 
@@ -48,9 +51,9 @@ def _attempt() -> TradingEvent:
         tenant_id="account-001",
         authority_id="simulator",
         occurred_at=NOW,
-        request_id="request-001",
-        workflow_id="workflow-001",
-        correlation_id="correlation-001",
+        request_id=REQUEST_ID,
+        workflow_id=WORKFLOW_ID,
+        correlation_id=CORRELATION_ID,
         payload={"client_order_id": "client-order-001"},
     )
 

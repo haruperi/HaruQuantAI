@@ -15,6 +15,7 @@ from app.services.brokers import (
 )
 from app.services.data import (
     AccountStateSnapshot,
+    MarketContextEvidence,
     MarketDataset,
 )
 from app.services.indicators import IndicatorResult
@@ -75,6 +76,9 @@ type MarketDataSource = Callable[[Mapping[str, JsonValue]], Awaitable[MarketData
 type EvaluationAccountSource = Callable[
     [Mapping[str, JsonValue]], Awaitable[AccountStateSnapshot]
 ]
+type MarketContextSource = Callable[
+    [MarketDataset, Mapping[str, JsonValue]], Awaitable[MarketContextEvidence]
+]
 type IndicatorSource = Callable[
     [MarketDataset, Mapping[str, JsonValue]], Awaitable[IndicatorResult]
 ]
@@ -83,10 +87,18 @@ type StrategySource = Callable[
     Awaitable[TradeIntent | None],
 ]
 type RiskSource = Callable[
-    [TradeIntent, AccountStateSnapshot, Mapping[str, JsonValue]],
+    [
+        TradeIntent,
+        AccountStateSnapshot,
+        MarketContextEvidence,
+        Mapping[str, JsonValue],
+    ],
     Awaitable[RiskDecisionPackage],
 ]
 type ChildRiskDecisionSource = Callable[[TradingRequest], RiskDecisionPackage | None]
+type ExecutionRiskDecisionSource = Callable[
+    [TradingRequest], RiskDecisionPackage | None
+]
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -117,10 +129,12 @@ class TradingDependencies:
         reconciliation_source: Read-only route-authority snapshot port.
         market_data_source: Data market-dataset evaluation port.
         evaluation_account_source: Data account-snapshot evaluation port.
+        market_context_source: Data-owned normalized market-context evidence port.
         indicator_source: Indicators evaluation port.
         strategy_source: Strategy TradeIntent evaluation port.
         risk_source: Risk decision evaluation port.
         child_risk_decision_source: Exact per-child emergency Risk authority.
+        execution_risk_decision_source: Exact per-request Simulation Risk authority.
     """
 
     store: TradingStateStore
@@ -146,10 +160,12 @@ class TradingDependencies:
     reconciliation_source: ReconciliationSource
     market_data_source: MarketDataSource
     evaluation_account_source: EvaluationAccountSource
+    market_context_source: MarketContextSource
     indicator_source: IndicatorSource
     strategy_source: StrategySource
     risk_source: RiskSource
     child_risk_decision_source: ChildRiskDecisionSource
+    execution_risk_decision_source: ExecutionRiskDecisionSource
 
     def __post_init__(self) -> None:
         """Reject explicit absence without resolving any dependency.
@@ -174,10 +190,12 @@ class TradingDependencies:
             self.reconciliation_source,
             self.market_data_source,
             self.evaluation_account_source,
+            self.market_context_source,
             self.indicator_source,
             self.strategy_source,
             self.risk_source,
             self.child_risk_decision_source,
+            self.execution_risk_decision_source,
         )
         if any(dependency is None for dependency in required):
             raise TradingError(

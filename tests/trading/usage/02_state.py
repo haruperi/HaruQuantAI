@@ -3,20 +3,23 @@
 Demonstrates Trading state stores, idempotency, and projections.
 """
 
+# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.trading.contracts import TradingRequest, TradingRoute
-from app.services.trading.state import (
+from app.services.trading import (
     TRADING_SCHEMA_VERSION,
     IdempotencyReservation,
     TradingEvent,
     TradingProjection,
+    TradingRequest,
+    TradingRoute,
     apply_execution_event,
     get_trading_migrations,
     reserve_idempotency,
@@ -69,6 +72,31 @@ class _UsageStore:
         """Append one immutable event."""
         self.events.append(event)
 
+    def complete_idempotency(
+        self,
+        key: str,
+        material_hash: str,
+        receipt_id: str,
+        completed_at: datetime,
+        *,
+        status: Literal["completed", "reconciliation_required"],
+    ) -> None:
+        """Persist a demonstrated terminal reservation outcome."""
+        existing = self.reservations[key]
+        if existing.material_hash != material_hash:
+            raise RuntimeError("usage idempotency material mismatch")
+        self.reservations[key] = existing.model_copy(
+            update={
+                "status": (
+                    "duplicate_completed"
+                    if status == "completed"
+                    else "reconciliation_required"
+                ),
+                "receipt_id": receipt_id,
+                "reserved_at": completed_at,
+            }
+        )
+
     def load_projection(self, scope: Scope) -> TradingProjection | None:
         """Load the projection for one exact scope."""
         return self.projections.get(scope)
@@ -106,9 +134,9 @@ class _UsageStore:
 def _request() -> TradingRequest:
     """Build one governed request for idempotency usage."""
     return TradingRequest(
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         route="sim",
         action="submit_order",
         account_id="usage-account-001",
@@ -140,9 +168,9 @@ def _event(event_id: str = "usage-event-001") -> TradingEvent:
         tenant_id="usage-tenant-001",
         authority_id="simulator",
         occurred_at=NOW,
-        request_id="usage-request-001",
-        workflow_id="usage-workflow-001",
-        correlation_id="usage-correlation-001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
         payload={"order_id": "usage-order-001"},
     )
 
@@ -180,6 +208,14 @@ def example_state() -> None:
         concurrency_lock_timeout_seconds=Decimal(30),
     )
     print(f"Idempotency reservation status: {res.status}")
+    store.complete_idempotency(
+        res.key,
+        res.material_hash,
+        "usage-receipt-001",
+        NOW,
+        status="completed",
+    )
+    print(f"Completed reservation receipt: {store.reservations[res.key].receipt_id}")
 
     # 2. Append and apply event
     event = _event()
@@ -193,6 +229,76 @@ def example_state() -> None:
     print(f"Trading schema version: {TRADING_SCHEMA_VERSION}")
     migrations = get_trading_migrations()
     print(f"Trading migrations domain: {migrations[0].domain}")
+
+
+def fr_trd_037() -> None:
+    """FR-TRD-037: The system shall represent send attempts, receipts, fills, reconciliation transitions, and incidents as versioned, redacted events."""
+    example_state()
+
+
+def fr_trd_038() -> None:
+    """FR-TRD-038: The system shall expose only minimal injected operations for idempotency, append, projection reads/writes, and reconciliation evidence."""
+    example_state()
+
+
+def fr_trd_039() -> None:
+    """FR-TRD-039: The system shall reserve a caller-supplied key against versioned canonical SHA-256 material at an injected time for the required positive retention window, reject different-material reuse, and keep stale duplicate-active work locked for reconciliation."""
+    example_state()
+
+
+def fr_trd_040() -> None:
+    """FR-TRD-040: The system shall apply deduplicated authority events in logical order with optimistic version checks."""
+    example_state()
+
+
+def fr_trd_041() -> None:
+    """FR-TRD-041: The system shall expose the current Trading schema version."""
+    example_state()
+
+
+def fr_trd_042() -> None:
+    """FR-TRD-042: The system shall provide additive Trading migration definitions for execution-owned state without opening a database."""
+    example_state()
+
+
+def fr_trd_051() -> None:
+    """FR-TRD-051: The store shall atomically reserve one caller key against canonical material and its injected reservation/expiry timestamps, returning the existing/new/conflict decision, and shall durably bind the exact receipt and terminal completed or reconciliation-required state after receipt persistence."""
+    example_state()
+
+
+def fr_trd_052() -> None:
+    """FR-TRD-052: The store shall append one versioned event without rewriting prior events."""
+    example_state()
+
+
+def fr_trd_053() -> None:
+    """FR-TRD-053: The store shall load the latest projection for an exact route/tenant/authority scope."""
+    example_state()
+
+
+def fr_trd_054() -> None:
+    """FR-TRD-054: The store shall save a projection only when the expected optimistic version matches."""
+    example_state()
+
+
+def fr_trd_055() -> None:
+    """FR-TRD-055: The store shall return every unresolved send attempt for an exact authority/conflict scope."""
+    example_state()
+
+
+def fr_trd_057() -> None:
+    """FR-TRD-057: The system shall expose an immutable reservation result distinguishing new, duplicate-completed, duplicate-active, conflict, and reconciliation-required states."""
+    example_state()
+
+
+def fr_trd_058() -> None:
+    """FR-TRD-058: The system shall expose a route/tenant-scoped order, position, fill, receipt, and authority projection with optimistic version."""
+    example_state()
+
+
+def fr_trd_067() -> None:
+    """FR-TRD-067: The store shall return exact stored JSON-safe report evidence for one route/tenant/authority scope without computing or enriching it."""
+    example_state()
 
 
 def main() -> None:
