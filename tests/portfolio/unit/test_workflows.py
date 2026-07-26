@@ -307,7 +307,7 @@ async def test_submit_rebalance_uses_owner_requests_once_and_measures(
         execution_route="sim",
         approval_refs=(),
         approval_token_ref="approval-token-ref-1",
-        trading_request_id="trading-request-1",
+        trading_request_id="req-44444444-4444-4444-8444-444444444444",
         valid_until=portfolio_now + timedelta(minutes=5),
     )
     assert result.status == "measured"
@@ -339,13 +339,13 @@ async def test_measurement_failure_preserves_execution_and_recomputes_without_tr
         execution_route="sim",
         approval_refs=(),
         approval_token_ref="approval-token-ref-1",
-        trading_request_id="trading-request-1",
+        trading_request_id="req-44444444-4444-4444-8444-444444444444",
         valid_until=portfolio_now + timedelta(minutes=5),
     )
     assert executed.status == "executed_unmeasured"
     measured = service.recompute_measurement(
         executed.plan_id,
-        trading_request_id="trading-request-1",
+        trading_request_id="req-44444444-4444-4444-8444-444444444444",
     )
     assert measured.status == "measured"
     assert recorder.trading_calls == 1
@@ -376,7 +376,7 @@ async def test_uncertain_trading_outcome_is_never_retried(
             execution_route="sim",
             approval_refs=(),
             approval_token_ref="approval-token-ref-1",
-            trading_request_id="trading-request-1",
+            trading_request_id="req-44444444-4444-4444-8444-444444444444",
             valid_until=portfolio_now + timedelta(minutes=5),
         )
     assert recorder.trading_calls == 1

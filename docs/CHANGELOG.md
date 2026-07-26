@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.2.10
+
+**Release date:** 2026-07-26
+
+### Complete Portfolio domain
+
+The Portfolio domain now exposes eight focused feature modules with deterministic construction, governed activation, reduce-only rebalancing, cross-domain coordination, and standalone usage coverage.
+
+#### Added (8)
+
+- `FEAT-PORT-01` Portfolio Boundary Contracts.
+- `FEAT-PORT-02` Evidence and Eligibility Validation.
+- `FEAT-PORT-03` Deterministic Construction.
+- `FEAT-PORT-04` Portfolio Persistence.
+- `FEAT-PORT-05` Version and Activation Governance.
+- `FEAT-PORT-06` Drift and Rebalance Planning.
+- `FEAT-PORT-07` Cross-Domain Workflow Coordination.
+- `FEAT-PORT-08` Public Portfolio API.
+
+#### Changed (1)
+
+- Relocated the requirement-bearing root `api.py` into a dedicated `api/` feature module folder and added four missing standalone usage programs so that feature count equals module folder count equals usage file count.
+
+#### Fixed (1)
+
+- Corrected portfolio test trace identifiers to canonical prefixed UUID4 format required by Risk and Trading contracts.
+
 ## 2.2.9
 
 **Release date:** 2026-07-26

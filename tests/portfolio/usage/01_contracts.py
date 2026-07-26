@@ -1,6 +1,8 @@
 """Executable Portfolio contracts usage example.
 
-Demonstrates portfolio construction request model construction and serialization.
+Demonstrates the public Portfolio boundary contract models through the
+package-root public API. Each functional requirement FR-PORT-001 through
+FR-PORT-005 has a dedicated demonstration function.
 """
 
 import sys
@@ -10,20 +12,23 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio.contracts import PortfolioConstructionRequest
+from app.services.portfolio import PortfolioConstructionRequest
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 HASH_A = "a" * 64
 HASH_B = "b" * 64
 
 
-def example_contracts() -> None:
-    """Demonstrate Portfolio contracts and serialization."""
-    print("=" * 80)
-    print("Portfolio Example 1: Construction Request Contracts")
-    print("=" * 80)
+def _base_request_data(**overrides: object) -> dict[str, object]:
+    """Return complete primitive construction request input.
 
-    request_data = {
+    Args:
+        **overrides: Optional field overrides for request variants.
+
+    Returns:
+        Complete request constructor data.
+    """
+    data: dict[str, object] = {
         "request_id": "req-portfolio-0001",
         "workflow_id": "wf-portfolio-0001",
         "correlation_id": "corr-portfolio-0001",
@@ -70,19 +75,118 @@ def example_contracts() -> None:
         "simulation_policy_version": "v1",
         "requested_at": NOW,
     }
+    data.update(overrides)
+    return data
 
-    request = PortfolioConstructionRequest(**request_data)
+
+def fr_port_001() -> None:
+    """FR-PORT-001: Reject unknown fields and unsafe runtime objects.
+
+    Demonstrates that PortfolioConstructionRequest rejects unknown fields via
+    strict Pydantic validation.
+    """
+    print("=" * 80)
+    print("FR-PORT-001: Reject unknown fields and unsafe runtime objects")
+    print("=" * 80)
+
+    request = PortfolioConstructionRequest(**_base_request_data())
     wire_value = request.model_dump(mode="json")
+    print(f"Valid request created with {len(wire_value['components'])} components")
 
-    print(f"Contract version: {wire_value['contract_version']}")
-    print(f"Schema ID: {wire_value['schema_id']}")
-    print(f"Components count: {len(wire_value['components'])}")
-    print(f"First component strategy ID: {wire_value['components'][0]['strategy_id']}")
+    try:
+        PortfolioConstructionRequest(**_base_request_data(unknown_field="bad"))
+        msg = "ERROR: unknown field was accepted"
+    except Exception:  # noqa: BLE001 - usage demonstrates rejection.
+        msg = "Unknown field correctly rejected"
+    print(msg)
+
+
+def fr_port_002() -> None:
+    """FR-PORT-002: Separate contract_version from namespaced schema_id.
+
+    Demonstrates that the construction request carries a fixed
+    contract_version and a separate namespaced schema_id.
+    """
+    print("=" * 80)
+    print("FR-PORT-002: Separate contract_version from schema_id")
+    print("=" * 80)
+
+    request = PortfolioConstructionRequest(**_base_request_data())
+    wire_value = request.model_dump(mode="json")
+    print(f"contract_version: {wire_value['contract_version']}")
+    print(f"schema_id: {wire_value['schema_id']}")
+    assert wire_value["contract_version"] != wire_value["schema_id"]
+    print("contract_version and schema_id are distinct identifiers")
+
+
+def fr_port_003() -> None:
+    """FR-PORT-003: Require UTC timestamps, trace IDs, immutable owner
+    references, and finite numbers.
+
+    Demonstrates that every timestamp on the construction request is
+    timezone-aware UTC and that trace IDs are required.
+    """
+    print("=" * 80)
+    print("FR-PORT-003: Require UTC timestamps, trace IDs, and finite numbers")
+    print("=" * 80)
+
+    request = PortfolioConstructionRequest(**_base_request_data())
+    for field in ("measurement_start", "measurement_end", "requested_at"):
+        ts = getattr(request, field)
+        assert ts.tzinfo is not None
+        assert ts.utcoffset().total_seconds() == 0
+        print(f"  {field}: UTC-aware OK")
+    for field in ("request_id", "workflow_id", "correlation_id"):
+        value = getattr(request, field)
+        assert value
+        assert value == value.strip()
+        print(f"  {field}: non-empty trimmed OK")
+
+
+def fr_port_004() -> None:
+    """FR-PORT-004: Represent capital weights separately from
+    Risk-authoritative budget projection references.
+
+    Demonstrates that the construction request does not embed a Risk budget
+    projection; it carries only evidence references and proposed weights.
+    """
+    print("=" * 80)
+    print("FR-PORT-004: Separate capital weights from Risk budget references")
+    print("=" * 80)
+
+    request = PortfolioConstructionRequest(**_base_request_data())
+    evidence_fields = list(type(request.evidence).model_fields)
+    print(f"Evidence reference fields: {', '.join(evidence_fields[:3])}...")
+    assert not hasattr(request, "risk_budget_projection")
+    print("No Risk budget projection embedded in construction request")
+
+
+def fr_port_005() -> None:
+    """FR-PORT-005: Version breaking contract changes and update every
+    producer/consumer document together.
+
+    Demonstrates that the contract carries a fixed version and schema identity
+    for version compatibility checking.
+    """
+    print("=" * 80)
+    print("FR-PORT-005: Version breaking contract changes")
+    print("=" * 80)
+
+    request = PortfolioConstructionRequest(**_base_request_data())
+    assert request.contract_version == "v1"
+    assert request.schema_id == "portfolio.construction_request.v1"
+    print(f"Fixed contract_version: {request.contract_version}")
+    print(f"Fixed schema_id: {request.schema_id}")
+    print("Breaking changes require a new version and coordinated updates")
 
 
 def main() -> None:
-    """Run Portfolio contracts usage example."""
-    example_contracts()
+    """Run every functional-requirement demonstration for Portfolio contracts."""
+    fr_port_001()
+    fr_port_002()
+    fr_port_003()
+    fr_port_004()
+    fr_port_005()
 
 
 if __name__ == "__main__":

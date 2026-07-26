@@ -74,9 +74,9 @@ def construction_request_data(portfolio_now: datetime) -> dict[str, Any]:
     digest_a = "a" * 64
     digest_b = "b" * 64
     return {
-        "request_id": "req-portfolio-0001",
-        "workflow_id": "wf-portfolio-0001",
-        "correlation_id": "corr-portfolio-0001",
+        "request_id": "req-11111111-1111-4111-8111-111111111111",
+        "workflow_id": "wf-22222222-2222-4222-8222-222222222222",
+        "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "causation_id": None,
         "portfolio_id": "portfolio-alpha",
         "portfolio_version": "version-1",
@@ -156,9 +156,9 @@ def construction_result(portfolio_now: datetime) -> PortfolioConstructionResult:
         strategy_lineage_hash="c" * 64,
         canonical_hash="d" * 64,
         created_at=portfolio_now,
-        request_id="req-portfolio-0001",
-        workflow_id="wf-portfolio-0001",
-        correlation_id="corr-portfolio-0001",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
 

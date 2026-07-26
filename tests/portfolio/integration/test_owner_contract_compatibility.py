@@ -48,7 +48,7 @@ async def test_rebalance_uses_each_receivers_public_owned_contract(
         execution_route="sim",
         approval_refs=(),
         approval_token_ref="approval-token-ref-1",
-        trading_request_id="trading-request-1",
+        trading_request_id="req-44444444-4444-4444-8444-444444444444",
         valid_until=portfolio_now + timedelta(minutes=5),
     )
     assert isinstance(recorder.last_risk_request, AllocationReviewRequest)

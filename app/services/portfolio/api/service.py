@@ -1,4 +1,4 @@
-"""Typed public Portfolio application boundary without presentation concerns."""
+"""Typed public Portfolio application boundary without UI concerns."""
 
 from __future__ import annotations
 
@@ -14,7 +14,10 @@ from app.services.portfolio.contracts import (
     PortfolioOutcome,
     PortfolioRebalancePlan,
 )
-from app.services.portfolio.exceptions import PortfolioError, PortfolioErrorPayload
+from app.services.portfolio.exceptions import (
+    PortfolioError,
+    PortfolioErrorPayload,
+)
 from app.utils import AuthContext, logger
 
 if TYPE_CHECKING:
@@ -59,14 +62,15 @@ class PortfolioService:
         command_workflow_id: str | None = None,
         command_correlation_id: str | None = None,
     ) -> tuple[str, str]:
-        """Validate supplied trace identity without authenticating the principal.
+        """Validate trace identity without authenticating the principal.
 
         Args:
             auth_context: Already authenticated Utils context.
             request_id: Optional caller-supplied request identity.
             command_request_id: Optional request identity carried by a command.
-            command_workflow_id: Optional workflow identity carried by a command.
-            command_correlation_id: Optional correlation identity carried by a command.
+            command_workflow_id: Optional workflow identity carried by command.
+            command_correlation_id: Optional correlation identity carried by
+                command.
 
         Returns:
             Validated request and correlation identities.
@@ -238,6 +242,7 @@ class PortfolioService:
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
             )
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
@@ -272,6 +277,7 @@ class PortfolioService:
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
             )
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
@@ -339,6 +345,7 @@ class PortfolioService:
                 correlation_id=correlation_id,
                 audit_event_id=value.audit_ref,
             )
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
@@ -390,6 +397,7 @@ class PortfolioService:
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
             )
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
@@ -416,7 +424,7 @@ class PortfolioService:
         """Submit and measure one Risk-reviewed reduce-only plan.
 
         Args:
-            plan: Current immutable rebalance plan.
+            plan: Current immutable reduce-only plan.
             account_evidence_ref: Current Data account evidence reference.
             market_evidence_ref: Current Data market evidence reference.
             fx_evidence_refs: Ordered Data FX evidence references.
@@ -459,6 +467,7 @@ class PortfolioService:
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
             )
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
@@ -498,6 +507,7 @@ class PortfolioService:
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
             )
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
@@ -568,6 +578,7 @@ class PortfolioService:
                 correlation_id=correlation_id,
                 audit_event_id=value.audit_ref,
             )
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
@@ -600,6 +611,7 @@ class PortfolioService:
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
             )
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,

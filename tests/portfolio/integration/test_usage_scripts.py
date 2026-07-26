@@ -12,6 +12,10 @@ _USAGE_SCRIPTS = (
     "02_construction.py",
     "03_rebalancing.py",
     "04_lifecycle.py",
+    "05_evidence.py",
+    "06_state.py",
+    "07_allocation.py",
+    "08_orchestration.py",
 )
 
 

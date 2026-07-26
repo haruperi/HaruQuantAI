@@ -175,7 +175,7 @@ async def test_submit_rebalance_returns_structured_measured_outcome(
         execution_route="sim",
         approval_refs=(),
         approval_token_ref="approval-token-ref-1",
-        trading_request_id="trading-request-1",
+        trading_request_id="req-44444444-4444-4444-8444-444444444444",
         valid_until=portfolio_now + timedelta(minutes=5),
         auth_context=auth,
     )
@@ -187,6 +187,6 @@ async def test_submit_rebalance_returns_structured_measured_outcome(
 def test_api_has_no_authentication_or_presentation_framework_imports() -> None:
     """Portfolio API remains independent of HTTP and authentication engines."""
     logger.info("Testing Portfolio API ownership import boundary")
-    source = Path("app/services/portfolio/api.py").read_text(encoding="utf-8")
+    source = Path("app/services/portfolio/api/service.py").read_text(encoding="utf-8")
     for forbidden in ("fastapi", "flask", "django", "jwt", "oauth", "httpx"):
         assert forbidden not in source.lower()

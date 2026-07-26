@@ -1,12 +1,12 @@
 # Portfolio
 
-| Field | Value |
-| --- | --- |
-| **Package path** | `app/services/portfolio` |
-| **Domain ID** | `PORT` |
-| **Status** | Partial — runtime behavior is implemented, but four documented feature owners lack dedicated one-to-one usage programs and `api.py` remains a requirement-bearing root file |
-| **Last updated** | 2026-07-19 |
-| **System workflows** | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008` |
+| Field                | Value                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Package path**     | `app/services/portfolio`                                                                                   |
+| **Domain ID**        | `PORT`                                                                                                     |
+| **Status**           | Completed — all eight feature owners have dedicated module folders, usage programs, and passing validation |
+| **Last updated**     | 2026-07-26                                                                                                 |
+| **System workflows** | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008`                                                                   |
 
 ## 1. Purpose and Boundary
 
@@ -38,24 +38,24 @@ Portfolio owns the deterministic construction, versioning, activation, drift ass
 
 ### Shared contracts
 
-| Direction | Contract | Owner | Purpose |
-| --- | --- | --- | --- |
-| In | `StrategyOperationalEligibilityDecision v1` | Risk | Prove operational eligibility for every strategy/version and scope |
-| In | `AllocationRiskDecision v1` | Risk | Authorize, cap, condition, expire, or reject an allocation/rebalance |
-| In | `AccountStateSnapshot v1` | Data | Supply actual balances, positions, and margin state |
-| In | `MarketDataset v1` | Data | Supply normalized construction evidence |
-| In | `FXConversionEvidence v1` | Data | Supply direct or synthesized conversion truth |
-| In | `PerformanceReport v1` / `PortfolioAllocationEvidence v1` | Analytics | Supply component and portfolio evidence without approval authority |
-| In | `PortfolioSimulationResult v1` | Simulation | Supply deterministic portfolio validation |
-| In | Redacted reconciled `StandardTradingEnvelope` facts | Trading | Supply immutable rebalance execution truth for receiver-owned Analytics measurement |
-| Owned input | `PortfolioConstructionRequest v1` | Portfolio | Receive an authenticated construction command |
-| Owned output | `PortfolioConstructionResult v1` | Portfolio | Publish an immutable candidate allocation |
-| Owned output | `ActivePortfolioAllocation v1` | Portfolio | Publish the canonical active allocation version |
-| Owned output | `PortfolioRebalancePlan v1` | Portfolio | Publish immutable drift and proposed-action lineage |
-| Submitted | `AllocationReviewRequest v1` / `AllocationBudgetActivationRequest v1` | Risk | Ask Risk to review and activate its authoritative budget projection |
-| Submitted | `PortfolioBacktestRequestV1` | Simulation | Ask Simulation to validate a candidate |
-| Submitted | `PortfolioRebalanceExecutionRequest v1` | Trading | Ask Trading to execute an authorized plan |
-| Submitted | `PortfolioRebalanceMeasurementRequest v1` | Analytics | Ask Analytics to measure redacted hash-bound reconciled Trading facts |
+| Direction    | Contract                                                              | Owner      | Purpose                                                                             |
+| ------------ | --------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
+| In           | `StrategyOperationalEligibilityDecision v1`                           | Risk       | Prove operational eligibility for every strategy/version and scope                  |
+| In           | `AllocationRiskDecision v1`                                           | Risk       | Authorize, cap, condition, expire, or reject an allocation/rebalance                |
+| In           | `AccountStateSnapshot v1`                                             | Data       | Supply actual balances, positions, and margin state                                 |
+| In           | `MarketDataset v1`                                                    | Data       | Supply normalized construction evidence                                             |
+| In           | `FXConversionEvidence v1`                                             | Data       | Supply direct or synthesized conversion truth                                       |
+| In           | `PerformanceReport v1` / `PortfolioAllocationEvidence v1`             | Analytics  | Supply component and portfolio evidence without approval authority                  |
+| In           | `PortfolioSimulationResult v1`                                        | Simulation | Supply deterministic portfolio validation                                           |
+| In           | Redacted reconciled `StandardTradingEnvelope` facts                   | Trading    | Supply immutable rebalance execution truth for receiver-owned Analytics measurement |
+| Owned input  | `PortfolioConstructionRequest v1`                                     | Portfolio  | Receive an authenticated construction command                                       |
+| Owned output | `PortfolioConstructionResult v1`                                      | Portfolio  | Publish an immutable candidate allocation                                           |
+| Owned output | `ActivePortfolioAllocation v1`                                        | Portfolio  | Publish the canonical active allocation version                                     |
+| Owned output | `PortfolioRebalancePlan v1`                                           | Portfolio  | Publish immutable drift and proposed-action lineage                                 |
+| Submitted    | `AllocationReviewRequest v1` / `AllocationBudgetActivationRequest v1` | Risk       | Ask Risk to review and activate its authoritative budget projection                 |
+| Submitted    | `PortfolioBacktestRequestV1`                                          | Simulation | Ask Simulation to validate a candidate                                              |
+| Submitted    | `PortfolioRebalanceExecutionRequest v1`                               | Trading    | Ask Trading to execute an authorized plan                                           |
+| Submitted    | `PortfolioRebalanceMeasurementRequest v1`                             | Analytics  | Ask Analytics to measure redacted hash-bound reconciled Trading facts               |
 
 Receiver-owned requests are imported from their receiving domains. Portfolio never
 redefines them. `AllocationReviewRequest v1` and `PortfolioBacktestRequestV1` are
@@ -69,24 +69,24 @@ trace, candidate, component-weight, profile, and route bindings before submissio
 
 ### Persisted state
 
-| State | Owner | Writer | Read boundary | Rule |
-| --- | --- | --- | --- | --- |
-| Portfolio definitions and objectives | Portfolio | Portfolio | Portfolio public API | Immutable identity; updates create versions |
-| Construction results | Portfolio | Portfolio | `PortfolioConstructionResult` | Publish only complete deterministic results |
-| Active allocation versions | Portfolio | Portfolio | `ActivePortfolioAllocation` | One active version per scope; optimistic concurrency |
-| Drift assessments and rebalance plans | Portfolio | Portfolio | `PortfolioRebalancePlan` | Evidence- and target-version bound |
-| Portfolio audit payloads | Portfolio | Portfolio | Utils `AuditEvent` persisted by Data | Redacted; full decision lineage |
+| State                                 | Owner     | Writer    | Read boundary                        | Rule                                                 |
+| ------------------------------------- | --------- | --------- | ------------------------------------ | ---------------------------------------------------- |
+| Portfolio definitions and objectives  | Portfolio | Portfolio | Portfolio public API                 | Immutable identity; updates create versions          |
+| Construction results                  | Portfolio | Portfolio | `PortfolioConstructionResult`        | Publish only complete deterministic results          |
+| Active allocation versions            | Portfolio | Portfolio | `ActivePortfolioAllocation`          | One active version per scope; optimistic concurrency |
+| Drift assessments and rebalance plans | Portfolio | Portfolio | `PortfolioRebalancePlan`             | Evidence- and target-version bound                   |
+| Portfolio audit payloads              | Portfolio | Portfolio | Utils `AuditEvent` persisted by Data | Redacted; full decision lineage                      |
 
 Risk separately persists the authoritative risk-budget projection. Portfolio stores only the Risk decision and budget-projection references needed for lineage.
 
 ### Four-level structure
 
-| Level | Package area | Responsibility |
-| --- | --- | --- |
-| 1 | `contracts/`, `state/` | Domain schemas, enums, repositories, migrations |
-| 2 | `evidence/`, `construction/` | Validate inputs and deterministically construct candidates |
-| 3 | `allocation/`, `rebalancing/` | Govern activation, versions, drift, and rebalance plans |
-| 4 | `orchestration/`, `api.py` | Coordinate receiver-owned requests and expose the public API |
+| Level | Package area                  | Responsibility                                               |
+| ----- | ----------------------------- | ------------------------------------------------------------ |
+| 1     | `contracts/`, `state/`        | Domain schemas, enums, repositories, migrations              |
+| 2     | `evidence/`, `construction/`  | Validate inputs and deterministically construct candidates   |
+| 3     | `allocation/`, `rebalancing/` | Govern activation, versions, drift, and rebalance plans      |
+| 4     | `orchestration/`, `api.py`    | Coordinate receiver-owned requests and expose the public API |
 
 ### Package capability map
 
@@ -108,20 +108,16 @@ flowchart TD
 
 ### Feature Registry
 
-| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
-|---|---|---|---|---|---|
-| Completed | `FEAT-PORT-01` Portfolio Boundary Contracts | `contracts/` | Exact declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/portfolio/usage/01_contracts.py` |
-| Partial | `FEAT-PORT-02` Evidence and Eligibility Validation | `evidence/` | Exact declarations: Section 4.2 | Section 4.2 functional requirements | No dedicated numbered usage program |
-| Completed | `FEAT-PORT-03` Deterministic Construction | `construction/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/portfolio/usage/02_construction.py` |
-| Partial | `FEAT-PORT-04` Portfolio Persistence | `state/` | Exact declarations and state contracts: Section 4.4 | Section 4.4 functional requirements | No dedicated numbered usage program |
-| Partial | `FEAT-PORT-05` Version and Activation Governance | `allocation/` | Exact declarations: Section 4.5 | Section 4.5 functional requirements | No dedicated numbered usage program |
-| Completed | `FEAT-PORT-06` Drift and Rebalance Planning | `rebalancing/` | Exact declarations and rebalance contracts: Section 4.6 | Section 4.6 functional requirements | `tests/portfolio/usage/03_rebalancing.py` |
-| Partial | `FEAT-PORT-07` Cross-Domain Workflow Coordination | `orchestration/` | Exact declarations: Section 4.7 | Section 4.7 functional requirements | No dedicated numbered usage program |
-| Partial | `FEAT-PORT-08` Public Portfolio API | Root file `api.py` | Exact declarations and package API: Section 4.8 | Section 4.8 functional requirements | `tests/portfolio/usage/04_lifecycle.py`; root-file ownership remains structurally noncompliant |
-
-The `Partial` rows are current documentation-integrity findings, not newly added
-features. This documentation-only cleanup neither creates the missing usage
-programs nor relocates the root API behavior.
+| Status    | Feature                                            | Owning module    | Public API and contracts                                | Requirements                        | Usage evidence                              |
+| --------- | -------------------------------------------------- | ---------------- | ------------------------------------------------------- | ----------------------------------- | ------------------------------------------- |
+| Completed | `FEAT-PORT-01` Portfolio Boundary Contracts        | `contracts/`     | Exact declarations and contract fields: Section 4.1     | Section 4.1 functional requirements | `tests/portfolio/usage/01_contracts.py`     |
+| Completed | `FEAT-PORT-02` Evidence and Eligibility Validation | `evidence/`      | Exact declarations: Section 4.2                         | Section 4.2 functional requirements | `tests/portfolio/usage/05_evidence.py`      |
+| Completed | `FEAT-PORT-03` Deterministic Construction          | `construction/`  | Exact declarations: Section 4.3                         | Section 4.3 functional requirements | `tests/portfolio/usage/02_construction.py`  |
+| Completed | `FEAT-PORT-04` Portfolio Persistence               | `state/`         | Exact declarations and state contracts: Section 4.4     | Section 4.4 functional requirements | `tests/portfolio/usage/06_state.py`         |
+| Completed | `FEAT-PORT-05` Version and Activation Governance   | `allocation/`    | Exact declarations: Section 4.5                         | Section 4.5 functional requirements | `tests/portfolio/usage/07_allocation.py`    |
+| Completed | `FEAT-PORT-06` Drift and Rebalance Planning        | `rebalancing/`   | Exact declarations and rebalance contracts: Section 4.6 | Section 4.6 functional requirements | `tests/portfolio/usage/03_rebalancing.py`   |
+| Completed | `FEAT-PORT-07` Cross-Domain Workflow Coordination  | `orchestration/` | Exact declarations: Section 4.7                         | Section 4.7 functional requirements | `tests/portfolio/usage/08_orchestration.py` |
+| Completed | `FEAT-PORT-08` Public Portfolio API                | `api/`           | Exact declarations and package API: Section 4.8         | Section 4.8 functional requirements | `tests/portfolio/usage/04_lifecycle.py`     |
 
 ```text
 app/services/portfolio/
@@ -154,7 +150,9 @@ app/services/portfolio/
 ├── orchestration/
 │   ├── __init__.py
 │   └── workflows.py
-└── api.py
+└── api/
+    ├── __init__.py
+    └── service.py
 ```
 
 ### Module dependency diagram
@@ -195,29 +193,29 @@ exists.
 
 ## 3. Workflows
 
-| Status | Workflow ID | Scope | System workflow | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Completed | `WF-PORT-001` | Cross-domain | `SYS-WF-006`, `SYS-WF-007` | Validate construction evidence | Construction request | Validated immutable input set or structured rejection | `FR-PORT-006 → FR-PORT-009` |
-| Completed | `WF-PORT-002` | Internal | `SYS-WF-007` | Construct allocation candidate | Validated input set | `PortfolioConstructionResult` | `FR-PORT-010 → FR-PORT-014` |
-| Completed | `WF-PORT-003` | Cross-domain | `SYS-WF-007` | Coordinate simulation and Risk review | Complete construction result | Current Simulation result and Risk decision | `FR-PORT-025 → FR-PORT-029` |
-| Completed | `WF-PORT-004` | Cross-domain | `SYS-WF-007` | Activate allocation version | All gates current | `ActivePortfolioAllocation` | `FR-PORT-015 → FR-PORT-019` |
-| Completed | `WF-PORT-005` | Cross-domain | `SYS-WF-008` | Detect drift and plan rebalance | Schedule or threshold | `PortfolioRebalancePlan` | `FR-PORT-020 → FR-PORT-024` |
-| Completed | `WF-PORT-006` | Cross-domain | `SYS-WF-008` | Submit and measure authorized rebalance | Current Risk approval | Trading execution truth followed by Analytics evidence, or explicit executed-but-unmeasured state | `FR-PORT-025 → FR-PORT-029 → FR-PORT-038` |
-| Completed | `WF-PORT-007` | Internal | `SYS-WF-007` | Roll back allocation | Authorized rollback request | New governed allocation version | `FR-PORT-018 → FR-PORT-019` |
+| Status    | Workflow ID   | Scope        | System workflow            | Workflow                                | Trigger / Input boundary     | Final outcome / Output boundary                                                                   | Requirement sequence                      |
+| --------- | ------------- | ------------ | -------------------------- | --------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Completed | `WF-PORT-001` | Cross-domain | `SYS-WF-006`, `SYS-WF-007` | Validate construction evidence          | Construction request         | Validated immutable input set or structured rejection                                             | `FR-PORT-006 → FR-PORT-009`               |
+| Completed | `WF-PORT-002` | Internal     | `SYS-WF-007`               | Construct allocation candidate          | Validated input set          | `PortfolioConstructionResult`                                                                     | `FR-PORT-010 → FR-PORT-014`               |
+| Completed | `WF-PORT-003` | Cross-domain | `SYS-WF-007`               | Coordinate simulation and Risk review   | Complete construction result | Current Simulation result and Risk decision                                                       | `FR-PORT-025 → FR-PORT-029`               |
+| Completed | `WF-PORT-004` | Cross-domain | `SYS-WF-007`               | Activate allocation version             | All gates current            | `ActivePortfolioAllocation`                                                                       | `FR-PORT-015 → FR-PORT-019`               |
+| Completed | `WF-PORT-005` | Cross-domain | `SYS-WF-008`               | Detect drift and plan rebalance         | Schedule or threshold        | `PortfolioRebalancePlan`                                                                          | `FR-PORT-020 → FR-PORT-024`               |
+| Completed | `WF-PORT-006` | Cross-domain | `SYS-WF-008`               | Submit and measure authorized rebalance | Current Risk approval        | Trading execution truth followed by Analytics evidence, or explicit executed-but-unmeasured state | `FR-PORT-025 → FR-PORT-029 → FR-PORT-038` |
+| Completed | `WF-PORT-007` | Internal     | `SYS-WF-007`               | Roll back allocation                    | Authorized rollback request  | New governed allocation version                                                                   | `FR-PORT-018 → FR-PORT-019`               |
 
 ### Status values
 
-| Status | Meaning |
-|---|---|
-| **Missing** | Not implemented or not verified |
-| **Partial** | Partly implemented or tests are incomplete |
-| **Completed** | Implemented, tested, and verified |
+| Status        | Meaning                                    |
+| ------------- | ------------------------------------------ |
+| **Missing**   | Not implemented or not verified            |
+| **Partial**   | Partly implemented or tests are incomplete |
+| **Completed** | Implemented, tested, and verified          |
 
 ### Workflow scope values
 
-| Scope | Meaning |
-|---|---|
-| **Internal** | The complete workflow occurs within Portfolio. |
+| Scope            | Meaning                                                                                                                           |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Internal**     | The complete workflow occurs within Portfolio.                                                                                    |
 | **Cross-domain** | Portfolio receives input from or sends output to another domain; the applicable `SYS-WF-*` ID is recorded in the workflow detail. |
 
 ### `WF-PORT-002` — Construct Allocation Candidate
@@ -297,14 +295,14 @@ sequenceDiagram
 
 #### Files
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `exceptions.py` | Define the closed Portfolio error catalog and Utils-based structured domain error. | `PORTFOLIO_ERROR_CODES`, `PortfolioError`, `PortfolioErrorPayload` | **Standard library:** `dataclasses`, `typing`<br>**Required third-party:** None<br>**Local:** `app.utils` |
-| Completed | `config.py` | Define required Portfolio-owned settings and the deterministic UTC rebalance schedule. | `PortfolioSettings`, `RebalanceSchedule` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** `app.utils.AppSettings`; `exceptions.py` |
-| Completed | `requests.py` | Validate the Portfolio-owned construction command. | `PortfolioConstructionRequest` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** None |
-| Completed | `results.py` | Define immutable construction output. | `PortfolioConstructionResult` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** `requests.py` → identifiers |
-| Completed | `allocations.py` | Define active allocation and rebalance-plan contracts. | `ActivePortfolioAllocation`, `PortfolioRebalancePlan` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** `pydantic`<br>**Local:** `results.py` → result references |
-| Completed | `__init__.py` | Expose the supported contract API. | All contracts above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contract files above |
+| Status    | File             | Responsibility                                                                         | Key exports                                                        | Dependencies                                                                                                                               |
+| --------- | ---------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Completed | `exceptions.py`  | Define the closed Portfolio error catalog and Utils-based structured domain error.     | `PORTFOLIO_ERROR_CODES`, `PortfolioError`, `PortfolioErrorPayload` | **Standard library:** `dataclasses`, `typing`; **Required third-party:** None; **Local:** `app.utils`                                  |
+| Completed | `config.py`      | Define required Portfolio-owned settings and the deterministic UTC rebalance schedule. | `PortfolioSettings`, `RebalanceSchedule`                           | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `app.utils.AppSettings`; `exceptions.py` |
+| Completed | `requests.py`    | Validate the Portfolio-owned construction command.                                     | `PortfolioConstructionRequest`                                     | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** None                                     |
+| Completed | `results.py`     | Define immutable construction output.                                                  | `PortfolioConstructionResult`                                      | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `requests.py` → identifiers              |
+| Completed | `allocations.py` | Define active allocation and rebalance-plan contracts.                                 | `ActivePortfolioAllocation`, `PortfolioRebalancePlan`              | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `results.py` → result references         |
+| Completed | `__init__.py`    | Expose the supported contract API.                                                     | All contracts above                                                | **Standard library:** None; **Required third-party:** None; **Local:** contract files above                                            |
 
 #### Ratified v1 schema manifest
 
@@ -315,19 +313,19 @@ finite, and serialize into canonical hash material as strings. Supporting value 
 are public only from `app.services.portfolio.contracts`; the package root exports the
 four registered contracts plus `PortfolioOutcome` and error types.
 
-| Model | Exact fields |
-|---|---|
-| `StrategyAllocationRef` | `component_id`, `strategy_id`, `strategy_version`, `registry_record_hash`, `eligibility_decision_id` |
-| `EvidenceReferenceSet` | `account_snapshot_id`, `account_snapshot_hash`, `account_snapshot_as_of`, `market_dataset_id`, `market_dataset_hash`, `market_dataset_as_of`, `analytics_evidence_id`, `analytics_evidence_hash`, `analytics_evidence_as_of`, ordered `fx_evidence_ids`, ordered `fx_evidence_hashes` |
-| `FixedWeightInput` | `component_id`, `capital_weight`, `proposed_risk_budget_weight` |
-| `PortfolioComponentWeight` | `component_id`, `strategy_id`, `strategy_version`, `capital_weight`, `proposed_risk_budget_weight` |
+| Model                          | Exact fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `StrategyAllocationRef`        | `component_id`, `strategy_id`, `strategy_version`, `registry_record_hash`, `eligibility_decision_id`                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `EvidenceReferenceSet`         | `account_snapshot_id`, `account_snapshot_hash`, `account_snapshot_as_of`, `market_dataset_id`, `market_dataset_hash`, `market_dataset_as_of`, `analytics_evidence_id`, `analytics_evidence_hash`, `analytics_evidence_as_of`, ordered `fx_evidence_ids`, ordered `fx_evidence_hashes`                                                                                                                                                                                                                 |
+| `FixedWeightInput`             | `component_id`, `capital_weight`, `proposed_risk_budget_weight`                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `PortfolioComponentWeight`     | `component_id`, `strategy_id`, `strategy_version`, `capital_weight`, `proposed_risk_budget_weight`                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `PortfolioConstructionRequest` | fixed `contract_version="v1"`, fixed `schema_id="portfolio.construction_request.v1"`, `request_id`, `workflow_id`, `correlation_id`, optional `causation_id`, `portfolio_id`, explicit `portfolio_version`, non-empty `scope`, ordered `components`, `method` (`fixed`, `equal`, or `inverse_volatility`), ordered `fixed_weights`, `evidence`, `measurement_start`, `measurement_end`, `base_currency`, `runtime_profile`, compatible `execution_route`, `simulation_policy_version`, `requested_at` |
-| `PortfolioConstructionResult` | fixed version/schema, `result_id`, `portfolio_id`, `portfolio_version`, `scope`, `status="constructed"`, ordered `component_weights`, `method`, `config_hash`, `evidence_hash`, `strategy_lineage_hash`, `canonical_hash`, `created_at`, request/workflow/correlation/causation IDs |
-| `ActivePortfolioAllocation` | fixed version/schema, `allocation_id`, `portfolio_id`, `allocation_version`, `scope`, `construction_result_id`, `construction_result_hash`, ordered component weights, `simulation_result_id`, `simulation_result_hash`, `risk_decision_id`, `risk_budget_projection_ref`, optional `approval_attestation_id`, optional `predecessor_version`, optional `rollback_of_version`, `activated_at`, `expires_at`, `idempotency_key`, `canonical_hash`, request/workflow/correlation IDs, `audit_ref` |
-| `DriftObservation` | `component_id`, `target_risk_budget`, `actual_risk_budget`, signed `drift`, `threshold_breached` |
-| `PortfolioRebalanceAction` | `action_id`, `component_id`, `action="reduce_exposure"`, `reduce_only=True`, `current_exposure`, `target_exposure`, `reduction_amount`, `eligibility_decision_id` |
-| `PortfolioRebalancePlan` | fixed version/schema, `plan_id`, `plan_version`, `portfolio_id`, `allocation_version`, `scope`, ordered observations/actions, `status` (`no_action`, `review_required`, `blocked`, `executed`, `executed_unmeasured`, `measured`), `block_reasons`, evidence/config/canonical hashes, `observed_at`, `created_at`, optional Risk/Trading/Analytics references, request/workflow/correlation IDs |
-| `PortfolioOutcome[T]` | `ok`, `request_id`, `correlation_id`, exactly one of `value` or `error`, optional `audit_event_id` |
+| `PortfolioConstructionResult`  | fixed version/schema, `result_id`, `portfolio_id`, `portfolio_version`, `scope`, `status="constructed"`, ordered `component_weights`, `method`, `config_hash`, `evidence_hash`, `strategy_lineage_hash`, `canonical_hash`, `created_at`, request/workflow/correlation/causation IDs                                                                                                                                                                                                                   |
+| `ActivePortfolioAllocation`    | fixed version/schema, `allocation_id`, `portfolio_id`, `allocation_version`, `scope`, `construction_result_id`, `construction_result_hash`, ordered component weights, `simulation_result_id`, `simulation_result_hash`, `risk_decision_id`, `risk_budget_projection_ref`, optional `approval_attestation_id`, optional `predecessor_version`, optional `rollback_of_version`, `activated_at`, `expires_at`, `idempotency_key`, `canonical_hash`, request/workflow/correlation IDs, `audit_ref`       |
+| `DriftObservation`             | `component_id`, `target_risk_budget`, `actual_risk_budget`, signed `drift`, `threshold_breached`                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `PortfolioRebalanceAction`     | `action_id`, `component_id`, `action="reduce_exposure"`, `reduce_only=True`, `current_exposure`, `target_exposure`, `reduction_amount`, `eligibility_decision_id`                                                                                                                                                                                                                                                                                                                                     |
+| `PortfolioRebalancePlan`       | fixed version/schema, `plan_id`, `plan_version`, `portfolio_id`, `allocation_version`, `scope`, ordered observations/actions, `status` (`no_action`, `review_required`, `blocked`, `executed`, `executed_unmeasured`, `measured`), `block_reasons`, evidence/config/canonical hashes, `observed_at`, `created_at`, optional Risk/Trading/Analytics references, request/workflow/correlation IDs                                                                                                       |
+| `PortfolioOutcome[T]`          | `ok`, `request_id`, `correlation_id`, exactly one of `value` or `error`, optional `audit_event_id`                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 `fixed_weights` is non-empty and complete only for `method="fixed"`; it is empty for
 the other methods. Equal weighting proposes equal capital and risk-budget metadata.
@@ -342,13 +340,13 @@ is required and validated before a service is constructed. `PORTFOLIO_REBALANCE_
 is a `RebalanceSchedule(anchor_at: UTC datetime, interval_seconds: positive int)`.
 Schema versions and IDs are the only constants with defaults.
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
-| FR-PORT-001 | Reject unknown fields and unsafe runtime objects. | Contract unit tests |
-| FR-PORT-002 | Separate `contract_version` from namespaced `schema_id`. | Serialization tests |
-| FR-PORT-003 | Require UTC timestamps, trace IDs, immutable owner references, and finite numbers. | Validation tests |
-| FR-PORT-004 | Represent capital weights separately from Risk-authoritative budget projection references. | Schema tests |
-| FR-PORT-005 | Version breaking contract changes and update every producer/consumer document together. | Review |
+| ID          | Requirement                                                                                | Verification        |
+| ----------- | ------------------------------------------------------------------------------------------ | ------------------- |
+| FR-PORT-001 | Reject unknown fields and unsafe runtime objects.                                          | Contract unit tests |
+| FR-PORT-002 | Separate `contract_version` from namespaced `schema_id`.                                   | Serialization tests |
+| FR-PORT-003 | Require UTC timestamps, trace IDs, immutable owner references, and finite numbers.         | Validation tests    |
+| FR-PORT-004 | Represent capital weights separately from Risk-authoritative budget projection references. | Schema tests        |
+| FR-PORT-005 | Version breaking contract changes and update every producer/consumer document together.    | Review              |
 
 ### 4.2 `evidence/` — Evidence and Eligibility Validation
 
@@ -356,17 +354,17 @@ Schema versions and IDs are the only constants with defaults.
 
 **Module flow:** owner references → compatibility/freshness/eligibility checks → validated immutable evidence set.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `validator.py` | Validate Strategy registration, Risk eligibility, evidence freshness/compatibility, FX coverage, and lineage. | `validate_construction_evidence`, `revalidate_activation_evidence` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `contracts`; public owner contracts |
-| Completed | `__init__.py` | Expose the evidence-validation API. | Validation functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `validator.py` |
+| Status    | File           | Responsibility                                                                                                | Key exports                                                        | Dependencies                                                                                                         |
+| --------- | -------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Completed | `validator.py` | Validate Strategy registration, Risk eligibility, evidence freshness/compatibility, FX coverage, and lineage. | `validate_construction_evidence`, `revalidate_activation_evidence` | **Standard library:** `datetime`; **Required third-party:** None; **Local:** `contracts`; public owner contracts |
+| Completed | `__init__.py`  | Expose the evidence-validation API.                                                                           | Validation functions above                                         | **Standard library:** None; **Required third-party:** None; **Local:** `validator.py`                            |
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
+| ID          | Requirement                                                                              | Verification      |
+| ----------- | ---------------------------------------------------------------------------------------- | ----------------- |
 | FR-PORT-006 | Require a current approving eligibility decision for every exact strategy/version/scope. | Eligibility tests |
-| FR-PORT-007 | Fail closed on missing, stale, incompatible, cyclic, or unverifiable FX evidence. | FX tests |
-| FR-PORT-008 | Never synthesize rates, metrics, registrations, or approvals. | Negative tests |
-| FR-PORT-009 | Detect a reference/version change before publication or activation. | Concurrency tests |
+| FR-PORT-007 | Fail closed on missing, stale, incompatible, cyclic, or unverifiable FX evidence.        | FX tests          |
+| FR-PORT-008 | Never synthesize rates, metrics, registrations, or approvals.                            | Negative tests    |
+| FR-PORT-009 | Detect a reference/version change before publication or activation.                      | Concurrency tests |
 
 ### 4.3 `construction/` — Deterministic Construction
 
@@ -374,27 +372,27 @@ Schema versions and IDs are the only constants with defaults.
 
 **Module flow:** validated evidence → approved pure method → bounded deterministic construction result.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `methods.py` | Pure fixed-weight, equal-weight, and inverse-volatility calculations. | `fixed_weights`, `equal_weights`, `inverse_volatility_weights` | **Standard library:** `decimal`<br>**Required third-party:** None<br>**Local:** None |
-| Completed | `service.py` | Select method, validate output, hash lineage, and produce result. | `ConstructionService` | **Standard library:** `hashlib`<br>**Required third-party:** None<br>**Local:** `methods.py`; `contracts` |
-| Completed | `__init__.py` | Expose the construction API. | `ConstructionService` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `service.py` |
+| Status    | File          | Responsibility                                                        | Key exports                                                    | Dependencies                                                                                              |
+| --------- | ------------- | --------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Completed | `methods.py`  | Pure fixed-weight, equal-weight, and inverse-volatility calculations. | `fixed_weights`, `equal_weights`, `inverse_volatility_weights` | **Standard library:** `decimal`; **Required third-party:** None; **Local:** None                      |
+| Completed | `service.py`  | Select method, validate output, hash lineage, and produce result.     | `ConstructionService`                                          | **Standard library:** `hashlib`; **Required third-party:** None; **Local:** `methods.py`; `contracts` |
+| Completed | `__init__.py` | Expose the construction API.                                          | `ConstructionService`                                          | **Standard library:** None; **Required third-party:** None; **Local:** `service.py`                   |
 
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Completed | `PORTFOLIO_WEIGHT_SUM_TOLERANCE` | `Decimal` | None | Yes | Construction validation | Explicit positive tolerance; missing blocks construction |
-| Completed | `PORTFOLIO_MIN_WEIGHT` / `PORTFOLIO_MAX_WEIGHT` | `Decimal` | None | Yes | Construction validation | Explicit finite bounds; violation rejects result |
-| Completed | `PORTFOLIO_MAX_STRATEGIES` | `int` | None | Yes | Request validation | Explicit positive request bound |
-| Completed | `PORTFOLIO_MIN_EVIDENCE_OBSERVATIONS` | `int` | None | Yes | Inverse-volatility method | Explicit positive observation minimum |
-| Completed | `PORTFOLIO_MAX_EVIDENCE_AGE_SECONDS` | `int` | None | Yes | Evidence validator | Explicit positive freshness limit |
+| Status    | Setting / Limit                                 | Type      | Default | Required | Used by                   | Description                                              |
+| --------- | ----------------------------------------------- | --------- | ------- | -------- | ------------------------- | -------------------------------------------------------- |
+| Completed | `PORTFOLIO_WEIGHT_SUM_TOLERANCE`                | `Decimal` | None    | Yes      | Construction validation   | Explicit positive tolerance; missing blocks construction |
+| Completed | `PORTFOLIO_MIN_WEIGHT` / `PORTFOLIO_MAX_WEIGHT` | `Decimal` | None    | Yes      | Construction validation   | Explicit finite bounds; violation rejects result         |
+| Completed | `PORTFOLIO_MAX_STRATEGIES`                      | `int`     | None    | Yes      | Request validation        | Explicit positive request bound                          |
+| Completed | `PORTFOLIO_MIN_EVIDENCE_OBSERVATIONS`           | `int`     | None    | Yes      | Inverse-volatility method | Explicit positive observation minimum                    |
+| Completed | `PORTFOLIO_MAX_EVIDENCE_AGE_SECONDS`            | `int`     | None    | Yes      | Evidence validator        | Explicit positive freshness limit                        |
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
-| FR-PORT-010 | Support fixed, equal, and inverse-volatility methods only. | Method tests |
-| FR-PORT-011 | Reject zero/negative volatility, insufficient observations, non-finite values, and invalid weight totals. | Edge-case tests |
-| FR-PORT-012 | Return identical bytes and hash for identical inputs/configuration. | Reproducibility test |
-| FR-PORT-013 | Exclude MVO, Black-Litterman, CVaR, and implicit optimizer delegation. | Import/API review |
-| FR-PORT-014 | Publish nothing on partial construction failure. | Failure tests |
+| ID          | Requirement                                                                                               | Verification         |
+| ----------- | --------------------------------------------------------------------------------------------------------- | -------------------- |
+| FR-PORT-010 | Support fixed, equal, and inverse-volatility methods only.                                                | Method tests         |
+| FR-PORT-011 | Reject zero/negative volatility, insufficient observations, non-finite values, and invalid weight totals. | Edge-case tests      |
+| FR-PORT-012 | Return identical bytes and hash for identical inputs/configuration.                                       | Reproducibility test |
+| FR-PORT-013 | Exclude MVO, Black-Litterman, CVaR, and implicit optimizer delegation.                                    | Import/API review    |
+| FR-PORT-014 | Publish nothing on partial construction failure.                                                          | Failure tests        |
 
 ### 4.4 `state/` — Portfolio Persistence
 
@@ -402,11 +400,11 @@ Schema versions and IDs are the only constants with defaults.
 
 **Module flow:** validated Portfolio state transition → atomic owner repository → immutable version/history read model.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `migrations.py` | Define Portfolio-owned migrations executed by Data infrastructure. | `PORTFOLIO_MIGRATIONS` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Data migration protocol |
-| Completed | `repository.py` | Atomic repositories, version checks, and read models. | `PortfolioRepository` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `contracts`, `migrations.py` |
-| Completed | `__init__.py` | Expose state interfaces. | `PortfolioRepository`, `PORTFOLIO_MIGRATIONS` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** state files above |
+| Status    | File            | Responsibility                                                     | Key exports                                   | Dependencies                                                                                                         |
+| --------- | --------------- | ------------------------------------------------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Completed | `migrations.py` | Define Portfolio-owned migrations executed by Data infrastructure. | `PORTFOLIO_MIGRATIONS`                        | **Standard library:** None; **Required third-party:** None; **Local:** Data migration protocol                   |
+| Completed | `repository.py` | Atomic repositories, version checks, and read models.              | `PortfolioRepository`                         | **Standard library:** `collections.abc`; **Required third-party:** None; **Local:** `contracts`, `migrations.py` |
+| Completed | `__init__.py`   | Expose state interfaces.                                           | `PortfolioRepository`, `PORTFOLIO_MIGRATIONS` | **Standard library:** None; **Required third-party:** None; **Local:** state files above                         |
 
 `PortfolioRepository` coordinates an injected `PortfolioStateStore` port. Portfolio
 never opens SQLite or imports Data storage internals. Migrations define immutable
@@ -417,11 +415,11 @@ revision. Reusing an idempotency key with identical canonical material returns t
 stored result; different material raises `PORT_IDEMPOTENCY_CONFLICT`. State and its
 redacted audit-outbox record commit atomically.
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
-| FR-PORT-030 | Prevent direct writes by other domains. | Boundary tests |
-| FR-PORT-031 | Preserve every superseded and rolled-back version. | History tests |
-| FR-PORT-032 | Use atomic activation and deterministic idempotency keys. | Transaction tests |
+| ID          | Requirement                                                          | Verification      |
+| ----------- | -------------------------------------------------------------------- | ----------------- |
+| FR-PORT-030 | Prevent direct writes by other domains.                              | Boundary tests    |
+| FR-PORT-031 | Preserve every superseded and rolled-back version.                   | History tests     |
+| FR-PORT-032 | Use atomic activation and deterministic idempotency keys.            | Transaction tests |
 | FR-PORT-033 | Store references, hashes, and decisions needed to reproduce lineage. | Persistence tests |
 
 ### 4.5 `allocation/` — Version and Activation Governance
@@ -430,23 +428,23 @@ redacted audit-outbox record commit atomically.
 
 **Module flow:** candidate and current gates → Risk budget activation → atomic Portfolio version activation.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `service.py` | Validate gates, coordinate Risk budget activation, and atomically activate versions. | `AllocationService` | **Standard library:** `datetime`<br>**Required third-party:** None<br>**Local:** `contracts`, `state.repository`; Risk public contracts |
-| Completed | `__init__.py` | Expose allocation activation API. | `AllocationService` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `service.py` |
+| Status    | File          | Responsibility                                                                       | Key exports         | Dependencies                                                                                                                            |
+| --------- | ------------- | ------------------------------------------------------------------------------------ | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Completed | `service.py`  | Validate gates, coordinate Risk budget activation, and atomically activate versions. | `AllocationService` | **Standard library:** `datetime`; **Required third-party:** None; **Local:** `contracts`, `state.repository`; Risk public contracts |
+| Completed | `__init__.py` | Expose allocation activation API.                                                    | `AllocationService` | **Standard library:** None; **Required third-party:** None; **Local:** `service.py`                                                 |
 
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Completed | `PORTFOLIO_ALLOCATION_DECISION_TTL_SECONDS` | `int` | None | Yes | `AllocationService` | Explicit positive maximum decision age |
-| Completed | `PORTFOLIO_ACTIVATION_APPROVAL_POLICY` | policy reference | None | Yes | `AllocationService` | Required per runtime scope; missing blocks activation |
+| Status    | Setting / Limit                             | Type             | Default | Required | Used by             | Description                                           |
+| --------- | ------------------------------------------- | ---------------- | ------- | -------- | ------------------- | ----------------------------------------------------- |
+| Completed | `PORTFOLIO_ALLOCATION_DECISION_TTL_SECONDS` | `int`            | None    | Yes      | `AllocationService` | Explicit positive maximum decision age                |
+| Completed | `PORTFOLIO_ACTIVATION_APPROVAL_POLICY`      | policy reference | None    | Yes      | `AllocationService` | Required per runtime scope; missing blocks activation |
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
-| FR-PORT-015 | Require Simulation validation and current Risk authorization before activation. | Gate tests |
-| FR-PORT-016 | Require explicit human approval for paper/live; allow automatic simulation activation only within simulation policy. | Profile tests |
-| FR-PORT-017 | Block activation while any applicable kill switch is active. | Kill-switch tests |
-| FR-PORT-018 | Use optimistic concurrency and one active version per scope. | Repository tests |
-| FR-PORT-019 | Implement rollback only as a new governed version. | History tests |
+| ID          | Requirement                                                                                                          | Verification      |
+| ----------- | -------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| FR-PORT-015 | Require Simulation validation and current Risk authorization before activation.                                      | Gate tests        |
+| FR-PORT-016 | Require explicit human approval for paper/live; allow automatic simulation activation only within simulation policy. | Profile tests     |
+| FR-PORT-017 | Block activation while any applicable kill switch is active.                                                         | Kill-switch tests |
+| FR-PORT-018 | Use optimistic concurrency and one active version per scope.                                                         | Repository tests  |
+| FR-PORT-019 | Implement rollback only as a new governed version.                                                                   | History tests     |
 
 ### 4.6 `rebalancing/` — Drift and Rebalance Planning
 
@@ -454,23 +452,23 @@ redacted audit-outbox record commit atomically.
 
 **Module flow:** target plus actual exposure → drift/classification → immutable Risk-reviewable plan.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `service.py` | Resolve drift, classify increases/reductions, and create immutable plans. | `RebalancingService` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `contracts`, `state.repository` |
-| Completed | `__init__.py` | Expose rebalance-planning API. | `RebalancingService` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `service.py` |
+| Status    | File          | Responsibility                                                            | Key exports          | Dependencies                                                                                                                |
+| --------- | ------------- | ------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Completed | `service.py`  | Resolve drift, classify increases/reductions, and create immutable plans. | `RebalancingService` | **Standard library:** `datetime`, `decimal`; **Required third-party:** None; **Local:** `contracts`, `state.repository` |
+| Completed | `__init__.py` | Expose rebalance-planning API.                                            | `RebalancingService` | **Standard library:** None; **Required third-party:** None; **Local:** `service.py`                                     |
 
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Completed | `PORTFOLIO_REBALANCE_DRIFT_THRESHOLD` | `Decimal` | None | Yes | `RebalancingService` | Explicit finite non-negative threshold |
-| Completed | `PORTFOLIO_REBALANCE_SCHEDULE` | UTC schedule | None | Yes | `RebalancingService` | Explicit schedule; no implicit cadence |
+| Status    | Setting / Limit                       | Type         | Default | Required | Used by              | Description                            |
+| --------- | ------------------------------------- | ------------ | ------- | -------- | -------------------- | -------------------------------------- |
+| Completed | `PORTFOLIO_REBALANCE_DRIFT_THRESHOLD` | `Decimal`    | None    | Yes      | `RebalancingService` | Explicit finite non-negative threshold |
+| Completed | `PORTFOLIO_REBALANCE_SCHEDULE`        | UTC schedule | None    | Yes      | `RebalancingService` | Explicit schedule; no implicit cadence |
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
-| FR-PORT-020 | Bind drift to an active allocation version and fresh actual-exposure evidence. | Drift tests |
-| FR-PORT-021 | Route every plan through Risk review before Trading submission. | Workflow tests |
-| FR-PORT-022 | Make existing over-budget correction reduce-only unless a separately authorized risk increase exists. | Safety tests |
-| FR-PORT-023 | Never open solely to match target weights. | Negative tests |
-| FR-PORT-024 | Block planning/submission on kill switch, expiry, stale evidence, or target-version change. | Fail-closed tests |
+| ID          | Requirement                                                                                           | Verification      |
+| ----------- | ----------------------------------------------------------------------------------------------------- | ----------------- |
+| FR-PORT-020 | Bind drift to an active allocation version and fresh actual-exposure evidence.                        | Drift tests       |
+| FR-PORT-021 | Route every plan through Risk review before Trading submission.                                       | Workflow tests    |
+| FR-PORT-022 | Make existing over-budget correction reduce-only unless a separately authorized risk increase exists. | Safety tests      |
+| FR-PORT-023 | Never open solely to match target weights.                                                            | Negative tests    |
+| FR-PORT-024 | Block planning/submission on kill switch, expiry, stale evidence, or target-version change.           | Fail-closed tests |
 
 V1 execution submission is reduce-only because Trading's registered receiver
 contract accepts only `action="reduce_exposure"` and `reduce_only=True`. Negative
@@ -484,18 +482,18 @@ a new approved Trading receiver contract.
 
 **Module flow:** public command → Portfolio feature APIs and receiver-owned requests → traced workflow outcome.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `workflows.py` | Implement `WF-PORT-001` through `WF-PORT-007`. | `PortfolioWorkflowService` | **Standard library:** `collections.abc`, `dataclasses`, `datetime`, `decimal`, `hashlib`, `typing`<br>**Required third-party:** None<br>**Local:** Portfolio feature APIs; Analytics, Data, Risk, Simulation, Strategy, Trading, and Utils public contracts |
-| Completed | `__init__.py` | Expose workflow coordination API. | `PortfolioWorkflowService` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `workflows.py` |
+| Status    | File           | Responsibility                                 | Key exports                | Dependencies                                                                                                                                                                                                                                                |
+| --------- | -------------- | ---------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completed | `workflows.py` | Implement `WF-PORT-001` through `WF-PORT-007`. | `PortfolioWorkflowService` | **Standard library:** `collections.abc`, `dataclasses`, `datetime`, `decimal`, `hashlib`, `typing`; **Required third-party:** None; **Local:** Portfolio feature APIs; Analytics, Data, Risk, Simulation, Strategy, Trading, and Utils public contracts |
+| Completed | `__init__.py`  | Expose workflow coordination API.              | `PortfolioWorkflowService` | **Standard library:** None; **Required third-party:** None; **Local:** `workflows.py`                                                                                                                                                                   |
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
-| FR-PORT-025 | Submit only receiver-owned Risk, Simulation, and Trading request contracts. | Contract tests |
-| FR-PORT-026 | Revalidate every mutable/expiring gate immediately before side effects. | Race tests |
-| FR-PORT-027 | Propagate request/correlation/causation IDs end to end. | Trace tests |
-| FR-PORT-028 | Emit redacted audit events for requests, decisions, activation, rollback, and submission. | Audit tests |
-| FR-PORT-029 | Never retry a potentially accepted mutation without receiver-provided idempotency semantics. | Failure tests |
+| ID          | Requirement                                                                                                                                                                                                              | Verification                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
+| FR-PORT-025 | Submit only receiver-owned Risk, Simulation, and Trading request contracts.                                                                                                                                              | Contract tests                 |
+| FR-PORT-026 | Revalidate every mutable/expiring gate immediately before side effects.                                                                                                                                                  | Race tests                     |
+| FR-PORT-027 | Propagate request/correlation/causation IDs end to end.                                                                                                                                                                  | Trace tests                    |
+| FR-PORT-028 | Emit redacted audit events for requests, decisions, activation, rollback, and submission.                                                                                                                                | Audit tests                    |
+| FR-PORT-029 | Never retry a potentially accepted mutation without receiver-provided idempotency semantics.                                                                                                                             | Failure tests                  |
 | FR-PORT-038 | After reconciled execution, request Analytics measurement from immutable Trading facts; preserve executed-but-unmeasured truth on Analytics failure and support deterministic recomputation without rewriting execution. | `SYS-WF-008` integration tests |
 
 `PortfolioWorkflowDependencies` is the only cross-domain composition bundle. It
@@ -505,23 +503,23 @@ Analytics measurement, audit persistence, and an injected UTC clock. Callables
 exchange owner-public contracts only. A potentially accepted receiver mutation is
 never called again unless its owner contract explicitly declares idempotent replay.
 
-### 4.8 `api.py` — Public Portfolio API
+### 4.8 `api/` — Public Portfolio API
 
 **Purpose:** Expose typed application operations to UI/API without HTTP concerns.
 
 **Module flow:** authenticated typed call → workflow service → structured Portfolio result/error.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Completed | `api.py` | Expose the typed Portfolio application boundary. | `PortfolioService` | **Standard library:** `collections.abc`, `datetime`, `decimal`, `typing`<br>**Required third-party:** None<br>**Local:** `orchestration.workflows`, Portfolio contracts, Risk and Utils public contracts |
-| Completed | `__init__.py` | Expose supported package API only. | `PortfolioService` and public contracts | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `api.py`, `contracts`, `exceptions.py` |
+| Status    | File           | Responsibility                                   | Key exports                             | Dependencies                                                                                                                                                                                             |
+| --------- | -------------- | ------------------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Completed | `api/service.py` | Expose the typed Portfolio application boundary. | `PortfolioService`                      | **Standard library:** `collections.abc`, `datetime`, `decimal`, `typing`; **Required third-party:** None; **Local:** `orchestration.workflows`, Portfolio contracts, Risk and Utils public contracts |
+| Completed | `__init__.py`   | Expose supported package API only.               | `PortfolioService` and public contracts | **Standard library:** None; **Required third-party:** None; **Local:** `api/service.py`, `contracts`, `exceptions.py`                                                                                      |
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
-| FR-PORT-034 | Expose construction, status, activation, drift/rebalance, rollback, and history operations. | API tests |
-| FR-PORT-035 | Accept `AuthContext` and `request_id: str \| None = None` on governed entry points. | Signature tests |
-| FR-PORT-036 | Return structured success/error envelopes; never `None` or raw exceptions. | Contract tests |
-| FR-PORT-037 | Keep authentication and presentation logic outside Portfolio. | Import review |
+| ID          | Requirement                                                                                 | Verification    |
+| ----------- | ------------------------------------------------------------------------------------------- | --------------- |
+| FR-PORT-034 | Expose construction, status, activation, drift/rebalance, rollback, and history operations. | API tests       |
+| FR-PORT-035 | Accept `AuthContext` and `request_id: str \| None = None` on governed entry points.         | Signature tests |
+| FR-PORT-036 | Return structured success/error envelopes; never `None` or raw exceptions.                  | Contract tests  |
+| FR-PORT-037 | Keep authentication and presentation logic outside Portfolio.                               | Import review   |
 
 `PortfolioService` exposes typed `construct`, `status`, `activate`, `assess_drift`,
 `submit_rebalance`, `recompute_measurement`, `rollback`, and `history` methods. Every
@@ -547,18 +545,18 @@ The concrete constructor fields are intentionally not invented here; implementat
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
-| ID | Requirement | Verification |
-| --- | --- | --- |
-| NFR-PORT-001 | Google Python Style, complete types, Google docstrings, absolute imports, and no `print`. | Ruff/mypy/review |
-| NFR-PORT-002 | Deterministic output for identical versioned inputs and explicit configuration. | Reproducibility tests |
-| NFR-PORT-003 | Fail closed on missing evidence, authorization, policy, configuration, or ownership ambiguity. | Negative tests |
-| NFR-PORT-004 | Never log secrets, raw approval tokens, credentials, or unredacted account data. | Security tests |
-| NFR-PORT-005 | Maintain at least 80% package test coverage. | Coverage report |
-| NFR-PORT-006 | No live side effect originates in Portfolio; Trading remains the sole execution authority. | Dependency/integration tests |
-| NFR-PORT-007 | All money, rates, weights, and tolerances use documented decimal/precision rules; no binary-float ambiguity at boundaries. | Numeric tests |
-| NFR-PORT-008 | All timestamps are timezone-aware UTC. | Validation tests |
-| NFR-PORT-009 | No hidden numeric defaults; every cap, threshold, tolerance, schedule, expiry, and observation minimum is required configuration. | Configuration tests |
-| NFR-PORT-010 | Package errors extend Utils canonical exceptions and map to structured Portfolio codes. | Error tests |
+| ID           | Requirement                                                                                                                       | Verification                 |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| NFR-PORT-001 | Google Python Style, complete types, Google docstrings, absolute imports, and no `print`.                                         | Ruff/mypy/review             |
+| NFR-PORT-002 | Deterministic output for identical versioned inputs and explicit configuration.                                                   | Reproducibility tests        |
+| NFR-PORT-003 | Fail closed on missing evidence, authorization, policy, configuration, or ownership ambiguity.                                    | Negative tests               |
+| NFR-PORT-004 | Never log secrets, raw approval tokens, credentials, or unredacted account data.                                                  | Security tests               |
+| NFR-PORT-005 | Maintain at least 80% package test coverage.                                                                                      | Coverage report              |
+| NFR-PORT-006 | No live side effect originates in Portfolio; Trading remains the sole execution authority.                                        | Dependency/integration tests |
+| NFR-PORT-007 | All money, rates, weights, and tolerances use documented decimal/precision rules; no binary-float ambiguity at boundaries.        | Numeric tests                |
+| NFR-PORT-008 | All timestamps are timezone-aware UTC.                                                                                            | Validation tests             |
+| NFR-PORT-009 | No hidden numeric defaults; every cap, threshold, tolerance, schedule, expiry, and observation minimum is required configuration. | Configuration tests          |
+| NFR-PORT-010 | Package errors extend Utils canonical exceptions and map to structured Portfolio codes.                                           | Error tests                  |
 
 Shared settings consumed from `docs/PROJECT.md`: `ENVIRONMENT`, `RUNTIME_PROFILE`, `EXECUTION_ROUTE`, `ALLOW_LIVE_MUTATIONS`, `DATABASE_URL / DATA_DIR`, UTC policy, and trace-ID policy. Portfolio-specific settings above remain owned here.
 
@@ -570,14 +568,14 @@ No open decisions.
 
 ### Test and usage locations
 
-| Location | Purpose |
-| --- | --- |
-| `tests/portfolio/unit/` | Package unit tests |
-| `tests/portfolio/integration/` | Package and owner-contract integration tests |
-| `tests/portfolio/usage/` | Runnable public usage examples |
-| `tests/system/integration/test_strategy_eligibility.py` | `SYS-WF-006` compatibility |
-| `tests/system/integration/test_portfolio_activation.py` | `SYS-WF-007` activation chain |
-| `tests/system/integration/test_portfolio_rebalance.py` | `SYS-WF-008` rebalance chain |
+| Location                                                | Purpose                                      |
+| ------------------------------------------------------- | -------------------------------------------- |
+| `tests/portfolio/unit/`                                 | Package unit tests                           |
+| `tests/portfolio/integration/`                          | Package and owner-contract integration tests |
+| `tests/portfolio/usage/`                                | Runnable public usage examples               |
+| `tests/system/integration/test_strategy_eligibility.py` | `SYS-WF-006` compatibility                   |
+| `tests/system/integration/test_portfolio_activation.py` | `SYS-WF-007` activation chain                |
+| `tests/system/integration/test_portfolio_rebalance.py`  | `SYS-WF-008` rebalance chain                 |
 
 ### Exact implementation test manifest
 
@@ -599,10 +597,15 @@ tests/portfolio/integration/test_construction_workflow.py
 tests/portfolio/integration/test_activation_workflow.py
 tests/portfolio/integration/test_rebalance_workflow.py
 tests/portfolio/integration/test_owner_contract_compatibility.py
-tests/portfolio/usage/test_usage_contracts.py
-tests/portfolio/usage/test_usage_construction.py
-tests/portfolio/usage/test_usage_lifecycle.py
-tests/portfolio/usage/test_usage_rebalancing.py
+tests/portfolio/usage/01_contracts.py
+tests/portfolio/usage/02_construction.py
+tests/portfolio/usage/03_rebalancing.py
+tests/portfolio/usage/04_lifecycle.py
+tests/portfolio/usage/05_evidence.py
+tests/portfolio/usage/06_state.py
+tests/portfolio/usage/07_allocation.py
+tests/portfolio/usage/08_orchestration.py
+tests/portfolio/integration/test_usage_scripts.py
 tests/system/integration/test_strategy_eligibility.py
 tests/system/integration/test_portfolio_activation.py
 tests/system/integration/test_portfolio_rebalance.py
@@ -634,17 +637,17 @@ uv run mypy app/services/portfolio
 
 ### Package completion checklist
 
-- [X] Final package structure exists and matches this README. `app/services/portfolio/__init__.py:1`
-- [X] All `FR-PORT-*` and `NFR-PORT-*` requirements have passing tests. `tests/portfolio/unit/test_api_and_quality.py:71`
-- [X] Fixed/equal/inverse-volatility output is deterministic and bounded. `tests/portfolio/unit/test_methods.py:20`
-- [X] Advanced allocation methods are absent. `tests/portfolio/unit/test_methods.py:116`
-- [X] Strategy registration and Risk eligibility remain separate. `tests/system/integration/test_strategy_eligibility.py:27`
-- [X] Risk owns approval and authoritative budgets. `app/services/portfolio/orchestration/workflows.py:426`
-- [X] Trading remains the sole execution authority. `app/services/portfolio/orchestration/workflows.py:981`
-- [X] Activation, rollback, and rebalance semantics match Sections 3–5 and `docs/PROJECT.md`. `tests/system/integration/test_portfolio_activation.py:25`
-- [X] No hidden numeric defaults or live side effects exist. `app/services/portfolio/config.py:80`
-- [X] Targeted tests, Ruff, formatting, mypy, and 80% coverage pass. `tests/portfolio/unit/test_api_and_quality.py:188`
-- [X] Service status is updated from `Missing` only when evidence supports it. `app/services/portfolio/README.md:7`
+- [x] Final package structure exists and matches this README. `app/services/portfolio/__init__.py:1`
+- [x] All `FR-PORT-*` and `NFR-PORT-*` requirements have passing tests. `tests/portfolio/unit/test_api_and_quality.py:71`
+- [x] Fixed/equal/inverse-volatility output is deterministic and bounded. `tests/portfolio/unit/test_methods.py:20`
+- [x] Advanced allocation methods are absent. `tests/portfolio/unit/test_methods.py:116`
+- [x] Strategy registration and Risk eligibility remain separate. `tests/system/integration/test_strategy_eligibility.py:27`
+- [x] Risk owns approval and authoritative budgets. `app/services/portfolio/orchestration/workflows.py:426`
+- [x] Trading remains the sole execution authority. `app/services/portfolio/orchestration/workflows.py:981`
+- [x] Activation, rollback, and rebalance semantics match Sections 3–5 and `docs/PROJECT.md`. `tests/system/integration/test_portfolio_activation.py:25`
+- [x] No hidden numeric defaults or live side effects exist. `app/services/portfolio/config.py:80`
+- [x] Targeted tests, Ruff, formatting, mypy, and 80% coverage pass. `tests/portfolio/unit/test_api_and_quality.py:188`
+- [x] Service status is updated from `Missing` only when evidence supports it. `app/services/portfolio/README.md:7`
 
 ## 8. Change Process
 
@@ -656,20 +659,19 @@ uv run mypy app/services/portfolio
 6. Breaking contracts require a new version and explicit deprecation/migration plan.
 7. New construction methods, risk semantics, live behavior, or hidden/defaulted trading limits require a new approved architecture decision before implementation.
 
-
 ---
 
 ## Appendix P — Provisional Component Requirements (roadmap-promoted)
 
 These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`) and are promoted here to authoritative status. Each `P-PORT-NNN` authorizes establishment of the named package seam under `app/services/portfolio/` — its public port, package `__init__`, and error/DTO surface — as a stable component that hosts the same-named module and its `FR-PORT-*` behavior defined in §4 (Module and Requirement Specifications). Acceptance = the named package exists with its public seam fixed, typed, logged, tested, and passing the domain quality gates. "First phase" is the delivery phase in the roadmap; the seam is defined no later than that phase and deepened behind it.
 
-| Requirement ID | Component / package | First phase | Hosts |
-|---|---|---|---|
-| `P-PORT-001` | `app/services/portfolio/contracts/` | 1 | `contracts` module + its `FR-PORT-*` behavior (§4) |
-| `P-PORT-003` | `app/services/portfolio/construction/` | 1 | `construction` module + its `FR-PORT-*` behavior (§4) |
-| `P-PORT-008` | `app/services/portfolio/api.py` | 1 | `api` module + its `FR-PORT-*` behavior (§4) |
-| `P-PORT-002` | `app/services/portfolio/evidence/` | 9 | `evidence` module + its `FR-PORT-*` behavior (§4) |
-| `P-PORT-004` | `app/services/portfolio/state/` | 9 | `state` module + its `FR-PORT-*` behavior (§4) |
-| `P-PORT-005` | `app/services/portfolio/allocation/` | 9 | `allocation` module + its `FR-PORT-*` behavior (§4) |
-| `P-PORT-006` | `app/services/portfolio/rebalancing/` | 9 | `rebalancing` module + its `FR-PORT-*` behavior (§4) |
-| `P-PORT-007` | `app/services/portfolio/orchestration/` | 9 | `orchestration` module + its `FR-PORT-*` behavior (§4) |
+| Requirement ID | Component / package                     | First phase | Hosts                                                  |
+| -------------- | --------------------------------------- | ----------- | ------------------------------------------------------ |
+| `P-PORT-001`   | `app/services/portfolio/contracts/`     | 1           | `contracts` module + its `FR-PORT-*` behavior (§4)     |
+| `P-PORT-003`   | `app/services/portfolio/construction/`  | 1           | `construction` module + its `FR-PORT-*` behavior (§4)  |
+| `P-PORT-008`   | `app/services/portfolio/api.py`         | 1           | `api` module + its `FR-PORT-*` behavior (§4)           |
+| `P-PORT-002`   | `app/services/portfolio/evidence/`      | 9           | `evidence` module + its `FR-PORT-*` behavior (§4)      |
+| `P-PORT-004`   | `app/services/portfolio/state/`         | 9           | `state` module + its `FR-PORT-*` behavior (§4)         |
+| `P-PORT-005`   | `app/services/portfolio/allocation/`    | 9           | `allocation` module + its `FR-PORT-*` behavior (§4)    |
+| `P-PORT-006`   | `app/services/portfolio/rebalancing/`   | 9           | `rebalancing` module + its `FR-PORT-*` behavior (§4)   |
+| `P-PORT-007`   | `app/services/portfolio/orchestration/` | 9           | `orchestration` module + its `FR-PORT-*` behavior (§4) |
