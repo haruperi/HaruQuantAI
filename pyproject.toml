@@ -1,6 +1,6 @@
 [project]
 name = "haruquantai"
-version = "2.2.8"
+version = "2.2.9"
 description = "Quantitative Financial Trading System"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -9,7 +9,6 @@ dependencies = [
     "ctrader-open-api>=0.9.2",
     "detect-secrets>=1.5.0",
     "fastapi>=0.115.0",
-    "loguru>=0.7.3",
     "metatrader5>=5.0.5735 ; sys_platform == 'win32'",
     "mypy>=2.1.0",
     "numba>=0.65.1",

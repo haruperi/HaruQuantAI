@@ -228,13 +228,13 @@ def test_trace_utc_compatibility_and_persistence_truth() -> None:
 
 
 def test_requirement_traceability_is_complete() -> None:
-    """Every FR is unique and every named unit/usage test exists at its path."""
+    """Every FR is unique and every documented test reference resolves."""
     logger.debug("Testing Optimization requirement traceability")
     readme = (_PACKAGE / "README.md").read_text(encoding="utf-8")
-    ids = [f"FR-OPT-{index:03d}" for index in range(1, 65)]
+    ids = [f"FR-OPT-{index:03d}" for index in range(1, 66)]
     assert all(readme.count(f"`{item}`") == 1 for item in ids)
     references = re.findall(
-        r"(tests/optimization/(?:unit|usage)/[^`()<>, ]+\.py)::"
+        r"(tests/optimization/(?:unit|usage|integration)/[^`()<>, ]+\.py)::"
         r"(test_[A-Za-z0-9_]+)",
         readme,
     )

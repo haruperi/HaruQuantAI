@@ -296,7 +296,7 @@ request or mutates Strategy state.
 
 **Integration test:**
 
-`tests/optimization/integration/test_request_packaging.py::test_request_packaging_has_no_side_effects()`
+`tests/optimization/integration/test_request_workflow.py::test_optimization_and_robustness_requests_return_typed_evidence()`
 
 ### `WF-OPT-002` — Execute a Bounded Parameter Sweep
 
@@ -339,7 +339,7 @@ request or mutates Strategy state.
 
 **Integration test:**
 
-`tests/optimization/integration/test_scoring_workflow.py::test_scoring_ranking_and_overfit_evidence()`
+`tests/optimization/integration/test_scoring_workflow.py::test_scoring_workflow_preserves_metric_and_trial_evidence()`
 
 ### `WF-OPT-004` — Run Walk-Forward Validation
 
@@ -381,7 +381,7 @@ request or mutates Strategy state.
 
 **Integration test:**
 
-`tests/optimization/integration/test_robustness.py::test_seeded_robustness_is_reproducible()`
+`tests/optimization/integration/test_robustness_workflow.py::test_robustness_workflow_is_seeded_and_availability_aware()`
 
 ### `WF-OPT-006` — Build Versioned Evidence and Handoffs
 
@@ -402,7 +402,7 @@ request or mutates Strategy state.
 
 **Integration test:**
 
-`tests/optimization/integration/test_evidence_handoff.py::test_evidence_handoff_preserves_domain_ownership()`
+`tests/optimization/integration/test_persistence_handoff_workflow.py::test_evidence_handoff_is_durable_only_after_receipt()`
 
 #### End-to-end workflow diagram
 
@@ -590,7 +590,7 @@ validated candidate + provenance → adapter compatibility checks → Simulation
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `contracts.py` | Versioned adapter, immutable execution context/request, and Analytics-bearing result contracts | `BacktestExecutionContext`, `BacktestExecutionAdapter`, `BacktestExecutionRequest`, `EngineOptimizationResult` | **Standard library:** `datetime`, `decimal`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `app.services.analytics → PerformanceReport`; `app.services.optimization.parameters → ParameterValue` |
-| Completed | `adapter.py` | Validate and invoke the injected adapter for one candidate | `execute_candidate` | **Standard library:** `time`<br>**Required third-party:** None<br>**Local:** `contracts.py → all execution contracts`; `app.services.optimization.parameters → get_executable_parameters, candidate_hash` |
+| Completed | `adapter.py` | Validate and invoke the injected adapter for one candidate | `execute_candidate`, `SimulationAnalyticsBacktestAdapter` | **Standard library:** `time`<br>**Required third-party:** None<br>**Local:** `contracts.py → all execution contracts`; `app.services.optimization.parameters → get_executable_parameters, candidate_hash`; `app.services.simulator → run_backtest, SimulationRunDependencies`; `app.services.analytics → AnalyticsRunConfig, build_performance_report` |
 | Completed | `__init__.py` | Expose the supported execution boundary | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** Explicit imports from module files |
 
 #### Configuration and Limits Manifest
@@ -605,14 +605,15 @@ validated candidate + provenance → adapter compatibility checks → Simulation
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-OPT-017` | The system shall define a versioned protocol implemented by the Simulation/Analytics boundary and accepting only an Optimization execution request. | `BacktestExecutionAdapter.execute(request: BacktestExecutionRequest) -> EngineOptimizationResult` | External API call | `OptimizationError`: Simulation cannot execute or convert the request | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_execution_contracts.py::test_adapter_protocol_contract()` |
-| Completed | `FR-OPT-018` | The system shall model one executable candidate with approved strategy reference, `MarketDataset` reference/provenance, executable parameters, seed, costs, realism, engine identity, and trace context. | `BacktestExecutionRequest(strategy_ref: str, market_data_ref: str, executable_parameters: Mapping[str, object], candidate_hash: str, seed: int, cost_model_hash: str, realism_hash: str, engine_type: str, required_adapter_version: str, request_id: str | None = None) -> BacktestExecutionRequest` | None | `pydantic.ValidationError`: required execution or provenance data is missing/invalid | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_execution_contracts.py::test_execution_request_rejects_missing_provenance()` |
-| Completed | `FR-OPT-019` | The system shall expose an optimization-facing immutable result converted from `SimulationResult` without leaking simulator internals. | `EngineOptimizationResult(candidate_hash: str, score_inputs: Mapping[str, object], trade_count: int, equity_points: tuple[Decimal, ...], processed_records: int, engine_version: str, realism_hash: str, warnings: tuple[str, ...] = ()) -> EngineOptimizationResult` | None | `pydantic.ValidationError`: result is incomplete, inconsistent, non-finite, or contains provider objects | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_execution_contracts.py::test_engine_result_rejects_inconsistent_candidate_hash()` |
+| Completed | `FR-OPT-018` | The system shall model one executable candidate with approved strategy reference, `MarketDataset` reference/provenance, executable parameters, seed, costs, realism, engine identity, and trace context. | `BacktestExecutionRequest(contract_version: Literal["v1"], schema_id: Literal["optimization.backtest_execution_request.v1"], candidate_hash: str, executable_parameters: Mapping[str, ParameterValue], seed: int, request_id: str, workflow_id: str, correlation_id: str, context: BacktestExecutionContext) -> BacktestExecutionRequest` | None | `pydantic.ValidationError`: required execution or provenance data is missing/invalid | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_execution_contracts.py::test_execution_request_rejects_missing_provenance()` |
+| Completed | `FR-OPT-019` | The system shall expose an optimization-facing immutable result converted from `SimulationResult` without leaking simulator internals. | `EngineOptimizationResult(candidate_hash: str, simulation_run_id: str, simulation_request_hash: str, analytics_report: PerformanceReport, runtime_ms: float, engine_type: str, engine_version: str) -> EngineOptimizationResult` | None | `pydantic.ValidationError`: result is incomplete, inconsistent, non-finite, or contains provider objects | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_execution_contracts.py::test_engine_result_rejects_inconsistent_candidate_hash()` |
 
 #### `adapter.py` — Candidate Execution
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-OPT-020` | The system shall validate adapter version, engine type, deterministic seed, cost/realism evidence, strategy compatibility, and required data before invoking Simulation once. | `execute_candidate(request: BacktestExecutionRequest, adapter: BacktestExecutionAdapter, *, deterministic_only: bool = True) -> EngineOptimizationResult` | External API call | `OptimizationError`: adapter mismatch, unsupported realism, invalid request, unavailable engine, symbol setup failure, or candidate execution failure | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_adapter.py::test_execute_candidate_fails_closed_on_version_mismatch()` |
+| Completed | `FR-OPT-065` | The system shall provide an Optimization-owned concrete adapter that composes the public Simulation and Analytics APIs behind the versioned execution port without leaking either domain's internals. | `SimulationAnalyticsBacktestAdapter(*, auth_context: AuthContext, simulation_dependencies: SimulationRunDependencies, analytics_config: AnalyticsRunConfig, engine_type: str, engine_version: str, simulation_runner: SimulationRunner = run_backtest)` | External API call | `OptimizationError`: Simulation or Analytics rejects the candidate | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_adapter.py::test_simulation_adapter_packages_exact_public_request()` |
 
 **Rules and implementation notes:**
 

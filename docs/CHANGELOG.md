@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.2.9
+
+**Release date:** 2026-07-26
+
+### Complete Optimization domain
+
+The Optimization domain now exposes nine focused feature modules with bounded reproducible parameter search, deterministic scoring, leakage-aware validation, robustness analysis, versioned advisory evidence, and standalone usage coverage.
+
+#### Added (9)
+
+- `FEAT-OPT-01` Parameter Space and Provenance.
+- `FEAT-OPT-02` Objectives, Ranking, and Overfit Evidence.
+- `FEAT-OPT-03` Bounded Candidate Search.
+- `FEAT-OPT-04` Simulation Execution Boundary.
+- `FEAT-OPT-05` Monte Carlo and Stress Analysis.
+- `FEAT-OPT-06` Optimization-Owned Durable State.
+- `FEAT-OPT-07` Versioned Results and Handoffs.
+- `FEAT-OPT-08` Time-Series Validation.
+- `FEAT-OPT-09` Typed Optimization Boundary.
+
 ## 2.2.8
 
 **Release date:** 2026-07-24
