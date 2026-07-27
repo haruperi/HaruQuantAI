@@ -76,7 +76,7 @@ _ENVIRONMENT_FIELDS = {
 
 
 def _load_environment_settings() -> dict[str, str]:
-    """Return supported dotenv/process values through one typed settings model.
+    """Return supported JSON/process values through one typed settings model.
 
     Returns:
         Mapping of uppercase environment key names to raw string values.

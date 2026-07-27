@@ -11,12 +11,12 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import DataQualityReport as SourceQualityReport
-from app.services.data.contracts import (
+from app.services.data import DataQualityReport as SourceQualityReport
+from app.services.data import (
     MarketDataset,
     OHLCVRecord,
 )
-from app.services.research.contracts import (
+from app.services.research import (
     CleaningConfig,
     EnrichmentConfig,
     ResearchResourceLimits,
@@ -32,7 +32,7 @@ REQUEST_ID = "req-2123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd
 
 
 def _dataset() -> MarketDataset:
-    """Build the usage dataset."""
+    """Build the bounded usage market dataset."""
     start = datetime(2026, 1, 5, tzinfo=UTC)
     records = tuple(
         OHLCVRecord(
@@ -82,49 +82,97 @@ def _dataset() -> MarketDataset:
     )
 
 
-def example_data() -> None:
-    """Demonstrate dataset preparation, cleaning, enrichment, and validation."""
-    print("=" * 80)
-    print("Research Example 2: Dataset Preparation and Cleaning")
-    print("=" * 80)
+def _limits() -> ResearchResourceLimits:
+    """Build the bounded Research resource limits."""
+    return ResearchResourceLimits(100, 10.0, 1024)
 
+
+def _cleaning_cfg() -> CleaningConfig:
+    """Build the explicit cleaning configuration."""
+    return CleaningConfig("UTC", "error", "none", "keep_warn", "error")
+
+
+def _enrichment_cfg() -> EnrichmentConfig:
+    """Build the explicit enrichment configuration."""
+    return EnrichmentConfig("TEST", True, True, False, True)
+
+
+def fr_res_027() -> None:
+    """FR-RES-027.
+
+    The system shall validate required columns, UTC/time ordering,
+    duplicates, gaps, OHLC consistency, spread quality, volume, finite
+    values, and source metadata without mutating input.
+    """
+    report = validate_dataset(_dataset(), limits=_limits())
+    print(f"FR-RES-027 fatal_issues={len(report.fatal_issues)}")
+
+
+def fr_res_028() -> None:
+    """FR-RES-028.
+
+    The system shall clean a copy using only explicit approved strategies
+    and record every action and unresolved warning.
+    """
     dataset = _dataset()
-    cleaning_cfg = CleaningConfig("UTC", "error", "none", "keep_warn", "error")
-    enrichment_cfg = EnrichmentConfig("TEST", True, True, False, True)
-    limits = ResearchResourceLimits(100, 10.0, 1024)
-
-    # 1. Validate dataset
+    limits = _limits()
     validation_report = validate_dataset(dataset, limits=limits)
-    print(f"Validation report fatal issues: {len(validation_report.fatal_issues)}")
-
-    # 2. Clean dataset
-    df_clean, clean_report = clean_dataset(
+    df_clean, _ = clean_dataset(
         dataset,
-        config=cleaning_cfg,
+        config=_cleaning_cfg(),
         report=validation_report,
         limits=limits,
     )
-    print(
-        f"Cleaned DataFrame rows: {len(df_clean)}, "
-        f"clean report fatal issues: {len(clean_report.fatal_issues)}"
-    )
+    print(f"FR-RES-028 cleaned_rows={len(df_clean)}")
 
-    # 3. Enrich dataset
+
+def fr_res_029() -> None:
+    """FR-RES-029.
+
+    The system shall enrich a copy with selected pip/geometry/return-label/
+    calendar fields, label forward fields as research-only, and preserve row
+    alignment; session tagging is a later seasonality/ operation.
+    """
+    dataset = _dataset()
+    limits = _limits()
+    validation_report = validate_dataset(dataset, limits=limits)
+    df_clean, clean_report = clean_dataset(
+        dataset,
+        config=_cleaning_cfg(),
+        report=validation_report,
+        limits=limits,
+    )
     df_enriched, _ = enrich_dataset(
-        df_clean, config=enrichment_cfg, report=clean_report
+        df_clean, config=_enrichment_cfg(), report=clean_report
     )
-    print(f"Enriched DataFrame columns: {list(df_enriched.columns)}")
+    print(f"FR-RES-029 enriched_columns={list(df_enriched.columns)}")
 
-    # 4. Full pipeline preparation
+
+def fr_res_030() -> None:
+    """FR-RES-030.
+
+    The system shall execute validate -> clean -> revalidate -> enrich
+    deterministically and return hashes, provenance, and quality evidence,
+    never fetching provider data.
+    """
     prepared = prepare_research_dataset(
-        dataset, cleaning=cleaning_cfg, enrichment=enrichment_cfg, limits=limits
+        _dataset(),
+        cleaning=_cleaning_cfg(),
+        enrichment=_enrichment_cfg(),
+        limits=_limits(),
     )
-    print(f"PreparedDataset record count: {len(prepared.data)}")
+    print(f"FR-RES-030 prepared_rows={len(prepared.data)}")
 
 
 def main() -> None:
-    """Run Research data usage example."""
-    example_data()
+    """Run every Research data requirement demonstration in order."""
+    print("=" * 80)
+    print("Research Example 2: Dataset Preparation and Cleaning")
+    print("=" * 80)
+    fr_res_027()
+    fr_res_028()
+    fr_res_029()
+    fr_res_030()
 
 
 if __name__ == "__main__":

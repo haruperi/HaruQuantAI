@@ -5,7 +5,10 @@ from decimal import Decimal
 
 import pytest
 from app.services.data import (
+    EconomicEvent,
+    EventImpact,
     MarketContextEvidence,
+    populate_market_context_calendar,
 )
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -189,6 +192,29 @@ def test_market_context_applies_missing_modes_units_and_availability() -> None:
     blocked_results = evaluate_market_context(blocked, config, now=NOW)
     assert blocked_results[1].status is LimitStatus.BLOCKED
     assert blocked_results[2].status is LimitStatus.BLOCKED
+
+
+def test_calendar_limit_consumes_data_derived_event_and_open_evidence() -> None:
+    """Risk blocks a Data-derived window and passes an authoritative empty query."""
+    event = EconomicEvent(
+        id="provider-event-1",
+        provider="demo",
+        name="CPI",
+        category="inflation",
+        country="US",
+        currency="USD",
+        scheduled_at=NOW + timedelta(minutes=5),
+        impact=EventImpact.HIGH,
+    )
+    blocked_evidence = populate_market_context_calendar(_market(), events=[event])
+    blocked = evaluate_market_context(blocked_evidence, _config(), now=NOW)
+    assert blocked[2].limit_id == "calendar"
+    assert blocked[2].status is LimitStatus.BLOCKED
+
+    open_evidence = populate_market_context_calendar(_market(), events=[])
+    opened = evaluate_market_context(open_evidence, _config(), now=NOW)
+    assert open_evidence.calendar_state == "open"
+    assert opened[2].status is LimitStatus.PASS
 
 
 def test_portfolio_limits_require_freshness_configuration() -> None:

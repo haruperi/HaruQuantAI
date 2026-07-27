@@ -67,7 +67,7 @@ class PortfolioSettings(AppSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_file=AppSettings.model_config.get("env_file"),
+        json_file=AppSettings.model_config.get("json_file"),
         env_file_encoding="utf-8",
         env_ignore_empty=True,
         case_sensitive=False,

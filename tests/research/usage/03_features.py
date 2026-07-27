@@ -1,7 +1,7 @@
 """Executable Research features usage example.
 
-Demonstrates log returns, simple returns, Hurst exponent estimation, forward
-returns, and excursion features.
+Demonstrates log/simple returns, Hurst estimation, forward returns,
+excursions, and canonical feature-frame assembly.
 """
 
 import sys
@@ -13,7 +13,14 @@ import pandas as pd
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.services.research import (
+    DataQualityReport,
+    FeatureConfig,
+    PreparedDataset,
+    ResearchResourceLimits,
+)
 from app.services.research.features import (
+    build_research_feature_frame,
     forward_max_adverse_excursion,
     forward_max_favorable_excursion,
     forward_returns,
@@ -25,7 +32,12 @@ from app.services.research.features import (
 
 
 def _prices() -> pd.Series:
-    """Build positive UTC-indexed prices."""
+    """Build positive UTC-indexed close prices.
+
+    Returns:
+        Series of 40 linearly-spaced floats from 100 to 130 on an hourly
+        UTC index.
+    """
     return pd.Series(
         np.linspace(100.0, 130.0, 40),
         index=pd.date_range("2026-01-01", periods=40, freq="h", tz="UTC"),
@@ -33,7 +45,11 @@ def _prices() -> pd.Series:
 
 
 def _frame() -> pd.DataFrame:
-    """Build OHLCV frame."""
+    """Build a bounded OHLCV frame.
+
+    Returns:
+        OHLCV DataFrame built from :func:`_prices`.
+    """
     close = _prices()
     return pd.DataFrame(
         {
@@ -42,51 +58,126 @@ def _frame() -> pd.DataFrame:
             "low": close - 1,
             "close": close,
             "volume": 100.0,
-            "spread": 0.1,
         }
     )
 
 
-def example_features() -> None:
-    """Demonstrate research feature calculations."""
-    print("=" * 80)
-    print("Research Example 3: Feature Calculations and Excursions")
-    print("=" * 80)
+def fr_res_031() -> None:
+    """FR-RES-031.
 
-    prices = _prices()
-    frame = _frame()
+    Compute one-period log returns without mutating input and preserve index
+    alignment.
+    """
+    result = log_returns(_prices())
+    print(f"FR-RES-031 log_return_rows={len(result)}")
 
-    # 1. Returns calculation
-    l_returns = log_returns(prices)
-    s_returns = simple_returns(prices)
+
+def fr_res_032() -> None:
+    """FR-RES-032.
+
+    Compute arithmetic returns without mutating input and preserve index
+    alignment.
+    """
+    result = simple_returns(_prices())
+    print(f"FR-RES-032 simple_return_rows={len(result)}")
+
+
+def fr_res_033() -> None:
+    """FR-RES-033.
+
+    Estimate Hurst exponent with explicit minimum sample and finite-value
+    validation.
+    """
+    estimate = hurst_exponent(_prices(), minimum_samples=20)
+    print(f"FR-RES-033 hurst={estimate:.4f}")
+
+
+def fr_res_034() -> None:
+    """FR-RES-034.
+
+    Compute rolling Hurst values with documented warm-up NaNs and stable
+    alignment.
+    """
+    rolling = rolling_hurst(_prices(), window=20, minimum_samples=20)
+    print(f"FR-RES-034 rolling_hurst_valid={int(rolling.notna().sum())}")
+
+
+def fr_res_035() -> None:
+    """FR-RES-035.
+
+    Compute one canonical horizon-aligned forward return in log or simple
+    mode and mark it research-only.
+    """
+    forward = forward_returns(_prices(), horizon=2, mode="log", output_label="f2")
     print(
-        f"Log returns count: {len(l_returns)}, Simple returns count: {len(s_returns)}"
+        f"FR-RES-035 label={forward.name} "
+        f"research_only={forward.attrs['research_only']}"
     )
 
-    # 2. Hurst exponent
-    h_exp = hurst_exponent(prices, minimum_samples=20)
-    print(f"Hurst exponent: {h_exp:.4f}")
 
-    r_h = rolling_hurst(prices, window=20, minimum_samples=20)
-    print(f"Rolling Hurst non-NaN values count: {r_h.notna().sum()}")
+def fr_res_036() -> None:
+    """FR-RES-036.
 
-    # 3. Forward returns
-    f_ret = forward_returns(prices, horizon=2, mode="log", output_label="f2")
-    print(
-        f"Forward returns output label: {f_ret.name}, "
-        f"research_only attr: {f_ret.attrs['research_only']}"
+    Compute forward maximum favorable excursion for declared side/horizon
+    with trailing unavailability explicit.
+    """
+    mfe = forward_max_favorable_excursion(_frame(), horizon=2, side="buy")
+    print(f"FR-RES-036 mfe_valid={int(mfe.notna().sum())}")
+
+
+def fr_res_037() -> None:
+    """FR-RES-037.
+
+    Compute forward maximum adverse excursion for declared side/horizon with
+    trailing unavailability explicit.
+    """
+    mae = forward_max_adverse_excursion(_frame(), horizon=2, side="buy")
+    print(f"FR-RES-037 mae_valid={int(mae.notna().sum())}")
+
+
+def fr_res_038() -> None:
+    """FR-RES-038.
+
+    Build a new feature frame with declared lineage, warm-up/NaN behavior,
+    caller-supplied public IndicatorResult v1 inputs, research-only forward
+    columns, and no input mutation.
+    """
+    quality = DataQualityReport((), (), ("schema",), ())
+    prepared = PreparedDataset(
+        data=_frame(),
+        schema_version="v1",
+        quality=quality,
+        dataset_hash="e" * 64,
+        configuration_hash="e" * 64,
+        source_references=("fixture",),
     )
-
-    # 4. Excursions
-    mfe = forward_max_favorable_excursion(frame, horizon=2, side="buy")
-    mae = forward_max_adverse_excursion(frame, horizon=2, side="buy")
-    print(f"Max Favorable Excursion (MFE) valid count: {mfe.notna().sum()}")
-    print(f"Max Adverse Excursion (MAE) valid count: {mae.notna().sum()}")
+    features = FeatureConfig(
+        {"sma": 2},
+        (1,),
+        # Forward column must match the generated "forward_return_{horizon}".
+        ("forward_return_1",),
+        "preserve",
+    )
+    limits = ResearchResourceLimits(100, 10.0, 1024)
+    frame, _metadata = build_research_feature_frame(
+        prepared, indicator_results={}, config=features, limits=limits
+    )
+    print(f"FR-RES-038 feature_columns={len(frame.columns)}")
 
 
 def main() -> None:
-    """Run Research features usage example."""
-    example_features()
+    """Run every Research feature requirement demonstration in order."""
+    print("=" * 80)
+    print("Research Example 3: Feature Calculations and Excursions")
+    print("=" * 80)
+    fr_res_031()
+    fr_res_032()
+    fr_res_033()
+    fr_res_034()
+    fr_res_035()
+    fr_res_036()
+    fr_res_037()
+    fr_res_038()
 
 
 if __name__ == "__main__":

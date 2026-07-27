@@ -1,0 +1,153 @@
+"""Executable Research market-structure usage example.
+
+Demonstrates profile, quality, validation, calibration, and strategy fit.
+"""
+
+import sys
+from pathlib import Path
+
+import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
+from app.services.research import (
+    DataQualityReport,
+    MarketStructureConfig,
+    MarketStructureProfile,
+    PreparedDataset,
+    ResearchResourceLimits,
+)
+from app.services.research.market_structure import (
+    build_market_structure_profile,
+    build_strategy_fit,
+    build_validation_summary,
+    calibrate_market_structure,
+    evaluate_market_structure_quality,
+    label_realized_market_behavior,
+)
+
+_HASH = "e" * 64
+
+
+def _prepared() -> PreparedDataset:
+    """Build a PreparedDataset with trending OHLCVS data."""
+    idx = pd.date_range("2026-01-05", periods=30, freq="h", tz="UTC")
+    close = pd.Series([100.0 + i * 0.5 for i in range(30)], index=idx, dtype="float64")
+    frame = pd.DataFrame(
+        {
+            "open": close,
+            "high": close + 1,
+            "low": close - 1,
+            "close": close,
+            "volume": 100.0,
+            "spread": 0.1,
+        },
+        index=idx,
+    )
+    return PreparedDataset(
+        frame,
+        "v1",
+        DataQualityReport((), (), ("schema",), ()),
+        _HASH,
+        _HASH,
+        ("fixture",),
+    )
+
+
+def _config() -> MarketStructureConfig:
+    """Build market-structure settings."""
+    return MarketStructureConfig(
+        {
+            "swing_window": 5,
+            "atr_period": 14,
+            "trend_threshold": 0.5,
+            "range_threshold": 0.2,
+            "calibration_grid": [{"trend_threshold": 0.4}],
+        },
+        True,
+        (10, 20),
+        128,
+        5,
+    )
+
+
+def _limits() -> ResearchResourceLimits:
+    """Build approved resource ceilings."""
+    return ResearchResourceLimits(500_000, 600.0, 52_428_800)
+
+
+def fr_res_075() -> None:
+    """FR-RES-075: Build swings, directional legs, score, verdict, and fit."""
+    print("=" * 80)
+    print("Research Example 9: Market-Structure Profile")
+    print("=" * 80)
+    profile = build_market_structure_profile(
+        _prepared(), config=_config(), limits=_limits()
+    )
+    print(f"FR-RES-075 verdict={profile.verdict} score={profile.score}")
+
+
+def fr_res_076() -> None:
+    """FR-RES-076: Run bounded temporal stability and parameter robustness."""
+    report = evaluate_market_structure_quality(
+        _prepared(), config=_config(), limits=_limits()
+    )
+    windows = report.stability.get("windows", [])
+    print(f"FR-RES-076 stability_windows={len(windows)}")
+
+
+def fr_res_077() -> None:
+    """FR-RES-077: Label later bars as trend/reversion/mixed."""
+    result = label_realized_market_behavior(
+        _prepared().data, symbol="TEST", timeframe="1h", config=_config()
+    )
+    print(f"FR-RES-077 verdict={result['verdict']}")
+
+
+def fr_res_078() -> None:
+    """FR-RES-078: Return concise observation/uncertainty/readiness summary."""
+    summary = build_validation_summary(
+        [{"verdict": "trend", "symbol": "TEST", "confidence": 0.9}]
+    )
+    print(f"FR-RES-078 total_rows={summary['total_rows']}")
+
+
+def fr_res_079() -> None:
+    """FR-RES-079: Rank calibration candidates by canonical score."""
+    result = calibrate_market_structure(
+        run_rows=[
+            {"efficiency_ratio": 0.6, "verdict": "trend", "symbol": "TEST"},
+        ],
+        validation_rows=[{"symbol": "TEST", "verdict": "trend"}],
+        config=_config(),
+        limits=_limits(),
+    )
+    print(f"FR-RES-079 candidates={result['candidate_count']}")
+
+
+def fr_res_080() -> None:
+    """FR-RES-080: Rank advisory strategy archetypes from profile evidence."""
+    profile = MarketStructureProfile(
+        "v1",
+        {"swing_window": 5},
+        75.0,
+        "trending",
+        {"primary_archetype": "trend_follow", "advisory_only": True},
+        (),
+    )
+    fit = build_strategy_fit(profile)
+    print(f"FR-RES-080 archetype={fit['primary_archetype']}")
+
+
+def main() -> None:
+    """Run Research market-structure usage example."""
+    fr_res_075()
+    fr_res_076()
+    fr_res_077()
+    fr_res_078()
+    fr_res_079()
+    fr_res_080()
+
+
+if __name__ == "__main__":
+    main()

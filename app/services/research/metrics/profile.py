@@ -5,7 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, cast
 
 from app.services.research.contracts import CoreMetricProfile, ResearchWarning
-from app.services.research.metrics.registry import MetricContext
+from app.services.research.metrics.registry import (
+    MetricContext,
+    build_default_registry,
+)
 from app.utils import ValidationError, logger
 
 if TYPE_CHECKING:
@@ -20,7 +23,7 @@ type JSONValue = (
 def build_core_metric_profile(
     prepared: PreparedDataset,
     *,
-    registry: MetricRegistry,
+    registry: MetricRegistry | None = None,
     limits: ResearchResourceLimits,
 ) -> CoreMetricProfile:
     """Execute a registry and assemble complete seven-family evidence.
@@ -37,6 +40,8 @@ def build_core_metric_profile(
         ValidationError: If resources or family membership are invalid.
     """
     logger.info("Building Research core metric profile")
+    if registry is None:
+        registry = build_default_registry()
     if len(prepared.data) > limits.max_rows:
         raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     metrics: dict[str, JSONValue] = {}

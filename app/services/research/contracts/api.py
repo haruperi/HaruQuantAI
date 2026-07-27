@@ -12,6 +12,7 @@ logger.debug("Defining implemented Research contract API classifications")
 PUBLIC_API_CLASSIFICATIONS: MappingProxyType[str, Literal["stable"]] = MappingProxyType(
     dict.fromkeys(
         (
+            "PUBLIC_API_CLASSIFICATIONS",
             "ArtifactReference",
             "ArtifactWriteConfig",
             "CleaningConfig",
@@ -37,6 +38,7 @@ PUBLIC_API_CLASSIFICATIONS: MappingProxyType[str, Literal["stable"]] = MappingPr
             "TimeSplitResult",
             "UnsupervisedResearchConfig",
             "UnsupervisedResearchResult",
+            "run_edge_lab_profile",
         ),
         "stable",
     )

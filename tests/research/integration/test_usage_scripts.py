@@ -13,6 +13,12 @@ _USAGE_SCRIPTS = (
     "04_leakage.py",
     "05_metrics.py",
     "06_statistics.py",
+    "07_studies.py",
+    "08_seasonality.py",
+    "09_market_structure.py",
+    "10_modeling.py",
+    "11_profiles.py",
+    "12_artifacts.py",
 )
 
 

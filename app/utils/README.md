@@ -27,7 +27,7 @@ It makes no trading or domain decision.
 - UTC clocks, timestamps, and freshness calculations.
 - Deterministic canonical JSON serialization.
 - Denylist-first secret redaction.
-- Immutable runtime settings and the sole repository `.env` loading boundary.
+- Immutable runtime settings and the sole repository `app/configs/env.json` loading boundary.
 - Import-safe structured logging with immutable bound context, a lazy approved
   default profile, and explicit override support for specialized routing.
 
@@ -207,7 +207,7 @@ one directly with Python.
 
 ### `WF-UTL-002` — Shared Settings Bootstrap
 
-1. `AppSettings` loads the repository `.env` and process overrides at the shared
+1. `AppSettings` loads the repository `app/configs/env.json` and process overrides at the shared
    Utils boundary; callers may supply explicit values without parsing files.
 2. The loader validates supported deployment and runtime settings.
 3. The loader returns an immutable settings object without mutating caller input.
@@ -371,7 +371,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 ### 4.7 `settings/` — Runtime Settings
 
 **Purpose:** Define immutable generic runtime/logging settings and provide the sole
-repository `.env` loading base for typed domain settings.
+repository `app/configs/env.json` loading base for typed domain settings.
 
 **Module flow:** `explicit values + environment → strict validation → immutable RuntimeSettings`
 
@@ -379,7 +379,7 @@ repository `.env` loading base for typed domain settings.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `models.py` | Define the immutable central `.env` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings`; module-level, not re-exported through `__init__.py`: `LogLevel`, `LogRender`, `LogCompression`, `Environment`, `RuntimeProfile` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
+| Completed | `models.py` | Define the immutable central `app/configs/env.json` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings`; module-level, not re-exported through `__init__.py`: `LogLevel`, `LogRender`, `LogCompression`, `Environment`, `RuntimeProfile` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
 | Completed | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping. | `load_settings` | **Standard library:** `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError` |
 | Completed | `__init__.py` | Expose the supported settings API. | Settings models and loader functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
 
@@ -387,8 +387,8 @@ repository `.env` loading base for typed domain settings.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-UTL-022` | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | `.env`/environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_022_construct_configuration()`<br>**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()` |
-| Completed | `FR-UTL-023` | Load explicit values and centralized `.env`/process settings in documented precedence order only when called. | `AppSettings`, `load_settings` | Settings read | `ConfigurationError`: unsupported or invalid runtime value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_023_load_active_configuration()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
+| Completed | `FR-UTL-022` | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | `app/configs/env.json`/environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_022_construct_configuration()`<br>**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()` |
+| Completed | `FR-UTL-023` | Load explicit values and centralized `app/configs/env.json`/process settings in documented precedence order only when called. | `AppSettings`, `load_settings` | Settings read | `ConfigurationError`: unsupported or invalid runtime value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_023_load_active_configuration()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
 | Completed | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_024_environment_constraints()`, `fr_utils_024_validate_settings()`<br>**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()` |
 
 ### 4.8 `logging/` — Structured Logging
@@ -465,7 +465,7 @@ capabilities beyond the Section 4 exports.
     4,096 characters, mapping depth is 16, and aggregate items are 1,000.
   - `load_settings(explicit_values=None, environment=None) -> RuntimeSettings`.
     Precedence is explicit values, then the supplied mapping (or centralized
-    `AppSettings` `.env`/process values when omitted), then documented defaults. Input keys are
+    `AppSettings` `app/configs/env.json`/process values when omitted), then documented defaults. Input keys are
     the exact uppercase setting names; unknown keys are rejected.
   - `normalize_error_code(code) -> str`, `get_error_metadata(code) ->
     ErrorMetadata`, and `route_error_event(exception, sink) -> dict[str, str]`.
@@ -612,7 +612,7 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
 ### Definition of done
 
 - [X] The final package tree exists exactly as specified. `app/utils/__init__.py:1`
-- [X] Public exports contain only the retained shared surface; dotenv parsing and
+- [X] Public exports contain only the retained shared surface; environment-file parsing and
   named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:90`
 - [X] Shared capabilities have documented consumers and secret redaction remains bounded to Utils. `app/utils/README.md:80`
 - [X] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:94`

@@ -1,7 +1,7 @@
 """Executable Research leakage usage example.
 
-Demonstrates lookahead feature validation, chronological time splitting, and
-research artifact masking.
+Demonstrates lookahead validation, chronological splitting, and artifact
+masking.
 """
 
 import sys
@@ -19,13 +19,13 @@ from app.services.research.leakage import (
 )
 
 
-def example_leakage() -> None:
-    """Demonstrate research leakage controls."""
-    print("=" * 80)
-    print("Research Example 4: Leakage Controls and Artifact Masking")
-    print("=" * 80)
+def fr_res_039() -> None:
+    """FR-RES-039.
 
-    # 1. Validate lookahead features
+    Inspect feature metadata, names, targets, horizons, and declarations and
+    return evidence/severity/recommendation without claiming proof of no
+    leakage.
+    """
     frame = pd.DataFrame({"feature": [1.0], "forward_1": [0.1]})
     report = validate_no_lookahead_features(
         frame,
@@ -36,30 +36,44 @@ def example_leakage() -> None:
         target_column="forward_1",
         allowed_forward_columns=("forward_1",),
     )
-    print(f"Lookahead validation severity: {report.severity}")
+    print(f"FR-RES-039 severity={report.severity}")
 
-    # 2. Time-series splitting
+
+def fr_res_040() -> None:
+    """FR-RES-040.
+
+    Split chronologically into non-overlapping train/validation/test frames
+    with deterministic boundaries and split hash.
+    """
     ts_frame = pd.DataFrame(
         {"value": range(20)},
         index=pd.date_range("2026-01-01", periods=20, freq="h", tz="UTC"),
     )
-    split_result = enforce_time_split(
-        ts_frame, train_fraction=0.5, validation_fraction=0.2
-    )
+    split = enforce_time_split(ts_frame, train_fraction=0.5, validation_fraction=0.2)
     print(
-        f"Train rows: {len(split_result.train)}, "
-        f"Val rows: {len(split_result.validation)}, "
-        f"Test rows: {len(split_result.test)}"
+        f"FR-RES-040 train={len(split.train)} "
+        f"val={len(split.validation)} test={len(split.test)}"
     )
 
-    # 3. Artifact masking
-    masked = mask_research_artifact({"password": "secret"})
-    print(f"Masked secret value: {masked['password']}")
+
+def fr_res_041() -> None:
+    """FR-RES-041.
+
+    Recursively mask sensitive, broker/account, and forbidden forward fields
+    before sharing or serialization without mutating input.
+    """
+    masked = mask_research_artifact({"password": "secret", "data": {"api_key": "abc"}})
+    print(f"FR-RES-041 masked_password={masked['password']}")
 
 
 def main() -> None:
-    """Run Research leakage usage example."""
-    example_leakage()
+    """Run every Research leakage requirement demonstration in order."""
+    print("=" * 80)
+    print("Research Example 4: Leakage Controls and Artifact Masking")
+    print("=" * 80)
+    fr_res_039()
+    fr_res_040()
+    fr_res_041()
 
 
 if __name__ == "__main__":

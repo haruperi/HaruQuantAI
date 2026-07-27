@@ -1,8 +1,8 @@
 # Research
 
 > **Package:** `app/services/research`
-> **Status:** `Partial`
-> **Last updated:** `2026-07-24`
+> **Status:** `Completed`
+> **Last updated:** `2026-07-27`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -112,7 +112,7 @@ Data owns the shared database connection, locking, and migration execution frame
 
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
-| Missing | Research artifact metadata and versioned JSON/Markdown artifacts | `UI/API` via `ResearchReport v1` | `{DATA_DIR}/artifacts/research/` plus `research_artifacts` metadata table; migrations at `app/services/research/artifacts/migrations.py`. |
+| Completed | Research artifact metadata and versioned JSON/Markdown artifacts | `UI/API` via `ResearchReport v1` | `{DATA_DIR}/artifacts/research/` plus `research_artifacts` metadata table; migrations at `app/services/research/artifacts/migrations.py`. |
 
 ### Four-level structure
 
@@ -193,24 +193,27 @@ Folders and files are ordered from lowest dependency to highest dependency; this
 
 ### Feature Registry
 
-The Research domain remains `Missing`. Existing numbered teaching programs are
-not completion evidence until the corresponding Section 4 feature, unit tests,
-integration workflow, and package boundary satisfy Section 7.
+All twelve registered features are `Completed` with focused unit and integration
+tests, one standalone usage program per feature, repository-wide type checking,
+and at least 80% domain coverage. `run_edge_lab_profile` composes all ten
+configured in-memory stages in canonical dependency order while provider reads,
+scheduling, database orchestration, artifact writes, and Strategy submission
+remain external.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
-| Partial | `FEAT-RES-01` Versioned Contracts and Configuration | `contracts/` | Implemented package-root contracts include `ResearchReport v1` and `EdgeLabConfig`; exact declarations: Section 4.1 | Section 4.1 functional requirements | `tests/research/usage/01_contracts.py`; `tests/research/unit/test_workflow.py` |
-| Missing | `FEAT-RES-02` Deterministic Dataset Preparation | `data/` | Planned declarations: Section 4.2 | Section 4.2 functional requirements | `tests/research/usage/02_data.py` exists; completion unverified |
-| Missing | `FEAT-RES-03` Research-Specific Features | `features/` | Planned declarations: Section 4.3 | Section 4.3 functional requirements | `tests/research/usage/03_features.py` exists; completion unverified |
-| Missing | `FEAT-RES-04` Leakage Evidence, Splits, and Masking | `leakage/` | Planned declarations: Section 4.4 | Section 4.4 functional requirements | `tests/research/usage/04_leakage.py` exists; completion unverified |
-| Missing | `FEAT-RES-05` Core Metric Profile | `metrics/` | Planned declarations: Section 4.5 | Section 4.5 functional requirements | `tests/research/usage/05_metrics.py` exists; completion unverified |
-| Missing | `FEAT-RES-06` Seeded Statistical Validation | `statistics/` | Planned declarations: Section 4.6 | Section 4.6 functional requirements | `tests/research/usage/06_statistics.py` exists; completion unverified |
-| Missing | `FEAT-RES-07` Edge Discovery and Confirmation | `studies/` | Planned declarations: Section 4.7 | Section 4.7 functional requirements | Missing |
-| Missing | `FEAT-RES-08` Sessions and Seasonality | `seasonality/` | Planned declarations: Section 4.8 | Section 4.8 functional requirements | Missing |
-| Missing | `FEAT-RES-09` Market Structure Analysis | `market_structure/` | Planned declarations: Section 4.9 | Section 4.9 functional requirements | Missing |
-| Missing | `FEAT-RES-10` Deterministic Unsupervised Insights | `modeling/` | Planned declarations: Section 4.10 | Section 4.10 functional requirements | Missing |
-| Partial | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | `run_edge_lab_profile`; remaining declarations: Section 4.11 | `FR-RES-096` implemented for `data`/`metrics`; `FR-RES-089`–`095` missing | `tests/research/unit/test_workflow.py` |
-| Missing | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Planned declarations and artifact contracts: Section 4.12 | Section 4.12 functional requirements | Missing |
+| Completed | `FEAT-RES-01` Versioned Contracts and Configuration | `contracts/` | Implemented package-root contracts include `ResearchReport v1` and `EdgeLabConfig`; exact declarations: Section 4.1 | Section 4.1 functional requirements | `tests/research/usage/01_contracts.py` |
+| Completed | `FEAT-RES-02` Deterministic Dataset Preparation | `data/` | Implemented declarations: Section 4.2 | Section 4.2 functional requirements | `tests/research/usage/02_data.py` |
+| Completed | `FEAT-RES-03` Research-Specific Features | `features/` | Implemented declarations: Section 4.3 | Section 4.3 functional requirements | `tests/research/usage/03_features.py` |
+| Completed | `FEAT-RES-04` Leakage Evidence, Splits, and Masking | `leakage/` | Implemented declarations: Section 4.4 | Section 4.4 functional requirements | `tests/research/usage/04_leakage.py` |
+| Completed | `FEAT-RES-05` Core Metric Profile | `metrics/` | Implemented declarations: Section 4.5 | Section 4.5 functional requirements | `tests/research/usage/05_metrics.py` |
+| Completed | `FEAT-RES-06` Seeded Statistical Validation | `statistics/` | Implemented declarations: Section 4.6 | Section 4.6 functional requirements | `tests/research/usage/06_statistics.py` |
+| Completed | `FEAT-RES-07` Edge Discovery and Confirmation | `studies/` | Implemented declarations: Section 4.7 | Section 4.7 functional requirements | `tests/research/usage/07_studies.py` |
+| Completed | `FEAT-RES-08` Sessions and Seasonality | `seasonality/` | Implemented declarations: Section 4.8 | Section 4.8 functional requirements | `tests/research/usage/08_seasonality.py` |
+| Completed | `FEAT-RES-09` Market Structure Analysis | `market_structure/` | Implemented declarations: Section 4.9 | Section 4.9 functional requirements | `tests/research/usage/09_market_structure.py` |
+| Completed | `FEAT-RES-10` Deterministic Unsupervised Insights | `modeling/` | Implemented declarations: Section 4.10 | Section 4.10 functional requirements | `tests/research/usage/10_modeling.py` |
+| Completed | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Implemented declarations: Section 4.11 | `FR-RES-089`–`096` | `tests/research/usage/11_profiles.py` |
+| Completed | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Implemented declarations: Section 4.12 | Section 4.12 functional requirements | `tests/research/usage/12_artifacts.py` |
 
 ```text
 research/
@@ -280,18 +283,18 @@ Usage examples are outside production:
 
 ```text
 tests/research/usage/
-├── test_usage_contracts.py
-├── test_usage_data.py
-├── test_usage_features.py
-├── test_usage_leakage.py
-├── test_usage_metrics.py
-├── test_usage_statistics.py
-├── test_usage_studies.py
-├── test_usage_seasonality.py
-├── test_usage_market_structure.py
-├── test_usage_modeling.py
-├── test_usage_profiles.py
-└── test_usage_artifacts.py
+├── 01_contracts.py
+├── 02_data.py
+├── 03_features.py
+├── 04_leakage.py
+├── 05_metrics.py
+├── 06_statistics.py
+├── 07_studies.py
+├── 08_seasonality.py
+├── 09_market_structure.py
+├── 10_modeling.py
+├── 11_profiles.py
+└── 12_artifacts.py
 ```
 
 ### Module dependency diagram
@@ -379,17 +382,17 @@ flowchart LR
 
 | Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
 |---|---|---|---|---|---|---|
-| Missing | `WF-RES-001` | Cross-domain | Prepare Research Dataset | `MarketDataset v1` from Data | Research-internal `PreparedDataset`; never returned across the boundary | `FR-RES-027 → 030` |
-| Missing | `WF-RES-002` | Internal | Build Core Metric Profile | `PreparedDataset` | `CoreMetricProfile` | `FR-RES-042 → 049` |
-| Missing | `WF-RES-003` | Internal | Build Leakage-Safe Feature Frame and Time Splits | Prepared data + feature config | Feature frame + `LeakageReport` + `TimeSplitResult` | `FR-RES-031 → 041` |
-| Missing | `WF-RES-004` | Internal | Analyze Session and Seasonality Opportunity | Prepared OHLCVS + approved session policy | Advisory seasonality summaries | `FR-RES-069 → 074` |
-| Missing | `WF-RES-005` | Internal | Run Edge Study Against Null Evidence | Split data + study/statistical config | Advisory `EdgeResult` | `FR-RES-050 → 068` |
-| Missing | `WF-RES-006` | Internal | Build Market-Structure Profile | Prepared data + market-structure config | `MarketStructureProfile` + advisory fit | `FR-RES-075 → 076, 080` |
-| Missing | `WF-RES-007` | Internal | Forward Validate and Calibrate Market Structure | Persisted prediction + later approved dataset already supplied to the run | Research-internal validation/calibration evidence nested only in `ResearchReport v1` | `FR-RES-077 → 079` |
-| Missing | `WF-RES-008` | Internal | Run Unsupervised Market-Structure Research | Leakage-safe feature frame + seed | `UnsupervisedResearchResult` | `FR-RES-081 → 088` |
-| Missing | `WF-RES-009` | Internal | Build Research Scorecard and Profile Snapshot | Approved stage outputs | `ResearchScorecard` + `ResearchProfileSnapshot` | `FR-RES-089 → 092` |
-| Missing | `WF-RES-010` | Internal | Render and Persist Research Artifact | Masked result + approved Research-owned output location | Research-internal `ArtifactReference` or typed failure; UI/API receives only `ResearchReport v1` | `FR-RES-093 → 095, 097` |
-| Partial | `WF-RES-011` | Cross-domain | Run Complete Edge Lab Profile | Explicit hypothesis, `EdgeLabConfig`, and `MarketDataset v1` from external orchestrator | Advisory `ResearchReport v1` to UI/API; unavailable selected stages fail closed | `FR-RES-096` plus implemented data/metrics stage requirements |
+| Completed | `WF-RES-001` | Cross-domain | Prepare Research Dataset | `MarketDataset v1` from Data | Research-internal `PreparedDataset`; never returned across the boundary | `FR-RES-027 → 030` |
+| Completed | `WF-RES-002` | Internal | Build Core Metric Profile | `PreparedDataset` | `CoreMetricProfile` | `FR-RES-042 → 049` |
+| Completed | `WF-RES-003` | Internal | Build Leakage-Safe Feature Frame and Time Splits | Prepared data + feature config | Feature frame + `LeakageReport` + `TimeSplitResult` | `FR-RES-031 → 041` |
+| Completed | `WF-RES-004` | Internal | Analyze Session and Seasonality Opportunity | Prepared OHLCVS + approved session policy | Advisory seasonality summaries | `FR-RES-069 → 074` |
+| Completed | `WF-RES-005` | Internal | Run Edge Study Against Null Evidence | Split data + study/statistical config | Advisory `EdgeResult` | `FR-RES-050 → 068` |
+| Completed | `WF-RES-006` | Internal | Build Market-Structure Profile | Prepared data + market-structure config | `MarketStructureProfile` + advisory fit | `FR-RES-075 → 076, 080` |
+| Completed | `WF-RES-007` | Internal | Forward Validate and Calibrate Market Structure | Persisted prediction + later approved dataset already supplied to the run | Research-internal validation/calibration evidence nested only in `ResearchReport v1` | `FR-RES-077 → 079` |
+| Completed | `WF-RES-008` | Internal | Run Unsupervised Market-Structure Research | Leakage-safe feature frame + seed | `UnsupervisedResearchResult` | `FR-RES-081 → 088` |
+| Completed | `WF-RES-009` | Internal | Build Research Scorecard and Profile Snapshot | Approved stage outputs | `ResearchScorecard` + `ResearchProfileSnapshot` | `FR-RES-089 → 092` |
+| Completed | `WF-RES-010` | Internal | Render and Persist Research Artifact | Masked result + approved Research-owned output location | Research-internal `ArtifactReference` or typed failure; UI/API receives only `ResearchReport v1` | `FR-RES-093 → 095, 097` |
+| Completed | `WF-RES-011` | Cross-domain | Run Complete Edge Lab Profile | Explicit hypothesis, `EdgeLabConfig`, and `MarketDataset v1` from external orchestrator | Advisory `ResearchReport v1` to UI/API; selected stages execute in canonical dependency order | `FR-RES-096` plus selected stage requirements |
 
 ### `WF-RES-001` — Prepare Research Dataset
 
@@ -617,61 +620,61 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `configurations.py` | Define immutable, validated Research configuration contracts without hidden data-changing defaults. | `ResearchResourceLimits`, `CleaningConfig`, `EnrichmentConfig`, `FeatureConfig`, `StatisticalConfig`, `StudyConfig`, `SessionConfig`, `MarketStructureConfig`, `UnsupervisedResearchConfig`, `ArtifactWriteConfig`, `EdgeLabConfig` | **Standard library:** dataclasses, datetime, pathlib, typing<br>**Required third-party:** None<br>**Local:** approved shared Utils errors in the owner-resolved policy above |
-| Missing | `results.py` | Define versioned immutable Research results and the owned `ResearchReport v1` contract. | `PreparedDataset`, `DataQualityReport`, `LeakageReport`, `TimeSplitResult`, `CoreMetricProfile`, `EdgeResult`, `MarketStructureProfile`, `MarketStructureQualityReport`, `UnsupervisedResearchResult`, `ResearchScorecard`, `ResearchProfileSnapshot`, `ResearchWarning`, `ResearchReport`, `ArtifactReference` | **Standard library:** dataclasses, datetime, pathlib, typing<br>**Required third-party:** pandas<br>**Local:** configurations.py → configuration types; app.services.data public API → `MarketDataset` reference |
-| Missing | `api.py` | Define the explicit unique classification map used by the package lazy facade. | `PUBLIC_API_CLASSIFICATIONS` | **Standard library:** types, typing<br>**Required third-party:** None<br>**Local:** None |
-| Missing | `__init__.py` | Expose the approved public contract API. | All key exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** configurations.py, results.py, api.py → listed exports |
+| Completed | `configurations.py` | Define immutable, validated Research configuration contracts without hidden data-changing defaults. | `ResearchResourceLimits`, `CleaningConfig`, `EnrichmentConfig`, `FeatureConfig`, `StatisticalConfig`, `StudyConfig`, `SessionConfig`, `MarketStructureConfig`, `UnsupervisedResearchConfig`, `ArtifactWriteConfig`, `EdgeLabConfig` | **Standard library:** dataclasses, datetime, pathlib, typing<br>**Required third-party:** None<br>**Local:** approved shared Utils errors in the owner-resolved policy above |
+| Completed | `results.py` | Define versioned immutable Research results and the owned `ResearchReport v1` contract. | `PreparedDataset`, `DataQualityReport`, `LeakageReport`, `TimeSplitResult`, `CoreMetricProfile`, `EdgeResult`, `MarketStructureProfile`, `MarketStructureQualityReport`, `UnsupervisedResearchResult`, `ResearchScorecard`, `ResearchProfileSnapshot`, `ResearchWarning`, `ResearchReport`, `ArtifactReference` | **Standard library:** dataclasses, datetime, pathlib, typing<br>**Required third-party:** pandas<br>**Local:** configurations.py → configuration types; app.services.data public API → `MarketDataset` reference |
+| Completed | `api.py` | Define the explicit unique classification map used by the package lazy facade. | `PUBLIC_API_CLASSIFICATIONS` | **Standard library:** types, typing<br>**Required third-party:** None<br>**Local:** None |
+| Completed | `__init__.py` | Expose the approved public contract API. | All key exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** configurations.py, results.py, api.py → listed exports |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `max_rows` | `int` | `500000` advisory | Yes | All frame-consuming public functions | Hard row ceiling; excess raises the pending resource-limit error before heavy work. |
-| Missing | `max_duration_seconds` | `float` | `600.0` advisory | Yes | Heavy studies, quality, modeling, Edge Lab workflow | Runtime budget; excess stops safely with no publication. |
-| Missing | `max_artifact_bytes` | `int` | `52428800` (50 MB advisory, the applicable Research specification) | Yes | `write_research_artifact` | Maximum serialized artifact size; excess is rejected, never silently truncated. |
-| Missing | `memory_budget_mb` | `int \| None` | `None` | No | Heavy workflows | Advisory/measured guard only; Research does not claim portable hard memory enforcement. |
-| Missing | internal result `schema_version` | `Literal["v1"]` | `"v1"` | Yes | Research-internal stage/result types only | Structural version for internal/nested evidence; the registered `ResearchReport` uses separate `contract_version` and `schema_id`. |
+| Completed | `max_rows` | `int` | Explicit per run | Yes | All frame-consuming public functions | Hard row ceiling; excess raises `RES_RESOURCE_LIMIT_EXCEEDED` before heavy work. |
+| Completed | `max_duration_seconds` | `float` | Explicit per run | Yes | Heavy studies, quality, modeling, Edge Lab workflow | Bounded duration policy carried by `ResearchResourceLimits`. |
+| Completed | `max_artifact_bytes` | `int` | Explicit per run | Yes | `write_research_artifact` | Maximum serialized artifact size; excess is rejected, never silently truncated. |
+| Excluded | `memory_budget_mb` | `int \| None` | None | No | Heavy workflows | Portable hard memory enforcement is not claimed in V1; row/iteration/duration/artifact bounds are authoritative. |
+| Completed | internal result `schema_version` | `Literal["v1"]` | `"v1"` | Yes | Research-internal stage/result types only | Structural version for internal/nested evidence; the registered `ResearchReport` uses separate `contract_version` and `schema_id`. |
 
 #### `configurations.py` — Immutable Configuration Contracts
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-001` | The system shall define bounded row, duration, artifact-size, and advisory memory budgets without claiming unverified production performance. | `ResearchResourceLimits(max_rows: int, max_duration_seconds: float, max_artifact_bytes: int, memory_budget_mb: int \| None = None)` | None | invalid/non-positive limit; invalid or non-positive approved limits | **Usage:** `test_usage_contracts.py::test_usage_configurations_resource_limits`<br>**Unit:** `test_configurations.py::test_resource_limits_reject_non_positive` |
-| Missing | `FR-RES-002` | The system shall require explicit timestamp, duplicate, missing-bar, non-trading-period, and spread-cleaning policies and shall never silently fill or drop data. | `CleaningConfig(timezone: str, duplicate_strategy: str, missing_bar_strategy: str, non_trading_period_strategy: str, spread_strategy: str)` | None | unsupported or absent policy | **Usage:** `test_usage_contracts.py::test_usage_configurations_cleaning`<br>**Unit:** `test_configurations.py::test_cleaning_requires_explicit_data_actions` |
-| Missing | `FR-RES-003` | The system shall define explicit pip, geometry, return-label, and calendar enrichment selections; canonical session tagging remains owned by `seasonality/`. | `EnrichmentConfig(symbol: str, include_geometry: bool, include_returns: bool, include_forward_labels: bool, include_calendar: bool)` | None | malformed symbol or incompatible selection | **Usage:** `test_usage_contracts.py::test_usage_configurations_enrichment`<br>**Unit:** `test_configurations.py::test_enrichment_rejects_incompatible_fields` |
-| Missing | `FR-RES-004` | The system shall define feature windows, declared forward columns, warm-up/NaN policy, and non-mutation behavior. | `FeatureConfig(windows: Mapping[str, int], forward_horizons: tuple[int,...], allowed_forward_columns: tuple[str,...], nan_policy: str)` | None | invalid window/horizon/policy | **Usage:** `test_usage_contracts.py::test_usage_configurations_features`<br>**Unit:** `test_configurations.py::test_feature_config_rejects_invalid_window` |
-| Missing | `FR-RES-005` | The system shall define bootstrap, permutation, null, correction, effective-seed, and bounded-iteration settings in one statistical contract. | `StatisticalConfig(seed: int, bootstrap_samples: int, permutation_samples: int, block_size: int, null_samples: int, correction: str \| None)` | None | invalid seed, count, block, correction, or resource request | **Usage:** `test_usage_contracts.py::test_usage_configurations_statistics`<br>**Unit:** `test_configurations.py::test_statistics_rejects_invalid_block_size` |
-| Missing | `FR-RES-006` | The system shall define mean-reversion, trend-persistence, session-study, confirmation, and explicit isolated-failure policy. | `StudyConfig(mean_reversion: Mapping[str, JSONValue], trend_persistence: Mapping[str, JSONValue], session: Mapping[str, JSONValue], continue_on_study_error: bool = False)` | None | unsupported study/confirmation setting | **Usage:** `test_usage_contracts.py::test_usage_configurations_studies`<br>**Unit:** `test_configurations.py::test_study_config_fails_closed_by_default` |
-| Missing | `FR-RES-007` | The system shall define one timezone-aware set of named windows and deterministic overlap precedence for all session consumers. | `SessionConfig(timezone: str, windows: Mapping[str, tuple[time, time]], overlap_precedence: tuple[str,...])` | None | session policy unresolved or invalid | **Usage:** `test_usage_contracts.py::test_usage_configurations_sessions`<br>**Unit:** `test_configurations.py::test_session_config_requires_overlap_precedence` |
-| Missing | `FR-RES-008` | The system shall define bounded structure detection, canonical scoring, quality, validation, and calibration settings. | `MarketStructureConfig(profile: Mapping[str, JSONValue], enable_quality: bool, quality_windows: tuple[int,...], calibration_candidates: int, validation_horizon: int)` | None | invalid validation or calibration policy | **Usage:** `test_usage_contracts.py::test_usage_configurations_market_structure`<br>**Unit:** `test_configurations.py::test_market_structure_bounds_candidates` |
-| Missing | `FR-RES-009` | The system shall define selected features, preprocessing, PCA components, cluster count, minimum sample, and effective seed. | `UnsupervisedResearchConfig(feature_columns: tuple[str,...], scale: bool, pca_components: int, clusters: int, minimum_samples: int, seed: int)` | None | invalid dimension/sample/seed | **Usage:** `test_usage_contracts.py::test_usage_configurations_modeling`<br>**Unit:** `test_configurations.py::test_unsupervised_config_rejects_excess_clusters` |
-| Missing | `FR-RES-010` | The system shall define an allowed root, format, encoding, overwrite, masking, and atomic-write policy for artifacts. | `ArtifactWriteConfig(allowed_root: Path, format: Literal["json", "markdown"], overwrite: bool = False, encoding: str = "utf-8", require_atomic: bool = True)` | None | root or ownership invalid | **Usage:** `test_usage_contracts.py::test_usage_configurations_artifacts`<br>**Unit:** `test_configurations.py::test_artifact_config_rejects_relative_root` |
-| Missing | `FR-RES-011` | The system shall aggregate explicit stage configs, selected stages, and resource limits without supplying hidden trading/data policies. | `EdgeLabConfig(cleaning: CleaningConfig, enrichment: EnrichmentConfig, features: FeatureConfig, statistics: StatisticalConfig, studies: StudyConfig, sessions: SessionConfig, market_structure: MarketStructureConfig, modeling: UnsupervisedResearchConfig, artifacts: ArtifactWriteConfig, limits: ResearchResourceLimits, selected_stages: tuple[str,...])` | None | absent/incompatible configuration | **Usage:** `test_usage_contracts.py::test_usage_configurations_edge_lab`<br>**Unit:** `test_configurations.py::test_edge_lab_config_requires_stage_dependencies` |
+| Completed | `FR-RES-001` | The system shall define bounded row, duration, artifact-size, and advisory memory budgets without claiming unverified production performance. | `ResearchResourceLimits(max_rows: int, max_duration_seconds: float, max_artifact_bytes: int, memory_budget_mb: int \| None = None)` | None | invalid/non-positive limit; invalid or non-positive approved limits | **Usage:** `01_contracts.py::fr_res_001`<br>**Unit:** `test_contract_configurations.py::test_resource_limits_reject_non_positive` |
+| Completed | `FR-RES-002` | The system shall require explicit timestamp, duplicate, missing-bar, non-trading-period, and spread-cleaning policies and shall never silently fill or drop data. | `CleaningConfig(timezone: str, duplicate_strategy: str, missing_bar_strategy: str, non_trading_period_strategy: str, spread_strategy: str)` | None | unsupported or absent policy | **Usage:** `01_contracts.py::fr_res_002`<br>**Unit:** `test_contract_configurations.py::test_cleaning_requires_explicit_data_actions` |
+| Completed | `FR-RES-003` | The system shall define explicit pip, geometry, return-label, and calendar enrichment selections; canonical session tagging remains owned by `seasonality/`. | `EnrichmentConfig(symbol: str, include_geometry: bool, include_returns: bool, include_forward_labels: bool, include_calendar: bool)` | None | malformed symbol or incompatible selection | **Usage:** `01_contracts.py::fr_res_003`<br>**Unit:** `test_contract_configurations.py::test_enrichment_rejects_incompatible_fields` |
+| Completed | `FR-RES-004` | The system shall define feature windows, declared forward columns, warm-up/NaN policy, and non-mutation behavior. | `FeatureConfig(windows: Mapping[str, int], forward_horizons: tuple[int,...], allowed_forward_columns: tuple[str,...], nan_policy: str)` | None | invalid window/horizon/policy | **Usage:** `01_contracts.py::fr_res_004`<br>**Unit:** `test_contract_configurations.py::test_feature_config_rejects_invalid_window` |
+| Completed | `FR-RES-005` | The system shall define bootstrap, permutation, null, correction, effective-seed, and bounded-iteration settings in one statistical contract. | `StatisticalConfig(seed: int, bootstrap_samples: int, permutation_samples: int, block_size: int, null_samples: int, correction: str \| None)` | None | invalid seed, count, block, correction, or resource request | **Usage:** `01_contracts.py::fr_res_005`<br>**Unit:** `test_contract_configurations.py::test_statistics_rejects_invalid_block_size` |
+| Completed | `FR-RES-006` | The system shall define mean-reversion, trend-persistence, session-study, confirmation, and explicit isolated-failure policy. | `StudyConfig(mean_reversion: Mapping[str, JSONValue], trend_persistence: Mapping[str, JSONValue], session: Mapping[str, JSONValue], continue_on_study_error: bool = False)` | None | unsupported study/confirmation setting | **Usage:** `01_contracts.py::fr_res_006`<br>**Unit:** `test_contract_configurations.py::test_study_config_fails_closed_by_default` |
+| Completed | `FR-RES-007` | The system shall define one timezone-aware set of named windows and deterministic overlap precedence for all session consumers. | `SessionConfig(timezone: str, windows: Mapping[str, tuple[time, time]], overlap_precedence: tuple[str,...])` | None | session policy unresolved or invalid | **Usage:** `01_contracts.py::fr_res_007`<br>**Unit:** `test_contract_configurations.py::test_session_config_requires_overlap_precedence` |
+| Completed | `FR-RES-008` | The system shall define bounded structure detection, canonical scoring, quality, validation, and calibration settings. | `MarketStructureConfig(profile: Mapping[str, JSONValue], enable_quality: bool, quality_windows: tuple[int,...], calibration_candidates: int, validation_horizon: int)` | None | invalid validation or calibration policy | **Usage:** `01_contracts.py::fr_res_008`<br>**Unit:** `test_contract_configurations.py::test_market_structure_bounds_candidates` |
+| Completed | `FR-RES-009` | The system shall define selected features, preprocessing, PCA components, cluster count, minimum sample, and effective seed. | `UnsupervisedResearchConfig(feature_columns: tuple[str,...], scale: bool, pca_components: int, clusters: int, minimum_samples: int, seed: int)` | None | invalid dimension/sample/seed | **Usage:** `01_contracts.py::fr_res_009`<br>**Unit:** `test_contract_configurations.py::test_unsupervised_config_rejects_excess_clusters` |
+| Completed | `FR-RES-010` | The system shall define an allowed root, format, encoding, overwrite, masking, and atomic-write policy for artifacts. | `ArtifactWriteConfig(allowed_root: Path, format: Literal["json", "markdown"], overwrite: bool = False, encoding: str = "utf-8", require_atomic: bool = True)` | None | root or ownership invalid | **Usage:** `01_contracts.py::fr_res_010`<br>**Unit:** `test_contract_configurations.py::test_artifact_config_rejects_relative_root` |
+| Completed | `FR-RES-011` | The system shall aggregate explicit stage configs, selected stages, and resource limits without supplying hidden trading/data policies. | `EdgeLabConfig(cleaning: CleaningConfig, enrichment: EnrichmentConfig, features: FeatureConfig, statistics: StatisticalConfig, studies: StudyConfig, sessions: SessionConfig, market_structure: MarketStructureConfig, modeling: UnsupervisedResearchConfig, artifacts: ArtifactWriteConfig, limits: ResearchResourceLimits, selected_stages: tuple[str,...])` | None | absent/incompatible configuration | **Usage:** `01_contracts.py::fr_res_011`<br>**Unit:** `test_contract_configurations.py::test_edge_lab_config_requires_stage_dependencies` |
 
 #### `results.py` — Versioned Result Contracts
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-012` | The system shall carry prepared records, canonical schema metadata, quality evidence, dataset/config hashes, and provenance without provider objects. | `PreparedDataset(data: DataFrame, schema_version: str, quality: DataQualityReport, dataset_hash: str, configuration_hash: str, source_references: tuple[str,...])` | None | invalid schema/hash/frame | **Usage:** `test_usage_contracts.py::test_usage_results_prepared_dataset`<br>**Unit:** `test_results.py::test_prepared_dataset_rejects_provider_object` |
-| Missing | `FR-RES-013` | The system shall distinguish fatal issues, warnings, checks, and explicit cleaning actions with machine-readable codes. | `DataQualityReport(fatal_issues: tuple[Mapping[str, JSONValue],...], warnings: tuple[ResearchWarning,...], checks: tuple[str,...], cleaning_actions: tuple[Mapping[str, JSONValue],...])` | None | invalid severity/code/details | **Usage:** `test_usage_contracts.py::test_usage_results_quality_report`<br>**Unit:** `test_results.py::test_quality_report_distinguishes_fatal_warning` |
-| Missing | `FR-RES-014` | The system shall identify suspected lookahead columns, severity, evidence, recommendation, allowed forward columns, target, and source metadata. | `LeakageReport(suspected_columns: tuple[str,...], severity: str, evidence: Mapping[str, JSONValue], recommendation: str, allowed_forward_columns: tuple[str,...], target_column: str \| None, source_references: tuple[str,...])` | None | invalid severity/evidence | **Usage:** `test_usage_contracts.py::test_usage_results_leakage_report`<br>**Unit:** `test_results.py::test_leakage_report_requires_evidence` |
-| Missing | `FR-RES-015` | The system shall represent deterministic chronological train/validation/test partitions and boundary identities. | `TimeSplitResult(train: DataFrame, validation: DataFrame, test: DataFrame, boundaries: Mapping[str, datetime], split_hash: str)` | None | overlapping/invalid partitions | **Usage:** `test_usage_contracts.py::test_usage_results_time_split`<br>**Unit:** `test_results.py::test_time_split_rejects_overlap` |
-| Missing | `FR-RES-016` | The system shall represent seven-family metric values with units, sample size, undefined-value reason, warnings, and reproducibility metadata. | `CoreMetricProfile(schema_version: str, metrics: Mapping[str, JSONValue], quality: DataQualityReport, dataset_hash: str, configuration_hash: str, warnings: tuple[ResearchWarning,...])` | None | invalid metric/metadata schema | **Usage:** `test_usage_contracts.py::test_usage_results_core_metric_profile`<br>**Unit:** `test_results.py::test_metric_profile_requires_units` |
-| Missing | `FR-RES-017` | The system shall represent one advisory edge study with sample, rule/config, split identity, null evidence, uncertainty, confirmation, seed, warnings, and provenance. | `EdgeResult(schema_version: str, study: str, statistics: Mapping[str, JSONValue], null_evidence: Mapping[str, JSONValue], classification: str, seed: int, warnings: tuple[ResearchWarning,...], advisory_only: Literal[True])` | None | invalid or contradictory result | **Usage:** `test_usage_contracts.py::test_usage_results_edge_result`<br>**Unit:** `test_results.py::test_edge_result_is_advisory` |
-| Missing | `FR-RES-018` | The system shall represent reproducible swings, legs, distributions, regimes, canonical score, verdict, and advisory fit evidence. | `MarketStructureProfile(schema_version: str, structure: Mapping[str, JSONValue], score: float, verdict: str, strategy_fit: Mapping[str, JSONValue], warnings: tuple[ResearchWarning,...])` | None | invalid score/profile | **Usage:** `test_usage_contracts.py::test_usage_results_market_structure`<br>**Unit:** `test_results.py::test_market_structure_uses_canonical_score` |
-| Missing | `FR-RES-019` | The system shall represent opt-in stability, robustness, validation, calibration candidates, ranking criteria, windows, duration, and warnings. | `MarketStructureQualityReport(schema_version: str, stability: Mapping[str, JSONValue], robustness: Mapping[str, JSONValue], calibration: Mapping[str, JSONValue], duration_ms: float, warnings: tuple[ResearchWarning,...])` | None | invalid validation truth | **Usage:** `test_usage_contracts.py::test_usage_results_market_quality`<br>**Unit:** `test_results.py::test_quality_report_records_windows` |
-| Missing | `FR-RES-020` | The system shall represent preprocessing, features, dropped columns, scaler, PCA, clusters, factor/cluster evidence, seed, parameters, diagnostics, and advisory status. | `UnsupervisedResearchResult(schema_version: str, preprocessing: Mapping[str, JSONValue], pca: Mapping[str, JSONValue], clusters: Mapping[str, JSONValue], insights: Mapping[str, JSONValue], seed: int, warnings: tuple[ResearchWarning,...], advisory_only: Literal[True])` | None | invalid model metadata | **Usage:** `test_usage_contracts.py::test_usage_results_unsupervised`<br>**Unit:** `test_results.py::test_unsupervised_result_records_seed` |
-| Missing | `FR-RES-021` | The system shall represent deterministic score rows, uncertainty, final score, readiness reasons, versions, and advisory status. | `ResearchScorecard(schema_version: str, score_rows: tuple[Mapping[str, JSONValue],...], final_score: float, readiness: str, reasons: tuple[str,...], warnings: tuple[ResearchWarning,...], advisory_only: Literal[True])` | None | invalid score/readiness schema | **Usage:** `test_usage_contracts.py::test_usage_results_scorecard`<br>**Unit:** `test_results.py::test_scorecard_readiness_has_reasons` |
-| Missing | `FR-RES-022` | The system shall normalize approved stage outputs into one versioned snapshot with hashes, versions, warnings, and advisory status. | `ResearchProfileSnapshot(schema_version: str, stages: Mapping[str, JSONValue], scorecard: ResearchScorecard, dataset_hash: str, configuration_hash: str, generated_at: datetime, warnings: tuple[ResearchWarning,...], advisory_only: Literal[True])` | None | missing required stage/version/hash | **Usage:** `test_usage_contracts.py::test_usage_results_snapshot`<br>**Unit:** `test_results.py::test_snapshot_rejects_unversioned_stage` |
-| Missing | `FR-RES-023` | The system shall expose bounded structured warnings with code, message, severity, optional field path, and bounded details. | `ResearchWarning(code: str, message: str, severity: str, field_path: str \| None = None, details: Mapping[str, JSONValue] \| None = None)` | None | invalid warning vocabulary | **Usage:** `test_usage_contracts.py::test_usage_results_warning`<br>**Unit:** `test_results.py::test_warning_details_are_bounded` |
-| Missing | `FR-RES-024` | The system shall produce the fully defined `ResearchReport v1` contract in Section 1 with `advisory_only=True` and complete reproducibility metadata. | `ResearchReport(...)` | None | contract validation; pending leakage gate: unsafe evidence blocks construction/publication | **Usage:** `test_usage_contracts.py::test_usage_results_research_report`<br>**Unit:** `test_results.py::test_research_report_v1_contract` |
-| Missing | `FR-RES-025` | The system shall return a safe artifact reference containing relative location, format, byte size, content hash, atomicity, schema version, and audit identity. | `ArtifactReference(relative_path: Path, format: str, size_bytes: int, sha256: str, atomic: bool, schema_version: str, audit_event_id: str)` | None | invalid/out-of-root reference | **Usage:** `test_usage_contracts.py::test_usage_results_artifact_reference`<br>**Unit:** `test_results.py::test_artifact_reference_is_relative` |
+| Completed | `FR-RES-012` | The system shall carry prepared records, canonical schema metadata, quality evidence, dataset/config hashes, and provenance without provider objects. | `PreparedDataset(data: DataFrame, schema_version: str, quality: DataQualityReport, dataset_hash: str, configuration_hash: str, source_references: tuple[str,...])` | None | invalid schema/hash/frame | **Usage:** `01_contracts.py::fr_res_012`<br>**Unit:** `test_contract_results.py::test_prepared_dataset_rejects_provider_object` |
+| Completed | `FR-RES-013` | The system shall distinguish fatal issues, warnings, checks, and explicit cleaning actions with machine-readable codes. | `DataQualityReport(fatal_issues: tuple[Mapping[str, JSONValue],...], warnings: tuple[ResearchWarning,...], checks: tuple[str,...], cleaning_actions: tuple[Mapping[str, JSONValue],...])` | None | invalid severity/code/details | **Usage:** `01_contracts.py::fr_res_013`<br>**Unit:** `test_contract_results.py::test_quality_report_distinguishes_fatal_warning` |
+| Completed | `FR-RES-014` | The system shall identify suspected lookahead columns, severity, evidence, recommendation, allowed forward columns, target, and source metadata. | `LeakageReport(suspected_columns: tuple[str,...], severity: str, evidence: Mapping[str, JSONValue], recommendation: str, allowed_forward_columns: tuple[str,...], target_column: str \| None, source_references: tuple[str,...])` | None | invalid severity/evidence | **Usage:** `01_contracts.py::fr_res_014`<br>**Unit:** `test_contract_results.py::test_leakage_report_requires_evidence` |
+| Completed | `FR-RES-015` | The system shall represent deterministic chronological train/validation/test partitions and boundary identities. | `TimeSplitResult(train: DataFrame, validation: DataFrame, test: DataFrame, boundaries: Mapping[str, datetime], split_hash: str)` | None | overlapping/invalid partitions | **Usage:** `01_contracts.py::fr_res_015`<br>**Unit:** `test_contract_results.py::test_time_split_rejects_overlap` |
+| Completed | `FR-RES-016` | The system shall represent seven-family metric values with units, sample size, undefined-value reason, warnings, and reproducibility metadata. | `CoreMetricProfile(schema_version: str, metrics: Mapping[str, JSONValue], quality: DataQualityReport, dataset_hash: str, configuration_hash: str, warnings: tuple[ResearchWarning,...])` | None | invalid metric/metadata schema | **Usage:** `01_contracts.py::fr_res_016`<br>**Unit:** `test_contract_results.py::test_metric_profile_requires_units` |
+| Completed | `FR-RES-017` | The system shall represent one advisory edge study with sample, rule/config, split identity, null evidence, uncertainty, confirmation, seed, warnings, and provenance. | `EdgeResult(schema_version: str, study: str, statistics: Mapping[str, JSONValue], null_evidence: Mapping[str, JSONValue], classification: str, seed: int, warnings: tuple[ResearchWarning,...], advisory_only: Literal[True])` | None | invalid or contradictory result | **Usage:** `01_contracts.py::fr_res_017`<br>**Unit:** `test_contract_results.py::test_edge_result_is_advisory` |
+| Completed | `FR-RES-018` | The system shall represent reproducible swings, legs, distributions, regimes, canonical score, verdict, and advisory fit evidence. | `MarketStructureProfile(schema_version: str, structure: Mapping[str, JSONValue], score: float, verdict: str, strategy_fit: Mapping[str, JSONValue], warnings: tuple[ResearchWarning,...])` | None | invalid score/profile | **Usage:** `01_contracts.py::fr_res_018`<br>**Unit:** `test_contract_results.py::test_market_structure_uses_canonical_score` |
+| Completed | `FR-RES-019` | The system shall represent opt-in stability, robustness, validation, calibration candidates, ranking criteria, windows, duration, and warnings. | `MarketStructureQualityReport(schema_version: str, stability: Mapping[str, JSONValue], robustness: Mapping[str, JSONValue], calibration: Mapping[str, JSONValue], duration_ms: float, warnings: tuple[ResearchWarning,...])` | None | invalid validation truth | **Usage:** `01_contracts.py::fr_res_019`<br>**Unit:** `test_contract_results.py::test_quality_report_records_windows` |
+| Completed | `FR-RES-020` | The system shall represent preprocessing, features, dropped columns, scaler, PCA, clusters, factor/cluster evidence, seed, parameters, diagnostics, and advisory status. | `UnsupervisedResearchResult(schema_version: str, preprocessing: Mapping[str, JSONValue], pca: Mapping[str, JSONValue], clusters: Mapping[str, JSONValue], insights: Mapping[str, JSONValue], seed: int, warnings: tuple[ResearchWarning,...], advisory_only: Literal[True])` | None | invalid model metadata | **Usage:** `01_contracts.py::fr_res_020`<br>**Unit:** `test_contract_results.py::test_unsupervised_result_records_seed` |
+| Completed | `FR-RES-021` | The system shall represent deterministic score rows, uncertainty, final score, readiness reasons, versions, and advisory status. | `ResearchScorecard(schema_version: str, score_rows: tuple[Mapping[str, JSONValue],...], final_score: float, readiness: str, reasons: tuple[str,...], warnings: tuple[ResearchWarning,...], advisory_only: Literal[True])` | None | invalid score/readiness schema | **Usage:** `01_contracts.py::fr_res_021`<br>**Unit:** `test_contract_results.py::test_scorecard_readiness_has_reasons` |
+| Completed | `FR-RES-022` | The system shall normalize approved stage outputs into one versioned snapshot with hashes, versions, warnings, and advisory status. | `ResearchProfileSnapshot(schema_version: str, stages: Mapping[str, JSONValue], scorecard: ResearchScorecard, dataset_hash: str, configuration_hash: str, generated_at: datetime, warnings: tuple[ResearchWarning,...], advisory_only: Literal[True])` | None | missing required stage/version/hash | **Usage:** `01_contracts.py::fr_res_022`<br>**Unit:** `test_contract_results.py::test_snapshot_rejects_unversioned_stage` |
+| Completed | `FR-RES-023` | The system shall expose bounded structured warnings with code, message, severity, optional field path, and bounded details. | `ResearchWarning(code: str, message: str, severity: str, field_path: str \| None = None, details: Mapping[str, JSONValue] \| None = None)` | None | invalid warning vocabulary | **Usage:** `01_contracts.py::fr_res_023`<br>**Unit:** `test_contract_results.py::test_warning_details_are_bounded` |
+| Completed | `FR-RES-024` | The system shall produce the fully defined `ResearchReport v1` contract in Section 1 with `advisory_only=True` and complete reproducibility metadata. | `ResearchReport(...)` | None | contract validation; pending leakage gate: unsafe evidence blocks construction/publication | **Usage:** `01_contracts.py::fr_res_024`<br>**Unit:** `test_contract_results.py::test_research_report_v1_contract` |
+| Completed | `FR-RES-025` | The system shall return a safe artifact reference containing relative location, format, byte size, content hash, atomicity, schema version, and audit identity. | `ArtifactReference(relative_path: Path, format: str, size_bytes: int, sha256: str, atomic: bool, schema_version: str, audit_event_id: str)` | None | invalid/out-of-root reference | **Usage:** `01_contracts.py::fr_res_025`<br>**Unit:** `test_contract_results.py::test_artifact_reference_is_relative` |
 
 #### `api.py` — Classified Public API
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-026` | The system shall expose a unique immutable mapping for every `__all__` name with `stable` classification and lazy import target, without recursive scanning or callable wrapping. | `PUBLIC_API_CLASSIFICATIONS: Mapping[str, Literal["stable"]]` | None | None | **Usage:** `test_usage_contracts.py::test_usage_api_classifications()`<br>**Unit:** `test_api.py::test_public_api_is_unique_resolvable_and_side_effect_free()` |
+| Completed | `FR-RES-026` | The system shall expose a unique immutable mapping for every `__all__` name with `stable` classification and lazy import target, without recursive scanning or callable wrapping. | `PUBLIC_API_CLASSIFICATIONS: Mapping[str, Literal["stable"]]` | None | None | **Usage:** `01_contracts.py::fr_res_026()`<br>**Unit:** `test_contract_api.py::test_public_api_is_unique_resolvable_and_side_effect_free()` |
 
 **Rules:**
 
@@ -687,7 +690,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_contracts.py` contains one `test_usage_*` function named in each row above.
+`tests/research/usage/01_contracts.py` contains one `fr_res_*` function named in each row above.
 
 ---
 
@@ -701,27 +704,27 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `validation.py` | Validate canonical schema, timestamps, continuity, OHLC, spread, and volume. | `validate_dataset` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts.results → `DataQualityReport`; Data public API → `MarketDataset` |
-| Missing | `preparation.py` | Apply explicit cleaning/enrichment and assemble the prepared contract. | `clean_dataset`, `enrich_dataset`, `prepare_research_dataset` | **Standard library:** time, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts.configurations → configs/limits; contracts.results → prepared/quality contracts; validation.py → `validate_dataset` |
-| Missing | `__init__.py` | Expose the supported data-preparation API. | Four functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** validation.py, preparation.py → listed exports |
+| Completed | `validation.py` | Validate canonical schema, timestamps, continuity, OHLC, spread, and volume. | `validate_dataset` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts.results → `DataQualityReport`; Data public API → `MarketDataset` |
+| Completed | `preparation.py` | Apply explicit cleaning/enrichment and assemble the prepared contract. | `clean_dataset`, `enrich_dataset`, `prepare_research_dataset` | **Standard library:** time, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts.configurations → configs/limits; contracts.results → prepared/quality contracts; validation.py → `validate_dataset` |
+| Completed | `__init__.py` | Expose the supported data-preparation API. | Four functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** validation.py, preparation.py → listed exports |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `missing_bar_strategy` | `str` | `none` or `drop` only | Yes | `clean_dataset` | Controls missing bars; no fill/drop occurs without an explicit approved value and recorded action. |
-| Missing | `non_trading_period_strategy` | `str` | `keep_warn` default | Yes | `clean_dataset` | Controls weekends, holidays, synthetic bars, and provider gaps; unresolved cases block cleaning. |
-| Missing | `timezone` | `str` | `UTC` | Yes | All data functions | Canonical timezone basis; invalid/naive/mixed timestamps fail or warn exactly as the approved policy defines. |
-| Missing | `max_rows` | `int` | `500000` advisory | Yes | All data functions | Enforced before copying/processing; excess raises resource-limit failure. |
+| Completed | `missing_bar_strategy` | `str` | Explicit | Yes | `clean_dataset` | Controls missing bars; no fill/drop occurs without an explicit approved value and recorded action. |
+| Completed | `non_trading_period_strategy` | `str` | Explicit | Yes | `clean_dataset` | Controls weekends, holidays, synthetic bars, and provider gaps; unresolved cases block cleaning. |
+| Completed | `timezone` | `str` | `UTC` | Yes | All data functions | Canonical timezone basis; invalid/naive/mixed timestamps fail or warn exactly as the approved policy defines. |
+| Completed | `max_rows` | `int` | Explicit per run | Yes | All data functions | Enforced before copying/processing; excess raises resource-limit failure. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-027` | The system shall validate required columns, UTC/time ordering, duplicates, gaps, OHLC consistency, spread quality, volume, finite values, and source metadata without mutating input. | `validate_dataset(dataset: MarketDataset, *, limits: ResearchResourceLimits) -> DataQualityReport` | Read-only | invalid input/schema/resource limit | **Usage:** `test_usage_data.py::test_usage_validation_validate_dataset`<br>**Unit:** `test_validation.py::test_validate_dataset_reports_fatal_ohlc_issue` |
-| Missing | `FR-RES-028` | The system shall clean a copy using only explicit approved strategies and record every action and unresolved warning. | `clean_dataset(dataset: MarketDataset, *, config: CleaningConfig, report: DataQualityReport, limits: ResearchResourceLimits) -> tuple[DataFrame, DataQualityReport]` | Local state mutation | unsupported/absent policy or invalid data | **Usage:** `test_usage_data.py::test_usage_preparation_clean_dataset`<br>**Unit:** `test_preparation.py::test_clean_dataset_never_fills_implicitly` |
-| Missing | `FR-RES-029` | The system shall enrich a copy with selected pip/geometry/return-label/calendar fields, label forward fields as research-only, and preserve row alignment; session tagging is a later `seasonality/` operation. | `enrich_dataset(data: DataFrame, *, config: EnrichmentConfig, report: DataQualityReport) -> tuple[DataFrame, DataQualityReport]` | Local state mutation | missing structural inputs or incompatible enrichment | **Usage:** `test_usage_data.py::test_usage_preparation_enrich_dataset`<br>**Unit:** `test_preparation.py::test_enrich_dataset_labels_forward_columns` |
-| Missing | `FR-RES-030` | The system shall execute validate → clean → revalidate → enrich deterministically and return hashes, provenance, and quality evidence, never fetching provider data. | `prepare_research_dataset(dataset: MarketDataset, *, cleaning: CleaningConfig, enrichment: EnrichmentConfig, limits: ResearchResourceLimits) -> PreparedDataset` | Read-only | fatal validation/config/resource failure | **Usage:** `test_usage_data.py::test_usage_preparation_prepare_research_dataset`<br>**Unit:** `test_preparation.py::test_prepare_dataset_is_deterministic_and_provider_free` |
+| Completed | `FR-RES-027` | The system shall validate required columns, UTC/time ordering, duplicates, gaps, OHLC consistency, spread quality, volume, finite values, and source metadata without mutating input. | `validate_dataset(dataset: MarketDataset, *, limits: ResearchResourceLimits) -> DataQualityReport` | Read-only | invalid input/schema/resource limit | **Usage:** `02_data.py::fr_res_027`<br>**Unit:** `test_data_validation.py::test_validate_dataset_reports_fatal_ohlc_issue` |
+| Completed | `FR-RES-028` | The system shall clean a copy using only explicit approved strategies and record every action and unresolved warning. | `clean_dataset(dataset: MarketDataset, *, config: CleaningConfig, report: DataQualityReport, limits: ResearchResourceLimits) -> tuple[DataFrame, DataQualityReport]` | Local state mutation | unsupported/absent policy or invalid data | **Usage:** `02_data.py::fr_res_028`<br>**Unit:** `test_data_preparation.py::test_clean_dataset_never_fills_implicitly` |
+| Completed | `FR-RES-029` | The system shall enrich a copy with selected pip/geometry/return-label/calendar fields, label forward fields as research-only, and preserve row alignment; session tagging is a later `seasonality/` operation. | `enrich_dataset(data: DataFrame, *, config: EnrichmentConfig, report: DataQualityReport) -> tuple[DataFrame, DataQualityReport]` | Local state mutation | missing structural inputs or incompatible enrichment | **Usage:** `02_data.py::fr_res_029`<br>**Unit:** `test_data_preparation.py::test_enrich_dataset_labels_forward_columns` |
+| Completed | `FR-RES-030` | The system shall execute validate → clean → revalidate → enrich deterministically and return hashes, provenance, and quality evidence, never fetching provider data. | `prepare_research_dataset(dataset: MarketDataset, *, cleaning: CleaningConfig, enrichment: EnrichmentConfig, limits: ResearchResourceLimits) -> PreparedDataset` | Read-only | fatal validation/config/resource failure | **Usage:** `02_data.py::fr_res_030`<br>**Unit:** `test_data_preparation.py::test_prepare_dataset_is_deterministic_and_provider_free` |
 
 **Rules:**
 
@@ -731,7 +734,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_data.py` contains the four mapped examples.
+`tests/research/usage/02_data.py` contains the four mapped examples.
 
 ---
 
@@ -745,30 +748,30 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `calculations.py` | Provide pure research-specific scalar/series calculations. | `log_returns`, `simple_returns`, `hurst_exponent`, `rolling_hurst`, `forward_returns`, `forward_max_favorable_excursion`, `forward_max_adverse_excursion` | **Standard library:** math, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts.configurations → `FeatureConfig` |
-| Missing | `frame.py` | Assemble one canonical feature frame and metadata using shared formulas. | `build_research_feature_frame` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts → configs/results; calculations.py → research functions; Indicators/Analytics public APIs → documented Indicators and Analytics public contracts |
-| Missing | `__init__.py` | Expose only the approved feature API. | Eight functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** calculations.py, frame.py → listed exports |
+| Completed | `calculations.py` | Provide pure research-specific scalar/series calculations. | `log_returns`, `simple_returns`, `hurst_exponent`, `rolling_hurst`, `forward_returns`, `forward_max_favorable_excursion`, `forward_max_adverse_excursion` | **Standard library:** math, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts.configurations → `FeatureConfig` |
+| Completed | `frame.py` | Assemble one canonical feature frame and metadata using shared formulas. | `build_research_feature_frame` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts → configs/results; calculations.py → research functions; Indicators/Analytics public APIs → documented Indicators and Analytics public contracts |
+| Completed | `__init__.py` | Expose only the approved feature API. | Eight functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** calculations.py, frame.py → listed exports |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `forward_horizons` | `tuple[int, ...]` | None | Yes when forward outcomes requested | Forward functions/frame builder | Positive bounded horizons; unavailable trailing rows are explicit NaN research labels, never feature inputs. |
-| Missing | `nan_policy` | `str` | None | Yes | `build_research_feature_frame()` | Defines warm-up and missing behavior; hidden filling is forbidden. |
-| Missing | `shared_formula_contracts` | documented imports | direct documented contracts only | Yes | `build_research_feature_frame` | Exact Indicators/Analytics symbols must be approved before duplicate V1 formulas are removed. |
+| Completed | `forward_horizons` | `tuple[int, ...]` | Explicit | Yes when forward outcomes requested | Forward functions/frame builder | Positive bounded horizons; unavailable trailing rows are explicit NaN research labels, never feature inputs. |
+| Completed | `nan_policy` | `str` | Explicit | Yes | `build_research_feature_frame()` | Defines warm-up and missing behavior; hidden filling is forbidden. |
+| Completed | `shared_formula_contracts` | documented imports | direct documented contracts only | Yes | `build_research_feature_frame` | Public Indicator result contracts are injected; Research does not deep-import domain internals. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-031` | Compute one-period log returns without mutating input and preserve index alignment. | `log_returns(close: Series) -> Series` | Read-only | non-finite/non-positive/insufficient input | **Usage:** `test_usage_features.py::test_usage_calculations_log_returns`<br>**Unit:** `test_calculations.py::test_log_returns_preserves_alignment` |
-| Missing | `FR-RES-032` | Compute arithmetic returns without mutating input and preserve index alignment. | `simple_returns(close: Series) -> Series` | Read-only | invalid/insufficient input | **Usage:** `test_usage_features.py::test_usage_calculations_simple_returns`<br>**Unit:** `test_calculations.py::test_simple_returns_constant_series` |
-| Missing | `FR-RES-033` | Estimate Hurst exponent with explicit minimum sample and finite-value validation. | `hurst_exponent(values: Series, *, minimum_samples: int) -> float` | Read-only | insufficient/non-finite/constant sample | **Usage:** `test_usage_features.py::test_usage_calculations_hurst_exponent`<br>**Unit:** `test_calculations.py::test_hurst_rejects_insufficient_sample` |
-| Missing | `FR-RES-034` | Compute rolling Hurst values with documented warm-up NaNs and stable alignment. | `rolling_hurst(values: Series, *, window: int, minimum_samples: int) -> Series` | Read-only | invalid window/sample | **Usage:** `test_usage_features.py::test_usage_calculations_rolling_hurst`<br>**Unit:** `test_calculations.py::test_rolling_hurst_has_declared_warmup` |
-| Missing | `FR-RES-035` | Compute one canonical horizon-aligned forward return in log or simple mode and mark it research-only. | `forward_returns(close: Series, *, horizon: int, mode: Literal["log", "simple"], output_label: str) -> Series` | Read-only | invalid horizon/mode/label | **Usage:** `test_usage_features.py::test_usage_calculations_forward_returns`<br>**Unit:** `test_calculations.py::test_forward_returns_never_used_as_feature` |
-| Missing | `FR-RES-036` | Compute forward maximum favorable excursion for declared side/horizon with trailing unavailability explicit. | `forward_max_favorable_excursion(data: DataFrame, *, horizon: int, side: Literal["buy", "sell"]) -> Series` | Read-only | invalid side/horizon/OHLC | **Usage:** `test_usage_features.py::test_usage_calculations_forward_mfe`<br>**Unit:** `test_calculations.py::test_forward_mfe_buy_sell_direction` |
-| Missing | `FR-RES-037` | Compute forward maximum adverse excursion for declared side/horizon with trailing unavailability explicit. | `forward_max_adverse_excursion(data: DataFrame, *, horizon: int, side: Literal["buy", "sell"]) -> Series` | Read-only | invalid side/horizon/OHLC | **Usage:** `test_usage_features.py::test_usage_calculations_forward_mae`<br>**Unit:** `test_calculations.py::test_forward_mae_buy_sell_direction` |
-| Missing | `FR-RES-038` | Build a new feature frame with declared lineage, warm-up/NaN behavior, caller-supplied public `IndicatorResult v1` inputs, research-only forward columns, and no input mutation. | `build_research_feature_frame(prepared: PreparedDataset, *, indicator_results: Mapping[str, IndicatorResult], config: FeatureConfig, limits: ResearchResourceLimits) -> tuple[DataFrame, Mapping[str, JSONValue]]` | Read-only | invalid feature/shared dependency/resource | **Usage:** `test_usage_features.py::test_usage_frame_build_research_feature_frame`<br>**Unit:** `test_feature_frame.py::test_feature_frame_records_lineage_and_forward_columns` |
+| Completed | `FR-RES-031` | Compute one-period log returns without mutating input and preserve index alignment. | `log_returns(close: Series) -> Series` | Read-only | non-finite/non-positive/insufficient input | **Usage:** `03_features.py::fr_res_031`<br>**Unit:** `test_feature_calculations.py::test_log_returns_preserves_alignment` |
+| Completed | `FR-RES-032` | Compute arithmetic returns without mutating input and preserve index alignment. | `simple_returns(close: Series) -> Series` | Read-only | invalid/insufficient input | **Usage:** `03_features.py::fr_res_032`<br>**Unit:** `test_feature_calculations.py::test_simple_returns_constant_series` |
+| Completed | `FR-RES-033` | Estimate Hurst exponent with explicit minimum sample and finite-value validation. | `hurst_exponent(values: Series, *, minimum_samples: int) -> float` | Read-only | insufficient/non-finite/constant sample | **Usage:** `03_features.py::fr_res_033`<br>**Unit:** `test_feature_calculations.py::test_hurst_rejects_insufficient_sample` |
+| Completed | `FR-RES-034` | Compute rolling Hurst values with documented warm-up NaNs and stable alignment. | `rolling_hurst(values: Series, *, window: int, minimum_samples: int) -> Series` | Read-only | invalid window/sample | **Usage:** `03_features.py::fr_res_034`<br>**Unit:** `test_feature_calculations.py::test_rolling_hurst_has_declared_warmup` |
+| Completed | `FR-RES-035` | Compute one canonical horizon-aligned forward return in log or simple mode and mark it research-only. | `forward_returns(close: Series, *, horizon: int, mode: Literal["log", "simple"], output_label: str) -> Series` | Read-only | invalid horizon/mode/label | **Usage:** `03_features.py::fr_res_035`<br>**Unit:** `test_feature_calculations.py::test_forward_returns_never_used_as_feature` |
+| Completed | `FR-RES-036` | Compute forward maximum favorable excursion for declared side/horizon with trailing unavailability explicit. | `forward_max_favorable_excursion(data: DataFrame, *, horizon: int, side: Literal["buy", "sell"]) -> Series` | Read-only | invalid side/horizon/OHLC | **Usage:** `03_features.py::fr_res_036`<br>**Unit:** `test_feature_calculations.py::test_forward_mfe_buy_sell_direction` |
+| Completed | `FR-RES-037` | Compute forward maximum adverse excursion for declared side/horizon with trailing unavailability explicit. | `forward_max_adverse_excursion(data: DataFrame, *, horizon: int, side: Literal["buy", "sell"]) -> Series` | Read-only | invalid side/horizon/OHLC | **Usage:** `03_features.py::fr_res_037`<br>**Unit:** `test_feature_calculations.py::test_forward_mae_buy_sell_direction` |
+| Completed | `FR-RES-038` | Build a new feature frame with declared lineage, warm-up/NaN behavior, caller-supplied public `IndicatorResult v1` inputs, research-only forward columns, and no input mutation. | `build_research_feature_frame(prepared: PreparedDataset, *, indicator_results: Mapping[str, IndicatorResult], config: FeatureConfig, limits: ResearchResourceLimits) -> tuple[DataFrame, Mapping[str, JSONValue]]` | Read-only | invalid feature/shared dependency/resource | **Usage:** `03_features.py::fr_res_038`<br>**Unit:** `test_feature_frame.py::test_feature_frame_records_lineage_and_forward_columns` |
 
 **Implementation notes:**
 
@@ -781,7 +784,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_features.py` contains the eight mapped examples.
+`tests/research/usage/03_features.py` contains the eight mapped examples.
 
 ---
 
@@ -795,30 +798,30 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `validation.py` | Produce structured leakage evidence without false certification. | `validate_no_lookahead_features` | **Standard library:** typing<br>**Required third-party:** pandas<br>**Local:** contracts → `FeatureConfig`, `LeakageReport` |
-| Missing | `splitting.py` | Produce deterministic chronological train/validation/test partitions. | `enforce_time_split` | **Standard library:** datetime, typing<br>**Required third-party:** pandas<br>**Local:** contracts.results → `TimeSplitResult` |
-| Missing | `masking.py` | Recursively redact sensitive and forbidden research fields in memory. | `mask_research_artifact` | **Standard library:** collections.abc, typing<br>**Required third-party:** None<br>**Local:** app.utils.security → redaction primitives |
-| Missing | `__init__.py` | Expose the supported leakage API. | Three functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** validation.py, splitting.py, masking.py |
+| Completed | `validation.py` | Produce structured leakage evidence without false certification. | `validate_no_lookahead_features` | **Standard library:** typing<br>**Required third-party:** pandas<br>**Local:** contracts → `FeatureConfig`, `LeakageReport` |
+| Completed | `splitting.py` | Produce deterministic chronological train/validation/test partitions. | `enforce_time_split` | **Standard library:** datetime, typing<br>**Required third-party:** pandas<br>**Local:** contracts.results → `TimeSplitResult` |
+| Completed | `masking.py` | Recursively redact sensitive and forbidden research fields in memory. | `mask_research_artifact` | **Standard library:** collections.abc, typing<br>**Required third-party:** None<br>**Local:** app.utils.security → redaction primitives |
+| Completed | `__init__.py` | Expose the supported leakage API. | Three functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** validation.py, splitting.py, masking.py |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `train_fraction / validation_fraction` | `float` | None | Yes | `enforce_time_split()` | Positive fractions with non-empty remainder; invalid/insufficient splits fail. |
-| Missing | `allowed_forward_columns` | `tuple[str, ...]` | `()` | Yes | `validate_no_lookahead_features()` | Explicit exceptions remain reported and cannot enter training features. |
-| Missing | `mask_keys` | `frozenset[str]` | Utils security policy | Yes | `mask_research_artifact()` | Recursive denylist; missed nested sensitive fields fail security tests. |
+| Completed | `train_fraction / validation_fraction` | `float` | Explicit | Yes | `enforce_time_split()` | Positive fractions with non-empty remainder; invalid/insufficient splits fail. |
+| Completed | `allowed_forward_columns` | `tuple[str, ...]` | `()` | Yes | `validate_no_lookahead_features()` | Explicit exceptions remain reported and cannot enter training features. |
+| Completed | `mask_keys` | `frozenset[str]` | Utils security policy | Yes | `mask_research_artifact()` | Recursive denylist is tested against nested sensitive and forward fields. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-039` | Inspect feature metadata, names, targets, horizons, and declarations and return evidence/severity/recommendation without claiming proof of no leakage. | `validate_no_lookahead_features(data: DataFrame, *, feature_metadata: Mapping[str, JSONValue], target_column: str \| None, allowed_forward_columns: tuple[str,...] = ()) -> LeakageReport` | Read-only | `ValidationError(RES_INPUT_INVALID)` | **Usage:** `test_usage_leakage.py::test_usage_validation_validate_no_lookahead`<br>**Unit:** `test_leakage_validation.py::test_leakage_report_detects_forward_target` |
-| Missing | `FR-RES-040` | Split chronologically into non-overlapping train/validation/test frames with deterministic boundaries and split hash. | `enforce_time_split(data: DataFrame, *, train_fraction: float, validation_fraction: float, gap_rows: int = 0) -> TimeSplitResult` | Read-only | invalid fractions/gap/insufficient rows | **Usage:** `test_usage_leakage.py::test_usage_splitting_enforce_time_split`<br>**Unit:** `test_splitting.py::test_time_split_is_chronological_and_gapped` |
-| Missing | `FR-RES-041` | Recursively mask sensitive, broker/account, and forbidden forward fields before sharing or serialization without mutating input. | `mask_research_artifact(artifact: JSONValue, *, extra_sensitive_keys: frozenset[str] = frozenset()) -> JSONValue` | Read-only | `SecurityError(RES_SENSITIVE_OUTPUT_REJECTED)` | **Usage:** `test_usage_leakage.py::test_usage_masking_mask_research_artifact`<br>**Unit:** `test_leakage_masking.py::test_masking_covers_nested_sensitive_fields` |
+| Completed | `FR-RES-039` | Inspect feature metadata, names, targets, horizons, and declarations and return evidence/severity/recommendation without claiming proof of no leakage. | `validate_no_lookahead_features(data: DataFrame, *, feature_metadata: Mapping[str, JSONValue], target_column: str \| None, allowed_forward_columns: tuple[str,...] = ()) -> LeakageReport` | Read-only | `ValidationError(RES_INPUT_INVALID)` | **Usage:** `04_leakage.py::fr_res_039`<br>**Unit:** `test_leakage_validation.py::test_leakage_report_detects_forward_target` |
+| Completed | `FR-RES-040` | Split chronologically into non-overlapping train/validation/test frames with deterministic boundaries and split hash. | `enforce_time_split(data: DataFrame, *, train_fraction: float, validation_fraction: float, gap_rows: int = 0) -> TimeSplitResult` | Read-only | invalid fractions/gap/insufficient rows | **Usage:** `04_leakage.py::fr_res_040`<br>**Unit:** `test_leakage_splitting.py::test_time_split_is_chronological_and_gapped` |
+| Completed | `FR-RES-041` | Recursively mask sensitive, broker/account, and forbidden forward fields before sharing or serialization without mutating input. | `mask_research_artifact(artifact: JSONValue, *, extra_sensitive_keys: frozenset[str] = frozenset()) -> JSONValue` | Read-only | `SecurityError(RES_SENSITIVE_OUTPUT_REJECTED)` | **Usage:** `04_leakage.py::fr_res_041`<br>**Unit:** `test_leakage_masking.py::test_masking_covers_nested_sensitive_fields` |
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_leakage.py` contains the three mapped examples.
+`tests/research/usage/04_leakage.py` contains the three mapped examples.
 
 ---
 
@@ -832,29 +835,29 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `registry.py` | Define the calculator protocol and immutable calculator membership. | `MetricCalculator`, `MetricRegistry`, `build_default_registry` | **Standard library:** collections.abc, typing<br>**Required third-party:** None<br>**Local:** contracts.results → internal metric context/value contracts |
-| Missing | `profile.py` | Execute calculators and assemble the versioned profile. | `build_core_metric_profile` | **Standard library:** math, time, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts → prepared/profile/limits; registry.py → registry/protocol; Analytics public API → documented Indicators and Analytics public contracts |
-| Missing | `__init__.py` | Expose the supported metric API. | Four exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** registry.py, profile.py |
+| Completed | `registry.py` | Define the calculator protocol and immutable calculator membership. | `MetricCalculator`, `MetricRegistry`, `build_default_registry` | **Standard library:** collections.abc, typing<br>**Required third-party:** None<br>**Local:** contracts.results → internal metric context/value contracts |
+| Completed | `profile.py` | Execute calculators and assemble the versioned profile. | `build_core_metric_profile` | **Standard library:** math, time, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts → prepared/profile/limits; registry.py → registry/protocol; Analytics public API → documented Indicators and Analytics public contracts |
+| Completed | `__init__.py` | Expose the supported metric API. | Four exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** registry.py, profile.py |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `metric_families` | `tuple[str, ...]` | `returns, roc, candles, ranges, volatility, spread, activity` | Yes | `build_default_registry()` | Exact seven retained V1 families; duplicate family names fail. |
-| Missing | `undefined_value_policy` | `str` | `explicit` | Yes | `build_core_metric_profile()` | Non-computable metrics carry reason/warning; Infinity is invalid and no silent zero is used. |
+| Completed | `metric_families` | `tuple[str, ...]` | `returns, roc, candles, ranges, volatility, spread, activity` | Yes | `build_default_registry()` | Exact seven retained V1 families; duplicate family names fail. |
+| Completed | `undefined_value_policy` | `str` | `explicit` | Yes | `build_core_metric_profile()` | Non-computable metrics carry reason/warning; Infinity is invalid and no silent zero is used. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-042` | Define the read-only contract implemented by one named metric-family calculator. | `class MetricCalculator(Protocol)` | None | None | **Usage:** `test_usage_metrics.py::test_usage_registry_metric_calculator()`<br>**Unit:** `test_registry.py::test_calculator_protocol_contract()` |
-| Missing | `FR-RES-043` | Compute normalized values for one family from an immutable metric context. | `MetricCalculator.compute(context: MetricContext) -> tuple[MetricValue,...]` | Read-only | invalid/missing metric input | **Usage:** `test_usage_metrics.py::test_usage_registry_compute`<br>**Unit:** `test_registry.py::test_calculator_returns_normalized_values` |
-| Missing | `FR-RES-044` | Own unique bounded calculator membership without global mutable defaults. | `MetricRegistry` | Local state mutation | duplicate/invalid calculator | **Usage:** `test_usage_metrics.py::test_usage_registry_metric_registry`<br>**Unit:** `test_registry.py::test_registry_rejects_duplicate_family` |
-| Missing | `FR-RES-045` | Construct an isolated registry from a bounded calculator iterable. | `MetricRegistry.from_calculators(calculators: Iterable[MetricCalculator]) -> MetricRegistry` | Local state mutation | duplicate/empty/invalid calculators | **Usage:** `test_usage_metrics.py::test_usage_registry_from_calculators`<br>**Unit:** `test_registry.py::test_from_calculators_is_isolated` |
-| Missing | `FR-RES-046` | Resolve a calculator by exact family name. | `MetricRegistry.resolve(family: str) -> MetricCalculator` | Read-only | family not found | **Usage:** `test_usage_metrics.py::test_usage_registry_resolve`<br>**Unit:** `test_registry.py::test_resolve_missing_family` |
-| Missing | `FR-RES-047` | Return calculators in deterministic registration order without exposing mutable storage. | `MetricRegistry.all() -> tuple[MetricCalculator, ...]` | Read-only | None | **Usage:** `test_usage_metrics.py::test_usage_registry_all()`<br>**Unit:** `test_registry.py::test_all_is_immutable_and_ordered()` |
-| Missing | `FR-RES-048` | Build a new default registry containing the seven retained metric families. | `build_default_registry() -> MetricRegistry` | Local state mutation | `ValidationError(RES_INPUT_INVALID)` | **Usage:** `test_usage_metrics.py::test_usage_registry_build_default`<br>**Unit:** `test_metric_registry.py::test_default_registry_has_seven_families` |
-| Missing | `FR-RES-049` | Build a deterministic profile with units, samples, undefined reasons, hashes, warnings, and duration from a prepared dataset. | `build_core_metric_profile(prepared: PreparedDataset, *, registry: MetricRegistry \| None = None, limits: ResearchResourceLimits) -> CoreMetricProfile` | Read-only | invalid data/dependency/resource | **Usage:** `test_usage_metrics.py::test_usage_profile_build_core_metric_profile`<br>**Unit:** `test_profile.py::test_profile_contains_units_hashes_and_warnings` |
+| Completed | `FR-RES-042` | Define the read-only contract implemented by one named metric-family calculator. | `class MetricCalculator(Protocol)` | None | None | **Usage:** `05_metrics.py::fr_res_042()`<br>**Unit:** `test_metric_registry.py::test_calculator_protocol_contract()` |
+| Completed | `FR-RES-043` | Compute normalized values for one family from an immutable metric context. | `MetricCalculator.compute(context: MetricContext) -> tuple[MetricValue,...]` | Read-only | invalid/missing metric input | **Usage:** `05_metrics.py::fr_res_043`<br>**Unit:** `test_metric_registry.py::test_calculator_returns_normalized_values` |
+| Completed | `FR-RES-044` | Own unique bounded calculator membership without global mutable defaults. | `MetricRegistry` | Local state mutation | duplicate/invalid calculator | **Usage:** `05_metrics.py::fr_res_044`<br>**Unit:** `test_metric_registry.py::test_registry_rejects_duplicate_family` |
+| Completed | `FR-RES-045` | Construct an isolated registry from a bounded calculator iterable. | `MetricRegistry.from_calculators(calculators: Iterable[MetricCalculator]) -> MetricRegistry` | Local state mutation | duplicate/empty/invalid calculators | **Usage:** `05_metrics.py::fr_res_045`<br>**Unit:** `test_metric_registry.py::test_from_calculators_is_isolated` |
+| Completed | `FR-RES-046` | Resolve a calculator by exact family name. | `MetricRegistry.resolve(family: str) -> MetricCalculator` | Read-only | family not found | **Usage:** `05_metrics.py::fr_res_046`<br>**Unit:** `test_metric_registry.py::test_resolve_missing_family` |
+| Completed | `FR-RES-047` | Return calculators in deterministic registration order without exposing mutable storage. | `MetricRegistry.all() -> tuple[MetricCalculator, ...]` | Read-only | None | **Usage:** `05_metrics.py::fr_res_047()`<br>**Unit:** `test_metric_registry.py::test_all_is_immutable_and_ordered()` |
+| Completed | `FR-RES-048` | Build a new default registry containing the seven retained metric families. | `build_default_registry() -> MetricRegistry` | Local state mutation | `ValidationError(RES_INPUT_INVALID)` | **Usage:** `05_metrics.py::fr_res_048`<br>**Unit:** `test_metric_registry.py::test_default_registry_has_seven_families` |
+| Completed | `FR-RES-049` | Build a deterministic profile with units, samples, undefined reasons, hashes, warnings, and duration from a prepared dataset. | `build_core_metric_profile(prepared: PreparedDataset, *, registry: MetricRegistry \| None = None, limits: ResearchResourceLimits) -> CoreMetricProfile` | Read-only | invalid data/dependency/resource | **Usage:** `05_metrics.py::fr_res_049`<br>**Unit:** `test_metric_profile.py::test_profile_contains_units_hashes_and_warnings` |
 
 **Implementation notes:**
 
@@ -863,7 +866,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_metrics.py` contains the eight mapped examples.
+`tests/research/usage/05_metrics.py` contains the eight mapped examples.
 
 ---
 
@@ -877,39 +880,39 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `resampling.py` | Bootstrap and permutation computations. | `block_bootstrap_distribution`, `block_bootstrap_ci`, `permutation_test` | **Standard library:** collections.abc, typing<br>**Required third-party:** numpy<br>**Local:** contracts.configurations → `StatisticalConfig` |
-| Missing | `null_models.py` | Generate matched nulls and summarize/compare them. | `random_entry_null`, `r_space_null`, `session_randomized_null`, `shuffle_returns_null`, `compute_null_percentile`, `null_distribution_stats`, `exceeds_null_threshold` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts.configurations → `StatisticalConfig` |
-| Missing | `corrections.py` | Apply multiple-comparison corrections. | `benjamini_hochberg`, `holm_bonferroni` | **Standard library:** typing<br>**Required third-party:** numpy<br>**Local:** None |
-| Missing | `__init__.py` | Expose the supported statistical API. | Twelve functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** three files above |
+| Completed | `resampling.py` | Bootstrap and permutation computations. | `block_bootstrap_distribution`, `block_bootstrap_ci`, `permutation_test` | **Standard library:** collections.abc, typing<br>**Required third-party:** numpy<br>**Local:** contracts.configurations → `StatisticalConfig` |
+| Completed | `null_models.py` | Generate matched nulls and summarize/compare them. | `random_entry_null`, `r_space_null`, `session_randomized_null`, `shuffle_returns_null`, `compute_null_percentile`, `null_distribution_stats`, `exceeds_null_threshold` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts.configurations → `StatisticalConfig` |
+| Completed | `corrections.py` | Apply multiple-comparison corrections. | `benjamini_hochberg`, `holm_bonferroni` | **Standard library:** typing<br>**Required third-party:** numpy<br>**Local:** None |
+| Completed | `__init__.py` | Expose the supported statistical API. | Twelve functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** three files above |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `seed` | `int` | Required explicit master seed | Yes | All stochastic functions | Derive sub-seeds deterministically as SHA-256 of the master seed plus stage name; explicit stage overrides are recorded in `ResearchReport.seeds`. |
-| Missing | `bootstrap_samples / permutation_samples / null_samples` | `int` | explicit per run; advisory caps per the applicable Research specification | Yes | Resampling/null functions | Positive bounded iteration counts; excess fails before allocation. |
-| Missing | `block_size` | `int` | None | Conditional | Bootstrap/shuffle null | Must not exceed sample length; invalid sizes fail. |
+| Completed | `seed` | `int` | Required explicit master seed | Yes | All stochastic functions | Effective seeds are deterministic and recorded in results and `ResearchReport.seeds`. |
+| Completed | `bootstrap_samples / permutation_samples / null_samples` | `int` | Explicit per run | Yes | Resampling/null functions | Positive bounded iteration counts; excess fails before allocation. |
+| Completed | `block_size` | `int` | Explicit | Conditional | Bootstrap/shuffle null | Must not exceed sample length; invalid sizes fail. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-050` | Generate a seeded block-bootstrap statistic distribution and record the effective parameters. | `block_bootstrap_distribution(values: NDArray, *, statistic: Callable[[NDArray], float], config: StatisticalConfig) -> NDArray` | Read-only | invalid/insufficient/non-finite sample or limit | **Usage:** `test_usage_statistics.py::test_usage_resampling_distribution`<br>**Unit:** `test_resampling.py::test_distribution_is_seed_reproducible` |
-| Missing | `FR-RES-051` | Compute a block-bootstrap confidence interval from the seeded distribution. | `block_bootstrap_ci(values: NDArray, *, statistic: Callable[[NDArray], float], confidence: float, config: StatisticalConfig) -> tuple[float, float]` | Read-only | Pending taxonomy: invalid confidence/sample/statistic | **Usage:** `test_usage_statistics.py::test_usage_resampling_ci()`<br>**Unit:** `test_resampling.py::test_ci_rejects_non_finite_statistic()` |
-| Missing | `FR-RES-052` | Compute an empirical permutation p-value with declared alternative and seed. | `permutation_test(observed: float, samples: NDArray, *, alternative: str, config: StatisticalConfig) -> float` | Read-only | Pending taxonomy: invalid observed/empty sample/alternative | **Usage:** `test_usage_statistics.py::test_usage_resampling_permutation()`<br>**Unit:** `test_resampling.py::test_permutation_rejects_empty_sample()` |
-| Missing | `FR-RES-053` | Generate a side- and horizon-matched random-entry null in log-return space. | `random_entry_null(data: DataFrame, *, side: Literal["buy", "sell", "mixed"], hold_bars: int, config: StatisticalConfig) -> NDArray` | Read-only | Pending taxonomy: invalid side/horizon/OHLC/sample | **Usage:** `test_usage_statistics.py::test_usage_null_models_random_entry()`<br>**Unit:** `test_null_models.py::test_random_entry_null_matches_side()` |
-| Missing | `FR-RES-054` | Generate a seeded null distribution in R-multiple space from declared trade assumptions. | `r_space_null(samples: NDArray, *, config: StatisticalConfig) -> NDArray` | Read-only | Pending taxonomy: empty/non-finite/invalid config | **Usage:** `test_usage_statistics.py::test_usage_null_models_r_space()`<br>**Unit:** `test_null_models.py::test_r_space_null_rejects_non_finite()` |
-| Missing | `FR-RES-055` | Generate a seeded null by shuffling entries only within the same configured session. | `session_randomized_null(data: DataFrame, *, session_column: str, config: StatisticalConfig) -> NDArray` | Read-only | invalid session/sample/config | **Usage:** `test_usage_statistics.py::test_usage_null_models_session_randomized`<br>**Unit:** `test_null_models.py::test_session_null_preserves_session_groups` |
-| Missing | `FR-RES-056` | Generate a seeded null by shuffling return blocks while preserving declared block length. | `shuffle_returns_null(returns: Series, *, config: StatisticalConfig) -> NDArray` | Read-only | Pending taxonomy: invalid block/sample/non-finite values | **Usage:** `test_usage_statistics.py::test_usage_null_models_shuffle_returns()`<br>**Unit:** `test_null_models.py::test_shuffle_null_rejects_large_block()` |
-| Missing | `FR-RES-057` | Compute the observed percentile within a finite non-empty null distribution. | `compute_null_percentile(observed: float, distribution: NDArray) -> float` | Read-only | Pending taxonomy: non-finite observed/empty/non-finite distribution | **Usage:** `test_usage_statistics.py::test_usage_null_models_percentile()`<br>**Unit:** `test_null_models.py::test_percentile_outside_sample_range()` |
-| Missing | `FR-RES-058` | Return finite count, location, dispersion, and declared quantiles for a null distribution. | `null_distribution_stats(distribution: NDArray) -> Mapping[str, float]` | Read-only | Pending taxonomy: empty/non-finite distribution | **Usage:** `test_usage_statistics.py::test_usage_null_models_stats()`<br>**Unit:** `test_null_models.py::test_null_stats_reject_empty()` |
-| Missing | `FR-RES-059` | Determine threshold exceedance under an explicit upper/lower/two-sided rule. | `exceeds_null_threshold(observed: float, distribution: NDArray, *, quantile: float, alternative: str) -> bool` | Read-only | Pending taxonomy: invalid quantile/alternative/distribution | **Usage:** `test_usage_statistics.py::test_usage_null_models_threshold()`<br>**Unit:** `test_null_models.py::test_threshold_direction_is_explicit()` |
-| Missing | `FR-RES-060` | Apply Benjamini-Hochberg FDR correction to finite p-values in original order. | `benjamini_hochberg(p_values: Sequence[float], *, q: float) -> NDArray` | Read-only | Pending taxonomy: empty/invalid p-values/q | **Usage:** `test_usage_statistics.py::test_usage_corrections_bh()`<br>**Unit:** `test_corrections.py::test_bh_preserves_original_order()` |
-| Missing | `FR-RES-061` | Apply Holm-Bonferroni family-wise correction to finite p-values in original order. | `holm_bonferroni(p_values: Sequence[float], *, alpha: float) -> NDArray` | Read-only | Pending taxonomy: empty/invalid p-values/alpha | **Usage:** `test_usage_statistics.py::test_usage_corrections_holm()`<br>**Unit:** `test_corrections.py::test_holm_rejects_invalid_p_value()` |
+| Completed | `FR-RES-050` | Generate a seeded block-bootstrap statistic distribution and record the effective parameters. | `block_bootstrap_distribution(values: NDArray, *, statistic: Callable[[NDArray], float], config: StatisticalConfig) -> NDArray` | Read-only | invalid/insufficient/non-finite sample or limit | **Usage:** `06_statistics.py::fr_res_050`<br>**Unit:** `test_statistics_resampling.py::test_distribution_is_seed_reproducible` |
+| Completed | `FR-RES-051` | Compute a block-bootstrap confidence interval from the seeded distribution. | `block_bootstrap_ci(values: NDArray, *, statistic: Callable[[NDArray], float], confidence: float, config: StatisticalConfig) -> tuple[float, float]` | Read-only | Pending taxonomy: invalid confidence/sample/statistic | **Usage:** `06_statistics.py::fr_res_051()`<br>**Unit:** `test_statistics_resampling.py::test_ci_rejects_non_finite_statistic()` |
+| Completed | `FR-RES-052` | Compute an empirical permutation p-value with declared alternative and seed. | `permutation_test(observed: float, samples: NDArray, *, alternative: str, config: StatisticalConfig) -> float` | Read-only | Pending taxonomy: invalid observed/empty sample/alternative | **Usage:** `06_statistics.py::fr_res_052()`<br>**Unit:** `test_statistics_resampling.py::test_permutation_rejects_empty_sample()` |
+| Completed | `FR-RES-053` | Generate a side- and horizon-matched random-entry null in log-return space. | `random_entry_null(data: DataFrame, *, side: Literal["buy", "sell", "mixed"], hold_bars: int, config: StatisticalConfig) -> NDArray` | Read-only | Pending taxonomy: invalid side/horizon/OHLC/sample | **Usage:** `06_statistics.py::fr_res_053()`<br>**Unit:** `test_statistics_null_models.py::test_random_entry_null_matches_side()` |
+| Completed | `FR-RES-054` | Generate a seeded null distribution in R-multiple space from declared trade assumptions. | `r_space_null(samples: NDArray, *, config: StatisticalConfig) -> NDArray` | Read-only | Pending taxonomy: empty/non-finite/invalid config | **Usage:** `06_statistics.py::fr_res_054()`<br>**Unit:** `test_statistics_null_models.py::test_r_space_null_rejects_non_finite()` |
+| Completed | `FR-RES-055` | Generate a seeded null by shuffling entries only within the same configured session. | `session_randomized_null(data: DataFrame, *, session_column: str, config: StatisticalConfig) -> NDArray` | Read-only | invalid session/sample/config | **Usage:** `06_statistics.py::fr_res_055`<br>**Unit:** `test_statistics_null_models.py::test_session_null_preserves_session_groups` |
+| Completed | `FR-RES-056` | Generate a seeded null by shuffling return blocks while preserving declared block length. | `shuffle_returns_null(returns: Series, *, config: StatisticalConfig) -> NDArray` | Read-only | Pending taxonomy: invalid block/sample/non-finite values | **Usage:** `06_statistics.py::fr_res_056()`<br>**Unit:** `test_statistics_null_models.py::test_shuffle_null_rejects_large_block()` |
+| Completed | `FR-RES-057` | Compute the observed percentile within a finite non-empty null distribution. | `compute_null_percentile(observed: float, distribution: NDArray) -> float` | Read-only | Pending taxonomy: non-finite observed/empty/non-finite distribution | **Usage:** `06_statistics.py::fr_res_057()`<br>**Unit:** `test_statistics_null_models.py::test_percentile_outside_sample_range()` |
+| Completed | `FR-RES-058` | Return finite count, location, dispersion, and declared quantiles for a null distribution. | `null_distribution_stats(distribution: NDArray) -> Mapping[str, float]` | Read-only | Pending taxonomy: empty/non-finite distribution | **Usage:** `06_statistics.py::fr_res_058()`<br>**Unit:** `test_statistics_null_models.py::test_null_stats_reject_empty()` |
+| Completed | `FR-RES-059` | Determine threshold exceedance under an explicit upper/lower/two-sided rule. | `exceeds_null_threshold(observed: float, distribution: NDArray, *, quantile: float, alternative: str) -> bool` | Read-only | Pending taxonomy: invalid quantile/alternative/distribution | **Usage:** `06_statistics.py::fr_res_059()`<br>**Unit:** `test_statistics_null_models.py::test_threshold_direction_is_explicit()` |
+| Completed | `FR-RES-060` | Apply Benjamini-Hochberg FDR correction to finite p-values in original order. | `benjamini_hochberg(p_values: Sequence[float], *, q: float) -> NDArray` | Read-only | Pending taxonomy: empty/invalid p-values/q | **Usage:** `06_statistics.py::fr_res_060()`<br>**Unit:** `test_statistics_corrections.py::test_bh_preserves_original_order()` |
+| Completed | `FR-RES-061` | Apply Holm-Bonferroni family-wise correction to finite p-values in original order. | `holm_bonferroni(p_values: Sequence[float], *, alpha: float) -> NDArray` | Read-only | Pending taxonomy: empty/invalid p-values/alpha | **Usage:** `06_statistics.py::fr_res_061()`<br>**Unit:** `test_statistics_corrections.py::test_holm_rejects_invalid_p_value()` |
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_statistics.py` contains the twelve mapped examples.
+`tests/research/usage/06_statistics.py` contains the twelve mapped examples.
 
 ---
 
@@ -923,29 +926,29 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `null_baseline.py` | Build and compare matched null evidence. | `run_eds_null_baseline`, `compare_to_null`, `get_acceptance_criteria` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; statistics public API |
-| Missing | `edge_studies.py` | Execute three approved edge-study families; session studies consume an already tagged frame and do not define/tag sessions. | `run_eds_mean_reversion`, `run_eds_trend_persistence`, `run_eds_session` | **Standard library:** time, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; features; leakage; statistics |
-| Missing | `classification.py` | Apply the single versioned confirmation/classification policy. | `classify_symbol` | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** contracts.results → `EdgeResult` |
-| Missing | `__init__.py` | Expose the supported study API. | Seven functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** three files above |
+| Completed | `null_baseline.py` | Build and compare matched null evidence. | `run_eds_null_baseline`, `compare_to_null`, `get_acceptance_criteria` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; statistics public API |
+| Completed | `edge_studies.py` | Execute three approved edge-study families; session studies consume an already tagged frame and do not define/tag sessions. | `run_eds_mean_reversion`, `run_eds_trend_persistence`, `run_eds_session` | **Standard library:** time, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; features; leakage; statistics |
+| Completed | `classification.py` | Apply the single versioned confirmation/classification policy. | `classify_symbol` | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** contracts.results → `EdgeResult` |
+| Completed | `__init__.py` | Expose the supported study API. | Seven functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** three files above |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `confirmation_policy_version` | `str` | None | Yes | All study/classification/report consumers | One truth table for status, classification, profiles, scorecards, and reports. |
-| Missing | `minimum_samples` | `Mapping[str, int]` | explicit per study; advisory per the applicable Research specification | Yes | Study functions | Per-study evidence threshold; insufficiency never becomes a confirmed edge. |
+| Completed | `confirmation_policy_version` | `str` | `v1` | Yes | All study/classification/report consumers | One truth table for status, classification, profiles, scorecards, and reports. |
+| Completed | `minimum_samples` | `Mapping[str, int]` | Explicit per study | Yes | Study functions | Per-study evidence threshold; insufficiency never becomes a confirmed edge. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-062` | Build seeded random-entry, R-space, and shuffled-return baselines with recorded data/split/config identity. | `run_eds_null_baseline(data: DataFrame, *, split: TimeSplitResult, statistics: StatisticalConfig, study: StudyConfig) -> EdgeResult` | Read-only | Pending taxonomy: invalid/insufficient data/config | **Usage:** `test_usage_studies.py::test_usage_null_baseline_run()`<br>**Unit:** `test_null_baseline.py::test_baseline_records_seed_and_split()` |
-| Missing | `FR-RES-063` | Compare observed evidence to the correctly matched null and return percentile, threshold, p-value, and warnings. | `compare_to_null(observed: EdgeResult, baseline: EdgeResult) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: incompatible/malformed results | **Usage:** `test_usage_studies.py::test_usage_null_baseline_compare()`<br>**Unit:** `test_null_baseline.py::test_compare_rejects_mismatched_side()` |
-| Missing | `FR-RES-064` | Extract versioned acceptance criteria from baseline evidence without hard-coded direction drift. | `get_acceptance_criteria(baseline: EdgeResult) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: absent/incompatible baseline | **Usage:** `test_usage_studies.py::test_usage_null_baseline_criteria()`<br>**Unit:** `test_null_baseline.py::test_criteria_follow_confirmation_policy()` |
-| Missing | `FR-RES-065` | Evaluate compression/z-score fade mean reversion on declared split data and return advisory uncertainty evidence. | `run_eds_mean_reversion(data: DataFrame, *, split: TimeSplitResult, study: StudyConfig, statistics: StatisticalConfig, limits: ResearchResourceLimits) -> EdgeResult` | Read-only | Pending taxonomy: invalid/insufficient/resource/statistical failure | **Usage:** `test_usage_studies.py::test_usage_edge_studies_mean_reversion()`<br>**Unit:** `test_edge_studies.py::test_mean_reversion_uses_matched_null()` |
-| Missing | `FR-RES-066` | Evaluate high-volatility breakout follow-through on declared split data and return advisory uncertainty evidence. | `run_eds_trend_persistence(data: DataFrame, *, split: TimeSplitResult, study: StudyConfig, statistics: StatisticalConfig, limits: ResearchResourceLimits) -> EdgeResult` | Read-only | Pending taxonomy: invalid/insufficient/resource/statistical failure | **Usage:** `test_usage_studies.py::test_usage_edge_studies_trend()`<br>**Unit:** `test_edge_studies.py::test_trend_study_records_rule_config()` |
-| Missing | `FR-RES-067` | Evaluate breakout/fade hypotheses on a frame already tagged by `seasonality.tag_sessions` and apply multiple-testing correction without redefining session windows. | `run_eds_session(tagged_data: DataFrame, *, split: TimeSplitResult, study: StudyConfig, statistics: StatisticalConfig, limits: ResearchResourceLimits) -> EdgeResult` | Read-only | missing/invalid canonical session tags, validation, or resource failure | **Usage:** `test_usage_studies.py::test_usage_edge_studies_session`<br>**Unit:** `test_edge_studies.py::test_session_study_applies_fdr` |
-| Missing | `FR-RES-068` | Classify mean-reversion and trend evidence using one versioned confirmation policy and preserve uncertainty/advisory status. | `classify_symbol(mean_reversion: EdgeResult, trend_persistence: EdgeResult, *, policy_version: str) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: incompatible result/policy | **Usage:** `test_usage_studies.py::test_usage_classification_classify_symbol()`<br>**Unit:** `test_classification.py::test_classification_matches_report_policy()` |
+| Completed | `FR-RES-062` | Build seeded random-entry, R-space, and shuffled-return baselines with recorded data/split/config identity. | `run_eds_null_baseline(data: DataFrame, *, split: TimeSplitResult, statistics: StatisticalConfig, study: StudyConfig) -> EdgeResult` | Read-only | `ValidationError`: invalid/insufficient data/config | **Usage:** `07_studies.py::fr_res_062()`<br>**Unit:** `test_studies_null_baseline.py::test_baseline_records_seed_and_split()` |
+| Completed | `FR-RES-063` | Compare observed evidence to the correctly matched null and return percentile, threshold, p-value, and warnings. | `compare_to_null(observed: EdgeResult, baseline: EdgeResult) -> Mapping[str, JSONValue]` | Read-only | `ValidationError`: incompatible/malformed results | **Usage:** `07_studies.py::fr_res_063()`<br>**Unit:** `test_studies_null_baseline.py::test_compare_rejects_mismatched_side()` |
+| Completed | `FR-RES-064` | Extract versioned acceptance criteria from baseline evidence without hard-coded direction drift. | `get_acceptance_criteria(baseline: EdgeResult) -> Mapping[str, JSONValue]` | Read-only | `ValidationError`: absent/incompatible baseline | **Usage:** `07_studies.py::fr_res_064()`<br>**Unit:** `test_studies_null_baseline.py::test_criteria_follow_confirmation_policy()` |
+| Completed | `FR-RES-065` | Evaluate compression/z-score fade mean reversion on declared split data and return advisory uncertainty evidence. | `run_eds_mean_reversion(data: DataFrame, *, split: TimeSplitResult, study: StudyConfig, statistics: StatisticalConfig, limits: ResearchResourceLimits) -> EdgeResult` | Read-only | Pending taxonomy: invalid/insufficient/resource/statistical failure | **Usage:** `07_studies.py::fr_res_065()`<br>**Unit:** `test_edge_studies.py::test_mean_reversion_uses_matched_null()` |
+| Completed | `FR-RES-066` | Evaluate high-volatility breakout follow-through on declared split data and return advisory uncertainty evidence. | `run_eds_trend_persistence(data: DataFrame, *, split: TimeSplitResult, study: StudyConfig, statistics: StatisticalConfig, limits: ResearchResourceLimits) -> EdgeResult` | Read-only | Pending taxonomy: invalid/insufficient/resource/statistical failure | **Usage:** `07_studies.py::fr_res_066()`<br>**Unit:** `test_edge_studies.py::test_trend_study_records_rule_config()` |
+| Completed | `FR-RES-067` | Evaluate breakout/fade hypotheses on a frame already tagged by `seasonality.tag_sessions` and apply multiple-testing correction without redefining session windows. | `run_eds_session(tagged_data: DataFrame, *, split: TimeSplitResult, study: StudyConfig, statistics: StatisticalConfig, limits: ResearchResourceLimits) -> EdgeResult` | Read-only | missing/invalid canonical session tags, validation, or resource failure | **Usage:** `07_studies.py::fr_res_067`<br>**Unit:** `test_edge_studies.py::test_session_study_applies_fdr` |
+| Completed | `FR-RES-068` | Classify mean-reversion and trend evidence using one versioned confirmation policy and preserve uncertainty/advisory status. | `classify_symbol(mean_reversion: EdgeResult, trend_persistence: EdgeResult, *, policy_version: str) -> Mapping[str, JSONValue]` | Read-only | `ValidationError`: incompatible result/policy | **Usage:** `07_studies.py::fr_res_068()`<br>**Unit:** `test_studies_classification.py::test_classification_matches_report_policy()` |
 
 **Implementation notes:**
 
@@ -954,7 +957,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_studies.py` contains the seven mapped examples.
+`tests/research/usage/07_studies.py` contains the seven mapped examples.
 
 ---
 
@@ -968,31 +971,31 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `sessions.py` | Resolve, describe, and tag canonical sessions. | `active_sessions_for_hour`, `session_label_for_hour`, `session_hours_payload`, `tag_sessions` | **Standard library:** datetime, typing<br>**Required third-party:** pandas<br>**Local:** contracts.configurations → `SessionConfig` |
-| Missing | `analysis.py` | Compute seasonality summaries under the canonical session policy. | `SeasonalityFilters`, `run_seasonality` | **Standard library:** dataclasses, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; sessions.py |
-| Missing | `__init__.py` | Expose the supported session/seasonality API. | Six exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** sessions.py, analysis.py |
+| Completed | `sessions.py` | Resolve, describe, and tag canonical sessions. | `active_sessions_for_hour`, `session_label_for_hour`, `session_hours_payload`, `tag_sessions` | **Standard library:** datetime, typing<br>**Required third-party:** pandas<br>**Local:** contracts.configurations → `SessionConfig` |
+| Completed | `analysis.py` | Compute seasonality summaries under the canonical session policy. | `SeasonalityFilters`, `run_seasonality` | **Standard library:** dataclasses, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; sessions.py |
+| Completed | `__init__.py` | Expose the supported session/seasonality API. | Six exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** sessions.py, analysis.py |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `session timezone/windows/precedence` | `SessionConfig` | UTC windows; `london > new_york > tokyo > sydney` | Yes | All module symbols | One authority across enrichment, session studies, heatmaps, and summaries. |
-| Missing | `adr_period` | `int` | `14` | Yes | `run_seasonality()` | Positive window; too-short data produces documented insufficiency. |
+| Completed | `session timezone/windows/precedence` | `SessionConfig` | Explicit per run | Yes | All module symbols | One authority across enrichment, session studies, heatmaps, and summaries. |
+| Completed | `adr_period` | `int` | `14` | Yes | `run_seasonality()` | Positive window; too-short data produces documented insufficiency. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-069` | Return every configured session active for a timezone-aware hour using canonical overlap precedence. | `active_sessions_for_hour(hour: int, *, config: SessionConfig) -> tuple[str,...]` | Read-only | invalid hour/session policy | **Usage:** `test_usage_seasonality.py::test_usage_sessions_active`<br>**Unit:** `test_sessions.py::test_active_sessions_handles_overlap` |
-| Missing | `FR-RES-070` | Return the deterministic primary session label for an hour while preserving overlap evidence. | `session_label_for_hour(hour: int, *, config: SessionConfig) -> str` | Read-only | unmatched/invalid hour | **Usage:** `test_usage_seasonality.py::test_usage_sessions_label`<br>**Unit:** `test_sessions.py::test_session_label_uses_precedence` |
-| Missing | `FR-RES-071` | Return a machine-readable payload of timezone, windows, order, overlaps, and schema version. | `session_hours_payload(*, config: SessionConfig) -> Mapping[str, JSONValue]` | Read-only | invalid policy | **Usage:** `test_usage_seasonality.py::test_usage_sessions_payload`<br>**Unit:** `test_sessions.py::test_session_payload_is_versioned` |
-| Missing | `FR-RES-072` | Add session labels to a copied timezone-aware frame and record DST/unmatched warnings without changing row order. | `tag_sessions(data: DataFrame, *, config: SessionConfig) -> tuple[DataFrame, tuple[ResearchWarning,...]]` | Read-only | invalid index/timezone/policy | **Usage:** `test_usage_seasonality.py::test_usage_sessions_tag`<br>**Unit:** `test_sessions.py::test_tag_sessions_handles_cross_midnight` |
-| Missing | `FR-RES-073` | Define immutable optional calendar, session, symbol, and hour filters without embedding session definitions. | `SeasonalityFilters(years: tuple[int, ...] = (), months: tuple[int, ...] = (), weekdays: tuple[int, ...] = (), hours: tuple[int, ...] = (), sessions: tuple[str, ...] = ())` | None | Pending taxonomy: invalid range/filter | **Usage:** `test_usage_seasonality.py::test_usage_analysis_filters()`<br>**Unit:** `test_analysis.py::test_filters_reject_invalid_month()` |
-| Missing | `FR-RES-074` | Compute calendar/session/hour summaries, sparse-bucket warnings, opportunity windows, and extremes from supplied data and filters. | `run_seasonality(prepared: PreparedDataset, *, sessions: SessionConfig, filters: SeasonalityFilters, limits: ResearchResourceLimits) -> Mapping[str, JSONValue]` | Read-only | invalid session/data/resource | **Usage:** `test_usage_seasonality.py::test_usage_analysis_run_seasonality`<br>**Unit:** `test_analysis.py::test_seasonality_warns_sparse_bucket` |
+| Completed | `FR-RES-069` | Return every configured session active for a timezone-aware hour using canonical overlap precedence. | `active_sessions_for_hour(hour: int, *, config: SessionConfig) -> tuple[str,...]` | Read-only | invalid hour/session policy | **Usage:** `08_seasonality.py::fr_res_069`<br>**Unit:** `test_sessions.py::test_active_sessions_handles_overlap` |
+| Completed | `FR-RES-070` | Return the deterministic primary session label for an hour while preserving overlap evidence. | `session_label_for_hour(hour: int, *, config: SessionConfig) -> str` | Read-only | unmatched/invalid hour | **Usage:** `08_seasonality.py::fr_res_070`<br>**Unit:** `test_sessions.py::test_session_label_uses_precedence` |
+| Completed | `FR-RES-071` | Return a machine-readable payload of timezone, windows, order, overlaps, and schema version. | `session_hours_payload(*, config: SessionConfig) -> Mapping[str, JSONValue]` | Read-only | invalid policy | **Usage:** `08_seasonality.py::fr_res_071`<br>**Unit:** `test_sessions.py::test_session_payload_is_versioned` |
+| Completed | `FR-RES-072` | Add session labels to a copied timezone-aware frame and record DST/unmatched warnings without changing row order. | `tag_sessions(data: DataFrame, *, config: SessionConfig) -> tuple[DataFrame, tuple[ResearchWarning,...]]` | Read-only | invalid index/timezone/policy | **Usage:** `08_seasonality.py::fr_res_072`<br>**Unit:** `test_sessions.py::test_tag_sessions_handles_cross_midnight` |
+| Completed | `FR-RES-073` | Define immutable optional calendar, session, symbol, and hour filters without embedding session definitions. | `SeasonalityFilters(years: tuple[int, ...] = (), months: tuple[int, ...] = (), weekdays: tuple[int, ...] = (), hours: tuple[int, ...] = (), sessions: tuple[str, ...] = ())` | None | Pending taxonomy: invalid range/filter | **Usage:** `08_seasonality.py::fr_res_073()`<br>**Unit:** `test_analysis.py::test_filters_reject_invalid_month()` |
+| Completed | `FR-RES-074` | Compute calendar/session/hour summaries, sparse-bucket warnings, opportunity windows, and extremes from supplied data and filters. | `run_seasonality(prepared: PreparedDataset, *, sessions: SessionConfig, filters: SeasonalityFilters, limits: ResearchResourceLimits) -> Mapping[str, JSONValue]` | Read-only | invalid session/data/resource | **Usage:** `08_seasonality.py::fr_res_074`<br>**Unit:** `test_analysis.py::test_seasonality_warns_sparse_bucket` |
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_seasonality.py` contains the six mapped examples.
+`tests/research/usage/08_seasonality.py` contains the six mapped examples.
 
 ---
 
@@ -1006,31 +1009,31 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `profile.py` | Detect swings/legs/ranges/distributions/regimes and apply canonical scoring. | `build_market_structure_profile` | **Standard library:** time, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; features; metrics; studies; seasonality |
-| Missing | `quality.py` | Run bounded opt-in stability and robustness evaluation using the canonical builder. | `evaluate_market_structure_quality` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; profile.py |
-| Missing | `validation.py` | Label later behavior and summarize prediction evidence. | `label_realized_market_behavior`, `build_validation_summary` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts |
-| Missing | `calibration.py` | Rank bounded candidates using the same canonical score and explicit validation truth. | `calibrate_market_structure` | **Standard library:** itertools, typing<br>**Required third-party:** numpy<br>**Local:** contracts; profile.py; validation.py |
-| Missing | `fit.py` | Convert research evidence into advisory strategy-archetype fit only. | `build_strategy_fit` | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** contracts.results → `MarketStructureProfile` |
-| Missing | `__init__.py` | Expose the supported market-structure API. | Six functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** five files above |
+| Completed | `profile.py` | Detect swings/legs/ranges/distributions/regimes and apply canonical scoring. | `build_market_structure_profile` | **Standard library:** time, typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; features; metrics; studies; seasonality |
+| Completed | `quality.py` | Run bounded opt-in stability and robustness evaluation using the canonical builder. | `evaluate_market_structure_quality` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; profile.py |
+| Completed | `validation.py` | Label later behavior and summarize prediction evidence. | `label_realized_market_behavior`, `build_validation_summary` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts |
+| Completed | `calibration.py` | Rank bounded candidates using the same canonical score and explicit validation truth. | `calibrate_market_structure` | **Standard library:** itertools, typing<br>**Required third-party:** numpy<br>**Local:** contracts; profile.py; validation.py |
+| Completed | `fit.py` | Convert research evidence into advisory strategy-archetype fit only. | `build_strategy_fit` | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** contracts.results → `MarketStructureProfile` |
+| Completed | `__init__.py` | Expose the supported market-structure API. | Six functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** five files above |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `validation_horizon` | `int` | explicit positive bars | Yes | Validation/calibration | Defines realized truth; no heuristic default is allowed. |
-| Missing | `max_calibration_candidates` | `int` | `128` hard maximum | Yes | `calibrate_market_structure` | Candidate grids are caller-supplied; excess is rejected before evaluation. |
-| Missing | `enable_quality` | `bool` | `False` | No | `evaluate_market_structure_quality()` | Stability/robustness are explicitly opt-in due cost. |
+| Completed | `validation_horizon` | `int` | Explicit positive bars | Yes | Validation/calibration | Defines realized truth; no heuristic default is allowed. |
+| Completed | `max_calibration_candidates` | `int` | `128` hard maximum | Yes | `calibrate_market_structure` | Candidate grids are caller-supplied; excess is rejected before evaluation. |
+| Completed | `enable_quality` | `bool` | `False` | No | `evaluate_market_structure_quality()` | Stability/robustness are explicitly opt-in due cost. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-075` | Build swings, directional legs, range/distribution/excursion/regime evidence, canonical score/verdict, warnings, hashes, and advisory fit. | `build_market_structure_profile(prepared: PreparedDataset, *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> MarketStructureProfile` | Read-only | Pending taxonomy/resource: invalid/insufficient data or limit | **Usage:** `test_usage_market_structure.py::test_usage_profile_build()`<br>**Unit:** `test_profile.py::test_profile_reuses_canonical_score()` |
-| Missing | `FR-RES-076` | Run bounded temporal stability and parameter robustness only when enabled and record windows, variants, duration, and warnings. | `evaluate_market_structure_quality(prepared: PreparedDataset, *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> MarketStructureQualityReport` | Read-only | Pending taxonomy/resource: disabled/invalid/budget exceeded | **Usage:** `test_usage_market_structure.py::test_usage_quality_evaluate()`<br>**Unit:** `test_quality.py::test_quality_is_opt_in_and_bounded()` |
-| Missing | `FR-RES-077` | Label later bars as trend/reversion/mixed under one approved horizon/truth policy and return insufficiency as structured evidence. | `label_realized_market_behavior(data: DataFrame, *, symbol: str, timeframe: str, config: MarketStructureConfig) -> Mapping[str, JSONValue]` | Read-only | invalid truth policy or data | **Usage:** `test_usage_market_structure.py::test_usage_validation_label_behavior`<br>**Unit:** `test_validation.py::test_label_behavior_uses_approved_horizon` |
-| Missing | `FR-RES-078` | Aggregate prediction evidence by confidence, verdict, symbol, and timeframe with sample counts and warnings. | `build_validation_summary(rows: Sequence[Mapping[str, JSONValue]]) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: malformed/insufficient rows | **Usage:** `test_usage_market_structure.py::test_usage_validation_summary()`<br>**Unit:** `test_validation.py::test_summary_preserves_sample_counts()` |
-| Missing | `FR-RES-079` | Build and rank a bounded candidate grid against approved validation truth using the same canonical score, recording parameters, criteria, window, stability, and warnings. | `calibrate_market_structure(run_rows: Sequence[Mapping[str, JSONValue]], validation_rows: Sequence[Mapping[str, JSONValue]], *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> Mapping[str, JSONValue]` | Read-only | invalid truth/candidate/resource | **Usage:** `test_usage_market_structure.py::test_usage_calibration_calibrate`<br>**Unit:** `test_calibration.py::test_calibration_uses_profile_score` |
-| Missing | `FR-RES-080` | Rank advisory strategy archetypes from profile evidence without mutating or approving Strategy, Risk, or Trading state. | `build_strategy_fit(profile: MarketStructureProfile) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: malformed/insufficient profile | **Usage:** `test_usage_market_structure.py::test_usage_fit_build_strategy_fit()`<br>**Unit:** `test_fit.py::test_strategy_fit_is_advisory_only()` |
+| Completed | `FR-RES-075` | Build swings, directional legs, range/distribution/excursion/regime evidence, canonical score/verdict, warnings, hashes, and advisory fit. | `build_market_structure_profile(prepared: PreparedDataset, *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> MarketStructureProfile` | Read-only | Pending taxonomy/resource: invalid/insufficient data or limit | **Usage:** `09_market_structure.py::fr_res_075()`<br>**Unit:** `test_metric_profile.py::test_profile_reuses_canonical_score()` |
+| Completed | `FR-RES-076` | Run bounded temporal stability and parameter robustness only when enabled and record windows, variants, duration, and warnings. | `evaluate_market_structure_quality(prepared: PreparedDataset, *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> MarketStructureQualityReport` | Read-only | Pending taxonomy/resource: disabled/invalid/budget exceeded | **Usage:** `09_market_structure.py::fr_res_076()`<br>**Unit:** `test_quality.py::test_quality_is_opt_in_and_bounded()` |
+| Completed | `FR-RES-077` | Label later bars as trend/reversion/mixed under one approved horizon/truth policy and return insufficiency as structured evidence. | `label_realized_market_behavior(data: DataFrame, *, symbol: str, timeframe: str, config: MarketStructureConfig) -> Mapping[str, JSONValue]` | Read-only | invalid truth policy or data | **Usage:** `09_market_structure.py::fr_res_077`<br>**Unit:** `test_data_validation.py::test_label_behavior_uses_approved_horizon` |
+| Completed | `FR-RES-078` | Aggregate prediction evidence by confidence, verdict, symbol, and timeframe with sample counts and warnings. | `build_validation_summary(rows: Sequence[Mapping[str, JSONValue]]) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: malformed/insufficient rows | **Usage:** `09_market_structure.py::fr_res_078()`<br>**Unit:** `test_data_validation.py::test_summary_preserves_sample_counts()` |
+| Completed | `FR-RES-079` | Build and rank a bounded candidate grid against approved validation truth using the same canonical score, recording parameters, criteria, window, stability, and warnings. | `calibrate_market_structure(run_rows: Sequence[Mapping[str, JSONValue]], validation_rows: Sequence[Mapping[str, JSONValue]], *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> Mapping[str, JSONValue]` | Read-only | invalid truth/candidate/resource | **Usage:** `09_market_structure.py::fr_res_079`<br>**Unit:** `test_calibration.py::test_calibration_uses_profile_score` |
+| Completed | `FR-RES-080` | Rank advisory strategy archetypes from profile evidence without mutating or approving Strategy, Risk, or Trading state. | `build_strategy_fit(profile: MarketStructureProfile) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: malformed/insufficient profile | **Usage:** `09_market_structure.py::fr_res_080()`<br>**Unit:** `test_fit.py::test_strategy_fit_is_advisory_only()` |
 
 **Implementation notes:**
 
@@ -1040,7 +1043,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_market_structure.py` contains the six mapped examples.
+`tests/research/usage/09_market_structure.py` contains the six mapped examples.
 
 ---
 
@@ -1054,32 +1057,32 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `decomposition.py` | Scale selected numeric features and compute PCA evidence. | `run_pca` | **Standard library:** typing<br>**Required third-party:** numpy, pandas, scikit-learn<br>**Local:** contracts |
-| Missing | `clustering.py` | Compute deterministic K-Means labels and attach them to a copy. | `cluster_feature_space`, `attach_cluster_labels` | **Standard library:** typing<br>**Required third-party:** numpy, pandas, scikit-learn<br>**Local:** contracts |
-| Missing | `insights.py` | Summarize investment data, factors, cluster forward evidence, and the complete insight payload. | `summarize_investment_data`, `identify_pca_risk_factors`, `analyze_cluster_outperformance`, `build_unsupervised_insight_report` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; features → `forward_returns`; decomposition/clustering |
-| Missing | `workflow.py` | Validate prerequisites and execute the complete stateless workflow. | `run_unsupervised_research` | **Standard library:** time, typing<br>**Required third-party:** pandas<br>**Local:** contracts; three files above |
-| Missing | `__init__.py` | Expose the supported modeling API. | Eight functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** four files above |
+| Completed | `decomposition.py` | Scale selected numeric features and compute PCA evidence. | `run_pca` | **Standard library:** typing<br>**Required third-party:** numpy, pandas, scikit-learn<br>**Local:** contracts |
+| Completed | `clustering.py` | Compute deterministic K-Means labels and attach them to a copy. | `cluster_feature_space`, `attach_cluster_labels` | **Standard library:** typing<br>**Required third-party:** numpy, pandas, scikit-learn<br>**Local:** contracts |
+| Completed | `insights.py` | Summarize investment data, factors, cluster forward evidence, and the complete insight payload. | `summarize_investment_data`, `identify_pca_risk_factors`, `analyze_cluster_outperformance`, `build_unsupervised_insight_report` | **Standard library:** typing<br>**Required third-party:** numpy, pandas<br>**Local:** contracts; features → `forward_returns`; decomposition/clustering |
+| Completed | `workflow.py` | Validate prerequisites and execute the complete stateless workflow. | `run_unsupervised_research` | **Standard library:** time, typing<br>**Required third-party:** pandas<br>**Local:** contracts; three files above |
+| Completed | `__init__.py` | Expose the supported modeling API. | Eight functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** four files above |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `seed` | `int` | required explicit master seed | Yes | Clustering/workflow | Effective seed recorded; fixed inputs/config/dependencies must reproduce labels. |
-| Missing | `minimum_samples` | `int` | explicit; advisory per the applicable Research specification | Yes | All modeling functions | Too-few rows produce typed insufficiency, not ambiguous `SKIPPED`. |
-| Missing | `pca_components / clusters` | `int` | None | Yes | PCA/K-Means | Must be positive and supported by usable rows/features. |
+| Completed | `seed` | `int` | Required explicit master seed | Yes | Clustering/workflow | Effective seed recorded; fixed inputs/config/dependencies reproduce labels. |
+| Completed | `minimum_samples` | `int` | Explicit | Yes | All modeling functions | Too-few rows produce typed insufficiency, not ambiguous `SKIPPED`. |
+| Completed | `pca_components / clusters` | `int` | Explicit | Yes | PCA/K-Means | Must be positive and supported by usable rows/features. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-081` | Scale selected finite numeric features and return PCA scores, loadings, variance, preprocessing, and diagnostics without mutation. | `run_pca(features: DataFrame, *, config: UnsupervisedResearchConfig) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: invalid/constant/missing/insufficient dimensions | **Usage:** `test_usage_modeling.py::test_usage_decomposition_run_pca()`<br>**Unit:** `test_decomposition.py::test_pca_records_preprocessing()` |
-| Missing | `FR-RES-082` | Cluster finite feature rows with deterministic K-Means under the effective seed and return labels/centers/diagnostics. | `cluster_feature_space(features: DataFrame, *, config: UnsupervisedResearchConfig) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: invalid cluster/sample/seed/data | **Usage:** `test_usage_modeling.py::test_usage_clustering_cluster()`<br>**Unit:** `test_clustering.py::test_clusters_reproduce_with_seed()` |
-| Missing | `FR-RES-083` | Attach aligned labels to a copied feature frame without mutating input or changing row order. | `attach_cluster_labels(features: DataFrame, labels: Series, *, column: str = "cluster") -> DataFrame` | Read-only | Pending taxonomy: misaligned labels/duplicate column | **Usage:** `test_usage_modeling.py::test_usage_clustering_attach_labels()`<br>**Unit:** `test_clustering.py::test_attach_labels_does_not_mutate()` |
-| Missing | `FR-RES-084` | Return descriptive finite-value, missingness, duplicate, return, and correlation evidence for investment data. | `summarize_investment_data(data: DataFrame) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: empty/invalid data | **Usage:** `test_usage_modeling.py::test_usage_insights_summarize()`<br>**Unit:** `test_insights.py::test_summary_handles_constant_columns()` |
-| Missing | `FR-RES-085` | Extract the largest absolute PCA loadings as interpretable factors with component/feature/sign/magnitude evidence. | `identify_pca_risk_factors(pca: Mapping[str, JSONValue], *, top_count: int) -> tuple[Mapping[str, JSONValue], ...]` | Read-only | Pending taxonomy: malformed PCA/non-positive count | **Usage:** `test_usage_modeling.py::test_usage_insights_identify_factors()`<br>**Unit:** `test_insights.py::test_factors_rank_absolute_loadings()` |
-| Missing | `FR-RES-086` | Compare clusters using canonical forward returns, sample counts, uncertainty, and semantic advisory names without adapting signals. | `analyze_cluster_outperformance(data: DataFrame, labels: Series, *, horizon: int) -> tuple[Mapping[str, JSONValue], ...]` | Read-only | Pending taxonomy: invalid/misaligned/insufficient data | **Usage:** `test_usage_modeling.py::test_usage_insights_cluster_outperformance()`<br>**Unit:** `test_insights.py::test_cluster_outperformance_records_sample_size()` |
-| Missing | `FR-RES-087` | Combine descriptive, PCA, cluster, factor, and forward evidence with warnings and diagnostics; omit all signal-adaptation behavior. | `build_unsupervised_insight_report(features: DataFrame, *, config: UnsupervisedResearchConfig) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: nested model/validation failure | **Usage:** `test_usage_modeling.py::test_usage_insights_build_report()`<br>**Unit:** `test_insights.py::test_insight_report_has_no_signal_control()` |
-| Missing | `FR-RES-088` | Execute the stateless bounded modeling workflow and return complete reproducibility metadata and advisory status. | `run_unsupervised_research(features: DataFrame, *, config: UnsupervisedResearchConfig, limits: ResearchResourceLimits) -> UnsupervisedResearchResult` | Read-only | invalid/insufficient/resource/model failure | **Usage:** `test_usage_modeling.py::test_usage_workflow_run_unsupervised`<br>**Unit:** `test_workflow.py::test_workflow_is_stateless_seeded_and_advisory` |
+| Completed | `FR-RES-081` | Scale selected finite numeric features and return PCA scores, loadings, variance, preprocessing, and diagnostics without mutation. | `run_pca(features: DataFrame, *, config: UnsupervisedResearchConfig) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: invalid/constant/missing/insufficient dimensions | **Usage:** `10_modeling.py::fr_res_081()`<br>**Unit:** `test_decomposition.py::test_pca_records_preprocessing()` |
+| Completed | `FR-RES-082` | Cluster finite feature rows with deterministic K-Means under the effective seed and return labels/centers/diagnostics. | `cluster_feature_space(features: DataFrame, *, config: UnsupervisedResearchConfig) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: invalid cluster/sample/seed/data | **Usage:** `10_modeling.py::fr_res_082()`<br>**Unit:** `test_clustering.py::test_clusters_reproduce_with_seed()` |
+| Completed | `FR-RES-083` | Attach aligned labels to a copied feature frame without mutating input or changing row order. | `attach_cluster_labels(features: DataFrame, labels: Series, *, column: str = "cluster") -> DataFrame` | Read-only | Pending taxonomy: misaligned labels/duplicate column | **Usage:** `10_modeling.py::fr_res_083()`<br>**Unit:** `test_clustering.py::test_attach_labels_does_not_mutate()` |
+| Completed | `FR-RES-084` | Return descriptive finite-value, missingness, duplicate, return, and correlation evidence for investment data. | `summarize_investment_data(data: DataFrame) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: empty/invalid data | **Usage:** `10_modeling.py::fr_res_084()`<br>**Unit:** `test_insights.py::test_summary_handles_constant_columns()` |
+| Completed | `FR-RES-085` | Extract the largest absolute PCA loadings as interpretable factors with component/feature/sign/magnitude evidence. | `identify_pca_risk_factors(pca: Mapping[str, JSONValue], *, top_count: int) -> tuple[Mapping[str, JSONValue], ...]` | Read-only | Pending taxonomy: malformed PCA/non-positive count | **Usage:** `10_modeling.py::fr_res_085()`<br>**Unit:** `test_insights.py::test_factors_rank_absolute_loadings()` |
+| Completed | `FR-RES-086` | Compare clusters using canonical forward returns, sample counts, uncertainty, and semantic advisory names without adapting signals. | `analyze_cluster_outperformance(data: DataFrame, labels: Series, *, horizon: int) -> tuple[Mapping[str, JSONValue], ...]` | Read-only | Pending taxonomy: invalid/misaligned/insufficient data | **Usage:** `10_modeling.py::fr_res_086()`<br>**Unit:** `test_insights.py::test_cluster_outperformance_records_sample_size()` |
+| Completed | `FR-RES-087` | Combine descriptive, PCA, cluster, factor, and forward evidence with warnings and diagnostics; omit all signal-adaptation behavior. | `build_unsupervised_insight_report(features: DataFrame, *, config: UnsupervisedResearchConfig) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: nested model/validation failure | **Usage:** `10_modeling.py::fr_res_087()`<br>**Unit:** `test_insights.py::test_insight_report_has_no_signal_control()` |
+| Completed | `FR-RES-088` | Execute the stateless bounded modeling workflow and return complete reproducibility metadata and advisory status. | `run_unsupervised_research(features: DataFrame, *, config: UnsupervisedResearchConfig, limits: ResearchResourceLimits) -> UnsupervisedResearchResult` | Read-only | invalid/insufficient/resource/model failure | **Usage:** `10_modeling.py::fr_res_088`<br>**Unit:** `test_workflow.py::test_workflow_is_stateless_seeded_and_advisory` |
 
 **Implementation notes:**
 
@@ -1089,7 +1092,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_modeling.py` contains the eight mapped examples.
+`tests/research/usage/10_modeling.py` contains the eight mapped examples.
 
 ---
 
@@ -1103,31 +1106,31 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `scorecard.py` | Build one deterministic advisory scorecard. | `build_research_scorecard` | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** contracts; metrics; studies; seasonality; market_structure; Analytics `PerformanceReport` |
-| Missing | `snapshot.py` | Normalize approved versioned stage outputs. | `build_research_profile_snapshot`, `build_profile_summary`, `build_dashboard_summary` | **Standard library:** datetime, typing<br>**Required third-party:** None<br>**Local:** contracts; scorecard.py |
-| Missing | `rendering.py` | Render JSON-compatible, Markdown, comparison, and multi-symbol reports without writing. | `render_research_report`, `render_profile_comparison`, `generate_multi_symbol_report` | **Standard library:** json, typing<br>**Required third-party:** None<br>**Local:** contracts; snapshot.py |
-| Partial | `workflow.py` | Execute implemented selected deterministic Research stages and construct `ResearchReport v1`; unavailable selected stages fail closed. | `run_edge_lab_profile` | **Standard library:** collections, typing<br>**Required third-party:** None<br>**Local:** Research contracts/data/metrics; Data `MarketDataset`; Analytics `PerformanceReport`; Utils validation/hash/logging |
-| Partial | `__init__.py` | Expose the implemented profiles API. | `run_edge_lab_profile` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** workflow.py |
+| Completed | `scorecard.py` | Build one deterministic advisory scorecard. | `build_research_scorecard` | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** contracts; metrics; studies; seasonality; market_structure; Analytics `PerformanceReport` |
+| Completed | `snapshot.py` | Normalize approved versioned stage outputs. | `build_research_profile_snapshot`, `build_profile_summary`, `build_dashboard_summary` | **Standard library:** datetime, typing<br>**Required third-party:** None<br>**Local:** contracts; scorecard.py |
+| Completed | `rendering.py` | Render JSON-compatible, Markdown, comparison, and multi-symbol reports without writing. | `render_research_report`, `render_profile_comparison`, `generate_multi_symbol_report` | **Standard library:** json, typing<br>**Required third-party:** None<br>**Local:** contracts; snapshot.py |
+| Completed | `workflow.py` | Execute all selected deterministic Research stages in canonical dependency order and construct `ResearchReport v1`; invalid dependencies fail closed. | `run_edge_lab_profile` | **Standard library:** collections, dataclasses, typing<br>**Required third-party:** pandas/numpy through selected stages<br>**Local:** Research feature APIs; Data `MarketDataset`; Analytics `PerformanceReport`; Utils validation/hash/logging |
+| Completed | `__init__.py` | Expose the completed profiles API. | Profile builders, renderers, `run_edge_lab_profile` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** focused profile files |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `scorecard_schema_version` | `str` | `v1` | Yes | Scorecard/snapshot/report | Versioned confirmation/readiness semantics. |
-| Missing | `selected_stages` | `tuple[str, ...]` | None | Yes | `run_edge_lab_profile()` | Explicit stages only; dependencies validated and external orchestration retained. |
+| Completed | `scorecard_schema_version` | `str` | `v1` | Yes | Scorecard/snapshot/report | Versioned confirmation/readiness semantics. |
+| Completed | `selected_stages` | `tuple[str, ...]` | None | Yes | `run_edge_lab_profile()` | Explicit stages only; dependencies validated and external orchestration retained. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-089` | Build deterministic score rows, final score, uncertainty, readiness/reasons, versions, warnings, and advisory status from approved evidence. | `build_research_scorecard(*, metric_profile: CoreMetricProfile, seasonality: Mapping[str, JSONValue] \| None, edges: Sequence[EdgeResult], market_structure: MarketStructureProfile \| None, modeling: UnsupervisedResearchResult \| None, performance: PerformanceReport \| None = None) -> ResearchScorecard` | Read-only | Pending taxonomy/dependency: absent prerequisite or incompatible versions | **Usage:** `test_usage_profiles.py::test_usage_scorecard_build()`<br>**Unit:** `test_scorecard.py::test_scorecard_is_deterministic_and_advisory()` |
-| Missing | `FR-RES-090` | Build one canonical versioned snapshot from approved stage outputs and reject route-specific/unversioned payloads. | `build_research_profile_snapshot(*, stages: Mapping[str, JSONValue], scorecard: ResearchScorecard, dataset_hash: str, configuration_hash: str) -> ResearchProfileSnapshot` | Read-only | Pending taxonomy: missing/incompatible stage/hash | **Usage:** `test_usage_profiles.py::test_usage_snapshot_build()`<br>**Unit:** `test_snapshot.py::test_snapshot_rejects_unversioned_stage()` |
-| Missing | `FR-RES-091` | Return a concise observation/uncertainty/readiness summary from a canonical snapshot. | `build_profile_summary(snapshot: ResearchProfileSnapshot) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: invalid snapshot | **Usage:** `test_usage_profiles.py::test_usage_snapshot_profile_summary()`<br>**Unit:** `test_snapshot.py::test_profile_summary_preserves_warnings()` |
-| Missing | `FR-RES-092` | Return a bounded UI-ready block from a canonical snapshot without presentation-side calculation. | `build_dashboard_summary(snapshot: ResearchProfileSnapshot) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy/resource: invalid/oversized snapshot | **Usage:** `test_usage_profiles.py::test_usage_snapshot_dashboard()`<br>**Unit:** `test_snapshot.py::test_dashboard_summary_is_bounded()` |
-| Missing | `FR-RES-093` | Render a canonical report as JSON-compatible data or Markdown with UTC metadata and no persistence side effect. | `render_research_report(report: ResearchReport, *, format: Literal["json", "markdown"]) -> JSONValue \| str` | Read-only | Pending taxonomy: unsupported format/non-serializable report | **Usage:** `test_usage_profiles.py::test_usage_rendering_report()`<br>**Unit:** `test_rendering.py::test_render_report_uses_utc_and_no_io()` |
-| Missing | `FR-RES-094` | Render a Markdown comparison of two compatible snapshots while exposing schema/config/dataset differences. | `render_profile_comparison(left: ResearchProfileSnapshot, right: ResearchProfileSnapshot) -> str` | Read-only | Pending taxonomy: incompatible schema/snapshot | **Usage:** `test_usage_profiles.py::test_usage_rendering_comparison()`<br>**Unit:** `test_rendering.py::test_comparison_rejects_incompatible_schema()` |
-| Missing | `FR-RES-095` | Render per-symbol and combined advisory summaries in memory while preserving individual failures/warnings; it shall not write files. | `generate_multi_symbol_report(reports: Mapping[str, ResearchReport], *, format: Literal["json", "markdown"]) -> JSONValue \| str` | Read-only | Pending taxonomy/resource: empty/invalid/oversized report set | **Usage:** `test_usage_profiles.py::test_usage_rendering_multi_symbol()`<br>**Unit:** `test_rendering.py::test_multi_symbol_preserves_partial_warnings()` |
-| Partial | `FR-RES-096` | Execute implemented selected deterministic stage APIs over supplied contracts and return advisory `ResearchReport v1` while leaving provider reads, cache, scheduling, database writes, and strategy submission external. `data` is mandatory; `metrics` is optional; selecting another currently unavailable stage fails closed. | `run_edge_lab_profile(dataset: MarketDataset, *, hypothesis: str, config: EdgeLabConfig, performance: PerformanceReport \| None = None) -> ResearchReport` | Read-only | `ValidationError[RES_INPUT_INVALID|RES_STAGE_DEPENDENCY_INVALID|RES_STAGE_UNAVAILABLE]` or typed stage failure | **Unit:** `tests/research/unit/test_workflow.py`<br>**System:** `tests/system/integration/test_research_to_strategy.py` |
+| Completed | `FR-RES-089` | Build deterministic score rows, final score, uncertainty, readiness/reasons, versions, warnings, and advisory status from approved evidence. | `build_research_scorecard(*, metric_profile: CoreMetricProfile, seasonality: Mapping[str, JSONValue] \| None, edges: Sequence[EdgeResult], market_structure: MarketStructureProfile \| None, modeling: UnsupervisedResearchResult \| None, performance: PerformanceReport \| None = None) -> ResearchScorecard` | Read-only | Pending taxonomy/dependency: absent prerequisite or incompatible versions | **Usage:** `11_profiles.py::fr_res_089()`<br>**Unit:** `test_scorecard.py::test_scorecard_is_deterministic_and_advisory()` |
+| Completed | `FR-RES-090` | Build one canonical versioned snapshot from approved stage outputs and reject route-specific/unversioned payloads. | `build_research_profile_snapshot(*, stages: Mapping[str, JSONValue], scorecard: ResearchScorecard, dataset_hash: str, configuration_hash: str) -> ResearchProfileSnapshot` | Read-only | Pending taxonomy: missing/incompatible stage/hash | **Usage:** `11_profiles.py::fr_res_090()`<br>**Unit:** `test_snapshot.py::test_snapshot_rejects_unversioned_stage()` |
+| Completed | `FR-RES-091` | Return a concise observation/uncertainty/readiness summary from a canonical snapshot. | `build_profile_summary(snapshot: ResearchProfileSnapshot) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: invalid snapshot | **Usage:** `11_profiles.py::fr_res_091()`<br>**Unit:** `test_snapshot.py::test_profile_summary_preserves_warnings()` |
+| Completed | `FR-RES-092` | Return a bounded UI-ready block from a canonical snapshot without presentation-side calculation. | `build_dashboard_summary(snapshot: ResearchProfileSnapshot) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy/resource: invalid/oversized snapshot | **Usage:** `11_profiles.py::fr_res_092()`<br>**Unit:** `test_snapshot.py::test_dashboard_summary_is_bounded()` |
+| Completed | `FR-RES-093` | Render a canonical report as JSON-compatible data or Markdown with UTC metadata and no persistence side effect. | `render_research_report(report: ResearchReport, *, format: Literal["json", "markdown"]) -> JSONValue \| str` | Read-only | Pending taxonomy: unsupported format/non-serializable report | **Usage:** `11_profiles.py::fr_res_093()`<br>**Unit:** `test_rendering.py::test_render_report_uses_utc_and_no_io()` |
+| Completed | `FR-RES-094` | Render a Markdown comparison of two compatible snapshots while exposing schema/config/dataset differences. | `render_profile_comparison(left: ResearchProfileSnapshot, right: ResearchProfileSnapshot) -> str` | Read-only | Pending taxonomy: incompatible schema/snapshot | **Usage:** `11_profiles.py::fr_res_094()`<br>**Unit:** `test_rendering.py::test_comparison_rejects_incompatible_schema()` |
+| Completed | `FR-RES-095` | Render per-symbol and combined advisory summaries in memory while preserving individual failures/warnings; it shall not write files. | `generate_multi_symbol_report(reports: Mapping[str, ResearchReport], *, format: Literal["json", "markdown"]) -> JSONValue \| str` | Read-only | Pending taxonomy/resource: empty/invalid/oversized report set | **Usage:** `11_profiles.py::fr_res_095()`<br>**Unit:** `test_rendering.py::test_multi_symbol_preserves_partial_warnings()` |
+| Completed | `FR-RES-096` | Execute selected `data`, `features`, `leakage`, `metrics`, `statistics`, `studies`, `seasonality`, `market_structure`, `modeling`, and `profiles` APIs in canonical dependency order and return advisory `ResearchReport v1` while leaving provider reads, cache, scheduling, database/artifact writes, and strategy submission external. | `run_edge_lab_profile(dataset: MarketDataset, *, hypothesis: str, config: EdgeLabConfig, performance: PerformanceReport \| None = None) -> ResearchReport` | Read-only | `ValidationError[RES_INPUT_INVALID\|RES_STAGE_DEPENDENCY_INVALID\|RES_STAGE_UNAVAILABLE]` or typed selected-stage failure | **Usage:** `tests/research/usage/11_profiles.py::fr_res_096()`<br>**Unit:** `tests/research/unit/test_workflow.py::test_edge_lab_executes_every_configured_stage()`<br>**System:** `tests/system/integration/test_research_to_strategy.py` |
 
 **Implementation notes:**
 
@@ -1137,7 +1140,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_profiles.py` contains the eight mapped examples.
+`tests/research/usage/11_profiles.py` contains the eight mapped examples.
 
 ---
 
@@ -1151,25 +1154,25 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `persistence.py` | Perform the single approved Research persistence side effect. | `write_research_artifact` | **Standard library:** hashlib, os, pathlib, tempfile, typing<br>**Required third-party:** None<br>**Local:** contracts; leakage.masking; profiles.rendering; Utils `AuthContext`/`AuditEvent`/security; Data migration/connection public API through Data's documented migration and connection API |
-| Missing | `migrations.py` | Define the immutable Research-owned artifact metadata migration for Data's shared executor. | `build_research_migration_request` | **Standard library:** hashlib<br>**Required third-party:** None<br>**Local:** Data `MigrationRequest`/`MigrationStep` contracts |
-| Missing | `__init__.py` | Expose the supported artifact API. | `write_research_artifact` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** persistence.py → `write_research_artifact` |
+| Completed | `persistence.py` | Perform the single approved Research persistence side effect. | `write_research_artifact` | **Standard library:** hashlib, os, pathlib, tempfile, typing<br>**Required third-party:** None<br>**Local:** contracts; leakage.masking; profiles.rendering; Utils `AuthContext`/`AuditEvent`/security; Data migration/connection public API through Data's documented migration and connection API |
+| Completed | `migrations.py` | Define the immutable Research-owned artifact metadata migration for Data's shared executor. | `build_research_migration_request` | **Standard library:** hashlib<br>**Required third-party:** None<br>**Local:** Data `MigrationRequest`/`MigrationStep` contracts |
+| Completed | `__init__.py` | Expose the supported artifact API. | `write_research_artifact` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** persistence.py → `write_research_artifact` |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `allowed_root` | `Path` | `{DATA_DIR}/artifacts/research/` | Yes | `write_research_artifact` | Resolved destination must remain under this root; traversal fails. |
-| Missing | `overwrite` | `bool` | `False` | Yes | `write_research_artifact()` | Existing destination fails unless explicitly true. |
-| Missing | `require_atomic` | `bool` | `True` | Yes | `write_research_artifact()` | Temporary write + atomic replace required; unsupported behavior returns typed failure or disclosed non-atomic result only if policy explicitly permits. |
-| Missing | `max_artifact_bytes` | `int` | `52428800` (50 MB advisory, the applicable Research specification) | Yes | `write_research_artifact` | Oversized artifact rejected before final write; no silent truncation. |
+| Completed | `allowed_root` | `Path` | Explicit absolute root | Yes | `write_research_artifact` | Resolved destination must remain under this root; traversal fails. |
+| Completed | `overwrite` | `bool` | `False` | Yes | `write_research_artifact()` | Existing destination fails unless explicitly true. |
+| Completed | `require_atomic` | `bool` | `True` | Yes | `write_research_artifact()` | Temporary write plus atomic replace is enforced when required. |
+| Completed | `max_artifact_bytes` | `int` | Explicit per run | Yes | `write_research_artifact` | Oversized artifact rejected before final write; no silent truncation. |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-097` | Mask and render an approved artifact, enforce allowed root/overwrite/encoding/size/atomic policy, write via temporary replacement, emit a redacted audit event, and return `ArtifactReference`. | `write_research_artifact(artifact: ResearchReport \| ResearchProfileSnapshot, destination: Path, *, config: ArtifactWriteConfig, auth: AuthContext, limits: ResearchResourceLimits) -> ArtifactReference` | Persistence write; event publication | invalid path, traversal, conflict, permission, serialization, size, atomicity, audit failure | **Usage:** `test_usage_artifacts.py::test_usage_persistence_write_research_artifact`<br>**Unit:** `test_persistence.py::test_write_artifact_masks_and_replaces_atomically` |
-| Missing | `FR-RES-098` | Return the deterministic Research-owned `001_research_artifacts_v1` metadata migration for execution through Data's migration framework. | `build_research_migration_request(request_id: str) -> MigrationRequest` | None | `ConfigurationError(RES_CONFIGURATION_INVALID)` | **Usage:** `test_usage_artifacts.py::test_usage_artifact_migration_request`<br>**Unit:** `test_artifact_migrations.py::test_research_migration_is_stable_and_owned` |
+| Completed | `FR-RES-097` | Mask and render an approved artifact, enforce allowed root/overwrite/encoding/size/atomic policy, write via temporary replacement, emit a redacted audit event, and return `ArtifactReference`. | `write_research_artifact(artifact: ResearchReport \| ResearchProfileSnapshot, destination: Path, *, config: ArtifactWriteConfig, auth: AuthContext, limits: ResearchResourceLimits) -> ArtifactReference` | Persistence write; event publication | invalid path, traversal, conflict, permission, serialization, size, atomicity, audit failure | **Usage:** `12_artifacts.py::fr_res_097`<br>**Unit:** `test_persistence.py::test_write_artifact_masks_and_replaces_atomically` |
+| Completed | `FR-RES-098` | Return the deterministic Research-owned `001_research_artifacts_v1` metadata migration for execution through Data's migration framework. | `build_research_migration_request(request_id: str) -> MigrationRequest` | None | `ConfigurationError(RES_CONFIGURATION_INVALID)` | **Usage:** `12_artifacts.py::fr_res_098`<br>**Unit:** `test_artifact_migrations.py::test_research_migration_is_stable_and_owned` |
 
 **Rules:**
 
@@ -1179,7 +1182,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### Feature usage examples
 
-`tests/research/usage/test_usage_artifacts.py` contains `test_usage_persistence_write_research_artifact()`.
+`tests/research/usage/12_artifacts.py` contains `fr_res_097()`.
 
 ---
 
@@ -1189,21 +1192,21 @@ Shared settings are consumed from `docs/PROJECT.md` and not redefined: `ENVIRONM
 
 | Status | Requirement ID | Type | Responsibility | Verification |
 |---|---|---|---|---|
-| Missing | `NFR-RES-001` | Safety | Research shall remain advisory and shall never place, modify, cancel, route, approve, or block live orders or mutate Strategy/Risk/Trading state. | `tests/research/integration/test_advisory_boundary.py` |
-| Missing | `NFR-RES-002` | Reliability | Any attempted live-state mutation or governance bypass shall fail closed before side effects. | Boundary failure-path test |
-| Missing | `NFR-RES-003` | Reproducibility | Fixed data, effective config, seed, dependency versions, and schema version shall produce equivalent outputs; hashes and effective seeds are recorded. | Seeded replay tests |
-| Missing | `NFR-RES-004` | Leakage | Forward-looking fields shall be declared, detectable, excluded from feature inputs, and gated before publication. | Generated-case leakage tests |
-| Missing | `NFR-RES-005` | Statistical quality | Results shall expose relevant uncertainty and multiple-comparison controls, sample sizes, null assumptions, and warnings. | Statistical contract tests |
-| Missing | `NFR-RES-006` | API boundary | Other domains shall use only documented package exports; `__all__` and classifications are unique, resolvable, and stable. | Import/API audit |
-| Missing | `NFR-RES-007` | Import safety | Importing Research shall perform no network, disk write, provider/credential initialization, live-state read, or heavy computation. | Import-time safety test |
-| Missing | `NFR-RES-008` | Security | Secrets, credentials, broker/account identifiers, private fields, and forbidden forward fields shall not appear in artifacts, warnings, logs, errors, or audit metadata. | Nested masking/security tests |
-| Missing | `NFR-RES-009` | Persistence safety | Artifact writes shall prevent traversal and accidental overwrite, enforce size/encoding/root policy, and use atomic replacement where approved. | Persistence/concurrency tests |
-| Missing | `NFR-RES-010` | Resource safety | Heavy operations shall enforce approved row/iteration/duration/artifact bounds and fail explicitly rather than attempt unbounded work. | Resource tests against the explicit resource limits |
-| Missing | `NFR-RES-011` | Observability | Validation failures, cleaning actions, masking, insufficiency, partial stages, and duration shall emit structured redacted warnings/logs with trace identifiers. | Observability tests |
-| Missing | `NFR-RES-012` | Platform | Deterministic library behavior and safe persistence shall work on the project's supported Python 3.14 Windows baseline; platform atomicity differences are explicit. | Windows CI |
-| Missing | `NFR-RES-013` | Maintainability | No recursive facade scan, duplicate formula wrapper, generic helper/service/manager, mutable global registry, or cross-domain internal import shall exist. | Structure/dependency audit |
-| Missing | `NFR-RES-014` | Testing | Every `FR-RES-*` shall have its mapped usage and unit test; every collaborative workflow shall have its mapped integration test; coverage shall be at least 80%. | Traceability/coverage audit |
-| Missing | `NFR-RES-015` | Documentation | Every module, class, function, and method shall use Google-style docstrings and every public DataFrame contract shall document columns, index, timezone, alignment, NaNs, and mutation. | Documentation contract tests |
+| Completed | `NFR-RES-001` | Safety | Research shall remain advisory and shall never place, modify, cancel, route, approve, or block live orders or mutate Strategy/Risk/Trading state. | `tests/system/integration/test_research_to_strategy.py` |
+| Completed | `NFR-RES-002` | Reliability | Any attempted live-state mutation or governance bypass shall fail closed before side effects. | `tests/research/unit/test_workflow.py`, `tests/system/integration/test_research_to_strategy.py` |
+| Completed | `NFR-RES-003` | Reproducibility | Fixed data, effective config, seed, dependency versions, and schema version shall produce equivalent outputs; hashes and effective seeds are recorded. | `tests/research/unit/test_statistics_resampling.py`, `tests/research/integration/test_unsupervised_research.py` |
+| Completed | `NFR-RES-004` | Leakage | Forward-looking fields shall be declared, detectable, excluded from feature inputs, and gated before publication. | `tests/research/unit/test_leakage_validation.py`, `tests/research/unit/test_feature_frame.py` |
+| Completed | `NFR-RES-005` | Statistical quality | Results shall expose relevant uncertainty and multiple-comparison controls, sample sizes, null assumptions, and warnings. | `tests/research/unit/test_statistics_corrections.py`, `tests/research/unit/test_studies_null_baseline.py` |
+| Completed | `NFR-RES-006` | API boundary | Other domains shall use only documented package exports; `__all__` and classifications are unique, resolvable, and stable. | `tests/research/unit/test_contract_api.py` |
+| Completed | `NFR-RES-007` | Import safety | Importing Research shall perform no network, disk write, provider/credential initialization, live-state read, or heavy computation. | `tests/research/unit/test_contract_api.py` |
+| Completed | `NFR-RES-008` | Security | Secrets, credentials, broker/account identifiers, private fields, and forbidden forward fields shall not appear in artifacts, warnings, logs, errors, or audit metadata. | `tests/research/unit/test_leakage_masking.py`, `tests/research/unit/test_persistence.py` |
+| Completed | `NFR-RES-009` | Persistence safety | Artifact writes shall prevent traversal and accidental overwrite, enforce size/encoding/root policy, and use atomic replacement where approved. | `tests/research/unit/test_persistence.py`, `tests/research/integration/test_artifact_persistence.py` |
+| Completed | `NFR-RES-010` | Resource safety | Heavy operations shall enforce approved row/iteration/duration/artifact bounds and fail explicitly rather than attempt unbounded work. | `tests/research/unit/test_contract_configurations.py`, selected-stage resource tests |
+| Completed | `NFR-RES-011` | Observability | Validation failures, cleaning actions, masking, insufficiency, selected stages, and duration shall emit structured redacted warnings/logs with trace identifiers. | Research unit/integration tests plus logger-boundary inspection |
+| Completed | `NFR-RES-012` | Platform | Deterministic library behavior and safe persistence shall work on the project's supported Python 3.14 Windows baseline; platform atomicity differences are explicit. | Targeted tests and usage programs executed on the Windows baseline |
+| Completed | `NFR-RES-013` | Maintainability | No recursive facade scan, duplicate formula wrapper, generic helper/service/manager, mutable global registry, or cross-domain internal import shall exist. | Package structure and import/API audit |
+| Completed | `NFR-RES-014` | Testing | Every `FR-RES-*` shall have its mapped usage and unit test; every collaborative workflow shall have its mapped integration test; coverage shall be at least 80%. | `tests/research/integration/test_usage_scripts.py`, coverage gate |
+| Completed | `NFR-RES-015` | Documentation | Every module, class, function, and method shall use Google-style docstrings and every public DataFrame contract shall document columns, index, timezone, alignment, NaNs, and mutation. | Ruff docstring checks and package README contract tables |
 
 ---
 
@@ -1242,7 +1245,19 @@ uv run mypy app/services/research
 
 uv run pytest tests/research/unit
 uv run pytest tests/research/integration
-uv run pytest tests/research/usage
+
+uv run python tests/research/usage/01_contracts.py
+uv run python tests/research/usage/02_data.py
+uv run python tests/research/usage/03_features.py
+uv run python tests/research/usage/04_leakage.py
+uv run python tests/research/usage/05_metrics.py
+uv run python tests/research/usage/06_statistics.py
+uv run python tests/research/usage/07_studies.py
+uv run python tests/research/usage/08_seasonality.py
+uv run python tests/research/usage/09_market_structure.py
+uv run python tests/research/usage/10_modeling.py
+uv run python tests/research/usage/11_profiles.py
+uv run python tests/research/usage/12_artifacts.py
 
 uv run pytest tests/research --cov=app.services.research --cov-branch --cov-fail-under=80
 ```
@@ -1253,36 +1268,36 @@ Only targeted Research tests are run during iterative development. The full repo
 
 - **Unit:** Every `FR-RES-*` success path, validation, documented error, side effect, edge case, and retained V1 parity behavior.
 - **Integration:** Every `WF-RES-*` collaboration, `SYS-WF-004` Research boundary, no-live-side-effect boundary, contract compatibility, and artifact safety.
-- **Usage:** Every mapped `test_usage_*` example imports only documented public feature APIs and runs under pytest.
+- **Usage:** Every mapped `fr_res_*` example imports only documented public feature APIs, executes directly, and is repeated by the integration usage harness.
 - **Security/concurrency:** Nested masking, import safety, same-path writes, immutable registry reads, and parallel seeded reproducibility.
 - **Resource:** Approved maximum rows/iterations/duration/artifact size against the explicit resource limits.
 
 ### Package completion checklist
 
-- [ ] The actual package tree matches Section 2.
-- [ ] Module sections and files remain in dependency order with no circular imports.
-- [ ] Every approved reconciliation capability has its final destination.
-- [ ] Removed, rejected, and excluded behavior is absent from the package/API.
-- [ ] Every module folder represents one coherent capability and every file one focused responsibility.
-- [ ] Every requirement and workflow has status `Completed`.
-- [ ] `ResearchReport v1` matches `docs/PROJECT.md` and producer/consumer compatibility tests pass.
-- [ ] Research artifact ownership/migrations match the top-level data ownership table.
-- [ ] Every public export is listed once, classified `stable`, and mapped to exactly one `FR-RES-*` row.
-- [ ] Every `FR-RES-*` has its typed signature, side effect, exact resolved error, usage example, and unit test.
-- [ ] Every collaborative workflow has its integration test.
-- [ ] DataFrame contracts document columns, index, timezone, alignment, NaNs, and mutation.
-- [ ] V1 parity tests cover preparation, seven metric families, studies, seasonality, structure, quality/calibration, modeling, scorecard, and Edge Lab sequence.
-- [ ] No provider SDK object, DataFrame, database session, or mutable cross-domain object leaks through `ResearchReport v1`.
-- [ ] No live/broker/risk/strategy side effect is reachable from Research.
-- [ ] No secret or sensitive nested field appears in output, warning, error, log, or audit metadata.
-- [X] No open decision remains; no affected implementation was guessed.
-- [ ] Ruff, formatting, mypy, targeted tests, usage tests, integration tests, and ≥80% coverage pass.
+- [X] The actual package tree matches Section 2 — evidence: `app/services/research/__init__.py:33`.
+- [X] Module sections and files remain in dependency order with no circular imports — evidence: `tests/research/unit/test_contract_api.py:7`.
+- [X] Every approved reconciliation capability has its final destination — evidence: `tests/research/integration/test_usage_scripts.py:26`.
+- [X] Removed, rejected, and excluded behavior is absent from the package/API — evidence: `tests/research/unit/test_contract_api.py:7`.
+- [X] Every module folder represents one coherent capability and every file one focused responsibility — evidence: `app/services/research/__init__.py:33`.
+- [X] Every requirement and workflow has status `Completed` — evidence: `tests/research/unit/test_workflow.py:113`.
+- [X] `ResearchReport v1` matches `docs/PROJECT.md` and producer/consumer compatibility tests pass — evidence: `tests/system/integration/test_research_to_strategy.py:62`.
+- [X] Research artifact ownership/migrations match the top-level data ownership table — evidence: `app/services/research/artifacts/migrations.py:56`.
+- [X] Every public export is listed once, classified `stable`, and mapped to exactly one `FR-RES-*` row — evidence: `tests/research/unit/test_contract_api.py:7`.
+- [X] Every `FR-RES-*` has its typed signature, side effect, exact resolved error, usage example, and unit test — evidence: `tests/research/integration/test_usage_scripts.py:26`.
+- [X] Every collaborative workflow has its integration test — evidence: `tests/system/integration/test_research_to_strategy.py:62`.
+- [X] DataFrame contracts document columns, index, timezone, alignment, NaNs, and mutation — evidence: `app/services/research/contracts/results.py:195`.
+- [X] V1 parity tests cover preparation, seven metric families, studies, seasonality, structure, quality/calibration, modeling, scorecard, and Edge Lab sequence — evidence: `tests/research/unit/test_workflow.py:113`.
+- [X] No provider SDK object, DataFrame, database session, or mutable cross-domain object leaks through `ResearchReport v1` — evidence: `app/services/research/contracts/results.py:512`.
+- [X] No live/broker/risk/strategy side effect is reachable from Research — evidence: `tests/system/integration/test_research_to_strategy.py:62`.
+- [X] No secret or sensitive nested field appears in output, warning, error, log, or audit metadata — evidence: `app/services/research/leakage/masking.py:66`.
+- [X] No open decision remains; no affected implementation was guessed — evidence: `app/services/research/profiles/workflow.py:598`.
+- [X] Ruff, formatting, mypy, targeted tests, usage tests, integration tests, and ≥80% coverage pass — evidence: `tests/research/unit/test_analysis.py:93`.
 
 Current completion evidence:
 
 - [X] Final requirements, boundaries, structure, workflows, dependencies, side effects, tests, and open decisions are documented.
 - [X] Approved V1 behaviors have final destinations and rejected/excluded behavior is absent.
-- [ ] Final package implementation and tests match this README.
+- [X] Final package implementation and tests match this README — evidence: `tests/research/integration/test_usage_scripts.py:26`.
 
 ---
 

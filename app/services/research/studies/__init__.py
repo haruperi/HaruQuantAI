@@ -1,6 +1,11 @@
 """Implemented public Research edge-study APIs."""
 
 from app.services.research.studies.classification import classify_symbol
+from app.services.research.studies.edge_studies import (
+    run_eds_mean_reversion,
+    run_eds_session,
+    run_eds_trend_persistence,
+)
 from app.services.research.studies.null_baseline import (
     compare_to_null,
     get_acceptance_criteria,
@@ -11,5 +16,8 @@ __all__ = (
     "classify_symbol",
     "compare_to_null",
     "get_acceptance_criteria",
+    "run_eds_mean_reversion",
     "run_eds_null_baseline",
+    "run_eds_session",
+    "run_eds_trend_persistence",
 )

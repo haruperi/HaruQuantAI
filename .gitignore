@@ -344,6 +344,7 @@ profiling_results/
 .secrets
 secrets.json
 api_keys.json
+app/configs/
 
 # Large exports
 *.pdf
@@ -765,6 +766,7 @@ artifacts/
 .aider*
 !app/web/src/lib/
 !app/web/src/lib/**
+!app/services/research/artifacts/
 # Root data now contains the database package and strategy source artifacts.
 # Keep source/control files trackable while runtime-heavy stores remain ignored.
 !/data/

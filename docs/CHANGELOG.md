@@ -1,5 +1,36 @@
 # Changelog
 
+## 2.2.11
+
+**Release date:** 2026-07-27
+
+### Complete Research domain and govern economic-news restrictions
+
+The Research domain now exposes twelve focused advisory feature modules, while normalized economic-calendar evidence flows deterministically from Data through Risk and Trading readiness.
+
+#### Added (12)
+
+- `FEAT-RES-01` Versioned Contracts and Configuration.
+- `FEAT-RES-02` Deterministic Dataset Preparation.
+- `FEAT-RES-03` Research-Specific Features.
+- `FEAT-RES-04` Leakage Evidence, Splits, and Masking.
+- `FEAT-RES-05` Core Metric Profile.
+- `FEAT-RES-06` Seeded Statistical Validation.
+- `FEAT-RES-07` Edge Discovery and Confirmation.
+- `FEAT-RES-08` Sessions and Seasonality.
+- `FEAT-RES-09` Market Structure Analysis.
+- `FEAT-RES-10` Deterministic Unsupervised Insights.
+- `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles.
+- `FEAT-RES-12` Safe Research Artifact Persistence.
+
+#### Changed (1)
+
+- Normalized provider-neutral economic events, symbol relevance, persistence, refresh policy, and fail-closed Data-to-Risk-to-Trading restriction evidence.
+
+#### Fixed (1)
+
+- Corrected economic-calendar typing, provider filtering, raw-value preservation, stable identifiers, UTC window handling, empty-calendar semantics, and original schedule retention.
+
 ## 2.2.10
 
 **Release date:** 2026-07-26

@@ -9,6 +9,7 @@ keeps Data free of an embedded HTTP client.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 
 # FR-DATA-099 specifies pickle for ScrapeResult transport. Only locally produced,
 # trusted payloads may be deserialized; see ScrapeResult.deserialize.
@@ -119,9 +120,13 @@ class CalendarEvent:
     title: str
     country: str
     impact: Literal["low", "medium", "high", "holiday"]
+    provider_event_id: str
     actual: Decimal | None = None
     forecast: Decimal | None = None
     previous: Decimal | None = None
+    actual_raw: str | None = None
+    forecast_raw: str | None = None
+    previous_raw: str | None = None
 
 
 @dataclass(frozen=True)
@@ -263,6 +268,31 @@ def _decimal(value: object) -> Decimal | None:
         return None
 
 
+def _raw_value(value: object) -> str | None:
+    """Return the trimmed provider representation or explicit absence."""
+    if value is None:
+        return None
+    text = str(value).strip()
+    return None if not text or text in {"-", "--", "n/a", "N/A"} else text
+
+
+def _provider_event_id(
+    site: str,
+    row: Mapping[str, object],
+    *,
+    timestamp: datetime,
+    title: str,
+    country: str,
+) -> str:
+    """Return a provider identifier stable across intraday schedule changes."""
+    for key in ("provider_event_id", "event_id", "id"):
+        value = _raw_value(row.get(key))
+        if value is not None:
+            return value
+    identity = f"{site}|{timestamp.date().isoformat()}|{country}|{title}"
+    return hashlib.sha256(identity.encode("utf-8")).hexdigest()
+
+
 def _clean_row(site: str, row: Mapping[str, object]) -> CalendarEvent | None:
     """Validate one raw row into a canonical event, or discard it."""
     title = str(row.get("title", "")).strip()
@@ -281,9 +311,19 @@ def _clean_row(site: str, row: Mapping[str, object]) -> CalendarEvent | None:
         title=title,
         country=country,
         impact=impact,  # type: ignore[arg-type]
+        provider_event_id=_provider_event_id(
+            site,
+            row,
+            timestamp=timestamp,
+            title=title,
+            country=country,
+        ),
         actual=_decimal(row.get("actual")),
         forecast=_decimal(row.get("forecast")),
         previous=_decimal(row.get("previous")),
+        actual_raw=_raw_value(row.get("actual")),
+        forecast_raw=_raw_value(row.get("forecast")),
+        previous_raw=_raw_value(row.get("previous")),
     )
 
 
@@ -307,9 +347,9 @@ async def _scrape_site(
             return site, (), "NETWORK_ERROR"
     cleaned = [_clean_row(site, row) for row in rows]
     events = tuple(event for event in cleaned if event is not None)
-    deduplicated: dict[tuple[str, datetime, str], CalendarEvent] = {}
+    deduplicated: dict[tuple[str, str], CalendarEvent] = {}
     for event in events:
-        deduplicated.setdefault((event.site, event.timestamp, event.title), event)
+        deduplicated.setdefault((event.site, event.provider_event_id), event)
     return site, tuple(deduplicated.values()), None
 
 

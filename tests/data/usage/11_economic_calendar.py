@@ -1,13 +1,15 @@
-"""Run multi-site economic calendar scraping examples (FEAT-DATA-07).
+"""Run multi-site economic calendar examples (FEAT-DATA-11).
 
-Covers `FR-DATA-095` through `FR-DATA-099`. Network access is injected, so this
-program runs deterministically without contacting an external site. A deployment
-supplies a real `CalendarTransport`; the shape of the call is identical.
+Covers `FR-DATA-095` through `FR-DATA-099` (raw scrape pipeline) and the
+normalized event/news-restriction surface `FR-DATA-123` through `FR-DATA-129`.
+Network access is injected, so this program runs deterministically without
+contacting an external site. A deployment supplies a real `CalendarTransport`;
+the shape of the call is identical.
 """
 
 import asyncio
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -15,11 +17,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
     CALENDAR_SITES,
+    CalendarScrapeProvider,
     DataError,
+    DataSettings,
+    EconomicCalendarProvider,
+    EconomicEvent,
+    EconomicEventStore,
+    EventImpact,
+    MarketContextEvidence,
     ScrapeOptions,
     ScrapeResult,
+    calendar_state_provenance,
+    data_settings_context,
+    derive_calendar_state,
+    get_economic_events,
+    get_symbol_economic_events,
+    get_symbol_event_profile,
+    is_news_restricted,
+    populate_market_context_calendar,
+    run_data_migrations,
     scrape_economic_calendar,
 )
+from app.utils import generate_id
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _END = datetime(2026, 1, 8, tzinfo=UTC)
@@ -120,7 +139,8 @@ def _example_fr_data_098(result: ScrapeResult) -> None:
     _header("FR-DATA-098 save with descriptive names")
     with TemporaryDirectory() as temporary:
         directory = Path(temporary)
-        result.save(directory, "csv")
+        with data_settings_context(DataSettings(approved_storage_roots=(directory,))):
+            result.save(directory, "csv")
         written = tuple(directory.glob("*.csv"))
         print("Artifacts written:", len(written))
         for path in written:
@@ -148,7 +168,106 @@ def _demonstrate_feature() -> None:
         print("Calendar example failed:", error.code)
 
 
+async def _normalized_service_examples(
+    provider: EconomicCalendarProvider,
+) -> tuple[list[EconomicEvent], list[EconomicEvent], bool]:
+    """Exercise normalized retrieval, symbol mapping, and news restriction."""
+    events = await get_economic_events(
+        _START,
+        _END,
+        provider=provider,
+        minimum_impact=EventImpact.MEDIUM,
+    )
+    symbol_events = await get_symbol_economic_events(
+        "EURUSD",
+        _START,
+        _END,
+        provider=provider,
+        minimum_impact=EventImpact.HIGH,
+    )
+    restricted = await is_news_restricted(
+        "EURUSD",
+        datetime(2026, 1, 2, 12, 25, tzinfo=UTC),
+        provider=provider,
+    )
+    return events, symbol_events, restricted
+
+
+def _example_fr_data_123_to_129() -> None:
+    """Exercise every normalized event, storage, and Risk-evidence operation."""
+    _header("FR-DATA-123..129 normalized economic calendar")
+    provider = CalendarScrapeProvider(
+        _DemonstrationTransport(),
+        sites=("forexfactory", "metalsmine"),
+        max_parallel_tasks=2,
+    )
+    events, symbol_events, restricted = asyncio.run(
+        _normalized_service_examples(provider)
+    )
+    profile = get_symbol_event_profile("EURUSD")
+    print(
+        "FR-DATA-123 normalized:",
+        events[0].actual,
+        events[0].actual_raw,
+        events[0].unit,
+    )
+    print("FR-DATA-124 provider events:", len(events))
+    print("FR-DATA-125 profile currencies:", sorted(profile.currencies))
+    print("FR-DATA-126 EURUSD events:", len(symbol_events))
+    print("FR-DATA-127 restricted:", restricted)
+
+    with TemporaryDirectory() as temporary:
+        directory = Path(temporary)
+        settings = DataSettings(
+            database_url="sqlite:///economic_usage.sqlite3",
+            data_dir=directory,
+            sqlite_busy_timeout_seconds=1,
+            write_lock_lease_seconds=30,
+            approved_storage_roots=(directory,),
+        )
+        with data_settings_context(settings):
+            run_data_migrations(generate_id("req"))
+            store = EconomicEventStore()
+            stored_count = store.upsert(events, request_id=generate_id("req"))
+            persisted = store.query(_START, _END)
+            seven_day, one_day = store.refresh_windows(now=_START)
+    print(
+        "FR-DATA-128 stored:",
+        stored_count,
+        len(persisted),
+        seven_day[1] - seven_day[0],
+        one_day[1] - one_day[0],
+    )
+
+    at = datetime(2026, 1, 2, 12, 25, tzinfo=UTC)
+    evidence = MarketContextEvidence(
+        symbol="EURUSD",
+        session_state="open",
+        calendar_state=None,
+        spread=None,
+        spread_unit=None,
+        liquidity=None,
+        volatility=None,
+        correlations={},
+        crisis_flags=(),
+        timezone="UTC",
+        as_of=at,
+        expires_at=at + timedelta(minutes=1),
+        provenance={"source": "calendar-usage"},
+        missing_fields=("calendar", "spread", "liquidity", "volatility"),
+        request_id=generate_id("req"),
+    )
+    populated = populate_market_context_calendar(evidence, events=events)
+    derived = derive_calendar_state("EURUSD", at, events=events)
+    print(
+        "FR-DATA-129 Risk evidence:",
+        populated.calendar_state,
+        calendar_state_provenance(derived),
+    )
+
+
 _DEMONSTRATED = [False]
+_NORMALIZED_DEMONSTRATED = [False]
 
 
 def _demonstrate_once() -> None:
@@ -157,6 +276,14 @@ def _demonstrate_once() -> None:
         return
     _demonstrate_feature()
     _DEMONSTRATED[0] = True
+
+
+def _demonstrate_normalized_once() -> None:
+    """Run normalized calendar demonstrations once for their requirement rows."""
+    if _NORMALIZED_DEMONSTRATED[0]:
+        return
+    _example_fr_data_123_to_129()
+    _NORMALIZED_DEMONSTRATED[0] = True
 
 
 def fr_data_095() -> None:
@@ -184,6 +311,41 @@ def fr_data_099() -> None:
     _demonstrate_once()
 
 
+def fr_data_123() -> None:
+    """FR-DATA-123: Preserve normalized and raw economic-event values."""
+    _demonstrate_normalized_once()
+
+
+def fr_data_124() -> None:
+    """FR-DATA-124: Retrieve events through a provider-neutral protocol."""
+    _demonstrate_normalized_once()
+
+
+def fr_data_125() -> None:
+    """FR-DATA-125: Resolve canonical symbol-event relevance profiles."""
+    _demonstrate_normalized_once()
+
+
+def fr_data_126() -> None:
+    """FR-DATA-126: Retrieve general and symbol-scoped normalized events."""
+    _demonstrate_normalized_once()
+
+
+def fr_data_127() -> None:
+    """FR-DATA-127: Evaluate symmetric high-impact news blackout windows."""
+    _demonstrate_normalized_once()
+
+
+def fr_data_128() -> None:
+    """FR-DATA-128: Upsert, query, and plan refreshes for economic events."""
+    _demonstrate_normalized_once()
+
+
+def fr_data_129() -> None:
+    """FR-DATA-129: Populate Risk-ready market-context calendar evidence."""
+    _demonstrate_normalized_once()
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     demonstrations = (
@@ -192,6 +354,13 @@ def main() -> None:
         fr_data_097,
         fr_data_098,
         fr_data_099,
+        fr_data_123,
+        fr_data_124,
+        fr_data_125,
+        fr_data_126,
+        fr_data_127,
+        fr_data_128,
+        fr_data_129,
     )
     for demonstration in demonstrations:
         demonstration()

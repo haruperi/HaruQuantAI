@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal, override
 
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import (
+    BaseSettings,
+    JsonConfigSettingsSource,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 from app.utils.errors.exceptions import ConfigurationError
 
@@ -19,17 +25,85 @@ RuntimeProfile = Literal["research", "simulation", "paper", "live"]
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
+class _CentralJsonSettingsSource(JsonConfigSettingsSource):
+    """Central JSON source matching aliases, uppercase, and exact field names.
+
+    The stock JSON source matches file keys to field names case-sensitively,
+    while the repository central settings file uses uppercase environment-style
+    keys. This source reproduces the previous dotenv name-matching behavior so
+    every ``AppSettings`` subclass loads identically from the JSON file.
+    """
+
+    @override
+    def __call__(self) -> dict[str, Any]:
+        """Return field values loaded from the central JSON settings file.
+
+        Returns:
+            Mapping of field aliases or names to raw JSON values; empty when the
+            configured file is missing or its root is not an object.
+        """
+        json_file = self.settings_cls.model_config.get("json_file")
+        if json_file is None or not Path(str(json_file)).is_file():
+            return {}
+        raw: object = json.loads(Path(str(json_file)).read_text(encoding="utf-8"))
+        if not isinstance(raw, dict):
+            return {}
+        values: dict[str, Any] = {}
+        for field_name, field in self.settings_cls.model_fields.items():
+            alias = (
+                field.validation_alias
+                if isinstance(field.validation_alias, str)
+                else None
+            )
+            candidates = ([alias] if alias else []) + [field_name.upper(), field_name]
+            for key in candidates:
+                if key in raw:
+                    values[alias or field_name] = raw[key]
+                    break
+        return values
+
+
 class AppSettings(BaseSettings):
     """Immutable base for typed settings loaded from the central environment."""
 
     model_config = SettingsConfigDict(
-        env_file=_REPOSITORY_ROOT / ".env",
+        json_file=_REPOSITORY_ROOT / "app" / "configs" / "env.json",
         env_file_encoding="utf-8",
         env_ignore_empty=True,
         case_sensitive=False,
         extra="ignore",
         frozen=True,
     )
+
+    @override
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Add the centralized JSON settings file after process overrides.
+
+        Args:
+            settings_cls: The settings class being constructed.
+            init_settings: Explicit constructor values source.
+            env_settings: Process environment source.
+            dotenv_settings: Dotenv file source (unused; no env_file configured).
+            file_secret_settings: File secrets source.
+
+        Returns:
+            Settings sources in precedence order.
+        """
+        return (
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            _CentralJsonSettingsSource(settings_cls),
+            file_secret_settings,
+        )
 
 
 class _ConfigurationModel(BaseModel):

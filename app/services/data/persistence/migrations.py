@@ -162,6 +162,36 @@ _DATA_SCHEMA_STATEMENTS = (
 )
 
 
+_ECONOMIC_EVENTS_SCHEMA_STATEMENTS = (
+    """
+    CREATE TABLE data_economic_events (
+        provider TEXT NOT NULL,
+        provider_event_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        category TEXT,
+        country TEXT,
+        currency TEXT,
+        scheduled_at TEXT NOT NULL,
+        original_scheduled_at TEXT,
+        actual TEXT,
+        forecast TEXT,
+        previous TEXT,
+        revised_previous TEXT,
+        actual_raw TEXT,
+        forecast_raw TEXT,
+        previous_raw TEXT,
+        unit TEXT,
+        source TEXT,
+        source_url TEXT,
+        impact INTEGER NOT NULL CHECK (impact BETWEEN 1 AND 4),
+        updated_at TEXT,
+        PRIMARY KEY (provider, provider_event_id)
+    ) STRICT
+    """.strip(),
+    "CREATE INDEX idx_economic_events_scheduled ON data_economic_events (scheduled_at)",
+)
+
+
 def _schema_checksum(statements: tuple[str, ...]) -> str:
     """Return the stable checksum for one ordered migration statement set."""
     logger.debug("Calculating DATA schema migration checksum")
@@ -175,6 +205,12 @@ DATA_MIGRATION_STEPS = (
         migration_id="001_initial_data_schema",
         checksum=_schema_checksum(_DATA_SCHEMA_STATEMENTS),
         statements=_DATA_SCHEMA_STATEMENTS,
+    ),
+    MigrationStep(
+        domain="data",
+        migration_id="002_economic_events",
+        checksum=_schema_checksum(_ECONOMIC_EVENTS_SCHEMA_STATEMENTS),
+        statements=_ECONOMIC_EVENTS_SCHEMA_STATEMENTS,
     ),
 )
 
