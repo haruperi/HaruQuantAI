@@ -8,7 +8,6 @@ from app.services.brokers.contracts import (
     BrokerCapabilityId,
     BrokerErrorCode,
     BrokerQuote,
-    BrokerResult,
     BrokerSubscription,
     BrokerSubscriptionInfo,
 )
@@ -16,7 +15,7 @@ from app.services.brokers.ctrader_session.mapping import (
     _field,
     _map_quote,
 )
-from app.utils import generate_id, utc_now
+from app.utils import StandardResponse, generate_id, utc_now
 
 
 class _CTraderPriceStreamsMixin:
@@ -24,7 +23,7 @@ class _CTraderPriceStreamsMixin:
 
     async def subscribe_quotes(
         self, symbols: tuple[str, ...]
-    ) -> BrokerResult[BrokerSubscription[BrokerQuote]]:
+    ) -> StandardResponse[BrokerSubscription[BrokerQuote]]:
         """Open one bounded cTrader spot-event subscription.
 
         Returns:
@@ -33,7 +32,7 @@ class _CTraderPriceStreamsMixin:
         subscription = await self._open_quote_subscription(symbols)
         return self._result(BrokerCapabilityId.SUBSCRIBE_QUOTES, data=subscription)
 
-    async def unsubscribe(self, subscription_id: str) -> BrokerResult[None]:
+    async def unsubscribe(self, subscription_id: str) -> StandardResponse[None]:
         """Close one exact adapter-owned cTrader subscription.
 
         Returns:
@@ -50,7 +49,7 @@ class _CTraderPriceStreamsMixin:
 
     async def list_subscriptions(
         self,
-    ) -> BrokerResult[tuple[BrokerSubscriptionInfo, ...]]:
+    ) -> StandardResponse[tuple[BrokerSubscriptionInfo, ...]]:
         """Return immutable cTrader subscription metadata.
 
         Returns:

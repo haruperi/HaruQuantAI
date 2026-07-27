@@ -3,6 +3,7 @@
 import importlib
 import importlib.metadata
 import importlib.util
+import time
 from dataclasses import dataclass
 from typing import cast
 
@@ -13,9 +14,17 @@ from app.services.brokers.contracts import (
     BrokerError,
     BrokerErrorCode,
     BrokerId,
-    BrokerResult,
 )
-from app.utils import generate_id, logger, utc_now
+from app.services.brokers.contracts.responses import build_broker_response
+from app.utils import (
+    RiskLevel,
+    StandardResponse,
+    build_response_metadata,
+    generate_id,
+    logger,
+    success_response,
+    utc_now,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -90,13 +99,32 @@ _FACTORIES = {
 }
 
 
-def get_registered_brokers() -> tuple[BrokerId, ...]:
+def get_registered_brokers() -> StandardResponse[tuple[BrokerId, ...]]:
     """List every profile without importing provider implementations or SDKs.
 
     Returns:
-        Every registered broker identifier in stable enumeration order.
+        A successful standard response containing every registered broker
+        identifier in stable enumeration order.
     """
-    return tuple(BrokerId)
+    start_time = time.perf_counter_ns()
+    brokers = tuple(BrokerId)
+    metadata = build_response_metadata(
+        name="brokers.registry.get_registered_brokers",
+        domain="brokers",
+        risk_level=RiskLevel.NONE,
+        request_id=generate_id("req"),
+        start_time=start_time,
+        read_only=True,
+        writes_file=False,
+        modifies_database=False,
+        places_trade=False,
+        requires_network=False,
+    )
+    return success_response(
+        brokers,
+        message="Registered broker profiles retrieved",
+        metadata=metadata,
+    )
 
 
 def _is_registered_broker(value: object) -> bool:
@@ -133,7 +161,7 @@ def _require_dependency(registration: _ProviderRegistration) -> None:
 
 def create_broker_adapter(
     broker_id: BrokerId, config: BrokerConnectionConfig
-) -> BrokerResult[BrokerAdapter]:
+) -> StandardResponse[BrokerAdapter]:
     """Create one exact disconnected adapter without selection or fallback.
 
     Args:
@@ -143,12 +171,14 @@ def create_broker_adapter(
     Returns:
         The disconnected adapter or a canonical structured factory error.
     """
+    start_time = time.perf_counter_ns()
     request_id = generate_id("req")
     if not _is_registered_broker(broker_id):
         return _factory_error(
             broker=config.broker_id,
             config=config,
             request_id=request_id,
+            start_time=start_time,
             code=BrokerErrorCode.BROKER_UNKNOWN,
             message="Broker profile is not registered",
             provider_metadata={"requested_broker": str(broker_id)},
@@ -158,6 +188,7 @@ def create_broker_adapter(
             broker=broker_id,
             config=config,
             request_id=request_id,
+            start_time=start_time,
             code=BrokerErrorCode.BROKER_CONFIGURATION_INVALID,
             message="Broker config does not match or provider is disabled",
         )
@@ -179,6 +210,7 @@ def create_broker_adapter(
             broker=broker_id,
             config=config,
             request_id=request_id,
+            start_time=start_time,
             code=BrokerErrorCode.BROKER_DEPENDENCY_MISSING,
             message="Required broker dependency is missing",
             provider_metadata=metadata,
@@ -188,6 +220,7 @@ def create_broker_adapter(
             broker=broker_id,
             config=config,
             request_id=request_id,
+            start_time=start_time,
             code=BrokerErrorCode.BROKER_CONFIGURATION_INVALID,
             message="Broker profile configuration is invalid",
         )
@@ -198,15 +231,19 @@ def create_broker_adapter(
         request_id=request_id,
         result="success",
     ).info("Created disconnected broker adapter")
-    return BrokerResult(
-        status="success",
+    return build_broker_response(
         broker=broker_id,
         operation=BrokerCapabilityId.CONNECT,
         request_id=request_id,
         timestamp=utc_now(),
         environment=config.environment,
         adapter_version="1.0.0",
+        start_time=start_time,
         data=cast("BrokerAdapter", adapter),
+        name="brokers.registry.create_broker_adapter",
+        risk_level=RiskLevel.LOW,
+        read_only=False,
+        requires_network=False,
     )
 
 
@@ -215,16 +252,18 @@ def _factory_error(
     broker: BrokerId,
     config: BrokerConnectionConfig,
     request_id: str,
+    start_time: int,
     code: BrokerErrorCode,
     message: str,
     provider_metadata: dict[str, object] | None = None,
-) -> BrokerResult[BrokerAdapter]:
+) -> StandardResponse[BrokerAdapter]:
     """Handle factory error.
 
     Args:
         broker: Value supplied to the operation.
         config: Value supplied to the operation.
         request_id: Value supplied to the operation.
+        start_time: Monotonic operation start value.
         code: Value supplied to the operation.
         message: Value supplied to the operation.
         provider_metadata: Value supplied to the operation.
@@ -240,16 +279,20 @@ def _factory_error(
         result="error",
         provider_code=code.value,
     ).warning("Broker adapter creation failed: %s", message)
-    return BrokerResult(
-        status="error",
+    return build_broker_response(
         broker=broker,
         operation=BrokerCapabilityId.CONNECT,
         request_id=request_id,
         timestamp=utc_now(),
         environment=config.environment,
         adapter_version="1.0.0",
+        start_time=start_time,
         error=BrokerError(code=code, message=message),
         provider_metadata=provider_metadata or {},
+        name="brokers.registry.create_broker_adapter",
+        risk_level=RiskLevel.LOW,
+        read_only=False,
+        requires_network=False,
     )
 
 

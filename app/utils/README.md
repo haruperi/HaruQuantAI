@@ -2,7 +2,7 @@
 
 > **Package:** `app/utils`
 > **Status:** `Completed — verified implementation baseline`
-> **Last updated:** `2026-07-21`
+> **Last updated:** `2026-07-27`
 
 > This README is the package's single source of truth for requirements, final
 > structure, implementation sequence, progress, usage examples, and tests.
@@ -16,13 +16,16 @@
 
 Utils provides business-neutral cross-domain primitives. It owns shared context
 and audit contracts, base errors, trace identifiers, UTC handling, canonical
-serialization, secret redaction, runtime settings, and structured logging.
+serialization, secret redaction, runtime settings, structured logging, and the
+standard response contract for bounded public operations.
 It makes no trading or domain decision.
 
 ### Owns
 
 - `AuthContext v1` and `AuditEvent v1`.
 - Shared base errors, error metadata, boundary-safe mapping, and injected event routing.
+- `StandardResponse v1`, structured response errors, required operation metadata,
+  immutable error-definition catalogues, and monotonic execution timing.
 - Request, workflow, correlation, causation, and event identifiers.
 - UTC clocks, timestamps, and freshness calculations.
 - Deterministic canonical JSON serialization.
@@ -33,7 +36,8 @@ It makes no trading or domain decision.
 
 ### Does not own
 
-- Domain contracts, domain result types, business validation, or business limits.
+- Domain payload contracts, business outcomes, error-code policy, business
+  validation, or business limits.
 - Authentication, identity verification, permission enforcement, session state,
   or credential persistence; UI/API owns these capabilities and produces
   `AuthContext v1`.
@@ -45,8 +49,8 @@ It makes no trading or domain decision.
   infrastructure owns encryption-key lifecycle.
 - Safe-path abstractions; each filesystem-writing domain owns and validates its
   allowed roots and paths.
-- Metrics exporters, health providers, public registries,
-  generic validation façades, or wrapper response envelopes.
+- Metrics exporters, health providers, domain error registries,
+  generic validation façades, or domain-specific wrapper response envelopes.
 - Import-time configuration, filesystem writes, environment-file reads, network
   connections, compatibility aliases, or fallback modules.
 
@@ -56,6 +60,7 @@ It makes no trading or domain decision.
 |---|---|---|---|---|---|
 | Completed | `AuthContext` | `v1` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio | Immutable authenticated principal and trace context. `principal_type` is exactly `USER` or `SERVICE_ACCOUNT`. |
 | Completed | `AuditEvent` | `v1` | Every emitting domain | Data (direct persistence consumer); Risk and UI/API query persisted events only through Data-owned query contracts | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning. |
+| Completed | `StandardResponse[T]` | `v1` | Every bounded public operation | Every internal or external caller of that operation | Immutable five-field function-level response preserving the raw result directly in `data` and prior envelope evidence in `metadata.extensions`. |
 
 `AuthContext v1` contains `contract_version`, `schema_id`, `principal_id`,
 `principal_type`, roles, permissions, scopes, tenant/environment, request ID,
@@ -65,6 +70,11 @@ closed at the receiving domain.
 `AuditEvent v1` contains `contract_version`, `schema_id`, event ID, UTC timestamp,
 domain, action, optional principal ID, request ID, correlation ID, optional causation
 ID, and a redacted JSON-safe payload. Emission or persistence failure is surfaced.
+
+`StandardResponse v1` contains exactly `status`, `message`, `data`, `error`, and
+`metadata`. A successful raw result is stored directly in `data`; it is never
+embedded inside a synthetic `result`, `payload`, or legacy envelope. Existing
+non-payload return evidence is preserved in `metadata.extensions`.
 
 ### Capability-to-consumer evidence
 
@@ -80,6 +90,7 @@ Shared business-neutral capabilities have at least two explicit domain consumers
 | Secret redaction | Brokers, Data, Strategy, Risk, Trading, Simulation, Analytics, Optimization, Research, Portfolio, UI/API |
 | Runtime settings | Data, Trading, Simulation, UI/API |
 | Error metadata and injected routing | Brokers, Risk, Trading, Simulation, Analytics, Research, Portfolio, UI/API |
+| Standard operation responses and immutable error definitions | Every service domain and UI/API |
 | Structured logging and specialized routing | Brokers, Risk, Trading, Data |
 
 ### Transferred ownership
@@ -117,6 +128,7 @@ Folders are ordered from lowest to highest dependency.
 | Completed | `FEAT-UTIL-05` Sensitive Data Redaction | `security/` | Exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/utils/usage/06_security.py` |
 | Completed | `FEAT-UTIL-06` Precedence-Ordered Settings Loading | `settings/` | Exact declarations and settings contracts: Section 4.7 | Section 4.7 functional requirements | `tests/utils/usage/07_settings.py` |
 | Completed | `FEAT-UTIL-07` Non-Blocking Logging Configuration | `logging/` | Exact declarations and logging contracts: Section 4.8 | Section 4.8 functional requirements | `tests/utils/usage/08_logging.py` |
+| Completed | `FEAT-UTIL-08` Standard Operation Responses | `responses/` | Exact declarations and response fields: Section 4.9 | Section 4.9 functional requirements | `tests/utils/usage/09_standard_responses.py` |
 
 This table is the sole current registry for Utils. Detailed signatures, contract
 fields, failure behavior, and evidence remain authoritative in the referenced
@@ -132,10 +144,13 @@ utils/
 |   `-- auth.py
 |-- errors/
 |   |-- __init__.py
+|   |-- catalog.py
+|   |-- contracts.py
 |   |-- exceptions.py
 |   |-- mapping.py
 |   |-- metadata.py
-|   `-- routing.py
+|   |-- routing.py
+|   `-- validation.py
 |-- identity/
 |   |-- __init__.py
 |   `-- identifiers.py
@@ -153,9 +168,14 @@ utils/
 |   |-- __init__.py
 |   |-- models.py
 |   `-- loader.py
-`-- logging/
+|-- logging/
+|   |-- __init__.py
+|   `-- logger.py
+`-- responses/
     |-- __init__.py
-    `-- logger.py
+    |-- factories.py
+    |-- models.py
+    `-- timing.py
 ```
 
 Package and feature `__init__.py` files expose only documented public names through
@@ -172,12 +192,15 @@ flowchart LR
     T --> L[logging]
     R --> L
     SET --> L
+    E --> RESP[responses]
+    I --> RESP
+    R --> RESP
 ```
 
 Standalone executable usage examples live under `tests/utils/usage/`. They are
 ordinary programs with `main()` and `if __name__ == "__main__"` entry points, not
-pytest tests. The eight numbered programs map one-to-one to `FEAT-UTIL-00` through
-`FEAT-UTIL-07`; each calls every public operation or constructor in its feature
+pytest tests. The nine numbered programs map one-to-one to `FEAT-UTIL-00` through
+`FEAT-UTIL-08`; each calls every public operation or constructor in its feature
 through `app.utils` using realistic, bounded, secret-safe inputs or genuine runtime
 state. Pytest explicitly ignores these programs, and verification executes each
 one directly with Python.
@@ -275,10 +298,13 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
+| Completed | `catalog.py` | Define the immutable business-neutral and root-system common error catalogue. | `COMMON_ERROR_CATALOG` | **Standard library:** `types`<br>**Required third-party:** None<br>**Local:** `contracts.py` → immutable error definitions |
+| Completed | `contracts.py` | Define the common immutable error-definition shape without domain policy. | `ErrorDefinition`, `ErrorSeverity` | **Standard library:** `dataclasses`, `re`, `typing`<br>**Required third-party:** None<br>**Local:** None |
 | Completed | `exceptions.py` | Define the minimal shared exception hierarchy and domain-extension boundary. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | **Standard library:** `re`<br>**Required third-party:** None<br>**Local:** None |
 | Completed | `mapping.py` | Convert caught exceptions to deterministic secret-safe shared error evidence. | `map_exception` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `exceptions.py` → shared base exceptions |
 | Completed | `metadata.py` | Normalize symbolic error codes and provide immutable built-in metadata. | `ErrorMetadata`, `normalize_error_code`, `get_error_metadata` | **Standard library:** `dataclasses`, `re`<br>**Required third-party:** None<br>**Local:** `exceptions.py` → `ValidationError` |
 | Completed | `routing.py` | Route a mapped error payload to an explicitly injected sink. | `ErrorSink`, `route_error_event` | **Standard library:** `collections.abc`, `typing`<br>**Required third-party:** None<br>**Local:** `mapping.py` → `map_exception` |
+| Completed | `validation.py` | Validate immutable catalogues and require explicitly approved codes. | `validate_error_catalog`, `require_error_definition` | **Standard library:** `collections.abc`, `types`<br>**Required third-party:** None<br>**Local:** `contracts.py`, `exceptions.py`, `metadata.py` → definitions, validation errors, normalization |
 | Completed | `__init__.py` | Expose the supported shared-error API. | Shared exceptions, mapping, metadata, and routing exports | **Standard library:** None<br>**Required third-party:** None<br>**Local:** all error feature files → approved exports |
 
 #### Functional requirements
@@ -290,6 +316,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `FR-UTL-006` | Require domains to define their own codes and boundary mapping above the shared base hierarchy. | Shared exception extension contract | None | None | **Usage:** `tests/utils/usage/02_errors.py::fr_utils_006_exception_extension()`<br>**Unit:** `tests/utils/unit/test_exceptions.py::test_domains_extend_shared_base()` |
 | Completed | `FR-UTL-034` | Normalize an error code and look up immutable safe metadata without a mutable registry. | `ErrorMetadata`, `normalize_error_code`, `get_error_metadata` | None | `ValidationError`: empty or malformed error code | **Usage:** `tests/utils/usage/02_errors.py::fr_utils_034_error_metadata()`<br>**Unit:** `tests/utils/unit/test_error_metadata.py::test_normalize_and_lookup_error_metadata()` |
 | Completed | `FR-UTL-035` | Map an exception and synchronously deliver its safe payload to an explicitly injected sink. | `ErrorSink`, `route_error_event` | Caller-provided sink invocation | Sink exception is propagated | **Usage:** `tests/utils/usage/02_errors.py::fr_utils_035_route_error_event()`<br>**Unit:** `tests/utils/unit/test_error_routing.py::test_route_error_event_invokes_injected_sink()` |
+| Completed | `FR-UTL-048` | Define immutable business-neutral and root-system error metadata, validate detached domain catalogues, and reject unapproved codes without importing service-domain policy into Utils. | `ErrorDefinition`, `COMMON_ERROR_CATALOG`, `validate_error_catalog`, `require_error_definition` | None | `ValidationError`: empty, malformed, inconsistent, or unapproved catalogue/code | **Usage:** `tests/utils/usage/02_errors.py::fr_utils_048_error_catalogues()`<br>**Unit:** `tests/utils/unit/test_error_catalog.py` |
 
 ### 4.3 `identity/` — Trace Identifiers
 
@@ -433,6 +460,70 @@ redacted structured-handler overrides for specialized entry points.
 | Completed | `FR-UTL-040` | Route access-context records to `access.log`, exact DEBUG records to `debug.log`, and ERROR-or-higher records to `errors.log`. | `configure_logging` specialized handlers | Explicit bounded file writes | `ConfigurationError`: unavailable directory or file sink | **Usage:** `tests/utils/usage/08_logging.py::fr_utils_040_specialized_routing()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_specialized_log_routing()` |
 | Completed | `FR-UTL-041` | Provide the approved lazy default profile: human-readable DEBUG stdout with ANSI color limited to level and message content, `data/logs`, 10 MB ZIP rotation, ten-day retention, ten backups, queued delivery, automatic process-exit cleanup, optional non-destructive synchronization, and deterministic explicit override/stop. | `LoggingSettings`, `BoundLogger`, `configure_logging`, `flush_logging`, `shutdown_logging` | First runtime bound-log emission or explicit override creates the directory, queue thread, and bounded files | `ConfigurationError`: invalid logging settings or sink | **Usage:** `tests/utils/usage/08_logging.py::main()`<br>**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()`, `test_explicit_configuration_is_not_replaced_by_lazy_default()`, `test_human_formatter_colors_only_level_and_message()`, `test_flush_logging_synchronizes_delivery_without_shutdown()`, `test_zip_rollover_and_shutdown()` |
 
+### 4.9 `responses/` — Standard Operation Responses
+
+**Purpose:** Define the single business-neutral response contract used by every
+HaruQuantAI-owned public operation that accepts one bounded request and produces
+one completed outcome.
+
+**Module flow:** `raw operation result or caught failure + static operation facts + monotonic start → validated StandardResponse[T]`
+
+#### Files
+
+| Status | File | Responsibility | Key exports | Dependencies |
+|---|---|---|---|---|
+| Completed | `models.py` | Define the exact immutable response, error, metadata, JSON-value, and risk-level contracts; redact and freeze extension evidence. | `StandardResponse`, `StandardError`, `ResponseMetadata`, `RiskLevel`, `JsonValue` | **Standard library:** `collections.abc`, `enum`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `errors/metadata.py`, `identity/identifiers.py`, `security/redaction.py` → code, trace, and redaction validation |
+| Completed | `timing.py` | Calculate one execution duration from a monotonic nanosecond start. | `get_execution_ms` | **Standard library:** `collections.abc`, `time`<br>**Required third-party:** None<br>**Local:** None |
+| Completed | `factories.py` | Build metadata and exclusive success/error responses, approve error codes, and safely normalize caught exceptions. | `build_response_metadata`, `success_response`, `error_response`, `exception_response` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `errors/`, `responses/models.py`, `responses/timing.py` → catalogue approval, safe mapping, response construction |
+| Completed | `__init__.py` | Expose the supported standard-response API. | All response exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** all response feature files → approved exports |
+
+#### Canonical response contract
+
+`StandardResponse[T]` serializes exactly five top-level fields:
+
+```text
+status: "success" | "error"
+message: bounded non-empty string
+data: T | None
+error: StandardError | None
+metadata: ResponseMetadata
+```
+
+The successful raw function result is assigned directly to `data`. Implementations
+must not insert a `result`, `payload`, legacy envelope, or other artificial layer.
+When replacing an existing envelope, its message maps to `message`, its primary
+failure maps to `error`, and every remaining non-payload field maps losslessly to
+stable keys inside `metadata.extensions`. Bare mappings that are themselves the
+function's result remain intact in `data`.
+
+An immutable `MappingProxyType` result retains its exact runtime identity in
+`data`. JSON-mode serialization produces a detached JSON-safe mapping through the
+shared bounded canonical converter; it does not replace or mutate the runtime
+value. Every other result type continues through Pydantic's existing serializer.
+
+Function-level `status="success"` means the operation completed and produced its
+documented domain outcome. A valid domain rejection, blocked action, neutral
+decision, pending reconciliation, or unknown broker outcome therefore remains in
+the typed domain `data`; it is not converted into a function-level error.
+
+Constructors, properties, dunder methods, private helpers, context-manager methods,
+generators, async iterators, subscriptions, event streams, framework hooks,
+externally prescribed protocols, runtime-resource factories, and response
+infrastructure primitives are not bounded public operations under this rule.
+
+#### Functional requirements
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Completed | `FR-UTL-042` | Define immutable generic `StandardResponse v1` with exactly `status`, `message`, `data`, `error`, and `metadata`. | `StandardResponse[T]` | None | Pydantic `ValidationError`: missing or extra top-level field, invalid status, or malformed value | **Usage:** `tests/utils/usage/09_standard_responses.py::fr_utils_042_through_047_standard_response()`<br>**Unit:** `tests/utils/unit/test_response_models.py::test_standard_response_has_exact_top_level_shape_and_raw_data()` |
+| Completed | `FR-UTL-043` | Enforce exclusive success/error branches while allowing a successful operation to return `data=None`. | `StandardResponse[T]` model validation | None | Pydantic `ValidationError`: success contains an error, or error lacks error evidence or contains data | **Usage:** `tests/utils/usage/09_standard_responses.py::fr_utils_042_through_047_standard_response()`<br>**Unit:** `tests/utils/unit/test_response_models.py::test_success_response_allows_none_data()`, `test_error_response_requires_error_and_null_data()` |
+| Completed | `FR-UTL-044` | Require version/schema identity, operation/domain/risk identity, canonical trace IDs, rounded execution time, five side-effect declarations, and bounded extension metadata. | `ResponseMetadata` | None | Pydantic `ValidationError`: missing, malformed, unsafe, or contradictory metadata | **Usage:** `tests/utils/usage/09_standard_responses.py::fr_utils_042_through_047_standard_response()`<br>**Unit:** `tests/utils/unit/test_response_models.py::test_metadata_requires_all_side_effect_fields_and_rejects_conflicts()`, `test_metadata_extensions_preserve_fields_and_redact_secrets()` |
+| Completed | `FR-UTL-045` | Define an exact two-field structured error containing an approved symbolic code and bounded redacted JSON-safe details. | `StandardError` | None | Pydantic `ValidationError`: malformed code/details or extra field | **Usage:** `tests/utils/usage/09_standard_responses.py::fr_utils_042_through_047_standard_response()`<br>**Unit:** `tests/utils/unit/test_response_models.py::test_standard_error_rejects_malformed_shape_and_redacts_details()` |
+| Completed | `FR-UTL-046` | Calculate non-negative elapsed milliseconds from `time.perf_counter_ns()` and round to three decimal places. | `get_execution_ms` | Monotonic clock read | `TypeError`: invalid clock values; `ValueError`: negative or future start | **Usage:** `tests/utils/usage/09_standard_responses.py::fr_utils_042_through_047_standard_response()`<br>**Unit:** `tests/utils/unit/test_response_timing.py` |
+| Completed | `FR-UTL-047` | Build metadata and success/error responses without wrapping the raw data, while requiring error codes to exist in the supplied catalogue. | `build_response_metadata`, `success_response`, `error_response` | Monotonic clock read during metadata construction | `ValidationError`: unapproved error code; model validation failures are propagated | **Usage:** `tests/utils/usage/09_standard_responses.py::fr_utils_042_through_047_standard_response()`<br>**Unit:** `tests/utils/unit/test_response_factories.py::test_success_factory_keeps_raw_result_without_embedding()`, `test_error_factory_requires_approved_error_code()` |
+| Completed | `FR-UTL-049` | Convert approved shared/domain exceptions to structured errors and map unknown or unapproved exceptions to `INTERNAL_ERROR` without retaining raw exception text; cancellation and process-control exceptions propagate. | `exception_response` | None | `CancelledError`, `GeneratorExit`, `KeyboardInterrupt`, `SystemExit`, and model validation failures are propagated | **Usage:** `tests/utils/usage/09_standard_responses.py::fr_utils_042_through_047_standard_response()`<br>**Unit:** `tests/utils/unit/test_response_factories.py::test_exception_factory_preserves_approved_code_and_hides_unknown_text()`, `test_exception_factory_propagates_process_control()` |
+| Completed | `FR-UTL-050` | Preserve an immutable mapping-proxy raw result by identity at runtime while emitting an equivalent detached JSON-safe mapping without changing serialization of other result types. | `StandardResponse[T]` JSON serializer | JSON-safe detached representation only | `ValidationError`: immutable mapping contents are unsupported, cyclic, unsafe, or exceed shared serialization bounds | **Usage:** `tests/utils/usage/09_standard_responses.py::fr_utils_050_immutable_mapping_data()`<br>**Unit:** `tests/utils/unit/test_response_factories.py::test_success_factory_serializes_mapping_proxy_without_replacing_raw_data()` |
+
 ---
 
 ## 5. Package-Wide Requirements and Shared Configuration
@@ -443,6 +534,14 @@ The following rules remove implementation ambiguity without adding public
 capabilities beyond the Section 4 exports.
 
 - Public function signatures are:
+  - `get_execution_ms(start_time, *, clock=time.perf_counter_ns) -> float`;
+    `build_response_metadata(...) -> ResponseMetadata`;
+    `success_response(data, *, message, metadata) -> StandardResponse[T]`;
+    `error_response(*, code, details, message, metadata, catalog) ->
+    StandardResponse[T]`; and `exception_response(exception, *, message,
+    metadata, catalog, extensions=None) -> StandardResponse[T]`.
+    The successful `data` argument is the raw result and is never embedded in
+    another payload. Catalogue validation is mandatory on error construction.
   - `map_exception(exception) -> dict[str, str]` returning exactly `code` and
     `detail`. Shared exception codes and details are uppercase symbolic tokens;
     unknown exceptions map to `INTERNAL_ERROR` / `UNEXPECTED_EXCEPTION` and no
@@ -493,6 +592,11 @@ capabilities beyond the Section 4 exports.
     process exit or explicit shutdown performs the final flush and close.
 - Shared exceptions accept a required uppercase symbolic `code` and optional
   uppercase symbolic `detail`. They never retain a wrapped provider exception.
+- `StandardResponse v1` has exactly five top-level fields. Its metadata carries
+  `contract_version="v1"`, `schema_id="utils.standard_response.v1"`, operation
+  identity, trace identity, monotonic duration, side-effect declarations, and
+  redacted JSON-safe `extensions`. `RiskLevel` is exactly `none`, `low`,
+  `medium`, `high`, or `critical`.
 - `AuditEvent` payloads are limited to 64 KiB of canonical UTF-8 JSON, depth 16,
   and 1,000 aggregate items. Producers redact before construction; the contract
   also rejects protected credential keys as a fail-closed boundary check.
@@ -590,7 +694,7 @@ Feature-integration tests are assigned as follows:
   reconstruction, and fail-closed rejection of version, schema, principal-type, or
   unknown-field drift. Consumer-side acceptance is proven inside each consuming
   domain's own suite.
-- `tests/utils/integration/test_usage_scripts.py` executes all eight standalone
+- `tests/utils/integration/test_usage_scripts.py` executes all nine standalone
   usage programs directly and asserts their bounded expected output.
 
 No test under `tests/utils/` imports `app.services`; the Utils suite is runnable in
@@ -607,6 +711,8 @@ isolation, matching the foundation-layer dependency direction in `docs/PROJECT.m
   `tests/data/integration/test_audit_event_handoff.py` owns the Data persistence
   handoff.
 - Secret-leak tests covering logging, errors, audit payloads, and diagnostics.
+- Exact-shape, raw-data preservation, metadata, approved-code, exception-safety,
+  and monotonic-timing tests for `StandardResponse v1`.
 - Determinism tests for canonical JSON, stable IDs, and UTC calculations.
 - Dependency checks proving DataFrame/OHLC, path, limit, business validation,
   permission, and domain-result behavior is absent from Utils.
@@ -625,10 +731,10 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
 
 - [X] The final package tree exists exactly as specified. `app/utils/__init__.py:1`
 - [X] Public exports contain only the retained shared surface; environment-file parsing and
-  named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:90`
-- [X] Shared capabilities have documented consumers and secret redaction remains bounded to Utils. `app/utils/README.md:80`
-- [X] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:94`
-- [X] UI/API owns authentication and permission enforcement. `docs/PROJECT.md:143`
+  named-secret convenience helpers are not exported. `tests/utils/unit/test_boundaries.py:115`
+- [X] Shared capabilities have documented consumers and secret redaction remains bounded to Utils. `app/utils/README.md:79`
+- [X] Data owns all DataFrame/OHLC behavior and exposes no raw DataFrame contract. `tests/utils/unit/test_boundaries.py:119`
+- [X] UI/API owns authentication and permission enforcement. `docs/PROJECT.md:288`
 - [X] Utils imports and import-time log attempts have no side effects.
   `tests/utils/unit/test_logger.py:229`, `tests/utils/unit/test_logger.py:243`
 - [X] No secret appears in logs, errors, audit records, or diagnostics.
@@ -637,22 +743,26 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
   once, explicit overrides remain intact, and queued output has deterministic
   synchronization and shutdown. `tests/utils/unit/test_logger.py:71`,
   `tests/utils/unit/test_logger.py:90`, `tests/utils/unit/test_logger.py:112`
-- [X] Every requirement has a targeted unit test and directly executable usage example. `tests/utils/integration/test_usage_scripts.py:21`
+- [X] Every requirement has a targeted unit test and directly executable usage example. `tests/utils/integration/test_usage_scripts.py:22`
+- [X] `StandardResponse v1` preserves raw result identity without synthetic data
+  nesting and preserves non-payload envelope evidence in redacted extensions.
+  `tests/utils/unit/test_response_models.py:38`,
+  `tests/utils/unit/test_response_factories.py:38`
 - [X] Every individual Utils source file exceeds 80% branch-aware coverage. The
-  verified minimum is 82.30% (`serialization/canonical.py`) and aggregate coverage
-  is 91.12% across 23 files.
+  verified minimum is 81% (`errors/contracts.py` and `errors/validation.py`) and
+  aggregate coverage is 90.18% across 30 files.
 - [X] `AuthContext v1` and `AuditEvent v1` each have producer-side contract
   compatibility evidence, and no Utils test depends on another domain.
   `tests/utils/integration/test_auth_context_compatibility.py:1`,
   `tests/utils/integration/test_audit_event_construction.py:1`
-- [X] Ruff, formatting, strict mypy, 111 targeted unit/integration tests, and all
-  eight directly executed standalone usage programs pass.
+- [X] Ruff, formatting, strict mypy, 144 targeted unit/integration tests, and all
+  nine directly executed standalone usage programs pass.
 
 Current implementation status: `Completed — verified implementation baseline`.
-The 2026-07-21 gate is green: Ruff and formatting pass over 56 targeted files,
-strict mypy passes over the 23 Utils source files, 111 targeted tests pass,
-aggregate branch coverage is 91.12%, every one of the 23 Utils source files exceeds
-80% coverage (minimum 82.30%), and all eight feature-aligned usage programs execute
+The 2026-07-27 gate is green: Ruff and formatting pass over the Utils source and
+test scope, strict mypy passes over 73 source/test files, 144 targeted tests pass,
+aggregate branch coverage is 90.18%, every one of the 30 Utils source files exceeds
+80% coverage (minimum 81%), and all nine feature-aligned usage programs execute
 successfully.
 
 ---

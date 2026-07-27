@@ -28,7 +28,7 @@ def _config(broker_id: BrokerId) -> BrokerConnectionConfig:
 def test_execution_receives_the_canonical_adapter_protocol_not_concrete_apis() -> None:
     """A caller (Trading) only ever needs the canonical BrokerAdapter surface."""
     created = create_broker_adapter(BrokerId.YAHOO, _config(BrokerId.YAHOO))
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert isinstance(adapter, BrokerAdapter)
     assert isinstance(adapter, TradeExecutionProvider)
@@ -57,7 +57,7 @@ def test_capability_scoped_adapter_never_exposes_a_native_sdk_handle() -> None:
         },
     )
     created = create_broker_adapter(BrokerId.MT5, config)
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
     public_members = {name for name in dir(adapter) if not name.startswith("_")}

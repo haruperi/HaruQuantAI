@@ -2,6 +2,7 @@
 
 import asyncio
 import sys
+from collections.abc import Mapping
 from unittest.mock import patch
 
 from app.services.brokers import (
@@ -15,6 +16,7 @@ from app.services.brokers.registry import (
     get_registered_brokers,
 )
 from app.services.brokers.registry.factory import _ProviderRegistration
+from app.utils import RiskLevel, validate_id
 
 
 def _config(enabled: bool = True) -> BrokerConnectionConfig:
@@ -35,7 +37,27 @@ def _config(enabled: bool = True) -> BrokerConnectionConfig:
 def test_listing_does_not_import_optional_sdks() -> None:
     """Listing profiles is static and SDK-free."""
     before = set(sys.modules)
-    assert set(get_registered_brokers()) == set(BrokerId)
+    response = get_registered_brokers()
+
+    assert response.status == "success"
+    assert response.message == "Registered broker profiles retrieved"
+    assert response.data == tuple(BrokerId)
+    assert response.error is None
+    assert response.metadata.name == "brokers.registry.get_registered_brokers"
+    assert response.metadata.domain == "brokers"
+    assert response.metadata.risk_level is RiskLevel.NONE
+    assert validate_id(response.metadata.request_id, expected_prefix="req")
+    assert response.metadata.execution_ms >= 0
+    assert response.metadata.execution_ms == round(response.metadata.execution_ms, 3)
+    assert response.metadata.read_only is True
+    assert response.metadata.writes_file is False
+    assert response.metadata.modifies_database is False
+    assert response.metadata.places_trade is False
+    assert response.metadata.requires_network is False
+    assert dict(response.metadata.extensions) == {}
+    assert response.model_dump(mode="json")["data"] == [
+        broker.value for broker in BrokerId
+    ]
     assert not ({"MetaTrader5", "binance", "yfinance"} - before) & set(sys.modules)
 
 
@@ -43,15 +65,15 @@ def test_create_adapter_never_falls_back() -> None:
     """Disabled or mismatched profiles fail before provider import."""
     result = create_broker_adapter(BrokerId.YAHOO, _config(enabled=False))
     assert result.error is not None
-    assert result.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID
+    assert result.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID.value
 
 
 def test_create_adapter_is_explicit_and_independent() -> None:
     """Each exact factory call creates a new disconnected adapter."""
     first = create_broker_adapter(BrokerId.YAHOO, _config())
     second = create_broker_adapter(BrokerId.YAHOO, _config())
-    assert first.is_success
-    assert second.is_success
+    assert first.status == "success"
+    assert second.status == "success"
     assert first.data is not second.data
 
 
@@ -62,11 +84,13 @@ def test_registry_created_yahoo_adapter_requires_explicit_probe() -> None:
         adapter = create_broker_adapter(BrokerId.YAHOO, _config()).data
         assert adapter is not None
         connected = await adapter.connect()
-        assert not connected.is_success
+        assert connected.status != "success"
         assert connected.error is not None
-        assert connected.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID
+        assert (
+            connected.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID.value
+        )
         status = await adapter.is_connected()
-        assert status.is_success
+        assert status.status == "success"
         assert status.data is False
         await adapter.disconnect()
 
@@ -81,7 +105,7 @@ def test_unsupported_provider_call_never_imports_sdk() -> None:
         assert result.data is not None
         quote = await result.data.get_quote("AAPL")
         assert quote.error is not None
-        assert quote.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert quote.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
         assert "yfinance" not in sys.modules
 
     asyncio.run(exercise())
@@ -93,7 +117,7 @@ def test_create_adapter_invalid_broker_type() -> None:
 
     result = create_broker_adapter(cast("Any", "NOT_AN_ID"), _config())
     assert result.error is not None
-    assert result.error.code == BrokerErrorCode.BROKER_UNKNOWN
+    assert result.error.code == BrokerErrorCode.BROKER_UNKNOWN.value
 
 
 def test_create_adapter_missing_dependency() -> None:
@@ -111,9 +135,11 @@ def test_create_adapter_missing_dependency() -> None:
     with patch("app.services.brokers.registry.factory._FACTORIES", fake_factories):
         result = create_broker_adapter(BrokerId.YAHOO, _config())
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_DEPENDENCY_MISSING
-        assert result.provider_metadata["package"] == "nonexistent-pkg"
-        assert result.provider_metadata["required_version"] is None
+        assert result.error.code == BrokerErrorCode.BROKER_DEPENDENCY_MISSING.value
+        provider_metadata = result.metadata.extensions["provider_metadata"]
+        assert isinstance(provider_metadata, Mapping)
+        assert provider_metadata["package"] == "nonexistent-pkg"
+        assert provider_metadata["required_version"] is None
 
 
 def test_create_adapter_dukascopy_missing_dependency() -> None:
@@ -144,10 +170,12 @@ def test_create_adapter_dukascopy_missing_dependency() -> None:
         )
         result = create_broker_adapter(BrokerId.DUKASCOPY, config)
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_DEPENDENCY_MISSING
+        assert result.error.code == BrokerErrorCode.BROKER_DEPENDENCY_MISSING.value
         expected_pkg = "app.services.brokers.nonexistent_dukascopy"
-        assert result.provider_metadata["package"] == expected_pkg
-        assert result.provider_metadata["required_version"] is None
+        provider_metadata = result.metadata.extensions["provider_metadata"]
+        assert isinstance(provider_metadata, Mapping)
+        assert provider_metadata["package"] == expected_pkg
+        assert provider_metadata["required_version"] is None
 
 
 def test_create_adapter_value_error() -> None:
@@ -178,4 +206,4 @@ def test_create_adapter_value_error() -> None:
     ):
         result = create_broker_adapter(BrokerId.YAHOO, _config())
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID
+        assert result.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID.value

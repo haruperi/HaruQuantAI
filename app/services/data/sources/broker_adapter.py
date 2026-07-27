@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Mapping
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Protocol, override
 
 from app.services.data.contracts import DataError
@@ -18,12 +19,13 @@ from app.services.data.sources.contracts import (
     SourceReadRequest,
 )
 from app.services.data.sources.protocol import MarketDataSource
-from app.utils import logger
+from app.utils import logger, parse_utc_timestamp
 
 if TYPE_CHECKING:
     from collections.abc import Coroutine
 
-    from app.services.brokers import BrokerAdapter, BrokerResult
+    from app.services.brokers import BrokerAdapter
+    from app.utils import StandardResponse
 
 
 class _AsyncRunner(Protocol):
@@ -62,7 +64,7 @@ def _run[T](operation: Coroutine[Any, Any, T], request_id: str) -> T:
 
 
 def _require_result[T](
-    result: BrokerResult[T],
+    result: StandardResponse[T],
     operation: str,
     request_id: str,
 ) -> T:
@@ -82,6 +84,57 @@ def _require_result[T](
             request_id=request_id,
         )
     return result.data
+
+
+def _require_broker_extension[T](
+    result: StandardResponse[T],
+    key: str,
+    operation: str,
+    request_id: str,
+) -> str:
+    """Return one required Brokers metadata extension.
+
+    Args:
+        result: Standard Brokers response.
+        key: Required extension key.
+        operation: Data-owned operation label.
+        request_id: Data request identity.
+
+    Returns:
+        Required string extension value.
+
+    Raises:
+        DataError: If the required Brokers evidence is absent or malformed.
+    """
+    value = result.metadata.extensions.get(key)
+    if not isinstance(value, str):
+        raise DataError(
+            "SOURCE_UNAVAILABLE",
+            safe_details={"operation": operation, "field": key},
+            request_id=request_id,
+        )
+    return value
+
+
+def _require_broker_timestamp[T](
+    result: StandardResponse[T],
+    operation: str,
+    request_id: str,
+) -> datetime:
+    """Return the required Brokers completion timestamp.
+
+    Raises:
+        DataError: If the timestamp extension is absent or malformed.
+    """
+    value = _require_broker_extension(result, "timestamp", operation, request_id)
+    try:
+        return parse_utc_timestamp(value)
+    except ValueError as error:
+        raise DataError(
+            "SOURCE_UNAVAILABLE",
+            safe_details={"operation": operation, "field": "timestamp"},
+            request_id=request_id,
+        ) from error
 
 
 class ExternalMarketDataSource(MarketDataSource):
@@ -143,6 +196,17 @@ class ExternalMarketDataSource(MarketDataSource):
             bar_page = _require_result(
                 bar_result, "historical_bars", request.request_id
             )
+            bar_revision = _require_broker_extension(
+                bar_result,
+                "adapter_version",
+                "historical_bars",
+                request.request_id,
+            )
+            bar_timestamp = _require_broker_timestamp(
+                bar_result,
+                "historical_bars",
+                request.request_id,
+            )
             normalized_bars: list[dict[str, object]] = []
             for bar in bar_page.items:
                 volume = bar.trade_volume
@@ -159,7 +223,7 @@ class ExternalMarketDataSource(MarketDataSource):
                         "timestamp": bar.opening_timestamp,
                         "source": request.source_id,
                         "source_symbol": request.provider_symbol,
-                        "source_revision": bar_result.adapter_version,
+                        "source_revision": bar_revision,
                         "available_at": bar.closing_timestamp,
                         "open": bar.open,
                         "high": bar.high,
@@ -176,10 +240,10 @@ class ExternalMarketDataSource(MarketDataSource):
             retrieved_at = max(
                 (
                     *(bar.closing_timestamp for bar in bar_page.items),
-                    bar_result.timestamp,
+                    bar_timestamp,
                 )
             )
-            revision = bar_result.adapter_version
+            revision = bar_revision
         elif request.data_kind == "ticks":
             tick_result = await self._adapter.get_ticks(
                 symbol=request.provider_symbol,
@@ -188,11 +252,17 @@ class ExternalMarketDataSource(MarketDataSource):
                 limit=request.limit,
             )
             tick_page = _require_result(tick_result, "ticks", request.request_id)
+            tick_revision = _require_broker_extension(
+                tick_result, "adapter_version", "ticks", request.request_id
+            )
+            tick_timestamp = _require_broker_timestamp(
+                tick_result, "ticks", request.request_id
+            )
             available_times = [
                 max(
                     tick.event_timestamp,
                     tick.provider_receipt_timestamp,
-                    tick_result.timestamp,
+                    tick_timestamp,
                 )
                 for tick in tick_page.items
             ]
@@ -201,7 +271,7 @@ class ExternalMarketDataSource(MarketDataSource):
                     "timestamp": tick.event_timestamp,
                     "source": request.source_id,
                     "source_symbol": request.provider_symbol,
-                    "source_revision": tick_result.adapter_version,
+                    "source_revision": tick_revision,
                     "available_at": available_at,
                     "price_unit": tick.price_unit,
                     "bid": tick.bid,
@@ -216,13 +286,19 @@ class ExternalMarketDataSource(MarketDataSource):
                     strict=True,
                 )
             )
-            retrieved_at = max(available_times, default=tick_result.timestamp)
-            revision = tick_result.adapter_version
+            retrieved_at = max(available_times, default=tick_timestamp)
+            revision = tick_revision
         elif request.data_kind == "spreads":
             spread_result = await self._adapter.get_spread(
                 symbol=request.provider_symbol
             )
             spread = _require_result(spread_result, "spread", request.request_id)
+            spread_revision = _require_broker_extension(
+                spread_result, "adapter_version", "spread", request.request_id
+            )
+            spread_timestamp = _require_broker_timestamp(
+                spread_result, "spread", request.request_id
+            )
             metadata_result = await self._adapter.get_symbol_info(
                 symbol=request.provider_symbol
             )
@@ -239,18 +315,18 @@ class ExternalMarketDataSource(MarketDataSource):
                 )
             records = (
                 {
-                    "timestamp": spread_result.timestamp,
+                    "timestamp": spread_timestamp,
                     "source": request.source_id,
                     "source_symbol": request.provider_symbol,
-                    "source_revision": spread_result.adapter_version,
-                    "available_at": spread_result.timestamp,
+                    "source_revision": spread_revision,
+                    "available_at": spread_timestamp,
                     "spread": spread,
                     "unit": metadata.price_unit,
                     "scale": metadata.price_precision,
                 },
             )
-            retrieved_at = spread_result.timestamp
-            revision = spread_result.adapter_version
+            retrieved_at = spread_timestamp
+            revision = spread_revision
         else:
             raise DataError(
                 "UNSUPPORTED_OPERATION",
@@ -292,13 +368,16 @@ class ExternalMarketDataSource(MarketDataSource):
             limit=request.limit,
         )
         page = _require_result(result, "symbols", request.request_id)
+        revision = _require_broker_extension(
+            result, "adapter_version", "symbols", request.request_id
+        )
         items = tuple(sorted({symbol.provider_symbol for symbol in page.items}))
         return SymbolPage(
             source_id=request.source_id,
             items=items,
             limit=request.limit,
             next_cursor=page.next_cursor,
-            revision=result.adapter_version,
+            revision=revision,
             request_id=request.request_id,
         )
 
@@ -323,6 +402,12 @@ class ExternalMarketDataSource(MarketDataSource):
             )
         result = await self._adapter.get_symbol_info(symbol=request.symbol)
         info = _require_result(result, "symbol_info", request.request_id)
+        revision = _require_broker_extension(
+            result, "adapter_version", "symbol_info", request.request_id
+        )
+        retrieved_at = _require_broker_timestamp(
+            result, "symbol_info", request.request_id
+        )
         timezone = info.provider_metadata.get("timezone")
         if timezone is not None and not isinstance(timezone, str):
             raise DataError(
@@ -341,8 +426,8 @@ class ExternalMarketDataSource(MarketDataSource):
             "quantity_step": info.quantity_step,
             "timezone": timezone,
             "source_id": request.source_id,
-            "revision": result.adapter_version,
-            "retrieved_at": result.timestamp,
+            "revision": revision,
+            "retrieved_at": retrieved_at,
             "request_id": request.request_id,
         }
         metadata_dict.update(info.provider_metadata)

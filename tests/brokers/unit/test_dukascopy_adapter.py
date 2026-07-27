@@ -112,7 +112,7 @@ def test_adapter_connect_verifies_via_bounded_probe() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert result.is_success
+        assert result.status == "success"
 
     asyncio.run(exercise())
 
@@ -123,7 +123,7 @@ def test_adapter_connect_fails_closed_on_transport_error() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
 
     asyncio.run(exercise())
 
@@ -152,7 +152,7 @@ def test_adapter_get_symbol_info_rejects_undeclared_symbol() -> None:
         await adapter.connect()
         result = await adapter.get_symbol_info("GBPUSD")
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
 
     asyncio.run(exercise())
 
@@ -165,7 +165,7 @@ def test_adapter_get_ticks_requires_start_and_positive_limit() -> None:
         await adapter.connect()
         result = await adapter.get_ticks("EURUSD", limit=1)
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
 
     asyncio.run(exercise())
 

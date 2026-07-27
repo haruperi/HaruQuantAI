@@ -30,16 +30,18 @@ def _config() -> BrokerConnectionConfig:
 def test_unsupported_operation_never_calls_provider() -> None:
     """An unreleased mutation returns a deterministic error from root API."""
     created = create_broker_adapter(BrokerId.DUKASCOPY, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         result = await adapter.cancel_order("not-a-ticket")
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        assert result.error.capability == BrokerCapabilityId.CANCEL_ORDER
+        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
+        assert (
+            result.error.details["capability"] == BrokerCapabilityId.CANCEL_ORDER.value
+        )
 
     asyncio.run(exercise())
 
@@ -47,13 +49,15 @@ def test_unsupported_operation_never_calls_provider() -> None:
 def test_unsupported_result_identifies_broker_and_environment() -> None:
     """The unsupported result carries broker/environment identity."""
     created = create_broker_adapter(BrokerId.DUKASCOPY, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         result = await adapter.cancel_order("not-a-ticket")
-        assert result.broker == BrokerId.DUKASCOPY
-        assert result.environment == BrokerEnvironment.SANDBOX
+        assert result.metadata.extensions["broker"] == BrokerId.DUKASCOPY.value
+        assert (
+            result.metadata.extensions["environment"] == BrokerEnvironment.SANDBOX.value
+        )
 
     asyncio.run(exercise())

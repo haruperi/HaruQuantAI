@@ -14,7 +14,6 @@ from app.services.brokers import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerId,
-    BrokerResult,
     BrokerTradingSession,
 )
 from app.services.data.contracts import DataError
@@ -31,8 +30,10 @@ from app.services.data.sources.registry import (
     register_source,
     resolve_source_identity,
 )
-from app.utils import generate_id
+from app.utils import StandardResponse, generate_id
 from pydantic import SecretStr
+
+from tests.brokers.response_factory import broker_response
 
 
 @pytest.fixture(autouse=True)
@@ -417,12 +418,11 @@ def test_broker_calendar_maps_authoritative_sessions() -> None:
             symbol: str,
             start: datetime,
             end: datetime,
-        ) -> BrokerResult[tuple[BrokerTradingSession, ...]]:
+        ) -> StandardResponse[tuple[BrokerTradingSession, ...]]:
             del symbol, start, end
-            return BrokerResult(
-                status="success",
+            return broker_response(
+                BrokerCapabilityId.GET_TRADING_SESSIONS,
                 broker=BrokerId.MT5,
-                operation=BrokerCapabilityId.GET_TRADING_SESSIONS,
                 request_id=generate_id("req"),
                 timestamp=observed_at,
                 environment=BrokerEnvironment.DEMO,

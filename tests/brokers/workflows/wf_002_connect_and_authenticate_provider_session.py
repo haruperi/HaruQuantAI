@@ -25,7 +25,7 @@ async def _run() -> None:
 
     connect_result = await adapter.connect()
     print_result("WF-BRK-002: connect", connect_result)
-    if connect_result.is_success:
+    if connect_result.status == "success":
         connected = await adapter.get_connection_status()
         print_connection_status("WF-BRK-002: connected", connected)
     else:

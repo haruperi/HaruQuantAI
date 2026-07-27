@@ -153,7 +153,8 @@ caller supplies `AuthContext` separately; unauthorized or unbounded queries fail
 | `AuthContext` | `v1` | Utils | Authenticate and trace governed reads, source promotion, audit persistence, and audit queries. |
 | `AuditEvent` | `v1` | Utils | Persist redacted governed events in Data's durable audit store. |
 | `BrokerAdapter` (read traits) | `v1` | Brokers | Read-only market data, account state, and calculation reads via `MarketDataProvider`, `AccountProvider`, and `CalculationProvider`; Data never invokes mutation operations. |
-| `BrokerResult` / `BrokerError` | `v1` | Brokers | Canonical result envelope and error taxonomy for every provider read consumed by Data. |
+| `StandardResponse[T]` | `v1` | Utils | Shared bounded-operation envelope for Broker reads; Data consumes raw Broker DTOs from `data` and validates required Broker evidence in `metadata.extensions`. |
+| Broker response extensions and error codes | `v1` | Brokers | Provider identity, environment, completion timestamp, adapter version, and structured failure semantics for every Broker read consumed by Data. |
 | `BrokerConnectionEvent` / subscription event DTOs | `v1` | Brokers | Bounded connection lifecycle and provider-event channels feeding Data's internal feed handling. |
 
 ### Persisted state
@@ -2159,7 +2160,8 @@ run the complete Data set at the feature/slice completion gate.
 
 - **Contract:** producer/consumer compatibility for `MarketDataset` and
   `AccountStateSnapshot`, plus consumer compatibility against Brokers'
-  `BrokerAdapter` read traits and `BrokerResult`/`BrokerError`.
+  `BrokerAdapter` read traits, Utils-owned `StandardResponse[T]`, and
+  Brokers-owned response extensions/error codes.
 - **Unit:** success, validation, exact errors, side effects, bounds, retained V1
   behavior, and modified/new behavior for every `FR-DATA-*`.
 - **Integration:** every `WF-DATA-*`, including fake source/broker contracts,

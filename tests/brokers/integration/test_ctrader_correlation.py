@@ -37,12 +37,12 @@ def _config() -> BrokerConnectionConfig:
 def test_ctrader_correlation_integration_via_root() -> None:
     """Verify cTrader adapter correlation via root API boundary."""
     created = create_broker_adapter(BrokerId.CTRADER, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         status = await adapter.get_connection_status()
-        assert status.is_success
+        assert status.status == "success"
 
     asyncio.run(exercise())

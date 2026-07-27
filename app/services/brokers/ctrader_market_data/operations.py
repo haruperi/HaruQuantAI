@@ -13,7 +13,6 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerPage,
     BrokerQuote,
-    BrokerResult,
     BrokerSymbolInfo,
     BrokerTick,
     BrokerTradingSession,
@@ -29,6 +28,7 @@ from app.services.brokers.ctrader_session.mapping import (
     _map_ticks,
     _optional,
 )
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class _CTraderMarketDataMixin:
@@ -39,7 +39,7 @@ class _CTraderMarketDataMixin:
         query: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]:
+    ) -> StandardResponse[BrokerPage[BrokerSymbolInfo]]:
         """Return bounded exact cTrader symbols and provider specifications.
 
         Returns:
@@ -70,7 +70,7 @@ class _CTraderMarketDataMixin:
             ),
         )
 
-    async def get_symbol_info(self, symbol: str) -> BrokerResult[BrokerSymbolInfo]:
+    async def get_symbol_info(self, symbol: str) -> StandardResponse[BrokerSymbolInfo]:
         """Return one exact cTrader symbol specification.
 
         Returns:
@@ -85,7 +85,7 @@ class _CTraderMarketDataMixin:
             )
         return self._result(BrokerCapabilityId.GET_SYMBOL_INFO, data=data)
 
-    async def get_quote(self, symbol: str) -> BrokerResult[BrokerQuote]:
+    async def get_quote(self, symbol: str) -> StandardResponse[BrokerQuote]:
         """Return the next genuine cTrader spot event for one symbol.
 
         Returns:
@@ -109,7 +109,7 @@ class _CTraderMarketDataMixin:
             return self._result(BrokerCapabilityId.GET_QUOTE, error=event)
         return self._result(BrokerCapabilityId.GET_QUOTE, data=event)
 
-    async def get_spread(self, symbol: str) -> BrokerResult[Decimal]:
+    async def get_spread(self, symbol: str) -> StandardResponse[Decimal]:
         """Return the spread from one genuine cTrader spot event.
 
         Returns:
@@ -117,7 +117,7 @@ class _CTraderMarketDataMixin:
         """
         quote = await self.get_quote(symbol)
         if quote.error is not None:
-            return self._result(BrokerCapabilityId.GET_SPREAD, error=quote.error)
+            return self._propagated_error(BrokerCapabilityId.GET_SPREAD, quote)
         if quote.data is None or quote.data.bid is None or quote.data.ask is None:
             return self._error(
                 BrokerCapabilityId.GET_SPREAD,
@@ -134,7 +134,7 @@ class _CTraderMarketDataMixin:
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerTick]]:
+    ) -> StandardResponse[BrokerPage[BrokerTick]]:
         """Return bounded merged cTrader BID and ASK tick history.
 
         Returns:
@@ -187,7 +187,7 @@ class _CTraderMarketDataMixin:
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerBar]]:
+    ) -> StandardResponse[BrokerPage[BrokerBar]]:
         """Return bounded cTrader provider trendbars without resampling.
 
         Returns:
@@ -339,7 +339,7 @@ class _CTraderMarketDataMixin:
         symbol: str,
         start: datetime | None = None,
         end: datetime | None = None,
-    ) -> BrokerResult[tuple[BrokerTradingSession, ...]]:
+    ) -> StandardResponse[tuple[BrokerTradingSession, ...]]:
         """Return broker-authored cTrader sessions with holiday closures applied.
 
         Args:

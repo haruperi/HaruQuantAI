@@ -7,9 +7,9 @@ from app.services.brokers.contracts import (
     BrokerBar,
     BrokerCapabilityId,
     BrokerPage,
-    BrokerResult,
 )
 from app.services.brokers.dukascopy_ticks.candle_mapping import _map_candles
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class _DukascopyBarsMixin:
@@ -23,7 +23,7 @@ class _DukascopyBarsMixin:
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerBar]]:
+    ) -> StandardResponse[BrokerPage[BrokerBar]]:
         """Return bounded provider BID candles from Dukascopy's web chart.
 
         Returns:

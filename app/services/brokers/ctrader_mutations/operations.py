@@ -12,7 +12,6 @@ from app.services.brokers.contracts import (
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-    BrokerResult,
 )
 from app.services.brokers.contracts.protocols import (
     _RequestValidationError,
@@ -22,6 +21,7 @@ from app.services.brokers.ctrader_session.mapping import (
     _map_error_code,
     _map_order_result,
 )
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class _CTraderMutationsMixin:
@@ -29,7 +29,7 @@ class _CTraderMutationsMixin:
 
     async def check_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderCheck]:
+    ) -> StandardResponse[BrokerOrderCheck]:
         """Validate symbol and obtain provider expected-margin evidence.
 
         Returns:
@@ -46,7 +46,7 @@ class _CTraderMutationsMixin:
             )
         )
         if margin.error is not None:
-            return self._result(BrokerCapabilityId.CHECK_ORDER, error=margin.error)
+            return self._propagated_error(BrokerCapabilityId.CHECK_ORDER, margin)
         return self._result(
             BrokerCapabilityId.CHECK_ORDER,
             data=BrokerOrderCheck(
@@ -57,7 +57,7 @@ class _CTraderMutationsMixin:
 
     async def place_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Submit exactly one cTrader order without retry.
 
         Returns:
@@ -81,7 +81,7 @@ class _CTraderMutationsMixin:
 
     async def modify_order(
         self, request: BrokerOrderModificationRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Modify exactly one cTrader order without retry.
 
         Returns:
@@ -101,7 +101,7 @@ class _CTraderMutationsMixin:
 
     async def cancel_order(
         self, order_id: str, client_request_id: str | None = None
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Cancel exactly one cTrader order without retry.
 
         Returns:
@@ -117,7 +117,7 @@ class _CTraderMutationsMixin:
 
     async def modify_position(
         self, request: BrokerPositionModificationRequest
-    ) -> BrokerResult[BrokerPosition]:
+    ) -> StandardResponse[BrokerPosition]:
         """Modify one cTrader position and return refreshed provider state.
 
         Returns:
@@ -132,9 +132,7 @@ class _CTraderMutationsMixin:
             **fields,
         )
         if execution.error is not None:
-            return self._result(
-                BrokerCapabilityId.MODIFY_POSITION, error=execution.error
-            )
+            return self._propagated_error(BrokerCapabilityId.MODIFY_POSITION, execution)
         positions = await self.get_positions(limit=100)
         if positions.data is not None:
             for position in positions.data.items:
@@ -149,7 +147,7 @@ class _CTraderMutationsMixin:
 
     async def close_position(
         self, request: BrokerPositionCloseRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Close or reduce exactly one cTrader position without retry.
 
         Returns:
@@ -207,7 +205,7 @@ class _CTraderMutationsMixin:
         *,
         fallback_id: str | None = None,
         **fields: object,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Send one cTrader mutation once and classify its execution event.
 
         Returns:

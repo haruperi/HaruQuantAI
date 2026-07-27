@@ -18,11 +18,10 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerOrderBook,
     BrokerQuote,
-    BrokerResult,
     BrokerSubscription,
     BrokerSubscriptionInfo,
 )
-from app.utils import generate_id, utc_now
+from app.utils import StandardResponse, generate_id, utc_now
 
 
 class _BinancePriceStreamsMixin:
@@ -32,7 +31,7 @@ class _BinancePriceStreamsMixin:
 
     async def subscribe_quotes(
         self, symbols: tuple[str, ...]
-    ) -> BrokerResult[BrokerSubscription[BrokerQuote]]:
+    ) -> StandardResponse[BrokerSubscription[BrokerQuote]]:
         """Open a bounded Binance book-ticker stream.
 
         Returns:
@@ -51,7 +50,7 @@ class _BinancePriceStreamsMixin:
 
     async def subscribe_bars(
         self, symbols: tuple[str, ...], timeframe: str
-    ) -> BrokerResult[BrokerSubscription[BrokerBar]]:
+    ) -> StandardResponse[BrokerSubscription[BrokerBar]]:
         """Open a bounded Binance kline stream.
 
         Returns:
@@ -70,7 +69,7 @@ class _BinancePriceStreamsMixin:
 
     async def subscribe_order_book(
         self, symbols: tuple[str, ...], depth: int | None = None
-    ) -> BrokerResult[BrokerSubscription[BrokerOrderBook]]:
+    ) -> StandardResponse[BrokerSubscription[BrokerOrderBook]]:
         """Open a bounded Binance depth stream after a genuine snapshot.
 
         Returns:
@@ -100,7 +99,7 @@ class _BinancePriceStreamsMixin:
         )
         return self._result(BrokerCapabilityId.SUBSCRIBE_ORDER_BOOK, data=subscription)
 
-    async def unsubscribe(self, subscription_id: str) -> BrokerResult[None]:
+    async def unsubscribe(self, subscription_id: str) -> StandardResponse[None]:
         """Close one exact Binance websocket subscription.
 
         Returns:
@@ -121,7 +120,7 @@ class _BinancePriceStreamsMixin:
 
     async def list_subscriptions(
         self,
-    ) -> BrokerResult[tuple[BrokerSubscriptionInfo, ...]]:
+    ) -> StandardResponse[tuple[BrokerSubscriptionInfo, ...]]:
         """Return immutable Binance subscription metadata.
 
         Returns:

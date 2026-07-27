@@ -8,11 +8,11 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerMarginRequest,
     BrokerProfitRequest,
-    BrokerResult,
 )
 from app.services.brokers.contracts.protocols import (
     _RequestValidationError,
 )
+from app.utils import StandardResponse  # noqa: TC001
 
 
 def _provider_ticket(value: str) -> int:
@@ -40,7 +40,7 @@ class _MT5CalculationsMixin:
 
     async def calculate_margin(
         self, request: BrokerMarginRequest
-    ) -> BrokerResult[Decimal]:
+    ) -> StandardResponse[Decimal]:
         """Return MT5's provider-native margin calculation.
 
         Returns:
@@ -65,7 +65,7 @@ class _MT5CalculationsMixin:
 
     async def calculate_profit(
         self, request: BrokerProfitRequest
-    ) -> BrokerResult[Decimal]:
+    ) -> StandardResponse[Decimal]:
         """Return MT5's provider-native profit calculation.
 
         Returns:

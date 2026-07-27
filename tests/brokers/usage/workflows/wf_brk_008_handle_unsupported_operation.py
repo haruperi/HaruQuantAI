@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+
 from app.services.brokers import BrokerCapabilityId, BrokerErrorCode, BrokerId
 from tests.brokers.usage._support import (
     create_real_adapter,
@@ -51,7 +52,7 @@ async def run() -> None:
         )
     finally:
         require_success("MT5 disconnect", await adapter.disconnect())
-    print("OUTPUT BOUNDARY — BrokerResult with capability and operation evidence")
+    print("OUTPUT BOUNDARY — StandardResponse with capability and operation evidence")
 
 
 def _stage(number: int) -> None:

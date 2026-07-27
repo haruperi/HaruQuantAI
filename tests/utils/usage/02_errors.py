@@ -7,12 +7,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
+    COMMON_ERROR_CATALOG,
+    ErrorDefinition,
     HaruQuantError,
     ValidationError,
     get_error_metadata,
     map_exception,
     normalize_error_code,
+    require_error_definition,
     route_error_event,
+    validate_error_catalog,
 )
 
 
@@ -59,6 +63,23 @@ def fr_utils_035_route_error_event() -> None:
     print("Routed error event:", events[0]["code"])
 
 
+def fr_utils_048_error_catalogues() -> None:
+    """FR-UTL-048: Validate immutable business-neutral error definitions."""
+    _header("Example 6: Error Catalogues")
+    example = ErrorDefinition(
+        code="EXAMPLE_FAILURE",
+        domain="example",
+        description="The example failed",
+        category="example",
+        severity="error",
+        retryable=False,
+        operator_action="Inspect safe example evidence",
+    )
+    validated = validate_error_catalog({example.code: example})
+    assert require_error_definition(example.code, validated) is example
+    print("Common error count:", len(COMMON_ERROR_CATALOG))
+
+
 def main() -> None:
     """Run all shared-error examples."""
     fr_utils_004_typed_error_codes()
@@ -66,6 +87,7 @@ def main() -> None:
     fr_utils_006_exception_extension()
     fr_utils_034_error_metadata()
     fr_utils_035_route_error_event()
+    fr_utils_048_error_catalogues()
 
 
 if __name__ == "__main__":

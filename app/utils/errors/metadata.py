@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass
 from typing import Literal
 
+from app.utils.errors.catalog import COMMON_ERROR_CATALOG
 from app.utils.errors.exceptions import ValidationError
 
 _SYMBOLIC_CODE = re.compile(r"[A-Z][A-Z0-9_]{0,127}\Z")
@@ -29,36 +30,13 @@ class ErrorMetadata:
 
 
 _ERROR_METADATA = {
-    "CONFIGURATION_INVALID": ErrorMetadata(
-        code="CONFIGURATION_INVALID",
-        title="Configuration is invalid",
-        severity="error",
-        retryable=False,
-    ),
-    "EXTERNAL_SERVICE_UNAVAILABLE": ErrorMetadata(
-        code="EXTERNAL_SERVICE_UNAVAILABLE",
-        title="External service is unavailable",
-        severity="error",
-        retryable=True,
-    ),
-    "INTERNAL_ERROR": ErrorMetadata(
-        code="INTERNAL_ERROR",
-        title="Internal error",
-        severity="critical",
-        retryable=False,
-    ),
-    "SECURITY_POLICY_VIOLATION": ErrorMetadata(
-        code="SECURITY_POLICY_VIOLATION",
-        title="Security policy violation",
-        severity="critical",
-        retryable=False,
-    ),
-    "VALIDATION_FAILED": ErrorMetadata(
-        code="VALIDATION_FAILED",
-        title="Validation failed",
-        severity="warning",
-        retryable=False,
-    ),
+    code: ErrorMetadata(
+        code=definition.code,
+        title=definition.description,
+        severity=definition.severity,
+        retryable=definition.retryable,
+    )
+    for code, definition in COMMON_ERROR_CATALOG.items()
 }
 
 

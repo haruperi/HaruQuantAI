@@ -66,7 +66,10 @@ def fr_brokers_041() -> None:
 def fr_brokers_042() -> None:
     """FR-BRK-042: Expose provider time, local timestamps, offset, and latency."""
     _header("FR-BRK-042: Expose provider time, local timestamps, offset, and latency.")
-    catalogue = get_broker_capability_catalogue()
+    response = get_broker_capability_catalogue()
+    assert response.status == "success"
+    assert response.data is not None
+    catalogue = response.data
     print("Result:", len(catalogue))
 
 
@@ -121,7 +124,10 @@ def fr_brokers_047() -> None:
     _header(
         "FR-BRK-047: Compose lifecycle and capabilities into one async adapter with contract_version v1."
     )
-    brokers = get_registered_brokers()
+    response = get_registered_brokers()
+    assert response.status == "success"
+    assert response.data is not None
+    brokers = response.data
     created = create_broker_adapter(brokers[0], config(brokers[0]))
     adapter = created.data
     assert adapter is not None

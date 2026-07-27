@@ -101,7 +101,7 @@ def test_fake_adapter_error_injection() -> None:
         )
         result = await fake.get_quote("A")
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_TIMEOUT
+        assert result.error.code == BrokerErrorCode.BROKER_TIMEOUT.value
 
     asyncio.run(exercise())
 
@@ -137,9 +137,9 @@ def test_fixture_cannot_bypass_declared_unavailable_capability() -> None:
             fixtures={BrokerCapabilityId.GET_QUOTE: _quote()},
         )
         result = await fake.get_quote("A")
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
 
     asyncio.run(exercise())
 
@@ -155,7 +155,7 @@ def test_injected_error_cannot_bypass_declared_unavailable_capability() -> None:
         )
         result = await fake.get_quote("A")
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
 
     asyncio.run(exercise())
 
@@ -164,9 +164,11 @@ def test_fake_adapter_honours_the_genuine_provider_catalogue() -> None:
     """Supplied the real Yahoo catalogue, unreleased reads stay fail-closed."""
 
     async def exercise() -> None:
+        catalogue_response = get_broker_capability_catalogue()
+        assert catalogue_response.status == "success"
+        assert catalogue_response.data is not None
         capabilities = {
-            entry.capability: entry
-            for entry in get_broker_capability_catalogue()[BrokerId.YAHOO]
+            entry.capability: entry for entry in catalogue_response.data[BrokerId.YAHOO]
         }
         fake = FakeBrokerAdapter(
             _config(),
@@ -175,7 +177,7 @@ def test_fake_adapter_honours_the_genuine_provider_catalogue() -> None:
         )
         result = await fake.get_quote("A")
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
 
     asyncio.run(exercise())
 
@@ -187,14 +189,14 @@ def test_fake_subscription_is_bounded_and_terminates_on_overflow() -> None:
         fake = _fake()
         await fake.connect()
         opened = await fake.subscribe_quotes(("EURUSD",))
-        assert opened.is_success
+        assert opened.status == "success"
         handle = opened.data
         assert handle is not None
         assert handle.info.buffer_size == _BUFFER_SIZE
 
         for index in range(_BUFFER_SIZE):
-            assert await fake.publish(handle.info.subscription_id, index)
-        assert not await fake.publish(handle.info.subscription_id, _BUFFER_SIZE)
+            assert (await fake.publish(handle.info.subscription_id, index)).data
+        assert not (await fake.publish(handle.info.subscription_id, _BUFFER_SIZE)).data
 
         assert handle.info.resynchronization_required
         assert not handle.info.active
@@ -231,11 +233,11 @@ def test_unknown_unsubscribe_is_isolated_and_explicit() -> None:
 
         unknown = await fake.unsubscribe("evt-does-not-exist")
         assert unknown.error is not None
-        assert unknown.error.code == BrokerErrorCode.BROKER_SUBSCRIPTION_NOT_FOUND
+        assert unknown.error.code == BrokerErrorCode.BROKER_SUBSCRIPTION_NOT_FOUND.value
         assert opened.data.info.active
 
         owned = await fake.unsubscribe(opened.data.info.subscription_id)
-        assert owned.is_success
+        assert owned.status == "success"
         assert not opened.data.info.active
 
     asyncio.run(exercise())

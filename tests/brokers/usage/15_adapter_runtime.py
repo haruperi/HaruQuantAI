@@ -15,7 +15,7 @@ async def _run() -> None:
         assert status.data is not None
         assert status.data.transport_connected
         print("state", status.data.state.value)
-        print("latency_ms", status.latency_ms)
+        print("latency_ms", status.metadata.execution_ms)
 
 
 def main() -> None:

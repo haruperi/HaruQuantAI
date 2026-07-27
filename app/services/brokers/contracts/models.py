@@ -331,56 +331,6 @@ class BrokerError(_Schema):
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class BrokerResult[T](_Schema):
-    """Truth-preserving canonical success/error envelope."""
-
-    SCHEMA_ID: ClassVar[str] = "brokers.result.v1"
-    status: Literal["success", "error"]
-    broker: BrokerId
-    operation: BrokerCapabilityId
-    request_id: str
-    timestamp: datetime
-    environment: BrokerEnvironment
-    adapter_version: str
-    data: T | None = None
-    error: BrokerError | None = None
-    provider_metadata: Mapping[str, object] = field(default_factory=dict)
-    latency_ms: float = 0.0
-    provider_latency_ms: float | None = None
-    adapter_overhead_ms: float = 0.0
-    provider_api_version: str | None = None
-
-    def __post_init__(self) -> None:
-        """Validate the immutable BrokerResult invariants.
-
-        Raises:
-            ValueError: If the documented operation cannot complete.
-        """
-        _text(self.request_id, "request_id")
-        _request_id(self.request_id, "request_id")
-        _utc(self.timestamp, "timestamp")
-        if self.status == "success" and self.error is not None:
-            raise ValueError("success cannot contain an error")
-        if self.status == "error" and (self.error is None or self.data is not None):
-            raise ValueError("error status requires an error and null data")
-        if self.status not in {"success", "error"}:
-            raise ValueError("unknown result status")
-        _non_negative_float(self.latency_ms, "latency_ms")
-        _non_negative_float(self.provider_latency_ms, "provider_latency_ms")
-        _non_negative_float(self.adapter_overhead_ms, "adapter_overhead_ms")
-        object.__setattr__(
-            self,
-            "provider_metadata",
-            _redacted(self.provider_metadata, "provider_metadata"),
-        )
-
-    @property
-    def is_success(self) -> bool:
-        """Return whether this result represents success."""
-        return self.status == "success"
-
-
-@dataclass(frozen=True, slots=True, kw_only=True)
 class BrokerPage[T](_Schema):
     """Bounded provider-native page."""
 

@@ -10,8 +10,8 @@ def main() -> None:
     config = build_mt5_connection_config()
     first = create_broker_adapter(BrokerId.MT5, config)
     second = create_broker_adapter(BrokerId.MT5, config)
-    print("WF-BRK-001: create first", first.is_success)
-    print("WF-BRK-001: create second", second.is_success)
+    print("WF-BRK-001: create first", first.status == "success")
+    print("WF-BRK-001: create second", second.status == "success")
     if first.data is None or second.data is None:
         return
     print("WF-BRK-001: independent instances", first.data is not second.data)

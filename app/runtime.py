@@ -1,6 +1,18 @@
 """System-level runtime initialization validation."""
 
+import time
 from typing import Final
+
+from app.utils import (
+    COMMON_ERROR_CATALOG,
+    RiskLevel,
+    StandardResponse,
+    build_response_metadata,
+    error_response,
+    generate_id,
+    logger,
+    success_response,
+)
 
 _EXECUTION_ROUTE_BY_PROFILE: Final[dict[str, str]] = {
     "research": "none",
@@ -8,33 +20,58 @@ _EXECUTION_ROUTE_BY_PROFILE: Final[dict[str, str]] = {
     "paper": "paper",
     "live": "live",
 }
-
-
-class RuntimeConfigurationError(ValueError):
-    """Report a fail-closed runtime profile and route mismatch."""
-
-    code: Final[str] = "SYSTEM_RUNTIME_ROUTE_INCOMPATIBLE"
-
-    def __init__(self) -> None:
-        """Initialize a bounded, value-free runtime configuration error."""
-        super().__init__("Runtime profile and execution route are incompatible")
+_ERROR_CODE: Final[str] = "SYSTEM_RUNTIME_ROUTE_INCOMPATIBLE"
+_ERROR_DETAIL: Final[str] = "RUNTIME_PROFILE_EXECUTION_ROUTE_INCOMPATIBLE"
+_ERROR_MESSAGE: Final[str] = "Runtime profile and execution route are incompatible"
+_SUCCESS_MESSAGE: Final[str] = "Runtime profile and execution route are compatible"
 
 
 def validate_runtime_configuration(
     *,
     runtime_profile: str,
     execution_route: str,
-) -> None:
+) -> StandardResponse[None]:
     """Validate the authoritative runtime profile and route pairing.
 
     Args:
         runtime_profile: Runtime profile selected by Utils-owned configuration.
         execution_route: Execution route selected by Trading-owned configuration.
 
-    Raises:
-        RuntimeConfigurationError: The values are unknown or are not the one
-            compatible pair defined by the system configuration manifest.
+    Returns:
+        A successful response containing raw ``None`` when the pair is
+        compatible, or a value-free structured error response otherwise.
     """
+    start_time = time.perf_counter_ns()
+    request_id = generate_id("req")
     expected_route = _EXECUTION_ROUTE_BY_PROFILE.get(runtime_profile)
-    if expected_route is None or execution_route != expected_route:
-        raise RuntimeConfigurationError
+    is_compatible = expected_route is not None and execution_route == expected_route
+    if is_compatible:
+        logger.info("Accepted runtime profile and execution route")
+    else:
+        logger.warning("Rejected runtime profile and execution route")
+    metadata = build_response_metadata(
+        name="app.runtime.validate_runtime_configuration",
+        domain="app",
+        risk_level=RiskLevel.NONE,
+        request_id=request_id,
+        start_time=start_time,
+        read_only=True,
+        writes_file=False,
+        modifies_database=False,
+        places_trade=False,
+        requires_network=False,
+    )
+    if not is_compatible:
+        response: StandardResponse[None] = error_response(
+            code=_ERROR_CODE,
+            details={"detail": _ERROR_DETAIL},
+            message=_ERROR_MESSAGE,
+            metadata=metadata,
+            catalog=COMMON_ERROR_CATALOG,
+        )
+        return response
+    return success_response(
+        None,
+        message=_SUCCESS_MESSAGE,
+        metadata=metadata,
+    )

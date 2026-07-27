@@ -164,7 +164,7 @@ def test_futures_profiles_remain_registry_only_for_connect() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
 
     asyncio.run(exercise())
 
@@ -176,7 +176,7 @@ def test_spot_adapter_connects_and_maps_symbols_and_klines() -> None:
 
     async def exercise() -> None:
         connected = await adapter.connect()
-        assert connected.is_success
+        assert connected.status == "success"
 
         symbols = await adapter.get_symbols(limit=10)
         assert symbols.data is not None
@@ -235,7 +235,7 @@ def test_adapter_connect_handles_probe_failure() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
 
     asyncio.run(exercise())
 
@@ -248,7 +248,7 @@ def test_adapter_ping() -> None:
     async def exercise() -> None:
         await adapter.connect()
         result = await adapter.ping()
-        assert result.is_success
+        assert result.status == "success"
 
     asyncio.run(exercise())
 
@@ -261,7 +261,7 @@ def test_adapter_get_server_time() -> None:
     async def exercise() -> None:
         await adapter.connect()
         result = await adapter.get_server_time()
-        assert result.is_success
+        assert result.status == "success"
         assert result.data is not None
         assert result.data.provider_time is not None
 
@@ -277,7 +277,7 @@ def test_adapter_get_symbols_filtering_and_errors() -> None:
         await adapter.connect()
         invalid = await adapter.get_symbols(limit=0)
         assert invalid.error is not None
-        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
         res = await adapter.get_symbols(query="BTC", limit=5)
         assert len(res.data.items) == 1
         assert res.data.items[0].provider_symbol == "BTCUSDT"
@@ -311,10 +311,10 @@ def test_adapter_get_symbol_info() -> None:
     async def exercise() -> None:
         await adapter.connect()
         res = await adapter.get_symbol_info("BTCUSDT")
-        assert res.is_success
+        assert res.status == "success"
         assert res.data.provider_symbol == "BTCUSDT"
         res_error = await adapter.get_symbol_info("UNKNOWN")
-        assert not res_error.is_success
+        assert res_error.status != "success"
 
     asyncio.run(exercise())
 
@@ -339,7 +339,7 @@ def test_adapter_get_quote() -> None:
     async def exercise() -> None:
         await adapter.connect()
         res = await adapter.get_quote("BTCUSDT")
-        assert res.is_success
+        assert res.status == "success"
         assert str(res.data.bid) == "1.0"
 
     asyncio.run(exercise())
@@ -361,9 +361,9 @@ def test_adapter_get_ticks() -> None:
         await adapter.connect()
         invalid = await adapter.get_ticks("BTCUSDT", limit=0)
         assert invalid.error is not None
-        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
         res = await adapter.get_ticks("BTCUSDT", limit=1)
-        assert res.is_success
+        assert res.status == "success"
         assert len(res.data.items) == 1
         assert str(res.data.items[0].last_price) == "1.2"
 
@@ -379,7 +379,7 @@ def test_adapter_get_historical_bars_parameters() -> None:
         await adapter.connect()
         invalid = await adapter.get_historical_bars("BTCUSDT", "1m", limit=0)
         assert invalid.error is not None
-        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert invalid.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
         res = await adapter.get_historical_bars(
             "BTCUSDT",
             "1m",
@@ -387,7 +387,7 @@ def test_adapter_get_historical_bars_parameters() -> None:
             end=datetime(2026, 1, 2, tzinfo=UTC),
             limit=5,
         )
-        assert res.is_success
+        assert res.status == "success"
 
     asyncio.run(exercise())
 
@@ -411,7 +411,7 @@ def test_adapter_maps_canonical_h1_to_binance_interval() -> None:
     async def exercise() -> None:
         await adapter.connect()
         result = await adapter.get_historical_bars("BTCUSDT", "H1", limit=5)
-        assert result.is_success
+        assert result.status == "success"
         assert result.data is not None
         assert transport.kline_kwargs["interval"] == "1h"
         assert result.data.items[0].provider_timeframe == "1h"
@@ -419,7 +419,7 @@ def test_adapter_maps_canonical_h1_to_binance_interval() -> None:
 
         unsupported = await adapter.get_historical_bars("BTCUSDT", "H3", limit=5)
         assert unsupported.error is not None
-        assert unsupported.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert unsupported.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
 
     asyncio.run(exercise())
 

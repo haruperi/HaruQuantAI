@@ -76,7 +76,8 @@ only bounded redacted unresolved-scope evidence.
 | `AuthContext`, `AuditEvent` | `v1` | Utils | Principal/trace context and redacted governed-action evidence. |
 | `MarketDataset`, `AccountStateSnapshot`, `MarketContextEvidence` | `v1` | Data | Runtime market/account/context evidence; Trading never creates Risk policy from it. `MarketContextEvidence` is carried to Risk as orchestrator only — Risk is its sole interpreting consumer. |
 | `BrokerAdapter` (mutation + execution-read traits) | `v1` | Brokers | Sole paper/live mutation boundary (`TradeExecutionProvider`) plus execution-state and account reads needed for dispatch and reconciliation; mutation operations are Trading-only. |
-| `BrokerResult` / `BrokerError` | `v1` | Brokers | Canonical authority response envelope; `BROKER_UNKNOWN_OUTCOME` maps to `unknown_outcome` and freezes execution. |
+| `StandardResponse[T]` | `v1` | Utils | Shared bounded-operation envelope for Broker mutations; Trading consumes raw Broker acknowledgement DTOs from `data`. |
+| Broker response extensions and error codes | `v1` | Brokers | Authority identity, environment, operation, completion timestamp, and failure semantics; `BROKER_UNKNOWN_OUTCOME` maps to `unknown_outcome` and freezes execution. |
 | `BrokerConnectionConfig` | `v1` | Brokers | UI/API-composed provider/account/environment configuration with already-resolved in-memory credentials; paper and live differ only by its environment/credentials. |
 | `IndicatorSeries` | `v1` | Indicators | Current deterministic indicator evidence during live/paper orchestration. |
 | `TradeIntent` | `v1` | Strategy | Proposal lineage; Trading never executes it before Risk approval. |

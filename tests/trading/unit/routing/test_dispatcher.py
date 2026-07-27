@@ -23,12 +23,13 @@ from app.services.brokers import (
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-    BrokerResult,
 )
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
 from app.services.trading.routing.dispatcher import (
     dispatch_order_intent as _dispatch_order_intent,
 )
+from app.utils import StandardResponse
+from tests.brokers.response_factory import broker_response
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 BROKER_REQUEST_ID = "req-dd37fc1c-2cd6-4d66-9f9a-7a7f9a2482ef"
@@ -122,12 +123,11 @@ class _Adapter:
     def _order_result(
         self,
         operation: BrokerCapabilityId,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Build one acknowledged Broker order result."""
-        return BrokerResult(
-            status="success",
+        return broker_response(
+            operation,
             broker=BrokerId.MT5,
-            operation=operation,
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
             environment=BrokerEnvironment.DEMO,
@@ -143,7 +143,7 @@ class _Adapter:
     async def place_order(
         self,
         request: BrokerOrderRequest,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Record and acknowledge one Broker placement."""
         self.calls += 1
         self.request = request
@@ -153,7 +153,7 @@ class _Adapter:
     async def modify_order(
         self,
         request: BrokerOrderModificationRequest,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Record and acknowledge one Broker order modification."""
         self.calls += 1
         self.mutations.append(request)
@@ -163,7 +163,7 @@ class _Adapter:
         self,
         order_id: str,
         client_request_id: str | None = None,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Record and acknowledge one Broker cancellation."""
         self.calls += 1
         self.mutations.append((order_id, client_request_id))
@@ -172,14 +172,13 @@ class _Adapter:
     async def modify_position(
         self,
         request: BrokerPositionModificationRequest,
-    ) -> BrokerResult[BrokerPosition]:
+    ) -> StandardResponse[BrokerPosition]:
         """Record and acknowledge one Broker position modification."""
         self.calls += 1
         self.mutations.append(request)
-        return BrokerResult(
-            status="success",
+        return broker_response(
+            BrokerCapabilityId.MODIFY_POSITION,
             broker=BrokerId.MT5,
-            operation=BrokerCapabilityId.MODIFY_POSITION,
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
             environment=BrokerEnvironment.DEMO,
@@ -197,7 +196,7 @@ class _Adapter:
     async def close_position(
         self,
         request: BrokerPositionCloseRequest,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Record and acknowledge one Broker position close."""
         self.calls += 1
         self.mutations.append(request)
@@ -215,14 +214,13 @@ class _ErrorAdapter(_Adapter):
     async def place_order(
         self,
         request: BrokerOrderRequest,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Return one explicit or ambiguous Broker failure."""
         self.calls += 1
         self.mutations.append(request)
-        return BrokerResult(
-            status="error",
+        return broker_response(
+            BrokerCapabilityId.PLACE_ORDER,
             broker=BrokerId.MT5,
-            operation=BrokerCapabilityId.PLACE_ORDER,
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
             environment=BrokerEnvironment.DEMO,
@@ -237,7 +235,7 @@ class _TimeoutAdapter(_Adapter):
     async def place_order(
         self,
         request: BrokerOrderRequest,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Remain pending until the dispatch boundary cancels the call."""
         await asyncio.sleep(1)
         return await super().place_order(request)
@@ -249,7 +247,7 @@ class _RaisingAdapter(_Adapter):
     async def place_order(
         self,
         request: BrokerOrderRequest,
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Raise secret-bearing provider text at the external boundary."""
         self.calls += 1
         self.mutations.append(request)

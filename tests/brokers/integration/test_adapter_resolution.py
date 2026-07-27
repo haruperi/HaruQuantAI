@@ -24,6 +24,6 @@ def test_adapter_resolution_is_explicit_and_isolated() -> None:
     )
     first = create_broker_adapter(BrokerId.YAHOO, config)
     second = create_broker_adapter(BrokerId.YAHOO, config)
-    assert first.is_success
-    assert second.is_success
+    assert first.status == "success"
+    assert second.status == "success"
     assert first.data is not second.data

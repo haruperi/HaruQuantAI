@@ -1,8 +1,12 @@
 """Static capability catalogue tests."""
 
+from collections.abc import Mapping
+from types import MappingProxyType
+
 import pytest
-from app.services.brokers import BrokerCapabilityId, BrokerId
+from app.services.brokers import BrokerCapability, BrokerCapabilityId, BrokerId
 from app.services.brokers.registry import get_broker_capability_catalogue
+from app.utils import RiskLevel, validate_id
 
 # Verbatim transcription of the normative provider/profile capability matrix in
 # `app/services/brokers/README.md` Section 4.8. Column order is MT5, cTrader,
@@ -104,6 +108,14 @@ _NORMATIVE_MATRIX: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
 )
 
 
+def _catalogue() -> Mapping[BrokerId, tuple[BrokerCapability, ...]]:
+    """Return the successfully validated raw capability catalogue."""
+    response = get_broker_capability_catalogue()
+    assert response.status == "success"
+    assert response.data is not None
+    return response.data
+
+
 def _expected_cells() -> dict[tuple[BrokerId, BrokerCapabilityId], str]:
     """Flatten the normative matrix into one cell per profile/operation.
 
@@ -134,9 +146,38 @@ def _actual_cell(entry: object) -> str:
     return "W" if entry.access_mode == "WRITE" else "A"  # type: ignore[attr-defined]
 
 
+def test_catalogue_response_preserves_immutable_raw_data_and_metadata() -> None:
+    """The standard response retains the mapping proxy and serializes it safely."""
+    response = get_broker_capability_catalogue()
+
+    assert response.status == "success"
+    assert response.message == "Broker capability catalogue retrieved"
+    assert response.error is None
+    assert isinstance(response.data, MappingProxyType)
+    with pytest.raises(TypeError):
+        response.data[BrokerId.MT5] = ()
+    assert response.metadata.name == (
+        "brokers.registry.get_broker_capability_catalogue"
+    )
+    assert response.metadata.domain == "brokers"
+    assert response.metadata.risk_level is RiskLevel.NONE
+    assert validate_id(response.metadata.request_id, expected_prefix="req")
+    assert response.metadata.execution_ms >= 0
+    assert response.metadata.execution_ms == round(response.metadata.execution_ms, 3)
+    assert response.metadata.read_only is True
+    assert response.metadata.writes_file is False
+    assert response.metadata.modifies_database is False
+    assert response.metadata.places_trade is False
+    assert response.metadata.requires_network is False
+    assert dict(response.metadata.extensions) == {}
+    serialized = response.model_dump(mode="json")["data"]
+    assert isinstance(serialized, dict)
+    assert set(serialized) == {broker.value for broker in BrokerId}
+
+
 def test_catalogue_is_the_single_complete_declaration_source() -> None:
     """Every profile declares every canonical operation exactly once."""
-    catalogue = get_broker_capability_catalogue()
+    catalogue = _catalogue()
     assert set(catalogue) == set(BrokerId)
     for entries in catalogue.values():
         assert {entry.capability for entry in entries} == set(BrokerCapabilityId)
@@ -157,7 +198,7 @@ def test_catalogue_is_the_single_complete_declaration_source() -> None:
 
 def test_only_mt5_sandbox_verified_writes_are_released() -> None:
     """FR-BRK-010 releases only evidence-backed MT5 demo-write operations."""
-    catalogue = get_broker_capability_catalogue()
+    catalogue = _catalogue()
     released = {
         BrokerCapabilityId.CHECK_ORDER,
         BrokerCapabilityId.PLACE_ORDER,
@@ -188,7 +229,7 @@ def test_catalogue_matches_the_normative_matrix() -> None:
     """The README capability matrix and the static catalogue never diverge."""
     expected = _expected_cells()
     assert len(expected) == len(BrokerId) * len(BrokerCapabilityId)
-    catalogue = get_broker_capability_catalogue()
+    catalogue = _catalogue()
     divergences = [
         (broker.value, entry.capability.value, expected[(broker, entry.capability)])
         for broker, entries in catalogue.items()
@@ -202,7 +243,7 @@ def test_catalogue_matches_the_normative_matrix() -> None:
 
 def test_available_provider_calls_carry_verification_evidence() -> None:
     """FR-BRK-010: a released provider read records its verification evidence."""
-    catalogue = get_broker_capability_catalogue()
+    catalogue = _catalogue()
     self_verifying = {BrokerCapabilityId.CONNECT, BrokerCapabilityId.IS_CONNECTED}
     unproven = [
         (broker.value, entry.capability.value)
@@ -222,7 +263,7 @@ def test_yahoo_historical_bars_are_released_with_provider_evidence() -> None:
     """Yahoo's tested historical-bar read is available through the registry."""
     entry = next(
         item
-        for item in get_broker_capability_catalogue()[BrokerId.YAHOO]
+        for item in _catalogue()[BrokerId.YAHOO]
         if item.capability == BrokerCapabilityId.GET_HISTORICAL_BARS
     )
     assert entry.availability == "AVAILABLE"
@@ -236,10 +277,7 @@ def test_yahoo_historical_bars_are_released_with_provider_evidence() -> None:
 
 def test_binance_data_reads_are_released_with_provider_evidence() -> None:
     """Only Data's three tested Binance Spot reads are released."""
-    entries = {
-        item.capability: item
-        for item in get_broker_capability_catalogue()[BrokerId.BINANCE_SPOT]
-    }
+    entries = {item.capability: item for item in _catalogue()[BrokerId.BINANCE_SPOT]}
     released = {
         BrokerCapabilityId.GET_SYMBOLS,
         BrokerCapabilityId.GET_SYMBOL_INFO,
@@ -258,10 +296,7 @@ def test_binance_data_reads_are_released_with_provider_evidence() -> None:
 
 def test_ctrader_sessions_are_released_with_demo_evidence() -> None:
     """Release only the provider-validated cTrader session operation."""
-    entries = {
-        item.capability: item
-        for item in get_broker_capability_catalogue()[BrokerId.CTRADER]
-    }
+    entries = {item.capability: item for item in _catalogue()[BrokerId.CTRADER]}
     session_entry = entries[BrokerCapabilityId.GET_TRADING_SESSIONS]
     assert session_entry.availability == "AVAILABLE"
     assert session_entry.verification_status == "TESTED_SANDBOX"
@@ -276,7 +311,7 @@ def test_ctrader_sessions_are_released_with_demo_evidence() -> None:
 
 def test_session_mutating_operations_are_not_declared_pure_reads() -> None:
     """Watch-list and subscription mutations are declared `READ_WRITE`."""
-    catalogue = get_broker_capability_catalogue()
+    catalogue = _catalogue()
     session_mutating = {
         BrokerCapabilityId.SELECT_SYMBOL,
         BrokerCapabilityId.SELECT_ACCOUNT,
@@ -306,7 +341,7 @@ def test_every_order_mutation_is_declared_write_everywhere(
     operation: BrokerCapabilityId,
 ) -> None:
     """The write gate permits only evidence-backed MT5 sandbox operations."""
-    catalogue = get_broker_capability_catalogue()
+    catalogue = _catalogue()
     released = {
         BrokerCapabilityId.CHECK_ORDER,
         BrokerCapabilityId.PLACE_ORDER,

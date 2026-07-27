@@ -13,11 +13,11 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerPage,
     BrokerPlatformInfo,
-    BrokerResult,
 )
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.yahoo_history.mapping import _map_history, _provider_interval
 from app.services.brokers.yahoo_history.transport import _YahooTransport
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class YahooBrokerAdapter(_UnsupportedAdapterBase):
@@ -48,7 +48,7 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         )
 
     @override
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         """Verify the provider using the caller's configured probe symbol.
 
         No probe symbol is ever assumed: a hidden default provider symbol is
@@ -81,7 +81,7 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         return self._result(BrokerCapabilityId.CONNECT)
 
     @override
-    async def is_connected(self) -> BrokerResult[bool]:
+    async def is_connected(self) -> StandardResponse[bool]:
         """Re-run the explicit provider probe for current connectivity evidence.
 
         Returns:
@@ -92,7 +92,7 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         await self._probe()
         return self._result(BrokerCapabilityId.IS_CONNECTED, data=True)
 
-    async def ping(self) -> BrokerResult[None]:
+    async def ping(self) -> StandardResponse[None]:
         """Run the configured explicit provider probe.
 
         Returns:
@@ -114,7 +114,7 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerBar]]:
+    ) -> StandardResponse[BrokerPage[BrokerBar]]:
         """Return one genuine bounded Yahoo history response.
 
         Raises:
@@ -139,7 +139,7 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
         )
         return self._result(BrokerCapabilityId.GET_HISTORICAL_BARS, data=page)
 
-    async def get_platform_info(self) -> BrokerResult[BrokerPlatformInfo]:
+    async def get_platform_info(self) -> StandardResponse[BrokerPlatformInfo]:
         """Return redacted research-only provider metadata."""
         return self._result(
             BrokerCapabilityId.GET_PLATFORM_INFO,
@@ -173,7 +173,7 @@ class YahooBrokerAdapter(_UnsupportedAdapterBase):
 
     def _error[T](
         self, operation: BrokerCapabilityId, code: BrokerErrorCode
-    ) -> BrokerResult[T]:
+    ) -> StandardResponse[T]:
         """Build one canonical Yahoo failure result.
 
         Returns:

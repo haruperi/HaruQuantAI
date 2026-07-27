@@ -40,20 +40,20 @@ def _config() -> BrokerConnectionConfig:
 def test_account_and_execution_state_boundary_from_root() -> None:
     """Root-created adapter handles session gating and account reads safely."""
     created = create_broker_adapter(BrokerId.MT5, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         # Disconnected operations return BROKER_NOT_CONNECTED
         res_acc = await adapter.get_account_info()
-        assert not res_acc.is_success
+        assert res_acc.status != "success"
         assert res_acc.error is not None
-        assert res_acc.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED
+        assert res_acc.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED.value
 
         res_pos = await adapter.get_positions(BrokerPositionFilter(), limit=10)
-        assert not res_pos.is_success
+        assert res_pos.status != "success"
         assert res_pos.error is not None
-        assert res_pos.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED
+        assert res_pos.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED.value
 
     asyncio.run(exercise())

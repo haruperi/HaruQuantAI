@@ -251,7 +251,7 @@ def test_adapter_connect_verifies_account_and_server() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert result.is_success
+        assert result.status == "success"
         status = await adapter.is_connected()
         assert status.data is True
 
@@ -274,9 +274,9 @@ def test_adapter_connect_fails_closed_on_account_mismatch() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CONNECTION_FAILED
+        assert result.error.code == BrokerErrorCode.BROKER_CONNECTION_FAILED.value
 
     asyncio.run(exercise())
 
@@ -296,7 +296,7 @@ def test_adapter_get_symbol_info_not_found_is_structured() -> None:
         await adapter.connect()
         result = await adapter.get_symbol_info("UNKNOWN")
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND
+        assert result.error.code == BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND.value
 
     asyncio.run(exercise())
 
@@ -324,7 +324,7 @@ def test_adapter_get_symbols_and_ping() -> None:
         assert symbols.data is not None
         assert symbols.data.items[0].provider_symbol == "EURUSD"
         ping = await adapter.ping()
-        assert ping.is_success
+        assert ping.status == "success"
 
     asyncio.run(exercise())
 
@@ -343,9 +343,9 @@ def test_adapter_select_symbol_reports_not_found() -> None:
     async def exercise() -> None:
         await adapter.connect()
         result = await adapter.select_symbol("UNKNOWN")
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND
+        assert result.error.code == BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND.value
 
     asyncio.run(exercise())
 
@@ -500,20 +500,24 @@ def test_adapter_account_history_mutation_and_calculation_operations() -> None:
             quantity_unit="lots",
             environment=BrokerEnvironment.DEMO,
         )
-        assert (await adapter.check_order(order)).is_success
-        assert (await adapter.place_order(order)).is_success
+        assert (await adapter.check_order(order)).status == "success"
+        assert (await adapter.place_order(order)).status == "success"
         modify_order = await adapter.modify_order(
             BrokerOrderModificationRequest(order_id="11", limit_price=Decimal("1.2"))
         )
         assert modify_order.error is not None
-        assert modify_order.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        assert (await adapter.cancel_order("11")).is_success
+        assert (
+            modify_order.error.code
+            == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
+        )
+        assert (await adapter.cancel_order("11")).status == "success"
         modify_position = await adapter.modify_position(
             BrokerPositionModificationRequest(position_id="1", stop_loss=Decimal("1.0"))
         )
         assert modify_position.error is not None
         assert (
-            modify_position.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+            modify_position.error.code
+            == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
         )
         assert (
             await adapter.close_position(
@@ -523,7 +527,7 @@ def test_adapter_account_history_mutation_and_calculation_operations() -> None:
                     quantity_unit="lots",
                 )
             )
-        ).is_success
+        ).status == "success"
         margin = await adapter.calculate_margin(
             BrokerMarginRequest(
                 symbol="EURUSD",
@@ -631,9 +635,9 @@ def test_adapter_connect_handles_transport_exception() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CONNECTION_FAILED
+        assert result.error.code == BrokerErrorCode.BROKER_CONNECTION_FAILED.value
 
     asyncio.run(exercise())
 
@@ -644,7 +648,7 @@ def test_adapter_connect_fails_if_initialized_is_false() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
 
     asyncio.run(exercise())
 
@@ -666,9 +670,9 @@ def test_adapter_ping_unsupported_if_terminal_none() -> None:
         await adapter.connect()
         adapter._state = BrokerConnectionState.READY
         result = await adapter.ping()
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
 
     asyncio.run(exercise())
 
@@ -681,7 +685,7 @@ def test_adapter_get_symbols_invalid_limit() -> None:
         await adapter.connect()
         result = await adapter.get_symbols(limit=0)
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
 
     asyncio.run(exercise())
 
@@ -694,7 +698,7 @@ def test_adapter_get_ticks_invalid_parameters() -> None:
         await adapter.connect()
         result = await adapter.get_ticks("EURUSD", start=None, end=None, limit=0)
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
 
     asyncio.run(exercise())
 
@@ -719,9 +723,9 @@ def test_adapter_get_account_info_not_found() -> None:
         await adapter.connect()
         transport.allow_account = False
         result = await adapter.get_account_info()
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_ACCOUNT_NOT_FOUND
+        assert result.error.code == BrokerErrorCode.BROKER_ACCOUNT_NOT_FOUND.value
 
     asyncio.run(exercise())
 
@@ -734,7 +738,7 @@ def test_adapter_get_positions_invalid_limit() -> None:
         await adapter.connect()
         result = await adapter.get_positions(limit=0)
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
 
     asyncio.run(exercise())
 
@@ -759,7 +763,7 @@ def test_adapter_get_symbol_info_success() -> None:
     async def exercise() -> None:
         await adapter.connect()
         result = await adapter.get_symbol_info("EURUSD")
-        assert result.is_success
+        assert result.status == "success"
         assert result.data is not None
         assert result.data.provider_symbol == "EURUSD"
 
@@ -781,8 +785,8 @@ def test_adapter_get_quote_not_found() -> None:
     async def exercise() -> None:
         await adapter.connect()
         result = await adapter.get_quote("EURUSD")
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND
+        assert result.error.code == BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND.value
 
     asyncio.run(exercise())

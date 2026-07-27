@@ -8,12 +8,12 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerMarginRequest,
     BrokerProfitRequest,
-    BrokerResult,
 )
 from app.services.brokers.ctrader_session.mapping import (
     _field,
     _optional,
 )
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class _CTraderCalculationsMixin:
@@ -21,7 +21,7 @@ class _CTraderCalculationsMixin:
 
     async def calculate_margin(
         self, request: BrokerMarginRequest
-    ) -> BrokerResult[Decimal]:
+    ) -> StandardResponse[Decimal]:
         """Return cTrader's expected margin for one candidate volume.
 
         Returns:
@@ -51,7 +51,7 @@ class _CTraderCalculationsMixin:
 
     async def calculate_profit(
         self, request: BrokerProfitRequest
-    ) -> BrokerResult[Decimal]:
+    ) -> StandardResponse[Decimal]:
         """Calculate profit from provider lot-size and exact request prices.
 
         Returns:

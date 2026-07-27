@@ -5,7 +5,7 @@ from collections.abc import Awaitable, Callable, Mapping
 from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.brokers import (
     BrokerAdapter,
@@ -17,11 +17,10 @@ from app.services.brokers import (
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-    BrokerResult,
 )
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
 from app.services.trading.routing.responses import classify_authority_response
-from app.utils import canonical_json, logger
+from app.utils import StandardResponse, canonical_json, logger, parse_utc_timestamp
 
 if TYPE_CHECKING:
     from app.services.trading.contracts.models import JsonValue
@@ -45,6 +44,46 @@ _EXPLICIT_REJECTIONS = frozenset(
         BrokerErrorCode.BROKER_INSUFFICIENT_FUNDS,
     }
 )
+_EXPLICIT_REJECTION_CODES = frozenset(code.value for code in _EXPLICIT_REJECTIONS)
+
+
+def _broker_evidence(
+    result: StandardResponse[Any],
+) -> tuple[str, str, str, datetime]:
+    """Return required Broker scope and completion evidence.
+
+    Args:
+        result: Standard response returned by a Broker mutation.
+
+    Returns:
+        Broker identifier, operation, environment, and completion timestamp.
+
+    Raises:
+        TradingError: If required Broker evidence is absent or malformed.
+    """
+    extensions = result.metadata.extensions
+    broker = extensions.get("broker")
+    operation = extensions.get("operation")
+    environment = extensions.get("environment")
+    timestamp = extensions.get("timestamp")
+    if (
+        not isinstance(broker, str)
+        or not isinstance(operation, str)
+        or not isinstance(environment, str)
+        or not isinstance(timestamp, str)
+    ):
+        raise TradingError(
+            "MALFORMED_RECEIPT",
+            "Broker result metadata is incomplete",
+        )
+    try:
+        parsed_timestamp = parse_utc_timestamp(timestamp)
+    except ValueError as error:
+        raise TradingError(
+            "MALFORMED_RECEIPT",
+            "Broker result timestamp is malformed",
+        ) from error
+    return broker, operation, environment, parsed_timestamp
 
 
 def _receipt_identity(intent: OrderIntent, authority_id: str, evidence_id: str) -> str:
@@ -145,7 +184,7 @@ def _order_result_fields(
 
 def _broker_raw_response(
     intent: OrderIntent,
-    result: BrokerResult[BrokerOrderResult] | BrokerResult[BrokerPosition],
+    result: StandardResponse[BrokerOrderResult] | StandardResponse[BrokerPosition],
     received_at: datetime,
 ) -> dict[str, JsonValue]:
     """Normalize one canonical Broker result for receipt classification.
@@ -158,24 +197,27 @@ def _broker_raw_response(
     Returns:
         JSON-safe response material.
     """
-    logger.debug("Normalizing Broker result for operation %s", result.operation)
+    broker, operation, _, timestamp = _broker_evidence(result)
+    logger.debug("Normalizing Broker result for operation %s", operation)
     raw = _base_raw_response(
         intent,
-        result.broker.value,
-        result.request_id,
-        result.timestamp,
+        broker,
+        result.metadata.request_id,
+        timestamp,
         received_at,
     )
     if result.status == "error":
         error = result.error
-        explicit_rejection = error is not None and error.code in _EXPLICIT_REJECTIONS
+        explicit_rejection = (
+            error is not None and error.code in _EXPLICIT_REJECTION_CODES
+        )
         raw.update(
             {
                 "status": "rejected" if explicit_rejection else "unknown_outcome",
                 "filled_quantity": "0",
                 "rate_limited": (
                     error is not None
-                    and error.code == BrokerErrorCode.BROKER_RATE_LIMITED
+                    and error.code == BrokerErrorCode.BROKER_RATE_LIMITED.value
                 ),
             }
         )
@@ -240,7 +282,7 @@ async def _invoke_broker(
     intent: OrderIntent,
     connection: BrokerConnectionConfig,
     broker_adapter: BrokerAdapter,
-) -> BrokerResult[BrokerOrderResult] | BrokerResult[BrokerPosition]:
+) -> StandardResponse[BrokerOrderResult] | StandardResponse[BrokerPosition]:
     """Adapt and invoke exactly one receiver-owned Broker mutation.
 
     Args:
@@ -461,9 +503,10 @@ async def dispatch_order_intent(  # noqa: C901, PLR0912
         ) from error
     except Exception:  # noqa: BLE001 - normalize authority-boundary failures.
         return _uncertain_failure_receipt(intent, clock())
+    broker, _, environment, _ = _broker_evidence(result)
     if (
-        result.broker != selected_connection.broker_id
-        or result.environment != selected_connection.environment
+        broker != selected_connection.broker_id.value
+        or environment != selected_connection.environment.value
     ):
         raise TradingError("MALFORMED_RECEIPT", "Broker result scope mismatches")
     return classify_authority_response(

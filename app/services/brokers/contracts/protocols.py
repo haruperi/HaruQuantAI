@@ -57,13 +57,13 @@ from app.services.brokers.contracts.models import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
     BrokerQuote,
-    BrokerResult,
     BrokerServerTime,
     BrokerSubscriptionInfo,
     BrokerSymbolInfo,
     BrokerTick,
     BrokerTradingSession,
 )
+from app.utils import StandardResponse
 
 
 @runtime_checkable
@@ -87,7 +87,7 @@ class BrokerSubscription[TEvent](Protocol):
         """
         ...
 
-    async def unsubscribe(self) -> BrokerResult[None]:
+    async def unsubscribe(self) -> StandardResponse[None]:
         """Handle unsubscribe.
 
         Returns:
@@ -105,7 +105,7 @@ class MarketDataProvider(Protocol):
         query: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]:
+    ) -> StandardResponse[BrokerPage[BrokerSymbolInfo]]:
         """Return get symbols.
 
         Args:
@@ -118,7 +118,7 @@ class MarketDataProvider(Protocol):
         """
         ...
 
-    async def get_symbol_info(self, symbol: str) -> BrokerResult[BrokerSymbolInfo]:
+    async def get_symbol_info(self, symbol: str) -> StandardResponse[BrokerSymbolInfo]:
         """Return get symbol info.
 
         Args:
@@ -131,7 +131,7 @@ class MarketDataProvider(Protocol):
 
     async def select_symbol(
         self, symbol: str, enabled: bool = True
-    ) -> BrokerResult[None]:
+    ) -> StandardResponse[None]:
         """Handle select symbol.
 
         Args:
@@ -143,7 +143,9 @@ class MarketDataProvider(Protocol):
         """
         ...
 
-    async def get_market_status(self, symbol: str) -> BrokerResult[BrokerMarketStatus]:
+    async def get_market_status(
+        self, symbol: str
+    ) -> StandardResponse[BrokerMarketStatus]:
         """Return get market status.
 
         Args:
@@ -159,7 +161,7 @@ class MarketDataProvider(Protocol):
         symbol: str,
         start: datetime | None = None,
         end: datetime | None = None,
-    ) -> BrokerResult[tuple[BrokerTradingSession, ...]]:
+    ) -> StandardResponse[tuple[BrokerTradingSession, ...]]:
         """Return get trading sessions.
 
         Args:
@@ -172,7 +174,7 @@ class MarketDataProvider(Protocol):
         """
         ...
 
-    async def get_quote(self, symbol: str) -> BrokerResult[BrokerQuote]:
+    async def get_quote(self, symbol: str) -> StandardResponse[BrokerQuote]:
         """Return get quote.
 
         Args:
@@ -190,7 +192,7 @@ class MarketDataProvider(Protocol):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerTick]]:
+    ) -> StandardResponse[BrokerPage[BrokerTick]]:
         """Return get ticks.
 
         Args:
@@ -213,7 +215,7 @@ class MarketDataProvider(Protocol):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerBar]]:
+    ) -> StandardResponse[BrokerPage[BrokerBar]]:
         """Return get historical bars.
 
         Args:
@@ -231,7 +233,7 @@ class MarketDataProvider(Protocol):
 
     async def get_order_book(
         self, symbol: str, depth: int | None = None
-    ) -> BrokerResult[BrokerOrderBook]:
+    ) -> StandardResponse[BrokerOrderBook]:
         """Return get order book.
 
         Args:
@@ -243,7 +245,7 @@ class MarketDataProvider(Protocol):
         """
         ...
 
-    async def get_spread(self, symbol: str) -> BrokerResult[Decimal]:
+    async def get_spread(self, symbol: str) -> StandardResponse[Decimal]:
         """Return get spread.
 
         Args:
@@ -256,7 +258,7 @@ class MarketDataProvider(Protocol):
 
     async def subscribe_quotes(
         self, symbols: tuple[str, ...]
-    ) -> BrokerResult[BrokerSubscription[BrokerQuote]]:
+    ) -> StandardResponse[BrokerSubscription[BrokerQuote]]:
         """Handle subscribe quotes.
 
         Args:
@@ -269,7 +271,7 @@ class MarketDataProvider(Protocol):
 
     async def subscribe_bars(
         self, symbols: tuple[str, ...], timeframe: str
-    ) -> BrokerResult[BrokerSubscription[BrokerBar]]:
+    ) -> StandardResponse[BrokerSubscription[BrokerBar]]:
         """Handle subscribe bars.
 
         Args:
@@ -283,7 +285,7 @@ class MarketDataProvider(Protocol):
 
     async def subscribe_order_book(
         self, symbols: tuple[str, ...], depth: int | None = None
-    ) -> BrokerResult[BrokerSubscription[BrokerOrderBook]]:
+    ) -> StandardResponse[BrokerSubscription[BrokerOrderBook]]:
         """Handle subscribe order book.
 
         Args:
@@ -295,7 +297,7 @@ class MarketDataProvider(Protocol):
         """
         ...
 
-    async def unsubscribe(self, subscription_id: str) -> BrokerResult[None]:
+    async def unsubscribe(self, subscription_id: str) -> StandardResponse[None]:
         """Handle unsubscribe.
 
         Args:
@@ -308,7 +310,7 @@ class MarketDataProvider(Protocol):
 
     async def list_subscriptions(
         self,
-    ) -> BrokerResult[tuple[BrokerSubscriptionInfo, ...]]:
+    ) -> StandardResponse[tuple[BrokerSubscriptionInfo, ...]]:
         """Return list subscriptions.
 
         Returns:
@@ -321,7 +323,7 @@ class MarketDataProvider(Protocol):
 class AccountProvider(Protocol):
     """Provider-native platform, account, and execution-state reads."""
 
-    async def get_feature_flags(self) -> BrokerResult[BrokerFeatureFlags]:
+    async def get_feature_flags(self) -> StandardResponse[BrokerFeatureFlags]:
         """Return get feature flags.
 
         Returns:
@@ -329,7 +331,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def supports(self, capability: BrokerCapabilityId) -> BrokerResult[bool]:
+    async def supports(self, capability: BrokerCapabilityId) -> StandardResponse[bool]:
         """Return supports.
 
         Args:
@@ -340,7 +342,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def get_platform_info(self) -> BrokerResult[BrokerPlatformInfo]:
+    async def get_platform_info(self) -> StandardResponse[BrokerPlatformInfo]:
         """Return get platform info.
 
         Returns:
@@ -348,7 +350,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def get_permissions(self) -> BrokerResult[BrokerPermissions]:
+    async def get_permissions(self) -> StandardResponse[BrokerPermissions]:
         """Return get permissions.
 
         Returns:
@@ -358,7 +360,7 @@ class AccountProvider(Protocol):
 
     async def list_accounts(
         self, cursor: str | None = None, limit: int | None = None
-    ) -> BrokerResult[BrokerPage[BrokerAccountInfo]]:
+    ) -> StandardResponse[BrokerPage[BrokerAccountInfo]]:
         """Return list accounts.
 
         Args:
@@ -370,7 +372,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def select_account(self, account_id: str) -> BrokerResult[None]:
+    async def select_account(self, account_id: str) -> StandardResponse[None]:
         """Handle select account.
 
         Args:
@@ -381,7 +383,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def get_account_info(self) -> BrokerResult[BrokerAccountInfo]:
+    async def get_account_info(self) -> StandardResponse[BrokerAccountInfo]:
         """Return get account info.
 
         Returns:
@@ -389,7 +391,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def get_balances(self) -> BrokerResult[tuple[BrokerBalance, ...]]:
+    async def get_balances(self) -> StandardResponse[tuple[BrokerBalance, ...]]:
         """Return get balances.
 
         Returns:
@@ -399,7 +401,7 @@ class AccountProvider(Protocol):
 
     async def list_assets(
         self, cursor: str | None = None, limit: int | None = None
-    ) -> BrokerResult[BrokerPage[BrokerAssetInfo]]:
+    ) -> StandardResponse[BrokerPage[BrokerAssetInfo]]:
         """Return list assets.
 
         Args:
@@ -411,7 +413,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def get_asset_info(self, asset: str) -> BrokerResult[BrokerAssetInfo]:
+    async def get_asset_info(self, asset: str) -> StandardResponse[BrokerAssetInfo]:
         """Return get asset info.
 
         Args:
@@ -427,7 +429,7 @@ class AccountProvider(Protocol):
         filter: BrokerPositionFilter | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerPosition]]:
+    ) -> StandardResponse[BrokerPage[BrokerPosition]]:
         """Return get positions.
 
         Args:
@@ -440,7 +442,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def get_position(self, position_id: str) -> BrokerResult[BrokerPosition]:
+    async def get_position(self, position_id: str) -> StandardResponse[BrokerPosition]:
         """Return get position.
 
         Args:
@@ -456,7 +458,7 @@ class AccountProvider(Protocol):
         filter: BrokerOrderFilter | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerOrder]]:
+    ) -> StandardResponse[BrokerPage[BrokerOrder]]:
         """Return get orders.
 
         Args:
@@ -469,7 +471,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def get_order(self, order_id: str) -> BrokerResult[BrokerOrder]:
+    async def get_order(self, order_id: str) -> StandardResponse[BrokerOrder]:
         """Return get order.
 
         Args:
@@ -487,7 +489,7 @@ class AccountProvider(Protocol):
         symbol: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerOrder]]:
+    ) -> StandardResponse[BrokerPage[BrokerOrder]]:
         """Return list order history.
 
         Args:
@@ -509,7 +511,7 @@ class AccountProvider(Protocol):
         symbol: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerDeal]]:
+    ) -> StandardResponse[BrokerPage[BrokerDeal]]:
         """Return list deal history.
 
         Args:
@@ -524,7 +526,7 @@ class AccountProvider(Protocol):
         """
         ...
 
-    async def get_deal(self, deal_id: str) -> BrokerResult[BrokerDeal]:
+    async def get_deal(self, deal_id: str) -> StandardResponse[BrokerDeal]:
         """Return get deal.
 
         Args:
@@ -541,7 +543,7 @@ class AccountProvider(Protocol):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerAccountTransaction]]:
+    ) -> StandardResponse[BrokerPage[BrokerAccountTransaction]]:
         """Return list account transactions.
 
         Args:
@@ -562,7 +564,7 @@ class TradeExecutionProvider(Protocol):
 
     async def check_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderCheck]:
+    ) -> StandardResponse[BrokerOrderCheck]:
         """Handle check order.
 
         Args:
@@ -575,7 +577,7 @@ class TradeExecutionProvider(Protocol):
 
     async def place_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Handle place order.
 
         Args:
@@ -588,7 +590,7 @@ class TradeExecutionProvider(Protocol):
 
     async def modify_order(
         self, request: BrokerOrderModificationRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Handle modify order.
 
         Args:
@@ -601,7 +603,7 @@ class TradeExecutionProvider(Protocol):
 
     async def cancel_order(
         self, order_id: str, client_request_id: str | None = None
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Handle cancel order.
 
         Args:
@@ -615,7 +617,7 @@ class TradeExecutionProvider(Protocol):
 
     async def modify_position(
         self, request: BrokerPositionModificationRequest
-    ) -> BrokerResult[BrokerPosition]:
+    ) -> StandardResponse[BrokerPosition]:
         """Handle modify position.
 
         Args:
@@ -628,7 +630,7 @@ class TradeExecutionProvider(Protocol):
 
     async def close_position(
         self, request: BrokerPositionCloseRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Handle close position.
 
         Args:
@@ -641,7 +643,7 @@ class TradeExecutionProvider(Protocol):
 
     async def replace_order(
         self, request: BrokerOrderModificationRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Handle replace order.
 
         Args:
@@ -659,7 +661,7 @@ class CalculationProvider(Protocol):
 
     async def calculate_margin(
         self, request: BrokerMarginRequest
-    ) -> BrokerResult[Decimal]:
+    ) -> StandardResponse[Decimal]:
         """Return calculate margin.
 
         Args:
@@ -672,7 +674,7 @@ class CalculationProvider(Protocol):
 
     async def calculate_profit(
         self, request: BrokerProfitRequest
-    ) -> BrokerResult[Decimal]:
+    ) -> StandardResponse[Decimal]:
         """Return calculate profit.
 
         Args:
@@ -685,7 +687,7 @@ class CalculationProvider(Protocol):
 
     async def get_commission_estimate(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerFeeEstimate]:
+    ) -> StandardResponse[BrokerFeeEstimate]:
         """Return get commission estimate.
 
         Args:
@@ -725,7 +727,7 @@ class BrokerAdapter(
         """
         ...
 
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         """Handle connect.
 
         Returns:
@@ -733,7 +735,7 @@ class BrokerAdapter(
         """
         ...
 
-    async def disconnect(self) -> BrokerResult[None]:
+    async def disconnect(self) -> StandardResponse[None]:
         """Handle disconnect.
 
         Returns:
@@ -741,7 +743,7 @@ class BrokerAdapter(
         """
         ...
 
-    async def reconnect(self) -> BrokerResult[None]:
+    async def reconnect(self) -> StandardResponse[None]:
         """Handle reconnect.
 
         Returns:
@@ -749,7 +751,7 @@ class BrokerAdapter(
         """
         ...
 
-    async def is_connected(self) -> BrokerResult[bool]:
+    async def is_connected(self) -> StandardResponse[bool]:
         """Return is connected.
 
         Returns:
@@ -759,7 +761,7 @@ class BrokerAdapter(
 
     async def get_connection_status(
         self,
-    ) -> BrokerResult[BrokerConnectionStatus]:
+    ) -> StandardResponse[BrokerConnectionStatus]:
         """Return get connection status.
 
         Returns:
@@ -767,7 +769,7 @@ class BrokerAdapter(
         """
         ...
 
-    async def ping(self) -> BrokerResult[None]:
+    async def ping(self) -> StandardResponse[None]:
         """Handle ping.
 
         Returns:
@@ -775,7 +777,7 @@ class BrokerAdapter(
         """
         ...
 
-    async def refresh_session(self) -> BrokerResult[None]:
+    async def refresh_session(self) -> StandardResponse[None]:
         """Handle refresh session.
 
         Returns:
@@ -783,7 +785,7 @@ class BrokerAdapter(
         """
         ...
 
-    async def get_server_time(self) -> BrokerResult[BrokerServerTime]:
+    async def get_server_time(self) -> StandardResponse[BrokerServerTime]:
         """Return get server time.
 
         Returns:
@@ -791,7 +793,7 @@ class BrokerAdapter(
         """
         ...
 
-    async def get_last_error(self) -> BrokerResult[BrokerError | None]:
+    async def get_last_error(self) -> StandardResponse[BrokerError | None]:
         """Return get last error.
 
         Returns:
@@ -822,7 +824,7 @@ def _make_unsupported_method(operation: BrokerCapabilityId) -> Any:
         self: _UnsupportedAdapterBase,
         *args: object,
         **kwargs: object,
-    ) -> BrokerResult[Any]:
+    ) -> StandardResponse[Any]:
         """Return the generated unsupported operation result.
 
         Returns:

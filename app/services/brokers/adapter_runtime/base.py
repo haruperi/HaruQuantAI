@@ -6,7 +6,6 @@ from __future__ import annotations
 import asyncio
 import contextvars
 import functools
-import time
 from collections.abc import AsyncIterator, Mapping
 from dataclasses import replace
 from typing import Any, Literal, cast, override
@@ -29,10 +28,13 @@ from app.services.brokers.contracts.models import (
     BrokerConnectionStatus,
     BrokerError,
     BrokerFeatureFlags,
-    BrokerResult,
 )
-from app.services.brokers.contracts.unsupported import _unsupported_result, _utc_now
-from app.utils import generate_id, logger
+from app.services.brokers.contracts.responses import (
+    broker_start_time,
+    build_broker_response,
+)
+from app.services.brokers.contracts.unsupported import _utc_now
+from app.utils import StandardResponse, generate_id, get_execution_ms, logger
 
 
 class _UnsupportedAdapterBase:
@@ -86,13 +88,20 @@ class _UnsupportedAdapterBase:
 
         Args:
             config: Immutable provider connection configuration.
+
+        Raises:
+            ValueError: If the internal capability catalogue response is
+                unavailable.
         """
         from app.services.brokers.registry.catalogue import (
             get_broker_capability_catalogue,
         )
 
         self._config = config
-        catalogue = get_broker_capability_catalogue()[config.broker_id]
+        catalogue_response = get_broker_capability_catalogue()
+        if catalogue_response.status != "success" or catalogue_response.data is None:
+            raise ValueError("broker capability catalogue is unavailable")
+        catalogue = catalogue_response.data[config.broker_id]
         self._capabilities = {
             item.capability: (
                 replace(
@@ -118,7 +127,7 @@ class _UnsupportedAdapterBase:
         # boundary, measured by `__getattribute__` and consumed once by
         # `_result`. Provider-network time is reported separately by the
         # transports through `_record_provider_latency`.
-        self._call_timing: contextvars.ContextVar[tuple[float, float | None] | None] = (
+        self._call_timing: contextvars.ContextVar[tuple[int, float | None] | None] = (
             contextvars.ContextVar(
                 f"broker_call_timing_{id(self)}",
                 default=None,
@@ -166,7 +175,7 @@ class _UnsupportedAdapterBase:
 
                     async def _blocked(
                         *args: object, **kwargs: object
-                    ) -> BrokerResult[Any]:
+                    ) -> StandardResponse[Any]:
                         """Return the declared unavailable capability result."""
                         del args, kwargs
                         return self._unsupported(operation)
@@ -179,7 +188,7 @@ class _UnsupportedAdapterBase:
 
                     async def _not_ready(
                         *args: object, **kwargs: object
-                    ) -> BrokerResult[Any]:
+                    ) -> StandardResponse[Any]:
                         """Return the disconnected session result."""
                         del args, kwargs
                         return self._not_connected(operation)
@@ -193,7 +202,7 @@ class _UnsupportedAdapterBase:
             return attribute
 
         @functools.wraps(attribute)
-        async def _guarded(*args: object, **kwargs: object) -> BrokerResult[Any]:
+        async def _guarded(*args: object, **kwargs: object) -> StandardResponse[Any]:
             """Normalize an adapter call into a canonical result.
 
             Returns:
@@ -203,10 +212,10 @@ class _UnsupportedAdapterBase:
                 asyncio.CancelledError: If caller cancels the operation.
             """
             timing = object.__getattribute__(self, "_call_timing")
-            token = timing.set((time.perf_counter(), None))
+            token = timing.set((broker_start_time(), None))
             try:
                 result = await attribute(*args, **kwargs)
-                return cast("BrokerResult[Any]", result)
+                return cast("StandardResponse[Any]", result)
             except asyncio.CancelledError:
                 raise
             except Exception as error:
@@ -226,7 +235,7 @@ class _UnsupportedAdapterBase:
         if context is None:
             return 0.0
         started, _ = context
-        return float(round((time.perf_counter() - started) * 1000.0, 3))
+        return get_execution_ms(started)
 
     def _result[T](
         self,
@@ -236,7 +245,7 @@ class _UnsupportedAdapterBase:
         error: BrokerError | None = None,
         request_id: str | None = None,
         provider_metadata: Mapping[str, object] | None = None,
-    ) -> BrokerResult[T]:
+    ) -> StandardResponse[T]:
         """Build and log one canonical adapter result.
 
         Total latency is the measured wall time of the public call. Provider
@@ -246,37 +255,30 @@ class _UnsupportedAdapterBase:
         Returns:
             The canonical result envelope.
         """
-        latency_ms = self._elapsed_ms()
         context = self._call_timing.get()
+        started = context[0] if context is not None else broker_start_time()
         provider_latency_ms = context[1] if context is not None else None
-        if provider_latency_ms is None:
-            adapter_overhead_ms = latency_ms
-        else:
-            provider_latency_ms = min(provider_latency_ms, latency_ms)
-            adapter_overhead_ms = max(latency_ms - provider_latency_ms, 0.0)
-        result: BrokerResult[T] = BrokerResult(
-            status="error" if error else "success",
+        result = build_broker_response(
             broker=self._config.broker_id,
             operation=operation,
             request_id=request_id or generate_id("req"),
             timestamp=_utc_now(),
             environment=self._config.environment,
             adapter_version=self.ADAPTER_VERSION,
+            start_time=started,
             data=data,
             error=error,
             provider_metadata=provider_metadata or {},
-            latency_ms=latency_ms,
             provider_latency_ms=provider_latency_ms,
-            adapter_overhead_ms=adapter_overhead_ms,
         )
         bound = logger.bind(
             broker=self._config.broker_id.value,
             environment=self._config.environment.value,
             operation=operation.value,
-            request_id=result.request_id,
+            request_id=result.metadata.request_id,
             result=result.status,
             provider_code=error.code.value if error is not None else None,
-            latency_ms=result.latency_ms,
+            latency_ms=result.metadata.execution_ms,
         )
         if error is not None:
             bound.warning("Broker operation returned canonical error")
@@ -295,6 +297,60 @@ class _UnsupportedAdapterBase:
             started, current = context
             accumulated = float(latency_ms) + (current or 0.0)
             self._call_timing.set((started, accumulated))
+
+    def _propagated_error[T](
+        self,
+        operation: BrokerCapabilityId,
+        response: StandardResponse[Any],
+    ) -> StandardResponse[T]:
+        """Re-scope one failed nested Broker response to the caller operation.
+
+        Args:
+            operation: Public Broker operation receiving the nested failure.
+            response: Failed response from a nested Broker operation.
+
+        Returns:
+            Failed response retaining all available canonical error evidence.
+
+        Raises:
+            ValueError: If the supplied response is not an error response.
+        """
+        standard_error = response.error
+        if standard_error is None:
+            raise ValueError("nested Broker response does not contain an error")
+        details = standard_error.details
+        raw_capability = details.get("capability")
+        capability = None
+        if isinstance(raw_capability, str):
+            try:
+                capability = BrokerCapabilityId(raw_capability)
+            except ValueError:
+                capability = None
+        raw_legacy_details = details.get("legacy_details")
+        legacy_details = (
+            raw_legacy_details if isinstance(raw_legacy_details, Mapping) else {}
+        )
+        try:
+            code = BrokerErrorCode(standard_error.code)
+        except ValueError:
+            code = BrokerErrorCode.BROKER_RESPONSE_INVALID
+        raw_provider_code = details.get("provider_code")
+        raw_provider_message = details.get("provider_message")
+        canonical = BrokerError(
+            code=code,
+            message=response.message,
+            retryable=details.get("retryable") is True,
+            provider_code=(
+                raw_provider_code if isinstance(raw_provider_code, str) else None
+            ),
+            provider_message=(
+                raw_provider_message if isinstance(raw_provider_message, str) else None
+            ),
+            capability=capability,
+            details=legacy_details,
+        )
+        self._last_error = canonical
+        return self._result(operation, error=canonical)
 
     async def _transition(
         self,
@@ -346,7 +402,7 @@ class _UnsupportedAdapterBase:
                 new_state=BrokerConnectionState.DEGRADED.value,
             ).warning("Connection event buffer overflow; adapter degraded")
 
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         """Fail closed unless a provider verifies a real session.
 
         Returns:
@@ -354,7 +410,7 @@ class _UnsupportedAdapterBase:
         """
         return self._unsupported(BrokerCapabilityId.CONNECT)
 
-    async def disconnect(self) -> BrokerResult[None]:
+    async def disconnect(self) -> StandardResponse[None]:
         """Idempotently close adapter-local state.
 
         Returns:
@@ -365,7 +421,7 @@ class _UnsupportedAdapterBase:
             await self._transition(BrokerConnectionState.DISCONNECTED)
         return self._result(BrokerCapabilityId.DISCONNECT)
 
-    async def reconnect(self) -> BrokerResult[None]:
+    async def reconnect(self) -> StandardResponse[None]:
         """Reconnect the same session without replaying an operation.
 
         Returns:
@@ -374,7 +430,7 @@ class _UnsupportedAdapterBase:
         await self.disconnect()
         return await self.connect()
 
-    async def is_connected(self) -> BrokerResult[bool]:
+    async def is_connected(self) -> StandardResponse[bool]:
         """Return conservative locally retained session evidence.
 
         Provider adapters override this method when current connectivity can be
@@ -388,7 +444,9 @@ class _UnsupportedAdapterBase:
             data=self._state == BrokerConnectionState.READY,
         )
 
-    async def get_connection_status(self) -> BrokerResult[BrokerConnectionStatus]:
+    async def get_connection_status(
+        self,
+    ) -> StandardResponse[BrokerConnectionStatus]:
         """Return detailed fail-closed session state."""
         return self._result(
             BrokerCapabilityId.GET_CONNECTION_STATUS,
@@ -405,7 +463,7 @@ class _UnsupportedAdapterBase:
             ),
         )
 
-    async def get_last_error(self) -> BrokerResult[BrokerError | None]:
+    async def get_last_error(self) -> StandardResponse[BrokerError | None]:
         """Return the latest redacted non-authoritative error."""
         return self._result(BrokerCapabilityId.GET_LAST_ERROR, data=self._last_error)
 
@@ -427,7 +485,7 @@ class _UnsupportedAdapterBase:
 
         return _events()
 
-    async def get_feature_flags(self) -> BrokerResult[BrokerFeatureFlags]:
+    async def get_feature_flags(self) -> StandardResponse[BrokerFeatureFlags]:
         """Return the complete catalogue supplied by the registry."""
         flags = BrokerFeatureFlags(
             broker_id=self._config.broker_id,
@@ -441,7 +499,7 @@ class _UnsupportedAdapterBase:
         )
         return self._result(BrokerCapabilityId.GET_FEATURE_FLAGS, data=flags)
 
-    async def supports(self, capability: BrokerCapabilityId) -> BrokerResult[bool]:
+    async def supports(self, capability: BrokerCapabilityId) -> StandardResponse[bool]:
         """Answer from the static declaration without probing a provider.
 
         Args:
@@ -456,7 +514,7 @@ class _UnsupportedAdapterBase:
             data=declared.availability in {"AVAILABLE", "DEGRADED"},
         )
 
-    def _not_connected[T](self, operation: BrokerCapabilityId) -> BrokerResult[T]:
+    def _not_connected[T](self, operation: BrokerCapabilityId) -> StandardResponse[T]:
         """Return and record a deterministic BROKER_NOT_CONNECTED result.
 
         Returns:
@@ -475,7 +533,7 @@ class _UnsupportedAdapterBase:
         self._last_error = error
         return self._result(operation, error=error)
 
-    def _unsupported[T](self, operation: BrokerCapabilityId) -> BrokerResult[T]:
+    def _unsupported[T](self, operation: BrokerCapabilityId) -> StandardResponse[T]:
         """Return and record a deterministic unsupported result.
 
         No provider call is made, so the gate consumes and discards any timing
@@ -486,32 +544,20 @@ class _UnsupportedAdapterBase:
             The canonical unsupported result.
         """
         self._elapsed_ms()
-        self._provider_latency_ms = None
-        result: BrokerResult[T] = _unsupported_result(
-            broker=self._config.broker_id,
-            environment=self._config.environment,
-            operation=operation,
-            request_id=generate_id("req"),
-            adapter_version=self.ADAPTER_VERSION,
+        error = BrokerError(
+            code=BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+            message=f"Broker operation {operation.value} is unavailable",
+            retryable=False,
+            capability=operation,
         )
-        self._last_error = result.error
-        logger.bind(
-            broker=self._config.broker_id.value,
-            environment=self._config.environment.value,
-            operation=operation.value,
-            request_id=result.request_id,
-            result="error",
-            provider_code=(
-                result.error.code.value if result.error is not None else None
-            ),
-        ).warning("Broker operation unavailable; failing closed without provider call")
-        return result
+        self._last_error = error
+        return self._result(operation, error=error)
 
     def _exception_result[T](
         self,
         operation: BrokerCapabilityId,
         error: BaseException,
-    ) -> BrokerResult[T]:
+    ) -> StandardResponse[T]:
         """Translate one public-boundary failure to a canonical result.
 
         Args:

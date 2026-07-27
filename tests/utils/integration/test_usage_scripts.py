@@ -14,6 +14,7 @@ _EXPECTED_OUTPUT = {
     "06_security.py": "Redaction policy: protected credential allowlist rejected",
     "07_settings.py": "Active settings:",
     "08_logging.py": "Logging verification:",
+    "09_standard_responses.py": "Raw standard response data:",
 }
 
 

@@ -151,6 +151,7 @@ ignore = [
 "app/utils/logging/__init__.py" = ["A005"]
 "app/utils/time/__init__.py" = ["A005"]
 "scripts/*.py" = ["INP001", "D100", "D103", "ANN", "S603", "S607", "T201"]
+"docs/**/*.py" = ["INP001", "D", "DOC", "E501", "EM101", "EM102", "TRY003", "UP042", "C901"]
 
 [tool.ruff.lint.mccabe]
 # Standard strict function complexity ceiling

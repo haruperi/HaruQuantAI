@@ -100,9 +100,9 @@ def test_adapter_connect_without_probe_symbol_never_calls_transport() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID
+        assert result.error.code == BrokerErrorCode.BROKER_CONFIGURATION_INVALID.value
 
     asyncio.run(exercise())
     assert transport.requested_symbols == []
@@ -115,7 +115,7 @@ def test_adapter_connect_with_probe_symbol_verifies_via_transport() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert result.is_success
+        assert result.status == "success"
 
     asyncio.run(exercise())
     assert transport.requested_symbols == ["AAPL"]
@@ -129,7 +129,7 @@ def test_adapter_connect_fails_closed_when_probe_fails() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
 
     asyncio.run(exercise())
 
@@ -142,7 +142,7 @@ def test_adapter_get_historical_bars_requires_positive_limit() -> None:
     async def exercise() -> None:
         result = await adapter.get_historical_bars("AAPL", "1d", limit=0)
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
 
     asyncio.run(exercise())
 

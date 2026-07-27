@@ -78,7 +78,10 @@ async def fr_brokers_102(adapter: BrokerAdapter) -> None:
     """FR-BRK-102: List registered brokers without importing all SDKs."""
     del adapter
     _header("FR-BRK-102: List registered brokers without importing all SDKs.")
-    brokers = get_registered_brokers()
+    response = get_registered_brokers()
+    assert response.status == "success"
+    assert response.data is not None
+    brokers = response.data
     print("Result", len(brokers))
     assert BrokerId.CTRADER in brokers
 
@@ -87,7 +90,10 @@ async def fr_brokers_103(adapter: BrokerAdapter) -> None:
     """FR-BRK-103: Expose the complete static capability catalogue."""
     del adapter
     _header("FR-BRK-103: Expose the complete static capability catalogue.")
-    catalogue = get_broker_capability_catalogue()
+    response = get_broker_capability_catalogue()
+    assert response.status == "success"
+    assert response.data is not None
+    catalogue = response.data
     print("Result", len(catalogue))
     assert BrokerId.CTRADER in catalogue
 

@@ -28,12 +28,12 @@ def _config() -> BrokerConnectionConfig:
 def test_stream_cancellation_integration_via_root() -> None:
     """Verify subscription stream cancellation boundary via domain root."""
     created = create_broker_adapter(BrokerId.YAHOO, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         status = await adapter.get_connection_status()
-        assert status.is_success
+        assert status.status == "success"
 
     asyncio.run(exercise())

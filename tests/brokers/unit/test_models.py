@@ -1,5 +1,6 @@
 """Canonical broker model tests."""
 
+from collections.abc import Mapping
 from dataclasses import FrozenInstanceError
 from datetime import UTC, datetime, timedelta, timezone
 from decimal import Decimal
@@ -42,14 +43,16 @@ from app.services.brokers import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
     BrokerQuote,
-    BrokerResult,
     BrokerServerTime,
     BrokerSubscriptionInfo,
     BrokerSymbolInfo,
     BrokerTick,
     BrokerTradingSession,
 )
+from app.utils import ValidationError
 from pydantic import SecretStr
+
+from tests.brokers.response_factory import broker_response
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 REQUEST_ID = "req-b4b8aa60-ba17-4561-884b-138c6074c5fb"
@@ -138,35 +141,39 @@ def test_error_is_redacted_and_structured() -> None:
 
 def test_result_supports_successful_none_and_exclusive_error() -> None:
     """FR-BRK-008: void success and structured error are exclusive."""
-    result = BrokerResult[None](
-        status="success",
+    result = broker_response(
+        BrokerCapabilityId.DISCONNECT,
         broker=BrokerId.YAHOO,
-        operation=BrokerCapabilityId.DISCONNECT,
         request_id=REQUEST_ID,
         timestamp=NOW,
         environment=BrokerEnvironment.SANDBOX,
         adapter_version="1",
         provider_metadata={"token": "secret"},  # pragma: allowlist secret
     )
-    assert result.is_success
+    assert result.status == "success"
     assert result.data is None
     assert result.error is None
-    assert result.provider_metadata["token"] != "secret"  # pragma: allowlist secret
-    with pytest.raises(ValueError, match="error status requires"):
-        BrokerResult[None](
-            status="error",
+    provider_metadata = result.metadata.extensions["provider_metadata"]
+    assert isinstance(provider_metadata, Mapping)
+    assert provider_metadata["token"] != "secret"  # pragma: allowlist secret
+    failed = broker_response(
+        BrokerCapabilityId.DISCONNECT,
+        broker=BrokerId.YAHOO,
+        request_id=REQUEST_ID,
+        timestamp=NOW,
+        environment=BrokerEnvironment.SANDBOX,
+        adapter_version="1",
+        error=BrokerError(
+            code=BrokerErrorCode.BROKER_CONNECTION_FAILED,
+            message="disconnection failed",
+        ),
+    )
+    assert failed.status == "error"
+    assert failed.data is None
+    with pytest.raises(ValidationError, match="TIMESTAMP_NOT_UTC"):
+        broker_response(
+            BrokerCapabilityId.DISCONNECT,
             broker=BrokerId.YAHOO,
-            operation=BrokerCapabilityId.DISCONNECT,
-            request_id=REQUEST_ID,
-            timestamp=NOW,
-            environment=BrokerEnvironment.SANDBOX,
-            adapter_version="1",
-        )
-    with pytest.raises(ValueError, match="UTC-aware"):
-        BrokerResult[None](
-            status="success",
-            broker=BrokerId.YAHOO,
-            operation=BrokerCapabilityId.DISCONNECT,
             request_id=REQUEST_ID,
             timestamp=NOW.replace(tzinfo=None),
             environment=BrokerEnvironment.SANDBOX,

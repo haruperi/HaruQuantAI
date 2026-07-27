@@ -2,6 +2,7 @@
 
 # ruff: noqa: ANN401 - generated fixed protocol methods preserve fixture types.
 import inspect
+import time
 import types
 from collections.abc import Mapping
 from datetime import UTC, datetime
@@ -15,14 +16,22 @@ from app.services.brokers.contracts import (
     BrokerConnectionState,
     BrokerError,
     BrokerErrorCode,
-    BrokerResult,
     BrokerSubscriptionInfo,
 )
+from app.services.brokers.contracts.error_catalog import BROKER_ERROR_CATALOG
 from app.services.brokers.contracts.protocols import (
     BrokerAdapter,
     _UnsupportedAdapterBase,
 )
-from app.utils import generate_id
+from app.utils import (
+    ResponseMetadata,
+    RiskLevel,
+    StandardResponse,
+    build_response_metadata,
+    error_response,
+    generate_id,
+    success_response,
+)
 
 _SUBSCRIPTION_OPERATIONS = {
     BrokerCapabilityId.SUBSCRIBE_QUOTES,
@@ -70,7 +79,7 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
         self._subscriptions: dict[str, _BrokerSubscription[Any]] = {}
 
     @override
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         """Establish a deterministic local verified session.
 
         Returns:
@@ -83,19 +92,33 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
 
     def inject_error(
         self, operation: BrokerCapabilityId, error: BrokerError | None
-    ) -> None:
+    ) -> StandardResponse[None]:
         """Set or clear the exact operation's canonical failure.
 
         Args:
             operation: Capability whose deterministic outcome is being set.
             error: Canonical failure to return, or `None` to clear it.
+
+        Returns:
+            Successful standard response after updating the fixture.
         """
+        start_time = time.perf_counter_ns()
         if error is None:
             self._errors.pop(operation, None)
         else:
             self._errors[operation] = error
+        return success_response(
+            None,
+            message="Fake broker error fixture updated",
+            metadata=self._testing_metadata(
+                name="brokers.testing.inject_error",
+                start_time=start_time,
+            ),
+        )
 
-    async def publish(self, subscription_id: str, event: object) -> bool:
+    async def publish(
+        self, subscription_id: str, event: object
+    ) -> StandardResponse[bool]:
         """Publish one event into an owned bounded subscription.
 
         Args:
@@ -105,12 +128,37 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
         Returns:
             Whether the event was accepted without terminal overflow.
 
-        Raises:
-            KeyError: If this instance does not own the subscription.
         """
-        return await self._subscriptions[subscription_id].publish(event)
+        start_time = time.perf_counter_ns()
+        subscription = self._subscriptions.get(subscription_id)
+        if subscription is None:
+            return error_response(
+                code=BrokerErrorCode.BROKER_SUBSCRIPTION_NOT_FOUND.value,
+                details={
+                    "retryable": False,
+                    "provider_code": None,
+                    "provider_message": None,
+                    "capability": BrokerCapabilityId.UNSUBSCRIBE.value,
+                    "legacy_details": {},
+                },
+                message="Subscription is not owned by this adapter",
+                metadata=self._testing_metadata(
+                    name="brokers.testing.publish",
+                    start_time=start_time,
+                ),
+                catalog=BROKER_ERROR_CATALOG,
+            )
+        accepted = await subscription.publish(event)
+        return success_response(
+            accepted,
+            message="Fake broker event publication completed",
+            metadata=self._testing_metadata(
+                name="brokers.testing.publish",
+                start_time=start_time,
+            ),
+        )
 
-    async def _invoke(self, operation: BrokerCapabilityId) -> BrokerResult[Any]:
+    async def _invoke(self, operation: BrokerCapabilityId) -> StandardResponse[Any]:
         """Return the deterministic outcome declared for one operation.
 
         Args:
@@ -155,14 +203,19 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
             return
         method = getattr(BrokerAdapter, operation.value)
         return_type = get_type_hints(method)["return"]
-        payload_type = get_args(return_type)[0]
+        generic_metadata = getattr(return_type, "__pydantic_generic_metadata__", {})
+        payload_types = generic_metadata.get("args", ())
+        if not payload_types:
+            message = f"{operation.value} does not declare a standard response payload"
+            raise TypeError(message)
+        payload_type = payload_types[0]
         if not _matches_payload(fixture, payload_type):
             message = f"{operation.value} fixture does not match {payload_type!r}"
             raise TypeError(message)
 
     def _open_subscription(
         self, operation: BrokerCapabilityId
-    ) -> BrokerResult[_BrokerSubscription[Any]]:
+    ) -> StandardResponse[_BrokerSubscription[Any]]:
         """Create one bounded FIFO subscription owned by this instance.
 
         Args:
@@ -189,7 +242,7 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
         self._subscriptions[subscription_id] = handle
         return self._result(operation, data=handle)
 
-    async def unsubscribe(self, subscription_id: str) -> BrokerResult[None]:
+    async def unsubscribe(self, subscription_id: str) -> StandardResponse[None]:
         """Terminate exactly one owned subscription.
 
         Args:
@@ -218,7 +271,7 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
 
     async def list_subscriptions(
         self,
-    ) -> BrokerResult[tuple[BrokerSubscriptionInfo, ...]]:
+    ) -> StandardResponse[tuple[BrokerSubscriptionInfo, ...]]:
         """List immutable metadata for subscriptions owned by this instance.
 
         Returns:
@@ -227,6 +280,38 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
         return self._result(
             BrokerCapabilityId.LIST_SUBSCRIPTIONS,
             data=tuple(handle.info for handle in self._subscriptions.values()),
+        )
+
+    def _testing_metadata(
+        self,
+        *,
+        name: str,
+        start_time: int,
+    ) -> ResponseMetadata:
+        """Build standard metadata for a fake-control operation.
+
+        Args:
+            name: Stable qualified operation name.
+            start_time: Monotonic operation start value.
+
+        Returns:
+            Validated response metadata.
+        """
+        return build_response_metadata(
+            name=name,
+            domain="brokers",
+            risk_level=RiskLevel.NONE,
+            request_id=generate_id("req"),
+            start_time=start_time,
+            read_only=False,
+            writes_file=False,
+            modifies_database=False,
+            places_trade=False,
+            requires_network=False,
+            extensions={
+                "broker": self._config.broker_id.value,
+                "environment": self._config.environment.value,
+            },
         )
 
 
@@ -242,7 +327,7 @@ def _make_fake_method(operation: BrokerCapabilityId) -> Any:
 
     async def _method(
         self: FakeBrokerAdapter, *args: object, **kwargs: object
-    ) -> BrokerResult[Any]:
+    ) -> StandardResponse[Any]:
         """Return the deterministic outcome for the generated operation.
 
         Args:
@@ -294,7 +379,7 @@ def _matches_payload(  # noqa: PLR0911
 
     Args:
         value: Fixture value under validation.
-        expected: Resolved payload annotation inside ``BrokerResult``.
+        expected: Resolved payload annotation inside ``StandardResponse``.
 
     Returns:
         Whether the value satisfies the annotation recursively.

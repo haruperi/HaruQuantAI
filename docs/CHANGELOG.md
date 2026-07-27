@@ -6,8 +6,16 @@
 
 Central environment configuration is grouped into logical sections, while provider-backed usage evidence now demonstrates genuine non-production connections and complete domain workflows.
 
-#### Changed (4)
+#### Added (1)
 
+- Added the immutable generic `StandardResponse v1`, exact structured error and execution metadata contracts, approved-code catalogue validation, monotonic millisecond timing, and lossless raw-data/extension preservation foundation in Utils.
+
+#### Changed (8)
+
+- Migrated the immutable Brokers capability catalogue to `StandardResponse` and added JSON-only mapping-proxy serialization that preserves raw runtime identity while emitting a detached bounded mapping.
+- Migrated the Brokers registered-profile listing to `StandardResponse[tuple[BrokerId, ...]]` while retaining the stable provider tuple directly in `data` and preserving SDK-free discovery.
+- Migrated every bounded Brokers public operation to Utils-owned `StandardResponse[T]`, preserved the former envelope evidence in `metadata.extensions` and `error.details`, centralized all 31 Broker error definitions, and updated Data/Trading consumers without compatibility shims.
+- Migrated root runtime-profile and execution-route validation from a public exception to `StandardResponse[None]` while preserving its established error code and value-free failure message.
 - Restructured central `app/configs/env.json` into grouped lowercase `snake_case` sections and updated `_CentralJsonSettingsSource` to parse nested configuration objects without altering process environment precedence or setting model contracts.
 - Replaced unused offline Brokers usage transports and placeholder credentials with enabled demo/testnet/sandbox session evidence, bounded released reads, exact capability-gate assertions, and deterministic disconnection without broker mutations.
 - Replaced the singular Utils, Brokers, Data, Indicators, Strategy, Risk, Trading, and Analytics workflow scripts with eighty-three standalone separator-delimited programs, one per active workflow, plus domain runners and registry-parity tests; MT5-backed paths use genuine demo reads/connections from documented input to typed output boundaries, with broker mutations excluded.

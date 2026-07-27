@@ -254,7 +254,7 @@ def test_adapter_connect_succeeds_on_verified_transport() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert result.is_success
+        assert result.status == "success"
 
     asyncio.run(exercise())
 
@@ -265,7 +265,7 @@ def test_adapter_connect_fails_closed_without_authentication() -> None:
 
     async def exercise() -> None:
         result = await adapter.connect()
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
 
     asyncio.run(exercise())
@@ -336,25 +336,25 @@ def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # n
         )
         assert (
             await adapter.check_order(order)
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
         assert (
             await adapter.place_order(order)
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
         assert (
             await adapter.modify_order(
                 BrokerOrderModificationRequest(order_id="11", quantity=Decimal(1))
             )
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
         assert (
             await adapter.cancel_order("11")
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
         assert (
             await adapter.modify_position(
                 BrokerPositionModificationRequest(
                     position_id="21", stop_loss=Decimal("1.09")
                 )
             )
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
         assert (
             await adapter.close_position(
                 BrokerPositionCloseRequest(
@@ -363,7 +363,7 @@ def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # n
                     quantity_unit="lots",
                 )
             )
-        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        ).error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
         margin = await adapter.calculate_margin(
             BrokerMarginRequest(
                 symbol="EURUSD",

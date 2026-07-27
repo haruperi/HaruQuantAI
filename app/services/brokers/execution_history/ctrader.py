@@ -13,7 +13,6 @@ from app.services.brokers.contracts import (
     BrokerPage,
     BrokerPosition,
     BrokerPositionFilter,
-    BrokerResult,
 )
 from app.services.brokers.ctrader_session.mapping import (
     _field,
@@ -22,6 +21,7 @@ from app.services.brokers.ctrader_session.mapping import (
     _map_position,
     _optional,
 )
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class _CTraderExecutionHistoryMixin:
@@ -32,7 +32,7 @@ class _CTraderExecutionHistoryMixin:
         filter: BrokerPositionFilter | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerPosition]]:
+    ) -> StandardResponse[BrokerPage[BrokerPosition]]:
         """Return bounded reconciled cTrader positions.
 
         Returns:
@@ -67,7 +67,7 @@ class _CTraderExecutionHistoryMixin:
         filter: BrokerOrderFilter | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerOrder]]:
+    ) -> StandardResponse[BrokerPage[BrokerOrder]]:
         """Return bounded reconciled cTrader orders.
 
         Returns:
@@ -106,7 +106,7 @@ class _CTraderExecutionHistoryMixin:
         symbol: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerOrder]]:
+    ) -> StandardResponse[BrokerPage[BrokerOrder]]:
         """Return bounded cTrader historical orders.
 
         Returns:
@@ -147,7 +147,7 @@ class _CTraderExecutionHistoryMixin:
         symbol: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerDeal]]:
+    ) -> StandardResponse[BrokerPage[BrokerDeal]]:
         """Return bounded cTrader execution deals.
 
         Returns:

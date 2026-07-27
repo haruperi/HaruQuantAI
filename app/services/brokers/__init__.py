@@ -17,6 +17,7 @@ from app.services.brokers.contracts.enums import (
     BrokerErrorCode,
     BrokerId,
 )
+from app.services.brokers.contracts.error_catalog import BROKER_ERROR_CATALOG
 from app.services.brokers.contracts.models import (
     BrokerAccountInfo,
     BrokerAccountTransaction,
@@ -49,7 +50,6 @@ from app.services.brokers.contracts.models import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
     BrokerQuote,
-    BrokerResult,
     BrokerServerTime,
     BrokerSubscriptionInfo,
     BrokerSymbolInfo,
@@ -81,6 +81,7 @@ _LAZY_ADAPTERS = {
 }
 
 __all__ = (
+    "BROKER_ERROR_CATALOG",
     "AccountProvider",
     "BinanceBrokerAdapter",
     "BrokerAccountInfo",
@@ -120,7 +121,6 @@ __all__ = (
     "BrokerPositionModificationRequest",
     "BrokerProfitRequest",
     "BrokerQuote",
-    "BrokerResult",
     "BrokerServerTime",
     "BrokerSubscription",
     "BrokerSubscriptionInfo",

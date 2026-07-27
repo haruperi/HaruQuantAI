@@ -7,6 +7,7 @@ from app.services.brokers.contracts.enums import (
     BrokerErrorCode,
     BrokerId,
 )
+from app.services.brokers.contracts.error_catalog import BROKER_ERROR_CATALOG
 from app.services.brokers.contracts.models import (
     BrokerAccountInfo,
     BrokerAccountTransaction,
@@ -39,7 +40,6 @@ from app.services.brokers.contracts.models import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
     BrokerQuote,
-    BrokerResult,
     BrokerServerTime,
     BrokerSubscriptionInfo,
     BrokerSymbolInfo,
@@ -56,6 +56,7 @@ from app.services.brokers.contracts.protocols import (
 )
 
 __all__: list[str] = [
+    "BROKER_ERROR_CATALOG",
     "AccountProvider",
     "BrokerAccountInfo",
     "BrokerAccountTransaction",
@@ -94,7 +95,6 @@ __all__: list[str] = [
     "BrokerPositionModificationRequest",
     "BrokerProfitRequest",
     "BrokerQuote",
-    "BrokerResult",
     "BrokerServerTime",
     "BrokerSubscription",
     "BrokerSubscriptionInfo",

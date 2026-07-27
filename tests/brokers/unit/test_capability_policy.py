@@ -86,5 +86,7 @@ def test_direct_mt5_live_construction_blocks_write() -> None:
         environment=BrokerEnvironment.LIVE,
     )
     result = asyncio.run(adapter.place_order(request))
-    assert not result.is_success
-    assert result.operation == BrokerCapabilityId.PLACE_ORDER
+    assert result.status != "success"
+    assert (
+        result.metadata.extensions["operation"] == BrokerCapabilityId.PLACE_ORDER.value
+    )

@@ -29,13 +29,13 @@ from app.services.brokers.contracts import (
     BrokerPage,
     BrokerPlatformInfo,
     BrokerQuote,
-    BrokerResult,
     BrokerServerTime,
     BrokerSymbolInfo,
     BrokerTick,
 )
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.price_streams.binance import _BinancePriceStreamsMixin
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
@@ -75,7 +75,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
         ] = {}
 
     @override
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         """Verify Spot ping/time; Futures profiles remain registry-only.
 
         Returns:
@@ -94,7 +94,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
         return self._result(BrokerCapabilityId.CONNECT)
 
     @override
-    async def disconnect(self) -> BrokerResult[None]:
+    async def disconnect(self) -> StandardResponse[None]:
         """Close all clients and streams deterministically.
 
         Returns:
@@ -106,7 +106,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
         return await super().disconnect()
 
     @override
-    async def is_connected(self) -> BrokerResult[bool]:
+    async def is_connected(self) -> StandardResponse[bool]:
         """Verify current Binance reachability with the documented ping.
 
         Returns:
@@ -115,7 +115,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
         await self._transport.call("ping")
         return self._result(BrokerCapabilityId.IS_CONNECTED, data=True)
 
-    async def ping(self) -> BrokerResult[None]:
+    async def ping(self) -> StandardResponse[None]:
         """Run the documented Spot ping.
 
         Returns:
@@ -124,7 +124,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
         await self._transport.call("ping")
         return self._result(BrokerCapabilityId.PING)
 
-    async def get_server_time(self) -> BrokerResult[BrokerServerTime]:
+    async def get_server_time(self) -> StandardResponse[BrokerServerTime]:
         """Return server time and measured local timing evidence."""
         sent = datetime.now(UTC)
         value = await self._transport.call("get_server_time")
@@ -148,7 +148,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
         query: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]:
+    ) -> StandardResponse[BrokerPage[BrokerSymbolInfo]]:
         """Return a caller-bounded page of exact Spot symbols.
 
         Raises:
@@ -169,21 +169,21 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
             ),
         )
 
-    async def get_symbol_info(self, symbol: str) -> BrokerResult[BrokerSymbolInfo]:
+    async def get_symbol_info(self, symbol: str) -> StandardResponse[BrokerSymbolInfo]:
         """Return direct Spot symbol metadata."""
         value = await self._transport.call("get_symbol_info", symbol=symbol)
         if value is None:
             return self._unsupported(BrokerCapabilityId.GET_SYMBOL_INFO)
         return self._result(BrokerCapabilityId.GET_SYMBOL_INFO, data=_map_symbol(value))
 
-    async def get_quote(self, symbol: str) -> BrokerResult[BrokerQuote]:
+    async def get_quote(self, symbol: str) -> StandardResponse[BrokerQuote]:
         """Return a genuine Spot book ticker."""
         value = await self._transport.call("get_orderbook_ticker", symbol=symbol)
         return self._result(
             BrokerCapabilityId.GET_QUOTE, data=_map_quote(value, symbol)
         )
 
-    async def get_spread(self, symbol: str) -> BrokerResult[Decimal]:
+    async def get_spread(self, symbol: str) -> StandardResponse[Decimal]:
         """Return the current genuine Spot book-ticker spread.
 
         Returns:
@@ -198,7 +198,9 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
             raise ValueError("Binance book ticker omitted bid or ask")
         return self._result(BrokerCapabilityId.GET_SPREAD, data=quote.ask - quote.bid)
 
-    async def get_market_status(self, symbol: str) -> BrokerResult[BrokerMarketStatus]:
+    async def get_market_status(
+        self, symbol: str
+    ) -> StandardResponse[BrokerMarketStatus]:
         """Return Binance's provider-reported symbol trading status.
 
         Returns:
@@ -223,7 +225,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
 
     async def get_order_book(
         self, symbol: str, depth: int | None = None
-    ) -> BrokerResult[BrokerOrderBook]:
+    ) -> StandardResponse[BrokerOrderBook]:
         """Return a genuine bounded Binance Spot depth snapshot.
 
         Returns:
@@ -247,7 +249,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerTick]]:
+    ) -> StandardResponse[BrokerPage[BrokerTick]]:
         """Return bounded genuine aggregate trades.
 
         Raises:
@@ -273,7 +275,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerBar]]:
+    ) -> StandardResponse[BrokerPage[BrokerBar]]:
         """Return caller-bounded genuine Spot klines.
 
         Raises:
@@ -307,7 +309,7 @@ class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):
             data=BrokerPage(items=items, limit=limit),
         )
 
-    async def get_platform_info(self) -> BrokerResult[BrokerPlatformInfo]:
+    async def get_platform_info(self) -> StandardResponse[BrokerPlatformInfo]:
         """Return immutable selected Binance product profile."""
         return self._result(
             BrokerCapabilityId.GET_PLATFORM_INFO,

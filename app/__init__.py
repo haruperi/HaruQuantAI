@@ -1,8 +1,5 @@
 """HaruQuantAI application boundary."""
 
-from app.runtime import RuntimeConfigurationError, validate_runtime_configuration
+from app.runtime import validate_runtime_configuration
 
-__all__ = (
-    "RuntimeConfigurationError",
-    "validate_runtime_configuration",
-)
+__all__ = ("validate_runtime_configuration",)

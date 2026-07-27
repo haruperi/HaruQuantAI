@@ -57,7 +57,10 @@ def _config(broker_id: BrokerId) -> BrokerConnectionConfig:
 
 def test_every_registered_broker_resolves_a_canonical_adapter() -> None:
     """Every registered broker profile constructs a protocol-conformant adapter."""
-    for broker_id in get_registered_brokers():
+    registered = get_registered_brokers()
+    assert registered.status == "success"
+    assert registered.data is not None
+    for broker_id in registered.data:
         result = create_broker_adapter(broker_id, _config(broker_id))
-        assert result.is_success, (broker_id, result.error)
+        assert result.status == "success", (broker_id, result.error)
         assert isinstance(result.data, BrokerAdapter)

@@ -72,8 +72,8 @@ async def _authority_state(adapter: BrokerAdapter) -> tuple[set[str], set[str]]:
     """
     orders_result = await adapter.get_orders(limit=_STATE_LIMIT)
     positions_result = await adapter.get_positions(limit=_STATE_LIMIT)
-    assert orders_result.is_success, orders_result.error
-    assert positions_result.is_success, positions_result.error
+    assert orders_result.status == "success", orders_result.error
+    assert positions_result.status == "success", positions_result.error
     assert orders_result.data is not None
     assert positions_result.data is not None
     assert not orders_result.data.truncated
@@ -103,10 +103,10 @@ async def _cleanup_created_state(
     current_orders, current_positions = await _authority_state(adapter)
     for order_id in sorted(current_orders - original_orders):
         cancelled = await adapter.cancel_order(order_id)
-        assert cancelled.is_success, cancelled.error
+        assert cancelled.status == "success", cancelled.error
     for position_id in sorted(current_positions - original_positions):
         position = await adapter.get_position(position_id)
-        assert position.is_success, position.error
+        assert position.status == "success", position.error
         assert position.data is not None
         closed = await adapter.close_position(
             BrokerPositionCloseRequest(
@@ -116,7 +116,7 @@ async def _cleanup_created_state(
                 client_request_id=generate_id("req"),
             )
         )
-        assert closed.is_success, closed.error
+        assert closed.status == "success", closed.error
     reconciled_orders, reconciled_positions = await _authority_state(adapter)
     assert reconciled_orders == original_orders
     assert reconciled_positions == original_positions
@@ -153,7 +153,7 @@ async def _verify_demo_session(adapter: BrokerAdapter) -> None:
     assert account is not None
     assert account.trade_mode == MetaTrader5.ACCOUNT_TRADE_MODE_DEMO
     permissions = await adapter.get_permissions()
-    assert permissions.is_success, permissions.error
+    assert permissions.status == "success", permissions.error
     assert permissions.data is not None
     assert permissions.data.trade_write is True
 
@@ -172,13 +172,13 @@ async def _minimum_pending_order(
         Minimum-size pending order unique to this validation run.
     """
     positions = await adapter.get_positions(limit=_STATE_LIMIT)
-    assert positions.is_success, positions.error
+    assert positions.status == "success", positions.error
     assert positions.data is not None
     assert all(item.symbol != _SYMBOL for item in positions.data.items)
     symbol = await adapter.get_symbol_info(_SYMBOL)
     quote = await adapter.get_quote(_SYMBOL)
-    assert symbol.is_success, symbol.error
-    assert quote.is_success, quote.error
+    assert symbol.status == "success", symbol.error
+    assert quote.status == "success", quote.error
     assert symbol.data is not None
     assert quote.data is not None
     assert symbol.data.min_quantity is not None
@@ -221,7 +221,7 @@ async def _exercise_demo_mutation(
         settings: Verified MT5 demo settings.
     """
     connected = await adapter.connect()
-    assert connected.is_success, connected.error
+    assert connected.status == "success", connected.error
     original_orders: set[str] | None = None
     original_positions: set[str] | None = None
     try:
@@ -229,7 +229,7 @@ async def _exercise_demo_mutation(
         original_orders, original_positions = await _authority_state(adapter)
         request = await _minimum_pending_order(adapter, settings)
         checked = await adapter.check_order(request)
-        assert checked.is_success, checked.error
+        assert checked.status == "success", checked.error
         assert checked.data is not None
         assert checked.data.accepted_for_submission
         logger.info(
@@ -238,7 +238,7 @@ async def _exercise_demo_mutation(
             "provider_account_classification=demo operation=place_order"
         )
         placed = await adapter.place_order(request)
-        assert placed.is_success, placed.error
+        assert placed.status == "success", placed.error
         assert placed.data is not None
         assert placed.data.outcome == "ACCEPTED"
         assert placed.data.order_id is not None
@@ -256,7 +256,7 @@ def test_mt5_demo_minimum_order_is_cancelled_and_reconciled() -> None:
     """Place one minimum-size demo order, clean it up, and reconcile exactly."""
     settings = _require_demo_settings()
     created = create_broker_adapter(BrokerId.MT5, _connection_config(settings))
-    assert created.is_success, created.error
+    assert created.status == "success", created.error
     adapter = created.data
     assert adapter is not None
 

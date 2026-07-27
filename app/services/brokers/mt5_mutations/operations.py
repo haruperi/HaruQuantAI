@@ -14,7 +14,6 @@ from app.services.brokers.contracts import (
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-    BrokerResult,
 )
 from app.services.brokers.contracts.protocols import (
     _RequestValidationError,
@@ -27,6 +26,7 @@ from app.services.brokers.mt5_account.mapping import (
     _map_position,
     _optional,
 )
+from app.utils import StandardResponse  # noqa: TC001
 
 
 def _provider_ticket(value: str) -> int:
@@ -56,7 +56,7 @@ class _MT5MutationsMixin:
 
     async def check_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderCheck]:
+    ) -> StandardResponse[BrokerOrderCheck]:
         """Ask MT5 to validate one order without submitting it.
 
         Returns:
@@ -76,7 +76,7 @@ class _MT5MutationsMixin:
 
     async def place_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Submit exactly one MT5 order without retry.
 
         Returns:
@@ -89,7 +89,7 @@ class _MT5MutationsMixin:
 
     async def modify_order(
         self, request: BrokerOrderModificationRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Modify exactly one pending MT5 order without retry.
 
         Returns:
@@ -108,7 +108,7 @@ class _MT5MutationsMixin:
 
     async def cancel_order(
         self, order_id: str, client_request_id: str | None = None
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Cancel exactly one pending MT5 order without retry.
 
         Returns:
@@ -123,7 +123,7 @@ class _MT5MutationsMixin:
 
     async def modify_position(
         self, request: BrokerPositionModificationRequest
-    ) -> BrokerResult[BrokerPosition]:
+    ) -> StandardResponse[BrokerPosition]:
         """Modify stop fields for exactly one MT5 position without retry.
 
         Returns:
@@ -157,7 +157,7 @@ class _MT5MutationsMixin:
 
     async def close_position(
         self, request: BrokerPositionCloseRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Close or reduce exactly one MT5 position without retry.
 
         Returns:
@@ -232,7 +232,7 @@ class _MT5MutationsMixin:
         self,
         operation: BrokerCapabilityId,
         native: Mapping[str, object],
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Send one mutation once and classify its explicit response.
 
         Returns:
@@ -248,7 +248,7 @@ class _MT5MutationsMixin:
 
     def _native_rejection[T](
         self, operation: BrokerCapabilityId, response: object
-    ) -> BrokerResult[T]:
+    ) -> StandardResponse[T]:
         """Map one explicit MT5 rejection to a canonical failure.
 
         Returns:

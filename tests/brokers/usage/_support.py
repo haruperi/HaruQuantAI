@@ -16,9 +16,9 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
-    BrokerResult,
     create_broker_adapter,
 )
+from app.utils import StandardResponse
 from pydantic import SecretStr
 
 from tests.brokers.provider_settings import ProviderTestSettings
@@ -152,11 +152,11 @@ async def real_session(broker_id: BrokerId) -> AsyncIterator[BrokerAdapter]:
 
 def require_success(
     label: str,
-    result: BrokerResult[_ResultT],
-) -> BrokerResult[_ResultT]:
+    result: StandardResponse[_ResultT],
+) -> StandardResponse[_ResultT]:
     """Require and display one canonical successful broker result."""
-    if not result.is_success:
-        code = result.error.code.value if result.error is not None else "NO_ERROR_CODE"
+    if result.status != "success":
+        code = result.error.code if result.error is not None else "NO_ERROR_CODE"
         raise UsageEvidenceError(f"{label} failed with {code}")
     show(label, result)
     return result
@@ -164,29 +164,31 @@ def require_success(
 
 def require_error(
     label: str,
-    result: BrokerResult[_ResultT],
+    result: StandardResponse[_ResultT],
     *expected: BrokerErrorCode,
-) -> BrokerResult[_ResultT]:
+) -> StandardResponse[_ResultT]:
     """Require and display one exact canonical fail-closed broker result."""
-    if result.error is None or result.error.code not in expected:
-        actual = result.error.code.value if result.error is not None else result.status
+    expected_codes = {code.value for code in expected}
+    if result.error is None or result.error.code not in expected_codes:
+        actual = result.error.code if result.error is not None else result.status
         wanted = ", ".join(code.value for code in expected)
         raise UsageEvidenceError(f"{label} returned {actual}; expected {wanted}")
     show(label, result)
     return result
 
 
-def show(label: str, result: BrokerResult[object]) -> None:
+def show(label: str, result: StandardResponse[object]) -> None:
     """Print bounded result metadata without provider payloads or secrets."""
     detail = ""
     if result.error is not None:
-        detail = f" {result.error.code.value}"
-    print(label, result.status, result.operation.value + detail)
+        detail = f" {result.error.code}"
+    operation = result.metadata.extensions.get("operation", "unknown")
+    print(label, result.status, str(operation) + detail)
 
 
 def show_value(
     label: str,
-    result: BrokerResult[object],
+    result: StandardResponse[object],
     value: object,
 ) -> None:
     """Print one bounded mapped provider value alongside result metadata."""

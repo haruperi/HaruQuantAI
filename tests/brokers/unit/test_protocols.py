@@ -21,7 +21,6 @@ from app.services.brokers import (
     BrokerId,
     BrokerOrderRequest,
     BrokerOrderResult,
-    BrokerResult,
     BrokerSubscription,
     BrokerSubscriptionInfo,
     CalculationProvider,
@@ -30,6 +29,9 @@ from app.services.brokers import (
 )
 from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
+from app.utils import StandardResponse
+
+from tests.brokers.response_factory import broker_response
 
 REQUEST_ID = "req-b4b8aa60-ba17-4561-884b-138c6074c5fb"
 
@@ -66,18 +68,18 @@ def _adapter(*, connect_available: bool = False) -> _UnsupportedAdapterBase:
     return _UnsupportedAdapterBase(config)
 
 
-def _unsupported(operation: BrokerCapabilityId) -> BrokerResult[object]:
+def _unsupported(operation: BrokerCapabilityId) -> StandardResponse[object]:
     adapter = _adapter()
     adapter._state = BrokerConnectionState.READY
 
-    async def _call() -> BrokerResult[object]:
+    async def _call() -> StandardResponse[object]:
         method = getattr(adapter, operation.value)
-        return cast("BrokerResult[object]", await method())
+        return cast("StandardResponse[object]", await method())
 
     result = asyncio.run(_call())
-    assert result.operation is operation
+    assert result.metadata.extensions["operation"] == operation.value
     assert result.error is not None
-    assert result.error.code is BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+    assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
     return result
 
 
@@ -97,10 +99,10 @@ class _ContextAdapter(_UnsupportedAdapterBase):
         super().__init__(base._config)
         self.disconnect_count = 0
 
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         return self._result(BrokerCapabilityId.CONNECT)
 
-    async def disconnect(self) -> BrokerResult[None]:
+    async def disconnect(self) -> StandardResponse[None]:
         self.disconnect_count += 1
         return self._result(BrokerCapabilityId.DISCONNECT)
 
@@ -156,7 +158,7 @@ def test_subscription_is_bounded_fifo_and_explicitly_closed() -> None:
         events = subscription.events()
         first = await anext(events)
         second = await anext(events)
-        assert (await subscription.unsubscribe()).is_success
+        assert (await subscription.unsubscribe()).status == "success"
         with pytest.raises(StopAsyncIteration):
             await anext(events)
         return cast("int", first), cast("int", second)
@@ -187,8 +189,8 @@ def test_disconnect_is_idempotent() -> None:
     adapter = _adapter()
 
     async def _twice() -> None:
-        assert (await adapter.disconnect()).is_success
-        assert (await adapter.disconnect()).is_success
+        assert (await adapter.disconnect()).status == "success"
+        assert (await adapter.disconnect()).status == "success"
 
     asyncio.run(_twice())
 
@@ -201,13 +203,13 @@ def test_is_connected_is_provider_verified() -> None:
     adapter = _adapter()
     adapter._state = BrokerConnectionState.READY
     result = asyncio.run(adapter.is_connected())
-    assert result.is_success
+    assert result.status == "success"
     assert result.data is True
 
 
 def test_connection_status_is_detailed() -> None:
     result = asyncio.run(_adapter().get_connection_status())
-    assert result.is_success
+    assert result.status == "success"
     assert result.data is not None
     assert not result.data.transport_connected
 
@@ -228,7 +230,7 @@ def test_last_error_is_redacted_and_non_authoritative() -> None:
     adapter = _adapter()
     _ = asyncio.run(adapter.ping())
     result = asyncio.run(adapter.get_last_error())
-    assert result.is_success
+    assert result.status == "success"
     assert result.data is not None
 
 
@@ -251,14 +253,14 @@ def test_connection_events_cover_every_transition() -> None:
 
 def test_feature_flags_include_unsupported_and_unapproved_entries() -> None:
     result = asyncio.run(_adapter().get_feature_flags())
-    assert result.is_success
+    assert result.status == "success"
     assert result.data is not None
     assert set(result.data.capabilities) == set(BrokerCapabilityId)
 
 
 def test_supports_uses_declaration_not_attribute_catch() -> None:
     result = asyncio.run(_adapter().supports(BrokerCapabilityId.GET_QUOTE))
-    assert result.is_success
+    assert result.status == "success"
     assert result.data is False
     with pytest.raises(AttributeError):
         object.__getattribute__(_adapter(), "not_a_capability")
@@ -435,7 +437,7 @@ def test_cancellation_propagates_without_translation() -> None:
     """Caller cancellation remains an exception rather than a broker result."""
 
     class _CancelledAdapter(_ContextAdapter):
-        async def connect(self) -> BrokerResult[None]:
+        async def connect(self) -> StandardResponse[None]:
             raise asyncio.CancelledError
 
     async def _cancel() -> None:
@@ -449,12 +451,12 @@ def test_public_boundary_translates_and_redacts_raw_provider_exception() -> None
     """Raw provider exceptions never cross the canonical adapter boundary."""
 
     class _ExplodingAdapter(_ContextAdapter):
-        async def connect(self) -> BrokerResult[None]:
+        async def connect(self) -> StandardResponse[None]:
             raise RuntimeError("password=provider-secret")
 
     result = asyncio.run(_ExplodingAdapter().connect())
     assert result.error is not None
-    assert result.error.code is BrokerErrorCode.BROKER_RESPONSE_INVALID
+    assert result.error.code == BrokerErrorCode.BROKER_RESPONSE_INVALID.value
     assert "provider-secret" not in repr(result)
 
 
@@ -464,7 +466,7 @@ def test_mutation_timeout_is_non_retryable_unknown_outcome() -> None:
     class _TimedOutAdapter(_ContextAdapter):
         async def place_order(
             self, request: BrokerOrderRequest
-        ) -> BrokerResult[BrokerOrderResult]:
+        ) -> StandardResponse[BrokerOrderResult]:
             del request
             raise TimeoutError("provider acknowledgement timeout")
 
@@ -481,21 +483,20 @@ def test_mutation_timeout_is_non_retryable_unknown_outcome() -> None:
     )
     result = asyncio.run(adapter.place_order(request))
     assert result.error is not None
-    assert result.error.code is BrokerErrorCode.BROKER_UNKNOWN_OUTCOME
-    assert result.error.retryable is False
+    assert result.error.code == BrokerErrorCode.BROKER_UNKNOWN_OUTCOME.value
+    assert result.error.details["retryable"] is False
 
 
 def test_adapter_connect_failure_returns_canonical_error() -> None:
     """A connection failure returns a canonical error result."""
 
     class _FailingAdapter(_ContextAdapter):
-        async def connect(self) -> BrokerResult[None]:
+        async def connect(self) -> StandardResponse[None]:
             from app.services.brokers import BrokerError
 
-            return BrokerResult(
-                status="error",
+            return broker_response(
+                BrokerCapabilityId.CONNECT,
                 broker=BrokerId.YAHOO,
-                operation=BrokerCapabilityId.CONNECT,
                 request_id=REQUEST_ID,
                 timestamp=datetime.now(UTC),
                 environment=BrokerEnvironment.SANDBOX,
@@ -508,7 +509,7 @@ def test_adapter_connect_failure_returns_canonical_error() -> None:
 
     result = asyncio.run(_FailingAdapter().connect())
     assert result.error is not None
-    assert result.error.code is BrokerErrorCode.BROKER_CONNECTION_FAILED
+    assert result.error.code == BrokerErrorCode.BROKER_CONNECTION_FAILED.value
 
 
 def test_transition_noop() -> None:
@@ -529,7 +530,7 @@ def test_reconnect_executes_disconnect_and_connect() -> None:
             super().__init__()
             self.connect_count = 0
 
-        async def connect(self) -> BrokerResult[None]:
+        async def connect(self) -> StandardResponse[None]:
             self.connect_count += 1
             return self._result(BrokerCapabilityId.CONNECT)
 
@@ -552,7 +553,7 @@ def test_getattr_fallback_for_undefined_capability() -> None:
         method = getattr(adapter, "calculate_profit")  # noqa: B009
         result = await method()
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
 
     asyncio.run(exercise())
 

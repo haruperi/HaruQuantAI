@@ -59,7 +59,10 @@ async def run() -> None:
 
     # Stage 4 — Expose registered broker IDs without fallback selection.
     _stage(4)
-    registered = get_registered_brokers()
+    response = get_registered_brokers()
+    assert response.status == "success"
+    assert response.data is not None
+    registered = response.data
     assert BrokerId.MT5 in registered
     print("Registered broker IDs:", tuple(item.value for item in registered))
     require_success("First cleanup", await first_result.data.disconnect())

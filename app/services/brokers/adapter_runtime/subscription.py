@@ -10,10 +10,13 @@ from app.services.brokers.contracts import (
     BrokerError,
     BrokerErrorCode,
     BrokerId,
-    BrokerResult,
     BrokerSubscriptionInfo,
 )
-from app.utils import generate_id, logger, utc_now
+from app.services.brokers.contracts.responses import (
+    broker_start_time,
+    build_broker_response,
+)
+from app.utils import StandardResponse, generate_id, logger, utc_now
 
 type _Event[TEvent] = TEvent | BrokerError | None
 
@@ -137,12 +140,13 @@ class _BrokerSubscription[TEvent]:
             if isinstance(event, BrokerError):
                 return
 
-    async def unsubscribe(self) -> BrokerResult[None]:
+    async def unsubscribe(self) -> StandardResponse[None]:
         """Idempotently stop the exact subscription and provider stream.
 
         Returns:
             Canonical successful unsubscribe result.
         """
+        start_time = broker_start_time()
         async with self._lock:
             if not self._closed and self._unsubscribe_callback is not None:
                 await self._unsubscribe_callback()
@@ -157,12 +161,12 @@ class _BrokerSubscription[TEvent]:
             capability=self._info.capability.value,
             result="success",
         ).info("Subscription unsubscribed and provider stream released")
-        return BrokerResult(
-            status="success",
+        return build_broker_response(
             broker=self._broker,
             operation=BrokerCapabilityId.UNSUBSCRIBE,
             request_id=generate_id("req"),
             timestamp=utc_now(),
             environment=self._environment,
             adapter_version=self._adapter_version,
+            start_time=start_time,
         )

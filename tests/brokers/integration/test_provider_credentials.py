@@ -56,14 +56,14 @@ def test_mt5_demo_credential_gated_connection() -> None:
         credentials=credentials,
     )
     created = create_broker_adapter(BrokerId.MT5, config)
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         """Connect and disconnect one genuine MT5 session."""
         result = await adapter.connect()
-        assert result.is_success, result.error
+        assert result.status == "success", result.error
         await adapter.disconnect()
 
     asyncio.run(exercise())
@@ -101,6 +101,6 @@ def test_ctrader_demo_credentials_validate_without_a_network_transport() -> None
         credentials=credentials,
     )
     created = create_broker_adapter(BrokerId.CTRADER, config)
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None

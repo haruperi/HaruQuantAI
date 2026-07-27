@@ -39,21 +39,21 @@ def _config() -> BrokerConnectionConfig:
 def test_session_lifecycle_initialization_and_status() -> None:
     """Root-created adapter initializes disconnected and status reflects state."""
     created = create_broker_adapter(BrokerId.MT5, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         status = await adapter.get_connection_status()
-        assert status.is_success
+        assert status.status == "success"
         assert status.data is not None
         assert status.data.state == BrokerConnectionState.DISCONNECTED
 
         disconnected = await adapter.disconnect()
-        assert disconnected.is_success
+        assert disconnected.status == "success"
 
         again = await adapter.disconnect()
-        assert again.is_success
+        assert again.status == "success"
 
     asyncio.run(exercise())
 
@@ -61,7 +61,7 @@ def test_session_lifecycle_initialization_and_status() -> None:
 def test_connect_emits_lifecycle_events() -> None:
     """Connection status and event channels function cleanly."""
     created = create_broker_adapter(BrokerId.MT5, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 

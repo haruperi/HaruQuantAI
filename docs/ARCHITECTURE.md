@@ -145,8 +145,47 @@ flowchart TD
 ### Shared Utility Framework (`app/utils/`)
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
-* **Target Submodule Footprint**: shared `AuthContext` and `AuditEvent` contracts, shared base errors and immutable metadata, injected error routing, identity/trace IDs, UTC time, canonical serialization, redaction, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. `app.utils.AppSettings` is the sole repository `app/configs/env.json` loading boundary; domains inherit it for typed owned settings and never parse environment files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, password hashing, credential encryption/persistence, active-key selection, credential-reference resolution, composition-root Brokers configuration, and permission enforcement; externally provisioned key infrastructure owns encryption-key generation/storage/rotation; Data owns normalized market contracts, cross-domain tabular processing, quality policy, and the only public detached OHLCV/spread and tick DataFrame projections from canonical `MarketDataset v1`; Indicators may privately project the same contract to pandas/NumPy for pure formula evaluation and owns its resulting tabular contract; each domain owns its paths, limits, validation, result types, and business contracts.
-* **Contract Ownership Rule**: Domain contract modules own their own base contract behavior locally. They must not inherit from or import a centralized utility contract base.
+* **Target Submodule Footprint**: shared `AuthContext`, `AuditEvent`, and `StandardResponse[T]` contracts; shared base errors, immutable error definitions, catalogue validation, injected error routing, identity/trace IDs, UTC and monotonic duration handling, canonical serialization, redaction, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. `app.utils.AppSettings` is the sole repository `app/configs/env.json` loading boundary; domains inherit it for typed owned settings and never parse environment files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, password hashing, credential encryption/persistence, active-key selection, credential-reference resolution, composition-root Brokers configuration, and permission enforcement; externally provisioned key infrastructure owns encryption-key generation/storage/rotation; Data owns normalized market contracts, cross-domain tabular processing, quality policy, and the only public detached OHLCV/spread and tick DataFrame projections from canonical `MarketDataset v1`; Indicators may privately project the same contract to pandas/NumPy for pure formula evaluation and owns its resulting tabular contract; each domain owns its paths, limits, validation, typed payloads, business outcomes, and error-code policy.
+* **Contract Ownership Rule**: Domain contract modules own their payload and business-outcome behavior locally. Utils owns only the shared five-field public-operation response envelope and business-neutral error-definition shape; domains do not inherit any other centralized contract base.
+
+### Standard Public-Operation Response
+
+Every HaruQuantAI-owned public operation that accepts one bounded request and
+produces one completed outcome returns `StandardResponse[T]`, regardless of
+whether the operation is registered as an AI tool. The envelope serializes exactly
+`status`, `message`, `data`, `error`, and `metadata`.
+
+- `data` is the raw result `T`; it is never nested in a synthetic result/payload
+  object or legacy response envelope.
+- Immutable mapping-proxy results retain their exact Python identity in `data`;
+  JSON-mode output is a detached bounded JSON-safe mapping and does not mutate or
+  replace that runtime value.
+- Existing non-payload envelope fields are preserved losslessly under stable
+  `metadata.extensions` keys.
+- Top-level status reports function completion. Completed domain decisions such as
+  rejection, blocking, neutral action, or uncertain execution truth remain typed
+  domain data rather than being reclassified as function failure.
+- Error details and extensions are bounded, redacted, and JSON-safe.
+- Execution time derives from `time.perf_counter_ns()` and is expressed in
+  non-negative milliseconds rounded to three decimal places.
+- Constructors, properties, private helpers, streams/subscriptions, callbacks,
+  externally prescribed protocol methods, runtime-resource factories, and response
+  infrastructure primitives are outside the bounded-operation rule.
+
+For Brokers, every bounded adapter, registry, subscription-control, and fake-control
+operation uses this shared envelope. The raw provider-neutral DTO is stored directly
+in `data`. Broker/profile identity, operation, UTC completion timestamp, environment,
+adapter/provider versions, redacted provider metadata, and separated provider/adapter
+latency are stable `metadata.extensions`; retryability, provider code/message,
+capability, and legacy details are stable `error.details`. The asynchronous
+`connection_events()` iterator and subscription `events()` iterator remain streams,
+not completed-operation responses. Brokers owns one complete immutable
+`BROKER_ERROR_CATALOG`; Utils owns only the catalogue shape and validation.
+
+Utils owns the common system error catalogue and catalogue validation shape. Each
+domain remains authoritative for its own immutable codes, descriptions, retry
+policy, severity, and operator action. Higher-level composition may validate and
+render a system-wide catalogue without making Utils depend on a service domain.
 
 ### Domain Audit Event Shape
 

@@ -1,5 +1,6 @@
 """Single static broker capability declaration source."""
 
+import time
 from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Literal
@@ -8,6 +9,13 @@ from app.services.brokers.contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerId,
+)
+from app.utils import (
+    RiskLevel,
+    StandardResponse,
+    build_response_metadata,
+    generate_id,
+    success_response,
 )
 
 _LOCAL = {
@@ -313,15 +321,38 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
     )
 
 
-def get_broker_capability_catalogue() -> Mapping[
-    BrokerId, tuple[BrokerCapability, ...]
+def get_broker_capability_catalogue() -> StandardResponse[
+    Mapping[BrokerId, tuple[BrokerCapability, ...]]
 ]:
-    """Return the immutable complete profile/operation declaration catalogue."""
-    return MappingProxyType(
+    """Return the immutable complete profile/operation declaration catalogue.
+
+    Returns:
+        A successful standard response containing the immutable catalogue
+        directly in ``data``.
+    """
+    start_time = time.perf_counter_ns()
+    catalogue: Mapping[BrokerId, tuple[BrokerCapability, ...]] = MappingProxyType(
         {
             broker: tuple(
                 _capability(broker, operation) for operation in BrokerCapabilityId
             )
             for broker in BrokerId
         }
+    )
+    metadata = build_response_metadata(
+        name="brokers.registry.get_broker_capability_catalogue",
+        domain="brokers",
+        risk_level=RiskLevel.NONE,
+        request_id=generate_id("req"),
+        start_time=start_time,
+        read_only=True,
+        writes_file=False,
+        modifies_database=False,
+        places_trade=False,
+        requires_network=False,
+    )
+    return success_response(
+        catalogue,
+        message="Broker capability catalogue retrieved",
+        metadata=metadata,
     )

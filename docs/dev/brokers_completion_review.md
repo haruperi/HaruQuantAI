@@ -364,7 +364,7 @@ The existing overflow test expects the originally queued event to disappear and 
 
 ### Evidence
 
-`FakeBrokerAdapter` accepts `Mapping[BrokerCapabilityId, object]` and places arbitrary fixture objects into `BrokerResult`.
+`FakeBrokerAdapter` accepted `Mapping[BrokerCapabilityId, object]` and placed arbitrary fixture objects into the former Broker-specific result envelope.
 
 The mutation test configures `PLACE_ORDER` with a `BrokerOrder`, although `place_order()` is declared to return `BrokerOrderResult`. It then asserts that the wrong object is returned unchanged.
 
@@ -517,7 +517,7 @@ Either:
 * explicitly document `RuntimeError` for `__aenter__`; or
 * expose a separate result-aware context helper.
 
-The recommended minimal resolution is to document the exception because Python context entry cannot return both the adapter and a `BrokerResult`.
+The recommended minimal resolution was to document the exception because Python context entry cannot return both the adapter and a completed-operation response.
 
 ---
 
@@ -727,7 +727,7 @@ The workflow documentation requires explicit backpressure and forbids silent dat
 | `BrokerAdapter v1`                   | Brokers                    | Data, Trading     | `NONCOMPLIANT`         | Protocol exists, but constructor/release policy can be bypassed                    |
 | Capability traits                    | Brokers                    | Data, Trading     | `NONCOMPLIANT`         | Structural read/write split exists; capability-ID/access-mode invariant is missing |
 | `BrokerConnectionConfig v1`          | Brokers                    | Composition root  | `NONCOMPLIANT`         | Fields exist; timeout/reconnect semantics are not fully implemented                |
-| `BrokerResult v1` / `BrokerError v1` | Brokers                    | Data, Trading     | `UNVERIFIED`           | Static invariants present; canonical circuit/open mapping needs correction         |
+| Former Broker result envelope / `BrokerError v1` | Brokers                    | Data, Trading     | `UNVERIFIED`           | Static invariants present; canonical circuit/open mapping needs correction         |
 | Canonical DTO family                 | Brokers                    | Data, Trading     | `UNVERIFIED`           | Strong static validation; mapping suites not executed                              |
 | `BrokerFeatureFlags v1`              | Brokers                    | Data, Trading     | `NONCOMPLIANT`         | Trusts supplied capability map without authoritative-policy equality               |
 | `BrokerSubscription`                 | Brokers                    | Data, Trading     | `NONCOMPLIANT`         | Queue semantics discard accepted data                                              |
@@ -1368,7 +1368,7 @@ Medium to high.
 1. Define the expected success payload category for every capability.
 2. Validate fixtures before storing them.
 3. Validate generated method results before returning.
-4. Permit `None` only for operations returning `BrokerResult[None]`.
+4. Permit `None` only for operations whose successful raw payload is `None`.
 5. Validate `BrokerPage` item type for page-returning operations.
 6. Replace the invalid `BrokerOrder` mutation fixture with `BrokerOrderResult`.
 7. Ensure injected errors remain canonical and unavailable capabilities remain gated.

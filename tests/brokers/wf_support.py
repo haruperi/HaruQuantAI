@@ -13,9 +13,8 @@ from app.services.brokers import (
     BrokerConnectionStatus,
     BrokerEnvironment,
     BrokerId,
-    BrokerResult,
 )
-from app.utils import settings
+from app.utils import StandardResponse, settings
 
 
 class _WorkflowSettings(settings.AppSettings):
@@ -104,24 +103,26 @@ def build_mt5_connection_config(
     )
 
 
-def print_result(label: str, result: BrokerResult[object]) -> None:
+def print_result(label: str, result: StandardResponse[object]) -> None:
     """Print a bounded result summary for workflow verification."""
-    operation = result.operation.value if result.operation is not None else "unknown"
+    operation = result.metadata.extensions.get("operation", "unknown")
     if result.error is not None:
-        print(f"{label}: {operation} -> {result.status} {result.error.code.value}")
+        print(f"{label}: {operation} -> {result.status} {result.error.code}")
     else:
         print(f"{label}: {operation} -> {result.status}")
 
 
 def print_connection_status(
     label: str,
-    result: BrokerResult[BrokerConnectionStatus],
+    result: StandardResponse[BrokerConnectionStatus],
 ) -> None:
     """Print one canonical connection status result."""
     if result.data is None:
-        print(f"{label}: no status payload ({result.operation.value})")
+        operation = result.metadata.extensions.get("operation", "unknown")
+        print(f"{label}: no status payload ({operation})")
         return
+    operation = result.metadata.extensions.get("operation", "unknown")
     print(
-        f"{label}: {result.operation.value} -> {result.status} "
+        f"{label}: {operation} -> {result.status} "
         f"{result.data.state} transport={result.data.transport_connected}"
     )

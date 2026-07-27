@@ -11,7 +11,6 @@ from app.services.brokers import (
     BrokerFeatureFlags,
     BrokerOrderRequest,
     BrokerOrderResult,
-    BrokerResult,
 )
 from app.services.trading import (
     LiveSession,
@@ -20,6 +19,7 @@ from app.services.trading import (
     evaluate_live_gate,
     submit_order,
 )
+from app.utils import StandardResponse
 from tests.trading.conftest import (
     CountingAdapter,
     MemoryStore,
@@ -47,7 +47,7 @@ class _AuditedAdapter(CountingAdapter):
 
     async def place_order(
         self, request: BrokerOrderRequest
-    ) -> BrokerResult[BrokerOrderResult]:
+    ) -> StandardResponse[BrokerOrderResult]:
         """Record adapter invocation and acknowledge the placement."""
         self.order.append("adapter")
         return await super().place_order(request)

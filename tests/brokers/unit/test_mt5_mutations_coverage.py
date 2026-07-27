@@ -14,7 +14,6 @@ from app.services.brokers.contracts import (
     BrokerOrderRequest,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-    BrokerResult,
 )
 from app.services.brokers.contracts.protocols import _RequestValidationError
 from app.services.brokers.mt5_account.adapter import (
@@ -23,22 +22,18 @@ from app.services.brokers.mt5_account.adapter import (
 from app.services.brokers.mt5_mutations.operations import (
     _provider_ticket,
 )
-from app.utils import generate_id
+from app.utils import StandardResponse
 
-_REQ_ID = generate_id("req")
+from tests.brokers.response_factory import broker_response
 
 
 def _make_result(
     operation: BrokerCapabilityId, data: object = None, error: object = None
-) -> BrokerResult:
-    return BrokerResult(
-        status="success" if error is None else "error",
+) -> StandardResponse:
+    return broker_response(
+        operation,
         broker=BrokerId.MT5,
-        operation=operation,
-        request_id=_REQ_ID,
-        timestamp=datetime.now(UTC),
         environment=BrokerEnvironment.SANDBOX,
-        adapter_version="1.0",
         data=data,
         error=error,
     )
@@ -102,10 +97,10 @@ class FakeMT5Mutations:
 
     def _result(
         self, operation: BrokerCapabilityId, data: object = None, error: object = None
-    ) -> BrokerResult:
+    ) -> StandardResponse:
         return _make_result(operation, data=data, error=error)
 
-    def _error(self, operation: BrokerCapabilityId, error: object) -> BrokerResult:
+    def _error(self, operation: BrokerCapabilityId, error: object) -> StandardResponse:
         return _make_result(operation, error=error)
 
     def _copy_prices(self, native: dict[str, object], request: object) -> None:

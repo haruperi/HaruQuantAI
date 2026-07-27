@@ -58,8 +58,8 @@ def test_subscription_unsubscribe_is_idempotent() -> None:
                 buffer_size=1,
             ),
         )
-        assert (await subscription.unsubscribe()).is_success
-        assert (await subscription.unsubscribe()).is_success
+        assert (await subscription.unsubscribe()).status == "success"
+        assert (await subscription.unsubscribe()).status == "success"
 
     asyncio.run(exercise())
 
@@ -154,6 +154,6 @@ def test_cancelling_a_consumer_never_corrupts_subscription_state() -> None:
         with contextlib.suppress(asyncio.CancelledError):
             await task
         result = await subscription.unsubscribe()
-        return result.is_success
+        return result.status == "success"
 
     assert asyncio.run(exercise())

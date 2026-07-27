@@ -10,7 +10,6 @@ from app.services.brokers.contracts import (
     BrokerEnvironment,
     BrokerPage,
     BrokerPlatformInfo,
-    BrokerResult,
     BrokerSymbolInfo,
     BrokerTick,
 )
@@ -25,6 +24,7 @@ from app.services.brokers.dukascopy_ticks.instruments import (
 )
 from app.services.brokers.dukascopy_ticks.mapping import _map_ticks
 from app.services.brokers.dukascopy_ticks.transport import _DukascopyTransport
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class _TickTransport(Protocol):
@@ -88,7 +88,7 @@ class DukascopyBrokerAdapter(_DukascopyBarsMixin, _UnsupportedAdapterBase):
         )
 
     @override
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         """Verify the provider by retrieving a bounded EURUSD hour file.
 
         Returns:
@@ -108,7 +108,7 @@ class DukascopyBrokerAdapter(_DukascopyBarsMixin, _UnsupportedAdapterBase):
         return self._result(BrokerCapabilityId.CONNECT)
 
     @override
-    async def is_connected(self) -> BrokerResult[bool]:
+    async def is_connected(self) -> StandardResponse[bool]:
         """Verify current reachability with one bounded provider hour probe.
 
         Returns:
@@ -118,7 +118,7 @@ class DukascopyBrokerAdapter(_DukascopyBarsMixin, _UnsupportedAdapterBase):
         await self._transport.get_hour("EURUSD", probe_hour)
         return self._result(BrokerCapabilityId.IS_CONNECTED, data=True)
 
-    async def ping(self) -> BrokerResult[None]:
+    async def ping(self) -> StandardResponse[None]:
         """Run the same genuine bounded provider probe.
 
         Returns:
@@ -136,7 +136,7 @@ class DukascopyBrokerAdapter(_DukascopyBarsMixin, _UnsupportedAdapterBase):
         query: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]:
+    ) -> StandardResponse[BrokerPage[BrokerSymbolInfo]]:
         """Return only fixture-verified exact provider symbols."""
         del cursor
         symbols = tuple(
@@ -151,7 +151,7 @@ class DukascopyBrokerAdapter(_DukascopyBarsMixin, _UnsupportedAdapterBase):
             data=BrokerPage(items=items, limit=max(1, bound)),
         )
 
-    async def get_symbol_info(self, symbol: str) -> BrokerResult[BrokerSymbolInfo]:
+    async def get_symbol_info(self, symbol: str) -> StandardResponse[BrokerSymbolInfo]:
         """Return structural metadata for one exact provider symbol."""
         _price_divisor(symbol)
         return self._result(
@@ -181,7 +181,7 @@ class DukascopyBrokerAdapter(_DukascopyBarsMixin, _UnsupportedAdapterBase):
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerTick]]:
+    ) -> StandardResponse[BrokerPage[BrokerTick]]:
         """Return genuine ticks from one caller-bounded provider hour file.
 
         Returns:
@@ -211,7 +211,7 @@ class DukascopyBrokerAdapter(_DukascopyBarsMixin, _UnsupportedAdapterBase):
             ),
         )
 
-    async def get_platform_info(self) -> BrokerResult[BrokerPlatformInfo]:
+    async def get_platform_info(self) -> StandardResponse[BrokerPlatformInfo]:
         """Return fixed redacted research-only provider metadata."""
         return self._result(
             BrokerCapabilityId.GET_PLATFORM_INFO,

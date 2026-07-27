@@ -37,15 +37,15 @@ def _config() -> BrokerConnectionConfig:
 def test_streaming_boundary_via_root() -> None:
     """Verify streaming boundary behavior via domain root API."""
     created = create_broker_adapter(BrokerId.BINANCE_SPOT, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         # Unreleased subscribe_quotes returns BROKER_CAPABILITY_UNSUPPORTED
         result = await adapter.subscribe_quotes((_SYMBOL,))
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
+        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
 
     asyncio.run(exercise())

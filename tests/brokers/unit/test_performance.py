@@ -17,12 +17,12 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
-    BrokerResult,
 )
 from app.services.brokers.adapter_runtime.circuit_breaker import (
     _TransportCircuitBreaker,
 )
 from app.services.brokers.yahoo_history.adapter import YahooBrokerAdapter
+from app.utils import StandardResponse
 
 
 def _config() -> BrokerConnectionConfig:
@@ -106,34 +106,41 @@ class _SlowTransport:
 def test_adapter_populates_measured_latency() -> None:
     """The adapter measures real elapsed time instead of reporting zero."""
 
-    async def exercise() -> BrokerResult[object]:
+    async def exercise() -> StandardResponse[object]:
         adapter = YahooBrokerAdapter(_config(), transport=_SlowTransport())
         adapter._state = BrokerConnectionState.READY
         return await adapter.get_historical_bars("AAPL", "1d", limit=1)
 
     result = asyncio.run(exercise())
-    assert result.is_success, result.error
-    assert result.latency_ms > 0.0
-    assert result.adapter_overhead_ms > 0.0
+    assert result.status == "success", result.error
+    assert result.metadata.execution_ms > 0.0
+    adapter_overhead_ms = result.metadata.extensions["adapter_overhead_ms"]
+    assert isinstance(adapter_overhead_ms, float)
+    assert adapter_overhead_ms > 0.0
 
 
 def test_adapter_separates_provider_latency_from_local_overhead() -> None:
     """Provider network time is reported separately from adapter overhead."""
 
-    async def exercise() -> BrokerResult[object]:
+    async def exercise() -> StandardResponse[object]:
         adapter = YahooBrokerAdapter(_config())
         adapter._transport = _SlowTransport(adapter._record_provider_latency)  # type: ignore[assignment]
         adapter._state = BrokerConnectionState.READY
         return await adapter.get_historical_bars("AAPL", "1d", limit=1)
 
     result = asyncio.run(exercise())
-    assert result.provider_latency_ms is not None
+    provider_latency_ms = result.metadata.extensions["provider_latency_ms"]
+    latency_ms = result.metadata.extensions["latency_ms"]
+    adapter_overhead_ms = result.metadata.extensions["adapter_overhead_ms"]
+    assert isinstance(provider_latency_ms, float)
+    assert isinstance(latency_ms, float)
+    assert isinstance(adapter_overhead_ms, float)
     # The provider call dominates, but the two components stay distinct and sum
     # to the measured total.
-    assert result.provider_latency_ms > 0.0
-    assert result.provider_latency_ms <= result.latency_ms
-    assert result.adapter_overhead_ms == pytest.approx(
-        result.latency_ms - result.provider_latency_ms, abs=1e-6
+    assert provider_latency_ms > 0.0
+    assert provider_latency_ms <= latency_ms
+    assert adapter_overhead_ms == pytest.approx(
+        latency_ms - provider_latency_ms, abs=1e-6
     )
 
 
@@ -150,7 +157,7 @@ def test_unsupported_operation_does_not_inherit_a_previous_measurement() -> None
         execution_model="PROVIDER_CALL",
     )
 
-    async def exercise() -> BrokerResult[object]:
+    async def exercise() -> StandardResponse[object]:
         adapter = YahooBrokerAdapter(_config(), transport=_SlowTransport())
         adapter._capabilities = capabilities
         adapter._state = BrokerConnectionState.READY
@@ -158,9 +165,9 @@ def test_unsupported_operation_does_not_inherit_a_previous_measurement() -> None
         return await adapter.get_order_book("AAPL")
 
     result = asyncio.run(exercise())
-    assert not result.is_success
-    assert result.latency_ms == 0.0
-    assert result.provider_latency_ms is None
+    assert result.status != "success"
+    assert result.metadata.execution_ms >= 0.0
+    assert result.metadata.extensions["provider_latency_ms"] is None
 
 
 def test_circuit_breaker_before_call_is_bounded_under_repeated_use() -> None:

@@ -1,4 +1,4 @@
-"""Private deterministic unsupported-result construction."""
+"""Private deterministic unsupported-response construction."""
 
 from datetime import datetime
 
@@ -8,8 +8,12 @@ from app.services.brokers.contracts.enums import (
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.contracts.models import BrokerError, BrokerResult
-from app.utils import utc_now
+from app.services.brokers.contracts.models import BrokerError
+from app.services.brokers.contracts.responses import (
+    broker_start_time,
+    build_broker_response,
+)
+from app.utils import StandardResponse, utc_now
 
 
 def _unsupported_result[T](
@@ -19,20 +23,20 @@ def _unsupported_result[T](
     operation: BrokerCapabilityId,
     request_id: str,
     adapter_version: str,
-) -> BrokerResult[T]:
+) -> StandardResponse[T]:
     """Build a redacted unsupported result without accessing a provider.
 
     Returns:
         Canonical unsupported-operation result.
     """
-    return BrokerResult(
-        status="error",
+    return build_broker_response(
         broker=broker,
         operation=operation,
         request_id=request_id,
         timestamp=utc_now(),
         environment=environment,
         adapter_version=adapter_version,
+        start_time=broker_start_time(),
         error=BrokerError(
             code=BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
             message=f"Capability {operation.value} is unavailable for {broker.value}",

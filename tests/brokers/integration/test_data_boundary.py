@@ -32,15 +32,15 @@ def _config() -> BrokerConnectionConfig:
 def test_data_boundary_via_root() -> None:
     """Verify data boundary via root API and session gating."""
     created = create_broker_adapter(BrokerId.YAHOO, _config())
-    assert created.is_success
+    assert created.status == "success"
     adapter = created.data
     assert adapter is not None
 
     async def exercise() -> None:
         # Disconnected call returns BROKER_NOT_CONNECTED
         result = await adapter.get_historical_bars(_SYMBOL, "1d", limit=1)
-        assert not result.is_success
+        assert result.status != "success"
         assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED
+        assert result.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED.value
 
     asyncio.run(exercise())

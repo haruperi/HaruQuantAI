@@ -14,7 +14,6 @@ from app.services.brokers.contracts import (
     BrokerOrderFilter,
     BrokerPage,
     BrokerPosition,
-    BrokerResult,
 )
 from app.services.brokers.contracts.protocols import (
     _RequestValidationError,
@@ -26,6 +25,7 @@ from app.services.brokers.mt5_account.mapping import (
     _map_position,
     _map_transaction,
 )
+from app.utils import StandardResponse  # noqa: TC001
 
 
 def _provider_ticket(value: str) -> int:
@@ -51,7 +51,7 @@ def _provider_ticket(value: str) -> int:
 class _MT5ExecutionHistoryMixin:
     """Private provider operations owned by this feature."""
 
-    async def get_position(self, position_id: str) -> BrokerResult[BrokerPosition]:
+    async def get_position(self, position_id: str) -> StandardResponse[BrokerPosition]:
         """Return one exact MT5 position by ticket.
 
         Args:
@@ -77,7 +77,7 @@ class _MT5ExecutionHistoryMixin:
         filter: BrokerOrderFilter | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerOrder]]:
+    ) -> StandardResponse[BrokerPage[BrokerOrder]]:
         """Return bounded current MT5 orders.
 
         Returns:
@@ -106,7 +106,7 @@ class _MT5ExecutionHistoryMixin:
             ),
         )
 
-    async def get_order(self, order_id: str) -> BrokerResult[BrokerOrder]:
+    async def get_order(self, order_id: str) -> StandardResponse[BrokerOrder]:
         """Return one active MT5 order by ticket.
 
         Args:
@@ -130,7 +130,7 @@ class _MT5ExecutionHistoryMixin:
         symbol: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerOrder]]:
+    ) -> StandardResponse[BrokerPage[BrokerOrder]]:
         """Return bounded MT5 order history for one explicit UTC range.
 
         Returns:
@@ -160,7 +160,7 @@ class _MT5ExecutionHistoryMixin:
         symbol: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerDeal]]:
+    ) -> StandardResponse[BrokerPage[BrokerDeal]]:
         """Return bounded MT5 execution deals for one explicit UTC range.
 
         Returns:
@@ -187,7 +187,7 @@ class _MT5ExecutionHistoryMixin:
             ),
         )
 
-    async def get_deal(self, deal_id: str) -> BrokerResult[BrokerDeal]:
+    async def get_deal(self, deal_id: str) -> StandardResponse[BrokerDeal]:
         """Return one MT5 deal by ticket.
 
         Args:
@@ -210,7 +210,7 @@ class _MT5ExecutionHistoryMixin:
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerAccountTransaction]]:
+    ) -> StandardResponse[BrokerPage[BrokerAccountTransaction]]:
         """Return bounded non-trade MT5 account transactions.
 
         Returns:

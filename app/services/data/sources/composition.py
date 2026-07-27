@@ -17,7 +17,6 @@ from app.services.brokers import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
-    BrokerResult,
     create_broker_adapter,
 )
 from app.services.data._settings import (
@@ -46,7 +45,7 @@ from app.services.data.sources.registry import (
     resolve_source_identity,
 )
 from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
-from app.utils import AppSettings, generate_id, logger
+from app.utils import AppSettings, StandardResponse, generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.data.time_sessions.schedule import MarketCalendar
@@ -144,7 +143,7 @@ def _run[T](operation: Coroutine[Any, Any, T], request_id: str) -> T:
 
 
 def _require_broker_result[T](
-    result: BrokerResult[T],
+    result: StandardResponse[T],
     *,
     operation: str,
     request_id: str,
@@ -497,7 +496,7 @@ class _BrokerMarketCalendar:
         """Return current provider-supplied sessions as normalized UTC windows."""
         adapter = self._session.adapter(request_id)
 
-        async def read_sessions() -> BrokerResult[Any]:
+        async def read_sessions() -> StandardResponse[Any]:
             """Resolve and call the guarded operation after session connection."""
             return await adapter.get_trading_sessions(
                 symbol=symbol,

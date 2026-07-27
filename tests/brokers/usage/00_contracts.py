@@ -37,15 +37,14 @@ from app.services.brokers import (
     BrokerPositionFilter,
     BrokerPositionModificationRequest,
     BrokerQuote,
-    BrokerResult,
     BrokerSubscriptionInfo,
     BrokerSymbolInfo,
     BrokerTick,
     BrokerTradingSession,
+    get_registered_brokers,
 )
 
 _NOW = datetime(2026, 1, 1, tzinfo=UTC)
-_REQ = "req-2f1d5a6c-8b3e-4c17-9f52-70a1c8d94e33"
 
 
 def _header(title: str) -> None:
@@ -119,16 +118,12 @@ def fr_brokers_008() -> None:
     _header(
         "FR-BRK-008: Return versioned status/broker/operation/time/data/error envelope."
     )
-    res: BrokerResult[None] = BrokerResult(
-        status="success",
-        broker=BrokerId.MT5,
-        operation=BrokerCapabilityId.CONNECT,
-        request_id=_REQ,
-        timestamp=_NOW,
-        environment=BrokerEnvironment.DEMO,
-        adapter_version="1.0.0",
+    response = get_registered_brokers()
+    print(
+        "Result:",
+        response.status == "success",
+        response.metadata.contract_version,
     )
-    print("Result:", res.is_success, res.contract_version)
 
 
 def fr_brokers_009() -> None:

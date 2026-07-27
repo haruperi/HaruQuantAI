@@ -9,12 +9,13 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerId,
     BrokerPage,
-    BrokerResult,
     BrokerTick,
 )
 from app.services.data.sources.broker_adapter import ExternalMarketDataSource
 from app.services.data.sources.contracts import SourceReadRequest
-from app.utils import generate_id
+from app.utils import StandardResponse, generate_id
+
+from tests.brokers.response_factory import broker_response
 
 
 def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
@@ -32,7 +33,7 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
             start: datetime | None,
             end: datetime | None,
             limit: int,
-        ) -> BrokerResult[BrokerPage[BrokerBar]]:
+        ) -> StandardResponse[BrokerPage[BrokerBar]]:
             del start, end
             bar = BrokerBar(
                 symbol=symbol,
@@ -51,10 +52,9 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
                 spread=Decimal(2),
                 spread_unit="points",
             )
-            return BrokerResult(
-                status="success",
+            return broker_response(
+                BrokerCapabilityId.GET_HISTORICAL_BARS,
                 broker=BrokerId.MT5,
-                operation=BrokerCapabilityId.GET_HISTORICAL_BARS,
                 request_id=generate_id("req"),
                 timestamp=retrieved,
                 environment=BrokerEnvironment.DEMO,
@@ -92,7 +92,7 @@ def test_tick_availability_tolerates_provider_clock_skew() -> None:
             start: datetime | None,
             end: datetime | None,
             limit: int,
-        ) -> BrokerResult[BrokerPage[BrokerTick]]:
+        ) -> StandardResponse[BrokerPage[BrokerTick]]:
             del start, end
             tick = BrokerTick(
                 symbol=symbol,
@@ -103,10 +103,9 @@ def test_tick_availability_tolerates_provider_clock_skew() -> None:
                 bid=Decimal("1.1"),
                 ask=Decimal("1.1002"),
             )
-            return BrokerResult(
-                status="success",
+            return broker_response(
+                BrokerCapabilityId.GET_TICKS,
                 broker=BrokerId.MT5,
-                operation=BrokerCapabilityId.GET_TICKS,
                 request_id=generate_id("req"),
                 timestamp=received_at,
                 environment=BrokerEnvironment.DEMO,

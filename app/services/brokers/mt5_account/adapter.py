@@ -21,7 +21,6 @@ from app.services.brokers.contracts import (
     BrokerPosition,
     BrokerPositionFilter,
     BrokerQuote,
-    BrokerResult,
     BrokerSymbolInfo,
     BrokerTick,
 )
@@ -41,6 +40,7 @@ from app.services.brokers.mt5_account.mapping import (
     _map_tick,
 )
 from app.services.brokers.mt5_account.transport import _MT5Transport
+from app.utils import StandardResponse  # noqa: TC001
 
 
 def _provider_ticket(value: str) -> int:
@@ -112,7 +112,7 @@ class MT5BrokerAdapter(
         )
 
     @override
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         """Connect and verify terminal, login, server, and trade evidence.
 
         Returns:
@@ -161,7 +161,7 @@ class MT5BrokerAdapter(
         return self._result(BrokerCapabilityId.CONNECT)
 
     @override
-    async def disconnect(self) -> BrokerResult[None]:
+    async def disconnect(self) -> StandardResponse[None]:
         """Idempotently release the owned terminal handle.
 
         Returns:
@@ -170,7 +170,7 @@ class MT5BrokerAdapter(
         await self._transport.close()
         return await super().disconnect()
 
-    async def ping(self) -> BrokerResult[None]:
+    async def ping(self) -> StandardResponse[None]:
         """Probe the verified terminal session.
 
         Returns:
@@ -182,7 +182,7 @@ class MT5BrokerAdapter(
         return self._result(BrokerCapabilityId.PING)
 
     @override
-    async def is_connected(self) -> BrokerResult[bool]:
+    async def is_connected(self) -> StandardResponse[bool]:
         """Verify the retained MT5 terminal and configured account identity.
 
         Returns:
@@ -206,7 +206,7 @@ class MT5BrokerAdapter(
         query: str | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerSymbolInfo]]:
+    ) -> StandardResponse[BrokerPage[BrokerSymbolInfo]]:
         """Return a caller-bounded page of exact MT5 symbols.
 
         Raises:
@@ -230,7 +230,7 @@ class MT5BrokerAdapter(
             ),
         )
 
-    async def get_symbol_info(self, symbol: str) -> BrokerResult[BrokerSymbolInfo]:
+    async def get_symbol_info(self, symbol: str) -> StandardResponse[BrokerSymbolInfo]:
         """Return direct MT5 symbol specifications."""
         value = await self._transport.call("symbol_info", symbol)
         if value is None:
@@ -242,7 +242,7 @@ class MT5BrokerAdapter(
 
     async def select_symbol(
         self, symbol: str, enabled: bool = True
-    ) -> BrokerResult[None]:
+    ) -> StandardResponse[None]:
         """Set only MT5 Market Watch selection state.
 
         Returns:
@@ -255,7 +255,7 @@ class MT5BrokerAdapter(
             )
         return self._result(BrokerCapabilityId.SELECT_SYMBOL)
 
-    async def get_quote(self, symbol: str) -> BrokerResult[BrokerQuote]:
+    async def get_quote(self, symbol: str) -> StandardResponse[BrokerQuote]:
         """Return the latest genuine MT5 quote."""
         value = await self._transport.call("symbol_info_tick", symbol)
         if value is None:
@@ -273,7 +273,7 @@ class MT5BrokerAdapter(
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerTick]]:
+    ) -> StandardResponse[BrokerPage[BrokerTick]]:
         """Return caller-bounded genuine MT5 ticks.
 
         Raises:
@@ -321,7 +321,7 @@ class MT5BrokerAdapter(
         end: datetime | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerBar]]:
+    ) -> StandardResponse[BrokerPage[BrokerBar]]:
         """Return caller-bounded genuine MT5 historical bars.
 
         Raises:
@@ -393,7 +393,7 @@ class MT5BrokerAdapter(
             ),
         )
 
-    async def get_spread(self, symbol: str) -> BrokerResult[Decimal]:
+    async def get_spread(self, symbol: str) -> StandardResponse[Decimal]:
         """Return the current genuine MT5 bid/ask spread."""
         value = await self._transport.call("symbol_info_tick", symbol)
         if value is None:
@@ -412,7 +412,7 @@ class MT5BrokerAdapter(
             data=quote.ask - quote.bid,
         )
 
-    async def get_account_info(self) -> BrokerResult[BrokerAccountInfo]:
+    async def get_account_info(self) -> StandardResponse[BrokerAccountInfo]:
         """Return direct MT5 account state."""
         value = await self._transport.call("account_info")
         if value is None:
@@ -429,7 +429,7 @@ class MT5BrokerAdapter(
         filter: BrokerPositionFilter | None = None,
         cursor: str | None = None,
         limit: int | None = None,
-    ) -> BrokerResult[BrokerPage[BrokerPosition]]:
+    ) -> StandardResponse[BrokerPage[BrokerPosition]]:
         """Return caller-bounded direct MT5 position state.
 
         Raises:
@@ -453,7 +453,7 @@ class MT5BrokerAdapter(
             ),
         )
 
-    async def get_platform_info(self) -> BrokerResult[BrokerPlatformInfo]:
+    async def get_platform_info(self) -> StandardResponse[BrokerPlatformInfo]:
         """Return redacted terminal version and environment evidence."""
         version = await self._transport.call("version")
         return self._result(
@@ -468,7 +468,7 @@ class MT5BrokerAdapter(
             ),
         )
 
-    async def get_permissions(self) -> BrokerResult[BrokerPermissions]:
+    async def get_permissions(self) -> StandardResponse[BrokerPermissions]:
         """Return permissions directly reported by MT5 account and terminal.
 
         Returns:
@@ -486,7 +486,7 @@ class MT5BrokerAdapter(
             data=_map_permissions(account, terminal),
         )
 
-    async def get_balances(self) -> BrokerResult[tuple[BrokerBalance, ...]]:
+    async def get_balances(self) -> StandardResponse[tuple[BrokerBalance, ...]]:
         """Return the provider account-currency balance.
 
         Returns:
@@ -504,7 +504,7 @@ class MT5BrokerAdapter(
         )
 
     @override
-    async def get_last_error(self) -> BrokerResult[BrokerError | None]:
+    async def get_last_error(self) -> StandardResponse[BrokerError | None]:
         """Return the latest canonical or provider-reported MT5 diagnostic.
 
         Returns:
@@ -546,7 +546,7 @@ class MT5BrokerAdapter(
 
     def _error[T](
         self, operation: BrokerCapabilityId, code: BrokerErrorCode
-    ) -> BrokerResult[T]:
+    ) -> StandardResponse[T]:
         """Handle error.
 
         Args:

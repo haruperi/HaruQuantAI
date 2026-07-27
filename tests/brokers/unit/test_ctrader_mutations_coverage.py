@@ -9,6 +9,7 @@ import pytest
 from app.services.brokers.contracts import (
     BrokerCapabilityId,
     BrokerEnvironment,
+    BrokerErrorCode,
     BrokerId,
     BrokerOrderModificationRequest,
     BrokerOrderRequest,
@@ -16,28 +17,23 @@ from app.services.brokers.contracts import (
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-    BrokerResult,
 )
 from app.services.brokers.contracts.protocols import _RequestValidationError
 from app.services.brokers.ctrader_session.adapter import (
     CTraderBrokerAdapter as _CTraderMutationsMixin,
 )
-from app.utils import generate_id
+from app.utils import StandardResponse
 
-_REQ_ID = generate_id("req")
+from tests.brokers.response_factory import broker_response
 
 
 def _make_result(
     operation: BrokerCapabilityId, data: object = None, error: object = None
-) -> BrokerResult:
-    return BrokerResult(
-        status="success" if error is None else "error",
+) -> StandardResponse:
+    return broker_response(
+        operation,
         broker=BrokerId.CTRADER,
-        operation=operation,
-        request_id=_REQ_ID,
-        timestamp=datetime.now(UTC),
         environment=BrokerEnvironment.SANDBOX,
-        adapter_version="1.0",
         data=data,
         error=error,
     )
@@ -51,6 +47,7 @@ class FakeCTraderMutations:
     modify_position = _CTraderMutationsMixin.modify_position
     close_position = _CTraderMutationsMixin.close_position
     _execution = _CTraderMutationsMixin._execution
+    _propagated_error = _CTraderMutationsMixin._propagated_error
     _copy_order_fields = staticmethod(_CTraderMutationsMixin._copy_order_fields)
 
     def __init__(self) -> None:
@@ -64,10 +61,10 @@ class FakeCTraderMutations:
 
     def _result(
         self, operation: BrokerCapabilityId, data: object = None, error: object = None
-    ) -> BrokerResult:
+    ) -> StandardResponse:
         return _make_result(operation, data=data, error=error)
 
-    def _error(self, operation: BrokerCapabilityId, error: object) -> BrokerResult:
+    def _error(self, operation: BrokerCapabilityId, error: object) -> StandardResponse:
         return _make_result(operation, error=error)
 
 
@@ -129,7 +126,8 @@ def test_check_order_margin_failure() -> None:
         )
 
         res = await provider.check_order(req)
-        assert res.error == "MARGIN_ERROR"
+        assert res.error is not None
+        assert res.error.code == BrokerErrorCode.BROKER_RESPONSE_INVALID.value
 
     asyncio.run(run_test())
 
@@ -264,7 +262,8 @@ def test_modify_position_success_and_error() -> None:
             )
         )
         res_err = await provider.modify_position(req)
-        assert res_err.error == "EXEC_ERROR"
+        assert res_err.error is not None
+        assert res_err.error.code == BrokerErrorCode.BROKER_RESPONSE_INVALID.value
 
         # Test missing position error
         provider._execution = AsyncMock(

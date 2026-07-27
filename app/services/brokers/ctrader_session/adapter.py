@@ -19,7 +19,6 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerPlatformInfo,
     BrokerQuote,
-    BrokerResult,
 )
 from app.services.brokers.contracts.protocols import (
     _UnsupportedAdapterBase,
@@ -31,6 +30,7 @@ from app.services.brokers.ctrader_session.transport import _CTraderTransport
 from app.services.brokers.execution_history.ctrader import _CTraderExecutionHistoryMixin
 from app.services.brokers.price_streams.ctrader import _CTraderPriceStreamsMixin
 from app.services.brokers.provider_calculations.ctrader import _CTraderCalculationsMixin
+from app.utils import StandardResponse  # noqa: TC001
 
 
 class CTraderBrokerAdapter(
@@ -94,7 +94,7 @@ class CTraderBrokerAdapter(
         self._publish_tasks: set[asyncio.Task[bool]] = set()
 
     @override
-    async def connect(self) -> BrokerResult[None]:
+    async def connect(self) -> StandardResponse[None]:
         """Require application/account authentication transport evidence.
 
         Returns:
@@ -130,7 +130,7 @@ class CTraderBrokerAdapter(
         return self._result(BrokerCapabilityId.CONNECT)
 
     @override
-    async def disconnect(self) -> BrokerResult[None]:
+    async def disconnect(self) -> StandardResponse[None]:
         """Release the exact owned cTrader session.
 
         Returns:
@@ -147,7 +147,7 @@ class CTraderBrokerAdapter(
         return await super().disconnect()
 
     @override
-    async def is_connected(self) -> BrokerResult[bool]:
+    async def is_connected(self) -> StandardResponse[bool]:
         """Verify current account reachability with one reconcile request.
 
         Returns:
@@ -156,7 +156,7 @@ class CTraderBrokerAdapter(
         await self._request("ProtoOAReconcileReq", "ProtoOAReconcileRes")
         return self._result(BrokerCapabilityId.IS_CONNECTED, data=True)
 
-    async def ping(self) -> BrokerResult[None]:
+    async def ping(self) -> StandardResponse[None]:
         """Verify current account reachability without mutation.
 
         Returns:
@@ -165,7 +165,7 @@ class CTraderBrokerAdapter(
         await self._request("ProtoOAReconcileReq", "ProtoOAReconcileRes")
         return self._result(BrokerCapabilityId.PING)
 
-    async def get_platform_info(self) -> BrokerResult[BrokerPlatformInfo]:
+    async def get_platform_info(self) -> StandardResponse[BrokerPlatformInfo]:
         """Return redacted endpoint/environment metadata."""
         endpoint = (
             "live.ctraderapi.com:5035"
@@ -255,7 +255,7 @@ class CTraderBrokerAdapter(
 
     def _error[T](
         self, operation: BrokerCapabilityId, code: BrokerErrorCode
-    ) -> BrokerResult[T]:
+    ) -> StandardResponse[T]:
         """Build one canonical cTrader failure result.
 
         Returns:

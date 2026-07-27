@@ -92,8 +92,10 @@ def test_registry_created_real_adapter_requires_connection_for_released_write() 
     async def exercise() -> None:
         result = await adapter.place_order(request)
         assert result.error is not None
-        assert result.error.code is BrokerErrorCode.BROKER_NOT_CONNECTED
-        assert result.error.capability is BrokerCapabilityId.PLACE_ORDER
+        assert result.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED.value
+        assert (
+            result.error.details["capability"] == BrokerCapabilityId.PLACE_ORDER.value
+        )
 
     asyncio.run(exercise())
 
@@ -155,10 +157,10 @@ def test_all_mutation_operations_fail_closed_at_public_root_boundary() -> None:
         ) -> None:
             res_place = await target_adapter.place_order(_order_request())  # type: ignore[attr-defined]
             assert res_place.error is not None
-            assert res_place.error.code is target_code
+            assert res_place.error.code == target_code.value
 
             res_cancel = await target_adapter.cancel_order("ticket-1")  # type: ignore[attr-defined]
             assert res_cancel.error is not None
-            assert res_cancel.error.code is target_code
+            assert res_cancel.error.code == target_code.value
 
         asyncio.run(exercise())
