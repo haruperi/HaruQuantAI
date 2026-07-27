@@ -249,6 +249,18 @@ flowchart LR
 
 ## 3. Workflows
 
+> **Workflow Usage Evidence**: Each active workflow has one standalone program in
+> `tests/optimization/usage/workflows/`; `run_all.py` executes them in registry order.
+
+Evidence programs:
+
+- `WF-OPT-001`: `tests/optimization/usage/workflows/wf_opt_001_package_optimization_robustness_request.py`
+- `WF-OPT-002`: `tests/optimization/usage/workflows/wf_opt_002_execute_bounded_parameter_sweep.py`
+- `WF-OPT-003`: `tests/optimization/usage/workflows/wf_opt_003_score_rank_assess_overfit_evidence.py`
+- `WF-OPT-004`: `tests/optimization/usage/workflows/wf_opt_004_run_walk_forward_validation.py`
+- `WF-OPT-005`: `tests/optimization/usage/workflows/wf_opt_005_run_monte_carlo_robustness_analysis.py`
+- `WF-OPT-006`: `tests/optimization/usage/workflows/wf_opt_006_build_persist_versioned_evidence_handoffs.py`
+
 ### Status values
 
 | Status | Meaning |
@@ -266,7 +278,7 @@ flowchart LR
 
 | Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
 |---|---|---|---|---|---|---|
-| Completed | `WF-OPT-001` | Cross-domain | Run an optimization or robustness request | UI/API typed request plus `AuthContext` | `OptimizationResult v1` or `OptimizationError` | `FR-OPT-021 → FR-OPT-024 → FR-OPT-044` |
+| Completed | `WF-OPT-001` | Cross-domain | Run an optimization or robustness request | Validated `SearchRequest`, `MonteCarloRequest`, or `ExecutionStressAnalysisRequest` | `OptimizationResult v1`, `RobustnessAnalysisResult`, or typed failure | FR-OPT-056 or FR-OPT-058 |
 | Completed | `WF-OPT-002` | Cross-domain | Execute a bounded parameter sweep | Approved `SearchRequest`, Strategy reference, Data provenance, and Simulation adapter | `SearchSummary` and candidate evidence; no trade authority | `FR-OPT-003 → FR-OPT-025 → FR-OPT-026 → FR-OPT-020 → FR-OPT-027` |
 | Completed | `WF-OPT-003` | Internal | Score, rank, and assess overfit evidence | Supplied candidate/trade evidence | Deterministically ranked candidates with DSR and caveats | `FR-OPT-010 → FR-OPT-011 → FR-OPT-012 → FR-OPT-013 → FR-OPT-015` |
 | Completed | `WF-OPT-004` | Cross-domain | Run walk-forward validation | Approved `WalkForwardRequest` and Simulation adapter | Fold, degradation, WFE, purge, and embargo evidence | `FR-OPT-032 → FR-OPT-027 → FR-OPT-020 → FR-OPT-033` |
@@ -279,18 +291,24 @@ flowchart LR
 
 **System workflow:** `SYS-WF-003`
 
-**Input boundary:** UI/API or an approved internal caller supplies typed request data and `AuthContext`.
+**Input boundary:** UI/API or an approved internal caller supplies a typed
+`SearchRequest`, `MonteCarloRequest`, or `ExecutionStressAnalysisRequest`.
 
-**Output boundary:** Optimization returns its typed result or `OptimizationError`; no trade occurs.
+**Output boundary:** Optimization returns `OptimizationResult v1`,
+`RobustnessAnalysisResult`, or a typed failure; no trade occurs.
 
 The result is advisory. UI/API may present it for explicit user selection and, after
 approval, construct the Strategy-owned `StrategyParameterUpdateRequest`. Strategy alone
 validates and persists the new immutable configuration. Optimization never submits the
 request or mutates Strategy state.
 
-1. `validate_optimization_request()` validates shape, bounds, provenance, and supported capability.
-2. The applicable public operation separates context fields from business data and defaults omitted `dry_run` to `True`.
-3. The operation serializes a deterministic package and performs no external or trading side effect.
+1. The owning Pydantic request contract validates shape, bounds, provenance, and
+   supported capability at the input boundary.
+2. `run_parameter_sweep()` executes one bounded search through the injected
+   Simulation adapter, or `run_robustness_analysis()` executes one bounded local
+   robustness request.
+3. The applicable operation returns deterministic advisory evidence and performs no
+   trading or Strategy-mutation side effect.
 
 **Failure behaviour:** Invalid input, non-JSON-safe data, missing approved limits, or unsupported behavior returns a structured `OPT_*` error; no exception crosses the public boundary.
 
@@ -951,7 +969,7 @@ maps domain results and errors to external transport responses.
 | Completed | `NFR-OPT-009` | Time | All cross-domain times and split boundaries shall be timezone-aware UTC; timeouts use a monotonic clock. | UTC and clock tests |
 | Completed | `NFR-OPT-010` | Compatibility | Breaking changes to the approved public API or `OptimizationResult v1` require a version bump. | Contract compatibility tests |
 | Completed | `NFR-OPT-011` | Persistence truth | Packaging/report functions shall never imply persistence; any public durable-success claim requires an `OptimizationPersistenceReceipt` from the injected Optimization store. | Side-effect tests |
-| Completed | `NFR-OPT-012` | Testing | Every public requirement shall have a unit test and runnable usage example; package statement coverage shall be at least 80%. | Traceability and coverage audit |
+| Completed | `NFR-OPT-012` | Testing | Every public requirement shall have a unit test and runnable usage example; every active workflow shall have one standalone README-aligned usage program; package statement coverage shall be at least 80%. | `tests/optimization/unit/test_workflow_usage_parity.py`, direct workflow runner, traceability and coverage audit |
 
 The explicit feature limits above are binding safety bounds. Other production performance targets remain informational until measured evidence supports a numeric gate.
 

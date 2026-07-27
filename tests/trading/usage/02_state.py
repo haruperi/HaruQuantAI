@@ -3,7 +3,6 @@
 Demonstrates Trading state stores, idempotency, and projections.
 """
 
-# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -131,6 +130,11 @@ class _UsageStore:
         return {}
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _request() -> TradingRequest:
     """Build one governed request for idempotency usage."""
     return TradingRequest(
@@ -193,9 +197,8 @@ def _projection(version: int = 1) -> TradingProjection:
 
 def example_state() -> None:
     """Demonstrate Trading state store, idempotency, projections, and events."""
-    print("=" * 80)
+    _header("Demonstrate Trading state store, idempotency, projections, and events.")
     print("Trading Example 2: State Store and Idempotency Reservation")
-    print("=" * 80)
 
     store = _UsageStore()
 
@@ -233,71 +236,111 @@ def example_state() -> None:
 
 def fr_trd_037() -> None:
     """FR-TRD-037: The system shall represent send attempts, receipts, fills, reconciliation transitions, and incidents as versioned, redacted events."""
+    _header(
+        "FR-TRD-037: The system shall represent send attempts, receipts, fills, reconciliation transitions, and incidents as versioned, redacted events."
+    )
     example_state()
 
 
 def fr_trd_038() -> None:
     """FR-TRD-038: The system shall expose only minimal injected operations for idempotency, append, projection reads/writes, and reconciliation evidence."""
+    _header(
+        "FR-TRD-038: The system shall expose only minimal injected operations for idempotency, append, projection reads/writes, and reconciliation evidence."
+    )
     example_state()
 
 
 def fr_trd_039() -> None:
     """FR-TRD-039: The system shall reserve a caller-supplied key against versioned canonical SHA-256 material at an injected time for the required positive retention window, reject different-material reuse, and keep stale duplicate-active work locked for reconciliation."""
+    _header(
+        "FR-TRD-039: The system shall reserve a caller-supplied key against versioned canonical SHA-256 material at an injected time for the required positive retention window, reject different-material reuse, and keep stale duplicate-active work locked for reconciliation."
+    )
     example_state()
 
 
 def fr_trd_040() -> None:
     """FR-TRD-040: The system shall apply deduplicated authority events in logical order with optimistic version checks."""
+    _header(
+        "FR-TRD-040: The system shall apply deduplicated authority events in logical order with optimistic version checks."
+    )
     example_state()
 
 
 def fr_trd_041() -> None:
     """FR-TRD-041: The system shall expose the current Trading schema version."""
+    _header("FR-TRD-041: The system shall expose the current Trading schema version.")
     example_state()
 
 
 def fr_trd_042() -> None:
     """FR-TRD-042: The system shall provide additive Trading migration definitions for execution-owned state without opening a database."""
+    _header(
+        "FR-TRD-042: The system shall provide additive Trading migration definitions for execution-owned state without opening a database."
+    )
     example_state()
 
 
 def fr_trd_051() -> None:
     """FR-TRD-051: The store shall atomically reserve one caller key against canonical material and its injected reservation/expiry timestamps, returning the existing/new/conflict decision, and shall durably bind the exact receipt and terminal completed or reconciliation-required state after receipt persistence."""
+    _header(
+        "FR-TRD-051: The store shall atomically reserve one caller key against canonical material and its injected reservation/expiry timestamps, returning the existing/new/conflict decision, and shall durably bind the exact receipt and terminal completed or reconciliation-required state after receipt persistence."
+    )
     example_state()
 
 
 def fr_trd_052() -> None:
     """FR-TRD-052: The store shall append one versioned event without rewriting prior events."""
+    _header(
+        "FR-TRD-052: The store shall append one versioned event without rewriting prior events."
+    )
     example_state()
 
 
 def fr_trd_053() -> None:
     """FR-TRD-053: The store shall load the latest projection for an exact route/tenant/authority scope."""
+    _header(
+        "FR-TRD-053: The store shall load the latest projection for an exact route/tenant/authority scope."
+    )
     example_state()
 
 
 def fr_trd_054() -> None:
     """FR-TRD-054: The store shall save a projection only when the expected optimistic version matches."""
+    _header(
+        "FR-TRD-054: The store shall save a projection only when the expected optimistic version matches."
+    )
     example_state()
 
 
 def fr_trd_055() -> None:
     """FR-TRD-055: The store shall return every unresolved send attempt for an exact authority/conflict scope."""
+    _header(
+        "FR-TRD-055: The store shall return every unresolved send attempt for an exact authority/conflict scope."
+    )
     example_state()
 
 
 def fr_trd_057() -> None:
     """FR-TRD-057: The system shall expose an immutable reservation result distinguishing new, duplicate-completed, duplicate-active, conflict, and reconciliation-required states."""
+    _header(
+        "FR-TRD-057: The system shall expose an immutable reservation result distinguishing new, duplicate-completed, duplicate-active, conflict, and reconciliation-required states."
+    )
     example_state()
 
 
 def fr_trd_058() -> None:
     """FR-TRD-058: The system shall expose a route/tenant-scoped order, position, fill, receipt, and authority projection with optimistic version."""
+    _header(
+        "FR-TRD-058: The system shall expose a route/tenant-scoped order, position, fill, receipt, and authority projection with optimistic version."
+    )
     example_state()
 
 
 def fr_trd_067() -> None:
     """FR-TRD-067: The store shall return exact stored JSON-safe report evidence for one route/tenant/authority scope without computing or enriching it."""
+    _header(
+        "FR-TRD-067: The store shall return exact stored JSON-safe report evidence for one route/tenant/authority scope without computing or enriching it."
+    )
     example_state()
 
 

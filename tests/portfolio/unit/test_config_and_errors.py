@@ -1,6 +1,5 @@
 """Unit tests for required Portfolio settings and error catalog."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 from datetime import UTC, datetime

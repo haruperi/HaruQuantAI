@@ -19,11 +19,15 @@ from tests.optimization.unit.test_adapter import FakeAdapter
 from tests.optimization.unit.test_validation_contracts import walk_forward_request
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_validation() -> None:
     """Demonstrate walk-forward validation execution and fold splitting."""
-    print("=" * 80)
+    _header("Demonstrate walk-forward validation execution and fold splitting.")
     print("Optimization Example 8: Walk-Forward Validation and Time Series Folds")
-    print("=" * 80)
 
     # 1. Split mode enum
     print(f"Split Mode: {SplitMode.ROLLING.value}")

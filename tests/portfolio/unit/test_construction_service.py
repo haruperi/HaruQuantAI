@@ -1,6 +1,5 @@
 """Unit tests for deterministic Portfolio construction publication."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 from dataclasses import replace

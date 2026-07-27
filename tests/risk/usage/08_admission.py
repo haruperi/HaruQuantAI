@@ -86,6 +86,11 @@ class _ExampleEligibilityStore:
         return True
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> RiskConfig:
     """Build a complete simulation-profile Risk configuration."""
     return RiskConfig(
@@ -200,9 +205,10 @@ def fr_risk_029() -> None:
     `StrategyOperationalEligibilityDecision v1` with scope, conditions,
     evidence/policy lineage, issue/expiry, and suspension semantics, then append
     its Risk audit record; never mutate Strategy state."""
-    print("=" * 80)
+    _header(
+        "FR-RISK-029: Validate a public Strategy `ValidatedStrategyRef` against the exact request, produce and atomically persist `StrategyOperationalEligibilityDecision v1` with scope, conditions, evidence/policy lineage, issue/expiry, and suspension semantics, then append its Risk audit record; never mutate Strategy state."
+    )
     print("Risk Example 8: Strategy Operational Eligibility")
-    print("=" * 80)
 
     config = _config()
     store = _ExampleEligibilityStore()

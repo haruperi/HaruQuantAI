@@ -39,103 +39,128 @@ _CORRELATION = "cor-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
 _WORKFLOW = "wf-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_001() -> None:
     """Demonstrate the supported Strategy environment."""
+    _header("Demonstrate the supported Strategy environment.")
     assert StrategyEnvironment.RESEARCH.value == "RESEARCH"
 
 
 def fr_str_002() -> None:
     """Demonstrate the explicit timing policy."""
+    _header("Demonstrate the explicit timing policy.")
     assert StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE.value
 
 
 def fr_str_003() -> None:
     """Demonstrate lifecycle eligibility states."""
+    _header("Demonstrate lifecycle eligibility states.")
     assert StrategyLifecycleStatus.APPROVED is not StrategyLifecycleStatus.REVOKED
 
 
 def fr_str_004() -> None:
     """Demonstrate exact Strategy reference construction."""
+    _header("Demonstrate exact Strategy reference construction.")
     assert StrategyRef.model_fields["exact_version"]
 
 
 def fr_str_005() -> None:
     """Demonstrate validated reference construction."""
+    _header("Demonstrate validated reference construction.")
     assert ValidatedStrategyRef.model_fields["registry_record_hash"]
 
 
 def fr_str_006() -> None:
     """Demonstrate declarative Strategy configuration."""
+    _header("Demonstrate declarative Strategy configuration.")
     assert StrategyConfig.model_fields["parameters"]
 
 
 def fr_str_007() -> None:
     """Demonstrate validated configuration identity."""
+    _header("Demonstrate validated configuration identity.")
     assert ValidatedStrategyConfig.model_fields["config_hash"]
 
 
 def fr_str_008() -> None:
     """Demonstrate the complete Strategy manifest."""
+    _header("Demonstrate the complete Strategy manifest.")
     assert StrategyManifest.model_fields["max_batch_records"]
 
 
 def fr_str_009() -> None:
     """Demonstrate the registration request contract."""
+    _header("Demonstrate the registration request contract.")
     assert StrategyRegistrationRequest.model_fields["authorization_ref"]
 
 
 def fr_str_010() -> None:
     """Demonstrate the parameter-update request contract."""
+    _header("Demonstrate the parameter-update request contract.")
     assert StrategyParameterUpdateRequest.model_fields["parameters"]
 
 
 def fr_str_011() -> None:
     """Demonstrate fixed execution context."""
+    _header("Demonstrate fixed execution context.")
     assert StrategyExecutionContext.model_fields["decision_timestamp"]
 
 
 def fr_str_012() -> None:
     """Demonstrate typed Strategy event evidence."""
+    _header("Demonstrate typed Strategy event evidence.")
     assert StrategyEvent.model_fields["source_checksum"]
 
 
 def fr_str_013() -> None:
     """Demonstrate neutral and proposal decisions."""
+    _header("Demonstrate neutral and proposal decisions.")
     assert StrategyDecision.model_fields["action"]
 
 
 def fr_str_014() -> None:
     """Demonstrate the closed atomic execution result."""
+    _header("Demonstrate the closed atomic execution result.")
     assert StrategyExecutionResult.model_fields["replay_manifest"]
 
 
 def fr_str_015() -> None:
     """Demonstrate structured Strategy errors."""
+    _header("Demonstrate structured Strategy errors.")
     assert StrategyError.model_fields["code"]
 
 
 def fr_str_016() -> None:
     """Demonstrate exclusive Strategy outcomes."""
+    _header("Demonstrate exclusive Strategy outcomes.")
     assert StrategyOutcome.model_fields["status"]
 
 
 def fr_str_017() -> None:
     """Demonstrate immutable mutation truth."""
+    _header("Demonstrate immutable mutation truth.")
     assert StrategyMutationResult.model_fields["mutation_id"]
 
 
 def fr_str_035() -> None:
     """Demonstrate explicit host validation policy."""
+    _header("Demonstrate explicit host validation policy.")
     assert StrategyValidationPolicy.model_fields["policy_version"]
 
 
 def fr_str_038() -> None:
     """Demonstrate immutable concrete signal output."""
+    _header("Demonstrate immutable concrete signal output.")
     assert StrategySignal.model_fields["signal_id"]
 
 
 def fr_str_039() -> None:
     """Demonstrate immutable point-in-time signal evidence."""
+    _header("Demonstrate immutable point-in-time signal evidence.")
     assert StrategySignalEvidence.model_fields["primary_market"]
 
 
@@ -175,7 +200,6 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     now = datetime.now(UTC)
     _demonstrate_requirement_contracts()
     print("\nSTRATEGY CONTRACTS")
-    print("=" * 88)
 
     print("\n-- Enumerations --")
     print("Environment:", StrategyEnvironment.RESEARCH.value)

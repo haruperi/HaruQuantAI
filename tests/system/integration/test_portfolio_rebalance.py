@@ -18,7 +18,7 @@ active_allocation = portfolio_fixtures.active_allocation
 construction_result = portfolio_fixtures.construction_result
 portfolio_settings = portfolio_fixtures.portfolio_settings
 portfolio_now = portfolio_fixtures.portfolio_now
-run_rebalance_chain = rebalance_workflow.test_rebalance_chain_preserves_risk_trading_and_analytics_ownership  # noqa: E501
+run_rebalance_chain = rebalance_workflow.test_rebalance_chain_preserves_risk_trading_and_analytics_ownership
 
 
 @pytest.fixture

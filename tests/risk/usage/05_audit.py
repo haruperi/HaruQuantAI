@@ -47,11 +47,15 @@ class _ExampleStore:
         return tuple(self.records)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_audit() -> None:
     """Demonstrate Risk audit chain hashing and appending."""
-    print("=" * 80)
+    _header("Demonstrate Risk audit chain hashing and appending.")
     print("Risk Example 6: Tamper-Evident Audit Chain")
-    print("=" * 80)
 
     config = RiskConfig(
         profile="research",
@@ -111,6 +115,9 @@ def _demonstrate_once() -> None:
 def fr_risk_032() -> None:
     """FR-RISK-032: Own injected canonical serializer, clock, storage port, and
     deterministic chain configuration without owning database infrastructure."""
+    _header(
+        "FR-RISK-032: Own injected canonical serializer, clock, storage port, and deterministic chain configuration without owning database infrastructure."
+    )
     _demonstrate_once()
 
 
@@ -118,12 +125,18 @@ def fr_risk_033() -> None:
     """FR-RISK-033: Accept only an unsealed record, redact, canonicalize, assign
     sequence/previous hash, calculate the record hash, and durably append the
     resulting sealed record with previous-hash continuity."""
+    _header(
+        "FR-RISK-033: Accept only an unsealed record, redact, canonicalize, assign sequence/previous hash, calculate the record hash, and durably append the resulting sealed record with previous-hash continuity."
+    )
     _demonstrate_once()
 
 
 def fr_risk_034() -> None:
     """FR-RISK-034: Verify genesis, sequence, previous hash, and record hash;
     identify tamper deterministically."""
+    _header(
+        "FR-RISK-034: Verify genesis, sequence, previous hash, and record hash; identify tamper deterministically."
+    )
     _demonstrate_once()
 
 

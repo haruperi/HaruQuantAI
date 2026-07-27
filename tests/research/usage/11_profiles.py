@@ -32,6 +32,11 @@ from tests.research._support import make_dataset, make_edge_lab_config
 _HASH = "e" * 64
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _metric_profile() -> CoreMetricProfile:
     """Build a seven-family metric profile with canonical families."""
     metrics = {
@@ -106,15 +111,15 @@ def _report() -> ResearchReport:
 
 def fr_res_089() -> None:
     """FR-RES-089: Build deterministic score rows, final score, and readiness."""
-    print("=" * 80)
+    _header("FR-RES-089: Build deterministic score rows, final score, and readiness.")
     print("Research Example 11: Profiles, Snapshots, and Rendering")
-    print("=" * 80)
     scorecard = _scorecard()
     print(f"FR-RES-089 readiness={scorecard.readiness} score={scorecard.final_score}")
 
 
 def fr_res_090() -> None:
     """FR-RES-090: Build one canonical versioned snapshot from stage outputs."""
+    _header("FR-RES-090: Build one canonical versioned snapshot from stage outputs.")
     snapshot = build_research_profile_snapshot(
         stages={"data": {"schema_version": "v1", "rows": 10}},
         scorecard=_scorecard(),
@@ -126,6 +131,7 @@ def fr_res_090() -> None:
 
 def fr_res_091() -> None:
     """FR-RES-091: Return concise observation/uncertainty/readiness summary."""
+    _header("FR-RES-091: Return concise observation/uncertainty/readiness summary.")
     snapshot = build_research_profile_snapshot(
         stages={"data": {"schema_version": "v1"}},
         scorecard=_scorecard(),
@@ -138,6 +144,7 @@ def fr_res_091() -> None:
 
 def fr_res_092() -> None:
     """FR-RES-092: Return bounded UI-ready dashboard block."""
+    _header("FR-RES-092: Return bounded UI-ready dashboard block.")
     snapshot = build_research_profile_snapshot(
         stages={"data": {"schema_version": "v1"}},
         scorecard=_scorecard(),
@@ -150,12 +157,14 @@ def fr_res_092() -> None:
 
 def fr_res_093() -> None:
     """FR-RES-093: Render a report as JSON or Markdown with no I/O."""
+    _header("FR-RES-093: Render a report as JSON or Markdown with no I/O.")
     result = render_research_report(_report(), format="markdown")
     print(f"FR-RES-093 markdown_len={len(result)}")
 
 
 def fr_res_094() -> None:
     """FR-RES-094: Render a Markdown comparison of two snapshots."""
+    _header("FR-RES-094: Render a Markdown comparison of two snapshots.")
     snapshot = build_research_profile_snapshot(
         stages={"data": {"schema_version": "v1"}},
         scorecard=_scorecard(),
@@ -168,6 +177,7 @@ def fr_res_094() -> None:
 
 def fr_res_095() -> None:
     """FR-RES-095: Render per-symbol and combined advisory summaries."""
+    _header("FR-RES-095: Render per-symbol and combined advisory summaries.")
     report = _report()
     result = generate_multi_symbol_report({"EURUSD": report}, format="json")
     print(f"FR-RES-095 symbols={result['symbol_count']}")
@@ -175,6 +185,7 @@ def fr_res_095() -> None:
 
 def fr_res_096() -> None:
     """FR-RES-096: Run selected deterministic stages into one advisory report."""
+    _header("FR-RES-096: Run selected deterministic stages into one advisory report.")
     config = make_edge_lab_config(
         (Path.cwd() / ".research-usage-artifacts").resolve(),
         selected_stages=("data", "metrics"),

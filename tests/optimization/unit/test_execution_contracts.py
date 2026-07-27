@@ -1,6 +1,5 @@
 """Tests for Optimization execution contracts."""
 
-# ruff: noqa: INP001
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
@@ -12,6 +11,7 @@ from app.services.optimization.execution import (
     EngineOptimizationResult,
 )
 from pydantic import ValidationError
+
 from tests.analytics._support import _report
 
 

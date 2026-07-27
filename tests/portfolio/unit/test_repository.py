@@ -1,6 +1,5 @@
 """Unit tests for Portfolio injected-store persistence semantics."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 import inspect

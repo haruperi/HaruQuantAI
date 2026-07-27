@@ -16,6 +16,11 @@ from app.services.risk import PortfolioRiskSnapshot, RiskConfig, generate_risk_r
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _snapshot() -> PortfolioRiskSnapshot:
     """Build immutable snapshot input."""
     return PortfolioRiskSnapshot(
@@ -55,9 +60,10 @@ def fr_risk_046() -> None:
     claim live approval without valid decision/token evidence. Active config and
     explicit time are required so format/timeout policy and generated time are
     deterministic."""
-    print("=" * 80)
+    _header(
+        "FR-RISK-046: Render evidence, calculations, assumptions, warnings, decision, and recommendations separately; show primary failure first; never claim live approval without valid decision/token evidence. Active config and explicit time are required so format/timeout policy and generated time are deterministic."
+    )
     print("Risk Example 11: Risk Reporting")
-    print("=" * 80)
 
     config = RiskConfig(
         profile="research",

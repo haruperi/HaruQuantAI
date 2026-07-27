@@ -1,43 +1,48 @@
-"""FEAT-BRK-08: cTrader mutation capabilities."""
+"""FEAT-BRK-08: cTrader calculation and mutation release boundaries."""
 
 import asyncio
 from decimal import Decimal
 
 import _support  # noqa: F401
-from _support import config
+from _support import real_session, require_error, require_success
 from app.services.brokers import (
+    BrokerAdapter,
     BrokerErrorCode,
     BrokerId,
     BrokerMarginRequest,
     BrokerProfitRequest,
-    create_broker_adapter,
+    get_broker_capability_catalogue,
+    get_registered_brokers,
 )
 
 
-def fr_brokers_098() -> None:
-    """FR-BRK-098: Request provider-native margin calculation."""
-    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
-    assert adapter is not None
-    req = BrokerMarginRequest(
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+async def fr_brokers_098(adapter: BrokerAdapter) -> None:
+    """FR-BRK-098: Request a provider-native margin calculation."""
+    _header("FR-BRK-098: Request a provider-native margin calculation.")
+    request = BrokerMarginRequest(
         symbol="EURUSD",
         side="BUY",
         quantity=Decimal("1.0"),
         quantity_unit="lots",
+        price=Decimal("1.10"),
         product_profile="ctrader",
     )
+    require_error(
+        "Result",
+        await adapter.calculate_margin(request),
+        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+    )
 
-    async def run() -> None:
-        res = await adapter.calculate_margin(req)
-        print("FR-BRK-098:", res.status)
 
-    asyncio.run(run())
-
-
-def fr_brokers_099() -> None:
-    """FR-BRK-099: Request provider-native profit calculation."""
-    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
-    assert adapter is not None
-    req = BrokerProfitRequest(
+async def fr_brokers_099(adapter: BrokerAdapter) -> None:
+    """FR-BRK-099: Request a provider-native profit calculation."""
+    _header("FR-BRK-099: Request a provider-native profit calculation.")
+    request = BrokerProfitRequest(
         symbol="EURUSD",
         side="BUY",
         quantity=Decimal("1.0"),
@@ -46,71 +51,72 @@ def fr_brokers_099() -> None:
         close_price=Decimal("1.11"),
         product_profile="ctrader",
     )
-
-    async def run() -> None:
-        res = await adapter.calculate_profit(req)
-        print("FR-BRK-099:", res.status)
-
-    asyncio.run(run())
-
-
-def fr_brokers_100() -> None:
-    """FR-BRK-100: Request provider-native commission estimate."""
-    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_commission_estimate("EURUSD", Decimal("1.0"))
-        print("FR-BRK-100:", res.status)
-
-    asyncio.run(run())
+    require_error(
+        "Result",
+        await adapter.calculate_profit(request),
+        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+    )
 
 
-def fr_brokers_101() -> None:
-    """FR-BRK-101: Resolve explicit broker adapter profile."""
-    created = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER))
-    print("FR-BRK-101:", created.status)
+async def fr_brokers_100(adapter: BrokerAdapter) -> None:
+    """FR-BRK-100: Request a provider-native commission estimate."""
+    _header("FR-BRK-100: Request a provider-native commission estimate.")
+    require_error(
+        "Result",
+        await adapter.get_commission_estimate("EURUSD", Decimal("1.0")),
+        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+    )
 
 
-def fr_brokers_102() -> None:
-    """FR-BRK-102: List registered brokers without SDK import."""
-    from app.services.brokers import get_registered_brokers
+async def fr_brokers_101(adapter: BrokerAdapter) -> None:
+    """FR-BRK-101: Resolve an explicit cTrader adapter profile."""
+    _header("FR-BRK-101: Resolve an explicit cTrader adapter profile.")
+    require_success("Result", await adapter.get_connection_status())
 
+
+async def fr_brokers_102(adapter: BrokerAdapter) -> None:
+    """FR-BRK-102: List registered brokers without importing all SDKs."""
+    del adapter
+    _header("FR-BRK-102: List registered brokers without importing all SDKs.")
     brokers = get_registered_brokers()
-    print("FR-BRK-102:", len(brokers))
+    print("Result", len(brokers))
+    assert BrokerId.CTRADER in brokers
 
 
-def fr_brokers_103() -> None:
-    """FR-BRK-103: Expose complete static capability catalogue."""
-    from app.services.brokers import get_broker_capability_catalogue
+async def fr_brokers_103(adapter: BrokerAdapter) -> None:
+    """FR-BRK-103: Expose the complete static capability catalogue."""
+    del adapter
+    _header("FR-BRK-103: Expose the complete static capability catalogue.")
+    catalogue = get_broker_capability_catalogue()
+    print("Result", len(catalogue))
+    assert BrokerId.CTRADER in catalogue
 
-    cat = get_broker_capability_catalogue()
-    print("FR-BRK-103:", len(cat))
 
-
-def fr_brokers_104() -> None:
+async def fr_brokers_104(adapter: BrokerAdapter) -> None:
     """FR-BRK-104: Block unreleased cTrader write operations."""
-    adapter = create_broker_adapter(BrokerId.CTRADER, config(BrokerId.CTRADER)).data
-    assert adapter is not None
+    _header("FR-BRK-104: Block unreleased cTrader write operations.")
+    require_error(
+        "Result",
+        await adapter.cancel_order("o1"),
+        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+    )
 
-    async def run() -> None:
-        res = await adapter.cancel_order("o1")
-        assert res.error is not None
-        assert res.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED
-        print("FR-BRK-104: write blocked")
 
-    asyncio.run(run())
+async def _run() -> None:
+    """Execute release evidence in one genuine cTrader demo session."""
+    async with real_session(BrokerId.CTRADER) as adapter:
+        await fr_brokers_098(adapter)
+        await fr_brokers_099(adapter)
+        await fr_brokers_100(adapter)
+        await fr_brokers_101(adapter)
+        await fr_brokers_102(adapter)
+        await fr_brokers_103(adapter)
+        await fr_brokers_104(adapter)
 
 
 def main() -> None:
-    """Execute every FR-BRK-098..104 usage function."""
-    fr_brokers_098()
-    fr_brokers_099()
-    fr_brokers_100()
-    fr_brokers_101()
-    fr_brokers_102()
-    fr_brokers_103()
-    fr_brokers_104()
+    """Run the standalone genuine cTrader release-boundary program."""
+    asyncio.run(_run())
 
 
 if __name__ == "__main__":

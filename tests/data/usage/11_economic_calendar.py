@@ -287,62 +287,74 @@ def _demonstrate_normalized_once() -> None:
 
 
 def fr_data_095() -> None:
-    "FR-DATA-095: Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`."  # noqa: E501 - exact specification text
+    _header("fr_data_095")
+    "FR-DATA-095: Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`."
     _demonstrate_once()
 
 
 def fr_data_096() -> None:
-    "FR-DATA-096: Clean and validate raw calendar data into structured records (representing title, country, impact, actual, forecast, previous, and timestamp), filtering duplicates and bad values."  # noqa: E501 - exact specification text
+    _header("fr_data_096")
+    "FR-DATA-096: Clean and validate raw calendar data into structured records (representing title, country, impact, actual, forecast, previous, and timestamp), filtering duplicates and bad values."
     _demonstrate_once()
 
 
 def fr_data_097() -> None:
-    "FR-DATA-097: Return scraped datasets as a pandas DataFrame via a clean encapsulation `ScrapeResult`."  # noqa: E501 - exact specification text
+    _header("fr_data_097")
+    "FR-DATA-097: Return scraped datasets as a pandas DataFrame via a clean encapsulation `ScrapeResult`."
     _demonstrate_once()
 
 
 def fr_data_098() -> None:
-    "FR-DATA-098: Automatically save non-empty calendar dataframes using descriptive file names that include the site name, date range, and scrape timestamp; empty dataframes are skipped."  # noqa: E501 - exact specification text
+    _header("fr_data_098")
+    "FR-DATA-098: Automatically save non-empty calendar dataframes using descriptive file names that include the site name, date range, and scrape timestamp; empty dataframes are skipped."
     _demonstrate_once()
 
 
 def fr_data_099() -> None:
-    "FR-DATA-099: Support serialization and deserialization of `ScrapeResult` using python's `pickle` module for easy persistence and transport."  # noqa: E501 - exact specification text
+    _header("fr_data_099")
+    "FR-DATA-099: Support serialization and deserialization of `ScrapeResult` using python's `pickle` module for easy persistence and transport."
     _demonstrate_once()
 
 
 def fr_data_123() -> None:
     """FR-DATA-123: Preserve normalized and raw economic-event values."""
+    _header("FR-DATA-123: Preserve normalized and raw economic-event values.")
     _demonstrate_normalized_once()
 
 
 def fr_data_124() -> None:
     """FR-DATA-124: Retrieve events through a provider-neutral protocol."""
+    _header("FR-DATA-124: Retrieve events through a provider-neutral protocol.")
     _demonstrate_normalized_once()
 
 
 def fr_data_125() -> None:
     """FR-DATA-125: Resolve canonical symbol-event relevance profiles."""
+    _header("FR-DATA-125: Resolve canonical symbol-event relevance profiles.")
     _demonstrate_normalized_once()
 
 
 def fr_data_126() -> None:
     """FR-DATA-126: Retrieve general and symbol-scoped normalized events."""
+    _header("FR-DATA-126: Retrieve general and symbol-scoped normalized events.")
     _demonstrate_normalized_once()
 
 
 def fr_data_127() -> None:
     """FR-DATA-127: Evaluate symmetric high-impact news blackout windows."""
+    _header("FR-DATA-127: Evaluate symmetric high-impact news blackout windows.")
     _demonstrate_normalized_once()
 
 
 def fr_data_128() -> None:
     """FR-DATA-128: Upsert, query, and plan refreshes for economic events."""
+    _header("FR-DATA-128: Upsert, query, and plan refreshes for economic events.")
     _demonstrate_normalized_once()
 
 
 def fr_data_129() -> None:
     """FR-DATA-129: Populate Risk-ready market-context calendar evidence."""
+    _header("FR-DATA-129: Populate Risk-ready market-context calendar evidence.")
     _demonstrate_normalized_once()
 
 

@@ -141,10 +141,11 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 # Rules to ignore only within test environments
-"test_*.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
-"*_test.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
-"conftest.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN"]
-"tests/*/usage/**/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001"]
+"test_*.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "E501"]
+"*_test.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "E501"]
+"conftest.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "E501"]
+"tests/*/usage/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001", "E501"]
+"tests/*/usage/**/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001", "E501"]
 "tests/research/**/*.py" = ["INP001"]
 "app/services/data/**/*.py" = ["DOC201", "DOC501"]
 "app/utils/logging/__init__.py" = ["A005"]
@@ -177,6 +178,9 @@ pythonpath = ["."]
 python_files = [
     "test_*.py",
     "*_test.py",
+]
+filterwarnings = [
+    "ignore:.*utcfromtimestamp.*",
 ]
 addopts = [
     "--import-mode=importlib",

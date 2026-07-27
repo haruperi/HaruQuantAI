@@ -24,4 +24,7 @@ def test_brokers_readme_has_one_reconciled_partial_registry() -> None:
         assert Path(usage).is_file()
     assert "aggregates midpoint bars locally" not in readme
     assert "without a probe" not in readme
+    assert "offline transport" not in readme
+    assert "reject live environments" in readme
+    assert re.search(r"never\s+transmit broker mutations", readme)
     assert "- [x]" not in readme

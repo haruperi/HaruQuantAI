@@ -33,28 +33,38 @@ _CORRELATION = "cor-66666666-6666-4666-8666-666666666666"
 _STRATEGY = "usage-naive-ma-trend"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_020() -> None:
     """Demonstrate immutable version registration."""
+    _header("Demonstrate immutable version registration.")
     assert callable(register_strategy_version)
 
 
 def fr_str_021() -> None:
     """Demonstrate immutable parameter-version recording."""
+    _header("Demonstrate immutable parameter-version recording.")
     assert callable(update_strategy_parameters)
 
 
 def fr_str_022() -> None:
     """Demonstrate deterministic registry listing."""
+    _header("Demonstrate deterministic registry listing.")
     assert callable(list_strategy_versions)
 
 
 def fr_str_023() -> None:
     """Demonstrate exact registry reference resolution."""
+    _header("Demonstrate exact registry reference resolution.")
     assert callable(validate_strategy_ref)
 
 
 def fr_str_024() -> None:
     """Demonstrate declarative configuration validation."""
+    _header("Demonstrate declarative configuration validation.")
     assert callable(validate_strategy_config)
 
 
@@ -130,7 +140,6 @@ def main() -> int:  # noqa: PLR0911
         ``0`` on success, or ``3`` when the configured Strategy store is closed.
     """
     print("\nGOVERNED STRATEGY REGISTRY LIFECYCLE")
-    print("=" * 88)
     _demonstrate_registry_requirements()
     if os.getenv("RUN_STRATEGY_STATEFUL_USAGE") != "1":
         print(

@@ -1,1 +1,1 @@
-"""Data domain tests."""
+"""Data tests package."""

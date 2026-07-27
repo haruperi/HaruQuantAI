@@ -1,1 +1,1 @@
-"""Strategy domain tests and runnable usage evidence."""
+"""Strategy tests package."""

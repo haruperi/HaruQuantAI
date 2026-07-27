@@ -16,6 +16,11 @@ from app.services.indicators import (
 _CACHE: dict[str, MarketDataset] = {}
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _dataset(timeframe: str) -> MarketDataset:
     """Return one cached real read-only market dataset.
 
@@ -39,27 +44,39 @@ def _dataset(timeframe: str) -> MarketDataset:
 
 
 def fr_indi_018() -> None:
-    """FR-INDI-018: The system shall calculate non-negative ATR for one validated `MarketDataset v1` using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation."""  # noqa: E501 - exact specification text
+    """FR-INDI-018: The system shall calculate non-negative ATR for one validated `MarketDataset v1` using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation."""
+    _header(
+        "FR-INDI-018: The system shall calculate non-negative ATR for one validated `MarketDataset v1` using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation."
+    )
     result = atr(_dataset("M5"), period=2)
-    print("FR-INDI-018", result.values["atr_2"].tolist())
+    print("Result:", result.values["atr_2"].tolist())
 
 
 def fr_indi_019() -> None:
-    """FR-INDI-019: The system shall calculate ADR for one validated D1 `MarketDataset v1` as the inclusive rolling mean of `high-low`, perform no timeframe aggregation, preserve warmup rows, and return deterministic availability and manifest metadata."""  # noqa: E501 - exact specification text
+    """FR-INDI-019: The system shall calculate ADR for one validated D1 `MarketDataset v1` as the inclusive rolling mean of `high-low`, perform no timeframe aggregation, preserve warmup rows, and return deterministic availability and manifest metadata."""
+    _header(
+        "FR-INDI-019: The system shall calculate ADR for one validated D1 `MarketDataset v1` as the inclusive rolling mean of `high-low`, perform no timeframe aggregation, preserve warmup rows, and return deterministic availability and manifest metadata."
+    )
     result = adr(_dataset("D1"), period=2)
-    print("FR-INDI-019", result.values["adr_2"].tolist())
+    print("Result:", result.values["adr_2"].tolist())
 
 
 def fr_indi_020() -> None:
-    """FR-INDI-020: The system shall calculate rolling volatility for one validated `MarketDataset v1` from `period` log returns using `ddof=1` and annualization 252, return the exact source-qualified output, treat constant prices as zero volatility, and return causal metadata."""  # noqa: E501 - exact specification text
+    """FR-INDI-020: The system shall calculate rolling volatility for one validated `MarketDataset v1` from `period` log returns using `ddof=1` and annualization 252, return the exact source-qualified output, treat constant prices as zero volatility, and return causal metadata."""
+    _header(
+        "FR-INDI-020: The system shall calculate rolling volatility for one validated `MarketDataset v1` from `period` log returns using `ddof=1` and annualization 252, return the exact source-qualified output, treat constant prices as zero volatility, and return causal metadata."
+    )
     result = rolling_volatility(_dataset("M5"), period=2)
-    print("FR-INDI-020", result.values["rolling_volatility_2"].tolist())
+    print("Result:", result.values["rolling_volatility_2"].tolist())
 
 
 def fr_indi_026() -> None:
-    """FR-INDI-026: The system shall calculate rolling sample standard deviation (`ddof=1`) for one validated `MarketDataset v1` over the selected price, return the exact source-qualified output, treat constant prices as zero, and expose causal metadata."""  # noqa: E501 - exact specification text
+    """FR-INDI-026: The system shall calculate rolling sample standard deviation (`ddof=1`) for one validated `MarketDataset v1` over the selected price, return the exact source-qualified output, treat constant prices as zero, and expose causal metadata."""
+    _header(
+        "FR-INDI-026: The system shall calculate rolling sample standard deviation (`ddof=1`) for one validated `MarketDataset v1` over the selected price, return the exact source-qualified output, treat constant prices as zero, and expose causal metadata."
+    )
     result = standard_deviation(_dataset("M5"), period=2)
-    print("FR-INDI-026", result.values["standard_deviation_2"].tolist())
+    print("Result:", result.values["standard_deviation_2"].tolist())
 
 
 def main() -> None:

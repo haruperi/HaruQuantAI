@@ -1084,6 +1084,11 @@ uv run mypy app
   bounded, secret-safe data or genuine runtime state. Usage programs define
   `main()`, use a main guard, remain excluded from pytest collection, and are run
   directly with Python.
+- Domain workflow evidence is additional to feature usage evidence. Every active
+  `WF-[DOM]-NNN` has exactly one standalone, stage-labelled program under
+  `tests/[domain]/usage/workflows/`, while retired workflows have none. Each domain
+  provides `tests/[domain]/usage/workflows/run_all.py` to execute its complete
+  active workflow inventory directly.
 - System integration tests verify collaboration across domains; every `SYS-WF-*` workflow must have at least one.
 - Shared contracts must have producer–consumer compatibility tests when needed.
 

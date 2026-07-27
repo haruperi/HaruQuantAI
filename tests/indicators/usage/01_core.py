@@ -25,15 +25,8 @@ _CACHE: dict[str, MarketDataset] = {}
 
 
 def _header(title: str) -> None:
-    """Print one bounded example heading.
-
-    Args:
-        title: Heading text.
-
-    Returns:
-        None.
-    """
-    print(f"\n=== {title} ===")
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _config() -> IndicatorConfig:
@@ -105,14 +98,18 @@ class _DemoCalculator:
 
 
 def fr_indi_001() -> None:
-    """FR-INDI-001: The system shall expose exactly the approved Core MVP codes: `IND_INVALID_CONFIG`, `IND_INVALID_PARAMETER`, `IND_UNSUPPORTED_INDICATOR`, `IND_UNSUPPORTED_TIMEFRAME`, `IND_UNSUPPORTED_DTYPE`, `IND_INVALID_INPUT_SCHEMA`, `IND_MISSING_REQUIRED_COLUMN`, `IND_INVALID_OUTPUT_COLUMN`, `IND_OUTPUT_COLUMN_CONFLICT`, `IND_INVALID_OUTPUT_MODE`, `IND_INPUT_MUTATION_DETECTED`, `IND_DUPLICATE_TIMESTAMP`, `IND_NON_MONOTONIC_TIME`, `IND_AMBIGUOUS_TIMESTAMP`, `IND_INVALID_TIMEZONE`, `IND_INVALID_OHLC`, `IND_INSUFFICIENT_DATA`, `IND_LOOKAHEAD_RISK`, `IND_FORMULA_VERSION_MISMATCH`, `IND_RESOURCE_LIMIT_EXCEEDED`, `IND_PARTIAL_RESULT`, and `IND_INTERNAL_ERROR`."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-001 error catalogue")
+    """FR-INDI-001: The system shall expose exactly the approved Core MVP codes: `IND_INVALID_CONFIG`, `IND_INVALID_PARAMETER`, `IND_UNSUPPORTED_INDICATOR`, `IND_UNSUPPORTED_TIMEFRAME`, `IND_UNSUPPORTED_DTYPE`, `IND_INVALID_INPUT_SCHEMA`, `IND_MISSING_REQUIRED_COLUMN`, `IND_INVALID_OUTPUT_COLUMN`, `IND_OUTPUT_COLUMN_CONFLICT`, `IND_INVALID_OUTPUT_MODE`, `IND_INPUT_MUTATION_DETECTED`, `IND_DUPLICATE_TIMESTAMP`, `IND_NON_MONOTONIC_TIME`, `IND_AMBIGUOUS_TIMESTAMP`, `IND_INVALID_TIMEZONE`, `IND_INVALID_OHLC`, `IND_INSUFFICIENT_DATA`, `IND_LOOKAHEAD_RISK`, `IND_FORMULA_VERSION_MISMATCH`, `IND_RESOURCE_LIMIT_EXCEEDED`, `IND_PARTIAL_RESULT`, and `IND_INTERNAL_ERROR`."""
+    _header(
+        "FR-INDI-001: The system shall expose exactly the approved Core MVP codes: `IND_INVALID_CONFIG`, `IND_INVALID_PARAMETER`, `IND_UNSUPPORTED_INDICATOR`, `IND_UNSUPPORTED_TIMEFRAME`, `IND_UNSUPPORTED_DTYPE`, `IND_INVALID_INPUT_SCHEMA`, `IND_MISSING_REQUIRED_COLUMN`, `IND_INVALID_OUTPUT_COLUMN`, `IND_OUTPUT_COLUMN_CONFLICT`, `IND_INVALID_OUTPUT_MODE`, `IND_INPUT_MUTATION_DETECTED`, `IND_DUPLICATE_TIMESTAMP`, `IND_NON_MONOTONIC_TIME`, `IND_AMBIGUOUS_TIMESTAMP`, `IND_INVALID_TIMEZONE`, `IND_INVALID_OHLC`, `IND_INSUFFICIENT_DATA`, `IND_LOOKAHEAD_RISK`, `IND_FORMULA_VERSION_MISMATCH`, `IND_RESOURCE_LIMIT_EXCEEDED`, `IND_PARTIAL_RESULT`, and `IND_INTERNAL_ERROR`."
+    )
     print([code.value for code in IndicatorErrorCode])
 
 
 def fr_indi_002() -> None:
-    """FR-INDI-002: The system shall represent a deterministic, redacted failure with code, safe message, and structured details without exposing raw exceptions or sensitive input data."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-002 deterministic error")
+    """FR-INDI-002: The system shall represent a deterministic, redacted failure with code, safe message, and structured details without exposing raw exceptions or sensitive input data."""
+    _header(
+        "FR-INDI-002: The system shall represent a deterministic, redacted failure with code, safe message, and structured details without exposing raw exceptions or sensitive input data."
+    )
     error = IndicatorError(
         IndicatorErrorCode.IND_UNSUPPORTED_INDICATOR,
         "requested indicator is not official",
@@ -122,75 +119,99 @@ def fr_indi_002() -> None:
 
 
 def fr_indi_003() -> None:
-    """FR-INDI-003: The system shall represent indicator ID, canonical parameters, source, formula version, output/precision/availability/quality policy, and error mode in one immutable batch config, excluding cache, calendar, backend, actor, tracing, SLO, entitlement, timeout, cancellation, and orchestration context."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-003 immutable config")
+    """FR-INDI-003: The system shall represent indicator ID, canonical parameters, source, formula version, output/precision/availability/quality policy, and error mode in one immutable batch config, excluding cache, calendar, backend, actor, tracing, SLO, entitlement, timeout, cancellation, and orchestration context."""
+    _header(
+        "FR-INDI-003: The system shall represent indicator ID, canonical parameters, source, formula version, output/precision/availability/quality policy, and error mode in one immutable batch config, excluding cache, calendar, backend, actor, tracing, SLO, entitlement, timeout, cancellation, and orchestration context."
+    )
     print(_config())
 
 
 def fr_indi_004() -> None:
-    """FR-INDI-004: The system shall describe each official indicator's ID, name, versions, tier, required columns, parameter/output schemas, warmup policy, supported batch capabilities, import path, stability, and workflow eligibility."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-004 official spec")
+    """FR-INDI-004: The system shall describe each official indicator's ID, name, versions, tier, required columns, parameter/output schemas, warmup policy, supported batch capabilities, import path, stability, and workflow eligibility."""
+    _header(
+        "FR-INDI-004: The system shall describe each official indicator's ID, name, versions, tier, required columns, parameter/output schemas, warmup policy, supported batch capabilities, import path, stability, and workflow eligibility."
+    )
     print(get_indicator("sma"))
 
 
 def fr_indi_005() -> None:
-    """FR-INDI-005: The system shall expose the exact normalized history requirement for an indicator/config without fetching data, including minimum observations, source timeframe, required columns, and availability basis."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-005 warmup requirement")
+    """FR-INDI-005: The system shall expose the exact normalized history requirement for an indicator/config without fetching data, including minimum observations, source timeframe, required columns, and availability basis."""
+    _header(
+        "FR-INDI-005: The system shall expose the exact normalized history requirement for an indicator/config without fetching data, including minimum observations, source timeframe, required columns, and availability basis."
+    )
     print(get_warmup_requirement("sma", _config()))
 
 
 def fr_indi_006() -> None:
-    """FR-INDI-006: The system shall expose a minimal structural registered-calculator protocol whose approved calculation accepts one normalized `MarketDataset v1` plus a complete `IndicatorConfig` and returns `IndicatorResult`; public convenience wrappers construct the config and are not required to share this internal signature."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-006 calculator protocol")
+    """FR-INDI-006: The system shall expose a minimal structural registered-calculator protocol whose approved calculation accepts one normalized `MarketDataset v1` plus a complete `IndicatorConfig` and returns `IndicatorResult`; public convenience wrappers construct the config and are not required to share this internal signature."""
+    _header(
+        "FR-INDI-006: The system shall expose a minimal structural registered-calculator protocol whose approved calculation accepts one normalized `MarketDataset v1` plus a complete `IndicatorConfig` and returns `IndicatorResult`; public convenience wrappers construct the config and are not required to share this internal signature."
+    )
     print(isinstance(_DemoCalculator(), IndicatorProtocol))
 
 
 def fr_indi_007() -> None:
-    """FR-INDI-007: The system shall expose a standalone serializable deterministic manifest containing manifest/indicator/formula/output-schema versions, canonical parameter hash, input/output checksums, output contract and shape, precision, availability policy, Data-provided provenance, and quality summary; volatile runtime/host data is excluded from identity."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-007 deterministic manifest")
+    """FR-INDI-007: The system shall expose a standalone serializable deterministic manifest containing manifest/indicator/formula/output-schema versions, canonical parameter hash, input/output checksums, output contract and shape, precision, availability policy, Data-provided provenance, and quality summary; volatile runtime/host data is excluded from identity."""
+    _header(
+        "FR-INDI-007: The system shall expose a standalone serializable deterministic manifest containing manifest/indicator/formula/output-schema versions, canonical parameter hash, input/output checksums, output contract and shape, precision, availability policy, Data-provided provenance, and quality summary; volatile runtime/host data is excluded from identity."
+    )
     print(_result().manifest)
 
 
 def fr_indi_008() -> None:
-    """FR-INDI-008: The system shall return timestamp/symbol-aligned values, canonical output columns, availability, quality, errors, and manifest as `IndicatorSeries v1`, preserving warmup and unavailable rows and exposing no incremental state or metrics."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-008 IndicatorSeries v1")
+    """FR-INDI-008: The system shall return timestamp/symbol-aligned values, canonical output columns, availability, quality, errors, and manifest as `IndicatorSeries v1`, preserving warmup and unavailable rows and exposing no incremental state or metrics."""
+    _header(
+        "FR-INDI-008: The system shall return timestamp/symbol-aligned values, canonical output columns, availability, quality, errors, and manifest as `IndicatorSeries v1`, preserving warmup and unavailable rows and exposing no incremental state or metrics."
+    )
     result = _result()
     print(result.schema_id, result.output_columns, len(result.values))
 
 
 def fr_indi_009() -> None:
-    """FR-INDI-009: The system shall expose a copy-safe projection containing generated indicator, availability, and quality columns without original OHLCV columns."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-009 values-only projection")
+    """FR-INDI-009: The system shall expose a copy-safe projection containing generated indicator, availability, and quality columns without original OHLCV columns."""
+    _header(
+        "FR-INDI-009: The system shall expose a copy-safe projection containing generated indicator, availability, and quality columns without original OHLCV columns."
+    )
     print(list(_result().values_only.columns))
 
 
 def fr_indi_010() -> None:
-    """FR-INDI-010: The system shall privately project one matching `MarketDataset v1`, append generated columns to that copied canonical tabular projection, and preserve source columns, row count/order, timestamp/symbol layout, warmup rows, and input identity; collisions fail."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-010 copy-safe join")
+    """FR-INDI-010: The system shall privately project one matching `MarketDataset v1`, append generated columns to that copied canonical tabular projection, and preserve source columns, row count/order, timestamp/symbol layout, warmup rows, and input identity; collisions fail."""
+    _header(
+        "FR-INDI-010: The system shall privately project one matching `MarketDataset v1`, append generated columns to that copied canonical tabular projection, and preserve source columns, row count/order, timestamp/symbol layout, warmup rows, and input identity; collisions fail."
+    )
     print(list(_result().join_to(_dataset()).columns))
 
 
 def fr_indi_011() -> None:
-    """FR-INDI-011: The system shall resolve one of the 21 official indicator IDs in the registry identity below to its immutable spec and reject every unknown ID before calculation."""  # noqa: E501
-    _header("FR-INDI-011 registry resolution")
+    """FR-INDI-011: The system shall resolve one of the 21 official indicator IDs in the registry identity below to its immutable spec and reject every unknown ID before calculation."""
+    _header(
+        "FR-INDI-011: The system shall resolve one of the 21 official indicator IDs in the registry identity below to its immutable spec and reject every unknown ID before calculation."
+    )
     print(get_indicator("rsi").indicator_id)
 
 
 def fr_indi_012() -> None:
-    """FR-INDI-012: The system shall list official specs in stable indicator-ID order with no mutable registry handle."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-012 stable listing")
+    """FR-INDI-012: The system shall list official specs in stable indicator-ID order with no mutable registry handle."""
+    _header(
+        "FR-INDI-012: The system shall list official specs in stable indicator-ID order with no mutable registry handle."
+    )
     print([spec.indicator_id for spec in list_indicators()])
 
 
 def fr_indi_013() -> None:
-    """FR-INDI-013: The system shall expose a JSON/YAML-compatible matrix containing ID, versions, tier, batch/vectorized/multi-symbol/multi-timeframe support, unsupported optional modes, dependencies, deterministic unsupported codes, and official-workflow eligibility."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-013 capability matrix")
+    """FR-INDI-013: The system shall expose a JSON/YAML-compatible matrix containing ID, versions, tier, batch/vectorized/multi-symbol/multi-timeframe support, unsupported optional modes, dependencies, deterministic unsupported codes, and official-workflow eligibility."""
+    _header(
+        "FR-INDI-013: The system shall expose a JSON/YAML-compatible matrix containing ID, versions, tier, batch/vectorized/multi-symbol/multi-timeframe support, unsupported optional modes, dependencies, deterministic unsupported codes, and official-workflow eligibility."
+    )
     print(len(get_capability_matrix()))
 
 
 def fr_indi_014() -> None:
-    """FR-INDI-014: The system shall resolve the spec and atomically validate config, parameters, row limits, `MarketDataset v1` identity, bars-only kind, one symbol/timeframe, required OHLC fields, ordered unique UTC record timestamps, finite OHLC consistency, output names/collisions, quality evidence, and formula version before private projection/calculation; an empty dataset fails, while a non-empty short dataset remains valid warmup input. Upstream source-quality policy remains Data-owned."""  # noqa: E501 - exact specification text
-    _header("FR-INDI-014 fail-fast validation")
+    """FR-INDI-014: The system shall resolve the spec and atomically validate config, parameters, row limits, `MarketDataset v1` identity, bars-only kind, one symbol/timeframe, required OHLC fields, ordered unique UTC record timestamps, finite OHLC consistency, output names/collisions, quality evidence, and formula version before private projection/calculation; an empty dataset fails, while a non-empty short dataset remains valid warmup input. Upstream source-quality policy remains Data-owned."""
+    _header(
+        "FR-INDI-014: The system shall resolve the spec and atomically validate config, parameters, row limits, `MarketDataset v1` identity, bars-only kind, one symbol/timeframe, required OHLC fields, ordered unique UTC record timestamps, finite OHLC consistency, output names/collisions, quality evidence, and formula version before private projection/calculation; an empty dataset fails, while a non-empty short dataset remains valid warmup input. Upstream source-quality policy remains Data-owned."
+    )
     print(validate_indicator("sma", _dataset(), _config()).indicator_id)
 
 

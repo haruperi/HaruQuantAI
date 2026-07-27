@@ -30,6 +30,11 @@ from tests.simulator.unit.test_orchestrator import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _build_request(
     dataset: object,
     runtime_profile: str = "simulation",
@@ -143,9 +148,8 @@ def _build_portfolio_request(
 
 def example_run() -> None:
     """Demonstrate backtest, fast research, and portfolio backtest execution."""
-    print("=" * 80)
+    _header("Demonstrate backtest, fast research, and portfolio backtest execution.")
     print("Simulator Example 7: Backtest and Portfolio Orchestration")
-    print("=" * 80)
 
     req_id = generate_id("req")
     dataset = _dataset(req_id)
@@ -192,6 +196,9 @@ def fr_sim_029() -> None:
         symbol/timeframe/UTC range, positive initial balance, trace IDs, simulation
         profile/route, config hash, and no raw code/provider objects/inline data.
     """
+    _header(
+        "Demonstrate FR-SIM-029. Responsibility: The system shall expose the exact `docs/PROJECT.md` §5 request for one synchronous bounded FX run, with separate contract version/schema ID, immutable Strategy/Data/Simulation/Risk references, JSON-safe parameters, symbol/timeframe/UTC range, positive initial balance, trace IDs, simulation profile/route, config hash, and no raw code/provider objects/inline data."
+    )
     request_id = generate_id("req")
     request = _build_request(_dataset(request_id))
     print(f"Backtest request: {request.schema_id}")
@@ -215,6 +222,9 @@ def fr_sim_032() -> None:
         Portfolio-owned contract type, and carries no caller-supplied measurement
         series.
     """
+    _header(
+        "Demonstrate FR-SIM-032. Responsibility: The system shall expose `PortfolioBacktestRequestV1` with `contract_version='v1'`, `schema_id='simulation.portfolio_backtest_request.v1'`, portfolio and construction-result identifiers and versions, ordered component allocations, exact Strategy/Data/FX/execution/Risk references and versions, bounded UTC range, explicit seed, positive initial balance, `runtime_profile='simulation'`, `execution_route='sim'`, and a SHA-256 config hash. Every FX evidence ID is positionally bound to an explicit `v1` compatibility version and lowercase canonical SHA-256 evidence hash. Each child request's initial balance equals the portfolio balance multiplied by its exact capital weight and its account currency equals the portfolio base currency. It carries scalar values, identifiers, references, and hashes only, never embeds a Portfolio-owned contract type, and carries no caller-supplied measurement series."
+    )
     request_id = generate_id("req")
     request, _ = _build_portfolio_request(_dataset(request_id))
     print(f"Portfolio request: {request.schema_id}")
@@ -232,6 +242,9 @@ def fr_sim_030() -> None:
         `SimulationRunDependencies.persist_audit_event`; unavailable audit persistence
         fails closed.
     """
+    _header(
+        "Demonstrate FR-SIM-030. Responsibility: The system shall authenticate, deduplicate, validate, execute, journal, report, persist, and return one deterministic canonical FX run, never publishing a partial completed result. It persists bounded `simulation.run_started`, `simulation.run_completed`, `simulation.run_replayed`, or `simulation.run_failed` `AuditEvent v1` evidence through `SimulationRunDependencies.persist_audit_event`; unavailable audit persistence fails closed."
+    )
     request_id = generate_id("req")
     dataset = _dataset(request_id)
     request = _build_request(dataset)
@@ -263,6 +276,9 @@ def fr_sim_034() -> None:
         version and canonical hash before freshness validation. The run persists bounded
         portfolio start/completion/failure audit evidence.
     """
+    _header(
+        "Demonstrate FR-SIM-034. Responsibility: The system shall execute every component of an approved portfolio candidate through the ordinary deterministic simulation path, maintain one aggregate account ledger and the Risk-owned budget history, and publish `PortfolioSimulationResult v1` only when every component and the aggregate journal reconcile. Reconciliation is arithmetic and falsifiable: exact allocated opening capital equals portfolio opening capital, aggregate net profit equals the exact sum of component net profit, and aggregate component count equals the request. Component returns are sampled from each engine's actual end-of-tick mark-to-market equity observations on one shared 30-point UTC cadence; open-position price movement is included and closed-trade reconstruction is forbidden. Every resolved FX evidence object must match its request-bound version and canonical hash before freshness validation. The run persists bounded portfolio start/completion/failure audit evidence."
+    )
     request_id = generate_id("req")
     dataset = _dataset(request_id)
     request, auth = _build_portfolio_request(dataset)
@@ -285,6 +301,9 @@ def fr_sim_031() -> None:
         fills, promotion evidence, and reports, and persist bounded research
         start/completion/failure audit evidence.
     """
+    _header(
+        "Demonstrate FR-SIM-031. Responsibility: The system shall run an explicitly requested approximation only when enabled, mark every output `canonical=false`, disclose assumptions, prohibit canonical fills, promotion evidence, and reports, and persist bounded research start/completion/failure audit evidence."
+    )
     request_id = generate_id("req")
     dataset = _dataset(request_id)
     request = _build_request(

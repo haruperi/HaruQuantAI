@@ -13,6 +13,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.services.risk import RiskConfig, compute_config_hash
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _values() -> dict[str, object]:
     """Return bounded policy configuration mapping."""
     return {
@@ -34,9 +39,8 @@ def _values() -> dict[str, object]:
 
 def example_config() -> None:
     """Demonstrate RiskConfig validation and hashing."""
-    print("=" * 80)
+    _header("Demonstrate RiskConfig validation and hashing.")
     print("Risk Example 2: Configuration Validation and Hashing")
-    print("=" * 80)
 
     # 1. Validate config
     config = RiskConfig.model_validate(_values())
@@ -64,18 +68,27 @@ def fr_risk_022() -> None:
     """FR-RISK-022: Define strict profile fields, thresholds, modes, freshness,
     rounding, concurrency, audit, and dependency timeouts with stable schema
     version."""
+    _header(
+        "FR-RISK-022: Define strict profile fields, thresholds, modes, freshness, rounding, concurrency, audit, and dependency timeouts with stable schema version."
+    )
     _demonstrate_once()
 
 
 def fr_risk_023() -> None:
     """FR-RISK-023: Load only the selected YAML profile from the bounded root and
     fail closed on missing/invalid live configuration."""
+    _header(
+        "FR-RISK-023: Load only the selected YAML profile from the bounded root and fail closed on missing/invalid live configuration."
+    )
     _demonstrate_once()
 
 
 def fr_risk_024() -> None:
     """FR-RISK-024: Hash canonical exact serialization so any material config
     change changes the SHA-256 hash."""
+    _header(
+        "FR-RISK-024: Hash canonical exact serialization so any material config change changes the SHA-256 hash."
+    )
     _demonstrate_once()
 
 

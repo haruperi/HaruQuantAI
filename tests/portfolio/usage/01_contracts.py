@@ -19,6 +19,11 @@ HASH_A = "a" * 64
 HASH_B = "b" * 64
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _base_request_data(**overrides: object) -> dict[str, object]:
     """Return complete primitive construction request input.
 
@@ -85,9 +90,10 @@ def fr_port_001() -> None:
     Demonstrates that PortfolioConstructionRequest rejects unknown fields via
     strict Pydantic validation.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-001: Reject unknown fields and unsafe runtime objects. Demonstrates that PortfolioConstructionRequest rejects unknown fields via strict Pydantic validation."
+    )
     print("FR-PORT-001: Reject unknown fields and unsafe runtime objects")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     wire_value = request.model_dump(mode="json")
@@ -107,9 +113,10 @@ def fr_port_002() -> None:
     Demonstrates that the construction request carries a fixed
     contract_version and a separate namespaced schema_id.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-002: Separate contract_version from namespaced schema_id. Demonstrates that the construction request carries a fixed contract_version and a separate namespaced schema_id."
+    )
     print("FR-PORT-002: Separate contract_version from schema_id")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     wire_value = request.model_dump(mode="json")
@@ -126,9 +133,10 @@ def fr_port_003() -> None:
     Demonstrates that every timestamp on the construction request is
     timezone-aware UTC and that trace IDs are required.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-003: Require UTC timestamps, trace IDs, immutable owner references, and finite numbers. Demonstrates that every timestamp on the construction request is timezone-aware UTC and that trace IDs are required."
+    )
     print("FR-PORT-003: Require UTC timestamps, trace IDs, and finite numbers")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     for field in ("measurement_start", "measurement_end", "requested_at"):
@@ -150,9 +158,10 @@ def fr_port_004() -> None:
     Demonstrates that the construction request does not embed a Risk budget
     projection; it carries only evidence references and proposed weights.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-004: Represent capital weights separately from Risk-authoritative budget projection references. Demonstrates that the construction request does not embed a Risk budget projection; it carries only evidence references and proposed weights."
+    )
     print("FR-PORT-004: Separate capital weights from Risk budget references")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     evidence_fields = list(type(request.evidence).model_fields)
@@ -168,9 +177,10 @@ def fr_port_005() -> None:
     Demonstrates that the contract carries a fixed version and schema identity
     for version compatibility checking.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-005: Version breaking contract changes and update every producer/consumer document together. Demonstrates that the contract carries a fixed version and schema identity for version compatibility checking."
+    )
     print("FR-PORT-005: Version breaking contract changes")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     assert request.contract_version == "v1"

@@ -1,6 +1,5 @@
 """Tests for safe parameter constraints."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 import pytest

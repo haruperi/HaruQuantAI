@@ -11,6 +11,7 @@ from app.services.data import MarketDataset
 from app.services.research import ResearchReport, run_edge_lab_profile
 from app.services.research.contracts import StudyConfig
 from app.utils import ValidationError
+
 from tests.research._support import make_dataset, make_edge_lab_config
 
 

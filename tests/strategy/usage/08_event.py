@@ -33,13 +33,20 @@ _STRATEGY = "usage-event-strategy"
 _HOOKS = ("on_init", "on_bar", "on_tick", "on_fill", "on_stop")
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_033() -> None:
     """Demonstrate atomic typed event evaluation."""
+    _header("Demonstrate atomic typed event evaluation.")
     assert callable(run_event_strategy_hook)
 
 
 def fr_str_037() -> None:
     """Demonstrate the hash-bound event evaluator contract."""
+    _header("Demonstrate the hash-bound event evaluator contract.")
     assert EventStrategyEvaluator
 
 
@@ -103,7 +110,6 @@ def main() -> int:
     fr_str_033()
     fr_str_037()
     print("\nSTATEFUL STRATEGY EVENT HOOK — REAL MT5 EURUSD M5")
-    print("=" * 88)
     try:
         market = get_market_data(
             source_id="mt5",

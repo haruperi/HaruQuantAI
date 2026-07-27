@@ -27,6 +27,11 @@ _CSV_PATH = Path("data/raw/EURUSD_H1.csv")
 _PARQUET_PATH = Path("data/raw/EURUSD_H1.parquet")
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _ensure_raw_datasets() -> None:
     """Ensure manifest-backed CSV and Parquet datasets exist in data/raw."""
     csv_manifest = _CSV_PATH.with_suffix(".csv.manifest.json")
@@ -79,6 +84,7 @@ def _ensure_raw_datasets() -> None:
 
 def example_08_csv_load_direct() -> None:
     """Load a local CSV file directly via load_csv."""
+    _header("Load a local CSV file directly via load_csv.")
     _ensure_raw_datasets()
     try:
         ds = load_csv(_CSV_PATH)
@@ -90,6 +96,7 @@ def example_08_csv_load_direct() -> None:
 
 def example_10_csv_fetch_range() -> None:
     """Fetch a local CSV range through the typed request boundary."""
+    _header("Fetch a local CSV range through the typed request boundary.")
     _ensure_raw_datasets()
     req_id = generate_id("req")
     request = DatasetLoadRequest(
@@ -107,6 +114,7 @@ def example_10_csv_fetch_range() -> None:
 
 def example_11_parquet_load_direct() -> None:
     """Load a local Parquet file directly via load_parquet."""
+    _header("Load a local Parquet file directly via load_parquet.")
     _ensure_raw_datasets()
     try:
         ds = load_parquet(_PARQUET_PATH)
@@ -136,7 +144,8 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_017() -> None:
-    "FR-DATA-017: Load CSV/Parquet plus manifest only from an approved root, verify hash/schema/normalization metadata, normalize records, and reject corruption without hidden migration."  # noqa: E501 - exact specification text
+    _header("fr_data_017")
+    "FR-DATA-017: Load CSV/Parquet plus manifest only from an approved root, verify hash/schema/normalization metadata, normalize records, and reject corruption without hidden migration."
     _demonstrate_once()
 
 

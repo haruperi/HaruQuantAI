@@ -1,5 +1,4 @@
 """Unit tests and fixtures for official Simulation orchestration."""
-# ruff: noqa: INP001
 
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
@@ -23,6 +22,7 @@ from app.services.simulator.execution import ExecutionProfile, SessionInterval
 from app.services.simulator.run import SimulationBacktestRequestV1, run_backtest
 from app.services.trading import OrderIntent, TradingRoute
 from app.utils import AuditEvent, AuthContext, canonical_json
+
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 

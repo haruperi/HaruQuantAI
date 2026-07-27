@@ -1,6 +1,5 @@
 """Tests for the Optimization execution adapter."""
 
-# ruff: noqa: INP001
 from datetime import UTC, datetime
 
 import pytest
@@ -11,6 +10,7 @@ from app.services.optimization.execution import (
     execute_candidate,
 )
 from app.utils import AuthContext
+
 from tests.analytics._support import _report
 from tests.optimization.unit.test_execution_contracts import execution_request
 from tests.simulator.unit.test_reporting_contracts import _result

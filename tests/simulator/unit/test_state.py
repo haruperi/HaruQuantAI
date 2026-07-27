@@ -1,5 +1,4 @@
 """Unit tests for the Simulation-owned persistence boundary."""
-# ruff: noqa: INP001
 
 import ast
 from pathlib import Path
@@ -9,6 +8,7 @@ import pytest
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.state import SIMULATION_MIGRATIONS, SimulationStateStore
 from app.utils import canonical_json
+
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 _PACKAGE_ROOT = Path(__file__).resolve().parents[3] / "app" / "services" / "simulator"

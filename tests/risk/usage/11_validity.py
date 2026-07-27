@@ -112,6 +112,11 @@ class _ExampleTokenStore:
         return 0
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> RiskConfig:
     """Build a complete simulation-profile Risk configuration."""
     return RiskConfig(
@@ -314,9 +319,10 @@ def fr_risk_042() -> None:
     """FR-RISK-042: Compare proposal/evidence/config/time with a prior decision
     and invalidate material changes, expiry, skew, stale state, config mismatch,
     or reconciliation expiry without granting action authority."""
-    print("=" * 80)
+    _header(
+        "FR-RISK-042: Compare proposal/evidence/config/time with a prior decision and invalidate material changes, expiry, skew, stale state, config mismatch, or reconciliation expiry without granting action authority."
+    )
     print("Risk Example 11: Decision Reuse Revalidation")
-    print("=" * 80)
 
     config = _config()
     audit = RiskAuditChain(config, _ExampleAuditStore(), lambda: NOW, canonical_json)

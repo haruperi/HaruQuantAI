@@ -133,11 +133,15 @@ class _TokenStore:
         return len(new)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_approvals() -> None:
     """Demonstrate Risk approval token lifecycle."""
-    print("=" * 80)
+    _header("Demonstrate Risk approval token lifecycle.")
     print("Risk Example 5: Approval Token Service")
-    print("=" * 80)
 
     config = RiskConfig(
         profile="research",
@@ -232,6 +236,9 @@ def _demonstrate_once() -> None:
 def fr_risk_035() -> None:
     """FR-RISK-035: Own internal HMAC signing plus an injected secret resolver,
     clock, durable state port, authorization verifier, and audit chain."""
+    _header(
+        "FR-RISK-035: Own internal HMAC signing plus an injected secret resolver, clock, durable state port, authorization verifier, and audit chain."
+    )
     _demonstrate_once()
 
 
@@ -240,6 +247,9 @@ def fr_risk_036() -> None:
     `ApprovalAttestation v1`, then issue a tamper-evident token only for an
     eligible decision, binding request/workflow/action/account/strategy/symbol/
     config/decision/approver/expiry/nonce and writing audit/state durably."""
+    _header(
+        "FR-RISK-036: Validate Risk-owned, UI/API-produced `ApprovalAttestation v1`, then issue a tamper-evident token only for an eligible decision, binding request/workflow/action/account/strategy/symbol/ config/decision/approver/expiry/nonce and writing audit/state durably."
+    )
     _demonstrate_once()
 
 
@@ -250,12 +260,18 @@ def fr_risk_037() -> None:
     before live success, create the allowed `ActionPolicyVerdict`, include it in
     `ApprovalValidationResult`, and audit the result. No failed validation
     contains an allowed verdict."""
+    _header(
+        "FR-RISK-037: Atomically verify schema/signature/scope/hashes/attestation/time/revocation/nonce, reserve token + workflow + action scope + expiry, persist single-use consumption before live success, create the allowed `ActionPolicyVerdict`, include it in `ApprovalValidationResult`, and audit the result. No failed validation contains an allowed verdict."
+    )
     _demonstrate_once()
 
 
 def fr_risk_038() -> None:
     """FR-RISK-038: Revoke every outstanding token intersecting an activated
     global/portfolio/strategy/symbol scope and write a material audit event."""
+    _header(
+        "FR-RISK-038: Revoke every outstanding token intersecting an activated global/portfolio/strategy/symbol scope and write a material audit event."
+    )
     _demonstrate_once()
 
 

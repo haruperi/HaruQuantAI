@@ -101,7 +101,7 @@ must never be inferred from SDK method presence.
 - **MT5 released-read implementation gap (`mt5/adapter.py`, `mt5/mapping.py`):** the catalogue declared historical bars and spread available while MT5 inherited deterministic unsupported defaults, and mapped bars had a zero-duration window. Implemented genuine bounded latest/ranged bar reads, provider-derived bid/ask spread, optional latest-tick lookup, SDK timeframe resolution, and valid closing timestamps.
 - **Yahoo zero-duration bar defect (`yahoo/mapping.py`):** every mapped bar set `closing_timestamp == opening_timestamp`, violating `BrokerBar`'s own `opening_timestamp < closing_timestamp` invariant and making every real Yahoo bar construction raise. Fixed by deriving the closing timestamp from the parsed provider interval (resolves `DEC-BRK-001`).
 
-Session lifecycle is the verified layer. MT5, Binance, Yahoo, and cTrader have verified real connections (MT5 and cTrader against provider-confirmed demo accounts; Binance against the real testnet; Yahoo against the real Yahoo Finance service). The 2026-07-24 cTrader validation also returned six genuine bounded ordered UTC `EURUSD` sessions and disconnected without creating provider state. Dukascopy's real host is unreachable from this environment's network specifically (confirmed by direct probe — Yahoo, Binance, and cTrader are reachable from the same environment). The static catalogue keeps operations without complete provider evidence unavailable, and direct unavailable calls fail before invoking the provider SDK.
+Session lifecycle is the verified layer. MT5, Binance, Yahoo, cTrader, and Dukascopy have verified real connections (MT5 and cTrader against provider-confirmed demo accounts; Binance against the real testnet; Yahoo against the real Yahoo Finance service; Dukascopy against its research-only BI5 and web-chart endpoints). The 2026-07-27 validation also returned six genuine bounded ordered UTC cTrader `EURUSD` sessions and five genuine Dukascopy `EUR/USD` M1 bars, then disconnected without creating provider state. The static catalogue keeps operations without complete provider evidence unavailable, and direct unavailable calls fail before invoking the provider SDK.
 
 ---
 
@@ -352,12 +352,15 @@ Registry imports provider factories lazily; provider modules never import Regist
 - Usage examples live under `tests/brokers/usage/`: exactly one standalone
   numbered program for each registered feature, `FEAT-BRK-00` through
   `FEAT-BRK-15`. Programs use a main guard and bounded secret-safe inputs. Each
-  drives the real adapter over an offline transport serving recorded provider
-  payloads, so genuine request construction, provider decoding, and canonical
-  mapping execute and produce mapped provider values. Every program also
-  demonstrates the fail-closed path with an unavailable capability map and
-  asserts that zero provider calls occur while gated. No network traffic,
-  credential, or provider side effect is required.
+  provider-backed program resolves a genuine adapter through the public factory,
+  establishes only an enabled demo/testnet/sandbox session, exercises bounded
+  released reads, and closes the session deterministically. Unreleased and
+  unsupported operations assert their exact canonical fail-closed result instead
+  of claiming false success. Usage programs reject live environments and never
+  transmit broker mutations. `FEAT-BRK-14` is the sole fake-adapter exception
+  because deterministic fake behavior is the capability under demonstration;
+  contract and registry programs remain network-free because their requirements
+  do not establish provider sessions.
 - No synchronous or strict-exception façade, manager, repository, service layer, or provider extension API is part of the initial package.
 
 ### Package root public API
@@ -383,6 +386,27 @@ The root file itself is assigned FR-BRK-135. Private helper/export requirements 
 ---
 
 ## 3. Workflows
+
+> **Workflow Usage Evidence**: Each active workflow has one standalone executable
+> program under [`tests/brokers/usage/workflows/`](../../../tests/brokers/usage/workflows/).
+> Every program labels its input boundary, each documented stage in comments and
+> output, and its typed output boundary. MT5 programs use a genuine enabled
+> non-production session for released reads. The mutation workflow verifies the
+> real session, then demonstrates every unreleased write gate without transmitting
+> a broker mutation. Run all Brokers workflows with
+> `uv run python tests/brokers/usage/workflows/run_all.py`.
+
+| Workflow ID | Standalone program |
+|---|---|
+| `WF-BRK-001` | `tests/brokers/usage/workflows/wf_brk_001_resolve_explicit_adapter.py` |
+| `WF-BRK-002` | `tests/brokers/usage/workflows/wf_brk_002_connect_authenticate_provider_session.py` |
+| `WF-BRK-003` | `tests/brokers/usage/workflows/wf_brk_003_acquire_provider_market_data.py` |
+| `WF-BRK-004` | `tests/brokers/usage/workflows/wf_brk_004_submit_one_broker_mutation.py` |
+| `WF-BRK-005` | `tests/brokers/usage/workflows/wf_brk_005_read_account_execution_state.py` |
+| `WF-BRK-006` | `tests/brokers/usage/workflows/wf_brk_006_stream_provider_connection_events.py` |
+| `WF-BRK-007` | `tests/brokers/usage/workflows/wf_brk_007_correlate_ctrader_response.py` |
+| `WF-BRK-008` | `tests/brokers/usage/workflows/wf_brk_008_handle_unsupported_operation.py` |
+| `WF-BRK-009` | `tests/brokers/usage/workflows/wf_brk_009_inject_canonical_broker_execution.py` |
 
 ### Status values
 
@@ -1331,7 +1355,8 @@ canonical `EURUSD` request
 ### Feature usage examples
 
 `tests/brokers/usage/05_dukascopy_lifecycle.py` and
-`13_dukascopy_bars.py` demonstrate FR-BRK-107 without a live network dependency.
+`13_dukascopy_bars.py` demonstrate FR-BRK-107 through genuine bounded
+research-only provider reads.
 
 ---
 
@@ -1512,7 +1537,7 @@ by UI/API and remains `Partial` in `docs/PROJECT.md` §6.
 | Partial | `NFR-BRK-009` | Determinism | Unsupported operations shall fail immediately and identically without any provider SDK call or consumer provider branch. | Shared unsupported contract suite |
 | Partial | `NFR-BRK-010` | Performance | Local mapping/copying shall be bounded and provider-network latency shall be measured separately from local adapter overhead; no unsupported numeric latency gate is imposed. | `tests/brokers/unit/test_performance.py`. `__getattribute__` measures total wall time at the public boundary; each transport reports provider-call time through an injected latency sink; `_result` derives `adapter_overhead_ms` as the remainder. |
 | Partial | `NFR-BRK-011` | Independence | Brokers shall compile/test independently of Data, Trading, Risk, Strategy, Indicators, Simulation, Analytics, Optimization, Research, and UI/API. | Dependency audit |
-| Partial | `NFR-BRK-012` | Testing | Every FR shall have one runnable usage example and unit coverage; each provider shall pass the shared contract suite and the package shall maintain at least 80% coverage. | Test/coverage audit — Current validation is pending for 16 feature-aligned standalone usage programs, one per registered `FEAT-BRK-NN`. Each program drives the real adapter over an offline transport and produces genuine mapped provider values. |
+| Partial | `NFR-BRK-012` | Testing | Every FR shall have one runnable usage example and unit coverage; every active workflow shall have one directly executable, stage-labelled workflow program; each provider shall pass the shared contract suite and the package shall maintain at least 80% coverage. | Test/coverage audit — Sixteen feature-aligned standalone usage programs cover the registered `FEAT-BRK-NN` features, and nine standalone workflow programs cover `WF-BRK-001` through `WF-BRK-009`. Provider-backed programs use genuine enabled non-production sessions; released reads preserve provider truth, unavailable operations assert canonical errors, every directly owned session is closed, and no usage program transmits a broker mutation. |
 | Partial | `NFR-BRK-013` | Dependencies | Provider library versions shall match `pyproject.toml`; directly imported transitive packages must be pinned before implementation. | Dependency manifest audit — confirmed against `pyproject.toml`, including the explicit `twisted==24.3.0` pin required by the direct import in `ctrader/network.py`. The exact-version pin matches the constraint `ctrader-open-api==0.9.2` already imposes. |
 | Partial | `NFR-BRK-014` | Persistence | Brokers shall own no database access, credential persistence, reusable market/account cache, business snapshot, order store, or migration. | Static and runtime side-effect tests |
 | Partial | `NFR-BRK-015` | Provider scope | Dukascopy and Yahoo shall be declared research-only and unavailable to production/live workflows; their provider results shall carry explicit provenance for Data. | Capability and consumer-boundary tests |
@@ -1547,10 +1572,24 @@ Resolved requirements:
 tests/brokers/
 ├── unit/                         # Contract, registry, adapter, mapping, and boundary behavior
 ├── integration/                  # WF-BRK-* collaboration and credential-gated provider suites
-└── usage/                        # 01_*.py through 13_*.py standalone feature programs
+└── usage/                        # 00_*.py through 15_*.py standalone feature programs
 ```
 
-Provider sandbox/testnet suites are credential-gated and scheduled or release-gated. Ordinary CI always runs deterministic contract, boundary, fake-adapter, and unit tests. The standalone `NN_<feature>.py` scripts are not part of `pytest`'s collection (no `test_` prefix) and are run directly with bounded secret-safe inputs. They demonstrate public signatures and fail-closed release behavior without requiring provider credentials or network access; credential-gated provider suites supply separate live evidence.
+Provider sandbox/testnet suites are credential-gated and scheduled or
+release-gated. Ordinary CI always runs deterministic contract, boundary,
+fake-adapter, and unit tests. The standalone `NN_<feature>.py` scripts are not
+part of `pytest`'s collection (no `test_` prefix) and are run directly with
+bounded secret-safe inputs. Contract, registry, and fake-adapter programs remain
+deterministic; provider-backed programs supply separate genuine non-production
+connection/read evidence.
+
+Provider-backed standalone usage programs are explicit credential-gated
+non-production evidence and therefore do require genuine provider reachability.
+They reject live configuration before adapter creation, fail when required
+credentials or enablement are absent, and always disconnect in a `finally`
+boundary. A successful usage run means the genuine connection and every released
+operation succeeded while unavailable operations returned the documented
+canonical error; it does not mean every provider capability is released.
 
 ### Normative test file manifest
 
@@ -1565,13 +1604,15 @@ Provider sandbox/testnet suites are credential-gated and scheduled or release-ga
 - **Integration/workflows:** `test_adapter_resolution.py`, `test_session_lifecycle.py`, `test_data_boundary.py`, `test_trading_mutation_boundary.py`, `test_account_state_boundary.py`, `test_streaming.py`, `test_ctrader_correlation.py`, `test_unsupported_capabilities.py`, `test_execution_injection.py`.
 - **Cross-cutting integration:** `test_provider_contracts.py`, `test_provider_credentials.py`, `test_stream_cancellation.py`, `test_circuit_breaking.py`, `test_consumer_boundaries.py`.
 - **Usage (standalone, not pytest-collected):** exactly one numbered program per
-  registered feature: `00_contracts.py` through `14_fake_adapter.py`. Each has a
-  `main()` guard and calls the feature's public operations with bounded
-  secret-safe inputs against an offline transport, producing genuine mapped
-  provider values, and separately demonstrates the fail-closed gate.
+  registered feature: `00_contracts.py` through `15_adapter_runtime.py`. Each has
+  a `main()` guard and calls the feature's public operations with bounded
+  secret-safe inputs. Provider-backed programs verify genuine non-production
+  sessions and released reads; capability-gated operations demonstrate the exact
+  fail-closed result without provider mutation.
 - **Support modules (not pytest-collected as tests):** `tests/brokers/provider_settings.py`
-  (typed credential-gated settings), `tests/brokers/usage/_support.py` (offline
-  transports, capability maps, and bounded display helpers), and
+  (typed credential-gated settings), `tests/brokers/usage/_support.py`
+  (non-production environment validation, genuine session lifecycle, and bounded display/result
+  assertion helpers), and
   `tests/brokers/usage/conftest.py` (collection exclusion).
 
 `test_provider_credentials.py` is skipped unless the exact profile's credential marker and environment are present. A skip is not release evidence and leaves affected capabilities unavailable. `test_performance.py` asserts bounded work and separated latency fields only; it introduces no unsupported numerical latency target.
@@ -1589,7 +1630,7 @@ uv run pytest tests/brokers --cov=app/services/brokers --cov-fail-under=80
 
 # Run each NN_*.py file under tests/brokers/usage directly.
 python tests/brokers/usage/00_contracts.py
-python tests/brokers/usage/14_fake_adapter.py
+python tests/brokers/usage/15_adapter_runtime.py
 ```
 
 During implementation, run only the targeted test file for the changed code before the broader domain verification commands.
@@ -1608,9 +1649,9 @@ During implementation, run only the targeted test file for the changed code befo
   demo classification, authenticated write permission, provider-minimum order
   size, unique identities, exact cleanup, and reconciliation.
 - **Usage:** Every registered `FEAT-BRK-*` owns exactly one `NN_<feature>.py`
-  standalone program. Programs exercise genuine adapter behavior over offline
-  transports and separately demonstrate fail-closed release behavior; live
-  provider reachability remains credential-gated evidence.
+  standalone program. Provider-backed programs use genuine non-production
+  sessions and released reads while preserving fail-closed release behavior;
+  live environments and broker mutations remain excluded.
 
 ### Package completion checklist
 
@@ -1630,7 +1671,7 @@ During implementation, run only the targeted test file for the changed code befo
 - [ ] Persisted state matches the system ownership table: Brokers persists nothing. `app/services/brokers/registry/factory.py:78`
 - [ ] Every planned dependency is documented in standard-library, third-party, local order. `app/services/brokers/mt5/adapter.py:1`
 - [ ] Every FR maps to one exact usage example and at least one exact unit test.
-  Fifteen programs cover `FEAT-BRK-00`–`FEAT-BRK-14`, one each. `tests/brokers/usage/00_contracts.py:1`
+  Sixteen programs cover `FEAT-BRK-00`–`FEAT-BRK-15`, one each. `tests/brokers/usage/00_contracts.py:1`
 - [ ] Removed, rejected, and excluded behavior is absent from the public surface. `app/services/brokers/contracts/unsupported.py:1`
 - [ ] Every retained V1 behavior has a final destination or explicit removal condition. `app/services/brokers/registry/catalogue.py:148`
 - [ ] No Brokers open decisions remain. Dukascopy candle mapping is adapter-local;

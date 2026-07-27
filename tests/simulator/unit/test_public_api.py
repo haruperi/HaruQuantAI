@@ -1,5 +1,4 @@
 """Unit tests pinning the documented Simulation public API surface."""
-# ruff: noqa: INP001
 
 import importlib
 

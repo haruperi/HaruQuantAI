@@ -11,6 +11,11 @@ from app.services.indicators import doji, engulfing, inside_bar, pinbar
 _CACHE: dict[str, MarketDataset] = {}
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _dataset() -> MarketDataset:
     """Return one cached real read-only market dataset.
 
@@ -31,27 +36,39 @@ def _dataset() -> MarketDataset:
 
 
 def fr_indi_031() -> None:
-    """FR-INDI-031: The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close."""  # noqa: E501 - exact specification text
+    """FR-INDI-031: The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close."""
+    _header(
+        "FR-INDI-031: The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close."
+    )
     result = doji(_dataset(), threshold=0.1)
-    print("FR-INDI-031", result.values["doji"].tolist())
+    print("Result:", result.values["doji"].tolist())
 
 
 def fr_indi_032() -> None:
-    """FR-INDI-032: The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies."""  # noqa: E501 - exact specification text
+    """FR-INDI-032: The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies."""
+    _header(
+        "FR-INDI-032: The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies."
+    )
     result = engulfing(_dataset())
-    print("FR-INDI-032", result.values["engulfing"].tolist())
+    print("Result:", result.values["engulfing"].tolist())
 
 
 def fr_indi_033() -> None:
-    """FR-INDI-033: The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match."""  # noqa: E501 - exact specification text
+    """FR-INDI-033: The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match."""
+    _header(
+        "FR-INDI-033: The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match."
+    )
     result = pinbar(_dataset())
-    print("FR-INDI-033", result.values["pinbar"].tolist())
+    print("Result:", result.values["pinbar"].tolist())
 
 
 def fr_indi_034() -> None:
-    """FR-INDI-034: The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup."""  # noqa: E501 - exact specification text
+    """FR-INDI-034: The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup."""
+    _header(
+        "FR-INDI-034: The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup."
+    )
     result = inside_bar(_dataset())
-    print("FR-INDI-034", result.values["inside_bar"].tolist())
+    print("Result:", result.values["inside_bar"].tolist())
 
 
 def main() -> None:

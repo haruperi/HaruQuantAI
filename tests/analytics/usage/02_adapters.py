@@ -23,6 +23,11 @@ from app.services.analytics import (
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> AnalyticsRunConfig:
     """Build usage configuration for analytics adapters."""
     return AnalyticsRunConfig(
@@ -71,9 +76,8 @@ def _trade() -> ClosedTrade:
 
 def example_adapters() -> None:
     """Demonstrate analytics input adapters."""
-    print("=" * 80)
+    _header("Demonstrate analytics input adapters.")
     print("Analytics Example 2: Result Adapters")
-    print("=" * 80)
 
     trade = _trade()
     config = _config()
@@ -130,6 +134,9 @@ def fr_anlt_027() -> None:
     returns and never accepts an undocumented point mapping. FX evidence is
     caller-supplied and validated, never sourced.
     """
+    _header(
+        "FR-ANLT-027. The system shall deterministically map an approved producer-neutral versioned closed-trade ledger projection to `TradingResult`, preserving IDs, phase, UTC window, account currency, initial balance, strategy, symbols, timeframe, every `ClosedTrade` field, quality metadata, and bounded source metadata without silent field loss. The source mapping contains exactly `contract_version`, `schema_id`, `source_id`, `phase`, `window_start`, `window_end`, `strategy_id`, `strategy_version`, `symbols`, `timeframe`, `closed_trades`, `quality_metadata`, and `source_metadata`. Open, pending, placeholder, missing, and unknown rows/fields are rejected. Optional benchmark evidence is a Data-owned `MarketDataset v1` containing at least two ordered OHLCV bars with checked passing quality; Analytics derives currency-neutral simple close returns and never accepts an undocumented point mapping. FX evidence is caller-supplied and validated, never sourced."
+    )
     example_adapters()
 
 
@@ -145,6 +152,9 @@ def fr_anlt_050() -> None:
     resample; per-trade statistics consume the trade-indexed curve. Mark-to-market
     equity is never synthesized.
     """
+    _header(
+        "FR-ANLT-050. The system shall derive one deterministic closed-trade equity curve by ordering the ledger on `(exit_time, ticket)` and accumulating `initial_balance + cumsum(net_trade_pnl)` in `Decimal`, where `net_trade_pnl = profit + commission + swap`, and shall additionally emit a UTC calendar-daily resample of that curve carrying the last equity value of each day. The curve is labelled `curve_basis='closed_trade'`. Time-based metrics consume the daily resample; per-trade statistics consume the trade-indexed curve. Mark-to-market equity is never synthesized."
+    )
     example_adapters()
 
 

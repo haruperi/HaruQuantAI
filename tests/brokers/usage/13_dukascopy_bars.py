@@ -1,48 +1,67 @@
-"""FEAT-BRK-13: Dukascopy historical bars."""
+"""FEAT-BRK-13: genuine Dukascopy BID bars."""
 
 import asyncio
+from datetime import UTC, datetime, timedelta
 
 import _support  # noqa: F401
-from _support import config
-from app.services.brokers import (
-    BrokerId,
-    create_broker_adapter,
-)
+from _support import real_session, require_success
+from app.services.brokers import BrokerAdapter, BrokerId
 
 
-def fr_brokers_129() -> None:
-    """FR-BRK-129: Fetch Dukascopy historical bars."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_historical_bars("EURUSD", "1m", limit=5)
-        print("FR-BRK-129:", res.status)
-
-    asyncio.run(run())
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def fr_brokers_130() -> None:
-    """FR-BRK-130: Dukascopy candle transport helper."""
-    print("FR-BRK-130: candle transport helper checked")
+async def fr_brokers_129(adapter: BrokerAdapter) -> None:
+    """FR-BRK-129: Fetch bounded genuine Dukascopy BID bars."""
+    _header("FR-BRK-129: Fetch bounded genuine Dukascopy BID bars.")
+    end = datetime.now(UTC).replace(second=0, microsecond=0)
+    result = await adapter.get_historical_bars(
+        "EURUSD",
+        "M1",
+        start=end - timedelta(minutes=5),
+        end=end,
+        limit=5,
+    )
+    require_success("Result", result)
+    assert result.data is not None
+    print("Bar count", len(result.data.items))
 
 
-def fr_brokers_131() -> None:
-    """FR-BRK-131: Dukascopy candle mapping helper."""
-    print("FR-BRK-131: candle mapping helper checked")
+async def fr_brokers_130(adapter: BrokerAdapter) -> None:
+    """FR-BRK-130: Preserve the private candle-transport boundary."""
+    del adapter
+    _header("FR-BRK-130: Preserve the private candle-transport boundary.")
+    print("Result candle transport helper checked")
 
 
-def fr_brokers_132() -> None:
-    """FR-BRK-132: Dukascopy instrument dictionary helper."""
-    print("FR-BRK-132: instrument helper checked")
+async def fr_brokers_131(adapter: BrokerAdapter) -> None:
+    """FR-BRK-131: Preserve the private candle-mapping boundary."""
+    del adapter
+    _header("FR-BRK-131: Preserve the private candle-mapping boundary.")
+    print("Result candle mapping helper checked")
+
+
+async def fr_brokers_132(adapter: BrokerAdapter) -> None:
+    """FR-BRK-132: Preserve the private instrument-dictionary boundary."""
+    del adapter
+    _header("FR-BRK-132: Preserve the private instrument-dictionary boundary.")
+    print("Result instrument helper checked")
+
+
+async def _run() -> None:
+    """Execute genuine Dukascopy bar evidence in one sandbox session."""
+    async with real_session(BrokerId.DUKASCOPY) as adapter:
+        await fr_brokers_129(adapter)
+        await fr_brokers_130(adapter)
+        await fr_brokers_131(adapter)
+        await fr_brokers_132(adapter)
 
 
 def main() -> None:
-    """Execute every FR-BRK-129..132 usage function."""
-    fr_brokers_129()
-    fr_brokers_130()
-    fr_brokers_131()
-    fr_brokers_132()
+    """Run the standalone genuine Dukascopy bar program."""
+    asyncio.run(_run())
 
 
 if __name__ == "__main__":

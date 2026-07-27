@@ -186,6 +186,18 @@ one directly with Python.
 
 ## 3. Workflows
 
+> **Workflow Usage Evidence**: Each active workflow has one standalone executable
+> program under [`tests/utils/usage/workflows/`](../../tests/utils/usage/workflows/).
+> Every program labels its input boundary, each documented stage in comments and
+> output, and its typed output boundary. Run all Utils workflows with
+> `uv run python tests/utils/usage/workflows/run_all.py`.
+
+| Workflow ID | Standalone program |
+|---|---|
+| `WF-UTL-001` | `tests/utils/usage/workflows/wf_utl_001_structured_logging_and_redaction.py` |
+| `WF-UTL-002` | `tests/utils/usage/workflows/wf_utl_002_shared_settings_bootstrap.py` |
+| `WF-UTL-003` | `tests/utils/usage/workflows/wf_utl_003_audit_event_construction.py` |
+
 | Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
 |---|---|---|---|---|---|---|
 | Completed | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033`, `FR-UTL-039` through `FR-UTL-041` |
@@ -524,7 +536,7 @@ capabilities beyond the Section 4 exports.
 | Completed | `NFR-UTL-003` | Import safety | Imports perform no configuration, environment/file read, filesystem write, network call, handler registration, or client initialization. | Subprocess import tests |
 | Completed | `NFR-UTL-004` | Determinism | Serialization, time calculations, validation, and stable-ID derivation are deterministic with explicit clock/entropy inputs. | Replay tests |
 | Completed | `NFR-UTL-005` | Maintainability | Public signatures are typed and documented; files have one focused responsibility. | Ruff, mypy, and documentation review |
-| Completed | `NFR-UTL-006` | Testing | Every requirement has a usage example and targeted unit test; collaborative workflows have integration tests; coverage is at least 80%. | Traceability and coverage audit |
+| Completed | `NFR-UTL-006` | Testing | Every requirement has a usage example and targeted unit test; every active workflow has one directly executable, stage-labelled workflow program; collaborative workflows have integration tests; coverage is at least 80%. | Traceability and coverage audit; three workflow programs and `tests/utils/usage/workflows/run_all.py` |
 | Completed | `NFR-UTL-007` | Persistence | Utils owns no durable business state or migration definition. | Ownership review |
 
 | Status | Setting | Type | Default | Required | Consumers | Description |

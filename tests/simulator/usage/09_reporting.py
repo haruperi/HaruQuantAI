@@ -29,11 +29,15 @@ from app.services.simulator import (
 from tests.simulator.unit.test_reporting_contracts import _result
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_reporting() -> None:
     """Demonstrate reporting models, manifest building, and report rendering."""
-    print("=" * 80)
+    _header("Demonstrate reporting models, manifest building, and report rendering.")
     print("Simulator Example 9: Result Contracts and Reporting")
-    print("=" * 80)
 
     result = _result()
     print(f"Simulation result status: {result.status}")
@@ -109,6 +113,9 @@ def fr_sim_024() -> None:
         derived from the completed `AccountLedger` totals; no monetary field in the
         published envelope is a constant.
     """
+    _header(
+        "Demonstrate FR-SIM-024. Responsibility: The system shall expose `SimulationResult` v1 with separate compatibility/schema identity, reproducibility identities, completed status, raw fills, the paired closed-trade ledger, journal/artifact references, fixed-precision accounting totals, diagnostics, and realism disclosures, and shall reject incomplete publication. `fills` are execution events; `closed_trades` are the paired round-trips consumers measure, populated from the engine-observed terminal closes of `FR-SIM-020` and never reconstructed after the run. `accounting` is derived from the completed `AccountLedger` totals; no monetary field in the published envelope is a constant."
+    )
     print(f"Simulation result status: {_result().status}")
 
 
@@ -124,6 +131,9 @@ def fr_sim_040() -> None:
         `commission` and `swap`, which carry a negative sign. The field set matches
         Analytics `FR-ANLT-049` exactly.
     """
+    _header(
+        "Demonstrate FR-SIM-040. Responsibility: The system shall expose one closed-trade ledger record carrying exactly `ticket`, `symbol`, `type`, `volume`, `entry_time`, `entry_price`, `stop_loss`, `take_profit`, `exit_time`, `exit_price`, `comment`, `commission`, `swap`, `profit`, `magic`, `mae`, and `mfe`. Timestamps are UTC; monetary and price fields are `Decimal`. `profit` is **gross** — price movement only — and excludes `commission` and `swap`, which carry a negative sign. The field set matches Analytics `FR-ANLT-049` exactly."
+    )
     trade = _result().closed_trades[0]
     print(f"Closed trade gross profit: {trade.profit}")
 
@@ -152,6 +162,9 @@ def fr_sim_033() -> None:
         `effective_at`, `expires_at`, `approved_budget`, and `currency`. Incomplete or
         unreconciled runs are never published.
     """
+    _header(
+        "Demonstrate FR-SIM-033. Responsibility: The system shall expose `PortfolioSimulationResult` v1 with separate compatibility/schema identity, run/result/reproducibility identities, construction identity, a bounded UTC measurement window, base currency, ordered reconciled component results, aligned component return evidence, aggregate journal and metric references, ordered Risk-owned budget-history evidence, FX lineage, an artifact manifest, and completed status. Each component row contains exactly `component_id`, `simulation_result_id`, `journal_ref`, `metrics_ref`, `account_currency`, and `reconciled=true`. Each component-return row contains exactly `component_id`, `simulation_result_id`, and `observations`; each observation contains exactly `timestamp` and `return_value`. Return observations are **periodic mark-to-market equity returns** measured by Simulation on one fixed UTC cadence shared by every component, derived from the component's own simulated equity curve; they are never supplied by the caller and never derived on a closed-trade basis. Return timestamps are unique ordered UTC values inside the measurement window, return values are finite, every component/result pair appears exactly once, and at least 30 timestamps are common to every component. Each risk-budget row contains exactly `risk_decision_id`, `component_id`, `effective_at`, `expires_at`, `approved_budget`, and `currency`. Incomplete or unreconciled runs are never published."
+    )
     start = datetime(2025, 1, 1, tzinfo=UTC)
     end = start + timedelta(days=30)
     observations = tuple(
@@ -219,6 +232,9 @@ def fr_sim_025() -> None:
         with relative path, media type, size, SHA-256 checksum, schema version, and
         creation time.
     """
+    _header(
+        "Demonstrate FR-SIM-025. Responsibility: The system shall expose a versioned manifest entry for every canonical artifact with relative path, media type, size, SHA-256 checksum, schema version, and creation time."
+    )
     instant = datetime(2025, 1, 1, tzinfo=UTC)
     entries = tuple(
         ArtifactEntry(
@@ -246,6 +262,9 @@ def fr_sim_026() -> None:
         size, calculate checksums, and return a stable manifest without publishing
         temporary files.
     """
+    _header(
+        "Demonstrate FR-SIM-026. Responsibility: The system shall read completed canonical artifacts, verify containment and size, calculate checksums, and return a stable manifest without publishing temporary files."
+    )
     instant = datetime(2025, 1, 1, tzinfo=UTC)
     with tempfile.TemporaryDirectory() as tmp_dir:
         root = Path(tmp_dir)
@@ -266,6 +285,9 @@ def fr_sim_027() -> None:
         with execution/accounting diagnostics and realism/data-quality disclosures,
         excluding Analytics-owned metric formulas.
     """
+    _header(
+        "Demonstrate FR-SIM-027. Responsibility: The system shall serialize a `SimulationResult` to deterministic canonical JSON with execution/accounting diagnostics and realism/data-quality disclosures, excluding Analytics-owned metric formulas."
+    )
     print(f"JSON report bytes: {len(build_json_report(_result()))}")
 
 
@@ -277,6 +299,9 @@ def fr_sim_028() -> None:
         assumptions, limitations, costs, fills, rejections, data quality, and artifact
         identities, excluding external distribution claims.
     """
+    _header(
+        "Demonstrate FR-SIM-028. Responsibility: The system shall render a deterministic Markdown execution report with assumptions, limitations, costs, fills, rejections, data quality, and artifact identities, excluding external distribution claims."
+    )
     print(build_markdown_report(_result()).splitlines()[0])
 
 

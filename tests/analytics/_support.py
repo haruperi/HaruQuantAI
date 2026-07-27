@@ -1,4 +1,3 @@
-# ruff: noqa: INP001 - standalone test namespace by repository policy.
 """Shared test support helpers for Analytics tests."""
 
 from dataclasses import replace

@@ -1,6 +1,6 @@
 """Unit tests for authorized Trading portfolio rebalance execution."""
 
-# ruff: noqa: ARG005, INP001
+# ruff: noqa: ARG005
 from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal
@@ -21,6 +21,7 @@ from app.services.trading.contracts import (
 from app.services.trading.state import TradingProjection
 from app.utils import canonical_json
 from pydantic import ValidationError
+
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
     MemoryStore,

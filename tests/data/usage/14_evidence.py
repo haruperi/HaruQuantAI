@@ -76,6 +76,11 @@ class _FXProvider:
         )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _demonstrate_feature() -> None:
     """Call every FEAT-DATA-09 public evidence operation."""
     context_request = MarketContextRequest(
@@ -127,32 +132,38 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_008() -> None:
-    "FR-DATA-008: Expose immutable normalized account, balance, margin, position, order, connectivity, and staleness evidence with exact decimals and UTC snapshot time."  # noqa: E501 - exact specification text
+    _header("fr_data_008")
+    "FR-DATA-008: Expose immutable normalized account, balance, margin, position, order, connectivity, and staleness evidence with exact decimals and UTC snapshot time."
     _demonstrate_once()
 
 
 def fr_data_028() -> None:
-    "FR-DATA-028: Return a fresh normalized `AccountStateSnapshot v1` from read-only Brokers `BrokerAdapter` account reads without exposing credentials/provider objects."  # noqa: E501 - exact specification text
+    _header("fr_data_028")
+    "FR-DATA-028: Return a fresh normalized `AccountStateSnapshot v1` from read-only Brokers `BrokerAdapter` account reads without exposing credentials/provider objects."
     _demonstrate_once()
 
 
 def fr_data_075() -> None:
-    "FR-DATA-075: Validate a bounded request for session, calendar, spread, liquidity, volatility, correlation, and crisis evidence for one declared scope."  # noqa: E501 - exact specification text
+    _header("fr_data_075")
+    "FR-DATA-075: Validate a bounded request for session, calendar, spread, liquidity, volatility, correlation, and crisis evidence for one declared scope."
     _demonstrate_once()
 
 
 def fr_data_076() -> None:
-    "FR-DATA-076: Produce immutable `MarketContextEvidence v1` with separate contract version/schema ID, UTC freshness, provenance, and explicit missingness; never produce a Risk verdict."  # noqa: E501 - exact specification text
+    _header("fr_data_076")
+    "FR-DATA-076: Produce immutable `MarketContextEvidence v1` with separate contract version/schema ID, UTC freshness, provenance, and explicit missingness; never produce a Risk verdict."
     _demonstrate_once()
 
 
 def fr_data_078() -> None:
-    "FR-DATA-078: Validate source/target currencies, UTC `as_of`, explicit maximum age, and explicit allowed-path policy; reject same-leg cycles and unbounded discovery."  # noqa: E501 - exact specification text
+    _header("fr_data_078")
+    "FR-DATA-078: Validate source/target currencies, UTC `as_of`, explicit maximum age, and explicit allowed-path policy; reject same-leg cycles and unbounded discovery."
     _demonstrate_once()
 
 
 def fr_data_079() -> None:
-    "FR-DATA-079: Deterministically select an allowed acyclic direct/synthesized path and publish exact rates, UTC freshness, policy version, and source provenance as `FXConversionEvidence v1`; never fabricate a rate."  # noqa: E501 - exact specification text
+    _header("fr_data_079")
+    "FR-DATA-079: Deterministically select an allowed acyclic direct/synthesized path and publish exact rates, UTC freshness, policy version, and source provenance as `FXConversionEvidence v1`; never fabricate a rate."
     _demonstrate_once()
 
 

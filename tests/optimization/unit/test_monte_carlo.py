@@ -1,6 +1,5 @@
 """Tests for Optimization Monte Carlo behavior."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 from app.services.optimization.robustness import (
@@ -9,6 +8,7 @@ from app.services.optimization.robustness import (
     run_monte_carlo,
     run_parametric_simulation,
 )
+
 from tests.optimization.unit.test_robustness_contracts import monte_carlo_request
 
 

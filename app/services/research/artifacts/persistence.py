@@ -28,14 +28,8 @@ from app.utils import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
-
     from app.services.research.contracts import ResearchResourceLimits
-    from app.utils.contracts.audit import JsonValue as AuditJSONValue
-
-type JSONValue = (
-    None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]
-)
+    from app.services.research.leakage.masking import JSONValue as LeakageJSONValue
 
 ArtifactT = ResearchReport | ResearchProfileSnapshot
 
@@ -75,7 +69,7 @@ def _serialize_artifact(artifact: ArtifactT, *, config: ArtifactWriteConfig) -> 
             "stages": dict(artifact.stages),
             "advisory_only": artifact.advisory_only,
         }
-    masked = mask_research_artifact(cast("JSONValue", payload))
+    masked = mask_research_artifact(cast("LeakageJSONValue", payload))
     return canonical_json(masked).encode("utf-8")
 
 
@@ -123,7 +117,7 @@ def _emit_audit_event(
     """
     logger.info("Emitting Research artifact audit event")
     event_id = generate_id("evt")
-    payload: dict[str, AuditJSONValue] = {
+    payload: dict[str, str | int] = {
         "relative_path": relative_path.as_posix(),
         "size_bytes": size_bytes,
         "sha256_prefix": sha256[:16],

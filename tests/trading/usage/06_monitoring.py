@@ -3,7 +3,6 @@
 Demonstrates operational events, runtime event emission, and budget gates.
 """
 
-# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -24,6 +23,11 @@ NOW = datetime(2026, 7, 19, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
 WORKFLOW_ID = "wf-22222222-2222-4222-8222-222222222222"
 CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def fr_trd_068() -> OperationalEvent:
@@ -64,9 +68,8 @@ def fr_trd_068() -> OperationalEvent:
 
 def example_monitoring() -> None:
     """Demonstrate Trading monitoring models and emission."""
-    print("=" * 80)
+    _header("Demonstrate Trading monitoring models and emission.")
     print("Trading Example 6: Operational Events and Monitoring")
-    print("=" * 80)
 
     # 1. Operational event construction
     event = OperationalEvent(
@@ -108,16 +111,25 @@ def example_monitoring() -> None:
 
 def fr_trd_046() -> None:
     """FR-TRD-046: The system shall represent focused health, dependency, staleness, timeout, latency, cost, and incident evidence in a Trading-owned contract."""
+    _header(
+        "FR-TRD-046: The system shall represent focused health, dependency, staleness, timeout, latency, cost, and incident evidence in a Trading-owned contract."
+    )
     example_monitoring()
 
 
 def fr_trd_047() -> None:
     """FR-TRD-047: Enforce the current Risk-owned `AllocationRiskDecision v1` together with a current `PortfolioBudgetExecutionVerdict v1` for the exact portfolio, allocation version, plan ID/hash, and budget unit; never calculate or modify the budget."""
+    _header(
+        "FR-TRD-047: Enforce the current Risk-owned `AllocationRiskDecision v1` together with a current `PortfolioBudgetExecutionVerdict v1` for the exact portfolio, allocation version, plan ID/hash, and budget unit; never calculate or modify the budget."
+    )
     example_monitoring()
 
 
 def fr_trd_048() -> None:
     """FR-TRD-048: The system shall publish redacted runtime evidence through an injected composition sink without importing Data or UI/API and without hiding delivery failure."""
+    _header(
+        "FR-TRD-048: The system shall publish redacted runtime evidence through an injected composition sink without importing Data or UI/API and without hiding delivery failure."
+    )
     example_monitoring()
 
 

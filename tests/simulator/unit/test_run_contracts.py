@@ -1,5 +1,4 @@
 """Unit tests for exact Simulation request contracts."""
-# ruff: noqa: INP001
 
 from datetime import timedelta
 from decimal import Decimal
@@ -12,6 +11,7 @@ from app.services.simulator.run import (
 )
 from app.utils import canonical_digest
 from pydantic import ValidationError
+
 from tests.simulator.unit.test_orchestrator import _dataset, _fx_evidence, _request
 
 

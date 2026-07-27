@@ -1,6 +1,6 @@
 """Unit tests for Trading controls and Risk-owned kill-switch transitions."""
 
-# ruff: noqa: ARG005, INP001
+# ruff: noqa: ARG005
 from dataclasses import replace
 from datetime import timedelta
 
@@ -16,6 +16,7 @@ from app.services.trading.actions import (
 from app.services.trading.contracts import TradingError
 from app.services.trading.reconciliation import AuthoritySnapshot
 from app.services.trading.state import TradingProjection
+
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
     MemoryStore,

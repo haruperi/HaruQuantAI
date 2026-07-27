@@ -25,13 +25,67 @@ RuntimeProfile = Literal["research", "simulation", "paper", "live"]
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
+def _flatten_leaf(
+    next_path: tuple[str, ...], value: object, result: dict[str, Any]
+) -> None:
+    """Record candidate field key names for a primitive JSON leaf node.
+
+    Args:
+        next_path: Sequence of path keys identifying the leaf node.
+        value: Primitive value to assign to candidate key names.
+        result: Dictionary accumulator receiving candidate settings mappings.
+    """
+    if len(next_path) > 1:
+        joined = "_".join(next_path)
+        result[joined] = value
+        result[joined.upper()] = value
+
+    if next_path == ("environment", "current"):
+        result["environment"] = value
+        result["ENVIRONMENT"] = value
+    elif next_path == ("google_genai", "agent_model"):
+        result["google_agent_model"] = value
+        result["GOOGLE_AGENT_MODEL"] = value
+
+    leaf_key = next_path[-1]
+    if leaf_key.lower() == "environment" and next_path != ("environment", "current"):
+        return
+
+    if leaf_key not in result:
+        result[leaf_key] = value
+        result[leaf_key.upper()] = value
+
+
+def _flatten_json(obj: object, path: tuple[str, ...] = ()) -> dict[str, Any]:
+    """Recursively flatten nested JSON objects into a lookup dictionary.
+
+    Args:
+        obj: Raw JSON object node.
+        path: Accumulated path of dictionary keys.
+
+    Returns:
+        Mapping of candidate field key names to primitive JSON values.
+    """
+    result: dict[str, Any] = {}
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            if isinstance(key, str):
+                next_path = (*path, key) if path or key != "settings" else ()
+                if isinstance(value, dict):
+                    result.update(_flatten_json(value, next_path))
+                elif next_path:
+                    _flatten_leaf(next_path, value, result)
+    return result
+
+
 class _CentralJsonSettingsSource(JsonConfigSettingsSource):
     """Central JSON source matching aliases, uppercase, and exact field names.
 
     The stock JSON source matches file keys to field names case-sensitively,
     while the repository central settings file uses uppercase environment-style
-    keys. This source reproduces the previous dotenv name-matching behavior so
-    every ``AppSettings`` subclass loads identically from the JSON file.
+    or nested snake_case keys. This source reproduces the previous dotenv
+    name-matching behavior so every ``AppSettings`` subclass loads identically
+    from the JSON file.
     """
 
     @override
@@ -48,6 +102,7 @@ class _CentralJsonSettingsSource(JsonConfigSettingsSource):
         raw: object = json.loads(Path(str(json_file)).read_text(encoding="utf-8"))
         if not isinstance(raw, dict):
             return {}
+        flattened = _flatten_json(raw)
         values: dict[str, Any] = {}
         for field_name, field in self.settings_cls.model_fields.items():
             alias = (
@@ -57,8 +112,8 @@ class _CentralJsonSettingsSource(JsonConfigSettingsSource):
             )
             candidates = ([alias] if alias else []) + [field_name.upper(), field_name]
             for key in candidates:
-                if key in raw:
-                    values[alias or field_name] = raw[key]
+                if key in flattened:
+                    values[alias or field_name] = flattened[key]
                     break
         return values
 

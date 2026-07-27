@@ -386,6 +386,20 @@ No experimental, optional, or future callable is exported in the initial package
 
 ## 3. Workflows
 
+> **Workflow usage evidence:** Each completed workflow has one standalone
+> input-to-output program with README-aligned stages. Market-dependent programs read
+> genuine MT5 demo evidence through Data. Run all programs with
+> `python tests/indicators/usage/workflows/run_all.py`. This satisfies
+> `NFR-INDI-011` and complements feature-level usage evidence.
+
+| Workflow | Standalone program |
+|---|---|
+| `WF-INDI-001` | `tests/indicators/usage/workflows/wf_indi_001_core_batch_indicator_calculation.py` |
+| `WF-INDI-002` | `tests/indicators/usage/workflows/wf_indi_002_decision_time_consumption.py` |
+| `WF-INDI-003` | `tests/indicators/usage/workflows/wf_indi_003_warmup_coordination.py` |
+| `WF-INDI-004` | `tests/indicators/usage/workflows/wf_indi_004_availability_aware_multi_timeframe_calculation.py` |
+| `WF-INDI-005` | `tests/indicators/usage/workflows/wf_indi_005_static_registry_discovery_validation.py` |
+
 ### Status values
 
 | Status | Meaning |

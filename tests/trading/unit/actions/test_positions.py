@@ -1,6 +1,5 @@
 """Unit tests for route-aware Trading position actions."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 import pytest
@@ -10,6 +9,7 @@ from app.services.trading.actions import (
     reduce_exposure,
 )
 from app.services.trading.contracts import TradingError
+
 from tests.trading.unit.actions.test_dependencies import (
     dependencies,
     execution_store,

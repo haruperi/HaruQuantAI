@@ -26,6 +26,11 @@ from app.services.research.modeling import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> UnsupervisedResearchConfig:
     """Build a modeling configuration."""
     return UnsupervisedResearchConfig(("a", "b"), True, 2, 2, 20, 7)
@@ -44,21 +49,22 @@ def _ohlc(rows: int = 25) -> pd.DataFrame:
 
 def fr_res_081() -> None:
     """FR-RES-081: Scale selected finite features and return PCA evidence."""
-    print("=" * 80)
+    _header("FR-RES-081: Scale selected finite features and return PCA evidence.")
     print("Research Example 10: Unsupervised Modeling")
-    print("=" * 80)
     pca = run_pca(_features(), config=_config())
     print(f"FR-RES-081 components={pca['n_components']}")
 
 
 def fr_res_082() -> None:
     """FR-RES-082: Cluster finite feature rows with seeded K-Means."""
+    _header("FR-RES-082: Cluster finite feature rows with seeded K-Means.")
     clusters = cluster_feature_space(_features(), config=_config())
     print(f"FR-RES-082 n_clusters={clusters['n_clusters']}")
 
 
 def fr_res_083() -> None:
     """FR-RES-083: Attach aligned labels to a copied frame."""
+    _header("FR-RES-083: Attach aligned labels to a copied frame.")
     features = _features()
     labels = pd.Series([0, 1] * 12 + [0], index=features.index)
     tagged = attach_cluster_labels(features, labels)
@@ -67,12 +73,14 @@ def fr_res_083() -> None:
 
 def fr_res_084() -> None:
     """FR-RES-084: Return descriptive evidence for investment data."""
+    _header("FR-RES-084: Return descriptive evidence for investment data.")
     summary = summarize_investment_data(_features())
     print(f"FR-RES-084 row_count={summary['row_count']}")
 
 
 def fr_res_085() -> None:
     """FR-RES-085: Extract largest absolute PCA loadings as factors."""
+    _header("FR-RES-085: Extract largest absolute PCA loadings as factors.")
     pca = run_pca(_features(), config=_config())
     factors = identify_pca_risk_factors(pca, top_count=1)
     print(f"FR-RES-085 factor_count={len(factors)}")
@@ -80,6 +88,7 @@ def fr_res_085() -> None:
 
 def fr_res_086() -> None:
     """FR-RES-086: Compare clusters using canonical forward returns."""
+    _header("FR-RES-086: Compare clusters using canonical forward returns.")
     data = _ohlc()
     labels = pd.Series([0, 1] * 12 + [0], index=data.index)
     result = analyze_cluster_outperformance(data, labels, horizon=2)
@@ -88,12 +97,14 @@ def fr_res_086() -> None:
 
 def fr_res_087() -> None:
     """FR-RES-087: Combine all evidence; omit signal-adaptation."""
+    _header("FR-RES-087: Combine all evidence; omit signal-adaptation.")
     report = build_unsupervised_insight_report(_features(), config=_config())
     print(f"FR-RES-087 signal_adaptation={report['signal_adaptation']}")
 
 
 def fr_res_088() -> None:
     """FR-RES-088: Execute the stateless bounded modeling workflow."""
+    _header("FR-RES-088: Execute the stateless bounded modeling workflow.")
     result = run_unsupervised_research(
         _features(),
         config=_config(),

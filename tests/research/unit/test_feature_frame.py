@@ -10,6 +10,7 @@ from app.services.research.contracts import (
 )
 from app.services.research.features import build_research_feature_frame
 from app.utils import logger
+
 from tests.indicators.helpers import build_dataset
 
 _HASH = "c" * 64

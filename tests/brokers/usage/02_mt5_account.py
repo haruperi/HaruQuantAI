@@ -3,130 +3,116 @@
 import asyncio
 
 import _support  # noqa: F401
-from _support import config
-from app.services.brokers import (
-    BrokerId,
-    create_broker_adapter,
+from _support import (
+    create_real_adapter,
+    real_session,
+    require_error,
+    require_success,
 )
+from app.services.brokers import BrokerAdapter, BrokerErrorCode, BrokerId
 
 
-def fr_brokers_048() -> None:
-    """FR-BRK-048: Explicitly establish and verify transport, auth, account, and
-    environment."""
-    created = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5))
-    print("FR-BRK-048:", created.status)
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def fr_brokers_049() -> None:
+async def fr_brokers_048(adapter: BrokerAdapter) -> None:
+    """FR-BRK-048: Establish and verify transport, auth, account, and environment."""
+    _header(
+        "FR-BRK-048: Establish and verify transport, auth, account, and environment."
+    )
+    result = await adapter.get_connection_status()
+    require_success("Result", result)
+    assert result.data is not None
+    assert result.data.transport_connected
+
+
+async def fr_brokers_049(adapter: BrokerAdapter) -> None:
     """FR-BRK-049: Idempotently close every session, task, handle, and subscription."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.disconnect()
-        print("FR-BRK-049:", res.status)
-
-    asyncio.run(run())
-
-
-def fr_brokers_050() -> None:
-    """FR-BRK-050: Recover transport/session up to bound without replaying
-    operations."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.reconnect()
-        print("FR-BRK-050:", res.status)
-
-    asyncio.run(run())
+    del adapter
+    _header(
+        "FR-BRK-049: Idempotently close every session, task, handle, and subscription."
+    )
+    disconnected = create_real_adapter(BrokerId.MT5)
+    require_success("Result", await disconnected.disconnect())
+    require_success("Repeated result", await disconnected.disconnect())
 
 
-def fr_brokers_051() -> None:
-    """FR-BRK-051: Return verified current connectivity rather than local Boolean
-    flag."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.is_connected()
-        print("FR-BRK-051:", res.data)
-
-    asyncio.run(run())
+async def fr_brokers_050(adapter: BrokerAdapter) -> None:
+    """FR-BRK-050: Recover transport/session without replaying operations."""
+    _header("FR-BRK-050: Recover transport/session without replaying operations.")
+    require_success("Result", await adapter.reconnect())
 
 
-def fr_brokers_052() -> None:
-    """FR-BRK-052: Return detailed lifecycle, auth, account, permission, and status.
-    environment"""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_connection_status()
-        print("FR-BRK-052:", res.data.state.value if res.data else None)
-
-    asyncio.run(run())
+async def fr_brokers_051(adapter: BrokerAdapter) -> None:
+    """FR-BRK-051: Return verified connectivity rather than a local Boolean flag."""
+    _header(
+        "FR-BRK-051: Return verified connectivity rather than a local Boolean flag."
+    )
+    result = await adapter.is_connected()
+    require_success("Connected status", result)
+    assert result.data is True
 
 
-def fr_brokers_053() -> None:
-    """FR-BRK-053: Perform provider-supported liveness probe or return unsupported."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.ping()
-        print("FR-BRK-053:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_052(adapter: BrokerAdapter) -> None:
+    """FR-BRK-052: Return detailed lifecycle, auth, account, and environment."""
+    _header("FR-BRK-052: Return detailed lifecycle, auth, account, and environment.")
+    result = await adapter.get_connection_status()
+    require_success("Lifecycle state", result)
+    assert result.data is not None
+    print("Lifecycle value", result.data.state.value)
 
 
-def fr_brokers_054() -> None:
-    """FR-BRK-054: Use provider token/session refresh or fail closed."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.refresh_session()
-        print("FR-BRK-054:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_053(adapter: BrokerAdapter) -> None:
+    """FR-BRK-053: Perform a provider-supported liveness probe."""
+    _header("FR-BRK-053: Perform a provider-supported liveness probe.")
+    require_success("Liveness probe", await adapter.ping())
 
 
-def fr_brokers_055() -> None:
-    """FR-BRK-055: Return provider time and clock/latency evidence when available."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_server_time()
-        print("FR-BRK-055:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_054(adapter: BrokerAdapter) -> None:
+    """FR-BRK-054: Use provider session refresh or fail closed."""
+    _header("FR-BRK-054: Use provider session refresh or fail closed.")
+    require_error(
+        "Session refresh",
+        await adapter.refresh_session(),
+        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+    )
 
 
-def fr_brokers_056() -> None:
-    """FR-BRK-056: Expose adapter instance latest redacted diagnostic error."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
+async def fr_brokers_055(adapter: BrokerAdapter) -> None:
+    """FR-BRK-055: Return provider time evidence when available."""
+    _header("FR-BRK-055: Return provider time evidence when available.")
+    require_error(
+        "Server time",
+        await adapter.get_server_time(),
+        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+    )
 
-    async def run() -> None:
-        res = await adapter.get_last_error()
-        print("FR-BRK-056:", res.data)
 
-    asyncio.run(run())
+async def fr_brokers_056(adapter: BrokerAdapter) -> None:
+    """FR-BRK-056: Expose the adapter's latest redacted diagnostic error."""
+    _header("FR-BRK-056: Expose the adapter's latest redacted diagnostic error.")
+    require_success("Last error", await adapter.get_last_error())
+
+
+async def _run() -> None:
+    """Execute every lifecycle requirement in one genuine MT5 demo session."""
+    async with real_session(BrokerId.MT5) as adapter:
+        await fr_brokers_048(adapter)
+        await fr_brokers_049(adapter)
+        await fr_brokers_050(adapter)
+        await fr_brokers_051(adapter)
+        await fr_brokers_052(adapter)
+        await fr_brokers_053(adapter)
+        await fr_brokers_054(adapter)
+        await fr_brokers_055(adapter)
+        await fr_brokers_056(adapter)
 
 
 def main() -> None:
-    """Execute every FR-BRK-048..056 usage function."""
-    fr_brokers_048()
-    fr_brokers_049()
-    fr_brokers_050()
-    fr_brokers_051()
-    fr_brokers_052()
-    fr_brokers_053()
-    fr_brokers_054()
-    fr_brokers_055()
-    fr_brokers_056()
+    """Run the standalone genuine MT5 lifecycle program."""
+    asyncio.run(_run())
 
 
 if __name__ == "__main__":

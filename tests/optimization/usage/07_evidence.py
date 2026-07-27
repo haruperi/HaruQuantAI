@@ -19,11 +19,15 @@ from app.services.optimization.evidence import (
 from tests.optimization.unit.test_evidence_contracts import evidence_request
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_evidence() -> None:
     """Demonstrate optimization evidence assembly."""
-    print("=" * 80)
+    _header("Demonstrate optimization evidence assembly.")
     print("Optimization Example 7: Evidence Assembly and Report Packages")
-    print("=" * 80)
 
     # 1. Final decision catalog
     print(f"Final Decision Enum: {FinalDecision.RESEARCH_ONLY.value}")

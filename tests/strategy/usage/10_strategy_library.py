@@ -96,6 +96,11 @@ _POLICY = StrategyValidationPolicy(
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _context(name: str) -> StrategyExecutionContext:
     """Build one fixed deterministic evaluation context.
 
@@ -784,7 +789,6 @@ def main() -> int:
         connection or required receiver-owned evidence is unavailable.
     """
     print("\nSTRATEGY SIGNAL LIBRARY — REAL MT5 EURUSD EVALUATION")
-    print("=" * 88)
 
     start_bound = datetime(2025, 1, 1, 0, 0, tzinfo=UTC)
     end_bound = datetime(2025, 12, 31, 23, 59, tzinfo=UTC)

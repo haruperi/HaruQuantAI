@@ -23,6 +23,11 @@ NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _snapshot() -> PortfolioRiskSnapshot:
     """Build immutable portfolio risk snapshot."""
     return PortfolioRiskSnapshot(
@@ -98,9 +103,8 @@ def _market() -> MarketContextEvidence:
 
 def example_limits() -> None:
     """Demonstrate evaluating portfolio and market-context limits."""
-    print("=" * 80)
+    _header("Demonstrate evaluating portfolio and market-context limits.")
     print("Risk Example 6: Deterministic Limit Evaluation")
-    print("=" * 80)
 
     snapshot = _snapshot()
     config = _config()
@@ -130,6 +134,9 @@ def fr_risk_027() -> None:
     exposure/concentration, margin/leverage, historical tail risk, correlation,
     and freshness in deterministic precedence, returning primary and composite
     failures."""
+    _header(
+        "FR-RISK-027: Evaluate daily/total loss, drawdown state, consistency, exposure/concentration, margin/leverage, historical tail risk, correlation, and freshness in deterministic precedence, returning primary and composite failures."
+    )
     _demonstrate_once()
 
 
@@ -139,6 +146,9 @@ def fr_risk_028() -> None:
     conversion, or naive/aware datetime comparison. Slippage is excluded because
     `MarketContextEvidence v1` does not carry it and execution slippage is
     receiver-owned post-trade evidence."""
+    _header(
+        "FR-RISK-028: Evaluate supplied spread, liquidity availability, session, and normalized calendar state without external fetches, hidden unit conversion, or naive/aware datetime comparison. Slippage is excluded because `MarketContextEvidence v1` does not carry it and execution slippage is receiver-owned post-trade evidence."
+    )
     _demonstrate_once()
 
 

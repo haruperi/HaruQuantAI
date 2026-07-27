@@ -37,6 +37,11 @@ class _MarketDataUsageSettings(AppSettings):
     data_usage_live_providers: str = ""
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _provider_opted_in(source_id: str) -> bool:
     """Return whether an external provider was explicitly enabled for this run."""
     raw_setting = _MarketDataUsageSettings().data_usage_live_providers
@@ -56,12 +61,11 @@ def _print_header(title: str) -> None:
     """Print a section header."""
     print("\n" + "=" * 100)
     print(f"\t\t {title} ")
-    print("=" * 100)
 
 
 def example_01_mt5_bars() -> None:
     """Retrieve MT5 OHLCV bar dataset via public get_market_data."""
-    _print_header("EXAMPLE 01: MT5 Bars")
+    _header("Retrieve MT5 OHLCV bar dataset via public get_market_data.")
     if not _provider_opted_in("mt5"):
         return
     req_id = generate_id("req")
@@ -89,7 +93,7 @@ def example_01_mt5_bars() -> None:
 
 def example_02_mt5_ticks() -> None:
     """Retrieve MT5 tick dataset via public get_tick_data."""
-    _print_header("EXAMPLE 02: MT5 Ticks")
+    _header("Retrieve MT5 tick dataset via public get_tick_data.")
     if not _provider_opted_in("mt5"):
         return
     req_id = generate_id("req")
@@ -116,7 +120,7 @@ def example_02_mt5_ticks() -> None:
 
 def example_03_dukascopy() -> None:
     """Retrieve Dukascopy OHLCV data via public get_market_data."""
-    _print_header("EXAMPLE 03: Dukascopy")
+    _header("Retrieve Dukascopy OHLCV data via public get_market_data.")
     if not _provider_opted_in("dukascopy"):
         return
     req_id = generate_id("req")
@@ -144,7 +148,7 @@ def example_03_dukascopy() -> None:
 
 def example_04_yahoo() -> None:
     """Retrieve Yahoo Finance OHLCV data via public get_market_data."""
-    _print_header("EXAMPLE 04: Yahoo Finance")
+    _header("Retrieve Yahoo Finance OHLCV data via public get_market_data.")
     if not _provider_opted_in("yahoo"):
         return
     req_id = generate_id("req")
@@ -172,7 +176,7 @@ def example_04_yahoo() -> None:
 
 def example_05_binance() -> None:
     """Retrieve Binance OHLCV data via public get_market_data."""
-    _print_header("EXAMPLE 05: Binance")
+    _header("Retrieve Binance OHLCV data via public get_market_data.")
     if not _provider_opted_in(_BINANCE_SOURCE):
         return
     req_id = generate_id("req")
@@ -200,7 +204,7 @@ def example_05_binance() -> None:
 
 def example_06_symbol_discovery() -> None:
     """Discover symbols per source using list_symbols."""
-    _print_header("EXAMPLE 06: Symbol Discovery")
+    _header("Discover symbols per source using list_symbols.")
     if not _provider_opted_in(_BINANCE_SOURCE):
         return
     req_id = generate_id("req")
@@ -220,7 +224,7 @@ def example_06_symbol_discovery() -> None:
 
 def example_07_symbol_metadata() -> None:
     """Inspect symbol metadata via get_symbol_metadata."""
-    _print_header("EXAMPLE 07: Symbol Metadata")
+    _header("Inspect symbol metadata via get_symbol_metadata.")
     if not _provider_opted_in(_BINANCE_SOURCE):
         return
     req_id = generate_id("req")
@@ -241,7 +245,7 @@ def example_07_symbol_metadata() -> None:
 
 def example_08_data_availability() -> None:
     """Inspect source availability via get_data_availability."""
-    _print_header("EXAMPLE 08: Data Availability")
+    _header("Inspect source availability via get_data_availability.")
     if not _provider_opted_in(_BINANCE_SOURCE):
         return
     req_id = generate_id("req")
@@ -290,42 +294,50 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_006() -> None:
-    "FR-DATA-006: Validate one typed internal request containing source, symbol, kind, optional timeframe/range/limit, cache policy, the closed quality-failure enum `reject` or `warn`, UTC/IANA inputs, workflow, precision, explicit fallbacks, and request ID. The default is `reject`; the removed `fail` literal is invalid."  # noqa: E501 - exact specification text
+    _header("fr_data_006")
+    "FR-DATA-006: Validate one typed internal request containing source, symbol, kind, optional timeframe/range/limit, cache policy, the closed quality-failure enum `reject` or `warn`, UTC/IANA inputs, workflow, precision, explicit fallbacks, and request ID. The default is `reject`; the removed `fail` literal is invalid."
     _demonstrate_once()
 
 
 def fr_data_007() -> None:
-    "FR-DATA-007: Represent indexed ranges, gaps, overlap/completeness evidence, record count, source revision/readiness, and provenance without materializing the full dataset."  # noqa: E501 - exact specification text
+    _header("fr_data_007")
+    "FR-DATA-007: Represent indexed ranges, gaps, overlap/completeness evidence, record count, source revision/readiness, and provenance without materializing the full dataset."
     _demonstrate_once()
 
 
 def fr_data_030() -> None:
-    "FR-DATA-030: Execute bounded bars/ticks/spreads retrieval through explicit source policy, versioned cache, normalization, quality, and precision, returning `MarketDataset`. A failed quality report raises `DATA_QUALITY_FAILED` under `reject`; under `warn`, fresh and cached paths log and return the unchanged data and failed report."  # noqa: E501 - exact specification text
+    _header("fr_data_030")
+    "FR-DATA-030: Execute bounded bars/ticks/spreads retrieval through explicit source policy, versioned cache, normalization, quality, and precision, returning `MarketDataset`. A failed quality report raises `DATA_QUALITY_FAILED` under `reject`; under `warn`, fresh and cached paths log and return the unchanged data and failed report."
     _demonstrate_once()
 
 
 def fr_data_031() -> None:
-    "FR-DATA-031: Return a bounded deterministic symbol page with cursor, source readiness, and provenance."  # noqa: E501 - exact specification text
+    _header("fr_data_031")
+    "FR-DATA-031: Return a bounded deterministic symbol page with cursor, source readiness, and provenance."
     _demonstrate_once()
 
 
 def fr_data_032() -> None:
-    "FR-DATA-032: Return normalized asset-aware metadata and explicitly mark unknown optional fields without provider-derived optimistic defaults."  # noqa: E501 - exact specification text
+    _header("fr_data_032")
+    "FR-DATA-032: Return normalized asset-aware metadata and explicitly mark unknown optional fields without provider-derived optimistic defaults."
     _demonstrate_once()
 
 
 def fr_data_033() -> None:
-    "FR-DATA-033: Compute ranges, gaps, overlaps, completeness, count, revision, and readiness from local manifests/indexes or one bounded provider retrieval, never hard-code certainty. Provider results describe only the observed probe window and record whether the probe limit was reached."  # noqa: E501 - exact specification text
+    _header("fr_data_033")
+    "FR-DATA-033: Compute ranges, gaps, overlaps, completeness, count, revision, and readiness from local manifests/indexes or one bounded provider retrieval, never hard-code certainty. Provider results describe only the observed probe window and record whether the probe limit was reached."
     _demonstrate_once()
 
 
 def fr_data_035() -> None:
-    "FR-DATA-035: Return bounded source-native or derived volume as records, buckets, or summary with explicit volume kind/unit and provenance."  # noqa: E501 - exact specification text
+    _header("fr_data_035")
+    "FR-DATA-035: Return bounded source-native or derived volume as records, buckets, or summary with explicit volume kind/unit and provenance."
     _demonstrate_once()
 
 
 def fr_data_107() -> None:
-    'FR-DATA-107: Honour a caller-declared stale-cache policy on `MarketDataRequest`: `refresh` treats an expired entry as a miss, `fail_closed` returns `EMPTY_RESULT` without contacting any source, and `serve_stale` returns the expired entry with `cache_status="stale_warning"`. `serve_stale` is valid only in the `research` workflow context and is rejected elsewhere at contract validation.'  # noqa: E501 - exact specification text
+    _header("fr_data_107")
+    'FR-DATA-107: Honour a caller-declared stale-cache policy on `MarketDataRequest`: `refresh` treats an expired entry as a miss, `fail_closed` returns `EMPTY_RESULT` without contacting any source, and `serve_stale` returns the expired entry with `cache_status="stale_warning"`. `serve_stale` is valid only in the `research` workflow context and is rejected elsewhere at contract validation.'
     _demonstrate_once()
 
 

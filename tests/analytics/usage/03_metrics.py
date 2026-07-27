@@ -35,6 +35,11 @@ from tests.analytics._support import _configured_result
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> AnalyticsRunConfig:
     """Build usage configuration."""
     return AnalyticsRunConfig(
@@ -88,9 +93,8 @@ def _trade() -> ClosedTrade:
 
 def example_metrics() -> None:
     """Demonstrate computing metric sections."""
-    print("=" * 80)
+    _header("Demonstrate computing metric sections.")
     print("Analytics Example 3: Metric Calculation")
-    print("=" * 80)
 
     config = _config()
     trade = _trade()
@@ -195,6 +199,9 @@ def fr_anlt_028() -> None:
     labelled per trade, merged-overlap market presence, streaks, and source
     context without treating open/placeholders as realized trades.
     """
+    _header(
+        "FR-ANLT-028. The system shall calculate closed-trade outcomes classified on `net_trade_pnl`, explicit-direction splits, cataloged R-multiples under the ordered `declared_stop` then `realized_mae` basis with the applied basis labelled per trade, merged-overlap market presence, streaks, and source context without treating open/placeholders as realized trades."
+    )
     example_metrics()
 
 
@@ -205,6 +212,9 @@ def fr_anlt_029() -> None:
     equity/return evidence with explicit frequency, scale, UTC, and undefined
     behavior.
     """
+    _header(
+        "FR-ANLT-029. The system shall calculate monetary PnL in `Decimal` and deterministic sorted equity/return evidence with explicit frequency, scale, UTC, and undefined behavior."
+    )
     example_metrics()
 
 
@@ -215,6 +225,9 @@ def fr_anlt_030() -> None:
     pain evidence from approved curves while returning undefined ratios as `None`
     with warnings.
     """
+    _header(
+        "FR-ANLT-030. The system shall calculate core drawdown depth, duration, recovery, ulcer, and pain evidence from approved curves while returning undefined ratios as `None` with warnings."
+    )
     example_metrics()
 
 
@@ -227,6 +240,9 @@ def fr_anlt_031() -> None:
     calculated separately: it is mathematically identical to conditional VaR and
     the catalog permits one implementation.
     """
+    _header(
+        "FR-ANLT-031. The system shall calculate only approved annualized volatility, historical VaR, and conditional VaR evidence from the daily return resample, with cataloged sign, confidence, sample, and units. Expected shortfall is not calculated separately: it is mathematically identical to conditional VaR and the catalog permits one implementation."
+    )
     example_metrics()
 
 
@@ -238,6 +254,9 @@ def fr_anlt_032() -> None:
     Excess-return metrics require source-backed annual-decimal risk-free-rate
     evidence from the injected configuration.
     """
+    _header(
+        "FR-ANLT-032. The system shall calculate only approved core ratios and return zero-denominator/insufficient-sample results as `None` with warnings. Excess-return metrics require source-backed annual-decimal risk-free-rate evidence from the injected configuration."
+    )
     example_metrics()
 
 
@@ -248,6 +267,9 @@ def fr_anlt_033() -> None:
     comparison window, resolve duplicates under approved policy, and return
     deterministic aligned observations.
     """
+    _header(
+        "FR-ANLT-033. The system shall normalize strategy/benchmark timestamps to UTC, restrict the comparison window, resolve duplicates under approved policy, and return deterministic aligned observations."
+    )
     example_metrics()
 
 
@@ -259,6 +281,9 @@ def fr_anlt_034() -> None:
     skipped/undefined evidence. Alpha requires source-backed annual-decimal
     risk-free-rate evidence from the injected configuration.
     """
+    _header(
+        "FR-ANLT-034. The system shall calculate approved benchmark-relative evidence only after alignment and currency checks; non-overlap or zero variance is explicit skipped/undefined evidence. Alpha requires source-backed annual-decimal risk-free-rate evidence from the injected configuration."
+    )
     example_metrics()
 
 
@@ -269,6 +294,9 @@ def fr_anlt_035() -> None:
     percentiles, tails, histogram, and outlier evidence, with constant/short
     samples handled explicitly.
     """
+    _header(
+        "FR-ANLT-035. The system shall use one cataloged implementation for approved moments, percentiles, tails, histogram, and outlier evidence, with constant/short samples handled explicitly."
+    )
     example_metrics()
 
 
@@ -279,6 +307,9 @@ def fr_anlt_036() -> None:
     multiple-comparison, and sample diagnostics reproducibly and shall not return
     fixed placeholder evidence.
     """
+    _header(
+        "FR-ANLT-036. The system shall compute real, bounded, seeded bootstrap, permutation, multiple-comparison, and sample diagnostics reproducibly and shall not return fixed placeholder evidence."
+    )
     example_metrics()
 
 
@@ -292,6 +323,9 @@ def fr_anlt_037() -> None:
     `sum(profit)`, `total_cost_drag` is their signed sum, and `net_pnl` is their
     combination.
     """
+    _header(
+        "FR-ANLT-037. The system shall calculate ledger cost drag, duration, MAE/MFE, `max_intratrade_excursion`, and selected efficiency evidence with documented sign conventions and no source mutation. Because `profit` is gross, `commission` and `swap` are real deductions: `gross_pnl_before_costs` is `sum(profit)`, `total_cost_drag` is their signed sum, and `net_pnl` is their combination."
+    )
     example_metrics()
 
 
@@ -303,6 +337,9 @@ def fr_anlt_038() -> None:
     all/long/short/benchmark/cost/statistical source context, and expose the
     documented feature operation through the package root.
     """
+    _header(
+        "FR-ANLT-038. The system shall execute approved metric groups in deterministic order using the injected bounded statistical and risk-free settings, preserve all/long/short/benchmark/cost/statistical source context, and expose the documented feature operation through the package root."
+    )
     example_metrics()
 
 

@@ -25,13 +25,20 @@ _WORKFLOW = "wf-88888888-8888-4888-8888-888888888888"
 _CORRELATION = "cor-99999999-9999-4999-8999-999999999999"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_027() -> None:
     """Demonstrate the replay-manifest contract."""
+    _header("Demonstrate the replay-manifest contract.")
     assert StrategyReplayManifest.model_fields["manifest_hash"]
 
 
 def fr_str_029() -> None:
     """Demonstrate deterministic replay-manifest creation."""
+    _header("Demonstrate deterministic replay-manifest creation.")
     assert callable(create_strategy_replay_manifest)
 
 
@@ -104,7 +111,6 @@ def main() -> int:
     fr_str_027()
     fr_str_029()
     print("\nSTRATEGY REPLAY MANIFEST")
-    print("=" * 88)
     print("Contract:", StrategyReplayManifest.__name__)
     ref, config = _binding()
     context = StrategyExecutionContext(

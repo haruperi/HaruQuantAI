@@ -45,6 +45,11 @@ class _ExampleCalculator:
         return (MetricValue(self.family, 1.0, "ratio", len(context.data)),)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _prepared() -> PreparedDataset:
     """Build a small two-row prepared Research dataset.
 
@@ -86,6 +91,9 @@ def fr_res_042() -> None:
     Define the read-only contract implemented by one named metric-family
     calculator.
     """
+    _header(
+        "FR-RES-042. Define the read-only contract implemented by one named metric-family calculator."
+    )
     calc = _ExampleCalculator("returns")
     print(f"FR-RES-042 family={calc.family}")
 
@@ -95,6 +103,9 @@ def fr_res_043() -> None:
 
     Compute normalized values for one family from an immutable metric context.
     """
+    _header(
+        "FR-RES-043. Compute normalized values for one family from an immutable metric context."
+    )
     calc = _ExampleCalculator("returns")
     value = calc.compute(MetricContext(pd.DataFrame({"value": [1.0]})))[0]
     print(f"FR-RES-043 name={value.name} unit={value.unit}")
@@ -105,6 +116,9 @@ def fr_res_044() -> None:
 
     Own unique bounded calculator membership without global mutable defaults.
     """
+    _header(
+        "FR-RES-044. Own unique bounded calculator membership without global mutable defaults."
+    )
     registry = MetricRegistry.from_calculators((_ExampleCalculator("returns"),))
     print(f"FR-RES-044 calculators={len(registry.all())}")
 
@@ -114,6 +128,9 @@ def fr_res_045() -> None:
 
     Construct an isolated registry from a bounded calculator iterable.
     """
+    _header(
+        "FR-RES-045. Construct an isolated registry from a bounded calculator iterable."
+    )
     registry = MetricRegistry.from_calculators((_ExampleCalculator("returns"),))
     print(f"FR-RES-045 calculators={len(registry.all())}")
 
@@ -123,6 +140,7 @@ def fr_res_046() -> None:
 
     Resolve a calculator by exact family name.
     """
+    _header("FR-RES-046. Resolve a calculator by exact family name.")
     registry = MetricRegistry.from_calculators((_ExampleCalculator("returns"),))
     resolved = registry.resolve("returns")
     print(f"FR-RES-046 resolved_family={resolved.family}")
@@ -134,6 +152,9 @@ def fr_res_047() -> None:
     Return calculators in deterministic registration order without exposing
     mutable storage.
     """
+    _header(
+        "FR-RES-047. Return calculators in deterministic registration order without exposing mutable storage."
+    )
     registry = MetricRegistry.from_calculators(
         (_ExampleCalculator("returns"), _ExampleCalculator("activity"))
     )
@@ -147,6 +168,9 @@ def fr_res_048() -> None:
 
     Build a new default registry containing the seven retained metric families.
     """
+    _header(
+        "FR-RES-048. Build a new default registry containing the seven retained metric families."
+    )
     registry = build_default_registry()
     families = [calc.family for calc in registry.all()]
     print(f"FR-RES-048 count={len(families)} families={families}")
@@ -158,6 +182,9 @@ def fr_res_049() -> None:
     Build a deterministic profile with units, samples, undefined reasons,
     hashes, warnings, and duration from a prepared dataset.
     """
+    _header(
+        "FR-RES-049. Build a deterministic profile with units, samples, undefined reasons, hashes, warnings, and duration from a prepared dataset."
+    )
     profile = build_core_metric_profile(
         _prepared(), limits=ResearchResourceLimits(10, 10.0, 1024)
     )
@@ -166,9 +193,7 @@ def fr_res_049() -> None:
 
 def main() -> None:
     """Run every Research metrics requirement demonstration in order."""
-    print("=" * 80)
     print("Research Example 5: Metric Registry and Profile")
-    print("=" * 80)
     fr_res_042()
     fr_res_043()
     fr_res_044()

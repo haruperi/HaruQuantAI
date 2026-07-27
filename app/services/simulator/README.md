@@ -307,6 +307,21 @@ Simulation does not activate Trading operational features.
 
 ## 3. Workflows
 
+> **Workflow Usage Evidence**: Each active workflow has one standalone program in
+> `tests/simulator/usage/workflows/`; `run_all.py` executes them in registry order.
+
+Evidence programs:
+
+- `WF-SIM-001`: `tests/simulator/usage/workflows/wf_sim_001_official_fx_backtest.py`
+- `WF-SIM-002`: `tests/simulator/usage/workflows/wf_sim_002_simulation_trader_operations.py`
+- `WF-SIM-003`: `tests/simulator/usage/workflows/wf_sim_003_optimization_candidate_execution.py`
+- `WF-SIM-004`: `tests/simulator/usage/workflows/wf_sim_004_severe_data_quality_blocked_run.py`
+- `WF-SIM-005`: `tests/simulator/usage/workflows/wf_sim_005_deterministic_replay.py`
+- `WF-SIM-006`: `tests/simulator/usage/workflows/wf_sim_006_registered_strategy_security_rejection.py`
+- `WF-SIM-007`: `tests/simulator/usage/workflows/wf_sim_007_non_canonical_fast_research.py`
+- `WF-SIM-009`: `tests/simulator/usage/workflows/wf_sim_009_portfolio_backtest.py`
+- `WF-SIM-010`: `tests/simulator/usage/workflows/wf_sim_010_tick_series_acquisition.py`
+
 ### Status values
 
 | Status | Meaning |
@@ -512,6 +527,29 @@ component and aggregate journals reconcile. It does not approve, activate, rank,
 modify the allocation. Missing/stale FX or incomplete results fail closed.
 
 **Integration test:** `tests/simulator/integration/test_portfolio_backtest.py::test_portfolio_candidate_publishes_reconciled_aggregate()`
+
+### `WF-SIM-010` — Tick-Series Acquisition
+
+**Scope:** Cross-domain
+**System workflow:** `SYS-WF-001`
+
+**Input boundary:** An approved Data `MarketDataRequest` for bounded MT5 bar
+evidence, plus an explicit Simulation tick-generation model.
+**Output boundary:** A canonical ordered tick `MarketDataset` and the ordered
+Simulation execution clock.
+
+1. Data's `get_market_data()` retrieves bounded genuine MT5 bar evidence.
+2. Data's `generate_tick_series()` applies the approved deterministic tick and
+   spread model.
+3. Simulation's `build_tick_timeline()` validates ordering and converts the
+   Data-owned tick records into the execution clock.
+
+**Failure behavior:** Missing provider readiness, empty or failed-quality evidence,
+unsupported generation settings, or non-monotonic ticks returns the owning
+domain's typed failure; Simulation never invents substitute observations.
+
+**Integration test:**
+`tests/simulator/integration/test_contract_compatibility.py`
 
 ---
 
@@ -1070,7 +1108,7 @@ exported.
 | Completed | `NFR-SIM-007` | Reliability | Missing evidence, persistence failure, invariant failure, unknown state, or unsupported scope shall fail closed with a deterministic code and no published completed result. | Fault-injection tests |
 | Completed | `NFR-SIM-008` | Auditability | Every governed transition and rejection shall be traceable through correlation/causation IDs. Execution evidence remains in the canonical hash-chained journal, while bounded run lifecycle evidence is persisted as Utils-owned `AuditEvent v1` records through `SimulationRunDependencies.persist_audit_event`. | Journal and run-audit tests |
 | Completed | `NFR-SIM-009` | Maintainability | Modules/files shall match Sections 2 and 4, remain acyclic, and contain Google-style typed public APIs without speculative layers. | Structure, Ruff, mypy review |
-| Completed | `NFR-SIM-010` | Testing | Every public functional requirement shall have one usage example, at least one unit test, and collaborative workflow coverage, with package coverage at least 80%. | Traceability and coverage gate |
+| Completed | `NFR-SIM-010` | Testing | Every public functional requirement shall have one usage example and at least one unit test; every active workflow shall have one standalone README-aligned usage program and collaborative workflow coverage; package coverage shall be at least 80%. | `tests/simulator/unit/test_workflow_usage_parity.py`, direct workflow runner, traceability and coverage gate |
 | Completed | `NFR-SIM-011` | Performance | Phase 1 shall record non-blocking deterministic runtime and memory baselines; no blocking numeric gate applies until measured evidence supports a separately approved domain limit. | Benchmark report |
 | Completed | `NFR-SIM-012` | Compatibility | `SimulationResult` and owned request contracts shall be versioned; breaking changes require a new version and coordinated consumer migration. | Producer-consumer contract tests |
 

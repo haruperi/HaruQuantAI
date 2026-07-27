@@ -23,11 +23,15 @@ from tests.optimization.unit.test_constraints import _space
 from tests.optimization.unit.test_search_contracts import search_request
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_search() -> None:
     """Demonstrate optimization search methods."""
-    print("=" * 80)
+    _header("Demonstrate optimization search methods.")
     print("Optimization Example 3: Search Methods and Execution")
-    print("=" * 80)
 
     # 1. Search method enum & request
     req = search_request()

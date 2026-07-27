@@ -1,6 +1,5 @@
 """Tests for Optimization metric evidence."""
 
-# ruff: noqa: INP001
 import pytest
 from app.services.optimization.scoring import (
     ObjectiveName,
@@ -8,6 +7,7 @@ from app.services.optimization.scoring import (
     calculate_deflated_sharpe,
     count_nominal_trials,
 )
+
 from tests.analytics._support import _report
 
 

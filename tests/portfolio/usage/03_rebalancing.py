@@ -18,6 +18,11 @@ from app.services.portfolio import PortfolioRebalancePlan
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _drift_observation(
     component_id: str,
     drift: Decimal,
@@ -106,9 +111,10 @@ def fr_port_020() -> None:
     Demonstrates that the rebalance plan carries an explicit allocation_version
     and observed_at timestamp binding it to its target.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-020: Bind drift to an active allocation version and fresh actual-exposure evidence. Demonstrates that the rebalance plan carries an explicit allocation_version and observed_at timestamp binding it to its target."
+    )
     print("FR-PORT-020: Bind drift to active allocation version and fresh evidence")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_base_plan_data())
     assert plan.allocation_version == "allocation-version-1"
@@ -124,9 +130,10 @@ def fr_port_021() -> None:
     Demonstrates that the plan starts in review_required status before Risk
     approval.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-021: Route every plan through Risk review before Trading submission. Demonstrates that the plan starts in review_required status before Risk approval."
+    )
     print("FR-PORT-021: Route every plan through Risk review")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_base_plan_data())
     assert plan.status == "review_required"
@@ -140,9 +147,10 @@ def fr_port_022() -> None:
 
     Demonstrates that every rebalance action is reduce-only.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-022: Make existing over-budget correction reduce-only unless a separately authorized risk increase exists. Demonstrates that every rebalance action is reduce-only."
+    )
     print("FR-PORT-022: Make over-budget correction reduce-only")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_base_plan_data())
     for action in plan.actions:
@@ -157,9 +165,10 @@ def fr_port_023() -> None:
     Demonstrates that negative drift (under-target exposure) does not produce
     an action.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-023: Never open solely to match target weights. Demonstrates that negative drift (under-target exposure) does not produce an action."
+    )
     print("FR-PORT-023: Never open solely to match target weights")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_base_plan_data())
     action_ids = {a.component_id for a in plan.actions}
@@ -179,9 +188,10 @@ def fr_port_024() -> None:
 
     Demonstrates that a blocked plan carries deterministic block reasons.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-024: Block planning/submission on kill switch, expiry, stale evidence, or target-version change. Demonstrates that a blocked plan carries deterministic block reasons."
+    )
     print("FR-PORT-024: Block planning on kill switch or stale evidence")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(
         **_base_plan_data(

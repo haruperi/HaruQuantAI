@@ -1,0 +1,135 @@
+"""WF-DATA-011: audit a reversible MT5 source-readiness transition."""
+
+from __future__ import annotations
+
+import sys
+import tempfile
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+
+from app.services.data import (
+    SourceDescriptor,
+    SourceLicensePolicy,
+    SourcePromotionRequest,
+    get_market_data,
+    get_source_descriptor,
+    promote_source,
+    register_source,
+    run_data_migrations,
+)
+from app.utils import AuthContext, generate_id, utc_now
+from tests.data.usage.workflows._support import isolated_runtime, market_request
+
+WORKFLOW_ID = "WF-DATA-011"
+STAGES = (
+    "Compose MT5 and read its current staging descriptor.",
+    "Build authenticated normalization, quality, and sign-off evidence.",
+    "Promote only with the descriptor's complete evidence package.",
+    "Demote immediately and preserve audited reversibility.",
+)
+
+
+def _stage(number: int) -> None:
+    """Print one README-aligned workflow stage."""
+    print(
+        f"\n{'=' * 88}\nStage {number}/{len(STAGES)} — {STAGES[number - 1]}\n{'=' * 88}"
+    )
+
+
+def main() -> None:
+    """Execute authenticated promotion and demotion in temporary state."""
+    print(f"{WORKFLOW_ID} — Source Readiness and Promotion")
+    print("INPUT BOUNDARY — operator evidence package and AuthContext")
+    genuine = get_market_data(market_request("bars", timeframe="M1", limit=1))
+    with (
+        tempfile.TemporaryDirectory(prefix="wf-data-011-") as directory,
+        isolated_runtime(Path(directory)),
+    ):
+        request_id = generate_id("req")
+        run_data_migrations(request_id)
+
+        # Stage 1 — Compose MT5 and read its current staging descriptor.
+        _stage(1)
+        candidate_id = "mt5-workflow-candidate"
+        evidence = ("normalization", "quality", "operator_signoff")
+        register_source(
+            SourceDescriptor(
+                source_id=candidate_id,
+                readiness="staging",
+                capabilities=("ohlcv",),
+                requires_credentials=True,
+                requires_network=True,
+                supports_writes=False,
+                schema_version="v1",
+                timezone="UTC",
+                revision=genuine.source_metadata.get("source_revision", "mt5-observed"),
+                license_policy=SourceLicensePolicy(
+                    source_id=candidate_id,
+                    status="approved",
+                    permitted_workflows=("research",),
+                    export_allowed=False,
+                    attribution_required=False,
+                ),
+                identity_mapping_revision="mt5-workflow-v1",
+                promotion_evidence=evidence,
+            ),
+            object,  # type: ignore[arg-type]
+        )
+        descriptor = get_source_descriptor(candidate_id)
+
+        # Stage 2 — Build authenticated normalization, quality, and sign-off evidence.
+        _stage(2)
+        now = utc_now()
+        auth = AuthContext(
+            contract_version="v1",
+            schema_id="utils.auth_context.v1",
+            principal_id="workflow-operator",
+            principal_type="USER",
+            roles=("admin",),
+            permissions=(),
+            scopes=(),
+            tenant_or_environment="dev",
+            request_id=request_id,
+            workflow_id=generate_id("wf"),
+            correlation_id=generate_id("cor"),
+            issued_at=now,
+        )
+        assert descriptor.promotion_evidence == evidence
+
+        # Stage 3 — Promote only with the descriptor's complete evidence package.
+        _stage(3)
+        promoted = promote_source(
+            SourcePromotionRequest(
+                source_id=candidate_id,
+                target_readiness="production",
+                evidence=evidence,
+                request_id=request_id,
+            ),
+            auth,
+            timestamp_ns=1,
+        )
+
+        # Stage 4 — Demote immediately and preserve audited reversibility.
+        _stage(4)
+        demoted = promote_source(
+            SourcePromotionRequest(
+                source_id=candidate_id,
+                target_readiness="staging",
+                evidence=("operator_signoff",),
+                request_id=generate_id("req"),
+            ),
+            auth,
+            timestamp_ns=2,
+        )
+        print(
+            "Readiness transition:",
+            descriptor.readiness,
+            promoted.readiness,
+            demoted.readiness,
+        )
+    print("OUTPUT BOUNDARY — audited reversible SourceDescriptor readiness")
+
+
+if __name__ == "__main__":
+    main()

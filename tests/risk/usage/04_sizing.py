@@ -21,6 +21,11 @@ from app.services.risk import (
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _snapshot() -> PortfolioRiskSnapshot:
     """Build immutable snapshot input."""
     return PortfolioRiskSnapshot(
@@ -79,9 +84,10 @@ def fr_risk_026() -> None:
     migration-evidenced formulas; enforce stop/equity/evidence rules; disclose
     fallback/correlation adjustment; normalize against explicit broker and risk
     constraints; return no non-zero failure fallback and no approval."""
-    print("=" * 80)
+    _header(
+        "FR-RISK-026: Calculate fixed-lot, fixed-risk, milestone, fractional-Kelly, volatility, or fixed-fractional size using the retained migration-evidenced formulas; enforce stop/equity/evidence rules; disclose fallback/correlation adjustment; normalize against explicit broker and risk constraints; return no non-zero failure fallback and no approval."
+    )
     print("Risk Example 8: Position Sizing Calculation")
-    print("=" * 80)
 
     snapshot = _snapshot()
     request = PositionSizingRequest(

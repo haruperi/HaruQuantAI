@@ -1,6 +1,5 @@
 """Unit tests for traced owner-contract Portfolio workflow coordination."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -32,6 +31,7 @@ from app.services.trading import (
     StandardTradingEnvelope,
 )
 from app.utils import AuditEvent, logger
+
 from tests.portfolio.unit.test_allocation import (
     _activator,
     _inactive_kill_switch,

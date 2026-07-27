@@ -1,9 +1,9 @@
 """Unit tests for the isolated fast-research path."""
-# ruff: noqa: INP001
 
 from pathlib import Path
 
 from app.services.simulator.run import run_fast_research
+
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,

@@ -27,6 +27,11 @@ _START = datetime(2026, 1, 1, 12, 0, tzinfo=UTC)
 _END = datetime(2026, 6, 30, 12, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _approved_temporary_directory(
     settings: DataSettings | None = None,
 ) -> TemporaryDirectory[str]:
@@ -40,7 +45,6 @@ def _print_header(title: str) -> None:
     """Print a section header."""
     print("\n" + "=" * 100)
     print(f"\t\t {title} ")
-    print("=" * 100)
 
 
 def _sample_bars(
@@ -123,7 +127,7 @@ def _print_generation_rate(record_count: int, elapsed_seconds: float) -> None:
 
 def example_01_tick_model_trading_bar() -> None:
     """Generate four ticks per trading timeframe bar using trading_bar model."""
-    _print_header("EXAMPLE 01: Generate four ticks per trading timeframe bar")
+    _header("Generate four ticks per trading timeframe bar using trading_bar model.")
     bars = _sample_bars()
     if bars is None:
         return
@@ -140,7 +144,7 @@ def example_01_tick_model_trading_bar() -> None:
 
 def example_02_tick_model_generated() -> None:
     """Generate interpolated ticks from bar volume using generated model."""
-    _print_header("EXAMPLE 02: Generate interpolated ticks from bar volume")
+    _header("Generate interpolated ticks from bar volume using generated model.")
     bars = _sample_bars(limit=5)
     if bars is None:
         return
@@ -162,7 +166,7 @@ def example_02_tick_model_generated() -> None:
 
 def example_03_tick_model_ohlc_m1() -> None:
     """Generate four ticks per real M1 bar."""
-    _print_header("EXAMPLE 03: Generate OHLC ticks from real M1 bars")
+    _header("Generate four ticks per real M1 bar.")
     bars = _sample_bars()
     m1_bars = _sample_bars(timeframe="M1")
     if bars is None or m1_bars is None:
@@ -189,7 +193,7 @@ def example_03_tick_model_ohlc_m1() -> None:
 
 def example_04_tick_model_real() -> None:
     """Standardize provider ticks and annotate their H1 bucket positions."""
-    _print_header("EXAMPLE 04: Standardize real provider ticks")
+    _header("Standardize provider ticks and annotate their H1 bucket positions.")
     bars = _sample_bars()
     ticks_data = _sample_ticks()
     if bars is None or ticks_data is None:
@@ -220,7 +224,7 @@ def example_04_tick_model_real() -> None:
 
 def example_05_stream_tick_series_to_parquet() -> None:
     """Write a bounded generated tick series through the public Parquet API."""
-    _print_header("EXAMPLE 05: Stream generated ticks to Parquet")
+    _header("Write a bounded generated tick series through the public Parquet API.")
     bars = _sample_bars(limit=5)
     if bars is None:
         return
@@ -266,22 +270,26 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_087() -> None:
-    "FR-DATA-087: Derive a canonical tick `MarketDataset` from real bar or tick evidence using exactly one approved model, preserving real prices and real tick counts, ordering ticks strictly by UTC timestamp then intra-bar index, and quantizing every price to `Decimal` at the contract boundary. Exact fixed-point arrays may be used internally; no array value crosses the canonical boundary."  # noqa: E501 - exact specification text
+    _header("fr_data_087")
+    "FR-DATA-087: Derive a canonical tick `MarketDataset` from real bar or tick evidence using exactly one approved model, preserving real prices and real tick counts, ordering ticks strictly by UTC timestamp then intra-bar index, and quantizing every price to `Decimal` at the contract boundary. Exact fixed-point arrays may be used internally; no array value crosses the canonical boundary."
     _demonstrate_once()
 
 
 def fr_data_088() -> None:
-    "FR-DATA-088: Apply exactly one approved spread model to every generated tick: `native_spread` uses the provider-reported spread, `fixed_spread` applies one configured point value, and `variable_spread` draws bounded points from a seeded generator. A `variable_spread` request without a seed fails; identical seed and inputs reproduce identical spreads."  # noqa: E501 - exact specification text
+    _header("fr_data_088")
+    "FR-DATA-088: Apply exactly one approved spread model to every generated tick: `native_spread` uses the provider-reported spread, `fixed_spread` applies one configured point value, and `variable_spread` draws bounded points from a seeded generator. A `variable_spread` request without a seed fails; identical seed and inputs reproduce identical spreads."
     _demonstrate_once()
 
 
 def fr_data_089() -> None:
-    "FR-DATA-089: Attach deterministic intra-bar position evidence to every generated tick: `source_bar_time`, `tick_index_in_bar`, and a phase bitmask marking the bar open, high, low, and close observations. The bitmask carries no trading meaning and never encodes an order, signal, or decision."  # noqa: E501 - exact specification text
+    _header("fr_data_089")
+    "FR-DATA-089: Attach deterministic intra-bar position evidence to every generated tick: `source_bar_time`, `tick_index_in_bar`, and a phase bitmask marking the bar open, high, low, and close observations. The bitmask carries no trading meaning and never encodes an order, signal, or decision."
     _demonstrate_once()
 
 
 def fr_data_090() -> None:
-    "FR-DATA-090: Stream a generated tick series to a bounded Parquet artifact under an approved root with output-aware chunking, returning path, row count, and column names without holding the full series in memory. Eligible fixed-point chunks bypass canonical in-memory record materialization."  # noqa: E501 - exact specification text
+    _header("fr_data_090")
+    "FR-DATA-090: Stream a generated tick series to a bounded Parquet artifact under an approved root with output-aware chunking, returning path, row count, and column names without holding the full series in memory. Eligible fixed-point chunks bypass canonical in-memory record materialization."
     _demonstrate_once()
 
 

@@ -29,6 +29,11 @@ from app.services.research.market_structure import (
 _HASH = "e" * 64
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _prepared() -> PreparedDataset:
     """Build a PreparedDataset with trending OHLCVS data."""
     idx = pd.date_range("2026-01-05", periods=30, freq="h", tz="UTC")
@@ -78,9 +83,8 @@ def _limits() -> ResearchResourceLimits:
 
 def fr_res_075() -> None:
     """FR-RES-075: Build swings, directional legs, score, verdict, and fit."""
-    print("=" * 80)
+    _header("FR-RES-075: Build swings, directional legs, score, verdict, and fit.")
     print("Research Example 9: Market-Structure Profile")
-    print("=" * 80)
     profile = build_market_structure_profile(
         _prepared(), config=_config(), limits=_limits()
     )
@@ -89,6 +93,7 @@ def fr_res_075() -> None:
 
 def fr_res_076() -> None:
     """FR-RES-076: Run bounded temporal stability and parameter robustness."""
+    _header("FR-RES-076: Run bounded temporal stability and parameter robustness.")
     report = evaluate_market_structure_quality(
         _prepared(), config=_config(), limits=_limits()
     )
@@ -98,6 +103,7 @@ def fr_res_076() -> None:
 
 def fr_res_077() -> None:
     """FR-RES-077: Label later bars as trend/reversion/mixed."""
+    _header("FR-RES-077: Label later bars as trend/reversion/mixed.")
     result = label_realized_market_behavior(
         _prepared().data, symbol="TEST", timeframe="1h", config=_config()
     )
@@ -106,6 +112,7 @@ def fr_res_077() -> None:
 
 def fr_res_078() -> None:
     """FR-RES-078: Return concise observation/uncertainty/readiness summary."""
+    _header("FR-RES-078: Return concise observation/uncertainty/readiness summary.")
     summary = build_validation_summary(
         [{"verdict": "trend", "symbol": "TEST", "confidence": 0.9}]
     )
@@ -114,6 +121,7 @@ def fr_res_078() -> None:
 
 def fr_res_079() -> None:
     """FR-RES-079: Rank calibration candidates by canonical score."""
+    _header("FR-RES-079: Rank calibration candidates by canonical score.")
     result = calibrate_market_structure(
         run_rows=[
             {"efficiency_ratio": 0.6, "verdict": "trend", "symbol": "TEST"},
@@ -127,6 +135,7 @@ def fr_res_079() -> None:
 
 def fr_res_080() -> None:
     """FR-RES-080: Rank advisory strategy archetypes from profile evidence."""
+    _header("FR-RES-080: Rank advisory strategy archetypes from profile evidence.")
     profile = MarketStructureProfile(
         "v1",
         {"swing_window": 5},

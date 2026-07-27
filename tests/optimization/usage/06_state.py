@@ -26,11 +26,15 @@ from tests.optimization.unit.test_state_contracts import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_state() -> None:
     """Demonstrate optimization state persistence and checkpointing."""
-    print("=" * 80)
+    _header("Demonstrate optimization state persistence and checkpointing.")
     print("Optimization Example 6: Durable State and Checkpoints")
-    print("=" * 80)
 
     # 1. Memory state store initialization
     store = MemoryOptimizationStore()

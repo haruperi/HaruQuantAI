@@ -18,6 +18,11 @@ from app.services.portfolio import ActivePortfolioAllocation
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _weights() -> tuple[dict[str, object], ...]:
     """Return ordered component weight data totaling exactly one.
 
@@ -82,9 +87,10 @@ def fr_port_030() -> None:
     Demonstrates that the active allocation is a Portfolio-owned immutable
     contract that other domains cannot construct with invalid state.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-030: Prevent direct writes by other domains. Demonstrates that the active allocation is a Portfolio-owned immutable contract that other domains cannot construct with invalid state."
+    )
     print("FR-PORT-030: Prevent direct writes by other domains")
-    print("=" * 80)
 
     allocation = ActivePortfolioAllocation(**_allocation_data())
     assert allocation.allocation_id
@@ -104,9 +110,10 @@ def fr_port_031() -> None:
     Demonstrates that the active allocation carries immutable version identity
     and predecessor references for history preservation.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-031: Preserve every superseded and rolled-back version. Demonstrates that the active allocation carries immutable version identity and predecessor references for history preservation."
+    )
     print("FR-PORT-031: Preserve superseded and rolled-back versions")
-    print("=" * 80)
 
     allocation = ActivePortfolioAllocation(**_allocation_data())
     assert allocation.allocation_version == "allocation-version-1"
@@ -133,9 +140,10 @@ def fr_port_032() -> None:
     Demonstrates that the active allocation carries a deterministic idempotency
     key for atomic activation.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-032: Use atomic activation and deterministic idempotency keys. Demonstrates that the active allocation carries a deterministic idempotency key for atomic activation."
+    )
     print("FR-PORT-032: Use atomic activation and idempotency keys")
-    print("=" * 80)
 
     allocation = ActivePortfolioAllocation(**_allocation_data())
     assert allocation.idempotency_key == "idem-1"
@@ -154,9 +162,10 @@ def fr_port_033() -> None:
     Demonstrates that the active allocation stores all references needed for
     complete lineage reproduction.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-033: Store references, hashes, and decisions needed to reproduce lineage. Demonstrates that the active allocation stores all references needed for complete lineage reproduction."
+    )
     print("FR-PORT-033: Store references, hashes, and decisions for lineage")
-    print("=" * 80)
 
     allocation = ActivePortfolioAllocation(**_allocation_data())
     assert allocation.construction_result_id

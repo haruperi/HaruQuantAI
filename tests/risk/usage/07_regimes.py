@@ -19,6 +19,11 @@ from app.services.risk import PortfolioRiskSnapshot, RiskConfig, assess_risk_reg
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _snapshot() -> PortfolioRiskSnapshot:
     """Build immutable snapshot input."""
     return PortfolioRiskSnapshot(
@@ -78,9 +83,10 @@ def fr_risk_031() -> None:
     crisis, news, and session regimes; record deterministic
     transitions/evidence; return only equal-or-stricter modifiers; fail closed
     on required missing/unknown live evidence."""
-    print("=" * 80)
+    _header(
+        "FR-RISK-031: Classify volatility, liquidity, correlation, drawdown, crisis, news, and session regimes; record deterministic transitions/evidence; return only equal-or-stricter modifiers; fail closed on required missing/unknown live evidence."
+    )
     print("Risk Example 9: Regime Assessment")
-    print("=" * 80)
 
     config = RiskConfig(
         profile="research",

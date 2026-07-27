@@ -19,11 +19,15 @@ from tests.optimization.unit.test_adapter import FakeAdapter
 from tests.optimization.unit.test_execution_contracts import execution_request
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_execution() -> None:
     """Demonstrate candidate execution engine integration."""
-    print("=" * 80)
+    _header("Demonstrate candidate execution engine integration.")
     print("Optimization Example 4: Candidate Execution")
-    print("=" * 80)
 
     req = execution_request()
     print(f"Execution request contract version: {req.contract_version}")

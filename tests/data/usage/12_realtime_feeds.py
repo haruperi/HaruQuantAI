@@ -25,6 +25,11 @@ from app.utils import generate_id
 _NOW = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _demonstrate_feature() -> None:
     """Exercise feed configuration, starting, ingestion, status, and reconnection."""
     req_id = generate_id("req")
@@ -115,17 +120,20 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_046() -> None:
-    "FR-DATA-046: Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle."  # noqa: E501 - exact specification text
+    _header("fr_data_046")
+    "FR-DATA-046: Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle."
     _demonstrate_once()
 
 
 def fr_data_047() -> None:
-    "FR-DATA-047: Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair."  # noqa: E501 - exact specification text
+    _header("fr_data_047")
+    "FR-DATA-047: Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair."
     _demonstrate_once()
 
 
 def fr_data_048() -> None:
-    "FR-DATA-048: Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state."  # noqa: E501 - exact specification text
+    _header("fr_data_048")
+    "FR-DATA-048: Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state."
     _demonstrate_once()
 
 

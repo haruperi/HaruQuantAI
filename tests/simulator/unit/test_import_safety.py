@@ -1,5 +1,4 @@
 """Import-safety verification for the Simulation package root."""
-# ruff: noqa: INP001
 
 import os
 import subprocess

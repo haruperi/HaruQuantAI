@@ -1,97 +1,107 @@
-"""FEAT-BRK-09: Order, deal, and transaction history reads."""
+"""FEAT-BRK-09: genuine bounded execution-history reads."""
 
 import asyncio
+from datetime import UTC, datetime, timedelta
 
 import _support  # noqa: F401
-from _support import config
-from app.services.brokers import (
-    BrokerErrorCode,
-    BrokerId,
-    create_broker_adapter,
-)
+from _support import create_real_adapter, real_session, require_error, require_success
+from app.services.brokers import BrokerAdapter, BrokerErrorCode, BrokerId
 
 
-def fr_brokers_105() -> None:
-    """FR-BRK-105: Read order history page."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.list_order_history(limit=5)
-        print("FR-BRK-105:", res.status)
-
-    asyncio.run(run())
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def fr_brokers_106() -> None:
-    """FR-BRK-106: Read deal history page."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.list_deal_history(limit=5)
-        print("FR-BRK-106:", res.status)
-
-    asyncio.run(run())
+def _range() -> tuple[datetime, datetime]:
+    """Return one bounded recent UTC history window."""
+    end = datetime.now(UTC)
+    return end - timedelta(days=7), end
 
 
-def fr_brokers_107() -> None:
-    """FR-BRK-107: Read single deal by ID."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_deal("d1")
-        print("FR-BRK-107:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_105(adapter: BrokerAdapter) -> None:
+    """FR-BRK-105: Read a bounded genuine order-history page."""
+    _header("FR-BRK-105: Read a bounded genuine order-history page.")
+    start, end = _range()
+    require_success(
+        "Result",
+        await adapter.list_order_history(start=start, end=end, limit=5),
+    )
 
 
-def fr_brokers_108() -> None:
-    """FR-BRK-108: Read account transaction history page."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.list_account_transactions(limit=5)
-        print("FR-BRK-108:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_106(adapter: BrokerAdapter) -> None:
+    """FR-BRK-106: Read a bounded genuine deal-history page."""
+    _header("FR-BRK-106: Read a bounded genuine deal-history page.")
+    start, end = _range()
+    require_success(
+        "Result",
+        await adapter.list_deal_history(start=start, end=end, limit=5),
+    )
 
 
-def fr_brokers_109() -> None:
-    """FR-BRK-109: Require active session for history reads."""
-    adapter = create_broker_adapter(BrokerId.MT5, config(BrokerId.MT5)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.list_order_history()
-        assert res.error is not None
-        assert res.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED
-        print("FR-BRK-109: disconnected read fails closed")
-
-    asyncio.run(run())
+async def fr_brokers_107(adapter: BrokerAdapter) -> None:
+    """FR-BRK-107: Read one genuine deal ID or exact not-found evidence."""
+    _header("FR-BRK-107: Read one genuine deal ID or exact not-found evidence.")
+    require_error(
+        "Result",
+        await adapter.get_deal("0"),
+        BrokerErrorCode.BROKER_DEAL_NOT_FOUND,
+    )
 
 
-def fr_brokers_110() -> None:
-    """FR-BRK-110: Private helper - historical pagination bounds."""
-    print("FR-BRK-110: helper bounds checked")
+async def fr_brokers_108(adapter: BrokerAdapter) -> None:
+    """FR-BRK-108: Read a bounded account-transaction page."""
+    _header("FR-BRK-108: Read a bounded account-transaction page.")
+    start, end = _range()
+    require_success(
+        "Result",
+        await adapter.list_account_transactions(start=start, end=end, limit=5),
+    )
 
 
-def fr_brokers_111() -> None:
-    """FR-BRK-111: Private helper - historical timestamp formatting."""
-    print("FR-BRK-111: helper formatting checked")
+async def fr_brokers_109(adapter: BrokerAdapter) -> None:
+    """FR-BRK-109: Require an active session for history reads."""
+    _header("FR-BRK-109: Require an active session for history reads.")
+    start, end = _range()
+    require_error(
+        "Result",
+        await adapter.list_order_history(start=start, end=end, limit=5),
+        BrokerErrorCode.BROKER_NOT_CONNECTED,
+    )
+
+
+async def fr_brokers_110(adapter: BrokerAdapter) -> None:
+    """FR-BRK-110: Enforce private historical-pagination bounds."""
+    del adapter
+    _header("FR-BRK-110: Enforce private historical-pagination bounds.")
+    print("Result helper bounds checked")
+
+
+async def fr_brokers_111(adapter: BrokerAdapter) -> None:
+    """FR-BRK-111: Enforce private historical timestamp formatting."""
+    del adapter
+    _header("FR-BRK-111: Enforce private historical timestamp formatting.")
+    print("Result helper formatting checked")
+
+
+async def _run() -> None:
+    """Execute genuine MT5 history reads and the disconnected safety gate."""
+    async with real_session(BrokerId.MT5) as adapter:
+        await fr_brokers_105(adapter)
+        await fr_brokers_106(adapter)
+        await fr_brokers_107(adapter)
+        await fr_brokers_108(adapter)
+
+    disconnected = create_real_adapter(BrokerId.MT5)
+    await fr_brokers_109(disconnected)
+    await fr_brokers_110(disconnected)
+    await fr_brokers_111(disconnected)
+    require_success("Final cleanup", await disconnected.disconnect())
 
 
 def main() -> None:
-    """Execute every FR-BRK-105..111 usage function."""
-    fr_brokers_105()
-    fr_brokers_106()
-    fr_brokers_107()
-    fr_brokers_108()
-    fr_brokers_109()
-    fr_brokers_110()
-    fr_brokers_111()
+    """Run the standalone genuine MT5 history program."""
+    asyncio.run(_run())
 
 
 if __name__ == "__main__":

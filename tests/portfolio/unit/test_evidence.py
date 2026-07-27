@@ -1,6 +1,5 @@
 """Unit tests for Portfolio owner-evidence and eligibility validation."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 from copy import deepcopy

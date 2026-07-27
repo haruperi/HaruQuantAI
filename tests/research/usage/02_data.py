@@ -31,6 +31,11 @@ from app.services.research.data import (
 REQUEST_ID = "req-2123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _dataset() -> MarketDataset:
     """Build the bounded usage market dataset."""
     start = datetime(2026, 1, 5, tzinfo=UTC)
@@ -104,6 +109,9 @@ def fr_res_027() -> None:
     duplicates, gaps, OHLC consistency, spread quality, volume, finite
     values, and source metadata without mutating input.
     """
+    _header(
+        "FR-RES-027. The system shall validate required columns, UTC/time ordering, duplicates, gaps, OHLC consistency, spread quality, volume, finite values, and source metadata without mutating input."
+    )
     report = validate_dataset(_dataset(), limits=_limits())
     print(f"FR-RES-027 fatal_issues={len(report.fatal_issues)}")
 
@@ -114,6 +122,9 @@ def fr_res_028() -> None:
     The system shall clean a copy using only explicit approved strategies
     and record every action and unresolved warning.
     """
+    _header(
+        "FR-RES-028. The system shall clean a copy using only explicit approved strategies and record every action and unresolved warning."
+    )
     dataset = _dataset()
     limits = _limits()
     validation_report = validate_dataset(dataset, limits=limits)
@@ -133,6 +144,9 @@ def fr_res_029() -> None:
     calendar fields, label forward fields as research-only, and preserve row
     alignment; session tagging is a later seasonality/ operation.
     """
+    _header(
+        "FR-RES-029. The system shall enrich a copy with selected pip/geometry/return-label/ calendar fields, label forward fields as research-only, and preserve row alignment; session tagging is a later seasonality/ operation."
+    )
     dataset = _dataset()
     limits = _limits()
     validation_report = validate_dataset(dataset, limits=limits)
@@ -155,6 +169,9 @@ def fr_res_030() -> None:
     deterministically and return hashes, provenance, and quality evidence,
     never fetching provider data.
     """
+    _header(
+        "FR-RES-030. The system shall execute validate -> clean -> revalidate -> enrich deterministically and return hashes, provenance, and quality evidence, never fetching provider data."
+    )
     prepared = prepare_research_dataset(
         _dataset(),
         cleaning=_cleaning_cfg(),
@@ -166,9 +183,7 @@ def fr_res_030() -> None:
 
 def main() -> None:
     """Run every Research data requirement demonstration in order."""
-    print("=" * 80)
     print("Research Example 2: Dataset Preparation and Cleaning")
-    print("=" * 80)
     fr_res_027()
     fr_res_028()
     fr_res_029()

@@ -1,1 +1,1 @@
-"""Brokers-domain tests and executable usage evidence."""
+"""Brokers tests package."""

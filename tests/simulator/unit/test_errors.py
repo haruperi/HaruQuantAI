@@ -1,5 +1,4 @@
 """Unit tests for the Simulation error surface."""
-# ruff: noqa: INP001
 
 import pytest
 from app.services.simulator.errors import (

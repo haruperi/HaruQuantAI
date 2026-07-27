@@ -27,6 +27,11 @@ from app.services.simulator import (
 from app.utils import canonical_json
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _dataset() -> MarketDataset:
     """Build one valid Data-owned tick dataset."""
     instant = datetime(2025, 1, 2, 12, tzinfo=UTC)
@@ -100,6 +105,9 @@ def fr_sim_001() -> None:
         strategy references, Data references, broker-profile references, trace
         identifiers, and deterministic serialization before any import or execution.
     """
+    _header(
+        "Demonstrate FR-SIM-001. Responsibility: The system shall validate authentication-relevant request structure, registered strategy references, Data references, broker-profile references, trace identifiers, and deterministic serialization before any import or execution."
+    )
     payload = {
         "request_id": "req-simulator-usage",
         "workflow_id": "wf-simulator-usage",
@@ -132,6 +140,9 @@ def fr_sim_003() -> None:
         rejecting unsupported assets, features, service mode, and canonical claims from
         approximation.
     """
+    _header(
+        "Demonstrate FR-SIM-003. Responsibility: The system shall permit only approved FX scope or explicit `FAST_RESEARCH`, rejecting unsupported assets, features, service mode, and canonical claims from approximation."
+    )
     validate_phase_one_scope(
         {
             "asset_class": "FX",
@@ -151,6 +162,9 @@ def fr_sim_002() -> None:
         availability metadata, and requested coverage, blocking severe failures before
         execution, and shall return immutable validated evidence.
     """
+    _header(
+        "Demonstrate FR-SIM-002. Responsibility: The system shall verify manifest checksum, required schema, UTC monotonic timestamps, uniqueness, OHLC consistency, bid/ask spread, staleness, availability metadata, and requested coverage, blocking severe failures before execution, and shall return immutable validated evidence."
+    )
     dataset = _dataset()
     evidence = validate_market_data(dataset, _context(dataset))
     print(f"Validated market data records: {evidence.record_count}")

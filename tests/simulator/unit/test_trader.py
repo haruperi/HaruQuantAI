@@ -1,5 +1,4 @@
 """Unit tests for the async Simulation Trading port."""
-# ruff: noqa: INP001
 
 import asyncio
 from collections.abc import Awaitable, Callable
@@ -10,6 +9,7 @@ import pytest
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.execution import SimTrader
 from app.services.trading import ExecutionReceipt, OrderIntent, TradingRoute
+
 from tests.simulator.unit.test_engine import _engine, _intent, _tick
 
 

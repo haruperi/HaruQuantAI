@@ -19,6 +19,11 @@ HASH_A = "a" * 64
 HASH_B = "b" * 64
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _evidence_data(**overrides: object) -> dict[str, object]:
     """Return complete evidence reference set data.
 
@@ -100,9 +105,10 @@ def fr_port_006() -> None:
     Demonstrates that every construction component carries an explicit
     eligibility_decision_id reference.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-006: Require a current approving eligibility decision for every exact strategy/version/scope. Demonstrates that every construction component carries an explicit eligibility_decision_id reference."
+    )
     print("FR-PORT-006: Require eligibility decision for every strategy/version")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     for component in request.components:
@@ -118,9 +124,10 @@ def fr_port_007() -> None:
 
     Demonstrates that FX evidence IDs and hashes must align and be ordered.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-007: Fail closed on missing, stale, incompatible, cyclic, or unverifiable FX evidence. Demonstrates that FX evidence IDs and hashes must align and be ordered."
+    )
     print("FR-PORT-007: Fail closed on invalid FX evidence")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     assert len(request.evidence.fx_evidence_ids) == len(
@@ -147,9 +154,10 @@ def fr_port_008() -> None:
     Demonstrates that evidence references are required and cannot be empty or
     synthesized.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-008: Never synthesize rates, metrics, registrations, or approvals. Demonstrates that evidence references are required and cannot be empty or synthesized."
+    )
     print("FR-PORT-008: Never synthesize rates, metrics, registrations, or approvals")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     assert request.evidence.account_snapshot_id
@@ -170,9 +178,10 @@ def fr_port_009() -> None:
     Demonstrates that every evidence reference carries an immutable hash for
     change detection.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-009: Detect a reference/version change before publication or activation. Demonstrates that every evidence reference carries an immutable hash for change detection."
+    )
     print("FR-PORT-009: Detect reference/version change via hashes")
-    print("=" * 80)
 
     request = PortfolioConstructionRequest(**_base_request_data())
     assert len(request.evidence.account_snapshot_hash) == 64

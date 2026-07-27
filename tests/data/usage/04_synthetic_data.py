@@ -21,8 +21,14 @@ from app.utils import generate_id
 _START = datetime(2026, 6, 1, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_07_synthetic_bars() -> None:
     """Generate deterministic synthetic OHLCV bars."""
+    _header("Generate deterministic synthetic OHLCV bars.")
     req_id = generate_id("req")
     req = SyntheticRequest(
         symbol="GBPUSD",
@@ -49,6 +55,7 @@ def example_07_synthetic_bars() -> None:
 
 def example_synthetic_ticks() -> None:
     """Generate deterministic synthetic tick records."""
+    _header("Generate deterministic synthetic tick records.")
     req_id = generate_id("req")
     req = SyntheticRequest(
         symbol="GBPUSD",
@@ -88,7 +95,8 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_039() -> None:
-    "FR-DATA-039: Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter."  # noqa: E501 - exact specification text
+    _header("fr_data_039")
+    "FR-DATA-039: Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter."
     _demonstrate_once()
 
 

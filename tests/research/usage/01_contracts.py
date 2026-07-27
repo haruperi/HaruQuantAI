@@ -45,6 +45,11 @@ from app.services.research import (
 _HASH = "e" * 64
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _quality() -> DataQualityReport:
     """Build a minimal valid Research data-quality report."""
     return DataQualityReport((), (), ("schema",), ())
@@ -57,6 +62,9 @@ def fr_res_001() -> None:
     advisory memory budgets without claiming unverified production
     performance.
     """
+    _header(
+        "FR-RES-001. The system shall define bounded row, duration, artifact-size, and advisory memory budgets without claiming unverified production performance."
+    )
     limits = ResearchResourceLimits(500_000, 600.0, 52_428_800)
     print(f"FR-RES-001 max_rows={limits.max_rows}")
 
@@ -68,6 +76,9 @@ def fr_res_002() -> None:
     non-trading-period, and spread-cleaning policies and shall never silently
     fill or drop data.
     """
+    _header(
+        "FR-RES-002. The system shall require explicit timestamp, duplicate, missing-bar, non-trading-period, and spread-cleaning policies and shall never silently fill or drop data."
+    )
     cleaning = CleaningConfig("UTC", "error", "none", "keep_warn", "error")
     print(f"FR-RES-002 timezone={cleaning.timezone}")
 
@@ -79,6 +90,9 @@ def fr_res_003() -> None:
     calendar enrichment selections; canonical session tagging remains owned
     by seasonality/.
     """
+    _header(
+        "FR-RES-003. The system shall define explicit pip, geometry, return-label, and calendar enrichment selections; canonical session tagging remains owned by seasonality/."
+    )
     enrichment = EnrichmentConfig("EURUSD", True, True, False, True)
     print(f"FR-RES-003 symbol={enrichment.symbol}")
 
@@ -89,6 +103,9 @@ def fr_res_004() -> None:
     The system shall define feature windows, declared forward columns,
     warm-up/NaN policy, and non-mutation behavior.
     """
+    _header(
+        "FR-RES-004. The system shall define feature windows, declared forward columns, warm-up/NaN policy, and non-mutation behavior."
+    )
     features = FeatureConfig(
         {"sma": 20}, (1, 5), ("forward_1", "forward_5"), "preserve"
     )
@@ -102,6 +119,9 @@ def fr_res_005() -> None:
     effective-seed, and bounded-iteration settings in one statistical
     contract.
     """
+    _header(
+        "FR-RES-005. The system shall define bootstrap, permutation, null, correction, effective-seed, and bounded-iteration settings in one statistical contract."
+    )
     statistics = StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg")
     print(f"FR-RES-005 seed={statistics.seed}")
 
@@ -112,6 +132,9 @@ def fr_res_006() -> None:
     The system shall define mean-reversion, trend-persistence,
     session-study, confirmation, and explicit isolated-failure policy.
     """
+    _header(
+        "FR-RES-006. The system shall define mean-reversion, trend-persistence, session-study, confirmation, and explicit isolated-failure policy."
+    )
     studies = StudyConfig({}, {}, {})
     print(f"FR-RES-006 continue_on_study_error={studies.continue_on_study_error}")
 
@@ -122,6 +145,9 @@ def fr_res_007() -> None:
     The system shall define one timezone-aware set of named windows and
     deterministic overlap precedence for all session consumers.
     """
+    _header(
+        "FR-RES-007. The system shall define one timezone-aware set of named windows and deterministic overlap precedence for all session consumers."
+    )
     sessions = SessionConfig("UTC", {"london": (time(8), time(17))}, ("london",))
     print(f"FR-RES-007 timezone={sessions.timezone}")
 
@@ -132,6 +158,9 @@ def fr_res_008() -> None:
     The system shall define bounded structure detection, canonical scoring,
     quality, validation, and calibration settings.
     """
+    _header(
+        "FR-RES-008. The system shall define bounded structure detection, canonical scoring, quality, validation, and calibration settings."
+    )
     structure = MarketStructureConfig({}, False, (20,), 5, 20)
     print(f"FR-RES-008 quality_windows={structure.quality_windows}")
 
@@ -142,6 +171,9 @@ def fr_res_009() -> None:
     The system shall define feature columns, PCA components, cluster count,
     minimum samples, and seed for deterministic unsupervised research.
     """
+    _header(
+        "FR-RES-009. The system shall define feature columns, PCA components, cluster count, minimum samples, and seed for deterministic unsupervised research."
+    )
     modeling = UnsupervisedResearchConfig(
         ("close", "high", "low", "volume"), True, 3, 5, 50, 7
     )
@@ -154,6 +186,9 @@ def fr_res_010() -> None:
     The system shall define allowed root, format, overwrite, encoding, and
     atomic-replacement policy for safe artifact persistence.
     """
+    _header(
+        "FR-RES-010. The system shall define allowed root, format, overwrite, encoding, and atomic-replacement policy for safe artifact persistence."
+    )
     artifacts = ArtifactWriteConfig(Path("research").resolve(), "json")
     print(f"FR-RES-010 format={artifacts.format}")
 
@@ -165,6 +200,9 @@ def fr_res_011() -> None:
     selected stage, reject absent or incompatible dependencies, and never
     apply defaults for selected stages.
     """
+    _header(
+        "FR-RES-011. The system shall require complete explicit configuration for every selected stage, reject absent or incompatible dependencies, and never apply defaults for selected stages."
+    )
     config = EdgeLabConfig(
         cleaning=CleaningConfig("UTC", "error", "none", "keep_warn", "error"),
         enrichment=EnrichmentConfig("EURUSD", True, True, False, True),
@@ -192,6 +230,9 @@ def fr_res_012() -> None:
     quality evidence, dataset/config hashes, and provenance without provider
     objects.
     """
+    _header(
+        "FR-RES-012. The system shall carry prepared records, canonical schema metadata, quality evidence, dataset/config hashes, and provenance without provider objects."
+    )
     index = pd.date_range("2026-01-05", periods=2, freq="min", tz="UTC")
     frame = pd.DataFrame(
         {
@@ -214,6 +255,9 @@ def fr_res_013() -> None:
     The system shall distinguish fatal issues, warnings, checks, and
     explicit cleaning actions with machine-readable codes.
     """
+    _header(
+        "FR-RES-013. The system shall distinguish fatal issues, warnings, checks, and explicit cleaning actions with machine-readable codes."
+    )
     quality = DataQualityReport((), (), ("schema",), ())
     print(f"FR-RES-013 checks={len(quality.checks)}")
 
@@ -225,6 +269,9 @@ def fr_res_014() -> None:
     evidence, recommendation, allowed forward columns, target, and source
     metadata.
     """
+    _header(
+        "FR-RES-014. The system shall identify suspected lookahead columns, severity, evidence, recommendation, allowed forward columns, target, and source metadata."
+    )
     leakage = LeakageReport(
         (), "none", {"checked": 1}, "No suspected lookahead", (), None, ("fixture",)
     )
@@ -237,6 +284,9 @@ def fr_res_015() -> None:
     The system shall represent deterministic chronological
     train/validation/test partitions and boundary identities.
     """
+    _header(
+        "FR-RES-015. The system shall represent deterministic chronological train/validation/test partitions and boundary identities."
+    )
     train = pd.DataFrame(
         {"close": [10.0, 10.1]},
         index=pd.date_range("2026-01-05 08:00", periods=2, freq="min", tz="UTC"),
@@ -263,6 +313,9 @@ def fr_res_016() -> None:
     The system shall represent seven-family metric values with units, sample
     size, undefined-value reason, warnings, and reproducibility metadata.
     """
+    _header(
+        "FR-RES-016. The system shall represent seven-family metric values with units, sample size, undefined-value reason, warnings, and reproducibility metadata."
+    )
     metrics = {
         family: {"unit": "ratio", "sample_size": 1}
         for family in (
@@ -286,6 +339,9 @@ def fr_res_017() -> None:
     rule/config, split identity, null evidence, uncertainty, confirmation,
     seed, warnings, and provenance.
     """
+    _header(
+        "FR-RES-017. The system shall represent one advisory edge study with sample, rule/config, split identity, null evidence, uncertainty, confirmation, seed, warnings, and provenance."
+    )
     edge = EdgeResult(
         "v1", "mean_reversion", {"mean": 0.5}, {}, "confirmed", 7, (), True
     )
@@ -298,6 +354,9 @@ def fr_res_018() -> None:
     The system shall represent detected structure, regime, scoring, quality,
     and advisory fit.
     """
+    _header(
+        "FR-RES-018. The system shall represent detected structure, regime, scoring, quality, and advisory fit."
+    )
     profile = MarketStructureProfile("v1", {}, 50.0, "mixed", {}, ())
     print(f"FR-RES-018 verdict={profile.verdict}")
 
@@ -308,6 +367,9 @@ def fr_res_019() -> None:
     The system shall represent stability windows, robustness,
     forward-validation outcome, and consolidated calibration evidence.
     """
+    _header(
+        "FR-RES-019. The system shall represent stability windows, robustness, forward-validation outcome, and consolidated calibration evidence."
+    )
     quality = MarketStructureQualityReport("v1", {}, {}, {}, 1.0, ())
     print(f"FR-RES-019 schema_version={quality.schema_version}")
 
@@ -319,6 +381,9 @@ def fr_res_020() -> None:
     scaler, PCA, clusters, factor/cluster evidence, seed, parameters,
     diagnostics, and advisory status.
     """
+    _header(
+        "FR-RES-020. The system shall represent preprocessing, features, dropped columns, scaler, PCA, clusters, factor/cluster evidence, seed, parameters, diagnostics, and advisory status."
+    )
     result = UnsupervisedResearchResult("v1", {}, {}, {}, {}, 7, (), True)
     print(f"FR-RES-020 seed={result.seed}")
 
@@ -329,6 +394,9 @@ def fr_res_021() -> None:
     The system shall represent deterministic score rows, uncertainty, final
     score, readiness reasons, versions, and advisory status.
     """
+    _header(
+        "FR-RES-021. The system shall represent deterministic score rows, uncertainty, final score, readiness reasons, versions, and advisory status."
+    )
     scorecard = ResearchScorecard(
         "v1",
         ({"criterion": "quality", "score": 20},),
@@ -347,6 +415,9 @@ def fr_res_022() -> None:
     The system shall normalize approved stage outputs into one versioned
     snapshot with hashes, versions, warnings, and advisory status.
     """
+    _header(
+        "FR-RES-022. The system shall normalize approved stage outputs into one versioned snapshot with hashes, versions, warnings, and advisory status."
+    )
     scorecard = ResearchScorecard(
         "v1",
         (),
@@ -375,6 +446,9 @@ def fr_res_023() -> None:
     The system shall expose bounded structured warnings with code, message,
     severity, optional field path, and bounded details.
     """
+    _header(
+        "FR-RES-023. The system shall expose bounded structured warnings with code, message, severity, optional field path, and bounded details."
+    )
     warning = ResearchWarning(
         "MISSING_DATA", "Some bars missing", "warning", "close", {"count": 1}
     )
@@ -387,6 +461,9 @@ def fr_res_024() -> None:
     The system shall produce the fully defined ResearchReport v1 contract
     with advisory_only=True and complete reproducibility metadata.
     """
+    _header(
+        "FR-RES-024. The system shall produce the fully defined ResearchReport v1 contract with advisory_only=True and complete reproducibility metadata."
+    )
     report = ResearchReport(
         contract_version="v1",
         schema_id="research.report.v1",
@@ -413,6 +490,9 @@ def fr_res_025() -> None:
     location, format, byte size, content hash, atomicity, schema version,
     and audit identity.
     """
+    _header(
+        "FR-RES-025. The system shall return a safe artifact reference containing relative location, format, byte size, content hash, atomicity, schema version, and audit identity."
+    )
     reference = ArtifactReference(
         Path("report.json"), "json", 100, _HASH, True, "v1", "audit-001"
     )
@@ -426,6 +506,9 @@ def fr_res_026() -> None:
     name with stable classification and lazy import target, without
     recursive scanning or callable wrapping.
     """
+    _header(
+        "FR-RES-026. The system shall expose a unique immutable mapping for every __all__ name with stable classification and lazy import target, without recursive scanning or callable wrapping."
+    )
     stable = all(value == "stable" for value in PUBLIC_API_CLASSIFICATIONS.values())
     print(
         f"FR-RES-026 classified_names={len(PUBLIC_API_CLASSIFICATIONS)} "
@@ -435,9 +518,7 @@ def fr_res_026() -> None:
 
 def main() -> None:
     """Run every Research contract requirement demonstration in order."""
-    print("=" * 80)
     print("Research Example 1: Contracts and Results")
-    print("=" * 80)
     fr_res_001()
     fr_res_002()
     fr_res_003()

@@ -27,6 +27,11 @@ _END = _START + timedelta(minutes=1)
 _REQUEST_ID = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _demonstrate_feature() -> None:
     """Construct every public FEAT-DATA-01 contract type."""
     bar = OHLCVRecord(
@@ -142,37 +147,44 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_001() -> None:
-    "FR-DATA-001: Validate UTC OHLCV with finite exact numerics, `low ≤ open/close ≤ high`, non-negative volume, optional non-negative provider-reported spread with its native unit, provenance, and `available_at`."  # noqa: E501 - exact specification text
+    _header("fr_data_001")
+    "FR-DATA-001: Validate UTC OHLCV with finite exact numerics, `low ≤ open/close ≤ high`, non-negative volume, optional non-negative provider-reported spread with its native unit, provenance, and `available_at`."
     _demonstrate_once()
 
 
 def fr_data_002() -> None:
-    "FR-DATA-002: Validate UTC ticks with finite bid/ask/last, `ask ≥ bid` when both exist, volume metadata, provenance, and `available_at`."  # noqa: E501 - exact specification text
+    _header("fr_data_002")
+    "FR-DATA-002: Validate UTC ticks with finite bid/ask/last, `ask ≥ bid` when both exist, volume metadata, provenance, and `available_at`."
     _demonstrate_once()
 
 
 def fr_data_003() -> None:
-    "FR-DATA-003: Validate spread records with declared unit/scale, non-negative exact spread, UTC timestamp, provenance, and `available_at`."  # noqa: E501 - exact specification text
+    _header("fr_data_003")
+    "FR-DATA-003: Validate spread records with declared unit/scale, non-negative exact spread, UTC timestamp, provenance, and `available_at`."
     _demonstrate_once()
 
 
 def fr_data_004() -> None:
-    "FR-DATA-004: Represent bounded quality evidence with status, score, issues, warnings, counts, truncation, schema version, UTC generation time, and governed blocking behavior."  # noqa: E501 - exact specification text
+    _header("fr_data_004")
+    "FR-DATA-004: Represent bounded quality evidence with status, score, issues, warnings, counts, truncation, schema version, UTC generation time, and governed blocking behavior."
     _demonstrate_once()
 
 
 def fr_data_005() -> None:
-    "FR-DATA-005: Expose immutable normalized records with availability, quality, provenance, license, cache, workflow, schema, normalization, and precision metadata, including failed quality evidence when the caller selected `warn`."  # noqa: E501 - exact specification text
+    _header("fr_data_005")
+    "FR-DATA-005: Expose immutable normalized records with availability, quality, provenance, license, cache, workflow, schema, normalization, and precision metadata, including failed quality evidence when the caller selected `warn`."
     _demonstrate_once()
 
 
 def fr_data_012() -> None:
-    "FR-DATA-012: Expose one redacted domain exception carrying a manifest code, safe details, retryability, severity, request ID, and operator action without raw exceptions."  # noqa: E501 - exact specification text
+    _header("fr_data_012")
+    "FR-DATA-012: Expose one redacted domain exception carrying a manifest code, safe details, retryability, severity, request ID, and operator action without raw exceptions."
     _demonstrate_once()
 
 
 def fr_data_013() -> None:
-    "FR-DATA-013: Expose one immutable manifest for active deterministic codes and reserve `UNKNOWN_ERROR` for failures not otherwise mapped."  # noqa: E501 - exact specification text
+    _header("fr_data_013")
+    "FR-DATA-013: Expose one immutable manifest for active deterministic codes and reserve `UNKNOWN_ERROR` for failures not otherwise mapped."
     _demonstrate_once()
 
 

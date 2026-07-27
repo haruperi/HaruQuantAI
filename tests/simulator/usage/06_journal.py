@@ -22,6 +22,11 @@ from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 NOW = datetime(2025, 1, 1, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_sim_013() -> None:
     """Demonstrate FR-SIM-013.
 
@@ -30,6 +35,9 @@ def fr_sim_013() -> None:
         sequence, UTC time, event type, redacted payload, previous hash, event hash,
         correlation, and causation identities.
     """
+    _header(
+        "Demonstrate FR-SIM-013. Responsibility: The system shall expose an immutable versioned journal event containing run, sequence, UTC time, event type, redacted payload, previous hash, event hash, correlation, and causation identities."
+    )
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
         store = SqliteSimulationStateStore(
@@ -53,6 +61,9 @@ def fr_sim_014() -> None:
         hash-chain link before the corresponding governed state transition is considered
         durable.
     """
+    _header(
+        "Demonstrate FR-SIM-014. Responsibility: The system shall append one event with the next monotonic sequence and hash-chain link before the corresponding governed state transition is considered durable."
+    )
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
         store = SqliteSimulationStateStore(
@@ -73,6 +84,9 @@ def fr_sim_015() -> None:
         The system shall finalize a completed journal atomically and return its checksum
         without publishing incomplete temporary artifacts.
     """
+    _header(
+        "Demonstrate FR-SIM-015. Responsibility: The system shall finalize a completed journal atomically and return its checksum without publishing incomplete temporary artifacts."
+    )
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
         store = SqliteSimulationStateStore(
@@ -95,6 +109,9 @@ def fr_sim_016() -> None:
         identities, and invariants while reconstructing state through an injected
         deterministic reducer.
     """
+    _header(
+        "Demonstrate FR-SIM-016. Responsibility: The system shall validate schema, sequence, hash chain, config/data/engine identities, and invariants while reconstructing state through an injected deterministic reducer."
+    )
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
         store = SqliteSimulationStateStore(
@@ -119,6 +136,9 @@ def fr_sim_017() -> None:
         The system shall return the existing completed run for the same request ID and
         hash, and reject the same request ID with a different hash.
     """
+    _header(
+        "Demonstrate FR-SIM-017. Responsibility: The system shall return the existing completed run for the same request ID and hash, and reject the same request ID with a different hash."
+    )
     run_id = resolve_idempotent_run(
         "req-usage",
         "a" * 64,
@@ -133,9 +153,8 @@ def fr_sim_017() -> None:
 
 def example_journal() -> None:
     """Demonstrate journal writer, finalization, replay, and idempotency."""
-    print("=" * 80)
+    _header("Demonstrate journal writer, finalization, replay, and idempotency.")
     print("Simulator Example 6: Event Journaling and Replay")
-    print("=" * 80)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)

@@ -1,10 +1,10 @@
 """Tests for Optimization evidence assembly."""
 
-# ruff: noqa: INP001
 from app.services.optimization.evidence import (
     FinalDecision,
     build_optimization_evidence,
 )
+
 from tests.optimization.unit.test_evidence_contracts import evidence_request
 
 

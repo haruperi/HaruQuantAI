@@ -1,8 +1,8 @@
 """Tests for bounded grid generation."""
 
-# ruff: noqa: INP001
 import pytest
 from app.services.optimization.search import iter_grid_candidates
+
 from tests.optimization.unit.test_constraints import _space
 
 

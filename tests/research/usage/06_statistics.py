@@ -30,6 +30,11 @@ from app.services.research.statistics import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> StatisticalConfig:
     """Build seeded and bounded statistical settings.
 
@@ -45,6 +50,9 @@ def fr_res_050() -> None:
     Generate a seeded stationary block-bootstrap distribution of a declared
     statistic.
     """
+    _header(
+        "FR-RES-050. Generate a seeded stationary block-bootstrap distribution of a declared statistic."
+    )
     data = np.arange(10.0)
     dist = block_bootstrap_distribution(data, statistic=np.mean, config=_config())
     print(f"FR-RES-050 distribution_size={dist.size}")
@@ -56,6 +64,9 @@ def fr_res_051() -> None:
     Return a lower and upper percentile confidence interval from the seeded
     bootstrap distribution.
     """
+    _header(
+        "FR-RES-051. Return a lower and upper percentile confidence interval from the seeded bootstrap distribution."
+    )
     interval = block_bootstrap_ci(
         np.arange(10.0), statistic=np.mean, confidence=0.95, config=_config()
     )
@@ -67,6 +78,9 @@ def fr_res_052() -> None:
 
     Compute a one-sided or two-sided permutation p-value against a seeded null.
     """
+    _header(
+        "FR-RES-052. Compute a one-sided or two-sided permutation p-value against a seeded null."
+    )
     p_value = permutation_test(
         1.0, np.arange(5.0), alternative="upper", config=_config()
     )
@@ -79,6 +93,9 @@ def fr_res_053() -> None:
     Generate a seeded random-entry null distribution matched to declared side,
     horizon, and sample.
     """
+    _header(
+        "FR-RES-053. Generate a seeded random-entry null distribution matched to declared side, horizon, and sample."
+    )
     df = pd.DataFrame({"close": np.arange(1.0, 21.0)})
     result = random_entry_null(df, side="buy", hold_bars=2, config=_config())
     print(f"FR-RES-053 null_size={result.size}")
@@ -90,6 +107,9 @@ def fr_res_054() -> None:
     Generate a seeded null distribution in R-multiple space from declared
     trade assumptions.
     """
+    _header(
+        "FR-RES-054. Generate a seeded null distribution in R-multiple space from declared trade assumptions."
+    )
     result = r_space_null(np.asarray([-1.0, 1.0]), config=_config())
     print(f"FR-RES-054 null_size={result.size}")
 
@@ -100,6 +120,9 @@ def fr_res_055() -> None:
     Generate a seeded null by shuffling entries only within the same configured
     session.
     """
+    _header(
+        "FR-RES-055. Generate a seeded null by shuffling entries only within the same configured session."
+    )
     # session_randomized_null requires a finite log_return column plus tags.
     df = pd.DataFrame({"log_return": range(20), "session": ["A"] * 10 + ["B"] * 10})
     result = session_randomized_null(df, session_column="session", config=_config())
@@ -112,6 +135,9 @@ def fr_res_056() -> None:
     Generate a seeded null by shuffling return blocks while preserving declared
     block length.
     """
+    _header(
+        "FR-RES-056. Generate a seeded null by shuffling return blocks while preserving declared block length."
+    )
     result = shuffle_returns_null(
         pd.Series([0.01, -0.02, 0.03, -0.01, 0.02]), config=_config()
     )
@@ -124,6 +150,9 @@ def fr_res_057() -> None:
     Compute the observed percentile within a finite non-empty null
     distribution.
     """
+    _header(
+        "FR-RES-057. Compute the observed percentile within a finite non-empty null distribution."
+    )
     percentile = compute_null_percentile(0.5, np.arange(-1.0, 1.0, 0.1))
     print(f"FR-RES-057 percentile={percentile}")
 
@@ -134,6 +163,9 @@ def fr_res_058() -> None:
     Return finite count, location, dispersion, and declared quantiles for a
     null distribution.
     """
+    _header(
+        "FR-RES-058. Return finite count, location, dispersion, and declared quantiles for a null distribution."
+    )
     stats = null_distribution_stats(np.arange(-1.0, 1.0, 0.1))
     print(f"FR-RES-058 keys={sorted(stats.keys())}")
 
@@ -144,6 +176,9 @@ def fr_res_059() -> None:
     Determine threshold exceedance under an explicit upper/lower/two-sided
     rule.
     """
+    _header(
+        "FR-RES-059. Determine threshold exceedance under an explicit upper/lower/two-sided rule."
+    )
     exceeds = exceeds_null_threshold(
         0.9, np.arange(-1.0, 1.0, 0.1), quantile=0.95, alternative="upper"
     )
@@ -156,6 +191,9 @@ def fr_res_060() -> None:
     Apply Benjamini-Hochberg FDR correction to finite p-values in original
     order.
     """
+    _header(
+        "FR-RES-060. Apply Benjamini-Hochberg FDR correction to finite p-values in original order."
+    )
     adjusted = benjamini_hochberg((0.01, 0.04, 0.20), q=0.05)
     print(f"FR-RES-060 adjusted_p_values={adjusted}")
 
@@ -166,15 +204,16 @@ def fr_res_061() -> None:
     Apply Holm-Bonferroni family-wise correction to finite p-values in
     original order.
     """
+    _header(
+        "FR-RES-061. Apply Holm-Bonferroni family-wise correction to finite p-values in original order."
+    )
     adjusted = holm_bonferroni((0.01, 0.04, 0.20), alpha=0.05)
     print(f"FR-RES-061 adjusted_p_values={adjusted}")
 
 
 def main() -> None:
     """Run every Research statistics requirement demonstration in order."""
-    print("=" * 80)
     print("Research Example 6: Resampling, Null Models, and Corrections")
-    print("=" * 80)
     fr_res_050()
     fr_res_051()
     fr_res_052()

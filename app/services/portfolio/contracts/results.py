@@ -209,7 +209,7 @@ class PortfolioConstructionResult(PortfolioContractModel):
             raise ValueError("result scope is required")
         return MappingProxyType(dict(sorted(value.items())))
 
-    @field_serializer("scope", when_used="json")
+    @field_serializer("scope", mode="plain")
     def _serialize_scope(self, value: Mapping[str, str]) -> dict[str, str]:
         """Serialize result scope deterministically.
 

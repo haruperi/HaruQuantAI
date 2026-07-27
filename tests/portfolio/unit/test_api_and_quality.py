@@ -1,6 +1,5 @@
 """Unit tests for the typed public Portfolio service and quality boundary."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 import inspect
@@ -19,6 +18,7 @@ from app.services.portfolio.contracts import (
 from app.services.portfolio.orchestration import PortfolioWorkflowService
 from app.services.portfolio.state import PortfolioRepository, scope_key
 from app.utils import AuthContext, logger
+
 from tests.portfolio.unit.test_repository import FakePortfolioStore
 from tests.portfolio.unit.test_workflows import _plan, _service
 

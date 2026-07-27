@@ -21,6 +21,11 @@ from app.services.risk import (
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _snapshot() -> PortfolioRiskSnapshot:
     """Build immutable snapshot input."""
     return PortfolioRiskSnapshot(
@@ -58,9 +63,10 @@ def fr_risk_045() -> None:
     """FR-RISK-045: Deterministically apply bounded scenarios to immutable
     snapshot evidence, return baseline/projected risk differences, preserve
     explicit seed, and mark every result advisory."""
-    print("=" * 80)
+    _header(
+        "FR-RISK-045: Deterministically apply bounded scenarios to immutable snapshot evidence, return baseline/projected risk differences, preserve explicit seed, and mark every result advisory."
+    )
     print("Risk Example 10: Scenario Stress Testing")
-    print("=" * 80)
 
     config = RiskConfig(
         profile="research",

@@ -34,6 +34,11 @@ from app.utils import generate_id
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> AnalyticsRunConfig:
     """Build usage configuration."""
     return AnalyticsRunConfig(
@@ -77,9 +82,8 @@ def _score(value: float = 1.0) -> CandidateScore:
 
 def example_scoring() -> None:
     """Demonstrate candidate scoring, ranking, and overfit assessment."""
-    print("=" * 80)
+    _header("Demonstrate candidate scoring, ranking, and overfit assessment.")
     print("Optimization Example 2: Candidate Scoring and Pareto Selection")
-    print("=" * 80)
 
     # 1. Objective Enum
     print(f"Canonical Sharpe objective name: {ObjectiveName.SHARPE_RATIO.value}")

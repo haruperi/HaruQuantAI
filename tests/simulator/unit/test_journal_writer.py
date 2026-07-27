@@ -1,5 +1,4 @@
 """Unit tests for hash-chained Simulation journal writing."""
-# ruff: noqa: INP001
 
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,6 +12,7 @@ from app.services.simulator.journal.writer import (
     JOURNAL_SIDECAR_MODE,
 )
 from app.services.simulator.state import SIMULATION_MIGRATIONS
+
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 

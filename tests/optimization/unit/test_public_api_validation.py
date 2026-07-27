@@ -1,12 +1,12 @@
 """Tests for Optimization public-operation validation."""
 
-# ruff: noqa: INP001
 import pytest
 from app.services.optimization.public_api.validation import (
     validate_compatible_results,
     validate_request_id,
     validate_walk_forward_matrix,
 )
+
 from tests.optimization.unit.test_validation_contracts import walk_forward_request
 
 

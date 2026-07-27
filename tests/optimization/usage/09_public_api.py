@@ -35,11 +35,15 @@ from tests.optimization.unit.test_sweep import FakeAdapter
 from tests.optimization.unit.test_validation_contracts import walk_forward_request
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_public_api() -> None:
     """Demonstrate top-level public Optimization operations."""
-    print("=" * 80)
+    _header("Demonstrate top-level public Optimization operations.")
     print("Optimization Example 9: Public API Operations")
-    print("=" * 80)
 
     adapter = FakeAdapter()
 

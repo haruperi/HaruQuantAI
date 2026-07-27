@@ -24,6 +24,11 @@ from app.services.simulator import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _dataset() -> MarketDataset:
     """Build tick dataset for timeline example."""
     start = datetime(2025, 1, 1, tzinfo=UTC)
@@ -96,6 +101,9 @@ def fr_sim_004() -> None:
         ask, source identity, sequence, and availability metadata with finite positive
         prices and `ask >= bid`.
     """
+    _header(
+        "Demonstrate FR-SIM-004. Responsibility: The system shall expose an immutable UTC tick containing symbol, timestamp, bid, ask, source identity, sequence, and availability metadata with finite positive prices and `ask >= bid`."
+    )
     instant = datetime(2025, 1, 1, tzinfo=UTC)
     tick = Tick(
         symbol="EURUSD",
@@ -119,6 +127,9 @@ def fr_sim_005() -> None:
         derivation itself belongs to Data (`FR-DATA-087`-`FR-DATA-090`); Simulation
         constructs no ticks, applies no spread model, and consumes no seed.
     """
+    _header(
+        "Demonstrate FR-SIM-005. Responsibility: The system shall convert one Data-owned tick `MarketDataset` into a strictly ordered immutable `Tick` tuple, validating UTC monotonicity, positive finite prices, `ask >= bid`, and the presence of intra-bar phase evidence. Tick derivation itself belongs to Data (`FR-DATA-087`-`FR-DATA-090`); Simulation constructs no ticks, applies no spread model, and consumes no seed."
+    )
     timeline = build_tick_timeline(_dataset())
     sequences = tuple(t.sequence for t in timeline)
     print(f"Timeline tick sequences: {sequences}")
@@ -131,6 +142,9 @@ def fr_sim_006() -> None:
         The system shall reject a strategy intent whose evidence became available after
         its execution time and enforce previous-closed-bar visibility by default.
     """
+    _header(
+        "Demonstrate FR-SIM-006. Responsibility: The system shall reject a strategy intent whose evidence became available after its execution time and enforce previous-closed-bar visibility by default."
+    )
     instant = datetime(2025, 1, 1, tzinfo=UTC)
     validate_intent_timing(instant, instant)
     print("Intent timing validated successfully")

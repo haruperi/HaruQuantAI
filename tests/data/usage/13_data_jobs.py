@@ -24,8 +24,14 @@ _JOB_NAME = "usage_sync_eurusd"
 _START = datetime(2026, 6, 1, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_29_scheduler_create_status() -> None:
     """Create and inspect a persisted update-job status."""
+    _header("Create and inspect a persisted update-job status.")
     req_id = generate_id("req")
     job_def = JobDefinition(
         job_id=_JOB_NAME,
@@ -59,6 +65,7 @@ def example_29_scheduler_create_status() -> None:
 
 def example_30_scheduler_start_stop() -> None:
     """Start, run once, and stop a persisted update job."""
+    _header("Start, run once, and stop a persisted update job.")
     req_id = generate_id("req")
     try:
         job = start_data_update_job(job_id=_JOB_NAME, request_id=req_id)
@@ -97,32 +104,38 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_041() -> None:
-    "FR-DATA-041: Derive the stable SHA-256 idempotency key from source, symbol, kind, timeframe, start/end, schema version, and normalization version."  # noqa: E501 - exact specification text
+    _header("fr_data_041")
+    "FR-DATA-041: Derive the stable SHA-256 idempotency key from source, symbol, kind, timeframe, start/end, schema version, and normalization version."
     _demonstrate_once()
 
 
 def fr_data_042() -> None:
-    "FR-DATA-042: Execute retrieval, normalization, quality, persistence, and checkpoint for one bounded chunk as one recoverable unit, deduplicating a committed key."  # noqa: E501 - exact specification text
+    _header("fr_data_042")
+    "FR-DATA-042: Execute retrieval, normalization, quality, persistence, and checkpoint for one bounded chunk as one recoverable unit, deduplicating a committed key."
     _demonstrate_once()
 
 
 def fr_data_043() -> None:
-    "FR-DATA-043: Validate interrupted job leases/checkpoints at startup and resume only after the last committed chunk without publishing partial work."  # noqa: E501 - exact specification text
+    _header("fr_data_043")
+    "FR-DATA-043: Validate interrupted job leases/checkpoints at startup and resume only after the last committed chunk without publishing partial work."
     _demonstrate_once()
 
 
 def fr_data_044() -> None:
-    "FR-DATA-044: Start or stop a persisted job only after state-transition, lease, source-policy, and schedule validation; recurring execution uses the single-node in-process asyncio loop, while `run_data_update_job_once` remains independently invokable by an OS scheduler."  # noqa: E501 - exact specification text
+    _header("fr_data_044")
+    "FR-DATA-044: Start or stop a persisted job only after state-transition, lease, source-policy, and schedule validation; recurring execution uses the single-node in-process asyncio loop, while `run_data_update_job_once` remains independently invokable by an OS scheduler."
     _demonstrate_once()
 
 
 def fr_data_045() -> None:
-    "FR-DATA-045: Return persisted job definition/state, enabled flag, run/checkpoint/error/next-run evidence, lease and recovery state, and request ID without mutation."  # noqa: E501 - exact specification text
+    _header("fr_data_045")
+    "FR-DATA-045: Return persisted job definition/state, enabled flag, run/checkpoint/error/next-run evidence, lease and recovery state, and request ID without mutation."
     _demonstrate_once()
 
 
 def fr_data_084() -> None:
-    "FR-DATA-084: Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper."  # noqa: E501 - exact specification text
+    _header("fr_data_084")
+    "FR-DATA-084: Keep ingestion chunking private to the bounded backfill workflow; expose no generic sequence helper."
     _demonstrate_once()
 
 

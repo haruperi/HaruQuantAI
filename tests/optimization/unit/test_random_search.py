@@ -1,7 +1,7 @@
 """Tests for seeded random candidate sampling."""
 
-# ruff: noqa: INP001
 from app.services.optimization.search import sample_random_candidates
+
 from tests.optimization.unit.test_constraints import _space
 
 

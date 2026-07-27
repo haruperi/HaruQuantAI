@@ -279,6 +279,29 @@ flowchart LR
 
 ## 3. Workflows
 
+> **Workflow usage evidence:** Each active workflow has one standalone
+> input-to-output program with README-aligned stages. Broker-relevant connection/gate
+> programs use genuine non-production MT5 sessions but remain package-only or fail
+> closed, transmitting no broker mutation. Run all programs with
+> `python tests/trading/usage/workflows/run_all.py`. This satisfies `NFR-TRD-007`.
+
+| Workflow | Standalone program |
+|---|---|
+| `WF-TRD-001` | `tests/trading/usage/workflows/wf_trd_001_validate_package_route_action.py` |
+| `WF-TRD-002` | `tests/trading/usage/workflows/wf_trd_002_execute_simulation_route_action.py` |
+| `WF-TRD-003` | `tests/trading/usage/workflows/wf_trd_003_start_enable_live_session.py` |
+| `WF-TRD-004` | `tests/trading/usage/workflows/wf_trd_004_gate_dispatch_live_action.py` |
+| `WF-TRD-005` | `tests/trading/usage/workflows/wf_trd_005_resolve_unknown_route_outcome.py` |
+| `WF-TRD-006` | `tests/trading/usage/workflows/wf_trd_006_read_route_facts_aggregate_readiness.py` |
+| `WF-TRD-007` | `tests/trading/usage/workflows/wf_trd_007_enforce_kill_switch_emergency_controls.py` |
+| `WF-TRD-008` | `tests/trading/usage/workflows/wf_trd_008_persist_evidence_recover_state.py` |
+| `WF-TRD-009` | `tests/trading/usage/workflows/wf_trd_009_perform_safe_live_shutdown.py` |
+| `WF-TRD-010` | `tests/trading/usage/workflows/wf_trd_010_emit_monitoring_cost_incident_evidence.py` |
+| `WF-TRD-011` | `tests/trading/usage/workflows/wf_trd_011_build_execution_reconciliation_evidence.py` |
+| `WF-TRD-012` | `tests/trading/usage/workflows/wf_trd_012_accept_governed_upstream_request.py` |
+| `WF-TRD-013` | `tests/trading/usage/workflows/wf_trd_013_execute_authorized_portfolio_rebalance.py` |
+| `WF-TRD-014` | `tests/trading/usage/workflows/wf_trd_014_run_live_paper_evaluation_cycle.py` |
+
 ### Status values
 
 | Status | Meaning |

@@ -22,6 +22,11 @@ from app.services.optimization.parameters import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _usage_space() -> ParameterSpace:
     """Construct a demonstration parameter space."""
     return ParameterSpace(
@@ -42,9 +47,8 @@ def _usage_space() -> ParameterSpace:
 
 def example_parameters() -> None:
     """Demonstrate parameter space definition, validation, and evaluation."""
-    print("=" * 80)
+    _header("Demonstrate parameter space definition, validation, and evaluation.")
     print("Optimization Example 1: Parameter Space and Provenance Hashing")
-    print("=" * 80)
 
     space = _usage_space()
     print(f"Parameter space contains {len(space.parameters)} parameter ranges.")

@@ -124,11 +124,15 @@ class _KillStore(_AuditStore):
         return "committed"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_kill_switch() -> None:
     """Demonstrate kill-switch state transitions and checks."""
-    print("=" * 80)
+    _header("Demonstrate kill-switch state transitions and checks.")
     print("Risk Example 4: Kill Switch State Transitions")
-    print("=" * 80)
 
     config = RiskConfig(
         profile="research",
@@ -293,6 +297,9 @@ def fr_risk_043() -> None:
     clearance leaves the active state unchanged and fails deterministically.
     Active config is explicit so permission, timeout, policy reference, and audit
     hashing never use implicit state."""
+    _header(
+        "FR-RISK-043: Apply an authorized, version-checked activation/clearance under `global > portfolio > strategy > symbol` precedence, atomically compare-and-swap canonical state with its Risk audit record in the injected store, revoke affected approvals on activation, and never mutate execution controls. Activation requires one authorized `AuthContext` and remains immediate and unilateral. Clearance additionally requires a matching current `ApprovalAttestation v1` from a different authorized principal; same-principal clearance leaves the active state unchanged and fails deterministically. Active config is explicit so permission, timeout, policy reference, and audit hashing never use implicit state."
+    )
     _demonstrate_once()
 
 
@@ -302,6 +309,9 @@ def fr_risk_044() -> None:
     all applicable scopes inactive plus Trading reconciliation. Config and
     authenticated trace context are required so the returned canonical decision
     contains no invented policy or trace identity."""
+    _header(
+        "FR-RISK-044: Return deterministic block/recovery eligibility; active or unknown applicable state blocks live risk increase, and recovery requires all applicable scopes inactive plus Trading reconciliation. Config and authenticated trace context are required so the returned canonical decision contains no invented policy or trace identity."
+    )
     _demonstrate_once()
 
 

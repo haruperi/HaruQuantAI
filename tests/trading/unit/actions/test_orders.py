@@ -1,6 +1,5 @@
 """Unit tests for route-aware Trading order actions."""
 
-# ruff: noqa: INP001
 from dataclasses import replace
 from decimal import Decimal
 
@@ -12,6 +11,7 @@ from app.services.trading.contracts import (
     TradingRoute,
 )
 from app.services.trading.monitoring import OperationalEvent
+
 from tests.trading.unit.actions.test_controls import authority as authority_snapshot
 from tests.trading.unit.actions.test_dependencies import (
     dependencies,

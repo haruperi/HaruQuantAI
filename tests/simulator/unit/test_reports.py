@@ -1,9 +1,9 @@
 """Unit tests for deterministic Simulation report rendering."""
-# ruff: noqa: INP001
 
 from pathlib import Path
 
 from app.services.simulator.reporting import build_json_report, build_markdown_report
+
 from tests.simulator.unit.test_reporting_contracts import _result
 
 

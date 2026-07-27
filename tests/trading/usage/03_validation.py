@@ -3,7 +3,6 @@
 Demonstrates order validation and execution readiness.
 """
 
-# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -27,6 +26,11 @@ from app.services.trading import (
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _request() -> TradingRequest:
@@ -153,9 +157,8 @@ def _policy() -> dict[str, object]:
 
 def example_validation() -> None:
     """Demonstrate Trading validation API."""
-    print("=" * 80)
+    _header("Demonstrate Trading validation API.")
     print("Trading Example 3: Order Validation and Execution Readiness")
-    print("=" * 80)
 
     req = _request()
 
@@ -198,31 +201,49 @@ def example_validation() -> None:
 
 def fr_trd_024() -> None:
     """FR-TRD-024: The system shall validate symbol, action, approved order type, required order-shape fields, instrument-provided quantity unit, Decimal volume/price/stops, instrument limits, margin evidence, tickets, and operation preconditions before route selection."""
+    _header(
+        "FR-TRD-024: The system shall validate symbol, action, approved order type, required order-shape fields, instrument-provided quantity unit, Decimal volume/price/stops, instrument limits, margin evidence, tickets, and operation preconditions before route selection."
+    )
     example_validation()
 
 
 def fr_trd_026() -> None:
     """FR-TRD-026: The system shall return timestamped account/symbol/quote/permission/authority facts or explicit unavailable/stale failures."""
+    _header(
+        "FR-TRD-026: The system shall return timestamped account/symbol/quote/permission/authority facts or explicit unavailable/stale failures."
+    )
     example_validation()
 
 
 def fr_trd_027() -> None:
     """FR-TRD-027: The system shall aggregate all required checks, enforce caller-declared expiry and configured `route_snapshot`, `risk_decision`, and `kill_switch` age bounds, and return a bounded pass/fail assessment with evidence references. Kill-switch evidence older than its bound fails with `KILL_SWITCH_STALE` independently of its reported `inactive` state."""
+    _header(
+        "FR-TRD-027: The system shall aggregate all required checks, enforce caller-declared expiry and configured `route_snapshot`, `risk_decision`, and `kill_switch` age bounds, and return a bounded pass/fail assessment with evidence references. Kill-switch evidence older than its bound fails with `KILL_SWITCH_STALE` independently of its reported `inactive` state."
+    )
     example_validation()
 
 
 def fr_trd_028() -> None:
     """FR-TRD-028: The system shall construct a deterministic plan and canonical idempotency material without side effects, preserving approved order type, validated quantity unit, optional order instructions, and Trading-state target identities exactly."""
+    _header(
+        "FR-TRD-028: The system shall construct a deterministic plan and canonical idempotency material without side effects, preserving approved order type, validated quantity unit, optional order instructions, and Trading-state target identities exactly."
+    )
     example_validation()
 
 
 def fr_trd_059() -> None:
     """FR-TRD-059: The system shall expose one immutable snapshot containing explicit fact values, source, authority, UTC timestamps, freshness, availability, and capability evidence."""
+    _header(
+        "FR-TRD-059: The system shall expose one immutable snapshot containing explicit fact values, source, authority, UTC timestamps, freshness, availability, and capability evidence."
+    )
     example_validation()
 
 
 def fr_trd_060() -> None:
     """FR-TRD-060: The system shall expose a bounded passed/failed readiness result with failed check codes and evidence references."""
+    _header(
+        "FR-TRD-060: The system shall expose a bounded passed/failed readiness result with failed check codes and evidence references."
+    )
     example_validation()
 
 

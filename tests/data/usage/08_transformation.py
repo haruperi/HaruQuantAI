@@ -24,6 +24,11 @@ from app.utils import generate_id
 _START = datetime(2026, 6, 22, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _sample_m1_dataset() -> MarketDataset:
     """Return a sample M1 MarketDataset fixture."""
     records = tuple(
@@ -74,6 +79,7 @@ def _sample_m1_dataset() -> MarketDataset:
 
 def example_26_resampling() -> None:
     """Resample M1 bars to M5 using resample_ohlcv."""
+    _header("Resample M1 bars to M5 using resample_ohlcv.")
     ds = _sample_m1_dataset()
     resampled = resample_ohlcv(ds, target_timeframe="M5")
     print(
@@ -84,6 +90,7 @@ def example_26_resampling() -> None:
 
 def example_27_multitimeframe_alignment() -> None:
     """Align M1 and M5 datasets using align_multitimeframe_data."""
+    _header("Align M1 and M5 datasets using align_multitimeframe_data.")
     m1_ds = _sample_m1_dataset()
     m5_ds = resample_ohlcv(m1_ds, target_timeframe="M5")
     targets = [m1_ds.records[-1].available_at]
@@ -95,6 +102,7 @@ def example_27_multitimeframe_alignment() -> None:
 
 def example_28_tick_aggregation() -> None:
     """Aggregate ticks into M1 bars using aggregate_ticks_to_bars."""
+    _header("Aggregate ticks into M1 bars using aggregate_ticks_to_bars.")
     ticks = tuple(
         TickRecord(
             timestamp=_START + timedelta(seconds=i * 10),
@@ -149,47 +157,56 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_036() -> None:
-    "FR-DATA-036: Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`."  # noqa: E501 - exact specification text
+    _header("fr_data_036")
+    "FR-DATA-036: Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`."
     _demonstrate_once()
 
 
 def fr_data_037() -> None:
-    "FR-DATA-037: Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead."  # noqa: E501 - exact specification text
+    _header("fr_data_037")
+    "FR-DATA-037: Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead."
     _demonstrate_once()
 
 
 def fr_data_038() -> None:
-    "FR-DATA-038: Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy, preserving the closing tick's genuine bid/ask spread when both sides exist and rejecting disorder or ambiguous units."  # noqa: E501 - exact specification text
+    _header("fr_data_038")
+    "FR-DATA-038: Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy, preserving the closing tick's genuine bid/ask spread when both sides exist and rejecting disorder or ambiguous units."
     _demonstrate_once()
 
 
 def fr_data_080() -> None:
-    "FR-DATA-080: Align a private tabular market-data copy to an aware UTC datetime field/index without mutating caller input."  # noqa: E501 - exact specification text
+    _header("fr_data_080")
+    "FR-DATA-080: Align a private tabular market-data copy to an aware UTC datetime field/index without mutating caller input."
     _demonstrate_once()
 
 
 def fr_data_081() -> None:
-    "FR-DATA-081: Convert bar rows or private DataFrames to deterministic JSON-safe records with canonical UTC timestamps."  # noqa: E501 - exact specification text
+    _header("fr_data_081")
+    "FR-DATA-081: Convert bar rows or private DataFrames to deterministic JSON-safe records with canonical UTC timestamps."
     _demonstrate_once()
 
 
 def fr_data_082() -> None:
-    "FR-DATA-082: Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics."  # noqa: E501 - exact specification text
+    _header("fr_data_082")
+    "FR-DATA-082: Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics."
     _demonstrate_once()
 
 
 def fr_data_083() -> None:
-    "FR-DATA-083: Compare OHLC or OHLCV columns only after schema and alignment validation."  # noqa: E501 - exact specification text
+    _header("fr_data_083")
+    "FR-DATA-083: Compare OHLC or OHLCV columns only after schema and alignment validation."
     _demonstrate_once()
 
 
 def fr_data_085() -> None:
-    'FR-DATA-085: Project one canonical bar `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly six float64 columns: finite `open`, `high`, `low`, `close`, and `volume`, plus provider-reported `spread`; preserve genuinely missing spread as `NaN`, expose the common supplied spread unit in `DataFrame.attrs["spread_unit"]` or `None` when absent, and fail on inconsistent supplied units or unsafe conversion.'  # noqa: E501 - exact specification text
+    _header("fr_data_085")
+    'FR-DATA-085: Project one canonical bar `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly six float64 columns: finite `open`, `high`, `low`, `close`, and `volume`, plus provider-reported `spread`; preserve genuinely missing spread as `NaN`, expose the common supplied spread unit in `DataFrame.attrs["spread_unit"]` or `None` when absent, and fail on inconsistent supplied units or unsafe conversion.'
     _demonstrate_once()
 
 
 def fr_data_086() -> None:
-    "FR-DATA-086: Project one canonical tick `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly four float64 columns: `bid`, `ask`, `last`, and `volume`; represent genuine missing optional values as `NaN`, expose common price/volume units in `DataFrame.attrs`, and fail on inconsistent units or unsafe float64 conversion."  # noqa: E501 - exact specification text
+    _header("fr_data_086")
+    "FR-DATA-086: Project one canonical tick `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly four float64 columns: `bid`, `ask`, `last`, and `volume`; represent genuine missing optional values as `NaN`, expose common price/volume units in `DataFrame.attrs`, and fail on inconsistent units or unsafe float64 conversion."
     _demonstrate_once()
 
 

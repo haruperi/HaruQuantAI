@@ -1,5 +1,4 @@
 """Unit tests for the authoritative Simulation account ledger."""
-# ruff: noqa: INP001
 
 from decimal import Decimal
 

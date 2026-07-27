@@ -51,8 +51,8 @@ _OBSERVED_AT = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 
 
 def _header(title: str) -> None:
-    """Print the header for an example section."""
-    print(f"\n{'=' * 100}")
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
     print(f"--- {title} ---")
     print(f"{'=' * 100}")
 
@@ -259,7 +259,7 @@ def _example_fr_data_020() -> None:
 
 def example_13_csv_saver() -> None:
     """Save and reload CSV market-data artifacts via save_market_data."""
-    _header("FR-DATA-018: CSV Saver (save_market_data)")
+    _header("Save and reload CSV market-data artifacts via save_market_data.")
     ds = _dataset()
     manifest = save_market_data(ds, destination_path=Path("data/raw/AAPL_saver.csv"))
     print(
@@ -269,7 +269,7 @@ def example_13_csv_saver() -> None:
 
 def example_14_parquet_saver() -> None:
     """Save and reload Parquet market-data artifacts via save_market_data."""
-    _header("FR-DATA-018: Parquet Saver (save_market_data)")
+    _header("Save and reload Parquet market-data artifacts via save_market_data.")
     ds = _dataset()
     manifest = save_market_data(
         ds,
@@ -283,14 +283,14 @@ def example_14_parquet_saver() -> None:
 
 def example_18_caching() -> None:
     """Demonstrate cache behavior and clearing via clear_data_cache."""
-    _header("FR-DATA-020: Data Caching (clear_data_cache)")
+    _header("Demonstrate cache behavior and clearing via clear_data_cache.")
     result = clear_data_cache(source_id="local_csv", symbol="AAPL", dry_run=False)
     print(f"Cleared cache entries: deleted={result.deleted_count}")
 
 
 def example_35_cleanup() -> None:
     """Clear local data cache as cleanup."""
-    _header("Cleanup: clear_data_cache")
+    _header("Clear local data cache as cleanup.")
     result = clear_data_cache(dry_run=False)
     print(f"Data cache cleanup result: deleted={result.deleted_count}")
 
@@ -455,57 +455,68 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_014() -> None:
-    "FR-DATA-014: Execute a bounded caller-owned statement plan in one short-lived SQLite transaction, return normalized results without a connection/session, and roll back atomically on failure."  # noqa: E501 - exact specification text
+    _header("fr_data_014")
+    "FR-DATA-014: Execute a bounded caller-owned statement plan in one short-lived SQLite transaction, return normalized results without a connection/session, and roll back atomically on failure."
     _demonstrate_once()
 
 
 def fr_data_015() -> None:
-    "FR-DATA-015: Validate ownership/order/checksums, acquire the shared lock, and execute domain-owned migration definitions exactly once while preserving an immutable ledger."  # noqa: E501 - exact specification text
+    _header("fr_data_015")
+    "FR-DATA-015: Validate ownership/order/checksums, acquire the shared lock, and execute domain-owned migration definitions exactly once while preserving an immutable ledger."
     _demonstrate_once()
 
 
 def fr_data_016() -> None:
-    "FR-DATA-016: Grant at most one writer lease per resolved path, reject conflicts deterministically, and release it on exit or verified stale recovery."  # noqa: E501 - exact specification text
+    _header("fr_data_016")
+    "FR-DATA-016: Grant at most one writer lease per resolved path, reject conflicts deterministically, and release it on exit or verified stale recovery."
     _demonstrate_once()
 
 
 def fr_data_018() -> None:
-    "FR-DATA-018: Validate license/quality/path, lock the target, write artifact and manifest through a temporary file, and atomically commit or quarantine failure."  # noqa: E501 - exact specification text
+    _header("fr_data_018")
+    "FR-DATA-018: Validate license/quality/path, lock the target, write artifact and manifest through a temporary file, and atomically commit or quarantine failure."
     _demonstrate_once()
 
 
 def fr_data_019() -> None:
-    "FR-DATA-019: Return a cache entry only when request dimensions, schema/normalization, source revision/raw hash, and stale policy match; stale data is never silent."  # noqa: E501 - exact specification text
+    _header("fr_data_019")
+    "FR-DATA-019: Return a cache entry only when request dimensions, schema/normalization, source revision/raw hash, and stale policy match; stale data is never silent."
     _demonstrate_once()
 
 
 def fr_data_020() -> None:
-    "FR-DATA-020: Write a bounded cache entry with complete identity/TTL metadata and surface an optional cache-write failure without corrupting a successful retrieval result."  # noqa: E501 - exact specification text
+    _header("fr_data_020")
+    "FR-DATA-020: Write a bounded cache entry with complete identity/TTL metadata and surface an optional cache-write failure without corrupting a successful retrieval result."
     _demonstrate_once()
 
 
 def fr_data_105() -> None:
-    "FR-DATA-105: Admit one externally produced artifact under a declared dialect and explicit column mapping, infer no governed field, validate and quality-check every record, commit through `save_dataset`, and persist an audit event marking external origin."  # noqa: E501 - exact specification text
+    _header("fr_data_105")
+    "FR-DATA-105: Admit one externally produced artifact under a declared dialect and explicit column mapping, infer no governed field, validate and quality-check every record, commit through `save_dataset`, and persist an audit event marking external origin."
     _demonstrate_once()
 
 
 def fr_data_106() -> None:
-    "FR-DATA-106: Expose the supported deterministic header and delimiter dialects so a caller can select one without trial and error; an unlisted dialect is rejected."  # noqa: E501 - exact specification text
+    _header("fr_data_106")
+    "FR-DATA-106: Expose the supported deterministic header and delimiter dialects so a caller can select one without trial and error; an unlisted dialect is rejected."
     _demonstrate_once()
 
 
 def fr_data_108() -> None:
-    "FR-DATA-108: Snapshot a declared set of backup targets (raw artifacts, processed artifacts, cache state, manifests, and the migration ledger) into one immutable manifest carrying per-target hashes, byte counts, UTC creation time, and schema/normalization versions. Persist one audit event. A target outside `APPROVED_STORAGE_ROOTS` is rejected before any read."  # noqa: E501 - exact specification text
+    _header("fr_data_108")
+    "FR-DATA-108: Snapshot a declared set of backup targets (raw artifacts, processed artifacts, cache state, manifests, and the migration ledger) into one immutable manifest carrying per-target hashes, byte counts, UTC creation time, and schema/normalization versions. Persist one audit event. A target outside `APPROVED_STORAGE_ROOTS` is rejected before any read."
     _demonstrate_once()
 
 
 def fr_data_109() -> None:
-    "FR-DATA-109: Restore every target in a named manifest to its recorded state, verifying each hash before writing and failing atomically without partial restoration when any verification fails. Restore is always explicit and never automatic."  # noqa: E501 - exact specification text
+    _header("fr_data_109")
+    "FR-DATA-109: Restore every target in a named manifest to its recorded state, verifying each hash before writing and failing atomically without partial restoration when any verification fails. Restore is always explicit and never automatic."
     _demonstrate_once()
 
 
 def fr_data_110() -> None:
-    "FR-DATA-110: Purge raw payloads for one dataset older than an explicit maximum age and return the purged count. Operates only on raw payloads; the canonical retention terms carried by `SourceLicensePolicy` are separate and are never overridden. Defaults to a dry run."  # noqa: E501 - exact specification text
+    _header("fr_data_110")
+    "FR-DATA-110: Purge raw payloads for one dataset older than an explicit maximum age and return the purged count. Operates only on raw payloads; the canonical retention terms carried by `SourceLicensePolicy` are separate and are never overridden. Defaults to a dry run."
     _demonstrate_once()
 
 

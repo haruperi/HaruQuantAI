@@ -18,15 +18,21 @@ from app.services.portfolio import PortfolioConstructionResult
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_port_010() -> None:
     """FR-PORT-010: Support fixed, equal, and inverse-volatility methods only.
 
     Demonstrates that the construction result carries one of exactly three
     approved methods and no other method identifier is valid.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-010: Support fixed, equal, and inverse-volatility methods only. Demonstrates that the construction result carries one of exactly three approved methods and no other method identifier is valid."
+    )
     print("FR-PORT-010: Support fixed, equal, and inverse-volatility methods only")
-    print("=" * 80)
 
     result = PortfolioConstructionResult(
         result_id="result-1",
@@ -79,9 +85,10 @@ def fr_port_011() -> None:
 
     Demonstrates that published component weights must total exactly one.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-011: Reject zero/negative volatility, insufficient observations, non-finite values, and invalid weight totals. Demonstrates that published component weights must total exactly one."
+    )
     print("FR-PORT-011: Reject invalid weights and non-finite values")
-    print("=" * 80)
 
     try:
         PortfolioConstructionResult(
@@ -129,9 +136,10 @@ def fr_port_012() -> None:
     Demonstrates that two identically constructed results produce identical
     canonical hash material.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-012: Return identical bytes and hash for identical inputs/configuration. Demonstrates that two identically constructed results produce identical canonical hash material."
+    )
     print("FR-PORT-012: Return identical hash for identical inputs")
-    print("=" * 80)
 
     data = {
         "result_id": "result-det",
@@ -181,9 +189,10 @@ def fr_port_013() -> None:
     Demonstrates that the construction result method field accepts only the
     three approved methods, excluding advanced optimization methods.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-013: Exclude MVO, Black-Litterman, CVaR, and implicit optimizer delegation. Demonstrates that the construction result method field accepts only the three approved methods, excluding advanced optimization methods."
+    )
     print("FR-PORT-013: Exclude MVO, Black-Litterman, CVaR optimization")
-    print("=" * 80)
 
     approved = {"fixed", "equal", "inverse_volatility"}
     excluded = {"mean_variance", "black_litterman", "cvar"}
@@ -199,9 +208,10 @@ def fr_port_014() -> None:
     Demonstrates that a construction result with invalid weights raises an
     error and publishes no result.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-014: Publish nothing on partial construction failure. Demonstrates that a construction result with invalid weights raises an error and publishes no result."
+    )
     print("FR-PORT-014: Publish nothing on partial construction failure")
-    print("=" * 80)
 
     try:
         PortfolioConstructionResult(

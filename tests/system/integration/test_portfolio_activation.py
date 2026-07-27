@@ -19,7 +19,7 @@ construction_request_data = portfolio_fixtures.construction_request_data
 construction_result = portfolio_fixtures.construction_result
 portfolio_settings = portfolio_fixtures.portfolio_settings
 portfolio_now = portfolio_fixtures.portfolio_now
-run_activation_chain = activation_workflow.test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts  # noqa: E501
+run_activation_chain = activation_workflow.test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts
 
 
 def test_candidate_simulation_risk_review_and_activation_chain(

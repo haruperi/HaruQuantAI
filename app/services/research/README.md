@@ -365,6 +365,23 @@ flowchart LR
 
 ## 3. Workflows
 
+> **Workflow Usage Evidence**: Each active workflow has one standalone program in
+> `tests/research/usage/workflows/`; `run_all.py` executes them in registry order.
+
+Evidence programs:
+
+- `WF-RES-001`: `tests/research/usage/workflows/wf_res_001_prepare_research_dataset.py`
+- `WF-RES-002`: `tests/research/usage/workflows/wf_res_002_build_core_metric_profile.py`
+- `WF-RES-003`: `tests/research/usage/workflows/wf_res_003_build_leakage_safe_feature_frame_time_splits.py`
+- `WF-RES-004`: `tests/research/usage/workflows/wf_res_004_analyze_session_seasonality_opportunity.py`
+- `WF-RES-005`: `tests/research/usage/workflows/wf_res_005_run_edge_study_null_evidence.py`
+- `WF-RES-006`: `tests/research/usage/workflows/wf_res_006_build_market_structure_profile.py`
+- `WF-RES-007`: `tests/research/usage/workflows/wf_res_007_forward_validate_calibrate_market_structure.py`
+- `WF-RES-008`: `tests/research/usage/workflows/wf_res_008_run_unsupervised_market_structure_research.py`
+- `WF-RES-009`: `tests/research/usage/workflows/wf_res_009_build_research_scorecard_profile_snapshot.py`
+- `WF-RES-010`: `tests/research/usage/workflows/wf_res_010_render_persist_research_artifact.py`
+- `WF-RES-011`: `tests/research/usage/workflows/wf_res_011_run_complete_edge_lab_profile.py`
+
 ### Status values
 
 | Status | Meaning |
@@ -1205,7 +1222,7 @@ Shared settings are consumed from `docs/PROJECT.md` and not redefined: `ENVIRONM
 | Completed | `NFR-RES-011` | Observability | Validation failures, cleaning actions, masking, insufficiency, selected stages, and duration shall emit structured redacted warnings/logs with trace identifiers. | Research unit/integration tests plus logger-boundary inspection |
 | Completed | `NFR-RES-012` | Platform | Deterministic library behavior and safe persistence shall work on the project's supported Python 3.14 Windows baseline; platform atomicity differences are explicit. | Targeted tests and usage programs executed on the Windows baseline |
 | Completed | `NFR-RES-013` | Maintainability | No recursive facade scan, duplicate formula wrapper, generic helper/service/manager, mutable global registry, or cross-domain internal import shall exist. | Package structure and import/API audit |
-| Completed | `NFR-RES-014` | Testing | Every `FR-RES-*` shall have its mapped usage and unit test; every collaborative workflow shall have its mapped integration test; coverage shall be at least 80%. | `tests/research/integration/test_usage_scripts.py`, coverage gate |
+| Completed | `NFR-RES-014` | Testing | Every `FR-RES-*` shall have its mapped usage and unit test; every active workflow shall have one standalone README-aligned usage program; every collaborative workflow shall have its mapped integration test; coverage shall be at least 80%. | `tests/research/unit/test_workflow_usage_parity.py`, direct workflow runner, `tests/research/integration/test_usage_scripts.py`, coverage gate |
 | Completed | `NFR-RES-015` | Documentation | Every module, class, function, and method shall use Google-style docstrings and every public DataFrame contract shall document columns, index, timezone, alignment, NaNs, and mutation. | Ruff docstring checks and package README contract tables |
 
 ---

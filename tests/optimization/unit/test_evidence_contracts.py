@@ -1,6 +1,5 @@
 """Tests for versioned Optimization evidence contracts."""
 
-# ruff: noqa: INP001
 import pytest
 from app.services.optimization.evidence import (
     EvidenceAssemblyRequest,
@@ -10,6 +9,7 @@ from app.services.optimization.evidence import (
 )
 from app.services.optimization.search import run_bounded_search
 from pydantic import ValidationError
+
 from tests.optimization.unit.test_search_contracts import search_request
 from tests.optimization.unit.test_sweep import FakeAdapter
 

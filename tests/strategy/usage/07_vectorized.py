@@ -31,13 +31,20 @@ _STRATEGY = "usage-vectorized-strategy"
 _MODULE = "app.services.strategy.evaluators.naive_ma_trend"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_032() -> None:
     """Demonstrate atomic vectorized evaluation."""
+    _header("Demonstrate atomic vectorized evaluation.")
     assert callable(run_vectorized_strategy_signals)
 
 
 def fr_str_036() -> None:
     """Demonstrate the hash-bound vectorized evaluator contract."""
+    _header("Demonstrate the hash-bound vectorized evaluator contract.")
     assert VectorizedStrategyEvaluator
 
 
@@ -102,7 +109,6 @@ def main() -> int:
     fr_str_032()
     fr_str_036()
     print("\nVECTORIZED STRATEGY EVALUATION — REAL MT5 EURUSD M5")
-    print("=" * 88)
     try:
         market = get_market_data(
             source_id="mt5",

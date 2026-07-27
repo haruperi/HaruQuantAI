@@ -15,15 +15,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.services.portfolio import PortfolioService
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_port_034() -> None:
     """FR-PORT-034: Expose construction, status, activation, drift/rebalance,
     rollback, and history operations.
 
     Demonstrates that PortfolioService exposes every required operation.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-034: Expose construction, status, activation, drift/rebalance, rollback, and history operations. Demonstrates that PortfolioService exposes every required operation."
+    )
     print("FR-PORT-034: Expose construction, status, activation, drift, rebalance")
-    print("=" * 80)
 
     required = {
         "construct",
@@ -55,9 +61,10 @@ def fr_port_035() -> None:
     Demonstrates that every governed public method accepts the required
     authentication and trace parameters.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-035: Accept AuthContext and request_id: str | None = None on governed entry points. Demonstrates that every governed public method accepts the required authentication and trace parameters."
+    )
     print("FR-PORT-035: Accept AuthContext and optional request_id")
-    print("=" * 80)
 
     governed = (
         "construct",
@@ -83,9 +90,10 @@ def fr_port_036() -> None:
     Demonstrates that every public method returns a PortfolioOutcome typed
     envelope.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-036: Return structured success/error envelopes; never None or raw exceptions. Demonstrates that every public method returns a PortfolioOutcome typed envelope."
+    )
     print("FR-PORT-036: Return structured envelopes, never None or raw exceptions")
-    print("=" * 80)
 
     governed = (
         "construct",
@@ -111,9 +119,10 @@ def fr_port_037() -> None:
     Demonstrates that the PortfolioService module contains no HTTP, FastAPI, or
     authentication-framework imports.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-037: Keep authentication and presentation logic outside Portfolio. Demonstrates that the PortfolioService module contains no HTTP, FastAPI, or authentication-framework imports."
+    )
     print("FR-PORT-037: Keep authentication and presentation outside Portfolio")
-    print("=" * 80)
 
     source_file = Path("app/services/portfolio/api/service.py")
     source = source_file.read_text(encoding="utf-8")

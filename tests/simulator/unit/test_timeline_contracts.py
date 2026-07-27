@@ -1,5 +1,4 @@
 """Unit tests for the canonical Simulation tick."""
-# ruff: noqa: INP001
 
 from datetime import UTC, datetime
 from decimal import Decimal

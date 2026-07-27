@@ -1,135 +1,118 @@
-"""FEAT-BRK-05: Dukascopy research lifecycle."""
+"""FEAT-BRK-05: Dukascopy research lifecycle and capability boundaries."""
 
 import asyncio
 
 import _support  # noqa: F401
-from _support import config
+from _support import real_session, require_error, require_success
 from app.services.brokers import (
+    BrokerAdapter,
+    BrokerErrorCode,
     BrokerId,
     BrokerPositionFilter,
-    create_broker_adapter,
 )
 
 
-def fr_brokers_075() -> None:
-    """FR-BRK-075: Return direct provider platform metadata without secrets."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_platform_info()
-        print("FR-BRK-075:", res.status)
-
-    asyncio.run(run())
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def fr_brokers_076() -> None:
-    """FR-BRK-076: Return provider-reported permissions without inferring from SDK."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_permissions()
-        print("FR-BRK-076:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_075(adapter: BrokerAdapter) -> None:
+    """FR-BRK-075: Return genuine provider platform metadata."""
+    _header("FR-BRK-075: Return genuine provider platform metadata.")
+    require_success("Result", await adapter.get_platform_info())
 
 
-def fr_brokers_077() -> None:
-    """FR-BRK-077: Return bounded page of provider-visible accounts."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.list_accounts()
-        print("FR-BRK-077:", res.status)
-
-    asyncio.run(run())
-
-
-def fr_brokers_078() -> None:
-    """FR-BRK-078: Reject in-place account switching as unsupported."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.select_account("acc-1")
-        print("FR-BRK-078:", res.status)
-
-    asyncio.run(run())
-
-
-def fr_brokers_079() -> None:
-    """FR-BRK-079: Return provider account info and state."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_account_info()
-        print("FR-BRK-079:", res.status)
-
-    asyncio.run(run())
+async def _require_unsupported(adapter: BrokerAdapter, operation: str) -> None:
+    """Require one non-Dukascopy account capability to remain unsupported."""
+    if operation == "permissions":
+        result = await adapter.get_permissions()
+    elif operation == "accounts":
+        result = await adapter.list_accounts()
+    elif operation == "select_account":
+        result = await adapter.select_account("acc-1")
+    elif operation == "account_info":
+        result = await adapter.get_account_info()
+    elif operation == "balances":
+        result = await adapter.get_balances()
+    elif operation == "assets":
+        result = await adapter.list_assets()
+    elif operation == "asset_info":
+        result = await adapter.get_asset_info("EUR")
+    else:
+        result = await adapter.get_positions(BrokerPositionFilter())
+    require_error(
+        "Result",
+        result,
+        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+    )
 
 
-def fr_brokers_080() -> None:
-    """FR-BRK-080: Return provider balances without currency conversion."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_balances()
-        print("FR-BRK-080:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_076(adapter: BrokerAdapter) -> None:
+    """FR-BRK-076: Return permissions or deterministic unsupported."""
+    _header("FR-BRK-076: Return permissions or deterministic unsupported.")
+    await _require_unsupported(adapter, "permissions")
 
 
-def fr_brokers_081() -> None:
-    """FR-BRK-081: Return provider-known assets without constructing universe."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.list_assets()
-        print("FR-BRK-081:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_077(adapter: BrokerAdapter) -> None:
+    """FR-BRK-077: List accounts or deterministic unsupported."""
+    _header("FR-BRK-077: List accounts or deterministic unsupported.")
+    await _require_unsupported(adapter, "accounts")
 
 
-def fr_brokers_082() -> None:
-    """FR-BRK-082: Return direct provider metadata for one asset or not-found."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
-
-    async def run() -> None:
-        res = await adapter.get_asset_info("EUR")
-        print("FR-BRK-082:", res.status)
-
-    asyncio.run(run())
+async def fr_brokers_078(adapter: BrokerAdapter) -> None:
+    """FR-BRK-078: Select an account or deterministic unsupported."""
+    _header("FR-BRK-078: Select an account or deterministic unsupported.")
+    await _require_unsupported(adapter, "select_account")
 
 
-def fr_brokers_083() -> None:
-    """FR-BRK-083: Return bounded canonical page of current positions."""
-    adapter = create_broker_adapter(BrokerId.DUKASCOPY, config(BrokerId.DUKASCOPY)).data
-    assert adapter is not None
+async def fr_brokers_079(adapter: BrokerAdapter) -> None:
+    """FR-BRK-079: Return account information or unsupported."""
+    _header("FR-BRK-079: Return account information or unsupported.")
+    await _require_unsupported(adapter, "account_info")
 
-    async def run() -> None:
-        res = await adapter.get_positions(BrokerPositionFilter())
-        print("FR-BRK-083:", res.status)
 
-    asyncio.run(run())
+async def fr_brokers_080(adapter: BrokerAdapter) -> None:
+    """FR-BRK-080: Return balances or deterministic unsupported."""
+    _header("FR-BRK-080: Return balances or deterministic unsupported.")
+    await _require_unsupported(adapter, "balances")
+
+
+async def fr_brokers_081(adapter: BrokerAdapter) -> None:
+    """FR-BRK-081: List assets or deterministic unsupported."""
+    _header("FR-BRK-081: List assets or deterministic unsupported.")
+    await _require_unsupported(adapter, "assets")
+
+
+async def fr_brokers_082(adapter: BrokerAdapter) -> None:
+    """FR-BRK-082: Return asset metadata or deterministic unsupported."""
+    _header("FR-BRK-082: Return asset metadata or deterministic unsupported.")
+    await _require_unsupported(adapter, "asset_info")
+
+
+async def fr_brokers_083(adapter: BrokerAdapter) -> None:
+    """FR-BRK-083: Return positions or deterministic unsupported."""
+    _header("FR-BRK-083: Return positions or deterministic unsupported.")
+    await _require_unsupported(adapter, "positions")
+
+
+async def _run() -> None:
+    """Execute capability evidence in one genuine Dukascopy sandbox session."""
+    async with real_session(BrokerId.DUKASCOPY) as adapter:
+        await fr_brokers_075(adapter)
+        await fr_brokers_076(adapter)
+        await fr_brokers_077(adapter)
+        await fr_brokers_078(adapter)
+        await fr_brokers_079(adapter)
+        await fr_brokers_080(adapter)
+        await fr_brokers_081(adapter)
+        await fr_brokers_082(adapter)
+        await fr_brokers_083(adapter)
 
 
 def main() -> None:
-    """Execute every FR-BRK-075..083 usage function."""
-    fr_brokers_075()
-    fr_brokers_076()
-    fr_brokers_077()
-    fr_brokers_078()
-    fr_brokers_079()
-    fr_brokers_080()
-    fr_brokers_081()
-    fr_brokers_082()
-    fr_brokers_083()
+    """Run the standalone genuine Dukascopy lifecycle program."""
+    asyncio.run(_run())
 
 
 if __name__ == "__main__":

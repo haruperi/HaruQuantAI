@@ -23,6 +23,10 @@ class ProviderTestSettings(AppSettings):
     ctrader_client_id: SecretStr | None = None
     ctrader_client_secret: SecretStr | None = None
     ctrader_access_token: SecretStr | None = None
+    binance_enabled: bool = False
+    binance_environment: Literal["testnet"] = "testnet"
+    dukascopy_enabled: bool = False
+    yahoo_enabled: bool = False
 
 
 __all__ = ["ProviderTestSettings"]

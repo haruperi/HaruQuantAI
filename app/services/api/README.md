@@ -404,6 +404,8 @@ public symbols below. Unsupported ranges are absent from the target structure.
 
 ## 3. Workflows
 
+> **Workflow Usage Evidence**: See [`tests/api/usage/workflows.py`](file:///tests/api/usage/workflows.py) for executable usage examples of all domain workflows.
+
 ### Workflow manifest
 
 | Status | Workflow ID | Scope | Workflow | System workflow | Trigger / input boundary | Final outcome / output boundary | Requirements | Failure behavior | Integration test |

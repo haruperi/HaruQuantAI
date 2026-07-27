@@ -1,6 +1,6 @@
 """Shared fixtures and unit tests for Trading action dependencies."""
 
-# ruff: noqa: ARG005, INP001
+# ruff: noqa: ARG005
 from __future__ import annotations
 
 from dataclasses import FrozenInstanceError

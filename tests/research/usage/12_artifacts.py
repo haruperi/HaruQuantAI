@@ -23,6 +23,11 @@ from app.utils import AuthContext
 _HASH = "e" * 64
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _report() -> ResearchReport:
     """Build a canonical advisory report."""
     return ResearchReport(
@@ -63,9 +68,8 @@ def _auth() -> AuthContext:
 
 def fr_res_097() -> None:
     """FR-RES-097: Mask, validate, and atomically persist an artifact."""
-    print("=" * 80)
+    _header("FR-RES-097: Mask, validate, and atomically persist an artifact.")
     print("Research Example 12: Artifact Persistence")
-    print("=" * 80)
     import tempfile
 
     root = Path(tempfile.mkdtemp()) / "artifacts"
@@ -83,6 +87,7 @@ def fr_res_097() -> None:
 
 def fr_res_098() -> None:
     """FR-RES-098: Return the deterministic Research-owned migration."""
+    _header("FR-RES-098: Return the deterministic Research-owned migration.")
     request = build_research_migration_request(
         "req-01234567-89ab-4def-8123-456789abcdef"
     )

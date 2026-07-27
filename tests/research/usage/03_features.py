@@ -31,6 +31,11 @@ from app.services.research.features import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _prices() -> pd.Series:
     """Build positive UTC-indexed close prices.
 
@@ -68,6 +73,9 @@ def fr_res_031() -> None:
     Compute one-period log returns without mutating input and preserve index
     alignment.
     """
+    _header(
+        "FR-RES-031. Compute one-period log returns without mutating input and preserve index alignment."
+    )
     result = log_returns(_prices())
     print(f"FR-RES-031 log_return_rows={len(result)}")
 
@@ -78,6 +86,9 @@ def fr_res_032() -> None:
     Compute arithmetic returns without mutating input and preserve index
     alignment.
     """
+    _header(
+        "FR-RES-032. Compute arithmetic returns without mutating input and preserve index alignment."
+    )
     result = simple_returns(_prices())
     print(f"FR-RES-032 simple_return_rows={len(result)}")
 
@@ -88,6 +99,9 @@ def fr_res_033() -> None:
     Estimate Hurst exponent with explicit minimum sample and finite-value
     validation.
     """
+    _header(
+        "FR-RES-033. Estimate Hurst exponent with explicit minimum sample and finite-value validation."
+    )
     estimate = hurst_exponent(_prices(), minimum_samples=20)
     print(f"FR-RES-033 hurst={estimate:.4f}")
 
@@ -98,6 +112,9 @@ def fr_res_034() -> None:
     Compute rolling Hurst values with documented warm-up NaNs and stable
     alignment.
     """
+    _header(
+        "FR-RES-034. Compute rolling Hurst values with documented warm-up NaNs and stable alignment."
+    )
     rolling = rolling_hurst(_prices(), window=20, minimum_samples=20)
     print(f"FR-RES-034 rolling_hurst_valid={int(rolling.notna().sum())}")
 
@@ -108,6 +125,9 @@ def fr_res_035() -> None:
     Compute one canonical horizon-aligned forward return in log or simple
     mode and mark it research-only.
     """
+    _header(
+        "FR-RES-035. Compute one canonical horizon-aligned forward return in log or simple mode and mark it research-only."
+    )
     forward = forward_returns(_prices(), horizon=2, mode="log", output_label="f2")
     print(
         f"FR-RES-035 label={forward.name} "
@@ -121,6 +141,9 @@ def fr_res_036() -> None:
     Compute forward maximum favorable excursion for declared side/horizon
     with trailing unavailability explicit.
     """
+    _header(
+        "FR-RES-036. Compute forward maximum favorable excursion for declared side/horizon with trailing unavailability explicit."
+    )
     mfe = forward_max_favorable_excursion(_frame(), horizon=2, side="buy")
     print(f"FR-RES-036 mfe_valid={int(mfe.notna().sum())}")
 
@@ -131,6 +154,9 @@ def fr_res_037() -> None:
     Compute forward maximum adverse excursion for declared side/horizon with
     trailing unavailability explicit.
     """
+    _header(
+        "FR-RES-037. Compute forward maximum adverse excursion for declared side/horizon with trailing unavailability explicit."
+    )
     mae = forward_max_adverse_excursion(_frame(), horizon=2, side="buy")
     print(f"FR-RES-037 mae_valid={int(mae.notna().sum())}")
 
@@ -142,6 +168,9 @@ def fr_res_038() -> None:
     caller-supplied public IndicatorResult v1 inputs, research-only forward
     columns, and no input mutation.
     """
+    _header(
+        "FR-RES-038. Build a new feature frame with declared lineage, warm-up/NaN behavior, caller-supplied public IndicatorResult v1 inputs, research-only forward columns, and no input mutation."
+    )
     quality = DataQualityReport((), (), ("schema",), ())
     prepared = PreparedDataset(
         data=_frame(),
@@ -167,9 +196,7 @@ def fr_res_038() -> None:
 
 def main() -> None:
     """Run every Research feature requirement demonstration in order."""
-    print("=" * 80)
     print("Research Example 3: Feature Calculations and Excursions")
-    print("=" * 80)
     fr_res_031()
     fr_res_032()
     fr_res_033()

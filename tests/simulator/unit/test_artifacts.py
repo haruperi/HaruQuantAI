@@ -1,5 +1,4 @@
 """Unit tests for safe Simulation artifact manifests."""
-# ruff: noqa: INP001
 
 from datetime import UTC, datetime
 from pathlib import Path

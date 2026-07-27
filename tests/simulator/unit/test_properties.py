@@ -1,5 +1,4 @@
 """Table-driven property checks for Simulation numeric invariants."""
-# ruff: noqa: INP001
 
 from decimal import Decimal
 

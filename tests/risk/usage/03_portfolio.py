@@ -20,15 +20,21 @@ from app.services.risk import PortfolioState, RiskConfig, build_portfolio_risk_s
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_risk_025() -> None:
     """FR-RISK-025: Build an immutable snapshot containing pending-order-aware
     gross/net exposure by dimension, account-currency conversions,
     drawdown/loss state, margin/leverage, volatility, historical VaR/CVaR,
     pair/portfolio correlation, incremental contribution, assumptions,
     coverage, and explicit gaps."""
-    print("=" * 80)
+    _header(
+        "FR-RISK-025: Build an immutable snapshot containing pending-order-aware gross/net exposure by dimension, account-currency conversions, drawdown/loss state, margin/leverage, volatility, historical VaR/CVaR, pair/portfolio correlation, incremental contribution, assumptions, coverage, and explicit gaps."
+    )
     print("Risk Example 7: Portfolio Risk Snapshot Construction")
-    print("=" * 80)
 
     account = AccountStateSnapshot(
         account_id="account-1",

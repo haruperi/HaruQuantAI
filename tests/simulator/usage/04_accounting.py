@@ -30,6 +30,11 @@ from app.services.simulator import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _specification() -> SymbolSpecification:
     """Build symbol specification."""
     return SymbolSpecification(
@@ -89,6 +94,9 @@ def fr_sim_007() -> None:
         within symbol min/max/step constraints without increasing, decreasing, or
         otherwise re-sizing it.
     """
+    _header(
+        "Demonstrate FR-SIM-007. Responsibility: The system shall verify that the final approved volume is finite, positive, and within symbol min/max/step constraints without increasing, decreasing, or otherwise re-sizing it."
+    )
     spec = _specification()
     norm_vol = normalize_volume(Decimal(1), spec)
     print(f"Normalized volume: {norm_vol}")
@@ -101,6 +109,9 @@ def fr_sim_008() -> None:
         The system shall calculate configured Phase 1 commission and swap
         deterministically and return an itemized fixed-precision cost mapping.
     """
+    _header(
+        "Demonstrate FR-SIM-008. Responsibility: The system shall calculate configured Phase 1 commission and swap deterministically and return an itemized fixed-precision cost mapping."
+    )
     cost_input = ExecutionCostInput(
         volume=Decimal(1), side="BUY", rollover_multiplier=Decimal(0)
     )
@@ -115,6 +126,9 @@ def fr_sim_009() -> None:
         The system shall calculate required FX margin from approved symbol evidence,
         price, volume, and leverage, rejecting insufficient free margin before a fill.
     """
+    _header(
+        "Demonstrate FR-SIM-009. Responsibility: The system shall calculate required FX margin from approved symbol evidence, price, volume, and leverage, rejecting insufficient free margin before a fill."
+    )
     margin = calculate_margin(Decimal(1), Decimal(1), Decimal(100_000), Decimal(100))
     print(f"Calculated margin: {margin}")
 
@@ -127,6 +141,9 @@ def fr_sim_010() -> None:
         `FXConversionEvidence v1` for conversion-dependent accounting, and shall never
         choose, synthesize, refresh, or fetch a rate path.
     """
+    _header(
+        "Demonstrate FR-SIM-010. Responsibility: The system shall accept only fresh, schema-compatible Data-owned `FXConversionEvidence v1` for conversion-dependent accounting, and shall never choose, synthesize, refresh, or fetch a rate path."
+    )
     evidence = _evidence()
     validated = validate_fx_evidence(evidence, as_of=evidence.as_of)
     print(f"Validated FX evidence hash: {validated.evidence_hash}")
@@ -140,6 +157,9 @@ def fr_sim_039() -> None:
         carried by validated `FXConversionEvidence v1`, preserving fixed precision and
         rejecting any conversion whose evidence was not first validated.
     """
+    _header(
+        "Demonstrate FR-SIM-039. Responsibility: The system shall convert one monetary amount using only the composite rate carried by validated `FXConversionEvidence v1`, preserving fixed precision and rejecting any conversion whose evidence was not first validated."
+    )
     evidence = _evidence()
     validated = validate_fx_evidence(evidence, as_of=evidence.as_of)
     converted = convert_fx_amount(Decimal(10), validated)
@@ -157,6 +177,9 @@ def fr_sim_011() -> None:
         exact position. The engine journals the resulting evidence; the ledger itself
         publishes no event.
     """
+    _header(
+        "Demonstrate FR-SIM-011. Responsibility: The system shall atomically apply a simulated fill, realized PnL, commission, swap, and margin effect while preserving balance/equity/free-margin invariants, accumulating commission, swap, and gross-profit totals, and returning the itemized costs charged by that fill so the caller can attribute them to the exact position. The engine journals the resulting evidence; the ledger itself publishes no event."
+    )
     costs = _ledger().apply_fill(
         LedgerFill(
             action="OPEN",
@@ -179,6 +202,9 @@ def fr_sim_012() -> None:
         `free_margin` is `equity - used_margin`, so open-position risk is reflected
         before the next fill is admitted.
     """
+    _header(
+        "Demonstrate FR-SIM-012. Responsibility: The system shall return an immutable read-only fixed-precision account snapshot without exposing mutable engine state. The snapshot exposes `balance`, `equity`, `used_margin`, `free_margin`, `unrealized`, `commission`, `swap`, `gross_profit`, and `account_currency`. `equity` is `balance + unrealized` and `free_margin` is `equity - used_margin`, so open-position risk is reflected before the next fill is admitted."
+    )
     snapshot = _ledger().snapshot()
     print(f"Account equity: {snapshot['equity']}")
 
@@ -192,6 +218,9 @@ def fr_sim_042() -> None:
         exposure at the current tick. The engine supplies it once per tick from observed
         excursions; Simulation computes no price of its own.
     """
+    _header(
+        "Demonstrate FR-SIM-042. Responsibility: The system shall accept the current aggregate unrealized profit and loss of all open positions, so that equity, free margin, and margin admission reflect open exposure at the current tick. The engine supplies it once per tick from observed excursions; Simulation computes no price of its own."
+    )
     ledger = _ledger()
     ledger.mark_to_market(Decimal(-25))
     print(f"Marked equity: {ledger.snapshot()['equity']}")

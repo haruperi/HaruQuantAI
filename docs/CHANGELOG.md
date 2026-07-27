@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Reorganize central settings and strengthen executable usage evidence
+
+Central environment configuration is grouped into logical sections, while provider-backed usage evidence now demonstrates genuine non-production connections and complete domain workflows.
+
+#### Changed (4)
+
+- Restructured central `app/configs/env.json` into grouped lowercase `snake_case` sections and updated `_CentralJsonSettingsSource` to parse nested configuration objects without altering process environment precedence or setting model contracts.
+- Replaced unused offline Brokers usage transports and placeholder credentials with enabled demo/testnet/sandbox session evidence, bounded released reads, exact capability-gate assertions, and deterministic disconnection without broker mutations.
+- Replaced the singular Utils, Brokers, Data, Indicators, Strategy, Risk, Trading, and Analytics workflow scripts with eighty-three standalone separator-delimited programs, one per active workflow, plus domain runners and registry-parity tests; MT5-backed paths use genuine demo reads/connections from documented input to typed output boundaries, with broker mutations excluded.
+- Added thirty-three standalone Simulator, Optimization, Portfolio, and Research workflow programs with registry-ordered runners, README evidence mappings, exact stage labels, parity tests, and bounded genuine MT5 demo market evidence.
+
 ## 2.2.11
 
 **Release date:** 2026-07-27

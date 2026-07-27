@@ -39,6 +39,11 @@ from tests.analytics._support import (
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> AnalyticsRunConfig:
     """Build usage configuration."""
     return AnalyticsRunConfig(
@@ -92,9 +97,8 @@ def _trade(profit: Decimal = Decimal(10)) -> ClosedTrade:
 
 def example_reports() -> None:
     """Demonstrate Analytics reporting capabilities."""
-    print("=" * 80)
+    _header("Demonstrate Analytics reporting capabilities.")
     print("Analytics Example 4: Performance Report Building and Comparison")
-    print("=" * 80)
 
     config = _config()
     trade1 = _trade(Decimal(10))
@@ -209,6 +213,9 @@ def fr_anlt_039() -> None:
     optional benchmark, and report hashes from canonical JSON while excluding
     documented nondeterministic fields.
     """
+    _header(
+        "FR-ANLT-039. The system shall compute deterministic SHA-256 input, config, ledger, equity, optional benchmark, and report hashes from canonical JSON while excluding documented nondeterministic fields."
+    )
     example_reports()
 
 
@@ -219,6 +226,9 @@ def fr_anlt_040() -> None:
     approved human-readable representation without file writes or placeholder
     formatters, enforcing the injected response bound before returning.
     """
+    _header(
+        "FR-ANLT-040. The system shall serialize a validated report as canonical JSON or one minimal approved human-readable representation without file writes or placeholder formatters, enforcing the injected response bound before returning."
+    )
     example_reports()
 
 
@@ -229,6 +239,9 @@ def fr_anlt_041() -> None:
     schema, base-currency, caller-supplied FX, and component-bound validation;
     missing conversion blocks affected aggregation.
     """
+    _header(
+        "FR-ANLT-041. The system shall aggregate actual compatible component evidence only after schema, base-currency, caller-supplied FX, and component-bound validation; missing conversion blocks affected aggregation."
+    )
     example_reports()
 
 
@@ -239,6 +252,9 @@ def fr_anlt_042() -> None:
     common cataloged metrics, preserving omissions and caveats without mutating
     either report.
     """
+    _header(
+        "FR-ANLT-042. The system shall compare schema- and pairing-compatible reports using actual common cataloged metrics, preserving omissions and caveats without mutating either report."
+    )
     example_reports()
 
 
@@ -259,6 +275,9 @@ def fr_anlt_043() -> None:
     `sample_below_threshold` below the statistical minimum, and
     `intratrade_exposure_unobserved` on every report.
     """
+    _header(
+        "FR-ANLT-043. The system shall build `PerformanceReport v1` from approved producer-neutral ledger evidence, required request/correlation IDs, caller-supplied UTC creation time, initial balance/account currency, injected bounded/statistical/risk-free configuration, optional Data-owned benchmark evidence, required and optional cataloged sections, deterministic warnings/flags, lineage, precision metadata, finite validation, and hashes. The public boundary logs start, validation failure, unexpected failure, and success with safe request/correlation IDs. `quality_flags` is drawn from the Evidence Catalog and is empty only when the report is a complete, clean measurement. The builder emits `required_section_failed` once per failed required section, `diagnostic_partial_report` exactly once in diagnostic mode, `sample_below_threshold` below the statistical minimum, and `intratrade_exposure_unobserved` on every report."
+    )
     example_reports()
 
 
@@ -277,6 +296,9 @@ def fr_anlt_048() -> None:
     projection. It shall emit no partial cross-domain evidence, recommend no
     weight, approve no portfolio, set no risk budget, and infer no missing value.
     """
+    _header(
+        "FR-ANLT-048. The system shall project validated component `PerformanceReport` evidence and required Simulation `FR-SIM-033` `PortfolioSimulationResult` evidence into `PortfolioAllocationEvidence v1` after exact component/source schema, component-result pairing, measurement-window, base-currency, fresh Data-owned `FXConversionEvidence`, finite-value, aligned-return, and injected component/response-bound validation. Dependence contains only cataloged pairwise `component_return_correlation`; concentration contains only cataloged `capital_concentration_hhi` calculated from converted actual starting equity. Missing, short, unaligned, or constant dependence inputs fail the complete projection. It shall emit no partial cross-domain evidence, recommend no weight, approve no portfolio, set no risk budget, and infer no missing value."
+    )
     example_reports()
 
 
@@ -290,6 +312,9 @@ def fr_anlt_052() -> None:
     deterministically publish non-binding `PortfolioRebalanceMeasurementEvidence
     v1` without invoking or changing execution.
     """
+    _header(
+        "FR-ANLT-052. The system shall receive `PortfolioRebalanceMeasurementRequest v1`, require exact plan/version/hash and Trading request/reference/hash bindings, accept only redacted reconciled-success `execute_portfolio_rebalance` facts with ordered successful action outcomes, verify the execution digest, and deterministically publish non-binding `PortfolioRebalanceMeasurementEvidence v1` without invoking or changing execution."
+    )
     example_reports()
 
 

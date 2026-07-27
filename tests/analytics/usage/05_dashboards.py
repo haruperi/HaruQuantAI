@@ -26,6 +26,11 @@ from app.utils import generate_id
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> AnalyticsRunConfig:
     """Build usage configuration."""
     return AnalyticsRunConfig(
@@ -79,9 +84,8 @@ def _trade() -> ClosedTrade:
 
 def example_dashboards() -> None:
     """Demonstrate Analytics dashboard projections."""
-    print("=" * 80)
+    _header("Demonstrate Analytics dashboard projections.")
     print("Analytics Example 5: Dashboard Payloads and Series Truncation")
-    print("=" * 80)
 
     # 1. Truncate series
     points = tuple(
@@ -137,6 +141,9 @@ def fr_anlt_045() -> None:
     points by defined priority and returning original/returned counts, method,
     reason, and truncation status.
     """
+    _header(
+        "FR-ANLT-045. The system shall deterministically bound a series without exceeding the approved limit, preserving endpoints and approved extrema/trough/high/warning points by defined priority and returning original/returned counts, method, reason, and truncation status."
+    )
     example_dashboards()
 
 
@@ -147,6 +154,9 @@ def fr_anlt_046() -> None:
     finite versioned summary, equity, drawdown, warning, and quality-flag payloads
     with units/status metadata and no metric recomputation.
     """
+    _header(
+        "FR-ANLT-046. The system shall project only approved `PerformanceReport` sections into finite versioned summary, equity, drawdown, warning, and quality-flag payloads with units/status metadata and no metric recomputation."
+    )
     example_dashboards()
 
 

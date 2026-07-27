@@ -1,6 +1,5 @@
 """Tests for Optimization state contracts and port."""
 
-# ruff: noqa: INP001
 from collections.abc import Mapping
 from datetime import UTC, datetime
 

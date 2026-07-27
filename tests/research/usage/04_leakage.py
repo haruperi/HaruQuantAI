@@ -19,6 +19,11 @@ from app.services.research.leakage import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_res_039() -> None:
     """FR-RES-039.
 
@@ -26,6 +31,9 @@ def fr_res_039() -> None:
     return evidence/severity/recommendation without claiming proof of no
     leakage.
     """
+    _header(
+        "FR-RES-039. Inspect feature metadata, names, targets, horizons, and declarations and return evidence/severity/recommendation without claiming proof of no leakage."
+    )
     frame = pd.DataFrame({"feature": [1.0], "forward_1": [0.1]})
     report = validate_no_lookahead_features(
         frame,
@@ -45,6 +53,9 @@ def fr_res_040() -> None:
     Split chronologically into non-overlapping train/validation/test frames
     with deterministic boundaries and split hash.
     """
+    _header(
+        "FR-RES-040. Split chronologically into non-overlapping train/validation/test frames with deterministic boundaries and split hash."
+    )
     ts_frame = pd.DataFrame(
         {"value": range(20)},
         index=pd.date_range("2026-01-01", periods=20, freq="h", tz="UTC"),
@@ -62,15 +73,16 @@ def fr_res_041() -> None:
     Recursively mask sensitive, broker/account, and forbidden forward fields
     before sharing or serialization without mutating input.
     """
+    _header(
+        "FR-RES-041. Recursively mask sensitive, broker/account, and forbidden forward fields before sharing or serialization without mutating input."
+    )
     masked = mask_research_artifact({"password": "secret", "data": {"api_key": "abc"}})
     print(f"FR-RES-041 masked_password={masked['password']}")
 
 
 def main() -> None:
     """Run every Research leakage requirement demonstration in order."""
-    print("=" * 80)
     print("Research Example 4: Leakage Controls and Artifact Masking")
-    print("=" * 80)
     fr_res_039()
     fr_res_040()
     fr_res_041()

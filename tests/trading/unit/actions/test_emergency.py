@@ -1,6 +1,5 @@
 """Unit tests for explicit gated Trading bulk actions."""
 
-# ruff: noqa: INP001
 from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal
@@ -16,6 +15,7 @@ from app.services.trading.contracts import ExecutionReceipt, OrderIntent, Tradin
 from app.services.trading.reconciliation import AuthoritySnapshot
 from app.services.trading.state import TradingProjection
 from app.utils import validate_id
+
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
     MemoryStore,

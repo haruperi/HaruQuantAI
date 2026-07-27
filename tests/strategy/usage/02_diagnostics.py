@@ -16,18 +16,26 @@ from app.services.strategy import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_018() -> None:
     """Demonstrate the accepted Strategy error catalogue."""
+    _header("Demonstrate the accepted Strategy error catalogue.")
     assert StrategyErrorCode.INVALID_CONFIG.value == "STRATEGY_INVALID_CONFIG"
 
 
 def fr_str_019() -> None:
     """Demonstrate the bounded diagnostic exporter."""
+    _header("Demonstrate the bounded diagnostic exporter.")
     assert callable(export_strategy_diagnostics)
 
 
 def fr_str_034() -> None:
     """Demonstrate the immutable diagnostic contract."""
+    _header("Demonstrate the immutable diagnostic contract.")
     assert StrategyDiagnostics.model_fields["safe_details"]
 
 
@@ -41,7 +49,6 @@ def main() -> int:
     fr_str_019()
     fr_str_034()
     print("\nSTRATEGY DIAGNOSTICS")
-    print("=" * 88)
     context = StrategyExecutionContext(
         environment=StrategyEnvironment.RESEARCH,
         decision_timestamp=datetime.now(UTC),

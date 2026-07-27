@@ -123,6 +123,11 @@ class _ExampleTokenStore:
         return 0
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> RiskConfig:
     """Build a complete simulation-profile Risk configuration."""
     return RiskConfig(
@@ -341,9 +346,8 @@ def _governor(config: RiskConfig) -> RiskGovernor:
 
 def example_governor() -> None:
     """Demonstrate pre-trade review and current-state portfolio governance."""
-    print("=" * 80)
+    _header("Demonstrate pre-trade review and current-state portfolio governance.")
     print("Risk Example 12: Canonical Risk Governor")
-    print("=" * 80)
 
     config = _config()
     governor = _governor(config)
@@ -391,6 +395,9 @@ def _demonstrate_once() -> None:
 def fr_risk_039() -> None:
     """FR-RISK-039: Own immutable config plus injected token, audit, clock, and
     optional configured concurrency protection dependencies."""
+    _header(
+        "FR-RISK-039: Own immutable config plus injected token, audit, clock, and optional configured concurrency protection dependencies."
+    )
     _demonstrate_once()
 
 
@@ -400,12 +407,18 @@ def fr_risk_040() -> None:
     attach a token only when eligible and a valid optional attestation is
     supplied, and audit the decision. Missing attestation yields
     `needs_approval`, never synthetic approval."""
+    _header(
+        "FR-RISK-040: Validate and review one proposed trade in fixed precedence, include regime/projected risks/final capped size/concurrency disclosure, attach a token only when eligible and a valid optional attestation is supplied, and audit the decision. Missing attestation yields `needs_approval`, never synthetic approval."
+    )
     _demonstrate_once()
 
 
 def fr_risk_041() -> None:
     """FR-RISK-041: Evaluate current portfolio compliance and return a
     remediation recommendation without changing execution state."""
+    _header(
+        "FR-RISK-041: Evaluate current portfolio compliance and return a remediation recommendation without changing execution state."
+    )
     _demonstrate_once()
 
 

@@ -18,6 +18,11 @@ from app.services.portfolio import ActivePortfolioAllocation
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _weights() -> tuple[dict[str, object], ...]:
     """Return ordered component weight data totaling exactly one.
 
@@ -83,9 +88,10 @@ def fr_port_015() -> None:
     Demonstrates that the active allocation carries mandatory Simulation and
     Risk decision references.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-015: Require Simulation validation and current Risk authorization before activation. Demonstrates that the active allocation carries mandatory Simulation and Risk decision references."
+    )
     print("FR-PORT-015: Require Simulation and Risk authorization")
-    print("=" * 80)
 
     allocation = ActivePortfolioAllocation(**_allocation_data())
     assert allocation.simulation_result_id
@@ -103,9 +109,10 @@ def fr_port_016() -> None:
     Demonstrates that the allocation carries a scope that determines the
     approval policy.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-016: Require explicit human approval for paper/live; allow automatic simulation activation only within simulation policy. Demonstrates that the allocation carries a scope that determines the approval policy."
+    )
     print("FR-PORT-016: Require human approval for paper/live profiles")
-    print("=" * 80)
 
     sim_allocation = ActivePortfolioAllocation(**_allocation_data())
     assert sim_allocation.scope.get("environment") == "simulation"
@@ -121,9 +128,10 @@ def fr_port_017() -> None:
     Demonstrates that the allocation carries an audit reference for kill-switch
     governance traceability.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-017: Block activation while any applicable kill switch is active. Demonstrates that the allocation carries an audit reference for kill-switch governance traceability."
+    )
     print("FR-PORT-017: Block activation while kill switch is active")
-    print("=" * 80)
 
     allocation = ActivePortfolioAllocation(**_allocation_data())
     assert allocation.audit_ref
@@ -138,9 +146,10 @@ def fr_port_018() -> None:
     Demonstrates that the allocation carries an immutable allocation_version
     for optimistic concurrency control.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-018: Use optimistic concurrency and one active version per scope. Demonstrates that the allocation carries an immutable allocation_version for optimistic concurrency control."
+    )
     print("FR-PORT-018: Use optimistic concurrency, one active version per scope")
-    print("=" * 80)
 
     allocation = ActivePortfolioAllocation(**_allocation_data())
     assert allocation.allocation_version == "allocation-version-1"
@@ -155,9 +164,10 @@ def fr_port_019() -> None:
     Demonstrates that rollback creates a new allocation version referencing the
     original, not a mutation of existing history.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-019: Implement rollback only as a new governed version. Demonstrates that rollback creates a new allocation version referencing the original, not a mutation of existing history."
+    )
     print("FR-PORT-019: Implement rollback as a new governed version")
-    print("=" * 80)
 
     original = ActivePortfolioAllocation(**_allocation_data())
     rollback = ActivePortfolioAllocation(

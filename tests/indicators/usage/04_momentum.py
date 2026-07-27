@@ -11,6 +11,11 @@ from app.services.indicators import rsi, williams_r
 _CACHE: dict[str, MarketDataset] = {}
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _dataset() -> MarketDataset:
     """Return one cached real read-only market dataset.
 
@@ -31,15 +36,21 @@ def _dataset() -> MarketDataset:
 
 
 def fr_indi_021() -> None:
-    """FR-INDI-021: The system shall calculate RSI for one validated `MarketDataset v1` using the approved gain/loss smoothing and seed contract, return the exact source-qualified output, keep values within approved bounds, handle flat/zero-gain/zero-loss windows deterministically, and expose causal metadata."""  # noqa: E501 - exact specification text
+    """FR-INDI-021: The system shall calculate RSI for one validated `MarketDataset v1` using the approved gain/loss smoothing and seed contract, return the exact source-qualified output, keep values within approved bounds, handle flat/zero-gain/zero-loss windows deterministically, and expose causal metadata."""
+    _header(
+        "FR-INDI-021: The system shall calculate RSI for one validated `MarketDataset v1` using the approved gain/loss smoothing and seed contract, return the exact source-qualified output, keep values within approved bounds, handle flat/zero-gain/zero-loss windows deterministically, and expose causal metadata."
+    )
     result = rsi(_dataset(), period=2)
-    print("FR-INDI-021", result.values["rsi_2"].tolist())
+    print("Result:", result.values["rsi_2"].tolist())
 
 
 def fr_indi_022() -> None:
-    """FR-INDI-022: The system shall calculate Williams %R for one validated `MarketDataset v1` over the approved inclusive high/low window, enforce approved bounds and zero-range behavior, preserve warmup rows, and expose causal metadata."""  # noqa: E501 - exact specification text
+    """FR-INDI-022: The system shall calculate Williams %R for one validated `MarketDataset v1` over the approved inclusive high/low window, enforce approved bounds and zero-range behavior, preserve warmup rows, and expose causal metadata."""
+    _header(
+        "FR-INDI-022: The system shall calculate Williams %R for one validated `MarketDataset v1` over the approved inclusive high/low window, enforce approved bounds and zero-range behavior, preserve warmup rows, and expose causal metadata."
+    )
     result = williams_r(_dataset(), period=2)
-    print("FR-INDI-022", result.values["williams_r_2"].tolist())
+    print("Result:", result.values["williams_r_2"].tolist())
 
 
 def main() -> None:

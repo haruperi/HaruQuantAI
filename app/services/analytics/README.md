@@ -263,6 +263,26 @@ reports, so the graph is acyclic.
 
 ## 3. Workflows
 
+> **Workflow usage evidence:** Each completed workflow has one standalone
+> input-to-output program with README-aligned stages. Programs consume bounded
+> canonical producer evidence, invent no performance, and write no state. Run all
+> programs with `python tests/analytics/usage/workflows/run_all.py`. This satisfies
+> `NFR-ANLT-011`; excluded `WF-ANLT-004` has no program.
+
+| Workflow | Standalone program |
+|---|---|
+| `WF-ANLT-001` | `tests/analytics/usage/workflows/wf_anlt_001_build_canonical_performance_report.py` |
+| `WF-ANLT-002` | `tests/analytics/usage/workflows/wf_anlt_002_calculate_grouped_analytics_evidence.py` |
+| `WF-ANLT-003` | `tests/analytics/usage/workflows/wf_anlt_003_benchmark_relative_analysis.py` |
+| `WF-ANLT-005` | `tests/analytics/usage/workflows/wf_anlt_005_build_dashboard_payload.py` |
+| `WF-ANLT-006` | `tests/analytics/usage/workflows/wf_anlt_006_adapt_upstream_result.py` |
+| `WF-ANLT-007` | `tests/analytics/usage/workflows/wf_anlt_007_run_statistical_validation.py` |
+| `WF-ANLT-008` | `tests/analytics/usage/workflows/wf_anlt_008_serialize_hash_report.py` |
+| `WF-ANLT-009` | `tests/analytics/usage/workflows/wf_anlt_009_build_portfolio_performance_report.py` |
+| `WF-ANLT-010` | `tests/analytics/usage/workflows/wf_anlt_010_compare_performance_reports.py` |
+| `WF-ANLT-013` | `tests/analytics/usage/workflows/wf_anlt_013_build_portfolio_allocation_evidence.py` |
+| `WF-ANLT-014` | `tests/analytics/usage/workflows/wf_anlt_014_measure_reconciled_portfolio_rebalance.py` |
+
 ### Status values
 
 | Status | Meaning |
@@ -486,6 +506,24 @@ The same immutable execution/FX/version inputs support deterministic recomputati
 
 **Integration test:**
 `tests/analytics/integration/test_portfolio_allocation_evidence.py::test_evidence_is_non_binding_and_fx_provenanced()`
+
+#### `WF-ANLT-014` — Measure Reconciled Portfolio Rebalance Execution
+
+**System workflow:** Final measurement contribution to `SYS-WF-008`.
+**Input boundary:** `PortfolioRebalanceMeasurementRequest v1` containing redacted,
+hash-bound successful Trading reconciliation facts.
+**Output boundary:** non-binding `PortfolioRebalanceMeasurementEvidence v1`.
+
+1. Validate contract identity, plan/allocation pairing, hashes, and successful outcomes.
+2. Calculate bounded execution measurement summaries without editing Trading truth.
+3. Preserve Trading execution references and deterministic non-binding lineage.
+4. Return measurement evidence or `AnalyticsValidationError`.
+
+**Failure behavior:** incompatible contract identity, pairing, hashes, status, or
+unbounded facts fail validation; Analytics never repairs or rewrites Trading truth.
+
+**Integration test:**
+`tests/analytics/integration/test_portfolio_allocation_evidence.py::test_rebalance_measurement_builder_is_package_root_public()`
 
 ### Core workflow diagram
 

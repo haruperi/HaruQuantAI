@@ -3,7 +3,6 @@
 Demonstrates authority snapshots and reconciliation.
 """
 
-# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -24,6 +23,11 @@ from app.services.trading import (
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _snapshot() -> AuthoritySnapshot:
@@ -138,9 +142,8 @@ class _Store:
 
 def example_reconciliation() -> None:
     """Demonstrate Trading reconciliation API."""
-    print("=" * 80)
+    _header("Demonstrate Trading reconciliation API.")
     print("Trading Example 5: Authority Reconciliation")
-    print("=" * 80)
 
     snap = _snapshot()
     proj = _projection()
@@ -162,26 +165,41 @@ def example_reconciliation() -> None:
 
 def fr_trd_043() -> None:
     """FR-TRD-043: The system shall expose normalized account/order/position/time authority evidence without provider objects."""
+    _header(
+        "FR-TRD-043: The system shall expose normalized account/order/position/time authority evidence without provider objects."
+    )
     example_reconciliation()
 
 
 def fr_trd_044() -> None:
     """FR-TRD-044: The system shall deterministically report missing, extra, mismatched, and stale records without claiming resolution."""
+    _header(
+        "FR-TRD-044: The system shall deterministically report missing, extra, mismatched, and stale records without claiming resolution."
+    )
     example_reconciliation()
 
 
 def fr_trd_045() -> None:
     """FR-TRD-045: The system shall lock retry, persist evidence, prefer route authority truth, and release only after an approved transition resolves."""
+    _header(
+        "FR-TRD-045: The system shall lock retry, persist evidence, prefer route authority truth, and release only after an approved transition resolves."
+    )
     example_reconciliation()
 
 
 def fr_trd_061() -> None:
     """FR-TRD-061: The system shall expose a deterministic comparison result with discrepancy classes, severity, evidence references, and unresolved status."""
+    _header(
+        "FR-TRD-061: The system shall expose a deterministic comparison result with discrepancy classes, severity, evidence references, and unresolved status."
+    )
     example_reconciliation()
 
 
 def fr_trd_062() -> None:
     """FR-TRD-062: The system shall expose the approved authority transition, retry decision, incident reference, and remaining unresolved scope."""
+    _header(
+        "FR-TRD-062: The system shall expose the approved authority transition, retry decision, incident reference, and remaining unresolved scope."
+    )
     example_reconciliation()
 
 

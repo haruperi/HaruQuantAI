@@ -3,7 +3,6 @@
 Demonstrates LiveSession lifecycle and evaluate_live_gate.
 """
 
-# ruff: noqa: E501
 import asyncio
 import sys
 from datetime import UTC, datetime, timedelta
@@ -35,6 +34,11 @@ NOW = datetime(2026, 7, 19, tzinfo=UTC)
 async def _passed() -> bool:
     """Return one successful usage lifecycle step."""
     return True
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _session() -> LiveSession:
@@ -155,34 +159,48 @@ async def _async_example() -> None:
 
 def example_live() -> None:
     """Demonstrate Trading live session operations."""
-    print("=" * 80)
+    _header("Demonstrate Trading live session operations.")
     print("Trading Example 7: Live Session Lifecycle and Safety Gates")
-    print("=" * 80)
     asyncio.run(_async_example())
 
 
 def fr_trd_032() -> None:
     """FR-TRD-032: The system shall use one stateful lifecycle object for admission, startup evidence, recovery lock, in-flight work, and shutdown."""
+    _header(
+        "FR-TRD-032: The system shall use one stateful lifecycle object for admission, startup evidence, recovery lock, in-flight work, and shutdown."
+    )
     example_live()
 
 
 def fr_trd_033() -> None:
     """FR-TRD-033: The system shall validate config/security, bind opaque Data authority, and complete startup reconciliation before enabling mutation."""
+    _header(
+        "FR-TRD-033: The system shall validate config/security, bind opaque Data authority, and complete startup reconciliation before enabling mutation."
+    )
     example_live()
 
 
 def fr_trd_034() -> None:
     """FR-TRD-034: The system shall return the actual session mode, admission, authority, health, reconciliation, and unresolved-work state."""
+    _header(
+        "FR-TRD-034: The system shall return the actual session mode, admission, authority, health, reconciliation, and unresolved-work state."
+    )
     example_live()
 
 
 def fr_trd_035() -> None:
     """FR-TRD-035: The system shall stop admission, drain/mark work, flush evidence, reconcile, and report every incomplete shutdown step."""
+    _header(
+        "FR-TRD-035: The system shall stop admission, drain/mark work, flush evidence, reconcile, and report every incomplete shutdown step."
+    )
     example_live()
 
 
 def fr_trd_036() -> None:
     """FR-TRD-036: The system shall enforce the canonical mandatory gate order using typed authority sources owned by the injected session and prohibit passthrough Risk or caller-declared emergency authority. JSON evidence carries facts/references only."""
+    _header(
+        "FR-TRD-036: The system shall enforce the canonical mandatory gate order using typed authority sources owned by the injected session and prohibit passthrough Risk or caller-declared emergency authority. JSON evidence carries facts/references only."
+    )
     example_live()
 
 

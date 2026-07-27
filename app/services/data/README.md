@@ -612,6 +612,39 @@ labeling (see `Explicit exclusions`).
 
 ## 3. Workflows
 
+> **Workflow Usage Evidence**: Each active workflow has one standalone executable
+> program under [`tests/data/usage/workflows/`](../../../tests/data/usage/workflows/).
+> Every program labels the documented input boundary, each workflow stage in
+> comments and output, invokes the public operations that implement those stages,
+> passes their typed results forward, and labels the typed result or `DataError`
+> output boundary. Provider-backed examples use genuine MT5 demo evidence. Run all
+> active Data workflows with
+> `uv run python tests/data/usage/workflows/run_all.py`.
+
+| Workflow ID | Standalone program |
+|---|---|
+| `WF-DATA-001` | `tests/data/usage/workflows/wf_data_001_historical_bars_ticks_spreads.py` |
+| `WF-DATA-002` | `tests/data/usage/workflows/wf_data_002_internal_analytical_data_access.py` |
+| `WF-DATA-003` | `tests/data/usage/workflows/wf_data_003_local_dataset_load_save.py` |
+| `WF-DATA-004` | `tests/data/usage/workflows/wf_data_004_resample_align_aggregate.py` |
+| `WF-DATA-005` | `tests/data/usage/workflows/wf_data_005_synthetic_generation.py` |
+| `WF-DATA-007` | `tests/data/usage/workflows/wf_data_007_update_job_historical_backfill.py` |
+| `WF-DATA-008` | `tests/data/usage/workflows/wf_data_008_internal_realtime_feed_status.py` |
+| `WF-DATA-009` | `tests/data/usage/workflows/wf_data_009_symbol_discovery_metadata_availability.py` |
+| `WF-DATA-010` | `tests/data/usage/workflows/wf_data_010_current_hours_sessions_volume.py` |
+| `WF-DATA-011` | `tests/data/usage/workflows/wf_data_011_source_readiness_promotion.py` |
+| `WF-DATA-012` | `tests/data/usage/workflows/wf_data_012_simulation_data_modelling_boundary.py` |
+| `WF-DATA-013` | `tests/data/usage/workflows/wf_data_013_account_snapshot_service.py` |
+| `WF-DATA-014` | `tests/data/usage/workflows/wf_data_014_risk_market_context_evidence.py` |
+| `WF-DATA-015` | `tests/data/usage/workflows/wf_data_015_fx_conversion_evidence.py` |
+| `WF-DATA-016` | `tests/data/usage/workflows/wf_data_016_tick_series_generation_real_evidence.py` |
+| `WF-DATA-017` | `tests/data/usage/workflows/wf_data_017_external_artifact_import.py` |
+| `WF-DATA-018` | `tests/data/usage/workflows/wf_data_018_venue_authoritative_market_hours.py` |
+| `WF-DATA-019` | `tests/data/usage/workflows/wf_data_019_analytical_named_session_classification.py` |
+
+`WF-DATA-006` is retired to Research and therefore intentionally has no Data
+workflow program.
+
 ### Status values
 
 | Status | Meaning |
@@ -709,6 +742,29 @@ sequenceDiagram
     Access-->>Consumer: MarketDataset or structured error
 ```
 
+### `WF-DATA-002` — Internal Analytical Data Access
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-001`, `SYS-WF-003`, `SYS-WF-004`
+**Input boundary:** An approved Python consumer supplies a typed
+`MarketDataRequest`.
+**Output boundary:** Data returns the canonical `MarketDataset` and, when requested,
+a detached analytical projection that exposes no provider-owned state.
+
+1. Construct and validate the same bounded `MarketDataRequest` accepted by
+   `WF-DATA-001`.
+2. Call `get_market_data()` so source policy, normalization, quality, cache, and
+   provenance remain governed by the canonical retrieval path.
+3. Call `to_ohlcv_dataframe()` only after retrieval succeeds; the returned frame is
+   detached and the typed `MarketDataset` remains unchanged.
+
+**Failure behaviour:** retrieval failures remain typed `DataError` values; an
+incompatible dataset cannot be projected and no raw adapter/provider object crosses
+the boundary.
+
+**Integration test:**
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_009_discovers_metadata_and_measures_local_availability()`
+
 ### `WF-DATA-003` — Local Dataset Load and Save
 
 **Scope:** `Internal`
@@ -786,6 +842,29 @@ fails the operation atomically.
 **Integration test:**
 `tests/data/integration/test_workflow_runtime.py::test_wf_data_004_005_and_016_transform_generate_and_derive()`
 
+### `WF-DATA-005` — Synthetic Generation
+
+**Scope:** `Cross-domain`
+**System workflow:** test/fixture support only
+**Input boundary:** A consumer supplies bounded `SyntheticRequest` parameters,
+including an explicit seed when deterministic replay is required.
+**Output boundary:** Data returns canonical fixture-only bars or ticks with synthetic
+provenance; the result carries no claim of observed market truth.
+
+1. Validate the symbol, data kind, range/count, approved model parameters, precision
+   policy, and seed through `SyntheticRequest`.
+2. Call `generate_synthetic_bars()` for an approved bar request.
+3. Call `generate_synthetic_ticks()` for an approved tick request.
+4. Repeat the seeded operation and compare canonical records to demonstrate
+   deterministic replay.
+
+**Failure behaviour:** invalid or unbounded parameters fail as `VALIDATION_FAILED`;
+unsupported models fail closed; synthetic output is never substituted for real
+market evidence in a live/current workflow.
+
+**Integration test:**
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_004_005_and_016_transform_generate_and_derive()`
+
 ### `WF-DATA-007` — Update Job and Historical Backfill
 
 **Scope:** `Internal`
@@ -826,6 +905,51 @@ gap only. The initial source is the deterministic fake contract harness. Promoti
 
 **Integration test:**
 `tests/data/integration/test_workflow_runtime.py::test_wf_data_008_persists_ingests_and_reads_feed_status()`
+
+### `WF-DATA-009` — Symbol Discovery, Metadata, and Availability
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-002`
+**Input boundary:** A consumer supplies bounded source, symbol/query, timeframe, and
+UTC probe-range requests.
+**Output boundary:** Data returns a provenanced `SymbolPage`, `SymbolMetadata`, and
+`DataAvailability`, or a typed `DataError`.
+
+1. Call `list_symbols()` with a bounded `SymbolListRequest`.
+2. Call `get_symbol_metadata()` for the exact selected provider symbol.
+3. Call `get_data_availability()` over an explicit UTC interval and maximum probe
+   count.
+
+**Failure behaviour:** disabled/unavailable sources, unknown symbols, stale metadata,
+or malformed ranges fail closed; availability is measured and is never hard-coded
+ready.
+
+**Integration test:**
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_009_discovers_metadata_and_measures_local_availability()`
+
+### `WF-DATA-010` — Current Hours, Sessions, and Volume
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-002`
+**Input boundary:** An explicit revisioned schedule source and a bounded current
+market-volume request.
+**Output boundary:** Data returns normalized UTC `MarketHours` plus a separately
+provenanced bounded `VolumeResult`.
+
+1. Construct `WeeklyScheduleProvider` from an explicit
+   `WeeklyScheduleDefinition`; schedule truth is never inferred from ticker text.
+2. Call `get_market_hours()` to normalize the configured sessions to UTC.
+3. Call `get_historical_volume()` for the exact provider symbol and bounded UTC
+   range.
+4. Return schedule and volume as separate evidence so analytical volume cannot grant
+   venue-tradability authority.
+
+**Failure behaviour:** missing schedule revisions, invalid timezone/session windows,
+unsupported symbols, or unavailable volume evidence fail closed without fabricated
+hours or volume.
+
+**Integration tests:** `tests/data/unit/test_market_hours.py` and
+`tests/data/unit/test_market_data_facade.py`.
 
 ### `WF-DATA-011` — Source Readiness and Promotion
 
@@ -907,6 +1031,34 @@ is emitted.
 
 **Integration test:**
 `tests/data/integration/test_workflow_runtime.py::test_wf_data_014_and_015_return_fresh_provider_evidence()`
+
+---
+
+### `WF-DATA-016` — Tick-Series Generation from Real Evidence
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-001`, `SYS-WF-003`
+**Input boundary:** A real canonical bar/tick `MarketDataset`, an approved generation
+model, explicit spread policy, and a seed whenever the model is variable.
+**Output boundary:** Data returns a canonical ordered tick `MarketDataset` with
+source-bar phase metadata, or a bounded Parquet artifact describing the same
+generated evidence.
+
+1. Call `get_market_data()` to obtain bounded real source evidence.
+2. Select an approved generation model, trading timeframe, spread model, and exact
+   point/spread parameters.
+3. Call `generate_tick_series()` and retain ordering, source-bar timestamps,
+   intra-bar phase, precision, and lineage.
+4. Call `generate_tick_series_to_parquet()` with an approved path and explicit chunk
+   bound when a durable artifact is required.
+
+**Failure behaviour:** missing real evidence, incompatible timeframe/model,
+unbounded output, invalid spread parameters, or unsafe destination path fails closed;
+the generator never invents a claim of broker-observed ticks.
+
+**Integration tests:**
+`tests/data/integration/test_workflow_runtime.py::test_wf_data_004_005_and_016_transform_generate_and_derive()`
+and `tests/data/unit/test_ticks.py`.
 
 ---
 
@@ -1908,7 +2060,7 @@ the focused unit and integration suites.
 | Completed | `NFR-DATA-009` | Performance | Official responses obey applicable hard inline/allocation limits and reject excess work before expensive operations where a governed bound exists. Direct OHLCV retrieval has no app-wide record-count ceiling; backfill chunks, payloads, diagnostics, and non-OHLCV retrieval remain bounded. | Direct limit and pre-side-effect tests |
 | Completed | `NFR-DATA-010` | Compatibility | Schema changes shall be additive within v1 or use a new major identifier; incompatible persisted data is explicitly migrated offline or invalidated/re-ingested. | Contract/migration tests |
 | Completed | `NFR-DATA-011` | Maintainability | Every file shall retain one focused responsibility, imports shall be absolute, and package/submodule `__all__` values shall list only approved public symbols. | Structure/import review |
-| Completed | `NFR-DATA-012` | Testing | Every `FR-DATA-*` shall have one runnable usage example and at least one unit test; every collaborative workflow shall have an integration test; coverage shall be at least 80%. | Traceability and coverage audit |
+| Completed | `NFR-DATA-012` | Testing | Every `FR-DATA-*` shall have one runnable usage example and at least one unit test; every active Data workflow shall have one directly executable, stage-labelled workflow program; every collaborative workflow shall have an integration test; coverage shall be at least 80%. | Traceability and coverage audit; eighteen active workflow programs and `tests/data/usage/workflows/run_all.py` |
 
 ### Shared Configuration and Limits Manifest
 
@@ -2027,7 +2179,7 @@ run the complete Data set at the feature/slice completion gate.
 - [x] Domain boundary matches `docs/PROJECT.md` and resolved ADRs.
 - [x] Every approved reconciliation capability has a destination.
 - [x] Removed or rejected behavior is absent from the architecture.
-- [x] All 15 reconciled workflows, including the required broker boundary, are represented.
+- [x] All 18 active workflows, plus retired `WF-DATA-006`, including the required broker boundary, are represented.
 - [x] Every intended public symbol maps to an owning functional requirement row.
 - [x] Every requirement has a typed signature, side-effect classification, errors,
   usage example location, and unit-test location.

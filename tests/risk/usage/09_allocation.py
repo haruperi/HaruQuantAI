@@ -104,6 +104,11 @@ class _ExampleAllocationStore:
         return True
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _config() -> RiskConfig:
     """Build a complete simulation-profile Risk configuration."""
     return RiskConfig(
@@ -225,9 +230,8 @@ def _inactive_kill_switch() -> KillSwitchState:
 
 def example_allocation() -> None:
     """Demonstrate allocation review followed by budget activation."""
-    print("=" * 80)
+    _header("Demonstrate allocation review followed by budget activation.")
     print("Risk Example 9: Allocation Review and Budget Activation")
-    print("=" * 80)
 
     config = _config()
     store = _ExampleAllocationStore()
@@ -287,6 +291,9 @@ def fr_risk_030() -> None:
     """FR-RISK-030: Produce and atomically persist `AllocationRiskDecision v1`,
     enforce caps for the exact reviewed Portfolio version, and append its Risk
     audit record without constructing or applying a Portfolio allocation."""
+    _header(
+        "FR-RISK-030: Produce and atomically persist `AllocationRiskDecision v1`, enforce caps for the exact reviewed Portfolio version, and append its Risk audit record without constructing or applying a Portfolio allocation."
+    )
     _demonstrate_once()
 
 
@@ -295,6 +302,9 @@ def fr_risk_051() -> None:
     projection only for the exact approved allocation version and predecessor;
     version, expiry, active/unknown kill-switch, or concurrency conflict blocks
     activation, and success is audit-chained."""
+    _header(
+        "FR-RISK-051: Atomically compare-and-swap the authoritative risk-budget projection only for the exact approved allocation version and predecessor; version, expiry, active/unknown kill-switch, or concurrency conflict blocks activation, and success is audit-chained."
+    )
     _demonstrate_once()
 
 

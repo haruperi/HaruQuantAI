@@ -1,5 +1,4 @@
 """Unit tests for deterministic Simulation order matching."""
-# ruff: noqa: INP001
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal

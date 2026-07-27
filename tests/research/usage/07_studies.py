@@ -33,6 +33,11 @@ from app.services.research.studies import (
 _HASH = "e" * 64
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _edge_split() -> TimeSplitResult:
     """Build a chronological split with an oscillating close in test."""
     idx = pd.date_range("2026-01-01", periods=50, freq="h", tz="UTC")
@@ -97,9 +102,10 @@ def _limits() -> ResearchResourceLimits:
 def fr_res_062() -> None:
     """FR-RES-062: Build seeded random-entry, R-space, and shuffled-return
     baselines with recorded data/split/config identity."""
-    print("=" * 80)
+    _header(
+        "FR-RES-062: Build seeded random-entry, R-space, and shuffled-return baselines with recorded data/split/config identity."
+    )
     print("Research Example 7: Edge Studies and Confirmation")
-    print("=" * 80)
     split = _edge_split()
     study = StudyConfig({"side": "buy", "hold_bars": 2}, {}, {})
     baseline = run_eds_null_baseline(
@@ -111,6 +117,9 @@ def fr_res_062() -> None:
 def fr_res_063() -> None:
     """FR-RES-063: Compare observed evidence to the correctly matched null and
     return percentile, threshold, p-value, and warnings."""
+    _header(
+        "FR-RES-063: Compare observed evidence to the correctly matched null and return percentile, threshold, p-value, and warnings."
+    )
     split = _edge_split()
     study = StudyConfig({"side": "buy", "hold_bars": 2}, {}, {})
     baseline = run_eds_null_baseline(
@@ -126,6 +135,9 @@ def fr_res_063() -> None:
 def fr_res_064() -> None:
     """FR-RES-064: Extract versioned acceptance criteria from baseline evidence
     without hard-coded direction drift."""
+    _header(
+        "FR-RES-064: Extract versioned acceptance criteria from baseline evidence without hard-coded direction drift."
+    )
     split = _edge_split()
     study = StudyConfig({"side": "buy", "hold_bars": 2}, {}, {})
     baseline = run_eds_null_baseline(
@@ -138,6 +150,9 @@ def fr_res_064() -> None:
 def fr_res_065() -> None:
     """FR-RES-065: Evaluate compression/z-score fade mean reversion on declared
     split data and return advisory uncertainty evidence."""
+    _header(
+        "FR-RES-065: Evaluate compression/z-score fade mean reversion on declared split data and return advisory uncertainty evidence."
+    )
     split = _edge_split()
     result = run_eds_mean_reversion(
         split.test,
@@ -152,6 +167,9 @@ def fr_res_065() -> None:
 def fr_res_066() -> None:
     """FR-RES-066: Evaluate high-volatility breakout follow-through on declared
     split data and return advisory uncertainty evidence."""
+    _header(
+        "FR-RES-066: Evaluate high-volatility breakout follow-through on declared split data and return advisory uncertainty evidence."
+    )
     split = _edge_split()
     result = run_eds_trend_persistence(
         split.test,
@@ -166,6 +184,9 @@ def fr_res_066() -> None:
 def fr_res_067() -> None:
     """FR-RES-067: Evaluate breakout/fade hypotheses on a frame already tagged
     by seasonality.tag_sessions and apply multiple-testing correction."""
+    _header(
+        "FR-RES-067: Evaluate breakout/fade hypotheses on a frame already tagged by seasonality.tag_sessions and apply multiple-testing correction."
+    )
     split = _edge_split()
     tagged = split.test.copy()
     tagged["session"] = ["A"] * 5 + ["B"] * 5 + ["A"] * 5 + ["B"] * 5
@@ -183,6 +204,9 @@ def fr_res_067() -> None:
 def fr_res_068() -> None:
     """FR-RES-068: Classify mean-reversion and trend evidence using one versioned
     confirmation policy and preserve uncertainty/advisory status."""
+    _header(
+        "FR-RES-068: Classify mean-reversion and trend evidence using one versioned confirmation policy and preserve uncertainty/advisory status."
+    )
     mr = EdgeResult("v1", "mean_reversion", {}, {}, "confirmed", 7, (), True)
     tp = EdgeResult("v1", "trend_persistence", {}, {}, "inconclusive", 7, (), True)
     classification = classify_symbol(mr, tp, policy_version="v1")

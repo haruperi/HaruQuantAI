@@ -1,6 +1,5 @@
 """Tests for all official Optimization public operations."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 from app.services.optimization.evidence import build_optimization_evidence
@@ -20,6 +19,7 @@ from app.services.optimization.public_api.contracts import (
     ExecutionStressAnalysisRequest,
 )
 from app.services.optimization.robustness import ExecutionStressRequest
+
 from tests.optimization.unit.test_evidence_contracts import evidence_request
 from tests.optimization.unit.test_ranking import _score
 from tests.optimization.unit.test_robustness_contracts import monte_carlo_request

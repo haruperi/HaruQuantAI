@@ -137,82 +137,98 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_010() -> None:
-    "FR-DATA-010: Declare source readiness, capabilities, credential/network/write requirements, schema/timezone/version metadata, promotion criteria, and sign-off evidence."  # noqa: E501 - exact specification text
+    _header("fr_data_010")
+    "FR-DATA-010: Declare source readiness, capabilities, credential/network/write requirements, schema/timezone/version metadata, promotion criteria, and sign-off evidence."
     _demonstrate_once()
 
 
 def fr_data_011() -> None:
-    "FR-DATA-011: Declare permitted workflow contexts, export/retention/attribution restrictions, enforcement behavior, and license status for each source."  # noqa: E501 - exact specification text
+    _header("fr_data_011")
+    "FR-DATA-011: Declare permitted workflow contexts, export/retention/attribution restrictions, enforcement behavior, and license status for each source."
     _demonstrate_once()
 
 
 def fr_data_022() -> None:
-    "FR-DATA-022: Require every adapter to perform one bounded read and return provider-neutral raw records plus source metadata without broker mutation."  # noqa: E501 - exact specification text
+    _header("fr_data_022")
+    "FR-DATA-022: Require every adapter to perform one bounded read and return provider-neutral raw records plus source metadata without broker mutation."
     _demonstrate_once()
 
 
 def fr_data_023() -> None:
-    "FR-DATA-023: Require bounded, deterministically ordered symbol discovery with cursor pagination and declared discovery capability."  # noqa: E501 - exact specification text
+    _header("fr_data_023")
+    "FR-DATA-023: Require bounded, deterministically ordered symbol discovery with cursor pagination and declared discovery capability."
     _demonstrate_once()
 
 
 def fr_data_024() -> None:
-    "FR-DATA-024: Require normalized symbol metadata with provenance and explicit missing fields rather than optimistic defaults."  # noqa: E501 - exact specification text
+    _header("fr_data_024")
+    "FR-DATA-024: Require normalized symbol metadata with provenance and explicit missing fields rather than optimistic defaults."
     _demonstrate_once()
 
 
 def fr_data_025() -> None:
-    "FR-DATA-025: Register a source descriptor and lazy factory atomically, reject duplicate/conflicting declarations, and perform no I/O during registration/import."  # noqa: E501 - exact specification text
+    _header("fr_data_025")
+    "FR-DATA-025: Register a source descriptor and lazy factory atomically, reject duplicate/conflicting declarations, and perform no I/O during registration/import."
     _demonstrate_once()
 
 
 def fr_data_026() -> None:
-    "FR-DATA-026: Validate requested and explicit fallback sources in order against capability, readiness, license, context, timeout/rate, and breaker state and record every attempt."  # noqa: E501 - exact specification text
+    _header("fr_data_026")
+    "FR-DATA-026: Validate requested and explicit fallback sources in order against capability, readiness, license, context, timeout/rate, and breaker state and record every attempt."
     _demonstrate_once()
 
 
 def fr_data_027() -> None:
-    "FR-DATA-027: Change readiness only from a complete authenticated evidence package, record an audit event, and permit immediate reversible demotion."  # noqa: E501 - exact specification text
+    _header("fr_data_027")
+    "FR-DATA-027: Change readiness only from a complete authenticated evidence package, record an audit event, and permit immediate reversible demotion."
     _demonstrate_once()
 
 
 def fr_data_101() -> None:
-    "FR-DATA-101: Compose and register the descriptor and lazy factory for every configured source — local artifact sources at `production` readiness and enabled provider facades at `staging` — dispatching on source kind rather than accepting a single hardcoded provider. Credential-free Binance Spot, Dukascopy, and Yahoo public reads compose without account secrets; an unconfigured identifier fails closed."  # noqa: E501 - exact specification text
+    _header("fr_data_101")
+    "FR-DATA-101: Compose and register the descriptor and lazy factory for every configured source — local artifact sources at `production` readiness and enabled provider facades at `staging` — dispatching on source kind rather than accepting a single hardcoded provider. Credential-free Binance Spot, Dukascopy, and Yahoo public reads compose without account secrets; an unconfigured identifier fails closed."
     _demonstrate_once()
 
 
 def fr_data_102() -> None:
-    "FR-DATA-102: Report which source identifiers the current configuration can compose so callers and operators discover valid `source_id` values without trial and error."  # noqa: E501 - exact specification text
+    _header("fr_data_102")
+    "FR-DATA-102: Report which source identifiers the current configuration can compose so callers and operators discover valid `source_id` values without trial and error."
     _demonstrate_once()
 
 
 def fr_data_103() -> None:
-    "FR-DATA-103: Resolve local artifacts as `{symbol}_{timeframe}` first and fall back to `{symbol}` only for kinds without a timeframe, so multiple timeframes per symbol are individually addressable."  # noqa: E501 - exact specification text
+    _header("fr_data_103")
+    "FR-DATA-103: Resolve local artifacts as `{symbol}_{timeframe}` first and fall back to `{symbol}` only for kinds without a timeframe, so multiple timeframes per symbol are individually addressable."
     _demonstrate_once()
 
 
 def fr_data_104() -> None:
-    "FR-DATA-104: Apply the requested UTC range and record limit at the local source boundary rather than returning the whole artifact, and fail closed when the window selects nothing."  # noqa: E501 - exact specification text
+    _header("fr_data_104")
+    "FR-DATA-104: Apply the requested UTC range and record limit at the local source boundary rather than returning the whole artifact, and fail closed when the window selects nothing."
     _demonstrate_once()
 
 
 def fr_data_113() -> None:
-    "FR-DATA-113: Block a retrieval, storage, or export workflow when the source `SourceLicensePolicy` does not permit it, failing closed when licence metadata is absent."  # noqa: E501 - exact specification text
+    _header("fr_data_113")
+    "FR-DATA-113: Block a retrieval, storage, or export workflow when the source `SourceLicensePolicy` does not permit it, failing closed when licence metadata is absent."
     _demonstrate_once()
 
 
 def fr_data_114() -> None:
-    "FR-DATA-114: Return the attribution text a source requires for publication, and fail rather than return an empty string when attribution is required but undeclared."  # noqa: E501 - exact specification text
+    _header("fr_data_114")
+    "FR-DATA-114: Return the attribution text a source requires for publication, and fail rather than return an empty string when attribution is required but undeclared."
     _demonstrate_once()
 
 
 def fr_data_115() -> None:
-    "FR-DATA-115: Allow only the declared read method names and reject every mutation name deterministically, independent of the adapter's actual surface."  # noqa: E501 - exact specification text
+    _header("fr_data_115")
+    "FR-DATA-115: Allow only the declared read method names and reject every mutation name deterministically, independent of the adapter's actual surface."
     _demonstrate_once()
 
 
 def fr_data_116() -> None:
-    "FR-DATA-116: Wrap a caller-owned broker client in a proxy that enforces the read-only contract on every attribute access at runtime, so a mutation call fails even when the underlying client exposes it."  # noqa: E501 - exact specification text
+    _header("fr_data_116")
+    "FR-DATA-116: Wrap a caller-owned broker client in a proxy that enforces the read-only contract on every attribute access at runtime, so a mutation call fails even when the underlying client exposes it."
     _demonstrate_once()
 
 

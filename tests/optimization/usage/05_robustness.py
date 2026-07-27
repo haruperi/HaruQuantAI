@@ -26,11 +26,15 @@ from app.services.optimization.robustness import (
 from tests.optimization.unit.test_robustness_contracts import monte_carlo_request
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_robustness() -> None:
     """Demonstrate robustness analysis tools."""
-    print("=" * 80)
+    _header("Demonstrate robustness analysis tools.")
     print("Optimization Example 5: Robustness Analysis and Stress Testing")
-    print("=" * 80)
 
     # 1. Monte Carlo method
     print(f"Monte Carlo method: {MonteCarloMethod.BLOCK_BOOTSTRAP.value}")

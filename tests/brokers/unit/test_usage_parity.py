@@ -33,10 +33,15 @@ def test_usage_parity_and_reachability() -> None:  # noqa: C901
 
         # Find all fr_brokers_NNN functions
         fr_funcs_in_file: list[str] = []
-        main_calls: set[str] = set()
+        calls_by_function: dict[str, set[str]] = {}
 
         for stmt in tree.body:
-            if isinstance(stmt, ast.FunctionDef):
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                calls_by_function[stmt.name] = {
+                    call.func.id
+                    for call in ast.walk(stmt)
+                    if isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
+                }
                 if stmt.name.startswith("fr_brokers_"):
                     fr_funcs_in_file.append(stmt.name)
                     # Extract FR ID from func name
@@ -49,16 +54,17 @@ def test_usage_parity_and_reachability() -> None:  # noqa: C901
                         f"Duplicate FR function {fr_id} in {file_path.name}"
                     )
                     all_fr_functions[fr_id] = file_path.name
-                elif stmt.name == "main":
-                    for main_stmt in ast.walk(stmt):
-                        if isinstance(main_stmt, ast.Call) and isinstance(
-                            main_stmt.func, ast.Name
-                        ):
-                            main_calls.add(main_stmt.func.id)
-
-        # Check reachability in main()
+        # Check transitive reachability from main(), including async `_run`.
+        reachable: set[str] = set()
+        pending = ["main"]
+        while pending:
+            function_name = pending.pop()
+            for called in calls_by_function.get(function_name, set()):
+                if called not in reachable:
+                    reachable.add(called)
+                    pending.append(called)
         for func in fr_funcs_in_file:
-            assert func in main_calls, (
+            assert func in reachable, (
                 f"Function {func} in {file_path.name} is not called in main()"
             )
 

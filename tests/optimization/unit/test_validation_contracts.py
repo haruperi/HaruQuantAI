@@ -1,6 +1,5 @@
 """Tests for walk-forward validation contracts."""
 
-# ruff: noqa: INP001
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -11,6 +10,7 @@ from app.services.optimization.validation import (
     build_time_series_splits,
 )
 from pydantic import ValidationError
+
 from tests.optimization.unit.test_search_contracts import search_request
 
 

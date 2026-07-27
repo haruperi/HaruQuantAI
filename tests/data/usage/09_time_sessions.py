@@ -32,8 +32,14 @@ _START = datetime(2026, 6, 1, 0, 0, tzinfo=UTC)
 _END = datetime(2026, 6, 1, 8, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def example_21_market_hours() -> None:
     """Inspect market hours for a given symbol and date using get_market_hours."""
+    _header("Inspect market hours for a given symbol and date using get_market_hours.")
     req_id = generate_id("req")
     request = ScheduleRequest(
         source_id="usage-offline-source",
@@ -51,6 +57,7 @@ def example_21_market_hours() -> None:
 
 def example_22_trading_sessions() -> None:
     """Inspect trading sessions for a symbol and date."""
+    _header("Inspect trading sessions for a symbol and date.")
     req_id = generate_id("req")
     request = ScheduleRequest(
         source_id="usage-offline-source",
@@ -94,12 +101,16 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_034() -> None:
-    "FR-DATA-034: Return current configured hours and normalized UTC sessions, advance cross-midnight windows correctly, and reject historical reconstruction."  # noqa: E501
+    _header("fr_data_034")
+    "FR-DATA-034: Return current configured hours and normalized UTC sessions, advance cross-midnight windows correctly, and reject historical reconstruction."
     _demonstrate_once()
 
 
 def fr_data_117() -> None:
-    """FR-DATA-117: Return provider- or venue-authoritative symbol trading windows as ordered timezone-aware UTC intervals without inferring a venue from ticker text."""  # noqa: E501
+    """FR-DATA-117: Return provider- or venue-authoritative symbol trading windows as ordered timezone-aware UTC intervals without inferring a venue from ticker text."""
+    _header(
+        "FR-DATA-117: Return provider- or venue-authoritative symbol trading windows as ordered timezone-aware UTC intervals without inferring a venue from ticker text."
+    )
     sessions = get_exchange_sessions(
         ExchangeSessionRequest(
             symbol="IBM",
@@ -113,7 +124,10 @@ def fr_data_117() -> None:
 
 
 def fr_data_118() -> None:
-    """FR-DATA-118: Derive `is_open`, `current_session`, and `next_session` deterministically from authoritative ordered windows at the checked UTC instant."""  # noqa: E501
+    """FR-DATA-118: Derive `is_open`, `current_session`, and `next_session` deterministically from authoritative ordered windows at the checked UTC instant."""
+    _header(
+        "FR-DATA-118: Derive `is_open`, `current_session`, and `next_session` deterministically from authoritative ordered windows at the checked UTC instant."
+    )
     provider = WeeklyScheduleProvider(
         WeeklyScheduleDefinition(
             source_id="configured-demo",
@@ -136,7 +150,10 @@ def fr_data_118() -> None:
 
 
 def fr_data_119() -> None:
-    """FR-DATA-119: Require an explicit registered exchange-calendar code for exchange-traded symbols and return bounded holiday-, break-, and shortened-session-aware UTC windows."""  # noqa: E501
+    """FR-DATA-119: Require an explicit registered exchange-calendar code for exchange-traded symbols and return bounded holiday-, break-, and shortened-session-aware UTC windows."""
+    _header(
+        "FR-DATA-119: Require an explicit registered exchange-calendar code for exchange-traded symbols and return bounded holiday-, break-, and shortened-session-aware UTC windows."
+    )
     request = ExchangeSessionRequest(
         symbol="IBM",
         calendar_code="XNYS",
@@ -148,7 +165,10 @@ def fr_data_119() -> None:
 
 
 def fr_data_120() -> None:
-    """FR-DATA-120: Expand an explicit timezone, effective range, revision, weekly interval map, and date holiday overrides for providers that expose no session API; never label configured evidence as provider evidence."""  # noqa: E501
+    """FR-DATA-120: Expand an explicit timezone, effective range, revision, weekly interval map, and date holiday overrides for providers that expose no session API; never label configured evidence as provider evidence."""
+    _header(
+        "FR-DATA-120: Expand an explicit timezone, effective range, revision, weekly interval map, and date holiday overrides for providers that expose no session API; never label configured evidence as provider evidence."
+    )
     provider = WeeklyScheduleProvider(
         WeeklyScheduleDefinition(
             source_id="configured-demo",
@@ -168,7 +188,10 @@ def fr_data_120() -> None:
 
 
 def fr_data_121() -> None:
-    """FR-DATA-121: Classify configurable named sessions in regional timezones with DST handling, including cross-midnight definitions."""  # noqa: E501
+    """FR-DATA-121: Classify configurable named sessions in regional timezones with DST handling, including cross-midnight definitions."""
+    _header(
+        "FR-DATA-121: Classify configurable named sessions in regional timezones with DST handling, including cross-midnight definitions."
+    )
     result = get_active_market_sessions(
         ActiveMarketSessionsRequest(
             symbol="EURUSD",
@@ -180,7 +203,10 @@ def fr_data_121() -> None:
 
 
 def fr_data_122() -> None:
-    """FR-DATA-122: Keep analytical named-session labels structurally separate from symbol tradability so labels never authorize or validate an order."""  # noqa: E501
+    """FR-DATA-122: Keep analytical named-session labels structurally separate from symbol tradability so labels never authorize or validate an order."""
+    _header(
+        "FR-DATA-122: Keep analytical named-session labels structurally separate from symbol tradability so labels never authorize or validate an order."
+    )
     result = get_active_market_sessions(
         ActiveMarketSessionsRequest(
             symbol="EURUSD",

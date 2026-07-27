@@ -3,7 +3,6 @@
 Demonstrates adapter capabilities and order dispatch.
 """
 
-# ruff: noqa: E501
 import asyncio
 import sys
 from datetime import UTC, datetime, timedelta
@@ -22,6 +21,11 @@ from app.services.trading import (
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _intent() -> OrderIntent:
@@ -79,9 +83,8 @@ def _capability() -> dict[str, object]:
 
 def example_routing() -> None:
     """Demonstrate Trading routing API."""
-    print("=" * 80)
+    _header("Demonstrate Trading routing API.")
     print("Trading Example 4: Adapter Capabilities and Order Dispatch")
-    print("=" * 80)
 
     # 1. Validate adapter capability
     validate_adapter_capability(  # type: ignore[arg-type]
@@ -149,16 +152,25 @@ def example_routing() -> None:
 
 def fr_trd_029() -> None:
     """FR-TRD-029: The system shall reject adapters lacking approved provider, API/schema, action, intent order-type, security, timeout, malformed-response, rate-limit, retry, and redaction declarations."""
+    _header(
+        "FR-TRD-029: The system shall reject adapters lacking approved provider, API/schema, action, intent order-type, security, timeout, malformed-response, rate-limit, retry, and redaction declarations."
+    )
     example_routing()
 
 
 def fr_trd_030() -> None:
     """FR-TRD-030: The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence."""
+    _header(
+        "FR-TRD-030: The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence."
+    )
     example_routing()
 
 
 def fr_trd_031() -> None:
     """FR-TRD-031: The system shall dispatch exactly one approved intent to Simulation for sim or adapt it into the matching receiver-owned Brokers mutation DTO for paper/live. Broker environment/account reference come only from injected `BrokerConnectionConfig`; order type/unit/instructions come only from `OrderIntent`; target order/position identities come only from Trading state carried by the intent; timeout and receipt time come from validated injected policy/clock dependencies."""
+    _header(
+        "FR-TRD-031: The system shall dispatch exactly one approved intent to Simulation for sim or adapt it into the matching receiver-owned Brokers mutation DTO for paper/live. Broker environment/account reference come only from injected `BrokerConnectionConfig`; order type/unit/instructions come only from `OrderIntent`; target order/position identities come only from Trading state carried by the intent; timeout and receipt time come from validated injected policy/clock dependencies."
+    )
     example_routing()
 
 

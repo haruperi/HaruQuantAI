@@ -1,1 +1,1 @@
-"""Test package marker."""
+"""Indicators tests package."""

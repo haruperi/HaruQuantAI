@@ -193,6 +193,19 @@ exists.
 
 ## 3. Workflows
 
+> **Workflow Usage Evidence**: Each active workflow has one standalone program in
+> `tests/portfolio/usage/workflows/`; `run_all.py` executes them in registry order.
+
+Evidence programs:
+
+- `WF-PORT-001`: `tests/portfolio/usage/workflows/wf_port_001_validate_construction_evidence.py`
+- `WF-PORT-002`: `tests/portfolio/usage/workflows/wf_port_002_construct_allocation_candidate.py`
+- `WF-PORT-003`: `tests/portfolio/usage/workflows/wf_port_003_coordinate_simulation_risk_review.py`
+- `WF-PORT-004`: `tests/portfolio/usage/workflows/wf_port_004_activate_allocation_version.py`
+- `WF-PORT-005`: `tests/portfolio/usage/workflows/wf_port_005_detect_drift_plan_rebalance.py`
+- `WF-PORT-006`: `tests/portfolio/usage/workflows/wf_port_006_submit_measure_rebalance.py`
+- `WF-PORT-007`: `tests/portfolio/usage/workflows/wf_port_007_rollback_allocation.py`
+
 | Status    | Workflow ID   | Scope        | System workflow            | Workflow                                | Trigger / Input boundary     | Final outcome / Output boundary                                                                   | Requirement sequence                      |
 | --------- | ------------- | ------------ | -------------------------- | --------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | Completed | `WF-PORT-001` | Cross-domain | `SYS-WF-006`, `SYS-WF-007` | Validate construction evidence          | Construction request         | Validated immutable input set or structured rejection                                             | `FR-PORT-006 → FR-PORT-009`               |
@@ -218,6 +231,20 @@ exists.
 | **Internal**     | The complete workflow occurs within Portfolio.                                                                                    |
 | **Cross-domain** | Portfolio receives input from or sends output to another domain; the applicable `SYS-WF-*` ID is recorded in the workflow detail. |
 
+### `WF-PORT-001` — Validate Construction Evidence
+
+1. `PortfolioWorkflowService.validate_construction()` receives one typed
+   `PortfolioConstructionRequest`.
+2. Resolve immutable Strategy references and current Risk eligibility decisions.
+3. Resolve Data-owned account, market, and FX evidence plus Analytics evidence.
+4. Validate exact versions, hashes, UTC freshness, coverage, observations, and
+   request configuration.
+5. Return one immutable `ValidatedConstructionEvidence` bundle without publishing
+   a candidate.
+
+**Failure behaviour:** missing, stale, incompatible, hash-mismatched, or ineligible
+evidence returns a structured Portfolio error and creates no state.
+
 ### `WF-PORT-002` — Construct Allocation Candidate
 
 1. Validate strategy/version uniqueness and current Risk eligibility for the requested scope.
@@ -228,6 +255,20 @@ exists.
 6. Hash the full configuration and evidence lineage, then publish one immutable result.
 
 **Failure behaviour:** any missing, stale, non-finite, unbounded, incompatible, or non-deterministic input returns a structured error and publishes nothing.
+
+### `WF-PORT-003` — Coordinate Simulation and Risk Review
+
+1. `PortfolioWorkflowService.coordinate_review()` receives the complete immutable
+   construction result, its validated evidence, and a receiver-owned
+   `PortfolioBacktestRequestV1`.
+2. Revalidate the Simulation request against the candidate and evidence lineage.
+3. Submit the receiver-owned request to Simulation and verify the returned result.
+4. Build and submit the receiver-owned Risk review request.
+5. Return `PortfolioReviewResult` containing current Simulation and Risk truth,
+   preserving trace IDs and redacted audit evidence.
+
+**Failure behaviour:** stale or mismatched lineage, incomplete Simulation evidence,
+Risk rejection, receiver incompatibility, or audit failure blocks activation.
 
 ### `WF-PORT-004` — Activate Allocation Version
 
@@ -252,6 +293,40 @@ Simulation activation is automatic within simulation policy. Paper/live activati
    receive `PortfolioRebalanceMeasurementEvidence v1`.
 8. If measurement fails, preserve execution truth as `executed-but-unmeasured` and
    retry deterministically from the same immutable execution/FX/version inputs.
+
+### `WF-PORT-006` — Submit and Measure Authorized Rebalance
+
+1. `PortfolioWorkflowService.submit_rebalance()` receives one current immutable
+   reduce-only plan and current owner-evidence references.
+2. Revalidate the active allocation, current Risk decision, expiry, route, approval
+   references, and idempotency material.
+3. Adapt the plan into the receiver-owned Trading request without changing approved
+   quantities.
+4. Submit once through Trading and persist reconciled execution truth.
+5. Submit immutable Trading facts through the Analytics-owned measurement request.
+6. Return a measured `PortfolioRebalancePlan`; if Analytics fails, return and persist
+   `executed_unmeasured`.
+7. `PortfolioWorkflowService.recompute_measurement()` may retry measurement from the
+   same immutable execution facts without invoking Trading again.
+
+**Failure behaviour:** missing authorization or stale evidence blocks before Trading;
+an ambiguous Trading outcome is never retried blindly; Analytics failure never erases
+execution truth.
+
+### `WF-PORT-007` — Roll Back Allocation
+
+1. `PortfolioWorkflowService.rollback()` receives the approved prior candidate,
+   validated evidence, current review, and exact allocation version to reverse.
+2. Revalidate approval policy, current Risk authorization, expiry, kill-switch, and
+   expected predecessor/revision.
+3. Submit the Risk-owned activation request for the rollback projection.
+4. Atomically activate a new governed allocation version linked by
+   `rollback_of_version`.
+5. Return the new `ActivePortfolioAllocation` and emit redacted audit evidence.
+
+**Failure behaviour:** rollback never mutates history; stale revision, missing
+authorization, or failed Risk activation returns a structured error without changing
+the active allocation.
 
 #### End-to-end workflow diagram
 
@@ -551,7 +626,7 @@ The concrete constructor fields are intentionally not invented here; implementat
 | NFR-PORT-002 | Deterministic output for identical versioned inputs and explicit configuration.                                                   | Reproducibility tests        |
 | NFR-PORT-003 | Fail closed on missing evidence, authorization, policy, configuration, or ownership ambiguity.                                    | Negative tests               |
 | NFR-PORT-004 | Never log secrets, raw approval tokens, credentials, or unredacted account data.                                                  | Security tests               |
-| NFR-PORT-005 | Maintain at least 80% package test coverage.                                                                                      | Coverage report              |
+| NFR-PORT-005 | Maintain at least 80% package test coverage and one standalone README-aligned usage program for every active workflow.             | `tests/portfolio/unit/test_workflow_usage_parity.py`, direct workflow runner, coverage report |
 | NFR-PORT-006 | No live side effect originates in Portfolio; Trading remains the sole execution authority.                                        | Dependency/integration tests |
 | NFR-PORT-007 | All money, rates, weights, and tolerances use documented decimal/precision rules; no binary-float ambiguity at boundaries.        | Numeric tests                |
 | NFR-PORT-008 | All timestamps are timezone-aware UTC.                                                                                            | Validation tests             |

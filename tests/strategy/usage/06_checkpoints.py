@@ -29,18 +29,26 @@ _CORRELATION = "cor-99999999-9999-4999-8999-999999999999"
 _AUTHORIZATION = "usage-checkpoint-auth"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_028() -> None:
     """Demonstrate the bounded checkpoint contract."""
+    _header("Demonstrate the bounded checkpoint contract.")
     assert StrategyCheckpoint.model_fields["state_checksum"]
 
 
 def fr_str_030() -> None:
     """Demonstrate checkpoint creation and persistence."""
+    _header("Demonstrate checkpoint creation and persistence.")
     assert callable(create_strategy_checkpoint)
 
 
 def fr_str_031() -> None:
     """Demonstrate read-only checkpoint validation."""
+    _header("Demonstrate read-only checkpoint validation.")
     assert callable(validate_strategy_checkpoint)
 
 
@@ -111,7 +119,6 @@ def main() -> int:
         ``0`` on success, or ``3`` when the configured Strategy store is closed.
     """
     print("\nSTRATEGY LOCAL CHECKPOINTS")
-    print("=" * 88)
     print("Contract:", StrategyCheckpoint.__name__)
     fr_str_028()
     fr_str_030()

@@ -1,6 +1,5 @@
 """Tests for bounded-search contracts."""
 
-# ruff: noqa: INP001
 import pytest
 from app.services.optimization.search import (
     CandidateResult,
@@ -9,6 +8,7 @@ from app.services.optimization.search import (
     SearchSummary,
 )
 from pydantic import ValidationError
+
 from tests.optimization.unit.test_constraints import _space
 from tests.optimization.unit.test_execution_contracts import execution_context
 

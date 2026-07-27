@@ -447,7 +447,7 @@ class PortfolioConstructionRequest(PortfolioContractModel):
             }
         )
 
-    @field_serializer("scope", when_used="json")
+    @field_serializer("scope", mode="plain")
     def _serialize_scope(self, value: Mapping[str, str]) -> dict[str, str]:
         """Serialize frozen scope deterministically.
 

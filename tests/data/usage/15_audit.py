@@ -20,6 +20,11 @@ _START = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 _END = _START + timedelta(hours=1)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _demonstrate_feature() -> None:
     """Exercise audit event creation, persistence, and authorized query."""
     req_id = generate_id("req")
@@ -87,12 +92,14 @@ def _demonstrate_once() -> None:
 
 
 def fr_data_021() -> None:
-    "FR-DATA-021: Persist a redacted `AuditEvent v1` idempotently with trace identifiers and surface every persistence failure."  # noqa: E501 - exact specification text
+    _header("fr_data_021")
+    "FR-DATA-021: Persist a redacted `AuditEvent v1` idempotently with trace identifiers and surface every persistence failure."
     _demonstrate_once()
 
 
 def fr_data_077() -> None:
-    "FR-DATA-077: Authorize and execute a bounded, deterministically ordered audit query without exposing storage handles or unredacted payloads."  # noqa: E501 - exact specification text
+    _header("fr_data_077")
+    "FR-DATA-077: Authorize and execute a bounded, deterministically ordered audit query without exposing storage handles or unredacted payloads."
     _demonstrate_once()
 
 

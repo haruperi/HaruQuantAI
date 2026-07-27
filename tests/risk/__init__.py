@@ -1,1 +1,1 @@
-"""Risk domain tests."""
+"""Risk tests package."""

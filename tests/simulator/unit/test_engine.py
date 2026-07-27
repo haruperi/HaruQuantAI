@@ -1,5 +1,4 @@
 """Unit tests for the canonical Simulation tick engine."""
-# ruff: noqa: INP001
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -20,6 +19,7 @@ from app.services.simulator.execution import (
 from app.services.simulator.journal import JournalWriter
 from app.services.simulator.timeline import Tick
 from app.services.trading import OrderIntent, TradingRoute
+
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 

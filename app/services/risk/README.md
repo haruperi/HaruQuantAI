@@ -303,6 +303,28 @@ flowchart LR
 
 ## 3. Workflows
 
+> **Workflow usage evidence:** Each of the thirteen active workflows has one
+> standalone input-to-output program with README-aligned stages. Programs mutate only
+> isolated injected Risk stores and never execution/broker state. Run all programs
+> with `python tests/risk/usage/workflows/run_all.py`. This satisfies
+> `NFR-RISK-010`; retired `WF-RISK-013` has no program.
+
+| Workflow | Standalone program |
+|---|---|
+| `WF-RISK-001` | `tests/risk/usage/workflows/wf_risk_001_build_portfolio_risk_snapshot.py` |
+| `WF-RISK-002` | `tests/risk/usage/workflows/wf_risk_002_calculate_position_size.py` |
+| `WF-RISK-003` | `tests/risk/usage/workflows/wf_risk_003_assess_risk_regime.py` |
+| `WF-RISK-004` | `tests/risk/usage/workflows/wf_risk_004_review_proposed_trade_risk.py` |
+| `WF-RISK-005` | `tests/risk/usage/workflows/wf_risk_005_run_current_portfolio_governor.py` |
+| `WF-RISK-006` | `tests/risk/usage/workflows/wf_risk_006_review_strategy_operational_eligibility.py` |
+| `WF-RISK-007` | `tests/risk/usage/workflows/wf_risk_007_review_activate_allocation_risk.py` |
+| `WF-RISK-008` | `tests/risk/usage/workflows/wf_risk_008_validate_approval_token.py` |
+| `WF-RISK-009` | `tests/risk/usage/workflows/wf_risk_009_apply_check_kill_switch_state.py` |
+| `WF-RISK-010` | `tests/risk/usage/workflows/wf_risk_010_run_scenario_what_if_analysis.py` |
+| `WF-RISK-011` | `tests/risk/usage/workflows/wf_risk_011_generate_risk_decision_summary.py` |
+| `WF-RISK-012` | `tests/risk/usage/workflows/wf_risk_012_persist_risk_audit_token_state.py` |
+| `WF-RISK-014` | `tests/risk/usage/workflows/wf_risk_014_revalidate_decision_evidence_before_reuse.py` |
+
 ### Status values
 
 | Status | Meaning |

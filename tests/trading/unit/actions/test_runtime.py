@@ -1,6 +1,5 @@
 """Unit tests for the thin Trading live evaluation-cycle orchestrator."""
 
-# ruff: noqa: INP001
 from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal
@@ -22,6 +21,7 @@ from app.services.trading.contracts import (
     TradingRequest,
 )
 from app.services.trading.state import TradingProjection
+
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
     account_snapshot,

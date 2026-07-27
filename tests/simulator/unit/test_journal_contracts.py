@@ -1,5 +1,4 @@
 """Unit tests for immutable Simulation journal events."""
-# ruff: noqa: INP001
 
 from datetime import UTC, datetime
 

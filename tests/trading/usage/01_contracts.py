@@ -3,7 +3,6 @@
 Demonstrates public Trading contracts, route selection, and validation.
 """
 
-# ruff: noqa: E501
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -31,6 +30,11 @@ from app.services.trading import (
 from app.utils import canonical_json
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _request_data() -> dict[str, object]:
@@ -122,9 +126,8 @@ def _rebalance_data() -> dict[str, object]:
 
 def example_contracts() -> None:
     """Demonstrate Trading contracts and helper models."""
-    print("=" * 80)
+    _header("Demonstrate Trading contracts and helper models.")
     print("Trading Example 1: Boundary Contracts and Validation")
-    print("=" * 80)
 
     print(f"Trading contract version: {TRADING_CONTRACT_VERSION}")
     print(f"Selected route: {TradingRoute('paper').value}")
@@ -213,66 +216,105 @@ def example_contracts() -> None:
 
 def fr_trd_001() -> None:
     """FR-TRD-001: The system shall expose only `sim`, `paper`, and `live` action routes; package-only is a side-effect mode, not a route."""
+    _header(
+        "FR-TRD-001: The system shall expose only `sim`, `paper`, and `live` action routes; package-only is a side-effect mode, not a route."
+    )
     example_contracts()
 
 
 def fr_trd_002() -> None:
     """FR-TRD-002: The system shall validate one immutable canonical request with route, action, trace, authority, approval, Risk, idempotency, UTC evidence, approved `order_type`, validated instrument `quantity_unit`, optional stop/TIF/expiration material, and nullable Trading-state broker target identities."""
+    _header(
+        "FR-TRD-002: The system shall validate one immutable canonical request with route, action, trace, authority, approval, Risk, idempotency, UTC evidence, approved `order_type`, validated instrument `quantity_unit`, optional stop/TIF/expiration material, and nullable Trading-state broker target identities."
+    )
     example_contracts()
 
 
 def fr_trd_003() -> None:
     """FR-TRD-003: The system shall return one finite JSON-safe envelope distinguishing packaging, rejection, block, send, fill, cancellation, unknown outcome, and error."""
+    _header(
+        "FR-TRD-003: The system shall return one finite JSON-safe envelope distinguishing packaging, rejection, block, send, fill, cancellation, unknown outcome, and error."
+    )
     example_contracts()
 
 
 def fr_trd_004() -> None:
     """FR-TRD-004: The system shall expose complete deterministic `OrderIntent v1` exactly as defined in Section 1, preserving Risk-approved size, approved order type, validated quantity unit, optional order instructions, and Trading-state broker target identities without connection material."""
+    _header(
+        "FR-TRD-004: The system shall expose complete deterministic `OrderIntent v1` exactly as defined in Section 1, preserving Risk-approved size, approved order type, validated quantity unit, optional order instructions, and Trading-state broker target identities without connection material."
+    )
     example_contracts()
 
 
 def fr_trd_005() -> None:
     """FR-TRD-005: The system shall expose immutable `ExecutionReceipt v1` with authority, status, fill, retry, and reconciliation evidence."""
+    _header(
+        "FR-TRD-005: The system shall expose immutable `ExecutionReceipt v1` with authority, status, fill, retry, and reconciliation evidence."
+    )
     example_contracts()
 
 
 def fr_trd_006() -> None:
     """FR-TRD-006: The system shall expose `TradeRecord v1` without deriving Analytics metrics or hiding unreconciled state."""
+    _header(
+        "FR-TRD-006: The system shall expose `TradeRecord v1` without deriving Analytics metrics or hiding unreconciled state."
+    )
     example_contracts()
 
 
 def fr_trd_007() -> None:
     """FR-TRD-007: The system shall expose one finite Trading exception carrying a registered code and redacted trace context."""
+    _header(
+        "FR-TRD-007: The system shall expose one finite Trading exception carrying a registered code and redacted trace context."
+    )
     example_contracts()
 
 
 def fr_trd_008() -> None:
     """FR-TRD-008: The system shall map validation, permission, persistence, timeout, provider, and unknown failures into the canonical envelope without raw exceptions."""
+    _header(
+        "FR-TRD-008: The system shall map validation, permission, persistence, timeout, provider, and unknown failures into the canonical envelope without raw exceptions."
+    )
     example_contracts()
 
 
 def fr_trd_009() -> None:
     """FR-TRD-009: The system shall recursively redact secrets before any log, error, event, metric, or returned payload."""
+    _header(
+        "FR-TRD-009: The system shall recursively redact secrets before any log, error, event, metric, or returned payload."
+    )
     example_contracts()
 
 
 def fr_trd_010() -> None:
     """FR-TRD-010: The system shall return the exact stable Python API with routes, schemas, side effects, approvals, idempotency, statuses, errors, and stability metadata."""
+    _header(
+        "FR-TRD-010: The system shall return the exact stable Python API with routes, schemas, side effects, approvals, idempotency, statuses, errors, and stability metadata."
+    )
     example_contracts()
 
 
 def fr_trd_012() -> None:
     """FR-TRD-012: The system shall create a non-executable action draft that cannot call a route authority."""
+    _header(
+        "FR-TRD-012: The system shall create a non-executable action draft that cannot call a route authority."
+    )
     example_contracts()
 
 
 def fr_trd_063() -> None:
     """FR-TRD-063: The system shall expose `PortfolioRebalanceExecutionRequest v1` exactly as defined in §1 (plan/allocation/decision references, ordered actions, reduce-only flags, route, approval token, validity, canonical hash) carrying `contract_version="v1"` and `schema_id="trading.portfolio_rebalance_execution_request.v1"`."""
+    _header(
+        "FR-TRD-063: The system shall expose `PortfolioRebalanceExecutionRequest v1` exactly as defined in §1 (plan/allocation/decision references, ordered actions, reduce-only flags, route, approval token, validity, canonical hash) carrying `contract_version='v1'` and `schema_id='trading.portfolio_rebalance_execution_request.v1'`."
+    )
     example_contracts()
 
 
 def fr_trd_066() -> None:
     """FR-TRD-066: The system shall expose one canonical `TRADING_CONTRACT_VERSION="v1"` constant used by every Trading-owned versioned contract and report schema. `FR-TRD-011` remains retired with `CAP-TRD-022` and is not reused."""
+    _header(
+        "FR-TRD-066: The system shall expose one canonical `TRADING_CONTRACT_VERSION='v1'` constant used by every Trading-owned versioned contract and report schema. `FR-TRD-011` remains retired with `CAP-TRD-022` and is not reused."
+    )
     example_contracts()
 
 

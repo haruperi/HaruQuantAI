@@ -1,5 +1,4 @@
 """Unit tests for Simulation journal replay and idempotency."""
-# ruff: noqa: INP001
 
 from datetime import UTC, datetime
 from pathlib import Path
@@ -12,6 +11,7 @@ from app.services.simulator.journal import (
     replay_journal,
     resolve_idempotent_run,
 )
+
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 

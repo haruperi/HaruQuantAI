@@ -35,13 +35,20 @@ _MODULE = "app.services.strategy.evaluators.naive_ma_trend"
 _STRATEGY = "usage-signal-boundary"
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_047() -> None:
     """Demonstrate atomic concrete signal evaluation."""
+    _header("Demonstrate atomic concrete signal evaluation.")
     assert callable(evaluate_strategy_signals)
 
 
 def fr_str_048() -> None:
     """Demonstrate the structural signal evaluator contract."""
+    _header("Demonstrate the structural signal evaluator contract.")
     assert SignalEvaluator
 
 
@@ -103,7 +110,6 @@ def main() -> int:
     fr_str_047()
     fr_str_048()
     print("\nCONCRETE SIGNAL EVALUATION BOUNDARY")
-    print("=" * 88)
     try:
         market = get_market_data(
             source_id="mt5",

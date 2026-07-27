@@ -3,7 +3,7 @@
 Demonstrates order, position, and control actions.
 """
 
-# ruff: noqa: E501, PLR0915
+# ruff: noqa: PLR0915
 import asyncio
 import sys
 from dataclasses import replace
@@ -46,6 +46,11 @@ from tests.trading.unit.actions.test_rebalance import (
     rebalance_request,
 )
 from tests.trading.unit.actions.test_runtime import evaluation_dependencies, evidence
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _position_request(action: str, **updates: object):
@@ -187,89 +192,134 @@ async def _async_example() -> None:
 
 def example_actions() -> None:
     """Demonstrate Trading action execution."""
-    print("=" * 80)
+    _header("Demonstrate Trading action execution.")
     print("Trading Example 8: Public Actions and Execution Control")
-    print("=" * 80)
     asyncio.run(_async_example())
 
 
 def fr_trd_013() -> None:
     """FR-TRD-013: The system shall submit one validated Risk-approved order through the selected route."""
+    _header(
+        "FR-TRD-013: The system shall submit one validated Risk-approved order through the selected route."
+    )
     example_actions()
 
 
 def fr_trd_014() -> None:
     """FR-TRD-014: The system shall modify only the approved identity/scope with optimistic version and caller idempotency."""
+    _header(
+        "FR-TRD-014: The system shall modify only the approved identity/scope with optimistic version and caller idempotency."
+    )
     example_actions()
 
 
 def fr_trd_015() -> None:
     """FR-TRD-015: The system shall cancel one pending order after normal gates."""
+    _header("FR-TRD-015: The system shall cancel one pending order after normal gates.")
     example_actions()
 
 
 def fr_trd_016() -> None:
     """FR-TRD-016: The system shall close a position fully or partially with correct netting/hedging identity."""
+    _header(
+        "FR-TRD-016: The system shall close a position fully or partially with correct netting/hedging identity."
+    )
     example_actions()
 
 
 def fr_trd_017() -> None:
     """FR-TRD-017: The system shall modify only approved stop-loss/take-profit scope."""
+    _header(
+        "FR-TRD-017: The system shall modify only approved stop-loss/take-profit scope."
+    )
     example_actions()
 
 
 def fr_trd_018() -> None:
     """FR-TRD-018: The system shall reduce, never increase, exposure and execute exactly the Risk-approved reduction."""
+    _header(
+        "FR-TRD-018: The system shall reduce, never increase, exposure and execute exactly the Risk-approved reduction."
+    )
     example_actions()
 
 
 def fr_trd_019() -> None:
     """FR-TRD-019: The system shall pause runtime admission without changing strategy lifecycle governance."""
+    _header(
+        "FR-TRD-019: The system shall pause runtime admission without changing strategy lifecycle governance."
+    )
     example_actions()
 
 
 def fr_trd_020() -> None:
     """FR-TRD-020: The system shall resume only after a valid Risk-owned `ActionPolicyVerdict`, all applicable `global > portfolio > strategy > symbol` kill-switch scopes are inactive, and reconciliation is ready."""
+    _header(
+        "FR-TRD-020: The system shall resume only after a valid Risk-owned `ActionPolicyVerdict`, all applicable `global > portfolio > strategy > symbol` kill-switch scopes are inactive, and reconciliation is ready."
+    )
     example_actions()
 
 
 def fr_trd_021() -> None:
     """FR-TRD-021: The system shall request a scoped Risk-owned kill-switch transition only with a compatible `ActionPolicyVerdict`; request text cannot create emergency authority."""
+    _header(
+        "FR-TRD-021: The system shall request a scoped Risk-owned kill-switch transition only with a compatible `ActionPolicyVerdict`; request text cannot create emergency authority."
+    )
     example_actions()
 
 
 def fr_trd_022() -> None:
     """FR-TRD-022: The system shall clear a switch only through Risk-authorized clearance; an inactive child cannot override an active parent, and resume requires reconciliation readiness."""
+    _header(
+        "FR-TRD-022: The system shall clear a switch only through Risk-authorized clearance; an inactive child cannot override an active parent, and resume requires reconciliation readiness."
+    )
     example_actions()
 
 
 def fr_trd_023() -> None:
     """FR-TRD-023: The system shall mass-cancel pending or otherwise cancellable orders through normal gates, bind each paper/live child to its own current Risk decision/token and action-policy verdict, validate every derived child, return every child result, and never claim cancellation for uncertain or already-filled work."""
+    _header(
+        "FR-TRD-023: The system shall mass-cancel pending or otherwise cancellable orders through normal gates, bind each paper/live child to its own current Risk decision/token and action-policy verdict, validate every derived child, return every child result, and never claim cancellation for uncertain or already-filled work."
+    )
     example_actions()
 
 
 def fr_trd_025() -> None:
     """FR-TRD-025: The system shall synchronize projections from route truth without mutating route orders or positions."""
+    _header(
+        "FR-TRD-025: The system shall synchronize projections from route truth without mutating route orders or positions."
+    )
     example_actions()
 
 
 def fr_trd_050() -> None:
     """FR-TRD-050: The system shall mass-close positions through normal gates, bind each paper/live child to its own current Risk decision/token and action-policy verdict, validate every derived child, and return every child result."""
+    _header(
+        "FR-TRD-050: The system shall mass-close positions through normal gates, bind each paper/live child to its own current Risk decision/token and action-policy verdict, validate every derived child, and return every child result."
+    )
     example_actions()
 
 
 def fr_trd_056() -> None:
     """FR-TRD-056: The system shall expose one immutable injected dependency container carrying every exact authority/read port and required runtime bound listed in the `dependencies.py` Files row, without resolving secrets or creating route/store dependencies at import time. Evaluation ports return public typed domain contracts; the normalized symbol-capability port returns exact `supported_order_types` and Brokers `BrokerSymbolInfo`, never interpreted provider-native flag names."""
+    _header(
+        "FR-TRD-056: The system shall expose one immutable injected dependency container carrying every exact authority/read port and required runtime bound listed in the `dependencies.py` Files row, without resolving secrets or creating route/store dependencies at import time. Evaluation ports return public typed domain contracts; the normalized symbol-capability port returns exact `supported_order_types` and Brokers `BrokerSymbolInfo`, never interpreted provider-native flag names."
+    )
     example_actions()
 
 
 def fr_trd_064() -> None:
     """FR-TRD-064: The system shall validate the receiver-owned `PortfolioRebalanceExecutionRequest` (hash, approval token, route, target version), revalidate eligibility, `AllocationRiskDecision`, `PortfolioBudgetExecutionVerdict`, kill switch, and idempotency, resolve each approved component exposure reduction into an executable order through the injected Trading-owned resolver, and revalidate the child request's immutable parent bindings before the existing order/reconciliation path; it never recalculates target weights and keeps correction actions canonical `reduce_exposure`."""
+    _header(
+        "FR-TRD-064: The system shall validate the receiver-owned `PortfolioRebalanceExecutionRequest` (hash, approval token, route, target version), revalidate eligibility, `AllocationRiskDecision`, `PortfolioBudgetExecutionVerdict`, kill switch, and idempotency, resolve each approved component exposure reduction into an executable order through the injected Trading-owned resolver, and revalidate the child request's immutable parent bindings before the existing order/reconciliation path; it never recalculates target weights and keeps correction actions canonical `reduce_exposure`."
+    )
     example_actions()
 
 
 def fr_trd_065() -> None:
     """FR-TRD-065: The system shall drive one live/paper evaluation cycle strictly through public domain APIs: request `MarketDataset` + `AccountStateSnapshot` from Data, `IndicatorSeries` from Indicators, invoke Strategy for a `TradeIntent`, and — when a non-neutral `TradeIntent` is produced — submit it to Risk and pass any approved `RiskDecision` into the existing validate/gate/dispatch path. A neutral signal returns a normal no-mutation `StandardTradingEnvelope` (no-action) and ends the cycle. Trading never computes indicators, generates signals, or sizes/approves."""
+    _header(
+        "FR-TRD-065: The system shall drive one live/paper evaluation cycle strictly through public domain APIs: request `MarketDataset` + `AccountStateSnapshot` from Data, `IndicatorSeries` from Indicators, invoke Strategy for a `TradeIntent`, and — when a non-neutral `TradeIntent` is produced — submit it to Risk and pass any approved `RiskDecision` into the existing validate/gate/dispatch path. A neutral signal returns a normal no-mutation `StandardTradingEnvelope` (no-action) and ends the cycle. Trading never computes indicators, generates signals, or sizes/approves."
+    )
     example_actions()
 
 

@@ -1,5 +1,4 @@
 """Unit tests for all-or-nothing portfolio simulation."""
-# ruff: noqa: INP001
 
 from collections.abc import Mapping
 from datetime import timedelta
@@ -14,6 +13,7 @@ from app.services.simulator.run import (
     run_portfolio_backtest,
 )
 from app.utils import AuthContext, canonical_digest
+
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,

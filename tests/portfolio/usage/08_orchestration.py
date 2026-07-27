@@ -18,6 +18,11 @@ from app.services.portfolio import PortfolioRebalancePlan
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _drift_observation(
     component_id: str,
     drift: Decimal,
@@ -106,9 +111,10 @@ def fr_port_025() -> None:
     Demonstrates that the rebalance plan carries receiver-compatible action
     data that does not embed Portfolio-owned contract instances.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-025: Submit only receiver-owned Risk, Simulation, and Trading request contracts. Demonstrates that the rebalance plan carries receiver-compatible action data that does not embed Portfolio-owned contract instances."
+    )
     print("FR-PORT-025: Submit only receiver-owned request contracts")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_plan_data())
     for action in plan.actions:
@@ -125,9 +131,10 @@ def fr_port_026() -> None:
     Demonstrates that the plan carries fresh observed_at and created_at
     timestamps for gate revalidation.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-026: Revalidate every mutable/expiring gate immediately before side effects. Demonstrates that the plan carries fresh observed_at and created_at timestamps for gate revalidation."
+    )
     print("FR-PORT-026: Revalidate gates before side effects")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_plan_data())
     assert plan.observed_at.tzinfo is not None
@@ -142,9 +149,10 @@ def fr_port_027() -> None:
 
     Demonstrates that the plan carries trace IDs for end-to-end propagation.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-027: Propagate request/correlation/causation IDs end to end. Demonstrates that the plan carries trace IDs for end-to-end propagation."
+    )
     print("FR-PORT-027: Propagate trace IDs end to end")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_plan_data())
     assert plan.request_id == "req-1"
@@ -163,9 +171,10 @@ def fr_port_028() -> None:
     Demonstrates that the plan carries canonical and evidence hashes for
     auditable redacted lineage.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-028: Emit redacted audit events for requests, decisions, activation, rollback, and submission. Demonstrates that the plan carries canonical and evidence hashes for auditable redacted lineage."
+    )
     print("FR-PORT-028: Emit redacted audit events")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_plan_data())
     assert len(plan.canonical_hash) == 64
@@ -184,9 +193,10 @@ def fr_port_029() -> None:
     Demonstrates that the plan status transitions deterministically and never
     implies a blind retry of a receiver mutation.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-029: Never retry a potentially accepted mutation without receiver-provided idempotency semantics. Demonstrates that the plan status transitions deterministically and never implies a blind retry of a receiver mutation."
+    )
     print("FR-PORT-029: Never retry accepted mutation without idempotency")
-    print("=" * 80)
 
     plan = PortfolioRebalancePlan(**_plan_data())
     assert plan.status == "review_required"
@@ -215,9 +225,10 @@ def fr_port_038() -> None:
     Demonstrates that the plan supports measured status and preserves execution
     reference for deterministic recomputation.
     """
-    print("=" * 80)
+    _header(
+        "FR-PORT-038: After reconciled execution, request Analytics measurement from immutable Trading facts; preserve executed-but-unmeasured truth on Analytics failure. Demonstrates that the plan supports measured status and preserves execution reference for deterministic recomputation."
+    )
     print("FR-PORT-038: Request Analytics measurement, preserve execution truth")
-    print("=" * 80)
 
     executed = PortfolioRebalancePlan(
         **_plan_data(

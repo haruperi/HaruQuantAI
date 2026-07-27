@@ -17,13 +17,20 @@ from app.services.strategy import (
 )
 
 
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def fr_str_025() -> None:
     """Demonstrate the canonical TradeIntent contract."""
+    _header("Demonstrate the canonical TradeIntent contract.")
     assert TradeIntent.model_fields["idempotency_key"]
 
 
 def fr_str_026() -> None:
     """Demonstrate deterministic TradeIntent construction."""
+    _header("Demonstrate deterministic TradeIntent construction.")
     assert callable(build_trade_intent)
 
 
@@ -73,7 +80,6 @@ def main() -> int:
     )
 
     print("\nTRADE INTENT PROPOSAL")
-    print("=" * 88)
     print("Contract:", TradeIntent.__name__)
     outcome = build_trade_intent(decision, context, 0)
     print("Status:", outcome.status)
