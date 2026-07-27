@@ -1,14 +1,14 @@
 # HaruQuant Streamlined Agent Permissions Policy
 
-**Document:** `agent_permissions.md`  
-**Recommended path:** `docs/agentic_firm/agent_permissions.md`  
-**Owner:** Human Board / Haruperi  
-**System:** HaruQuant Streamlined Agentic Trading System  
-**Policy version:** 2.0.0  
-**Status:** Streamlined implementation baseline  
-**Last updated:** 2026-05-24  
-**Python enforcement:** `runtime/permissions.py`  
-**Canonical tool location:** root-level `tools/` folder  
+**Document:** `agent_permissions.md`
+**Recommended path:** `docs/agentic_firm/agent_permissions.md`
+**Owner:** Human Board / Haruperi
+**System:** HaruQuant Streamlined Agentic Trading System
+**Policy version:** 2.0.0
+**Status:** Streamlined implementation baseline
+**Last updated:** 2026-05-24
+**Python enforcement:** `runtime/permissions.py`
+**Canonical tool location:** root-level `tools/` folder
 
 ---
 

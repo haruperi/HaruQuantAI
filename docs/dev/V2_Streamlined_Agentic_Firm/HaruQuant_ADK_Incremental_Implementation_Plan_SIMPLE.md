@@ -1,8 +1,8 @@
 # HaruQuant ADK Incremental Implementation Plan — Simple Build Version
 
-Status: revised simple implementation plan  
-Target runtime: Google ADK  
-Architecture style: direct Python ADK agents + shared root-level tools + lightweight runtime  
+Status: revised simple implementation plan
+Target runtime: Google ADK
+Architecture style: direct Python ADK agents + shared root-level tools + lightweight runtime
 Goal: build the streamlined HaruQuant trading agent system from scratch without unnecessary folder/file overhead.
 
 ---

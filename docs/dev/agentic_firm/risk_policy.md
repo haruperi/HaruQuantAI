@@ -1,12 +1,12 @@
 # HaruQuant Agentic AI Trading Firm — Risk Policy
 
-**Document:** `risk_policy.md`  
-**Target path:** `docs/agentic_firm/risk_policy.md`  
-**Version:** 1.0.0  
-**Status:** Draft for Board Review  
-**Owner:** Human Board / Haruperi  
-**Applies to:** HaruQuant multi-agent research, backtesting, paper trading, and live trading workflows  
-**Effective date:** 2026-05-03  
+**Document:** `risk_policy.md`
+**Target path:** `docs/agentic_firm/risk_policy.md`
+**Version:** 1.0.0
+**Status:** Draft for Board Review
+**Owner:** Human Board / Haruperi
+**Applies to:** HaruQuant multi-agent research, backtesting, paper trading, and live trading workflows
+**Effective date:** 2026-05-03
 
 ---
 
@@ -1671,4 +1671,3 @@ This policy is informed by public risk-management and automated-trading control 
 The final law of this Risk Policy is:
 
 > **When in doubt, HaruQuant must preserve capital, block new risk, log the event, and escalate to the Human Board.**
-

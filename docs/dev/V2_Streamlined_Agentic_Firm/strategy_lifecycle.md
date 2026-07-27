@@ -1,11 +1,11 @@
 # HaruQuant Streamlined Strategy Lifecycle Policy
 
-**Document:** `strategy_lifecycle.md`  
-**Recommended path:** `docs/agentic_firm/strategy_lifecycle.md`  
-**Owner:** Human Board / Haruperi  
-**Version:** 2.0.0  
-**Status:** Streamlined lifecycle baseline  
-**Last Updated:** 2026-05-24  
+**Document:** `strategy_lifecycle.md`
+**Recommended path:** `docs/agentic_firm/strategy_lifecycle.md`
+**Owner:** Human Board / Haruperi
+**Version:** 2.0.0
+**Status:** Streamlined lifecycle baseline
+**Last Updated:** 2026-05-24
 
 ---
 

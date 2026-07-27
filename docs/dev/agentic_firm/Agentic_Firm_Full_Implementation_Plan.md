@@ -1477,4 +1477,3 @@ Do not integrate an agent into the full firm until it can pass these checks inde
 ```
 
 Build the firm one safe, testable department at a time.
-

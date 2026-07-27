@@ -1,12 +1,12 @@
 # HaruQuant Streamlined Risk Policy
 
-**Document:** `risk_policy.md`  
-**Recommended path:** `docs/agentic_firm/risk_policy.md`  
-**Owner:** Human Board / Haruperi  
-**Version:** 2.0.0  
-**Status:** Streamlined prop-firm risk baseline  
-**Last Updated:** 2026-05-24  
-**Python enforcement:** `tools/risk_tools.py`, `runtime/permissions.py`, later `risk/governor.py`  
+**Document:** `risk_policy.md`
+**Recommended path:** `docs/agentic_firm/risk_policy.md`
+**Owner:** Human Board / Haruperi
+**Version:** 2.0.0
+**Status:** Streamlined prop-firm risk baseline
+**Last Updated:** 2026-05-24
+**Python enforcement:** `tools/risk_tools.py`, `runtime/permissions.py`, later `risk/governor.py`
 
 ---
 

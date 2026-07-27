@@ -1,10 +1,10 @@
 # Agent Template
 
-Status: canonical agent implementation template  
-Scope: framework-neutral agent design, implementation, testing, logging, evaluation, registry, and audit alignment  
-Use this when: creating, refactoring, reviewing, or onboarding any agent in an agentic AI system  
-Companion docs: `docs/Agentic_AI_Playbook.md`, `docs/Agent_Auditing_Checklist.md`  
-Owner: platform architecture / agent platform team  
+Status: canonical agent implementation template
+Scope: framework-neutral agent design, implementation, testing, logging, evaluation, registry, and audit alignment
+Use this when: creating, refactoring, reviewing, or onboarding any agent in an agentic AI system
+Companion docs: `docs/Agentic_AI_Playbook.md`, `docs/Agent_Auditing_Checklist.md`
+Owner: platform architecture / agent platform team
 Review cadence: quarterly or whenever the Playbook, Audit Checklist, registry schema, or canonical project structure changes materially
 
 > **Purpose:** Standardize how every agent is built, tested, logged, evaluated, documented, registered, audited, and connected into a larger agentic system.

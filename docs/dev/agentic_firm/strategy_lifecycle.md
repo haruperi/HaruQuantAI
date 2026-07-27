@@ -1,11 +1,11 @@
 # HaruQuant Agentic Firm — Strategy Lifecycle Policy
 
-**File:** `docs/agentic_firm/strategy_lifecycle.md`  
-**Document Owner:** HaruQuant Human Board / Haruperi  
-**Applies To:** Research agents, strategy agents, code-generation agents, backtest agents, robustness agents, risk agents, portfolio agents, execution agents, and reporting agents  
-**Status:** Governance Policy  
-**Version:** 1.0.0  
-**Last Updated:** 2026-05-03  
+**File:** `docs/agentic_firm/strategy_lifecycle.md`
+**Document Owner:** HaruQuant Human Board / Haruperi
+**Applies To:** Research agents, strategy agents, code-generation agents, backtest agents, robustness agents, risk agents, portfolio agents, execution agents, and reporting agents
+**Status:** Governance Policy
+**Version:** 1.0.0
+**Last Updated:** 2026-05-03
 
 ---
 
@@ -1378,19 +1378,19 @@ updated_at
 
 This policy is informed by the following governance and trading-system control references:
 
-1. NIST AI Risk Management Framework — Govern, Map, Measure, and Manage functions for AI risk management.  
+1. NIST AI Risk Management Framework — Govern, Map, Measure, and Manage functions for AI risk management.
    https://www.nist.gov/itl/ai-risk-management-framework
 
-2. FINRA Artificial Intelligence in the Securities Industry — guidance that firms should assess AI tools based on their business models, use cases, supervision, books and records, and model-risk considerations.  
+2. FINRA Artificial Intelligence in the Securities Industry — guidance that firms should assess AI tools based on their business models, use cases, supervision, books and records, and model-risk considerations.
    https://www.finra.org/rules-guidance/key-topics/fintech/report/artificial-intelligence-in-the-securities-industry/key-challenges
 
-3. FIA Best Practices for Automated Trading Risk Controls — automated trading risk-control practices including pre-trade controls, post-trade controls, monitoring, and kill-switch concepts.  
+3. FIA Best Practices for Automated Trading Risk Controls — automated trading risk-control practices including pre-trade controls, post-trade controls, monitoring, and kill-switch concepts.
    https://www.fia.org/sites/default/files/2024-07/FIA_WP_AUTOMATED%20TRADING%20RISK%20CONTROLS_FINAL_0.pdf
 
-4. CFTC Pre-Trade Risk Controls — risk controls designed to prevent disruptive automated orders and accumulation of excessive order/execution/position volume.  
+4. CFTC Pre-Trade Risk Controls — risk controls designed to prevent disruptive automated orders and accumulation of excessive order/execution/position volume.
    https://www.cftc.gov/LawRegulation/FederalRegister/finalrules/2013-22185.html
 
-5. TradingAgents — multi-agent financial trading framework using specialized analysts, researchers, trader, risk management, and portfolio-style coordination.  
+5. TradingAgents — multi-agent financial trading framework using specialized analysts, researchers, trader, risk management, and portfolio-style coordination.
    https://tradingagents-ai.github.io/
 
 ---

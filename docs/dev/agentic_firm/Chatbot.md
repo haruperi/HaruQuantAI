@@ -1,8 +1,8 @@
 # HaruQuant CEO Chatbot Implementation Plan
 
-Status: canonical feature implementation plan  
-Scope: phased delivery plan for converting the HaruQuant global AI chatbot into the front door of the HaruQuant Agentic Trading Firm  
-Use this when: implementing the global chat UI, CEO Agent routing, conversation memory, page context, tool wrappers, agent orchestration, supervised actions, paper automation, prop-firm controls, and production rollout  
+Status: canonical feature implementation plan
+Scope: phased delivery plan for converting the HaruQuant global AI chatbot into the front door of the HaruQuant Agentic Trading Firm
+Use this when: implementing the global chat UI, CEO Agent routing, conversation memory, page context, tool wrappers, agent orchestration, supervised actions, paper automation, prop-firm controls, and production rollout
 Companion docs:
 
 - `docs/agentic_firm/constitution.md`
@@ -30,8 +30,8 @@ haruquant/
   tests/
 ```
 
-Owner: Product Owner and AI Platform Lead  
-Review cadence: weekly during active implementation  
+Owner: Product Owner and AI Platform Lead
+Review cadence: weekly during active implementation
 Primary interface: Global chat widget talking to the `CEOAgent`
 
 ---

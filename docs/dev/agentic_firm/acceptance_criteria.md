@@ -1,8 +1,8 @@
 # HaruQuant Agentic Trading Firm — Phase-by-Phase Acceptance Criteria
 
-**Target path:** `docs/agentic_firm/acceptance_criteria.md`  
-**System:** HaruQuant Agentic AI Trading Firm  
-**Purpose:** Define testable acceptance criteria for each implementation phase in the HaruQuant multi-agent trading firm roadmap.  
+**Target path:** `docs/agentic_firm/acceptance_criteria.md`
+**System:** HaruQuant Agentic AI Trading Firm
+**Purpose:** Define testable acceptance criteria for each implementation phase in the HaruQuant multi-agent trading firm roadmap.
 **Primary principle:** A phase is not complete because code exists. A phase is complete only when its behavior can be tested, audited, and shown to obey the Constitution, Risk Policy, Agent Permissions Policy, and Strategy Lifecycle Policy.
 
 ---
@@ -2084,4 +2084,3 @@ This acceptance criteria document is aligned with the following external control
 3. Model Context Protocol tool model — tools should expose typed schemas, clear metadata, visibility, and human approval for sensitive operations.
 4. FIA automated trading guidance — pre-trade risk controls, kill switches, post-trade analysis, system operations, and documentation.
 5. TradingAgents framework — specialized analyst, researcher, trader, risk, and portfolio-management roles working through structured collaboration.
-

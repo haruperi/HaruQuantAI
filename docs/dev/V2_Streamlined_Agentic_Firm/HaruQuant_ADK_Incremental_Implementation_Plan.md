@@ -1,8 +1,8 @@
 # HaruQuant Streamlined Agent System Implementation Plan
 
-Status: build-from-scratch implementation plan  
-Target runtime: Google ADK  
-Architecture style: agent-first, Markdown-manifest-driven, ADK-compatible, governance-aware  
+Status: build-from-scratch implementation plan
+Target runtime: Google ADK
+Architecture style: agent-first, Markdown-manifest-driven, ADK-compatible, governance-aware
 Goal: implement the new lean HaruQuant forecast trading agent system incrementally, agent by agent, with strict contracts, tests, permissions, audit, and quality gates.
 
 ---
@@ -283,12 +283,12 @@ User
 
 ### 1. AI CEO / CIO Agent
 
-**Department:** Executive & Control  
-**Package path:** `agentic/agents/executive_and_control/ai_ceo_cio_agent/`  
-**Purpose:** single user-facing executive; routes final decisions.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Executive & Control
+**Package path:** `agentic/agents/executive_and_control/ai_ceo_cio_agent/`
+**Purpose:** single user-facing executive; routes final decisions.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -502,12 +502,12 @@ This agent is complete when:
 
 ### 2. Planner Agent
 
-**Department:** Executive & Control  
-**Package path:** `agentic/agents/executive_and_control/planner_agent/`  
-**Purpose:** classifies intent and creates workflow plan.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Executive & Control
+**Package path:** `agentic/agents/executive_and_control/planner_agent/`
+**Purpose:** classifies intent and creates workflow plan.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -721,12 +721,12 @@ This agent is complete when:
 
 ### 3. Control Plane
 
-**Department:** Executive & Control  
-**Package path:** `agentic/agents/executive_and_control/control_plane/`  
-**Purpose:** deterministic policy, permissions, state, registry.  
-**Execution mode:** `deterministic`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Executive & Control
+**Package path:** `agentic/agents/executive_and_control/control_plane/`
+**Purpose:** deterministic policy, permissions, state, registry.
+**Execution mode:** `deterministic`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -961,12 +961,12 @@ Control Plane
 
 ### 4. Research Lead Agent
 
-**Department:** Research  
-**Package path:** `agentic/agents/research/research_lead_agent/`  
-**Purpose:** owns evidence pack and department handoff.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Research
+**Package path:** `agentic/agents/research/research_lead_agent/`
+**Purpose:** owns evidence pack and department handoff.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -1184,12 +1184,12 @@ This agent is complete when:
 
 ### 5. Market Intelligence Agent
 
-**Department:** Research  
-**Package path:** `agentic/agents/research/market_intelligence_agent/`  
-**Purpose:** news, calendar, sentiment, macro, seasonality.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Research
+**Package path:** `agentic/agents/research/market_intelligence_agent/`
+**Purpose:** news, calendar, sentiment, macro, seasonality.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -1407,12 +1407,12 @@ This agent is complete when:
 
 ### 6. Quant Research Agent
 
-**Department:** Research  
-**Package path:** `agentic/agents/research/quant_research_agent/`  
-**Purpose:** technical/statistical edge discovery.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Research
+**Package path:** `agentic/agents/research/quant_research_agent/`
+**Purpose:** technical/statistical edge discovery.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -1630,12 +1630,12 @@ This agent is complete when:
 
 ### 7. Research Validator Agent
 
-**Department:** Research  
-**Package path:** `agentic/agents/research/research_validator_agent/`  
-**Purpose:** sample, bias, evidence sufficiency gate.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Research
+**Package path:** `agentic/agents/research/research_validator_agent/`
+**Purpose:** sample, bias, evidence sufficiency gate.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -1872,12 +1872,12 @@ Control Plane
 
 ### 8. Strategy Lead Agent
 
-**Department:** Strategy Development  
-**Package path:** `agentic/agents/strategy_development/strategy_lead_agent/`  
-**Purpose:** owns strategy package and handoff.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Strategy Development
+**Package path:** `agentic/agents/strategy_development/strategy_lead_agent/`
+**Purpose:** owns strategy package and handoff.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -2093,12 +2093,12 @@ This agent is complete when:
 
 ### 9. Strategy Designer Agent
 
-**Department:** Strategy Development  
-**Package path:** `agentic/agents/strategy_development/strategy_designer_agent/`  
-**Purpose:** turns hypothesis into rules/spec.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Strategy Development
+**Package path:** `agentic/agents/strategy_development/strategy_designer_agent/`
+**Purpose:** turns hypothesis into rules/spec.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -2314,12 +2314,12 @@ This agent is complete when:
 
 ### 10. Strategy Engineer Agent
 
-**Department:** Strategy Development  
-**Package path:** `agentic/agents/strategy_development/strategy_engineer_agent/`  
-**Purpose:** implements code + tests.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Strategy Development
+**Package path:** `agentic/agents/strategy_development/strategy_engineer_agent/`
+**Purpose:** implements code + tests.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -2535,12 +2535,12 @@ This agent is complete when:
 
 ### 11. Strategy Reviewer Agent
 
-**Department:** Strategy Development  
-**Package path:** `agentic/agents/strategy_development/strategy_reviewer_agent/`  
-**Purpose:** reviews spec/code/risk assumptions.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Strategy Development
+**Package path:** `agentic/agents/strategy_development/strategy_reviewer_agent/`
+**Purpose:** reviews spec/code/risk assumptions.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -2756,12 +2756,12 @@ This agent is complete when:
 
 ### 12. Strategy Librarian Agent
 
-**Department:** Strategy Development  
-**Package path:** `agentic/agents/strategy_development/strategy_librarian_agent/`  
-**Purpose:** versioning, registry, storage.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Strategy Development
+**Package path:** `agentic/agents/strategy_development/strategy_librarian_agent/`
+**Purpose:** versioning, registry, storage.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -2996,12 +2996,12 @@ Control Plane
 
 ### 13. Simulation Lead Agent
 
-**Department:** Simulation & Validation  
-**Package path:** `agentic/agents/simulation_and_validation/simulation_lead_agent/`  
-**Purpose:** owns test suite and validation workflow.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Simulation & Validation
+**Package path:** `agentic/agents/simulation_and_validation/simulation_lead_agent/`
+**Purpose:** owns test suite and validation workflow.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -3217,12 +3217,12 @@ This agent is complete when:
 
 ### 14. Backtest Analyst Agent
 
-**Department:** Simulation & Validation  
-**Package path:** `agentic/agents/simulation_and_validation/backtest_analyst_agent/`  
-**Purpose:** metrics, behavior, diagnostics.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Simulation & Validation
+**Package path:** `agentic/agents/simulation_and_validation/backtest_analyst_agent/`
+**Purpose:** metrics, behavior, diagnostics.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -3438,12 +3438,12 @@ This agent is complete when:
 
 ### 15. Optimization Agent
 
-**Department:** Simulation & Validation  
-**Package path:** `agentic/agents/simulation_and_validation/optimization_agent/`  
-**Purpose:** parameter search, WFO/WFM, sensitivity.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Simulation & Validation
+**Package path:** `agentic/agents/simulation_and_validation/optimization_agent/`
+**Purpose:** parameter search, WFO/WFM, sensitivity.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -3659,12 +3659,12 @@ This agent is complete when:
 
 ### 16. Robustness Validator Agent
 
-**Department:** Simulation & Validation  
-**Package path:** `agentic/agents/simulation_and_validation/robustness_validator_agent/`  
-**Purpose:** Monte Carlo, spread/slippage/cross tests.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Simulation & Validation
+**Package path:** `agentic/agents/simulation_and_validation/robustness_validator_agent/`
+**Purpose:** Monte Carlo, spread/slippage/cross tests.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -3880,12 +3880,12 @@ This agent is complete when:
 
 ### 17. Evidence Packager Agent
 
-**Department:** Simulation & Validation  
-**Package path:** `agentic/agents/simulation_and_validation/evidence_packager_agent/`  
-**Purpose:** validation evidence package.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Simulation & Validation
+**Package path:** `agentic/agents/simulation_and_validation/evidence_packager_agent/`
+**Purpose:** validation evidence package.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -4120,12 +4120,12 @@ Control Plane
 
 ### 18. Risk Lead Agent
 
-**Department:** Risk & Portfolio  
-**Package path:** `agentic/agents/risk_and_portfolio/risk_lead_agent/`  
-**Purpose:** final risk review and risk decision package.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Risk & Portfolio
+**Package path:** `agentic/agents/risk_and_portfolio/risk_lead_agent/`
+**Purpose:** final risk review and risk decision package.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -4345,12 +4345,12 @@ This agent is complete when:
 
 ### 19. Risk Governor Agent
 
-**Department:** Risk & Portfolio  
-**Package path:** `agentic/agents/risk_and_portfolio/risk_governor_agent/`  
-**Purpose:** deterministic hard limits and gates.  
-**Execution mode:** `deterministic`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Risk & Portfolio
+**Package path:** `agentic/agents/risk_and_portfolio/risk_governor_agent/`
+**Purpose:** deterministic hard limits and gates.
+**Execution mode:** `deterministic`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -4570,12 +4570,12 @@ This agent is complete when:
 
 ### 20. Portfolio Manager Agent
 
-**Department:** Risk & Portfolio  
-**Package path:** `agentic/agents/risk_and_portfolio/portfolio_manager_agent/`  
-**Purpose:** strategy lifecycle and portfolio composition.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Risk & Portfolio
+**Package path:** `agentic/agents/risk_and_portfolio/portfolio_manager_agent/`
+**Purpose:** strategy lifecycle and portfolio composition.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -4795,12 +4795,12 @@ This agent is complete when:
 
 ### 21. Allocation Agent
 
-**Department:** Risk & Portfolio  
-**Package path:** `agentic/agents/risk_and_portfolio/allocation_agent/`  
-**Purpose:** position sizing and capital allocation.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Risk & Portfolio
+**Package path:** `agentic/agents/risk_and_portfolio/allocation_agent/`
+**Purpose:** position sizing and capital allocation.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -5020,12 +5020,12 @@ This agent is complete when:
 
 ### 22. Risk Auditor Agent
 
-**Department:** Risk & Portfolio  
-**Package path:** `agentic/agents/risk_and_portfolio/risk_auditor_agent/`  
-**Purpose:** verifies risk evidence and approvals.  
-**Execution mode:** `hybrid`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Risk & Portfolio
+**Package path:** `agentic/agents/risk_and_portfolio/risk_auditor_agent/`
+**Purpose:** verifies risk evidence and approvals.
+**Execution mode:** `hybrid`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -5264,12 +5264,12 @@ Control Plane
 
 ### 23. Execution Lead Agent
 
-**Department:** Execution  
-**Package path:** `agentic/agents/execution/execution_lead_agent/`  
-**Purpose:** coordinates approved execution workflow.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Execution
+**Package path:** `agentic/agents/execution/execution_lead_agent/`
+**Purpose:** coordinates approved execution workflow.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -5487,12 +5487,12 @@ This agent is complete when:
 
 ### 24. Execution Readiness Agent
 
-**Department:** Execution  
-**Package path:** `agentic/agents/execution/execution_readiness_agent/`  
-**Purpose:** broker/session/spread/margin readiness.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Execution
+**Package path:** `agentic/agents/execution/execution_readiness_agent/`
+**Purpose:** broker/session/spread/margin readiness.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -5710,12 +5710,12 @@ This agent is complete when:
 
 ### 25. Paper Trading Agent
 
-**Department:** Execution  
-**Package path:** `agentic/agents/execution/paper_trading_agent/`  
-**Purpose:** paper deployment and graduation report.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Execution
+**Package path:** `agentic/agents/execution/paper_trading_agent/`
+**Purpose:** paper deployment and graduation report.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -5933,12 +5933,12 @@ This agent is complete when:
 
 ### 26. Live Execution Agent
 
-**Department:** Execution  
-**Package path:** `agentic/agents/execution/live_execution_agent/`  
-**Purpose:** permissioned live actions only.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Execution
+**Package path:** `agentic/agents/execution/live_execution_agent/`
+**Purpose:** permissioned live actions only.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -6156,12 +6156,12 @@ This agent is complete when:
 
 ### 27. Kill Switch Agent
 
-**Department:** Execution  
-**Package path:** `agentic/agents/execution/kill_switch_agent/`  
-**Purpose:** deterministic safe-stop authority.  
-**Execution mode:** `deterministic`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Execution
+**Package path:** `agentic/agents/execution/kill_switch_agent/`
+**Purpose:** deterministic safe-stop authority.
+**Execution mode:** `deterministic`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -6398,12 +6398,12 @@ Control Plane
 
 ### 28. Governance Agent
 
-**Department:** Operations, Audit & Governance  
-**Package path:** `agentic/agents/operations,_audit_and_governance/governance_agent/`  
-**Purpose:** policy, approval, lifecycle authority.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Operations, Audit & Governance
+**Package path:** `agentic/agents/operations,_audit_and_governance/governance_agent/`
+**Purpose:** policy, approval, lifecycle authority.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -6621,12 +6621,12 @@ This agent is complete when:
 
 ### 29. Audit Agent
 
-**Department:** Operations, Audit & Governance  
-**Package path:** `agentic/agents/operations,_audit_and_governance/audit_agent/`  
-**Purpose:** immutable logs and traceability.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Operations, Audit & Governance
+**Package path:** `agentic/agents/operations,_audit_and_governance/audit_agent/`
+**Purpose:** immutable logs and traceability.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -6842,12 +6842,12 @@ This agent is complete when:
 
 ### 30. Performance Reporter Agent
 
-**Department:** Operations, Audit & Governance  
-**Package path:** `agentic/agents/operations,_audit_and_governance/performance_reporter_agent/`  
-**Purpose:** performance and degradation monitoring.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Operations, Audit & Governance
+**Package path:** `agentic/agents/operations,_audit_and_governance/performance_reporter_agent/`
+**Purpose:** performance and degradation monitoring.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -7063,12 +7063,12 @@ This agent is complete when:
 
 ### 31. Cost & Efficiency Agent
 
-**Department:** Operations, Audit & Governance  
-**Package path:** `agentic/agents/operations,_audit_and_governance/cost_and_efficiency_agent/`  
-**Purpose:** LLM, compute, broker, data, friction cost.  
-**Execution mode:** `hybrid`  
-**State mutation:** `write-capable through policy-gated services`  
-**Lifecycle start:** `development`  
+**Department:** Operations, Audit & Governance
+**Package path:** `agentic/agents/operations,_audit_and_governance/cost_and_efficiency_agent/`
+**Purpose:** LLM, compute, broker, data, friction cost.
+**Execution mode:** `hybrid`
+**State mutation:** `write-capable through policy-gated services`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -7303,12 +7303,12 @@ Control Plane
 
 ### 32. ADK Markdown Manifest Runtime
 
-**Department:** Shared Runtime & Capability Layer  
-**Package path:** `agentic/agents/shared_runtime_and_capability_layer/adk_markdown_manifest_runtime_agent/`  
-**Purpose:** .agent.md, .prompt.md, SKILL.md, .instructions.md.  
-**Execution mode:** `deterministic`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Shared Runtime & Capability Layer
+**Package path:** `agentic/agents/shared_runtime_and_capability_layer/adk_markdown_manifest_runtime_agent/`
+**Purpose:** .agent.md, .prompt.md, SKILL.md, .instructions.md.
+**Execution mode:** `deterministic`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -7522,12 +7522,12 @@ This agent is complete when:
 
 ### 33. Tool / Resource Registry
 
-**Department:** Shared Runtime & Capability Layer  
-**Package path:** `agentic/agents/shared_runtime_and_capability_layer/tool_resource_registry_agent/`  
-**Purpose:** typed governed capabilities.  
-**Execution mode:** `deterministic`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Shared Runtime & Capability Layer
+**Package path:** `agentic/agents/shared_runtime_and_capability_layer/tool_resource_registry_agent/`
+**Purpose:** typed governed capabilities.
+**Execution mode:** `deterministic`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -7741,12 +7741,12 @@ This agent is complete when:
 
 ### 34. Services
 
-**Department:** Shared Runtime & Capability Layer  
-**Package path:** `agentic/agents/shared_runtime_and_capability_layer/services_agent/`  
-**Purpose:** data, research, backtest, risk, execution adapters.  
-**Execution mode:** `deterministic`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Shared Runtime & Capability Layer
+**Package path:** `agentic/agents/shared_runtime_and_capability_layer/services_agent/`
+**Purpose:** data, research, backtest, risk, execution adapters.
+**Execution mode:** `deterministic`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files
@@ -7960,12 +7960,12 @@ This agent is complete when:
 
 ### 35. Observability / Evaluation
 
-**Department:** Shared Runtime & Capability Layer  
-**Package path:** `agentic/agents/shared_runtime_and_capability_layer/observability_evaluation_agent/`  
-**Purpose:** traces, audits, quality gates, tests.  
-**Execution mode:** `deterministic`  
-**State mutation:** `read-only/advisory`  
-**Lifecycle start:** `development`  
+**Department:** Shared Runtime & Capability Layer
+**Package path:** `agentic/agents/shared_runtime_and_capability_layer/observability_evaluation_agent/`
+**Purpose:** traces, audits, quality gates, tests.
+**Execution mode:** `deterministic`
+**State mutation:** `read-only/advisory`
+**Lifecycle start:** `development`
 **First target:** standalone smoke test, then department workflow test.
 
 #### Required Folders and Files

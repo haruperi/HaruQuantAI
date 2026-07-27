@@ -1,11 +1,11 @@
 # HaruQuant Agent Permissions Policy
 
-**Document path:** `docs/agentic_firm/agent_permissions.md`  
-**Document owner:** Human Board / Haruperi  
-**System:** HaruQuant Agentic Trading Firm  
-**Policy version:** 1.0.0  
-**Status:** Draft for implementation  
-**Last updated:** 2026-05-03  
+**Document path:** `docs/agentic_firm/agent_permissions.md`
+**Document owner:** Human Board / Haruperi
+**System:** HaruQuant Agentic Trading Firm
+**Policy version:** 1.0.0
+**Status:** Draft for implementation
+**Last updated:** 2026-05-03
 **Related documents:**
 
 - `docs/agentic_firm/constitution.md`

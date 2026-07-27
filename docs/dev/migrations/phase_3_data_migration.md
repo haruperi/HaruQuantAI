@@ -1,10 +1,10 @@
 # Phase 3 Data StandardResponse Migration
 
-> **Plan ID:** `DATA-001`  
-> **Document status:** Approved planning artifact; implementation not yet authorized  
-> **Prepared:** 2026-07-27  
-> **Target domain:** `app/services/data`  
-> **Migration program:** HaruQuantAI standard public-operation responses  
+> **Plan ID:** `DATA-001`
+> **Document status:** Approved planning artifact; implementation not yet authorized
+> **Prepared:** 2026-07-27
+> **Target domain:** `app/services/data`
+> **Migration program:** HaruQuantAI standard public-operation responses
 > **Intended reader:** A coding agent that may have no prior conversation context
 
 ## 1. Purpose
@@ -1602,4 +1602,3 @@ The coding agent's final report must include:
 - Documentation updated.
 - Rollback path.
 - Confirmation that no commit or push occurred unless separately authorized.
-

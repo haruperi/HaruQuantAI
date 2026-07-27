@@ -1,9 +1,9 @@
 # HaruQuant Streamlined Agent Architecture
 
-Status: proposed canonical architecture  
-Scope: new-build streamlined forecast trading agent system  
-Target runtime: Google ADK with Markdown Manifest Runtime  
-Design goal: reduce agent bloat while preserving all critical trading, research, validation, risk, execution, governance, and audit capabilities  
+Status: proposed canonical architecture
+Scope: new-build streamlined forecast trading agent system
+Target runtime: Google ADK with Markdown Manifest Runtime
+Design goal: reduce agent bloat while preserving all critical trading, research, validation, risk, execution, governance, and audit capabilities
 
 ---
 
@@ -242,11 +242,11 @@ Workflow Plan, Control Decision, Approval Packet, Audit Context
 
 #### AI CEO / CIO Agent
 
-**Purpose:** single user-facing executive; routes final decisions.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** single user-facing executive; routes final decisions.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -259,11 +259,11 @@ Workflow Plan, Control Decision, Approval Packet, Audit Context
 
 #### Planner Agent
 
-**Purpose:** classifies intent and creates workflow plan.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** classifies intent and creates workflow plan.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -276,11 +276,11 @@ Workflow Plan, Control Decision, Approval Packet, Audit Context
 
 #### Control Plane
 
-**Purpose:** deterministic policy, permissions, state, registry.  
-**Execution mode:** deterministic.  
-**Risk class:** critical.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** deterministic policy, permissions, state, registry.
+**Execution mode:** deterministic.
+**Risk class:** critical.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -314,11 +314,11 @@ Research Evidence Pack
 
 #### Research Lead Agent
 
-**Purpose:** owns evidence pack and department handoff.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** owns evidence pack and department handoff.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -331,11 +331,11 @@ Research Evidence Pack
 
 #### Market Intelligence Agent
 
-**Purpose:** news, calendar, sentiment, macro, seasonality.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** news, calendar, sentiment, macro, seasonality.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -348,11 +348,11 @@ Research Evidence Pack
 
 #### Quant Research Agent
 
-**Purpose:** technical/statistical edge discovery.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** technical/statistical edge discovery.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -365,11 +365,11 @@ Research Evidence Pack
 
 #### Research Validator Agent
 
-**Purpose:** sample, bias, evidence sufficiency gate.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** sample, bias, evidence sufficiency gate.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -403,11 +403,11 @@ Strategy Specification Package
 
 #### Strategy Lead Agent
 
-**Purpose:** owns strategy package and handoff.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** owns strategy package and handoff.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -420,11 +420,11 @@ Strategy Specification Package
 
 #### Strategy Designer Agent
 
-**Purpose:** turns hypothesis into rules/spec.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** turns hypothesis into rules/spec.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -437,11 +437,11 @@ Strategy Specification Package
 
 #### Strategy Engineer Agent
 
-**Purpose:** implements code + tests.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** implements code + tests.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -454,11 +454,11 @@ Strategy Specification Package
 
 #### Strategy Reviewer Agent
 
-**Purpose:** reviews spec/code/risk assumptions.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** reviews spec/code/risk assumptions.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -471,11 +471,11 @@ Strategy Specification Package
 
 #### Strategy Librarian Agent
 
-**Purpose:** versioning, registry, storage.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** versioning, registry, storage.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -509,11 +509,11 @@ Validation Evidence Package
 
 #### Simulation Lead Agent
 
-**Purpose:** owns test suite and validation workflow.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** owns test suite and validation workflow.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -526,11 +526,11 @@ Validation Evidence Package
 
 #### Backtest Analyst Agent
 
-**Purpose:** metrics, behavior, diagnostics.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** metrics, behavior, diagnostics.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -543,11 +543,11 @@ Validation Evidence Package
 
 #### Optimization Agent
 
-**Purpose:** parameter search, WFO/WFM, sensitivity.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** parameter search, WFO/WFM, sensitivity.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -560,11 +560,11 @@ Validation Evidence Package
 
 #### Robustness Validator Agent
 
-**Purpose:** Monte Carlo, spread/slippage/cross tests.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** Monte Carlo, spread/slippage/cross tests.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -577,11 +577,11 @@ Validation Evidence Package
 
 #### Evidence Packager Agent
 
-**Purpose:** validation evidence package.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** validation evidence package.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -615,11 +615,11 @@ Risk Decision Package
 
 #### Risk Lead Agent
 
-**Purpose:** final risk review and risk decision package.  
-**Execution mode:** hybrid.  
-**Risk class:** high.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** final risk review and risk decision package.
+**Execution mode:** hybrid.
+**Risk class:** high.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -632,11 +632,11 @@ Risk Decision Package
 
 #### Risk Governor Agent
 
-**Purpose:** deterministic hard limits and gates.  
-**Execution mode:** deterministic.  
-**Risk class:** critical.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** deterministic hard limits and gates.
+**Execution mode:** deterministic.
+**Risk class:** critical.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -649,11 +649,11 @@ Risk Decision Package
 
 #### Portfolio Manager Agent
 
-**Purpose:** strategy lifecycle and portfolio composition.  
-**Execution mode:** hybrid.  
-**Risk class:** high.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** strategy lifecycle and portfolio composition.
+**Execution mode:** hybrid.
+**Risk class:** high.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -666,11 +666,11 @@ Risk Decision Package
 
 #### Allocation Agent
 
-**Purpose:** position sizing and capital allocation.  
-**Execution mode:** hybrid.  
-**Risk class:** high.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** position sizing and capital allocation.
+**Execution mode:** hybrid.
+**Risk class:** high.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -683,11 +683,11 @@ Risk Decision Package
 
 #### Risk Auditor Agent
 
-**Purpose:** verifies risk evidence and approvals.  
-**Execution mode:** hybrid.  
-**Risk class:** high.  
-**Default state mutation:** mostly read-only/advisory until handoff.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** verifies risk evidence and approvals.
+**Execution mode:** hybrid.
+**Risk class:** high.
+**Default state mutation:** mostly read-only/advisory until handoff.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -721,11 +721,11 @@ Execution State Package
 
 #### Execution Lead Agent
 
-**Purpose:** coordinates approved execution workflow.  
-**Execution mode:** hybrid.  
-**Risk class:** high.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** coordinates approved execution workflow.
+**Execution mode:** hybrid.
+**Risk class:** high.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -738,11 +738,11 @@ Execution State Package
 
 #### Execution Readiness Agent
 
-**Purpose:** broker/session/spread/margin readiness.  
-**Execution mode:** hybrid.  
-**Risk class:** high.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** broker/session/spread/margin readiness.
+**Execution mode:** hybrid.
+**Risk class:** high.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -755,11 +755,11 @@ Execution State Package
 
 #### Paper Trading Agent
 
-**Purpose:** paper deployment and graduation report.  
-**Execution mode:** hybrid.  
-**Risk class:** high.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** paper deployment and graduation report.
+**Execution mode:** hybrid.
+**Risk class:** high.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -772,11 +772,11 @@ Execution State Package
 
 #### Live Execution Agent
 
-**Purpose:** permissioned live actions only.  
-**Execution mode:** hybrid.  
-**Risk class:** critical.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** permissioned live actions only.
+**Execution mode:** hybrid.
+**Risk class:** critical.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -789,11 +789,11 @@ Execution State Package
 
 #### Kill Switch Agent
 
-**Purpose:** deterministic safe-stop authority.  
-**Execution mode:** deterministic.  
-**Risk class:** critical.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** deterministic safe-stop authority.
+**Execution mode:** deterministic.
+**Risk class:** critical.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -827,11 +827,11 @@ Audit & Performance Package
 
 #### Governance Agent
 
-**Purpose:** policy, approval, lifecycle authority.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** policy, approval, lifecycle authority.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -844,11 +844,11 @@ Audit & Performance Package
 
 #### Audit Agent
 
-**Purpose:** immutable logs and traceability.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** immutable logs and traceability.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -861,11 +861,11 @@ Audit & Performance Package
 
 #### Performance Reporter Agent
 
-**Purpose:** performance and degradation monitoring.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** performance and degradation monitoring.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -878,11 +878,11 @@ Audit & Performance Package
 
 #### Cost & Efficiency Agent
 
-**Purpose:** LLM, compute, broker, data, friction cost.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** LLM, compute, broker, data, friction cost.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -916,11 +916,11 @@ Runtime Contracts, Tool Results, Service Results, Trace Records
 
 #### ADK Markdown Manifest Runtime
 
-**Purpose:** .agent.md, .prompt.md, SKILL.md, .instructions.md.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** .agent.md, .prompt.md, SKILL.md, .instructions.md.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -933,11 +933,11 @@ Runtime Contracts, Tool Results, Service Results, Trace Records
 
 #### Tool / Resource Registry
 
-**Purpose:** typed governed capabilities.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** typed governed capabilities.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -950,11 +950,11 @@ Runtime Contracts, Tool Results, Service Results, Trace Records
 
 #### Services
 
-**Purpose:** data, research, backtest, risk, execution adapters.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** data, research, backtest, risk, execution adapters.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**
@@ -967,11 +967,11 @@ Runtime Contracts, Tool Results, Service Results, Trace Records
 
 #### Observability / Evaluation
 
-**Purpose:** traces, audits, quality gates, tests.  
-**Execution mode:** hybrid.  
-**Risk class:** medium.  
-**Default state mutation:** write-capable with strict approvals.  
-**Primary consumers:** downstream department lead, audit layer, and workflow state manager.  
+**Purpose:** traces, audits, quality gates, tests.
+**Execution mode:** hybrid.
+**Risk class:** medium.
+**Default state mutation:** write-capable with strict approvals.
+**Primary consumers:** downstream department lead, audit layer, and workflow state manager.
 **Minimum outputs:** status, evidence references, decision/recommendation, blocked actions, assumptions, warnings, next action, audit metadata.
 
 **Must not:**

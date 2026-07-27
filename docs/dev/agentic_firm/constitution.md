@@ -1,11 +1,11 @@
 # HaruQuant Agentic Trading Firm Constitution
 
-**Document:** `constitution.md`  
-**System:** HaruQuant Multi-Agent LLM Financial Trading Firm  
-**Owner / Board Authority:** Haruperi  
-**Version:** 1.0.0  
-**Status:** Phase 1.1 Governance Baseline  
-**Last Updated:** 2026-05-03  
+**Document:** `constitution.md`
+**System:** HaruQuant Multi-Agent LLM Financial Trading Firm
+**Owner / Board Authority:** Haruperi
+**Version:** 1.0.0
+**Status:** Phase 1.1 Governance Baseline
+**Last Updated:** 2026-05-03
 
 ---
 

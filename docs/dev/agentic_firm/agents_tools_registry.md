@@ -2070,4 +2070,3 @@ That gives you the best balance between architecture discipline and actual progr
 [2]: https://modelcontextprotocol.io/specification/draft/server/tools?utm_source=chatgpt.com "Tools"
 [3]: https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html?utm_source=chatgpt.com "AI Agent Security Cheat Sheet"
 [4]: https://www.nist.gov/itl/ai-risk-management-framework?utm_source=chatgpt.com "AI Risk Management Framework | NIST"
-

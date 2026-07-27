@@ -1,13 +1,13 @@
 # HaruQuant Agentic AI Trading Firm — Standard Prop Firm Risk Policy
 
-**Document:** `risk_policy.md`  
-**Target path:** `docs/agentic_firm/risk_policy.md`  
-**Version:** 1.2.0 — Standard Prop Firm Compliance Edition  
-**Status:** Draft for Board Review  
-**Owner:** Human Board / Haruperi  
-**Applies to:** HaruQuant multi-agent research, backtesting, paper trading, prop-firm challenge simulation, funded-account simulation, and future live/prop-firm trading workflows  
-**Effective date:** 2026-05-03  
-**Primary profile:** Standard Prop Firm Compliance Profile  
+**Document:** `risk_policy.md`
+**Target path:** `docs/agentic_firm/risk_policy.md`
+**Version:** 1.2.0 — Standard Prop Firm Compliance Edition
+**Status:** Draft for Board Review
+**Owner:** Human Board / Haruperi
+**Applies to:** HaruQuant multi-agent research, backtesting, paper trading, prop-firm challenge simulation, funded-account simulation, and future live/prop-firm trading workflows
+**Effective date:** 2026-05-03
+**Primary profile:** Standard Prop Firm Compliance Profile
 
 ---
 

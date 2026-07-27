@@ -1,12 +1,12 @@
 # HaruQuant Streamlined Agent Constitution
 
-**Document:** `constitution.md`  
-**Recommended path:** `docs/agentic_firm/constitution.md`  
-**Owner / Board Authority:** Haruperi  
-**System:** HaruQuant Streamlined Agentic Trading System  
-**Version:** 2.0.0  
-**Status:** Streamlined Governance Baseline  
-**Last Updated:** 2026-05-24  
+**Document:** `constitution.md`
+**Recommended path:** `docs/agentic_firm/constitution.md`
+**Owner / Board Authority:** Haruperi
+**System:** HaruQuant Streamlined Agentic Trading System
+**Version:** 2.0.0
+**Status:** Streamlined Governance Baseline
+**Last Updated:** 2026-05-24
 
 ---
 
