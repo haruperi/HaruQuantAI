@@ -328,3 +328,12 @@ def redact_mapping_value(
         tuple(sorted(set(redacted_paths))),
         tuple(sorted(set(truncated_paths))),
     )
+
+
+def get_default_redaction_policy() -> RedactionPolicy:
+    """Return the default immutable RedactionPolicy instance.
+
+    Returns:
+        The default RedactionPolicy instance.
+    """
+    return RedactionPolicy()

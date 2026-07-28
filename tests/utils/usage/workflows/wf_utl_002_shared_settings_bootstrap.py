@@ -38,6 +38,12 @@ def main() -> None:
     original_environment = dict(environment)
     settings = load_settings(explicit, environment)
     print("Loaded precedence:", settings.environment, settings.runtime_profile)
+    print("\n--- Active Application Configuration ---")
+    print(f"Loaded Config Environment : {settings.environment}")
+    print(f"Runtime Profile           : {settings.runtime_profile}")
+    print(f"Log Level                 : {settings.logging.level}")
+    print(f"Log Render Format         : {settings.logging.render}")
+    print(f"Log Directory             : {settings.logging.log_directory}")
 
     # Stage 2 — Validate supported deployment and runtime settings.
     _stage(2)

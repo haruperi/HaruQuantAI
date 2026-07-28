@@ -7,10 +7,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
-    COMMON_ERROR_CATALOG,
     ErrorDefinition,
     HaruQuantError,
     ValidationError,
+    get_common_error_catalog,
     get_error_metadata,
     map_exception,
     normalize_error_code,
@@ -77,7 +77,7 @@ def fr_utils_048_error_catalogues() -> None:
     )
     validated = validate_error_catalog({example.code: example})
     assert require_error_definition(example.code, validated) is example
-    print("Common error count:", len(COMMON_ERROR_CATALOG))
+    print("Common error count:", len(get_common_error_catalog()))
 
 
 def main() -> None:

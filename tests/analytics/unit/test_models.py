@@ -1,6 +1,5 @@
 """Unit tests for immutable Analytics contracts."""
 
-# ruff: noqa: INP001
 from datetime import UTC, datetime
 from decimal import Decimal
 

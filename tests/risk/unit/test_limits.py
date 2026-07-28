@@ -9,13 +9,21 @@ from app.services.data import (
     MarketContextEvidence,
     populate_market_context_calendar,
 )
-from app.services.risk.config import RiskConfig, compute_config_hash
+from app.services.risk.config import (
+    DrawdownMode,
+    LossReferenceBasis,
+    RiskConfig,
+    compute_config_hash,
+)
 from app.services.risk.contracts import LimitStatus, PortfolioRiskSnapshot
 from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.limits import (
     evaluate_market_context,
     evaluate_portfolio_limits,
+    evaluate_single_day_profit_share,
 )
+
+from tests.risk.unit.test_mandate import _mandate
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
@@ -237,6 +245,91 @@ def test_calendar_limit_consumes_data_derived_event_and_open_evidence() -> None:
     )
     assert open_evidence.calendar_state == "open"
     assert opened[2].status is LimitStatus.PASS
+
+
+def test_each_drawdown_mode_produces_distinct_floor() -> None:
+    """Report absolute headroom from each configured drawdown reference."""
+    config = _config()
+    snapshot = _snapshot(config).model_copy(
+        update={
+            "equity": Decimal(950),
+            "initial_balance": Decimal(1000),
+            "peak_equity": Decimal(1300),
+            "highest_eod_balance": Decimal(1200),
+        }
+    )
+    headrooms: list[Decimal | None] = []
+    for mode, extra in (
+        (DrawdownMode.STATIC, {"drawdown_trails_on_unrealised": False}),
+        (
+            DrawdownMode.TRAILING_EOD,
+            {
+                "drawdown_eod_snapshot_time": "23:59",
+                "drawdown_eod_snapshot_timezone": "UTC",
+            },
+        ),
+        (DrawdownMode.TRAILING_INTRADAY, {}),
+    ):
+        mode_config = config.model_copy(update={"drawdown_mode": mode, **extra})
+        mode_snapshot = snapshot.model_copy(
+            update={
+                "config_hash": unwrap_risk_response(
+                    compute_config_hash(mode_config), operation="compute_config_hash"
+                )
+            }
+        )
+        results = unwrap_risk_response(
+            evaluate_portfolio_limits(mode_snapshot, mode_config, now=NOW),
+            operation="evaluate_portfolio_limits",
+        )
+        headrooms.append(results[4].headroom_value)
+    assert len(set(headrooms)) == 3
+
+
+def test_initial_balance_basis_differs_from_day_start() -> None:
+    """Use fixed initial balance rather than embedded day-start equity."""
+    config = _config().model_copy(
+        update={"daily_loss_basis": LossReferenceBasis.INITIAL_BALANCE}
+    )
+    snapshot = _snapshot(config).model_copy(
+        update={
+            "equity": Decimal(1000),
+            "initial_balance": Decimal(2000),
+            "daily_loss": Decimal(60),
+        }
+    )
+    snapshot = snapshot.model_copy(
+        update={
+            "config_hash": unwrap_risk_response(
+                compute_config_hash(config), operation="compute_config_hash"
+            )
+        }
+    )
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(snapshot, config, now=NOW),
+        operation="evaluate_portfolio_limits",
+    )
+    assert results[2].reference_basis == "initial_balance"
+    assert results[2].headroom_value == Decimal(40)
+
+
+def test_projected_day_share_constrains_before_settlement() -> None:
+    """Constrain a proposal whose best case breaches the share rule."""
+    mandate = _mandate()
+    config = _config()
+    snapshot = _snapshot(config).model_copy(
+        update={
+            "cumulative_profit": Decimal(300),
+            "current_day_profit": Decimal(50),
+            "proposal_best_case_profit": Decimal(300),
+        }
+    )
+    result = unwrap_risk_response(
+        evaluate_single_day_profit_share(snapshot, mandate, now=NOW),
+        operation="evaluate_single_day_profit_share",
+    )
+    assert result.status is LimitStatus.FAIL
+    assert result.reference_basis == "cumulative_profit_projection"
 
 
 def test_portfolio_limits_require_freshness_configuration() -> None:

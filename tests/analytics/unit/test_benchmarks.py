@@ -1,6 +1,5 @@
 """Unit tests for Analytics benchmark evidence."""
 
-# ruff: noqa: INP001
 import json
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -15,6 +14,7 @@ from app.services.analytics.metrics.benchmarks import (
 )
 from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
 from app.utils import generate_id, logger
+
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)

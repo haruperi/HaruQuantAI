@@ -1,7 +1,5 @@
 """Verify Analytics workflow registry and standalone usage-program parity."""
 
-# ruff: noqa: INP001
-
 from __future__ import annotations
 
 import ast

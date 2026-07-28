@@ -1,10 +1,10 @@
 """Bounded reference performance evidence for Analytics reporting."""
 
-# ruff: noqa: INP001
 import time
 import tracemalloc
 
 from app.utils import logger
+
 from tests.analytics._support import _report
 
 _MAX_REFERENCE_SECONDS = 5.0

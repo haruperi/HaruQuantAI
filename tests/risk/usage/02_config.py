@@ -3,14 +3,24 @@
 Demonstrates RiskConfig validation, file loading, and canonical config hash calculation.
 """
 
+import hashlib
 import sys
+import tempfile
 from decimal import Decimal
 from pathlib import Path
+
+import yaml
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.risk import RiskConfig, compute_config_hash
+from app.services.risk import (
+    DrawdownMode,
+    FirmMandate,
+    RiskConfig,
+    compute_config_hash,
+    load_firm_mandate,
+)
 
 from tests.risk._support import unwrap_risk_response
 
@@ -96,9 +106,91 @@ def fr_risk_024() -> None:
     _demonstrate_once()
 
 
+def _mandate(*, verified: bool = True, digest: str = "a" * 64) -> FirmMandate:
+    """Build a bounded mandate usage fixture."""
+    return FirmMandate(
+        account_id="usage-account",
+        mandate_version="2026.07.28-01",
+        firm="Example Firm",
+        model="fx_cfd",
+        phase="funded",
+        initial_balance=Decimal(10000),
+        currency="USD",
+        terms_url="https://example.invalid/terms",
+        terms_accessed="2026-07-28",
+        terms_source_hash=digest,
+        verified=verified,
+        profit_target={"type": "percent_of_initial", "value": Decimal("0.1")},
+        daily_loss={
+            "basis": "initial_balance",
+            "value": Decimal("0.05"),
+            "includes_unrealised": True,
+            "reset_time": "00:00",
+            "reset_tz": "UTC",
+        },
+        max_drawdown={
+            "mode": "static",
+            "basis": "initial_balance",
+            "value": Decimal("0.1"),
+            "trails_on_unrealised": False,
+            "trail_stops_at_initial": False,
+        },
+    )
+
+
+def fr_risk_063() -> None:
+    """FR-RISK-063: Demonstrate an immutable mandate record."""
+    _header("FR-RISK-063: Immutable per-account firm mandate record")
+    mandate = _mandate()
+    print(f"Mandate account/version: {mandate.account_id}/{mandate.mandate_version}")
+    print(f"Terms hash present: {bool(mandate.terms_source_hash)}")
+
+
+def fr_risk_064() -> None:
+    """FR-RISK-064: Demonstrate archived terms verification and fail-closed load."""
+    _header("FR-RISK-064: Verified mandate loading")
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        terms = b"bounded archived terms"
+        digest = hashlib.sha256(terms).hexdigest()
+        (root / "usage-account.terms").write_bytes(terms)
+        (root / "usage-account.yaml").write_text(
+            yaml.safe_dump(_mandate(digest=digest).model_dump(mode="json")),
+            encoding="utf-8",
+        )
+        loaded = unwrap_risk_response(
+            load_firm_mandate("usage-account", root), operation="load_firm_mandate"
+        )
+        print(f"Verified mandate loaded: {loaded.verified}")
+
+
+def fr_risk_065() -> None:
+    """FR-RISK-065: Demonstrate explicit drawdown mode configuration."""
+    _header("FR-RISK-065: Explicit drawdown mode configuration")
+    config = RiskConfig.model_validate(
+        {
+            **_values(),
+            "drawdown_mode": DrawdownMode.TRAILING_EOD,
+            "drawdown_eod_snapshot_time": "23:59",
+            "drawdown_eod_snapshot_timezone": "UTC",
+        }
+    )
+    print(
+        f"Drawdown mode: {config.drawdown_mode}; snapshot: "
+        f"{config.drawdown_eod_snapshot_time} {config.drawdown_eod_snapshot_timezone}"
+    )
+
+
 def main() -> None:
     """Run every functional-requirement demonstration for Risk configuration."""
-    for demonstrate in (fr_risk_022, fr_risk_023, fr_risk_024):
+    for demonstrate in (
+        fr_risk_022,
+        fr_risk_023,
+        fr_risk_024,
+        fr_risk_063,
+        fr_risk_064,
+        fr_risk_065,
+    ):
         demonstrate()
 
 

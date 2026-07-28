@@ -1,6 +1,5 @@
 """Unit tests for deterministic Analytics metric composition."""
 
-# ruff: noqa: INP001
 import json
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -14,6 +13,7 @@ from app.services.analytics.contracts.catalogs import METRIC_DEFINITION_CATALOG
 from app.services.analytics.contracts.evidence import to_report_json_safe
 from app.services.analytics.metrics.groups import calculate_grouped_evidence
 from app.utils import logger
+
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 _GOLDEN_DIRECTORY = Path("tests/analytics/fixtures/golden")

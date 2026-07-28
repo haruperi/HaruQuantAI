@@ -126,6 +126,7 @@ flowchart TD
     SYSTEM --> OPT[[Optimization]]
     SYSTEM --> RES[[Research]]
     SYSTEM --> PORT[[Portfolio]]
+    SYSTEM --> AGENTIC[[Agentic]]
     SYSTEM --> UIAPI[[UI/API]]
 
     UTILS --> UTILS_CAP[Provide shared business-neutral infrastructure]
@@ -140,6 +141,7 @@ flowchart TD
     OPT --> OPT_CAP[Search and validate strategy parameters]
     RES --> RES_CAP[Produce advisory insights from data]
     PORT --> PORT_CAP[Construct and govern multi-strategy portfolios]
+    AGENTIC --> AGENTIC_CAP[Operate a governed multi-agent research and proposal firm]
     UIAPI --> UIAPI_CAP[Expose the system to users and clients]
 ```
 
@@ -179,14 +181,14 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 #### 2.1.3 Data
 
 * **Package**: `app/services/data`
-* **Responsibility**: Acquire, normalize, store, and serve trusted market data and read-only broker/account state. All of Data's broker/provider access is read-only and flows through the Brokers domain's canonical `BrokerAdapter` (read capability traits).
-* **Inputs**: Package-root retrieval arguments or typed Data requests, Broker/provider reads via Brokers' `BrokerAdapter`, historical files, externally produced CSV/Parquet artifacts admitted by explicit audited import, backfill commands.
-* **Outputs**: Normalized bars/ticks (`MarketDataset`), account/broker state snapshots (`AccountStateSnapshot`), storage state, and explicitly requested detached analytical OHLCV/spread or tick DataFrame projections.
+* **Responsibility**: Acquire, normalize, store, and serve trusted market data, read-only broker/account state, and governed point-in-time research-source documents. All broker/provider access is read-only and flows through the Brokers domain's canonical read capabilities.
+* **Inputs**: Package-root retrieval arguments or typed Data requests, Broker/provider reads, historical files, admitted CSV/Parquet artifacts, backfill commands, and licensed filing/transcript/macro/news/approved alternative source records.
+* **Outputs**: Normalized bars/ticks (`MarketDataset`), account/broker state snapshots (`AccountStateSnapshot`), storage state, detached analytical projections, and the future `ResearchSourceDocument`/query evidence family.
 * **Owns**: Historical market and account data storage/persistence, durable audit storage, shared database infrastructure, connections, locking, SQLite migration execution framework, real-time feed handling, data-source selection and cross-provider fallback policy, every provider/cross-provider alias mapping plus canonical and friendly market identity, conversion of those identities to exact provider-native symbols before a Brokers call, normalization of raw broker/provider reads into `MarketDataset` / `AccountStateSnapshot`, multi-timeframe alignment, deterministic series-level market-data quality inspection producing scored issue, severity, and remediation evidence, and deterministic tick-series derivation from real bar or tick evidence under approved tick and spread models (distinct from GBM synthetic generation, which is fixtures-only and never reaches an official simulation run).
 * **Boundaries**: Foundation layer with no trading decision logic. Brokers continues to own provider adapter implementations and connection/session mechanics. Data's package-root retrieval facade may privately and lazily compose a read-only adapter through the Brokers factory from Utils-loaded settings; manual adapter/source injection remains supported. Data does not expose that composition, invoke broker mutations, own strategy logic, backtest engines, sizing formulas, order dispatch, or other domains' tables, artifact schemas, and migration definitions (each domain owns its tables, artifact schemas, and migration definitions, utilizing the shared execution framework). Raw provider DataFrames, sockets, DB sessions, credentials, adapters, and provider SDK objects never cross its boundary. Data may explicitly project canonical bar or tick `MarketDataset` evidence into detached analytical DataFrames whose exact columns, missingness, units, and precision-loss boundaries are fixed in the Data README; the canonical dataset remains authoritative evidence.
 * **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers. Quality evidence attached to a `MarketDataset` must be computed from the actual records; a constant or unexamined quality score is never emitted.
 * **Market-time authority**: Data owns broker-independent market-hour evaluation. Brokers supplies provider-authored symbol sessions (including cTrader weekly intervals and holidays); exchange-traded instruments require an explicit exchange calendar identifier; providers without a session API may use only an explicit revisioned weekly definition. Named Sydney/Tokyo/London/New York sessions are analytical liquidity labels and never establish tradability or order authority.
-* **Module structure**: `CAP-DATA-028` is complete with fifteen focused capability folders: `contracts/`, `market_data/`, `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`, `quality/`, `transformation/`, `time_sessions/`, `sources/`, `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, and `audit/`. Each registered capability owns exactly one folder and one standalone usage program. Historical labeling remains owned by Research and has no Data implementation.
+* **Module structure**: The existing fifteen focused capabilities are complete. `FEAT-DATA-16` adds the documented but `Missing` `research_sources/` capability required for point-in-time fundamental and sentiment evidence. Each registered capability owns exactly one folder and one standalone usage program. Historical interpretation remains owned by Research/Agentic.
 * **Documentation**: `app/services/data/README.md`
 
 #### 2.1.4 Indicators
@@ -203,10 +205,10 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 #### 2.1.5 Strategy
 
 * **Package**: `app/services/strategy`
-* **Responsibility**: Turn market state and indicator values into canonical trading signals and trade intents when invoked by an approved runtime workflow.
-* **Inputs**: Normalized datasets, indicator series, strategy parameters, lifecycle commands, `AccountStateSnapshot` from Data.
-* **Outputs**: Utils `StandardResponse[T]` values carrying canonical signals, `TradeIntent` proposals, diagnostics, and `StrategyMutationResult` business outcomes directly in `data`.
-* **Owns**: Strategy registry and versioning, parameter schemas, strategy state checkpoints, deterministic strategy evaluation, and signal/intent generation.
+* **Responsibility**: Turn market state and indicator values into canonical trading signals and trade intents when invoked by an approved runtime workflow, including deterministic evaluation of untrusted external research proposals.
+* **Inputs**: Normalized datasets, indicator series, strategy parameters, lifecycle commands, `AccountStateSnapshot`, and future receiver-owned `StrategyProposalEvaluationRequest`.
+* **Outputs**: Utils `StandardResponse[T]` values carrying canonical signals, `TradeIntent` proposals, diagnostics, mutation outcomes, and future `StrategyProposalEvaluationResult`.
+* **Owns**: Strategy registry and versioning, parameter schemas, strategy state checkpoints, deterministic strategy evaluation, signal/intent generation, and the receiver-owned external-proposal evaluation boundary.
 * **Boundaries**: Emits proposals (which may include sizing proposals), never broker orders. Does not own live/paper runtime orchestration, risk enforcement, final position sizing approval (Risk owns the final approved size), order routing, official fills, or data normalization.
 * **Key Limits**: Neutral signals emit no action; lookahead or clock-drift violations fail the batch atomically; account/broker state access is read-only `AccountStateSnapshot` from Data.
 * **Documentation**: `app/services/strategy/README.md`
@@ -269,10 +271,10 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 #### 2.1.11 Research
 
 * **Package**: `app/services/research`
-* **Responsibility**: Provide a sandboxed, leakage-gated environment for data exploration and hypothesis evaluation, producing advisory reports only.
-* **Inputs**: Datasets from Data, consumes Analytics public metric contracts.
-* **Outputs**: Advisory `ResearchReport`s, insights, feature definitions, hypothesis evaluations.
-* **Owns**: Research artifacts persistence, its own tables, schemas, and migration definitions, sandboxed analysis, feature engineering operations, deterministic historical labeling, leakage/bias validation, null-model and edge-discovery operations, statistical sign-off (bootstrapping/FDR).
+* **Responsibility**: Provide a sandboxed, leakage-gated environment for data exploration and hypothesis evaluation, producing advisory reports and deterministic source-evidence projections only.
+* **Inputs**: Datasets and future point-in-time `ResearchSourceDocument` evidence from Data; Analytics public metric contracts.
+* **Outputs**: Advisory `ResearchReport`s, insights, feature definitions, hypothesis evaluations, and future `FundamentalSourceEvidence`/`SentimentSourceEvidence`.
+* **Owns**: Research artifact persistence, its own tables/schemas/migrations, sandboxed analysis, feature engineering, deterministic historical labeling, leakage/bias validation, null models, edge discovery, statistical sign-off, and deterministic fundamental/sentiment source-evidence preparation.
 * **Boundaries**: Read-only toward live systems. Does not own live mutations, risk decisions, strategy promotion, or roadmap/code selection. Advisory only.
 * **Key Limits**: Non-deterministic routines require seed injection and output logs; persisted artifacts store SHA-256 config hashes; implicit/hidden data filling or dropping is forbidden (`CleaningConfig` explicit).
 * **Documentation**: `app/services/research/README.md`
@@ -288,7 +290,19 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Key Limits**: No hidden numeric defaults; portfolio size, weight caps, evidence freshness, drift thresholds, schedules, and decision expiry are required profile values. Missing/stale evidence fails closed. Live/paper activation requires authenticated human approval plus Risk authorization.
 * **Documentation**: `app/services/portfolio/README.md`
 
-#### 2.1.13 UI/API
+#### 2.1.13 Agentic
+
+* **Package**: `app/agentic`
+* **Responsibility**: Operate a governed multi-agent trading firm whose specialized leadership, fundamental, sentiment, technical, quantitative, research, trader, experimentation, engineering, portfolio, risk-advisory, and operations roles dynamically collaborate to research, challenge, simulate, optimize, code, explain, and propose decisions.
+* **Inputs**: Authenticated operator objectives; point-in-time Data evidence; Indicators, Research, Analytics, Simulation, Optimization, Strategy, Portfolio, Risk, and account-state public evidence; human-authored code specifications; receiver decisions and receipts.
+* **Outputs**: Typed `AgentResult[T]`, evidence packs, `DeliberationRecord`, `Hypothesis`, `StrategyThesis`, `ExperimentSpec`, `SweepPlan`/`SweepVerdict`, staged `CodeArtifact`, `PromotionEvidencePacket`, `AllocationProposal`, `RiskAdvisory`, and `TradeProposal`.
+* **Owns**: Agentic contracts and provenance; firm mandate and role registry; Google ADK composition behind provider-neutral adapters; durable workflow state; dynamic bounded deliberation; Agentic tool permissions; evidence context and memory; specialized capabilities; sandboxed code generation; Agentic evaluation, promotion evidence, lifecycle, observability, incidents, replay, and public operations.
+* **Boundaries**: Agentic may submit an untrusted typed proposal into a receiver's normal public intake. It owns no source acquisition, canonical market fact, deterministic indicator or metric, strategy registration decision, portfolio activation, risk approval, order construction, trading state, execution, broker credential, broker mutation, kill-switch authority, or human authentication. Every consequential proposal passes through the complete deterministic Strategy, Portfolio, Risk, Trading, and Brokers pipeline applicable to that action.
+* **Key Limits**: Deny by default; no direct Brokers dependency; no self-approval or mandate override; no model-selected permission or limit; generated code is never hot-loaded; discussion is bounded and preserves dissent; data-dependent roles refuse without governed point-in-time evidence; disabling Agentic leaves deterministic safety and already-approved trading behaviour available.
+* **Status**: `Missing`. The complete target is documented before implementation begins.
+* **Documentation**: `app/agentic/README.md`
+
+#### 2.1.14 UI/API
 
 * **Package**: `app/services/api` (FastAPI gateway) + `ui/` (Next.js frontend) — one logical domain implemented by two deployable packages.
 * **Responsibility**: Expose the system to users and clients through authenticated HTTP/WebSocket interfaces and frontend views, delegating logic to selected public domain APIs including Portfolio.
@@ -331,6 +345,7 @@ flowchart LR
     OPT[[Optimization]]
     RES[[Research]]
     PORT[[Portfolio]]
+    AGENTIC[[Agentic]]
     UIAPI[[UI/API]]
 
     UTILS --> BROKER
@@ -365,6 +380,17 @@ flowchart LR
     TRADE --> PORT
     SIM --> PORT
     ANA --> PORT
+    DATA --> AGENTIC
+    IND --> AGENTIC
+    STRAT --> AGENTIC
+    RISK --> AGENTIC
+    TRADE --> AGENTIC
+    SIM --> AGENTIC
+    ANA --> AGENTIC
+    OPT --> AGENTIC
+    RES --> AGENTIC
+    PORT --> AGENTIC
+    AGENTIC --> UIAPI
     ANA --> UIAPI
     OPT --> UIAPI
     RES --> UIAPI
@@ -391,6 +417,7 @@ Utils is required by every domain; only the Utils → Brokers edge is drawn to k
 - **Optimization** consumes Data, Strategy, Simulation, and Analytics to drive bounded search and scoring. **Research** consumes Data and Analytics public metric contracts.
 - **Portfolio** consumes Data, Strategy, Risk, Trading, Simulation, and Analytics contracts to construct and activate multi-strategy allocations after Risk activates the authoritative risk-budget projection. Risk/Trading/Simulation receive only their own receiver-owned request contracts, so none imports Portfolio and no cycle is introduced.
 - **Optimization, Research, and Portfolio** share the highest computational level once their individual prerequisites are stable.
+- **Agentic** consumes public evidence and request/result contracts from Data, Indicators, Strategy, Risk, Trading, Simulation, Analytics, Optimization, Research, and Portfolio. It may submit typed receiver-owned requests through their public APIs, but it has no Brokers dependency and receives no privileged execution route. Read and proposal edges do not transfer authority: deterministic receivers validate and decide in full.
 - **UI/API** is the highest-dependency domain: it presents and delegates to selected public domain APIs (including Portfolio) and owns nothing computational.
 
 No circular dependencies exist. Simulation and Analytics may be implemented concurrently: Simulation imports no Analytics code, and Analytics consumes its receiver-owned ledger mapping rather than Simulation implementation types. The sequencing edge `Simulation FR-SIM-033 → Analytics reports/allocation.py` is an integration-order constraint, not a package dependency cycle.
@@ -408,12 +435,18 @@ No circular dependencies exist. Simulation and Analytics may be implemented conc
 8. Simulation
 9. Analytics
 10. Optimization, Research, and Portfolio (same level once individual prerequisites are stable)
-11. UI/API
+11. Agentic
+12. UI/API
 ```
 
 ### Eventual implementation order
 
 Same as the documentation order. Optimization, Research, and Portfolio may be implemented in parallel once their declared prerequisites are stable. UI/API is implemented last, thin slices earlier if operator visibility is needed.
+
+Agentic is implemented only after its complete end-state documentation and all
+required deterministic seams are approved. Its code follows the canonical
+`FEAT-AGT-01`–`22` registry. It remains last among computational domains because its
+value and safety depend on the public evidence and enforcement contracts beneath it.
 
 ---
 
@@ -447,6 +480,10 @@ documents its own boundary; implicit Utils use does not create a business-workfl
 | Completed | `SYS-WF-006` | Strategy operational eligibility             | Registered strategy eligibility request   | `Strategy/Data → UI/API/Portfolio → Risk → Portfolio/Trading/UI/API`                             | Versioned route/profile eligibility decision                                                                | `tests/system/integration/test_strategy_eligibility.py` |
 | Completed | `SYS-WF-007` | Portfolio construction and activation        | Portfolio construction request            | `UI/API → Data/Strategy/Analytics → Portfolio → Simulation → Risk → Portfolio`                 | Risk-approved active portfolio allocation                                                                   | `tests/system/integration/test_portfolio_activation.py` |
 | Completed | `SYS-WF-008` | Governed portfolio rebalance                 | Drift or scheduled rebalance trigger      | `Data → Portfolio → Risk → Trading → Brokers → Analytics`                                      | Approved reduce-only rebalance reconciled and measured                                                      | `tests/system/integration/test_portfolio_rebalance.py`  |
+| Missing | `SYS-WF-009` | Agentic firm research council | Operator research or analysis request | `Data/Indicators/Research/Analytics/Simulation/Optimization → Agentic → UI/API` | `DeliberationRecord` and typed research output, or `insufficient_evidence` | `tests/system/integration/test_agentic_research_council.py` |
+| Missing | `SYS-WF-010` | Agent-authored artefact promotion | Human-approved code specification | `Agentic (sandbox) → Simulation/Optimization → Agentic → UI/API (human sign-off) → Strategy/Indicators` | Signed `PromotionEvidencePacket v1` accepted by the receiver, or terminal `research_only` | `tests/system/integration/test_agentic_promotion.py` |
+| Missing | `SYS-WF-011` | Agentic portfolio and risk council | Operator or scheduled advisory request | `Data/Analytics/Portfolio/Risk → Agentic → Portfolio/Risk/UI/API` | Non-binding `AllocationProposal` and `RiskAdvisory`; deterministic receiver decision remains authoritative | `tests/system/integration/test_agentic_advisory.py` |
+| Missing | `SYS-WF-012` | Agentic trade proposal to deterministic pipeline | Approved Agentic thesis workflow | `Agentic → Strategy/Portfolio → Risk → Trading → Brokers` | Receiver rejection/expiry or normal deterministic execution and reconciliation; Agentic receives a proposal receipt, never a fill claim | `tests/system/integration/test_agentic_trade_proposal.py` |
 
 ---
 
@@ -804,14 +841,121 @@ whose authorized principal differs from the commanding `AuthContext`.
 
 ---
 
+### `SYS-WF-009` — Agentic Firm Research Council
+
+**Trigger:** Authenticated operator research or analysis request.
+**Domains:** `Data/Indicators/Research/Analytics/Simulation/Optimization → Agentic → UI/API`
+
+1. Agentic validates the mandate, role/data readiness, identity, budgets, and task
+   idempotency before persisting the initial checkpoint.
+2. The deterministic planner selects evaluated roles and a bounded Google ADK
+   workflow graph.
+3. Relevant analysts produce independent point-in-time evidence briefs.
+4. Proposer, challengers, and deterministic tools create claims, counterclaims,
+   rebuttals, and evidence.
+5. The synthesizer preserves supported conclusions, uncertainty, and dissent in a
+   versioned `DeliberationRecord`.
+6. UI/API presents the record and typed research output.
+
+**Failure behaviour:**
+
+- Missing or ineligible data, policy denial, unresolved material conflict, deadline,
+  budget, or schema failure produces `refused` or `insufficient_evidence`.
+- Provider/tool failure follows bounded retry and checkpoint recovery.
+- Agentic unavailable rejects new Agentic work without weakening deterministic
+  safety controls.
+
+**Integration test:** `tests/system/integration/test_agentic_research_council.py`
+
+---
+
+### `SYS-WF-010` — Agent-Authored Artefact Promotion
+
+**Trigger:** Human-approved code specification.
+**Domains:** `Agentic (sandbox) → Simulation → Agentic (promotion) → UI/API (human sign-off) → Strategy/Indicators`
+
+1. Agentic generates a `CodeArtifact` in an isolated sandbox with no network route and no credential access, writing only to the staging registry.
+2. Agentic runs the ordered promotion gates: static analysis, purity and property tests, timestamp causality, temporal non-interference, frozen reference replay, mutation testing.
+3. Simulation performs constrained evaluation and walk-forward validation under the target risk profile.
+4. Agentic checks the lifetime search budget and out-of-sample consumption register.
+5. The Robustness Critic produces a critique memo; Agentic assembles the evidence packet.
+6. UI/API presents the artefact for human code review and signature.
+7. On signature, the signed `PromotionEvidencePacket v1` is handed to Strategy or Indicators for registration.
+
+**Failure behaviour:**
+
+- Mechanical gate failure → bounded repair loop; counts against the search budget.
+- **Leakage, search-budget or holdout-reuse failure → terminal `research_only`, no repair loop.**
+- Incomplete evidence packet → `research_only`.
+- Absent human signature → no handoff occurs.
+- Generated code is never hot-loaded; registration is a deliberate release event.
+
+**Integration test:** `tests/system/integration/test_agentic_promotion.py`
+
+---
+
+### `SYS-WF-011` — Agentic Portfolio and Risk Council
+
+**Trigger:** Authenticated operator or scheduled advisory request.
+**Domains:** `Data/Analytics/Portfolio/Risk → Agentic → Portfolio/Risk/UI/API`
+
+1. Agentic retrieves current immutable allocation, analytics, account, mandate, and
+   deterministic Risk evidence.
+2. Portfolio, risk, compliance, and adversarial roles independently assess the
+   evidence and preserve dissent.
+3. Agentic emits a non-binding `AllocationProposal` and `RiskAdvisory`.
+4. Portfolio and Risk validate any submitted receiver-owned request using their
+   complete normal controls.
+
+**Failure behaviour:** Missing, stale, incompatible, unauthorized, or out-of-scope
+evidence refuses the council or receiver request. Agentic cannot approve, activate,
+size, or bypass a rejection.
+
+**Integration test:** `tests/system/integration/test_agentic_advisory.py`
+
+---
+
+### `SYS-WF-012` — Agentic Trade Proposal to Deterministic Pipeline
+
+**Trigger:** An approved Agentic thesis workflow is authorized to submit a proposal.
+**Domains:** `Agentic → Strategy/Portfolio → Risk → Trading → Brokers`
+
+1. Agentic emits `TradeProposal v1` with evidence, uncertainty, horizon,
+   invalidation, requested evaluation scope, and expiry but no broker-native fields.
+2. The receiver treats it as untrusted input and runs normal Strategy and Portfolio
+   validation.
+3. Risk performs authoritative mandate, eligibility, limit, and action-policy
+   evaluation.
+4. Only an authenticated Trading request that passes every deterministic gate can
+   reach Brokers.
+5. Agentic receives a `TradeProposalReceipt`; execution truth remains owned by
+   Trading/Brokers.
+
+**Failure behaviour:** Rejection, expiry, kill switch, unavailable Risk/Trading,
+idempotency conflict, or failed readiness prevents progression. Agentic never
+represents a proposal receipt as an order or fill.
+
+**Integration test:** `tests/system/integration/test_agentic_trade_proposal.py`
+
+---
+
 ## 5. System Interfaces and Contracts
 
 Document only contracts crossing domain or external-system boundaries.
 
 | Status    | Contract / Event                           | Version | Contract owner   | Producer / Submitter                                                                     | Consumer                                                                                                                                                                         | Purpose                                                                                                                                                                                                                                                               | Core schema / type                                                                                                                                                                                                                                                                 | Failure behaviour                                                                                                                                                                             |
 | --------- | ------------------------------------------ | ------- | ---------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `MarketDataset`                          | `v1`  | `Data`         | `Data`                                                                                 | `Indicators, Strategy, Trading, Simulation, Optimization, Research, Analytics, Portfolio, UI/API` (Risk consumes `MarketContextEvidence` / `AccountStateSnapshot` instead) | Normalized bars/ticks with alignment metadata                                                                                                                                                                                                                         | symbol, timeframe, records,`available_at`, provenance                                                                                                                                                                                                                            | Structured data error; consumers must not accept raw provider objects                                                                                                                         |
-| Completed | `AccountStateSnapshot`                   | `v1`  | `Data`         | `Data`                                                                                 | `Strategy, Risk, Trading, Portfolio`                                                                                                                                           | Read-only broker/account state for evaluation and validation                                                                                                                                                                                                          | account, balances, positions, margin, snapshot time (UTC)                                                                                                                                                                                                                          | Stale or unavailable snapshot causes dependent governed operations to fail closed                                                                                                             |
+| Missing | `AgentResult[T]` | `v1` | `Agentic` | `Agentic` | `Agentic, UI/API` | Uniform validated agent output carrying status, typed payload, deterministic reasons, provenance, and budget usage | status (`ok`/`refused`/`failed`), typed payload, reasons, `AgentProvenance`, `BudgetUsage` | Budget exhaustion returns `refused`; invalid schema after one repair returns `failed`; receivers accept only their own typed request contracts |
+| Missing | `DeliberationRecord` | `v1` | `Agentic` | `Agentic` | `Research, UI/API` | Immutable evidence for dynamic bounded firm discussion | plan/topology, independent briefs, claims, counterclaims, tool evidence, rebuttals, dissent, synthesis, budgets, stop reason, provenance | Missing evidence, limits, or schema refuses publication; consensus grants no authority |
+| Missing | `PromotionEvidencePacket` | `v1` | `Agentic` | `Agentic` | `Strategy, Indicators` | Complete evidence required for a receiver to consider an agent-authored artefact | specification, artefact/dependency hashes, SBOM, provenance, leakage/causality/search/holdout evidence, tests, simulation, critique, approval | Any missing element marks the artefact terminal `research_only`; receiver validation remains mandatory |
+| Missing | `Hypothesis` / `ExperimentSpec` / `SweepPlan` | `v1` | `Agentic` | `Agentic` | `Research, Simulation, Optimization` | Falsifiable research, experiment, and bounded-search proposals | evidence and falsifier; immutable protocol/splits/costs/seeds; bounded space/budget/stop criteria | Embedded approval language is ignored; receiver validation failure rejects the request |
+| Missing | `AllocationProposal` / `RiskAdvisory` | `v1` | `Agentic` | `Agentic` | `Portfolio, Risk, UI/API` | Non-binding portfolio recommendation and risk challenge | evidence refs, scope, proposed ranges, uncertainty, identified risks, constraints, dissent, expiry, `non_binding=true` | Missing/stale evidence or receiver rejection prevents adoption; no approval field exists |
+| Missing | `TradeProposal` | `v1` | `Agentic` | `Agentic` | `Strategy, Portfolio` | Submit a research thesis for normal deterministic evaluation | proposal/task IDs, instrument, direction, horizon, thesis, invalidation, evidence, uncertainty, requested evaluation scope, expiry; no broker fields | Expired, invalid, unauthorized, or rejected proposals stop; receipt is not order/fill evidence |
+| Missing | `StrategyProposalEvaluationRequest` / `StrategyProposalEvaluationResult` | `v1` | `Strategy` | `Agentic or other authenticated proposal source` | `Strategy; Agentic/UI/API receive result` | Receiver-owned boundary that converts an untrusted thesis into a deterministic Strategy evaluation | source proposal/hash, exact strategy/version, scope, expiry, evidence refs; result status/reasons, evaluated signal evidence, optional canonical `TradeIntent` | Proposal text/confidence/consensus cannot alter deterministic fields; absent matching current strategy signal emits no `TradeIntent` |
+| Missing | `ResearchSourceDocument` / `ResearchSourcePage` | `v1` | `Data` | `Data` | `Research; Agentic only through eligible bounded projections` | Point-in-time licensed filing, transcript, macro, news, or approved alternative-source evidence | source/license, asset/issuer/language scope, event/published/first-seen/available/retrieved times, revision, hashes, quality/trust/manipulation/injection, retention, provenance | Unknown availability, prohibited license, integrity, manipulation, injection, or scope makes evidence ineligible |
+| Missing | `FundamentalSourceEvidence` / `SentimentSourceEvidence` | `v1` | `Research` | `Research` | `Agentic, UI/API` | Deterministic bounded source selection, coverage, and measurement evidence for specialized agents | source-document references, decision time, asset applicability, coverage, revisions, deterministic measurements, trust/injection, limitations, hash | Ineligible, insufficient, inapplicable, poisoned, or conflicting evidence is preserved/refused; no model opinion or execution field |
+| Completed | `MarketDataset`                          | `v1`  | `Data`         | `Data`                                                                                 | `Indicators, Strategy, Trading, Simulation, Optimization, Research, Analytics, Portfolio, Agentic, UI/API` (Risk consumes `MarketContextEvidence` / `AccountStateSnapshot` instead) | Normalized bars/ticks with alignment metadata                                                                                                                                                                                                                         | symbol, timeframe, records,`available_at`, provenance                                                                                                                                                                                                                            | Structured data error; consumers must not accept raw provider objects                                                                                                                         |
+| Completed | `AccountStateSnapshot`                   | `v1`  | `Data`         | `Data`                                                                                 | `Strategy, Risk, Trading, Portfolio, Agentic`                                                                                                                                  | Read-only broker/account state for evaluation and validation                                                                                                                                                                                                          | account, balances, positions, margin, snapshot time (UTC)                                                                                                                                                                                                                          | Stale or unavailable snapshot causes dependent governed operations to fail closed                                                                                                             |
 | Completed | `FXConversionEvidence`                   | `v1`  | `Data`         | `Data`                                                                                 | `Risk, Simulation, Analytics, Portfolio`                                                                                                                                       | Fresh, provenance-bound direct or synthesized FX conversion path for one amount/currency scope                                                                                                                                                                        | source/target currencies, ordered rate legs, composite rate,`as_of`, freshness limit, path policy/version, provenance                                                                                                                                                            | Missing, stale, cyclic, disallowed, or unverifiable conversion path fails closed; consumers never synthesize rates                                                                            |
 | Completed | `MarketContextEvidence`                  | `v1`  | `Data`         | `Data`                                                                                 | `Risk; Trading (orchestrator carrier only — never interprets it), UI/API (views)`                                                                                             | Normalized market/session/calendar/liquidity evidence for fail-closed risk evaluation                                                                                                                                                                                 | contract version, schema ID, session/calendar state, spread/liquidity/volatility/correlation/crisis evidence, timezone,`as_of`, provenance, missingness                                                                                                                          | Missing, stale, incompatible, or unavailable mandatory evidence causes Risk to reject the governed operation                                                                                  |
 | Completed | `BrokerAdapter`                          | `v1`  | `Brokers`      | `Brokers`                                                                              | `Data` (read-only), `Trading` (execution reads + mutations)                                                                                                                  | Canonical async passthrough protocol over every broker/provider platform, composed of capability traits (`MarketDataProvider`, `TradeExecutionProvider`, `AccountProvider`, `CalculationProvider`); resolved via `create_broker_adapter(broker_id, config)` | full standard operation set (connection, reads, subscriptions, mutations, calculations), feature-flag report                                                                                                                                                                       | Unknown broker →`BROKER_UNKNOWN`; disconnected → `BROKER_NOT_CONNECTED`; unsupported → `BROKER_CAPABILITY_UNSUPPORTED`; fails closed — only Trading may invoke mutation operations  |
@@ -853,7 +997,7 @@ Document only contracts crossing domain or external-system boundaries.
 | Completed | `AuthContext`                            | `v1`  | `Utils`        | `UI/API`                                                                               | `All governed domains`                                                                                                                                                         | Shared authenticated principal and trace context                                                                                                                                                                                                                      | principal ID, roles, scopes, request/correlation IDs, issued timestamp                                                                                                                                                                                                             | Missing or invalid context causes the receiving domain to fail closed                                                                                                                         |
 | Completed | `ApprovalAttestation`                    | `v1`  | `Risk`         | `UI/API`                                                                               | `Risk`                                                                                                                                                                         | Authenticated human approval evidence; never execution authority by itself                                                                                                                                                                                            | principal, action, scope, policy reference/version, issue/expiry times, trace IDs                                                                                                                                                                                                  | Missing, expired, revoked, unauthorized, or scope-mismatched attestation is rejected by Risk; kill-switch clearance also rejects the commanding principal's own attestation |
 | Completed | `ActionPolicyVerdict`                    | `v1`  | `Risk`         | `Risk`                                                                                 | `Trading, UI/API`                                                                                                                                                              | Risk-owned action classification and permission verdict bound to approval and scope                                                                                                                                                                                   | verdict ID, action/scope, policy version, approval reference, allowed flag, expiry, reason, trace IDs                                                                                                                                                                              | Missing, stale, incompatible, denied, or unreserved verdict blocks Trading dispatch                                                                                                           |
-| Completed | `AuditEvent` common envelope             | `v1`  | `Utils`        | `Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, UI/API` | `Data` durable audit storage; Risk and UI/API query only through Data-owned query contracts                                                                                    | Redacted trace record for governed actions or durable mutations; each emitting domain owns its payload fields                                                                                                                                                         | event ID, timestamp, domain, action, principal ID, correlation ID, redacted payload                                                                                                                                                                                                | Emission or persistence failure is surfaced; Brokers emits technical logs, while Indicators and Analytics remain pure/read-only                                                               |
+| Completed | `AuditEvent` common envelope             | `v1`  | `Utils`        | `Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, Agentic, UI/API` | `Data` durable audit storage; Risk, Agentic, and UI/API query only through Data-owned query contracts                                                                           | Redacted trace record for governed actions or durable mutations; each emitting domain owns its payload fields                                                                                                                                                         | event ID, timestamp, domain, action, principal ID, correlation ID, redacted payload                                                                                                                                                                                                | Emission or persistence failure is surfaced; Brokers emits technical logs, while Indicators and Analytics remain pure/read-only                                                               |
 | Completed | `StandardResponse[T]`                    | `v1`  | `Utils`        | Every HaruQuantAI-owned bounded public operation                                      | Internal callers and external-boundary adapters                                                                                                                                | Canonical function-level success/error response while preserving the producing domain's raw typed result and all prior non-payload return evidence                                                                                                                       | exactly `status`, `message`, `data`, `error`, `metadata`; raw `T` directly in `data`; error is exactly code/details; metadata carries version/schema, operation/domain/risk, trace, duration, side-effect flags, and redacted extensions                                               | Missing or extra fields, conflicting success/error branches, malformed metadata/error evidence, or unapproved error code fails validation; raw results are never nested in a synthetic payload |
 | Completed | `AuditEventQuery` / `AuditEventPage`   | `v1`  | `Data`         | `UI/API, Risk`                                                                         | `Data`; query page returned to submitter                                                                                                                                       | Governed bounded access to durable Utils-owned audit envelopes                                                                                                                                                                                                        | contract version, schema ID, UTC range, optional filters, opaque cursor, bounded limit; ordered events and next cursor                                                                                                                                                             | Unauthorized, malformed, unbounded, or storage-failed query returns a structured Data error; no raw store access                                                                              |
 | Completed | `KillSwitchCommand`                      | `v1`  | `Risk`         | `UI/API`                                                                               | `Risk`                                                                                                                                                                         | Request authorized activation or clearance at an explicit scope                                                                                                                                                                                                       | action; scope level`global`/`portfolio`/`strategy`/`symbol`; applicable IDs; reason; UTC time; request/workflow/correlation IDs. Principal authority is supplied separately in `AuthContext`; clearance additionally supplies a matching current `ApprovalAttestation` from a distinct authorized principal | Invalid scope/IDs or authorization rejects the command; clearance without matching current distinct-principal attestation fails closed |
@@ -945,9 +1089,13 @@ Only settings or limits shared across multiple domains belong here. Feature-spec
 | Completed | `RUNTIME_PROFILE`                                                          | `str`            | `research`                                  | Yes         | `Utils`   | Strategy, Risk, Trading, Simulation, Portfolio, UI/API                               | Active profile:`research`, `simulation`, `paper`, or `live`                                                                                                                                |
 | Completed | `EXECUTION_ROUTE`                                                          | `str`            | `none`                                      | Conditional | `Trading` | Risk, Trading, Simulation, Portfolio, UI/API                                         | Active route:`none`, `sim`, `paper`, or `live`; must be compatible with `RUNTIME_PROFILE`                                                                                                |
 | Completed | `ALLOW_LIVE_MUTATIONS`                                                     | `bool`           | `false`                                     | Yes         | `Trading` | Trading, Portfolio, UI/API                                                           | Master live-trading enablement;`false` blocks all broker mutation regardless of approval. Risk does not consume or redefine this Trading-owned execution gate.                                   |
-| Completed | `DATABASE_URL` / `DATA_DIR`                                              | `str` / `Path` | None                                         | Conditional | `Data`    | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, UI/API | Shared connection and artifact-root configuration; persistence boundaries fail closed before work when the applicable value is absent, and each persistent domain owns its own tables/files. |
-| Completed | `QUALITY_PROFILE`                                                          | `str`            | `standard`                                  | Yes         | `Data`    | Data, Indicators, Strategy, Trading, Simulation, Optimization, Research, Portfolio, Analytics, UI/API | Series-level market-data quality strictness: exactly`strict`, `standard`, or `lenient`. Selects one frozen threshold set; individual thresholds are not separately tunable. Determines which detected issues are blocking, so it changes fail-closed behaviour for every `MarketDataset` consumer. |
+| Completed | `DATABASE_URL` / `DATA_DIR`                                              | `str` / `Path` | None                                         | Conditional | `Data`    | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, Agentic, UI/API | Shared connection and artifact-root configuration; persistence boundaries fail closed before work when the applicable value is absent, and each persistent domain owns its own tables/files. |
+| Completed | `QUALITY_PROFILE`                                                          | `str`            | `standard`                                  | Yes         | `Data`    | Data, Indicators, Strategy, Trading, Simulation, Optimization, Research, Portfolio, Analytics, Agentic, UI/API | Series-level market-data quality strictness: exactly`strict`, `standard`, or `lenient`. Selects one frozen threshold set; individual thresholds are not separately tunable. Determines which detected issues are blocking, so it changes fail-closed behaviour for every `MarketDataset` consumer. |
 | Missing   | `METRICS_ENABLED`                                                          | `bool`           | `false`                                     | No          | `UI/API`  | All emitting domains                                                                 | Master enablement for operational telemetry recording and the Prometheus exposition surface. Disabled by default; telemetry is never an input to a governed decision and its unavailability never blocks execution.                                                                              |
+| Missing   | `AGENTIC_ENABLED`                                                          | `bool`           | `false`                                     | Yes         | `Agentic` | Agentic, UI/API                                                                       | Master Agentic enablement. `false` rejects new Agentic work and safely drains or cancels active work by the firm mandate without disabling deterministic safety controls. |
+| Missing   | `AGENTIC_MANDATE_PATH`                                                     | `Path`           | None                                        | Conditional | `Agentic` | Agentic                                                                                | Required when Agentic is enabled; points to the signed/versioned firm mandate. Missing, expired, hash-mismatched, or incompatible mandate fails startup closed. |
+| Missing   | `AGENTIC_MODEL_PROFILES`                                                   | `tuple[str, ...]` | `()`                                        | Conditional | `Agentic` | Agentic                                                                                | Evaluated provider-neutral model-profile IDs. Floating model aliases and silent fallback are prohibited. |
+| Missing   | `AGENTIC_LIMITS_PROFILE`                                                   | `str`            | None                                        | Conditional | `Agentic` | Agentic                                                                                | Required versioned limits profile for workflow concurrency, fan-out, rounds, retries, deadlines, context/output size, tokens, tools, cost, storage, and lifetime search. No hidden numeric defaults. |
 | Partial   | `MT5_ENABLED` (per-platform: `CTRADER_ENABLED`, `BINANCE_ENABLED`, …) | `bool`           | `false`                                     | Yes         | `Brokers` | Brokers connections; Data reads, Trading dispatch                                    | `BrokerConnectionConfig.provider_enabled` is implemented. UI/API composition-root loading remains pending. Data composes a provider source only when its flag is enabled and Data holds a descriptor for it; see `DATA_PROVIDER_SOURCES`                                |
 | Completed | `DATA_PROVIDER_SOURCES`                                                    | `tuple[str, ...]` | `()`                                        | No          | `Data`    | Data source composition                                                              | Additional broker-backed provider source identifiers Data may compose as read-only sources, each gated by its `*_ENABLED` platform flag. Credential-free Binance Spot, Dukascopy, and Yahoo compose automatically when enabled; every provider registers at `staging` readiness and reaches `production` only through `WF-DATA-011` promotion. |
 | Completed | `DATA_LOCAL_SOURCES`                                                       | `tuple[str, ...]` | `("csv", "parquet")`                        | No          | `Data`    | Data source composition                                                              | Local artifact source identifiers Data composes from `DATA_RAW_ROOT`. Local sources require no credentials, no network, and no promotion evidence, so they register at `production` readiness directly                                                                     |
@@ -1026,7 +1174,9 @@ Rules:
 | Partial | `Binance (exchange)`            | `Brokers (connection); Data (read via Brokers), Trading (write via Brokers)`           | Market/account data and order execution (separate Spot / USD-M / Coin-M profiles)                    | Read (Data) / Write (Trading), both through Brokers | Spot testnet/public-read evidence exists; authenticated mutations and Futures remain unavailable                |
 | Partial | `Dukascopy (data provider)`     | `Brokers (connection); Data (read via Brokers)`                                        | Historical market data (read-only provider)                                                          | Read only, through Brokers                          | Adapter is implemented; the provider host is unreachable from the current evidence environment and fails closed |
 | Partial | `Yahoo Finance (data provider)` | `Brokers (connection); Data (read via Brokers)`                                        | Historical market data (read-only provider)                                                          | Read only, through Brokers                          | Genuine bounded historical reads are implemented; unsupported operations remain deterministic                   |
-| Partial | `SQLite`                        | `Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, UI/API` | Shared relational persistence; Data owns connection, locking, and migration execution infrastructure | Read/Write                                          | Data infrastructure is implemented; remaining persistent domains have not yet landed                            |
+| Missing | `LLM model providers`           | `Agentic through ModelGateway`                                                        | Structured reasoning for evaluated Agentic roles                                                      | HTTPS model/tool API through provider-neutral adapter | Missing credentials, quota, incompatible schema/tool capability, policy, privacy, or provider failure returns typed refusal; no silent substitution |
+| Missing | `Google Agent Development Kit`  | `Agentic runtime adapter`                                                             | In-process graph, dynamic, collaborative, task, session, artifact, evaluation, and telemetry runtime  | Pinned Python library behind `AdkRuntime`            | Version incompatibility or failed regression blocks Agentic startup/upgrade; ADK/provider objects never cross the Agentic public API |
+| Partial | `SQLite`                        | `Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, Agentic, UI/API` | Shared relational persistence; Data owns connection, locking, and migration execution infrastructure | Read/Write                                          | Data infrastructure is implemented; remaining persistent domains have not yet landed                            |
 
 Provider-specific implementation details belong in the owning domain README.
 
@@ -1036,12 +1186,20 @@ Provider-specific implementation details belong in the owning domain README.
 
 **Status:** `Missing` — planned topology; to be confirmed against the actual runtime as implementation proceeds.
 
-**Runtime model:** Modular Python monolith plus a separate frontend. All domain packages (`app/utils`, `app/services/*`) run in-process behind the FastAPI gateway (`app/services/api`); the Trading live/paper runtime loop runs as a background worker inside the same process, activated by `RUNTIME_PROFILE`. The `ui/` Next.js frontend is a separate deployable. SQLite and the MT5 terminal are local to the host, which constrains the backend to a single instance.
+**Runtime model:** Modular Python backend plus isolated workers and a separate
+frontend. Deterministic domains run behind the FastAPI gateway; Trading owns its
+live/paper loop. Agentic orchestration runs in a separately controllable worker, and
+generated code runs in an ephemeral sandbox worker with denied production
+credentials and network. The `ui/` Next.js frontend is separate. SQLite and a local
+MT5 terminal constrain the initial backend to a single writer/host; later scaling
+requires a separately approved persistence topology.
 
 | Runtime unit                                                  | Contains domains                                                                                                                 | Environment        | Started by                                                         | Scaling / instances                                                   |
 | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------- |
 | Backend process (FastAPI +`app/utils` + `app/services/*`) | Utils, Brokers, Data, Indicators, Strategy, Risk, Trading, Simulation, Analytics, Optimization, Research, Portfolio, API gateway | dev / paper / live | `uv run` (single entry point)                                    | Single instance — SQLite write locking and one MT5 terminal per host |
 | Trading runtime loop (background worker)                      | Trading orchestrating Data, Indicators, Strategy, Risk; dispatching via Brokers                                                  | paper / live only  | Backend process, gated by`RUNTIME_PROFILE` / `EXECUTION_ROUTE` | Single instance                                                       |
+| Agentic worker                                                | `app/agentic` Google ADK adapter, workflows, agents, context, permissions, and operations                                        | dev / sandbox / paper / separately approved live proposal mode | Backend composition starts a separately cancellable worker, gated by `AGENTIC_ENABLED` and firm mandate | Bounded concurrency; no broker credential or direct broker route |
+| Code sandbox worker                                           | Ephemeral approved toolchain and staged artefact output only                                                                      | sandbox only       | Agentic worker after authenticated specification and policy approval | Isolated per run; strict CPU/memory/disk/process/time/network limits |
 | Frontend (`ui/`, Next.js)                                   | UI views and client stores                                                                                                       | dev / prod         | `npm run` / hosted                                               | Stateless; may scale independently                                    |
 | MT5 terminal                                                  | External broker gateway                                                                                                          | paper / live       | Operator                                                           | One per broker account                                                |
 
@@ -1050,6 +1208,10 @@ flowchart LR
     U[User / Browser] --> FE[Frontend Next.js]
     FE --> BE[[Backend process: FastAPI + app domains]]
     BE --> DB[(SQLite + artifact storage)]
+    BE --> AW[Agentic worker: ADK runtime]
+    AW --> MP[Evaluated model providers]
+    AW --> SB[Ephemeral code sandbox]
+    AW --> DB
     BE --> MT5[Broker/provider platforms: MT5 terminal / cTrader / Binance / Dukascopy / Yahoo Finance]
 ```
 
@@ -1128,7 +1290,6 @@ under `Changed` during release aggregation. Do not create ADR, NDR, or other
 standalone decision-record documents.
 
 No open decisions.
-
 ---
 
 ## 13. System Definition of Done

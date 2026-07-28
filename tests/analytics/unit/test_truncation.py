@@ -1,6 +1,5 @@
 """Unit tests for bounded Analytics dashboard series."""
 
-# ruff: noqa: INP001
 from datetime import UTC, datetime, timedelta
 
 import pytest

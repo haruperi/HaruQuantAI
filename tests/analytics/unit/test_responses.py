@@ -1,6 +1,5 @@
 """Tests for the Analytics StandardResponse public boundary."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 from app.services.analytics import (
@@ -9,6 +8,7 @@ from app.services.analytics import (
     truncate_series,
 )
 from app.services.analytics.contracts.responses import ANALYTICS_ERROR_CATALOG
+
 from tests.analytics._support import NOW, _config, _source, unwrap
 
 

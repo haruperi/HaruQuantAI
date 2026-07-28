@@ -1,6 +1,5 @@
 """Unit tests for complete Analytics allocation projection."""
 
-# ruff: noqa: INP001
 from dataclasses import replace
 from decimal import Decimal
 
@@ -11,6 +10,7 @@ from app.services.analytics.reports.allocation import (
     build_portfolio_rebalance_measurement,
 )
 from app.utils import logger
+
 from tests.analytics._support import (
     _measurement_request,
     _portfolio_simulation_result,

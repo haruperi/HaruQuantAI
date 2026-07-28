@@ -180,6 +180,9 @@ utils/
 
 Package and feature `__init__.py` files expose only documented public names through
 explicit `__all__` declarations. No optional heavy dependency is imported by Utils.
+The package root also exposes the documented `JsonValue` type-only alias because
+service response contracts use it for static JSON-safe typing; it has no runtime
+behavior and is not a standalone operation.
 
 ```mermaid
 flowchart LR
@@ -269,15 +272,64 @@ functional behavior.
 
 **Purpose:** Define the immutable authenticated principal, trace context, and redacted audit envelope shared across every domain.
 
+
+| Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
+|---|---|---|---|---|---|---|
+| Completed | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033`, `FR-UTL-039` through `FR-UTL-041` |
+| Completed | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-024` |
+| Completed | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-002`, `FR-UTL-003`, `FR-UTL-007`, `FR-UTL-008`, `FR-UTL-010`, `FR-UTL-011`, `FR-UTL-013` through `FR-UTL-021`, `FR-UTL-036` |
+
+### `WF-UTL-001` — Structured Logging and Redaction
+
+1. The caller imports the global import-safe bound logger without side effects.
+2. The caller supplies a structured, JSON-safe context.
+3. Redaction runs before formatting or emission.
+4. The first runtime bound-logger emission atomically activates the approved default
+   profile; an explicit `configure_logging(...)` call replaces it only when a
+   specialized profile is required.
+5. Default queued delivery flushes and stops through the registered process-exit
+   lifecycle; special entry points may synchronize or stop it explicitly through
+   `flush_logging()` and `shutdown_logging()`.
+6. Configuration or sink failure is surfaced without exposing the source payload.
+
+### `WF-UTL-002` — Shared Settings Bootstrap
+
+1. `AppSettings` loads the repository `app/configs/env.json` and process overrides at the shared
+   Utils boundary; callers may supply explicit values without parsing files.
+2. The loader validates supported deployment and runtime settings.
+3. The loader returns an immutable settings object without mutating caller input.
+Imports never read the environment, a file, or a secret store.
+
+### `WF-UTL-003` — Audit-Event Construction
+
+1. The emitting domain supplies its action, trace context, and payload meaning.
+2. IDs and UTC timestamps are validated.
+3. The payload is redacted and canonicalized.
+4. A bounded `AuditEvent v1` is constructed.
+5. Data persists the event through its owned audit-storage boundary.
+
+---
+
+## 4. Module and Requirement Specifications
+
+This section is the implementation plan. The package-level `utils/__init__.py`
+re-exports only the approved feature APIs below and is governed by
+`NFR-UTL-001`, `NFR-UTL-003`, and `NFR-UTL-005`; it owns no independent
+functional behavior.
+
+### 4.1 `contracts/` — Shared Context and Audit Contracts
+
+**Purpose:** Define the immutable authenticated principal, trace context, and redacted audit envelope shared across every domain.
+
 **Module flow:** `untrusted trace/identity mapping → strict contract-field validation → immutable AuthContext / AuditEvent`
 
 #### Files
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent`; module-level, not re-exported through `__init__.py`: `JsonValue`, `validate_non_empty`, `validate_utc`, `validate_trace_id` | **Standard library:** `collections.abc`, `datetime`, `json`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
-| Completed | `auth.py` | Define immutable authenticated principal and trace context. | `AuthContext` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `audit.py` → strict contract-field validation |
-| Completed | `__init__.py` | Expose the supported shared-contract API. | `AuthContext`, `AuditEvent` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
+| Completed | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent`, `create_audit_event`; module-level, not re-exported through `__init__.py`: `JsonValue`, `validate_non_empty`, `validate_utc`, `validate_trace_id` | **Standard library:** `collections.abc`, `datetime`, `json`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
+| Completed | `auth.py` | Define immutable authenticated principal and trace context. | `AuthContext`, `create_auth_context` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `audit.py` → strict contract-field validation |
+| Completed | `__init__.py` | Expose the supported shared-contract API. | `AuthContext`, `AuditEvent`, `create_auth_context`, `create_audit_event` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
 
 #### Functional requirements
 
@@ -298,7 +350,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `catalog.py` | Define the immutable business-neutral and root-system common error catalogue. | `COMMON_ERROR_CATALOG` | **Standard library:** `types`<br>**Required third-party:** None<br>**Local:** `contracts.py` → immutable error definitions |
+| Completed | `catalog.py` | Define the immutable business-neutral and root-system common error catalogue. | `COMMON_ERROR_CATALOG`, `get_common_error_catalog` | **Standard library:** `types`<br>**Required third-party:** None<br>**Local:** `contracts.py` → immutable error definitions |
 | Completed | `contracts.py` | Define the common immutable error-definition shape without domain policy. | `ErrorDefinition`, `ErrorSeverity` | **Standard library:** `dataclasses`, `re`, `typing`<br>**Required third-party:** None<br>**Local:** None |
 | Completed | `exceptions.py` | Define the minimal shared exception hierarchy and domain-extension boundary. | `HaruQuantError`, `ConfigurationError`, `ValidationError`, `SecurityError`, `ExternalServiceError` | **Standard library:** `re`<br>**Required third-party:** None<br>**Local:** None |
 | Completed | `mapping.py` | Convert caught exceptions to deterministic secret-safe shared error evidence. | `map_exception` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `exceptions.py` → shared base exceptions |
@@ -393,14 +445,14 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `redaction.py` | Define redaction policy/results and redact bounded text or JSON-safe mappings. | `RedactionPolicy`, `RedactionResult`, `is_sensitive_key`, `redact_text_value`, `redact_mapping_value` | **Standard library:** `collections.abc`, `dataclasses`, `math`, `re`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `SecurityError`, `ValidationError` |
-| Completed | `__init__.py` | Expose the supported secret-redaction API. | All security exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `redaction.py` → approved exports |
+| Completed | `redaction.py` | Define redaction policy/results and redact bounded text or JSON-safe mappings. | `RedactionPolicy`, `RedactionResult`, `get_default_redaction_policy`, `is_sensitive_key`, `redact_text_value`, `redact_mapping_value` | **Standard library:** `collections.abc`, `dataclasses`, `math`, `re`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `SecurityError`, `ValidationError` |
+| Completed | `__init__.py` | Expose the supported secret-redaction API. | `RedactionPolicy`, `RedactionResult`, `get_default_redaction_policy`, `is_sensitive_key`, `redact_mapping_value`, `redact_text_value` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `redaction.py` → approved exports |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-UTL-016` | Define immutable denylist-first redaction policy with narrow reviewed field-path allowlists. | `RedactionPolicy` | None | `ValidationError`: malformed policy definition | **Usage:** `tests/utils/usage/06_security.py::fr_utils_016_redaction_policy()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_policy_is_immutable()` |
+| Completed | `FR-UTL-016` | Define immutable denylist-first redaction policy with narrow reviewed field-path allowlists. | `RedactionPolicy`, `get_default_redaction_policy` | None | `ValidationError`: malformed policy definition | **Usage:** `tests/utils/usage/06_security.py::fr_utils_016_redaction_policy()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_policy_is_immutable()` |
 | Completed | `FR-UTL-017` | Detect sensitive keys case-insensitively, including normalized composite suffixes. | `is_sensitive_key` | None | None | **Usage:** `tests/utils/usage/06_security.py::fr_utils_017_key_classification()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_is_sensitive_key_is_case_insensitive()`, `test_is_sensitive_key_matches_composite_suffixes()` |
 | Completed | `FR-UTL-018` | Redact bounded text without mutating input. | `redact_text_value` | None | None | **Usage:** `tests/utils/usage/06_security.py::fr_utils_018_redaction_text()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_text_value_does_not_mutate_input()` |
 | Completed | `FR-UTL-019` | Recursively redact a JSON-safe mapping without mutating input. | `redact_mapping_value` | None | `ValidationError`: non-JSON-safe mapping | **Usage:** `tests/utils/usage/06_security.py::fr_utils_019_redaction_mapping()`<br>**Unit:** `tests/utils/unit/test_redaction.py::test_redact_mapping_value_is_recursive()` |

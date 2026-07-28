@@ -64,6 +64,8 @@ class PortfolioSettings(AppSettings):
         portfolio_activation_approval_policy: Exact policy reference by profile.
         portfolio_rebalance_drift_threshold: Non-negative drift threshold.
         portfolio_rebalance_schedule: Required deterministic UTC schedule.
+        portfolio_cross_account_correlation_window: Rolling correlation window.
+        portfolio_cross_account_correlation_alert: Correlation alert threshold.
     """
 
     model_config = SettingsConfigDict(
@@ -111,12 +113,22 @@ class PortfolioSettings(AppSettings):
     portfolio_rebalance_schedule: RebalanceSchedule = Field(
         validation_alias="PORTFOLIO_REBALANCE_SCHEDULE",
     )
+    portfolio_cross_account_correlation_window: int = Field(
+        default=20,
+        gt=1,
+        validation_alias="PORTFOLIO_CROSS_ACCOUNT_CORRELATION_WINDOW",
+    )
+    portfolio_cross_account_correlation_alert: Decimal = Field(
+        default=Decimal("0.60"),
+        validation_alias="PORTFOLIO_CROSS_ACCOUNT_CORRELATION_ALERT",
+    )
 
     @field_validator(
         "portfolio_weight_sum_tolerance",
         "portfolio_min_weight",
         "portfolio_max_weight",
         "portfolio_rebalance_drift_threshold",
+        "portfolio_cross_account_correlation_alert",
     )
     @classmethod
     def _validate_decimal(cls, value: Decimal) -> Decimal:
@@ -155,6 +167,8 @@ class PortfolioSettings(AppSettings):
             raise PortfolioError("PORT_CONFIG_INVALID", "MAX_WEIGHT")
         if self.portfolio_rebalance_drift_threshold < 0:
             raise PortfolioError("PORT_CONFIG_INVALID", "DRIFT_THRESHOLD")
+        if not 0 <= self.portfolio_cross_account_correlation_alert <= 1:
+            raise PortfolioError("PORT_CONFIG_INVALID", "CORRELATION_ALERT")
         policies = self.portfolio_activation_approval_policy
         if set(policies) != {"simulation", "paper", "live"}:
             raise PortfolioError("PORT_CONFIG_INVALID", "APPROVAL_POLICY")

@@ -1,1 +1,1 @@
-"""Risk unit tests."""
+"""Unit tests for risk domain."""

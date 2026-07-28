@@ -5,7 +5,12 @@ from pathlib import Path
 
 import pytest
 import yaml
-from app.services.risk.config import RiskConfig, compute_config_hash, load_risk_config
+from app.services.risk.config import (
+    DrawdownMode,
+    RiskConfig,
+    compute_config_hash,
+    load_risk_config,
+)
 from app.services.risk.contracts import RiskErrorCode
 from app.services.risk.contracts.responses import unwrap_risk_response
 from pydantic import ValidationError
@@ -86,3 +91,11 @@ def test_config_hash_is_stable_and_sensitive() -> None:
     )
     assert first == second
     assert first != third
+
+
+def test_trailing_eod_requires_snapshot_time() -> None:
+    """Require time and timezone evidence for end-of-day trailing mode."""
+    values = _config_values()
+    values["drawdown_mode"] = DrawdownMode.TRAILING_EOD
+    with pytest.raises(ValidationError):
+        RiskConfig.model_validate(values)

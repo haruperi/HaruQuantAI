@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.utils import (
     RedactionPolicy,
     SecurityError,
+    get_default_redaction_policy,
     is_sensitive_key,
     redact_mapping_value,
     redact_text_value,
@@ -23,7 +24,7 @@ def _header(title: str) -> None:
 def fr_utils_016_redaction_policy() -> None:
     """FR-UTL-016: immutable denylist-first redaction policy."""
     _header("Example 1: Redaction Policy")
-    policy = RedactionPolicy()
+    policy = get_default_redaction_policy()
     print("Redaction policy:", bool(policy))
     print("Sample redacted:", to_json_safe(sorted(policy.sensitive_keys)))
 

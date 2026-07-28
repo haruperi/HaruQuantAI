@@ -39,12 +39,16 @@ _EXPECTED_EXPORTS = {
     "canonical_digest",
     "canonical_json",
     "configure_logging",
+    "create_audit_event",
+    "create_auth_context",
     "derive_stable_id",
     "error_response",
     "exception_response",
     "flush_logging",
     "format_utc_timestamp",
     "generate_id",
+    "get_common_error_catalog",
+    "get_default_redaction_policy",
     "get_error_metadata",
     "get_execution_ms",
     "get_logger",
@@ -72,8 +76,9 @@ _FORBIDDEN_IMPORT_ROOTS = {
     "sqlite3",
 }
 _EXPECTED_USAGE_CALLS = {
-    "01_contracts.py": {"AuditEvent", "AuthContext"},
+    "01_contracts.py": {"create_audit_event", "create_auth_context"},
     "02_errors.py": {
+        "get_common_error_catalog",
         "get_error_metadata",
         "map_exception",
         "normalize_error_code",
@@ -91,6 +96,7 @@ _EXPECTED_USAGE_CALLS = {
     },
     "05_serialization.py": {"canonical_digest", "canonical_json", "to_json_safe"},
     "06_security.py": {
+        "get_default_redaction_policy",
         "is_sensitive_key",
         "redact_mapping_value",
         "redact_text_value",

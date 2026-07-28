@@ -1,6 +1,5 @@
 """Unit tests for immutable Analytics catalogs."""
 
-# ruff: noqa: INP001
 from types import MappingProxyType
 
 import pytest

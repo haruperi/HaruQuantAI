@@ -1,6 +1,5 @@
 """Security and redaction evidence for Analytics public failures."""
 
-# ruff: noqa: INP001
 from app.services.analytics.contracts.errors import (
     AnalyticsValidationError,
     to_analytics_error_payload,

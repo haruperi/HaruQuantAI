@@ -8,7 +8,13 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from app.services.risk.config import RiskConfig, compute_config_hash
+from app.services.risk.config import (
+    DrawdownMode,
+    FirmMandate,
+    LossReferenceBasis,
+    RiskConfig,
+    compute_config_hash,
+)
 from app.services.risk.contracts import (
     LimitStatus,
     PortfolioRiskSnapshot,
@@ -56,6 +62,8 @@ def _result(
     precedence: int,
     *,
     reason: RiskErrorCode | None = None,
+    headroom: Decimal | None = None,
+    reference_basis: str | None = None,
 ) -> RiskLimitResult:
     """Build one ordered limit result.
 
@@ -67,6 +75,8 @@ def _result(
         evidence_refs: Exact evidence references.
         precedence: Stable evaluation order.
         reason: Required failing reason code.
+        headroom: Optional absolute monetary distance to the limit.
+        reference_basis: Name of the balance basis used for evaluation.
 
     Returns:
         Immutable ordered limit result.
@@ -80,6 +90,8 @@ def _result(
         reason_code=reason,
         evidence_refs=evidence_refs,
         precedence=precedence,
+        headroom_value=headroom,
+        reference_basis=reference_basis,
     )
 
 
@@ -147,6 +159,176 @@ def _loss_ratio(loss: Decimal, equity: Decimal) -> Decimal:
     logger.debug("Calculating Policy loss ratio against reference equity")
     reference = equity + loss
     return Decimal(1) if reference <= 0 else loss / reference
+
+
+def _reference_equity(
+    snapshot: PortfolioRiskSnapshot,
+    basis: LossReferenceBasis,
+    *,
+    loss: Decimal,
+) -> Decimal | None:
+    """Resolve one loss reference balance from supplied snapshot evidence.
+
+    Args:
+        snapshot: Portfolio evidence containing candidate reference balances.
+        basis: Requested loss-reference basis.
+        loss: Observed loss used for derived balance bases.
+
+    Returns:
+        Reference balance, or ``None`` when required evidence is unavailable.
+
+    Raises:
+        AssertionError: If an unsupported reference basis reaches this helper.
+    """
+    basis = LossReferenceBasis(basis)
+    if basis is LossReferenceBasis.INITIAL_BALANCE:
+        return snapshot.initial_balance
+    if basis is LossReferenceBasis.CURRENT_BALANCE:
+        return snapshot.equity
+    if basis is LossReferenceBasis.EQUITY:
+        return snapshot.equity
+    if basis is LossReferenceBasis.DAY_START:
+        return snapshot.equity + loss
+    if basis is LossReferenceBasis.INCEPTION:
+        return snapshot.equity + loss
+    raise AssertionError("unsupported loss reference basis")
+
+
+def _loss_limit_result(
+    limit_id: str,
+    loss: Decimal,
+    configured_ratio: Decimal,
+    snapshot: PortfolioRiskSnapshot,
+    basis: LossReferenceBasis,
+    evidence_refs: tuple[str, ...],
+    precedence: int,
+    *,
+    absolute_limit: Decimal | None = None,
+) -> RiskLimitResult:
+    """Evaluate a loss limit while exposing absolute monetary headroom.
+
+    Args:
+        limit_id: Stable limit identity.
+        loss: Observed non-negative loss.
+        configured_ratio: Ratio limit when no absolute limit is supplied.
+        snapshot: Portfolio evidence for reference-balance resolution.
+        basis: Loss-reference basis.
+        evidence_refs: Exact evidence references.
+        precedence: Stable evaluation order.
+        absolute_limit: Optional absolute limit override.
+
+    Returns:
+        Ordered result with ratio and absolute headroom evidence.
+    """
+    basis = LossReferenceBasis(basis)
+    reference = _reference_equity(snapshot, basis, loss=loss)
+    if reference is None or reference <= 0:
+        return _result(
+            limit_id,
+            LimitStatus.NEEDS_MORE_EVIDENCE,
+            None,
+            absolute_limit or configured_ratio,
+            evidence_refs,
+            precedence,
+            reason=RiskErrorCode.MISSING_EVIDENCE,
+            reference_basis=basis.value,
+        )
+    threshold = (
+        absolute_limit if absolute_limit is not None else reference * configured_ratio
+    )
+    observed_ratio = _loss_ratio(loss, reference - loss)
+    threshold_ratio = threshold / reference if reference > 0 else Decimal(1)
+    status = LimitStatus.FAIL if loss > threshold else LimitStatus.PASS
+    return _result(
+        limit_id,
+        status,
+        observed_ratio,
+        threshold_ratio,
+        evidence_refs,
+        precedence,
+        reason=RiskErrorCode.LIMIT_FAILED if status is LimitStatus.FAIL else None,
+        headroom=threshold - loss,
+        reference_basis=basis.value,
+    )
+
+
+def _drawdown_result(
+    snapshot: PortfolioRiskSnapshot,
+    config: RiskConfig,
+    evidence_refs: tuple[str, ...],
+    precedence: int,
+    mandate: FirmMandate | None,
+) -> RiskLimitResult:
+    """Evaluate the configured drawdown floor in account currency.
+
+    Args:
+        snapshot: Portfolio evidence for initial, peak, and EOD balances.
+        config: Active Risk configuration.
+        evidence_refs: Exact evidence references.
+        precedence: Stable evaluation order.
+        mandate: Optional verified firm mandate.
+
+    Returns:
+        Ordered drawdown result with absolute monetary headroom.
+    """
+    mode = mandate.max_drawdown.mode if mandate is not None else config.drawdown_mode
+    if mandate is not None:
+        rule = mandate.max_drawdown
+        limit = rule.value_absolute
+        ratio = rule.value
+        ratchet = rule.trail_stops_at_initial
+    else:
+        limit = None
+        ratio = config.max_drawdown
+        ratchet = config.drawdown_trail_stops_at_initial
+
+    initial = snapshot.initial_balance
+    if mandate is not None or mode is DrawdownMode.STATIC:
+        reference = initial
+    elif mode is DrawdownMode.TRAILING_EOD:
+        reference = snapshot.highest_eod_balance
+    else:
+        reference = snapshot.peak_equity
+
+    if reference is None or reference <= 0:
+        if mandate is None and snapshot.peak_equity is None:
+            return _threshold_result(
+                "drawdown",
+                snapshot.drawdown,
+                config.max_drawdown,
+                evidence_refs,
+                precedence,
+            )
+        return _result(
+            "drawdown",
+            LimitStatus.NEEDS_MORE_EVIDENCE,
+            None,
+            limit or ratio,
+            evidence_refs,
+            precedence,
+            reason=RiskErrorCode.MISSING_EVIDENCE,
+            reference_basis=mode.value,
+        )
+
+    if limit is None:
+        limit = reference * (ratio or Decimal(0))
+    floor = reference - limit
+    if ratchet and initial is not None:
+        floor = min(floor, initial)
+    headroom = snapshot.equity - floor
+    consumed = max(Decimal(0), -headroom)
+    status = LimitStatus.FAIL if headroom < 0 else LimitStatus.PASS
+    return _result(
+        "drawdown",
+        status,
+        consumed,
+        limit,
+        evidence_refs,
+        precedence,
+        reason=RiskErrorCode.LIMIT_FAILED if status is LimitStatus.FAIL else None,
+        headroom=headroom,
+        reference_basis=mode.value,
+    )
 
 
 def _freshness_result(
@@ -281,6 +463,7 @@ def evaluate_portfolio_limits(
     config: RiskConfig,
     *,
     now: datetime,
+    mandate: FirmMandate | None = None,
 ) -> tuple[RiskLimitResult, ...]:
     """Evaluate portfolio limits in the authoritative deterministic precedence.
 
@@ -288,6 +471,7 @@ def evaluate_portfolio_limits(
         snapshot: Immutable portfolio Risk measurements.
         config: Active validated Risk policy.
         now: Injected current UTC time.
+        mandate: Optional verified firm mandate for account-specific limits.
 
     Returns:
         Complete ordered limit results; the first failing item is primary.
@@ -302,29 +486,68 @@ def evaluate_portfolio_limits(
         evidence_refs = tuple(snapshot.evidence_refs.values()) or (
             snapshot.snapshot_id,
         )
+        if mandate is not None and (
+            not mandate.verified or mandate.account_id != snapshot.account_id
+        ):
+            return (
+                _result(
+                    "mandate",
+                    LimitStatus.BLOCKED,
+                    None,
+                    None,
+                    evidence_refs,
+                    0,
+                    reason=RiskErrorCode.INVALID_RISK_CONFIG,
+                    reference_basis="verified_firm_mandate",
+                ),
+            )
+        daily_basis = (
+            LossReferenceBasis(mandate.daily_loss.basis)
+            if mandate is not None
+            else config.daily_loss_basis
+        )
+        total_basis = (
+            LossReferenceBasis.INITIAL_BALANCE
+            if mandate is not None
+            else config.total_loss_basis
+        )
+        daily_limit = mandate.daily_loss.value_absolute if mandate is not None else None
+        daily_ratio = (
+            mandate.daily_loss.value or config.max_daily_loss
+            if mandate is not None
+            else config.max_daily_loss
+        )
+        total_limit = None
+        total_ratio = config.max_total_loss
         results = [
             _freshness_result(snapshot.as_of, checked_now, max_age, evidence_refs),
             _consistency_result(snapshot, config, evidence_refs),
-            _threshold_result(
+            _loss_limit_result(
                 "daily_loss",
-                _loss_ratio(snapshot.daily_loss, snapshot.equity),
-                config.max_daily_loss,
+                snapshot.daily_loss,
+                daily_ratio,
+                snapshot,
+                daily_basis,
                 evidence_refs,
                 2,
+                absolute_limit=daily_limit,
             ),
-            _threshold_result(
+            _loss_limit_result(
                 "total_loss",
-                _loss_ratio(snapshot.total_loss, snapshot.equity),
-                config.max_total_loss,
+                snapshot.total_loss,
+                total_ratio,
+                snapshot,
+                total_basis,
                 evidence_refs,
                 3,
+                absolute_limit=total_limit,
             ),
-            _threshold_result(
-                "drawdown",
-                snapshot.drawdown,
-                config.max_drawdown,
+            _drawdown_result(
+                snapshot,
+                config,
                 evidence_refs,
                 4,
+                mandate,
             ),
         ]
         concentrations = _concentration_results(
@@ -379,12 +602,94 @@ def evaluate_portfolio_limits(
     except RiskDomainError:
         logger.error("Portfolio Policy limit evaluation failed closed")
         raise
-    except (KeyError, TypeError, ValueError) as error:
-        logger.error("Portfolio Policy configuration is incomplete")
-        raise RiskDomainError(
-            RiskErrorCode.INVALID_RISK_CONFIG,
-            "portfolio limit policy configuration invalid",
-        ) from error
+
+
+@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+def evaluate_single_day_profit_share(
+    snapshot: PortfolioRiskSnapshot,
+    mandate: FirmMandate,
+    *,
+    now: datetime,
+) -> RiskLimitResult:
+    """Project today's best-case share of cumulative profit.
+
+    Args:
+        snapshot: Snapshot carrying cumulative, current-day, and proposal data.
+        mandate: Verified account mandate containing the consistency rule.
+        now: Injected current UTC time.
+
+    Returns:
+        A deterministic consistency limit result.
+
+    Raises:
+        RiskDomainError: If the mandate or required profit evidence is invalid.
+    """
+    logger.info("Evaluating forward single-day profit-share projection")
+    checked_now = _utc(now)
+    del checked_now
+    evidence_refs = tuple(snapshot.evidence_refs.values()) or (snapshot.snapshot_id,)
+    if not mandate.verified or mandate.account_id != snapshot.account_id:
+        return _result(
+            "single_day_profit_share",
+            LimitStatus.BLOCKED,
+            None,
+            None,
+            evidence_refs,
+            0,
+            reason=RiskErrorCode.INVALID_RISK_CONFIG,
+            reference_basis="verified_firm_mandate",
+        )
+    rule = mandate.consistency_rule
+    if rule is None or mandate.phase not in rule.applies_in_phase:
+        return _result(
+            "single_day_profit_share",
+            LimitStatus.PASS,
+            None,
+            None,
+            evidence_refs,
+            0,
+            reference_basis="not_applicable",
+        )
+    if snapshot.cumulative_profit is None or snapshot.current_day_profit is None:
+        return _result(
+            "single_day_profit_share",
+            LimitStatus.NEEDS_MORE_EVIDENCE,
+            None,
+            rule.value,
+            evidence_refs,
+            0,
+            reason=RiskErrorCode.MISSING_EVIDENCE,
+            reference_basis="cumulative_profit",
+        )
+    projected_day = snapshot.proposal_best_case_profit or snapshot.current_day_profit
+    projected_day = max(Decimal(0), projected_day)
+    cumulative = max(Decimal(0), snapshot.cumulative_profit)
+    denominator = cumulative + projected_day
+    if denominator <= 0:
+        return _result(
+            "single_day_profit_share",
+            LimitStatus.NEEDS_MORE_EVIDENCE,
+            None,
+            rule.value,
+            evidence_refs,
+            0,
+            reason=RiskErrorCode.MISSING_EVIDENCE,
+            reference_basis="positive_cumulative_profit",
+        )
+    share = projected_day / denominator
+    status = LimitStatus.FAIL if share > rule.value else LimitStatus.PASS
+    allowed_day_profit = (rule.value * cumulative) / (Decimal(1) - rule.value)
+    return _result(
+        "single_day_profit_share",
+        status,
+        share,
+        rule.value,
+        evidence_refs,
+        0,
+        reason=RiskErrorCode.LIMIT_FAILED if status is LimitStatus.FAIL else None,
+        headroom=allowed_day_profit - projected_day,
+        reference_basis="cumulative_profit_projection",
+    )
 
 
 def _calendar_missing_result(

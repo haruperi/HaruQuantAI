@@ -14,6 +14,12 @@ from app.services.portfolio.contracts import (
     PortfolioRebalancePlan,
 )
 from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.rebalancing.cross_account import (
+    CommonModeExposureReport,
+    CrossAccountCorrelationReport,
+    assess_common_mode_exposure,
+    measure_cross_account_correlation,
+)
 from app.services.risk import (
     AllocationRiskDecision,
     DecisionState,
@@ -74,6 +80,47 @@ class RebalancingService:
             return False
         elapsed = int((now - schedule.anchor_at).total_seconds())
         return elapsed % schedule.interval_seconds == 0
+
+    def measure_cross_account_correlation(
+        self,
+        return_series: Mapping[str, Sequence[Decimal]],
+        decision_series: Mapping[str, Sequence[Decimal]],
+        counterparties: Mapping[str, str],
+    ) -> CrossAccountCorrelationReport:
+        """Measure configured rolling cross-account return/decision correlation.
+
+        Returns:
+            Correlation evidence using the configured window and alert threshold.
+        """
+        return measure_cross_account_correlation(
+            return_series,
+            decision_series,
+            counterparties,
+            window=self._settings.portfolio_cross_account_correlation_window,
+            alert_threshold=self._settings.portfolio_cross_account_correlation_alert,
+        )
+
+    def assess_common_mode_exposure(
+        self,
+        loss_at_stop_by_account: Mapping[str, Mapping[str, Decimal]],
+        account_headroom: Mapping[str, Decimal],
+        shared_adverse_scenario: Mapping[str, Decimal],
+        *,
+        software_dependencies: Mapping[str, Sequence[str]],
+        signal_dependencies: Mapping[str, Sequence[str]],
+    ) -> CommonModeExposureReport:
+        """Aggregate cross-account loss-at-stop exposure by risk factor.
+
+        Returns:
+            Common-mode exposure evidence for the supplied scenario.
+        """
+        return assess_common_mode_exposure(
+            loss_at_stop_by_account,
+            account_headroom,
+            shared_adverse_scenario,
+            software_dependencies=software_dependencies,
+            signal_dependencies=signal_dependencies,
+        )
 
     def _block_reasons(
         self,

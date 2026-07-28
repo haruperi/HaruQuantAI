@@ -19,6 +19,7 @@ from app.utils import canonical_json, logger
 
 ANALYTICS_SCHEMA_VERSION = "v1"
 _SHA256_LENGTH = 64
+_MIN_DAILY_OBSERVATIONS = 2
 
 
 def _require_cataloged_code(
@@ -465,6 +466,25 @@ class ClosedTrade:
         return self.profit + self.commission + self.swap
 
 
+@dataclass(config=ConfigDict(frozen=True, extra="forbid"))
+class ClosedTradeLedger:
+    """Minimal closed-ledger projection for barrier-tail analysis."""
+
+    daily_pnl: tuple[Decimal, ...]
+
+    def __post_init__(self) -> None:
+        """Validate finite daily P&L observations.
+
+        Raises:
+            AnalyticsValidationError: If fewer than two finite observations are
+                supplied.
+        """
+        if len(self.daily_pnl) < _MIN_DAILY_OBSERVATIONS or any(
+            not value.is_finite() for value in self.daily_pnl
+        ):
+            raise AnalyticsValidationError("daily ledger needs two finite observations")
+
+
 @dataclass(config=ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True))
 class TradingResult:
     """Canonical producer-neutral Analytics calculation input."""
@@ -591,6 +611,9 @@ class SectionEvidence:
             raise AnalyticsValidationError(
                 "completed or degraded section requires metrics"
             )
+
+
+ReportSection = SectionEvidence
 
 
 @dataclass(config=ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True))

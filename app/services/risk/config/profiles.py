@@ -23,6 +23,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.services.risk.config.mandates import DrawdownMode, LossReferenceBasis
 from app.services.risk.contracts import RiskDomainError, RiskErrorCode
 from app.services.risk.contracts.responses import guard_risk_boundary
 from app.utils import RiskLevel, logger
@@ -239,6 +240,14 @@ class RiskConfig(BaseModel):
     max_daily_loss: Decimal = Decimal("0.05")
     max_total_loss: Decimal = Decimal("0.10")
     max_drawdown: Decimal = Decimal("0.10")
+    drawdown_mode: DrawdownMode = DrawdownMode.TRAILING_INTRADAY
+    drawdown_reference_basis: Literal["initial_balance", "peak_equity"] = "peak_equity"
+    drawdown_trails_on_unrealised: bool = True
+    drawdown_trail_stops_at_initial: bool = False
+    drawdown_eod_snapshot_time: str | None = None
+    drawdown_eod_snapshot_timezone: str | None = None
+    daily_loss_basis: LossReferenceBasis = LossReferenceBasis.DAY_START
+    total_loss_basis: LossReferenceBasis = LossReferenceBasis.INCEPTION
     max_historical_var_ratio: Decimal = Decimal("0.02")
     max_historical_cvar_ratio: Decimal = Decimal("0.03")
     max_symbol_concentration: Decimal = Decimal("0.10")
@@ -536,7 +545,37 @@ class RiskConfig(BaseModel):
         self._validate_numeric_policy()
         self._validate_capability_policy()
         self._validate_live_policy()
+        self._validate_drawdown_policy()
         return self
+
+    def _validate_drawdown_policy(self) -> None:
+        """Validate drawdown mode-specific reference evidence policy.
+
+        Raises:
+            ValueError: If snapshot evidence does not match the selected mode.
+        """
+        if self.drawdown_mode is DrawdownMode.TRAILING_EOD:
+            if (
+                not self.drawdown_eod_snapshot_time
+                or not self.drawdown_eod_snapshot_timezone
+            ):
+                raise ValueError(
+                    "trailing_eod requires an end-of-day snapshot time and timezone"
+                )
+            try:
+                ZoneInfo(self.drawdown_eod_snapshot_timezone)
+            except ZoneInfoNotFoundError as error:
+                raise ValueError("drawdown snapshot timezone is unknown") from error
+        elif (
+            self.drawdown_eod_snapshot_time is not None
+            or self.drawdown_eod_snapshot_timezone is not None
+        ):
+            raise ValueError("eod snapshot settings require trailing_eod")
+        if (
+            self.drawdown_mode is DrawdownMode.TRAILING_INTRADAY
+            and not self.drawdown_trails_on_unrealised
+        ):
+            raise ValueError("trailing_intraday must trail unrealised equity")
 
     def _validate_numeric_policy(self) -> None:
         """Validate numeric ranges and ordered bounds.

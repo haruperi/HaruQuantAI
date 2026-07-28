@@ -402,3 +402,50 @@ class AuditEvent(BaseModel):
         if not isinstance(frozen, Mapping):
             raise TypeError("payload must be a mapping")
         return frozen
+
+
+def create_audit_event(
+    *,
+    event_id: str,
+    timestamp: datetime,
+    domain: str,
+    action: str,
+    request_id: str,
+    correlation_id: str,
+    payload: Mapping[str, object],
+    principal_id: str | None = None,
+    causation_id: str | None = None,
+    contract_version: Literal["v1"] = "v1",
+    schema_id: Literal["utils.audit_event.v1"] = "utils.audit_event.v1",
+) -> AuditEvent:
+    """Construct an immutable AuditEvent instance.
+
+    Args:
+        event_id: Unique trace identifier for the event.
+        timestamp: Aware UTC datetime when the event occurred.
+        domain: Business domain name representing the source.
+        action: Specific action performed within the domain.
+        request_id: Trace identifier of the outer request.
+        correlation_id: Trace identifier tracking the entire flow.
+        payload: Event data mapping to validate and freeze.
+        principal_id: Optional identity of the invoking user or service.
+        causation_id: Optional trace identifier tracking the direct cause.
+        contract_version: Version string fixed at 'v1'.
+        schema_id: Schema identifier fixed at 'utils.audit_event.v1'.
+
+    Returns:
+        Validated immutable AuditEvent instance.
+    """
+    return AuditEvent(
+        contract_version=contract_version,
+        schema_id=schema_id,
+        event_id=event_id,
+        timestamp=timestamp,
+        domain=domain,
+        action=action,
+        principal_id=principal_id,
+        request_id=request_id,
+        correlation_id=correlation_id,
+        causation_id=causation_id,
+        payload=payload,
+    )

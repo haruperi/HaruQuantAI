@@ -1,8 +1,9 @@
 ﻿# Strategy
 
 > **Package:** `app/services/strategy`
-> **Status:** `Completed`
-> **Last updated:** `2026-07-24`
+> **Status:** `Partial` — the existing ten features remain completed;
+> `FEAT-STR-11` external research-proposal evaluation is documented and `Missing`.
+> **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for final requirements, structure, implementation sequence, workflows, public contracts, configuration, limits, progress, usage examples, and tests.
 > Update this file before changing Strategy code.
@@ -235,6 +236,7 @@ Folders and files are ordered from lowest dependency to highest dependency. This
 | Completed | `FEAT-STR-08` Stateful Event Evaluation | `event/` | Exact declarations: Section 4.8 | Section 4.8 functional requirements | `tests/strategy/usage/08_event.py` |
 | Completed | `FEAT-STR-09` Concrete Signal Execution Boundary | `signals/` | Exact declarations and signal contracts: Section 4.9 | Section 4.9 functional requirements | `tests/strategy/usage/09_signals.py` |
 | Completed | `FEAT-STR-10` Strategy Signal Library | `evaluators/` | Exact declarations: Section 4.10 | Section 4.10 functional requirements | `tests/strategy/usage/10_strategy_library.py` |
+| Missing | `FEAT-STR-11` External Research Proposal Evaluation | `proposal_intake/` | `StrategyProposalEvaluationRequest`, `StrategyProposalEvaluationResult`, `evaluate_strategy_proposal` | `FR-STR-049`–`053` | `tests/strategy/usage/11_proposal_intake.py` |
 
 ```text
 app/services/strategy/
@@ -297,15 +299,19 @@ app/services/strategy/
 │   ├── _mechanics.py                   # Private deterministic signal mechanics
 │   └── boundary.py                     # Hash-bound atomic evaluation boundary
 ├── evaluators/                         # Feature: the strategy signal library
-    ├── __init__.py
-    ├── README.md
-    ├── naive_ma_trend.py               # MA crossover and trend-filter signals
-    ├── decomposing_trade.py            # Recovered RSI crossing signals
-    ├── harriet_hedging.py              # Point-in-time MTF structure signals
-    ├── market_structure.py             # Provenance-bound ZigZag structure signals
-    ├── random_walk.py                  # Flat-state basket trigger signals
-    ├── sqx_breakout_atr_trailing.py    # Channel breakout and ATR facts
-    └── white_fairy.py                  # Recovered RSI crossing signals
+│   ├── __init__.py
+│   ├── README.md
+│   ├── naive_ma_trend.py               # MA crossover and trend-filter signals
+│   ├── decomposing_trade.py            # Recovered RSI crossing signals
+│   ├── harriet_hedging.py              # Point-in-time MTF structure signals
+│   ├── market_structure.py             # Provenance-bound ZigZag structure signals
+│   ├── random_walk.py                  # Flat-state basket trigger signals
+│   ├── sqx_breakout_atr_trailing.py    # Channel breakout and ATR facts
+│   └── white_fairy.py                  # Recovered RSI crossing signals
+├── proposal_intake/                    # FEAT-STR-11 external proposal evaluation (Missing)
+│   ├── __init__.py
+│   ├── contracts.py
+│   └── evaluation.py
 └── migrations/                         # Documented non-feature persistence support
     ├── __init__.py
     ├── README.md
@@ -337,11 +343,16 @@ flowchart LR
     EVT[[event]]
     SIG[[signals]]
     EVAL[[evaluators]]
+    PROP[[proposal_intake]]
 
     CON --> DIA
     CON --> REG
     DIA --> REG
     CON --> INT
+    CON --> PROP
+    REG --> PROP
+    SIG --> PROP
+    INT --> PROP
     DIA --> INT
     CON --> REP
     DIA --> REP
@@ -996,6 +1007,24 @@ No feature-specific numeric default is approved. Precision and UTC policies come
 - Every inactive signal remains explicit and deterministic so golden tests can distinguish false from missing/unready evidence.
 
 ---
+
+### 4.11 `proposal_intake/` — External Research Proposal Evaluation
+
+**Status:** `Missing`
+
+This receiver-owned boundary lets Agentic or another authorized external researcher
+submit a typed thesis for deterministic evaluation. It does not accept executable
+code, broker fields, risk approval, or authoritative size. A proposal can produce a
+canonical `TradeIntent` only when an exact registered strategy/version and current
+deterministic signal evidence independently support it.
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-STR-049` | Define the receiver-owned proposal-evaluation request with principal/trace identity, source proposal/task/hash, exact strategy/version, instrument, direction, horizon, thesis/invalidation evidence references, requested evaluation scope, expiry, and no broker-native or approval fields. | `StrategyProposalEvaluationRequest` | None | `ValidationError`: source, scope, strategy, evidence, time, or prohibited field is invalid | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Missing | `FR-STR-050` | Define a result that records accepted-for-evaluation, rejected, expired, or no-signal status; deterministic reasons; source binding; evaluated strategy/signal evidence; and optional canonical `TradeIntent`. | `StrategyProposalEvaluationResult` | None | `ValidationError`: status, evidence, or intent binding is inconsistent | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Missing | `FR-STR-051` | Validate authorization, idempotency, expiry, exact registered strategy identity/hashes, point-in-time Data/Indicators evidence, and evaluator compatibility before evaluation. | `validate_strategy_proposal(...)` | Read-only registry/evidence access | None; returns typed rejection | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Missing | `FR-STR-052` | Evaluate the registered deterministic strategy normally and emit a `TradeIntent` only when its current canonical decision agrees with the requested instrument/direction and all Strategy invariants. | `evaluate_strategy_proposal(...) -> StandardResponse[StrategyProposalEvaluationResult]` | Audit event publication | None; returns deterministic rejection/failure | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Missing | `FR-STR-053` | Preserve the Agentic proposal only as lineage and never let its confidence, consensus, rationale, size, approval language, or free text alter deterministic signals or `TradeIntent` fields. | `bind_proposal_lineage(...)` | None | `ValidationError`: proposal attempts deterministic-field influence | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
 
 ## 5. Package-Wide Requirements and Shared Configuration
 

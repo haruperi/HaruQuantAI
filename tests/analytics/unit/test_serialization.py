@@ -1,6 +1,5 @@
 """Unit tests for bounded Analytics report serialization."""
 
-# ruff: noqa: INP001
 import json
 from dataclasses import replace
 
@@ -8,6 +7,7 @@ import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.serialization import serialize_report
 from app.utils import logger
+
 from tests.analytics._support import _report
 
 

@@ -188,14 +188,16 @@ def fr_sim_011() -> None:
     _header(
         "Demonstrate FR-SIM-011. Responsibility: The system shall atomically apply a simulated fill, realized PnL, commission, swap, and margin effect while preserving balance/equity/free-margin invariants, accumulating commission, swap, and gross-profit totals, and returning the itemized costs charged by that fill so the caller can attribute them to the exact position. The engine journals the resulting evidence; the ledger itself publishes no event."
     )
-    costs = _value(_ledger().apply_fill(
-        LedgerFill(
-            action="OPEN",
-            side="BUY",
-            volume=Decimal(1),
-            price=Decimal("1.1"),
+    costs = _value(
+        _ledger().apply_fill(
+            LedgerFill(
+                action="OPEN",
+                side="BUY",
+                volume=Decimal(1),
+                price=Decimal("1.1"),
+            )
         )
-    ))
+    )
     print(f"Applied fill total costs: {costs['total']}")
 
 

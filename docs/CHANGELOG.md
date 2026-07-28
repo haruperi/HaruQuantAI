@@ -2,6 +2,30 @@
 
 ## [Unreleased]
 
+### Define the complete Agentic Firm end state
+
+The fourteenth domain is specified as a full multi-agent research, engineering, advisory, and proposal firm while deterministic domains retain all consequential authority.
+
+#### Added (3)
+
+- Added the canonical twenty-two-feature Agentic Firm registry, specialized firm organization, dynamic deliberation, provider-neutral Google ADK runtime, durable workflows, governed memory, security, observability, and deterministic proposal-handoff contracts.
+- Added supporting specifications for orchestration, firm organization, Google ADK/model providers, memory/evidence, security threats, operations, and data readiness.
+- Added missing Data point-in-time research sources, Research fundamental/sentiment evidence, Strategy external-proposal evaluation, and UI/API Agentic operator seams required by the end-state workflows.
+
+#### Changed (6)
+
+- Expanded Agentic from a restricted offline eight-agent pipeline to the documented end-state firm covering fundamental, sentiment, technical, quantitative, trader, risk-advisory, portfolio, experimentation, optimization, and coding capabilities.
+- Required every Agentic trade or allocation proposal to traverse the normal receiver-owned Strategy, Portfolio, Risk, Trading, and Brokers controls without direct Agentic execution authority.
+- Reconciled Agentic requirements into one sequential canonical namespace and converted the supporting files from competing authorities into elaborations of the package Feature Registry.
+- Corrected the retained research-report provenance and recorded Google ADK 2.x as the selected runtime behind HaruQuantAI-owned provider-neutral contracts.
+- Reorganized the canonical Agentic README into the package README template, adding dependency-ordered module/file, workflow, configuration, persistence, testing, and change-process manifests without changing the approved twenty-two-feature end state.
+- Replaced the uniform Agentic capability layout with a hybrid architecture that retains ten shared infrastructure modules and gives twelve role-bearing features registered department/agent packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, focused schemas, and explicit optional files.
+
+#### Removed (1)
+
+- Removed the superseded Agentic v1, v2, and v3 document sets and completed historical consolidation plan after retaining the canonical research evidence and end-state specifications.
+
+
 ### Reorganize central settings and strengthen executable usage evidence
 
 Central environment configuration is grouped into logical sections, while provider-backed usage evidence now demonstrates genuine non-production connections and complete domain workflows.

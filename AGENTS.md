@@ -15,12 +15,18 @@
 - **Document Assumptions**: Add inline comments explaining non-obvious domain assumptions, numeric thresholds, mathematical models, or boundary conditions.
 - **Research Workflow**: 1. **WebSearch** (landscape) → 2. **Context7** (verify syntax/deprecations) → 3. **DeepWiki** (design intent). Handle disagreements by explicitly calling out tradeoffs.
 - **Focused Domain Architecture (Domain Scoping)**: In `app/services/[DOMAIN]`, everything must be focused:
+  - **Agentic domain exception**: `app/agentic/` is the approved top-level orchestration domain. It follows the same focused rules below: one registered `FEAT-AGT-NN` capability per production module folder and one numbered standalone usage program per feature. This location does not make Agentic a deterministic service owner and does not permit it to bypass any `app/services/[DOMAIN]` public boundary.
   - A **Module folder** inside a domain is dedicated to ONE feature / capability only (e.g., feature `FEAT-DATA-01: Retrieve historical data` has its own module folder inside the data domain focused solely on that feature).
   - A **File** inside a module folder is for ONE use case or focused responsibility only.
   - A **Class / function / method** inside a file addresses ONE functional requirement behavior at a time.
   - One feature = One module folder = One usage example file demonstrating that feature
   - **Reconciliation Exclusions**: For feature-count reconciliation, count only README-registered production feature directories. Exclude cache directories (`__pycache__`), generated artifacts, package metadata (`py.typed`), migration infrastructure (`migrations/`), and explicitly documented non-feature support directories (`contracts/`, `schemas/`, `_shared/`). Support directories must have documented ownership and may not become a second implementation location for feature behavior.
   - **Root-file Rule**: Except for explicitly allowed package infrastructure (`__init__.py`, `_settings.py`, `_limits.py`), production behavior must reside inside its owning feature module folder.
+  - **Package-Root Export Gate**: `app/services/[DOMAIN]/__init__.py` is the sole public import boundary for a domain. Any symbol not re-exported in `__init__.py` is strictly private and internal to that domain.
+  - **No Deep Cross-Domain Imports**: Public consumers outside a domain (production services, usage examples, workflow scripts, and integration tests) must import strictly from `app.services.[DOMAIN]` (e.g. `from app.services.data import ...`). Deep submodule imports (e.g. `from app.services.data.evidence.fx_contracts import FXConversionEvidence`) are strictly prohibited.
+  - **Function-Only Public API Surface**: Domain public exports (`__all__` in `app/services/[DOMAIN]/__init__.py`) must consist exclusively of standalone functions (`def func(...)`). Classes and constants must remain internal/private:
+    - *Constants*: Expose via getter functions (e.g., `get_...()`).
+    - *Classes*: Encapsulate classes internally. To expose class functionality publicly, convert the internal class method to a private helper (e.g. `_func()`) and expose a standalone public function outside the class (e.g. `func()`) that delegates to it.
 - **Dry Run Required**: Before editing, produce a dry-run report detailing:
   - Selected feature to be built/edited and rationale
   - Files read: authoritative documents, upstream dependency documentation, related source/test files.

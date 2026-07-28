@@ -1,11 +1,11 @@
 """Unit tests for Analytics reproducibility hashes."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
 from app.utils import logger
+
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 

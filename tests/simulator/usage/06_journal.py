@@ -48,13 +48,13 @@ def fr_sim_013() -> None:
         store = SqliteSimulationStateStore(
             tmp_path / "state.db", tmp_path / "artifacts"
         )
-        event = _value(JournalWriter(
-            store, "run-usage", "req-usage", "cor-usage"
-        ).append(
-            "run_started",
-            {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
-            NOW,
-        ))
+        event = _value(
+            JournalWriter(store, "run-usage", "req-usage", "cor-usage").append(
+                "run_started",
+                {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
+                NOW,
+            )
+        )
         print(f"JournalEvent sequence: {event.sequence}")
 
 
@@ -74,11 +74,13 @@ def fr_sim_014() -> None:
         store = SqliteSimulationStateStore(
             tmp_path / "state.db", tmp_path / "artifacts"
         )
-        event = _value(JournalWriter(store, "run-usage", "req-usage", "cor-usage").append(
-            "run_started",
-            {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
-            NOW,
-        ))
+        event = _value(
+            JournalWriter(store, "run-usage", "req-usage", "cor-usage").append(
+                "run_started",
+                {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
+                NOW,
+            )
+        )
         print(f"Appended event hash: {event.event_hash[:16]}...")
 
 
@@ -146,15 +148,17 @@ def fr_sim_017() -> None:
     _header(
         "Demonstrate FR-SIM-017. Responsibility: The system shall return the existing completed run for the same request ID and hash, and reject the same request ID with a different hash."
     )
-    run_id = _value(resolve_idempotent_run(
-        "req-usage",
-        "a" * 64,
-        lambda request_id: {
-            "request_hash": "a" * 64,
-            "run_id": request_id.replace("req", "run"),
-            "status": "completed",
-        },
-    ))
+    run_id = _value(
+        resolve_idempotent_run(
+            "req-usage",
+            "a" * 64,
+            lambda request_id: {
+                "request_hash": "a" * 64,
+                "run_id": request_id.replace("req", "run"),
+                "status": "completed",
+            },
+        )
+    )
     print(f"Resolved run ID: {run_id}")
 
 
@@ -171,11 +175,13 @@ def example_journal() -> None:
         writer = JournalWriter(store, "run-usage", "req-usage", "cor-usage")
 
         # 1. Append journal event
-        event = _value(writer.append(
-            "run_started",
-            {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
-            NOW,
-        ))
+        event = _value(
+            writer.append(
+                "run_started",
+                {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
+                NOW,
+            )
+        )
         print(
             f"Appended JournalEvent type: {event.event_type}, "
             f"sequence: {event.sequence}"
@@ -193,15 +199,17 @@ def example_journal() -> None:
         print(f"Replayed journal state sequence: {replayed['sequence']}")
 
     # 4. Resolve idempotent run
-    run_id = _value(resolve_idempotent_run(
-        "req-usage",
-        "a" * 64,
-        lambda request_id: {
-            "request_hash": "a" * 64,
-            "run_id": request_id.replace("req", "run"),
-            "status": "completed",
-        },
-    ))
+    run_id = _value(
+        resolve_idempotent_run(
+            "req-usage",
+            "a" * 64,
+            lambda request_id: {
+                "request_hash": "a" * 64,
+                "run_id": request_id.replace("req", "run"),
+                "status": "completed",
+            },
+        )
+    )
     print(f"Resolved idempotent run ID: {run_id}")
 
 

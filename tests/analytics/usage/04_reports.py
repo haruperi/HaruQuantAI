@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.services.analytics import (
     AnalyticsRunConfig,
     ClosedTrade,
+    ClosedTradeLedger,
     PerformanceReport,
     PortfolioAllocationEvidence,
     PortfolioPerformanceReport,
@@ -22,14 +23,21 @@ from app.services.analytics import (
     RiskFreeRateEvidence,
     StatisticalValidationConfig,
     adapt_trading_result,
+    build_barrier_section,
     build_performance_report,
     build_portfolio_allocation_evidence,
     build_portfolio_performance_report,
     build_portfolio_rebalance_measurement,
+    build_worst_day_distribution,
     compare_performance_reports,
     compute_reproducibility_hashes,
     serialize_report,
 )
+from app.services.optimization.robustness import (
+    FirstPassageReport,
+    JointFirstPassageReport,
+)
+from app.services.risk import DrawdownMode
 from app.utils import generate_id
 from tests.analytics._support import (
     _measurement_request,
@@ -331,9 +339,63 @@ def fr_anlt_052() -> None:
     example_reports()
 
 
+def fr_anlt_053() -> None:
+    """FR-ANLT-053: Report worst-day percentiles rather than a mean."""
+    _header("FR-ANLT-053: Worst-single-day percentile distribution")
+    distribution = build_worst_day_distribution(
+        ClosedTradeLedger(
+            daily_pnl=(Decimal(-100), Decimal(-10), Decimal(-50), Decimal(20))
+        ),
+        percentiles=(Decimal("0.5"), Decimal("0.95")),
+    )
+    print(f"Worst-day percentiles: {dict(distribution.percentiles)}")
+
+
+def fr_anlt_054() -> None:
+    """FR-ANLT-054: Build a non-fabricating barrier report section."""
+    _header("FR-ANLT-054: Barrier report section")
+    first = FirstPassageReport(
+        mandate_version="v1",
+        mode=DrawdownMode.STATIC,
+        paths=10,
+        seed=7,
+        probability_target=Decimal("0.5"),
+        probability_daily_breach=Decimal("0.1"),
+        probability_drawdown_breach=Decimal("0.1"),
+        probability_expired=Decimal("0.3"),
+        median_termination_day=Decimal(3),
+    )
+    joint = JointFirstPassageReport(
+        paths=10,
+        seed=7,
+        account_ids=("account-1", "account-2"),
+        surviving_accounts_distribution={
+            0: Decimal("0.2"),
+            1: Decimal("0.3"),
+            2: Decimal("0.5"),
+        },
+        probability_none_survive=Decimal("0.2"),
+        measured_correlation={"account-1:account-2": Decimal("0.8")},
+    )
+    worst = build_worst_day_distribution(
+        ClosedTradeLedger(daily_pnl=(Decimal(-100), Decimal(-10))),
+        percentiles=(Decimal("0.95"),),
+    )
+    section = build_barrier_section(
+        first,
+        joint,
+        worst,
+        mandate_version="v1",
+        mode_sensitivity={DrawdownMode.STATIC: first},
+    )
+    print(f"Barrier section status: {section.status}")
+
+
 def main() -> None:
     """Run the bounded demonstration shared by every reporting requirement."""
     example_reports()
+    fr_anlt_053()
+    fr_anlt_054()
 
 
 if __name__ == "__main__":

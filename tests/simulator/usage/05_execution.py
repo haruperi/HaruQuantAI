@@ -153,7 +153,9 @@ def example_execution() -> None:
         trader = SimTrader(engine)
         _value(asyncio.run(trader.submit_order(_intent())))
         _value(engine.execute_tick(_tick()))
-        close_res = _value(trader.close_position("sim-position-order-engine", Decimal(1)))
+        close_res = _value(
+            trader.close_position("sim-position-order-engine", Decimal(1))
+        )
         print(f"Closed position quantity: {close_res['quantity']}")
 
         snapshot = _value(trader.snapshot())

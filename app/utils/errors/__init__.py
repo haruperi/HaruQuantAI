@@ -1,6 +1,6 @@
 """Public shared-error exports."""
 
-from app.utils.errors.catalog import COMMON_ERROR_CATALOG
+from app.utils.errors.catalog import COMMON_ERROR_CATALOG, get_common_error_catalog
 from app.utils.errors.contracts import ErrorDefinition, ErrorSeverity
 from app.utils.errors.exceptions import (
     ConfigurationError,
@@ -32,6 +32,7 @@ __all__ = [
     "HaruQuantError",
     "SecurityError",
     "ValidationError",
+    "get_common_error_catalog",
     "get_error_metadata",
     "map_exception",
     "normalize_error_code",

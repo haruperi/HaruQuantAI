@@ -78,6 +78,6 @@ def test_margin_formula_is_exact_and_deterministic(
 ) -> None:
     """Apply the documented Decimal margin formula without float drift."""
     inputs = tuple(Decimal(value) for value in (volume, price, contract_size, leverage))
-    assert _value(calculate_margin(inputs[0], inputs[1], inputs[2], inputs[3])) == Decimal(
-        expected
-    )
+    assert _value(
+        calculate_margin(inputs[0], inputs[1], inputs[2], inputs[3])
+    ) == Decimal(expected)

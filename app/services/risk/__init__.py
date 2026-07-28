@@ -7,7 +7,14 @@ from app.services.risk.allocation import (
 )
 from app.services.risk.approvals import ApprovalTokenService
 from app.services.risk.audit import RiskAuditChain
-from app.services.risk.config import RiskConfig, compute_config_hash, load_risk_config
+from app.services.risk.config import (
+    DrawdownMode,
+    FirmMandate,
+    RiskConfig,
+    compute_config_hash,
+    load_firm_mandate,
+    load_risk_config,
+)
 from app.services.risk.contracts import (
     ActionPolicyVerdict,
     AllocationBudgetActivationRequest,
@@ -48,6 +55,7 @@ from app.services.risk.kill_switch import (
 from app.services.risk.limits import (
     evaluate_market_context,
     evaluate_portfolio_limits,
+    evaluate_single_day_profit_share,
 )
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
 from app.services.risk.regimes import assess_risk_regime
@@ -66,6 +74,8 @@ __all__ = (
     "ApprovalValidationResult",
     "DecisionReuseValidationResult",
     "DecisionState",
+    "DrawdownMode",
+    "FirmMandate",
     "KillSwitchCommand",
     "KillSwitchState",
     "LimitStatus",
@@ -99,7 +109,9 @@ __all__ = (
     "compute_config_hash",
     "evaluate_market_context",
     "evaluate_portfolio_limits",
+    "evaluate_single_day_profit_share",
     "generate_risk_report",
+    "load_firm_mandate",
     "load_risk_config",
     "revalidate_risk_decision",
     "review_allocation_proposal",

@@ -1,6 +1,5 @@
 """Unit tests for closed-trade drawdown evidence."""
 
-# ruff: noqa: INP001
 import json
 from decimal import Decimal
 from pathlib import Path
@@ -9,6 +8,7 @@ import pytest
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.metrics.drawdowns import calculate_drawdown_evidence
 from app.utils import logger
+
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 GOLDEN = Path("tests/analytics/fixtures/golden/max_drawdown.json")

@@ -1,8 +1,8 @@
 """Unit tests for Analytics risk evidence."""
 
-# ruff: noqa: INP001
 from app.services.analytics.metrics.risk import calculate_risk_evidence
 from app.utils import logger
+
 from tests.analytics.unit.test_results_adapter import _config
 
 

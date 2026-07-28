@@ -6,7 +6,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.utils import AuditEvent, AuthContext, generate_id, redact_mapping_value
+from app.utils import (
+    create_audit_event,
+    create_auth_context,
+    generate_id,
+    redact_mapping_value,
+)
 from pydantic import ValidationError as PydanticValidationError
 
 
@@ -18,7 +23,7 @@ def _header(title: str) -> None:
 def fr_utils_001_auth_context() -> None:
     """FR-UTL-001: Construct and display bounded AuthContext identity evidence."""
     _header("Example 1: AuthContext Construction")
-    context = AuthContext(
+    context = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="service-demo",
@@ -40,7 +45,7 @@ def fr_utils_002_audit_event() -> None:
     _header("Example 2: AuditEvent Construction")
     payload = redact_mapping_value({"status": "accepted", "token": "demo"}).value
     assert isinstance(payload, dict)
-    event = AuditEvent(
+    event = create_audit_event(
         contract_version="v1",
         schema_id="utils.audit_event.v1",
         event_id=generate_id("evt"),
@@ -58,7 +63,7 @@ def fr_utils_003_contract_validation() -> None:
     """FR-UTL-003: Demonstrate fail-closed contract timestamp validation."""
     _header("Example 3: Contract Validation")
     try:
-        AuthContext(
+        create_auth_context(
             contract_version="v1",
             schema_id="utils.auth_context.v1",
             principal_id="service-demo",

@@ -1,6 +1,5 @@
 """Unit tests for core Analytics ratios."""
 
-# ruff: noqa: INP001
 from dataclasses import replace
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -9,6 +8,7 @@ from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.contracts import RiskFreeRateEvidence
 from app.services.analytics.metrics.ratios import calculate_ratio_evidence
 from app.utils import logger
+
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 

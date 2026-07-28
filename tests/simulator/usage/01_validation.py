@@ -149,13 +149,15 @@ def fr_sim_003() -> None:
     _header(
         "Demonstrate FR-SIM-003. Responsibility: The system shall permit only approved FX scope or explicit `FAST_RESEARCH`, rejecting unsupported assets, features, service mode, and canonical claims from approximation."
     )
-    _value(validate_phase_one_scope(
-        {
-            "asset_class": "FX",
-            "runtime_profile": "simulation",
-            "execution_route": "sim",
-        }
-    ))
+    _value(
+        validate_phase_one_scope(
+            {
+                "asset_class": "FX",
+                "runtime_profile": "simulation",
+                "execution_route": "sim",
+            }
+        )
+    )
     print("Phase one scope successfully validated")
 
 

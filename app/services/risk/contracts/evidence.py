@@ -503,11 +503,17 @@ class PortfolioRiskSnapshot(_EvidenceModel):
     account_id: str
     base_currency: str
     equity: Decimal
+    initial_balance: Decimal | None = None
     daily_loss: Decimal
     total_loss: Decimal
+    current_day_profit: Decimal | None = None
+    cumulative_profit: Decimal | None = None
+    proposal_best_case_profit: Decimal | None = None
     gross_exposure: Decimal
     net_exposure: Decimal
     drawdown: Decimal
+    peak_equity: Decimal | None = None
+    highest_eod_balance: Decimal | None = None
     margin_utilization: Decimal | None
     effective_leverage: Decimal | None
     historical_var: Decimal | None
@@ -564,11 +570,17 @@ class PortfolioRiskSnapshot(_EvidenceModel):
 
     @field_validator(
         "equity",
+        "initial_balance",
         "daily_loss",
         "total_loss",
+        "current_day_profit",
+        "cumulative_profit",
+        "proposal_best_case_profit",
         "gross_exposure",
         "net_exposure",
         "drawdown",
+        "peak_equity",
+        "highest_eod_balance",
         "margin_utilization",
         "effective_leverage",
         "historical_var",

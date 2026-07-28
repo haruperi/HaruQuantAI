@@ -30,6 +30,7 @@
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
 * `app/services/api/README.md` defines the approved gateway/UI boundary, state ownership, and synchronous initial Simulation/Optimization surface; no API runtime code or `ui/` application package has landed yet.
 * `app/services/portfolio/README.md` now defines the approved Portfolio target architecture; the package code is not yet implemented. Portfolio is the thirteenth domain and its status remains `Missing`.
+* `app/agentic/README.md` defines the complete Agentic Firm target; no package code has landed and every `FEAT-AGT-*` feature remains `Missing`. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,
   errors, identifiers, UTC, canonical serialization, redaction/security helpers,
   settings, and structured logging.
@@ -48,9 +49,11 @@
   arguments; standalone calls lazily compose MT5 read-only source, identity,
   migration, and calendar dependencies through the existing Brokers and Data
   boundaries. Explicit source/adapter injection remains supported.
-  Its package-local architecture and repository-wide package-root consumer boundary
-  are implemented and verified. Data status is `Completed`; specification parity,
-  standalone usage evidence, and the approved MT5 demo-provider validation pass.
+  Its existing package-local architecture and repository-wide package-root consumer
+  boundary are implemented and verified. Data status is now `Partial`: the fifteen
+  current features remain completed, while `FEAT-DATA-16` point-in-time licensed
+  research-source evidence is documented and `Missing` for future Agentic
+  fundamental/sentiment activation.
   `CAP-DATA-028` locates the behavior in
   fifteen approved capabilities: `contracts/`, `market_data/`,
   `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`,
@@ -69,8 +72,11 @@
   Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the
   non-repainting contract.
 * `app/services/strategy/` is implemented across contracts, diagnostics, registry,
-  intents, replay/checkpoints, vectorized evaluation, event hooks, concrete signal
-  evaluators, and all ten `WF-STRAT-*` workflows.
+  intents, replay/checkpoints, vectorized evaluation, event hooks, and concrete
+  signal evaluators. Its status is now `Partial`: `FEAT-STR-11` documents the
+  `Missing` receiver-owned external-proposal evaluation that can emit a canonical
+  `TradeIntent` only when the registered deterministic strategy independently
+  supports the proposal.
 * `app/services/risk/` is implemented across contracts, configuration, snapshots,
   sizing, audit chaining, policy gates, regimes, approvals, decisions, scenarios, and
   reporting. Its status is `Partial`: kill-switch clearance must require a distinct
@@ -92,6 +98,10 @@
   `FR-SIM-033` fixture parity are verified without reverse imports. Analytics
   derives its equity curve deterministically from the closed-trade ledger and has
   no open decisions.
+* `app/services/research/` retains its completed twelve-feature deterministic
+  research baseline. Its status is now `Partial`: `FEAT-RES-13` documents the
+  `Missing` deterministic fundamental/sentiment source-evidence projection required
+  before those Agentic roles can activate.
 
 ---
 
@@ -100,7 +110,8 @@
 ### Workspace Directory Layout (Target)
 
 * `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. UI/API owns user/session/settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
-* `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, and API). Live-route execution is owned by Trading.
+* `app/agentic/`: Approved top-level orchestration domain with one focused owning module per registered feature. Ten shared infrastructure features remain root packages for portable contracts/governance, Google ADK adaptation, durable orchestration, permissions, context/memory, bounded deliberation, lifecycle, operations, and public API. Twelve role-bearing feature modules are leaf packages under the namespace-only `agents/<department>/<agent_name>/` hierarchy; each owns `agent.py`, `prompt.md`, schemas, README, and only its declared optional files. Agentic submits untrusted typed requests only and has no direct execution path.
+* `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, agentic, and API). Live-route execution is owned by Trading.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
 * `ui/`: Next.js frontend application environment.
 * `tests/`: Unit, integration, usage, and system contract test suites.
@@ -115,7 +126,13 @@ public domain APIs and may not bypass Risk, Trading, Data, or Brokers boundaries
 ```mermaid
 flowchart TD
     CLIENT["UI / External clients"] --> API["UI/API Gateway / Identity / Access Control"]
+    API --> AGENTIC["Agentic Firm: governed research, deliberation and proposals"]
     API --> ORCH["Research / Optimization / Simulation / Analytics"]
+    AGENTIC --> ORCH
+    AGENTIC --> DECIDE
+    AGENTIC --> PORT
+    AGENTIC --> TRADING
+    AGENTIC --> UTILS
     API --> PORT["Portfolio"]
     API --> DECIDE["Strategy / Indicators / Risk"]
     API --> TRADING["Trading"]
@@ -137,6 +154,61 @@ flowchart TD
     DATA --> UTILS
     BROKERS --> UTILS
 ```
+
+**Agentic boundary note.** Agentic reads public evidence from deterministic domains
+and may submit receiver-owned requests to Strategy, Portfolio, Risk, and Trading.
+Those edges are untrusted proposal/intake edges, not authority transfers. Each
+receiver performs its complete validation and authorization, and only Trading may
+reach Brokers. Agentic has no Brokers edge, credential, mandate override,
+kill-switch authority, order tool, or direct execution route. Agent-authored code
+reaches Indicators or Strategy only through the governed promotion and
+receiver-registration workflow.
+
+### Agentic Runtime and Trust Boundaries
+
+Google ADK 2.x provides the in-process graph, dynamic, collaborative, task, session,
+artifact, evaluation, callback, and telemetry runtime behind `AdkRuntime`.
+HaruQuantAI owns the stable task, message, result, deliberation, evidence, proposal,
+checkpoint, permission, and model-profile contracts. No ADK or provider object
+crosses the Agentic public API or becomes canonical persisted state.
+
+The validated `RoleRegistry` resolves stable role IDs to registered leaf agent
+packages, prompt and composite-instruction hashes, model profiles, schemas, tools,
+evaluation state, and limits. A leaf `agent.py` produces a provider-neutral
+definition only after its package-local `prompt.md` passes integrity validation.
+Only `runtime/adk.py` may construct Google ADK objects.
+
+```mermaid
+flowchart LR
+    OP["Authenticated operator"] --> API2["UI/API"]
+    API2 --> AP["Agentic public API"]
+    AP --> POL["Mandate + permission enforcement"]
+    POL --> WF["Durable HaruQuantAI workflow state"]
+    WF --> REG["Validated RoleRegistry + package/prompt hashes"]
+    REG --> AG["Registered agent.py + prompt.md packages"]
+    AG --> ADK["AdkRuntime / Google ADK graph"]
+    ADK --> MG["Provider-neutral ModelGateway"]
+    MG --> LLM["Evaluated model providers"]
+    ADK --> TOOLS["Typed Agentic tool adapters"]
+    TOOLS --> DOM["Deterministic public domain APIs"]
+    ADK --> MEM["Scoped evidence / experiment / audit / TTL memory"]
+    ADK --> SB["Ephemeral code sandbox"]
+    DOM --> PIPE["Strategy / Portfolio / Risk / Trading"]
+    PIPE --> BRK["Brokers — Trading only"]
+```
+
+The Agentic worker is separately cancellable from the deterministic backend. The
+code sandbox is an isolated per-run worker with no production credential and denied
+network by default. Persistent Agentic stores use the repository migration ledger,
+checksum, lock, transaction, retention, and recovery rules.
+
+### Package-Root Export Gate & Public API Surface Rules
+
+1. **Package-Root Export Gate**: `app/services/[DOMAIN]/__init__.py` is a domain's sole public boundary. Symbols not re-exported in `__init__.py` and declared in `__all__` are strictly internal.
+2. **Domain-Root Imports Only**: Cross-domain consumers, usage examples, workflows, and integration tests must import strictly from `app.services.[DOMAIN]`. Deep imports (e.g., `from app.services.[DOMAIN].[submodule] import Name`) are prohibited.
+3. **Function-Only Public Surface**: Public APIs expose only standalone functions (`def func(...)`). Classes and constants remain internal:
+   - Constants are accessed via public getter functions (`get_...()`).
+   - Classes are encapsulated internally; public functions delegate to internal class methods (`_func()`).
 
 ---
 

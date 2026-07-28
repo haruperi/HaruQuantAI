@@ -1,8 +1,10 @@
 # Research
 
 > **Package:** `app/services/research`
-> **Status:** `Completed`
-> **Last updated:** `2026-07-27`
+> **Status:** `Partial` — the existing twelve features remain completed;
+> `FEAT-RES-13` fundamental and sentiment source evidence is documented and
+> `Missing`.
+> **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -224,6 +226,7 @@ remain external.
 | Completed | `FEAT-RES-10` Deterministic Unsupervised Insights | `modeling/` | Implemented declarations: Section 4.10 | Section 4.10 functional requirements | `tests/research/usage/10_modeling.py` |
 | Completed | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Implemented declarations: Section 4.11 | `FR-RES-089`–`096` | `tests/research/usage/11_profiles.py` |
 | Completed | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Implemented declarations: Section 4.12 | Section 4.12 functional requirements | `tests/research/usage/12_artifacts.py` |
+| Missing | `FEAT-RES-13` Fundamental and Sentiment Source Evidence | `intelligence/` | `FundamentalSourceEvidence`, `SentimentSourceEvidence`, `build_fundamental_source_evidence`, `build_sentiment_source_evidence` | `FR-RES-099`–`104` | `tests/research/usage/13_intelligence.py` |
 
 ```text
 research/
@@ -284,9 +287,13 @@ research/
 │   ├── snapshot.py
 │   ├── rendering.py
 │   └── workflow.py
-└── artifacts/                          # Safe masked artifact persistence
+├── artifacts/                          # Safe masked artifact persistence
+│   ├── __init__.py
+│   └── persistence.py
+└── intelligence/                       # FEAT-RES-13 fundamental/sentiment evidence (Missing)
     ├── __init__.py
-    └── persistence.py
+    ├── contracts.py
+    └── evidence.py
 ```
 
 Usage examples are outside production:
@@ -304,7 +311,8 @@ tests/research/usage/
 ├── 09_market_structure.py
 ├── 10_modeling.py
 ├── 11_profiles.py
-└── 12_artifacts.py
+├── 12_artifacts.py
+└── 13_intelligence.py
 ```
 
 ### Module dependency diagram
@@ -325,6 +333,7 @@ flowchart LR
     MOD[[modeling]]
     PRO[[profiles]]
     ART[[artifacts]]
+    INTEL[[intelligence]]
 
     CON --> DAT
     CON --> FEA
@@ -337,6 +346,8 @@ flowchart LR
     CON --> MOD
     CON --> PRO
     CON --> ART
+    CON --> INTEL
+    DAT --> INTEL
     DAT --> FEA
     DAT --> LEA
     DAT --> MET
@@ -1212,6 +1223,24 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 `tests/research/usage/12_artifacts.py` contains `fr_res_097()`.
 
 ---
+
+### 4.13 `intelligence/` — Fundamental and Sentiment Source Evidence
+
+**Status:** `Missing`
+
+This deterministic feature converts eligible Data-owned point-in-time research
+documents into bounded evidence suitable for Agentic analysis. It performs
+selection, normalization, coverage, and deterministic measurement; it does not use
+an LLM, express a market opinion, approve a strategy, or trade.
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-RES-099` | Represent fundamental source evidence with issuer/asset scope, filing/statement/transcript/macro references, observation and availability windows, coverage, revisions, currency/unit lineage, quality, and canonical hash. | `FundamentalSourceEvidence` | None | `ResearchValidationError`: source, scope, time, coverage, unit, or lineage is invalid | **Usage:** `tests/research/usage/13_intelligence.py` |
+| Missing | `FR-RES-100` | Build fundamental source evidence only from eligible Data `ResearchSourceDocument` records available by the supplied decision time and refuse missing required coverage. | `build_fundamental_source_evidence(...)` | Data public API reads | `ResearchValidationError`: evidence is ineligible or insufficient | **Usage:** `tests/research/usage/13_intelligence.py` |
+| Missing | `FR-RES-101` | Represent sentiment source evidence with bounded document/event references, source coverage, deterministic polarity/event measurements where available, revision/trust/manipulation/injection evidence, and canonical hash. | `SentimentSourceEvidence` | None | `ResearchValidationError`: source, scope, measurement, or lineage is invalid | **Usage:** `tests/research/usage/13_intelligence.py` |
+| Missing | `FR-RES-102` | Build sentiment source evidence from eligible point-in-time documents using declared deterministic extraction/measurement versions and preserve disagreement and missingness. | `build_sentiment_source_evidence(...)` | Data public API reads | `ResearchValidationError`: evidence is ineligible, poisoned, or insufficient | **Usage:** `tests/research/usage/13_intelligence.py` |
+| Missing | `FR-RES-103` | Enforce asset-class applicability so issuer-specific evidence is not fabricated for instruments without an applicable issuer/fundamental model. | `assess_intelligence_applicability(...)` | None | None; returns typed applicability/refusal reasons | **Usage:** `tests/research/usage/13_intelligence.py` |
+| Missing | `FR-RES-104` | Return detached, bounded, non-binding evidence with no unrestricted source payload, model instruction, strategy recommendation, or execution field. | `project_intelligence_evidence(...)` | None | `ResearchValidationError`: size, redaction, or output contract is invalid | **Usage:** `tests/research/usage/13_intelligence.py` |
 
 ## 5. Package-Wide Requirements and Shared Configuration
 

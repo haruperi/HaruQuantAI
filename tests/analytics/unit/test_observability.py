@@ -1,6 +1,5 @@
 """Structured boundary-observability tests for Analytics."""
 
-# ruff: noqa: INP001
 import logging
 from decimal import Decimal
 
@@ -8,6 +7,7 @@ import pytest
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.reports.builder import build_performance_report
 from app.utils import generate_id, logger
+
 from tests.analytics._support import NOW, _configured, _source
 
 

@@ -28,6 +28,7 @@ from app.services.analytics.contracts import (
     AnalyticsValidationError,
     AnalyticsWarning,
     ClosedTrade,
+    ClosedTradeLedger,
     DashboardPayload,
     Lineage,
     MetricEvidence,
@@ -37,6 +38,7 @@ from app.services.analytics.contracts import (
     PortfolioRebalanceMeasurementEvidence,
     PortfolioRebalanceMeasurementRequest,
     QualityFlag,
+    ReportSection,
     ReproducibilityHashes,
     RiskFreeRateEvidence,
     SectionEvidence,
@@ -105,6 +107,11 @@ from app.services.analytics.metrics import (
 )
 from app.services.analytics.metrics import (
     run_statistical_validation as _run_statistical_validation,
+)
+from app.services.analytics.reports import (
+    WorstDayDistribution,
+    build_barrier_section,
+    build_worst_day_distribution,
 )
 from app.services.analytics.reports import (
     build_performance_report as _build_performance_report,
@@ -803,6 +810,7 @@ __all__: tuple[str, ...] = (
     "AnalyticsValidationError",
     "AnalyticsWarning",
     "ClosedTrade",
+    "ClosedTradeLedger",
     "DashboardPayload",
     "Lineage",
     "MetricEvidence",
@@ -812,13 +820,16 @@ __all__: tuple[str, ...] = (
     "PortfolioRebalanceMeasurementEvidence",
     "PortfolioRebalanceMeasurementRequest",
     "QualityFlag",
+    "ReportSection",
     "ReproducibilityHashes",
     "RiskFreeRateEvidence",
     "SectionEvidence",
     "StatisticalValidationConfig",
     "TradingResult",
+    "WorstDayDistribution",
     "adapt_trading_result",
     "align_benchmark_series",
+    "build_barrier_section",
     "build_closed_trade_equity_curve",
     "build_dashboard_payload",
     "build_performance_report",
@@ -827,6 +838,7 @@ __all__: tuple[str, ...] = (
     "build_portfolio_rebalance_measurement",
     "build_quality_flag",
     "build_warning",
+    "build_worst_day_distribution",
     "calculate_benchmark_evidence",
     "calculate_cost_efficiency_evidence",
     "calculate_distribution_evidence",

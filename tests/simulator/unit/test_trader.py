@@ -18,7 +18,8 @@ def test_submit_order_never_calls_live_adapter(tmp_path: Path) -> None:
     """Submit directly to the isolated simulation engine."""
     trader = SimTrader(_engine(tmp_path, "submit"))
     receipt = unwrap_simulation_response(
-        asyncio.run(trader.submit_order(_intent())), operation="test.trader.submit_order"
+        asyncio.run(trader.submit_order(_intent())),
+        operation="test.trader.submit_order",
     )
     assert receipt.status == "accepted"
     assert str(receipt.route) == "sim"
@@ -64,7 +65,8 @@ def test_submit_order_rejects_non_sim_route_before_engine() -> None:
     intent = _intent().model_copy(update={"route": TradingRoute.PAPER})
     with pytest.raises(SimulationError) as captured:
         unwrap_simulation_response(
-            asyncio.run(trader.submit_order(intent)), operation="test.trader.submit_order"
+            asyncio.run(trader.submit_order(intent)),
+            operation="test.trader.submit_order",
         )
     assert captured.value.code == "SIM_INVALID_CONFIG"
     assert not spy.called
@@ -77,7 +79,8 @@ def test_submit_order_rejects_altered_volume_before_engine() -> None:
     intent = _intent().model_copy(update={"approved_volume": Decimal(2)})
     with pytest.raises(SimulationError) as captured:
         unwrap_simulation_response(
-            asyncio.run(trader.submit_order(intent)), operation="test.trader.submit_order"
+            asyncio.run(trader.submit_order(intent)),
+            operation="test.trader.submit_order",
         )
     assert captured.value.code == "SIM_INVALID_VOLUME"
     assert not spy.called

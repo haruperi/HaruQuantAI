@@ -17,6 +17,7 @@ from app.services.data import (
     query_audit_events,
     run_data_migrations,
 )
+from app.services.data.contracts.responses import unwrap_data_response
 from app.utils import (
     AuditEvent,
     AuthContext,
@@ -114,16 +115,22 @@ def main() -> None:
         )
         with data_settings_context(settings):
             run_data_migrations(generate_id("req"))
-            persisted = persist_audit_event(event)
-            page = query_audit_events(
-                AuditEventQuery(
-                    start=timestamp - timedelta(seconds=1),
-                    end=timestamp + timedelta(seconds=1),
-                    domain="utils",
-                    limit=10,
-                    request_id=generate_id("req"),
-                ),
-                auth,
+            persisted = unwrap_data_response(
+                persist_audit_event(event),
+                operation="data.audit.persist_audit_event",
+                request_id=event.request_id,
+            )
+            query = AuditEventQuery(
+                start=timestamp - timedelta(seconds=1),
+                end=timestamp + timedelta(seconds=1),
+                domain="utils",
+                limit=10,
+                request_id=generate_id("req"),
+            )
+            page = unwrap_data_response(
+                query_audit_events(query, auth),
+                operation="data.audit.query_audit_events",
+                request_id=query.request_id,
             )
         assert persisted.persisted
         assert tuple(item.event_id for item in page.events) == (event.event_id,)

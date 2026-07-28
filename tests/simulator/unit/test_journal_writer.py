@@ -40,11 +40,13 @@ def test_append_fails_closed_on_write_error(
 
     monkeypatch.setattr(writer._store, "append_journal", fail_append)
     with pytest.raises(SimulationError) as captured:
-        _value(writer.append(
-            "run_started",
-            {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
-            datetime(2025, 1, 1, tzinfo=UTC),
-        ))
+        _value(
+            writer.append(
+                "run_started",
+                {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
+                datetime(2025, 1, 1, tzinfo=UTC),
+            )
+        )
     assert captured.value.code == "SIM_PERSISTENCE_FAILED"
 
 

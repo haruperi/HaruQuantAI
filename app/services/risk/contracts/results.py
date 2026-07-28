@@ -95,6 +95,8 @@ class RiskLimitResult(_ResultModel):
     reason_code: RiskErrorCode | None
     evidence_refs: tuple[str, ...]
     precedence: int
+    headroom_value: Decimal | None = None
+    reference_basis: str | None = None
 
     @model_validator(mode="after")
     def _validate_limit(self) -> RiskLimitResult:

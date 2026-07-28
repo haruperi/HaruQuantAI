@@ -19,7 +19,9 @@ def test_catalog_matches_documented_requirements() -> None:
     """Verify the closed catalog has only prefixed fail-closed codes."""
     assert len(SIM_ERROR_CATALOG) == 43
     assert all(code.startswith("SIM_") for code in SIM_ERROR_CATALOG)
-    assert all(row.severity in {"error", "critical"} for row in SIM_ERROR_CATALOG.values())
+    assert all(
+        row.severity in {"error", "critical"} for row in SIM_ERROR_CATALOG.values()
+    )
 
 
 def test_error_payload_is_bounded_and_redacted() -> None:

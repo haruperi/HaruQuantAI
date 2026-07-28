@@ -1,11 +1,11 @@
 """Unit tests for closed-trade Analytics evidence."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.metrics.trades import calculate_trade_evidence
 from app.utils import logger
+
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 

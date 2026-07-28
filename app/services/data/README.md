@@ -1,7 +1,9 @@
 # Data
 
 > **Package:** `app/services/data`
-> **Status:** `Completed` — `CAP-DATA-028` implements the owner-approved focused
+> **Status:** `Partial` — the existing fifteen-feature `CAP-DATA-028` baseline
+> remains completed; `FEAT-DATA-16` point-in-time research-source evidence is
+> documented and `Missing`. The implemented baseline retains the owner-approved focused
 > architecture: one registered capability equals one module folder and one standalone
 > usage program. Behaviour, the 207 explicitly declared package-root public names,
 > active requirement IDs,
@@ -12,7 +14,7 @@
 > migration are complete; production consumers outside this domain use only the
 > documented `app.services.data` package-root boundary. Specification parity,
 > standalone usage evidence, and the approved MT5 demo-provider validation pass.
-> **Last updated:** `2026-07-24`
+> **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -219,6 +221,7 @@ capabilities: fourteen business features and one foundational contract capabilit
 | Completed | `FEAT-DATA-13` Scheduler and Job Management | `data_jobs/` | Job/backfill/recovery contracts and create/start/stop/run/status/recovery operations | Section 4 job requirements, allocated to this owner | `tests/data/usage/13_data_jobs.py` |
 | Completed | `FEAT-DATA-14` Cross-Domain Evidence | `evidence/` | Market-context, FX-conversion, account-state, freshness contracts/providers, and public evidence operations | Section 4 normalized-evidence requirements, allocated to this owner | `tests/data/usage/14_evidence.py` |
 | Completed | `FEAT-DATA-15` Audit Evidence | `audit/` | Audit query/page/persistence contracts and authorized persist/query operations | Section 4 audit requirements, allocated to this owner | `tests/data/usage/15_audit.py` |
+| Missing | `FEAT-DATA-16` Point-in-Time Research Source Evidence | `research_sources/` | `ResearchSourceDocument`, `ResearchSourceRevision`, `ResearchSourceQuery`, `ResearchSourcePage`, `ingest_research_source`, `query_research_sources`; exact declarations: Section 9 | `FR-DATA-130`–`136` | `tests/data/usage/16_research_sources.py` |
 
 Private root files such as `_settings.py` and `_limits.py` may remain only for
 genuinely domain-wide infrastructure. They are not feature modules, expose no public
@@ -245,6 +248,7 @@ feature usages that consume them.
 |---|---|---|
 | Completed | `FEAT-DATA-01` Canonical Data Contracts | Canonical contract bases, request-boundary validation, records, dataset envelope, and stable errors now live in `contracts/`; all direct consumers were migrated without compatibility re-exports; `01_contracts.py` directly exercises the complete public feature surface. Evidence: `app/services/data/contracts/__init__.py:24`, `app/services/data/contracts/records.py:77`, `app/services/data/contracts/dataset.py:135`, `app/services/data/contracts/errors.py:341`, `tests/data/unit/test_import_graph.py:71`, `tests/data/usage/01_contracts.py:30`. |
 | Completed | `FEAT-DATA-02`–`FEAT-DATA-15` | Focused owners, consumers, tests, and all fourteen remaining usage programs are migrated; forbidden horizontal folders are absent and the complete Data gate passes. |
+| Missing | `FEAT-DATA-16` | Point-in-time research-source evidence is documented for future fundamental and sentiment consumers; no module, export, test, or usage evidence exists yet. |
 
 The completed migration preserves contract versions, schema identifiers, error codes,
 validation behavior, and golden JSON schemas. The package root explicitly exports the
@@ -380,6 +384,12 @@ app/services/data/
 │   ├── __init__.py
 │   ├── store.py                        # Idempotent redacted AuditEvent persistence
 │   └── query.py                        # Authorized bounded cursor query
+├── research_sources/                   # FEAT-DATA-16 point-in-time research documents (Missing)
+│   ├── __init__.py
+│   ├── contracts.py
+│   ├── policy.py
+│   ├── ingestion.py
+│   └── queries.py
 ├── evidence/                           # Normalized cross-domain evidence contracts
 │   ├── __init__.py
 │   ├── market_context.py               # MarketContextEvidence for Risk
@@ -2248,3 +2258,21 @@ decisions update `docs/CHANGELOG.md`.
 
 This keeps requirements, dependency order, implementation, usage examples, tests,
 and documentation aligned.
+## 9. `research_sources/` — Point-in-Time Research Source Evidence
+
+**Status:** `Missing`
+
+This feature is the governed acquisition and persistence boundary required before
+Agentic fundamental or sentiment roles may activate. It owns licensed filing,
+transcript, issuer, macro-document, news, and approved social/alternative source
+records. It does not interpret sentiment, fundamentals, strategy, or trading value.
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Missing | `FR-DATA-130` | Represent immutable research-source documents and revisions with source/license, asset/issuer/language scope, event/published/first-seen/available/retrieved UTC times, revision chain, original/normalized hashes, quality/trust/manipulation/injection labels, retention, and provenance. | `ResearchSourceDocument`; `ResearchSourceRevision` | None | `DataValidationError`: identity, time, source, revision, hash, policy, or provenance is invalid | **Usage:** `tests/data/usage/16_research_sources.py` |
+| Missing | `FR-DATA-131` | Validate a source policy covering licensing, permitted environments/uses, retention/deletion, geography, training use, rate limits, and source trust before acquisition. | `validate_research_source_policy(...)` | None | `DataPolicyError`: absent, expired, incompatible, or prohibited policy | **Usage:** `tests/data/usage/16_research_sources.py` |
+| Missing | `FR-DATA-132` | Ingest one source document idempotently, preserve original content outside Agentic context, normalize deterministically, create revision/deduplication evidence, and commit under the migration-ledger/write-lock transaction rules. | `ingest_research_source(...) -> ResearchSourceDocument` | Network read and transactional persistence | `DataSourceError`; `DataPersistenceError` | **Usage:** `tests/data/usage/16_research_sources.py` |
+| Missing | `FR-DATA-133` | Query only records available at or before a supplied decision time with asset, issuer, source, language, event-window, trust, license, and injection filters and deterministic pagination. | `query_research_sources(request: ResearchSourceQuery) -> ResearchSourcePage` | Database read | `DataValidationError`: query or eligibility is invalid | **Usage:** `tests/data/usage/16_research_sources.py` |
+| Missing | `FR-DATA-134` | Preserve conflicting sources and later corrections as distinct versions; never overwrite or silently merge source disagreement. | `link_research_source_revision(...)` | Transactional persistence | `DataPersistenceError`: revision linkage is invalid | **Usage:** `tests/data/usage/16_research_sources.py` |
+| Missing | `FR-DATA-135` | Mark unknown availability time, prohibited license, failed integrity, unresolved manipulation, or unsafe injection evidence ineligible for historical or Agentic consumption. | `assess_research_source_eligibility(...)` | None | None; returns typed ineligibility reasons | **Usage:** `tests/data/usage/16_research_sources.py` |
+| Missing | `FR-DATA-136` | Return bounded redacted detached evidence references to consumers; never expose provider credentials, unrestricted copyrighted payloads, or mutable provider objects. | `project_research_source_evidence(...)` | None | `DataValidationError`: scope, size, redaction, or contract is invalid | **Usage:** `tests/data/usage/16_research_sources.py` |

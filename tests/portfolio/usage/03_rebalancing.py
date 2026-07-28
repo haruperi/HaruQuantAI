@@ -13,7 +13,11 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import PortfolioRebalancePlan
+from app.services.portfolio import (
+    PortfolioRebalancePlan,
+    assess_common_mode_exposure,
+    measure_cross_account_correlation,
+)
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
@@ -206,6 +210,51 @@ def fr_port_024() -> None:
     print(f"Block reasons: {', '.join(plan.block_reasons)}")
 
 
+def fr_port_039() -> None:
+    """FR-PORT-039: Measure rolling cross-account correlation."""
+    _header("FR-PORT-039: Cross-account return and decision correlation")
+    report = measure_cross_account_correlation(
+        {
+            "account-a": (Decimal("0.01"), Decimal("0.02"), Decimal("0.03")),
+            "account-b": (Decimal("0.011"), Decimal("0.019"), Decimal("0.029")),
+        },
+        {
+            "account-a": (Decimal(1), Decimal(1), Decimal(0)),
+            "account-b": (Decimal(1), Decimal(1), Decimal(0)),
+        },
+        {"account-a": "broker-a", "account-b": "broker-b"},
+        window=3,
+        alert_threshold=Decimal("0.60"),
+    )
+    print(f"Return correlation: {dict(report.return_correlation)}")
+    print(f"Decision correlation: {dict(report.decision_correlation)}")
+    print(f"Alert pairs: {report.alert_pairs}")
+
+
+def fr_port_040() -> None:
+    """FR-PORT-040: Report common-mode loss-at-stop exposure."""
+    _header("FR-PORT-040: Common-mode loss-at-stop exposure")
+    report = assess_common_mode_exposure(
+        {
+            "account-a": {"equity_index": Decimal(80), "usd": Decimal(20)},
+            "account-b": {"equity_index": Decimal(70)},
+        },
+        {"account-a": Decimal(50), "account-b": Decimal(100)},
+        {"equity_index": Decimal(1), "usd": Decimal("0.5")},
+        software_dependencies={
+            "account-a": ("engine-v1",),
+            "account-b": ("engine-v1",),
+        },
+        signal_dependencies={"account-a": ("signal-x",), "account-b": ("signal-x",)},
+    )
+    print(
+        f"Aggregate loss-at-stop by factor: {dict(report.aggregate_loss_at_stop_by_factor)}"
+    )
+    print(f"Breached accounts: {dict(report.breached_accounts)}")
+    print(f"Shared software: {dict(report.software_dependencies)}")
+    print(f"Shared signals: {dict(report.signal_dependencies)}")
+
+
 def main() -> None:
     """Run every functional-requirement demonstration for Portfolio rebalancing."""
     fr_port_020()
@@ -213,6 +262,8 @@ def main() -> None:
     fr_port_022()
     fr_port_023()
     fr_port_024()
+    fr_port_039()
+    fr_port_040()
 
 
 if __name__ == "__main__":

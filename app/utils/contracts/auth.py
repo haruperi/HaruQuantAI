@@ -138,3 +138,53 @@ class AuthContext(BaseModel):
             The validated UTC datetime.
         """
         return validate_utc(value, "issued_at")
+
+
+def create_auth_context(
+    *,
+    principal_id: str,
+    principal_type: Literal["USER", "SERVICE_ACCOUNT"],
+    roles: tuple[str, ...],
+    permissions: tuple[str, ...],
+    scopes: tuple[str, ...],
+    tenant_or_environment: str,
+    request_id: str,
+    workflow_id: str,
+    correlation_id: str,
+    issued_at: datetime,
+    contract_version: Literal["v1"] = "v1",
+    schema_id: Literal["utils.auth_context.v1"] = "utils.auth_context.v1",
+) -> AuthContext:
+    """Construct an immutable AuthContext instance.
+
+    Args:
+        principal_id: Unique identity of the authenticated user or service.
+        principal_type: Categorization as USER or SERVICE_ACCOUNT.
+        roles: Bounded unique roles assigned to the principal.
+        permissions: Bounded unique fine-grained permissions.
+        scopes: Bounded unique scopes requested/granted.
+        tenant_or_environment: Namespace of the tenant or environment.
+        request_id: Trace identifier of the outer request.
+        workflow_id: Trace identifier tracking the orchestrating workflow.
+        correlation_id: Trace identifier tracking the entire flow.
+        issued_at: Aware UTC datetime representing token issuance.
+        contract_version: Version string fixed at 'v1'.
+        schema_id: Schema identifier fixed at 'utils.auth_context.v1'.
+
+    Returns:
+        Validated immutable AuthContext instance.
+    """
+    return AuthContext(
+        contract_version=contract_version,
+        schema_id=schema_id,
+        principal_id=principal_id,
+        principal_type=principal_type,
+        roles=roles,
+        permissions=permissions,
+        scopes=scopes,
+        tenant_or_environment=tenant_or_environment,
+        request_id=request_id,
+        workflow_id=workflow_id,
+        correlation_id=correlation_id,
+        issued_at=issued_at,
+    )

@@ -13,10 +13,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import MarketContextEvidence
 from app.services.risk import (
+    FirmMandate,
     PortfolioRiskSnapshot,
     RiskConfig,
     evaluate_market_context,
     evaluate_portfolio_limits,
+    evaluate_single_day_profit_share,
 )
 
 from tests.risk._support import unwrap_risk_response
@@ -37,11 +39,17 @@ def _snapshot() -> PortfolioRiskSnapshot:
         account_id="account-1",
         base_currency="USD",
         equity=Decimal(10000),
+        initial_balance=Decimal(10000),
         daily_loss=Decimal(0),
         total_loss=Decimal(0),
+        cumulative_profit=Decimal(500),
+        current_day_profit=Decimal(100),
+        proposal_best_case_profit=Decimal(100),
         gross_exposure=Decimal(0),
         net_exposure=Decimal(0),
         drawdown=Decimal(0),
+        peak_equity=Decimal(10000),
+        highest_eod_balance=Decimal(10000),
         margin_utilization=Decimal(0),
         effective_leverage=Decimal(0),
         historical_var=None,
@@ -171,9 +179,90 @@ def fr_risk_062() -> None:
     _demonstrate_once()
 
 
+def _mandate() -> FirmMandate:
+    """Build a verified mandate for the forward checks."""
+    return FirmMandate(
+        account_id="account-1",
+        mandate_version="2026.07.28-01",
+        firm="Example Firm",
+        model="fx_cfd",
+        phase="funded",
+        initial_balance=Decimal(10000),
+        currency="USD",
+        terms_url="https://example.invalid/terms",
+        terms_accessed="2026-07-28",
+        terms_source_hash="a" * 64,
+        verified=True,
+        profit_target={"type": "percent_of_initial", "value": Decimal("0.1")},
+        daily_loss={
+            "basis": "initial_balance",
+            "value": Decimal("0.05"),
+            "includes_unrealised": True,
+            "reset_time": "00:00",
+            "reset_tz": "UTC",
+        },
+        max_drawdown={
+            "mode": "static",
+            "basis": "initial_balance",
+            "value": Decimal("0.1"),
+            "trails_on_unrealised": False,
+            "trail_stops_at_initial": False,
+        },
+        consistency_rule={
+            "type": "max_single_day_share_of_profit",
+            "value": Decimal("0.4"),
+            "evaluated": "retrospective",
+            "applies_in_phase": ("funded",),
+        },
+    )
+
+
+def fr_risk_066() -> None:
+    """FR-RISK-066: Report absolute drawdown headroom under a mandate."""
+    _header("FR-RISK-066: Absolute drawdown headroom")
+    mandate = _mandate()
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(_snapshot(), _config(), now=NOW, mandate=mandate),
+        operation="evaluate_portfolio_limits",
+    )
+    drawdown = next(item for item in results if item.limit_id == "drawdown")
+    print(f"Drawdown headroom in account currency: {drawdown.headroom_value}")
+
+
+def fr_risk_067() -> None:
+    """FR-RISK-067: Record the fixed initial-balance loss basis."""
+    _header("FR-RISK-067: Initial-balance loss basis")
+    mandate = _mandate()
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(_snapshot(), _config(), now=NOW, mandate=mandate),
+        operation="evaluate_portfolio_limits",
+    )
+    daily = next(item for item in results if item.limit_id == "daily_loss")
+    print(f"Daily-loss reference basis: {daily.reference_basis}")
+    print(f"Daily-loss headroom: {daily.headroom_value}")
+
+
+def fr_risk_068() -> None:
+    """FR-RISK-068: Project a single-day profit share before settlement."""
+    _header("FR-RISK-068: Forward single-day profit-share projection")
+    result = unwrap_risk_response(
+        evaluate_single_day_profit_share(_snapshot(), _mandate(), now=NOW),
+        operation="evaluate_single_day_profit_share",
+    )
+    print(f"Projected share status: {result.status}")
+    print(f"Projected share headroom: {result.headroom_value}")
+
+
 def main() -> None:
     """Run every functional-requirement demonstration for Risk limits."""
-    for demonstrate in (fr_risk_027, fr_risk_028, fr_risk_062):
+    for demonstrate in (
+        fr_risk_027,
+        fr_risk_028,
+        fr_risk_062,
+        fr_risk_066,
+        fr_risk_067,
+        fr_risk_068,
+    ):
         demonstrate()
 
 

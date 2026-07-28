@@ -1,12 +1,12 @@
 """Unit tests for canonical Analytics report orchestration."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError, SectionEvidence
 from app.services.analytics.reports import builder
 from app.utils import generate_id, logger
+
 from tests.analytics._support import NOW, _configured, _source_with_profit
 
 

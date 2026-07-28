@@ -536,14 +536,18 @@ redacted audit-outbox record commit atomically.
 | --------- | ------------------------------------- | ------------ | ------- | -------- | -------------------- | -------------------------------------- |
 | Completed | `PORTFOLIO_REBALANCE_DRIFT_THRESHOLD` | `Decimal`    | None    | Yes      | `RebalancingService` | Explicit finite non-negative threshold |
 | Completed | `PORTFOLIO_REBALANCE_SCHEDULE`        | UTC schedule | None    | Yes      | `RebalancingService` | Explicit schedule; no implicit cadence |
+| Completed | `PORTFOLIO_CROSS_ACCOUNT_CORRELATION_WINDOW` | `int`     | `20`    | Yes      | `RebalancingService` | Rolling window in sessions for cross-account correlation |
+| Completed | `PORTFOLIO_CROSS_ACCOUNT_CORRELATION_ALERT`  | `Decimal` | `0.60`  | Yes      | `RebalancingService` | Alert above this correlation; alert only, never an automatic size change |
 
-| ID          | Requirement                                                                                           | Verification      |
-| ----------- | ----------------------------------------------------------------------------------------------------- | ----------------- |
-| FR-PORT-020 | Bind drift to an active allocation version and fresh actual-exposure evidence.                        | Drift tests       |
-| FR-PORT-021 | Route every plan through Risk review before Trading submission.                                       | Workflow tests    |
-| FR-PORT-022 | Make existing over-budget correction reduce-only unless a separately authorized risk increase exists. | Safety tests      |
-| FR-PORT-023 | Never open solely to match target weights.                                                            | Negative tests    |
-| FR-PORT-024 | Block planning/submission on kill switch, expiry, stale evidence, or target-version change.           | Fail-closed tests |
+| Status | ID | Requirement | Verification |
+|---|---|---|---|
+| Completed | FR-PORT-020 | Bind drift to an active allocation version and fresh actual-exposure evidence. | Drift tests |
+| Completed | FR-PORT-021 | Route every plan through Risk review before Trading submission. | Workflow tests |
+| Completed | FR-PORT-022 | Make existing over-budget correction reduce-only unless a separately authorized risk increase exists. | Safety tests |
+| Completed | FR-PORT-023 | Never open solely to match target weights. | Negative tests |
+| Completed | FR-PORT-024 | Block planning/submission on kill switch, expiry, stale evidence, or target-version change. | Fail-closed tests |
+| Completed | FR-PORT-039 | Compute rolling cross-account return correlation and cross-account decision correlation over a configured window, across accounts held at different counterparties, and raise a deterministic alert above the configured threshold. | Correlation tests |
+| Completed | FR-PORT-040 | Report aggregate exposure across all accounts in loss-at-stop amounts mapped to risk factors rather than nominal size, identify which accounts would breach under a shared adverse scenario, and record shared software and signal dependencies. | Common-mode tests |
 
 V1 execution submission is reduce-only because Trading's registered receiver
 contract accepts only `action="reduce_exposure"` and `reduce_only=True`. Negative

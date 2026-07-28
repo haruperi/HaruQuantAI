@@ -11,7 +11,11 @@ from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioRebalancePlan,
 )
-from app.services.portfolio.rebalancing import RebalancingService
+from app.services.portfolio.rebalancing import (
+    RebalancingService,
+    assess_common_mode_exposure,
+    measure_cross_account_correlation,
+)
 from app.services.risk import (
     AllocationRiskDecision,
     DecisionState,
@@ -265,3 +269,40 @@ def test_planning_blocks_stale_kill_switch_and_expired_allocation(
 
     assert plan.status == "blocked"
     assert plan.actions == ()
+
+
+def test_cross_account_correlation_alerts_above_threshold() -> None:
+    """Alert deterministically on correlated returns and decisions."""
+    report = measure_cross_account_correlation(
+        {
+            "account-a": (Decimal("0.01"), Decimal("0.02"), Decimal("0.03")),
+            "account-b": (Decimal("0.011"), Decimal("0.019"), Decimal("0.029")),
+        },
+        {
+            "account-a": (Decimal(1), Decimal(1), Decimal(0)),
+            "account-b": (Decimal(1), Decimal(1), Decimal(0)),
+        },
+        {"account-a": "broker-a", "account-b": "broker-b"},
+        window=3,
+        alert_threshold=Decimal("0.60"),
+    )
+    assert report.alert_pairs == ("account-a:account-b",)
+
+
+def test_common_mode_reports_loss_at_stop_and_shared_breaches() -> None:
+    """Aggregate risk-factor loss-at-stop rather than nominal exposure."""
+    report = assess_common_mode_exposure(
+        {
+            "account-a": {"equity_index": Decimal(80), "usd": Decimal(20)},
+            "account-b": {"equity_index": Decimal(70)},
+        },
+        {"account-a": Decimal(50), "account-b": Decimal(100)},
+        {"equity_index": Decimal(1), "usd": Decimal("0.5")},
+        software_dependencies={
+            "account-a": ("engine-v1",),
+            "account-b": ("engine-v1",),
+        },
+        signal_dependencies={"account-a": ("signal-x",), "account-b": ("signal-x",)},
+    )
+    assert report.aggregate_loss_at_stop_by_factor["equity_index"] == Decimal(150)
+    assert report.breached_accounts == {"account-a": ("equity_index", "usd")}

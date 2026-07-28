@@ -1,6 +1,5 @@
 """Unit tests for bounded Analytics statistical validation."""
 
-# ruff: noqa: INP001
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -8,6 +7,7 @@ from pathlib import Path
 import pytest
 from app.services.analytics.metrics.statistics import run_statistical_validation
 from app.utils import logger
+
 from tests.analytics.unit.test_results_adapter import _config
 
 _GOLDEN_DIRECTORY = Path("tests/analytics/fixtures/golden")

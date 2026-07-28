@@ -1,6 +1,5 @@
 """Unit tests for currency-safe Analytics portfolio composition."""
 
-# ruff: noqa: INP001
 from copy import copy
 from dataclasses import replace
 from datetime import datetime, timedelta
@@ -11,6 +10,7 @@ import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.portfolio import build_portfolio_performance_report
 from app.utils import logger
+
 from tests.analytics._support import _report
 
 _T = TypeVar("_T")

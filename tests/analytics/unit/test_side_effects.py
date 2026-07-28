@@ -1,6 +1,5 @@
 """Read-only side-effect boundary evidence for Analytics."""
 
-# ruff: noqa: INP001
 import builtins
 import os
 import socket
@@ -8,6 +7,7 @@ import subprocess
 
 import pytest
 from app.utils import logger
+
 from tests.analytics._support import _report
 
 

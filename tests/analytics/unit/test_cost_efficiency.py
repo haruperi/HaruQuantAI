@@ -1,6 +1,5 @@
 """Unit tests for Analytics cost and efficiency evidence."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 from app.services.analytics.adapters.results import adapt_trading_result
@@ -8,6 +7,7 @@ from app.services.analytics.metrics.cost_efficiency import (
     calculate_cost_efficiency_evidence,
 )
 from app.utils import logger
+
 from tests.analytics.unit.test_results_adapter import _config, _source
 
 

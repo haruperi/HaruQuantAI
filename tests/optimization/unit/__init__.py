@@ -1,1 +1,1 @@
-"""Optimization unit tests."""
+"""Unit tests for optimization domain."""

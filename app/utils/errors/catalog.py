@@ -65,4 +65,14 @@ COMMON_ERROR_CATALOG = MappingProxyType(
     {definition.code: definition for definition in _COMMON_DEFINITIONS}
 )
 
-__all__ = ["COMMON_ERROR_CATALOG"]
+
+def get_common_error_catalog() -> MappingProxyType[str, ErrorDefinition]:
+    """Return the immutable common error catalogue mapping.
+
+    Returns:
+        Immutable dictionary mapping error codes to ErrorDefinition instances.
+    """
+    return COMMON_ERROR_CATALOG
+
+
+__all__ = ["COMMON_ERROR_CATALOG", "get_common_error_catalog"]
