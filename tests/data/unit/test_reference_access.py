@@ -7,7 +7,8 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import DataError, MarketDataset
+from app.services.data.contracts import MarketDataset
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.requests import (
     AvailabilityRequest,
     MarketDataRequest,
@@ -32,6 +33,15 @@ from tests.data.helpers import make_dataset, make_quality, register_local_test_s
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(hours=1)
+
+_REQ_ID = "req-00000000-0000-4000-8000-000000000000"
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.market_data.test", request_id=_REQ_ID
+    )
 
 
 def _configure_database(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -72,7 +82,7 @@ def test_discover_symbols_cursor_is_stable(
         limit=1,
         request_id="req-6db5d884ba341a7b10e272a1ae77bbc1ccb6b53a6ff1a75c88fc511a799b06bd",
     )
-    page1 = discover_symbols(req_page1)
+    page1 = _unwrap(discover_symbols(req_page1))
     assert len(page1.items) == 1
     assert page1.next_cursor == "AAPL"
 
@@ -82,7 +92,7 @@ def test_discover_symbols_cursor_is_stable(
         limit=1,
         request_id="req-d88461f85431a9aff500fb7615831c70cb225248b12d466b15eb9067a414e18b",
     )
-    page2 = discover_symbols(req_page2)
+    page2 = _unwrap(discover_symbols(req_page2))
     assert len(page2.items) == 1
     assert page2.items[0] == "MSFT"
 
@@ -99,7 +109,7 @@ def test_fetch_metadata_preserves_unknown_fields(
         symbol="AAPL",
         request_id="req-539196dd947fb4026e1c6e1c9f5b443b4e9b22c247c95f32667f30977d85b3f3",
     )
-    meta = fetch_symbol_metadata(req)
+    meta = _unwrap(fetch_symbol_metadata(req))
     assert meta.canonical_symbol == "AAPL"
     assert "digits" in meta.missing_fields or meta.digits is None
 
@@ -167,7 +177,7 @@ def test_availability_never_hardcodes_ready(
         request_id="req-a7568abaa3e3b459d8ea90f379a8f8436241a8eb8a75133827e845001c5df427",
     )
 
-    avail = inspect_availability(avail_req)
+    avail = _unwrap(inspect_availability(avail_req))
     assert avail.completeness < Decimal("1.0")
     assert len(avail.gaps) == 2
     assert avail.gaps[0].start == query_start
@@ -225,7 +235,7 @@ def test_provider_availability_uses_bounded_observed_probe(
     )
     captured: list[MarketDataRequest] = []
     monkeypatch.setattr(
-        "app.services.data.market_data.symbol_discovery.get_source_descriptor",
+        "app.services.data.market_data.symbol_discovery._get_source_descriptor_raw",
         lambda _source_id: descriptor,
     )
     monkeypatch.setattr(
@@ -242,7 +252,7 @@ def test_provider_availability_uses_bounded_observed_probe(
         return dataset
 
     monkeypatch.setattr(
-        "app.services.data.market_data.pipeline.fetch_market_dataset",
+        "app.services.data.market_data.symbol_discovery._fetch_market_dataset_raw",
         fetch,
     )
     request = AvailabilityRequest(
@@ -256,7 +266,7 @@ def test_provider_availability_uses_bounded_observed_probe(
         request_id=request_id,
     )
 
-    availability = inspect_availability(request)
+    availability = _unwrap(inspect_availability(request))
 
     assert len(captured) == 1
     assert captured[0].limit == 2
@@ -282,6 +292,7 @@ def test_reference_limits_are_validated_at_call_time(
             "req-3c1a7e2bed217a9dcf951ea33b8dc5aca4230cb80abf292dce3b5078bd3c180d"
         ),
     )
-    with pytest.raises(DataError) as captured:
-        discover_symbols(request)
-    assert captured.value.code == "INVALID_INPUT"
+    response = discover_symbols(request)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "INVALID_INPUT"

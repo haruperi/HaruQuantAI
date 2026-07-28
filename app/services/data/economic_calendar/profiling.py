@@ -15,6 +15,12 @@ from types import MappingProxyType
 from typing import Final
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
+from app.utils import generate_id
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,7 +69,7 @@ SYMBOL_EVENT_PROFILES: Final[Mapping[str, SymbolEventProfile]] = MappingProxyTyp
 )
 
 
-def get_symbol_event_profile(symbol: str) -> SymbolEventProfile:
+def _get_symbol_event_profile_raw(symbol: str) -> SymbolEventProfile:
     """Return the canonical profile for ``symbol`` or fail closed.
 
     Args:
@@ -79,6 +85,27 @@ def get_symbol_event_profile(symbol: str) -> SymbolEventProfile:
     if profile is None:
         raise DataError("VALIDATION_FAILED", safe_details={"field": "symbol"})
     return profile
+
+
+def get_symbol_event_profile(symbol: str) -> StandardResponse[SymbolEventProfile]:
+    """Return the canonical profile for ``symbol`` or fail closed.
+
+    Args:
+        symbol: Canonical tradable symbol.
+
+    Returns:
+        Standard response carrying the matching immutable profile.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when the symbol has no registered
+            profile.
+    """
+    return run_data_operation(
+        operation="data.economic_calendar.get_symbol_event_profile",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _get_symbol_event_profile_raw(symbol),
+    )
 
 
 __all__ = ["SYMBOL_EVENT_PROFILES", "SymbolEventProfile", "get_symbol_event_profile"]

@@ -13,19 +13,28 @@ even when synchronously testable transports are used.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Coroutine, Sequence
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+    run_data_operation_async,
+    unwrap_data_response,
+)
 from app.services.data.economic_calendar.calendar_state import (
     DEFAULT_MINIMUM_IMPACT,
 )
-from app.services.data.economic_calendar.profiling import get_symbol_event_profile
-from app.services.data.economic_calendar.restriction import (
-    is_news_restricted_events,
+from app.services.data.economic_calendar.profiling import (
+    _get_symbol_event_profile_raw,
 )
-from app.utils import logger
+from app.services.data.economic_calendar.restriction import (
+    _is_news_restricted_events_raw,
+)
+from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
@@ -62,7 +71,7 @@ def _matches_scope(
     )
 
 
-async def get_economic_events(
+async def _get_economic_events_raw(
     start: datetime,
     end: datetime,
     *,
@@ -70,19 +79,9 @@ async def get_economic_events(
     currencies: Sequence[str] | None = None,
     countries: Sequence[str] | None = None,
     minimum_impact: EventImpact | None = None,
+    request_id: str | None = None,
 ) -> list[EconomicEvent]:
     """Retrieve normalized economic events for a UTC window.
-
-    Args:
-        start: Inclusive timezone-aware UTC window start.
-        end: Exclusive timezone-aware UTC window end.
-        provider: Injected economic-calendar provider.
-        currencies: Optional currency filter.
-        countries: Optional country filter.
-        minimum_impact: Optional minimum-impact filter.
-
-    Returns:
-        Normalized economic events matching the supplied filters.
 
     Raises:
         DataError: If the window is invalid or the provider fails.
@@ -96,12 +95,16 @@ async def get_economic_events(
         start.isoformat(),
         end.isoformat(),
     )
-    events = await provider.get_events(
-        start,
-        end,
-        currencies=currencies,
-        countries=countries,
-        minimum_impact=minimum_impact,
+    events = unwrap_data_response(
+        await provider.get_events(
+            start,
+            end,
+            currencies=currencies,
+            countries=countries,
+            minimum_impact=minimum_impact,
+        ),
+        operation="data.economic_calendar.get_economic_events",
+        request_id=request_id or generate_id("req"),
     )
     return [
         event
@@ -112,30 +115,65 @@ async def get_economic_events(
     ]
 
 
-async def get_symbol_economic_events(
+async def get_economic_events(
+    start: datetime,
+    end: datetime,
+    *,
+    provider: EconomicCalendarProvider,
+    currencies: Sequence[str] | None = None,
+    countries: Sequence[str] | None = None,
+    minimum_impact: EventImpact | None = None,
+) -> StandardResponse[list[EconomicEvent]]:
+    """Retrieve normalized economic events for a UTC window.
+
+    Args:
+        start: Inclusive timezone-aware UTC window start.
+        end: Exclusive timezone-aware UTC window end.
+        provider: Injected economic-calendar provider.
+        currencies: Optional currency filter.
+        countries: Optional country filter.
+        minimum_impact: Optional minimum-impact filter.
+
+    Returns:
+        Standard response carrying the normalized economic events matching
+        the supplied filters.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when the window is invalid, plus
+            ``DataError`` codes when the provider fails.
+    """
+    request_id = generate_id("req")
+    return await run_data_operation_async(
+        operation="data.economic_calendar.get_economic_events",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_economic_events_raw(
+            start,
+            end,
+            provider=provider,
+            currencies=currencies,
+            countries=countries,
+            minimum_impact=minimum_impact,
+            request_id=request_id,
+        ),
+    )
+
+
+async def _get_symbol_economic_events_raw(
     symbol: str,
     start: datetime,
     end: datetime,
     *,
     provider: EconomicCalendarProvider,
     minimum_impact: EventImpact | None = None,
+    request_id: str | None = None,
 ) -> list[EconomicEvent]:
     """Retrieve economic events relevant to one tradable symbol.
-
-    Args:
-        symbol: Canonical tradable symbol (must have a registered profile).
-        start: Inclusive timezone-aware UTC window start.
-        end: Exclusive timezone-aware UTC window end.
-        provider: Injected economic-calendar provider.
-        minimum_impact: Optional minimum-impact filter.
-
-    Returns:
-        Normalized economic events relevant to the symbol.
 
     Raises:
         DataError: If the symbol/profile is unknown or the window is invalid.
     """
-    profile = get_symbol_event_profile(symbol)
+    profile = _get_symbol_event_profile_raw(symbol)
     _require_aware("start", start)
     _require_aware("end", end)
     if start >= end:
@@ -146,12 +184,96 @@ async def get_symbol_economic_events(
         start.isoformat(),
         end.isoformat(),
     )
-    return await get_economic_events(
+    return await _get_economic_events_raw(
         start,
         end,
         provider=provider,
         currencies=tuple(sorted(profile.currencies)),
         countries=tuple(sorted(profile.countries)),
+        minimum_impact=minimum_impact,
+        request_id=request_id,
+    )
+
+
+async def get_symbol_economic_events(
+    symbol: str,
+    start: datetime,
+    end: datetime,
+    *,
+    provider: EconomicCalendarProvider,
+    minimum_impact: EventImpact | None = None,
+) -> StandardResponse[list[EconomicEvent]]:
+    """Retrieve economic events relevant to one tradable symbol.
+
+    Args:
+        symbol: Canonical tradable symbol (must have a registered profile).
+        start: Inclusive timezone-aware UTC window start.
+        end: Exclusive timezone-aware UTC window end.
+        provider: Injected economic-calendar provider.
+        minimum_impact: Optional minimum-impact filter.
+
+    Returns:
+        Standard response carrying the normalized economic events relevant
+        to the symbol.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when the symbol/profile is unknown or
+            the window is invalid.
+    """
+    request_id = generate_id("req")
+    return await run_data_operation_async(
+        operation="data.economic_calendar.get_symbol_economic_events",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_symbol_economic_events_raw(
+            symbol,
+            start,
+            end,
+            provider=provider,
+            minimum_impact=minimum_impact,
+            request_id=request_id,
+        ),
+    )
+
+
+async def _is_news_restricted_raw(
+    symbol: str,
+    at: datetime,
+    *,
+    provider: EconomicCalendarProvider,
+    minutes_before: int = 10,
+    minutes_after: int = 10,
+    minimum_impact: EventImpact = DEFAULT_MINIMUM_IMPACT,
+    request_id: str | None = None,
+) -> bool:
+    """Return True when ``at`` falls inside a relevant news-window for ``symbol``.
+
+    Raises:
+        ValueError: If ``at`` is timezone-naive.
+        DataError: If the symbol is unknown or retrieval fails.
+    """
+    if at.tzinfo is None or at.utcoffset() != timedelta(0):
+        raise ValueError("at must be timezone-aware UTC")
+    if minutes_before < 0 or minutes_after < 0:
+        raise DataError("VALIDATION_FAILED", safe_details={"field": "minutes"})
+    window_start = at - timedelta(minutes=max(minutes_before, minutes_after))
+    window_end = at + timedelta(
+        minutes=max(minutes_before, minutes_after),
+        microseconds=1,
+    )
+    events = await _get_symbol_economic_events_raw(
+        symbol,
+        window_start,
+        window_end,
+        provider=provider,
+        minimum_impact=minimum_impact,
+        request_id=request_id,
+    )
+    return _is_news_restricted_events_raw(
+        events,
+        at,
+        minutes_before=minutes_before,
+        minutes_after=minutes_after,
         minimum_impact=minimum_impact,
     )
 
@@ -164,7 +286,7 @@ async def is_news_restricted(
     minutes_before: int = 10,
     minutes_after: int = 10,
     minimum_impact: EventImpact = DEFAULT_MINIMUM_IMPACT,
-) -> bool:
+) -> StandardResponse[bool]:
     """Return True when ``at`` falls inside a relevant news-window for ``symbol``.
 
     Mirrors section 6 of the design. The system-trading path normally realizes
@@ -181,34 +303,73 @@ async def is_news_restricted(
         minimum_impact: Minimum impact to consider. Defaults to HIGH.
 
     Returns:
-        True when ``at`` falls inside any blocking window for the symbol.
+        Standard response carrying ``True`` when ``at`` falls inside any
+        blocking window for the symbol.
 
     Raises:
-        ValueError: If ``at`` is timezone-naive.
-        DataError: If the symbol is unknown or retrieval fails.
+        (in-band) ``VALIDATION_FAILED`` when ``at`` is timezone-naive, the
+            minutes are negative, or the symbol is unknown, plus ``DataError``
+            codes when retrieval fails.
     """
-    if at.tzinfo is None or at.utcoffset() != timedelta(0):
-        raise ValueError("at must be timezone-aware UTC")
-    if minutes_before < 0 or minutes_after < 0:
-        raise DataError("VALIDATION_FAILED", safe_details={"field": "minutes"})
-    window_start = at - timedelta(minutes=max(minutes_before, minutes_after))
-    window_end = at + timedelta(
-        minutes=max(minutes_before, minutes_after),
-        microseconds=1,
+
+    def _raw() -> Coroutine[Any, Any, bool]:
+        async def _coro() -> bool:
+            try:
+                return await _is_news_restricted_raw(
+                    symbol,
+                    at,
+                    provider=provider,
+                    minutes_before=minutes_before,
+                    minutes_after=minutes_after,
+                    minimum_impact=minimum_impact,
+                    request_id=request_id,
+                )
+            except ValueError as error:
+                raise DataError(
+                    "VALIDATION_FAILED", safe_details={"field": "at"}
+                ) from error
+
+        return _coro()
+
+    request_id = generate_id("req")
+    return await run_data_operation_async(
+        operation="data.economic_calendar.is_news_restricted",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=_raw,
     )
-    events = await get_symbol_economic_events(
-        symbol,
-        window_start,
-        window_end,
-        provider=provider,
-        minimum_impact=minimum_impact,
-    )
-    return is_news_restricted_events(
-        events,
-        at,
-        minutes_before=minutes_before,
-        minutes_after=minutes_after,
-        minimum_impact=minimum_impact,
+
+
+def _get_persisted_events_raw(
+    start: datetime,
+    end: datetime,
+    *,
+    store: EconomicEventStore,
+    currencies: Sequence[str] | None = None,
+    countries: Sequence[str] | None = None,
+    minimum_impact: EventImpact | None = None,
+    provider: str | None = None,
+    request_id: str | None = None,
+) -> list[EconomicEvent]:
+    """Synchronous read-only accessor over one stored economic-event set.
+
+    Raises:
+        DataError: If the window is invalid or the read fails.
+    """
+    _require_aware("start", start)
+    _require_aware("end", end)
+    return unwrap_data_response(
+        store.query(
+            start,
+            end,
+            currencies=currencies,
+            countries=countries,
+            minimum_impact=minimum_impact,
+            provider=provider,
+            request_id=request_id,
+        ),
+        operation="data.economic_calendar.get_persisted_events",
+        request_id=request_id or generate_id("req"),
     )
 
 
@@ -222,7 +383,7 @@ def get_persisted_events(
     minimum_impact: EventImpact | None = None,
     provider: str | None = None,
     request_id: str | None = None,
-) -> list[EconomicEvent]:
+) -> StandardResponse[list[EconomicEvent]]:
     """Synchronous read-only accessor over one stored economic-event set.
 
     Convenience wrapper around `EconomicEventStore.query` for callers that do
@@ -240,21 +401,27 @@ def get_persisted_events(
         request_id: Optional trace correlation id.
 
     Returns:
-        Chronologically ordered events matching the supplied filters.
+        Standard response carrying the chronologically ordered events
+        matching the supplied filters.
 
     Raises:
-        DataError: If the window is invalid or the read fails.
+        (in-band) ``VALIDATION_FAILED`` when the window is invalid, plus
+            ``DataError`` codes when the read fails.
     """
-    _require_aware("start", start)
-    _require_aware("end", end)
-    return store.query(
-        start,
-        end,
-        currencies=currencies,
-        countries=countries,
-        minimum_impact=minimum_impact,
-        provider=provider,
+    return run_data_operation(
+        operation="data.economic_calendar.get_persisted_events",
         request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_persisted_events_raw(
+            start,
+            end,
+            store=store,
+            currencies=currencies,
+            countries=countries,
+            minimum_impact=minimum_impact,
+            provider=provider,
+            request_id=request_id,
+        ),
     )
 
 

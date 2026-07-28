@@ -72,9 +72,10 @@ def test_load_manifest_invalid_manifest_id() -> None:
 
 def test_restore_from_backup_nonexistent_manifest() -> None:
     """Test restore_from_backup raises DATA_NOT_FOUND for non-existent manifest_id."""
-    with pytest.raises(DataError) as exc_info:
-        restore_from_backup("nonexistent_manifest_id")
-    assert exc_info.value.code == "DATA_NOT_FOUND"
+    response = restore_from_backup("nonexistent_manifest_id")
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATA_NOT_FOUND"
 
 
 def test_license_retention_days_invalid_manifest() -> None:
@@ -92,21 +93,23 @@ def test_license_retention_days_invalid_manifest() -> None:
 
 def test_enforce_retention_policy_invalid_age() -> None:
     """Test enforce_retention_policy raises DataError when max_age_days <= 0."""
-    with pytest.raises(DataError):
-        enforce_retention_policy("mt5", max_age_days=0)
+    response = enforce_retention_policy("mt5", max_age_days=0)
+    assert response.status == "error"
+    assert response.error is not None
 
 
 def test_enforce_retention_policy_nonexistent_dataset() -> None:
     """Test enforce_retention_policy raises DataError for nonexistent dataset."""
-    with pytest.raises(DataError):
-        enforce_retention_policy("nonexistent_dataset_12345", max_age_days=30)
+    response = enforce_retention_policy("nonexistent_dataset_12345", max_age_days=30)
+    assert response.status == "error"
+    assert response.error is not None
 
 
 def test_commit_restore_rollback_on_error() -> None:
     """Test _commit_restore triggers rollback when error occurs during restore."""
     prepared = [("entry", Path("target.csv"), Path("stage.csv"), Path("rollback.csv"))]
     with (
-        patch("app.services.data.persistence.backup.acquire_write_lock"),
+        patch("app.services.data.persistence.backup._acquire_write_lock_raw"),
         patch(
             "app.services.data.persistence.backup._stage_restore",
             side_effect=RuntimeError("Stage failed"),
@@ -124,7 +127,7 @@ def test_purge_expired_rollback_on_error() -> None:
     mock_root.parent = Path("artifacts/data")
 
     with (
-        patch("app.services.data.persistence.backup.acquire_write_lock"),
+        patch("app.services.data.persistence.backup._acquire_write_lock_raw"),
         patch(
             "app.services.data.persistence.backup._audit",
             side_effect=RuntimeError("Audit failed"),

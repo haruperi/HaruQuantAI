@@ -7,7 +7,8 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
-from app.services.data.contracts import DataError, OHLCVRecord
+from app.services.data.contracts import OHLCVRecord
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.pipeline import fetch_market_dataset
 from app.services.data.market_data.requests import (
     MarketDataRequest,
@@ -21,6 +22,13 @@ from app.utils import generate_id
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _REQUEST_ID = generate_id("req")
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.market_data.test", request_id=_REQUEST_ID
+    )
 
 
 def _bar(index: int, minute: int) -> OHLCVRecord:
@@ -98,13 +106,16 @@ def _install_runtime(
         revision="rev-1",
         request_id=_REQUEST_ID,
     )
-    source = SimpleNamespace(fetch=lambda _request: batch)
+    # The migrated raw core unwraps the nested source ``fetch`` StandardResponse,
+    # so the isolated source returns a success-shaped response carrying the batch.
+    fetch_response = SimpleNamespace(status="success", data=batch, error=None)
+    source = SimpleNamespace(fetch=lambda _request: fetch_response)
     monkeypatch.setattr(
-        "app.services.data.market_data.pipeline.evaluate_source_policy",
+        "app.services.data.market_data.pipeline._evaluate_source_policy_raw",
         lambda request: SimpleNamespace(ordered_sources=(request.source_id,)),
     )
     monkeypatch.setattr(
-        "app.services.data.market_data.pipeline.get_source_descriptor",
+        "app.services.data.market_data.pipeline._get_source_descriptor_raw",
         lambda _source_id: _descriptor(),
     )
     monkeypatch.setattr(
@@ -115,7 +126,7 @@ def _install_runtime(
         ),
     )
     monkeypatch.setattr(
-        "app.services.data.market_data.pipeline.resolve_source",
+        "app.services.data.market_data.pipeline._resolve_source_raw",
         lambda _source_id: source,
     )
     monkeypatch.setattr(
@@ -133,10 +144,10 @@ def test_fetch_market_dataset_rejects_blocking_quality(
         (_bar(0, 0), _bar(1, 1), _bar(2, 30)),
     )
 
-    with pytest.raises(DataError) as captured:
-        fetch_market_dataset(_request())
-
-    assert captured.value.code == "DATA_QUALITY_FAILED"
+    response = fetch_market_dataset(_request())
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "DATA_QUALITY_FAILED"
 
 
 def test_fetch_market_dataset_warns_and_returns_blocking_quality(
@@ -151,7 +162,7 @@ def test_fetch_market_dataset_warns_and_returns_blocking_quality(
         update={"quality_failure_behavior": "warn"},
     )
 
-    dataset = fetch_market_dataset(request)
+    dataset = _unwrap(fetch_market_dataset(request))
 
     assert dataset.record_count == 3
     assert dataset.quality_report.quality_status == "failed"
@@ -169,21 +180,22 @@ def test_cached_failed_quality_obeys_warn_and_reject(
     warn_request = _request().model_copy(
         update={"quality_failure_behavior": "warn"},
     )
-    failed_dataset = fetch_market_dataset(warn_request)
+    failed_dataset = _unwrap(fetch_market_dataset(warn_request))
     monkeypatch.setattr(
         "app.services.data.market_data.pipeline._cached_dataset",
         lambda *_args: failed_dataset,
     )
 
     cached_warn = warn_request.model_copy(update={"use_cache": True})
-    assert fetch_market_dataset(cached_warn) is failed_dataset
+    assert _unwrap(fetch_market_dataset(cached_warn)) is failed_dataset
 
     cached_reject = cached_warn.model_copy(
         update={"quality_failure_behavior": "reject"},
     )
-    with pytest.raises(DataError) as captured:
-        fetch_market_dataset(cached_reject)
-    assert captured.value.code == "DATA_QUALITY_FAILED"
+    response = fetch_market_dataset(cached_reject)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "DATA_QUALITY_FAILED"
 
 
 def test_fetch_market_dataset_returns_nonblocking_quality(
@@ -195,7 +207,7 @@ def test_fetch_market_dataset_returns_nonblocking_quality(
         tuple(_bar(index, index) for index in range(8)),
     )
 
-    dataset = fetch_market_dataset(_request())
+    dataset = _unwrap(fetch_market_dataset(_request()))
 
     assert dataset.record_count == 8
     assert dataset.quality_report.quality_status != "failed"

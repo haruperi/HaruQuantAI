@@ -14,10 +14,20 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
 from app.services.data.contracts.records import OHLCVRecord
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.time_sessions.contracts import SessionWindow
 from app.services.data.time_sessions.gaps import GapType, classify_gap
+
+
+def _unwrap(response: object) -> object:
+    """Unwrap a successful Data standard response to its raw payload."""
+    return unwrap_data_response(
+        response,  # type: ignore[arg-type]
+        operation="data.time_sessions.classify_gap",
+        request_id=REQUEST_ID,
+    )
+
 
 # 2024-01-05 is a Friday; 2024-01-06 and 07 are the weekend.
 FRIDAY = datetime(2024, 1, 5, 20, 0, tzinfo=UTC)
@@ -47,21 +57,21 @@ def test_a_gap_wholly_inside_the_weekend_is_expected() -> None:
     Raises:
         AssertionError: If a weekend gap is reported as anomalous.
     """
-    assert classify_gap(SATURDAY, SUNDAY) is GapType.EXPECTED_WEEKEND
+    assert _unwrap(classify_gap(SATURDAY, SUNDAY)) is GapType.EXPECTED_WEEKEND
 
 
 def test_weekend_gap_may_end_exactly_when_monday_starts() -> None:
     """Assert the half-open weekend excludes its Monday endpoint."""
     monday_midnight = datetime(2024, 1, 8, tzinfo=UTC)
 
-    assert classify_gap(SATURDAY, monday_midnight) is GapType.EXPECTED_WEEKEND
+    assert _unwrap(classify_gap(SATURDAY, monday_midnight)) is GapType.EXPECTED_WEEKEND
 
 
 def test_weekend_gap_extending_into_monday_is_not_expected_without_sessions() -> None:
     """Assert Monday missing time is not hidden as a weekend closure."""
     monday_one = datetime(2024, 1, 8, 1, 0, tzinfo=UTC)
 
-    assert classify_gap(SATURDAY, monday_one) is GapType.UNVERIFIED
+    assert _unwrap(classify_gap(SATURDAY, monday_one)) is GapType.UNVERIFIED
 
 
 def test_a_gap_without_session_evidence_is_unverified_not_expected() -> None:
@@ -75,7 +85,7 @@ def test_a_gap_without_session_evidence_is_unverified_not_expected() -> None:
     """
     monday_noon = datetime(2024, 1, 8, 12, 0, tzinfo=UTC)
     monday_two = datetime(2024, 1, 8, 14, 0, tzinfo=UTC)
-    assert classify_gap(monday_noon, monday_two) is GapType.UNVERIFIED
+    assert _unwrap(classify_gap(monday_noon, monday_two)) is GapType.UNVERIFIED
 
 
 def test_a_gap_inside_an_open_session_is_unexpected() -> None:
@@ -86,8 +96,9 @@ def test_a_gap_inside_an_open_session_is_unexpected() -> None:
     """
     sessions = (_session(MONDAY, MONDAY + timedelta(hours=8)),)
     inside = MONDAY + timedelta(hours=2)
-    assert classify_gap(inside, inside + timedelta(minutes=30), sessions) is (
-        GapType.UNEXPECTED
+    assert (
+        _unwrap(classify_gap(inside, inside + timedelta(minutes=30), sessions))
+        is GapType.UNEXPECTED
     )
 
 
@@ -99,8 +110,9 @@ def test_a_gap_outside_every_session_is_an_expected_break() -> None:
     """
     sessions = (_session(MONDAY, MONDAY + timedelta(hours=4)),)
     after_close = MONDAY + timedelta(hours=5)
-    assert classify_gap(after_close, after_close + timedelta(hours=1), sessions) is (
-        GapType.EXPECTED_SESSION_BREAK
+    assert (
+        _unwrap(classify_gap(after_close, after_close + timedelta(hours=1), sessions))
+        is GapType.EXPECTED_SESSION_BREAK
     )
 
 
@@ -110,8 +122,10 @@ def test_a_non_advancing_gap_is_rejected() -> None:
     Raises:
         AssertionError: If a degenerate interval is silently accepted.
     """
-    with pytest.raises(ValueError, match="gap_end must follow gap_start"):
-        classify_gap(MONDAY, MONDAY)
+    response = classify_gap(MONDAY, MONDAY)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def _bar(moment: datetime) -> OHLCVRecord:

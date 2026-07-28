@@ -8,11 +8,16 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, cast
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourcePlan,
@@ -20,7 +25,7 @@ from app.services.data.sources.contracts import (
 )
 from app.services.data.sources.licensing import enforce_license
 from app.services.data.sources.registry import (
-    get_source_descriptor,
+    _get_source_descriptor_raw,
     update_source_descriptor_readiness,
 )
 from app.utils import generate_id, logger
@@ -99,7 +104,7 @@ def record_source_attempt(
     if observed_ns < 0:
         raise ValueError("timestamp_ns must be non-negative")
     try:
-        execute_transaction(
+        _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=(
@@ -140,7 +145,7 @@ def _recent_attempts(
     """Read durable recent source attempts or fail closed."""
     logger.debug("Reading durable source attempts for %s", source_id)
     try:
-        result = execute_transaction(
+        result = _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=(
@@ -177,7 +182,7 @@ def _rate_limit_exceeded(
     logger.debug("Checking source rate limit for %s", config.source_id)
     window_ns = config.rate_window_seconds * 1_000_000_000
     try:
-        result = execute_transaction(
+        result = _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=(
@@ -258,7 +263,7 @@ def _persisted_descriptor(
 ) -> SourceDescriptor:
     """Overlay a durable readiness transition on the configured descriptor."""
     logger.debug("Resolving durable readiness for %s", descriptor.source_id)
-    result = execute_transaction(
+    result = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(
@@ -294,7 +299,7 @@ def _persisted_descriptor(
     return descriptor.model_copy(update={"readiness": readiness})
 
 
-def evaluate_source_policy(
+def _evaluate_source_policy_raw(
     request: MarketDataRequest,
     *,
     now_ns: int | None = None,
@@ -306,7 +311,7 @@ def evaluate_source_policy(
     for source_id in ordered_sources:
         config = _policy_for(source_id, request.request_id)
         try:
-            configured_descriptor = get_source_descriptor(source_id)
+            configured_descriptor = _get_source_descriptor_raw(source_id)
         except DataError as error:
             raise DataError(
                 "SOURCE_UNAVAILABLE",
@@ -337,7 +342,25 @@ def evaluate_source_policy(
     )
 
 
-def promote_source(
+def evaluate_source_policy(
+    request: MarketDataRequest,
+    *,
+    now_ns: int | None = None,
+) -> StandardResponse[SourcePlan]:
+    """Build and validate the exact requested-plus-fallback source plan.
+
+    Returns:
+        Standard response carrying the validated source plan.
+    """
+    return run_data_operation(
+        operation="data.sources.evaluate_source_policy",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _evaluate_source_policy_raw(request, now_ns=now_ns),
+    )
+
+
+def _promote_source_raw(
     request: SourcePromotionRequest,
     auth: AuthContext,
     *,
@@ -353,7 +376,7 @@ def promote_source(
     )
     if not authorized:
         raise DataError("PERMISSION_DENIED", request_id=request.request_id)
-    descriptor = get_source_descriptor(request.source_id)
+    descriptor = _get_source_descriptor_raw(request.source_id)
     if request.target_readiness == "production" and not set(
         descriptor.promotion_evidence
     ).issubset(request.evidence):
@@ -393,7 +416,7 @@ def promote_source(
         """.strip(),
     )
     try:
-        execute_transaction(
+        _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=statements,
@@ -431,6 +454,25 @@ def promote_source(
     return update_source_descriptor_readiness(
         request.source_id,
         request.target_readiness,
+    )
+
+
+def promote_source(
+    request: SourcePromotionRequest,
+    auth: AuthContext,
+    *,
+    timestamp_ns: int | None = None,
+) -> StandardResponse[SourceDescriptor]:
+    """Atomically persist source readiness and its required audit event.
+
+    Returns:
+        Standard response carrying the promoted source descriptor.
+    """
+    return run_data_operation(
+        operation="data.sources.promote_source",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _promote_source_raw(request, auth, timestamp_ns=timestamp_ns),
     )
 
 

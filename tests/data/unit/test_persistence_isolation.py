@@ -15,14 +15,22 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 from app.services.data._settings import DataSettings, data_settings_context
-from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import execute_transaction
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
+
 
 REQUEST_ID = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
 
@@ -55,14 +63,16 @@ def test_transaction_uses_the_context_local_database(tmp_path: Path) -> None:
     """
     settings = _isolated_settings(tmp_path)
     with data_settings_context(settings):
-        execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=("CREATE TABLE isolation_probe (id TEXT)",),
-                    parameter_sets=((),),
-                    max_rows=1,
-                ),
-                request_id=REQUEST_ID,
+        _unwrap(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=("CREATE TABLE isolation_probe (id TEXT)",),
+                        parameter_sets=((),),
+                        max_rows=1,
+                    ),
+                    request_id=REQUEST_ID,
+                )
             )
         )
     written = list(tmp_path.glob("*.db"))
@@ -85,29 +95,33 @@ def test_a_second_profile_cannot_see_the_first_profiles_data(tmp_path: Path) -> 
     second.mkdir()
 
     with data_settings_context(_isolated_settings(first)):
-        execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=("CREATE TABLE only_in_first (id TEXT)",),
-                    parameter_sets=((),),
-                    max_rows=1,
-                ),
-                request_id=REQUEST_ID,
+        _unwrap(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=("CREATE TABLE only_in_first (id TEXT)",),
+                        parameter_sets=((),),
+                        max_rows=1,
+                    ),
+                    request_id=REQUEST_ID,
+                )
             )
         )
 
     with data_settings_context(_isolated_settings(second)):
-        result = execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        "SELECT name FROM sqlite_master "
-                        "WHERE type='table' AND name='only_in_first'",
+        result = _unwrap(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=(
+                            "SELECT name FROM sqlite_master "
+                            "WHERE type='table' AND name='only_in_first'",
+                        ),
+                        parameter_sets=((),),
+                        max_rows=1,
                     ),
-                    parameter_sets=((),),
-                    max_rows=1,
-                ),
-                request_id=REQUEST_ID,
+                    request_id=REQUEST_ID,
+                )
             )
         )
     assert not result.rows, (
@@ -131,8 +145,8 @@ def test_unusable_configuration_fails_closed(tmp_path: Path) -> None:
         sqlite_busy_timeout_seconds=1.0,
         approved_storage_roots=(tmp_path,),
     )
-    with data_settings_context(unusable), pytest.raises(DataError) as excinfo:
-        execute_transaction(
+    with data_settings_context(unusable):
+        response = execute_transaction(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=("SELECT 1",),
@@ -142,7 +156,9 @@ def test_unusable_configuration_fails_closed(tmp_path: Path) -> None:
                 request_id=REQUEST_ID,
             )
         )
-    assert excinfo.value.code in {"DB_CONNECTION_ERROR", "DATABASE_ERROR"}
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code in {"DB_CONNECTION_ERROR", "DATABASE_ERROR"}
 
 
 def test_approved_roots_reject_paths_outside_the_isolated_profile(

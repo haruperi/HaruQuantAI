@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING
 
-from app.services.data.persistence.dataset_writer import load_dataset
+from app.services.data.persistence.dataset_writer import _load_dataset_raw
 
 if TYPE_CHECKING:
     from app.services.data.contracts import MarketDataset
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 def verify_dataset_manifest(request: DatasetLoadRequest) -> MarketDataset:
     """Verify a dataset manifest and return its canonical dataset."""
-    return load_dataset(request)
+    return _load_dataset_raw(request)
 
 
 __all__ = ["verify_dataset_manifest"]

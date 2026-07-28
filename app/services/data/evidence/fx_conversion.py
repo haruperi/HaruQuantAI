@@ -17,6 +17,12 @@ from decimal import Decimal
 from typing import Protocol
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+    unwrap_data_response,
+)
 from app.services.data.evidence.fx_contracts import (
     FXConversionEvidence,
     FXConversionRequest,
@@ -37,8 +43,8 @@ class FXRateProvider(Protocol):
         target_currency: str,
         as_of: datetime,
         request_id: str,
-    ) -> FXRateLeg:
-        """Return one exact direct leg or raise a canonical DATA failure."""
+    ) -> StandardResponse[FXRateLeg]:
+        """Return one exact direct leg or a canonical DATA failure response."""
         ...
 
 
@@ -51,23 +57,20 @@ def _read_leg(
     """Read and validate one exact direct rate leg."""
     logger.debug("Reading explicit FX leg %s/%s", source_currency, target_currency)
     try:
-        leg = provider.get_rate_leg(
-            source_currency=source_currency,
-            target_currency=target_currency,
-            as_of=request.as_of,
+        leg = unwrap_data_response(
+            provider.get_rate_leg(
+                source_currency=source_currency,
+                target_currency=target_currency,
+                as_of=request.as_of,
+                request_id=request.request_id,
+            ),
+            operation="data.evidence.get_fx_conversion_evidence",
             request_id=request.request_id,
         )
     except DataError as error:
         if error.code in {"DATA_NOT_FOUND", "SOURCE_UNAVAILABLE"}:
             return None
         raise
-    except Exception as error:
-        logger.error("FX rate provider failed")
-        raise DataError(
-            "SOURCE_UNAVAILABLE",
-            safe_details={"operation": "fx_rate"},
-            request_id=request.request_id,
-        ) from error
     if (
         leg.source_currency != source_currency
         or leg.target_currency != target_currency
@@ -124,7 +127,7 @@ def _select_path(
     raise DataError("DATA_NOT_FOUND", request_id=request.request_id)
 
 
-def get_fx_conversion_evidence(
+def _get_fx_conversion_evidence_raw(
     request: FXConversionRequest,
     provider: FXRateProvider,
 ) -> FXConversionEvidence:
@@ -163,6 +166,31 @@ def get_fx_conversion_evidence(
             "provider_symbols": ",".join(leg.provider_symbol for leg in legs),
         },
         request_id=request.request_id,
+    )
+
+
+def get_fx_conversion_evidence(
+    request: FXConversionRequest,
+    provider: FXRateProvider,
+) -> StandardResponse[FXConversionEvidence]:
+    """Acquire an exact bounded direct or two-leg FX conversion path.
+
+    Args:
+        request: Currency pair, freshness, and explicit path policy.
+        provider: Caller-injected exact direct-rate provider.
+
+    Returns:
+        Standard response carrying immutable exact conversion evidence.
+
+    Raises:
+        DataError: Never; failures surface as an error response. Cancellation and
+            process-control exceptions propagate.
+    """
+    return run_data_operation(
+        operation="data.evidence.get_fx_conversion_evidence",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_fx_conversion_evidence_raw(request, provider),
     )
 
 

@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.contracts import ColumnMapping, ExternalImportRequest
 from app.services.data.persistence.external_import import (
     _decimal,
@@ -19,6 +20,14 @@ from app.services.data.persistence.external_import import (
 
 _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _make_import_req(**kwargs) -> ExternalImportRequest:
@@ -52,7 +61,7 @@ def _make_import_req(**kwargs) -> ExternalImportRequest:
 
 def test_describe_import_dialects() -> None:
     """Test describe_import_dialects returns non-empty dict."""
-    dialects = describe_import_dialects()
+    dialects = _unwrap(describe_import_dialects())
     assert "standard" in dialects
 
 

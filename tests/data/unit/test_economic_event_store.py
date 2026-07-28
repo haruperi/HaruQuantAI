@@ -12,12 +12,21 @@ from pathlib import Path
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
 from app.services.data.economic_calendar.store import EconomicEventStore
 from app.services.data.persistence.contracts import StatementPlan, TransactionRequest
 from app.services.data.persistence.migrations import run_data_migrations
 from app.services.data.persistence.transactions import execute_transaction
 from app.utils import generate_id
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _configure_db(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
@@ -31,7 +40,7 @@ def _configure_db(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
 
 def _apply_migrations(request_id: str) -> None:
     """Apply the canonical DATA migration manifest including 002_economic_events."""
-    run_data_migrations(request_id)
+    _unwrap(run_data_migrations(request_id))
 
 
 def _event(
@@ -135,17 +144,19 @@ def test_upsert_preserves_original_schedule_when_release_moves(
     store.upsert([original], request_id=generate_id("req"))
     store.upsert([revised], request_id=generate_id("req"))
 
-    result = execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    "SELECT scheduled_at, original_scheduled_at "
-                    "FROM data_economic_events WHERE provider_event_id = ?",
+    result = _unwrap(
+        execute_transaction(
+            TransactionRequest(
+                plan=StatementPlan(
+                    statements=(
+                        "SELECT scheduled_at, original_scheduled_at "
+                        "FROM data_economic_events WHERE provider_event_id = ?",
+                    ),
+                    parameter_sets=((original.id,),),
+                    max_rows=1,
                 ),
-                parameter_sets=((original.id,),),
-                max_rows=1,
-            ),
-            request_id=generate_id("req"),
+                request_id=generate_id("req"),
+            )
         )
     )
     row = result.rows[0]

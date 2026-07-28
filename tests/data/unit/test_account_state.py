@@ -10,7 +10,6 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 from app.services.brokers import (
     BrokerAccountInfo,
     BrokerBalance,
@@ -20,7 +19,6 @@ from app.services.brokers import (
     BrokerPosition,
 )
 from app.services.data._limits import get_limit
-from app.services.data.contracts import DataError
 from app.services.data.evidence.account_contracts import (
     AccountSnapshotRequest,
 )
@@ -46,9 +44,10 @@ def test_account_snapshot_fails_closed_when_incomplete() -> None:
     adapter.get_permissions = AsyncMock(return_value=missing)
     adapter.is_connected = AsyncMock(return_value=missing)
 
-    with pytest.raises(DataError) as captured:
-        get_account_state_snapshot(req, adapter)
-    assert captured.value.code == "SOURCE_UNAVAILABLE"
+    response = get_account_state_snapshot(req, adapter)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "SOURCE_UNAVAILABLE"
 
 
 def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence mapping
@@ -139,7 +138,9 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence ma
 
     clock = MagicMock()
     clock.now.return_value = now
-    snapshot = get_account_state_snapshot(req, mock_adapter, clock=clock)
+    response = get_account_state_snapshot(req, mock_adapter, clock=clock)
+    assert response.status == "success"
+    snapshot = response.data
 
     # Assertions
     account_limit = get_limit("ACCOUNT_SNAPSHOT_MAX_RECORDS", "execution_bound")
@@ -197,8 +198,8 @@ def test_account_snapshot_rejects_truncated_exposure_evidence() -> None:
         request_id="req-9c425996-f4f8-4197-a7b1-b63e36cccd4c",
     )
 
-    with pytest.raises(DataError) as captured:
-        get_account_state_snapshot(request, adapter)
-
-    assert captured.value.code == "LIMIT_EXCEEDED"
-    assert captured.value.safe_details["operation"] == "positions"
+    response = get_account_state_snapshot(request, adapter)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "LIMIT_EXCEEDED"
+    assert response.error.details["operation"] == "positions"

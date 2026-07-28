@@ -15,14 +15,21 @@ from decimal import Decimal
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord
-from app.services.data.time_sessions.timeframes import (
-    get_timeframe_spec,
-    validate_resample_target,
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
 )
-from app.utils import logger
+from app.services.data.time_sessions.timeframes import (
+    _get_timeframe_spec_raw,
+    _validate_resample_target_raw,
+)
+from app.utils import generate_id, logger
 
 
-def resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDataset:
+def _resample_dataset_raw(
+    dataset: MarketDataset, target_timeframe: str
+) -> MarketDataset:
     """Resample ordered canonical OHLCV only to a supported higher timeframe.
 
     Uses deterministic OHLCV/spread aggregation and updates available_at.
@@ -50,8 +57,8 @@ def resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDat
             safe_details={"message": "Only bar datasets can be resampled."},
         )
 
-    validate_resample_target(dataset.timeframe, target_timeframe)
-    target_spec = get_timeframe_spec(target_timeframe)
+    _validate_resample_target_raw(dataset.timeframe, target_timeframe)
+    target_spec = _get_timeframe_spec_raw(target_timeframe)
 
     if not dataset.records:
         logger.info("Empty source dataset records, returning empty dataset")
@@ -178,10 +185,43 @@ def resample_dataset(dataset: MarketDataset, target_timeframe: str) -> MarketDat
     )
 
 
-def resample_ohlcv(dataset: MarketDataset, target_timeframe: str) -> MarketDataset:
+def resample_dataset(
+    dataset: MarketDataset, target_timeframe: str
+) -> StandardResponse[MarketDataset]:
+    """Resample ordered canonical OHLCV only to a supported higher timeframe.
+
+    Uses deterministic OHLCV/spread aggregation and updates available_at.
+
+    Args:
+        dataset: The source MarketDataset.
+        target_timeframe: The target timeframe key (e.g. "M5").
+
+    Returns:
+        Standard response carrying a new resampled MarketDataset.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED``, ``UNSUPPORTED_TIMEFRAME``, or
+          ``DATA_QUALITY_FAILED`` on failure.
+    """
+    return run_data_operation(
+        operation="data.transformation.resample_dataset",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _resample_dataset_raw(dataset, target_timeframe),
+    )
+
+
+def resample_ohlcv(
+    dataset: MarketDataset, target_timeframe: str
+) -> StandardResponse[MarketDataset]:
     """Roll up OHLCV records to a larger timeframe."""
     logger.info("Executing public DATA OHLCV resample")
-    return resample_dataset(dataset, target_timeframe)
+    return run_data_operation(
+        operation="data.transformation.resample_ohlcv",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _resample_dataset_raw(dataset, target_timeframe),
+    )
 
 
 __all__ = [

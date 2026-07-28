@@ -16,7 +16,12 @@ from decimal import Decimal
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, SpreadRecord, TickRecord
-from app.utils import logger
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
+from app.utils import generate_id, logger
 
 
 def _validate_alignment_target(target: Sequence[datetime]) -> None:
@@ -43,7 +48,7 @@ def _validate_alignment_target(target: Sequence[datetime]) -> None:
             )
 
 
-def align_datasets(
+def _align_datasets_raw(
     datasets: Mapping[str, MarketDataset], target: Sequence[datetime]
 ) -> Mapping[str, MarketDataset]:
     """Backward-align multiple datasets using only values available by target.
@@ -180,13 +185,44 @@ def align_datasets(
     return aligned_datasets
 
 
+def align_datasets(
+    datasets: Mapping[str, MarketDataset], target: Sequence[datetime]
+) -> StandardResponse[Mapping[str, MarketDataset]]:
+    """Backward-align multiple datasets using only values available by target.
+
+    Preserves source availability metadata and fails atomically on lookahead.
+
+    Args:
+        datasets: Map of dataset keys to MarketDataset.
+        target: Ordered sequence of aware UTC target datetimes.
+
+    Returns:
+        Standard response carrying a map of dataset keys to backward-aligned
+        MarketDatasets.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` on validation or lookahead failure.
+    """
+    return run_data_operation(
+        operation="data.transformation.align_datasets",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _align_datasets_raw(datasets, target),
+    )
+
+
 def align_multitimeframe_data(
     datasets: Mapping[str, MarketDataset],
     target_timestamps: Sequence[datetime],
-) -> Mapping[str, MarketDataset]:
+) -> StandardResponse[Mapping[str, MarketDataset]]:
     """Align multiple datasets to a uniform timestamp index with forward fill."""
     logger.info("Executing public DATA multi-timeframe alignment")
-    return align_datasets(datasets, target_timestamps)
+    return run_data_operation(
+        operation="data.transformation.align_multitimeframe_data",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _align_datasets_raw(datasets, target_timestamps),
+    )
 
 
 __all__ = [

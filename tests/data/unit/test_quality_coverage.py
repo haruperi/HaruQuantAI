@@ -4,8 +4,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock
 
-import pytest
-from app.services.data.contracts import DataError, DataQualityReport, QualityIssue
+from app.services.data.contracts import DataQualityReport, QualityIssue
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.quality.contracts import QualityFlag, aggregate_flags
 from app.services.data.quality.policy import get_quality_policy
 from app.services.data.quality.series import (
@@ -17,6 +17,15 @@ from app.services.data.quality.series import (
 )
 
 _NOW = datetime.now(UTC)
+
+
+def _unwrap(response: object) -> object:
+    """Unwrap a successful Data standard response to its raw payload."""
+    return unwrap_data_response(
+        response,  # type: ignore[arg-type]
+        operation="data.quality.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def test_aggregate_flags_success_and_unknown_flag() -> None:
@@ -46,7 +55,7 @@ def test_aggregate_flags_success_and_unknown_flag() -> None:
         generated_at=_NOW,
     )
 
-    flags = aggregate_flags(report)
+    flags = _unwrap(aggregate_flags(report))
     assert flags == (QualityFlag.MISSING_BARS, QualityFlag.PRICE_SPIKE)
 
     # Unknown issue code raises DataError VALIDATION_FAILED
@@ -68,9 +77,11 @@ def test_aggregate_flags_success_and_unknown_flag() -> None:
         schema_version="v1",
         generated_at=_NOW,
     )
-    with pytest.raises(DataError) as exc_info:
-        aggregate_flags(report_unknown)
-    assert exc_info.value.code == "VALIDATION_FAILED"
+    # Unknown issue code now surfaces as an in-band error response.
+    response = aggregate_flags(report_unknown)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def test_count_weekend_days() -> None:
@@ -93,7 +104,7 @@ def test_detect_duplicates_non_ohlcv() -> None:
 
 def test_detect_gaps_edge_cases() -> None:
     """Test _detect_gaps with invalid timeframe, short records, D1 timeframe."""
-    policy = get_quality_policy()
+    policy = _unwrap(get_quality_policy())
 
     # Invalid timeframe returns None
     rec1 = MagicMock()

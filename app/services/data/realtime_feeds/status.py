@@ -88,7 +88,7 @@ def read_feed_status(
         StatementPlan,
         TransactionRequest,
     )
-    from app.services.data.persistence.transactions import execute_transaction
+    from app.services.data.persistence.transactions import _execute_transaction_raw
 
     query_sql = (
         "SELECT feed_id, source_id, symbol, data_kind, state, heartbeat_at, "
@@ -97,7 +97,7 @@ def read_feed_status(
         "  heartbeat_timeout_seconds "
         "FROM data_feeds WHERE feed_id = ?"
     )
-    res = execute_transaction(
+    res = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(query_sql,),

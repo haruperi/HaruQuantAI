@@ -23,9 +23,16 @@ from app.services.data.contracts.dataset import (
     WorkflowContext,
 )
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.paths import resolve_approved_storage_path
-from app.services.data.time_sessions.timeframes import get_timeframe_spec
-from app.utils import logger
+from app.services.data.time_sessions.timeframes import (
+    _get_timeframe_spec_raw as get_timeframe_spec,
+)
+from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     import numpy as np
@@ -1021,7 +1028,7 @@ def _build_dataset(
     )
 
 
-def generate_tick_series(
+def _generate_tick_series_raw(
     dataset: MarketDataset,
     *,
     model: str,
@@ -1182,6 +1189,78 @@ def generate_tick_series(
         dataset.workflow_context,
         dataset.precision_policy,
         resolved_request_id,
+    )
+
+
+def generate_tick_series(
+    dataset: MarketDataset,
+    *,
+    model: str,
+    trading_timeframe: str,
+    m1_dataset: MarketDataset | None = None,
+    real_tick_dataset: MarketDataset | None = None,
+    spread_model: str = SPREAD_NATIVE,
+    point_value: Decimal = Decimal("0.00001"),
+    price_precision: int = 5,
+    fixed_spread_points: Decimal | None = None,
+    min_spread_points: Decimal | None = None,
+    max_spread_points: Decimal | None = None,
+    seed: int | None = None,
+    max_records: int | None = None,
+    request_id: str | None = None,
+) -> StandardResponse[MarketDataset]:
+    """Derive a canonical tick dataset from real bar or tick evidence.
+
+    Prices originate from real OHLC bounds or real quotes and tick counts from real
+    tick volume; only the intra-bar path shape is constructed. This is not synthetic
+    generation and never fabricates a price.
+
+    Args:
+        dataset: Source MarketDataset supplying bars, or signal-timeframe context
+          for the real model.
+        model: One of TICK_GENERATION_MODELS.
+        trading_timeframe: Timeframe key used when bar spacing cannot be inferred.
+        m1_dataset: Required M1 bar dataset for the ohlc_m1 model.
+        real_tick_dataset: Required real tick dataset for the real model.
+        spread_model: One of SPREAD_MODELS.
+        point_value: Value of one spread point in price units.
+        price_precision: Decimal exponent used to quantize emitted prices.
+        fixed_spread_points: Required when spread_model is fixed_spread.
+        min_spread_points: Required when spread_model is variable_spread.
+        max_spread_points: Required when spread_model is variable_spread.
+        seed: Required when spread_model is variable_spread.
+        max_records: Optional caller ceiling. The domain ceiling is always enforced,
+            and a lower caller ceiling may tighten it.
+        request_id: Optional caller trace identifier.
+
+    Returns:
+        Standard response carrying a canonical tick MarketDataset ordered by
+        timestamp then intra-bar index.
+
+    Raises:
+        (in-band) ``DataError`` codes if the model, spread configuration,
+          timeframe, source evidence, or output size is invalid.
+    """
+    return run_data_operation(
+        operation="data.tick_derivation.generate_tick_series",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _generate_tick_series_raw(
+            dataset,
+            model=model,
+            trading_timeframe=trading_timeframe,
+            m1_dataset=m1_dataset,
+            real_tick_dataset=real_tick_dataset,
+            spread_model=spread_model,
+            point_value=point_value,
+            price_precision=price_precision,
+            fixed_spread_points=fixed_spread_points,
+            min_spread_points=min_spread_points,
+            max_spread_points=max_spread_points,
+            seed=seed,
+            max_records=max_records,
+            request_id=request_id,
+        ),
     )
 
 
@@ -1356,7 +1435,7 @@ def _source_chunks(
     return chunks
 
 
-def generate_tick_series_to_parquet(
+def _generate_tick_series_to_parquet_raw(
     dataset: MarketDataset,
     *,
     path: Path,
@@ -1421,7 +1500,7 @@ def generate_tick_series_to_parquet(
         for chunk in chunks:
             direct_columns = _kernel_parquet_columns(chunk, generation_arguments)
             if direct_columns is None:
-                generated = generate_tick_series(
+                generated = _generate_tick_series_raw(
                     chunk,
                     **generation_arguments,  # type: ignore[arg-type]
                 )
@@ -1451,6 +1530,43 @@ def generate_tick_series_to_parquet(
         if writer is not None:
             writer.close()  # type: ignore[no-untyped-call]
     return {"path": str(approved_path), "rows": rows_written, "columns": columns}
+
+
+def generate_tick_series_to_parquet(
+    dataset: MarketDataset,
+    *,
+    path: Path,
+    max_output_rows_per_chunk: int | None = None,
+    **generation_arguments: object,
+) -> StandardResponse[Mapping[str, object]]:
+    """Stream a generated tick series to a bounded Parquet artifact.
+
+    Args:
+        dataset: Source MarketDataset supplying bar or context evidence.
+        path: Destination Parquet path beneath an approved artifact root.
+        max_output_rows_per_chunk: Optional caller chunk ceiling. The domain ceiling
+            is used by default and cannot be loosened.
+        **generation_arguments: Keyword arguments forwarded to generate_tick_series.
+
+    Returns:
+        Standard response carrying a mapping with the written path, row count,
+        and column names.
+
+    Raises:
+        (in-band) ``DataError`` codes if generation fails or the destination
+          cannot be written.
+    """
+    return run_data_operation(
+        operation="data.tick_derivation.generate_tick_series_to_parquet",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _generate_tick_series_to_parquet_raw(
+            dataset,
+            path=path,
+            max_output_rows_per_chunk=max_output_rows_per_chunk,
+            **generation_arguments,
+        ),
+    )
 
 
 __all__ = [

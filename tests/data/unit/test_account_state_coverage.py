@@ -67,7 +67,7 @@ def test_validate_freshness_stale_or_future() -> None:
 
 def test_get_account_state_snapshot_mismatched_account_id() -> None:
     """
-    Test get_account_state_snapshot raises STALE_EVIDENCE for mismatched account_id.
+    Test get_account_state_snapshot surfaces STALE_EVIDENCE for mismatched account_id.
     """
     req = AccountSnapshotRequest(
         source_id="mt5",
@@ -96,6 +96,7 @@ def test_get_account_state_snapshot_mismatched_account_id() -> None:
     )
     mock_adapter.is_connected = AsyncMock(return_value=MagicMock(error=None, data=True))
 
-    with pytest.raises(DataError) as exc_info:
-        get_account_state_snapshot(req, mock_adapter)
-    assert exc_info.value.code == "STALE_EVIDENCE"
+    response = get_account_state_snapshot(req, mock_adapter)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "STALE_EVIDENCE"

@@ -18,10 +18,18 @@ from app.services.data.audit import (
 from app.services.data.audit.contracts import (
     AuditEventQuery,
 )
-from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.utils import AuthContext
 
 from tests.data.helpers_models import END, START, make_audit_event
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.audit.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _configure_audit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -32,8 +40,10 @@ def _configure_audit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "10")
     from app.services.data.persistence.migrations import run_data_migrations
 
-    run_data_migrations(
-        "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
+    _unwrap(
+        run_data_migrations(
+            "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
+        )
     )
 
 
@@ -66,12 +76,12 @@ def test_persist_audit_event_idempotency(
     event = make_audit_event()
 
     # First persist call -> new insert
-    res1 = persist_audit_event(event)
+    res1 = _unwrap(persist_audit_event(event))
     assert res1.persisted
     assert not res1.idempotent
 
     # Second persist call -> idempotent skip
-    res2 = persist_audit_event(event)
+    res2 = _unwrap(persist_audit_event(event))
     assert not res2.persisted
     assert res2.idempotent
 
@@ -91,14 +101,15 @@ def test_query_audit_events_authorization(
 
     # Authorized (admin role) -> Succeeds (returns empty page)
     auth_admin = make_auth(admin=True)
-    page = query_audit_events(query, auth_admin)
+    page = _unwrap(query_audit_events(query, auth_admin))
     assert len(page.events) == 0
 
-    # Unauthorized (viewer role, no permission) -> Raises PERMISSION_DENIED
+    # Unauthorized (viewer role, no permission) -> PERMISSION_DENIED
     auth_viewer = make_auth(admin=False)
-    with pytest.raises(DataError) as captured:
-        query_audit_events(query, auth_viewer)
-    assert captured.value.code == "PERMISSION_DENIED"
+    response = query_audit_events(query, auth_viewer)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "PERMISSION_DENIED"
 
 
 def test_query_filtering_and_keyset_pagination(
@@ -112,9 +123,9 @@ def test_query_filtering_and_keyset_pagination(
     evt2 = make_audit_event(timestamp=START + timedelta(seconds=1))
     evt3 = make_audit_event(timestamp=START + timedelta(seconds=2))
 
-    persist_audit_event(evt1)
-    persist_audit_event(evt2)
-    persist_audit_event(evt3)
+    _unwrap(persist_audit_event(evt1))
+    _unwrap(persist_audit_event(evt2))
+    _unwrap(persist_audit_event(evt3))
 
     auth = make_auth(admin=True)
 
@@ -125,7 +136,7 @@ def test_query_filtering_and_keyset_pagination(
         limit=2,
         request_id="req-fd73f938bae2baf88208bab837d9571375e87dfdf6fa0f4a20586570b8f53ced",
     )
-    page1 = query_audit_events(query1, auth)
+    page1 = _unwrap(query_audit_events(query1, auth))
     assert len(page1.events) == 2
     assert page1.events[0].event_id == evt1.event_id
     assert page1.events[1].event_id == evt2.event_id
@@ -139,7 +150,7 @@ def test_query_filtering_and_keyset_pagination(
         limit=2,
         request_id="req-edc607562832cec9ae86d7151ba1a16623fce4821ad5cec4ec7d34a10711aeed",
     )
-    page2 = query_audit_events(query2, auth)
+    page2 = _unwrap(query_audit_events(query2, auth))
     assert len(page2.events) == 1
     assert page2.events[0].event_id == evt3.event_id
     assert page2.next_cursor is None
@@ -152,7 +163,7 @@ def test_query_filtering_optional_params(
     _configure_audit(monkeypatch, tmp_path)
 
     evt = make_audit_event(timestamp=START)
-    persist_audit_event(evt)
+    _unwrap(persist_audit_event(evt))
 
     auth = make_auth(admin=True)
 
@@ -167,7 +178,7 @@ def test_query_filtering_optional_params(
         correlation_id=evt.correlation_id,
         request_id="req-b55955461cceab6a12ba17c64b01f4264ea4a49351dd6c37f9587b60d80a38a5",
     )
-    page_match = query_audit_events(q_match, auth)
+    page_match = _unwrap(query_audit_events(q_match, auth))
     assert len(page_match.events) == 1
 
     # Filter with non-matching domain
@@ -178,7 +189,7 @@ def test_query_filtering_optional_params(
         domain="non-existent-domain",
         request_id="req-af8a28424f1ac6303d6e5245c9e414706a1f4f4f47d68bb67898cd4085021a9e",
     )
-    page_no_match = query_audit_events(q_no_match, auth)
+    page_no_match = _unwrap(query_audit_events(q_no_match, auth))
     assert len(page_no_match.events) == 0
 
 
@@ -197,9 +208,10 @@ def test_query_malformed_cursor(
         request_id="req-041131f35158458920b9da4a031da28bb0cfe05e63c1c4223bd2de2018daa542",
     )
 
-    with pytest.raises(DataError) as captured:
-        query_audit_events(query, auth)
-    assert captured.value.code == "INVALID_INPUT"
+    response = query_audit_events(query, auth)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "INVALID_INPUT"
 
 
 def test_persist_audit_uncommitted_transaction_error(
@@ -220,12 +232,13 @@ def test_persist_audit_uncommitted_transaction_error(
             request_id="req-4248ec040f25c337464d601a23be28bee0a2a9c01d8ff18ccdbc5913176bd0ff",
         )
 
-    monkeypatch.setattr(audit_mod, "execute_transaction", mock_execute)
+    monkeypatch.setattr(audit_mod, "_execute_transaction_raw", mock_execute)
 
     event = make_audit_event()
-    with pytest.raises(DataError) as captured:
-        persist_audit_event(event)
-    assert captured.value.code == "DB_WRITE_FAILED"
+    response = persist_audit_event(event)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_WRITE_FAILED"
 
 
 def test_persist_audit_exception_mapping(
@@ -239,12 +252,13 @@ def test_persist_audit_exception_mapping(
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock write database error")
 
-    monkeypatch.setattr(audit_mod, "execute_transaction", mock_execute)
+    monkeypatch.setattr(audit_mod, "_execute_transaction_raw", mock_execute)
 
     event = make_audit_event()
-    with pytest.raises(DataError) as captured:
-        persist_audit_event(event)
-    assert captured.value.code == "DB_WRITE_FAILED"
+    response = persist_audit_event(event)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_WRITE_FAILED"
 
 
 def test_query_audit_exception_mapping(
@@ -258,7 +272,7 @@ def test_query_audit_exception_mapping(
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock query database error")
 
-    monkeypatch.setattr(audit_mod, "execute_transaction", mock_execute)
+    monkeypatch.setattr(audit_mod, "_execute_transaction_raw", mock_execute)
 
     auth = make_auth(admin=True)
     query = AuditEventQuery(
@@ -268,6 +282,7 @@ def test_query_audit_exception_mapping(
         request_id="req-42c830675463ef92743a20f6bee6c830b821e4fdc3d1891624cae7366b9cb008",
     )
 
-    with pytest.raises(DataError) as captured:
-        query_audit_events(query, auth)
-    assert captured.value.code == "DATABASE_ERROR"
+    response = query_audit_events(query, auth)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATABASE_ERROR"

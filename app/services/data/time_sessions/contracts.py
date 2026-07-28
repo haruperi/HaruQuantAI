@@ -9,7 +9,7 @@ from typing import Literal
 from pydantic import field_validator, model_validator
 
 from app.services.data.contracts._base import FrozenContract, TracedOpenContract
-from app.services.data.time_sessions.utc import require_utc
+from app.services.data.time_sessions.utc import _require_utc_raw as require_utc
 
 _LAST_WEEKDAY = 6
 

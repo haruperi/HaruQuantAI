@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from app.services.data.contracts import DataError
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import logger
 
 if TYPE_CHECKING:
@@ -163,7 +163,7 @@ def _persist_feed_status(active: ActiveFeed, request_id: str) -> None:
         else None
     )
 
-    execute_transaction(
+    _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(update_sql,),

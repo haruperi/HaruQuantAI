@@ -10,12 +10,21 @@ from pathlib import Path
 import pytest
 from app.services.data._settings import DataSettings, data_settings_context
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.contracts import (
     MigrationRequest,
     MigrationStep,
 )
 from app.services.data.persistence.locking import acquire_write_lock
 from app.services.data.persistence.migrations import run_domain_migrations
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _configure_migrations(
@@ -57,12 +66,12 @@ def test_run_domain_migrations_applies_and_skips_steps(
     )
 
     # First run: should apply both
-    result1 = run_domain_migrations(request1)
+    result1 = _unwrap(run_domain_migrations(request1))
     assert result1.applied_ids == ("001_create_test", "002_add_index")
     assert result1.skipped_ids == ()
 
     # Second run with same request: should skip both
-    result2 = run_domain_migrations(request1)
+    result2 = _unwrap(run_domain_migrations(request1))
     assert result2.applied_ids == ()
     assert result2.skipped_ids == ("001_create_test", "002_add_index")
 
@@ -81,11 +90,13 @@ def test_run_domain_migrations_rejects_modified_applied_step(
     )
 
     # Apply the first version of step 1
-    run_domain_migrations(
-        MigrationRequest(
-            domain="data",
-            steps=(step1,),
-            request_id="req-1c465394a7256e0bd4fb6746c0906fcf394c93e3fc3d7ff5b5d94e13262f649c",
+    _unwrap(
+        run_domain_migrations(
+            MigrationRequest(
+                domain="data",
+                steps=(step1,),
+                request_id="req-1c465394a7256e0bd4fb6746c0906fcf394c93e3fc3d7ff5b5d94e13262f649c",
+            )
         )
     )
 
@@ -103,12 +114,13 @@ def test_run_domain_migrations_rejects_modified_applied_step(
         request_id="req-b0883908531bfb068184243e2dbfbdba8313f9b0b65918d0f3ec90551eaff81a",
     )
 
-    with pytest.raises(DataError) as captured:
-        run_domain_migrations(request_fail)
+    response = run_domain_migrations(request_fail)
 
-    assert captured.value.code == "SCHEMA_MIGRATION_FAILED"
-    assert captured.value.safe_details["stage"] == "checksum_validation"
-    assert captured.value.safe_details["migration_id"] == "001_create_test"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "SCHEMA_MIGRATION_FAILED"
+    assert response.error.details["stage"] == "checksum_validation"
+    assert response.error.details["migration_id"] == "001_create_test"
 
 
 def test_run_domain_migrations_rejects_out_of_order_step(
@@ -125,11 +137,13 @@ def test_run_domain_migrations_rejects_out_of_order_step(
     )
 
     # Apply step 2 first (simulating out-of-order database state or step gaps)
-    run_domain_migrations(
-        MigrationRequest(
-            domain="data",
-            steps=(step2,),
-            request_id="req-c3e9c0253cdddbe63e4241e137d042e852677834cc0f42c2dc539138b4f70c6e",
+    _unwrap(
+        run_domain_migrations(
+            MigrationRequest(
+                domain="data",
+                steps=(step2,),
+                request_id="req-c3e9c0253cdddbe63e4241e137d042e852677834cc0f42c2dc539138b4f70c6e",
+            )
         )
     )
 
@@ -147,12 +161,13 @@ def test_run_domain_migrations_rejects_out_of_order_step(
         request_id="req-62d1d2555a5e35a974e02ceb75e51aa8fd44bb16f2338cd8c122441d0dd1b818",
     )
 
-    with pytest.raises(DataError) as captured:
-        run_domain_migrations(request_fail)
+    response = run_domain_migrations(request_fail)
 
-    assert captured.value.code == "SCHEMA_MIGRATION_FAILED"
-    assert captured.value.safe_details["stage"] == "order_validation"
-    assert captured.value.safe_details["migration_id"] == "001_create_table"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "SCHEMA_MIGRATION_FAILED"
+    assert response.error.details["stage"] == "order_validation"
+    assert response.error.details["migration_id"] == "001_create_table"
 
 
 def test_run_domain_migrations_propagates_concurrent_lock(
@@ -162,9 +177,11 @@ def test_run_domain_migrations_propagates_concurrent_lock(
     database_path = _configure_migrations(monkeypatch, tmp_path)
 
     # Acquire the lock beforehand
-    with acquire_write_lock(
-        database_path,
-        "req-9cfa283ea158f52056d10d74c3dad4a198f7d89587a65601ac05b83ef9e92d22",
+    with _unwrap(
+        acquire_write_lock(
+            database_path,
+            "req-9cfa283ea158f52056d10d74c3dad4a198f7d89587a65601ac05b83ef9e92d22",
+        )
     ):
         step = MigrationStep(
             domain="data",
@@ -178,10 +195,11 @@ def test_run_domain_migrations_propagates_concurrent_lock(
             request_id="req-edaa55c9b738149fe519e7e254fec1dad549fce62ff08a1ab28000a65d6de1ac",
         )
 
-        with pytest.raises(DataError) as captured:
-            run_domain_migrations(request)
+        response = run_domain_migrations(request)
 
-        assert captured.value.code == "CONCURRENT_WRITE_LOCKED"
+        assert response.status == "error"
+        assert response.error is not None
+        assert response.error.code == "CONCURRENT_WRITE_LOCKED"
 
 
 def test_run_domain_migrations_rejects_unsafe_configuration(
@@ -204,13 +222,12 @@ def test_run_domain_migrations_rejects_unsafe_configuration(
         request_id="req-2c5ba42aa86dfdc67bd844f3252b1cfd53b4726c7b9dea4d9c34e85b35f12910",
     )
 
-    with (
-        data_settings_context(DataSettings(database_url=None, data_dir=None)),
-        pytest.raises(DataError) as captured,
-    ):
-        run_domain_migrations(request)
+    with data_settings_context(DataSettings(database_url=None, data_dir=None)):
+        response = run_domain_migrations(request)
 
-    assert captured.value.code == "DB_CONNECTION_ERROR"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_CONNECTION_ERROR"
 
 
 @pytest.mark.parametrize(
@@ -251,11 +268,12 @@ def test_run_domain_migrations_invalid_env_details(
         request_id="req-63196181e70b4db641ee87242a6b0bee26cd421dc09cf13c8d221e946cffda20",
     )
 
-    with pytest.raises(DataError) as captured:
-        run_domain_migrations(request)
+    response = run_domain_migrations(request)
 
-    assert captured.value.code == "DB_CONNECTION_ERROR"
-    assert captured.value.safe_details["stage"] == stage
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_CONNECTION_ERROR"
+    assert response.error.details["stage"] == stage
 
 
 def test_run_domain_migrations_ledger_initialization_failure(
@@ -269,7 +287,9 @@ def test_run_domain_migrations_ledger_initialization_failure(
     def mock_execute_transaction(*args, **kwargs):
         raise DataError("DATABASE_ERROR", safe_details={"stage": "mock"})
 
-    monkeypatch.setattr(migrations, "execute_transaction", mock_execute_transaction)
+    monkeypatch.setattr(
+        migrations, "_execute_transaction_raw", mock_execute_transaction
+    )
 
     step = MigrationStep(
         domain="data",
@@ -283,11 +303,12 @@ def test_run_domain_migrations_ledger_initialization_failure(
         request_id="req-7b1614aa64942fea386a43b32faf63df2739536d624874e6b2f967e46d2b2487",
     )
 
-    with pytest.raises(DataError) as captured:
-        run_domain_migrations(request)
+    response = run_domain_migrations(request)
 
-    assert captured.value.code == "SCHEMA_MIGRATION_FAILED"
-    assert captured.value.safe_details["stage"] == "ledger_initialization"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "SCHEMA_MIGRATION_FAILED"
+    assert response.error.details["stage"] == "ledger_initialization"
 
 
 def test_run_domain_migrations_ledger_query_failure(
@@ -313,7 +334,9 @@ def test_run_domain_migrations_ledger_query_failure(
             request_id="req-4248ec040f25c337464d601a23be28bee0a2a9c01d8ff18ccdbc5913176bd0ff",
         )
 
-    monkeypatch.setattr(migrations, "execute_transaction", mock_execute_transaction)
+    monkeypatch.setattr(
+        migrations, "_execute_transaction_raw", mock_execute_transaction
+    )
 
     step = MigrationStep(
         domain="data",
@@ -327,11 +350,12 @@ def test_run_domain_migrations_ledger_query_failure(
         request_id="req-3f648b5c5df3542ba593551b7f195d0d1153b386eadbacc46b023fd7ad4fa245",
     )
 
-    with pytest.raises(DataError) as captured:
-        run_domain_migrations(request)
+    response = run_domain_migrations(request)
 
-    assert captured.value.code == "SCHEMA_MIGRATION_FAILED"
-    assert captured.value.safe_details["stage"] == "ledger_query"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "SCHEMA_MIGRATION_FAILED"
+    assert response.error.details["stage"] == "ledger_query"
 
 
 def test_run_domain_migrations_step_execution_failure(
@@ -357,7 +381,9 @@ def test_run_domain_migrations_step_execution_failure(
             request_id="req-4248ec040f25c337464d601a23be28bee0a2a9c01d8ff18ccdbc5913176bd0ff",
         )
 
-    monkeypatch.setattr(migrations, "execute_transaction", mock_execute_transaction)
+    monkeypatch.setattr(
+        migrations, "_execute_transaction_raw", mock_execute_transaction
+    )
 
     step = MigrationStep(
         domain="data",
@@ -371,8 +397,9 @@ def test_run_domain_migrations_step_execution_failure(
         request_id="req-5260ff118a63787e7efa7a5b649197a24cacb65fe1d7df32d254f7711f51de2d",
     )
 
-    with pytest.raises(DataError) as captured:
-        run_domain_migrations(request)
+    response = run_domain_migrations(request)
 
-    assert captured.value.code == "SCHEMA_MIGRATION_FAILED"
-    assert captured.value.safe_details["stage"] == "step_execution"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "SCHEMA_MIGRATION_FAILED"
+    assert response.error.details["stage"] == "step_execution"

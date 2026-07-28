@@ -5,11 +5,10 @@ from __future__ import annotations
 import json
 import math
 from collections.abc import Mapping
-from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import logger, redact_text_value
+from app.utils import ErrorDefinition, logger, redact_text_value
 
 type JsonScalar = None | bool | int | float | str
 type ErrorSeverity = Literal["info", "warning", "error", "critical"]
@@ -27,18 +26,6 @@ _SENSITIVE_KEY_PARTS = (
 )
 
 
-@dataclass(frozen=True, slots=True)
-class ErrorDefinition:
-    """Safe handling metadata for one deterministic Data error code."""
-
-    code: str
-    category: str
-    retryable: bool
-    severity: ErrorSeverity
-    safe_message: str
-    operator_action: str
-
-
 def _definition(
     code: str,
     category: str,
@@ -48,14 +35,33 @@ def _definition(
     safe_message: str,
     operator_action: str,
 ) -> ErrorDefinition:
-    """Build one internal immutable error definition."""
+    """Build one internal immutable error definition.
+
+    The shared ``ErrorDefinition`` contract is owned by Utils. Data retains its
+    own immutable catalogue by stamping every definition with ``domain="data"``
+    and mapping the legacy ``safe_message`` onto the shared ``description``
+    field. Category, retryable policy, severity, and operator action are
+    preserved unchanged.
+
+    Args:
+        code: Deterministic manifest code.
+        category: Short symbolic category.
+        retryable: Whether automated retry is permitted.
+        severity: Safe handling severity.
+        safe_message: Boundary-safe human-readable message.
+        operator_action: Concrete remediation instruction.
+
+    Returns:
+        One immutable Utils-owned error definition carrying Data domain identity.
+    """
     logger.debug("Running DATA function: _definition")
     return ErrorDefinition(
         code=code,
+        domain="data",
+        description=safe_message,
         category=category,
-        retryable=retryable,
         severity=severity,
-        safe_message=safe_message,
+        retryable=retryable,
         operator_action=operator_action,
     )
 
@@ -380,7 +386,11 @@ class DataError(Exception):
         self.request_id = request_id
         self.retryable = definition.retryable
         self.severity = definition.severity
-        self.safe_message = definition.safe_message
+        # The shared Utils ``ErrorDefinition`` carries the legacy Data safe
+        # message in its ``description`` field. The attribute name is preserved
+        # on ``DataError`` so private cores and characterization tests retain
+        # the original evidence shape.
+        self.safe_message = definition.description
         self.operator_action = definition.operator_action
         super().__init__(definition.code)
 

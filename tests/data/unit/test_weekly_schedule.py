@@ -7,6 +7,15 @@ from app.services.data import (
     WeeklyScheduleDefinition,
     WeeklyScheduleProvider,
 )
+from app.services.data.contracts.responses import unwrap_data_response
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.time_sessions.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def test_weekly_schedule_applies_holiday_closure_and_revision() -> None:
@@ -22,9 +31,11 @@ def test_weekly_schedule_applies_holiday_closure_and_revision() -> None:
         )
     )
 
-    sessions = provider.get_sessions(
-        start=datetime(2026, 7, 20, tzinfo=UTC),
-        end=datetime(2026, 7, 21, tzinfo=UTC),
+    sessions = _unwrap(
+        provider.get_sessions(
+            start=datetime(2026, 7, 20, tzinfo=UTC),
+            end=datetime(2026, 7, 21, tzinfo=UTC),
+        )
     )
 
     assert sessions == ()
@@ -42,9 +53,11 @@ def test_weekly_schedule_normalizes_dst_regional_time_to_utc() -> None:
         )
     )
 
-    sessions = provider.get_sessions(
-        start=datetime(2026, 7, 20, tzinfo=UTC),
-        end=datetime(2026, 7, 21, tzinfo=UTC),
+    sessions = _unwrap(
+        provider.get_sessions(
+            start=datetime(2026, 7, 20, tzinfo=UTC),
+            end=datetime(2026, 7, 21, tzinfo=UTC),
+        )
     )
 
     assert len(sessions) == 1

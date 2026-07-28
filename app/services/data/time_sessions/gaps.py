@@ -23,7 +23,12 @@ from datetime import timedelta
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from app.utils import logger
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
+from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -106,26 +111,12 @@ def _overlaps_any_session(
     )
 
 
-def classify_gap(
+def _classify_gap_raw(
     gap_start: datetime,
     gap_end: datetime,
     sessions: Sequence[SessionWindow] | None = None,
 ) -> GapType:
-    """Classify one gap against declared session windows.
-
-    Weekend-only intervals are inherently classified as ``EXPECTED_WEEKEND``. For
-    every other gap, the function returns ``UNVERIFIED`` rather than guessing when no
-    session evidence is supplied. That distinction matters: an unverified gap is not
-    the same as a gap known to be benign.
-
-    Args:
-        gap_start: Aware UTC timestamp of the first missing moment.
-        gap_end: Aware UTC timestamp of the first observation after the gap.
-        sessions: Declared session windows covering the gap period. ``None`` or empty
-            means no evidence is available.
-
-    Returns:
-        The gap classification.
+    """Classify one gap against declared session windows without response wrapping.
 
     Raises:
         ValueError: If ``gap_end`` does not follow ``gap_start``.
@@ -144,3 +135,46 @@ def classify_gap(
     if _overlaps_any_session(gap_start, gap_end, sessions):
         return GapType.UNEXPECTED
     return GapType.EXPECTED_SESSION_BREAK
+
+
+def classify_gap(
+    gap_start: datetime,
+    gap_end: datetime,
+    sessions: Sequence[SessionWindow] | None = None,
+) -> StandardResponse[GapType]:
+    """Classify one gap against declared session windows.
+
+    Weekend-only intervals are inherently classified as ``EXPECTED_WEEKEND``. For
+    every other gap, the function returns ``UNVERIFIED`` rather than guessing when no
+    session evidence is supplied. That distinction matters: an unverified gap is not
+    the same as a gap known to be benign.
+
+    Args:
+        gap_start: Aware UTC timestamp of the first missing moment.
+        gap_end: Aware UTC timestamp of the first observation after the gap.
+        sessions: Declared session windows covering the gap period. ``None`` or empty
+            means no evidence is available.
+
+    Returns:
+        Standard response carrying the gap classification.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when ``gap_end`` does not follow ``gap_start``.
+    """
+    from app.services.data.contracts import DataError
+
+    def _raw() -> GapType:
+        try:
+            return _classify_gap_raw(gap_start, gap_end, sessions)
+        except ValueError as error:
+            raise DataError(
+                "VALIDATION_FAILED",
+                safe_details={"field": "gap_end", "reason": "must_follow_gap_start"},
+            ) from error
+
+    return run_data_operation(
+        operation="data.time_sessions.classify_gap",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=_raw,
+    )

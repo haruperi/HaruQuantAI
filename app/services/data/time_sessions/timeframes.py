@@ -18,7 +18,12 @@ from datetime import timedelta
 from typing import Final, NamedTuple
 
 from app.services.data.contracts import DataError
-from app.utils import logger
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
+from app.utils import generate_id, logger
 
 
 class TimeframeSpec(NamedTuple):
@@ -50,14 +55,8 @@ TIMEFRAME_MANIFEST: Final[Mapping[str, TimeframeSpec]] = {
 }
 
 
-def get_timeframe_spec(key: str) -> TimeframeSpec:
+def _get_timeframe_spec_raw(key: str) -> TimeframeSpec:
     """Retrieve the spec for a timeframe key, raising if unsupported.
-
-    Args:
-        key: The timeframe key to lookup.
-
-    Returns:
-        The matching TimeframeSpec.
 
     Raises:
         DataError: If the timeframe key is not supported.
@@ -71,12 +70,28 @@ def get_timeframe_spec(key: str) -> TimeframeSpec:
     return TIMEFRAME_MANIFEST[key]
 
 
-def validate_resample_target(source_key: str | None, target_key: str) -> None:
-    """Validate that the target timeframe is strictly higher than the source.
+def get_timeframe_spec(key: str) -> StandardResponse[TimeframeSpec]:
+    """Retrieve the spec for a timeframe key, raising if unsupported.
 
     Args:
-        source_key: The timeframe key of the source dataset, if any.
-        target_key: The timeframe key of the target resampled dataset.
+        key: The timeframe key to lookup.
+
+    Returns:
+        Standard response carrying the matching TimeframeSpec.
+
+    Raises:
+        (in-band) ``UNSUPPORTED_TIMEFRAME`` when the key is not supported.
+    """
+    return run_data_operation(
+        operation="data.time_sessions.get_timeframe_spec",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _get_timeframe_spec_raw(key),
+    )
+
+
+def _validate_resample_target_raw(source_key: str | None, target_key: str) -> None:
+    """Validate that the target timeframe is strictly higher than the source.
 
     Raises:
         DataError: If validation fails.
@@ -94,8 +109,8 @@ def validate_resample_target(source_key: str | None, target_key: str) -> None:
             },
         )
 
-    source_spec = get_timeframe_spec(source_key)
-    target_spec = get_timeframe_spec(target_key)
+    source_spec = _get_timeframe_spec_raw(source_key)
+    target_spec = _get_timeframe_spec_raw(target_key)
 
     if target_spec.rank <= source_spec.rank:
         raise DataError(
@@ -107,3 +122,26 @@ def validate_resample_target(source_key: str | None, target_key: str) -> None:
                 )
             },
         )
+
+
+def validate_resample_target(
+    source_key: str | None, target_key: str
+) -> StandardResponse[None]:
+    """Validate that the target timeframe is strictly higher than the source.
+
+    Args:
+        source_key: The timeframe key of the source dataset, if any.
+        target_key: The timeframe key of the target resampled dataset.
+
+    Returns:
+        Standard response carrying ``None`` on success.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` or ``UNSUPPORTED_TIMEFRAME`` on failure.
+    """
+    return run_data_operation(
+        operation="data.time_sessions.validate_resample_target",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _validate_resample_target_raw(source_key, target_key),
+    )

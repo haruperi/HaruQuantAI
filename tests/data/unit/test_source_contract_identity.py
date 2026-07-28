@@ -21,12 +21,22 @@ from pathlib import Path
 
 import pytest
 from app.services.data._settings import DataSettings, data_settings_context
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources import composition as _composition
 from app.services.data.sources.registry import (
     _reset_registry,
     get_source_descriptor,
 )
 from app.utils import generate_id
+
+_REQ_ID = "req-00000000-0000-4000-8000-000000000000"
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.sources.test", request_id=_REQ_ID
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -71,7 +81,7 @@ def test_composed_descriptor_comes_from_the_models_package(tmp_path: Path) -> No
     (tmp_path / "raw").mkdir(parents=True, exist_ok=True)
     with data_settings_context(_settings(tmp_path)):
         _composition.ensure_source("csv", generate_id("req"))
-        descriptor = get_source_descriptor("csv")
+        descriptor = _unwrap(get_source_descriptor("csv"))
 
     assert type(descriptor).__module__.startswith("app.services.data.sources"), (
         f"Descriptor came from {type(descriptor).__module__}. Source governance was "
@@ -94,7 +104,7 @@ def test_descriptor_exposes_every_attribute_consumers_read(tmp_path: Path) -> No
     (tmp_path / "raw").mkdir(parents=True, exist_ok=True)
     with data_settings_context(_settings(tmp_path)):
         _composition.ensure_source("csv", generate_id("req"))
-        descriptor = get_source_descriptor("csv")
+        descriptor = _unwrap(get_source_descriptor("csv"))
 
     for attribute in ("source_id", "readiness", "revision", "license_policy"):
         assert hasattr(descriptor, attribute), (
@@ -118,8 +128,8 @@ def test_registry_returns_the_same_object_it_was_given(tmp_path: Path) -> None:
     (tmp_path / "raw").mkdir(parents=True, exist_ok=True)
     with data_settings_context(_settings(tmp_path)):
         _composition.ensure_source("csv", generate_id("req"))
-        first = get_source_descriptor("csv")
-        second = get_source_descriptor("csv")
+        first = _unwrap(get_source_descriptor("csv"))
+        second = _unwrap(get_source_descriptor("csv"))
 
     assert first is second, (
         "The registry returned a different object on the second read, so it is "
@@ -142,7 +152,7 @@ def test_composable_sources_reflect_the_active_settings_profile(
     """
     (tmp_path / "raw").mkdir(parents=True, exist_ok=True)
     with data_settings_context(_settings(tmp_path)):
-        composable = _composition.list_composable_sources()
+        composable = _unwrap(_composition.list_composable_sources())
 
     assert "csv" in composable
     assert "parquet" not in composable, (

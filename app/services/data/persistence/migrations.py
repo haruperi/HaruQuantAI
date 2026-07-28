@@ -8,6 +8,11 @@ from pathlib import Path
 
 from app.services.data._settings import DataSettings, get_data_settings
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     MigrationRequest,
     MigrationResult,
@@ -16,8 +21,8 @@ from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.locking import acquire_write_lock
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.locking import _acquire_write_lock_raw
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import logger
 
 _SQLITE_URL_PREFIX = "sqlite:///"
@@ -294,7 +299,7 @@ def _initialize_ledger(domain: str, request_id: str) -> None:
 
     try:
         logger.info("Initializing migration ledger table if not exists")
-        execute_transaction(
+        _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=(create_ledger_table_sql,),
@@ -335,7 +340,7 @@ def _fetch_applied_migrations(domain: str, request_id: str) -> dict[str, str]:
         "WHERE domain = ? ORDER BY migration_id"
     )
     try:
-        query_result = execute_transaction(
+        query_result = _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=(sql,),
@@ -388,7 +393,7 @@ def _apply_step(step: MigrationStep, request_id: str) -> None:
     )
 
     try:
-        execute_transaction(
+        _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=tuple(statements),
@@ -414,7 +419,7 @@ def _apply_step(step: MigrationStep, request_id: str) -> None:
         ) from error
 
 
-def run_domain_migrations(request: MigrationRequest) -> MigrationResult:
+def _run_domain_migrations_raw(request: MigrationRequest) -> MigrationResult:
     """Validate and execute domain-owned migration steps.
 
     Args:
@@ -445,7 +450,7 @@ def run_domain_migrations(request: MigrationRequest) -> MigrationResult:
         ) from None
 
     try:
-        lock = acquire_write_lock(database_path, request.request_id)
+        lock = _acquire_write_lock_raw(database_path, request.request_id)
     except DataError:
         logger.error("Failed to acquire database write lock")
         raise
@@ -528,7 +533,26 @@ def run_domain_migrations(request: MigrationRequest) -> MigrationResult:
     )
 
 
-def run_data_migrations(request_id: str) -> MigrationResult:
+def run_domain_migrations(
+    request: MigrationRequest,
+) -> StandardResponse[MigrationResult]:
+    """Validate and execute domain-owned migration steps.
+
+    Args:
+        request: Migration request containing domain and ordered steps.
+
+    Returns:
+        Standard response carrying applied and skipped migration identifiers.
+    """
+    return run_data_operation(
+        operation="data.persistence.run_domain_migrations",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _run_domain_migrations_raw(request),
+    )
+
+
+def _run_data_migrations_raw(request_id: str) -> MigrationResult:
     """Apply the complete ordered DATA-owned schema manifest.
 
     Args:
@@ -538,12 +562,29 @@ def run_data_migrations(request_id: str) -> MigrationResult:
         Applied and skipped DATA migration identifiers.
     """
     logger.info("Running the authoritative DATA schema migration manifest")
-    return run_domain_migrations(
+    return _run_domain_migrations_raw(
         MigrationRequest(
             domain="data",
             steps=DATA_MIGRATION_STEPS,
             request_id=request_id,
         )
+    )
+
+
+def run_data_migrations(request_id: str) -> StandardResponse[MigrationResult]:
+    """Apply the complete ordered DATA-owned schema manifest.
+
+    Args:
+        request_id: Canonical request identifier for migration audit evidence.
+
+    Returns:
+        Standard response carrying applied and skipped DATA migration identifiers.
+    """
+    return run_data_operation(
+        operation="data.persistence.run_data_migrations",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _run_data_migrations_raw(request_id),
     )
 
 

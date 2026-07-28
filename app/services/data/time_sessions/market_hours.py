@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from app.services.data.time_sessions.contracts import MarketHours, MarketSchedule
-from app.services.data.time_sessions.utc import require_utc
+from app.services.data.time_sessions.utc import _require_utc_raw as require_utc
 
 
 def evaluate_market_hours(

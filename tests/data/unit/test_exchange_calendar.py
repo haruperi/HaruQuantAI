@@ -2,19 +2,29 @@
 
 from datetime import UTC, date
 
-import pytest
-from app.services.data import DataError, ExchangeSessionRequest, get_exchange_sessions
+from app.services.data import ExchangeSessionRequest, get_exchange_sessions
+from app.services.data.contracts.responses import unwrap_data_response
 from app.utils import generate_id
 
 
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.time_sessions.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
+
+
 def test_exchange_sessions_require_explicit_calendar_and_return_utc() -> None:
-    sessions = get_exchange_sessions(
-        ExchangeSessionRequest(
-            symbol="IBM",
-            calendar_code="XNYS",
-            start=date(2026, 7, 6),
-            end=date(2026, 7, 6),
-            request_id=generate_id("req"),
+    sessions = _unwrap(
+        get_exchange_sessions(
+            ExchangeSessionRequest(
+                symbol="IBM",
+                calendar_code="XNYS",
+                start=date(2026, 7, 6),
+                end=date(2026, 7, 6),
+                request_id=generate_id("req"),
+            )
         )
     )
 
@@ -25,15 +35,15 @@ def test_exchange_sessions_require_explicit_calendar_and_return_utc() -> None:
 
 
 def test_exchange_sessions_reject_unbounded_range_before_library_work() -> None:
-    with pytest.raises(DataError) as error:
-        get_exchange_sessions(
-            ExchangeSessionRequest(
-                symbol="IBM",
-                calendar_code="XNYS",
-                start=date(2024, 1, 1),
-                end=date(2026, 7, 6),
-                request_id=generate_id("req"),
-            )
+    resp = get_exchange_sessions(
+        ExchangeSessionRequest(
+            symbol="IBM",
+            calendar_code="XNYS",
+            start=date(2024, 1, 1),
+            end=date(2026, 7, 6),
+            request_id=generate_id("req"),
         )
-
-    assert error.value.code == "LIMIT_EXCEEDED"
+    )
+    assert resp.status == "error"
+    assert resp.error is not None
+    assert resp.error.code == "LIMIT_EXCEEDED"

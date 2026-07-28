@@ -25,6 +25,11 @@ from __future__ import annotations
 from typing import Final, override
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.utils import logger
 
 __all__ = [
@@ -71,7 +76,7 @@ READ_ONLY_BROKER_METHODS: Final[frozenset[str]] = frozenset(
 )
 
 
-def verify_read_only_call(method_name: str) -> bool:
+def _verify_read_only_call_raw(method_name: str) -> bool:
     """Confirm that one broker method name is permitted for Data.
 
     Args:
@@ -92,6 +97,23 @@ def verify_read_only_call(method_name: str) -> bool:
             safe_details={"method": method_name, "reason": "not_read_only"},
         )
     return True
+
+
+def verify_read_only_call(method_name: str) -> StandardResponse[bool]:
+    """Confirm that one broker method name is permitted for Data.
+
+    Args:
+        method_name: Attribute name Data intends to invoke.
+
+    Returns:
+        Standard response carrying ``True`` when the method is permitted.
+    """
+    return run_data_operation(
+        operation="data.sources.verify_read_only_call",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=lambda: _verify_read_only_call_raw(method_name),
+    )
 
 
 class ReadOnlyBrokerProxy:
@@ -130,7 +152,7 @@ class ReadOnlyBrokerProxy:
         """
         if name in ("__class__", "__repr__", "__doc__", "__slots__"):
             return object.__getattribute__(self, name)
-        verify_read_only_call(name)
+        _verify_read_only_call_raw(name)
         return getattr(object.__getattribute__(self, "_client"), name)
 
     @override
@@ -162,7 +184,7 @@ class ReadOnlyBrokerProxy:
         return "<ReadOnlyBrokerProxy>"
 
 
-def wrap_broker_client(client: object) -> ReadOnlyBrokerProxy:
+def _wrap_broker_client_raw(client: object) -> ReadOnlyBrokerProxy:
     """Wrap a caller-owned broker client so only read operations are reachable.
 
     Args:
@@ -177,3 +199,22 @@ def wrap_broker_client(client: object) -> ReadOnlyBrokerProxy:
         return client
     logger.debug("Wrapping a broker client in the read-only proxy")
     return ReadOnlyBrokerProxy(client)
+
+
+def wrap_broker_client(client: object) -> StandardResponse[ReadOnlyBrokerProxy]:
+    """Wrap a caller-owned broker client so only read operations are reachable.
+
+    Args:
+        client: Connected broker adapter owned by the caller.
+
+    Returns:
+        Standard response carrying a proxy exposing only the operations in
+        ``READ_ONLY_BROKER_METHODS``. Wrapping an already-wrapped client returns it
+        unchanged, so repeated wrapping along a call path is harmless.
+    """
+    return run_data_operation(
+        operation="data.sources.wrap_broker_client",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=lambda: _wrap_broker_client_raw(client),
+    )

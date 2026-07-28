@@ -175,21 +175,26 @@ def test_feed_restore_rehydrates_controls_and_blocks_volatile_depth() -> None:
 def test_symbol_metadata_validation_covers_required_precision_rules() -> None:
     """Governed metadata fails closed for missing or inconsistent precision."""
     valid = _metadata()
-    assert validate_symbol_metadata(valid) is valid
+    ok = validate_symbol_metadata(valid)
+    assert ok.status == "success"
+    assert ok.data is valid
 
-    with pytest.raises(DataError) as missing:
-        validate_symbol_metadata(_metadata(missing_fields=("asset_class",)))
-    assert missing.value.code == "MISSING_ASSET_METADATA"
+    missing = validate_symbol_metadata(_metadata(missing_fields=("asset_class",)))
+    assert missing.status == "error"
+    assert missing.error is not None
+    assert missing.error.code == "MISSING_ASSET_METADATA"
 
-    with pytest.raises(DataError) as non_positive:
-        validate_symbol_metadata(
-            _metadata().model_copy(update={"quantity_step": Decimal(0)})
-        )
-    assert non_positive.value.code == "PRECISION_MISMATCH"
+    non_positive = validate_symbol_metadata(
+        _metadata().model_copy(update={"quantity_step": Decimal(0)})
+    )
+    assert non_positive.status == "error"
+    assert non_positive.error is not None
+    assert non_positive.error.code == "PRECISION_MISMATCH"
 
-    with pytest.raises(DataError) as inconsistent:
-        validate_symbol_metadata(_metadata(price_step=Decimal("0.01")))
-    assert inconsistent.value.code == "PRECISION_MISMATCH"
+    inconsistent = validate_symbol_metadata(_metadata(price_step=Decimal("0.01")))
+    assert inconsistent.status == "error"
+    assert inconsistent.error is not None
+    assert inconsistent.error.code == "PRECISION_MISMATCH"
 
 
 def test_schedule_request_and_evidence_validation(
@@ -264,14 +269,13 @@ def test_schedule_request_and_evidence_validation(
 
     clock = _Clock()
 
-    assert (
-        schedule.get_current_schedule(
-            request,
-            _Calendar(),
-            clock=clock,
-        )
-        == expected
+    resp = schedule.get_current_schedule(
+        request,
+        _Calendar(),
+        clock=clock,
     )
+    assert resp.status == "success"
+    assert resp.data == expected
 
     class _BrokenCalendar:
         """Raise a raw provider exception."""
@@ -280,13 +284,14 @@ def test_schedule_request_and_evidence_validation(
             """Raise a provider failure."""
             raise RuntimeError("sensitive provider detail")
 
-    with pytest.raises(DataError) as unavailable:
-        schedule.get_current_schedule(
-            request,
-            _BrokenCalendar(),
-            clock=clock,
-        )
-    assert unavailable.value.code == "SOURCE_UNAVAILABLE"
+    unavailable = schedule.get_current_schedule(
+        request,
+        _BrokenCalendar(),
+        clock=clock,
+    )
+    assert unavailable.status == "error"
+    assert unavailable.error is not None
+    assert unavailable.error.code == "SOURCE_UNAVAILABLE"
 
     stale = expected.model_copy(update={"symbol": "GBPUSD"})
 
@@ -297,10 +302,11 @@ def test_schedule_request_and_evidence_validation(
             """Return stale evidence."""
             return stale
 
-    with pytest.raises(DataError) as stale_error:
-        schedule.get_current_schedule(
-            request,
-            _StaleCalendar(),
-            clock=clock,
-        )
-    assert stale_error.value.code == "STALE_EVIDENCE"
+    stale_resp = schedule.get_current_schedule(
+        request,
+        _StaleCalendar(),
+        clock=clock,
+    )
+    assert stale_resp.status == "error"
+    assert stale_resp.error is not None
+    assert stale_resp.error.code == "STALE_EVIDENCE"

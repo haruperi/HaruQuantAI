@@ -8,6 +8,7 @@ from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
+from unittest.mock import MagicMock
 
 import pytest
 from app.services.brokers import (
@@ -17,6 +18,7 @@ from app.services.brokers import (
     BrokerTradingSession,
 )
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.symbol_metadata import SymbolMetadata
 from app.services.data.sources import composition as _runtime
 from app.services.data.sources.contracts import (
@@ -34,6 +36,15 @@ from app.utils import StandardResponse, generate_id
 from pydantic import SecretStr
 
 from tests.brokers.response_factory import broker_response
+
+_REQ_ID = "req-00000000-0000-4000-8000-000000000000"
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.sources.test", request_id=_REQ_ID
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -85,7 +96,7 @@ def test_ensure_source_registers_mt5_without_connecting(
 
     _runtime.ensure_source("mt5", generate_id("req"))
 
-    descriptor = get_source_descriptor("mt5")
+    descriptor = _unwrap(get_source_descriptor("mt5"))
     assert descriptor.readiness == "staging"
     assert descriptor.capabilities == ("bars", "ticks", "spreads")
     assert _runtime.resolve_calendar("mt5", generate_id("req")) is not None
@@ -103,15 +114,16 @@ def test_ensure_source_registers_ctrader_session_capability_without_connecting(
 
     _runtime.ensure_source("ctrader", generate_id("req"))
 
-    descriptor = get_source_descriptor("ctrader")
+    descriptor = _unwrap(get_source_descriptor("ctrader"))
     assert descriptor.capabilities == ("bars", "ticks", "spreads", "sessions")
 
 
 def test_ensure_source_rejects_unknown_profile() -> None:
     """An undeclared direct-call source fails before provider access."""
-    with pytest.raises(DataError) as error:
-        _runtime.ensure_source("unknown", generate_id("req"))
-    assert error.value.code == "UNSUPPORTED_SOURCE"
+    response = _runtime.ensure_source("unknown", generate_id("req"))
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "UNSUPPORTED_SOURCE"
 
 
 def test_lazy_mt5_session_maps_disabled_and_missing_credentials(
@@ -349,8 +361,10 @@ def test_ensure_identity_registers_provider_confirmed_mapping() -> None:
     request_id = generate_id("req")
 
     class _Source:
-        def get_symbol_metadata(self, request: object) -> SymbolMetadata:
-            return SymbolMetadata(
+        def get_symbol_metadata(
+            self, request: object
+        ) -> StandardResponse[SymbolMetadata]:
+            metadata = SymbolMetadata(
                 canonical_symbol="EURUSD",
                 provider_symbol="EURUSD.a",
                 asset_class="forex",
@@ -362,6 +376,12 @@ def test_ensure_identity_registers_provider_confirmed_mapping() -> None:
                 retrieved_at=datetime(2026, 7, 1, tzinfo=UTC),
                 request_id=request.request_id,
             )
+            # Return a successful StandardResponse-shaped value so the migrated
+            # ``ensure_identity`` boundary can unwrap the nested source call.
+            response: StandardResponse[SymbolMetadata] = MagicMock()
+            response.status = "success"
+            response.data = metadata
+            return response
 
     register_source(_descriptor("custom"), _Source)
 

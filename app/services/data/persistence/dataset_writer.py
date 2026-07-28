@@ -22,11 +22,16 @@ from app.services.data.contracts import (
     SpreadRecord,
     TickRecord,
 )
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     DatasetSaveRequest,
     StorageManifest,
 )
-from app.services.data.persistence.locking import acquire_write_lock
+from app.services.data.persistence.locking import _acquire_write_lock_raw
 from app.utils import Clock, logger, utc_now
 
 if TYPE_CHECKING:
@@ -310,7 +315,7 @@ def _atomic_write_dataset(
         raise
 
 
-def save_dataset(
+def _save_dataset_raw(
     request: DatasetSaveRequest,
     *,
     clock: Clock | None = None,
@@ -348,7 +353,7 @@ def save_dataset(
     manifest_path = absolute_path.with_suffix(absolute_path.suffix + ".manifest.json")
 
     # Lock target to ensure exclusive lease
-    with acquire_write_lock(absolute_path, request_id=request.request_id):
+    with _acquire_write_lock_raw(absolute_path, request_id=request.request_id):
         try:
             return _atomic_write_dataset(
                 df, request, absolute_path, manifest_path, clock
@@ -362,6 +367,28 @@ def save_dataset(
                 safe_details={"operation": "save_dataset"},
                 request_id=request.request_id,
             ) from error
+
+
+def save_dataset(
+    request: DatasetSaveRequest,
+    *,
+    clock: Clock | None = None,
+) -> StandardResponse[StorageManifest]:
+    """Validate quality, lock target path, write temp files, and commit manifest.
+
+    Args:
+        request: The dataset save request.
+        clock: Optional injected UTC clock.
+
+    Returns:
+        Standard response carrying the generated storage manifest.
+    """
+    return run_data_operation(
+        operation="data.persistence.save_dataset",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _save_dataset_raw(request, clock=clock),
+    )
 
 
 def _verify_manifest_integrity(
@@ -448,7 +475,7 @@ def _parse_dataframe_to_records(
     return records
 
 
-def load_dataset(request: DatasetLoadRequest) -> MarketDataset:
+def _load_dataset_raw(request: DatasetLoadRequest) -> MarketDataset:
     """Load a dataset from an approved root and verify manifest integrity.
 
     Args:
@@ -555,16 +582,71 @@ def load_dataset(request: DatasetLoadRequest) -> MarketDataset:
         ) from error
 
 
-def save_market_data(request: DatasetSaveRequest) -> StorageManifest:
+def load_dataset(
+    request: DatasetLoadRequest,
+) -> StandardResponse[MarketDataset]:
+    """Load a dataset from an approved root and verify manifest integrity.
+
+    Args:
+        request: The dataset load request.
+
+    Returns:
+        Standard response carrying the verified MarketDataset.
+    """
+    return run_data_operation(
+        operation="data.persistence.load_dataset",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _load_dataset_raw(request),
+    )
+
+
+def _save_market_data_raw(request: DatasetSaveRequest) -> StorageManifest:
     """Atomically commit a normalized dataset to disk with manifest signature."""
     logger.info("Executing public DATA dataset save")
-    return save_dataset(request)
+    return _save_dataset_raw(request)
 
 
-def load_local_dataset(request: DatasetLoadRequest) -> MarketDataset:
+def save_market_data(
+    request: DatasetSaveRequest,
+) -> StandardResponse[StorageManifest]:
+    """Atomically commit a normalized dataset to disk with manifest signature.
+
+    Args:
+        request: The dataset save request.
+
+    Returns:
+        Standard response carrying the generated storage manifest.
+    """
+    return run_data_operation(
+        operation="data.persistence.save_market_data",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _save_market_data_raw(request),
+    )
+
+
+def _load_local_dataset_raw(request: DatasetLoadRequest) -> MarketDataset:
     """Atomically read a local CSV/Parquet dataset with checksum verification."""
     logger.info("Executing public DATA dataset load")
-    return load_dataset(request)
+    return _load_dataset_raw(request)
+
+
+def load_local_dataset(request: DatasetLoadRequest) -> StandardResponse[MarketDataset]:
+    """Atomically read a local CSV/Parquet dataset with checksum verification.
+
+    Args:
+        request: The dataset load request.
+
+    Returns:
+        Standard response carrying the verified MarketDataset.
+    """
+    return run_data_operation(
+        operation="data.local_datasets.load_local_dataset",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _load_local_dataset_raw(request),
+    )
 
 
 __all__ = [

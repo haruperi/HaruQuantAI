@@ -8,8 +8,9 @@ from pathlib import Path
 import app.services.data.tick_derivation.generator as tick_generator
 import pytest
 from app.services.data._settings import DataSettings, data_settings_context
-from app.services.data.contracts import DataError, DataQualityReport, MarketDataset
+from app.services.data.contracts import DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.tick_derivation.generator import (
     GENERATED_TICKS_MIN_PER_BAR,
     PHASE_CLOSE,
@@ -21,6 +22,15 @@ from app.services.data.tick_derivation.generator import (
 )
 
 _START = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
+
+
+def _unwrap(response):
+    """Extract the raw payload from a migrated tick-derivation response."""
+    return unwrap_data_response(
+        response,
+        operation="data.tick_derivation.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def test_usage_parquet_directory_is_beneath_approved_root(tmp_path: Path) -> None:
@@ -101,10 +111,12 @@ def _bullish_dataset() -> MarketDataset:
 
 def test_trading_bar_model_emits_four_direction_ordered_waypoints() -> None:
     """A bullish bar visits open, low, high, then close."""
-    result = generate_tick_series(
-        _bullish_dataset(),
-        model="trading_bar",
-        trading_timeframe="M1",
+    result = _unwrap(
+        generate_tick_series(
+            _bullish_dataset(),
+            model="trading_bar",
+            trading_timeframe="M1",
+        )
     )
 
     assert result.data_kind == "ticks"
@@ -122,7 +134,9 @@ def test_bearish_bar_visits_high_before_low() -> None:
     """A bearish bar reverses the intra-bar extreme ordering."""
     dataset = _bar_dataset((_bar(0, "1.10100", "1.10200", "1.09900", "1.10000"),))
 
-    result = generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
+    result = _unwrap(
+        generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
+    )
 
     bids = [record.bid for record in result.records if isinstance(record, TickRecord)]
     assert bids[1] == Decimal("1.10200")
@@ -131,8 +145,10 @@ def test_bearish_bar_visits_high_before_low() -> None:
 
 def test_phase_bitmask_marks_open_high_low_close() -> None:
     """Every canonical waypoint carries its phase bit."""
-    result = generate_tick_series(
-        _bullish_dataset(), model="trading_bar", trading_timeframe="M1"
+    result = _unwrap(
+        generate_tick_series(
+            _bullish_dataset(), model="trading_bar", trading_timeframe="M1"
+        )
     )
 
     phases = [
@@ -147,7 +163,9 @@ def test_generated_model_uses_real_tick_volume() -> None:
         (_bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="7"),)
     )
 
-    result = generate_tick_series(dataset, model="generated", trading_timeframe="M1")
+    result = _unwrap(
+        generate_tick_series(dataset, model="generated", trading_timeframe="M1")
+    )
 
     assert result.record_count == 7
 
@@ -158,7 +176,9 @@ def test_generated_model_clamps_to_minimum_waypoints() -> None:
         (_bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="1"),)
     )
 
-    result = generate_tick_series(dataset, model="generated", trading_timeframe="M1")
+    result = _unwrap(
+        generate_tick_series(dataset, model="generated", trading_timeframe="M1")
+    )
 
     assert result.record_count == GENERATED_TICKS_MIN_PER_BAR
 
@@ -169,7 +189,9 @@ def test_generated_prices_stay_within_real_bar_bounds() -> None:
         (_bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="25"),)
     )
 
-    result = generate_tick_series(dataset, model="generated", trading_timeframe="M1")
+    result = _unwrap(
+        generate_tick_series(dataset, model="generated", trading_timeframe="M1")
+    )
 
     for record in result.records:
         assert isinstance(record, TickRecord)
@@ -186,7 +208,9 @@ def test_generate_tick_series_preserves_real_prices_and_volume() -> None:
         )
     )
 
-    result = generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
+    result = _unwrap(
+        generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
+    )
 
     ticks = [r for r in result.records if isinstance(r, TickRecord)]
     assert ticks[0].bid == Decimal("1.10000")
@@ -204,7 +228,9 @@ def test_output_is_ordered_by_timestamp_then_intrabar_index() -> None:
         )
     )
 
-    result = generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
+    result = _unwrap(
+        generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
+    )
 
     keys = [
         (r.timestamp, r.tick_index_in_bar)
@@ -216,11 +242,13 @@ def test_output_is_ordered_by_timestamp_then_intrabar_index() -> None:
 
 def test_native_spread_produces_ask_above_bid() -> None:
     """Native spread evidence is applied in price units."""
-    result = generate_tick_series(
-        _bullish_dataset(),
-        model="trading_bar",
-        trading_timeframe="M1",
-        point_value=Decimal("0.00001"),
+    result = _unwrap(
+        generate_tick_series(
+            _bullish_dataset(),
+            model="trading_bar",
+            trading_timeframe="M1",
+            point_value=Decimal("0.00001"),
+        )
     )
 
     first = next(r for r in result.records if isinstance(r, TickRecord))
@@ -231,13 +259,15 @@ def test_native_spread_produces_ask_above_bid() -> None:
 
 def test_fixed_spread_requires_points() -> None:
     """A fixed spread model without its point value fails closed."""
-    with pytest.raises(DataError):
-        generate_tick_series(
-            _bullish_dataset(),
-            model="trading_bar",
-            trading_timeframe="M1",
-            spread_model="fixed_spread",
-        )
+    response = generate_tick_series(
+        _bullish_dataset(),
+        model="trading_bar",
+        trading_timeframe="M1",
+        spread_model="fixed_spread",
+    )
+
+    assert response.status == "error"
+    assert response.error.code == "INVALID_INPUT"
 
 
 def test_variable_spread_requires_seed_and_replays() -> None:
@@ -253,24 +283,27 @@ def test_variable_spread_requires_seed_and_replays() -> None:
         "max_spread_points": Decimal(5),
     }
 
-    with pytest.raises(DataError):
-        generate_tick_series(dataset, **arguments)  # type: ignore[arg-type]
+    response = generate_tick_series(dataset, **arguments)  # type: ignore[arg-type]
+    assert response.status == "error"
+    assert response.error.code == "INVALID_INPUT"
 
     kwargs = {"seed": 99, **arguments}
-    first = generate_tick_series(dataset, **kwargs)  # type: ignore[arg-type]
-    second = generate_tick_series(dataset, **kwargs)  # type: ignore[arg-type]
+    first = _unwrap(generate_tick_series(dataset, **kwargs))  # type: ignore[arg-type]
+    second = _unwrap(generate_tick_series(dataset, **kwargs))  # type: ignore[arg-type]
 
     assert [r.ask for r in first.records] == [r.ask for r in second.records]
 
 
 def test_unsupported_model_fails_closed() -> None:
     """An unrecognized model is rejected rather than falling back."""
-    with pytest.raises(DataError):
-        generate_tick_series(
-            _bullish_dataset(),
-            model="not_a_model",
-            trading_timeframe="M1",
-        )
+    response = generate_tick_series(
+        _bullish_dataset(),
+        model="not_a_model",
+        trading_timeframe="M1",
+    )
+
+    assert response.status == "error"
+    assert response.error.code == "INVALID_INPUT"
 
 
 def test_record_count_ceiling_is_enforced() -> None:
@@ -279,19 +312,23 @@ def test_record_count_ceiling_is_enforced() -> None:
         (_bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="500"),)
     )
 
-    with pytest.raises(DataError):
-        generate_tick_series(
-            dataset,
-            model="generated",
-            trading_timeframe="M1",
-            max_records=10,
-        )
+    response = generate_tick_series(
+        dataset,
+        model="generated",
+        trading_timeframe="M1",
+        max_records=10,
+    )
+
+    assert response.status == "error"
+    assert response.error.code == "LIMIT_EXCEEDED"
 
 
 def test_generated_ticks_carry_no_strategy_fields() -> None:
     """Data records expose no signal, order, or protective-level concept."""
-    result = generate_tick_series(
-        _bullish_dataset(), model="trading_bar", trading_timeframe="M1"
+    result = _unwrap(
+        generate_tick_series(
+            _bullish_dataset(), model="trading_bar", trading_timeframe="M1"
+        )
     )
 
     forbidden = {
@@ -308,8 +345,10 @@ def test_generated_ticks_carry_no_strategy_fields() -> None:
 
 def test_source_metadata_records_generation_provenance() -> None:
     """Model, spread model, and seed are recorded on the dataset."""
-    result = generate_tick_series(
-        _bullish_dataset(), model="trading_bar", trading_timeframe="M1"
+    result = _unwrap(
+        generate_tick_series(
+            _bullish_dataset(), model="trading_bar", trading_timeframe="M1"
+        )
     )
 
     assert result.source_metadata["tick_generation_model"] == "trading_bar"
@@ -346,16 +385,22 @@ def test_bars_required_for_bar_derived_models() -> None:
         request_id="req-d3b07384-d113-4404-94c5-000000000002",
     )
 
-    with pytest.raises(DataError):
-        generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
+    response = generate_tick_series(
+        dataset, model="trading_bar", trading_timeframe="M1"
+    )
+
+    assert response.status == "error"
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def test_ohlc_m1_model_requires_m1_dataset() -> None:
     """The M1 model fails closed without its finer-grained evidence."""
-    with pytest.raises(DataError):
-        generate_tick_series(
-            _bullish_dataset(), model="ohlc_m1", trading_timeframe="M5"
-        )
+    response = generate_tick_series(
+        _bullish_dataset(), model="ohlc_m1", trading_timeframe="M5"
+    )
+
+    assert response.status == "error"
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def test_real_model_marks_bucket_extremes() -> None:
@@ -390,11 +435,13 @@ def test_real_model_marks_bucket_extremes() -> None:
         request_id="req-d3b07384-d113-4404-94c5-000000000003",
     )
 
-    result = generate_tick_series(
-        _bullish_dataset(),
-        model="real",
-        trading_timeframe="M1",
-        real_tick_dataset=tick_dataset,
+    result = _unwrap(
+        generate_tick_series(
+            _bullish_dataset(),
+            model="real",
+            trading_timeframe="M1",
+            real_tick_dataset=tick_dataset,
+        )
     )
 
     phases = [r.bar_phase for r in result.records if isinstance(r, TickRecord)]
@@ -434,9 +481,9 @@ def test_compiled_generated_path_matches_decimal_fallback_exactly(
         arguments["fixed_spread_points"] = Decimal(3)
 
     monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1)
-    compiled = generate_tick_series(dataset, **arguments)  # type: ignore[arg-type]
+    compiled = _unwrap(generate_tick_series(dataset, **arguments))  # type: ignore[arg-type]
     monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1_000_000)
-    fallback = generate_tick_series(dataset, **arguments)  # type: ignore[arg-type]
+    fallback = _unwrap(generate_tick_series(dataset, **arguments))  # type: ignore[arg-type]
 
     assert [record.model_dump() for record in compiled.records] == [
         record.model_dump() for record in fallback.records
@@ -454,12 +501,12 @@ def test_compiled_four_tick_path_matches_decimal_fallback_exactly(
         )
     )
     monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1)
-    compiled = generate_tick_series(
-        dataset, model="trading_bar", trading_timeframe="M1"
+    compiled = _unwrap(
+        generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
     )
     monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1_000_000)
-    fallback = generate_tick_series(
-        dataset, model="trading_bar", trading_timeframe="M1"
+    fallback = _unwrap(
+        generate_tick_series(dataset, model="trading_bar", trading_timeframe="M1")
     )
 
     assert [record.model_dump() for record in compiled.records] == [
@@ -485,11 +532,13 @@ def test_unsafe_precision_uses_exact_decimal_fallback(
     )
     monkeypatch.setattr(tick_generator, "_KERNEL_MIN_RECORDS", 1)
 
-    result = generate_tick_series(
-        dataset,
-        model="generated",
-        trading_timeframe="M1",
-        price_precision=5,
+    result = _unwrap(
+        generate_tick_series(
+            dataset,
+            model="generated",
+            trading_timeframe="M1",
+            price_precision=5,
+        )
     )
 
     assert result.record_count == 12
@@ -508,13 +557,15 @@ def test_generated_limit_is_rejected_before_kernel_allocation(
         raise AssertionError("kernel must not run after a failed preflight")
 
     monkeypatch.setattr(tick_generator, "generate_volume_tick_arrays", fail_if_called)
-    with pytest.raises(DataError):
-        generate_tick_series(
-            dataset,
-            model="generated",
-            trading_timeframe="M1",
-            max_records=100,
-        )
+    response = generate_tick_series(
+        dataset,
+        model="generated",
+        trading_timeframe="M1",
+        max_records=100,
+    )
+
+    assert response.status == "error"
+    assert response.error.code == "LIMIT_EXCEEDED"
 
 
 def test_parquet_uses_bounded_compiled_columns_without_materializing_dataset(
@@ -536,14 +587,16 @@ def test_parquet_uses_bounded_compiled_columns_without_materializing_dataset(
     def fail_if_called(*args: object, **kwargs: object) -> None:
         raise AssertionError("public materializing path must not run")
 
-    monkeypatch.setattr(tick_generator, "generate_tick_series", fail_if_called)
+    monkeypatch.setattr(tick_generator, "_generate_tick_series_raw", fail_if_called)
     with data_settings_context(DataSettings(approved_storage_roots=(tmp_path,))):
-        result = generate_tick_series_to_parquet(
-            dataset,
-            path=destination,
-            max_output_rows_per_chunk=20,
-            model="generated",
-            trading_timeframe="M1",
+        result = _unwrap(
+            generate_tick_series_to_parquet(
+                dataset,
+                path=destination,
+                max_output_rows_per_chunk=20,
+                model="generated",
+                trading_timeframe="M1",
+            )
         )
     table = pq.read_table(destination)
 
@@ -568,18 +621,16 @@ def test_parquet_rejects_destination_outside_approved_roots(tmp_path: Path) -> N
     approved = tmp_path / "approved"
     approved.mkdir()
 
-    with (
-        data_settings_context(DataSettings(approved_storage_roots=(approved,))),
-        pytest.raises(DataError) as excinfo,
-    ):
-        generate_tick_series_to_parquet(
+    with data_settings_context(DataSettings(approved_storage_roots=(approved,))):
+        response = generate_tick_series_to_parquet(
             dataset,
             path=tmp_path / "outside.parquet",
             model="generated",
             trading_timeframe="M1",
         )
 
-    assert excinfo.value.code == "PERMISSION_DENIED"
+    assert response.status == "error"
+    assert response.error.code == "PERMISSION_DENIED"
     assert not (tmp_path / "outside.parquet").exists()
 
 
@@ -589,12 +640,12 @@ def test_tick_series_domain_ceiling_cannot_be_loosened() -> None:
         (_bar(0, "1.10000", "1.10200", "1.09900", "1.10100", volume="4"),)
     )
 
-    with pytest.raises(DataError) as excinfo:
-        generate_tick_series(
-            dataset,
-            model="generated",
-            trading_timeframe="M1",
-            max_records=250_001,
-        )
+    response = generate_tick_series(
+        dataset,
+        model="generated",
+        trading_timeframe="M1",
+        max_records=250_001,
+    )
 
-    assert excinfo.value.code == "LIMIT_EXCEEDED"
+    assert response.status == "error"
+    assert response.error.code == "LIMIT_EXCEEDED"

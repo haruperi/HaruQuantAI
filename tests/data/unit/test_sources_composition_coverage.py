@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.composition import (
     _BrokerMarketCalendar,
     _LazyBrokerSession,
@@ -24,17 +25,25 @@ _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)
 
 
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.sources.test", request_id=_REQ_ID
+    )
+
+
 def test_list_composable_sources() -> None:
     """Test list_composable_sources returns tuple of available sources."""
-    sources = list_composable_sources()
+    sources = _unwrap(list_composable_sources())
     assert isinstance(sources, tuple)
 
 
 def test_ensure_source_unsupported() -> None:
-    """Test ensure_source raises UNSUPPORTED_SOURCE for invalid source_id."""
-    with pytest.raises(DataError) as exc_info:
-        ensure_source("unsupported_source_xyz", _REQ_ID)
-    assert exc_info.value.code == "UNSUPPORTED_SOURCE"
+    """Test ensure_source fails closed with UNSUPPORTED_SOURCE for invalid source_id."""
+    response = ensure_source("unsupported_source_xyz", _REQ_ID)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "UNSUPPORTED_SOURCE"
 
 
 def test_run_helper_exception() -> None:
@@ -232,8 +241,17 @@ def test_ensure_identity_dukascopy() -> None:
     """Test ensure_identity registers identity for dukascopy."""
     mock_meta = MagicMock()
     mock_meta.provider_symbol = "EURUSD"
-    with patch("app.services.data.sources.composition.resolve_source") as mock_res_src:
+    # ``ensure_identity`` resolves the source through the migrated raw core
+    # ``_resolve_source_raw`` and then unwraps the nested ``get_symbol_metadata``
+    # StandardResponse, so both the patch target and the mock return shape must
+    # follow the migrated contract.
+    with patch(
+        "app.services.data.sources.composition._resolve_source_raw"
+    ) as mock_res_src:
         mock_src = MagicMock()
-        mock_src.get_symbol_metadata.return_value = mock_meta
+        metadata_response = MagicMock()
+        metadata_response.status = "success"
+        metadata_response.data = mock_meta
+        mock_src.get_symbol_metadata.return_value = metadata_response
         mock_res_src.return_value = mock_src
         ensure_identity("dukascopy", "EURUSD", _REQ_ID)

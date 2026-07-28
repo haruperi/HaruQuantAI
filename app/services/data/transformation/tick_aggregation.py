@@ -18,10 +18,15 @@ from decimal import Decimal
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
-from app.services.data.time_sessions.timeframes import (
-    get_timeframe_spec,
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
 )
-from app.utils import logger
+from app.services.data.time_sessions.timeframes import (
+    _get_timeframe_spec_raw,
+)
+from app.utils import generate_id, logger
 
 
 def _resolve_price(r: TickRecord, policy: str) -> Decimal | None:
@@ -71,7 +76,7 @@ def _validate_units(records: Sequence[TickRecord]) -> tuple[str, str]:
     return price_unit, volume_unit
 
 
-def aggregate_ticks(
+def _aggregate_ticks_raw(
     dataset: MarketDataset, timeframe: str, spread_policy: str
 ) -> MarketDataset:
     """Aggregate sorted canonical ticks into OHLCV bars.
@@ -101,7 +106,7 @@ def aggregate_ticks(
             safe_details={"message": "Only tick datasets can be aggregated."},
         )
 
-    target_spec = get_timeframe_spec(timeframe)
+    target_spec = _get_timeframe_spec_raw(timeframe)
     if spread_policy not in ("bid", "ask", "mid", "last"):
         raise DataError(
             "VALIDATION_FAILED",
@@ -227,10 +232,41 @@ def aggregate_ticks_to_bars(
     dataset: MarketDataset,
     target_timeframe: str,
     price_policy: str = "last",
-) -> MarketDataset:
+) -> StandardResponse[MarketDataset]:
     """Aggregate tick records into custom-timeframe OHLCV bars."""
     logger.info("Executing public DATA tick aggregation")
-    return aggregate_ticks(dataset, target_timeframe, price_policy)
+    return run_data_operation(
+        operation="data.transformation.aggregate_ticks_to_bars",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _aggregate_ticks_raw(dataset, target_timeframe, price_policy),
+    )
+
+
+def aggregate_ticks(
+    dataset: MarketDataset, timeframe: str, spread_policy: str
+) -> StandardResponse[MarketDataset]:
+    """Aggregate sorted canonical ticks into OHLCV bars.
+
+    Rejects disorder or ambiguous spread/price units.
+
+    Args:
+        dataset: The Tick MarketDataset.
+        timeframe: The target timeframe key (e.g. "M1").
+        spread_policy: Price selection policy ("bid", "ask", "mid", "last").
+
+    Returns:
+        Standard response carrying a new Bar MarketDataset.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` or ``DATA_QUALITY_FAILED`` on failure.
+    """
+    return run_data_operation(
+        operation="data.transformation.aggregate_ticks",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _aggregate_ticks_raw(dataset, timeframe, spread_policy),
+    )
 
 
 __all__ = [

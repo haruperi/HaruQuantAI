@@ -12,12 +12,22 @@ from pathlib import Path
 import pytest
 from app.services.data._settings import DataSettings, data_settings_context
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.contracts import ColumnMapping, ExternalImportRequest
 from app.services.data.persistence.external_import import (
     describe_import_dialects,
     import_external_dataset,
 )
 from app.utils import generate_id
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
+
 
 _STANDARD_CSV = (
     "timestamp,open,high,low,close,volume\n"
@@ -97,7 +107,7 @@ def _settings(tmp_path: Path) -> DataSettings:
 
 def test_supported_dialects_are_described() -> None:
     """A caller can discover valid dialects without trial and error."""
-    dialects = describe_import_dialects()
+    dialects = _unwrap(describe_import_dialects())
 
     assert "standard" in dialects
     assert "mt5_export" in dialects
@@ -153,10 +163,12 @@ def test_bar_import_requires_a_timeframe() -> None:
 
 def test_missing_artifact_fails_closed(data_root: Path) -> None:
     """An absent source artifact is corruption, not an empty import."""
-    with data_settings_context(_settings(data_root)), pytest.raises(DataError) as error:
-        import_external_dataset(_request(data_root))
+    with data_settings_context(_settings(data_root)):
+        response = import_external_dataset(_request(data_root))
 
-    assert error.value.code == "FILE_CORRUPTED"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "FILE_CORRUPTED"
 
 
 def test_declared_columns_absent_from_artifact_fail_validation(
@@ -166,10 +178,12 @@ def test_declared_columns_absent_from_artifact_fail_validation(
     (data_root / "raw" / "EURUSD.csv").write_text(_STANDARD_CSV, encoding="utf-8")
     request = _request(data_root, mapping=_mapping(close="settlement"))
 
-    with data_settings_context(_settings(data_root)), pytest.raises(DataError) as error:
-        import_external_dataset(request)
+    with data_settings_context(_settings(data_root)):
+        response = import_external_dataset(request)
 
-    assert error.value.code == "VALIDATION_FAILED"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def test_import_admits_a_standard_csv(
@@ -180,16 +194,16 @@ def test_import_admits_a_standard_csv(
     (data_root / "raw" / "EURUSD.csv").write_text(_STANDARD_CSV, encoding="utf-8")
     captured: dict[str, object] = {}
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import.save_dataset",
+        "app.services.data.persistence.external_import._save_dataset_raw",
         lambda request: captured.setdefault("dataset", request.dataset),
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import.persist_audit_event",
+        "app.services.data.persistence.external_import._persist_audit_event_raw",
         lambda event: captured.setdefault("event", event),
     )
 
     with data_settings_context(_settings(data_root)):
-        import_external_dataset(_request(data_root))
+        _unwrap(import_external_dataset(_request(data_root)))
 
     dataset = captured["dataset"]
     assert dataset.record_count == 2  # type: ignore[union-attr]
@@ -205,11 +219,11 @@ def test_import_admits_an_mt5_export(
     (data_root / "raw" / "EURUSD.csv").write_text(_MT5_CSV, encoding="utf-8")
     captured: dict[str, object] = {}
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import.save_dataset",
+        "app.services.data.persistence.external_import._save_dataset_raw",
         lambda request: captured.setdefault("dataset", request.dataset),
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import.persist_audit_event",
+        "app.services.data.persistence.external_import._persist_audit_event_raw",
         lambda _event: None,
     )
     mapping = ColumnMapping(
@@ -222,8 +236,10 @@ def test_import_admits_an_mt5_export(
     )
 
     with data_settings_context(_settings(data_root)):
-        import_external_dataset(
-            _request(data_root, dialect="mt5_export", mapping=mapping)
+        _unwrap(
+            import_external_dataset(
+                _request(data_root, dialect="mt5_export", mapping=mapping)
+            )
         )
 
     dataset = captured["dataset"]
@@ -238,16 +254,16 @@ def test_import_records_external_origin_in_audit(
     (data_root / "raw" / "EURUSD.csv").write_text(_STANDARD_CSV, encoding="utf-8")
     events: list[object] = []
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import.save_dataset",
+        "app.services.data.persistence.external_import._save_dataset_raw",
         lambda _request: None,
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import.persist_audit_event",
+        "app.services.data.persistence.external_import._persist_audit_event_raw",
         events.append,
     )
 
     with data_settings_context(_settings(data_root)):
-        import_external_dataset(_request(data_root))
+        _unwrap(import_external_dataset(_request(data_root)))
 
     assert len(events) == 1
     assert events[0].action == "import_external_dataset"  # type: ignore[union-attr]
@@ -264,15 +280,17 @@ def test_import_rejects_blocking_measured_quality(
         encoding="utf-8",
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import.save_dataset",
+        "app.services.data.persistence.external_import._save_dataset_raw",
         lambda _request: pytest.fail("failed-quality import reached persistence"),
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import.persist_audit_event",
+        "app.services.data.persistence.external_import._persist_audit_event_raw",
         lambda _event: pytest.fail("failed-quality import reached audit"),
     )
 
-    with data_settings_context(_settings(data_root)), pytest.raises(DataError) as error:
-        import_external_dataset(_request(data_root))
+    with data_settings_context(_settings(data_root)):
+        response = import_external_dataset(_request(data_root))
 
-    assert error.value.code == "DATA_QUALITY_FAILED"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATA_QUALITY_FAILED"

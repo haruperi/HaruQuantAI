@@ -18,11 +18,16 @@ from app.services.data.audit.contracts import (
     AuditEventQuery,
 )
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import AuditEvent, logger
 
 if TYPE_CHECKING:
@@ -99,7 +104,7 @@ def _parse_audit_events(rows: tuple[Mapping[str, Any], ...]) -> list[AuditEvent]
     return events
 
 
-def query_audit_events(
+def _query_audit_events_raw(
     request: AuditEventQuery, auth_context: AuthContext
 ) -> AuditEventPage:
     """Authorize and execute a bounded cursor-paginated audit query in SQLite.
@@ -141,7 +146,7 @@ def query_audit_events(
             request_id=request.request_id,
         )
 
-        result = execute_transaction(tx_request)
+        result = _execute_transaction_raw(tx_request)
         events = _parse_audit_events(result.rows)
 
         # Determine if a next page cursor should be generated
@@ -164,6 +169,26 @@ def query_audit_events(
             safe_details={"operation": "query_audit_events"},
             request_id=request.request_id,
         ) from error
+
+
+def query_audit_events(
+    request: AuditEventQuery, auth_context: AuthContext
+) -> StandardResponse[AuditEventPage]:
+    """Authorize and execute a bounded cursor-paginated audit query in SQLite.
+
+    Args:
+        request: The audit event query filters and limits.
+        auth_context: The authenticated caller context.
+
+    Returns:
+        Standard response carrying an AuditEventPage of ordered events.
+    """
+    return run_data_operation(
+        operation="data.audit.query_audit_events",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _query_audit_events_raw(request, auth_context),
+    )
 
 
 __all__ = ["query_audit_events"]

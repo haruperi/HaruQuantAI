@@ -20,6 +20,11 @@ from datetime import datetime
 from typing import Literal, Protocol
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.contracts.validation import (
     reject_mixed_call_styles as _reject_mixed,
 )
@@ -38,7 +43,7 @@ from app.services.data.time_sessions.contracts import (
     ScheduleRequest,
 )
 from app.services.data.time_sessions.market_hours import evaluate_market_hours
-from app.utils import Clock, logger, utc_now
+from app.utils import Clock, generate_id, logger, utc_now
 
 
 class MarketCalendar(Protocol):
@@ -52,12 +57,12 @@ class MarketCalendar(Protocol):
         timezone: str,
         observed_at: datetime,
         request_id: str,
-    ) -> MarketSchedule:
+    ) -> StandardResponse[MarketSchedule]:
         """Return versioned provider/exchange schedule evidence."""
         ...
 
 
-def get_current_schedule(
+def _get_current_schedule_raw(
     request: ScheduleRequest,
     calendar: MarketCalendar,
     *,
@@ -128,6 +133,43 @@ def get_current_schedule(
     return schedule
 
 
+def get_current_schedule(
+    request: ScheduleRequest,
+    calendar: MarketCalendar,
+    *,
+    clock: Clock | None = None,
+    validate_source: bool = True,
+) -> StandardResponse[MarketSchedule]:
+    """Return current configured hours and normalized UTC sessions.
+
+    Advances cross-midnight windows correctly and rejects historical reconstruction.
+
+    Args:
+        request: Schedule details request.
+        calendar: Caller-injected authoritative schedule provider.
+        clock: Optional injected UTC clock.
+        validate_source: Whether to require a registered source descriptor.
+
+    Returns:
+        Standard response carrying the MarketSchedule details.
+
+    Raises:
+        (in-band) ``SOURCE_UNAVAILABLE``/``STALE_EVIDENCE`` on missing, invalid, or
+        unavailable schedule evidence.
+    """
+    return run_data_operation(
+        operation="data.time_sessions.get_current_schedule",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_current_schedule_raw(
+            request,
+            calendar,
+            clock=clock,
+            validate_source=validate_source,
+        ),
+    )
+
+
 def schedule_request(
     request: ScheduleRequest | None,
     *,
@@ -175,7 +217,7 @@ def schedule_request(
 # --- Public session operations ---
 
 
-def get_market_hours(
+def _get_market_hours_raw(
     request: MarketHoursRequest | ScheduleRequest | None = None,
     calendar: MarketCalendar | None = None,
     *,
@@ -216,9 +258,9 @@ def get_market_hours(
     if calendar is None:
         ensure_source(resolved.source_id, resolved.request_id)
     schedule = (
-        get_current_schedule(resolved, selected_calendar)
+        _get_current_schedule_raw(resolved, selected_calendar)
         if calendar is None
-        else get_current_schedule(
+        else _get_current_schedule_raw(
             resolved,
             selected_calendar,
             validate_source=False,
@@ -227,7 +269,41 @@ def get_market_hours(
     return evaluate_market_hours(schedule, checked_at=schedule.observed_at)
 
 
-def get_trading_sessions(
+def get_market_hours(
+    request: MarketHoursRequest | ScheduleRequest | None = None,
+    calendar: MarketCalendar | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    timezone: str | None = None,
+    request_id: str | None = None,
+) -> StandardResponse[MarketHours]:
+    """Retrieve market hours using a request or direct keywords.
+
+    Returns:
+        Standard response carrying evaluated current authoritative market hours.
+    """
+    trace_id = (
+        request.request_id
+        if isinstance(request, MarketHoursRequest | ScheduleRequest)
+        else request_id
+    )
+    return run_data_operation(
+        operation="data.time_sessions.get_market_hours",
+        request_id=generate_id("req") if trace_id is None else trace_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_market_hours_raw(
+            request,
+            calendar,
+            source_id=source_id,
+            symbol=symbol,
+            timezone=timezone,
+            request_id=request_id,
+        ),
+    )
+
+
+def _get_trading_sessions_raw(
     request: ScheduleRequest | None = None,
     calendar: MarketCalendar | None = None,
     *,
@@ -257,11 +333,43 @@ def get_trading_sessions(
     if calendar is None:
         ensure_source(resolved.source_id, resolved.request_id)
     if calendar is None:
-        return get_current_schedule(resolved, selected_calendar)
-    return get_current_schedule(
+        return _get_current_schedule_raw(resolved, selected_calendar)
+    return _get_current_schedule_raw(
         resolved,
         selected_calendar,
         validate_source=False,
+    )
+
+
+def get_trading_sessions(
+    request: ScheduleRequest | None = None,
+    calendar: MarketCalendar | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    timezone: str | None = None,
+    request_id: str | None = None,
+) -> StandardResponse[MarketSchedule]:
+    """Retrieve trading sessions using a request or direct keywords.
+
+    Returns:
+        Standard response carrying the current authoritative trading-session schedule.
+    """
+    trace_id = (
+        request.request_id if isinstance(request, ScheduleRequest) else request_id
+    )
+    return run_data_operation(
+        operation="data.time_sessions.get_trading_sessions",
+        request_id=generate_id("req") if trace_id is None else trace_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_trading_sessions_raw(
+            request,
+            calendar,
+            source_id=source_id,
+            symbol=symbol,
+            timezone=timezone,
+            request_id=request_id,
+        ),
     )
 
 

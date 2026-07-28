@@ -18,7 +18,15 @@ from app.services.data.contracts.dataset import (
     MarketDataset,
 )
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
-from app.services.data.time_sessions.timeframes import TimeframeSpec, get_timeframe_spec
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
+from app.services.data.time_sessions.timeframes import (
+    TimeframeSpec,
+    _get_timeframe_spec_raw,
+)
 from app.utils import logger
 
 if TYPE_CHECKING:
@@ -224,8 +232,12 @@ def _validate_synthetic_request(
     return mu, sigma, start
 
 
-def generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset:
-    """Generate a byte-reproducible bounded Decimal GBM dataset."""
+def _generate_synthetic_dataset_raw(request: SyntheticRequest) -> MarketDataset:
+    """Generate a byte-reproducible bounded Decimal GBM dataset.
+
+    Raises:
+        DataError: On any validation, limit, or generation failure.
+    """
     logger.info("Generating synthetic dataset for request %s", request.request_id)
     maximum = (
         SYNTHETIC_BAR_MAX_RECORDS
@@ -248,7 +260,7 @@ def generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset:
                 safe_details={"field": "timeframe"},
                 request_id=request.request_id,
             )
-        spec = get_timeframe_spec(request.timeframe)
+        spec = _get_timeframe_spec_raw(request.timeframe)
         path = _gbm_path(
             start=start,
             mu=mu,
@@ -309,15 +321,34 @@ def generate_synthetic_dataset(request: SyntheticRequest) -> MarketDataset:
     )
 
 
-__all__ = [
-    "generate_synthetic_bars",
-    "generate_synthetic_dataset",
-    "generate_synthetic_ticks",
-]
+def generate_synthetic_dataset(
+    request: SyntheticRequest,
+) -> StandardResponse[MarketDataset]:
+    """Generate a byte-reproducible bounded Decimal GBM dataset.
+
+    Args:
+        request: Canonical synthetic-generation request.
+
+    Returns:
+        Standard response carrying the generated ``MarketDataset``.
+
+    Raises:
+        (in-band) ``DataError`` codes on validation, limit, or generation failure.
+    """
+    return run_data_operation(
+        operation="data.synthetic_data.generate_synthetic_dataset",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _generate_synthetic_dataset_raw(request),
+    )
 
 
-def generate_synthetic_ticks(request: SyntheticRequest) -> MarketDataset:
-    """Generate GBM-based synthetic tick records; raises if kind is not ticks."""
+def _generate_synthetic_ticks_raw(request: SyntheticRequest) -> MarketDataset:
+    """Generate GBM-based synthetic tick records; raises if kind is not ticks.
+
+    Raises:
+        DataError: ``VALIDATION_FAILED`` if ``data_kind`` is not ``ticks``.
+    """
     logger.info("Executing public DATA synthetic-tick generation")
     if request.data_kind != "ticks":
         raise DataError(
@@ -330,11 +361,37 @@ def generate_synthetic_ticks(request: SyntheticRequest) -> MarketDataset:
             },
             request_id=request.request_id,
         )
-    return generate_synthetic_dataset(request)
+    return _generate_synthetic_dataset_raw(request)
 
 
-def generate_synthetic_bars(request: SyntheticRequest) -> MarketDataset:
-    """Generate GBM-based synthetic OHLCV bar records; raises if kind is not bars."""
+def generate_synthetic_ticks(
+    request: SyntheticRequest,
+) -> StandardResponse[MarketDataset]:
+    """Generate GBM-based synthetic tick records.
+
+    Args:
+        request: Canonical synthetic-generation request (must be ``ticks``).
+
+    Returns:
+        Standard response carrying the generated ``MarketDataset``.
+
+    Raises:
+        (in-band) ``DataError`` codes on validation, limit, or generation failure.
+    """
+    return run_data_operation(
+        operation="data.synthetic_data.generate_synthetic_ticks",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _generate_synthetic_ticks_raw(request),
+    )
+
+
+def _generate_synthetic_bars_raw(request: SyntheticRequest) -> MarketDataset:
+    """Generate GBM-based synthetic OHLCV bar records; raises if kind is not bars.
+
+    Raises:
+        DataError: ``VALIDATION_FAILED`` if ``data_kind`` is not ``bars``.
+    """
     logger.info("Executing public DATA synthetic-bar generation")
     if request.data_kind != "bars":
         raise DataError(
@@ -347,4 +404,33 @@ def generate_synthetic_bars(request: SyntheticRequest) -> MarketDataset:
             },
             request_id=request.request_id,
         )
-    return generate_synthetic_dataset(request)
+    return _generate_synthetic_dataset_raw(request)
+
+
+def generate_synthetic_bars(
+    request: SyntheticRequest,
+) -> StandardResponse[MarketDataset]:
+    """Generate GBM-based synthetic OHLCV bar records.
+
+    Args:
+        request: Canonical synthetic-generation request (must be ``bars``).
+
+    Returns:
+        Standard response carrying the generated ``MarketDataset``.
+
+    Raises:
+        (in-band) ``DataError`` codes on validation, limit, or generation failure.
+    """
+    return run_data_operation(
+        operation="data.synthetic_data.generate_synthetic_bars",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _generate_synthetic_bars_raw(request),
+    )
+
+
+__all__ = [
+    "generate_synthetic_bars",
+    "generate_synthetic_dataset",
+    "generate_synthetic_ticks",
+]

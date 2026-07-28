@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from app.services.data.contracts import DataError, OHLCVRecord
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.contracts import (
     SourceReadRequest,
 )
@@ -16,6 +17,14 @@ from tests.data.helpers import make_dataset
 
 _SYMBOL = "ABC"
 _START = datetime(2026, 1, 1, tzinfo=UTC)
+_REQ_ID = "req-00000000-0000-4000-8000-000000000000"
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.sources.test", request_id=_REQ_ID
+    )
 
 
 def _bar(index: int) -> OHLCVRecord:
@@ -152,10 +161,11 @@ def test_select_without_bounds_returns_every_record() -> None:
 
 def test_fetch_rejects_a_mismatched_source_id(raw_root: Path) -> None:
     """A request naming another source never reads this source's artifacts."""
-    with pytest.raises(DataError) as error:
-        _source(raw_root).fetch(_read_request(source_id="other"))
+    response = _source(raw_root).fetch(_read_request(source_id="other"))
 
-    assert error.value.code == "INVALID_INPUT"
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "INVALID_INPUT"
 
 
 def test_fetch_reports_empty_when_the_window_selects_nothing(
@@ -169,15 +179,16 @@ def test_fetch_reports_empty_when_the_window_selects_nothing(
         lambda _request: make_dataset(),
     )
 
-    with pytest.raises(DataError) as error:
-        _source(raw_root).fetch(
-            _read_request(
-                start=_START + timedelta(days=365),
-                end=_START + timedelta(days=366),
-            )
+    response = _source(raw_root).fetch(
+        _read_request(
+            start=_START + timedelta(days=365),
+            end=_START + timedelta(days=366),
         )
+    )
 
-    assert error.value.code == "EMPTY_RESULT"
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "EMPTY_RESULT"
 
 
 def test_fetch_honours_range_and_limit(
@@ -194,6 +205,6 @@ def test_fetch_honours_range_and_limit(
         lambda _request: dataset,
     )
 
-    batch = _source(raw_root).fetch(_read_request(limit=3))
+    batch = _unwrap(_source(raw_root).fetch(_read_request(limit=3)))
 
     assert len(batch.records) == 3

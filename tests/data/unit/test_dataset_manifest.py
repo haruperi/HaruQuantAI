@@ -11,7 +11,7 @@ def test_verify_dataset_manifest_delegates_to_load_dataset() -> None:
     request = MagicMock(spec=DatasetLoadRequest)
     expected_dataset = MagicMock()
     with patch(
-        "app.services.data.local_datasets.manifest.load_dataset",
+        "app.services.data.local_datasets.manifest._load_dataset_raw",
         return_value=expected_dataset,
     ) as mock_load:
         result = verify_dataset_manifest(request)

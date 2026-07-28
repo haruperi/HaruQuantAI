@@ -9,12 +9,26 @@ from unittest.mock import MagicMock
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import build_data_response, data_start_time
+from app.services.data.evidence.market_context import get_market_context_evidence
 from app.services.data.evidence.market_context_contracts import (
     MarketContextEvidence,
     MarketContextRequest,
 )
 
 from tests.data.helpers import END, START
+
+_MKT_OP = "data.evidence.market_context_provider.get_market_context"
+
+
+def _wrap(evidence: object) -> object:
+    """Wrap raw provider evidence in a successful StandardResponse."""
+    return build_data_response(
+        operation=_MKT_OP,
+        request_id="req-b89bb415342811090c814e32b6f92350f6cb703de4ac8c068f751a194d49c34e",
+        start_time=data_start_time(),
+        data=evidence,
+    )
 
 
 def test_request_rejects_unknown_scope() -> None:
@@ -48,8 +62,6 @@ def test_missing_evidence_is_explicit() -> None:
 
 def test_get_market_context_evidence_raises_source_unavailable() -> None:
     """Provider failures map to stable SOURCE_UNAVAILABLE evidence."""
-    from app.services.data.evidence.market_context import get_market_context_evidence
-
     request = MarketContextRequest(
         symbol="ABC",
         as_of=START,
@@ -59,17 +71,24 @@ def test_get_market_context_evidence_raises_source_unavailable() -> None:
         request_id="req-b89bb415342811090c814e32b6f92350f6cb703de4ac8c068f751a194d49c34e",
     )
     provider = MagicMock()
-    provider.get_market_context.side_effect = RuntimeError("provider secret")
-    with pytest.raises(DataError) as captured:
-        get_market_context_evidence(request, provider)
-    assert captured.value.code == "SOURCE_UNAVAILABLE"
-    assert captured.value.safe_details == {"operation": "market_context"}
+    provider.get_market_context.return_value = build_data_response(
+        operation=_MKT_OP,
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        error=DataError(
+            "SOURCE_UNAVAILABLE",
+            safe_details={"operation": "market_context"},
+            request_id=request.request_id,
+        ),
+    )
+    response = get_market_context_evidence(request, provider)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "SOURCE_UNAVAILABLE"
 
 
 def test_get_market_context_evidence_accepts_fresh_exact_evidence() -> None:
     """Acquisition returns exact fresh evidence without producing a Risk verdict."""
-    from app.services.data.evidence.market_context import get_market_context_evidence
-
     request = MarketContextRequest(
         symbol="ABC",
         as_of=START,
@@ -98,8 +117,10 @@ def test_get_market_context_evidence_accepts_fresh_exact_evidence() -> None:
         request_id=request.request_id,
     )
     provider = MagicMock()
-    provider.get_market_context.return_value = evidence
-    assert get_market_context_evidence(request, provider) == evidence
+    provider.get_market_context.return_value = _wrap(evidence)
+    response = get_market_context_evidence(request, provider)
+    assert response.status == "success"
+    assert response.data == evidence
 
 
 def test_market_context_request_validation_failures() -> None:

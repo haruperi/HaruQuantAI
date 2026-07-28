@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 from app.services.data.contracts import DataError, MarketDataset
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.pipeline import fetch_market_dataset
 from app.services.data.market_data.requests import MarketDataRequest
 from app.services.data.persistence.contracts import DatasetSaveRequest
@@ -18,6 +19,14 @@ from tests.data.helpers import make_dataset, register_local_test_source
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(hours=1)
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def test_serve_stale_is_rejected_outside_research() -> None:
@@ -48,8 +57,10 @@ def _configure_database(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None
     monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "30")
     from app.services.data.persistence.migrations import run_data_migrations
 
-    run_data_migrations(
-        "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
+    _unwrap(
+        run_data_migrations(
+            "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
+        )
     )
 
 
@@ -97,7 +108,7 @@ def test_fetch_market_dataset_reports_actual_source(
         overwrite=True,
         request_id="req-9e79c6ea45b572dd655e077ea534a48a4593ad8eacf1dbd3edfe0d4dc6bb2859",
     )
-    save_dataset(save_req)
+    _unwrap(save_dataset(save_req))
 
     # 1. Successful retrieval
     req = MarketDataRequest(
@@ -115,13 +126,13 @@ def test_fetch_market_dataset_reports_actual_source(
         request_id="req-12273c6b83cd2187ad2952ac03f30810a02043fe67f88d81fa02ef4053aa64e4",
     )
 
-    res = fetch_market_dataset(req)
+    res = _unwrap(fetch_market_dataset(req))
     assert isinstance(res, MarketDataset)
     assert res.symbol == "AAPL"
     assert res.records[0].source == "local_csv"
 
     # 2. OHLCV requests are not capped by an app-wide record-count limit.
     large_req = req.model_copy(update={"limit": 8_000_000})
-    large_result = fetch_market_dataset(large_req)
+    large_result = _unwrap(fetch_market_dataset(large_req))
     assert isinstance(large_result, MarketDataset)
     assert large_result.records

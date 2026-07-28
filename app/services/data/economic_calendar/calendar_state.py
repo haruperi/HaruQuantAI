@@ -20,16 +20,22 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
 from app.services.data.economic_calendar.profiling import (
     SymbolEventProfile,
-    get_symbol_event_profile,
+    _get_symbol_event_profile_raw,
 )
 from app.services.data.economic_calendar.restriction import (
     CALENDAR_STATE_OPEN,
     CALENDAR_STATE_UNKNOWN,
-    evaluate_calendar_state,
+    _evaluate_calendar_state_raw,
 )
+from app.utils import generate_id
 
 if TYPE_CHECKING:
     from app.services.data.evidence.market_context_contracts import (
@@ -83,7 +89,7 @@ def _relevant_events(
     return relevant
 
 
-def derive_calendar_state(
+def _derive_calendar_state_raw(
     symbol: str,
     at: datetime,
     *,
@@ -100,9 +106,6 @@ def derive_calendar_state(
         at: Timezone-aware UTC instant.
         events: Pre-fetched normalized events, or ``None`` when acquisition
             failed or was not attempted. An empty successful result is open.
-            Callers are expected to
-            constrain to the relevant window before calling (e.g. +/- one
-            day is sufficient for the default 10-minute windows).
         before_minutes: Requester blackout minutes before each release.
         after_minutes: Requester blackout minutes after each release.
         minimum_impact: Minimum impact (defaults to HIGH).
@@ -117,14 +120,14 @@ def derive_calendar_state(
     """
     if at.tzinfo is None:
         raise DataError("VALIDATION_FAILED", safe_details={"field": "at"})
-    profile = get_symbol_event_profile(symbol)
+    profile = _get_symbol_event_profile_raw(symbol)
     relevant = [] if events is None else _relevant_events(events, profile)
     if events is None:
         state = CALENDAR_STATE_UNKNOWN
     elif not relevant:
         state = CALENDAR_STATE_OPEN
     else:
-        state = evaluate_calendar_state(
+        state = _evaluate_calendar_state_raw(
             relevant,
             at,
             before_minutes=before_minutes,
@@ -143,7 +146,56 @@ def derive_calendar_state(
     )
 
 
-def calendar_state_provenance(
+def derive_calendar_state(
+    symbol: str,
+    at: datetime,
+    *,
+    events: Sequence[EconomicEvent] | None,
+    before_minutes: int = 10,
+    after_minutes: int = 10,
+    minimum_impact: EventImpact | None = None,
+    evidence_ref: str | None = None,
+) -> StandardResponse[CalendarStateResult]:
+    """Derive one Risk-consumable calendar-state for ``symbol`` at ``at``.
+
+    Args:
+        symbol: Canonical tradable symbol (must have a registered profile).
+        at: Timezone-aware UTC instant.
+        events: Pre-fetched normalized events, or ``None`` when acquisition
+            failed or was not attempted. An empty successful result is open.
+            Callers are expected to constrain to the relevant window before
+            calling (e.g. +/- one day is sufficient for the default 10-minute
+            windows).
+        before_minutes: Requester blackout minutes before each release.
+        after_minutes: Requester blackout minutes after each release.
+        minimum_impact: Minimum impact (defaults to HIGH).
+        evidence_ref: Optional opaque correlation reference for audit.
+
+    Returns:
+        Standard response carrying the immutable calendar-state result ready
+        to populate ``MarketContextEvidence``.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when ``at`` is timezone-naive or
+            ``symbol`` is unknown.
+    """
+    return run_data_operation(
+        operation="data.economic_calendar.derive_calendar_state",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _derive_calendar_state_raw(
+            symbol,
+            at,
+            events=events,
+            before_minutes=before_minutes,
+            after_minutes=after_minutes,
+            minimum_impact=minimum_impact,
+            evidence_ref=evidence_ref,
+        ),
+    )
+
+
+def _calendar_state_provenance_raw(
     result: CalendarStateResult,
 ) -> dict[str, str]:
     """Build the provenance fields Risk's ``_calendar_result`` requires.
@@ -165,7 +217,27 @@ def calendar_state_provenance(
     }
 
 
-def populate_market_context_calendar(
+def calendar_state_provenance(
+    result: CalendarStateResult,
+) -> StandardResponse[dict[str, str]]:
+    """Build the provenance fields Risk's ``_calendar_result`` requires.
+
+    Args:
+        result: One calendar-state derivation result.
+
+    Returns:
+        Standard response carrying
+        ``{"blackout_before_minutes": str, "blackout_after_minutes": str}``.
+    """
+    return run_data_operation(
+        operation="data.economic_calendar.calendar_state_provenance",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _calendar_state_provenance_raw(result),
+    )
+
+
+def _populate_market_context_calendar_raw(
     evidence: MarketContextEvidence,
     *,
     events: Sequence[EconomicEvent] | None,
@@ -174,6 +246,48 @@ def populate_market_context_calendar(
     minimum_impact: EventImpact | None = None,
     evidence_ref: str | None = None,
 ) -> MarketContextEvidence:
+    """Return a copy of ``evidence`` with populated ``calendar_state``.
+
+    Raises:
+        DataError: If the result cannot be derived for the supplied symbol.
+    """
+    derived = _derive_calendar_state_raw(
+        evidence.symbol,
+        evidence.as_of,
+        events=events,
+        before_minutes=before_minutes,
+        after_minutes=after_minutes,
+        minimum_impact=minimum_impact,
+        evidence_ref=evidence_ref,
+    )
+    merged_provenance = dict(evidence.provenance)
+    merged_provenance.update(_calendar_state_provenance_raw(derived))
+    update: dict[str, object] = {
+        "calendar_state": derived.calendar_state,
+        "provenance": merged_provenance,
+    }
+    # Risk's gate treats ``"unknown"`` exactly like ``None`` (calendar evidence
+    # is missing). Only when a real state is present should "calendar" leave
+    # ``missing_fields``; "unknown" preserves the explicit-missing contract.
+    if (
+        derived.calendar_state != CALENDAR_STATE_UNKNOWN
+        and "calendar" in evidence.missing_fields
+    ):
+        update["missing_fields"] = tuple(
+            field for field in evidence.missing_fields if field != "calendar"
+        )
+    return evidence.model_copy(update=update)
+
+
+def populate_market_context_calendar(
+    evidence: MarketContextEvidence,
+    *,
+    events: Sequence[EconomicEvent] | None,
+    before_minutes: int = 10,
+    after_minutes: int = 10,
+    minimum_impact: EventImpact | None = None,
+    evidence_ref: str | None = None,
+) -> StandardResponse[MarketContextEvidence]:
     """Return a copy of ``evidence`` with populated ``calendar_state``.
 
     This is the Data-side wiring used to satisfy Risk's existing calendar
@@ -195,40 +309,29 @@ def populate_market_context_calendar(
         evidence_ref: Optional opaque correlation reference.
 
     Returns:
-        A new `MarketContextEvidence` with ``calendar_state`` populated
-        (one of ``"event"``, ``"blackout_before"``, ``"blackout_after"``,
-        ``"open"``, or ``"unknown"``) and provenance carrying
+        Standard response carrying a new `MarketContextEvidence` with
+        ``calendar_state`` populated (one of ``"event"``,
+        ``"blackout_before"``, ``"blackout_after"``, ``"open"``, or
+        ``"unknown"``) and provenance carrying
         ``blackout_before_minutes``/``blackout_after_minutes`` as strings.
 
     Raises:
-        DataError: If the result cannot be derived for the supplied symbol.
+        (in-band) ``VALIDATION_FAILED`` when the result cannot be derived for
+            the supplied symbol.
     """
-    derived = derive_calendar_state(
-        evidence.symbol,
-        evidence.as_of,
-        events=events,
-        before_minutes=before_minutes,
-        after_minutes=after_minutes,
-        minimum_impact=minimum_impact,
-        evidence_ref=evidence_ref,
+    return run_data_operation(
+        operation="data.economic_calendar.populate_market_context_calendar",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _populate_market_context_calendar_raw(
+            evidence,
+            events=events,
+            before_minutes=before_minutes,
+            after_minutes=after_minutes,
+            minimum_impact=minimum_impact,
+            evidence_ref=evidence_ref,
+        ),
     )
-    merged_provenance = dict(evidence.provenance)
-    merged_provenance.update(calendar_state_provenance(derived))
-    update: dict[str, object] = {
-        "calendar_state": derived.calendar_state,
-        "provenance": merged_provenance,
-    }
-    # Risk's gate treats ``"unknown"`` exactly like ``None`` (calendar evidence
-    # is missing). Only when a real state is present should "calendar" leave
-    # ``missing_fields``; "unknown" preserves the explicit-missing contract.
-    if (
-        derived.calendar_state != CALENDAR_STATE_UNKNOWN
-        and "calendar" in evidence.missing_fields
-    ):
-        update["missing_fields"] = tuple(
-            field for field in evidence.missing_fields if field != "calendar"
-        )
-    return evidence.model_copy(update=update)
 
 
 __all__ = [

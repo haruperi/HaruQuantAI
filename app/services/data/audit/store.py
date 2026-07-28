@@ -19,11 +19,16 @@ from app.services.data.audit.contracts import (
     AuditPersistenceResult,
 )
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import AuditEvent, logger
 
 _INSERT_AUDIT_EVENT: Final = """
@@ -47,7 +52,7 @@ def _raise_write_failed(event_id: str, request_id: str) -> None:
     )
 
 
-def persist_audit_event(event: AuditEvent) -> AuditPersistenceResult:
+def _persist_audit_event_raw(event: AuditEvent) -> AuditPersistenceResult:
     """Idempotently persist a redacted AuditEvent version 1 into SQLite.
 
     Args:
@@ -82,7 +87,7 @@ def persist_audit_event(event: AuditEvent) -> AuditPersistenceResult:
             request_id=event.request_id,
         )
 
-        result = execute_transaction(tx_request)
+        result = _execute_transaction_raw(tx_request)
         if not result.committed:
             _raise_write_failed(event.event_id, event.request_id)
 
@@ -111,6 +116,25 @@ def persist_audit_event(event: AuditEvent) -> AuditPersistenceResult:
             safe_details={"operation": "persist_audit_event"},
             request_id=event.request_id,
         ) from error
+
+
+def persist_audit_event(
+    event: AuditEvent,
+) -> StandardResponse[AuditPersistenceResult]:
+    """Idempotently persist a redacted AuditEvent version 1 into SQLite.
+
+    Args:
+        event: The audit event to persist.
+
+    Returns:
+        Standard response carrying the audit persistence result.
+    """
+    return run_data_operation(
+        operation="data.audit.persist_audit_event",
+        request_id=event.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _persist_audit_event_raw(event),
+    )
 
 
 __all__ = ["persist_audit_event"]

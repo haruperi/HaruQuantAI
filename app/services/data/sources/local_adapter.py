@@ -7,6 +7,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, override
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.local_datasets.contracts import DatasetLoadRequest
 from app.services.data.market_data.symbol_metadata import (
     SymbolListRequest,
@@ -14,7 +19,9 @@ from app.services.data.market_data.symbol_metadata import (
     SymbolMetadataRequest,
     SymbolPage,
 )
-from app.services.data.persistence.dataset_writer import load_dataset
+from app.services.data.persistence.dataset_writer import (
+    _load_dataset_raw as load_dataset,
+)
 from app.services.data.sources.contracts import (
     RawSourceBatch,
     SourceReadRequest,
@@ -95,8 +102,7 @@ class LocalMarketDataSource(MarketDataSource):
                 return csv_path, "csv"
         raise DataError("DATA_NOT_FOUND", safe_details={"field": "symbol"})
 
-    @override
-    def fetch(self, request: SourceReadRequest) -> RawSourceBatch:
+    def _fetch_raw(self, request: SourceReadRequest) -> RawSourceBatch:
         """Load an exact local artifact through the governed dataset boundary."""
         logger.info("Fetching local data for source %s", self._source_id)
         if request.source_id != self._source_id:
@@ -145,6 +151,20 @@ class LocalMarketDataSource(MarketDataSource):
             request_id=request.request_id,
         )
 
+    @override
+    def fetch(self, request: SourceReadRequest) -> StandardResponse[RawSourceBatch]:
+        """Fetch provider-neutral raw records and metadata.
+
+        Returns:
+            Standard response carrying the raw source batch.
+        """
+        return run_data_operation(
+            operation="data.sources.local_market_data_source.fetch",
+            request_id=request.request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._fetch_raw(request),
+        )
+
     @staticmethod
     def _select(
         records: Sequence[CanonicalRecord],
@@ -172,8 +192,7 @@ class LocalMarketDataSource(MarketDataSource):
         )
         return selected[: request.limit]
 
-    @override
-    def list_symbols(self, request: SymbolListRequest) -> SymbolPage:
+    def _list_symbols_raw(self, request: SymbolListRequest) -> SymbolPage:
         """Return a stable, cursor-bounded page of configured local symbols."""
         logger.info("Listing symbols for local source %s", self._source_id)
         if request.source_id != self._source_id:
@@ -207,7 +226,22 @@ class LocalMarketDataSource(MarketDataSource):
         )
 
     @override
-    def get_symbol_metadata(self, request: SymbolMetadataRequest) -> SymbolMetadata:
+    def list_symbols(self, request: SymbolListRequest) -> StandardResponse[SymbolPage]:
+        """List provider symbols with cursor pagination support.
+
+        Returns:
+            Standard response carrying the symbol page.
+        """
+        return run_data_operation(
+            operation="data.sources.local_market_data_source.list_symbols",
+            request_id=request.request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._list_symbols_raw(request),
+        )
+
+    def _get_symbol_metadata_raw(
+        self, request: SymbolMetadataRequest
+    ) -> SymbolMetadata:
         """Return caller-supplied authoritative metadata for one local symbol."""
         logger.info("Reading configured local metadata for source %s", self._source_id)
         if request.source_id != self._source_id:
@@ -224,6 +258,22 @@ class LocalMarketDataSource(MarketDataSource):
                 request_id=request.request_id,
             )
         return metadata
+
+    @override
+    def get_symbol_metadata(
+        self, request: SymbolMetadataRequest
+    ) -> StandardResponse[SymbolMetadata]:
+        """Retrieve normalized symbol metadata.
+
+        Returns:
+            Standard response carrying the local symbol metadata.
+        """
+        return run_data_operation(
+            operation="data.sources.local_market_data_source.get_symbol_metadata",
+            request_id=request.request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._get_symbol_metadata_raw(request),
+        )
 
 
 __all__ = ["LocalMarketDataSource"]

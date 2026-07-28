@@ -17,6 +17,11 @@ from typing import TYPE_CHECKING, cast
 
 from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.evidence.account_contracts import (
     AccountBalance,
     AccountOrder,
@@ -24,7 +29,7 @@ from app.services.data.evidence.account_contracts import (
     AccountSnapshotRequest,
     AccountStateSnapshot,
 )
-from app.services.data.sources.read_only import wrap_broker_client
+from app.services.data.sources.read_only import _wrap_broker_client_raw
 from app.utils import Clock, logger, utc_now
 
 if TYPE_CHECKING:
@@ -205,7 +210,7 @@ def _validate_freshness(
         raise _failure(request_id, "account_info.retrieved_at")
 
 
-def get_account_state_snapshot(
+def _get_account_state_snapshot_raw(
     request: AccountSnapshotRequest,
     adapter: BrokerAdapter,
     *,
@@ -233,7 +238,11 @@ def get_account_state_snapshot(
             # relying on the adapter to lack one. Phase 9 made the read-only
             # contract a local runtime property instead of a convention.
             _fetch_from_adapter(
-                cast("BrokerAdapter", wrap_broker_client(adapter)), request.request_id
+                cast(
+                    "BrokerAdapter",
+                    _wrap_broker_client_raw(adapter),
+                ),
+                request.request_id,
             )
         )
     except DataError:
@@ -281,6 +290,34 @@ def get_account_state_snapshot(
         snapshot_at=info.retrieved_at,
         expires_at=info.retrieved_at + timedelta(seconds=request.max_age_seconds),
         request_id=request.request_id,
+    )
+
+
+def get_account_state_snapshot(
+    request: AccountSnapshotRequest,
+    adapter: BrokerAdapter,
+    *,
+    clock: Clock | None = None,
+) -> StandardResponse[AccountStateSnapshot]:
+    """Normalize a fresh snapshot from an already configured caller-owned adapter.
+
+    Args:
+        request: Account identity and freshness boundary.
+        adapter: Caller-owned, already connected canonical broker adapter.
+        clock: Optional injected UTC clock for deterministic verification.
+
+    Returns:
+        Standard response carrying immutable normalized account-state evidence.
+
+    Raises:
+        DataError: Never; failures surface as an error response. Cancellation and
+            process-control exceptions propagate.
+    """
+    return run_data_operation(
+        operation="data.evidence.get_account_state_snapshot",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_account_state_snapshot_raw(request, adapter, clock=clock),
     )
 
 

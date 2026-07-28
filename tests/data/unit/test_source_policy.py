@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.requests import MarketDataRequest
 from app.services.data.sources.contracts import (
     SourceDescriptor,
@@ -33,6 +33,15 @@ from app.utils import AuthContext, generate_id
 # Base timestamps
 START = datetime.now(UTC)
 END = START + timedelta(hours=1)
+
+_REQ_ID = "req-00000000-0000-4000-8000-000000000000"
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.sources.test", request_id=_REQ_ID
+    )
 
 
 def _configure_database(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -134,7 +143,7 @@ def test_evaluate_source_policy_success() -> None:
         request_id="req-9456bdfa12ea76959c94a3572f5d91c73d838622df0a8d9b4e815c276c6b7880",
     )
 
-    plan = evaluate_source_policy(req)
+    plan = _unwrap(evaluate_source_policy(req))
     assert plan.requested_source == "src-1"
     assert plan.ordered_sources == ("src-1",)
 
@@ -156,9 +165,10 @@ def test_evaluate_source_policy_unregistered() -> None:
         request_id="req-a697f8b99a46c8465b9a70e7af44e49a7665cf1ce8e62c3b42678f1c26b21814",
     )
 
-    with pytest.raises(DataError) as captured:
-        evaluate_source_policy(req)
-    assert captured.value.code == "SOURCE_UNAVAILABLE"
+    response = evaluate_source_policy(req)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "SOURCE_UNAVAILABLE"
 
 
 def test_evaluate_source_policy_capability_mismatch() -> None:
@@ -181,9 +191,10 @@ def test_evaluate_source_policy_capability_mismatch() -> None:
         request_id="req-bc0e142195cb27a6127a29283e0ccdfb3a51449da848f04abee1c1526184084e",
     )
 
-    with pytest.raises(DataError) as captured:
-        evaluate_source_policy(req)
-    assert captured.value.code == "SOURCE_UNAVAILABLE"
+    response = evaluate_source_policy(req)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "SOURCE_UNAVAILABLE"
 
 
 def test_evaluate_source_policy_license_restriction() -> None:
@@ -206,9 +217,10 @@ def test_evaluate_source_policy_license_restriction() -> None:
         request_id="req-d9c2b1bc8ab6d4617766f0c4dbee6bbbc164c63262325a31ed7b8c8bb2d90bca",
     )
 
-    with pytest.raises(DataError) as captured:
-        evaluate_source_policy(req)
-    assert captured.value.code == "LICENSE_RESTRICTION"
+    response = evaluate_source_policy(req)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "LICENSE_RESTRICTION"
 
 
 def test_evaluate_source_policy_circuit_breaking() -> None:
@@ -242,9 +254,10 @@ def test_evaluate_source_policy_circuit_breaking() -> None:
         request_id="req-749e7e1c63a152e701f9ae4d52d9dc8fe7b50df12c9f54b06e7a9f8ff3550414",
     )
 
-    with pytest.raises(DataError) as captured:
-        evaluate_source_policy(req)
-    assert captured.value.code == "CIRCUIT_BREAKER_OPEN"
+    response = evaluate_source_policy(req)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "CIRCUIT_BREAKER_OPEN"
 
 
 def test_evaluate_source_policy_rate_limits(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -271,9 +284,10 @@ def test_evaluate_source_policy_rate_limits(monkeypatch: pytest.MonkeyPatch) -> 
         request_id="req-eb1bae3d11ff7b713a6bcf6bc16a5bf7fb51efa405d42d0caa8bf5dcda7c090b",
     )
 
-    with pytest.raises(DataError) as captured:
-        evaluate_source_policy(req)
-    assert captured.value.code == "POLICY_BLOCKED"
+    response = evaluate_source_policy(req)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "POLICY_BLOCKED"
 
 
 def test_promote_source_unauthorized() -> None:
@@ -290,9 +304,10 @@ def test_promote_source_unauthorized() -> None:
         request_id="req-cffae068a5c52b2bfc23b7bbd83d773ae5d705b427ad8341299d256dfcf06ffe",
     )
 
-    with pytest.raises(DataError) as captured:
-        promote_source(promo_req, auth)
-    assert captured.value.code == "PERMISSION_DENIED"
+    response = promote_source(promo_req, auth)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "PERMISSION_DENIED"
 
 
 def test_promote_source_production_missing_evidence() -> None:
@@ -313,9 +328,10 @@ def test_promote_source_production_missing_evidence() -> None:
         request_id="req-cffae068a5c52b2bfc23b7bbd83d773ae5d705b427ad8341299d256dfcf06ffe",
     )
 
-    with pytest.raises(DataError) as captured:
-        promote_source(promo_req, auth)
-    assert captured.value.code == "VALIDATION_FAILED"
+    response = promote_source(promo_req, auth)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def test_promote_source_success_and_demotion() -> None:
@@ -337,7 +353,7 @@ def test_promote_source_success_and_demotion() -> None:
         evidence=("staging_check", "audit_complete"),
         request_id=f"req-{uid}",
     )
-    res_promo = promote_source(promo_req, auth)
+    res_promo = _unwrap(promote_source(promo_req, auth))
     assert res_promo.readiness == "production"
 
     # 2. Demote back to staging (should not require evidence checklist)
@@ -347,7 +363,7 @@ def test_promote_source_success_and_demotion() -> None:
         evidence=("staging_check",),
         request_id=f"req-{uid}",
     )
-    res_demote = promote_source(demote_req, auth)
+    res_demote = _unwrap(promote_source(demote_req, auth))
     assert res_demote.readiness == "staging"
 
 
@@ -373,20 +389,22 @@ def test_promoted_readiness_survives_registry_restart() -> None:
     _reset_registry()
     _reset_policy_registry()
     _register_descriptor(descriptor)
-    plan = evaluate_source_policy(
-        MarketDataRequest(
-            source_id="src-restart",
-            symbol="AAPL",
-            data_kind="bars",
-            timeframe="1m",
-            start=START,
-            end=END,
-            limit=10,
-            use_cache=False,
-            quality_failure_behavior="reject",
-            workflow_context="research",
-            precision_policy="decimal_string",
-            request_id=generate_id("req"),
+    plan = _unwrap(
+        evaluate_source_policy(
+            MarketDataRequest(
+                source_id="src-restart",
+                symbol="AAPL",
+                data_kind="bars",
+                timeframe="1m",
+                start=START,
+                end=END,
+                limit=10,
+                use_cache=False,
+                quality_failure_behavior="reject",
+                workflow_context="research",
+                precision_policy="decimal_string",
+                request_id=generate_id("req"),
+            )
         )
     )
     assert plan.ordered_sources == ("src-restart",)

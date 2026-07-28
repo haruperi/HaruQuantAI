@@ -8,6 +8,11 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, Protocol, override
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.market_data.symbol_metadata import (
     SymbolListRequest,
     SymbolMetadata,
@@ -437,35 +442,54 @@ class ExternalMarketDataSource(MarketDataSource):
         return SymbolMetadata(**metadata_dict)
 
     @override
-    def fetch(self, request: SourceReadRequest) -> RawSourceBatch:
+    def fetch(self, request: SourceReadRequest) -> StandardResponse[RawSourceBatch]:
         """Fetch raw records through the injected adapter.
 
         Returns:
-            Provider-neutral raw source batch.
+            Standard response carrying the provider-neutral raw source batch.
         """
         logger.info("Executing external source fetch")
-        return self._runner(self._fetch_async(request), request.request_id)
+        return run_data_operation(
+            operation="data.sources.market_data_source.fetch",
+            request_id=request.request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._runner(self._fetch_async(request), request.request_id),
+        )
 
     @override
-    def list_symbols(self, request: SymbolListRequest) -> SymbolPage:
+    def list_symbols(self, request: SymbolListRequest) -> StandardResponse[SymbolPage]:
         """List provider-native symbols through the injected adapter.
 
         Returns:
-            Bounded normalized symbol page.
+            Standard response carrying the bounded normalized symbol page.
         """
         logger.info("Executing external source symbol listing")
-        return self._runner(self._list_symbols_async(request), request.request_id)
+        return run_data_operation(
+            operation="data.sources.market_data_source.list_symbols",
+            request_id=request.request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._runner(
+                self._list_symbols_async(request), request.request_id
+            ),
+        )
 
     @override
-    def get_symbol_metadata(self, request: SymbolMetadataRequest) -> SymbolMetadata:
+    def get_symbol_metadata(
+        self, request: SymbolMetadataRequest
+    ) -> StandardResponse[SymbolMetadata]:
         """Read provider-native symbol metadata through the injected adapter.
 
         Returns:
-            Normalized symbol metadata.
+            Standard response carrying the normalized symbol metadata.
         """
         logger.info("Executing external source metadata read")
-        return self._runner(
-            self._get_symbol_metadata_async(request), request.request_id
+        return run_data_operation(
+            operation="data.sources.market_data_source.get_symbol_metadata",
+            request_id=request.request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._runner(
+                self._get_symbol_metadata_async(request), request.request_id
+            ),
         )
 
 

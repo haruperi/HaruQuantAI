@@ -10,12 +10,20 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import execute_transaction
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _configure_database(
@@ -55,10 +63,12 @@ def test_execute_transaction_rolls_back_atomically(
 ) -> None:
     """A later integrity failure rolls back every earlier write in the plan."""
     _configure_database(monkeypatch, tmp_path)
-    execute_transaction(
-        _request(
-            "CREATE TABLE facts (id INTEGER PRIMARY KEY, value TEXT NOT NULL)",
-            parameters=((),),
+    _unwrap(
+        execute_transaction(
+            _request(
+                "CREATE TABLE facts (id INTEGER PRIMARY KEY, value TEXT NOT NULL)",
+                parameters=((),),
+            )
         )
     )
     failing = _request(
@@ -67,13 +77,16 @@ def test_execute_transaction_rolls_back_atomically(
         parameters=((1, "first"), (1, "duplicate")),
     )
 
-    with pytest.raises(DataError) as captured:
-        execute_transaction(failing)
+    response = execute_transaction(failing)
 
-    assert captured.value.code == "DB_WRITE_FAILED"
-    assert captured.value.safe_details["stage"] == "execution"
-    result = execute_transaction(
-        _request("SELECT COUNT(*) AS count FROM facts", parameters=((),))
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_WRITE_FAILED"
+    assert response.error.details["stage"] == "execution"
+    result = _unwrap(
+        execute_transaction(
+            _request("SELECT COUNT(*) AS count FROM facts", parameters=((),))
+        )
     )
     assert result.rows == ({"count": 0},)
 
@@ -103,11 +116,12 @@ def test_execute_transaction_rejects_unsafe_configuration(
         timeout=timeout,
     )
 
-    with pytest.raises(DataError) as captured:
-        execute_transaction(_request("SELECT 1", parameters=((),)))
+    response = execute_transaction(_request("SELECT 1", parameters=((),)))
 
-    assert captured.value.code == "DB_CONNECTION_ERROR"
-    assert captured.value.safe_details["stage"] == "configuration"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_CONNECTION_ERROR"
+    assert response.error.details["stage"] == "configuration"
 
 
 def test_execute_transaction_requires_every_configuration_value() -> None:
@@ -119,10 +133,12 @@ def test_execute_transaction_requires_every_configuration_value() -> None:
         data_dir=None,
         sqlite_busy_timeout_seconds=None,
     )
-    with data_settings_context(bad_settings), pytest.raises(DataError) as captured:
-        execute_transaction(_request("SELECT 1", parameters=((),)))
+    with data_settings_context(bad_settings):
+        response = execute_transaction(_request("SELECT 1", parameters=((),)))
 
-    assert captured.value.code == "DB_CONNECTION_ERROR"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_CONNECTION_ERROR"
 
 
 def test_execute_transaction_rolls_back_when_result_exceeds_bound(
@@ -130,12 +146,14 @@ def test_execute_transaction_rolls_back_when_result_exceeds_bound(
 ) -> None:
     """A result beyond max_rows aborts writes made by the same transaction."""
     _configure_database(monkeypatch, tmp_path)
-    execute_transaction(
-        _request(
-            "CREATE TABLE facts (id INTEGER PRIMARY KEY)",
-            "INSERT INTO facts (id) VALUES (?)",
-            "INSERT INTO facts (id) VALUES (?)",
-            parameters=((), (1,), (2,)),
+    _unwrap(
+        execute_transaction(
+            _request(
+                "CREATE TABLE facts (id INTEGER PRIMARY KEY)",
+                "INSERT INTO facts (id) VALUES (?)",
+                "INSERT INTO facts (id) VALUES (?)",
+                parameters=((), (1,), (2,)),
+            )
         )
     )
     failing = _request(
@@ -145,13 +163,16 @@ def test_execute_transaction_rolls_back_when_result_exceeds_bound(
         max_rows=1,
     )
 
-    with pytest.raises(DataError) as captured:
-        execute_transaction(failing)
+    response = execute_transaction(failing)
 
-    assert captured.value.code == "DATABASE_ERROR"
-    assert captured.value.safe_details["stage"] == "result_bound"
-    result = execute_transaction(
-        _request("SELECT COUNT(*) AS count FROM facts", parameters=((),))
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATABASE_ERROR"
+    assert response.error.details["stage"] == "result_bound"
+    result = _unwrap(
+        execute_transaction(
+            _request("SELECT COUNT(*) AS count FROM facts", parameters=((),))
+        )
     )
     assert result.rows == ({"count": 2},)
 
@@ -171,11 +192,12 @@ def test_execute_transaction_denies_caller_transaction_or_attachment(
     """Caller SQL cannot escape the executor's transaction or database boundary."""
     _configure_database(monkeypatch, tmp_path)
 
-    with pytest.raises(DataError) as captured:
-        execute_transaction(_request(statement, parameters=((),)))
+    response = execute_transaction(_request(statement, parameters=((),)))
 
-    assert captured.value.code == "DATABASE_ERROR"
-    assert captured.value.safe_details["stage"] == "execution"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATABASE_ERROR"
+    assert response.error.details["stage"] == "execution"
 
 
 @pytest.mark.parametrize(
@@ -194,11 +216,12 @@ def test_execute_transaction_rejects_unrepresentable_results(
     """Ambiguous columns and BLOB values never cross the typed result boundary."""
     _configure_database(monkeypatch, tmp_path)
 
-    with pytest.raises(DataError) as captured:
-        execute_transaction(_request(statement, parameters=((),)))
+    response = execute_transaction(_request(statement, parameters=((),)))
 
-    assert captured.value.code == "DATABASE_ERROR"
-    assert captured.value.safe_details["stage"] == stage
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATABASE_ERROR"
+    assert response.error.details["stage"] == stage
 
 
 def test_execute_transaction_classifies_busy_timeout_as_write_lock(
@@ -207,10 +230,12 @@ def test_execute_transaction_classifies_busy_timeout_as_write_lock(
     """A verified SQLite busy timeout maps to the shared lock-conflict code."""
     _configure_database(monkeypatch, tmp_path, timeout="0.01")
     database_path = tmp_path / "unit.sqlite3"
-    execute_transaction(
-        _request(
-            "CREATE TABLE facts (id INTEGER PRIMARY KEY)",
-            parameters=((),),
+    _unwrap(
+        execute_transaction(
+            _request(
+                "CREATE TABLE facts (id INTEGER PRIMARY KEY)",
+                parameters=((),),
+            )
         )
     )
 
@@ -218,14 +243,15 @@ def test_execute_transaction_classifies_busy_timeout_as_write_lock(
         sqlite3.connect(database_path, timeout=0.01, autocommit=False)
     ) as blocker:
         blocker.execute("INSERT INTO facts (id) VALUES (?)", (1,))
-        with pytest.raises(DataError) as captured:
-            execute_transaction(
-                _request(
-                    "INSERT INTO facts (id) VALUES (?)",
-                    parameters=((2,),),
-                )
+        response = execute_transaction(
+            _request(
+                "INSERT INTO facts (id) VALUES (?)",
+                parameters=((2,),),
             )
+        )
         blocker.rollback()
 
-    assert captured.value.code == "CONCURRENT_WRITE_LOCKED"
-    assert captured.value.safe_details["stage"] == "execution"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "CONCURRENT_WRITE_LOCKED"
+    assert response.error.details["stage"] == "execution"

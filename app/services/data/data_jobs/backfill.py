@@ -14,7 +14,7 @@ from app.services.data.data_jobs.contracts import (
     BackfillChunkRequest,
     BackfillChunkResult,
 )
-from app.services.data.market_data.pipeline import fetch_market_dataset
+from app.services.data.market_data.pipeline import _fetch_market_dataset_raw
 from app.services.data.market_data.requests import (
     MarketDataRequest,
 )
@@ -23,8 +23,8 @@ from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.dataset_writer import save_dataset
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.dataset_writer import _save_dataset_raw
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import Clock, logger, utc_now
 
 if TYPE_CHECKING:
@@ -99,7 +99,7 @@ def _committed_result(
 ) -> BackfillChunkResult | None:
     """Return an existing committed idempotency result."""
     logger.debug("Checking committed backfill idempotency state")
-    result = execute_transaction(
+    result = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(
@@ -124,7 +124,7 @@ def _acquire_lease(request: BackfillChunkRequest, now: datetime) -> None:
     """Atomically acquire or renew the job lease with one conditional mutation."""
     logger.info("Acquiring atomic backfill lease for job %s", request.job_id)
     expires_at = now + timedelta(seconds=JOB_LEASE_TIMEOUT_SECONDS)
-    result = execute_transaction(
+    result = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(
@@ -155,7 +155,7 @@ def _acquire_lease(request: BackfillChunkRequest, now: datetime) -> None:
     )
     if result.affected_rows > 0:
         return
-    existing = execute_transaction(
+    existing = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=("SELECT job_id FROM data_update_jobs WHERE job_id = ?",),
@@ -193,9 +193,9 @@ def _fetch_backfill_data(request: BackfillChunkRequest) -> MarketDataset:
         request_id=request.request_id,
     )
     try:
-        return fetch_market_dataset(market_request)
+        return _fetch_market_dataset_raw(market_request)
     except DataError as error:
-        execute_transaction(
+        _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=(
@@ -275,7 +275,7 @@ def _prepare_artifact(
     """Write a pending artifact and durably record prepared publication state."""
     logger.info("Preparing recoverable backfill artifact")
     pending_relative, final_relative, _, _ = _artifact_paths(request, key)
-    manifest = save_dataset(
+    manifest = _save_dataset_raw(
         DatasetSaveRequest(
             dataset=dataset,
             relative_path=pending_relative,
@@ -285,7 +285,7 @@ def _prepare_artifact(
         )
     )
     chunk_id = f"chunk-{key}"
-    execute_transaction(
+    _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(
@@ -377,7 +377,7 @@ def _finalize_checkpoint(
 ) -> None:
     """Atomically finalize checkpoint and job evidence after publication."""
     logger.info("Finalizing committed backfill checkpoint")
-    result = execute_transaction(
+    result = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(

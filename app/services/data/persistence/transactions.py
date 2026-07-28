@@ -11,6 +11,11 @@ from typing import NoReturn
 
 from app.services.data._settings import DataSettings, get_data_settings
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     ResultScalar,
     TransactionRequest,
@@ -196,7 +201,7 @@ def _rollback_and_raise(
     raise error
 
 
-def execute_transaction(request: TransactionRequest) -> TransactionResult:
+def _execute_transaction_raw(request: TransactionRequest) -> TransactionResult:
     """Execute a bounded statement plan atomically on a short-lived connection.
 
     Args:
@@ -209,7 +214,7 @@ def execute_transaction(request: TransactionRequest) -> TransactionResult:
         DataError: If configuration, connection, execution, result validation,
             commit, or rollback fails. Raw SQL and exception details are omitted.
     """
-    logger.debug("Running DATA function: execute_transaction")
+    logger.debug("Running DATA function: _execute_transaction_raw")
     try:
         settings = get_data_settings()
     except ValueError:
@@ -276,6 +281,30 @@ def execute_transaction(request: TransactionRequest) -> TransactionResult:
             connection.close()
         except sqlite3.Error:
             raise _error("DATABASE_ERROR", request.request_id, "close") from None
+
+
+def execute_transaction(
+    request: TransactionRequest,
+) -> StandardResponse[TransactionResult]:
+    """Execute a bounded statement plan atomically on a short-lived connection.
+
+    Args:
+        request: Immutable statement plan, row bound, and request identifier.
+
+    Returns:
+        Standard response carrying normalized rows and affected-row evidence
+        after a successful commit.
+
+    Raises:
+        (in-band) ``DataError`` codes for configuration, connection, execution,
+            result validation, commit, or rollback failures.
+    """
+    return run_data_operation(
+        operation="data.persistence.execute_transaction",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _execute_transaction_raw(request),
+    )
 
 
 __all__ = ["execute_transaction"]

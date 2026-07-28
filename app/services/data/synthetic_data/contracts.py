@@ -11,7 +11,7 @@ from typing import Literal
 from pydantic import field_serializer, field_validator, model_validator
 
 from app.services.data.contracts._base import TracedOpenContract
-from app.services.data.time_sessions.utc import require_utc
+from app.services.data.time_sessions.utc import _require_utc_raw as require_utc
 
 type PrecisionPolicy = Literal[
     "decimal_string",

@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from app.services.data.contracts import DataError, OHLCVRecord
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.requests import AvailabilityRequest, VolumeRequest
 from app.services.data.market_data.symbol_discovery import (
     _compute_overlap_and_gaps,
@@ -30,6 +31,13 @@ _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)
 
 
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.market_data.test", request_id=_REQ_ID
+    )
+
+
 def test_configured_limit_invalid_name() -> None:
     """Test _configured_limit raises DataError for invalid limit name."""
     with pytest.raises(DataError) as exc_info:
@@ -38,43 +46,46 @@ def test_configured_limit_invalid_name() -> None:
 
 
 def test_discover_symbols_limit_exceeded() -> None:
-    """Test discover_symbols raises LIMIT_EXCEEDED when limit > max."""
+    """Test discover_symbols fails closed with LIMIT_EXCEEDED when limit > max."""
     req = SymbolListRequest(source_id="mt5", limit=20000, request_id=_REQ_ID)
-    with pytest.raises(DataError) as exc_info:
-        discover_symbols(req)
-    assert exc_info.value.code == "LIMIT_EXCEEDED"
+    response = discover_symbols(req)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "LIMIT_EXCEEDED"
 
 
 def test_discover_symbols_disabled_source() -> None:
-    """Test discover_symbols raises SOURCE_UNAVAILABLE for disabled source."""
+    """Test discover_symbols fails closed with SOURCE_UNAVAILABLE for disabled source."""
     mock_desc = MagicMock()
     mock_desc.readiness = "disabled"
 
     with patch(
-        "app.services.data.market_data.symbol_discovery.get_source_descriptor",
+        "app.services.data.market_data.symbol_discovery._get_source_descriptor_raw",
         return_value=mock_desc,
     ):
         req = SymbolListRequest(source_id="disabled_src", limit=10, request_id=_REQ_ID)
-        with pytest.raises(DataError) as exc_info:
-            discover_symbols(req)
-        assert exc_info.value.code == "SOURCE_UNAVAILABLE"
+        response = discover_symbols(req)
+        assert response.status != "success"
+        assert response.error is not None
+        assert response.error.code == "SOURCE_UNAVAILABLE"
 
 
 def test_fetch_symbol_metadata_disabled_source() -> None:
-    """Test fetch_symbol_metadata raises SOURCE_UNAVAILABLE for disabled source."""
+    """Test fetch_symbol_metadata fails closed with SOURCE_UNAVAILABLE for disabled source."""
     mock_desc = MagicMock()
     mock_desc.readiness = "disabled"
 
     with patch(
-        "app.services.data.market_data.symbol_discovery.get_source_descriptor",
+        "app.services.data.market_data.symbol_discovery._get_source_descriptor_raw",
         return_value=mock_desc,
     ):
         req = SymbolMetadataRequest(
             source_id="disabled_src", symbol="EURUSD", request_id=_REQ_ID
         )
-        with pytest.raises(DataError) as exc_info:
-            fetch_symbol_metadata(req)
-        assert exc_info.value.code == "SOURCE_UNAVAILABLE"
+        response = fetch_symbol_metadata(req)
+        assert response.status != "success"
+        assert response.error is not None
+        assert response.error.code == "SOURCE_UNAVAILABLE"
 
 
 def test_load_local_manifest_missing_file() -> None:
@@ -107,7 +118,7 @@ def test_compute_overlap_and_gaps_invalid_range() -> None:
 
 
 def test_inspect_availability_limit_exceeded() -> None:
-    """Test inspect_availability raises LIMIT_EXCEEDED when probe records > max."""
+    """Test inspect_availability fails closed with LIMIT_EXCEEDED when probe records > max."""
     req = AvailabilityRequest(
         source_id="mt5",
         symbol="EURUSD",
@@ -118,18 +129,19 @@ def test_inspect_availability_limit_exceeded() -> None:
         max_probe_records=2_000_000,
         request_id=_REQ_ID,
     )
-    with pytest.raises(DataError) as exc_info:
-        inspect_availability(req)
-    assert exc_info.value.code == "LIMIT_EXCEEDED"
+    response = inspect_availability(req)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "LIMIT_EXCEEDED"
 
 
 def test_inspect_availability_disabled_source() -> None:
-    """Test inspect_availability raises SOURCE_UNAVAILABLE for disabled source."""
+    """Test inspect_availability fails closed with SOURCE_UNAVAILABLE for disabled source."""
     mock_desc = MagicMock()
     mock_desc.readiness = "disabled"
 
     with patch(
-        "app.services.data.market_data.symbol_discovery.get_source_descriptor",
+        "app.services.data.market_data.symbol_discovery._get_source_descriptor_raw",
         return_value=mock_desc,
     ):
         req = AvailabilityRequest(
@@ -142,9 +154,10 @@ def test_inspect_availability_disabled_source() -> None:
             max_probe_records=100,
             request_id=_REQ_ID,
         )
-        with pytest.raises(DataError) as exc_info:
-            inspect_availability(req)
-        assert exc_info.value.code == "SOURCE_UNAVAILABLE"
+        response = inspect_availability(req)
+        assert response.status != "success"
+        assert response.error is not None
+        assert response.error.code == "SOURCE_UNAVAILABLE"
 
 
 def test_fetch_historical_volume_records_mode() -> None:
@@ -168,7 +181,7 @@ def test_fetch_historical_volume_records_mode() -> None:
     mock_ds.source_metadata = {"source": "mt5"}
 
     with patch(
-        "app.services.data.market_data.pipeline.fetch_market_dataset",
+        "app.services.data.market_data.symbol_discovery._fetch_market_dataset_raw",
         return_value=mock_ds,
     ):
         req = VolumeRequest(
@@ -180,7 +193,7 @@ def test_fetch_historical_volume_records_mode() -> None:
             limit=100,
             request_id=_REQ_ID,
         )
-        res = fetch_historical_volume(req)
+        res = _unwrap(fetch_historical_volume(req))
         assert res.mode == "records"
         assert len(res.records) == 1
         assert res.records[0].volume == Decimal(500)
@@ -193,19 +206,23 @@ def test_public_get_symbol_metadata_and_list_symbols_keyword_style() -> None:
 
     with (
         patch(
-            "app.services.data.market_data.symbol_discovery.fetch_symbol_metadata",
+            "app.services.data.market_data.symbol_discovery._fetch_symbol_metadata_raw",
             return_value=mock_meta,
         ),
         patch(
-            "app.services.data.market_data.symbol_discovery.discover_symbols",
+            "app.services.data.market_data.symbol_discovery._discover_symbols_raw",
             return_value=mock_page,
         ),
-        patch("app.services.data.market_data.symbol_discovery.ensure_source_access"),
+        patch(
+            "app.services.data.market_data.symbol_discovery._ensure_source_access_raw"
+        ),
     ):
-        meta = get_symbol_metadata(source_id="mt5", symbol="EURUSD", request_id=_REQ_ID)
+        meta = _unwrap(
+            get_symbol_metadata(source_id="mt5", symbol="EURUSD", request_id=_REQ_ID)
+        )
         assert meta == mock_meta
 
-        page = list_symbols(source_id="mt5", limit=10, request_id=_REQ_ID)
+        page = _unwrap(list_symbols(source_id="mt5", limit=10, request_id=_REQ_ID))
         assert page == mock_page
 
 

@@ -95,14 +95,14 @@ def test_committed_lookup_and_lease_outcomes(monkeypatch: pytest.MonkeyPatch) ->
     }
     monkeypatch.setattr(
         backfill,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _transaction: SimpleNamespace(rows=(row,)),
     )
     assert backfill._committed_result(request, result.idempotency_key)
 
     monkeypatch.setattr(
         backfill,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _transaction: SimpleNamespace(rows=(), affected_rows=1),
     )
     backfill._acquire_lease(request, _NOW)
@@ -115,7 +115,7 @@ def test_committed_lookup_and_lease_outcomes(monkeypatch: pytest.MonkeyPatch) ->
     )
     monkeypatch.setattr(
         backfill,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _transaction: next(responses),
     )
     with pytest.raises(DataError) as exc_info:
@@ -130,20 +130,20 @@ def test_fetch_and_configured_storage_fail_closed(
     """Map source kinds and require an explicit existing DATA storage root."""
     request = _request()
     dataset = make_dataset().model_copy(update={"request_id": request.request_id})
-    monkeypatch.setattr(backfill, "fetch_market_dataset", lambda _request: dataset)
+    monkeypatch.setattr(backfill, "_fetch_market_dataset_raw", lambda _request: dataset)
     assert backfill._fetch_backfill_data(request) is dataset
 
     persisted: list[object] = []
     monkeypatch.setattr(
         backfill,
-        "execute_transaction",
+        "_execute_transaction_raw",
         persisted.append,
     )
 
     def _fail(_request: object) -> object:
         raise DataError("SOURCE_UNAVAILABLE")
 
-    monkeypatch.setattr(backfill, "fetch_market_dataset", _fail)
+    monkeypatch.setattr(backfill, "_fetch_market_dataset_raw", _fail)
     with pytest.raises(DataError):
         backfill._fetch_backfill_data(request)
     assert persisted
@@ -182,7 +182,7 @@ def test_publication_and_finalize_reject_incomplete_evidence(
 
     monkeypatch.setattr(
         backfill,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _transaction: SimpleNamespace(committed=False),
     )
     with pytest.raises(DataError):
@@ -258,12 +258,12 @@ def test_prepare_finalize_and_execute_protocol(monkeypatch: pytest.MonkeyPatch) 
     )
     monkeypatch.setattr(
         backfill,
-        "save_dataset",
+        "_save_dataset_raw",
         lambda _request: SimpleNamespace(content_hash="hash-fixture"),
     )
     monkeypatch.setattr(
         backfill,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _transaction: SimpleNamespace(committed=True),
     )
     prepared = backfill._prepare_artifact(
@@ -321,7 +321,7 @@ def test_recovery_classifies_recovered_and_blocked(
     )
     monkeypatch.setattr(
         recovery,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _transaction: SimpleNamespace(rows=rows),
     )
 

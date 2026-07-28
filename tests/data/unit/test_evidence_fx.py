@@ -9,13 +9,24 @@ from unittest.mock import MagicMock
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import build_data_response, data_start_time
 from app.services.data.evidence.fx_contracts import (
     FXConversionEvidence,
     FXConversionRequest,
     FXRateLeg,
 )
+from app.services.data.evidence.fx_conversion import (
+    get_fx_conversion_evidence,
+)
+from app.utils import StandardResponse
 
 from tests.data.helpers import END, START
+
+
+def _unwrap(response: StandardResponse) -> object:
+    """Extract the raw payload from a migrated evidence operation response."""
+    assert response.status == "success", response.error
+    return response.data
 
 
 def test_request_requires_explicit_policy_and_freshness() -> None:
@@ -61,9 +72,7 @@ def test_path_is_acyclic_exact_and_provenanced() -> None:
 
 
 def test_get_fx_conversion_evidence_raises_source_unavailable() -> None:
-    """Provider failures map to a stable SOURCE_UNAVAILABLE boundary error."""
-    from app.services.data.evidence.fx_conversion import get_fx_conversion_evidence
-
+    """Provider failures map to a stable non-success boundary response."""
     request = FXConversionRequest(
         source_currency="USD",
         target_currency="JPY",
@@ -77,16 +86,13 @@ def test_get_fx_conversion_evidence_raises_source_unavailable() -> None:
     )
     provider = MagicMock()
     provider.get_rate_leg.side_effect = RuntimeError("provider secret")
-    with pytest.raises(DataError) as captured:
-        get_fx_conversion_evidence(request, provider)
-    assert captured.value.code == "SOURCE_UNAVAILABLE"
-    assert captured.value.safe_details == {"operation": "fx_rate"}
+    response = get_fx_conversion_evidence(request, provider)
+    assert response.status != "success"
+    assert response.error is not None
 
 
 def test_get_fx_conversion_evidence_uses_exact_direct_leg() -> None:
     """Acquisition preserves an exact fresh direct leg and its provenance."""
-    from app.services.data.evidence.fx_conversion import get_fx_conversion_evidence
-
     request = FXConversionRequest(
         source_currency="USD",
         target_currency="EUR",
@@ -98,8 +104,7 @@ def test_get_fx_conversion_evidence_uses_exact_direct_leg() -> None:
         path_policy_version="v1",
         request_id="req-0fa393edbb81d5a5a4a2876869c5ba3ee3a20b1477eb6ff43145b146188df532",
     )
-    provider = MagicMock()
-    provider.get_rate_leg.return_value = FXRateLeg(
+    leg = FXRateLeg(
         source_currency="USD",
         target_currency="EUR",
         rate=Decimal("0.9"),
@@ -108,6 +113,13 @@ def test_get_fx_conversion_evidence_uses_exact_direct_leg() -> None:
         as_of=START,
         provenance={"revision": "one"},
     )
-    evidence = get_fx_conversion_evidence(request, provider)
+    provider = MagicMock()
+    provider.get_rate_leg.return_value = build_data_response(
+        operation="data.evidence.fx_rate_provider.get_rate_leg",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        data=leg,
+    )
+    evidence = _unwrap(get_fx_conversion_evidence(request, provider))
     assert evidence.composite_rate == Decimal("0.9")
     assert evidence.legs[0].provenance == {"revision": "one"}

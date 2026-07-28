@@ -18,12 +18,17 @@ from decimal import Decimal
 from typing import Final
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import generate_id, logger
 
 _REFRESH_NEXT_7_DAYS: Final[int] = 7
@@ -150,7 +155,7 @@ def _required_dt(row: dict[str, object], key: str) -> datetime:
     return value
 
 
-def from_row(row: dict[str, object]) -> EconomicEvent:
+def _from_row_raw(row: dict[str, object]) -> EconomicEvent:
     """Reconstruct one `EconomicEvent` from a stored row mapping.
 
     Args:
@@ -198,18 +203,31 @@ def from_row(row: dict[str, object]) -> EconomicEvent:
         ) from error
 
 
+def from_row(row: dict[str, object]) -> StandardResponse[EconomicEvent]:
+    """Reconstruct one `EconomicEvent` from a stored row mapping.
+
+    Args:
+        row: Column-name -> scalar mapping as returned by ``execute_transaction``.
+
+    Returns:
+        Standard response carrying the normalized economic event.
+
+    Raises:
+        (in-band) ``FILE_CORRUPTED`` when a stored row is malformed.
+    """
+    return run_data_operation(
+        operation="data.economic_calendar.from_row",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _from_row_raw(row),
+    )
+
+
 class EconomicEventStore:
     """Idempotent upsert and read access to ``data_economic_events``."""
 
-    def upsert(self, events: Sequence[EconomicEvent], *, request_id: str) -> int:
+    def _upsert_raw(self, events: Sequence[EconomicEvent], *, request_id: str) -> int:
         """Insert or refresh events under their composite provider key.
-
-        Args:
-            events: Normalized economic events to store.
-            request_id: Caller-supplied trace correlation id.
-
-        Returns:
-            Number of events written (each is one upsert row).
 
         Raises:
             DataError: If the bounded write transaction fails.
@@ -219,7 +237,7 @@ class EconomicEventStore:
         parameter_sets = tuple(_to_row(event) for event in events)
         statements = tuple(_UPSERT_SQL for _ in events)
         logger.info("Upserting %d economic events", len(events))
-        execute_transaction(
+        _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=statements,
@@ -231,7 +249,31 @@ class EconomicEventStore:
         )
         return len(events)
 
-    def query(
+    def upsert(
+        self, events: Sequence[EconomicEvent], *, request_id: str
+    ) -> StandardResponse[int]:
+        """Insert or refresh events under their composite provider key.
+
+        Args:
+            events: Normalized economic events to store.
+            request_id: Caller-supplied trace correlation id.
+
+        Returns:
+            Standard response carrying the number of events written (each is
+            one upsert row).
+
+        Raises:
+            (in-band) ``DataError`` codes when the bounded write transaction
+                fails.
+        """
+        return run_data_operation(
+            operation="data.economic_calendar.economic_event_store.upsert",
+            request_id=request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._upsert_raw(events, request_id=request_id),
+        )
+
+    def _query_raw(
         self,
         start: datetime,
         end: datetime,
@@ -244,20 +286,8 @@ class EconomicEventStore:
     ) -> list[EconomicEvent]:
         """Return stored events for a UTC window under optional filters.
 
-        Args:
-            start: Inclusive aware-UTC window start.
-            end: Exclusive aware-UTC window end.
-            currencies: Optional currency filter.
-            countries: Optional country filter.
-            minimum_impact: Optional impact filter.
-            provider: Optional provider filter.
-            request_id: Optional trace correlation id.
-
-        Returns:
-            Chronologically ordered normalized events matching the filters.
-
         Raises:
-            DataError: If the bounded read transaction fails.
+            DataError: If the window is invalid or the read transaction fails.
         """
         if start.tzinfo is None or end.tzinfo is None:
             raise DataError("VALIDATION_FAILED", safe_details={"field": "window"})
@@ -286,7 +316,7 @@ class EconomicEventStore:
         sql = f"{sql} ORDER BY scheduled_at ASC"
 
         logger.debug("Querying stored economic events")
-        result = execute_transaction(
+        result = _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=(sql,),
@@ -296,11 +326,72 @@ class EconomicEventStore:
                 request_id=request_id or generate_id("req"),
             )
         )
-        return [from_row(dict(row)) for row in result.rows]
+        return [_from_row_raw(dict(row)) for row in result.rows]
+
+    def query(
+        self,
+        start: datetime,
+        end: datetime,
+        *,
+        currencies: Sequence[str] | None = None,
+        countries: Sequence[str] | None = None,
+        minimum_impact: EventImpact | None = None,
+        provider: str | None = None,
+        request_id: str | None = None,
+    ) -> StandardResponse[list[EconomicEvent]]:
+        """Return stored events for a UTC window under optional filters.
+
+        Args:
+            start: Inclusive aware-UTC window start.
+            end: Exclusive aware-UTC window end.
+            currencies: Optional currency filter.
+            countries: Optional country filter.
+            minimum_impact: Optional impact filter.
+            provider: Optional provider filter.
+            request_id: Optional trace correlation id.
+
+        Returns:
+            Standard response carrying the chronologically ordered normalized
+            events matching the filters.
+
+        Raises:
+            (in-band) ``VALIDATION_FAILED`` when the window is invalid, plus
+                ``DataError`` codes when the bounded read transaction fails.
+        """
+        return run_data_operation(
+            operation="data.economic_calendar.economic_event_store.query",
+            request_id=request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._query_raw(
+                start,
+                end,
+                currencies=currencies,
+                countries=countries,
+                minimum_impact=minimum_impact,
+                provider=provider,
+                request_id=request_id,
+            ),
+        )
+
+    def _refresh_windows_raw(
+        self, *, now: datetime | None = None
+    ) -> tuple[tuple[datetime, datetime], tuple[datetime, datetime]]:
+        """Return the next-7-day and next-24-hour refresh windows as UTC bounds.
+
+        Raises:
+            DataError: If ``now`` is naive or not UTC.
+        """
+        observed = now if now is not None else datetime.now(UTC)
+        if observed.tzinfo is None or observed.utcoffset() != timedelta(0):
+            raise DataError("VALIDATION_FAILED", safe_details={"field": "now"})
+        return (
+            (observed, observed + timedelta(days=_REFRESH_NEXT_7_DAYS)),
+            (observed, observed + timedelta(hours=_REFRESH_NEXT_24_HOURS)),
+        )
 
     def refresh_windows(
         self, *, now: datetime | None = None
-    ) -> tuple[tuple[datetime, datetime], tuple[datetime, datetime]]:
+    ) -> StandardResponse[tuple[tuple[datetime, datetime], tuple[datetime, datetime]]]:
         """Return the next-7-day and next-24-hour refresh windows as UTC bounds.
 
         These are advisory refresh windows for the caller (section 7 of the
@@ -313,15 +404,17 @@ class EconomicEventStore:
             now: Optional observation instant; defaults to UTC now.
 
         Returns:
-            ``(seven_day_window, twenty_four_hour_window)`` as
-            ``(start, end)`` UTC datetime pairs.
+            Standard response carrying ``(seven_day_window,
+            twenty_four_hour_window)`` as ``(start, end)`` UTC datetime pairs.
+
+        Raises:
+            (in-band) ``VALIDATION_FAILED`` when ``now`` is naive or not UTC.
         """
-        observed = now if now is not None else datetime.now(UTC)
-        if observed.tzinfo is None or observed.utcoffset() != timedelta(0):
-            raise DataError("VALIDATION_FAILED", safe_details={"field": "now"})
-        return (
-            (observed, observed + timedelta(days=_REFRESH_NEXT_7_DAYS)),
-            (observed, observed + timedelta(hours=_REFRESH_NEXT_24_HOURS)),
+        return run_data_operation(
+            operation="data.economic_calendar.economic_event_store.refresh_windows",
+            request_id=generate_id("req"),
+            start_time=data_start_time(),
+            raw=lambda: self._refresh_windows_raw(now=now),
         )
 
 

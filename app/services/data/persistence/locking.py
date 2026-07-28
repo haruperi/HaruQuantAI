@@ -11,11 +11,16 @@ from typing import Self
 
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import logger
 
 _SQLITE_INTEGER_MAX = (1 << 63) - 1
@@ -178,7 +183,7 @@ class WriteLock:
     ) -> None:
         """Release this lease without deleting another owner's record."""
         logger.debug("Running DATA function: __exit__")
-        result = execute_transaction(
+        result = _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(
                     statements=(_RELEASE_LOCK,),
@@ -196,7 +201,7 @@ class WriteLock:
         self._entered = False
 
 
-def acquire_write_lock(path: Path, request_id: str) -> WriteLock:
+def _acquire_write_lock_raw(path: Path, request_id: str) -> WriteLock:
     """Atomically acquire one exclusive bounded lease for a resolved path.
 
     The Data-owned lock table is the sole migration-bootstrap exception. It is
@@ -214,11 +219,11 @@ def acquire_write_lock(path: Path, request_id: str) -> WriteLock:
         DataError: If input/configuration is invalid, persistence fails, or another
             unexpired owner holds the resolved path.
     """
-    logger.debug("Running DATA function: acquire_write_lock")
+    logger.debug("Running DATA function: _acquire_write_lock_raw")
     validated_request_id = _validate_request_id(request_id)
     resolved_path = _resolve_path(path, validated_request_id)
     now_ns, expires_at_ns = _lease_expiry(validated_request_id)
-    result = execute_transaction(
+    result = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(_CREATE_LOCK_TABLE, _ACQUIRE_LOCK),
@@ -261,6 +266,29 @@ def acquire_write_lock(path: Path, request_id: str) -> WriteLock:
         request_id=validated_request_id,
         expires_at_ns=parsed_expiry,
         recovery_count=recovery_count,
+    )
+
+
+def acquire_write_lock(path: Path, request_id: str) -> StandardResponse[WriteLock]:
+    """Atomically acquire one exclusive bounded lease for a resolved path.
+
+    Args:
+        path: Filesystem path whose resolved identity must have one writer.
+        request_id: Non-empty caller-owned trace and lease-owner identifier.
+
+    Returns:
+        Standard response carrying an acquired context manager that releases only
+        its exact owner record.
+
+    Raises:
+        (in-band) ``DataError`` codes if input/configuration is invalid,
+            persistence fails, or another unexpired owner holds the path.
+    """
+    return run_data_operation(
+        operation="data.persistence.acquire_write_lock",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _acquire_write_lock_raw(path, request_id),
     )
 
 

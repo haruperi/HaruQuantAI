@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
@@ -17,6 +17,14 @@ from app.services.data.persistence.migrations import (
 )
 from app.services.data.persistence.transactions import execute_transaction
 from app.utils import generate_id
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _configure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
@@ -31,14 +39,16 @@ def _configure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
 def _table_exists(name: str, request_id: str) -> bool:
     """Return True when a named table exists on the configured database."""
     sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
-    result = execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(sql,),
-                parameter_sets=((name,),),
-                max_rows=1,
-            ),
-            request_id=request_id,
+    result = _unwrap(
+        execute_transaction(
+            TransactionRequest(
+                plan=StatementPlan(
+                    statements=(sql,),
+                    parameter_sets=((name,),),
+                    max_rows=1,
+                ),
+                request_id=request_id,
+            )
         )
     )
     return any(row.get("name") == name for row in result.rows)
@@ -58,7 +68,7 @@ def test_run_data_migrations_creates_economic_events_table(
     """The canonical DATA migration runner creates ``data_economic_events``."""
     _configure(monkeypatch, tmp_path)
 
-    run_data_migrations(generate_id("req"))
+    _unwrap(run_data_migrations(generate_id("req")))
 
     request_id = generate_id("req")
     assert _table_exists("data_economic_events", request_id)
@@ -70,8 +80,8 @@ def test_run_data_migrations_is_idempotent_on_re_run(
     """A second run skips both steps and changes no state."""
     _configure(monkeypatch, tmp_path)
 
-    first = run_data_migrations(generate_id("req"))
-    second = run_data_migrations(generate_id("req"))
+    first = _unwrap(run_data_migrations(generate_id("req")))
+    second = _unwrap(run_data_migrations(generate_id("req")))
 
     assert tuple(first.applied_ids) == (
         "001_initial_data_schema",
@@ -91,18 +101,20 @@ def test_running_only_step_one_before_step_two_can_be_repaired_by_running_first(
     _configure(monkeypatch, tmp_path)
     step_one_only = (DATA_MIGRATION_STEPS[0],)
     run_domain_migrations_with_steps(step_one_only)
-    run_data_migrations(generate_id("req"))
+    _unwrap(run_data_migrations(generate_id("req")))
 
 
 def run_domain_migrations_with_steps(steps: tuple[object, ...]) -> None:
     """Delegate wrapper kept here so the demo stays self-contained."""
     from app.services.data.persistence.contracts import MigrationRequest
 
-    run_domain_migrations(
-        MigrationRequest(
-            domain="data",
-            steps=tuple(steps),  # type: ignore[arg-type]
-            request_id=generate_id("req"),
+    _unwrap(
+        run_domain_migrations(
+            MigrationRequest(
+                domain="data",
+                steps=tuple(steps),  # type: ignore[arg-type]
+                request_id=generate_id("req"),
+            )
         )
     )
 
@@ -113,7 +125,7 @@ def test_checksum_mismatch_on_economic_events_step_blocks(
     """Modifying the applied 002 checksum fails migration invariance."""
     _configure(monkeypatch, tmp_path)
 
-    run_data_migrations(generate_id("req"))
+    _unwrap(run_data_migrations(generate_id("req")))
 
     from app.services.data.persistence.contracts import MigrationRequest, MigrationStep
 
@@ -123,11 +135,12 @@ def test_checksum_mismatch_on_economic_events_step_blocks(
         checksum="tampered",
         statements=("SELECT 1",),
     )
-    with pytest.raises(DataError):
-        run_domain_migrations(
-            MigrationRequest(
-                domain="data",
-                steps=(DATA_MIGRATION_STEPS[0], bad_step),
-                request_id=generate_id("req"),
-            )
+    response = run_domain_migrations(
+        MigrationRequest(
+            domain="data",
+            steps=(DATA_MIGRATION_STEPS[0], bad_step),
+            request_id=generate_id("req"),
         )
+    )
+    assert response.status == "error"
+    assert response.error is not None

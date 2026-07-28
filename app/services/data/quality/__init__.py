@@ -13,6 +13,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+    unwrap_data_response,
+)
+from app.utils import generate_id
+
 if TYPE_CHECKING:
     from app.services.data.contracts import (
         DataQualityReport,
@@ -41,16 +49,26 @@ from app.services.data.quality.series import (
 
 def inspect_data_quality(
     dataset: MarketDataset,
-) -> DataQualityReport:
+) -> StandardResponse[DataQualityReport]:
     """Inspect one canonical dataset through the package quality facade.
 
     Args:
         dataset: Canonical dataset whose series evidence must be measured.
 
     Returns:
-        Deterministic bounded quality evidence.
+        Standard response carrying deterministic bounded quality evidence.
     """
-    return inspect_dataset_quality(dataset)
+    request_id = generate_id("req")
+    return run_data_operation(
+        operation="data.quality.inspect_data_quality",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: unwrap_data_response(
+            inspect_dataset_quality(dataset),
+            operation="data.quality.inspect_data_quality",
+            request_id=request_id,
+        ),
+    )
 
 
 __all__ = [

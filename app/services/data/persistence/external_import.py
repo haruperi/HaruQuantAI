@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import ValidationError
 
 from app.services.data._settings import get_data_settings
-from app.services.data.audit.store import persist_audit_event
+from app.services.data.audit.store import _persist_audit_event_raw
 from app.services.data.contracts import (
     DataError,
     DataQualityReport,
@@ -26,13 +26,21 @@ from app.services.data.contracts import (
     SpreadRecord,
     TickRecord,
 )
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     IMPORT_DIALECTS,
     DatasetSaveRequest,
     ExternalImportRequest,
+    StorageManifest,
 )
-from app.services.data.persistence.dataset_writer import save_dataset
-from app.services.data.quality import inspect_records_quality
+from app.services.data.persistence.dataset_writer import _save_dataset_raw
+from app.services.data.quality.series import (
+    _inspect_records_quality_raw as inspect_records_quality,
+)
 from app.utils import AuditEvent, generate_id, logger
 
 if TYPE_CHECKING:
@@ -41,7 +49,7 @@ if TYPE_CHECKING:
     import pandas as pd
 
     from app.services.data.contracts.dataset import CanonicalRecord
-    from app.services.data.persistence.contracts import ColumnMapping, StorageManifest
+    from app.services.data.persistence.contracts import ColumnMapping
 else:
 
     class _LazyPandas:
@@ -57,15 +65,26 @@ IMPORT_NORMALIZATION_VERSION = "v1"
 _MT5_TIME_COLUMNS = ("<DATE>", "<TIME>")
 
 
-def describe_import_dialects() -> Mapping[str, str]:
+def _describe_import_dialects_raw() -> Mapping[str, str]:
+    """Return the supported deterministic header and delimiter dialects."""
+    logger.debug("Describing supported DATA import dialects")
+    return IMPORT_DIALECTS
+
+
+def describe_import_dialects() -> StandardResponse[Mapping[str, str]]:
     """Return the supported deterministic header and delimiter dialects.
 
     Returns:
-        An immutable mapping of dialect identifier to its exact meaning. A dialect
-        outside this set is rejected by `ExternalImportRequest`.
+        Standard response carrying an immutable mapping of dialect identifier to
+        its exact meaning. A dialect outside this set is rejected by
+        `ExternalImportRequest`.
     """
-    logger.debug("Describing supported DATA import dialects")
-    return IMPORT_DIALECTS
+    return run_data_operation(
+        operation="data.persistence.describe_import_dialects",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=_describe_import_dialects_raw,
+    )
 
 
 def _resolve_source_path(request: ExternalImportRequest) -> Path:
@@ -378,7 +397,7 @@ def _require_acceptable_quality(
 def _audit_import(request: ExternalImportRequest, record_count: int) -> None:
     """Record the external origin of an admitted artifact."""
     logger.info("Recording external import provenance for %s", request.symbol)
-    persist_audit_event(
+    _persist_audit_event_raw(
         AuditEvent(
             contract_version="v1",
             schema_id="utils.audit_event.v1",
@@ -401,7 +420,7 @@ def _audit_import(request: ExternalImportRequest, record_count: int) -> None:
     )
 
 
-def import_external_dataset(request: ExternalImportRequest) -> StorageManifest:
+def _import_external_dataset_raw(request: ExternalImportRequest) -> StorageManifest:
     """Admit one externally produced artifact into canonical manifest-backed form.
 
     No governed field is inferred from file contents: the caller declares the symbol,
@@ -455,7 +474,7 @@ def import_external_dataset(request: ExternalImportRequest) -> StorageManifest:
         request_id=request.request_id,
     )
 
-    manifest = save_dataset(
+    manifest = _save_dataset_raw(
         DatasetSaveRequest(
             dataset=dataset,
             relative_path=request.destination_path,
@@ -466,6 +485,25 @@ def import_external_dataset(request: ExternalImportRequest) -> StorageManifest:
     )
     _audit_import(request, len(records))
     return manifest
+
+
+def import_external_dataset(
+    request: ExternalImportRequest,
+) -> StandardResponse[StorageManifest]:
+    """Admit one externally produced artifact into canonical manifest-backed form.
+
+    Args:
+        request: The explicit import declaration.
+
+    Returns:
+        Standard response carrying the manifest of the committed canonical artifact.
+    """
+    return run_data_operation(
+        operation="data.persistence.import_external_dataset",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _import_external_dataset_raw(request),
+    )
 
 
 __all__ = ["describe_import_dialects", "import_external_dataset"]

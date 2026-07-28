@@ -13,7 +13,12 @@ from typing import TYPE_CHECKING, Final, NamedTuple
 
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import DataError
-from app.utils import logger
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
+from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -65,11 +70,8 @@ _MIN_SPIKE_RECORDS: Final = 3
 _MIN_GAP_RECORDS: Final = 2
 
 
-def get_quality_policy() -> QualityPolicy:
-    """Return the active immutable quality thresholds.
-
-    Returns:
-        The frozen policy named by `QUALITY_PROFILE`.
+def _get_quality_policy_raw() -> QualityPolicy:
+    """Resolve the active immutable quality thresholds without response wrapping.
 
     Raises:
         DataError: If the configured profile is not recognized.
@@ -82,16 +84,30 @@ def get_quality_policy() -> QualityPolicy:
     return policy
 
 
-def summarize_quality_remediation(report: DataQualityReport) -> Mapping[str, str]:
-    """Map each detected issue code to its recommended remediation action.
-
-    The dataset is neither mutated nor remediated; this returns evidence only.
+def get_quality_policy() -> StandardResponse[QualityPolicy]:
+    """Return the active immutable quality thresholds.
 
     Args:
-        report: The quality evidence to summarize.
+        (none)
 
     Returns:
-        An ordered mapping of issue code to recommended action.
+        Standard response carrying the frozen policy named by ``QUALITY_PROFILE``.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when the configured profile is unrecognized.
+    """
+    return run_data_operation(
+        operation="data.quality.get_quality_policy",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=_get_quality_policy_raw,
+    )
+
+
+def _summarize_quality_remediation_raw(
+    report: DataQualityReport,
+) -> Mapping[str, str]:
+    """Map each detected issue code to remediation without response wrapping.
 
     Raises:
         DataError: If the report carries an unknown issue code.
@@ -107,6 +123,30 @@ def summarize_quality_remediation(report: DataQualityReport) -> Mapping[str, str
             )
         summary[issue.code] = action
     return summary
+
+
+def summarize_quality_remediation(
+    report: DataQualityReport,
+) -> StandardResponse[Mapping[str, str]]:
+    """Map each detected issue code to its recommended remediation action.
+
+    The dataset is neither mutated nor remediated; this returns evidence only.
+
+    Args:
+        report: The quality evidence to summarize.
+
+    Returns:
+        Standard response carrying an ordered mapping of issue code to action.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when the report carries an unknown code.
+    """
+    return run_data_operation(
+        operation="data.quality.summarize_quality_remediation",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _summarize_quality_remediation_raw(report),
+    )
 
 
 __all__ = [

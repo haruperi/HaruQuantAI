@@ -13,6 +13,7 @@ from app.services.data.contracts import (
     SpreadRecord,
     TickRecord,
 )
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.transformation.alignment import align_datasets
 from app.services.data.transformation.resampling import resample_dataset
 from app.services.data.transformation.tabular import (
@@ -29,6 +30,22 @@ from app.services.data.transformation.tick_aggregation import aggregate_ticks
 from app.utils import generate_id
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
+
+
+def _unwrap(response: object) -> object:
+    """Unwrap a successful Data standard response to its raw payload.
+
+    Args:
+        response: Standard response returned by a migrated Data operation.
+
+    Returns:
+        The raw ``data`` payload.
+    """
+    return unwrap_data_response(
+        response,  # type: ignore[arg-type]
+        operation="data.transformation.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _quality(count: int) -> DataQualityReport:
@@ -119,10 +136,12 @@ def test_transformations_produce_canonical_datasets() -> None:
     bars = _dataset(_bars(), "bars", "M1")
     ticks = _dataset(_ticks(), "ticks", None)
 
-    assert resample_dataset(bars, "M5").record_count == 1
-    aligned = align_datasets({"bars": bars}, (bars.available_at,))
-    assert aligned["bars"].record_count == 1
-    assert aggregate_ticks(ticks, "M1", "mid").record_count == 1
+    assert _unwrap(resample_dataset(bars, "M5")).record_count == 1  # type: ignore[attr-defined]
+    aligned = _unwrap(align_datasets({"bars": bars}, (bars.available_at,)))
+    assert aligned["bars"].record_count == 1  # type: ignore[union-attr]
+    assert (
+        _unwrap(aggregate_ticks(ticks, "M1", "mid")).record_count == 1  # type: ignore[attr-defined]
+    )
 
 
 def test_alignment_supports_all_record_types_and_rejects_bad_targets() -> None:
@@ -141,51 +160,50 @@ def test_alignment_supports_all_record_types_and_rejects_bad_targets() -> None:
     spreads = _dataset((spread,), "spreads", None)
     target = (_START + timedelta(seconds=2),)
 
-    assert align_datasets({"ticks": ticks, "spreads": spreads}, target)
-    assert align_datasets({}, ()) == {}
+    assert _unwrap(align_datasets({"ticks": ticks, "spreads": spreads}, target))
+    assert _unwrap(align_datasets({}, ())) == {}  # type: ignore[comparison-overlap]
     naive = datetime(2026, 1, 1)  # noqa: DTZ001 - ambiguity is under test.
     for invalid in ((), (naive,), (target[0], _START)):
-        with pytest.raises(DataError):
-            align_datasets({"ticks": ticks}, invalid)
-    with pytest.raises(DataError):
-        align_datasets({"ticks": ticks}, (_START,))
+        response = align_datasets({"ticks": ticks}, invalid)
+        assert response.status == "error"
+    response = align_datasets({"ticks": ticks}, (_START,))
+    assert response.status == "error"
 
 
 @pytest.mark.parametrize("policy", ["bid", "ask", "last"])
 def test_tick_aggregation_price_policies(policy: str) -> None:
     """Exercise each supported exact price-selection policy."""
-    assert aggregate_ticks(_dataset(_ticks(), "ticks", None), "M1", policy).records
+    aggregated = _unwrap(
+        aggregate_ticks(_dataset(_ticks(), "ticks", None), "M1", policy)
+    )
+    assert aggregated.records  # type: ignore[attr-defined]
 
 
 def test_transformations_reject_invalid_evidence() -> None:
     """Reject wrong kinds, empty ticks, unsupported policies, and identities."""
     bars = _dataset(_bars(), "bars", "M1")
     ticks = _dataset(_ticks(), "ticks", None)
-    with pytest.raises(DataError):
-        resample_dataset(ticks, "M5")
-    with pytest.raises(DataError):
-        aggregate_ticks(bars, "M1", "last")
-    with pytest.raises(DataError):
-        aggregate_ticks(_dataset((), "ticks", None), "M1", "last")
-    with pytest.raises(DataError):
-        aggregate_ticks(ticks, "M1", "unsupported")
+    assert resample_dataset(ticks, "M5").status == "error"
+    assert aggregate_ticks(bars, "M1", "last").status == "error"
+    assert aggregate_ticks(_dataset((), "ticks", None), "M1", "last").status == "error"
+    assert aggregate_ticks(ticks, "M1", "unsupported").status == "error"
 
 
 def test_tabular_projection_and_serialization() -> None:
     """Project detached frames and serialize supported exact values."""
     bars = _dataset(_bars(), "bars", "M1")
     ticks = _dataset(_ticks(), "ticks", None)
-    bar_frame = to_ohlcv_dataframe(bars)
-    tick_frame = to_tick_dataframe(ticks)
+    bar_frame = _unwrap(to_ohlcv_dataframe(bars))
+    tick_frame = _unwrap(to_tick_dataframe(ticks))
 
-    assert bar_frame.attrs["spread_unit"] == "USD"
-    assert tick_frame.attrs["price_unit"] == "USD"
+    assert bar_frame.attrs["spread_unit"] == "USD"  # type: ignore[union-attr]
+    assert tick_frame.attrs["price_unit"] == "USD"  # type: ignore[union-attr]
     assert bars_to_records(_bars())[0]["source"] == "fixture"
-    serialized = serialize_dataframe_records(bar_frame.head(1))
+    serialized = serialize_dataframe_records(bar_frame.head(1))  # type: ignore[union-attr]
     assert serialized[0]["timestamp"].endswith("Z")
-    assert compare_dataframes(bar_frame, bar_frame.copy())
-    assert compare_ohlc(bar_frame, bar_frame.copy())
-    assert compare_ohlcv(bar_frame, bar_frame.copy())
+    assert compare_dataframes(bar_frame, bar_frame.copy())  # type: ignore[arg-type]
+    assert compare_ohlc(bar_frame, bar_frame.copy())  # type: ignore[arg-type]
+    assert compare_ohlcv(bar_frame, bar_frame.copy())  # type: ignore[arg-type]
 
 
 def test_dataframe_alignment_uses_aware_utc_copy() -> None:
@@ -236,10 +254,8 @@ def test_tabular_operations_reject_ambiguous_inputs() -> None:
         )
     bars = _dataset(_bars(), "bars", "M1")
     ticks = _dataset(_ticks(), "ticks", None)
-    with pytest.raises(DataError):
-        to_ohlcv_dataframe(ticks)
-    with pytest.raises(DataError):
-        to_tick_dataframe(bars)
+    assert to_ohlcv_dataframe(ticks).status == "error"
+    assert to_tick_dataframe(bars).status == "error"
     with pytest.raises(DataError):
         compare_ohlc(pd.DataFrame({"open": [1]}), pd.DataFrame({"open": [1]}))
     with pytest.raises(DataError):

@@ -15,6 +15,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+    unwrap_data_response,
+)
 from app.utils import logger
 
 if TYPE_CHECKING:
@@ -30,12 +36,12 @@ class MarketContextProvider(Protocol):
     def get_market_context(
         self,
         request: MarketContextRequest,
-    ) -> MarketContextEvidence:
+    ) -> StandardResponse[MarketContextEvidence]:
         """Return normalized context evidence for the exact request."""
         ...
 
 
-def get_market_context_evidence(
+def _get_market_context_evidence_raw(
     request: MarketContextRequest,
     provider: MarketContextProvider,
 ) -> MarketContextEvidence:
@@ -52,17 +58,11 @@ def get_market_context_evidence(
         DataError: If the provider fails or mandatory evidence is stale or absent.
     """
     logger.info("Acquiring market context for request %s", request.request_id)
-    try:
-        evidence = provider.get_market_context(request)
-    except DataError:
-        raise
-    except Exception as error:
-        logger.error("Market-context provider failed")
-        raise DataError(
-            "SOURCE_UNAVAILABLE",
-            safe_details={"operation": "market_context"},
-            request_id=request.request_id,
-        ) from error
+    evidence = unwrap_data_response(
+        provider.get_market_context(request),
+        operation="data.evidence.get_market_context_evidence",
+        request_id=request.request_id,
+    )
 
     if (
         evidence.symbol != request.symbol
@@ -108,6 +108,31 @@ def get_market_context_evidence(
             request_id=request.request_id,
         )
     return evidence
+
+
+def get_market_context_evidence(
+    request: MarketContextRequest,
+    provider: MarketContextProvider,
+) -> StandardResponse[MarketContextEvidence]:
+    """Acquire and verify requested market context without producing a Risk verdict.
+
+    Args:
+        request: Exact context scope and freshness requirement.
+        provider: Caller-injected read-only context provider.
+
+    Returns:
+        Standard response carrying verified immutable market-context evidence.
+
+    Raises:
+        DataError: Never; failures surface as an error response. Cancellation and
+            process-control exceptions propagate.
+    """
+    return run_data_operation(
+        operation="data.evidence.get_market_context_evidence",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_market_context_evidence_raw(request, provider),
+    )
 
 
 __all__ = ["MarketContextProvider", "get_market_context_evidence"]

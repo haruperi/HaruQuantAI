@@ -3,30 +3,39 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.local_datasets.contracts import DatasetLoadRequest
-from app.services.data.persistence.dataset_writer import load_local_dataset
+from app.services.data.persistence.dataset_writer import _load_local_dataset_raw
 from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.data.contracts import MarketDataset
 
 
-def load_csv(path: Path | str) -> MarketDataset:
+def load_csv(path: Path | str) -> StandardResponse[MarketDataset]:
     """Load one manifest-backed CSV dataset.
 
     Args:
         path: Approved-root-relative CSV artifact path.
 
     Returns:
-        The normalized canonical market dataset.
+        Standard response carrying the normalized canonical market dataset.
     """
     logger.info("Loading a local CSV dataset")
-    return load_local_dataset(
-        DatasetLoadRequest(
-            relative_path=Path(path),
-            format="csv",
-            request_id=generate_id("req"),
-        )
+    request = DatasetLoadRequest(
+        relative_path=Path(path),
+        format="csv",
+        request_id=generate_id("req"),
+    )
+    return run_data_operation(
+        operation="data.local_datasets.load_csv",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _load_local_dataset_raw(request),
     )
 
 

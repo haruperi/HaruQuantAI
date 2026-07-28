@@ -7,7 +7,7 @@ import time
 from unittest.mock import MagicMock
 
 import pytest
-from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourceIdentity,
@@ -23,6 +23,15 @@ from app.services.data.sources.registry import (
     resolve_source,
     resolve_source_identity,
 )
+
+_REQ_ID = "req-00000000-0000-4000-8000-000000000000"
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.sources.test", request_id=_REQ_ID
+    )
 
 
 def _make_descriptor(source_id: str) -> SourceDescriptor:
@@ -68,12 +77,12 @@ def test_registry_lazy_resolution() -> None:
     assert factory_calls == 0  # Lazy check: no instant factory invocation
 
     # Resolve first time
-    first = resolve_source("test-lazy")
+    first = _unwrap(resolve_source("test-lazy"))
     assert first is mock_source
     assert factory_calls == 1
 
     # Resolve second time (should hit cache)
-    second = resolve_source("test-lazy")
+    second = _unwrap(resolve_source("test-lazy"))
     assert second is mock_source
     assert factory_calls == 1
 
@@ -86,16 +95,18 @@ def test_registry_rejects_duplicate_registration() -> None:
         return MagicMock(spec=MarketDataSource)
 
     register_source(descriptor, factory)
-    with pytest.raises(DataError) as captured:
-        register_source(descriptor, factory)
-    assert captured.value.code == "VALIDATION_FAILED"
+    response = register_source(descriptor, factory)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def test_resolve_missing_source() -> None:
-    """Verify resolve_source raises DataError for non-existent source."""
-    with pytest.raises(DataError) as captured:
-        resolve_source("missing-source")
-    assert captured.value.code == "SOURCE_UNAVAILABLE"
+    """Verify resolve_source fails closed for non-existent source."""
+    response = resolve_source("missing-source")
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "SOURCE_UNAVAILABLE"
 
 
 def test_registry_thread_safety() -> None:
@@ -116,7 +127,7 @@ def test_registry_thread_safety() -> None:
     threads = []
 
     def worker() -> None:
-        inst = resolve_source("test-thread")
+        inst = _unwrap(resolve_source("test-thread"))
         resolved_instances.append(inst)
 
     # Spawn 10 concurrent threads resolving same lazy source
@@ -142,7 +153,7 @@ def test_list_registered_sources() -> None:
     register_source(desc1, lambda: MagicMock(spec=MarketDataSource))
     register_source(desc2, lambda: MagicMock(spec=MarketDataSource))
 
-    all_desc = list_registered_sources()
+    all_desc = _unwrap(list_registered_sources())
     assert len(all_desc) == 2
     assert {d.source_id for d in all_desc} == {"test-1", "test-2"}
 

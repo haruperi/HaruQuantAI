@@ -17,11 +17,16 @@ from itertools import pairwise
 from typing import TYPE_CHECKING
 
 from app.services.data.contracts.dataset import QualityIssue
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.quality.scoring import (
     _MIN_SPIKE_RECORDS,
     _issue,
 )
-from app.utils import logger
+from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -30,9 +35,12 @@ if TYPE_CHECKING:
     from app.services.data.time_sessions.contracts import SessionWindow
 
 from app.services.data.contracts.dataset import QUALITY_SAMPLE_LIMIT
-from app.services.data.quality.policy import QualityPolicy, get_quality_policy
-from app.services.data.time_sessions.gaps import GapType, classify_gap
-from app.services.data.time_sessions.timeframes import get_timeframe_spec
+from app.services.data.quality.policy import QualityPolicy, _get_quality_policy_raw
+from app.services.data.time_sessions.gaps import GapType
+from app.services.data.time_sessions.gaps import _classify_gap_raw as classify_gap
+from app.services.data.time_sessions.timeframes import (
+    _get_timeframe_spec_raw as get_timeframe_spec,
+)
 
 
 def _closes(records: Sequence[CanonicalRecord]) -> list[Decimal] | None:
@@ -158,7 +166,7 @@ def detect_price_jumps(
     *,
     policy: QualityPolicy | None = None,
     limit: int = QUALITY_SAMPLE_LIMIT,
-) -> QualityIssue | None:
+) -> StandardResponse[QualityIssue | None]:
     """Detect closes that moved beyond the profile's sigma bound.
 
     Args:
@@ -167,10 +175,15 @@ def detect_price_jumps(
         limit: Maximum number of bounded samples to attach to the issue.
 
     Returns:
-        One ``PRICE_SPIKE`` issue, or ``None`` when no close breaches the bound.
+        Standard response carrying one ``PRICE_SPIKE`` issue, or ``None`` when no
+        close breaches the bound.
     """
-    logger.debug("Detecting price jumps")
-    return _detect_spikes(records, policy or get_quality_policy(), limit)
+    return run_data_operation(
+        operation="data.quality.detect_price_jumps",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_spikes(records, policy or _get_quality_policy_raw(), limit),
+    )
 
 
 def detect_flatline_periods(
@@ -178,7 +191,7 @@ def detect_flatline_periods(
     *,
     policy: QualityPolicy | None = None,
     limit: int = QUALITY_SAMPLE_LIMIT,
-) -> QualityIssue | None:
+) -> StandardResponse[QualityIssue | None]:
     """Detect runs of unchanged closing price longer than the profile allows.
 
     Args:
@@ -187,18 +200,22 @@ def detect_flatline_periods(
         limit: Maximum number of bounded samples to attach to the issue.
 
     Returns:
-        One ``FLAT_LINE`` issue, or ``None`` when no run exceeds the threshold.
+        Standard response carrying one ``FLAT_LINE`` issue, or ``None`` when no run
+        exceeds the threshold.
     """
-    logger.debug("Detecting flat-line periods")
-    active = policy or get_quality_policy()
-    return _detect_runs(
-        records,
-        "close",
-        active.flatline_run,
-        "FLAT_LINE",
-        "Consecutive identical closes were observed.",
-        limit,
-        zero_only=False,
+    return run_data_operation(
+        operation="data.quality.detect_flatline_periods",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_runs(
+            records,
+            "close",
+            (policy or _get_quality_policy_raw()).flatline_run,
+            "FLAT_LINE",
+            "Consecutive identical closes were observed.",
+            limit,
+            zero_only=False,
+        ),
     )
 
 
@@ -207,7 +224,7 @@ def detect_zero_volume_bars(
     *,
     policy: QualityPolicy | None = None,
     limit: int = QUALITY_SAMPLE_LIMIT,
-) -> QualityIssue | None:
+) -> StandardResponse[QualityIssue | None]:
     """Detect runs of zero-volume records longer than the profile allows.
 
     Shares ``_detect_runs`` with flat-line detection: both scan for a run of an
@@ -220,18 +237,22 @@ def detect_zero_volume_bars(
         limit: Maximum number of bounded samples to attach to the issue.
 
     Returns:
-        One ``ZERO_VOLUME`` issue, or ``None`` when no run exceeds the threshold.
+        Standard response carrying one ``ZERO_VOLUME`` issue, or ``None`` when no run
+        exceeds the threshold.
     """
-    logger.debug("Detecting zero-volume runs")
-    active = policy or get_quality_policy()
-    return _detect_runs(
-        records,
-        "volume",
-        active.zero_volume_run,
-        "ZERO_VOLUME",
-        "Consecutive zero-volume records were observed.",
-        limit,
-        zero_only=True,
+    return run_data_operation(
+        operation="data.quality.detect_zero_volume_bars",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_runs(
+            records,
+            "volume",
+            (policy or _get_quality_policy_raw()).zero_volume_run,
+            "ZERO_VOLUME",
+            "Consecutive zero-volume records were observed.",
+            limit,
+            zero_only=True,
+        ),
     )
 
 
@@ -240,7 +261,7 @@ def detect_extreme_spread_widening(
     *,
     policy: QualityPolicy | None = None,
     limit: int = QUALITY_SAMPLE_LIMIT,
-) -> QualityIssue | None:
+) -> StandardResponse[QualityIssue | None]:
     """Detect spreads beyond the profile ceiling.
 
     Args:
@@ -249,10 +270,17 @@ def detect_extreme_spread_widening(
         limit: Maximum number of bounded samples to attach to the issue.
 
     Returns:
-        One ``SPREAD_BREACH`` issue, or ``None`` when every spread is within bounds.
+        Standard response carrying one ``SPREAD_BREACH`` issue, or ``None`` when every
+        spread is within bounds.
     """
-    logger.debug("Detecting extreme spread widening")
-    return _detect_spread_breach(records, policy or get_quality_policy(), limit)
+    return run_data_operation(
+        operation="data.quality.detect_extreme_spread_widening",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_spread_breach(
+            records, policy or _get_quality_policy_raw(), limit
+        ),
+    )
 
 
 def detect_unexpected_gaps(
@@ -289,7 +317,7 @@ def detect_unexpected_gaps(
         every gap is accounted for by a session break or weekend.
     """
     logger.debug("Detecting unexpected gaps against declared sessions")
-    active = policy or get_quality_policy()
+    active = policy or _get_quality_policy_raw()
     if timeframe is None or len(records) < _MIN_GAP_PAIR:
         return None
     spec = get_timeframe_spec(timeframe)

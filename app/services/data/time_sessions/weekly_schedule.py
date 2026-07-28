@@ -4,6 +4,11 @@ from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.time_sessions.contracts import (
     MarketSchedule,
     SessionWindow,
@@ -11,6 +16,7 @@ from app.services.data.time_sessions.contracts import (
     WeeklyHoliday,
     WeeklyScheduleDefinition,
 )
+from app.utils import generate_id
 
 
 class WeeklyScheduleProvider:
@@ -24,7 +30,7 @@ class WeeklyScheduleProvider:
         """
         self._definition = definition
 
-    def get_sessions(
+    def _get_sessions_raw(
         self,
         *,
         start: datetime,
@@ -70,7 +76,33 @@ class WeeklyScheduleProvider:
             )
         )
 
-    def get_schedule(
+    def get_sessions(
+        self,
+        *,
+        start: datetime,
+        end: datetime,
+    ) -> StandardResponse[tuple[TradingSession, ...]]:
+        """Expand configured sessions intersecting a bounded UTC range.
+
+        Args:
+            start: Inclusive UTC range start.
+            end: Exclusive UTC range end.
+
+        Returns:
+            Standard response carrying ordered configured sessions.
+
+        Raises:
+            (in-band) ``INVALID_INPUT`` if bounds, effective dates, or timezone are
+            invalid.
+        """
+        return run_data_operation(
+            operation="data.time_sessions.weekly_schedule_provider.get_sessions",
+            request_id=generate_id("req"),
+            start_time=data_start_time(),
+            raw=lambda: self._get_sessions_raw(start=start, end=end),
+        )
+
+    def _get_schedule_raw(
         self,
         *,
         source_id: str,
@@ -104,7 +136,7 @@ class WeeklyScheduleProvider:
                 safe_details={"field": "weekly_schedule_identity"},
                 request_id=request_id,
             )
-        sessions = self.get_sessions(
+        sessions = self._get_sessions_raw(
             start=observed_at,
             end=observed_at + timedelta(days=8),
         )
@@ -124,6 +156,44 @@ class WeeklyScheduleProvider:
             sessions=windows,
             observed_at=observed_at,
             request_id=request_id,
+        )
+
+    def get_schedule(
+        self,
+        *,
+        source_id: str,
+        symbol: str,
+        timezone: str,
+        observed_at: datetime,
+        request_id: str,
+    ) -> StandardResponse[MarketSchedule]:
+        """Return the next seven days as the canonical Data schedule.
+
+        Args:
+            source_id: Requested source identifier.
+            symbol: Requested exact symbol.
+            timezone: Requested display timezone identity.
+            observed_at: UTC observation instant.
+            request_id: Canonical trace identity.
+
+        Returns:
+            Standard response carrying the current configured schedule.
+
+        Raises:
+            (in-band) ``INVALID_INPUT`` if the requested identity differs from the
+            definition.
+        """
+        return run_data_operation(
+            operation="data.time_sessions.weekly_schedule_provider.get_schedule",
+            request_id=request_id,
+            start_time=data_start_time(),
+            raw=lambda: self._get_schedule_raw(
+                source_id=source_id,
+                symbol=symbol,
+                timezone=timezone,
+                observed_at=observed_at,
+                request_id=request_id,
+            ),
         )
 
     def _sessions_for_date(

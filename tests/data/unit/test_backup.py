@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 from app.services.data._settings import DataSettings, data_settings_context
-from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.backup import (
     create_backup,
     enforce_retention_policy,
@@ -20,6 +20,14 @@ from app.services.data.persistence.contracts import (
     StorageManifest,
 )
 from app.utils import generate_id
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _settings(root: Path) -> DataSettings:
@@ -49,7 +57,7 @@ def data_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     ):
         (tmp_path / relative).mkdir(parents=True)
     monkeypatch.setattr(
-        "app.services.data.persistence.backup.persist_audit_event",
+        "app.services.data.persistence.backup._persist_audit_event_raw",
         lambda _event: None,
     )
     return tmp_path
@@ -70,7 +78,7 @@ def test_manifest_records_hash_per_target(data_root: Path) -> None:
     payload.write_bytes(b"timestamp,close\n2026-01-01T00:00:00Z,1.2\n")
 
     with data_settings_context(_settings(data_root)):
-        manifest = create_backup((_target("data/raw/EURUSD.csv"),))
+        manifest = _unwrap(create_backup((_target("data/raw/EURUSD.csv"),)))
 
     entry = manifest.entries[0]
     assert entry.relative_path == Path("data/raw/EURUSD.csv")
@@ -85,9 +93,9 @@ def test_restore_round_trip(data_root: Path) -> None:
     payload = data_root / "data/raw/EURUSD.csv"
     payload.write_text("original", encoding="utf-8")
     with data_settings_context(_settings(data_root)):
-        manifest = create_backup((_target("data/raw/EURUSD.csv"),))
+        manifest = _unwrap(create_backup((_target("data/raw/EURUSD.csv"),)))
         payload.write_text("changed", encoding="utf-8")
-        report = restore_from_backup(manifest.manifest_id)
+        report = _unwrap(restore_from_backup(manifest.manifest_id))
 
     assert payload.read_text(encoding="utf-8") == "original"
     assert report.restored_paths == (Path("data/raw/EURUSD.csv"),)
@@ -100,7 +108,7 @@ def test_restore_is_atomic_on_hash_mismatch(data_root: Path) -> None:
     first.write_text("first-original", encoding="utf-8")
     second.write_text("second-original", encoding="utf-8")
     with data_settings_context(_settings(data_root)):
-        manifest = create_backup((_target("data/raw"),))
+        manifest = _unwrap(create_backup((_target("data/raw"),)))
         first.write_text("first-current", encoding="utf-8")
         second.write_text("second-current", encoding="utf-8")
         backup_second = (
@@ -110,10 +118,11 @@ def test_restore_is_atomic_on_hash_mismatch(data_root: Path) -> None:
             / "payload/data/raw/second.csv"
         )
         backup_second.write_text("corrupted", encoding="utf-8")
-        with pytest.raises(DataError) as captured:
-            restore_from_backup(manifest.manifest_id)
+        response = restore_from_backup(manifest.manifest_id)
 
-    assert captured.value.code == "FILE_CORRUPTED"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "FILE_CORRUPTED"
     assert first.read_text(encoding="utf-8") == "first-current"
     assert second.read_text(encoding="utf-8") == "second-current"
 
@@ -124,10 +133,12 @@ def test_backup_rejects_unapproved_target_before_read(data_root: Path) -> None:
     outside.mkdir()
     (outside / "secret.csv").write_text("not admitted", encoding="utf-8")
 
-    with data_settings_context(_settings(data_root)), pytest.raises(DataError) as error:
-        create_backup((_target("outside/secret.csv"),))
+    with data_settings_context(_settings(data_root)):
+        response = create_backup((_target("outside/secret.csv"),))
 
-    assert error.value.code == "PERMISSION_DENIED"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "PERMISSION_DENIED"
 
 
 def test_retention_dry_run_does_not_delete(data_root: Path) -> None:
@@ -140,7 +151,7 @@ def test_retention_dry_run_does_not_delete(data_root: Path) -> None:
     os.utime(payload, (old, old))
 
     with data_settings_context(_settings(data_root)):
-        count = enforce_retention_policy("EURUSD", 10)
+        count = _unwrap(enforce_retention_policy("EURUSD", 10))
 
     assert count == 1
     assert payload.exists()
@@ -174,7 +185,7 @@ def test_retention_purges_payload_and_manifest(data_root: Path) -> None:
     os.utime(payload, (old, old))
 
     with data_settings_context(_settings(data_root)):
-        count = enforce_retention_policy("EURUSD", 10, dry_run=False)
+        count = _unwrap(enforce_retention_policy("EURUSD", 10, dry_run=False))
 
     assert count == 1
     assert not payload.exists()
@@ -208,7 +219,9 @@ def test_retention_never_overrides_licence_terms(data_root: Path) -> None:
         encoding="utf-8",
     )
 
-    with data_settings_context(_settings(data_root)), pytest.raises(DataError) as error:
-        enforce_retention_policy("EURUSD", 10)
+    with data_settings_context(_settings(data_root)):
+        response = enforce_retention_policy("EURUSD", 10)
 
-    assert error.value.code == "LICENSE_RESTRICTION"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "LICENSE_RESTRICTION"

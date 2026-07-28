@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.cache import get_cache_entry, put_cache_entry
 from app.services.data.persistence.contracts import (
     CACHE_CLEAR_MAX_ENTRIES,
@@ -22,6 +23,14 @@ from app.services.data.persistence.contracts import (
 )
 
 from tests.data.helpers_models import make_dataset
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def test_cache_requests_reject_unbounded_work() -> None:
@@ -56,8 +65,10 @@ def _configure_cache(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "10")
     from app.services.data.persistence.migrations import run_data_migrations
 
-    run_data_migrations(
-        "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
+    _unwrap(
+        run_data_migrations(
+            "req-60d56de3ff8bb20750e936377422e90f785e5ecfef35c15300af6cade7ff5e9d"
+        )
     )
 
 
@@ -77,7 +88,7 @@ def test_put_and_get_cache_entry_hit(
         request_id="req-2ae03bafcccbab9ee63678442e848f30e0fa769b9620e3bc932ef55a253447f2",
     )
 
-    result = put_cache_entry(write_req)
+    result = _unwrap(put_cache_entry(write_req))
     assert result.written
     assert result.key == "cache-key-1"
 
@@ -87,7 +98,7 @@ def test_put_and_get_cache_entry_hit(
         request_id="req-c7756479b1fb11e0f56ab97a6b8a728e63123618e2f2f0216ae0b427103f13c6",
     )
 
-    entry = get_cache_entry(read_req)
+    entry = _unwrap(get_cache_entry(read_req))
     assert entry is not None
     assert entry.key == "cache-key-1"
     assert entry.source_revision == "rev-1"
@@ -106,7 +117,7 @@ def test_cache_miss_when_missing(
         request_id="req-44515035a1d649bff8d8bc34f5853053646eb028920cb1d9c22b7286e21ed00a",
     )
 
-    entry = get_cache_entry(read_req)
+    entry = _unwrap(get_cache_entry(read_req))
     assert entry is None
 
 
@@ -126,7 +137,7 @@ def test_cache_expiration_policy(
         raw_data_hash="hash-1",
         request_id="req-d28c2b51880bae5db4771a0284035b4dafaace830c3ddc87098e3f98636d3444",
     )
-    put_cache_entry(write_req)
+    _unwrap(put_cache_entry(write_req))
 
     # Wait for entry to expire
     time.sleep(1.1)
@@ -137,7 +148,7 @@ def test_cache_expiration_policy(
         allow_stale=False,
         request_id="req-b0d723e3ba8d92fec6d6cdb73d9b86e95b5be57a8e04efe5524a241b6c7d5d03",
     )
-    entry_miss = get_cache_entry(read_req_miss)
+    entry_miss = _unwrap(get_cache_entry(read_req_miss))
     assert entry_miss is None
 
     # 2. Reading with allow_stale=True -> Hit with warning status
@@ -146,7 +157,7 @@ def test_cache_expiration_policy(
         allow_stale=True,
         request_id="req-137083e33c90538abb67fc8925817bf77ede5ab669e2ea39bfc4987e28ebcdae",
     )
-    entry_stale = get_cache_entry(read_req_stale)
+    entry_stale = _unwrap(get_cache_entry(read_req_stale))
     assert entry_stale is not None
     assert entry_stale.dataset.cache_status == "stale_warning"
 
@@ -156,12 +167,11 @@ def test_cache_write_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
     _configure_cache(monkeypatch, tmp_path)
 
     import app.services.data.persistence.cache as cache_mod
-    from app.services.data.contracts import DataError
 
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock DB write error")
 
-    monkeypatch.setattr(cache_mod, "execute_transaction", mock_execute)
+    monkeypatch.setattr(cache_mod, "_execute_transaction_raw", mock_execute)
 
     dataset = make_dataset()
     write_req = CacheWriteRequest(
@@ -173,9 +183,10 @@ def test_cache_write_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
         request_id="req-21a1fad252673e68d97261e2fa7a19009e3ae1c4e8ea30c42dac0da63a6fcdaa",
     )
 
-    with pytest.raises(DataError) as captured:
-        put_cache_entry(write_req)
-    assert captured.value.code == "DB_WRITE_FAILED"
+    response = put_cache_entry(write_req)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_WRITE_FAILED"
 
 
 def test_cache_read_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -183,12 +194,11 @@ def test_cache_read_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> No
     _configure_cache(monkeypatch, tmp_path)
 
     import app.services.data.persistence.cache as cache_mod
-    from app.services.data.contracts import DataError
 
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock DB read error")
 
-    monkeypatch.setattr(cache_mod, "execute_transaction", mock_execute)
+    monkeypatch.setattr(cache_mod, "_execute_transaction_raw", mock_execute)
 
     read_req = CacheReadRequest(
         key="error-key",
@@ -196,6 +206,7 @@ def test_cache_read_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> No
         request_id="req-55021baa8a82e4df27c6953c578dbf5a0de2d6d366325afe3266b6706cf5685a",
     )
 
-    with pytest.raises(DataError) as captured:
-        get_cache_entry(read_req)
-    assert captured.value.code == "DATABASE_ERROR"
+    response = get_cache_entry(read_req)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATABASE_ERROR"

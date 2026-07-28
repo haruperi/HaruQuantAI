@@ -11,11 +11,21 @@ from app.services.brokers import (
     BrokerPage,
     BrokerTick,
 )
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.broker_adapter import ExternalMarketDataSource
 from app.services.data.sources.contracts import SourceReadRequest
 from app.utils import StandardResponse, generate_id
 
 from tests.brokers.response_factory import broker_response
+
+_REQ_ID = "req-00000000-0000-4000-8000-000000000000"
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.sources.test", request_id=_REQ_ID
+    )
 
 
 def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
@@ -62,14 +72,16 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
                 data=BrokerPage(items=(bar,), limit=limit, truncated=False),
             )
 
-    batch = ExternalMarketDataSource("mt5", _Adapter()).fetch(
-        SourceReadRequest(
-            source_id="mt5",
-            provider_symbol="EURUSD",
-            data_kind="bars",
-            timeframe="M1",
-            limit=10,
-            request_id=generate_id("req"),
+    batch = _unwrap(
+        ExternalMarketDataSource("mt5", _Adapter()).fetch(
+            SourceReadRequest(
+                source_id="mt5",
+                provider_symbol="EURUSD",
+                data_kind="bars",
+                timeframe="M1",
+                limit=10,
+                request_id=generate_id("req"),
+            )
         )
     )
 
@@ -114,13 +126,15 @@ def test_tick_availability_tolerates_provider_clock_skew() -> None:
             )
 
     request_id = generate_id("req")
-    batch = ExternalMarketDataSource("mt5", _Adapter()).fetch(
-        SourceReadRequest(
-            source_id="mt5",
-            provider_symbol="EURUSD",
-            data_kind="ticks",
-            limit=10,
-            request_id=request_id,
+    batch = _unwrap(
+        ExternalMarketDataSource("mt5", _Adapter()).fetch(
+            SourceReadRequest(
+                source_id="mt5",
+                provider_symbol="EURUSD",
+                data_kind="ticks",
+                limit=10,
+                request_id=request_id,
+            )
         )
     )
 

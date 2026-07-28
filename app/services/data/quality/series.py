@@ -22,13 +22,18 @@ from typing import TYPE_CHECKING
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import DataQualityReport, QualityIssue
 from app.services.data.contracts.records import OHLCVRecord
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.quality.scoring import (
     _MAX_SAMPLES,
     _MIN_GAP_RECORDS,
     _fit_samples,
     _issue,
 )
-from app.utils import logger
+from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -48,9 +53,11 @@ from app.services.data.quality.policy import (
     QUALITY_MIN_SCORE,
     QUALITY_SEVERITY_WEIGHTS,
     QualityPolicy,
-    get_quality_policy,
+    _get_quality_policy_raw,
 )
-from app.services.data.time_sessions.timeframes import get_timeframe_spec
+from app.services.data.time_sessions.timeframes import (
+    _get_timeframe_spec_raw as get_timeframe_spec,
+)
 
 
 def _detect_duplicates(
@@ -171,7 +178,7 @@ def inspect_dataset_quality(
     policy: QualityPolicy | None = None,
     sessions: Sequence[SessionWindow] | None = None,
     generated_at: datetime | None = None,
-) -> DataQualityReport:
+) -> StandardResponse[DataQualityReport]:
     """Produce scored bounded quality evidence for one dataset.
 
     Args:
@@ -182,24 +189,29 @@ def inspect_dataset_quality(
         generated_at: Optional explicit evidence timestamp.
 
     Returns:
-        Bounded quality evidence for the dataset's records.
+        Standard response carrying bounded quality evidence for the dataset's records.
 
     Raises:
-        DataError: If the policy is malformed or the computed score is invalid.
+        (in-band) ``VALIDATION_FAILED`` if the policy is malformed or the score invalid.
     """
-    return inspect_records_quality(
-        dataset.records,
-        dataset.timeframe,
-        policy=policy,
-        sessions=sessions,
-        generated_at=(
-            generated_at if generated_at is not None else dataset.available_at
-        ),
+    return run_data_operation(
+        operation="data.quality.inspect_dataset_quality",
         request_id=dataset.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _inspect_records_quality_raw(
+            dataset.records,
+            dataset.timeframe,
+            policy=policy,
+            sessions=sessions,
+            generated_at=(
+                generated_at if generated_at is not None else dataset.available_at
+            ),
+            request_id=dataset.request_id,
+        ),
     )
 
 
-def inspect_records_quality(
+def _inspect_records_quality_raw(
     records: Sequence[CanonicalRecord],
     timeframe: str | None,
     *,
@@ -208,29 +220,13 @@ def inspect_records_quality(
     generated_at: datetime,
     request_id: str | None = None,
 ) -> DataQualityReport:
-    """Produce scored bounded quality evidence for one canonical series.
-
-    The report always reflects the records actually examined. Blocking issues are
-    exactly `MISSING_BARS` and `DUPLICATE_BARS`; every other detected issue is
-    advisory and reduces the score without failing the series.
-
-    Args:
-        records: The canonical records to examine.
-        timeframe: Expected bar timeframe, or None for kinds without one.
-        policy: Optional explicit thresholds; the configured profile is used when
-            omitted.
-        sessions: Optional authoritative UTC session windows covering the records.
-        generated_at: Explicit evidence timestamp.
-        request_id: Optional trace identifier for failure evidence.
-
-    Returns:
-        Bounded quality evidence for the supplied records.
+    """Produce scored bounded quality evidence without response wrapping.
 
     Raises:
         DataError: If the policy is malformed or the computed score is invalid.
     """
     logger.info("Inspecting series quality over %d records", len(records))
-    active = policy if policy is not None else get_quality_policy()
+    active = policy if policy is not None else _get_quality_policy_raw()
     checked = len(records)
     limit = _MAX_SAMPLES
 
@@ -297,13 +293,58 @@ def inspect_records_quality(
     )
 
 
+def inspect_records_quality(
+    records: Sequence[CanonicalRecord],
+    timeframe: str | None,
+    *,
+    policy: QualityPolicy | None = None,
+    sessions: Sequence[SessionWindow] | None = None,
+    generated_at: datetime,
+    request_id: str | None = None,
+) -> StandardResponse[DataQualityReport]:
+    """Produce scored bounded quality evidence for one canonical series.
+
+    The report always reflects the records actually examined. Blocking issues are
+    exactly `MISSING_BARS` and `DUPLICATE_BARS`; every other detected issue is
+    advisory and reduces the score without failing the series.
+
+    Args:
+        records: The canonical records to examine.
+        timeframe: Expected bar timeframe, or None for kinds without one.
+        policy: Optional explicit thresholds; the configured profile is used when
+            omitted.
+        sessions: Optional authoritative UTC session windows covering the records.
+        generated_at: Explicit evidence timestamp.
+        request_id: Optional trace identifier for failure evidence.
+
+    Returns:
+        Standard response carrying bounded quality evidence for the supplied records.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` if the policy is malformed or the score invalid.
+    """
+    return run_data_operation(
+        operation="data.quality.inspect_records_quality",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _inspect_records_quality_raw(
+            records,
+            timeframe,
+            policy=policy,
+            sessions=sessions,
+            generated_at=generated_at,
+            request_id=request_id,
+        ),
+    )
+
+
 def detect_timestamp_gaps(
     records: Sequence[CanonicalRecord],
     timeframe: str | None,
     *,
     policy: QualityPolicy | None = None,
     limit: int = QUALITY_SAMPLE_LIMIT,
-) -> QualityIssue | None:
+) -> StandardResponse[QualityIssue | None]:
     """Detect bars missing against the expected timeframe frequency.
 
     Session awareness is the caller's concern: when a ``MarketCalendar`` is available,
@@ -318,10 +359,17 @@ def detect_timestamp_gaps(
         limit: Maximum number of bounded samples to attach to the issue.
 
     Returns:
-        One ``MISSING_BARS`` issue, or ``None`` when no gap exceeds tolerance.
+        Standard response carrying one ``MISSING_BARS`` issue, or ``None`` when no gap
+        exceeds tolerance.
     """
-    logger.debug("Detecting timestamp gaps")
-    return _detect_gaps(records, timeframe, policy or get_quality_policy(), limit)
+    return run_data_operation(
+        operation="data.quality.detect_timestamp_gaps",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_gaps(
+            records, timeframe, policy or _get_quality_policy_raw(), limit
+        ),
+    )
 
 
 def validate_tick_order(records: Sequence[CanonicalRecord]) -> bool:

@@ -19,7 +19,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from app.services.data.contracts import DataError
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.services.data.realtime_feeds.contracts import (
     FeedEventResult,
     FeedStatus,
@@ -99,7 +99,7 @@ def start_internal_feed(
         "breaker_state, breaker_opened_at, drift_ms, last_error "
         "FROM data_feeds WHERE feed_id = ?"
     )
-    res = execute_transaction(
+    res = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(query_sql,),
@@ -162,7 +162,7 @@ def start_internal_feed(
         "  NULL, NULL, ?, ?, ?"
         ")"
     )
-    execute_transaction(
+    _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(insert_sql,),

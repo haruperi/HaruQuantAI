@@ -3,17 +3,27 @@
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock
 
-import pytest
-from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import build_data_response, data_start_time
 from app.services.data.evidence.market_context import get_market_context_evidence
 from app.services.data.evidence.market_context_contracts import MarketContextRequest
 
 _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)
+_MKT_OP = "data.evidence.market_context_provider.get_market_context"
+
+
+def _wrap(evidence: object) -> object:
+    """Wrap raw provider evidence in a successful StandardResponse."""
+    return build_data_response(
+        operation=_MKT_OP,
+        request_id=_REQ_ID,
+        start_time=data_start_time(),
+        data=evidence,
+    )
 
 
 def test_market_context_provider_exception() -> None:
-    """Test get_market_context_evidence raises SOURCE_UNAVAILABLE when provider raises Exception."""
+    """Test get_market_context_evidence surfaces a non-success response when provider raises Exception."""
     mock_provider = MagicMock()
     mock_provider.get_market_context.side_effect = RuntimeError("Provider crashed")
 
@@ -25,17 +35,17 @@ def test_market_context_provider_exception() -> None:
         requested_evidence=("session",),
         request_id=_REQ_ID,
     )
-    with pytest.raises(DataError) as exc_info:
-        get_market_context_evidence(req, mock_provider)
-    assert exc_info.value.code == "SOURCE_UNAVAILABLE"
+    response = get_market_context_evidence(req, mock_provider)
+    assert response.status != "success"
+    assert response.error is not None
 
 
 def test_market_context_validation_failed() -> None:
-    """Test get_market_context_evidence raises VALIDATION_FAILED on symbol mismatch or empty provenance."""
+    """Test get_market_context_evidence surfaces VALIDATION_FAILED on symbol mismatch or empty provenance."""
     mock_provider = MagicMock()
     mock_evidence = MagicMock()
     mock_evidence.symbol = "WRONG_SYMBOL"
-    mock_provider.get_market_context.return_value = mock_evidence
+    mock_provider.get_market_context.return_value = _wrap(mock_evidence)
 
     req = MarketContextRequest(
         symbol="EURUSD",
@@ -45,13 +55,14 @@ def test_market_context_validation_failed() -> None:
         requested_evidence=("session",),
         request_id=_REQ_ID,
     )
-    with pytest.raises(DataError) as exc_info:
-        get_market_context_evidence(req, mock_provider)
-    assert exc_info.value.code == "VALIDATION_FAILED"
+    response = get_market_context_evidence(req, mock_provider)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def test_market_context_stale_evidence() -> None:
-    """Test get_market_context_evidence raises STALE_EVIDENCE when age > max_age_seconds."""
+    """Test get_market_context_evidence surfaces STALE_EVIDENCE when age > max_age_seconds."""
     mock_provider = MagicMock()
     mock_evidence = MagicMock()
     mock_evidence.symbol = "EURUSD"
@@ -62,7 +73,7 @@ def test_market_context_stale_evidence() -> None:
         seconds=100
     )  # Stale: age is 100s, max is 10s
     mock_evidence.expires_at = _NOW + timedelta(seconds=100)
-    mock_provider.get_market_context.return_value = mock_evidence
+    mock_provider.get_market_context.return_value = _wrap(mock_evidence)
 
     req = MarketContextRequest(
         symbol="EURUSD",
@@ -72,6 +83,7 @@ def test_market_context_stale_evidence() -> None:
         requested_evidence=("session",),
         request_id=_REQ_ID,
     )
-    with pytest.raises(DataError) as exc_info:
-        get_market_context_evidence(req, mock_provider)
-    assert exc_info.value.code == "STALE_EVIDENCE"
+    response = get_market_context_evidence(req, mock_provider)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "STALE_EVIDENCE"

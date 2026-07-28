@@ -21,7 +21,12 @@ from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from app.services.data.contracts import DataError
-from app.utils import logger
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
+from app.utils import generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.data.contracts.dataset import DataQualityReport
@@ -55,24 +60,12 @@ class QualityFlag(StrEnum):
     SPREAD_BREACH = "SPREAD_BREACH"
 
 
-def aggregate_flags(report: DataQualityReport) -> tuple[QualityFlag, ...]:
-    """Compile the distinct quality flags present in one report.
-
-    Flags are returned in the enum's declaration order rather than the order issues
-    happen to appear, so the result is deterministic for a given set of conditions and
-    two reports with the same problems compare equal.
-
-    Args:
-        report: Quality evidence produced by series inspection.
-
-    Returns:
-        Distinct flags present in the report, in declaration order. Empty when the
-        series is clean.
+def _aggregate_flags_raw(report: DataQualityReport) -> tuple[QualityFlag, ...]:
+    """Compile distinct quality flags present in one report without wrapping.
 
     Raises:
         DataError: With code ``VALIDATION_FAILED`` if the report carries an issue code
-            that no detector emits. That means evidence and vocabulary have diverged,
-            which is a defect rather than an unknown-but-tolerable condition.
+            that no detector emits.
     """
     logger.debug("Aggregating quality flags from a report")
     present: set[QualityFlag] = set()
@@ -85,3 +78,32 @@ def aggregate_flags(report: DataQualityReport) -> tuple[QualityFlag, ...]:
                 safe_details={"issue_code": issue.code, "reason": "unknown_flag"},
             ) from error
     return tuple(flag for flag in QualityFlag if flag in present)
+
+
+def aggregate_flags(
+    report: DataQualityReport,
+) -> StandardResponse[tuple[QualityFlag, ...]]:
+    """Compile the distinct quality flags present in one report.
+
+    Flags are returned in the enum's declaration order rather than the order issues
+    happen to appear, so the result is deterministic for a given set of conditions and
+    two reports with the same problems compare equal.
+
+    Args:
+        report: Quality evidence produced by series inspection.
+
+    Returns:
+        Standard response carrying distinct flags present in the report, in declaration
+        order. Empty when the series is clean.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` if the report carries an issue code that no
+            detector emits. That means evidence and vocabulary have diverged, which is
+            a defect rather than an unknown-but-tolerable condition.
+    """
+    return run_data_operation(
+        operation="data.quality.aggregate_flags",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _aggregate_flags_raw(report),
+    )

@@ -5,8 +5,8 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
-from app.services.data.contracts import DataError, OHLCVRecord, TickRecord
+from app.services.data.contracts import OHLCVRecord, TickRecord
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.quality import (
     get_quality_policy,
     inspect_records_quality,
@@ -19,6 +19,22 @@ _START = datetime(2026, 1, 1, tzinfo=UTC)
 _GENERATED = datetime(2026, 1, 2, tzinfo=UTC)
 _STANDARD = QUALITY_PROFILE_THRESHOLDS["standard"]
 _STRICT = QUALITY_PROFILE_THRESHOLDS["strict"]
+
+
+def _unwrap(response: object) -> object:
+    """Unwrap a successful Data standard response to its raw payload.
+
+    Args:
+        response: Standard response returned by a migrated Data operation.
+
+    Returns:
+        The raw ``data`` payload.
+    """
+    return unwrap_data_response(
+        response,  # type: ignore[arg-type]
+        operation="data.quality.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _bar(
@@ -52,11 +68,13 @@ def _bar(
 
 def _inspect(records: tuple[OHLCVRecord, ...], *, policy=_STANDARD):
     """Inspect one bar series under an explicit policy."""
-    return inspect_records_quality(
-        records,
-        "M1",
-        policy=policy,
-        generated_at=_GENERATED,
+    return _unwrap(
+        inspect_records_quality(
+            records,
+            "M1",
+            policy=policy,
+            generated_at=_GENERATED,
+        )
     )
 
 
@@ -101,11 +119,13 @@ def test_gap_detection_discounts_weekend_closure() -> None:
         ),
     )
 
-    report = inspect_records_quality(
-        records,
-        "H1",
-        policy=_STANDARD,
-        generated_at=_GENERATED,
+    report = _unwrap(
+        inspect_records_quality(
+            records,
+            "H1",
+            policy=_STANDARD,
+            generated_at=_GENERATED,
+        )
     )
 
     assert "MISSING_BARS" not in {issue.code for issue in report.issues}
@@ -137,12 +157,14 @@ def test_gap_detection_discounts_declared_session_break() -> None:
         ),
     )
 
-    report = inspect_records_quality(
-        records,
-        "H1",
-        policy=_STANDARD,
-        sessions=sessions,
-        generated_at=_GENERATED,
+    report = _unwrap(
+        inspect_records_quality(
+            records,
+            "H1",
+            policy=_STANDARD,
+            sessions=sessions,
+            generated_at=_GENERATED,
+        )
     )
 
     assert "MISSING_BARS" not in {issue.code for issue in report.issues}
@@ -178,11 +200,13 @@ def test_duplicate_tick_timestamps_are_not_duplicate_bars() -> None:
         for index in range(2)
     )
 
-    report = inspect_records_quality(
-        ticks,
-        None,
-        policy=_STANDARD,
-        generated_at=_GENERATED,
+    report = _unwrap(
+        inspect_records_quality(
+            ticks,
+            None,
+            policy=_STANDARD,
+            generated_at=_GENERATED,
+        )
     )
 
     assert "DUPLICATE_BARS" not in {issue.code for issue in report.issues}
@@ -300,8 +324,8 @@ def test_remediation_is_deterministic() -> None:
     )
     report = _inspect(records)
 
-    first = summarize_quality_remediation(report)
-    second = summarize_quality_remediation(report)
+    first = _unwrap(summarize_quality_remediation(report))
+    second = _unwrap(summarize_quality_remediation(report))
 
     assert first == second
     assert "MISSING_BARS" in first
@@ -313,7 +337,7 @@ def test_remediation_does_not_mutate_report() -> None:
     report = _inspect(records)
     before = report.model_dump_json()
 
-    summarize_quality_remediation(report)
+    _unwrap(summarize_quality_remediation(report))
 
     assert report.model_dump_json() == before
 
@@ -344,12 +368,16 @@ def test_unknown_issue_code_is_rejected() -> None:
         generated_at=_GENERATED,
     )
 
-    with pytest.raises(DataError):
-        summarize_quality_remediation(report)
+    # Expected Data failures are now returned in-band rather than raised at the
+    # public operation boundary.
+    response = summarize_quality_remediation(report)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "VALIDATION_FAILED"
 
 
 def test_active_policy_is_resolved_from_settings() -> None:
     """The configured profile selects one frozen threshold set."""
-    policy = get_quality_policy()
+    policy = _unwrap(get_quality_policy())
 
     assert policy.profile in QUALITY_PROFILE_THRESHOLDS

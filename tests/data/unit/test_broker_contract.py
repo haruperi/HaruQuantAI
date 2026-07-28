@@ -20,12 +20,24 @@ from __future__ import annotations
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.read_only import (
     READ_ONLY_BROKER_METHODS,
     ReadOnlyBrokerProxy,
     verify_read_only_call,
     wrap_broker_client,
 )
+
+_REQ_ID = "req-00000000-0000-4000-8000-000000000000"
+
+
+def _wrap(client: object) -> ReadOnlyBrokerProxy:
+    """Wrap a client and unwrap the migrated StandardResponse boundary."""
+    return unwrap_data_response(
+        wrap_broker_client(client),
+        operation="data.sources.test",
+        request_id=_REQ_ID,
+    )
 
 
 def test_sources_surface_has_no_account_state_bypass() -> None:
@@ -80,7 +92,7 @@ def test_every_permitted_read_passes_through(method: str) -> None:
     Raises:
         AssertionError: If a legitimate read is blocked.
     """
-    proxy = wrap_broker_client(_FullyCapableAdapter())
+    proxy = _wrap(_FullyCapableAdapter())
     assert getattr(proxy, method)() == f"called:{method}"
 
 
@@ -94,7 +106,7 @@ def test_every_mutation_is_refused(method: str) -> None:
     Raises:
         AssertionError: If a mutation reaches the adapter.
     """
-    proxy = wrap_broker_client(_FullyCapableAdapter())
+    proxy = _wrap(_FullyCapableAdapter())
     with pytest.raises(DataError) as excinfo:
         getattr(proxy, method)
     assert excinfo.value.code == "PERMISSION_DENIED"
@@ -109,7 +121,7 @@ def test_an_unknown_future_method_is_refused() -> None:
     Raises:
         AssertionError: If an unrecognized method is permitted.
     """
-    proxy = wrap_broker_client(_FullyCapableAdapter())
+    proxy = _wrap(_FullyCapableAdapter())
     with pytest.raises(DataError) as excinfo:
         proxy.submit_order_v2_experimental  # noqa: B018
     assert excinfo.value.code == "PERMISSION_DENIED"
@@ -124,7 +136,7 @@ def test_the_wrapped_client_cannot_be_reached_through_the_proxy() -> None:
     Raises:
         AssertionError: If the wrapped client is accessible by attribute.
     """
-    proxy = wrap_broker_client(_FullyCapableAdapter())
+    proxy = _wrap(_FullyCapableAdapter())
     with pytest.raises(DataError):
         proxy._client  # noqa: B018
 
@@ -135,7 +147,7 @@ def test_the_proxy_cannot_be_mutated() -> None:
     Raises:
         AssertionError: If the proxy accepts an assignment.
     """
-    proxy = wrap_broker_client(_FullyCapableAdapter())
+    proxy = _wrap(_FullyCapableAdapter())
     with pytest.raises(DataError) as excinfo:
         proxy.get_ticks = lambda: "replaced"
     assert excinfo.value.code == "PERMISSION_DENIED"
@@ -147,8 +159,8 @@ def test_wrapping_twice_returns_the_same_proxy() -> None:
     Raises:
         AssertionError: If double wrapping nests proxies.
     """
-    once = wrap_broker_client(_FullyCapableAdapter())
-    twice = wrap_broker_client(once)
+    once = _wrap(_FullyCapableAdapter())
+    twice = _wrap(once)
     assert twice is once
 
 
@@ -156,14 +168,18 @@ def test_verify_raises_rather_than_returning_false() -> None:
     """Assert the check fails loudly for a denied method.
 
     Returning ``False`` would let a caller that ignored the result proceed to make the
-    very call the check exists to prevent.
-
-    Raises:
-        AssertionError: If a denied method returns instead of raising.
+    very call the check exists to prevent. The migrated boundary returns an error
+    response rather than raising, so the denied path is asserted through the response
+    status and error code.
     """
-    assert verify_read_only_call("get_ticks") is True
-    with pytest.raises(DataError):
-        verify_read_only_call("place_order")
+    success = verify_read_only_call("get_ticks")
+    assert success.status == "success"
+    assert success.data is True
+
+    failure = verify_read_only_call("place_order")
+    assert failure.status != "success"
+    assert failure.error is not None
+    assert failure.error.code == "PERMISSION_DENIED"
 
 
 def test_the_allow_list_contains_no_mutation_names() -> None:

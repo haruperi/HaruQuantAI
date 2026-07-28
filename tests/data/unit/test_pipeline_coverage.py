@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.pipeline import (
     _cached_dataset,
     _default_ttl,
@@ -27,6 +28,13 @@ from app.services.data.market_data.requests import MarketDataRequest
 _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)
 _PAST = _NOW - timedelta(days=1)
+
+
+def _unwrap(response):
+    """Extract the raw payload from a StandardResponse for assertions."""
+    return unwrap_data_response(
+        response, operation="data.market_data.test", request_id=_REQ_ID
+    )
 
 
 def _make_market_data_req(**kwargs) -> MarketDataRequest:
@@ -144,13 +152,14 @@ def test_cached_dataset_incompatible_entry() -> None:
 
 
 def test_fetch_market_dataset_ttl_exceeded() -> None:
-    """Test fetch_market_dataset raises LIMIT_EXCEEDED when cache_ttl_seconds > max."""
+    """Test fetch_market_dataset fails closed with LIMIT_EXCEEDED when cache_ttl_seconds > max."""
     req = _make_market_data_req(
         cache_ttl_seconds=1_000_000,  # CACHE_TTL_MAX_SECONDS is 604_800
     )
-    with pytest.raises(DataError) as exc_info:
-        fetch_market_dataset(req)
-    assert exc_info.value.code == "LIMIT_EXCEEDED"
+    response = fetch_market_dataset(req)
+    assert response.status != "success"
+    assert response.error is not None
+    assert response.error.code == "LIMIT_EXCEEDED"
 
 
 def test_reject_mixed_calls() -> None:
@@ -273,19 +282,25 @@ def test_public_facades_keyword_style() -> None:
     mock_ds = MagicMock()
     with (
         patch(
-            "app.services.data.market_data.pipeline.fetch_market_dataset",
+            "app.services.data.market_data.pipeline._fetch_market_dataset_raw",
             return_value=mock_ds,
         ),
         patch("app.services.data.market_data.pipeline.ensure_storage"),
         patch("app.services.data.market_data.pipeline.ensure_identity"),
     ):
-        res1 = get_market_data(
-            source_id="mt5", symbol="EURUSD", timeframe="M1", request_id=_REQ_ID
+        res1 = _unwrap(
+            get_market_data(
+                source_id="mt5", symbol="EURUSD", timeframe="M1", request_id=_REQ_ID
+            )
         )
         assert res1 == mock_ds
 
-        res2 = get_tick_data(source_id="mt5", symbol="EURUSD", request_id=_REQ_ID)
+        res2 = _unwrap(
+            get_tick_data(source_id="mt5", symbol="EURUSD", request_id=_REQ_ID)
+        )
         assert res2 == mock_ds
 
-        res3 = get_spread_data(source_id="mt5", symbol="EURUSD", request_id=_REQ_ID)
+        res3 = _unwrap(
+            get_spread_data(source_id="mt5", symbol="EURUSD", request_id=_REQ_ID)
+        )
         assert res3 == mock_ds

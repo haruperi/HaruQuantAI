@@ -27,7 +27,7 @@ from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import Clock, generate_id, logger, utc_now
 
 BACKFILL_MAX_RECORDS_PER_CHUNK: Final = 10_000
@@ -43,7 +43,7 @@ def recover_update_jobs(
     """Finish prepared publications and classify unrecoverable checkpoints."""
     rid = request_id or generate_id("req")
     logger.info("Recovering prepared DATA backfill publications")
-    prepared = execute_transaction(
+    prepared = _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
                 statements=(
@@ -79,7 +79,7 @@ def recover_update_jobs(
                 str(row["artifact_final"]),
             )
         except DataError:
-            execute_transaction(
+            _execute_transaction_raw(
                 TransactionRequest(
                     plan=StatementPlan(
                         statements=(

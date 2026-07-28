@@ -5,6 +5,11 @@ from importlib import import_module
 
 from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.time_sessions.contracts import (
     ExchangeSessionRequest,
     TradingSession,
@@ -12,7 +17,7 @@ from app.services.data.time_sessions.contracts import (
 from app.utils import logger
 
 
-def get_exchange_sessions(
+def _get_exchange_sessions_raw(
     request: ExchangeSessionRequest,
 ) -> tuple[TradingSession, ...]:
     """Return exchange-authoritative regular sessions in an inclusive date range.
@@ -68,6 +73,29 @@ def get_exchange_sessions(
             request_id=request.request_id,
         ) from error
     return sessions
+
+
+def get_exchange_sessions(
+    request: ExchangeSessionRequest,
+) -> StandardResponse[tuple[TradingSession, ...]]:
+    """Return exchange-authoritative regular sessions in an inclusive date range.
+
+    Args:
+        request: Explicit symbol, calendar code, date range, and trace identity.
+
+    Returns:
+        Standard response carrying ordered venue sessions with UTC boundaries.
+
+    Raises:
+        (in-band) ``LIMIT_EXCEEDED`` if the range is too large, or
+        ``SOURCE_UNAVAILABLE`` if the calendar cannot be resolved.
+    """
+    return run_data_operation(
+        operation="data.time_sessions.get_exchange_sessions",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_exchange_sessions_raw(request),
+    )
 
 
 def _as_utc(value: datetime) -> datetime:

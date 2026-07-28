@@ -12,12 +12,21 @@ from typing import cast
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence import locking
 from app.services.data.persistence.contracts import (
     TransactionRequest,
     TransactionResult,
 )
 from app.services.data.persistence.locking import acquire_write_lock
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _configure_locking(
@@ -58,21 +67,25 @@ def test_write_lock_is_path_scoped_and_exclusive(
     _configure_locking(monkeypatch, tmp_path)
     target = tmp_path / "dataset.parquet"
 
-    with (
+    with _unwrap(
         acquire_write_lock(
             target,
             "req-b2f972ff90198b269433a685737f461ed34f4ddb7c36be7e9faff7b6b40cf2dc",
-        ),
-        pytest.raises(DataError) as captured,
+        )
     ):
-        acquire_write_lock(
+        response = acquire_write_lock(
             target,
             "req-0565ba438d31eb0e5a019dc636c894ffae5fee7f9c5e1240dc67bba72e527450",
         )
 
-    assert captured.value.code == "CONCURRENT_WRITE_LOCKED"
-    with acquire_write_lock(
-        target, "req-24ab04ec4acda0c145865de174ee6065c9d979e8fe4cf8f9b404aad029e3b084"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "CONCURRENT_WRITE_LOCKED"
+    with _unwrap(
+        acquire_write_lock(
+            target,
+            "req-24ab04ec4acda0c145865de174ee6065c9d979e8fe4cf8f9b404aad029e3b084",
+        )
     ) as reacquired:
         assert reacquired.path == target.resolve()
 
@@ -84,13 +97,17 @@ def test_different_resolved_paths_can_be_owned_together(
     _configure_locking(monkeypatch, tmp_path)
 
     with (
-        acquire_write_lock(
-            tmp_path / "one.csv",
-            "req-6af65d1bad1fe41723c4ba5bc9da65ad30af95eead59cfa3deda8c25dd6a94e5",
+        _unwrap(
+            acquire_write_lock(
+                tmp_path / "one.csv",
+                "req-6af65d1bad1fe41723c4ba5bc9da65ad30af95eead59cfa3deda8c25dd6a94e5",
+            )
         ),
-        acquire_write_lock(
-            tmp_path / "two.csv",
-            "req-340f21f1a09a9f488b5ab8ef3d2f2be30a587ff4fd798a0b3933009057de0374",
+        _unwrap(
+            acquire_write_lock(
+                tmp_path / "two.csv",
+                "req-340f21f1a09a9f488b5ab8ef3d2f2be30a587ff4fd798a0b3933009057de0374",
+            )
         ),
     ):
         pass
@@ -109,11 +126,17 @@ def test_stale_lock_recovery_is_atomic_and_persists_evidence(
     monkeypatch.setattr(locking.time, "time_ns", lambda: next(times))
     target = tmp_path / "stale.csv"
 
-    abandoned = acquire_write_lock(
-        target, "req-61261de311c66ee9928f20e2bc9d83fcaa3498fdab96317b8b3820e51c8689e4"
+    abandoned = _unwrap(
+        acquire_write_lock(
+            target,
+            "req-61261de311c66ee9928f20e2bc9d83fcaa3498fdab96317b8b3820e51c8689e4",
+        )
     )
-    with acquire_write_lock(
-        target, "req-a982027e287b92f89b7984548551a52948505b5da64ade4b388f5434fece21e1"
+    with _unwrap(
+        acquire_write_lock(
+            target,
+            "req-a982027e287b92f89b7984548551a52948505b5da64ade4b388f5434fece21e1",
+        )
     ) as recovered:
         assert recovered.recovery_count == 1
 
@@ -168,13 +191,15 @@ def test_lock_lease_configuration_fails_closed(
 
         context = _BadSettingsContext()
 
-    with context, pytest.raises(DataError) as captured:
-        acquire_write_lock(
+    with context:
+        response = acquire_write_lock(
             tmp_path / "invalid.csv",
             "req-2bafd040219b771f2951816df2030ebcfeae4a9a6b0beedca0794caf066a8085",
         )
 
-    assert captured.value.code == "DB_CONNECTION_ERROR"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_CONNECTION_ERROR"
     assert not database_path.exists()
 
 
@@ -187,10 +212,11 @@ def test_lock_requires_caller_owned_request_id(
     """Blank or untrimmed owner identities fail before persistence."""
     database_path = _configure_locking(monkeypatch, tmp_path)
 
-    with pytest.raises(DataError) as captured:
-        acquire_write_lock(tmp_path / "invalid.csv", request_id)
+    response = acquire_write_lock(tmp_path / "invalid.csv", request_id)
 
-    assert captured.value.code == "INVALID_INPUT"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "INVALID_INPUT"
     assert not database_path.exists()
 
 
@@ -200,13 +226,14 @@ def test_lock_rejects_non_path_input(
     """Runtime path validation fails closed before persistence."""
     database_path = _configure_locking(monkeypatch, tmp_path)
 
-    with pytest.raises(DataError) as captured:
-        acquire_write_lock(
-            cast("Path", "not-a-path"),
-            "req-b8064ee6a3eb5622a5fa6eef5fec60c43147e6425834eaead5d6647a10b0aab0",
-        )
+    response = acquire_write_lock(
+        cast("Path", "not-a-path"),
+        "req-b8064ee6a3eb5622a5fa6eef5fec60c43147e6425834eaead5d6647a10b0aab0",
+    )
 
-    assert captured.value.code == "INVALID_INPUT"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "INVALID_INPUT"
     assert not database_path.exists()
 
 
@@ -234,15 +261,16 @@ def test_lock_rejects_inconsistent_persisted_result(
             request_id=request.request_id,
         )
 
-    monkeypatch.setattr(locking, "execute_transaction", _inconsistent_result)
+    monkeypatch.setattr(locking, "_execute_transaction_raw", _inconsistent_result)
 
-    with pytest.raises(DataError) as captured:
-        acquire_write_lock(
-            tmp_path / "result.csv",
-            "req-502380604dc2c213ee83e5e7b473e65f437c11e8bd0a3ee8cbfd512974bab732",
-        )
+    response = acquire_write_lock(
+        tmp_path / "result.csv",
+        "req-502380604dc2c213ee83e5e7b473e65f437c11e8bd0a3ee8cbfd512974bab732",
+    )
 
-    assert captured.value.code == "DATABASE_ERROR"
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATABASE_ERROR"
 
 
 def test_release_does_not_clear_a_recovered_owner(
@@ -257,11 +285,17 @@ def test_release_does_not_clear_a_recovered_owner(
     times = iter((1_000_000_000, 2_000_000_000))
     monkeypatch.setattr(locking.time, "time_ns", lambda: next(times))
     target = tmp_path / "owner.csv"
-    abandoned = acquire_write_lock(
-        target, "req-9c41a36f930606de49211e907304eb7ebec1487464bfa8b52835350459dd068a"
+    abandoned = _unwrap(
+        acquire_write_lock(
+            target,
+            "req-9c41a36f930606de49211e907304eb7ebec1487464bfa8b52835350459dd068a",
+        )
     )
-    successor = acquire_write_lock(
-        target, "req-67be6c5ffe05da4c3cab25d3fe3d7eae5084fd687fbc958f1395a1133dacf9da"
+    successor = _unwrap(
+        acquire_write_lock(
+            target,
+            "req-67be6c5ffe05da4c3cab25d3fe3d7eae5084fd687fbc958f1395a1133dacf9da",
+        )
     )
 
     with pytest.raises(DataError) as captured:
@@ -281,9 +315,11 @@ def test_write_lock_context_cannot_be_reentered(
 ) -> None:
     """One acquired context cannot be entered twice or reused after release."""
     _configure_locking(monkeypatch, tmp_path)
-    lock = acquire_write_lock(
-        tmp_path / "context.csv",
-        "req-032124525dcd565cdd553d78b79aaee38fb37b71982ec92d73cb1174471d62f3",
+    lock = _unwrap(
+        acquire_write_lock(
+            tmp_path / "context.csv",
+            "req-032124525dcd565cdd553d78b79aaee38fb37b71982ec92d73cb1174471d62f3",
+        )
     )
 
     with lock, pytest.raises(DataError) as captured:

@@ -53,9 +53,19 @@ from app.services.data import (
     start_internal_feed,
     to_ohlcv_dataframe,
 )
+from app.services.data.contracts.responses import unwrap_data_response
 from app.utils import AuthContext, generate_id
 
 from tests.data.helpers import make_dataset, register_local_test_source
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.time_sessions.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
+
 
 _NOW = datetime(2026, 7, 1, 12, tzinfo=UTC)
 
@@ -529,15 +539,17 @@ def test_wf_data_010_returns_configured_utc_market_hours(
     with data_settings_context(runtime):
         run_data_migrations(request_id)
         ensure_source("csv", request_id)
-        hours = get_market_hours(
-            ScheduleRequest(
-                source_id="csv",
-                symbol="EURUSD",
-                view="hours",
-                timezone="UTC",
-                request_id=request_id,
-            ),
-            _Calendar(),
+        hours = _unwrap(
+            get_market_hours(
+                ScheduleRequest(
+                    source_id="csv",
+                    symbol="EURUSD",
+                    view="hours",
+                    timezone="UTC",
+                    request_id=request_id,
+                ),
+                _Calendar(),
+            )
         )
 
     assert hours.symbol == "EURUSD"

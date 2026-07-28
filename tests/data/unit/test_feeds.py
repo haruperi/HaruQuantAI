@@ -76,7 +76,7 @@ def _isolated_feed_state(monkeypatch: pytest.MonkeyPatch) -> None:
     """Isolate runtime state and replace persistence with deterministic evidence."""
     _ACTIVE_FEEDS.clear()
     result = SimpleNamespace(rows=(), affected_rows=1, committed=True)
-    monkeypatch.setattr(buffer, "execute_transaction", lambda _request: result)
+    monkeypatch.setattr(buffer, "_execute_transaction_raw", lambda _request: result)
     monkeypatch.setattr(buffer, "_persist_feed_status", lambda *_args: None)
     monkeypatch.setattr(reconnection, "_persist_feed_status", lambda *_args: None)
     monkeypatch.setattr(
@@ -239,7 +239,7 @@ def test_status_database_result_and_missing(monkeypatch: pytest.MonkeyPatch) -> 
         "heartbeat_timeout_seconds": 10,
     }
     monkeypatch.setattr(
-        "app.services.data.persistence.transactions.execute_transaction",
+        "app.services.data.persistence.transactions._execute_transaction_raw",
         lambda _transaction: SimpleNamespace(rows=(row,)),
     )
     current = status.read_feed_status(
@@ -250,7 +250,7 @@ def test_status_database_result_and_missing(monkeypatch: pytest.MonkeyPatch) -> 
     assert current.last_error == "FEED_HEARTBEAT_TIMEOUT"
 
     monkeypatch.setattr(
-        "app.services.data.persistence.transactions.execute_transaction",
+        "app.services.data.persistence.transactions._execute_transaction_raw",
         lambda _transaction: SimpleNamespace(rows=()),
     )
     with pytest.raises(DataError):

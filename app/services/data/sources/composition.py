@@ -24,6 +24,12 @@ from app.services.data._settings import (
     get_data_settings,
 )
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+    unwrap_data_response,
+)
 from app.services.data.market_data.symbol_metadata import (
     SymbolMetadata,
     SymbolMetadataRequest,
@@ -38,14 +44,14 @@ from app.services.data.sources.contracts import (
 )
 from app.services.data.sources.local_adapter import LocalMarketDataSource
 from app.services.data.sources.registry import (
-    get_source_descriptor,
-    register_source,
+    _get_source_descriptor_raw,
+    _register_source_raw,
+    _resolve_source_raw,
     register_source_identity,
-    resolve_source,
     resolve_source_identity,
 )
 from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
-from app.utils import AppSettings, StandardResponse, generate_id, logger
+from app.utils import AppSettings, generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.data.time_sessions.schedule import MarketCalendar
@@ -749,7 +755,7 @@ def _register_local_source(source_id: str, request_id: str) -> None:
     artifact_format: Literal["csv", "parquet"] = (
         "parquet" if source_id == "parquet" else "csv"
     )
-    register_source(
+    _register_source_raw(
         descriptor,
         lambda: LocalMarketDataSource(
             source_id=source_id,
@@ -761,7 +767,7 @@ def _register_local_source(source_id: str, request_id: str) -> None:
     )
 
 
-def list_composable_sources() -> tuple[str, ...]:
+def _list_composable_sources_raw() -> tuple[str, ...]:
     """Return every source identifier the current configuration can compose.
 
     Returns:
@@ -791,7 +797,21 @@ def list_composable_sources() -> tuple[str, ...]:
     )
 
 
-def ensure_source(source_id: str, request_id: str) -> None:
+def list_composable_sources() -> StandardResponse[tuple[str, ...]]:
+    """Return every source identifier the current configuration can compose.
+
+    Returns:
+        Standard response carrying the sorted composable source identifiers.
+    """
+    return run_data_operation(
+        operation="data.sources.list_composable_sources",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=_list_composable_sources_raw,
+    )
+
+
+def _ensure_source_raw(source_id: str, request_id: str) -> None:
     """Register one supported source and its private lazy dependencies.
 
     Composition dispatches on source kind. Local artifact sources need no
@@ -802,7 +822,7 @@ def ensure_source(source_id: str, request_id: str) -> None:
         DataError: If the source is unsupported or registration fails.
     """
     try:
-        get_source_descriptor(source_id)
+        _get_source_descriptor_raw(source_id)
         return
     except DataError as error:
         if error.code != "SOURCE_UNAVAILABLE":
@@ -827,7 +847,7 @@ def ensure_source(source_id: str, request_id: str) -> None:
         )
     with _lock:
         try:
-            get_source_descriptor(source_id)
+            _get_source_descriptor_raw(source_id)
             return
         except DataError as error:
             if error.code != "SOURCE_UNAVAILABLE":
@@ -856,22 +876,60 @@ def ensure_source(source_id: str, request_id: str) -> None:
             if source_id == BrokerId.YAHOO.value
             else ()
         )
-        register_source(descriptor, session.source, identities)
+        _register_source_raw(descriptor, session.source, identities)
         _sessions[source_id] = session
         _calendars[source_id] = _BrokerMarketCalendar(session)
 
 
-def ensure_source_access(source_id: str, request_id: str) -> None:
+def ensure_source(source_id: str, request_id: str) -> StandardResponse[None]:
+    """Register one supported source and its private lazy dependencies.
+
+    Composition dispatches on source kind. Local artifact sources need no
+    credentials, network, or promotion evidence and register at `production`
+    readiness; the MT5 broker profile composes a lazy read-only provider session.
+
+    Returns:
+        Standard response confirming source composition.
+
+    Raises:
+        DataError: If the source is unsupported or registration fails.
+    """
+    return run_data_operation(
+        operation="data.sources.ensure_source",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _ensure_source_raw(source_id, request_id),
+    )
+
+
+def _ensure_source_access_raw(source_id: str, request_id: str) -> None:
     """Connect a facade-composed source before its first provider read.
 
     Raises:
         DataError: If provider composition or connection fails.
     """
-    ensure_source(source_id, request_id)
+    _ensure_source_raw(source_id, request_id)
     with _lock:
         session = _sessions.get(source_id)
     if session is not None:
         session.adapter(request_id)
+
+
+def ensure_source_access(source_id: str, request_id: str) -> StandardResponse[None]:
+    """Connect a facade-composed source before its first provider read.
+
+    Returns:
+        Standard response confirming source access.
+
+    Raises:
+        DataError: If provider composition or connection fails.
+    """
+    return run_data_operation(
+        operation="data.sources.ensure_source_access",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _ensure_source_access_raw(source_id, request_id),
+    )
 
 
 def ensure_identity(source_id: str, symbol: str, request_id: str) -> None:
@@ -880,7 +938,7 @@ def ensure_identity(source_id: str, symbol: str, request_id: str) -> None:
     Raises:
         DataError: If provider metadata cannot confirm the identity.
     """
-    ensure_source_access(source_id, request_id)
+    _ensure_source_access_raw(source_id, request_id)
     identity_request = SourceIdentityRequest(
         source_id=source_id,
         identity=symbol,
@@ -892,12 +950,18 @@ def ensure_identity(source_id: str, symbol: str, request_id: str) -> None:
     except DataError as error:
         if error.code != "MISSING_ASSET_METADATA":
             raise
-    metadata = resolve_source(source_id).get_symbol_metadata(
+    source = _resolve_source_raw(source_id)
+    metadata_response = source.get_symbol_metadata(
         SymbolMetadataRequest(
             source_id=source_id,
             symbol=symbol,
             request_id=request_id,
         )
+    )
+    metadata = unwrap_data_response(
+        metadata_response,
+        operation="data.sources.ensure_identity",
+        request_id=request_id,
     )
     register_source_identity(
         SourceIdentity(
@@ -905,7 +969,9 @@ def ensure_identity(source_id: str, symbol: str, request_id: str) -> None:
             canonical_symbol=symbol,
             friendly_name=symbol,
             provider_symbol=metadata.provider_symbol,
-            mapping_revision=get_source_descriptor(source_id).identity_mapping_revision,
+            mapping_revision=_get_source_descriptor_raw(
+                source_id
+            ).identity_mapping_revision,
             provenance={
                 "method": "provider_metadata",
                 "provider_symbol": metadata.provider_symbol,
@@ -932,7 +998,7 @@ def resolve_calendar(source_id: str, request_id: str) -> MarketCalendar:
     Raises:
         DataError: If the source has no authoritative calendar.
     """
-    ensure_source(source_id, request_id)
+    _ensure_source_raw(source_id, request_id)
     with _lock:
         calendar = _calendars.get(source_id)
     if calendar is None:

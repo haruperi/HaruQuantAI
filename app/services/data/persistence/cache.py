@@ -9,6 +9,11 @@ from typing import Final, Literal
 from pydantic import ValidationError
 
 from app.services.data.contracts import DataError, MarketDataset
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     CacheClearRequest,
     CacheClearResult,
@@ -19,7 +24,7 @@ from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
 )
-from app.services.data.persistence.transactions import execute_transaction
+from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import Clock, logger, utc_now
 
 _GET_CACHE_ENTRY: Final = (
@@ -36,7 +41,7 @@ INSERT OR REPLACE INTO data_cache (
 """.strip()
 
 
-def get_cache_entry(
+def _get_cache_entry_raw(
     request: CacheReadRequest,
     *,
     clock: Clock | None = None,
@@ -63,7 +68,7 @@ def get_cache_entry(
             request_id=request.request_id,
         )
 
-        result = execute_transaction(tx_request)
+        result = _execute_transaction_raw(tx_request)
         if not result.rows:
             return None
 
@@ -123,7 +128,29 @@ def get_cache_entry(
         ) from error
 
 
-def put_cache_entry(
+def get_cache_entry(
+    request: CacheReadRequest,
+    *,
+    clock: Clock | None = None,
+) -> StandardResponse[CacheEntry | None]:
+    """Retrieve an active or allowed-stale cache entry from SQLite.
+
+    Args:
+        request: The cache read request.
+        clock: Optional injected UTC clock.
+
+    Returns:
+        Standard response carrying the CacheEntry or None if missing or expired.
+    """
+    return run_data_operation(
+        operation="data.persistence.get_cache_entry",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_cache_entry_raw(request, clock=clock),
+    )
+
+
+def _put_cache_entry_raw(
     request: CacheWriteRequest,
     *,
     clock: Clock | None = None,
@@ -169,7 +196,7 @@ def put_cache_entry(
             request_id=request.request_id,
         )
 
-        result = execute_transaction(tx_request)
+        result = _execute_transaction_raw(tx_request)
         written = result.committed and result.affected_rows > 0
         if not written:
             _raise_cache_write_failed(request.request_id)
@@ -189,6 +216,28 @@ def put_cache_entry(
             safe_details={"operation": "put_cache_entry"},
             request_id=request.request_id,
         ) from error
+
+
+def put_cache_entry(
+    request: CacheWriteRequest,
+    *,
+    clock: Clock | None = None,
+) -> StandardResponse[CacheWriteResult]:
+    """Store a TTL-bound cache entry into SQLite.
+
+    Args:
+        request: The cache write request.
+        clock: Optional injected UTC clock.
+
+    Returns:
+        Standard response carrying the cache write result.
+    """
+    return run_data_operation(
+        operation="data.persistence.put_cache_entry",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _put_cache_entry_raw(request, clock=clock),
+    )
 
 
 def _raise_cache_write_failed(request_id: str) -> None:
@@ -233,7 +282,7 @@ def _filter_cached_keys(
     return matched_keys
 
 
-def clear_cache_entry(request: CacheClearRequest) -> CacheClearResult:
+def _clear_cache_entry_raw(request: CacheClearRequest) -> CacheClearResult:
     """Clear select cache entries matching request criteria.
 
     Args:
@@ -263,7 +312,7 @@ def clear_cache_entry(request: CacheClearRequest) -> CacheClearResult:
             ),
             request_id=request.request_id,
         )
-        result = execute_transaction(select_req)
+        result = _execute_transaction_raw(select_req)
 
         matched_keys = _filter_cached_keys(result.rows, request)
         matched_count = len(matched_keys)
@@ -280,7 +329,7 @@ def clear_cache_entry(request: CacheClearRequest) -> CacheClearResult:
                 ),
                 request_id=request.request_id,
             )
-            del_res = execute_transaction(delete_req)
+            del_res = _execute_transaction_raw(delete_req)
             if del_res.committed:
                 deleted_count = del_res.affected_rows
 
@@ -300,6 +349,25 @@ def clear_cache_entry(request: CacheClearRequest) -> CacheClearResult:
             safe_details={"operation": "clear_cache_entry"},
             request_id=request.request_id,
         ) from error
+
+
+def clear_cache_entry(
+    request: CacheClearRequest,
+) -> StandardResponse[CacheClearResult]:
+    """Clear select cache entries matching request criteria.
+
+    Args:
+        request: The cache clear request.
+
+    Returns:
+        Standard response carrying the cache clear result.
+    """
+    return run_data_operation(
+        operation="data.persistence.clear_cache_entry",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _clear_cache_entry_raw(request),
+    )
 
 
 # --- Request construction and validation helpers ---
@@ -351,7 +419,7 @@ def cache_clear_request(
 # --- Public Cache Operations ---
 
 
-def clear_data_cache(
+def _clear_data_cache_raw(
     request: CacheClearRequest | None = None,
     *,
     source_id: str | None = None,
@@ -376,7 +444,38 @@ def clear_data_cache(
         max_entries=max_entries,
         request_id=request_id,
     )
-    return clear_cache_entry(resolved)
+    return _clear_cache_entry_raw(resolved)
+
+
+def clear_data_cache(
+    request: CacheClearRequest | None = None,
+    *,
+    source_id: str | None = None,
+    symbol: str | None = None,
+    data_kind: str | None = None,
+    dry_run: bool | None = None,
+    max_entries: int | None = None,
+    request_id: str | None = None,
+) -> StandardResponse[CacheClearResult]:
+    """Clear cached entries using a request or direct keywords.
+
+    Returns:
+        Standard response carrying the outcomes and deleted counts.
+    """
+    return run_data_operation(
+        operation="data.persistence.clear_data_cache",
+        request_id=request_id,
+        start_time=data_start_time(),
+        raw=lambda: _clear_data_cache_raw(
+            request,
+            source_id=source_id,
+            symbol=symbol,
+            data_kind=data_kind,
+            dry_run=dry_run,
+            max_entries=max_entries,
+            request_id=request_id,
+        ),
+    )
 
 
 __all__ = [

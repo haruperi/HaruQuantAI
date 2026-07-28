@@ -13,8 +13,13 @@ from typing import TYPE_CHECKING
 
 from pydantic import ValidationError
 
-from app.services.data.audit.store import persist_audit_event
+from app.services.data.audit.store import _persist_audit_event_raw
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.persistence.contracts import (
     BackupEntry,
     BackupManifest,
@@ -27,7 +32,7 @@ from app.services.data.persistence.dataset_writer import (
     resolve_approved_storage_path,
     resolve_data_root,
 )
-from app.services.data.persistence.locking import acquire_write_lock
+from app.services.data.persistence.locking import _acquire_write_lock_raw
 from app.utils import AuditEvent, derive_stable_id, generate_id, logger, utc_now
 
 if TYPE_CHECKING:
@@ -235,7 +240,7 @@ def _audit(
         DataError: If durable audit persistence fails.
     """
     logger.info("Persisting %s audit evidence", action)
-    persist_audit_event(
+    _persist_audit_event_raw(
         AuditEvent(
             contract_version="v1",
             schema_id="utils.audit_event.v1",
@@ -250,7 +255,7 @@ def _audit(
     )
 
 
-def create_backup(targets: Sequence[BackupTarget]) -> BackupManifest:
+def _create_backup_raw(targets: Sequence[BackupTarget]) -> BackupManifest:
     """Snapshot approved files into one immutable hashed backup manifest.
 
     Args:
@@ -295,7 +300,7 @@ def create_backup(targets: Sequence[BackupTarget]) -> BackupManifest:
     )
 
     try:
-        with acquire_write_lock(final_directory, request_id):
+        with _acquire_write_lock_raw(final_directory, request_id):
             if final_directory.exists() or staging_directory.exists():
                 raise _error("DB_WRITE_FAILED", request_id, "create_backup")
             staging_directory.mkdir(parents=True)
@@ -337,6 +342,26 @@ def create_backup(targets: Sequence[BackupTarget]) -> BackupManifest:
         logger.error("DATA backup creation failed")
         raise _error("DB_WRITE_FAILED", request_id, "create_backup") from error
     return manifest
+
+
+def create_backup(
+    targets: Sequence[BackupTarget],
+) -> StandardResponse[BackupManifest]:
+    """Snapshot approved files into one immutable hashed backup manifest.
+
+    Args:
+        targets: Declared approved-root-relative files or directories with explicit
+            schema and normalization versions.
+
+    Returns:
+        Standard response carrying the immutable manifest evidence.
+    """
+    return run_data_operation(
+        operation="data.persistence.create_backup",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=lambda: _create_backup_raw(targets),
+    )
 
 
 def _load_manifest(manifest_id: str, request_id: str) -> tuple[BackupManifest, Path]:
@@ -488,7 +513,7 @@ def _commit_restore(
         with ExitStack() as stack:
             ordered = sorted(prepared, key=lambda item: str(item[1]))
             for _entry, target, _stage, _rollback in ordered:
-                stack.enter_context(acquire_write_lock(target, request_id))
+                stack.enter_context(_acquire_write_lock_raw(target, request_id))
             _stage_restore(prepared, directory, request_id)
             for _entry, target, stage, rollback in prepared:
                 _require(
@@ -522,7 +547,7 @@ def _commit_restore(
         raise _error("DB_WRITE_FAILED", request_id, "restore_backup") from error
 
 
-def restore_from_backup(manifest_id: str) -> RestoreReport:
+def _restore_from_backup_raw(manifest_id: str) -> RestoreReport:
     """Restore every file in a named manifest after complete hash verification.
 
     Args:
@@ -549,6 +574,23 @@ def restore_from_backup(manifest_id: str) -> RestoreReport:
         restored_count=len(restored_paths),
         restored_at=restored_at,
         request_id=request_id,
+    )
+
+
+def restore_from_backup(manifest_id: str) -> StandardResponse[RestoreReport]:
+    """Restore every file in a named manifest after complete hash verification.
+
+    Args:
+        manifest_id: Exact backup identity returned by :func:`create_backup`.
+
+    Returns:
+        Standard response carrying the truthful restore report.
+    """
+    return run_data_operation(
+        operation="data.persistence.restore_from_backup",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=lambda: _restore_from_backup_raw(manifest_id),
     )
 
 
@@ -693,7 +735,7 @@ def _purge_expired(
     quarantine = root.parent / f"{root.name}.{request_id}.retention"
     moved: list[tuple[Path, Path]] = []
     try:
-        with acquire_write_lock(root, request_id):
+        with _acquire_write_lock_raw(root, request_id):
             _require(
                 not quarantine.exists(),
                 "DB_WRITE_FAILED",
@@ -728,7 +770,7 @@ def _purge_expired(
         raise _error("DB_WRITE_FAILED", request_id, "retention") from error
 
 
-def enforce_retention_policy(
+def _enforce_retention_policy_raw(
     dataset: str,
     max_age_days: int,
     *,
@@ -765,6 +807,32 @@ def enforce_retention_policy(
 
     _purge_expired(root, expired, dataset, request_id, observed_at)
     return len(expired)
+
+
+def enforce_retention_policy(
+    dataset: str,
+    max_age_days: int,
+    *,
+    dry_run: bool = True,
+) -> StandardResponse[int]:
+    """Count or purge expired raw payloads without weakening licence retention.
+
+    Args:
+        dataset: Relative identity below the canonical ``data/raw`` root.
+        max_age_days: Positive maximum payload age in days.
+        dry_run: When true, report the candidate count without mutation.
+
+    Returns:
+        Standard response carrying the number of raw payloads selected by policy.
+    """
+    return run_data_operation(
+        operation="data.persistence.enforce_retention_policy",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=lambda: _enforce_retention_policy_raw(
+            dataset, max_age_days, dry_run=dry_run
+        ),
+    )
 
 
 __all__ = [

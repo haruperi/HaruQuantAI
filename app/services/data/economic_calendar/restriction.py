@@ -16,6 +16,14 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Final
 
+from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
+from app.utils import generate_id
+
 if TYPE_CHECKING:
     from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
 
@@ -35,7 +43,7 @@ def _meets_minimum(impact: EventImpact, minimum: EventImpact | None) -> bool:
     return impact >= minimum
 
 
-def evaluate_calendar_state(
+def _evaluate_calendar_state_raw(
     events: list[EconomicEvent],
     at: datetime,
     *,
@@ -93,7 +101,56 @@ def evaluate_calendar_state(
     return state
 
 
-def is_news_restricted_events(
+def evaluate_calendar_state(
+    events: list[EconomicEvent],
+    at: datetime,
+    *,
+    before_minutes: int = 10,
+    after_minutes: int = 10,
+    minimum_impact: EventImpact | None = None,
+) -> StandardResponse[str]:
+    """Return the canonical calendar state for ``at`` given the supplied events.
+
+    Args:
+        events: Relevant economic events for the queried scope.
+        at: Timezone-aware UTC instant.
+        before_minutes: Blackout window applied before each event release.
+        after_minutes: Blackout window applied after each event release.
+        minimum_impact: Ignore events strictly below this impact level.
+
+    Returns:
+        Standard response carrying one of ``"event"``, ``"blackout_before"``,
+        ``"blackout_after"``, or ``"open"``.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when ``at`` is timezone-naive or the
+            minute windows are negative.
+    """
+
+    def _raw() -> str:
+        try:
+            return _evaluate_calendar_state_raw(
+                events,
+                at,
+                before_minutes=before_minutes,
+                after_minutes=after_minutes,
+                minimum_impact=minimum_impact,
+            )
+        except ValueError as error:
+            raise DataError(
+                "VALIDATION_FAILED",
+                safe_details={"field": "calendar_state"},
+            ) from error
+
+    return run_data_operation(
+        operation="data.economic_calendar.evaluate_calendar_state",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=_raw,
+    )
+
+
+def _is_news_restricted_events_raw(
     events: list[EconomicEvent],
     at: datetime,
     *,
@@ -103,27 +160,15 @@ def is_news_restricted_events(
 ) -> bool:
     """Return True when ``at`` falls inside any event's blackout window.
 
-    This is the pure-flag analogue of ``is_news_restricted`` and the canonical
-    Risk calendar gate: returns ``True`` for any blocking state
-    (``event``, ``blackout_before``, ``blackout_after``) and ``False`` only
+    Pure-flag analogue of ``is_news_restricted`` and the canonical Risk
+    calendar gate: returns ``True`` for any blocking state and ``False`` only
     for ``open``. The ``unknown`` (empty-events) case is excluded from blocking
-    by this pure helper; callers decide their own missing-evidence policy.
-
-    Args:
-        events: Relevant economic events for the queried scope.
-        at: Timezone-aware UTC instant.
-        minutes_before: Blackout minutes before each release.
-        minutes_after: Blackout minutes after each release.
-        minimum_impact: Ignore events strictly below this impact level.
-
-    Returns:
-        ``True`` when ``at`` is inside an event release window or adjacent
-        blackout; ``False`` otherwise.
+    by this helper; callers decide their own missing-evidence policy.
 
     Raises:
         ValueError: If ``at`` is timezone-naive or blackout minutes negative.
     """
-    state = evaluate_calendar_state(
+    state = _evaluate_calendar_state_raw(
         events,
         at,
         before_minutes=minutes_before,
@@ -135,6 +180,55 @@ def is_news_restricted_events(
         CALENDAR_STATE_BLACKOUT_BEFORE,
         CALENDAR_STATE_BLACKOUT_AFTER,
     }
+
+
+def is_news_restricted_events(
+    events: list[EconomicEvent],
+    at: datetime,
+    *,
+    minutes_before: int = 10,
+    minutes_after: int = 10,
+    minimum_impact: EventImpact | None = None,
+) -> StandardResponse[bool]:
+    """Return True when ``at`` falls inside any event's blackout window.
+
+    Args:
+        events: Relevant economic events for the queried scope.
+        at: Timezone-aware UTC instant.
+        minutes_before: Blackout minutes before each release.
+        minutes_after: Blackout minutes after each release.
+        minimum_impact: Ignore events strictly below this impact level.
+
+    Returns:
+        Standard response carrying ``True`` when ``at`` is inside an event
+        release window or adjacent blackout; ``False`` otherwise.
+
+    Raises:
+        (in-band) ``VALIDATION_FAILED`` when ``at`` is timezone-naive or the
+            blackout minutes are negative.
+    """
+
+    def _raw() -> bool:
+        try:
+            return _is_news_restricted_events_raw(
+                events,
+                at,
+                minutes_before=minutes_before,
+                minutes_after=minutes_after,
+                minimum_impact=minimum_impact,
+            )
+        except ValueError as error:
+            raise DataError(
+                "VALIDATION_FAILED",
+                safe_details={"field": "news_restriction"},
+            ) from error
+
+    return run_data_operation(
+        operation="data.economic_calendar.is_news_restricted_events",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=_raw,
+    )
 
 
 __all__ = [

@@ -6,8 +6,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
-import pytest
-from app.services.data.contracts import DataError, DataQualityReport, MarketDataset
+from app.services.data.contracts import DataQualityReport, MarketDataset
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.cache import (
     _filter_cached_keys,
     clear_cache_entry,
@@ -22,6 +22,14 @@ from app.services.data.persistence.contracts import (
 )
 
 _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _sample_dataset() -> MarketDataset:
@@ -91,15 +99,15 @@ def test_get_cache_entry_handles_stale_and_expiration() -> None:
     mock_res.rows = (mock_row,)
 
     with patch(
-        "app.services.data.persistence.cache.execute_transaction",
+        "app.services.data.persistence.cache._execute_transaction_raw",
         return_value=mock_res,
     ):
         # Allow stale False -> returns None
-        entry = get_cache_entry(read_req_no_stale)
+        entry = _unwrap(get_cache_entry(read_req_no_stale))
         assert entry is None
 
         # Allow stale True -> returns CacheEntry with stale_warning
-        entry_stale = get_cache_entry(read_req_stale)
+        entry_stale = _unwrap(get_cache_entry(read_req_stale))
         assert entry_stale is not None
         assert entry_stale.dataset.cache_status == "stale_warning"
 
@@ -123,21 +131,23 @@ def test_get_cache_entry_error_handling() -> None:
     mock_res.rows = (mock_row,)
 
     with patch(
-        "app.services.data.persistence.cache.execute_transaction",
+        "app.services.data.persistence.cache._execute_transaction_raw",
         return_value=mock_res,
     ):
-        with pytest.raises(DataError) as exc_info:
-            get_cache_entry(read_req)
-        assert exc_info.value.code == "FILE_CORRUPTED"
+        response = get_cache_entry(read_req)
+        assert response.status == "error"
+        assert response.error is not None
+        assert response.error.code == "FILE_CORRUPTED"
 
     # Database exception
     with patch(
-        "app.services.data.persistence.cache.execute_transaction",
+        "app.services.data.persistence.cache._execute_transaction_raw",
         side_effect=RuntimeError("DB query failed"),
     ):
-        with pytest.raises(DataError) as exc_info:
-            get_cache_entry(read_req)
-        assert exc_info.value.code == "DATABASE_ERROR"
+        response = get_cache_entry(read_req)
+        assert response.status == "error"
+        assert response.error is not None
+        assert response.error.code == "DATABASE_ERROR"
 
 
 def test_put_cache_entry_uncommitted_row() -> None:
@@ -157,12 +167,13 @@ def test_put_cache_entry_uncommitted_row() -> None:
     mock_res.affected_rows = 0
 
     with patch(
-        "app.services.data.persistence.cache.execute_transaction",
+        "app.services.data.persistence.cache._execute_transaction_raw",
         return_value=mock_res,
     ):
-        with pytest.raises(DataError) as exc_info:
-            put_cache_entry(write_req)
-        assert exc_info.value.code == "DB_WRITE_FAILED"
+        response = put_cache_entry(write_req)
+        assert response.status == "error"
+        assert response.error is not None
+        assert response.error.code == "DB_WRITE_FAILED"
 
 
 def test_clear_cache_entry_filters_and_dry_run() -> None:
@@ -171,7 +182,7 @@ def test_clear_cache_entry_filters_and_dry_run() -> None:
     other_req = CacheClearRequest(
         namespace="other", dry_run=True, max_entries=10, request_id=_REQ_ID
     )
-    res_other = clear_cache_entry(other_req)
+    res_other = _unwrap(clear_cache_entry(other_req))
     assert res_other.matched_count == 0
 
     # Test filtering rows
@@ -214,10 +225,10 @@ def test_clear_cache_entry_filters_and_dry_run() -> None:
     )
 
     with patch(
-        "app.services.data.persistence.cache.execute_transaction",
+        "app.services.data.persistence.cache._execute_transaction_raw",
         side_effect=[mock_select_res, mock_delete_res],
     ):
-        res_del = clear_cache_entry(req_delete)
+        res_del = _unwrap(clear_cache_entry(req_delete))
         assert res_del.matched_count == 1
         assert res_del.deleted_count == 1
 
@@ -227,5 +238,6 @@ def test_clear_data_cache_mixed_styles() -> None:
     req = CacheClearRequest(
         namespace="data", dry_run=True, max_entries=10, request_id=_REQ_ID
     )
-    with pytest.raises(DataError):
-        clear_data_cache(req, symbol="EURUSD")
+    response = clear_data_cache(req, symbol="EURUSD")
+    assert response.status == "error"
+    assert response.error is not None

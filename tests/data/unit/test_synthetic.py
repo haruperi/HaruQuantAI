@@ -4,12 +4,22 @@ from datetime import UTC, datetime
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.synthetic_data.contracts import SyntheticRequest
 from app.services.data.synthetic_data.gbm import (
     SYNTHETIC_BAR_MAX_RECORDS,
     SYNTHETIC_TICK_MAX_RECORDS,
     generate_synthetic_dataset,
 )
+
+
+def _unwrap(response):
+    """Extract the raw payload from a migrated synthetic-data response."""
+    return unwrap_data_response(
+        response,
+        operation="data.synthetic_data.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def test_synthetic_dataset_replays_from_seed() -> None:
@@ -40,8 +50,8 @@ def test_synthetic_dataset_replays_from_seed() -> None:
         request_id="req-a697f8b99a46c8465b9a70e7af44e49a7665cf1ce8e62c3b42678f1c26b21814",
     )
 
-    ds1 = generate_synthetic_dataset(req1)
-    ds2 = generate_synthetic_dataset(req2)
+    ds1 = _unwrap(generate_synthetic_dataset(req1))
+    ds2 = _unwrap(generate_synthetic_dataset(req2))
 
     assert ds1.record_count == 10
     assert len(ds1.records) == 10
@@ -63,7 +73,7 @@ def test_synthetic_ticks_generation() -> None:
         precision_policy="decimal_string",
         request_id="req-0b43c1e5a01f391ad6257f03d5af3bc5d3b78394cfe4aa9d5d3dbcbc1b4d8a2d",
     )
-    ds = generate_synthetic_dataset(req)
+    ds = _unwrap(generate_synthetic_dataset(req))
     assert ds.data_kind == "ticks"
     assert ds.record_count == 10
     assert len(ds.records) == 10
@@ -84,9 +94,9 @@ def test_synthetic_dataset_limit_exceeded() -> None:
         request_id="req-9456bdfa12ea76959c94a3572f5d91c73d838622df0a8d9b4e815c276c6b7880",
     )
 
-    with pytest.raises(DataError) as exc_info:
-        generate_synthetic_dataset(req_bar)
-    assert exc_info.value.args[0] == "LIMIT_EXCEEDED"
+    resp = generate_synthetic_dataset(req_bar)
+    assert resp.status == "error"
+    assert resp.error.code == "LIMIT_EXCEEDED"
 
     req_tick = SyntheticRequest(
         symbol="BTC/USD",
@@ -101,9 +111,9 @@ def test_synthetic_dataset_limit_exceeded() -> None:
         request_id="req-a697f8b99a46c8465b9a70e7af44e49a7665cf1ce8e62c3b42678f1c26b21814",
     )
 
-    with pytest.raises(DataError) as exc_info:
-        generate_synthetic_dataset(req_tick)
-    assert exc_info.value.args[0] == "LIMIT_EXCEEDED"
+    resp = generate_synthetic_dataset(req_tick)
+    assert resp.status == "error"
+    assert resp.error.code == "LIMIT_EXCEEDED"
 
 
 def test_synthetic_invalid_parameters() -> None:
@@ -121,9 +131,9 @@ def test_synthetic_invalid_parameters() -> None:
         precision_policy="decimal_string",
         request_id="req-9456bdfa12ea76959c94a3572f5d91c73d838622df0a8d9b4e815c276c6b7880",
     )
-    with pytest.raises(DataError) as exc_info:
-        generate_synthetic_dataset(req)
-    assert exc_info.value.args[0] == "INVALID_INPUT"
+    resp = generate_synthetic_dataset(req)
+    assert resp.status == "error"
+    assert resp.error.code == "INVALID_INPUT"
 
     # Non-positive sigma
     req2 = SyntheticRequest(
@@ -138,9 +148,9 @@ def test_synthetic_invalid_parameters() -> None:
         precision_policy="decimal_string",
         request_id="req-a697f8b99a46c8465b9a70e7af44e49a7665cf1ce8e62c3b42678f1c26b21814",
     )
-    with pytest.raises(DataError) as exc_info:
-        generate_synthetic_dataset(req2)
-    assert exc_info.value.args[0] == "INVALID_INPUT"
+    resp = generate_synthetic_dataset(req2)
+    assert resp.status == "error"
+    assert resp.error.code == "INVALID_INPUT"
 
     # Missing timeframe for bars
 

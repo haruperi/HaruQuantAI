@@ -7,6 +7,11 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.sources.protocol import MarketDataSource
 from app.utils import logger
 
@@ -25,7 +30,7 @@ _instances: dict[str, MarketDataSource] = {}
 _identities: dict[str, tuple[SourceIdentity, ...]] = {}
 
 
-def register_source(
+def _register_source_raw(
     descriptor: SourceDescriptor,
     factory: SourceFactory,
     identities: tuple[SourceIdentity, ...] = (),
@@ -55,7 +60,30 @@ def register_source(
         _identities[descriptor.source_id] = identities
 
 
-def resolve_source(source_id: str) -> MarketDataSource:
+def register_source(
+    descriptor: SourceDescriptor,
+    factory: SourceFactory,
+    identities: tuple[SourceIdentity, ...] = (),
+) -> StandardResponse[None]:
+    """Register a data source descriptor and lazy factory atomically.
+
+    Args:
+        descriptor: Capability and readiness declaration.
+        factory: Lazy callable returning the source instance.
+        identities: Explicit canonical/friendly/provider identity mappings.
+
+    Returns:
+        Standard response confirming registration.
+    """
+    return run_data_operation(
+        operation="data.sources.register_source",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=lambda: _register_source_raw(descriptor, factory, identities),
+    )
+
+
+def _resolve_source_raw(source_id: str) -> MarketDataSource:
     """Lazily resolve and instantiate a registered source.
 
     Args:
@@ -82,7 +110,24 @@ def resolve_source(source_id: str) -> MarketDataSource:
         return instance
 
 
-def get_source_descriptor(source_id: str) -> SourceDescriptor:
+def resolve_source(source_id: str) -> StandardResponse[MarketDataSource]:
+    """Lazily resolve and instantiate a registered source.
+
+    Args:
+        source_id: Identifier of the source.
+
+    Returns:
+        Standard response carrying the instantiated MarketDataSource.
+    """
+    return run_data_operation(
+        operation="data.sources.resolve_source",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=lambda: _resolve_source_raw(source_id),
+    )
+
+
+def _get_source_descriptor_raw(source_id: str) -> SourceDescriptor:
     """Get the descriptor for a registered source.
 
     Args:
@@ -102,6 +147,23 @@ def get_source_descriptor(source_id: str) -> SourceDescriptor:
                 safe_details={"field": "source_id"},
             )
         return _registry[source_id][0]
+
+
+def get_source_descriptor(source_id: str) -> StandardResponse[SourceDescriptor]:
+    """Get the descriptor for a registered source.
+
+    Args:
+        source_id: Identifier of the source.
+
+    Returns:
+        Standard response carrying the source descriptor.
+    """
+    return run_data_operation(
+        operation="data.sources.get_source_descriptor",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=lambda: _get_source_descriptor_raw(source_id),
+    )
 
 
 def update_source_descriptor_readiness(
@@ -131,7 +193,7 @@ def update_source_descriptor_readiness(
         return updated
 
 
-def list_registered_sources() -> tuple[SourceDescriptor, ...]:
+def _list_registered_sources_raw() -> tuple[SourceDescriptor, ...]:
     """List descriptors for all currently registered sources.
 
     Returns:
@@ -140,6 +202,20 @@ def list_registered_sources() -> tuple[SourceDescriptor, ...]:
     logger.info("Listing all registered source descriptors")
     with _lock:
         return tuple(desc for desc, _ in _registry.values())
+
+
+def list_registered_sources() -> StandardResponse[tuple[SourceDescriptor, ...]]:
+    """List descriptors for all currently registered sources.
+
+    Returns:
+        Standard response carrying the registered source descriptors.
+    """
+    return run_data_operation(
+        operation="data.sources.list_registered_sources",
+        request_id=None,
+        start_time=data_start_time(),
+        raw=_list_registered_sources_raw,
+    )
 
 
 def resolve_source_identity(request: SourceIdentityRequest) -> SourceIdentity:

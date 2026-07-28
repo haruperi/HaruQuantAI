@@ -4,6 +4,11 @@ from datetime import time
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import (
+    StandardResponse,
+    data_start_time,
+    run_data_operation,
+)
 from app.services.data.time_sessions.contracts import (
     ActiveMarketSessions,
     ActiveMarketSessionsRequest,
@@ -39,7 +44,7 @@ FOREX_NAMED_SESSIONS = (
 )
 
 
-def get_active_market_sessions(
+def _get_active_market_sessions_raw(
     request: ActiveMarketSessionsRequest,
     *,
     definitions: tuple[NamedSessionDefinition, ...] = FOREX_NAMED_SESSIONS,
@@ -80,6 +85,33 @@ def get_active_market_sessions(
         checked_at=request.at,
         sessions=tuple(active),
         request_id=request.request_id,
+    )
+
+
+def get_active_market_sessions(
+    request: ActiveMarketSessionsRequest,
+    *,
+    definitions: tuple[NamedSessionDefinition, ...] = FOREX_NAMED_SESSIONS,
+) -> StandardResponse[ActiveMarketSessions]:
+    """Return analytical labels active at an aware UTC instant.
+
+    These labels describe regional liquidity only and do not authorize orders.
+
+    Args:
+        request: Symbol, UTC evaluation instant, and trace identity.
+        definitions: Explicit regional definitions to classify.
+
+    Returns:
+        Standard response carrying active labels in configured order.
+
+    Raises:
+        (in-band) ``INVALID_INPUT`` if a configured timezone is unavailable.
+    """
+    return run_data_operation(
+        operation="data.time_sessions.get_active_market_sessions",
+        request_id=request.request_id,
+        start_time=data_start_time(),
+        raw=lambda: _get_active_market_sessions_raw(request, definitions=definitions),
     )
 
 

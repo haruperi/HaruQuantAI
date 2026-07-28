@@ -120,8 +120,8 @@ def test_create_start_stop_handlers(monkeypatch: pytest.MonkeyPatch) -> None:
             SimpleNamespace(rows=()),
         )
     )
-    monkeypatch.setattr(job, "execute_transaction", lambda _request: next(results))
-    monkeypatch.setattr(job, "evaluate_source_policy", lambda _request: None)
+    monkeypatch.setattr(job, "_execute_transaction_raw", lambda _request: next(results))
+    monkeypatch.setattr(job, "_evaluate_source_policy_raw", lambda _request: None)
     started: list[tuple[str, int]] = []
     stopped: list[str] = []
     monkeypatch.setattr(
@@ -145,10 +145,10 @@ def test_handlers_reject_missing_duplicate_and_held_jobs(
 ) -> None:
     """Fail closed for absent, duplicate, and concurrently leased jobs."""
     definition = _definition()
-    monkeypatch.setattr(job, "evaluate_source_policy", lambda _request: None)
+    monkeypatch.setattr(job, "_evaluate_source_policy_raw", lambda _request: None)
     monkeypatch.setattr(
         job,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _request: SimpleNamespace(rows=({"job_id": definition.job_id},)),
     )
     with pytest.raises(DataError):
@@ -156,7 +156,7 @@ def test_handlers_reject_missing_duplicate_and_held_jobs(
 
     monkeypatch.setattr(
         job,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _request: SimpleNamespace(rows=()),
     )
     with pytest.raises(DataError):
@@ -170,7 +170,7 @@ def test_handlers_reject_missing_duplicate_and_held_jobs(
     )
     monkeypatch.setattr(
         job,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _request: SimpleNamespace(rows=(held,)),
     )
     with pytest.raises(DataError):
@@ -193,7 +193,7 @@ def test_read_status_maps_persisted_evidence(monkeypatch: pytest.MonkeyPatch) ->
     }
     monkeypatch.setattr(
         job,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _request: SimpleNamespace(rows=(row,)),
     )
     result = job.read_update_job_status(
@@ -204,7 +204,7 @@ def test_read_status_maps_persisted_evidence(monkeypatch: pytest.MonkeyPatch) ->
 
     monkeypatch.setattr(
         job,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _request: SimpleNamespace(rows=()),
     )
     with pytest.raises(DataError):
@@ -218,7 +218,7 @@ def test_run_range_and_chunk_execution(monkeypatch: pytest.MonkeyPatch) -> None:
     checkpoint_end = _NOW + timedelta(minutes=10)
     monkeypatch.setattr(
         job,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _request: SimpleNamespace(
             rows=({"max_end": checkpoint_end.isoformat()},)
         ),
@@ -280,7 +280,7 @@ def test_run_once_success_and_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     monkeypatch.setattr(
         job,
-        "execute_transaction",
+        "_execute_transaction_raw",
         lambda _request: SimpleNamespace(rows=()),
     )
     success = job.run_data_update_job_once(

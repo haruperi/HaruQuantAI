@@ -11,7 +11,8 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import DataError, DataQualityReport
+from app.services.data.contracts import DataQualityReport
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.local_datasets.contracts import DatasetLoadRequest
 from app.services.data.persistence.contracts import (
     DatasetSaveRequest,
@@ -19,6 +20,14 @@ from app.services.data.persistence.contracts import (
 from app.services.data.persistence.dataset_writer import load_dataset, save_dataset
 
 from tests.data.helpers_models import AVAILABLE, make_dataset
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.persistence.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def _configure_datasets(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
@@ -49,7 +58,7 @@ def test_save_and_load_csv_dataset(
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    manifest = save_dataset(save_req)
+    manifest = _unwrap(save_dataset(save_req))
     assert manifest.format == "csv"
     assert manifest.row_count == 1
     assert manifest.content_hash != ""
@@ -60,7 +69,7 @@ def test_save_and_load_csv_dataset(
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    loaded = load_dataset(load_req)
+    loaded = _unwrap(load_dataset(load_req))
     assert loaded.symbol == "ABC"
     assert loaded.record_count == 1
     assert len(loaded.records) == 1
@@ -82,7 +91,7 @@ def test_save_and_load_parquet_dataset(
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    manifest = save_dataset(save_req)
+    manifest = _unwrap(save_dataset(save_req))
     assert manifest.format == "parquet"
 
     load_req = DatasetLoadRequest(
@@ -91,7 +100,7 @@ def test_save_and_load_parquet_dataset(
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    loaded = load_dataset(load_req)
+    loaded = _unwrap(load_dataset(load_req))
     assert loaded.symbol == "ABC"
     assert loaded.records[0].close == Decimal("10.5")
 
@@ -115,9 +124,10 @@ def test_save_overwrite_prevention(
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    with pytest.raises(DataError) as captured:
-        save_dataset(save_req)
-    assert captured.value.code == "DB_WRITE_FAILED"
+    response = save_dataset(save_req)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DB_WRITE_FAILED"
 
 
 def test_save_quality_failed_dataset(
@@ -155,9 +165,10 @@ def test_save_quality_failed_dataset(
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    with pytest.raises(DataError) as captured:
-        save_dataset(save_req)
-    assert captured.value.code == "DATA_QUALITY_FAILED"
+    response = save_dataset(save_req)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "DATA_QUALITY_FAILED"
 
 
 def test_save_and_load_unapproved_root(
@@ -179,9 +190,10 @@ def test_save_and_load_unapproved_root(
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    with pytest.raises(DataError) as captured:
-        save_dataset(save_req)
-    assert captured.value.code == "PERMISSION_DENIED"
+    save_response = save_dataset(save_req)
+    assert save_response.status == "error"
+    assert save_response.error is not None
+    assert save_response.error.code == "PERMISSION_DENIED"
 
     load_req = DatasetLoadRequest(
         relative_path=Path("other/test.csv"),
@@ -189,9 +201,10 @@ def test_save_and_load_unapproved_root(
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    with pytest.raises(DataError) as captured:
-        load_dataset(load_req)
-    assert captured.value.code == "PERMISSION_DENIED"
+    load_response = load_dataset(load_req)
+    assert load_response.status == "error"
+    assert load_response.error is not None
+    assert load_response.error.code == "PERMISSION_DENIED"
 
 
 def test_load_corrupted_hash(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -206,7 +219,7 @@ def test_load_corrupted_hash(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) ->
         overwrite=True,
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
-    save_dataset(save_req)
+    _unwrap(save_dataset(save_req))
 
     # Modify file contents to corrupt hash
     target = raw_dir / "test.csv"
@@ -219,6 +232,7 @@ def test_load_corrupted_hash(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) ->
         request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
     )
 
-    with pytest.raises(DataError) as captured:
-        load_dataset(load_req)
-    assert captured.value.code == "FILE_CORRUPTED"
+    response = load_dataset(load_req)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "FILE_CORRUPTED"
