@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import run_backtest
+from app.services.simulator import run_backtest, unwrap_simulation_response
 from tests.simulator.usage.workflows._support import (
     authority,
     backtest_request,
@@ -45,10 +45,13 @@ def main() -> None:
     # Stage 2 — Execute it through the ordinary canonical run_backtest() path.
     _stage(2)
     with tempfile.TemporaryDirectory(prefix="wf-sim-003-") as directory:
-        result = run_backtest(
-            request,
-            authority(request),
-            dependencies(Path(directory), dataset),
+        result = unwrap_simulation_response(
+            run_backtest(
+                request,
+                authority(request),
+                dependencies(Path(directory), dataset),
+            ),
+            operation="simulation.workflow.wf_sim_003.run_backtest",
         )
 
     # Stage 3 — Preserve immutable result and provenance without ranking or promotion.

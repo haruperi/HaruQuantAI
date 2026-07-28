@@ -7,7 +7,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import SimulationError, validate_run_inputs
+from app.services.simulator import (
+    SimulationError,
+    unwrap_simulation_response,
+    validate_run_inputs,
+)
 from tests.simulator.unit.test_validate import _valid_payload
 
 WORKFLOW_ID = "WF-SIM-006"
@@ -37,7 +41,10 @@ def main() -> None:
     # Stage 2 — Validate reference-only run material at the public boundary.
     _stage(2)
     try:
-        validate_run_inputs(payload)
+        unwrap_simulation_response(
+            validate_run_inputs(payload),
+            operation="simulation.workflow.wf_sim_006.validate_run_inputs",
+        )
     except SimulationError as error:
         rejected = error
     else:

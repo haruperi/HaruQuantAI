@@ -3,7 +3,7 @@
 
 from pathlib import Path
 
-from app.services.simulator import run_backtest
+from app.services.simulator import run_backtest, unwrap_simulation_response
 from app.utils import logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
@@ -19,8 +19,14 @@ def test_external_adapter_can_call_stable_simulation_port(tmp_path: Path) -> Non
     dataset = _dataset("req-dddddddd-dddd-4ddd-8ddd-dddddddddddd")
     request = _request(dataset, suffix="d")
     dependencies = FakeDependencies(tmp_path, dataset)
-    first = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
-    second = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    first = unwrap_simulation_response(
+        run_backtest(request, _auth(request), dependencies),
+        operation="test.optimization.run_backtest",
+    )
+    second = unwrap_simulation_response(
+        run_backtest(request, _auth(request), dependencies),
+        operation="test.optimization.run_backtest",
+    )
     assert first == second
     assert first.status == "completed"
     assert first.model_config["frozen"] is True

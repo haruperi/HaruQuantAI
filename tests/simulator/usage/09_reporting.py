@@ -25,8 +25,14 @@ from app.services.simulator import (
     build_artifact_manifest,
     build_json_report,
     build_markdown_report,
+    unwrap_simulation_response,
 )
 from tests.simulator.unit.test_reporting_contracts import _result
+
+
+def _value(response: object) -> object:
+    """Unwrap one public Simulation response for display."""
+    return unwrap_simulation_response(response, operation="usage.reporting")
 
 
 def _header(title: str) -> None:
@@ -89,12 +95,14 @@ def example_reporting() -> None:
             path = tmp_path / name
             path.write_text(name, encoding="utf-8")
             paths.append(path)
-        disk_manifest = build_artifact_manifest(tmp_path, paths, created_at=instant)
+        disk_manifest = _value(
+            build_artifact_manifest(tmp_path, paths, created_at=instant)
+        )
         print(f"Disk manifest created with {len(disk_manifest.artifacts)} files")
 
     # 4. JSON and Markdown report generation
-    json_report = build_json_report(result)
-    markdown_report = build_markdown_report(result)
+    json_report = _value(build_json_report(result))
+    markdown_report = _value(build_markdown_report(result))
     print(f"JSON report length: {len(json_report)} chars")
     print(f"Markdown report title: {markdown_report.splitlines()[0]}")
 
@@ -273,7 +281,7 @@ def fr_sim_026() -> None:
             path = root / name
             path.write_text(name, encoding="utf-8")
             paths.append(path)
-        manifest = build_artifact_manifest(root, paths, created_at=instant)
+        manifest = _value(build_artifact_manifest(root, paths, created_at=instant))
         print(f"Built artifacts: {len(manifest.artifacts)}")
 
 
@@ -288,7 +296,7 @@ def fr_sim_027() -> None:
     _header(
         "Demonstrate FR-SIM-027. Responsibility: The system shall serialize a `SimulationResult` to deterministic canonical JSON with execution/accounting diagnostics and realism/data-quality disclosures, excluding Analytics-owned metric formulas."
     )
-    print(f"JSON report bytes: {len(build_json_report(_result()))}")
+    print(f"JSON report bytes: {len(_value(build_json_report(_result())))}")
 
 
 def fr_sim_028() -> None:
@@ -302,7 +310,7 @@ def fr_sim_028() -> None:
     _header(
         "Demonstrate FR-SIM-028. Responsibility: The system shall render a deterministic Markdown execution report with assumptions, limitations, costs, fills, rejections, data quality, and artifact identities, excluding external distribution claims."
     )
-    print(build_markdown_report(_result()).splitlines()[0])
+    print(_value(build_markdown_report(_result())).splitlines()[0])
 
 
 def main() -> None:

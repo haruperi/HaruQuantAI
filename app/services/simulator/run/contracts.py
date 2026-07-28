@@ -17,7 +17,14 @@ from pydantic import (
     model_validator,
 )
 
-from app.utils import canonical_digest, canonical_json, logger
+from app.services.simulator.errors import guard_operation
+from app.utils import (
+    RiskLevel,
+    StandardResponse,
+    canonical_digest,
+    canonical_json,
+    logger,
+)
 
 if TYPE_CHECKING:
     from app.services.data import FXConversionEvidence, MarketDataset
@@ -102,7 +109,9 @@ class SimulationBacktestRequestV1(BaseModel):
     config_hash: str
 
     @classmethod
-    def calculate_config_hash(cls, payload: Mapping[str, object]) -> str:
+    def calculate_config_hash(
+        cls, payload: Mapping[str, object]
+    ) -> StandardResponse[str]:
         """Calculate the required configuration hash for request construction.
 
         Args:
@@ -112,10 +121,19 @@ class SimulationBacktestRequestV1(BaseModel):
             Lowercase SHA-256 configuration digest.
         """
         logger.debug("Calculating SimulationBacktestRequestV1 config hash")
-        material = dict(payload)
-        material.setdefault("contract_version", "v1")
-        material.setdefault("schema_id", "simulation.backtest_request.v1")
-        return _hash_material(material)
+
+        def calculate(value: Mapping[str, object]) -> str:
+            material = dict(value)
+            material.setdefault("contract_version", "v1")
+            material.setdefault("schema_id", "simulation.backtest_request.v1")
+            return _hash_material(material)
+
+        return guard_operation(
+            calculate,
+            operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+            risk_level=RiskLevel.LOW,
+            read_only=True,
+        )(payload)
 
     @field_validator("start", "end")
     @classmethod
@@ -205,7 +223,7 @@ class SimulationBacktestRequestV1(BaseModel):
         if self.runtime_profile == "fast_research" and self.canonical:
             raise ValueError("Fast research request cannot be canonical")
         payload = self.model_dump(mode="python", warnings=False)
-        if self.config_hash != type(self).calculate_config_hash(payload):
+        if self.config_hash != _hash_material(payload):
             raise ValueError("config_hash does not match request material")
         return self
 
@@ -254,7 +272,9 @@ class PortfolioBacktestRequestV1(BaseModel):
     config_hash: str
 
     @classmethod
-    def calculate_config_hash(cls, payload: Mapping[str, object]) -> str:
+    def calculate_config_hash(
+        cls, payload: Mapping[str, object]
+    ) -> StandardResponse[str]:
         """Calculate portfolio request configuration identity.
 
         Args:
@@ -264,10 +284,19 @@ class PortfolioBacktestRequestV1(BaseModel):
             Lowercase SHA-256 digest.
         """
         logger.debug("Calculating PortfolioBacktestRequestV1 config hash")
-        material = dict(payload)
-        material.setdefault("contract_version", "v1")
-        material.setdefault("schema_id", "simulation.portfolio_backtest_request.v1")
-        return _hash_material(material)
+
+        def calculate(value: Mapping[str, object]) -> str:
+            material = dict(value)
+            material.setdefault("contract_version", "v1")
+            material.setdefault("schema_id", "simulation.portfolio_backtest_request.v1")
+            return _hash_material(material)
+
+        return guard_operation(
+            calculate,
+            operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
+            risk_level=RiskLevel.LOW,
+            read_only=True,
+        )(payload)
 
     def _validate_fx_bindings(self) -> None:
         """Validate ordered immutable FX evidence identities.
@@ -334,7 +363,7 @@ class PortfolioBacktestRequestV1(BaseModel):
         self._validate_fx_bindings()
         self._validate_component_allocations()
         payload = self.model_dump(mode="python", warnings=False)
-        if self.config_hash != type(self).calculate_config_hash(payload):
+        if self.config_hash != _hash_material(payload):
             raise ValueError("config_hash does not match portfolio material")
         return self
 
@@ -346,7 +375,7 @@ class SimulationRunDependencies(Protocol):
     artifact_root: Path
     fast_research_enabled: bool
 
-    def persist_audit_event(self, event: AuditEvent) -> None:
+    def persist_audit_event(self, event: AuditEvent) -> StandardResponse[None]:
         """Persist one governed Simulation audit event through Data.
 
         Args:
@@ -359,7 +388,9 @@ class SimulationRunDependencies(Protocol):
         del event
         raise NotImplementedError
 
-    def load_market_data(self, request: SimulationBacktestRequestV1) -> MarketDataset:
+    def load_market_data(
+        self, request: SimulationBacktestRequestV1
+    ) -> StandardResponse[MarketDataset]:
         """Load the immutable referenced Data dataset."""
         logger.debug("Declaring Simulation load_market_data dependency")
         del request
@@ -367,7 +398,7 @@ class SimulationRunDependencies(Protocol):
 
     def generate_tick_series(
         self, dataset: MarketDataset, request: SimulationBacktestRequestV1
-    ) -> MarketDataset:
+    ) -> StandardResponse[MarketDataset]:
         """Invoke Data's official real-evidence tick generator."""
         logger.debug("Declaring Simulation generate_tick_series dependency")
         del dataset, request
@@ -375,7 +406,7 @@ class SimulationRunDependencies(Protocol):
 
     def calculate_indicators(
         self, dataset: MarketDataset, request: SimulationBacktestRequestV1
-    ) -> tuple[IndicatorResult, ...]:
+    ) -> StandardResponse[tuple[IndicatorResult, ...]]:
         """Calculate point-in-time Indicator evidence."""
         logger.debug("Declaring Simulation calculate_indicators dependency")
         del dataset, request
@@ -386,7 +417,7 @@ class SimulationRunDependencies(Protocol):
         dataset: MarketDataset,
         indicators: tuple[IndicatorResult, ...],
         request: SimulationBacktestRequestV1,
-    ) -> tuple[TradeIntent, ...]:
+    ) -> StandardResponse[tuple[TradeIntent, ...]]:
         """Evaluate a registered Strategy against supplied evidence."""
         logger.debug("Declaring Simulation evaluate_strategy dependency")
         del dataset, indicators, request
@@ -396,7 +427,7 @@ class SimulationRunDependencies(Protocol):
         self,
         intents: tuple[TradeIntent, ...],
         request: SimulationBacktestRequestV1,
-    ) -> tuple[RiskDecisionPackage, ...]:
+    ) -> StandardResponse[tuple[RiskDecisionPackage, ...]]:
         """Review Strategy proposals under the referenced sim policy."""
         logger.debug("Declaring Simulation review_risk dependency")
         del intents, request
@@ -406,7 +437,7 @@ class SimulationRunDependencies(Protocol):
         self,
         decisions: tuple[RiskDecisionPackage, ...],
         request: SimulationBacktestRequestV1,
-    ) -> tuple[OrderIntent, ...]:
+    ) -> StandardResponse[tuple[OrderIntent, ...]]:
         """Pack approved Risk decisions through Trading's public boundary."""
         logger.debug("Declaring Simulation build_order_intents dependency")
         del decisions, request
@@ -414,7 +445,7 @@ class SimulationRunDependencies(Protocol):
 
     def resolve_execution_profile(
         self, request: SimulationBacktestRequestV1
-    ) -> ExecutionProfile:
+    ) -> StandardResponse[ExecutionProfile]:
         """Resolve the exact referenced execution profile."""
         logger.debug("Declaring Simulation execution profile dependency")
         del request
@@ -422,7 +453,7 @@ class SimulationRunDependencies(Protocol):
 
     def resolve_symbol_specification(
         self, request: SimulationBacktestRequestV1
-    ) -> SymbolSpecification:
+    ) -> StandardResponse[SymbolSpecification]:
         """Resolve approved symbol constraints."""
         logger.debug("Declaring Simulation symbol specification dependency")
         del request
@@ -430,7 +461,7 @@ class SimulationRunDependencies(Protocol):
 
     def resolve_cost_model(
         self, request: SimulationBacktestRequestV1
-    ) -> ExecutionCostModel:
+    ) -> StandardResponse[ExecutionCostModel]:
         """Resolve the exact referenced cost model."""
         logger.debug("Declaring Simulation cost-model dependency")
         del request
@@ -438,7 +469,7 @@ class SimulationRunDependencies(Protocol):
 
     def resolve_fx_evidence(
         self, evidence_ids: tuple[str, ...]
-    ) -> Mapping[str, FXConversionEvidence]:
+    ) -> StandardResponse[Mapping[str, FXConversionEvidence]]:
         """Resolve one Data-owned FXConversionEvidence v1 per identifier.
 
         Simulation validates freshness through `validate_fx_evidence()` and

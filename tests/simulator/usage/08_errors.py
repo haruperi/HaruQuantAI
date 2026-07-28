@@ -14,6 +14,7 @@ from app.services.simulator import (
     SIM_ERROR_CATALOG,
     SimulationError,
     to_simulation_error_payload,
+    unwrap_simulation_response,
 )
 
 
@@ -52,7 +53,7 @@ def fr_sim_036() -> None:
     catalog_entry = SIM_ERROR_CATALOG.get("SIM_MARKET_CLOSED")
     print(
         "Catalog entry for SIM_MARKET_CLOSED group: "
-        f"{catalog_entry['group'] if catalog_entry else None}"
+        f"{catalog_entry.category if catalog_entry else None}"
     )
 
 
@@ -66,8 +67,11 @@ def fr_sim_037() -> None:
     _header(
         "Demonstrate FR-SIM-037. Responsibility: The system shall convert a controlled exception into a bounded, redacted payload exposing no provider exception, path, credential, or raw payload."
     )
-    payload = to_simulation_error_payload(
-        SimulationError("SIM_INVALID_CONFIG", "Invalid configuration")
+    payload = unwrap_simulation_response(
+        to_simulation_error_payload(
+            SimulationError("SIM_INVALID_CONFIG", "Invalid configuration")
+        ),
+        operation="usage.errors.to_simulation_error_payload",
     )
     print(f"Converted error payload code: {payload['code']}")
 

@@ -8,7 +8,7 @@ from hashlib import sha256
 from typing import TYPE_CHECKING
 
 from app.services.simulator.accounting import validate_fx_evidence
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.journal import JournalWriter
 from app.services.simulator.reporting import (
     ComponentReturnSeries,
@@ -166,7 +166,10 @@ def _validate_fx_lineage(
     if not request.fx_evidence_ids:
         return
     try:
-        resolved = dependencies.resolve_fx_evidence(request.fx_evidence_ids)
+        resolved = unwrap_simulation_response(
+            dependencies.resolve_fx_evidence(request.fx_evidence_ids),
+            operation="simulation.run.resolve_fx_evidence",
+        )
     except SimulationError:
         raise
     except Exception as error:
@@ -391,24 +394,32 @@ def _run_portfolio_backtest(
         request.request_id,
         request.correlation_id,
     )
-    writer.append(
-        "run_started",
-        {
-            "config_hash": request.config_hash,
-            "data_hash": data_hash,
-            "engine_version": _ENGINE_VERSION,
-        },
-        request.measurement_start,
+    unwrap_simulation_response(
+        writer.append(
+            "run_started",
+            {
+                "config_hash": request.config_hash,
+                "data_hash": data_hash,
+                "engine_version": _ENGINE_VERSION,
+            },
+            request.measurement_start,
+        ),
+        operation="simulation.run.journal_append",
     )
-    writer.append(
-        "portfolio_completed",
-        {
-            "component_run_ids": tuple(item.run_id for item in completed),
-            "aggregate_net_profit": aggregate_net_profit,
-        },
-        request.measurement_end,
+    unwrap_simulation_response(
+        writer.append(
+            "portfolio_completed",
+            {
+                "component_run_ids": tuple(item.run_id for item in completed),
+                "aggregate_net_profit": aggregate_net_profit,
+            },
+            request.measurement_end,
+        ),
+        operation="simulation.run.journal_append",
     )
-    writer.finalize()
+    unwrap_simulation_response(
+        writer.finalize(), operation="simulation.run.journal_finalize"
+    )
     _write_completed_text(
         result_path,
         canonical_json(

@@ -3,7 +3,12 @@
 
 from pathlib import Path
 
-from app.services.simulator import JournalEvent, replay_journal, run_backtest
+from app.services.simulator import (
+    JournalEvent,
+    replay_journal,
+    run_backtest,
+    unwrap_simulation_response,
+)
 from app.utils import logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
@@ -26,10 +31,16 @@ def test_completed_run_replays_to_terminal_state(tmp_path: Path) -> None:
     dataset = _dataset("req-ffffffff-ffff-4fff-8fff-ffffffffffff")
     request = _request(dataset, suffix="f")
     dependencies = FakeDependencies(tmp_path, dataset)
-    result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
-    state = replay_journal(
-        dependencies.artifact_root / result.journal_ref,
-        _count_events,
+    result = unwrap_simulation_response(
+        run_backtest(request, _auth(request), dependencies),
+        operation="test.replay.run_backtest",
+    )
+    state = unwrap_simulation_response(
+        replay_journal(
+            dependencies.artifact_root / result.journal_ref,
+            _count_events,
+        ),
+        operation="test.replay.replay_journal",
     )
     assert state["events"] >= 3  # type: ignore[operator]
     assert state["last_type"] == "run_completed"

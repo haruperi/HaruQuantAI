@@ -8,7 +8,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import SimulationError, run_backtest
+from app.services.simulator import (
+    SimulationError,
+    run_backtest,
+    unwrap_simulation_response,
+)
 from tests.simulator.usage.workflows._support import (
     authority,
     backtest_request,
@@ -57,7 +61,11 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="wf-sim-004-") as directory:
         deps = dependencies(Path(directory), failed)
         try:
-            run_backtest(request, authority(request), deps)
+            response = run_backtest(request, authority(request), deps)
+            unwrap_simulation_response(
+                response,
+                operation="simulation.workflow.wf_sim_004.run_backtest",
+            )
         except SimulationError as error:
             blocked = error
         else:

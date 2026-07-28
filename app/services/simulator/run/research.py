@@ -5,7 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.reporting import FastResearchResult
 from app.services.simulator.run.audit import emit_simulation_audit
 from app.services.simulator.run.orchestrator import _canonical_hash, _validate_auth
@@ -52,8 +52,14 @@ def _run_fast_research(
         )
     if not dependencies.fast_research_enabled:
         raise SimulationError("SIM_UNSUPPORTED_OPERATION", "Fast research is disabled")
-    source = dependencies.load_market_data(request)
-    tick_dataset = dependencies.generate_tick_series(source, request)
+    source = unwrap_simulation_response(
+        dependencies.load_market_data(request),
+        operation="simulation.run.load_market_data",
+    )
+    tick_dataset = unwrap_simulation_response(
+        dependencies.generate_tick_series(source, request),
+        operation="simulation.run.generate_tick_series",
+    )
     timeline = build_tick_timeline(tick_dataset)
     if not timeline:
         raise SimulationError(

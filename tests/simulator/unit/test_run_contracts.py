@@ -4,6 +4,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from app.services.simulator.errors import unwrap_simulation_response
 from app.services.simulator.reporting import ReturnObservation
 from app.services.simulator.run import (
     PortfolioBacktestRequestV1,
@@ -67,6 +68,9 @@ def test_portfolio_request_is_self_contained() -> None:
         "runtime_profile": "simulation",
         "execution_route": "sim",
     }
-    payload["config_hash"] = PortfolioBacktestRequestV1.calculate_config_hash(payload)
+    payload["config_hash"] = unwrap_simulation_response(
+        PortfolioBacktestRequestV1.calculate_config_hash(payload),
+        operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
+    )
     request = PortfolioBacktestRequestV1.model_validate(payload)
     assert request.components[0].backtest_request is not None

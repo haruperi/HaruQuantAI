@@ -20,8 +20,14 @@ from app.services.data.contracts import (
 from app.services.simulator import (
     Tick,
     build_tick_timeline,
+    unwrap_simulation_response,
     validate_intent_timing,
 )
+
+
+def _value(response: object) -> object:
+    """Unwrap one public Simulation response for display."""
+    return unwrap_simulation_response(response, operation="usage.timeline")
 
 
 def _header(title: str) -> None:
@@ -130,7 +136,7 @@ def fr_sim_005() -> None:
     _header(
         "Demonstrate FR-SIM-005. Responsibility: The system shall convert one Data-owned tick `MarketDataset` into a strictly ordered immutable `Tick` tuple, validating UTC monotonicity, positive finite prices, `ask >= bid`, and the presence of intra-bar phase evidence. Tick derivation itself belongs to Data (`FR-DATA-087`-`FR-DATA-090`); Simulation constructs no ticks, applies no spread model, and consumes no seed."
     )
-    timeline = build_tick_timeline(_dataset())
+    timeline = _value(build_tick_timeline(_dataset()))
     sequences = tuple(t.sequence for t in timeline)
     print(f"Timeline tick sequences: {sequences}")
 
@@ -146,7 +152,7 @@ def fr_sim_006() -> None:
         "Demonstrate FR-SIM-006. Responsibility: The system shall reject a strategy intent whose evidence became available after its execution time and enforce previous-closed-bar visibility by default."
     )
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-    validate_intent_timing(instant, instant)
+    _value(validate_intent_timing(instant, instant))
     print("Intent timing validated successfully")
 
 

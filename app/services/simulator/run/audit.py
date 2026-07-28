@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.utils import AuditEvent, AuthContext, generate_id, logger
 
 if TYPE_CHECKING:
@@ -54,7 +54,10 @@ def emit_simulation_audit(
             correlation_id=auth_context.correlation_id,
             payload=payload,
         )
-        dependencies.persist_audit_event(event)
+        unwrap_simulation_response(
+            dependencies.persist_audit_event(event),
+            operation="simulation.run.emit_simulation_audit",
+        )
     except SimulationError:
         raise
     except Exception as error:

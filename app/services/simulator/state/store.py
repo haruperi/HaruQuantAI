@@ -9,7 +9,10 @@ connection, schema statement, filesystem write, or SQL of any kind.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Literal, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
+
+if TYPE_CHECKING:
+    from app.utils import StandardResponse
 
 type RunStatus = Literal["started", "completed", "failed"]
 
@@ -18,7 +21,9 @@ type RunStatus = Literal["started", "completed", "failed"]
 class SimulationStateStore(Protocol):
     """Persistence operations Simulation depends on and never implements."""
 
-    def append_journal(self, run_id: str, canonical_event: str) -> None:
+    def append_journal(
+        self, run_id: str, canonical_event: str
+    ) -> StandardResponse[None]:
         """Append one canonical journal record durably and transactionally.
 
         Args:
@@ -30,7 +35,7 @@ class SimulationStateStore(Protocol):
         """
         ...
 
-    def flush_journal(self, run_id: str) -> None:
+    def flush_journal(self, run_id: str) -> StandardResponse[None]:
         """Make every previously appended event durable.
 
         Called by `JournalWriter` on the `JOURNAL_FSYNC_INTERVAL` group-commit
@@ -49,7 +54,7 @@ class SimulationStateStore(Protocol):
         run_id: str,
         expected_event_count: int,
         expected_tail_hash: str,
-    ) -> str:
+    ) -> StandardResponse[str]:
         """Atomically publish one completed journal and return its checksum.
 
         Args:
@@ -65,7 +70,9 @@ class SimulationStateStore(Protocol):
         """
         ...
 
-    def load_run(self, request_id: str) -> Mapping[str, object] | None:
+    def load_run(
+        self, request_id: str
+    ) -> StandardResponse[Mapping[str, object] | None]:
         """Load a recorded idempotency row by request identity.
 
         Args:
@@ -86,7 +93,7 @@ class SimulationStateStore(Protocol):
         run_id: str,
         status: RunStatus,
         result_payload: Mapping[str, object] | None = None,
-    ) -> None:
+    ) -> StandardResponse[None]:
         """Record or advance one request-id lifecycle state without ambiguity.
 
         Args:

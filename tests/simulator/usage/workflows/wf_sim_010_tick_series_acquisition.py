@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 import sys
-from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import generate_tick_series, get_market_data
-from app.services.simulator import build_tick_timeline
-from tests.data.usage.workflows._support import market_request
+from app.services.simulator import build_tick_timeline, unwrap_simulation_response
+from tests.simulator.usage.workflows._support import (
+    live_market_dataset,
+    live_tick_dataset,
+)
 
 WORKFLOW_ID = "WF-SIM-010"
 STAGES = (
@@ -35,22 +36,18 @@ def main() -> None:
 
     # Stage 1 — Retrieve bounded genuine MT5 bar evidence through Data.get_market_data().
     _stage(1)
-    bars = get_market_data(market_request("bars", timeframe="M1", limit=10))
+    live_market_dataset()
 
     # Stage 2 — Generate canonical ordered ticks through Data.generate_tick_series().
     _stage(2)
-    ticks = generate_tick_series(
-        bars,
-        model="trading_bar",
-        trading_timeframe="M1",
-        spread_model="fixed_spread",
-        fixed_spread_points=Decimal(2),
-        point_value=Decimal("0.00001"),
-    )
+    ticks = live_tick_dataset()
 
     # Stage 3 — Validate and convert ticks through Simulator.build_tick_timeline().
     _stage(3)
-    timeline = build_tick_timeline(ticks)
+    timeline = unwrap_simulation_response(
+        build_tick_timeline(ticks),
+        operation="simulation.workflow.wf_sim_010.build_tick_timeline",
+    )
 
     # Stage 4 — Return the Data-owned tick dataset and immutable execution clock.
     _stage(4)

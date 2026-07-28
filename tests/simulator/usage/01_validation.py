@@ -20,11 +20,17 @@ from app.services.data.contracts import (
 )
 from app.services.simulator import (
     MarketDataValidationContext,
+    unwrap_simulation_response,
     validate_market_data,
     validate_phase_one_scope,
     validate_run_inputs,
 )
 from app.utils import canonical_json
+
+
+def _value(response: object) -> object:
+    """Unwrap one public Simulation response for display."""
+    return unwrap_simulation_response(response, operation="usage.validation")
 
 
 def _header(title: str) -> None:
@@ -128,7 +134,7 @@ def fr_sim_001() -> None:
         "symbol": "EURUSD",
         "config_hash": "e" * 64,
     }
-    validate_run_inputs(payload)
+    _value(validate_run_inputs(payload))
     print("Run inputs successfully validated")
 
 
@@ -143,13 +149,13 @@ def fr_sim_003() -> None:
     _header(
         "Demonstrate FR-SIM-003. Responsibility: The system shall permit only approved FX scope or explicit `FAST_RESEARCH`, rejecting unsupported assets, features, service mode, and canonical claims from approximation."
     )
-    validate_phase_one_scope(
+    _value(validate_phase_one_scope(
         {
             "asset_class": "FX",
             "runtime_profile": "simulation",
             "execution_route": "sim",
         }
-    )
+    ))
     print("Phase one scope successfully validated")
 
 
@@ -166,7 +172,7 @@ def fr_sim_002() -> None:
         "Demonstrate FR-SIM-002. Responsibility: The system shall verify manifest checksum, required schema, UTC monotonic timestamps, uniqueness, OHLC consistency, bid/ask spread, staleness, availability metadata, and requested coverage, blocking severe failures before execution, and shall return immutable validated evidence."
     )
     dataset = _dataset()
-    evidence = validate_market_data(dataset, _context(dataset))
+    evidence = _value(validate_market_data(dataset, _context(dataset)))
     print(f"Validated market data records: {evidence.record_count}")
 
 

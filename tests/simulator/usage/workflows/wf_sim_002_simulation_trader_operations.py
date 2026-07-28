@@ -9,7 +9,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import SimTrader, match_order, price_order
+from app.services.simulator import (
+    SimTrader,
+    match_order,
+    price_order,
+    unwrap_simulation_response,
+)
 from tests.simulator.unit.test_engine import _engine, _intent, _tick
 from tests.simulator.unit.test_pricing import _profile
 
@@ -46,20 +51,35 @@ def main() -> None:
 
         # Stage 2 — Submit the unchanged intent through SimTrader.submit_order().
         _stage(2)
-        receipt = asyncio.run(trader.submit_order(intent))
+        receipt = unwrap_simulation_response(
+            asyncio.run(trader.submit_order(intent)),
+            operation="simulation.workflow.wf_sim_002.submit_order",
+        )
 
         # Stage 3 — Price and match it against the current canonical tick.
         _stage(3)
-        priced = price_order(intent, tick, _profile())
-        matched = match_order(intent, tick, _profile())
+        priced = unwrap_simulation_response(
+            price_order(intent, tick, _profile()),
+            operation="simulation.workflow.wf_sim_002.price_order",
+        )
+        matched = unwrap_simulation_response(
+            match_order(intent, tick, _profile()),
+            operation="simulation.workflow.wf_sim_002.match_order",
+        )
 
         # Stage 4 — Execute the tick, mutate only simulated state, and append journal evidence.
         _stage(4)
-        engine.execute_tick(tick)
+        unwrap_simulation_response(
+            engine.execute_tick(tick),
+            operation="simulation.workflow.wf_sim_002.execute_tick",
+        )
 
         # Stage 5 — Return the simulated receipt and immutable SimTrader.snapshot().
         _stage(5)
-        snapshot = trader.snapshot()
+        snapshot = unwrap_simulation_response(
+            trader.snapshot(),
+            operation="simulation.workflow.wf_sim_002.snapshot",
+        )
         print("Price/match:", priced, matched.status)
         print(
             "OUTPUT BOUNDARY — ExecutionReceipt and snapshot:",

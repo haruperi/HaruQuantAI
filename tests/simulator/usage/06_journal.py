@@ -12,14 +12,19 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.simulator import (
-    JournalEvent,
     JournalWriter,
     replay_journal,
     resolve_idempotent_run,
+    unwrap_simulation_response,
 )
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 NOW = datetime(2025, 1, 1, tzinfo=UTC)
+
+
+def _value(response: object) -> object:
+    """Unwrap one public Simulation response for display."""
+    return unwrap_simulation_response(response, operation="usage.journal")
 
 
 def _header(title: str) -> None:
@@ -43,13 +48,13 @@ def fr_sim_013() -> None:
         store = SqliteSimulationStateStore(
             tmp_path / "state.db", tmp_path / "artifacts"
         )
-        event: JournalEvent = JournalWriter(
+        event = _value(JournalWriter(
             store, "run-usage", "req-usage", "cor-usage"
         ).append(
             "run_started",
             {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
             NOW,
-        )
+        ))
         print(f"JournalEvent sequence: {event.sequence}")
 
 
@@ -69,11 +74,11 @@ def fr_sim_014() -> None:
         store = SqliteSimulationStateStore(
             tmp_path / "state.db", tmp_path / "artifacts"
         )
-        event = JournalWriter(store, "run-usage", "req-usage", "cor-usage").append(
+        event = _value(JournalWriter(store, "run-usage", "req-usage", "cor-usage").append(
             "run_started",
             {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
             NOW,
-        )
+        ))
         print(f"Appended event hash: {event.event_hash[:16]}...")
 
 
@@ -98,7 +103,7 @@ def fr_sim_015() -> None:
             {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
             NOW,
         )
-        print(f"Finalized checksum: {writer.finalize()[:16]}...")
+        print(f"Finalized checksum: {_value(writer.finalize())[:16]}...")
 
 
 def fr_sim_016() -> None:
@@ -123,9 +128,11 @@ def fr_sim_016() -> None:
             {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
             NOW,
         )
-        writer.finalize()
+        _value(writer.finalize())
         path = tmp_path / "artifacts" / "run-usage" / "journal.jsonl"
-        state = replay_journal(path, lambda _state, event: {"sequence": event.sequence})
+        state = _value(
+            replay_journal(path, lambda _state, event: {"sequence": event.sequence})
+        )
         print(f"Replayed sequence: {state['sequence']}")
 
 
@@ -139,7 +146,7 @@ def fr_sim_017() -> None:
     _header(
         "Demonstrate FR-SIM-017. Responsibility: The system shall return the existing completed run for the same request ID and hash, and reject the same request ID with a different hash."
     )
-    run_id = resolve_idempotent_run(
+    run_id = _value(resolve_idempotent_run(
         "req-usage",
         "a" * 64,
         lambda request_id: {
@@ -147,7 +154,7 @@ def fr_sim_017() -> None:
             "run_id": request_id.replace("req", "run"),
             "status": "completed",
         },
-    )
+    ))
     print(f"Resolved run ID: {run_id}")
 
 
@@ -164,27 +171,29 @@ def example_journal() -> None:
         writer = JournalWriter(store, "run-usage", "req-usage", "cor-usage")
 
         # 1. Append journal event
-        event = writer.append(
+        event = _value(writer.append(
             "run_started",
             {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
             NOW,
-        )
+        ))
         print(
             f"Appended JournalEvent type: {event.event_type}, "
             f"sequence: {event.sequence}"
         )
 
         # 2. Finalize journal
-        digest = writer.finalize()
+        digest = _value(writer.finalize())
         print(f"Finalized journal digest SHA256: {digest[:16]}...")
 
         # 3. Replay journal
         path = tmp_path / "artifacts" / "run-usage" / "journal.jsonl"
-        replayed = replay_journal(path, lambda _state, evt: {"sequence": evt.sequence})
+        replayed = _value(
+            replay_journal(path, lambda _state, evt: {"sequence": evt.sequence})
+        )
         print(f"Replayed journal state sequence: {replayed['sequence']}")
 
     # 4. Resolve idempotent run
-    run_id = resolve_idempotent_run(
+    run_id = _value(resolve_idempotent_run(
         "req-usage",
         "a" * 64,
         lambda request_id: {
@@ -192,7 +201,7 @@ def example_journal() -> None:
             "run_id": request_id.replace("req", "run"),
             "status": "completed",
         },
-    )
+    ))
     print(f"Resolved idempotent run ID: {run_id}")
 
 

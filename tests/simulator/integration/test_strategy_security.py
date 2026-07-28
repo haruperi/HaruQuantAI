@@ -2,7 +2,11 @@
 # ruff: noqa: INP001
 
 import pytest
-from app.services.simulator import SimulationError, validate_run_inputs
+from app.services.simulator import (
+    SimulationError,
+    unwrap_simulation_response,
+    validate_run_inputs,
+)
 from app.utils import logger
 from tests.simulator.unit.test_validate import _valid_payload
 
@@ -12,5 +16,7 @@ def test_raw_strategy_code_is_rejected_before_execution() -> None:
     logger.info("Testing WF-SIM-006 registered-strategy-only enforcement")
     payload = _valid_payload() | {"source_code": "import os"}
     with pytest.raises(SimulationError) as captured:
-        validate_run_inputs(payload)
+        unwrap_simulation_response(
+            validate_run_inputs(payload), operation="test.strategy.validate_run_inputs"
+        )
     assert captured.value.code == "SIM_ARBITRARY_CODE_REJECTED"

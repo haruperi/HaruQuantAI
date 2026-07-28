@@ -3,7 +3,7 @@
 from collections.abc import Mapping
 from types import MappingProxyType
 
-from app.utils import logger
+from app.utils import ErrorDefinition, logger
 
 _GROUPS: dict[str, tuple[str, ...]] = {
     "request_scope": (
@@ -62,7 +62,7 @@ _GROUPS: dict[str, tuple[str, ...]] = {
 }
 
 
-def _build_catalog() -> Mapping[str, Mapping[str, object]]:
+def _build_catalog() -> Mapping[str, ErrorDefinition]:
     """Build the immutable authoritative error catalog.
 
     Returns:
@@ -70,12 +70,14 @@ def _build_catalog() -> Mapping[str, Mapping[str, object]]:
     """
     logger.debug("Building the Simulation error catalog")
     catalog = {
-        code: MappingProxyType(
-            {
-                "group": group,
-                "meaning": code.removeprefix("SIM_").lower(),
-                "effect": "fail_closed",
-            }
+        code: ErrorDefinition(
+            code=code,
+            domain="simulation",
+            description=code.removeprefix("SIM_").replace("_", " ").capitalize(),
+            category=group,
+            severity="critical" if group == "safe_fallback" else "error",
+            retryable=False,
+            operator_action="Review Simulation evidence and correct the request",
         )
         for group, codes in _GROUPS.items()
         for code in codes

@@ -6,8 +6,13 @@ from collections.abc import Mapping
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from app.services.simulator.errors import SimulationError
-from app.utils import logger
+from app.services.simulator.errors import (
+    SimulationError,
+    async_operation_guard,
+    operation_guard,
+    unwrap_simulation_response,
+)
+from app.utils import RiskLevel, logger
 
 if TYPE_CHECKING:
     from app.services.simulator.execution.engine import EventDrivenExecutionEngine
@@ -26,6 +31,11 @@ class SimTrader:
         logger.info("Binding SimTrader to one execution engine")
         self._engine = engine
 
+    @async_operation_guard(
+        operation="simulation.execution.sim_trader.submit_order",
+        risk_level=RiskLevel.MEDIUM,
+        read_only=False,
+    )
     async def submit_order(self, intent: OrderIntent) -> ExecutionReceipt:
         """Submit a Trading-owned sim intent through the injected async port.
 
@@ -53,8 +63,16 @@ class SimTrader:
             raise SimulationError(
                 "SIM_INVALID_VOLUME", "Approved volume was altered after Risk approval"
             )
-        return self._engine.submit_order(intent)
+        return unwrap_simulation_response(
+            self._engine.submit_order(intent),
+            operation="simulation.execution.sim_trader.submit_order",
+        )
 
+    @operation_guard(
+        operation="simulation.execution.sim_trader.close_position",
+        risk_level=RiskLevel.MEDIUM,
+        read_only=False,
+    )
     def close_position(
         self, position_id: str, quantity: Decimal
     ) -> Mapping[str, object]:
@@ -72,8 +90,16 @@ class SimTrader:
                 unknown, or `SIM_INVALID_VOLUME` for an invalid quantity.
         """
         logger.info("Closing position through SimTrader")
-        return self._engine.close_position(position_id, quantity)
+        return unwrap_simulation_response(
+            self._engine.close_position(position_id, quantity),
+            operation="simulation.execution.sim_trader.close_position",
+        )
 
+    @operation_guard(
+        operation="simulation.execution.sim_trader.snapshot",
+        risk_level=RiskLevel.MEDIUM,
+        read_only=True,
+    )
     def snapshot(self) -> Mapping[str, object]:
         """Return immutable read-only simulated state.
 
@@ -85,7 +111,10 @@ class SimTrader:
                 cannot be verified.
         """
         logger.debug("Reading state through SimTrader")
-        return self._engine.snapshot()
+        return unwrap_simulation_response(
+            self._engine.snapshot(),
+            operation="simulation.execution.sim_trader.snapshot",
+        )
 
 
 __all__ = ["SimTrader"]

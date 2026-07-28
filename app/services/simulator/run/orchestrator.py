@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from pydantic import ValidationError
 
 from app.services.simulator.accounting import AccountLedger
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import EventDrivenExecutionEngine
 from app.services.simulator.journal import JournalWriter, resolve_idempotent_run
 from app.services.simulator.reporting import (
@@ -31,7 +31,7 @@ from app.services.simulator.validation import (
     validate_run_inputs,
 )
 from app.services.simulator.validation.contracts import MarketDataValidationContext
-from app.services.trading.contracts import ExecutionReceipt
+from app.services.trading.contracts import ExecutionReceipt, OrderIntent
 from app.utils import AuthContext, canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
@@ -145,7 +145,9 @@ def _completed_result(
     typed_receipts = tuple(
         item for item in receipts if isinstance(item, ExecutionReceipt)
     )
-    snapshot = ledger.snapshot()
+    snapshot = unwrap_simulation_response(
+        ledger.snapshot(), operation="simulation.run.ledger_snapshot"
+    )
     final_balance = Decimal(str(snapshot["balance"]))
     used_margin = Decimal(str(snapshot["used_margin"]))
     free_margin = Decimal(str(snapshot["free_margin"]))
@@ -215,8 +217,14 @@ def _publish_result(
     result_path = run_root / "result.json"
     report_path = run_root / "report.md"
     journal_path = run_root / "journal.jsonl"
-    _write_completed_text(result_path, build_json_report(result))
-    _write_completed_text(report_path, build_markdown_report(result))
+    _write_completed_text(
+        result_path,
+        build_json_report(result),
+    )
+    _write_completed_text(
+        report_path,
+        build_markdown_report(result),
+    )
     manifest = build_artifact_manifest(
         run_root,
         (journal_path, result_path, report_path),
@@ -281,10 +289,16 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
     completed_run = resolve_idempotent_run(
         request.request_id,
         request_hash,
-        dependencies.state_store.load_run,
+        lambda request_id: unwrap_simulation_response(
+            dependencies.state_store.load_run(request_id),
+            operation="simulation.run.load_run",
+        ),
     )
     if completed_run is not None:
-        existing = dependencies.state_store.load_run(request.request_id)
+        existing = unwrap_simulation_response(
+            dependencies.state_store.load_run(request.request_id),
+            operation="simulation.run.load_run",
+        )
         stored = None if existing is None else existing.get("result_payload")
         if not isinstance(stored, dict):
             raise SimulationError(
@@ -304,15 +318,24 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
             {"request_hash": request_hash, "run_id": result.run_id},
         )
         return result, ()
-    dependencies.state_store.record_idempotency(
-        request.request_id,
-        request_hash,
-        run_id,
-        "started",
+    unwrap_simulation_response(
+        dependencies.state_store.record_idempotency(
+            request.request_id,
+            request_hash,
+            run_id,
+            "started",
+        ),
+        operation="simulation.run.record_idempotency",
     )
     try:
-        source_dataset = dependencies.load_market_data(request)
-        tick_dataset = dependencies.generate_tick_series(source_dataset, request)
+        source_dataset = unwrap_simulation_response(
+            dependencies.load_market_data(request),
+            operation="simulation.run.load_market_data",
+        )
+        tick_dataset = unwrap_simulation_response(
+            dependencies.generate_tick_series(source_dataset, request),
+            operation="simulation.run.generate_tick_series",
+        )
         context = MarketDataValidationContext(
             expected_data_hash=request.data_hash,
             requested_start=request.start,
@@ -330,18 +353,30 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
             request.request_id,
             request.correlation_id,
         )
-        writer.append(
-            "run_started",
-            {
-                "config_hash": request.config_hash,
-                "data_hash": evidence.data_hash,
-                "engine_version": _ENGINE_VERSION,
-            },
-            timeline[0].timestamp,
+        unwrap_simulation_response(
+            writer.append(
+                "run_started",
+                {
+                    "config_hash": request.config_hash,
+                    "data_hash": evidence.data_hash,
+                    "engine_version": _ENGINE_VERSION,
+                },
+                timeline[0].timestamp,
+            ),
+            operation="simulation.run.journal_append",
         )
-        specification = dependencies.resolve_symbol_specification(request)
-        cost_model = dependencies.resolve_cost_model(request)
-        profile = dependencies.resolve_execution_profile(request)
+        specification = unwrap_simulation_response(
+            dependencies.resolve_symbol_specification(request),
+            operation="simulation.run.resolve_symbol_specification",
+        )
+        cost_model = unwrap_simulation_response(
+            dependencies.resolve_cost_model(request),
+            operation="simulation.run.resolve_cost_model",
+        )
+        profile = unwrap_simulation_response(
+            dependencies.resolve_execution_profile(request),
+            operation="simulation.run.resolve_execution_profile",
+        )
         ledger = AccountLedger(
             request.initial_balance,
             request.account_currency,
@@ -349,14 +384,25 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
             cost_model,
         )
         engine = EventDrivenExecutionEngine(ledger, writer, profile, _ENGINE_VERSION)
-        indicators = dependencies.calculate_indicators(source_dataset, request)
-        strategy_intents = dependencies.evaluate_strategy(
-            source_dataset, indicators, request
+        indicators = unwrap_simulation_response(
+            dependencies.calculate_indicators(source_dataset, request),
+            operation="simulation.run.calculate_indicators",
         )
-        risk_decisions = dependencies.review_risk(strategy_intents, request)
+        strategy_intents = unwrap_simulation_response(
+            dependencies.evaluate_strategy(source_dataset, indicators, request),
+            operation="simulation.run.evaluate_strategy",
+        )
+        risk_decisions = unwrap_simulation_response(
+            dependencies.review_risk(strategy_intents, request),
+            operation="simulation.run.review_risk",
+        )
+        approved_order_intents: tuple[OrderIntent, ...] = unwrap_simulation_response(
+            dependencies.build_order_intents(risk_decisions, request),
+            operation="simulation.run.build_order_intents",
+        )
         order_intents = tuple(
             sorted(
-                dependencies.build_order_intents(risk_decisions, request),
+                approved_order_intents,
                 key=lambda item: (item.created_at, item.client_order_id),
             )
         )
@@ -364,17 +410,37 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
         receipts: list[object] = []
         first_time = timeline[0].timestamp
         while unsent and unsent[0].created_at < first_time:
-            receipts.append(engine.submit_order(unsent.pop(0)))
+            receipts.append(
+                unwrap_simulation_response(
+                    engine.submit_order(unsent.pop(0)),
+                    operation="simulation.run.engine_submit_order",
+                )
+            )
         for tick in timeline:
-            receipts.extend(engine.execute_tick(tick))
+            receipts.extend(
+                unwrap_simulation_response(
+                    engine.execute_tick(tick),
+                    operation="simulation.run.engine_execute_tick",
+                )
+            )
             while unsent and unsent[0].created_at <= tick.timestamp:
-                receipts.append(engine.submit_order(unsent.pop(0)))
-        writer.append(
-            "run_completed",
-            {"receipt_count": len(receipts)},
-            timeline[-1].timestamp,
+                receipts.append(
+                    unwrap_simulation_response(
+                        engine.submit_order(unsent.pop(0)),
+                        operation="simulation.run.engine_submit_order",
+                    )
+                )
+        unwrap_simulation_response(
+            writer.append(
+                "run_completed",
+                {"receipt_count": len(receipts)},
+                timeline[-1].timestamp,
+            ),
+            operation="simulation.run.journal_append",
         )
-        writer.finalize()
+        unwrap_simulation_response(
+            writer.finalize(), operation="simulation.run.journal_finalize"
+        )
         result = _completed_result(
             request,
             request_hash,
@@ -388,12 +454,15 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
             evidence.tick_model,
         )
         _publish_result(result, dependencies.artifact_root, timeline[-1].timestamp)
-        dependencies.state_store.record_idempotency(
-            request.request_id,
-            request_hash,
-            run_id,
-            "completed",
-            result.model_dump(mode="python", warnings=False),
+        unwrap_simulation_response(
+            dependencies.state_store.record_idempotency(
+                request.request_id,
+                request_hash,
+                run_id,
+                "completed",
+                result.model_dump(mode="python", warnings=False),
+            ),
+            operation="simulation.run.record_idempotency",
         )
         emit_simulation_audit(
             dependencies,
@@ -404,20 +473,26 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
         )
         return result, engine.equity_observations
     except SimulationError:
-        dependencies.state_store.record_idempotency(
-            request.request_id,
-            request_hash,
-            run_id,
-            "failed",
+        unwrap_simulation_response(
+            dependencies.state_store.record_idempotency(
+                request.request_id,
+                request_hash,
+                run_id,
+                "failed",
+            ),
+            operation="simulation.run.record_idempotency",
         )
         raise
     except Exception as error:
         logger.exception("Mapping unexpected Simulation run failure safely")
-        dependencies.state_store.record_idempotency(
-            request.request_id,
-            request_hash,
-            run_id,
-            "failed",
+        unwrap_simulation_response(
+            dependencies.state_store.record_idempotency(
+                request.request_id,
+                request_hash,
+                run_id,
+                "failed",
+            ),
+            operation="simulation.run.record_idempotency",
         )
         raise SimulationError(
             "SIM_INTERNAL_ERROR",

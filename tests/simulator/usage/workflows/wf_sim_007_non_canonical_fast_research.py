@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import run_fast_research
+from app.services.simulator import run_fast_research, unwrap_simulation_response
 from tests.simulator.usage.workflows._support import (
     authority,
     backtest_request,
@@ -54,10 +54,13 @@ def main() -> None:
     # Stage 3 — Run the bounded approximation through run_fast_research().
     _stage(3)
     with tempfile.TemporaryDirectory(prefix="wf-sim-007-") as directory:
-        result = run_fast_research(
-            request,
-            authority(request),
-            dependencies(Path(directory), dataset),
+        result = unwrap_simulation_response(
+            run_fast_research(
+                request,
+                authority(request),
+                dependencies(Path(directory), dataset),
+            ),
+            operation="simulation.workflow.wf_sim_007.run_fast_research",
         )
 
     # Stage 4 — Return disclosed FastResearchResult with canonical=false.

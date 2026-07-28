@@ -4,7 +4,12 @@
 from decimal import Decimal
 from pathlib import Path
 
-from app.services.simulator import JournalEvent, replay_journal, run_portfolio_backtest
+from app.services.simulator import (
+    JournalEvent,
+    replay_journal,
+    run_portfolio_backtest,
+    unwrap_simulation_response,
+)
 from app.utils import logger
 from tests.simulator.unit.test_orchestrator import FakeDependencies, _dataset
 from tests.simulator.unit.test_portfolio_run import (
@@ -26,10 +31,9 @@ def test_portfolio_candidate_publishes_reconciled_aggregate(tmp_path: Path) -> N
     request = _portfolio_request()
     dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     dependencies = FakeDependencies(tmp_path, dataset)
-    result = run_portfolio_backtest(
-        request,
-        _portfolio_auth(request),
-        dependencies,  # type: ignore[arg-type]
+    result = unwrap_simulation_response(
+        run_portfolio_backtest(request, _portfolio_auth(request), dependencies),
+        operation="test.portfolio.run_portfolio_backtest",
     )
     assert result.status == "completed"
     assert all(row.reconciled for row in result.component_results)
@@ -42,8 +46,11 @@ def test_portfolio_candidate_publishes_reconciled_aggregate(tmp_path: Path) -> N
         result.component_results[0].simulation_result_id
     )
     assert (dependencies.artifact_root / result.artifact_manifest_ref).is_file()
-    replayed = replay_journal(
-        dependencies.artifact_root / result.aggregate_journal_ref,
-        _last_event,
+    replayed = unwrap_simulation_response(
+        replay_journal(
+            dependencies.artifact_root / result.aggregate_journal_ref,
+            _last_event,
+        ),
+        operation="test.portfolio.replay_journal",
     )
     assert replayed["last_type"] == "portfolio_completed"

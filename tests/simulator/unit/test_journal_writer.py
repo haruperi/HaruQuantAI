@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.journal import JournalWriter
 from app.services.simulator.journal.writer import (
     JOURNAL_FORMAT,
@@ -14,6 +14,11 @@ from app.services.simulator.journal.writer import (
 from app.services.simulator.state import SIMULATION_MIGRATIONS
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
+
+
+def _value(response: object) -> object:
+    """Return one raw journal payload from its StandardResponse envelope."""
+    return unwrap_simulation_response(response, operation="test.journal_writer")
 
 
 def _writer(tmp_path: Path) -> JournalWriter:
@@ -35,11 +40,11 @@ def test_append_fails_closed_on_write_error(
 
     monkeypatch.setattr(writer._store, "append_journal", fail_append)
     with pytest.raises(SimulationError) as captured:
-        writer.append(
+        _value(writer.append(
             "run_started",
             {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
             datetime(2025, 1, 1, tzinfo=UTC),
-        )
+        ))
     assert captured.value.code == "SIM_PERSISTENCE_FAILED"
 
 
@@ -51,7 +56,7 @@ def test_finalize_is_atomic(tmp_path: Path) -> None:
         {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
         datetime(2025, 1, 1, tzinfo=UTC),
     )
-    checksum = writer.finalize()
+    checksum = _value(writer.finalize())
     assert len(checksum) == 64
     assert (tmp_path / "artifacts" / "run-test" / "journal.jsonl").is_file()
     assert not (tmp_path / "artifacts" / "run-test" / "journal.jsonl.partial").exists()

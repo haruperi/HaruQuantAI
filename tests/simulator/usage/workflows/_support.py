@@ -10,11 +10,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import MarketDataset, generate_tick_series, get_market_data
+from app.services.data import (
+    MarketDataset,
+    generate_tick_series,
+    get_market_data,
+    unwrap_data_response,
+)
 from app.services.simulator import (
     PortfolioBacktestRequestV1,
     PortfolioComponentRequest,
     SimulationBacktestRequestV1,
+    unwrap_simulation_response,
 )
 from app.utils import AuthContext, canonical_digest, generate_id
 from tests.data.usage.workflows._support import market_request
@@ -35,19 +41,33 @@ def live_market_dataset() -> MarketDataset:
         return MarketDataset.model_validate_json(
             Path(captured).read_text(encoding="utf-8")
         )
-    return get_market_data(market_request("bars", timeframe="M1", limit=20))
+    return unwrap_data_response(
+        get_market_data(market_request("bars", timeframe="M1", limit=20)),
+        operation="simulation.usage.workflows.live_market_dataset",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
 
 
 def live_tick_dataset() -> MarketDataset:
     """Return canonical ticks deterministically derived from genuine MT5 bars."""
-    return generate_tick_series(
-        live_market_dataset(),
+    dataset = live_market_dataset()
+    generated: object = generate_tick_series(
+        dataset,
         model="trading_bar",
         trading_timeframe="M1",
         spread_model="fixed_spread",
         fixed_spread_points=Decimal(2),
         point_value=Decimal("0.00001"),
     )
+    while hasattr(generated, "status") and hasattr(generated, "data"):
+        generated = unwrap_data_response(
+            generated,  # type: ignore[arg-type]
+            operation="simulation.usage.workflows.live_tick_dataset",
+            request_id=dataset.request_id,
+        )
+    if not isinstance(generated, MarketDataset):
+        raise TypeError("Data tick generation did not return a MarketDataset")
+    return generated
 
 
 def backtest_request(
@@ -90,7 +110,10 @@ def backtest_request(
         "execution_route": "sim",
         "canonical": canonical,
     }
-    payload["config_hash"] = SimulationBacktestRequestV1.calculate_config_hash(payload)
+    payload["config_hash"] = unwrap_simulation_response(
+        SimulationBacktestRequestV1.calculate_config_hash(payload),
+        operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+    )
     return SimulationBacktestRequestV1.model_validate(payload)
 
 
@@ -144,7 +167,10 @@ def portfolio_request(
         "runtime_profile": "simulation",
         "execution_route": "sim",
     }
-    payload["config_hash"] = PortfolioBacktestRequestV1.calculate_config_hash(payload)
+    payload["config_hash"] = unwrap_simulation_response(
+        PortfolioBacktestRequestV1.calculate_config_hash(payload),
+        operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
+    )
     request = PortfolioBacktestRequestV1.model_validate(payload)
     auth = AuthContext(
         contract_version="v1",

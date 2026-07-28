@@ -6,9 +6,10 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import SimTrader
 from app.services.trading import ExecutionReceipt, OrderIntent, TradingRoute
+from app.utils import StandardResponse
 
 from tests.simulator.unit.test_engine import _engine, _intent, _tick
 
@@ -16,7 +17,9 @@ from tests.simulator.unit.test_engine import _engine, _intent, _tick
 def test_submit_order_never_calls_live_adapter(tmp_path: Path) -> None:
     """Submit directly to the isolated simulation engine."""
     trader = SimTrader(_engine(tmp_path, "submit"))
-    receipt = asyncio.run(trader.submit_order(_intent()))
+    receipt = unwrap_simulation_response(
+        asyncio.run(trader.submit_order(_intent())), operation="test.trader.submit_order"
+    )
     assert receipt.status == "accepted"
     assert str(receipt.route) == "sim"
 
@@ -24,8 +27,13 @@ def test_submit_order_never_calls_live_adapter(tmp_path: Path) -> None:
 def test_dispatch_signature_matches_trading_port(tmp_path: Path) -> None:
     """Prove the bound async method is assignable to Trading's sim port."""
     trader = SimTrader(_engine(tmp_path, "port"))
-    dispatch: Callable[[OrderIntent], Awaitable[ExecutionReceipt]] = trader.submit_order
-    assert asyncio.run(dispatch(_intent())).status == "accepted"
+    dispatch: Callable[[OrderIntent], Awaitable[StandardResponse[ExecutionReceipt]]] = (
+        trader.submit_order
+    )
+    receipt = unwrap_simulation_response(
+        asyncio.run(dispatch(_intent())), operation="test.trader.submit_order"
+    )
+    assert receipt.status == "accepted"
 
 
 class _SpyEngine:
@@ -55,7 +63,9 @@ def test_submit_order_rejects_non_sim_route_before_engine() -> None:
     trader = SimTrader(spy)  # type: ignore[arg-type]
     intent = _intent().model_copy(update={"route": TradingRoute.PAPER})
     with pytest.raises(SimulationError) as captured:
-        asyncio.run(trader.submit_order(intent))
+        unwrap_simulation_response(
+            asyncio.run(trader.submit_order(intent)), operation="test.trader.submit_order"
+        )
     assert captured.value.code == "SIM_INVALID_CONFIG"
     assert not spy.called
 
@@ -66,7 +76,9 @@ def test_submit_order_rejects_altered_volume_before_engine() -> None:
     trader = SimTrader(spy)  # type: ignore[arg-type]
     intent = _intent().model_copy(update={"approved_volume": Decimal(2)})
     with pytest.raises(SimulationError) as captured:
-        asyncio.run(trader.submit_order(intent))
+        unwrap_simulation_response(
+            asyncio.run(trader.submit_order(intent)), operation="test.trader.submit_order"
+        )
     assert captured.value.code == "SIM_INVALID_VOLUME"
     assert not spy.called
 
@@ -74,15 +86,23 @@ def test_submit_order_rejects_altered_volume_before_engine() -> None:
 def test_close_position_rejects_unknown_position(tmp_path: Path) -> None:
     """Fail closed when a position identity is absent."""
     engine = _engine(tmp_path, "close")
-    engine.execute_tick(_tick())
+    unwrap_simulation_response(
+        engine.execute_tick(_tick()), operation="test.trader.execute_tick"
+    )
     trader = SimTrader(engine)
     with pytest.raises(SimulationError) as captured:
-        trader.close_position("missing", Decimal(1))
+        unwrap_simulation_response(
+            trader.close_position("missing", Decimal(1)),
+            operation="test.trader.close_position",
+        )
     assert captured.value.code == "SIM_POSITION_NOT_FOUND"
 
 
 def test_snapshot_cannot_mutate_engine_state(tmp_path: Path) -> None:
     """Reject mutation through the public state projection."""
-    snapshot = SimTrader(_engine(tmp_path, "snapshot")).snapshot()
+    snapshot = unwrap_simulation_response(
+        SimTrader(_engine(tmp_path, "snapshot")).snapshot(),
+        operation="test.trader.snapshot",
+    )
     with pytest.raises(TypeError, match="does not support item assignment"):
         snapshot["orders"] = ()  # type: ignore[index]

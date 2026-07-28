@@ -12,7 +12,7 @@ from app.services.data.contracts import (
     MarketDataset,
     TickRecord,
 )
-from app.services.simulator import run_backtest
+from app.services.simulator import run_backtest, unwrap_simulation_response
 from app.utils import logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
@@ -170,7 +170,10 @@ def test_official_backtest_completes_end_to_end(tmp_path: Path) -> None:
     dataset = _dataset("req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
     request = _request(dataset, suffix="a")
     dependencies = TrackingDependencies(tmp_path, dataset)
-    result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    result = unwrap_simulation_response(
+        run_backtest(request, _auth(request), dependencies),
+        operation="test.official.run_backtest",
+    )
     assert result.status == "completed"
     assert dependencies.calls == [
         "data.load",
@@ -195,7 +198,10 @@ def test_completed_run_publishes_closed_trade_ledger(tmp_path: Path) -> None:
     dataset = _protective_dataset("req-dddddddd-dddd-4ddd-8ddd-dddddddddddd")
     request = _request(dataset, suffix="d")
     dependencies = ProtectiveDependencies(tmp_path, dataset)
-    result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    result = unwrap_simulation_response(
+        run_backtest(request, _auth(request), dependencies),
+        operation="test.official.run_backtest",
+    )
     assert result.status == "completed"
     assert len(result.closed_trades) >= 1
     record = result.closed_trades[0]
@@ -212,7 +218,10 @@ def test_official_backtest_uses_data_tick_series_only(tmp_path: Path) -> None:
     dataset = _dataset("req-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
     request = _request(dataset, suffix="b")
     dependencies = TrackingDependencies(tmp_path, dataset)
-    run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    unwrap_simulation_response(
+        run_backtest(request, _auth(request), dependencies),
+        operation="test.official.run_backtest",
+    )
     assert dependencies.calls.count("data.generate_tick_series") == 1
     assert dependencies.dataset.source_metadata["tick_generation_model"] == "real"
 
@@ -225,7 +234,10 @@ def test_official_backtest_performance_baseline(tmp_path: Path) -> None:
     dependencies = FakeDependencies(tmp_path, dataset)
     tracemalloc.start()
     started = perf_counter()
-    result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    result = unwrap_simulation_response(
+        run_backtest(request, _auth(request), dependencies),
+        operation="test.official.run_backtest",
+    )
     elapsed = perf_counter() - started
     _, peak_bytes = tracemalloc.get_traced_memory()
     tracemalloc.stop()

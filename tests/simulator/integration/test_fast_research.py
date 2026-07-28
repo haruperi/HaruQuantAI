@@ -3,7 +3,7 @@
 
 from pathlib import Path
 
-from app.services.simulator import run_fast_research
+from app.services.simulator import run_fast_research, unwrap_simulation_response
 from app.utils import logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
@@ -24,10 +24,9 @@ def test_fast_research_cannot_produce_canonical_evidence(tmp_path: Path) -> None
         suffix="1",
     )
     dependencies = FakeDependencies(tmp_path, dataset)
-    result = run_fast_research(
-        request,
-        _auth(request),
-        dependencies,  # type: ignore[arg-type]
+    result = unwrap_simulation_response(
+        run_fast_research(request, _auth(request), dependencies),
+        operation="test.fast_research.run_fast_research",
     )
     assert result.canonical is False
     assert result.observations

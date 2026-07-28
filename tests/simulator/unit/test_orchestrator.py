@@ -17,7 +17,7 @@ from app.services.data.evidence.fx_contracts import (
     FXRateLeg,
 )
 from app.services.simulator.accounting import ExecutionCostModel, SymbolSpecification
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import ExecutionProfile, SessionInterval
 from app.services.simulator.run import SimulationBacktestRequestV1, run_backtest
 from app.services.trading import OrderIntent, TradingRoute
@@ -168,7 +168,10 @@ def _request(
         "execution_route": "sim",
         "canonical": canonical,
     }
-    payload["config_hash"] = SimulationBacktestRequestV1.calculate_config_hash(payload)
+    payload["config_hash"] = unwrap_simulation_response(
+        SimulationBacktestRequestV1.calculate_config_hash(payload),
+        operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+    )
     return SimulationBacktestRequestV1.model_validate(payload)
 
 

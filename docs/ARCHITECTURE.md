@@ -168,6 +168,9 @@ whether the operation is registered as an AI tool. The envelope serializes exact
 - Error details and extensions are bounded, redacted, and JSON-safe.
 - Execution time derives from `time.perf_counter_ns()` and is expressed in
   non-negative milliseconds rounded to three decimal places.
+- Simulation applies this boundary to validation, tick construction, accounting,
+  execution, journaling, reporting, and backtest orchestration; raw Simulation
+  results remain directly in `data`, while `SIM_*` failures remain in `error`.
 - Constructors, properties, private helpers, streams/subscriptions, callbacks,
   externally prescribed protocol methods, runtime-resource factories, and response
   infrastructure primitives are outside the bounded-operation rule.

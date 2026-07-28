@@ -4,7 +4,11 @@
 from pathlib import Path
 
 import pytest
-from app.services.simulator import SimulationError, run_backtest
+from app.services.simulator import (
+    SimulationError,
+    run_backtest,
+    unwrap_simulation_response,
+)
 from app.utils import logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
@@ -25,6 +29,9 @@ def test_failed_data_quality_prevents_result_publication(tmp_path: Path) -> None
     request = _request(dataset, suffix="e")
     dependencies = FakeDependencies(tmp_path, dataset)
     with pytest.raises(SimulationError) as captured:
-        run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+        unwrap_simulation_response(
+            run_backtest(request, _auth(request), dependencies),
+            operation="test.data_quality.run_backtest",
+        )
     assert captured.value.code == "SIM_DATA_SCHEMA_INVALID"
     assert not tuple(dependencies.artifact_root.rglob("manifest.json"))

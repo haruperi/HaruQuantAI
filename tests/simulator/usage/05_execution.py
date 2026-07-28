@@ -27,11 +27,17 @@ from app.services.simulator import (
     evaluate_protective_exit,
     match_order,
     price_order,
+    unwrap_simulation_response,
 )
 from app.services.trading import OrderIntent, TradingRoute
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 NOW = datetime(2025, 1, 1, tzinfo=UTC)
+
+
+def _value(response: object) -> object:
+    """Unwrap one public Simulation response for display."""
+    return unwrap_simulation_response(response, operation="usage.execution")
 
 
 def _header(title: str) -> None:
@@ -133,11 +139,11 @@ def example_execution() -> None:
     print("Simulator Example 5: Execution Engine and Order Pricing")
 
     # 1. Price order
-    priced = price_order(_intent(), _tick(), _profile())
+    priced = _value(price_order(_intent(), _tick(), _profile()))
     print(f"Priced BUY order: {priced}")
 
     # 2. Match order
-    matched = match_order(_intent(), _tick(), _profile())
+    matched = _value(match_order(_intent(), _tick(), _profile()))
     print(f"Matched order status: {matched.status}")
 
     # 3. SimTrader Operations with temporary directory
@@ -145,12 +151,12 @@ def example_execution() -> None:
         tmp_path = Path(tmp_dir)
         engine = _engine(tmp_path, "usage-close")
         trader = SimTrader(engine)
-        asyncio.run(trader.submit_order(_intent()))
-        engine.execute_tick(_tick())
-        close_res = trader.close_position("sim-position-order-engine", Decimal(1))
+        _value(asyncio.run(trader.submit_order(_intent())))
+        _value(engine.execute_tick(_tick()))
+        close_res = _value(trader.close_position("sim-position-order-engine", Decimal(1)))
         print(f"Closed position quantity: {close_res['quantity']}")
 
-        snapshot = trader.snapshot()
+        snapshot = _value(trader.snapshot())
         print(f"SimTrader snapshot engine version: {snapshot['engine_version']}")
 
     # 4. Protective exit
@@ -159,7 +165,7 @@ def example_execution() -> None:
         "stop_loss": Decimal("1.20000"),
         "take_profit": Decimal("1.05000"),
     }
-    exit_type = evaluate_protective_exit(position, _tick())
+    exit_type = _value(evaluate_protective_exit(position, _tick()))
     print(f"Evaluated protective exit type: {exit_type}")
 
 
@@ -173,7 +179,7 @@ def fr_sim_018() -> None:
     _header(
         "Demonstrate FR-SIM-018. Responsibility: The system shall derive an executable bid/ask price from the current tick and approved spread/slippage model without using future ticks."
     )
-    print(f"Priced order: {price_order(_intent(), _tick(), _profile())}")
+    print(f"Priced order: {_value(price_order(_intent(), _tick(), _profile()))}")
 
 
 def fr_sim_019() -> None:
@@ -187,7 +193,7 @@ def fr_sim_019() -> None:
     _header(
         "Demonstrate FR-SIM-019. Responsibility: The system shall deterministically match supported FX market and pending intents using configured trigger, gap, liquidity, FOK/IOC, and same-tick priority rules, explicitly recording partial or cancelled remainder outcomes."
     )
-    print(f"Match status: {match_order(_intent(), _tick(), _profile()).status}")
+    print(f"Match status: {_value(match_order(_intent(), _tick(), _profile())).status}")
 
 
 def fr_sim_043() -> None:
@@ -209,7 +215,7 @@ def fr_sim_043() -> None:
         "stop_loss": Decimal("1.20000"),
         "take_profit": Decimal("1.05000"),
     }
-    print(f"Protective exit: {evaluate_protective_exit(position, _tick())}")
+    print(f"Protective exit: {_value(evaluate_protective_exit(position, _tick()))}")
 
 
 def fr_sim_020() -> None:
@@ -232,7 +238,7 @@ def fr_sim_020() -> None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         engine = _engine(Path(tmp_dir), "usage-engine")
         engine.submit_order(_intent())
-        print(f"Execution receipts: {len(engine.execute_tick(_tick()))}")
+        print(f"Execution receipts: {len(_value(engine.execute_tick(_tick())))}")
 
 
 def fr_sim_021() -> None:
@@ -249,7 +255,7 @@ def fr_sim_021() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         trader = SimTrader(_engine(Path(tmp_dir), "usage-submit"))
-        receipt = asyncio.run(trader.submit_order(_intent()))
+        receipt = _value(asyncio.run(trader.submit_order(_intent())))
         print(f"Submission status: {receipt.status}")
 
 
@@ -267,7 +273,7 @@ def fr_sim_038() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         trader = SimTrader(_engine(Path(tmp_dir), "usage-port"))
-        receipt = asyncio.run(trader.submit_order(_intent()))
+        receipt = _value(asyncio.run(trader.submit_order(_intent())))
         print(f"Async port status: {receipt.status}")
 
 
@@ -284,9 +290,9 @@ def fr_sim_022() -> None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         engine = _engine(Path(tmp_dir), "usage-close-fr")
         trader = SimTrader(engine)
-        asyncio.run(trader.submit_order(_intent()))
-        engine.execute_tick(_tick())
-        print(trader.close_position("sim-position-order-engine", Decimal(1)))
+        _value(asyncio.run(trader.submit_order(_intent())))
+        _value(engine.execute_tick(_tick()))
+        print(_value(trader.close_position("sim-position-order-engine", Decimal(1))))
 
 
 def fr_sim_023() -> None:
@@ -302,7 +308,7 @@ def fr_sim_023() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         trader = SimTrader(_engine(Path(tmp_dir), "usage-snapshot"))
-        print(f"Snapshot engine: {trader.snapshot()['engine_version']}")
+        print(f"Snapshot engine: {_value(trader.snapshot())['engine_version']}")
 
 
 def main() -> None:

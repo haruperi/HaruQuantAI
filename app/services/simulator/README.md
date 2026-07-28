@@ -294,7 +294,8 @@ explicit `__all__` re-exports the documented feature APIs below:
   `PortfolioComponentRequest`, `SimulationBacktestRequestV1`,
   `SimulationRunDependencies`, `run_backtest`, `run_fast_research`,
   `run_portfolio_backtest`, `SIM_ERROR_CATALOG`, `SimulationError`, and
-  `to_simulation_error_payload`.
+  `to_simulation_error_payload`, plus `unwrap_simulation_response` for
+  producer-owned consumers.
 
 Every external consumer and standalone usage program imports these names through
 `from app.services.simulator import ...`. Feature subpackages remain internal
@@ -302,6 +303,63 @@ implementation organization and do not create additional cross-domain import
 paths. Simulation consumes Trading-owned `OrderIntent` and `ExecutionReceipt`
 through Trading's approved `app.services.trading.contracts` package so importing
 Simulation does not activate Trading operational features.
+
+### StandardResponse public signatures
+
+Every bounded operation below returns `StandardResponse[T]`; the raw `T` is stored
+directly in `data`, successful value-free operations use `data=None`, and failures
+use the catalogued `error` branch. `metadata.places_trade` is always `False` for
+Simulation. The package root is the supported response boundary; feature
+subpackages remain internal implementation ports.
+
+- Validation: `validate_phase_one_scope -> StandardResponse[None]`,
+  `validate_run_inputs -> StandardResponse[None]`, and
+  `validate_market_data -> StandardResponse[ValidatedMarketDataEvidence]`.
+- Timeline: `build_tick_timeline -> StandardResponse[tuple[Tick, ...]]` and
+  `validate_intent_timing -> StandardResponse[None]`.
+- Accounting: `calculate_execution_costs -> StandardResponse[Mapping[str, Decimal]]`,
+  `calculate_margin -> StandardResponse[Decimal]`,
+  `convert_fx_amount -> StandardResponse[Decimal]`,
+  `normalize_volume -> StandardResponse[Decimal]`, and
+  `validate_fx_evidence -> StandardResponse[None]`.
+- Execution: `evaluate_protective_exit -> StandardResponse[str | None]`,
+  `match_order -> StandardResponse[MatchResult]`,
+  `price_order -> StandardResponse[Decimal]`, and
+  `EventDrivenExecutionEngine.submit_order`, `execute_tick`, `close_position`,
+  and `snapshot` return `StandardResponse[T]` for their documented payloads.
+- Journal and state: `replay_journal -> StandardResponse[T]`,
+  `resolve_idempotent_run -> StandardResponse[T]`,
+  `JournalWriter.append -> StandardResponse[JournalEvent]`,
+  `JournalWriter.finalize -> StandardResponse[str]`,
+  `SimulationStateStore.append_journal`, `flush_journal`, `finalize_journal`,
+  `load_run`, and `record_idempotency` return `StandardResponse[T]`.
+- Reporting: `build_artifact_manifest -> StandardResponse[ArtifactManifest]`,
+  `build_json_report -> StandardResponse[str]`, and
+  `build_markdown_report -> StandardResponse[str]`.
+- Runs: `run_backtest -> StandardResponse[SimulationResult]`,
+  `run_fast_research -> StandardResponse[FastResearchResult]`, and
+  `run_portfolio_backtest -> StandardResponse[PortfolioSimulationResult]`.
+- Contracts and errors: `SimulationBacktestRequestV1.calculate_config_hash` and
+  `PortfolioBacktestRequestV1.calculate_config_hash` return
+  `StandardResponse[str]`; `to_simulation_error_payload` returns
+  `StandardResponse[Mapping[str, object]]`.
+- Dependency seams: `SimulationRunDependencies.persist_audit_event`,
+  `load_market_data`, `generate_tick_series`, `calculate_indicators`,
+  `evaluate_strategy`, `review_risk`, `build_order_intents`,
+  `resolve_execution_profile`, `resolve_symbol_specification`, `resolve_cost_model`,
+  `resolve_fx_evidence`, `validate_market_data`, `build_tick_timeline`, and
+  `validate_fx_evidence` return `StandardResponse[T]`.
+- Data, Trading, and lifecycle seams: `AccountLedger.apply_fill`,
+  `mark_to_market`, `snapshot`, `SimTrader.submit_order`, `close_position`, and
+  `snapshot` return `StandardResponse[T]` at their public boundary.
+
+Consumers that need the raw producer-owned value use
+`unwrap_simulation_response(response, operation=...)`, which raises the original
+catalogued `SimulationError` with preserved safe trace evidence on the error branch.
+
+The requirement evidence tables below retain raw core implementation signatures
+to describe feature behavior; the package-root signatures above are the supported
+public API and are the signatures callers must consume.
 
 ---
 
@@ -602,20 +660,23 @@ remove all implementation discretion from the Phase 1 build:
   evidence, audit persistence, and the state store. The canonical operation is
   `run_backtest(request, auth_context, dependencies)`. Request identity is not
   duplicated by an optional function argument. FX evidence reaches Simulation
-  only through `resolve_fx_evidence(evidence_ids) -> Mapping[str,
-  FXConversionEvidence]`, which returns one Data-owned `FXConversionEvidence v1`
-  per requested identifier; Simulation validates freshness through
-  `validate_fx_evidence()` and never selects, refreshes, or synthesizes a rate.
+  only through `resolve_fx_evidence(evidence_ids) ->
+  StandardResponse[Mapping[str, FXConversionEvidence]]`, which returns one
+  Data-owned `FXConversionEvidence v1` in `data` per requested identifier;
+  Simulation validates freshness through `validate_fx_evidence()` and never
+  selects, refreshes, or synthesizes a rate.
   An identifier the caller cannot resolve fails the run closed with
   `SIM_FX_EVIDENCE_UNAVAILABLE`. Governed run transitions are persisted only
-  through `persist_audit_event(event: AuditEvent) -> None`; unavailable audit
+  through `persist_audit_event(event: AuditEvent) -> StandardResponse[None]`;
+  unavailable audit
   persistence fails the governed operation closed.
 - `SimulationStateStore` is a `Protocol` only. Simulation declares the port and
   its own migration definitions; the caller supplies the implementation.
   Simulation opens no database connection, executes no migration, and imports
   neither `sqlite3` nor `app.services.data.storage.*`.
 - `SimTrader.submit_order` is asynchronous and is directly assignable to
-  Trading's `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]` sim port. No
+  Trading's `Callable[[OrderIntent], Awaitable[StandardResponse[ExecutionReceipt]]]`
+  sim port. No
   module-global active engine or standalone dispatcher exists.
 - Canonical artifact entries are exactly `journal.jsonl`, `result.json`, and
   `report.md`. `manifest.json` is the envelope and never hashes itself. Results

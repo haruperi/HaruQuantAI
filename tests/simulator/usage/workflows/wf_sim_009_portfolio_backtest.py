@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import run_portfolio_backtest
+from app.services.simulator import run_portfolio_backtest, unwrap_simulation_response
 from tests.simulator.usage.workflows._support import (
     dependencies,
     live_tick_dataset,
@@ -49,10 +49,13 @@ def main() -> None:
     # Stage 3 — Execute every component through the ordinary deterministic Simulation path.
     _stage(3)
     with tempfile.TemporaryDirectory(prefix="wf-sim-009-") as directory:
-        result = run_portfolio_backtest(
-            request,
-            auth,
-            dependencies(Path(directory), dataset),
+        result = unwrap_simulation_response(
+            run_portfolio_backtest(
+                request,
+                auth,
+                dependencies(Path(directory), dataset),
+            ),
+            operation="simulation.workflow.wf_sim_009.run_portfolio_backtest",
         )
 
     # Stage 4 — Reconcile component and aggregate journals and account evidence.

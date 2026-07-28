@@ -19,6 +19,7 @@ from app.services.simulator import (
     run_backtest,
     run_fast_research,
     run_portfolio_backtest,
+    unwrap_simulation_response,
 )
 from app.utils import AuthContext, canonical_digest, generate_id
 from tests.simulator.unit.test_orchestrator import (
@@ -80,7 +81,10 @@ def _build_request(
         "execution_route": "sim",
         "canonical": canonical,
     }
-    payload["config_hash"] = SimulationBacktestRequestV1.calculate_config_hash(payload)
+    payload["config_hash"] = unwrap_simulation_response(
+        SimulationBacktestRequestV1.calculate_config_hash(payload),
+        operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+    )
     return SimulationBacktestRequestV1.model_validate(payload)
 
 
@@ -126,7 +130,10 @@ def _build_portfolio_request(
         "runtime_profile": "simulation",
         "execution_route": "sim",
     }
-    payload["config_hash"] = PortfolioBacktestRequestV1.calculate_config_hash(payload)
+    payload["config_hash"] = unwrap_simulation_response(
+        PortfolioBacktestRequestV1.calculate_config_hash(payload),
+        operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
+    )
     port_req = PortfolioBacktestRequestV1.model_validate(payload)
 
     auth = AuthContext(
@@ -162,7 +169,9 @@ def example_run() -> None:
 
         # 1. Run canonical backtest
         deps = FakeDependencies(tmp_path, dataset)  # type: ignore[arg-type]
-        result = run_backtest(request, _auth(request), deps)
+        result = unwrap_simulation_response(
+            run_backtest(request, _auth(request), deps), operation="usage.run_backtest"
+        )
         print(f"Canonical backtest status: {result.status}")
 
         # 2. Run fast research
@@ -174,7 +183,10 @@ def example_run() -> None:
             canonical=False,
         )
         fast_deps = FakeDependencies(tmp_path, fast_dataset)  # type: ignore[arg-type]
-        fast_result = run_fast_research(fast_request, _auth(fast_request), fast_deps)
+        fast_result = unwrap_simulation_response(
+            run_fast_research(fast_request, _auth(fast_request), fast_deps),
+            operation="usage.run_fast_research",
+        )
         print(f"Fast research canonical status: {fast_result.canonical}")
 
         # 3. Run portfolio backtest
@@ -182,7 +194,10 @@ def example_run() -> None:
         port_dataset = _dataset(port_req_id)
         port_request, port_auth = _build_portfolio_request(port_dataset)
         port_deps = FakeDependencies(tmp_path, port_dataset)  # type: ignore[arg-type]
-        port_result = run_portfolio_backtest(port_request, port_auth, port_deps)
+        port_result = unwrap_simulation_response(
+            run_portfolio_backtest(port_request, port_auth, port_deps),
+            operation="usage.run_portfolio_backtest",
+        )
         print(f"Portfolio backtest status: {port_result.status}")
 
 
@@ -250,10 +265,9 @@ def fr_sim_030() -> None:
     request = _build_request(dataset)
     with tempfile.TemporaryDirectory() as tmp_dir:
         dependencies = FakeDependencies(Path(tmp_dir), dataset)
-        result = run_backtest(
-            request,
-            _auth(request),
-            dependencies,  # type: ignore[arg-type]
+        result = unwrap_simulation_response(
+            run_backtest(request, _auth(request), dependencies),
+            operation="usage.run_backtest",
         )
         print(f"Canonical status: {result.status}")
 
@@ -284,10 +298,9 @@ def fr_sim_034() -> None:
     request, auth = _build_portfolio_request(dataset)
     with tempfile.TemporaryDirectory() as tmp_dir:
         dependencies = FakeDependencies(Path(tmp_dir), dataset)
-        result = run_portfolio_backtest(
-            request,
-            auth,
-            dependencies,  # type: ignore[arg-type]
+        result = unwrap_simulation_response(
+            run_portfolio_backtest(request, auth, dependencies),
+            operation="usage.run_portfolio_backtest",
         )
         print(f"Portfolio status: {result.status}")
 
@@ -313,10 +326,9 @@ def fr_sim_031() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         dependencies = FakeDependencies(Path(tmp_dir), dataset)
-        result = run_fast_research(
-            request,
-            _auth(request),
-            dependencies,  # type: ignore[arg-type]
+        result = unwrap_simulation_response(
+            run_fast_research(request, _auth(request), dependencies),
+            operation="usage.run_fast_research",
         )
         print(f"Fast research canonical: {result.canonical}")
 

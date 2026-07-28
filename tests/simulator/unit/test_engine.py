@@ -10,7 +10,7 @@ from app.services.simulator.accounting import (
     ExecutionCostModel,
     SymbolSpecification,
 )
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import (
     EventDrivenExecutionEngine,
     ExecutionProfile,
@@ -21,6 +21,11 @@ from app.services.simulator.timeline import Tick
 from app.services.trading import OrderIntent, TradingRoute
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
+
+
+def _value(response: object) -> object:
+    """Return one raw engine payload from its StandardResponse envelope."""
+    return unwrap_simulation_response(response, operation="test.engine")
 
 
 def _engine(tmp_path: Path, suffix: str) -> EventDrivenExecutionEngine:
@@ -114,7 +119,7 @@ def test_execute_tick_is_deterministic(tmp_path: Path) -> None:
     second = _engine(tmp_path, "second")
     first.submit_order(_intent())
     second.submit_order(_intent())
-    assert first.execute_tick(_tick()) == second.execute_tick(_tick())
+    assert _value(first.execute_tick(_tick())) == _value(second.execute_tick(_tick()))
 
 
 def test_execute_tick_rejects_missing_order_state(tmp_path: Path) -> None:
@@ -123,7 +128,7 @@ def test_execute_tick_rejects_missing_order_state(tmp_path: Path) -> None:
     engine.submit_order(_intent())
     engine._orders.clear()
     with pytest.raises(SimulationError) as captured:
-        engine.execute_tick(_tick())
+        _value(engine.execute_tick(_tick()))
     assert captured.value.code == "SIM_ORDER_NOT_FOUND"
 
 
@@ -172,10 +177,10 @@ def test_execute_tick_closes_position_on_stop_loss(tmp_path: Path) -> None:
     """Close an open long position when the bid crosses its stop."""
     engine = _engine(tmp_path, "stop-loss")
     engine.submit_order(_protected_intent(Decimal("1.09000"), None))
-    engine.execute_tick(_tick())
-    assert engine.snapshot()["positions"]
-    engine.execute_tick(_later_tick(Decimal("1.08500"), Decimal("1.08502"), 1))
-    assert not engine.snapshot()["positions"]
+    _value(engine.execute_tick(_tick()))
+    assert _value(engine.snapshot())["positions"]
+    _value(engine.execute_tick(_later_tick(Decimal("1.08500"), Decimal("1.08502"), 1)))
+    assert not _value(engine.snapshot())["positions"]
     assert len(engine.closed_trades) == 1
     assert engine.closed_trades[0].exit_price == Decimal("1.08500")
 
@@ -184,8 +189,8 @@ def test_execute_tick_closes_position_on_take_profit(tmp_path: Path) -> None:
     """Close an open long position when the bid reaches its target."""
     engine = _engine(tmp_path, "take-profit")
     engine.submit_order(_protected_intent(None, Decimal("1.11000")))
-    engine.execute_tick(_tick())
-    engine.execute_tick(_later_tick(Decimal("1.11500"), Decimal("1.11502"), 1))
+    _value(engine.execute_tick(_tick()))
+    _value(engine.execute_tick(_later_tick(Decimal("1.11500"), Decimal("1.11502"), 1)))
     assert len(engine.closed_trades) == 1
     assert engine.closed_trades[0].profit > Decimal(0)
 
@@ -200,8 +205,8 @@ def test_stop_loss_wins_same_tick_conflict_with_take_profit(tmp_path: Path) -> N
     """
     engine = _engine(tmp_path, "same-tick")
     engine.submit_order(_protected_intent(Decimal("1.10500"), Decimal("1.10400")))
-    engine.execute_tick(_tick())
-    engine.execute_tick(_later_tick(Decimal("1.10450"), Decimal("1.10452"), 1))
+    _value(engine.execute_tick(_tick()))
+    _value(engine.execute_tick(_later_tick(Decimal("1.10450"), Decimal("1.10452"), 1)))
     assert len(engine.closed_trades) == 1
     assert engine.closed_trades[0].exit_price == Decimal("1.10450")
 
@@ -210,9 +215,9 @@ def test_closed_trade_carries_observed_excursions(tmp_path: Path) -> None:
     """Prove MAE and MFE are observed during execution, not reconstructed."""
     engine = _engine(tmp_path, "excursions")
     engine.submit_order(_protected_intent(Decimal("1.09000"), None))
-    engine.execute_tick(_tick())
-    engine.execute_tick(_later_tick(Decimal("1.10500"), Decimal("1.10502"), 1))
-    engine.execute_tick(_later_tick(Decimal("1.08900"), Decimal("1.08902"), 2))
+    _value(engine.execute_tick(_tick()))
+    _value(engine.execute_tick(_later_tick(Decimal("1.10500"), Decimal("1.10502"), 1)))
+    _value(engine.execute_tick(_later_tick(Decimal("1.08900"), Decimal("1.08902"), 2)))
     record = engine.closed_trades[0]
     assert record.mfe is not None
     assert record.mfe > Decimal(0)
@@ -260,14 +265,14 @@ def test_tick_outside_session_is_skipped_not_fatal(tmp_path: Path) -> None:
     )
     engine = EventDrivenExecutionEngine(ledger, writer, profile, "v1")
     engine.submit_order(_intent())
-    assert engine.execute_tick(_tick()) == ()
-    assert not engine.snapshot()["positions"]
+    assert _value(engine.execute_tick(_tick())) == ()
+    assert not _value(engine.snapshot())["positions"]
 
 
 def test_pre_tick_submission_invents_no_price(tmp_path: Path) -> None:
     """Accept an order before the first tick without fabricating a price."""
     engine = _engine(tmp_path, "pre-tick")
-    receipt = engine.submit_order(_intent())
+    receipt = _value(engine.submit_order(_intent()))
     assert receipt.average_price is None
     assert receipt.status == "accepted"
     assert receipt.authority_timestamp == datetime(2025, 1, 1, tzinfo=UTC)

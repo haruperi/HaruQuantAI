@@ -17,8 +17,8 @@ from app.services.simulator.accounting.calculations import (
     calculate_margin,
     normalize_volume,
 )
-from app.services.simulator.errors import SimulationError
-from app.utils import logger
+from app.services.simulator.errors import SimulationError, operation_guard
+from app.utils import RiskLevel, logger
 
 
 class LedgerFill(BaseModel):
@@ -114,6 +114,11 @@ class AccountLedger:
         self._cost_model = cost_model
         self._currency = account_currency
 
+    @operation_guard(
+        operation="simulation.accounting.account_ledger.apply_fill",
+        risk_level=RiskLevel.MEDIUM,
+        read_only=False,
+    )
     def apply_fill(self, fill: LedgerFill) -> Mapping[str, Decimal]:
         """Atomically apply one fill's cash and margin effects.
 
@@ -167,6 +172,11 @@ class AccountLedger:
         self._gross_profit_total += fill.gross_profit
         return costs
 
+    @operation_guard(
+        operation="simulation.accounting.account_ledger.mark_to_market",
+        risk_level=RiskLevel.MEDIUM,
+        read_only=False,
+    )
     def mark_to_market(self, unrealized: Decimal) -> None:
         """Record aggregate open-position profit and loss at the current tick.
 
@@ -183,6 +193,11 @@ class AccountLedger:
             )
         self._unrealized = unrealized
 
+    @operation_guard(
+        operation="simulation.accounting.account_ledger.snapshot",
+        risk_level=RiskLevel.MEDIUM,
+        read_only=True,
+    )
     def snapshot(self) -> Mapping[str, Decimal | str]:
         """Return an immutable read-only account snapshot.
 

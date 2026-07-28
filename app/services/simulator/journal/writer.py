@@ -6,9 +6,13 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import (
+    SimulationError,
+    operation_guard,
+    unwrap_simulation_response,
+)
 from app.services.simulator.journal.contracts import JournalEvent
-from app.utils import canonical_digest, canonical_json, logger
+from app.utils import RiskLevel, canonical_digest, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.simulator.state import SimulationStateStore
@@ -61,6 +65,12 @@ class JournalWriter:
         self._unflushed = 0
         self._finalized = False
 
+    @operation_guard(
+        operation="simulation.journal.journal_writer.append",
+        risk_level=RiskLevel.MEDIUM,
+        read_only=False,
+        writes_file=True,
+    )
     def append(
         self,
         event_type: str,
@@ -104,7 +114,10 @@ class JournalWriter:
         canonical_event = canonical_json(
             event.model_dump(mode="python", warnings=False)
         )
-        self._store.append_journal(self._run_id, canonical_event)
+        unwrap_simulation_response(
+            self._store.append_journal(self._run_id, canonical_event),
+            operation="simulation.journal.journal_writer.append",
+        )
         self._sequence += 1
         self._tail_hash = event.event_hash
         self._unflushed += 1
@@ -123,9 +136,18 @@ class JournalWriter:
             SimulationError: If the store cannot make the batch durable.
         """
         logger.info("Flushing %d Simulation journal events", self._unflushed)
-        self._store.flush_journal(self._run_id)
+        unwrap_simulation_response(
+            self._store.flush_journal(self._run_id),
+            operation="simulation.journal.journal_writer._flush",
+        )
         self._unflushed = 0
 
+    @operation_guard(
+        operation="simulation.journal.journal_writer.finalize",
+        risk_level=RiskLevel.MEDIUM,
+        read_only=False,
+        writes_file=True,
+    )
     def finalize(self) -> str:
         """Atomically finalize the journal and return its checksum.
 
@@ -142,10 +164,13 @@ class JournalWriter:
             )
         if self._unflushed:
             self._flush()
-        checksum = self._store.finalize_journal(
-            self._run_id,
-            self._sequence,
-            self._tail_hash,
+        checksum = unwrap_simulation_response(
+            self._store.finalize_journal(
+                self._run_id,
+                self._sequence,
+                self._tail_hash,
+            ),
+            operation="simulation.journal.journal_writer.finalize",
         )
         self._finalized = True
         return checksum
