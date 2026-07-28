@@ -40,6 +40,7 @@ from app.services.trading import (
 )
 
 from tests.analytics import _support as analytics_examples
+from tests.indicators.helpers import unwrap_response
 from tests.risk import _support as risk_examples
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
@@ -189,7 +190,7 @@ class _SystemBacktestDependencies(FakeDependencies):
         """Invoke the Indicators package-root SMA operation."""
         del request
         self.calls.append("indicators")
-        return (sma(dataset, period=2),)
+        return (unwrap_response(sma(dataset, period=2)),)
 
     def evaluate_strategy(
         self,

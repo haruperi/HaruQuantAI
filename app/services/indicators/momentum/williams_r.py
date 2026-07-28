@@ -12,6 +12,7 @@ from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
     IndicatorErrorCode,
+    _unwrap_indicator_response,
     guard_public_boundary,
 )
 from app.services.indicators.core.results import build_indicator_result
@@ -114,7 +115,7 @@ def williams_r(
     """
     logger.info("Calculating williams_r for %s (period=%d)", data.symbol, period)
     resolved_config = _build_config(period, config)
-    validate_indicator("williams_r", data, resolved_config)
+    _unwrap_indicator_response(validate_indicator("williams_r", data, resolved_config))
     records = cast("tuple[OHLCVRecord, ...]", data.records)
     index = pd.DatetimeIndex(
         [record.timestamp for record in records], name="timestamp", tz="UTC"

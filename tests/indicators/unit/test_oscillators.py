@@ -12,8 +12,9 @@ from app.services.data.contracts import (
     OHLCVRecord,
 )
 from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.services.indicators.momentum import rsi, williams_r
+
+from tests.indicators.helpers import assert_error, unwrap_response
 
 _FIXTURE_PATH = (
     Path(__file__).resolve().parent.parent / "fixtures" / "momentum_golden.json"
@@ -210,7 +211,7 @@ def test_rsi_matches_approved_flat_and_golden_fixtures() -> None:
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["rsi_bars"])
     spec = fixture["rsi"]
-    result = rsi(data, period=spec["period"], source=spec["source"])
+    result = unwrap_response(rsi(data, period=spec["period"], source=spec["source"]))
     actual = result.values[spec["output_column"]].tolist()
     for actual_value, expected_value in zip(actual, spec["expected"], strict=True):
         if expected_value is None:
@@ -222,7 +223,7 @@ def test_rsi_matches_approved_flat_and_golden_fixtures() -> None:
 def test_rsi_flat_prices_yield_flat_fifty() -> None:
     """Zero gain and zero loss together yield the flat RSI value of 50."""
     data = _dataset([2.0, 2.0, 2.0, 2.0, 2.0])
-    result = rsi(data, period=2)
+    result = unwrap_response(rsi(data, period=2))
     valid = result.values["unavailable_reason"].isna()
     assert valid.any()
     assert (result.values.loc[valid, "rsi_2"] == 50.0).all()
@@ -233,7 +234,7 @@ def test_williams_r_matches_approved_zero_range_fixture() -> None:
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["williams_r_bars"])
     spec = fixture["williams_r"]
-    result = williams_r(data, period=spec["period"])
+    result = unwrap_response(williams_r(data, period=spec["period"]))
     actual = result.values[spec["output_column"]].tolist()
     for actual_value, expected_value in zip(actual, spec["expected"], strict=True):
         if expected_value is None:
@@ -245,9 +246,7 @@ def test_williams_r_matches_approved_zero_range_fixture() -> None:
 def test_williams_r_zero_range_raises_invalid_ohlc() -> None:
     """A flat OHLC window raises IND_INVALID_OHLC for Williams %R."""
     data = _flat_dataset(4, 1.5)
-    with pytest.raises(IndicatorError) as excinfo:
-        williams_r(data, period=2)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_OHLC
+    assert_error(williams_r(data, period=2), "IND_INVALID_OHLC")
 
 
 def test_rsi_rejects_config_disagreement() -> None:
@@ -265,9 +264,10 @@ def test_rsi_rejects_config_disagreement() -> None:
         quality_policy="propagate_dataset",
         error_mode="raise",
     )
-    with pytest.raises(IndicatorError) as excinfo:
-        rsi(data, period=2, source="close", config=bad_config)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
+    assert_error(
+        rsi(data, period=2, source="close", config=bad_config),
+        "IND_INVALID_CONFIG",
+    )
 
 
 def test_williams_r_rejects_config_disagreement() -> None:
@@ -286,15 +286,13 @@ def test_williams_r_rejects_config_disagreement() -> None:
         quality_policy="propagate_dataset",
         error_mode="raise",
     )
-    with pytest.raises(IndicatorError) as excinfo:
-        williams_r(data, period=3, config=bad_config)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
+    assert_error(williams_r(data, period=3, config=bad_config), "IND_INVALID_CONFIG")
 
 
 def test_rsi_short_history_is_entirely_warmup() -> None:
     """A dataset shorter than period+1 prices stays entirely unavailable."""
     data = _dataset([1.0, 2.0])
-    result = rsi(data, period=3)
+    result = unwrap_response(rsi(data, period=3))
     assert result.values["rsi_3"].isna().all()
     assert (result.values["unavailable_reason"] == "warmup").all()
 
@@ -302,5 +300,5 @@ def test_rsi_short_history_is_entirely_warmup() -> None:
 def test_rsi_non_default_source_uses_qualified_output_name() -> None:
     """A non-close source produces the exact source-qualified output name."""
     data = _dataset([1.0, 2.0, 3.0, 4.0])
-    result = rsi(data, period=2, source="high")
+    result = unwrap_response(rsi(data, period=2, source="high"))
     assert "rsi_high_2" in result.output_columns

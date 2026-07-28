@@ -10,5 +10,6 @@ evidence remain in the package
 This file does not define a second Feature Registry.
 
 Public consumers import `atr`, `adr`, `rolling_volatility`, and
-`standard_deviation` through `app.services.indicators`. Calculations are pure,
-deterministic, and persistence-free.
+`standard_deviation` through `app.services.indicators`. Calculations return
+`StandardResponse[IndicatorResult]` and are pure, deterministic, and
+persistence-free.

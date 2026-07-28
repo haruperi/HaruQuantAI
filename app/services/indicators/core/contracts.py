@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
 if TYPE_CHECKING:
     from app.services.data import MarketDataset
     from app.services.indicators.core.results import IndicatorResult
+    from app.utils import StandardResponse
 
 
 @dataclass(frozen=True, slots=True)
@@ -141,7 +142,7 @@ class IndicatorProtocol(Protocol):
 
     def calculate(
         self, data: MarketDataset, config: IndicatorConfig
-    ) -> IndicatorResult:
+    ) -> StandardResponse[IndicatorResult]:
         """Calculate one official indicator for a normalized dataset.
 
         Args:
@@ -150,11 +151,8 @@ class IndicatorProtocol(Protocol):
             config: Complete, validated calculation configuration.
 
         Returns:
-            The deterministic ``IndicatorResult`` for the supplied dataset.
-
-        Raises:
-            IndicatorError: On deterministic request or calculation failure
-                under the approved error mode.
+            A standard response containing the deterministic
+            ``IndicatorResult`` for the supplied dataset.
         """
         ...
 

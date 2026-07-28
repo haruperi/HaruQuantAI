@@ -3,7 +3,6 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
 from app.services.data import (
     DataQualityReport,
     MarketDataset,
@@ -11,13 +10,13 @@ from app.services.data import (
 )
 from app.services.indicators import (
     IndicatorConfig,
-    IndicatorError,
-    IndicatorErrorCode,
     get_capability_matrix,
     get_indicator,
     list_indicators,
     validate_indicator,
 )
+
+from tests.indicators.helpers import assert_error, unwrap_response
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _OFFICIAL_INDICATOR_IDS = frozenset(
@@ -113,19 +112,17 @@ def test_registry_discovers_and_validates_only_official_batch_indicators() -> No
     resolved spec for a valid request or raises a deterministic
     ``IND_*`` error, never a partial or silent result.
     """
-    specs = list_indicators()
+    specs = unwrap_response(list_indicators())
     assert {spec.indicator_id for spec in specs} == set(_OFFICIAL_INDICATOR_IDS)
 
-    matrix = get_capability_matrix()
+    matrix = unwrap_response(get_capability_matrix())
     assert {record["indicator_id"] for record in matrix} == set(_OFFICIAL_INDICATOR_IDS)
 
     for indicator_id in _OFFICIAL_INDICATOR_IDS:
-        spec = get_indicator(indicator_id)
+        spec = unwrap_response(get_indicator(indicator_id))
         assert spec.indicator_id == indicator_id
 
-    with pytest.raises(IndicatorError) as excinfo:
-        get_indicator("macd")
-    assert excinfo.value.code == IndicatorErrorCode.IND_UNSUPPORTED_INDICATOR
+    assert_error(get_indicator("macd"), "IND_UNSUPPORTED_INDICATOR")
 
     data = _dataset()
     config = IndicatorConfig(
@@ -140,9 +137,7 @@ def test_registry_discovers_and_validates_only_official_batch_indicators() -> No
         quality_policy="propagate_dataset",
         error_mode="raise",
     )
-    resolved = validate_indicator("sma", data, config)
+    resolved = unwrap_response(validate_indicator("sma", data, config))
     assert resolved.indicator_id == "sma"
 
-    with pytest.raises(IndicatorError) as excinfo:
-        validate_indicator("ema", data, config)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
+    assert_error(validate_indicator("ema", data, config), "IND_INVALID_CONFIG")

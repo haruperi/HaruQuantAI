@@ -11,6 +11,7 @@ from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
     IndicatorErrorCode,
+    _unwrap_indicator_response,
     guard_public_boundary,
 )
 from app.services.indicators.core.results import build_indicator_result
@@ -87,7 +88,7 @@ def doji(
     """
     logger.info("Calculating doji for %s (threshold=%s)", data.symbol, threshold)
     resolved_config = _build_config(threshold, config)
-    validate_indicator("doji", data, resolved_config)
+    _unwrap_indicator_response(validate_indicator("doji", data, resolved_config))
     records = cast("tuple[OHLCVRecord, ...]", data.records)
     index = pd.DatetimeIndex(
         [record.timestamp for record in records], name="timestamp", tz="UTC"

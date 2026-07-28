@@ -11,12 +11,16 @@ This file does not define a second Feature Registry.
 
 Production files:
 
-- `errors.py`: deterministic public error boundary.
+- `errors.py`: deterministic public error boundary and response metadata.
+- `error_catalog.py`: immutable catalogue of the twenty-two approved
+  Indicators error definitions.
 - `contracts.py`: immutable calculation and result-shape contracts.
 - `results.py`: manifest, checksums, projections, and copied joins.
 - `registry.py`: immutable official indicator metadata.
 - `validation.py`: request validation and exact warmup resolution.
 
 Public consumers import all approved names through `app.services.indicators`.
+Every Core operation returns `StandardResponse[T]`; successful `T` is stored
+directly in `data`, while deterministic `IND_*` failures use the error branch.
 The module performs no acquisition, persistence, network, broker, or execution
 work.

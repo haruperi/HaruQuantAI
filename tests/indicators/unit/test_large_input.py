@@ -10,10 +10,15 @@ documented ``MAX_INPUT_ROWS`` limit of 1,000,000.
 import pytest
 from app.services.indicators import atr, obv, rsi, sma
 from app.services.indicators.core import registry
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
+from app.services.indicators.core.errors import IndicatorErrorCode
 from app.services.indicators.core.validation import MAX_INPUT_ROWS
 
-from tests.indicators.helpers import build_dataset, close_dataset
+from tests.indicators.helpers import (
+    assert_error,
+    build_dataset,
+    close_dataset,
+    unwrap_response,
+)
 
 # One record contributes roughly fifteen canonical-JSON items, so the previous
 # single-call implementation failed just past this many records.
@@ -53,7 +58,7 @@ def test_indicator_succeeds_across_the_previous_checksum_ceiling(
     row_count: int,
 ) -> None:
     """A dataset at or past the old 664-record ceiling now calculates cleanly."""
-    result = sma(close_dataset(_prices(row_count)), period=3)
+    result = unwrap_response(sma(close_dataset(_prices(row_count)), period=3))
     assert len(result.values) == row_count
     assert len(result.manifest.input_checksum) == 64
     assert result.manifest.row_count == row_count
@@ -67,9 +72,9 @@ def test_every_indicator_family_handles_a_multi_thousand_bar_history() -> None:
     """
     row_count = 1_000
     dataset = build_dataset(_bars(row_count))
-    assert len(atr(dataset, period=14).values) == row_count
-    assert len(obv(dataset).values) == row_count
-    assert len(rsi(dataset, period=14).values) == row_count
+    assert len(unwrap_response(atr(dataset, period=14)).values) == row_count
+    assert len(unwrap_response(obv(dataset)).values) == row_count
+    assert len(unwrap_response(rsi(dataset, period=14)).values) == row_count
 
 
 def test_large_input_checksum_is_deterministic_and_order_sensitive() -> None:
@@ -79,9 +84,13 @@ def test_large_input_checksum_is_deterministic_and_order_sensitive() -> None:
     naive fold could otherwise collide for permuted records.
     """
     prices = _prices(_PREVIOUS_CEILING + 36)
-    first = sma(close_dataset(prices), period=3).manifest.input_checksum
-    second = sma(close_dataset(prices), period=3).manifest.input_checksum
-    reordered = sma(close_dataset(list(reversed(prices))), period=3)
+    first = unwrap_response(
+        sma(close_dataset(prices), period=3)
+    ).manifest.input_checksum
+    second = unwrap_response(
+        sma(close_dataset(prices), period=3)
+    ).manifest.input_checksum
+    reordered = unwrap_response(sma(close_dataset(list(reversed(prices))), period=3))
 
     assert first == second
     assert reordered.manifest.input_checksum != first
@@ -90,7 +99,8 @@ def test_large_input_checksum_is_deterministic_and_order_sensitive() -> None:
 def test_join_to_round_trips_a_dataset_past_the_old_ceiling() -> None:
     """``join_to`` still matches the manifest checksum past the old ceiling."""
     dataset = close_dataset(_prices(_PREVIOUS_CEILING + 36))
-    joined = sma(dataset, period=3).join_to(dataset)
+    result = unwrap_response(sma(dataset, period=3))
+    joined = unwrap_response(result.join_to(dataset))
     assert len(joined) == _PREVIOUS_CEILING + 36
     assert "sma_3" in joined.columns
 
@@ -121,23 +131,22 @@ def test_raw_upstream_exception_never_crosses_the_public_boundary(
         raise RuntimeError("upstream payload 4111-1111-1111-1111 exploded")
 
     monkeypatch.setattr("app.services.indicators.core.results.canonical_json", _explode)
-    with pytest.raises(IndicatorError) as failure:
-        sma(close_dataset(_prices(50)), period=3)
+    failure = sma(close_dataset(_prices(50)), period=3)
 
-    assert failure.value.code is IndicatorErrorCode.IND_INTERNAL_ERROR
-    assert failure.value.details["operation"] == "sma"
-    assert failure.value.details["failure_type"] == "RuntimeError"
+    assert_error(failure, "IND_INTERNAL_ERROR")
+    assert failure.error is not None
+    assert failure.error.details["operation"] == "sma"
+    assert failure.error.details["failure_type"] == "RuntimeError"
     # The original exception and its payload must not cross the boundary.
-    assert failure.value.__cause__ is None
-    assert "4111" not in failure.value.message
-    assert "4111" not in str(failure.value.details)
+    assert "4111" not in failure.message
+    assert "4111" not in str(failure.error.details)
 
 
 def test_deliberate_indicator_error_is_not_masked_by_the_guard() -> None:
     """The boundary guard preserves documented deterministic failure codes."""
-    with pytest.raises(IndicatorError) as failure:
-        sma(close_dataset(_prices(50)), period=1)
-    assert failure.value.code is not IndicatorErrorCode.IND_INTERNAL_ERROR
+    failure = sma(close_dataset(_prices(50)), period=1)
+    assert failure.error is not None
+    assert failure.error.code != IndicatorErrorCode.IND_INTERNAL_ERROR.value
 
 
 def test_every_official_indicator_is_boundary_guarded() -> None:
@@ -145,7 +154,7 @@ def test_every_official_indicator_is_boundary_guarded() -> None:
     import importlib
 
     unguarded = []
-    for spec in registry.list_indicators():
+    for spec in unwrap_response(registry.list_indicators()):
         module_path, _, attribute = spec.import_path.partition(":")
         function = getattr(importlib.import_module(module_path), attribute)
         if not hasattr(function, "__wrapped__"):

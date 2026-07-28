@@ -3,7 +3,6 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
 from app.services.data import (
     DataQualityReport,
     MarketDataset,
@@ -11,13 +10,13 @@ from app.services.data import (
 )
 from app.services.indicators import (
     IndicatorConfig,
-    IndicatorError,
-    IndicatorErrorCode,
     get_indicator,
     get_warmup_requirement,
     sma,
     validate_indicator,
 )
+
+from tests.indicators.helpers import assert_error, unwrap_response
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -100,7 +99,7 @@ def test_warmup_requirement_preserves_unavailable_rows() -> None:
     further. A non-empty but too-short dataset stays entirely warmup, and
     an empty dataset fails closed with ``IND_INSUFFICIENT_DATA``.
     """
-    spec = get_indicator("sma")
+    spec = unwrap_response(get_indicator("sma"))
     period = 3
     config = IndicatorConfig(
         indicator_id="sma",
@@ -114,20 +113,18 @@ def test_warmup_requirement_preserves_unavailable_rows() -> None:
         quality_policy="propagate_dataset",
         error_mode="raise",
     )
-    requirement = get_warmup_requirement("sma", config)
+    requirement = unwrap_response(get_warmup_requirement("sma", config))
     assert requirement.minimum_observations == period
 
     sufficient_data = _dataset(bar_count=4)
-    result = sma(sufficient_data, period=period, source="close")
+    result = unwrap_response(sma(sufficient_data, period=period, source="close"))
     values = result.values
     assert values["unavailable_reason"].iloc[: period - 1].eq("warmup").all()
     assert values["unavailable_reason"].iloc[period - 1 :].isna().all()
 
     short_data = _dataset(bar_count=2)
-    short_result = sma(short_data, period=period, source="close")
+    short_result = unwrap_response(sma(short_data, period=period, source="close"))
     assert short_result.values["unavailable_reason"].eq("warmup").all()
 
     empty_data = _dataset(bar_count=0)
-    with pytest.raises(IndicatorError) as excinfo:
-        validate_indicator("sma", empty_data, config)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INSUFFICIENT_DATA
+    assert_error(validate_indicator("sma", empty_data, config), "IND_INSUFFICIENT_DATA")

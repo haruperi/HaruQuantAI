@@ -10,7 +10,7 @@ Central environment configuration is grouped into logical sections, while provid
 
 - Added the immutable generic `StandardResponse v1`, exact structured error and execution metadata contracts, approved-code catalogue validation, monotonic millisecond timing, and lossless raw-data/extension preservation foundation in Utils.
 
-#### Changed (8)
+#### Changed (9)
 
 - Migrated the immutable Brokers capability catalogue to `StandardResponse` and added JSON-only mapping-proxy serialization that preserves raw runtime identity while emitting a detached bounded mapping.
 - Migrated the Brokers registered-profile listing to `StandardResponse[tuple[BrokerId, ...]]` while retaining the stable provider tuple directly in `data` and preserving SDK-free discovery.
@@ -20,6 +20,7 @@ Central environment configuration is grouped into logical sections, while provid
 - Replaced unused offline Brokers usage transports and placeholder credentials with enabled demo/testnet/sandbox session evidence, bounded released reads, exact capability-gate assertions, and deterministic disconnection without broker mutations.
 - Replaced the singular Utils, Brokers, Data, Indicators, Strategy, Risk, Trading, and Analytics workflow scripts with eighty-three standalone separator-delimited programs, one per active workflow, plus domain runners and registry-parity tests; MT5-backed paths use genuine demo reads/connections from documented input to typed output boundaries, with broker mutations excluded.
 - Added thirty-three standalone Simulator, Optimization, Portfolio, and Research workflow programs with registry-ordered runners, README evidence mappings, exact stage labels, parity tests, and bounded genuine MT5 demo market evidence.
+- Migrated the Indicators Core and twenty-one official formula operations to Utils-owned `StandardResponse[T]` with the exact twenty-two-code catalogue, response metadata, nested-response unwrapping, and updated consumers and usage evidence.
 
 ## 2.2.11
 

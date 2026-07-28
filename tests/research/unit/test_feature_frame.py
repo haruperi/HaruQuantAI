@@ -11,7 +11,7 @@ from app.services.research.contracts import (
 from app.services.research.features import build_research_feature_frame
 from app.utils import logger
 
-from tests.indicators.helpers import build_dataset
+from tests.indicators.helpers import build_dataset, unwrap_response
 
 _HASH = "c" * 64
 
@@ -48,7 +48,7 @@ def test_feature_frame_records_lineage_and_forward_columns() -> None:
     original = prepared.data.copy(deep=True)
     features, metadata = build_research_feature_frame(
         prepared,
-        indicator_results={"sma": sma(dataset, period=5)},
+        indicator_results={"sma": unwrap_response(sma(dataset, period=5))},
         config=FeatureConfig({"hurst": 20}, (2,), ("forward_return_2",), "preserve"),
         limits=ResearchResourceLimits(100, 10.0, 1024),
     )

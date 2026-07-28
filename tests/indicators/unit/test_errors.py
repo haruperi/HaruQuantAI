@@ -1,7 +1,12 @@
 """Unit tests for the Indicators Core MVP error catalogue and exception."""
 
 import pytest
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
+from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
+from app.services.indicators.core.errors import (
+    IndicatorError,
+    IndicatorErrorCode,
+    guard_public_boundary,
+)
 
 _EXPECTED_CODES = {
     "IND_INVALID_CONFIG",
@@ -34,6 +39,27 @@ def test_error_code_catalog_contains_only_core_codes() -> None:
     codes = {member.value for member in IndicatorErrorCode}
     assert codes == _EXPECTED_CODES
     assert len(IndicatorErrorCode) == len(_EXPECTED_CODES)
+    assert set(INDICATOR_ERROR_CATALOG) == _EXPECTED_CODES
+
+
+@guard_public_boundary
+def _unexpected_failure() -> None:
+    """Raise a caller-payload-like exception for boundary testing."""
+    raise RuntimeError("password=do-not-leak")
+
+
+def test_boundary_redacts_unexpected_exceptions_and_reports_metadata() -> None:
+    """Unexpected exceptions become safe internal-error responses."""
+    response = _unexpected_failure()
+
+    assert response.status == "error"
+    assert response.data is None
+    assert response.error is not None
+    assert response.error.code == "IND_INTERNAL_ERROR"
+    assert "do-not-leak" not in response.message
+    assert response.metadata.execution_ms >= 0
+    assert response.metadata.domain == "indicators"
+    assert response.metadata.read_only is True
 
 
 def test_indicator_error_serializes_redacted_details() -> None:

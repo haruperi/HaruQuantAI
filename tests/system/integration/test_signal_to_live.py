@@ -45,6 +45,7 @@ from tests.brokers.integration.test_mt5_demo_mutations import (
     _require_demo_settings,
     _verify_demo_session,
 )
+from tests.indicators.helpers import unwrap_response
 from tests.risk import _support as risk_examples
 from tests.trading.unit.actions.test_dependencies import (
     MemoryStore,
@@ -178,7 +179,7 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
             max_records=100,
             request_id=dataset.request_id,
         )
-        indicator = sma(dataset, period=2)
+        indicator = unwrap_response(sma(dataset, period=2))
         assert ticks.records
         assert not indicator.values.empty
         assert symbol.min_quantity is not None

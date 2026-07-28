@@ -9,5 +9,6 @@ evidence remain in the package
 This file does not define a second Feature Registry.
 
 Public consumers import `doji`, `engulfing`, `pinbar`, and `inside_bar` through
-`app.services.indicators`. Calculations are pure, deterministic, and
+`app.services.indicators`. Calculations return
+`StandardResponse[IndicatorResult]` and are pure, deterministic, and
 persistence-free.

@@ -8,6 +8,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.services.data import DataError, MarketDataset, get_market_data
 from app.services.indicators import doji, engulfing, inside_bar, pinbar
 
+from tests.indicators.usage._support import (
+    unwrap_indicator_response,
+    unwrap_market_data_response,
+)
+
 _CACHE: dict[str, MarketDataset] = {}
 
 
@@ -26,11 +31,13 @@ def _dataset() -> MarketDataset:
         DataError: If the configured source is unavailable.
     """
     if "dataset" not in _CACHE:
-        _CACHE["dataset"] = get_market_data(
-            source_id="mt5",
-            symbol="EURUSD",
-            timeframe="M5",
-            limit=20,
+        _CACHE["dataset"] = unwrap_market_data_response(
+            get_market_data(
+                source_id="mt5",
+                symbol="EURUSD",
+                timeframe="M5",
+                limit=20,
+            )
         )
     return _CACHE["dataset"]
 
@@ -40,7 +47,7 @@ def fr_indi_031() -> None:
     _header(
         "FR-INDI-031: The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close."
     )
-    result = doji(_dataset(), threshold=0.1)
+    result = unwrap_indicator_response(doji(_dataset(), threshold=0.1))
     print("Result:", result.values["doji"].tolist())
 
 
@@ -49,7 +56,7 @@ def fr_indi_032() -> None:
     _header(
         "FR-INDI-032: The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies."
     )
-    result = engulfing(_dataset())
+    result = unwrap_indicator_response(engulfing(_dataset()))
     print("Result:", result.values["engulfing"].tolist())
 
 
@@ -58,7 +65,7 @@ def fr_indi_033() -> None:
     _header(
         "FR-INDI-033: The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match."
     )
-    result = pinbar(_dataset())
+    result = unwrap_indicator_response(pinbar(_dataset()))
     print("Result:", result.values["pinbar"].tolist())
 
 
@@ -67,7 +74,7 @@ def fr_indi_034() -> None:
     _header(
         "FR-INDI-034: The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup."
     )
-    result = inside_bar(_dataset())
+    result = unwrap_indicator_response(inside_bar(_dataset()))
     print("Result:", result.values["inside_bar"].tolist())
 
 

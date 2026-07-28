@@ -11,6 +11,8 @@ from app.services.data import (
 )
 from app.services.indicators import IndicatorConfig, sma, validate_indicator
 
+from tests.indicators.helpers import unwrap_response
+
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 
 
@@ -106,11 +108,11 @@ def test_batch_calculation_returns_atomic_available_result() -> None:
     data = _dataset([1.0, 2.0, 3.0, 4.0, 5.0])
     config = _config()
 
-    spec = validate_indicator("sma", data, config)
+    spec = unwrap_response(validate_indicator("sma", data, config))
     assert spec.indicator_id == "sma"
 
-    result_first = sma(data, period=2, source="close", config=config)
-    result_second = sma(data, period=2, source="close", config=config)
+    result_first = unwrap_response(sma(data, period=2, source="close", config=config))
+    result_second = unwrap_response(sma(data, period=2, source="close", config=config))
 
     assert (
         result_first.manifest.output_checksum == result_second.manifest.output_checksum

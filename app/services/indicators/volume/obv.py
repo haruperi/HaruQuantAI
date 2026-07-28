@@ -11,6 +11,7 @@ from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
     IndicatorErrorCode,
+    _unwrap_indicator_response,
     guard_public_boundary,
 )
 from app.services.indicators.core.results import build_indicator_result
@@ -84,7 +85,7 @@ def obv(
     """
     logger.info("Calculating obv for %s", data.symbol)
     resolved_config = _build_config(config)
-    validate_indicator("obv", data, resolved_config)
+    _unwrap_indicator_response(validate_indicator("obv", data, resolved_config))
     records = cast("tuple[OHLCVRecord, ...]", data.records)
     index = pd.DatetimeIndex(
         [record.timestamp for record in records], name="timestamp", tz="UTC"

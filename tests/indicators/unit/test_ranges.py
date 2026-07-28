@@ -12,8 +12,9 @@ from app.services.data.contracts import (
     OHLCVRecord,
 )
 from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.services.indicators.volatility import adr, atr
+
+from tests.indicators.helpers import assert_error, unwrap_response
 
 _FIXTURE_PATH = (
     Path(__file__).resolve().parent.parent / "fixtures" / "volatility_golden.json"
@@ -152,7 +153,7 @@ def test_atr_matches_approved_gap_fixture() -> None:
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["atr_bars"], timeframe="M5")
     spec = fixture["atr"]
-    result = atr(data, period=spec["period"])
+    result = unwrap_response(atr(data, period=spec["period"]))
     actual = result.values[spec["output_column"]].tolist()
     for actual_value, expected_value in zip(actual, spec["expected"], strict=True):
         if expected_value is None:
@@ -166,7 +167,7 @@ def test_adr_matches_approved_golden_fixture() -> None:
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["adr_bars"], timeframe="D1")
     spec = fixture["adr"]
-    result = adr(data, period=spec["period"])
+    result = unwrap_response(adr(data, period=spec["period"]))
     actual = result.values[spec["output_column"]].tolist()
     for actual_value, expected_value in zip(actual, spec["expected"], strict=True):
         if expected_value is None:
@@ -191,9 +192,7 @@ def test_atr_rejects_config_disagreement() -> None:
         quality_policy="propagate_dataset",
         error_mode="raise",
     )
-    with pytest.raises(IndicatorError) as excinfo:
-        atr(data, period=2, config=bad_config)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
+    assert_error(atr(data, period=2, config=bad_config), "IND_INVALID_CONFIG")
 
 
 def test_adr_rejects_config_disagreement() -> None:
@@ -212,24 +211,20 @@ def test_adr_rejects_config_disagreement() -> None:
         quality_policy="propagate_dataset",
         error_mode="raise",
     )
-    with pytest.raises(IndicatorError) as excinfo:
-        adr(data, period=2, config=bad_config)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
+    assert_error(adr(data, period=2, config=bad_config), "IND_INVALID_CONFIG")
 
 
 def test_adr_rejects_non_d1_timeframe() -> None:
     """ADR against a non-D1 dataset raises IND_UNSUPPORTED_TIMEFRAME."""
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["atr_bars"], timeframe="M5")
-    with pytest.raises(IndicatorError) as excinfo:
-        adr(data, period=2)
-    assert excinfo.value.code == IndicatorErrorCode.IND_UNSUPPORTED_TIMEFRAME
+    assert_error(adr(data, period=2), "IND_UNSUPPORTED_TIMEFRAME")
 
 
 def test_adr_zero_range_is_valid() -> None:
     """A constant flat D1 dataset produces a valid zero ADR, not an error."""
     data = _flat_daily_dataset(4, 1.5)
-    result = adr(data, period=2)
+    result = unwrap_response(adr(data, period=2))
     valid = result.values["unavailable_reason"].isna()
     assert valid.any()
     assert (result.values.loc[valid, "adr_2"] == 0.0).all()
@@ -239,7 +234,7 @@ def test_atr_short_history_is_entirely_warmup() -> None:
     """A dataset shorter than the period stays entirely unavailable."""
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["atr_bars"][:1], timeframe="M5")
-    result = atr(data, period=2)
+    result = unwrap_response(atr(data, period=2))
     assert result.values["atr_2"].isna().all()
     assert (result.values["unavailable_reason"] == "warmup").all()
 
@@ -248,5 +243,5 @@ def test_atr_manifest_row_count_matches_input() -> None:
     """ATR's manifest row count matches the input dataset row count."""
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["atr_bars"], timeframe="M5")
-    result = atr(data, period=2)
+    result = unwrap_response(atr(data, period=2))
     assert result.manifest.row_count == len(fixture["atr_bars"])

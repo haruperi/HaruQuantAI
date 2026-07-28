@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import MarketDataset, get_market_data
+from app.services.data import MarketDataset, get_market_data, unwrap_data_response
 from app.services.indicators import IndicatorConfig
 from tests.data.usage.workflows._support import market_request
 
@@ -16,8 +16,11 @@ from tests.data.usage.workflows._support import market_request
 @lru_cache(maxsize=4)
 def live_bars(timeframe: str = "M1", limit: int = 80) -> MarketDataset:
     """Read bounded genuine MT5 bars through the Data public boundary."""
-    return get_market_data(
-        market_request("bars", timeframe=timeframe, limit=limit),
+    response = get_market_data(market_request("bars", timeframe=timeframe, limit=limit))
+    return unwrap_data_response(
+        response,
+        operation="indicators.usage.workflow.live_bars",
+        request_id=response.metadata.request_id,
     )
 
 

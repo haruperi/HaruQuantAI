@@ -1,11 +1,10 @@
 """Unit tests for the Indicators Core immutable calculation contracts."""
 
 import dataclasses
+from typing import cast
 
 import pytest
 from app.services.indicators import (
-    IndicatorError,
-    IndicatorErrorCode,
     get_warmup_requirement,
 )
 from app.services.indicators.core.contracts import (
@@ -14,6 +13,9 @@ from app.services.indicators.core.contracts import (
     IndicatorSpec,
     WarmupRequirement,
 )
+from app.utils import StandardResponse
+
+from tests.indicators.helpers import assert_error, unwrap_response
 
 
 def _config() -> IndicatorConfig:
@@ -187,7 +189,7 @@ def test_get_warmup_requirement_resolves_every_official_policy(
         error_mode="raise",
     )
 
-    requirement = get_warmup_requirement(indicator_id, config)
+    requirement = unwrap_response(get_warmup_requirement(indicator_id, config))
 
     assert requirement.minimum_observations == minimum
     assert requirement.source_timeframe == timeframe
@@ -196,18 +198,17 @@ def test_get_warmup_requirement_resolves_every_official_policy(
 
 def test_get_warmup_requirement_rejects_config_identity_mismatch() -> None:
     """FR-INDI-005: invalid candidate configuration fails closed."""
-    with pytest.raises(IndicatorError) as excinfo:
-        get_warmup_requirement("ema", _config())
-
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
+    assert_error(get_warmup_requirement("ema", _config()), "IND_INVALID_CONFIG")
 
 
 class _StubCalculator:
     """Minimal stand-in satisfying ``IndicatorProtocol`` structurally."""
 
-    def calculate(self, _data: object, _config: IndicatorConfig) -> object:
+    def calculate(
+        self, _data: object, _config: IndicatorConfig
+    ) -> StandardResponse[object]:
         """Return a placeholder result for protocol-conformance testing."""
-        return object()
+        return cast("StandardResponse[object]", object())
 
 
 def test_official_calculator_satisfies_indicator_protocol() -> None:

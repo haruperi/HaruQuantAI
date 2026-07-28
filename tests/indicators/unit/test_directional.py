@@ -12,8 +12,9 @@ from app.services.data.contracts import (
     OHLCVRecord,
 )
 from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.services.indicators.trend.directional import adx
+
+from tests.indicators.helpers import assert_error, unwrap_response
 
 _FIXTURE_PATH = (
     Path(__file__).resolve().parent.parent / "fixtures" / "trend_golden.json"
@@ -151,7 +152,7 @@ def test_adx_matches_approved_golden_fixture() -> None:
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["adx_bars"])
     spec = fixture["adx"]
-    result = adx(data, period=spec["period"])
+    result = unwrap_response(adx(data, period=spec["period"]))
     columns = spec["output_columns"]
     expectations = (
         spec["expected_adx"],
@@ -183,16 +184,14 @@ def test_adx_rejects_config_disagreement() -> None:
         quality_policy="propagate_dataset",
         error_mode="raise",
     )
-    with pytest.raises(IndicatorError) as excinfo:
-        adx(data, period=2, config=bad_config)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
+    assert_error(adx(data, period=2, config=bad_config), "IND_INVALID_CONFIG")
 
 
 def test_adx_short_history_is_entirely_warmup() -> None:
     """A dataset shorter than two periods stays entirely unavailable."""
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["adx_bars"][:3])
-    result = adx(data, period=2)
+    result = unwrap_response(adx(data, period=2))
     assert result.values["adx_2"].isna().all()
     assert result.values["plus_di_2"].isna().all()
     assert result.values["minus_di_2"].isna().all()
@@ -202,7 +201,7 @@ def test_adx_short_history_is_entirely_warmup() -> None:
 def test_adx_zero_true_range_produces_zero_directional_values() -> None:
     """Zero true range across a flat dataset yields zero DI/DX/ADX."""
     data = _flat_dataset(8, 1.5)
-    result = adx(data, period=2)
+    result = unwrap_response(adx(data, period=2))
     valid = result.values["unavailable_reason"].isna()
     assert valid.any()
     assert (result.values.loc[valid, "adx_2"] == 0.0).all()
@@ -214,5 +213,5 @@ def test_adx_manifest_row_count_matches_input() -> None:
     """ADX's manifest row count matches the input dataset row count."""
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["adx_bars"])
-    result = adx(data, period=2)
+    result = unwrap_response(adx(data, period=2))
     assert result.manifest.row_count == len(fixture["adx_bars"])

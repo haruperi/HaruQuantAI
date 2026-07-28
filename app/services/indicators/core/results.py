@@ -17,7 +17,11 @@ from dataclasses import dataclass
 from importlib import import_module
 from typing import TYPE_CHECKING, Final, Literal, cast
 
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
+from app.services.indicators.core.errors import (
+    IndicatorError,
+    IndicatorErrorCode,
+    guard_public_boundary,
+)
 from app.utils import canonical_json, logger
 
 # ``app.utils.canonical_json`` rejects any traversal exceeding 10,000 cumulative
@@ -128,8 +132,8 @@ class IndicatorResult:
         manifest: Deterministic identity, checksum, and evidence manifest.
         contract_version: Series contract version; always ``"v1"``.
         schema_id: Stable namespaced schema identity.
-        errors: Unused in v1; public failures raise deterministic
-            exceptions instead of a partial result.
+        errors: Unused in v1; public failures are represented by the outer
+            StandardResponse error branch instead of a partial result.
     """
 
     indicator_id: str
@@ -165,6 +169,7 @@ class IndicatorResult:
         """
         return self.values.copy(deep=True)
 
+    @guard_public_boundary
     def join_to(
         self, data: MarketDataset, mode: Literal["copy"] = "copy"
     ) -> pd.DataFrame:

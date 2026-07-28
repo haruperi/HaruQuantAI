@@ -13,7 +13,7 @@ from app.services.indicators import (
 )
 from app.services.indicators.core import registry
 
-from tests.indicators.helpers import close_dataset
+from tests.indicators.helpers import close_dataset, unwrap_response
 
 _PRICES = [
     1.10,
@@ -41,9 +41,9 @@ def test_parallel_calculations_produce_identical_checksums() -> None:
     """NFR-INDI-010: concurrent calculations are byte-identical to serial ones."""
     data = close_dataset(_PRICES)
     expected = {
-        "sma": sma(data, period=3).manifest,
-        "ema": ema(data, period=3).manifest,
-        "rsi": rsi(data, period=3).manifest,
+        "sma": unwrap_response(sma(data, period=3)).manifest,
+        "ema": unwrap_response(ema(data, period=3)).manifest,
+        "rsi": unwrap_response(rsi(data, period=3)).manifest,
     }
 
     def calculate(indicator_id: str) -> tuple[str, str, str]:
@@ -56,7 +56,7 @@ def test_parallel_calculations_produce_identical_checksums() -> None:
             The indicator ID, its output checksum, and its parameter hash.
         """
         functions = {"sma": sma, "ema": ema, "rsi": rsi}
-        result = functions[indicator_id](data, period=3)
+        result = unwrap_response(functions[indicator_id](data, period=3))
         return (
             indicator_id,
             result.manifest.output_checksum,
@@ -87,7 +87,7 @@ def test_parallel_calculations_do_not_mutate_shared_input() -> None:
         Returns:
             The manifest input checksum.
         """
-        return sma(data, period=period).manifest.input_checksum
+        return unwrap_response(sma(data, period=period)).manifest.input_checksum
 
     with ThreadPoolExecutor(max_workers=_WORKERS) as pool:
         checksums = set(pool.map(calculate, [2, 3, 4, 5] * 3))
@@ -98,8 +98,8 @@ def test_parallel_calculations_do_not_mutate_shared_input() -> None:
 
 def test_parallel_registry_reads_are_stable() -> None:
     """NFR-INDI-010: registry reads are immutable and stable under concurrency."""
-    serial_ids = tuple(spec.indicator_id for spec in list_indicators())
-    serial_matrix_size = len(get_capability_matrix())
+    serial_ids = tuple(spec.indicator_id for spec in unwrap_response(list_indicators()))
+    serial_matrix_size = len(unwrap_response(get_capability_matrix()))
 
     def read(_attempt: int) -> tuple[tuple[str, ...], int, str]:
         """Perform one concurrent registry read.
@@ -111,9 +111,9 @@ def test_parallel_registry_reads_are_stable() -> None:
             Listed indicator IDs, capability-matrix size, and one resolved ID.
         """
         return (
-            tuple(spec.indicator_id for spec in list_indicators()),
-            len(get_capability_matrix()),
-            get_indicator("sma").indicator_id,
+            tuple(spec.indicator_id for spec in unwrap_response(list_indicators())),
+            len(unwrap_response(get_capability_matrix())),
+            unwrap_response(get_indicator("sma")).indicator_id,
         )
 
     with ThreadPoolExecutor(max_workers=_WORKERS) as pool:
@@ -129,5 +129,5 @@ def test_registry_storage_is_immutable() -> None:
     """NFR-INDI-010: the registry exposes no mutable handle to callers."""
     assert isinstance(registry._REGISTRY, MappingProxyType)
     assert isinstance(registry._REGISTRY_ORDER, tuple)
-    assert isinstance(list_indicators(), tuple)
-    assert isinstance(get_capability_matrix(), tuple)
+    assert isinstance(unwrap_response(list_indicators()), tuple)
+    assert isinstance(unwrap_response(get_capability_matrix()), tuple)

@@ -13,6 +13,7 @@ from app.services.indicators import (
     list_indicators,
     validate_indicator,
 )
+from tests.indicators.usage._support import unwrap_indicator_response
 from tests.indicators.usage.workflows._support import indicator_config, live_bars
 
 WORKFLOW_ID = "WF-INDI-005"
@@ -36,23 +37,25 @@ def main() -> None:
     """Run the documented input-to-output workflow."""
     # Stage 1 — INPUT BOUNDARY: Consumer supplies registry discovery/validation inputs.
     _stage(1)
-    specs = list_indicators()
+    specs = unwrap_indicator_response(list_indicators())
     print("Registered indicators:", len(specs))
 
     # Stage 2: Read machine-readable capabilities.
     _stage(2)
-    matrix = get_capability_matrix()
+    matrix = unwrap_indicator_response(get_capability_matrix())
     print("Capability records:", len(matrix))
 
     # Stage 3: Resolve the canonical specification.
     _stage(3)
-    spec = get_indicator("sma")
+    spec = unwrap_indicator_response(get_indicator("sma"))
     print("Resolved:", spec.indicator_id, spec.formula_version)
 
     # Stage 4: Validate against real Data output.
     _stage(4)
     dataset = live_bars()
-    resolved = validate_indicator("sma", dataset, indicator_config("sma", 5))
+    resolved = unwrap_indicator_response(
+        validate_indicator("sma", dataset, indicator_config("sma", 5))
+    )
     print("Validated:", resolved.indicator_id, dataset.source_metadata.get("provider"))
 
     # Stage 5 — OUTPUT BOUNDARY: Return immutable registry/validation evidence.

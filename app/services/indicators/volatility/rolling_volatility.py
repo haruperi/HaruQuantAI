@@ -21,6 +21,7 @@ from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
     IndicatorErrorCode,
+    _unwrap_indicator_response,
     guard_public_boundary,
 )
 from app.services.indicators.core.results import build_indicator_result
@@ -237,7 +238,9 @@ def rolling_volatility(
         source,
     )
     resolved_config = _build_config(period, source, config)
-    validate_indicator("rolling_volatility", data, resolved_config)
+    _unwrap_indicator_response(
+        validate_indicator("rolling_volatility", data, resolved_config)
+    )
     records = cast("tuple[OHLCVRecord, ...]", data.records)
     index, _timestamps, available_ats = _timestamps_and_available(data)
     prices = np.array(

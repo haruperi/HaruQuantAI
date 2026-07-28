@@ -12,8 +12,9 @@ from app.services.data.contracts import (
     OHLCVRecord,
 )
 from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
 from app.services.indicators.volatility.rolling_volatility import rolling_volatility
+
+from tests.indicators.helpers import assert_error, unwrap_response
 
 _FIXTURE_PATH = (
     Path(__file__).resolve().parent.parent / "fixtures" / "volatility_golden.json"
@@ -150,7 +151,9 @@ def test_rolling_volatility_matches_approved_return_fixture() -> None:
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["rolling_bars"])
     spec = fixture["rolling_volatility"]
-    result = rolling_volatility(data, period=spec["period"], source=spec["source"])
+    result = unwrap_response(
+        rolling_volatility(data, period=spec["period"], source=spec["source"])
+    )
     actual = result.values[spec["output_column"]].tolist()
     for actual_value, expected_value in zip(actual, spec["expected"], strict=True):
         if expected_value is None:
@@ -174,23 +177,22 @@ def test_rolling_volatility_rejects_config_disagreement() -> None:
         quality_policy="propagate_dataset",
         error_mode="raise",
     )
-    with pytest.raises(IndicatorError) as excinfo:
-        rolling_volatility(data, period=2, source="close", config=bad_config)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_CONFIG
+    assert_error(
+        rolling_volatility(data, period=2, source="close", config=bad_config),
+        "IND_INVALID_CONFIG",
+    )
 
 
 def test_rolling_volatility_rejects_non_positive_source() -> None:
     """A non-positive selected price raises IND_INVALID_OHLC."""
     data = _dataset([1.0, 2.0, 0.0, 3.0])
-    with pytest.raises(IndicatorError) as excinfo:
-        rolling_volatility(data, period=2)
-    assert excinfo.value.code == IndicatorErrorCode.IND_INVALID_OHLC
+    assert_error(rolling_volatility(data, period=2), "IND_INVALID_OHLC")
 
 
 def test_rolling_volatility_constant_prices_are_zero() -> None:
     """Constant prices produce exactly zero rolling volatility."""
     data = _dataset([2.0, 2.0, 2.0, 2.0, 2.0])
-    result = rolling_volatility(data, period=2)
+    result = unwrap_response(rolling_volatility(data, period=2))
     valid = result.values["unavailable_reason"].isna()
     assert valid.any()
     assert (result.values.loc[valid, "rolling_volatility_2"] == 0.0).all()
@@ -199,7 +201,7 @@ def test_rolling_volatility_constant_prices_are_zero() -> None:
 def test_rolling_volatility_short_history_is_entirely_warmup() -> None:
     """A dataset shorter than period+1 prices stays entirely unavailable."""
     data = _dataset([1.0, 2.0])
-    result = rolling_volatility(data, period=2)
+    result = unwrap_response(rolling_volatility(data, period=2))
     assert result.values["rolling_volatility_2"].isna().all()
     assert (result.values["unavailable_reason"] == "warmup").all()
 
@@ -207,5 +209,5 @@ def test_rolling_volatility_short_history_is_entirely_warmup() -> None:
 def test_rolling_volatility_non_default_source_uses_qualified_output_name() -> None:
     """A non-close source produces the exact source-qualified output name."""
     data = _dataset([1.0, 2.0, 3.0, 4.0, 5.0])
-    result = rolling_volatility(data, period=2, source="high")
+    result = unwrap_response(rolling_volatility(data, period=2, source="high"))
     assert "rolling_volatility_high_2" in result.output_columns

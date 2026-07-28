@@ -33,7 +33,15 @@ from app.services.data import (
     get_market_data,
     get_symbol_metadata,
 )
-from app.services.indicators import IndicatorError, atr, rsi, sma, zigzag
+from app.services.indicators import (
+    IndicatorError,
+    IndicatorErrorCode,
+    IndicatorResult,
+    atr,
+    rsi,
+    sma,
+    zigzag,
+)
 from app.services.strategy import (
     DecomposingTradeEvaluator,
     HarrietHedgingEvaluator,
@@ -54,7 +62,7 @@ from app.services.strategy import (
     WhiteFairyEvaluator,
     evaluate_strategy_signals,
 )
-from app.utils import AppSettings, canonical_json
+from app.utils import AppSettings, StandardResponse, canonical_json
 from pydantic import Field, SecretStr
 
 
@@ -72,6 +80,17 @@ class _StrategyUsageSettings(AppSettings):
 _USAGE_SETTINGS = _StrategyUsageSettings()
 
 _UNAVAILABLE = 3
+
+
+def _unwrap_indicator(response: StandardResponse[IndicatorResult]) -> IndicatorResult:
+    """Extract a successful indicator result for strategy evaluation."""
+    if response.status != "success" or response.data is None:
+        error = response.error
+        message = error.message if error is not None else "indicator calculation failed"
+        raise IndicatorError(IndicatorErrorCode.IND_INTERNAL_ERROR, message)
+    return response.data
+
+
 # Signal-audit tuning. Each audited bar re-evaluates the real boundary against
 # history truncated at that bar, so cost is roughly O(bars x window). Override
 # STRATEGY_AUDIT_BARS to widen or narrow the sample.
@@ -397,9 +416,9 @@ def example_01_naive_ma_trend(market: object, point: Decimal) -> int:
         "naive-ma-trend",
         {"fast_ma_period": 20, "slow_ma_period": 50, "filter_ma_period": 200},
         lambda slice_: (
-            sma(slice_, period=20),
-            sma(slice_, period=50),
-            sma(slice_, period=200),
+            _unwrap_indicator(sma(slice_, period=20)),
+            _unwrap_indicator(sma(slice_, period=50)),
+            _unwrap_indicator(sma(slice_, period=200)),
         ),
         ("sma",),
         market,
@@ -423,7 +442,7 @@ def example_02_decomposing_trade(market: object, point: Decimal) -> int:
         DecomposingTradeEvaluator,
         "decomposing-trade",
         {"rsi_period": 14, "overbought": "70", "oversold": "30"},
-        lambda slice_: (rsi(slice_, period=14),),
+        lambda slice_: (_unwrap_indicator(rsi(slice_, period=14)),),
         ("rsi",),
         market,
         point,
@@ -446,7 +465,7 @@ def example_03_white_fairy(market: object, point: Decimal) -> int:
         WhiteFairyEvaluator,
         "white-fairy",
         {"rsi_period": 14, "overbought": "70", "oversold": "30"},
-        lambda slice_: (rsi(slice_, period=14),),
+        lambda slice_: (_unwrap_indicator(rsi(slice_, period=14)),),
         ("rsi",),
         market,
         point,
@@ -477,7 +496,7 @@ def example_04_sqx_breakout_atr_trailing(market: object, point: Decimal) -> int:
             "trailing_activation_atr_period": 14,
             "trailing_activation_atr_multiple": "1.0",
         },
-        lambda slice_: (atr(slice_, period=14),),
+        lambda slice_: (_unwrap_indicator(atr(slice_, period=14)),),
         ("atr",),
         market,
         point,
@@ -602,7 +621,7 @@ def example_06_market_structure(market: object, point: Decimal) -> int:
     """
     print("\n06 MARKET STRUCTURE")
     print("-" * 88)
-    result = zigzag(market, depth=2)
+    result = _unwrap_indicator(zigzag(market, depth=2))
     if result.values_only["zigzag_value_2"].count() < 8:
         print("Fewer than eight causal confirmed ZigZag pivots are available.")
         return _UNAVAILABLE

@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 import pandas as pd
 from app.services.data import (
@@ -12,12 +12,53 @@ from app.services.data import (
 )
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.results import IndicatorResult, build_indicator_result
+from app.utils import StandardResponse
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _REQUEST_ID = "req-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+_ResponseT = TypeVar("_ResponseT")
+
+
+def unwrap_response(response: StandardResponse[_ResponseT]) -> _ResponseT:
+    """Return a successful raw Indicators result from a standard response.
+
+    Args:
+        response: Indicators operation response.
+
+    Returns:
+        The exact successful raw result stored in ``data``.
+
+    Raises:
+        AssertionError: If the operation returned an error response.
+    """
+    if response.status != "success" or response.error is not None:
+        message = f"expected success response, got {response.status}"
+        raise AssertionError(message)
+    if response.data is None:
+        raise AssertionError("successful response did not contain data")
+    return response.data
+
+
+def assert_error(response: StandardResponse[object], code: str) -> None:
+    """Assert one safe Indicators error response code.
+
+    Args:
+        response: Indicators operation response.
+        code: Expected symbolic error code.
+
+    Raises:
+        AssertionError: If the response is not the expected error.
+    """
+    if response.status != "error" or response.data is not None:
+        message = f"expected error response, got {response.status}"
+        raise AssertionError(message)
+    if response.error is None or response.error.code != code:
+        actual = response.error.code if response.error is not None else None
+        message = f"expected error {code}, got {actual}"
+        raise AssertionError(message)
 
 
 def build_dataset(
@@ -154,4 +195,10 @@ def build_indicator_evidence(
     )
 
 
-__all__ = ["build_dataset", "build_indicator_evidence", "close_dataset"]
+__all__ = [
+    "assert_error",
+    "build_dataset",
+    "build_indicator_evidence",
+    "close_dataset",
+    "unwrap_response",
+]

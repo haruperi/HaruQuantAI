@@ -12,6 +12,7 @@ from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
     IndicatorErrorCode,
+    _unwrap_indicator_response,
     guard_public_boundary,
 )
 from app.services.indicators.core.results import build_indicator_result
@@ -123,7 +124,9 @@ def standard_deviation(
         source,
     )
     resolved_config = _build_config(period, source, config)
-    validate_indicator("standard_deviation", data, resolved_config)
+    _unwrap_indicator_response(
+        validate_indicator("standard_deviation", data, resolved_config)
+    )
     records = cast("tuple[OHLCVRecord, ...]", data.records)
     index = pd.DatetimeIndex(
         [record.timestamp for record in records], name="timestamp", tz="UTC"

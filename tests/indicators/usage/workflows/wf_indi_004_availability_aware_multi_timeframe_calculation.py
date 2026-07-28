@@ -8,8 +8,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import align_multitimeframe_data
+from app.services.data import align_multitimeframe_data, unwrap_data_response
 from app.services.indicators import sma
+from tests.indicators.usage._support import unwrap_indicator_response
 from tests.indicators.usage.workflows._support import live_bars
 
 WORKFLOW_ID = "WF-INDI-004"
@@ -47,16 +48,21 @@ def main() -> None:
     _stage(2)
     decision_start = max(primary.available_at, higher.available_at)
     target = tuple(decision_start + timedelta(seconds=index) for index in range(6))
-    aligned = align_multitimeframe_data(
+    aligned_response = align_multitimeframe_data(
         {"primary": primary, "higher": higher},
         target,
+    )
+    aligned = unwrap_data_response(
+        aligned_response,
+        operation="indicators.usage.workflow.align_multitimeframe_data",
+        request_id=aligned_response.metadata.request_id,
     )
     print("Aligned rows:", len(target))
 
     # Stage 3: Indicators calculates each timeframe independently.
     _stage(3)
-    primary_result = sma(aligned["primary"], period=5)
-    higher_result = sma(aligned["higher"], period=5)
+    primary_result = unwrap_indicator_response(sma(aligned["primary"], period=5))
+    higher_result = unwrap_indicator_response(sma(aligned["higher"], period=5))
     print(
         "Calculated:",
         primary_result.manifest.source_timeframe,

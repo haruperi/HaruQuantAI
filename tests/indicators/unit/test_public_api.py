@@ -1,5 +1,6 @@
 """Import-contract tests for the Indicators public API surface."""
 
+import inspect
 import types
 
 import app.services.indicators as indicators_root
@@ -9,6 +10,9 @@ import app.services.indicators.momentum as indicators_momentum
 import app.services.indicators.trend as indicators_trend
 import app.services.indicators.volatility as indicators_volatility
 import app.services.indicators.volume as indicators_volume
+from app.services.indicators import IndicatorErrorCode, get_indicator, sma
+
+from tests.indicators.helpers import build_dataset
 
 _EXPECTED_ROOT_ALL = (
     "IndicatorConfig",
@@ -126,3 +130,35 @@ def test_retired_bundled_modules_are_not_public_symbols() -> None:
     """Retired bundled implementation modules are absent from public exports."""
     for _module, expected in _NAMESPACES:
         assert not set(expected) & set(_RETIRED_BUNDLED_MODULE_NAMES)
+
+
+def test_public_operations_return_the_exact_standard_response_shape() -> None:
+    """Every migrated public operation exposes raw data in the five-field envelope."""
+    response = get_indicator("sma")
+
+    assert set(response.__class__.model_fields) == {
+        "status",
+        "message",
+        "data",
+        "error",
+        "metadata",
+    }
+    assert response.status == "success"
+    assert response.error is None
+    assert response.data is not None
+    assert response.data.indicator_id == "sma"
+    assert response.data is get_indicator("sma").data
+    assert response.metadata.domain == "indicators"
+    assert response.metadata.read_only is True
+    assert response.metadata.writes_file is False
+    assert response.metadata.modifies_database is False
+    assert response.metadata.places_trade is False
+    assert response.metadata.requires_network is False
+    assert "StandardResponse" in str(inspect.signature(sma).return_annotation)
+
+    failure = sma(build_dataset([(1, 2, 0, 1, 10)]), period=1)
+    assert failure.status == "error"
+    assert failure.data is None
+    assert failure.error is not None
+    assert failure.error.code == IndicatorErrorCode.IND_INVALID_PARAMETER.value
+    assert '"status":"error"' in failure.model_dump_json()

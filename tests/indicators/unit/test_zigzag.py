@@ -3,7 +3,7 @@
 import pandas as pd
 from app.services.indicators import zigzag
 
-from tests.indicators.helpers import build_dataset
+from tests.indicators.helpers import build_dataset, unwrap_response
 
 
 def _dataset():
@@ -30,7 +30,7 @@ def _dataset():
 def test_zigzag_emits_alternating_pivots_on_confirmation_rows() -> None:
     """Confirmed outputs alternate and use their confirmation timestamps."""
     data = _dataset()
-    result = zigzag(data, depth=2)
+    result = unwrap_response(zigzag(data, depth=2))
     ready = result.values_only.dropna(subset=["zigzag_value_2"])
     assert ready["zigzag_type_2"].tolist() == [1.0, -1.0, 1.0, -1.0, 1.0]
     assert ready["zigzag_value_2"].tolist() == [12.0, 2.0, 14.0, 1.0, 15.0]
@@ -51,8 +51,8 @@ def test_zigzag_prefix_is_not_revised_by_later_bars() -> None:
             ),
         }
     )
-    prefix_result = zigzag(prefix, depth=2)
-    full_result = zigzag(data, depth=2)
+    prefix_result = unwrap_response(zigzag(prefix, depth=2))
+    full_result = unwrap_response(zigzag(data, depth=2))
     pd.testing.assert_frame_equal(
         prefix_result.values_only,
         full_result.values_only.iloc[:9],

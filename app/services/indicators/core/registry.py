@@ -11,7 +11,11 @@ from collections.abc import Mapping
 from types import MappingProxyType
 
 from app.services.indicators.core.contracts import IndicatorSpec
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
+from app.services.indicators.core.errors import (
+    IndicatorError,
+    IndicatorErrorCode,
+    guard_public_boundary,
+)
 from app.utils import logger
 
 _REGISTRY_PARAMETER_SCHEMA_MAXIMUM = 1_000_000
@@ -476,6 +480,7 @@ _REGISTRY_ORDER: tuple[str, ...] = (
 )
 
 
+@guard_public_boundary
 def get_indicator(indicator_id: str) -> IndicatorSpec:
     """Resolve one official indicator ID to its immutable spec.
 
@@ -500,6 +505,7 @@ def get_indicator(indicator_id: str) -> IndicatorSpec:
     return spec
 
 
+@guard_public_boundary
 def list_indicators() -> tuple[IndicatorSpec, ...]:
     """List every official spec in stable indicator-ID order.
 
@@ -511,6 +517,7 @@ def list_indicators() -> tuple[IndicatorSpec, ...]:
     return tuple(_REGISTRY[indicator_id] for indicator_id in _REGISTRY_ORDER)
 
 
+@guard_public_boundary
 def get_capability_matrix() -> tuple[Mapping[str, object], ...]:
     """Build the JSON/YAML-compatible official capability matrix.
 

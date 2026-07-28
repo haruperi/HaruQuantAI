@@ -18,6 +18,8 @@ from app.services.indicators.core.results import (
     build_indicator_result,
 )
 
+from tests.indicators.helpers import assert_error, unwrap_response
+
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 
 
@@ -177,7 +179,7 @@ def test_join_to_preserves_input_and_alignment() -> None:
     """FR-INDI-010: join_to appends generated columns onto a copied projection."""
     data = _dataset()
     result = _build_result(data)
-    joined = result.join_to(data)
+    joined = unwrap_response(result.join_to(data))
     assert len(joined) == data.record_count
     assert "close" in joined.columns
     assert "sma_2" in joined.columns
@@ -189,16 +191,17 @@ def test_join_to_rejects_mismatched_dataset() -> None:
     """FR-INDI-010: join_to fails when the dataset checksum does not match."""
     result = _build_result(_dataset())
     other = _dataset(bar_count=4)
-    with pytest.raises(IndicatorError):
-        result.join_to(other)
+    assert_error(result.join_to(other), "IND_INPUT_MUTATION_DETECTED")
 
 
 def test_join_to_rejects_unsupported_mode() -> None:
     """FR-INDI-010: join_to fails for any mode other than copy."""
     data = _dataset()
     result = _build_result(data)
-    with pytest.raises(IndicatorError):
-        result.join_to(data, mode="overwrite")  # type: ignore[arg-type]
+    assert_error(
+        result.join_to(data, mode="overwrite"),  # type: ignore[arg-type]
+        "IND_INVALID_OUTPUT_MODE",
+    )
 
 
 def test_build_result_row_count_mismatch() -> None:

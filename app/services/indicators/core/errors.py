@@ -3,14 +3,30 @@
 from __future__ import annotations
 
 import functools
+import inspect
 import math
 import re
+import time
 from collections.abc import Callable, Mapping
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Final, ParamSpec, TypeVar
+from typing import Final, ParamSpec, TypeVar, cast
 
-from app.utils import logger, redact_text_value
+from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
+from app.utils import (
+    HaruQuantError,
+    JsonValue,
+    ResponseMetadata,
+    RiskLevel,
+    StandardResponse,
+    build_response_metadata,
+    error_response,
+    exception_response,
+    generate_id,
+    logger,
+    redact_text_value,
+    success_response,
+)
 
 _P = ParamSpec("_P")
 _R = TypeVar("_R")
@@ -183,13 +199,12 @@ class IndicatorError(Exception):
 
 def guard_public_boundary(
     function: Callable[_P, _R],
-) -> Callable[_P, _R]:
-    """Convert any unexpected exception into a redacted ``IND_INTERNAL_ERROR``.
+) -> Callable[_P, StandardResponse[_R]]:
+    """Return a standard response for one Indicators public operation.
 
-    Applied to every official indicator convenience function so that no raw
-    pandas, NumPy, Utils, or Python exception can cross the Indicators public
-    port. A deliberate ``IndicatorError`` propagates unchanged so documented
-    deterministic failures keep their exact code.
+    Applied to every qualifying Indicators operation. The wrapped callable
+    remains the raw implementation so internal formula and validation behavior
+    is unchanged, while callers receive the Utils-owned five-field response.
 
     The original exception is suppressed with ``raise ... from None`` and only
     its class name is reported, because an upstream exception message may embed
@@ -202,11 +217,11 @@ def guard_public_boundary(
         function: One official public indicator callable to protect.
 
     Returns:
-        The wrapped callable with identical signature and behavior on success.
+        The wrapped callable returning ``StandardResponse[_R]``.
     """
 
     @functools.wraps(function)
-    def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+    def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> StandardResponse[_R]:
         """Execute the wrapped callable under the deterministic error boundary.
 
         Args:
@@ -214,16 +229,48 @@ def guard_public_boundary(
             **kwargs: Keyword arguments forwarded unchanged.
 
         Returns:
-            Whatever the wrapped callable returns.
-
-        Raises:
-            IndicatorError: The original deterministic failure, or a redacted
-                ``IND_INTERNAL_ERROR`` replacing an unexpected exception.
+            A standard response containing the raw result or safe error.
         """
+        start_time = time.perf_counter_ns()
+        operation = (
+            f"{function.__module__.removeprefix('app.services.')}.{function.__name__}"
+        )
+        risk_level = (
+            RiskLevel.NONE
+            if function.__module__.endswith(".registry")
+            else RiskLevel.LOW
+        )
+
+        def metadata() -> ResponseMetadata:
+            """Build the common pure/read-only operation metadata.
+
+            Returns:
+                Standard response metadata for this operation.
+            """
+            return build_response_metadata(
+                name=operation,
+                domain="indicators",
+                risk_level=risk_level,
+                request_id=generate_id("req"),
+                start_time=start_time,
+                read_only=True,
+                writes_file=False,
+                modifies_database=False,
+                places_trade=False,
+                requires_network=False,
+            )
+
         try:
-            return function(*args, **kwargs)
-        except IndicatorError:
-            raise
+            raw_result = function(*args, **kwargs)
+        except IndicatorError as error:
+            logger.info("Indicators operation returned a known error: %s", operation)
+            return error_response(
+                code=error.code.value,
+                details=cast("Mapping[str, JsonValue]", dict(error.details)),
+                message=error.message,
+                metadata=metadata(),
+                catalog=INDICATOR_ERROR_CATALOG,
+            )
         # BLE001 is intentional here and only here: this decorator is the
         # domain's outermost exception boundary, and its entire purpose is to
         # stop *any* unexpected exception from crossing the public port. A
@@ -233,17 +280,69 @@ def guard_public_boundary(
         except Exception as error:  # noqa: BLE001
             failure_type = type(error).__name__
             logger.error(
-                "Unexpected %s escaped %s; raising IND_INTERNAL_ERROR",
+                "Unexpected %s escaped %s; returning IND_INTERNAL_ERROR",
                 failure_type,
                 function.__name__,
             )
-            raise IndicatorError(
-                IndicatorErrorCode.IND_INTERNAL_ERROR,
-                "indicator calculation failed with an unexpected internal error",
-                {"operation": function.__name__, "failure_type": failure_type},
-            ) from None
+            return exception_response(
+                HaruQuantError("IND_INTERNAL_ERROR", "UNEXPECTED_EXCEPTION"),
+                message="indicator operation failed with an unexpected internal error",
+                metadata=metadata(),
+                catalog=INDICATOR_ERROR_CATALOG,
+                extensions={
+                    "operation": function.__name__,
+                    "failure_type": failure_type,
+                },
+            )
 
+        return success_response(
+            raw_result,
+            message=f"{function.__name__} completed successfully",
+            metadata=metadata(),
+        )
+
+    signature = inspect.signature(function)
+    return_annotation = signature.return_annotation
+    if return_annotation is inspect.Signature.empty:
+        return_annotation = "object"
+    if isinstance(return_annotation, str):
+        response_annotation = f"StandardResponse[{return_annotation}]"
+    else:
+        response_annotation = f"StandardResponse[{return_annotation!r}]"
+    wrapper.__signature__ = signature.replace(  # type: ignore[attr-defined]
+        return_annotation=response_annotation
+    )
+    wrapper.__annotations__ = {
+        **wrapper.__annotations__,
+        "return": response_annotation,
+    }
     return wrapper
+
+
+def _unwrap_indicator_response(response: StandardResponse[_R]) -> _R:
+    """Consume a nested internal Indicators response without nesting it.
+
+    Args:
+        response: Response returned by another migrated Indicators operation.
+
+    Returns:
+        The exact successful raw result.
+
+    Raises:
+        IndicatorError: If the nested operation returned a known error.
+    """
+    if response.status == "success" and response.data is not None:
+        return response.data
+    if response.error is not None:
+        try:
+            code = IndicatorErrorCode(response.error.code)
+        except ValueError:
+            code = IndicatorErrorCode.IND_INTERNAL_ERROR
+        raise IndicatorError(code, response.message, response.error.details)
+    raise IndicatorError(
+        IndicatorErrorCode.IND_INTERNAL_ERROR,
+        "indicator operation returned an invalid response",
+    )
 
 
 __all__ = ["IndicatorError", "IndicatorErrorCode"]

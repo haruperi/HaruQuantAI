@@ -14,6 +14,7 @@ from app.services.strategy import (
     run_vectorized_strategy_signals,
 )
 
+from tests.indicators.helpers import unwrap_response
 from tests.strategy.unit.test_models import make_config, make_context, make_ref
 from tests.strategy.unit.test_vectorized_runner import Evaluator
 
@@ -87,7 +88,7 @@ def test_strategy_receives_only_availability_qualified_series() -> None:
     consumption boundary.
     """
     data = _dataset([1.0, 2.0, 3.0, 4.0, 5.0])
-    result = ema(data, period=2)
+    result = unwrap_response(ema(data, period=2))
     timing = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
     ref = make_ref(timing=timing)
     ref = ref.model_copy(

@@ -8,6 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.indicators import sma, validate_indicator
+from tests.indicators.usage._support import unwrap_indicator_response
 from tests.indicators.usage.workflows._support import indicator_config, live_bars
 
 WORKFLOW_ID = "WF-INDI-001"
@@ -37,12 +38,14 @@ def main() -> None:
 
     # Stage 2: Resolve and validate before calculation.
     _stage(2)
-    spec = validate_indicator("sma", dataset, config)
+    spec = unwrap_indicator_response(validate_indicator("sma", dataset, config))
     print("Validated:", spec.indicator_id, spec.formula_version)
 
     # Stage 3: Execute the official formula.
     _stage(3)
-    result = sma(dataset, period=5, source="close", config=config)
+    result = unwrap_indicator_response(
+        sma(dataset, period=5, source="close", config=config)
+    )
     print("Calculated rows:", result.manifest.row_count)
 
     # Stage 4: Inspect propagated evidence.

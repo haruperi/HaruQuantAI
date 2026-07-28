@@ -24,7 +24,12 @@ from app.services.indicators.core.contracts import (
     IndicatorSpec,
     WarmupRequirement,
 )
-from app.services.indicators.core.errors import IndicatorError, IndicatorErrorCode
+from app.services.indicators.core.errors import (
+    IndicatorError,
+    IndicatorErrorCode,
+    _unwrap_indicator_response,
+    guard_public_boundary,
+)
 from app.services.indicators.core.registry import get_indicator
 from app.utils import logger
 
@@ -557,6 +562,7 @@ def _validate_no_output_collision(output_columns: tuple[str, ...]) -> None:
         )
 
 
+@guard_public_boundary
 def get_warmup_requirement(
     indicator_id: str,
     config: IndicatorConfig,
@@ -574,7 +580,7 @@ def get_warmup_requirement(
         IndicatorError: If the indicator or configuration is invalid.
     """
     logger.info("Resolving warmup requirement for %s", indicator_id)
-    spec = get_indicator(indicator_id)
+    spec = _unwrap_indicator_response(get_indicator(indicator_id))
     _validate_config_identity(indicator_id, config)
     _validate_output_mode(config)
     _validate_precision_dtype(config)
@@ -632,6 +638,7 @@ def get_warmup_requirement(
     )
 
 
+@guard_public_boundary
 def validate_indicator(
     indicator_id: str, data: MarketDataset, config: IndicatorConfig
 ) -> IndicatorSpec:
@@ -650,7 +657,7 @@ def validate_indicator(
             the approved precedence order.
     """
     logger.info("Validating indicator request for %s", indicator_id)
-    spec = get_indicator(indicator_id)
+    spec = _unwrap_indicator_response(get_indicator(indicator_id))
     _validate_config_identity(indicator_id, config)
     _validate_output_mode(config)
     _validate_precision_dtype(config)

@@ -13,6 +13,7 @@ from app.services.indicators import (
     sma,
     validate_indicator,
 )
+from tests.indicators.usage._support import unwrap_indicator_response
 from tests.indicators.usage.workflows._support import indicator_config, live_bars
 
 WORKFLOW_ID = "WF-INDI-003"
@@ -36,13 +37,13 @@ def main() -> None:
     """Run the documented input-to-output workflow."""
     # Stage 1 — INPUT BOUNDARY: Consumer supplies indicator ID and parameters.
     _stage(1)
-    spec = get_indicator("sma")
+    spec = unwrap_indicator_response(get_indicator("sma"))
     print("Specification:", spec.indicator_id, spec.formula_version)
 
     # Stage 2: Resolve the warmup contract.
     _stage(2)
     config = indicator_config("sma", 10)
-    requirement = get_warmup_requirement("sma", config)
+    requirement = unwrap_indicator_response(get_warmup_requirement("sma", config))
     print("Minimum observations:", requirement.minimum_observations)
 
     # Stage 3: Data performs the genuine MT5 read.
@@ -52,8 +53,8 @@ def main() -> None:
 
     # Stage 4: Validate and calculate without silently dropping warmup.
     _stage(4)
-    validate_indicator("sma", dataset, config)
-    result = sma(dataset, period=10, config=config)
+    unwrap_indicator_response(validate_indicator("sma", dataset, config))
+    result = unwrap_indicator_response(sma(dataset, period=10, config=config))
     unavailable = int(result.values["unavailable_reason"].notna().sum())
     print("Retained warmup rows:", unavailable)
 

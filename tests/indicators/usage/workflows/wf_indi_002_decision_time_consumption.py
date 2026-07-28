@@ -15,6 +15,7 @@ from app.services.strategy import (
     StrategyTimingPolicy,
     run_vectorized_strategy_signals,
 )
+from tests.indicators.usage._support import unwrap_indicator_response
 from tests.indicators.usage.workflows._support import live_bars
 from tests.strategy.unit.test_models import (
     HASH,
@@ -80,7 +81,7 @@ def main() -> None:
 
     # Stage 2: Calculate official EMA values.
     _stage(2)
-    indicator = ema(dataset, period=5)
+    indicator = unwrap_indicator_response(ema(dataset, period=5))
     print("Indicator rows:", indicator.manifest.row_count)
 
     # Stage 3: Establish the documented decision-time policy.

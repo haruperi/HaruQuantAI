@@ -13,6 +13,11 @@ from app.services.indicators import (
     standard_deviation,
 )
 
+from tests.indicators.usage._support import (
+    unwrap_indicator_response,
+    unwrap_market_data_response,
+)
+
 _CACHE: dict[str, MarketDataset] = {}
 
 
@@ -34,11 +39,13 @@ def _dataset(timeframe: str) -> MarketDataset:
         DataError: If the configured source is unavailable.
     """
     if timeframe not in _CACHE:
-        _CACHE[timeframe] = get_market_data(
-            source_id="mt5",
-            symbol="EURUSD",
-            timeframe=timeframe,
-            limit=20,
+        _CACHE[timeframe] = unwrap_market_data_response(
+            get_market_data(
+                source_id="mt5",
+                symbol="EURUSD",
+                timeframe=timeframe,
+                limit=20,
+            )
         )
     return _CACHE[timeframe]
 
@@ -48,7 +55,7 @@ def fr_indi_018() -> None:
     _header(
         "FR-INDI-018: The system shall calculate non-negative ATR for one validated `MarketDataset v1` using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation."
     )
-    result = atr(_dataset("M5"), period=2)
+    result = unwrap_indicator_response(atr(_dataset("M5"), period=2))
     print("Result:", result.values["atr_2"].tolist())
 
 
@@ -57,7 +64,7 @@ def fr_indi_019() -> None:
     _header(
         "FR-INDI-019: The system shall calculate ADR for one validated D1 `MarketDataset v1` as the inclusive rolling mean of `high-low`, perform no timeframe aggregation, preserve warmup rows, and return deterministic availability and manifest metadata."
     )
-    result = adr(_dataset("D1"), period=2)
+    result = unwrap_indicator_response(adr(_dataset("D1"), period=2))
     print("Result:", result.values["adr_2"].tolist())
 
 
@@ -66,7 +73,7 @@ def fr_indi_020() -> None:
     _header(
         "FR-INDI-020: The system shall calculate rolling volatility for one validated `MarketDataset v1` from `period` log returns using `ddof=1` and annualization 252, return the exact source-qualified output, treat constant prices as zero volatility, and return causal metadata."
     )
-    result = rolling_volatility(_dataset("M5"), period=2)
+    result = unwrap_indicator_response(rolling_volatility(_dataset("M5"), period=2))
     print("Result:", result.values["rolling_volatility_2"].tolist())
 
 
@@ -75,7 +82,7 @@ def fr_indi_026() -> None:
     _header(
         "FR-INDI-026: The system shall calculate rolling sample standard deviation (`ddof=1`) for one validated `MarketDataset v1` over the selected price, return the exact source-qualified output, treat constant prices as zero, and expose causal metadata."
     )
-    result = standard_deviation(_dataset("M5"), period=2)
+    result = unwrap_indicator_response(standard_deviation(_dataset("M5"), period=2))
     print("Result:", result.values["standard_deviation_2"].tolist())
 
 

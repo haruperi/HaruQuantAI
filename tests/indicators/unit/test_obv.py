@@ -2,7 +2,7 @@
 
 from app.services.indicators.volume import obv
 
-from tests.indicators.helpers import build_dataset
+from tests.indicators.helpers import build_dataset, unwrap_response
 
 
 def test_obv_matches_directional_cumulative_fixture() -> None:
@@ -15,4 +15,5 @@ def test_obv_matches_directional_cumulative_fixture() -> None:
             (1, 1.5, 0.5, 1, 40),
         ]
     )
-    assert obv(data).values["obv"].tolist() == [0.0, 20.0, -10.0, -10.0]
+    result = unwrap_response(obv(data))
+    assert result.values["obv"].tolist() == [0.0, 20.0, -10.0, -10.0]

@@ -20,6 +20,12 @@ from app.services.indicators import (
     sma,
     validate_indicator,
 )
+from app.utils import StandardResponse
+
+from tests.indicators.usage._support import (
+    unwrap_indicator_response,
+    unwrap_market_data_response,
+)
 
 _CACHE: dict[str, MarketDataset] = {}
 
@@ -59,11 +65,13 @@ def _dataset() -> MarketDataset:
         DataError: If the configured read-only source is unavailable.
     """
     if "dataset" not in _CACHE:
-        _CACHE["dataset"] = get_market_data(
-            source_id="mt5",
-            symbol="EURUSD",
-            timeframe="M5",
-            limit=20,
+        _CACHE["dataset"] = unwrap_market_data_response(
+            get_market_data(
+                source_id="mt5",
+                symbol="EURUSD",
+                timeframe="M5",
+                limit=20,
+            )
         )
     return _CACHE["dataset"]
 
@@ -74,7 +82,7 @@ def _result() -> IndicatorResult:
     Returns:
         A two-period SMA result.
     """
-    return sma(_dataset(), period=2)
+    return unwrap_indicator_response(sma(_dataset(), period=2))
 
 
 class _DemoCalculator:
@@ -84,7 +92,7 @@ class _DemoCalculator:
         self,
         _data: MarketDataset,
         _config: IndicatorConfig,
-    ) -> IndicatorResult:
+    ) -> StandardResponse[IndicatorResult]:
         """Return a placeholder solely for structural protocol inspection.
 
         Args:
@@ -94,7 +102,7 @@ class _DemoCalculator:
         Returns:
             A type-only placeholder.
         """
-        return cast("IndicatorResult", object())
+        return cast("StandardResponse[IndicatorResult]", object())
 
 
 def fr_indi_001() -> None:
@@ -131,7 +139,7 @@ def fr_indi_004() -> None:
     _header(
         "FR-INDI-004: The system shall describe each official indicator's ID, name, versions, tier, required columns, parameter/output schemas, warmup policy, supported batch capabilities, import path, stability, and workflow eligibility."
     )
-    print(get_indicator("sma"))
+    print(unwrap_indicator_response(get_indicator("sma")))
 
 
 def fr_indi_005() -> None:
@@ -139,7 +147,7 @@ def fr_indi_005() -> None:
     _header(
         "FR-INDI-005: The system shall expose the exact normalized history requirement for an indicator/config without fetching data, including minimum observations, source timeframe, required columns, and availability basis."
     )
-    print(get_warmup_requirement("sma", _config()))
+    print(unwrap_indicator_response(get_warmup_requirement("sma", _config())))
 
 
 def fr_indi_006() -> None:
@@ -180,7 +188,8 @@ def fr_indi_010() -> None:
     _header(
         "FR-INDI-010: The system shall privately project one matching `MarketDataset v1`, append generated columns to that copied canonical tabular projection, and preserve source columns, row count/order, timestamp/symbol layout, warmup rows, and input identity; collisions fail."
     )
-    print(list(_result().join_to(_dataset()).columns))
+    joined = unwrap_indicator_response(_result().join_to(_dataset()))
+    print(list(joined.columns))
 
 
 def fr_indi_011() -> None:
@@ -188,7 +197,7 @@ def fr_indi_011() -> None:
     _header(
         "FR-INDI-011: The system shall resolve one of the 21 official indicator IDs in the registry identity below to its immutable spec and reject every unknown ID before calculation."
     )
-    print(get_indicator("rsi").indicator_id)
+    print(unwrap_indicator_response(get_indicator("rsi")).indicator_id)
 
 
 def fr_indi_012() -> None:
@@ -196,7 +205,7 @@ def fr_indi_012() -> None:
     _header(
         "FR-INDI-012: The system shall list official specs in stable indicator-ID order with no mutable registry handle."
     )
-    print([spec.indicator_id for spec in list_indicators()])
+    print([spec.indicator_id for spec in unwrap_indicator_response(list_indicators())])
 
 
 def fr_indi_013() -> None:
@@ -204,7 +213,7 @@ def fr_indi_013() -> None:
     _header(
         "FR-INDI-013: The system shall expose a JSON/YAML-compatible matrix containing ID, versions, tier, batch/vectorized/multi-symbol/multi-timeframe support, unsupported optional modes, dependencies, deterministic unsupported codes, and official-workflow eligibility."
     )
-    print(len(get_capability_matrix()))
+    print(len(unwrap_indicator_response(get_capability_matrix())))
 
 
 def fr_indi_014() -> None:
@@ -212,7 +221,11 @@ def fr_indi_014() -> None:
     _header(
         "FR-INDI-014: The system shall resolve the spec and atomically validate config, parameters, row limits, `MarketDataset v1` identity, bars-only kind, one symbol/timeframe, required OHLC fields, ordered unique UTC record timestamps, finite OHLC consistency, output names/collisions, quality evidence, and formula version before private projection/calculation; an empty dataset fails, while a non-empty short dataset remains valid warmup input. Upstream source-quality policy remains Data-owned."
     )
-    print(validate_indicator("sma", _dataset(), _config()).indicator_id)
+    print(
+        unwrap_indicator_response(
+            validate_indicator("sma", _dataset(), _config())
+        ).indicator_id
+    )
 
 
 def main() -> None:

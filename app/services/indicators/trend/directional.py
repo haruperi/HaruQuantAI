@@ -18,6 +18,7 @@ from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
     IndicatorErrorCode,
+    _unwrap_indicator_response,
     guard_public_boundary,
 )
 from app.services.indicators.core.results import build_indicator_result
@@ -272,7 +273,7 @@ def adx(
     """
     logger.info("Calculating adx for %s (period=%d)", data.symbol, period)
     resolved_config = _build_config(period, config)
-    validate_indicator("adx", data, resolved_config)
+    _unwrap_indicator_response(validate_indicator("adx", data, resolved_config))
     records = cast("tuple[OHLCVRecord, ...]", data.records)
     index, timestamps, available_ats = _timestamps_and_available(data)
     high = np.array([float(record.high) for record in records], dtype="float64")

@@ -3,7 +3,7 @@
 import pytest
 from app.services.indicators.volume import cmf
 
-from tests.indicators.helpers import build_dataset
+from tests.indicators.helpers import build_dataset, unwrap_response
 
 
 def test_cmf_matches_money_flow_volume_fixture() -> None:
@@ -15,6 +15,6 @@ def test_cmf_matches_money_flow_volume_fixture() -> None:
             (1.0, 2.0, 0.0, 1.0, 100.0),
         ]
     )
-    result = cmf(data, period=2)
+    result = unwrap_response(cmf(data, period=2))
     assert result.values["cmf_2"].iloc[1] == pytest.approx(0.0)
     assert result.values["cmf_2"].iloc[2] == pytest.approx(-0.5)
