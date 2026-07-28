@@ -309,21 +309,42 @@ flowchart LR
 > with `python tests/risk/usage/workflows/run_all.py`. This satisfies
 > `NFR-RISK-010`; retired `WF-RISK-013` has no program.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-RISK-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-RISK-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-RISK-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-RISK-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-RISK-004`, `WF-RISK-009`, and `WF-RISK-002` were absorbed into `WF-RISK-PRI`,
+`WF-RISK-SEC`, and `WF-RISK-TER` respectively. Absorbed numbers are retired and are
+never reused. `WF-RISK-013` remains retired from design consolidation. New workflows
+continue from `WF-RISK-015`.
+
 | Workflow | Standalone program |
 |---|---|
+| `WF-RISK-PRI` | `tests/risk/usage/workflows/wf_risk_pri_review_proposed_trade_risk.py` |
+| `WF-RISK-SEC` | `tests/risk/usage/workflows/wf_risk_sec_apply_check_kill_switch_state.py` |
+| `WF-RISK-TER` | `tests/risk/usage/workflows/wf_risk_ter_calculate_position_size.py` |
 | `WF-RISK-001` | `tests/risk/usage/workflows/wf_risk_001_build_portfolio_risk_snapshot.py` |
-| `WF-RISK-002` | `tests/risk/usage/workflows/wf_risk_002_calculate_position_size.py` |
 | `WF-RISK-003` | `tests/risk/usage/workflows/wf_risk_003_assess_risk_regime.py` |
-| `WF-RISK-004` | `tests/risk/usage/workflows/wf_risk_004_review_proposed_trade_risk.py` |
 | `WF-RISK-005` | `tests/risk/usage/workflows/wf_risk_005_run_current_portfolio_governor.py` |
 | `WF-RISK-006` | `tests/risk/usage/workflows/wf_risk_006_review_strategy_operational_eligibility.py` |
 | `WF-RISK-007` | `tests/risk/usage/workflows/wf_risk_007_review_activate_allocation_risk.py` |
 | `WF-RISK-008` | `tests/risk/usage/workflows/wf_risk_008_validate_approval_token.py` |
-| `WF-RISK-009` | `tests/risk/usage/workflows/wf_risk_009_apply_check_kill_switch_state.py` |
 | `WF-RISK-010` | `tests/risk/usage/workflows/wf_risk_010_run_scenario_what_if_analysis.py` |
 | `WF-RISK-011` | `tests/risk/usage/workflows/wf_risk_011_generate_risk_decision_summary.py` |
 | `WF-RISK-012` | `tests/risk/usage/workflows/wf_risk_012_persist_risk_audit_token_state.py` |
 | `WF-RISK-014` | `tests/risk/usage/workflows/wf_risk_014_revalidate_decision_evidence_before_reuse.py` |
+| `WF-RISK-015` | `tests/risk/usage/workflows/wf_risk_015_firm_mandate_single_day_profit_share.py` *(pending)* |
+| `WF-RISK-016` | `tests/risk/usage/workflows/wf_risk_016_compute_pin_risk_config_hash.py` *(pending)* |
+
+Entries marked *(pending)* are registered workflows whose standalone program is not
+yet written.
 
 ### Status values
 
@@ -340,25 +361,26 @@ flowchart LR
 | **Internal** | Complete inside Risk. |
 | **Cross-domain** | Risk receives or returns a documented cross-domain contract. |
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-RISK-001` | Internal with Data input | Build portfolio risk snapshot | Data/account and bounded market evidence | Risk-internal immutable `PortfolioRiskSnapshot` | `FR-RISK-004 → FR-RISK-005 → FR-RISK-025` |
-| Completed | `WF-RISK-002` | Cross-domain | Calculate position size | Sizing request plus portfolio/symbol evidence | `PositionSizingResult`; never approval | `FR-RISK-007 → FR-RISK-008 → FR-RISK-026` |
-| Completed | `WF-RISK-003` | Cross-domain | Assess risk regime | Bounded external market/context evidence | `RegimeAssessment` and limit modifiers | `FR-RISK-011 → FR-RISK-031` |
-| Completed | `WF-RISK-004` | Cross-domain | Review proposed trade risk | Risk-owned `ProposedTrade` embedding exact `TradeIntent v1`, fresh evidence, config, governance state | `RiskDecision` v1 / `RiskDecisionPackage` | `FR-RISK-006 → FR-RISK-027 → FR-RISK-031 → FR-RISK-040` |
-| Completed | `WF-RISK-005` | Cross-domain | Run current portfolio governor | Current snapshot, config, kill-switch evidence | Current-state `RiskDecisionPackage`; caller remediates | `FR-RISK-005 → FR-RISK-044 → FR-RISK-041` |
-| Completed | `WF-RISK-006` | Cross-domain | Review strategy operational eligibility | Exact registered strategy/version, evidence, policy, route/profile, approval context | `StrategyOperationalEligibilityDecision v1` | `FR-RISK-010 → FR-RISK-029` |
-| Completed | `WF-RISK-007` | Cross-domain | Review/activate allocation risk | Portfolio construction/rebalance reference plus fresh evidence and approval context | `AllocationRiskDecision v1` and budget activation result | `FR-RISK-009 → FR-RISK-030 → FR-RISK-051` |
-| Completed | `WF-RISK-008` | Cross-domain | Validate approval token | Token, expected scope/action/config, injected time | Durable validation/consumption result | `FR-RISK-015 → FR-RISK-020 → FR-RISK-037` |
-| Completed | `WF-RISK-009` | Cross-domain | Apply/check kill-switch state | Authorized command or current state and scope | Canonical state or block/recovery decision | `FR-RISK-016 → FR-RISK-043 → FR-RISK-017 → FR-RISK-044` |
-| Completed | `WF-RISK-010` | Cross-domain | Run scenario or what-if analysis | Immutable snapshot and scenario definitions | Advisory `ScenarioResult` | `FR-RISK-012 → FR-RISK-013 → FR-RISK-045` |
-| Completed | `WF-RISK-011` | Internal/Cross-domain | Generate risk decision summary | Snapshot, decision, or scenario result | Markdown/JSON `RiskReport` | `FR-RISK-019 → FR-RISK-046` |
-| Completed | `WF-RISK-012` | Cross-domain | Persist risk audit and token state | Material decision/token event | Durable hash-chain/token state or fail-closed result | `FR-RISK-018 → FR-RISK-033 → FR-RISK-037` |
-| Completed | `WF-RISK-014` | Cross-domain | Revalidate decision/evidence before reuse | Prior decision/token plus current evidence/config/time | Reuse validity result; refresh or block | `FR-RISK-042 → FR-RISK-037` |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-RISK-PRI` | Cross-domain | Review proposed trade risk | Risk-owned `ProposedTrade` embedding exact `TradeIntent v1`, fresh evidence, config, governance state | `RiskDecision` v1 / `RiskDecisionPackage` | `FR-RISK-006 → FR-RISK-027 → FR-RISK-031 → FR-RISK-040` |
+| Completed | Secondary | `WF-RISK-SEC` | Cross-domain | Apply/check kill-switch state | Authorized command or current state and scope | Canonical state or block/recovery decision | `FR-RISK-016 → FR-RISK-043 → FR-RISK-017 → FR-RISK-044` |
+| Completed | Tertiary | `WF-RISK-TER` | Cross-domain | Calculate position size | Sizing request plus portfolio/symbol evidence | `PositionSizingResult`; never approval | `FR-RISK-007 → FR-RISK-008 → FR-RISK-026` |
+| Completed | Supporting | `WF-RISK-001` | Internal with Data input | Build portfolio risk snapshot | Data/account and bounded market evidence | Risk-internal immutable `PortfolioRiskSnapshot` | `FR-RISK-004 → FR-RISK-005 → FR-RISK-025` |
+| Completed | Supporting | `WF-RISK-003` | Cross-domain | Assess risk regime | Bounded external market/context evidence | `RegimeAssessment` and limit modifiers | `FR-RISK-011 → FR-RISK-031` |
+| Completed | Supporting | `WF-RISK-005` | Cross-domain | Run current portfolio governor | Current snapshot, config, kill-switch evidence | Current-state `RiskDecisionPackage`; caller remediates | `FR-RISK-005 → FR-RISK-044 → FR-RISK-041` |
+| Completed | Supporting | `WF-RISK-006` | Cross-domain | Review strategy operational eligibility | Exact registered strategy/version, evidence, policy, route/profile, approval context | `StrategyOperationalEligibilityDecision v1` | `FR-RISK-010 → FR-RISK-029` |
+| Completed | Supporting | `WF-RISK-007` | Cross-domain | Review/activate allocation risk | Portfolio construction/rebalance reference plus fresh evidence and approval context | `AllocationRiskDecision v1` and budget activation result | `FR-RISK-009 → FR-RISK-030 → FR-RISK-051` |
+| Completed | Supporting | `WF-RISK-008` | Cross-domain | Validate approval token | Token, expected scope/action/config, injected time | Durable validation/consumption result | `FR-RISK-015 → FR-RISK-020 → FR-RISK-037` |
+| Completed | Supporting | `WF-RISK-010` | Cross-domain | Run scenario or what-if analysis | Immutable snapshot and scenario definitions | Advisory `ScenarioResult` | `FR-RISK-012 → FR-RISK-013 → FR-RISK-045` |
+| Completed | Supporting | `WF-RISK-011` | Internal/Cross-domain | Generate risk decision summary | Snapshot, decision, or scenario result | Markdown/JSON `RiskReport` | `FR-RISK-019 → FR-RISK-046` |
+| Completed | Supporting | `WF-RISK-012` | Cross-domain | Persist risk audit and token state | Material decision/token event | Durable hash-chain/token state or fail-closed result | `FR-RISK-018 → FR-RISK-033 → FR-RISK-037` |
+| Completed | Supporting | `WF-RISK-014` | Cross-domain | Revalidate decision/evidence before reuse | Prior decision/token plus current evidence/config/time | Reuse validity result; refresh or block | `FR-RISK-042 → FR-RISK-037` |
+| Completed | Supporting | `WF-RISK-015` | Internal | Load firm mandate and evaluate single-day profit share | Firm mandate configuration plus a closed-trade or intraday profit series | Mandate-bound single-day profit-share verdict feeding limit evaluation | `Pending` |
+| Completed | Supporting | `WF-RISK-016` | Internal | Compute and pin risk configuration hash | Loaded risk profile and firm mandate configuration | Canonical config hash pinned into every decision and audit record | `Pending` |
 
-There are thirteen active workflows. The identifier `WF-RISK-013` was retired during
-design consolidation and is intentionally not reused; the count of thirteen is
-correct.
+There are fifteen active workflows. The identifier `WF-RISK-013` was retired during
+design consolidation and is intentionally not reused.
 
 ### Workflow details
 
@@ -371,19 +393,36 @@ limits, regime assessment, decision synthesis, scenarios, and reporting. Cross-d
 callers receive registered `RiskDecision` contracts or UI/API-owned views, never the
 snapshot directly.
 
-1. Validate contract versions, timestamps, numeric finiteness, and profile/config hash.
-2. Normalize evidence without inventing missing values or mutating inputs.
-3. Include pending exposure and calculate base-currency exposure, drawdown, margin/leverage, historical VaR/CVaR, correlation, and contributions where evidence is sufficient.
-4. Return calculations, assumptions, coverage, missing-evidence markers, and provenance.
+1. Validate contract versions, timestamps, numeric finiteness, and profile/config
+   hash — `risk.load_risk_config()`, `risk.compute_config_hash()`.
+2. Acquire the account and market evidence supplied by owning domains —
+   `data.get_account_state_snapshot()`, `data.get_market_context_evidence()`.
+3. Normalize evidence without inventing missing values or mutating inputs —
+   `risk.validate_market_context_evidence()`.
+4. Include pending exposure and calculate base-currency exposure, drawdown,
+   margin/leverage, historical VaR/CVaR, correlation, and contributions where
+   evidence is sufficient — `risk.build_portfolio_risk_snapshot()`,
+   `data.get_fx_conversion_evidence()`.
+5. Return calculations, assumptions, coverage, missing-evidence markers, and
+   provenance — `risk.build_portfolio_risk_snapshot()`.
 
 **Failure behaviour:** invalid input raises `RiskDomainError(INVALID_PORTFOLIO_STATE)`; missing material conversion/metadata remains explicit and blocks live-sensitive consumers; calculation failure never creates a synthetic safe value.
 **Integration test:** `tests/risk/integration/test_build_portfolio_snapshot.py::test_build_portfolio_snapshot_from_external_evidence()`
 
-#### `WF-RISK-002` — Calculate position size
+#### `WF-RISK-TER` — Calculate position size
 
 **System workflow:** Internal contribution to `SYS-WF-001` and `SYS-WF-002`.
 **Input boundary:** `PositionSizingRequest` (a Risk-internal type, not a registered cross-domain contract) plus portfolio, symbol, stop, broker-constraint, volatility/correlation, and performance evidence.
 **Output boundary:** `PositionSizingResult` only (Risk-internal; cross-domain consumers receive sizing outcomes only inside `RiskDecision v1`).
+
+1. Load the applicable risk profile and firm mandate for the requested scope —
+   `risk.load_risk_config()`, `risk.load_firm_mandate()`.
+2. Resolve the current portfolio snapshot and symbol evidence —
+   `risk.build_portfolio_risk_snapshot()`.
+3. Apply the requested sizing method and clamp or reject against supplied broker
+   constraints — `risk.calculate_position_size()`.
+4. Return a sizing result that never carries approval authority —
+   `risk.calculate_position_size()`.
 
 The calculator supports fixed-lot, fixed-risk, milestone, fractional-Kelly, volatility, and fixed-fractional methods; it clamps or rejects against supplied constraints and never returns the V1 `0.1`-lot failure fallback. Missing stop distance, zero equity, insufficient volatility/Kelly evidence, or unapproved full Kelly produces a deterministic failure or an explicitly configured fixed-risk fallback.
 
@@ -395,11 +434,18 @@ The calculator supports fixed-lot, fixed-risk, milestone, fractional-Kelly, vola
 **Input boundary:** external volatility, liquidity, correlation, drawdown, crisis, news, and session evidence.
 **Output boundary:** `RegimeAssessment` with transition evidence and configured tightening modifiers.
 
-Unknown or required-missing regime evidence fails closed for live-sensitive workflows. Data supplies `MarketContextEvidence v1`; Risk profiles interpret it using a default stressed lookback of 252 trading days and named UTC crisis windows, without fetching or extrapolating evidence.
+1. Receive `MarketContextEvidence v1` from Data without fetching it —
+   `data.get_market_context_evidence()`.
+2. Validate the evidence envelope, freshness, and coverage —
+   `risk.validate_market_context_evidence()`, `risk.evaluate_market_context()`.
+3. Classify the regime and derive configured tightening modifiers —
+   `risk.assess_risk_regime()`.
+
+Unknown or required-missing regime evidence fails closed for live-sensitive workflows. Risk profiles interpret the evidence using a default stressed lookback of 252 trading days and named UTC crisis windows, without fetching or extrapolating evidence.
 
 **Integration test:** `tests/risk/integration/test_regime_assessment.py::test_regime_assessment_workflow_end_to_end()`
 
-#### `WF-RISK-004` — Review proposed trade risk
+#### `WF-RISK-PRI` — Review proposed trade risk
 
 **System workflow:** `SYS-WF-001`, `SYS-WF-002`
 **Input boundary:** Risk-owned `ProposedTrade` containing the exact immutable
@@ -422,6 +468,24 @@ flowchart LR
     H --> O[Trading or Simulation boundary]
 ```
 
+1. Validate the request, embedded `TradeIntent v1`, state, and pinned configuration —
+   `risk.load_risk_config()`, `risk.compute_config_hash()`.
+2. Check the complete applicable kill-switch hierarchy before any limit work —
+   `risk.check_risk_kill_switch()`.
+3. Reject missing or stale evidence rather than substituting a default —
+   `risk.validate_market_context_evidence()`, `utils.is_fresh()`.
+4. Assess the regime, then evaluate ordered hard limits and policy restrictions —
+   `risk.assess_risk_regime()`, `risk.evaluate_portfolio_limits()`,
+   `risk.evaluate_single_day_profit_share()`.
+5. Size the approved action inside the decision —
+   `risk.calculate_position_size()`.
+6. Resolve approval-token eligibility for live-sensitive routes —
+   `risk.review_strategy_admission()`.
+7. Synthesize the final verdict as one decision package —
+   `risk.generate_risk_report()`.
+8. Write the tamper-evident audit chain entry before returning —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
 The fixed precedence is validation/config → kill switch → missing/stale evidence → hard limits → policy restrictions → approval requirement → final verdict. Every material result includes `primary_failure_limit` and ordered `composite_breach_flags`. No forced/manual override is accepted.
 
 **Failure behaviour:** any unknown safety state, unavailable mandatory audit/token state, or unresolved live double-spend protection blocks approval.
@@ -434,6 +498,17 @@ The fixed precedence is validation/config → kill switch → missing/stale evid
 `KillSwitchState` hierarchy, and governance evidence.
 **Output boundary:** current-state compliance `RiskDecisionPackage`; Trading/UI/API owns remediation.
 
+1. Read the current snapshot, configuration, and regime —
+   `risk.build_portfolio_risk_snapshot()`, `risk.assess_risk_regime()`.
+2. Read the complete applicable kill-switch hierarchy —
+   `risk.check_risk_kill_switch()`.
+3. Evaluate current-state limits and detect breaches —
+   `risk.evaluate_portfolio_limits()`, `risk.evaluate_single_day_profit_share()`.
+4. Recommend block, reduction, or review as a decision package —
+   `risk.generate_risk_report()`.
+5. Trading, not Risk, performs any remediation —
+   `trading.reduce_exposure()`, `trading.close_all_positions()`.
+
 Risk detects breaches and recommends block/reduction/review without cancelling orders, closing positions, or changing execution controls.
 
 **Integration test:** `tests/risk/integration/test_portfolio_governor.py::test_portfolio_governor_has_no_execution_side_effect()`
@@ -445,6 +520,17 @@ Risk detects breaches and recommends block/reduction/review without cancelling o
 registration reference, required Data evidence, policy, route/profile, and approval
 context.
 **Output boundary:** `StrategyOperationalEligibilityDecision v1`.
+
+1. Resolve the exact Strategy registration reference without mutating it —
+   `strategy.validate_strategy_ref()`, `strategy.list_strategy_versions()`.
+2. Load the applicable policy, route, and profile —
+   `risk.load_risk_config()`, `risk.load_firm_mandate()`.
+3. Validate the required Data evidence and its freshness —
+   `risk.validate_market_context_evidence()`.
+4. Approve, condition, expire, suspend, or reject operational use —
+   `risk.review_strategy_admission()`.
+5. Persist the decision to the audit chain —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
 
 Risk approves, conditions, expires, suspends, or rejects operational use without
 altering Strategy's registry. Registration alone never authorizes allocation or
@@ -464,6 +550,18 @@ references, and hashes; it never embeds or imports a Portfolio-owned contract.
 `AllocationBudgetActivationRequest v1`, the active authoritative risk-budget
 projection.
 
+1. Receive the Risk-owned projection of the immutable Portfolio candidate or
+   rebalance plan — `portfolio.assess_common_mode_exposure()`.
+2. Validate eligibility, account, market, FX, Analytics, policy, and approval
+   evidence — `risk.validate_market_context_evidence()`,
+   `data.get_fx_conversion_evidence()`.
+3. Approve, cap, condition, expire, or reject the proposal —
+   `risk.review_allocation_proposal()`.
+4. Activate the authoritative risk-budget projection only after a valid activation
+   request — `risk.activate_allocation_budget()`.
+5. Record the decision and activation in the audit chain —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
 Risk may approve, cap, condition, expire, or reject. It never constructs Portfolio
 weights, activates Portfolio state, or executes a rebalance. Capital weights remain
 Portfolio metadata; the Risk budget projection is the binding control.
@@ -477,14 +575,20 @@ Portfolio metadata; the Risk budget projection is the binding control.
 config, Risk-owned and UI/API-produced `ApprovalAttestation`, audit requirement, and injected time.
 **Output boundary:** `ApprovalValidationResult`; caller proceeds only when valid and durably consumed.
 
-Schema, HMAC-or-stronger signature, scope, decision/config binding, expiry,
-revocation, nonce, single use, authorized attestation, and mandatory audit write are
-checked atomically. Risk reserves token + workflow + action scope + expiry before a
-live-success path; concurrent or conflicting reservation fails closed.
+1. Pin the expected configuration so the token binding cannot drift —
+   `risk.compute_config_hash()`.
+2. Check schema, signature, scope, decision binding, expiry, revocation, nonce, and
+   single use atomically — `risk.revalidate_risk_decision()`.
+3. Reserve token, workflow, action scope, and expiry before any live-success path —
+   `trading.reserve_idempotency()`.
+4. Write the mandatory audit record as part of the same atomic result —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
+Concurrent or conflicting reservation fails closed.
 
 **Integration test:** `tests/risk/integration/test_approval_tokens.py::test_live_token_is_consumed_once_durably()`
 
-#### `WF-RISK-009` — Apply or check kill-switch state
+#### `WF-RISK-SEC` — Apply or check kill-switch state
 
 **System workflow:** `SYS-WF-005`
 **Input boundary:** UI/API `KillSwitchCommand` with explicit scope level
@@ -493,10 +597,24 @@ separate `AuthContext`. Clearance also requires a matching current
 `ApprovalAttestation` from a different authorized principal; activation does not.
 **Output boundary:** canonical `KillSwitchState` and deterministic block/recovery decision consumed by Trading/UI/API.
 
+1. Authenticate the command principal separately from the attestation principal —
+   `utils.create_auth_context()`.
+2. Apply the authorized activation or clearance command —
+   `risk.apply_kill_switch_command()`.
+3. Read the resolved canonical state across the whole scope hierarchy —
+   `risk.check_risk_kill_switch()`.
+4. Revoke approvals invalidated by the new state —
+   `risk.revalidate_risk_decision()`.
+5. Persist canonical state to the tamper-evident chain —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+6. Trading alone mutates execution controls in response —
+   `trading.trigger_kill_switch()`, `trading.clear_kill_switch()`.
+7. UI/API delivers the critical operational alert —
+   `api.build_kill_switch_activation_alert()`, `api.deliver_critical_alert()`.
+
 Active or unknown state blocks live risk increase. `global` state overrides
 `portfolio`, which overrides `strategy`, which overrides `symbol`; an inactive child cannot override an active
-parent. Risk persists canonical state and revokes affected approvals; only Trading
-mutates execution controls. Clearance requires a valid Risk-owned, UI/API-produced
+parent. Clearance requires a valid Risk-owned, UI/API-produced
 `ApprovalAttestation` whose principal differs from the commanding `AuthContext`.
 Same-principal clearance fails deterministically with no state change. Trading
 resumes only after all applicable scopes are inactive and reconciliation succeeds.
@@ -509,7 +627,14 @@ resumes only after all applicable scopes are inactive and reconciliation succeed
 **Input boundary:** immutable snapshot plus bounded `ScenarioDefinition` values.
 **Output boundary:** registered `ScenarioResult v1` advisory baseline/projected comparison.
 
-No live state changes. Scenario output cannot claim approval and must pass through the canonical governor before any action.
+1. Take an immutable snapshot as the scenario baseline —
+   `risk.build_portfolio_risk_snapshot()`.
+2. Apply bounded scenario definitions deterministically —
+   `risk.run_risk_scenario_analysis()`.
+3. Return an advisory baseline/projected comparison that claims no approval —
+   `risk.generate_risk_report()`.
+
+No live state changes. Scenario output must pass through the canonical governor before any action.
 
 **Integration test:** `tests/risk/integration/test_scenario_analysis.py::test_scenario_analysis_is_deterministic_and_advisory()`
 
@@ -518,6 +643,13 @@ No live state changes. Scenario output cannot claim approval and must pass throu
 **System workflow:** `SYS-WF-001`, `SYS-WF-002`, `SYS-WF-005`
 **Input boundary:** completed snapshot, decision, or scenario result.
 **Output boundary:** focused Markdown/JSON `RiskReport`.
+
+1. Accept a completed snapshot, decision, or scenario result as input —
+   `risk.build_portfolio_risk_snapshot()`, `risk.run_risk_scenario_analysis()`.
+2. Render the focused Markdown or JSON summary —
+   `risk.generate_risk_report()`.
+3. Redact any sensitive field before the summary leaves the domain —
+   `utils.redact_mapping_value()`.
 
 Evidence, calculations, assumptions, warnings, decisions, and recommendations are separated. Rejections/blocks identify the primary failure first. Live approval is claimed only when a valid decision and token are present.
 
@@ -529,7 +661,17 @@ Evidence, calculations, assumptions, warnings, decisions, and recommendations ar
 **Input boundary:** material decision, kill-switch, audit, or token event.
 **Output boundary:** Risk-owned record persisted through Data-owned infrastructure or a fail-closed live result.
 
-Canonical JSON and SHA-256-or-stronger hashing bind each record to `previous_hash`; genesis defaults to 64 zeroes unless deployment config specifies another constant. Partial writes, tamper, or mandatory-store unavailability block live-sensitive success.
+1. Canonicalize the record so the hash is byte-stable across processes —
+   `utils.canonical_json()`, `utils.canonical_digest()`.
+2. Bind the record to `previous_hash` and construct the audit envelope —
+   `utils.create_audit_event()`.
+3. Persist through Data-owned infrastructure under the write lock —
+   `data.persist_audit_event()`, `data.acquire_write_lock()`,
+   `data.execute_transaction()`.
+4. Read back the chain for verification —
+   `data.query_audit_events()`.
+
+Genesis defaults to 64 zeroes unless deployment config specifies another constant. Partial writes, tamper, or mandatory-store unavailability block live-sensitive success.
 
 **Integration test:** `tests/risk/integration/test_risk_persistence.py::test_audit_and_token_state_fail_closed_atomically()`
 
@@ -539,9 +681,63 @@ Canonical JSON and SHA-256-or-stronger hashing bind each record to `previous_has
 **Input boundary:** prior decision/token plus current proposal, evidence, config, and injected time.
 **Output boundary:** reusable/refresh-required/blocked validation result.
 
+1. Re-pin the current configuration and compare it to the decision's binding —
+   `risk.compute_config_hash()`, `risk.load_risk_config()`.
+2. Re-check evidence freshness against injected time —
+   `utils.is_fresh()`, `utils.age_seconds()`.
+3. Evaluate reuse validity and return reusable, refresh-required, or blocked —
+   `risk.revalidate_risk_decision()`.
+4. Re-check the applicable kill-switch hierarchy before permitting reuse —
+   `risk.check_risk_kill_switch()`.
+
 Material scope change, expiry, clock skew, stale evidence, config mismatch, in-flight reconciliation expiry, revoked token, or consumed token invalidates reuse.
 
 **Integration test:** `tests/risk/integration/test_decision_revalidation.py::test_material_change_requires_new_decision()`
+
+#### `WF-RISK-015` — Load firm mandate and evaluate single-day profit share
+
+**System workflow:** Internal contribution to `SYS-WF-002` and `SYS-WF-005`.
+**Input boundary:** the firm mandate configuration plus a closed-trade or intraday
+profit series for the evaluated account and window.
+**Output boundary:** a mandate-bound single-day profit-share verdict consumed by
+limit evaluation; never an approval on its own.
+
+1. Load the firm mandate that governs the account and its concentration rules —
+   `risk.load_firm_mandate()`.
+2. Pin the mandate and profile configuration into a canonical hash —
+   `risk.compute_config_hash()`.
+3. Evaluate what share of the window's profit came from a single day —
+   `risk.evaluate_single_day_profit_share()`.
+4. Feed the verdict into ordered portfolio limit evaluation —
+   `risk.evaluate_portfolio_limits()`.
+5. Record the evaluation in the decision summary —
+   `risk.generate_risk_report()`.
+
+**Failure behaviour:** a missing mandate, an unbounded window, or an incomplete
+profit series fails closed rather than assuming an unconcentrated distribution.
+
+**Integration test:** `Pending`
+
+#### `WF-RISK-016` — Compute and pin risk configuration hash
+
+**System workflow:** Internal contribution to every Risk decision workflow.
+**Input boundary:** the loaded risk profile and firm mandate configuration.
+**Output boundary:** one canonical configuration hash pinned into every decision,
+approval token binding, and audit record produced in the same operation.
+
+1. Load the applicable risk profile — `risk.load_risk_config()`.
+2. Load the firm mandate that constrains it — `risk.load_firm_mandate()`.
+3. Canonicalize both so the hash is byte-stable across processes —
+   `utils.canonical_json()`.
+4. Compute the pinned configuration hash — `risk.compute_config_hash()`.
+5. Bind the hash into the decision and its audit record —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
+**Failure behaviour:** a decision is never emitted without a pinned hash. A hash
+mismatch discovered at reuse time invalidates the decision through `WF-RISK-014`
+rather than being silently refreshed.
+
+**Integration test:** `Pending`
 
 ---
 

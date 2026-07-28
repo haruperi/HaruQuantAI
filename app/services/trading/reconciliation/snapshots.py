@@ -13,7 +13,9 @@ from app.services.trading.contracts import (
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import logger, to_json_safe
+from app.utils import get_logger, to_json_safe
+
+logger = get_logger(__name__)
 
 
 def _freeze_mapping(value: Mapping[str, object]) -> Mapping[str, JsonValue]:

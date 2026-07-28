@@ -10,14 +10,14 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_DIR = ROOT / "tests/simulator/usage/workflows"
 README = ROOT / "app/services/simulator/README.md"
 EXPECTED = {
-    "WF-SIM-001": "wf_sim_001_official_fx_backtest.py",
+    "WF-SIM-PRI": "wf_sim_pri_official_fx_backtest.py",
     "WF-SIM-002": "wf_sim_002_simulation_trader_operations.py",
-    "WF-SIM-003": "wf_sim_003_optimization_candidate_execution.py",
+    "WF-SIM-TER": "wf_sim_ter_optimization_candidate_execution.py",
     "WF-SIM-004": "wf_sim_004_severe_data_quality_blocked_run.py",
     "WF-SIM-005": "wf_sim_005_deterministic_replay.py",
     "WF-SIM-006": "wf_sim_006_registered_strategy_security_rejection.py",
     "WF-SIM-007": "wf_sim_007_non_canonical_fast_research.py",
-    "WF-SIM-009": "wf_sim_009_portfolio_backtest.py",
+    "WF-SIM-SEC": "wf_sim_sec_portfolio_backtest.py",
     "WF-SIM-010": "wf_sim_010_tick_series_acquisition.py",
 }
 

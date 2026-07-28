@@ -10,7 +10,9 @@ from app.services.research.contracts import (
     MarketStructureProfile,
     ResearchWarning,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -37,10 +39,10 @@ def _atr(data: pd.DataFrame, period: int) -> float:
         The mean true range, or 0.0 when insufficient.
 
     Raises:
-        ValidationError: If OHLC columns are absent.
+        ValueError: If OHLC columns are absent.
     """
     if not {"high", "low", "close"} <= set(data.columns):
-        raise ValidationError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
     high = data["high"].astype("float64")
     low = data["low"].astype("float64")
     prev_close = data["close"].shift(1).astype("float64")
@@ -136,18 +138,18 @@ def build_market_structure_profile(
         Canonical advisory ``MarketStructureProfile``.
 
     Raises:
-        ValidationError: If data, configuration, or resources are invalid.
+        ValueError: If data, configuration, or resources are invalid.
     """
     logger.info("Building Research market-structure profile")
     if len(prepared.data) > limits.max_rows:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     settings = config.profile
     swing_window = int(settings.get("swing_window", 5))  # type: ignore[arg-type]
     atr_period = int(settings.get("atr_period", 14))  # type: ignore[arg-type]
     trend_threshold = float(settings.get("trend_threshold", 0.5))  # type: ignore[arg-type]
     range_threshold = float(settings.get("range_threshold", 0.2))  # type: ignore[arg-type]
     if not {"high", "low", "close"} <= set(prepared.data.columns):
-        raise ValidationError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
     close = prepared.data["close"].astype("float64")
     if len(close) < swing_window:
         return _insufficient_profile(prepared)

@@ -7,7 +7,7 @@ import os
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from app.services.research.contracts import (
     ArtifactReference,
@@ -18,14 +18,17 @@ from app.services.research.contracts import (
 from app.services.research.leakage import mask_research_artifact
 from app.services.research.profiles import render_research_report
 from app.utils import (
-    AuditEvent,
-    AuthContext,
     SecurityError,
     ValidationError,
     canonical_json,
+    create_audit_event,
     generate_id,
-    logger,
+    get_logger,
 )
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import ResearchResourceLimits
@@ -122,7 +125,7 @@ def _emit_audit_event(
         "size_bytes": size_bytes,
         "sha256_prefix": sha256[:16],
     }
-    event = AuditEvent(
+    event = create_audit_event(
         contract_version="v1",
         schema_id="utils.audit_event.v1",
         event_id=event_id,

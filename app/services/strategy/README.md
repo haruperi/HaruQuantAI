@@ -392,18 +392,38 @@ No dependency points from Strategy into Risk, Trading, Simulation internals, Opt
 > `python tests/strategy/usage/workflows/run_all.py`. This satisfies `NFR-STR-011`
 > and complements feature-level usage evidence.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-STR-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-STR-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-STR-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-STR-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-STR-002`, `WF-STR-004`, and `WF-STR-008` were absorbed into `WF-STR-PRI`,
+`WF-STR-SEC`, and `WF-STR-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-STR-011`.
+
 | Workflow | Standalone program |
 |---|---|
+| `WF-STR-PRI` | `tests/strategy/usage/workflows/wf_str_pri_generate_vectorized_decisions.py` |
+| `WF-STR-SEC` | `tests/strategy/usage/workflows/wf_str_sec_build_hand_off_trade_intent.py` |
+| `WF-STR-TER` | `tests/strategy/usage/workflows/wf_str_ter_register_immutable_strategy_version.py` |
 | `WF-STR-001` | `tests/strategy/usage/workflows/wf_str_001_validate_reference_configuration.py` |
-| `WF-STR-002` | `tests/strategy/usage/workflows/wf_str_002_generate_vectorized_decisions.py` |
 | `WF-STR-003` | `tests/strategy/usage/workflows/wf_str_003_run_stateful_event_hook.py` |
-| `WF-STR-004` | `tests/strategy/usage/workflows/wf_str_004_build_hand_off_trade_intent.py` |
 | `WF-STR-005` | `tests/strategy/usage/workflows/wf_str_005_create_replay_manifest_checkpoint.py` |
 | `WF-STR-006` | `tests/strategy/usage/workflows/wf_str_006_export_structured_diagnostics.py` |
 | `WF-STR-007` | `tests/strategy/usage/workflows/wf_str_007_supply_paper_live_decisions.py` |
-| `WF-STR-008` | `tests/strategy/usage/workflows/wf_str_008_register_immutable_strategy_version.py` |
 | `WF-STR-009` | `tests/strategy/usage/workflows/wf_str_009_reject_arbitrary_strategy_code.py` |
 | `WF-STR-010` | `tests/strategy/usage/workflows/wf_str_010_evaluate_recovered_concrete_signals.py` |
+| `WF-STR-011` | `tests/strategy/usage/workflows/wf_str_011_adopt_approved_optimization_parameters.py` *(pending)* |
+| `WF-STR-012` | `tests/strategy/usage/workflows/wf_str_012_evaluate_signals_for_research.py` *(pending)* |
+
+Entries marked *(pending)* are registered workflows whose standalone program is not
+yet written.
 
 ### Status values
 
@@ -413,34 +433,41 @@ No dependency points from Strategy into Risk, Trading, Simulation internals, Opt
 | **Partial**   | Reusable behavior exists but needs contract, structure, validation, or test work.                             |
 | **Completed** | Final behavior, structure, runtime use, and tests are verified.                                               |
 
-| Status  | Workflow ID    | Scope        | Workflow                              | Trigger / Input boundary                                 | Final outcome / Output boundary                                | Requirement sequence                           |
-| ------- | -------------- | ------------ | ------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------- |
-| Completed | `WF-STR-001` | Internal     | Validate reference and configuration  | Registry ref and declarative config                      | Exact validated immutable version/config or structured failure | `FR-STR-023 → FR-STR-024`                   |
-| Completed | `WF-STR-002` | Cross-domain | Generate vectorized decisions         | Data`MarketDataset` + Indicators `IndicatorSeries`   | Ordered`TradeIntent` batch to Risk/runtime boundary          | `FR-STR-023 → FR-STR-024 → FR-STR-032`     |
-| Completed | `WF-STR-003` | Cross-domain | Run stateful event hook               | Typed event + immutable snapshots                        | Intents, diagnostics, and atomic local-state update            | `FR-STR-023 → FR-STR-024 → FR-STR-033`     |
-| Completed | `WF-STR-004` | Cross-domain | Build and hand off TradeIntent        | Validated strategy decision metadata                     | Canonical proposal to Risk; no execution                       | `FR-STR-026`                                 |
-| Completed | `WF-STR-005` | Cross-domain | Create replay manifest and checkpoint | Identity/config/input hashes + optional local state      | Manifest/checkpoint reference to runtime                       | `FR-STR-029 → FR-STR-030 → FR-STR-031`     |
-| Completed | `WF-STR-006` | Cross-domain | Export structured diagnostics         | Context + bounded diagnostic details                     | Redacted diagnostics to caller/audit boundary                  | `FR-STR-019`                                 |
-| Completed | `WF-STR-007` | Cross-domain | Supply paper/live decisions           | Trading invokes Strategy with prepared inputs            | `TradeIntent` to Risk/Trading workflow                       | `FR-STR-023 → FR-STR-024 → FR-STR-032/033` |
-| Completed | `WF-STR-008` | Cross-domain | Register immutable strategy version   | UI/API-approved registration or parameter update command | Immutable registry/config record                               | `FR-STR-020 → FR-STR-021`                   |
-| Completed | `WF-STR-009` | Cross-domain | Reject arbitrary strategy code        | Raw code/path/archive at command boundary                | Redacted`STRATEGY_ARBITRARY_CODE_REJECTED`; no import        | `FR-STR-018 → FR-STR-020/021/023/024`       |
-| Completed | `WF-STR-010` | Cross-domain | Evaluate recovered concrete signals | Registry-bound evaluator + point-in-time Data/Indicators evidence | Atomic ordered immutable signal tuple or structured failure | `FR-STR-038 → FR-STR-039 → FR-STR-040/046 → FR-STR-047` |
+| Status  | Rank | Workflow ID    | Scope        | Workflow                              | Trigger / Input boundary                                 | Final outcome / Output boundary                                | Requirement sequence                           |
+| ------- | ---- | -------------- | ------------ | ------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------- |
+| Completed | Primary | `WF-STR-PRI` | Cross-domain | Generate vectorized decisions         | Data`MarketDataset` + Indicators `IndicatorSeries`   | Ordered`TradeIntent` batch to Risk/runtime boundary          | `FR-STR-023 → FR-STR-024 → FR-STR-032`     |
+| Completed | Secondary | `WF-STR-SEC` | Cross-domain | Build and hand off TradeIntent        | Validated strategy decision metadata                     | Canonical proposal to Risk; no execution                       | `FR-STR-026`                                 |
+| Completed | Tertiary | `WF-STR-TER` | Cross-domain | Register immutable strategy version   | UI/API-approved registration or parameter update command | Immutable registry/config record                               | `FR-STR-020 → FR-STR-021`                   |
+| Completed | Supporting | `WF-STR-001` | Internal     | Validate reference and configuration  | Registry ref and declarative config                      | Exact validated immutable version/config or structured failure | `FR-STR-023 → FR-STR-024`                   |
+| Completed | Supporting | `WF-STR-003` | Cross-domain | Run stateful event hook               | Typed event + immutable snapshots                        | Intents, diagnostics, and atomic local-state update            | `FR-STR-023 → FR-STR-024 → FR-STR-033`     |
+| Completed | Supporting | `WF-STR-005` | Cross-domain | Create replay manifest and checkpoint | Identity/config/input hashes + optional local state      | Manifest/checkpoint reference to runtime                       | `FR-STR-029 → FR-STR-030 → FR-STR-031`     |
+| Completed | Supporting | `WF-STR-006` | Cross-domain | Export structured diagnostics         | Context + bounded diagnostic details                     | Redacted diagnostics to caller/audit boundary                  | `FR-STR-019`                                 |
+| Completed | Supporting | `WF-STR-007` | Cross-domain | Supply paper/live decisions           | Trading invokes Strategy with prepared inputs            | `TradeIntent` to Risk/Trading workflow                       | `FR-STR-023 → FR-STR-024 → FR-STR-032/033` |
+| Completed | Supporting | `WF-STR-009` | Cross-domain | Reject arbitrary strategy code        | Raw code/path/archive at command boundary                | Redacted`STRATEGY_ARBITRARY_CODE_REJECTED`; no import        | `FR-STR-018 → FR-STR-020/021/023/024`       |
+| Completed | Supporting | `WF-STR-010` | Cross-domain | Evaluate recovered concrete signals | Registry-bound evaluator + point-in-time Data/Indicators evidence | Atomic ordered immutable signal tuple or structured failure | `FR-STR-038 → FR-STR-039 → FR-STR-040/046 → FR-STR-047` |
+| Completed | Supporting | `WF-STR-011` | Cross-domain | Adopt approved optimization parameters | Explicitly approved `OptimizationResult` reference plus authenticated adoption command | New hash-addressed immutable configuration record; the approved record is never mutated | `Pending` |
+| Completed | Supporting | `WF-STR-012` | Cross-domain | Evaluate signals for research | Registered strategy version plus point-in-time Data and Indicators evidence | Ordered signal evidence for Research and Optimization; never a `TradeIntent` | `Pending` |
 
 ### `WF-STR-001` — Validate Strategy Reference and Configuration
 
 **Scope:** Internal
 **System workflow:** `SYS-WF-007` when Portfolio resolves registered immutable strategy versions; otherwise internal.
 
-1. `validate_strategy_ref()` rejects empty, unknown, ambiguous, deprecated, revoked, unapproved, hash-mismatched, or environment-ineligible references.
-2. It resolves exactly one immutable `ValidatedStrategyRef`.
-3. `validate_strategy_config()` applies the entry's declarative schema, explicit defaults, unknown-field policy, bounds, and payload limits.
-4. Validation returns a canonical configuration hash without importing or executing strategy code.
+1. Reject empty, unknown, ambiguous, deprecated, revoked, unapproved,
+   hash-mismatched, or environment-ineligible references —
+   `strategy.validate_strategy_ref()`.
+2. Resolve exactly one immutable `ValidatedStrategyRef` from the registry —
+   `strategy.list_strategy_versions()`.
+3. Apply the entry's declarative schema, explicit defaults, unknown-field policy,
+   bounds, and payload limits — `strategy.validate_strategy_config()`.
+4. Return a canonical configuration hash without importing or executing strategy
+   code — `utils.canonical_digest()`.
 
 **Failure behavior:** Every expected failure returns `StandardResponse(status="error")` with one Strategy-owned `StrategyErrorCode` and Utils-owned `StandardError`; no raw validation, database, or import exception crosses the boundary.
 
 **Integration test:** `tests/strategy/integration/test_registry_validation.py::test_registry_validation_workflow()`
 
-### `WF-STR-002` — Generate Vectorized Strategy Decisions
+### `WF-STR-PRI` — Generate Vectorized Strategy Decisions
 
 **Scope:** Cross-domain
 **System workflows:** `SYS-WF-001`, `SYS-WF-002`
@@ -454,6 +481,19 @@ Data MarketDataset + Indicators IndicatorSeries
 → Risk/runtime boundary
 ```
 
+1. Obtain normalized market evidence and calculated indicator series —
+   `data.get_market_data()`, `indicators.validate_indicator()`.
+2. Resolve and validate the registered strategy version and its configuration —
+   `strategy.validate_strategy_ref()`, `strategy.validate_strategy_config()`.
+3. Run atomic readiness and no-lookahead validation against the fixed
+   `decision_timestamp` — `strategy.evaluate_strategy_signals()`.
+4. Execute the approved vectorized signal logic in canonical row order —
+   `strategy.run_vectorized_strategy_signals()`.
+5. Canonicalize each surviving decision into an ordered proposal batch —
+   `strategy.build_trade_intent()`.
+6. Emit redacted diagnostics alongside the batch —
+   `strategy.export_strategy_diagnostics()`.
+
 The decision clock remains fixed at `decision_timestamp`. Any lookahead, clock-drift, required-field, indicator-readiness, sequence, or identity failure discards the whole batch. A neutral decision emits no intent.
 
 **Integration test:** `tests/strategy/integration/test_vectorized_workflow.py::test_vectorized_workflow()`
@@ -463,18 +503,37 @@ The decision clock remains fixed at `decision_timestamp`. Any lookahead, clock-d
 **Scope:** Cross-domain
 **System workflows:** `SYS-WF-001`, `SYS-WF-002`
 
-The runtime supplies a typed event, fixed context, Data-owned account snapshot, and provider-owned immutable execution-state evidence where applicable. Strategy invokes one declared hook in stable order and returns intents, diagnostics, and a candidate local-state update. The update commits only when the complete hook result validates.
+1. The runtime supplies a typed event, fixed context, Data-owned account snapshot,
+   and provider-owned immutable execution-state evidence where applicable —
+   `data.get_account_state_snapshot()`.
+2. Strategy validates the reference and configuration before dispatching —
+   `strategy.validate_strategy_ref()`, `strategy.validate_strategy_config()`.
+3. Strategy invokes one declared hook in stable order —
+   `strategy.run_event_strategy_hook()`.
+4. Resulting proposals are canonicalized — `strategy.build_trade_intent()`.
+5. The candidate local-state update commits only when the complete hook result
+   validates — `strategy.create_strategy_checkpoint()`,
+   `strategy.validate_strategy_checkpoint()`.
 
 The initial typed hook set is `on_init`, `on_bar`, `on_tick`, `on_fill`, and `on_stop`, evaluated in that priority order. Undeclared hooks fail deterministically; current advanced strategy logic is reusable only when it conforms to this contract.
 
 **Integration test:** `tests/strategy/integration/test_event_workflow.py::test_event_workflow()`
 
-### `WF-STR-004` — Build and Hand Off TradeIntent
+### `WF-STR-SEC` — Build and Hand Off TradeIntent
 
 **Scope:** Cross-domain
 **System workflows:** `SYS-WF-001`, `SYS-WF-002`
 
-`build_trade_intent()` canonicalizes approved decision metadata, validates advisory sizing/protection fields, creates stable IDs and lineage, and returns `TradeIntent`. Strategy does not create a `RiskDecision`, `OrderIntent`, fill, or official position mutation.
+1. Canonicalize approved decision metadata and validate advisory sizing and
+   protection fields — `strategy.build_trade_intent()`.
+2. Create stable identifiers and lineage for the proposal —
+   `utils.generate_id()`, `utils.derive_stable_id()`.
+3. Hand the canonical `TradeIntent` to Risk, which alone decides —
+   `risk.calculate_position_size()`, `risk.review_strategy_admission()`.
+4. Trading executes only after Risk approves, and only the approved size —
+   `trading.create_trading_action_draft()`.
+
+Strategy does not create a `RiskDecision`, `OrderIntent`, fill, or official position mutation.
 
 **Integration test:** `tests/strategy/integration/test_intent_handoff.py::test_intent_handoff_workflow()`
 
@@ -483,7 +542,14 @@ The initial typed hook set is `on_init`, `on_bar`, `on_tick`, `on_fill`, and `on
 **Scope:** Cross-domain
 **System workflows:** `SYS-WF-001`, `SYS-WF-003`
 
-`create_strategy_replay_manifest()` binds the exact strategy/interface/config/data/indicator/simulation/seed inputs. Stateful execution may create a bounded checkpoint containing serializable local decision state only. Validation checks identity, versions, hashes, schema, checksum, authorization reference, and size before restore.
+1. Bind the exact strategy, interface, config, data, indicator, simulation, and seed
+   inputs into one manifest — `strategy.create_strategy_replay_manifest()`.
+2. Create a bounded checkpoint containing serializable local decision state only —
+   `strategy.create_strategy_checkpoint()`.
+3. Check identity, versions, hashes, schema, checksum, authorization reference, and
+   size before restore — `strategy.validate_strategy_checkpoint()`.
+4. Hand the manifest reference to the replaying runtime —
+   `simulator.replay_journal()`, `simulator.resolve_idempotent_run()`.
 
 **Integration test:** `tests/strategy/integration/test_replay_workflow.py::test_replay_workflow()`
 
@@ -492,7 +558,16 @@ The initial typed hook set is `on_init`, `on_bar`, `on_tick`, `on_fill`, and `on
 **Scope:** Cross-domain
 **System workflows:** `SYS-WF-001`, `SYS-WF-002`
 
-`export_strategy_diagnostics()` accepts safe facts, recursively redacts denied fields, enforces the registry-declared payload bound, and emits schema-valid diagnostics with request/correlation IDs and dependency status. Strategy may create an `AuditEvent` payload but does not persist or route the common envelope.
+1. Accept safe facts and recursively redact denied fields —
+   `strategy.export_strategy_diagnostics()`, `utils.redact_mapping_value()`.
+2. Enforce the registry-declared payload bound before emission —
+   `strategy.export_strategy_diagnostics()`.
+3. Emit schema-valid diagnostics carrying request and correlation identifiers plus
+   dependency status — `utils.generate_id()`.
+4. Create an `AuditEvent` payload where the caller requires one —
+   `utils.create_audit_event()`.
+5. Data persists the envelope; Strategy neither persists nor routes it —
+   `data.persist_audit_event()`.
 
 **Integration test:** `tests/strategy/integration/test_diagnostics_workflow.py::test_diagnostics_workflow()`
 
@@ -501,22 +576,38 @@ The initial typed hook set is `on_init`, `on_bar`, `on_tick`, `on_fill`, and `on
 **Scope:** Cross-domain
 **System workflow:** `SYS-WF-002`
 
-Trading owns the live/paper loop and supplies prepared public-contract inputs. Strategy returns no action or `TradeIntent`; Risk independently governs every proposal. Trading begins execution only after an approved `RiskDecision` and executes exactly the approved size.
+1. Trading owns the live/paper loop and supplies prepared public-contract inputs —
+   `trading.run_live_evaluation_cycle()`.
+2. Strategy validates the reference and evaluates the prepared inputs —
+   `strategy.validate_strategy_ref()`, `strategy.run_event_strategy_hook()`.
+3. Strategy returns no action or one canonical proposal —
+   `strategy.build_trade_intent()`.
+4. Risk independently governs every proposal —
+   `risk.calculate_position_size()`, `risk.revalidate_risk_decision()`.
+5. Trading begins execution only after an approved decision and executes exactly the
+   approved size — `trading.evaluate_live_gate()`, `trading.dispatch_order_intent()`.
 
 **Integration test:** `tests/strategy/integration/test_runtime_boundary.py::test_runtime_boundary_emits_proposals_only()`
 
-### `WF-STR-008` — Register Immutable Strategy Version
+### `WF-STR-TER` — Register Immutable Strategy Version
 
 **Scope:** Cross-domain
 **System workflows:** `SYS-WF-003`, `SYS-WF-004`, and registration-truth evidence for `SYS-WF-006`.
 
-UI/API submits an authenticated Strategy-owned request after external review. For
-`SYS-WF-003`, the request references the selected `OptimizationResult` and carries
-explicit user approval; Optimization cannot submit it. Strategy validates schema,
-module allowlisting, immutable hashes, lifecycle/environment evidence references, and
-uniqueness, then writes its registry state through Data's persistence infrastructure.
-Parameter updates create a new hash-addressed configuration record and never mutate an
-approved record in place.
+1. UI/API submits an authenticated Strategy-owned request after external review —
+   `utils.create_auth_context()`.
+2. Strategy validates schema, module allowlisting, immutable hashes,
+   lifecycle/environment evidence references, and uniqueness —
+   `strategy.validate_strategy_config()`, `strategy.list_strategy_versions()`.
+3. Strategy writes its registry state through Data's persistence infrastructure —
+   `strategy.register_strategy_version()`, `data.execute_transaction()`.
+4. Parameter updates create a new hash-addressed configuration record and never
+   mutate an approved record in place — `strategy.update_strategy_parameters()`.
+5. One audit event records the registration —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
+For `SYS-WF-003`, the request references the selected `OptimizationResult` and carries
+explicit user approval; Optimization cannot submit it.
 
 **Output boundary:** `StrategyMutationResult v1` records accepted, idempotent, or
 rejected mutation truth for UI/API and supplies the immutable registration reference
@@ -534,7 +625,15 @@ or Trading may use the registered version.
 **Scope:** Cross-domain
 **System workflows:** `SYS-WF-001`, `SYS-WF-003`, `SYS-WF-004`
 
-Raw Python, archives, executable configuration, import strings, and user filesystem paths are rejected before import or execution. Diagnostics contain hashes and safe reason metadata, never the full rejected body. Audit persistence is performed by Data through the common `AuditEvent` contract.
+1. Raw Python, archives, executable configuration, import strings, and user
+   filesystem paths are rejected before import or execution —
+   `strategy.validate_strategy_ref()`.
+2. The rejection is expressed as a canonical Strategy error, never a raw exception —
+   `utils.normalize_error_code()`, `utils.require_error_definition()`.
+3. Diagnostics carry hashes and safe reason metadata, never the full rejected body —
+   `strategy.export_strategy_diagnostics()`, `utils.canonical_digest()`.
+4. Data persists the audit trail through the common `AuditEvent` contract —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
 
 **Integration test:** `tests/strategy/integration/test_registered_only_security.py::test_unregistered_evaluator_hash_fails_closed()`
 
@@ -549,11 +648,74 @@ results, and one injected hash-bound concrete evaluator. Strategy validates iden
 hashes, evidence availability, indicator alignment, and output identity atomically;
 any failure returns a structured error and no partial signal tuple.
 
+1. Validate the exact approved registry reference and its immutable configuration —
+   `strategy.validate_strategy_ref()`, `strategy.validate_strategy_config()`.
+2. Supply Data-owned point-in-time market evidence and optional Indicators results —
+   `data.get_market_data()`, `indicators.validate_indicator()`.
+3. Evaluate the injected hash-bound concrete evaluator atomically —
+   `strategy.evaluate_strategy_signals()`.
+4. Verify identity, hashes, evidence availability, indicator alignment, and output
+   identity — `utils.canonical_digest()`.
+
 This workflow verifies recovered signal parity only. It does not load legacy code or
 perform basket management, risk approval, sizing, order construction, execution,
 fills, or broker/account mutation.
 
 **Integration test:** `tests/strategy/integration/test_concrete_signal_workflow.py::test_concrete_signal_workflow()`
+
+### `WF-STR-011` — Adopt Approved Optimization Parameters
+
+**Scope:** Cross-domain
+**System workflow:** `SYS-WF-003`
+
+**Input boundary:** an explicitly approved `OptimizationResult` reference plus an
+authenticated adoption command submitted through UI/API.
+**Output boundary:** one new hash-addressed immutable configuration record; the
+previously approved record is never mutated.
+
+1. UI/API supplies the authenticated adoption command and explicit user approval;
+   Optimization cannot submit it — `utils.create_auth_context()`.
+2. Resolve the selected candidate and its evidence lineage from the optimization
+   handoff — `optimization.build_optimization_handoff()`.
+3. Validate the proposed parameters against the registered version's declarative
+   schema and bounds — `strategy.validate_strategy_ref()`,
+   `strategy.validate_strategy_config()`.
+4. Write a new hash-addressed configuration record —
+   `strategy.update_strategy_parameters()`.
+5. Record the adoption in the audit trail —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
+**Failure behavior:** a missing or forged approval, a stale optimization reference,
+or an out-of-bounds parameter returns a structured Strategy error and writes nothing.
+Adoption confers no operational eligibility; that remains the Risk-owned `SYS-WF-006`
+decision.
+
+**Integration test:** `Pending`
+
+### `WF-STR-012` — Evaluate Signals for Research
+
+**Scope:** Cross-domain
+**System workflow:** `SYS-WF-004`
+
+**Input boundary:** a registered strategy version plus point-in-time Data and
+Indicators evidence supplied by Research or Optimization.
+**Output boundary:** ordered signal evidence for analysis only; never a
+`TradeIntent`, sizing decision, or execution instruction.
+
+1. Validate the registered reference and configuration —
+   `strategy.validate_strategy_ref()`, `strategy.validate_strategy_config()`.
+2. Prepare the bounded research dataset and its indicator inputs —
+   `research.run_edge_lab_profile()`, `data.get_market_data()`.
+3. Evaluate signals over the prepared evidence —
+   `strategy.evaluate_strategy_signals()`.
+4. Export bounded redacted diagnostics alongside the signal evidence —
+   `strategy.export_strategy_diagnostics()`.
+
+**Failure behavior:** this workflow never constructs a proposal. Any attempt to
+convert its output into an executable action must re-enter `WF-STR-SEC` and the
+Risk-owned decision that follows it.
+
+**Integration test:** `Pending`
 
 ---
 

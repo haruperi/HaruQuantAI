@@ -27,7 +27,9 @@ from app.services.data.time_sessions.timeframes import (
     TimeframeSpec,
     _get_timeframe_spec_raw,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.synthetic_data.contracts import SyntheticRequest

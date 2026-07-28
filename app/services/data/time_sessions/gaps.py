@@ -2,14 +2,14 @@
 
 A missing bar is not automatically a defect. Markets close on weekends, at session
 boundaries, and on holidays, and a detector that reports every closure as missing data
-is worse than useless — it trains operators to ignore quality evidence.
+is worse than useless â€” it trains operators to ignore quality evidence.
 
 This module separates the two. ``classify_gap`` answers whether a gap falls inside a
 declared non-trading window; ``quality/adversarial.detect_unexpected_gaps`` uses it to
 report only the gaps that need explaining.
 
 **Reconciliation is not here.** ``feeds/runtime.reconcile_feed_gap`` mutates live feed
-state — buffer counters, last error, gap count — which is feed lifecycle rather than
+state â€” buffer counters, last error, gap count â€” which is feed lifecycle rather than
 temporal truth. Hosting it in ``time`` would put runtime state in the layer everything
 else depends on. It stays with feeds.
 
@@ -28,7 +28,9 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -94,7 +96,7 @@ def _overlaps_any_session(
     The gap is the half-open interval ``[gap_start, gap_end)``: ``gap_end`` is the first
     observation *after* the gap, so it is not itself missing. Testing the endpoints for
     membership instead of testing the interval for overlap would misclassify a gap that
-    ends exactly when a session opens — the moment trading resumed would be read as
+    ends exactly when a session opens â€” the moment trading resumed would be read as
     proof that trading had been expected throughout.
 
     Args:

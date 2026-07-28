@@ -196,25 +196,42 @@ exists.
 > **Workflow Usage Evidence**: Each active workflow has one standalone program in
 > `tests/portfolio/usage/workflows/`; `run_all.py` executes them in registry order.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-PORT-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-PORT-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-PORT-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-PORT-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-PORT-002`, `WF-PORT-004`, and `WF-PORT-005` were absorbed into `WF-PORT-PRI`,
+`WF-PORT-SEC`, and `WF-PORT-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-PORT-008`.
+
 Evidence programs:
 
+- `WF-PORT-PRI`: `tests/portfolio/usage/workflows/wf_port_pri_construct_allocation_candidate.py`
+- `WF-PORT-SEC`: `tests/portfolio/usage/workflows/wf_port_sec_activate_allocation_version.py`
+- `WF-PORT-TER`: `tests/portfolio/usage/workflows/wf_port_ter_detect_drift_plan_rebalance.py`
 - `WF-PORT-001`: `tests/portfolio/usage/workflows/wf_port_001_validate_construction_evidence.py`
-- `WF-PORT-002`: `tests/portfolio/usage/workflows/wf_port_002_construct_allocation_candidate.py`
 - `WF-PORT-003`: `tests/portfolio/usage/workflows/wf_port_003_coordinate_simulation_risk_review.py`
-- `WF-PORT-004`: `tests/portfolio/usage/workflows/wf_port_004_activate_allocation_version.py`
-- `WF-PORT-005`: `tests/portfolio/usage/workflows/wf_port_005_detect_drift_plan_rebalance.py`
 - `WF-PORT-006`: `tests/portfolio/usage/workflows/wf_port_006_submit_measure_rebalance.py`
 - `WF-PORT-007`: `tests/portfolio/usage/workflows/wf_port_007_rollback_allocation.py`
+- `WF-PORT-008`: `tests/portfolio/usage/workflows/wf_port_008_assess_common_mode_exposure.py`
 
-| Status    | Workflow ID   | Scope        | System workflow            | Workflow                                | Trigger / Input boundary     | Final outcome / Output boundary                                                                   | Requirement sequence                      |
-| --------- | ------------- | ------------ | -------------------------- | --------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| Completed | `WF-PORT-001` | Cross-domain | `SYS-WF-006`, `SYS-WF-007` | Validate construction evidence          | Construction request         | Validated immutable input set or structured rejection                                             | `FR-PORT-006 → FR-PORT-009`               |
-| Completed | `WF-PORT-002` | Internal     | `SYS-WF-007`               | Construct allocation candidate          | Validated input set          | `PortfolioConstructionResult`                                                                     | `FR-PORT-010 → FR-PORT-014`               |
-| Completed | `WF-PORT-003` | Cross-domain | `SYS-WF-007`               | Coordinate simulation and Risk review   | Complete construction result | Current Simulation result and Risk decision                                                       | `FR-PORT-025 → FR-PORT-029`               |
-| Completed | `WF-PORT-004` | Cross-domain | `SYS-WF-007`               | Activate allocation version             | All gates current            | `ActivePortfolioAllocation`                                                                       | `FR-PORT-015 → FR-PORT-019`               |
-| Completed | `WF-PORT-005` | Cross-domain | `SYS-WF-008`               | Detect drift and plan rebalance         | Schedule or threshold        | `PortfolioRebalancePlan`                                                                          | `FR-PORT-020 → FR-PORT-024`               |
-| Completed | `WF-PORT-006` | Cross-domain | `SYS-WF-008`               | Submit and measure authorized rebalance | Current Risk approval        | Trading execution truth followed by Analytics evidence, or explicit executed-but-unmeasured state | `FR-PORT-025 → FR-PORT-029 → FR-PORT-038` |
-| Completed | `WF-PORT-007` | Internal     | `SYS-WF-007`               | Roll back allocation                    | Authorized rollback request  | New governed allocation version                                                                   | `FR-PORT-018 → FR-PORT-019`               |
+| Status    | Rank | Workflow ID   | Scope        | System workflow            | Workflow                                | Trigger / Input boundary     | Final outcome / Output boundary                                                                   | Requirement sequence                      |
+| --------- | ---- | ------------- | ------------ | -------------------------- | --------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Completed | Primary | `WF-PORT-PRI` | Internal     | `SYS-WF-007`               | Construct allocation candidate          | Validated input set          | `PortfolioConstructionResult`                                                                     | `FR-PORT-010 → FR-PORT-014`               |
+| Completed | Secondary | `WF-PORT-SEC` | Cross-domain | `SYS-WF-007`               | Activate allocation version             | All gates current            | `ActivePortfolioAllocation`                                                                       | `FR-PORT-015 → FR-PORT-019`               |
+| Completed | Tertiary | `WF-PORT-TER` | Cross-domain | `SYS-WF-008`               | Detect drift and plan rebalance         | Schedule or threshold        | `PortfolioRebalancePlan`                                                                          | `FR-PORT-020 → FR-PORT-024`               |
+| Completed | Supporting | `WF-PORT-001` | Cross-domain | `SYS-WF-006`, `SYS-WF-007` | Validate construction evidence          | Construction request         | Validated immutable input set or structured rejection                                             | `FR-PORT-006 → FR-PORT-009`               |
+| Completed | Supporting | `WF-PORT-003` | Cross-domain | `SYS-WF-007`               | Coordinate simulation and Risk review   | Complete construction result | Current Simulation result and Risk decision                                                       | `FR-PORT-025 → FR-PORT-029`               |
+| Completed | Supporting | `WF-PORT-006` | Cross-domain | `SYS-WF-008`               | Submit and measure authorized rebalance | Current Risk approval        | Trading execution truth followed by Analytics evidence, or explicit executed-but-unmeasured state | `FR-PORT-025 → FR-PORT-029 → FR-PORT-038` |
+| Completed | Supporting | `WF-PORT-007` | Internal     | `SYS-WF-007`               | Roll back allocation                    | Authorized rollback request  | New governed allocation version                                                                   | `FR-PORT-018 → FR-PORT-019`               |
+| Completed | Supporting | `WF-PORT-008` | Cross-domain | `SYS-WF-007`, `SYS-WF-008` | Assess common-mode exposure and cross-account correlation | Active allocation plus account and FX evidence across every managed account | Common-mode exposure report and cross-account correlation measurement for Risk review | `Pending` |
 
 ### Status values
 
@@ -233,81 +250,113 @@ Evidence programs:
 
 ### `WF-PORT-001` — Validate Construction Evidence
 
-1. `PortfolioWorkflowService.validate_construction()` receives one typed
-   `PortfolioConstructionRequest`.
-2. Resolve immutable Strategy references and current Risk eligibility decisions.
-3. Resolve Data-owned account, market, and FX evidence plus Analytics evidence.
+1. Receive one typed `PortfolioConstructionRequest` —
+   `portfolio.PortfolioService.validate_construction()`.
+2. Resolve immutable Strategy references and current Risk eligibility decisions —
+   `strategy.validate_strategy_ref()`, `risk.review_strategy_admission()`.
+3. Resolve Data-owned account, market, and FX evidence plus Analytics evidence —
+   `data.get_account_state_snapshot()`, `data.get_fx_conversion_evidence()`,
+   `analytics.build_performance_report()`.
 4. Validate exact versions, hashes, UTC freshness, coverage, observations, and
-   request configuration.
+   request configuration — `utils.canonical_digest()`, `utils.is_fresh()`.
 5. Return one immutable `ValidatedConstructionEvidence` bundle without publishing
-   a candidate.
+   a candidate — `portfolio.PortfolioService.validate_construction()`.
 
 **Failure behaviour:** missing, stale, incompatible, hash-mismatched, or ineligible
 evidence returns a structured Portfolio error and creates no state.
 
-### `WF-PORT-002` — Construct Allocation Candidate
+### `WF-PORT-PRI` — Construct Allocation Candidate
 
-1. Validate strategy/version uniqueness and current Risk eligibility for the requested scope.
-2. Validate evidence versions, UTC times, freshness, currency coverage, and required configuration.
-3. Apply exactly one approved method: fixed weights, equal weights, or inverse volatility.
-4. Normalize using the request-supplied tolerance and validate finite bounds and total.
-5. Record capital weights separately from proposed risk-budget weights.
-6. Hash the full configuration and evidence lineage, then publish one immutable result.
+1. Validate strategy/version uniqueness and current Risk eligibility for the
+   requested scope — `strategy.list_strategy_versions()`,
+   `risk.review_strategy_admission()`.
+2. Validate evidence versions, UTC times, freshness, currency coverage, and required
+   configuration — `portfolio.PortfolioService.validate_construction()`,
+   `utils.is_fresh()`.
+3. Apply exactly one approved method: fixed weights, equal weights, or inverse
+   volatility — `portfolio.PortfolioService.construct()`.
+4. Normalize using the request-supplied tolerance and validate finite bounds and
+   total — `portfolio.PortfolioService.construct()`.
+5. Record capital weights separately from proposed risk-budget weights —
+   `portfolio.PortfolioService.construct()`.
+6. Hash the full configuration and evidence lineage, then publish one immutable
+   result — `utils.canonical_json()`, `utils.canonical_digest()`.
 
 **Failure behaviour:** any missing, stale, non-finite, unbounded, incompatible, or non-deterministic input returns a structured error and publishes nothing.
 
 ### `WF-PORT-003` — Coordinate Simulation and Risk Review
 
-1. `PortfolioWorkflowService.coordinate_review()` receives the complete immutable
-   construction result, its validated evidence, and a receiver-owned
-   `PortfolioBacktestRequestV1`.
-2. Revalidate the Simulation request against the candidate and evidence lineage.
-3. Submit the receiver-owned request to Simulation and verify the returned result.
-4. Build and submit the receiver-owned Risk review request.
+1. Receive the complete immutable construction result, its validated evidence, and a
+   receiver-owned `PortfolioBacktestRequestV1` —
+   `portfolio.PortfolioService.coordinate_review()`.
+2. Revalidate the Simulation request against the candidate and evidence lineage —
+   `utils.canonical_digest()`.
+3. Submit the receiver-owned request to Simulation and verify the returned result —
+   `simulator.run_portfolio_backtest()`, `simulator.unwrap_simulation_response()`.
+4. Build and submit the receiver-owned Risk review request —
+   `risk.review_allocation_proposal()`.
 5. Return `PortfolioReviewResult` containing current Simulation and Risk truth,
-   preserving trace IDs and redacted audit evidence.
+   preserving trace IDs and redacted audit evidence —
+   `utils.redact_mapping_value()`, `utils.create_audit_event()`.
 
 **Failure behaviour:** stale or mismatched lineage, incomplete Simulation evidence,
 Risk rejection, receiver incompatibility, or audit failure blocks activation.
 
-### `WF-PORT-004` — Activate Allocation Version
+### `WF-PORT-SEC` — Activate Allocation Version
 
-1. Re-read the candidate and expected current allocation version.
-2. Revalidate every eligibility decision, Simulation result, Risk decision, approval attestation where required, expiry, and kill-switch state.
-3. Submit `AllocationBudgetActivationRequest` to Risk.
-4. Atomically activate one Portfolio allocation version only after Risk confirms its budget projection.
-5. Emit a redacted audit event with complete references.
+1. Re-read the candidate and expected current allocation version —
+   `portfolio.PortfolioService.get_active_allocation()`.
+2. Revalidate every eligibility decision, Simulation result, Risk decision, approval
+   attestation where required, expiry, and kill-switch state —
+   `risk.revalidate_risk_decision()`, `risk.check_risk_kill_switch()`.
+3. Submit the budget activation request to Risk —
+   `risk.activate_allocation_budget()`.
+4. Atomically activate one Portfolio allocation version only after Risk confirms its
+   budget projection — `portfolio.PortfolioService.activate()`,
+   `data.execute_transaction()`.
+5. Emit a redacted audit event with complete references —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
 
 Simulation activation is automatic within simulation policy. Paper/live activation requires explicit human approval and current Risk authorization.
 
-### `WF-PORT-005` — Detect Drift and Plan Rebalance
+### `WF-PORT-TER` — Detect Drift and Plan Rebalance
 
-1. Resolve actual exposure using fresh account and FX evidence.
-2. Compare actual risk-budget exposure to the active target using explicit threshold and schedule configuration.
-3. Create proposed reductions or reallocations bound to the active version.
-4. Mark existing over-budget exposure reduce-only.
-5. Never open a position solely to make actual holdings match target weights.
-6. Submit the immutable plan to Risk; only an approved plan may be adapted into Trading's request.
-7. After Trading reconciliation, submit the redacted hash-bound immutable execution
-   facts through Analytics-owned `PortfolioRebalanceMeasurementRequest v1` and
-   receive `PortfolioRebalanceMeasurementEvidence v1`.
-8. If measurement fails, preserve execution truth as `executed-but-unmeasured` and
-   retry deterministically from the same immutable execution/FX/version inputs.
+1. Resolve actual exposure using fresh account and FX evidence —
+   `data.get_account_state_snapshot()`, `data.get_fx_conversion_evidence()`.
+2. Compare actual risk-budget exposure to the active target using explicit threshold
+   and schedule configuration — `portfolio.RebalancingService.detect_drift()`.
+3. Create proposed reductions or reallocations bound to the active version —
+   `portfolio.RebalancingService.plan_rebalance()`.
+4. Mark existing over-budget exposure reduce-only, and never open a position solely
+   to make actual holdings match target weights —
+   `portfolio.RebalancingService.plan_rebalance()`.
+5. Submit the immutable plan to Risk; only an approved plan may be adapted into
+   Trading's request — `risk.review_allocation_proposal()`.
+6. After Trading reconciliation, submit the redacted hash-bound immutable execution
+   facts and receive measurement evidence —
+   `trading.build_trading_report()`,
+   `analytics.build_portfolio_rebalance_measurement()`.
+7. If measurement fails, preserve execution truth as `executed-but-unmeasured` and
+   retry deterministically from the same immutable execution/FX/version inputs —
+   `utils.canonical_digest()`.
 
 ### `WF-PORT-006` — Submit and Measure Authorized Rebalance
 
-1. `PortfolioWorkflowService.submit_rebalance()` receives one current immutable
-   reduce-only plan and current owner-evidence references.
+1. Receive one current immutable reduce-only plan and current owner-evidence
+   references — `portfolio.PortfolioService.submit_rebalance()`.
 2. Revalidate the active allocation, current Risk decision, expiry, route, approval
-   references, and idempotency material.
+   references, and idempotency material — `risk.revalidate_risk_decision()`,
+   `risk.check_risk_kill_switch()`.
 3. Adapt the plan into the receiver-owned Trading request without changing approved
-   quantities.
-4. Submit once through Trading and persist reconciled execution truth.
-5. Submit immutable Trading facts through the Analytics-owned measurement request.
-6. Return a measured `PortfolioRebalancePlan`; if Analytics fails, return and persist
-   `executed_unmeasured`.
-7. `PortfolioWorkflowService.recompute_measurement()` may retry measurement from the
-   same immutable execution facts without invoking Trading again.
+   quantities — `portfolio.PortfolioService.submit_rebalance()`.
+4. Submit once through Trading and persist reconciled execution truth —
+   `trading.execute_portfolio_rebalance()`, `trading.build_trading_report()`.
+5. Submit immutable Trading facts through the Analytics-owned measurement request —
+   `analytics.build_portfolio_rebalance_measurement()`.
+6. Return a measured plan; if Analytics fails, return and persist
+   `executed_unmeasured` — `data.execute_transaction()`.
+7. Retry measurement from the same immutable execution facts without invoking Trading
+   again — `portfolio.PortfolioService.recompute_measurement()`.
 
 **Failure behaviour:** missing authorization or stale evidence blocks before Trading;
 an ambiguous Trading outcome is never retried blindly; Analytics failure never erases
@@ -315,18 +364,53 @@ execution truth.
 
 ### `WF-PORT-007` — Roll Back Allocation
 
-1. `PortfolioWorkflowService.rollback()` receives the approved prior candidate,
-   validated evidence, current review, and exact allocation version to reverse.
+1. Receive the approved prior candidate, validated evidence, current review, and
+   exact allocation version to reverse — `portfolio.PortfolioService.rollback()`.
 2. Revalidate approval policy, current Risk authorization, expiry, kill-switch, and
-   expected predecessor/revision.
-3. Submit the Risk-owned activation request for the rollback projection.
+   expected predecessor/revision — `risk.revalidate_risk_decision()`,
+   `risk.check_risk_kill_switch()`.
+3. Submit the Risk-owned activation request for the rollback projection —
+   `risk.activate_allocation_budget()`.
 4. Atomically activate a new governed allocation version linked by
-   `rollback_of_version`.
-5. Return the new `ActivePortfolioAllocation` and emit redacted audit evidence.
+   `rollback_of_version` — `portfolio.PortfolioService.activate()`,
+   `data.execute_transaction()`.
+5. Return the new `ActivePortfolioAllocation` and emit redacted audit evidence —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
 
 **Failure behaviour:** rollback never mutates history; stale revision, missing
 authorization, or failed Risk activation returns a structured error without changing
 the active allocation.
+
+### `WF-PORT-008` — Assess Common-Mode Exposure and Cross-Account Correlation
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-007`, `SYS-WF-008`
+**Input boundary:** the active allocation plus account, position, and FX evidence
+for every managed account in scope.
+**Output boundary:** a common-mode exposure report and a cross-account correlation
+measurement supplied to Risk as evidence. Neither is an approval, and neither
+authorizes a rebalance.
+
+1. Resolve the active allocation and the accounts it spans —
+   `portfolio.PortfolioService.get_active_allocation()`.
+2. Read current account and position evidence for every account in scope —
+   `data.get_account_state_snapshot()`.
+3. Normalize every exposure into one comparison currency —
+   `data.get_fx_conversion_evidence()`.
+4. Identify exposure that is nominally diversified but moves as a single risk —
+   `portfolio.assess_common_mode_exposure()`.
+5. Measure realized correlation of returns across accounts —
+   `portfolio.measure_cross_account_correlation()`.
+6. Supply both reports to Risk, which alone decides whether they constrain
+   allocation — `risk.review_allocation_proposal()`,
+   `risk.evaluate_portfolio_limits()`.
+
+**Failure behaviour:** missing or stale account evidence for any in-scope account
+fails closed rather than reporting lower common-mode exposure than actually exists.
+Insufficient overlapping return history returns explicit missingness rather than a
+correlation computed from a short or misaligned window.
+
+**Integration test:** `Pending`
 
 #### End-to-end workflow diagram
 

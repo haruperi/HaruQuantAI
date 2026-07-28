@@ -10,7 +10,9 @@ import pandas as pd
 from app.services.research.features import forward_returns
 from app.services.research.modeling.clustering import cluster_feature_space
 from app.services.research.modeling.decomposition import run_pca
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -34,11 +36,11 @@ def summarize_investment_data(
         Versioned descriptive summary.
 
     Raises:
-        ValidationError: If the frame is empty.
+        ValueError: If the frame is empty.
     """
     logger.debug("Summarizing Research investment data")
     if data.empty:
-        raise ValidationError("RES_INPUT_INVALID", "EMPTY_INVESTMENT_DATA")
+        raise ValueError("RES_INPUT_INVALID", "EMPTY_INVESTMENT_DATA")
     numeric = data.select_dtypes(include=[np.number])
     return {
         "schema_version": "v1",
@@ -76,15 +78,15 @@ def identify_pca_risk_factors(
         Tuple of factor mappings with component, feature, sign, and magnitude.
 
     Raises:
-        ValidationError: If PCA evidence is malformed or count is invalid.
+        ValueError: If PCA evidence is malformed or count is invalid.
     """
     logger.debug("Identifying Research PCA risk factors")
     if not isinstance(top_count, int) or top_count <= 0:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_TOP_COUNT")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_TOP_COUNT")
     loadings = pca.get("loadings")
     feature_columns = pca.get("feature_columns")
     if not isinstance(loadings, list) or not isinstance(feature_columns, list):
-        raise ValidationError("RES_INPUT_INVALID", "MALFORMED_PCA_EVIDENCE")
+        raise ValueError("RES_INPUT_INVALID", "MALFORMED_PCA_EVIDENCE")
     factors: list[Mapping[str, JSONValue]] = []
     for component_index, component in enumerate(loadings):
         if not isinstance(component, list):
@@ -125,15 +127,15 @@ def analyze_cluster_outperformance(
         Tuple of per-cluster evidence with mean return, sample, and uncertainty.
 
     Raises:
-        ValidationError: If data or labels are invalid/misaligned.
+        ValueError: If data or labels are invalid/misaligned.
     """
     logger.debug("Analyzing Research cluster outperformance")
     if "close" not in data.columns:
-        raise ValidationError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
     if len(labels) != len(data):
-        raise ValidationError("RES_INPUT_INVALID", "MISALIGNED_LABELS")
+        raise ValueError("RES_INPUT_INVALID", "MISALIGNED_LABELS")
     if horizon <= 0:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_HORIZON")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_HORIZON")
     close = data["close"].astype("float64")
     returns = forward_returns(close, horizon=horizon, mode="log", output_label="cf")
     results: list[Mapping[str, JSONValue]] = []
@@ -176,7 +178,7 @@ def build_unsupervised_insight_report(
         Versioned insight report with no signal-control fields.
 
     Raises:
-        ValidationError: If features or configuration are invalid.
+        ValueError: If features or configuration are invalid.
     """
     logger.info("Building Research unsupervised insight report")
     descriptive = summarize_investment_data(features)

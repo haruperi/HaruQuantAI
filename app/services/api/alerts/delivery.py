@@ -10,7 +10,9 @@ from app.services.api.alerts.models import (
     CriticalAlertSink,
     CriticalOperationalAlert,
 )
-from app.utils import canonical_json, logger, utc_now
+from app.utils import canonical_json, get_logger, utc_now
+
+logger = get_logger(__name__)
 
 
 def deliver_critical_alert(
@@ -32,7 +34,7 @@ def deliver_critical_alert(
     failure_code: Literal["ALERT_DELIVERY_FAILED"] | None = None
     try:
         sink(alert, idempotency_key=alert.alert_id)
-    except Exception:  # noqa: BLE001
+    except Exception:
         logger.exception(
             "Critical alert delivery failed without changing authoritative state"
         )

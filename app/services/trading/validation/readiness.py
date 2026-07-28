@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
 from types import MappingProxyType
-from typing import Self, cast
+from typing import Any, Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -21,7 +21,12 @@ from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.validation.snapshots import (
     RouteSnapshot,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import RiskLevel, StandardResponse, logger, to_json_safe
+from app.utils import get_logger, to_json_safe
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 _MAX_FAILED_CHECKS = 32
 
@@ -313,7 +318,7 @@ def assess_execution_readiness(
         value,
         operation="trading.assess_execution_readiness",
         message="Trading execution readiness assessed",
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=True,

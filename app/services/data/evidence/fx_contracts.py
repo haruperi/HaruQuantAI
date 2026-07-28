@@ -15,7 +15,9 @@ from pydantic import (
 )
 
 from app.services.data.contracts._base import TracedOpenContract as _Contract
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 FX_CONVERSION_EVIDENCE_SCHEMA: Final = "data.fx_conversion_evidence.v1"
 CURRENCY_CODE_LENGTH = 3

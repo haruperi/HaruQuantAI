@@ -19,7 +19,9 @@ from app.services.brokers.contracts.protocols import (
     _CircuitOpenError,
     _RateLimitedError,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class _BinanceTransport:

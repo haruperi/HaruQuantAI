@@ -13,7 +13,9 @@ from app.services.strategy.contracts.outcomes import failure, success
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.diagnostics.models import StrategyDiagnostics
-from app.utils import RedactionPolicy, canonical_json, logger, redact_mapping_value
+from app.utils import canonical_json, get_logger, redact_mapping_value
+
+logger = get_logger(__name__)
 
 
 @guard_strategy_boundary
@@ -33,14 +35,7 @@ def export_strategy_diagnostics(
     """
     logger.info("Exporting bounded Strategy diagnostics")
     try:
-        redacted = redact_mapping_value(
-            facts,
-            RedactionPolicy(
-                max_text_length=context.max_diagnostic_bytes,
-                max_depth=16,
-                max_items=1_000,
-            ),
-        )
+        redacted = redact_mapping_value(facts)
         if not isinstance(redacted.value, dict):
             logger.error("Strategy redaction returned an invalid mapping")
             return failure(

@@ -4,29 +4,43 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Mapping
+from dataclasses import dataclass
 from types import MappingProxyType
-from typing import cast
+from typing import Any, Literal, cast
 
 from app.services.analytics.contracts.errors import (
     AnalyticsError,
     AnalyticsValidationError,
 )
 from app.utils import (
-    ErrorDefinition,
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     error_response,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     validate_id,
 )
-from app.utils import (
-    ValidationError as UtilsValidationError,
-)
+
+type JsonValue = Any
+type ResponseMetadata = Any
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorDefinition:
+    """Immutable domain-owned error catalogue entry."""
+
+    code: str
+    domain: str
+    description: str
+    category: str
+    severity: Literal["info", "warning", "error", "critical"]
+    retryable: bool
+    operator_action: str
+
+
+logger = get_logger(__name__)
 
 _ANALYTICS_ERROR_DEFINITIONS = (
     ErrorDefinition(
@@ -66,7 +80,7 @@ def _resolve_identifier(value: str | None, prefix: str) -> str:
         try:
             validate_id(value, expected_prefix=prefix)
             return value
-        except UtilsValidationError:
+        except Exception:
             logger.warning("Invalid Analytics response identifier was replaced")
     return generate_id(prefix)
 
@@ -107,7 +121,7 @@ def run_analytics_operation[TRaw, T](
     raw: Callable[[], TRaw],
     request_id: str | None = None,
     correlation_id: str | None = None,
-    risk_level: RiskLevel = RiskLevel.LOW,
+    risk_level: RiskLevel = "low",
     extensions: Mapping[str, object] | None = None,
     transform: ResponseTransform[TRaw, T] | None = None,
 ) -> StandardResponse[T]:
@@ -174,7 +188,7 @@ def run_analytics_operation[TRaw, T](
             metadata=metadata,
             catalog=ANALYTICS_ERROR_CATALOG,
         )
-    except Exception:  # noqa: BLE001 - public boundary normalizes all failures.
+    except Exception:
         logger.exception("Unexpected Analytics operation failure")
         metadata = _metadata(
             operation=operation,

@@ -1,18 +1,18 @@
 """System-level runtime initialization validation."""
 
 import time
-from typing import Final
+from typing import Any, Final
 
 from app.utils import (
-    COMMON_ERROR_CATALOG,
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     error_response,
     generate_id,
-    logger,
+    get_common_error_catalog,
+    get_logger,
     success_response,
 )
+
+logger = get_logger(__name__)
 
 _EXECUTION_ROUTE_BY_PROFILE: Final[dict[str, str]] = {
     "research": "none",
@@ -30,7 +30,7 @@ def validate_runtime_configuration(
     *,
     runtime_profile: str,
     execution_route: str,
-) -> StandardResponse[None]:
+) -> Any:
     """Validate the authoritative runtime profile and route pairing.
 
     Args:
@@ -52,7 +52,7 @@ def validate_runtime_configuration(
     metadata = build_response_metadata(
         name="app.runtime.validate_runtime_configuration",
         domain="app",
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         request_id=request_id,
         start_time=start_time,
         read_only=True,
@@ -62,12 +62,12 @@ def validate_runtime_configuration(
         requires_network=False,
     )
     if not is_compatible:
-        response: StandardResponse[None] = error_response(
+        response = error_response(
             code=_ERROR_CODE,
             details={"detail": _ERROR_DETAIL},
             message=_ERROR_MESSAGE,
             metadata=metadata,
-            catalog=COMMON_ERROR_CATALOG,
+            catalog=get_common_error_catalog(),
         )
         return response
     return success_response(

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from hashlib import sha256
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.contracts import (
@@ -43,7 +43,12 @@ from app.services.trading.validation.authority import (
     validate_kill_switch_hierarchy,
     validate_risk_authority,
 )
-from app.utils import RiskLevel, StandardResponse, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -70,7 +75,7 @@ def _envelope(
             details={"receipt": receipt.model_dump(mode="json")},
             operation=f"trading.{request.action}",
             message="Trading authority outcome requires reconciliation",
-            risk_level=RiskLevel.CRITICAL,
+            risk_level="critical",
             request_id=request.request_id,
             correlation_id=request.correlation_id,
             read_only=False,
@@ -91,7 +96,7 @@ def _envelope(
         receipt,
         operation=f"trading.{request.action}",
         message="Trading authority receipt recorded",
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=False,
@@ -482,7 +487,7 @@ async def _execute_request(
                 reservation,
                 operation=f"trading.{request.action}",
                 message="Completed idempotent request requires no dispatch",
-                risk_level=RiskLevel.HIGH,
+                risk_level="high",
                 request_id=request.request_id,
                 correlation_id=request.correlation_id,
                 read_only=False,

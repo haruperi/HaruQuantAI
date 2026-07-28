@@ -24,13 +24,14 @@ from app.services.data.sources.contracts import (
     SourceReadRequest,
 )
 from app.services.data.sources.protocol import MarketDataSource
-from app.utils import logger, parse_utc_timestamp
+from app.utils import get_logger, parse_utc_timestamp
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Coroutine
 
     from app.services.brokers import BrokerAdapter
-    from app.utils import StandardResponse
 
 
 class _AsyncRunner(Protocol):

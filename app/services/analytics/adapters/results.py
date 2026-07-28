@@ -18,7 +18,9 @@ from app.services.analytics.contracts.models import (
     TradingResult,
 )
 from app.services.data import MarketDataset, OHLCVRecord
-from app.utils import canonical_json, logger, redact_mapping_value
+from app.utils import canonical_json, get_logger, redact_mapping_value
+
+logger = get_logger(__name__)
 
 _SOURCE_FIELDS = frozenset(
     {

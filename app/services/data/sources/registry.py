@@ -13,7 +13,9 @@ from app.services.data.contracts.responses import (
     run_data_operation,
 )
 from app.services.data.sources.protocol import MarketDataSource
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.sources.contracts import (

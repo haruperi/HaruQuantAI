@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
+from typing import Any
 
 from app.services.data import (
     DataError,
@@ -25,12 +26,14 @@ from app.services.strategy.contracts.responses import (
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
 from app.utils import (
-    AuthContext,
-    RedactionPolicy,
     canonical_json,
-    logger,
+    get_logger,
     redact_mapping_value,
 )
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 _CHECKPOINT_PERMISSION = "strategy:checkpoint"
 _PROHIBITED_STATE_KEYS = frozenset(
@@ -79,14 +82,7 @@ def create_strategy_checkpoint(  # noqa: PLR0911
             correlation_id=auth.correlation_id,
         )
     try:
-        redacted = redact_mapping_value(
-            state,
-            RedactionPolicy(
-                max_text_length=ref.manifest.max_checkpoint_bytes,
-                max_depth=ref.validation_policy.max_config_nesting_depth,
-                max_items=ref.validation_policy.max_config_collection_items,
-            ),
-        )
+        redacted = redact_mapping_value(state)
         if not isinstance(redacted.value, dict):
             return failure(
                 StrategyErrorCode.CHECKPOINT_INVALID,

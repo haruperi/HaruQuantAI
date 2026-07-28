@@ -10,9 +10,13 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_DIR = ROOT / "tests/utils/usage/workflows"
 README = ROOT / "app/utils/README.md"
 EXPECTED = {
-    "WF-UTL-001": "wf_utl_001_structured_logging_and_redaction.py",
-    "WF-UTL-002": "wf_utl_002_shared_settings_bootstrap.py",
-    "WF-UTL-003": "wf_utl_003_audit_event_construction.py",
+    "WF-UTL-PRI": "wf_utl_pri_structured_logging_and_redaction.py",
+    "WF-UTL-SEC": "wf_utl_sec_shared_settings_bootstrap.py",
+    "WF-UTL-TER": "wf_utl_ter_audit_event_construction.py",
+    "WF-UTL-004": "wf_utl_004_standard_operation_response_envelope.py",
+    "WF-UTL-005": "wf_utl_005_error_normalization_and_routing.py",
+    "WF-UTL-006": "wf_utl_006_trace_identity_and_utc_time.py",
+    "WF-UTL-007": "wf_utl_007_canonical_serialization_and_digest.py",
 }
 
 

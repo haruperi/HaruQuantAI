@@ -11,7 +11,9 @@ import numpy as np
 
 from app.services.optimization.errors import OptimizationError
 from app.services.risk import DrawdownMode, FirmMandate
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _MIN_OBSERVATIONS = 2
 _PSD_EIGENVALUE_TOLERANCE = -1e-10

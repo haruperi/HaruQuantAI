@@ -6,7 +6,9 @@ from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
 from app.services.data import MarketDataset  # noqa: TC001 - Pydantic runtime model
 from app.services.research import EdgeLabConfig  # noqa: TC001 - Pydantic runtime model
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class ResearchRunRequest(BaseModel):

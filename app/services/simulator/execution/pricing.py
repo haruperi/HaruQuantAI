@@ -8,7 +8,9 @@ from typing import TYPE_CHECKING, Literal
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from app.services.simulator.errors import SimulationError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.timeline import Tick

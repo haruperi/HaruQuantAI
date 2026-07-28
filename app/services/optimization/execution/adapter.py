@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Mapping
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from app.services.analytics import (
     AnalyticsRunConfig,
@@ -24,7 +24,12 @@ from app.services.simulator import (
     SimulationRunDependencies,
     run_backtest,
 )
-from app.utils import AuthContext, StandardResponse, logger
+from app.utils import get_logger
+
+type AuthContext = Any
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 _T = TypeVar("_T")
 

@@ -1,8 +1,6 @@
 import pytest
-from app.utils import (
-    ConfigurationError,
-    load_settings,
-)
+from app.utils import load_settings
+from app.utils.errors.exceptions import ConfigurationError
 
 
 def test_load_settings_precedence_order() -> None:

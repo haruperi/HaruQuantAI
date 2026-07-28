@@ -18,7 +18,9 @@ from collections.abc import Callable
 from typing import Any
 
 from app.services.brokers.contracts import BrokerConnectionConfig, BrokerEnvironment
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _reactor_lock = threading.Lock()
 _reactor_running = False

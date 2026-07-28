@@ -45,7 +45,15 @@ from app.services.trading import (
     StandardTradingEnvelope,
     TradingRoute,
 )
-from app.utils import AuditEvent, StandardResponse, canonical_json, generate_id, logger
+from app.utils import (
+    StandardResponse,
+    canonical_json,
+    create_audit_event,
+    generate_id,
+    get_logger,
+)
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -285,7 +293,7 @@ class PortfolioWorkflowService:
         """
         logger.info("Persisting redacted Portfolio workflow audit event")
         event_id = generate_id("evt")
-        event = AuditEvent(
+        event = create_audit_event(
             contract_version="v1",
             schema_id="utils.audit_event.v1",
             event_id=event_id,

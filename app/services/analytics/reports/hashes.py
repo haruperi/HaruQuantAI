@@ -12,8 +12,9 @@ from app.services.analytics.contracts.models import (
     ReproducibilityHashes,
     TradingResult,
 )
-from app.utils import ValidationError as UtilsValidationError
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 
 def _digest(value: object) -> str:
@@ -32,7 +33,7 @@ def _digest(value: object) -> str:
     try:
         safe = to_report_json_safe(value)
         return hashlib.sha256(canonical_json(safe).encode("utf-8")).hexdigest()
-    except (AnalyticsValidationError, UtilsValidationError, TypeError) as error:
+    except (AnalyticsValidationError, Exception, TypeError) as error:
         raise AnalyticsValidationError("Analytics evidence cannot be hashed") from error
 
 

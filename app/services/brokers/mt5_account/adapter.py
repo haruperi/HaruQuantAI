@@ -1,5 +1,7 @@
 """Canonical MetaTrader 5 broker adapter."""
 
+from __future__ import annotations
+
 # ruff: noqa: A002 - public protocol signatures are normative.
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -40,7 +42,6 @@ from app.services.brokers.mt5_account.mapping import (
     _map_tick,
 )
 from app.services.brokers.mt5_account.transport import _MT5Transport
-from app.utils import StandardResponse  # noqa: TC001
 
 
 def _provider_ticket(value: str) -> int:

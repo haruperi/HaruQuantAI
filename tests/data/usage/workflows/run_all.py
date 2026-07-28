@@ -7,12 +7,12 @@ import sys
 from pathlib import Path
 
 WORKFLOWS = (
-    "wf_data_001_historical_bars_ticks_spreads.py",
-    "wf_data_002_internal_analytical_data_access.py",
+    "wf_data_pri_historical_bars_ticks_spreads.py",
+    "wf_data_sec_internal_analytical_data_access.py",
     "wf_data_003_local_dataset_load_save.py",
     "wf_data_004_resample_align_aggregate.py",
     "wf_data_005_synthetic_generation.py",
-    "wf_data_007_update_job_historical_backfill.py",
+    "wf_data_ter_update_job_historical_backfill.py",
     "wf_data_008_internal_realtime_feed_status.py",
     "wf_data_009_symbol_discovery_metadata_availability.py",
     "wf_data_010_current_hours_sessions_volume.py",
@@ -25,6 +25,9 @@ WORKFLOWS = (
     "wf_data_017_external_artifact_import.py",
     "wf_data_018_venue_authoritative_market_hours.py",
     "wf_data_019_analytical_named_session_classification.py",
+    "wf_data_022_data_audit_trail.py",
+    "wf_data_023_versioned_cache_lifecycle.py",
+    "wf_data_024_quality_inspection_remediation.py",
 )
 
 

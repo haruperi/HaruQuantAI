@@ -8,7 +8,9 @@ from typing import cast
 import pandas as pd
 
 from app.services.research.contracts import LeakageReport
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]
@@ -37,16 +39,16 @@ def validate_no_lookahead_features(
         Structured suspicion evidence without certifying absence of leakage.
 
     Raises:
-        ValidationError: If frame or metadata is malformed.
+        ValueError: If frame or metadata is malformed.
     """
     logger.info("Inspecting Research features for lookahead risk")
     if not isinstance(data, pd.DataFrame) or data.empty:
-        raise ValidationError("RES_INPUT_INVALID", "NONEMPTY_FEATURE_FRAME_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "NONEMPTY_FEATURE_FRAME_REQUIRED")
     training = feature_metadata.get("training_feature_columns")
     if not isinstance(training, list) or any(
         not isinstance(item, str) for item in training
     ):
-        raise ValidationError("RES_INPUT_INVALID", "TRAINING_COLUMNS_METADATA_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "TRAINING_COLUMNS_METADATA_REQUIRED")
     named = {
         column
         for column in data.columns
@@ -54,7 +56,7 @@ def validate_no_lookahead_features(
     }
     if target_column is not None:
         if target_column not in data:
-            raise ValidationError("RES_INPUT_INVALID", "TARGET_COLUMN_MISSING")
+            raise ValueError("RES_INPUT_INVALID", "TARGET_COLUMN_MISSING")
         named.add(target_column)
     declared = set(allowed_forward_columns)
     training_set = set(training)

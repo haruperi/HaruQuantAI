@@ -9,7 +9,9 @@ from app.services.optimization.state.contracts import (
     OptimizationPersistenceReceipt,
     OptimizationStateStore,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _validate_receipt(

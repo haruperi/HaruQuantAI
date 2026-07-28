@@ -516,6 +516,32 @@ leaf `__init__.py` exposes only the Feature Registry public API.
 Workflows describe collaboration; they do not create a second structural or
 requirement authority.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-AGT-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-AGT-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-AGT-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-AGT-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+The `WF-AGENTIC-*` prefix is retired in favour of `WF-AGT-*`, matching the
+`FEAT-AGT-NN` feature prefix. `WF-AGENTIC-001`, `WF-AGENTIC-006`, and
+`WF-AGENTIC-007` were absorbed into `WF-AGT-PRI`, `WF-AGT-SEC`, and `WF-AGT-TER`
+respectively; the remaining identifiers keep their numbers under the new prefix.
+Absorbed numbers are retired and are never reused. New workflows continue from
+`WF-AGT-011`.
+
+### Step annotation convention
+
+`app/agentic/` currently contains this specification only — there is no package and
+no export surface. Every Agentic operation named below is therefore **planned** and
+annotated `agentic.<operation>()` *(planned)*; each workflow keeps its `Missing`
+status. Cross-domain steps name the receiving domain's verified public export, which
+is what Agentic must call once implemented.
+
 ### Status values
 
 | Status    | Meaning                                    |
@@ -531,41 +557,52 @@ requirement authority.
 | Internal     | The complete workflow occurs inside Agentic                     |
 | Cross-domain | Agentic participates through documented input/output boundaries |
 
-| Status  | Workflow ID        | Scope        | System workflow | Workflow                         | Trigger / Input boundary                                              | Final outcome / Output boundary                            | Requirement sequence                                                                                                                                                                 |
-| ------- | ------------------ | ------------ | --------------- | -------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Missing | `WF-AGENTIC-001` | Cross-domain | `SYS-WF-009`  | Firm research council            | Authenticated operator research request                               | `DeliberationRecord` and typed research output to UI/API | `FR-AGENTIC-004 → FR-AGENTIC-005 → FR-AGENTIC-010 → FR-AGENTIC-013 → FR-AGENTIC-016 → FR-AGENTIC-019 → FR-AGENTIC-020 → FR-AGENTIC-021 → FR-AGENTIC-064 → FR-AGENTIC-065` |
-| Missing | `WF-AGENTIC-002` | Cross-domain | `SYS-WF-009`  | Interpret deterministic evidence | Completed Analytics/Simulation/Optimization evidence                  | `RunInterpretation` or typed refusal                     | `FR-AGENTIC-022 → FR-AGENTIC-023 → FR-AGENTIC-024`                                                                                                                               |
-| Missing | `WF-AGENTIC-003` | Cross-domain | `SYS-WF-009`  | Hypothesis to experiment         | Approved research objective                                           | `ExperimentVerdict` bound to Simulation run evidence     | `FR-AGENTIC-025 → FR-AGENTIC-039 → FR-AGENTIC-040 → FR-AGENTIC-041 → FR-AGENTIC-042`                                                                                           |
-| Missing | `WF-AGENTIC-004` | Cross-domain | `SYS-WF-009`  | Bounded optimization             | Approved`ExperimentSpec`                                            | `SweepVerdict` bound to Optimization trials              | `FR-AGENTIC-043 → FR-AGENTIC-044 → FR-AGENTIC-045`                                                                                                                               |
-| Missing | `WF-AGENTIC-005` | Internal     | `SYS-WF-010`  | Author code artefact             | Authenticated human code specification                                | Staged`CodeArtifact`                                     | `FR-AGENTIC-046 → FR-AGENTIC-047 → FR-AGENTIC-048 → FR-AGENTIC-050`                                                                                                             |
-| Missing | `WF-AGENTIC-006` | Cross-domain | `SYS-WF-010`  | Promote artefact                 | Staged artefact                                                       | Receiver registration or terminal`research_only`         | `FR-AGENTIC-049 → FR-AGENTIC-050 → FR-AGENTIC-051 → FR-AGENTIC-052 → FR-AGENTIC-053 → FR-AGENTIC-054`                                                                         |
-| Missing | `WF-AGENTIC-007` | Cross-domain | `SYS-WF-011`  | Portfolio and risk council       | Operator or scheduled advisory request                                | Non-binding`AllocationProposal` and `RiskAdvisory`     | `FR-AGENTIC-055 → FR-AGENTIC-056 → FR-AGENTIC-057`                                                                                                                               |
-| Missing | `WF-AGENTIC-008` | Cross-domain | `SYS-WF-012`  | Submit trade proposal            | Approved Agentic thesis outcome                                       | Receiver receipt, rejection, or expiry; never a fill       | `FR-AGENTIC-058 → FR-AGENTIC-059 → FR-AGENTIC-060`                                                                                                                               |
-| Missing | `WF-AGENTIC-009` | Internal     | None            | Model upgrade                    | Owner requests a model-profile change                                 | Activated evaluated pin or refusal                         | `FR-AGENTIC-007 → FR-AGENTIC-008 → FR-AGENTIC-009`                                                                                                                               |
-| Missing | `WF-AGENTIC-010` | Internal     | None            | Incident and recovery            | Timeout, injection, policy, schema, drift, provider, or sandbox event | Contained incident and safe resume or termination          | `FR-AGENTIC-061 → FR-AGENTIC-062 → FR-AGENTIC-063 → FR-AGENTIC-066`                                                                                                             |
+| Status  | Rank | Workflow ID        | Scope        | System workflow | Workflow                         | Trigger / Input boundary                                              | Final outcome / Output boundary                            | Requirement sequence                                                                                                                                                                 |
+| ------- | ---- | ------------------ | ------------ | --------------- | -------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Missing | Primary | `WF-AGT-PRI` | Cross-domain | `SYS-WF-009`  | Firm research council            | Authenticated operator research request                               | `DeliberationRecord` and typed research output to UI/API | `FR-AGENTIC-004 → FR-AGENTIC-005 → FR-AGENTIC-010 → FR-AGENTIC-013 → FR-AGENTIC-016 → FR-AGENTIC-019 → FR-AGENTIC-020 → FR-AGENTIC-021 → FR-AGENTIC-064 → FR-AGENTIC-065` |
+| Missing | Supporting | `WF-AGT-002` | Cross-domain | `SYS-WF-009`  | Interpret deterministic evidence | Completed Analytics/Simulation/Optimization evidence                  | `RunInterpretation` or typed refusal                     | `FR-AGENTIC-022 → FR-AGENTIC-023 → FR-AGENTIC-024`                                                                                                                               |
+| Missing | Supporting | `WF-AGT-003` | Cross-domain | `SYS-WF-009`  | Hypothesis to experiment         | Approved research objective                                           | `ExperimentVerdict` bound to Simulation run evidence     | `FR-AGENTIC-025 → FR-AGENTIC-039 → FR-AGENTIC-040 → FR-AGENTIC-041 → FR-AGENTIC-042`                                                                                           |
+| Missing | Supporting | `WF-AGT-004` | Cross-domain | `SYS-WF-009`  | Bounded optimization             | Approved`ExperimentSpec`                                            | `SweepVerdict` bound to Optimization trials              | `FR-AGENTIC-043 → FR-AGENTIC-044 → FR-AGENTIC-045`                                                                                                                               |
+| Missing | Supporting | `WF-AGT-005` | Internal     | `SYS-WF-010`  | Author code artefact             | Authenticated human code specification                                | Staged`CodeArtifact`                                     | `FR-AGENTIC-046 → FR-AGENTIC-047 → FR-AGENTIC-048 → FR-AGENTIC-050`                                                                                                             |
+| Missing | Secondary | `WF-AGT-SEC` | Cross-domain | `SYS-WF-010`  | Promote artefact                 | Staged artefact                                                       | Receiver registration or terminal`research_only`         | `FR-AGENTIC-049 → FR-AGENTIC-050 → FR-AGENTIC-051 → FR-AGENTIC-052 → FR-AGENTIC-053 → FR-AGENTIC-054`                                                                         |
+| Missing | Tertiary | `WF-AGT-TER` | Cross-domain | `SYS-WF-011`  | Portfolio and risk council       | Operator or scheduled advisory request                                | Non-binding`AllocationProposal` and `RiskAdvisory`     | `FR-AGENTIC-055 → FR-AGENTIC-056 → FR-AGENTIC-057`                                                                                                                               |
+| Missing | Supporting | `WF-AGT-008` | Cross-domain | `SYS-WF-012`  | Submit trade proposal            | Approved Agentic thesis outcome                                       | Receiver receipt, rejection, or expiry; never a fill       | `FR-AGENTIC-058 → FR-AGENTIC-059 → FR-AGENTIC-060`                                                                                                                               |
+| Missing | Supporting | `WF-AGT-009` | Internal     | None            | Model upgrade                    | Owner requests a model-profile change                                 | Activated evaluated pin or refusal                         | `FR-AGENTIC-007 → FR-AGENTIC-008 → FR-AGENTIC-009`                                                                                                                               |
+| Missing | Supporting | `WF-AGT-010` | Internal     | None            | Incident and recovery            | Timeout, injection, policy, schema, drift, provider, or sandbox event | Contained incident and safe resume or termination          | `FR-AGENTIC-061 → FR-AGENTIC-062 → FR-AGENTIC-063 → FR-AGENTIC-066`                                                                                                             |
+| Missing | Supporting | `WF-AGT-011` | Internal     | `SYS-WF-009`, `SYS-WF-011` | Governed memory write and retrieval | Agent proposes a memory write or requests governed context for a bounded task scope | Governed memory record or bounded retrieved context with provenance; never an evidence authority | `Pending` |
+| Missing | Supporting | `WF-AGT-012` | Internal     | `SYS-WF-009`, `SYS-WF-010`, `SYS-WF-012` | Tool permission grant and approval | Agent requests a registered tool for a bounded task scope | Scoped time-bounded grant or deterministic refusal; never receiver-domain authorization | `Pending` |
 
 Every workflow supports idempotent submission, persisted checkpoints, cancellation,
 expiration, bounded retry, backpressure, and crash-safe resume. A repeated request
 with the same idempotency key returns the original run or receipt.
 
-### `WF-AGENTIC-001` — Firm Research Council
+### `WF-AGT-PRI` — Firm Research Council
 
 **Input boundary:** UI/API supplies an authenticated bounded research objective.
 
 **Output boundary:** Agentic returns a `DeliberationRecord` and typed research result
 to UI/API; it submits no trade or approval.
 
-1. Validate mandate, data readiness, identity, budgets, idempotency, and deadline.
+1. Validate mandate, data readiness, identity, budgets, idempotency, and deadline —
+   `agentic.validate_mandate()` *(planned)*, `utils.create_auth_context()`.
 2. Deterministically select enabled participants, model profiles, tools, maximum
-   rounds, fan-out, and stop conditions.
-3. Collect independent first-pass briefs before exposing peer conclusions.
+   rounds, fan-out, and stop conditions —
+   `agentic.select_participants()` *(planned)*.
+3. Collect independent first-pass briefs before exposing peer conclusions —
+   `agentic.collect_briefs()` *(planned)*.
 4. Normalize material statements into evidence claims with source, availability
-   time, content hash, confidence basis, and falsifier.
-5. Assigned challengers create typed counterclaims; configured rebuttal rounds run.
-6. Deterministic tools calculate or simulate every calculable claim.
+   time, content hash, confidence basis, and falsifier —
+   `agentic.normalize_claims()` *(planned)*, `utils.canonical_digest()`.
+5. Assigned challengers create typed counterclaims and configured rebuttal rounds
+   run — `agentic.run_deliberation_round()` *(planned)*.
+6. Deterministic tools calculate or simulate every calculable claim —
+   `data.get_market_data()`, `indicators.validate_indicator()`,
+   `analytics.build_performance_report()`, `simulator.run_backtest()`.
 7. Synthesis preserves supported conclusions, uncertainty, and dissent without
-   majority-vote authority.
-8. Publish an immutable record or return `refused` for insufficient evidence.
+   majority-vote authority — `agentic.synthesize_deliberation()` *(planned)*.
+8. Publish an immutable record, or return `refused` for insufficient evidence —
+   `agentic.publish_deliberation_record()` *(planned)*,
+   `data.persist_audit_event()`.
 
 **Failure behaviour:** Missing/ineligible evidence, policy denial, unresolved
 material conflict, budget/deadline exhaustion, or schema failure refuses the run.
@@ -573,83 +610,228 @@ Provider/tool failure follows bounded retry and checkpoint recovery.
 
 **Integration test:** `tests/agentic/integration/test_research_council.py`
 
-### `WF-AGENTIC-002` — Interpret Deterministic Evidence
+### `WF-AGT-002` — Interpret Deterministic Evidence
 
-Agentic validates completed versioned evidence, identifies facts, uncertainty,
-limitations, and unanswered questions, and returns a cited `RunInterpretation`.
+1. Receive completed versioned evidence from the owning domain —
+   `analytics.build_performance_report()`, `simulator.build_json_report()`,
+   `optimization.build_optimization_handoff()`.
+2. Validate the evidence contract and version before reading it —
+   `analytics.validate_contract_version()`.
+3. Identify facts, uncertainty, limitations, and unanswered questions —
+   `agentic.interpret_run_evidence()` *(planned)*.
+4. Return a cited interpretation that recomputes nothing —
+   `agentic.build_run_interpretation()` *(planned)*.
+
 Missing or incompatible evidence refuses without recomputation or invention.
 
 **Integration test:** `tests/agentic/integration/test_interpretation.py`
 
-### `WF-AGENTIC-003` — Hypothesis to Experiment
+### `WF-AGT-003` — Hypothesis to Experiment
 
-Independent analysts produce evidence packs; thesis synthesis preserves conflict;
-the experiment feature emits an immutable protocol to Simulation and binds every
-verdict to returned run IDs. Receiver validation failure or unsafe evidence ends
-the workflow without a result claim.
+1. Independent analysts produce evidence packs —
+   `agentic.collect_briefs()` *(planned)*, `data.get_market_data()`.
+2. Thesis synthesis preserves conflict rather than resolving it by vote —
+   `agentic.synthesize_deliberation()` *(planned)*.
+3. Emit an immutable experiment protocol —
+   `agentic.build_experiment_spec()` *(planned)*.
+4. Simulation executes the receiver-owned request —
+   `simulator.run_backtest()`.
+5. Bind every verdict to the returned run identifiers —
+   `agentic.build_experiment_verdict()` *(planned)*,
+   `simulator.resolve_idempotent_run()`.
+
+Receiver validation failure or unsafe evidence ends the workflow without a result
+claim.
 
 **Integration test:** `tests/agentic/integration/test_hypothesis_experiment.py`
 
-### `WF-AGENTIC-004` — Bounded Optimization
+### `WF-AGT-004` — Bounded Optimization
 
-An approved experiment creates a predeclared bounded `SweepPlan`; Optimization runs
-the receiver-owned request; every trial and failure remains visible; Agentic returns
-a robustness-focused `SweepVerdict`. Exhausted search budget or holdout misuse is
-terminal.
+1. Create a predeclared bounded sweep plan from the approved experiment —
+   `agentic.build_sweep_plan()` *(planned)*.
+2. Optimization runs the receiver-owned request —
+   `optimization.run_parameter_sweep()`.
+3. Every trial and failure remains visible; none is discarded —
+   `optimization.rank_parameter_sets()`.
+4. Read robustness and overfit evidence rather than raw rank —
+   `optimization.calculate_robustness_score()`,
+   `optimization.detect_overfit_parameters()`.
+5. Return a robustness-focused verdict —
+   `agentic.build_sweep_verdict()` *(planned)*.
+
+Exhausted search budget or holdout misuse is terminal.
 
 **Integration test:** `tests/agentic/integration/test_bounded_optimization.py`
 
-### `WF-AGENTIC-005` — Author Code Artefact
+### `WF-AGT-005` — Author Code Artefact
 
-An authenticated specification enters an ephemeral credential-free,
-network-denied sandbox. Generated files, dependencies, tests, hashes, provenance,
-and search history become a staged `CodeArtifact`; no code is hot-loaded.
+1. Accept an authenticated human code specification —
+   `utils.create_auth_context()`.
+2. Enter an ephemeral credential-free, network-denied sandbox —
+   `agentic.open_sandbox()` *(planned)*.
+3. Generate files, dependencies, and tests inside that sandbox —
+   `agentic.author_code_artifact()` *(planned)*.
+4. Hash every generated file and record provenance and search history —
+   `utils.canonical_digest()`.
+5. Stage the artefact; no code is hot-loaded —
+   `agentic.stage_code_artifact()` *(planned)*.
 
 **Integration test:** `tests/agentic/integration/test_code_artifact.py`
 
-### `WF-AGENTIC-006` — Promote Artefact
+### `WF-AGT-SEC` — Promote Artefact
 
-Evaluation, deterministic gates, Simulation evidence, lifetime-search accounting,
-critic review, and authenticated human approval form a complete evidence packet.
+1. Evaluate the staged artefact against deterministic gates —
+   `agentic.evaluate_artifact()` *(planned)*.
+2. Obtain Simulation evidence for the artefact —
+   `simulator.run_backtest()`, `simulator.build_artifact_manifest()`.
+3. Account for lifetime search budget and holdout use —
+   `optimization.detect_overfit_parameters()`.
+4. Run critic review and preserve dissent —
+   `agentic.run_critic_review()` *(planned)*.
+5. Require authenticated human approval —
+   `utils.create_auth_context()`.
+6. Assemble the complete signed evidence packet —
+   `agentic.build_promotion_packet()` *(planned)*, `utils.canonical_digest()`.
+7. The receiver domain alone registers the artefact —
+   `strategy.register_strategy_version()`.
+
 Leakage, holdout reuse, exhausted search budget, missing evidence, or absent
 approval produces terminal `research_only`; receiver registration remains
 authoritative.
 
 **Integration test:** `tests/agentic/integration/test_artifact_promotion.py`
 
-### `WF-AGENTIC-007` — Portfolio and Risk Council
+### `WF-AGT-TER` — Portfolio and Risk Council
 
-Agentic reads current allocation, analytics, account, mandate, and Risk evidence;
-advisers assess independently and preserve dissent; Agentic emits non-binding
-advice. Portfolio and Risk apply their complete normal controls to any submitted
-receiver-owned request.
+1. Read current allocation, analytics, account, mandate, and Risk evidence —
+   `portfolio.assess_common_mode_exposure()`,
+   `portfolio.measure_cross_account_correlation()`,
+   `data.get_account_state_snapshot()`, `risk.load_firm_mandate()`,
+   `analytics.build_portfolio_allocation_evidence()`.
+2. Advisers assess independently before seeing peer conclusions —
+   `agentic.collect_briefs()` *(planned)*.
+3. Synthesis preserves dissent —
+   `agentic.synthesize_deliberation()` *(planned)*.
+4. Emit non-binding allocation and risk advice —
+   `agentic.build_allocation_proposal()` *(planned)*,
+   `agentic.build_risk_advisory()` *(planned)*.
+5. Portfolio and Risk apply their complete normal controls to any submitted
+   receiver-owned request — `risk.review_allocation_proposal()`,
+   `portfolio.PortfolioService.coordinate_review()`.
 
 **Integration test:** `tests/agentic/integration/test_advisory_council.py`
 
-### `WF-AGENTIC-008` — Submit Trade Proposal
+### `WF-AGT-008` — Submit Trade Proposal
 
-Agentic emits a proposal with evidence, uncertainty, horizon, invalidation, scope,
-and expiry but no broker fields. Strategy and Portfolio treat it as untrusted,
-Risk and Trading remain mandatory, and Agentic receives a proposal receipt rather
-than order/fill truth.
+1. Emit a proposal carrying evidence, uncertainty, horizon, invalidation, scope, and
+   expiry, and no broker fields —
+   `agentic.build_trade_proposal()` *(planned)*.
+2. Strategy and Portfolio treat the proposal as untrusted input —
+   `strategy.validate_strategy_ref()`, `strategy.build_trade_intent()`.
+3. Risk governs the resulting intent exactly as any other —
+   `risk.calculate_position_size()`, `risk.check_risk_kill_switch()`.
+4. Trading gates and dispatches only after Risk approves —
+   `trading.evaluate_live_gate()`, `trading.dispatch_order_intent()`.
+5. Agentic receives a proposal receipt, never order or fill truth —
+   `agentic.record_proposal_receipt()` *(planned)*.
 
 **Integration test:** `tests/agentic/integration/test_trade_proposal.py`
 
-### `WF-AGENTIC-009` — Model Upgrade
+### `WF-AGT-009` — Model Upgrade
 
-An Owner-requested profile change passes contract, schema, tool, safety, privacy,
-latency, cost, regression, shadow, and economic acceptance gates before activation.
+1. Accept an Owner-requested model-profile change —
+   `utils.create_auth_context()`.
+2. Check contract, schema, and tool compatibility for the proposed pin —
+   `agentic.validate_model_profile()` *(planned)*.
+3. Run safety, privacy, latency, cost, regression, and shadow acceptance gates —
+   `agentic.evaluate_model_profile()` *(planned)*.
+4. Activate the evaluated pin, or refuse —
+   `agentic.activate_model_profile()` *(planned)*.
+5. Record the activation in the audit trail —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
 Failed compatibility or silent/floating substitution is refused.
 
 **Integration test:** `tests/agentic/integration/test_model_upgrade.py`
 
-### `WF-AGENTIC-010` — Incident and Recovery
+### `WF-AGT-010` — Incident and Recovery
 
-Deterministic containment cancels or quarantines affected work, preserves
-checkpoint and evidence, and permits only isolated side-effect-free replay.
+1. Classify the triggering event — timeout, injection, policy, schema, drift,
+   provider, or sandbox — `agentic.classify_incident()` *(planned)*,
+   `utils.map_exception()`.
+2. Deterministically cancel or quarantine affected work —
+   `agentic.quarantine_task()` *(planned)*.
+3. Preserve the checkpoint and evidence rather than discarding them —
+   `agentic.persist_checkpoint()` *(planned)*, `data.execute_transaction()`.
+4. Record the incident in the audit trail —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+5. Permit only isolated side-effect-free replay —
+   `agentic.replay_task()` *(planned)*.
+
 Terminal work cannot resume under the same task identity.
 
 **Integration test:** `tests/agentic/integration/test_incident_recovery.py`
+
+### `WF-AGT-011` — Governed Memory Write and Retrieval
+
+**Scope:** `Internal`
+**System workflow:** `SYS-WF-009`, `SYS-WF-011`
+
+**Input boundary:** an agent proposes a memory write, or requests retrieval of
+governed context for a bounded task scope.
+**Output boundary:** a governed memory record, or a bounded retrieved context set
+carrying provenance. Memory never becomes an independent evidence authority.
+
+1. Authorize the write or read against the mandate and task scope —
+   `agentic.validate_mandate()` *(planned)*.
+2. Normalize the candidate memory into a typed record with source, availability
+   time, and content hash — `agentic.normalize_claims()` *(planned)*,
+   `utils.canonical_digest()`.
+3. Redact every sensitive field before persistence —
+   `utils.redact_mapping_value()`, `utils.is_sensitive_key()`.
+4. Persist the governed record transactionally —
+   `agentic.write_governed_memory()` *(planned)*,
+   `data.execute_transaction()`.
+5. Retrieve a bounded context set for a declared task scope —
+   `agentic.retrieve_governed_memory()` *(planned)*.
+6. Re-verify freshness at retrieval time rather than trusting stored recency —
+   `utils.is_fresh()`, `utils.age_seconds()`.
+
+**Failure behaviour:** memory is context, never evidence. A retrieved memory cannot
+substitute for a deterministic domain read, and a claim supported only by memory is
+treated as unsupported. Writes outside the authorized scope, or containing
+unredacted sensitive material, are refused.
+
+**Integration test:** `tests/agentic/integration/test_governed_memory.py`
+
+### `WF-AGT-012` — Tool Permission Grant and Approval
+
+**Scope:** `Internal`
+**System workflow:** `SYS-WF-009`, `SYS-WF-010`, `SYS-WF-012`
+
+**Input boundary:** an agent requests a registered tool for a bounded task scope.
+**Output boundary:** a scoped time-bounded grant, or a deterministic refusal. A
+grant never confers receiver-domain authorization.
+
+1. Resolve the requested tool in the static tool registry —
+   `agentic.get_tool_registry()` *(planned)*.
+2. Check the mandate and roster authority for the requesting agent —
+   `agentic.validate_mandate()` *(planned)*.
+3. Require explicit human approval for any tool declared approval-gated —
+   `utils.create_auth_context()`.
+4. Issue a scoped, time-bounded grant —
+   `agentic.grant_tool_permission()` *(planned)*.
+5. Enforce the grant at each invocation, not only at issue time —
+   `agentic.check_tool_permission()` *(planned)*.
+6. Record every grant, use, and expiry —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
+**Failure behaviour:** an unregistered tool is refused without invocation. A grant
+authorizes only the calling of a tool; the receiving domain applies its own complete
+controls regardless, so no grant can be escalated into a trade, an activation, or a
+registration.
+
+**Integration test:** `tests/agentic/integration/test_tool_permissions.py`
 
 #### End-to-end workflow diagram
 
@@ -1163,7 +1345,7 @@ uv run python tests/agentic/usage/22_public_api.py
 
 - **Unit:** Verify every `FR-AGENTIC-*` requirement and file failure path using
   controlled clocks, providers, tools, network, and persistence.
-- **Integration:** Verify all ten `WF-AGENTIC-*` workflows and the four
+- **Integration:** Verify all ten `WF-AGT-*` workflows and the four
   `SYS-WF-009`–`012` boundaries without bypassing receiver authority.
 - **Usage:** Directly run each numbered program; each demonstrates every public
   constructor and operation of one feature.

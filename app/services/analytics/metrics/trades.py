@@ -16,7 +16,9 @@ from app.services.analytics.contracts.models import (
     SectionEvidence,
     TradingResult,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 BREAKEVEN_EPSILON = Decimal("1e-8")
 ANNUALIZATION_POLICY = MappingProxyType({"trading_days": 252})

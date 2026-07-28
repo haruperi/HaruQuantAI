@@ -21,7 +21,9 @@ from app.services.optimization.validation.contracts import (
     WalkForwardResult,
 )
 from app.services.optimization.validation.splits import build_time_series_splits
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 
 def _utility(value: float, direction: ObjectiveDirection) -> float:

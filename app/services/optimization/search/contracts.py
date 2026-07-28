@@ -17,7 +17,9 @@ from app.services.optimization.scoring import (  # noqa: TC001
     CandidateScore,
     ObjectiveName,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _SHA256_HEX_LENGTH = 64
 

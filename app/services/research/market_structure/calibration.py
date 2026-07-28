@@ -9,7 +9,9 @@ from app.services.research.contracts import ResearchWarning
 from app.services.research.market_structure.profile import (
     canonical_structure_score,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import (
@@ -43,16 +45,16 @@ def calibrate_market_structure(
         Versioned calibration evidence with ranked candidates and warnings.
 
     Raises:
-        ValidationError: If truth/candidate/resource inputs are invalid.
+        ValueError: If truth/candidate/resource inputs are invalid.
     """
     logger.info("Calibrating Research market-structure candidates")
     if not run_rows:
-        raise ValidationError("RES_INPUT_INVALID", "EMPTY_RUN_ROWS")
+        raise ValueError("RES_INPUT_INVALID", "EMPTY_RUN_ROWS")
     grid = config.profile.get("calibration_grid")
     if not isinstance(grid, list) or not grid:
-        raise ValidationError("RES_INPUT_INVALID", "MISSING_CALIBRATION_GRID")
+        raise ValueError("RES_INPUT_INVALID", "MISSING_CALIBRATION_GRID")
     if len(grid) > config.calibration_candidates:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "CANDIDATE_LIMIT_EXCEEDED")
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "CANDIDATE_LIMIT_EXCEEDED")
     trend_threshold = float(
         config.profile.get("trend_threshold", 0.5)  # type: ignore[arg-type]
     )

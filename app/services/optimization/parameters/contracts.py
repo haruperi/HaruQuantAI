@@ -7,7 +7,9 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 type ParameterValue = bool | int | str | Decimal
 

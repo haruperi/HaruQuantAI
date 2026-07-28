@@ -5,12 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.utils import (
-    ConfigurationError,
-    LoggingSettings,
-    RuntimeSettings,
-    load_settings,
-)
+from app.utils import load_settings
 
 
 def _header(title: str) -> None:
@@ -21,7 +16,7 @@ def _header(title: str) -> None:
 def fr_utils_022_construct_configuration() -> None:
     """FR-UTL-022: Construct immutable generic settings directly."""
     _header("Example 1: Construct Configuration")
-    settings = RuntimeSettings(logging=LoggingSettings(log_directory=None))
+    settings = load_settings({"ENVIRONMENT": "test"}, {})
     print("Constructed settings:", settings.environment, settings.runtime_profile)
 
 
@@ -40,7 +35,7 @@ def fr_utils_024_environment_constraints() -> None:
     _header("Example 3: Environment Constraints")
     try:
         load_settings({"ENVIRONMENT": "invalid"}, {})
-    except ConfigurationError:
+    except Exception:  # noqa: BLE001 - public loader intentionally hides error classes.
         print("Environment constraint: invalid value rejected")
 
 
@@ -50,7 +45,7 @@ def fr_utils_024_validate_settings() -> None:
     source = {"UNKNOWN": "value"}
     try:
         load_settings(source, {})
-    except ConfigurationError:
+    except Exception:  # noqa: BLE001 - public loader intentionally hides error classes.
         print("Settings validation: unknown key rejected", source)
 
 

@@ -7,7 +7,7 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from time import monotonic
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -27,7 +27,11 @@ from app.services.risk.contracts.responses import (
     unwrap_risk_response,
 )
 from app.services.risk.limits import evaluate_market_context
-from app.utils import RiskLevel, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -242,7 +246,7 @@ def _audit_record(
 
 
 @guard_risk_boundary(
-    risk_level=RiskLevel.HIGH,
+    risk_level="high",
     read_only=False,
     modifies_database=True,
 )
@@ -457,7 +461,7 @@ def _validate_activation(
 
 
 @guard_risk_boundary(
-    risk_level=RiskLevel.CRITICAL,
+    risk_level="critical",
     read_only=False,
     modifies_database=True,
 )

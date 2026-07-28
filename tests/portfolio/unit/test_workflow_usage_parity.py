@@ -11,12 +11,13 @@ WORKFLOW_DIR = ROOT / "tests/portfolio/usage/workflows"
 README = ROOT / "app/services/portfolio/README.md"
 EXPECTED = {
     "WF-PORT-001": "wf_port_001_validate_construction_evidence.py",
-    "WF-PORT-002": "wf_port_002_construct_allocation_candidate.py",
+    "WF-PORT-PRI": "wf_port_pri_construct_allocation_candidate.py",
     "WF-PORT-003": "wf_port_003_coordinate_simulation_risk_review.py",
-    "WF-PORT-004": "wf_port_004_activate_allocation_version.py",
-    "WF-PORT-005": "wf_port_005_detect_drift_plan_rebalance.py",
+    "WF-PORT-SEC": "wf_port_sec_activate_allocation_version.py",
+    "WF-PORT-TER": "wf_port_ter_detect_drift_plan_rebalance.py",
     "WF-PORT-006": "wf_port_006_submit_measure_rebalance.py",
     "WF-PORT-007": "wf_port_007_rollback_allocation.py",
+    "WF-PORT-008": "wf_port_008_assess_common_mode_exposure.py",
 }
 
 

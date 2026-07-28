@@ -19,7 +19,11 @@ from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
-from app.utils import RiskLevel, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -276,7 +280,7 @@ def _require_live_evidence(config: RiskConfig, missing: tuple[str, ...]) -> None
         )
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def assess_risk_regime(
     snapshot: PortfolioRiskSnapshot,
     evidence: MarketContextEvidence,

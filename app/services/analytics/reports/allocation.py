@@ -24,7 +24,9 @@ from app.services.analytics.reports.portfolio import (
     _measurement_window,
     build_portfolio_performance_report,
 )
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 _PORTFOLIO_RESULT_FIELDS = frozenset(
     {

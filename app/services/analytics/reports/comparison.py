@@ -14,7 +14,9 @@ from app.services.analytics.contracts.models import (
     PerformanceReport,
     SectionEvidence,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _numeric_metrics(

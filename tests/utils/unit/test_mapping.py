@@ -1,4 +1,5 @@
-from app.utils import ExternalServiceError, map_exception
+from app.utils import map_exception
+from app.utils.errors.exceptions import ExternalServiceError
 
 
 def test_map_exception_never_leaks_raw_provider_error() -> None:

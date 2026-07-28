@@ -22,7 +22,9 @@ from typing import TYPE_CHECKING, Final, Literal, Protocol
 
 from app.services.data.contracts import DataError
 from app.services.data.persistence.paths import resolve_approved_storage_path
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence

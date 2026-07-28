@@ -6,7 +6,9 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -39,16 +41,16 @@ def label_realized_market_behavior(
         Versioned realized-behavior evidence with insufficiency warnings.
 
     Raises:
-        ValidationError: If the truth policy or data is invalid.
+        ValueError: If the truth policy or data is invalid.
     """
     logger.info("Labeling Research realized market behavior")
     horizon = config.validation_horizon
     if horizon <= 0:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_VALIDATION_HORIZON")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_VALIDATION_HORIZON")
     if not symbol.strip() or not timeframe.strip():
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_IDENTITY")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_IDENTITY")
     if "close" not in data.columns:
-        raise ValidationError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
     close = data["close"].astype("float64")
     if len(close) <= horizon:
         return {
@@ -108,11 +110,11 @@ def build_validation_summary(
         Versioned summary with per-verdict and per-symbol sample counts.
 
     Raises:
-        ValidationError: If rows are empty or malformed.
+        ValueError: If rows are empty or malformed.
     """
     logger.debug("Building Research validation summary")
     if not rows:
-        raise ValidationError("RES_INPUT_INVALID", "EMPTY_VALIDATION_ROWS")
+        raise ValueError("RES_INPUT_INVALID", "EMPTY_VALIDATION_ROWS")
     by_verdict: dict[str, int] = dict.fromkeys(_VERDICTS, 0)
     by_symbol: dict[str, int] = {}
     confidence_values: list[float] = []

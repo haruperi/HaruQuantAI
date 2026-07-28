@@ -22,7 +22,11 @@ from app.services.simulator.execution.matching import (
 from app.services.simulator.reporting.contracts import ClosedTradeRecord
 from app.services.simulator.timeline import Tick, validate_intent_timing
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent
-from app.utils import RiskLevel, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.execution.matching import MatchResult
@@ -181,7 +185,7 @@ class EventDrivenExecutionEngine:
 
     @operation_guard(
         operation="simulation.execution.event_driven_execution_engine.submit_order",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
     )
     def submit_order(self, intent: OrderIntent) -> ExecutionReceipt:
@@ -484,7 +488,7 @@ class EventDrivenExecutionEngine:
 
     @operation_guard(
         operation="simulation.execution.event_driven_execution_engine.execute_tick",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
     )
     def execute_tick(self, tick: Tick) -> tuple[ExecutionReceipt, ...]:
@@ -562,7 +566,7 @@ class EventDrivenExecutionEngine:
 
     @operation_guard(
         operation="simulation.execution.event_driven_execution_engine.close_position",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
     )
     def close_position(
@@ -587,7 +591,7 @@ class EventDrivenExecutionEngine:
 
     @operation_guard(
         operation="simulation.execution.event_driven_execution_engine.snapshot",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=True,
     )
     def snapshot(self) -> Mapping[str, object]:

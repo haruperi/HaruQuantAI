@@ -3,7 +3,19 @@
 import re
 
 from app.services.risk.contracts.enums import RiskErrorCode  # noqa: TC001
-from app.utils import HaruQuantError, is_sensitive_key, logger, redact_text_value
+from app.utils import get_logger, is_sensitive_key, redact_text_value
+
+
+class HaruQuantError(Exception):
+    """Local safe base for Risk domain exceptions."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+logger = get_logger(__name__)
 
 _SAFE_DETAIL = re.compile(r"[^A-Z0-9_]+")
 _ASSIGNMENT = re.compile(r"(?i)(\b[a-z][a-z0-9_-]*\b\s*[:=]\s*)([^\s,;]+)")

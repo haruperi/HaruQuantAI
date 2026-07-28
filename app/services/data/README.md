@@ -632,14 +632,30 @@ labeling (see `Explicit exclusions`).
 > active Data workflows with
 > `uv run python tests/data/usage/workflows/run_all.py`.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-DATA-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-DATA-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-DATA-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-DATA-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-DATA-001`, `WF-DATA-002`, and `WF-DATA-007` were absorbed into `WF-DATA-PRI`,
+`WF-DATA-SEC`, and `WF-DATA-TER` respectively. Absorbed numbers are retired and are
+never reused. `WF-DATA-006` remains retired to Research. New workflows continue from
+`WF-DATA-020`.
+
 | Workflow ID | Standalone program |
 |---|---|
-| `WF-DATA-001` | `tests/data/usage/workflows/wf_data_001_historical_bars_ticks_spreads.py` |
-| `WF-DATA-002` | `tests/data/usage/workflows/wf_data_002_internal_analytical_data_access.py` |
+| `WF-DATA-PRI` | `tests/data/usage/workflows/wf_data_pri_historical_bars_ticks_spreads.py` |
+| `WF-DATA-SEC` | `tests/data/usage/workflows/wf_data_sec_internal_analytical_data_access.py` |
+| `WF-DATA-TER` | `tests/data/usage/workflows/wf_data_ter_update_job_historical_backfill.py` |
 | `WF-DATA-003` | `tests/data/usage/workflows/wf_data_003_local_dataset_load_save.py` |
 | `WF-DATA-004` | `tests/data/usage/workflows/wf_data_004_resample_align_aggregate.py` |
 | `WF-DATA-005` | `tests/data/usage/workflows/wf_data_005_synthetic_generation.py` |
-| `WF-DATA-007` | `tests/data/usage/workflows/wf_data_007_update_job_historical_backfill.py` |
 | `WF-DATA-008` | `tests/data/usage/workflows/wf_data_008_internal_realtime_feed_status.py` |
 | `WF-DATA-009` | `tests/data/usage/workflows/wf_data_009_symbol_discovery_metadata_availability.py` |
 | `WF-DATA-010` | `tests/data/usage/workflows/wf_data_010_current_hours_sessions_volume.py` |
@@ -652,9 +668,15 @@ labeling (see `Explicit exclusions`).
 | `WF-DATA-017` | `tests/data/usage/workflows/wf_data_017_external_artifact_import.py` |
 | `WF-DATA-018` | `tests/data/usage/workflows/wf_data_018_venue_authoritative_market_hours.py` |
 | `WF-DATA-019` | `tests/data/usage/workflows/wf_data_019_analytical_named_session_classification.py` |
+| `WF-DATA-020` | `tests/data/usage/workflows/wf_data_020_economic_calendar_news_restriction.py` *(pending)* |
+| `WF-DATA-021` | `tests/data/usage/workflows/wf_data_021_persistence_lifecycle.py` *(pending)* |
+| `WF-DATA-022` | `tests/data/usage/workflows/wf_data_022_data_audit_trail.py` |
+| `WF-DATA-023` | `tests/data/usage/workflows/wf_data_023_versioned_cache_lifecycle.py` |
+| `WF-DATA-024` | `tests/data/usage/workflows/wf_data_024_quality_inspection_remediation.py` |
 
 `WF-DATA-006` is retired to Research and therefore intentionally has no Data
-workflow program.
+workflow program. Entries marked *(pending)* are registered workflows whose
+standalone program is not yet written.
 
 ### Status values
 
@@ -671,29 +693,34 @@ workflow program.
 | **Internal** | The complete workflow occurs within Data. |
 | **Cross-domain** | Data receives input from or returns output to another domain. |
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-DATA-001` | Cross-domain | Historical bars/ticks/spreads retrieval | Consumer submits bounded source/range request | `MarketDataset v1` | `FR-DATA-006 → 026 → 030` |
-| Completed | `WF-DATA-002` | Cross-domain | Internal analytical data access | Approved Python consumer submits `MarketDataRequest` | Typed `MarketDataset`, never raw provider state | `FR-DATA-006 → 030 → 005` |
-| Completed | `WF-DATA-003` | Internal | Local dataset load/save | Approved CSV/Parquet path and normalized data | Validated dataset or atomic committed artifact/manifest | `FR-DATA-016 → 017/018` |
-| Completed | `WF-DATA-004` | Internal | Resample, align, and aggregate | Normalized datasets/ticks | Deterministic no-lookahead dataset | `FR-DATA-036 → 037/038` |
-| Completed | `WF-DATA-005` | Cross-domain | Synthetic generation | Bounded parameters and optional seed | Deterministic canonical bars/ticks for fixtures only | `FR-DATA-039` |
-| Completed | `WF-DATA-016` | Cross-domain | Tick-series generation from real evidence | Real bar or tick `MarketDataset`, approved model, spread model, and seed when variable | Canonical tick `MarketDataset` with intra-bar phase metadata, or a bounded Parquet artifact | `FR-DATA-087 → FR-DATA-088 → FR-DATA-089 → FR-DATA-090` |
-| Retired | `WF-DATA-006` | — | Historical labeling | Owned by Research; no Data workflow | — | — |
-| Completed | `WF-DATA-007` | Internal | Update job and historical backfill | Job definition or run-once command | Committed chunks and resumable checkpoint | `FR-DATA-041 → 042 → 043/044/045` |
-| Completed | `WF-DATA-008` | Cross-domain | Internal real-time feed and status | Staging feed source emits event | Normalized bounded state and `get_feed_status` output | `FR-DATA-046 → 047 → 048` |
-| Completed | `WF-DATA-009` | Cross-domain | Symbol discovery, metadata, availability | Bounded source/symbol query | Provenanced metadata/page/availability result | `FR-DATA-023/024 → 031/032/033` |
-| Completed | `WF-DATA-010` | Cross-domain | Current hours, sessions, and volume | Current configured market request | UTC windows or bounded volume result | `FR-DATA-034/035` |
-| Completed | `WF-DATA-018` | Cross-domain | Venue-authoritative market hours | Explicit broker source or exchange calendar code and exact symbol | UTC sessions plus deterministic open/current/next state | `FR-DATA-117 → FR-DATA-118 → FR-DATA-119/120` |
-| Completed | `WF-DATA-019` | Cross-domain | Analytical named-session classification | Exact symbol, aware UTC instant, and configured regional definitions | DST-aware liquidity labels that confer no trading authority | `FR-DATA-121 → FR-DATA-122` |
-| Completed | `WF-DATA-011` | Internal | Source readiness and promotion | Operator evidence package and `AuthContext` | Reversible readiness state | `FR-DATA-026 → 027` |
-| Completed | `WF-DATA-012` | Cross-domain | Simulation data-modelling boundary | Simulation requests canonical history | Data supplies canonical bars/ticks; Simulation reconstructs model-specific ticks | `FR-DATA-030 → 005` |
-| Completed | `WF-DATA-013` | Cross-domain | Account snapshot service | Strategy/Risk/Trading read-only account evidence request | `AccountStateSnapshot v1` (read-only; no mutation capability) | `FR-DATA-028 → 008` |
-| Completed | `WF-DATA-014` | Cross-domain | Risk market-context evidence | Risk requests current normalized context | `MarketContextEvidence v1` or explicit stale/missing failure | `FR-DATA-075 → 076` |
-| Completed | `WF-DATA-015` | Cross-domain | FX conversion evidence | Risk, Simulation, Analytics, or Portfolio requests a bounded conversion | `FXConversionEvidence v1` or explicit stale/path failure | `FR-DATA-078 → FR-DATA-079` |
-| Completed | `WF-DATA-017` | Internal | External artifact import | Operator supplies an approved path, declared dialect, and explicit column mapping | Committed canonical artifact, manifest, and audit event | `FR-DATA-105 → FR-DATA-106 → FR-DATA-018` |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-DATA-PRI` | Cross-domain | Historical bars/ticks/spreads retrieval | Consumer submits bounded source/range request | `MarketDataset v1` | `FR-DATA-006 → 026 → 030` |
+| Completed | Secondary | `WF-DATA-SEC` | Cross-domain | Internal analytical data access | Approved Python consumer submits `MarketDataRequest` | Typed `MarketDataset`, never raw provider state | `FR-DATA-006 → 030 → 005` |
+| Completed | Tertiary | `WF-DATA-TER` | Internal | Update job and historical backfill | Job definition or run-once command | Committed chunks and resumable checkpoint | `FR-DATA-041 → 042 → 043/044/045` |
+| Completed | Supporting | `WF-DATA-003` | Internal | Local dataset load/save | Approved CSV/Parquet path and normalized data | Validated dataset or atomic committed artifact/manifest | `FR-DATA-016 → 017/018` |
+| Completed | Supporting | `WF-DATA-004` | Internal | Resample, align, and aggregate | Normalized datasets/ticks | Deterministic no-lookahead dataset | `FR-DATA-036 → 037/038` |
+| Completed | Supporting | `WF-DATA-005` | Cross-domain | Synthetic generation | Bounded parameters and optional seed | Deterministic canonical bars/ticks for fixtures only | `FR-DATA-039` |
+| Retired | — | `WF-DATA-006` | — | Historical labeling | Owned by Research; no Data workflow | — | — |
+| Completed | Supporting | `WF-DATA-008` | Cross-domain | Internal real-time feed and status | Staging feed source emits event | Normalized bounded state and `get_feed_status` output | `FR-DATA-046 → 047 → 048` |
+| Completed | Supporting | `WF-DATA-009` | Cross-domain | Symbol discovery, metadata, availability | Bounded source/symbol query | Provenanced metadata/page/availability result | `FR-DATA-023/024 → 031/032/033` |
+| Completed | Supporting | `WF-DATA-010` | Cross-domain | Current hours, sessions, and volume | Current configured market request | UTC windows or bounded volume result | `FR-DATA-034/035` |
+| Completed | Supporting | `WF-DATA-011` | Internal | Source readiness and promotion | Operator evidence package and `AuthContext` | Reversible readiness state | `FR-DATA-026 → 027` |
+| Completed | Supporting | `WF-DATA-012` | Cross-domain | Simulation data-modelling boundary | Simulation requests canonical history | Data supplies canonical bars/ticks; Simulation reconstructs model-specific ticks | `FR-DATA-030 → 005` |
+| Completed | Supporting | `WF-DATA-013` | Cross-domain | Account snapshot service | Strategy/Risk/Trading read-only account evidence request | `AccountStateSnapshot v1` (read-only; no mutation capability) | `FR-DATA-028 → 008` |
+| Completed | Supporting | `WF-DATA-014` | Cross-domain | Risk market-context evidence | Risk requests current normalized context | `MarketContextEvidence v1` or explicit stale/missing failure | `FR-DATA-075 → 076` |
+| Completed | Supporting | `WF-DATA-015` | Cross-domain | FX conversion evidence | Risk, Simulation, Analytics, or Portfolio requests a bounded conversion | `FXConversionEvidence v1` or explicit stale/path failure | `FR-DATA-078 → FR-DATA-079` |
+| Completed | Supporting | `WF-DATA-016` | Cross-domain | Tick-series generation from real evidence | Real bar or tick `MarketDataset`, approved model, spread model, and seed when variable | Canonical tick `MarketDataset` with intra-bar phase metadata, or a bounded Parquet artifact | `FR-DATA-087 → FR-DATA-088 → FR-DATA-089 → FR-DATA-090` |
+| Completed | Supporting | `WF-DATA-017` | Internal | External artifact import | Operator supplies an approved path, declared dialect, and explicit column mapping | Committed canonical artifact, manifest, and audit event | `FR-DATA-105 → FR-DATA-106 → FR-DATA-018` |
+| Completed | Supporting | `WF-DATA-018` | Cross-domain | Venue-authoritative market hours | Explicit broker source or exchange calendar code and exact symbol | UTC sessions plus deterministic open/current/next state | `FR-DATA-117 → FR-DATA-118 → FR-DATA-119/120` |
+| Completed | Supporting | `WF-DATA-019` | Cross-domain | Analytical named-session classification | Exact symbol, aware UTC instant, and configured regional definitions | DST-aware liquidity labels that confer no trading authority | `FR-DATA-121 → FR-DATA-122` |
+| Completed | Supporting | `WF-DATA-020` | Internal | Economic calendar and news-restriction evidence | Bounded symbol/date-range calendar query | Provenanced economic events, symbol event profile, and restriction verdict | `Pending` |
+| Completed | Supporting | `WF-DATA-021` | Internal | Persistence lifecycle: migration, backup, restore, retention | Operator maintenance command against the Data-owned store | Verified schema ledger, committed backup, restored store, or enforced retention result | `Pending` |
+| Completed | Supporting | `WF-DATA-022` | Cross-domain | Data audit trail | Domain-supplied redacted `AuditEvent v1` or bounded audit query | Durably persisted event or bounded ordered audit page | `Pending` |
+| Completed | Supporting | `WF-DATA-023` | Internal | Versioned cache lifecycle | Cache identity derived from source revision, schema version, and request dimensions | Cache hit, miss, or explicit invalidation with no stale record served outside policy | `Pending` |
+| Completed | Supporting | `WF-DATA-024` | Internal | Standalone quality inspection and remediation | Normalized records or an existing dataset plus the active quality profile | Bounded `QualityReport` with classified issues and a remediation summary | `Pending` |
 
-### `WF-DATA-001` — Historical Bars, Ticks, and Spreads
+### `WF-DATA-PRI` — Historical Bars, Ticks, and Spreads
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-001`, `SYS-WF-002`, `SYS-WF-003`, `SYS-WF-004`
@@ -702,26 +729,31 @@ workflow program.
 **Output boundary:** Data returns its documented typed result or `DataError`.
 
 1. Validate request bounds, UTC range, workflow context, precision, stale-cache
-   policy, and fallback list. Reject `serve_stale` outside the `research` context.
+   policy, and fallback list. Reject `serve_stale` outside the `research` context —
+   `data.get_market_data()`, `data.require_utc()`.
 2. Compose the requested source and each explicitly supplied fallback, then enforce
    readiness, capability, license, rate, timeout, and breaker policy for each. A
    source identifier that is neither a configured local source nor an enabled
-   provider source fails closed as `UNSUPPORTED_SOURCE` before any policy evaluation.
+   provider source fails closed as `UNSUPPORTED_SOURCE` before any policy evaluation —
+   `data.resolve_source()`, `data.list_composable_sources()`,
+   `data.ensure_source_access()`, `data.evaluate_source_policy()`.
 3. Resolve cache identity from source revision, schema/normalization versions, raw
    hash when known, request dimensions, and policy. Apply the stale-cache policy:
    `refresh` treats an expired entry as a miss; `fail_closed` returns `EMPTY_RESULT`
    without contacting any source; `serve_stale` returns the expired entry with
-   `cache_status="stale_warning"`.
+   `cache_status="stale_warning"` — `data.get_cache_entry()`, `data.put_cache_entry()`.
 4. Fetch from one lazy read adapter on cache miss, normalize UTC records to the
    requested UTC range and record limit, and create a
-   bounded quality report by running `inspect_dataset_quality` over the normalized
-   records under the active `QUALITY_PROFILE`. The report always reflects the actual
-   records examined; a constant or unexamined score is never emitted.
+   bounded quality report over the normalized records under the active
+   `QUALITY_PROFILE`. The report always reflects the actual records examined; a
+   constant or unexamined score is never emitted — `data.fetch_market_dataset()`,
+   `data.inspect_dataset_quality()`, `data.get_quality_policy()`.
 5. Apply `quality_failure_behavior` to failed reports identically for fresh and
    cached data: `reject` raises `DATA_QUALITY_FAILED`, while `warn` emits a bounded
    warning and returns the unchanged typed dataset with its failed report intact.
    Precision violations still fail closed. Advisory issues reduce `quality_score`
-   and populate `issues`/`warnings` without blocking.
+   and populate `issues`/`warnings` without blocking — `data.build_data_response()`,
+   `data.unwrap_data_response()`.
 
 **Failure behaviour:** invalid input → `VALIDATION_FAILED`; undeclared fallback → no
 fallback; unavailable/staging-disallowed source → `SOURCE_UNAVAILABLE`; missing
@@ -753,7 +785,7 @@ sequenceDiagram
     Access-->>Consumer: MarketDataset or structured error
 ```
 
-### `WF-DATA-002` — Internal Analytical Data Access
+### `WF-DATA-SEC` — Internal Analytical Data Access
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-001`, `SYS-WF-003`, `SYS-WF-004`
@@ -763,11 +795,16 @@ sequenceDiagram
 a detached analytical projection that exposes no provider-owned state.
 
 1. Construct and validate the same bounded `MarketDataRequest` accepted by
-   `WF-DATA-001`.
-2. Call `get_market_data()` so source policy, normalization, quality, cache, and
-   provenance remain governed by the canonical retrieval path.
-3. Call `to_ohlcv_dataframe()` only after retrieval succeeds; the returned frame is
-   detached and the typed `MarketDataset` remains unchanged.
+   `WF-DATA-PRI` — `data.require_utc()`, `data.get_timeframe_spec()`.
+2. Retrieve through the canonical path so source policy, normalization, quality,
+   cache, and provenance remain governed — `data.get_market_data()`,
+   `data.get_tick_data()`, `data.get_spread_data()`.
+3. Project to a detached analytical frame only after retrieval succeeds; the typed
+   `MarketDataset` remains unchanged — `data.to_ohlcv_dataframe()`,
+   `data.to_tick_dataframe()`.
+4. Run the projection under the shared operation wrapper when a uniform response
+   envelope is required — `data.run_data_operation()`,
+   `data.run_data_operation_async()`.
 
 **Failure behaviour:** retrieval failures remain typed `DataError` values; an
 incompatible dataset cannot be projected and no raw adapter/provider object crosses
@@ -785,12 +822,17 @@ overwrite/manifest options.
 **Output boundary:** Loaded `MarketDataset` or committed artifact plus manifest.
 
 1. Resolve the path under configured approved roots and reject traversal, absolute
-   escape, and unapproved hidden/system paths.
-2. Acquire the exclusive path-scoped writer lock for writes.
-3. Validate/normalize records and license/export policy.
+   escape, and unapproved hidden/system paths — `data.load_local_dataset()`,
+   `data.save_dataset()`.
+2. Acquire the exclusive path-scoped writer lock for writes —
+   `data.acquire_write_lock()`.
+3. Validate/normalize records and license/export policy —
+   `data.inspect_records_quality()`, `data.ensure_source_access()`.
 4. Write a temporary artifact and versioned manifest, fsync as supported, then commit
-   atomically; quarantine failed temporary output.
-5. Verify file hash/schema on load and never perform hidden on-read migration.
+   atomically; quarantine failed temporary output — `data.save_dataset()`,
+   `data.execute_transaction()`.
+5. Verify file hash/schema on load and never perform hidden on-read migration —
+   `data.load_dataset()`, `data.load_csv()`, `data.load_parquet()`.
 
 **Failure behaviour:** unsafe path → `PERMISSION_DENIED`; lock conflict →
 `CONCURRENT_WRITE_LOCKED`; corrupt artifact → `FILE_CORRUPTED`; invalid data →
@@ -811,18 +853,23 @@ artifact cannot supply: `symbol`, `data_kind`, optional `timeframe`, `source_id`
 persisted audit event recording external origin.
 
 1. Resolve the path under configured approved roots using the same validation as
-   `WF-DATA-003`; reject traversal, absolute escape, and unapproved hidden paths.
+   `WF-DATA-003`; reject traversal, absolute escape, and unapproved hidden paths —
+   `data.import_external_dataset()`.
 2. Read the artifact under the declared dialect, which fixes header style and
    delimiter. No governed field is inferred: an artifact whose columns do not satisfy
-   the declared mapping fails rather than being guessed at.
+   the declared mapping fails rather than being guessed at —
+   `data.describe_import_dialects()`, `data.load_csv()`, `data.load_parquet()`.
 3. Map source columns to canonical fields, normalize timestamps to UTC, and validate
-   every record through the canonical record contracts.
+   every record through the canonical record contracts — `data.from_row()`,
+   `data.require_utc()`.
 4. Run the same quality pass as retrieval under the active `QUALITY_PROFILE` and fail
-   closed on blocking issues.
-5. Commit through `save_dataset`, so the result is an ordinary manifest-backed
-   artifact indistinguishable from Data-authored output, and record provenance
-   marking the artifact as externally originated.
-6. Persist one `AuditEvent` naming the operator, source path, dialect, and mapping.
+   closed on blocking issues — `data.inspect_records_quality()`,
+   `data.get_quality_policy()`.
+5. Commit so the result is an ordinary manifest-backed artifact indistinguishable
+   from Data-authored output, and record provenance marking the artifact as
+   externally originated — `data.save_dataset()`.
+6. Persist one `AuditEvent` naming the operator, source path, dialect, and mapping —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
 
 Import never mutates the source artifact and never runs implicitly. `load_dataset`
 continues to require a Data-written manifest; this workflow is the only admission
@@ -844,11 +891,20 @@ incomplete mapping → `VALIDATION_FAILED`; unreadable or malformed artifact →
 **Output boundary:** Deterministic `MarketDataset` with updated provenance and
 `available_at`.
 
-The single timeframe manifest validates ordering. Resampling permits only supported
-higher-timeframe conversion; alignment selects only values available at each target
-timestamp; tick aggregation requires sorted canonical ticks and explicit spread
-policy. Any lookahead, disorder, overlap-policy, or unsupported-timeframe violation
-fails the operation atomically.
+1. Validate the declared source and target timeframes against the single timeframe
+   manifest — `data.get_timeframe_spec()`, `data.validate_resample_target()`.
+2. Resample only to a supported higher timeframe, preserving canonical OHLCV
+   semantics — `data.resample_dataset()`, `data.resample_ohlcv()`.
+3. Align multiple datasets so each target timestamp selects only values already
+   available at that instant — `data.align_datasets()`,
+   `data.align_multitimeframe_data()`.
+4. Aggregate sorted canonical ticks under an explicit spread policy —
+   `data.aggregate_ticks()`, `data.aggregate_ticks_to_bars()`.
+5. Merge per-record quality flags into the result provenance and stamp
+   `available_at` — `data.aggregate_flags()`, `data.data_start_time()`.
+
+Any lookahead, disorder, overlap-policy, or unsupported-timeframe violation fails the
+operation atomically.
 
 **Integration test:**
 `tests/data/integration/test_workflow_runtime.py::test_wf_data_004_005_and_016_transform_generate_and_derive()`
@@ -863,11 +919,14 @@ including an explicit seed when deterministic replay is required.
 provenance; the result carries no claim of observed market truth.
 
 1. Validate the symbol, data kind, range/count, approved model parameters, precision
-   policy, and seed through `SyntheticRequest`.
-2. Call `generate_synthetic_bars()` for an approved bar request.
-3. Call `generate_synthetic_ticks()` for an approved tick request.
+   policy, and seed through `SyntheticRequest` — `data.generate_synthetic_dataset()`.
+2. Generate canonical bars for an approved bar request —
+   `data.generate_synthetic_bars()`.
+3. Generate canonical ticks for an approved tick request —
+   `data.generate_synthetic_ticks()`.
 4. Repeat the seeded operation and compare canonical records to demonstrate
-   deterministic replay.
+   deterministic replay — `data.generate_synthetic_dataset()`,
+   `utils.canonical_digest()`.
 
 **Failure behaviour:** invalid or unbounded parameters fail as `VALIDATION_FAILED`;
 unsupported models fail closed; synthetic output is never substituted for real
@@ -876,7 +935,7 @@ market evidence in a live/current workflow.
 **Integration test:**
 `tests/data/integration/test_workflow_runtime.py::test_wf_data_004_005_and_016_transform_generate_and_derive()`
 
-### `WF-DATA-007` — Update Job and Historical Backfill
+### `WF-DATA-TER` — Update Job and Historical Backfill
 
 **Scope:** `Internal`
 **System workflow:** `None`
@@ -884,12 +943,23 @@ market evidence in a live/current workflow.
 **Output boundary:** Atomic chunk commits, checkpoints, and observable job state.
 
 1. Validate source/license/destination and derive an idempotency key from source,
-   symbol, kind, timeframe, range, schema, and normalization version.
+   symbol, kind, timeframe, range, schema, and normalization version —
+   `data.create_data_update_job()`, `data.derive_backfill_key()`,
+   `data.ensure_source_access()`.
 2. Acquire one active lease and divide the range into chunks no larger than 10,000
-   records or one source calendar day, whichever is smaller.
-3. For each chunk run retrieval → normalization → quality → persistence.
-4. Commit artifact/data, idempotency record, and checkpoint in one recoverable unit.
-5. On restart, validate the checkpoint and resume after the last committed chunk.
+   records or one source calendar day, whichever is smaller —
+   `data.acquire_write_lock()`, `data.schedule_update_job()`.
+3. For each chunk run retrieval → normalization → quality → persistence —
+   `data.execute_backfill_chunk()`, `data.get_market_data()`,
+   `data.inspect_dataset_quality()`, `data.save_market_data()`.
+4. Commit artifact/data, idempotency record, and checkpoint in one recoverable unit —
+   `data.execute_transaction()`.
+5. Start, observe, and stop the job through its owned lifecycle operations —
+   `data.start_data_update_job()`, `data.run_data_update_job_once()`,
+   `data.get_data_update_job_status()`, `data.read_update_job_status()`,
+   `data.stop_data_update_job()`.
+6. On restart, validate the checkpoint and resume after the last committed chunk —
+   `data.recover_update_jobs()`.
 
 **Failure behaviour:** duplicate active worker → `CONCURRENT_WRITE_LOCKED`; corrupt
 checkpoint → `CHECKPOINT_CORRUPTED`; failed chunk leaves no published partial chunk;
@@ -908,11 +978,21 @@ the internal runtime; no public subscription API exists.
 **Output boundary:** Consumers receive normalized internal events and operators receive
 bounded read-only `FeedStatus` data.
 
-The runtime normalizes events into a bounded buffer, updates heartbeats/counters,
-records gap windows and dropped-data evidence, and reconnects with bounded exponential
-backoff plus jitter. Overflow follows `halt`, `drop_and_reconcile`, or `backpressure`;
-no automatic historical reconciliation capability exists, so Phase 1 records and exposes the
-gap only. The initial source is the deterministic fake contract harness. Promotion to one MT5 demo feed for the Trading live/paper runtime occurs only after Trading exists and the promotion evidence passes.
+1. Start the internal runtime against a configured staging/production source —
+   `data.start_internal_feed()`.
+2. Normalize each provider event into the bounded buffer and update heartbeats and
+   counters — `data.ingest_feed_event()`.
+3. Expose bounded read-only operator status without granting a subscription API —
+   `data.get_feed_status()`, `data.read_feed_status()`.
+4. Record gap windows and dropped-data evidence when overflow policy engages —
+   `data.reconcile_feed_gap()`.
+5. Reconnect with bounded exponential backoff plus jitter — `data.reconnect_feed()`.
+
+Overflow follows `halt`, `drop_and_reconcile`, or `backpressure`; no automatic
+historical reconciliation capability exists, so Phase 1 records and exposes the gap
+only. The initial source is the deterministic fake contract harness. Promotion to one
+MT5 demo feed for the Trading live/paper runtime occurs only after Trading exists and
+the promotion evidence passes.
 
 **Integration test:**
 `tests/data/integration/test_workflow_runtime.py::test_wf_data_008_persists_ingests_and_reads_feed_status()`
@@ -926,10 +1006,13 @@ UTC probe-range requests.
 **Output boundary:** Data returns a provenanced `SymbolPage`, `SymbolMetadata`, and
 `DataAvailability`, or a typed `DataError`.
 
-1. Call `list_symbols()` with a bounded `SymbolListRequest`.
-2. Call `get_symbol_metadata()` for the exact selected provider symbol.
-3. Call `get_data_availability()` over an explicit UTC interval and maximum probe
-   count.
+1. Page the bounded symbol universe for the requested source —
+   `data.list_symbols()`, `data.discover_symbols()`.
+2. Resolve metadata for the exact selected provider symbol and validate it before
+   publication — `data.get_symbol_metadata()`, `data.fetch_symbol_metadata()`,
+   `data.validate_symbol_metadata()`.
+3. Measure coverage over an explicit UTC interval and maximum probe count —
+   `data.get_data_availability()`, `data.inspect_availability()`.
 
 **Failure behaviour:** disabled/unavailable sources, unknown symbols, stale metadata,
 or malformed ranges fail closed; availability is measured and is never hard-coded
@@ -947,13 +1030,15 @@ market-volume request.
 **Output boundary:** Data returns normalized UTC `MarketHours` plus a separately
 provenanced bounded `VolumeResult`.
 
-1. Construct `WeeklyScheduleProvider` from an explicit
-   `WeeklyScheduleDefinition`; schedule truth is never inferred from ticker text.
-2. Call `get_market_hours()` to normalize the configured sessions to UTC.
-3. Call `get_historical_volume()` for the exact provider symbol and bounded UTC
-   range.
+1. Resolve the current revisioned schedule from an explicit
+   `WeeklyScheduleDefinition`; schedule truth is never inferred from ticker text —
+   `data.get_current_schedule()`.
+2. Normalize the configured sessions to UTC — `data.get_market_hours()`,
+   `data.get_trading_sessions()`.
+3. Read bounded market volume for the exact provider symbol and UTC range —
+   `data.get_historical_volume()`, `data.fetch_historical_volume()`.
 4. Return schedule and volume as separate evidence so analytical volume cannot grant
-   venue-tradability authority.
+   venue-tradability authority — `data.get_active_market_sessions()`.
 
 **Failure behaviour:** missing schedule revisions, invalid timezone/session windows,
 unsupported symbols, or unavailable volume evidence fail closed without fabricated
@@ -969,6 +1054,15 @@ hours or volume.
 **Input boundary:** Authenticated operator submits mocked/live, normalization, quality,
 timeout, rate-limit, license, redaction, and sign-off evidence.
 **Output boundary:** Audited, reversible source readiness transition.
+
+1. Register or confirm the source descriptor and its declared capabilities —
+   `data.register_source()`, `data.ensure_source()`, `data.get_source_descriptor()`,
+   `data.list_registered_sources()`.
+2. Evaluate the operator evidence package against the declared readiness policy —
+   `data.evaluate_source_policy()`.
+3. Apply the audited reversible readiness transition — `data.promote_source()`.
+4. Persist one audit event naming the operator and the linked evidence —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
 
 CSV and Parquet begin `production`; synthetic generation is production processing.
 MT5, cTrader, Dukascopy, Binance discovery, and the real-time feed gateway begin
@@ -986,6 +1080,15 @@ demotion is always allowed when evidence degrades.
 **Output boundary:** Data returns `MarketDataset`; Simulation owns trading-bar, M1,
 generated/real tick reconstruction, fill models, and simulated state.
 
+1. Simulation requests canonical history through the ordinary retrieval boundary —
+   `data.get_market_data()`, `data.get_tick_data()`.
+2. Data returns canonical bars or ticks with provenance and stops there —
+   `data.build_data_response()`.
+3. Simulation reconstructs its own model-specific tick stream from that canonical
+   evidence — `simulator.build_tick_timeline()`.
+4. Simulation applies its own fill and cost models; Data holds no simulation state —
+   `simulator.price_order()`, `simulator.match_order()`.
+
 **Failure behaviour:** Data-quality or no-lookahead violation aborts the dataset
 boundary; Data never returns a partially modeled simulation stream.
 
@@ -999,11 +1102,18 @@ boundary; Data never returns a partially modeled simulation stream.
 **Input boundary:** Strategy/Risk/Trading request read-only account evidence.
 **Output boundary:** `AccountStateSnapshot v1`.
 
-Data reads raw account/broker state through Brokers' `BrokerAdapter` read traits
-(`AccountProvider`), then normalizes provider state, connectivity/trading-allowance
-evidence, and staleness metadata into an immutable snapshot. Data holds no mutation
-capability and issues none: broker mutations are dispatched by Trading directly
-through Brokers' `BrokerAdapter` mutation operations.
+1. Resolve the read-only broker client for the requested account scope —
+   `brokers.create_broker_adapter()`, `data.wrap_broker_client()`.
+2. Assert the wrapper exposes no mutation capability before any call is issued —
+   `data.verify_read_only_call()`.
+3. Read raw account state through the Brokers read traits and normalize provider
+   state, connectivity/trading-allowance evidence, and staleness metadata —
+   `data.get_account_state_snapshot()`.
+4. Return an immutable snapshot carrying explicit freshness —
+   `utils.is_fresh()`, `utils.age_seconds()`.
+
+Data holds no mutation capability and issues none: broker mutations are dispatched by
+Trading directly through Brokers' `BrokerAdapter` mutation operations.
 
 **Integration test:**
 `tests/data/integration/test_broker_boundary.py::test_account_evidence_wraps_every_injected_broker()`
@@ -1016,10 +1126,20 @@ through Brokers' `BrokerAdapter` mutation operations.
 volatility, correlation, and crisis evidence for a declared symbol/account scope.
 **Output boundary:** `MarketContextEvidence v1` or a structured missing/stale error.
 
-Data obtains provider facts through Brokers read traits and Data-owned sources,
-normalizes timezones and freshness, preserves provenance and explicit missingness,
-and publishes no policy verdict. Risk alone decides whether the evidence permits an
-action. Missing mandatory evidence is never replaced with a fabricated default.
+1. Populate the calendar component of market context for the declared scope —
+   `data.populate_market_context_calendar()`.
+2. Obtain provider facts through Brokers read traits and Data-owned sources, then
+   normalize timezones, spreads, liquidity, volatility, and correlation —
+   `data.get_market_context_evidence()`.
+3. Derive and provenance the venue calendar state used by the evidence —
+   `data.derive_calendar_state()`, `data.evaluate_calendar_state()`,
+   `data.calendar_state_provenance()`.
+4. Preserve provenance and explicit missingness, and publish no policy verdict; the
+   receiving domain validates the evidence for its own use —
+   `risk.validate_market_context_evidence()`.
+
+Risk alone decides whether the evidence permits an action. Missing mandatory evidence
+is never replaced with a fabricated default.
 
 **Integration test:**
 `tests/data/integration/test_workflow_runtime.py::test_wf_data_014_and_015_return_fresh_provider_evidence()`
@@ -1034,11 +1154,17 @@ action. Missing mandatory evidence is never replaced with a fabricated default.
 explicit maximum age, and explicit allowed-path policy.
 **Output boundary:** `FXConversionEvidence v1` or a structured failure.
 
-Data resolves provider truth through read-only sources, selects an allowed acyclic
-path deterministically, preserves every leg and provenance reference, calculates
-the exact composite rate, and validates freshness. Consumers may multiply by the
-published rate but may not reconstruct a different path. No synthetic/default rate
-is emitted.
+1. Resolve provider truth for each candidate leg through read-only sources —
+   `data.resolve_source()`, `data.get_market_data()`.
+2. Select an allowed acyclic conversion path deterministically and calculate the
+   exact composite rate — `data.get_fx_conversion_evidence()`.
+3. Validate freshness against the explicit maximum age — `utils.is_fresh()`,
+   `utils.age_seconds()`.
+4. Publish every leg and provenance reference so the receiver can audit but not
+   re-derive the path — `data.build_data_response()`.
+
+Consumers may multiply by the published rate but may not reconstruct a different
+path. No synthetic/default rate is emitted.
 
 **Integration test:**
 `tests/data/integration/test_workflow_runtime.py::test_wf_data_014_and_015_return_fresh_provider_evidence()`
@@ -1055,13 +1181,14 @@ model, explicit spread policy, and a seed whenever the model is variable.
 source-bar phase metadata, or a bounded Parquet artifact describing the same
 generated evidence.
 
-1. Call `get_market_data()` to obtain bounded real source evidence.
+1. Obtain bounded real source evidence — `data.get_market_data()`,
+   `data.get_tick_data()`.
 2. Select an approved generation model, trading timeframe, spread model, and exact
-   point/spread parameters.
-3. Call `generate_tick_series()` and retain ordering, source-bar timestamps,
-   intra-bar phase, precision, and lineage.
-4. Call `generate_tick_series_to_parquet()` with an approved path and explicit chunk
-   bound when a durable artifact is required.
+   point/spread parameters — `data.get_timeframe_spec()`.
+3. Generate the tick series, retaining ordering, source-bar timestamps, intra-bar
+   phase, precision, and lineage — `data.generate_tick_series()`.
+4. Write a durable artifact with an approved path and explicit chunk bound when one
+   is required — `data.generate_tick_series_to_parquet()`.
 
 **Failure behaviour:** missing real evidence, incompatible timeframe/model,
 unbounded output, invalid spread parameters, or unsafe destination path fails closed;
@@ -1080,11 +1207,21 @@ and `tests/data/unit/test_ticks.py`.
 an explicit exchange calendar code, or an explicit revisioned weekly definition.
 **Output boundary:** ordered UTC sessions and deterministic `MarketHours`.
 
-Data reads broker sessions through the Brokers public contract, reads exchange
-sessions only from an explicit calendar identifier, or expands an operator-owned
-revisioned definition when a provider API is unavailable. It applies authoritative
-holiday closures before selecting current and next sessions. Missing or conflicting
-evidence fails closed; ticker text and recent ticks are never schedule evidence.
+1. Read broker sessions through the Brokers public contract when a configured broker
+   source is supplied — `brokers.create_broker_adapter()`,
+   `data.get_trading_sessions()`.
+2. Read exchange sessions only from an explicit calendar identifier —
+   `data.get_exchange_sessions()`.
+3. Expand an operator-owned revisioned definition when no provider API is available —
+   `data.get_current_schedule()`.
+4. Apply authoritative holiday closures, then select current and next sessions —
+   `data.derive_calendar_state()`, `data.evaluate_calendar_state()`,
+   `data.get_market_hours()`.
+5. Record which authority produced the published state —
+   `data.calendar_state_provenance()`.
+
+Missing or conflicting evidence fails closed; ticker text and recent ticks are never
+schedule evidence.
 
 **Integration tests:** `tests/data/integration/test_workflow_runtime.py`,
 `tests/data/unit/test_exchange_calendar.py`, and
@@ -1099,12 +1236,159 @@ evidence fails closed; ticker text and recent ticks are never schedule evidence.
 session definitions.
 **Output boundary:** ordered analytical liquidity labels only.
 
+1. Validate the exact symbol and aware UTC instant — `data.require_utc()`.
+2. Classify the instant against configured regional definitions using DST-aware
+   `zoneinfo` timezones — `data.get_active_market_sessions()`.
+3. Return ordered analytical liquidity labels only —
+   `data.build_data_response()`.
+
 Regional `zoneinfo` timezones provide DST-aware classification and definitions may
 cross midnight. The result has no `is_open` field and cannot authorize order
 validation; venue tradability remains exclusively in `MarketHours`.
 
 **Integration tests:** `tests/data/unit/test_named_sessions.py` and
 `tests/data/unit/test_market_hours.py`.
+
+---
+
+### `WF-DATA-020` — Economic Calendar and News-Restriction Evidence
+
+**Scope:** `Internal`
+**System workflow:** `SYS-WF-002`
+**Input boundary:** a bounded UTC date range plus either an explicit event query or
+an exact symbol whose event profile is required.
+**Output boundary:** provenanced economic events, a symbol event profile, and an
+explicit restriction verdict; never a trading authorization.
+
+1. Acquire calendar evidence from the configured read-only source —
+   `data.scrape_economic_calendar()`.
+2. Persist the acquired events so later reads are reproducible —
+   `data.get_persisted_events()`.
+3. Read bounded events for the requested range — `data.get_economic_events()`.
+4. Resolve the events attached to an exact symbol —
+   `data.get_symbol_economic_events()`, `data.get_symbol_event_profile()`.
+5. Evaluate the configured restriction window around each qualifying event —
+   `data.is_news_restricted()`, `data.is_news_restricted_events()`.
+
+**Failure behaviour:** an unavailable calendar source, an unbounded range, or an
+unknown symbol fails closed. A restriction verdict is evidence only; Risk and Trading
+remain the sole authorities on whether an action may proceed.
+
+**Integration test:** `Pending`
+
+---
+
+### `WF-DATA-021` — Persistence Lifecycle: Migration, Backup, Restore, Retention
+
+**Scope:** `Internal`
+**System workflow:** `None`
+**Input boundary:** an operator maintenance command against the Data-owned store.
+**Output boundary:** a verified schema ledger, a committed backup, a restored store,
+or an enforced retention result.
+
+1. Acquire the explicit database write lock before any schema or bulk operation —
+   `data.acquire_write_lock()`.
+2. Apply the authoritative migration manifest with ledger verification and checksum
+   validation — `data.run_data_migrations()`, `data.run_domain_migrations()`.
+3. Perform every step transactionally under the busy-timeout policy —
+   `data.execute_transaction()`.
+4. Commit a backup of the current store — `data.create_backup()`.
+5. Restore from a verified backup when recovery is required —
+   `data.restore_from_backup()`.
+6. Enforce the configured retention policy over aged partitions —
+   `data.enforce_retention_policy()`.
+
+**Failure behaviour:** a step checksum mismatch blocks database access rather than
+being repaired in place; applied migration steps are immutable; a failed restore
+never leaves a partially overwritten store.
+
+**Integration test:** `Pending`
+
+---
+
+### `WF-DATA-022` — Data Audit Trail
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-005`
+**Input boundary:** a redacted `AuditEvent v1` constructed by the emitting domain, or
+a bounded audit query.
+**Output boundary:** a durably persisted event, or one bounded ordered audit page.
+
+1. The emitting domain constructs and redacts its event at the shared boundary —
+   `utils.create_audit_event()`.
+2. Data validates the envelope and persists it under the write lock —
+   `data.persist_audit_event()`, `data.acquire_write_lock()`.
+3. The write commits transactionally with the action it records —
+   `data.execute_transaction()`.
+4. Operators read bounded ordered pages of recorded events —
+   `data.query_audit_events()`.
+5. Every read resolves its originating request identity for correlation —
+   `data.resolve_operation_request_id()`.
+
+**Failure behaviour:** an unredacted or malformed envelope is rejected; Data never
+authors audit content on another domain's behalf, and a failed persist surfaces
+rather than silently dropping the event.
+
+**Integration test:** `Pending`
+
+---
+
+### `WF-DATA-023` — Versioned Cache Lifecycle
+
+**Scope:** `Internal`
+**System workflow:** `SYS-WF-001`
+**Input boundary:** a cache identity derived from source revision, schema and
+normalization versions, raw hash when known, request dimensions, and policy.
+**Output boundary:** a cache hit, a miss, or an explicit invalidation; no stale
+record is served outside declared policy.
+
+1. Derive cache identity from the resolved source descriptor and request dimensions —
+   `data.get_source_descriptor()`, `data.derive_backfill_key()`.
+2. Look up the versioned entry — `data.get_cache_entry()`.
+3. Store a normalized result after a successful retrieval —
+   `data.put_cache_entry()`.
+4. Invalidate one entry when its source revision or schema version changes —
+   `data.clear_cache_entry()`.
+5. Clear the whole cache during maintenance or schema migration —
+   `data.clear_data_cache()`.
+
+**Failure behaviour:** a cache-write failure is disclosed as a warning and never
+changes returned records; an entry whose identity components disagree is treated as a
+miss rather than served.
+
+**Integration test:** `Pending`
+
+---
+
+### `WF-DATA-024` — Standalone Quality Inspection and Remediation
+
+**Scope:** `Internal`
+**System workflow:** `SYS-WF-001`
+**Input boundary:** normalized records or an existing dataset, plus the active
+quality profile.
+**Output boundary:** a bounded `QualityReport` with classified issues and a
+remediation summary.
+
+1. Resolve the active quality policy and its thresholds —
+   `data.get_quality_policy()`.
+2. Inspect an existing dataset or a bare record sequence —
+   `data.inspect_data_quality()`, `data.inspect_dataset_quality()`,
+   `data.inspect_records_quality()`.
+3. Run the individual detectors that populate the report —
+   `data.detect_timestamp_gaps()`, `data.detect_price_jumps()`,
+   `data.detect_flatline_periods()`, `data.detect_zero_volume_bars()`,
+   `data.detect_extreme_spread_widening()`.
+4. Classify each detected gap against the venue calendar so an expected closure is
+   not reported as a defect — `data.classify_gap()`.
+5. Merge per-record flags into one bounded report — `data.aggregate_flags()`.
+6. Summarize what a caller would need to remediate —
+   `data.summarize_quality_remediation()`.
+
+**Failure behaviour:** a report always reflects the records actually examined; a
+constant or unexamined score is never emitted, and a precision violation fails closed
+regardless of the configured failure behaviour.
+
+**Integration test:** `Pending`
 
 ---
 

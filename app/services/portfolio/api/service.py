@@ -7,26 +7,28 @@ from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.portfolio.exceptions import (
     PORTFOLIO_ERROR_CATALOG,
     PortfolioError,
 )
 from app.utils import (
-    AuthContext,
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
-    ValidationError,
     build_response_metadata,
     error_response,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     validate_id,
 )
+
+type AuthContext = Any
+type JsonValue = Any
+type ResponseMetadata = Any
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.portfolio.contracts import (
@@ -52,49 +54,49 @@ if TYPE_CHECKING:
 _OPERATION_FACTS = MappingProxyType(
     {
         "portfolio.api.service.construct": (
-            RiskLevel.MEDIUM,
+            "medium",
             False,
             True,
             False,
             True,
         ),
-        "portfolio.api.service.status": (RiskLevel.LOW, True, False, False, False),
+        "portfolio.api.service.status": ("low", True, False, False, False),
         "portfolio.api.service.activate": (
-            RiskLevel.CRITICAL,
+            "critical",
             False,
             True,
             False,
             True,
         ),
         "portfolio.api.service.assess_drift": (
-            RiskLevel.HIGH,
+            "high",
             False,
             True,
             False,
             True,
         ),
         "portfolio.api.service.submit_rebalance": (
-            RiskLevel.CRITICAL,
+            "critical",
             False,
             True,
             True,
             True,
         ),
         "portfolio.api.service.recompute_measurement": (
-            RiskLevel.HIGH,
+            "high",
             False,
             True,
             False,
             True,
         ),
         "portfolio.api.service.rollback": (
-            RiskLevel.CRITICAL,
+            "critical",
             False,
             True,
             False,
             True,
         ),
-        "portfolio.api.service.history": (RiskLevel.LOW, True, False, False, False),
+        "portfolio.api.service.history": ("low", True, False, False, False),
     }
 )
 
@@ -143,7 +145,10 @@ class PortfolioService:
             PortfolioError: If context type or trace identities conflict.
         """
         logger.debug("Validating Portfolio public boundary trace identities")
-        if not isinstance(auth_context, AuthContext):
+        if not all(
+            hasattr(auth_context, field)
+            for field in ("request_id", "workflow_id", "correlation_id")
+        ):
             raise PortfolioError("PORT_INVALID_INPUT", "AUTH_CONTEXT")
         observed_request_id = request_id or auth_context.request_id
         if (
@@ -187,7 +192,7 @@ class PortfolioService:
             if isinstance(value, str):
                 try:
                     return validate_id(value, expected_prefix=prefix)
-                except ValidationError:
+                except Exception:
                     pass
             return generate_id(prefix)
 

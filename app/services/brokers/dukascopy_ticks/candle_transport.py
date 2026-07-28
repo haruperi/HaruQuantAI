@@ -1,8 +1,8 @@
 """Bounded Dukascopy web-chart candle transport with cursor pagination."""
 
-# ruff: noqa: S310 - URL is constructed from a fixed HTTPS provider base.
 from __future__ import annotations
 
+# ruff: noqa: S310 - URL is constructed from a fixed HTTPS provider base.
 import asyncio
 import hashlib
 import json
@@ -24,7 +24,9 @@ from app.services.brokers.contracts.protocols import (
 )
 from app.services.brokers.dukascopy_ticks.candle_mapping import _provider_interval
 from app.services.brokers.dukascopy_ticks.instruments import _web_symbol
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.brokers.contracts import BrokerConnectionConfig

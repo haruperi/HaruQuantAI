@@ -15,7 +15,9 @@ from pydantic import (
 )
 
 from app.services.trading.contracts import ExecutionReceipt  # noqa: TC001
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 CANONICAL_ARTIFACT_TYPES = ("journal.jsonl", "result.json", "report.md")
 REPORT_SCHEMA_VERSION = "v1"

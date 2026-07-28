@@ -9,7 +9,9 @@ from typing import Protocol, runtime_checkable
 import numpy as np
 import pandas as pd
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _FAMILIES = (
     "returns",
@@ -48,15 +50,15 @@ class MetricValue:
         """Validate normalized metric evidence.
 
         Raises:
-            ValidationError: If metric metadata is contradictory.
+            ValueError: If metric metadata is contradictory.
         """
         logger.debug("Validating normalized Research metric value")
         if not self.name or not self.unit or self.sample_size < 0:
-            raise ValidationError("RES_INPUT_INVALID", "INVALID_METRIC_VALUE")
+            raise ValueError("RES_INPUT_INVALID", "INVALID_METRIC_VALUE")
         if self.value is None and self.undefined_reason is None:
-            raise ValidationError("RES_INPUT_INVALID", "UNDEFINED_REASON_REQUIRED")
+            raise ValueError("RES_INPUT_INVALID", "UNDEFINED_REASON_REQUIRED")
         if self.value is not None and not np.isfinite(self.value):
-            raise ValidationError("RES_NONFINITE_DATA", "METRIC_VALUE_NONFINITE")
+            raise ValueError("RES_NONFINITE_DATA", "METRIC_VALUE_NONFINITE")
 
 
 @runtime_checkable
@@ -104,13 +106,13 @@ class _FamilyCalculator:
             One normalized family value.
 
         Raises:
-            ValidationError: If required columns are missing.
+            ValueError: If required columns are missing.
         """
         logger.info("Computing Research metric family %s", self.family)
         data = context.data
         required = {"open", "high", "low", "close", "volume", "spread"}
         if not required <= set(data.columns):
-            raise ValidationError("RES_INPUT_INVALID", "OHLCVS_COLUMNS_REQUIRED")
+            raise ValueError("RES_INPUT_INVALID", "OHLCVS_COLUMNS_REQUIRED")
         close = data["close"].astype("float64")
         returns = np.log(close / close.shift(1)).dropna()
         calculations = {
@@ -157,16 +159,16 @@ class MetricRegistry:
         """Validate bounded unique membership.
 
         Raises:
-            ValidationError: If membership is empty, invalid, or duplicated.
+            ValueError: If membership is empty, invalid, or duplicated.
         """
         logger.debug("Validating Research metric registry")
         if not self._calculators or any(
             not isinstance(item, MetricCalculator) for item in self._calculators
         ):
-            raise ValidationError("RES_INPUT_INVALID", "INVALID_METRIC_CALCULATOR")
+            raise ValueError("RES_INPUT_INVALID", "INVALID_METRIC_CALCULATOR")
         families = tuple(item.family for item in self._calculators)
         if len(set(families)) != len(families):
-            raise ValidationError("RES_INPUT_INVALID", "DUPLICATE_METRIC_FAMILY")
+            raise ValueError("RES_INPUT_INVALID", "DUPLICATE_METRIC_FAMILY")
 
     @classmethod
     def from_calculators(
@@ -181,7 +183,7 @@ class MetricRegistry:
             New immutable registry.
 
         Raises:
-            ValidationError: If membership is invalid.
+            ValueError: If membership is invalid.
         """
         logger.info("Building isolated Research metric registry")
         return cls(tuple(calculators))
@@ -196,13 +198,13 @@ class MetricRegistry:
             Matching calculator.
 
         Raises:
-            ValidationError: If the family is absent.
+            ValueError: If the family is absent.
         """
         logger.debug("Resolving Research metric family %s", family)
         for calculator in self._calculators:
             if calculator.family == family:
                 return calculator
-        raise ValidationError("RES_INPUT_INVALID", "METRIC_FAMILY_NOT_FOUND")
+        raise ValueError("RES_INPUT_INVALID", "METRIC_FAMILY_NOT_FOUND")
 
     def all(self) -> tuple[MetricCalculator, ...]:
         """Return calculators in deterministic registration order.

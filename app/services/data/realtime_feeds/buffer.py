@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.data.contracts import DataError
 from app.services.data.persistence.transactions import _execute_transaction_raw
@@ -24,7 +24,7 @@ from app.services.data.realtime_feeds.contracts import (
     FeedEventResult,
     FeedStatus,
 )
-from app.utils import Clock, logger, utc_now
+from app.utils import get_logger, utc_now
 
 if TYPE_CHECKING:
     from app.services.data.realtime_feeds.contracts import (
@@ -38,11 +38,13 @@ from app.services.data.realtime_feeds.state import (
     _restore_active_feed,
 )
 
+logger = get_logger(__name__)
+
 
 def start_internal_feed(
     config: FeedConfig,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> FeedStatus:
     """Start one internal feed for a declared live-capable staging/production source.
 
@@ -358,7 +360,7 @@ def reconcile_feed_gap(
     request_id: str,
     *,
     reconcile: Callable[[], bool],
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> None:
     """Unblock a dropped feed only after injected reconciliation succeeds."""
     logger.info("Reconciling recorded gap for feed %s", feed_id)

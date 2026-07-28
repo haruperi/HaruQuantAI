@@ -1,4 +1,6 @@
-# mypy: disable-error-code="attr-defined,no-any-return,has-type"
+type StandardResponse[T] = (
+    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
+)
 """MT5 provider-native calculation operations."""
 
 from decimal import Decimal
@@ -12,7 +14,6 @@ from app.services.brokers.contracts import (
 from app.services.brokers.contracts.protocols import (
     _RequestValidationError,
 )
-from app.utils import StandardResponse  # noqa: TC001
 
 
 def _provider_ticket(value: str) -> int:

@@ -22,7 +22,9 @@ from app.services.analytics.metrics.returns import calculate_return_evidence
 from app.services.analytics.metrics.risk import calculate_risk_evidence
 from app.services.analytics.metrics.statistics import run_statistical_validation
 from app.services.analytics.metrics.trades import calculate_trade_evidence
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _daily_returns(return_section: SectionEvidence) -> tuple[float, ...]:

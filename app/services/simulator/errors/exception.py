@@ -6,7 +6,9 @@ from collections.abc import Mapping
 from types import MappingProxyType
 
 from app.services.simulator.errors.catalog import SIM_ERROR_CATALOG
-from app.utils import logger, redact_mapping_value, redact_text_value
+from app.utils import get_logger, redact_mapping_value, redact_text_value
+
+logger = get_logger(__name__)
 
 
 class SimulationError(Exception):

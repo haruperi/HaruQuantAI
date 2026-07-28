@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydantic import ValidationError
 
@@ -32,7 +32,11 @@ from app.services.simulator.validation import (
 )
 from app.services.simulator.validation.contracts import MarketDataValidationContext
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent
-from app.utils import AuthContext, canonical_digest, canonical_json, logger
+from app.utils import canonical_digest, canonical_json, get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import (

@@ -12,7 +12,7 @@ even when the injected adapter implements it. "Data cannot place a trade" become
 property the code asserts rather than a property the code relies on others to maintain.
 
 **The allow-list is closed, not a deny-list.** Denying known-bad names would permit any
-mutation nobody thought to list — and a broker SDK adding ``submit_order_v2`` in a minor
+mutation nobody thought to list â€” and a broker SDK adding ``submit_order_v2`` in a minor
 release should not silently become reachable. Anything not named here is refused,
 including methods that do not exist yet.
 
@@ -30,7 +30,9 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 __all__ = [
     "READ_ONLY_BROKER_METHODS",
@@ -42,7 +44,7 @@ __all__ = [
 # The complete set of broker operations Data may invoke, derived from the call sites
 # that exist rather than from the specification.
 #
-# The Data README proposed a four-name list — `get_bars`, `get_ticks`, `is_connected`,
+# The Data README proposed a four-name list â€” `get_bars`, `get_ticks`, `is_connected`,
 # `connect`. Applying it literally would have broken two working capabilities:
 # `get_bars` is not a real method (`get_historical_bars` is), and account snapshots plus
 # symbol discovery call nine further reads that the list omitted. An allow-list built
@@ -119,7 +121,7 @@ def verify_read_only_call(method_name: str) -> StandardResponse[bool]:
 class ReadOnlyBrokerProxy:
     """A broker adapter facade that exposes only Data's permitted read operations.
 
-    Attribute access is intercepted, so the restriction holds for any call route —
+    Attribute access is intercepted, so the restriction holds for any call route â€”
     including a method looked up dynamically by name. Private and dunder attributes are
     refused too: allowing them would let a caller reach the wrapped adapter and bypass
     the proxy entirely.
@@ -159,7 +161,7 @@ class ReadOnlyBrokerProxy:
     def __setattr__(self, name: str, value: object) -> None:
         """Refuse every attribute assignment.
 
-        Mutating the proxy — or through it, the wrapped client — would defeat the
+        Mutating the proxy â€” or through it, the wrapped client â€” would defeat the
         contract this class exists to enforce.
 
         Args:

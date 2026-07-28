@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from app.services.data import (
     AccountStateSnapshot,  # noqa: TC001 - runtime annotation and model resolution
@@ -35,7 +35,11 @@ from app.services.strategy.diagnostics import (
 )
 from app.services.strategy.intents import TradeIntent, build_trade_intent
 from app.services.strategy.replay import create_strategy_replay_manifest
-from app.utils import StandardResponse, canonical_digest, logger
+from app.utils import canonical_digest, get_logger
+
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 
 @runtime_checkable

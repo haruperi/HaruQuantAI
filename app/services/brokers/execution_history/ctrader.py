@@ -1,9 +1,11 @@
-# mypy: disable-error-code="attr-defined,no-any-return,has-type"
+type StandardResponse[T] = (
+    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
+)
 """cTrader execution-history read operations."""
 
 # ruff: noqa: A002 - public protocol signatures are normative.
 from datetime import datetime
-from typing import cast
+from typing import Any, cast
 
 from app.services.brokers.contracts import (
     BrokerCapabilityId,
@@ -21,7 +23,6 @@ from app.services.brokers.ctrader_session.mapping import (
     _map_position,
     _optional,
 )
-from app.utils import StandardResponse  # noqa: TC001
 
 
 class _CTraderExecutionHistoryMixin:

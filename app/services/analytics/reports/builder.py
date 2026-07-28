@@ -27,8 +27,9 @@ from app.services.analytics.metrics.trades import (
     MIN_METRIC_SAMPLES,
 )
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
-from app.utils import ValidationError as UtilsValidationError
-from app.utils import canonical_json, derive_stable_id, logger, validate_id
+from app.utils import canonical_json, derive_stable_id, get_logger, validate_id
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import MarketDataset
@@ -190,7 +191,7 @@ def _build_performance_report(
     try:
         validate_id(request_id, expected_prefix="req")
         validate_id(correlation_id, expected_prefix="cor")
-    except UtilsValidationError as error:
+    except Exception as error:
         raise AnalyticsValidationError("request_id is invalid") from error
     result = adapt_trading_result(
         source,

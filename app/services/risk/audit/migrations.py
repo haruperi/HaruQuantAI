@@ -5,7 +5,9 @@ import hashlib
 from app.services.data import (
     MigrationStep,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _STATEMENTS = (
     """CREATE TABLE IF NOT EXISTS risk_policy_versions (

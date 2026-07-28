@@ -10,23 +10,35 @@ import time
 from collections.abc import Callable, Mapping
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Final, ParamSpec, TypeVar, cast
+from typing import Any, Final, Literal, ParamSpec, TypeVar, cast
 
 from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
 from app.utils import (
-    HaruQuantError,
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     error_response,
     exception_response,
     generate_id,
-    logger,
+    get_logger,
     redact_text_value,
     success_response,
 )
+
+type JsonValue = Any
+type StandardResponse[T] = Any
+type ResponseMetadata = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+
+class HaruQuantError(Exception):
+    """Local safe error used for the Indicators response boundary."""
+
+    def __init__(self, code: str, detail: str) -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+logger = get_logger(__name__)
 
 _P = ParamSpec("_P")
 _R = TypeVar("_R")
@@ -235,11 +247,7 @@ def guard_public_boundary(
         operation = (
             f"{function.__module__.removeprefix('app.services.')}.{function.__name__}"
         )
-        risk_level = (
-            RiskLevel.NONE
-            if function.__module__.endswith(".registry")
-            else RiskLevel.LOW
-        )
+        risk_level = "none" if function.__module__.endswith(".registry") else "low"
 
         def metadata() -> ResponseMetadata:
             """Build the common pure/read-only operation metadata.

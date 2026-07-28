@@ -2,10 +2,14 @@
 
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
-from app.utils import AuditEvent, AuthContext, generate_id, logger
+from app.utils import create_audit_event, generate_id, get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import SimulationRunDependencies
@@ -42,7 +46,7 @@ def emit_simulation_audit(
     """
     logger.info("Persisting Simulation audit action %s", action)
     try:
-        event = AuditEvent(
+        event = create_audit_event(
             contract_version="v1",
             schema_id="utils.audit_event.v1",
             event_id=generate_id("evt"),

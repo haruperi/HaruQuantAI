@@ -3,15 +3,40 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import dataclass
 from types import MappingProxyType
+from typing import Literal
 
 from app.utils import (
-    ErrorDefinition,
-    HaruQuantError,
-    logger,
+    get_logger,
     redact_mapping_value,
     validate_error_catalog,
 )
+
+
+class HaruQuantError(Exception):
+    """Local safe error base for Optimization exceptions."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorDefinition:
+    """Immutable domain-owned error catalogue entry."""
+
+    code: str
+    domain: str
+    description: str
+    category: str
+    severity: Literal["info", "warning", "error", "critical"]
+    retryable: bool
+    operator_action: str
+
+
+logger = get_logger(__name__)
 
 _OPTIMIZATION_ERROR_DEFINITIONS = (
     ErrorDefinition(

@@ -11,20 +11,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from app.utils import (
-    BoundLogger,
-    ConfigurationError,
-    LoggingSettings,
-    RedactingFilter,
-    StructuredFormatter,
-    configure_logging,
-    flush_logging,
-    get_logger,
-    shutdown_logging,
-)
-from app.utils import (
-    logger as global_logger,
-)
+from app.utils import configure_logging, flush_logging, get_logger, shutdown_logging
+from app.utils.errors.exceptions import ConfigurationError
+from app.utils.logging.logger import BoundLogger, RedactingFilter, StructuredFormatter
+from app.utils.logging.logger import logger as global_logger
+from app.utils.settings.models import LoggingSettings
 
 
 @pytest.fixture(autouse=True)
@@ -243,7 +234,7 @@ def test_import_registers_no_handlers() -> None:
 def test_import_time_bound_log_does_not_activate_defaults(tmp_path: Path) -> None:
     probe = tmp_path / "lazy_logging_probe.py"
     probe.write_text(
-        "from app.utils import logger\nlogger.info('import-time record')\n",
+        "from app.utils import get_logger\nget_logger('haruquant').info('import-time record')\n",
         encoding="utf-8",
     )
     environment = os.environ.copy()

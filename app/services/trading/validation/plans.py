@@ -1,13 +1,19 @@
 """Side-effect-free deterministic Trading execution-plan construction."""
 
 from hashlib import sha256
+from typing import Any, Literal
 
 from app.services.trading.contracts import OrderIntent, TradingError, TradingRequest
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.validation.readiness import (
     ReadinessAssessment,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import RiskLevel, StandardResponse, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 def _build_execution_plan_value(
@@ -149,7 +155,7 @@ def build_execution_plan(
         value,
         operation="trading.build_execution_plan",
         message="Trading execution plan built",
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=True,

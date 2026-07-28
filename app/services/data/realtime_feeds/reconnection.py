@@ -2,7 +2,7 @@
 
 Retry is bounded and deliberate: a delay derived from the attempt count, capped, and
 exhausted into an open circuit rather than retried forever. Blind retries are forbidden
-by ``NFR-DATA-004`` — an unbounded reconnect loop against a failing provider is
+by ``NFR-DATA-004`` â€” an unbounded reconnect loop against a failing provider is
 indistinguishable from a working feed at the status boundary.
 """
 
@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Callable
 from datetime import timedelta
+from typing import Any
 
 from app.services.data.contracts import DataError
 from app.services.data.realtime_feeds.state import (
@@ -18,7 +19,9 @@ from app.services.data.realtime_feeds.state import (
     ActiveFeed,
     _persist_feed_status,
 )
-from app.utils import Clock, logger, utc_now
+from app.utils import get_logger, utc_now
+
+logger = get_logger(__name__)
 
 
 def _reconnect_delay_seconds(active: ActiveFeed) -> int:
@@ -45,7 +48,7 @@ def reconnect_feed(
     *,
     reconnect: Callable[[], bool],
     wait: Callable[[int], None],
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> None:
     """Attempt reconnecting the feed using reconnect policy parameters.
 

@@ -13,7 +13,7 @@ it.
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import Final
+from typing import Any, Final
 
 from app.services.data.contracts import DataError
 from app.services.data.data_jobs.backfill import (
@@ -28,7 +28,9 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import Clock, generate_id, logger, utc_now
+from app.utils import generate_id, get_logger, utc_now
+
+logger = get_logger(__name__)
 
 BACKFILL_MAX_RECORDS_PER_CHUNK: Final = 10_000
 BACKFILL_MAX_SOURCE_SPAN: Final = timedelta(days=1)
@@ -38,7 +40,7 @@ JOB_LEASE_TIMEOUT_SECONDS: Final = 300
 def recover_update_jobs(
     request_id: str | None = None,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> RecoveryReport:
     """Finish prepared publications and classify unrecoverable checkpoints."""
     rid = request_id or generate_id("req")

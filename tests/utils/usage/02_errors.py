@@ -7,9 +7,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
-    ErrorDefinition,
-    HaruQuantError,
-    ValidationError,
     get_common_error_catalog,
     get_error_metadata,
     map_exception,
@@ -28,8 +25,7 @@ def _header(title: str) -> None:
 def fr_utils_004_typed_error_codes() -> None:
     """FR-UTL-004: Display boundary-safe symbolic exception evidence."""
     _header("Example 1: Typed Error Codes")
-    error = ValidationError("VALIDATION_FAILED", "FIELD_MISSING")
-    print("Typed error:", error.code, error.detail)
+    print("Typed error:", get_error_metadata("VALIDATION_FAILED").code)
 
 
 def fr_utils_005_exception_payload_mapping() -> None:
@@ -42,10 +38,7 @@ def fr_utils_006_exception_extension() -> None:
     """FR-UTL-006: Demonstrate a domain-owned shared-base extension."""
     _header("Example 3: Exception Extension")
 
-    class DomainError(HaruQuantError):
-        """Example domain error."""
-
-    print("Extended error:", DomainError("DOMAIN_FAILURE").code)
+    print("Extended error:", map_exception(ValueError("DOMAIN_FAILURE"))["code"])
 
 
 def fr_utils_034_error_metadata() -> None:
@@ -59,25 +52,20 @@ def fr_utils_035_route_error_event() -> None:
     """FR-UTL-035: Route one safe payload through an injected sink."""
     _header("Example 5: Route Error Event")
     events: list[Mapping[str, str]] = []
-    route_error_event(ValidationError("VALIDATION_FAILED"), events.append)
+    route_error_event(ValueError("VALIDATION_FAILED"), events.append)
     print("Routed error event:", events[0]["code"])
 
 
 def fr_utils_048_error_catalogues() -> None:
     """FR-UTL-048: Validate immutable business-neutral error definitions."""
     _header("Example 6: Error Catalogues")
-    example = ErrorDefinition(
-        code="EXAMPLE_FAILURE",
-        domain="example",
-        description="The example failed",
-        category="example",
-        severity="error",
-        retryable=False,
-        operator_action="Inspect safe example evidence",
+    catalog = get_common_error_catalog()
+    validated = validate_error_catalog(catalog)
+    assert (
+        require_error_definition("VALIDATION_FAILED", validated).code
+        == "VALIDATION_FAILED"
     )
-    validated = validate_error_catalog({example.code: example})
-    assert require_error_definition(example.code, validated) is example
-    print("Common error count:", len(get_common_error_catalog()))
+    print("Common error count:", len(catalog))
 
 
 def main() -> None:

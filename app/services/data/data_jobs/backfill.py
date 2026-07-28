@@ -6,7 +6,7 @@ import hashlib
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, Literal, cast
+from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import DataError
@@ -25,7 +25,9 @@ from app.services.data.persistence.contracts import (
 )
 from app.services.data.persistence.dataset_writer import _save_dataset_raw
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import Clock, logger, utc_now
+from app.utils import get_logger, utc_now
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.contracts.dataset import MarketDataset
@@ -414,7 +416,7 @@ def _finalize_checkpoint(
 def execute_backfill_chunk(
     request: BackfillChunkRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> BackfillChunkResult:
     """Execute one bounded chunk through a recoverable publication protocol."""
     logger.info("Executing backfill chunk for job %s", request.job_id)

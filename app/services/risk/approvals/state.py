@@ -10,7 +10,9 @@ from decimal import Decimal
 from typing import Literal, Protocol
 
 from app.services.risk.contracts import RiskApprovalToken  # noqa: TC001
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class _TokenStateStore(Protocol):  # pragma: no cover

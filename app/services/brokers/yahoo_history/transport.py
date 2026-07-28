@@ -1,8 +1,8 @@
 """Bounded yfinance history transport without direct pandas imports."""
 
-# ruff: noqa: ANN401 - yfinance returns a transitive table without a stable type.
 from __future__ import annotations
 
+# ruff: noqa: ANN401 - yfinance returns a transitive table without a stable type.
 import asyncio
 import importlib
 import time
@@ -15,7 +15,9 @@ from app.services.brokers.adapter_runtime.circuit_breaker import (
     _TransportCircuitBreaker,
 )
 from app.services.brokers.contracts.protocols import _CircuitOpenError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class _YahooTransport:

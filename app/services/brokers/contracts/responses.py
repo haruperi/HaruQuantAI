@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from collections.abc import Mapping
 from datetime import datetime
-from typing import cast
+from typing import Any, Literal, cast
 
 from app.services.brokers.contracts.enums import (
     BrokerCapabilityId,
@@ -15,16 +15,17 @@ from app.services.brokers.contracts.enums import (
 from app.services.brokers.contracts.error_catalog import BROKER_ERROR_CATALOG
 from app.services.brokers.contracts.models import BrokerError  # noqa: TC001
 from app.utils import (
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
+    build_response_metadata,
     error_response,
     format_utc_timestamp,
     get_execution_ms,
     success_response,
     to_json_safe,
 )
+
+type JsonValue = Any
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 _TRADE_OPERATIONS = frozenset(
     {
@@ -78,12 +79,12 @@ def _risk_level(operation: BrokerCapabilityId) -> RiskLevel:
         Static invocation-risk classification.
     """
     if operation in _TRADE_OPERATIONS:
-        return RiskLevel.CRITICAL
+        return "critical"
     if operation is BrokerCapabilityId.CHECK_ORDER:
-        return RiskLevel.MEDIUM
+        return "medium"
     if operation in _LOCAL_READ_OPERATIONS:
-        return RiskLevel.NONE
-    return RiskLevel.LOW
+        return "none"
+    return "low"
 
 
 def _error_details(error: BrokerError) -> Mapping[str, JsonValue]:
@@ -177,12 +178,12 @@ def build_broker_response[T](
         "legacy_contract_version": "v1",
         "legacy_schema_id": "brokers.result.v1",
     }
-    metadata = ResponseMetadata(
+    metadata = build_response_metadata(
         name=name or f"brokers.adapter.{operation.value}",
         domain="brokers",
         risk_level=risk_level or _risk_level(operation),
         request_id=request_id,
-        execution_ms=execution_ms,
+        start_time=start_time,
         read_only=(
             operation not in _STATE_MUTATION_OPERATIONS
             if read_only is None

@@ -7,7 +7,9 @@ from collections.abc import Mapping
 from decimal import ROUND_HALF_EVEN, Decimal
 from typing import TYPE_CHECKING
 
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.optimization.parameters.contracts import (

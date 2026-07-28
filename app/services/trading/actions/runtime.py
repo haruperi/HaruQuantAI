@@ -8,7 +8,7 @@ import asyncio
 from collections.abc import Mapping
 from datetime import datetime
 from hashlib import sha256
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -21,7 +21,12 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.monitoring import OperationalEvent, emit_runtime_event
-from app.utils import RiskLevel, StandardResponse, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.risk import RiskDecisionPackage
@@ -335,7 +340,7 @@ async def _run_live_evaluation_cycle_value(
                     {"mutation_performed": False},
                     operation="trading.run_live_evaluation_cycle",
                     message="Strategy produced a neutral no-action outcome",
-                    risk_level=RiskLevel.HIGH,
+                    risk_level="high",
                     request_id=_required_text(evidence, "request_id"),
                     correlation_id=_required_text(evidence, "correlation_id"),
                     read_only=True,

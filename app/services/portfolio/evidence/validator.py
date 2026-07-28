@@ -21,7 +21,9 @@ from app.services.data import (
 from app.services.portfolio.exceptions import PortfolioError
 from app.services.risk import DecisionState, StrategyOperationalEligibilityDecision
 from app.services.strategy import StrategyLifecycleStatus, ValidatedStrategyRef
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.portfolio.config import PortfolioSettings

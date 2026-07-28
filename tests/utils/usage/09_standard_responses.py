@@ -8,14 +8,14 @@ from types import MappingProxyType
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from typing import Any
+
 from app.utils import (
-    COMMON_ERROR_CATALOG,
-    ResponseMetadata,
-    RiskLevel,
     build_response_metadata,
     error_response,
     exception_response,
     generate_id,
+    get_common_error_catalog,
     get_execution_ms,
     success_response,
 )
@@ -28,12 +28,12 @@ class ExampleResult:
     value: int
 
 
-def _metadata() -> ResponseMetadata:
+def _metadata() -> Any:
     """Build bounded example response metadata."""
     return build_response_metadata(
         name="utils.standard_response_example",
         domain="utils",
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         request_id=generate_id("req"),
         start_time=time.perf_counter_ns(),
         read_only=True,
@@ -65,7 +65,7 @@ def fr_utils_042_through_047_standard_response() -> None:
         details={"field": "value"},
         message="Example validation failed",
         metadata=_metadata(),
-        catalog=COMMON_ERROR_CATALOG,
+        catalog=get_common_error_catalog(),
     )
     assert failure.data is None
     assert failure.error is not None
@@ -75,7 +75,7 @@ def fr_utils_042_through_047_standard_response() -> None:
         RuntimeError("secret=must-not-escape"),
         message="Example failed safely",
         metadata=_metadata(),
-        catalog=COMMON_ERROR_CATALOG,
+        catalog=get_common_error_catalog(),
     )
     assert unexpected.error is not None
     assert unexpected.error.code == "INTERNAL_ERROR"

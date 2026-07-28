@@ -7,7 +7,9 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from app.services.research.contracts import ResearchProfileSnapshot
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import ResearchScorecard
@@ -38,14 +40,14 @@ def build_research_profile_snapshot(
         Validated ``ResearchProfileSnapshot``.
 
     Raises:
-        ValidationError: If any stage is unversioned or hashes are invalid.
+        ValueError: If any stage is unversioned or hashes are invalid.
     """
     logger.info("Building Research profile snapshot")
     if not stages:
-        raise ValidationError("RES_INPUT_INVALID", "EMPTY_SNAPSHOT_STAGES")
+        raise ValueError("RES_INPUT_INVALID", "EMPTY_SNAPSHOT_STAGES")
     for value in stages.values():
         if not isinstance(value, Mapping) or "schema_version" not in value:
-            raise ValidationError("RES_INPUT_INVALID", "UNVERSIONED_SNAPSHOT_STAGE")
+            raise ValueError("RES_INPUT_INVALID", "UNVERSIONED_SNAPSHOT_STAGE")
     return ResearchProfileSnapshot(
         "v1",
         dict(stages),
@@ -70,7 +72,7 @@ def build_profile_summary(
         Versioned summary preserving warning count and readiness.
 
     Raises:
-        ValidationError: If the snapshot is invalid.
+        ValueError: If the snapshot is invalid.
     """
     logger.debug("Building Research profile summary")
     return {
@@ -95,7 +97,7 @@ def build_dashboard_summary(
         Bounded dashboard block with verdict, score, and top reasons.
 
     Raises:
-        ValidationError: If the snapshot is invalid or oversized.
+        ValueError: If the snapshot is invalid or oversized.
     """
     logger.debug("Building Research dashboard summary")
     reasons: list[JSONValue] = [

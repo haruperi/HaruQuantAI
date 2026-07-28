@@ -11,7 +11,9 @@ from typing import TYPE_CHECKING, Literal, cast
 
 from app.services.data import OHLCVRecord
 from app.services.strategy.contracts import StrategySignal
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import MarketDataset

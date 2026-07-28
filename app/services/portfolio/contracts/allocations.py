@@ -20,7 +20,9 @@ from app.services.portfolio.contracts.requests import (
 from app.services.portfolio.contracts.results import (
     PortfolioComponentWeight,  # noqa: TC001
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 PlanStatus = Literal[
     "no_action",

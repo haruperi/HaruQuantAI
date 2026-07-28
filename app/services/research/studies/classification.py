@@ -5,7 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import EdgeResult
@@ -32,13 +34,13 @@ def classify_symbol(
         Advisory classification with uncertainty preserved.
 
     Raises:
-        ValidationError: If versions or study identities are incompatible.
+        ValueError: If versions or study identities are incompatible.
     """
     logger.info("Classifying Research symbol evidence")
     if policy_version != "v1":
-        raise ValidationError("RES_VERSION_INCOMPATIBLE", "CONFIRMATION_POLICY_NOT_V1")
+        raise ValueError("RES_VERSION_INCOMPATIBLE", "CONFIRMATION_POLICY_NOT_V1")
     if mean_reversion.schema_version != trend_persistence.schema_version:
-        raise ValidationError("RES_VERSION_INCOMPATIBLE", "EDGE_SCHEMA_MISMATCH")
+        raise ValueError("RES_VERSION_INCOMPATIBLE", "EDGE_SCHEMA_MISMATCH")
     confirmed = {
         "mean_reversion": mean_reversion.classification == "confirmed",
         "trend_persistence": trend_persistence.classification == "confirmed",

@@ -13,7 +13,24 @@ from typing import Annotated, Literal
 import pandas as pd
 from pydantic import PlainSerializer
 
-from app.utils import SecurityError, ValidationError, logger
+from app.utils import get_logger
+
+
+class ValidationError(ValueError):
+    """Research-owned result validation error."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        super().__init__(f"{code}:{detail}")
+
+
+class SecurityError(ValueError):
+    """Research-owned result security error."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        super().__init__(f"{code}:{detail}")
+
+
+logger = get_logger(__name__)
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]

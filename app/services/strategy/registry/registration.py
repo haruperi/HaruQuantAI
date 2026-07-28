@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from typing import Any
 
 from app.services.data import (
     DataError,
@@ -36,7 +37,11 @@ from app.services.strategy.registry._mutations import (
     _mutation_id,
     _publish_mutation,
 )
-from app.utils import AuthContext, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 
 @guard_strategy_boundary

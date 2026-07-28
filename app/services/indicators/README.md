@@ -403,13 +403,31 @@ No experimental, optional, or future callable is exported in the initial package
 > `python tests/indicators/usage/workflows/run_all.py`. This satisfies
 > `NFR-INDI-011` and complements feature-level usage evidence.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-INDI-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-INDI-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-INDI-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-INDI-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-INDI-001`, `WF-INDI-002`, and `WF-INDI-004` were absorbed into `WF-INDI-PRI`,
+`WF-INDI-SEC`, and `WF-INDI-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-INDI-006`.
+
 | Workflow | Standalone program |
 |---|---|
-| `WF-INDI-001` | `tests/indicators/usage/workflows/wf_indi_001_core_batch_indicator_calculation.py` |
-| `WF-INDI-002` | `tests/indicators/usage/workflows/wf_indi_002_decision_time_consumption.py` |
+| `WF-INDI-PRI` | `tests/indicators/usage/workflows/wf_indi_pri_core_batch_indicator_calculation.py` |
+| `WF-INDI-SEC` | `tests/indicators/usage/workflows/wf_indi_sec_decision_time_consumption.py` |
+| `WF-INDI-TER` | `tests/indicators/usage/workflows/wf_indi_ter_availability_aware_multi_timeframe_calculation.py` |
 | `WF-INDI-003` | `tests/indicators/usage/workflows/wf_indi_003_warmup_coordination.py` |
-| `WF-INDI-004` | `tests/indicators/usage/workflows/wf_indi_004_availability_aware_multi_timeframe_calculation.py` |
 | `WF-INDI-005` | `tests/indicators/usage/workflows/wf_indi_005_static_registry_discovery_validation.py` |
+| `WF-INDI-006` | `tests/indicators/usage/workflows/wf_indi_006_candlestick_pattern_detection.py` |
+| `WF-INDI-007` | `tests/indicators/usage/workflows/wf_indi_007_volume_profile_distribution.py` |
+| `WF-INDI-008` | `tests/indicators/usage/workflows/wf_indi_008_capability_matrix_introspection.py` |
 
 ### Status values
 
@@ -421,19 +439,22 @@ No experimental, optional, or future callable is exported in the initial package
 
 ### Workflow register
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-INDI-001` | Internal | Core batch indicator calculation | One normalized `MarketDataset v1` plus approved config | Atomic `IndicatorResult` with values, availability, quality, and manifest | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-007..010` |
-| Completed | `WF-INDI-002` | Cross-domain | Decision-time consumption | Trading or Simulation supplies Data-owned normalized input | `IndicatorSeries v1` returned for Strategy consumption | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-008` |
-| Completed | `WF-INDI-003` | Cross-domain | Warmup coordination | Caller queries an official `WarmupRequirement` and supplies sufficient history | Warmup rows retained and explicitly unavailable until safe | `FR-INDI-005 → FR-INDI-014 → FR-INDI-015..035` |
-| Completed | `WF-INDI-004` | Cross-domain | Availability-aware multi-timeframe orchestration compatibility | Data supplies separately keyed aligned primary and higher-timeframe datasets; caller calculates each independently | Separately returned series preserve source availability and can be combined by the orchestrator without lookahead | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-007` |
-| Completed | `WF-INDI-005` | Internal | Static registry discovery and validation | Caller supplies official indicator ID/config | Validated spec/capability record or deterministic refusal | `FR-INDI-011..014` |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-INDI-PRI` | Internal | Core batch indicator calculation | One normalized `MarketDataset v1` plus approved config | Atomic `IndicatorResult` with values, availability, quality, and manifest | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-007..010` |
+| Completed | Secondary | `WF-INDI-SEC` | Cross-domain | Decision-time consumption | Trading or Simulation supplies Data-owned normalized input | `IndicatorSeries v1` returned for Strategy consumption | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-008` |
+| Completed | Tertiary | `WF-INDI-TER` | Cross-domain | Availability-aware multi-timeframe orchestration compatibility | Data supplies separately keyed aligned primary and higher-timeframe datasets; caller calculates each independently | Separately returned series preserve source availability and can be combined by the orchestrator without lookahead | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-007` |
+| Completed | Supporting | `WF-INDI-003` | Cross-domain | Warmup coordination | Caller queries an official `WarmupRequirement` and supplies sufficient history | Warmup rows retained and explicitly unavailable until safe | `FR-INDI-005 → FR-INDI-014 → FR-INDI-015..035` |
+| Completed | Supporting | `WF-INDI-005` | Internal | Static registry discovery and validation | Caller supplies official indicator ID/config | Validated spec/capability record or deterministic refusal | `FR-INDI-011..014` |
+| Completed | Supporting | `WF-INDI-006` | Internal | Candlestick pattern detection | One normalized `MarketDataset v1` and an official pattern ID | Boolean pattern series with the same availability and warmup semantics as any other indicator | `Pending` |
+| Completed | Supporting | `WF-INDI-007` | Internal | Volume-profile and volume-flow distribution | One normalized `MarketDataset v1` carrying volume plus bounded bucket configuration | Distribution or flow series with explicit unavailability where volume is absent | `Pending` |
+| Completed | Supporting | `WF-INDI-008` | Cross-domain | Capability-matrix introspection | Caller queries the static registry for capabilities and warmup cost | Capability matrix and per-indicator `WarmupRequirement` used to plan history before any calculation | `Pending` |
 
-`WF-INDI-001` through `WF-INDI-004` are multi-feature completion gates covering
-Core, trend, volatility, momentum, volume, and candles. `WF-INDI-005` covers the
-immutable registry and validation boundary.
+`WF-INDI-PRI`, `WF-INDI-SEC`, `WF-INDI-TER`, and `WF-INDI-003` are multi-feature
+completion gates covering Core, trend, volatility, momentum, volume, and candles.
+`WF-INDI-005` covers the immutable registry and validation boundary.
 
-### `WF-INDI-001` — Core Batch Indicator Calculation
+### `WF-INDI-PRI` — Core Batch Indicator Calculation
 
 **Scope:** `Internal`
 **System workflow:** `None`
@@ -443,11 +464,21 @@ immutable registry and validation boundary.
 **Output boundary:** An atomic `IndicatorResult`; the input contract remains
 unchanged.
 
-1. `validate_indicator()` resolves the immutable `IndicatorSpec` and validates the entire config and input before formula work.
-2. One official convenience function executes its approved vectorized formula for the dataset's single symbol in canonical row order.
-3. The function retains warmup/unavailable rows and derives `available_at` and source-window bounds.
-4. Data-owned provenance and quality are propagated without redefining upstream policy.
-5. The function returns deterministic values, output names, checksums, and manifest metadata.
+1. Resolve the immutable `IndicatorSpec` and validate the entire config and input
+   before formula work — `indicators.get_indicator()`,
+   `indicators.validate_indicator()`.
+2. Execute the approved vectorized formula for the dataset's single symbol in
+   canonical row order — `indicators.ema()`, `indicators.sma()`, `indicators.wma()`,
+   `indicators.hull_ma()`, `indicators.bollinger_bands()`, `indicators.adx()`,
+   `indicators.zigzag()`, `indicators.atr()`, `indicators.adr()`,
+   `indicators.rolling_volatility()`, `indicators.standard_deviation()`,
+   `indicators.rsi()`, `indicators.williams_r()`.
+3. Retain warmup/unavailable rows and derive `available_at` and source-window
+   bounds — `indicators.get_warmup_requirement()`.
+4. Propagate Data-owned provenance and quality without redefining upstream policy —
+   `data.inspect_dataset_quality()`.
+5. Return deterministic values, output names, checksums, and manifest metadata —
+   `utils.canonical_digest()`.
 
 **Failure behavior:** validation or limit failure produces one Core MVP `IND_*` error before calculation; formula failure is atomic; output collision or detected input mutation fails rather than overwriting data.
 
@@ -464,13 +495,24 @@ flowchart LR
     A --> B --> C --> D --> E
 ```
 
-### `WF-INDI-002` — Decision-Time Consumption
+### `WF-INDI-SEC` — Decision-Time Consumption
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-001`, `SYS-WF-002`
 
 **Input boundary:** Trading (live/paper) or Simulation (historical) supplies Data-owned normalized market data.
 **Output boundary:** Indicators returns `IndicatorSeries v1`; Strategy consumes only rows whose `available_at <= decision_time`.
+
+1. The orchestrator obtains Data-owned normalized market data —
+   `data.get_market_data()`.
+2. The orchestrator calculates one official indicator over that dataset —
+   `indicators.validate_indicator()`, then the official function for the requested
+   indicator (see `WF-INDI-PRI` step 2).
+3. Indicators returns `IndicatorSeries v1` describing availability per row and
+   nothing more — `indicators.get_warmup_requirement()`.
+4. Strategy consumes only rows whose `available_at <= decision_time` —
+   `strategy.run_vectorized_strategy_signals()`,
+   `strategy.run_event_strategy_hook()`.
 
 Indicators calculates and describes availability only. Trading/Simulation owns orchestration, and Strategy/Simulation owns enforcement of the decision-time filter and any resulting action.
 
@@ -500,6 +542,15 @@ sequenceDiagram
 **Input boundary:** The caller resolves `WarmupRequirement`, then Data supplies the requested normalized history.
 **Output boundary:** Indicators retains all rows and marks warmup/unavailable values explicitly.
 
+1. The caller resolves the official warmup cost for the indicator and config —
+   `indicators.get_warmup_requirement()`.
+2. The caller obtains at least that much normalized history from Data —
+   `data.get_market_data()`.
+3. Validation confirms sufficiency before any formula runs —
+   `indicators.validate_indicator()`.
+4. Calculation retains every aligned row and marks warmup rows explicitly
+   unavailable — the official function for the requested indicator.
+
 Indicators never fetches history. A non-empty short dataset retains all aligned
 rows, sets indicator values to `NaN`, sets window bounds to `NaT`, marks
 `unavailable_reason="warmup"`, and never fetches additional history. An empty
@@ -516,7 +567,7 @@ flowchart LR
     D --> E[Warmup rows retained and marked unavailable]
 ```
 
-### `WF-INDI-004` — Availability-Aware Multi-Timeframe Calculation
+### `WF-INDI-TER` — Availability-Aware Multi-Timeframe Calculation
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-001`, `SYS-WF-002`
@@ -527,6 +578,18 @@ higher-timeframe dataset as separate official calculations.
 **Output boundary:** Indicators returns one independent series per submitted
 dataset. Each result preserves the source dataset's timeframe and record
 availability; Indicators neither combines nor realigns the results.
+
+1. Data resamples and aligns the primary and higher-timeframe datasets —
+   `data.resample_dataset()`, `data.align_multitimeframe_data()`.
+2. The orchestrator calculates the primary dataset independently —
+   `indicators.validate_indicator()` plus the official function.
+3. The orchestrator calculates the higher-timeframe dataset independently —
+   `indicators.validate_indicator()` plus the official function.
+4. Each result preserves its own source timeframe and record availability;
+   Indicators neither combines nor realigns them —
+   `indicators.get_capability_matrix()`.
+5. The orchestrator joins only availability-qualified rows —
+   `strategy.run_vectorized_strategy_signals()`.
 
 Data owns multi-timeframe resampling/alignment. Trading, Simulation, or Strategy
 owns decision-time combination of the separate series. Official Indicator
@@ -558,6 +621,15 @@ flowchart LR
 **Input boundary:** Official indicator ID and candidate config.
 **Output boundary:** Immutable `IndicatorSpec`/capability metadata or deterministic `IND_UNSUPPORTED_INDICATOR` / validation error.
 
+1. Enumerate the immutable set of official indicators —
+   `indicators.list_indicators()`.
+2. Resolve the typed wrapper for one official indicator ID —
+   `indicators.get_indicator()`.
+3. Validate the candidate config against the resolved spec —
+   `indicators.validate_indicator()`.
+4. Return the spec and capability record, or a deterministic refusal —
+   `indicators.get_capability_matrix()`.
+
 The registry exposes exactly 21 reviewed built-ins and cannot register or
 unregister at runtime.
 
@@ -572,6 +644,79 @@ flowchart LR
     D[Typed wrapper or deterministic refusal]
     A --> B --> C --> D
 ```
+
+### `WF-INDI-006` — Candlestick Pattern Detection
+
+**Scope:** `Internal`
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+
+**Input boundary:** One immutable `MarketDataset v1` and an official candlestick
+pattern ID with its config.
+**Output boundary:** A boolean pattern series carrying the same availability,
+warmup, and provenance semantics as any other official indicator.
+
+1. Resolve the pattern spec and validate the config and input —
+   `indicators.get_indicator()`, `indicators.validate_indicator()`.
+2. Resolve the warmup cost, which for multi-bar patterns exceeds one row —
+   `indicators.get_warmup_requirement()`.
+3. Execute the approved detector over canonical row order —
+   `indicators.doji()`, `indicators.engulfing()`, `indicators.pinbar()`,
+   `indicators.inside_bar()`.
+4. Retain warmup rows as explicitly unavailable rather than emitting `False` —
+   `indicators.get_capability_matrix()`.
+
+**Failure behavior:** a pattern is never reported on a row whose required lookback
+is incomplete; a dataset missing OHLC fields fails validation before detection.
+
+**Integration test:** `Pending`
+
+### `WF-INDI-007` — Volume-Profile and Volume-Flow Distribution
+
+**Scope:** `Internal`
+**System workflow:** `SYS-WF-001`
+
+**Input boundary:** One immutable `MarketDataset v1` carrying volume, plus bounded
+bucket or period configuration.
+**Output boundary:** A distribution or flow series with explicit unavailability
+wherever volume evidence is absent.
+
+1. Validate that the dataset actually carries usable volume for the requested
+   calculation — `indicators.validate_indicator()`.
+2. Build the price-bucketed volume distribution over the bounded window —
+   `indicators.price_volume_distribution()`.
+3. Calculate cumulative and money-weighted flow series —
+   `indicators.obv()`, `indicators.mfi()`, `indicators.cmf()`.
+4. Mark rows whose source volume is zero or missing as unavailable rather than
+   treating absence as zero flow — `data.detect_zero_volume_bars()`.
+
+**Failure behavior:** a symbol whose venue reports no genuine volume fails closed
+rather than producing a distribution over synthetic tick counts.
+
+**Integration test:** `Pending`
+
+### `WF-INDI-008` — Capability-Matrix Introspection
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-001`, `SYS-WF-003`
+
+**Input boundary:** A planning caller — Strategy, Simulation, or Optimization —
+queries the static registry before requesting any history.
+**Output boundary:** The capability matrix plus per-indicator `WarmupRequirement`,
+used to size history requests without running a calculation.
+
+1. Enumerate the official indicator set — `indicators.list_indicators()`.
+2. Read declared capabilities, including `multi_timeframe_support` and required
+   input fields — `indicators.get_capability_matrix()`.
+3. Resolve the exact warmup cost for each planned indicator and config —
+   `indicators.get_warmup_requirement()`.
+4. Size the upstream history request from the largest resolved warmup —
+   `data.get_market_data()`.
+
+**Failure behavior:** introspection never triggers a calculation and never fetches
+data; an unsupported indicator ID returns `IND_UNSUPPORTED_INDICATOR` rather than an
+empty capability record.
+
+**Integration test:** `Pending`
 
 ---
 

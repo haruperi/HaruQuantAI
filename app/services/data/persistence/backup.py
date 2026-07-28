@@ -33,7 +33,15 @@ from app.services.data.persistence.dataset_writer import (
     resolve_data_root,
 )
 from app.services.data.persistence.locking import _acquire_write_lock_raw
-from app.utils import AuditEvent, derive_stable_id, generate_id, logger, utc_now
+from app.utils import (
+    create_audit_event,
+    derive_stable_id,
+    generate_id,
+    get_logger,
+    utc_now,
+)
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -241,7 +249,7 @@ def _audit(
     """
     logger.info("Persisting %s audit evidence", action)
     _persist_audit_event_raw(
-        AuditEvent(
+        create_audit_event(
             contract_version="v1",
             schema_id="utils.audit_event.v1",
             event_id=generate_id("evt"),

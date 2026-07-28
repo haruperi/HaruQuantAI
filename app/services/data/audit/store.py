@@ -13,7 +13,7 @@ it does not import this module, so the two halves stay independently testable.
 from __future__ import annotations
 
 import json
-from typing import Final
+from typing import Any, Final
 
 from app.services.data.audit.contracts import (
     AuditPersistenceResult,
@@ -29,7 +29,9 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import AuditEvent, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _INSERT_AUDIT_EVENT: Final = """
 INSERT OR IGNORE INTO data_audit_events (
@@ -52,7 +54,7 @@ def _raise_write_failed(event_id: str, request_id: str) -> None:
     )
 
 
-def _persist_audit_event_raw(event: AuditEvent) -> AuditPersistenceResult:
+def _persist_audit_event_raw(event: Any) -> AuditPersistenceResult:
     """Idempotently persist a redacted AuditEvent version 1 into SQLite.
 
     Args:
@@ -119,7 +121,7 @@ def _persist_audit_event_raw(event: AuditEvent) -> AuditPersistenceResult:
 
 
 def persist_audit_event(
-    event: AuditEvent,
+    event: Any,
 ) -> StandardResponse[AuditPersistenceResult]:
     """Idempotently persist a redacted AuditEvent version 1 into SQLite.
 

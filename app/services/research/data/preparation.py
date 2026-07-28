@@ -19,7 +19,9 @@ from app.services.research.contracts import (
     ResearchWarning,
 )
 from app.services.research.data.validation import validate_dataset
-from app.utils import ValidationError, canonical_digest, canonical_json, logger
+from app.utils import canonical_digest, canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import MarketDataset
@@ -69,13 +71,13 @@ def _clean_duplicates(
         Updated frame and actions.
 
     Raises:
-        ValidationError: If duplicates exist under the error policy.
+        ValueError: If duplicates exist under the error policy.
     """
     logger.debug("Applying Research duplicate policy")
     if not frame.index.has_duplicates:
         return frame, ()
     if strategy == "error":
-        raise ValidationError("RES_INPUT_INVALID", "DUPLICATE_TIMESTAMPS")
+        raise ValueError("RES_INPUT_INVALID", "DUPLICATE_TIMESTAMPS")
     keep = False if strategy == "drop" else strategy.removeprefix("keep_")
     cleaned = frame.loc[~frame.index.duplicated(keep=keep)]
     action: Mapping[str, JSONValue] = {
@@ -135,14 +137,14 @@ def _clean_spreads(
         Updated frame, warnings, and actions.
 
     Raises:
-        ValidationError: If invalid spreads exist under the error policy.
+        ValueError: If invalid spreads exist under the error policy.
     """
     logger.debug("Applying Research spread cleaning policy")
     invalid = ~np.isfinite(frame["spread"]) | (frame["spread"] < 0)
     if not bool(invalid.any()):
         return frame, (), ()
     if strategy == "error":
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_SPREAD")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_SPREAD")
     if strategy == "drop_invalid":
         cleaned = frame.loc[~invalid]
         action: Mapping[str, JSONValue] = {
@@ -175,13 +177,13 @@ def clean_dataset(
         Cleaned detached frame and updated quality evidence.
 
     Raises:
-        ValidationError: If fatal evidence or a resource/input failure exists.
+        ValueError: If fatal evidence or a resource/input failure exists.
     """
     logger.info("Cleaning Research dataset with explicit policies")
     if dataset.record_count > limits.max_rows:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     if report.fatal_issues:
-        raise ValidationError("RES_INPUT_INVALID", "FATAL_QUALITY_ISSUES")
+        raise ValueError("RES_INPUT_INVALID", "FATAL_QUALITY_ISSUES")
     frame_response = to_ohlcv_dataframe(dataset)
     if isinstance(frame_response, pd.DataFrame):
         # Keep isolated legacy test doubles compatible while production Data
@@ -201,7 +203,7 @@ def clean_dataset(
         frame, config.spread_strategy
     )
     if frame.empty:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "NO_ROWS_AFTER_CLEANING")
+        raise ValueError("RES_INSUFFICIENT_DATA", "NO_ROWS_AFTER_CLEANING")
     return frame, _quality_with(
         report,
         warnings=(*calendar_warnings, *spread_warnings),
@@ -230,12 +232,12 @@ def enrich_dataset(
         Enriched detached frame and quality evidence.
 
     Raises:
-        ValidationError: If required structural inputs are absent.
+        ValueError: If required structural inputs are absent.
     """
     logger.info("Enriching Research dataset")
     required = {"open", "high", "low", "close", "volume", "spread"}
     if not required <= set(data.columns):
-        raise ValidationError("RES_INPUT_INVALID", "OHLCVS_COLUMNS_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "OHLCVS_COLUMNS_REQUIRED")
     enriched = data.copy(deep=True)
     if config.include_geometry:
         enriched["candle_range"] = enriched["high"] - enriched["low"]
@@ -259,7 +261,7 @@ def enrich_dataset(
             not isinstance(enriched.index, pd.DatetimeIndex)
             or enriched.index.tz is None
         ):
-            raise ValidationError("RES_INPUT_INVALID", "UTC_TIME_INDEX_REQUIRED")
+            raise ValueError("RES_INPUT_INVALID", "UTC_TIME_INDEX_REQUIRED")
         enriched["calendar_year"] = enriched.index.year
         enriched["calendar_month"] = enriched.index.month
         enriched["calendar_weekday"] = enriched.index.dayofweek
@@ -287,12 +289,12 @@ def prepare_research_dataset(
         Detached prepared Research dataset with hashes and provenance.
 
     Raises:
-        ValidationError: If validation, cleaning, or resource checks fail.
+        ValueError: If validation, cleaning, or resource checks fail.
     """
     logger.info("Preparing canonical Research dataset")
     initial_report = validate_dataset(dataset, limits=limits)
     if initial_report.fatal_issues:
-        raise ValidationError("RES_INPUT_INVALID", "FATAL_QUALITY_ISSUES")
+        raise ValueError("RES_INPUT_INVALID", "FATAL_QUALITY_ISSUES")
     cleaned, cleaned_report = clean_dataset(
         dataset, config=cleaning, report=initial_report, limits=limits
     )

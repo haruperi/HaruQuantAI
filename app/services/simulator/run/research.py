@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.reporting import FastResearchResult
@@ -14,7 +14,11 @@ from app.services.simulator.validation import (
     validate_phase_one_scope,
     validate_run_inputs,
 )
-from app.utils import AuthContext, logger
+from app.utils import get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import (

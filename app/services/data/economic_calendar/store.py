@@ -29,7 +29,9 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 _REFRESH_NEXT_7_DAYS: Final[int] = 7
 _REFRESH_NEXT_24_HOURS: Final[int] = 24
@@ -379,7 +381,8 @@ class EconomicEventStore:
         """Return the next-7-day and next-24-hour refresh windows as UTC bounds.
 
         Raises:
-            DataError: If ``now`` is naive or not UTC.
+                    DataError: If `
+        ow`` is naive or not UTC.
         """
         observed = now if now is not None else datetime.now(UTC)
         if observed.tzinfo is None or observed.utcoffset() != timedelta(0):
@@ -394,21 +397,22 @@ class EconomicEventStore:
     ) -> StandardResponse[tuple[tuple[datetime, datetime], tuple[datetime, datetime]]]:
         """Return the next-7-day and next-24-hour refresh windows as UTC bounds.
 
-        These are advisory refresh windows for the caller (section 7 of the
-        design): the next 7 days is refreshed periodically for schedule
-        changes while the next 24 hours is refreshed more frequently. The
-        store does not schedule its own refresh; callers integrate it with
-        their own scheduler (the DATA jobs feature is out of scope here).
+                These are advisory refresh windows for the caller (section 7 of the
+                design): the next 7 days is refreshed periodically for schedule
+                changes while the next 24 hours is refreshed more frequently. The
+                store does not schedule its own refresh; callers integrate it with
+                their own scheduler (the DATA jobs feature is out of scope here).
 
         Args:
-            now: Optional observation instant; defaults to UTC now.
+                    now: Optional observation instant; defaults to UTC now.
 
         Returns:
-            Standard response carrying ``(seven_day_window,
-            twenty_four_hour_window)`` as ``(start, end)`` UTC datetime pairs.
+                    Standard response carrying ``(seven_day_window,
+                    twenty_four_hour_window)`` as ``(start, end)`` UTC datetime pairs.
 
         Raises:
-            (in-band) ``VALIDATION_FAILED`` when ``now`` is naive or not UTC.
+                    (in-band) ``VALIDATION_FAILED`` when `
+        ow`` is naive or not UTC.
         """
         return run_data_operation(
             operation="data.economic_calendar.economic_event_store.refresh_windows",

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from time import perf_counter_ns
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.research.contracts import (
     EdgeLabConfig,
@@ -45,20 +45,40 @@ from app.services.research.studies import (
     run_eds_trend_persistence,
 )
 from app.utils import (
-    ConfigurationError,
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
-    ValidationError,
     build_response_metadata,
     canonical_digest,
     exception_response,
     generate_id,
     get_execution_ms,
-    logger,
+    get_logger,
     success_response,
 )
+
+type JsonValue = Any
+type ResponseMetadata = Any
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+
+class ConfigurationError(ValueError):
+    """Research-owned configuration failure."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+class ValidationError(ValueError):
+    """Research-owned workflow validation failure."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -663,7 +683,7 @@ def run_edge_lab_profile(
         return build_response_metadata(
             name="research.run_edge_lab_profile",
             domain="research",
-            risk_level=RiskLevel.LOW,
+            risk_level="low",
             request_id=request_id,
             start_time=start_time,
             read_only=True,

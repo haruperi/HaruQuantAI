@@ -1,6 +1,7 @@
 """Fail-closed validation of Risk-owned rebalance budget authority."""
 
 from datetime import datetime
+from typing import Any, Literal
 
 from app.services.risk import (
     AllocationRiskDecision,
@@ -12,7 +13,12 @@ from app.services.trading.contracts import (
     TradingError,
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel, StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 class BudgetGate:
@@ -97,7 +103,7 @@ class BudgetGate:
             return map_trading_error(error, {"plan_id": request.plan_id})
         return success_trading_response(
             None,
-            risk_level=RiskLevel.HIGH,
+            risk_level="high",
             legacy_status="approved",
             extensions={"plan_id": request.plan_id},
         )

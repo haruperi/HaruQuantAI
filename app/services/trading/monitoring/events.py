@@ -4,7 +4,7 @@ from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timedelta
 from hashlib import sha256
 from types import MappingProxyType
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 from pydantic import (
     BaseModel,
@@ -27,18 +27,18 @@ from app.services.trading.contracts.models import (
 )
 from app.services.trading.contracts.responses import success_trading_response
 from app.utils import (
-    RiskLevel,
-    StandardResponse,
     canonical_json,
+    get_logger,
     is_sensitive_key,
-    logger,
     redact_text_value,
     to_json_safe,
     validate_id,
 )
-from app.utils import (
-    ValidationError as UtilsValidationError,
-)
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 type OperationalEventType = Literal[
     "HEALTH_CHANGED",
@@ -252,7 +252,7 @@ def _validate_unknown_event_source(
 
     Raises:
         ValueError: If source, time, or bounded facts are incompatible.
-        UtilsValidationError: If trace identities are incompatible.
+        Exception: If trace identities are incompatible.
     """
     if receipt.status != "unknown_outcome" or not receipt.reconciliation_required:
         raise ValueError("receipt is not a retry-locked unknown outcome")
@@ -354,7 +354,7 @@ def _build_broker_state_unknown_event_value(
                 "incident_id": incident_id,
             },
         )
-    except (TypeError, ValueError, UtilsValidationError) as error:
+    except (TypeError, ValueError, Exception) as error:
         raise TradingError(
             "VALIDATION_FAILED",
             "Unknown broker-state event source is invalid",
@@ -460,7 +460,7 @@ def build_broker_state_unknown_event(
         return map_trading_error(error, {"incident_id": incident_id})
     return success_trading_response(
         event,
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         legacy_status="unknown_outcome",
         extensions={"incident_id": incident_id},
     )
@@ -487,7 +487,7 @@ def emit_runtime_event(
         return map_trading_error(error, {"event_id": event.event_id})
     return success_trading_response(
         None,
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         legacy_status="emitted",
         extensions={"event_id": event.event_id},
     )

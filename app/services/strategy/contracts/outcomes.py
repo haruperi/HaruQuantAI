@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING, Literal, NoReturn, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, NoReturn, TypeVar
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -16,7 +16,11 @@ from app.services.strategy.contracts.responses import (
     StrategyOperationError,
     unwrap_strategy_response,
 )
-from app.utils import StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.strategy.contracts._base import JsonValue

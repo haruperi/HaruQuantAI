@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 from datetime import datetime, timedelta
 from time import monotonic
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -27,7 +27,11 @@ from app.services.strategy import (
     StrategyLifecycleStatus,
     ValidatedStrategyRef,
 )
-from app.utils import RiskLevel, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -188,7 +192,7 @@ def _audit_record(
 
 
 @guard_risk_boundary(
-    risk_level=RiskLevel.HIGH,
+    risk_level="high",
     read_only=False,
     modifies_database=True,
 )

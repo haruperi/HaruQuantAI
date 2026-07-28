@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -24,14 +24,18 @@ from app.services.risk import (
     RiskDomainError,
 )
 from app.services.trading import OperationalEvent
-from app.utils import AuditEvent, AuthContext, logger
+from app.utils import get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 type _KillSwitchTransition = Callable[
     [KillSwitchCommand, AuthContext, ApprovalAttestation | None],
     KillSwitchState,
 ]
 type _ReadinessSource = Callable[[AuthContext], Mapping[str, str]]
-type _AuditSource = Callable[[AuthContext, int], Sequence[AuditEvent]]
+type _AuditSource = Callable[[AuthContext, int], Sequence[Any]]
 type _EventSource = Callable[[AuthContext], Sequence[OperationalEvent]]
 
 router = APIRouter(prefix="/api/operator", tags=["operator"])
@@ -339,12 +343,12 @@ def _get_readiness(
     return dict(source(auth))
 
 
-@router.get("/audit-events", response_model=tuple[AuditEvent, ...])
+@router.get("/audit-events", response_model=None)
 def _get_audit_events(
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_AuditSource, Depends(_audit_source)],
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
-) -> tuple[AuditEvent, ...]:
+) -> Any:
     """Return a protected bounded Data-owned audit page.
 
     Args:

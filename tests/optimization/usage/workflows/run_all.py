@@ -17,11 +17,12 @@ from tests.optimization.usage.workflows._support import (
 
 WORKFLOWS = (
     "wf_opt_001_package_optimization_robustness_request.py",
-    "wf_opt_002_execute_bounded_parameter_sweep.py",
-    "wf_opt_003_score_rank_assess_overfit_evidence.py",
-    "wf_opt_004_run_walk_forward_validation.py",
+    "wf_opt_pri_execute_bounded_parameter_sweep.py",
+    "wf_opt_ter_score_rank_assess_overfit_evidence.py",
+    "wf_opt_sec_run_walk_forward_validation.py",
     "wf_opt_005_run_monte_carlo_robustness_analysis.py",
     "wf_opt_006_build_persist_versioned_evidence_handoffs.py",
+    "wf_opt_008_first_passage_drawdown_sensitivity.py",
 )
 
 

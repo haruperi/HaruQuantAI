@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # mypy: disable-error-code="attr-defined,no-any-return,has-type"
 """Binance price-stream operations."""
 
@@ -21,7 +23,7 @@ from app.services.brokers.contracts import (
     BrokerSubscription,
     BrokerSubscriptionInfo,
 )
-from app.utils import StandardResponse, generate_id, utc_now
+from app.utils import generate_id, utc_now
 
 
 class _BinancePriceStreamsMixin:

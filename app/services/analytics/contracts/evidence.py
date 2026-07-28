@@ -12,16 +12,15 @@ from app.services.analytics.contracts.catalogs import EVIDENCE_CATALOG
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.models import AnalyticsWarning, QualityFlag
 from app.utils import (
-    ValidationError as UtilsValidationError,
-)
-from app.utils import (
     canonical_json,
-    logger,
+    get_logger,
     redact_mapping_value,
 )
 from app.utils import (
     to_json_safe as _utils_to_json_safe,
 )
+
+logger = get_logger(__name__)
 
 
 def _normalize_analytical_value(value: object) -> object:
@@ -88,7 +87,7 @@ def _safe_detail(
         if len(canonical_json(result).encode("utf-8")) > max_detail_bytes:
             raise AnalyticsValidationError("evidence detail exceeds configured bound")
         return result
-    except UtilsValidationError as error:
+    except Exception as error:
         raise AnalyticsValidationError("evidence detail is unsafe") from error
 
 
@@ -190,7 +189,7 @@ def to_report_json_safe(value: object) -> object:
     logger.info("Converting Analytics report evidence to JSON-safe values")
     try:
         return _utils_to_json_safe(_normalize_analytical_value(value))
-    except UtilsValidationError as error:
+    except Exception as error:
         raise AnalyticsValidationError(
             "report value is not finite JSON-safe evidence"
         ) from error

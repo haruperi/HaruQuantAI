@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -23,7 +23,12 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel, StandardResponse, generate_id, logger
+from app.utils import generate_id, get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -175,7 +180,7 @@ def _bulk_envelope(
         data,
         operation=f"trading.{request.action}",
         message="Trading bulk action retained every child result",
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=False,

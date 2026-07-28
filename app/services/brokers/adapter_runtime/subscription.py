@@ -1,5 +1,7 @@
 """Bounded FIFO broker subscription implementation."""
 
+from __future__ import annotations
+
 import asyncio
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import replace
@@ -16,7 +18,9 @@ from app.services.brokers.contracts.responses import (
     broker_start_time,
     build_broker_response,
 )
-from app.utils import StandardResponse, generate_id, logger, utc_now
+from app.utils import generate_id, get_logger, utc_now
+
+logger = get_logger(__name__)
 
 type _Event[TEvent] = TEvent | BrokerError | None
 

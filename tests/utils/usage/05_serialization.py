@@ -7,7 +7,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
-    ValidationError,
     canonical_digest,
     canonical_json,
     to_json_safe,
@@ -36,7 +35,7 @@ def fr_utils_015_reject_unsafe_value() -> None:
     _header("Example 3: Reject Unsafe Value")
     try:
         canonical_json({"unsafe": object()})
-    except ValidationError:
+    except Exception:  # noqa: BLE001 - public serializer hides internal error classes.
         print("Serialization validation: unsafe value rejected")
 
 
@@ -46,7 +45,7 @@ def fr_utils_036_canonical_digest() -> None:
     oversized = {"records": [{"i": index} for index in range(20_000)]}
     try:
         canonical_json(oversized)
-    except ValidationError:
+    except Exception:  # noqa: BLE001 - public serializer hides internal error classes.
         print("canonical_json rejects >10,000 items for untrusted payloads")
     print("canonical_digest of 20,000 records:", canonical_digest(oversized))
 

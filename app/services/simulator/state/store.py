@@ -9,10 +9,9 @@ connection, schema statement, filesystem write, or SQL of any kind.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
+from typing import Any, Literal, Protocol, runtime_checkable
 
-if TYPE_CHECKING:
-    from app.utils import StandardResponse
+type StandardResponse[T] = Any
 
 type RunStatus = Literal["started", "completed", "failed"]
 

@@ -252,14 +252,36 @@ flowchart LR
 > **Workflow Usage Evidence**: Each active workflow has one standalone program in
 > `tests/optimization/usage/workflows/`; `run_all.py` executes them in registry order.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-OPT-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-OPT-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-OPT-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-OPT-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-OPT-002`, `WF-OPT-004`, and `WF-OPT-003` were absorbed into `WF-OPT-PRI`,
+`WF-OPT-SEC`, and `WF-OPT-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-OPT-007`.
+
 Evidence programs:
 
+- `WF-OPT-PRI`: `tests/optimization/usage/workflows/wf_opt_pri_execute_bounded_parameter_sweep.py`
+- `WF-OPT-SEC`: `tests/optimization/usage/workflows/wf_opt_sec_run_walk_forward_validation.py`
+- `WF-OPT-TER`: `tests/optimization/usage/workflows/wf_opt_ter_score_rank_assess_overfit_evidence.py`
 - `WF-OPT-001`: `tests/optimization/usage/workflows/wf_opt_001_package_optimization_robustness_request.py`
-- `WF-OPT-002`: `tests/optimization/usage/workflows/wf_opt_002_execute_bounded_parameter_sweep.py`
-- `WF-OPT-003`: `tests/optimization/usage/workflows/wf_opt_003_score_rank_assess_overfit_evidence.py`
-- `WF-OPT-004`: `tests/optimization/usage/workflows/wf_opt_004_run_walk_forward_validation.py`
 - `WF-OPT-005`: `tests/optimization/usage/workflows/wf_opt_005_run_monte_carlo_robustness_analysis.py`
 - `WF-OPT-006`: `tests/optimization/usage/workflows/wf_opt_006_build_persist_versioned_evidence_handoffs.py`
+- `WF-OPT-007`: `tests/optimization/usage/workflows/wf_opt_007_compare_runs_parameter_stability.py` *(pending)*
+- `WF-OPT-008`: `tests/optimization/usage/workflows/wf_opt_008_first_passage_drawdown_sensitivity.py`
+
+The entry marked *(pending)* is a registered workflow whose standalone program is not
+yet written: `compare_optimization_runs()` accepts `OptimizationResult` values for
+which the package root exposes no construction function, so no rule-compliant program
+can be written until that gap is closed.
 
 ### Status values
 
@@ -276,14 +298,16 @@ Evidence programs:
 | **Internal** | The complete workflow occurs inside Optimization. |
 | **Cross-domain** | Optimization receives input from or returns output to another domain. |
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-OPT-001` | Cross-domain | Run an optimization or robustness request | Validated `SearchRequest`, `MonteCarloRequest`, or `ExecutionStressAnalysisRequest` | `OptimizationResult v1`, `RobustnessAnalysisResult`, or typed failure | FR-OPT-056 or FR-OPT-058 |
-| Completed | `WF-OPT-002` | Cross-domain | Execute a bounded parameter sweep | Approved `SearchRequest`, Strategy reference, Data provenance, and Simulation adapter | `SearchSummary` and candidate evidence; no trade authority | `FR-OPT-003 → FR-OPT-025 → FR-OPT-026 → FR-OPT-020 → FR-OPT-027` |
-| Completed | `WF-OPT-003` | Internal | Score, rank, and assess overfit evidence | Supplied candidate/trade evidence | Deterministically ranked candidates with DSR and caveats | `FR-OPT-010 → FR-OPT-011 → FR-OPT-012 → FR-OPT-013 → FR-OPT-015` |
-| Completed | `WF-OPT-004` | Cross-domain | Run walk-forward validation | Approved `WalkForwardRequest` and Simulation adapter | Fold, degradation, WFE, purge, and embargo evidence | `FR-OPT-032 → FR-OPT-027 → FR-OPT-020 → FR-OPT-033` |
-| Completed | `WF-OPT-005` | Internal | Run Monte Carlo and robustness analysis | Supplied realized results and deterministic seed | Monte Carlo distributions, stress results, ruin evidence, and caveats | `FR-OPT-038 → FR-OPT-039 → FR-OPT-040 → FR-OPT-042 → FR-OPT-043` |
-| Completed | `WF-OPT-006` | Cross-domain | Build and persist versioned evidence and handoffs | Completed or explicitly incomplete search/WFA/robustness evidence | Durable `OptimizationResult v1` and report package for downstream review | `FR-OPT-047 → FR-OPT-048 → FR-OPT-053 → FR-OPT-049` |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-OPT-PRI` | Cross-domain | Execute a bounded parameter sweep | Approved `SearchRequest`, Strategy reference, Data provenance, and Simulation adapter | `SearchSummary` and candidate evidence; no trade authority | `FR-OPT-003 → FR-OPT-025 → FR-OPT-026 → FR-OPT-020 → FR-OPT-027` |
+| Completed | Secondary | `WF-OPT-SEC` | Cross-domain | Run walk-forward validation | Approved `WalkForwardRequest` and Simulation adapter | Fold, degradation, WFE, purge, and embargo evidence | `FR-OPT-032 → FR-OPT-027 → FR-OPT-020 → FR-OPT-033` |
+| Completed | Tertiary | `WF-OPT-TER` | Internal | Score, rank, and assess overfit evidence | Supplied candidate/trade evidence | Deterministically ranked candidates with DSR and caveats | `FR-OPT-010 → FR-OPT-011 → FR-OPT-012 → FR-OPT-013 → FR-OPT-015` |
+| Completed | Supporting | `WF-OPT-001` | Cross-domain | Run an optimization or robustness request | Validated `SearchRequest`, `MonteCarloRequest`, or `ExecutionStressAnalysisRequest` | `OptimizationResult v1`, `RobustnessAnalysisResult`, or typed failure | FR-OPT-056 or FR-OPT-058 |
+| Completed | Supporting | `WF-OPT-005` | Internal | Run Monte Carlo and robustness analysis | Supplied realized results and deterministic seed | Monte Carlo distributions, stress results, ruin evidence, and caveats | `FR-OPT-038 → FR-OPT-039 → FR-OPT-040 → FR-OPT-042 → FR-OPT-043` |
+| Completed | Supporting | `WF-OPT-006` | Cross-domain | Build and persist versioned evidence and handoffs | Completed or explicitly incomplete search/WFA/robustness evidence | Durable `OptimizationResult v1` and report package for downstream review | `FR-OPT-047 → FR-OPT-048 → FR-OPT-053 → FR-OPT-049` |
+| Completed | Supporting | `WF-OPT-007` | Internal | Compare optimization runs and parameter stability | Two or more completed `OptimizationResult v1` records over comparable provenance | Metric deltas across runs plus per-parameter stability evidence | `Pending` |
+| Completed | Supporting | `WF-OPT-008` | Internal | Analytical first-passage and drawdown-mode sensitivity estimation | Validated distribution parameters and explicit barrier definitions | Closed-form first-passage and drawdown-mode sensitivity evidence requiring no simulation run | `Pending` |
 
 ### `WF-OPT-001` — Package an Optimization or Robustness Request
 
@@ -302,13 +326,15 @@ approval, construct the Strategy-owned `StrategyParameterUpdateRequest`. Strateg
 validates and persists the new immutable configuration. Optimization never submits the
 request or mutates Strategy state.
 
-1. The owning Pydantic request contract validates shape, bounds, provenance, and
-   supported capability at the input boundary.
-2. `run_parameter_sweep()` executes one bounded search through the injected
-   Simulation adapter, or `run_robustness_analysis()` executes one bounded local
-   robustness request.
-3. The applicable operation returns deterministic advisory evidence and performs no
-   trading or Strategy-mutation side effect.
+1. Validate shape, bounds, provenance, and supported capability at the input
+   boundary — `utils.create_auth_context()`.
+2. Execute one bounded search through the injected Simulation adapter, or one
+   bounded local robustness request — `optimization.run_parameter_sweep()`,
+   `optimization.run_robustness_analysis()`.
+3. Return deterministic advisory evidence with no trading or Strategy-mutation side
+   effect — `optimization.build_optimization_handoff()`.
+4. UI/API alone converts an approved result into a Strategy parameter update —
+   `strategy.update_strategy_parameters()`.
 
 **Failure behaviour:** Invalid input, non-JSON-safe data, missing approved limits, or unsupported behavior returns a structured `OPT_*` error; no exception crosses the public boundary.
 
@@ -316,7 +342,7 @@ request or mutates Strategy state.
 
 `tests/optimization/integration/test_request_workflow.py::test_optimization_and_robustness_requests_return_typed_evidence()`
 
-### `WF-OPT-002` — Execute a Bounded Parameter Sweep
+### `WF-OPT-PRI` — Execute a Bounded Parameter Sweep
 
 **Scope:** `Cross-domain`
 
@@ -326,11 +352,19 @@ request or mutates Strategy state.
 
 **Output boundary:** Optimization returns `SearchSummary`; Simulation retains ownership of execution and `SimulationResult`.
 
-1. `validate_parameter_space()` rejects invalid, cyclic, unsafe, unbounded, or oversized spaces.
-2. `iter_grid_candidates()` or `sample_random_candidates()` yields executable candidates without materializing an unbounded product.
-3. Constraint failures are recorded and never sent to Simulation.
-4. `execute_candidate()` calls only the version-compatible adapter.
-5. `run_bounded_search()` scores, deduplicates, ranks, and returns deterministic evidence.
+1. Resolve the registered Strategy version and Data provenance the sweep is bound
+   to — `strategy.validate_strategy_ref()`, `data.get_source_descriptor()`.
+2. Reject invalid, cyclic, unsafe, unbounded, or oversized parameter spaces —
+   `optimization.run_parameter_sweep()`.
+3. Yield executable candidates without materializing an unbounded product, recording
+   constraint failures rather than sending them to Simulation —
+   `optimization.run_parameter_sweep()`.
+4. Execute each surviving candidate through the version-compatible adapter —
+   `simulator.run_backtest()`.
+5. Score, deduplicate, and rank into deterministic evidence —
+   `optimization.rank_parameter_sets()`.
+6. Attach overfit evidence to the ranked set —
+   `optimization.detect_overfit_parameters()`.
 
 **Failure behaviour:** Missing limits or adapter incompatibility blocks the workflow; a candidate failure is recorded without being converted to score zero; leakage or resource-cap failure aborts fail-closed.
 
@@ -338,7 +372,7 @@ request or mutates Strategy state.
 
 `tests/optimization/integration/test_bounded_sweep.py::test_bounded_sweep_uses_simulation_adapter()`
 
-### `WF-OPT-003` — Score, Rank, and Assess Overfit Evidence
+### `WF-OPT-TER` — Score, Rank, and Assess Overfit Evidence
 
 **Scope:** `Internal`
 
@@ -348,10 +382,16 @@ request or mutates Strategy state.
 
 **Output boundary:** Internal typed scores, deterministic ranking, DSR/trial evidence, and explicit caveats.
 
-1. `calculate_candidate_score()` evaluates only an enabled objective.
-2. `calculate_deflated_sharpe()` and `count_nominal_trials()` produce baseline multiple-testing evidence when inputs are sufficient.
-3. `rank_candidates()` resolves ties by score descending, present trade count descending, then candidate hash ascending.
-4. `assess_overfit_evidence()` labels IS/OOS degradation and independence limitations without declaring live readiness.
+1. Consume Analytics-owned metric evidence for each candidate —
+   `analytics.build_performance_report()`.
+2. Evaluate only an enabled objective and produce baseline multiple-testing evidence
+   when inputs are sufficient — `optimization.rank_parameter_sets()`.
+3. Resolve ties by score descending, present trade count descending, then candidate
+   hash ascending — `optimization.rank_parameter_sets()`,
+   `utils.canonical_digest()`.
+4. Label IS/OOS degradation and independence limitations without declaring live
+   readiness — `optimization.detect_overfit_parameters()`,
+   `optimization.calculate_robustness_score()`.
 
 **Failure behaviour:** Missing, non-finite, or insufficient evidence produces an explicit unavailable result or validation error; another objective is never substituted silently.
 
@@ -359,7 +399,7 @@ request or mutates Strategy state.
 
 `tests/optimization/integration/test_scoring_workflow.py::test_scoring_workflow_preserves_metric_and_trial_evidence()`
 
-### `WF-OPT-004` — Run Walk-Forward Validation
+### `WF-OPT-SEC` — Run Walk-Forward Validation
 
 **Scope:** `Cross-domain`
 
@@ -369,10 +409,15 @@ request or mutates Strategy state.
 
 **Output boundary:** Optimization returns fold-level and aggregate walk-forward evidence.
 
-1. `build_time_series_splits()` creates rolling or anchored/expanding folds with UTC boundaries.
-2. Effective embargo is at least the supplied average trade duration when that duration is valid.
-3. `run_bounded_search()` selects train-window candidates and `execute_candidate()` evaluates them out of sample.
-4. `run_walk_forward_validation()` emits fold pass rate, parameter drift, OOS retention, WFE, and leakage-prevention evidence.
+1. Create rolling or anchored/expanding folds with UTC boundaries, applying purge and
+   embargo — `optimization.run_walk_forward_optimization()`.
+2. Set effective embargo to at least the supplied average trade duration when that
+   duration is valid — `optimization.run_walk_forward_optimization()`.
+3. Select train-window candidates per fold — `optimization.run_parameter_sweep()`.
+4. Evaluate the selected candidates out of sample — `simulator.run_backtest()`.
+5. Emit fold pass rate, parameter drift, OOS retention, WFE, and leakage-prevention
+   evidence — `optimization.run_walk_forward_matrix()`,
+   `optimization.calculate_parameter_stability()`.
 
 **Failure behaviour:** Invalid/overlapping windows, insufficient data, missing embargo provenance, or adapter failure returns a structured failure; folds are not replaced with zero scores.
 
@@ -390,10 +435,15 @@ request or mutates Strategy state.
 
 **Output boundary:** Monte Carlo and robustness evidence; no broker or Simulation call.
 
-1. `run_monte_carlo()` performs shuffle, empirical resample, or block-bootstrap analysis with deterministic sub-seeds.
-2. `calculate_probability_of_ruin()` and `calculate_confidence_intervals()` summarize distributions.
-3. `apply_execution_cost_stress()` applies explicit spread, slippage, or commission assumptions.
-4. `assess_strategy_robustness()` combines applicable evidence and caveats without claiming certainty.
+1. Perform shuffle, empirical resample, or block-bootstrap analysis with
+   deterministic sub-seeds — `optimization.run_robustness_analysis()`.
+2. Summarize ruin probability and confidence intervals over the distributions —
+   `optimization.estimate_first_passage()`,
+   `optimization.estimate_joint_first_passage()`.
+3. Apply explicit spread, slippage, or commission assumptions —
+   `simulator.calculate_execution_costs()`.
+4. Combine applicable evidence and caveats without claiming certainty —
+   `optimization.calculate_robustness_score()`.
 
 **Failure behaviour:** Empty inputs, invalid counts, non-finite values, missing seed, or exceeded simulation caps fail before work begins; malformed outcomes never disappear silently.
 
@@ -411,16 +461,82 @@ request or mutates Strategy state.
 
 **Output boundary:** Durably recorded `OptimizationResult v1` plus a chart-ready report package; UI/API decides, renders, or submits downstream commands.
 
-1. `build_optimization_evidence()` assembles provenance, ranked candidates, diagnostics, warnings, and audit references without recomputation.
-2. `build_report_package()` returns chart-ready series/tables without rendering.
-3. `persist_optimization_result()` atomically records the result and ranked-candidate evidence through the injected Optimization store.
-4. `build_optimization_handoff()` returns the typed advisory `OptimizationResult v1` without trade or Strategy-mutation authority.
+1. Assemble provenance, ranked candidates, diagnostics, warnings, and audit
+   references without recomputation — `optimization.rank_parameter_sets()`,
+   `optimization.calculate_robustness_score()`.
+2. Atomically record the result and ranked-candidate evidence through the injected
+   Optimization store — `data.execute_transaction()`.
+3. Return the typed advisory result without trade or Strategy-mutation authority —
+   `optimization.build_optimization_handoff()`.
+4. Bind the handoff to reproducible hashes for downstream adoption —
+   `utils.canonical_digest()`.
+5. Strategy alone converts an approved handoff into a new configuration —
+   `strategy.update_strategy_parameters()`.
 
 **Failure behaviour:** Missing required provenance yields `validation_needed`, `research_only`, or a structured failure; Optimization never creates a Strategy update or live approval.
 
 **Integration test:**
 
 `tests/optimization/integration/test_persistence_handoff_workflow.py::test_evidence_handoff_is_durable_only_after_receipt()`
+
+### `WF-OPT-007` — Compare Optimization Runs and Parameter Stability
+
+**Scope:** `Internal`
+
+**System workflow:** `SYS-WF-003`
+
+**Input boundary:** two or more completed `OptimizationResult v1` records over
+comparable Strategy, Data, and objective provenance.
+
+**Output boundary:** metric deltas across runs plus per-parameter stability
+evidence. The comparison is advisory and confers no adoption authority.
+
+1. Confirm the runs share comparable Strategy, Data, and objective provenance —
+   `utils.canonical_digest()`.
+2. Compare approved common metrics across the runs without mutating either —
+   `optimization.compare_optimization_runs()`.
+3. Measure how stable each parameter remains across runs and folds —
+   `optimization.calculate_parameter_stability()`.
+4. Re-express instability as overfit evidence —
+   `optimization.detect_overfit_parameters()`.
+5. Summarize into one robustness figure with explicit caveats —
+   `optimization.calculate_robustness_score()`.
+
+**Failure behaviour:** runs with incompatible provenance, objectives, or windows are
+refused rather than compared on a best-effort basis. A parameter present in only one
+run is reported as missing rather than treated as unchanged.
+
+**Integration test:** `Pending`
+
+### `WF-OPT-008` — Analytical First-Passage and Drawdown-Mode Sensitivity Estimation
+
+**Scope:** `Internal`
+
+**System workflow:** `None`
+
+**Input boundary:** validated distribution parameters plus explicit barrier
+definitions supplied by the caller.
+
+**Output boundary:** closed-form first-passage and drawdown-mode sensitivity
+evidence produced without executing a simulation run.
+
+1. Validate the supplied distribution parameters and barrier definitions —
+   `optimization.run_robustness_analysis()`.
+2. Estimate the probability and timing of reaching a single barrier —
+   `optimization.estimate_first_passage()`.
+3. Estimate the joint case where profit and loss barriers compete —
+   `optimization.estimate_joint_first_passage()`.
+4. Measure how the drawdown mode shifts as inputs vary —
+   `optimization.estimate_drawdown_mode_sensitivity()`.
+5. Fold the analytical evidence into the overall robustness figure —
+   `optimization.calculate_robustness_score()`.
+
+**Failure behaviour:** these estimators are analytical and never substitute for a
+Monte Carlo run or a realized result. Non-finite parameters, a non-positive barrier,
+or an unsupported distribution fails before any estimate is produced, and no estimate
+is presented as an observed outcome.
+
+**Integration test:** `Pending`
 
 #### End-to-end workflow diagram
 

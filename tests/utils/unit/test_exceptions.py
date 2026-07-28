@@ -1,5 +1,5 @@
 import pytest
-from app.utils import (
+from app.utils.errors.exceptions import (
     ConfigurationError,
     ExternalServiceError,
     HaruQuantError,

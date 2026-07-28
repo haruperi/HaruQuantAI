@@ -1,6 +1,6 @@
 """Typed vocabulary for the quality issues the detectors actually emit.
 
-``CAP-DATA-026`` originally proposed a ten-value flag enum — ``MISSING``, ``STALE``,
+``CAP-DATA-026`` originally proposed a ten-value flag enum â€” ``MISSING``, ``STALE``,
 ``PARTIAL``, ``NON_MONOTONIC``, ``INVERTED_BID_ASK``, and so on. None of those values
 is produced by any detector. Shipping them would have given consumers a vocabulary of
 codes that never appear, and left two lists to keep in sync.
@@ -10,8 +10,8 @@ faithful view of the evidence rather than an aspiration. Adding a value here wit
 adding the detector that emits it is a defect, and ``tests/data/unit/test_flags.py``
 fails if the enum and the remediation mapping disagree.
 
-Record-level conditions absent from this enum — non-finite prices, inverted bid/ask,
-negative volume — are not missing by oversight. They cannot reach a series at all,
+Record-level conditions absent from this enum â€” non-finite prices, inverted bid/ask,
+negative volume â€” are not missing by oversight. They cannot reach a series at all,
 because ``models/records.py`` rejects them fail-closed at construction.
 """
 
@@ -26,7 +26,9 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.contracts.dataset import DataQualityReport

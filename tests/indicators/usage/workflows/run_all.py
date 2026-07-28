@@ -9,11 +9,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 WORKFLOWS = (
-    "wf_indi_001_core_batch_indicator_calculation.py",
-    "wf_indi_002_decision_time_consumption.py",
+    "wf_indi_pri_core_batch_indicator_calculation.py",
+    "wf_indi_sec_decision_time_consumption.py",
     "wf_indi_003_warmup_coordination.py",
-    "wf_indi_004_availability_aware_multi_timeframe_calculation.py",
+    "wf_indi_ter_availability_aware_multi_timeframe_calculation.py",
     "wf_indi_005_static_registry_discovery_validation.py",
+    "wf_indi_006_candlestick_pattern_detection.py",
+    "wf_indi_007_volume_profile_distribution.py",
+    "wf_indi_008_capability_matrix_introspection.py",
 )
 
 

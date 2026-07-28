@@ -10,7 +10,9 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class StrategyDiagnostics(BaseModel):

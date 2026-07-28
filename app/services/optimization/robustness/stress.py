@@ -9,7 +9,9 @@ from decimal import Decimal
 from app.services.optimization.robustness.contracts import (  # noqa: TC001
     ExecutionStressRequest,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def apply_execution_cost_stress(

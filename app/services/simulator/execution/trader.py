@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from app.services.simulator.errors import (
     SimulationError,
@@ -12,7 +12,11 @@ from app.services.simulator.errors import (
     operation_guard,
     unwrap_simulation_response,
 )
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.execution.engine import EventDrivenExecutionEngine
@@ -33,7 +37,7 @@ class SimTrader:
 
     @async_operation_guard(
         operation="simulation.execution.sim_trader.submit_order",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
     )
     async def submit_order(self, intent: OrderIntent) -> ExecutionReceipt:
@@ -70,7 +74,7 @@ class SimTrader:
 
     @operation_guard(
         operation="simulation.execution.sim_trader.close_position",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
     )
     def close_position(
@@ -97,7 +101,7 @@ class SimTrader:
 
     @operation_guard(
         operation="simulation.execution.sim_trader.snapshot",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=True,
     )
     def snapshot(self) -> Mapping[str, object]:

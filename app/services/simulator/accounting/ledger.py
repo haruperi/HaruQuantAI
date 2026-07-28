@@ -18,7 +18,11 @@ from app.services.simulator.accounting.calculations import (
     normalize_volume,
 )
 from app.services.simulator.errors import SimulationError, operation_guard
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 class LedgerFill(BaseModel):
@@ -116,7 +120,7 @@ class AccountLedger:
 
     @operation_guard(
         operation="simulation.accounting.account_ledger.apply_fill",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
     )
     def apply_fill(self, fill: LedgerFill) -> Mapping[str, Decimal]:
@@ -174,7 +178,7 @@ class AccountLedger:
 
     @operation_guard(
         operation="simulation.accounting.account_ledger.mark_to_market",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
     )
     def mark_to_market(self, unrealized: Decimal) -> None:
@@ -195,7 +199,7 @@ class AccountLedger:
 
     @operation_guard(
         operation="simulation.accounting.account_ledger.snapshot",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=True,
     )
     def snapshot(self) -> Mapping[str, Decimal | str]:

@@ -1,6 +1,9 @@
 """Private deterministic unsupported-response construction."""
 
+from __future__ import annotations
+
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from app.services.brokers.contracts.enums import (
     BrokerCapabilityId,
@@ -13,7 +16,10 @@ from app.services.brokers.contracts.responses import (
     broker_start_time,
     build_broker_response,
 )
-from app.utils import StandardResponse, utc_now
+from app.utils import utc_now
+
+if TYPE_CHECKING:
+    from app.utils.responses.models import StandardResponse
 
 
 def _unsupported_result[T](

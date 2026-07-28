@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -30,13 +32,13 @@ def build_strategy_fit(
         Advisory archetype ranking with advisory_only=True.
 
     Raises:
-        ValidationError: If the profile is malformed or insufficient.
+        ValueError: If the profile is malformed or insufficient.
     """
     logger.info("Building Research advisory strategy fit")
     verdict = profile.verdict
     score = profile.score
     if score < 0.0:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_PROFILE_SCORE")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_PROFILE_SCORE")
     if verdict == "trending":
         ranking = ("trend_follow", "breakout", "range")
     elif verdict == "ranging":

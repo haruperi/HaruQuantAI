@@ -1,6 +1,6 @@
 """FX conversion evidence over an injected rate provider.
 
-Selects a deterministic acyclic conversion path — direct or synthesized — and publishes
+Selects a deterministic acyclic conversion path â€” direct or synthesized â€” and publishes
 the exact rates, freshness, policy version, and provenance behind it. **It never
 fabricates a rate.** When no allowed path satisfies the request within its declared
 maximum age, it fails rather than interpolating, because an invented rate silently
@@ -28,7 +28,9 @@ from app.services.data.evidence.fx_contracts import (
     FXConversionRequest,
     FXRateLeg,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _SYNTHETIC_PATH_LEGS = 2
 

@@ -14,7 +14,9 @@ from app.services.research.statistics import (
     null_distribution_stats,
     random_entry_null,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import (
@@ -47,14 +49,14 @@ def run_eds_null_baseline(
         Advisory null-baseline result.
 
     Raises:
-        ValidationError: If required study settings or data are absent.
+        ValueError: If required study settings or data are absent.
     """
     logger.info("Building Research edge-study null baseline")
     settings = study.mean_reversion
     side = settings.get("side")
     hold = settings.get("hold_bars")
     if side not in {"buy", "sell", "mixed"} or not isinstance(hold, int):
-        raise ValidationError("RES_INPUT_INVALID", "MATCHED_NULL_POLICY_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "MATCHED_NULL_POLICY_REQUIRED")
     sample = split.test if "close" in split.test else data
     distribution = random_entry_null(
         sample,
@@ -89,13 +91,13 @@ def compare_to_null(
         Percentile, threshold, and empirical p-value evidence.
 
     Raises:
-        ValidationError: If results are incompatible or malformed.
+        ValueError: If results are incompatible or malformed.
     """
     logger.info("Comparing Research edge evidence to matched null")
     value = observed.statistics.get("mean")
     distribution = baseline.null_evidence.get("distribution")
     if not isinstance(value, int | float) or not isinstance(distribution, list):
-        raise ValidationError("RES_INPUT_INVALID", "NULL_COMPARISON_EVIDENCE_MISSING")
+        raise ValueError("RES_INPUT_INVALID", "NULL_COMPARISON_EVIDENCE_MISSING")
     values = np.asarray(distribution, dtype="float64")
     percentile = compute_null_percentile(float(value), values)
     return {
@@ -116,14 +118,14 @@ def get_acceptance_criteria(baseline: EdgeResult) -> Mapping[str, JSONValue]:
         Closed confirmation truth-table criteria.
 
     Raises:
-        ValidationError: If the baseline is incompatible.
+        ValueError: If the baseline is incompatible.
     """
     logger.debug("Reading Research edge acceptance criteria")
     if (
         baseline.study != "null_baseline"
         or baseline.null_evidence.get("policy_version") != "v1"
     ):
-        raise ValidationError("RES_VERSION_INCOMPATIBLE", "BASELINE_POLICY_NOT_V1")
+        raise ValueError("RES_VERSION_INCOMPATIBLE", "BASELINE_POLICY_NOT_V1")
     return {
         "policy_version": "v1",
         "confidence": 0.95,

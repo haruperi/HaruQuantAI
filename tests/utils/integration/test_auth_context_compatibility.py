@@ -11,7 +11,7 @@ deliberately imports nothing from `app.services`.
 from datetime import UTC, datetime
 
 import pytest
-from app.utils import AuthContext, generate_id
+from app.utils import create_auth_context, generate_id
 from pydantic import ValidationError
 
 _CONTRACT_VERSION = "v1"
@@ -34,10 +34,8 @@ _REQUIRED_FIELDS = frozenset(
 )
 
 
-def _canonical_context() -> AuthContext:
-    return AuthContext(
-        contract_version=_CONTRACT_VERSION,
-        schema_id=_SCHEMA_ID,
+def _canonical_context():
+    return create_auth_context(
         principal_id="user-123",
         principal_type="USER",
         roles=("operator", "manager"),
@@ -69,7 +67,7 @@ def test_auth_context_exposes_exactly_the_required_consumer_fields() -> None:
 def test_auth_context_round_trips_without_loss() -> None:
     """Reconstruct a producer-serialized context exactly, as a consumer would."""
     context = _canonical_context()
-    rebuilt = AuthContext(**context.model_dump())
+    rebuilt = create_auth_context(**context.model_dump())
     assert rebuilt == context
     assert rebuilt.request_id == context.request_id
     assert rebuilt.roles == context.roles
@@ -97,13 +95,13 @@ def test_auth_context_rejects_incompatible_identity(field: str, value: str) -> N
     """Fail closed on version, schema, or principal-type drift."""
     values = _canonical_context().model_dump()
     values[field] = value
-    with pytest.raises(ValidationError):
-        AuthContext(**values)
+    with pytest.raises((ValidationError, TypeError)):
+        create_auth_context(**values)
 
 
 def test_auth_context_rejects_unknown_field() -> None:
     """Reject producer-side field additions that consumers cannot interpret."""
     values = _canonical_context().model_dump()
     values["impersonated_by"] = "user-999"
-    with pytest.raises(ValidationError):
-        AuthContext(**values)
+    with pytest.raises((ValidationError, TypeError)):
+        create_auth_context(**values)

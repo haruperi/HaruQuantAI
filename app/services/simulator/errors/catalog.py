@@ -1,9 +1,27 @@
+from dataclasses import dataclass
+
 """Authoritative closed Simulation error catalog."""
 
 from collections.abc import Mapping
 from types import MappingProxyType
 
-from app.utils import ErrorDefinition, logger
+from app.utils import get_logger
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorDefinition:
+    """Immutable domain-owned error catalogue entry."""
+
+    code: str
+    domain: str
+    description: str
+    category: str
+    severity: Literal[info, warning, error, critical]
+    retryable: bool
+    operator_action: str
+
+
+logger = get_logger(__name__)
 
 _GROUPS: dict[str, tuple[str, ...]] = {
     "request_scope": (

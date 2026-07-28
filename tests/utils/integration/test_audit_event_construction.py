@@ -11,8 +11,8 @@ from datetime import UTC, datetime
 
 import pytest
 from app.utils import (
-    AuditEvent,
     canonical_json,
+    create_audit_event,
     generate_id,
     redact_mapping_value,
 )
@@ -23,9 +23,7 @@ def test_redacted_canonical_audit_event_is_constructed() -> None:
     """Build one genuinely redacted, canonicalized Utils audit envelope."""
     safe_payload = redact_mapping_value({"account": "demo", "token": "abc123"}).value
     assert isinstance(safe_payload, dict)
-    event = AuditEvent(
-        contract_version="v1",
-        schema_id="utils.audit_event.v1",
+    event = create_audit_event(
         event_id=generate_id("evt"),
         timestamp=datetime.now(UTC),
         domain="trading",
@@ -43,9 +41,7 @@ def test_redacted_canonical_audit_event_is_constructed() -> None:
 def test_audit_event_construction_fails_closed_on_protected_key() -> None:
     """Reject a payload carrying a protected credential key before persistence."""
     with pytest.raises(ValidationError):
-        AuditEvent(
-            contract_version="v1",
-            schema_id="utils.audit_event.v1",
+        create_audit_event(
             event_id=generate_id("evt"),
             timestamp=datetime.now(UTC),
             domain="trading",

@@ -9,7 +9,9 @@ from app.services.optimization.state.contracts import (
     OptimizationStateStore,  # noqa: TC001
 )
 from app.services.optimization.state.stores import _validate_receipt
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def persist_optimization_result(

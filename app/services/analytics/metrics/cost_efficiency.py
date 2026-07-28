@@ -12,7 +12,9 @@ from app.services.analytics.contracts.models import (
     SectionEvidence,
     TradingResult,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _metric(metric_key: str, value: object, unit: str) -> MetricEvidence:

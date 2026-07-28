@@ -1,10 +1,25 @@
+from dataclasses import dataclass
+
 """Accepted deterministic Strategy error catalogue."""
 
 from enum import StrEnum
 from types import MappingProxyType
-from typing import cast
+from typing import Literal, cast
 
-from app.utils import ErrorDefinition, ErrorSeverity, validate_error_catalog
+from app.utils import validate_error_catalog
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorDefinition:
+    """Immutable domain-owned error catalogue entry."""
+
+    code: str
+    domain: str
+    description: str
+    category: str
+    severity: Literal["info", "warning", "error", "critical"]
+    retryable: bool
+    operator_action: str
 
 
 class StrategyErrorCode(StrEnum):

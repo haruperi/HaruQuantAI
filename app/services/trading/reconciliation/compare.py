@@ -3,7 +3,7 @@
 from collections.abc import Mapping
 from hashlib import sha256
 from types import MappingProxyType
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -19,12 +19,15 @@ from app.services.trading.state import (
     TradingProjection,  # noqa: TC001 - runtime annotation and model resolution
 )
 from app.utils import (
-    RiskLevel,
-    StandardResponse,
     canonical_json,
-    logger,
+    get_logger,
     to_json_safe,
 )
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 type DiscrepancyClass = Literal[
     "missing_internal",
@@ -277,7 +280,7 @@ def compare_authority_state(
         return map_trading_error(error, {"authority_id": authority.authority_id})
     return success_trading_response(
         report,
-        risk_level=RiskLevel.HIGH if report.unresolved else RiskLevel.LOW,
+        risk_level="high" if report.unresolved else "low",
         legacy_status="discrepancy" if report.unresolved else "consistent",
         extensions={"report_id": report.report_id},
     )

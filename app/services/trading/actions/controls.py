@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from hashlib import sha256
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.risk import ActionPolicyVerdict, KillSwitchCommand
 from app.services.trading.actions._shared import authority_id, require_action
@@ -25,7 +25,12 @@ from app.services.trading.validation.authority import (
     validate_action_policy,
     validate_kill_switch_hierarchy,
 )
-from app.utils import RiskLevel, StandardResponse, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -120,7 +125,7 @@ def _control_envelope(
         redacted_data,
         operation=f"trading.{request.action}",
         message="Trading control transition completed",
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=False,

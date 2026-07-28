@@ -19,7 +19,7 @@ from app.services.data.audit.contracts import (
     AuditEventQuery,
 )
 from app.services.data.contracts.responses import unwrap_data_response
-from app.utils import AuthContext
+from app.utils import create_auth_context
 
 from tests.data.helpers_models import END, START, make_audit_event
 
@@ -51,7 +51,7 @@ def make_auth(*, admin: bool = True) -> AuthContext:
     """Helper to construct authenticated context."""
     from app.utils import generate_id
 
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="user-1",

@@ -7,7 +7,9 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from app.services.optimization.search.grid import iter_grid_candidates
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.optimization.parameters import ParameterSpace, ParameterValue

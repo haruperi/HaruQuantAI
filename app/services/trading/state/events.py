@@ -22,7 +22,9 @@ from app.services.trading.contracts.models import (
     _validate_trace_id,
     _validation_field_name,
 )
-from app.utils import logger, to_json_safe
+from app.utils import get_logger, to_json_safe
+
+logger = get_logger(__name__)
 
 type TradingEventType = Literal[
     "send_attempted",

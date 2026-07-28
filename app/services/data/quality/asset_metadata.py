@@ -6,7 +6,7 @@ handed: it performs no lookup, resolves no identity, and contacts no source.
 
 ``map_canonical_symbol`` was proposed for this module and deliberately excluded.
 ``sources/registry.resolve_source_identity`` already performs provider-symbol mapping,
-so a second implementation would duplicate it — and importing ``sources`` from
+so a second implementation would duplicate it â€” and importing ``sources`` from
 ``quality`` would add a dependency edge that the layering does not have. Symbol mapping
 stays with its existing owner.
 """
@@ -22,7 +22,9 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.market_data.symbol_metadata import SymbolMetadata
@@ -93,7 +95,7 @@ def validate_symbol_metadata(
     fields a governed workflow needs are present rather than explicitly missing, that
     the declared step sizes are positive, and that ``digits`` and ``price_step`` agree
     with each other. A five-digit instrument with a step of ``0.01`` is not a rounding
-    nuisance — it silently misprices every downstream calculation.
+    nuisance â€” it silently misprices every downstream calculation.
 
     Args:
         metadata: Normalized symbol metadata to verify.

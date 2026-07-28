@@ -8,7 +8,7 @@ from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 from time import monotonic
-from typing import TYPE_CHECKING, Literal, Protocol
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -30,7 +30,13 @@ from app.services.risk.contracts.responses import (
     unwrap_risk_response,
 )
 from app.services.risk.limits import evaluate_market_context, evaluate_portfolio_limits
-from app.utils import AuthContext, RiskLevel, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type AuthContext = Any
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -598,7 +604,7 @@ class RiskGovernor:
         return checks
 
     @guard_risk_boundary(
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         read_only=False,
         modifies_database=True,
     )
@@ -760,7 +766,7 @@ class RiskGovernor:
             ) from error
 
     @guard_risk_boundary(
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         read_only=False,
         modifies_database=True,
     )

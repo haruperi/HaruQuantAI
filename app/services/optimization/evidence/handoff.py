@@ -5,7 +5,9 @@ from __future__ import annotations
 from app.services.optimization.evidence.contracts import (
     OptimizationResult,  # noqa: TC001
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def build_report_package(result: OptimizationResult) -> dict[str, object]:

@@ -1,8 +1,8 @@
 """Normalized market-context evidence for Risk.
 
 Data owns normalization and freshness; Risk owns interpretation. This module produces
-``MarketContextEvidence`` — session, calendar, spread, liquidity, volatility,
-correlation, and crisis observations — and never a verdict. Missing evidence is stated
+``MarketContextEvidence`` â€” session, calendar, spread, liquidity, volatility,
+correlation, and crisis observations â€” and never a verdict. Missing evidence is stated
 explicitly rather than defaulted, because a Risk gate that cannot tell "absent" from
 "benign" cannot fail closed.
 
@@ -21,7 +21,9 @@ from app.services.data.contracts.responses import (
     run_data_operation,
     unwrap_data_response,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.evidence.market_context_contracts import (

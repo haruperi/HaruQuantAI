@@ -18,7 +18,9 @@ from app.services.research.contracts import (
     ResearchResourceLimits,
     ResearchWarning,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _MIN_CONTINUITY_ROWS = 3
 
@@ -121,15 +123,15 @@ def validate_dataset(
         Machine-readable quality evidence.
 
     Raises:
-        ValidationError: If the input contract or resource bound is invalid.
+        ValueError: If the input contract or resource bound is invalid.
     """
     logger.info("Validating canonical dataset for Research")
     if not isinstance(dataset, MarketDataset):
-        raise ValidationError("RES_INPUT_INVALID", "MARKET_DATASET_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "MARKET_DATASET_REQUIRED")
     if dataset.record_count > limits.max_rows:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     if dataset.data_kind != "bars" or dataset.record_count == 0:
-        raise ValidationError("RES_INPUT_INVALID", "NONEMPTY_BAR_DATASET_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "NONEMPTY_BAR_DATASET_REQUIRED")
     try:
         frame_response = to_ohlcv_dataframe(dataset)
         if isinstance(frame_response, pd.DataFrame):
@@ -144,7 +146,7 @@ def validate_dataset(
             )
     except DataError as error:
         logger.error("Data projection failed during Research validation")
-        raise ValidationError("RES_INPUT_INVALID", "DATA_PROJECTION_FAILED") from error
+        raise ValueError("RES_INPUT_INVALID", "DATA_PROJECTION_FAILED") from error
     fatal = _frame_findings(frame)
     if not dataset.source_metadata:
         fatal.append(_fatal("MISSING_SOURCE_METADATA", "source_metadata"))

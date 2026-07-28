@@ -12,7 +12,9 @@ from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from app.services.analytics import PerformanceReport  # noqa: TC001
 from app.services.optimization.parameters import ParameterValue  # noqa: TC001
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _SHA256_HEX_LENGTH = 64
 

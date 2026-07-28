@@ -1,8 +1,8 @@
 """Serialized non-blocking MetaTrader 5 terminal transport."""
 
-# ruff: noqa: ANN401 - the optional SDK has heterogeneous documented return types.
 from __future__ import annotations
 
+# ruff: noqa: ANN401 - the optional SDK has heterogeneous documented return types.
 import asyncio
 import importlib
 import time
@@ -16,7 +16,9 @@ from app.services.brokers.adapter_runtime.circuit_breaker import (
 )
 from app.services.brokers.contracts import BrokerErrorCode
 from app.services.brokers.contracts.protocols import _CircuitOpenError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class _MT5Transport:

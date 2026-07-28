@@ -26,7 +26,9 @@ from app.services.data.contracts.responses import (
 from app.services.data.time_sessions.timeframes import (
     _get_timeframe_spec_raw,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 
 def _resolve_price(r: TickRecord, policy: str) -> Decimal | None:

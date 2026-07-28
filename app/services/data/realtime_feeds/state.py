@@ -3,8 +3,8 @@
 ``feeds/runtime.py`` split three ways in ``CAP-DATA-026`` Phase 8, and ``_ACTIVE_FEEDS``
 had to end up in exactly one of them. Letting each module declare its own would have
 produced two registries: ingestion writing to one while status read the other, so a feed
-receiving events would report as idle. That failure is silent — nothing raises, the
-numbers are simply wrong — which is the same shape as the duplicated settings
+receiving events would report as idle. That failure is silent â€” nothing raises, the
+numbers are simply wrong â€” which is the same shape as the duplicated settings
 ``ContextVar`` Phase 3 uncovered.
 
 Hosting the registry below every module that touches it makes a second copy impossible
@@ -23,7 +23,9 @@ from typing import TYPE_CHECKING
 
 from app.services.data.contracts import DataError
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.realtime_feeds.contracts import (

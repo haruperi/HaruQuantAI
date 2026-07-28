@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -28,11 +28,14 @@ from app.services.data.sources.registry import (
     _get_source_descriptor_raw,
     update_source_descriptor_readiness,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.market_data.requests import MarketDataRequest
-    from app.utils import AuthContext
 
 type AttemptStatus = Literal["SUCCESS", "FAILURE", "BLOCKED"]
 

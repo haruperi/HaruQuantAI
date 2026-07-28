@@ -18,7 +18,7 @@ import asyncio
 import hashlib
 import json
 from datetime import UTC, datetime, timedelta
-from typing import Final, Literal
+from typing import Any, Final, Literal
 
 from app.services.data.contracts import DataError
 from app.services.data.data_jobs.backfill import (
@@ -40,7 +40,9 @@ from app.services.data.persistence.contracts import (
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.services.data.sources.policy import _evaluate_source_policy_raw
-from app.utils import Clock, generate_id, logger, utc_now
+from app.utils import generate_id, get_logger, utc_now
+
+logger = get_logger(__name__)
 
 # Configuration Limits
 JOB_MAX_SYMBOLS: Final[int] = 500
@@ -194,7 +196,7 @@ def _handle_create(request: ScheduleJobRequest) -> None:
         _start_background_loop(request.job_id, definition.interval_seconds)
 
 
-def _handle_start(request: ScheduleJobRequest, clock: Clock | None = None) -> None:
+def _handle_start(request: ScheduleJobRequest, clock: Any | None = None) -> None:
     """Handle starting an update job."""
     logger.debug("Running DATA function: _handle_start")
     query_sql = (
@@ -302,7 +304,7 @@ def _handle_stop(request: ScheduleJobRequest) -> None:
 def schedule_update_job(
     request: ScheduleJobRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> JobStatus:
     """Coordinate create/start/stop/run-once lifecycle for update jobs.
 
@@ -341,7 +343,7 @@ def schedule_update_job(
 def read_update_job_status(
     request: JobStatusRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> JobStatus:
     """Query current status of a job definition from SQLite database.
 
@@ -520,7 +522,7 @@ def _execute_run_chunks(
     start_time: datetime,
     end_time: datetime,
     request_id: str,
-    clock: Clock | None,
+    clock: Any | None,
 ) -> tuple[int, int, str | None]:
     """Loop and execute all required backfill chunk requests."""
     logger.debug("Running DATA function: _execute_run_chunks")
@@ -568,7 +570,7 @@ def run_data_update_job_once(
     job_id: str,
     request_id: str,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> JobRunResult:
     """Execute a data update job synchronously once.
 

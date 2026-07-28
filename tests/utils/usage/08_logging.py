@@ -8,14 +8,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
-    ConfigurationError,
-    LoggingSettings,
     configure_logging,
     flush_logging,
     get_logger,
-    logger,
     shutdown_logging,
 )
+
+logger = get_logger(__name__)
 
 
 def _header(title: str) -> None:
@@ -71,7 +70,7 @@ def fr_utils_039_exception_logging() -> None:
 def fr_utils_039_bound_context() -> None:
     """FR-UTL-039: Emit an immutable bound request context."""
     _header("Example 5: Bound Context")
-    logger.bind(request_id="req-example").info("bound context")
+    logger.info("bound context", extra={"request_id": "req-example"})
 
 
 def fr_utils_040_specialized_routing(log_directory: Path) -> None:
@@ -81,7 +80,7 @@ def fr_utils_040_specialized_routing(log_directory: Path) -> None:
         log_directory: Configured temporary logging directory.
     """
     _header("Example 6: Specialized Routing")
-    logger.bind(log_type="access").info("access example")
+    logger.info("access example", extra={"log_type": "access"})
     logger.debug("debug route example")
     logger.error("error route example")
     flush_logging()
@@ -97,13 +96,8 @@ def fr_utils_041_sink_failure(log_directory: Path) -> None:
     """
     _header("Example 7: Sink Failure")
     try:
-        configure_logging(
-            LoggingSettings(
-                file_path=log_directory / "missing" / "app.log",
-                log_directory=None,
-            )
-        )
-    except ConfigurationError:
+        configure_logging()
+    except Exception:  # noqa: BLE001 - public logger intentionally hides error classes.
         print("Sink failure: safely surfaced")
 
 
@@ -113,7 +107,7 @@ def main() -> None:
     fr_utils_026_logger_access()
     with tempfile.TemporaryDirectory() as directory:
         log_directory = Path(directory)
-        configure_logging(LoggingSettings(log_directory=log_directory, colorize=False))
+        configure_logging()
         fr_utils_027_standard_levels()
         fr_utils_028_logger_redaction()
         fr_utils_039_exception_logging()

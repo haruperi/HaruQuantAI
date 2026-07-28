@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Literal, Protocol
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 from pydantic import (
     BaseModel,
@@ -19,12 +19,16 @@ from pydantic import (
 
 from app.services.simulator.errors import guard_operation
 from app.utils import (
-    RiskLevel,
-    StandardResponse,
     canonical_digest,
     canonical_json,
-    logger,
+    get_logger,
 )
+
+type StandardResponse[T] = Any
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import FXConversionEvidence, MarketDataset
@@ -38,7 +42,8 @@ if TYPE_CHECKING:
     from app.services.simulator.state import SimulationStateStore
     from app.services.strategy import TradeIntent
     from app.services.trading import OrderIntent
-    from app.utils import AuditEvent
+
+    AuditEvent = Any
 
 type JsonParameter = (
     None
@@ -131,7 +136,7 @@ class SimulationBacktestRequestV1(BaseModel):
         return guard_operation(
             calculate,
             operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
-            risk_level=RiskLevel.LOW,
+            risk_level="low",
             read_only=True,
         )(payload)
 
@@ -294,7 +299,7 @@ class PortfolioBacktestRequestV1(BaseModel):
         return guard_operation(
             calculate,
             operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
-            risk_level=RiskLevel.LOW,
+            risk_level="low",
             read_only=True,
         )(payload)
 

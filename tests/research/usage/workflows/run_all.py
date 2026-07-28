@@ -16,17 +16,17 @@ from tests.research.usage.workflows._support import (
 )
 
 WORKFLOWS = (
-    "wf_res_001_prepare_research_dataset.py",
+    "wf_res_sec_prepare_research_dataset.py",
     "wf_res_002_build_core_metric_profile.py",
     "wf_res_003_build_leakage_safe_feature_frame_time_splits.py",
     "wf_res_004_analyze_session_seasonality_opportunity.py",
-    "wf_res_005_run_edge_study_null_evidence.py",
+    "wf_res_ter_run_edge_study_null_evidence.py",
     "wf_res_006_build_market_structure_profile.py",
     "wf_res_007_forward_validate_calibrate_market_structure.py",
     "wf_res_008_run_unsupervised_market_structure_research.py",
     "wf_res_009_build_research_scorecard_profile_snapshot.py",
     "wf_res_010_render_persist_research_artifact.py",
-    "wf_res_011_run_complete_edge_lab_profile.py",
+    "wf_res_pri_run_complete_edge_lab_profile.py",
 )
 
 

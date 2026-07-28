@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -37,11 +39,11 @@ def render_research_report(
         JSON-compatible mapping or Markdown string.
 
     Raises:
-        ValidationError: If the format is unsupported or the report is invalid.
+        ValueError: If the format is unsupported or the report is invalid.
     """
     logger.info("Rendering Research report")
     if format not in ("json", "markdown"):
-        raise ValidationError("RES_INPUT_INVALID", "UNSUPPORTED_RENDER_FORMAT")
+        raise ValueError("RES_INPUT_INVALID", "UNSUPPORTED_RENDER_FORMAT")
     generated = report.generated_at.isoformat()
     payload: dict[str, JSONValue] = {
         "schema_id": report.schema_id,
@@ -80,11 +82,11 @@ def render_profile_comparison(
         Markdown comparison string exposing schema/config/dataset differences.
 
     Raises:
-        ValidationError: If the snapshots have incompatible schemas.
+        ValueError: If the snapshots have incompatible schemas.
     """
     logger.info("Rendering Research profile comparison")
     if left.schema_version != right.schema_version:
-        raise ValidationError("RES_INPUT_INVALID", "INCOMPATIBLE_SNAPSHOT_SCHEMA")
+        raise ValueError("RES_INPUT_INVALID", "INCOMPATIBLE_SNAPSHOT_SCHEMA")
     same_dataset = left.dataset_hash == right.dataset_hash
     same_config = left.configuration_hash == right.configuration_hash
     lines = [
@@ -118,13 +120,13 @@ def generate_multi_symbol_report(
         JSON-compatible mapping or Markdown string.
 
     Raises:
-        ValidationError: If the report set is empty or format is invalid.
+        ValueError: If the report set is empty or format is invalid.
     """
     logger.info("Rendering Research multi-symbol report")
     if not reports:
-        raise ValidationError("RES_INPUT_INVALID", "EMPTY_REPORT_SET")
+        raise ValueError("RES_INPUT_INVALID", "EMPTY_REPORT_SET")
     if format not in ("json", "markdown"):
-        raise ValidationError("RES_INPUT_INVALID", "UNSUPPORTED_RENDER_FORMAT")
+        raise ValueError("RES_INPUT_INVALID", "UNSUPPORTED_RENDER_FORMAT")
     per_symbol: dict[str, Mapping[str, JSONValue]] = {}
     combined_warnings = 0
     for symbol, report in reports.items():

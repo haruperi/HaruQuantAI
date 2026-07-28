@@ -15,7 +15,9 @@ from pydantic import (
 )
 
 from app.services.data.contracts._base import FrozenContract as _Contract
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 type WorkflowContext = Literal[
     "research", "backtest", "validation", "risk", "execution_bound"

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from app.services.risk.config import (
@@ -27,7 +27,11 @@ from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -457,7 +461,7 @@ def _concentration_results(
     return tuple(results)
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def evaluate_portfolio_limits(
     snapshot: PortfolioRiskSnapshot,
     config: RiskConfig,
@@ -604,7 +608,7 @@ def evaluate_portfolio_limits(
         raise
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def evaluate_single_day_profit_share(
     snapshot: PortfolioRiskSnapshot,
     mandate: FirmMandate,
@@ -854,7 +858,7 @@ def _spread_result(
     return _threshold_result("spread", evidence.spread, threshold, evidence_refs, 3)
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def evaluate_market_context(
     evidence: MarketContextEvidence,
     config: RiskConfig,

@@ -2,7 +2,7 @@
 
 Resampling only ever coarsens: a target finer than the source is rejected rather than
 interpolated, because inventing intra-bar detail would fabricate evidence. The source
-dataset's quality report is propagated with updated provenance rather than recomputed —
+dataset's quality report is propagated with updated provenance rather than recomputed â€”
 a transform changes the shape of a series, not the trustworthiness of the observations
 it derives from.
 """
@@ -24,7 +24,9 @@ from app.services.data.time_sessions.timeframes import (
     _get_timeframe_spec_raw,
     _validate_resample_target_raw,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 
 def _resample_dataset_raw(

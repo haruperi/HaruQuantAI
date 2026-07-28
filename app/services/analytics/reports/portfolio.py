@@ -16,7 +16,9 @@ from app.services.analytics.contracts.models import (
     SectionEvidence,
 )
 from app.services.analytics.reports.hashes import _compute_portfolio_hashes
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _FX_FIELDS = frozenset(
     {

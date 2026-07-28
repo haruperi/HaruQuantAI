@@ -14,7 +14,9 @@ from app.services.optimization.parameters import (
     get_executable_parameters,
     validate_parameter_space,
 )
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 
 def _values(item: ParameterRange) -> tuple[ParameterValue, ...]:

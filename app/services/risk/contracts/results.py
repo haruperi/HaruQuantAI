@@ -16,8 +16,9 @@ from pydantic import (
 )
 
 from app.services.risk.contracts.enums import DecisionState, LimitStatus, RiskErrorCode
-from app.utils import ValidationError as UtilsValidationError
-from app.utils import is_sensitive_key, logger, validate_id
+from app.utils import get_logger, is_sensitive_key, validate_id
+
+logger = get_logger(__name__)
 
 _SHA256_HEX_LENGTH = 64
 
@@ -80,7 +81,7 @@ class _ResultModel(BaseModel):
             raise ValueError("unsupported Risk trace identifier field")
         try:
             return validate_id(value, expected_prefix=prefix)
-        except UtilsValidationError as error:
+        except Exception as error:
             message = f"{info.field_name} must be a canonical prefixed UUID4"
             raise ValueError(message) from error
 

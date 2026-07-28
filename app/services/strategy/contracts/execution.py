@@ -28,7 +28,9 @@ from app.services.strategy.contracts.enums import (  # noqa: TC001
     StrategyEnvironment,
     StrategyTimingPolicy,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class StrategyExecutionContext(_Contract):

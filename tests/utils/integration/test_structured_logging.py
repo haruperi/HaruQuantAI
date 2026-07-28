@@ -3,10 +3,13 @@ from pathlib import Path
 
 import pytest
 from app.utils import (
+    configure_logging,
     flush_logging,
-    logger,
+    get_logger,
     shutdown_logging,
 )
+
+logger = get_logger(__name__)
 
 
 def test_structured_logging_redacts_before_file_emission(
@@ -19,8 +22,12 @@ def test_structured_logging_redacts_before_file_emission(
     monkeypatch.setenv("LOG_RENDER", "json")
     monkeypatch.setenv("LOG_COLORIZE", "false")
     shutdown_logging()
-    logger.bind(request_id="req-example", password="hidden").info("api_key=abc123")
-    logger.bind(log_type="access").info("access")
+    configure_logging()
+    logger.info(
+        "api_key=abc123",
+        extra={"request_id": "req-example", "password": "hidden"},
+    )
+    logger.info("access", extra={"log_type": "access"})
     logger.debug("debug")
     logger.error("error")
     flush_logging()

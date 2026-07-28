@@ -1,7 +1,8 @@
 from datetime import UTC, datetime
 
 import pytest
-from app.utils import AuthContext, generate_id
+from app.utils import generate_id
+from app.utils.contracts.auth import AuthContext
 from pydantic import ValidationError
 
 

@@ -16,7 +16,9 @@ from app.services.indicators.core.errors import (
     IndicatorErrorCode,
     guard_public_boundary,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _REGISTRY_PARAMETER_SCHEMA_MAXIMUM = 1_000_000
 _WORKFLOW_ELIGIBILITY: tuple[str, ...] = (

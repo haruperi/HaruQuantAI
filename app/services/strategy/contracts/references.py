@@ -28,7 +28,9 @@ from app.services.strategy.contracts.manifest import StrategyManifest  # noqa: T
 from app.services.strategy.contracts.policy import (
     StrategyValidationPolicy,  # noqa: TC001
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class StrategyRef(_Contract):

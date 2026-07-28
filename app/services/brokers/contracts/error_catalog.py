@@ -1,9 +1,24 @@
 """Authoritative immutable Brokers error catalogue."""
 
+from dataclasses import dataclass
 from types import MappingProxyType
+from typing import Literal
 
 from app.services.brokers.contracts.enums import BrokerErrorCode
-from app.utils import ErrorDefinition
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorDefinition:
+    """Immutable broker-owned error catalogue entry."""
+
+    code: str
+    domain: str
+    description: str
+    category: str
+    severity: Literal["info", "warning", "error", "critical"]
+    retryable: bool
+    operator_action: str
+
 
 _ERROR_DEFINITIONS = (
     ErrorDefinition(

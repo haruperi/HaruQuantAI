@@ -8,7 +8,9 @@ from typing import Literal
 from pydantic import field_validator, model_validator
 
 from app.services.data.contracts._base import TracedContract as _Contract
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _text(value: str) -> str:

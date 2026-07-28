@@ -1,14 +1,9 @@
 from dataclasses import FrozenInstanceError
 
 import pytest
-from app.utils import (
-    RedactionPolicy,
-    SecurityError,
-    ValidationError,
-    is_sensitive_key,
-    redact_mapping_value,
-    redact_text_value,
-)
+from app.utils import is_sensitive_key, redact_mapping_value, redact_text_value
+from app.utils.errors.exceptions import SecurityError, ValidationError
+from app.utils.security.redaction import RedactionPolicy
 
 
 def test_redaction_policy_is_immutable() -> None:

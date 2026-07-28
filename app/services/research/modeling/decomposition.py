@@ -9,7 +9,9 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -34,18 +36,18 @@ def _select_finite_features(
         The selected finite frame and its float64 matrix.
 
     Raises:
-        ValidationError: If columns are missing, non-finite, or insufficient.
+        ValueError: If columns are missing, non-finite, or insufficient.
     """
     logger.debug("Selecting Research PCA feature columns")
     missing = [c for c in config.feature_columns if c not in features.columns]
     if missing:
-        raise ValidationError("RES_INPUT_INVALID", "MISSING_FEATURE_COLUMNS")
+        raise ValueError("RES_INPUT_INVALID", "MISSING_FEATURE_COLUMNS")
     selected = features[list(config.feature_columns)].astype("float64")
     matrix = selected.to_numpy()
     if not np.isfinite(matrix).all():
-        raise ValidationError("RES_INPUT_INVALID", "NONFINITE_FEATURE_VALUES")
+        raise ValueError("RES_INPUT_INVALID", "NONFINITE_FEATURE_VALUES")
     if matrix.shape[0] < config.minimum_samples:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "INSUFFICIENT_MODELING_SAMPLES")
+        raise ValueError("RES_INSUFFICIENT_DATA", "INSUFFICIENT_MODELING_SAMPLES")
     return selected, matrix
 
 
@@ -64,12 +66,12 @@ def run_pca(
         Versioned PCA evidence with preprocessing and diagnostics.
 
     Raises:
-        ValidationError: If features are invalid, constant, or insufficient.
+        ValueError: If features are invalid, constant, or insufficient.
     """
     logger.info("Running Research PCA decomposition")
     _selected, matrix = _select_finite_features(features, config)
     if config.pca_components > matrix.shape[1]:
-        raise ValidationError("RES_INPUT_INVALID", "PCA_COMPONENTS_EXCEED_FEATURES")
+        raise ValueError("RES_INPUT_INVALID", "PCA_COMPONENTS_EXCEED_FEATURES")
     preprocessing: dict[str, JSONValue] = {"scale": config.scale}
     if config.scale:
         scaler = StandardScaler()

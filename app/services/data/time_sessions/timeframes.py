@@ -1,7 +1,7 @@
 """Temporal truth for the DATA domain: timeframes and UTC normalization.
 
 Moved from ``transforms/timeframes.py`` by ``CAP-DATA-026``. The timeframe manifest is
-not a transform — it is the definition of what a timeframe *is*, consumed by
+not a transform â€” it is the definition of what a timeframe *is*, consumed by
 resampling, aggregation, quality gap detection, and tick generation alike. Hosting it
 under ``time`` gives every temporal fact one owner.
 
@@ -23,7 +23,9 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 
 class TimeframeSpec(NamedTuple):

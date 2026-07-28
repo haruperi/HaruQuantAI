@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from app.services.simulator.errors import (
     SimulationError,
@@ -12,7 +12,11 @@ from app.services.simulator.errors import (
     unwrap_simulation_response,
 )
 from app.services.simulator.journal.contracts import JournalEvent
-from app.utils import RiskLevel, canonical_digest, canonical_json, logger
+from app.utils import canonical_digest, canonical_json, get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.state import SimulationStateStore
@@ -67,7 +71,7 @@ class JournalWriter:
 
     @operation_guard(
         operation="simulation.journal.journal_writer.append",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
         writes_file=True,
     )
@@ -144,7 +148,7 @@ class JournalWriter:
 
     @operation_guard(
         operation="simulation.journal.journal_writer.finalize",
-        risk_level=RiskLevel.MEDIUM,
+        risk_level="medium",
         read_only=False,
         writes_file=True,
     )

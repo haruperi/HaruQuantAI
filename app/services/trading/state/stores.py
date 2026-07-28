@@ -7,7 +7,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Literal, Protocol
 
 from app.services.trading.contracts.models import JsonValue, TradingRoute
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.state.events import TradingEvent

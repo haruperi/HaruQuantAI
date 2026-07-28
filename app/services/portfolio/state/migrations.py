@@ -7,7 +7,9 @@ from hashlib import sha256
 from app.services.data import (
     MigrationStep,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _PORTFOLIO_SCHEMA_STATEMENTS = (
     """

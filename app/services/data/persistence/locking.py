@@ -21,7 +21,9 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _SQLITE_INTEGER_MAX = (1 << 63) - 1
 _NANOSECONDS_PER_SECOND = 1_000_000_000

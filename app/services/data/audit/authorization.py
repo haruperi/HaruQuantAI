@@ -1,9 +1,8 @@
 """Audit-query authorization boundary."""
 
-from typing import TYPE_CHECKING
+from typing import Any
 
-if TYPE_CHECKING:
-    from app.utils import AuthContext
+type AuthContext = Any
 
 
 def may_query_audit(context: AuthContext) -> bool:

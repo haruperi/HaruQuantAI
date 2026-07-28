@@ -1,12 +1,18 @@
 """Additive Trading-owned schema definitions executed by Data."""
 
 from hashlib import sha256
+from typing import Any, Literal
 
 from app.services.data import (
     MigrationStep,
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel, StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 TRADING_SCHEMA_VERSION = "v1"
 
@@ -82,7 +88,7 @@ def get_trading_migrations() -> StandardResponse[tuple[MigrationStep, ...]]:
     """
     return success_trading_response(
         _get_trading_migrations_value(),
-        risk_level=RiskLevel.LOW,
+        risk_level="low",
         legacy_status="available",
     )
 

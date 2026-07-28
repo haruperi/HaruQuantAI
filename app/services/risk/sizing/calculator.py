@@ -1,6 +1,7 @@
 """Migration-evidenced deterministic position sizing recommendations."""
 
 from decimal import ROUND_FLOOR, Decimal
+from typing import Literal
 
 from app.services.risk.config import RiskConfig  # noqa: TC001
 from app.services.risk.contracts import (
@@ -11,7 +12,11 @@ from app.services.risk.contracts import (
     RiskErrorCode,
 )
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 def _risk_per_unit(
@@ -299,7 +304,7 @@ def _validate_raw_size(raw_size: Decimal) -> Decimal:
     return raw_size
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def calculate_position_size(
     request: PositionSizingRequest,
     snapshot: PortfolioRiskSnapshot,

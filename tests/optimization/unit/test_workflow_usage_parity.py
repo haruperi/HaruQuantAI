@@ -11,11 +11,12 @@ WORKFLOW_DIR = ROOT / "tests/optimization/usage/workflows"
 README = ROOT / "app/services/optimization/README.md"
 EXPECTED = {
     "WF-OPT-001": "wf_opt_001_package_optimization_robustness_request.py",
-    "WF-OPT-002": "wf_opt_002_execute_bounded_parameter_sweep.py",
-    "WF-OPT-003": "wf_opt_003_score_rank_assess_overfit_evidence.py",
-    "WF-OPT-004": "wf_opt_004_run_walk_forward_validation.py",
+    "WF-OPT-PRI": "wf_opt_pri_execute_bounded_parameter_sweep.py",
+    "WF-OPT-TER": "wf_opt_ter_score_rank_assess_overfit_evidence.py",
+    "WF-OPT-SEC": "wf_opt_sec_run_walk_forward_validation.py",
     "WF-OPT-005": "wf_opt_005_run_monte_carlo_robustness_analysis.py",
     "WF-OPT-006": "wf_opt_006_build_persist_versioned_evidence_handoffs.py",
+    "WF-OPT-008": "wf_opt_008_first_passage_drawdown_sensitivity.py",
 }
 
 

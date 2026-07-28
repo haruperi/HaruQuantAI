@@ -13,7 +13,9 @@ from app.services.simulator.reporting.contracts import (
     ArtifactEntry,
     ArtifactManifest,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _MEDIA_TYPES = {
     "journal.jsonl": "application/x-ndjson",

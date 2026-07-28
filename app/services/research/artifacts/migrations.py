@@ -5,7 +5,19 @@ from __future__ import annotations
 import hashlib
 
 from app.services.data import MigrationRequest, MigrationStep
-from app.utils import ConfigurationError, logger
+from app.utils import get_logger
+
+
+class ConfigurationError(ValueError):
+    """Research-owned configuration migration error."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+logger = get_logger(__name__)
 
 _DOMAIN = "research"
 _MIGRATION_ID = "001_research_artifacts_v1"

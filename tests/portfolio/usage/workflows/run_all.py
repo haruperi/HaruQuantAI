@@ -17,12 +17,13 @@ from tests.portfolio.usage.workflows._support import (
 
 WORKFLOWS = (
     "wf_port_001_validate_construction_evidence.py",
-    "wf_port_002_construct_allocation_candidate.py",
+    "wf_port_pri_construct_allocation_candidate.py",
     "wf_port_003_coordinate_simulation_risk_review.py",
-    "wf_port_004_activate_allocation_version.py",
-    "wf_port_005_detect_drift_plan_rebalance.py",
+    "wf_port_sec_activate_allocation_version.py",
+    "wf_port_ter_detect_drift_plan_rebalance.py",
     "wf_port_006_submit_measure_rebalance.py",
     "wf_port_007_rollback_allocation.py",
+    "wf_port_008_assess_common_mode_exposure.py",
 )
 
 

@@ -10,13 +10,13 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_DIR = ROOT / "tests/trading/usage/workflows"
 README = ROOT / "app/services/trading/README.md"
 EXPECTED = {
-    "WF-TRD-001": "wf_trd_001_validate_package_route_action.py",
+    "WF-TRD-SEC": "wf_trd_sec_validate_package_route_action.py",
     "WF-TRD-002": "wf_trd_002_execute_simulation_route_action.py",
     "WF-TRD-003": "wf_trd_003_start_enable_live_session.py",
-    "WF-TRD-004": "wf_trd_004_gate_dispatch_live_action.py",
+    "WF-TRD-PRI": "wf_trd_pri_gate_dispatch_live_action.py",
     "WF-TRD-005": "wf_trd_005_resolve_unknown_route_outcome.py",
     "WF-TRD-006": "wf_trd_006_read_route_facts_aggregate_readiness.py",
-    "WF-TRD-007": "wf_trd_007_enforce_kill_switch_emergency_controls.py",
+    "WF-TRD-TER": "wf_trd_ter_enforce_kill_switch_emergency_controls.py",
     "WF-TRD-008": "wf_trd_008_persist_evidence_recover_state.py",
     "WF-TRD-009": "wf_trd_009_perform_safe_live_shutdown.py",
     "WF-TRD-010": "wf_trd_010_emit_monitoring_cost_incident_evidence.py",
@@ -60,6 +60,6 @@ def test_trading_workflow_registry_has_one_complete_program_per_workflow() -> No
         assert 'if __name__ == "__main__":' in source
         assert f"`{workflow_id}`" in readme
         assert f"`tests/trading/usage/workflows/{filename}`" in readme
-    for workflow_id in ("WF-TRD-003", "WF-TRD-004", "WF-TRD-013"):
+    for workflow_id in ("WF-TRD-003", "WF-TRD-PRI", "WF-TRD-013"):
         source = (WORKFLOW_DIR / EXPECTED[workflow_id]).read_text(encoding="utf-8")
         assert "No broker mutation was transmitted" in source

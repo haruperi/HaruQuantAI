@@ -6,7 +6,7 @@ condition inlined in ``sources/policy.py``. Extracting it gives licence policy a
 owner: a change to what a licence permits happens here, not in whichever module happened
 to need the check.
 
-Every function fails closed. Absent licence metadata is a refusal, not a default —
+Every function fails closed. Absent licence metadata is a refusal, not a default â€”
 ``SourceLicensePolicy`` carries ``status``, so "unknown" is a value the model can hold
 and the enforcement must reject rather than optimistically permit. A licence system that
 allows use when it cannot prove permission provides no protection at all.
@@ -20,7 +20,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from app.services.data.contracts import DataError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.sources.contracts import SourceDescriptor
@@ -65,7 +67,7 @@ def get_attribution_text(
 ) -> str:
     """Return the attribution a publication must carry for this source.
 
-    Returns an empty string when the source requires no attribution — that is a real
+    Returns an empty string when the source requires no attribution â€” that is a real
     answer, not a missing one. But when attribution *is* required and no text was
     declared, this raises rather than returning empty: silently publishing without a
     mandated credit is the licence breach the field exists to prevent, and an empty

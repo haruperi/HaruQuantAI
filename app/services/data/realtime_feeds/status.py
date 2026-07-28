@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from app.services.data.contracts import DataError
 from app.services.data.realtime_feeds.contracts import (
     FeedStatus,
     FeedStatusRequest,
 )
-from app.utils import Clock, logger, utc_now
+from app.utils import get_logger, utc_now
+
+logger = get_logger(__name__)
 
 
 def _parse_time(value: object) -> datetime | None:
@@ -38,7 +41,7 @@ def _effective_health(
 def read_feed_status(
     request: FeedStatusRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> FeedStatus:
     """Read persisted or in-memory feed status without mutation.
 

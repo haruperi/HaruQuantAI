@@ -11,7 +11,9 @@ from app.services.risk import (
     RiskDecisionPackage,
 )
 from app.services.trading.contracts import TradingError, TradingRequest
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def validate_action_policy(

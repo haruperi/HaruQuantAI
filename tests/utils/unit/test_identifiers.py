@@ -1,5 +1,6 @@
 import pytest
-from app.utils import ValidationError, derive_stable_id, generate_id, validate_id
+from app.utils import derive_stable_id, generate_id, validate_id
+from app.utils.errors.exceptions import ValidationError
 
 
 def test_generate_id_is_prefixed_and_secret_free() -> None:

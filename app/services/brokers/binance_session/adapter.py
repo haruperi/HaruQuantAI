@@ -1,5 +1,7 @@
 """Canonical Binance product-profile broker adapter."""
 
+from __future__ import annotations
+
 import asyncio
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -35,7 +37,6 @@ from app.services.brokers.contracts import (
 )
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.price_streams.binance import _BinancePriceStreamsMixin
-from app.utils import StandardResponse  # noqa: TC001
 
 
 class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):

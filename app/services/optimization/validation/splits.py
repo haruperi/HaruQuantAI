@@ -9,7 +9,9 @@ from app.services.optimization.validation.contracts import (
     TimeSeriesSplit,
     WalkForwardRequest,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _boundary(observations: tuple[datetime, ...], index: int) -> datetime:

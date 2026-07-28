@@ -31,7 +31,9 @@ from app.services.indicators.core.errors import (
     guard_public_boundary,
 )
 from app.services.indicators.core.registry import get_indicator
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 MAX_INPUT_ROWS = 1_000_000
 

@@ -6,11 +6,15 @@ import hashlib
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timedelta
 from threading import RLock
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from app.services.risk.contracts import RiskAuditRecord, RiskDomainError, RiskErrorCode
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import RiskLevel, logger, redact_mapping_value
+from app.utils import get_logger, redact_mapping_value
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.risk.audit.storage import _KillSwitchStateStore, _RiskAuditStore
@@ -173,7 +177,7 @@ class RiskAuditChain:
         return RiskAuditRecord.model_validate(values)
 
     @guard_risk_boundary(
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         read_only=False,
         modifies_database=True,
     )
@@ -196,7 +200,7 @@ class RiskAuditChain:
             return self._append_locked(record)
 
     @guard_risk_boundary(
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         read_only=False,
         modifies_database=True,
     )
@@ -368,7 +372,7 @@ class RiskAuditChain:
             RiskErrorCode.STORAGE_ERROR, "audit append conflict exhausted"
         )
 
-    @guard_risk_boundary(risk_level=RiskLevel.CRITICAL, read_only=True)
+    @guard_risk_boundary(risk_level="critical", read_only=True)
     def verify(self, records: Sequence[RiskAuditRecord]) -> bool:
         """Verify genesis, sequence, continuity, and every record hash.
 

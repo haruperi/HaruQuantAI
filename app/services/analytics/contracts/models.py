@@ -15,7 +15,9 @@ from pydantic.dataclasses import dataclass
 
 from app.services.analytics.contracts.catalogs import EVIDENCE_CATALOG
 from app.services.analytics.contracts.errors import AnalyticsValidationError
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 ANALYTICS_SCHEMA_VERSION = "v1"
 _SHA256_LENGTH = 64

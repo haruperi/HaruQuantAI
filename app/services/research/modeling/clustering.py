@@ -9,7 +9,9 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
 from app.services.research.modeling.decomposition import _select_finite_features
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -36,7 +38,7 @@ def cluster_feature_space(
         Versioned cluster evidence with labels, centers, and diagnostics.
 
     Raises:
-        ValidationError: If features or configuration are invalid.
+        ValueError: If features or configuration are invalid.
     """
     logger.info("Running Research K-Means clustering")
     _selected, matrix = _select_finite_features(features, config)
@@ -81,13 +83,13 @@ def attach_cluster_labels(
         A copied frame carrying the attached label column.
 
     Raises:
-        ValidationError: If labels are misaligned or the column exists.
+        ValueError: If labels are misaligned or the column exists.
     """
     logger.debug("Attaching Research cluster labels")
     if column in features.columns:
-        raise ValidationError("RES_INPUT_INVALID", "DUPLICATE_CLUSTER_COLUMN")
+        raise ValueError("RES_INPUT_INVALID", "DUPLICATE_CLUSTER_COLUMN")
     if len(labels) != len(features):
-        raise ValidationError("RES_INPUT_INVALID", "MISALIGNED_CLUSTER_LABELS")
+        raise ValueError("RES_INPUT_INVALID", "MISALIGNED_CLUSTER_LABELS")
     result = features.copy()
     result[column] = labels.to_numpy()
     return result

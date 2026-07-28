@@ -10,7 +10,9 @@ from pydantic import BaseModel, ConfigDict
 
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.execution.pricing import ExecutionProfile, price_order
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.timeline import Tick

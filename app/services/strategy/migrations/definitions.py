@@ -8,7 +8,9 @@ from app.services.data import (
     run_domain_migrations,
 )
 from app.services.strategy.contracts.responses import unwrap_data_response
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _STATEMENTS = (
     """CREATE TABLE IF NOT EXISTS strategy_versions (

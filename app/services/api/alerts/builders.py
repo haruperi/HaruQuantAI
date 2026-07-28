@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.api.alerts.models import (
     CriticalAlertError,
     CriticalAlertTrigger,
     CriticalOperationalAlert,
 )
-from app.utils import AuthContext, canonical_json, logger, redact_mapping_value
+from app.utils import canonical_json, get_logger, redact_mapping_value
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.risk import KillSwitchState

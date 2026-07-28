@@ -11,7 +11,9 @@ from app.services.optimization.parameters.contracts import (
     ParameterSpace,
     ParameterValue,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _BINARY_OPERATORS = {
     ast.Add: operator.add,

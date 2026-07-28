@@ -389,19 +389,47 @@ flowchart LR
 > **Workflow Usage Evidence**: Each active workflow has one standalone program in
 > `tests/research/usage/workflows/`; `run_all.py` executes them in registry order.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-RES-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-RES-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-RES-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-RES-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-RES-011`, `WF-RES-001`, and `WF-RES-005` were absorbed into `WF-RES-PRI`,
+`WF-RES-SEC`, and `WF-RES-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-RES-012`.
+
+### Step annotation convention
+
+Research exposes exactly one package-root public function,
+`research.run_edge_lab_profile()`. Every stage operation named below is
+Research-internal and is reached only through that entry point; internal stages are
+annotated `research.<stage>()` *(internal)* so a reader can trace the stage without
+mistaking it for a public import. Cross-domain steps name the owning domain's
+public export.
+
 Evidence programs:
 
-- `WF-RES-001`: `tests/research/usage/workflows/wf_res_001_prepare_research_dataset.py`
+- `WF-RES-PRI`: `tests/research/usage/workflows/wf_res_pri_run_complete_edge_lab_profile.py`
+- `WF-RES-SEC`: `tests/research/usage/workflows/wf_res_sec_prepare_research_dataset.py`
+- `WF-RES-TER`: `tests/research/usage/workflows/wf_res_ter_run_edge_study_null_evidence.py`
 - `WF-RES-002`: `tests/research/usage/workflows/wf_res_002_build_core_metric_profile.py`
 - `WF-RES-003`: `tests/research/usage/workflows/wf_res_003_build_leakage_safe_feature_frame_time_splits.py`
 - `WF-RES-004`: `tests/research/usage/workflows/wf_res_004_analyze_session_seasonality_opportunity.py`
-- `WF-RES-005`: `tests/research/usage/workflows/wf_res_005_run_edge_study_null_evidence.py`
 - `WF-RES-006`: `tests/research/usage/workflows/wf_res_006_build_market_structure_profile.py`
 - `WF-RES-007`: `tests/research/usage/workflows/wf_res_007_forward_validate_calibrate_market_structure.py`
 - `WF-RES-008`: `tests/research/usage/workflows/wf_res_008_run_unsupervised_market_structure_research.py`
 - `WF-RES-009`: `tests/research/usage/workflows/wf_res_009_build_research_scorecard_profile_snapshot.py`
 - `WF-RES-010`: `tests/research/usage/workflows/wf_res_010_render_persist_research_artifact.py`
-- `WF-RES-011`: `tests/research/usage/workflows/wf_res_011_run_complete_edge_lab_profile.py`
+- `WF-RES-012`: `tests/research/usage/workflows/wf_res_012_compare_research_profiles_across_periods.py` *(pending)*
+
+The entry marked *(pending)* is a registered workflow whose standalone program is not
+yet written.
 
 ### Status values
 
@@ -418,21 +446,22 @@ Evidence programs:
 | **Internal** | The complete workflow occurs within Research. |
 | **Cross-domain** | Research receives input from or produces output for another domain. |
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-RES-001` | Cross-domain | Prepare Research Dataset | `MarketDataset v1` from Data | Research-internal `PreparedDataset`; never returned across the boundary | `FR-RES-027 → 030` |
-| Completed | `WF-RES-002` | Internal | Build Core Metric Profile | `PreparedDataset` | `CoreMetricProfile` | `FR-RES-042 → 049` |
-| Completed | `WF-RES-003` | Internal | Build Leakage-Safe Feature Frame and Time Splits | Prepared data + feature config | Feature frame + `LeakageReport` + `TimeSplitResult` | `FR-RES-031 → 041` |
-| Completed | `WF-RES-004` | Internal | Analyze Session and Seasonality Opportunity | Prepared OHLCVS + approved session policy | Advisory seasonality summaries | `FR-RES-069 → 074` |
-| Completed | `WF-RES-005` | Internal | Run Edge Study Against Null Evidence | Split data + study/statistical config | Advisory `EdgeResult` | `FR-RES-050 → 068` |
-| Completed | `WF-RES-006` | Internal | Build Market-Structure Profile | Prepared data + market-structure config | `MarketStructureProfile` + advisory fit | `FR-RES-075 → 076, 080` |
-| Completed | `WF-RES-007` | Internal | Forward Validate and Calibrate Market Structure | Persisted prediction + later approved dataset already supplied to the run | Research-internal validation/calibration evidence nested only in `ResearchReport v1` | `FR-RES-077 → 079` |
-| Completed | `WF-RES-008` | Internal | Run Unsupervised Market-Structure Research | Leakage-safe feature frame + seed | `UnsupervisedResearchResult` | `FR-RES-081 → 088` |
-| Completed | `WF-RES-009` | Internal | Build Research Scorecard and Profile Snapshot | Approved stage outputs | `ResearchScorecard` + `ResearchProfileSnapshot` | `FR-RES-089 → 092` |
-| Completed | `WF-RES-010` | Internal | Render and Persist Research Artifact | Masked result + approved Research-owned output location | Research-internal `ArtifactReference` or typed failure; UI/API receives only `ResearchReport v1` | `FR-RES-093 → 095, 097` |
-| Completed | `WF-RES-011` | Cross-domain | Run Complete Edge Lab Profile | Explicit hypothesis, `EdgeLabConfig`, and `MarketDataset v1` from external orchestrator | Advisory `ResearchReport v1` to UI/API; selected stages execute in canonical dependency order | `FR-RES-096` plus selected stage requirements |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-RES-PRI` | Cross-domain | Run Complete Edge Lab Profile | Explicit hypothesis, `EdgeLabConfig`, and `MarketDataset v1` from external orchestrator | Advisory `ResearchReport v1` to UI/API; selected stages execute in canonical dependency order | `FR-RES-096` plus selected stage requirements |
+| Completed | Secondary | `WF-RES-SEC` | Cross-domain | Prepare Research Dataset | `MarketDataset v1` from Data | Research-internal `PreparedDataset`; never returned across the boundary | `FR-RES-027 → 030` |
+| Completed | Tertiary | `WF-RES-TER` | Internal | Run Edge Study Against Null Evidence | Split data + study/statistical config | Advisory `EdgeResult` | `FR-RES-050 → 068` |
+| Completed | Supporting | `WF-RES-002` | Internal | Build Core Metric Profile | `PreparedDataset` | `CoreMetricProfile` | `FR-RES-042 → 049` |
+| Completed | Supporting | `WF-RES-003` | Internal | Build Leakage-Safe Feature Frame and Time Splits | Prepared data + feature config | Feature frame + `LeakageReport` + `TimeSplitResult` | `FR-RES-031 → 041` |
+| Completed | Supporting | `WF-RES-004` | Internal | Analyze Session and Seasonality Opportunity | Prepared OHLCVS + approved session policy | Advisory seasonality summaries | `FR-RES-069 → 074` |
+| Completed | Supporting | `WF-RES-006` | Internal | Build Market-Structure Profile | Prepared data + market-structure config | `MarketStructureProfile` + advisory fit | `FR-RES-075 → 076, 080` |
+| Completed | Supporting | `WF-RES-007` | Internal | Forward Validate and Calibrate Market Structure | Persisted prediction + later approved dataset already supplied to the run | Research-internal validation/calibration evidence nested only in `ResearchReport v1` | `FR-RES-077 → 079` |
+| Completed | Supporting | `WF-RES-008` | Internal | Run Unsupervised Market-Structure Research | Leakage-safe feature frame + seed | `UnsupervisedResearchResult` | `FR-RES-081 → 088` |
+| Completed | Supporting | `WF-RES-009` | Internal | Build Research Scorecard and Profile Snapshot | Approved stage outputs | `ResearchScorecard` + `ResearchProfileSnapshot` | `FR-RES-089 → 092` |
+| Completed | Supporting | `WF-RES-010` | Internal | Render and Persist Research Artifact | Masked result + approved Research-owned output location | Research-internal `ArtifactReference` or typed failure; UI/API receives only `ResearchReport v1` | `FR-RES-093 → 095, 097` |
+| Completed | Supporting | `WF-RES-012` | Internal | Compare Research Profiles Across Periods | Two or more `ResearchProfileSnapshot` records over comparable symbol, timeframe, and config | Period-over-period profile deltas and stability caveats; advisory only | `Pending` |
 
-### `WF-RES-001` — Prepare Research Dataset
+### `WF-RES-SEC` — Prepare Research Dataset
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-004`
@@ -441,10 +470,16 @@ Evidence programs:
 **Output boundary:** Research retains `PreparedDataset` as internal stage evidence;
 only the final `ResearchReport v1` may expose its bounded lineage/result projection.
 
-1. `validate_dataset()` produces fatal/warning quality evidence.
-2. `clean_dataset()` applies only explicit approved actions to a copy.
-3. `enrich_dataset()` adds research-owned price, return-label, and calendar fields.
-4. `prepare_research_dataset()` returns the versioned dataset, hashes, and report.
+1. Data supplies the dataset and provenance; Research performs no provider read —
+   `data.get_market_data()`.
+2. Produce fatal and warning quality evidence —
+   `research.validate_dataset()` *(internal)*.
+3. Apply only explicit approved actions to a copy —
+   `research.clean_dataset()` *(internal)*.
+4. Add research-owned price, return-label, and calendar fields —
+   `research.enrich_dataset()` *(internal)*.
+5. Return the versioned dataset, hashes, and report —
+   `research.prepare_research_dataset()` *(internal)*, `utils.canonical_digest()`.
 
 **Failure behaviour:**
 
@@ -461,7 +496,12 @@ only the final `ResearchReport v1` may expose its bounded lineage/result project
 
 `PreparedDataset → immutable MetricRegistry → seven metric families → CoreMetricProfile`
 
-Undefined metrics remain explicit with warnings and units; they are not silently coerced.
+1. Resolve the immutable metric registry —
+   `research.get_metric_registry()` *(internal)*.
+2. Calculate the seven metric families over the prepared dataset —
+   `research.build_core_metric_profile()` *(internal)*.
+3. Keep undefined metrics explicit with warnings and units rather than coercing them
+   silently — `research.build_core_metric_profile()` *(internal)*.
 
 **Integration test:** `tests/research/integration/test_core_metric_profile.py::test_build_core_metric_profile_with_provenance()`
 
@@ -470,7 +510,12 @@ Undefined metrics remain explicit with warnings and units; they are not silently
 **Scope:** `Internal`
 **System workflow:** None.
 
-`PreparedDataset → build_research_feature_frame() → validate_no_lookahead_features() → enforce_time_split()`
+1. Build the research feature frame from prepared data and feature config —
+   `research.build_research_feature_frame()` *(internal)*.
+2. Validate that no feature reads forward information —
+   `research.validate_no_lookahead_features()` *(internal)*.
+3. Enforce the declared time split —
+   `research.enforce_time_split()` *(internal)*.
 
 High/critical leakage evidence blocks downstream claims. Forward columns remain explicitly declared and excluded from feature inputs.
 
@@ -481,18 +526,30 @@ High/critical leakage evidence blocks downstream claims. Forward columns remain 
 **Scope:** `Internal`
 **System workflow:** None.
 
-`PreparedDataset + SessionConfig → tag_sessions() → run_seasonality() → advisory opportunity summaries`
+1. Tag each bar with its canonical session —
+   `research.tag_sessions()` *(internal)*, `data.get_active_market_sessions()`.
+2. Run the seasonality analysis over the tagged buckets —
+   `research.run_seasonality()` *(internal)*.
+3. Return advisory opportunity summaries with structured warnings —
+   `research.run_seasonality()` *(internal)*.
 
 Sparse buckets, overlaps, DST transitions, and unmatched hours produce structured warnings. UTC is authoritative, with Sydney 21:00–06:00, Tokyo 00:00–09:00, London 07:00–16:00, New York 12:00–21:00, and overlap precedence `london > new_york > tokyo > sydney`; DST is not modeled in v1.
 
 **Integration test:** `tests/research/integration/test_seasonality.py::test_seasonality_uses_canonical_sessions()`
 
-### `WF-RES-005` — Run Edge Study Against Null Evidence
+### `WF-RES-TER` — Run Edge Study Against Null Evidence
 
 **Scope:** `Internal`
 **System workflow:** None.
 
-`Split data + seed → matching null baseline → selected study → compare/classify → EdgeResult`
+1. Build the matching seeded null baseline for the split data —
+   `research.build_null_baseline()` *(internal)*.
+2. Run the selected study against the same split —
+   `research.run_edge_study()` *(internal)*.
+3. Compare the study against its null and classify the result —
+   `research.classify_edge_result()` *(internal)*.
+4. Preserve statistical caveats rather than asserting significance —
+   `analytics.run_statistical_validation()`.
 
 Isolated study failures may be reported and other independent studies continued only when `StudyConfig.continue_on_study_error` is explicitly true. Mixed/BUY/SELL samples use matching null direction; one confirmation policy drives results, profiles, and reports.
 
@@ -503,7 +560,12 @@ Isolated study failures may be reported and other independent studies continued 
 **Scope:** `Internal`
 **System workflow:** None.
 
-`PreparedDataset → structure profile → optional bounded quality evaluation → advisory strategy fit`
+1. Build the market-structure profile from prepared data and config —
+   `research.build_market_structure_profile()` *(internal)*.
+2. Run the opt-in bounded quality evaluation —
+   `research.evaluate_structure_quality()` *(internal)*.
+3. Score the profile and derive advisory strategy fit —
+   `research.score_market_structure()` *(internal)*.
 
 Quality layers are opt-in and bounded. The canonical profile scorer is also used by calibration.
 
@@ -519,7 +581,16 @@ later research-ready dataset through its existing Data input boundary.
 **Output boundary:** Labeling, validation, stability, and calibration evidence remains
 Research-internal and may cross only as bounded fields in `ResearchReport v1`.
 
-The validation horizon is expressed in bars of the study timeframe; realized forward outcome at that horizon is calibration truth, ranked by calibration error and then sample size.
+1. Label the realized forward outcome at the declared horizon —
+   `research.label_forward_outcome()` *(internal)*.
+2. Validate the persisted prediction against that realized outcome —
+   `research.forward_validate_structure()` *(internal)*.
+3. Calibrate using the canonical profile scorer —
+   `research.score_market_structure()` *(internal)*.
+4. Rank evidence by calibration error and then sample size —
+   `research.forward_validate_structure()` *(internal)*.
+
+The validation horizon is expressed in bars of the study timeframe; realized forward outcome at that horizon is calibration truth.
 
 **Integration test:** `tests/research/integration/test_market_structure_validation.py::test_forward_validation_returns_ranked_evidence()`
 
@@ -528,7 +599,14 @@ The validation horizon is expressed in bars of the study timeframe; realized for
 **Scope:** `Internal`
 **System workflow:** None.
 
-`Leakage-safe feature frame + seed → PCA → K-Means → factor/cluster evidence → UnsupervisedResearchResult`
+1. Preprocess and scale the leakage-safe feature frame under the effective seed —
+   `research.preprocess_features()` *(internal)*.
+2. Reduce dimensionality and derive factor evidence —
+   `research.run_factor_analysis()` *(internal)*.
+3. Cluster the reduced space and derive cluster evidence —
+   `research.run_clustering()` *(internal)*.
+4. Record selected and dropped columns, scaler behavior, seed, model parameters, and
+   diagnostics — `research.run_unsupervised_research()` *(internal)*.
 
 Preprocessing, selected/dropped columns, scaler behavior, effective seed, model parameters, and diagnostics are recorded. Signal adaptation is absent.
 
@@ -539,7 +617,12 @@ Preprocessing, selected/dropped columns, scaler behavior, effective seed, model 
 **Scope:** `Internal`
 **System workflow:** None.
 
-`Approved stage outputs → ResearchScorecard → ResearchProfileSnapshot`
+1. Build the scorecard from approved stage outputs under one confirmation policy —
+   `research.build_research_scorecard()` *(internal)*.
+2. Freeze the scorecard and stage lineage into an immutable snapshot —
+   `research.build_research_profile_snapshot()` *(internal)*.
+3. Bind versions and hashes so the snapshot is reproducible —
+   `utils.canonical_json()`, `utils.canonical_digest()`.
 
 The scorecard and snapshot use one confirmation/fit policy and preserve uncertainty, readiness reasons, versions, hashes, warnings, and advisory status.
 
@@ -554,11 +637,20 @@ The scorecard and snapshot use one confirmation/fit policy and preserve uncertai
 **Output boundary:** `ArtifactReference` remains Research-internal. Research emits the
 registered redacted `AuditEvent v1`; UI/API receives only `ResearchReport v1`.
 
+1. Mask the result before any serialization —
+   `research.mask_research_result()` *(internal)*, `utils.redact_mapping_value()`.
+2. Serialize the masked result canonically —
+   `utils.canonical_json()`.
+3. Write atomically to the approved Research-owned destination —
+   `research.persist_research_artifact()` *(internal)*, `data.save_dataset()`.
+4. Emit the registered redacted audit event —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
 Masking precedes serialization; traversal, disallowed root, overwrite conflict, permission failure, non-serializable input, and unsupported atomic replacement fail explicitly.
 
 **Integration test:** `tests/research/integration/test_artifact_persistence.py::test_persist_masked_artifact_atomically()`
 
-### `WF-RES-011` — Run Complete Edge Lab Profile
+### `WF-RES-PRI` — Run Complete Edge Lab Profile
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-004`
@@ -567,10 +659,53 @@ Masking precedes serialization; traversal, disallowed root, overwrite conflict, 
 `EdgeLabConfig`, `MarketDataset v1`, and optional `PerformanceReport v1`.
 **Output boundary:** Research returns `ResearchReport v1`. UI/API owns human approval and any `StrategyRegistrationRequest` submission.
 
+1. The external orchestrator supplies the dataset and config; Research reads no
+   provider — `data.get_market_data()`,
+   `analytics.build_performance_report()`.
+2. Enter the single public boundary, which runs the selected stages in canonical
+   dependency order — `research.run_edge_lab_profile()`.
+3. Prepare the dataset (`WF-RES-SEC`) —
+   `research.prepare_research_dataset()` *(internal)*.
+4. Run the selected evidence stages — metrics, features and splits, seasonality,
+   edge studies, market structure, unsupervised research —
+   `research.run_edge_study()` *(internal)*,
+   `research.build_market_structure_profile()` *(internal)*.
+5. Build the scorecard and profile snapshot —
+   `research.build_research_scorecard()` *(internal)*.
+6. Return the advisory report; UI/API owns human approval —
+   `research.run_edge_lab_profile()`.
+7. Only after explicit human approval may Strategy register the candidate —
+   `strategy.register_strategy_version()`.
+
 Research executes only selected deterministic stages. External code owns triggering, scheduling, provider reads, caching, and database orchestration.
 
 **Integration tests:** `tests/research/unit/test_workflow.py`;
 `tests/system/integration/test_research_to_strategy.py`.
+
+### `WF-RES-012` — Compare Research Profiles Across Periods
+
+**Scope:** `Internal`
+**System workflow:** Internal contribution to `SYS-WF-004`.
+
+**Input boundary:** two or more `ResearchProfileSnapshot` records covering
+comparable symbol, timeframe, and configuration over different periods.
+**Output boundary:** period-over-period profile deltas and stability caveats. The
+comparison is advisory and confers no readiness or registration authority.
+
+1. Confirm the snapshots share comparable symbol, timeframe, and config —
+   `utils.canonical_digest()`.
+2. Compare scorecard metrics across periods —
+   `research.compare_profile_snapshots()` *(internal)*.
+3. Report which structure and edge conclusions persisted and which did not —
+   `research.compare_profile_snapshots()` *(internal)*.
+4. Preserve statistical caveats about repeated comparison —
+   `analytics.run_statistical_validation()`.
+
+**Failure behaviour:** snapshots with incompatible symbol, timeframe, or config are
+refused rather than compared. A conclusion that holds in one period only is reported
+as unstable rather than averaged into an apparent edge.
+
+**Integration test:** `Pending`
 
 #### End-to-end workflow diagram
 

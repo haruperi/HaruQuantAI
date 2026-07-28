@@ -1,11 +1,13 @@
 """Explicit lazy broker adapter construction."""
 
+from __future__ import annotations
+
 import importlib
 import importlib.metadata
 import importlib.util
 import time
 from dataclasses import dataclass
-from typing import cast
+from typing import Literal, cast
 
 from app.services.brokers.contracts import (
     BrokerAdapter,
@@ -17,14 +19,16 @@ from app.services.brokers.contracts import (
 )
 from app.services.brokers.contracts.responses import build_broker_response
 from app.utils import (
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     utc_now,
 )
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -111,7 +115,7 @@ def get_registered_brokers() -> StandardResponse[tuple[BrokerId, ...]]:
     metadata = build_response_metadata(
         name="brokers.registry.get_registered_brokers",
         domain="brokers",
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         request_id=generate_id("req"),
         start_time=start_time,
         read_only=True,
@@ -241,7 +245,7 @@ def create_broker_adapter(
         start_time=start_time,
         data=cast("BrokerAdapter", adapter),
         name="brokers.registry.create_broker_adapter",
-        risk_level=RiskLevel.LOW,
+        risk_level="low",
         read_only=False,
         requires_network=False,
     )
@@ -290,7 +294,7 @@ def _factory_error(
         error=BrokerError(code=code, message=message),
         provider_metadata=provider_metadata or {},
         name="brokers.registry.create_broker_adapter",
-        risk_level=RiskLevel.LOW,
+        risk_level="low",
         read_only=False,
         requires_network=False,
     )

@@ -1,6 +1,6 @@
 """Authenticated Strategy catalogue and mutation HTTP boundary."""
 
-from typing import Annotated, NoReturn
+from typing import Annotated, Any, NoReturn
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -13,7 +13,11 @@ from app.services.strategy import (
     register_strategy_version,
     update_strategy_parameters,
 )
-from app.utils import AuthContext, logger
+from app.utils import get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/strategies", tags=["strategies"])
 

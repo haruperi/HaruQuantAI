@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # mypy: disable-error-code="attr-defined,no-any-return,has-type"
 """cTrader price-stream operations."""
 
@@ -15,7 +17,7 @@ from app.services.brokers.ctrader_session.mapping import (
     _field,
     _map_quote,
 )
-from app.utils import StandardResponse, generate_id, utc_now
+from app.utils import generate_id, utc_now
 
 
 class _CTraderPriceStreamsMixin:

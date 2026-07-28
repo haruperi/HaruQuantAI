@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 from decimal import Decimal
 from hashlib import sha256
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.simulator.accounting import validate_fx_evidence
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
@@ -25,7 +25,11 @@ from app.services.simulator.run.orchestrator import (
     _run_backtest_with_evidence,
     _write_completed_text,
 )
-from app.utils import AuthContext, canonical_digest, canonical_json, logger
+from app.utils import canonical_digest, canonical_json, get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from datetime import datetime

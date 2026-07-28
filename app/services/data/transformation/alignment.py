@@ -21,7 +21,9 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 
 def _validate_alignment_target(target: Sequence[datetime]) -> None:

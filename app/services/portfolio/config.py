@@ -7,10 +7,12 @@ from decimal import Decimal
 from typing import Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-from pydantic_settings import SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.services.portfolio.exceptions import PortfolioError
-from app.utils import AppSettings, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class RebalanceSchedule(BaseModel):
@@ -50,7 +52,7 @@ class RebalanceSchedule(BaseModel):
         return value
 
 
-class PortfolioSettings(AppSettings):
+class PortfolioSettings(BaseSettings):
     """Complete required Portfolio policy configuration.
 
     Attributes:
@@ -69,7 +71,6 @@ class PortfolioSettings(AppSettings):
     """
 
     model_config = SettingsConfigDict(
-        json_file=AppSettings.model_config.get("json_file"),
         env_file_encoding="utf-8",
         env_ignore_empty=True,
         case_sensitive=False,

@@ -13,7 +13,9 @@ from app.services.risk.contracts import (
     RiskAuditRecord,  # noqa: TC001
     StrategyOperationalEligibilityDecision,  # noqa: TC001
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class _RiskAuditStore(Protocol):  # pragma: no cover

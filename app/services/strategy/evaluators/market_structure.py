@@ -14,7 +14,9 @@ from app.services.strategy.signals._mechanics import (
     _SignalDataError,
     _SignalEvaluatorBase,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.indicators import IndicatorResult

@@ -5,12 +5,8 @@ from decimal import Decimal
 from enum import StrEnum
 
 import pytest
-from app.utils import (
-    ValidationError,
-    canonical_digest,
-    canonical_json,
-    to_json_safe,
-)
+from app.utils import canonical_digest, canonical_json, to_json_safe
+from app.utils.errors.exceptions import ValidationError
 
 
 class _State(StrEnum):

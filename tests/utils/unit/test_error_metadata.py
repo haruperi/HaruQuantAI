@@ -1,12 +1,9 @@
 from dataclasses import FrozenInstanceError
 
 import pytest
-from app.utils import (
-    ErrorMetadata,
-    ValidationError,
-    get_error_metadata,
-    normalize_error_code,
-)
+from app.utils import get_error_metadata, normalize_error_code
+from app.utils.errors.exceptions import ValidationError
+from app.utils.errors.metadata import ErrorMetadata
 
 
 def test_normalize_and_lookup_error_metadata() -> None:

@@ -6,7 +6,9 @@ from datetime import datetime, timedelta
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _SHA256_HEX_LENGTH = 64
 

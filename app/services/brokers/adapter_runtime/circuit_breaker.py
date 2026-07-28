@@ -5,7 +5,9 @@ import time
 from enum import StrEnum
 
 from app.services.brokers.contracts import BrokerErrorCode
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class _CircuitState(StrEnum):

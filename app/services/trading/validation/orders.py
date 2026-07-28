@@ -4,11 +4,16 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel, StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import AccountStateSnapshot
@@ -349,7 +354,7 @@ def validate_order_request(
         value,
         operation="trading.validate_order_request",
         message="Trading order request validated",
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=True,

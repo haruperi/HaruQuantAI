@@ -1,8 +1,8 @@
 """Series-level quality inspection, scoring, and status derivation.
 
-Answers one question: is this *series* trustworthy? Record-level invariants — finite
+Answers one question: is this *series* trustworthy? Record-level invariants â€” finite
 prices, non-negative volume and spread, ``low <= high``, open/close inside the bar
-range, aware UTC timestamps — are enforced fail-closed at contract construction in
+range, aware UTC timestamps â€” are enforced fail-closed at contract construction in
 ``models/records.py`` and are deliberately not repeated here. One rule, one enforcement
 point.
 
@@ -33,7 +33,7 @@ from app.services.data.quality.scoring import (
     _fit_samples,
     _issue,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -58,6 +58,8 @@ from app.services.data.quality.policy import (
 from app.services.data.time_sessions.timeframes import (
     _get_timeframe_spec_raw as get_timeframe_spec,
 )
+
+logger = get_logger(__name__)
 
 
 def _detect_duplicates(

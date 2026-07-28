@@ -1,4 +1,6 @@
-# mypy: disable-error-code="attr-defined,no-any-return,has-type"
+type StandardResponse[T] = (
+    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
+)
 """Dukascopy direct BID candle operations."""
 
 from datetime import UTC, datetime
@@ -9,7 +11,6 @@ from app.services.brokers.contracts import (
     BrokerPage,
 )
 from app.services.brokers.dukascopy_ticks.candle_mapping import _map_candles
-from app.utils import StandardResponse  # noqa: TC001
 
 
 class _DukascopyBarsMixin:

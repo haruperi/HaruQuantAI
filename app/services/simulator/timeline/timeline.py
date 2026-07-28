@@ -10,7 +10,9 @@ from app.services.data import (
 )
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.timeline.contracts import Tick
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 APPROVED_TICK_MODELS = ("real", "trading_bar", "ohlc_m1", "generated")
 

@@ -2,9 +2,25 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from types import MappingProxyType
+from typing import Literal
 
-from app.utils import ErrorDefinition, validate_error_catalog
+from app.utils import validate_error_catalog
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorDefinition:
+    """Immutable domain-owned error catalogue entry."""
+
+    code: str
+    domain: str
+    description: str
+    category: str
+    severity: Literal["info", "warning", "error", "critical"]
+    retryable: bool
+    operator_action: str
+
 
 _DEFINITIONS = (
     ErrorDefinition(

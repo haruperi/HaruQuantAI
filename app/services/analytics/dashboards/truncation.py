@@ -8,7 +8,9 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 DASHBOARD_MAX_POINTS = 5000
 DASHBOARD_TRUNCATION_POLICY = "min_max_per_bucket"

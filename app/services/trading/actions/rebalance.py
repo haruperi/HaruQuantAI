@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.risk import DecisionState
 from app.services.trading.actions._shared import response_data_json
@@ -18,7 +18,12 @@ from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.monitoring import BudgetGate
 from app.services.trading.validation.authority import validate_kill_switch_hierarchy
-from app.utils import RiskLevel, StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -178,7 +183,7 @@ async def _execute_portfolio_rebalance_value(
         data,
         operation="trading.execute_portfolio_rebalance",
         message="Authorized rebalance actions executed through ordinary Trading gates",
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=False,

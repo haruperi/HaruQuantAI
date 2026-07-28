@@ -8,7 +8,9 @@ from datetime import UTC
 import pandas as pd
 
 from app.services.research.contracts import TimeSplitResult
-from app.utils import ValidationError, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 _MIN_PARTITION_ROWS = 1
 
@@ -34,21 +36,21 @@ def enforce_time_split(
         Detached partitions, UTC boundaries, and deterministic split hash.
 
     Raises:
-        ValidationError: If fractions, index, gap, or sample size is invalid.
+        ValueError: If fractions, index, gap, or sample size is invalid.
     """
     logger.info("Enforcing chronological Research split")
     if not isinstance(data.index, pd.DatetimeIndex) or data.index.tz is None:
-        raise ValidationError("RES_INPUT_INVALID", "UTC_TIME_INDEX_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "UTC_TIME_INDEX_REQUIRED")
     if not data.index.is_monotonic_increasing or data.index.has_duplicates:
-        raise ValidationError("RES_INPUT_INVALID", "ORDERED_UNIQUE_TIME_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "ORDERED_UNIQUE_TIME_REQUIRED")
     if (
         train_fraction <= 0
         or validation_fraction <= 0
         or train_fraction + validation_fraction >= 1
     ):
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_SPLIT_FRACTIONS")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_SPLIT_FRACTIONS")
     if gap_rows < 0:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_SPLIT_GAP")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_SPLIT_GAP")
     train_end = int(len(data) * train_fraction)
     validation_start = train_end + gap_rows
     validation_end = validation_start + int(len(data) * validation_fraction)
@@ -57,7 +59,7 @@ def enforce_time_split(
     validation = data.iloc[validation_start:validation_end].copy(deep=True)
     test = data.iloc[test_start:].copy(deep=True)
     if any(len(part) < _MIN_PARTITION_ROWS for part in (train, validation, test)):
-        raise ValidationError("RES_INSUFFICIENT_DATA", "EMPTY_TIME_PARTITION")
+        raise ValueError("RES_INSUFFICIENT_DATA", "EMPTY_TIME_PARTITION")
     boundaries = {
         "train_start": train.index[0].to_pydatetime().astimezone(UTC),
         "train_end": train.index[-1].to_pydatetime().astimezone(UTC),

@@ -7,6 +7,7 @@ from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from decimal import ROUND_CEILING, Decimal
+from typing import Literal
 
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -20,7 +21,11 @@ from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 _MIN_SAMPLE_SIZE = 2
 
@@ -484,7 +489,7 @@ def _build_snapshot(
     )
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def build_portfolio_risk_snapshot(
     state: PortfolioState, config: RiskConfig, *, now: datetime
 ) -> PortfolioRiskSnapshot:

@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 from time import monotonic
+from typing import Literal
 
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -16,7 +17,11 @@ from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 def _utc(value: datetime) -> datetime:
@@ -132,7 +137,7 @@ def _validate_reuse_state(
         )
 
 
-@guard_risk_boundary(risk_level=RiskLevel.HIGH, read_only=True)
+@guard_risk_boundary(risk_level="high", read_only=True)
 def revalidate_risk_decision(
     decision: RiskDecisionPackage,
     proposal: ProposedTrade,

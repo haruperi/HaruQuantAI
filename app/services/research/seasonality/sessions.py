@@ -8,7 +8,9 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from app.services.research.contracts import ResearchWarning
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -33,13 +35,13 @@ def _validate_hour(hour: int) -> int:
         The validated hour.
 
     Raises:
-        ValidationError: If the hour is not a 0-23 integer.
+        ValueError: If the hour is not a 0-23 integer.
     """
     logger.debug("Validating Research session hour")
     if not isinstance(hour, int) or isinstance(hour, bool) or hour < 0:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_HOUR_OF_DAY")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_HOUR_OF_DAY")
     if hour > _MAX_HOUR_OF_DAY:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_HOUR_OF_DAY")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_HOUR_OF_DAY")
     return hour
 
 
@@ -75,7 +77,7 @@ def active_sessions_for_hour(hour: int, *, config: SessionConfig) -> tuple[str, 
         Active session names in documented overlap-precedence order.
 
     Raises:
-        ValidationError: If the hour or session policy is invalid.
+        ValueError: If the hour or session policy is invalid.
     """
     logger.info("Resolving active Research sessions for hour")
     checked = _validate_hour(hour)
@@ -83,7 +85,7 @@ def active_sessions_for_hour(hour: int, *, config: SessionConfig) -> tuple[str, 
     for name in config.overlap_precedence:
         window = config.windows.get(name)
         if window is None:
-            raise ValidationError("RES_CONFIGURATION_INVALID", "MISSING_SESSION_WINDOW")
+            raise ValueError("RES_CONFIGURATION_INVALID", "MISSING_SESSION_WINDOW")
         start, end = window
         if _session_active_at_hour(start, end, checked):
             active.append(name)
@@ -104,7 +106,7 @@ def session_label_for_hour(hour: int, *, config: SessionConfig) -> str:
         The primary session name, or ``unmatched``.
 
     Raises:
-        ValidationError: If the hour or session policy is invalid.
+        ValueError: If the hour or session policy is invalid.
     """
     logger.debug("Selecting Research primary session label")
     active = active_sessions_for_hour(hour, config=config)
@@ -121,7 +123,7 @@ def session_hours_payload(*, config: SessionConfig) -> Mapping[str, JSONValue]:
         Versioned payload of timezone, windows, order, and overlaps.
 
     Raises:
-        ValidationError: If the session policy is invalid.
+        ValueError: If the session policy is invalid.
     """
     logger.debug("Building Research session-hours payload")
     overlaps: list[JSONValue] = []
@@ -165,13 +167,13 @@ def tag_sessions(
         A copied frame with a ``session`` column and structured warnings.
 
     Raises:
-        ValidationError: If the index is not a DatetimeIndex or is naive.
+        ValueError: If the index is not a DatetimeIndex or is naive.
     """
     logger.info("Tagging Research sessions on frame")
     if not isinstance(data.index, pd.DatetimeIndex):
-        raise ValidationError("RES_INPUT_INVALID", "DATETIME_INDEX_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "DATETIME_INDEX_REQUIRED")
     if data.index.tz is None:
-        raise ValidationError("RES_INPUT_INVALID", "NAIVE_INDEX_REJECTED")
+        raise ValueError("RES_INPUT_INVALID", "NAIVE_INDEX_REJECTED")
     labels: list[str] = []
     warnings: list[ResearchWarning] = []
     unmatched = 0

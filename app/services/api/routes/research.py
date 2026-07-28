@@ -1,6 +1,6 @@
 """Authenticated initial Edge Lab HTTP boundary."""
 
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
 
@@ -9,12 +9,17 @@ from app.services.api.contracts import (
 )
 from app.services.api.identity import require_auth_context, require_human_permission
 from app.services.research import ResearchReport, run_edge_lab_profile
-from app.utils import AuthContext, StandardResponse, logger
+from app.utils import get_logger
+
+type AuthContext = Any
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/research", tags=["research"])
 
 
-@router.post("/run", response_model=StandardResponse[ResearchReport])
+@router.post("/run", response_model=None)
 def _run_research(
     request: ResearchRunRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],

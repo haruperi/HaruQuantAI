@@ -1,6 +1,7 @@
 """Canonical fail-fast live/paper Trading mutation gate sequence."""
 
 from collections.abc import Mapping
+from typing import Any, Literal
 
 from app.services.trading.contracts import (
     TradingError,
@@ -22,7 +23,12 @@ from app.services.trading.validation.authority import (
     validate_kill_switch_hierarchy,
     validate_risk_authority,
 )
-from app.utils import RiskLevel, StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 def _gate_envelope(
@@ -49,7 +55,7 @@ def _gate_envelope(
         redacted_data,
         operation="trading.evaluate_live_gate",
         message=message,
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=False,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime, timedelta
-from typing import Final, Literal
+from typing import Any, Final, Literal
 
 from pydantic import ValidationError
 
@@ -25,7 +25,9 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import Clock, logger, utc_now
+from app.utils import get_logger, utc_now
+
+logger = get_logger(__name__)
 
 _GET_CACHE_ENTRY: Final = (
     "SELECT dataset_json, created_at, expires_at, source_revision, "
@@ -44,7 +46,7 @@ INSERT OR REPLACE INTO data_cache (
 def _get_cache_entry_raw(
     request: CacheReadRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> CacheEntry | None:
     """Retrieve an active or allowed-stale cache entry from SQLite.
 
@@ -131,7 +133,7 @@ def _get_cache_entry_raw(
 def get_cache_entry(
     request: CacheReadRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> StandardResponse[CacheEntry | None]:
     """Retrieve an active or allowed-stale cache entry from SQLite.
 
@@ -153,7 +155,7 @@ def get_cache_entry(
 def _put_cache_entry_raw(
     request: CacheWriteRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> CacheWriteResult:
     """Store a TTL-bound cache entry into SQLite.
 
@@ -221,7 +223,7 @@ def _put_cache_entry_raw(
 def put_cache_entry(
     request: CacheWriteRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> StandardResponse[CacheWriteResult]:
     """Store a TTL-bound cache entry into SQLite.
 

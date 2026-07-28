@@ -1,4 +1,6 @@
-# mypy: disable-error-code="attr-defined,no-any-return,has-type"
+type StandardResponse[T] = (
+    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
+)
 """MT5 mutation implementations behind unreleased public policy."""
 
 from collections.abc import Mapping
@@ -26,7 +28,6 @@ from app.services.brokers.mt5_account.mapping import (
     _map_position,
     _optional,
 )
-from app.utils import StandardResponse  # noqa: TC001
 
 
 def _provider_ticket(value: str) -> int:

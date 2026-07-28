@@ -2,6 +2,7 @@
 
 from collections.abc import Mapping
 from types import MappingProxyType
+from typing import Any, Literal
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -14,7 +15,12 @@ from app.services.trading.contracts.responses import (
     error_trading_response,
     success_trading_response,
 )
-from app.utils import RiskLevel, StandardResponse, logger, redact_text_value
+from app.utils import get_logger, redact_text_value
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 def _contract_entry(
@@ -165,7 +171,7 @@ def get_public_contracts() -> StandardResponse[tuple[Mapping[str, JsonValue], ..
         _build_public_contracts(),
         operation="trading.get_public_contracts",
         message="Trading public contracts returned",
-        risk_level=RiskLevel.LOW,
+        risk_level="low",
         read_only=True,
     )
 
@@ -201,7 +207,7 @@ def create_trading_action_draft(
             },
             operation="trading.create_trading_action_draft",
             message="Trading draft material is invalid",
-            risk_level=RiskLevel.HIGH,
+            risk_level="high",
             read_only=True,
         )
     safe_validated = validated
@@ -215,7 +221,7 @@ def create_trading_action_draft(
         safe_validated,
         operation="trading.create_trading_action_draft",
         message="Trading action draft packaged without execution",
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         request_id=safe_validated.request_id,
         correlation_id=safe_validated.correlation_id,
         read_only=True,

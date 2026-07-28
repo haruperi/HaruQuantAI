@@ -1,7 +1,8 @@
 from datetime import UTC, datetime
 
 import pytest
-from app.utils import AuditEvent, generate_id
+from app.utils import generate_id
+from app.utils.contracts.audit import AuditEvent
 from pydantic import ValidationError
 
 

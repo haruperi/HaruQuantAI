@@ -12,7 +12,9 @@ from app.services.optimization.scoring.contracts import (
     CandidateScore,
     ObjectiveName,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.analytics import PerformanceReport

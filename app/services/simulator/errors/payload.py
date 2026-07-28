@@ -1,7 +1,9 @@
 """Public Simulation error-payload conversion."""
 
 from app.services.simulator.errors.exception import SimulationError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def to_simulation_error_payload(error: Exception) -> dict[str, object]:

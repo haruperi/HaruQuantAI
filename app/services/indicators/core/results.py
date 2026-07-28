@@ -22,7 +22,9 @@ from app.services.indicators.core.errors import (
     IndicatorErrorCode,
     guard_public_boundary,
 )
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 # ``app.utils.canonical_json`` rejects any traversal exceeding 10,000 cumulative
 # items. One OHLCV record contributes roughly fifteen, so this chunk size keeps

@@ -12,7 +12,9 @@ from app.services.data import (
     FXConversionEvidence,  # noqa: TC001
 )
 from app.services.simulator.errors import SimulationError
-from app.utils import canonical_digest, logger
+from app.utils import canonical_digest, get_logger
+
+logger = get_logger(__name__)
 
 
 class SymbolSpecification(BaseModel):

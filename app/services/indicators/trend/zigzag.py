@@ -16,7 +16,9 @@ from app.services.indicators.core.errors import (
 )
 from app.services.indicators.core.results import build_indicator_result
 from app.services.indicators.core.validation import validate_indicator
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import MarketDataset, OHLCVRecord

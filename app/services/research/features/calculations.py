@@ -7,7 +7,9 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _MIN_HURST_SAMPLES = 20
 _MAX_HURST_LAG = 20
@@ -26,16 +28,16 @@ def _numeric_series(values: pd.Series, *, positive: bool = False) -> pd.Series:
         Detached float64 series.
 
     Raises:
-        ValidationError: If values are empty, non-finite, or non-positive.
+        ValueError: If values are empty, non-finite, or non-positive.
     """
     logger.debug("Validating Research numeric series")
     if not isinstance(values, pd.Series) or values.empty:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "NONEMPTY_SERIES_REQUIRED")
+        raise ValueError("RES_INSUFFICIENT_DATA", "NONEMPTY_SERIES_REQUIRED")
     output = values.astype("float64").copy(deep=True)
     if not np.isfinite(output.to_numpy()).all():
-        raise ValidationError("RES_NONFINITE_DATA", "FINITE_SERIES_REQUIRED")
+        raise ValueError("RES_NONFINITE_DATA", "FINITE_SERIES_REQUIRED")
     if positive and bool((output <= 0).any()):
-        raise ValidationError("RES_INPUT_INVALID", "POSITIVE_VALUES_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "POSITIVE_VALUES_REQUIRED")
     return output
 
 
@@ -49,12 +51,12 @@ def log_returns(close: pd.Series) -> pd.Series:
         Float64 series with a warm-up NaN in the first row.
 
     Raises:
-        ValidationError: If input is invalid or insufficient.
+        ValueError: If input is invalid or insufficient.
     """
     logger.info("Computing Research log returns")
     values = _numeric_series(close, positive=True)
     if len(values) < _MIN_RETURN_SAMPLES:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "TWO_PRICES_REQUIRED")
+        raise ValueError("RES_INSUFFICIENT_DATA", "TWO_PRICES_REQUIRED")
     result = np.log(values / values.shift(1))
     result.name = "log_return"
     return result
@@ -70,12 +72,12 @@ def simple_returns(close: pd.Series) -> pd.Series:
         Float64 series with a warm-up NaN in the first row.
 
     Raises:
-        ValidationError: If input is invalid or insufficient.
+        ValueError: If input is invalid or insufficient.
     """
     logger.info("Computing Research simple returns")
     values = _numeric_series(close, positive=True)
     if len(values) < _MIN_RETURN_SAMPLES:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "TWO_PRICES_REQUIRED")
+        raise ValueError("RES_INSUFFICIENT_DATA", "TWO_PRICES_REQUIRED")
     result = values.pct_change(fill_method=None)
     result.name = "simple_return"
     return result
@@ -92,16 +94,16 @@ def hurst_exponent(values: pd.Series, *, minimum_samples: int) -> float:
         Finite Hurst exponent estimate.
 
     Raises:
-        ValidationError: If sample, finiteness, or variance is invalid.
+        ValueError: If sample, finiteness, or variance is invalid.
     """
     logger.info("Estimating Research Hurst exponent")
     if minimum_samples < _MIN_HURST_SAMPLES:
-        raise ValidationError("RES_INPUT_INVALID", "HURST_MINIMUM_BELOW_POLICY")
+        raise ValueError("RES_INPUT_INVALID", "HURST_MINIMUM_BELOW_POLICY")
     sample = _numeric_series(values).dropna()
     if len(sample) < minimum_samples:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "HURST_SAMPLE_TOO_SMALL")
+        raise ValueError("RES_INSUFFICIENT_DATA", "HURST_SAMPLE_TOO_SMALL")
     if bool(sample.eq(sample.iloc[0]).all()):
-        raise ValidationError("RES_INPUT_INVALID", "CONSTANT_HURST_SAMPLE")
+        raise ValueError("RES_INPUT_INVALID", "CONSTANT_HURST_SAMPLE")
     maximum_lag = min(_MAX_HURST_LAG, len(sample) // 2)
     lags = np.arange(2, maximum_lag + 1, dtype="float64")
     dispersions = np.asarray(
@@ -113,10 +115,10 @@ def hurst_exponent(values: pd.Series, *, minimum_samples: int) -> float:
     )
     valid = dispersions > 0
     if int(valid.sum()) < _MIN_REGRESSION_POINTS:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "HURST_LAGS_INSUFFICIENT")
+        raise ValueError("RES_INSUFFICIENT_DATA", "HURST_LAGS_INSUFFICIENT")
     estimate = float(np.polyfit(np.log(lags[valid]), np.log(dispersions[valid]), 1)[0])
     if not np.isfinite(estimate):
-        raise ValidationError("RES_NONFINITE_DATA", "HURST_ESTIMATE_NONFINITE")
+        raise ValueError("RES_NONFINITE_DATA", "HURST_ESTIMATE_NONFINITE")
     return estimate
 
 
@@ -132,12 +134,12 @@ def rolling_hurst(values: pd.Series, *, window: int, minimum_samples: int) -> pd
         Aligned float64 series.
 
     Raises:
-        ValidationError: If window or sample policy is invalid.
+        ValueError: If window or sample policy is invalid.
     """
     logger.info("Computing rolling Research Hurst exponent")
     sample = _numeric_series(values)
     if window < minimum_samples or minimum_samples < _MIN_HURST_SAMPLES:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_HURST_WINDOW")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_HURST_WINDOW")
     result = sample.rolling(window=window, min_periods=window).apply(
         lambda item: hurst_exponent(pd.Series(item), minimum_samples=minimum_samples),
         raw=False,
@@ -165,12 +167,12 @@ def forward_returns(
         Aligned series with trailing unavailable rows as NaN and research-only attrs.
 
     Raises:
-        ValidationError: If mode, horizon, label, or data is invalid.
+        ValueError: If mode, horizon, label, or data is invalid.
     """
     logger.info("Computing Research forward returns")
     values = _numeric_series(close, positive=True)
     if not 0 < horizon < len(values) or not output_label.strip():
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_FORWARD_RETURN_POLICY")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_FORWARD_RETURN_POLICY")
     ratio = values.shift(-horizon) / values
     result = np.log(ratio) if mode == "log" else ratio - 1.0
     result.name = output_label
@@ -195,13 +197,13 @@ def _forward_extreme(
         Aligned excursion series with trailing NaNs.
 
     Raises:
-        ValidationError: If input or policy is invalid.
+        ValueError: If input or policy is invalid.
     """
     logger.debug("Computing direction-aware Research excursion")
     if not {"high", "low", "close"} <= set(data.columns):
-        raise ValidationError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
     if side not in {"buy", "sell"} or not 0 < horizon < len(data):
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_EXCURSION_POLICY")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_EXCURSION_POLICY")
     values = data[["high", "low", "close"]].astype("float64")
     output = pd.Series(np.nan, index=data.index, dtype="float64")
     for position in range(len(values) - horizon):
@@ -233,7 +235,7 @@ def forward_max_favorable_excursion(
         Aligned favorable-excursion series.
 
     Raises:
-        ValidationError: If input or policy is invalid.
+        ValueError: If input or policy is invalid.
     """
     logger.info("Computing Research maximum favorable excursion")
     result = _forward_extreme(data, horizon=horizon, side=side, favorable=True)
@@ -255,7 +257,7 @@ def forward_max_adverse_excursion(
         Aligned adverse-excursion series.
 
     Raises:
-        ValidationError: If input or policy is invalid.
+        ValueError: If input or policy is invalid.
     """
     logger.info("Computing Research maximum adverse excursion")
     result = _forward_extreme(data, horizon=horizon, side=side, favorable=False)

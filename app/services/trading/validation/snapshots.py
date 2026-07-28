@@ -3,7 +3,7 @@
 from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta
 from types import MappingProxyType
-from typing import Self, cast
+from typing import Any, Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -12,7 +12,12 @@ from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel, StandardResponse, logger, to_json_safe
+from app.utils import get_logger, to_json_safe
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 class RouteSnapshot(BaseModel):
@@ -226,7 +231,7 @@ def get_route_snapshot(
         value,
         operation="trading.get_route_snapshot",
         message="Trading route snapshot returned",
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         request_id=request.request_id,
         correlation_id=request.correlation_id,
         read_only=True,

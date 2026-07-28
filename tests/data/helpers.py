@@ -20,7 +20,7 @@ from app.services.data.sources.contracts import (
 from app.services.data.sources.local_adapter import LocalMarketDataSource
 from app.services.data.sources.policy import SourcePolicyConfig, register_source_policy
 from app.services.data.sources.registry import register_source
-from app.utils import AuditEvent, generate_id
+from app.utils import create_audit_event, generate_id
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)
@@ -95,9 +95,9 @@ def make_dataset() -> MarketDataset:
     )
 
 
-def make_audit_event(*, timestamp: datetime = START) -> AuditEvent:
+def make_audit_event(*, timestamp: datetime = START):
     """Return one valid Utils-owned audit event."""
-    return AuditEvent(
+    return create_audit_event(
         contract_version="v1",
         schema_id="utils.audit_event.v1",
         event_id=generate_id("evt"),

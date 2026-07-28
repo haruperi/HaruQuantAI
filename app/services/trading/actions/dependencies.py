@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.brokers import (
     BrokerAdapter,
@@ -39,7 +39,11 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.models import JsonValue
 from app.services.trading.reconciliation import AuthoritySnapshot
-from app.utils import StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.live import LiveSession

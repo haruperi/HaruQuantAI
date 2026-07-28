@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 from app.services.strategy.contracts.execution import (
     StrategyDecision,
@@ -32,7 +32,11 @@ from app.services.strategy.diagnostics import (
 )
 from app.services.strategy.intents import TradeIntent, build_trade_intent
 from app.services.strategy.replay import create_strategy_replay_manifest
-from app.utils import StandardResponse, canonical_digest, canonical_json, logger
+from app.utils import canonical_digest, canonical_json, get_logger
+
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data import AccountStateSnapshot

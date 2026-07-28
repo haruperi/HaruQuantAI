@@ -3,13 +3,19 @@
 from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
+from typing import Any, Literal
 
 from app.services.trading.contracts import ExecutionReceipt, TradingError
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel, StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 _RECEIPT_TEXT_FIELDS = (
     "receipt_id",
@@ -296,7 +302,7 @@ def classify_authority_response(
         receipt,
         operation="trading.classify_authority_response",
         message="Trading authority response classified",
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         request_id=receipt.request_id,
         correlation_id=receipt.correlation_id,
         read_only=True,

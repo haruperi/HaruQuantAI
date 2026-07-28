@@ -4,19 +4,21 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from time import perf_counter_ns
-from typing import TypeVar, cast
+from typing import Any, Literal, TypeVar, cast
 
 from app.utils import (
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardError,
-    StandardResponse,
     build_response_metadata,
     generate_id,
     validate_id,
 )
-from app.utils import ValidationError as UtilsValidationError
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+type JsonValue = Any
+type ResponseMetadata = Any
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 T = TypeVar("T")
 
@@ -26,7 +28,7 @@ def _safe_trace_id(value: str | None, prefix: str) -> str:
     if value is not None:
         try:
             return validate_id(value, expected_prefix=prefix)
-        except ValueError, TypeError, UtilsValidationError:
+        except Exception:
             pass
     return generate_id(prefix)
 
@@ -75,7 +77,7 @@ def success_trading_response(
     *,
     operation: str = "trading.operation",
     message: str = "Trading operation completed",
-    risk_level: RiskLevel = RiskLevel.LOW,
+    risk_level: RiskLevel = "low",
     request_id: str | None = None,
     correlation_id: str | None = None,
     started_at: int | None = None,
@@ -122,7 +124,7 @@ def error_trading_response(
     details: Mapping[str, object],
     operation: str = "trading.operation",
     message: str = "Trading operation failed",
-    risk_level: RiskLevel = RiskLevel.HIGH,
+    risk_level: RiskLevel = "high",
     request_id: str | None = None,
     correlation_id: str | None = None,
     started_at: int | None = None,

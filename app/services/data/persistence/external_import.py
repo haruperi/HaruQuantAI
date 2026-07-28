@@ -41,7 +41,9 @@ from app.services.data.persistence.dataset_writer import _save_dataset_raw
 from app.services.data.quality.series import (
     _inspect_records_quality_raw as inspect_records_quality,
 )
-from app.utils import AuditEvent, generate_id, logger
+from app.utils import create_audit_event, generate_id, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -398,7 +400,7 @@ def _audit_import(request: ExternalImportRequest, record_count: int) -> None:
     """Record the external origin of an admitted artifact."""
     logger.info("Recording external import provenance for %s", request.symbol)
     _persist_audit_event_raw(
-        AuditEvent(
+        create_audit_event(
             contract_version="v1",
             schema_id="utils.audit_event.v1",
             event_id=generate_id("evt"),

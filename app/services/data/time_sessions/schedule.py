@@ -17,7 +17,7 @@ runtime cycle.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal, Protocol
+from typing import Any, Literal, Protocol
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -43,7 +43,9 @@ from app.services.data.time_sessions.contracts import (
     ScheduleRequest,
 )
 from app.services.data.time_sessions.market_hours import evaluate_market_hours
-from app.utils import Clock, generate_id, logger, utc_now
+from app.utils import generate_id, get_logger, utc_now
+
+logger = get_logger(__name__)
 
 
 class MarketCalendar(Protocol):
@@ -66,7 +68,7 @@ def _get_current_schedule_raw(
     request: ScheduleRequest,
     calendar: MarketCalendar,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
     validate_source: bool = True,
 ) -> MarketSchedule:
     """Return current configured hours and normalized UTC sessions.
@@ -137,7 +139,7 @@ def get_current_schedule(
     request: ScheduleRequest,
     calendar: MarketCalendar,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
     validate_source: bool = True,
 ) -> StandardResponse[MarketSchedule]:
     """Return current configured hours and normalized UTC sessions.

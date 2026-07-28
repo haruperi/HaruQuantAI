@@ -10,7 +10,9 @@ from app.services.data.contracts.responses import (
 )
 from app.services.data.local_datasets.contracts import DatasetLoadRequest
 from app.services.data.persistence.dataset_writer import _load_local_dataset_raw
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.contracts import MarketDataset

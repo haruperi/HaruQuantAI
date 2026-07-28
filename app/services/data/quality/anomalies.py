@@ -26,7 +26,7 @@ from app.services.data.quality.scoring import (
     _MIN_SPIKE_RECORDS,
     _issue,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -41,6 +41,8 @@ from app.services.data.time_sessions.gaps import _classify_gap_raw as classify_g
 from app.services.data.time_sessions.timeframes import (
     _get_timeframe_spec_raw as get_timeframe_spec,
 )
+
+logger = get_logger(__name__)
 
 
 def _closes(records: Sequence[CanonicalRecord]) -> list[Decimal] | None:

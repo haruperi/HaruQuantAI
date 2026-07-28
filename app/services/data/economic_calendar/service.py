@@ -34,7 +34,9 @@ from app.services.data.economic_calendar.profiling import (
 from app.services.data.economic_calendar.restriction import (
     _is_news_restricted_events_raw,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.economic_calendar.events import EconomicEvent, EventImpact

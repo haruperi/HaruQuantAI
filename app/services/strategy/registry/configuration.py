@@ -17,7 +17,9 @@ from app.services.strategy.contracts.references import (
 )
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 
 @guard_strategy_boundary

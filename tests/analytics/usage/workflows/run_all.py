@@ -9,11 +9,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 WORKFLOWS = (
-    "wf_anlt_001_build_canonical_performance_report.py",
-    "wf_anlt_002_calculate_grouped_analytics_evidence.py",
+    "wf_anlt_pri_build_canonical_performance_report.py",
+    "wf_anlt_ter_calculate_grouped_analytics_evidence.py",
     "wf_anlt_003_benchmark_relative_analysis.py",
     "wf_anlt_005_build_dashboard_payload.py",
-    "wf_anlt_006_adapt_upstream_result.py",
+    "wf_anlt_sec_adapt_upstream_result.py",
     "wf_anlt_007_run_statistical_validation.py",
     "wf_anlt_008_serialize_hash_report.py",
     "wf_anlt_009_build_portfolio_performance_report.py",

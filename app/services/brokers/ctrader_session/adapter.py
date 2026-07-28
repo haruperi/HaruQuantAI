@@ -1,5 +1,7 @@
 """Canonical cTrader broker adapter."""
 
+from __future__ import annotations
+
 import asyncio
 import importlib
 from datetime import UTC, datetime
@@ -30,7 +32,6 @@ from app.services.brokers.ctrader_session.transport import _CTraderTransport
 from app.services.brokers.execution_history.ctrader import _CTraderExecutionHistoryMixin
 from app.services.brokers.price_streams.ctrader import _CTraderPriceStreamsMixin
 from app.services.brokers.provider_calculations.ctrader import _CTraderCalculationsMixin
-from app.utils import StandardResponse  # noqa: TC001
 
 
 class CTraderBrokerAdapter(

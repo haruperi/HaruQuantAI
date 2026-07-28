@@ -5,7 +5,8 @@ Public surface composed of two layers:
 1. The raw multi-site scrape pipeline declared by the legacy FEAT-DATA-11
    (`CalendarEvent`, `ScrapeOptions`, `ScrapeResult`, `scrape_economic_calendar`,
    `CalendarTransport`, `CALENDAR_SITES`) and its thin boundary helpers
-   (`normalize_calendar_number`, `parse_calendar_row`).
+   (
+ormalize_calendar_number`, `parse_calendar_row`).
 2. The normalized event/news-restriction surface that consumers outside Data
    depend on: `EconomicEvent`, `EventImpact`,
    `EconomicCalendarProvider`, `CalendarScrapeProvider`,

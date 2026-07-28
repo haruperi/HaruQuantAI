@@ -10,11 +10,14 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_DIR = ROOT / "tests/indicators/usage/workflows"
 README = ROOT / "app/services/indicators/README.md"
 EXPECTED = {
-    "WF-INDI-001": "wf_indi_001_core_batch_indicator_calculation.py",
-    "WF-INDI-002": "wf_indi_002_decision_time_consumption.py",
+    "WF-INDI-PRI": "wf_indi_pri_core_batch_indicator_calculation.py",
+    "WF-INDI-SEC": "wf_indi_sec_decision_time_consumption.py",
     "WF-INDI-003": "wf_indi_003_warmup_coordination.py",
-    "WF-INDI-004": "wf_indi_004_availability_aware_multi_timeframe_calculation.py",
+    "WF-INDI-TER": "wf_indi_ter_availability_aware_multi_timeframe_calculation.py",
     "WF-INDI-005": "wf_indi_005_static_registry_discovery_validation.py",
+    "WF-INDI-006": "wf_indi_006_candlestick_pattern_detection.py",
+    "WF-INDI-007": "wf_indi_007_volume_profile_distribution.py",
+    "WF-INDI-008": "wf_indi_008_capability_matrix_introspection.py",
 }
 
 

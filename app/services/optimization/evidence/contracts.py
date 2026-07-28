@@ -11,7 +11,9 @@ from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from app.services.optimization.robustness import MonteCarloResult  # noqa: TC001
 from app.services.optimization.search import SearchSummary  # noqa: TC001
 from app.services.optimization.validation import WalkForwardResult  # noqa: TC001
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 _SHA256_HEX_LENGTH = 64
 

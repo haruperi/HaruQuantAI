@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 from hashlib import sha256
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -25,7 +25,12 @@ from app.services.trading.state import (
     TradingStateStore,
 )
 from app.services.trading.state.projections import _apply_execution_event_value
-from app.utils import RiskLevel, StandardResponse, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 class AuthorityResolution(BaseModel):
@@ -384,7 +389,7 @@ def resolve_unknown_outcome(
         return map_trading_error(error, {"receipt_id": receipt.receipt_id})
     return success_trading_response(
         resolution,
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         legacy_status=resolution.transition,
         extensions={"receipt_id": receipt.receipt_id},
     )

@@ -144,13 +144,14 @@ def __getattr__(name: str) -> object:
     """Resolve one approved adapter type without importing SDKs eagerly.
 
     Args:
-        name: Requested package attribute.
+            name: Requested package attribute.
 
     Returns:
-        Approved concrete adapter class.
+            Approved concrete adapter class.
 
     Raises:
-        AttributeError: If ``name`` is not an approved lazy export.
+            AttributeError: If `
+    ame`` is not an approved lazy export.
     """
     module_name = _LAZY_ADAPTERS.get(name)
     if module_name is None:

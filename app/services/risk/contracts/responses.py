@@ -7,7 +7,7 @@ import inspect
 import time
 from collections.abc import Callable, Mapping
 from contextlib import suppress
-from typing import ParamSpec, TypeVar, cast
+from typing import Any, Literal, ParamSpec, TypeVar, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -15,17 +15,20 @@ from app.services.risk.contracts.catalog import RISK_ERROR_CATALOG
 from app.services.risk.contracts.enums import RiskErrorCode
 from app.services.risk.contracts.errors import RiskDomainError
 from app.utils import (
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     error_response,
     exception_response,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     validate_id,
 )
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+type ResponseMetadata = Any
+type StandardResponse[T] = Any
+logger = get_logger(__name__)
 
 _P = ParamSpec("_P")
 _T = TypeVar("_T")
@@ -249,7 +252,7 @@ def unwrap_risk_response(
     Raises:
         RiskDomainError: If the response is an error or structurally invalid.
     """
-    if not isinstance(response, StandardResponse):
+    if not all(hasattr(response, field) for field in ("status", "metadata")):
         raise RiskDomainError(RiskErrorCode.UNKNOWN_ERROR, "INVALID_RESPONSE")
     if response.status == "success":
         return cast("_T", response.data)

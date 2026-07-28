@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
 from pydantic import SecretStr, ValidationError
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.services.brokers import (
     BrokerAdapter,
@@ -51,7 +52,9 @@ from app.services.data.sources.registry import (
     resolve_source_identity,
 )
 from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
-from app.utils import AppSettings, generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.data.time_sessions.schedule import MarketCalendar
@@ -62,8 +65,15 @@ _sessions: dict[str, _LazyBrokerSession] = {}
 _migrated_targets: set[tuple[str, str]] = set()
 
 
-class _ProviderRuntimeSettings(AppSettings):
+class _ProviderRuntimeSettings(BaseSettings):
     """Private provider settings used only by the standalone Data runtime."""
+
+    model_config = SettingsConfigDict(
+        env_ignore_empty=True,
+        case_sensitive=False,
+        extra="ignore",
+        frozen=True,
+    )
 
     mt5_enabled: bool = False
     mt5_environment: Literal["demo", "live"] = "demo"

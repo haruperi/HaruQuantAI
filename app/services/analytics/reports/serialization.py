@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import to_report_json_safe
-from app.utils import ValidationError as UtilsValidationError
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.analytics.contracts.models import (
@@ -66,7 +67,7 @@ def serialize_report(
         else:
             message = f"unsupported Analytics report format: {format_name}"
             raise AnalyticsValidationError(message)
-    except UtilsValidationError as error:
+    except Exception as error:
         raise AnalyticsValidationError("report serialization failed") from error
     if len(rendered.encode("utf-8")) > config.max_response_bytes:
         raise AnalyticsValidationError("serialized report exceeds configured bound")

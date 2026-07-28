@@ -14,7 +14,9 @@ from app.services.data.time_sessions.contracts import (
     ActiveMarketSessionsRequest,
     NamedSessionDefinition,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 FOREX_NAMED_SESSIONS = (
     NamedSessionDefinition(

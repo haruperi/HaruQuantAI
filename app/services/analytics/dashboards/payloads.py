@@ -11,7 +11,9 @@ from app.services.analytics.dashboards.truncation import (
     DASHBOARD_MAX_POINTS,
     truncate_series,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 DASHBOARD_REQUIRED_PAYLOADS = ("equity_curve", "summary_table")
 DASHBOARD_OPTIONAL_PAYLOADS = ("drawdown_chart", "monthly_returns_table")

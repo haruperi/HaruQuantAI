@@ -8,7 +8,9 @@ from app.services.optimization.evidence.contracts import (
     OptimizationResult,
 )
 from app.services.optimization.search import CandidateState
-from app.utils import canonical_digest, logger
+from app.utils import canonical_digest, get_logger
+
+logger = get_logger(__name__)
 
 
 def _select_decision(request: EvidenceAssemblyRequest) -> FinalDecision:

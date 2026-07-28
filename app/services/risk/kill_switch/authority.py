@@ -6,7 +6,7 @@ import hashlib
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from time import monotonic
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -25,7 +25,13 @@ from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
-from app.utils import AuthContext, RiskLevel, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type AuthContext = Any
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.risk.approvals import ApprovalTokenService
@@ -270,7 +276,7 @@ def _validate_check_request(
 
 
 @guard_risk_boundary(
-    risk_level=RiskLevel.CRITICAL,
+    risk_level="critical",
     read_only=False,
     modifies_database=True,
 )
@@ -399,7 +405,7 @@ def _applicable_states(
     return tuple(sorted(selected, key=lambda item: _SCOPE_PRECEDENCE[item.scope_level]))
 
 
-@guard_risk_boundary(risk_level=RiskLevel.CRITICAL, read_only=True)
+@guard_risk_boundary(risk_level="critical", read_only=True)
 def check_risk_kill_switch(
     states: Sequence[KillSwitchState],
     scope: Mapping[str, str],

@@ -13,7 +13,9 @@ from pydantic import (
 )
 
 from app.services.data.contracts._base import TracedContract as _Contract
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 ACCOUNT_SNAPSHOT_SCHEMA: Final = "data.account_state_snapshot.v1"
 

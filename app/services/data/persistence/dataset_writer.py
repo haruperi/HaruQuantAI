@@ -32,7 +32,9 @@ from app.services.data.persistence.contracts import (
     StorageManifest,
 )
 from app.services.data.persistence.locking import _acquire_write_lock_raw
-from app.utils import Clock, logger, utc_now
+from app.utils import get_logger, utc_now
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -243,7 +245,7 @@ def _atomic_write_dataset(
     request: DatasetSaveRequest,
     absolute_path: Path,
     manifest_path: Path,
-    clock: Clock | None,
+    clock: Any | None,
 ) -> StorageManifest:
     """Write DataFrame and manifest to temporary files, then atomic rename."""
     logger.info("Writing a DATA artifact and manifest atomically")
@@ -318,7 +320,7 @@ def _atomic_write_dataset(
 def _save_dataset_raw(
     request: DatasetSaveRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> StorageManifest:
     """Validate quality, lock target path, write temp files, and commit manifest.
 
@@ -372,7 +374,7 @@ def _save_dataset_raw(
 def save_dataset(
     request: DatasetSaveRequest,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> StandardResponse[StorageManifest]:
     """Validate quality, lock target path, write temp files, and commit manifest.
 

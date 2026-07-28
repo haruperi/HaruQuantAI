@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.indicators import IndicatorError
 from app.services.strategy.contracts import StrategySignal
@@ -19,7 +19,11 @@ from app.services.strategy.signals._mechanics import (
     _SignalDataError,
     _SignalIndicatorError,
 )
-from app.utils import StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.indicators import IndicatorResult

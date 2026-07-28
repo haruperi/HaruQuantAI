@@ -9,7 +9,9 @@ import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import StatisticalConfig
@@ -25,14 +27,14 @@ def _finite(values: object) -> NDArray[np.float64]:
         Validated flattened vector.
 
     Raises:
-        ValidationError: If values are empty or non-finite.
+        ValueError: If values are empty or non-finite.
     """
     logger.debug("Validating Research null sample")
     output = np.asarray(values, dtype="float64").reshape(-1)
     if output.size == 0:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "EMPTY_NULL_SAMPLE")
+        raise ValueError("RES_INSUFFICIENT_DATA", "EMPTY_NULL_SAMPLE")
     if not np.isfinite(output).all():
-        raise ValidationError("RES_NONFINITE_DATA", "FINITE_NULL_SAMPLE_REQUIRED")
+        raise ValueError("RES_NONFINITE_DATA", "FINITE_NULL_SAMPLE_REQUIRED")
     return output
 
 
@@ -55,14 +57,14 @@ def random_entry_null(
         Seeded null distribution.
 
     Raises:
-        ValidationError: If policy or data is invalid.
+        ValueError: If policy or data is invalid.
     """
     logger.info("Generating Research random-entry null")
     if "close" not in data or side not in {"buy", "sell", "mixed"}:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_RANDOM_ENTRY_INPUT")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_RANDOM_ENTRY_INPUT")
     close = _finite(data["close"])
     if not 0 < hold_bars < close.size or bool((close <= 0).any()):
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_HOLD_HORIZON")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_HOLD_HORIZON")
     outcomes = np.log(close[hold_bars:] / close[:-hold_bars])
     rng = np.random.default_rng(config.seed)
     sampled = rng.choice(outcomes, size=config.null_samples, replace=True)
@@ -86,7 +88,7 @@ def r_space_null(
         Seeded null distribution.
 
     Raises:
-        ValidationError: If samples are invalid.
+        ValueError: If samples are invalid.
     """
     logger.info("Generating Research R-space null")
     values = _finite(samples)
@@ -112,20 +114,20 @@ def session_randomized_null(
         Null distribution of shuffled overall means.
 
     Raises:
-        ValidationError: If session or return inputs are invalid.
+        ValueError: If session or return inputs are invalid.
     """
     logger.info("Generating Research within-session null")
     if session_column not in data or "log_return" not in data:
-        raise ValidationError("RES_INPUT_INVALID", "SESSION_RETURN_COLUMNS_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "SESSION_RETURN_COLUMNS_REQUIRED")
     values = _finite(data["log_return"].dropna())
     if len(values) != int(data["log_return"].notna().sum()):
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_SESSION_SAMPLE")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_SESSION_SAMPLE")
     groups = [
         group["log_return"].dropna().to_numpy(dtype="float64")
         for _, group in data.groupby(session_column, sort=True)
     ]
     if not groups or any(group.size == 0 for group in groups):
-        raise ValidationError("RES_INSUFFICIENT_DATA", "EMPTY_SESSION_GROUP")
+        raise ValueError("RES_INSUFFICIENT_DATA", "EMPTY_SESSION_GROUP")
     rng = np.random.default_rng(config.seed)
     output = np.empty(config.null_samples, dtype="float64")
     for index in range(config.null_samples):
@@ -148,12 +150,12 @@ def shuffle_returns_null(
         Null distribution of block-shuffled means.
 
     Raises:
-        ValidationError: If block or sample is invalid.
+        ValueError: If block or sample is invalid.
     """
     logger.info("Generating Research shuffled-return null")
     values = _finite(returns)
     if config.block_size > values.size:
-        raise ValidationError("RES_INPUT_INVALID", "BLOCK_EXCEEDS_SAMPLE")
+        raise ValueError("RES_INPUT_INVALID", "BLOCK_EXCEEDS_SAMPLE")
     blocks = [
         values[index : index + config.block_size]
         for index in range(0, values.size, config.block_size)
@@ -181,12 +183,12 @@ def compute_null_percentile(
         Percentile in [0, 100].
 
     Raises:
-        ValidationError: If input is invalid.
+        ValueError: If input is invalid.
     """
     logger.debug("Computing Research null percentile")
     values = _finite(distribution)
     if not np.isfinite(observed):
-        raise ValidationError("RES_NONFINITE_DATA", "OBSERVED_NONFINITE")
+        raise ValueError("RES_NONFINITE_DATA", "OBSERVED_NONFINITE")
     return float(100.0 * np.mean(values <= observed))
 
 
@@ -200,7 +202,7 @@ def null_distribution_stats(distribution: NDArray[np.floating]) -> Mapping[str, 
         Deterministic statistical summary.
 
     Raises:
-        ValidationError: If input is invalid.
+        ValueError: If input is invalid.
     """
     logger.debug("Summarizing Research null distribution")
     values = _finite(distribution)
@@ -233,7 +235,7 @@ def exceeds_null_threshold(
         Whether the declared threshold is exceeded.
 
     Raises:
-        ValidationError: If policy or data is invalid.
+        ValueError: If policy or data is invalid.
     """
     logger.debug("Evaluating Research null threshold")
     values = _finite(distribution)
@@ -242,7 +244,7 @@ def exceeds_null_threshold(
         or not 0.0 < quantile < 1.0
         or alternative not in {"upper", "lower", "two-sided"}
     ):
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_NULL_THRESHOLD_POLICY")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_NULL_THRESHOLD_POLICY")
     if alternative == "upper":
         return bool(observed >= np.quantile(values, quantile))
     if alternative == "lower":

@@ -3,13 +3,10 @@
 from dataclasses import FrozenInstanceError
 
 import pytest
-from app.utils import (
-    COMMON_ERROR_CATALOG,
-    ErrorDefinition,
-    ValidationError,
-    require_error_definition,
-    validate_error_catalog,
-)
+from app.utils import require_error_definition, validate_error_catalog
+from app.utils.errors.catalog import COMMON_ERROR_CATALOG
+from app.utils.errors.contracts import ErrorDefinition
+from app.utils.errors.exceptions import ValidationError
 
 
 def test_common_error_catalog_is_immutable_and_valid() -> None:

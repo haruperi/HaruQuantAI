@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from app.services.data.audit.contracts import (
     AuditEventPage,
@@ -28,10 +28,11 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import AuditEvent, logger
+from app.utils import create_audit_event, get_logger
 
-if TYPE_CHECKING:
-    from app.utils import AuthContext
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 
 def _build_audit_query(request: AuditEventQuery) -> tuple[str, list[Any]]:
@@ -76,14 +77,14 @@ def _build_audit_query(request: AuditEventQuery) -> tuple[str, list[Any]]:
     return " ".join(sql_parts).strip(), params
 
 
-def _parse_audit_events(rows: tuple[Mapping[str, Any], ...]) -> list[AuditEvent]:
+def _parse_audit_events(rows: tuple[Mapping[str, Any], ...]) -> list[Any]:
     """Parse raw SQLite query result rows into AuditEvent objects."""
     logger.debug("Parsing persisted audit rows into Utils contracts")
     events = []
     for row in rows:
         ts_str = str(row["timestamp"])
         events.append(
-            AuditEvent(
+            create_audit_event(
                 contract_version="v1",
                 schema_id="utils.audit_event.v1",
                 event_id=str(row["event_id"]),
@@ -105,7 +106,7 @@ def _parse_audit_events(rows: tuple[Mapping[str, Any], ...]) -> list[AuditEvent]
 
 
 def _query_audit_events_raw(
-    request: AuditEventQuery, auth_context: AuthContext
+    request: AuditEventQuery, auth_context: Any
 ) -> AuditEventPage:
     """Authorize and execute a bounded cursor-paginated audit query in SQLite.
 

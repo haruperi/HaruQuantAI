@@ -1,7 +1,8 @@
 from collections.abc import Mapping
 
 import pytest
-from app.utils import ValidationError, route_error_event
+from app.utils import route_error_event
+from app.utils.errors.exceptions import ValidationError
 
 
 def test_route_error_event_invokes_injected_sink() -> None:

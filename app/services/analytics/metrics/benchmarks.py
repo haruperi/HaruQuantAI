@@ -22,7 +22,9 @@ from app.services.analytics.metrics.trades import (
     ANNUALIZATION_POLICY,
     MIN_METRIC_SAMPLES,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _VARIANCE_MIN_SAMPLES = MIN_METRIC_SAMPLES["variance"]
 _ALPHA_MIN_SAMPLES = MIN_METRIC_SAMPLES["tail"]

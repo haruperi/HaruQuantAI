@@ -5,24 +5,26 @@ from __future__ import annotations
 import functools
 import time
 from collections.abc import Awaitable, Callable, Mapping
-from typing import cast, overload
+from typing import Any, Literal, cast, overload
 
 from app.services.simulator.errors.catalog import SIM_ERROR_CATALOG
 from app.services.simulator.errors.exception import SimulationError
 from app.utils import (
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
-    ValidationError,
     build_response_metadata,
     error_response,
     exception_response,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     validate_id,
 )
+
+type JsonValue = Any
+type ResponseMetadata = Any
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 def _trace_context(
@@ -58,7 +60,7 @@ def _trace_context(
             request_id if isinstance(request_id, str) else "",
             expected_prefix="req",
         )
-    except ValidationError, ValueError:
+    except Exception:
         request_id = generate_id("req")
     if correlation_id is not None:
         try:
@@ -66,7 +68,7 @@ def _trace_context(
                 correlation_id if isinstance(correlation_id, str) else "",
                 expected_prefix="cor",
             )
-        except ValidationError, ValueError:
+        except Exception:
             correlation_id = None
     return request_id, correlation_id
 
@@ -350,7 +352,7 @@ def unwrap_simulation_response[T](response: T, *, operation: str) -> T:
         SimulationError: If the response reports a domain failure or has no
             valid error evidence.
     """
-    if not isinstance(response, StandardResponse):
+    if not all(hasattr(response, field) for field in ("status", "metadata")):
         # Transitional adapters are accepted while every concrete seam is
         # migrated; public Simulation boundaries still always emit envelopes.
         return response

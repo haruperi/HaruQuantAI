@@ -8,7 +8,7 @@ import asyncio
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from datetime import datetime
 from hashlib import sha256
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.brokers import (
     BrokerConnectionConfig,
@@ -34,14 +34,18 @@ from app.services.trading.monitoring import (
 )
 from app.services.trading.validation import ReadinessAssessment
 from app.utils import (
-    AuditEvent,
-    AuthContext,
-    RiskLevel,
-    StandardResponse,
     canonical_json,
+    create_audit_event,
     generate_id,
-    logger,
+    get_logger,
 )
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.brokers import BrokerAdapter
@@ -326,7 +330,7 @@ class LiveSession:
             or auth.correlation_id != request.correlation_id
         ):
             raise TradingError("AUDIT_FAILED", "Audit context trace is mismatched")
-        event = AuditEvent(
+        event = create_audit_event(
             contract_version="v1",
             schema_id="utils.audit_event.v1",
             event_id=generate_id("evt"),
@@ -363,7 +367,7 @@ class LiveSession:
         return success_trading_response(
             None,
             operation="trading.live.write_pre_audit",
-            risk_level=RiskLevel.CRITICAL,
+            risk_level="critical",
             read_only=False,
             writes_file=True,
             legacy_status="audited",
@@ -403,7 +407,7 @@ class LiveSession:
             redacted_data,
             operation=operation,
             message=message,
-            risk_level=RiskLevel.CRITICAL,
+            risk_level="critical",
             request_id=self._lifecycle_request_id,
             correlation_id=self._lifecycle_correlation_id,
             read_only=operation.endswith(".status"),

@@ -9,7 +9,19 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import ConfigurationError, logger
+from app.utils import get_logger
+
+
+class ConfigurationError(ValueError):
+    """Research-owned configuration validation error."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+logger = get_logger(__name__)
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]

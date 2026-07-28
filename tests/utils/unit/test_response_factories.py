@@ -7,15 +7,14 @@ from types import MappingProxyType
 
 import pytest
 from app.utils import (
-    COMMON_ERROR_CATALOG,
-    ResponseMetadata,
-    RiskLevel,
-    ValidationError,
     build_response_metadata,
     error_response,
     exception_response,
     success_response,
 )
+from app.utils.errors.catalog import COMMON_ERROR_CATALOG
+from app.utils.errors.exceptions import ValidationError
+from app.utils.responses.models import ResponseMetadata, RiskLevel
 
 _REQUEST_ID = "req-00000000-0000-4000-8000-000000000001"
 

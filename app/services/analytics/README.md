@@ -291,19 +291,40 @@ reports, so the graph is acyclic.
 > programs with `python tests/analytics/usage/workflows/run_all.py`. This satisfies
 > `NFR-ANLT-011`; excluded `WF-ANLT-004` has no program.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-ANLT-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-ANLT-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-ANLT-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-ANLT-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-ANLT-001`, `WF-ANLT-006`, and `WF-ANLT-002` were absorbed into `WF-ANLT-PRI`,
+`WF-ANLT-SEC`, and `WF-ANLT-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-ANLT-015`.
+
 | Workflow | Standalone program |
 |---|---|
-| `WF-ANLT-001` | `tests/analytics/usage/workflows/wf_anlt_001_build_canonical_performance_report.py` |
-| `WF-ANLT-002` | `tests/analytics/usage/workflows/wf_anlt_002_calculate_grouped_analytics_evidence.py` |
+| `WF-ANLT-PRI` | `tests/analytics/usage/workflows/wf_anlt_pri_build_canonical_performance_report.py` |
+| `WF-ANLT-SEC` | `tests/analytics/usage/workflows/wf_anlt_sec_adapt_upstream_result.py` |
+| `WF-ANLT-TER` | `tests/analytics/usage/workflows/wf_anlt_ter_calculate_grouped_analytics_evidence.py` |
 | `WF-ANLT-003` | `tests/analytics/usage/workflows/wf_anlt_003_benchmark_relative_analysis.py` |
 | `WF-ANLT-005` | `tests/analytics/usage/workflows/wf_anlt_005_build_dashboard_payload.py` |
-| `WF-ANLT-006` | `tests/analytics/usage/workflows/wf_anlt_006_adapt_upstream_result.py` |
 | `WF-ANLT-007` | `tests/analytics/usage/workflows/wf_anlt_007_run_statistical_validation.py` |
 | `WF-ANLT-008` | `tests/analytics/usage/workflows/wf_anlt_008_serialize_hash_report.py` |
 | `WF-ANLT-009` | `tests/analytics/usage/workflows/wf_anlt_009_build_portfolio_performance_report.py` |
 | `WF-ANLT-010` | `tests/analytics/usage/workflows/wf_anlt_010_compare_performance_reports.py` |
 | `WF-ANLT-013` | `tests/analytics/usage/workflows/wf_anlt_013_build_portfolio_allocation_evidence.py` |
 | `WF-ANLT-014` | `tests/analytics/usage/workflows/wf_anlt_014_measure_reconciled_portfolio_rebalance.py` |
+| `WF-ANLT-015` | `tests/analytics/usage/workflows/wf_anlt_015_equity_curve_worst_day_distribution.py` *(pending)* |
+| `WF-ANLT-016` | `tests/analytics/usage/workflows/wf_anlt_016_validate_contract_and_metric_catalogue.py` *(pending)* |
+| `WF-ANLT-017` | `tests/analytics/usage/workflows/wf_anlt_017_emit_error_payload_quality_flags.py` *(pending)* |
+
+Entries marked *(pending)* are registered workflows whose standalone program is not
+yet written.
 
 ### Status values
 
@@ -317,24 +338,27 @@ reports, so the graph is acyclic.
 
 ### Workflow registry
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-ANLT-001` | Cross-domain | Build canonical performance report | Versioned canonical closed-trade ledger projection | `PerformanceReport v1` to UI/API, Research, or Optimization | `FR-ANLT-027 → FR-ANLT-038 → FR-ANLT-043` |
-| Completed | `WF-ANLT-002` | Internal | Calculate grouped analytics evidence | Canonical trades/series | Ordered `SectionEvidence` groups | `FR-ANLT-028 → FR-ANLT-038` |
-| Completed | `WF-ANLT-003` | Internal | Benchmark-relative analysis | Strategy result and Data-owned `MarketDataset v1` bars | Benchmark evidence or explicit skipped/undefined section | `FR-ANLT-027 → FR-ANLT-033 → FR-ANLT-034` |
-| Excluded | `WF-ANLT-004` | Internal | Evaluate strategy quality | Canonical `PerformanceReport` | Non-binding `StrategyQualityEvidence` | `FR-ANLT-044` |
-| Completed | `WF-ANLT-005` | Cross-domain | Build dashboard payload | Canonical `PerformanceReport` | Bounded `DashboardPayload` to UI/API | `FR-ANLT-045 → FR-ANLT-046` |
-| Completed | `WF-ANLT-006` | Cross-domain | Adapt upstream result | Versioned canonical closed-trade ledger projection emitted by Trading or Simulation | Canonical `TradingResult` or structured validation failure | `FR-ANLT-021 → FR-ANLT-027` |
-| Completed | `WF-ANLT-007` | Internal | Run statistical validation | Canonical numeric series, seed, bounded config | Deterministic confidence/permutation/sample evidence | `FR-ANLT-036` |
-| Completed | `WF-ANLT-008` | Internal | Serialize and hash report | Validated report | Canonical JSON or minimal human-readable output plus hashes | `FR-ANLT-025 → FR-ANLT-039 → FR-ANLT-040` |
-| Completed | `WF-ANLT-009` | Internal | Build portfolio performance report | Compatible component reports and FX evidence | Analytics-internal currency-safe portfolio report or blocker failure | `FR-ANLT-012 → FR-ANLT-041` |
-| Completed | `WF-ANLT-010` | Internal | Compare performance reports | Compatible reference and candidate reports | Actual metric deltas, omissions, and caveats | `FR-ANLT-042` |
-| Completed | `WF-ANLT-013` | Cross-domain | Build portfolio allocation evidence | Component reports and required `PortfolioSimulationResult` plus FX evidence | `PortfolioAllocationEvidence v1` | `FR-SIM-033 → FR-ANLT-041 → FR-ANLT-047 → FR-ANLT-048` |
-| Completed | `WF-ANLT-014` | Cross-domain | Measure reconciled Portfolio rebalance execution | `PortfolioRebalanceMeasurementRequest v1` containing redacted hash-bound successful Trading facts | `PortfolioRebalanceMeasurementEvidence v1` | `FR-ANLT-052` |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-ANLT-PRI` | Cross-domain | Build canonical performance report | Versioned canonical closed-trade ledger projection | `PerformanceReport v1` to UI/API, Research, or Optimization | `FR-ANLT-027 → FR-ANLT-038 → FR-ANLT-043` |
+| Completed | Secondary | `WF-ANLT-SEC` | Cross-domain | Adapt upstream result | Versioned canonical closed-trade ledger projection emitted by Trading or Simulation | Canonical `TradingResult` or structured validation failure | `FR-ANLT-021 → FR-ANLT-027` |
+| Completed | Tertiary | `WF-ANLT-TER` | Internal | Calculate grouped analytics evidence | Canonical trades/series | Ordered `SectionEvidence` groups | `FR-ANLT-028 → FR-ANLT-038` |
+| Completed | Supporting | `WF-ANLT-003` | Internal | Benchmark-relative analysis | Strategy result and Data-owned `MarketDataset v1` bars | Benchmark evidence or explicit skipped/undefined section | `FR-ANLT-027 → FR-ANLT-033 → FR-ANLT-034` |
+| Excluded | — | `WF-ANLT-004` | Internal | Evaluate strategy quality | Canonical `PerformanceReport` | Non-binding `StrategyQualityEvidence` | `FR-ANLT-044` |
+| Completed | Supporting | `WF-ANLT-005` | Cross-domain | Build dashboard payload | Canonical `PerformanceReport` | Bounded `DashboardPayload` to UI/API | `FR-ANLT-045 → FR-ANLT-046` |
+| Completed | Supporting | `WF-ANLT-007` | Internal | Run statistical validation | Canonical numeric series, seed, bounded config | Deterministic confidence/permutation/sample evidence | `FR-ANLT-036` |
+| Completed | Supporting | `WF-ANLT-008` | Internal | Serialize and hash report | Validated report | Canonical JSON or minimal human-readable output plus hashes | `FR-ANLT-025 → FR-ANLT-039 → FR-ANLT-040` |
+| Completed | Supporting | `WF-ANLT-009` | Internal | Build portfolio performance report | Compatible component reports and FX evidence | Analytics-internal currency-safe portfolio report or blocker failure | `FR-ANLT-012 → FR-ANLT-041` |
+| Completed | Supporting | `WF-ANLT-010` | Internal | Compare performance reports | Compatible reference and candidate reports | Actual metric deltas, omissions, and caveats | `FR-ANLT-042` |
+| Completed | Supporting | `WF-ANLT-013` | Cross-domain | Build portfolio allocation evidence | Component reports and required `PortfolioSimulationResult` plus FX evidence | `PortfolioAllocationEvidence v1` | `FR-SIM-033 → FR-ANLT-041 → FR-ANLT-047 → FR-ANLT-048` |
+| Completed | Supporting | `WF-ANLT-014` | Cross-domain | Measure reconciled Portfolio rebalance execution | `PortfolioRebalanceMeasurementRequest v1` containing redacted hash-bound successful Trading facts | `PortfolioRebalanceMeasurementEvidence v1` | `FR-ANLT-052` |
+| Completed | Supporting | `WF-ANLT-015` | Internal | Build closed-trade equity curve and worst-day distribution | Canonical closed-trade ledger plus required initial balance | Equity curve series, worst-day distribution, and barrier section evidence | `Pending` |
+| Completed | Supporting | `WF-ANLT-016` | Internal | Validate contract version and metric catalogue | Inbound report or evidence envelope plus the registered metric catalogue | Accepted versioned envelope, or a structured incompatibility failure before any calculation | `Pending` |
+| Completed | Supporting | `WF-ANLT-017` | Internal | Emit analytics error payload, quality flags, and warnings | A failed or degraded calculation within any Analytics workflow | Redacted error payload plus non-blocking quality flags and warnings attached to the result | `Pending` |
 
 ### Workflow boundaries and failures
 
-#### `WF-ANLT-001` — Build Canonical Performance Report
+#### `WF-ANLT-PRI` — Build Canonical Performance Report
 
 **System workflows:** `SYS-WF-001`, `SYS-WF-002`, `SYS-WF-003` (candidate scoring:
 Optimization consumes the resulting `PerformanceReport v1`; Analytics performs no
@@ -347,12 +371,18 @@ evidence; the equity curve and every return series are derived from it by
 `build_closed_trade_equity_curve` (`FR-ANLT-050`) on a closed-trade basis.
 **Output boundary:** Analytics returns `PerformanceReport v1`; it writes nothing.
 
-1. `adapt_trading_result()` validates the approved source version and maps it to
-   `TradingResult` without silent field loss.
-2. `calculate_grouped_evidence()` runs only catalog-approved metric groups.
-3. `build_performance_report()` applies section criticality, warnings, lineage,
-   finite-output validation, and hashes.
-4. The public operation returns `PerformanceReport v1` or surfaces `AnalyticsValidationError`.
+1. Validate the approved source version and map it to `TradingResult` without silent
+   field loss — `analytics.validate_contract_version()`,
+   `analytics.adapt_trading_result()`.
+2. Derive the equity curve from the closed-trade ledger, which is the sole primary
+   evidence — `analytics.build_closed_trade_equity_curve()`.
+3. Run only catalog-approved metric groups —
+   `analytics.validate_metric_catalog()`, `analytics.calculate_grouped_evidence()`.
+4. Apply section criticality, warnings, lineage, finite-output validation, and
+   hashes — `analytics.build_performance_report()`, `analytics.build_warning()`,
+   `analytics.build_quality_flag()`, `analytics.compute_reproducibility_hashes()`.
+5. Return `PerformanceReport v1`, or a structured failure —
+   `analytics.to_analytics_error_payload()`.
 
 **Failure behavior:** incompatible schema, missing required evidence, required
 section failure, non-finite output, or limit breach returns a structured error.
@@ -366,13 +396,21 @@ alone.
 **Integration test:**
 `tests/analytics/integration/test_build_performance_report.py::test_build_performance_report_from_simulation_result()`
 
-#### `WF-ANLT-002` — Calculate Grouped Analytics Evidence
+#### `WF-ANLT-TER` — Calculate Grouped Analytics Evidence
 
 **System workflow:** None (internal).
-Canonical input is split only by explicit source context (all/long/short,
-benchmark, cost, or statistical), passed to cataloged kernels, and returned as
-ordered section evidence. Empty/undefined evidence is `None` or skipped with a
-warning, never fabricated zero/infinity.
+
+1. Split canonical input only by explicit source context — all/long/short,
+   benchmark, cost, or statistical — `analytics.calculate_grouped_evidence()`.
+2. Pass each group to its cataloged kernel —
+   `analytics.calculate_return_evidence()`, `analytics.calculate_risk_evidence()`,
+   `analytics.calculate_drawdown_evidence()`, `analytics.calculate_ratio_evidence()`,
+   `analytics.calculate_trade_evidence()`,
+   `analytics.calculate_distribution_evidence()`,
+   `analytics.calculate_cost_efficiency_evidence()`.
+3. Return ordered section evidence, marking empty or undefined evidence as skipped
+   with a warning rather than a fabricated zero or infinity —
+   `analytics.build_warning()`.
 
 **Failure behavior:** invalid closed-trade semantics, ambiguous direction,
 non-finite required values, or an unapproved metric definition fails validation.
@@ -383,10 +421,15 @@ non-finite required values, or an unapproved metric definition fails validation.
 #### `WF-ANLT-003` — Benchmark-Relative Analysis
 
 **System workflow:** None (internal contribution to `SYS-WF-001`/`SYS-WF-002`).
-`align_benchmark_series()` normalizes UTC timestamps, restricts the benchmark to
-the analytics window, resolves duplicates deterministically under approved
-policy, and intersects observations. `calculate_benchmark_evidence()` then
-calculates only approved, currency-valid metrics.
+
+1. Obtain the benchmark bars from Data — `data.get_market_data()`.
+2. Normalize UTC timestamps, restrict the benchmark to the analytics window, resolve
+   duplicates deterministically, and intersect observations —
+   `analytics.align_benchmark_series()`.
+3. Calculate only approved, currency-valid metrics —
+   `analytics.calculate_benchmark_evidence()`.
+4. Mark non-overlap or insufficient observations as skipped evidence —
+   `analytics.build_warning()`.
 
 **Failure behavior:** non-overlap or insufficient observations yields skipped
 evidence; missing benchmark currency restricts output to currency-neutral
@@ -421,9 +464,12 @@ blocks evaluation; degraded inputs propagate degraded confidence.
 **Input boundary:** a validated `PerformanceReport`.
 **Output boundary:** a versioned `DashboardPayload` for UI/API.
 
-`build_dashboard_payload()` projects approved summary/equity/drawdown/warning
-and quality-flag sections without recomputing metrics; `truncate_series()`
-applies the approved deterministic point limit.
+1. Project approved summary, equity, drawdown, warning, and quality-flag sections
+   without recomputing any metric — `analytics.build_dashboard_payload()`.
+2. Apply the approved deterministic point limit to every series —
+   `analytics.truncate_series()`.
+3. Serialize the payload safely for the UI/API boundary —
+   `analytics.to_report_json_safe()`.
 
 **Failure behavior:** missing/degraded sections remain visibly skipped/degraded;
 non-finite values or inability to satisfy the point limit fails validation.
@@ -431,12 +477,21 @@ non-finite values or inability to satisfy the point limit fails validation.
 **Integration test:**
 `tests/analytics/integration/test_dashboard_payload.py::test_dashboard_uses_report_sections_without_recomputation()`
 
-#### `WF-ANLT-006` — Adapt Upstream Result
+#### `WF-ANLT-SEC` — Adapt Upstream Result
 
 **System workflows:** `SYS-WF-001`, `SYS-WF-003`, and the later measurement
 stage of `SYS-WF-002` only after a complete versioned closed-trade ledger exists.
 **Input boundary:** versioned producer-owned result.
 **Output boundary:** internal canonical `TradingResult`.
+
+1. The producer publishes its complete versioned closed-trade ledger —
+   `trading.build_trading_report()`, `simulator.build_json_report()`.
+2. Validate the declared contract version before any mapping —
+   `analytics.validate_contract_version()`.
+3. Map the producer result into canonical form without silent field loss —
+   `analytics.adapt_trading_result()`.
+4. Preserve bounded source metadata in lineage and surface bounded failure detail —
+   `analytics.to_analytics_error_payload()`.
 
 **Failure behavior:** missing mappings, required fields, versions, identifiers,
 currency/timestamps, or conflicting PnL fields fail closed with bounded details.
@@ -454,9 +509,13 @@ mandatory.
 #### `WF-ANLT-007` — Run Statistical Validation
 
 **System workflow:** None.
-`run_statistical_validation()` accepts an explicit seed and bounded iteration,
-confidence, alpha, and sample configuration; it computes real bootstrap,
-permutation, multiple-comparison, and sample-size evidence only.
+
+1. Accept an explicit seed and bounded iteration, confidence, alpha, and sample
+   configuration — `analytics.run_statistical_validation()`.
+2. Compute real bootstrap, permutation, multiple-comparison, and sample-size
+   evidence only — `analytics.run_statistical_validation()`.
+3. Return explicit skipped evidence rather than a fixed value where the catalog
+   requires it — `analytics.build_warning()`.
 
 **Failure behavior:** absent seed, insufficient/invalid observations, invalid
 alpha/confidence, or iteration-limit breach fails or returns explicit skipped
@@ -469,11 +528,16 @@ PBO, and backtest wrappers are prohibited.
 #### `WF-ANLT-008` — Serialize and Hash Report
 
 **System workflow:** None.
-`serialize_report()` emits canonical JSON or the one approved minimal
-human-readable representation. `compute_reproducibility_hashes()` computes
-input, config, ledger, equity, optional benchmark, and report hashes from
-canonical JSON while excluding documented nondeterministic fields. MD5 is not
-permitted.
+
+1. Coerce the validated report into JSON-safe primitives —
+   `analytics.to_report_json_safe()`, `utils.to_json_safe()`.
+2. Emit canonical JSON or the one approved minimal human-readable representation —
+   `analytics.serialize_report()`, `utils.canonical_json()`.
+3. Compute input, config, ledger, equity, optional benchmark, and report hashes
+   while excluding documented nondeterministic fields —
+   `analytics.compute_reproducibility_hashes()`, `utils.canonical_digest()`.
+
+MD5 is not permitted.
 
 **Failure behavior:** unsupported values, non-finite numbers, or unknown format
 fails validation; serialization never writes a file.
@@ -484,10 +548,17 @@ fails validation; serialization never writes a file.
 #### `WF-ANLT-009` — Build Portfolio Performance Report
 
 **System workflows:** Internal helper for `SYS-WF-007` / `SYS-WF-008`.
-`PortfolioPerformanceReport` is Analytics-internal; only the
-registered `PortfolioAllocationEvidence v1` projection crosses the boundary.
-Validated component reports are checked for schema, pairing, base currency, and
-caller-supplied FX evidence before real aggregation.
+1. Check every component report for schema, pairing, and base currency —
+   `analytics.validate_contract_version()`.
+2. Require caller-supplied FX evidence before any aggregation —
+   `data.get_fx_conversion_evidence()`.
+3. Aggregate into the Analytics-internal currency-safe portfolio report —
+   `analytics.build_portfolio_performance_report()`.
+4. Attach quality flags and caveats rather than silently degrading —
+   `analytics.build_quality_flag()`, `analytics.build_warning()`.
+
+`PortfolioPerformanceReport` is Analytics-internal; only the registered
+`PortfolioAllocationEvidence v1` projection crosses the boundary.
 
 **Failure behavior:** raw multi-currency PnL is never summed; missing required FX
 or incompatible schemas produces blocker evidence and no aggregate report.
@@ -498,9 +569,15 @@ or incompatible schemas produces blocker evidence and no aggregate report.
 #### `WF-ANLT-010` — Compare Performance Reports
 
 **System workflow:** None.
-`compare_performance_reports()` validates schema and pairing metadata, compares
-approved common metrics without mutating inputs, and reports deltas, missing
-metrics, and caveats. Fixed zero differences are prohibited.
+
+1. Validate schema and pairing metadata on both reports —
+   `analytics.validate_contract_version()`.
+2. Compare approved common metrics without mutating either input —
+   `analytics.compare_performance_reports()`.
+3. Report deltas, missing metrics, and caveats explicitly —
+   `analytics.build_warning()`.
+
+Fixed zero differences are prohibited.
 
 **Integration test:**
 `tests/analytics/integration/test_report_comparison.py::test_report_comparison_uses_actual_common_metrics()`
@@ -515,11 +592,19 @@ receiver-owned `FR-ANLT-047` and `FR-ANLT-048` evidence contract.
 **System workflows:** `SYS-WF-007`, `SYS-WF-008`.
 For the final `SYS-WF-008` leg, Analytics receives immutable reconciled
 `TradeRecord v1` / `ExecutionReceipt v1` facts and never edits execution truth.
-Analytics validates exact component/source schemas, measurement window, base
-currency, fresh Data-owned `FXConversionEvidence`, and finite numeric results,
-then projects performance, dependence, concentration, and caveat evidence into
-`PortfolioAllocationEvidence v1`. It does not recommend weights, approve a
-portfolio, set a risk budget, or infer missing values.
+1. Validate exact component and source schemas plus the measurement window —
+   `analytics.validate_contract_version()`.
+2. Require fresh Data-owned FX evidence for the declared base currency —
+   `data.get_fx_conversion_evidence()`, `utils.is_fresh()`.
+3. Build the internal portfolio performance aggregate —
+   `analytics.build_portfolio_performance_report()`.
+4. Project performance, dependence, concentration, and caveat evidence into the
+   receiver-owned contract — `analytics.build_portfolio_allocation_evidence()`.
+5. Bind the evidence to reproducible hashes —
+   `analytics.compute_reproducibility_hashes()`.
+
+Analytics does not recommend weights, approve a portfolio, set a risk budget, or
+infer missing values.
 
 **Failure behavior:** missing/incompatible sources or FX evidence returns a
 structured blocker and no partial cross-domain evidence. After execution this is
@@ -536,16 +621,91 @@ The same immutable execution/FX/version inputs support deterministic recomputati
 hash-bound successful Trading reconciliation facts.
 **Output boundary:** non-binding `PortfolioRebalanceMeasurementEvidence v1`.
 
-1. Validate contract identity, plan/allocation pairing, hashes, and successful outcomes.
-2. Calculate bounded execution measurement summaries without editing Trading truth.
-3. Preserve Trading execution references and deterministic non-binding lineage.
-4. Return measurement evidence or `AnalyticsValidationError`.
+1. Validate contract identity, plan/allocation pairing, hashes, and successful
+   outcomes — `analytics.validate_contract_version()`, `utils.canonical_digest()`.
+2. Calculate bounded execution measurement summaries without editing Trading truth —
+   `analytics.build_portfolio_rebalance_measurement()`.
+3. Preserve Trading execution references and deterministic non-binding lineage —
+   `analytics.compute_reproducibility_hashes()`.
+4. Return measurement evidence, or a structured failure —
+   `analytics.to_analytics_error_payload()`.
 
 **Failure behavior:** incompatible contract identity, pairing, hashes, status, or
 unbounded facts fail validation; Analytics never repairs or rewrites Trading truth.
 
 **Integration test:**
 `tests/analytics/integration/test_portfolio_allocation_evidence.py::test_rebalance_measurement_builder_is_package_root_public()`
+
+#### `WF-ANLT-015` — Build Closed-Trade Equity Curve and Worst-Day Distribution
+
+**System workflow:** Internal contribution to `SYS-WF-001` and `SYS-WF-002`.
+**Input boundary:** a canonical closed-trade ledger plus a required
+`initial_balance` and `account_currency`.
+**Output boundary:** the equity curve series, worst-day distribution, and barrier
+section evidence consumed by `WF-ANLT-PRI`.
+
+1. Derive the equity curve from closed trades only; the ledger is the sole primary
+   evidence — `analytics.build_closed_trade_equity_curve()`.
+2. Build the worst-day loss distribution over that curve —
+   `analytics.build_worst_day_distribution()`.
+3. Build barrier section evidence for the same window —
+   `analytics.build_barrier_section()`.
+4. Apply the approved deterministic point limit before publication —
+   `analytics.truncate_series()`.
+
+**Failure behavior:** an open or incomplete trade never contributes to the curve. An
+absent `initial_balance` fails closed rather than assuming a default, and an empty
+ledger produces explicit skipped evidence rather than a flat zero curve.
+
+**Integration test:** `Pending`
+
+#### `WF-ANLT-016` — Validate Contract Version and Metric Catalogue
+
+**System workflow:** Internal gate for every Analytics workflow.
+**Input boundary:** an inbound report or evidence envelope, plus the registered
+metric catalogue.
+**Output boundary:** an accepted versioned envelope, or a structured
+incompatibility failure raised before any calculation runs.
+
+1. Read the declared contract version from the inbound envelope —
+   `analytics.validate_contract_version()`.
+2. Validate the registered metric catalogue so no unapproved definition can run —
+   `analytics.validate_metric_catalog()`.
+3. Confirm every requested metric group resolves to a cataloged kernel —
+   `analytics.calculate_grouped_evidence()`.
+4. Reject an unknown or future schema with bounded detail —
+   `analytics.to_analytics_error_payload()`.
+
+**Failure behavior:** validation precedes calculation in every workflow. An
+unrecognized version fails closed rather than being adapted on a best-effort basis,
+and an unapproved metric definition is never executed.
+
+**Integration test:** `Pending`
+
+#### `WF-ANLT-017` — Emit Analytics Error Payload, Quality Flags, and Warnings
+
+**System workflow:** Internal contribution to every Analytics workflow.
+**Input boundary:** a failed or degraded calculation occurring inside any Analytics
+workflow.
+**Output boundary:** one redacted error payload, plus non-blocking quality flags and
+warnings attached to the returned result.
+
+1. Map the underlying failure to a canonical Analytics error code —
+   `utils.normalize_error_code()`, `utils.require_error_definition()`.
+2. Build the bounded redacted error payload —
+   `analytics.to_analytics_error_payload()`, `utils.redact_mapping_value()`.
+3. Attach non-blocking quality flags describing degraded evidence —
+   `analytics.build_quality_flag()`.
+4. Attach warnings that reduce confidence without blocking —
+   `analytics.build_warning()`.
+5. Serialize the result safely for the consuming boundary —
+   `analytics.to_report_json_safe()`.
+
+**Failure behavior:** a degraded section is always visible as degraded; a warning is
+never used to mask a required-section failure, and no payload carries raw upstream
+exception text across the boundary.
+
+**Integration test:** `Pending`
 
 ### Core workflow diagram
 

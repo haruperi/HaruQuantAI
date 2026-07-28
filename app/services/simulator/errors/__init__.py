@@ -12,12 +12,11 @@ from app.services.simulator.errors.responses import (
     operation_guard,
     unwrap_simulation_response,
 )
-from app.utils import RiskLevel
 
 to_simulation_error_payload = guard_operation(
     _to_simulation_error_payload,
     operation="simulation.errors.to_simulation_error_payload",
-    risk_level=RiskLevel.LOW,
+    risk_level="low",
     read_only=True,
 )
 

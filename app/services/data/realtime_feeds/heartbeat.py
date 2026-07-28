@@ -4,7 +4,7 @@ Heartbeat is an attribute of live feed state, not a separate subsystem: it is to
 when an event arrives and read when status is derived. Phase 8 extracted those two
 touch points into named helpers so the intent is legible at the call site, rather than
 inventing the ``update_heartbeat`` / ``check_timeout`` public surface the README
-proposed — neither had a caller, and one would have duplicated the ingestion path.
+proposed â€” neither had a caller, and one would have duplicated the ingestion path.
 
 A missed heartbeat is evidence, not an action. ``feeds/status.py`` reports expiry;
 nothing here mutates a feed in response.
@@ -14,7 +14,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from datetime import datetime, timedelta

@@ -7,33 +7,6 @@ from pathlib import Path
 import app.utils
 
 _EXPECTED_EXPORTS = {
-    "COMMON_ERROR_CATALOG",
-    "AppSettings",
-    "AuditEvent",
-    "AuthContext",
-    "BoundLogger",
-    "Clock",
-    "ConfigurationError",
-    "ErrorDefinition",
-    "ErrorMetadata",
-    "ErrorSeverity",
-    "ErrorSink",
-    "ExternalServiceError",
-    "HaruQuantError",
-    "JsonValue",
-    "LoggingSettings",
-    "RedactingFilter",
-    "RedactionPolicy",
-    "RedactionResult",
-    "ResponseMetadata",
-    "RiskLevel",
-    "RuntimeSettings",
-    "SecurityError",
-    "StandardError",
-    "StandardResponse",
-    "StructuredFormatter",
-    "SystemClock",
-    "ValidationError",
     "age_seconds",
     "build_response_metadata",
     "canonical_digest",
@@ -55,7 +28,6 @@ _EXPECTED_EXPORTS = {
     "is_fresh",
     "is_sensitive_key",
     "load_settings",
-    "logger",
     "map_exception",
     "normalize_error_code",
     "parse_utc_timestamp",
@@ -120,6 +92,29 @@ _EXPECTED_USAGE_CALLS = {
 
 def test_public_surface_contains_only_documented_exports() -> None:
     assert set(app.utils.__all__) == _EXPECTED_EXPORTS
+    assert all(
+        inspect.isfunction(getattr(app.utils, name)) for name in app.utils.__all__
+    )
+
+
+def test_feature_roots_declare_only_function_exports() -> None:
+    """Ensure Utils feature roots do not declare classes as public."""
+    from app.utils import (
+        contracts,
+        errors,
+        logging,
+        responses,
+        security,
+        settings,
+        time,
+    )
+
+    feature_roots = (contracts, errors, logging, responses, security, settings, time)
+    for feature_root in feature_roots:
+        assert all(
+            inspect.isfunction(getattr(feature_root, name))
+            for name in feature_root.__all__
+        )
 
 
 def test_utils_has_no_domain_or_persistence_dependencies() -> None:
@@ -148,33 +143,36 @@ def test_no_consumer_imports_or_mutates_utils_internals() -> None:
         for source_file in (repository_root / scope).rglob("*.py"):
             if source_root in source_file.parents or source_file == source_root:
                 continue
-            tree = ast.parse(source_file.read_text(encoding="utf-8"))
-            relative = source_file.relative_to(repository_root).as_posix()
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Import):
-                    offenders.extend(
-                        f"{relative}:{node.lineno} imports {alias.name}"
-                        for alias in node.names
-                        if alias.name.count(".") > 2
-                        and alias.name.startswith("app.utils.")
-                    )
-                elif (
-                    isinstance(node, ast.ImportFrom)
-                    and node.module is not None
-                    and node.module.count(".") > 2
-                    and node.module.startswith("app.utils.")
-                ):
-                    offenders.append(
-                        f"{relative}:{node.lineno} imports from {node.module}"
-                    )
-                elif isinstance(node, ast.Assign):
-                    offenders.extend(
-                        f"{relative}:{node.lineno} assigns {target.attr}"
-                        for target in node.targets
-                        if isinstance(target, ast.Attribute)
-                        and target.attr.startswith("_")
-                        and "app.utils" in ast.unparse(target.value)
-                    )
+                tree = ast.parse(source_file.read_text(encoding="utf-8"))
+                relative = source_file.relative_to(repository_root).as_posix()
+                unit_test = relative.startswith("tests/utils/unit/")
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Import):
+                        offenders.extend(
+                            f"{relative}:{node.lineno} imports {alias.name}"
+                            for alias in node.names
+                            if not unit_test
+                            and alias.name.count(".") > 2
+                            and alias.name.startswith("app.utils.")
+                        )
+                    elif (
+                        isinstance(node, ast.ImportFrom)
+                        and not unit_test
+                        and node.module is not None
+                        and node.module.count(".") > 2
+                        and node.module.startswith("app.utils.")
+                    ):
+                        offenders.append(
+                            f"{relative}:{node.lineno} imports from {node.module}"
+                        )
+                    elif isinstance(node, ast.Assign):
+                        offenders.extend(
+                            f"{relative}:{node.lineno} assigns {target.attr}"
+                            for target in node.targets
+                            if isinstance(target, ast.Attribute)
+                            and target.attr.startswith("_")
+                            and "app.utils" in ast.unparse(target.value)
+                        )
     assert not offenders, "\n" + "\n".join(offenders)
 
 

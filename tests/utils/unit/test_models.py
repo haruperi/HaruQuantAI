@@ -1,12 +1,9 @@
 from pathlib import Path
 
 import pytest
-from app.utils import (
-    ConfigurationError,
-    LoggingSettings,
-    RuntimeSettings,
-    load_settings,
-)
+from app.utils import load_settings
+from app.utils.errors.exceptions import ConfigurationError
+from app.utils.settings.models import LoggingSettings, RuntimeSettings
 from pydantic import ValidationError
 
 

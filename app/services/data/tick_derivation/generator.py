@@ -32,7 +32,9 @@ from app.services.data.persistence.paths import resolve_approved_storage_path
 from app.services.data.time_sessions.timeframes import (
     _get_timeframe_spec_raw as get_timeframe_spec,
 )
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     import numpy as np

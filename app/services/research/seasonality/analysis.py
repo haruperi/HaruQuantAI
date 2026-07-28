@@ -10,7 +10,9 @@ import pandas as pd
 
 from app.services.research.contracts import ResearchWarning
 from app.services.research.seasonality.sessions import tag_sessions
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -50,21 +52,21 @@ class SeasonalityFilters:
         """Validate declared filter ranges.
 
         Raises:
-            ValidationError: If any declared range is invalid.
+            ValueError: If any declared range is invalid.
         """
         logger.debug("Validating Research seasonality filters")
         if self.years and any(y < _MIN_YEAR for y in self.years):
-            raise ValidationError("RES_INPUT_INVALID", "INVALID_YEAR_FILTER")
+            raise ValueError("RES_INPUT_INVALID", "INVALID_YEAR_FILTER")
         if self.months and not set(self.months) <= _VALID_MONTHS:
-            raise ValidationError("RES_INPUT_INVALID", "INVALID_MONTH_FILTER")
+            raise ValueError("RES_INPUT_INVALID", "INVALID_MONTH_FILTER")
         if self.weekdays and not set(self.weekdays) <= _VALID_WEEKDAYS:
-            raise ValidationError("RES_INPUT_INVALID", "INVALID_WEEKDAY_FILTER")
+            raise ValueError("RES_INPUT_INVALID", "INVALID_WEEKDAY_FILTER")
         if self.hours and not set(self.hours) <= _VALID_HOURS:
-            raise ValidationError("RES_INPUT_INVALID", "INVALID_HOUR_FILTER")
+            raise ValueError("RES_INPUT_INVALID", "INVALID_HOUR_FILTER")
         if self.sessions and any(
             not s.strip() or s != s.strip() for s in self.sessions
         ):
-            raise ValidationError("RES_INPUT_INVALID", "INVALID_SESSION_FILTER")
+            raise ValueError("RES_INPUT_INVALID", "INVALID_SESSION_FILTER")
 
 
 def _apply_filters(tagged: pd.DataFrame, filters: SeasonalityFilters) -> pd.DataFrame:
@@ -169,11 +171,11 @@ def _row_number(row: Mapping[str, JSONValue], key: str) -> float:
         Numeric field coerced to float.
 
     Raises:
-        ValidationError: If the value is missing or non-numeric.
+        ValueError: If the value is missing or non-numeric.
     """
     value = row.get(key)
     if isinstance(value, bool) or not isinstance(value, int | float):
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_SEASONALITY_SUMMARY")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_SEASONALITY_SUMMARY")
     return float(value)
 
 
@@ -199,16 +201,16 @@ def run_seasonality(
         Advisory seasonality evidence with warnings.
 
     Raises:
-        ValidationError: If data, session, filter, or resource inputs are invalid.
+        ValueError: If data, session, filter, or resource inputs are invalid.
     """
     logger.info("Running Research seasonality analysis")
     if len(prepared.data) > limits.max_rows:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     if "close" not in prepared.data:
-        raise ValidationError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
     tagged, tag_warnings = tag_sessions(prepared.data, config=sessions)
     if not isinstance(tagged.index, pd.DatetimeIndex) or tagged.index.tz is None:
-        raise ValidationError("RES_INPUT_INVALID", "NAIVE_INDEX_REJECTED")
+        raise ValueError("RES_INPUT_INVALID", "NAIVE_INDEX_REJECTED")
     filtered = _apply_filters(tagged, filters)
     close = filtered["close"].astype("float64")
     if len(close) <= _ADR_PERIOD:

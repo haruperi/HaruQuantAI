@@ -1,8 +1,14 @@
 """Authenticated principal and permission enforcement."""
 
+from typing import Any
+
 from fastapi import HTTPException, status
 
-from app.utils import AuthContext, logger
+from app.utils import get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 
 def require_auth_context() -> AuthContext:

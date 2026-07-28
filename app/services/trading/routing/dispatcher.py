@@ -7,7 +7,7 @@ from collections.abc import Awaitable, Callable, Mapping
 from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.brokers import (
     BrokerAdapter,
@@ -27,12 +27,15 @@ from app.services.trading.contracts.responses import (
 )
 from app.services.trading.routing.responses import _classify_authority_response_value
 from app.utils import (
-    RiskLevel,
-    StandardResponse,
     canonical_json,
-    logger,
+    get_logger,
     parse_utc_timestamp,
 )
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.contracts.models import JsonValue
@@ -584,7 +587,7 @@ async def dispatch_order_intent(
             details={"receipt": receipt.model_dump(mode="json")},
             operation="trading.dispatch_order_intent",
             message="Trading authority outcome requires reconciliation",
-            risk_level=RiskLevel.CRITICAL,
+            risk_level="critical",
             request_id=receipt.request_id,
             correlation_id=receipt.correlation_id,
             read_only=False,
@@ -597,7 +600,7 @@ async def dispatch_order_intent(
         receipt,
         operation="trading.dispatch_order_intent",
         message="Trading authority receipt received",
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         request_id=receipt.request_id,
         correlation_id=receipt.correlation_id,
         read_only=False,

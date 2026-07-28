@@ -1,7 +1,7 @@
 """Read-only account state normalized from a caller-owned broker adapter.
 
 Produces ``AccountStateSnapshot`` from balance, position, and order reads. Data owns no
-connection, credential, or mutation capability here — the adapter arrives from the
+connection, credential, or mutation capability here â€” the adapter arrives from the
 caller, already connected, and only its read traits are used.
 
 Incomplete or stale evidence fails closed. A snapshot that silently omitted a position
@@ -13,7 +13,7 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
@@ -30,7 +30,9 @@ from app.services.data.evidence.account_contracts import (
     AccountStateSnapshot,
 )
 from app.services.data.sources.read_only import _wrap_broker_client_raw
-from app.utils import Clock, logger, utc_now
+from app.utils import get_logger, utc_now
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.brokers import (
@@ -214,7 +216,7 @@ def _get_account_state_snapshot_raw(
     request: AccountSnapshotRequest,
     adapter: BrokerAdapter,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> AccountStateSnapshot:
     """Normalize a fresh snapshot from an already configured caller-owned adapter.
 
@@ -297,7 +299,7 @@ def get_account_state_snapshot(
     request: AccountSnapshotRequest,
     adapter: BrokerAdapter,
     *,
-    clock: Clock | None = None,
+    clock: Any | None = None,
 ) -> StandardResponse[AccountStateSnapshot]:
     """Normalize a fresh snapshot from an already configured caller-owned adapter.
 

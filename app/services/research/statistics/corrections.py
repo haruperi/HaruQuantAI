@@ -7,7 +7,9 @@ from collections.abc import Sequence
 import numpy as np
 from numpy.typing import NDArray
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _p_values(values: Sequence[float], level: float) -> NDArray[np.float64]:
@@ -21,7 +23,7 @@ def _p_values(values: Sequence[float], level: float) -> NDArray[np.float64]:
         Float64 p-value array.
 
     Raises:
-        ValidationError: If values or level are invalid.
+        ValueError: If values or level are invalid.
     """
     logger.debug("Validating Research multiple-comparison inputs")
     output = np.asarray(values, dtype="float64")
@@ -30,9 +32,9 @@ def _p_values(values: Sequence[float], level: float) -> NDArray[np.float64]:
         or not np.isfinite(output).all()
         or bool(((output < 0) | (output > 1)).any())
     ):
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_P_VALUES")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_P_VALUES")
     if not 0.0 < level < 1.0:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_CONTROL_LEVEL")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_CONTROL_LEVEL")
     return output
 
 
@@ -47,7 +49,7 @@ def benjamini_hochberg(p_values: Sequence[float], *, q: float) -> NDArray[np.flo
         Monotone BH-adjusted p-values restored to original order.
 
     Raises:
-        ValidationError: If p-values or q are invalid.
+        ValueError: If p-values or q are invalid.
     """
     logger.info("Applying Benjamini-Hochberg Research correction")
     values = _p_values(p_values, q)
@@ -72,7 +74,7 @@ def holm_bonferroni(p_values: Sequence[float], *, alpha: float) -> NDArray[np.fl
         Holm-adjusted p-values restored to original order.
 
     Raises:
-        ValidationError: If p-values or alpha are invalid.
+        ValueError: If p-values or alpha are invalid.
     """
     logger.info("Applying Holm-Bonferroni Research correction")
     values = _p_values(p_values, alpha)

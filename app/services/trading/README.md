@@ -291,15 +291,30 @@ flowchart LR
 > closed, transmitting no broker mutation. Run all programs with
 > `python tests/trading/usage/workflows/run_all.py`. This satisfies `NFR-TRD-007`.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-TRD-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-TRD-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-TRD-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-TRD-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-TRD-004`, `WF-TRD-001`, and `WF-TRD-007` were absorbed into `WF-TRD-PRI`,
+`WF-TRD-SEC`, and `WF-TRD-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-TRD-015`.
+
 | Workflow | Standalone program |
 |---|---|
-| `WF-TRD-001` | `tests/trading/usage/workflows/wf_trd_001_validate_package_route_action.py` |
+| `WF-TRD-PRI` | `tests/trading/usage/workflows/wf_trd_pri_gate_dispatch_live_action.py` |
+| `WF-TRD-SEC` | `tests/trading/usage/workflows/wf_trd_sec_validate_package_route_action.py` |
+| `WF-TRD-TER` | `tests/trading/usage/workflows/wf_trd_ter_enforce_kill_switch_emergency_controls.py` |
 | `WF-TRD-002` | `tests/trading/usage/workflows/wf_trd_002_execute_simulation_route_action.py` |
 | `WF-TRD-003` | `tests/trading/usage/workflows/wf_trd_003_start_enable_live_session.py` |
-| `WF-TRD-004` | `tests/trading/usage/workflows/wf_trd_004_gate_dispatch_live_action.py` |
 | `WF-TRD-005` | `tests/trading/usage/workflows/wf_trd_005_resolve_unknown_route_outcome.py` |
 | `WF-TRD-006` | `tests/trading/usage/workflows/wf_trd_006_read_route_facts_aggregate_readiness.py` |
-| `WF-TRD-007` | `tests/trading/usage/workflows/wf_trd_007_enforce_kill_switch_emergency_controls.py` |
 | `WF-TRD-008` | `tests/trading/usage/workflows/wf_trd_008_persist_evidence_recover_state.py` |
 | `WF-TRD-009` | `tests/trading/usage/workflows/wf_trd_009_perform_safe_live_shutdown.py` |
 | `WF-TRD-010` | `tests/trading/usage/workflows/wf_trd_010_emit_monitoring_cost_incident_evidence.py` |
@@ -307,6 +322,11 @@ flowchart LR
 | `WF-TRD-012` | `tests/trading/usage/workflows/wf_trd_012_accept_governed_upstream_request.py` |
 | `WF-TRD-013` | `tests/trading/usage/workflows/wf_trd_013_execute_authorized_portfolio_rebalance.py` |
 | `WF-TRD-014` | `tests/trading/usage/workflows/wf_trd_014_run_live_paper_evaluation_cycle.py` |
+| `WF-TRD-015` | `tests/trading/usage/workflows/wf_trd_015_pause_resume_strategy_route.py` *(pending)* |
+| `WF-TRD-016` | `tests/trading/usage/workflows/wf_trd_016_modify_working_order_or_position.py` *(pending)* |
+
+Entries marked *(pending)* are registered workflows whose standalone program is not
+yet written.
 
 ### Status values
 
@@ -323,33 +343,42 @@ flowchart LR
 | **Internal** | Complete inside Trading |
 | **Cross-domain** | Trading participates through defined input/output boundaries |
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-TRD-001` | Internal | Validate and package a route-aware action | Canonical `TradingRequest` | Validated package or structured rejection | `FR-TRD-024 → FR-TRD-027 → FR-TRD-028` |
-| Completed | `WF-TRD-002` | Cross-domain | Execute a simulation-route action | Approved sim request | `OrderIntent` to Simulation; canonical receipt returned | `FR-TRD-013 → FR-TRD-031` |
-| Completed | `WF-TRD-003` | Cross-domain | Start and enable a live session | Approved config and Data session/channel | Package-only or mutation-enabled session | `FR-TRD-033 → FR-TRD-034` |
-| Completed | `WF-TRD-004` | Cross-domain | Gate and dispatch a live action | Canonical request plus external verdicts | One broker dispatch or fail-closed outcome | `FR-TRD-036 → FR-TRD-013 → FR-TRD-031` |
-| Completed | `WF-TRD-005` | Cross-domain | Resolve an unknown route outcome | Timeout/malformed authority response | Retry locked until authority resolution; critical operational event emitted | `FR-TRD-030 → FR-TRD-044 → FR-TRD-045 → FR-TRD-068` |
-| Completed | `WF-TRD-006` | Cross-domain | Read route facts and aggregate readiness | Data/Simulation read evidence | Fresh structured readiness assessment | `FR-TRD-026 → FR-TRD-027` |
-| Completed | `WF-TRD-007` | Cross-domain | Enforce kill switch and emergency controls | Risk state and approved control request | New actions blocked; gated cancel/close result | `FR-TRD-021 → FR-TRD-023`, `FR-TRD-050` |
-| Completed | `WF-TRD-008` | Cross-domain | Persist evidence and recover state | Trading events and injected stores | Reconstructed projections and unresolved attempts | `FR-TRD-037 → FR-TRD-042`, `FR-TRD-051 → FR-TRD-055` |
-| Completed | `WF-TRD-009` | Cross-domain | Perform safe live shutdown | Operator/runtime stop request | Admission stopped and unresolved-work report | `FR-TRD-035` |
-| Completed | `WF-TRD-010` | Cross-domain | Emit monitoring, cost, and incident evidence | Runtime observation | Trading-owned `OperationalEvent`; durable audit evidence through Data and operator presentation/critical-alert intake through UI/API | `FR-TRD-046 → FR-TRD-048 → FR-TRD-068` |
-| Completed | `WF-TRD-011` | Cross-domain | Build execution/reconciliation evidence | Receipts, readiness, incidents | Immutable report to Analytics/Portfolio/UI/API | `FR-TRD-049` |
-| Completed | `WF-TRD-012` | Cross-domain | Accept governed upstream request | Approved `RiskDecision` and immutable lineage | Validated Trading request; no raw signal translation | `FR-TRD-003 → FR-TRD-024` |
-| Completed | `WF-TRD-013` | Cross-domain | Execute authorized portfolio rebalance | `PortfolioRebalanceExecutionRequest v1` plus current Risk decisions | Idempotent order outcomes and reconciliation evidence | `FR-TRD-063 → FR-TRD-064 → FR-TRD-024 → FR-TRD-036 → FR-TRD-039` |
-| Completed | `WF-TRD-014` | Cross-domain | Run a live/paper evaluation cycle | Live/paper market update or scheduled evaluation trigger | Neutral signal ends the cycle, or an approved `RiskDecision` enters the validate/gate/dispatch path | `FR-TRD-065 → FR-TRD-012 → FR-TRD-036` |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-TRD-PRI` | Cross-domain | Gate and dispatch a live action | Canonical request plus external verdicts | One broker dispatch or fail-closed outcome | `FR-TRD-036 → FR-TRD-013 → FR-TRD-031` |
+| Completed | Secondary | `WF-TRD-SEC` | Internal | Validate and package a route-aware action | Canonical `TradingRequest` | Validated package or structured rejection | `FR-TRD-024 → FR-TRD-027 → FR-TRD-028` |
+| Completed | Tertiary | `WF-TRD-TER` | Cross-domain | Enforce kill switch and emergency controls | Risk state and approved control request | New actions blocked; gated cancel/close result | `FR-TRD-021 → FR-TRD-023`, `FR-TRD-050` |
+| Completed | Supporting | `WF-TRD-002` | Cross-domain | Execute a simulation-route action | Approved sim request | `OrderIntent` to Simulation; canonical receipt returned | `FR-TRD-013 → FR-TRD-031` |
+| Completed | Supporting | `WF-TRD-003` | Cross-domain | Start and enable a live session | Approved config and Data session/channel | Package-only or mutation-enabled session | `FR-TRD-033 → FR-TRD-034` |
+| Completed | Supporting | `WF-TRD-005` | Cross-domain | Resolve an unknown route outcome | Timeout/malformed authority response | Retry locked until authority resolution; critical operational event emitted | `FR-TRD-030 → FR-TRD-044 → FR-TRD-045 → FR-TRD-068` |
+| Completed | Supporting | `WF-TRD-006` | Cross-domain | Read route facts and aggregate readiness | Data/Simulation read evidence | Fresh structured readiness assessment | `FR-TRD-026 → FR-TRD-027` |
+| Completed | Supporting | `WF-TRD-008` | Cross-domain | Persist evidence and recover state | Trading events and injected stores | Reconstructed projections and unresolved attempts | `FR-TRD-037 → FR-TRD-042`, `FR-TRD-051 → FR-TRD-055` |
+| Completed | Supporting | `WF-TRD-009` | Cross-domain | Perform safe live shutdown | Operator/runtime stop request | Admission stopped and unresolved-work report | `FR-TRD-035` |
+| Completed | Supporting | `WF-TRD-010` | Cross-domain | Emit monitoring, cost, and incident evidence | Runtime observation | Trading-owned `OperationalEvent`; durable audit evidence through Data and operator presentation/critical-alert intake through UI/API | `FR-TRD-046 → FR-TRD-048 → FR-TRD-068` |
+| Completed | Supporting | `WF-TRD-011` | Cross-domain | Build execution/reconciliation evidence | Receipts, readiness, incidents | Immutable report to Analytics/Portfolio/UI/API | `FR-TRD-049` |
+| Completed | Supporting | `WF-TRD-012` | Cross-domain | Accept governed upstream request | Approved `RiskDecision` and immutable lineage | Validated Trading request; no raw signal translation | `FR-TRD-003 → FR-TRD-024` |
+| Completed | Supporting | `WF-TRD-013` | Cross-domain | Execute authorized portfolio rebalance | `PortfolioRebalanceExecutionRequest v1` plus current Risk decisions | Idempotent order outcomes and reconciliation evidence | `FR-TRD-063 → FR-TRD-064 → FR-TRD-024 → FR-TRD-036 → FR-TRD-039` |
+| Completed | Supporting | `WF-TRD-014` | Cross-domain | Run a live/paper evaluation cycle | Live/paper market update or scheduled evaluation trigger | Neutral signal ends the cycle, or an approved `RiskDecision` enters the validate/gate/dispatch path | `FR-TRD-065 → FR-TRD-012 → FR-TRD-036` |
+| Completed | Supporting | `WF-TRD-015` | Cross-domain | Pause and resume a strategy route | Authorized operator or governance command naming an exact strategy scope | Durable paused/resumed route state; no position or order mutation | `Pending` |
+| Completed | Supporting | `WF-TRD-016` | Cross-domain | Modify a working order or open position | Approved modification request carrying current Risk authorization | One broker modification or cancellation, or an audited fail-closed outcome | `Pending` |
 
-### `WF-TRD-001` — Validate and package a route-aware action
+### `WF-TRD-SEC` — Validate and package a route-aware action
 
 **Scope:** `Internal`
 **System workflow:** None
 **Input boundary:** A canonical request already carrying immutable route, intent, Risk, approval, and trace references.
 **Output boundary:** A validated request/package or structured rejection.
 
-1. `validate_order_request()` validates Decimal values and operation preconditions.
-2. `build_execution_plan()` constructs deterministic intent material.
-3. The action returns `packaged` when no mutation authority is enabled; route selection never bypasses validation.
+1. Create the canonical draft from the governed upstream request —
+   `trading.create_trading_action_draft()`.
+2. Validate Decimal values and operation preconditions —
+   `trading.validate_order_request()`.
+3. Confirm the selected adapter actually supports the requested operation —
+   `trading.validate_adapter_capability()`.
+4. Construct deterministic intent material —
+   `trading.build_execution_plan()`.
+5. Return `packaged` when no mutation authority is enabled; route selection never
+   bypasses validation — `trading.get_route_snapshot()`.
 
 **Failure behavior:** invalid or incomplete evidence produces a redacted `TradingError`; no authority call occurs.
 **Integration test:** `tests/trading/integration/test_validate_and_package.py::test_validate_and_package_fails_closed()`
@@ -361,9 +390,14 @@ flowchart LR
 **Input boundary:** An approved `route="sim"` request.
 **Output boundary:** `OrderIntent` to Simulation; canonical simulated `ExecutionReceipt` returned.
 
-1. Trading validates and builds the intent.
-2. `dispatch_order_intent()` selects Simulation authority.
-3. Simulation alone mutates simulated state and returns receipt evidence.
+1. Trading validates and builds the intent —
+   `trading.validate_order_request()`, `trading.build_execution_plan()`.
+2. Dispatch selects the Simulation authority for `route="sim"` —
+   `trading.dispatch_order_intent()`, `trading.submit_order()`.
+3. Simulation alone mutates simulated state and returns receipt evidence —
+   `simulator.match_order()`, `simulator.price_order()`.
+4. Trading classifies the returned response into a canonical receipt —
+   `trading.classify_authority_response()`, `trading.apply_execution_event()`.
 
 **Failure behavior:** missing Simulation authority or incompatible contract returns `SERVICE_UNAVAILABLE`; no local fill is invented.
 **Integration test:** `tests/trading/integration/test_sim_dispatch.py::test_sim_dispatch_uses_simulation_authority()`
@@ -375,23 +409,45 @@ flowchart LR
 **Input boundary:** Approved configuration, injected `BrokerConnectionConfig`, a Brokers adapter session created via `create_broker_adapter()`, provider capability/security evidence (`BrokerFeatureFlags`), and Risk kill-switch state.
 **Output boundary:** Package-only or mutation-enabled `LiveSession` status.
 
-1. `LiveSession.start()` validates configuration without resolving raw secrets.
-2. Adapter capability/security and readiness are checked.
-3. Startup reconciliation completes before mutation admission.
+1. Validate configuration without resolving raw secrets —
+   `trading.get_public_contracts()`.
+2. Create the provider session through the Brokers boundary —
+   `brokers.create_broker_adapter()`.
+3. Check adapter capability, security evidence, and readiness —
+   `trading.validate_adapter_capability()`,
+   `brokers.get_broker_capability_catalogue()`,
+   `trading.assess_execution_readiness()`.
+4. Confirm no applicable kill-switch scope is active —
+   `risk.check_risk_kill_switch()`.
+5. Complete startup reconciliation before mutation admission —
+   `trading.sync_positions()`, `trading.compare_authority_state()`.
 
 **Failure behavior:** any missing or stale evidence leaves the session package-only and returns a structured reason.
 **Integration test:** `tests/trading/integration/test_live_startup.py::test_live_startup_requires_reconciliation()`
 
-### `WF-TRD-004` — Gate and dispatch a live action
+### `WF-TRD-PRI` — Gate and dispatch a live action
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-002`
 **Input boundary:** Canonical request, valid `RiskDecision`, approval/action-policy verdicts, `KillSwitchState`, and current Data evidence.
 **Output boundary:** One dispatch through Brokers' `BrokerAdapter` mutation operations, or an audited fail-closed result.
 
-1. `evaluate_live_gate()` executes schema → enablement/session → action policy/approval → Risk verdict → kill switch → readiness/staleness → idempotency → concurrency → reconciliation authority → pre-audit → adapter permission.
-2. Pre-audit failure blocks dispatch.
-3. `dispatch_order_intent()` is invoked at most once after every mandatory gate passes.
+1. Execute the ordered mandatory gate chain: schema → enablement/session → action
+   policy/approval → Risk verdict → kill switch → readiness/staleness → idempotency →
+   concurrency → reconciliation authority → pre-audit → adapter permission —
+   `trading.evaluate_live_gate()`.
+2. Re-read the Risk verdict and kill-switch state immediately before send —
+   `risk.revalidate_risk_decision()`, `risk.check_risk_kill_switch()`.
+3. Confirm route readiness and evidence freshness —
+   `trading.get_route_snapshot()`, `trading.assess_execution_readiness()`.
+4. Reserve the idempotency key so a retry cannot double-send —
+   `trading.reserve_idempotency()`.
+5. Write the pre-audit record; failure here blocks dispatch —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+6. Dispatch at most once after every mandatory gate passes —
+   `trading.dispatch_order_intent()`, `trading.submit_order()`.
+7. Classify the raw authority response into a canonical receipt —
+   `trading.classify_authority_response()`, `trading.apply_execution_event()`.
 
 **Failure behavior:** no passthrough risk gate; expiry is rechecked immediately before send; unknown state is never retried blindly.
 **Integration test:** `tests/trading/integration/test_live_dispatch.py::test_live_dispatch_completes_single_broker_mutation()`
@@ -434,12 +490,20 @@ sequenceDiagram
 plus one critical `BROKER_STATE_UNKNOWN` `OperationalEvent` for the first locked
 transition.
 
-1. `classify_authority_response()` emits `unknown_outcome` conservatively.
-2. `resolve_unknown_outcome()` locks the conflict scope and obtains authority snapshots.
-3. After the lock and incident are persisted, Trading builds and emits one critical
-   `BROKER_STATE_UNKNOWN` event carrying the receipt/incident references and bounded
-   unresolved scope.
-4. Broker truth wins for paper/live; Simulation truth wins for sim.
+1. Classify the ambiguous response conservatively as `unknown_outcome` —
+   `trading.classify_authority_response()`.
+2. Lock the conflict scope and obtain authority snapshots —
+   `trading.resolve_unknown_outcome()`, `trading.sync_positions()`.
+3. Compare local projections against authority truth —
+   `trading.compare_authority_state()`.
+4. Persist the incident and retry lock —
+   `trading.emit_runtime_event()`, `data.persist_audit_event()`.
+5. Build and emit one critical `BROKER_STATE_UNKNOWN` event carrying the
+   receipt/incident references and bounded unresolved scope —
+   `trading.build_broker_state_unknown_event()`,
+   `api.build_unknown_broker_state_alert()`, `api.deliver_critical_alert()`.
+6. Broker truth wins for paper/live; Simulation truth wins for sim —
+   `trading.apply_execution_event()`.
 
 **Failure behavior:** unresolved comparison stays blocked and visible; no failure
 status implies safe retry. Event construction or sink failure is surfaced but never
@@ -454,24 +518,45 @@ releases the retry lock or changes authority truth.
 **Input boundary:** Data or Simulation route facts.
 **Output boundary:** Timestamped snapshot and bounded readiness failures.
 
-`get_route_snapshot()` returns explicit unavailable/stale evidence; `assess_execution_readiness()` aggregates required checks without exposing many public validators.
+1. Read Data-owned and Simulation-owned route facts —
+   `data.get_account_state_snapshot()`, `data.get_market_hours()`.
+2. Return a timestamped snapshot with explicit unavailable/stale evidence —
+   `trading.get_route_snapshot()`.
+3. Aggregate the required checks into one readiness assessment —
+   `trading.assess_execution_readiness()`.
+4. Evaluate freshness explicitly rather than defaulting to ready —
+   `utils.is_fresh()`, `utils.age_seconds()`.
 
 **Failure behavior:** missing facts never become neutral zero/empty values.
 **Integration test:** `tests/trading/integration/test_readiness.py::test_unavailable_route_fact_fails_readiness()`
 
-### `WF-TRD-007` — Activate/enforce kill switch and emergency controls
+### `WF-TRD-TER` — Activate/enforce kill switch and emergency controls
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-005`
 **Input boundary:** Risk-owned `KillSwitchState`, `ActionPolicyVerdict`, and approval-token reservation evidence.
 **Output boundary:** Durable state/evidence, blocked new actions, and optional gated mass actions.
 
-Risk owns `global > portfolio > strategy > symbol` state and clearance. Trading blocks new
-dispatches, attempts cancellation only for pending/cancellable work, reports every
-uncertain result, and never blindly closes already-filled positions. Trigger, clear,
-cancel-all, and close-all pass the same policy, approval, idempotency, audit, and live
-gates as other mutations. Emergency classification never comes from request text;
-resume requires all applicable Risk scopes inactive plus successful reconciliation.
+1. Read the Risk-owned canonical state; Risk alone owns
+   `global > portfolio > strategy > symbol` and clearance —
+   `risk.check_risk_kill_switch()`, `risk.apply_kill_switch_command()`.
+2. Block new dispatches by engaging the Trading-side control —
+   `trading.trigger_kill_switch()`.
+3. Pass every mass action through the same policy, approval, idempotency, audit, and
+   live gates as any other mutation — `trading.evaluate_live_gate()`,
+   `trading.reserve_idempotency()`.
+4. Attempt cancellation only for pending/cancellable work —
+   `trading.cancel_all_orders()`, `trading.cancel_order()`.
+5. Reduce or close exposure only where explicitly authorized —
+   `trading.reduce_exposure()`, `trading.close_all_positions()`,
+   `trading.close_position()`.
+6. Report every uncertain child result rather than assuming success —
+   `trading.emit_runtime_event()`, `trading.build_trading_report()`.
+7. Resume only after all applicable Risk scopes are inactive and reconciliation
+   succeeds — `trading.clear_kill_switch()`, `trading.sync_positions()`.
+
+Trading never blindly closes already-filled positions, and emergency classification
+never comes from request text.
 
 **Failure behavior:** partial child outcomes remain explicit; clearance without required authority is rejected.
 **Integration test:** `tests/trading/integration/test_kill_switch.py::test_kill_switch_blocks_and_reports_partial_emergency_results()`
@@ -483,6 +568,17 @@ resume requires all applicable Risk scopes inactive plus successful reconciliati
 **Input boundary:** Versioned Trading events.
 **Output boundary:** Data infrastructure persists Trading-owned schemas; projections reconstruct without hidden side effects.
 
+1. Apply the Trading-owned schema migrations to the injected store —
+   `trading.get_trading_migrations()`, `data.run_domain_migrations()`.
+2. Redact each event payload before it is written —
+   `trading.redact_trading_payload()`.
+3. Persist versioned Trading events transactionally —
+   `data.persist_audit_event()`, `data.execute_transaction()`.
+4. Reconstruct projections from the recorded events —
+   `trading.apply_execution_event()`.
+5. Surface unresolved attempts rather than discarding them —
+   `trading.resolve_unknown_outcome()`.
+
 **Failure behavior:** required idempotency/pre-audit write failure blocks send; recovery uncertainty keeps mutation disabled.
 **Integration test:** `tests/trading/integration/test_state_recovery.py::test_recovery_preserves_unresolved_attempt()`
 
@@ -493,7 +589,15 @@ resume requires all applicable Risk scopes inactive plus successful reconciliati
 **Input boundary:** Operator or runtime stop request.
 **Output boundary:** Structured shutdown result with unresolved work.
 
-`LiveSession.stop()` stops admission, marks/drains in-flight work within an approved budget, flushes evidence, attempts reconciliation, and reports every incomplete step.
+1. Stop admission of new actions — `trading.trigger_kill_switch()`.
+2. Mark and drain in-flight work within an approved budget —
+   `trading.resolve_unknown_outcome()`.
+3. Flush evidence to durable storage —
+   `data.persist_audit_event()`, `utils.flush_logging()`.
+4. Attempt final reconciliation against authority truth —
+   `trading.sync_positions()`, `trading.compare_authority_state()`.
+5. Report every incomplete step in a structured result —
+   `trading.build_trading_report()`.
 
 **Failure behavior:** flush/reconciliation failures are returned, not silently logged.
 **Integration test:** `tests/trading/integration/test_live_shutdown.py::test_shutdown_reports_unresolved_work()`
@@ -509,6 +613,17 @@ registered portfolio budget verdicts and execution-governance state.
 root submits required `AuditEvent` evidence to Data and exposes authorized operator
 views through UI/API; Trading imports neither Data nor UI/API implementation details.
 
+1. Observe runtime health, staleness, timeout, latency, and cost facts —
+   `trading.assess_execution_readiness()`, `trading.get_route_snapshot()`.
+2. Construct the redacted Trading-owned operational event —
+   `trading.emit_runtime_event()`, `trading.redact_trading_payload()`.
+3. Map any underlying failure to a canonical code —
+   `trading.map_trading_error()`, `utils.normalize_error_code()`.
+4. The composition root submits required audit evidence to Data —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+5. UI/API exposes authorized operator views and critical-alert intake —
+   `api.deliver_critical_alert()`.
+
 **Failure behavior:** pre-send budget breach blocks; post-send breach becomes an
 incident; event-delivery failure is surfaced and never hides execution state, releases
 an unknown-outcome retry lock, or implies safe retry.
@@ -521,6 +636,15 @@ an unknown-outcome retry lock, or implies safe retry.
 **Input boundary:** Trading-owned receipts, readiness, reconciliation, warning, and incident facts.
 **Output boundary:** Immutable evidence report to Analytics, Portfolio, and UI/API.
 
+1. Collect receipts, readiness, reconciliation, warning, and incident facts —
+   `trading.apply_execution_event()`, `trading.assess_execution_readiness()`.
+2. Redact the assembled payload before publication —
+   `trading.redact_trading_payload()`.
+3. Build the immutable execution-evidence report —
+   `trading.build_trading_report()`.
+4. Analytics, not Trading, derives performance and cost metrics from it —
+   `analytics.adapt_trading_result()`, `analytics.build_performance_report()`.
+
 **Failure behavior:** Trading never derives performance/TCA metrics or fabricates missing fills.
 **Integration test:** `tests/trading/integration/test_reporting.py::test_report_contains_only_execution_evidence()`
 
@@ -530,6 +654,15 @@ an unknown-outcome retry lock, or implies safe retry.
 **System workflow:** `SYS-WF-002`, `SYS-WF-006`
 **Input boundary:** An approved `RiskDecision` with immutable Strategy intent lineage — produced within `WF-TRD-014` (`FR-TRD-065`) when Trading drives the loop, or supplied by an external governed caller.
 **Output boundary:** Canonical Trading request accepted for validation.
+
+1. Require an approved decision carrying immutable Strategy intent lineage —
+   `risk.revalidate_risk_decision()`.
+2. Reject raw signal dictionaries and any request lacking approval lineage —
+   `trading.create_trading_action_draft()`.
+3. Confirm the requested size exactly matches the approved size —
+   `trading.validate_order_request()`.
+4. Hand the accepted canonical request into validation —
+   `trading.build_execution_plan()`.
 
 **Failure behavior:** raw signal dictionaries, missing approval lineage, and size changes are rejected.
 **Integration test:** `tests/trading/integration/test_upstream_request.py::test_raw_signal_translation_is_rejected()`
@@ -541,7 +674,19 @@ an unknown-outcome retry lock, or implies safe retry.
 **Input boundary:** A live/paper market update or scheduled strategy evaluation under an authenticated principal.
 **Output boundary:** Either a neutral-signal termination, or an approved `RiskDecision` handed into the validate/gate/dispatch path.
 
-`run_live_evaluation_cycle()` owns the runtime loop defined in `docs/PROJECT.md` `SYS-WF-002` step 1: it requests `MarketDataset`/`AccountStateSnapshot` from Data, `IndicatorSeries` from Indicators, invokes Strategy for a `TradeIntent`, ends the cycle on a neutral signal, submits the `TradeIntent` to Risk, and forwards any approved `RiskDecision` into `WF-TRD-012`. Trading never computes indicators, generates signals, or sizes/approves.
+1. Own the runtime loop defined in `docs/PROJECT.md` `SYS-WF-002` step 1 —
+   `trading.run_live_evaluation_cycle()`.
+2. Request market and account evidence from Data —
+   `data.get_market_data()`, `data.get_account_state_snapshot()`.
+3. Request calculated series from Indicators —
+   `indicators.validate_indicator()`.
+4. Invoke Strategy for a proposal and end the cycle on a neutral signal —
+   `strategy.run_event_strategy_hook()`, `strategy.build_trade_intent()`.
+5. Submit the proposal to Risk — `risk.calculate_position_size()`.
+6. Forward any approved decision into `WF-TRD-012` —
+   `trading.create_trading_action_draft()`.
+
+Trading never computes indicators, generates signals, or sizes/approves.
 
 **Failure behavior:** upstream unavailable/stale evidence fails closed; neutral signals end the cycle without mutation.
 **Integration test:** `tests/trading/integration/test_live_cycle.py::test_cycle_submits_intent_and_never_sizes()`
@@ -555,14 +700,80 @@ referencing one immutable allocation/plan, current eligibility and
 `AllocationRiskDecision`, approval token, route, and canonical hash.
 **Output boundary:** ordinary `ExecutionReceipt` / `TradeRecord` outcomes.
 
-Trading revalidates eligibility, Risk budget/decision, kill switch, route, token,
-target version, idempotency, and current execution state before dispatch. Each
-approved action follows the existing order/reconciliation path through Brokers.
+1. Revalidate eligibility, Risk budget/decision, kill switch, route, token, and
+   target version — `risk.revalidate_risk_decision()`,
+   `risk.check_risk_kill_switch()`, `risk.activate_allocation_budget()`.
+2. Reserve idempotency for the whole rebalance and each child action —
+   `trading.reserve_idempotency()`.
+3. Confirm current execution state before dispatch —
+   `trading.sync_positions()`, `trading.assess_execution_readiness()`.
+4. Execute each approved child action through the ordinary gated path —
+   `trading.execute_portfolio_rebalance()`, `trading.evaluate_live_gate()`,
+   `trading.dispatch_order_intent()`, `trading.reduce_exposure()`.
+5. Build reconciliation evidence for the receiving domains —
+   `trading.build_trading_report()`.
+6. Analytics measures the reconciled execution; Trading does not —
+   `analytics.build_portfolio_rebalance_measurement()`.
+
 Trading never recalculates target weights. Existing over-budget correction remains
 reduce-only unless Risk separately authorizes an increase; no order opens solely to
 match a target weight.
 
 **Integration test:** `tests/trading/integration/test_portfolio_rebalance.py::test_rebalance_cannot_bypass_risk_or_open_to_match_weight()`
+
+### `WF-TRD-015` — Pause and resume a strategy route
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-005`
+**Input boundary:** an authorized operator or governance command naming an exact
+strategy scope, plus a separate `AuthContext`.
+**Output boundary:** durable paused or resumed route state. No position is closed,
+no working order is cancelled, and no broker mutation is issued.
+
+1. Authenticate the commanding principal — `utils.create_auth_context()`.
+2. Confirm the named strategy scope resolves to a registered version —
+   `strategy.validate_strategy_ref()`.
+3. Stop admitting new actions for that scope — `trading.pause_strategy()`.
+4. Report what remains in flight without cancelling it —
+   `trading.get_route_snapshot()`, `trading.build_trading_report()`.
+5. Confirm no applicable Risk scope blocks resumption —
+   `risk.check_risk_kill_switch()`.
+6. Resume admission for the scope — `trading.resume_strategy()`.
+7. Record both transitions in the audit trail —
+   `utils.create_audit_event()`, `data.persist_audit_event()`.
+
+**Failure behavior:** pausing never implies flattening; existing exposure and working
+orders survive a pause untouched. Resume is refused while any applicable kill-switch
+scope is active, and an unresolved reconciliation keeps the route paused.
+
+**Integration test:** `Pending`
+
+### `WF-TRD-016` — Modify a working order or open position
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-002`
+**Input boundary:** an approved modification request carrying current Risk
+authorization for the resulting exposure.
+**Output boundary:** one broker modification or cancellation, or an audited
+fail-closed outcome.
+
+1. Validate the modification request and its Decimal values —
+   `trading.validate_order_request()`.
+2. Confirm the adapter supports the requested modification —
+   `trading.validate_adapter_capability()`.
+3. Require current Risk authorization for the resulting exposure, not the original —
+   `risk.revalidate_risk_decision()`, `risk.calculate_position_size()`.
+4. Pass the full mandatory gate chain exactly as a new dispatch would —
+   `trading.evaluate_live_gate()`, `trading.reserve_idempotency()`.
+5. Issue at most one modification or cancellation —
+   `trading.modify_order()`, `trading.modify_position()`,
+   `trading.cancel_order()`.
+6. Classify the authority response and update projections —
+   `trading.classify_authority_response()`, `trading.apply_execution_event()`.
+
+**Failure behavior:** a modification that increases risk without fresh Risk
+authorization is rejected. An ambiguous authority response enters `WF-TRD-005` rather
+than being retried.
 
 ---
 

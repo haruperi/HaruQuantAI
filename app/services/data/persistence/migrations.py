@@ -23,7 +23,9 @@ from app.services.data.persistence.contracts import (
 )
 from app.services.data.persistence.locking import _acquire_write_lock_raw
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _SQLITE_URL_PREFIX = "sqlite:///"
 

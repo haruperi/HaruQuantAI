@@ -27,7 +27,9 @@ from app.services.strategy.contracts._base import (
     _thaw_json,
     _utc,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class StrategySignal(_Contract):

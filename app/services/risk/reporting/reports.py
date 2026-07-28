@@ -18,7 +18,11 @@ from app.services.risk.contracts import (
     ScenarioResult,
 )
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.risk.config import RiskConfig
@@ -266,7 +270,7 @@ def _validate_timeout(started: float, config: RiskConfig) -> None:
         raise TimeoutError("Risk report generation exceeded timeout")
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def generate_risk_report(
     source: PortfolioRiskSnapshot | RiskDecisionPackage | Sequence[ScenarioResult],
     format: Literal["markdown", "json"],  # noqa: A002 - public contract name

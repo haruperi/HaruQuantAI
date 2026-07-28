@@ -11,14 +11,14 @@ WORKFLOW_DIR = ROOT / "tests/risk/usage/workflows"
 README = ROOT / "app/services/risk/README.md"
 EXPECTED = {
     "WF-RISK-001": "wf_risk_001_build_portfolio_risk_snapshot.py",
-    "WF-RISK-002": "wf_risk_002_calculate_position_size.py",
+    "WF-RISK-TER": "wf_risk_ter_calculate_position_size.py",
     "WF-RISK-003": "wf_risk_003_assess_risk_regime.py",
-    "WF-RISK-004": "wf_risk_004_review_proposed_trade_risk.py",
+    "WF-RISK-PRI": "wf_risk_pri_review_proposed_trade_risk.py",
     "WF-RISK-005": "wf_risk_005_run_current_portfolio_governor.py",
     "WF-RISK-006": "wf_risk_006_review_strategy_operational_eligibility.py",
     "WF-RISK-007": "wf_risk_007_review_activate_allocation_risk.py",
     "WF-RISK-008": "wf_risk_008_validate_approval_token.py",
-    "WF-RISK-009": "wf_risk_009_apply_check_kill_switch_state.py",
+    "WF-RISK-SEC": "wf_risk_sec_apply_check_kill_switch_state.py",
     "WF-RISK-010": "wf_risk_010_run_scenario_what_if_analysis.py",
     "WF-RISK-011": "wf_risk_011_generate_risk_decision_summary.py",
     "WF-RISK-012": "wf_risk_012_persist_risk_audit_token_state.py",

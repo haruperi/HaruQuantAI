@@ -6,21 +6,25 @@ import functools
 import inspect
 import time
 from collections.abc import Callable, Mapping
-from typing import ParamSpec, TypeVar, cast, overload
+from typing import Any, Literal, ParamSpec, TypeVar, cast, overload
 
 from app.utils import (
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
-    ValidationError,
     build_response_metadata,
     error_response,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     validate_id,
 )
+
+type StandardResponse[T] = Any
+
+type JsonValue = Any
+type ResponseMetadata = Any
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 _P = ParamSpec("_P")
 _T = TypeVar("_T")
@@ -70,7 +74,7 @@ def _trace_context(
             correlation_id = getattr(value, "correlation_id", None)
             try:
                 canonical_request = validate_id(request_id, expected_prefix="req")
-            except ValidationError:
+            except Exception:
                 canonical_request = generate_id("req")
             canonical_correlation = None
             if isinstance(correlation_id, str):
@@ -78,7 +82,7 @@ def _trace_context(
                     canonical_correlation = validate_id(
                         correlation_id, expected_prefix="cor"
                     )
-                except ValidationError:
+                except Exception:
                     canonical_correlation = generate_id("cor")
             return canonical_request, canonical_correlation
     return generate_id("req"), None
@@ -102,13 +106,13 @@ def _operation_metadata(
         "checkpoints.store"
     ) and function.__name__ == ("create_strategy_checkpoint")
     if is_mutation:
-        risk = RiskLevel.HIGH
+        risk = "high"
     elif module.endswith(("vectorized.runner", "event.runner", "signals.boundary")) or (
         ".evaluators." in module
     ):
-        risk = RiskLevel.MEDIUM
+        risk = "medium"
     else:
-        risk = RiskLevel.LOW
+        risk = "low"
     request_id, correlation_id = _trace_context(args, kwargs)
     return build_response_metadata(
         name=operation,
@@ -264,7 +268,7 @@ def unwrap_evaluator_result(
     Returns:
         The raw evaluator result.
     """
-    if isinstance(result, StandardResponse):
+    if all(hasattr(result, field) for field in ("status", "metadata")):
         return cast("_T", unwrap_strategy_response(result, operation=operation))
     return result
 
@@ -290,7 +294,7 @@ def unwrap_data_response(
     Raises:
         StrategyOperationError: If Data returned an error response.
     """
-    if not isinstance(response, StandardResponse):
+    if not all(hasattr(response, field) for field in ("status", "metadata")):
         return response
     if response.status == "success":
         return cast("_T", response.data)

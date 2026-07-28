@@ -9,7 +9,9 @@ from app.services.research.metrics.registry import (
     MetricContext,
     build_default_registry,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import PreparedDataset, ResearchResourceLimits
@@ -37,20 +39,20 @@ def build_core_metric_profile(
         Versioned metric profile with explicit undefined values and warnings.
 
     Raises:
-        ValidationError: If resources or family membership are invalid.
+        ValueError: If resources or family membership are invalid.
     """
     logger.info("Building Research core metric profile")
     if registry is None:
         registry = build_default_registry()
     if len(prepared.data) > limits.max_rows:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     metrics: dict[str, JSONValue] = {}
     warnings: list[ResearchWarning] = []
     context = MetricContext(prepared.data)
     for calculator in registry.all():
         values = calculator.compute(context)
         if len(values) != 1:
-            raise ValidationError("RES_INPUT_INVALID", "ONE_VALUE_PER_FAMILY_REQUIRED")
+            raise ValueError("RES_INPUT_INVALID", "ONE_VALUE_PER_FAMILY_REQUIRED")
         value = values[0]
         metrics[calculator.family] = cast(
             "JSONValue",

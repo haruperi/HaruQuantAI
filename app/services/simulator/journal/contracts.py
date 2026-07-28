@@ -9,7 +9,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 _HASH_LENGTH = 64
 _SENSITIVE_PARTS = ("password", "secret", "token", "credential", "private_key")

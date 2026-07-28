@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -16,18 +16,31 @@ from app.services.trading.contracts.responses import (
 if TYPE_CHECKING:
     from app.services.trading.contracts.models import JsonValue
 from app.utils import (
-    ExternalServiceError,
-    HaruQuantError,
-    RiskLevel,
-    StandardResponse,
-    logger,
+    get_logger,
     redact_mapping_value,
     redact_text_value,
     to_json_safe,
 )
-from app.utils import (
-    ValidationError as UtilsValidationError,
-)
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+
+class HaruQuantError(Exception):
+    """Local safe Trading error base."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+class ExternalServiceError(HaruQuantError):
+    """Trading-owned external-service error."""
+
+
+logger = get_logger(__name__)
 
 _SAFE_DETAIL = re.compile(r"[^A-Z0-9_]+")
 _TRADING_ERROR_CODES = frozenset(
@@ -100,7 +113,7 @@ def _redact_trading_payload_value(payload: JsonValue) -> JsonValue:
     try:
         safe = to_json_safe(payload)
         result = redact_mapping_value({"value": safe}).value
-    except (TypeError, ValueError, UtilsValidationError) as error:
+    except (TypeError, ValueError, Exception) as error:
         logger.warning("Rejecting a non-JSON-safe Trading payload")
         raise TradingError(
             "PAYLOAD_NOT_JSON_SAFE",

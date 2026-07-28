@@ -1,7 +1,9 @@
 from datetime import UTC, datetime
 
 import pytest
-from app.utils import SystemClock, ValidationError, utc_now
+from app.utils import utc_now
+from app.utils.errors.exceptions import ValidationError
+from app.utils.time.clocks import SystemClock
 
 
 class _FixedClock:

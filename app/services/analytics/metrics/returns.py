@@ -12,7 +12,9 @@ from app.services.analytics.contracts.models import (
     SectionEvidence,
     TradingResult,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _PERIOD_RETURN_MIN_SAMPLES = 2
 _CAGR_MIN_WINDOW_DAYS = 1

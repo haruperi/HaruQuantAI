@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.analytics.adapters import (
     adapt_trading_result as _adapt_trading_result,
@@ -134,7 +134,9 @@ from app.services.analytics.reports import (
 from app.services.analytics.reports import (
     serialize_report as _serialize_report,
 )
-from app.utils import RiskLevel, StandardResponse
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 if TYPE_CHECKING:
     from app.services.data import MarketDataset
@@ -156,7 +158,7 @@ def validate_contract_version(
         operation="analytics.contracts.validate_contract_version",
         request_id=request_id,
         correlation_id=correlation_id,
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         raw=lambda: _validate_contract_version(contract, version),
     )
 
@@ -176,7 +178,7 @@ def validate_metric_catalog(
         operation="analytics.contracts.validate_metric_catalog",
         request_id=request_id,
         correlation_id=correlation_id,
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         raw=lambda: _validate_metric_catalog(catalog),
     )
 
@@ -200,7 +202,7 @@ def build_quality_flag(
         operation="analytics.contracts.build_quality_flag",
         request_id=request_id,
         correlation_id=correlation_id,
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         raw=lambda: _build_quality_flag(
             code,
             section=section,
@@ -230,7 +232,7 @@ def build_warning(
         operation="analytics.contracts.build_warning",
         request_id=request_id,
         correlation_id=correlation_id,
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         raw=lambda: _build_warning(
             code,
             section=section,
@@ -257,7 +259,7 @@ def to_analytics_error_payload(
         operation="analytics.contracts.to_analytics_error_payload",
         request_id=request_id,
         correlation_id=correlation_id,
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         raw=lambda: _to_analytics_error_payload(
             error, max_detail_bytes=max_detail_bytes
         ),
@@ -279,7 +281,7 @@ def to_report_json_safe(
         operation="analytics.contracts.to_report_json_safe",
         request_id=request_id,
         correlation_id=correlation_id,
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         raw=lambda: _to_report_json_safe(value),
     )
 

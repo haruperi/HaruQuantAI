@@ -9,7 +9,9 @@ from app.services.optimization.scoring.contracts import (
     CandidateScore,
     ObjectiveDirection,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _ranking_value(candidate: CandidateScore) -> float:

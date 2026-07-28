@@ -2,13 +2,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.utils import (
-    ValidationError,
-    age_seconds,
-    format_utc_timestamp,
-    is_fresh,
-    parse_utc_timestamp,
-)
+from app.utils import age_seconds, format_utc_timestamp, is_fresh, parse_utc_timestamp
+from app.utils.errors.exceptions import ValidationError
 
 
 def test_format_uses_canonical_z_suffix() -> None:

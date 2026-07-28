@@ -3,7 +3,7 @@
 from collections.abc import Mapping
 from datetime import datetime, timedelta
 from types import MappingProxyType
-from typing import Self
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -18,7 +18,12 @@ from app.services.trading.state.events import (
 from app.services.trading.state.stores import (
     TradingStateStore,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import RiskLevel, StandardResponse, logger, to_json_safe
+from app.utils import get_logger, to_json_safe
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 
 def _freeze_mapping(value: Mapping[str, object]) -> Mapping[str, JsonValue]:
@@ -355,7 +360,7 @@ def apply_execution_event(
         return map_trading_error(error, {"event_id": event.event_id})
     return success_trading_response(
         projection,
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         legacy_status="applied",
         extensions={"event_id": event.event_id},
     )

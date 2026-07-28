@@ -11,7 +11,9 @@ from app.services.optimization.robustness.contracts import (
     MonteCarloRequest,
     MonteCarloResult,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _SUB_SEED_POLICY = "seed_plus_path_index_v1"
 

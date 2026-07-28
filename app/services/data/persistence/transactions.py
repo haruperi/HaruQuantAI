@@ -21,7 +21,9 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
     TransactionResult,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _SQLITE_URL_PREFIX = "sqlite:///"
 _SQLITE_PRIMARY_CODE_MASK = 0xFF

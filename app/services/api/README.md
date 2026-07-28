@@ -406,28 +406,146 @@ public symbols below. Unsupported ranges are absent from the target structure.
 
 > **Workflow Usage Evidence**: See [`tests/api/usage/workflows.py`](file:///tests/api/usage/workflows.py) for executable usage examples of all domain workflows.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-API-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-API-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-API-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-API-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-API-002`, `WF-API-001`, and `WF-API-003` were absorbed into `WF-API-PRI`,
+`WF-API-SEC`, and `WF-API-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-API-019`.
+
+Every UI/API workflow below whose status is `Missing` carries **planned** function
+annotations. No status is changed by the annotation pass.
+
 ### Workflow manifest
 
-| Status | Workflow ID | Scope | Workflow | System workflow | Trigger / input boundary | Final outcome / output boundary | Requirements | Failure behavior | Integration test |
-|---|---|---|---|---|---|---|---|---|---|
-| Missing | `WF-API-001` | Internal | Gateway startup and readiness | None | Process configuration | Canonical app with truthful readiness | `FR-API-014`, `FR-API-015`, `FR-API-034` | Required failure blocks startup/readiness; approved optional failure is reported degraded | `tests/api/integration/test_startup.py::test_required_failure_blocks_readiness()` |
-| Missing | `WF-API-002` | Internal | Authenticated request boundary | All applicable | HTTP request | One typed response or stream event after one approved delegation | `FR-API-001`–`FR-API-020` | Validation/auth/dependency failures become redacted deterministic envelopes | `tests/api/integration/test_request_boundary.py::test_authenticated_request_delegates_once()` |
-| Missing | `WF-API-003` | Cross-domain | Authentication, settings, and credential composition | None | Credentials, session, or broker credential reference | Validated `AuthContext`, UI/API-owned settings response, or Brokers-owned `BrokerConnectionConfig v1` | `FR-API-008`–`FR-API-013`, `FR-API-021`, `FR-API-022`, `FR-API-057`, `FR-API-058` | No fallback identity/key/credential; unavailable key source, state, or idempotency dependency fails closed | `tests/api/integration/test_auth_settings.py::test_login_settings_logout()` |
-| Missing | `WF-API-004` | Cross-domain | Market data and dataset preparation | `SYS-WF-001`, `SYS-WF-002` | Authenticated source/range request | Bounded Data result or provider error | `FR-API-023` | Requested provider failure is surfaced; no provider or user fallback | `tests/api/integration/test_data_boundary.py::test_prepare_dataset_delegates_to_data()` |
-| Partial | `WF-API-005` | Cross-domain | Strategy catalogue, registered version commands, and approved optimization adoption | `SYS-WF-003`, `SYS-WF-004` | Authenticated Strategy registration or explicitly approved Optimization-derived parameter update; catalogue/version queries remain missing | `StrategyMutationResult v1` or structured failure | `FR-API-025` | Missing approval blocks adoption; gateway never writes strategy state or handles raw strategy artifacts | `tests/system/integration/test_optimization.py`; `tests/system/integration/test_research_to_strategy.py` |
-| Missing | `WF-API-006` | Cross-domain | Synchronous backtest run and result review | `SYS-WF-001` | Exact `SimulationBacktestRequestV1` plus `AuthContext` | Completed `SimulationResult`, derived `PerformanceReport`, or structured error | `FR-API-026`, `FR-API-018`–`FR-API-020` | Incomplete runs are not published; no session/queue/log-stream state is implied | `tests/api/integration/test_backtest_boundary.py::test_synchronous_backtest_run_and_review()` |
-| Excluded | `WF-API-007` | Cross-domain | Interactive Simulation session lifecycle | Outside initial scope | — | — | `FR-API-027` | No initial session, frame, replay, or queued state | Excluded |
-| Excluded | `WF-API-008` | Cross-domain | Governed interactive Simulation mutation/what-if | Outside initial scope | — | — | `FR-API-027` | Excluded with the interactive session lifecycle | Excluded |
-| Missing | `WF-API-009` | Cross-domain | Synchronous Optimization and scenario run | `SYS-WF-003` | Bounded optimization request | Terminal in-memory `OptimizationResult` or structured error | `FR-API-030` | No create/detail/cancel/progress/WebSocket or repository-backed job lifecycle is exposed | `tests/api/integration/test_optimization_boundary.py::test_synchronous_run_and_result()` |
-| Missing | `WF-API-010` | Cross-domain | Risk decision support | `SYS-WF-002`, `SYS-WF-005` | Authorized risk request | Typed Risk-owned evaluation | `FR-API-028` | Missing evidence or stale state fails closed; gateway performs no calculation | `tests/api/integration/test_risk_boundary.py::test_risk_delegation()` |
-| Completed | `WF-API-011` | Cross-domain | Core Edge Lab research | `SYS-WF-004` | Bounded dataset/config request with explicit hypothesis | Registered `ResearchReport v1` or structured error | `FR-API-031` | Leakage/provider failures block publication; internal profiles, snapshots, and unsupported endpoints are absent | `tests/api/unit/test_research_routes.py`; `tests/system/integration/test_research_to_strategy.py` |
-| Missing | `WF-API-012` | Cross-domain | Live/paper session and governed broker action | `SYS-WF-002`, `SYS-WF-005` | Authenticated Trading command | Trading-owned status, receipt, or rejection | `FR-API-029` | Closed live flags, Risk, approval, reconciliation, idempotency, audit, or kill-switch gate causes no broker mutation | `tests/api/integration/test_trading_boundary.py::test_live_mutation_cannot_bypass_gates()` |
-| Partial | `WF-API-013` | Cross-domain | Operator approval, scoped kill switch, and event review | `SYS-WF-005` | Validated command principal plus explicit global/portfolio/strategy/symbol scope; clearance attestation from a distinct authorized principal | Audited Risk command result or protected readiness/audit/event view; UI/API approval-attestation production remains missing | `FR-API-034` | Underprivileged or malformed scope is rejected; clearance without a matching current distinct-principal attestation is rejected; no public sample stream | `tests/api/integration/test_operator_boundary.py::test_operator_kill_switch()` |
-| Completed | `WF-API-014` | Cross-domain | Critical operational alert delivery | `SYS-WF-002`, `SYS-WF-005` | Active Risk `KillSwitchState` plus authenticated trace context, or critical Trading `BROKER_STATE_UNKNOWN` `OperationalEvent` | Deterministic `CriticalOperationalAlert` plus one `CriticalAlertDeliveryResult` | `FR-API-064`–`FR-API-067` | Invalid source is rejected; sink failure is structured and logged but never alters source truth, safety state, or retry locks | `tests/api/integration/test_critical_alerts.py::test_delivery_failure_cannot_change_authoritative_state()` |
-| Missing | `WF-API-015` | Cross-domain | Frontend governed request | All applicable | User action | Typed result, warning, or client preflight block | `FR-API-035`–`FR-API-041` | Preflight never substitutes for backend authorization; stale data blocks governed use | `tests/api/integration/test_frontend_governed.py::test_backend_remains_authoritative()` |
-| Missing | `WF-API-016` | Cross-domain | Frontend stream consumption | All applicable | Authenticated stream connection | Validated ordered events and authoritative refresh after gaps | `FR-API-004`, `FR-API-017`–`FR-API-020`, `FR-API-042` | Disconnect cleans resources; gap/backpressure/terminal error triggers documented recovery | `tests/api/integration/test_frontend_streams.py::test_gap_refresh_and_cleanup()` |
-| Missing | `WF-API-017` | Cross-domain | Portfolio construction, eligibility, activation, history, and rebalance | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008` | Authenticated Portfolio request/operator approval | Owner-contract result or structured fail-closed error | `FR-API-056` | Gateway delegates and presents; it never calculates weights, eligibility, Risk budget, or orders | `tests/api/integration/test_portfolio_boundary.py::test_portfolio_workflows_preserve_owner_gates()` |
-| Missing | `WF-API-018` | Cross-domain | Agentic firm request, inspection, cancellation, handoff approval, quarantine, and replay | `SYS-WF-009`–`012` | Authenticated Agentic request or exact governed operator action | Agentic-owned run/result/trace/receipt or structured failure | `FR-API-068`–`072` | Gateway exposes no provider prompt/credential, calculates no Agentic result, and cannot turn a handoff approval into receiver-domain authorization | `tests/api/integration/test_agentic_boundary.py::test_agentic_routes_preserve_owner_authority()` |
+| Status | Rank | Workflow ID | Scope | Workflow | System workflow | Trigger / input boundary | Final outcome / output boundary | Requirements | Failure behavior | Integration test |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Missing | Primary | `WF-API-PRI` | Internal | Authenticated request boundary | All applicable | HTTP request | One typed response or stream event after one approved delegation | `FR-API-001`–`FR-API-020` | Validation/auth/dependency failures become redacted deterministic envelopes | `tests/api/integration/test_request_boundary.py::test_authenticated_request_delegates_once()` |
+| Missing | Secondary | `WF-API-SEC` | Internal | Gateway startup and readiness | None | Process configuration | Canonical app with truthful readiness | `FR-API-014`, `FR-API-015`, `FR-API-034` | Required failure blocks startup/readiness; approved optional failure is reported degraded | `tests/api/integration/test_startup.py::test_required_failure_blocks_readiness()` |
+| Missing | Tertiary | `WF-API-TER` | Cross-domain | Authentication, settings, and credential composition | None | Credentials, session, or broker credential reference | Validated `AuthContext`, UI/API-owned settings response, or Brokers-owned `BrokerConnectionConfig v1` | `FR-API-008`–`FR-API-013`, `FR-API-021`, `FR-API-022`, `FR-API-057`, `FR-API-058` | No fallback identity/key/credential; unavailable key source, state, or idempotency dependency fails closed | `tests/api/integration/test_auth_settings.py::test_login_settings_logout()` |
+| Missing | Supporting | `WF-API-004` | Cross-domain | Market data and dataset preparation | `SYS-WF-001`, `SYS-WF-002` | Authenticated source/range request | Bounded Data result or provider error | `FR-API-023` | Requested provider failure is surfaced; no provider or user fallback | `tests/api/integration/test_data_boundary.py::test_prepare_dataset_delegates_to_data()` |
+| Partial | Supporting | `WF-API-005` | Cross-domain | Strategy catalogue, registered version commands, and approved optimization adoption | `SYS-WF-003`, `SYS-WF-004` | Authenticated Strategy registration or explicitly approved Optimization-derived parameter update; catalogue/version queries remain missing | `StrategyMutationResult v1` or structured failure | `FR-API-025` | Missing approval blocks adoption; gateway never writes strategy state or handles raw strategy artifacts | `tests/system/integration/test_optimization.py`; `tests/system/integration/test_research_to_strategy.py` |
+| Missing | Supporting | `WF-API-006` | Cross-domain | Synchronous backtest run and result review | `SYS-WF-001` | Exact `SimulationBacktestRequestV1` plus `AuthContext` | Completed `SimulationResult`, derived `PerformanceReport`, or structured error | `FR-API-026`, `FR-API-018`–`FR-API-020` | Incomplete runs are not published; no session/queue/log-stream state is implied | `tests/api/integration/test_backtest_boundary.py::test_synchronous_backtest_run_and_review()` |
+| Excluded | Supporting | `WF-API-007` | Cross-domain | Interactive Simulation session lifecycle | Outside initial scope | — | — | `FR-API-027` | No initial session, frame, replay, or queued state | Excluded |
+| Excluded | Supporting | `WF-API-008` | Cross-domain | Governed interactive Simulation mutation/what-if | Outside initial scope | — | — | `FR-API-027` | Excluded with the interactive session lifecycle | Excluded |
+| Missing | Supporting | `WF-API-009` | Cross-domain | Synchronous Optimization and scenario run | `SYS-WF-003` | Bounded optimization request | Terminal in-memory `OptimizationResult` or structured error | `FR-API-030` | No create/detail/cancel/progress/WebSocket or repository-backed job lifecycle is exposed | `tests/api/integration/test_optimization_boundary.py::test_synchronous_run_and_result()` |
+| Missing | Supporting | `WF-API-010` | Cross-domain | Risk decision support | `SYS-WF-002`, `SYS-WF-005` | Authorized risk request | Typed Risk-owned evaluation | `FR-API-028` | Missing evidence or stale state fails closed; gateway performs no calculation | `tests/api/integration/test_risk_boundary.py::test_risk_delegation()` |
+| Completed | Supporting | `WF-API-011` | Cross-domain | Core Edge Lab research | `SYS-WF-004` | Bounded dataset/config request with explicit hypothesis | Registered `ResearchReport v1` or structured error | `FR-API-031` | Leakage/provider failures block publication; internal profiles, snapshots, and unsupported endpoints are absent | `tests/api/unit/test_research_routes.py`; `tests/system/integration/test_research_to_strategy.py` |
+| Missing | Supporting | `WF-API-012` | Cross-domain | Live/paper session and governed broker action | `SYS-WF-002`, `SYS-WF-005` | Authenticated Trading command | Trading-owned status, receipt, or rejection | `FR-API-029` | Closed live flags, Risk, approval, reconciliation, idempotency, audit, or kill-switch gate causes no broker mutation | `tests/api/integration/test_trading_boundary.py::test_live_mutation_cannot_bypass_gates()` |
+| Partial | Supporting | `WF-API-013` | Cross-domain | Operator approval, scoped kill switch, and event review | `SYS-WF-005` | Validated command principal plus explicit global/portfolio/strategy/symbol scope; clearance attestation from a distinct authorized principal | Audited Risk command result or protected readiness/audit/event view; UI/API approval-attestation production remains missing | `FR-API-034` | Underprivileged or malformed scope is rejected; clearance without a matching current distinct-principal attestation is rejected; no public sample stream | `tests/api/integration/test_operator_boundary.py::test_operator_kill_switch()` |
+| Completed | Supporting | `WF-API-014` | Cross-domain | Critical operational alert delivery | `SYS-WF-002`, `SYS-WF-005` | Active Risk `KillSwitchState` plus authenticated trace context, or critical Trading `BROKER_STATE_UNKNOWN` `OperationalEvent` | Deterministic `CriticalOperationalAlert` plus one `CriticalAlertDeliveryResult` | `FR-API-064`–`FR-API-067` | Invalid source is rejected; sink failure is structured and logged but never alters source truth, safety state, or retry locks | `tests/api/integration/test_critical_alerts.py::test_delivery_failure_cannot_change_authoritative_state()` |
+| Missing | Supporting | `WF-API-015` | Cross-domain | Frontend governed request | All applicable | User action | Typed result, warning, or client preflight block | `FR-API-035`–`FR-API-041` | Preflight never substitutes for backend authorization; stale data blocks governed use | `tests/api/integration/test_frontend_governed.py::test_backend_remains_authoritative()` |
+| Missing | Supporting | `WF-API-016` | Cross-domain | Frontend stream consumption | All applicable | Authenticated stream connection | Validated ordered events and authoritative refresh after gaps | `FR-API-004`, `FR-API-017`–`FR-API-020`, `FR-API-042` | Disconnect cleans resources; gap/backpressure/terminal error triggers documented recovery | `tests/api/integration/test_frontend_streams.py::test_gap_refresh_and_cleanup()` |
+| Missing | Supporting | `WF-API-017` | Cross-domain | Portfolio construction, eligibility, activation, history, and rebalance | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008` | Authenticated Portfolio request/operator approval | Owner-contract result or structured fail-closed error | `FR-API-056` | Gateway delegates and presents; it never calculates weights, eligibility, Risk budget, or orders | `tests/api/integration/test_portfolio_boundary.py::test_portfolio_workflows_preserve_owner_gates()` |
+| Missing | Supporting | `WF-API-018` | Cross-domain | Agentic firm request, inspection, cancellation, handoff approval, quarantine, and replay | `SYS-WF-009`–`012` | Authenticated Agentic request or exact governed operator action | Agentic-owned run/result/trace/receipt or structured failure | `FR-API-068`–`072` | Gateway exposes no provider prompt/credential, calculates no Agentic result, and cannot turn a handoff approval into receiver-domain authorization | `tests/api/integration/test_agentic_boundary.py::test_agentic_routes_preserve_owner_authority()` |
+| Missing | Supporting | `WF-API-019` | Internal | Observability exposition and metrics scrape | All applicable | Authorized scrape or telemetry read against the gateway | Bounded redacted operational telemetry exposition; never business or trading data | `Pending` | An unauthorized scrape is refused; exposition failure never blocks request serving or alters readiness truth | `Pending` |
+| Missing | Supporting | `WF-API-020` | Cross-domain | Server-side ordered stream publication | All applicable | An owner-domain event accepted for publication to subscribed clients | Ordered validated stream events with explicit sequence and gap markers | `Pending` | Backpressure and gaps are published explicitly; the gateway never reorders, invents, or silently drops an owner-domain event | `Pending` |
+
+### Workflow step detail
+
+UI/API currently exposes three package-root public functions —
+`api.build_kill_switch_activation_alert()`, `api.build_unknown_broker_state_alert()`,
+and `api.deliver_critical_alert()`. Every other UI/API operation named below is
+**planned** and annotated `api.<operation>()` *(planned)*; those workflows keep their
+`Missing` status. Cross-domain steps name the owning domain's verified public export.
+
+#### `WF-API-PRI` — Authenticated Request Boundary
+
+1. Terminate the HTTP request and attach request identity and trace context —
+   `api.build_request_context()` *(planned)*, `utils.generate_id()`.
+2. Validate and authenticate the caller into a typed context —
+   `api.authenticate_request()` *(planned)*, `utils.create_auth_context()`.
+3. Validate the request body against its boundary schema —
+   `api.validate_request_model()` *(planned)*.
+4. Delegate exactly once to the owning domain; the gateway calculates nothing —
+   the owning domain's public export for the requested operation.
+5. Return one typed response or stream event —
+   `utils.success_response()`, `utils.build_response_metadata()`.
+6. Convert any failure into a redacted deterministic envelope —
+   `utils.exception_response()`, `utils.redact_mapping_value()`.
+
+#### `WF-API-SEC` — Gateway Startup and Readiness
+
+1. Load runtime settings without resolving secrets at import time —
+   `utils.load_settings()`.
+2. Configure structured logging before the first request is served —
+   `utils.configure_logging()`.
+3. Compose the canonical application and its dependencies —
+   `api.create_app()` *(planned)*.
+4. Probe each required dependency; a required failure blocks readiness —
+   `api.check_readiness()` *(planned)*, `data.run_domain_migrations()`.
+5. Report an approved optional failure as degraded rather than ready —
+   `api.check_readiness()` *(planned)*.
+6. Flush and stop logging deterministically on shutdown —
+   `utils.flush_logging()`, `utils.shutdown_logging()`.
+
+#### `WF-API-TER` — Authentication, Settings, and Credential Composition
+
+1. Validate submitted credentials against the configured identity source —
+   `api.authenticate_request()` *(planned)*.
+2. Issue the validated typed principal; no fallback identity exists —
+   `utils.create_auth_context()`, `utils.generate_id()`.
+3. Return the UI/API-owned settings projection —
+   `api.build_settings_response()` *(planned)*, `utils.load_settings()`.
+4. Compose the Brokers-owned connection config from a credential reference —
+   `brokers.create_broker_adapter()`.
+5. Redact every credential-adjacent field before any response or log —
+   `utils.redact_mapping_value()`, `utils.is_sensitive_key()`.
+
+#### `WF-API-019` — Observability Exposition and Metrics Scrape
+
+**Scope:** `Internal`
+**Input boundary:** an authorized scrape or telemetry read against the gateway.
+**Output boundary:** bounded redacted operational telemetry. Business, trading, and
+account data are never exposed through this surface.
+
+1. Authorize the scrape; the exposition endpoint is not public —
+   `api.authenticate_request()` *(planned)*.
+2. Collect gateway request, latency, and dependency counters —
+   `api.collect_metrics()` *(planned)*.
+3. Read owner-domain operational events without recomputing them —
+   `trading.emit_runtime_event()`.
+4. Redact every label and value before exposition —
+   `utils.redact_mapping_value()`, `utils.is_sensitive_key()`.
+5. Serve the bounded exposition payload —
+   `api.render_metrics_exposition()` *(planned)*.
+
+**Failure behavior:** an unauthorized scrape is refused. Exposition failure is logged
+and surfaced but never blocks request serving, changes readiness truth, or causes a
+domain operation to be recomputed.
+
+#### `WF-API-020` — Server-Side Ordered Stream Publication
+
+**Scope:** `Cross-domain`
+**Input boundary:** an owner-domain event accepted for publication to subscribed
+clients.
+**Output boundary:** ordered validated stream events carrying explicit sequence
+numbers and gap markers. `WF-API-016` covers the frontend consumption side.
+
+1. Accept the owner-domain event at the publication boundary —
+   `trading.emit_runtime_event()`, `data.get_feed_status()`.
+2. Validate the event against its registered stream contract —
+   `api.validate_stream_event()` *(planned)*.
+3. Assign a monotonic sequence number per subscription —
+   `api.publish_stream_event()` *(planned)*, `utils.generate_id()`.
+4. Apply the bounded buffer policy and publish an explicit gap marker on overflow —
+   `api.publish_stream_event()` *(planned)*.
+5. Redact the payload before it reaches any subscriber —
+   `utils.redact_mapping_value()`.
+6. Terminate subscriptions cleanly on disconnect —
+   `api.close_subscription()` *(planned)*.
+
+**Failure behavior:** the gateway never reorders, invents, or silently drops an
+owner-domain event. Backpressure and gaps are published explicitly so a client can
+request an authoritative refresh rather than assuming continuity.
 
 ### Authenticated request sequence
 

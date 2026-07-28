@@ -404,17 +404,33 @@ The root file itself is assigned FR-BRK-135. Private helper/export requirements 
 > a broker mutation. Run all Brokers workflows with
 > `uv run python tests/brokers/usage/workflows/run_all.py`.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-BRK-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-BRK-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-BRK-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-BRK-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-BRK-001`, `WF-BRK-002`, and `WF-BRK-004` were absorbed into `WF-BRK-PRI`,
+`WF-BRK-SEC`, and `WF-BRK-TER` respectively. Absorbed numbers are retired and are
+never reused. New workflows continue from `WF-BRK-010`.
+
 | Workflow ID | Standalone program |
 |---|---|
-| `WF-BRK-001` | `tests/brokers/usage/workflows/wf_brk_001_resolve_explicit_adapter.py` |
-| `WF-BRK-002` | `tests/brokers/usage/workflows/wf_brk_002_connect_authenticate_provider_session.py` |
+| `WF-BRK-PRI` | `tests/brokers/usage/workflows/wf_brk_pri_resolve_explicit_adapter.py` |
+| `WF-BRK-SEC` | `tests/brokers/usage/workflows/wf_brk_sec_connect_authenticate_provider_session.py` |
+| `WF-BRK-TER` | `tests/brokers/usage/workflows/wf_brk_ter_submit_one_broker_mutation.py` |
 | `WF-BRK-003` | `tests/brokers/usage/workflows/wf_brk_003_acquire_provider_market_data.py` |
-| `WF-BRK-004` | `tests/brokers/usage/workflows/wf_brk_004_submit_one_broker_mutation.py` |
 | `WF-BRK-005` | `tests/brokers/usage/workflows/wf_brk_005_read_account_execution_state.py` |
 | `WF-BRK-006` | `tests/brokers/usage/workflows/wf_brk_006_stream_provider_connection_events.py` |
 | `WF-BRK-007` | `tests/brokers/usage/workflows/wf_brk_007_correlate_ctrader_response.py` |
 | `WF-BRK-008` | `tests/brokers/usage/workflows/wf_brk_008_handle_unsupported_operation.py` |
 | `WF-BRK-009` | `tests/brokers/usage/workflows/wf_brk_009_inject_canonical_broker_execution.py` |
+| `WF-BRK-010` | `tests/brokers/usage/workflows/wf_brk_010_discover_registered_brokers_capabilities.py` |
 
 ### Status values
 
@@ -431,24 +447,25 @@ The root file itself is assigned FR-BRK-135. Private helper/export requirements 
 | **Internal** | Entire workflow occurs in Brokers. |
 | **Cross-domain** | Brokers receives an input or produces an output at a documented domain boundary. |
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Partial | `WF-BRK-001` | Internal | Resolve explicit adapter | Explicit broker/profile ID and config | Independent adapter or `BROKER_UNKNOWN` / `BROKER_DEPENDENCY_MISSING` | `FR-BRK-101 → FR-BRK-102` |
-| Partial | `WF-BRK-002` | Internal | Connect and authenticate | Caller-owned adapter and composition-root-built immutable config | Verified session, capability report, and lifecycle events | `FR-BRK-006 → FR-BRK-111 → FR-BRK-048 → FR-BRK-052 → FR-BRK-073` |
-| Partial | `WF-BRK-003` | Cross-domain | Acquire provider market data | Data supplies an explicit adapter read | Direct canonical provider page/stream returned to Data | `FR-BRK-058 → FR-BRK-067` |
-| Partial | `WF-BRK-004` | Cross-domain (`SYS-WF-002`, `SYS-WF-008`) | Submit one mutation | Trading supplies a complete approved mutation request | Catalogue returns deterministic unavailable while writes are unreleased; adapter execution maps explicit acknowledgement, rejection, or unknown outcome | `FR-BRK-091 → FR-BRK-097` |
-| Partial | `WF-BRK-005` | Cross-domain | Read account and execution state | Data or Trading requests bounded provider truth | Canonical account/order/position/deal page | `FR-BRK-079 → FR-BRK-090` |
-| Partial | `WF-BRK-006` | Cross-domain | Stream provider and connection events | Data or Trading subscribes | Bounded canonical stream with explicit loss/resync state | `FR-BRK-026 → FR-BRK-112 → FR-BRK-114 → FR-BRK-057 → FR-BRK-068 → FR-BRK-072` |
-| Partial | `WF-BRK-007` | Internal | Correlate cTrader response | cTrader transport submits one request | Only the native-ID match, or serialized same-type fallback match, is mapped | `FR-BRK-105` |
-| Partial | `WF-BRK-008` | Internal | Handle unsupported operation | Caller invokes unavailable capability | No SDK call; deterministic unsupported result | `FR-BRK-010 → FR-BRK-074` |
-| Partial | `WF-BRK-009` | Cross-domain | Inject canonical broker into execution | Composition root creates adapter for Trading | Trading receives a capability-scoped adapter, not MT5/cTrader concrete APIs | `FR-BRK-101 → FR-BRK-046` |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Partial | Primary | `WF-BRK-PRI` | Internal | Resolve explicit adapter | Explicit broker/profile ID and config | Independent adapter or `BROKER_UNKNOWN` / `BROKER_DEPENDENCY_MISSING` | `FR-BRK-101 → FR-BRK-102` |
+| Partial | Secondary | `WF-BRK-SEC` | Internal | Connect and authenticate | Caller-owned adapter and composition-root-built immutable config | Verified session, capability report, and lifecycle events | `FR-BRK-006 → FR-BRK-111 → FR-BRK-048 → FR-BRK-052 → FR-BRK-073` |
+| Partial | Tertiary | `WF-BRK-TER` | Cross-domain (`SYS-WF-002`, `SYS-WF-008`) | Submit one mutation | Trading supplies a complete approved mutation request | Catalogue returns deterministic unavailable while writes are unreleased; adapter execution maps explicit acknowledgement, rejection, or unknown outcome | `FR-BRK-091 → FR-BRK-097` |
+| Partial | Supporting | `WF-BRK-003` | Cross-domain | Acquire provider market data | Data supplies an explicit adapter read | Direct canonical provider page/stream returned to Data | `FR-BRK-058 → FR-BRK-067` |
+| Partial | Supporting | `WF-BRK-005` | Cross-domain | Read account and execution state | Data or Trading requests bounded provider truth | Canonical account/order/position/deal page | `FR-BRK-079 → FR-BRK-090` |
+| Partial | Supporting | `WF-BRK-006` | Cross-domain | Stream provider and connection events | Data or Trading subscribes | Bounded canonical stream with explicit loss/resync state | `FR-BRK-026 → FR-BRK-112 → FR-BRK-114 → FR-BRK-057 → FR-BRK-068 → FR-BRK-072` |
+| Partial | Supporting | `WF-BRK-007` | Internal | Correlate cTrader response | cTrader transport submits one request | Only the native-ID match, or serialized same-type fallback match, is mapped | `FR-BRK-105` |
+| Partial | Supporting | `WF-BRK-008` | Internal | Handle unsupported operation | Caller invokes unavailable capability | No SDK call; deterministic unsupported result | `FR-BRK-010 → FR-BRK-074` |
+| Partial | Supporting | `WF-BRK-009` | Cross-domain | Inject canonical broker into execution | Composition root creates adapter for Trading | Trading receives a capability-scoped adapter, not MT5/cTrader concrete APIs | `FR-BRK-101 → FR-BRK-046` |
+| Partial | Supporting | `WF-BRK-010` | Cross-domain | Discover registered brokers and capability catalogue | A composition root or operator queries the static registry before creating any adapter | The registered broker set plus its declared capability catalogue; no provider import or connection | `Pending` |
 
 **Release scope.** MT5/cTrader account and execution-state reads are implemented,
 and cTrader/Binance produce bounded market streams. Mutation execution bodies are
 implemented and tested without live calls, but every registry-created write path
 remains deterministically unavailable under the owner-approved release rule.
 
-### `WF-BRK-001` — Resolve Explicit Adapter
+### `WF-BRK-PRI` — Resolve Explicit Adapter
 
 **Scope:** `Internal`
 **System workflow:** `SYS-WF-001`, `SYS-WF-002`
@@ -456,10 +473,14 @@ remains deterministically unavailable under the owner-approved release rule.
 **Input boundary:** Exact `BrokerId`/product profile and `BrokerConnectionConfig` constructed by the composition root after Utils secret resolution.
 **Output boundary:** New caller-owned `BrokerAdapter` in a `StandardResponse`.
 
-1. `create_broker_adapter()` validates exact ID/config correspondence without selecting policy.
-2. The registry lazily imports only the selected factory.
-3. The factory returns a new independent, disconnected adapter.
-4. Unknown IDs and missing optional dependencies remain distinct canonical errors.
+1. Confirm the requested identifier is registered before any import —
+   `brokers.get_registered_brokers()`.
+2. Validate exact ID/config correspondence without selecting policy —
+   `brokers.create_broker_adapter()`.
+3. The registry lazily imports only the selected factory, which returns a new
+   independent, disconnected adapter — `brokers.create_broker_adapter()`.
+4. Unknown IDs and missing optional dependencies remain distinct canonical errors —
+   `utils.require_error_definition()`, `utils.normalize_error_code()`.
 
 **Failure behaviour:**
 
@@ -470,7 +491,7 @@ remains deterministically unavailable under the owner-approved release rule.
 **Integration test:**
 `tests/brokers/integration/test_adapter_resolution.py::test_adapter_resolution_is_explicit_and_isolated()`
 
-### `WF-BRK-002` — Connect and Authenticate Provider Session
+### `WF-BRK-SEC` — Connect and Authenticate Provider Session
 
 **Scope:** `Internal`
 **System workflows:** `SYS-WF-002`, `SYS-WF-008`
@@ -478,11 +499,19 @@ remains deterministically unavailable under the owner-approved release rule.
 **Input boundary:** A caller-owned adapter containing immutable provider/account/environment configuration.
 **Output boundary:** Verified `READY` status, refreshed capabilities, and connection events.
 
-1. `BrokerAdapter.connect()` validates connection-only configuration.
-2. The adapter establishes transport and provider-required authentication.
-3. It verifies account/environment identity instead of trusting a local flag.
-4. It refreshes feature flags and emits each validated state transition.
-5. `disconnect()` deterministically releases all owned resources and subscriptions.
+1. Validate connection-only configuration —
+   `brokers.create_broker_adapter()`, `BrokerAdapter.connect()`.
+2. Establish transport and provider-required authentication —
+   `BrokerAdapter.connect()`.
+3. Verify account/environment identity instead of trusting a local flag —
+   `BrokerAdapter.connect()`.
+4. Refresh feature flags and emit each validated state transition —
+   `brokers.get_broker_capability_catalogue()`.
+5. Release all owned resources and subscriptions deterministically —
+   `BrokerAdapter.disconnect()`.
+
+`BrokerAdapter` methods are documented protocol operations rather than
+package-root function exports; see §4.1 for the canonical contract.
 
 **Failure behaviour:**
 
@@ -501,6 +530,17 @@ remains deterministically unavailable under the owner-approved release rule.
 **Input boundary:** Data selects an explicit provider from the set it has composed and submits one bounded market-data request. Which providers Data composes is a Data-side configuration decision (`DATA_PROVIDER_SOURCES`, gated by the `*_ENABLED` platform flags); Brokers neither selects nor restricts it.
 **Output boundary:** Brokers returns direct canonical provider observations; Data owns all subsequent validation, normalization, caching, and persistence.
 
+1. Data composes and selects an explicit provider —
+   `data.resolve_source()`, `data.list_composable_sources()`.
+2. Data creates or reuses the adapter for that provider —
+   `brokers.create_broker_adapter()`.
+3. Brokers confirms the observation type is supported before any provider call —
+   `brokers.get_broker_capability_catalogue()`.
+4. The adapter returns one direct canonical provider page or stream —
+   `BrokerAdapter.get_bars()`, `BrokerAdapter.get_ticks()`.
+5. Data owns all subsequent validation, normalization, caching, and persistence —
+   `data.fetch_market_dataset()`, `data.inspect_dataset_quality()`.
+
 **Failure behaviour:**
 
 - Unsupported observation type → `BROKER_CAPABILITY_UNSUPPORTED` without provider call.
@@ -510,13 +550,24 @@ remains deterministically unavailable under the owner-approved release rule.
 **Integration test:**
 `tests/brokers/integration/test_data_boundary.py::test_data_receives_provider_truth_without_normalization()`
 
-### `WF-BRK-004` — Submit One Broker Mutation
+### `WF-BRK-TER` — Submit One Broker Mutation
 
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-002`, `SYS-WF-008`
 
 **Input boundary:** Trading supplies a complete, approved, single-target request and caller-owned correlation/idempotency fields.
 **Output boundary:** Direct provider acknowledgement, rejection, or unknown outcome returned to Trading for reconciliation and persistence.
+
+1. Trading passes every mandatory gate before Brokers is called —
+   `trading.evaluate_live_gate()`, `trading.reserve_idempotency()`.
+2. Brokers confirms the mutation capability is declared and released —
+   `brokers.get_broker_capability_catalogue()`.
+3. The adapter transmits exactly one provider mutation —
+   `trading.dispatch_order_intent()`, `BrokerAdapter.submit_order()`.
+4. The raw provider outcome is returned without retry —
+   `BrokerAdapter.submit_order()`.
+5. Trading classifies the outcome and owns reconciliation —
+   `trading.classify_authority_response()`, `trading.resolve_unknown_outcome()`.
 
 **Failure behaviour:**
 
@@ -535,6 +586,15 @@ remains deterministically unavailable under the owner-approved release rule.
 **Input boundary:** Data or Trading submits a bounded account, position, order, deal, or transaction read.
 **Output boundary:** Canonical provider truth with provider and retrieval timestamps; caller owns freshness and reconciliation.
 
+1. The caller submits a bounded account, position, order, deal, or transaction read —
+   `data.get_account_state_snapshot()`, `trading.sync_positions()`.
+2. Brokers confirms the read capability is declared —
+   `brokers.get_broker_capability_catalogue()`.
+3. The adapter returns canonical provider truth with both timestamps —
+   `BrokerAdapter.get_account()`, `BrokerAdapter.get_positions()`.
+4. The caller owns freshness and reconciliation —
+   `utils.is_fresh()`, `trading.compare_authority_state()`.
+
 **Failure behaviour:**
 
 - Missing target → the exact `BROKER_*_NOT_FOUND` result.
@@ -551,6 +611,15 @@ remains deterministically unavailable under the owner-approved release rule.
 
 **Input boundary:** Data or Trading requests a supported adapter-scoped subscription.
 **Output boundary:** FIFO canonical events through a bounded async stream plus explicit disconnect/backpressure/resync events.
+
+1. The caller requests a supported adapter-scoped subscription —
+   `brokers.get_broker_capability_catalogue()`, `BrokerAdapter.subscribe()`.
+2. Provider events are delivered FIFO through the bounded stream —
+   `data.ingest_feed_event()`.
+3. Overflow, disconnect, and resync are surfaced as explicit events —
+   `data.reconcile_feed_gap()`, `data.reconnect_feed()`.
+4. Consumers read bounded status rather than inferring liveness —
+   `data.get_feed_status()`, `trading.emit_runtime_event()`.
 
 **Failure behaviour:**
 
@@ -569,6 +638,15 @@ remains deterministically unavailable under the owner-approved release rule.
 **Input boundary:** Internal cTrader request, expected response type, request token, and session generation.
 **Output boundary:** Matching decoded response or canonical error; correlation details stay private.
 
+1. The transport records the request token and session generation before sending —
+   `utils.generate_id()`.
+2. An inbound payload is matched only against its native correlation token —
+   *(adapter-internal; no package-root export)*.
+3. Where no reliable native request ID exists, same-type requests are serialized per
+   adapter and session generation — *(adapter-internal)*.
+4. A stale generation discards the response as a canonical error —
+   `utils.require_error_definition()`.
+
 **Failure behaviour:**
 
 - Stale generation or mismatched native correlation token → response discarded with `BROKER_SESSION_CHANGED`.
@@ -584,6 +662,13 @@ remains deterministically unavailable under the owner-approved release rule.
 
 **Input boundary:** Any canonical operation unavailable for the connected provider/profile/account.
 **Output boundary:** `StandardResponse` error identifying broker, operation, and capability.
+
+1. Read the declared capability for the connected provider and profile —
+   `brokers.get_broker_capability_catalogue()`.
+2. Compare the declaration against the runtime capability report; disagreement fails
+   closed — `brokers.get_broker_capability_catalogue()`.
+3. Return the canonical unsupported error with zero SDK calls —
+   `utils.require_error_definition()`, `utils.error_response()`.
 
 **Failure behaviour:**
 
@@ -606,8 +691,47 @@ remains deterministically unavailable under the owner-approved release rule.
 - Direct provider import or native delegated method remains → the import-boundary test fails.
 - A caller requests an MT5-native operation absent from the canonical contract → deterministic `BROKER_CAPABILITY_UNSUPPORTED`; raw delegation is never restored.
 
+1. The composition root resolves secrets through the shared settings boundary —
+   `utils.load_settings()`.
+2. It confirms the intended broker is registered —
+   `brokers.get_registered_brokers()`.
+3. It creates one explicit adapter — `brokers.create_broker_adapter()`.
+4. It injects only the capability Trading requires —
+   `trading.validate_adapter_capability()`.
+5. Trading receives the capability-scoped contract, never a concrete client —
+   `trading.get_public_contracts()`.
+
 **Integration test:**
 `tests/brokers/integration/test_execution_injection.py::test_execution_receives_the_canonical_adapter_protocol_not_concrete_apis()`
+
+### `WF-BRK-010` — Discover Registered Brokers and Capability Catalogue
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-002`
+
+**Input boundary:** A composition root, Data source registry, or operator queries the
+static broker registry before creating any adapter.
+**Output boundary:** The registered broker set plus its declared capability
+catalogue. No provider package is imported, no session is opened, and no credential
+is resolved.
+
+1. Enumerate the registered broker identifiers —
+   `brokers.get_registered_brokers()`.
+2. Read the declared capability catalogue for each identifier —
+   `brokers.get_broker_capability_catalogue()`.
+3. Data uses the result to decide which sources it can compose —
+   `data.list_composable_sources()`, `data.register_source()`.
+4. Trading uses the result to plan which mutations are available —
+   `trading.validate_adapter_capability()`.
+5. Only after selection does the caller create an adapter —
+   `brokers.create_broker_adapter()`.
+
+**Failure behaviour:** discovery is import-safe and side-effect free. An unregistered
+identifier is absent from the result rather than returning an empty capability
+record, and a declared-but-unreleased capability is reported unavailable so a caller
+cannot plan around a write path that fails closed at execution time.
+
+**Integration test:** `Pending`
 
 #### End-to-end workflow diagram
 

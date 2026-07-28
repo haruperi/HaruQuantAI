@@ -10,12 +10,12 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_DIR = ROOT / "tests/data/usage/workflows"
 README = ROOT / "app/services/data/README.md"
 EXPECTED = {
-    "WF-DATA-001": "wf_data_001_historical_bars_ticks_spreads.py",
-    "WF-DATA-002": "wf_data_002_internal_analytical_data_access.py",
+    "WF-DATA-PRI": "wf_data_pri_historical_bars_ticks_spreads.py",
+    "WF-DATA-SEC": "wf_data_sec_internal_analytical_data_access.py",
     "WF-DATA-003": "wf_data_003_local_dataset_load_save.py",
     "WF-DATA-004": "wf_data_004_resample_align_aggregate.py",
     "WF-DATA-005": "wf_data_005_synthetic_generation.py",
-    "WF-DATA-007": "wf_data_007_update_job_historical_backfill.py",
+    "WF-DATA-TER": "wf_data_ter_update_job_historical_backfill.py",
     "WF-DATA-008": "wf_data_008_internal_realtime_feed_status.py",
     "WF-DATA-009": "wf_data_009_symbol_discovery_metadata_availability.py",
     "WF-DATA-010": "wf_data_010_current_hours_sessions_volume.py",
@@ -28,6 +28,9 @@ EXPECTED = {
     "WF-DATA-017": "wf_data_017_external_artifact_import.py",
     "WF-DATA-018": "wf_data_018_venue_authoritative_market_hours.py",
     "WF-DATA-019": "wf_data_019_analytical_named_session_classification.py",
+    "WF-DATA-022": "wf_data_022_data_audit_trail.py",
+    "WF-DATA-023": "wf_data_023_versioned_cache_lifecycle.py",
+    "WF-DATA-024": "wf_data_024_quality_inspection_remediation.py",
 }
 
 

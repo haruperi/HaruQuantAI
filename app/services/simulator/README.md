@@ -368,17 +368,38 @@ public API and are the signatures callers must consume.
 > **Workflow Usage Evidence**: Each active workflow has one standalone program in
 > `tests/simulator/usage/workflows/`; `run_all.py` executes them in registry order.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-SIM-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-SIM-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-SIM-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-SIM-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-SIM-001`, `WF-SIM-009`, and `WF-SIM-003` were absorbed into `WF-SIM-PRI`,
+`WF-SIM-SEC`, and `WF-SIM-TER` respectively. Absorbed numbers are retired and are
+never reused. `WF-SIM-008` remains retired. New workflows continue from
+`WF-SIM-011`.
+
 Evidence programs:
 
-- `WF-SIM-001`: `tests/simulator/usage/workflows/wf_sim_001_official_fx_backtest.py`
+- `WF-SIM-PRI`: `tests/simulator/usage/workflows/wf_sim_pri_official_fx_backtest.py`
+- `WF-SIM-SEC`: `tests/simulator/usage/workflows/wf_sim_sec_portfolio_backtest.py`
+- `WF-SIM-TER`: `tests/simulator/usage/workflows/wf_sim_ter_optimization_candidate_execution.py`
 - `WF-SIM-002`: `tests/simulator/usage/workflows/wf_sim_002_simulation_trader_operations.py`
-- `WF-SIM-003`: `tests/simulator/usage/workflows/wf_sim_003_optimization_candidate_execution.py`
 - `WF-SIM-004`: `tests/simulator/usage/workflows/wf_sim_004_severe_data_quality_blocked_run.py`
 - `WF-SIM-005`: `tests/simulator/usage/workflows/wf_sim_005_deterministic_replay.py`
 - `WF-SIM-006`: `tests/simulator/usage/workflows/wf_sim_006_registered_strategy_security_rejection.py`
 - `WF-SIM-007`: `tests/simulator/usage/workflows/wf_sim_007_non_canonical_fast_research.py`
-- `WF-SIM-009`: `tests/simulator/usage/workflows/wf_sim_009_portfolio_backtest.py`
 - `WF-SIM-010`: `tests/simulator/usage/workflows/wf_sim_010_tick_series_acquisition.py`
+- `WF-SIM-011`: `tests/simulator/usage/workflows/wf_sim_011_reports_and_artifact_manifest.py` *(pending)*
+- `WF-SIM-012`: `tests/simulator/usage/workflows/wf_sim_012_fx_margin_and_execution_costs.py` *(pending)*
+
+Entries marked *(pending)* are registered workflows whose standalone program is not
+yet written.
 
 ### Status values
 
@@ -395,19 +416,21 @@ Evidence programs:
 | **Internal** | The complete workflow occurs within Simulation. |
 | **Cross-domain** | Simulation receives input from or returns output to another domain. |
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-SIM-001` | Cross-domain | Official FX backtest | Approved request plus Data/Strategy references | Persisted `SimulationResult`; Analytics-ready evidence | `FR-SIM-029 → FR-SIM-001 → FR-SIM-002 → FR-SIM-003 → FR-SIM-005 → FR-SIM-006 → FR-SIM-020 → FR-SIM-024 → FR-SIM-026 → FR-SIM-027 → FR-SIM-028 → FR-SIM-030` |
-| Completed | `WF-SIM-002` | Cross-domain | Simulation Trader operations | Trading-owned `OrderIntent` with route=`sim` | Journaled simulated fill/state response | `FR-SIM-038 → FR-SIM-021 → FR-SIM-018 → FR-SIM-019 → FR-SIM-020 → FR-SIM-014 → FR-SIM-023` |
-| Completed | `WF-SIM-003` | Cross-domain | Optimization candidate execution | Optimization-owned candidate and canonical request | Immutable result/provenance; no ranking by Simulation | `FR-SIM-030 → FR-SIM-024 → FR-SIM-026` |
-| Completed | `WF-SIM-004` | Cross-domain | Severe data-quality blocked run | Data-owned manifest and normalized dataset | Failed envelope; no execution or published result | `FR-SIM-002 → FR-SIM-030` |
-| Completed | `WF-SIM-005` | Internal | Deterministic replay | Journal plus matching identity hashes | Reconstructed state equal to stored result | `FR-SIM-016` |
-| Completed | `WF-SIM-006` | Cross-domain | Registered-strategy security rejection | Raw code or unapproved registry reference | `SIM_ARBITRARY_CODE_REJECTED`; no import/execution | `FR-SIM-001 → FR-SIM-030` |
-| Completed | `WF-SIM-007` | Internal | Non-canonical fast research | Approved research-mode request | Disclosed approximate result with no official claims | `FR-SIM-003 → FR-SIM-031` |
-| Completed | `WF-SIM-010` | Cross-domain | Tick-series acquisition | Approved request plus Data-owned bar or tick evidence | Ordered execution clock from `generate_tick_series` | `FR-DATA-087 → FR-SIM-005 → FR-SIM-004` |
-| Completed | `WF-SIM-009` | Cross-domain | Portfolio backtest | `PortfolioBacktestRequestV1` plus referenced strategies/data/FX/policy | `PortfolioSimulationResult v1` | `FR-SIM-032 → FR-SIM-010 → FR-SIM-034 → FR-SIM-033` |
+| Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-SIM-PRI` | Cross-domain | Official FX backtest | Approved request plus Data/Strategy references | Persisted `SimulationResult`; Analytics-ready evidence | `FR-SIM-029 → FR-SIM-001 → FR-SIM-002 → FR-SIM-003 → FR-SIM-005 → FR-SIM-006 → FR-SIM-020 → FR-SIM-024 → FR-SIM-026 → FR-SIM-027 → FR-SIM-028 → FR-SIM-030` |
+| Completed | Secondary | `WF-SIM-SEC` | Cross-domain | Portfolio backtest | `PortfolioBacktestRequestV1` plus referenced strategies/data/FX/policy | `PortfolioSimulationResult v1` | `FR-SIM-032 → FR-SIM-010 → FR-SIM-034 → FR-SIM-033` |
+| Completed | Tertiary | `WF-SIM-TER` | Cross-domain | Optimization candidate execution | Optimization-owned candidate and canonical request | Immutable result/provenance; no ranking by Simulation | `FR-SIM-030 → FR-SIM-024 → FR-SIM-026` |
+| Completed | Supporting | `WF-SIM-002` | Cross-domain | Simulation Trader operations | Trading-owned `OrderIntent` with route=`sim` | Journaled simulated fill/state response | `FR-SIM-038 → FR-SIM-021 → FR-SIM-018 → FR-SIM-019 → FR-SIM-020 → FR-SIM-014 → FR-SIM-023` |
+| Completed | Supporting | `WF-SIM-004` | Cross-domain | Severe data-quality blocked run | Data-owned manifest and normalized dataset | Failed envelope; no execution or published result | `FR-SIM-002 → FR-SIM-030` |
+| Completed | Supporting | `WF-SIM-005` | Internal | Deterministic replay | Journal plus matching identity hashes | Reconstructed state equal to stored result | `FR-SIM-016` |
+| Completed | Supporting | `WF-SIM-006` | Cross-domain | Registered-strategy security rejection | Raw code or unapproved registry reference | `SIM_ARBITRARY_CODE_REJECTED`; no import/execution | `FR-SIM-001 → FR-SIM-030` |
+| Completed | Supporting | `WF-SIM-007` | Internal | Non-canonical fast research | Approved research-mode request | Disclosed approximate result with no official claims | `FR-SIM-003 → FR-SIM-031` |
+| Completed | Supporting | `WF-SIM-010` | Cross-domain | Tick-series acquisition | Approved request plus Data-owned bar or tick evidence | Ordered execution clock from `generate_tick_series` | `FR-DATA-087 → FR-SIM-005 → FR-SIM-004` |
+| Completed | Supporting | `WF-SIM-011` | Internal | Build simulation reports and artifact manifest | Completed immutable run state and its canonical journal | JSON and Markdown reports plus a hash-bound artifact manifest | `Pending` |
+| Completed | Supporting | `WF-SIM-012` | Cross-domain | Validate FX evidence and calculate margin and execution costs | Data-owned `FXConversionEvidence v1`, symbol contract terms, and an approved order | Base-currency margin requirement and execution cost applied inside the run | `Pending` |
 
-### `WF-SIM-001` — Official FX Backtest
+### `WF-SIM-PRI` — Official FX Backtest
 
 **Scope:** Cross-domain
 **System workflow:** `SYS-WF-001`
@@ -415,12 +438,27 @@ Evidence programs:
 **Input boundary:** `SimulationBacktestRequestV1`, `AuthContext`, Data-owned market evidence, and vetted registry references.
 **Output boundary:** A completed `SimulationResult` for Analytics, Optimization, or UI/API; artifacts are persisted by Simulation through Data-owned infrastructure.
 
-1. `run_backtest()` validates authentication, request structure, approved references, profile/route compatibility, and Phase 1 scope.
-2. `validate_market_data()` blocks execution-critical data failures before state is created.
-3. Data's `generate_tick_series()` produces the tick `MarketDataset`; `build_tick_timeline()` converts it into the ordered execution clock.
-4. Strategy, Risk, and Trading produce approved `OrderIntent` values through their public boundaries; Simulation does not reproduce their internal logic.
-5. `EventDrivenExecutionEngine.execute_tick()` processes each tick, applies accounting, and appends journal events.
-6. Reporting functions persist canonical artifacts and return `SimulationResult`.
+1. Validate authentication, request structure, approved references, profile/route
+   compatibility, and Phase 1 scope — `simulator.run_backtest()`,
+   `simulator.validate_run_inputs()`, `simulator.validate_phase_one_scope()`.
+2. Block execution-critical data failures before state is created —
+   `simulator.validate_market_data()`.
+3. Resolve idempotency so a repeated request cannot double-publish —
+   `simulator.resolve_idempotent_run()`.
+4. Acquire canonical evidence and convert it into the ordered execution clock —
+   `data.get_market_data()`, `data.generate_tick_series()`,
+   `simulator.build_tick_timeline()`.
+5. Strategy, Risk, and Trading produce approved intents through their public
+   boundaries — `strategy.run_vectorized_strategy_signals()`,
+   `risk.calculate_position_size()`, `trading.build_execution_plan()`.
+6. Process each tick, price and match orders, apply accounting, and append journal
+   events — `simulator.price_order()`, `simulator.match_order()`,
+   `simulator.normalize_volume()`, `simulator.calculate_margin()`,
+   `simulator.calculate_execution_costs()`, `simulator.evaluate_protective_exit()`,
+   `simulator.validate_intent_timing()`.
+7. Persist canonical artifacts and return the result envelope —
+   `simulator.build_artifact_manifest()`, `simulator.build_json_report()`,
+   `simulator.build_markdown_report()`, `simulator.unwrap_simulation_response()`.
 
 **Failure behavior:** Invalid or missing evidence returns a structured `SIM_*` error; risk rejection is journaled and the run continues; persistence or invariant failure aborts the run and prevents result publication.
 
@@ -444,10 +482,18 @@ flowchart LR
 **Input boundary:** Trading-owned `OrderIntent` with `route=sim` and final Risk-approved volume.
 **Output boundary:** A journaled simulated response and read-only state snapshot inside the active run.
 
-1. `SimTrader.submit_order()` verifies the route and forwards the unchanged approved intent.
-2. Pricing and matching functions evaluate it against the current canonical tick.
-3. The engine and ledger mutate only simulated state and append typed journal events.
-4. `SimTrader.snapshot()` exposes an immutable read-only view.
+1. Verify the route and forward the unchanged approved intent —
+   `trading.dispatch_order_intent()`, `simulator.validate_intent_timing()`.
+2. Normalize volume against contract terms without changing approved risk —
+   `simulator.normalize_volume()`.
+3. Price and match the intent against the current canonical tick —
+   `simulator.price_order()`, `simulator.match_order()`.
+4. Apply margin and cost accounting to simulated state only —
+   `simulator.calculate_margin()`, `simulator.calculate_execution_costs()`.
+5. Append typed journal events for every state transition —
+   `simulator.replay_journal()`.
+6. Expose an immutable read-only view to the caller —
+   `simulator.unwrap_simulation_response()`.
 
 **Failure behavior:** A non-sim route, changed volume, missing state, unsupported order type, or any live-adapter dependency fails closed before mutation.
 
@@ -467,13 +513,23 @@ sequenceDiagram
     SimTrader-->>Trading: read-only outcome
 ```
 
-### `WF-SIM-003` — Optimization Candidate Execution
+### `WF-SIM-TER` — Optimization Candidate Execution
 
 **Scope:** Cross-domain
 **System workflow:** `SYS-WF-003`
 
 **Input boundary:** Optimization supplies a bounded candidate through `SimulationBacktestRequestV1`.
 **Output boundary:** Simulation returns one immutable canonical result and provenance; Optimization owns ranking, diagnostics, and checkpoints.
+
+1. Optimization packages one bounded candidate as a canonical request —
+   `optimization.run_parameter_sweep()`.
+2. Simulation validates the candidate before any execution —
+   `simulator.validate_run_inputs()`, `simulator.validate_phase_one_scope()`.
+3. Resolve idempotency so a repeated candidate reuses its prior result —
+   `simulator.resolve_idempotent_run()`.
+4. Execute through the ordinary deterministic path — `simulator.run_backtest()`.
+5. Return one immutable result and provenance; Optimization alone ranks —
+   `optimization.rank_parameter_sets()`, `optimization.detect_overfit_parameters()`.
 
 **Failure behavior:** Invalid candidate parameters fail before execution; Simulation never schedules workers, ranks candidates, or promotes a strategy.
 
@@ -495,6 +551,13 @@ flowchart LR
 **Input boundary:** Data-owned manifest and normalized dataset.
 **Output boundary:** Structured failed response and bounded redacted diagnostics; no engine state or completed result.
 
+1. Read the Data-owned quality report attached to the dataset —
+   `data.inspect_dataset_quality()`.
+2. Apply the Simulation-owned execution-critical gate —
+   `simulator.validate_market_data()`.
+3. Return a structured failed envelope and bounded redacted diagnostics —
+   `simulator.to_simulation_error_payload()`, `utils.redact_mapping_value()`.
+
 **Failure behavior:** Empty, non-monotonic, duplicate, invalid-OHLC, negative-spread, stale, checksum-mismatched, or lookahead-tainted input fails before execution.
 
 **Integration test:**
@@ -514,6 +577,15 @@ flowchart LR
 
 **Input boundary:** Canonical journal with matching config, data, engine, and schema identities.
 **Output boundary:** Reconstructed state and result identity comparison.
+
+1. Resolve the stored run identity for the supplied journal —
+   `simulator.resolve_idempotent_run()`.
+2. Validate sequence continuity and the journal hash chain —
+   `simulator.replay_journal()`, `utils.canonical_digest()`.
+3. Reconstruct terminal state with the pure reducer —
+   `simulator.replay_journal()`.
+4. Compare the reconstructed identity to the stored result —
+   `simulator.build_artifact_manifest()`.
 
 **Failure behavior:** Sequence gaps, hash-chain breaks, incompatible identities, unknown event versions, or invariant failures abort replay deterministically.
 
@@ -535,6 +607,13 @@ flowchart LR
 **Input boundary:** Raw code, a filesystem path, or an unapproved strategy reference reaches the public boundary.
 **Output boundary:** `SIM_ARBITRARY_CODE_REJECTED` in a redacted standard response; no import, network call, or engine creation.
 
+1. Reject raw code, filesystem paths, and unapproved references at the boundary —
+   `simulator.validate_run_inputs()`.
+2. Confirm the reference resolves to a registered immutable Strategy version —
+   `strategy.validate_strategy_ref()`.
+3. Return the canonical rejection with the body withheld —
+   `simulator.to_simulation_error_payload()`, `utils.redact_mapping_value()`.
+
 **Integration test:**
 `tests/simulator/integration/test_strategy_security.py::test_raw_strategy_code_is_rejected_before_execution()`
 
@@ -553,6 +632,12 @@ flowchart LR
 **Input boundary:** Authenticated request explicitly selecting `FAST_RESEARCH`.
 **Output boundary:** Approximate result labelled `canonical=false`, with assumptions and prohibited-claim metadata.
 
+1. Gate on the explicitly selected research mode —
+   `simulator.validate_phase_one_scope()`.
+2. Run the approximate path — `simulator.run_fast_research()`.
+3. Label the result `canonical=false` with assumptions and prohibited-claim
+   metadata — `simulator.build_json_report()`.
+
 **Failure behavior:** An omitted mode, attempt to emit official fills, promotion evidence, or canonical reports, or unsupported data fails closed.
 
 **Integration test:**
@@ -568,7 +653,7 @@ flowchart LR
 No asynchronous queue, worker, quota, cancellation service, health-probe, or
 distributed-lock capability exists in the Simulation architecture.
 
-### `WF-SIM-009` — Portfolio Backtest
+### `WF-SIM-SEC` — Portfolio Backtest
 
 **Scope:** Cross-domain
 **System workflow:** `SYS-WF-007`
@@ -579,10 +664,21 @@ execution/Risk versions, bounded UTC range, explicit seed, and config hash. It
 never embeds or imports a Portfolio-owned contract type.
 **Output boundary:** `PortfolioSimulationResult v1`.
 
-Simulation executes every component through the ordinary deterministic simulation
-path, maintains aggregate account/risk-budget history, and publishes only when all
-component and aggregate journals reconcile. It does not approve, activate, rank, or
-modify the allocation. Missing/stale FX or incomplete results fail closed.
+1. Validate the self-contained Simulation-owned projection and its hashes —
+   `simulator.validate_run_inputs()`.
+2. Validate the supplied FX evidence before any base-currency aggregation —
+   `simulator.validate_fx_evidence()`, `data.get_fx_conversion_evidence()`.
+3. Execute every component through the ordinary deterministic path —
+   `simulator.run_portfolio_backtest()`, `simulator.run_backtest()`.
+4. Convert component results into the account currency —
+   `simulator.convert_fx_amount()`.
+5. Maintain aggregate account and risk-budget history across components —
+   `simulator.calculate_margin()`.
+6. Publish only when all component and aggregate journals reconcile —
+   `simulator.replay_journal()`, `simulator.build_artifact_manifest()`.
+
+Simulation does not approve, activate, rank, or modify the allocation. Missing/stale
+FX or incomplete results fail closed.
 
 **Integration test:** `tests/simulator/integration/test_portfolio_backtest.py::test_portfolio_candidate_publishes_reconciled_aggregate()`
 
@@ -596,11 +692,13 @@ evidence, plus an explicit Simulation tick-generation model.
 **Output boundary:** A canonical ordered tick `MarketDataset` and the ordered
 Simulation execution clock.
 
-1. Data's `get_market_data()` retrieves bounded genuine MT5 bar evidence.
-2. Data's `generate_tick_series()` applies the approved deterministic tick and
-   spread model.
-3. Simulation's `build_tick_timeline()` validates ordering and converts the
-   Data-owned tick records into the execution clock.
+1. Retrieve bounded genuine MT5 bar evidence — `data.get_market_data()`.
+2. Apply the approved deterministic tick and spread model —
+   `data.generate_tick_series()`.
+3. Validate ordering and convert the Data-owned tick records into the execution
+   clock — `simulator.build_tick_timeline()`.
+4. Confirm the resulting clock satisfies the run's timing contract —
+   `simulator.validate_intent_timing()`.
 
 **Failure behavior:** Missing provider readiness, empty or failed-quality evidence,
 unsupported generation settings, or non-monotonic ticks returns the owning
@@ -608,6 +706,61 @@ domain's typed failure; Simulation never invents substitute observations.
 
 **Integration test:**
 `tests/simulator/integration/test_contract_compatibility.py`
+
+### `WF-SIM-011` — Build Simulation Reports and Artifact Manifest
+
+**Scope:** Internal
+**System workflow:** `SYS-WF-001`, `SYS-WF-003`
+
+**Input boundary:** Completed immutable run state and its canonical journal.
+**Output boundary:** A canonical JSON report, a human-readable Markdown report, and
+a hash-bound artifact manifest persisted through Data-owned infrastructure.
+
+1. Confirm the run reached terminal state and its journal reconciles —
+   `simulator.replay_journal()`.
+2. Serialize the canonical machine-readable report —
+   `simulator.build_json_report()`, `utils.canonical_json()`.
+3. Render the bounded human-readable summary —
+   `simulator.build_markdown_report()`.
+4. Bind every emitted artifact to a content hash —
+   `simulator.build_artifact_manifest()`, `utils.canonical_digest()`.
+5. Commit the artifacts and manifest atomically —
+   `data.save_dataset()`, `data.execute_transaction()`.
+
+**Failure behavior:** Reports are never produced for an incomplete or unreconciled
+run. A manifest hash mismatch aborts publication rather than emitting an artifact
+whose provenance cannot be proven.
+
+**Integration test:** `Pending`
+
+### `WF-SIM-012` — Validate FX Evidence and Calculate Margin and Execution Costs
+
+**Scope:** Cross-domain
+**System workflow:** `SYS-WF-001`, `SYS-WF-007`
+
+**Input boundary:** Data-owned `FXConversionEvidence v1`, symbol contract terms, and
+one approved order.
+**Output boundary:** A base-currency margin requirement and execution cost applied
+inside the active run; never a standalone claim of broker truth.
+
+1. Acquire bounded conversion evidence for the account currency —
+   `data.get_fx_conversion_evidence()`.
+2. Validate the evidence envelope, path, and freshness before use —
+   `simulator.validate_fx_evidence()`.
+3. Convert notional and profit amounts into the account currency —
+   `simulator.convert_fx_amount()`.
+4. Normalize order volume against contract terms —
+   `simulator.normalize_volume()`.
+5. Calculate the margin requirement for the resulting exposure —
+   `simulator.calculate_margin()`.
+6. Calculate spread, commission, and swap costs for the fill —
+   `simulator.calculate_execution_costs()`.
+
+**Failure behavior:** Missing, stale, or path-invalid FX evidence fails closed. No
+synthetic or default rate is substituted, and a margin figure is never published
+outside the run that produced it.
+
+**Integration test:** `Pending`
 
 ---
 

@@ -19,12 +19,14 @@ from pydantic import (
 
 from app.utils import (
     canonical_json,
+    get_logger,
     is_sensitive_key,
-    logger,
     redact_mapping_value,
     to_json_safe,
     validate_id,
 )
+
+logger = get_logger(__name__)
 
 TRADING_CONTRACT_VERSION: Final = "v1"
 

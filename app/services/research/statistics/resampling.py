@@ -8,7 +8,9 @@ from typing import TYPE_CHECKING
 import numpy as np
 from numpy.typing import NDArray
 
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import StatisticalConfig
@@ -24,14 +26,14 @@ def _sample(values: NDArray[np.floating]) -> NDArray[np.float64]:
         Flattened float64 sample.
 
     Raises:
-        ValidationError: If the sample is empty or non-finite.
+        ValueError: If the sample is empty or non-finite.
     """
     logger.debug("Validating Research statistical sample")
     sample = np.asarray(values, dtype="float64").reshape(-1)
     if sample.size == 0:
-        raise ValidationError("RES_INSUFFICIENT_DATA", "EMPTY_STATISTICAL_SAMPLE")
+        raise ValueError("RES_INSUFFICIENT_DATA", "EMPTY_STATISTICAL_SAMPLE")
     if not np.isfinite(sample).all():
-        raise ValidationError("RES_NONFINITE_DATA", "FINITE_SAMPLE_REQUIRED")
+        raise ValueError("RES_NONFINITE_DATA", "FINITE_SAMPLE_REQUIRED")
     return sample
 
 
@@ -52,12 +54,12 @@ def block_bootstrap_distribution(
         Float64 bootstrap statistic distribution.
 
     Raises:
-        ValidationError: If sample, block, or statistic is invalid.
+        ValueError: If sample, block, or statistic is invalid.
     """
     logger.info("Generating Research block-bootstrap distribution")
     sample = _sample(values)
     if config.block_size > sample.size:
-        raise ValidationError("RES_INPUT_INVALID", "BLOCK_EXCEEDS_SAMPLE")
+        raise ValueError("RES_INPUT_INVALID", "BLOCK_EXCEEDS_SAMPLE")
     rng = np.random.default_rng(config.seed)
     output = np.empty(config.bootstrap_samples, dtype="float64")
     starts = np.arange(sample.size - config.block_size + 1)
@@ -69,7 +71,7 @@ def block_bootstrap_distribution(
         )[: sample.size]
         output[index] = float(statistic(resample))
     if not np.isfinite(output).all():
-        raise ValidationError("RES_NONFINITE_DATA", "STATISTIC_NONFINITE")
+        raise ValueError("RES_NONFINITE_DATA", "STATISTIC_NONFINITE")
     return output
 
 
@@ -92,11 +94,11 @@ def block_bootstrap_ci(
         Lower and upper percentile interval.
 
     Raises:
-        ValidationError: If confidence, sample, or statistic is invalid.
+        ValueError: If confidence, sample, or statistic is invalid.
     """
     logger.info("Computing Research bootstrap confidence interval")
     if not 0.0 < confidence < 1.0:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_CONFIDENCE")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_CONFIDENCE")
     distribution = block_bootstrap_distribution(
         values, statistic=statistic, config=config
     )
@@ -124,12 +126,12 @@ def permutation_test(
         Corrected finite empirical p-value in [0, 1].
 
     Raises:
-        ValidationError: If inputs or alternative are invalid.
+        ValueError: If inputs or alternative are invalid.
     """
     logger.info("Computing Research permutation p-value")
     sample = _sample(samples)
     if not np.isfinite(observed) or alternative not in {"upper", "lower", "two-sided"}:
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_PERMUTATION_POLICY")
+        raise ValueError("RES_INPUT_INVALID", "INVALID_PERMUTATION_POLICY")
     rng = np.random.default_rng(config.seed)
     distribution = np.empty(config.permutation_samples, dtype="float64")
     for index in range(config.permutation_samples):

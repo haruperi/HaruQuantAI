@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from app.services.data import (
     DataError,
     StatementPlan,
@@ -33,7 +35,11 @@ from app.services.strategy.registry._mutations import (
 )
 from app.services.strategy.registry.configuration import validate_strategy_config
 from app.services.strategy.registry.resolution import validate_strategy_ref
-from app.utils import AuthContext, logger
+from app.utils import get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 
 @guard_strategy_boundary

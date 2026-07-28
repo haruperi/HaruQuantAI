@@ -13,7 +13,9 @@ from pydantic import (
     model_validator,
 )
 
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _MAX_BAR_PHASE = 15
 

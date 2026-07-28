@@ -1,5 +1,7 @@
 """Approved public contracts for the Trading domain."""
 
+from typing import Any
+
 from app.services.trading.contracts.errors import (
     TradingError,
     map_trading_error,
@@ -19,7 +21,8 @@ from app.services.trading.contracts.registry import (
     create_trading_action_draft,
     get_public_contracts,
 )
-from app.utils import StandardResponse
+
+type StandardResponse[T] = Any
 
 __all__ = [
     "TRADING_CONTRACT_VERSION",

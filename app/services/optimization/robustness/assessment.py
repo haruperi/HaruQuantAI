@@ -8,7 +8,9 @@ from collections.abc import Mapping, Sequence
 from app.services.optimization.robustness.contracts import (
     MonteCarloResult,  # noqa: TC001
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def assess_strategy_robustness(

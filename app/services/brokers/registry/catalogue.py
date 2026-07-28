@@ -1,5 +1,7 @@
 """Single static broker capability declaration source."""
 
+from __future__ import annotations
+
 import time
 from collections.abc import Mapping
 from types import MappingProxyType
@@ -11,12 +13,12 @@ from app.services.brokers.contracts import (
     BrokerId,
 )
 from app.utils import (
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     generate_id,
     success_response,
 )
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 _LOCAL = {
     BrokerCapabilityId.DISCONNECT,
@@ -342,7 +344,7 @@ def get_broker_capability_catalogue() -> StandardResponse[
     metadata = build_response_metadata(
         name="brokers.registry.get_broker_capability_catalogue",
         domain="brokers",
-        risk_level=RiskLevel.NONE,
+        risk_level="none",
         request_id=generate_id("req"),
         start_time=start_time,
         read_only=True,

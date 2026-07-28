@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.actions.orders import _execute_request
@@ -13,7 +13,11 @@ from app.services.trading.contracts import (
     TradingError,
     TradingRequest,
 )
-from app.utils import StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies

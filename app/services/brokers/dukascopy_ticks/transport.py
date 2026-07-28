@@ -1,8 +1,8 @@
 """Bounded standard-library Dukascopy tick-file transport."""
 
-# ruff: noqa: S310 - URL is constructed from a fixed HTTPS provider base.
 from __future__ import annotations
 
+# ruff: noqa: S310 - URL is constructed from a fixed HTTPS provider base.
 import asyncio
 import lzma
 import time
@@ -17,7 +17,9 @@ from app.services.brokers.adapter_runtime.circuit_breaker import (
     _TransportCircuitBreaker,
 )
 from app.services.brokers.contracts.protocols import _CircuitOpenError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class _DukascopyTransport:

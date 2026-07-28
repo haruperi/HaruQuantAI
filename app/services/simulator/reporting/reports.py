@@ -5,7 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from app.services.simulator.errors import SimulationError
-from app.utils import ValidationError, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.reporting.contracts import SimulationResult
@@ -28,7 +30,7 @@ def build_json_report(result: SimulationResult) -> str:
         return canonical_json(
             result.model_dump(mode="python", warnings=False), max_items=None
         )
-    except ValidationError as error:
+    except ValueError as error:
         raise SimulationError(
             "SIM_INTERNAL_ERROR", "Result serialization failed"
         ) from error

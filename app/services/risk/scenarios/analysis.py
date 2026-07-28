@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from app.services.risk.contracts import (
     PortfolioRiskSnapshot,
@@ -15,7 +15,11 @@ from app.services.risk.contracts import (
     ScenarioResult,
 )
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.risk.config import RiskConfig
@@ -154,7 +158,7 @@ def _validate_bounds(
         )
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def run_risk_scenario_analysis(
     snapshot: PortfolioRiskSnapshot,
     scenarios: Sequence[ScenarioDefinition],

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.trading.contracts import (
     ExecutionEvidenceReport,
@@ -10,7 +10,12 @@ from app.services.trading.contracts import (
     TradingRequest,
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel, StandardResponse, logger, to_json_safe
+from app.utils import get_logger, to_json_safe
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.contracts.models import JsonValue
@@ -78,7 +83,7 @@ def _build_trading_report_value(
     )
     return success_trading_response(
         report,
-        risk_level=RiskLevel.LOW,
+        risk_level="low",
         legacy_status="packaged",
         extensions={
             "request_id": request.request_id,

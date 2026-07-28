@@ -6,7 +6,9 @@ from collections.abc import Sequence
 
 from app.services.optimization.evidence import OptimizationResult  # noqa: TC001
 from app.services.optimization.validation import WalkForwardRequest  # noqa: TC001
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def validate_request_id(request_id: str | None) -> str | None:

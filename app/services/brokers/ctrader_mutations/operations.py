@@ -1,4 +1,6 @@
-# mypy: disable-error-code="attr-defined,no-any-return,has-type"
+type StandardResponse[T] = (
+    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
+)
 """cTrader mutation implementations behind unreleased public policy."""
 
 from app.services.brokers.contracts import (
@@ -21,7 +23,6 @@ from app.services.brokers.ctrader_session.mapping import (
     _map_error_code,
     _map_order_result,
 )
-from app.utils import StandardResponse  # noqa: TC001
 
 
 class _CTraderMutationsMixin:

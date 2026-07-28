@@ -13,7 +13,9 @@ from app.services.research.features.calculations import (
     rolling_hurst,
     simple_returns,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.indicators import IndicatorResult
@@ -42,20 +44,20 @@ def _attach_indicator(
         Updated frame and lineage evidence.
 
     Raises:
-        ValidationError: If the contract, index, or columns are incompatible.
+        ValueError: If the contract, index, or columns are incompatible.
     """
     logger.debug("Attaching public IndicatorResult to Research frame")
     if (
         result.contract_version != "v1"
         or result.schema_id != "indicators.indicator_series.v1"
     ):
-        raise ValidationError("RES_VERSION_INCOMPATIBLE", "INDICATOR_VERSION_INVALID")
+        raise ValueError("RES_VERSION_INCOMPATIBLE", "INDICATOR_VERSION_INVALID")
     values = result.values_only
     if not values.index.equals(frame.index):
-        raise ValidationError("RES_INPUT_INVALID", "INDICATOR_INDEX_MISMATCH")
+        raise ValueError("RES_INPUT_INVALID", "INDICATOR_INDEX_MISMATCH")
     columns = result.output_columns
     if set(columns) & set(frame.columns):
-        raise ValidationError("RES_INPUT_INVALID", "INDICATOR_COLUMN_COLLISION")
+        raise ValueError("RES_INPUT_INVALID", "INDICATOR_COLUMN_COLLISION")
     output = frame.copy(deep=True)
     for column in columns:
         output[column] = values[column].to_numpy(copy=True)
@@ -78,27 +80,28 @@ def build_research_feature_frame(
 ) -> tuple[pd.DataFrame, Mapping[str, JSONValue]]:
     """Build a detached feature frame with lineage and leakage metadata.
 
-    The output retains the prepared UTC index. Warm-up values remain NaN unless
-    ``nan_policy='drop_warmup'``. Forward columns are recorded as research-only
-    labels and are never included in ``training_feature_columns``.
+        The output retains the prepared UTC index. Warm-up values remain NaN unless
+        `
+    an_policy='drop_warmup'``. Forward columns are recorded as research-only
+        labels and are never included in ``training_feature_columns``.
 
     Args:
-        prepared: Prepared Research dataset.
-        indicator_results: Caller-supplied public IndicatorResult v1 values.
-        config: Explicit feature windows and NaN policy.
-        limits: Approved resource ceilings.
+            prepared: Prepared Research dataset.
+            indicator_results: Caller-supplied public IndicatorResult v1 values.
+            config: Explicit feature windows and NaN policy.
+            limits: Approved resource ceilings.
 
     Returns:
-        Detached feature frame and JSON-compatible lineage metadata.
+            Detached feature frame and JSON-compatible lineage metadata.
 
     Raises:
-        ValidationError: If inputs, dependencies, or resource bounds are invalid.
+            ValueError: If inputs, dependencies, or resource bounds are invalid.
     """
     logger.info("Building canonical Research feature frame")
     if len(prepared.data) > limits.max_rows:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     if "close" not in prepared.data:
-        raise ValidationError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
     frame = pd.DataFrame(index=prepared.data.index.copy())
     close = prepared.data["close"]
     frame["log_return"] = log_returns(close)
@@ -121,7 +124,7 @@ def build_research_feature_frame(
         forward_columns.append(column)
     declared = set(config.allowed_forward_columns)
     if declared - set(forward_columns):
-        raise ValidationError("RES_INPUT_INVALID", "UNRESOLVED_FORWARD_DECLARATION")
+        raise ValueError("RES_INPUT_INVALID", "UNRESOLVED_FORWARD_DECLARATION")
     training_columns = tuple(
         column for column in frame.columns if column not in set(forward_columns)
     )

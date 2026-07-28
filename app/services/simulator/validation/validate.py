@@ -15,7 +15,9 @@ from app.services.simulator.validation.contracts import (
     MarketDataValidationContext,
     ValidatedMarketDataEvidence,
 )
-from app.utils import ValidationError, canonical_digest, canonical_json, logger
+from app.utils import canonical_digest, canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 SUPPORTED_ASSET_CLASSES = ("FX",)
 _REQUIRED_INPUT_FIELDS = (
@@ -105,7 +107,7 @@ def validate_run_inputs(payload: Mapping[str, object]) -> None:
         _raise("SIM_INVALID_CONFIG", "Required run identity is missing", payload)
     try:
         canonical_json(payload)
-    except ValidationError as error:
+    except ValueError as error:
         logger.warning(
             "Simulation input serialization was rejected: %s", type(error).__name__
         )

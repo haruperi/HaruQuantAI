@@ -13,7 +13,9 @@ from app.services.strategy.contracts.references import (  # noqa: TC001
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.replay.models import StrategyReplayManifest
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 _SHA256_LENGTH = 64
 

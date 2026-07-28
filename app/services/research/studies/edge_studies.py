@@ -22,7 +22,9 @@ from app.services.research.statistics import (
     null_distribution_stats,
     random_entry_null,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.research.contracts import (
@@ -49,12 +51,12 @@ def _int_setting(mapping: Mapping[str, JSONValue], key: str, detail: str) -> int
         The validated positive integer.
 
     Raises:
-        ValidationError: If the setting is absent or not a positive integer.
+        ValueError: If the setting is absent or not a positive integer.
     """
     value = mapping.get(key)
     # Booleans are ints in Python; exclude them explicitly.
     if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
-        raise ValidationError("RES_INPUT_INVALID", detail)
+        raise ValueError("RES_INPUT_INVALID", detail)
     return value
 
 
@@ -70,14 +72,14 @@ def _float_setting(mapping: Mapping[str, JSONValue], key: str, detail: str) -> f
         The validated finite float.
 
     Raises:
-        ValidationError: If the setting is absent or non-finite.
+        ValueError: If the setting is absent or non-finite.
     """
     value = mapping.get(key)
     if isinstance(value, bool) or not isinstance(value, int | float):
-        raise ValidationError("RES_INPUT_INVALID", detail)
+        raise ValueError("RES_INPUT_INVALID", detail)
     output = float(value)
     if not np.isfinite(output):
-        raise ValidationError("RES_INPUT_INVALID", detail)
+        raise ValueError("RES_INPUT_INVALID", detail)
     return output
 
 
@@ -95,11 +97,11 @@ def _unit_interval_setting(
         The validated value in the open unit interval.
 
     Raises:
-        ValidationError: If the setting is outside ``(0, 1)``.
+        ValueError: If the setting is outside ``(0, 1)``.
     """
     output = _float_setting(mapping, key, detail)
     if not 0.0 < output < 1.0:
-        raise ValidationError("RES_INPUT_INVALID", detail)
+        raise ValueError("RES_INPUT_INVALID", detail)
     return output
 
 
@@ -116,11 +118,11 @@ def _side_setting(
         The validated buy or sell side.
 
     Raises:
-        ValidationError: If the side is not buy or sell.
+        ValueError: If the side is not buy or sell.
     """
     value = mapping.get("side")
     if value not in ("buy", "sell"):
-        raise ValidationError("RES_INPUT_INVALID", detail)
+        raise ValueError("RES_INPUT_INVALID", detail)
     return cast("Literal['buy', 'sell']", value)
 
 
@@ -135,11 +137,11 @@ def _enforce_rows(
         detail: Symbolic error detail.
 
     Raises:
-        ValidationError: If the row count exceeds the approved limit.
+        ValueError: If the row count exceeds the approved limit.
     """
     logger.debug("Checking Research edge-study resource limits")
     if len(data) > limits.max_rows:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", detail)
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", detail)
 
 
 def _classify(
@@ -234,7 +236,7 @@ def run_eds_mean_reversion(
         Advisory mean-reversion edge result with matched null evidence.
 
     Raises:
-        ValidationError: If settings, data, or resources are invalid/insufficient.
+        ValueError: If settings, data, or resources are invalid/insufficient.
     """
     logger.info("Running Research mean-reversion edge study")
     _enforce_rows(data, limits, "MEAN_REVERSION_ROW_LIMIT_EXCEEDED")
@@ -254,7 +256,7 @@ def run_eds_mean_reversion(
     )
     sample = split.test if "close" in split.test else data
     if "close" not in sample:
-        raise ValidationError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
     close = sample["close"].astype("float64")
     rolling = close.rolling(lookback)
     zscores = (close - rolling.mean()) / rolling.std(ddof=0)
@@ -311,7 +313,7 @@ def run_eds_trend_persistence(
         Advisory trend-persistence edge result with matched null evidence.
 
     Raises:
-        ValidationError: If settings, data, or resources are invalid/insufficient.
+        ValueError: If settings, data, or resources are invalid/insufficient.
     """
     logger.info("Running Research trend-persistence edge study")
     _enforce_rows(data, limits, "TREND_ROW_LIMIT_EXCEEDED")
@@ -331,7 +333,7 @@ def run_eds_trend_persistence(
     )
     sample = split.test if "close" in split.test else data
     if "close" not in sample:
-        raise ValidationError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "OHLC_COLUMNS_REQUIRED")
     close = sample["close"].astype("float64")
     entries = _trend_breakout_entries(close, lookback, minimum_move, side)
     forward = forward_returns(close, horizon=hold_bars, mode="log", output_label="tp_f")
@@ -393,7 +395,7 @@ def run_eds_session(
         Advisory session edge result with FDR-adjusted per-session evidence.
 
     Raises:
-        ValidationError: If session tags, settings, data, or resources are invalid.
+        ValueError: If session tags, settings, data, or resources are invalid.
     """
     logger.info("Running Research session edge study")
     _enforce_rows(tagged_data, limits, "SESSION_ROW_LIMIT_EXCEEDED")
@@ -407,7 +409,7 @@ def run_eds_session(
         settings, "null_quantile", "SESSION_NULL_QUANTILE_REQUIRED"
     )
     if "close" not in tagged_data or "session" not in tagged_data:
-        raise ValidationError("RES_INPUT_INVALID", "SESSION_TAGS_REQUIRED")
+        raise ValueError("RES_INPUT_INVALID", "SESSION_TAGS_REQUIRED")
     sample = tagged_data.loc[split.test.index] if not split.test.empty else tagged_data
     sample = sample.dropna(subset=["close", "session"])
     close = sample["close"].astype("float64")

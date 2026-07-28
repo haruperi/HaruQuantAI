@@ -13,9 +13,11 @@ from pathlib import Path
 from typing import Annotated, Final, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import NoDecode
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
-from app.utils import AppSettings, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 DEFAULT_APPROVED_STORAGE_ROOTS: Final = (
     Path("data/raw"),
@@ -29,8 +31,15 @@ DEFAULT_RAW_ROOT: Final = Path("data/raw")
 LOCAL_SYMBOL_MANIFEST_NAME: Final = "symbols.json"
 
 
-class DataSettings(AppSettings):
-    """Immutable DATA-owned settings resolved by the shared settings loader."""
+class DataSettings(BaseSettings):
+    """Immutable DATA-owned settings resolved from explicit or process values."""
+
+    model_config = SettingsConfigDict(
+        env_ignore_empty=True,
+        case_sensitive=False,
+        extra="ignore",
+        frozen=True,
+    )
 
     database_url: str | None = None
     data_dir: Path | None = None

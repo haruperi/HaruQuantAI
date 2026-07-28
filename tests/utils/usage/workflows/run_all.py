@@ -7,9 +7,13 @@ import sys
 from pathlib import Path
 
 WORKFLOWS = (
-    "wf_utl_001_structured_logging_and_redaction.py",
-    "wf_utl_002_shared_settings_bootstrap.py",
-    "wf_utl_003_audit_event_construction.py",
+    "wf_utl_pri_structured_logging_and_redaction.py",
+    "wf_utl_sec_shared_settings_bootstrap.py",
+    "wf_utl_ter_audit_event_construction.py",
+    "wf_utl_004_standard_operation_response_envelope.py",
+    "wf_utl_005_error_normalization_and_routing.py",
+    "wf_utl_006_trace_identity_and_utc_time.py",
+    "wf_utl_007_canonical_serialization_and_digest.py",
 )
 
 

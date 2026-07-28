@@ -1,8 +1,8 @@
 """cTrader request correlation and session transport boundary."""
 
-# ruff: noqa: TRY004 - an unexpected provider response is invalid provider evidence.
 from __future__ import annotations
 
+# ruff: noqa: TRY004 - an unexpected provider response is invalid provider evidence.
 import asyncio
 import importlib
 import time
@@ -20,7 +20,9 @@ from app.services.brokers.contracts.protocols import (
     _CircuitOpenError,
     _RateLimitedError,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 type _Sender = Callable[[object], Awaitable[object]]
 type _EventHandler = Callable[[object], None]

@@ -13,7 +13,9 @@ from app.services.optimization.robustness import (
     MonteCarloRequest,
     MonteCarloResult,
 )
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 
 class ExecutionStressAnalysisRequest(BaseModel):

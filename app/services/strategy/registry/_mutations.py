@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from typing import Any
 
 from app.services.data import (
     DataError,
@@ -23,7 +24,11 @@ from app.services.strategy.contracts.responses import (
     unwrap_data_response,
 )
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
-from app.utils import AuditEvent, AuthContext, generate_id, logger
+from app.utils import create_audit_event, generate_id, get_logger
+
+type AuthContext = Any
+
+logger = get_logger(__name__)
 
 _REGISTER_PERMISSION = "strategy:register"
 _UPDATE_PERMISSION = "strategy:update"
@@ -122,7 +127,7 @@ def _publish_mutation(
     try:
         unwrap_data_response(
             persist_audit_event(
-                AuditEvent(
+                create_audit_event(
                     contract_version="v1",
                     schema_id="utils.audit_event.v1",
                     event_id=event_id,

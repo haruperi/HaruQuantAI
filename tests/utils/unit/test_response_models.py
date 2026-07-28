@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 
 import pytest
-from app.utils import (
+from app.utils.responses.models import (
     ResponseMetadata,
     RiskLevel,
     StandardError,

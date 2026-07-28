@@ -1,12 +1,14 @@
 """Deterministic complete broker adapter test double."""
 
+from __future__ import annotations
+
 # ruff: noqa: ANN401 - generated fixed protocol methods preserve fixture types.
 import inspect
 import time
 import types
 from collections.abc import Mapping
 from datetime import UTC, datetime
-from typing import Any, cast, get_args, get_origin, get_type_hints, override
+from typing import Any, Literal, cast, get_args, get_origin, get_type_hints, override
 
 from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
 from app.services.brokers.contracts import (
@@ -25,13 +27,13 @@ from app.services.brokers.contracts.protocols import (
 )
 from app.utils import (
     ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     error_response,
     generate_id,
     success_response,
 )
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 _SUBSCRIPTION_OPERATIONS = {
     BrokerCapabilityId.SUBSCRIBE_QUOTES,
@@ -42,7 +44,6 @@ _SUBSCRIPTION_OPERATIONS = {
 
 class FakeBrokerAdapter(_UnsupportedAdapterBase):
     """Isolated fixture/result adapter with per-operation error injection.
-
     The fake honours its supplied capability declaration exactly as a real
     adapter does: a fixture or injected error registered against a capability
     declared `UNAVAILABLE` never bypasses the fail-closed gate. Subscription
@@ -300,7 +301,7 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
         return build_response_metadata(
             name=name,
             domain="brokers",
-            risk_level=RiskLevel.NONE,
+            risk_level="none",
             request_id=generate_id("req"),
             start_time=start_time,
             read_only=False,

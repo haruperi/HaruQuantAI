@@ -16,7 +16,11 @@ from pydantic import BaseModel, ConfigDict, model_validator
 
 from app.services.risk.contracts import RiskDomainError, RiskErrorCode
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 _HASH_PATTERN = re.compile(r"(?:sha256:)?[0-9a-f]{64}\Z")
 _CURRENCY_CODE_LENGTH = 3
@@ -271,7 +275,7 @@ def _load_firm_mandate(account_id: str, config_root: Path) -> FirmMandate:
     return mandate
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def load_firm_mandate(account_id: str, config_root: Path) -> FirmMandate:
     """Load one verified firm mandate from a bounded configuration root.
 

@@ -24,7 +24,9 @@ from app.services.optimization.search.contracts import (
 )
 from app.services.optimization.search.grid import iter_grid_candidates
 from app.services.optimization.search.random import sample_random_candidates
-from app.utils import canonical_json, generate_id, logger
+from app.utils import canonical_json, generate_id, get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.optimization.parameters import ParameterValue

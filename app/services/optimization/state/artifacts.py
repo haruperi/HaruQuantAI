@@ -6,7 +6,9 @@ import re
 from pathlib import Path
 
 from app.services.optimization.errors import OptimizationError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _IDENTIFIER = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")

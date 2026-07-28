@@ -10,12 +10,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Literal, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
     from app.services.data import MarketDataset
     from app.services.indicators.core.results import IndicatorResult
-    from app.utils import StandardResponse
+type StandardResponse[T] = Any
 
 
 @dataclass(frozen=True, slots=True)

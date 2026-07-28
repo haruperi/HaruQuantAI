@@ -13,7 +13,9 @@ from pydantic import (
     ConfigDict,
 )
 
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _MAX_TEXT_LENGTH = 512
 _SHA256_LENGTH = 64

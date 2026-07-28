@@ -178,11 +178,14 @@ utils/
     `-- timing.py
 ```
 
-Package and feature `__init__.py` files expose only documented public names through
-explicit `__all__` declarations. No optional heavy dependency is imported by Utils.
-The package root also exposes the documented `JsonValue` type-only alias because
-service response contracts use it for static JSON-safe typing; it has no runtime
-behavior and is not a standalone operation.
+Package and feature `__init__.py` files expose only documented standalone
+functions through explicit `__all__` declarations. Class-based implementations
+and constants are not public operations. The package-root public API is exactly
+the function list in `app/utils/__init__.py`; contract, error, settings, logging,
+response, and redaction classes are implementation details and must be accessed
+through their documented function factories/getters. No compatibility aliases
+are retained for removed class or constant exports. `JsonValue` is an internal
+type alias and is not exported.
 
 ```mermaid
 flowchart LR
@@ -218,95 +221,146 @@ one directly with Python.
 > output, and its typed output boundary. Run all Utils workflows with
 > `uv run python tests/utils/usage/workflows/run_all.py`.
 
+### Workflow rank values
+
+| Rank | Identifier | Meaning |
+|---|---|---|
+| **Primary** | `WF-UTL-PRI` | The workflow this domain exists to serve. |
+| **Secondary** | `WF-UTL-SEC` | The next most load-bearing workflow. |
+| **Tertiary** | `WF-UTL-TER` | The third-ranked workflow. |
+| **Supporting** | `WF-UTL-0NN` | Every remaining registered workflow. |
+
+### Retired identifiers
+
+`WF-UTL-001`, `WF-UTL-002`, and `WF-UTL-003` were absorbed into `WF-UTL-PRI`,
+`WF-UTL-SEC`, and `WF-UTL-TER` respectively. Absorbed numbers are retired and are
+never reused; new workflows continue from `WF-UTL-004`.
+
 | Workflow ID | Standalone program |
 |---|---|
-| `WF-UTL-001` | `tests/utils/usage/workflows/wf_utl_001_structured_logging_and_redaction.py` |
-| `WF-UTL-002` | `tests/utils/usage/workflows/wf_utl_002_shared_settings_bootstrap.py` |
-| `WF-UTL-003` | `tests/utils/usage/workflows/wf_utl_003_audit_event_construction.py` |
+| `WF-UTL-PRI` | `tests/utils/usage/workflows/wf_utl_pri_structured_logging_and_redaction.py` |
+| `WF-UTL-SEC` | `tests/utils/usage/workflows/wf_utl_sec_shared_settings_bootstrap.py` |
+| `WF-UTL-TER` | `tests/utils/usage/workflows/wf_utl_ter_audit_event_construction.py` |
+| `WF-UTL-004` | `tests/utils/usage/workflows/wf_utl_004_standard_operation_response_envelope.py` |
+| `WF-UTL-005` | `tests/utils/usage/workflows/wf_utl_005_error_normalization_and_routing.py` |
+| `WF-UTL-006` | `tests/utils/usage/workflows/wf_utl_006_trace_identity_and_utc_time.py` |
+| `WF-UTL-007` | `tests/utils/usage/workflows/wf_utl_007_canonical_serialization_and_digest.py` |
 
-| Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033`, `FR-UTL-039` through `FR-UTL-041` |
-| Completed | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-024` |
-| Completed | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-002`, `FR-UTL-003`, `FR-UTL-007`, `FR-UTL-008`, `FR-UTL-010`, `FR-UTL-011`, `FR-UTL-013` through `FR-UTL-021`, `FR-UTL-036` |
+| Status | Rank | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
+|---|---|---|---|---|---|---|---|
+| Completed | Primary | `WF-UTL-PRI` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033`, `FR-UTL-039` through `FR-UTL-041` |
+| Completed | Secondary | `WF-UTL-SEC` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-024` |
+| Completed | Tertiary | `WF-UTL-TER` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-002`, `FR-UTL-003`, `FR-UTL-007`, `FR-UTL-008`, `FR-UTL-010`, `FR-UTL-011`, `FR-UTL-013` through `FR-UTL-021`, `FR-UTL-036` |
+| Completed | Supporting | `WF-UTL-004` | Cross-domain | Standard operation response envelope | Domain operation outcome and trace context | Uniform `StandardResponse v1` success, error, or exception envelope | `FR-UTL-034`, `FR-UTL-035` |
+| Completed | Supporting | `WF-UTL-005` | Cross-domain | Error normalization, metadata, and routing | Raw exception or domain error code | Canonical error code, resolved metadata, and one routed error event | `FR-UTL-004` through `FR-UTL-006`, `FR-UTL-009`, `FR-UTL-012` |
+| Completed | Supporting | `WF-UTL-006` | Cross-domain | Trace identity and UTC time discipline | Caller-supplied identity seed or timestamp | Validated trace identifier plus aware UTC instant and freshness verdict | `FR-UTL-001`, `FR-UTL-025`, `FR-UTL-037` |
+| Completed | Supporting | `WF-UTL-007` | Cross-domain | Canonical serialization and digest | Arbitrary domain payload | Deterministic redacted canonical JSON and stable digest | `FR-UTL-036`, `FR-UTL-038` |
 
-### `WF-UTL-001` — Structured Logging and Redaction
+### `WF-UTL-PRI` — Structured Logging and Redaction
 
-1. The caller imports the global import-safe bound logger without side effects.
-2. The caller supplies a structured, JSON-safe context.
-3. Redaction runs before formatting or emission.
+1. The caller imports the global import-safe bound logger without side effects —
+   `utils.get_logger()`.
+2. The caller supplies a structured, JSON-safe context — `utils.to_json_safe()`.
+3. Redaction runs before formatting or emission — `utils.get_default_redaction_policy()`,
+   `utils.is_sensitive_key()`, `utils.redact_mapping_value()`, `utils.redact_text_value()`.
 4. The first runtime bound-logger emission atomically activates the approved default
-   profile; an explicit `configure_logging(...)` call replaces it only when a
-   specialized profile is required.
+   profile; an explicit call replaces it only when a specialized profile is
+   required — `utils.configure_logging()`.
 5. Default queued delivery flushes and stops through the registered process-exit
-   lifecycle; special entry points may synchronize or stop it explicitly through
-   `flush_logging()` and `shutdown_logging()`.
-6. Configuration or sink failure is surfaced without exposing the source payload.
+   lifecycle; special entry points may synchronize or stop it explicitly —
+   `utils.flush_logging()`, `utils.shutdown_logging()`.
+6. Configuration or sink failure is surfaced without exposing the source payload —
+   `utils.exception_response()`.
 
-### `WF-UTL-002` — Shared Settings Bootstrap
+### `WF-UTL-SEC` — Shared Settings Bootstrap
 
-1. `AppSettings` loads the repository `app/configs/env.json` and process overrides at the shared
-   Utils boundary; callers may supply explicit values without parsing files.
-2. The loader validates supported deployment and runtime settings.
-3. The loader returns an immutable settings object without mutating caller input.
+1. The loader reads the repository `app/configs/env.json` and process overrides at
+   the shared Utils boundary; callers may supply explicit values without parsing
+   files — `utils.load_settings()`.
+2. The loader validates supported deployment and runtime settings —
+   `utils.load_settings()`.
+3. The loader returns an immutable settings object without mutating caller input —
+   `utils.load_settings()`.
+4. Consumers open a scoped view of the resolved settings where a domain needs one —
+   `data.data_settings_context()`.
+
 Imports never read the environment, a file, or a secret store.
 
-### `WF-UTL-003` — Audit-Event Construction
+### `WF-UTL-TER` — Audit-Event Construction
 
-1. The emitting domain supplies its action, trace context, and payload meaning.
-2. IDs and UTC timestamps are validated.
-3. The payload is redacted and canonicalized.
-4. A bounded `AuditEvent v1` is constructed.
-5. Data persists the event through its owned audit-storage boundary.
+1. The emitting domain supplies its action, trace context, and payload meaning —
+   `utils.create_auth_context()`.
+2. IDs and UTC timestamps are validated — `utils.validate_id()`,
+   `utils.parse_utc_timestamp()`.
+3. The payload is redacted and canonicalized — `utils.redact_mapping_value()`,
+   `utils.canonical_json()`.
+4. A bounded `AuditEvent v1` is constructed — `utils.create_audit_event()`.
+5. Data persists the event through its owned audit-storage boundary —
+   `data.persist_audit_event()`.
 
----
+### `WF-UTL-004` — Standard Operation Response Envelope
 
-## 4. Module and Requirement Specifications
+1. The operation records its aware UTC start instant — `utils.utc_now()`.
+2. The caller assembles trace, version, and timing metadata for the envelope —
+   `utils.build_response_metadata()`.
+3. A completed operation returns its typed payload in a success envelope —
+   `utils.success_response()`.
+4. A known domain failure returns a canonical code and redacted detail —
+   `utils.error_response()`.
+5. An unexpected exception is converted without leaking the source payload —
+   `utils.exception_response()`.
+6. Elapsed duration is measured and attached to the envelope metadata —
+   `utils.get_execution_ms()`.
 
-This section is the implementation plan. The package-level `utils/__init__.py`
-re-exports only the approved feature APIs below and is governed by
-`NFR-UTL-001`, `NFR-UTL-003`, and `NFR-UTL-005`; it owns no independent
-functional behavior.
+**Failure behaviour:** an envelope is never returned without a canonical status; an
+unmapped exception is reported as an internal error with the payload withheld.
 
-### 4.1 `contracts/` — Shared Context and Audit Contracts
+### `WF-UTL-005` — Error Normalization, Metadata, and Routing
 
-**Purpose:** Define the immutable authenticated principal, trace context, and redacted audit envelope shared across every domain.
+1. The shared catalog is loaded and structurally validated —
+   `utils.get_common_error_catalog()`, `utils.validate_error_catalog()`.
+2. A raw exception is mapped to its canonical domain error — `utils.map_exception()`.
+3. The resulting code is normalized to canonical form — `utils.normalize_error_code()`.
+4. A definition is required for the normalized code, failing closed when absent —
+   `utils.require_error_definition()`.
+5. Severity, retryability, and routing metadata are resolved —
+   `utils.get_error_metadata()`.
+6. One redacted error event is routed to the configured sink —
+   `utils.route_error_event()`.
 
+**Failure behaviour:** an unregistered code fails closed at
+`utils.require_error_definition()` rather than being routed with invented metadata.
 
-| Status | Workflow ID | Scope | Workflow | Input boundary | Final outcome | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Completed | `WF-UTL-001` | Cross-domain | Structured logging and redaction | Domain log record and explicit context | Redacted structured record reaches the configured sink | `FR-UTL-026` through `FR-UTL-033`, `FR-UTL-039` through `FR-UTL-041` |
-| Completed | `WF-UTL-002` | Cross-domain | Shared settings bootstrap | Explicit mapping and environment | Immutable validated `RuntimeSettings` | `FR-UTL-022` through `FR-UTL-024` |
-| Completed | `WF-UTL-003` | Cross-domain | Audit-event construction | Domain-owned action facts and trace context | Valid redacted `AuditEvent v1` ready for Data persistence | `FR-UTL-002`, `FR-UTL-003`, `FR-UTL-007`, `FR-UTL-008`, `FR-UTL-010`, `FR-UTL-011`, `FR-UTL-013` through `FR-UTL-021`, `FR-UTL-036` |
+### `WF-UTL-006` — Trace Identity and UTC Time Discipline
 
-### `WF-UTL-001` — Structured Logging and Redaction
+1. A new correlation identifier is generated for an inbound operation —
+   `utils.generate_id()`.
+2. A deterministic identifier is derived where a stable key must survive replay —
+   `utils.derive_stable_id()`.
+3. Any caller-supplied identifier is validated before use — `utils.validate_id()`.
+4. The current aware UTC instant is read from the single shared clock —
+   `utils.utc_now()`.
+5. Inbound and outbound timestamps are parsed and rendered canonically —
+   `utils.parse_utc_timestamp()`, `utils.format_utc_timestamp()`.
+6. Evidence freshness is evaluated against an explicit bound —
+   `utils.is_fresh()`, `utils.age_seconds()`.
 
-1. The caller imports the global import-safe bound logger without side effects.
-2. The caller supplies a structured, JSON-safe context.
-3. Redaction runs before formatting or emission.
-4. The first runtime bound-logger emission atomically activates the approved default
-   profile; an explicit `configure_logging(...)` call replaces it only when a
-   specialized profile is required.
-5. Default queued delivery flushes and stops through the registered process-exit
-   lifecycle; special entry points may synchronize or stop it explicitly through
-   `flush_logging()` and `shutdown_logging()`.
-6. Configuration or sink failure is surfaced without exposing the source payload.
+**Failure behaviour:** a naive timestamp or malformed identifier is rejected; no
+default timezone is assumed and no identifier is silently regenerated.
 
-### `WF-UTL-002` — Shared Settings Bootstrap
+### `WF-UTL-007` — Canonical Serialization and Digest
 
-1. `AppSettings` loads the repository `app/configs/env.json` and process overrides at the shared
-   Utils boundary; callers may supply explicit values without parsing files.
-2. The loader validates supported deployment and runtime settings.
-3. The loader returns an immutable settings object without mutating caller input.
-Imports never read the environment, a file, or a secret store.
+1. Arbitrary domain values are coerced to JSON-safe primitives —
+   `utils.to_json_safe()`.
+2. Sensitive keys are redacted before any bytes are produced —
+   `utils.redact_mapping_value()`.
+3. The payload is serialized with deterministic key order and separators —
+   `utils.canonical_json()`.
+4. A stable digest is computed over the canonical bytes for lineage and hash
+   comparison — `utils.canonical_digest()`.
 
-### `WF-UTL-003` — Audit-Event Construction
-
-1. The emitting domain supplies its action, trace context, and payload meaning.
-2. IDs and UTC timestamps are validated.
-3. The payload is redacted and canonicalized.
-4. A bounded `AuditEvent v1` is constructed.
-5. Data persists the event through its owned audit-storage boundary.
+**Failure behaviour:** a value that cannot be canonicalized raises rather than being
+coerced to a lossy string, so digests never disagree across processes.
 
 ---
 
@@ -329,7 +383,7 @@ functional behavior.
 |---|---|---|---|---|
 | Completed | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent`, `create_audit_event`; module-level, not re-exported through `__init__.py`: `JsonValue`, `validate_non_empty`, `validate_utc`, `validate_trace_id` | **Standard library:** `collections.abc`, `datetime`, `json`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
 | Completed | `auth.py` | Define immutable authenticated principal and trace context. | `AuthContext`, `create_auth_context` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `audit.py` → strict contract-field validation |
-| Completed | `__init__.py` | Expose the supported shared-contract API. | `AuthContext`, `AuditEvent`, `create_auth_context`, `create_audit_event` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
+| Completed | `__init__.py` | Expose the supported shared-contract API. | `create_auth_context`, `create_audit_event` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
 
 #### Functional requirements
 
@@ -357,7 +411,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `metadata.py` | Normalize symbolic error codes and provide immutable built-in metadata. | `ErrorMetadata`, `normalize_error_code`, `get_error_metadata` | **Standard library:** `dataclasses`, `re`<br>**Required third-party:** None<br>**Local:** `exceptions.py` → `ValidationError` |
 | Completed | `routing.py` | Route a mapped error payload to an explicitly injected sink. | `ErrorSink`, `route_error_event` | **Standard library:** `collections.abc`, `typing`<br>**Required third-party:** None<br>**Local:** `mapping.py` → `map_exception` |
 | Completed | `validation.py` | Validate immutable catalogues and require explicitly approved codes. | `validate_error_catalog`, `require_error_definition` | **Standard library:** `collections.abc`, `types`<br>**Required third-party:** None<br>**Local:** `contracts.py`, `exceptions.py`, `metadata.py` → definitions, validation errors, normalization |
-| Completed | `__init__.py` | Expose the supported shared-error API. | Shared exceptions, mapping, metadata, and routing exports | **Standard library:** None<br>**Required third-party:** None<br>**Local:** all error feature files → approved exports |
+| Completed | `__init__.py` | Expose the supported shared-error API. | Mapping, metadata, routing, catalogue, and validation functions | **Standard library:** None<br>**Required third-party:** None<br>**Local:** all error feature files → approved exports |
 
 #### Functional requirements
 
@@ -403,7 +457,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 |---|---|---|---|---|
 | Completed | `clocks.py` | Define the injectable clock boundary and UTC system clock. | `Clock`, `SystemClock`, `utc_now` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
 | Completed | `timestamps.py` | Parse, format, age, and evaluate canonical UTC timestamps. | `parse_utc_timestamp`, `format_utc_timestamp`, `age_seconds`, `is_fresh` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `ValidationError` |
-| Completed | `__init__.py` | Expose the supported time API. | All clock and timestamp exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `clocks.py`, `timestamps.py` → approved exports |
+| Completed | `__init__.py` | Expose the supported time API. | `utc_now`, `parse_utc_timestamp`, `format_utc_timestamp`, `age_seconds`, `is_fresh` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `clocks.py`, `timestamps.py` → approved exports |
 
 #### Functional requirements
 
@@ -446,7 +500,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `redaction.py` | Define redaction policy/results and redact bounded text or JSON-safe mappings. | `RedactionPolicy`, `RedactionResult`, `get_default_redaction_policy`, `is_sensitive_key`, `redact_text_value`, `redact_mapping_value` | **Standard library:** `collections.abc`, `dataclasses`, `math`, `re`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py` → `SecurityError`, `ValidationError` |
-| Completed | `__init__.py` | Expose the supported secret-redaction API. | `RedactionPolicy`, `RedactionResult`, `get_default_redaction_policy`, `is_sensitive_key`, `redact_mapping_value`, `redact_text_value` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `redaction.py` → approved exports |
+| Completed | `__init__.py` | Expose the supported secret-redaction API. | `get_default_redaction_policy`, `is_sensitive_key`, `redact_mapping_value`, `redact_text_value` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `redaction.py` → approved exports |
 
 #### Functional requirements
 
@@ -472,7 +526,7 @@ repository `app/configs/env.json` loading base for typed domain settings.
 |---|---|---|---|---|
 | Completed | `models.py` | Define the immutable central `app/configs/env.json` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings`; module-level, not re-exported through `__init__.py`: `LogLevel`, `LogRender`, `LogCompression`, `Environment`, `RuntimeProfile` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
 | Completed | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping. | `load_settings` | **Standard library:** `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError` |
-| Completed | `__init__.py` | Expose the supported settings API. | Settings models and loader functions above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
+| Completed | `__init__.py` | Expose the supported settings API. | `load_settings` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
 
 #### Functional requirements
 
@@ -494,7 +548,7 @@ redacted structured-handler overrides for specialized entry points.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `logger.py` | Provide import-safe bound logger access, thread-safe lazy default activation, explicit override configuration and synchronization, source-aware human rendering, compressed rotation, color, lifecycle, and specialized routing. | `BoundLogger`, `logger`, `get_logger`, `configure_logging`, `flush_logging`, `shutdown_logging`, `RedactingFilter`, `StructuredFormatter` | **Standard library:** `atexit`, `collections.abc`, `copy`, `datetime`, `json`, `logging`, `logging.handlers`, `pathlib`, `queue`, `sys`, `threading`, `time`, `types`, `typing`, `zipfile`<br>**Required third-party:** None<br>**Local:** `errors/exceptions.py`; `time/timestamps.py`; `security/redaction.py`; `settings/loader.py`; `settings/models.py` → `LoggingSettings` (type-only) |
-| Completed | `__init__.py` | Expose the supported logging API without configuring logging. | All logging exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `logger.py` → approved exports |
+| Completed | `__init__.py` | Expose the supported logging API without configuring logging. | `get_logger`, `configure_logging`, `flush_logging`, `shutdown_logging` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `logger.py` → approved exports |
 
 #### Functional requirements
 
@@ -527,7 +581,7 @@ one completed outcome.
 | Completed | `models.py` | Define the exact immutable response, error, metadata, JSON-value, and risk-level contracts; redact and freeze extension evidence. | `StandardResponse`, `StandardError`, `ResponseMetadata`, `RiskLevel`, `JsonValue` | **Standard library:** `collections.abc`, `enum`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `errors/metadata.py`, `identity/identifiers.py`, `security/redaction.py` → code, trace, and redaction validation |
 | Completed | `timing.py` | Calculate one execution duration from a monotonic nanosecond start. | `get_execution_ms` | **Standard library:** `collections.abc`, `time`<br>**Required third-party:** None<br>**Local:** None |
 | Completed | `factories.py` | Build metadata and exclusive success/error responses, approve error codes, and safely normalize caught exceptions. | `build_response_metadata`, `success_response`, `error_response`, `exception_response` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `errors/`, `responses/models.py`, `responses/timing.py` → catalogue approval, safe mapping, response construction |
-| Completed | `__init__.py` | Expose the supported standard-response API. | All response exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** all response feature files → approved exports |
+| Completed | `__init__.py` | Expose the supported standard-response API. | `build_response_metadata`, `success_response`, `error_response`, `exception_response`, `get_execution_ms` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** all response feature files → approved exports |
 
 #### Canonical response contract
 
@@ -826,9 +880,9 @@ successfully.
 ```python
 from datetime import datetime, timezone
 
-from app.utils import AuthContext
+from app.utils import create_auth_context, generate_id
 
-context = AuthContext(
+context = create_auth_context(
     contract_version="v1",
     schema_id="utils.auth_context.v1",
     principal_id="user-123",
@@ -837,9 +891,9 @@ context = AuthContext(
     permissions=("backtest:run",),
     scopes=("portfolio:demo",),
     tenant_or_environment="dev",
-    request_id="req-8be20911-572d-42f7-bc52-e6844f8d2125",
-    workflow_id="wf-f4bccf77-6121-44e0-a480-17ae2043868d",
-    correlation_id="cor-0d5ab3cf-4003-47ec-a797-f70db66418a4",
+    request_id=generate_id("req"),
+    workflow_id=generate_id("wf"),
+    correlation_id=generate_id("cor"),
     issued_at=datetime.now(timezone.utc),
 )
 ```

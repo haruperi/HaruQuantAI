@@ -18,9 +18,6 @@ from app.services.brokers.contracts.enums import (
     BrokerId,
 )
 from app.utils import (
-    ValidationError as UtilsValidationError,
-)
-from app.utils import (
     format_utc_timestamp,
     redact_mapping_value,
     redact_text_value,
@@ -57,7 +54,7 @@ def _utc(value: datetime | None, name: str) -> None:
         return
     try:
         format_utc_timestamp(value)
-    except UtilsValidationError as error:
+    except Exception as error:
         message = f"{name} must be UTC-aware"
         raise ValueError(message) from error
 
@@ -166,7 +163,7 @@ def _request_id(value: str | None, name: str) -> None:
     _text(value, name)
     try:
         validate_id(value, expected_prefix="req")
-    except UtilsValidationError as error:
+    except Exception as error:
         message = f"{name} must be a valid req identifier"
         raise ValueError(message) from error
 
@@ -216,7 +213,7 @@ def _redacted(value: Mapping[str, object], name: str) -> Mapping[str, object]:
     """
     try:
         result = redact_mapping_value(value)
-    except UtilsValidationError as error:
+    except Exception as error:
         message = f"{name} must be a bounded JSON-safe mapping"
         raise ValueError(message) from error
     if result.truncated_paths:

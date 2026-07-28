@@ -1,5 +1,7 @@
 """Research-only Dukascopy canonical broker adapter."""
 
+from __future__ import annotations
+
 from datetime import UTC, datetime, timedelta
 from typing import Protocol, override
 
@@ -24,7 +26,6 @@ from app.services.brokers.dukascopy_ticks.instruments import (
 )
 from app.services.brokers.dukascopy_ticks.mapping import _map_ticks
 from app.services.brokers.dukascopy_ticks.transport import _DukascopyTransport
-from app.utils import StandardResponse  # noqa: TC001
 
 
 class _TickTransport(Protocol):

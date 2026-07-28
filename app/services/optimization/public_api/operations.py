@@ -7,7 +7,7 @@ import inspect
 import math
 import time
 from collections.abc import Callable, Mapping, Sequence
-from typing import ParamSpec, TypeVar, cast
+from typing import Any, Literal, ParamSpec, TypeVar, cast
 
 from app.services.optimization.errors import (
     OPTIMIZATION_ERROR_CATALOG,
@@ -44,18 +44,20 @@ from app.services.optimization.validation import (
     run_walk_forward_validation,
 )
 from app.utils import (
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
-    ValidationError,
     build_response_metadata,
     error_response,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     validate_id,
 )
+
+type JsonValue = Any
+type ResponseMetadata = Any
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 _P = ParamSpec("_P")
 _R = TypeVar("_R")
@@ -83,7 +85,7 @@ def _canonical_trace_context(
         if request_id is None and isinstance(candidate, str):
             try:
                 request_id = validate_id(candidate, expected_prefix="req")
-            except ValidationError:
+            except Exception:
                 continue
         candidate_correlation = getattr(value, "correlation_id", None)
         if correlation_id is None and isinstance(candidate_correlation, str):
@@ -91,7 +93,7 @@ def _canonical_trace_context(
                 correlation_id = validate_id(
                     candidate_correlation, expected_prefix="cor"
                 )
-            except ValidationError:
+            except Exception:
                 continue
         if request_id is not None and correlation_id is not None:
             break
@@ -565,7 +567,7 @@ def _with_request_id(request: SearchRequest, request_id: str | None) -> SearchRe
     )
 
 
-@_optimization_boundary(risk_level=RiskLevel.MEDIUM, requires_network=True)
+@_optimization_boundary(risk_level="medium", requires_network=True)
 def run_parameter_sweep(
     request: SearchRequest,
     adapter: BacktestExecutionAdapter,
@@ -580,7 +582,7 @@ def run_parameter_sweep(
     return _run_parameter_sweep(request, adapter, request_id=request_id)
 
 
-@_optimization_boundary(risk_level=RiskLevel.MEDIUM, requires_network=True)
+@_optimization_boundary(risk_level="medium", requires_network=True)
 def run_walk_forward_optimization(
     request: WalkForwardRequest,
     adapter: BacktestExecutionAdapter,
@@ -595,7 +597,7 @@ def run_walk_forward_optimization(
     return _run_walk_forward_optimization(request, adapter, request_id=request_id)
 
 
-@_optimization_boundary(risk_level=RiskLevel.MEDIUM, requires_network=True)
+@_optimization_boundary(risk_level="medium", requires_network=True)
 def run_walk_forward_matrix(
     requests: Sequence[WalkForwardRequest],
     adapter: BacktestExecutionAdapter,
@@ -616,7 +618,7 @@ def run_walk_forward_matrix(
     )
 
 
-@_optimization_boundary(risk_level=RiskLevel.MEDIUM, requires_network=False)
+@_optimization_boundary(risk_level="medium", requires_network=False)
 def run_robustness_analysis(
     request: RobustnessRequest,
     *,
@@ -635,7 +637,7 @@ def run_robustness_analysis(
     )
 
 
-@_optimization_boundary(risk_level=RiskLevel.LOW, requires_network=False)
+@_optimization_boundary(risk_level="low", requires_network=False)
 def compare_optimization_runs(
     results: Sequence[OptimizationResult], *, request_id: str | None = None
 ) -> OptimizationComparison:
@@ -647,7 +649,7 @@ def compare_optimization_runs(
     return _compare_optimization_runs(results, request_id=request_id)
 
 
-@_optimization_boundary(risk_level=RiskLevel.LOW, requires_network=False)
+@_optimization_boundary(risk_level="low", requires_network=False)
 def calculate_parameter_stability(
     ranked_candidates: Sequence[Mapping[str, object]],
     *,
@@ -664,7 +666,7 @@ def calculate_parameter_stability(
     )
 
 
-@_optimization_boundary(risk_level=RiskLevel.MEDIUM, requires_network=False)
+@_optimization_boundary(risk_level="medium", requires_network=False)
 def detect_overfit_parameters(
     in_sample: Mapping[str, float],
     out_of_sample: Mapping[str, float],
@@ -685,7 +687,7 @@ def detect_overfit_parameters(
     )
 
 
-@_optimization_boundary(risk_level=RiskLevel.LOW, requires_network=False)
+@_optimization_boundary(risk_level="low", requires_network=False)
 def rank_parameter_sets(
     candidates: Sequence[CandidateScore], *, request_id: str | None = None
 ) -> tuple[CandidateScore, ...]:
@@ -697,7 +699,7 @@ def rank_parameter_sets(
     return _rank_parameter_sets(candidates, request_id=request_id)
 
 
-@_optimization_boundary(risk_level=RiskLevel.MEDIUM, requires_network=False)
+@_optimization_boundary(risk_level="medium", requires_network=False)
 def calculate_robustness_score(
     checks: Sequence[bool], *, request_id: str | None = None
 ) -> RobustnessScore:
@@ -709,7 +711,7 @@ def calculate_robustness_score(
     return _calculate_robustness_score(checks, request_id=request_id)
 
 
-@_optimization_boundary(risk_level=RiskLevel.HIGH, requires_network=False)
+@_optimization_boundary(risk_level="high", requires_network=False)
 def build_optimization_handoff(
     request: EvidenceAssemblyRequest, *, request_id: str | None = None
 ) -> OptimizationResult:

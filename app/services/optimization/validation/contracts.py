@@ -13,7 +13,9 @@ from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from app.services.optimization.parameters import ParameterValue  # noqa: TC001
 from app.services.optimization.scoring import CandidateScore  # noqa: TC001
 from app.services.optimization.search import SearchRequest  # noqa: TC001
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class SplitMode(StrEnum):

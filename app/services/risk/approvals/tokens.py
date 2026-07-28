@@ -8,7 +8,7 @@ import secrets
 from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta
 from time import monotonic
-from typing import TYPE_CHECKING, NoReturn
+from typing import TYPE_CHECKING, Literal, NoReturn
 
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -26,7 +26,11 @@ from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
-from app.utils import RiskLevel, canonical_json, generate_id, logger
+from app.utils import canonical_json, generate_id, get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.risk.approvals.state import _TokenStateStore
@@ -365,7 +369,7 @@ class ApprovalTokenService:
         )
 
     @guard_risk_boundary(
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         read_only=False,
         modifies_database=True,
     )
@@ -609,7 +613,7 @@ class ApprovalTokenService:
         raise RiskDomainError(code, "approval token validation failed")
 
     @guard_risk_boundary(
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         read_only=False,
         modifies_database=True,
     )
@@ -757,7 +761,7 @@ class ApprovalTokenService:
         return result
 
     @guard_risk_boundary(
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         read_only=False,
         modifies_database=True,
     )

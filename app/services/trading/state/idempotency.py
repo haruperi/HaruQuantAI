@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -12,7 +12,12 @@ from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.state.stores import (
     TradingStateStore,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import RiskLevel, StandardResponse, canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 type ReservationStatus = Literal[
     "new",
@@ -239,7 +244,7 @@ def reserve_idempotency(
         return map_trading_error(error, {"request_id": request.request_id})
     return success_trading_response(
         reservation,
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         legacy_status=reservation.status,
         extensions={"request_id": request.request_id},
     )

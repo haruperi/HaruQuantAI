@@ -5,13 +5,30 @@ from __future__ import annotations
 import json
 import math
 from collections.abc import Mapping
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import ErrorDefinition, logger, redact_text_value
+from app.utils import get_logger, redact_text_value
+
+logger = get_logger(__name__)
 
 type JsonScalar = None | bool | int | float | str
 type ErrorSeverity = Literal["info", "warning", "error", "critical"]
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorDefinition:
+    """Immutable DATA-owned error catalogue entry."""
+
+    code: str
+    domain: str
+    description: str
+    category: str
+    severity: ErrorSeverity
+    retryable: bool
+    operator_action: str
+
 
 ERROR_SAFE_DETAILS_MAX_ITEMS = 64
 ERROR_SAFE_DETAILS_MAX_BYTES = 8_192

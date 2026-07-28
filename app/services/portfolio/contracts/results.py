@@ -18,7 +18,9 @@ from app.services.portfolio.contracts.requests import (
     _text,
     _utc,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class PortfolioComponentWeight(PortfolioContractModel):

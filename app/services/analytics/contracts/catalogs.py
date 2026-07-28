@@ -6,7 +6,9 @@ from collections.abc import Mapping
 from types import MappingProxyType
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _METRIC_KEYS = (
     "trade_count",

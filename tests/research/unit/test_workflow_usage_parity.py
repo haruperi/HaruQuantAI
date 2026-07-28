@@ -10,17 +10,17 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_DIR = ROOT / "tests/research/usage/workflows"
 README = ROOT / "app/services/research/README.md"
 EXPECTED = {
-    "WF-RES-001": "wf_res_001_prepare_research_dataset.py",
+    "WF-RES-SEC": "wf_res_sec_prepare_research_dataset.py",
     "WF-RES-002": "wf_res_002_build_core_metric_profile.py",
     "WF-RES-003": "wf_res_003_build_leakage_safe_feature_frame_time_splits.py",
     "WF-RES-004": "wf_res_004_analyze_session_seasonality_opportunity.py",
-    "WF-RES-005": "wf_res_005_run_edge_study_null_evidence.py",
+    "WF-RES-TER": "wf_res_ter_run_edge_study_null_evidence.py",
     "WF-RES-006": "wf_res_006_build_market_structure_profile.py",
     "WF-RES-007": "wf_res_007_forward_validate_calibrate_market_structure.py",
     "WF-RES-008": "wf_res_008_run_unsupervised_market_structure_research.py",
     "WF-RES-009": "wf_res_009_build_research_scorecard_profile_snapshot.py",
     "WF-RES-010": "wf_res_010_render_persist_research_artifact.py",
-    "WF-RES-011": "wf_res_011_run_complete_edge_lab_profile.py",
+    "WF-RES-PRI": "wf_res_pri_run_complete_edge_lab_profile.py",
 }
 
 

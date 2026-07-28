@@ -22,7 +22,9 @@ from app.services.strategy.contracts.responses import (
     unwrap_data_response,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
 
 
 @guard_strategy_boundary

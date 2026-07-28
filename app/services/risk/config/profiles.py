@@ -26,7 +26,11 @@ from pydantic import (
 from app.services.risk.config.mandates import DrawdownMode, LossReferenceBasis
 from app.services.risk.contracts import RiskDomainError, RiskErrorCode
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import RiskLevel, logger
+from app.utils import get_logger
+
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 _HASH_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
 _PROFILES = frozenset({"research", "simulation", "paper", "live"})
@@ -811,7 +815,7 @@ def _load_risk_config(profile: str, config_root: Path) -> RiskConfig:
     return config
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def load_risk_config(profile: str, config_root: Path) -> RiskConfig:
     """Load one selected YAML profile from an exact bounded root.
 
@@ -836,7 +840,7 @@ def load_risk_config(profile: str, config_root: Path) -> RiskConfig:
         ) from error
 
 
-@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
+@guard_risk_boundary(risk_level="medium", read_only=True)
 def compute_config_hash(config: RiskConfig) -> str:
     """Hash canonical exact JSON serialization of one Risk configuration.
 

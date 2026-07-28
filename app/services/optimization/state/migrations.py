@@ -8,7 +8,9 @@ from app.services.data import (
     MigrationStep,
 )
 from app.services.optimization.state.contracts import OPTIMIZATION_SCHEMA_VERSION
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _STATEMENTS = (
     """CREATE TABLE IF NOT EXISTS optimization_results (

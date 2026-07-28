@@ -11,7 +11,9 @@ from pydantic import ValidationError
 
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.journal.contracts import JournalEvent
-from app.utils import canonical_digest, canonical_json, logger
+from app.utils import canonical_digest, canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 type JournalReducer = Callable[
     [Mapping[str, object], JournalEvent], Mapping[str, object]

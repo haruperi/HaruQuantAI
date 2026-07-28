@@ -9,7 +9,9 @@ from typing import Protocol, runtime_checkable
 from pydantic import BaseModel, ConfigDict, model_validator
 
 from app.services.optimization.evidence import OptimizationResult  # noqa: TC001
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 OPTIMIZATION_SCHEMA_VERSION = "v1"
 _SHA256_HEX_LENGTH = 64

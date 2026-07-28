@@ -22,25 +22,31 @@ import asyncio
 import time
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 from app.services.data.contracts.errors import DATA_ERROR_MANIFEST, DataError
 from app.utils import (
-    JsonValue,
-    ResponseMetadata,
-    RiskLevel,
-    StandardResponse,
+    build_response_metadata,
     error_response,
     exception_response,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     validate_id,
 )
 
+logger = get_logger(__name__)
+
 # Utils re-raises these from ``exception_response``; mirrored here only so the
 # boundary runners can document the propagation contract without importing the
 # private Utils sentinel module.
+type JsonValue = (
+    None | bool | int | float | str | tuple[object, ...] | Mapping[str, object]
+)
+type StandardResponse[T] = Any
+type ResponseMetadata = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
 _PROPAGATED_EXCEPTIONS = (
     asyncio.CancelledError,
     GeneratorExit,
@@ -111,315 +117,267 @@ def _traits(
 _TRAITS: Mapping[str, OperationTraits] = {
     # FEAT-DATA-02 - Market Data Retrieval (provider/network reads).
     "data.market_data.fetch_market_dataset": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.get_market_data": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.get_tick_data": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.get_spread_data": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.discover_symbols": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.fetch_symbol_metadata": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.inspect_availability": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.fetch_historical_volume": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.get_symbol_metadata": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.list_symbols": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.get_data_availability": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.market_data.get_historical_volume": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     # FEAT-DATA-03 - Local Dataset Loading (local file reads).
-    "data.local_datasets.load_csv": _traits(RiskLevel.LOW, read_only=True),
-    "data.local_datasets.load_parquet": _traits(RiskLevel.LOW, read_only=True),
-    "data.local_datasets.load_local_dataset": _traits(RiskLevel.LOW, read_only=True),
+    "data.local_datasets.load_csv": _traits("low", read_only=True),
+    "data.local_datasets.load_parquet": _traits("low", read_only=True),
+    "data.local_datasets.load_local_dataset": _traits("low", read_only=True),
     # FEAT-DATA-04 - Synthetic Data Generation (pure, no I/O).
-    "data.synthetic_data.generate_synthetic_dataset": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.synthetic_data.generate_synthetic_ticks": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.synthetic_data.generate_synthetic_bars": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
+    "data.synthetic_data.generate_synthetic_dataset": _traits("none", read_only=True),
+    "data.synthetic_data.generate_synthetic_ticks": _traits("none", read_only=True),
+    "data.synthetic_data.generate_synthetic_bars": _traits("none", read_only=True),
     # FEAT-DATA-05 - Tick-Series Derivation.
-    "data.tick_derivation.generate_tick_series": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
+    "data.tick_derivation.generate_tick_series": _traits("none", read_only=True),
     "data.tick_derivation.generate_tick_series_to_parquet": _traits(
-        RiskLevel.MEDIUM, read_only=False, writes_file=True
+        "medium", read_only=False, writes_file=True
     ),
     # FEAT-DATA-06 - Data Persistence and Storage.
     "data.persistence.acquire_write_lock": _traits(
-        RiskLevel.LOW, read_only=False, writes_file=True
+        "low", read_only=False, writes_file=True
     ),
     "data.persistence.clear_cache_entry": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
     "data.persistence.clear_data_cache": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
     "data.persistence.create_backup": _traits(
-        RiskLevel.MEDIUM, read_only=False, writes_file=True
+        "medium", read_only=False, writes_file=True
     ),
-    "data.persistence.describe_import_dialects": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
+    "data.persistence.describe_import_dialects": _traits("none", read_only=True),
     "data.persistence.enforce_retention_policy": _traits(
-        RiskLevel.HIGH, read_only=False, writes_file=True
+        "high", read_only=False, writes_file=True
     ),
     "data.persistence.execute_transaction": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
-    "data.persistence.get_cache_entry": _traits(RiskLevel.LOW, read_only=True),
+    "data.persistence.get_cache_entry": _traits("low", read_only=True),
     "data.persistence.import_external_dataset": _traits(
-        RiskLevel.MEDIUM,
+        "medium",
         read_only=False,
         writes_file=True,
         modifies_database=True,
     ),
-    "data.persistence.load_dataset": _traits(RiskLevel.LOW, read_only=True),
+    "data.persistence.load_dataset": _traits("low", read_only=True),
     "data.persistence.put_cache_entry": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
     "data.persistence.restore_from_backup": _traits(
-        RiskLevel.HIGH, read_only=False, modifies_database=True, writes_file=True
+        "high", read_only=False, modifies_database=True, writes_file=True
     ),
     "data.persistence.run_data_migrations": _traits(
-        RiskLevel.HIGH, read_only=False, modifies_database=True
+        "high", read_only=False, modifies_database=True
     ),
     "data.persistence.run_domain_migrations": _traits(
-        RiskLevel.HIGH, read_only=False, modifies_database=True
+        "high", read_only=False, modifies_database=True
     ),
     "data.persistence.save_dataset": _traits(
-        RiskLevel.MEDIUM, read_only=False, writes_file=True
+        "medium", read_only=False, writes_file=True
     ),
     "data.persistence.save_market_data": _traits(
-        RiskLevel.MEDIUM, read_only=False, writes_file=True
+        "medium", read_only=False, writes_file=True
     ),
     # FEAT-DATA-07 - Data Quality and Validation (pure).
-    "data.quality.aggregate_flags": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.detect_extreme_spread_widening": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.quality.detect_flatline_periods": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.detect_price_jumps": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.detect_timestamp_gaps": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.detect_zero_volume_bars": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.get_quality_policy": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.inspect_data_quality": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.inspect_dataset_quality": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.inspect_records_quality": _traits(RiskLevel.NONE, read_only=True),
-    "data.quality.summarize_quality_remediation": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.quality.validate_symbol_metadata": _traits(RiskLevel.NONE, read_only=True),
+    "data.quality.aggregate_flags": _traits("none", read_only=True),
+    "data.quality.detect_extreme_spread_widening": _traits("none", read_only=True),
+    "data.quality.detect_flatline_periods": _traits("none", read_only=True),
+    "data.quality.detect_price_jumps": _traits("none", read_only=True),
+    "data.quality.detect_timestamp_gaps": _traits("none", read_only=True),
+    "data.quality.detect_zero_volume_bars": _traits("none", read_only=True),
+    "data.quality.get_quality_policy": _traits("none", read_only=True),
+    "data.quality.inspect_data_quality": _traits("none", read_only=True),
+    "data.quality.inspect_dataset_quality": _traits("none", read_only=True),
+    "data.quality.inspect_records_quality": _traits("none", read_only=True),
+    "data.quality.summarize_quality_remediation": _traits("none", read_only=True),
+    "data.quality.validate_symbol_metadata": _traits("none", read_only=True),
     # FEAT-DATA-08 - Data Transformation and Resampling (pure in-memory).
-    "data.transformation.aggregate_ticks": _traits(RiskLevel.NONE, read_only=True),
-    "data.transformation.aggregate_ticks_to_bars": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.transformation.align_datasets": _traits(RiskLevel.NONE, read_only=True),
-    "data.transformation.align_multitimeframe_data": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.transformation.resample_dataset": _traits(RiskLevel.NONE, read_only=True),
-    "data.transformation.resample_ohlcv": _traits(RiskLevel.NONE, read_only=True),
-    "data.transformation.to_ohlcv_dataframe": _traits(RiskLevel.NONE, read_only=True),
-    "data.transformation.to_tick_dataframe": _traits(RiskLevel.NONE, read_only=True),
+    "data.transformation.aggregate_ticks": _traits("none", read_only=True),
+    "data.transformation.aggregate_ticks_to_bars": _traits("none", read_only=True),
+    "data.transformation.align_datasets": _traits("none", read_only=True),
+    "data.transformation.align_multitimeframe_data": _traits("none", read_only=True),
+    "data.transformation.resample_dataset": _traits("none", read_only=True),
+    "data.transformation.resample_ohlcv": _traits("none", read_only=True),
+    "data.transformation.to_ohlcv_dataframe": _traits("none", read_only=True),
+    "data.transformation.to_tick_dataframe": _traits("none", read_only=True),
     # FEAT-DATA-09 - Time and Session Handling (pure).
-    "data.time_sessions.require_utc": _traits(RiskLevel.NONE, read_only=True),
-    "data.time_sessions.get_timeframe_spec": _traits(RiskLevel.NONE, read_only=True),
-    "data.time_sessions.validate_resample_target": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.time_sessions.classify_gap": _traits(RiskLevel.NONE, read_only=True),
-    "data.time_sessions.get_active_market_sessions": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.time_sessions.get_exchange_sessions": _traits(RiskLevel.NONE, read_only=True),
-    "data.time_sessions.get_current_schedule": _traits(RiskLevel.NONE, read_only=True),
-    "data.time_sessions.get_market_hours": _traits(RiskLevel.NONE, read_only=True),
-    "data.time_sessions.get_trading_sessions": _traits(RiskLevel.NONE, read_only=True),
-    "data.time_sessions.market_calendar.get_schedule": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
+    "data.time_sessions.require_utc": _traits("none", read_only=True),
+    "data.time_sessions.get_timeframe_spec": _traits("none", read_only=True),
+    "data.time_sessions.validate_resample_target": _traits("none", read_only=True),
+    "data.time_sessions.classify_gap": _traits("none", read_only=True),
+    "data.time_sessions.get_active_market_sessions": _traits("none", read_only=True),
+    "data.time_sessions.get_exchange_sessions": _traits("none", read_only=True),
+    "data.time_sessions.get_current_schedule": _traits("none", read_only=True),
+    "data.time_sessions.get_market_hours": _traits("none", read_only=True),
+    "data.time_sessions.get_trading_sessions": _traits("none", read_only=True),
+    "data.time_sessions.market_calendar.get_schedule": _traits("none", read_only=True),
     "data.time_sessions.weekly_schedule_provider.get_sessions": _traits(
-        RiskLevel.NONE, read_only=True
+        "none", read_only=True
     ),
     "data.time_sessions.weekly_schedule_provider.get_schedule": _traits(
-        RiskLevel.NONE, read_only=True
+        "none", read_only=True
     ),
     # FEAT-DATA-10 - Data Source Governance.
-    "data.sources.ensure_source": _traits(RiskLevel.LOW, read_only=False),
-    "data.sources.ensure_source_access": _traits(RiskLevel.LOW, read_only=False),
-    "data.sources.evaluate_source_policy": _traits(RiskLevel.LOW, read_only=True),
-    "data.sources.get_source_descriptor": _traits(RiskLevel.LOW, read_only=True),
-    "data.sources.list_composable_sources": _traits(RiskLevel.LOW, read_only=True),
-    "data.sources.list_registered_sources": _traits(RiskLevel.LOW, read_only=True),
-    "data.sources.promote_source": _traits(RiskLevel.MEDIUM, read_only=False),
-    "data.sources.register_source": _traits(RiskLevel.LOW, read_only=False),
-    "data.sources.resolve_source": _traits(RiskLevel.LOW, read_only=True),
-    "data.sources.verify_read_only_call": _traits(RiskLevel.NONE, read_only=True),
-    "data.sources.wrap_broker_client": _traits(RiskLevel.NONE, read_only=True),
+    "data.sources.ensure_source": _traits("low", read_only=False),
+    "data.sources.ensure_source_access": _traits("low", read_only=False),
+    "data.sources.evaluate_source_policy": _traits("low", read_only=True),
+    "data.sources.get_source_descriptor": _traits("low", read_only=True),
+    "data.sources.list_composable_sources": _traits("low", read_only=True),
+    "data.sources.list_registered_sources": _traits("low", read_only=True),
+    "data.sources.promote_source": _traits("medium", read_only=False),
+    "data.sources.register_source": _traits("low", read_only=False),
+    "data.sources.resolve_source": _traits("low", read_only=True),
+    "data.sources.verify_read_only_call": _traits("none", read_only=True),
+    "data.sources.wrap_broker_client": _traits("none", read_only=True),
     "data.sources.market_data_source.fetch": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.sources.market_data_source.list_symbols": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.sources.market_data_source.get_symbol_metadata": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
-    "data.sources.local_market_data_source.fetch": _traits(
-        RiskLevel.LOW, read_only=True
-    ),
+    "data.sources.local_market_data_source.fetch": _traits("low", read_only=True),
     "data.sources.local_market_data_source.list_symbols": _traits(
-        RiskLevel.LOW, read_only=True
+        "low", read_only=True
     ),
     "data.sources.local_market_data_source.get_symbol_metadata": _traits(
-        RiskLevel.LOW, read_only=True
+        "low", read_only=True
     ),
     # FEAT-DATA-11 - Economic Calendar.
-    "data.economic_calendar.calendar_state_provenance": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.economic_calendar.derive_calendar_state": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.economic_calendar.evaluate_calendar_state": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.economic_calendar.from_row": _traits(RiskLevel.NONE, read_only=True),
-    "data.economic_calendar.get_economic_events": _traits(
-        RiskLevel.LOW, read_only=True
-    ),
-    "data.economic_calendar.get_persisted_events": _traits(
-        RiskLevel.LOW, read_only=True
-    ),
-    "data.economic_calendar.get_symbol_economic_events": _traits(
-        RiskLevel.LOW, read_only=True
-    ),
-    "data.economic_calendar.get_symbol_event_profile": _traits(
-        RiskLevel.LOW, read_only=True
-    ),
-    "data.economic_calendar.is_news_restricted": _traits(RiskLevel.LOW, read_only=True),
-    "data.economic_calendar.is_news_restricted_events": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
+    "data.economic_calendar.calendar_state_provenance": _traits("none", read_only=True),
+    "data.economic_calendar.derive_calendar_state": _traits("none", read_only=True),
+    "data.economic_calendar.evaluate_calendar_state": _traits("none", read_only=True),
+    "data.economic_calendar.from_row": _traits("none", read_only=True),
+    "data.economic_calendar.get_economic_events": _traits("low", read_only=True),
+    "data.economic_calendar.get_persisted_events": _traits("low", read_only=True),
+    "data.economic_calendar.get_symbol_economic_events": _traits("low", read_only=True),
+    "data.economic_calendar.get_symbol_event_profile": _traits("low", read_only=True),
+    "data.economic_calendar.is_news_restricted": _traits("low", read_only=True),
+    "data.economic_calendar.is_news_restricted_events": _traits("none", read_only=True),
     "data.economic_calendar.populate_market_context_calendar": _traits(
-        RiskLevel.NONE, read_only=True
+        "none", read_only=True
     ),
     "data.economic_calendar.scrape_economic_calendar": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.economic_calendar.calendar_transport.fetch_site": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.economic_calendar.economic_calendar_provider.get_events": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.economic_calendar.calendar_scrape_provider.get_events": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.economic_calendar.economic_event_store.upsert": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
-    "data.economic_calendar.economic_event_store.query": _traits(
-        RiskLevel.LOW, read_only=True
-    ),
+    "data.economic_calendar.economic_event_store.query": _traits("low", read_only=True),
     "data.economic_calendar.economic_event_store.refresh_windows": _traits(
-        RiskLevel.NONE, read_only=True
+        "none", read_only=True
     ),
     "data.economic_calendar.scrape_result.to_dataframe": _traits(
-        RiskLevel.NONE, read_only=True
+        "none", read_only=True
     ),
     "data.economic_calendar.scrape_result.save": _traits(
-        RiskLevel.MEDIUM, read_only=False, writes_file=True
+        "medium", read_only=False, writes_file=True
     ),
-    "data.economic_calendar.scrape_result.serialize": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
-    "data.economic_calendar.scrape_result.deserialize": _traits(
-        RiskLevel.NONE, read_only=True
-    ),
+    "data.economic_calendar.scrape_result.serialize": _traits("none", read_only=True),
+    "data.economic_calendar.scrape_result.deserialize": _traits("none", read_only=True),
     # FEAT-DATA-12 - Real-Time Feed Lifecycle and Observability.
-    "data.realtime_feeds.start_internal_feed": _traits(RiskLevel.LOW, read_only=False),
-    "data.realtime_feeds.ingest_feed_event": _traits(RiskLevel.LOW, read_only=False),
-    "data.realtime_feeds.reconcile_feed_gap": _traits(RiskLevel.LOW, read_only=False),
-    "data.realtime_feeds.reconnect_feed": _traits(RiskLevel.LOW, read_only=False),
-    "data.realtime_feeds.read_feed_status": _traits(RiskLevel.LOW, read_only=True),
-    "data.realtime_feeds.get_feed_status": _traits(RiskLevel.LOW, read_only=True),
+    "data.realtime_feeds.start_internal_feed": _traits("low", read_only=False),
+    "data.realtime_feeds.ingest_feed_event": _traits("low", read_only=False),
+    "data.realtime_feeds.reconcile_feed_gap": _traits("low", read_only=False),
+    "data.realtime_feeds.reconnect_feed": _traits("low", read_only=False),
+    "data.realtime_feeds.read_feed_status": _traits("low", read_only=True),
+    "data.realtime_feeds.get_feed_status": _traits("low", read_only=True),
     # FEAT-DATA-13 - Scheduler and Job Management.
-    "data.data_jobs.derive_backfill_key": _traits(RiskLevel.NONE, read_only=True),
+    "data.data_jobs.derive_backfill_key": _traits("none", read_only=True),
     "data.data_jobs.execute_backfill_chunk": _traits(
-        RiskLevel.MEDIUM,
+        "medium",
         read_only=False,
         modifies_database=True,
         requires_network=True,
     ),
     "data.data_jobs.schedule_update_job": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
-    "data.data_jobs.read_update_job_status": _traits(RiskLevel.LOW, read_only=True),
+    "data.data_jobs.read_update_job_status": _traits("low", read_only=True),
     "data.data_jobs.run_data_update_job_once": _traits(
-        RiskLevel.MEDIUM,
+        "medium",
         read_only=False,
         modifies_database=True,
         requires_network=True,
     ),
     "data.data_jobs.create_data_update_job": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
     "data.data_jobs.start_data_update_job": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
     "data.data_jobs.stop_data_update_job": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
-    "data.data_jobs.get_data_update_job_status": _traits(RiskLevel.LOW, read_only=True),
+    "data.data_jobs.get_data_update_job_status": _traits("low", read_only=True),
     "data.data_jobs.recover_update_jobs": _traits(
-        RiskLevel.HIGH, read_only=False, modifies_database=True
+        "high", read_only=False, modifies_database=True
     ),
     # FEAT-DATA-14 - Cross-Domain Evidence (provider reads).
     "data.evidence.get_account_state_snapshot": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.evidence.get_fx_conversion_evidence": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.evidence.get_market_context_evidence": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.evidence.fx_rate_provider.get_rate_leg": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     "data.evidence.market_context_provider.get_market_context": _traits(
-        RiskLevel.LOW, read_only=True, requires_network=True
+        "low", read_only=True, requires_network=True
     ),
     # FEAT-DATA-15 - Audit Evidence.
     "data.audit.persist_audit_event": _traits(
-        RiskLevel.MEDIUM, read_only=False, modifies_database=True
+        "medium", read_only=False, modifies_database=True
     ),
-    "data.audit.query_audit_events": _traits(RiskLevel.LOW, read_only=True),
+    "data.audit.query_audit_events": _traits("low", read_only=True),
 }
 
 OPERATION_TRAITS: Mapping[str, OperationTraits] = _TRAITS
@@ -507,13 +465,13 @@ def build_data_response[T](
     """
     resolved_id, _ = resolve_operation_request_id(explicit=request_id)
     traits = _operation_traits(operation)
-    metadata = ResponseMetadata(
+    metadata = build_response_metadata(
         name=operation,
         domain="data",
         risk_level=traits.risk_level,
         request_id=resolved_id,
         correlation_id=correlation_id,
-        execution_ms=_elapsed_ms(start_time),
+        start_time=start_time,
         read_only=traits.read_only,
         writes_file=traits.writes_file,
         modifies_database=traits.modifies_database,
@@ -569,13 +527,13 @@ def build_exception_response[T](
     """
     resolved_id, _ = resolve_operation_request_id(explicit=request_id)
     traits = _operation_traits(operation)
-    metadata = ResponseMetadata(
+    metadata = build_response_metadata(
         name=operation,
         domain="data",
         risk_level=traits.risk_level,
         request_id=resolved_id,
         correlation_id=correlation_id,
-        execution_ms=_elapsed_ms(start_time),
+        start_time=start_time,
         read_only=traits.read_only,
         writes_file=traits.writes_file,
         modifies_database=traits.modifies_database,

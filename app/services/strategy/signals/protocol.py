@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
-from app.utils import logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.indicators import IndicatorResult
@@ -14,7 +18,6 @@ if TYPE_CHECKING:
         StrategySignalEvidence,
         ValidatedStrategyConfig,
     )
-    from app.utils import StandardResponse
 
 
 class SignalEvaluator(Protocol):

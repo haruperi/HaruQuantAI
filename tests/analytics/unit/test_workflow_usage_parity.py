@@ -10,11 +10,11 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_DIR = ROOT / "tests/analytics/usage/workflows"
 README = ROOT / "app/services/analytics/README.md"
 EXPECTED = {
-    "WF-ANLT-001": "wf_anlt_001_build_canonical_performance_report.py",
-    "WF-ANLT-002": "wf_anlt_002_calculate_grouped_analytics_evidence.py",
+    "WF-ANLT-PRI": "wf_anlt_pri_build_canonical_performance_report.py",
+    "WF-ANLT-TER": "wf_anlt_ter_calculate_grouped_analytics_evidence.py",
     "WF-ANLT-003": "wf_anlt_003_benchmark_relative_analysis.py",
     "WF-ANLT-005": "wf_anlt_005_build_dashboard_payload.py",
-    "WF-ANLT-006": "wf_anlt_006_adapt_upstream_result.py",
+    "WF-ANLT-SEC": "wf_anlt_sec_adapt_upstream_result.py",
     "WF-ANLT-007": "wf_anlt_007_run_statistical_validation.py",
     "WF-ANLT-008": "wf_anlt_008_serialize_hash_report.py",
     "WF-ANLT-009": "wf_anlt_009_build_portfolio_performance_report.py",

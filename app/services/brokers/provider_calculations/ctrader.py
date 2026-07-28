@@ -1,4 +1,6 @@
-# mypy: disable-error-code="attr-defined,no-any-return,has-type"
+type StandardResponse[T] = (
+    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
+)
 """cTrader provider-native calculation operations."""
 
 from decimal import Decimal
@@ -13,7 +15,6 @@ from app.services.brokers.ctrader_session.mapping import (
     _field,
     _optional,
 )
-from app.utils import StandardResponse  # noqa: TC001
 
 
 class _CTraderCalculationsMixin:

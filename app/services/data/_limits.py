@@ -26,7 +26,9 @@ from types import MappingProxyType
 from typing import Final
 
 from app.services.data.contracts import DataError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 WORKFLOW_CONTEXTS: Final[tuple[str, ...]] = (
     "research",

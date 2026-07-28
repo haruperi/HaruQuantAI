@@ -16,7 +16,9 @@ from pydantic import (
 
 from app.services.data.contracts._base import TracedOpenContract as _Contract
 from app.services.data.contracts.records import OHLCVRecord, SpreadRecord, TickRecord
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 MARKET_DATASET_SCHEMA: Final = "data.market_dataset.v1"
 NORMALIZATION_VERSION = "v1"

@@ -1,8 +1,9 @@
 """Private validation helpers shared by canonical DATA request boundaries."""
 
 from app.services.data.contracts.errors import DataError
-from app.utils import ValidationError as UtilsValidationError
-from app.utils import generate_id, logger, validate_id
+from app.utils import generate_id, get_logger, validate_id
+
+logger = get_logger(__name__)
 
 _LEGACY_REQ_ID_LEN = 68
 
@@ -21,7 +22,7 @@ def validate_request_id(value: str | None) -> None:
         return
     try:
         validate_id(value, expected_prefix="req")
-    except UtilsValidationError as error:
+    except Exception as error:
         if value.startswith("req-") and len(value) == _LEGACY_REQ_ID_LEN:
             return
         raise ValueError("request_id must be a prefixed UUID4 or stable ID") from error

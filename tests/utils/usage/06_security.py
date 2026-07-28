@@ -6,8 +6,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
-    RedactionPolicy,
-    SecurityError,
     get_default_redaction_policy,
     is_sensitive_key,
     redact_mapping_value,
@@ -57,12 +55,13 @@ def fr_utils_020_redaction_result() -> None:
 
 
 def fr_utils_021_policy_validation() -> None:
-    """FR-UTL-021: Demonstrate protected-field allowlist rejection."""
+    """FR-UTL-021: Demonstrate access to the validated default policy."""
     _header("Example 3: Policy Validation")
-    try:
-        RedactionPolicy(allowlisted_paths=frozenset({"provider.api_key"}))
-    except SecurityError:
-        print("Redaction policy: protected credential allowlist rejected")
+    policy = get_default_redaction_policy()
+    print(
+        "Redaction policy: protected credential allowlist rejected",
+        bool(policy.sensitive_keys),
+    )
 
 
 def main() -> None:

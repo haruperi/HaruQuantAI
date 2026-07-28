@@ -5,19 +5,43 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Final
+from typing import Final, Literal
 
 from app.utils import (
-    ErrorDefinition,
-    HaruQuantError,
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     generate_id,
-    logger,
+    get_logger,
     success_response,
     validate_error_catalog,
 )
+
+type StandardResponse[T] = object
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+
+class HaruQuantError(Exception):
+    """Local safe error base for Portfolio exceptions."""
+
+    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+@dataclass(frozen=True, slots=True)
+class ErrorDefinition:
+    """Immutable domain-owned error catalogue entry."""
+
+    code: str
+    domain: str
+    description: str
+    category: str
+    severity: Literal["info", "warning", "error", "critical"]
+    retryable: bool
+    operator_action: str
+
+
+logger = get_logger(__name__)
 
 _PORTFOLIO_ERROR_DEFINITIONS: tuple[ErrorDefinition, ...] = (
     ErrorDefinition(

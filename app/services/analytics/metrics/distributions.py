@@ -14,7 +14,9 @@ from app.services.analytics.contracts.models import (
     MetricEvidence,
     SectionEvidence,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _STDEV_MIN_SAMPLES = 2
 _SKEW_MIN_SAMPLES = 3

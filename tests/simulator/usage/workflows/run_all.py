@@ -16,14 +16,14 @@ from tests.simulator.usage.workflows._support import (
 )
 
 WORKFLOWS = (
-    "wf_sim_001_official_fx_backtest.py",
+    "wf_sim_pri_official_fx_backtest.py",
     "wf_sim_002_simulation_trader_operations.py",
-    "wf_sim_003_optimization_candidate_execution.py",
+    "wf_sim_ter_optimization_candidate_execution.py",
     "wf_sim_004_severe_data_quality_blocked_run.py",
     "wf_sim_005_deterministic_replay.py",
     "wf_sim_006_registered_strategy_security_rejection.py",
     "wf_sim_007_non_canonical_fast_research.py",
-    "wf_sim_009_portfolio_backtest.py",
+    "wf_sim_sec_portfolio_backtest.py",
     "wf_sim_010_tick_series_acquisition.py",
 )
 

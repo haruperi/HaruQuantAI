@@ -2,13 +2,19 @@
 
 from collections.abc import Mapping
 from decimal import Decimal, InvalidOperation
+from typing import Any, Literal
 
 from app.services.trading.contracts import OrderIntent, TradingError
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel, StandardResponse, logger
+from app.utils import get_logger
+
+type StandardResponse[T] = Any
+RiskLevel = Literal["none", "low", "medium", "high", "critical"]
+
+logger = get_logger(__name__)
 
 BROKER_OPERATION_TIMEOUT_SECONDS = Decimal(10)
 
@@ -173,7 +179,7 @@ def validate_adapter_capability(
         )
     return success_trading_response(
         None,
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         legacy_status="validated",
         extensions={"provider_id": intent.provider_id},
     )

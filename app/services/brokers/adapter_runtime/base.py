@@ -1,8 +1,8 @@
 """Invocation-local lifecycle and fail-closed adapter runtime."""
 
-# ruff: noqa: BLE001, C901 - canonical public-boundary normalization.
 from __future__ import annotations
 
+# ruff: noqa: BLE001, C901 - canonical public-boundary normalization.
 import asyncio
 import contextvars
 import functools
@@ -34,7 +34,9 @@ from app.services.brokers.contracts.responses import (
     build_broker_response,
 )
 from app.services.brokers.contracts.unsupported import _utc_now
-from app.utils import StandardResponse, generate_id, get_execution_ms, logger
+from app.utils import generate_id, get_execution_ms, get_logger
+
+logger = get_logger(__name__)
 
 
 class _UnsupportedAdapterBase:

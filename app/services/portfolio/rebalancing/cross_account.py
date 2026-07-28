@@ -8,7 +8,9 @@ from decimal import Decimal
 from types import MappingProxyType
 
 from app.services.portfolio.exceptions import PortfolioError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _MIN_OBSERVATIONS = 2
 

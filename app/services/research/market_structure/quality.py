@@ -13,7 +13,9 @@ from app.services.research.contracts import (
 from app.services.research.market_structure.profile import (
     canonical_structure_score,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -49,11 +51,11 @@ def evaluate_market_structure_quality(
         Advisory ``MarketStructureQualityReport``.
 
     Raises:
-        ValidationError: If resources are exceeded.
+        ValueError: If resources are exceeded.
     """
     logger.info("Evaluating Research market-structure quality")
     if len(prepared.data) > limits.max_rows:
-        raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     if not config.enable_quality:
         return MarketStructureQualityReport(
             "v1",
