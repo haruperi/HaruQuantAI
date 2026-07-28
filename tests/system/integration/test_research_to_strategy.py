@@ -74,12 +74,16 @@ def test_sys_wf_004_research_to_reviewed_strategy_candidate(tmp_path: Path) -> N
         research_request.model_dump(mode="json"),
     )
     assert report_status == 200
-    assert report["schema_id"] == "research.report.v1"
-    assert report["advisory_only"] is True
+    assert set(report) == {"status", "message", "data", "error", "metadata"}
+    assert report["status"] == "success"
+    assert report["error"] is None
+    research_report = report["data"]
+    assert research_report["schema_id"] == "research.report.v1"
+    assert research_report["advisory_only"] is True
 
     registration = make_registration()
     manifest = registration.manifest.model_copy(
-        update={"provenance_refs": (report["report_id"],)}
+        update={"provenance_refs": (research_report["report_id"],)}
     )
     registration = registration.model_copy(
         update={
@@ -100,5 +104,5 @@ def test_sys_wf_004_research_to_reviewed_strategy_candidate(tmp_path: Path) -> N
     assert mutation_status == 200
     assert mutation["status"] == "ACCEPTED"
     assert mutation["validated_ref"]["manifest"]["provenance_refs"] == [
-        report["report_id"]
+        research_report["report_id"]
     ]

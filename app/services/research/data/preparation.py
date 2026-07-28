@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 
-from app.services.data import to_ohlcv_dataframe
+from app.services.data import to_ohlcv_dataframe, unwrap_data_response
 from app.services.research.contracts import (
     CleaningConfig,
     DataQualityReport,
@@ -182,7 +182,17 @@ def clean_dataset(
         raise ValidationError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     if report.fatal_issues:
         raise ValidationError("RES_INPUT_INVALID", "FATAL_QUALITY_ISSUES")
-    frame = to_ohlcv_dataframe(dataset).copy(deep=True)
+    frame_response = to_ohlcv_dataframe(dataset)
+    if isinstance(frame_response, pd.DataFrame):
+        # Keep isolated legacy test doubles compatible while production Data
+        # calls are consumed through the StandardResponse boundary.
+        frame = frame_response.copy(deep=True)
+    else:
+        frame = unwrap_data_response(
+            frame_response,
+            operation="research.data.clean_dataset",
+            request_id=frame_response.metadata.request_id,
+        ).copy(deep=True)
     frame, duplicate_actions = _clean_duplicates(frame, config.duplicate_strategy)
     frame, calendar_warnings, calendar_actions = _clean_calendar(
         frame, config.non_trading_period_strategy

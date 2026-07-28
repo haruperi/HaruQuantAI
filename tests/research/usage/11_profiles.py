@@ -190,11 +190,14 @@ def fr_res_096() -> None:
         (Path.cwd() / ".research-usage-artifacts").resolve(),
         selected_stages=("data", "metrics"),
     )
-    report = run_edge_lab_profile(
+    response = run_edge_lab_profile(
         make_dataset(),
         hypothesis="Returns persist over one bounded research bar.",
         config=config,
     )
+    assert response.status == "success"
+    report = response.data
+    assert isinstance(report, ResearchReport)
     print(
         "FR-RES-096 "
         f"stages={report.evidence['selected_stages']} "

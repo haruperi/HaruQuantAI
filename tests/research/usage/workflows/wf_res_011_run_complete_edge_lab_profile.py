@@ -43,14 +43,17 @@ def main() -> None:
 
         # Stage 2 — Validate selected stages and execute them in canonical dependency order.
         _stage(2)
-        report = run_edge_lab_profile(
+        response = run_edge_lab_profile(
             dataset,
             hypothesis="Bounded MT5 returns contain measurable structure.",
             config=config,
         )
+        assert response.status == "success"
+        report = response.data
 
         # Stage 3 — Assemble bounded provenance, quality, statistics, warnings, and stage evidence.
         _stage(3)
+        assert report is not None
         assert report.evidence["selected_stages"] == ["data", "metrics"]
         print(
             "Provenance entries:",

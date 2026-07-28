@@ -60,14 +60,17 @@ def main() -> None:
 
         # Stage 1 — Receive a versioned Research result, AuthContext, and approved destination.
         _stage(1)
-        report = run_edge_lab_profile(
+        response = run_edge_lab_profile(
             live_market_dataset(),
             hypothesis="Bounded MT5 returns contain measurable structure.",
             config=make_edge_lab_config(root, selected_stages=("data", "metrics")),
         )
+        assert response.status == "success"
+        report = response.data
 
         # Stage 2 — Mask sensitive and forbidden forward fields before serialization.
         _stage(2)
+        assert report is not None
         masked = mask_research_artifact(
             {
                 "schema_id": report.schema_id,

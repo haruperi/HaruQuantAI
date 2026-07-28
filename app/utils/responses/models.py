@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 import re
 from collections.abc import Mapping
+from dataclasses import is_dataclass
 from enum import StrEnum
 from types import MappingProxyType
 from typing import Literal, Self
@@ -399,7 +400,9 @@ class StandardResponse[T](BaseModel):
             ValidationError: If immutable mapping contents are unsupported,
                 cyclic, unsafe, or exceed shared serialization bounds.
         """
-        if isinstance(value, MappingProxyType):
+        if isinstance(value, MappingProxyType) or (
+            is_dataclass(value) and not isinstance(value, type)
+        ):
             return to_json_safe(value)
         return handler(value)
 

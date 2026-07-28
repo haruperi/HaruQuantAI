@@ -71,6 +71,16 @@ Contract definitions match `docs/PROJECT.md`. Commands and requests are owned by
 |---|---|---|---|---|
 | Completed | `ResearchReport` | `v1` | `UI/API` | Return advisory research evidence and hypothesis results; leakage-gate failure blocks publication. |
 
+### StandardResponse v1 boundary
+
+The package-root `run_edge_lab_profile` operation returns the Utils-owned
+`StandardResponse[ResearchReport]` envelope. The complete report is placed
+directly in `data`; failures use the immutable Research-owned error catalogue
+and return `data=None`. The response metadata identifies
+`research.run_edge_lab_profile` as low-risk, read-only, non-networked, and free
+of file, database, and trade side effects. Feature-module stage functions remain
+raw internal composition APIs and are wrapped only once at this root boundary.
+
 `ResearchReport` is the only registered cross-domain Research result in the initial
 build. Prepared datasets, stage profiles/results, scorecards, snapshots, warnings, and
 artifact references are Research-internal assembly types or are nested inside the
@@ -589,7 +599,7 @@ symbolic details:
 
 | Error class | Approved Research codes |
 |---|---|
-| `ConfigurationError` | `RES_CONFIGURATION_INVALID`, `RES_STAGE_DEPENDENCY_INVALID` |
+| `ConfigurationError` | `RES_CONFIGURATION_INVALID`, `RES_STAGE_DEPENDENCY_INVALID`, `RES_STAGE_UNAVAILABLE` |
 | `ValidationError` | `RES_INPUT_INVALID`, `RES_INSUFFICIENT_DATA`, `RES_NONFINITE_DATA`, `RES_RESOURCE_LIMIT_EXCEEDED`, `RES_VERSION_INCOMPATIBLE`, `RES_MODEL_FIT_FAILED` |
 | `SecurityError` | `RES_PERMISSION_DENIED`, `RES_LEAKAGE_DETECTED`, `RES_ARTIFACT_PATH_REJECTED`, `RES_SENSITIVE_OUTPUT_REJECTED` |
 | `HaruQuantError` | `RES_ARTIFACT_CONFLICT`, `RES_ARTIFACT_TOO_LARGE`, `RES_ARTIFACT_ATOMICITY_UNAVAILABLE`, `RES_ARTIFACT_WRITE_FAILED`, `RES_AUDIT_PERSISTENCE_FAILED` |
@@ -1126,7 +1136,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 | Completed | `scorecard.py` | Build one deterministic advisory scorecard. | `build_research_scorecard` | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** contracts; metrics; studies; seasonality; market_structure; Analytics `PerformanceReport` |
 | Completed | `snapshot.py` | Normalize approved versioned stage outputs. | `build_research_profile_snapshot`, `build_profile_summary`, `build_dashboard_summary` | **Standard library:** datetime, typing<br>**Required third-party:** None<br>**Local:** contracts; scorecard.py |
 | Completed | `rendering.py` | Render JSON-compatible, Markdown, comparison, and multi-symbol reports without writing. | `render_research_report`, `render_profile_comparison`, `generate_multi_symbol_report` | **Standard library:** json, typing<br>**Required third-party:** None<br>**Local:** contracts; snapshot.py |
-| Completed | `workflow.py` | Execute all selected deterministic Research stages in canonical dependency order and construct `ResearchReport v1`; invalid dependencies fail closed. | `run_edge_lab_profile` | **Standard library:** collections, dataclasses, typing<br>**Required third-party:** pandas/numpy through selected stages<br>**Local:** Research feature APIs; Data `MarketDataset`; Analytics `PerformanceReport`; Utils validation/hash/logging |
+| Completed | `workflow.py` | Execute all selected deterministic Research stages in canonical dependency order and construct `ResearchReport v1` inside one standard response; invalid dependencies fail closed. | `run_edge_lab_profile` | **Standard library:** collections, dataclasses, time, typing<br>**Required third-party:** pandas/numpy through selected stages<br>**Local:** Research feature APIs and error catalogue; Data `MarketDataset`; Analytics `PerformanceReport`; Utils validation/hash/logging/response contracts |
 | Completed | `__init__.py` | Expose the completed profiles API. | Profile builders, renderers, `run_edge_lab_profile` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** focused profile files |
 
 ### Configuration and Limits Manifest
@@ -1147,7 +1157,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 | Completed | `FR-RES-093` | Render a canonical report as JSON-compatible data or Markdown with UTC metadata and no persistence side effect. | `render_research_report(report: ResearchReport, *, format: Literal["json", "markdown"]) -> JSONValue \| str` | Read-only | Pending taxonomy: unsupported format/non-serializable report | **Usage:** `11_profiles.py::fr_res_093()`<br>**Unit:** `test_rendering.py::test_render_report_uses_utc_and_no_io()` |
 | Completed | `FR-RES-094` | Render a Markdown comparison of two compatible snapshots while exposing schema/config/dataset differences. | `render_profile_comparison(left: ResearchProfileSnapshot, right: ResearchProfileSnapshot) -> str` | Read-only | Pending taxonomy: incompatible schema/snapshot | **Usage:** `11_profiles.py::fr_res_094()`<br>**Unit:** `test_rendering.py::test_comparison_rejects_incompatible_schema()` |
 | Completed | `FR-RES-095` | Render per-symbol and combined advisory summaries in memory while preserving individual failures/warnings; it shall not write files. | `generate_multi_symbol_report(reports: Mapping[str, ResearchReport], *, format: Literal["json", "markdown"]) -> JSONValue \| str` | Read-only | Pending taxonomy/resource: empty/invalid/oversized report set | **Usage:** `11_profiles.py::fr_res_095()`<br>**Unit:** `test_rendering.py::test_multi_symbol_preserves_partial_warnings()` |
-| Completed | `FR-RES-096` | Execute selected `data`, `features`, `leakage`, `metrics`, `statistics`, `studies`, `seasonality`, `market_structure`, `modeling`, and `profiles` APIs in canonical dependency order and return advisory `ResearchReport v1` while leaving provider reads, cache, scheduling, database/artifact writes, and strategy submission external. | `run_edge_lab_profile(dataset: MarketDataset, *, hypothesis: str, config: EdgeLabConfig, performance: PerformanceReport \| None = None) -> ResearchReport` | Read-only | `ValidationError[RES_INPUT_INVALID\|RES_STAGE_DEPENDENCY_INVALID\|RES_STAGE_UNAVAILABLE]` or typed selected-stage failure | **Usage:** `tests/research/usage/11_profiles.py::fr_res_096()`<br>**Unit:** `tests/research/unit/test_workflow.py::test_edge_lab_executes_every_configured_stage()`<br>**System:** `tests/system/integration/test_research_to_strategy.py` |
+| Completed | `FR-RES-096` | Execute selected `data`, `features`, `leakage`, `metrics`, `statistics`, `studies`, `seasonality`, `market_structure`, `modeling`, and `profiles` APIs in canonical dependency order and return advisory `ResearchReport v1` directly in `StandardResponse.data` while leaving provider reads, cache, scheduling, database/artifact writes, and strategy submission external. | `run_edge_lab_profile(dataset: MarketDataset, *, hypothesis: str, config: EdgeLabConfig, performance: PerformanceReport \| None = None) -> StandardResponse[ResearchReport]` | Read-only | `StandardResponse.error` with approved Research code, including `RES_INPUT_INVALID`, `RES_STAGE_DEPENDENCY_INVALID`, or `RES_STAGE_UNAVAILABLE`; unexpected failures map safely to `INTERNAL_ERROR` | **Usage:** `tests/research/usage/11_profiles.py::fr_res_096()`<br>**Unit:** `tests/research/unit/test_workflow.py`<br>**System:** `tests/system/integration/test_research_to_strategy.py` |
 
 **Implementation notes:**
 

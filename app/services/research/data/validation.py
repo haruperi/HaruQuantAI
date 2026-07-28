@@ -7,7 +7,12 @@ from collections.abc import Mapping
 import numpy as np
 import pandas as pd
 
-from app.services.data import DataError, MarketDataset, to_ohlcv_dataframe
+from app.services.data import (
+    DataError,
+    MarketDataset,
+    to_ohlcv_dataframe,
+    unwrap_data_response,
+)
 from app.services.research.contracts import (
     DataQualityReport,
     ResearchResourceLimits,
@@ -126,7 +131,17 @@ def validate_dataset(
     if dataset.data_kind != "bars" or dataset.record_count == 0:
         raise ValidationError("RES_INPUT_INVALID", "NONEMPTY_BAR_DATASET_REQUIRED")
     try:
-        frame = to_ohlcv_dataframe(dataset)
+        frame_response = to_ohlcv_dataframe(dataset)
+        if isinstance(frame_response, pd.DataFrame):
+            # Keep isolated legacy test doubles compatible while production
+            # Data calls are consumed through the StandardResponse boundary.
+            frame = frame_response
+        else:
+            frame = unwrap_data_response(
+                frame_response,
+                operation="research.data.validate_dataset",
+                request_id=frame_response.metadata.request_id,
+            )
     except DataError as error:
         logger.error("Data projection failed during Research validation")
         raise ValidationError("RES_INPUT_INVALID", "DATA_PROJECTION_FAILED") from error

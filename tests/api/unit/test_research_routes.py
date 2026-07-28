@@ -32,7 +32,7 @@ def _app(*, authenticated: bool) -> FastAPI:
 
 
 def test_only_registered_report_crosses_boundary(tmp_path: Path) -> None:
-    """Verify authenticated Research route returns only ResearchReport v1."""
+    """Verify authenticated Research route returns a standard response."""
     request = ResearchRunRequest(
         hypothesis="Returns persist over one research bar.",
         dataset=make_dataset(),
@@ -46,10 +46,13 @@ def test_only_registered_report_crosses_boundary(tmp_path: Path) -> None:
     )
 
     assert status_code == 200, body
-    assert body["schema_id"] == "research.report.v1"
-    assert body["hypothesis"] == request.hypothesis
-    assert body["advisory_only"] is True
-    assert "data" not in body
+    assert set(body) == {"status", "message", "data", "error", "metadata"}
+    assert body["status"] == "success"
+    assert body["error"] is None
+    assert body["data"]["schema_id"] == "research.report.v1"
+    assert body["data"]["hypothesis"] == request.hypothesis
+    assert body["data"]["advisory_only"] is True
+    assert body["metadata"]["name"] == "research.run_edge_lab_profile"
 
 
 def test_research_route_fails_closed_without_authentication(tmp_path: Path) -> None:

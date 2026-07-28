@@ -58,6 +58,7 @@ def test_standard_response_has_exact_top_level_shape_and_raw_data() -> None:
         "metadata",
     }
     assert not isinstance(response.data, dict)
+    assert response.model_dump(mode="json")["data"] == {"value": 7}
 
 
 def test_success_response_allows_none_data() -> None:

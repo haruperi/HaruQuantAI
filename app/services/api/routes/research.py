@@ -9,16 +9,16 @@ from app.services.api.contracts import (
 )
 from app.services.api.identity import require_auth_context, require_human_permission
 from app.services.research import ResearchReport, run_edge_lab_profile
-from app.utils import AuthContext, logger
+from app.utils import AuthContext, StandardResponse, logger
 
 router = APIRouter(prefix="/api/research", tags=["research"])
 
 
-@router.post("/run", response_model=ResearchReport)
+@router.post("/run", response_model=StandardResponse[ResearchReport])
 def _run_research(
     request: ResearchRunRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
-) -> ResearchReport:
+) -> StandardResponse[ResearchReport]:
     """Delegate one authenticated bounded run to Research.
 
     Args:
@@ -26,7 +26,7 @@ def _run_research(
         auth: Authenticated human principal.
 
     Returns:
-        Registered advisory Research report.
+        Standard response containing the registered advisory Research report.
     """
     logger.info("Delegating authenticated Research run")
     require_human_permission(auth, "research:run")

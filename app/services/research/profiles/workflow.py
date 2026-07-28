@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from time import perf_counter_ns
 from typing import TYPE_CHECKING
 
 from app.services.research.contracts import (
@@ -15,6 +16,7 @@ from app.services.research.contracts import (
     ResearchWarning,
     UnsupervisedResearchResult,
 )
+from app.services.research.contracts.errors import RESEARCH_ERROR_CATALOG
 from app.services.research.data import prepare_research_dataset
 from app.services.research.features import build_research_feature_frame
 from app.services.research.leakage import (
@@ -42,7 +44,21 @@ from app.services.research.studies import (
     run_eds_session,
     run_eds_trend_persistence,
 )
-from app.utils import ValidationError, canonical_digest, logger
+from app.utils import (
+    ConfigurationError,
+    JsonValue,
+    ResponseMetadata,
+    RiskLevel,
+    StandardResponse,
+    ValidationError,
+    build_response_metadata,
+    canonical_digest,
+    exception_response,
+    generate_id,
+    get_execution_ms,
+    logger,
+    success_response,
+)
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -238,10 +254,10 @@ def _require_stage[T](
         The narrowed stage result.
 
     Raises:
-        ValidationError: If the prerequisite is absent.
+        ConfigurationError: If the prerequisite is absent.
     """
     if value is None:
-        raise ValidationError("RES_STAGE_DEPENDENCY_INVALID", detail)
+        raise ConfigurationError("RES_STAGE_DEPENDENCY_INVALID", detail)
     return value
 
 
@@ -344,20 +360,20 @@ def _validate_selection(config: EdgeLabConfig) -> None:
         config: Complete Edge Lab configuration.
 
     Raises:
-        ValidationError: If a stage is unavailable or lacks a prerequisite.
+        ConfigurationError: If a stage is unavailable or lacks a prerequisite.
     """
     selected = set(config.selected_stages)
     if "data" not in selected:
-        raise ValidationError("RES_STAGE_DEPENDENCY_INVALID", "DATA_STAGE_REQUIRED")
+        raise ConfigurationError("RES_STAGE_DEPENDENCY_INVALID", "DATA_STAGE_REQUIRED")
     if selected - _IMPLEMENTED_STAGES:
-        raise ValidationError("RES_STAGE_UNAVAILABLE", "UNAVAILABLE_SELECTED_STAGE")
+        raise ConfigurationError("RES_STAGE_UNAVAILABLE", "UNAVAILABLE_SELECTED_STAGE")
     if "leakage" in selected and "features" not in selected:
-        raise ValidationError(
+        raise ConfigurationError(
             "RES_STAGE_DEPENDENCY_INVALID",
             "LEAKAGE_REQUIRES_FEATURES",
         )
     if "studies" in selected and not {"features", "leakage"} <= selected:
-        raise ValidationError(
+        raise ConfigurationError(
             "RES_STAGE_DEPENDENCY_INVALID",
             "STUDIES_REQUIRE_SAFE_FEATURES",
         )
@@ -595,13 +611,26 @@ _STAGE_RUNNERS: Mapping[str, Callable[[_RunState], None]] = {
 }
 
 
+def _validate_hypothesis(hypothesis: str) -> None:
+    """Validate the explicit hypothesis at the workflow boundary.
+
+    Args:
+        hypothesis: Explicit researcher-supplied hypothesis text.
+
+    Raises:
+        ValidationError: If the hypothesis is empty or padded.
+    """
+    if not hypothesis or hypothesis != hypothesis.strip():
+        raise ValidationError("RES_INPUT_INVALID", "INVALID_HYPOTHESIS")
+
+
 def run_edge_lab_profile(
     dataset: MarketDataset,
     *,
     hypothesis: str,
     config: EdgeLabConfig,
     performance: PerformanceReport | None = None,
-) -> ResearchReport:
+) -> StandardResponse[ResearchReport]:
     """Run selected deterministic stages and build an advisory report.
 
     Args:
@@ -611,61 +640,103 @@ def run_edge_lab_profile(
         performance: Optional Analytics evidence supplied by the orchestrator.
 
     Returns:
-        Immutable advisory ``ResearchReport v1``.
+        Successful or failed standard response containing an advisory
+        ``ResearchReport v1`` directly in ``data``.
 
     Raises:
-        ValidationError: If the hypothesis, stage selection, or input is invalid.
+        ConfigurationError: If stage selection or dependencies are invalid.
+        ValidationError: If the hypothesis, input, or selected stage evidence
+            is invalid.
+        BaseException: Process interruption and asynchronous cancellation are
+            re-raised by the standard response exception boundary.
     """
-    logger.info("Running bounded Research Edge Lab profile")
-    if not hypothesis or hypothesis != hypothesis.strip():
-        raise ValidationError("RES_INPUT_INVALID", "INVALID_HYPOTHESIS")
-    _validate_selection(config)
-    state = _build_state(
-        dataset,
-        config=config,
-        performance=performance,
-    )
-    selected = set(config.selected_stages)
-    for stage, runner in _STAGE_RUNNERS.items():
-        if stage in selected:
-            runner(state)
+    start_time = perf_counter_ns()
+    request_id = generate_id("req")
+    extensions: dict[str, JsonValue] = {"workflow_version": "v1"}
 
-    evidence: dict[str, JSONValue] = {
-        "selected_stages": _strings(config.selected_stages),
-    }
-    evidence.update(state.stages)
-    if performance is not None:
-        evidence["performance_report_ref"] = performance.report_id
+    def _metadata() -> ResponseMetadata:
+        """Build response metadata for this bounded workflow call.
 
-    report_material = {
-        "hypothesis": hypothesis,
-        "dataset_hash": state.prepared.dataset_hash,
-        "configuration_hash": state.prepared.configuration_hash,
-        "selected_stages": _strings(config.selected_stages),
-    }
-    report_hash = canonical_digest(report_material)
-    return ResearchReport(
-        contract_version="v1",
-        schema_id="research.report.v1",
-        report_id=f"research-report-{report_hash[:24]}",
-        hypothesis=hypothesis,
-        evidence=evidence,
-        seeds={
-            "statistics": config.statistics.seed,
-            "modeling": config.modeling.seed,
-        },
-        configuration_hash=state.prepared.configuration_hash,
-        dataset_hash=state.prepared.dataset_hash,
-        source_references=state.prepared.source_references,
-        warnings=tuple(state.warnings),
-        generated_at=dataset.available_at,
-        dependency_versions={
-            "data": dataset.normalization_version,
-            "research": "v1",
-        },
-        duration_ms=0.0,
-        advisory_only=True,
-    )
+        Returns:
+            Immutable standard response metadata.
+        """
+        return build_response_metadata(
+            name="research.run_edge_lab_profile",
+            domain="research",
+            risk_level=RiskLevel.LOW,
+            request_id=request_id,
+            start_time=start_time,
+            read_only=True,
+            writes_file=False,
+            modifies_database=False,
+            places_trade=False,
+            requires_network=False,
+            extensions=extensions,
+        )
+
+    try:
+        logger.info("Running bounded Research Edge Lab profile")
+        _validate_hypothesis(hypothesis)
+        extensions["selected_stages"] = tuple(config.selected_stages)
+        _validate_selection(config)
+        state = _build_state(
+            dataset,
+            config=config,
+            performance=performance,
+        )
+        selected = set(config.selected_stages)
+        for stage, runner in _STAGE_RUNNERS.items():
+            if stage in selected:
+                runner(state)
+
+        evidence: dict[str, JSONValue] = {
+            "selected_stages": _strings(config.selected_stages),
+        }
+        evidence.update(state.stages)
+        if performance is not None:
+            evidence["performance_report_ref"] = performance.report_id
+
+        report_material = {
+            "hypothesis": hypothesis,
+            "dataset_hash": state.prepared.dataset_hash,
+            "configuration_hash": state.prepared.configuration_hash,
+            "selected_stages": _strings(config.selected_stages),
+        }
+        report_hash = canonical_digest(report_material)
+        report = ResearchReport(
+            contract_version="v1",
+            schema_id="research.report.v1",
+            report_id=f"research-report-{report_hash[:24]}",
+            hypothesis=hypothesis,
+            evidence=evidence,
+            seeds={
+                "statistics": config.statistics.seed,
+                "modeling": config.modeling.seed,
+            },
+            configuration_hash=state.prepared.configuration_hash,
+            dataset_hash=state.prepared.dataset_hash,
+            source_references=state.prepared.source_references,
+            warnings=tuple(state.warnings),
+            generated_at=dataset.available_at,
+            dependency_versions={
+                "data": dataset.normalization_version,
+                "research": "v1",
+            },
+            duration_ms=get_execution_ms(start_time),
+            advisory_only=True,
+        )
+        return success_response(
+            report,
+            message="Research Edge Lab profile completed",
+            metadata=_metadata(),
+        )
+    except Exception as error:  # noqa: BLE001 - public response boundary.
+        return exception_response(
+            error,
+            message="Research Edge Lab profile failed",
+            metadata=_metadata(),
+            catalog=RESEARCH_ERROR_CATALOG,
+        )
 
 
 __all__ = ("run_edge_lab_profile",)
