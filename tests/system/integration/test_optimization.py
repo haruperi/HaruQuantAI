@@ -83,7 +83,9 @@ def test_sys_wf_003_approved_optimization_adoption(tmp_path: Path) -> None:
         engine_version="v1",
         simulation_runner=runner,
     )
-    result = run_parameter_sweep(search_request(), adapter)
+    response = run_parameter_sweep(search_request(), adapter)
+    assert response.data is not None
+    result = response.data
     parameters = result.ranked_candidates[0]["executable_parameters"]
     registration = make_registration()
     strategy_manifest = registration.manifest.model_copy(

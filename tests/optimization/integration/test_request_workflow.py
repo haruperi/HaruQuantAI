@@ -16,5 +16,7 @@ def test_optimization_and_robustness_requests_return_typed_evidence() -> None:
     logger.debug("Testing WF-OPT-001 request packaging")
     optimization = run_parameter_sweep(search_request(), FakeAdapter())
     robustness = run_robustness_analysis(monte_carlo_request(), max_simulations=5)
-    assert optimization.schema_id == "optimization.result.v1"
-    assert robustness.schema_id == "optimization.robustness.v1"
+    assert optimization.data is not None
+    assert robustness.data is not None
+    assert optimization.data.schema_id == "optimization.result.v1"
+    assert robustness.data.schema_id == "optimization.robustness.v1"

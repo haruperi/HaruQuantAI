@@ -5,21 +5,111 @@ from __future__ import annotations
 from collections.abc import Mapping
 from types import MappingProxyType
 
-from app.utils import HaruQuantError, logger, redact_mapping_value
+from app.utils import (
+    ErrorDefinition,
+    HaruQuantError,
+    logger,
+    redact_mapping_value,
+    validate_error_catalog,
+)
 
-OPTIMIZATION_ERROR_CODES = frozenset(
-    {
-        "OPT_ADAPTER_INCOMPATIBLE",
-        "OPT_CONSTRAINT_INVALID",
-        "OPT_EVIDENCE_INCOMPLETE",
-        "OPT_EXECUTION_FAILED",
-        "OPT_INTERNAL_ERROR",
-        "OPT_INVALID_REQUEST",
-        "OPT_LEAKAGE_DETECTED",
-        "OPT_LIMIT_EXCEEDED",
-        "OPT_PERSISTENCE_FAILED",
-        "OPT_STATE_CONFLICT",
-    }
+_OPTIMIZATION_ERROR_DEFINITIONS = (
+    ErrorDefinition(
+        code="OPT_ADAPTER_INCOMPATIBLE",
+        domain="optimization",
+        description="The execution adapter is incompatible with the request",
+        category="dependency",
+        severity="error",
+        retryable=False,
+        operator_action="Use a compatible deterministic execution adapter",
+    ),
+    ErrorDefinition(
+        code="OPT_CONSTRAINT_INVALID",
+        domain="optimization",
+        description="The optimization constraint is invalid",
+        category="validation",
+        severity="warning",
+        retryable=False,
+        operator_action="Correct the parameter constraint definition",
+    ),
+    ErrorDefinition(
+        code="OPT_EVIDENCE_INCOMPLETE",
+        domain="optimization",
+        description="Required optimization evidence is incomplete",
+        category="evidence",
+        severity="warning",
+        retryable=False,
+        operator_action="Supply the missing bounded evidence before review",
+    ),
+    ErrorDefinition(
+        code="OPT_EXECUTION_FAILED",
+        domain="optimization",
+        description="A candidate execution failed",
+        category="execution",
+        severity="error",
+        retryable=True,
+        operator_action="Inspect the safe execution evidence before retrying",
+    ),
+    ErrorDefinition(
+        code="OPT_INTERNAL_ERROR",
+        domain="optimization",
+        description="Optimization failed with an unexpected internal error",
+        category="internal",
+        severity="critical",
+        retryable=False,
+        operator_action="Inspect redacted diagnostic evidence",
+    ),
+    ErrorDefinition(
+        code="OPT_INVALID_REQUEST",
+        domain="optimization",
+        description="The optimization request is invalid",
+        category="validation",
+        severity="warning",
+        retryable=False,
+        operator_action="Correct the supplied optimization request",
+    ),
+    ErrorDefinition(
+        code="OPT_LEAKAGE_DETECTED",
+        domain="optimization",
+        description="Time-series or evaluation leakage was detected",
+        category="security",
+        severity="critical",
+        retryable=False,
+        operator_action="Reject the run and review temporal evidence",
+    ),
+    ErrorDefinition(
+        code="OPT_LIMIT_EXCEEDED",
+        domain="optimization",
+        description="An approved optimization limit was exceeded",
+        category="resource_limit",
+        severity="error",
+        retryable=False,
+        operator_action="Reduce the request within the approved bounds",
+    ),
+    ErrorDefinition(
+        code="OPT_PERSISTENCE_FAILED",
+        domain="optimization",
+        description="Optimization evidence persistence failed",
+        category="persistence",
+        severity="error",
+        retryable=True,
+        operator_action="Verify the injected store before retrying",
+    ),
+    ErrorDefinition(
+        code="OPT_STATE_CONFLICT",
+        domain="optimization",
+        description="Optimization state conflicts with the supplied identity",
+        category="state",
+        severity="error",
+        retryable=False,
+        operator_action="Reconcile the optimization state identity",
+    ),
+)
+
+OPTIMIZATION_ERROR_CATALOG = validate_error_catalog(
+    MappingProxyType(
+        {definition.code: definition for definition in _OPTIMIZATION_ERROR_DEFINITIONS}
+    )
 )
 
 
@@ -45,7 +135,7 @@ class OptimizationError(HaruQuantError):
             ValueError: If the error code or detail is invalid.
         """
         logger.debug("Creating OptimizationError with code %s", code)
-        if code not in OPTIMIZATION_ERROR_CODES:
+        if code not in OPTIMIZATION_ERROR_CATALOG:
             raise ValueError("Optimization error code is not cataloged")
         super().__init__(code, detail)
         redacted = redact_mapping_value(safe_details or {}).value
@@ -67,4 +157,4 @@ class OptimizationError(HaruQuantError):
         }
 
 
-__all__ = ["OptimizationError"]
+__all__ = ["OPTIMIZATION_ERROR_CATALOG", "OptimizationError"]

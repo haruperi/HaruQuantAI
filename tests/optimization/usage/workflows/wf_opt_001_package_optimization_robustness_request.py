@@ -60,13 +60,15 @@ def main() -> None:
         validated_robustness,
         max_simulations=5,
     )
+    assert optimization_result.data is not None
+    assert robustness_result.data is not None
 
     # Stage 4 — Return OptimizationResult v1 or RobustnessAnalysisResult with no trade authority.
     _stage(4)
     print(
         "OUTPUT BOUNDARY — typed advisory results:",
-        optimization_result.schema_id,
-        robustness_result.schema_id,
+        optimization_result.data.schema_id,
+        robustness_result.data.schema_id,
     )
 
 

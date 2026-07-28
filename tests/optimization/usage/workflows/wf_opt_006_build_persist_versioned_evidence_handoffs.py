@@ -56,7 +56,9 @@ def main() -> None:
 
     # Stage 5 — Build and return the advisory Optimization handoff.
     _stage(5)
-    handoff = build_optimization_handoff(request)
+    handoff_response = build_optimization_handoff(request)
+    assert handoff_response.data is not None
+    handoff = handoff_response.data
     print("Report/durable:", report["schema_id"], receipt.durable)
     print("OUTPUT BOUNDARY — typed OptimizationResult v1:", handoff.schema_id)
 
