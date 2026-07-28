@@ -6,7 +6,7 @@ import hashlib
 from collections.abc import Mapping
 
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
-from app.services.strategy.contracts.outcomes import StrategyOutcome, failure, success
+from app.services.strategy.contracts.outcomes import failure, success
 from app.services.strategy.contracts.policy import (
     StrategyValidationPolicy,  # noqa: TC001
 )
@@ -15,14 +15,16 @@ from app.services.strategy.contracts.references import (
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
 )
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.utils import canonical_json, logger
 
 
+@guard_strategy_boundary
 def validate_strategy_config(
     ref: ValidatedStrategyRef,
     config: StrategyConfig,
-) -> StrategyOutcome[ValidatedStrategyConfig]:
+) -> ValidatedStrategyConfig:
     """Validate declarative configuration and derive its canonical hash.
 
     Args:

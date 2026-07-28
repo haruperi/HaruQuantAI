@@ -55,7 +55,7 @@ def main() -> None:
     update = outcome.data.local_state_update if outcome.data else None
     print("Candidate local state:", update)
 
-    # Stage 5 — OUTPUT BOUNDARY: Return validated result or StrategyOutcome error.
+    # Stage 5 — OUTPUT BOUNDARY: Return validated result or StandardResponse error.
     _stage(5)
     print("Output:", type(outcome).__name__, outcome.status)
 

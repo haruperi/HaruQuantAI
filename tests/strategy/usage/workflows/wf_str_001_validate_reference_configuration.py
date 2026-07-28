@@ -25,7 +25,7 @@ STAGES = (
     "Register the approved immutable version in isolated Data-backed storage.",
     "Resolve exactly one eligible ValidatedStrategyRef.",
     "Validate schema, defaults, bounds, and unknown-field policy.",
-    "Return a canonical configuration hash or StrategyOutcome error.",
+    "Return a canonical configuration hash or StandardResponse error.",
 )
 
 
@@ -76,7 +76,7 @@ def main() -> None:
     validated = validate_strategy_config(resolved.data, config)
     print("Configuration:", validated.status)
 
-    # Stage 5 — OUTPUT BOUNDARY: Return StrategyOutcome with validated hash or error.
+    # Stage 5 — OUTPUT BOUNDARY: Return StandardResponse with validated hash or error.
     _stage(5)
     print(
         "Output:",

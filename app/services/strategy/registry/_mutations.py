@@ -18,6 +18,10 @@ from app.services.strategy.contracts.policy import StrategyValidationPolicy
 from app.services.strategy.contracts.references import (  # noqa: TC001
     StrategyRef,
 )
+from app.services.strategy.contracts.responses import (
+    StrategyOperationError,
+    unwrap_data_response,
+)
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
 from app.utils import AuditEvent, AuthContext, generate_id, logger
 
@@ -36,17 +40,21 @@ def _load_mutation(command_id: str, request_id: str) -> StrategyMutationResult |
         Prior mutation result or ``None``.
     """
     logger.debug("Loading prior Strategy mutation")
-    result = execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    "SELECT mutation_json FROM strategy_mutations WHERE command_id = ?",
+    result = unwrap_data_response(
+        execute_transaction(
+            TransactionRequest(
+                plan=StatementPlan(
+                    statements=(
+                        "SELECT mutation_json FROM strategy_mutations "
+                        "WHERE command_id = ?",
+                    ),
+                    parameter_sets=((command_id,),),
+                    max_rows=1,
                 ),
-                parameter_sets=((command_id,),),
-                max_rows=1,
-            ),
-            request_id=request_id,
-        )
+                request_id=request_id,
+            )
+        ),
+        operation="data.execute_transaction.strategy_mutation_lookup",
     )
     if not result.rows:
         return None
@@ -70,18 +78,22 @@ def _load_policy(ref: StrategyRef, request_id: str) -> StrategyValidationPolicy 
     version = ref.exact_version
     if version is None:
         return None
-    result = execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    "SELECT policy_json FROM strategy_versions WHERE strategy_id = ? "
-                    "AND strategy_version = ?",
+    result = unwrap_data_response(
+        execute_transaction(
+            TransactionRequest(
+                plan=StatementPlan(
+                    statements=(
+                        "SELECT policy_json FROM strategy_versions "
+                        "WHERE strategy_id = ? "
+                        "AND strategy_version = ?",
+                    ),
+                    parameter_sets=((ref.strategy_id, version),),
+                    max_rows=1,
                 ),
-                parameter_sets=((ref.strategy_id, version),),
-                max_rows=1,
-            ),
-            request_id=request_id,
-        )
+                request_id=request_id,
+            )
+        ),
+        operation="data.execute_transaction.strategy_policy_lookup",
     )
     if not result.rows:
         return None
@@ -108,43 +120,49 @@ def _publish_mutation(
     logger.info("Publishing Strategy mutation audit evidence")
     event_id = generate_id("evt")
     try:
-        persist_audit_event(
-            AuditEvent(
-                contract_version="v1",
-                schema_id="utils.audit_event.v1",
-                event_id=event_id,
-                timestamp=mutation.completed_at,
-                domain="strategy",
-                action=mutation.mutation_type,
-                principal_id=auth.principal_id,
-                request_id=mutation.request_id,
-                correlation_id=mutation.correlation_id,
-                payload={
-                    "mutation_id": mutation.mutation_id,
-                    "status": mutation.status,
-                    "strategy_id": mutation.strategy_id,
-                    "strategy_version": mutation.strategy_version,
-                },
-            )
+        unwrap_data_response(
+            persist_audit_event(
+                AuditEvent(
+                    contract_version="v1",
+                    schema_id="utils.audit_event.v1",
+                    event_id=event_id,
+                    timestamp=mutation.completed_at,
+                    domain="strategy",
+                    action=mutation.mutation_type,
+                    principal_id=auth.principal_id,
+                    request_id=mutation.request_id,
+                    correlation_id=mutation.correlation_id,
+                    payload={
+                        "mutation_id": mutation.mutation_id,
+                        "status": mutation.status,
+                        "strategy_id": mutation.strategy_id,
+                        "strategy_version": mutation.strategy_version,
+                    },
+                )
+            ),
+            operation="data.persist_audit_event.strategy_mutation",
         )
         published = mutation.model_copy(
             update={"audit_event_ref": event_id, "publication_pending": False}
         )
-        execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        "UPDATE strategy_mutations SET mutation_json = ?, "
-                        "publication_pending = 0 WHERE command_id = ?",
+        unwrap_data_response(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=(
+                            "UPDATE strategy_mutations SET mutation_json = ?, "
+                            "publication_pending = 0 WHERE command_id = ?",
+                        ),
+                        parameter_sets=((published.model_dump_json(), command_id),),
+                        max_rows=1,
                     ),
-                    parameter_sets=((published.model_dump_json(), command_id),),
-                    max_rows=1,
-                ),
-                request_id=mutation.request_id,
-            )
+                    request_id=mutation.request_id,
+                )
+            ),
+            operation="data.execute_transaction.strategy_mutation_publication",
         )
         return published
-    except DataError:
+    except DataError, StrategyOperationError:
         logger.warning("Strategy mutation audit publication remains pending")
         return mutation
 

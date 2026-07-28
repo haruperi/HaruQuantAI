@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
     _current_previous,
     _decimal_parameter,
@@ -32,6 +33,7 @@ _MIN_PERIOD = 2
 class WhiteFairyEvaluator(_SignalEvaluatorBase):
     """Preserve recovered White Fairy RSI long and short entry signals."""
 
+    @guard_strategy_boundary
     def evaluate_signals(
         self,
         evidence: StrategySignalEvidence,

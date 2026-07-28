@@ -60,7 +60,7 @@ def main() -> None:
     )
     print("Evaluation:", outcome.status)
 
-    # Stage 5 — OUTPUT BOUNDARY: Return atomic result or StrategyOutcome error.
+    # Stage 5 — OUTPUT BOUNDARY: Return atomic result or StandardResponse error.
     _stage(5)
     print(
         "Output:",

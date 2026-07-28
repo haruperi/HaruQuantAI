@@ -111,7 +111,7 @@ def main() -> int:
     fr_str_037()
     print("\nSTATEFUL STRATEGY EVENT HOOK — REAL MT5 EURUSD M5")
     try:
-        market = get_market_data(
+        market_response = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="M5",
@@ -121,6 +121,10 @@ def main() -> int:
     except DataError as error:
         print("Live MT5 data unavailable:", error.code)
         return _UNAVAILABLE
+    if market_response.status != "success" or market_response.data is None:
+        print("Live MT5 data unavailable:", market_response.error)
+        return _UNAVAILABLE
+    market = market_response.data
 
     bar = market.records[-1]
     source_checksum = hashlib.sha256(

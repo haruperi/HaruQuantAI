@@ -24,7 +24,7 @@ def test_random_walk_emits_non_random_flat_state_triggers() -> None:
         artifact_hash=HASH,
         dependency_hash=HASH,
     )
-    signals = evaluator.evaluate_signals(
+    response = evaluator.evaluate_signals(
         make_signal_evidence(
             market,
             active_position_tags=("mt5-magic:10:BUY",),
@@ -33,5 +33,7 @@ def test_random_walk_emits_non_random_flat_state_triggers() -> None:
         make_signal_config({"buy_magic_number": 10, "sell_magic_number": 20}),
         make_context(),
     )
+    assert response.data is not None
+    signals = response.data
     assert tuple(signal.active for signal in signals) == (False, True)
     assert all(signal.facts["random_signal"] is False for signal in signals)

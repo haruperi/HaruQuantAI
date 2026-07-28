@@ -2,10 +2,11 @@
 
 from unittest.mock import MagicMock, patch
 
+import pytest
 from app.services.data import DataError
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
-from app.services.strategy.contracts.outcomes import StrategyOutcome
-from app.services.strategy.contracts.references import StrategyRef, ValidatedStrategyRef
+from app.services.strategy.contracts.references import StrategyRef
+from app.services.strategy.contracts.responses import StrategyOperationError
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.registry.resolution import (
     _validate_record,
@@ -36,7 +37,7 @@ def test_validate_strategy_ref_handles_data_error() -> None:
         "app.services.strategy.registry.resolution.execute_transaction",
         side_effect=DataError("DB failure"),
     ):
-        res: StrategyOutcome[ValidatedStrategyRef] = validate_strategy_ref(ref, policy)
+        res = validate_strategy_ref(ref, policy)
         assert res.status == "error"
         assert res.error is not None
         assert res.error.code == StrategyErrorCode.INTERNAL_ERROR.value
@@ -71,30 +72,25 @@ def test_validate_record_rejection_rules() -> None:
     manifest.module_path = "app.strategies.my_strategy"
 
     # 1. Unapproved lifecycle
-    res_lifecycle = _validate_record(
-        manifest, StrategyLifecycleStatus.DRAFT, "hash", ref, policy
-    )
-    assert res_lifecycle.status == "error"
-    assert res_lifecycle.error is not None
-    assert res_lifecycle.error.code == StrategyErrorCode.LIFECYCLE_NOT_APPROVED.value
+    with pytest.raises(StrategyOperationError) as lifecycle:
+        _validate_record(manifest, StrategyLifecycleStatus.DRAFT, "hash", ref, policy)
+    assert str(StrategyErrorCode.LIFECYCLE_NOT_APPROVED) in str(lifecycle.value)
 
     # 2. Environment not permitted
-    res_env = _validate_record(
-        manifest, StrategyLifecycleStatus.APPROVED, "hash", ref, policy
-    )
-    assert res_env.status == "error"
-    assert res_env.error is not None
-    assert res_env.error.code == StrategyErrorCode.ENVIRONMENT_NOT_PERMITTED.value
+    with pytest.raises(StrategyOperationError) as environment:
+        _validate_record(
+            manifest, StrategyLifecycleStatus.APPROVED, "hash", ref, policy
+        )
+    assert str(StrategyErrorCode.ENVIRONMENT_NOT_PERMITTED) in str(environment.value)
 
     # 3. Unapproved module
     manifest.permitted_environments = ("LIVE",)
     manifest.module_path = "unapproved.module.path"
-    res_mod = _validate_record(
-        manifest, StrategyLifecycleStatus.APPROVED, "hash", ref, policy
-    )
-    assert res_mod.status == "error"
-    assert res_mod.error is not None
-    assert res_mod.error.code == StrategyErrorCode.UNAPPROVED_MODULE.value
+    with pytest.raises(StrategyOperationError) as module:
+        _validate_record(
+            manifest, StrategyLifecycleStatus.APPROVED, "hash", ref, policy
+        )
+    assert str(StrategyErrorCode.UNAPPROVED_MODULE) in str(module.value)
 
 
 def test_validate_strategy_ref_search_results() -> None:

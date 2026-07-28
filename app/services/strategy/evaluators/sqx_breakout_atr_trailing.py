@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
     _bar_records,
     _current_value,
@@ -70,6 +71,7 @@ def _atr_distance(
 class SQXBreakoutAtrTrailingEvaluator(_SignalEvaluatorBase):
     """Preserve recovered SQX channel-breakout signals and ATR facts."""
 
+    @guard_strategy_boundary
     def evaluate_signals(
         self,
         evidence: StrategySignalEvidence,

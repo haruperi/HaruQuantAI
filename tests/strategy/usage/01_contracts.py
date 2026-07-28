@@ -12,14 +12,12 @@ from app.services.strategy import (
     StrategyConfig,
     StrategyDecision,
     StrategyEnvironment,
-    StrategyError,
     StrategyEvent,
     StrategyExecutionContext,
     StrategyExecutionResult,
     StrategyLifecycleStatus,
     StrategyManifest,
     StrategyMutationResult,
-    StrategyOutcome,
     StrategyParameterUpdateRequest,
     StrategyRef,
     StrategyRegistrationRequest,
@@ -32,6 +30,7 @@ from app.services.strategy import (
     create_strategy_replay_manifest,
     export_strategy_diagnostics,
 )
+from app.utils import StandardResponse
 
 _HASH = "a" * 64
 _REQUEST = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
@@ -131,13 +130,13 @@ def fr_str_014() -> None:
 def fr_str_015() -> None:
     """Demonstrate structured Strategy errors."""
     _header("Demonstrate structured Strategy errors.")
-    assert StrategyError.model_fields["code"]
+    assert StandardResponse.model_fields["error"]
 
 
 def fr_str_016() -> None:
     """Demonstrate exclusive Strategy outcomes."""
     _header("Demonstrate exclusive Strategy outcomes.")
-    assert StrategyOutcome.model_fields["status"]
+    assert StandardResponse.model_fields["status"]
 
 
 def fr_str_017() -> None:
@@ -453,15 +452,6 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     print("Signal:", signal.signal_name, "active:", signal.active)
     print("Signal evidence:", signal_evidence.evidence_id)
 
-    error = StrategyError(
-        code="STRATEGY_INVALID_CONFIG",
-        message="usage example structured failure",
-        details={"field": "fast_ma_period"},
-        request_id=_REQUEST,
-        correlation_id=_CORRELATION,
-    )
-    success_outcome = StrategyOutcome[StrategyConfig](status="success", data=config)
-    error_outcome = StrategyOutcome[StrategyConfig](status="error", error=error)
     mutation = StrategyMutationResult(
         mutation_id="usage-mutation-1",
         mutation_type="REGISTER_VERSION",
@@ -495,9 +485,9 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
         local_state_update=None,
         result_hash=_HASH,
     )
-    print("\n-- Structured outcomes --")
-    print("Success outcome:", success_outcome.status)
-    print("Error outcome:", error_outcome.status, error.code)
+    print("\n-- Standard responses --")
+    print("Diagnostics response:", diagnostics.status)
+    print("Replay response:", replay.status)
     print("Mutation:", mutation.status, mutation.record_ref)
     print("Execution result intents:", len(result.intents))
     print("\nEvery contract above is immutable and carries no executable value.")

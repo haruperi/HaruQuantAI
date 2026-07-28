@@ -33,9 +33,11 @@ def test_decomposing_trade_preserves_four_rsi_crossings() -> None:
         artifact_hash=HASH,
         dependency_hash=HASH,
     )
-    signals = evaluator.evaluate_signals(
+    response = evaluator.evaluate_signals(
         make_signal_evidence(market), (rsi,), config, make_context()
     )
+    assert response.data is not None
+    signals = response.data
     assert tuple(signal.signal_name for signal in signals) == (
         "LONG_ENTRY",
         "SHORT_ENTRY",

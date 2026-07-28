@@ -10,7 +10,7 @@ from app.services.data import (
 )
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
-from app.services.strategy.contracts.outcomes import StrategyOutcome, failure, success
+from app.services.strategy.contracts.outcomes import failure, success
 from app.services.strategy.contracts.policy import (
     StrategyValidationPolicy,  # noqa: TC001
 )
@@ -18,14 +18,19 @@ from app.services.strategy.contracts.references import (
     StrategyRef,
     ValidatedStrategyRef,
 )
+from app.services.strategy.contracts.responses import (
+    guard_strategy_boundary,
+    unwrap_data_response,
+)
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.utils import logger
 
 
+@guard_strategy_boundary
 def validate_strategy_ref(
     ref: StrategyRef,
     policy: StrategyValidationPolicy,
-) -> StrategyOutcome[ValidatedStrategyRef]:
+) -> ValidatedStrategyRef:
     """Resolve and validate exactly one approved immutable strategy version.
 
     Args:
@@ -37,20 +42,23 @@ def validate_strategy_ref(
     """
     logger.info("Validating Strategy reference for %s", ref.strategy_id)
     try:
-        result = execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        "SELECT manifest_json, lifecycle_status, policy_json, "
-                        "record_hash, request_id, correlation_id FROM "
-                        "strategy_versions WHERE strategy_id = ? ORDER BY "
-                        "strategy_version",
+        result = unwrap_data_response(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=(
+                            "SELECT manifest_json, lifecycle_status, policy_json, "
+                            "record_hash, request_id, correlation_id FROM "
+                            "strategy_versions WHERE strategy_id = ? ORDER BY "
+                            "strategy_version",
+                        ),
+                        parameter_sets=((ref.strategy_id,),),
+                        max_rows=1_000,
                     ),
-                    parameter_sets=((ref.strategy_id,),),
-                    max_rows=1_000,
-                ),
-                request_id=ref.request_id,
-            )
+                    request_id=ref.request_id,
+                )
+            ),
+            operation="data.execute_transaction.strategy_registry",
         )
     except DataError:
         logger.error("Strategy reference persistence read failed")
@@ -72,10 +80,7 @@ def validate_strategy_ref(
             ref,
             policy,
         )
-        if validated.status == "success" and validated.data is not None:
-            matches.append(validated.data)
-        elif validated.status == "error":
-            return validated
+        matches.append(validated)
     if len(matches) != 1:
         code = (
             StrategyErrorCode.NOT_FOUND
@@ -118,7 +123,7 @@ def _validate_record(
     record_hash: str,
     ref: StrategyRef,
     policy: StrategyValidationPolicy,
-) -> StrategyOutcome[ValidatedStrategyRef]:
+) -> ValidatedStrategyRef:
     """Validate one resolved registry record.
 
     Args:

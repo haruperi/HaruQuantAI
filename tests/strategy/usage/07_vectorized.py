@@ -110,7 +110,7 @@ def main() -> int:
     fr_str_036()
     print("\nVECTORIZED STRATEGY EVALUATION — REAL MT5 EURUSD M5")
     try:
-        market = get_market_data(
+        market_response = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="M5",
@@ -120,6 +120,10 @@ def main() -> int:
     except DataError as error:
         print("Live MT5 data unavailable:", error.code)
         return _UNAVAILABLE
+    if market_response.status != "success" or market_response.data is None:
+        print("Live MT5 data unavailable:", market_response.error)
+        return _UNAVAILABLE
+    market = market_response.data
 
     print("Source: MT5")
     print("Bars:", market.record_count)

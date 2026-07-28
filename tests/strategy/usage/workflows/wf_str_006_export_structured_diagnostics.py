@@ -49,7 +49,7 @@ def main() -> None:
     safe = outcome.data.safe_details if outcome.data else {}
     print("Redacted password:", safe.get("password"))
 
-    # Stage 5 — OUTPUT BOUNDARY: Return typed diagnostics or StrategyOutcome error.
+    # Stage 5 — OUTPUT BOUNDARY: Return typed diagnostics or StandardResponse error.
     _stage(5)
     print("Output:", type(outcome.data).__name__ if outcome.data else outcome.error)
 

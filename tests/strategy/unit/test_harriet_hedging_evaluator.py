@@ -41,7 +41,9 @@ def test_harriet_uses_only_available_higher_timeframe_bars() -> None:
         artifact_hash=HASH,
         dependency_hash=HASH,
     )
-    signals = evaluator.evaluate_signals(evidence, (), config, make_context())
+    response = evaluator.evaluate_signals(evidence, (), config, make_context())
+    assert response.data is not None
+    signals = response.data
     assert tuple(signal.active for signal in signals) == (True, False)
     assert signals[0].facts["higher_timeframe"] == "H1"
 

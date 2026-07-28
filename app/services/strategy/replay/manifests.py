@@ -5,11 +5,12 @@ import hashlib
 from app.services.strategy.contracts.execution import (
     StrategyExecutionContext,  # noqa: TC001
 )
-from app.services.strategy.contracts.outcomes import StrategyOutcome, failure, success
+from app.services.strategy.contracts.outcomes import failure, success
 from app.services.strategy.contracts.references import (  # noqa: TC001
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
 )
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.replay.models import StrategyReplayManifest
 from app.utils import canonical_json, logger
@@ -17,6 +18,7 @@ from app.utils import canonical_json, logger
 _SHA256_LENGTH = 64
 
 
+@guard_strategy_boundary
 def create_strategy_replay_manifest(
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
@@ -24,7 +26,7 @@ def create_strategy_replay_manifest(
     data_checksum: str,
     indicator_manifest_hash: str,
     simulation_config_hash: str | None = None,
-) -> StrategyOutcome[StrategyReplayManifest]:
+) -> StrategyReplayManifest:
     """Create an exact deterministic replay identity.
 
     Args:

@@ -111,7 +111,7 @@ def main() -> int:
     fr_str_048()
     print("\nCONCRETE SIGNAL EVALUATION BOUNDARY")
     try:
-        market = get_market_data(
+        market_response = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="H1",
@@ -119,10 +119,18 @@ def main() -> int:
             use_cache=False,
             quality_failure_behavior="warn",
         )
-        metadata = get_symbol_metadata(source_id="mt5", symbol="EURUSD")
+        metadata_response = get_symbol_metadata(source_id="mt5", symbol="EURUSD")
     except DataError as error:
         print("Live MT5 evidence unavailable:", error.code)
         return _UNAVAILABLE
+    if market_response.status != "success" or market_response.data is None:
+        print("Live MT5 data unavailable:", market_response.error)
+        return _UNAVAILABLE
+    if metadata_response.status != "success" or metadata_response.data is None:
+        print("MT5 metadata unavailable:", metadata_response.error)
+        return _UNAVAILABLE
+    market = market_response.data
+    metadata = metadata_response.data
     if not isinstance(metadata.point, int | float):
         print("MT5 point-size evidence unavailable:", metadata.point)
         return _UNAVAILABLE

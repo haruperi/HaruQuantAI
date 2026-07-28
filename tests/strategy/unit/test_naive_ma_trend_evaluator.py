@@ -50,7 +50,8 @@ def test_naive_ma_signals_are_deterministic() -> None:
     evidence = make_signal_evidence(market)
     first = _evaluator().evaluate_signals(evidence, indicators, config, make_context())
     second = _evaluator().evaluate_signals(evidence, indicators, config, make_context())
-    assert first == second
-    assert tuple(signal.active for signal in first) == (True, False, False, True)
+    assert first.data == second.data
+    assert first.data is not None
+    assert tuple(signal.active for signal in first.data) == (True, False, False, True)
     with pytest.raises(TypeError):
         first[0].facts["fast_ma"] = "999"  # type: ignore[index]

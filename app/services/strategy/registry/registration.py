@@ -13,8 +13,6 @@ from app.services.data import (
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
-    StrategyOutcome,
-    failure,
     success,
 )
 from app.services.strategy.contracts.policy import (
@@ -26,7 +24,11 @@ from app.services.strategy.contracts.references import (
 from app.services.strategy.contracts.requests import (  # noqa: TC001
     StrategyRegistrationRequest,
 )
-from app.services.strategy.diagnostics.errors import StrategyErrorCode
+from app.services.strategy.contracts.responses import (
+    StrategyOperationError,
+    guard_strategy_boundary,
+    unwrap_data_response,
+)
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
 from app.services.strategy.registry._mutations import (
     _REGISTER_PERMISSION,
@@ -37,11 +39,12 @@ from app.services.strategy.registry._mutations import (
 from app.utils import AuthContext, canonical_json, logger
 
 
+@guard_strategy_boundary
 def register_strategy_version(
     request: StrategyRegistrationRequest,
     auth: AuthContext,
     policy: StrategyValidationPolicy,
-) -> StrategyOutcome[StrategyMutationResult]:
+) -> StrategyMutationResult:
     """Register one unique immutable strategy version.
 
     Args:
@@ -52,6 +55,9 @@ def register_strategy_version(
     Returns:
         Accepted, idempotent, or rejected mutation truth; infrastructure
         failures use the error branch.
+
+    Raises:
+        StrategyOperationError: If a nested Strategy or Data operation fails.
     """
     logger.info("Registering Strategy version %s", request.manifest.strategy_version)
     rejected = _registration_rejection(request, auth, policy)
@@ -96,34 +102,38 @@ def register_strategy_version(
         existing = _load_mutation(request.command_id, request.request_id)
         if existing is not None:
             return success(existing.model_copy(update={"status": "IDEMPOTENT"}))
-        execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        "INSERT INTO strategy_versions (strategy_id, "
-                        "strategy_version, manifest_json, lifecycle_status, "
-                        "policy_json, record_hash, request_id, correlation_id) "
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                        "INSERT INTO strategy_mutations (command_id, mutation_json, "
-                        "publication_pending) VALUES (?, ?, 1)",
-                    ),
-                    parameter_sets=(
-                        (
-                            request.manifest.strategy_id,
-                            request.manifest.strategy_version,
-                            request.manifest.model_dump_json(),
-                            request.lifecycle_status.value,
-                            policy.model_dump_json(),
-                            record_hash,
-                            request.request_id,
-                            request.correlation_id,
+        unwrap_data_response(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=(
+                            "INSERT INTO strategy_versions (strategy_id, "
+                            "strategy_version, manifest_json, lifecycle_status, "
+                            "policy_json, record_hash, request_id, correlation_id) "
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO strategy_mutations (command_id, "
+                            "mutation_json, "
+                            "publication_pending) VALUES (?, ?, 1)",
                         ),
-                        (request.command_id, mutation.model_dump_json()),
+                        parameter_sets=(
+                            (
+                                request.manifest.strategy_id,
+                                request.manifest.strategy_version,
+                                request.manifest.model_dump_json(),
+                                request.lifecycle_status.value,
+                                policy.model_dump_json(),
+                                record_hash,
+                                request.request_id,
+                                request.correlation_id,
+                            ),
+                            (request.command_id, mutation.model_dump_json()),
+                        ),
+                        max_rows=2,
                     ),
-                    max_rows=2,
-                ),
-                request_id=request.request_id,
-            )
+                    request_id=request.request_id,
+                )
+            ),
+            operation="data.execute_transaction.strategy_registry_mutation",
         )
     except DataError as error:
         logger.warning("Strategy registration persistence outcome: %s", error.code)
@@ -133,12 +143,15 @@ def register_strategy_version(
                     request, "IMMUTABLE_VERSION_EXISTS", auth.workflow_id
                 )
             )
-        return failure(
-            StrategyErrorCode.INTERNAL_ERROR,
-            "strategy registration persistence failed",
-            request_id=request.request_id,
-            correlation_id=request.correlation_id,
-        )
+    except StrategyOperationError as error:
+        logger.warning("Strategy registration response failure")
+        if error.details.get("upstream_code") == "DB_WRITE_FAILED":
+            return success(
+                _rejected_registration(
+                    request, "IMMUTABLE_VERSION_EXISTS", auth.workflow_id
+                )
+            )
+        raise
     return success(_publish_mutation(mutation, request.command_id, auth))
 
 

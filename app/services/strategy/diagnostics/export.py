@@ -9,16 +9,18 @@ from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
 from app.services.strategy.contracts.execution import (
     StrategyExecutionContext,  # noqa: TC001
 )
-from app.services.strategy.contracts.outcomes import StrategyOutcome, failure, success
+from app.services.strategy.contracts.outcomes import failure, success
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.diagnostics.models import StrategyDiagnostics
 from app.utils import RedactionPolicy, canonical_json, logger, redact_mapping_value
 
 
+@guard_strategy_boundary
 def export_strategy_diagnostics(
     context: StrategyExecutionContext,
     facts: Mapping[str, JsonValue],
-) -> StrategyOutcome[StrategyDiagnostics]:
+) -> StrategyDiagnostics:
     """Redact, bound, and export diagnostic facts.
 
     Args:

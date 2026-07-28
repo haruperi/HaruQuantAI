@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
     _current_previous,
     _current_value,
@@ -32,6 +33,7 @@ _MIN_PERIOD = 2
 class NaiveMATrendEvaluator(_SignalEvaluatorBase):
     """Preserve recovered MA crossover, trend-filter, and exit signals."""
 
+    @guard_strategy_boundary
     def evaluate_signals(
         self,
         evidence: StrategySignalEvidence,

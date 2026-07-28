@@ -7,6 +7,7 @@ from app.services.data import (
     MigrationStep,
     run_domain_migrations,
 )
+from app.services.strategy.contracts.responses import unwrap_data_response
 from app.utils import logger
 
 _STATEMENTS = (
@@ -70,12 +71,15 @@ def _ensure_strategy_storage(request_id: str) -> None:
         request_id: Canonical request trace identifier.
     """
     logger.info("Ensuring Strategy-owned persistence schema")
-    run_domain_migrations(
-        MigrationRequest(
-            domain="strategy",
-            steps=_strategy_migration_steps(),
-            request_id=request_id,
-        )
+    unwrap_data_response(
+        run_domain_migrations(
+            MigrationRequest(
+                domain="strategy",
+                steps=_strategy_migration_steps(),
+                request_id=request_id,
+            )
+        ),
+        operation="data.run_domain_migrations.strategy",
     )
 
 

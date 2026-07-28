@@ -16,14 +16,18 @@ from app.services.strategy.contracts.execution import (
     StrategyExecutionResult,
 )
 from app.services.strategy.contracts.outcomes import (
-    StrategyOutcome,
     failure,
-    propagate_failure,
     success,
 )
 from app.services.strategy.contracts.references import (  # noqa: TC001
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
+)
+from app.services.strategy.contracts.responses import (
+    StrategyOperationError,
+    guard_strategy_boundary,
+    unwrap_evaluator_result,
+    unwrap_strategy_response,
 )
 from app.services.strategy.diagnostics import (
     StrategyErrorCode,
@@ -31,7 +35,7 @@ from app.services.strategy.diagnostics import (
 )
 from app.services.strategy.intents import TradeIntent, build_trade_intent
 from app.services.strategy.replay import create_strategy_replay_manifest
-from app.utils import canonical_digest, logger
+from app.utils import StandardResponse, canonical_digest, logger
 
 
 @runtime_checkable
@@ -52,7 +56,7 @@ class VectorizedStrategyEvaluator(Protocol):
         config: ValidatedStrategyConfig,
         context: StrategyExecutionContext,
         account_snapshot: AccountStateSnapshot | None,
-    ) -> tuple[StrategyDecision, ...]:
+    ) -> StandardResponse[tuple[StrategyDecision, ...]]:
         """Evaluate normalized evidence without external access.
 
         Args:
@@ -70,7 +74,8 @@ class VectorizedStrategyEvaluator(Protocol):
         raise NotImplementedError
 
 
-def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
+@guard_strategy_boundary
+def run_vectorized_strategy_signals(  # noqa: PLR0911
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
     market: MarketDataset,
@@ -78,7 +83,7 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
     context: StrategyExecutionContext,
     evaluator: VectorizedStrategyEvaluator,
     account_snapshot: AccountStateSnapshot | None = None,
-) -> StrategyOutcome[StrategyExecutionResult]:
+) -> StrategyExecutionResult:
     """Validate and atomically run one vectorized evaluator.
 
     Args:
@@ -92,6 +97,9 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
 
     Returns:
         One atomic execution result or deterministic failure with no intents.
+
+    Raises:
+        StrategyOperationError: If an evaluator or nested boundary fails.
     """
     logger.info("Running vectorized Strategy evaluation")
     readiness = _validate_readiness(
@@ -100,9 +108,14 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
     if readiness is not None:
         return readiness
     try:
-        decisions = evaluator.evaluate_vectorized(
-            market, indicators, config, context, account_snapshot
+        decisions = unwrap_evaluator_result(
+            evaluator.evaluate_vectorized(
+                market, indicators, config, context, account_snapshot
+            ),
+            operation="strategy.vectorized.evaluate_vectorized",
         )
+    except StrategyOperationError:
+        raise
     except Exception as error:  # noqa: BLE001 - evaluator trust boundary.
         logger.error("Vectorized Strategy evaluator failed: %s", type(error).__name__)
         return failure(
@@ -129,10 +142,7 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    intents_outcome = _build_intents(decisions, context)
-    if intents_outcome.status == "error" or intents_outcome.data is None:
-        return propagate_failure(intents_outcome)
-    intents = intents_outcome.data
+    intents = _build_intents(decisions, context)
     if len({intent.idempotency_key for intent in intents}) != len(intents):
         return failure(
             StrategyErrorCode.DUPLICATE_INTENT,
@@ -153,25 +163,27 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    replay = create_strategy_replay_manifest(
-        ref, config, context, data_checksum, indicator_hash
+    replay = unwrap_strategy_response(
+        create_strategy_replay_manifest(
+            ref, config, context, data_checksum, indicator_hash
+        ),
+        operation="strategy.replay.create_strategy_replay_manifest",
     )
-    if replay.status == "error" or replay.data is None:
-        return propagate_failure(replay)
-    diagnostics = export_strategy_diagnostics(
-        context,
-        {
-            "status": "PROPOSED" if intents else "NEUTRAL",
-            "strategy_id": ref.manifest.strategy_id,
-            "strategy_version": ref.manifest.strategy_version,
-            "config_hash": config.config_hash,
-            "data_checksum": data_checksum,
-            "decision_count": len(decisions),
-            "intent_count": len(intents),
-        },
+    diagnostics = unwrap_strategy_response(
+        export_strategy_diagnostics(
+            context,
+            {
+                "status": "PROPOSED" if intents else "NEUTRAL",
+                "strategy_id": ref.manifest.strategy_id,
+                "strategy_version": ref.manifest.strategy_version,
+                "config_hash": config.config_hash,
+                "data_checksum": data_checksum,
+                "decision_count": len(decisions),
+                "intent_count": len(intents),
+            },
+        ),
+        operation="strategy.diagnostics.export_strategy_diagnostics",
     )
-    if diagnostics.status == "error" or diagnostics.data is None:
-        return propagate_failure(diagnostics)
     local_updates = tuple(
         decision.candidate_local_state
         for decision in decisions
@@ -187,7 +199,7 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
     result_material = {
         "decisions": tuple(item.model_dump(mode="json") for item in decisions),
         "intents": tuple(item.model_dump(mode="json") for item in intents),
-        "replay_manifest": replay.data.model_dump(mode="json"),
+        "replay_manifest": replay.model_dump(mode="json"),
         "local_state_update": local_updates[0] if local_updates else None,
     }
     try:
@@ -204,8 +216,8 @@ def run_vectorized_strategy_signals(  # noqa: C901, PLR0911
         StrategyExecutionResult(
             decisions=decisions,
             intents=intents,
-            diagnostics=diagnostics.data,
-            replay_manifest=replay.data,
+            diagnostics=diagnostics,
+            replay_manifest=replay,
             local_state_update=local_updates[0] if local_updates else None,
             result_hash=result_hash,
         )
@@ -220,7 +232,7 @@ def _validate_readiness(  # noqa: PLR0911
     context: StrategyExecutionContext,
     evaluator: VectorizedStrategyEvaluator,
     account_snapshot: AccountStateSnapshot | None,
-) -> StrategyOutcome[StrategyExecutionResult] | None:
+) -> StrategyExecutionResult | None:
     """Validate all vectorized evidence before evaluator invocation.
 
     Args:
@@ -364,7 +376,7 @@ def _indicator_ready(
 def _build_intents(
     decisions: tuple[StrategyDecision, ...],
     context: StrategyExecutionContext,
-) -> StrategyOutcome[tuple[TradeIntent, ...]]:
+) -> tuple[TradeIntent, ...]:
     """Build all proposal intents atomically.
 
     Args:
@@ -388,10 +400,11 @@ def _build_intents(
     for decision in decisions:
         if decision.action == "NEUTRAL":
             continue
-        outcome = build_trade_intent(decision, context, decision.sequence)
-        if outcome.status == "error" or outcome.data is None:
-            return propagate_failure(outcome)
-        intents.append(outcome.data)
+        outcome = unwrap_strategy_response(
+            build_trade_intent(decision, context, decision.sequence),
+            operation="strategy.intents.build_trade_intent",
+        )
+        intents.append(outcome)
     return success(tuple(intents))
 
 

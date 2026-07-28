@@ -14,6 +14,7 @@ if TYPE_CHECKING:
         StrategySignalEvidence,
         ValidatedStrategyConfig,
     )
+    from app.utils import StandardResponse
 
 
 class SignalEvaluator(Protocol):
@@ -32,7 +33,7 @@ class SignalEvaluator(Protocol):
         indicators: tuple[IndicatorResult, ...],
         config: ValidatedStrategyConfig,
         context: StrategyExecutionContext,
-    ) -> tuple[StrategySignal, ...]:
+    ) -> StandardResponse[tuple[StrategySignal, ...]]:
         """Declare concrete signal evaluation behavior.
 
         Args:

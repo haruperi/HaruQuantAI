@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
     _bar_records,
     _indicator_reference,
@@ -34,6 +35,7 @@ _REQUIRED_EXTREMES = 8
 class MarketStructureEvaluator(_SignalEvaluatorBase):
     """Preserve recovered structure breaks over supplied ZigZag evidence."""
 
+    @guard_strategy_boundary
     def evaluate_signals(
         self,
         evidence: StrategySignalEvidence,

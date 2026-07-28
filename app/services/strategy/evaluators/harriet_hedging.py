@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
     _bar_records,
     _decimal_parameter,
@@ -33,6 +34,7 @@ _MIN_BARS = 2
 class HarrietHedgingEvaluator(_SignalEvaluatorBase):
     """Preserve recovered point-in-time multi-timeframe structure signals."""
 
+    @guard_strategy_boundary
     def evaluate_signals(
         self,
         evidence: StrategySignalEvidence,

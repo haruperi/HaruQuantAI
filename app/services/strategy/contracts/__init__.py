@@ -13,9 +13,7 @@ from app.services.strategy.contracts.execution import (
 )
 from app.services.strategy.contracts.manifest import StrategyManifest
 from app.services.strategy.contracts.outcomes import (
-    StrategyError,
     StrategyMutationResult,
-    StrategyOutcome,
 )
 from app.services.strategy.contracts.policy import StrategyValidationPolicy
 from app.services.strategy.contracts.references import (
@@ -37,14 +35,12 @@ __all__ = [
     "StrategyConfig",
     "StrategyDecision",
     "StrategyEnvironment",
-    "StrategyError",
     "StrategyEvent",
     "StrategyExecutionContext",
     "StrategyExecutionResult",
     "StrategyLifecycleStatus",
     "StrategyManifest",
     "StrategyMutationResult",
-    "StrategyOutcome",
     "StrategyParameterUpdateRequest",
     "StrategyRef",
     "StrategyRegistrationRequest",

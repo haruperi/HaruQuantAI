@@ -10,12 +10,17 @@ from app.services.data import (
 )
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
-    StrategyOutcome,
     failure,
     success,
 )
 from app.services.strategy.contracts.requests import (  # noqa: TC001
     StrategyParameterUpdateRequest,
+)
+from app.services.strategy.contracts.responses import (
+    StrategyOperationError,
+    guard_strategy_boundary,
+    unwrap_data_response,
+    unwrap_strategy_response,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
@@ -31,10 +36,11 @@ from app.services.strategy.registry.resolution import validate_strategy_ref
 from app.utils import AuthContext, logger
 
 
+@guard_strategy_boundary
 def update_strategy_parameters(  # noqa: PLR0911
     request: StrategyParameterUpdateRequest,
     auth: AuthContext,
-) -> StrategyOutcome[StrategyMutationResult]:
+) -> StrategyMutationResult:
     """Validate and persist one immutable configuration hash.
 
     Args:
@@ -55,17 +61,24 @@ def update_strategy_parameters(  # noqa: PLR0911
         return success(
             _rejected_update(request, "STRATEGY_NOT_FOUND", auth.workflow_id)
         )
-    ref_outcome = validate_strategy_ref(request.ref, policy_outcome)
-    if ref_outcome.status == "error" or ref_outcome.data is None:
+    try:
+        ref = unwrap_strategy_response(
+            validate_strategy_ref(request.ref, policy_outcome),
+            operation="strategy.registry.validate_strategy_ref",
+        )
+    except StrategyOperationError:
         return success(
             _rejected_update(request, "REFERENCE_VALIDATION_FAILED", auth.workflow_id)
         )
-    config_outcome = validate_strategy_config(ref_outcome.data, request.config)
-    if config_outcome.status == "error" or config_outcome.data is None:
+    try:
+        config = unwrap_strategy_response(
+            validate_strategy_config(ref, request.config),
+            operation="strategy.registry.validate_strategy_config",
+        )
+    except StrategyOperationError:
         return success(
             _rejected_update(request, "CONFIG_VALIDATION_FAILED", auth.workflow_id)
         )
-    config = config_outcome.data
     mutation = StrategyMutationResult(
         mutation_id=_mutation_id(request.command_id),
         mutation_type="UPDATE_PARAMETERS",
@@ -86,31 +99,36 @@ def update_strategy_parameters(  # noqa: PLR0911
         existing = _load_mutation(request.command_id, request.request_id)
         if existing is not None:
             return success(existing.model_copy(update={"status": "IDEMPOTENT"}))
-        execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        "INSERT OR IGNORE INTO strategy_configs (strategy_id, "
-                        "strategy_version, config_hash, config_json, policy_version, "
-                        "request_id) VALUES (?, ?, ?, ?, ?, ?)",
-                        "INSERT INTO strategy_mutations (command_id, mutation_json, "
-                        "publication_pending) VALUES (?, ?, 1)",
-                    ),
-                    parameter_sets=(
-                        (
-                            config.strategy_id,
-                            config.strategy_version,
-                            config.config_hash,
-                            config.model_dump_json(),
-                            config.policy_version,
-                            request.request_id,
+        unwrap_data_response(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=(
+                            "INSERT OR IGNORE INTO strategy_configs (strategy_id, "
+                            "strategy_version, config_hash, config_json, "
+                            "policy_version, "
+                            "request_id) VALUES (?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO strategy_mutations (command_id, "
+                            "mutation_json, "
+                            "publication_pending) VALUES (?, ?, 1)",
                         ),
-                        (request.command_id, mutation.model_dump_json()),
+                        parameter_sets=(
+                            (
+                                config.strategy_id,
+                                config.strategy_version,
+                                config.config_hash,
+                                config.model_dump_json(),
+                                config.policy_version,
+                                request.request_id,
+                            ),
+                            (request.command_id, mutation.model_dump_json()),
+                        ),
+                        max_rows=2,
                     ),
-                    max_rows=2,
-                ),
-                request_id=request.request_id,
-            )
+                    request_id=request.request_id,
+                )
+            ),
+            operation="data.execute_transaction.strategy_parameter_mutation",
         )
     except DataError:
         logger.error("Strategy parameter persistence failed")

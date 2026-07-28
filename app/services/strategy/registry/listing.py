@@ -12,22 +12,23 @@ from app.services.data import (
 )
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
-from app.services.strategy.contracts.outcomes import (
-    StrategyOutcome,
-    failure,
-    success,
-)
+from app.services.strategy.contracts.outcomes import failure, success
 from app.services.strategy.contracts.policy import StrategyValidationPolicy
 from app.services.strategy.contracts.references import (
     ValidatedStrategyRef,
+)
+from app.services.strategy.contracts.responses import (
+    guard_strategy_boundary,
+    unwrap_data_response,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.utils import generate_id, logger
 
 
+@guard_strategy_boundary
 def list_strategy_versions(
     strategy_id: str | None = None,
-) -> StrategyOutcome[tuple[ValidatedStrategyRef, ...]]:
+) -> tuple[ValidatedStrategyRef, ...]:
     """List immutable registry versions in deterministic order.
 
     Args:
@@ -53,15 +54,18 @@ def list_strategy_versions(
                 "strategy_version"
             )
             params = (strategy_id,)
-        result = execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(statement,),
-                    parameter_sets=(params,),
-                    max_rows=1_000,
-                ),
-                request_id=request_id,
-            )
+        result = unwrap_data_response(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=(statement,),
+                        parameter_sets=(params,),
+                        max_rows=1_000,
+                    ),
+                    request_id=request_id,
+                )
+            ),
+            operation="data.execute_transaction.strategy_registry",
         )
     except DataError:
         return failure(

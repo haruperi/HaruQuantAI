@@ -1,39 +1,61 @@
-"""Strategy typed-outcome tests."""
+"""Strategy StandardResponse contract tests."""
 
 from datetime import UTC, datetime
 
 import pytest
-from app.services.strategy import (
-    StrategyError,
-    StrategyMutationResult,
-    StrategyOutcome,
+from app.services.strategy import StrategyMutationResult
+from app.utils import (
+    ResponseMetadata,
+    RiskLevel,
+    StandardError,
+    StandardResponse,
+    generate_id,
+    logger,
 )
-from app.utils import logger
 from pydantic import ValidationError
 
 
-def test_outcome_requires_exactly_one_branch() -> None:
-    """Verify success and error branches are exclusive."""
-    logger.debug("Testing Strategy outcome exclusivity")
+def _metadata() -> ResponseMetadata:
+    """Build minimal valid response metadata for contract tests."""
+    return ResponseMetadata(
+        name="strategy.test",
+        domain="strategy",
+        risk_level=RiskLevel.LOW,
+        request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        execution_ms=0.001,
+        read_only=True,
+        writes_file=False,
+        modifies_database=False,
+        places_trade=False,
+        requires_network=False,
+        extensions={},
+    )
+
+
+def test_response_requires_exclusive_error_branch() -> None:
+    """Verify StandardResponse success and error branches are exclusive."""
+    logger.debug("Testing Strategy response exclusivity")
     with pytest.raises(ValidationError):
-        StrategyOutcome[str](
+        StandardResponse[str](
             status="success",
+            message="ok",
             data="ok",
-            error=StrategyError(code="X", message="x", details={}),
+            error=StandardError(code="STRATEGY_INVALID_CONFIG", details={}),
+            metadata=_metadata(),
         )
 
 
-def test_strategy_error_rejects_unredacted_details() -> None:
-    """Verify sensitive keys cannot enter public Strategy errors."""
+def test_strategy_error_details_are_redacted() -> None:
+    """Verify sensitive values cannot cross the shared error contract."""
     logger.debug("Testing safe Strategy error details")
-    with pytest.raises(ValidationError):
-        StrategyError(code="X", message="safe", details={"token": "secret"})
+    value = StandardError(code="STRATEGY_INVALID_CONFIG", details={"token": "secret"})
+    assert "secret" not in str(value.details)
 
 
 def test_outcome_exclusive_data_or_error() -> None:
-    """Verify the documented exact outcome test name."""
-    logger.debug("Testing exact Strategy outcome branch")
-    test_outcome_requires_exactly_one_branch()
+    """Retain the historical test name for the migrated response rule."""
+    test_response_requires_exclusive_error_branch()
 
 
 def test_mutation_result_has_immutable_registration_truth() -> None:

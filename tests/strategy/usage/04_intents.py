@@ -81,12 +81,12 @@ def main() -> int:
 
     print("\nTRADE INTENT PROPOSAL")
     print("Contract:", TradeIntent.__name__)
-    outcome = build_trade_intent(decision, context, 0)
-    print("Status:", outcome.status)
-    if outcome.data is None:
-        print("Error:", outcome.error)
+    response = build_trade_intent(decision, context, 0)
+    print("Status:", response.status)
+    if response.data is None:
+        print("Error:", response.error)
         return 1
-    intent = outcome.data
+    intent = response.data
     print("Schema:", intent.schema_id)
     print("Intent ID:", intent.intent_id)
     print("Idempotency key:", intent.idempotency_key)
@@ -113,10 +113,10 @@ def main() -> int:
         diagnostic_facts={},
         lineage=lineage,
     )
-    neutral_outcome = build_trade_intent(neutral, context, 1)
-    print("Status:", neutral_outcome.status)
-    if neutral_outcome.error is not None:
-        print("Error code:", neutral_outcome.error.code)
+    neutral_response = build_trade_intent(neutral, context, 1)
+    print("Status:", neutral_response.status)
+    if neutral_response.error is not None:
+        print("Error code:", neutral_response.error.code)
     print("\nThis remains a proposal; Risk has not approved execution.")
     return 0
 

@@ -518,7 +518,7 @@ def example_05_harriet_hedging(  # noqa: C901
     print("\n05 HARRIET HEDGING")
     print("-" * 88)
     try:
-        higher = get_market_data(
+        higher_response = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="H4",
@@ -531,6 +531,10 @@ def example_05_harriet_hedging(  # noqa: C901
     except DataError as error:
         print("Higher-timeframe evidence unavailable:", error.code)
         return _UNAVAILABLE
+    if higher_response.status != "success" or higher_response.data is None:
+        print("Higher-timeframe evidence unavailable:", higher_response.error)
+        return _UNAVAILABLE
+    higher = higher_response.data
     parameters: dict[str, object] = {
         "lower_timeframe": "H1",
         "higher_timeframe": "H4",
@@ -652,7 +656,7 @@ def example_06_market_structure(market: object, point: Decimal) -> int:
     return 0
 
 
-def _real_mt5_account_snapshot() -> AccountStateSnapshot | None:
+def _real_mt5_account_snapshot() -> AccountStateSnapshot | None:  # noqa: PLR0911
     """Read a verified demo MT5 account snapshot through public contracts."""
     login_secret = _USAGE_SETTINGS.mt5_login
     password = _USAGE_SETTINGS.mt5_password
@@ -699,9 +703,9 @@ def _real_mt5_account_snapshot() -> AccountStateSnapshot | None:
         return None
     try:
         connected = asyncio.run(adapter.connect())
-        if not connected.is_success:
+        if connected.status != "success":
             return None
-        return get_account_state_snapshot(
+        snapshot_response = get_account_state_snapshot(
             AccountSnapshotRequest(
                 source_id="mt5",
                 account_id=login,
@@ -710,6 +714,9 @@ def _real_mt5_account_snapshot() -> AccountStateSnapshot | None:
             ),
             adapter,
         )
+        if snapshot_response.status != "success":
+            return None
+        return snapshot_response.data
     except DataError as error:
         print("MT5 demo account snapshot failed:", error.code)
         return None
@@ -815,7 +822,7 @@ def main() -> int:
     try:
         # 500 bars comfortably covers the audit window (260) plus the audited
         # sample (120) with headroom for the 200-period trend filter.
-        market = get_market_data(
+        market_response = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="H1",
@@ -825,10 +832,18 @@ def main() -> int:
             use_cache=False,
             quality_failure_behavior="warn",
         )
-        metadata = get_symbol_metadata(source_id="mt5", symbol="EURUSD")
+        metadata_response = get_symbol_metadata(source_id="mt5", symbol="EURUSD")
     except DataError as error:
         print("Live MT5 evidence unavailable:", error.code)
         return _UNAVAILABLE
+    if market_response.status != "success" or market_response.data is None:
+        print("Live MT5 evidence unavailable:", market_response.error)
+        return _UNAVAILABLE
+    market = market_response.data
+    if metadata_response.status != "success" or metadata_response.data is None:
+        print("Live MT5 metadata unavailable:", metadata_response.error)
+        return _UNAVAILABLE
+    metadata = metadata_response.data
     if not isinstance(metadata.point, int | float):
         print("MT5 point-size evidence unavailable:", metadata.point)
         return _UNAVAILABLE

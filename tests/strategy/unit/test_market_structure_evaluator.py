@@ -64,8 +64,10 @@ def test_market_structure_uses_exact_eight_zigzag_extremes() -> None:
         artifact_hash=HASH,
         dependency_hash=HASH,
     )
-    signals = evaluator.evaluate_signals(
+    response = evaluator.evaluate_signals(
         evidence, (zigzag,), make_signal_config({}), make_context()
     )
+    assert response.data is not None
+    signals = response.data
     assert tuple(signal.active for signal in signals) == (True, False)
     assert signals[0].lineage["zigzag_ref"] == HASH

@@ -205,7 +205,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Package**: `app/services/strategy`
 * **Responsibility**: Turn market state and indicator values into canonical trading signals and trade intents when invoked by an approved runtime workflow.
 * **Inputs**: Normalized datasets, indicator series, strategy parameters, lifecycle commands, `AccountStateSnapshot` from Data.
-* **Outputs**: Canonical signals, `TradeIntent` proposals with metadata, and `StrategyMutationResult` outcomes for registration or parameter updates.
+* **Outputs**: Utils `StandardResponse[T]` values carrying canonical signals, `TradeIntent` proposals, diagnostics, and `StrategyMutationResult` business outcomes directly in `data`.
 * **Owns**: Strategy registry and versioning, parameter schemas, strategy state checkpoints, deterministic strategy evaluation, and signal/intent generation.
 * **Boundaries**: Emits proposals (which may include sizing proposals), never broker orders. Does not own live/paper runtime orchestration, risk enforcement, final position sizing approval (Risk owns the final approved size), order routing, official fills, or data normalization.
 * **Key Limits**: Neutral signals emit no action; lookahead or clock-drift violations fail the batch atomically; account/broker state access is read-only `AccountStateSnapshot` from Data.

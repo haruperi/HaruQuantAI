@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
     _integer_parameter,
     _make_signal,
@@ -28,6 +29,7 @@ if TYPE_CHECKING:
 class RandomWalkEvaluator(_SignalEvaluatorBase):
     """Preserve deterministic flat-state triggers from the RandomWalk source."""
 
+    @guard_strategy_boundary
     def evaluate_signals(
         self,
         evidence: StrategySignalEvidence,

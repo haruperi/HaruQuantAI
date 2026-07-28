@@ -30,12 +30,14 @@ def test_white_fairy_preserves_entry_crossings_only() -> None:
         artifact_hash=HASH,
         dependency_hash=HASH,
     )
-    signals = evaluator.evaluate_signals(
+    response = evaluator.evaluate_signals(
         make_signal_evidence(market),
         (rsi,),
         make_signal_config({"rsi_period": 14, "oversold": "30", "overbought": "70"}),
         make_context(),
     )
+    assert response.data is not None
+    signals = response.data
     assert tuple(signal.signal_name for signal in signals) == (
         "LONG_ENTRY",
         "SHORT_ENTRY",

@@ -46,9 +46,11 @@ def test_sqx_preserves_prior_channel_breakout_and_atr_facts() -> None:
         artifact_hash=HASH,
         dependency_hash=HASH,
     )
-    signals = evaluator.evaluate_signals(
+    response = evaluator.evaluate_signals(
         make_signal_evidence(market), (atr,), config, make_context()
     )
+    assert response.data is not None
+    signals = response.data
     assert tuple(signal.active for signal in signals) == (True, False)
     assert signals[0].facts["stop_distance"] == "4.0"
     assert signals[0].facts["trailing_distance"] == "6.0"

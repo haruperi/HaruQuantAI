@@ -6,17 +6,19 @@ from app.services.strategy.contracts.execution import (  # noqa: TC001
     StrategyDecision,
     StrategyExecutionContext,
 )
-from app.services.strategy.contracts.outcomes import StrategyOutcome, failure, success
+from app.services.strategy.contracts.outcomes import failure, success
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.intents.intent import TradeIntent
 from app.utils import canonical_json, logger
 
 
+@guard_strategy_boundary
 def build_trade_intent(
     decision: StrategyDecision,
     context: StrategyExecutionContext,
     sequence: int,
-) -> StrategyOutcome[TradeIntent]:
+) -> TradeIntent:
     """Build one deterministic canonical intent from a proposal decision.
 
     Args:

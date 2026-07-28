@@ -13,10 +13,14 @@ from app.services.data import (
 )
 from app.services.strategy.checkpoints.models import StrategyCheckpoint
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
-from app.services.strategy.contracts.outcomes import StrategyOutcome, failure, success
+from app.services.strategy.contracts.outcomes import failure, success
 from app.services.strategy.contracts.references import (  # noqa: TC001
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
+)
+from app.services.strategy.contracts.responses import (
+    guard_strategy_boundary,
+    unwrap_data_response,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
@@ -34,13 +38,14 @@ _PROHIBITED_STATE_KEYS = frozenset(
 )
 
 
+@guard_strategy_boundary
 def create_strategy_checkpoint(  # noqa: PLR0911
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
     state: Mapping[str, JsonValue],
     authorization_ref: str,
     auth: AuthContext,
-) -> StrategyOutcome[StrategyCheckpoint]:
+) -> StrategyCheckpoint:
     """Redact, bound, checksum, and persist Strategy-local state.
 
     Args:
@@ -125,27 +130,30 @@ def create_strategy_checkpoint(  # noqa: PLR0911
             redacted_paths=redacted.redacted_paths,
         )
         _ensure_strategy_storage(auth.request_id)
-        execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        "INSERT OR IGNORE INTO strategy_checkpoints "
-                        "(checkpoint_id, checkpoint_json, checksum, "
-                        "authorization_ref, request_id) VALUES (?, ?, ?, ?, ?)",
-                    ),
-                    parameter_sets=(
-                        (
-                            checkpoint.checkpoint_id,
-                            checkpoint.model_dump_json(),
-                            checkpoint.state_checksum,
-                            checkpoint.authorization_ref,
-                            checkpoint.request_id,
+        unwrap_data_response(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=(
+                            "INSERT OR IGNORE INTO strategy_checkpoints "
+                            "(checkpoint_id, checkpoint_json, checksum, "
+                            "authorization_ref, request_id) VALUES (?, ?, ?, ?, ?)",
                         ),
+                        parameter_sets=(
+                            (
+                                checkpoint.checkpoint_id,
+                                checkpoint.model_dump_json(),
+                                checkpoint.state_checksum,
+                                checkpoint.authorization_ref,
+                                checkpoint.request_id,
+                            ),
+                        ),
+                        max_rows=1,
                     ),
-                    max_rows=1,
-                ),
-                request_id=auth.request_id,
-            )
+                    request_id=auth.request_id,
+                )
+            ),
+            operation="data.execute_transaction.strategy_checkpoint_write",
         )
         return success(checkpoint)
     except DataError:
@@ -166,12 +174,13 @@ def create_strategy_checkpoint(  # noqa: PLR0911
         )
 
 
+@guard_strategy_boundary
 def validate_strategy_checkpoint(
     checkpoint: StrategyCheckpoint,
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
     auth: AuthContext,
-) -> StrategyOutcome[Mapping[str, JsonValue]]:
+) -> Mapping[str, JsonValue]:
     """Load and validate a persisted checkpoint before restore.
 
     Args:
@@ -195,18 +204,21 @@ def validate_strategy_checkpoint(
             correlation_id=auth.correlation_id,
         )
     try:
-        result = execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        "SELECT checkpoint_json FROM strategy_checkpoints "
-                        "WHERE checkpoint_id = ?",
+        result = unwrap_data_response(
+            execute_transaction(
+                TransactionRequest(
+                    plan=StatementPlan(
+                        statements=(
+                            "SELECT checkpoint_json FROM strategy_checkpoints "
+                            "WHERE checkpoint_id = ?",
+                        ),
+                        parameter_sets=((checkpoint.checkpoint_id,),),
+                        max_rows=1,
                     ),
-                    parameter_sets=((checkpoint.checkpoint_id,),),
-                    max_rows=1,
-                ),
-                request_id=auth.request_id,
-            )
+                    request_id=auth.request_id,
+                )
+            ),
+            operation="data.execute_transaction.strategy_checkpoint_read",
         )
     except DataError:
         return failure(
