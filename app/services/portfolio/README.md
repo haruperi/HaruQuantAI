@@ -372,7 +372,7 @@ sequenceDiagram
 
 | Status    | File             | Responsibility                                                                         | Key exports                                                        | Dependencies                                                                                                                               |
 | --------- | ---------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Completed | `exceptions.py`  | Define the closed Portfolio error catalog and Utils-based structured domain error.     | `PORTFOLIO_ERROR_CODES`, `PortfolioError`, `PortfolioErrorPayload` | **Standard library:** `dataclasses`, `typing`; **Required third-party:** None; **Local:** `app.utils`                                  |
+| Completed | `exceptions.py`  | Define the immutable Portfolio error catalogue and Utils-based structured domain error. | `PORTFOLIO_ERROR_CATALOG`, `PortfolioError`, `PortfolioErrorPayload` | **Standard library:** `dataclasses`, `time`, `types`, `typing`; **Required third-party:** None; **Local:** `app.utils` |
 | Completed | `config.py`      | Define required Portfolio-owned settings and the deterministic UTC rebalance schedule. | `PortfolioSettings`, `RebalanceSchedule`                           | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `app.utils.AppSettings`; `exceptions.py` |
 | Completed | `requests.py`    | Validate the Portfolio-owned construction command.                                     | `PortfolioConstructionRequest`                                     | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** None                                     |
 | Completed | `results.py`     | Define immutable construction output.                                                  | `PortfolioConstructionResult`                                      | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `requests.py` → identifiers              |
@@ -386,7 +386,8 @@ allow_inf_nan=False)`. Every timestamp is timezone-aware UTC. Every digest is
 lowercase SHA-256 hexadecimal. Decimal values are accepted only as `Decimal`, are
 finite, and serialize into canonical hash material as strings. Supporting value rows
 are public only from `app.services.portfolio.contracts`; the package root exports the
-four registered contracts plus `PortfolioOutcome` and error types.
+four registered contracts plus Portfolio error types. Public bounded operations
+use Utils `StandardResponse[T]`; Portfolio DTOs remain the direct response data.
 
 | Model                          | Exact fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -400,7 +401,6 @@ four registered contracts plus `PortfolioOutcome` and error types.
 | `DriftObservation`             | `component_id`, `target_risk_budget`, `actual_risk_budget`, signed `drift`, `threshold_breached`                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `PortfolioRebalanceAction`     | `action_id`, `component_id`, `action="reduce_exposure"`, `reduce_only=True`, `current_exposure`, `target_exposure`, `reduction_amount`, `eligibility_decision_id`                                                                                                                                                                                                                                                                                                                                     |
 | `PortfolioRebalancePlan`       | fixed version/schema, `plan_id`, `plan_version`, `portfolio_id`, `allocation_version`, `scope`, ordered observations/actions, `status` (`no_action`, `review_required`, `blocked`, `executed`, `executed_unmeasured`, `measured`), `block_reasons`, evidence/config/canonical hashes, `observed_at`, `created_at`, optional Risk/Trading/Analytics references, request/workflow/correlation IDs                                                                                                       |
-| `PortfolioOutcome[T]`          | `ok`, `request_id`, `correlation_id`, exactly one of `value` or `error`, optional `audit_event_id`                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 `fixed_weights` is non-empty and complete only for `method="fixed"`; it is empty for
 the other methods. Equal weighting proposes equal capital and risk-budget metadata.
@@ -593,15 +593,29 @@ never called again unless its owner contract explicitly declares idempotent repl
 | ----------- | ------------------------------------------------------------------------------------------- | --------------- |
 | FR-PORT-034 | Expose construction, status, activation, drift/rebalance, rollback, and history operations. | API tests       |
 | FR-PORT-035 | Accept `AuthContext` and `request_id: str \| None = None` on governed entry points.         | Signature tests |
-| FR-PORT-036 | Return structured success/error envelopes; never `None` or raw exceptions.                  | Contract tests  |
+| FR-PORT-036 | Return Utils `StandardResponse[T]` envelopes; never `None` or raw exceptions cross the public boundary. | Contract tests |
 | FR-PORT-037 | Keep authentication and presentation logic outside Portfolio.                               | Import review   |
 
 `PortfolioService` exposes typed `construct`, `status`, `activate`, `assess_drift`,
 `submit_rebalance`, `recompute_measurement`, `rollback`, and `history` methods. Every
 governed method accepts `AuthContext` and `request_id: str | None = None`; a supplied
 request ID must equal any ID carried by the command. Every method returns
-`PortfolioOutcome` and converts known domain/dependency failures into the closed
-Portfolio error catalog.
+`StandardResponse[T]` with the raw Portfolio DTO directly in `data`, canonical
+trace identifiers in `metadata`, and known domain/dependency failures mapped to
+the immutable Portfolio error catalogue. `PortfolioError.to_payload` returns
+`StandardResponse[PortfolioErrorPayload]` with the payload directly in `data`.
+
+| Operation | Public return type |
+| --------- | ------------------ |
+| `construct` | `StandardResponse[PortfolioConstructionResult]` |
+| `status` | `StandardResponse[ActivePortfolioAllocation]` |
+| `activate` | `StandardResponse[ActivePortfolioAllocation]` |
+| `assess_drift` | `StandardResponse[PortfolioRebalancePlan]` |
+| `submit_rebalance` | `StandardResponse[PortfolioRebalancePlan]` |
+| `recompute_measurement` | `StandardResponse[PortfolioRebalancePlan]` |
+| `rollback` | `StandardResponse[ActivePortfolioAllocation]` |
+| `history` | `StandardResponse[tuple[ActivePortfolioAllocation, ...]]` |
+| `PortfolioError.to_payload` | `StandardResponse[PortfolioErrorPayload]` |
 
 ### Feature usage examples
 

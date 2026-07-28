@@ -2,38 +2,246 @@
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import Final
 
-from app.utils import HaruQuantError, logger
+from app.utils import (
+    ErrorDefinition,
+    HaruQuantError,
+    RiskLevel,
+    StandardResponse,
+    build_response_metadata,
+    generate_id,
+    logger,
+    success_response,
+    validate_error_catalog,
+)
 
-PORTFOLIO_ERROR_CODES: Final[frozenset[str]] = frozenset(
-    {
-        "PORT_APPROVAL_REQUIRED",
-        "PORT_AUDIT_PENDING",
-        "PORT_CONFIG_INVALID",
-        "PORT_CONSTRUCTION_FAILED",
-        "PORT_DEPENDENCY_FAILED",
-        "PORT_ELIGIBILITY_INVALID",
-        "PORT_EVIDENCE_INVALID",
-        "PORT_FX_EVIDENCE_INVALID",
-        "PORT_IDEMPOTENCY_CONFLICT",
-        "PORT_INTERNAL_ERROR",
-        "PORT_INVALID_INPUT",
-        "PORT_KILL_SWITCH_ACTIVE",
-        "PORT_MEASUREMENT_FAILED",
-        "PORT_METHOD_UNSUPPORTED",
-        "PORT_NOT_FOUND",
-        "PORT_PERSISTENCE_FAILED",
-        "PORT_REBALANCE_BLOCKED",
-        "PORT_REFERENCE_CHANGED",
-        "PORT_RISK_AUTHORIZATION_INVALID",
-        "PORT_SIMULATION_INVALID",
-        "PORT_UNCERTAIN_OUTCOME",
-        "PORT_UNSAFE_OBJECT",
-        "PORT_VERSION_CONFLICT",
-        "PORT_WEIGHT_INVALID",
-    }
+_PORTFOLIO_ERROR_DEFINITIONS: tuple[ErrorDefinition, ...] = (
+    ErrorDefinition(
+        code="PORT_APPROVAL_REQUIRED",
+        domain="portfolio",
+        description="Portfolio approval is required",
+        category="authorization",
+        severity="warning",
+        retryable=False,
+        operator_action="Obtain the required approval",
+    ),
+    ErrorDefinition(
+        code="PORT_AUDIT_PENDING",
+        domain="portfolio",
+        description="Portfolio audit evidence is pending",
+        category="audit",
+        severity="critical",
+        retryable=False,
+        operator_action="Resolve the audit persistence failure",
+    ),
+    ErrorDefinition(
+        code="PORT_CONFIG_INVALID",
+        domain="portfolio",
+        description="Portfolio configuration is invalid",
+        category="configuration",
+        severity="error",
+        retryable=False,
+        operator_action="Correct the Portfolio configuration",
+    ),
+    ErrorDefinition(
+        code="PORT_CONSTRUCTION_FAILED",
+        domain="portfolio",
+        description="Portfolio construction failed",
+        category="construction",
+        severity="error",
+        retryable=False,
+        operator_action="Correct the construction inputs and evidence",
+    ),
+    ErrorDefinition(
+        code="PORT_DEPENDENCY_FAILED",
+        domain="portfolio",
+        description="A Portfolio dependency failed",
+        category="dependency",
+        severity="error",
+        retryable=False,
+        operator_action="Verify the dependent domain outcome",
+    ),
+    ErrorDefinition(
+        code="PORT_ELIGIBILITY_INVALID",
+        domain="portfolio",
+        description="Portfolio strategy eligibility is invalid",
+        category="eligibility",
+        severity="error",
+        retryable=False,
+        operator_action="Obtain a current approving eligibility decision",
+    ),
+    ErrorDefinition(
+        code="PORT_EVIDENCE_INVALID",
+        domain="portfolio",
+        description="Portfolio evidence is invalid",
+        category="evidence",
+        severity="error",
+        retryable=False,
+        operator_action="Refresh and validate the required evidence",
+    ),
+    ErrorDefinition(
+        code="PORT_FX_EVIDENCE_INVALID",
+        domain="portfolio",
+        description="Portfolio FX evidence is invalid",
+        category="evidence",
+        severity="error",
+        retryable=False,
+        operator_action="Provide current verified FX evidence",
+    ),
+    ErrorDefinition(
+        code="PORT_IDEMPOTENCY_CONFLICT",
+        domain="portfolio",
+        description="Portfolio idempotency material conflicts",
+        category="concurrency",
+        severity="error",
+        retryable=False,
+        operator_action="Use a new idempotency key or matching material",
+    ),
+    ErrorDefinition(
+        code="PORT_INTERNAL_ERROR",
+        domain="portfolio",
+        description="Portfolio operation failed unexpectedly",
+        category="internal",
+        severity="critical",
+        retryable=False,
+        operator_action="Inspect redacted Portfolio diagnostics",
+    ),
+    ErrorDefinition(
+        code="PORT_INVALID_INPUT",
+        domain="portfolio",
+        description="Portfolio input is invalid",
+        category="validation",
+        severity="warning",
+        retryable=False,
+        operator_action="Correct the supplied Portfolio input",
+    ),
+    ErrorDefinition(
+        code="PORT_KILL_SWITCH_ACTIVE",
+        domain="portfolio",
+        description="Portfolio operation is blocked by an active kill switch",
+        category="governance",
+        severity="critical",
+        retryable=False,
+        operator_action="Resolve the applicable Risk kill switch",
+    ),
+    ErrorDefinition(
+        code="PORT_MEASUREMENT_FAILED",
+        domain="portfolio",
+        description="Portfolio measurement failed",
+        category="measurement",
+        severity="error",
+        retryable=False,
+        operator_action="Verify immutable Trading measurement evidence",
+    ),
+    ErrorDefinition(
+        code="PORT_METHOD_UNSUPPORTED",
+        domain="portfolio",
+        description="Portfolio construction method is unsupported",
+        category="construction",
+        severity="warning",
+        retryable=False,
+        operator_action="Select an approved construction method",
+    ),
+    ErrorDefinition(
+        code="PORT_NOT_FOUND",
+        domain="portfolio",
+        description="Portfolio state was not found",
+        category="state",
+        severity="warning",
+        retryable=False,
+        operator_action="Verify the Portfolio identity and version",
+    ),
+    ErrorDefinition(
+        code="PORT_PERSISTENCE_FAILED",
+        domain="portfolio",
+        description="Portfolio persistence failed",
+        category="persistence",
+        severity="critical",
+        retryable=False,
+        operator_action="Verify Portfolio state storage and audit integrity",
+    ),
+    ErrorDefinition(
+        code="PORT_REBALANCE_BLOCKED",
+        domain="portfolio",
+        description="Portfolio rebalance is blocked",
+        category="governance",
+        severity="warning",
+        retryable=False,
+        operator_action="Resolve the rebalance block reason",
+    ),
+    ErrorDefinition(
+        code="PORT_REFERENCE_CHANGED",
+        domain="portfolio",
+        description="Portfolio reference changed during the operation",
+        category="concurrency",
+        severity="warning",
+        retryable=False,
+        operator_action="Refresh Portfolio state before retrying",
+    ),
+    ErrorDefinition(
+        code="PORT_RISK_AUTHORIZATION_INVALID",
+        domain="portfolio",
+        description="Portfolio Risk authorization is invalid",
+        category="authorization",
+        severity="critical",
+        retryable=False,
+        operator_action="Obtain a current approving Risk decision",
+    ),
+    ErrorDefinition(
+        code="PORT_SIMULATION_INVALID",
+        domain="portfolio",
+        description="Portfolio simulation validation is invalid",
+        category="simulation",
+        severity="error",
+        retryable=False,
+        operator_action="Resolve the Simulation validation conflict",
+    ),
+    ErrorDefinition(
+        code="PORT_UNCERTAIN_OUTCOME",
+        domain="portfolio",
+        description="Portfolio execution outcome is uncertain",
+        category="execution",
+        severity="critical",
+        retryable=False,
+        operator_action="Reconcile Trading state before any further action",
+    ),
+    ErrorDefinition(
+        code="PORT_UNSAFE_OBJECT",
+        domain="portfolio",
+        description="Portfolio received an unsafe object",
+        category="validation",
+        severity="critical",
+        retryable=False,
+        operator_action="Supply the documented typed contract",
+    ),
+    ErrorDefinition(
+        code="PORT_VERSION_CONFLICT",
+        domain="portfolio",
+        description="Portfolio version conflicts with current state",
+        category="concurrency",
+        severity="warning",
+        retryable=False,
+        operator_action="Refresh the current Portfolio version",
+    ),
+    ErrorDefinition(
+        code="PORT_WEIGHT_INVALID",
+        domain="portfolio",
+        description="Portfolio weight is invalid",
+        category="construction",
+        severity="warning",
+        retryable=False,
+        operator_action="Correct the Portfolio weight inputs",
+    ),
+)
+
+PORTFOLIO_ERROR_CATALOG: Final = validate_error_catalog(
+    MappingProxyType(
+        {definition.code: definition for definition in _PORTFOLIO_ERROR_DEFINITIONS}
+    )
 )
 
 
@@ -56,7 +264,7 @@ class PortfolioErrorPayload:
             ValueError: If the error code is not registered.
         """
         logger.debug("Validating Portfolio error payload")
-        if self.code not in PORTFOLIO_ERROR_CODES:
+        if self.code not in PORTFOLIO_ERROR_CATALOG:
             raise ValueError("Portfolio error code is not registered")
 
 
@@ -74,22 +282,39 @@ class PortfolioError(HaruQuantError):
             ValueError: If the code is not registered or tokens are malformed.
         """
         logger.debug("Initializing Portfolio error")
-        if code not in PORTFOLIO_ERROR_CODES:
+        if code not in PORTFOLIO_ERROR_CATALOG:
             raise ValueError("Portfolio error code is not registered")
         super().__init__(code, detail)
 
-    def to_payload(self) -> PortfolioErrorPayload:
-        """Return the boundary-safe error payload.
+    def to_payload(self) -> StandardResponse[PortfolioErrorPayload]:
+        """Return the boundary-safe error payload in a standard response.
 
         Returns:
-            Immutable error payload.
+            Successful standard response containing the immutable error payload.
         """
         logger.debug("Converting Portfolio error to payload")
-        return PortfolioErrorPayload(code=self.code, detail=self.detail)
+        start_time = time.perf_counter_ns()
+        metadata = build_response_metadata(
+            name="portfolio.exceptions.portfolio_error.to_payload",
+            domain="portfolio",
+            risk_level=RiskLevel.NONE,
+            request_id=generate_id("req"),
+            start_time=start_time,
+            read_only=True,
+            writes_file=False,
+            modifies_database=False,
+            places_trade=False,
+            requires_network=False,
+        )
+        return success_response(
+            PortfolioErrorPayload(code=self.code, detail=self.detail),
+            message="Portfolio error payload created",
+            metadata=metadata,
+        )
 
 
 __all__: tuple[str, ...] = (
-    "PORTFOLIO_ERROR_CODES",
+    "PORTFOLIO_ERROR_CATALOG",
     "PortfolioError",
     "PortfolioErrorPayload",
 )

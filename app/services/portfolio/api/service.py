@@ -2,25 +2,39 @@
 
 from __future__ import annotations
 
+import time
 from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Literal
 
-from app.services.portfolio.contracts import (
-    ActivePortfolioAllocation,
-    PortfolioConstructionRequest,
-    PortfolioConstructionResult,
-    PortfolioOutcome,
-    PortfolioRebalancePlan,
-)
 from app.services.portfolio.exceptions import (
+    PORTFOLIO_ERROR_CATALOG,
     PortfolioError,
-    PortfolioErrorPayload,
 )
-from app.utils import AuthContext, logger
+from app.utils import (
+    AuthContext,
+    JsonValue,
+    ResponseMetadata,
+    RiskLevel,
+    StandardResponse,
+    ValidationError,
+    build_response_metadata,
+    error_response,
+    generate_id,
+    logger,
+    success_response,
+    validate_id,
+)
 
 if TYPE_CHECKING:
+    from app.services.portfolio.contracts import (
+        ActivePortfolioAllocation,
+        PortfolioConstructionRequest,
+        PortfolioConstructionResult,
+        PortfolioRebalancePlan,
+    )
     from app.services.portfolio.evidence import ValidatedConstructionEvidence
     from app.services.portfolio.orchestration import (
         PortfolioReviewResult,
@@ -33,6 +47,56 @@ if TYPE_CHECKING:
         ApprovalValidationResult,
         StrategyOperationalEligibilityDecision,
     )
+
+
+_OPERATION_FACTS = MappingProxyType(
+    {
+        "portfolio.api.service.construct": (
+            RiskLevel.MEDIUM,
+            False,
+            True,
+            False,
+            True,
+        ),
+        "portfolio.api.service.status": (RiskLevel.LOW, True, False, False, False),
+        "portfolio.api.service.activate": (
+            RiskLevel.CRITICAL,
+            False,
+            True,
+            False,
+            True,
+        ),
+        "portfolio.api.service.assess_drift": (
+            RiskLevel.HIGH,
+            False,
+            True,
+            False,
+            True,
+        ),
+        "portfolio.api.service.submit_rebalance": (
+            RiskLevel.CRITICAL,
+            False,
+            True,
+            True,
+            True,
+        ),
+        "portfolio.api.service.recompute_measurement": (
+            RiskLevel.HIGH,
+            False,
+            True,
+            False,
+            True,
+        ),
+        "portfolio.api.service.rollback": (
+            RiskLevel.CRITICAL,
+            False,
+            True,
+            False,
+            True,
+        ),
+        "portfolio.api.service.history": (RiskLevel.LOW, True, False, False, False),
+    }
+)
 
 
 class PortfolioService:
@@ -112,21 +176,24 @@ class PortfolioService:
             request_id: Optional caller-supplied request identity.
 
         Returns:
-            Non-empty request and correlation text for safe error mapping.
+            Canonical request and correlation identities for safe error mapping.
         """
         logger.debug("Preparing fallback Portfolio error-envelope trace")
         context_request_id = getattr(auth_context, "request_id", None)
         context_correlation_id = getattr(auth_context, "correlation_id", None)
+
+        def canonical_or_generated(value: object, prefix: Literal["req", "cor"]) -> str:
+            """Return a valid trace ID without retaining malformed input."""
+            if isinstance(value, str):
+                try:
+                    return validate_id(value, expected_prefix=prefix)
+                except ValidationError:
+                    pass
+            return generate_id(prefix)
+
         return (
-            request_id
-            or (
-                context_request_id if isinstance(context_request_id, str) else "unknown"
-            ),
-            (
-                context_correlation_id
-                if isinstance(context_correlation_id, str)
-                else "unknown"
-            ),
+            canonical_or_generated(request_id or context_request_id, "req"),
+            canonical_or_generated(context_correlation_id, "cor"),
         )
 
     def _active(
@@ -156,58 +223,117 @@ class PortfolioService:
     def _failure[T](
         error: Exception,
         *,
+        operation: str,
         request_id: str,
         correlation_id: str,
-    ) -> PortfolioOutcome[T]:
+        start_time: int,
+    ) -> StandardResponse[T]:
         """Map every failure into the closed Portfolio error envelope.
 
         Args:
             error: Known or unexpected operation failure.
+            operation: Qualified Portfolio operation name.
             request_id: Request trace identity.
             correlation_id: Correlation trace identity.
+            start_time: Monotonic operation start time.
 
         Returns:
-            Structured error-only Portfolio outcome.
+            Structured Portfolio error response.
         """
         logger.warning("Mapping Portfolio operation failure to a safe envelope")
-        payload = (
-            error.to_payload()
-            if isinstance(error, PortfolioError)
-            else PortfolioErrorPayload("PORT_INTERNAL_ERROR", "UNEXPECTED")
+        code = (
+            error.code if isinstance(error, PortfolioError) else "PORT_INTERNAL_ERROR"
         )
-        return PortfolioOutcome(
-            ok=False,
+        details: dict[str, JsonValue] = {
+            "detail": (
+                error.detail if isinstance(error, PortfolioError) else "UNEXPECTED"
+            ),
+        }
+        if not isinstance(error, PortfolioError):
+            details["failure_type"] = type(error).__name__
+        metadata = PortfolioService._metadata(
+            operation=operation,
             request_id=request_id,
             correlation_id=correlation_id,
-            error=payload,
+            start_time=start_time,
+        )
+        return error_response(
+            code=code,
+            details=details,
+            message=PORTFOLIO_ERROR_CATALOG[code].description,
+            metadata=metadata,
+            catalog=PORTFOLIO_ERROR_CATALOG,
+        )
+
+    @staticmethod
+    def _metadata(
+        *,
+        operation: str,
+        request_id: str,
+        correlation_id: str,
+        start_time: int,
+        extensions: Mapping[str, JsonValue] | None = None,
+    ) -> ResponseMetadata:
+        """Build metadata for one Portfolio public operation.
+
+        Returns:
+            Validated standard response metadata.
+        """
+        risk_level, read_only, modifies_database, places_trade, requires_network = (
+            _OPERATION_FACTS[operation]
+        )
+        return build_response_metadata(
+            name=operation,
+            domain="portfolio",
+            risk_level=risk_level,
+            request_id=request_id,
+            correlation_id=correlation_id,
+            start_time=start_time,
+            read_only=read_only,
+            writes_file=False,
+            modifies_database=modifies_database,
+            places_trade=places_trade,
+            requires_network=requires_network,
+            extensions=extensions,
         )
 
     @staticmethod
     def _success[T](
-        value: T,
+        value: T | None,
         *,
+        operation: str,
         request_id: str,
         correlation_id: str,
+        start_time: int,
         audit_event_id: str | None = None,
-    ) -> PortfolioOutcome[T]:
+    ) -> StandardResponse[T]:
         """Wrap one non-null success value in the public envelope.
 
         Args:
             value: Successful typed operation value.
+            operation: Qualified Portfolio operation name.
             request_id: Request trace identity.
             correlation_id: Correlation trace identity.
+            start_time: Monotonic operation start time.
             audit_event_id: Optional persisted audit identity.
 
         Returns:
-            Structured success-only Portfolio outcome.
+            Structured Portfolio success response.
         """
         logger.debug("Wrapping successful Portfolio operation outcome")
-        return PortfolioOutcome(
-            ok=True,
-            request_id=request_id,
-            correlation_id=correlation_id,
-            value=value,
-            audit_event_id=audit_event_id,
+        extensions: dict[str, JsonValue] = {}
+        if audit_event_id is not None:
+            extensions["audit_event_id"] = audit_event_id
+        return success_response(
+            value,
+            message="Portfolio operation completed successfully",
+            metadata=PortfolioService._metadata(
+                operation=operation,
+                request_id=request_id,
+                correlation_id=correlation_id,
+                start_time=start_time,
+                extensions=extensions,
+            ),
         )
 
     def construct(
@@ -215,7 +341,7 @@ class PortfolioService:
         request: PortfolioConstructionRequest,
         auth_context: AuthContext,
         request_id: str | None = None,
-    ) -> PortfolioOutcome[PortfolioConstructionResult]:
+    ) -> StandardResponse[PortfolioConstructionResult]:
         """Construct and persist one deterministic Portfolio candidate.
 
         Args:
@@ -227,6 +353,7 @@ class PortfolioService:
             Structured construction result or failure.
         """
         logger.info("Serving public Portfolio construction operation")
+        start_time = time.perf_counter_ns()
         safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
         try:
             safe_request_id, correlation_id = self._trace(
@@ -239,15 +366,19 @@ class PortfolioService:
             result, _evidence = self._workflows.construct(request)
             return self._success(
                 result,
+                operation="portfolio.api.service.construct",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
+                operation="portfolio.api.service.construct",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
 
     def status(
@@ -256,7 +387,7 @@ class PortfolioService:
         scope: Mapping[str, str],
         auth_context: AuthContext,
         request_id: str | None = None,
-    ) -> PortfolioOutcome[ActivePortfolioAllocation]:
+    ) -> StandardResponse[ActivePortfolioAllocation]:
         """Return the exact active allocation for one Portfolio scope.
 
         Args:
@@ -269,20 +400,25 @@ class PortfolioService:
             Structured active allocation or failure.
         """
         logger.info("Serving public Portfolio status operation")
+        start_time = time.perf_counter_ns()
         safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
         try:
             safe_request_id, correlation_id = self._trace(auth_context, request_id)
             return self._success(
                 self._active(portfolio_id, scope),
+                operation="portfolio.api.service.status",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
+                operation="portfolio.api.service.status",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
 
     def activate(
@@ -299,7 +435,7 @@ class PortfolioService:
         expected_revision: int,
         auth_context: AuthContext,
         request_id: str | None = None,
-    ) -> PortfolioOutcome[ActivePortfolioAllocation]:
+    ) -> StandardResponse[ActivePortfolioAllocation]:
         """Activate a fully reviewed Portfolio allocation version.
 
         Args:
@@ -319,6 +455,7 @@ class PortfolioService:
             Structured active allocation or failure.
         """
         logger.info("Serving public Portfolio activation operation")
+        start_time = time.perf_counter_ns()
         safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
         try:
             safe_request_id, correlation_id = self._trace(
@@ -341,16 +478,20 @@ class PortfolioService:
             )
             return self._success(
                 value,
+                operation="portfolio.api.service.activate",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
                 audit_event_id=value.audit_ref,
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
+                operation="portfolio.api.service.activate",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
 
     def assess_drift(
@@ -363,7 +504,7 @@ class PortfolioService:
         eligibility_decisions: Mapping[str, StrategyOperationalEligibilityDecision],
         auth_context: AuthContext,
         request_id: str | None = None,
-    ) -> PortfolioOutcome[PortfolioRebalancePlan]:
+    ) -> StandardResponse[PortfolioRebalancePlan]:
         """Assess actual exposure drift against an active target.
 
         Args:
@@ -379,6 +520,7 @@ class PortfolioService:
             Structured immutable rebalance plan or failure.
         """
         logger.info("Serving public Portfolio drift operation")
+        start_time = time.perf_counter_ns()
         safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
         try:
             safe_request_id, correlation_id = self._trace(auth_context, request_id)
@@ -394,15 +536,19 @@ class PortfolioService:
             )
             return self._success(
                 value,
+                operation="portfolio.api.service.assess_drift",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
+                operation="portfolio.api.service.assess_drift",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
 
     async def submit_rebalance(
@@ -420,7 +566,7 @@ class PortfolioService:
         valid_until: datetime,
         auth_context: AuthContext,
         request_id: str | None = None,
-    ) -> PortfolioOutcome[PortfolioRebalancePlan]:
+    ) -> StandardResponse[PortfolioRebalancePlan]:
         """Submit and measure one Risk-reviewed reduce-only plan.
 
         Args:
@@ -441,6 +587,7 @@ class PortfolioService:
             Structured measured or executed-but-unmeasured plan, or failure.
         """
         logger.info("Serving public Portfolio rebalance submission")
+        start_time = time.perf_counter_ns()
         safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
         try:
             safe_request_id, correlation_id = self._trace(
@@ -464,15 +611,19 @@ class PortfolioService:
             )
             return self._success(
                 value,
+                operation="portfolio.api.service.submit_rebalance",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
+                operation="portfolio.api.service.submit_rebalance",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
 
     def recompute_measurement(
@@ -482,7 +633,7 @@ class PortfolioService:
         trading_request_id: str,
         auth_context: AuthContext,
         request_id: str | None = None,
-    ) -> PortfolioOutcome[PortfolioRebalancePlan]:
+    ) -> StandardResponse[PortfolioRebalancePlan]:
         """Recompute read-only Analytics evidence from immutable Trading facts.
 
         Args:
@@ -495,6 +646,7 @@ class PortfolioService:
             Structured measured or unchanged plan, or failure.
         """
         logger.info("Serving public Portfolio measurement recomputation")
+        start_time = time.perf_counter_ns()
         safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
         try:
             safe_request_id, correlation_id = self._trace(auth_context, request_id)
@@ -504,15 +656,19 @@ class PortfolioService:
             )
             return self._success(
                 value,
+                operation="portfolio.api.service.recompute_measurement",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
+                operation="portfolio.api.service.recompute_measurement",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
 
     def rollback(
@@ -530,7 +686,7 @@ class PortfolioService:
         expected_revision: int,
         auth_context: AuthContext,
         request_id: str | None = None,
-    ) -> PortfolioOutcome[ActivePortfolioAllocation]:
+    ) -> StandardResponse[ActivePortfolioAllocation]:
         """Create a new governed version reproducing historical allocation.
 
         Args:
@@ -551,6 +707,7 @@ class PortfolioService:
             Structured new active allocation or failure.
         """
         logger.info("Serving public Portfolio rollback operation")
+        start_time = time.perf_counter_ns()
         safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
         try:
             safe_request_id, correlation_id = self._trace(
@@ -574,16 +731,20 @@ class PortfolioService:
             )
             return self._success(
                 value,
+                operation="portfolio.api.service.rollback",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
                 audit_event_id=value.audit_ref,
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
+                operation="portfolio.api.service.rollback",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
 
     def history(
@@ -591,7 +752,7 @@ class PortfolioService:
         portfolio_id: str,
         auth_context: AuthContext,
         request_id: str | None = None,
-    ) -> PortfolioOutcome[tuple[ActivePortfolioAllocation, ...]]:
+    ) -> StandardResponse[tuple[ActivePortfolioAllocation, ...]]:
         """Return immutable allocation history in activation order.
 
         Args:
@@ -603,20 +764,25 @@ class PortfolioService:
             Structured immutable history or failure.
         """
         logger.info("Serving public Portfolio history operation")
+        start_time = time.perf_counter_ns()
         safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
         try:
             safe_request_id, correlation_id = self._trace(auth_context, request_id)
             return self._success(
                 self._repository.history(portfolio_id),
+                operation="portfolio.api.service.history",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
         # pylint: disable-next=broad-exception-caught
         except Exception as error:  # noqa: BLE001 - public exception boundary.
             return self._failure(
                 error,
+                operation="portfolio.api.service.history",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
+                start_time=start_time,
             )
 
 

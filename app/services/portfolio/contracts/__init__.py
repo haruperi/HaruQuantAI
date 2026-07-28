@@ -19,7 +19,6 @@ from app.services.portfolio.contracts.requests import (
 from app.services.portfolio.contracts.results import (
     PortfolioComponentWeight,
     PortfolioConstructionResult,
-    PortfolioOutcome,
 )
 
 __all__: tuple[str, ...] = (
@@ -33,7 +32,6 @@ __all__: tuple[str, ...] = (
     "PortfolioComponentWeight",
     "PortfolioConstructionRequest",
     "PortfolioConstructionResult",
-    "PortfolioOutcome",
     "PortfolioRebalanceAction",
     "PortfolioRebalancePlan",
     "RuntimeProfile",

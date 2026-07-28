@@ -12,9 +12,8 @@ from app.services.portfolio.contracts import (
     PortfolioComponentWeight,
     PortfolioConstructionRequest,
     PortfolioConstructionResult,
-    PortfolioOutcome,
 )
-from app.services.portfolio.exceptions import PortfolioError, PortfolioErrorPayload
+from app.services.portfolio.exceptions import PortfolioError
 from app.utils import logger
 
 
@@ -181,27 +180,9 @@ def test_result_requires_ordered_exact_weight_totals(
         PortfolioConstructionResult(**invalid_result)
 
 
-def test_outcome_contains_exactly_one_value_or_error() -> None:
-    """Verify public envelopes never represent ambiguous outcomes."""
-    logger.info("Testing Portfolio operation envelope exclusivity")
-    success = PortfolioOutcome[str](
-        ok=True,
-        request_id="req-1",
-        correlation_id="corr-1",
-        value="done",
-    )
-    failure = PortfolioOutcome[str](
-        ok=False,
-        request_id="req-1",
-        correlation_id="corr-1",
-        error=PortfolioErrorPayload("PORT_NOT_FOUND", "ALLOCATION"),
-    )
+def test_portfolio_contracts_exclude_legacy_response_envelope() -> None:
+    """Verify Portfolio DTOs do not expose the retired response envelope."""
+    logger.info("Testing removal of the legacy Portfolio response envelope")
+    from app.services.portfolio import contracts
 
-    assert success.value == "done"
-    assert failure.error is not None
-    with pytest.raises(ValueError, match="exactly one"):
-        PortfolioOutcome[str](
-            ok=True,
-            request_id="req-1",
-            correlation_id="corr-1",
-        )
+    assert not hasattr(contracts, "PortfolioOutcome")

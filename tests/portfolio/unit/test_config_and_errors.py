@@ -8,7 +8,7 @@ from decimal import Decimal
 import pytest
 from app.services.portfolio.config import PortfolioSettings, RebalanceSchedule
 from app.services.portfolio.exceptions import (
-    PORTFOLIO_ERROR_CODES,
+    PORTFOLIO_ERROR_CATALOG,
     PortfolioError,
     PortfolioErrorPayload,
 )
@@ -71,10 +71,13 @@ def test_error_catalog_is_closed_and_utils_based() -> None:
     error = PortfolioError("PORT_EVIDENCE_INVALID", "STALE")
 
     assert isinstance(error, HaruQuantError)
-    assert error.to_payload() == PortfolioErrorPayload(
+    response = error.to_payload()
+    assert response.status == "success"
+    assert response.data == PortfolioErrorPayload(
         code="PORT_EVIDENCE_INVALID",
         detail="STALE",
     )
-    assert "PORT_INTERNAL_ERROR" in PORTFOLIO_ERROR_CODES
+    assert "PORT_INTERNAL_ERROR" in PORTFOLIO_ERROR_CATALOG
+    assert len(PORTFOLIO_ERROR_CATALOG) == 24
     with pytest.raises(ValueError, match="not registered"):
         PortfolioError("UNKNOWN")

@@ -13,11 +13,10 @@ from app.services.portfolio.config import PortfolioSettings
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioConstructionRequest,
-    PortfolioOutcome,
 )
 from app.services.portfolio.orchestration import PortfolioWorkflowService
 from app.services.portfolio.state import PortfolioRepository, scope_key
-from app.utils import AuthContext, logger
+from app.utils import AuthContext, StandardResponse, logger
 
 from tests.portfolio.unit.test_repository import FakePortfolioStore
 from tests.portfolio.unit.test_workflows import _plan, _service
@@ -106,10 +105,14 @@ def test_status_and_history_return_structured_non_null_outcomes(
         auth,
     )
     history = service.history(active_allocation.portfolio_id, auth)
-    assert status.ok is True
-    assert status.value is active_allocation
-    assert history.ok is True
-    assert history.value == (active_allocation,)
+    assert isinstance(status, StandardResponse)
+    assert status.status == "success"
+    assert status.data is active_allocation
+    assert history.status == "success"
+    assert history.data == (active_allocation,)
+    assert status.metadata.request_id == auth.request_id
+    assert status.metadata.correlation_id == auth.correlation_id
+    assert status.metadata.read_only is True
 
 
 def test_public_boundary_maps_unexpected_exception_without_detail_leak(
@@ -132,11 +135,13 @@ def test_public_boundary_maps_unexpected_exception_without_detail_leak(
         PortfolioRepository(FakePortfolioStore()),
     )
     outcome = service.construct(request, auth)
-    assert isinstance(outcome, PortfolioOutcome)
-    assert outcome.ok is False
+    assert isinstance(outcome, StandardResponse)
+    assert outcome.status == "error"
+    assert outcome.data is None
     assert outcome.error is not None
     assert outcome.error.code == "PORT_INTERNAL_ERROR"
-    assert "private" not in outcome.error.detail.lower()
+    assert outcome.error.details["detail"] == "UNEXPECTED"
+    assert "private" not in str(outcome.error.details).lower()
 
 
 @pytest.fixture
@@ -179,9 +184,10 @@ async def test_submit_rebalance_returns_structured_measured_outcome(
         valid_until=portfolio_now + timedelta(minutes=5),
         auth_context=auth,
     )
-    assert outcome.ok is True
-    assert outcome.value is not None
-    assert outcome.value.status == "measured"
+    assert outcome.status == "success"
+    assert outcome.data is not None
+    assert outcome.data.status == "measured"
+    assert outcome.metadata.places_trade is True
 
 
 def test_api_has_no_authentication_or_presentation_framework_imports() -> None:

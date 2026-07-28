@@ -45,7 +45,7 @@ from app.services.trading import (
     StandardTradingEnvelope,
     TradingRoute,
 )
-from app.utils import AuditEvent, canonical_json, generate_id, logger
+from app.utils import AuditEvent, StandardResponse, canonical_json, generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -120,7 +120,8 @@ type TradingExecutor = Callable[
 type TradingExecutionSource = Callable[[str], StandardTradingEnvelope]
 type AnalyticsMeasurer = Callable[
     [PortfolioRebalanceMeasurementRequest],
-    PortfolioRebalanceMeasurementEvidence,
+    StandardResponse[PortfolioRebalanceMeasurementEvidence]
+    | PortfolioRebalanceMeasurementEvidence,
 ]
 type AuditPersister = Callable[[AuditEvent], str]
 
@@ -1012,12 +1013,25 @@ class PortfolioWorkflowService:
             trading_request_id=trading_request_id,
         )
         try:
-            evidence = self._deps.analytics_measurer(request)
+            analytics_response = self._deps.analytics_measurer(request)
         except Exception:  # noqa: BLE001 - receiver failure preserves execution truth.
             logger.warning(
                 "Analytics measurement failed; preserving executed Portfolio truth"
             )
             return executed
+        if isinstance(analytics_response, StandardResponse):
+            if (
+                analytics_response.status != "success"
+                or analytics_response.data is None
+            ):
+                logger.warning(
+                    "Analytics returned no measurement; preserving executed "
+                    "Portfolio truth"
+                )
+                return executed
+            evidence = analytics_response.data
+        else:
+            evidence = analytics_response
         if (
             evidence.plan_id != executed.plan_id
             or evidence.trading_execution_ref != executed.trading_execution_ref

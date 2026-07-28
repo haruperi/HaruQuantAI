@@ -12,7 +12,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import PortfolioService
+from app.services.portfolio import PortfolioError, PortfolioService
 
 
 def _header(title: str) -> None:
@@ -87,11 +87,11 @@ def fr_port_036() -> None:
     """FR-PORT-036: Return structured success/error envelopes; never None or
     raw exceptions.
 
-    Demonstrates that every public method returns a PortfolioOutcome typed
+    Demonstrates that every public method returns a StandardResponse typed
     envelope.
     """
     _header(
-        "FR-PORT-036: Return structured success/error envelopes; never None or raw exceptions. Demonstrates that every public method returns a PortfolioOutcome typed envelope."
+        "FR-PORT-036: Return structured success/error envelopes; never None or raw exceptions. Demonstrates that every public method returns a StandardResponse typed envelope."
     )
     print("FR-PORT-036: Return structured envelopes, never None or raw exceptions")
 
@@ -108,8 +108,13 @@ def fr_port_036() -> None:
     for method_name in governed:
         signature = inspect.signature(getattr(PortfolioService, method_name))
         return_annotation = str(signature.return_annotation)
-        assert "PortfolioOutcome" in return_annotation
+        assert "StandardResponse" in return_annotation
         print(f"  {method_name} -> {return_annotation.split('[', maxsplit=1)[0]}")
+
+    error_response = PortfolioError("PORT_NOT_FOUND", "LIFECYCLE").to_payload()
+    assert error_response.status == "success"
+    assert error_response.data is not None
+    print("  PortfolioError.to_payload -> StandardResponse")
 
 
 def fr_port_037() -> None:

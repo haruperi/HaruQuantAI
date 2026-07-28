@@ -1,5 +1,6 @@
 """Coverage expansion tests for Portfolio public API service."""
 
+import time
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock
 
@@ -64,7 +65,7 @@ def test_portfolio_service_fallback_trace() -> None:
 
     auth = _auth()
     req_id2, cor_id2 = PortfolioService._fallback_trace(auth, "caller-req-id")
-    assert req_id2 == "caller-req-id"
+    assert req_id2.startswith("req-")
     assert cor_id2 == auth.correlation_id
 
 
@@ -87,36 +88,40 @@ def test_portfolio_service_construct_and_status_outcomes() -> None:
     # 1. construct success
     mock_workflows.construct.return_value = ("result-obj", "evidence-obj")
     outcome = service.construct(req, auth)
-    assert outcome.ok is True
-    assert outcome.value == "result-obj"
+    assert outcome.status == "success"
+    assert outcome.data == "result-obj"
 
     # 2. construct failure handling (exception)
     mock_workflows.construct.side_effect = PortfolioError(
         "PORT_INVALID_INPUT", "TEST_ERR"
     )
     err_outcome = service.construct(req, auth)
-    assert err_outcome.ok is False
+    assert err_outcome.status == "error"
     assert err_outcome.error is not None
     assert err_outcome.error.code == "PORT_INVALID_INPUT"
 
     # 3. status when no active allocation -> PORT_NOT_FOUND
     mock_repo.active.return_value = None
     status_err = service.status("port-1", {"scope": "test"}, auth)
-    assert status_err.ok is False
+    assert status_err.status == "error"
     assert status_err.error is not None
     assert status_err.error.code == "PORT_NOT_FOUND"
 
     # 4. status success
     mock_repo.active.return_value = ("alloc-obj", 1)
     status_ok = service.status("port-1", {"scope": "test"}, auth)
-    assert status_ok.ok is True
-    assert status_ok.value == "alloc-obj"
+    assert status_ok.status == "success"
+    assert status_ok.data == "alloc-obj"
 
     # 5. generic exception in _failure
     generic_err_outcome = PortfolioService._failure(
-        ValueError("unexpected"), request_id="req-1", correlation_id="cor-1"
+        ValueError("unexpected"),
+        operation="portfolio.api.service.construct",
+        request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        start_time=time.perf_counter_ns(),
     )
-    assert generic_err_outcome.ok is False
+    assert generic_err_outcome.status == "error"
     assert generic_err_outcome.error is not None
     assert generic_err_outcome.error.code == "PORT_INTERNAL_ERROR"
 
@@ -139,7 +144,7 @@ def test_portfolio_service_remaining_methods() -> None:
             eligibility_decisions={},
             auth_context=auth,
         )
-        assert drift_ok.ok is True
+        assert drift_ok.status == "success"
 
         # submit_rebalance success
         plan_mock = MagicMock(
@@ -161,14 +166,14 @@ def test_portfolio_service_remaining_methods() -> None:
             valid_until=datetime.now(UTC),
             auth_context=auth,
         )
-        assert sub_ok.ok is True
+        assert sub_ok.status == "success"
 
         # recompute_measurement success
         mock_workflows.recompute_measurement.return_value = "recompute-res"
         recomp_ok = service.recompute_measurement(
             "plan-1", trading_request_id="trd-1", auth_context=auth
         )
-        assert recomp_ok.ok is True
+        assert recomp_ok.status == "success"
 
         # rollback success
         candidate = MagicMock(
@@ -191,12 +196,12 @@ def test_portfolio_service_remaining_methods() -> None:
             expected_revision=0,
             auth_context=auth,
         )
-        assert rb_ok.ok is True
+        assert rb_ok.status == "success"
 
         # history success
         mock_repo.history.return_value = ("alloc-1", "alloc-2")
         hist_ok = service.history("port-1", auth)
-        assert hist_ok.ok is True
+        assert hist_ok.status == "success"
 
     import asyncio
 

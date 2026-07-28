@@ -1,13 +1,12 @@
-"""Immutable Portfolio construction results and structured outcomes."""
+"""Immutable Portfolio construction results."""
 
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Literal, Self
+from typing import Literal, Self
 
 from pydantic import field_serializer, field_validator, model_validator
 
@@ -20,9 +19,6 @@ from app.services.portfolio.contracts.requests import (
     _utc,
 )
 from app.utils import logger
-
-if TYPE_CHECKING:
-    from app.services.portfolio.exceptions import PortfolioErrorPayload
 
 
 class PortfolioComponentWeight(PortfolioContractModel):
@@ -248,43 +244,7 @@ class PortfolioConstructionResult(PortfolioContractModel):
         return self
 
 
-@dataclass(frozen=True, slots=True)
-class PortfolioOutcome[T]:
-    """Structured success or error envelope for Portfolio operations.
-
-    Attributes:
-        ok: Whether the operation succeeded.
-        request_id: Request trace identity.
-        correlation_id: Correlation trace identity.
-        value: Success value when `ok` is true.
-        error: Structured failure when `ok` is false.
-        audit_event_id: Optional emitted audit event identity.
-    """
-
-    ok: bool
-    request_id: str
-    correlation_id: str
-    value: T | None = None
-    error: PortfolioErrorPayload | None = None
-    audit_event_id: str | None = None
-
-    def __post_init__(self) -> None:
-        """Validate envelope exclusivity and trace identities.
-
-        Raises:
-            ValueError: If value/error exclusivity is violated.
-        """
-        logger.debug("Validating Portfolio operation outcome")
-        _text(self.request_id, "request_id")
-        _text(self.correlation_id, "correlation_id")
-        if self.ok != (self.error is None) or (self.value is None) == self.ok:
-            raise ValueError(
-                "Portfolio outcome must contain exactly one value or error"
-            )
-
-
 __all__: tuple[str, ...] = (
     "PortfolioComponentWeight",
     "PortfolioConstructionResult",
-    "PortfolioOutcome",
 )
